@@ -14,7 +14,6 @@
     if (Model is not null && Model.Any())
     {
         goodOrgs = Model.Where(o => o.Platy.AktualniRok().Any()).ToList();
-        badOrgs = Model.Where(o => !o.Platy.AktualniRok().Any()).ToList();
     }
 
     var aktualniPlaty = goodOrgs.SelectMany(o => o.Platy.AktualniRok()).ToList();
@@ -40,24 +39,21 @@
     </ol>
 }
 
-@if (goodOrgs.Any())
+@if (Model is not null && Model.Any())
 {
     <section class="d-flex align-items-center justify-content-center">
         <div class="container">
             <div>
-                @if (Model is not null && Model.Any())
-                {
-                    <h3 class="pb-5">
-                        Oblast @ViewData["oblast"] obsahuje @goodOrgs.Count institucí, které v roce @PuRepo.DefaultYear poskytli platy.
-                    </h3>
-                }
+                <h3 class="pb-5">
+                    Oblast @ViewData["oblast"] obsahuje @goodOrgs.Count institucí, které v roce @PuRepo.DefaultYear poskytli platy.
+                </h3>
             </div>
 
             <div>
                 <div class="border-start border-primary border-opacity-25 border-2">
                     <table class="table table-borderless table-hover">
                         <tbody>
-                        @foreach (var org in goodOrgs.OrderBy(o => o.Nazev))
+                        @foreach (var org in Model.OrderBy(o => o.Nazev))
                         {
                             <tr>
                                 <td class="col-6">
@@ -67,13 +63,14 @@
                                 </td>
                                 <td class="col-2">
                                     @Html.Raw(Devmasters.Lang.CS.Plural.GetWithZero(org.Platy.AktualniRok().Count,
-                                        "<span class='text-danger'><i class='fa-solid fa-circle-xmark'></i> Nedostali jsme žádný plat</span>",
+                                        "<span class='text-danger'><i class='fa-solid fa-circle-xmark'></i> Odmítli poskytnout plat</span>",
                                         "<span class='text-warning'><i class='fa-solid fa-circle-exclamation'></i></span> Evidujeme jeden plat jedné pozice",
                                         $"<span class='text-success'><i class='fa-solid fa-badge-check'></span></i> {{0}} platy",
                                         $"<span class='text-success'><i class='fa-solid fa-badge-check'></span></i> {{0}} platů")
                                     ).
                                 </td>
-                                @{
+                                @if (org.Platy.AktualniRok().Any())
+                                {
                                     var minimalniPlatOrganizace = org.Platy.AktualniRok().Min(m => m.HrubyMesicniPlat);
                                     var maximalniPlatOrganizace = org.Platy.AktualniRok().Max(m => m.HrubyMesicniPlat);
                                     var startPer = Math.Round((minimalniPlatOrganizace - platyMin) / platyLength * 100);
@@ -82,65 +79,28 @@
                                         endPer = 1;
                                     var minimalniPlatAsString = HlidacStatu.Util.RenderData.NicePrice(minimalniPlatOrganizace).Replace(" ", "&nbsp;");
                                     var maximalniPlatAsString = HlidacStatu.Util.RenderData.NicePrice(maximalniPlatOrganizace).Replace(" ", "&nbsp;");
-                                }
-                                <td class="col-4" title="Platové rozmezí v organizace se pohybuje od @Html.Raw(minimalniPlatAsString) do @Html.Raw(maximalniPlatAsString)">
-                                    <div class="d-flex"
-                                         style="width: 100%;height: 1rem;background: linear-gradient(90deg, hsl(216deg 100% 87%) 0%, hsl(216deg 100% 26.67%) 100%);">
-                                        <div class="bg-light" style="width: @startPer%;height: 1rem"></div>
-                                        <div class="bg-transparent rounded-pill position-relative"
-                                             style="width: @endPer%;height: 1rem;">
+                                    
+                                    <td class="col-4" title="Platové rozmezí v organizace se pohybuje od @Html.Raw(minimalniPlatAsString) do @Html.Raw(maximalniPlatAsString)">
+                                        <div class="d-flex"
+                                             style="width: 100%;height: 1rem;background: linear-gradient(90deg, hsl(216deg 100% 87%) 0%, hsl(216deg 100% 26.67%) 100%);">
+                                            <div class="bg-light" style="width: @startPer%;height: 1rem"></div>
+                                            <div class="bg-transparent rounded-pill position-relative"
+                                                 style="width: @endPer%;height: 1rem;">
+                                            </div>
+                                            <div class="bg-light" style="width: @(100 - endPer - startPer)%;height: 1rem"></div>
                                         </div>
-                                        <div class="bg-light" style="width: @(100 - endPer - startPer)%;height: 1rem"></div>
-                                    </div>
-                                    <div class="d-flex justify-content-between">
-                                        <span>@Html.Raw(minimalniPlatAsString)</span>
-                                        <span>-</span>
-                                        <span>@Html.Raw(maximalniPlatAsString)</span>
-                                    </div>
-                                </td>
-                            </tr>
-                        }
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-    </section>
-}
+                                        <div class="d-flex justify-content-between">
+                                            <span>@Html.Raw(minimalniPlatAsString)</span>
+                                            <span>-</span>
+                                            <span>@Html.Raw(maximalniPlatAsString)</span>
+                                        </div>
+                                    </td>
+                                }
+                                else
+                                {
+                                    <td></td>
+                                }
 
-@if (badOrgs.Any())
-{
-    <section class="d-flex align-items-center justify-content-center alter-bg-color">
-        <div class="container">
-            <div>
-                @if (Model is not null && Model.Any())
-                {
-                    <h3 class="pb-5">
-                        Oblast @ViewData["oblast"] obsahuje @badOrgs.Count institucí, které v roce @PuRepo.DefaultYear odmítli poskytnout platy.
-                    </h3>
-                }
-            </div>
-            <div>
-                <div class="border-start border-primary border-opacity-25 border-2">
-                    <table class="table table-borderless table-hover">
-                        <tbody>
-                        @foreach (var org in badOrgs.OrderBy(o => o.Nazev))
-                        {
-                            var platy = org.Platy.AktualniRok().Count > 1 ? $", <i class='fa-solid fa-money-bills'></i> {HlidacStatu.Util.RenderData.NicePrice(org.Platy.AktualniRok().Min(m => m.HrubyMesicniPlat))} - {HlidacStatu.Util.RenderData.NicePrice(org.Platy.AktualniRok().Max(m => m.HrubyMesicniPlat))}" : ".";
-                            <tr>
-                                <td style="width:50%">
-                                    <h4>
-                                        <a asp-action="Detail" asp-route-id="@org.DS">@org.Nazev</a>
-                                    </h4>
-                                </td>
-                                <td style="width:50%">
-                                    @Html.Raw(Devmasters.Lang.CS.Plural.GetWithZero(org.Platy.AktualniRok().Count,
-                                        "<span class='text-danger'><i class='fa-solid fa-circle-xmark'></i> Nedostali jsme žádný plat</span>",
-                                        "<span class='text-warning'><i class='fa-solid fa-circle-exclamation'></i></span> Evidujeme jeden plat jedné pozice",
-                                        $"<span class='text-success'><i class='fa-solid fa-badge-check'></span></i> {{0}} platy{platy}",
-                                        $"<span class='text-success'><i class='fa-solid fa-badge-check'></span></i> {{0}} platů{platy}")
-                                    ).
-                                </td>
                             </tr>
                         }
                         </tbody>
