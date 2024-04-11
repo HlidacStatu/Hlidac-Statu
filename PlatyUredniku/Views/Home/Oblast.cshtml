@@ -14,11 +14,12 @@
     if (Model is not null && Model.Any())
     {
         goodOrgs = Model.Where(o => o.Platy.AktualniRok().Any()).ToList();
+        badOrgs = Model.Where(o => !o.Platy.AktualniRok().Any()).ToList();
     }
 
     var aktualniPlaty = goodOrgs.SelectMany(o => o.Platy.AktualniRok()).ToList();
-    var platyMin = aktualniPlaty.Min(p => p.HrubyMesicniPlat);
-    var platyMax = aktualniPlaty.Max(p => p.HrubyMesicniPlat);
+    var platyMin = aktualniPlaty.Any() ? aktualniPlaty.Min(p => p.HrubyMesicniPlat) : 0;
+    var platyMax = aktualniPlaty.Any() ? aktualniPlaty.Max(p => p.HrubyMesicniPlat) : 0;
     var platyLength = platyMax - platyMin;
     if (platyLength == 0)
         platyLength = 0.01m;
@@ -45,12 +46,25 @@
         <div class="container">
             <div>
                 <h3 class="pb-5">
-                    Oblast @ViewData["oblast"] obsahuje @goodOrgs.Count institucí, které v roce @PuRepo.DefaultYear poskytli platy.
+                    Instituce z oblasti <hashtag tag="@ViewData["oblast"]"></hashtag>
                 </h3>
+                <p>
+                    V roce @PuRepo.DefaultYear @Html.Raw(Devmasters.Lang.CS.Plural.GetWithZero(goodOrgs.Count,
+                    "odmítli poskytnout plat všechny instituce",
+                    "poskyla plat jedna instituce",
+                    $"poskytli plat {{0}} instituce",
+                    $"poskytlo plat {{0}} institucí")).
+                    @Html.Raw(Devmasters.Lang.CS.Plural.GetWithZero(badOrgs.Count,
+                    "",
+                    " Jedna instituce plat neposkytla.",
+                    $" Plat odmítly poskytnout {{0}} instituce.",
+                    $" Plat odmítlo poskytnout {{0}} institucí.")
+                    )
+                </p>
             </div>
 
             <div>
-                <div class="border-start border-primary border-opacity-25 border-2">
+                <div>
                     <table class="table table-borderless table-hover">
                         <tbody>
                         @foreach (var org in Model.OrderBy(o => o.Nazev))
