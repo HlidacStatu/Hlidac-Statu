@@ -24,7 +24,7 @@
             <a asp-action="Oblasti">Oblasti</a>
         </li>
         <li>
-            <a asp-action="Oblast" asp-route-id="@ViewData["mainTag"]">Oblast: #@ViewData["mainTag"]</a>
+            <hashtag tag="@ViewData["mainTag"]"></hashtag>
         </li>
         <li class="active">@Model.Nazev</li>
     </ol>
@@ -36,18 +36,15 @@
 
         <h2 class="pb-2 border-bottom">@Model.Nazev</h2>
         <p>
-            IČO: @Model.Ico <br/>
+            IČO: <a href="https://www.hlidacstatu.cz/subjekt/@(Model.Ico)" target=”_blank”>@Model.Ico<i class="fa-solid fa-arrow-up-right-from-square"></i></a> <br/>
             Datová schránka: @Model.DS <br/>
-            <a href="https://www.hlidacstatu.cz/subjekt/@(Model.Ico)">Více informací o subjektu</a>
         </p>
-        <h5>
+        <div>
             @foreach (var tag in Model.Tags)
             {
-                <a asp-action="Oblast" asp-route-id="@tag.Tag" class="badge bg-primary">
-                    <i class="fa-solid fa-hashtag"></i>&nbsp;@tag.Tag
-                </a>
+                <hashtag tag="@tag.Tag"></hashtag>
             }
-        </h5>
+        </div>
 
         @{
             var salariesYearly = Model.Platy
