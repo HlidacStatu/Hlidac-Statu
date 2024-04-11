@@ -25,7 +25,7 @@
             čtvrtina má plat vyšší než @(HlidacStatu.Util.RenderData.NicePrice(stats.PercentilyPlatuHlavounu[75])) měsíčně včetně odměn.
         </p>
         <p>
-            <a class="btn btn-primary btn-sm" href="/oblasti">Přehled platů v organizacích</a>
+            <a class="btn btn-primary btn-sm" href="/oblasti">Seznam všech organizací</a>
         </p>
     </div>
 </section>
@@ -36,15 +36,13 @@
         <h3 class="new-title">
             Organizací dne je - @organizationOfTheDay.Nazev 
         </h3>
-        <h5>
+        <div>
             Najdete ji v kategoriích: 
             @foreach (var tag in organizationOfTheDay.Tags)
             {
-                <a asp-action="Oblast" asp-route-id="@tag.Tag" class="badge bg-primary">
-                    <i class="fa-solid fa-hashtag"></i>&nbsp;@tag.Tag
-                </a>
+                <hashtag tag="@tag.Tag"></hashtag>
             }
-        </h5>
+        </div>
         <br/>
         
         @if (ceoOfTheDay is not null)

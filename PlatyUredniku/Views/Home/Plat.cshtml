@@ -15,7 +15,7 @@
             <a asp-action="Oblasti">Oblasti</a>
         </li>
         <li>
-            <a asp-action="Oblast" asp-route-id="@ViewData["mainTag"]">Oblast: #@ViewData["mainTag"]</a>
+            <hashtag tag="@ViewData["mainTag"]"></hashtag>
         </li>
         <li>
             <a asp-action="Detail" asp-route-id="@Model.Organizace.DS">@Model.Organizace.Nazev</a>

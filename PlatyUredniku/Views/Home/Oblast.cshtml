@@ -21,6 +21,8 @@
     var platyMin = aktualniPlaty.Min(p => p.HrubyMesicniPlat);
     var platyMax = aktualniPlaty.Max(p => p.HrubyMesicniPlat);
     var platyLength = platyMax - platyMin;
+    if (platyLength == 0)
+        platyLength = 0.01m;
 }
 
 @section breadcrumbs
@@ -32,7 +34,9 @@
         <li>
             <a asp-action="Oblasti">Oblasti</a>
         </li>
-        <li class="active">Oblast: #@ViewData["oblast"]</li>
+        <li class="active">
+            <hashtag tag="@ViewData["oblast"]"></hashtag>
+        </li>
     </ol>
 }
 

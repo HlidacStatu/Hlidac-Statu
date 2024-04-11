@@ -11,7 +11,7 @@ namespace HlidacStatu.Repositories;
 
 public static class PuRepo
 {
-    public const int DefaultYear = 2022;
+    public const int DefaultYear = 2023;
 
     public static readonly string[] MainTags =
     [
