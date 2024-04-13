@@ -30,13 +30,13 @@ namespace HlidacStatu.Extensions
 
             List<Task<Search.ISearchResult>> tasks = new()
             {
-                Helper.GeneralizeTask<Search.ISearchResult, SmlouvaSearchResult>(
+                Helper.CreateBaseTask<Search.ISearchResult, SmlouvaSearchResult>(
                     SmlouvaRepo.Searching.SimpleSearchAsync("osobaid:" + osoba.NameId, 1, 1, 0,
                         cancellationToken: cts.Token)),
-                Helper.GeneralizeTask<Search.ISearchResult, VerejnaZakazkaSearchData>(
+                Helper.CreateBaseTask<Search.ISearchResult, VerejnaZakazkaSearchData>(
                     VerejnaZakazkaRepo.Searching.SimpleSearchAsync("osobaid:" + osoba.NameId, null, 1, 1, "0",
                         cancellationToken: cts.Token)),
-                Helper.GeneralizeTask<Search.ISearchResult, DotaceSearchResult>(
+                Helper.CreateBaseTask<Search.ISearchResult, DotaceSearchResult>(
                     DotaceRepo.Searching.SimpleSearchAsync("osobaid:" + osoba.NameId, 1, 1, "0",
                         cancellationToken: cts.Token)),
             };

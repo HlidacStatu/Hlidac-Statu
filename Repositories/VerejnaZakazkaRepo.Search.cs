@@ -377,7 +377,7 @@ namespace HlidacStatu.Repositories
                 }
                 catch (Exception e)
                 {
-                    if (e.Message == "A task was canceled.")
+                    if (e.Message == "A task was canceled." || e.Message == "The operation was canceled.")
                         throw;
                     
                     AuditRepo.Add(Audit.Operations.Search, "", "", "VerejnaZakazka", "error", search.Q, null);
