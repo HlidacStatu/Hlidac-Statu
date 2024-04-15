@@ -382,7 +382,7 @@ namespace HlidacStatu.Repositories
                     
                     AuditRepo.Add(Audit.Operations.Search, "", "", "VerejnaZakazka", "error", search.Q, null);
                     if (res != null && res.ServerError != null)
-                        Manager.LogQueryError<VerejnaZakazka>(res, "Exception, Orig query:"
+                        Manager.LogQueryError<VerejnaZakazka>(res, "Exception, Orig query from catch:"
                                                                    + search.OrigQuery + "   query:"
                                                                    + search.Q
                                                                    + "\n\n res:" +

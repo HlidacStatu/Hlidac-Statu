@@ -835,7 +835,7 @@ namespace HlidacStatu.Connectors
             httpContext?.Request?.Headers?.TryGetValue("User-Agent", out browser);
 
             Elasticsearch.Net.ServerError serverErr = esReq.ServerError;
-            _logger.Error(ex, "ES query error: " + text
+            _logger.Debug(ex, "ES query error: " + text
                         + "\n\nCause:" + serverErr?.Error?.ToString()
                         + "\n\nDetail:" + esReq.DebugInformation
                         + "\n\n"
