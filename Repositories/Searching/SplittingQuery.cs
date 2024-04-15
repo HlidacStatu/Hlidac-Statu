@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Text;
 
 namespace HlidacStatu.Repositories.Searching
 {
@@ -145,21 +146,27 @@ namespace HlidacStatu.Repositories.Searching
         }
 
 
-        public string FullQuery(bool encode = true)
+        public string FullQuery()
         {
             if (_parts.Length == 0)
             {
                 return "";
             }
-            else
+
+            StringBuilder sb = new StringBuilder();
+            foreach (var part in _parts)
             {
-                return _parts
-                    .Select(m => m.ToQueryString.Trim())
-                    .Where(m => m.Length > 0)
-                    .Aggregate((f, s) => f + " " + s)
-                    .Trim();
+                var trimmed = part.ToQueryString.Trim();
+                if (!string.IsNullOrEmpty(trimmed))
+                {
+                    if (sb.Length > 0)
+                        sb.Append(" ");
+                    sb.Append(trimmed);
+                }
             }
+            return sb.ToString().Trim();
         }
+        
         Part[] _parts = null;
         public Part[] Parts { get { return _parts; } }
 
