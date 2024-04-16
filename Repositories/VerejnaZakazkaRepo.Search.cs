@@ -377,12 +377,12 @@ namespace HlidacStatu.Repositories
                 }
                 catch (Exception e)
                 {
-                    if (e.Message == "A task was canceled.")
+                    if (e.Message == "A task was canceled." || e.Message == "The operation was canceled.")
                         throw;
                     
                     AuditRepo.Add(Audit.Operations.Search, "", "", "VerejnaZakazka", "error", search.Q, null);
                     if (res != null && res.ServerError != null)
-                        Manager.LogQueryError<VerejnaZakazka>(res, "Exception, Orig query:"
+                        Manager.LogQueryError<VerejnaZakazka>(res, "Exception, Orig query from catch:"
                                                                    + search.OrigQuery + "   query:"
                                                                    + search.Q
                                                                    + "\n\n res:" +

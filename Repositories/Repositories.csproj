@@ -28,6 +28,7 @@
       <PackageReference Include="NEST" Version="7.17.5" />
       <PackageReference Include="Polly.Extensions.Http" Version="3.0.0" />
       <PackageReference Include="System.Text.Encoding.CodePages" Version="8.0.0" />
+      <PackageReference Include="ZiggyCreatures.FusionCache" Version="1.0.0" />
     </ItemGroup>
 
     <ItemGroup>

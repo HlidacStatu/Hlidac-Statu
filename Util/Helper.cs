@@ -33,7 +33,7 @@ namespace HlidacStatu.Util
         /// <summary>
         /// Makes Task return its base class 
         /// </summary>
-        public static async Task<TBase> GeneralizeTask<TBase, TDerived>(Task<TDerived> task) 
+        public static async Task<TBase> CreateBaseTask<TBase, TDerived>(Task<TDerived> task) 
             where TDerived : TBase 
         {
             return (TBase) await task;

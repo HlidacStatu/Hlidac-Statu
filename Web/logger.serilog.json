@@ -20,7 +20,6 @@
         "Args": {
           "restrictedToMinimumLevel": "Warning",
           "path": "c:/Data/Logs/HlidacStatu/Web/web.txt",
-          "formatter": "Elastic.CommonSchema.Serilog.EcsTextFormatter, Elastic.CommonSchema.Serilog",
           "rollingInterval": "Day",
           "fileSizeLimitBytes": null,
           "retainedFileCountLimit": 9,

@@ -14,6 +14,8 @@ namespace HlidacStatu.Repositories
 {
     public static class SponzoringRepo
     {
+        private static int? _defaultLastSponzoringYear = null;
+        
         public static string[] VelkeStrany = new string[]
         {
             "ANO", "ODS", "ČSSD", "Česká pirátská strana", "KSČM",
@@ -29,10 +31,12 @@ namespace HlidacStatu.Repositories
 
         public static int DefaultLastSponzoringYear()
         {
-            return HlidacStatu.Connectors.DirectDB
-                .GetList<int?>("select max(DATEPART(yy, Sponzoring.DarovanoDne)) from sponzoring where sponzoring.darovanoDne < GetDate()")
-                .FirstOrDefault()
-                 ?? (DateTime.Now.Year - 1);
+            _defaultLastSponzoringYear ??= (HlidacStatu.Connectors.DirectDB
+                                               .GetList<int?>("select max(DATEPART(yy, Sponzoring.DarovanoDne)) from sponzoring where sponzoring.darovanoDne < GetDate()")
+                                               .FirstOrDefault()
+                                           ?? (DateTime.Now.Year - 1));
+            
+            return _defaultLastSponzoringYear.Value;
         }
 
 

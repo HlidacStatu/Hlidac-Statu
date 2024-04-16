@@ -93,9 +93,92 @@
     </div>
 </section>
 
+
+@{
+    var platyPoLetech = Model.Platy.GroupBy(p => p.Rok).OrderByDescending(pg => pg.Key).ToList();
+}
+<section class="d-flex justify-content-center alter-bg-color">
+    <div class="container">
+        <h3>Přehled platů</h3>
+        <div class="nav flex-row nav-pills my-5" id="v-pills-tab" role="tablist">
+            <button class="nav-link disabled" type="button" disabled="disabled">Rok</button>
+            @{
+                string classAttributes = "nav-link active";
+
+                foreach (var platRok in platyPoLetech)
+                {
+                    <button class="@classAttributes"
+                            id="year-@platRok.Key-tab"
+                            data-bs-toggle="pill"
+                            data-bs-target="#year-@platRok.Key"
+                            type="button"
+                            role="tab"
+                            onclick="adjustDataTablesWidth()">
+                        @platRok.Key
+                    </button>
+
+                    classAttributes = "nav-link";
+                }
+            }
+        </div>
+        <div class="tab-content width-75vp">
+            @{
+                classAttributes = "tab-pane width-75vp fade show active";
+
+                foreach (var platGroup in platyPoLetech)
+                {
+                    <div class="@classAttributes" id="year-@platGroup.Key" role="tabpanel">
+                        <script>
+                            $(document).ready(function () {
+                                $('#tblSum_@platGroup.Key').DataTable(
+                                    {
+                                        'language': {
+                                            'url': '//cdn.datatables.net/plug-ins/1.13.4/i18n/cs.json'
+                                        },
+                                        "searching": false,
+                                        "paging": false,
+                                        "ordering": true,
+                                        "order": [],
+                                        "info": false
+                                    });
+                            });
+                        </script>
+
+                        <table class="table table-borderless table-hover" id="tblSum_@platGroup.Key">
+                            <thead>
+                            <tr>
+                                <th>Název pozice</th>
+                                <th>Celkový roční<br/>příjem</th>
+                                <th>Přepočtený průměrný<br/>měsíční plat</th>
+                                <th>Nefinanční bonus</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            @foreach (var plat in platGroup.OrderBy(p => p.DisplayOrder).ThenBy(p => p.NazevPozice))
+                            {
+                                <tr>
+                                    <td>
+                                        <a asp-action="Plat" asp-route-id="@plat.Id">@plat.NazevPozice</a>
+                                    </td>
+                                    <td data-order="@(HlidacStatu.Util.RenderData.OrderValueFormat(plat.CelkovyRocniPlat))" class="number">@HlidacStatu.Util.RenderData.NicePrice(plat.CelkovyRocniPlat)</td>
+                                    <td data-order="@(HlidacStatu.Util.RenderData.OrderValueFormat(plat.HrubyMesicniPlat))" class="number">@HlidacStatu.Util.RenderData.NicePrice(plat.HrubyMesicniPlat)</td>
+                                    <td>@plat.NefinancniBonus</td>
+                                </tr>
+                            }
+                            </tbody>
+                        </table>
+                    </div>
+                    classAttributes = "tab-pane width-75vp";
+                }
+            }
+        </div>
+        <partial name="ExportModal" model="@(new ExportModalViewModel() { DatovaSchranka = Model.DS, Titulek = $"Export dat pro {Model.Nazev}" })"/>
+    </div>
+</section>
+
 @if (Model.Metadata.Any())
 {
-    <section class="d-flex justify-content-center alter-bg-color">
+    <section class="d-flex justify-content-center">
         <div class="container">
             <h3>Detaily komunikace instituce ohledně platů</h3>
             <div class="nav flex-row nav-pills my-5" id="v-meta-pills-tab" role="tablist">
@@ -184,88 +267,3 @@
         </div>
     </section>
 }
-
-@{
-    var platyPoLetech = Model.Platy.GroupBy(p => p.Rok).OrderByDescending(pg => pg.Key).ToList();
-}
-
-<section class="d-flex justify-content-center @(Model.Metadata.Any()? "":"alter-bg-color")">
-    <div class="container">
-        <h3>Přehled platů</h3>
-        <div class="nav flex-row nav-pills my-5" id="v-pills-tab" role="tablist">
-            <button class="nav-link disabled" type="button" disabled="disabled">Rok</button>
-            @{
-                string classAttributes = "nav-link active";
-
-                foreach (var platRok in platyPoLetech)
-                {
-                    <button class="@classAttributes"
-                            id="year-@platRok.Key-tab"
-                            data-bs-toggle="pill"
-                            data-bs-target="#year-@platRok.Key"
-                            type="button"
-                            role="tab"
-                            onclick="adjustDataTablesWidth()">
-                        @platRok.Key
-                    </button>
-
-                    classAttributes = "nav-link";
-                }
-            }
-        </div>
-        <div class="tab-content width-75vp">
-            @{
-                classAttributes = "tab-pane width-75vp fade show active";
-
-                foreach (var platGroup in platyPoLetech)
-                {
-                    <div class="@classAttributes" id="year-@platGroup.Key" role="tabpanel">
-                        <script>
-                            $(document).ready(function () {
-                                $('#tblSum_@platGroup.Key').DataTable(
-                                    {
-                                        'language': {
-                                            'url': '//cdn.datatables.net/plug-ins/1.13.4/i18n/cs.json'
-                                        },
-                                        "searching": false,
-                                        "paging": false,
-                                        "ordering": true,
-                                        "order": [],
-                                        "scrollCollapse": true,
-                                        "scrollY": '50vh',
-                                        "info": false
-                                    });
-                            });
-                        </script>
-
-                        <table class="table table-borderless table-hover" id="tblSum_@platGroup.Key">
-                            <thead>
-                            <tr>
-                                <th>Název pozice</th>
-                                <th>Celkový roční<br/>příjem</th>
-                                <th>Přepočtený průměrný<br/>měsíční plat</th>
-                                <th>Nefinanční bonus</th>
-                            </tr>
-                            </thead>
-                            <tbody>
-                            @foreach (var plat in platGroup.OrderBy(p => p.DisplayOrder).ThenBy(p => p.NazevPozice))
-                            {
-                                <tr>
-                                    <td>
-                                        <a asp-action="Plat" asp-route-id="@plat.Id">@plat.NazevPozice</a>
-                                    </td>
-                                    <td data-order="@(HlidacStatu.Util.RenderData.OrderValueFormat(plat.CelkovyRocniPlat))" class="number">@HlidacStatu.Util.RenderData.NicePrice(plat.CelkovyRocniPlat)</td>
-                                    <td data-order="@(HlidacStatu.Util.RenderData.OrderValueFormat(plat.HrubyMesicniPlat))" class="number">@HlidacStatu.Util.RenderData.NicePrice(plat.HrubyMesicniPlat)</td>
-                                    <td>@plat.NefinancniBonus</td>
-                                </tr>
-                            }
-                            </tbody>
-                        </table>
-                    </div>
-                    classAttributes = "tab-pane width-75vp";
-                }
-            }
-        </div>
-        <partial name="ExportModal" model="@(new ExportModalViewModel() { DatovaSchranka = Model.DS, Titulek = $"Export dat pro {Model.Nazev}" })"/>
-    </div>
-</section>
