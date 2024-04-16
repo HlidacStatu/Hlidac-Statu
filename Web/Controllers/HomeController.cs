@@ -1123,7 +1123,7 @@ text zpravy: {txt}
                         );
                 }
                 if (string.IsNullOrEmpty(socialHtml))
-                    return File(@"content\icons\largetile.png", "image/png");
+                    return File(@"content/icons/largetile.png", "image/png");
                 else
                     url = mainUrl + "/imagebannercore/quote"
                         + "?title=" + System.Net.WebUtility.UrlEncode(System.Net.WebUtility.HtmlDecode(socialTitle))
@@ -1148,7 +1148,7 @@ text zpravy: {txt}
                 _logger.Error(e, "Manager Save");
             }
             if (data == null || data.Length == 0)
-                return File(@"content\icons\largetile.png", "image/png");
+                return File(@"content/icons/largetile.png", "image/png");
             else
                 return File(data, "image/png");
 

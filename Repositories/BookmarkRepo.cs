@@ -3,6 +3,7 @@ using HlidacStatu.Entities;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Linq;
+using HlidacStatu.Repositories.Cache;
 using ZiggyCreatures.Caching.Fusion;
 
 namespace HlidacStatu.Repositories
@@ -11,10 +12,7 @@ namespace HlidacStatu.Repositories
     {
         private static FusionCache _cache = new FusionCache(new FusionCacheOptions()
         {
-            DefaultEntryOptions = new FusionCacheEntryOptions
-            {
-                Duration = TimeSpan.FromMinutes(1)
-            },
+            DefaultEntryOptions = CachingOptions.Simple1m,
             CacheName = "BookmarkRepoCache",
         });
         
