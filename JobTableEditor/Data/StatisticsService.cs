@@ -1,9 +1,5 @@
 using HlidacStatu.Entities;
 using HlidacStatu.Repositories;
-using System;
-using System.Collections.Generic;
-using System.Threading;
-using System.Threading.Tasks;
 using HlidacStatu.Entities.Views;
 using Microsoft.EntityFrameworkCore;
 

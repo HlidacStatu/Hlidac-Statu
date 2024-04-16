@@ -1,15 +1,13 @@
 @using HlidacStatu.Entities
-@using HlidacStatu.DetectJobs
 @using Devmasters.Enums
-@using Microsoft.AspNetCore.Mvc.ViewFeatures
-@using Microsoft.Extensions.Logging
-@using Nest
+@using JobTableEditor.Data
 @using Serilog
 @using ILogger = Serilog.ILogger
 
-@inject JobService JobService
 @inject ToastService ToastService
 @inject IJSRuntime JSRuntime
+
+@rendermode InteractiveServer
 
 <!-- Button trigger modal -->
 <button type="button" class="btn btn-primary" @onclick="LoadJobs">

@@ -1,13 +1,10 @@
 using HlidacStatu.DetectJobs;
 using HlidacStatu.Entities;
 using HlidacStatu.Repositories;
-using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Threading;
-using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Serilog;
+using ILogger = Serilog.ILogger;
 
 namespace JobTableEditor.Data
 {
