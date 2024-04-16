@@ -21,6 +21,58 @@
             <div class="row row-cols-2 row-cols-md-4 g-0">
                 <table class="table ">
                     @{
+                        var a_it23 = new JobService.AnalysisStat(new YearlyStatisticsGroup.Key() { Obor = "IT", Rok = 2023 });
+                    }
+                    @if (HttpContext.HasAccess("IT", 2023).Result.Access == false)
+                    {
+                        <tr @Html.Raw(Request.Query["accent"].Equals("it2023") ? "class=\"table-warning\"" : "")>
+                            <td width="60%">
+                                <div class="fs-6 fw-bolder text-decoration-none text-muted">
+                                    Přehled obvyklých cen IT prací ve státní správě za rok 2023
+                                </div>
+                            </td>
+                            <td width="20%">
+                                <a class="btn btn-primary" href="/Objednat">Objednat</a>
+                            </td>
+                            <td width="20%">
+                                <div class="text-muted small">
+
+                                                                        <span class="text-danger fw-bold">
+                                Report bude k dispozici do konce dubna 2023. Ve statistice vidíte, kolik smluv jsme zatím zpracovali.
+                                </span>
+                                <br />
+                                <br />
+
+                                    Zatím máme zpracované údaje z @a_it23.PocetSmluv smluv od <b class="text-black">@a_it23.PocetZadavatelu</b> zadavatelů,
+                                    <b class="text-black">@a_it23.PocetDodavatelu</b> dodavatelů,
+                                    zahrnuje <b class="text-black">@a_it23.PocetCen cen</b>.
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                    else
+                    {
+                        <tr @Html.Raw(Request.Query["accent"].Equals("it2023") ? "class=\"table-warning\"" : "")>
+                            <td>
+                                <a class="fs-6 fw-bolder" href="/Souhrn?obor=IT&rok=2023">Přehled obvyklých cen IT prací ve státní správě za rok 2023</a>
+                            </td>
+                            <td>
+                                <a class="btn btn-primary" href="/Souhrn?obor=IT&rok=2023">Otevřít analýzu</a>
+                            </td>
+                            <td>
+                                <div class="text-muted small">
+                                                                      <span class="text-danger fw-bold">
+                                        Report bude k dispozici do konce dubna 2023. Ve statistice vidíte, kolik smluv jsme zatím zpracovali.
+                                </span>
+                                <br />
+                                <br />
+                                    Zatím máme zpracované údaje z @a_it23.PocetSmluv smluv od <b class="text-black">@a_it23.PocetZadavatelu</b> zadavatelů,
+                                    <b class="text-black">@a_it23.PocetDodavatelu</b> dodavatelů,
+                                    zahrnuje <b class="text-black">@a_it23.PocetCen cen</b>.
+                                </div>
+                            </td>
+                        </tr>
+                    }             @{
                         var a_it22 = new JobService.AnalysisStat(new YearlyStatisticsGroup.Key() { Obor = "IT", Rok = 2022 });
                     }
                     @if (HttpContext.HasAccess("IT", 2022).Result.Access == false)
