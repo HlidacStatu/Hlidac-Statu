@@ -51,6 +51,7 @@ namespace HlidacStatu.Web.HealthChecks
                     _client = new ElasticClient(settings);
 
                 var res = await _client.Nodes.StatsAsync((r) => r.Metric(Elasticsearch.Net.NodesStatsMetric.Fs));
+                //res = await _client.Nodes.StatsAsync((r) => r.Metric(Elasticsearch.Net.NodesStatsMetric.All));
 
                 List<Tuple<string, Nest.FileSystemStats.TotalFileSystemStats>> nodesStat = new List<Tuple<string, Nest.FileSystemStats.TotalFileSystemStats>>();
 
