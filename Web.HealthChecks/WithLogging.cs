@@ -6,25 +6,22 @@ using System.Threading.Tasks;
 
 namespace HlidacStatu.Web.HealthChecks
 {
-    public class WithResponseTime : IHealthCheck
+    public class WithLogging : IHealthCheck
     {
         IHealthCheck origHC = null;
-        public WithResponseTime(IHealthCheck originalHC)
+        public WithLogging(IHealthCheck originalHC)
         {
             if (originalHC == null)
                 throw new ArgumentNullException("originalHC");
             this.origHC = originalHC;
         }
-        ILogger logger = Log.ForContext<WithResponseTime>();
+        ILogger logger = Log.ForContext<WithLogging>();
 
         public async Task<HealthCheckResult> CheckHealthAsync(HealthCheckContext context, CancellationToken cancellationToken = default)
         {
-            Devmasters.DT.StopWatchEx sw = new Devmasters.DT.StopWatchEx();
-            sw.Start();
             logger.Debug("Starting {healthcheck}", origHC.GetType().FullName);
             var hcRes = await origHC.CheckHealthAsync(context, cancellationToken);
-            sw.Stop();
-            var description = hcRes.Description + $" Response time {sw.ElapsedMilliseconds} ms.";
+            var description = hcRes.Description;
             HealthCheckResult newHCres = new HealthCheckResult(
                 hcRes.Status, description, hcRes.Exception, hcRes.Data
                 );

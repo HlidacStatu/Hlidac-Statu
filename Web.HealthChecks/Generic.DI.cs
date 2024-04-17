@@ -1,4 +1,5 @@
 ﻿
+using HlidacStatu.Web.HealthChecks;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 
 using System;
@@ -32,15 +33,32 @@ namespace Microsoft.Extensions.DependencyInjection
         {
             name = name ?? typeof(T).Name;
             T instance = (T)Activator.CreateInstance(typeof(T), options);
-
+            
             return builder.Add(new HealthCheckRegistration(
                 name,
-                instance,
+                new WithLogging(instance),
                 failureStatus,
                 tags,
                 timeout));
         }
 
+
+        public static IHealthChecksBuilder AddHealthCheckWithLogging(
+            this IHealthChecksBuilder builder,
+            IHealthCheck instance,
+            string name = default, HealthStatus? failureStatus = default, IEnumerable<string> tags = default, TimeSpan? timeout = default)
+        {
+            if (instance == null)
+                throw new ArgumentNullException("instance");
+
+            name = name ?? instance.GetType().Name;
+            return builder.Add(new HealthCheckRegistration(
+                name,
+                new HlidacStatu.Web.HealthChecks.WithLogging(instance),
+                failureStatus,
+                tags,
+                timeout));
+        }
         public static IHealthChecksBuilder AddHealthCheckWithResponseTime(
             this IHealthChecksBuilder builder,
             IHealthCheck instance,

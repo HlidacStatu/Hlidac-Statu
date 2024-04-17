@@ -1198,7 +1198,7 @@ text zpravy: {txt}
         }
         public ActionResult Status()
         {
-            return View(Models.HealthCheckStatusModel.CurrentData.Get());
+            return RedirectPermanent("https://status.hlidacstatu.cz");
         }
         public ActionResult Tmp()
         {

@@ -1,5 +1,5 @@
 ﻿using Microsoft.Extensions.Diagnostics.HealthChecks;
-
+using Serilog;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
@@ -20,6 +20,7 @@ namespace HlidacStatu.Web.HealthChecks
             this.cacheTime = cacheTime;
             
         }
+        ILogger logger = Log.ForContext<CachedResult>();
 
         object lockObj = new object();
         public async Task<HealthCheckResult> CheckHealthAsync(HealthCheckContext context, CancellationToken cancellationToken = default)
@@ -40,6 +41,7 @@ namespace HlidacStatu.Web.HealthChecks
                 }
             }
 
+            logger.Debug("Starting {healthcheck}", origHC.GetType().FullName);
             var cacheRes = this.cache.Get();
             HealthCheckResult hcRes = cacheRes.Item1;
             var description = hcRes.Description;
@@ -47,6 +49,7 @@ namespace HlidacStatu.Web.HealthChecks
                 hcRes.Status, description, hcRes.Exception, hcRes.Data
                 );
 
+            logger.Debug("Ending {healthcheck} with {@HcStatus}", origHC.GetType().FullName, newHCres);
             return newHCres;
         }
     }
