@@ -110,6 +110,7 @@ namespace HlidacStatu.Entities
             WrongTable = 4,
             BrokenFormat = 5,
             MissingPrices = 6,
+            CurrentlyNotInteresting = 7,
         }
 
         [NotMapped()]

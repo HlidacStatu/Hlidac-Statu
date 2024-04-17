@@ -6,12 +6,16 @@
 @using HlidacStatu.Repositories.Exceptions
 
 @using System.Diagnostics
+@using JobTableEditor.Data
+@using Microsoft.AspNetCore.Authorization
 @using Serilog
 
 @inject JobService JobService
 @inject ToastService ToastService
 @inject AuthenticationStateProvider AuthenticationStateProvider
 @inject NavigationManager NavigationManager
+
+@rendermode InteractiveServer
 
 @attribute [Authorize(Roles = "Admin,TableEditor")]
 
@@ -77,6 +81,7 @@ else
         <div class="float-end">
             @* <button class="btn btn-outline-success" @onclick="SaveTable">Save changes</button> *@
             <Modal Table="_table"></Modal>
+            <button class="btn btn-outline-secondary" @onclick="NotItTable">Není z oblasti IT</button>
             <button class="btn btn-outline-warning" @onclick="NoPricesTable">Chybí ceny</button>
             <button class="btn btn-outline-warning" @onclick="SuperviseTable">Nevím co s tím šéfe (supervisor)</button>
             <button class="btn btn-outline-warning" @onclick="BrokenTable">Obsahuje data, ale je moc rozházená</button>
@@ -204,6 +209,15 @@ else
     private async Task NoPricesTable()
     {
         var isSaved = await TrySave(InDocTables.CheckState.MissingPrices);
+        if (isSaved)
+        {
+            await OnSaved();
+        }
+    }
+    
+    private async Task NotItTable()
+    {
+        var isSaved = await TrySave(InDocTables.CheckState.CurrentlyNotInteresting);
         if (isSaved)
         {
             await OnSaved();

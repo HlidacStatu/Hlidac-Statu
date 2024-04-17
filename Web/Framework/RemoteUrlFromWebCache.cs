@@ -41,7 +41,7 @@ namespace HlidacStatu.Web.Framework
             }
 
             if (data == null || data.Length == 0)
-                return System.IO.File.ReadAllBytes(Init.WebAppRoot + @"content\icons\largetile.png");
+                return System.IO.File.ReadAllBytes(Init.WebAppRoot + @"content/icons/largetile.png");
             else
                 return data;
         }

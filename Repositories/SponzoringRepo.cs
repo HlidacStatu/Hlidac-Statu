@@ -8,13 +8,20 @@ using System.Threading.Tasks;
 using HlidacStatu.Connectors;
 using HlidacStatu.Entities;
 using HlidacStatu.Entities.Views;
+using HlidacStatu.Repositories.Cache;
 using Microsoft.EntityFrameworkCore;
+using ZiggyCreatures.Caching.Fusion;
 
 namespace HlidacStatu.Repositories
 {
     public static class SponzoringRepo
     {
         private static int? _defaultLastSponzoringYear = null;
+        
+        private static readonly FusionCache _cache = new FusionCache(new FusionCacheOptions()
+        {
+            CacheName = "SponzoringCache",
+        });
         
         public static string[] VelkeStrany = new string[]
         {
@@ -201,11 +208,12 @@ namespace HlidacStatu.Repositories
         {
             int rok = year ?? 0;
             int yearSwitch = year.HasValue ? 0 : 1;
-
-            using (DbEntities db = new DbEntities())
+            
+            var partiesPerYear = await _cache.GetOrSetAsync<List<SponzoringOverview>>($"bookmark:{rok}_{yearSwitch}", async _=>
             {
+                using DbEntities db = new DbEntities();
                 return await db.SponzoringOverviewView.FromSqlInterpolated(
-                    $@"SELECT zs.KratkyNazev, IcoPrijemce as IcoStrany
+                        $@"SELECT zs.KratkyNazev, IcoPrijemce as IcoStrany
                       ,Year(DarovanoDne) as Rok, SUM(Hodnota) as DaryCelkem
                       ,SUM(case when icodarce is null or Len(IcoDarce) < 3 then Hodnota end) as DaryOsob
                       ,SUM(case when icodarce is not null and Len(IcoDarce) >= 3 then Hodnota end) as DaryFirem
@@ -216,7 +224,9 @@ namespace HlidacStatu.Repositories
                       WHERE (year(sp.DarovanoDne) = {rok} or 1={yearSwitch})
                       group by zs.KratkyNazev, IcoPrijemce, Year(DarovanoDne)")
                     .ToListAsync(cancellationToken);
-            }
+            }, token: cancellationToken, options: CachingOptions.Cache10m_failsave4h);
+
+            return partiesPerYear;
         }
         public static async Task<Dictionary<string, string>> StranyIco()
         {

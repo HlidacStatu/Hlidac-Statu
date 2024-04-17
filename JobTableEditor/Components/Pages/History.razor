@@ -2,11 +2,13 @@
 @using HlidacStatu.Entities
 @using System.Threading
 @using HlidacStatu.Entities.Views
+@using JobTableEditor.Data
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Components.Authorization
 
 @inject JobService JobService
 @inject StatisticsService StatisticsService
 @inject AuthenticationStateProvider AuthenticationStateProvider
-@inject NavigationManager NavigationManager
 
 @attribute [Authorize(Roles = "Admin,TableEditor")]
 

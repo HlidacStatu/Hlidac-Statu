@@ -1,20 +1,71 @@
+using HlidacStatu.Entities;
 using HlidacStatu.LibCore.Extensions;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.Hosting;
+using JobTableEditor;
+using JobTableEditor.Areas.Identity;
+using JobTableEditor.Components;
+using JobTableEditor.Data;
+using Microsoft.AspNetCore.Components.Authorization;
+using Microsoft.AspNetCore.DataProtection;
+using Microsoft.EntityFrameworkCore;
 
-namespace JobTableEditor
+var builder = WebApplication.CreateBuilder(args);
+builder.ConfigureHostForWeb(args);
+builder.WebHost.UseStaticWebAssets();
+
+
+// Service registration
+//inicializace statických proměnných
+var configuration = builder.Configuration;
+Devmasters.Config.Init(configuration);
+System.Globalization.CultureInfo.DefaultThreadCurrentCulture = HlidacStatu.Util.Consts.czCulture;
+System.Globalization.CultureInfo.DefaultThreadCurrentUICulture = HlidacStatu.Util.Consts.csCulture;
+
+builder.Services.AddRazorComponents()
+    .AddInteractiveServerComponents();
+
+string? connectionString = configuration.GetConnectionString("DefaultConnection");
+// for scoped services (mainly for identity)
+builder.Services.AddDbContext<DbEntities>(options =>
+    options.UseSqlServer(connectionString));
+            
+// Add a DbContext to store your Database Keys
+builder.Services.AddDbContext<HlidacKeysContext>(options =>
+    options.UseSqlServer(connectionString));
+            
+// using Microsoft.AspNetCore.DataProtection;
+builder.Services.AddDataProtection()
+    .PersistKeysToDbContext<HlidacKeysContext>()
+    .SetApplicationName("HlidacStatu");
+            
+IdentityStartup.AddIdentity(builder.Services);
+            
+builder.Services.AddScoped<AuthenticationStateProvider, RevalidatingIdentityAuthenticationStateProvider<ApplicationUser>>();
+
+
+builder.Services.AddSingleton<JobService>();
+builder.Services.AddScoped<ToastService>();
+builder.Services.AddScoped<StatisticsService>();
+
+
+var app = builder.Build();
+
+// HTTP request pipeline.
+if (!app.Environment.IsDevelopment())
 {
-    public class Program
-    {
-        public static void Main(string[] args)
-        {
-            CreateHostBuilder(args)
-                .Build().Run();
-        }
-
-        public static IHostBuilder CreateHostBuilder(string[] args) =>
-            Host.CreateDefaultBuilder(args)
-                .ConfigureHostForWeb(args)
-                .ConfigureWebHostDefaults(webBuilder => { webBuilder.UseStartup<Startup>(); });
-    }
+    app.UseExceptionHandler("/Error", createScopeForErrors: true);
+    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
+    app.UseHsts();
 }
+
+app.UseHttpsRedirection();
+
+app.UseStaticFiles();
+app.UseAntiforgery();
+
+app.UseAuthentication();
+app.UseAuthorization();
+
+app.MapRazorComponents<App>()
+    .AddInteractiveServerRenderMode();
+
+app.Run();

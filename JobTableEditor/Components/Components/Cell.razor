@@ -1,8 +1,10 @@
-@using Microsoft.AspNetCore.Components
-@using HlidacStatu.DetectJobs
 @using System.ComponentModel
+@using JobTableEditor.Data
 
 @implements IDisposable
+
+@rendermode InteractiveServer
+
 
 <td class="@dropClass @cellStyle" @onclick="ColorChange"
     draggable="true"

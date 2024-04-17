@@ -1,5 +1,4 @@
-using System;
-using JobTableEditor.Components;
+using JobTableEditor.Components.Components;
 
 namespace JobTableEditor.Data
 {
