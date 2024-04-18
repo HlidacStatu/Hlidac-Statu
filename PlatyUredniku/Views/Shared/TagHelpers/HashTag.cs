@@ -13,6 +13,7 @@ public class HashTag : TagHelper
         output.TagMode = TagMode.StartTagAndEndTag;
 
         output.Attributes.SetAttribute("href", $"Oblast/{Tag}");
+        output.Attributes.SetAttribute("class", "badge rounded-pill text-bg-dark");
         output.Content.AppendHtml($"<i class=\"fa-solid fa-hashtag\"></i>{Tag}");
     }
 }
