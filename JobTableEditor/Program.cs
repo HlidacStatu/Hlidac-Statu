@@ -23,6 +23,8 @@ System.Globalization.CultureInfo.DefaultThreadCurrentUICulture = HlidacStatu.Uti
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 
+builder.Services.AddCascadingAuthenticationState();
+
 string? connectionString = configuration.GetConnectionString("DefaultConnection");
 // for scoped services (mainly for identity)
 builder.Services.AddDbContext<DbEntities>(options =>
