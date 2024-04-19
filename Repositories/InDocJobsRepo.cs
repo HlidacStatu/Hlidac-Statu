@@ -12,11 +12,13 @@ namespace HlidacStatu.Repositories
     public class InDocJobsRepo
     {
         static List<InDocJobNames> jobnames = null;
+
         static InDocJobsRepo()
         {
             if (jobnames == null)
                 LoadJobNames();
         }
+
         static void LoadJobNames()
         {
             using (DbEntities db = new DbEntities())
@@ -47,12 +49,11 @@ namespace HlidacStatu.Repositories
             normalizedFromText = Devmasters.TextUtil.ReplaceDuplicates(normalizedFromText, " ").Trim();
 
             return normalizedFromText;
-
         }
 
         public static InDocJobNames FindSimilar(string subject, string jobraw)
         {
-            string subjectNormalized = subject?.ToUpper() ?? ""; 
+            string subjectNormalized = subject?.ToUpper() ?? "";
             jobraw = NormalizeTextNoDiacriticsLower(jobraw);
 
             foreach (var jobname in jobnames.Where(m => m.Subject == subjectNormalized))
@@ -76,6 +77,7 @@ namespace HlidacStatu.Repositories
                     bestJob = jobname;
                 }
             }
+
             if (bestDistance <= acceptableDistnace)
                 return bestJob;
 
@@ -86,34 +88,40 @@ namespace HlidacStatu.Repositories
         {
             await using (DbEntities db = new DbEntities())
             {
-                var found = await db.InDocJobs.AsNoTracking().AsAsyncEnumerable().FirstOrDefaultAsync(m => m.Pk == jobPk);
+                var found = await db.InDocJobs.AsNoTracking().AsAsyncEnumerable()
+                    .FirstOrDefaultAsync(m => m.Pk == jobPk);
                 return found;
             }
         }
-        
+
         public static bool IsTableHavingItJob(long tablePk)
         {
             using DbEntities db = new DbEntities();
-            
-            var job = db.InDocJobs.AsNoTracking().FirstOrDefault(j => j.TablePk == tablePk);
+
+            var job = db.InDocJobs.AsNoTracking()
+                .FirstOrDefault(j => j.TablePk == tablePk
+                                     && (j.Unit == InDocJobs.MeasureUnit.Day || j.Unit == InDocJobs.MeasureUnit.Hour)
+                                     && j.PriceVATCalculated != null);
+
             if (job is not null)
             {
-                return (job.Unit == InDocJobs.MeasureUnit.Day || job.Unit == InDocJobs.MeasureUnit.Hour)
-                       && job.PriceVATCalculated is not null;
+                return true;
             }
-                
+
             return false;
         }
 
 
-        public static async Task SaveAsync(InDocJobs job, bool dontChangeDates = false, bool rewriteAll = false, string forceSubject = null)
+        public static async Task SaveAsync(InDocJobs job, bool dontChangeDates = false, bool rewriteAll = false,
+            string forceSubject = null)
         {
             await using (DbEntities db = new DbEntities())
             {
                 //find jobGroup
                 if (string.IsNullOrEmpty(job.JobGrouped) || rewriteAll)
                 {
-                    string jobSubject = db.InDocTables.AsQueryable().FirstOrDefault(m => m.Pk == job.TablePk)?.Klasifikace;
+                    string jobSubject = db.InDocTables.AsQueryable().FirstOrDefault(m => m.Pk == job.TablePk)
+                        ?.Klasifikace;
                     if (forceSubject != null)
                         jobSubject = forceSubject;
 
@@ -122,7 +130,7 @@ namespace HlidacStatu.Repositories
                     {
                         job.JobGrouped = classif.First().Class;
                         job.Tags = null;
-                        if (classif.First().Tags?.Count()>0)
+                        if (classif.First().Tags?.Count() > 0)
                             job.Tags = String.Join('|', classif.First().Tags);
                     }
                     else
@@ -140,10 +148,11 @@ namespace HlidacStatu.Repositories
                         }
                     }
                 }
+
                 if (dontChangeDates == false)
                     job.Created = DateTime.Now;
 
-                
+
                 job.NormalizePrices();
 
                 db.InDocJobs.Attach(job);
@@ -158,13 +167,13 @@ namespace HlidacStatu.Repositories
             }
         }
 
-        public static async Task SaveAsync(IEnumerable<InDocJobs> jobs, bool dontChangeDates = false, bool rewriteAll = false)
+        public static async Task SaveAsync(IEnumerable<InDocJobs> jobs, bool dontChangeDates = false,
+            bool rewriteAll = false)
         {
             foreach (var job in jobs)
             {
-                await SaveAsync(job,dontChangeDates,rewriteAll);
+                await SaveAsync(job, dontChangeDates, rewriteAll);
             }
-
         }
 
         public static async Task RemoveAsync(long tablePk)
