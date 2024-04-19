@@ -155,6 +155,24 @@ namespace HlidacStatu.Repositories
                 .AsNoTracking()
                 .ToList();
         }
+        
+        public static List<InDocTables> GetForMachineLearning()
+        {
+            var wantedTrainingStatuses = new[]
+            {
+                //stavy 0, 1, 3 nechceme dávat do učení, protože by kazily výsledky
+                (int)InDocTables.CheckState.Done,
+                (int)InDocTables.CheckState.WrongTable,
+                (int)InDocTables.CheckState.BrokenFormat,
+                (int)InDocTables.CheckState.MissingPrices,
+            };
+            
+            using DbEntities db = new DbEntities();
+            return db.InDocTables
+                .AsNoTracking()
+                .Where(t => wantedTrainingStatuses.Contains(t.Status))
+                .ToList();
+        }
 
         public static async Task<int> WaitingInQueue(string obor, CancellationToken cancellationToken)
         {

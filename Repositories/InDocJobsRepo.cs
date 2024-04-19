@@ -9,7 +9,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace HlidacStatu.Repositories
 {
-    public partial class InDocJobsRepo
+    public class InDocJobsRepo
     {
         static List<InDocJobNames> jobnames = null;
         static InDocJobsRepo()
@@ -174,7 +174,5 @@ namespace HlidacStatu.Repositories
                 await db.Database.ExecuteSqlInterpolatedAsync($"Delete from InDocJobs where tablepk = {tablePk}");
             }
         }
-        
-        
     }
 }
