@@ -124,7 +124,7 @@ namespace HlidacStatu.Repositories
 
             public static QueryContainer GetSimpleQuery(string query)
             {
-                var qc = SimpleQueryCreator.GetSimpleQuery<Smlouva>(query, Irules);
+                QueryContainer qc = SimpleQueryCreator.GetSimpleQuery<Smlouva>(query, Irules);
                 return qc;
             }
 
