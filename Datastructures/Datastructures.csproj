@@ -16,7 +16,7 @@
 		<PackageReference Include="DeepCloner" Version="0.10.4" />
 		<PackageReference Include="Devmasters.DT" Version="5.0.22" />
 		<PackageReference Include="Devmasters.Enums" Version="5.0.22" />
-		<PackageReference Include="Devmasters.SpeechToText" Version="5.1.0" />
+		<PackageReference Include="Devmasters.SpeechToText" Version="5.1.24" />
 		<PackageReference Include="MimeMapping" Version="3.0.1" />
 		<PackageReference Include="NEST" Version="7.17.5" />
 		<PackageReference Include="Newtonsoft.Json" Version="13.0.3" />

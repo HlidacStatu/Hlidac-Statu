@@ -15,7 +15,7 @@
 
 		<PackageReference Include="Devmasters.Net" Version="5.0.22" />
 
-		<PackageReference Include="Devmasters.SpeechToText" Version="5.1.0" />
+		<PackageReference Include="Devmasters.SpeechToText" Version="5.1.24" />
 
 		<PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
 	</ItemGroup>
