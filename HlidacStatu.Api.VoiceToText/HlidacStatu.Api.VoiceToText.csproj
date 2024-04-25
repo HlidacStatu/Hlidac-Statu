@@ -13,7 +13,7 @@
 
 	<ItemGroup>
 
-		<PackageReference Include="Devmasters.Net" Version="5.0.11" />
+		<PackageReference Include="Devmasters.Net" Version="5.0.22" />
 
 		<PackageReference Include="Devmasters.SpeechToText" Version="5.1.0" />
 

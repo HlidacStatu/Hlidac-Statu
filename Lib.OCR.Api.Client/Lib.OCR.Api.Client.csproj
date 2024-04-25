@@ -8,13 +8,13 @@
   </PropertyGroup>
   
   <ItemGroup>
-    <PackageReference Include="Devmasters.Core" Version="5.0.1" />
-    <PackageReference Include="Devmasters.DT" Version="5.0.0" />
-    <PackageReference Include="Devmasters.Lang" Version="5.0.0" />
-    <PackageReference Include="Devmasters.Net" Version="5.0.11" />
+    <PackageReference Include="Devmasters.Core" Version="5.0.22" />
+    <PackageReference Include="Devmasters.DT" Version="5.0.22" />
+    <PackageReference Include="Devmasters.Lang" Version="5.0.22" />
+    <PackageReference Include="Devmasters.Net" Version="5.0.22" />
     <PackageReference Include="Microsoft.AspNetCore.Http.Features" Version="5.0.17" />
     <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
-    <PackageReference Include="Microsoft.Net.Http.Headers" Version="8.0.3" />
+    <PackageReference Include="Microsoft.Net.Http.Headers" Version="8.0.4" />
     <PackageReference Include="MimeMapping" Version="3.0.1" />
     <PackageReference Include="System.Data.DataSetExtensions" Version="4.5.0" />
     <PackageReference Include="System.Threading.Tasks.Parallel" Version="4.3.0" />

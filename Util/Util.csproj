@@ -12,15 +12,15 @@
 		<CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
 	</PropertyGroup>
 	<ItemGroup>
-		<PackageReference Include="Devmasters.Batch" Version="5.0.0" />
-		<PackageReference Include="Devmasters.Cache.AWS_S3" Version="5.0.1" />
-		<PackageReference Include="Devmasters.Collections" Version="5.0.0" />
-		<PackageReference Include="Devmasters.DT" Version="5.0.0" />
+		<PackageReference Include="Devmasters.Batch" Version="5.0.22" />
+		<PackageReference Include="Devmasters.Cache.AWS_S3" Version="5.0.22" />
+		<PackageReference Include="Devmasters.Collections" Version="5.0.22" />
+		<PackageReference Include="Devmasters.DT" Version="5.0.22" />
 		
-		<PackageReference Include="Devmasters.Enums" Version="5.0.0" />
-		<PackageReference Include="Devmasters.IO" Version="5.0.0" />
-		<PackageReference Include="Devmasters.Net" Version="5.0.11" />
-		<PackageReference Include="Microsoft.AspNetCore.Components" Version="8.0.3" />
+		<PackageReference Include="Devmasters.Enums" Version="5.0.22" />
+		<PackageReference Include="Devmasters.IO" Version="5.0.22" />
+		<PackageReference Include="Devmasters.Net" Version="5.0.22" />
+		<PackageReference Include="Microsoft.AspNetCore.Components" Version="8.0.4" />
 		<PackageReference Include="Microsoft.AspNetCore.Html.Abstractions" Version="2.2.0" />
 <!--		<PackageReference Include="jnm2.ReferenceAssemblies.net35" Version="1.0.1" />-->
 		<PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
