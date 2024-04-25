@@ -9,6 +9,8 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Net.Sockets;
+using System.Threading.RateLimiting;
 using System.Threading.Tasks;
 using Devmasters;
 using Devmasters.Collections;
@@ -18,20 +20,67 @@ using Polly;
 using Polly.Extensions.Http;
 using Polly.Retry;
 using HlidacStatu.DS.Api;
+using Polly.RateLimiting;
 
 namespace HlidacStatu.Repositories
 {
     public static partial class VerejnaZakazkaRepo
     {
-        private static AsyncRetryPolicy<HttpResponseMessage> _retryPolicy = HttpPolicyExtensions
-            .HandleTransientHttpError()
-            .OrResult(r => r.RequestMessage.RequestUri.Host.Contains("bpapi.datlab.eu") &&
-                           r.StatusCode == HttpStatusCode.Forbidden)
-            .WaitAndRetryAsync(3, _ => TimeSpan.FromSeconds(1));
+        // private static AsyncRetryPolicy<HttpResponseMessage> _retryPolicy = HttpPolicyExtensions
+        //     .HandleTransientHttpError()
+        //     .OrResult(r => r.RequestMessage.RequestUri.Host.Contains("bpapi.datlab.eu") &&
+        //                    r.StatusCode == HttpStatusCode.Forbidden)
+        //     .WaitAndRetryAsync(3, _ => TimeSpan.FromSeconds(1));
+
+        private static ResiliencePipeline<HttpResponseMessage> _retryPipeline;
+        private static ResiliencePipeline<HttpResponseMessage> _retryThrottledPipeline;
 
         // Emergency HttpClient for cases where it is not convinient to inject HttpClient.
         private static Lazy<HttpClient> _lazyHttpClient = new();
 
+        static VerejnaZakazkaRepo()
+        {
+            _retryPipeline = new ResiliencePipelineBuilder<HttpResponseMessage>()
+                .AddRetry(new()
+                {
+                    ShouldHandle = static args => args.Outcome switch
+                    {
+                        { Exception: HttpRequestException } or { Exception: SocketException} => PredicateResult.True(),
+                        { Result.StatusCode: >= HttpStatusCode.InternalServerError } => PredicateResult.True(),
+                        { Result.StatusCode: HttpStatusCode.RequestTimeout } => PredicateResult.True(),
+                        var outcome when outcome.Result?.StatusCode == HttpStatusCode.Forbidden 
+                                         && outcome.Result?.RequestMessage?.RequestUri?.Host.Contains("bpapi.datlab.eu") == true => PredicateResult.True(),
+                        _ => PredicateResult.False()
+                    },
+                    MaxRetryAttempts = 3,
+                    Delay = TimeSpan.FromSeconds(2),
+                    UseJitter = true
+                })
+                .Build();
+            
+            _retryThrottledPipeline = new ResiliencePipelineBuilder<HttpResponseMessage>()
+                .AddConcurrencyLimiter(new ConcurrencyLimiterOptions()
+                {
+                    PermitLimit = 3,
+                    QueueLimit = 10000
+                })
+                .AddRetry(new()
+                {
+                    ShouldHandle = static args => args.Outcome switch
+                    {
+                        { Exception: HttpRequestException } or { Exception: SocketException} => PredicateResult.True(),
+                        { Result.StatusCode: >= HttpStatusCode.InternalServerError } => PredicateResult.True(),
+                        { Result.StatusCode: HttpStatusCode.RequestTimeout } => PredicateResult.True(),
+                        _ => PredicateResult.False()
+                    },
+                    MaxRetryAttempts = 3,
+                    Delay = TimeSpan.FromSeconds(2),
+                    UseJitter = true
+                })
+                .Build();
+
+        }
+        
         private static void AfterSave(VerejnaZakazka vz)
         {
             RecalculateItemRepo.AddFirmaToProcessingQueue(vz.Zadavatel.ICO, RecalculateItem.StatisticsTypeEnum.VZ , $"VZ {vz.Id}");
@@ -412,14 +461,38 @@ namespace HlidacStatu.Repositories
             // turn off retry
             // using var responseMessage = await _retryPolicy.ExecuteAsync(() =>
             //     httpClient.GetAsync(url, HttpCompletionOption.ResponseHeadersRead));
-            
-            using var responseMessage = await httpClient.GetAsync(url, HttpCompletionOption.ResponseHeadersRead);
+
+            HttpResponseMessage responseMessage = null;
+            try
+            {
+                if (url.Contains("nen.nipez.cz"))
+                {
+                    responseMessage = await _retryThrottledPipeline.ExecuteAsync(async _ => 
+                        await httpClient.GetAsync(url, HttpCompletionOption.ResponseHeadersRead));
+                }
+                else
+                {
+                    responseMessage = await _retryPipeline.ExecuteAsync(async _ => 
+                        await httpClient.GetAsync(url, HttpCompletionOption.ResponseHeadersRead));
+                }
+
+            }
+            catch (RateLimiterRejectedException)
+            {
+                _logger.Warning($"Rate limit exceeded for Url: {url} for VZ (id:{vzId}).");
+            }
+            catch (Exception exception)
+            {
+                _logger.Warning($"During downloadFileAsync there was an exception {exception}. For Url: {url} for VZ (id:{vzId}).");
+            }
+
+            // using var responseMessage = await httpClient.GetAsync(url, HttpCompletionOption.ResponseHeadersRead);
             
             if (!responseMessage.IsSuccessStatusCode)
             {
                 _logger.Error($"Url: {url} for VZ (id:{vzId}) returned {responseMessage.StatusCode} status code with reason phrase: {responseMessage.ReasonPhrase}.");
                 throw new Exception(
-                    $"Can't download file for VZ (id:{vzId}). Http status code: {responseMessage.StatusCode}");
+                    $"Can't download file (Url: {url}) for VZ (id:{vzId}). Http status code: {responseMessage.StatusCode}");
             }
             
             try
