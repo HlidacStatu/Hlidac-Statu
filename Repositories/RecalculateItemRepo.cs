@@ -28,10 +28,12 @@ namespace HlidacStatu.Repositories
         public static void RecalculateTasks(int? threads = null, bool debug = false, string[] ids = null,
             Action<string> outputWriter = null,
             Action<Devmasters.Batch.ActionProgressData> progressWriter = null,
-            int? maxItemsInBatch = null
+            int? maxItemsInBatch = null, bool cascadeParents = true
             )
         {
             bool onlyIds = ids?.Count() > 0;
+            if (cascadeParents == false)
+                _logger.Information($"Don't cascade to parents");
 
             maxItemsInBatch = maxItemsInBatch ?? int.MaxValue;
 
@@ -61,8 +63,14 @@ namespace HlidacStatu.Repositories
                     .ToList();
                 System.Collections.Concurrent.ConcurrentBag<RecalculateItem> list = new(items);
 
-                uniqueItems = items.SelectMany(m=> CascadeItems(m, ref list))
-                    .Distinct(comparer).ToList();
+                if (cascadeParents)
+                    uniqueItems = items.SelectMany(m => CascadeItems(m, ref list))
+                        .Distinct(comparer).ToList();
+                else
+                {
+                    uniqueItems = items.Distinct(comparer).ToList();
+                }
+
             }
             else
             {
