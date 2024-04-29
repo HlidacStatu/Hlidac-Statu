@@ -119,7 +119,8 @@ namespace HlidacStatu.Repositories
                     return new Devmasters.Batch.ActionOutputData();
                 },
                 outputWriter, progressWriter,
-                !System.Diagnostics.Debugger.IsAttached, maxDegreeOfParallelism: threads,
+                true, //!System.Diagnostics.Debugger.IsAttached, 
+                maxDegreeOfParallelism: threads,
                 monitor: new MonitoredTaskRepo.ForBatch()
                 );
 

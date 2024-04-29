@@ -47,7 +47,7 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Devmasters.Core">
-      <Version>5.0.22</Version>
+      <Version>5.0.23</Version>
     </PackageReference>
     <PackageReference Include="Devmasters.Net">
       <Version>5.0.22</Version>
