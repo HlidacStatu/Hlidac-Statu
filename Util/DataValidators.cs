@@ -1,5 +1,7 @@
-﻿using System;
+﻿using Serilog;
+using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -8,6 +10,7 @@ namespace HlidacStatu.Util
 {
     public static partial class DataValidators
     {
+        private static readonly ILogger logger = Log.ForContext("SourceMethod", "DataValidators");
 
         static string root = null;
         static List<string> czobce = new List<string>();
@@ -34,44 +37,51 @@ return Devmasters.Net.HttpClient.Simple.GetAsync("https://somedata.hlidacstatu.c
 
         static DataValidators()
         {
-
-            if (!string.IsNullOrEmpty(Devmasters.Config.GetWebConfigValue("WebAppDataPath")))
+            try
             {
-                root = Devmasters.Config.GetWebConfigValue("WebAppDataPath");
-            }
-            //else if (System.Web.HttpContext.Current != null) //inside web app
-            //{
-            //    root = System.Web.HttpContext.Current.Server.MapPath("~/App_Data/");
-            //}
-            else
-                root = Devmasters.IO.IOTools.GetExecutingDirectoryName(true);
-
-            if (!root.EndsWith(Path.DirectorySeparatorChar))
-                root = root + Path.DirectorySeparatorChar;
-
-
-            var tmp = statyCache.Get().Split("\n", StringSplitOptions.RemoveEmptyEntries)
-                .Select(m => m.Split('\t'))
-                .Select(mm =>
+                if (!string.IsNullOrEmpty(Devmasters.Config.GetWebConfigValue("WebAppDataPath")))
                 {
-                    if (mm.Length == 1)
-                        return new KeyValuePair<string, string>(Devmasters.TextUtil.RemoveDiacritics(mm[0]).Trim().ToLower(), "xx");
-                    else
-                        return new KeyValuePair<string, string>(Devmasters.TextUtil.RemoveDiacritics(mm[0]).Trim().ToLower(), mm[1].Length == 0 ? "xx" : mm[1].Trim());
-                });
-            foreach (var kv in tmp.Where(m => !string.IsNullOrEmpty(m.Key)))
-            {
-                if (!ciziStaty.ContainsKey(kv.Key))
-                    ciziStaty.Add(kv.Key, kv.Value);
+                    root = Devmasters.Config.GetWebConfigValue("WebAppDataPath");
+                }
+                //else if (System.Web.HttpContext.Current != null) //inside web app
+                //{
+                //    root = System.Web.HttpContext.Current.Server.MapPath("~/App_Data/");
+                //}
+                else
+                    root = Devmasters.IO.IOTools.GetExecutingDirectoryName(true);
+
+                if (!root.EndsWith(Path.DirectorySeparatorChar))
+                    root = root + Path.DirectorySeparatorChar;
+
+
+                var tmp = statyCache.Get().Split("\n", StringSplitOptions.RemoveEmptyEntries)
+                    .Select(m => m.Split('\t'))
+                    .Select(mm =>
+                    {
+                        if (mm.Length == 1)
+                            return new KeyValuePair<string, string>(Devmasters.TextUtil.RemoveDiacritics(mm[0]).Trim().ToLower(), "xx");
+                        else
+                            return new KeyValuePair<string, string>(Devmasters.TextUtil.RemoveDiacritics(mm[0]).Trim().ToLower(), mm[1].Length == 0 ? "xx" : mm[1].Trim());
+                    });
+                foreach (var kv in tmp.Where(m => !string.IsNullOrEmpty(m.Key)))
+                {
+                    if (!ciziStaty.ContainsKey(kv.Key))
+                        ciziStaty.Add(kv.Key, kv.Value);
+                }
+
+                czobce = czobceCache.Get().Split("\n", StringSplitOptions.RemoveEmptyEntries)
+                        .Select(m => Devmasters.TextUtil.RemoveDiacritics(m.Trim()).ToLower())
+                        .ToList();
+                skobce = skobceCache.Get().Split("\n", StringSplitOptions.RemoveEmptyEntries)
+                        .Select(m => Devmasters.TextUtil.RemoveDiacritics(m.Trim()).ToLower())
+                        .ToList();
+
+
             }
-
-            czobce = czobceCache.Get().Split("\n", StringSplitOptions.RemoveEmptyEntries)
-                    .Select(m => Devmasters.TextUtil.RemoveDiacritics(m.Trim()).ToLower())
-                    .ToList();
-            skobce = skobceCache.Get().Split("\n", StringSplitOptions.RemoveEmptyEntries)
-                    .Select(m => Devmasters.TextUtil.RemoveDiacritics(m.Trim()).ToLower())
-                    .ToList();
-
+            catch (Exception e)
+            {
+                logger.Fatal(e, "Cannot initialize DataValidators class");
+            }
 
         }
 
