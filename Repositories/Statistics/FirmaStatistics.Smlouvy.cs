@@ -11,14 +11,16 @@ namespace HlidacStatu.Repositories.Statistics
     public static partial class FirmaStatistics
     {
 
-        static Devmasters.Cache.Elastic.Manager<StatisticsSubjectPerYear<Smlouva.Statistics.Data>, (Firma firma, HlidacStatu.DS.Graphs.Relation.AktualnostType aktualnost, int? obor)> 
+        static Devmasters.Cache.Redis.Manager<StatisticsSubjectPerYear<Smlouva.Statistics.Data>, (Firma firma, HlidacStatu.DS.Graphs.Relation.AktualnostType aktualnost, int? obor)> 
             _holdingSmlouvaCache
-            = Devmasters.Cache.Elastic.Manager<StatisticsSubjectPerYear<Smlouva.Statistics.Data>, (Firma firma, HlidacStatu.DS.Graphs.Relation.AktualnostType aktualnost, int? obor)>
+            = Devmasters.Cache.Redis.Manager<StatisticsSubjectPerYear<Smlouva.Statistics.Data>, (Firma firma, HlidacStatu.DS.Graphs.Relation.AktualnostType aktualnost, int? obor)>
                 .GetSafeInstance("Holding_SmlouvyStatistics_v1_",
                     (obj) => _holdingCalculateStats(obj.firma, obj.aktualnost, obj.obor),
                     TimeSpan.Zero,
-                    Devmasters.Config.GetWebConfigValue("ESConnection").Split(';'),
-                    Devmasters.Config.GetWebConfigValue("ElasticCacheDbname"),
+                    Devmasters.Config.GetWebConfigValue("RedisServerUrls").Split(';'),
+                    Devmasters.Config.GetWebConfigValue("RedisBucketName"),
+                    Devmasters.Config.GetWebConfigValue("RedisUsername"),
+                    Devmasters.Config.GetWebConfigValue("RedisCachePassword"),
                     keyValueSelector: obj => obj.firma.ICO + "-" + obj.aktualnost.ToString() + "-" + (obj.obor ?? 0));
 
         public static StatisticsSubjectPerYear<Smlouva.Statistics.Data> CachedHoldingStatisticsSmlouvy(
@@ -45,14 +47,16 @@ namespace HlidacStatu.Repositories.Statistics
 
         }
 
-        static Devmasters.Cache.Elastic.ManagerAsync<StatisticsSubjectPerYear<Smlouva.Statistics.Data>, (Firma firma, int? obor)> 
+        static Devmasters.Cache.Redis.ManagerAsync<StatisticsSubjectPerYear<Smlouva.Statistics.Data>, (Firma firma, int? obor)> 
             _smlouvaCache
-            = Devmasters.Cache.Elastic.ManagerAsync<StatisticsSubjectPerYear<Smlouva.Statistics.Data>, (Firma firma, int? obor)>
+            = Devmasters.Cache.Redis.ManagerAsync<StatisticsSubjectPerYear<Smlouva.Statistics.Data>, (Firma firma, int? obor)>
                 .GetSafeInstance("Firma_SmlouvyStatistics_v3_",
                     async (obj) => await _calculateSmlouvyStatsAsync(obj.firma, obj.obor),
                     TimeSpan.Zero,
-                    Devmasters.Config.GetWebConfigValue("ESConnection").Split(';'),
-                    Devmasters.Config.GetWebConfigValue("ElasticCacheDbname"),
+                    Devmasters.Config.GetWebConfigValue("RedisServerUrls").Split(';'),
+                    Devmasters.Config.GetWebConfigValue("RedisBucketName"),
+                    Devmasters.Config.GetWebConfigValue("RedisUsername"),
+                    Devmasters.Config.GetWebConfigValue("RedisCachePassword"),
                     keyValueSelector: obj => obj.firma.ICO + "-" + (obj.obor ?? 0));
 
         public static StatisticsSubjectPerYear<Smlouva.Statistics.Data> GetStatistics(Firma firma, int? obor, bool forceUpdateCache = false)

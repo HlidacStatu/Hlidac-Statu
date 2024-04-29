@@ -331,13 +331,15 @@ namespace HlidacStatu.Extensions
             return ret;
         }
 
-        static Devmasters.Cache.Elastic.Manager<InfoFact[], Osoba> _cacheInfoFacts =
-            Devmasters.Cache.Elastic.Manager<InfoFact[], Osoba>
+        static Devmasters.Cache.Redis.Manager<InfoFact[], Osoba> _cacheInfoFacts =
+            Devmasters.Cache.Redis.Manager<InfoFact[], Osoba>
                 .GetSafeInstance("Osoba_InfoFacts_v1_",
                     (obj) => InfoFactsAsync(obj).GetAwaiter().GetResult(),
                     TimeSpan.Zero,
-                    Devmasters.Config.GetWebConfigValue("ESConnection").Split(';'),
-                    Devmasters.Config.GetWebConfigValue("ElasticCacheDbname"),
+                    Devmasters.Config.GetWebConfigValue("RedisServerUrls").Split(';'),
+                    Devmasters.Config.GetWebConfigValue("RedisBucketName"),
+                    Devmasters.Config.GetWebConfigValue("RedisUsername"),
+                    Devmasters.Config.GetWebConfigValue("RedisCachePassword"),
                     keyValueSelector: obj => $"_infofacts_{obj.NameId}");
 
         public static InfoFact[] InfoFactsCached(this Osoba osoba, bool forceUpdateCache = false)

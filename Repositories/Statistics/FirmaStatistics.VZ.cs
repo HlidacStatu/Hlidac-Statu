@@ -12,23 +12,27 @@ namespace HlidacStatu.Repositories.Statistics
 {
     public static partial class FirmaStatistics
     {
-        static Devmasters.Cache.Elastic.Manager<StatisticsSubjectPerYear<Firma.Statistics.VZ>, Firma>
-           _VZCache = Devmasters.Cache.Elastic.Manager<StatisticsSubjectPerYear<Firma.Statistics.VZ>, Firma>
+        static Devmasters.Cache.Redis.Manager<StatisticsSubjectPerYear<Firma.Statistics.VZ>, Firma>
+           _VZCache = Devmasters.Cache.Redis.Manager<StatisticsSubjectPerYear<Firma.Statistics.VZ>, Firma>
                .GetSafeInstance("Firma_VZStatistics_",
                     (firma) => CalculateVZStat(firma),
                     TimeSpan.Zero,
-                    Devmasters.Config.GetWebConfigValue("ESConnection").Split(';'),
-                    Devmasters.Config.GetWebConfigValue("ElasticCacheDbname"),
+                    Devmasters.Config.GetWebConfigValue("RedisServerUrls").Split(';'),
+                    Devmasters.Config.GetWebConfigValue("RedisBucketName"),
+                    Devmasters.Config.GetWebConfigValue("RedisUsername"),
+                    Devmasters.Config.GetWebConfigValue("RedisCachePassword"),
                     keyValueSelector: f => f.ICO);
 
 
-        static Devmasters.Cache.Elastic.Manager<StatisticsSubjectPerYear<Firma.Statistics.VZ>, (Firma firma, HlidacStatu.DS.Graphs.Relation.AktualnostType aktualnost)>
-           _holdingVZCache = Devmasters.Cache.Elastic.Manager<StatisticsSubjectPerYear<Firma.Statistics.VZ>, (Firma firma, HlidacStatu.DS.Graphs.Relation.AktualnostType aktualnost)>
+        static Devmasters.Cache.Redis.Manager<StatisticsSubjectPerYear<Firma.Statistics.VZ>, (Firma firma, HlidacStatu.DS.Graphs.Relation.AktualnostType aktualnost)>
+           _holdingVZCache = Devmasters.Cache.Redis.Manager<StatisticsSubjectPerYear<Firma.Statistics.VZ>, (Firma firma, HlidacStatu.DS.Graphs.Relation.AktualnostType aktualnost)>
                .GetSafeInstance("Holding_VZStatistics_",
                    (obj) => CalculateHoldingVZStat(obj.firma, obj.aktualnost),
                    TimeSpan.Zero,
-Devmasters.Config.GetWebConfigValue("ESConnection").Split(';'),
-Devmasters.Config.GetWebConfigValue("ElasticCacheDbname"),
+                    Devmasters.Config.GetWebConfigValue("RedisServerUrls").Split(';'),
+                    Devmasters.Config.GetWebConfigValue("RedisBucketName"),
+                    Devmasters.Config.GetWebConfigValue("RedisUsername"),
+                    Devmasters.Config.GetWebConfigValue("RedisCachePassword"),
 keyValueSelector: obj => obj.firma.ICO + "-" + obj.aktualnost.ToString());
 
         public static StatisticsSubjectPerYear<Firma.Statistics.VZ> CachedHoldingStatisticsVZ(

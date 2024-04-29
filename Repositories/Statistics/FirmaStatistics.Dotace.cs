@@ -10,25 +10,29 @@ namespace HlidacStatu.Repositories.Statistics
 {
     public static partial class FirmaStatistics
     {
-        static Devmasters.Cache.Elastic.ManagerAsync<StatisticsSubjectPerYear<Firma.Statistics.Dotace>, Firma>
-            _dotaceCache = Devmasters.Cache.Elastic.ManagerAsync<StatisticsSubjectPerYear<Firma.Statistics.Dotace>, Firma>
+        static Devmasters.Cache.Redis.ManagerAsync<StatisticsSubjectPerYear<Firma.Statistics.Dotace>, Firma>
+            _dotaceCache = Devmasters.Cache.Redis.ManagerAsync<StatisticsSubjectPerYear<Firma.Statistics.Dotace>, Firma>
                 .GetSafeInstance("Firma_DotaceStatistics_v2",
                     async (firma) => await CalculateDotaceStatAsync(firma),
                     TimeSpan.Zero,
-                    Devmasters.Config.GetWebConfigValue("ESConnection").Split(';'),
-                    Devmasters.Config.GetWebConfigValue("ElasticCacheDbname"),
+                    Devmasters.Config.GetWebConfigValue("RedisServerUrls").Split(';'),
+                    Devmasters.Config.GetWebConfigValue("RedisBucketName"),
+                    Devmasters.Config.GetWebConfigValue("RedisUsername"),
+                    Devmasters.Config.GetWebConfigValue("RedisCachePassword"),
                     keyValueSelector: f => f.ICO);
 
 
-        static Devmasters.Cache.Elastic.Manager<StatisticsSubjectPerYear<Firma.Statistics.Dotace>, (Firma firma,
+        static Devmasters.Cache.Redis.Manager<StatisticsSubjectPerYear<Firma.Statistics.Dotace>, (Firma firma,
                 HlidacStatu.DS.Graphs.Relation.AktualnostType aktualnost)>
-            _holdingDotaceCache = Devmasters.Cache.Elastic.Manager<StatisticsSubjectPerYear<Firma.Statistics.Dotace>, (Firma firma,
+            _holdingDotaceCache = Devmasters.Cache.Redis.Manager<StatisticsSubjectPerYear<Firma.Statistics.Dotace>, (Firma firma,
                     HlidacStatu.DS.Graphs.Relation.AktualnostType aktualnost)>
                 .GetSafeInstance("Holding_DotaceStatistics_v3",
                     (obj) => CalculateHoldingDotaceStat(obj.firma, obj.aktualnost),
                     TimeSpan.Zero,
-                    Devmasters.Config.GetWebConfigValue("ESConnection").Split(';'),
-                    Devmasters.Config.GetWebConfigValue("ElasticCacheDbname"),
+                    Devmasters.Config.GetWebConfigValue("RedisServerUrls").Split(';'),
+                    Devmasters.Config.GetWebConfigValue("RedisBucketName"),
+                    Devmasters.Config.GetWebConfigValue("RedisUsername"),
+                    Devmasters.Config.GetWebConfigValue("RedisCachePassword"),
                     keyValueSelector: obj => obj.firma.ICO + "-" + obj.aktualnost.ToString());
 
         public static StatisticsSubjectPerYear<Firma.Statistics.Dotace> CachedHoldingStatisticsDotace(

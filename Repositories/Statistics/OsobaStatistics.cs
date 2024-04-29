@@ -11,14 +11,16 @@ namespace HlidacStatu.Repositories.Statistics
 {
     public static class OsobaStatistics
     {
-        static Devmasters.Cache.Elastic.Manager<Osoba.Statistics.RegistrSmluv, (Osoba os, int aktualnost, int? obor)>
+        static Devmasters.Cache.Redis.Manager<Osoba.Statistics.RegistrSmluv, (Osoba os, int aktualnost, int? obor)>
             _cache
-                = Devmasters.Cache.Elastic.Manager<Osoba.Statistics.RegistrSmluv, (Osoba os, int aktualnost, int? obor)>
+                = Devmasters.Cache.Redis.Manager<Osoba.Statistics.RegistrSmluv, (Osoba os, int aktualnost, int? obor)>
                     .GetSafeInstance("Osoba_SmlouvyStatistics_v1_",
                         (obj) => Calculate(obj.os, (Relation.AktualnostType)obj.aktualnost, obj.obor),
                         TimeSpan.Zero,
-                        Devmasters.Config.GetWebConfigValue("ESConnection").Split(';'),
-                        Devmasters.Config.GetWebConfigValue("ElasticCacheDbname"),
+                    Devmasters.Config.GetWebConfigValue("RedisServerUrls").Split(';'),
+                    Devmasters.Config.GetWebConfigValue("RedisBucketName"),
+                    Devmasters.Config.GetWebConfigValue("RedisUsername"),
+                    Devmasters.Config.GetWebConfigValue("RedisCachePassword"),
                         keyValueSelector: obj => $"{obj.os.NameId}/{obj.aktualnost}/{(obj.obor ?? 0)}");
 
 

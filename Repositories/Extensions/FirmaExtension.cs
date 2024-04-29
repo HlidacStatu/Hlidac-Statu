@@ -573,14 +573,16 @@ namespace HlidacStatu.Extensions
                 .Any();
         }
         
-        static Devmasters.Cache.Elastic.Manager<InfoFact[], Firma> _infoFactsCache()
+        static Devmasters.Cache.Redis.Manager<InfoFact[], Firma> _infoFactsCache()
         {
-            var cache = Devmasters.Cache.Elastic.Manager<InfoFact[], Firma>
+            var cache = Devmasters.Cache.Redis.Manager<InfoFact[], Firma>
                 .GetSafeInstance("Firma_InfoFacts",
                     (firma) => GetInfoFactsAsync(firma).ConfigureAwait(false).GetAwaiter().GetResult(),
                     TimeSpan.Zero,
-                    Devmasters.Config.GetWebConfigValue("ESConnection").Split(';'),
-                    Devmasters.Config.GetWebConfigValue("ElasticCacheDbname"),
+                    Devmasters.Config.GetWebConfigValue("RedisServerUrls").Split(';'),
+                    Devmasters.Config.GetWebConfigValue("RedisBucketName"),
+                    Devmasters.Config.GetWebConfigValue("RedisUsername"),
+                    Devmasters.Config.GetWebConfigValue("RedisCachePassword"),
                     keyValueSelector: f => f.ICO);
 
             return cache;

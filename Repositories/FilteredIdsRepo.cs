@@ -25,13 +25,15 @@ namespace HlidacStatu.Repositories
         public static class CachedIds
         {
 
-            private static volatile Devmasters.Cache.Elastic.Manager<string[], QueryBatch> cacheSmlouvy
-                = Devmasters.Cache.Elastic.Manager<string[], QueryBatch>.GetSafeInstance(
+            private static volatile Devmasters.Cache.Redis.Manager<string[], QueryBatch> cacheSmlouvy
+                = Devmasters.Cache.Redis.Manager<string[], QueryBatch>.GetSafeInstance(
                     "cachedIdsSmlouvy",
                     q => GetSmlouvyIdAsync(q).ConfigureAwait(false).GetAwaiter().GetResult(),
                     TimeSpan.FromHours(24),
-                    Devmasters.Config.GetWebConfigValue("ESConnection").Split(';'),
-                    Devmasters.Config.GetWebConfigValue("ElasticCacheDbname"), 
+                    Devmasters.Config.GetWebConfigValue("RedisServerUrls").Split(';'),
+                    Devmasters.Config.GetWebConfigValue("RedisBucketName"),
+                    Devmasters.Config.GetWebConfigValue("RedisUsername"),
+                    Devmasters.Config.GetWebConfigValue("RedisCachePassword"),
                     keyValueSelector: key => key.TaskPrefix + Devmasters.Crypto.Hash.ComputeHashToHex(key.Query)
                     );
 
