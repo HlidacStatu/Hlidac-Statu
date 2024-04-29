@@ -24,6 +24,8 @@ namespace HlidacStatu.Entities
         [Required] public long TablePk { get; set; }
         [Required] [StringLength(300)] public string JobRaw { get; set; }
         [StringLength(300)] public string JobGrouped { get; set; }
+        [StringLength(300)] public string JobGrouped2 { get; set; }
+        [StringLength(300)] public string JobGrouped3 { get; set; }
 
         [Column(TypeName = "datetime")] public DateTime? Created { get; set; }
         public string Tags { get; set; }

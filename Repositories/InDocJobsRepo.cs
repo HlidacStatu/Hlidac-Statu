@@ -125,13 +125,30 @@ namespace HlidacStatu.Repositories
                     if (forceSubject != null)
                         jobSubject = forceSubject;
 
-                    var classif = HlidacStatu.Connectors.External.TablePolozkaClassif.GetClassification(job.JobRaw);
-                    if (classif?.Count() > 0)
+                    var classifications = HlidacStatu.Connectors.External.TablePolozkaClassif.GetClassification(job.JobRaw);
+                    if (classifications?.Count() > 0)
                     {
-                        job.JobGrouped = classif.First().Class;
+                        var maxScore = classifications.Max(c => c.Prediction);
+                        var topClassifications = classifications.Where(c => c.Prediction == maxScore).ToList();
+                        
+                        if (topClassifications.Count() > 0)
+                        {
+                            job.JobGrouped = topClassifications[0].Class;
+                        }
+
+                        if (topClassifications.Count() > 1)
+                        {
+                            job.JobGrouped2 = topClassifications[1].Class;
+                        }
+
+                        if (topClassifications.Count() > 2)
+                        {
+                            job.JobGrouped3 = topClassifications[2].Class;
+                        }
+                        
                         job.Tags = null;
-                        if (classif.First().Tags?.Count() > 0)
-                            job.Tags = String.Join('|', classif.First().Tags);
+                        if (topClassifications.First().Tags?.Count() > 0)
+                            job.Tags = String.Join('|', topClassifications.First().Tags);
                     }
                     else
                     {
