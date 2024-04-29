@@ -6,7 +6,7 @@ using HlidacStatu.Repositories.Statistics;
 
 namespace HlidacStatu.Extensions;
 
-public static class OsobaExtension
+public static class OsobaExtension2
 {
     public static async Task<bool> IsInterestingToShowAsync(this Osoba osoba)
     {

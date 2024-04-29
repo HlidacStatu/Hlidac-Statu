@@ -325,14 +325,16 @@ namespace HlidacStatu.Repositories
             }
         }
 
-        public static IEnumerable<Firma> AllFirmyInRS(bool skipDS_Nace = false)
+        //don;t use it, 
+/*        public static IEnumerable<Firma> AllFirmyInRS(bool skipDS_Nace = false)
         {
             return AllIcoInRS()
                 .Select(m => FromIco(m))
+                .ToArray()
                 .Where(m => m.Valid);
 
         }
-
+*/
         private static Firma FromDataRow(DataRow dr, bool skipDS_Nace = false)
         {
             Firma f = new Firma();

@@ -596,7 +596,7 @@ namespace HlidacStatu.Extensions
             var inf = _infoFactsCache().Get(firma);
             return inf;
         }
-        private static async Task<InfoFact[]> GetInfoFactsAsync(Firma firma)
+        public static async Task<InfoFact[]> GetInfoFactsAsync(Firma firma)
         {
             var sName = firma.ObecneJmeno();
             bool sMuzsky = sName == uradName;
