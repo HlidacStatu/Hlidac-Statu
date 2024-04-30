@@ -326,7 +326,7 @@
                 var linkUrl = $"{ViewContext.GetBaseUrl()}/subjekt/{Model.ICO}";
             }
             <share-facebook url="@linkUrl"></share-facebook>
-            <share-twitter url="@linkUrl" text="@($"{Model.Jmeno} na @HlidacStatu - {Model.InfoFacts().First().Render(false)}")"></share-twitter>
+            <share-twitter url="@linkUrl" text="@($"{Model.Jmeno} na @HlidacStatu - {Model.InfoFacts().FirstOrDefault()?.Render(false)}")"></share-twitter>
             <share-widget url="@linkUrl"></share-widget>
         </div>
     </div>

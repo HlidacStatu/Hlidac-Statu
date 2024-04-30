@@ -137,7 +137,7 @@ else
                         Sdílení
                     </span><br />
                     <share-facebook></share-facebook>
-                    <share-twitter text="@($"Insolvenční řízení '{Model.Rizeni.BookmarkName()}' na @HlidacStatu - {Model.Rizeni.InfoFacts().First().Render(false)}")"></share-twitter>
+                    <share-twitter text="@($"Insolvenční řízení '{Model.Rizeni.BookmarkName()}' na @HlidacStatu - {Model.Rizeni.InfoFacts().FirstOrDefault()?.Render(false)}")"></share-twitter>
                     @if (Model.Rizeni.OnRadar)
                     {
                         <share-widget></share-widget>
@@ -201,7 +201,7 @@ else
                 <td>Sdílení</td>
                 <td>
                     <share-facebook></share-facebook>
-                    <share-twitter text="@($"Insolvenční řízení '{Model.Rizeni.BookmarkName()}' na @HlidacStatu - {Model.Rizeni.InfoFacts().First().Render(false)}")"></share-twitter>
+                    <share-twitter text="@($"Insolvenční řízení '{Model.Rizeni.BookmarkName()}' na @HlidacStatu - {Model.Rizeni.InfoFacts().FirstOrDefault()?.Render(false)}")"></share-twitter>
                     <share-widget></share-widget>
                 </td>
             </tr>

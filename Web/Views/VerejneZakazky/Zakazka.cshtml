@@ -252,7 +252,7 @@ else
             <td>Sdílení</td>
             <td>
                 <share-facebook></share-facebook>
-                <share-twitter text="@($"Zakázka '{Devmasters.TextUtil.ShortenText(Model.NazevZakazky, 80)}' na @HlidacStatu - {Model.InfoFacts().First().Render(false)}")"></share-twitter>
+                <share-twitter text="@($"Zakázka '{Devmasters.TextUtil.ShortenText(Model.NazevZakazky, 80)}' na @HlidacStatu - {Model.InfoFacts().FirstOrDefault()?.Render(false)}")"></share-twitter>
                 <share-widget></share-widget>
             </td>
         </tr>
