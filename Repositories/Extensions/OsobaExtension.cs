@@ -319,6 +319,8 @@ namespace HlidacStatu.Extensions
             Relation.AktualnostType minAktualnost, int? obor = null, bool forceUpdateCache = false)
         {
             //temporary fix for null values
+            //STAT FIX
+            return new();
 
             var ret = OsobaStatistics.CachedStatistics(osoba, minAktualnost, obor, forceUpdateCache);
             foreach (var k in ret.SoukromeFirmy.Keys)
@@ -344,6 +346,9 @@ namespace HlidacStatu.Extensions
 
         public static InfoFact[] InfoFactsCached(this Osoba osoba, bool forceUpdateCache = false)
         {
+            //STAT FIX
+            return Array.Empty<InfoFact>();
+
             if (forceUpdateCache)
                 _cacheInfoFacts.Delete(osoba);
 

@@ -18,6 +18,7 @@ using HlidacStatu.Entities.KIndex;
 using HlidacStatu.Entities.Views;
 using HlidacStatu.Lib.Data.External.RPP;
 using HlidacStatu.Repositories.Analysis.KorupcniRiziko;
+using Devmasters.Collections;
 
 namespace HlidacStatu.Extensions
 {
@@ -149,23 +150,35 @@ namespace HlidacStatu.Extensions
 
         public static Lib.Analytics.StatisticsSubjectPerYear<Firma.Statistics.Dotace> StatistikaDotaci(this Firma firma, bool forceUpdateCache = false)
         {
+            //STAT FIX
+            return new();
+
             return FirmaStatistics.CachedStatisticsDotace(firma,forceUpdateCache);
         }
         public static Lib.Analytics.StatisticsSubjectPerYear<Firma.Statistics.Dotace> HoldingStatistikaDotaci(
             this Firma firma,
             Relation.AktualnostType aktualnost, bool forceUpdateCache = false)
         {
+            //STAT FIX
+            return new();
+
             return FirmaStatistics.CachedHoldingStatisticsDotace(firma, aktualnost,forceUpdateCache);
         }
 
         public static Lib.Analytics.StatisticsSubjectPerYear<Firma.Statistics.VZ> StatistikaVerejneZakazky(this Firma firma, bool forceUpdateCache = false)
         {
+            //STAT FIX
+            return new ();
+
             return FirmaStatistics.CachedStatisticsVZ(firma, forceUpdateCache);
         }
         public static Lib.Analytics.StatisticsSubjectPerYear<Firma.Statistics.VZ> HoldingStatistikaVerejneZakazky(
             this Firma firma,
             Relation.AktualnostType aktualnost, bool forceUpdateCache = false)
         {
+            //STAT FIX
+            return new();
+
             return FirmaStatistics.CachedHoldingStatisticsVZ(firma, aktualnost, forceUpdateCache);
         }
 
@@ -361,6 +374,9 @@ namespace HlidacStatu.Extensions
             this Firma firma,
             Relation.AktualnostType aktualnost, int? obor = null, bool forceUpdateCache = false)
         {
+            //STAT FIX
+            return new Lib.Analytics.StatisticsSubjectPerYear<Smlouva.Statistics.Data>();
+
             return FirmaStatistics.CachedHoldingStatisticsSmlouvy(firma, aktualnost, obor, forceUpdateCache);
         }
 
@@ -590,6 +606,9 @@ namespace HlidacStatu.Extensions
 
         public static InfoFact[] InfoFacts(this Firma firma, bool forceUpdateCache = false) //otázka jestli tohle nebrat z cachce
         {
+            //STAT FIX
+            return Array.Empty<InfoFact>();
+
             if (forceUpdateCache)
                 _infoFactsCache().Delete(firma);
 
