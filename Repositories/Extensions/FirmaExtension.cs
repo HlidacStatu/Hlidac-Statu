@@ -151,7 +151,7 @@ namespace HlidacStatu.Extensions
         public static Lib.Analytics.StatisticsSubjectPerYear<Firma.Statistics.Dotace> StatistikaDotaci(this Firma firma, bool forceUpdateCache = false)
         {
             //STAT FIX
-            return new();
+            //return new();
 
             return FirmaStatistics.CachedStatisticsDotace(firma,forceUpdateCache);
         }
@@ -160,7 +160,7 @@ namespace HlidacStatu.Extensions
             Relation.AktualnostType aktualnost, bool forceUpdateCache = false)
         {
             //STAT FIX
-            return new();
+            //return new();
 
             return FirmaStatistics.CachedHoldingStatisticsDotace(firma, aktualnost,forceUpdateCache);
         }
@@ -168,7 +168,7 @@ namespace HlidacStatu.Extensions
         public static Lib.Analytics.StatisticsSubjectPerYear<Firma.Statistics.VZ> StatistikaVerejneZakazky(this Firma firma, bool forceUpdateCache = false)
         {
             //STAT FIX
-            return new ();
+            //return new ();
 
             return FirmaStatistics.CachedStatisticsVZ(firma, forceUpdateCache);
         }
@@ -177,7 +177,7 @@ namespace HlidacStatu.Extensions
             Relation.AktualnostType aktualnost, bool forceUpdateCache = false)
         {
             //STAT FIX
-            return new();
+            //return new();
 
             return FirmaStatistics.CachedHoldingStatisticsVZ(firma, aktualnost, forceUpdateCache);
         }
@@ -375,7 +375,7 @@ namespace HlidacStatu.Extensions
             Relation.AktualnostType aktualnost, int? obor = null, bool forceUpdateCache = false)
         {
             //STAT FIX
-            return new Lib.Analytics.StatisticsSubjectPerYear<Smlouva.Statistics.Data>();
+            //return new Lib.Analytics.StatisticsSubjectPerYear<Smlouva.Statistics.Data>();
 
             return FirmaStatistics.CachedHoldingStatisticsSmlouvy(firma, aktualnost, obor, forceUpdateCache);
         }
@@ -607,7 +607,7 @@ namespace HlidacStatu.Extensions
         public static InfoFact[] InfoFacts(this Firma firma, bool forceUpdateCache = false) //otázka jestli tohle nebrat z cachce
         {
             //STAT FIX
-            return Array.Empty<InfoFact>();
+            //return Array.Empty<InfoFact>();
 
             if (forceUpdateCache)
                 _infoFactsCache().Delete(firma);

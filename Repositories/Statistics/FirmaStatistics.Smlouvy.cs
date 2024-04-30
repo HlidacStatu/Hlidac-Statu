@@ -63,7 +63,7 @@ namespace HlidacStatu.Repositories.Statistics
         {
             StatisticsSubjectPerYear<Smlouva.Statistics.Data> ret = new StatisticsSubjectPerYear<Smlouva.Statistics.Data>();
             //STAT FIX
-            return ret;
+            //return ret;
 
             if (string.IsNullOrWhiteSpace(firma.ICO))
             {
