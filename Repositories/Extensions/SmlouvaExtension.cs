@@ -158,9 +158,9 @@ namespace HlidacStatu.Extensions
                 }
             }
 
-            var _infofacts = f.OrderByDescending(o => o.Level).ToArray();
+            var infofacts = f.OrderByDescending(o => o.Level).ToArray();
 
-            return _infofacts;
+            return infofacts;
         }
 
 

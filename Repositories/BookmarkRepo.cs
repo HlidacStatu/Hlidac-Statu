@@ -3,7 +3,7 @@ using HlidacStatu.Entities;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Linq;
-using HlidacStatu.Repositories.Cache;
+using HlidacStatu.Util;
 using ZiggyCreatures.Caching.Fusion;
 
 namespace HlidacStatu.Repositories

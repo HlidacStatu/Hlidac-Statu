@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 using HlidacStatu.Connectors;
 using HlidacStatu.Entities;
 using HlidacStatu.Entities.Views;
-using HlidacStatu.Repositories.Cache;
+using HlidacStatu.Util;
 using Microsoft.EntityFrameworkCore;
 using ZiggyCreatures.Caching.Fusion;
 

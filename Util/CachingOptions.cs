@@ -1,7 +1,7 @@
 using System;
 using ZiggyCreatures.Caching.Fusion;
 
-namespace HlidacStatu.Repositories.Cache;
+namespace HlidacStatu.Util;
 
 public static class CachingOptions
 {
