@@ -95,7 +95,7 @@ namespace HlidacStatu.Repositories.Statistics
         public static StatisticsPerYear<Smlouva.Statistics.Data> SoukromeFirmySummary(this Osoba.Statistics.RegistrSmluv registrSmluv)
         {
             if (registrSmluv._soukromeFirmySummary == null)
-                registrSmluv._soukromeFirmySummary = registrSmluv.SoukromeFirmy.Values.AggregateStats();
+                registrSmluv._soukromeFirmySummary = registrSmluv.SoukromeFirmy?.Values.AggregateStats();
 
             return registrSmluv._soukromeFirmySummary;
         }
@@ -103,7 +103,7 @@ namespace HlidacStatu.Repositories.Statistics
         public static StatisticsPerYear<Smlouva.Statistics.Data> StatniFirmySummary(this Osoba.Statistics.RegistrSmluv registrSmluv)
         {
             if (registrSmluv._statniFirmySummary == null)
-                registrSmluv._statniFirmySummary = registrSmluv.StatniFirmy.Values.AggregateStats();
+                registrSmluv._statniFirmySummary = registrSmluv.StatniFirmy?.Values.AggregateStats();
 
             return registrSmluv._statniFirmySummary;
         }
@@ -111,7 +111,7 @@ namespace HlidacStatu.Repositories.Statistics
         public static StatisticsPerYear<Smlouva.Statistics.Data> NeziskovkySummary(this Osoba.Statistics.RegistrSmluv registrSmluv)
         {
             if (registrSmluv._neziskovkySummary == null)
-                registrSmluv._neziskovkySummary = registrSmluv.SoukromeFirmy
+                registrSmluv._neziskovkySummary = registrSmluv.SoukromeFirmy?
                     .Where(k => registrSmluv.Neziskovky().Contains(k.Key))
                     .Select(m => m.Value)
                     .AggregateStats();

@@ -148,7 +148,7 @@
     @{
         laps.StopPreviousAndStartNextLap("registr smluv");
     }
-    @if (statistics.SoukromeFirmySummary().Summary().PocetSmluv + statistics.NeziskovkySummary().Summary().PocetSmluv > 0)
+    @if (statistics.SoukromeFirmySummary()?.Summary().PocetSmluv + statistics.NeziskovkySummary()?.Summary().PocetSmluv > 0)
     {
         <div>
             <h4>
@@ -169,7 +169,7 @@
     @{
         laps.StopPreviousAndStartNextLap("angazovanost");
     }
-    @if (statistics.SoukromeFirmy.Count > 0 || statistics.StatniFirmy.Count > 0)
+    @if (statistics.SoukromeFirmy?.Count > 0 || statistics.StatniFirmy?.Count > 0)
     {
         <div>
             <h4>
