@@ -75,7 +75,7 @@ namespace HlidacStatu.Repositories.Statistics
                 _smlouvaCache.DeleteAsync((firma, obor)).ConfigureAwait(false).GetAwaiter().GetResult();
 
             ret = _smlouvaCache.GetAsync((firma, obor)).ConfigureAwait(false).GetAwaiter().GetResult();
-
+            //_smlouvaCache.RemoveCacheInstance((firma, obor));
             return ret;
         }
         public static void SetStatistics(Firma firma, int? obor, StatisticsSubjectPerYear<Smlouva.Statistics.Data> data)
