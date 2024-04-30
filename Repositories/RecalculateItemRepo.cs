@@ -28,11 +28,11 @@ namespace HlidacStatu.Repositories
         public static void RecalculateTasks(int? threads = null, bool debug = false, string[] ids = null,
             Action<string> outputWriter = null,
             Action<Devmasters.Batch.ActionProgressData> progressWriter = null,
-            int? maxItemsInBatch = null, bool cascadeParents = true
+            int? maxItemsInBatch = null, bool reloadAllTask = true, bool noRebuild = true
             )
         {
             bool onlyIds = ids?.Count() > 0;
-            if (cascadeParents == false)
+            if (reloadAllTask == false)
                 _logger.Information($"Don't cascade to parents");
 
             maxItemsInBatch = maxItemsInBatch ?? int.MaxValue;
@@ -63,7 +63,7 @@ namespace HlidacStatu.Repositories
                     .ToList();
                 System.Collections.Concurrent.ConcurrentBag<RecalculateItem> list = new(items);
 
-                if (cascadeParents)
+                if (reloadAllTask)
                     uniqueItems = items.SelectMany(m => CascadeItems(m, ref list))
                         .Distinct(comparer).ToList();
                 else
@@ -112,7 +112,7 @@ namespace HlidacStatu.Repositories
                 {
                     if (debug)
                         _logger.Debug($"start statistics firma {item.Id}");
-                    RecalculateFirma(item);
+                    RecalculateFirma(item, noRebuild);
                     if (debug)
                         _logger.Debug($"end statistics firma {item.Id}");
 
@@ -137,7 +137,7 @@ namespace HlidacStatu.Repositories
                 {
                     if (debug)
                         _logger.Debug($"start statistics osoba {item.Id}");
-                    RecalculateOsoba(item);
+                    RecalculateOsoba(item, noRebuild);
                     if (debug)
                         _logger.Debug($"end statistics osoba {item.Id}");
 
@@ -167,19 +167,19 @@ namespace HlidacStatu.Repositories
 
         }
 
-        public static void RecalculateOsoba(RecalculateItem item)
+        public static void RecalculateOsoba(RecalculateItem item, bool noRebuild)
         {
             var o = Osoby.GetByNameId.Get(item.Id);
             if (o != null)
             {
-                _ = o.StatistikaRegistrSmluv(DS.Graphs.Relation.AktualnostType.Nedavny, forceUpdateCache: true);
-                _ = o.InfoFactsCached(forceUpdateCache: true);
+                _ = o.StatistikaRegistrSmluv(DS.Graphs.Relation.AktualnostType.Nedavny, forceUpdateCache: noRebuild ? false : true);
+                _ = o.InfoFactsCached(forceUpdateCache: noRebuild ? false : true);
                 RecalculateItemRepo.Finish(item);
 
             }
         }
 
-        public static void RecalculateFirma(RecalculateItem item)
+        public static void RecalculateFirma(RecalculateItem item, bool noRebuild)
         {
             var f = Firmy.Get(item.Id);
             if (f != null)
@@ -188,20 +188,20 @@ namespace HlidacStatu.Repositories
                 {
                     case RecalculateItem.StatisticsTypeEnum.Smlouva:
                         _ = f.StatistikaRegistruSmluv(forceUpdateCache: true);
-                        _ = f.HoldingStatisticsRegistrSmluv(DS.Graphs.Relation.AktualnostType.Nedavny, forceUpdateCache: true);
+                        _ = f.HoldingStatisticsRegistrSmluv(DS.Graphs.Relation.AktualnostType.Nedavny, forceUpdateCache: noRebuild ? false : true);
                         break;
                     case RecalculateItem.StatisticsTypeEnum.VZ:
                         _ = f.StatistikaVerejneZakazky(forceUpdateCache: true);
-                        _ = f.HoldingStatistikaVerejneZakazky(DS.Graphs.Relation.AktualnostType.Nedavny, forceUpdateCache: true);
+                        _ = f.HoldingStatistikaVerejneZakazky(DS.Graphs.Relation.AktualnostType.Nedavny, forceUpdateCache: noRebuild ? false : true);
                         break;
                     case RecalculateItem.StatisticsTypeEnum.Dotace:
                         _ = f.StatistikaDotaci(forceUpdateCache: true);
-                        _ = f.HoldingStatistikaDotaci(DS.Graphs.Relation.AktualnostType.Nedavny, forceUpdateCache: true);
+                        _ = f.HoldingStatistikaDotaci(DS.Graphs.Relation.AktualnostType.Nedavny, forceUpdateCache: noRebuild ? false : true);
                         break;
                     default:
                         break;
                 }
-                _ = f.InfoFacts(forceUpdateCache: true);
+                _ = f.InfoFacts(forceUpdateCache: noRebuild ? false : true);
                 RecalculateItemRepo.Finish(item);
             }
         }
