@@ -17,7 +17,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Devmasters.Imaging" Version="4.5.22.2" />
+    <PackageReference Include="Devmasters.Imaging" Version="5.0.22" />
     <PackageReference Include="Emgu.CV" Version="4.8.1.5350" />
     <PackageReference Include="Emgu.CV.Bitmap" Version="4.8.1.5350" />
     <PackageReference Include="Emgu.CV.runtime.windows" Version="4.8.1.5350" />

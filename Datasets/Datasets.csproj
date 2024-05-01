@@ -7,7 +7,7 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <PackageReference Include="Devmasters.Cache.Memcached" Version="5.0.22" />
+      <PackageReference Include="Devmasters.Cache.Memcached" Version="5.1.1" />
       <PackageReference Include="Microsoft.AspNetCore.Mvc.TagHelpers" Version="2.2.0" />
       <PackageReference Include="Scriban" Version="5.10.0" />
       <PackageReference Include="System.Text.Encoding.CodePages" Version="8.0.0" />
