@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json.Linq;
 using Swashbuckle.AspNetCore.Annotations;
 using System.Data.SqlClient;
+using HlidacStatu.Extensions;
 using ILogger = Serilog.ILogger;
 
 namespace HlidacStatuApi.Controllers.ApiV2
@@ -237,12 +238,12 @@ namespace HlidacStatuApi.Controllers.ApiV2
             res.parentDocId = item.ItemId;
             res.docs = vz.Dokumenty
                 .Where(m => item.GetOptions().forceOCR || HlidacStatu.Util.ParseTools.EnoughExtractedTextCheck(m.WordCount, m.Lenght, m.WordCount, 0) == false)
-                .Where(m => Uri.TryCreate(m.GetDocumentUrlToDownload(), UriKind.Absolute, out _))
+                .Where(m => Uri.TryCreate(m.GetHlidacUrl(item.ItemId), UriKind.Absolute, out _))
                 .Select(m => new HlidacStatu.DS.Api.OcrWork.Task.Doc()
                 {
                     origFilename = m.Name,
                     prilohaId = m.GetUniqueId(),
-                    url = m.GetDocumentUrlToDownload()
+                    url = m.GetHlidacUrl(item.ItemId)
                 })
                 .ToArray();
 
@@ -545,7 +546,7 @@ namespace HlidacStatuApi.Controllers.ApiV2
                     att.LastUpdate = DateTime.Now;
                 }//docs.count = 1
             }
-            await VerejnaZakazkaRepo.UpsertAsync(vz, sendToOcr: false, updatePosledniZmena: false);
+            await VerejnaZakazkaRepo.UpsertAsync(vz, sendToOcr: false, updatePosledniZmena: false, shouldDownloadFile: false);
             return true;
         }
         private async Task<bool> SaveDataset(HlidacStatu.DS.Api.OcrWork.Task res)

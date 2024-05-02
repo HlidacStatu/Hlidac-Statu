@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using System.Linq;
 using System.Threading.Tasks;
 using HlidacStatu.Connectors;
+using HlidacStatu.Extensions;
 
 namespace HlidacStatu.Web.Controllers
 {
@@ -66,18 +67,15 @@ namespace HlidacStatu.Web.Controllers
 
             if (document is null)
                 return NotFound();
-            
-            //todo: sem přidat načtení souboru z té složky
-            var destination = Init.VzPrilohaLocalCopy.GetFullPath(storageId);
-            if (System.IO.File.Exists(destination) == false)
-                return NotFound();
 
-            if (Lib.OCR.DocTools.HasPDFHeader(destination))
+            var file = document.GetDocumentLocalCopy();
+            
+            if (Lib.OCR.DocTools.HasPDFHeader(file))
             {
-                return File(System.IO.File.ReadAllBytes(destination), "application/pdf", string.IsNullOrWhiteSpace(document.Name) ? $"{document.Sha256Checksum}_smlouva.pdf" : document.Name);
+                return File(file, "application/pdf", string.IsNullOrWhiteSpace(document.Name) ? $"{document.Sha256Checksum}_smlouva.pdf" : document.Name);
             }
             else
-                return File(System.IO.File.ReadAllBytes(destination),
+                return File(file,
                     string.IsNullOrWhiteSpace(document.ContentType) ? "application/octet-stream" : document.ContentType,
                     string.IsNullOrWhiteSpace(document.Name) ? "priloha" : document.Name);
             
