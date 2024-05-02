@@ -654,6 +654,55 @@ namespace HlidacStatu.Repositories.Searching
             return res;
         }
 
+        public static List<string> SimpleGetAllIds(this ElasticClient sourceESClient, int maxDegreeOfParallelism,
+            QueryContainer query, int batchSize = 100)
+        {
+            if (maxDegreeOfParallelism < 2)
+                throw new ArgumentOutOfRangeException(nameof(maxDegreeOfParallelism), "maxDegreeOfParallelism cannot be smaller than 2");
+            
+            var scrollAllObservable = sourceESClient.ScrollAll<object>("4m", maxDegreeOfParallelism, sc => sc
+                .MaxDegreeOfParallelism(maxDegreeOfParallelism)
+                .Search(s => s
+                    .Size(batchSize)
+                    .Source(false)
+                    .Query(q => query)
+                )
+            );
+
+            var waitHandle = new ManualResetEvent(false);
+            var allIds = new ConcurrentBag<string>();
+            var scrollAllObserver = new ScrollAllObserver<object>(
+                onNext: response =>
+                {
+                    if (!response.SearchResponse.IsValid)
+                    {
+                        _logger.Warning("Invalid response {response}", response.SearchResponse.DebugInformation);
+                    }
+
+                    var ids = response.SearchResponse.Hits.Select(h => h.Id);
+                    foreach (var id in ids)
+                    {
+                        allIds.Add(id);
+                    }
+                },
+                onError: e =>
+                {
+                    _logger.Error(e, "Scroll error occured cl:{client} q:{query}",
+                        sourceESClient.ConnectionSettings.DefaultIndex, query);
+                    _ = waitHandle.Set();
+                },
+                onCompleted: () => {
+
+                    waitHandle.Set();
+                    }
+            );
+
+            var subscriber = scrollAllObservable.SubscribeSafe(scrollAllObserver);
+            _ = waitHandle.WaitOne();
+            subscriber.Dispose();
+
+            return allIds.ToList();
+        }
 
 
         public static QueryContainer GetRawQuery(string jsonQuery)

@@ -192,6 +192,26 @@ namespace HlidacStatu.Repositories
                 _logger.Error(e, $"VZ ERROR Upserting ID:{newVZ.Id} Size:{Newtonsoft.Json.JsonConvert.SerializeObject(newVZ).Length}");
             }
         }
+        
+        public static async Task RedownloadVzFiles(VerejnaZakazka vz, ElasticClient elasticClient, HttpClient httpClient)
+        {
+            if (vz is null)
+                return;
+            
+            try
+            {
+                // stáhnout dokumenty, které nemají checksum
+                await StoreDocumentCopyToHlidacStorageAsync(vz, httpClient);
+                MergeDocumentsBySHA(vz);
+                SendToOcrQueue(vz);
+                
+                await elasticClient.IndexDocumentAsync<VerejnaZakazka>(vz);
+            }
+            catch (Exception e)
+            {
+                _logger.Error(e, $"VZ Redownload ID:{vz.Id}");
+            }
+        }
 
         public static void FixPublicationDate(VerejnaZakazka firstVz)
         {
