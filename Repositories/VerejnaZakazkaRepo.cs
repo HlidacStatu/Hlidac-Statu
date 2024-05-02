@@ -5,11 +5,13 @@ using Nest;
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Net.Sockets;
+using System.Threading;
 using System.Threading.RateLimiting;
 using System.Threading.Tasks;
 using Devmasters;
@@ -17,8 +19,6 @@ using Devmasters.Collections;
 using HlidacStatu.Connectors;
 using HlidacStatu.Entities;
 using Polly;
-using Polly.Extensions.Http;
-using Polly.Retry;
 using HlidacStatu.DS.Api;
 using Polly.RateLimiting;
 
@@ -108,12 +108,9 @@ namespace HlidacStatu.Repositories
         /// <summary>
         /// Update or insert new
         /// </summary>
-        /// <param name="newVZ"></param>
-        /// <param name="elasticClient"></param>
-        /// <param name="httpClient"></param>
-        /// <param name="posledniZmena"></param>
         public static async Task UpsertAsync(VerejnaZakazka newVZ, ElasticClient elasticClient = null,
-            HttpClient httpClient = null, DateTime? posledniZmena = null, bool sendToOcr = true, bool updatePosledniZmena = true)
+            HttpClient httpClient = null, DateTime? posledniZmena = null, bool sendToOcr = true, bool updatePosledniZmena = true,
+            bool shouldDownloadFile = true)
         {
             if (newVZ is null)
                 return;
@@ -174,7 +171,10 @@ namespace HlidacStatu.Repositories
                 }
                 
                 // stáhnout dokumenty, které nemají checksum
-                await StoreDocumentCopyToHlidacStorageAsync(newVZ, httpClient);
+                if (shouldDownloadFile)
+                {
+                    await StoreDocumentCopyToHlidacStorageAsync(newVZ, httpClient);
+                }
                 SetupUpdateDates(newVZ, posledniZmena, updatePosledniZmena);
                 
                 // zmergovat stejné dokumenty podle sha
@@ -255,6 +255,7 @@ namespace HlidacStatu.Repositories
         private static void MergeDocumentsBySHA(VerejnaZakazka newVZ)
         {
             var groups = newVZ.Dokumenty
+                .Where(d => !string.IsNullOrWhiteSpace(d.Sha256Checksum))
                 .GroupBy(d => d.Sha256Checksum)
                 .Where(g => g.Count() > 1);
             foreach (var group in groups)
@@ -453,6 +454,53 @@ namespace HlidacStatu.Repositories
             }
         }
 
+        private static SemaphoreSlim _fileSemaphore = new(1);
+        
+        private static async Task<HttpResponseMessage> ExecuteHttpRequest(HttpClient httpClient, string url)
+        {
+            var startTime = DateTime.Now;
+            var stopWatch = new Stopwatch();
+            stopWatch.Start();
+            HttpResponseMessage response = null;
+            var logResult=String.Empty;
+            try
+            {
+                response = await httpClient.GetAsync(url, HttpCompletionOption.ResponseHeadersRead);
+            }
+            catch(Exception exception)
+            {
+                logResult = exception.Message;
+                throw;
+            }
+            finally
+            {
+                stopWatch.Stop();
+                var endTime = startTime.Add(stopWatch.Elapsed);
+                if (response is not null)
+                {
+                    logResult = $"Result {response.StatusCode}";
+                }
+                //add to bag
+                await _fileSemaphore.WaitAsync();
+                try
+                {
+                    await File.AppendAllTextAsync("e:/Data/App/HlidacSmluv/petr/vzres.tsv",
+                        $"{startTime:hh:mm:ss.fff}\t{endTime:hh:mm:ss.fff}\t{stopWatch.ElapsedMilliseconds}\t{logResult}\t{url}");
+
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e);
+                }
+                finally
+                {
+                    _fileSemaphore.Release();
+                }
+            }
+            
+            return response;
+        }
+
         private static async Task DownloadFileAsync(HttpClient httpClient,
             string url,
             string path,
@@ -467,8 +515,9 @@ namespace HlidacStatu.Repositories
             {
                 if (url.Contains("nen.nipez.cz"))
                 {
-                    responseMessage = await _retryThrottledPipeline.ExecuteAsync(async _ => 
-                        await httpClient.GetAsync(url, HttpCompletionOption.ResponseHeadersRead));
+                    responseMessage = await _retryThrottledPipeline.ExecuteAsync(async _ =>
+                        await ExecuteHttpRequest(httpClient, url));
+                        // await httpClient.GetAsync(url, HttpCompletionOption.ResponseHeadersRead));
                 }
                 else
                 {

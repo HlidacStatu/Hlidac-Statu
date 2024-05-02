@@ -35,4 +35,3 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyVersion("2.1.5.0")]
 
 [assembly: InternalsVisibleTo("InsolvencniRejstrikTest")]
-[assembly: log4net.Config.XmlConfigurator(ConfigFile = "log4net.config")]

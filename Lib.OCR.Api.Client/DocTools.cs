@@ -67,6 +67,17 @@ namespace HlidacStatu.Lib.OCR
             }
             return valid;
         }
+        
+        public static bool HasPDFHeader(byte[] file)
+        {
+            byte[] pdfheader = new byte[] { 37, 80, 68, 70 };
+            bool valid = true;
+            for (int i = 0; i < 4; i++)
+            {
+                valid = valid && file[i] == pdfheader[i];
+            }
+            return valid;
+        }
 
         public static int CountWords(string s)
         {
