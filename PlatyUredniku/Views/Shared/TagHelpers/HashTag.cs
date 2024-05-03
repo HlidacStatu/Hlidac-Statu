@@ -6,11 +6,11 @@ namespace PlatyUredniku.Views.Shared.TagHelpers;
 public class HashTag : TagHelper
 {
     public string Tag { get; set; }
-    public string AdditionalClass { get; set; }
+    public string AdditionalClass { get; set; } = "badge rounded-pill ";
     public string Style { get; set; }
     public int? Count { get; set; } = null;
 
-    public PlatyUredniku.Bootstrap.Colors Color { get; set; } = Bootstrap.Colors.Dark;
+    public PlatyUredniku.Bootstrap.Colors Color { get; set; } = Bootstrap.Colors.Light;
 
     public override void Process(TagHelperContext context, TagHelperOutput output)
     {
@@ -20,7 +20,7 @@ public class HashTag : TagHelper
             this.AdditionalClass += " position-relative me-3 mb-2";
 
         output.Attributes.SetAttribute("href", $"Oblast/{Tag}");
-        output.Attributes.SetAttribute("class", $"badge rounded-pill text-bg-{this.Color.ToString().ToLower()} {AdditionalClass}");
+        output.Attributes.SetAttribute("class", $"text-bg-{this.Color.ToString().ToLower()} {AdditionalClass}");
         if (!string.IsNullOrEmpty( Style ) )
         {
             output.Attributes.SetAttribute("style", Style);

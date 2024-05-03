@@ -35,7 +35,7 @@
             <a asp-action="Oblasti">Oblasti</a>
         </li>
         <li class="active">
-            <hashtag tag="@ViewData["oblast"]"></hashtag>
+            <hashtag tag="@ViewData["oblast"]" style="font-size:13px; padding:0.2em" additional-class=""></hashtag>
         </li>
     </ol>
 }
@@ -102,11 +102,11 @@
                                         <td class="col-2 text-start d-none d-md-table-cell d-lg-table-cell d-xl-table-cell d-xxl-table-cell" title="Platové rozmezí v organizace se pohybuje od @Html.Raw(minimalniPlatAsString) do @Html.Raw(maximalniPlatAsString)">
                                             <div class="d-flex"
                                                  style="width: 100%;height: 1rem;background: linear-gradient(90deg, hsl(216deg 100% 87%) 0%, hsl(216deg 100% 26.67%) 100%);">
-                                                <div class="bg-light" style="width: @startPer%;height: 1rem"></div>
+                                                <div class="border-start  bg-light" style="width: @startPer%;height: 1rem"></div>
                                                 <div class="bg-transparent rounded-pill position-relative"
                                                      style="width: @endPer%;height: 1rem;">
                                                 </div>
-                                                <div class="bg-light" style="width: @(100 - endPer - startPer)%;height: 1rem"></div>
+                                                <div class="border-end bg-light" style="width: @(100 - endPer - startPer)%;height: 1rem"></div>
                                             </div>
                                         </td>
                                     }

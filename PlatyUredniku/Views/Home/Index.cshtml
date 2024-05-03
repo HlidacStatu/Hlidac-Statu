@@ -1,5 +1,6 @@
 ﻿@using HlidacStatu.Entities.Entities
 @using HlidacStatu.Repositories
+@inject ZiggyCreatures.Caching.Fusion.IFusionCache cache;
 @{
     var stats = await PuRepo.GetGlobalStatAsync();
     List<PuPlat> platy = (List<PuPlat>?)ViewData["platy"];
@@ -31,35 +32,40 @@
             Polovina představených úřadů má plat nižší než @(HlidacStatu.Util.RenderData.NicePrice(stats.PercentilyPlatuHlavounu[50])),
             čtvrtina má plat vyšší než @(HlidacStatu.Util.RenderData.NicePrice(stats.PercentilyPlatuHlavounu[75])) měsíčně včetně odměn.
         </p>
-        <p>
-
-        </p>
-        <div class="card mt-5">
-            <div class="card-body">
-                <h5 class="card-title">
-                    Za @PuRepo.DefaultYear jsme žádali o platy @(HlidacStatu.Util.RenderData.NiceNumber(stats.PocetOslovenych)) organizací
-                    a plat nám poskytlo @(HlidacStatu.Util.RenderData.NiceNumber(stats.PocetCoPoslaliPlat)) z nich.
-
-                </h5>
-                <h6 class="card-subtitle mb-2 text-body-secondary">
-                    <a class="btn btn-primary btn-sm" href="/oblasti">Seznam všech organizací <span class="badge text-bg-danger">@(HlidacStatu.Util.RenderData.NiceNumber(stats.PocetOslovenych))</span></a>
-                </h6>
-                <h6 class="card-subtitle mb-2 mt-4 text-body-secondary">
-<p>Platy organizací v jednotlivých oblastech</p>
-                    @foreach (var tag in PuRepo.MainTags)
-                    {
-                        <hashtag tag="@tag" count="@(await PuRepo.GetOrganizaceCountForTagAsync(tag, PuRepo.DefaultYear))")></hashtag>
-                    }
-
-                </h6>
-            </div>
-        </div>
-        <div>
-        </div>
-    </div>
 </section>
 
 <section class="d-flex align-items-center justify-content-center alter-bg-color">
+    <div class="container">
+        <h5>
+            Za @PuRepo.DefaultYear jsme žádali o platy @(HlidacStatu.Util.RenderData.NiceNumber(stats.PocetOslovenych)) organizací
+            a plat nám poskytlo @(HlidacStatu.Util.RenderData.NiceNumber(stats.PocetCoPoslaliPlat)) z nich.
+
+        </h5>
+        <p>
+            <a class="btn btn-primary btn-sm" href="/oblasti">Seznam všech organizací <span class="badge text-bg-danger">@(HlidacStatu.Util.RenderData.NiceNumber(stats.PocetOslovenych))</span></a>
+        </p>
+        <p class="mb-2 mt-4 text-body-secondary">
+        <p>Platy organizací v jednotlivých oblastech</p>
+        <div class="row">
+                @foreach (var group in PuRepo.MainTags.Chunk(PuRepo.MainTags.Length / 4 + 1))
+                {
+                <div class="col-3">
+
+                        @foreach (var item in group)
+                        {
+                        <hashtag tag="@item" additional-class="badge rounded-pill border me-3 mb-2"></hashtag>
+                        <br />
+                        }
+
+                </div>
+                }
+        </div>
+
+        </p>
+    </div>
+</section>
+
+<section class="d-flex align-items-center justify-content-center">
     <div class="container">
 
         <h3>
@@ -96,7 +102,7 @@
 
 </section>
 
-<section class="d-flex align-items-center justify-content-center">
+<section class="d-flex align-items-center justify-content-center alter-bg-color">
     <div class="container">
 
         <h2>
@@ -121,3 +127,8 @@
         </div>
     </div>
 </section>
+
+<p class="m-5">
+
+</p>
+
