@@ -4,6 +4,7 @@ using HlidacStatu.Util;
 using Nest;
 
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -32,33 +33,38 @@ namespace HlidacStatu.Repositories
         //                    r.StatusCode == HttpStatusCode.Forbidden)
         //     .WaitAndRetryAsync(3, _ => TimeSpan.FromSeconds(1));
 
-        private static ResiliencePipeline<HttpResponseMessage> _retryPipeline;
-        private static ResiliencePipeline<HttpResponseMessage> _retryThrottledPipeline;
+        // private static ResiliencePipeline<HttpResponseMessage> _retryPipeline;
+        // private static ResiliencePipeline<HttpResponseMessage> _retryThrottledPipeline;
+        private static ConcurrentDictionary<string,ResiliencePipeline<HttpResponseMessage>> _retryThrottledPipelinePerHost = new ();
 
         // Emergency HttpClient for cases where it is not convinient to inject HttpClient.
         private static Lazy<HttpClient> _lazyHttpClient = new();
 
-        static VerejnaZakazkaRepo()
+        // static VerejnaZakazkaRepo()
+        // {
+        //     _retryPipeline = new ResiliencePipelineBuilder<HttpResponseMessage>()
+        //         .AddRetry(new()
+        //         {
+        //             ShouldHandle = static args => args.Outcome switch
+        //             {
+        //                 { Exception: HttpRequestException } or { Exception: SocketException} => PredicateResult.True(),
+        //                 { Result.StatusCode: >= HttpStatusCode.InternalServerError } => PredicateResult.True(),
+        //                 { Result.StatusCode: HttpStatusCode.RequestTimeout } => PredicateResult.True(),
+        //                 var outcome when outcome.Result?.StatusCode == HttpStatusCode.Forbidden 
+        //                                  && outcome.Result?.RequestMessage?.RequestUri?.Host.Contains("bpapi.datlab.eu") == true => PredicateResult.True(),
+        //                 _ => PredicateResult.False()
+        //             },
+        //             MaxRetryAttempts = 3,
+        //             Delay = TimeSpan.FromSeconds(2),
+        //             UseJitter = true
+        //         })
+        //         .Build();
+        //     
+        // }
+
+        private static ResiliencePipeline<HttpResponseMessage> CreateNewResiliencePipeline()
         {
-            _retryPipeline = new ResiliencePipelineBuilder<HttpResponseMessage>()
-                .AddRetry(new()
-                {
-                    ShouldHandle = static args => args.Outcome switch
-                    {
-                        { Exception: HttpRequestException } or { Exception: SocketException} => PredicateResult.True(),
-                        { Result.StatusCode: >= HttpStatusCode.InternalServerError } => PredicateResult.True(),
-                        { Result.StatusCode: HttpStatusCode.RequestTimeout } => PredicateResult.True(),
-                        var outcome when outcome.Result?.StatusCode == HttpStatusCode.Forbidden 
-                                         && outcome.Result?.RequestMessage?.RequestUri?.Host.Contains("bpapi.datlab.eu") == true => PredicateResult.True(),
-                        _ => PredicateResult.False()
-                    },
-                    MaxRetryAttempts = 3,
-                    Delay = TimeSpan.FromSeconds(2),
-                    UseJitter = true
-                })
-                .Build();
-            
-            _retryThrottledPipeline = new ResiliencePipelineBuilder<HttpResponseMessage>()
+            return new ResiliencePipelineBuilder<HttpResponseMessage>()
                 .AddConcurrencyLimiter(new ConcurrencyLimiterOptions()
                 {
                     PermitLimit = 3,
@@ -78,7 +84,6 @@ namespace HlidacStatu.Repositories
                     UseJitter = true
                 })
                 .Build();
-
         }
         
         private static void AfterSave(VerejnaZakazka vz)
@@ -434,6 +439,7 @@ namespace HlidacStatu.Repositories
             foreach (var dokument in vz.Dokumenty.Where(d => string.IsNullOrWhiteSpace(d.Sha256Checksum)))
             {
                 string fullTempPath = string.Empty;
+                string downloadUrl = string.Empty;
                 try
                 {
                     // download file from web and save it to temporaryPath
@@ -443,7 +449,7 @@ namespace HlidacStatu.Repositories
                     Directory.CreateDirectory(temporaryPath);
                     fullTempPath = Path.Combine(temporaryPath, filename);
 
-                    string downloadUrl = dokument.GetDocumentUrlToDownload();
+                    downloadUrl = dokument.GetDocumentUrlToDownload();
                     await DownloadFileAsync(httpClient, downloadUrl, fullTempPath, vz.Id);
 
                     // calculate checksum first and get length so we can create hlidacStorageId
@@ -464,7 +470,7 @@ namespace HlidacStatu.Repositories
                 }
                 catch (Exception e)
                 {
-                    _logger.Error(e, "VZ - problem with storing file to hlidac storage");
+                    _logger.Error(e, $"VZ:{vz.Id}, Url:{downloadUrl} - problem during downloading/storing file");
                 }
                 finally
                 {
@@ -530,29 +536,26 @@ namespace HlidacStatu.Repositories
             // using var responseMessage = await _retryPolicy.ExecuteAsync(() =>
             //     httpClient.GetAsync(url, HttpCompletionOption.ResponseHeadersRead));
 
+            var uri = new Uri(url);
+            var uriBase = uri.Host;
+
+            var pipeline = _retryThrottledPipelinePerHost.GetOrAdd(uriBase, CreateNewResiliencePipeline());
+            
             HttpResponseMessage responseMessage = null;
             try
             {
-                if (url.Contains("nen.nipez.cz"))
-                {
-                    responseMessage = await _retryThrottledPipeline.ExecuteAsync(async _ =>
-                        await ExecuteHttpRequest(httpClient, url));
-                        // await httpClient.GetAsync(url, HttpCompletionOption.ResponseHeadersRead));
-                }
-                else
-                {
-                    responseMessage = await _retryPipeline.ExecuteAsync(async _ => 
-                        await httpClient.GetAsync(url, HttpCompletionOption.ResponseHeadersRead));
-                }
-
+                responseMessage = await pipeline.ExecuteAsync(async _ =>
+                    await ExecuteHttpRequest(httpClient, url));
             }
             catch (RateLimiterRejectedException)
             {
                 _logger.Warning($"Rate limit exceeded for Url: {url} for VZ (id:{vzId}).");
+                throw;
             }
             catch (Exception exception)
             {
                 _logger.Warning($"During downloadFileAsync there was an exception {exception}. For Url: {url} for VZ (id:{vzId}).");
+                throw;
             }
 
             // using var responseMessage = await httpClient.GetAsync(url, HttpCompletionOption.ResponseHeadersRead);
