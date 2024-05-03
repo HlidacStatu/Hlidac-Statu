@@ -439,6 +439,7 @@ namespace HlidacStatu.Repositories
             foreach (var dokument in vz.Dokumenty.Where(d => string.IsNullOrWhiteSpace(d.Sha256Checksum)))
             {
                 string fullTempPath = string.Empty;
+                string downloadUrl = string.Empty;
                 try
                 {
                     // download file from web and save it to temporaryPath
@@ -448,7 +449,7 @@ namespace HlidacStatu.Repositories
                     Directory.CreateDirectory(temporaryPath);
                     fullTempPath = Path.Combine(temporaryPath, filename);
 
-                    string downloadUrl = dokument.GetDocumentUrlToDownload();
+                    downloadUrl = dokument.GetDocumentUrlToDownload();
                     await DownloadFileAsync(httpClient, downloadUrl, fullTempPath, vz.Id);
 
                     // calculate checksum first and get length so we can create hlidacStorageId
@@ -469,7 +470,7 @@ namespace HlidacStatu.Repositories
                 }
                 catch (Exception e)
                 {
-                    _logger.Error(e, "VZ - problem with storing file to hlidac storage");
+                    _logger.Error(e, $"VZ:{vz.Id}, Url:{downloadUrl} - problem during downloading/storing file");
                 }
                 finally
                 {
