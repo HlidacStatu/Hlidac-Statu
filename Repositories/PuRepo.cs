@@ -11,7 +11,7 @@ namespace HlidacStatu.Repositories;
 
 public static class PuRepo
 {
-    public const int DefaultYear = 2022;
+    public const int DefaultYear = 2023;
 
     public static readonly string[] MainTags =
     [
@@ -148,6 +148,28 @@ public static class PuRepo
         return await query.ToListAsync();
     }
 
+    public static async Task<int> GetOrganizaceCountForTagAsync(string tag, int rok)
+    {
+        await using var db = new DbEntities();
+        try
+        {
+            var listOfCounts = await db.PuOrganizaceTags
+    .AsNoTracking()
+    .Where(t => t.Tag.Equals(tag))
+    .Include(t => t.Organizace).ThenInclude(o => o.Platy)
+    .Select(m => m.Organizace.Platy.Count(c=>c.Rok == rok))
+    .ToArrayAsync();
+
+
+            return listOfCounts.Sum();
+
+        }
+        catch (Exception e)
+        {
+
+            throw;
+        }
+    }
     public static async Task<PuPlat> GetPlatAsync(int id)
     {
         await using var db = new DbEntities();

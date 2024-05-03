@@ -1841,14 +1841,6 @@ kbd {
     border-bottom-left-radius: 0;
 }
 
-.bg-warning {
-    background-color: #fcf8e3 !important;
-}
-
-.bg-danger {
-    background-color: #f2dede !important;
-}
-
 blockquote {
     padding: 10px 20px;
     border-left: 5px solid #eee;

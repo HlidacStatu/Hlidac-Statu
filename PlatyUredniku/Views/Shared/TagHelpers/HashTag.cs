@@ -6,14 +6,28 @@ namespace PlatyUredniku.Views.Shared.TagHelpers;
 public class HashTag : TagHelper
 {
     public string Tag { get; set; }
+    public string AdditionalClass { get; set; }
+    public string Style { get; set; }
+    public int? Count { get; set; } = null;
+
+    public PlatyUredniku.Bootstrap.Colors Color { get; set; } = Bootstrap.Colors.Dark;
 
     public override void Process(TagHelperContext context, TagHelperOutput output)
     {
         output.TagName = "a";
         output.TagMode = TagMode.StartTagAndEndTag;
+        if (Count.HasValue)
+            this.AdditionalClass += " position-relative me-3 mb-2";
 
         output.Attributes.SetAttribute("href", $"Oblast/{Tag}");
-        output.Attributes.SetAttribute("class", "badge rounded-pill text-bg-dark");
-        output.Content.AppendHtml($"<i class=\"fa-solid fa-hashtag\"></i>{Tag}");
+        output.Attributes.SetAttribute("class", $"badge rounded-pill text-bg-{this.Color.ToString().ToLower()} {AdditionalClass}");
+        if (!string.IsNullOrEmpty( Style ) )
+        {
+            output.Attributes.SetAttribute("style", Style);
+        }
+        output.Content.AppendHtml(
+            $"<i class=\"fa-solid fa-hashtag\"></i>{Tag}"
+            + (Count.HasValue ? $"<span class=\"position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger\">{this.Count}</span>" : "")
+            );
     }
 }

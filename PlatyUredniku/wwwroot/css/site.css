@@ -1,5 +1,27 @@
 ﻿/* Please see documentation at https://docs.microsoft.com/aspnet/core/client-side/bundling-and-minification
 for details on configuring this project to bundle and minify static web assets. */
+.navbar.hlidac .nav-item {
+    line-height: 1.2em;
+}
+
+section {
+    min-height: 30vh;
+    padding-top: 3rem;
+    padding-bottom: 1rem;
+}
+
+.alter-bg-color {
+    background: #f2f5f7;
+}
+
+/*somehow this doesnt work in bootstrap but it should?!*/
+.table-borderless td,
+.table-borderless th {
+    border: 0 !important;
+    background-color: transparent;
+}
+
+
 
 table.table-sm > * > * {
     padding: .25rem .25rem !important;
@@ -66,8 +88,6 @@ body {
   margin-bottom: 60px;
 }
 .footer {
-  position: absolute;
-  bottom: 0;
   width: 100%;
   white-space: nowrap;
   line-height: 60px; /* Vertically center the text there */
