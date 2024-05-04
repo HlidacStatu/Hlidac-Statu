@@ -1,3 +1,4 @@
+using HlidacStatu.Entities.Entities;
 using HlidacStatu.Repositories;
 using Microsoft.AspNetCore.Mvc;
 using PlatyUredniku.Models;
@@ -5,7 +6,6 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
-using HlidacStatu.Entities.Entities;
 using ZiggyCreatures.Caching.Fusion;
 
 namespace PlatyUredniku.Controllers;
@@ -22,10 +22,10 @@ public class HomeController : Controller
     public async Task<IActionResult> Index()
     {
         var platyTask = _cache.GetOrSetAsync<List<PuPlat>>(
-            $"{nameof(PuRepo.GetPlatyAsync)}_{PuRepo.DefaultYear}", 
+            $"{nameof(PuRepo.GetPlatyAsync)}_{PuRepo.DefaultYear}",
             _ => PuRepo.GetPlatyAsync(PuRepo.DefaultYear)
         );
-        
+
         ViewData["platy"] = await platyTask;
 
         return View();
@@ -39,7 +39,7 @@ public class HomeController : Controller
         string noteHtml = "";
         switch (id)
         {
-            case 2: 
+            case 2:
                 range = (0_000, prumernyPlat);
                 title = "Manažerské platy ve veřejné správě nižší než průměrný plat v ČR za rok 2023";
                 noteHtml = "Průměrný plat v Q4 2023 <a href='https://www.czso.cz/csu/czso/cri/prumerne-mzdy-4-ctvrtleti-2023' target='_blank'>podle ČSÚ </a>v Q4 2023 byl <b>46 013 Kč hrubého</b>.";
@@ -50,7 +50,7 @@ public class HomeController : Controller
                 noteHtml = "Průměrný plat v Q4 2023 <a href='https://www.czso.cz/csu/czso/cri/prumerne-mzdy-4-ctvrtleti-2023' target='_blank'>podle ČSÚ </a> byl <b>46 013 Kč hrubého</b>.";
                 break;
             case 4:
-                range = (prumernyPlat*2, 100_000_000);
+                range = (prumernyPlat * 2, 100_000_000);
                 title = "Nejvyšší manažerské platy ve veřejné správě za rok 2023";
                 noteHtml = "Zobrazujeme platy, které jsou více než dvojnásobné, než je průměrný plat v Q4 2023 <a href='https://www.czso.cz/csu/czso/cri/prumerne-mzdy-4-ctvrtleti-2023' target='_blank'>podle ČSÚ </a>(46 013 Kč hrubého).";
                 break;
@@ -61,19 +61,9 @@ public class HomeController : Controller
                 noteHtml = "Nástupní plat pokladní v Lidl v Praze byl <a href='https://www.idnes.cz/ekonomika/domaci/lidl-mzdy-prodavaci-obchod-retezec.A231213_161827_ekonomika_ven' target='_blank'>podle iDnes</a> <b>33 700 Kč hrubého</b>.";
                 break;
         }
-        
-        var platyTask = _cache.GetOrSetAsync<List<PuPlat>>(
-            $"{nameof(PuRepo.GetPoziceDlePlatuAsync)}_{range.Min}_{range.Max}_{PuRepo.DefaultYear}",
-            _ => PuRepo.GetPoziceDlePlatuAsync(range.Min, range.Max, PuRepo.DefaultYear)
-        );
 
-        var platyCountTask = _cache.GetOrSetAsync<List<PuPlat>>(
-            $"platyCount_{PuRepo.DefaultYear}",
-            _ => PuRepo.GetPlatyAsync(PuRepo.DefaultYear)
-        );
-
-        var platy = await platyTask;
-        var platyCount = (await platyCountTask).Count;
+        var platy = await StaticCache.GetPoziceDlePlatu(range.Min, range.Max, PuRepo.DefaultYear);
+        var platyCount = await StaticCache.GetPlatyCountPerYearAsync(PuRepo.DefaultYear);
 
         ViewData["platy"] = platy;
         //ViewData["context"] = $"Dle platů {range.Min} - {range.Max},-";
@@ -81,9 +71,9 @@ public class HomeController : Controller
         ViewData["noteHtml"] = noteHtml;
         ViewData["pocetPlatuCelkem"] = platyCount;
         return View(platy);
-}
+    }
 
-public async Task<IActionResult> Oblast(string id)
+    public async Task<IActionResult> Oblast(string id)
     {
         var organizaceForTagTask = _cache.GetOrSetAsync<List<PuOrganizace>>(
             $"{nameof(PuRepo.GetOrganizaceForTagAsync)}_{id}",
@@ -111,10 +101,10 @@ public async Task<IActionResult> Oblast(string id)
                 $"{nameof(PuRepo.GetOrganizaceForTagAsync)}_{oblast}",
                 _ => PuRepo.GetOrganizaceForTagAsync(oblast)
             );
-            
+
             model.Add(oblast, organizace);
         }
-        
+
         List<Breadcrumb> breadcrumbs = new()
         {
             new Breadcrumb()
@@ -136,7 +126,7 @@ public async Task<IActionResult> Oblast(string id)
             $"{nameof(PuRepo.GetFullDetailAsync)}_{id}",
             _ => PuRepo.GetFullDetailAsync(id)
         );
-        
+
         ViewData["platy"] = detail.Platy.ToList();
         ViewData["context"] = detail.FirmaDs.DsSubjName;
 
@@ -149,7 +139,7 @@ public async Task<IActionResult> Oblast(string id)
             $"{nameof(PuRepo.GetFullDetailAsync)}_{id}",
             _ => PuRepo.GetFullDetailAsync(id)
         );
-        
+
         ViewData["mainTag"] = detail.Tags.FirstOrDefault(t => PuRepo.MainTags.Contains(t.Tag))?.Tag;
         ViewData["platy"] = detail.Platy.ToList();
         ViewData["rok"] = rok ?? (detail.Platy.Any() ? detail.Platy.Max(m => m.Rok) : PuRepo.DefaultYear);
@@ -165,7 +155,7 @@ public async Task<IActionResult> Oblast(string id)
             $"{nameof(PuRepo.GetPlatAsync)}_{id}",
             _ => PuRepo.GetPlatAsync(id)
         );
-        
+
         ViewData["mainTag"] = detail.Organizace.Tags.FirstOrDefault(t => PuRepo.MainTags.Contains(t.Tag))?.Tag;
         ViewData["context"] = $"{detail.NazevPozice} v organizaci {detail.Organizace.FirmaDs.DsSubjName}";
 
@@ -183,7 +173,7 @@ public async Task<IActionResult> Oblast(string id)
         byte[] rawData = null;
         string contentType = "";
         string filename = "";
-        
+
         if (rok is not null)
         {
             var platy = await PuRepo.GetPlatyWithOrganizaceForYearAsync(rok.Value);
@@ -191,7 +181,7 @@ public async Task<IActionResult> Oblast(string id)
             {
                 data.Add(plat.FlatExport());
             }
-            
+
         }
         else if (!string.IsNullOrWhiteSpace(datovaSchranka))
         {
@@ -205,7 +195,7 @@ public async Task<IActionResult> Oblast(string id)
         {
             return NoContent();
         }
-        
+
         switch (type)
         {
             case "excel":

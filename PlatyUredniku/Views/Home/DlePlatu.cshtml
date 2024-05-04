@@ -19,11 +19,15 @@
 }
 
 
-<section class="d-flex align-items-center justify-content-center">
+<section class="d-flex align-items-center justify-content-center alter-bg-color">
     <div class="container">
         <h2>@ViewData["title"]</h2>
         <p class="text-muted">Informace o manažerských platech a odměnách vedoucích úřadů, státních podniků či příspěvkových organizací za rok 2023.</p>
 
+        </<div>
+</section>
+<section class="d-flex align-items-center justify-content-center">
+    <div class="container">
         <p class="lead">@Html.Raw(ViewData["noteHtml"])</p>
 
         <table class="table table-hover table-striped">
@@ -38,7 +42,7 @@
                 {
                     <tr>
                         <td>
-                        <a asp-action="Plat" asp-route-id="@plat.Id"> @plat.NazevPozice</a>
+                            <a asp-action="Plat" asp-route-id="@plat.Id"> @plat.NazevPozice</a>
                         </td>
                         <td>
                             <a asp-action="Detail" asp-route-id="@plat.Organizace.DS">@plat.Organizace.Nazev</a>
@@ -48,6 +52,7 @@
                     </tr>
                 }
             </tbody>
+            <caption>Zobrazeno @(Model.Count) platů z celkem @(ViewData["pocetPlatuCelkem"])</caption>
         </table>
 
     </div>

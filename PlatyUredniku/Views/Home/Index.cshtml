@@ -32,6 +32,7 @@
             Polovina představených úřadů má plat nižší než @(HlidacStatu.Util.RenderData.NicePrice(stats.PercentilyPlatuHlavounu[50])),
             čtvrtina má plat vyšší než @(HlidacStatu.Util.RenderData.NicePrice(stats.PercentilyPlatuHlavounu[75])) měsíčně včetně odměn.
         </p>
+    </div>
 </section>
 
 <section class="d-flex align-items-center justify-content-center alter-bg-color">
@@ -47,13 +48,17 @@
         <p class="mb-2 mt-4 text-body-secondary">
         <p>Platy organizací v jednotlivých oblastech</p>
         <div class="row">
+                @{
+                    int count = 0;
+                }
                 @foreach (var group in PuRepo.MainTags.Chunk(PuRepo.MainTags.Length / 4 + 1))
                 {
-                <div class="col-3">
+                    count = count + 1;
+                <div class="col-md-3 col-sm-6 col-6">
 
                         @foreach (var item in group)
                         {
-                        <hashtag tag="@item" additional-class="badge rounded-pill border me-3 mb-2"></hashtag>
+                        <hashtag tag="@item" additional-class="badge rounded-pill border me-3 mb-2 order-{@count}"></hashtag>
                         <br />
                         }
 
@@ -61,7 +66,6 @@
                 }
         </div>
 
-        </p>
     </div>
 </section>
 
@@ -112,7 +116,10 @@
             <div class="card-header">Přehledy podle platu</div>
             <ul class="list-group list-group-flush">
                 <li class="list-group-item">
-                    <a asp-action="DlePlatu" asp-route-id="1">Platy nižší než má pokladní</a>
+                    <a asp-action="DlePlatu" asp-route-id="1">Platy nižší než je nástupní plat pokladní v Lidl</a>
+                </li>
+                <li class="list-group-item">
+                    <a asp-action="DlePlatu" asp-route-id="1">Platy nižší než je nástupní plat pokladní v Lidl</a>
                 </li>
                 <li class="list-group-item">
                     <a asp-action="DlePlatu" asp-route-id="2">Nižší než průměrné platy</a>

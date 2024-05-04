@@ -192,7 +192,17 @@ public static class PuRepo
                                       && p.Rok == rok
                                       && p.NazevPozice == nazevPozice);
     }
-    
+
+
+    public static async Task<int> GetPlatyCountAsync(int rok)
+    {
+        await using var db = new DbEntities();
+
+        return await db.PuPlaty
+            .AsNoTracking()
+            .Where(p => p.Rok == rok)
+            .CountAsync();
+    }
 
     public static async Task<List<PuPlat>> GetPlatyAsync(int rok)
     {

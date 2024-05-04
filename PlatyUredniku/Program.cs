@@ -70,7 +70,9 @@ public class Program
             // builder.Services.AddScoped<IErrorBoundaryLogger, AutocompleteErrorLogger>();
 
             var app = builder.Build();
-            
+     
+            StaticCache.Init(app.Services.GetService<IFusionCache>());
+
             var whitelistIps = Devmasters.Config.GetWebConfigValue("BanWhitelist")?.Split(',',
                 StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
             BannedIpsMiddleware.Whitelist whitelist = new BannedIpsMiddleware.Whitelist();
