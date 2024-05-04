@@ -225,7 +225,7 @@ public static class PuRepo
             .Where(p => p.Rok == year)
             .Where(p => (((p.Plat ?? 0) + (p.Odmeny ?? 0)) * (1 / p.Uvazek ?? 1) / (p.PocetMesicu ?? 12)) >= rangeMin)
             .Where(p => (((p.Plat ?? 0) + (p.Odmeny ?? 0)) * (1 / p.Uvazek ?? 1) / (p.PocetMesicu ?? 12)) <= rangeMax)
-            .Include(p => p.Organizace)
+            .Include(p => p.Organizace).ThenInclude(o => o.FirmaDs)
             .ToListAsync();
     }
 

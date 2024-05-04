@@ -1,15 +1,54 @@
+﻿@using HlidacStatu.Entities.Entities
+@using HlidacStatu.Repositories
 @model List<HlidacStatu.Entities.Entities.PuPlat>
 
-<ul class="list-group">
-    @foreach (var plat in Model.OrderByDescending(p => p.HrubyMesicniPlat))
-    {
-        <li class="list-group-item">
-            <div class="d-flex w-100 justify-content-between">
-                <h5 class="mb-1">@plat.Organizace.Nazev</h5>
-                <small>@plat.NefinancniBonus</small>
-            </div>
-            <p class="mb-1">@plat.NazevPozice</p>
-            <small>@plat.HrubyMesicniPlat.ToString("N0")</small>
+
+@section breadcrumbs
+{
+    <ol class="breadcrumb">
+        <li>
+            <a asp-action="Index">Platy úředníků</a>
         </li>
-    }
-</ul>
+        <li>
+            Přehled jednotlivých platů
+        </li>
+        <li class="active">
+            @ViewData["title"]
+        </li>
+    </ol>
+}
+
+
+<section class="d-flex align-items-center justify-content-center">
+    <div class="container">
+        <h2>@ViewData["title"]</h2>
+        <p class="text-muted">Informace o manažerských platech a odměnách vedoucích úřadů, státních podniků či příspěvkových organizací za rok 2023.</p>
+
+        <p class="lead">@Html.Raw(ViewData["noteHtml"])</p>
+
+        <table class="table table-hover table-striped">
+            <thead class="xtable-light">
+            <th>Pozice</th>
+            <th>Organizace</th>
+            <th><abbr title="Průměrný měsíční plat přepočtený z ročního příjmu včetně odměn">Měsíční plat</abbr> v @PuRepo.DefaultYear</th>
+            <th>Nefinanční odměna</th>
+            </thead>
+            <tbody>
+                @foreach (PuPlat plat in Model.OrderByDescending(p => p.HrubyMesicniPlat))
+                {
+                    <tr>
+                        <td>
+                        <a asp-action="Plat" asp-route-id="@plat.Id"> @plat.NazevPozice</a>
+                        </td>
+                        <td>
+                            <a asp-action="Detail" asp-route-id="@plat.Organizace.DS">@plat.Organizace.Nazev</a>
+                        </td>
+                        <td class="number">@HlidacStatu.Util.RenderData.NicePrice(plat.HrubyMesicniPlat)</td>
+                        <td style="max-width:25rem"><small>@plat.NefinancniBonus</small></td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+
+    </div>
+</section>

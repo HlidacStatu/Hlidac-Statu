@@ -33,28 +33,57 @@ public class HomeController : Controller
 
     public async Task<IActionResult> DlePlatu(int id)
     {
-        (int Min, int Max) range = id switch
+        int prumernyPlat = 46_013;
+        (int Min, int Max) range = (0, int.MaxValue);
+        string title = "Manažerské platy ve veřejné správě";
+        string noteHtml = "";
+        switch (id)
         {
-            2 => (20_000, 40_000),
-            3 => (40_000, 70_000),
-            4 => (70_000, 1000_000_000),
-            _ => (0, 20_000)
-        };
+            case 2: 
+                range = (0_000, prumernyPlat);
+                title = "Manažerské platy ve veřejné správě nižší než průměrný plat v ČR za rok 2023";
+                noteHtml = "Průměrný plat v Q4 2023 <a href='https://www.czso.cz/csu/czso/cri/prumerne-mzdy-4-ctvrtleti-2023' target='_blank'>podle ČSÚ </a>v Q4 2023 byl <b>46 013 Kč hrubého</b>.";
+                break;
+            case 3:
+                range = (prumernyPlat, 70_000);
+                title = "Manažerské platy ve veřejné správě vyšší než průměrný plat v ČR za rok 2023";
+                noteHtml = "Průměrný plat v Q4 2023 <a href='https://www.czso.cz/csu/czso/cri/prumerne-mzdy-4-ctvrtleti-2023' target='_blank'>podle ČSÚ </a> byl <b>46 013 Kč hrubého</b>.";
+                break;
+            case 4:
+                range = (prumernyPlat*2, 100_000_000);
+                title = "Nejvyšší manažerské platy ve veřejné správě za rok 2023";
+                noteHtml = "Zobrazujeme platy, které jsou více než dvojnásobné, než je průměrný plat v Q4 2023 <a href='https://www.czso.cz/csu/czso/cri/prumerne-mzdy-4-ctvrtleti-2023' target='_blank'>podle ČSÚ </a>(46 013 Kč hrubého).";
+                break;
+            case 1:
+            default:
+                range = (0_000, 33_000);
+                title = "Manažerské platy ve veřejné správě za rok 2023 nižší než nástupní plat pokladní/ho v Lidlu ";
+                noteHtml = "Nástupní plat pokladní v Lidl v Praze byl <a href='https://www.idnes.cz/ekonomika/domaci/lidl-mzdy-prodavaci-obchod-retezec.A231213_161827_ekonomika_ven' target='_blank'>podle iDnes</a> <b>33 700 Kč hrubého</b>.";
+                break;
+        }
         
         var platyTask = _cache.GetOrSetAsync<List<PuPlat>>(
             $"{nameof(PuRepo.GetPoziceDlePlatuAsync)}_{range.Min}_{range.Max}_{PuRepo.DefaultYear}",
             _ => PuRepo.GetPoziceDlePlatuAsync(range.Min, range.Max, PuRepo.DefaultYear)
         );
-        
+
+        var platyCountTask = _cache.GetOrSetAsync<List<PuPlat>>(
+            $"platyCount_{PuRepo.DefaultYear}",
+            _ => PuRepo.GetPlatyAsync(PuRepo.DefaultYear)
+        );
+
         var platy = await platyTask;
+        var platyCount = (await platyCountTask).Count;
 
         ViewData["platy"] = platy;
-        ViewData["context"] = $"Dle platů {range.Min} - {range.Max},-";
-        
+        //ViewData["context"] = $"Dle platů {range.Min} - {range.Max},-";
+        ViewData["title"] = title;
+        ViewData["noteHtml"] = noteHtml;
+        ViewData["pocetPlatuCelkem"] = platyCount;
         return View(platy);
-    }
+}
 
-    public async Task<IActionResult> Oblast(string id)
+public async Task<IActionResult> Oblast(string id)
     {
         var organizaceForTagTask = _cache.GetOrSetAsync<List<PuOrganizace>>(
             $"{nameof(PuRepo.GetOrganizaceForTagAsync)}_{id}",
