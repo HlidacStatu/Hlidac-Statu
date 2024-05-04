@@ -1,5 +1,6 @@
 ﻿using HlidacStatu.Entities.Entities;
 using HlidacStatu.Repositories;
+using Nest;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using ZiggyCreatures.Caching.Fusion;
@@ -23,12 +24,21 @@ namespace PlatyUredniku
             );
         }
 
-        public static async Task<List<PuPlat>> GetPoziceDlePlatu(int min, int max, int year)
+        public static async Task<List<PuPlat>> GetPoziceDlePlatuAsync(int min, int max, int year)
         {
             return await _cache.GetOrSetAsync<List<PuPlat>>(
                 $"{nameof(PuRepo.GetPoziceDlePlatuAsync)}_{min}_{max}_{year}",
                     async _ => await PuRepo.GetPoziceDlePlatuAsync(min, max, year)
         );
+        }
+
+        public static async Task<PuOrganizace> GetFullDetailAsync(string datovaSchranka)
+        {
+            return await _cache.GetOrSetAsync<PuOrganizace>(
+                $"{nameof(PuRepo.GetFullDetailAsync)}_{datovaSchranka}",
+                    async _ => await PuRepo.GetFullDetailAsync(datovaSchranka)
+        );
+
         }
     }
 

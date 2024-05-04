@@ -1,5 +1,6 @@
 ﻿@using HlidacStatu.Entities.Entities
 @using HlidacStatu.Repositories
+@using PlatyUredniku.Models
 @inject ZiggyCreatures.Caching.Fusion.IFusionCache cache;
 @{
     var stats = await PuRepo.GetGlobalStatAsync();
@@ -7,6 +8,7 @@
 
     var organizationOfTheDay = await PuRepo.GetOrganizationOfTheDayAsync();
     var ceoOfTheDay = organizationOfTheDay.Platy.FirstOrDefault(p => p.JeHlavoun == true && p.Rok == PuRepo.DefaultYear);
+    var dataForOrganizationOfTheDay = await StaticCache.GetFullDetailAsync(organizationOfTheDay.DS);
 }
 
 <section class="d-flex align-items-center justify-content-center">
@@ -71,39 +73,54 @@
 
 <section class="d-flex align-items-center justify-content-center">
     <div class="container">
+        <div class="row">
+            <div class="col-12 col-md-6">
+                <h3>
+                    @organizationOfTheDay.Nazev
+                    <small class="text-body-secondary" style="font-size:75%">Organizace dne</small>
+                </h3>
+                <div>
+                    Najdete ji v kategoriích:
+                    @foreach (var tag in organizationOfTheDay.Tags)
+                    {
+                        <hashtag tag="@tag.Tag"></hashtag>
+                    }
+                </div>
+                <br />
 
-        <h3>
-            @organizationOfTheDay.Nazev
-            <small class="text-body-secondary" style="font-size:75%">Organizace dne</small>
-        </h3>
-        <div>
-            Najdete ji v kategoriích:
-            @foreach (var tag in organizationOfTheDay.Tags)
-            {
-                <hashtag tag="@tag.Tag"></hashtag>
-            }
+                @if (ceoOfTheDay is not null)
+                {
+                    <p>
+                        Nejvyšším představitelem organizace je <strong>@ceoOfTheDay.NazevPozice</strong>.
+                        Jeho hrubý měsíční plat je @HlidacStatu.Util.RenderData.NicePrice(ceoOfTheDay.HrubyMesicniPlat).
+                    </p>
+
+                }
+                <p>  
+                    @Html.Raw(Devmasters.Lang.CS.Plural.GetWithZero(dataForOrganizationOfTheDay.Platy.AktualniRok().Count,
+                             "<span class='text-danger'><i class='fa-solid fa-circle-xmark'></i> Odmítli nám poskytnout jakékoliv platy</span>",
+                             "<span class='text-warning'><i class='fa-solid fa-circle-exclamation'></i></span> Evidujeme od organizace jeden plat jedné pozice",
+                             $"<span class='text-success'><i class='fa-solid fa-badge-check'></span></i>Dostali jsme celkem {{0}} platy vedení organizace",
+                             $"<span class='text-success'><i class='fa-solid fa-badge-check'></span></i>Dostali jsme celkem {{0}} manažerských platů")
+                             )
+                    za rok @(PuRepo.DefaultYear).
+                </p>
+                <p>
+                    <a asp-action="Detail"
+                       asp-route-id="@organizationOfTheDay.DS"
+                       asp-route-rok="@PuRepo.DefaultYear"
+                       class="btn btn-primary btn-sm">Detail o platech</a>
+                </p>
+
+            </div>
+            <div class="col-12 col-lg-6">
+
+                <div>
+                    <partial name="Graphs/_AreaRangePlot" model="@(new AreaRangeRenderOptions(){ Platy= dataForOrganizationOfTheDay.Platy, CssHeight="250"})" />
+                </div>
+            </div>
         </div>
-        <br />
-
-        @if (ceoOfTheDay is not null)
-        {
-            <h5></h5>
-            <p class="fs-5">
-                Nejvyšším představitelem organizace je <strong>@ceoOfTheDay.NazevPozice</strong>.
-                Jeho hrubý měsíční plat je @HlidacStatu.Util.RenderData.NicePrice(ceoOfTheDay.HrubyMesicniPlat).
-            </p>
-
-        }
-
-        <p>
-            <a asp-action="Detail"
-               asp-route-id="@organizationOfTheDay.DS"
-               asp-route-rok="@PuRepo.DefaultYear"
-               class="btn btn-primary btn-sm">@organizationOfTheDay.Nazev</a>
-        </p>
-
     </div>
-
 </section>
 
 <section class="d-flex align-items-center justify-content-center alter-bg-color">

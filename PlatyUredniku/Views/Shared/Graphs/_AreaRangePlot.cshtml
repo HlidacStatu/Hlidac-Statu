@@ -1,30 +1,85 @@
-@model PlatyUredniku.Models.AreaRangePlot
+@model AreaRangeRenderOptions
+
+@using HlidacStatu.Entities.Entities
+@using MathNet.Numerics.Statistics
+@using PlatyUredniku.Models
 
 @{
     string chartId = HlidacStatu.Util.Consts.Rnd.Next(999).ToString("000");
+
+
+    PlatyUredniku.Models.AreaRangePlot chartData = null;
+
+    var salariesYearly = Model.Platy
+        .GroupBy(p => p.Rok, p => p)
+        .OrderBy(k => k.Key)
+        .ToDictionary(g => g.Key, g => g.Select(x => x).ToList());
+    if (salariesYearly.Any())
+    {
+        Dictionary<int, AreaRangePlot.PlotData?> plotData = new();
+
+        for (int year = salariesYearly.Keys.Min(); year <= salariesYearly.Keys.Max(); year++)
+        {
+            AreaRangePlot.PlotData? dataForYear = new AreaRangePlot.PlotData();
+
+            if (salariesYearly.TryGetValue(year, out var platyForYear))
+            {
+                var hrubeMesicniPlaty = platyForYear
+                .Select(p => (double)p.HrubyMesicniPlat)
+                .ToList();
+                dataForYear.Median = hrubeMesicniPlaty?.Median() ?? null;
+                dataForYear.Min = hrubeMesicniPlaty?.Min() ?? null;
+                dataForYear.Max = hrubeMesicniPlaty?.Max() ?? null;
+
+                var hrubeMesicniPlatyCeo = platyForYear
+                .Where(p => p.JeHlavoun == true)
+                .Select(p => (double)p.HrubyMesicniPlat);
+                if (hrubeMesicniPlatyCeo.Any())
+                {
+                    dataForYear.Ceo = hrubeMesicniPlatyCeo.Average();
+                }
+            }
+
+            plotData.Add(year, dataForYear);
+        }
+
+        chartData = new AreaRangePlot()
+                {
+                    Title = "Vývoj platů",
+                    Subtitle = "vývoj průměrného platu po letech",
+                    Values = plotData
+                };
+    }
 }
 
-<figure class="highcharts-figure width-75vp">
+@if (chartData == null)
+{
+    if (!string.IsNullOrEmpty(Model.TextForNoData))
+    {
+        <div>@Model.TextForNoData</div>
+    }
+
+    return;
+}
+<figure >
     <div id="chart-container-@chartId"></div>
 
-    <div class="text-muted">Popis grafu</div>
-
-
-    <p class="highcharts-description">
-        Další popis grafu
-    </p>
-
+    <div class="text-muted">Rozsah průměrných manažerských měsíčních platů vedení organizace (včetně odměn) přepočtených z ročního příjmu za sledované období</div>
 
 </figure>
 
-<script>    
+<script>
     Highcharts.chart('chart-container-@(chartId)', {
+        chart: {
+            height: '@Model.CssHeight' , // 16:6 ratio
+            width: null // 16:6 ratio
+        },
         title: {
-            text: '@Html.Raw(Model.Title)',
+            text: '@Html.Raw(chartData.Title)',
             align: 'left'
         },
         subtitle: {
-            text: '@Html.Raw(Model.Subtitle)',
+            text: '@Html.Raw(chartData.Subtitle)',
             align: 'left'
         },
         xAxis: {
@@ -45,38 +100,39 @@
         },
         plotOptions: {
             series: {
-                pointStart: Date.UTC(@Model.FirstYear, 1, 1),
+                pointStart: Date.UTC(@chartData.FirstYear, 1, 1),
                 pointIntervalUnit: 'year'
             }
         },
         series: [
             {
-            name: 'Plat šéfa',
-            color: 'red',
-            data: @Model.DrawCeoSalaries(),
-            zIndex: 1
-        }, {
-            name: 'Medián',
-            data: @Model.DrawMedians(),
-            zIndex: 1,
-            marker: {
-                fillColor: 'white',
-                lineWidth: 2,
-                lineColor: Highcharts.getOptions().colors[0]
-            }
-        }, {
-            name: 'Rozsah',
-            data: @Model.DrawMinMaxes(),
-            type: 'arearange',
-            lineWidth: 0,
-            linkedTo: ':previous',
-            color: Highcharts.getOptions().colors[0],
-            fillOpacity: 0.3,
-            zIndex: 0,
-            marker: {
-                enabled: false
-            }
-        }]
+                name: 'Plat šéfa',
+                color: 'red',
+                data: @chartData.DrawCeoSalaries(),
+                zIndex: 1
+            }, {
+                name: 'Medián',
+                data: @chartData.DrawMedians(),
+                zIndex: 1,
+                marker: {
+                    fillColor: 'white',
+                    lineWidth: 2,
+                    lineColor: Highcharts.getOptions().colors[0]
+                }
+            }, {
+                name: 'Rozsah',
+                data: @chartData.DrawMinMaxes(),
+                type: 'arearange',
+                lineWidth: 0,
+                linkedTo: ':previous',
+                color: Highcharts.getOptions().colors[0],
+                fillOpacity: 0.3,
+                zIndex: 0,
+                marker: {
+                    enabled: false
+                }
+            }]
     });
 
 </script>
+

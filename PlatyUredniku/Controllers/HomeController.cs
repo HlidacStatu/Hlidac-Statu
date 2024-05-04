@@ -62,7 +62,7 @@ public class HomeController : Controller
                 break;
         }
 
-        var platy = await StaticCache.GetPoziceDlePlatu(range.Min, range.Max, PuRepo.DefaultYear);
+        var platy = await StaticCache.GetPoziceDlePlatuAsync(range.Min, range.Max, PuRepo.DefaultYear);
         var platyCount = await StaticCache.GetPlatyCountPerYearAsync(PuRepo.DefaultYear);
 
         ViewData["platy"] = platy;
@@ -135,10 +135,7 @@ public class HomeController : Controller
 
     public async Task<IActionResult> Detail(string id, int? rok = null)
     {
-        var detail = await _cache.GetOrSetAsync<PuOrganizace>(
-            $"{nameof(PuRepo.GetFullDetailAsync)}_{id}",
-            _ => PuRepo.GetFullDetailAsync(id)
-        );
+        var detail = await StaticCache.GetFullDetailAsync(id);
 
         ViewData["mainTag"] = detail.Tags.FirstOrDefault(t => PuRepo.MainTags.Contains(t.Tag))?.Tag;
         ViewData["platy"] = detail.Platy.ToList();

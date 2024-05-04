@@ -19,7 +19,7 @@
                 {
                     <tr>
                         <td>
-                            <hashtag tag="@kvp.Key"></hashtag>
+                            <hashtag tag="@kvp.Key" style="font-size:1em;"></hashtag>
                         </td>
                         <td>
                             @{
@@ -30,7 +30,7 @@
                                     sample = $" jako např. {instituce[0].Nazev}, {instituce[1].Nazev} a další.";
                                 }
                             }
-                            Oblast obsahuje celkem <b>@(instituce.Count)</b> institucí@(sample)
+                                Oblast obsahuje celkem <a asp-action="oblast" asp-route-id="@kvp.Key"><b>@(instituce.Count)</b> institucí</a> @(sample)
                         </td>
                     </tr>
                 }
