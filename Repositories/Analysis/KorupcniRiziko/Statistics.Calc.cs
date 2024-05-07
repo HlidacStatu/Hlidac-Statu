@@ -94,9 +94,9 @@ namespace HlidacStatu.Repositories.Analysis.KorupcniRiziko
                     .Select(m =>
                     {
                         var company = Firmy.Get(m.Key);
-                        return (m.Key, m.Value.KIndex, company.KrajId);
+                        return new IcoDetail() { ico = m.Key, kindex = m.Value.KIndex, krajId = company.KrajId };
                     })
-                    .OrderBy(m => m.KIndex)
+                    .OrderBy(m => m.kindex)
                     .ToList();
 
                 foreach (KIndexData.KIndexParts part in Enum.GetValues(typeof(KIndexData.KIndexParts)))
@@ -107,10 +107,15 @@ namespace HlidacStatu.Repositories.Analysis.KorupcniRiziko
                         .Select(m =>
                         {
                             var company = Firmy.Get(m.Key);
-                            return (m.Key, m.Value.KIndexVypocet.Radky.First(r => r.VelicinaPart == part).Hodnota,
-                                company.KrajId);
+                            return new IcoDetail()
+                            {
+                                ico = m.Key,
+                                kindex = m.Value.KIndexVypocet.Radky.First(r => r.VelicinaPart == part).Hodnota,
+                                krajId = company.KrajId
+                            };
+                            
                         })
-                        .OrderBy(m => m.Hodnota)
+                        .OrderBy(m => m.kindex)
                         .ToList()
                     );
                 }

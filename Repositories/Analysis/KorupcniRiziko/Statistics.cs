@@ -29,8 +29,14 @@ namespace HlidacStatu.Repositories.Analysis.KorupcniRiziko
 
         public decimal AverageKindex { get; set; }
         public Dictionary<int, decimal> PercentileKIndex { get; set; } = new Dictionary<int, decimal>();
-        public List<(string ico, decimal kindex, string krajId)> SubjektOrderedListKIndexAsc { get; set; }
-        public Dictionary<KIndexData.KIndexParts, List<(string ico, decimal kindex, string krajId)>> SubjektOrderedListPartsAsc { get; set; } = new Dictionary<KIndexData.KIndexParts, List<(string ico, decimal kindex, string krajId)>>();
+        public List<IcoDetail> SubjektOrderedListKIndexAsc { get; set; }
+        public class IcoDetail
+        {
+            public string ico { get; set; }
+            public decimal kindex { get; set; }
+            public string krajId { get; set; }
+        }
+        public Dictionary<KIndexData.KIndexParts, List<IcoDetail>> SubjektOrderedListPartsAsc { get; set; } = new Dictionary<KIndexData.KIndexParts, List<IcoDetail>>();
 
 
         public KIndexData.VypocetDetail AverageParts { get; set; }
@@ -100,7 +106,7 @@ namespace HlidacStatu.Repositories.Analysis.KorupcniRiziko
             return AverageParts.Radky.First(m => m.Velicina == (int)part).Hodnota;
         }
 
-        public IEnumerable<SubjectWithKIndex> Filter(IEnumerable<(string ico, decimal kindex, string krajId)> source, IEnumerable<Firma.Zatrideni.Item> filterIco = null, bool showNone = false)
+        public IEnumerable<SubjectWithKIndex> Filter(IEnumerable<IcoDetail> source, IEnumerable<Firma.Zatrideni.Item> filterIco = null, bool showNone = false)
         {
             IEnumerable<SubjectWithKIndex> data;
             if (filterIco != null && filterIco.Count() > 0)
