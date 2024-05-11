@@ -102,7 +102,7 @@ namespace HlidacStatu.Api.VoiceToText
         {
             try
             {   //
-                var res = await Simple.GetAsync<string>(
+                var res = await Simple.GetAsync(
                     BaseApiUri.AbsoluteUri + "api/v2/voice2text/Check", continueOnCapturedContext: false,
                         headers: new Dictionary<string, string>() { { "Authorization", this.ApiKey } },
                         timeout: this.TimeOut
