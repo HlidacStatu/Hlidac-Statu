@@ -2,8 +2,7 @@
 
 if '%1'=='' goto argumentError
 
-dotnet publish -o ./bin/dockerPublish
-docker build -f dockerfile.publish -t hlidacstatu/asr-runner:%1 .
+docker build -f Dockerfile.publish -t hlidacstatu/asr-runner:%1 .
 docker push hlidacstatu/asr-runner:%1
 
 goto :EOF

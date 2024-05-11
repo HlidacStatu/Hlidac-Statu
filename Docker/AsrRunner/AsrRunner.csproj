@@ -6,7 +6,7 @@
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
         <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
-        <AssemblyVersion>2.2.6</AssemblyVersion>
+        <AssemblyVersion>2.2.7</AssemblyVersion>
         <DockerfileContext>..\..\..</DockerfileContext>
     </PropertyGroup>
 
@@ -20,6 +20,12 @@
     </ItemGroup>
 
     <ItemGroup>
+        <None Update="BuildPushDocker.bat">
+          <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </None>
+        <None Update="Dockerfile.publish">
+          <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </None>
         <None Update="DockerfileCI">
             <CopyToOutputDirectory>Always</CopyToOutputDirectory>
             <CopyToPublishDirectory>Always</CopyToPublishDirectory>
