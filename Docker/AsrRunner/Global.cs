@@ -66,7 +66,7 @@ public static class Global
 
     public static string LogStashUrl =>
         Environment.GetEnvironmentVariable(nameof(LogStashUrl)) ??
-        "http://10.10.150.203:5000";
+        "http://10.10.100.145:5000";
 
     public static string Debugme =>
         Environment.GetEnvironmentVariable(nameof(Debugme)) ??

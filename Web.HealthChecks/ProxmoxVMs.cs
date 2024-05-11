@@ -1,12 +1,11 @@
-﻿using Microsoft.Extensions.Diagnostics.HealthChecks;
-
+﻿using Corsinvest.ProxmoxVE.Api;
+using Microsoft.Extensions.Diagnostics.HealthChecks;
+using Newtonsoft.Json;
 using System;
 using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using Corsinvest.ProxmoxVE.Api;
-using Newtonsoft.Json;
 
 namespace HlidacStatu.Web.HealthChecks
 {
@@ -21,7 +20,7 @@ namespace HlidacStatu.Web.HealthChecks
             public string ServerUri { get; set; }
             public string NodeName { get; set; }
             public string ApiToken { get; set; }
-            public string[] ExpectedRunningVMs { get; set; }
+            public string[] ExpectedRunningVMs { get; set; } = new string[0];
         }
         public class VM
         {
@@ -52,7 +51,8 @@ namespace HlidacStatu.Web.HealthChecks
         {
             try
             {
-                bool bad = false;
+                bool warn = false;
+                bool unhealth = false;
                 StringBuilder result = new StringBuilder(1024);
                 Uri url = new Uri(this.options.ServerUri);
                 var client = new PveClient(url.Host, url.Port != 80 ? url.Port : 8006);
@@ -67,14 +67,14 @@ namespace HlidacStatu.Web.HealthChecks
                     {
                         if (allVMs.Any(m => m.name.Equals(vm, StringComparison.InvariantCultureIgnoreCase)) == false)
                         {
-                            bad = true;
+                            warn = true;
                             result.AppendLine($"VM '{vm}' doesn't exists");
                         }
                         else if (allVMs
                             .Where(m => m.status == "running")
                             .Any(m => m.name.Equals(vm, StringComparison.InvariantCultureIgnoreCase)) == false)
                         {
-                            bad = true;
+                            warn = true;
                             result.AppendLine($"VM '{vm}' is stopped");
                         }
                         else if (allVMs
@@ -85,21 +85,39 @@ namespace HlidacStatu.Web.HealthChecks
                         }
                         else
                         {
-                            bad = true;
+                            warn = true;
                             result.AppendLine($"VM '{vm}' is in unknown state");
                         }
 
                     }
 
-                    var nonListedVM = allVMs
-                        .Where(m=>m.status=="running")
-                        .Select(m => m.name)
-                        .Except(this.options.ExpectedRunningVMs, System.StringComparer.InvariantCultureIgnoreCase);
-                    
+
+                    //check CPU & Memory
+                    foreach (var vm in allVMs)
+                    {
+                        if (vm.cpu > 0.9)
+                        {
+                            unhealth = true;
+                            result.AppendLine($"VM '{vm.name}' {vm.cpu:P1} exhausted CPU." );
+                        }
+                        if (vm.mem > (vm.maxmem * .93))
+                        {
+                            warn = true;
+                            result.AppendLine($"VM '{vm.name}' {(vm.mem / 1_000_000_000):N2} / {(vm.mem / 1_000_000_000):N2} exhausted Memory.");
+
+                        }
+                        if (vm.mem > (vm.maxmem*.98))
+                        {
+                            unhealth = true;
+                            result.AppendLine($"VM '{vm.name}' {(vm.mem/1_000_000_000):N2} / {(vm.mem / 1_000_000_000):N2} exhausted Memory.");
+                        }
+                    }
+
                     //if (nonListedVM.Count()>0)
                     //    result.AppendLine($"Other running VMs: {string.Join(',', nonListedVM)}");
-
-                    if (bad)
+                    if (unhealth)
+                        return HealthCheckResult.Unhealthy(result.ToString());
+                    if (warn)
                         return HealthCheckResult.Degraded(result.ToString());
                     else
                         return HealthCheckResult.Healthy(result.ToString());

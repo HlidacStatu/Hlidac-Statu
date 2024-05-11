@@ -39,7 +39,7 @@
     // https://www.aspnetmonsters.com/2016/08/2016-08-27-httpclientwrong/
     using (var httpClient = new HttpClient())
     {
-        using (var request = new HttpRequestMessage(new HttpMethod("POST"), "http://10.10.150.203:8001/text_stemmer_ngrams?ngrams=3"))
+        using (var request = new HttpRequestMessage(new HttpMethod("POST"), "http://10.10.100.145:8001/text_stemmer_ngrams?ngrams=3"))
         {
             request.Headers.TryAddWithoutValidation("accept", "application/json"); 
 
@@ -53,7 +53,7 @@
     var explainStr = "";
     using (var httpClient = new HttpClient())
     {
-    using (var request = new HttpRequestMessage(new HttpMethod("POST"), "http://10.10.150.203:8001/explain_text_json"))
+    using (var request = new HttpRequestMessage(new HttpMethod("POST"), "http://10.10.100.145:8001/explain_text_json"))
     {
         request.Headers.TryAddWithoutValidation("accept", "application/json"); 
 

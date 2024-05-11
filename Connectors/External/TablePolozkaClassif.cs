@@ -13,7 +13,7 @@ namespace HlidacStatu.Connectors.External
 {
     public class TablePolozkaClassif
     {
-        static string endpoint = "http://10.10.150.203:8001";
+        static string endpoint = "http://10.10.100.145:8001";
         private static readonly ILogger _logger = Log.ForContext<TablePolozkaClassif>();
 
         static Dictionary<string, InDocTag> tags = null;
