@@ -341,7 +341,7 @@ text zpravy: {txt}
             return Content("");
         }
 
-        public async Task<ActionResult> TextSmlouvy(string Id, string hash, string secret)
+        public async Task<ActionResult> TextSmlouvy(string Id, string hash, string secret, bool? raw = null)
         {
             if (string.IsNullOrEmpty(Id) || string.IsNullOrEmpty(hash))
                 return NotFound();
@@ -371,6 +371,7 @@ text zpravy: {txt}
             }
 
             ViewBag.hashValue = hash;
+            ViewBag.RawDisplay = raw;
             return View(model);
         }
         public async Task<ActionResult> KopiePrilohy(string Id, string hash, string secret, bool forcePDF = false)

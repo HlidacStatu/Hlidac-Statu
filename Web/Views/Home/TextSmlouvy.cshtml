@@ -1,6 +1,9 @@
 ﻿@model HlidacStatu.Entities.Smlouva
 
 @{
+    if (ViewBag.RawDisplay == true)
+        Layout = null;    
+
 
     ViewBag.SubTitle = Model.FullTitle();
     ViewBag.Title = "Textová podoba smlouvy";
