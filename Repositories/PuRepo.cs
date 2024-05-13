@@ -1,6 +1,6 @@
 using System;
 using HlidacStatu.Entities;
-using HlidacStatu.Entities.Entities;
+using HlidacStatu.Entities;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using System.Linq;

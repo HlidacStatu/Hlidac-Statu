@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace HlidacStatu.Entities.Entities;
+namespace HlidacStatu.Entities;
 [Table("PU_Organizace")]
 public class PuOrganizace
 {

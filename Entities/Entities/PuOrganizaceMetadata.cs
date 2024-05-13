@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using Devmasters.Enums;
 
-namespace HlidacStatu.Entities.Entities;
+namespace HlidacStatu.Entities;
 
 [Table("PU_OrganizaceMetadata")]
 public class PuOrganizaceMetadata
