@@ -2,7 +2,9 @@
 
 @{
     if (ViewBag.RawDisplay == true)
-        Layout = null;    
+    {
+        Layout = null;  
+    }
 
 
     ViewBag.SubTitle = Model.FullTitle();
@@ -62,36 +64,42 @@
 
     }
 }
-@section scripts {
-    @*<script src="https://linker.zakonyprolidi.cz/lib/lite.js"></script>
-    <script>
-        $(function () {
-            zpl_linker.ProcessNode(document.getElementById('processZPL'));
-        });
-    </script>*@
-}
+@if (Layout != null)
+{
+    <text>
+        @section scripts {
+        @*<script src="https://linker.zakonyprolidi.cz/lib/lite.js"></script>
+            <script>
+                $(function () {
+                    zpl_linker.ProcessNode(document.getElementById('processZPL'));
+                });
+            </script>*@
+        }
 
 
-@section footerscripts
-{
-    @if (!string.IsNullOrEmpty(query))
-    {
-        <script>
-            var first = document.getElementById("found1");
-            if (first != null)
-            first.scrollIntoView();   //Even IE6 supports this
-        </script>
-    }
+        @section footerscripts
+        {
+            @if (!string.IsNullOrEmpty(query))
+            {
+                <script>
+                    var first = document.getElementById("found1");
+                    if (first != null)
+                        first.scrollIntoView();   //Even IE6 supports this
+                </script>
+            }
+        }
+        @section breadcrumb
+        {
+            <ol class="breadcrumb">
+                <li><a href="/">Hlídač Státu</a></li>
+                <li><a href="@Url.Action("Smlouvy","Home")">Hlídač Smluv</a></li>
+                <li><a href="@Url.Action("Detail","Home", new { id = Model.Id })">@Model.FullTitle()</a></li>
+                <li class="active">@ViewBag.Title</li>
+            </ol>
+        }
+    </text>
 }
-@section breadcrumb
-{
-    <ol class="breadcrumb">
-        <li><a href="/">Hlídač Státu</a></li>
-        <li><a href="@Url.Action("Smlouvy","Home")">Hlídač Smluv</a></li>
-        <li><a href="@Url.Action("Detail","Home", new { id = Model.Id })">@Model.FullTitle()</a></li>
-        <li class="active">@ViewBag.Title</li>
-    </ol>
-}
+
 @if (Model.Prilohy != null && Model.Prilohy.Count() > 0)
 {
 
