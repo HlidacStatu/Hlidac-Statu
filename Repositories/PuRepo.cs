@@ -56,7 +56,7 @@ public static class PuRepo
         await db.SaveChangesAsync();
 
     }
-    public static async Task<PuVydelek[]> LoadVydelekData(int rok, int level = 4)
+    public static async Task<PuVydelek[]> LoadVydelekDataAsync(int rok, int level = 4)
     {
         await using var db = new DbEntities();
         PuVydelek[] res = await db.PuVydelky
@@ -66,12 +66,15 @@ public static class PuRepo
 
         return res;
     }
-    public static async Task<PuVydelek[]> LoadVydelekForZamestnani(string cz_ISCO)
+    public static async Task<PuVydelek[]> LoadVydelekForZamestnaniAsync(string cz_ISCO, PuVydelek.VydelekSektor? sektor)
     {
         await using var db = new DbEntities();
-        PuVydelek[] res = await db.PuVydelky
-            .Where(m => m.CZ_ISCO == cz_ISCO)
-            .ToArrayAsync();
+        var query = db.PuVydelky
+            .Where(m => m.CZ_ISCO == cz_ISCO);
+        if (sektor.HasValue)
+            query = query.Where(m => m.SektorId == (int)sektor);
+
+        PuVydelek[] res = await query.ToArrayAsync();
 
         return res;
     }

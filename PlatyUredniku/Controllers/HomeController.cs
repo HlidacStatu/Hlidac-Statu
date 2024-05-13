@@ -163,6 +163,10 @@ public class HomeController : Controller
     {
         return View();
     }
+    public IActionResult Statistika(string id, string typ)
+    {
+        return View("statistika_"+id,typ);
+    }
 
     public async Task<IActionResult> Export(string type, string datovaSchranka, int? rok)
     {

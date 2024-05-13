@@ -675,7 +675,7 @@ point: {
         }
 
 
-        public static IHtmlContent SimpleColumnChart(this IHtmlHelper htmlHelper, IEnumerable<(string name,
+        public static IHtmlContent SimpleLineColumnChart(this IHtmlHelper htmlHelper, IEnumerable<(string name,
                 IEnumerable<ReportDataTimeValue> values)> data,
             string title, string valueName,
             int height, string addStyle = "", string chartType = "column",

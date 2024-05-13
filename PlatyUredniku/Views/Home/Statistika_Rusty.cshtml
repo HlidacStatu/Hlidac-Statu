@@ -1,0 +1,77 @@
+﻿@using MathNet.Numerics.Statistics
+@using Microsoft.AspNetCore.Mvc.TagHelpers
+@using PlatyUredniku.Models
+@using HlidacStatu.Repositories;
+@using Devmasters;
+
+@model string
+
+@section scripts
+{
+    <link rel="stylesheet" type="text/css" href="//cdn.datatables.net/1.13.4/css/jquery.dataTables.min.css" />
+    <script type="text/javascript" charset="utf8" src="//cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
+    <script>
+        function adjustDataTablesWidth() {
+            $.fn.dataTable.tables({ visible: true, api: true }).columns.adjust();
+        }
+    </script>
+}
+
+@section breadcrumbs
+{
+    <ol class="breadcrumb">
+        <li>
+            <a asp-action="Index">Platy úředníků</a>
+        </li>
+        <li>
+            <a asp-action="Statistiky">Statistiky</a>
+        </li>
+        <li class="active">Roční změny mezd a platů</li>
+    </ol>
+}
+
+<section class="d-flex align-items-center justify-content-center">
+    <div class="container">
+
+        @{
+            var d1 = await PuRepo.LoadVydelekForZamestnaniAsync("1112", HlidacStatu.Entities.PuVydelek.VydelekSektor.StatSamosprava);
+            var d2 = await PuRepo.LoadVydelekForZamestnaniAsync("1120", HlidacStatu.Entities.PuVydelek.VydelekSektor.Soukromy );
+            var d1Name = d1.OrderByDescending(m => m.Rok).Select(m => m.FullNazevKategorieZamestnani()).FirstOrDefault().ShortenMe(140);
+            var d2Name = d2.OrderByDescending(m => m.Rok).Select(m => m.FullNazevKategorieZamestnani()).FirstOrDefault().ShortenMe(140);
+
+            Dictionary<int, AreaRangePlot.PlotData> data1 = d1
+                //zacatek u roku, kde zacinaji pozdejsi data
+                //.Where(m => m.Rok >= Math.Max(d1.Min(m => m.Rok), d2.Min(m => m.Rok)))
+                //.Where(m => m.TypVydelkuId ==1)
+                .Select(m => new
+                {
+                    rok = m.Rok,
+                    data = new AreaRangePlot.PlotData() { Extra = (double)m.Prumer, Max = (double)m.Percentil90, Min = (double)m.Percentil10, Median = (double)m.Percentil50 }
+                })
+                .ToDictionary(m => m.rok, v => v.data);
+
+            Dictionary<int, AreaRangePlot.PlotData> data2 = d2
+                //zacatek u roku, kde zacinaji pozdejsi data
+                //.Where(m => m.Rok >= Math.Max(d1.Min(m => m.Rok), d2.Min(m => m.Rok)))
+            .Select(m => new
+                {
+                    rok = m.Rok,
+                    data = new AreaRangePlot.PlotData() { Extra = (double)m.Prumer, Max = (double)m.Percentil90, Min = (double)m.Percentil10, Median = (double)m.Percentil50 }
+                })
+                .ToDictionary(m => m.rok, v => v.data);
+
+
+            AreaRangeCompareRenderOptions chartModel = new AreaRangeCompareRenderOptions()
+            {
+                CssHeight = "450",
+                Data1 = new AreaRangePlot(){ Values = data1, ExtraTitle="Průměr ", MinMaxTitle="Většina od - do ", Title =d1Name },
+                Data2 = new AreaRangePlot() { Values = data2, ExtraTitle = "Průměr ", MinMaxTitle = "Od-do ", Title = d2Name },
+            };
+        }
+        <partial name="Graphs/_AreaRangeComparePlot" model="@chartModel" />
+
+     
+
+    </div>
+</section>
+

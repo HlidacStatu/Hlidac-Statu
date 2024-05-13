@@ -36,7 +36,7 @@
                 .Select(p => (double)p.HrubyMesicniPlat);
                 if (hrubeMesicniPlatyCeo.Any())
                 {
-                    dataForYear.Ceo = hrubeMesicniPlatyCeo.Average();
+                    dataForYear.Extra = hrubeMesicniPlatyCeo.Average();
                 }
             }
 
@@ -108,7 +108,7 @@
             {
                 name: 'Plat šéfa',
                 color: 'red',
-                data: @chartData.DrawCeoSalaries(),
+                data: @chartData.DrawExtras(),
                 zIndex: 1
             }, {
                 name: 'Medián',

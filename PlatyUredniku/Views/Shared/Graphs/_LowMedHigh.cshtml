@@ -1,0 +1,154 @@
+@model LowMedHighRenderOptions
+
+@using Devmasters
+@using HlidacStatu.Entities.Entities
+@using MathNet.Numerics.Statistics
+@using PlatyUredniku.Models
+
+@{
+    string chartId = HlidacStatu.Util.Consts.Rnd.Next(999).ToString("000");
+
+
+    PlatyUredniku.Models.AreaRangePlot chartData = null;
+
+    var years = Model.Data.SelectMany(m => m.Values.Keys).Distinct().OrderBy(o=>o);
+
+}
+
+@if (Model.Data == null || Model.Data.Length == 0)
+{
+    if (!string.IsNullOrEmpty(Model.TextForNoData))
+    {
+        <div>@Model.TextForNoData</div>
+    }
+
+    return;
+}
+<figure >
+    <div id="chart-container-@chartId"></div>
+
+    <div class="text-muted">Porovnání 1.decilu, mediánu a 9.decilu platů</div>
+
+</figure>
+
+<script>
+    // Define custom series type for displaying low/med/high values using boxplot as a base
+    Highcharts.seriesType('lowmedhigh', 'boxplot', {
+        keys: ['low', 'median', 'high'],
+        tooltip: {
+            pointFormat: '<span style="color:{point.color}">\u25CF</span> {series.userOptions.shortname}: ' +
+                'Většina mezi <b>{point.low}</b> - <b>{point.high} Kč</b>, @Html.Raw(Model.Data.FirstOrDefault().ExtraTitle) <b>{point.median} Kč</b><br/>'
+        }
+    }, {
+        // Change point shape to a line with three crossing lines for low/median/high
+        // Stroke width is hardcoded to 1 for simplicity
+        drawPoints: function () {
+            const series = this;
+            this.points.forEach(function (point) {
+                let graphic = point.graphic;
+                const verb = graphic ? 'animate' : 'attr',
+                    shapeArgs = point.shapeArgs,
+                    width = shapeArgs.width,
+                    left = Math.floor(shapeArgs.x) + 0.5,
+                    right = left + width,
+                    crispX = left + Math.round(width / 2) + 0.5,
+                    highPlot = Math.floor(point.highPlot) + 0.5,
+                    medianPlot = Math.floor(point.medianPlot) + 0.5,
+                    // Sneakily draw low marker even if 0
+                    lowPlot = Math.floor(point.lowPlot) +
+                        0.5 - (point.low === 0 ? 1 : 0);
+
+                if (point.isNull) {
+                    return;
+                }
+
+                if (!graphic) {
+                    point.graphic = graphic = series.chart.renderer
+                        .path('point')
+                        .add(series.group);
+                }
+
+                graphic.attr({
+                    stroke: point.color || series.color,
+                    'stroke-width': @(Model.LineWidth)
+                });
+
+                graphic[verb]({
+                    d: [
+                        'M', left, highPlot,
+                        'H', right,
+                        'M', left, medianPlot,
+                        'H', right,
+                        'M', left, lowPlot,
+                        'H', right,
+                        'M', crispX, highPlot,
+                        'V', lowPlot
+                    ]
+                });
+            });
+        }
+    });
+
+    const chart@(chartId) = Highcharts.chart('chart-container-@(chartId)', {
+        chart: {
+            type: 'lowmedhigh',
+                height: '@Model.CssHeight', // 16:6 ratio
+            width: null // 16:6 ratio
+        },
+        title: {
+            text: '@Html.Raw(Model.Title)',
+            align: 'left'
+        },
+        subtitle: {
+            text: '@Html.Raw(Model.Subtitle)',
+            align: 'left'
+        },
+        xAxis: {            
+            crosshair: true,
+            categories: [@(string.Join(",",years))]
+        },
+        yAxis: {
+            title: {
+                text: 'Výše platu'
+            },
+            labels: {
+                format: '{value:,.0f} Kč'
+            },
+            min: 0
+        },
+        tooltip: {
+            crosshairs: true,
+            shared: true,
+            stickOnContact: true
+        },
+        plotOptions: {
+            series: {
+                stickyTracking: true,
+                whiskerWidth: 5
+            }
+        },
+        series: [
+            @{
+                List<string> renderedSeriesData = new();
+            
+                foreach (var s in Model.Data)
+                {
+                    var sdataArr = years
+                        .Select(y => s.Values.ContainsKey(y) ? $"[{(int)s.Values[y].Min},{(int)s.Values[y].Median},{(int)s.Values[y].Max}]" : $"[null,null,null]");
+                    var sdata = string.Join(",", sdataArr);
+
+            renderedSeriesData.Add($"{{ name: '{s.Title}', shortname: '{s.Title.ShortenMe(30)}', data: [{sdata}] }}");
+                
+                }
+            }
+            @Html.Raw(string.Join(",\n",renderedSeriesData))
+            ]
+    });
+
+    // Remove click events on container to avoid having "clickable" announced by AT
+    // These events are needed for custom click events, drag to zoom, and navigator
+    // support.
+        chart@(chartId).container.onmousedown = null;
+        chart@(chartId).container.onclick = null;
+</script>
+

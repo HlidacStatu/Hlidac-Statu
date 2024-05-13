@@ -1,19 +1,7 @@
-﻿using HlidacStatu.Entities.Entities;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 
 namespace PlatyUredniku.Models;
-
-public class AreaRangeRenderOptions
-{
-    public ICollection<PuPlat> Platy { get; set; }
-    public string CssWidth { get; set; } = "100%";
-    public string CssHeight { get; set; } = "100%"; //$"{9 / 16 * 100}%'"; //16:9
-    public string TextForNoData { get; set; } = string.Empty;
-    public string? Title { get; set; } = "Vývoj platů";
-    public string? Subtitle { get; set; } = "Vývoj průměrného měsíčního platu po letech";
-
-}
 
 public class AreaRangePlot
 {
@@ -23,6 +11,9 @@ public class AreaRangePlot
 
     public Dictionary<int, PlotData?> Values { get; set; }
 
+    public string MinMaxTitle { get; set; } = "Rozsah";
+    public string ExtraTitle { get; set; } = "Průměr";
+    public string MedianTitle { get; set; } = "Medián";
 
 
     public string DrawMinMaxes()
@@ -39,9 +30,9 @@ public class AreaRangePlot
         return $"[{string.Join(",", data)}]";
     }
 
-    public string DrawCeoSalaries()
+    public string DrawExtras()
     {
-        var data = Values.Select(kvp => $"[Date.UTC({kvp.Key}, 0, 1), {kvp.Value?.Ceo?.ToString("F0") ?? "null"}]");
+        var data = Values.Select(kvp => $"[Date.UTC({kvp.Key}, 0, 1), {kvp.Value?.Extra?.ToString("F0") ?? "null"}]");
 
         return $"[{string.Join(",", data)}]";
     }
@@ -51,7 +42,7 @@ public class AreaRangePlot
         public double? Min { get; set; }
         public double? Max { get; set; }
         public double? Median { get; set; }
-        public double? Ceo { get; set; }
+        public double? Extra { get; set; }
 
     }
 }

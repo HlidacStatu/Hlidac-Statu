@@ -13,6 +13,7 @@ public class PuCZISCO
     public string CZ_ISCO { get; set; }
     public int Level { get; set; }
     public string NazevKategorieZamestnani { get; set; }
+    public string Groupname { get; set; }
    
 
 }

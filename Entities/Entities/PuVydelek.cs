@@ -1,4 +1,4 @@
-using System.ComponentModel.DataAnnotations;
+ï»¿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Dynamic;
 using Devmasters.Enums;
@@ -10,27 +10,44 @@ namespace HlidacStatu.Entities;
 public class PuVydelek
 {
 
-    [ShowNiceDisplayName]
-    public enum VydelekTyp
+    [ShowNiceDisplayName(), Groupable()]
+    public enum VydelekSektor
     {
-        [NiceDisplayName("Mzda - soukromý sektor")]
-        Mzda = 1,
+        [GroupValue("Mzda")]
+        [NiceDisplayName("SoukromÃ½ sektor")]
+        Soukromy = 1,
 
-        [NiceDisplayName("Plat - stát, samospráva")]
-        Plat = 2,
+        [GroupValue("Plat")]
+        [NiceDisplayName("VeÅ™ejnÃ¡ sprÃ¡va")]
+        StatSamosprava = 2,
 
         Neuveden = 0
     }
-    public VydelekTyp TypVydelku { get => (VydelekTyp)this.TypVydelku; }
+    [NotMapped]
+    public VydelekSektor Sektor { 
+        get => (VydelekSektor)this.SektorId; 
+        set { SektorId = (int)value; }
+    }
 
     [Key]
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
     public long Pk { get; set; }
-    public int TypVydelkuId { get; set; }
+    public int SektorId { get; set; }
     public int Rok { get; set; }
     public string CZ_ISCO { get; set; }
     public int Level { get; set; }
     public string NazevKategorieZamestnani { get; set; }
+
+    
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="format">{0} sektor, {1} kategorie zamestnani</param>
+    /// <returns></returns>
+    public string FullNazevKategorieZamestnani(string format = "({0}) {1}") {
+        var res = string.Format(format, this.Sektor.ToNiceDisplayName(), this.NazevKategorieZamestnani);
+        return res;    
+    }
     public int PocetZkoumanychOsob { get; set; }
     public decimal Percentil10 { get; set; }
     public decimal Percentil25 { get; set; }

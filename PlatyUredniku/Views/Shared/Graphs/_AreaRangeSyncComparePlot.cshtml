@@ -1,0 +1,233 @@
+@model AreaRangeCompareRenderOptions
+
+@using HlidacStatu.Entities.Entities
+@using MathNet.Numerics.Statistics
+@using PlatyUredniku.Models
+
+@{
+    string chartId = HlidacStatu.Util.Consts.Rnd.Next(999).ToString("000");
+
+
+    PlatyUredniku.Models.AreaRangePlot chartData1 = Model.Data1;
+    PlatyUredniku.Models.AreaRangePlot chartData2 = Model.Data2;
+
+    var maxPlat = Math.Max(
+        Model.Data1.Values.Concat(Model.Data2.Values).Max(m => m.Value.Max) ?? 0,
+        Model.Data1.Values.Concat(Model.Data2.Values).Max(m => m.Value.Extra) ?? 0
+    ) * 1.05d;
+}
+
+@if (chartData1 == null)
+{
+    if (!string.IsNullOrEmpty(Model.TextForNoData))
+    {
+        <div>@Model.TextForNoData</div>
+    }
+
+    return;
+}
+<figure>
+    <div id="chart-container-@chartId">
+
+        <div id="chart-container-@(chartId)-0">
+        </div>
+        <div id="chart-container-@(chartId)-1">
+        </div>
+    </div>
+
+</figure>
+
+<script>
+
+
+    Highcharts.chart('chart-container-@(chartId)-0', {
+        chart: {
+            height: '@Model.CssHeight', // 16:6 ratio
+            width: null // 16:6 ratio
+        },
+        legend: { enabled: false},
+        title: {
+            text: '@Html.Raw(Model.Data1.Title)',
+            align: 'left'
+        },
+        subtitle: {
+            text: '@Html.Raw(Model.Data1.Subtitle)',
+            align: 'left'
+        },
+        xAxis: {
+            type: 'datetime'
+        },
+        yAxis: {
+            title: {
+                text: 'Výše platu'
+            },
+            labels: {
+                format: '{value:,.0f} Kč'
+            },
+            max: @(maxPlat.ToString(HlidacStatu.Util.Consts.enCulture)),
+            tickAmount: 4
+            },
+        tooltip: {
+            crosshairs: true,
+            shared: true,
+            valueSuffix: ' Kč'
+        },
+        plotOptions: {
+            series: {
+                pointStart: Date.UTC(@Model.Data1.FirstYear, 1, 1),
+                pointIntervalUnit: 'year'
+            }
+        },
+        series: [
+            {
+                name: '@Html.Raw(Model.Data1.ExtraTitle)',
+                color: Highcharts.getOptions().colors[0],
+                data: @Model.Data1.DrawExtras(),
+                zIndex: 1
+            }, {
+                name: '@Html.Raw(Model.Data1.MinMaxTitle)',
+                data: @Model.Data1.DrawMinMaxes(),
+                type: 'arearange',
+                lineWidth: 0,
+                linkedTo: ':previous',
+                color: Highcharts.getOptions().colors[0],
+                fillOpacity: 0.3,
+                zIndex: 0,
+                marker: {
+                    enabled: false
+                }
+            }
+        ]
+    });
+
+
+    Highcharts.chart('chart-container-@(chartId)-1', {
+        chart: {
+            height: '@Model.CssHeight', // 16:6 ratio
+            width: null // 16:6 ratio
+        },
+        legend: { enabled: false },
+        title: {
+            text: '@Html.Raw(Model.Data2.Title)',
+            align: 'left'
+        },
+        subtitle: {
+            text: '@Html.Raw(Model.Data2.Subtitle)',
+            align: 'left'
+        },
+        xAxis: {
+            type: 'datetime'
+        },
+        yAxis: {
+            title: {
+                text: 'Výše platu'
+            },
+            labels: {
+                format: '{value:,.0f} Kč'
+            },
+            max : @(maxPlat.ToString(HlidacStatu.Util.Consts.enCulture)),
+            tickAmount: 4
+        },
+        tooltip: {
+            crosshairs: true,
+            shared: true,
+            valueSuffix: ' Kč'
+        },
+        plotOptions: {
+            series: {
+                pointStart: Date.UTC(@Model.Data2.FirstYear, 1, 1),
+                pointIntervalUnit: 'year'
+            }
+        },
+        series: [            
+            {
+                name: '@Html.Raw(Model.Data2.ExtraTitle)',
+                color: Highcharts.getOptions().colors[3],
+                data: @Model.Data2.DrawExtras(),
+                zIndex: 1
+            }, {
+                name: '@Html.Raw(Model.Data2.MinMaxTitle)',
+                data: @Model.Data2.DrawMinMaxes(),
+                type: 'arearange',
+                lineWidth: 0,
+                linkedTo: ':previous',
+                color: Highcharts.getOptions().colors[3],
+                fillOpacity: 0.3,
+                zIndex: 0,
+                marker: {
+                    enabled: false
+                }
+            }
+        ]
+    });
+
+    /**
+    * In order to synchronize tooltips and crosshairs, override the
+    * built-in events with handlers defined on the parent element.
+    */
+    ['mousemove', 'touchmove', 'touchstart'].forEach(function (eventType) {
+        document.getElementById('chart-container-@chartId').addEventListener(
+            eventType,
+            function (e) {
+                let chart,
+                    point,
+                    i,
+                    event;
+
+                for (i = 0; i < Highcharts.charts.length; i = i + 1) {
+                    chart = Highcharts.charts[i];
+                    // Find coordinates within the chart
+                    event = chart.pointer.normalize(e);
+                    // Get the hovered point
+                    point = chart.series[0].searchPoint(event, true);
+
+                    if (point) {
+                        point.highlight(e);
+                    }
+                }
+            }
+        );
+    });
+
+    /**
+     * Override the reset function, we don't need to hide the tooltips and
+     * crosshairs.
+     */
+    Highcharts.Pointer.prototype.reset = function () {
+        return undefined;
+    };
+
+    /**
+     * Highlight a point by showing tooltip, setting hover state and draw crosshair
+     */
+    Highcharts.Point.prototype.highlight = function (event) {
+        event = this.series.chart.pointer.normalize(event);
+        this.onMouseOver(); // Show the hover marker
+        //this.series.chart.tooltip.refresh(this); // Show the tooltip
+        this.series.chart.xAxis[0].drawCrosshair(event, this); // Show the crosshair
+    };
+
+    /**
+     * Synchronize zooming through the setExtremes event handler.
+     */
+    function syncExtremes(e) {
+        const thisChart = this.chart;
+
+        if (e.trigger !== 'syncExtremes') { // Prevent feedback loop
+            Highcharts.each(Highcharts.charts, function (chart) {
+                if (chart !== thisChart) {
+                    if (chart.xAxis[0].setExtremes) { // It is null while updating
+                        chart.xAxis[0].setExtremes(
+                            e.min,
+                            e.max,
+                            undefined,
+                            false,
+                            { trigger: 'syncExtremes' }
+                        );
+                    }
+                }
+            });
+        }
+    }
+</script>
+
