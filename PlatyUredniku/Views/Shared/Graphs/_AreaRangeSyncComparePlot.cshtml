@@ -7,17 +7,13 @@
 @{
     string chartId = HlidacStatu.Util.Consts.Rnd.Next(999).ToString("000");
 
-
-    PlatyUredniku.Models.AreaRangePlot chartData1 = Model.Data1;
-    PlatyUredniku.Models.AreaRangePlot chartData2 = Model.Data2;
-
     var maxPlat = Math.Max(
-        Model.Data1.Values.Concat(Model.Data2.Values).Max(m => m.Value.Max) ?? 0,
-        Model.Data1.Values.Concat(Model.Data2.Values).Max(m => m.Value.Extra) ?? 0
+        Model.Data.SelectMany(m => m.Values).Max(m => m.Value.Max) ?? 0,
+        Model.Data.SelectMany(m => m.Values).Max(m => m.Value.Extra) ?? 0
     ) * 1.05d;
 }
 
-@if (chartData1 == null)
+@if (Model.Data == null || Model.Data.Count() == 0)
 {
     if (!string.IsNullOrEmpty(Model.TextForNoData))
     {
@@ -39,127 +35,72 @@
 
 <script>
 
-
-    Highcharts.chart('chart-container-@(chartId)-0', {
-        chart: {
-            height: '@Model.CssHeight', // 16:6 ratio
-            width: null // 16:6 ratio
-        },
-        legend: { enabled: false},
-        title: {
-            text: '@Html.Raw(Model.Data1.Title)',
-            align: 'left'
-        },
-        subtitle: {
-            text: '@Html.Raw(Model.Data1.Subtitle)',
-            align: 'left'
-        },
-        xAxis: {
-            type: 'datetime'
-        },
-        yAxis: {
-            title: {
-                text: 'Výše platu'
-            },
-            labels: {
-                format: '{value:,.0f} Kč'
-            },
-            max: @(maxPlat.ToString(HlidacStatu.Util.Consts.enCulture)),
-            tickAmount: 4
-            },
-        tooltip: {
-            crosshairs: true,
-            shared: true,
-            valueSuffix: ' Kč'
-        },
-        plotOptions: {
-            series: {
-                pointStart: Date.UTC(@Model.Data1.FirstYear, 1, 1),
-                pointIntervalUnit: 'year'
-            }
-        },
-        series: [
+            @for (int i = 0; i < Model.Data.Length; i++)
             {
-                name: '@Html.Raw(Model.Data1.ExtraTitle)',
-                color: Highcharts.getOptions().colors[0],
-                data: @Model.Data1.DrawExtras(),
-                zIndex: 1
-            }, {
-                name: '@Html.Raw(Model.Data1.MinMaxTitle)',
-                data: @Model.Data1.DrawMinMaxes(),
-                type: 'arearange',
-                lineWidth: 0,
-                linkedTo: ':previous',
-                color: Highcharts.getOptions().colors[0],
-                fillOpacity: 0.3,
-                zIndex: 0,
-                marker: {
-                    enabled: false
-                }
+                var s = Model.Data[i];
+                <text>
+                    Highcharts.chart('chart-container-@(chartId)-@(i)', {
+                        chart: {
+                            height: '@Model.CssHeight', // 16:6 ratio
+                            width: null // 16:6 ratio
+                        },
+                        legend: { enabled: false },
+                        title: {
+                            text: '@Html.Raw(Model.Data.First().Title)',
+                            align: 'left'
+                        },
+                        subtitle: {
+                            text: '@Html.Raw(Model.Data.First().Subtitle)',
+                            align: 'left'
+                        },
+                        xAxis: {
+                            type: 'datetime'
+                        },
+                        yAxis: {
+                            title: {
+                                text: 'Výše platu'
+                            },
+                            labels: {
+                                format: '{value:,.0f} Kč'
+                            },
+                            max: @(maxPlat.ToString(HlidacStatu.Util.Consts.enCulture)),
+                            tickAmount: 4
+                        },
+                        tooltip: {
+                            crosshairs: true,
+                            shared: true,
+                            valueSuffix: ' Kč'
+                        },
+                        plotOptions: {
+                            series: {
+                                pointStart: Date.UTC(@Model.Data.First().FirstYear, 1, 1),
+                                pointIntervalUnit: 'year'
+                            }
+                        },
+                        series: [
+                            {
+                                name: '@Html.Raw(s.ExtraTitle)',
+                                color: Highcharts.getOptions().colors[@(i*1)],
+                                data: @s.DrawExtras(),
+                                zIndex: 1
+                            }, {
+                                name: '@Html.Raw(s.MinMaxTitle)',
+                                data: @s.DrawMinMaxes(),
+                                type: 'arearange',
+                                lineWidth: 0,
+                                linkedTo: ':previous',
+                                color: Highcharts.getOptions().colors[@(i*1)],
+                                fillOpacity: 0.3,
+                                zIndex: 0,
+                                marker: {
+                                    enabled: false
+                                }
+                            }
+                        ]
+                    });
+                </text>
             }
-        ]
-    });
 
-
-    Highcharts.chart('chart-container-@(chartId)-1', {
-        chart: {
-            height: '@Model.CssHeight', // 16:6 ratio
-            width: null // 16:6 ratio
-        },
-        legend: { enabled: false },
-        title: {
-            text: '@Html.Raw(Model.Data2.Title)',
-            align: 'left'
-        },
-        subtitle: {
-            text: '@Html.Raw(Model.Data2.Subtitle)',
-            align: 'left'
-        },
-        xAxis: {
-            type: 'datetime'
-        },
-        yAxis: {
-            title: {
-                text: 'Výše platu'
-            },
-            labels: {
-                format: '{value:,.0f} Kč'
-            },
-            max : @(maxPlat.ToString(HlidacStatu.Util.Consts.enCulture)),
-            tickAmount: 4
-        },
-        tooltip: {
-            crosshairs: true,
-            shared: true,
-            valueSuffix: ' Kč'
-        },
-        plotOptions: {
-            series: {
-                pointStart: Date.UTC(@Model.Data2.FirstYear, 1, 1),
-                pointIntervalUnit: 'year'
-            }
-        },
-        series: [            
-            {
-                name: '@Html.Raw(Model.Data2.ExtraTitle)',
-                color: Highcharts.getOptions().colors[3],
-                data: @Model.Data2.DrawExtras(),
-                zIndex: 1
-            }, {
-                name: '@Html.Raw(Model.Data2.MinMaxTitle)',
-                data: @Model.Data2.DrawMinMaxes(),
-                type: 'arearange',
-                lineWidth: 0,
-                linkedTo: ':previous',
-                color: Highcharts.getOptions().colors[3],
-                fillOpacity: 0.3,
-                zIndex: 0,
-                marker: {
-                    enabled: false
-                }
-            }
-        ]
-    });
 
     /**
     * In order to synchronize tooltips and crosshairs, override the

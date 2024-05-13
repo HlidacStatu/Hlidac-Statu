@@ -36,8 +36,8 @@
         @{
             var d1 = await PuRepo.LoadVydelekForZamestnaniAsync("1112", HlidacStatu.Entities.PuVydelek.VydelekSektor.StatSamosprava);
             var d2 = await PuRepo.LoadVydelekForZamestnaniAsync("1120", HlidacStatu.Entities.PuVydelek.VydelekSektor.Soukromy );
-            var d1Name = d1.OrderByDescending(m => m.Rok).Select(m => m.FullNazevKategorieZamestnani()).FirstOrDefault().ShortenMe(140);
-            var d2Name = d2.OrderByDescending(m => m.Rok).Select(m => m.FullNazevKategorieZamestnani()).FirstOrDefault().ShortenMe(140);
+            var d1Name = d1.OrderByDescending(m => m.Rok).Select(m => m.FullNazevKategorieZamestnani()).FirstOrDefault();
+            var d2Name = d2.OrderByDescending(m => m.Rok).Select(m => m.FullNazevKategorieZamestnani()).FirstOrDefault();
 
             Dictionary<int, AreaRangePlot.PlotData> data1 = d1
                 //zacatek u roku, kde zacinaji pozdejsi data
@@ -64,8 +64,10 @@
             AreaRangeCompareRenderOptions chartModel = new AreaRangeCompareRenderOptions()
             {
                 CssHeight = "450",
-                Data1 = new AreaRangePlot(){ Values = data1, ExtraTitle="Průměr ", MinMaxTitle="Většina od - do ", Title =d1Name },
-                Data2 = new AreaRangePlot() { Values = data2, ExtraTitle = "Průměr ", MinMaxTitle = "Od-do ", Title = d2Name },
+                Data = new[] {
+                    new AreaRangePlot(){ Values = data1, ExtraTitle="Průměr ", MinMaxTitle="Většina od-do ", Title =d1Name },
+                    new AreaRangePlot() { Values = data2, ExtraTitle = "Průměr ", MinMaxTitle = "Většina od-do ", Title = d2Name }
+                }
             };
         }
         <partial name="Graphs/_AreaRangeComparePlot" model="@chartModel" />

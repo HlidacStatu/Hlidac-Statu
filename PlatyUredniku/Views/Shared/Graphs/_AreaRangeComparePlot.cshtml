@@ -1,5 +1,6 @@
 @model AreaRangeCompareRenderOptions
 
+@using Devmasters
 @using HlidacStatu.Entities.Entities
 @using MathNet.Numerics.Statistics
 @using PlatyUredniku.Models
@@ -8,12 +9,10 @@
     string chartId = HlidacStatu.Util.Consts.Rnd.Next(999).ToString("000");
 
 
-    PlatyUredniku.Models.AreaRangePlot chartData1 = Model.Data1;
-    PlatyUredniku.Models.AreaRangePlot chartData2 = Model.Data2;
 
 }
 
-@if (chartData1 == null)
+@if (Model.Data == null || Model.Data.Count() == 0)
 {
     if (!string.IsNullOrEmpty(Model.TextForNoData))
     {
@@ -22,10 +21,12 @@
 
     return;
 }
-<figure >
+
+
+<figure>
     <div id="chart-container-@chartId"></div>
 
-    <div class="text-muted">Rozsah průměrných manažerských měsíčních platů vedení organizace (včetně odměn) přepočtených z ročního příjmu za sledované období</div>
+    <div class="text-muted">Porovnání 1. decilu, mediánu a 9. decilu platů uvedených pracovních skupin</div>
 
 </figure>
 
@@ -36,11 +37,11 @@
             width: null // 16:6 ratio
         },
         title: {
-            text: '@Html.Raw(Model.Data1.Title)',
+            text: '@Html.Raw(Model.Data.First().Title)',
             align: 'left'
         },
         subtitle: {
-            text: '@Html.Raw(Model.Data1.Subtitle)',
+            text: '@Html.Raw(Model.Data.First().Subtitle)',
             align: 'left'
         },
         xAxis: {
@@ -59,48 +60,49 @@
             shared: true,
             valueSuffix: ' Kč'
         },
+        legend: {
+            enabled: true,
+            labelFormatter: function () {
+                return this.userOptions.categoryname;
+            }
+        },
         plotOptions: {
-            series: {
+@*            series: {
                 pointStart: Date.UTC(@Model.Data1.FirstYear, 1, 1),
                 pointIntervalUnit: 'year'
             }
+*@
         },
         series: [
+            @for (int i = 0; i < Model.Data.Length; i++)
             {
-                name: '@Html.Raw(Model.Data1.ExtraTitle)',
-                color: Highcharts.getOptions().colors[0],
-                data: @Model.Data1.DrawExtras(),
-                zIndex: 1
-            }, {
-                name: '@Html.Raw(Model.Data1.MinMaxTitle)',
-                data: @Model.Data1.DrawMinMaxes(),
-                type: 'arearange',
-                lineWidth: 0,
-                linkedTo: ':previous',
-                color: Highcharts.getOptions().colors[0],
-                fillOpacity: 0.3,
-                zIndex: 0,
-                marker: {
-                    enabled: false
-                }
-            },
-            //second to compare
-            {
-                name: '@Html.Raw(Model.Data2.ExtraTitle)',
-                color: Highcharts.getOptions().colors[3],
-                data: @Model.Data2.DrawExtras(),
-                zIndex: 1
-            },  {
-                name: '@Html.Raw(Model.Data2.MinMaxTitle)',
-                data: @Model.Data2.DrawMinMaxes(),
-                type: 'arearange',
-                lineWidth: 0,
-                linkedTo: ':previous',
-                color: Highcharts.getOptions().colors[3],
-                fillOpacity: 0.3,
-                zIndex: 0,
-                marker: {
-                    enabled: false
+                var s = Model.Data[i];
+                bool last = (i == Model.Data.Length - 1);
+                <text>
+                    {
+                        name: '@Html.Raw(s.ExtraTitle)',
+                        categoryname: '@Html.Raw(s.Title.ShortenMe(40))',
+                        color: Highcharts.getOptions().colors[@(i*1)],
+                        data: @s.DrawExtras(),
+                        type: 'spline',
+                        zIndex: 1
+                    }, {
+                        name: '@Html.Raw(s.MinMaxTitle)',
+                        data: @s.DrawMinMaxes(),
+                        type: 'arearange',
+                        lineWidth: 1,
+                        linkedTo: ':previous',
+                        color: Highcharts.getOptions().colors[@(i*1)],
+                        fillOpacity: 0.3,
+                        zIndex: 0,
+                        marker: {
+                            enabled: false
+                        }
+                    }
+                </text>
+                @if (!last)
+                {
+                    <text>,</text>
                 }
             }
         ]

@@ -11,7 +11,7 @@
 
     PlatyUredniku.Models.AreaRangePlot chartData = null;
 
-    var years = Model.Data.SelectMany(m => m.Values.Keys).Distinct().OrderBy(o=>o);
+    var years = Model.Data.SelectMany(m => m.Values.Keys).Distinct().OrderBy(o=>o).ToArray();
 
 }
 
@@ -128,20 +128,43 @@
             }
         },
         series: [
-            @{
-                List<string> renderedSeriesData = new();
-            
-                foreach (var s in Model.Data)
+            @for (int i = 0; i < Model.Data.Length; i++)
+            {
+                var s = Model.Data[i];
+                bool last = (i == Model.Data.Length - 1);
+                <text>
                 {
-                    var sdataArr = years
-                        .Select(y => s.Values.ContainsKey(y) ? $"[{(int)s.Values[y].Min},{(int)s.Values[y].Median},{(int)s.Values[y].Max}]" : $"[null,null,null]");
-                    var sdata = string.Join(",", sdataArr);
-
-            renderedSeriesData.Add($"{{ name: '{s.Title}', shortname: '{s.Title.ShortenMe(30)}', data: [{sdata}] }}");
-                
+                    name: '@Html.Raw(s.Title)', 
+                    shortname: '@Html.Raw(s.Title.ShortenMe(30))', 
+                    color: Highcharts.getOptions().colors[@(i*1)],
+                    data: [
+                    @for (int j = 0; j < years.Length; j++)
+                    {   int y = years[j];
+                        bool lastY = (j == years.Length - 1);
+                        if (s.Values.ContainsKey(y))
+                        {
+                            <text>
+                                [@((int)s.Values[y].Min), @((int)s.Values[y].Median), @((int)s.Values[y].Max)]
+                            </text>                    
+                        }
+                        else
+                        {
+                            <text>[null,null,null]</text>
+                        }
+                        @if (!lastY)
+                        {
+                            <text>, </text>
+                        }
+                    }
+                    ]
                 }
+                </text>
+                @if (!last)
+                {
+                    <text>, </text>
+                }
+
             }
-            @Html.Raw(string.Join(",\n",renderedSeriesData))
             ]
     });
 

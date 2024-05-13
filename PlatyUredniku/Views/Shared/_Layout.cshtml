@@ -110,6 +110,7 @@
     <script src="~/bundles/scriptbundle"></script>
     <script src="~/bundles/highcharts8"></script>
     <link rel="stylesheet" href="~/content/bundled.css"/>
+    <link rel="stylesheet" href="~/Scripts/Highcharts-8/css/themes/grid-light.css " />
     <script src="~/bundles/modernizr"></script>
 
     <!-- Matomo Tag Manager -->
@@ -130,6 +131,13 @@
             var dd = new bootstrap.Dropdown(navItem[0]);
             dd.hide();
         }
+
+        Highcharts.setOptions({
+            colors:    ["#fd7f6f", "#7eb0d5", "#b2e061", "#bd7ebe", "#ffb55a", "#ffee65", "#beb9db", "#fdcce5", "#8bd3c7","#ea5545", "#f46a9b", "#ef9b20", "#edbf33", "#ede15b", "#bdcf32", "#87bc45", "#27aeef", "#b33dc6"]
+            /* ["#1984c5", "#22a7f0", "#63bff0", "#a7d5ed", "#e2e2e2", "#e1a692", "#de6e56", "#e14b31", "#c23728", "#ffb400", "#d2980d", "#a57c1b", "#786028", "#363445", "#48446e", "#5e569b", "#776bcd", "#9080ff"] */
+        });
+
+
 
     </script>
     @RenderSection("Scripts", required: false)
