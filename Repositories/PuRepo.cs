@@ -1,11 +1,11 @@
-using System;
+using Devmasters.Collections;
 using HlidacStatu.Entities;
-using HlidacStatu.Entities;
+using HlidacStatu.Entities.Entities;
 using Microsoft.EntityFrameworkCore;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Devmasters.Collections;
 
 namespace HlidacStatu.Repositories;
 
@@ -35,6 +35,46 @@ public static class PuRepo
         "životní prostředí",
         "ostatní"
     ];
+    public static async Task SaveVydelek(PuVydelek vydelek)
+    {
+        await SaveVydelky(new[] { vydelek });
+    }
+    public static async Task SaveVydelky(IEnumerable<PuVydelek> vydelky)
+    {
+        await using var db = new DbEntities();
+
+        foreach (var vydelek in vydelky)
+        {
+            db.PuVydelky.Attach(vydelek);
+            if (vydelek.Pk == 0)
+            {
+                db.Entry(vydelek).State = EntityState.Added;
+            }
+            else
+                db.Entry(vydelek).State = EntityState.Modified;
+        }
+        await db.SaveChangesAsync();
+
+    }
+    public static async Task<PuVydelek[]> LoadVydelekData(int rok, int level = 4)
+    {
+        await using var db = new DbEntities();
+        PuVydelek[] res = await db.PuVydelky
+            .Where(m => m.Rok == rok
+                        && m.Level == level)
+            .ToArrayAsync();
+
+        return res;
+    }
+    public static async Task<PuVydelek[]> LoadVydelekForZamestnani(string cz_ISCO)
+    {
+        await using var db = new DbEntities();
+        PuVydelek[] res = await db.PuVydelky
+            .Where(m => m.CZ_ISCO == cz_ISCO)
+            .ToArrayAsync();
+
+        return res;
+    }
 
     public static async Task<PuRokOrganizaceStat> GetGlobalStatAsync(int rok = DefaultYear)
     {
@@ -107,7 +147,7 @@ public static class PuRepo
             .Include(o => o.Platy) // Include PuPlat
             .FirstOrDefaultAsync();
     }
-    
+
     public static async Task<PuOrganizace> GetOrganizationOfTheDayAsync()
     {
         await using var db = new DbEntities();
@@ -141,10 +181,10 @@ public static class PuRepo
             .Include(t => t.Organizace).ThenInclude(o => o.Metadata)
             .Include(t => t.Organizace).ThenInclude(o => o.Platy)
             .Select(t => t.Organizace);
-        
-        if(limit > 0)
+
+        if (limit > 0)
             query = query.Take(limit);
-        
+
         return await query.ToListAsync();
     }
 
@@ -157,7 +197,7 @@ public static class PuRepo
     .AsNoTracking()
     .Where(t => t.Tag.Equals(tag))
     .Include(t => t.Organizace).ThenInclude(o => o.Platy)
-    .Select(m => m.Organizace.Platy.Count(c=>c.Rok == rok))
+    .Select(m => m.Organizace.Platy.Count(c => c.Rok == rok))
     .ToArrayAsync();
 
 
@@ -181,7 +221,7 @@ public static class PuRepo
             .Where(p => p.Id == id)
             .FirstOrDefaultAsync();
     }
-    
+
     public static async Task<PuPlat> GetPlatAsync(int idOrganizace, int rok, string nazevPozice)
     {
         await using var db = new DbEntities();
@@ -213,7 +253,7 @@ public static class PuRepo
             .Where(p => p.Rok == rok)
             .ToListAsync();
     }
-    
+
     public static async Task<List<PuPlat>> GetPlatyWithOrganizaceForYearAsync(int rok)
     {
         await using var db = new DbEntities();
@@ -249,7 +289,7 @@ public static class PuRepo
         }
 
         organizace.DS = organizace.DS.Trim();
-        
+
         // null navigation properties in organizace, because we will add them manually
         var metadata = organizace.Metadata;
         organizace.Metadata = null;

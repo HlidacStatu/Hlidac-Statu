@@ -1,4 +1,4 @@
-﻿using HlidacStatu.Entities;
+﻿using HlidacStatu.Entities.Entities;
 using HlidacStatu.Repositories;
 using Nest;
 using System.Collections.Generic;

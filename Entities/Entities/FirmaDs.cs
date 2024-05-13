@@ -1,7 +1,7 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace HlidacStatu.Entities;
+namespace HlidacStatu.Entities.Entities;
 
 [Table("Firma_DS")]
 public class FirmaDs

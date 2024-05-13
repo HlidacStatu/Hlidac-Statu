@@ -4,7 +4,7 @@
 @using HlidacStatu.Repositories;
 
 
-@model HlidacStatu.Entities.PuOrganizace
+@model HlidacStatu.Entities.Entities.PuOrganizace
 
 @section scripts
 {
@@ -63,7 +63,7 @@
 
     if (platyPoLetech.Any(m=>m.Key == PuRepo.DefaultYear) == false)
     {
-        platyPoLetech.Add(new { Key = PuRepo.DefaultYear, Platy= new List<HlidacStatu.Entities.PuPlat>() });
+        platyPoLetech.Add(new { Key = PuRepo.DefaultYear, Platy= new List<HlidacStatu.Entities.Entities.PuPlat>() });
     }
 
     platyPoLetech = platyPoLetech.OrderByDescending(pg => pg.Key).ToList();

@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 using System.Dynamic;
 using HlidacStatu.Entities.Dotace;
 
-namespace HlidacStatu.Entities;
+namespace HlidacStatu.Entities.Entities;
 
 [Table("PU_Plat")]
 public class PuPlat
