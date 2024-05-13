@@ -23,12 +23,12 @@
     return;
 }
 <figure>
-    <div id="chart-container-@chartId">
-
-        <div id="chart-container-@(chartId)-0">
+    <div id="chart-container-@(chartId)">
+        @for (int i = 0; i < Model.Data.Length; i++)
+        {
+        <div id="chart-container-@(chartId)-@(i)">
         </div>
-        <div id="chart-container-@(chartId)-1">
-        </div>
+        }
     </div>
 
 </figure>
@@ -107,7 +107,7 @@
     * built-in events with handlers defined on the parent element.
     */
     ['mousemove', 'touchmove', 'touchstart'].forEach(function (eventType) {
-        document.getElementById('chart-container-@chartId').addEventListener(
+        document.getElementById('chart-container-@(chartId)').addEventListener(
             eventType,
             function (e) {
                 let chart,

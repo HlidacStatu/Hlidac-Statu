@@ -81,7 +81,7 @@
                 <text>
                     {
                         name: '@Html.Raw(s.ExtraTitle)',
-                        categoryname: '@Html.Raw(s.Title.ShortenMe(40))',
+                        categoryname: '@Html.Raw(s.Title.ShortenMe(140))',
                         color: Highcharts.getOptions().colors[@(i*1)],
                         data: @s.DrawExtras(),
                         type: 'spline',
