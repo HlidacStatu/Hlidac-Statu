@@ -24,9 +24,19 @@
 
 
 <figure>
+    @if (!string.IsNullOrEmpty(Model.Subtitle))
+    {
+        <p class="text-body-emphasis">@Model.Subtitle</p>
+    }
     <div id="chart-container-@chartId"></div>
 
-    <div class="text-muted">Porovnání 1. decilu, mediánu a 9. decilu platů uvedených pracovních skupin</div>
+    <br class="text-muted">
+        V grafu je porovnání platového rozmezí jednotlivých skupin pracovníků v čase. 
+        Každá skupina pracovníků je rozlišena barvou a zobrazujeme pro každou rozsah platů mezi <abbr title="10 % platů ze vzorku je nižších a 90 vyšších, než tato hodnota"  class="fw-bold">1. decilem</abbr> 
+        a <abbr title="90 % platů ze vzorku je nižších a 10% vyšších, než tato hodnota">9. decilem</abbr> platů.
+        <br />
+        Uvedené údaje doplňuje <b>@Model.Data.First().ExtraTitle</b> platů v daném roce.
+    </p>
 
 </figure>
 
@@ -45,7 +55,11 @@
             align: 'left'
         },
         xAxis: {
-            type: 'datetime'
+            type: 'datetime',
+            crosshair: {
+                width: 2,
+                color: '#c0c0c0'
+            }
         },
         yAxis: {
             title: {
@@ -56,7 +70,6 @@
             }
         },
         tooltip: {
-            crosshairs: true,
             shared: true,
             valueSuffix: ' Kč'
         },
@@ -67,11 +80,19 @@
             }
         },
         plotOptions: {
-@*            series: {
-                pointStart: Date.UTC(@Model.Data1.FirstYear, 1, 1),
-                pointIntervalUnit: 'year'
+            series: {
+                pointIntervalUnit: 'year',
+                marker: {
+                    states: {
+                        hover: {
+                            radius: 2
+                        },
+                        select: {
+                            radius: 1
+                        }
+                    }
+                }
             }
-*@
         },
         series: [
             @for (int i = 0; i < Model.Data.Length; i++)
@@ -91,6 +112,8 @@
                         data: @s.DrawMinMaxes(),
                         type: 'arearange',
                         lineWidth: 1,
+                        dashStyle: 'shortdot',
+                        //lineColor: new Highcharts.Color(Highcharts.getOptions().colors[0]).setOpacity(0.3), //.get('rgba'),
                         linkedTo: ':previous',
                         color: Highcharts.getOptions().colors[@(i*1)],
                         fillOpacity: 0.3,

@@ -98,7 +98,7 @@ public class AutocompleteCacheService
                 PriorityMultiplier = 1,
                 Type = "instituce",
                 ImageElement = $"<i class='fas fa-university'></i>",
-                Description = $"{o.Oblast}",
+                Description = "", //puvodne $"{o.Oblast}" //TODO zmenit na tagy?
                 Category = Autocomplete.CategoryEnum.Authority,
             })
             .ToListAsync(cancellationToken: cancellationToken);

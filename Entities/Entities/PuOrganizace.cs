@@ -16,9 +16,7 @@ public class PuOrganizace
     public string Nazev => FirmaDs?.DsSubjName;
     public string Info { get; set; }
     public string HiddenNote { get; set; }
-    public string Zatrideni { get; set; }
-    public string Oblast { get; set; }
-    public string PodOblast { get; set; }
+    public string CZISCO { get; set; }
 
     // Navigation properties
     [ForeignKey("DS")]

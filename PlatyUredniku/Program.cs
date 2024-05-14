@@ -174,6 +174,11 @@ public class Program
                     "Scripts/Highcharts-8/highcharts-more.js",
                     "Scripts/highcharts.global.options.js");
 
+                pipeline.AddJavaScriptBundle("/bundles/highcharts11",
+                    "Scripts/Highcharts-11/highcharts.js",
+                    "Scripts/Highcharts-11/highcharts-more.js",
+                    "Scripts/highcharts.global.options.js");
+
                 pipeline.AddJavaScriptBundle("/bundles/typeahead",
                     "Scripts/typeahead.bundle.min.js",
                     "Scripts/bloodhound.min.js");
