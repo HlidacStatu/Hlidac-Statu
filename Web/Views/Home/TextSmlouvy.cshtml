@@ -67,6 +67,7 @@
 @if (Layout != null)
 {
     <text>
+        @* ReSharper disable once Razor.SectionNotResolved *@
         @section scripts {
         @*<script src="https://linker.zakonyprolidi.cz/lib/lite.js"></script>
             <script>
@@ -77,6 +78,7 @@
         }
 
 
+        @* ReSharper disable once Razor.SectionNotResolved *@
         @section footerscripts
         {
             @if (!string.IsNullOrEmpty(query))
@@ -88,6 +90,8 @@
                 </script>
             }
         }
+        
+        @* ReSharper disable once Razor.SectionNotResolved *@
         @section breadcrumb
         {
             <ol class="breadcrumb">

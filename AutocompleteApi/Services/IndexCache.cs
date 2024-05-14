@@ -47,11 +47,16 @@ public class IndexCache
         return new Status()
         {
             LastUpdates = LastUpdateRun.ToDictionary(ks => ks.Key, vs => vs.Value),
-            KindexDataStamp = CurrentIndexStamp(AutocompleteIndexType.KIndex),
-            CompanyDataStamp = CurrentIndexStamp(AutocompleteIndexType.Company),
-            UptimeServerDataStamp = CurrentIndexStamp(AutocompleteIndexType.Uptime),
-            FullAutocompleteDataStamp = CurrentIndexStamp(AutocompleteIndexType.Full),
-            AdresyDataStamp = CurrentIndexStamp(AutocompleteIndexType.Adresy)
+            KindexDataStamp = LatestIndexStamp(AutocompleteIndexType.KIndex),
+            KindexDocumentCount = Kindex?.Count(),
+            CompanyDataStamp = LatestIndexStamp(AutocompleteIndexType.Company),
+            CompanyDocumentCount = Company?.Count(),
+            UptimeServerDataStamp = LatestIndexStamp(AutocompleteIndexType.Uptime),
+            UptimeServerDocumentCount = UptimeServer?.Count(),
+            FullAutocompleteDataStamp = LatestIndexStamp(AutocompleteIndexType.Full),
+            FullAutocompleteDocumentCount = FullAutocomplete?.Count(),
+            AdresyDataStamp = LatestIndexStamp(AutocompleteIndexType.Adresy),
+            AdresyDocumentCount = Adresy?.Count()
         };
     }
 
@@ -82,7 +87,7 @@ public class IndexCache
 
         var type = AutocompleteIndexTypeToString(indexType);
 
-        string lastTimeStamp = CurrentIndexStamp(indexType) ?? "_null_";
+        string lastTimeStamp = LatestIndexStamp(indexType) ?? "_null_";
 
         var url = $"{baseUrl}?type={type}&lastTimestamp={lastTimeStamp}";
 
@@ -114,13 +119,13 @@ public class IndexCache
     /// <exception cref="ArgumentOutOfRangeException"></exception>
     public async Task UpdateCacheAsync(AutocompleteIndexType indexType, CancellationToken cancellationToken)
     {
-        string? path = PathToCurrentIndex(indexType);
+        string? path = PathToLatestIndex(indexType);
         if (path is null || !Directory.EnumerateFiles(path).Any())
         {
             logger.Warning("Prazdny index folder.");
             return;
         }
-
+        
         switch (indexType)
         {
             case AutocompleteIndexType.Adresy:
@@ -215,6 +220,50 @@ public class IndexCache
 
         LastUpdateRun[indexType] = DateTime.Now;
     }
+    
+    public async Task RollbackIndexAsync(AutocompleteIndexType indexType, CancellationToken cancellationToken)
+    {
+        try
+        {
+            //get current index folder
+            string? path = PathToLatestIndex(indexType);
+            if (path is null || !Directory.EnumerateFiles(path).Any())
+            {
+                logger.Warning("Prazdny index folder.");
+                return;
+            }
+
+            IDisposable? currentIndex = indexType switch
+            {
+                AutocompleteIndexType.Adresy => Adresy,
+                AutocompleteIndexType.KIndex => Kindex,
+                AutocompleteIndexType.Company => Company,
+                AutocompleteIndexType.Uptime => UptimeServer,
+                AutocompleteIndexType.Full => FullAutocomplete,
+                _ => throw new ArgumentOutOfRangeException()
+            };
+            
+            currentIndex?.Dispose();
+            Directory.Delete(path, recursive: true);
+            
+            logger.Debug($"Reporting corrupted {indexType:G} index.");
+            await ReportCorruptedIndexAsync(path, indexType, cancellationToken);
+            await Task.Delay(TimeSpan.FromSeconds(5), cancellationToken);
+            
+            //Todo: fix double update...
+            logger.Debug($"Loading older {indexType:G} index.");
+            await UpdateCacheAsync(indexType, cancellationToken);
+            logger.Debug($"Try download newer {indexType:G} index.");
+            await DownloadCacheIndexAsync(indexType, cancellationToken);
+            logger.Debug($"Updating {indexType:G} index.");
+            await UpdateCacheAsync(indexType, cancellationToken);
+        }
+        catch (Exception e)
+        {
+            logger.Error($"Error occured during index load.", e);
+            
+        }
+    }
 
     private async Task ReportCorruptedIndexAsync(string path, AutocompleteIndexType indexType, CancellationToken cancellationToken)
     {
@@ -264,15 +313,15 @@ public class IndexCache
         return path;
     }
 
-    private static string? PathToCurrentIndex(AutocompleteIndexType type)
+    private static string? PathToLatestIndex(AutocompleteIndexType type)
     {
         var directories = Directory.EnumerateDirectories(PathToIndexFolder(type));
         return directories.MaxBy(f => f);
     }
 
-    private static string? CurrentIndexStamp(AutocompleteIndexType type)
+    private static string? LatestIndexStamp(AutocompleteIndexType type)
     {
-        return PathToCurrentIndex(type)?
+        return PathToLatestIndex(type)?
             .Split(Path.DirectorySeparatorChar, StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries)?
             .Last();
     }
@@ -296,8 +345,13 @@ public class Status
 {
     public Dictionary<AutocompleteIndexType,DateTime?> LastUpdates { get; set; }
     public string? KindexDataStamp { get; set; }
+    public int? KindexDocumentCount { get; set; }
     public string? CompanyDataStamp { get; set; }
+    public int? CompanyDocumentCount { get; set; }
     public string? UptimeServerDataStamp { get; set; }
+    public int? UptimeServerDocumentCount { get; set; }
     public string? FullAutocompleteDataStamp { get; set; }
+    public int? FullAutocompleteDocumentCount { get; set; }
     public string? AdresyDataStamp { get; set; }
+    public int? AdresyDocumentCount { get; set; }
 }
