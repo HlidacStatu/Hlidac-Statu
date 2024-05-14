@@ -12,4 +12,6 @@ public class AreaRangeCompareRenderOptions
     public string? Title { get; set; } = "Vývoj platů";
     public string? Subtitle { get; set; } = "Vývoj průměrného měsíčního platu po letech";
 
+    public int EnableNumSeries { get; set; } = 4;
+
 }

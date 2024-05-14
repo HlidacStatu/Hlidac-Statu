@@ -8,7 +8,7 @@
 @{
     string chartId = HlidacStatu.Util.Consts.Rnd.Next(999).ToString("000");
 
-
+    int count = 0;
 
 }
 
@@ -100,6 +100,8 @@
         series: [
             @for (int i = 0; i < Model.Data.Length; i++)
             {
+                count++;
+                bool show = count <= Model.EnableNumSeries;
                 var s = Model.Data[i];
                 bool last = (i == Model.Data.Length - 1);
                 <text>
@@ -109,7 +111,8 @@
                         color: Highcharts.getOptions().colors[@(i*1)],
                         data: @s.DrawExtras(),
                         type: 'spline',
-                        zIndex: 1
+                        zIndex: 1,
+                        visible: @(show ? "true" : "false")
                     }, {
                         name: '@Html.Raw(s.MinMaxTitle)',
                         data: @s.DrawMinMaxes(),
@@ -121,6 +124,7 @@
                         color: Highcharts.getOptions().colors[@(i*1)],
                         fillOpacity: 0.3,
                         zIndex: 0,
+                        visible: @(show ? "true" : "false"),
                         marker: {
                             enabled: false
                         }

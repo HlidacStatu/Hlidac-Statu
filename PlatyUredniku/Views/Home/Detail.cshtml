@@ -1,3 +1,4 @@
+@using Devmasters
 @using MathNet.Numerics.Statistics
 @using Microsoft.AspNetCore.Mvc.TagHelpers
 @using PlatyUredniku.Models
@@ -32,8 +33,11 @@
         <li class="active">@Model.Nazev</li>
     </ol>
 }
+@{
+    bool sectionBgSwitch = false;
+}
 
-<section class="d-flex align-items-center justify-content-center">
+<section class="d-flex align-items-center justify-content-center @(sectionBgSwitch ? "alter-bg-color" : "")">
     <div class="container">
 
 
@@ -68,7 +72,11 @@
 
     platyPoLetech = platyPoLetech.OrderByDescending(pg => pg.Key).ToList();
 }
-<section class="d-flex justify-content-center alter-bg-color">
+
+@{
+    sectionBgSwitch = !sectionBgSwitch;
+}
+<section class="d-flex justify-content-center  @(sectionBgSwitch ? "alter-bg-color" : "")">
     <div class="container">
         <h3>Přehled platů</h3>
         <div class="nav flex-row nav-pills my-5" id="v-pills-tab" role="tablist">
@@ -162,9 +170,59 @@
     </div>
 </section>
 
+@{
+    string[] compareTo = Model.CZISCO?.Split(new char[] { ',', ';', ' ' }, StringSplitOptions.RemoveEmptyEntries);
+}
+@if (compareTo?.Length > 0)
+{
+    sectionBgSwitch = !sectionBgSwitch;
+    <section class="d-flex justify-content-center @(sectionBgSwitch ? "alter-bg-color" : "")">
+        <div class="container">
+            <h3>Porovnání vývoje platů vzhledem k vybraným kategoriím pracovníků</h3>
+
+            @{
+                //PlatyUredniku.Models.AreaRangePlot uradData = 
+                List<AreaRangePlot> data = new List<AreaRangePlot>();
+                data.Add(PlatyUredniku.Models.AreaRangePlot.ToAreaRangePlotWithPrumer(Model.Platy, Model.Nazev));
+                foreach (var compItem in compareTo)
+                {
+                    var d = await PuRepo.LoadVydelekForZamestnaniAsync(compItem, HlidacStatu.Entities.PuVydelek.VydelekSektor.StatSamosprava);
+                    if (d?.Any() == true)
+                    {
+                        var dName = d.OrderByDescending(m => m.Rok).Select(m => m.FullNazevKategorieZamestnani()).FirstOrDefault().ShortenMe(140);
+                        data.Add(AreaRangePlot.ToAreaRangePlotWithPrumer(d, dName));
+                    }
+                    d = await PuRepo.LoadVydelekForZamestnaniAsync(compItem, HlidacStatu.Entities.PuVydelek.VydelekSektor.Soukromy);
+                    if (d?.Any() == true)
+                    {
+                        var dName = d.OrderByDescending(m => m.Rok).Select(m => m.FullNazevKategorieZamestnani()).FirstOrDefault().ShortenMe(140);
+                        data.Add(AreaRangePlot.ToAreaRangePlotWithPrumer(d, dName));
+                    }
+
+                }
+
+                AreaRangeCompareRenderOptions chartModel = new AreaRangeCompareRenderOptions()
+                {
+                    CssHeight = (430 + data.Count()*9).ToString(),
+                    Data = data.ToArray(),
+                    Title="Porovnání s jinými oblastmi trhu"
+                };
+                <partial name="Graphs/_AreaRangeComparePlot" model="@chartModel" />
+
+            }
+
+        </div>
+    </section>
+    <div class="pb-3"></div>
+}
+
+
+
 @if (Model.Metadata.Any())
 {
-    <section class="d-flex justify-content-center">
+    sectionBgSwitch = !sectionBgSwitch;
+
+    <section class="d-flex justify-content-center @(sectionBgSwitch ? "alter-bg-color" : "")">
         <div class="container">
             <h3>Detaily komunikace instituce ohledně platů</h3>
             <div class="nav flex-row nav-pills my-5" id="v-meta-pills-tab" role="tablist">
@@ -253,3 +311,5 @@
         </div>
     </section>
 }
+
+

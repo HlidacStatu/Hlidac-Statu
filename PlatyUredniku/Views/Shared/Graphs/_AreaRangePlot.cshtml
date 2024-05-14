@@ -8,48 +8,8 @@
     string chartId = HlidacStatu.Util.Consts.Rnd.Next(999).ToString("000");
 
 
-    PlatyUredniku.Models.AreaRangePlot chartData = null;
-
-    var salariesYearly = Model.Platy
-        .GroupBy(p => p.Rok, p => p)
-        .OrderBy(k => k.Key)
-        .ToDictionary(g => g.Key, g => g.Select(x => x).ToList());
-    if (salariesYearly.Any())
-    {
-        Dictionary<int, AreaRangePlot.PlotData?> plotData = new();
-
-        for (int year = salariesYearly.Keys.Min(); year <= salariesYearly.Keys.Max(); year++)
-        {
-            AreaRangePlot.PlotData? dataForYear = new AreaRangePlot.PlotData();
-
-            if (salariesYearly.TryGetValue(year, out var platyForYear))
-            {
-                var hrubeMesicniPlaty = platyForYear
-                .Select(p => (double)p.HrubyMesicniPlat)
-                .ToList();
-                dataForYear.Median = hrubeMesicniPlaty?.Median() ?? null;
-                dataForYear.Min = hrubeMesicniPlaty?.Min() ?? null;
-                dataForYear.Max = hrubeMesicniPlaty?.Max() ?? null;
-
-                var hrubeMesicniPlatyCeo = platyForYear
-                .Where(p => p.JeHlavoun == true)
-                .Select(p => (double)p.HrubyMesicniPlat);
-                if (hrubeMesicniPlatyCeo.Any())
-                {
-                    dataForYear.Extra = hrubeMesicniPlatyCeo.Average();
-                }
-            }
-
-            plotData.Add(year, dataForYear);
-        }
-
-        chartData = new AreaRangePlot()
-                {
-                    Title = "Vývoj platů",
-                    Subtitle = "vývoj průměrného platu po letech",
-                    Values = plotData
-                };
-    }
+    PlatyUredniku.Models.AreaRangePlot chartData = PlatyUredniku.Models.AreaRangePlot.ToAreaRangePlotWithPrumer(Model.Platy,"Vývoj platů ");
+    
 }
 
 @if (chartData == null)
