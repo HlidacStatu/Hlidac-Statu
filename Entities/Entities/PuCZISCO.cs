@@ -14,6 +14,7 @@ public class PuCZISCO
     public int Level { get; set; }
     public string NazevKategorieZamestnani { get; set; }
     public string Groupname { get; set; }
+    public string? KratkyNazev { get; set; }
    
 
 }
