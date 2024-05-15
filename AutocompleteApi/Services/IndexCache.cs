@@ -8,6 +8,7 @@ using System.Net;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
+using HlidacStatu.AutocompleteApi.Autocompletes;
 using HlidacStatu.Entities;
 using HlidacStatu.Entities.Views;
 using HlidacStatu.LibCore.Enums;
@@ -17,27 +18,27 @@ using Polly;
 using Polly.Extensions.Http;
 using Polly.Retry;
 using Serilog;
-using Whisperer;
 
 namespace HlidacStatu.AutocompleteApi.Services;
 
 public class IndexCache
 {
-    public Index<SubjectNameCache>? Kindex { get; set; }
-    public Index<Autocomplete>? Company { get; set; }
-    public Index<StatniWebyAutocomplete>? UptimeServer { get; set; }
-    public Index<Autocomplete>? FullAutocomplete { get; set; }
-    public Index<AdresyKVolbam>? Adresy { get; set; }
 
-    private ILogger logger = Log.ForContext<IndexCache>();
-    private IHttpClientFactory _httpClientFactory;
+    private readonly ILogger logger = Log.ForContext<IndexCache>();
+    private readonly IHttpClientFactory _httpClientFactory;
+    private readonly Dictionary<AutocompleteIndexType, IIndexStrategy?> _indexStrategies;
+    private ConcurrentDictionary<AutocompleteIndexType, DateTime?> LastUpdateRun { get; set; } = new();
 
     public IndexCache(IHttpClientFactory httpClientFactory)
     {
         _httpClientFactory = httpClientFactory;
-    }
 
-    private ConcurrentDictionary<AutocompleteIndexType, DateTime?> LastUpdateRun { get; set; } = new();
+        _indexStrategies = new();
+        foreach (var autocompleteIndexType in Enum.GetValues<AutocompleteIndexType>())
+        {
+            _indexStrategies.TryAdd(autocompleteIndexType, null);
+        }
+    }
 
     public Status? Status()
     {
@@ -48,34 +49,36 @@ public class IndexCache
         {
             LastUpdates = LastUpdateRun.ToDictionary(ks => ks.Key, vs => vs.Value),
             KindexDataStamp = LatestIndexStamp(AutocompleteIndexType.KIndex),
-            KindexDocumentCount = Kindex?.Count(),
+            KindexDocumentCount = _indexStrategies[AutocompleteIndexType.KIndex]?.Count(),
             CompanyDataStamp = LatestIndexStamp(AutocompleteIndexType.Company),
-            CompanyDocumentCount = Company?.Count(),
+            CompanyDocumentCount = _indexStrategies[AutocompleteIndexType.Company]?.Count(),
             UptimeServerDataStamp = LatestIndexStamp(AutocompleteIndexType.Uptime),
-            UptimeServerDocumentCount = UptimeServer?.Count(),
+            UptimeServerDocumentCount = _indexStrategies[AutocompleteIndexType.Uptime]?.Count(),
             FullAutocompleteDataStamp = LatestIndexStamp(AutocompleteIndexType.Full),
-            FullAutocompleteDocumentCount = FullAutocomplete?.Count(),
+            FullAutocompleteDocumentCount = _indexStrategies[AutocompleteIndexType.Full]?.Count(),
             AdresyDataStamp = LatestIndexStamp(AutocompleteIndexType.Adresy),
-            AdresyDocumentCount = Adresy?.Count()
+            AdresyDocumentCount = _indexStrategies[AutocompleteIndexType.Adresy]?.Count(),
         };
     }
 
-    private string AutocompleteIndexTypeToString(AutocompleteIndexType indexType) =>
-        indexType switch
+    private string AutocompleteIndexTypeToString(AutocompleteIndexType indexType) => indexType.ToString("G");
+    
+    public IEnumerable<object>? Search(AutocompleteIndexType indexType, string query, int numResults = 10, string? filter = null)
+    {
+        var strategy = _indexStrategies[indexType]; 
+        
+        if (strategy is not null)
         {
-            AutocompleteIndexType.Adresy => nameof(AutocompleteIndexType.Adresy),
-            AutocompleteIndexType.KIndex => nameof(AutocompleteIndexType.KIndex),
-            AutocompleteIndexType.Company => nameof(AutocompleteIndexType.Company),
-            AutocompleteIndexType.Uptime => nameof(AutocompleteIndexType.Uptime),
-            AutocompleteIndexType.Full => nameof(AutocompleteIndexType.Full),
-            _ => throw new ArgumentOutOfRangeException()
-        };
+            return strategy.Search(query, numResults, filter);
+        }
+        return default;
+    }
 
     /// <summary>
     /// Downloads Index from generator api
     /// </summary>
     /// <returns>True if cache is downloaded, false if nothing new to download was received</returns>
-    public async Task DownloadCacheIndexAsync(AutocompleteIndexType indexType, CancellationToken cancellationToken)
+    public async Task<string?> DownloadCacheIndexAsync(AutocompleteIndexType indexType, CancellationToken cancellationToken)
     {
         var baseUrl = Devmasters.Config.GetWebConfigValue("GeneratorUrl");
         var httpClient = _httpClientFactory.CreateClient();
@@ -96,7 +99,7 @@ public class IndexCache
 
         _ = responseMessage.EnsureSuccessStatusCode();
         if (responseMessage.StatusCode == HttpStatusCode.NoContent) // there are no newer data ready
-            return;
+            return null;
 
         await using var stream = await responseMessage.Content.ReadAsStreamAsync(cancellationToken);
         using var zipArchive = new ZipArchive(stream, ZipArchiveMode.Read);
@@ -110,115 +113,55 @@ public class IndexCache
 
         var outputDirPath = Path.Combine(PathToIndexFolder(indexType), outputDirName);
         zipArchive.ExtractToDirectory(outputDirPath);
+        return outputDirPath;
     }
-
 
     /// <summary>
     /// Updates cache if it can. If a new Index is corrupted, then it rolls back to the old one and reports corrupted Index to Generator.
     /// </summary>
     /// <exception cref="ArgumentOutOfRangeException"></exception>
-    public async Task UpdateCacheAsync(AutocompleteIndexType indexType, CancellationToken cancellationToken)
+    public async Task<bool> TryUpdateIndexAsync(AutocompleteIndexType indexType, string path, CancellationToken cancellationToken)
     {
-        string? path = PathToLatestIndex(indexType);
-        if (path is null || !Directory.EnumerateFiles(path).Any())
+        var newIndex = CreateIndex(indexType, path);
+
+        if (newIndex.IsCorrupted())
         {
-            logger.Warning("Prazdny index folder.");
-            return;
+            logger.Error($"Index {AutocompleteIndexTypeToString(indexType)} on path [{path}] is corrupted.");
+            await ReportCorruptedIndexAsync(path, indexType, cancellationToken);
+            newIndex.Dispose();
+            Directory.Delete(path, recursive: true);
+            return false;
         }
         
-        switch (indexType)
-        {
-            case AutocompleteIndexType.Adresy:
-            {
-                var newIndex = new Index<AdresyKVolbam>(path);
-                if (IsIndexCorrupted(newIndex))
-                {
-                    await ReportCorruptedIndexAsync(path, indexType, cancellationToken);
-                    newIndex.Dispose();
-                    Directory.Delete(path, recursive: true);
-                }
-                else
-                {
-                    var oldIndex = Adresy;
-                    Adresy = newIndex;
-                    oldIndex?.Dispose();
-                }
-            }
-                break;
-            case AutocompleteIndexType.KIndex:
-            {
-                var newIndex = new Index<SubjectNameCache>(path);
-                if (IsIndexCorrupted(newIndex))
-                {
-                    await ReportCorruptedIndexAsync(path, indexType, cancellationToken);
-                    newIndex.Dispose();
-                    Directory.Delete(path, recursive: true);
-                }
-                else
-                {
-                    var oldIndex = Kindex;
-                    Kindex = newIndex;
-                    oldIndex?.Dispose();
-                }
-            }
-                break;
-            case AutocompleteIndexType.Company:
-            {
-                var newIndex = new Index<Autocomplete>(path);
-                if (IsIndexCorrupted(newIndex))
-                {
-                    await ReportCorruptedIndexAsync(path, indexType, cancellationToken);
-                    newIndex.Dispose();
-                    Directory.Delete(path, recursive: true);
-                }
-                else
-                {
-                    var oldIndex = Company;
-                    Company = newIndex;
-                    oldIndex?.Dispose();
-                }
-            }
-                break;
-            case AutocompleteIndexType.Uptime:
-            {
-                var newIndex = new Index<StatniWebyAutocomplete>(path);
-                if (IsIndexCorrupted(newIndex))
-                {
-                    await ReportCorruptedIndexAsync(path, indexType, cancellationToken);
-                    newIndex.Dispose();
-                    Directory.Delete(path, recursive: true);
-                }
-                else
-                {
-                    var oldIndex = UptimeServer;
-                    UptimeServer = newIndex;
-                    oldIndex?.Dispose();
-                }
-            }
-                break;
-            case AutocompleteIndexType.Full:
-            {
-                var newIndex = new Index<Autocomplete>(path);
-                if (IsIndexCorrupted(newIndex))
-                {
-                    await ReportCorruptedIndexAsync(path, indexType, cancellationToken);
-                    newIndex.Dispose();
-                    Directory.Delete(path, recursive: true);
-                }
-                else
-                {
-                    var oldIndex = FullAutocomplete;
-                    FullAutocomplete = newIndex;
-                    oldIndex?.Dispose();
-                }
-            }
-                break;
-            default:
-                throw new ArgumentOutOfRangeException();
-        }
-
-
+        ReplaceOldIndex(indexType, newIndex);
         LastUpdateRun[indexType] = DateTime.Now;
+        return true;
+    }
+    
+    private void ReplaceOldIndex(AutocompleteIndexType indexType, IIndexStrategy newIndex)
+    {
+        var oldIndex = _indexStrategies[indexType];
+        _indexStrategies[indexType] = newIndex;
+        oldIndex?.Dispose();
+    }
+    
+    private IIndexStrategy CreateIndex(AutocompleteIndexType indexType, string path)
+    {
+        return indexType switch
+        {
+            AutocompleteIndexType.Adresy => new IndexStrategy<AdresyKVolbam>(path, results => results),
+            AutocompleteIndexType.Uptime => new IndexStrategy<StatniWebyAutocomplete>(path, results => results),
+            AutocompleteIndexType.KIndex => new IndexStrategy<SubjectNameCache>(path, results => results
+                .OrderByDescending(s => s.Score)
+                .ThenBy(s => Firma.JmenoBezKoncovky(s.Document.Name).Length)),
+            AutocompleteIndexType.Company => new IndexStrategy<Autocomplete>(path, results => results
+                .OrderByDescending(s => s.Score)
+                .ThenBy(s => Firma.JmenoBezKoncovky(s.Document.Text).Length)),
+            AutocompleteIndexType.Full => new IndexStrategy<Autocomplete>(path, results => results
+                .OrderByDescending(s => s.Score)
+                .ThenBy(s => Firma.JmenoBezKoncovky(s.Document.Text).Length)),
+            _ => throw new ArgumentOutOfRangeException(nameof(indexType), indexType, null)
+        };
     }
     
     public async Task RollbackIndexAsync(AutocompleteIndexType indexType, CancellationToken cancellationToken)
@@ -233,30 +176,33 @@ public class IndexCache
                 return;
             }
 
-            IDisposable? currentIndex = indexType switch
-            {
-                AutocompleteIndexType.Adresy => Adresy,
-                AutocompleteIndexType.KIndex => Kindex,
-                AutocompleteIndexType.Company => Company,
-                AutocompleteIndexType.Uptime => UptimeServer,
-                AutocompleteIndexType.Full => FullAutocomplete,
-                _ => throw new ArgumentOutOfRangeException()
-            };
-            
-            currentIndex?.Dispose();
+            _indexStrategies[indexType]?.Dispose();
             Directory.Delete(path, recursive: true);
             
             logger.Debug($"Reporting corrupted {indexType:G} index.");
             await ReportCorruptedIndexAsync(path, indexType, cancellationToken);
             await Task.Delay(TimeSpan.FromSeconds(5), cancellationToken);
             
-            //Todo: fix double update...
             logger.Debug($"Loading older {indexType:G} index.");
-            await UpdateCacheAsync(indexType, cancellationToken);
+            path = PathToLatestIndex(indexType);
+            if (path is null || !Directory.EnumerateFiles(path).Any())
+            {
+                logger.Warning("Prazdny index folder.");
+                return;
+            }
+            var isUpdated = await TryUpdateIndexAsync(indexType, path, cancellationToken);
+            if(isUpdated)
+                return;
+            
             logger.Debug($"Try download newer {indexType:G} index.");
-            await DownloadCacheIndexAsync(indexType, cancellationToken);
+            path = await DownloadCacheIndexAsync(indexType, cancellationToken);
+            if (path is null || !Directory.EnumerateFiles(path).Any())
+            {
+                logger.Warning("Prazdny index folder.");
+                return;
+            }
             logger.Debug($"Updating {indexType:G} index.");
-            await UpdateCacheAsync(indexType, cancellationToken);
+            await TryUpdateIndexAsync(indexType, path, cancellationToken);
         }
         catch (Exception e)
         {
@@ -291,21 +237,7 @@ public class IndexCache
                            $"Url [{url}], response [{responseMessage.StatusCode} - {responseMessage.ReasonPhrase}]");
         }
     }
-
-    private bool IsIndexCorrupted<T>(Index<T> index) where T : IEquatable<T>
-    {
-        try
-        {
-            _ = index.Search("a");
-            return false;
-        }
-        catch (Exception e)
-        {
-            logger.Error($"Index {typeof(T).Name} is corrupted.", e);
-            return true;
-        }
-    }
-
+    
     private static string PathToIndexFolder(AutocompleteIndexType type)
     {
         string path = Path.Combine(Devmasters.Config.GetWebConfigValue("DataFolder"), type.ToString("G"));

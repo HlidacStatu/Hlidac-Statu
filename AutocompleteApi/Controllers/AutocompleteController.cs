@@ -1,11 +1,7 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
 using HlidacStatu.AutocompleteApi.Services;
-using HlidacStatu.Entities;
-using HlidacStatu.Entities.Views;
-using HlidacStatu.Repositories.Analysis.KorupcniRiziko;
+using HlidacStatu.LibCore.Enums;
 using Microsoft.AspNetCore.Mvc;
-using MinimalEntities;
 
 namespace HlidacStatu.AutocompleteApi.Controllers
 {
@@ -27,50 +23,33 @@ namespace HlidacStatu.AutocompleteApi.Controllers
         /// <param name="category">Kategorie oddělené mezerami. Seznam kategorií je v CategoryEnum </param>
         /// <returns></returns>
         [HttpGet]
-        public IEnumerable<Autocomplete> Autocomplete(string q, string? category = null, int size = 8)
+        public IEnumerable<object>? Autocomplete(string q, string? category = null, int size = 8)
         {
-            var results = _cacheService.FullAutocomplete.Search(q, size * 2, category);
-            
-            //filter final results by the length of text
-            return results.OrderByDescending(s => s.Score)
-                .ThenBy(s => Firma.JmenoBezKoncovky(s.Document.Text).Length)
-                .Take(size)
-                .Select(s => s.Document);
+            return _cacheService.Search(AutocompleteIndexType.Full, q, size, category);
         }
 
         [HttpGet]
-        public IEnumerable<SubjectNameCache> Kindex(string q, int size = 10)
+        public IEnumerable<object>? Kindex(string q, int size = 10)
         {
-            //Web/controllers/KindexController
-            var results = _cacheService.Kindex.Search(q, size);
-            return results.OrderByDescending(s => s.Score)
-                .ThenBy(s => Firma.JmenoBezKoncovky(s.Document.Name).Length)
-                .Select(s => s.Document);
+            return _cacheService.Search(AutocompleteIndexType.KIndex, q, size);
         }
         
         [HttpGet]
-        public IEnumerable<Autocomplete> Companies(string q, int size = 10)
+        public IEnumerable<object>? Companies(string q, int size = 10)
         {
-            //Web/controllers/apiv1controller
-            var results = _cacheService.Company.Search(q, size);
-            return results.OrderByDescending(s => s.Score)
-                .ThenBy(s => Firma.JmenoBezKoncovky(s.Document.Text).Length)
-                .Select(s => s.Document);
+            return _cacheService.Search(AutocompleteIndexType.Company, q, size);
         }
 
         [HttpGet]
-        public IEnumerable<StatniWebyAutocomplete> UptimeServer(string q, int size = 20)
+        public IEnumerable<object>? UptimeServer(string q, int size = 20)
         {
-            //HlidacStatu.Repositories.uptimeserverrepo
-            var results = _cacheService.UptimeServer.Search(q, size);
-            return results.Select(s => s.Document);
+            return _cacheService.Search(AutocompleteIndexType.Uptime, q, size);
         }
         
         [HttpGet]
-        public IEnumerable<AdresyKVolbam> Adresy(string q, int size = 10)
+        public IEnumerable<object>? Adresy(string q, int size = 10)
         {
-            var results = _cacheService.Adresy.Search(q, size);
-            return results.Select(s => s.Document);
+            return _cacheService.Search(AutocompleteIndexType.Adresy, q, size);
         }
         
     }
