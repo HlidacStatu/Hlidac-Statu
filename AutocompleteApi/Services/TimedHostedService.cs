@@ -1,4 +1,5 @@
 using System;
+using System.IO;
 using System.Linq;
 using System.Net.Http;
 using System.Threading;
@@ -52,9 +53,16 @@ public class TimedHostedService : BackgroundService
         try
         {
             logger.Debug($"Loading {indexType:G} index.");
-            await _indexCache.DownloadCacheIndexAsync(indexType, cancellationToken);
+            var path = await _indexCache.DownloadCacheIndexAsync(indexType, cancellationToken);
+            
+            if (string.IsNullOrWhiteSpace(path) || !Directory.EnumerateFiles(path).Any())
+            {
+                logger.Warning("Empty index folder.");
+                return;
+            }
+            
             logger.Debug($"Updating {indexType:G} index.");
-            await _indexCache.UpdateCacheAsync(indexType, cancellationToken);
+            await _indexCache.TryUpdateIndexAsync(indexType, path, cancellationToken);
         }
         catch (Exception e)
         {

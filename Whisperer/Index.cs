@@ -109,6 +109,7 @@ public sealed class Index<T> : IDisposable where T : IEquatable<T>
 
         using var directoryReader = DirectoryReader.Open(_directory);
         var indexSearcher = new IndexSearcher(directoryReader);
+        
         var queryParser = new QueryParser(LuceneVersion, SearchFieldName, _queryAnalyzer)
         {
             DefaultOperator = Operator.AND
@@ -147,6 +148,12 @@ public sealed class Index<T> : IDisposable where T : IEquatable<T>
     {
         var json = luceneDocument.GetField(DataFieldName).GetStringValue();
         return JsonSerializer.Deserialize<T>(json);
+    }
+
+    public int Count()
+    {
+        using var directoryReader = DirectoryReader.Open(_directory);
+        return directoryReader.NumDocs;
     }
 
     public void Dispose()

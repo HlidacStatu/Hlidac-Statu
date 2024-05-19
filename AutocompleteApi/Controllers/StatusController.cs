@@ -24,6 +24,5 @@ namespace HlidacStatu.AutocompleteApi.Controllers
             
             return new JsonResult(status);
         }
-    
     }
 }
