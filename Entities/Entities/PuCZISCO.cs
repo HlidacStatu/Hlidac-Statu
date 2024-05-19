@@ -15,6 +15,7 @@ public class PuCZISCO
     public string Nazev { get; set; }
     public string Groupname { get; set; }
     public string? KratkyNazev { get; set; }
-   
+    public bool MameVydelky { get; set; }
+
 
 }

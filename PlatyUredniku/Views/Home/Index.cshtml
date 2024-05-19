@@ -133,13 +133,7 @@
             <div class="card-header">Přehledy podle platu</div>
             <ul class="list-group list-group-flush">
                 <li class="list-group-item">
-                    <a asp-action="DlePlatu" asp-route-id="1">Porovnání platů a mezd v různých kategoriích zaměstnání</a>
-                </li>
-                <li class="list-group-item">
-                    <a asp-action="DlePlatu" asp-route-id="1">Porovnání výdělků mezi jednotlivými organizacemi</a>
-                </li>
-                <li class="list-group-item">
-                    <a asp-action="DlePlatu" asp-route-id="1">Platy nižší než je nástupní plat pokladní v Lidl</a>
+                    <a asp-action="DlePlatu" asp-route-id="1">Platy nižší než je nástupní plat pokladní v Lidlu</a>
                 </li>
                 <li class="list-group-item">
                     <a asp-action="DlePlatu" asp-route-id="2">Nižší než průměrné platy</a>
@@ -148,7 +142,16 @@
                     <a asp-action="DlePlatu" asp-route-id="3">Vyšší než průměrné platy</a>
                 </li>
                 <li class="list-group-item">
-                    <a asp-action="DlePlatu" asp-route-id="4">Nejvyšší platy</a>
+                    <a asp-action="DlePlatu" asp-route-id="4">Nejvyšší platy ve veřejné správě</a>
+                </li>
+                <li class="list-group-item">
+                    <a href="/analyza/kategorie">Porovnání a vývoj platů a mezd v různých kategoriích zaměstnání</a>
+                </li>
+                <li class="list-group-item">
+                    <a href="/analyza/kategorie?k1=2341&k2=2330">Vývoj platů učitelů 1. stupně základní školy a srovnání se soukromými školami</a>
+                </li>
+                <li class="list-group-item">
+                    <a href="/analyza/kategorie?k1=2341&k2=2330">Vývoj a porovnání platů učitelů 1. stupně základní školy a srovnání se soukromými školami</a>
                 </li>
             </ul>
         </div>

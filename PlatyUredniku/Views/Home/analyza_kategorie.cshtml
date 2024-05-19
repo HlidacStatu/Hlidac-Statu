@@ -51,14 +51,14 @@
     {
         categories1 = db.PuCZISCO
             .AsNoTracking()
-            .Where(m => m.Groupname != null)
+            .Where(m => m.Groupname != null & m.MameVydelky)
             .ToArray()
             .Select(m => new SelectListItem() { Text = m.Nazev, Value = m.Kod, Selected = m.Kod == k1 })
             .OrderBy(m => m.Text)
             .Concat(new SelectListItem[] { new SelectListItem() { Text = "--ostatní kategorie--" } })
             .Concat(db.PuCZISCO
                 .AsNoTracking()
-                .Where(m => m.Groupname == null)
+                .Where(m => m.Groupname == null & m.MameVydelky)
                 .ToArray()
 
                 .Select(m => new SelectListItem() { Text = m.Nazev, Value = m.Kod, Selected = m.Kod == k1 })
@@ -68,14 +68,14 @@
 
         categories2 = db.PuCZISCO
          .AsNoTracking()
-         .Where(m => m.Groupname != null)
+         .Where(m => m.Groupname != null & m.MameVydelky)
          .ToArray()
          .Select(m => new SelectListItem() { Text = m.Nazev, Value = m.Kod, Selected = m.Kod == k2 })
          .OrderBy(m => m.Text)
          .Concat(new SelectListItem[] { new SelectListItem() { Text = "--ostatní kategorie--" } })
          .Concat(db.PuCZISCO
              .AsNoTracking()
-             .Where(m => m.Groupname == null)
+             .Where(m => m.Groupname == null & m.MameVydelky)
              .ToArray()
 
              .Select(m => new SelectListItem() { Text = m.Nazev, Value = m.Kod, Selected = m.Kod == k2 })
