@@ -21,7 +21,11 @@ section {
     background-color: transparent;
 }
 
+.hashtag {
+    text-decoration: underline;
+    text-decoration-style: dotted;
 
+}
 
 table.table-sm > * > * {
     padding: .25rem .25rem !important;

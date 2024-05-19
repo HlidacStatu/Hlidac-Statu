@@ -16,7 +16,7 @@
 {
     if (!string.IsNullOrEmpty(Model.TextForNoData))
     {
-        <div>@Model.TextForNoData</div>
+        <div>@Html.Raw(Model.TextForNoData)</div>
     }
 
     return;
@@ -30,7 +30,18 @@
     }
     <div id="chart-container-@chartId"></div>
 
-    <br class="text-muted">
+    @if (!string.IsNullOrEmpty(Model.Footer))
+    {
+        <p class="text-muted fs-6">Zdroj: <a href="https://www.ispv.cz">Informačního systém o průměrném výdělku</a></p>
+    }
+    @if (Model.Data.Length > Model.EnableNumSeries)
+    {
+        <div class="alert alert-info" role="alert">
+            Ve spodní části grafu můžete zapnou a vypnout další skupiny platů pro srovnání. Stačí kliknout na její název.
+        </div>
+        
+    }
+    <p class="text-muted">
         V grafu je porovnání platového rozmezí jednotlivých skupin pracovníků v čase. 
         Každá skupina pracovníků je rozlišena barvou a zobrazujeme pro každou rozsah platů mezi <abbr title="10 % platů ze vzorku je nižších a 90 vyšších, než tato hodnota"  class="fw-bold">1. decilem</abbr> 
         a <abbr title="90 % platů ze vzorku je nižších a 10% vyšších, než tato hodnota">9. decilem</abbr> platů.

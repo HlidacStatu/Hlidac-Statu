@@ -10,9 +10,9 @@ namespace HlidacStatu.Entities;
 public class PuCZISCO
 {
     [Key]
-    public string CZ_ISCO { get; set; }
+    public string Kod { get; set; }
     public int Level { get; set; }
-    public string NazevKategorieZamestnani { get; set; }
+    public string Nazev { get; set; }
     public string Groupname { get; set; }
     public string? KratkyNazev { get; set; }
    

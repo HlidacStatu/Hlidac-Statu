@@ -184,6 +184,16 @@
                 //PlatyUredniku.Models.AreaRangePlot uradData = 
                 List<AreaRangePlot> data = new List<AreaRangePlot>();
                 data.Add(PlatyUredniku.Models.AreaRangePlot.ToAreaRangePlotWithPrumer(Model.Platy, Model.Nazev));
+                if (Model.Nazev.Contains("Ministerstvo")) {
+                    data[0].ExtraTitle = "Ministr/yně";
+                }
+                else if (Model.Platy.Any(m=>m.JeHlavoun == true)) {
+                    data[0].ExtraTitle = Model.Platy.Where(m=>m.JeHlavoun == true).OrderByDescending(m=>m.Rok).First().NazevPozice;
+                }
+                else {
+                    data[0].ExtraTitle = "Nejvyšší představitel/ka organizace";
+                }
+
                 foreach (var compItem in compareTo)
                 {
                     var d = await PuRepo.LoadVydelekForZamestnaniAsync(compItem, HlidacStatu.Entities.PuVydelek.VydelekSektor.StatSamosprava);
@@ -201,14 +211,18 @@
 
                 }
 
+                //calculate height
+                var height = 430
+                + data.Count() * 12 //pul radku na jednu serii
+                + (data.Count(m => m.Title.Length > 80) * 17); //dlouhe nazvy serii pocitej na cely radek
+
                 AreaRangeCompareRenderOptions chartModel = new AreaRangeCompareRenderOptions()
                 {
-                    CssHeight = (430 + data.Count()*9).ToString(),
+                    CssHeight = height.ToString(),
                     Data = data.ToArray(),
                     Title="Porovnání s jinými oblastmi trhu"
                 };
                 <partial name="Graphs/_AreaRangeComparePlot" model="@chartModel" />
-
             }
 
         </div>

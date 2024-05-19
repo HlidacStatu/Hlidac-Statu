@@ -1,0 +1,160 @@
+@using Devmasters
+@using MathNet.Numerics.Statistics
+@using Microsoft.AspNetCore.Mvc.TagHelpers
+@using Microsoft.EntityFrameworkCore
+@using PlatyUredniku.Models
+@using HlidacStatu.Repositories;
+
+
+
+@section scripts
+{
+    <link rel="stylesheet" type="text/css" href="//cdn.datatables.net/1.13.4/css/jquery.dataTables.min.css" />
+    <script type="text/javascript" charset="utf8" src="//cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
+    <script>
+        function adjustDataTablesWidth() {
+            $.fn.dataTable.tables({ visible: true, api: true }).columns.adjust();
+        }
+    </script>
+}
+
+@section breadcrumbs
+{
+    <ol class="breadcrumb">
+        <li>
+            <a asp-action="Index">Platy úředníků</a>
+        </li>
+        <li>
+            <a asp-action="Oblasti">Analýzy</a>
+        </li>
+        <li>
+            Porovnání vývoje výdělků
+        </li>
+        <li class="active"> </li>
+    </ol>
+}
+@{
+    string k1 = "";
+    string k2 = "";
+    if (this.Context.Request.Query.TryGetValue("k1", out var rk1))
+    {
+        k1 = rk1.FirstOrDefault();
+    }
+    if (this.Context.Request.Query.TryGetValue("k2", out var rk2))
+    {
+        k2 = rk2.FirstOrDefault();
+    }
+    bool sectionBgSwitch = false;
+    List<SelectListItem> categories1= new List<SelectListItem>();
+    List<SelectListItem> categories2= new List<SelectListItem>();
+    using (var db = new HlidacStatu.Entities.DbEntities())
+    {
+        categories1 = db.PuCZISCO
+            .AsNoTracking()
+            .Where(m => m.Groupname != null)
+            .ToArray()
+            .Select(m => new SelectListItem() { Text = m.Nazev, Value = m.Kod, Selected = m.Kod == k1 })
+            .OrderBy(m => m.Text)
+            .Concat(new SelectListItem[] { new SelectListItem() { Text = "--ostatní kategorie--" } })
+            .Concat(db.PuCZISCO
+                .AsNoTracking()
+                .Where(m => m.Groupname == null)
+                .ToArray()
+
+                .Select(m => new SelectListItem() { Text = m.Nazev, Value = m.Kod, Selected = m.Kod == k1 })
+                .OrderBy(m => m.Text)
+            )
+           .ToList();
+
+        categories2 = db.PuCZISCO
+         .AsNoTracking()
+         .Where(m => m.Groupname != null)
+         .ToArray()
+         .Select(m => new SelectListItem() { Text = m.Nazev, Value = m.Kod, Selected = m.Kod == k2 })
+         .OrderBy(m => m.Text)
+         .Concat(new SelectListItem[] { new SelectListItem() { Text = "--ostatní kategorie--" } })
+         .Concat(db.PuCZISCO
+             .AsNoTracking()
+             .Where(m => m.Groupname == null)
+             .ToArray()
+
+             .Select(m => new SelectListItem() { Text = m.Nazev, Value = m.Kod, Selected = m.Kod == k2 })
+             .OrderBy(m => m.Text)
+         )
+        .ToList();
+
+        categories1.Insert(0, new SelectListItem() { Text = "(Vyberte první kategorii)", Selected = string.IsNullOrEmpty(k1) });
+        categories2.Insert(0, new SelectListItem() { Text = "(Vyberte první kategorii)", Selected = string.IsNullOrEmpty(k2) });
+    }
+ 
+}
+
+<section class="d-flex align-items-center justify-content-center @(sectionBgSwitch ? "alter-bg-color" : "")">
+    <div class="container">
+
+
+        <h2 class="pb-2 border-bottom">Porovnání kategorií zaměstnání</h2>
+
+        <form action="/analyza/kategorie" method="get">
+            <div class="row">
+                <div class="col-md-6 col-sm-12">
+                    <label for="k1" class="form-label">První kategorie</label>
+                    <select class="form-select"  name="k1" asp-items="categories1">
+                    </select>
+                </div>
+                <div class="col-md-6 col-sm-12">
+                      <label for="k2" class="form-label">Druhá kategorie</label>
+                    <select class="form-select" name="k2" asp-items="categories2">
+                    </select>
+                </div>
+                <div class="col"><button class="btn btn-sm btn-primary" type="submit">Porovnat vývoj platů</button></div>
+            </div>
+        </form>
+
+
+        @{
+            string[] compareTo = new string[] { k1,k2}.Where(m=>!string.IsNullOrWhiteSpace(m)).ToArray();
+
+            if (compareTo?.Length > 0)
+            {
+                sectionBgSwitch = !sectionBgSwitch;
+
+                List<AreaRangePlot> data = new List<AreaRangePlot>();
+
+                foreach (var compItem in compareTo)
+                {
+                    var d = await PuRepo.LoadVydelekForZamestnaniAsync(compItem, HlidacStatu.Entities.PuVydelek.VydelekSektor.StatSamosprava);
+                    if (d?.Any() == true)
+                    {
+                        var dName = d.OrderByDescending(m => m.Rok).Select(m => m.FullNazevKategorieZamestnani()).FirstOrDefault().ShortenMe(140);
+                        data.Add(AreaRangePlot.ToAreaRangePlotWithPrumer(d, dName));
+                    }
+                    d = await PuRepo.LoadVydelekForZamestnaniAsync(compItem, HlidacStatu.Entities.PuVydelek.VydelekSektor.Soukromy);
+                    if (d?.Any() == true)
+                    {
+                        var dName = d.OrderByDescending(m => m.Rok).Select(m => m.FullNazevKategorieZamestnani()).FirstOrDefault().ShortenMe(140);
+                        data.Add(AreaRangePlot.ToAreaRangePlotWithPrumer(d, dName));
+                    }
+
+                }
+
+                //calculate height
+                var height = 430
+                + data.Count() * 12 //pul radku na jednu serii
+                + (data.Count(m => m.Title.Length > 80) * 17); //dlouhe nazvy serii pocitej na cely radek
+
+                AreaRangeCompareRenderOptions chartModel = new AreaRangeCompareRenderOptions()
+                {
+                    CssHeight = height.ToString(),
+                    Data = data.ToArray(),
+                    Title = "Porovnání s jinými oblastmi trhu"
+                };
+
+
+                <partial name="Graphs/_AreaRangeComparePlot" model="@chartModel" />
+            }
+        }
+
+    </div>
+</section>
+

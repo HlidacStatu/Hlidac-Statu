@@ -86,7 +86,7 @@ public class Program
 
             app.UseTimeMeasureMiddleware(new List<string>() { "/_blazor" });
             
-            app.UseBannedIpsMiddleware(whitelist);
+            //app.UseBannedIpsMiddleware(whitelist);
 
             //todo: remove after
             app.UseDeveloperExceptionPage();

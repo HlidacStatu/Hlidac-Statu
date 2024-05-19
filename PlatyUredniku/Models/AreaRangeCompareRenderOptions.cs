@@ -11,6 +11,7 @@ public class AreaRangeCompareRenderOptions
     public string TextForNoData { get; set; } = string.Empty;
     public string? Title { get; set; } = "Vývoj platů";
     public string? Subtitle { get; set; } = "Vývoj průměrného měsíčního platu po letech";
+    public string? Footer { get; set; } = "Zdroj: <a href=\"https://www.ispv.cz\">Informačního systém o průměrném výdělku</a>";
 
     public int EnableNumSeries { get; set; } = 4;
 

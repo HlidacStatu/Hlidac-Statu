@@ -60,7 +60,7 @@
 
                         @foreach (var item in group)
                         {
-                        <hashtag tag="@item" additional-class="badge rounded-pill border me-3 mb-2 order-{@count}"></hashtag>
+                        <hashtag tag="@item" additional-class="badge rounded-pill border me-3 mb-2 order-{@count}" style="font-size:0.9em"></hashtag>
                         <br />
                         }
 
@@ -127,13 +127,16 @@
     <div class="container">
 
         <h2>
-            Žebříčky
+            Analýzy a porovnání
         </h2>
         <div class="card text-bg-light mb-3">
             <div class="card-header">Přehledy podle platu</div>
             <ul class="list-group list-group-flush">
                 <li class="list-group-item">
-                    <a asp-action="DlePlatu" asp-route-id="1">Platy nižší než je nástupní plat pokladní v Lidl</a>
+                    <a asp-action="DlePlatu" asp-route-id="1">Porovnání platů a mezd v různých kategoriích zaměstnání</a>
+                </li>
+                <li class="list-group-item">
+                    <a asp-action="DlePlatu" asp-route-id="1">Porovnání výdělků mezi jednotlivými organizacemi</a>
                 </li>
                 <li class="list-group-item">
                     <a asp-action="DlePlatu" asp-route-id="1">Platy nižší než je nástupní plat pokladní v Lidl</a>
