@@ -32,7 +32,7 @@
 
     @if (!string.IsNullOrEmpty(Model.Footer))
     {
-        <p class="text-muted fs-6">Zdroj: <a href="https://www.ispv.cz">Informačního systém o průměrném výdělku</a></p>
+        <p class="text-end text-muted small">@Html.Raw(Model.Footer)</p>
     }
     @if (Model.Data.Length > Model.EnableNumSeries)
     {
