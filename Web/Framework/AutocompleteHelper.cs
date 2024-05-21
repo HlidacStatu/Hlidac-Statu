@@ -5,8 +5,6 @@ using HlidacStatu.Entities;
 using HlidacStatu.Extensions;
 using HlidacStatu.Repositories;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.WebUtilities;
-using Microsoft.Extensions.Primitives;
 using MinimalEntities;
 using Serilog;
 using WasmComponents.Components.Autocomplete;
@@ -69,7 +67,7 @@ public static class AutocompleteHelper
             }
             else if (parsedQuery.StartsWith("ico:", StringComparison.InvariantCultureIgnoreCase))
             {
-                var firma = FirmaRepo.FromIco(parsedQuery.Substring(4));
+                var firma = FirmaRepo.FromIco(parsedQuery.Substring(4).Trim());
                 if (firma is not null)
                 {
                     Autocomplete.CategoryEnum kategorie = Autocomplete.CategoryEnum.Company;
