@@ -60,6 +60,7 @@ public class Program
             builder.Services.AddHttpClient();
 
             builder.Services.AddSingleton<AutocompleteCacheService>();
+            builder.Services.AddSingleton<AutocompleteCategoryCacheService>();
             builder.Services.AddHostedService<AutocompleteTimer>();
 
             builder.Services.AddFusionCache()

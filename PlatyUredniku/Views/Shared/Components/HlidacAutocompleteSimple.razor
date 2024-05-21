@@ -2,45 +2,21 @@
 
 @typeparam TItem
 
-<div class="hlidac-autocomplete-overlay" style="display:@(IsAnyOptionItem || ShowHelpTips ? "flex" : "none")" @onclick="CloseOptions">
-</div>
 <div class="hlidac-autocomplete">
     <div class="input-group bg-white rounded-2">
         <input @ref="InputBoxElement"
-               id="autocompleteInputBox"
                type="text"
                autocomplete="off"
-               placeholder="@InputBoxPlaceHolder"
-               class="hlidac-autocomplete-input form-control border border-0"
+               placeholder="@DefaultPlaceholder"
+               class="form-control"
                @bind="@InputBoxValue"
                @bind:event="oninput"
                @onkeyup="@(async (e) => await SearchAsync(e))"
                @onkeydown="OnInputKeyDown"
-               @onclick="@ShowDefaultHintItems"/>
-
-            @if (_showSpinner)
-            {
-                <span class="spinner-border spinner-border-sm text-light align-middle mb-1 ms-1" role="status">
-                  <span class="visually-hidden">Loading...</span>
-                </span>
-            }
+        />
         
+        <input type="hidden" name="@Name" id="@Name" @bind="HiddenValue"/>
     </div>
-
-    @if (ShowHelpTips && string.IsNullOrWhiteSpace(InputBoxValue))
-    {
-        <div class="hlidac-autocomplete-list">
-            <div class="list-group">
-                @if (HelpTemplate is not null)
-                {
-                    @foreach (RenderFragment helpTip in HelpTips)
-                    {
-                        @HelpTemplate(helpTip)
-                    }
-                }
-            </div>
-        </div>
-    }
 
     @if (IsAnyOptionItem)
     {
@@ -52,7 +28,7 @@
                     var item = OptionItems[index];
                     if (ItemTemplate is not null)
                     {
-                        <button class="list-group-item list-group-item-action @(option == _selectedOption ? "active" : "")"
+                        <button type="button" class="list-group-item list-group-item-action @(option == _selectedOption ? "active" : "")"
                                 @onclick="@(() => SelectItemAsync(option))">
                             @ItemTemplate(item)
                         </button>
@@ -64,32 +40,31 @@
 </div>
 
 @code {
+    [Parameter]
+    public string Name { get; set; }
 
     [Parameter]
     public RenderFragment<TItem>? ItemTemplate { get; set; }
+    
+    [Parameter]
+    public Func<string, CancellationToken, Task<List<TItem>>> SearchFuncAsync { get; set; } = null!;
+    
+    [Parameter]
+    public Func<TItem, string> ValueSelectorFunc { get; set; } = null!;
+    [Parameter]
+    public Func<TItem, string> TextSelectorFunc { get; set; } = null!;
+    
+    [Parameter]    
+    public string DefaultPlaceholder { get; set; } = "Začněte psát...";
+    
+    [Parameter]
+    public string DefaultValue { get; set; }
 
     
 
-    [Parameter]
-    public RenderFragment<RenderFragment>? HelpTemplate { get; set; }
-
-    [Parameter]
-    public Func<string, CancellationToken, Task<List<TItem>>> SearchFuncAsync { get; set; } = null!;
-
-    [Parameter]
-    public Func<TItem, string> TextSelector { get; set; } = null!;
-
-    [Parameter]
-    public EventCallback<AutocompleteItem<TItem>> OnAutocompleteSubmitted { get; set; }
-
-    [Parameter]
-    public EventCallback<string> OnAutocompleteTextSelected { get; set; }
-
-    [Parameter]
-    public List<RenderFragment>? HelpTips { get; set; }
-
     private ElementReference InputBoxElement { get; set; }
     private string? InputBoxValue { get; set; }
+    private string? HiddenValue { get; set; }
     private bool IsInputboxEmpty => string.IsNullOrEmpty(InputBoxValue);
     
     private CancellationTokenSource? _cts;
@@ -97,48 +72,31 @@
 
     private List<TItem>? OptionItems { get; set; }
     private bool IsAnyOptionItem => OptionItems is not null && OptionItems.Count > 0;
-    private bool ShowHelpTips { get; set; }
-
-    private string GrayboxDisplay { get; set; } = "none";
     
-    private bool _showSpinner = false;
-
-    private string InputBoxPlaceHolder
-    {
-        get => "Začněte psát název organizace";
-    }
-
 
     private int _selectedOption = -1;
-
-        private const string ActiveTag = "border border-3 border-warning";
-
+    
     protected override async Task OnParametersSetAsync()
     {
-        await base.OnParametersSetAsync();
-
-        if (TextSelector is null)
-            throw new ArgumentNullException(nameof(TextSelector));
-
+        if (!string.IsNullOrWhiteSpace(DefaultValue))
+        {
+            HiddenValue = DefaultValue;
+            
+        }
+        
         if (SearchFuncAsync is null)
             throw new ArgumentNullException(nameof(SearchFuncAsync));
-    }
-
-    private string GetTextFromItem(AutocompleteItem<TItem> autocompleteItem)
-    {
-        if (autocompleteItem.Value is null)
-            return autocompleteItem.Text ?? "";
-
-        return TextSelector(autocompleteItem.Value);
+        if (ValueSelectorFunc is null)
+            throw new ArgumentNullException(nameof(ValueSelectorFunc));
+        if (TextSelectorFunc is null)
+            throw new ArgumentNullException(nameof(TextSelectorFunc));
     }
 
     private async Task SearchAsync(KeyboardEventArgs eventArgs)
     {
-    //string? query = eventArgs.Value?.ToString();
         string query = InputBoxValue;
         CancelRunningTask();
 
-    // if query is empty, we can cleanup task and data
         if (string.IsNullOrWhiteSpace(query))
         {
             CloseOptions();
@@ -146,9 +104,7 @@
         }
 
         _cts = new CancellationTokenSource();
-
-    // here we can also add delay when typing before sending a request
-
+        
         try
         {
             _searchTask = SearchFuncAsync.Invoke(query, _cts.Token);
@@ -169,7 +125,6 @@
         OptionItems = null;
         _searchTask = null;
         _selectedOption = -1;
-        HideDefaultHintItems();
     }
 
     private void CancelRunningTask()
@@ -177,17 +132,6 @@
         if (_searchTask is not null && !_searchTask.IsCompleted && !_searchTask.IsCanceled
             && _cts is not null && !_cts.IsCancellationRequested)
             _cts.Cancel();
-    }
-
-
-    private void OnSelectOption(int option)
-    {
-        Interlocked.Exchange(ref _selectedOption, option);
-    }
-
-    private void OnDeselectOption(int option)
-    {
-        Interlocked.CompareExchange(ref _selectedOption, -1, option);
     }
 
     private async Task SelectItemAsync(int option)
@@ -199,11 +143,12 @@
             return;
         }
 
+        // vybraná položka existuje => vybrat
         if (IsAnyOptionItem && option >= 0 && option <= OptionItems.Count)
         {
-            var result = new AutocompleteItem<TItem>(OptionItems[option]);
-            InputBoxValue = result.Text;
-            await SubmitSearch(result);
+            var selectedItem = OptionItems[option];
+            InputBoxValue = TextSelectorFunc(selectedItem);
+            HiddenValue = ValueSelectorFunc(selectedItem);
         }
         
         CloseOptions();
@@ -211,7 +156,6 @@
 
     private async Task OnInputKeyDown(KeyboardEventArgs eventArgs)
     {
-        HideDefaultHintItems();
         switch (eventArgs.Code)
         {
             case "ArrowUp" when IsAnyOptionItem:
@@ -239,25 +183,4 @@
                 break;
         }
     }
-    
-
-    private async Task SubmitSearch(AutocompleteItem<TItem> selectedItem)
-    {
-        
-        //spin it
-        _showSpinner = true;
-        //notify parent, that we are done
-        await OnAutocompleteSubmitted.InvokeAsync(selectedItem);
-    }
-
-    private void ShowDefaultHintItems()
-    {
-        ShowHelpTips = true;
-    }
-
-    private void HideDefaultHintItems()
-    {
-        ShowHelpTips = false;
-    }
-    
 }

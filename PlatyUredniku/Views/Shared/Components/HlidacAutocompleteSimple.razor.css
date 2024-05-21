@@ -1,0 +1,13 @@
+.no-overflow {
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.selected-element {
+    max-width: 200px;
+}
+
+.input-group-newline {
+    width: 100%;
+}
+

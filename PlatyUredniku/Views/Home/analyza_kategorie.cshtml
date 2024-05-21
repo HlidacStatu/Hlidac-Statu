@@ -1,9 +1,8 @@
 @using Devmasters
-@using MathNet.Numerics.Statistics
 @using Microsoft.AspNetCore.Mvc.TagHelpers
-@using Microsoft.EntityFrameworkCore
 @using PlatyUredniku.Models
 @using HlidacStatu.Repositories;
+@using Microsoft.EntityFrameworkCore
 
 
 
@@ -35,7 +34,9 @@
 }
 @{
     string k1 = "";
+    string k1Text = "";
     string k2 = "";
+    string k2Text = "";
     if (this.Context.Request.Query.TryGetValue("k1", out var rk1))
     {
         k1 = rk1.FirstOrDefault();
@@ -45,48 +46,27 @@
         k2 = rk2.FirstOrDefault();
     }
     bool sectionBgSwitch = false;
-    List<SelectListItem> categories1= new List<SelectListItem>();
-    List<SelectListItem> categories2= new List<SelectListItem>();
     using (var db = new HlidacStatu.Entities.DbEntities())
     {
-        categories1 = db.PuCZISCO
-            .AsNoTracking()
-            .Where(m => m.Groupname != null & m.MameVydelky)
-            .ToArray()
-            .Select(m => new SelectListItem() { Text = m.Nazev, Value = m.Kod, Selected = m.Kod == k1 })
-            .OrderBy(m => m.Text)
-            .Concat(new SelectListItem[] { new SelectListItem() { Text = "--ostatní kategorie--" } })
-            .Concat(db.PuCZISCO
+        if (!string.IsNullOrWhiteSpace(k1))
+        {
+            k1Text = db.PuCZISCO
                 .AsNoTracking()
-                .Where(m => m.Groupname == null & m.MameVydelky)
-                .ToArray()
+                .Where(m => m.MameVydelky && m.Kod == k1)
+                .Select(m => m.Nazev)
+                .FirstOrDefault();
+        }
 
-                .Select(m => new SelectListItem() { Text = m.Nazev, Value = m.Kod, Selected = m.Kod == k1 })
-                .OrderBy(m => m.Text)
-            )
-           .ToList();
-
-        categories2 = db.PuCZISCO
-         .AsNoTracking()
-         .Where(m => m.Groupname != null & m.MameVydelky)
-         .ToArray()
-         .Select(m => new SelectListItem() { Text = m.Nazev, Value = m.Kod, Selected = m.Kod == k2 })
-         .OrderBy(m => m.Text)
-         .Concat(new SelectListItem[] { new SelectListItem() { Text = "--ostatní kategorie--" } })
-         .Concat(db.PuCZISCO
-             .AsNoTracking()
-             .Where(m => m.Groupname == null & m.MameVydelky)
-             .ToArray()
-
-             .Select(m => new SelectListItem() { Text = m.Nazev, Value = m.Kod, Selected = m.Kod == k2 })
-             .OrderBy(m => m.Text)
-         )
-        .ToList();
-
-        categories1.Insert(0, new SelectListItem() { Text = "(Vyberte první kategorii)", Selected = string.IsNullOrEmpty(k1) });
-        categories2.Insert(0, new SelectListItem() { Text = "(Vyberte druhou kategorii)", Selected = string.IsNullOrEmpty(k2) });
+        if (!string.IsNullOrWhiteSpace(k2))
+        {
+            k2Text = db.PuCZISCO
+                .AsNoTracking()
+                .Where(m => m.MameVydelky && m.Kod == k2)
+                .Select(m => m.Nazev)
+                .FirstOrDefault();
+        }
     }
- 
+    
 }
 
 <section class="d-flex align-items-center justify-content-center @(sectionBgSwitch ? "alter-bg-color" : "")">
@@ -95,17 +75,26 @@
 
         <h2 class="pb-2 border-bottom">Porovnání kategorií zaměstnání</h2>
 
-        <form action="/analyza/kategorie" method="get">
+        <form action="/analyza/kategorie" method="get" onkeydown="if(event.key === 'Enter') {return false;}">
             <div class="row">
                 <div class="col-md-6 col-sm-12">
                     <label for="k1" class="form-label">První kategorie</label>
-                    <select class="form-select"  name="k1" asp-items="categories1">
-                    </select>
+                    @(await Html.RenderComponentAsync<PlatyUredniku.Views.Shared.Components.AutocompleteSimpleWrap>(RenderMode.ServerPrerendered, new
+                    {
+                        Name = "k1",
+                        DefaultPlaceholder = k1Text,
+                        DefaultValue = k1
+                    }))
                 </div>
                 <div class="col-md-6 col-sm-12">
-                      <label for="k2" class="form-label">Druhá kategorie</label>
-                    <select class="form-select" name="k2" asp-items="categories2">
-                    </select>
+                    <label for="k2" class="form-label">Druhá kategorie</label>
+                    @(await Html.RenderComponentAsync<PlatyUredniku.Views.Shared.Components.AutocompleteSimpleWrap>(RenderMode.ServerPrerendered, new
+                    {
+                        Name = "k2",
+                        DefaultPlaceholder = k2Text,
+                        DefaultValue = k2
+                    }))
+                    
                 </div>
                 <div class="col"><button class="btn btn-sm btn-primary" type="submit">Porovnat vývoj platů</button></div>
             </div>

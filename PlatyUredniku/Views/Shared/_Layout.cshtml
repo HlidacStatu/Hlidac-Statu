@@ -211,13 +211,7 @@
     <div class="header__content header__content--compact  d-print-none">
         <div class="header__search">
             <div id="new-search-input">
-                @(await Html.RenderComponentAsync<PlatyUredniku.Views.Shared.Components.AutocompleteWrap>(
-                    RenderMode.ServerPrerendered, new
-                    {
-                        Endpoint = Devmasters.Config.GetWebConfigValue("PlatyAutocompleteEndpoint"),
-                        HttpClient = HttpClientFactory.CreateClient(),
-                        SearchPath = "hledat"
-                    }))
+                @(await Html.RenderComponentAsync<PlatyUredniku.Views.Shared.Components.AutocompleteWrap>(RenderMode.ServerPrerendered))
             </div>
         </div>
     </div>

@@ -8,10 +8,13 @@ namespace PlatyUredniku.Services;
 public class AutocompleteTimer : BackgroundService
 {
     private readonly AutocompleteCacheService _autocompleteCacheService;
+    private readonly AutocompleteCategoryCacheService _autocompleteCategoryCacheService;
 
-    public AutocompleteTimer(AutocompleteCacheService autocompleteCacheService)
+    public AutocompleteTimer(AutocompleteCacheService autocompleteCacheService,
+        AutocompleteCategoryCacheService autocompleteCategoryCacheService)
     {
         _autocompleteCacheService = autocompleteCacheService;
+        _autocompleteCategoryCacheService = autocompleteCategoryCacheService;
     }
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -37,7 +40,10 @@ public class AutocompleteTimer : BackgroundService
     private async Task RunAsync(CancellationToken stoppingToken)
     {
         Console.WriteLine("Spouštím refresh autocompletu.");
-        await _autocompleteCacheService.RefreshAutocompleteDataAsync(stoppingToken);
+        var cacheTask = _autocompleteCacheService.RefreshAutocompleteDataAsync(stoppingToken);
+        var categoryCacheTask = _autocompleteCategoryCacheService.RefreshAutocompleteDataAsync(stoppingToken);
+
+        await Task.WhenAll(cacheTask, categoryCacheTask);
         Console.WriteLine("Refresh autocompletu dokončen.");
     }
 }

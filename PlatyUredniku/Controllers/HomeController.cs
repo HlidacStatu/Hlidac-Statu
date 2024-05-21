@@ -24,6 +24,7 @@ public class HomeController : Controller
         return View("Analyza_"+id);
 
     }
+    
     public async Task<IActionResult> Index()
     {
         var platyTask = _cache.GetOrSetAsync<List<PuPlat>>(
