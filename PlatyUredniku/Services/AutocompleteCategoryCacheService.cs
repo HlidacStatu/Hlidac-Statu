@@ -85,5 +85,14 @@ public class AutocompleteCategoryCacheService
             .ToListAsync(cancellationToken: cancellationToken);
     }
     
+    public List<PuCZISCO> LoadCzisco()
+    {
+        using var db = new DbEntities();
+        return db.PuCZISCO
+            .AsNoTracking()
+            .Where(m => m.MameVydelky)
+            .ToList();
+    }
+    
     
 }

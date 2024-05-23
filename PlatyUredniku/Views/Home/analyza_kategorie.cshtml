@@ -3,7 +3,9 @@
 @using PlatyUredniku.Models
 @using HlidacStatu.Repositories;
 @using Microsoft.EntityFrameworkCore
+@using PlatyUredniku.Services
 
+@inject AutocompleteCategoryCacheService AutocompleteService
 
 
 @section scripts
@@ -13,6 +15,21 @@
     <script>
         function adjustDataTablesWidth() {
             $.fn.dataTable.tables({ visible: true, api: true }).columns.adjust();
+        }
+    </script>
+    <script>
+        function updateHiddenInput(hiddenId) {
+            const input = document.getElementById(hiddenId+'filter');
+            const hiddenInput = document.getElementById(hiddenId);
+            const datalist = document.getElementById('organizace_list');
+            const options = datalist.options;
+            hiddenInput.value = '';
+            for (let i = 0; i < options.length; i++) {
+                if (options[i].value === input.value) {
+                    hiddenInput.value = options[i].getAttribute('data-value');
+                    break;
+                }
+            }
         }
     </script>
 }
@@ -87,17 +104,18 @@
                     }))
                 </div>
                 <div class="col-md-6 col-sm-12">
-                    <label for="k2" class="form-label">Druhá kategorie</label>
-                    @(await Html.RenderComponentAsync<PlatyUredniku.Views.Shared.Components.AutocompleteSimpleWrap>(RenderMode.ServerPrerendered, new
-                    {
-                        Name = "k2",
-                        DefaultPlaceholder = k2Text,
-                        DefaultValue = k2
-                    }))
-                    
+                    <label for="k2filter" class="form-label">Druhá kategorie</label>
+                    <input id="k2filter" list="organizace_list" type="text" class="form-control" oninput="updateHiddenInput('k2')" placeholder="@k2Text">
+                    <input type="hidden" id="k2" name="k2">
                 </div>
                 <div class="col"><button class="btn btn-sm btn-primary" type="submit">Porovnat vývoj platů</button></div>
             </div>
+            <datalist id="organizace_list">
+                @foreach (var org in AutocompleteService.LoadCzisco())
+                {
+                    <option value="@org.Nazev" data-value="@org.Kod"></option>    
+                }
+            </datalist>
         </form>
 
 
