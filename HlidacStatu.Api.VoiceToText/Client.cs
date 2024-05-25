@@ -31,7 +31,10 @@ namespace HlidacStatu.Api.VoiceToText
             TimeOut = timeOut;
         }
 
-        public async Task<long> AddNewTaskAsync(HlidacStatu.DS.Api.Voice2Text.Options options, Uri source, string callerId, string callerTaskId, int priority)
+        public async Task<long?> AddNewTaskAsync(HlidacStatu.DS.Api.Voice2Text.Options options, 
+            Uri source, string callerId, string callerTaskId, int priority,
+            bool addDuplicated = false
+            )
         {
             try
             {
@@ -46,8 +49,8 @@ namespace HlidacStatu.Api.VoiceToText
 
                 JsonContent form = JsonContent.Create<HlidacStatu.DS.Api.Voice2Text.Task>(task);
 
-                var id = await Simple.PostAsync<long>(
-                    BaseApiUri.AbsoluteUri + "api/v2/voice2text/CreateTask",
+                var id = await Simple.PostAsync<long?>(
+                    BaseApiUri.AbsoluteUri + $"api/v2/voice2text/CreateTask?addDuplicated={addDuplicated}",
                     form, continueOnCapturedContext: false,
                         headers: new Dictionary<string, string>() { { "Authorization", this.ApiKey } }, 
                         timeout: this.TimeOut

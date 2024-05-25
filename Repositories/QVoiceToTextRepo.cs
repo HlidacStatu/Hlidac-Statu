@@ -23,8 +23,8 @@ namespace HlidacStatu.Repositories
 
 
             if (checkExisting && exists != null)
-                tbl.QId= exists.QId;
-                
+                tbl.QId = exists.QId;
+
 
             db.QVoiceToText.Attach(tbl);
             if (tbl.QId == 0)
@@ -89,7 +89,44 @@ namespace HlidacStatu.Repositories
             return q;
         }
 
-        public static async Task<QVoiceToText[]> GetByParameters(int maxItems = 1000, string? callerId = null, string? callerTaskId = null, HlidacStatu.DS.Api.Voice2Text.Task.CheckState? status = null, CancellationToken cancellationToken = default(CancellationToken))
+        public static async Task<bool> IsDuplicatedBySource(string sourceUri)
+        {
+            if (!Uri.IsWellFormedUriString(sourceUri, UriKind.Absolute))
+                return true;
+
+
+            await using (DbEntities db = new DbEntities())
+            {
+                var q1 = await db.QVoiceToText
+                    .AsQueryable()
+                    .Where(m =>
+                            m.Source == sourceUri &&
+                            m.Status == (int)HlidacStatu.DS.Api.Voice2Text.Task.CheckState.WaitingInQueue
+                    )
+                    .AnyAsync();
+
+                if ( q1)
+                    return true;
+
+                var q2 = await db.QVoiceToText
+                .AsQueryable()
+                .Where(m =>
+                        m.Source == sourceUri
+                        && m.Status != (int)HlidacStatu.DS.Api.Voice2Text.Task.CheckState.Error
+                        && m.Result != "[]"
+                )
+                .AnyAsync();
+                if (q2)
+                    return true;
+
+                return false;
+            }
+        }
+        public static async Task<QVoiceToText[]> GetByParameters(int maxItems = 1000,
+        string? callerId = null, string? callerTaskId = null,
+        string source = null,
+        HlidacStatu.DS.Api.Voice2Text.Task.CheckState? status = null,
+        CancellationToken cancellationToken = default(CancellationToken))
         {
             await using (DbEntities db = new DbEntities())
             {
@@ -99,6 +136,8 @@ namespace HlidacStatu.Repositories
                     query = query.Where(m => m.CallerId == callerId);
                 if (!string.IsNullOrEmpty(callerTaskId))
                     query = query.Where(m => m.CallerTaskId == callerTaskId);
+                if (source != null)
+                    query = query.Where(m => m.Source == source);
                 if (status.HasValue)
                     query = query.Where(m => m.Status == (int)status.Value);
 

@@ -21,11 +21,14 @@ namespace HlidacStatuApi.Controllers.ApiV2
         /// <returns></returns>
         [Authorize(Roles = "Admin,InternalQ")]
         [HttpPost("CreateTask")]
-        public async Task<ActionResult<long>> CreateTask([FromBody] HlidacStatu.DS.Api.Voice2Text.Task task)
+        public async Task<ActionResult<long?>> CreateTask([FromBody] HlidacStatu.DS.Api.Voice2Text.Task task, [FromQuery] bool addDuplicated = false)
         {
             try
             {
-
+                //check duplication
+                if (addDuplicated == false && (await QVoiceToTextRepo.IsDuplicatedBySource(task.Source)))
+                    return StatusCode(204);
+                
 
                 var qv2t = new QVoiceToText();
                 qv2t.Priority = task.Priority;
@@ -164,7 +167,7 @@ namespace HlidacStatuApi.Controllers.ApiV2
             try
             {
 
-                QVoiceToText[] tasks = await QVoiceToTextRepo.GetByParameters(maxItems, callerId, callerTaskId, status);
+                QVoiceToText[] tasks = await QVoiceToTextRepo.GetByParameters(maxItems, callerId, callerTaskId, status: status);
                 var res = new List<HlidacStatu.DS.Api.Voice2Text.Task>();
                 foreach (var m in tasks) {
                     try
