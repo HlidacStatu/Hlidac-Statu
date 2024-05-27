@@ -1,10 +1,11 @@
 @model PlatyUredniku.Models.ExportModalViewModel
 @{
-    string modalid = "export-modal";
+    string modalid = $"_em_{Model.GetHashCode()}";
+    
 }
 
 <a href="#" class="btn btn-sm btn-primary" role="button" data-bs-toggle="modal" data-bs-target="#modal@(modalid)">
-    <span class="small">Exportovat výsledky</span>
+    <span class="small">@(string.IsNullOrWhiteSpace(Model.NazevTlacitka)? "Exportovat výsledky" : Model.NazevTlacitka)</span>
 </a> <!-- Modal -->
 <div class="modal fade" id="modal@(modalid)" tabindex="-1" role="dialog" aria-labelledby="modal@(modalid)">
     <div class="modal-dialog" role="document">

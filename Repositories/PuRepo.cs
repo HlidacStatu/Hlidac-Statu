@@ -12,6 +12,7 @@ namespace HlidacStatu.Repositories;
 public static class PuRepo
 {
     public const int DefaultYear = 2023;
+    public const int MinYear = 2016;
 
     public static readonly string[] MainTags =
     [
@@ -149,6 +150,30 @@ public static class PuRepo
             .Include(o => o.FirmaDs)
             .Include(o => o.Platy) // Include PuPlat
             .FirstOrDefaultAsync();
+    }
+
+    public static async Task<List<PuOrganizace>> ExportAllAsync(string? datovaSchranka, int? year)
+    {
+        await using var db = new DbEntities();
+
+        IQueryable<PuOrganizace> query = db.PuOrganizace
+            .AsNoTracking()
+            .Include(o => o.Metadata)
+            .Include(o => o.Tags)
+            .Include(o => o.FirmaDs)
+            .Include(o => o.Platy);
+
+        if (!string.IsNullOrEmpty(datovaSchranka))
+        {
+            query = query.Where(pu => pu.DS == datovaSchranka);
+        }
+
+        if (year.HasValue)
+        {
+            query = query.Where(pu => pu.Metadata.Any(m => m.Rok == year.Value) || pu.Platy.Any(p => p.Rok == year.Value));
+        }
+
+        return await query.ToListAsync();
     }
 
     public static async Task<PuOrganizace> GetOrganizationOfTheDayAsync()

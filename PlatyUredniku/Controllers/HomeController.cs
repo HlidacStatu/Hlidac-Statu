@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
+using Devmasters.Enums;
 using ZiggyCreatures.Caching.Fusion;
 
 namespace PlatyUredniku.Controllers;
@@ -36,6 +37,7 @@ public class HomeController : Controller
 
         return View();
     }
+    
 
     public async Task<IActionResult> DlePlatu(int id)
     {
@@ -173,34 +175,85 @@ public class HomeController : Controller
     {
         return View("statistika_"+id,typ);
     }
-
-    public async Task<IActionResult> Export(string type, string datovaSchranka, int? rok)
+    
+    public IActionResult Exporty()
     {
-        List<dynamic> data = new List<dynamic>();
+        return View();
+    }
+
+    public async Task<IActionResult> Export(string type, string? datovaSchranka, int? rok)
+    {
         byte[] rawData = null;
         string contentType = "";
         string filename = "";
 
-        if (rok is not null)
-        {
-            var platy = await PuRepo.GetPlatyWithOrganizaceForYearAsync(rok.Value);
-            foreach (var plat in platy)
-            {
-                data.Add(plat.FlatExport());
-            }
-
-        }
-        else if (!string.IsNullOrWhiteSpace(datovaSchranka))
-        {
-            var detail = await PuRepo.GetFullDetailAsync(datovaSchranka);
-            foreach (var plat in detail.Platy)
-            {
-                data.Add(plat.FlatExport());
-            }
-        }
-        else
-        {
+        if (type != "excel" || type != "tsv")
             return NoContent();
+
+        
+        var platyRaw = await PuRepo.ExportAllAsync(datovaSchranka, rok);
+        var minYear = rok.HasValue ? rok.Value : PuRepo.MinYear;
+        var maxYear = rok.HasValue ? rok.Value : PuRepo.DefaultYear;
+
+        List<dynamic> data = new List<dynamic>();
+        foreach (var organizace in platyRaw)
+        {
+            var tags = string.Join(", ", organizace.Tags.Select(t => t.Tag));
+            for (var forYear = minYear; forYear <= maxYear; forYear++)
+            {
+                var metadataForYear = organizace.Metadata.FirstOrDefault(r => r.Rok == forYear);
+                var platyForYear = organizace.Platy.Where(r => r.Rok == forYear).ToList();
+                
+                if(platyForYear.Any())
+                {
+                    foreach (var plat in platyForYear)
+                    {
+                        data.Add(new {
+                            organizace.Ico,
+                            NazevOrganizace = organizace.Nazev,
+                            DatovaSchranka = organizace.DS,
+                            Rok = forYear,
+                            NazevPozice = plat.NazevPozice?.ReplaceLineEndings(" "),
+                            plat.Plat,
+                            plat.Odmeny,
+                            plat.PocetMesicu,
+                            plat.Uvazek,
+                            NefinancniBonus = plat.NefinancniBonus?.ReplaceLineEndings(" "),
+                            PoznamkaPlat = plat.PoznamkaPlat?.ReplaceLineEndings(" "),
+                            JeReditel = plat.JeHlavoun == true ? "Ano" : "Ne",
+                            Tagy = tags,
+                            DatumOdeslaniZadosti = metadataForYear?.DatumOdeslaniZadosti,
+                            DatumPrijetiOdpovedi = metadataForYear?.DatumPrijetiOdpovedi,
+                            Poznamka = metadataForYear?.SkrytaPoznamka?.ReplaceLineEndings(" "),
+                            ZduvodneniMimoradnychOdmen = metadataForYear?.ZduvodneniMimoradnychOdmen == true ? "Ano" : "Ne",
+                            Komunikace = metadataForYear?.ZpusobKomunikace?.ToNiceDisplayName()
+                        });
+                    }
+                }
+                else if (metadataForYear is not null)
+                {
+                    data.Add(new {
+                        organizace.Ico,
+                        NazevOrganizace = organizace.Nazev,
+                        DatovaSchranka = organizace.DS,
+                        Rok = forYear,
+                        NazevPozice = "",
+                        Plat = 0,
+                        Odmeny = 0,
+                        PocetMesicu = 0,
+                        Uvazek = 0,
+                        NefinancniBonus = "",
+                        PoznamkaPlat = "",
+                        JeReditel = "",
+                        Tagy = tags,
+                        DatumOdeslaniZadosti = metadataForYear?.DatumOdeslaniZadosti,
+                        DatumPrijetiOdpovedi = metadataForYear?.DatumPrijetiOdpovedi,
+                        Poznamka = metadataForYear?.SkrytaPoznamka?.ReplaceLineEndings(" "),
+                        ZduvodneniMimoradnychOdmen = metadataForYear?.ZduvodneniMimoradnychOdmen == true ? "Ano" : "Ne",
+                        Komunikace = metadataForYear?.ZpusobKomunikace?.ToNiceDisplayName()
+                    });
+                }
+            }
         }
 
         switch (type)
