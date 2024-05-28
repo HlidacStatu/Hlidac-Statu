@@ -176,7 +176,7 @@ public class HomeController : Controller
         return View("statistika_"+id,typ);
     }
     
-    public IActionResult Exporty()
+    public IActionResult OpenData()
     {
         return View();
     }
@@ -187,7 +187,7 @@ public class HomeController : Controller
         string contentType = "";
         string filename = "";
 
-        if (type != "excel" || type != "tsv")
+        if (!(type == "excel" || type == "tsv"))
             return NoContent();
 
         

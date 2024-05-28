@@ -6,10 +6,15 @@
     <div class="container">
 
 
-        <h2 class="pb-2 border-bottom">Exporty dat</h2>
+        <h2 class="pb-2 border-bottom">Open data</h2>
+
         <p>
-            Níže si vyberte export dat, který budete chtít
+            Kompletní data s platy sesbíranými projektem Platy úředníků. 
         </p>
+        <div class="alert alert-primary" role="alert">
+            Licence (<a href="https://texty.hlidacstatu.cz/licence/" class="alert-link">úplný text</a>) umožňuje data použít bez omezení, podmínkou je uvedení
+            zdroje na projekt včetně aktivního odkazu.
+        </div>
         <div>
 
             <partial 
@@ -17,8 +22,8 @@
                 model="@(new ExportModalViewModel() 
                    { 
                        DatovaSchranka = null, 
-                       Titulek = $"Kompletní export všech dat", 
-                       NazevTlacitka = $"Kompletní export všech dat"
+                       Titulek = $"Kompletní export všech dat za všechny roky", 
+                       NazevTlacitka = $"Kompletní export všech dat za všechny roky"
                    })"/>
 
             @for (int year = PuRepo.MinYear; year <= PuRepo.DefaultYear; year++)

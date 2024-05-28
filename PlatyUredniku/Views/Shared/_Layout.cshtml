@@ -151,7 +151,7 @@
     <nav class="navbar navbar-expand-lg navbar-light shadow hlidac">
         <div class="container-fluid">
             <a class="navbar-brand" href="/" style="margin-right:1em;">
-                <a href="/" class="logo">
+                <a href="https://www.hlidacstatu.cz/" class="logo">
                     <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="46px" height="46px" viewBox="0 0 46 46" version="1.1">
                         <g id="Page-2" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
                             <g id="06-DOBRA" transform="translate(-31.000000, -18.000000)">
@@ -186,17 +186,17 @@
                     <li class="nav-item mainmenu">
                         <a class="nav-link active" aria-current="page" href="" onclick="return false;" style="visibility:hidden;cursor:pointer;">&nbsp;&nbsp;&nbsp;</a>
                     </li>
-                    <li class="nav-item dropdown dropdown-mega position-static mainmenu">
+                        <li class="nav-item dropdown dropdown-mega position-static mainmenu">
+                            <a asp-controller="Home" asp-action="Index" class="nav-link mainmenu">Titulka</a>
+                        </li>
+                        <li class="nav-item dropdown dropdown-mega position-static mainmenu">
                         <a asp-controller="Texty" asp-action="OProjektu" class="nav-link mainmenu">O projektu</a>
                     </li>
                     <li class="nav-item dropdown dropdown-mega position-static mainmenu">
                         <a asp-controller="Texty" asp-action="PlatyStatnichZamestnancu" class="nav-link mainmenu">Jak určuje platy st. zaměstnanců zákon?</a>
                     </li>
                     <li class="nav-item dropdown dropdown-mega position-static mainmenu">
-                        <a asp-controller="Texty" asp-action="Nejvyssi" class="nav-link mainmenu">A co ti nejvyšší?</a>
-                    </li>
-                    <li class="nav-item dropdown dropdown-mega position-static mainmenu">
-                        <a asp-controller="Texty" asp-action="Aktuality" class="nav-link mainmenu">Aktuality</a>
+                        <a asp-controller="Texty" asp-action="Nejvyssi" class="nav-link mainmenu">Výpočet platů</a>
                     </li>
 
                 </ul>

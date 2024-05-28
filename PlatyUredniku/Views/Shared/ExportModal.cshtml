@@ -5,7 +5,7 @@
 }
 
 <a href="#" class="btn btn-sm btn-primary" role="button" data-bs-toggle="modal" data-bs-target="#modal@(modalid)">
-    <span class="small">@(string.IsNullOrWhiteSpace(Model.NazevTlacitka)? "Exportovat výsledky" : Model.NazevTlacitka)</span>
+    <span class="small">@(string.IsNullOrWhiteSpace(Model.NazevTlacitka)? "Stáhnout open data" : Model.NazevTlacitka)</span>
 </a> <!-- Modal -->
 <div class="modal fade" id="modal@(modalid)" tabindex="-1" role="dialog" aria-labelledby="modal@(modalid)">
     <div class="modal-dialog" role="document">
@@ -49,6 +49,10 @@
                     <p>Pokud vám výše uvedená licence&nbsp;CC BY 3.0 CZ&nbsp;nevyhovuje,&nbsp;&nbsp;<a href="https://texty.hlidacstatu.cz/Kontakt">kontaktujte nás</a>&nbsp;pro&nbsp;nalezení jiné, více vyhovující formy či licence.</p>
                 </div>
 
+                <div class="alert alert-danger" role="alert">
+                    Stažením dat souhlasíte a potvrzujete, že budete dodržovat 
+                    <a href="https://texty.hlidacstatu.cz/licence/" target="_blank" class="alert-link">licenční podmínky</a>.
+                </div>
                 <p>
                     <a asp-controller="Home" asp-action="Export"
                        asp-route-type="excel"
