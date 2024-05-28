@@ -15,9 +15,7 @@
     if (Model is not null && Model.Any())
     {
         goodOrgs = Model.Where(o => o.Platy.AktualniRok().Any()).ToList();
-        badOrgs = Model.Where(o => !o.Platy.AktualniRok().Any())
-            .Where(m => neaktivniOrg.Any(neakt => neakt.Item1 ==m.DS) == false)
-            .ToList();
+        badOrgs = Model.Where(o => !o.Platy.AktualniRok().Any()).ToList();
     }
 
     var aktualniPlaty = goodOrgs.SelectMany(o => o.Platy.AktualniRok()).ToList();
@@ -80,12 +78,21 @@
                                         <a asp-action="Detail" asp-route-id="@org.DS">@org.Nazev</a>
                                     </td>
                                     <td class="col-3">
-                                        @Html.Raw(Devmasters.Lang.CS.Plural.GetWithZero(org.Platy.AktualniRok().Count,
-                                                 "<span class='text-danger'><i class='fa-solid fa-circle-xmark'></i> Odmítli poskytnout platy</span>",
-                                                 "<span class='text-warning'><i class='fa-solid fa-circle-exclamation'></i></span> Evidujeme jeden plat jedné pozice",
-                                                 $"<span class='text-success'><i class='fa-solid fa-badge-check'></span></i> {{0}} platy",
-                                                 $"<span class='text-success'><i class='fa-solid fa-badge-check'></span></i> {{0}} platů")
-                                                 ).
+                                        @if(org.Platy.AktualniRok().Count==0 && neaktivniOrg.Any(m=>m.Item1 == org.DS))
+                                        {
+                                            <span class='text-warning'><i class='fa-solid fa-circle-exclamation'></i> Organizace je v likvidaci či zaniklá.</span>
+                                        }
+                                        else
+                                        {
+                                            <span>
+                                                @Html.Raw(Devmasters.Lang.CS.Plural.GetWithZero(org.Platy.AktualniRok().Count,
+                                                     "<span class='text-danger'><i class='fa-solid fa-circle-xmark'></i> Odmítli poskytnout platy</span>",
+                                                     "<span class='text-warning'><i class='fa-solid fa-circle-exclamation'></i></span> Evidujeme jeden plat jedné pozice",
+                                                     $"<span class='text-success'><i class='fa-solid fa-badge-check'></span></i> {{0}} platy",
+                                                     $"<span class='text-success'><i class='fa-solid fa-badge-check'></span></i> {{0}} platů")
+                                                     ).
+                                            </span>
+                                        }
                                     </td>
                                     @if (org.Platy.AktualniRok().Any())
                                     {

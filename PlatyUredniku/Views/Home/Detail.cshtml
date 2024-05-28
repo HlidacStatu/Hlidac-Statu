@@ -35,6 +35,8 @@
 }
 @{
     bool sectionBgSwitch = false;
+    var neaktivniOrg = PuRepo.GetNeaktivniOrganizace().ToArray();
+
 }
 
 <section class="d-flex align-items-center justify-content-center @(sectionBgSwitch ? "alter-bg-color" : "")">
@@ -148,6 +150,14 @@
                                     }
                                 </tbody>
                             </table>
+                        }
+                        else if (neaktivniOrg.Any(m => m.Item1 == Model.DS))
+                        {
+                            <div class="alert alert-warning" role="alert">
+                                <h4 class="alert-heading">Platy pro rok @platGroup.Key jsme nedostali</h4>
+                                <p>@Model.Nazev je zaniklá organizace anebo v likvidaci.</p>
+                            </div>
+
                         }
                         else
                         {
