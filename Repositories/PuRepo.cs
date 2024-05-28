@@ -1,4 +1,5 @@
 using Devmasters.Collections;
+using HlidacStatu.Connectors;
 using HlidacStatu.Entities;
 using HlidacStatu.Entities.Entities;
 using Microsoft.EntityFrameworkCore;
@@ -173,10 +174,27 @@ public static class PuRepo
         return platy?.Where(m => m.Rok == rok).ToList();
     }
 
-    public static async Task<List<PuOrganizace>> GetOrganizaceForTagAsync(string tag, int limit = 0)
+    /// <summary>
+    /// dvojice datovaschranka , ICO
+    /// </summary>
+    /// <returns></returns>
+    public static IEnumerable<Tuple<string, string>> GetNeaktivniOrganizace()
+    {
+        IEnumerable<Tuple<string, string>> nonActiveDS = DirectDB.GetList<string, string>(@"
+select distinct ds.DatovaSchranka, f.ico from firma f 
+	inner join Firma_DS ds on f.ICO=ds.ICO
+	inner join PU_Organizace puo on ds.DatovaSchranka = puo.DS
+	where f.status>1 	
+");
+
+        return nonActiveDS;
+    }
+
+    public static async Task<List<PuOrganizace>> GetActiveOrganizaceForTagAsync(string tag, int limit = 0)
     {
         await using var db = new DbEntities();
 
+        
         var query = db.PuOrganizaceTags
             .AsNoTracking()
             .Where(t => t.Tag.Equals(tag))

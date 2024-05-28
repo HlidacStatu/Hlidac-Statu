@@ -11,10 +11,13 @@
 
     List<PuOrganizace> goodOrgs = new();
     List<PuOrganizace> badOrgs = new();
+    var neaktivniOrg = PuRepo.GetNeaktivniOrganizace().ToArray();
     if (Model is not null && Model.Any())
     {
         goodOrgs = Model.Where(o => o.Platy.AktualniRok().Any()).ToList();
-        badOrgs = Model.Where(o => !o.Platy.AktualniRok().Any()).ToList();
+        badOrgs = Model.Where(o => !o.Platy.AktualniRok().Any())
+            .Where(m => neaktivniOrg.Any(neakt => neakt.Item1 ==m.DS) == false)
+            .ToList();
     }
 
     var aktualniPlaty = goodOrgs.SelectMany(o => o.Platy.AktualniRok()).ToList();
@@ -68,8 +71,7 @@
                     <table class="table table-sm">
                         <tbody>
                             @{
-                                var noPlaty = Model.Where(m => m.Platy.AktualniRok().Count == 0);
-                                var sorted = noPlaty.Concat(Model.Where(m => m.Platy.AktualniRok().Count > 0).OrderBy(o => o.Nazev));
+                                var sorted = badOrgs.Concat(Model.Where(m => m.Platy.AktualniRok().Count > 0).OrderBy(o => o.Nazev));
                             }
                             @foreach (var org in sorted)
                             {

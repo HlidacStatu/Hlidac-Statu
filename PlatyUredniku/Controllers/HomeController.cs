@@ -81,9 +81,9 @@ public class HomeController : Controller
 
     public async Task<IActionResult> Oblast(string id)
     {
-        var organizaceForTagTask = _cache.GetOrSetAsync<List<PuOrganizace>>(
-            $"{nameof(PuRepo.GetOrganizaceForTagAsync)}_{id}",
-            _ => PuRepo.GetOrganizaceForTagAsync(id)
+        ValueTask<List<PuOrganizace>> organizaceForTagTask = _cache.GetOrSetAsync<List<PuOrganizace>>(
+            $"{nameof(PuRepo.GetActiveOrganizaceForTagAsync)}_{id}",
+            _ => PuRepo.GetActiveOrganizaceForTagAsync(id)
         );
 
         var organizace = await organizaceForTagTask;
@@ -104,8 +104,8 @@ public class HomeController : Controller
         foreach (var oblast in oblasti)
         {
             var organizace = await _cache.GetOrSetAsync<List<PuOrganizace>>(
-                $"{nameof(PuRepo.GetOrganizaceForTagAsync)}_{oblast}",
-                _ => PuRepo.GetOrganizaceForTagAsync(oblast)
+                $"{nameof(PuRepo.GetActiveOrganizaceForTagAsync)}_{oblast}",
+                _ => PuRepo.GetActiveOrganizaceForTagAsync(oblast)
             );
 
             model.Add(oblast, organizace);

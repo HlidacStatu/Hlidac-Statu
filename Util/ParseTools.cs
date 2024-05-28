@@ -21,7 +21,43 @@ namespace HlidacStatu.Util
 
             );
         }
-        public static int RomanToLatin(string roman)
+
+        private static readonly Dictionary<char, int> RomanNumeralMap = new Dictionary<char, int>
+        {
+            { 'I', 1 },
+            { 'V', 5 },
+            { 'X', 10 },
+            { 'L', 50 },
+            { 'C', 100 },
+            { 'D', 500 },
+            { 'M', 1000 }
+        };
+        public static int RomanToDecimal(string roman)
+        {
+            try
+            {
+
+                int result = 0;
+                for (int i = 0; i < roman.Length; i++)
+                {
+                    if (i > 0 && RomanNumeralMap[roman[i]] > RomanNumeralMap[roman[i - 1]])
+                    {
+                        result += RomanNumeralMap[roman[i]] - 2 * RomanNumeralMap[roman[i - 1]];
+                    }
+                    else
+                    {
+                        result += RomanNumeralMap[roman[i]];
+                    }
+                }
+                return result;
+            }
+            catch (Exception e)
+            {
+                throw;
+            }
+        }
+
+        public static int RomanToLatinOld(string roman)
         {
             Dictionary<char, int> romanToLatin = new Dictionary<char, int>()
                 {
@@ -65,19 +101,19 @@ namespace HlidacStatu.Util
 
             if (string.IsNullOrEmpty(plaintext))
                 return false;
-            
+
             string textWithTrimmedSpaces = Regex.Replace(plaintext, @"\s+", " ");
             var penalization = DolozkaPenalization(textWithTrimmedSpaces);
-            
-            
+
+
             var wordsPerPage = Devmasters.TextUtil.CountWords(textWithTrimmedSpaces);
             wordsPerPage -= penalization.WordCount;
             wordsPerPage = wordsPerPage / pages;
-            
+
             var lengthPerPage = textWithTrimmedSpaces?.Length ?? 0;
             lengthPerPage -= penalization.Length;
             lengthPerPage = lengthPerPage / pages;
-            
+
             var variance = Devmasters.TextUtil.WordsVarianceInText(textWithTrimmedSpaces);
             var uniqueWordsCount = variance.Item2;
             var wordsVariance = variance.Item1; //0 = kazde slovo jine, 1=vsechna stejna
@@ -153,7 +189,7 @@ namespace HlidacStatu.Util
                 return string.Empty;
 
             ico = ico.Trim().ToLower();
-            
+
             if (string.IsNullOrEmpty(ico))
                 return string.Empty;
 
@@ -166,7 +202,7 @@ namespace HlidacStatu.Util
 
             ico = ico.PadLeft(8, '0');
 
-            if (DataValidators.CheckCZICO(ico)==false)
+            if (DataValidators.CheckCZICO(ico) == false)
                 return string.Empty;
 
 
@@ -399,7 +435,7 @@ namespace HlidacStatu.Util
             return Convert.ChangeType(value, t);
         }
 
-        
+
 
     }
 }
