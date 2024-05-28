@@ -1,0 +1,40 @@
+@using HlidacStatu.Repositories
+@using Microsoft.AspNetCore.Mvc.TagHelpers
+@using PlatyUredniku.Models
+
+<section class="d-flex align-items-center justify-content-center">
+    <div class="container">
+
+
+        <h2 class="pb-2 border-bottom">Exporty dat</h2>
+        <p>
+            Níže si vyberte export dat, který budete chtít
+        </p>
+        <div>
+
+            <partial 
+                name="ExportModal" 
+                model="@(new ExportModalViewModel() 
+                   { 
+                       DatovaSchranka = null, 
+                       Titulek = $"Kompletní export všech dat", 
+                       NazevTlacitka = $"Kompletní export všech dat"
+                   })"/>
+
+            @for (int year = PuRepo.MinYear; year <= PuRepo.DefaultYear; year++)
+            {
+                <partial 
+                    name="ExportModal" 
+                    model="@(new ExportModalViewModel() 
+                       { 
+                           DatovaSchranka = null, 
+                           Rok = year, 
+                           Titulek = $"Export dat za rok {year}", 
+                           NazevTlacitka = $"Export dat za rok {year}"
+                       })"/>
+            }
+        </div>
+
+
+    </div>
+</section>
