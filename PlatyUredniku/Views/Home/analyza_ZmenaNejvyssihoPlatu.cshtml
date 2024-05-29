@@ -1,14 +1,47 @@
 @using HlidacStatu.Repositories
 @using PlatyUredniku.Models;
+@using System.Collections.Generic;
 
-@model List<PrumerPlatu>
+@{
 
+    int minYear = 2021;
+    var orgs = await PuRepo.GetPlatyForYearsAsync(minYear, PuRepo.DefaultYear);
+
+    List<PrumerPlatu> rusty = new();
+    foreach (var org in orgs)
+    {
+        var platyBezCeos = org.Platy.Where(plat => plat.JeHlavoun != true).ToList();
+        var platyPrvniRok = platyBezCeos.Where(p => p.Rok == minYear);
+        var platyPosledniRok = platyBezCeos.Where(p => p.Rok == PuRepo.DefaultYear);
+        if (!platyPrvniRok.Any() || !platyPosledniRok.Any())
+            continue;
+
+        var rustPlatu = new PrumerPlatu()
+                {
+                    DatovaSchrankaOrganizace = org.DS,
+                    NazevOrganizace = org.Nazev,
+                    PlatPrvniRok = platyPrvniRok.Max(p => p.HrubyMesicniPlat),
+                    PlatPosledniRok = platyPosledniRok.Max(p => p.HrubyMesicniPlat),
+                };
+
+        //filter results
+        if (rustPlatu.PlatPrvniRok > 0 && rustPlatu.PlatPosledniRok > 0)
+        {
+            rusty.Add(rustPlatu);
+        }
+
+    }
+}
 @section breadcrumbs
 {
     <ol class="breadcrumb">
         <li>
             <a asp-action="Index">Platy úředníků</a>
         </li>
+        <li>
+            <a asp-action="Analyzy">Analýzy</a>
+        </li>
+
         <li class="active">
             Přehled růstu platů
         </li>
@@ -23,8 +56,8 @@
 
 <section class="d-flex align-items-center justify-content-center">
     <div class="container">
-        <h2>Růst ředitelského platu</h2>
-        <p class="text-muted">Přehled růstu platů včetně odměn vedoucích úřadů, státních podniků či příspěvkových organizací mezi roky 2021 a @PuRepo.DefaultYear.</p>
+        <h2>Růst nejvyššího neředitelského platu</h2>
+        <p class="text-muted">Přehled růstu nejvyššího platu včetně odměn mezi roky 2021 a @PuRepo.DefaultYear u pozice, která není ředitelská.</p>
 
         <div class="tab-pane width-75vp" id="rustPlatuCeo" role="tabpanel">
             <script>
@@ -52,7 +85,7 @@
                 <th>Nárůst absolutní</th>
                 </thead>
                 <tbody>
-                @foreach (var prumerPlatu in Model.OrderByDescending(p => p.NarustProcentualni))
+                @foreach (var prumerPlatu in rusty.OrderByDescending(p => p.NarustProcentualni))
                 {
                 <tr>
                     <td>

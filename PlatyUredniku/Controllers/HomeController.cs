@@ -22,11 +22,17 @@ public class HomeController : Controller
     public async Task<IActionResult> Analyza(string id)
     {
 
+        if (string.IsNullOrWhiteSpace(id))
+            return Redirect("/analyzy");
+
         return View("Analyza_"+id);
 
     }
-    
-    public async Task<IActionResult> Index()
+    public async Task<IActionResult> Analyzy()
+    {
+        return View();
+    }
+        public async Task<IActionResult> Index()
     {
         var platyTask = _cache.GetOrSetAsync<List<PuPlat>>(
             $"{nameof(PuRepo.GetPlatyAsync)}_{PuRepo.DefaultYear}",
@@ -176,75 +182,11 @@ public class HomeController : Controller
         return View("statistika_"+id,typ);
     }
     
-    public async Task<IActionResult> RustPlatuCeos()
-    {
-        int minYear = 2021;
-        var orgs = await PuRepo.GetPlatyForYearsAsync(minYear, PuRepo.DefaultYear);
-
-        List<PrumerPlatu> rusty = new();
-        foreach (var org in orgs)
-        {
-            var platyCeos = org.Platy.Where(plat => plat.JeHlavoun == true).ToList();
-            var platyPrvniRok = platyCeos.Where(p => p.Rok == minYear);
-            var platyPosledniRok = platyCeos.Where(p => p.Rok == PuRepo.DefaultYear);
-            if(!platyPrvniRok.Any() || !platyPosledniRok.Any())
-                continue;
-            
-            var rustPlatu = new PrumerPlatu()
-            {
-                DatovaSchrankaOrganizace = org.DS,
-                NazevOrganizace = org.Nazev,
-                PlatPrvniRok = platyPrvniRok.Average(p => p.HrubyMesicniPlat),
-                PlatPosledniRok = platyPosledniRok.Average(p => p.HrubyMesicniPlat),
-            };
-
-            //filter results
-            if (rustPlatu.PlatPrvniRok > 0 && rustPlatu.PlatPosledniRok > 0)
-            {
-                rusty.Add(rustPlatu);
-            }
-            
-        }
-        
-        return View(rusty);
-    }
     
     public async Task<IActionResult> RustNejvyssihoPlatu()
     {
-        int minYear = 2021;
-        var orgs = await PuRepo.GetPlatyForYearsAsync(minYear, PuRepo.DefaultYear);
-
-        List<PrumerPlatu> rusty = new();
-        foreach (var org in orgs)
-        {
-            var platyBezCeos = org.Platy.Where(plat => plat.JeHlavoun != true).ToList();
-            var platyPrvniRok = platyBezCeos.Where(p => p.Rok == minYear);
-            var platyPosledniRok = platyBezCeos.Where(p => p.Rok == PuRepo.DefaultYear);
-            if(!platyPrvniRok.Any() || !platyPosledniRok.Any())
-                continue;
-            
-            var rustPlatu = new PrumerPlatu()
-            {
-                DatovaSchrankaOrganizace = org.DS,
-                NazevOrganizace = org.Nazev,
-                PlatPrvniRok = platyPrvniRok.Max(p => p.HrubyMesicniPlat),
-                PlatPosledniRok = platyPosledniRok.Max(p => p.HrubyMesicniPlat),
-            };
-
-            //filter results
-            if (rustPlatu.PlatPrvniRok > 0 && rustPlatu.PlatPosledniRok > 0)
-            {
-                rusty.Add(rustPlatu);
-            }
-            
-        }
         
         return View(rusty);
-    }
-    
-    public IActionResult NejvetsiOdmeny()
-    {
-        return View();
     }
     
     public IActionResult OpenData()
