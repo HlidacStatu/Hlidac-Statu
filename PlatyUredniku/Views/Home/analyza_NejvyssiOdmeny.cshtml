@@ -11,7 +11,10 @@
     }
 
     var platy = await PuRepo.GetPlatyWithOrganizaceForYearAsync(rok);
-    platy = platy.Where(p => p.OsobniOhodnoceniPerc > 0).ToList();
+    platy = platy
+    .Where(m => m.Plat >= 120000)
+    .Where(p => p.OsobniOhodnoceniPerc > 0)
+    .ToList();
 
 }
 @section breadcrumbs
@@ -20,22 +23,25 @@
         <li>
             <a asp-action="Index">Platy úředníků</a>
         </li>
+        <li>
+            <a asp-action="Analyzy">Analýzy</a>
+        </li>
         <li class="active">
-            Přehled růstu platů
+            Platy s nejvyšším podílem odměny
         </li>
     </ol>
 }
 
 @section scripts
 {
-    <link rel="stylesheet" type="text/css" href="//cdn.datatables.net/1.13.4/css/jquery.dataTables.min.css"/>
+    <link rel="stylesheet" type="text/css" href="//cdn.datatables.net/1.13.4/css/jquery.dataTables.min.css" />
     <script type="text/javascript" charset="utf8" src="//cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
 }
 
 <section class="d-flex align-items-center justify-content-center">
     <div class="container">
-        <h2>Přehled nejvyšších odměn v poměru k platu za rok @ViewData["rok"]</h2>
-        <p class="text-muted">Přehled nejvyšších odměn v poměru k platu.</p>
+        <h2>Přehled platů u kterých odměny tvoří nejvyšší část za rok @ViewData["rok"]</h2>
+        <p class="text-muted">Přehled pracovních pozic, u kterých odměna tvoří nejvyšší podíl celkového příjmu.</p>
 
         <div class="tab-pane width-75vp" id="prehledOdmen" role="tabpanel">
             <script>
@@ -48,7 +54,7 @@
                             "searching": false,
                             "paging": false,
                             "ordering": true,
-                            "order": [],
+                            "order": [[4,'asc']],
                             "info": false
                         });
                 });
@@ -60,23 +66,23 @@
                 <th>Pozice</th>
                 <th><abbr title="Průměrný měsíční plat přepočtený z ročního příjmu">Měsíční plat</abbr></th>
                 <th><abbr title="Průměrné měsíční odměny přepočtené z ročního příjmu">Měsíční odměny</abbr></th>
-                <th>Poměr odměn k platu %</th>
+                <th>Podíl odměny na celkovém příjmu v %</th>
                 </thead>
                 <tbody>
-                @foreach (var plat in platy.OrderByDescending(p => p.OsobniOhodnoceniPerc))
-                {
-                <tr>
-                    <td>
-                        <a asp-action="Detail" asp-route-id="@plat.Organizace.DS">@plat.Organizace.Nazev</a>
-                    </td>
-                    <td>
-                        <a asp-action="Plat" asp-route-id="@plat.Id">@plat.NazevPozice</a>
-                    </td>
-                    <td class="number">@HlidacStatu.Util.RenderData.NicePriceHtml(plat.PlatMesicne ?? 0)</td>
-                    <td class="number">@HlidacStatu.Util.RenderData.NicePriceHtml(plat.OdmenyMesicne ?? 0)</td>
-                    <td class="number">@plat.OsobniOhodnoceniPerc?.ToString("P")</td>
-                </tr>
-                }
+                    @foreach (var plat in platy.OrderByDescending(p => p.OsobniOhodnoceniPerc))
+                    {
+                        <tr>
+                            <td>
+                                <a asp-action="Detail" asp-route-id="@plat.Organizace.DS">@plat.Organizace.Nazev</a>
+                            </td>
+                            <td>
+                                <a asp-action="Plat" asp-route-id="@plat.Id">@plat.NazevPozice</a>
+                            </td>
+                            <td class="number" data-order="@(HlidacStatu.Util.RenderData.OrderValueFormat(plat.PlatMesicne ?? 0))">@HlidacStatu.Util.RenderData.NicePriceHtml(plat.PlatMesicne ?? 0)</td>
+                            <td class="number" data-order="@(HlidacStatu.Util.RenderData.OrderValueFormat(plat.OdmenyMesicne ?? 0))">@HlidacStatu.Util.RenderData.NicePriceHtml(plat.OdmenyMesicne ?? 0)</td>
+                            <td class="number" data-order="@(HlidacStatu.Util.RenderData.OrderValueFormat(plat.OsobniOhodnoceniPerc ?? 0))">@plat.OsobniOhodnoceniPerc?.ToString("P")</td>
+                        </tr>
+                    }
                 </tbody>
             </table>
         </div>
