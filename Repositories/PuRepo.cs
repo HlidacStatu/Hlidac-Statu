@@ -525,12 +525,22 @@ select distinct ds.DatovaSchranka, f.ico from firma f
     public static async Task<List<PuOrganizace>> GetPlatyForYearsAsync(int minYear, int lastYear)
     {
         await using var db = new DbEntities();
-
-        return await db.PuOrganizace
+        
+        var result = await db.PuOrganizace
             .AsNoTracking()
-            .Include(o => o.Platy)
             .Include(o => o.FirmaDs)
-            .Where(o => o.Platy.Any(p => p.Rok == minYear || p.Rok == lastYear))
+            .Select(o => new
+            {
+                o, // Include the main entity
+                Platy = o.Platy.Where(p => p.Rok == minYear || p.Rok == lastYear).ToList()
+            })
             .ToListAsync();
+
+        // Map the result back to the list of PuOrganizace with filtered Platy
+        return  result.Select(x =>
+        {
+            x.o.Platy = x.Platy; // Assign the filtered Platy list back to the PuOrganizace entity
+            return x.o;
+        }).ToList();
     }
 }

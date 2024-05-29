@@ -1,0 +1,72 @@
+@using HlidacStatu.Repositories
+@using PlatyUredniku.Models;
+
+@model List<PrumerPlatu>
+
+@section breadcrumbs
+{
+    <ol class="breadcrumb">
+        <li>
+            <a asp-action="Index">Platy úředníků</a>
+        </li>
+        <li class="active">
+            Přehled růstu platů
+        </li>
+    </ol>
+}
+
+@section scripts
+{
+    <link rel="stylesheet" type="text/css" href="//cdn.datatables.net/1.13.4/css/jquery.dataTables.min.css"/>
+    <script type="text/javascript" charset="utf8" src="//cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
+}
+
+<section class="d-flex align-items-center justify-content-center">
+    <div class="container">
+        <h2>Růst ředitelského platu</h2>
+        <p class="text-muted">Přehled růstu platů včetně odměn vedoucích úřadů, státních podniků či příspěvkových organizací mezi roky 2021 a @PuRepo.DefaultYear.</p>
+
+        <div class="tab-pane width-75vp" id="rustPlatuCeo" role="tabpanel">
+            <script>
+                $(document).ready(function () {
+                    $('#tblSum_rustPlatuCeo').DataTable(
+                        {
+                            'language': {
+                                'url': '//cdn.datatables.net/plug-ins/1.13.4/i18n/cs.json'
+                            },
+                            "searching": false,
+                            "paging": false,
+                            "ordering": true,
+                            "order": [],
+                            "info": false
+                        });
+                });
+            </script>
+
+            <table class="table table-borderless table-hover" id="tblSum_rustPlatuCeo">
+                <thead class="xtable-light">
+                <th>Organizace</th>
+                <th><abbr title="Průměrný měsíční plat přepočtený z ročního příjmu včetně odměn">Měsíční plat</abbr> v 2021</th>
+                <th><abbr title="Průměrný měsíční plat přepočtený z ročního příjmu včetně odměn">Měsíční plat</abbr> v @PuRepo.DefaultYear</th>
+                <th>Nárůst %</th>
+                <th>Nárůst absolutní</th>
+                </thead>
+                <tbody>
+                @foreach (var prumerPlatu in Model.OrderByDescending(p => p.NarustProcentualni))
+                {
+                <tr>
+                    <td>
+                        <a asp-action="Detail" asp-route-id="@prumerPlatu.DatovaSchrankaOrganizace">@prumerPlatu.NazevOrganizace</a>
+                    </td>
+                    <td class="number">@HlidacStatu.Util.RenderData.NicePrice(prumerPlatu.PlatPrvniRok ?? 0)</td>
+                    <td class="number">@HlidacStatu.Util.RenderData.NicePrice(prumerPlatu.PlatPosledniRok ?? 0)</td>
+                    <td class="number">@prumerPlatu.NarustProcentualni?.ToString("P")</td>
+                    <td class="number">@HlidacStatu.Util.RenderData.NicePrice(prumerPlatu.NarustAbsolutni ?? 0)</td>
+
+                </tr>
+                }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</section>
