@@ -1,8 +1,19 @@
+@using HlidacStatu.Repositories
+@using PlatyUredniku.Models;
 @using System.Collections.Generic;
 @using HlidacStatu.Entities.Entities;
 
-@model List<PuPlat>
+@{
+    int rok = PuRepo.DefaultYear;
+    if (this.Context.Request.Query.TryGetValue("rok", out var rrok))
+    {
+        rok = Devmasters.ParseText.ToInt(rrok.FirstOrDefault()) ?? PuRepo.DefaultYear;
+    }
 
+    var platy = await PuRepo.GetPlatyWithOrganizaceForYearAsync(rok);
+    platy = platy.Where(p => p.OsobniOhodnoceniPerc > 0).ToList();
+
+}
 @section breadcrumbs
 {
     <ol class="breadcrumb">
@@ -52,7 +63,7 @@
                 <th>Poměr odměn k platu %</th>
                 </thead>
                 <tbody>
-                @foreach (var plat in Model.OrderByDescending(p => p.OsobniOhodnoceniPerc))
+                @foreach (var plat in platy.OrderByDescending(p => p.OsobniOhodnoceniPerc))
                 {
                 <tr>
                     <td>
