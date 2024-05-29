@@ -183,12 +183,17 @@ public class HomeController : Controller
     }
     
     
-    public async Task<IActionResult> RustNejvyssihoPlatu()
+    public async Task<IActionResult> NejvyssiOdmeny(int rok)
     {
-        
-        return View(rusty);
+        if (rok == 0)
+            rok = PuRepo.DefaultYear;
+
+        var platy = await PuRepo.GetPlatyWithOrganizaceForYearAsync(rok);
+        platy = platy.Where(p => p.OsobniOhodnoceniPerc > 0).ToList();
+        ViewData["rok"] = rok;
+
+        return View(platy);
     }
-    
     public IActionResult OpenData()
     {
         return View();
