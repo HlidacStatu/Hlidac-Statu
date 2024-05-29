@@ -1,0 +1,79 @@
+@using HlidacStatu.Repositories
+
+@{
+    var ministerstva = await PuRepo.GetActiveOrganizaceForTagAsync("ministerstvo");
+    var ministerstvaPlatyNamestku = ministerstva.SelectMany(o =>
+        o.Platy.Where(p => p.NazevPozice.Contains("náměstek", StringComparison.InvariantCultureIgnoreCase))
+            .GroupBy(p => p.Rok)
+            .Select(g => new
+            {
+                Rok = g.Key,
+                NazevOrganizace = o.Nazev,
+                DatovaSchranka = o.DS,
+                SouhrnPlatu = g.Sum(p => p.HrubyMesicniPlatVcetneOdmen)
+            }));
+}
+
+@section breadcrumbs
+{
+    <ol class="breadcrumb">
+        <li>
+            <a asp-action="Index">Platy úředníků</a>
+        </li>
+        <li class="active">
+            Náměstci ministerstev
+        </li>
+    </ol>
+}
+
+@section scripts
+{
+    <link rel="stylesheet" type="text/css" href="//cdn.datatables.net/1.13.4/css/jquery.dataTables.min.css"/>
+    <script type="text/javascript" charset="utf8" src="//cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
+}
+
+<section class="d-flex align-items-center justify-content-center">
+    <div class="container">
+        <h2>Přehled kolik vyplácela jednotlivá ministerstva svým náměstkům v letech</h2>
+        <p class="text-muted">Výplaty náměstkům</p>
+
+        <div class="tab-pane width-75vp" id="prehledOdmen" role="tabpanel">
+            <script>
+                $(document).ready(function () {
+                    $('#tblSum_prehledOdmen').DataTable(
+                        {
+                            'language': {
+                                'url': '//cdn.datatables.net/plug-ins/1.13.4/i18n/cs.json'
+                            },
+                            "searching": false,
+                            "paging": false,
+                            "ordering": true,
+                            "order": [],
+                            "info": false
+                        });
+                });
+            </script>
+
+            <table class="table table-borderless table-hover" id="tblSum_prehledOdmen">
+                <thead class="xtable-light">
+                <th>Organizace</th>
+                <th>Rok</th>
+                <th>Souhrný průměrný plat včetně odměn</th>
+                </thead>
+                <tbody>
+                @foreach (var platNamestku in ministerstvaPlatyNamestku.OrderBy(m => m.NazevOrganizace).ThenBy(m => m.Rok))
+                {
+                    <tr>
+                        <td>
+                            <a asp-action="Detail" asp-route-id="@platNamestku.DatovaSchranka">@platNamestku.NazevOrganizace</a>
+                        </td>
+
+                        <td class="number">@platNamestku.Rok</td>
+                        <td class="number">@HlidacStatu.Util.RenderData.NicePriceHtml(platNamestku.SouhrnPlatu)</td>
+                    </tr>
+                }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</section>
