@@ -184,12 +184,17 @@ public class HomeController : Controller
         List<PrumerPlatu> rusty = new();
         foreach (var org in orgs)
         {
+            var platyPrvniRok = org.Platy.Where(p => p.Rok == PuRepo.MinYear);
+            var platyPosledniRok = org.Platy.Where(p => p.Rok == PuRepo.DefaultYear);
+            if(!platyPrvniRok.Any() || !platyPosledniRok.Any())
+                continue;
+            
             var rustPlatu = new PrumerPlatu()
             {
                 DatovaSchrankaOrganizace = org.DS,
                 NazevOrganizace = org.Nazev,
-                PlatPrvniRok = org.Platy.Where(p => p.Rok == PuRepo.MinYear).Average(p => p.HrubyMesicniPlat),
-                PlatPosledniRok = org.Platy.Where(p => p.Rok == PuRepo.DefaultYear).Average(p => p.HrubyMesicniPlat),
+                PlatPrvniRok = platyPrvniRok.Average(p => p.HrubyMesicniPlat),
+                PlatPosledniRok = platyPosledniRok.Average(p => p.HrubyMesicniPlat),
             };
 
             //filter results

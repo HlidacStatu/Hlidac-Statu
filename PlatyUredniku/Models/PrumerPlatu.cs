@@ -9,5 +9,5 @@ public class PrumerPlatu
     public decimal? PlatPosledniRok { get; set; }
 
     public decimal? NarustAbsolutni => PlatPosledniRok - PlatPrvniRok;
-    public decimal? NarustProcentualni => (PlatPosledniRok/PlatPrvniRok);    
+    public decimal? NarustProcentualni => (PlatPosledniRok/PlatPrvniRok) - 1;    
 }
