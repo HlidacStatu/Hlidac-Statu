@@ -92,8 +92,8 @@
                                 <a asp-action="Detail" asp-route-id="@platNamestku.DatovaSchranka">@platNamestku.NazevOrganizace</a>
                             </td>
 
-                            <td class="number" data-order="@(HlidacStatu.Util.RenderData.OrderValueFormat(platNamestku.Rok))">@platNamestku.Rok</td>
-                        <td class="number" data-order="@(HlidacStatu.Util.RenderData.OrderValueFormat(platNamestku.SouhrnPlatu))">
+                        <td class="number" data-order="@(HlidacStatu.Util.RenderData.OrderValueFormat(platNamestku.Rok))">@platNamestku.Rok</td>
+                        <td class="number" data-order="@(HlidacStatu.Util.RenderData.OrderValueFormat(platNamestku.SouhrnPlatu ?? 0))">
                         @if (platNamestku.SouhrnPlatu.HasValue)
                         {
                             @HlidacStatu.Util.RenderData.NicePriceHtml(platNamestku.SouhrnPlatu.Value)    
