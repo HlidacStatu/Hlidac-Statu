@@ -176,6 +176,18 @@ public class HomeController : Controller
         return View("statistika_"+id,typ);
     }
     
+    public async Task<IActionResult> NejvyssiOdmeny(int rok)
+    {
+        if (rok == 0)
+            rok = PuRepo.DefaultYear;
+
+        var platy = await PuRepo.GetPlatyWithOrganizaceForYearAsync(rok);
+        platy = platy.Where(p => p.OsobniOhodnoceniPerc > 0).ToList();
+        ViewData["rok"] = rok;
+        
+        return View(platy);
+    }
+    
     public async Task<IActionResult> RustPlatuCeos()
     {
         int minYear = 2021;
@@ -194,8 +206,8 @@ public class HomeController : Controller
             {
                 DatovaSchrankaOrganizace = org.DS,
                 NazevOrganizace = org.Nazev,
-                PlatPrvniRok = platyPrvniRok.Average(p => p.HrubyMesicniPlat),
-                PlatPosledniRok = platyPosledniRok.Average(p => p.HrubyMesicniPlat),
+                PlatPrvniRok = platyPrvniRok.Average(p => p.HrubyMesicniPlatVcetneOdmen),
+                PlatPosledniRok = platyPosledniRok.Average(p => p.HrubyMesicniPlatVcetneOdmen),
             };
 
             //filter results
@@ -227,8 +239,8 @@ public class HomeController : Controller
             {
                 DatovaSchrankaOrganizace = org.DS,
                 NazevOrganizace = org.Nazev,
-                PlatPrvniRok = platyPrvniRok.Max(p => p.HrubyMesicniPlat),
-                PlatPosledniRok = platyPosledniRok.Max(p => p.HrubyMesicniPlat),
+                PlatPrvniRok = platyPrvniRok.Max(p => p.HrubyMesicniPlatVcetneOdmen),
+                PlatPosledniRok = platyPosledniRok.Max(p => p.HrubyMesicniPlatVcetneOdmen),
             };
 
             //filter results

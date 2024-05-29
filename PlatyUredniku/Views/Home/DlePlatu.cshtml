@@ -38,7 +38,7 @@
             <th>Nefinanční odměna</th>
             </thead>
             <tbody>
-                @foreach (PuPlat plat in Model.OrderByDescending(p => p.HrubyMesicniPlat))
+                @foreach (PuPlat plat in Model.OrderByDescending(p => p.HrubyMesicniPlatVcetneOdmen))
                 {
                     <tr>
                         <td>
@@ -47,7 +47,7 @@
                         <td>
                             <a asp-action="Detail" asp-route-id="@plat.Organizace.DS">@plat.Organizace.Nazev</a>
                         </td>
-                        <td class="number">@HlidacStatu.Util.RenderData.NicePrice(plat.HrubyMesicniPlat)</td>
+                        <td class="number">@HlidacStatu.Util.RenderData.NicePrice(plat.HrubyMesicniPlatVcetneOdmen)</td>
                         <td style="max-width:25rem"><small>@plat.NefinancniBonus</small></td>
                     </tr>
                 }

@@ -68,20 +68,20 @@
 
         @if (Model.Plat is not null && Model.Plat != 0)
         {
-            var platMesicne = (Model.Plat ?? 0) / (Model.PocetMesicu ?? 12);
-            var odmenyMesicne = (Model.Odmeny ?? 0) / (Model.PocetMesicu ?? 12);
-            var osobniOhodnoceni = Model.Odmeny / (Model.Plat + Model.Odmeny);
+            var platMesicne = Model.PlatMesicne;
+            var odmenyMesicne = Model.OdmenyMesicne;
+            var osobniOhodnoceni = Model.OsobniOhodnoceniPerc;
 
             <div class="row mt-5">
                 <div class="col">
                     <p>
                         Pozice <b>@Model.NazevPozice</b> měla za rok
-                        @Model.Rok celkový hrubý příjem <b>@HlidacStatu.Util.RenderData.NicePriceHtml(Model.CelkovyRocniPlat)</b>.
+                        @Model.Rok celkový hrubý příjem <b>@HlidacStatu.Util.RenderData.NicePriceHtml(Model.CelkovyRocniPlatVcetneOdmen)</b>.
                     </p>
                     <p>
                         Přepočteno na průměrný měsíční základní plat
-                        šlo o <strong>@HlidacStatu.Util.RenderData.NicePriceHtml(platMesicne)</strong> měsíčně a průměrnou měsíční odměnu
-                        <strong>@HlidacStatu.Util.RenderData.NicePriceHtml(odmenyMesicne)</strong>.
+                        šlo o <strong>@HlidacStatu.Util.RenderData.NicePriceHtml(platMesicne ?? 0)</strong> měsíčně a průměrnou měsíční odměnu
+                        <strong>@HlidacStatu.Util.RenderData.NicePriceHtml(odmenyMesicne ?? 0)</strong>.
                     </p>
 
                     @if (Model.Odmeny.HasValue)
@@ -121,7 +121,7 @@
                     </sup>
                 </td>
                 <td>
-                    @Model.HrubyMesicniPlat.ToString("N0")
+                    @Model.HrubyMesicniPlatVcetneOdmen.ToString("N0")
                 </td>
             </tr>
             <tr>

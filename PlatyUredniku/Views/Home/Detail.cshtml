@@ -143,8 +143,8 @@
                                             <td>
                                                 <a asp-action="Plat" asp-route-id="@plat.Id">@plat.NazevPozice</a>
                                             </td>
-                                            <td data-order="@(HlidacStatu.Util.RenderData.OrderValueFormat(plat.CelkovyRocniPlat))" class="number">@HlidacStatu.Util.RenderData.NicePrice(plat.CelkovyRocniPlat)</td>
-                                            <td data-order="@(HlidacStatu.Util.RenderData.OrderValueFormat(plat.HrubyMesicniPlat))" class="number">@HlidacStatu.Util.RenderData.NicePrice(plat.HrubyMesicniPlat)</td>
+                                            <td data-order="@(HlidacStatu.Util.RenderData.OrderValueFormat(plat.CelkovyRocniPlatVcetneOdmen))" class="number">@HlidacStatu.Util.RenderData.NicePrice(plat.CelkovyRocniPlatVcetneOdmen)</td>
+                                            <td data-order="@(HlidacStatu.Util.RenderData.OrderValueFormat(plat.HrubyMesicniPlatVcetneOdmen))" class="number">@HlidacStatu.Util.RenderData.NicePrice(plat.HrubyMesicniPlatVcetneOdmen)</td>
                                             <td>@plat.NefinancniBonus</td>
                                         </tr>
                                     }

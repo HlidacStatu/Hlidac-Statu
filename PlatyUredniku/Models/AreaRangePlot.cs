@@ -31,7 +31,7 @@ public class AreaRangePlot
                 if (salariesYearly.TryGetValue(year, out var platyForYear))
                 {
                     var hrubeMesicniPlaty = platyForYear
-                    .Select(p => (double)p.HrubyMesicniPlat)
+                    .Select(p => (double)p.HrubyMesicniPlatVcetneOdmen)
                     .ToList();
                     dataForYear.Median = hrubeMesicniPlaty?.Median() ?? null;
                     dataForYear.Min = hrubeMesicniPlaty?.Min() ?? null;
@@ -39,7 +39,7 @@ public class AreaRangePlot
 
                     var hrubeMesicniPlatyCeo = platyForYear
                     .Where(p => p.JeHlavoun == true)
-                    .Select(p => (double)p.HrubyMesicniPlat);
+                    .Select(p => (double)p.HrubyMesicniPlatVcetneOdmen);
                     if (hrubeMesicniPlatyCeo.Any())
                     {
                         dataForYear.Extra = hrubeMesicniPlatyCeo.Average();
