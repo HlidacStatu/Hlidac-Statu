@@ -1,6 +1,7 @@
 @using HlidacStatu.Repositories
 
 @{
+
     var ministerstva = await PuRepo.GetActiveOrganizaceForTagAsync("ministerstvo");
     var ministerstvaPlatyNamestku = ministerstva.SelectMany(o =>
         o.Platy.Where(p => p.NazevPozice.Contains("náměstek", StringComparison.InvariantCultureIgnoreCase))
@@ -10,8 +11,29 @@
                 Rok = g.Key,
                 NazevOrganizace = o.Nazev,
                 DatovaSchranka = o.DS,
-                SouhrnPlatu = g.Sum(p => p.HrubyMesicniPlatVcetneOdmen)
-            }));
+                SouhrnPlatu = (decimal?)g.Sum(p => p.HrubyMesicniPlatVcetneOdmen)
+            }))
+        .ToList();
+    var allYears = Enumerable.Range(ministerstvaPlatyNamestku.Min(p => p.Rok), PuRepo.DefaultYear - ministerstvaPlatyNamestku.Min(p => p.Rok)).ToList();
+    
+    //fill in gaps in years
+    foreach (var year in allYears)
+    {
+        foreach (var ministerstvo in ministerstva)
+        {
+            if (ministerstvaPlatyNamestku.Any(m => m.Rok == year && m.DatovaSchranka == ministerstvo.DS))
+                continue;
+            
+            ministerstvaPlatyNamestku.Add(new
+            {
+                Rok = year,
+                NazevOrganizace = ministerstvo.Nazev,
+                DatovaSchranka = ministerstvo.DS,
+                SouhrnPlatu = (decimal?)null
+            });
+            
+        }
+    }
 }
 
 @section breadcrumbs
@@ -71,9 +93,18 @@
                             </td>
 
                             <td class="number" data-order="@(HlidacStatu.Util.RenderData.OrderValueFormat(platNamestku.Rok))">@platNamestku.Rok</td>
-                            <td class="number" data-order="@(HlidacStatu.Util.RenderData.OrderValueFormat(platNamestku.SouhrnPlatu))">@HlidacStatu.Util.RenderData.NicePriceHtml(platNamestku.SouhrnPlatu)</td>
-                        </tr>
-                    }
+                        <td class="number" data-order="@(HlidacStatu.Util.RenderData.OrderValueFormat(platNamestku.SouhrnPlatu))">
+                        @if (platNamestku.SouhrnPlatu.HasValue)
+                        {
+                            @HlidacStatu.Util.RenderData.NicePriceHtml(platNamestku.SouhrnPlatu.Value)    
+                        }
+                        else
+                        {
+                            <span>nedostali jsme data</span>
+                        }
+                        </td>
+                    </tr>
+                }
                 </tbody>
             </table>
         </div>
