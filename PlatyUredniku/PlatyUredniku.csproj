@@ -35,21 +35,25 @@
       </None>
 		<None Remove="AutocompleteCache_False\**" />
 		<None Remove="AutocompleteCache_True\**" />
+		<None Remove="AutocompleteCategoryCache_False\**" />
 
 	</ItemGroup>
 	<ItemGroup>
 		<Compile Remove="AutocompleteCache_False\**" />
 		<Compile Remove="AutocompleteCache_True\**" />
+		<Compile Remove="AutocompleteCategoryCache_False\**" />
 	</ItemGroup>
 
 	<ItemGroup>
 		<EmbeddedResource Remove="AutocompleteCache_False\**" />
 		<EmbeddedResource Remove="AutocompleteCache_True\**" />
+		<EmbeddedResource Remove="AutocompleteCategoryCache_False\**" />
 	</ItemGroup>
 
 	<ItemGroup>
 		<Content Remove="AutocompleteCache_False\**" />
 		<Content Remove="AutocompleteCache_True\**" />
+		<Content Remove="AutocompleteCategoryCache_False\**" />
 	</ItemGroup>
 
 </Project>

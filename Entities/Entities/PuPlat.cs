@@ -1,7 +1,5 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Dynamic;
-using HlidacStatu.Entities.Dotace;
 
 namespace HlidacStatu.Entities.Entities;
 
@@ -20,11 +18,7 @@ public class PuPlat
     decimal? _uvazek = 1;
     public decimal? Uvazek
     {
-        get {
-            if (_uvazek == null)
-                _uvazek = 1;
-            return _uvazek;
-        }
+        get => _uvazek ??= 1;
 
         set
         {
@@ -38,11 +32,7 @@ public class PuPlat
     decimal? _pocetMesicu = 12;
     public decimal? PocetMesicu
     {
-        get  {
-            if (_pocetMesicu == null)
-                _pocetMesicu = 12;
-            return _pocetMesicu;
-        }
+        get => _pocetMesicu ??= 12;
         set
         {
             if (value == null || value == 0)

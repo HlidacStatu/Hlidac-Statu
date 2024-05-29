@@ -176,6 +176,38 @@ public class HomeController : Controller
         return View("statistika_"+id,typ);
     }
     
+    public async Task<IActionResult> RustPlatu()
+    {
+        var orgs = await PuRepo.GetPlatyForYearsAsync(PuRepo.MinYear, PuRepo.DefaultYear);
+        var test = orgs.Where(o => o.Platy.Any(p => p.Rok <= PuRepo.MinYear)).ToList();
+
+        List<PrumerPlatu> rusty = new();
+        foreach (var org in orgs)
+        {
+            var rustPlatu = new PrumerPlatu()
+            {
+                DatovaSchrankaOrganizace = org.DS,
+                NazevOrganizace = org.Nazev,
+                PlatPrvniRok = org.Platy.Where(p => p.Rok == PuRepo.MinYear).Average(p => p.HrubyMesicniPlat),
+                PlatPosledniRok = org.Platy.Where(p => p.Rok == PuRepo.DefaultYear).Average(p => p.HrubyMesicniPlat),
+            };
+
+            //filter results
+            if (rustPlatu.PlatPrvniRok > 0 && rustPlatu.PlatPosledniRok > 0)
+            {
+                rusty.Add(rustPlatu);
+            }
+            
+        }
+        
+        return View(rusty);
+    }
+    
+    public IActionResult NejvetsiOdmeny()
+    {
+        return View();
+    }
+    
     public IActionResult OpenData()
     {
         return View();
