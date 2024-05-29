@@ -63,7 +63,7 @@
                 <b>Celkový příjem za rok @plat.Rok včetně odměn</b>
 
                 <mark>
-                    @HlidacStatu.Util.RenderData.NicePriceHtml(plat.CelkovyRocniPlat)
+                    @HlidacStatu.Util.RenderData.NicePriceHtml(plat.CelkovyRocniPlatVcetneOdmen)
                 </mark>
                 @if (plat.Odmeny.HasValue)
                 {
@@ -78,7 +78,7 @@
                 <i class="fas fa-exclamation-circle" style="padding-right:20px;" aria-hidden="true"></i>
                 <b>Přepočtený měsíční plat</b>
                 <mark>
-                    @HlidacStatu.Util.RenderData.NicePriceHtml(plat.HrubyMesicniPlat)
+                    @HlidacStatu.Util.RenderData.NicePriceHtml(plat.HrubyMesicniPlatVcetneOdmen)
                 </mark>
             </p>
 

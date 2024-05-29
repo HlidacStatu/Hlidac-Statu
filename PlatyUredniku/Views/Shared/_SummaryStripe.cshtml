@@ -10,7 +10,7 @@
     if (platy is null || !platy.Any())
         return;
 
-    var hrubeMesicniPlaty = platy.Select(o => (double)o.HrubyMesicniPlat).ToList();
+    var hrubeMesicniPlaty = platy.Select(o => (double)o.HrubyMesicniPlatVcetneOdmen).ToList();
 
     var minimum = hrubeMesicniPlaty.Minimum();
     var median = hrubeMesicniPlaty.Median();

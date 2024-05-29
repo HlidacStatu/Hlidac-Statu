@@ -52,7 +52,11 @@ public class PuPlat
     [ForeignKey("IdOrganizace")]
     public virtual PuOrganizace Organizace { get; set; }
 
-    public decimal HrubyMesicniPlat => ((Plat ?? 0) + (Odmeny ?? 0)) * (1 / Uvazek ?? 1) / (PocetMesicu ?? 12);
+    public decimal HrubyMesicniPlatVcetneOdmen => ((Plat ?? 0) + (Odmeny ?? 0)) * (1 / Uvazek ?? 1) / (PocetMesicu ?? 12);
 
-    public decimal CelkovyRocniPlat => (Plat ?? 0) + (Odmeny ?? 0);
+    public decimal CelkovyRocniPlatVcetneOdmen => (Plat ?? 0) + (Odmeny ?? 0);
+    
+    public decimal? PlatMesicne => (Plat ?? 0) / (PocetMesicu ?? 12);
+    public decimal? OdmenyMesicne => (Odmeny ?? 0) / (PocetMesicu ?? 12);
+    public decimal? OsobniOhodnoceniPerc => ((Plat + Odmeny) == 0 || Plat ==0) ? null : Odmeny / (Plat + Odmeny);
 }

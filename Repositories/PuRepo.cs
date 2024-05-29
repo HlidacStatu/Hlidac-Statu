@@ -98,7 +98,7 @@ public static class PuRepo
         var platyRok = db.PuPlaty
             .AsNoTracking()
             .Where(m => m.Rok == rok)
-            .Select(m => new { mplat = m.HrubyMesicniPlat, plat = m, org = m.Organizace })
+            .Select(m => new { mplat = m.HrubyMesicniPlatVcetneOdmen, plat = m, org = m.Organizace })
             .ToArray()
             .OrderBy(o => o.mplat)
             .ToArray();
@@ -106,7 +106,7 @@ public static class PuRepo
         var platyRokHlavouni = db.PuPlaty
             .AsNoTracking()
             .Where(m => m.Rok == rok && m.JeHlavoun == true)
-            .Select(m => new { mplat = m.HrubyMesicniPlat, plat = m, org = m.Organizace })
+            .Select(m => new { mplat = m.HrubyMesicniPlatVcetneOdmen, plat = m, org = m.Organizace })
             .ToArray()
             .OrderBy(o => o.mplat)
             .ToArray();
