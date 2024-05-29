@@ -3,9 +3,10 @@
 @using System.Collections.Generic;
 
 @{
-    bool max = true;
+    bool max = this.Context.Request.Query.GetFirstQueryParameter("max") != "false";
 
-    int minYear = 2021;
+
+    int minYear = Devmasters.ParseText.ToInt(this.Context.Request.Query.GetFirstQueryParameter("minyear")) ?? 2021;
     var orgs = await PuRepo.GetPlatyForYearsAsync(minYear, PuRepo.DefaultYear);
 
     List<PrumerPlatu> rusty = new();
@@ -85,13 +86,13 @@
                 });
             </script>
 
-            <table class="table table-borderless table-hover" id="tblSum_rustPlatuCeo">
-                <thead class="xtable-light">
+            <table class="table table-borderless table-striped table-hover" id="tblSum_rustPlatuCeo">
+                <thead class="table-dark">
                 <th>Organizace</th>
                 <th><abbr title="Průměrný měsíční plat přepočtený z ročního příjmu včetně odměn">Měsíční plat</abbr> v 2021</th>
                 <th><abbr title="Průměrný měsíční plat přepočtený z ročního příjmu včetně odměn">Měsíční plat</abbr> v @PuRepo.DefaultYear</th>
-                <th>Nárůst %</th>
-                <th>Nárůst absolutní</th>
+                <th>Změna v %</th>
+                <th>Změna v Kč</th>
                 </thead>
                 <tbody>
                     @foreach (var prumerPlatu in rusty.OrderByDescending(p => p.NarustProcentualni))

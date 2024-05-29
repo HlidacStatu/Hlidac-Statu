@@ -4,11 +4,7 @@
 @using HlidacStatu.Entities.Entities;
 
 @{
-    int rok = PuRepo.DefaultYear;
-    if (this.Context.Request.Query.TryGetValue("rok", out var rrok))
-    {
-        rok = Devmasters.ParseText.ToInt(rrok.FirstOrDefault()) ?? PuRepo.DefaultYear;
-    }
+    int rok = Devmasters.ParseText.ToInt(this.Context.Request.Query.GetFirstQueryParameter("rok")) ?? PuRepo.DefaultYear;
 
     var platy = await PuRepo.GetPlatyWithOrganizaceForYearAsync(rok);
     platy = platy
@@ -52,7 +48,9 @@
                                 'url': '//cdn.datatables.net/plug-ins/1.13.4/i18n/cs.json'
                             },
                             "searching": false,
-                            "paging": false,
+                            "paging": true,
+                            "pageLength": 20,
+                            "lengthChange": false,
                             "ordering": true,
                             "order": [[4,'asc']],
                             "info": false
@@ -60,7 +58,7 @@
                 });
             </script>
 
-            <table class="table table-borderless table-hover" id="tblSum_prehledOdmen">
+            <table class="table table-borderless table-striped table-hover" id="tblSum_prehledOdmen">
                 <thead class="xtable-light">
                 <th>Organizace</th>
                 <th>Pozice</th>

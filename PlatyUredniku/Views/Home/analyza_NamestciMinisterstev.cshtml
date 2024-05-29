@@ -28,7 +28,7 @@
 
 @section scripts
 {
-    <link rel="stylesheet" type="text/css" href="//cdn.datatables.net/1.13.4/css/jquery.dataTables.min.css"/>
+    <link rel="stylesheet" type="text/css" href="//cdn.datatables.net/1.13.4/css/jquery.dataTables.min.css" />
     <script type="text/javascript" charset="utf8" src="//cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
 }
 
@@ -46,32 +46,34 @@
                                 'url': '//cdn.datatables.net/plug-ins/1.13.4/i18n/cs.json'
                             },
                             "searching": false,
-                            "paging": false,
+                            "paging": true,
+                            "pageLength": 20,
+                            "lengthChange": false,
                             "ordering": true,
-                            "order": [],
+                            "order": [[2,'desc']],
                             "info": false
                         });
                 });
             </script>
 
-            <table class="table table-borderless table-hover" id="tblSum_prehledOdmen">
-                <thead class="xtable-light">
+            <table class="table table-borderless table-hover table-striped " id="tblSum_prehledOdmen">
+                <thead class="table-dark">
                 <th>Organizace</th>
-                <th>Rok</th>
-                <th>Souhrný průměrný plat včetně odměn</th>
+                <th class="text-end">Rok</th>
+                <th class="text-end">Souhrnný průměrný plat včetně odměn</th>
                 </thead>
                 <tbody>
-                @foreach (var platNamestku in ministerstvaPlatyNamestku.OrderBy(m => m.NazevOrganizace).ThenBy(m => m.Rok))
-                {
-                    <tr>
-                        <td>
-                            <a asp-action="Detail" asp-route-id="@platNamestku.DatovaSchranka">@platNamestku.NazevOrganizace</a>
-                        </td>
+                    @foreach (var platNamestku in ministerstvaPlatyNamestku.OrderBy(m => m.NazevOrganizace).ThenBy(m => m.Rok))
+                    {
+                        <tr>
+                            <td>
+                                <a asp-action="Detail" asp-route-id="@platNamestku.DatovaSchranka">@platNamestku.NazevOrganizace</a>
+                            </td>
 
-                        <td class="number">@platNamestku.Rok</td>
-                        <td class="number">@HlidacStatu.Util.RenderData.NicePriceHtml(platNamestku.SouhrnPlatu)</td>
-                    </tr>
-                }
+                            <td class="number" data-order="@(HlidacStatu.Util.RenderData.OrderValueFormat(platNamestku.Rok))">@platNamestku.Rok</td>
+                            <td class="number" data-order="@(HlidacStatu.Util.RenderData.OrderValueFormat(platNamestku.SouhrnPlatu))">@HlidacStatu.Util.RenderData.NicePriceHtml(platNamestku.SouhrnPlatu)</td>
+                        </tr>
+                    }
                 </tbody>
             </table>
         </div>
