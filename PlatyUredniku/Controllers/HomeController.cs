@@ -254,11 +254,6 @@ public class HomeController : Controller
         return View(rusty);
     }
     
-    public IActionResult NejvetsiOdmeny()
-    {
-        return View();
-    }
-    
     public IActionResult OpenData()
     {
         return View();
