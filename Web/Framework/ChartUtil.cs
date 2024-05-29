@@ -344,7 +344,7 @@ pie: {
             sb.AppendLine($"<script>");
             sb.AppendLine($"var price_year_chart;");
             sb.AppendLine("$(document).ready(function() {");
-            sb.AppendLine($"price_year_chart = new Highcharts.chart('{containerId}',");
+            sb.AppendLine($"price_year_chart = Highcharts.chart('{containerId}',");
             sb.AppendLine("{ chart: {");
             sb.AppendLine($"    renderTo:\"{containerId}\",");
             sb.AppendLine($"    height:\"{(rds.Count() > 1 ? height + 62 : height)}\",");
@@ -383,11 +383,11 @@ pie: {
             sb.AppendLine("			\"type\": \"linear\"");
             sb.AppendLine("		},");
             sb.AppendLine("\"navigation\": { \"buttonOptions\": { \"enabled\": false } }, ");
-            sb.AppendLine("					\"series\": [{");
+            sb.AppendLine("					\"series\": [");
 
             foreach (var rdsItem in rds)
             {
-                sb.AppendLine($"				\"name\":\"{rdsItem.Title}\",");
+                sb.AppendLine($"				{{\"name\":\"{rdsItem.Title}\",");
                 sb.AppendLine($"				\"data\":[");
                 foreach (var item in rdsItem.Data)
                 {
@@ -395,10 +395,10 @@ pie: {
                         $"[{item[0].Column.ValueRender(item[0].Value)},{item[1].Column.ValueRender(item[1].Value)}],");
                 }
 
-                sb.AppendLine("                          ],");
+                sb.AppendLine("                          ]},");
             }
 
-            sb.AppendLine("					}]");
+            sb.AppendLine("					]");
             sb.AppendLine(" 	  });");
             sb.AppendLine("	});");
             sb.AppendLine("</script>");

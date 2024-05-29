@@ -100,7 +100,7 @@ namespace HlidacStatu.Lib.Web.UI
             sb.AppendLine($"var g_{random};");
             sb.AppendLine("$(document).ready(function () {");
             //sb.AppendLine(GraphTheme());
-            sb.AppendLine($"g_{random} = new Highcharts.Chart(");
+            sb.AppendLine($"g_{random} = Highcharts.Chart(");
 
             var anon = new
             {
@@ -163,7 +163,7 @@ namespace HlidacStatu.Lib.Web.UI
             sb.AppendLine($"var g_{random};");
             sb.AppendLine("$(document).ready(function () {");
             //sb.AppendLine(GraphTheme());
-            sb.AppendLine($"g_{random} = new Highcharts.Chart(");
+            sb.AppendLine($"g_{random} = Highcharts.Chart(");
 
             var anon = new
             {
@@ -611,14 +611,14 @@ point: {
             sb.AppendLine($"<script>");
             sb.AppendLine($"var price_year_chart;");
             sb.AppendLine("$(document).ready(function() {");
-            sb.AppendLine($"price_year_chart = new Highcharts.chart('{containerId}',");
+            sb.AppendLine($"price_year_chart = Highcharts.chart('{containerId}',");
             sb.AppendLine("{ chart: {");
             sb.AppendLine($"    renderTo:\"{containerId}\",");
             sb.AppendLine($"    height:\"{(rds.Count() > 1 ? height + 62 : height)}\",");
             sb.AppendLine($"    type:\"{(columnType ? "column" : "bar")}\"");
             sb.AppendLine("},");
-            sb.AppendLine("\"legend\": { \"enabled\": " + ((rds.Count() > 1) ? "true" : "false") +
-                          ",\"reversed\": true},");
+            sb.AppendLine("legend: { enabled: " + ((rds.Count() > 1) ? "true" : "false") +
+                          ",reversed: true},");
             sb.AppendLine(
                 $"\"plotOptions\": {{ \"bar\": {{ \"animation\": true, \"borderWidth\": 0, \"groupPadding\": 0, \"shadow\": true }}, \"column\": {{ \"animation\": true, \"borderWidth\": 0, \"groupPadding\": 0, \"shadow\": true }}{stackingElement} }}, ");
             sb.AppendLine("title: {text : undefined},");
@@ -627,9 +627,9 @@ point: {
             sb.AppendLine("\"xAxis\": {");
             if (timeData == false)
             {
-                sb.AppendLine("	\"categories\": [" +
+                sb.AppendLine("	categories: [" +
                  string.Join(",",
-                         rds[0].Data.Select(v => "\"" + v[0].Column.TextRender(v[0].Value) + "\"")
+                         rds[0].Data.Select(v => "'" + v[0].Column.TextRender(v[0].Value) + "'")
                          ) + "],"
                   );
             }
@@ -654,15 +654,15 @@ point: {
 
             foreach (var rdsItem in rds)
             {
-                sb.AppendLine($"				\"name\":\"{rdsItem.Title}\",");
-                sb.AppendLine($"				\"data\":[");
+                sb.AppendLine($"				{{\"name\": \"{rdsItem.Title}\",");
+                sb.AppendLine($"				\"data\": [");
                 foreach (var item in rdsItem.Data)
                 {
                     sb.AppendLine(
                         $"[{item[0].Column.ValueRender(item[0].Value)},{item[1].Column.ValueRender(item[1].Value)}],");
                 }
 
-                sb.AppendLine("                          ],");
+                sb.AppendLine("                          ]},");
             }
 
             sb.AppendLine("					}]");

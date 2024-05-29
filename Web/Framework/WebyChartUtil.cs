@@ -373,7 +373,7 @@ Highcharts.setOptions({
                     colsize = data.colsize;
                     $('#container" + uniqueId + @"').html('');
                     $('#adbmsg" + uniqueId + @"').show();
-                    chart" + uniqueId + @" = new Highcharts.Chart(chartopt" + uniqueId + @");
+                    chart" + uniqueId + @" = Highcharts.Chart(chartopt" + uniqueId + @");
                     $('#adbmsg" + uniqueId + @"').hide();
                 });");
             sb.AppendLine("}); //end chart");

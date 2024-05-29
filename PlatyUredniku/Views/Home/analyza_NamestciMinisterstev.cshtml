@@ -1,11 +1,13 @@
+@using HlidacStatu.Lib.Web.UI
 @using HlidacStatu.Repositories
-
+@using HlidacStatu.XLib.Render
+@using PlatyUredniku.Models;
 @{
     var ministerstva = await PuRepo.GetActiveOrganizaceForTagAsync("ministerstvo");
     var ministerstvaPlatyNamestku = ministerstva.SelectMany(o =>
         o.Platy.Where(p => p.NazevPozice.Contains("náměstek", StringComparison.InvariantCultureIgnoreCase))
             .GroupBy(p => p.Rok)
-            .Select(g => new
+            .Select(g => new NamestciMinisterstevSummary()
             {
                 Rok = g.Key,
                 NazevOrganizace = o.Nazev,
@@ -36,6 +38,47 @@
     <div class="container">
         <h2>Přehled kolik vyplácela jednotlivá ministerstva svým náměstkům v letech</h2>
         <p class="text-muted">Výplaty náměstkům</p>
+
+        <div style="height: 400px" id="perYchart"></div>
+        <script>
+            Highcharts.chart('perYchart', {
+                chart: {
+                    type: 'column'
+                },
+                title: false,
+                xAxis: {
+                    categories: [ @(string.Join(",", ministerstvaPlatyNamestku.Select(m=>$"'{m.Rok}'").Distinct().OrderBy(o=>o))) ]
+                },
+                yAxis: {
+                    min: 0,
+                    title: {
+                        text: 'Suma odměn náměstků ministerstev'
+                    }
+                },
+                tooltip: {
+                    pointFormat: '<span style="color:{series.color}">{series.name}</span>' +
+                        ': <b>{point.y}</b><br/>',
+                    shared: true
+                },
+                plotOptions: {
+                    column: {
+                        dataLabels: {
+                            enabled: true,
+                            format: '{point.y}'
+                        }
+                    }
+                },
+                series: [
+                    @foreach (var item in ministerstvaPlatyNamestku.Select(m=>m.NazevOrganizace).OrderBy(o=>o))
+                    {
+                        var data = ministerstvaPlatyNamestku.Where(m => m.NazevOrganizace == item).OrderBy(o=>o.Rok).Select(m=>m.SouhrnPlatu);
+                        <text>
+                            @($"{{ name:'{item}',data:[{string.Join(",",data)}] }},")                    
+                        </text>
+                    }
+            });
+
+    </script>
 
         <div class="tab-pane width-75vp" id="prehledOdmen" role="tabpanel">
             <script>
