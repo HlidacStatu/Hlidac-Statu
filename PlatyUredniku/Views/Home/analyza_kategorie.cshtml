@@ -98,23 +98,21 @@
                     @(await Html.RenderComponentAsync<PlatyUredniku.Views.Shared.Components.AutocompleteSimpleWrap>(RenderMode.ServerPrerendered, new
                     {
                         Name = "k1",
-                        DefaultPlaceholder = k1Text,
+                        DefaultPlaceholder = "Začněte psát název zaměstnání",
                         DefaultValue = k1
                     }))
                 </div>
                 <div class="col-md-6 col-sm-12">
-                    <label for="k2filter" class="form-label">Druhá kategorie</label>
-                    <input id="k2filter" list="organizace_list" type="text" class="form-control" oninput="updateHiddenInput('k2')" placeholder="@k2Text">
-                    <input type="hidden" id="k2" name="k2">
+                    <label for="k2" class="form-label">První kategorie</label>
+                    @(await Html.RenderComponentAsync<PlatyUredniku.Views.Shared.Components.AutocompleteSimpleWrap>(RenderMode.ServerPrerendered, new
+                    {
+                        Name = "k2",
+                        DefaultPlaceholder = "Začněte psát název druhého zaměstnání",
+                        DefaultValue = k2
+                    }))
                 </div>
                 <div class="col"><button class="btn btn-sm btn-primary" type="submit">Porovnat vývoj platů</button></div>
             </div>
-            <datalist id="organizace_list">
-                @foreach (var org in AutocompleteService.LoadCzisco())
-                {
-                    <option value="@org.Nazev" data-value="@org.Kod"></option>    
-                }
-            </datalist>
         </form>
 
 

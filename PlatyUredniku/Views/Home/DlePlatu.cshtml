@@ -50,7 +50,7 @@
                         <td>
                             <a asp-action="Detail" asp-route-id="@plat.Organizace.DS">@plat.Organizace.Nazev</a>
                         </td>
-                        <td class="number">@HlidacStatu.Util.RenderData.NicePrice(plat.HrubyMesicniPlatVcetneOdmen)</td>
+                        <td class="number text-nowrap">@HlidacStatu.Util.RenderData.NicePrice(plat.HrubyMesicniPlatVcetneOdmen)</td>
                         <td style="max-width:25rem"><small>@plat.NefinancniBonus</small></td>
                     </tr>
                 }

@@ -79,6 +79,7 @@
                             "searching": false,
                             "paging": true,
                             "pageLength": 20,
+                            "lengthChange": false,
                             "ordering": true,
                             "order": [[3, @Html.Raw(max ? "'desc'" : "'asc'")]],
                             "info": false
@@ -101,10 +102,10 @@
                     <td>
                         <a asp-action="Detail" asp-route-id="@prumerPlatu.DatovaSchrankaOrganizace">@prumerPlatu.NazevOrganizace</a>
                     </td>
-                            <td class="number" data-order="@(HlidacStatu.Util.RenderData.OrderValueFormat(prumerPlatu.PlatPrvniRok ?? 0))">@HlidacStatu.Util.RenderData.NicePrice(prumerPlatu.PlatPrvniRok ?? 0)</td>
-                            <td class="number" data-order="@(HlidacStatu.Util.RenderData.OrderValueFormat(prumerPlatu.PlatPosledniRok ?? 0))">@HlidacStatu.Util.RenderData.NicePrice(prumerPlatu.PlatPosledniRok ?? 0)</td>
-                            <td class="number" data-order="@(HlidacStatu.Util.RenderData.OrderValueFormat(prumerPlatu.NarustProcentualni ?? 0))">@prumerPlatu.NarustProcentualni?.ToString("P")</td>
-                            <td class="number" data-order="@(HlidacStatu.Util.RenderData.OrderValueFormat(prumerPlatu.NarustAbsolutni ?? 0))">@HlidacStatu.Util.RenderData.NicePrice(prumerPlatu.NarustAbsolutni ?? 0)</td>
+                            <td class="number text-nowrap" data-order="@(HlidacStatu.Util.RenderData.OrderValueFormat(prumerPlatu.PlatPrvniRok ?? 0))">@HlidacStatu.Util.RenderData.NicePrice(prumerPlatu.PlatPrvniRok ?? 0)</td>
+                            <td class="number text-nowrap" data-order="@(HlidacStatu.Util.RenderData.OrderValueFormat(prumerPlatu.PlatPosledniRok ?? 0))">@HlidacStatu.Util.RenderData.NicePrice(prumerPlatu.PlatPosledniRok ?? 0)</td>
+                            <td class="number text-nowrap" data-order="@(HlidacStatu.Util.RenderData.OrderValueFormat(prumerPlatu.NarustProcentualni ?? 0))">@prumerPlatu.NarustProcentualni?.ToString("P")</td>
+                            <td class="number text-nowrap" data-order="@(HlidacStatu.Util.RenderData.OrderValueFormat(prumerPlatu.NarustAbsolutni ?? 0))">@HlidacStatu.Util.RenderData.NicePrice(prumerPlatu.NarustAbsolutni ?? 0)</td>
 
                 </tr>
                 }
