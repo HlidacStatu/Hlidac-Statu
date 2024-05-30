@@ -51,28 +51,37 @@ public class HomeController : Controller
         (int Min, int Max) range = (0, int.MaxValue);
         string title = "Manažerské platy ve veřejné správě";
         string noteHtml = "";
+        string rozsah = "";
+        string odkaz = "";
         switch (id)
         {
             case 2:
                 range = (0_000, prumernyPlat);
                 title = "Manažerské platy ve veřejné správě nižší než průměrný plat v ČR za rok 2023";
                 noteHtml = "Průměrný plat v Q4 2023 <a href='https://www.czso.cz/csu/czso/cri/prumerne-mzdy-4-ctvrtleti-2023' target='_blank'>podle ČSÚ </a>v Q4 2023 byl <b>46 013 Kč hrubého</b>.";
+                rozsah = $"Rozsah zobrazovaných platů je od nuly až po průměrný plat (<b>46 013 Kč</b>).";
+                odkaz = $"<a href=\"/DlePlatu/3\">Vyšší než průměrné platy</a>";
                 break;
             case 3:
-                range = (prumernyPlat, 70_000);
+                range = (prumernyPlat, prumernyPlat * 2);
                 title = "Manažerské platy ve veřejné správě vyšší než průměrný plat v ČR za rok 2023";
-                noteHtml = "Průměrný plat v Q4 2023 <a href='https://www.czso.cz/csu/czso/cri/prumerne-mzdy-4-ctvrtleti-2023' target='_blank'>podle ČSÚ </a> byl <b>46 013 Kč hrubého</b>.";
+                noteHtml = "Průměrný plat v Q4 2023 <a href='https://www.czso.cz/csu/czso/cri/prumerne-mzdy-4-ctvrtleti-2023' target='_blank'>podle ČSÚ </a>v Q4 2023 byl <b>46 013 Kč hrubého</b>.";
+                rozsah = $"Rozsah zobrazovaných platů je od průměrného platu (<b>46 013 Kč</b>) po dvojnásobek průměrného platu (<b>92 026 Kč</b>).";
+                odkaz = $"<a href=\"/DlePlatu/4\">Nejvyšší platy ve veřejné správě</a>";
                 break;
             case 4:
                 range = (prumernyPlat * 2, 100_000_000);
                 title = "Nejvyšší manažerské platy ve veřejné správě za rok 2023";
                 noteHtml = "Zobrazujeme platy, které jsou více než dvojnásobné, než je průměrný plat v Q4 2023 <a href='https://www.czso.cz/csu/czso/cri/prumerne-mzdy-4-ctvrtleti-2023' target='_blank'>podle ČSÚ </a>(46 013 Kč hrubého).";
+                rozsah = $"Zobrazované platy jsou větší než dvojnásobek průměrného platu (<b>92 026 Kč</b>).";
                 break;
             case 1:
             default:
                 range = (0_000, 33_000);
                 title = "Manažerské platy ve veřejné správě za rok 2023 nižší než nástupní plat pokladní/ho v Lidlu ";
                 noteHtml = "Nástupní plat pokladní v Lidl v Praze byl <a href='https://www.idnes.cz/ekonomika/domaci/lidl-mzdy-prodavaci-obchod-retezec.A231213_161827_ekonomika_ven' target='_blank'>podle iDnes</a> <b>33 700 Kč hrubého</b>.";
+                rozsah = $"Rozsah zobrazovaných platů je od nuly až po nástupní plat pokladní/ho v Lidlu (<b>33 700 Kč</b>).";
+                odkaz = $"<a href=\"/DlePlatu/2\">Nižší než průměrné platy</a>";
                 break;
         }
 
@@ -80,7 +89,9 @@ public class HomeController : Controller
         var platyCount = await StaticCache.GetPlatyCountPerYearAsync(PuRepo.DefaultYear);
 
         ViewData["platy"] = platy;
-        //ViewData["context"] = $"Dle platů {range.Min} - {range.Max},-";
+        ViewData["rozsah"] = rozsah;
+        ViewData["odkaz"] = odkaz;
+        ViewData["platyMaximum"] = range.Max;
         ViewData["title"] = title;
         ViewData["noteHtml"] = noteHtml;
         ViewData["pocetPlatuCelkem"] = platyCount;
