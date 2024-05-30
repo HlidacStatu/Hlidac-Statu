@@ -5,7 +5,7 @@
 @{
     bool max = this.Context.Request.Query.GetFirstQueryParameter("max") != "false";
 
-    int minYear =  Devmasters.ParseText.ToInt(this.Context.Request.Query.GetFirstQueryParameter("minyear")) ?? 2021;
+    int minYear = Devmasters.ParseText.ToInt(this.Context.Request.Query.GetFirstQueryParameter("minyear")) ?? 2021;
     var orgs = await PuRepo.GetPlatyForYearsAsync(minYear, PuRepo.DefaultYear);
 
     List<PrumerPlatu> rusty = new();
@@ -21,8 +21,9 @@
                 {
                     DatovaSchrankaOrganizace = org.DS,
                     NazevOrganizace = org.Nazev,
-                    PlatPrvniRok = platyPrvniRok.Average(p => p.HrubyMesicniPlatVcetneOdmen),
-                    PlatPosledniRok = platyPosledniRok.Average(p => p.HrubyMesicniPlatVcetneOdmen),
+                    PlatPrvniRok = platyPrvniRok.FirstOrDefault()?.HrubyMesicniPlatVcetneOdmen,
+                    PlatPosledniRok = platyPosledniRok.FirstOrDefault()?.HrubyMesicniPlatVcetneOdmen,
+                    PocetMesicu = platyPosledniRok.FirstOrDefault()?.PocetMesicu
                 };
 
         //filter results
@@ -32,8 +33,8 @@
         {
             if (max && rustPlatu.NarustProcentualni > 0)
                 rusty.Add(rustPlatu);
-            else if (max == false && rustPlatu.NarustProcentualni < 0) 
-                rusty.Add(rustPlatu);            
+            else if (max == false && rustPlatu.NarustProcentualni < 0)
+                rusty.Add(rustPlatu);
         }
 
     }
@@ -48,14 +49,14 @@
             <a asp-action="Analyzy">Analýzy</a>
         </li>
         <li class="active">
-            @(max ? "Největší navýšení" : "Největší snížení" ) platů nejvyšších představitelů od roku @minYear
+            @(max ? "Největší navýšení" : "Největší snížení") platů nejvyšších představitelů od roku @minYear
         </li>
     </ol>
 }
 
 @section scripts
 {
-    <link rel="stylesheet" type="text/css" href="//cdn.datatables.net/1.13.4/css/jquery.dataTables.min.css"/>
+    <link rel="stylesheet" type="text/css" href="//cdn.datatables.net/1.13.4/css/jquery.dataTables.min.css" />
     <script type="text/javascript" charset="utf8" src="//cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
 }
 
@@ -63,8 +64,8 @@
     <div class="container">
         <h2>@(max ? "Největší navýšení" : "Největší snížení") platů nejvyšších představitelů od roku @minYear</h2>
         <p class="text-muted">
-            Analýza @(max ? "největšího navýšení" : "největšího snížení" )  platů včetně odměn
-            <b>nejvyšších představených</b> jednotlivých úřadů, státních podniků 
+            Analýza @(max ? "největšího navýšení" : "největšího snížení")  platů včetně odměn
+            <b>nejvyšších představených</b> jednotlivých úřadů, státních podniků
             či příspěvkových organizací mezi roky @minYear a @PuRepo.DefaultYear .
         </p>
 
@@ -94,21 +95,32 @@
                 <th><abbr title="Průměrný měsíční plat přepočtený z ročního příjmu včetně odměn">Měsíční plat</abbr> v @PuRepo.DefaultYear</th>
                 <th>Změna v %</th>
                 <th>Změna v Kč</th>
+                <th></th>
                 </thead>
                 <tbody>
-                @foreach (var prumerPlatu in rusty.OrderByDescending(p => p.NarustProcentualni))
-                {
-                <tr>
-                    <td>
-                        <a asp-action="Detail" asp-route-id="@prumerPlatu.DatovaSchrankaOrganizace">@prumerPlatu.NazevOrganizace</a>
-                    </td>
+                    @foreach (var prumerPlatu in rusty.OrderByDescending(p => p.NarustProcentualni))
+                    {
+                        <tr>
+                            <td>
+                                <a asp-action="Detail" asp-route-id="@prumerPlatu.DatovaSchrankaOrganizace">@prumerPlatu.NazevOrganizace</a>
+                            </td>
                             <td class="number text-nowrap" data-order="@(HlidacStatu.Util.RenderData.OrderValueFormat(prumerPlatu.PlatPrvniRok ?? 0))">@HlidacStatu.Util.RenderData.NicePrice(prumerPlatu.PlatPrvniRok ?? 0)</td>
                             <td class="number text-nowrap" data-order="@(HlidacStatu.Util.RenderData.OrderValueFormat(prumerPlatu.PlatPosledniRok ?? 0))">@HlidacStatu.Util.RenderData.NicePrice(prumerPlatu.PlatPosledniRok ?? 0)</td>
                             <td class="number text-nowrap" data-order="@(HlidacStatu.Util.RenderData.OrderValueFormat(prumerPlatu.NarustProcentualni ?? 0))">@prumerPlatu.NarustProcentualni?.ToString("P")</td>
                             <td class="number text-nowrap" data-order="@(HlidacStatu.Util.RenderData.OrderValueFormat(prumerPlatu.NarustAbsolutni ?? 0))">@HlidacStatu.Util.RenderData.NicePrice(prumerPlatu.NarustAbsolutni ?? 0)</td>
+                            <td>
+                                @if (prumerPlatu.PocetMesicu < 12)
+                                {
+                                    <a href="#" class="link-danger" data-bs-toggle="tooltip" data-bs-title="Plat je pouze za @Devmasters.Lang.CS.Plural.Get((long)prumerPlatu.PocetMesicu.Value, "jeden měsíc", "{0} měsíce", "{0} měsíců") a může obsahovat odstupné či jinou smluvní odměnu"><i class="fa-solid fa-triangle-exclamation"></i>Info</a>
+                                }
+                                else
+                                {
+                                    <text>&nbsp;</text>
+                                }
 
-                </tr>
-                }
+                            </td>
+                        </tr>
+                    }
                 </tbody>
             </table>
         </div>

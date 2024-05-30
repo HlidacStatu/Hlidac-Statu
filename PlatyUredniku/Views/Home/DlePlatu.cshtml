@@ -51,7 +51,14 @@
                             <a asp-action="Detail" asp-route-id="@plat.Organizace.DS">@plat.Organizace.Nazev</a>
                         </td>
                         <td class="number text-nowrap">@HlidacStatu.Util.RenderData.NicePrice(plat.HrubyMesicniPlatVcetneOdmen)</td>
-                        <td style="max-width:25rem"><small>@plat.NefinancniBonus</small></td>
+                        <td style="max-width:25rem">
+                            @if (plat.PocetMesicu<12)
+                            {
+                                <a href="#" class="link-danger" data-bs-toggle="tooltip" data-bs-title="Plat je pouze za @Devmasters.Lang.CS.Plural.Get((long)plat.PocetMesicu.Value, "jeden měsíc", "{0} měsíce", "{0} měsíců") a může obsahovat odstupné či jinou smluvní odměnu"><i class="fa-solid fa-triangle-exclamation"></i>Info</a>
+                            }
+
+                            <small>@plat.NefinancniBonus</small>
+                            </td>
                     </tr>
                 }
             </tbody>
