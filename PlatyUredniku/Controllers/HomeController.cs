@@ -173,10 +173,7 @@ public class HomeController : Controller
         return View(detail);
     }
 
-    public IActionResult Statistiky()
-    {
-        return View();
-    }
+    
     public IActionResult Statistika(string id, string typ)
     {
         return View("statistika_"+id,typ);
@@ -231,7 +228,7 @@ public class HomeController : Controller
                             Tagy = tags,
                             DatumOdeslaniZadosti = metadataForYear?.DatumOdeslaniZadosti,
                             DatumPrijetiOdpovedi = metadataForYear?.DatumPrijetiOdpovedi,
-                            Poznamka = metadataForYear?.SkrytaPoznamka?.ReplaceLineEndings(" "),
+                            PoznamkaHlidace = metadataForYear?.PoznamkaHlidace?.ReplaceLineEndings(" "),
                             ZduvodneniMimoradnychOdmen = metadataForYear?.ZduvodneniMimoradnychOdmen == true ? "Ano" : "Ne",
                             Komunikace = metadataForYear?.ZpusobKomunikace?.ToNiceDisplayName()
                         });
@@ -255,7 +252,7 @@ public class HomeController : Controller
                         Tagy = tags,
                         DatumOdeslaniZadosti = metadataForYear?.DatumOdeslaniZadosti,
                         DatumPrijetiOdpovedi = metadataForYear?.DatumPrijetiOdpovedi,
-                        Poznamka = metadataForYear?.SkrytaPoznamka?.ReplaceLineEndings(" "),
+                        PoznamkaHlidace = metadataForYear?.PoznamkaHlidace?.ReplaceLineEndings(" "),
                         ZduvodneniMimoradnychOdmen = metadataForYear?.ZduvodneniMimoradnychOdmen == true ? "Ano" : "Ne",
                         Komunikace = metadataForYear?.ZpusobKomunikace?.ToNiceDisplayName()
                     });

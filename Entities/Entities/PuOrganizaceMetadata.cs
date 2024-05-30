@@ -17,7 +17,7 @@ public class PuOrganizaceMetadata
     public bool? ZduvodneniMimoradnychOdmen { get; set; }
     public DateTime? DatumOdeslaniZadosti { get; set; }
     public DateTime? DatumPrijetiOdpovedi { get; set; }
-    public string SkrytaPoznamka { get; set; }
+    public string PoznamkaHlidace { get; set; }
 
     // Navigation properties
     [ForeignKey("IdOrganizace")]

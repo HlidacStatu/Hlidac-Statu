@@ -37,10 +37,12 @@ public static class PuRepo
         "životní prostředí",
         "ostatní"
     ];
+
     public static async Task SaveVydelek(PuVydelek vydelek)
     {
         await SaveVydelky(new[] { vydelek });
     }
+
     public static async Task SaveVydelky(IEnumerable<PuVydelek> vydelky)
     {
         await using var db = new DbEntities();
@@ -55,9 +57,10 @@ public static class PuRepo
             else
                 db.Entry(vydelek).State = EntityState.Modified;
         }
-        await db.SaveChangesAsync();
 
+        await db.SaveChangesAsync();
     }
+
     public static async Task<PuVydelek[]> LoadVydelekDataAsync(int rok, int level = 4)
     {
         await using var db = new DbEntities();
@@ -68,6 +71,7 @@ public static class PuRepo
 
         return res;
     }
+
     public static async Task<PuVydelek[]> LoadVydelekForZamestnaniAsync(string cz_ISCO, PuVydelek.VydelekSektor? sektor)
     {
         await using var db = new DbEntities();
@@ -171,7 +175,8 @@ public static class PuRepo
 
         if (year.HasValue)
         {
-            query = query.Where(pu => pu.Metadata.Any(m => m.Rok == year.Value) || pu.Platy.Any(p => p.Rok == year.Value));
+            query = query.Where(pu =>
+                pu.Metadata.Any(m => m.Rok == year.Value) || pu.Platy.Any(p => p.Rok == year.Value));
         }
 
         return await query.ToListAsync();
@@ -219,7 +224,7 @@ select distinct ds.DatovaSchranka, f.ico from firma f
     {
         await using var db = new DbEntities();
 
-        
+
         var query = db.PuOrganizaceTags
             .AsNoTracking()
             .Where(t => t.Tag.Equals(tag))
@@ -240,22 +245,21 @@ select distinct ds.DatovaSchranka, f.ico from firma f
         try
         {
             var listOfCounts = await db.PuOrganizaceTags
-    .AsNoTracking()
-    .Where(t => t.Tag.Equals(tag))
-    .Include(t => t.Organizace).ThenInclude(o => o.Platy)
-    .Select(m => m.Organizace.Platy.Count(c => c.Rok == rok))
-    .ToArrayAsync();
+                .AsNoTracking()
+                .Where(t => t.Tag.Equals(tag))
+                .Include(t => t.Organizace).ThenInclude(o => o.Platy)
+                .Select(m => m.Organizace.Platy.Count(c => c.Rok == rok))
+                .ToArrayAsync();
 
 
             return listOfCounts.Sum();
-
         }
         catch (Exception e)
         {
-
             throw;
         }
     }
+
     public static async Task<PuPlat> GetPlatAsync(int id)
     {
         await using var db = new DbEntities();
@@ -421,7 +425,7 @@ select distinct ds.DatovaSchranka, f.ico from firma f
             origMetadata.DatumOdeslaniZadosti = metadatum.DatumOdeslaniZadosti;
             origMetadata.DatumPrijetiOdpovedi = metadatum.DatumPrijetiOdpovedi;
             origMetadata.ZduvodneniMimoradnychOdmen = metadatum.ZduvodneniMimoradnychOdmen;
-            origMetadata.SkrytaPoznamka = metadatum.SkrytaPoznamka;
+            origMetadata.PoznamkaHlidace = metadatum.PoznamkaHlidace;
         }
 
         await dbContext.SaveChangesAsync();
@@ -515,7 +519,6 @@ select distinct ds.DatovaSchranka, f.ico from firma f
             origPlat.NefinancniBonus = plat.NefinancniBonus;
             origPlat.PocetMesicu = plat.PocetMesicu;
             origPlat.PoznamkaPlat = plat.PoznamkaPlat;
-            origPlat.PoznamkaPozice = plat.PoznamkaPozice;
             origPlat.SkrytaPoznamka = plat.SkrytaPoznamka;
         }
 
@@ -525,7 +528,7 @@ select distinct ds.DatovaSchranka, f.ico from firma f
     public static async Task<List<PuOrganizace>> GetPlatyForYearsAsync(int minYear, int lastYear)
     {
         await using var db = new DbEntities();
-        
+
         var result = await db.PuOrganizace
             .AsNoTracking()
             .Include(o => o.FirmaDs)
@@ -537,7 +540,7 @@ select distinct ds.DatovaSchranka, f.ico from firma f
             .ToListAsync();
 
         // Map the result back to the list of PuOrganizace with filtered Platy
-        return  result.Select(x =>
+        return result.Select(x =>
         {
             x.o.Platy = x.Platy; // Assign the filtered Platy list back to the PuOrganizace entity
             return x.o;

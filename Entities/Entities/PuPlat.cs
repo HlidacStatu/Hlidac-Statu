@@ -42,7 +42,6 @@ public class PuPlat
         }
     }
     public string NefinancniBonus { get; set; }
-    public string PoznamkaPozice { get; set; }
     public string PoznamkaPlat { get; set; }
     public string SkrytaPoznamka { get; set; }
     public bool? JeHlavoun { get; set; }
