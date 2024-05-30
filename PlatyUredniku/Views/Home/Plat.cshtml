@@ -148,6 +148,15 @@
                 <td>Je ředitelskou pozicí</td>
                 <td>@(Model.JeHlavoun == true ? "Ano" : "Ne")</td>
             </tr>
+            <tr>
+                <td>Poznámka k platu</td>
+                <td>@(Model.PoznamkaPlat)</td>
+            </tr>
+            @if (this.User?.IsInRole("canEditData") == true)
+            {
+                <td>Skrytá poznámka</td>
+                <td>@(Model.SkrytaPoznamka)</td>
+            }
 
 
             </tbody>
