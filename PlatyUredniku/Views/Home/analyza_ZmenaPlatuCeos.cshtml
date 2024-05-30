@@ -111,10 +111,39 @@
                             <td class="number text-nowrap" data-order="@(HlidacStatu.Util.RenderData.OrderValueFormat(prumerPlatu.NarustProcentualni ?? 0))">@prumerPlatu.NarustProcentualni?.ToString("P")</td>
                             <td class="number text-nowrap" data-order="@(HlidacStatu.Util.RenderData.OrderValueFormat(prumerPlatu.NarustAbsolutni ?? 0))">@HlidacStatu.Util.RenderData.NicePrice(prumerPlatu.NarustAbsolutni ?? 0)</td>
                             <td>
-                                @if (prumerPlatu.PocetMesicu < 12)
+                                @if (prumerPlatu.PocetPlatuPrvniRok >1 && prumerPlatu.PocetPlatuPosledniRok<2)
                                 {
-                                    <a href="#" class="link-danger" data-bs-toggle="tooltip" data-bs-title="Plat je pouze za @Devmasters.Lang.CS.Plural.Get((long)prumerPlatu.PocetMesicu.Value, "jeden měsíc", "{0} měsíce", "{0} měsíců") a může obsahovat odstupné či jinou smluvní odměnu"><i class="fa-solid fa-circle-info"></i>Info</a>
+                                    <a href="#" class="link-danger" data-bs-toggle="tooltip" 
+                                    data-bs-title="Plat roku @(minYear) je spočítán jako průměr platů @Devmasters.Lang.CS.Plural.Get((long)prumerPlatu.PocetPlatuPrvniRok, "jednoho ředitele", "{0} ředitelů", "{0} ředitelů") a hodnota platu může obsahovat odstupné či jinou smluvní odměnu"><i class="fa-solid fa-circle-info"></i>Info</a>
                                 }
+                                else if (prumerPlatu.PocetPlatuPosledniRok > 1 && prumerPlatu.PocetPlatuPrvniRok < 2)
+                                {
+                                    <a href="#" class="link-danger" data-bs-toggle="tooltip"
+                                       data-bs-title="Plat roku @(PuRepo.DefaultYear) je spočítán jako průměr platů @Devmasters.Lang.CS.Plural.Get((long)prumerPlatu.PocetPlatuPosledniRok, "jednoho ředitele", "{0} ředitelů", "{0} ředitelů") a hodnota platu může obsahovat odstupné či jinou smluvní odměnu"><i class="fa-solid fa-circle-info"></i>Info</a>
+                                }
+                                else if (prumerPlatu.PocetPlatuPrvniRok > 1 && prumerPlatu.PocetPlatuPosledniRok > 1 )
+                                {
+                                    <a href="#" class="link-danger" data-bs-toggle="tooltip"
+                                       data-bs-title="Plat roku @(minYear) je spočítán jako průměr platů 
+                                            @Devmasters.Lang.CS.Plural.Get((long)prumerPlatu.PocetPlatuPrvniRok, "jednoho ředitele", "{0} ředitelů", "{0} ředitelů") 
+                                            a plat roku @(PuRepo.DefaultYear) je spočítán jako průměr platů
+                                            @Devmasters.Lang.CS.Plural.Get((long)prumerPlatu.PocetPlatuPosledniRok, "jednoho ředitele", "{0} ředitelů", "{0} ředitelů").
+                                            Hodnota platu tak může obsahovat jedno nebo více odstupné či jiné smluvní odměny."><i class="fa-solid fa-circle-info"></i>Info</a>
+                                }
+                                else if (prumerPlatu.PocetPlatuPrvniRok == 1 && prumerPlatu.PocetMesicuPrvniRok < 12
+                                    && prumerPlatu.PocetPlatuPosledniRok == 1 && prumerPlatu.PocetMesicuPosledniRok < 12)
+                                {
+                                    <a href="#" class="link-danger me-2" data-bs-toggle="tooltip" data-bs-title="Plat roku @(minYear) je pouze za @Devmasters.Lang.CS.Plural.Get((long)prumerPlatu.PocetMesicuPrvniRok, "jeden měsíc", "{0} měsíce", "{0} měsíců"), plat roku @(PuRepo.DefaultYear) je pouze za @Devmasters.Lang.CS.Plural.Get((long)prumerPlatu.PocetMesicuPosledniRok, "jeden měsíc", "{0} měsíce", "{0} měsíců") a mohou obsahovat odstupné či jinou smluvní odměnu"><i class="fa-solid fa-circle-info"></i>Info</a>
+                                }
+                                else if (prumerPlatu.PocetPlatuPrvniRok == 1 && prumerPlatu.PocetMesicuPrvniRok < 12)
+                                {
+                                    <a href="#" class="link-danger me-2" data-bs-toggle="tooltip" data-bs-title="Plat roku @(minYear) je pouze za @Devmasters.Lang.CS.Plural.Get((long)prumerPlatu.PocetMesicuPrvniRok, "jeden měsíc", "{0} měsíce", "{0} měsíců") a může obsahovat odstupné či jinou smluvní odměnu"><i class="fa-solid fa-circle-info"></i>Info</a>
+                                }
+                                else if (prumerPlatu.PocetPlatuPosledniRok == 1 && prumerPlatu.PocetMesicuPosledniRok < 12)
+                                {
+                                    <a href="#" class="link-danger me-2" data-bs-toggle="tooltip" data-bs-title="Plat roku @(PuRepo.DefaultYear) je pouze za @Devmasters.Lang.CS.Plural.Get((long)prumerPlatu.PocetMesicuPosledniRok, "jeden měsíc", "{0} měsíce", "{0} měsíců") a může obsahovat odstupné či jinou smluvní odměnu"><i class="fa-solid fa-circle-info"></i>Info</a>
+                                }
+
                                 else
                                 {
                                     <text>&nbsp;</text>
