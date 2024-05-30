@@ -18,18 +18,20 @@
             continue;
 
         var rustPlatu = new PrumerPlatu()
-                {
-                    DatovaSchrankaOrganizace = org.DS,
-                    NazevOrganizace = org.Nazev,
-                    PlatPrvniRok = platyPrvniRok.FirstOrDefault()?.HrubyMesicniPlatVcetneOdmen,
-                    PlatPosledniRok = platyPosledniRok.FirstOrDefault()?.HrubyMesicniPlatVcetneOdmen,
-                    PocetMesicu = platyPosledniRok.FirstOrDefault()?.PocetMesicu
-                };
+        {
+            DatovaSchrankaOrganizace = org.DS,
+            NazevOrganizace = org.Nazev,
+            PlatPrvniRok = platyPrvniRok.Average(p => p.HrubyMesicniPlatVcetneOdmen),
+            PocetMesicuPrvniRok = platyPrvniRok.Sum(p => p.PocetMesicu),
+            PocetPlatuPrvniRok = platyPrvniRok.Count(),
+            
+            PlatPosledniRok = platyPosledniRok.Average(p => p.HrubyMesicniPlatVcetneOdmen),
+            PocetMesicuPosledniRok = platyPosledniRok.Sum(p => p.PocetMesicu),
+            PocetPlatuPosledniRok = platyPosledniRok.Count(),
+        };
 
         //filter results
-        if (
-            rustPlatu.PlatPrvniRok > 0 && rustPlatu.PlatPosledniRok > 0
-            )
+        if (rustPlatu.PlatPrvniRok > 0 && rustPlatu.PlatPosledniRok > 0)
         {
             if (max && rustPlatu.NarustProcentualni > 0)
                 rusty.Add(rustPlatu);
