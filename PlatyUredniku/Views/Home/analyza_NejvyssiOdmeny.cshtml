@@ -81,7 +81,7 @@
                             <td class="number" data-order="@(HlidacStatu.Util.RenderData.OrderValueFormat(plat.OsobniOhodnoceniPerc ?? 0))">
                                 @if (plat.PocetMesicu < 12)
                                 {
-                                    <a href="#" class="link-danger me-2" data-bs-toggle="tooltip" data-bs-title="Plat je pouze za @Devmasters.Lang.CS.Plural.Get((long)plat.PocetMesicu.Value, "jeden měsíc", "{0} měsíce", "{0} měsíců") a může obsahovat odstupné či jinou smluvní odměnu"><i class="fa-solid fa-triangle-exclamation"></i>Info</a>
+                                    <a href="#" class="link-danger me-2" data-bs-toggle="tooltip" data-bs-title="Plat je pouze za @Devmasters.Lang.CS.Plural.Get((long)plat.PocetMesicu.Value, "jeden měsíc", "{0} měsíce", "{0} měsíců") a může obsahovat odstupné či jinou smluvní odměnu"><i class="fa-solid fa-circle-info"></i>Info</a>
                                 }
 
                                 @plat.OsobniOhodnoceniPerc?.ToString("P")
