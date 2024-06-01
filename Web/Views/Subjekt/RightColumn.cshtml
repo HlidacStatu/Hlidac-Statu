@@ -168,109 +168,95 @@
 
     @if (Model.PatrimStatu())
     {
-        var platyUredniku = await PlatyUrednikuRepo.GetCenyForIco(Model.ICO);
+        var platyUrednikuOrg = await PuRepo.GetFullDetailAsync(Model.DatovaSchranka);
 
-        if (platyUredniku.Any())
+        if (platyUrednikuOrg?.Platy?.Any() == true)
         {
-            var sortedYears = platyUredniku.OrderByDescending(pu => pu.Rok).Select(pu => pu.Rok).Distinct();
+            var sortedYears = platyUrednikuOrg.Platy.OrderByDescending(pu => pu.Rok).Select(pu => pu.Rok).Distinct();
 
             var lastYear = sortedYears.FirstOrDefault();
             var secondLastYear = sortedYears.Skip(1).FirstOrDefault();
 
-            var platyLastYear = platyUredniku.Where(pu => pu.Rok == lastYear).OrderBy(pu => pu.Pozice).ToList();
+            var platyLastYear = platyUrednikuOrg.Platy
+            .Where(pu => pu.Rok == lastYear)
+            .OrderBy(pu => pu.HrubyMesicniPlatVcetneOdmen)
+            .ToList();
+            var platySecondLastYear = platyUrednikuOrg.Platy
+            .Where(pu => pu.Rok == secondLastYear)
+            .OrderBy(pu => pu.HrubyMesicniPlatVcetneOdmen)
+            .ToList();
 
-            var othersLast = platyLastYear.Where(pu => !pu.HeadOfOffice).Where(pu => pu.PocetMes > 0);
 
-            var minOthersLast = othersLast.Count() == 0 ? 0 : othersLast.Min(pu => (pu.Plat + pu.Odmeny + pu.Bonus) / pu.PocetMes);
-
-            var maxOthersLast = othersLast.Count() == 0 ? 0 : othersLast.Max(pu => (pu.Plat + pu.Odmeny + pu.Bonus) / pu.PocetMes);
-
-            <p>Průměrná měsíční mzda včetně odměn</p>
-
-            <table>
-                <tr>
-                    <th colspan="2" class="col-sm-12">
-                        za rok @lastYear
-                    </th>
-                </tr>
-                @foreach (var plat in platyLastYear.Where(p => p.HeadOfOffice))
-                {
-                    if (plat.PocetMes > 0)
-                    {
-                        var mesicniPlatVcetneOdmen = (plat.Plat + plat.Odmeny + plat.Bonus) / plat.PocetMes;
+            <hr />
+            <div class="card">
+                <div class="card-header">
+                    <b> <i class="fa-solid fa-user-tie-hair"></i><i class="fa-solid fa-user-tie-hair-long"></i> Platy úředníků</b>
+                </div>
+                <div class="card-body">
+                    <h5 class="card-title">Průměrná měsíční mzda včetně odměn</h5>
+                    <table>
                         <tr>
-                            <td class="text-nowrap text-muted col-sm-5">@plat.Pozice</td>
-                            <td class="col-sm-7 text-end">@mesicniPlatVcetneOdmen.ToString("##,##0")&nbsp;Kč</td>
+                            <th colspan="2" class="col-sm-12">
+                                za rok @lastYear
+                            </th>
                         </tr>
-                    }
-                }
-                @if (platyLastYear.Count > 1)
-                {
-                    <tr>
-                        <td class="text-nowrap text-muted col-sm-5">Rozsah @platyLastYear.Count platů vedoucích pozic</td>
-                        <td class="col-sm-7 text-end">@minOthersLast.ToString("##,##0")&nbsp;-&nbsp;@maxOthersLast.ToString("##,##0")&nbsp;Kč</td>
-                    </tr>
-                }
-                else if (platyLastYear.Count == 0)
-                {
-                    var plat = platyLastYear.FirstOrDefault();
-                    var mesicniPlatVcetneOdmen = (plat.Plat + plat.Odmeny + plat.Bonus) / plat.PocetMes;
-                    <tr>
-                        <td class="text-nowrap text-muted col-sm-5">@plat.Pozice</td>
-                        <td class="col-sm-7 text-end">@mesicniPlatVcetneOdmen.ToString("##,##0")&nbsp;Kč</td>
-                    </tr>
-                }
-                @if (secondLastYear != 0)
-                {
-                    var platySecondLastYear = platyUredniku.Where(pu => pu.Rok == secondLastYear).OrderBy(pu => pu.Pozice).ToList();
-
-                    var othersSecondLast = platySecondLastYear.Where(pu => !pu.HeadOfOffice).Where(pu => pu.PocetMes > 0);
-                    var minOthersSecondLast = othersSecondLast.Count() == 0 ? 0 :
-                    othersSecondLast.Min(pu => (pu.Plat + pu.Odmeny + pu.Bonus) / pu.PocetMes);
-                    var maxOthersSecondLast = othersSecondLast.Count() == 0 ? 0 :
-                    othersSecondLast.Max(pu => (pu.Plat + pu.Odmeny + pu.Bonus) / pu.PocetMes);
-
-                    <tr>
-                        <th colspan="2" class="col-sm-12">
-                            za rok @secondLastYear
-                        </th>
-                    </tr>
-                    @foreach (var plat in platySecondLastYear.Where(p => p.HeadOfOffice))
-                    {
-                        if (plat.PocetMes > 0)
+                        @foreach (var plat in platyLastYear.Where(p => p.JeHlavoun == true))
                         {
-                            var mesicniPlatVcetneOdmen = (plat.Plat + plat.Odmeny + plat.Bonus) / plat.PocetMes;
+                            if (plat.PocetMesicu > 0)
+                            {
+                                <tr>
+                                    <td class="text-muted col-sm-5">@plat.NazevPozice</td>
+                                    <td class="col-sm-7 text-end">@HlidacStatu.Util.RenderData.NicePriceHtml(plat.HrubyMesicniPlatVcetneOdmen)</td>
+                                </tr>
+                            }
+                        }
+                        @if (platyLastYear.Count > 1)
+                        {
                             <tr>
-                                <td class="text-nowrap text-muted col-sm-5">@plat.Pozice</td>
-                                <td class="col-sm-7 text-end">@mesicniPlatVcetneOdmen.ToString("##,##0")&nbsp;Kč</td>
+                                <td class="text-muted col-sm-5">Rozsah @platyLastYear.Count platů vedoucích pozic</td>
+                                <td class="col-sm-7 text-end ">
+                                    @HlidacStatu.Util.RenderData.NicePriceHtml(platyLastYear.Where(m => m.JeHlavoun != true).First().HrubyMesicniPlatVcetneOdmen)&nbsp;-&nbsp;@HlidacStatu.Util.RenderData.NicePriceHtml(platyLastYear.Where(m => m.JeHlavoun != true).Last().HrubyMesicniPlatVcetneOdmen)
+                                </td>
                             </tr>
                         }
-                    }
-                    @if (platySecondLastYear.Count > 1)
-                    {
-                        <tr>
-                            <td class="text-nowrap text-muted col-sm-5">Rozsah @platySecondLastYear.Count platů vedoucích pozic</td>
-                            <td class="col-sm-7 text-end">@minOthersSecondLast.ToString("##,##0")&nbsp;-&nbsp;@maxOthersSecondLast.ToString("##,##0")&nbsp;Kč</td>
-                        </tr>
-                    }
-                    else if (platySecondLastYear.Count == 0)
-                    {
-                        var plat = platySecondLastYear.FirstOrDefault();
-                        var mesicniPlatVcetneOdmen = (plat.Plat + plat.Odmeny + plat.Bonus) / plat.PocetMes;
-                        <tr>
-                            <td class="text-nowrap text-muted col-sm-5">@plat.Pozice</td>
-                            <td class="col-sm-7 text-end">@mesicniPlatVcetneOdmen.ToString("##,##0")&nbsp;Kč</td>
-                        </tr>
-                    }
-                }
+                        @if (platySecondLastYear.Count > 0)
+                        {
+                            <tr style="height: 2.5em;vertical-align: bottom;">
+                                <th colspan="2" class="col-sm-12">
+                                    za rok @secondLastYear
+                                </th>
+                            </tr>
+                            @foreach (var plat in platyLastYear.Where(p => p.JeHlavoun == true))
+                            {
+                                if (plat.PocetMesicu > 0)
+                                {
+                                    <tr>
+                                        <td class="text-muted col-sm-5">@plat.NazevPozice</td>
+                                        <td class="col-sm-7 text-end">@HlidacStatu.Util.RenderData.NicePriceHtml(plat.HrubyMesicniPlatVcetneOdmen)</td>
+                                    </tr>
+                                }
+                            }
 
-            </table>
-            <p class="text-end mt-4"> Informace o platech z <a href="@platyUredniku.FirstOrDefault().Link">platyuredniku.cz</a> </p>
-            <hr />
+                            <tr>
+                                <td class="text-muted col-sm-5">Rozsah @platySecondLastYear.Count platů vedoucích pozic</td>
+                                <td class="col-sm-7 text-end ">
+                                    @HlidacStatu.Util.RenderData.NicePriceHtml(platySecondLastYear.Where(m => m.JeHlavoun != true).First().HrubyMesicniPlatVcetneOdmen)&nbsp;-&nbsp;@HlidacStatu.Util.RenderData.NicePriceHtml(platySecondLastYear.Where(m => m.JeHlavoun != true).Last().HrubyMesicniPlatVcetneOdmen)
+                                </td>
+                            </tr>
+
+                        }
+
+                    </table>
+                </div>
+                <div class="card-footer text-muted">
+                    <a href="@(platyUrednikuOrg.GetUrl())">Detailní informace o platech @Model.Jmeno.ShortenMeInMiddle(40) <i class="fa-regular fa-arrow-up-right-from-square" aria-hidden="true"></i></a>
+                </div>
+            </div>
         }
     }
 
     <div class="watcher">
+        <hr />
         <h4>Chci hlídat</h4>
         <div>
             @{

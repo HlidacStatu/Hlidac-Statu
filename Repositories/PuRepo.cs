@@ -162,11 +162,15 @@ inner join Firma_DS fds
 
     public static async Task<PuOrganizace> GetFullDetailAsync(string datovaSchranka)
     {
+        return await GetFullDetailAsync(new string[] { datovaSchranka });
+    }
+    public static async Task<PuOrganizace> GetFullDetailAsync(string[] datovaSchranky)
+    {
         await using var db = new DbEntities();
 
         return await db.PuOrganizace
             .AsNoTracking()
-            .Where(pu => pu.DS == datovaSchranka)
+            .Where(pu => datovaSchranky.Contains(pu.DS) )
             .Include(o => o.Metadata)
             .Include(o => o.Tags)
             .Include(o => o.FirmaDs)

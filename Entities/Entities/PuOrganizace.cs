@@ -7,7 +7,7 @@ namespace HlidacStatu.Entities.Entities;
 public class PuOrganizace
 {
     public const char PathSplittingChar = '>';
-    
+
     [Key]
     public int Id { get; set; }
 
@@ -24,4 +24,10 @@ public class PuOrganizace
     public virtual ICollection<PuOrganizaceTag> Tags { get; set; }
     public virtual ICollection<PuPlat> Platy { get; set; }
     public virtual ICollection<PuOrganizaceMetadata> Metadata { get; set; }
+
+    public string GetUrl(bool relative = false)
+    {
+        var url = $"/Detail/{this.DS}";
+        return relative ? url : "https://platyuredniku.hlidacstatu.cz" + url;
+    }
 }
