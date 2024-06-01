@@ -344,8 +344,8 @@
 <section class="d-flex justify-content-center  @(sectionBgSwitch ? "alter-bg-color" : "")">
     <div class="container">
         <h3>Open data</h3>
-        <p>Open data s kompletními platy pro @(Model.Nazev) za všechny dostupné roky</p>
-        <partial name="ExportModal" model="@(new ExportModalViewModel() { DatovaSchranka = Model.DS, Titulek = $"Export dat pro {Model.Nazev}" })" />
+        <p>Open data s kompletními platy pro <b>@(Model.Nazev)</b></b> za všechny dostupné roky</p>
+        <partial name="ExportModal" model="@(new ExportModalViewModel() { DatovaSchranka = Model.DS, Titulek = $"Export dat pro {Model.Nazev}", NazevTlacitka=$"Open data pro {Model.Nazev}" })" />
 
     </div>
 </section>
