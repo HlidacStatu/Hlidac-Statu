@@ -2,6 +2,7 @@
 @using PlatyUredniku.Models;
 @using System.Collections.Generic;
 @using HlidacStatu.Entities.Entities;
+@using HlidacStatu.Util;
 
 @{
     int rok = Devmasters.ParseText.ToInt(this.Context.Request.Query.GetFirstQueryParameter("rok")) ?? PuRepo.DefaultYear;
@@ -34,10 +35,29 @@
     <script type="text/javascript" charset="utf8" src="//cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
 }
 
+
+
 <section class="d-flex align-items-center justify-content-center">
     <div class="container">
-        <h2>Přehled platů u kterých odměny tvoří nejvyšší část za rok @ViewData["rok"]</h2>
+
+        <h2>Přehled platů u kterých odměny tvoří nejvyšší část za rok @rok</h2>
         <p class="text-muted">Přehled pracovních pozic, u kterých odměna tvoří nejvyšší podíl celkového příjmu.</p>
+
+        <div class="nav flex-row nav-pills">
+            <button class="nav-link disabled" type="button" disabled="disabled">Rok</button>
+            @{
+
+                foreach (var y in PuRepo.AllYears.Reverse())
+                {
+                    <a href="@(this.Context.Request.GetCurrentUrl("rok",y.ToString()))" 
+                            class="@($"nav-link {(rok ==y ? "active" :  "")}")"
+                            type="button"
+                            role="tab">
+                        @y
+                    </a>
+                }
+            }
+        </div>
 
         <div class="tab-pane width-75vp" id="prehledOdmen" role="tabpanel">
             <script>
@@ -81,7 +101,7 @@
                             <td class="number" data-order="@(HlidacStatu.Util.RenderData.OrderValueFormat(plat.OsobniOhodnoceniPerc ?? 0))">
                                 @if (plat.PocetMesicu < 12)
                                 {
-                                    <a href="#" class="link-danger me-2" data-bs-toggle="tooltip" data-bs-title="Plat je pouze za @Devmasters.Lang.CS.Plural.Get((long)plat.PocetMesicu.Value, "jeden měsíc", "{0} měsíce", "{0} měsíců") a může obsahovat odstupné či jinou smluvní odměnu"><i class="fa-solid fa-circle-info"></i>Info</a>
+                                    <a href="#" class="link-danger me-2" data-bs-toggle="tooltip" data-bs-title="Plat je pouze za @Devmasters.Lang.CS.Plural.Get((long)plat.PocetMesicu.Value, "jeden měsíc", "{0} měsíce", "{0} měsíců") a může obsahovat odstupné či jinou smluvní odměnu"><i class="fa-solid fa-circle-info"></i></a>
                                 }
 
                                 @plat.OsobniOhodnoceniPerc?.ToString("P")

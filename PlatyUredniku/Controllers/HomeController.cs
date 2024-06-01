@@ -8,6 +8,9 @@ using System.Linq;
 using System.Threading.Tasks;
 using Devmasters.Enums;
 using ZiggyCreatures.Caching.Fusion;
+using System.Text;
+using System;
+using Microsoft.AspNetCore.OutputCaching;
 
 namespace PlatyUredniku.Controllers;
 
@@ -59,28 +62,28 @@ public class HomeController : Controller
                 range = (0_000, prumernyPlat);
                 title = "Manažerské platy ve veřejné správě nižší než průměrný plat v ČR za rok 2023";
                 noteHtml = "Průměrný plat v Q4 2023 <a href='https://www.czso.cz/csu/czso/cri/prumerne-mzdy-4-ctvrtleti-2023' target='_blank'>podle ČSÚ </a>v Q4 2023 byl <b>46 013 Kč hrubého</b>.";
-                rozsah = $"Rozsah zobrazovaných platů je od nuly až po průměrný plat (<b>46 013 Kč</b>).";
+                rozsah = $"Rozsah zobrazovaných platů manažerů ve veřejné správě je od nuly až po průměrný plat (<b>46 013 Kč</b>).";
                 odkaz = $"<a href=\"/DlePlatu/3\">Vyšší než průměrné platy</a>";
                 break;
             case 3:
                 range = (prumernyPlat, prumernyPlat * 2);
                 title = "Manažerské platy ve veřejné správě vyšší než průměrný plat v ČR za rok 2023";
                 noteHtml = "Průměrný plat v Q4 2023 <a href='https://www.czso.cz/csu/czso/cri/prumerne-mzdy-4-ctvrtleti-2023' target='_blank'>podle ČSÚ </a>v Q4 2023 byl <b>46 013 Kč hrubého</b>.";
-                rozsah = $"Rozsah zobrazovaných platů je od průměrného platu (<b>46 013 Kč</b>) po dvojnásobek průměrného platu (<b>92 026 Kč</b>).";
+                rozsah = $"Rozsah zobrazovaných platů manažerů ve veřejné správě je od průměrného platu (<b>46 013 Kč</b>) po dvojnásobek průměrného platu (<b>92 026 Kč</b>).";
                 odkaz = $"<a href=\"/DlePlatu/4\">Nejvyšší platy ve veřejné správě</a>";
                 break;
             case 4:
                 range = (prumernyPlat * 2, 100_000_000);
                 title = "Nejvyšší manažerské platy ve veřejné správě za rok 2023";
-                noteHtml = "Zobrazujeme platy, které jsou více než dvojnásobné, než je průměrný plat v Q4 2023 <a href='https://www.czso.cz/csu/czso/cri/prumerne-mzdy-4-ctvrtleti-2023' target='_blank'>podle ČSÚ </a>(46 013 Kč hrubého).";
-                rozsah = $"Zobrazované platy jsou větší než dvojnásobek průměrného platu (<b>92 026 Kč</b>).";
+                noteHtml = "Zobrazujeme platy manažerů, které jsou více než dvojnásobné, než je průměrný plat v Q4 2023 <a href='https://www.czso.cz/csu/czso/cri/prumerne-mzdy-4-ctvrtleti-2023' target='_blank'>podle ČSÚ </a>(46 013 Kč hrubého).";
+                rozsah = $"Zobrazované platy manažerů ve veřejné správě jsou větší než dvojnásobek průměrného platu (<b>92 026 Kč</b>).";
                 break;
             case 1:
             default:
                 range = (0_000, 33_000);
                 title = "Manažerské platy ve veřejné správě za rok 2023 nižší než nástupní plat pokladní/ho v Lidlu ";
                 noteHtml = "Nástupní plat pokladní v Lidl v Praze byl <a href='https://www.idnes.cz/ekonomika/domaci/lidl-mzdy-prodavaci-obchod-retezec.A231213_161827_ekonomika_ven' target='_blank'>podle iDnes</a> <b>33 700 Kč hrubého</b>.";
-                rozsah = $"Rozsah zobrazovaných platů je od nuly až po nástupní plat pokladní/ho v Lidlu (<b>33 700 Kč</b>).";
+                rozsah = $"Rozsah zobrazovaných platů manažerů ve veřejné správě je od nuly až po nástupní plat pokladní/ho v Lidlu (<b>33 700 Kč</b>).";
                 odkaz = $"<a href=\"/DlePlatu/2\">Nižší než průměrné platy</a>";
                 break;
         }
@@ -288,5 +291,108 @@ public class HomeController : Controller
         }
 
         return File(rawData, contentType, filename);
+    }
+
+
+    [OutputCache(Duration = 3600*24*7)]
+    public async Task<IActionResult> SiteMap()
+    {
+        string modif = DateTime.Now.Date.ToString("yyyy-MM-dd") + "T09:00:00+00:00";
+        StringBuilder sb = new StringBuilder(1024*20);
+        sb.AppendLine(@$"<urlset xmlns=""http://www.sitemaps.org/schemas/sitemap/0.9"" xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"" xsi:schemaLocation=""http://www.sitemaps.org/schemas/sitemap/0.9
+            http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd"">
+    <url>
+        <loc>https://platyuredniku.hlidacstatu.cz/</loc>
+        <lastmod>{modif}</lastmod>
+        <priority>1.00</priority>
+    </url>
+    <url>
+        <loc>https://platyuredniku.hlidacstatu.cz/Texty/OProjektu</loc>
+        <lastmod>{modif}</lastmod>
+        <priority>0.80</priority>
+    </url>
+    <url>
+        <loc>https://platyuredniku.hlidacstatu.cz/Texty/PlatyStatnichZamestnancu</loc>
+        <lastmod>{modif}</lastmod>
+        <priority>0.80</priority>
+    </url>
+    <url>
+        <loc>https://platyuredniku.hlidacstatu.cz/Texty/Nejvyssi</loc>
+        <lastmod>{modif}</lastmod>
+        <priority>0.80</priority>
+    </url>
+
+    <url>
+        <loc>https://platyuredniku.hlidacstatu.cz/DlePlatu/1</loc>
+        <lastmod>{modif}</lastmod>
+        <priority>0.80</priority>
+    </url>
+    <url>
+        <loc>https://platyuredniku.hlidacstatu.cz/DlePlatu/2</loc>
+        <lastmod>{modif}</lastmod>
+        <priority>0.80</priority>
+    </url>
+    <url>
+        <loc>https://platyuredniku.hlidacstatu.cz/DlePlatu/3</loc>
+        <lastmod>{modif}</lastmod>
+        <priority>0.80</priority>
+    </url>
+    <url>
+        <loc>https://platyuredniku.hlidacstatu.cz/DlePlatu/4</loc>
+        <lastmod>{modif}</lastmod>
+        <priority>0.80</priority>
+    </url>
+    <url>
+        <loc>https://platyuredniku.hlidacstatu.cz/analyzy</loc>
+        <lastmod>{modif}</lastmod>
+        <priority>0.80</priority>
+    </url>
+    <url>
+        <loc>https://platyuredniku.hlidacstatu.cz/analyza/</loc>
+        <lastmod>{modif}</lastmod>
+        <priority>0.80</priority>
+    </url>
+
+");
+        foreach (var item in new string[]{ 
+            "ZmenaPlatuCeos","ZmenaPlatuCeos?max=false","ZmenaNejvyssihoPlatu","ZmenaNejvyssihoPlatu?max=false",
+                "NejvyssiOdmeny","kategorie","kategorie?k1=23" }
+        )
+        {
+            sb.AppendLine("<url>");
+            sb.AppendLine($"<loc>https://platyuredniku.hlidacstatu.cz/analyza/{System.Security.SecurityElement.Escape(item)}</loc>");
+            sb.AppendLine($"<lastmod>{modif}</lastmod>");
+            sb.AppendLine($"<priority>0.80</priority>");
+            sb.AppendLine($"</url>");
+        }
+
+        foreach (var item in PuRepo.MainTags)
+        {
+            sb.AppendLine("<url>");
+            sb.AppendLine($"<loc>https://platyuredniku.hlidacstatu.cz/Oblast/{System.Security.SecurityElement.Escape(item)}</loc>");
+            sb.AppendLine($"<lastmod>{modif}</lastmod>");
+            sb.AppendLine($"<priority>0.80</priority>");
+            sb.AppendLine($"</url>");
+        }
+        foreach (var org in (await PuRepo.GetPlatyForYearsAsync(PuRepo.MinYear,PuRepo.DefaultYear)))
+        {
+            sb.AppendLine("<url>");
+            sb.AppendLine($"<loc>https://platyuredniku.hlidacstatu.cz/detail/{System.Security.SecurityElement.Escape(org.DS)}</loc>");
+            sb.AppendLine($"<lastmod>{modif}</lastmod>");
+            sb.AppendLine($"<priority>0.80</priority>");
+            sb.AppendLine($"</url>");
+            foreach (var item in org.Platy)
+            {
+                sb.AppendLine("<url>");
+                sb.AppendLine($"<loc>https://platyuredniku.hlidacstatu.cz/Plat/{System.Security.SecurityElement.Escape(item.Id.ToString())}</loc>");
+                sb.AppendLine($"<lastmod>{modif}</lastmod>");
+                sb.AppendLine($"<priority>0.60</priority>");
+                sb.AppendLine($"</url>");
+            }
+        }
+
+
+        sb.AppendLine("</urlset>");
+        return Content(sb.ToString(), "application/xml");
     }
 }

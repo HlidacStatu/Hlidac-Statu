@@ -1,4 +1,5 @@
 using Devmasters.Collections;
+using EnumsNET;
 using HlidacStatu.Connectors;
 using HlidacStatu.Entities;
 using HlidacStatu.Entities.Entities;
@@ -14,6 +15,8 @@ public static class PuRepo
 {
     public const int DefaultYear = 2023;
     public const int MinYear = 2016;
+
+    public static int[] AllYears = Enumerable.Range(MinYear, DefaultYear-MinYear+1).ToArray();
 
     public static readonly string[] MainTags =
     [
@@ -178,8 +181,12 @@ public static class PuRepo
             query = query.Where(pu =>
                 pu.Metadata.Any(m => m.Rok == year.Value) || pu.Platy.Any(p => p.Rok == year.Value));
         }
+        var data = await query.ToListAsync();
+        data = data
+            .Where(o => o.Tags.Any())
+            .ToList();
 
-        return await query.ToListAsync();
+        return data;
     }
 
     public static async Task<PuOrganizace> GetOrganizationOfTheDayAsync()
@@ -532,12 +539,16 @@ select distinct ds.DatovaSchranka, f.ico from firma f
         var result = await db.PuOrganizace
             .AsNoTracking()
             .Include(o => o.FirmaDs)
+            .Include(o => o.Tags)
             .Select(o => new
             {
                 o, // Include the main entity
                 Platy = o.Platy.Where(p => p.Rok == minYear || p.Rok == lastYear).ToList()
             })
-            .ToListAsync();
+            .ToArrayAsync();
+        result = result
+            .Where(m => m.o.Tags.Any())
+            .ToArray();
 
         // Map the result back to the list of PuOrganizace with filtered Platy
         return result.Select(x =>

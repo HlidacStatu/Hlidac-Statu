@@ -1,1 +1,5 @@
 User-agent: *
+Disallow: /Account/*
+Disallow: /Admin/*
+
+Sitemap: https://platyuredniku.hlidacstatu.cz/sitemap

@@ -88,8 +88,13 @@ public class AutocompleteCacheService
     {
         await using var db = new DbEntities();
 
-        return await db.PuOrganizace.AsNoTracking()
+        var data = await db.PuOrganizace.AsNoTracking()
             .Include(o => o.FirmaDs)
+            .Include(o => o.Tags)
+            .ToListAsync(cancellationToken: cancellationToken);
+
+        data = data.Where(m => m.Tags.Any()).ToList();
+        var res = data
             .Select(o => new Autocomplete()
             {
                 Id = $"/detail/{o.DS}",
@@ -101,7 +106,9 @@ public class AutocompleteCacheService
                 Description = "", //puvodne $"{o.Oblast}" //TODO zmenit na tagy?
                 Category = Autocomplete.CategoryEnum.Authority,
             })
-            .ToListAsync(cancellationToken: cancellationToken);
+            .ToList();
+        
+        return res;
     }
     
     private async Task<List<Autocomplete>> LoadOblasti(CancellationToken cancellationToken)
