@@ -13,7 +13,10 @@
     List<PrumerPlatu> rusty = new();
     foreach (var org in orgs)
     {
-        var platyBezCeos = org.Platy.Where(plat => plat.JeHlavoun != true).ToList();
+        var platyBezCeos = org.Platy
+            .Where(plat => plat.JeHlavoun != true)
+            .Where(plat => plat.PocetMesicu == 12)
+            .ToList();
         var platyPrvniRok = platyBezCeos.Where(p => p.Rok == minYear);
         var platyPosledniRok = platyBezCeos.Where(p => p.Rok == PuRepo.DefaultYear);
         if (!platyPrvniRok.Any() || !platyPosledniRok.Any())
