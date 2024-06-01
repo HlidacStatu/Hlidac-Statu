@@ -13,6 +13,20 @@ namespace HlidacStatu.Repositories;
 
 public static class PuRepo
 {
+    /*
+     List PU_organizace s prelozenymi CZISCO
+    select o.id,f.Jmeno, o.DS, t2.nazev
+
+from PU_Organizace o 
+	cross apply (select nazev from string_split(o.CZISCO,',') ss inner join PU_ISPV_CZISCO cz on ss.value = cz.kod) t2
+
+inner join Firma_DS fds
+	on o.DS = fds.DatovaSchranka
+	inner join firma f on f.ICO = fds.ICO
+
+
+     */
+
     public const int DefaultYear = 2023;
     public const int MinYear = 2016;
 
