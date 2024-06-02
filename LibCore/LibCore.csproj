@@ -11,7 +11,7 @@
         <PackageReference Include="Devmasters.Cache" Version="5.1.1" />
         <PackageReference Include="Devmasters.Core" Version="5.0.23" />
         <PackageReference Include="Microsoft.AspNetCore.Http.Abstractions" Version="2.2.0" />
-        <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="8.0.4">
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="8.0.6">
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
@@ -24,7 +24,7 @@
         <PackageReference Include="Serilog.Sinks.File" Version="5.0.0" />
         <PackageReference Include="Serilog.Sinks.Http" Version="9.0.0" />
         <PackageReference Include="Serilog.Sinks.Udp" Version="10.0.0" />
-        <PackageReference Include="Swashbuckle.AspNetCore.SwaggerGen" Version="6.5.0" />
+        <PackageReference Include="Swashbuckle.AspNetCore.SwaggerGen" Version="6.6.2" />
     </ItemGroup>
 
     <ItemGroup>
