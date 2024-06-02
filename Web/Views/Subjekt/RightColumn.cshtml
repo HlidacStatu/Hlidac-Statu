@@ -166,9 +166,12 @@
 
     }
 
-    @if (Model.PatrimStatu())
-    {
+    @{
         var platyUrednikuOrg = await PuRepo.GetFullDetailAsync(Model.DatovaSchranka);
+    }
+    @if (platyUrednikuOrg != null)
+    {
+        
 
         if (platyUrednikuOrg?.Platy?.Any() == true)
         {

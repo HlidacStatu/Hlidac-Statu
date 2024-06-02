@@ -82,7 +82,7 @@
           <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
         <PackageReference Include="Microsoft.Extensions.Diagnostics.HealthChecks.EntityFrameworkCore" Version="8.0.4" />
-        <PackageReference Include="Microsoft.Extensions.Http.Polly" Version="8.0.4" />
+        <PackageReference Include="Microsoft.Extensions.Http.Polly" Version="8.0.6" />
         <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="8.0.2" />
         <PackageReference Include="PDFtoImage" Version="4.0.1" />
         <PackageReference Include="QuestPDF" Version="2024.3.1" />

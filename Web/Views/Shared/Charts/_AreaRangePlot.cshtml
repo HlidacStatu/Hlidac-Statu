@@ -1,9 +1,16 @@
 @model AreaRangeRenderOptions
 
-@using HlidacStatu.Entities.Entities
+@* COPY OF 
+    Hlidac-Statu\PlatyUredniku\Views\Shared\Graphs\_AreaRangePlot.cshtml
+
+ANY MODIFICATION HERE CONSIDER FOR primary file Hlidac-Statu\PlatyUredniku\Views\Shared\Graphs\_AreaRangePlot.cshtml
+
+*@
+
+
 @using HlidacStatu.Repositories.SharedModels
+@using HlidacStatu.Entities.Entities
 @using MathNet.Numerics.Statistics
-@using PlatyUredniku.Models
 
 @{
     string chartId = HlidacStatu.Util.Consts.Rnd.Next(999).ToString("000");

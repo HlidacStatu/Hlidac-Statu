@@ -4,12 +4,13 @@
 @using HlidacStatu.Entities.Entities
 @using MathNet.Numerics.Statistics
 @using PlatyUredniku.Models
+@using HlidacStatu.Repositories.SharedModels;
 
 @{
     string chartId = HlidacStatu.Util.Consts.Rnd.Next(999).ToString("000");
 
 
-    PlatyUredniku.Models.AreaRangePlot chartData = null;
+    AreaRangePlot chartData = null;
 
     var years = Model.Data.SelectMany(m => m.Values.Keys).Distinct().OrderBy(o=>o).ToArray();
 

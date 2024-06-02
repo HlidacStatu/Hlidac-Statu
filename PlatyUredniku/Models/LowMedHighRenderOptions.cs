@@ -1,4 +1,6 @@
-﻿namespace PlatyUredniku.Models;
+﻿using HlidacStatu.Repositories.SharedModels;
+
+namespace PlatyUredniku.Models;
 
 public class LowMedHighRenderOptions
 {

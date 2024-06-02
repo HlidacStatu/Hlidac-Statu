@@ -1,4 +1,5 @@
 @using Devmasters
+@using HlidacStatu.Repositories.SharedModels
 @using MathNet.Numerics.Statistics
 @using Microsoft.AspNetCore.Mvc.TagHelpers
 @using PlatyUredniku.Models
@@ -191,9 +192,9 @@
             <h3>Porovnání vývoje platů vzhledem k vybraným kategoriím pracovníků</h3>
 
             @{
-                //PlatyUredniku.Models.AreaRangePlot uradData =
+                //AreaRangePlot uradData =
                 List<AreaRangePlot> data = new List<AreaRangePlot>();
-                data.Add(PlatyUredniku.Models.AreaRangePlot.ToAreaRangePlotWithPrumer(Model.Platy, Model.Nazev));
+                data.Add(AreaRangePlot.ToAreaRangePlotWithPrumer(Model.Platy, Model.Nazev));
                 if (Model.Nazev.Contains("Ministerstvo"))
                 {
                     data[0].ExtraTitle = "Ministr/yně";

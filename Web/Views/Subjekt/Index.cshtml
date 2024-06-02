@@ -12,6 +12,7 @@
 @using HlidacStatu.XLib.Render;
 @using HlidacStatu.Entities.Analysis;
 @using HlidacStatu.Entities.KIndex
+@using HlidacStatu.Repositories.SharedModels;
 
 @{
     Layout = null;
@@ -651,53 +652,6 @@
 </div>
 <hr/>
 
-@* ----- Insolvence -----*@
-@{
-    intv.Stop();
-    intv = laps.StopPreviousAndStartNextLap("Insolvence");
-}
-
-<div>
-    <h4>Insolvenční rejstřík</h4>
-    <p class="text-muted sub-header-info">
-        Informace o insolvenčních řízeních, kterých se @Html.SubjektTypTrojice(Model, "úřad ", "organizace ", "firma ")
-        účastní jako dlužník, věřitel či správce.
-    </p>
-
-    @{
-        var insDluznik = await InsolvenceRepo.Searching.SimpleSearchAsync("icodluznik:" + Model.ICO, 1, 1, (int)HlidacStatu.Repositories.Searching.InsolvenceSearchResult.InsolvenceOrderResult.FastestForScroll, false, InsolvenceLimitedView.IsLimited(User));
-        var insVeritel = await InsolvenceRepo.Searching.SimpleSearchAsync("icoveritel:" + Model.ICO, 1, 1, (int)HlidacStatu.Repositories.Searching.InsolvenceSearchResult.InsolvenceOrderResult.FastestForScroll, false, InsolvenceLimitedView.IsLimited(User));
-        var insSpravce = await InsolvenceRepo.Searching.SimpleSearchAsync("icospravce:" + Model.ICO, 1, 1, (int)HlidacStatu.Repositories.Searching.InsolvenceSearchResult.InsolvenceOrderResult.FastestForScroll, false, InsolvenceLimitedView.IsLimited(User));
-
-        Dictionary<string, long> insolv = new();
-        insolv.Add("dluznik|dlužník|dlužníka|dlužníkem", insDluznik.Total);
-        insolv.Add("veritel|věřitel|věřitele|veřitelem", insVeritel.Total);
-        insolv.Add("spravce|insolvenční správce|insolvenčního správce|insolvenčním správcem", insSpravce.Total);
-    }
-    @if (insolv.Sum(m => m.Value) > 0)
-    {
-        <p>
-            @Model.Jmeno se vyskytuje
-            <ul>
-                @foreach (var kv in insolv.OrderByDescending(m => m.Value))
-                {
-                    var text = kv.Key.Split('|');
-                    string surl = WebUtil.GetSearchUrl("/insolvence/hledat", $"ico{text[0]}:" + Model.ICO);
-
-                    <li>
-                        @Html.Raw(Devmasters.Lang.CS.Plural.Get((int)kv.Value,
-                            " se vyskytuje v <a href='" + surl + "'><b>jedné insolvenci</b></a>", " se vyskytuje v <a href='" + surl + "'><b>{0} insolvencích</b></a>", " se vyskytuje v <a href='" + surl + "'><b>{0} insolvencích</b></a>")) jako @text[1].
-                    </li>
-                }
-            </ul>
-        </p>
-    }
-    <a href="/subjekt/InsolvencniRejstrik/@Model.ICO" class="moreinfolink text-uppercase">
-        <strong>Zobrazit podrobnosti o insolvencích</strong>
-    </a>
-</div>
-<hr/>
-
 @* ----- Sponzoring -----*@
 @if (Model.IsSponzor() || HlidacStatu.Repositories.StaticData.FirmySVazbamiNaPolitiky_nedavne_Cache.Get().SoukromeFirmy.ContainsKey(Model.ICO))
 {
@@ -718,6 +672,71 @@
     </div>
     <hr/>
 }
+
+
+    @* ----- Insolvence -----*@
+    @{
+        intv.Stop();
+        intv = laps.StopPreviousAndStartNextLap("Insolvence");
+    }
+
+    <div>
+        <h4>Insolvenční rejstřík</h4>
+        <p class="text-muted sub-header-info">
+            Informace o insolvenčních řízeních, kterých se @Html.SubjektTypTrojice(Model, "úřad ", "organizace ", "firma ")
+            účastní jako dlužník, věřitel či správce.
+        </p>
+
+        @{
+            var insDluznik = await InsolvenceRepo.Searching.SimpleSearchAsync("icodluznik:" + Model.ICO, 1, 1, (int)HlidacStatu.Repositories.Searching.InsolvenceSearchResult.InsolvenceOrderResult.FastestForScroll, false, InsolvenceLimitedView.IsLimited(User));
+            var insVeritel = await InsolvenceRepo.Searching.SimpleSearchAsync("icoveritel:" + Model.ICO, 1, 1, (int)HlidacStatu.Repositories.Searching.InsolvenceSearchResult.InsolvenceOrderResult.FastestForScroll, false, InsolvenceLimitedView.IsLimited(User));
+            var insSpravce = await InsolvenceRepo.Searching.SimpleSearchAsync("icospravce:" + Model.ICO, 1, 1, (int)HlidacStatu.Repositories.Searching.InsolvenceSearchResult.InsolvenceOrderResult.FastestForScroll, false, InsolvenceLimitedView.IsLimited(User));
+
+            Dictionary<string, long> insolv = new();
+            insolv.Add("dluznik|dlužník|dlužníka|dlužníkem", insDluznik.Total);
+            insolv.Add("veritel|věřitel|věřitele|veřitelem", insVeritel.Total);
+            insolv.Add("spravce|insolvenční správce|insolvenčního správce|insolvenčním správcem", insSpravce.Total);
+        }
+        @if (insolv.Sum(m => m.Value) > 0)
+        {
+            <p>
+                @Model.Jmeno se vyskytuje
+                <ul>
+                    @foreach (var kv in insolv.OrderByDescending(m => m.Value))
+                    {
+                        var text = kv.Key.Split('|');
+                        string surl = WebUtil.GetSearchUrl("/insolvence/hledat", $"ico{text[0]}:" + Model.ICO);
+
+                        <li>
+                            @Html.Raw(Devmasters.Lang.CS.Plural.Get((int)kv.Value,
+                                     " se vyskytuje v <a href='" + surl + "'><b>jedné insolvenci</b></a>", " se vyskytuje v <a href='" + surl + "'><b>{0} insolvencích</b></a>", " se vyskytuje v <a href='" + surl + "'><b>{0} insolvencích</b></a>")) jako @text[1].
+                        </li>
+                    }
+                </ul>
+            </p>
+        }
+        <a href="/subjekt/InsolvencniRejstrik/@Model.ICO" class="moreinfolink text-uppercase">
+            <strong>Zobrazit podrobnosti o insolvencích</strong>
+        </a>
+    </div>
+    <hr />
+
+
+@* ----- Odkazy platy uredniku-----*@
+    @{
+        var platyUrednikuOrg = await PuRepo.GetFullDetailAsync(Model.DatovaSchranka);
+    }
+    @if (platyUrednikuOrg?.Platy?.Count>0)
+    {
+        <h4>Platy vedení organizace</h4>
+        <p class="text-muted sub-header-info">
+            Rozsah průměrných manažerských měsíčních platů vedení organizace (včetně odměn) přepočtených z ročního příjmu za sledované období. Více na <a href="@platyUrednikuOrg.GetUrl()" target="_blank"><b>PlatyUredniku.hlidacstatu.cz</b> <i class="fa-regular fa-arrow-up-right-from-square" aria-hidden="true"></i></a>.
+        </p>
+
+        <partial name="Charts/_AreaRangePlot" model="@(new AreaRangeRenderOptions(){ Platy= platyUrednikuOrg.Platy, CssHeight="380" })" />
+
+        <p>Detaily, historická data a analýzy platů organizace i 300+ organizací veřejné správy na <a href="@platyUrednikuOrg.GetUrl()" target="_blank"><b>PlatyUredniku.hlidacstatu.cz</b></a></p>
+    }
 
 @* ----- Odkazy na další -----*@
 @if (Model.JsemStatniFirma())

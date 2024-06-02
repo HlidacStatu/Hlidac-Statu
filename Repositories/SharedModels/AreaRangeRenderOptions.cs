@@ -1,7 +1,7 @@
 ﻿using HlidacStatu.Entities.Entities;
 using System.Collections.Generic;
 
-namespace PlatyUredniku.Models;
+namespace HlidacStatu.Repositories.SharedModels;
 
 public class AreaRangeRenderOptions
 {

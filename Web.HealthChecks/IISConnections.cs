@@ -10,6 +10,7 @@ using System.Net;
 using System.Net.NetworkInformation;
 using System.Threading;
 using System.Threading.Tasks;
+using MathNet.Numerics;
 
 namespace HlidacStatu.Web.HealthChecks
 {
@@ -42,7 +43,7 @@ namespace HlidacStatu.Web.HealthChecks
                 if (allReq.Count() > 0)
                 {
                     max = allReq.Max(m => m.TimeElapsed);
-                    median = MathNet.Numerics.Statistics.Statistics.Median(allReq.Select(m => (float)m.TimeElapsed));
+                    median = 0; // MathNet.Numerics.Statistics.Statistics.Median(allReq.Select(m => (float)m.TimeElapsed));
                 }
                 string report = $"IIS requests:{allReq.Count()}<br/>\n"
                     + $"Max TimeElapsed:{max} ms<br/>\n"
