@@ -5,6 +5,7 @@
 @using HlidacStatu.Extensions
 @using HlidacStatu.Entities
 @using HlidacStatu.Repositories
+@using HlidacStatu.Repositories.SharedModels
 @using Newtonsoft.Json.Linq;
 
 @{
@@ -197,6 +198,13 @@
                 </div>
                 <div class="card-body">
                     <p class="card-title">Průměrná měsíční mzda včetně odměn</p>
+                    @if (platyUrednikuOrg?.Platy?.Count > 0)
+                    {
+
+                        <partial name="Charts/_AreaRangePlot" model="@(new AreaRangeRenderOptions(){ Platy= platyUrednikuOrg.Platy, CssHeight="280", YAxisTitle="",Description="" })" />
+
+                    }
+
                     <table>
                         <tr>
                             <th colspan="2" class="col-sm-12">
@@ -222,7 +230,7 @@
                                 </td>
                             </tr>
                         }
-                        @if (platySecondLastYear.Count > 0)
+                        @if (false && platySecondLastYear.Count > 0)
                         {
                             <tr style="height: 2.5em;vertical-align: bottom;">
                                 <th colspan="2" class="col-sm-12">
