@@ -11,6 +11,7 @@ using ZiggyCreatures.Caching.Fusion;
 using System.Text;
 using System;
 using Microsoft.AspNetCore.OutputCaching;
+using Nest;
 
 namespace PlatyUredniku.Controllers;
 
@@ -28,11 +29,40 @@ public class HomeController : Controller
         if (string.IsNullOrWhiteSpace(id))
             return Redirect("/analyzy");
 
+
+        switch (id.ToLower())
+        {
+            case "kategorie":
+                ViewBag.Title = "Porovnání a vývoj platů v různých kategoriích zaměstnání";
+                break;
+            case "namestciministerstev":
+                ViewBag.Title = "Porovnání odměn náměstků na ministerstvech";
+                break;
+            case "nejvyssiodmeny":
+                ViewBag.Title = "Platy s nejvyšším podílem odměny na celkovém platu";
+                break;
+            case "zmenanejvyssihoplatu":
+                if (Request.Query["max"] == "false")
+                    ViewBag.Title = "Přehled nejvyšších poklesů manažerských platů";
+                else
+                    ViewBag.Title = "Přehled nejvyšších nárůstů manažerských platů";
+                break;
+            case "zmenaplatuceos":
+                if (Request.Query["max"]=="false")
+                    ViewBag.Title = "Přehled nejvyšších poklesů ředitelských platů";
+                else
+                    ViewBag.Title = "Přehled nejvyšších nárůstů ředitelských platů";
+                break;
+            default:
+                break;
+        }
         return View("Analyza_"+id);
 
     }
     public async Task<IActionResult> Analyzy()
     {
+        ViewBag.Title = "Podrobné analýzy";
+
         return View();
     }
         public async Task<IActionResult> Index()
@@ -98,6 +128,9 @@ public class HomeController : Controller
         ViewData["title"] = title;
         ViewData["noteHtml"] = noteHtml;
         ViewData["pocetPlatuCelkem"] = platyCount;
+
+        ViewBag.Title = title;
+
         return View(platy);
     }
 
@@ -113,6 +146,8 @@ public class HomeController : Controller
         ViewData["platy"] = organizace.SelectMany(o => o.Platy).ToList();
         ViewData["oblast"] = id;
         ViewData["context"] = $"{id}";
+
+        ViewBag.Title = "Platy a organizace v oblasti #" + id;
 
         return View(organizace);
     }
@@ -145,6 +180,9 @@ public class HomeController : Controller
         ViewData["breadcrumbs"] = breadcrumbs;
         sw.Stop();
         ViewData["sw"] = sw.ElapsedMilliseconds;
+
+        ViewBag.Title = "Platy a organizace v různých oborech";
+
         return View(model);
     }
 
@@ -164,6 +202,8 @@ public class HomeController : Controller
     public async Task<IActionResult> Detail(string id, int? rok = null)
     {
         var detail = await StaticCache.GetFullDetailAsync(id);
+        
+        ViewBag.Title = detail.Nazev;
 
         ViewData["mainTag"] = detail.Tags.FirstOrDefault(t => PuRepo.MainTags.Contains(t.Tag))?.Tag;
         ViewData["platy"] = detail.Platy.ToList();
@@ -184,6 +224,8 @@ public class HomeController : Controller
         ViewData["mainTag"] = detail.Organizace.Tags.FirstOrDefault(t => PuRepo.MainTags.Contains(t.Tag))?.Tag;
         ViewData["context"] = $"{detail.NazevPozice} v organizaci {detail.Organizace.FirmaDs.DsSubjName}";
 
+        ViewBag.Title = $"Plat {detail.NazevPozice} v {detail.Organizace.Nazev}";
+
         return View(detail);
     }
 
@@ -196,6 +238,8 @@ public class HomeController : Controller
     
     public IActionResult OpenData()
     {
+        ViewBag.Title = $"Open data";
+
         return View();
     }
 
