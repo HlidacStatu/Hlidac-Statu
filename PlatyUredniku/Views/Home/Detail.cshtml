@@ -134,7 +134,7 @@
                                         <th>Název pozice</th>
                                         <th class="text-end">Celkový roční příjem</th>
                                         <th class="text-end">Přepočtený průměrný měsíční plat</th>
-                                        <th style="max-width:20rem">Nefinanční bonus</th>
+                                        <th style="max-width:20rem">Nefinanční bonus</th>                                        
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -144,8 +144,20 @@
                                             <td>
                                                 <a asp-action="Plat" asp-route-id="@plat.Id">@plat.NazevPozice</a>
                                             </td>
-                                            <td data-order="@(HlidacStatu.Util.RenderData.OrderValueFormat(plat.CelkovyRocniPlatVcetneOdmen))" class="number">@HlidacStatu.Util.RenderData.NicePrice(plat.CelkovyRocniPlatVcetneOdmen)</td>
-                                            <td data-order="@(HlidacStatu.Util.RenderData.OrderValueFormat(plat.HrubyMesicniPlatVcetneOdmen))" class="number">@HlidacStatu.Util.RenderData.NicePrice(plat.HrubyMesicniPlatVcetneOdmen)</td>
+                                            <td data-order="@(HlidacStatu.Util.RenderData.OrderValueFormat(plat.CelkovyRocniPlatVcetneOdmen))" class="number">
+                                                @if (plat.PocetMesicu < 12)
+                                                {
+                                                    <a href="#" class="link-danger me-2" data-bs-toggle="tooltip" data-bs-title="Plat je pouze za @Devmasters.Lang.CS.Plural.Get((long)plat.PocetMesicu.Value, "jeden měsíc", "{0} měsíce", "{0} měsíců") a může obsahovat odstupné či jinou smluvní odměnu"><i class="fa-solid fa-circle-info"></i></a>
+                                                }
+
+                                            @HlidacStatu.Util.RenderData.NicePrice(plat.CelkovyRocniPlatVcetneOdmen)</td>
+                                            <td data-order="@(HlidacStatu.Util.RenderData.OrderValueFormat(plat.HrubyMesicniPlatVcetneOdmen))" class="number">
+                                                @if (plat.PocetMesicu < 12)
+                                                {
+                                                    <a href="#" class="link-danger me-2" data-bs-toggle="tooltip" data-bs-title="Plat je pouze za @Devmasters.Lang.CS.Plural.Get((long)plat.PocetMesicu.Value, "jeden měsíc", "{0} měsíce", "{0} měsíců") a může obsahovat odstupné či jinou smluvní odměnu"><i class="fa-solid fa-circle-info"></i></a>
+                                                }
+                                                @HlidacStatu.Util.RenderData.NicePrice(plat.HrubyMesicniPlatVcetneOdmen)
+                                            </td>
                                             <td>@plat.NefinancniBonus</td>
                                         </tr>
                                     }
