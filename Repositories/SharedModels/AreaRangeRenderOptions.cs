@@ -1,4 +1,5 @@
 ﻿using HlidacStatu.Entities.Entities;
+using Nest;
 using System.Collections.Generic;
 
 namespace HlidacStatu.Repositories.SharedModels;
@@ -11,5 +12,8 @@ public class AreaRangeRenderOptions
     public string TextForNoData { get; set; } = string.Empty;
     public string? Title { get; set; } = "Vývoj platů";
     public string? Subtitle { get; set; } = "Vývoj průměrného měsíčního platu po letech";
+
+    public string Description { get; set; } = "Rozsah průměrných manažerských měsíčních platů vedení organizace (včetně odměn) přepočtených z ročního příjmu za sledované období";
+    public string YAxisTitle { get; set; } = "Výše platu";
 
 }

@@ -25,7 +25,10 @@
 <figure >
     <div id="chart-container-@chartId"></div>
 
-    <div class="text-muted">Rozsah průměrných manažerských měsíčních platů vedení organizace (včetně odměn) přepočtených z ročního příjmu za sledované období</div>
+    @if (!string.IsNullOrEmpty(Model.Description))
+    {
+        <div class="text-muted">@Model.Description</div>
+    }
 
 </figure>
 
@@ -48,7 +51,7 @@
         },
         yAxis: {
             title: {
-                text: 'Výše platu'
+                text: '@Html.Raw(Model.YAxisTitle)'
             },
             labels: {
                 format: '{value:,.0f} Kč'
