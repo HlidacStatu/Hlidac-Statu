@@ -1,5 +1,5 @@
 /**
- * @license Highcharts JS v7.0.0 (2018-12-11)
+ * @license Highcharts JS v6.2.0 (2018-10-17)
  *
  * (c) 2009-2018 Torstein Honsi
  *
@@ -14,25 +14,21 @@
 			return factory;
 		});
 	} else {
-		factory(typeof Highcharts !== 'undefined' ? Highcharts : undefined);
+		factory(Highcharts);
 	}
 }(function (Highcharts) {
 	(function (H) {
-		/* *
+		/**
+		 * (c) 2010-2018 Torstein Honsi
 		 *
-		 *  (c) 2010-2018 Torstein Honsi
-		 *
-		 *  License: www.highcharts.com/license
-		 *
-		 * */
-
-
-
+		 * License: www.highcharts.com/license
+		 */
 		var addEvent = H.addEvent,
 		    Axis = H.Axis,
 		    Chart = H.Chart,
 		    color = H.color,
 		    ColorAxis,
+		    each = H.each,
 		    extend = H.extend,
 		    isNumber = H.isNumber,
 		    Legend = H.Legend,
@@ -46,22 +42,13 @@
 		if (!H.ColorAxis) {
 
 		    /**
-		     * The ColorAxis object for inclusion in gradient legends.
-		     *
-		     * @private
-		     * @class
-		     * @name Highcharts.ColorAxis
-		     *
-		     * @augments Highcharts.Axis
+		     * The ColorAxis object for inclusion in gradient legends
 		     */
 		    ColorAxis = H.ColorAxis = function () {
 		        this.init.apply(this, arguments);
 		    };
-
 		    extend(ColorAxis.prototype, Axis.prototype);
-
 		    extend(ColorAxis.prototype, {
-
 		        /**
 		         * A color axis for choropleth maps and heat maps. Visually, the color
 		         * axis will appear as a gradient or as separate items inside the
@@ -90,21 +77,21 @@
 		         * See [the Axis object](/class-reference/Highcharts.Axis) for
 		         * programmatic access to the axis.
 		         *
-		         * @extends      xAxis
-		         * @excluding    allowDecimals, alternateGridColor, breaks, categories,
-		         *               crosshair, dateTimeLabelFormats, lineWidth, linkedTo,
-		         *               maxZoom, minRange, minTickInterval, offset, opposite,
-		         *               plotBands, plotLines, showEmpty, title
-		         * @product      highcharts highmaps
+		         * @extends xAxis
+		         * @excluding allowDecimals,alternateGridColor,breaks,categories,
+		         *            crosshair,dateTimeLabelFormats,lineWidth,linkedTo,maxZoom,
+		         *            minRange,minTickInterval,offset,opposite,plotBands,
+		         *            plotLines,showEmpty,title
+		         * @product highcharts highmaps
 		         * @optionparent colorAxis
 		         */
 		        defaultColorAxisOptions: {
 
 		            /**
 		             * Whether to allow decimals on the color axis.
-		             * @type      {boolean}
-		             * @default   true
-		             * @product   highcharts highmaps
+		             * @type {Boolean}
+		             * @default true
+		             * @product highcharts highmaps
 		             * @apioption colorAxis.allowDecimals
 		             */
 
@@ -115,14 +102,12 @@
 		             * value, `category`, pulls colors from the global or chart specific
 		             * [colors](#colors) array.
 		             *
-		             * @sample {highmaps} maps/coloraxis/dataclasscolor/
-		             *         Category colors
-		             *
-		             * @type       {string}
-		             * @default    tween
-		             * @product    highcharts highmaps
 		             * @validvalue ["tween", "category"]
-		             * @apioption  colorAxis.dataClassColor
+		             * @type {String}
+		             * @sample {highmaps} maps/coloraxis/dataclasscolor/ Category colors
+		             * @default tween
+		             * @product highcharts highmaps
+		             * @apioption colorAxis.dataClassColor
 		             */
 
 		            /**
@@ -130,14 +115,10 @@
 		             * none given, the color axis is scalar and values are distributed
 		             * as a gradient between the minimum and maximum colors.
 		             *
-		             * @sample {highmaps} maps/demo/data-class-ranges/
-		             *         Multiple ranges
-		             *
-		             * @sample {highmaps} maps/demo/data-class-two-ranges/
-		             *         Two ranges
-		             *
-		             * @type      {Array<*>}
-		             * @product   highcharts highmaps
+		             * @type {Array<Object>}
+		             * @sample {highmaps} maps/demo/data-class-ranges/ Multiple ranges
+		             * @sample {highmaps} maps/demo/data-class-two-ranges/ Two ranges
+		             * @product highcharts highmaps
 		             * @apioption colorAxis.dataClasses
 		             */
 
@@ -147,11 +128,10 @@
 		             * styled mode, this option is ignored. Instead, use colors defined
 		             * in CSS.
 		             *
+		             * @type {Color}
 		             * @sample {highmaps} maps/demo/data-class-two-ranges/
 		             *         Explicit colors
-		             *
-		             * @type      {Highcharts.ColorString}
-		             * @product   highcharts highmaps
+		             * @product highcharts highmaps
 		             * @apioption colorAxis.dataClasses.color
 		             */
 
@@ -162,7 +142,7 @@
 		             * The range of each `dataClass` is closed in both ends, but can be
 		             * overridden by the next `dataClass`.
 		             *
-		             * @type      {number}
+		             * @type      {Number}
 		             * @product   highcharts highmaps
 		             * @apioption colorAxis.dataClasses.from
 		             */
@@ -174,13 +154,11 @@
 		             * [legend.labelFormatter](#legend.labelFormatter) can be used.
 		             * In the formatter, `this.from` and `this.to` can be accessed.
 		             *
-		             * @sample {highmaps} maps/coloraxis/dataclasses-name/
-		             *         Named data classes
-		             *
-		             * @sample {highmaps} maps/coloraxis/dataclasses-labelformatter/
-		             *         Formatted data classes
-		             *
-		             * @type      {string}
+		             * @type      {String}
+		             * @sample    {highmaps} maps/coloraxis/dataclasses-name/
+		             *            Named data classes
+		             * @sample    {highmaps} maps/coloraxis/dataclasses-labelformatter/
+		             *            Formatted data classes
 		             * @product   highcharts highmaps
 		             * @apioption colorAxis.dataClasses.name
 		             */
@@ -192,18 +170,21 @@
 		             * The range of each `dataClass` is closed in both ends, but can be
 		             * overridden by the next `dataClass`.
 		             *
-		             * @type      {number}
+		             * @type      {Number}
 		             * @product   highcharts highmaps
 		             * @apioption colorAxis.dataClasses.to
 		             */
 
-		            /** @ignore-option */
+		            /**
+		              * @ignore-option
+		              */
 		            lineWidth: 0,
 
 		            /**
 		             * Padding of the min value relative to the length of the axis. A
 		             * padding of 0.05 will make a 100px axis 5px longer.
 		             *
+		             * @type {Number}
 		             * @product highcharts highmaps
 		             */
 		            minPadding: 0,
@@ -213,11 +194,10 @@
 		             * `null`, the max value is automatically calculated. If the
 		             * `endOnTick` option is true, the max value might be rounded up.
 		             *
+		             * @type {Number}
 		             * @sample {highmaps} maps/coloraxis/gridlines/
 		             *         Explicit min and max to reduce the effect of outliers
-		             *
-		             * @type      {number}
-		             * @product   highcharts highmaps
+		             * @product highcharts highmaps
 		             * @apioption colorAxis.max
 		             */
 
@@ -227,11 +207,10 @@
 		             * `startOnTick` option is true, the min value might be rounded
 		             * down.
 		             *
+		             * @type {Number}
 		             * @sample {highmaps} maps/coloraxis/gridlines/
 		             *         Explicit min and max to reduce the effect of outliers
-		             *
-		             * @type      {number}
-		             * @product   highcharts highmaps
+		             * @product highcharts highmaps
 		             * @apioption colorAxis.min
 		             */
 
@@ -239,6 +218,7 @@
 		             * Padding of the max value relative to the length of the axis. A
 		             * padding of 0.05 will make a 100px axis 5px longer.
 		             *
+		             * @type {Number}
 		             * @product highcharts highmaps
 		             */
 		            maxPadding: 0,
@@ -247,12 +227,11 @@
 		             * Color of the grid lines extending from the axis across the
 		             * gradient.
 		             *
+		             * @type {Color}
 		             * @sample {highmaps} maps/coloraxis/gridlines/
 		             *         Grid lines demonstrated
-		             *
-		             * @type      {Highcharts.ColorString}
-		             * @default   #e6e6e6
-		             * @product   highcharts highmaps
+		             * @default #e6e6e6
+		             * @product highcharts highmaps
 		             * @apioption colorAxis.gridLineColor
 		             */
 
@@ -260,9 +239,10 @@
 		             * The width of the grid lines extending from the axis across the
 		             * gradient of a scalar color axis.
 		             *
+		             * @type {Number}
 		             * @sample {highmaps} maps/coloraxis/gridlines/
 		             *         Grid lines demonstrated
-		             *
+		             * @default 1
 		             * @product highcharts highmaps
 		             */
 		            gridLineWidth: 1,
@@ -272,8 +252,8 @@
 		             * tick interval is computed to approximately follow the
 		             * `tickPixelInterval`.
 		             *
-		             * @type      {number}
-		             * @product   highcharts highmaps
+		             * @type {Number}
+		             * @product highcharts highmaps
 		             * @apioption colorAxis.tickInterval
 		             */
 
@@ -281,6 +261,8 @@
 		             * If [tickInterval](#colorAxis.tickInterval) is `null` this option
 		             * sets the approximate pixel interval of the tick marks.
 		             *
+		             * @type {Number}
+		             * @default 72
 		             * @product highcharts highmaps
 		             */
 		            tickPixelInterval: 72,
@@ -289,6 +271,8 @@
 		             * Whether to force the axis to start on a tick. Use this option
 		             * with the `maxPadding` option to control the axis start.
 		             *
+		             * @type {Boolean}
+		             * @default true
 		             * @product highcharts highmaps
 		             */
 		            startOnTick: true,
@@ -298,11 +282,13 @@
 		             * the [maxPadding](#colorAxis.maxPadding) option to control the
 		             * axis end.
 		             *
+		             * @type {Boolean}
+		             * @default true
 		             * @product highcharts highmaps
 		             */
 		            endOnTick: true,
 
-		            /** @ignore */
+		            /**    @ignore */
 		            offset: 0,
 
 		            /**
@@ -310,9 +296,8 @@
 		             * value of the hovered area. To disable the marker, set
 		             * `marker: null`.
 		             *
-		             * @sample {highmaps} maps/coloraxis/marker/
-		             *         Black marker
-		             *
+		             * @type {Object}
+		             * @sample {highmaps} maps/coloraxis/marker/ Black marker
 		             * @product highcharts highmaps
 		             */
 		            marker: {
@@ -321,25 +306,18 @@
 		                 * Animation for the marker as it moves between values. Set to
 		                 * `false` to disable animation. Defaults to `{ duration: 50 }`.
 		                 *
-		                 * @type    {boolean|Highcharts.AnimationOptionsObject}
-		                 * @default {"duration": 50}
+		                 * @type {AnimationOptions|Boolean}
 		                 * @product highcharts highmaps
 		                 */
 		                animation: {
-		                    /** @ignore */
 		                    duration: 50
 		                },
 
-		                /** @ignore */
-		                width: 0.01,
-
 		                /**
-		                 * The color of the marker.
-		                 *
-		                 * @type    {Highcharts.ColorString}
-		                 * @product highcharts highmaps
+		                 * @ignore
 		                 */
-		                color: '#999999'
+		                width: 0.01
+                
 		            },
 
 		            /**
@@ -348,6 +326,7 @@
 		             * For more live examples on label options, see [xAxis.labels in the
 		             * Highcharts API.](/highcharts#xAxis.labels)
 		             *
+		             * @type {Object}
 		             * @extends xAxis.labels
 		             * @product highcharts highmaps
 		             */
@@ -359,13 +338,14 @@
 		                 * render outside the legend area. If there is room to move it,
 		                 * it will be aligned to the edge, else it will be removed.
 		                 *
-		                 * @validvalue ["allow", "justify"]
-		                 * @product    highcharts highmaps
+		                 * @validvalue [null, "justify"]
+		                 * @type {String}
+		                 * @default justify
+		                 * @product highcharts highmaps
 		                 */
 		                overflow: 'justify',
 
 		                rotation: 0
-
 		            },
 
 		            /**
@@ -378,12 +358,12 @@
 		             * maxColor unless a color is set for each data class, or the
 		             * [dataClassColor](#colorAxis.dataClassColor) is set.
 		             *
+		             * @type {Color}
 		             * @sample {highmaps} maps/coloraxis/mincolor-maxcolor/
 		             *         Min and max colors on scalar (gradient) axis
 		             * @sample {highmaps} maps/coloraxis/mincolor-maxcolor-dataclasses/
 		             *         On data classes
-		             *
-		             * @type    {Highcharts.ColorString}
+		             * @default #e6ebf5
 		             * @product highcharts highmaps
 		             */
 		            minColor: '#e6ebf5',
@@ -398,12 +378,12 @@
 		             * maxColor unless a color is set for each data class, or the
 		             * [dataClassColor](#colorAxis.dataClassColor) is set.
 		             *
+		             * @type {Color}
 		             * @sample {highmaps} maps/coloraxis/mincolor-maxcolor/
 		             *         Min and max colors on scalar (gradient) axis
 		             * @sample {highmaps} maps/coloraxis/mincolor-maxcolor-dataclasses/
 		             *         On data classes
-		             *
-		             * @type    {Highcharts.ColorString}
+		             * @default #003399
 		             * @product highcharts highmaps
 		             */
 		            maxColor: '#003399',
@@ -415,11 +395,10 @@
 		             * first item is a float between 0 and 1 assigning the relative
 		             * position in the gradient, and the second item is the color.
 		             *
+		             * @type {Array<Array>}
 		             * @sample {highmaps} maps/demo/heatmap/
 		             *         Heatmap with three color stops
-		             *
-		             * @type      {Array<Array<number,Highcharts.ColorString>>}
-		             * @product   highcharts highmaps
+		             * @product highcharts highmaps
 		             * @apioption colorAxis.stops
 		             */
 
@@ -432,11 +411,11 @@
 		             * The type of interpolation to use for the color axis. Can be
 		             * `linear` or `logarithmic`.
 		             *
-		             * @type       {string}
-		             * @default    linear
-		             * @product    highcharts highmaps
 		             * @validvalue ["linear", "logarithmic"]
-		             * @apioption  colorAxis.type
+		             * @type {String}
+		             * @default linear
+		             * @product highcharts highmaps
+		             * @apioption colorAxis.type
 		             */
 
 		            /**
@@ -445,8 +424,8 @@
 		             * `true` in a vertical legend, where the smallest value starts on
 		             * top.
 		             *
-		             * @type      {boolean}
-		             * @product   highcharts highmaps
+		             * @type {Boolean}
+		             * @product highcharts highmaps
 		             * @apioption colorAxis.reversed
 		             */
 
@@ -462,9 +441,10 @@
 		            /**
 		             * Whether to display the colorAxis in the legend.
 		             *
+		             * @type {Boolean}
 		             * @see [heatmap.showInLegend](#series.heatmap.showInLegend)
-		             *
-		             * @since   4.2.7
+		             * @default true
+		             * @since 4.2.7
 		             * @product highcharts highmaps
 		             */
 		            showInLegend: true
@@ -481,13 +461,6 @@
 
 		        /**
 		         * Initialize the color axis
-		         *
-		         * @private
-		         * @function Highcharts.ColorAxis#init
-		         *
-		         * @param {Highcharts.Chart} chart
-		         *
-		         * @param {Highcharts.ColorAxisOptions} userOptions
 		         */
 		        init: function (chart, userOptions) {
 		            var horiz = chart.options.legend.layout !== 'vertical',
@@ -535,23 +508,15 @@
 		            this.dataClasses = dataClasses = [];
 		            this.legendItems = [];
 
-		            userOptions.dataClasses.forEach(function (dataClass, i) {
+		            each(userOptions.dataClasses, function (dataClass, i) {
 		                var colors;
 
 		                dataClass = merge(dataClass);
 		                dataClasses.push(dataClass);
 
-		                if (!chart.styledMode && dataClass.color) {
-		                    return;
-		                }
-
+                
 		                if (options.dataClassColor === 'category') {
-		                    if (!chart.styledMode) {
-		                        colors = chart.options.colors;
-		                        colorCount = colors.length;
-		                        dataClass.color = colors[colorCounter];
-		                    }
-
+                    
 		                    dataClass.colorIndex = colorCounter;
 
 		                    // increase and loop back to zero
@@ -570,9 +535,6 @@
 
 		        /**
 		         * Override so that ticks are not added in data class axes (#6914)
-		         *
-		         * @private
-		         * @function Highcharts.ColorAxis#setTickPositions
 		         */
 		        setTickPositions: function () {
 		            if (!this.dataClasses) {
@@ -580,12 +542,13 @@
 		            }
 		        },
 
+
 		        initStops: function () {
 		            this.stops = this.options.stops || [
 		                [0, this.options.minColor],
 		                [1, this.options.maxColor]
 		            ];
-		            this.stops.forEach(function (stop) {
+		            each(this.stops, function (stop) {
 		                stop.color = color(stop[1]);
 		            });
 		        },
@@ -593,11 +556,6 @@
 		        /**
 		         * Extend the setOptions method to process extreme colors and color
 		         * stops.
-		         *
-		         * @private
-		         * @function Highcharts.ColorAxis#setOptions
-		         *
-		         * @param {Highcharts.ColorAxisOptions} userOptions
 		         */
 		        setOptions: function (userOptions) {
 		            Axis.prototype.setOptions.call(this, userOptions);
@@ -643,14 +601,7 @@
 		        },
 
 		        /**
-		         * Translate from a value to a color.
-		         *
-		         * @private
-		         * @function Highcharts.ColorAxis#toColor
-		         *
-		         * @param {number} value
-		         *
-		         * @param {Highcharts.Point} point
+		         * Translate from a value to a color
 		         */
 		        toColor: function (value, point) {
 		            var pos,
@@ -672,9 +623,7 @@
 		                        (from === undefined || value >= from) &&
 		                        (to === undefined || value <= to)
 		                    ) {
-
-		                        color = dataClass.color;
-
+                        
 		                        if (point) {
 		                            point.dataClass = i;
 		                            point.colorIndex = dataClass.colorIndex;
@@ -709,9 +658,6 @@
 		        /**
 		         * Override the getOffset method to add the whole axis groups inside
 		         * the legend.
-		         *
-		         * @private
-		         * @function Highcharts.ColorAxis#getOffset
 		         */
 		        getOffset: function () {
 		            var group = this.legendGroup,
@@ -740,10 +686,7 @@
 		        },
 
 		        /**
-		         * Create the color gradient.
-		         *
-		         * @private
-		         * @function Highcharts.ColorAxis#setLegendColor
+		         * Create the color gradient
 		         */
 		        setLegendColor: function () {
 		            var grad,
@@ -764,14 +707,7 @@
 
 		        /**
 		         * The color axis appears inside the legend and has its own legend
-		         * symbol.
-		         *
-		         * @private
-		         * @function Highcharts.ColorAxis#drawLegendSymbol
-		         *
-		         * @param {Highcharts.Legend} legend
-		         *
-		         * @param {*} item
+		         * symbol
 		         */
 		        drawLegendSymbol: function (legend, item) {
 		            var padding = legend.padding,
@@ -809,25 +745,16 @@
 		            this.legendItemHeight = height + padding +
 		                (horiz ? labelPadding : 0);
 		        },
-
 		        /**
 		         * Fool the legend
-		         *
-		         * @private
-		         * @function Highcharts.ColorAxis#setState
-		         *
-		         * @param {*} state
 		         */
 		        setState: function (state) {
-		            this.series.forEach(function (series) {
+		            each(this.series, function (series) {
 		                series.setState(state);
 		            });
 		        },
-
 		        visible: true,
-
 		        setVisible: noop,
-
 		        getSeriesExtremes: function () {
 		            var series = this.series,
 		                i = series.length;
@@ -841,7 +768,6 @@
 		                }
 		            }
 		        },
-
 		        drawCrosshair: function (e, point) {
 		            var plotX = point && point.plotX,
 		                plotY = point && point.plotY,
@@ -874,16 +800,11 @@
 
 		                    this.cross.addedToColorAxis = true;
 
-		                    if (!this.chart.styledMode) {
-		                        this.cross.attr({
-		                            fill: this.crosshair.color
-		                        });
-		                    }
+                    
 
 		                }
 		            }
 		        },
-
 		        getPlotLinePath: function (a, b, c, d, pos) {
 		            // crosshairs only
 		            return isNumber(pos) ? // pos can be 0 (#3969)
@@ -911,7 +832,7 @@
 		            var chart = this.chart,
 		                legend = chart.legend;
 
-		            this.series.forEach(function (series) {
+		            each(this.series, function (series) {
 		                // Needed for Axis.update when choropleth colors change
 		                series.isDirtyData = true;
 		            });
@@ -919,7 +840,7 @@
 		            // When updating data classes, destroy old items and make sure new
 		            // ones are created (#3207)
 		            if (newOptions.dataClasses && legend.allItems) {
-		                legend.allItems.forEach(function (item) {
+		                each(legend.allItems, function (item) {
 		                    if (item.isDataClass && item.legendGroup) {
 		                        item.legendGroup.destroy();
 		                    }
@@ -940,9 +861,6 @@
 
 		        /**
 		         * Extend basic axis remove by also removing the legend item.
-		         *
-		         * @private
-		         * @function Highcharts.ColorAxis#remove
 		         */
 		        remove: function () {
 		            if (this.legendItem) {
@@ -952,12 +870,7 @@
 		        },
 
 		        /**
-		         * Get the legend item symbols for data classes.
-		         *
-		         * @private
-		         * @function Highcharts.ColorAxis#getDataClassLegendSymbols
-		         *
-		         * @return {*}
+		         * Get the legend item symbols for data classes
 		         */
 		        getDataClassLegendSymbols: function () {
 		            var axis = this,
@@ -969,7 +882,7 @@
 		                name;
 
 		            if (!legendItems.length) {
-		                this.dataClasses.forEach(function (dataClass, i) {
+		                each(this.dataClasses, function (dataClass, i) {
 		                    var vis = true,
 		                        from = dataClass.from,
 		                        to = dataClass.to;
@@ -1003,8 +916,8 @@
 		                        isDataClass: true,
 		                        setVisible: function () {
 		                            vis = this.visible = !vis;
-		                            axis.series.forEach(function (series) {
-		                                series.points.forEach(function (point) {
+		                            each(axis.series, function (series) {
+		                                each(series.points, function (point) {
 		                                    if (point.dataClass === i) {
 		                                        point.setVisible(vis);
 		                                    }
@@ -1022,16 +935,8 @@
 
 		    /**
 		     * Handle animation of the color attributes directly
-		     *
-		     * @private
-		     * @function Highcharts.Fx#fillSetter
-		     *//**
-		     * Handle animation of the color attributes directly
-		     *
-		     * @private
-		     * @function Highcharts.Fx#strokeSetter
 		     */
-		    ['fill', 'stroke'].forEach(function (prop) {
+		    each(['fill', 'stroke'], function (prop) {
 		        H.Fx.prototype[prop + 'Setter'] = function () {
 		            this.elem.attr(
 		                prop,
@@ -1045,7 +950,9 @@
 		        };
 		    });
 
-		    // Extend the chart getAxes method to also get the color axis
+		    /**
+		     * Extend the chart getAxes method to also get the color axis
+		     */
 		    addEvent(Chart, 'afterGetAxes', function () {
 
 		        var options = this.options,
@@ -1058,8 +965,10 @@
 		    });
 
 
-		    // Add the color axis. This also removes the axis' own series to prevent
-		    // them from showing up individually.
+		    /**
+		     * Add the color axis. This also removes the axis' own series to prevent
+		     * them from showing up individually.
+		     */
 		    addEvent(Legend, 'afterGetAllItems', function (e) {
 		        var colorAxisItems = [],
 		            colorAxis = this.chart.colorAxis[0],
@@ -1077,7 +986,7 @@
 		                }
 
 		                // Don't add the color axis' series
-		                colorAxis.series.forEach(function (series) {
+		                each(colorAxis.series, function (series) {
 		                    H.erase(e.allItems, series);
 		                });
 		            }
@@ -1112,27 +1021,18 @@
 		 *
 		 * License: www.highcharts.com/license
 		 */
-
-
-
 		var defined = H.defined,
+		    each = H.each,
 		    noop = H.noop,
 		    seriesTypes = H.seriesTypes;
 
 		/**
 		 * Mixin for maps and heatmaps
-		 *
-		 * @private
-		 * @mixin Highcharts.colorPointMixin
 		 */
 		H.colorPointMixin = {
 		    /**
 		     * Color points have a value option that determines whether or not it is
 		     * a null point
-		     *
-		     * @function Highcharts.colorPointMixin.isValid
-		     *
-		     * @return {boolean}
 		     */
 		    isValid: function () {
 		        // undefined is allowed
@@ -1145,10 +1045,6 @@
 
 		    /**
 		     * Set the visibility of a single point
-		     *
-		     * @function Highcharts.colorPointMixin.setVisible
-		     *
-		     * @param {boolean} visible
 		     */
 		    setVisible: function (vis) {
 		        var point = this,
@@ -1157,17 +1053,12 @@
 		        point.visible = Boolean(vis);
 
 		        // Show and hide associated elements
-		        ['graphic', 'dataLabel'].forEach(function (key) {
+		        each(['graphic', 'dataLabel'], function (key) {
 		            if (point[key]) {
 		                point[key][method]();
 		            }
 		        });
 		    },
-		    /**
-		     * @function Highcharts.colorPointMixin.setState
-		     *
-		     * @param {string} state
-		     */
 		    setState: function (state) {
 		        H.Point.prototype.setState.call(this, state);
 		        if (this.graphic) {
@@ -1178,10 +1069,6 @@
 		    }
 		};
 
-		/**
-		 * @private
-		 * @mixin Highcharts.colorSeriesMixin
-		 */
 		H.colorSeriesMixin = {
 		    pointArrayMap: ['value'],
 		    axisTypes: ['xAxis', 'yAxis', 'colorAxis'],
@@ -1191,13 +1078,11 @@
 		    parallelArrays: ['x', 'y', 'value'],
 		    colorKey: 'value',
 
-		    pointAttribs: seriesTypes.column.prototype.pointAttribs,
+    
 
 		    /**
 		     * In choropleth maps, the color is a result of the value, so this needs
 		     * translation too
-		     *
-		     * @function Highcharts.colorSeriesMixin.translateColors
 		     */
 		    translateColors: function () {
 		        var series = this,
@@ -1205,7 +1090,7 @@
 		            colorAxis = this.colorAxis,
 		            colorKey = this.colorKey;
 
-		        this.data.forEach(function (point) {
+		        each(this.data, function (point) {
 		            var value = point[colorKey],
 		                color;
 
@@ -1226,12 +1111,6 @@
 
 		    /**
 		     * Get the color attibutes to apply on the graphic
-		     *
-		     * @function Highcharts.colorSeriesMixin.colorAttribs
-		     *
-		     * @param {Highcharts.Point} point
-		     *
-		     * @return {Highcharts.Dictionary<Highcharts.ColorString>}
 		     */
 		    colorAttribs: function (point) {
 		        var ret = {};
@@ -1254,6 +1133,7 @@
 
 		var colorPointMixin = H.colorPointMixin,
 		    colorSeriesMixin = H.colorSeriesMixin,
+		    each = H.each,
 		    LegendSymbolMixin = H.LegendSymbolMixin,
 		    merge = H.merge,
 		    noop = H.noop,
@@ -1280,12 +1160,11 @@
 		 * @sample highcharts/demo/heatmap-canvas/
 		 *         Heavy heatmap
 		 *
-		 * @extends      plotOptions.scatter
+		 * @extends      {plotOptions.scatter}
 		 * @excluding    animationLimit, connectEnds, connectNulls, dashStyle,
 		 *               findNearestPointBy, getExtremesFromAll, linecap, lineWidth,
 		 *               marker, pointInterval, pointIntervalUnit, pointRange,
-		 *               pointStart, shadow, softThreshold, stacking, step,
-		 *               threshold
+		 *               pointStart, shadow, softThreshold, stacking, step, threshold
 		 * @product      highcharts highmaps
 		 * @optionparent plotOptions.heatmap
 		 */
@@ -1353,13 +1232,7 @@
 		     * @apioption plotOptions.heatmap.rowsize
 		     */
 
-		    /**
-		     * The color applied to null points. In styled mode, a general CSS class is
-		     * applied instead.
-		     *
-		     * @type {Highcharts.ColorString}
-		     */
-		    nullColor: '#f7f7f7',
+    
 
 		    dataLabels: {
 		        formatter: function () { // #2945
@@ -1372,7 +1245,9 @@
 		        padding: 0 // #3837
 		    },
 
-		    /** @ignore */
+		    /**
+		     * @ignore
+		     */
 		    marker: null,
 
 		    /**
@@ -1388,15 +1263,19 @@
 
 		        hover: {
 
-		            /** @ignore */
-		            halo: false, // #3406, halo is disabled on heatmaps by default
+		            /**
+		             * @ignore
+		             */
+		            halo: false,  // #3406, halo is disabled on heatmaps by default
 
 		            /**
 		             * How much to brighten the point on interaction. Requires the main
 		             * color to be defined in hex or rgb(a) format.
 		             *
-		             * In styled mode, the hover brightening is by default replaced with
-		             * a fill-opacity set in the `.highcharts-point:hover` rule.
+		             * In styled mode, the hover brightening is by default replaced
+		             * with a fill-opacity set in the `.highcharts-point:hover` rule.
+		             *
+		             * @product highcharts highmaps
 		             */
 		            brightness: 0.2
 		        }
@@ -1423,8 +1302,7 @@
 		        options = this.options;
 		        // #3758, prevent resetting in setData
 		        options.pointRange = pick(options.pointRange, options.colsize || 1);
-		        // general point range
-		        this.yAxis.axisPointRange = options.rowsize || 1;
+		        this.yAxis.axisPointRange = options.rowsize || 1; // general point range
 		    },
 
 		    /**
@@ -1443,7 +1321,7 @@
 
 		        series.generatePoints();
 
-		        series.points.forEach(function (point) {
+		        each(series.points, function (point) {
 		            var xPad = (options.colsize || 1) / 2,
 		                yPad = (options.rowsize || 1) / 2,
 		                x1 = between(
@@ -1491,15 +1369,14 @@
 		     * @function Highcharts.seriesTypes.heatmap#drawPoints
 		     */
 		    drawPoints: function () {
-
-		        // In styled mode, use CSS, otherwise the fill used in the style sheet
-		        // will take precedence over the fill attribute.
-		        var func = this.chart.styledMode ? 'css' : 'attr';
-
 		        seriesTypes.column.prototype.drawPoints.call(this);
 
-		        this.points.forEach(function (point) {
-		            point.graphic[func](this.colorAttribs(point));
+		        each(this.points, function (point) {
+            
+		            // In styled mode, use CSS, otherwise the fill used in the style
+		            // sheet will take precedence over the fill attribute.
+		            point.graphic.css(this.colorAttribs(point));
+            
 		        }, this);
 		    },
 
@@ -1680,7 +1557,6 @@
 		 *         Point padding on tiles
 		 *
 		 * @type      {number}
-		 * @product   highcharts highmaps
 		 * @apioption series.heatmap.data.pointPadding
 		 */
 

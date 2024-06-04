@@ -288,7 +288,7 @@ namespace HlidacStatu.Web
                 pipeline.AddJavaScriptBundle("/bundles/scriptbundle", scriptBundle);
 
                 pipeline.AddJavaScriptBundle("/bundles/highcharts",
-                    "Scripts/Highcharts-6/js/highcharts.js",
+                    "Scripts/Highcharts-7/highcharts.js",
                     "Scripts/highcharts.global.options.js");
 
                 pipeline.AddJavaScriptBundle("/bundles/highcharts8",

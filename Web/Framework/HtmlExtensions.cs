@@ -342,7 +342,7 @@ namespace HlidacStatu.Web.Framework
             sb.AppendLine($"var g_{random};");
             sb.AppendLine("$(document).ready(function () {");
             //sb.AppendLine(GraphTheme());
-            sb.AppendLine($"g_{random} = Highcharts.Chart(");
+            sb.AppendLine($"g_{random} = new Highcharts.Chart(");
 
             var anon = new
             {
@@ -405,7 +405,7 @@ namespace HlidacStatu.Web.Framework
             sb.AppendLine($"var g_{random};");
             sb.AppendLine("$(document).ready(function () {");
             //sb.AppendLine(GraphTheme());
-            sb.AppendLine($"g_{random} = Highcharts.Chart(");
+            sb.AppendLine($"g_{random} = new Highcharts.Chart(");
 
             var anon = new
             {

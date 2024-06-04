@@ -1,8 +1,8 @@
 /**
- * @license  Highcharts JS v7.0.0 (2018-12-11)
+ * @license  Highcharts JS v6.2.0 (2018-10-17)
  * Tilemap module
  *
- * (c) 2010-2018 Highsoft AS
+ * (c) 2010-2017 Highsoft AS
  *
  * License: www.highcharts.com/license
  */
@@ -15,7 +15,7 @@
 			return factory;
 		});
 	} else {
-		factory(typeof Highcharts !== 'undefined' ? Highcharts : undefined);
+		factory(Highcharts);
 	}
 }(function (Highcharts) {
 	(function (H) {
@@ -24,27 +24,18 @@
 		 *
 		 * License: www.highcharts.com/license
 		 */
-
-
-
 		var defined = H.defined,
+		    each = H.each,
 		    noop = H.noop,
 		    seriesTypes = H.seriesTypes;
 
 		/**
 		 * Mixin for maps and heatmaps
-		 *
-		 * @private
-		 * @mixin Highcharts.colorPointMixin
 		 */
 		H.colorPointMixin = {
 		    /**
 		     * Color points have a value option that determines whether or not it is
 		     * a null point
-		     *
-		     * @function Highcharts.colorPointMixin.isValid
-		     *
-		     * @return {boolean}
 		     */
 		    isValid: function () {
 		        // undefined is allowed
@@ -57,10 +48,6 @@
 
 		    /**
 		     * Set the visibility of a single point
-		     *
-		     * @function Highcharts.colorPointMixin.setVisible
-		     *
-		     * @param {boolean} visible
 		     */
 		    setVisible: function (vis) {
 		        var point = this,
@@ -69,17 +56,12 @@
 		        point.visible = Boolean(vis);
 
 		        // Show and hide associated elements
-		        ['graphic', 'dataLabel'].forEach(function (key) {
+		        each(['graphic', 'dataLabel'], function (key) {
 		            if (point[key]) {
 		                point[key][method]();
 		            }
 		        });
 		    },
-		    /**
-		     * @function Highcharts.colorPointMixin.setState
-		     *
-		     * @param {string} state
-		     */
 		    setState: function (state) {
 		        H.Point.prototype.setState.call(this, state);
 		        if (this.graphic) {
@@ -90,10 +72,6 @@
 		    }
 		};
 
-		/**
-		 * @private
-		 * @mixin Highcharts.colorSeriesMixin
-		 */
 		H.colorSeriesMixin = {
 		    pointArrayMap: ['value'],
 		    axisTypes: ['xAxis', 'yAxis', 'colorAxis'],
@@ -103,13 +81,11 @@
 		    parallelArrays: ['x', 'y', 'value'],
 		    colorKey: 'value',
 
-		    pointAttribs: seriesTypes.column.prototype.pointAttribs,
+    
 
 		    /**
 		     * In choropleth maps, the color is a result of the value, so this needs
 		     * translation too
-		     *
-		     * @function Highcharts.colorSeriesMixin.translateColors
 		     */
 		    translateColors: function () {
 		        var series = this,
@@ -117,7 +93,7 @@
 		            colorAxis = this.colorAxis,
 		            colorKey = this.colorKey;
 
-		        this.data.forEach(function (point) {
+		        each(this.data, function (point) {
 		            var value = point[colorKey],
 		                color;
 
@@ -138,12 +114,6 @@
 
 		    /**
 		     * Get the color attibutes to apply on the graphic
-		     *
-		     * @function Highcharts.colorSeriesMixin.colorAttribs
-		     *
-		     * @param {Highcharts.Point} point
-		     *
-		     * @return {Highcharts.Dictionary<Highcharts.ColorString>}
 		     */
 		    colorAttribs: function (point) {
 		        var ret = {};
@@ -166,6 +136,7 @@
 
 		var colorPointMixin = H.colorPointMixin,
 		    colorSeriesMixin = H.colorSeriesMixin,
+		    each = H.each,
 		    LegendSymbolMixin = H.LegendSymbolMixin,
 		    merge = H.merge,
 		    noop = H.noop,
@@ -192,12 +163,11 @@
 		 * @sample highcharts/demo/heatmap-canvas/
 		 *         Heavy heatmap
 		 *
-		 * @extends      plotOptions.scatter
+		 * @extends      {plotOptions.scatter}
 		 * @excluding    animationLimit, connectEnds, connectNulls, dashStyle,
 		 *               findNearestPointBy, getExtremesFromAll, linecap, lineWidth,
 		 *               marker, pointInterval, pointIntervalUnit, pointRange,
-		 *               pointStart, shadow, softThreshold, stacking, step,
-		 *               threshold
+		 *               pointStart, shadow, softThreshold, stacking, step, threshold
 		 * @product      highcharts highmaps
 		 * @optionparent plotOptions.heatmap
 		 */
@@ -265,13 +235,7 @@
 		     * @apioption plotOptions.heatmap.rowsize
 		     */
 
-		    /**
-		     * The color applied to null points. In styled mode, a general CSS class is
-		     * applied instead.
-		     *
-		     * @type {Highcharts.ColorString}
-		     */
-		    nullColor: '#f7f7f7',
+    
 
 		    dataLabels: {
 		        formatter: function () { // #2945
@@ -284,7 +248,9 @@
 		        padding: 0 // #3837
 		    },
 
-		    /** @ignore */
+		    /**
+		     * @ignore
+		     */
 		    marker: null,
 
 		    /**
@@ -300,15 +266,19 @@
 
 		        hover: {
 
-		            /** @ignore */
-		            halo: false, // #3406, halo is disabled on heatmaps by default
+		            /**
+		             * @ignore
+		             */
+		            halo: false,  // #3406, halo is disabled on heatmaps by default
 
 		            /**
 		             * How much to brighten the point on interaction. Requires the main
 		             * color to be defined in hex or rgb(a) format.
 		             *
-		             * In styled mode, the hover brightening is by default replaced with
-		             * a fill-opacity set in the `.highcharts-point:hover` rule.
+		             * In styled mode, the hover brightening is by default replaced
+		             * with a fill-opacity set in the `.highcharts-point:hover` rule.
+		             *
+		             * @product highcharts highmaps
 		             */
 		            brightness: 0.2
 		        }
@@ -335,8 +305,7 @@
 		        options = this.options;
 		        // #3758, prevent resetting in setData
 		        options.pointRange = pick(options.pointRange, options.colsize || 1);
-		        // general point range
-		        this.yAxis.axisPointRange = options.rowsize || 1;
+		        this.yAxis.axisPointRange = options.rowsize || 1; // general point range
 		    },
 
 		    /**
@@ -355,7 +324,7 @@
 
 		        series.generatePoints();
 
-		        series.points.forEach(function (point) {
+		        each(series.points, function (point) {
 		            var xPad = (options.colsize || 1) / 2,
 		                yPad = (options.rowsize || 1) / 2,
 		                x1 = between(
@@ -403,15 +372,14 @@
 		     * @function Highcharts.seriesTypes.heatmap#drawPoints
 		     */
 		    drawPoints: function () {
-
-		        // In styled mode, use CSS, otherwise the fill used in the style sheet
-		        // will take precedence over the fill attribute.
-		        var func = this.chart.styledMode ? 'css' : 'attr';
-
 		        seriesTypes.column.prototype.drawPoints.call(this);
 
-		        this.points.forEach(function (point) {
-		            point.graphic[func](this.colorAttribs(point));
+		        each(this.points, function (point) {
+            
+		            // In styled mode, use CSS, otherwise the fill used in the style
+		            // sheet will take precedence over the fill attribute.
+		            point.graphic.css(this.colorAttribs(point));
+            
 		        }, this);
 		    },
 
@@ -592,14 +560,13 @@
 		 *         Point padding on tiles
 		 *
 		 * @type      {number}
-		 * @product   highcharts highmaps
 		 * @apioption series.heatmap.data.pointPadding
 		 */
 
 
 	}(Highcharts));
 	(function (H) {
-		/* *
+		/**
 		 * Tilemaps module
 		 *
 		 * (c) 2010-2017 Highsoft AS
@@ -611,6 +578,8 @@
 
 
 		var seriesType = H.seriesType,
+		    each = H.each,
+		    reduce = H.reduce,
 		    pick = H.pick,
 		    // Utility func to get the middle number of 3
 		    between = function (x, a, b) {
@@ -625,10 +594,22 @@
 		        };
 		    };
 
-		// Map of shape types.
+		/**
+		 * Map of shape types.
+		 *
+		 * @private
+		 * @name Highcharts.tileShapeTypes
+		 * @type {*}
+		 */
 		H.tileShapeTypes = {
 
-		    // Hexagon shape type.
+		    /**
+		     * Hexagon shape type.
+		     *
+		     * @private
+		     * @name Highcharts.tileShapeTypes.hexagon
+		     * @type {*}
+		     */
 		    hexagon: {
 		        alignDataLabel: H.seriesTypes.scatter.prototype.alignDataLabel,
 		        getSeriesPadding: function (series) {
@@ -661,7 +642,7 @@
 
 		            series.generatePoints();
 
-		            series.points.forEach(function (point) {
+		            each(series.points, function (point) {
 		                var x1 = between(
 		                        Math.floor(
 		                            xAxis.len -
@@ -760,7 +741,13 @@
 		    },
 
 
-		    // Diamond shape type.
+		    /**
+		     * Diamond shape type.
+		     *
+		     * @private
+		     * @name Highcharts.tileShapeTypes.diamond
+		     * @type {*}
+		     */
 		    diamond: {
 		        alignDataLabel: H.seriesTypes.scatter.prototype.alignDataLabel,
 		        getSeriesPadding: function (series) {
@@ -791,7 +778,7 @@
 
 		            series.generatePoints();
 
-		            series.points.forEach(function (point) {
+		            each(series.points, function (point) {
 		                var x1 = between(
 		                        Math.round(
 		                            xAxis.len -
@@ -877,7 +864,13 @@
 		    },
 
 
-		    // Circle shape type.
+		    /**
+		     * Circle shape type.
+		     *
+		     * @private
+		     * @name Highcharts.tileShapeTypes.circle
+		     * @type {*}
+		     */
 		    circle: {
 		        alignDataLabel: H.seriesTypes.scatter.prototype.alignDataLabel,
 		        getSeriesPadding: function (series) {
@@ -905,7 +898,7 @@
 
 		            series.generatePoints();
 
-		            series.points.forEach(function (point) {
+		            each(series.points, function (point) {
 		                var x = between(
 		                        Math.round(
 		                            xAxis.len -
@@ -1007,7 +1000,13 @@
 		    },
 
 
-		    // Square shape type.
+		    /**
+		     * Square shape type.
+		     *
+		     * @private
+		     * @name Highcharts.tileShapeTypes.square
+		     * @type {*}
+		     */
 		    square: {
 		        alignDataLabel: H.seriesTypes.heatmap.prototype.alignDataLabel,
 		        translate: H.seriesTypes.heatmap.prototype.translate,
@@ -1030,18 +1029,15 @@
 
 		    var axis = this,
 		        // Find which series' padding to use
-		        seriesPadding = axis.series
-		            .map(function (series) {
-		                return series.getSeriesPixelPadding &&
-		                    series.getSeriesPixelPadding(axis);
-		            })
-		            .reduce(function (a, b) {
-		                return (a && a.padding) > (b && b.padding) ? a : b;
-		            }, undefined) ||
-		            {
-		                padding: 0,
-		                axisLengthFactor: 1
-		            },
+		        seriesPadding = reduce(H.map(axis.series, function (series) {
+		            return series.getSeriesPixelPadding &&
+		                series.getSeriesPixelPadding(axis);
+		        }), function (a, b) {
+		            return (a && a.padding) > (b && b.padding) ? a : b;
+		        }, undefined) || {
+		            padding: 0,
+		            axisLengthFactor: 1
+		        },
 		        lengthPadding = Math.round(
 		            seriesPadding.padding * seriesPadding.axisLengthFactor
 		        );
@@ -1162,7 +1158,14 @@
 
 		}, { // Prototype functions
 
-		    // Set tile shape object on series
+		    /**
+		     * Set tile shape object on series
+		     *
+		     * @private
+		     * @function Highcharts.seriesTypes.tilemap#setOptions
+		     *
+		     * @return {*}
+		     */
 		    setOptions: function () {
 		        // Call original function
 		        var ret = H.seriesTypes.heatmap.prototype.setOptions.apply(this,
@@ -1173,14 +1176,30 @@
 		        return ret;
 		    },
 
-		    // Use the shape's defined data label alignment function
+		    /**
+		     * Use the shape's defined data label alignment function
+		     *
+		     * @private
+		     * @function Highcharts.seriesTypes.tilemap#alignDataLabel
+		     *
+		     * @return {*}
+		     */
 		    alignDataLabel: function () {
 		        return this.tileShape.alignDataLabel.apply(this,
 		            Array.prototype.slice.call(arguments)
 		        );
 		    },
 
-		    // Get metrics for padding of axis for this series
+		    /**
+		     * Get metrics for padding of axis for this series
+		     *
+		     * @private
+		     * @function Highcharts.seriesTypes.tilemap#getSeriesPixelPadding
+		     *
+		     * @param {Highcharts.Axis} axis
+		     *
+		     * @return {*}
+		     */
 		    getSeriesPixelPadding: function (axis) {
 		        var isX = axis.isXAxis,
 		            padding = this.tileShape.getSeriesPadding(this),
@@ -1225,7 +1244,12 @@
 		        };
 		    },
 
-		    // Use translate from tileShape
+		    /**
+		     * Use translate from tileShape
+		     *
+		     * @private
+		     * @function Highcharts.seriesTypes.tilemap#translate
+		     */
 		    translate: function () {
 		        return this.tileShape.translate.apply(this,
 		            Array.prototype.slice.call(arguments)

@@ -1,8 +1,10 @@
 /**
- * @license Highcharts JS v7.0.0 (2018-12-11)
+ * @license Highcharts JS v6.2.0 (2018-10-17)
  * StaticScale
  *
- * (c) 2016-2018 Torstein Honsi, Lars A. V. Cabrera
+ * (c) 2016 Torstein Honsi, Lars A. V. Cabrera
+ *
+ * --- WORK IN PROGRESS ---
  *
  * License: www.highcharts.com/license
  */
@@ -15,19 +17,18 @@
 			return factory;
 		});
 	} else {
-		factory(typeof Highcharts !== 'undefined' ? Highcharts : undefined);
+		factory(Highcharts);
 	}
 }(function (Highcharts) {
 	(function (H) {
-		/* *
+		/**
 		 * (c) 2018 Torstein Honsi, Lars Cabrera
 		 *
 		 * License: www.highcharts.com/license
 		 */
 
-
-
 		var Chart = H.Chart,
+		    each = H.each,
 		    pick = H.pick;
 
 		/**
@@ -37,13 +38,11 @@
 		 * height of the chart adjusts. Adding or removing items will make the chart
 		 * resize.
 		 *
-		 * @sample gantt/xrange-series/demo/
-		 *         X-range series with static scale
-		 *
-		 * @type      {number}
-		 * @default   50
-		 * @since     6.2.0
-		 * @product   gantt
+		 * @type {number}
+		 * @sample gantt/xrange-series/demo/ X-range series with static scale
+		 * @since 6.2.0
+		 * @product gantt
+		 * @default 50
 		 * @apioption yAxis.staticScale
 		 */
 
@@ -59,7 +58,7 @@
 
 		Chart.prototype.adjustHeight = function () {
 		    if (this.redrawTrigger !== 'adjustHeight') {
-		        (this.axes || []).forEach(function (axis) {
+		        each(this.axes || [], function (axis) {
 		            var chart = axis.chart,
 		                animate = !!chart.initiatedScale && chart.options.animation,
 		                staticScale = axis.options.staticScale,
@@ -86,7 +85,7 @@
 
 		                // Make sure clip rects have the right height before initial
 		                // animation.
-		                axis.series.forEach(function (series) {
+		                each(axis.series, function (series) {
 		                    var clipRect =
 		                        series.sharedClipKey && chart[series.sharedClipKey];
 		                    if (clipRect) {

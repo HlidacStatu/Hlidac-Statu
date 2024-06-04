@@ -344,7 +344,7 @@ pie: {
             sb.AppendLine($"<script>");
             sb.AppendLine($"var price_year_chart;");
             sb.AppendLine("$(document).ready(function() {");
-            sb.AppendLine($"price_year_chart = Highcharts.chart('{containerId}',");
+            sb.AppendLine($"price_year_chart = new Highcharts.chart('{containerId}',");
             sb.AppendLine("{ chart: {");
             sb.AppendLine($"    renderTo:\"{containerId}\",");
             sb.AppendLine($"    height:\"{(rds.Count() > 1 ? height + 62 : height)}\",");

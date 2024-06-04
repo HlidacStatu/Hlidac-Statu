@@ -1,7 +1,7 @@
 /**
- * @license Highcharts JS v7.0.0 (2018-12-11)
+ * @license Highcharts JS v6.2.0 (2018-10-17)
  *
- * (c) 2009-2018 Highsoft AS
+ * (c) 2009-2017 Highsoft AS
  *
  * License: www.highcharts.com/license
  */
@@ -14,7 +14,7 @@
 			return factory;
 		});
 	} else {
-		factory(typeof Highcharts !== 'undefined' ? Highcharts : undefined);
+		factory(Highcharts);
 	}
 }(function (Highcharts) {
 	(function (Highcharts) {

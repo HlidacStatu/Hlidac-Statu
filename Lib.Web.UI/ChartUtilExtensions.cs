@@ -100,7 +100,7 @@ namespace HlidacStatu.Lib.Web.UI
             sb.AppendLine($"var g_{random};");
             sb.AppendLine("$(document).ready(function () {");
             //sb.AppendLine(GraphTheme());
-            sb.AppendLine($"g_{random} = Highcharts.Chart(");
+            sb.AppendLine($"g_{random} = new Highcharts.Chart(");
 
             var anon = new
             {
@@ -163,7 +163,7 @@ namespace HlidacStatu.Lib.Web.UI
             sb.AppendLine($"var g_{random};");
             sb.AppendLine("$(document).ready(function () {");
             //sb.AppendLine(GraphTheme());
-            sb.AppendLine($"g_{random} = Highcharts.Chart(");
+            sb.AppendLine($"g_{random} = new Highcharts.Chart(");
 
             var anon = new
             {
@@ -611,7 +611,7 @@ point: {
             sb.AppendLine($"<script>");
             sb.AppendLine($"var price_year_chart;");
             sb.AppendLine("$(document).ready(function() {");
-            sb.AppendLine($"price_year_chart = Highcharts.chart('{containerId}',");
+            sb.AppendLine($"price_year_chart = new Highcharts.chart('{containerId}',");
             sb.AppendLine("{ chart: {");
             sb.AppendLine($"    renderTo:\"{containerId}\",");
             sb.AppendLine($"    height:\"{(rds.Count() > 1 ? height + 62 : height)}\",");

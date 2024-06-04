@@ -1,5 +1,5 @@
 /**
- * @license  Highcharts JS v7.0.0 (2018-12-11)
+ * @license  Highcharts JS v6.2.0 (2018-10-17)
  * Vector plot series module
  *
  * (c) 2010-2018 Torstein Honsi
@@ -15,7 +15,7 @@
 			return factory;
 		});
 	} else {
-		factory(typeof Highcharts !== 'undefined' ? Highcharts : undefined);
+		factory(Highcharts);
 	}
 }(function (Highcharts) {
 	(function (H) {
@@ -29,7 +29,8 @@
 
 
 
-		var seriesType = H.seriesType;
+		var each = H.each,
+		    seriesType = H.seriesType;
 
 		/**
 		 * The vector series class.
@@ -209,7 +210,7 @@
 
 		        var chart = this.chart;
 
-		        this.points.forEach(function (point) {
+		        each(this.points, function (point) {
 		            var plotX = point.plotX,
 		                plotY = point.plotY;
 

@@ -1,8 +1,8 @@
 /**
- * @license Highcharts JS v7.0.0 (2018-12-11)
+ * @license Highcharts JS v6.2.0 (2018-10-17)
  * Drag-panes module
  *
- * (c) 2010-2018 Highsoft AS
+ * (c) 2010-2017 Highsoft AS
  * Author: Kacper Madej
  *
  * License: www.highcharts.com/license
@@ -16,11 +16,11 @@
 			return factory;
 		});
 	} else {
-		factory(typeof Highcharts !== 'undefined' ? Highcharts : undefined);
+		factory(Highcharts);
 	}
 }(function (Highcharts) {
 	(function (H) {
-		/* *
+		/**
 		 * Plugin for resizing axes / panes in a chart.
 		 *
 		 * (c) 2010-2017 Highsoft AS
@@ -30,10 +30,10 @@
 		 */
 
 
-
 		var hasTouch = H.hasTouch,
 		    merge = H.merge,
 		    wrap = H.wrap,
+		    each = H.each,
 		    isNumber = H.isNumber,
 		    addEvent = H.addEvent,
 		    relativeLength = H.relativeLength,
@@ -41,7 +41,9 @@
 		    Axis = H.Axis,
 		    Pointer = H.Pointer,
 
-		    // Default options for AxisResizer.
+		    /**
+		     * Default options for AxisResizer.
+		     */
 		    resizerOptions = {
 		        /**
 		         * Minimal size of a resizable axis. Could be set as a percent
@@ -134,50 +136,7 @@
 		             */
 		            enabled: false,
 
-		            /**
-		             * Cursor style for the control line.
-		             *
-		             * In styled mode use class `highcharts-axis-resizer` instead.
-		             *
-		             * This feature requires the `drag-panes.js` module.
-		             */
-		            cursor: 'ns-resize',
-
-		            /**
-		             * Color of the control line.
-		             *
-		             * In styled mode use class `highcharts-axis-resizer` instead.
-		             *
-		             * This feature requires the `drag-panes.js` module.
-		             *
-		             * @type   {Color}
-		             * @sample {highstock} stock/yaxis/styled-resizer Styled resizer
-		             */
-		            lineColor: '#cccccc',
-
-		            /**
-		             * Dash style of the control line.
-		             *
-		             * In styled mode use class `highcharts-axis-resizer` instead.
-		             *
-		             * This feature requires the `drag-panes.js` module.
-		             *
-		             * @sample {highstock} stock/yaxis/styled-resizer Styled resizer
-		             * @see    For supported options check
-		             *         [dashStyle](#plotOptions.series.dashStyle)
-		             */
-		            lineDashStyle: 'Solid',
-
-		            /**
-		             * Width of the control line.
-		             *
-		             * In styled mode use class `highcharts-axis-resizer` instead.
-		             *
-		             * This feature requires the `drag-panes.js` module.
-		             *
-		             * @sample {highstock} stock/yaxis/styled-resizer Styled resizer
-		             */
-		            lineWidth: 4,
+            
 
 		            /**
 		             * Horizontal offset of the control line.
@@ -202,13 +161,8 @@
 
 		/**
 		 * The AxisResizer class.
-		 *
-		 * @private
+		 * @param {Object} axis - main axis for the AxisResizer.
 		 * @class
-		 * @name Highcharts.AxisResizer
-		 *
-		 * @param {Highcharts.Axis} axis
-		 *        Main axis for the AxisResizer.
 		 */
 		H.AxisResizer = function (axis) {
 		    this.init(axis);
@@ -217,11 +171,7 @@
 		H.AxisResizer.prototype = {
 		    /**
 		     * Initiate the AxisResizer object.
-		     *
-		     * @function Highcharts.AxisResizer#init
-		     *
-		     * @param {Highcharts.Axis} axis
-		     *        Main axis for the AxisResizer.
+		     * @param {Object} axis - main axis for the AxisResizer.
 		     */
 		    init: function (axis, update) {
 		        this.axis = axis;
@@ -236,8 +186,6 @@
 
 		    /**
 		     * Render the AxisResizer
-		     *
-		     * @function Highcharts.AxisResizer#render
 		     */
 		    render: function () {
 		        var resizer = this,
@@ -257,14 +205,7 @@
 		            attr = {},
 		            lineWidth;
 
-		        if (!chart.styledMode) {
-		            attr = {
-		                cursor: options.cursor,
-		                stroke: options.lineColor,
-		                'stroke-width': options.lineWidth,
-		                dashstyle: options.lineDashStyle
-		            };
-		        }
+        
 
 		        // Register current position for future reference.
 		        resizer.lastPos = pos - y;
@@ -275,13 +216,14 @@
 		        }
 
 		        // Add to axisGroup after axis update, because the group is recreated
+        
 		        // Do .add() before path is calculated because strokeWidth() needs it.
+        
 		        resizer.controlLine.add(axis.axisGroup);
 
-		        lineWidth = chart.styledMode ?
-		            resizer.controlLine.strokeWidth() :
-		            options.lineWidth;
-
+        
+		        lineWidth = resizer.controlLine.strokeWidth();
+        
 		        attr.d = chart.renderer.crispLine(
 		            [
 		                'M', axis.left + x, pos,
@@ -295,8 +237,6 @@
 
 		    /**
 		     * Set up the mouse and touch events for the control line.
-		     *
-		     * @function Highcharts.AxisResizer#addMouseEvents
 		     */
 		    addMouseEvents: function () {
 		        var resizer = this,
@@ -345,18 +285,14 @@
 
 		    /**
 		     * Mouse move event based on x/y mouse position.
-		     *
-		     * @function Highcharts.AxisResizer#onMouseMove
-		     *
-		     * @param {global.PointerEvent} e
-		     *        Mouse event.
+		     * @param {Object} e  - mouse event.
 		     */
 		    onMouseMove: function (e) {
 		        /*
 		         * In iOS, a mousemove event with e.pageX === 0 is fired when holding
 		         * the finger down in the center of the scrollbar. This should
 		         * be ignored. Borrowed from Navigator.
-		         */
+		        */
 		        if (!e.touches || e.touches[0].pageX !== 0) {
 		            // Drag the control line
 		            if (this.grabbed) {
@@ -369,11 +305,7 @@
 
 		    /**
 		     * Mouse up event based on x/y mouse position.
-		     *
-		     * @function Highcharts.AxisResizer#onMouseUp
-		     *
-		     * @param {global.PointerEvent} e
-		     *        Mouse event.
+		     * @param {Object} e - mouse event.
 		     */
 		    onMouseUp: function (e) {
 		        if (this.hasDragged) {
@@ -388,8 +320,6 @@
 		    /**
 		     * Mousedown on a control line.
 		     * Will store necessary information for drag&drop.
-		     *
-		     * @function Highcharts.AxisResizer#onMouseDown
 		     */
 		    onMouseDown: function () {
 		        // Clear all hover effects.
@@ -401,17 +331,13 @@
 
 		    /**
 		     * Update all connected axes after a change of control line position
-		     *
-		     * @function Highcharts.AxisResizer#updateAxes
-		     *
-		     * @param {number} chartY
 		     */
 		    updateAxes: function (chartY) {
 		        var resizer = this,
 		            chart = resizer.axis.chart,
 		            axes = resizer.options.controlledAxis,
 		            nextAxes = axes.next.length === 0 ?
-		                [chart.yAxis.indexOf(resizer.axis) + 1] : axes.next,
+		                [H.inArray(resizer.axis, chart.yAxis) + 1] : axes.next,
 		            // Main axis is included in the prev array by default
 		            prevAxes = [resizer.axis].concat(axes.prev),
 		            axesConfigs = [], // prev and next configs
@@ -435,8 +361,8 @@
 		        }
 
 		        // First gather info how axes should behave
-		        [prevAxes, nextAxes].forEach(function (axesGroup, isNext) {
-		            axesGroup.forEach(function (axisInfo, i) {
+		        each([prevAxes, nextAxes], function (axesGroup, isNext) {
+		            each(axesGroup, function (axisInfo, i) {
 		                // Axes given as array index, axis object or axis id
 		                var axis = isNumber(axisInfo) ?
 		                        // If it's a number - it's an index
@@ -542,7 +468,7 @@
 		        // If we hit the min/maxLength with dragging, don't do anything:
 		        if (!stopDrag) {
 		            // Now update axes:
-		            axesConfigs.forEach(function (config) {
+		            each(axesConfigs, function (config) {
 		                config.axis.update(config.options, false);
 		            });
 
@@ -553,8 +479,6 @@
 		    /**
 		     * Destroy AxisResizer. Clear outside references, clear events,
 		     * destroy elements, nullify properties.
-		     *
-		     * @function Highcharts.AxisResizer#destroy
 		     */
 		    destroy: function () {
 		        var resizer = this,
@@ -565,7 +489,7 @@
 
 		        // Clear control line events
 		        if (this.eventsToUnbind) {
-		            this.eventsToUnbind.forEach(function (unbind) {
+		            each(this.eventsToUnbind, function (unbind) {
 		                unbind();
 		            });
 		        }
@@ -629,8 +553,8 @@
 		    }
 		});
 
-		// Prevent default drag action detection while dragging a control line of
-		// AxisResizer. (#7563)
+		// Prevent default drag action detection while dragging a control line
+		// of AxisResizer. (#7563)
 		wrap(Pointer.prototype, 'drag', function (proceed) {
 		    if (!this.chart.activeResizer) {
 		        proceed.apply(this, Array.prototype.slice.call(arguments, 1));

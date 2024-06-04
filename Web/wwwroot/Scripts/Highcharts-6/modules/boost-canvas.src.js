@@ -1,8 +1,8 @@
 /**
- * @license Highcharts JS v7.0.0 (2018-12-11)
+ * @license Highcharts JS v6.2.0 (2018-10-17)
  * Boost module
  *
- * (c) 2010-2018 Highsoft AS
+ * (c) 2010-2017 Highsoft AS
  * Author: Torstein Honsi
  *
  * License: www.highcharts.com/license
@@ -16,11 +16,11 @@
 			return factory;
 		});
 	} else {
-		factory(typeof Highcharts !== 'undefined' ? Highcharts : undefined);
+		factory(Highcharts);
 	}
 }(function (Highcharts) {
 	(function (H) {
-		/* *
+		/**
 		 * License: www.highcharts.com/license
 		 * Author: Torstein Honsi, Christer Vasseng
 		 *
@@ -31,14 +31,13 @@
 		 * IE9 and IE10.
 		 */
 
-
-
 		var win = H.win,
 		    doc = win.document,
 		    noop = function () {},
 		    Color = H.Color,
 		    Series = H.Series,
 		    seriesTypes = H.seriesTypes,
+		    each = H.each,
 		    extend = H.extend,
 		    addEvent = H.addEvent,
 		    fireEvent = H.fireEvent,
@@ -49,24 +48,14 @@
 		    CHUNK_SIZE = 50000,
 		    destroyLoadingDiv;
 
-		/**
-		 * Initialize the canvas boost.
-		 *
-		 * @function Highcharts.initCanvasBoost
-		 */
 		H.initCanvasBoost = function () {
 		    if (H.seriesTypes.heatmap) {
 		        H.wrap(H.seriesTypes.heatmap.prototype, 'drawPoints', function () {
-		            var chart = this.chart,
-		                ctx = this.getContext(),
-		                inverted = this.chart.inverted,
-		                xAxis = this.xAxis,
-		                yAxis = this.yAxis;
-
+		            var ctx = this.getContext();
 		            if (ctx) {
 
 		                // draw the columns
-		                this.points.forEach(function (point) {
+		                each(this.points, function (point) {
 		                    var plotY = point.plotY,
 		                        shapeArgs,
 		                        pointAttr;
@@ -78,29 +67,17 @@
 		                    ) {
 		                        shapeArgs = point.shapeArgs;
 
-		                        if (!chart.styledMode) {
-		                            pointAttr = point.series.pointAttribs(point);
-		                        } else {
-		                            pointAttr = point.series.colorAttribs(point);
-		                        }
+                        
+		                        pointAttr = point.series.pointAttribs(point);
+                        
 
 		                        ctx.fillStyle = pointAttr.fill;
-
-		                        if (inverted) {
-		                            ctx.fillRect(
-		                                yAxis.len - shapeArgs.y + xAxis.left,
-		                                xAxis.len - shapeArgs.x + yAxis.top,
-		                                -shapeArgs.height,
-		                                -shapeArgs.width
-		                            );
-		                        } else {
-		                            ctx.fillRect(
-		                                shapeArgs.x + xAxis.left,
-		                                shapeArgs.y + yAxis.top,
-		                                shapeArgs.width,
-		                                shapeArgs.height
-		                            );
-		                        }
+		                        ctx.fillRect(
+		                            shapeArgs.x,
+		                            shapeArgs.y,
+		                            shapeArgs.width,
+		                            shapeArgs.height
+		                        );
 		                    }
 		                });
 
@@ -125,9 +102,6 @@
 		        /**
 		         * Create a hidden canvas to draw the graph on. The contents is later
 		         * copied over to an SVG image element.
-		         *
-		         * @private
-		         * @function Highcharts.Series#getContext
 		         */
 		        getContext: function () {
 		            var chart = this.chart,
@@ -163,7 +137,7 @@
 		                target.ctx = ctx = target.canvas.getContext('2d');
 
 		                if (chart.inverted) {
-		                    ['moveTo', 'lineTo', 'rect', 'arc'].forEach(function (fn) {
+		                    each(['moveTo', 'lineTo', 'rect', 'arc'], function (fn) {
 		                        wrap(ctx, fn, swapXY);
 		                    });
 		                }
@@ -219,9 +193,6 @@
 
 		        /**
 		         * Draw the canvas image inside an SVG image
-		         *
-		         * @private
-		         * @function Highcharts.Series#canvasToSVG
 		         */
 		        canvasToSVG: function () {
 		            if (!this.chart.isChartSeriesBoosting()) {

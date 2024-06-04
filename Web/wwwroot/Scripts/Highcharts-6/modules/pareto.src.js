@@ -1,9 +1,9 @@
 /**
- * @license  Highcharts JS v7.0.0 (2018-12-11)
+ * @license  Highcharts JS v6.2.0 (2018-10-17)
  *
  * Pareto series type for Highcharts
  *
- * (c) 2010-2018 Sebastian Bochan
+ * (c) 2010-2017 Sebastian Bochan
  *
  * License: www.highcharts.com/license
  */
@@ -16,37 +16,35 @@
 			return factory;
 		});
 	} else {
-		factory(typeof Highcharts !== 'undefined' ? Highcharts : undefined);
+		factory(Highcharts);
 	}
 }(function (Highcharts) {
 	var derivedSeriesMixin = (function (H) {
 
-
-		var Series = H.Series,
+		var each = H.each,
+		    Series = H.Series,
 		    addEvent = H.addEvent,
 		    noop = H.noop;
 
 
-		/* ************************************************************************** *
-		 *
-		 * DERIVED SERIES MIXIN
-		 *
-		 * ************************************************************************** */
+		/* ***************************************************************************
+		*
+		* DERIVED SERIES MIXIN
+		*
+		**************************************************************************** */
 
 		/**
 		 * Provides methods for auto setting/updating series data based on the based
 		 * series data.
 		 *
-		 * @private
-		 * @mixin derivedSeriesMixin
-		 */
+		 * @mixin
+		 **/
 		var derivedSeriesMixin = {
-		    /**
-		     * Initialise series
-		     *
-		     * @private
-		     * @function derivedSeriesMixin.init
-		     */
+		  /**
+		   * Initialise series
+		   *
+		   * returns {undefined}
+		   **/
 		    init: function () {
 		        Series.prototype.init.apply(this, arguments);
 
@@ -57,26 +55,21 @@
 		        this.addEvents();
 		    },
 
-		    /**
-		     * Method to be implemented - inside the method the series has already
-		     * access to the base series via m `this.baseSeries` and the bases data is
-		     * initialised. It should return data in the format accepted by
-		     * `Series.setData()` method
-		     *
-		     * @private
-		     * @function derivedSeriesMixin.setDerivedData
-		     *
-		     * @return {Array<*>}
-		     *         An array of data
-		     */
+		  /**
+		   * Method to be implemented - inside the method the series has already access
+		   * to the base series via m `this.baseSeries` and the bases data is
+		   * initialised. It should return data in the format accepted by
+		   * `Series.setData()` method
+		   *
+		   * @returns {Array} - an array of data
+		   **/
 		    setDerivedData: noop,
 
-		    /**
-		     * Sets base series for the series
-		     *
-		     * @private
-		     * @function derivedSeriesMixin.setBaseSeries
-		     */
+		  /**
+		   * Sets base series for the series
+		   *
+		   * returns {undefined}
+		   **/
 		    setBaseSeries: function () {
 		        var chart = this.chart,
 		            baseSeriesOptions = this.options.baseSeries,
@@ -87,12 +80,11 @@
 		        this.baseSeries = baseSeries || null;
 		    },
 
-		    /**
-		     * Adds events for the series
-		     *
-		     * @private
-		     * @function derivedSeriesMixin.addEvents
-		     */
+		  /**
+		   * Adds events for the series
+		   *
+		   * @returns {undefined}
+		   **/
 		    addEvents: function () {
 		        var derivedSeries = this,
 		            chartSeriesLinked;
@@ -116,13 +108,12 @@
 		        );
 		    },
 
-		    /**
-		     * Adds events to the base series - it required for recalculating the data
-		     * in the series if the base series is updated / removed / etc.
-		     *
-		     * @private
-		     * @function derivedSeriesMixin.addBaseSeriesEvents
-		     */
+		  /**
+		   * Adds events to the base series - it required for recalculating the data in
+		   * the series if the base series is updated / removed / etc.
+		   *
+		   * @returns {undefined}
+		   **/
 		    addBaseSeriesEvents: function () {
 		        var derivedSeries = this,
 		            updatedDataRemover,
@@ -151,14 +142,13 @@
 		      );
 		    },
 
-		    /**
-		     * Destroys the series
-		     *
-		     * @private
-		     * @function derivedSeriesMixin.destroy
-		     */
+		  /**
+		   * Destroys the series
+		   *
+		   * @returns {undefined}
+		   **/
 		    destroy: function () {
-		        this.eventRemovers.forEach(function (remover) {
+		        each(this.eventRemovers, function (remover) {
 		            remover();
 		        });
 
@@ -170,15 +160,15 @@
 		return derivedSeriesMixin;
 	}(Highcharts));
 	(function (H, derivedSeriesMixin) {
-		/* *
+		/**
 		 * (c) 2010-2017 Sebastian Bochan
 		 *
 		 * License: www.highcharts.com/license
 		 */
 
 
-
-		var correctFloat = H.correctFloat,
+		var each = H.each,
+		    correctFloat = H.correctFloat,
 		    seriesType = H.seriesType,
 		    merge = H.merge;
 
@@ -186,48 +176,41 @@
 		/**
 		 * The pareto series type.
 		 *
-		 * @private
-		 * @class
-		 * @name Highcharts.seriesTypes.pareto
-		 *
-		 * @augments Highcharts.Series
+		 * @constructor seriesTypes.pareto
+		 * @augments seriesTypes.line
 		 */
-		seriesType('pareto', 'line'
 
 		/**
 		 * A pareto diagram is a type of chart that contains both bars and a line graph,
-		 * where individual values are represented in descending order by bars, and the
-		 * cumulative total is represented by the line.
+		 * where individual values are represented in descending order by bars,
+		 * and the cumulative total is represented by the line.
 		 *
+		 * @extends plotOptions.line
+		 * @product highcharts
 		 * @sample {highcharts} highcharts/demo/pareto/
 		 *         Pareto diagram
-		 *
-		 * @extends      plotOptions.line
-		 * @since        6.0.0
-		 * @product      highcharts
-		 * @excluding    allAreas, boostThreshold, borderColor, borderRadius,
-		 *               borderWidth, crisp, colorAxis, depth, data, edgeColor,
-		 *               edgeWidth, findNearestPointBy, gapSize, gapUnit, grouping,
-		 *               groupPadding, groupZPadding, maxPointWidth, keys,
-		 *               negativeColor, pointInterval, pointIntervalUnit, pointPadding,
-		 *               pointPlacement, pointRange, pointStart, pointWidth, shadow,
-		 *               step, softThreshold, stacking, threshold, zoneAxis, zones
+		 * @since 6.0.0
+		 * @excluding allAreas,boostThreshold,borderColor,borderRadius,
+		 *         borderWidth,crisp,colorAxis,depth,data,edgeColor,edgeWidth,
+		 *         findNearestPointBy,gapSize,gapUnit,grouping,groupPadding,
+		 *         groupZPadding,maxPointWidth,keys,negativeColor,pointInterval,
+		 *         pointIntervalUnit,pointPadding,pointPlacement,pointRange,pointStart,
+		 *         pointWidth,shadow,step,softThreshold,
+		 *         stacking,threshold,zoneAxis,zones
 		 * @optionparent plotOptions.pareto
 		 */
-		, {
+
+		seriesType('pareto', 'line', {
 		    /**
 		     * Higher zIndex than column series to draw line above shapes.
 		     */
 		    zIndex: 3
 		}, merge(derivedSeriesMixin, {
 		    /**
-		     * Calculate sum and return percent points.
+		     * calculate sum and return percent points
 		     *
-		     * @private
-		     * @function Highcharts.Series#setDerivedData
-		     *
-		     * @return {Array<Array<number,number>>}
-		     *         Returns array of points [x,y]
+		     * @param  {Object} series
+		     * @return {Array} Returns array of points [x,y]
 		     */
 		    setDerivedData: function () {
 		        if (this.baseSeries.yData.length > 1) {
@@ -242,25 +225,13 @@
 		        }
 		    },
 		    /**
-		     * Calculate y sum and each percent point.
+		     * calculate y sum and each percent point
 		     *
-		     * @private
-		     * @function Highcharts.Series#sumPointsPercents
-		     *
-		     * @param {Array<number>} yValues
-		     *        Y values
-		     *
-		     * @param {Array<number>} xValues
-		     *        X values
-		     *
-		     * @param {number} sum
-		     *        Sum of all y values
-		     *
-		     * @param {boolean} [isSum]
-		     *        Declares if calculate sum of all points
-		     *
-		     * @return {number|Array<number,number>}
-		     *         Returns sum of points or array of points [x,sum]
+		     * @param  {Array} yValues y values
+		     * @param  {Array} xValues x values
+		     * @param  {Number} sum of all y values
+		     * @param  {Boolean} isSum declares if calculate sum of all points
+		     * @return {Array} Returns sum of points or array of points [x,y]
 		     */
 		    sumPointsPercents: function (yValues, xValues, sum, isSum) {
 		        var sumY = 0,
@@ -268,7 +239,7 @@
 		            percentPoints = [],
 		            percentPoint;
 
-		        yValues.forEach(function (point, i) {
+		        each(yValues, function (point, i) {
 		            if (point !== null) {
 		                if (isSum) {
 		                    sumY += point;
@@ -290,10 +261,11 @@
 		 * A `pareto` series. If the [type](#series.pareto.type) option is not
 		 * specified, it is inherited from [chart.type](#chart.type).
 		 *
-		 * @extends   series,plotOptions.pareto
-		 * @since     6.0.0
-		 * @product   highcharts
-		 * @excluding data, dataParser, dataURL
+		 * @type {Object}
+		 * @since 6.0.0
+		 * @extends series,plotOptions.pareto
+		 * @excluding data,dataParser,dataURL
+		 * @product highcharts
 		 * @apioption series.pareto
 		 */
 
@@ -301,8 +273,8 @@
 		 * An integer identifying the index to use for the base series, or a string
 		 * representing the id of the series.
 		 *
-		 * @type      {number|string}
-		 * @default   undefined
+		 * @type {Number|String}
+		 * @default undefined
 		 * @apioption series.pareto.baseSeries
 		 */
 
@@ -310,10 +282,10 @@
 		 * An array of data points for the series. For the `pareto` series type,
 		 * points are calculated dynamically.
 		 *
-		 * @type      {Array<Array<number|string>|*>}
-		 * @extends   series.column.data
-		 * @since     6.0.0
-		 * @product   highcharts
+		 * @type {Array<Object|Array>}
+		 * @since 6.0.0
+		 * @extends series.column.data
+		 * @product highcharts
 		 * @apioption series.pareto.data
 		 */
 

@@ -1,7 +1,7 @@
 /**
- * @license  Highcharts JS v7.0.0 (2018-12-11)
+ * @license  Highcharts JS v6.2.0 (2018-10-17)
  *
- * (c) 2010-2018 Highsoft AS
+ * (c) 2010-2017 Highsoft AS
  * Author: Sebastian Domas
  *
  * License: www.highcharts.com/license
@@ -15,37 +15,35 @@
 			return factory;
 		});
 	} else {
-		factory(typeof Highcharts !== 'undefined' ? Highcharts : undefined);
+		factory(Highcharts);
 	}
 }(function (Highcharts) {
 	var derivedSeriesMixin = (function (H) {
 
-
-		var Series = H.Series,
+		var each = H.each,
+		    Series = H.Series,
 		    addEvent = H.addEvent,
 		    noop = H.noop;
 
 
-		/* ************************************************************************** *
-		 *
-		 * DERIVED SERIES MIXIN
-		 *
-		 * ************************************************************************** */
+		/* ***************************************************************************
+		*
+		* DERIVED SERIES MIXIN
+		*
+		**************************************************************************** */
 
 		/**
 		 * Provides methods for auto setting/updating series data based on the based
 		 * series data.
 		 *
-		 * @private
-		 * @mixin derivedSeriesMixin
-		 */
+		 * @mixin
+		 **/
 		var derivedSeriesMixin = {
-		    /**
-		     * Initialise series
-		     *
-		     * @private
-		     * @function derivedSeriesMixin.init
-		     */
+		  /**
+		   * Initialise series
+		   *
+		   * returns {undefined}
+		   **/
 		    init: function () {
 		        Series.prototype.init.apply(this, arguments);
 
@@ -56,26 +54,21 @@
 		        this.addEvents();
 		    },
 
-		    /**
-		     * Method to be implemented - inside the method the series has already
-		     * access to the base series via m `this.baseSeries` and the bases data is
-		     * initialised. It should return data in the format accepted by
-		     * `Series.setData()` method
-		     *
-		     * @private
-		     * @function derivedSeriesMixin.setDerivedData
-		     *
-		     * @return {Array<*>}
-		     *         An array of data
-		     */
+		  /**
+		   * Method to be implemented - inside the method the series has already access
+		   * to the base series via m `this.baseSeries` and the bases data is
+		   * initialised. It should return data in the format accepted by
+		   * `Series.setData()` method
+		   *
+		   * @returns {Array} - an array of data
+		   **/
 		    setDerivedData: noop,
 
-		    /**
-		     * Sets base series for the series
-		     *
-		     * @private
-		     * @function derivedSeriesMixin.setBaseSeries
-		     */
+		  /**
+		   * Sets base series for the series
+		   *
+		   * returns {undefined}
+		   **/
 		    setBaseSeries: function () {
 		        var chart = this.chart,
 		            baseSeriesOptions = this.options.baseSeries,
@@ -86,12 +79,11 @@
 		        this.baseSeries = baseSeries || null;
 		    },
 
-		    /**
-		     * Adds events for the series
-		     *
-		     * @private
-		     * @function derivedSeriesMixin.addEvents
-		     */
+		  /**
+		   * Adds events for the series
+		   *
+		   * @returns {undefined}
+		   **/
 		    addEvents: function () {
 		        var derivedSeries = this,
 		            chartSeriesLinked;
@@ -115,13 +107,12 @@
 		        );
 		    },
 
-		    /**
-		     * Adds events to the base series - it required for recalculating the data
-		     * in the series if the base series is updated / removed / etc.
-		     *
-		     * @private
-		     * @function derivedSeriesMixin.addBaseSeriesEvents
-		     */
+		  /**
+		   * Adds events to the base series - it required for recalculating the data in
+		   * the series if the base series is updated / removed / etc.
+		   *
+		   * @returns {undefined}
+		   **/
 		    addBaseSeriesEvents: function () {
 		        var derivedSeries = this,
 		            updatedDataRemover,
@@ -150,14 +141,13 @@
 		      );
 		    },
 
-		    /**
-		     * Destroys the series
-		     *
-		     * @private
-		     * @function derivedSeriesMixin.destroy
-		     */
+		  /**
+		   * Destroys the series
+		   *
+		   * @returns {undefined}
+		   **/
 		    destroy: function () {
-		        this.eventRemovers.forEach(function (remover) {
+		        each(this.eventRemovers, function (remover) {
 		            remover();
 		        });
 
@@ -172,13 +162,15 @@
 
 
 
-		var objectEach = H.objectEach,
+		var each = H.each,
+		    objectEach = H.objectEach,
 		    seriesType = H.seriesType,
 		    correctFloat = H.correctFloat,
 		    isNumber = H.isNumber,
 		    arrayMax = H.arrayMax,
 		    arrayMin = H.arrayMin,
-		    merge = H.merge;
+		    merge = H.merge,
+		    map = H.map;
 
 		/* ***************************************************************************
 		 *
@@ -267,7 +259,7 @@
 		    pointPlacement: 'between',
 		    tooltip: {
 		        headerFormat: '',
-		        pointFormat: '<span style="font-size: 10px">{point.x} - {point.x2}' +
+		        pointFormat: '<span style="font-size:10px">{point.x} - {point.x2}' +
 		            '</span><br/>' +
 		            '<span style="color:{point.color}">\u25CF</span>' +
 		            ' {series.name} <b>{point.y}</b><br/>'
@@ -312,11 +304,11 @@
 		        }
 
 		        fitToBin = fitToBinLeftClosed(
-		            frequencies.map(function (elem) {
+		            map(frequencies, function (elem) {
 		                return parseFloat(elem);
 		            }));
 
-		        baseData.forEach(function (y) {
+		        each(baseData, function (y) {
 		            var x = correctFloat(fitToBin(y));
 		            bins[x]++;
 		        });
@@ -391,11 +383,11 @@
 
 
 
-
 		var seriesType = H.seriesType,
 		    correctFloat = H.correctFloat,
 		    isNumber = H.isNumber,
-		    merge = H.merge;
+		    merge = H.merge,
+		    reduce = H.reduce;
 
 
 		/** ****************************************************************************
@@ -406,7 +398,7 @@
 
 		function mean(data) {
 		    var length = data.length,
-		        sum = data.reduce(function (sum, value) {
+		        sum = reduce(data, function (sum, value) {
 		            return (sum += value);
 		        }, 0);
 
@@ -419,7 +411,7 @@
 
 		    average = isNumber(average) ? average : mean(data);
 
-		    sum = data.reduce(function (sum, value) {
+		    sum = reduce(data, function (sum, value) {
 		        var diff = value - average;
 		        return (sum += diff * diff);
 		    }, 0);
@@ -436,16 +428,13 @@
 		}
 
 
-		/* *
+		/**
 		 * Bell curve class
 		 *
-		 * @private
-		 * @class
-		 * @name Highcharts.seriesTypes.bellcurve
-		 *
-		 * @augments Highcharts.Series
-		 * @mixes    DerivedSeriesMixin
-		 */
+		 * @constructor seriesTypes.bellcurve
+		 * @augments seriesTypes.areaspline
+		 * @mixes DerivedSeriesMixin
+		 **/
 
 		/**
 		 * A bell curve is an areaspline series which represents the probability density
@@ -453,16 +442,14 @@
 		 * deviation of the base series data and plots the curve according to the
 		 * calculated parameters.
 		 *
-		 * @sample {highcharts} highcharts/demo/bellcurve/
-		 *         Bell curve
-		 *
-		 * @extends      plotOptions.areaspline
-		 * @since        6.0.0
 		 * @product      highcharts
-		 * @excluding    boostThreshold, connectNulls, stacking, pointInterval,
+		 * @sample       {highcharts} highcharts/demo/bellcurve/ Bell curve
+		 * @since        6.0.0
+		 * @extends      plotOptions.areaspline
+		 * @excluding    boostThreshold,connectNulls,stacking,pointInterval,
 		 *               pointIntervalUnit
 		 * @optionparent plotOptions.bellcurve
-		 */
+		 **/
 		seriesType('bellcurve', 'areaspline', {
 		   /**
 		    * This option allows to define the length of the bell curve. A unit of the
@@ -527,39 +514,41 @@
 
 
 		/**
-		 * A `bellcurve` series. If the [type](#series.bellcurve.type) option is not
-		 * specified, it is inherited from [chart.type](#chart.type).
-		 *
-		 * For options that apply to multiple series, it is recommended to add
-		 * them to the [plotOptions.series](#plotOptions.series) options structure.
-		 * To apply to all series of this specific type, apply it to
-		 * [plotOptions.bellcurve](#plotOptions.bellcurve).
-		 *
-		 * @extends   series,plotOptions.bellcurve
-		 * @since     6.0.0
-		 * @product   highcharts
-		 * @excluding dataParser, dataURL, data
-		 * @apioption series.bellcurve
-		 */
+		* A `bellcurve` series. If the [type](#series.bellcurve.type) option is not
+		* specified, it is inherited from [chart.type](#chart.type).
+		*
+		* For options that apply to multiple series, it is recommended to add
+		* them to the [plotOptions.series](#plotOptions.series) options structure.
+		* To apply to all series of this specific type, apply it to
+		* [plotOptions.bellcurve](#plotOptions.bellcurve).
+		*
+		* @type      {Object}
+		* @since     6.0.0
+		* @extends   series,plotOptions.bellcurve
+		* @excluding dataParser,dataURL,data
+		* @product   highcharts
+		* @apioption series.bellcurve
+		*/
 
 		/**
-		 * An integer identifying the index to use for the base series, or a string
-		 * representing the id of the series.
-		 *
-		 * @type      {number|string}
-		 * @apioption series.bellcurve.baseSeries
-		 */
+		* An integer identifying the index to use for the base series, or a string
+		* representing the id of the series.
+		*
+		* @type      {Number|String}
+		* @default   undefined
+		* @apioption series.bellcurve.baseSeries
+		*/
 
 		/**
-		 * An array of data points for the series. For the `bellcurve` series type,
-		 * points are calculated dynamically.
-		 *
-		 * @type      {Array<number|Array<number|string>|*>}
-		 * @extends   series.areaspline.data
-		 * @since     6.0.0
-		 * @product   highcharts
-		 * @apioption series.bellcurve.data
-		 */
+		* An array of data points for the series. For the `bellcurve` series type,
+		* points are calculated dynamically.
+		*
+		* @type      {Array<Object|Array>}
+		* @since     6.0.0
+		* @extends   series.areaspline.data
+		* @product   highcharts
+		* @apioption series.bellcurve.data
+		*/
 
 	}(Highcharts, derivedSeriesMixin));
 	return (function () {
