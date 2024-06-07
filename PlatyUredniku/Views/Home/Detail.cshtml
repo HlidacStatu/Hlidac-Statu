@@ -1,6 +1,5 @@
 @using Devmasters
 @using HlidacStatu.Repositories.SharedModels
-@using MathNet.Numerics.Statistics
 @using Microsoft.AspNetCore.Mvc.TagHelpers
 @using PlatyUredniku.Models
 @using HlidacStatu.Repositories;
@@ -195,7 +194,7 @@
 @{
     string[] compareTo = Model.CZISCO?.Split(new char[] { ',', ';', ' ' }, StringSplitOptions.RemoveEmptyEntries);
 }
-@if (compareTo?.Length > 0)
+@if (compareTo?.Length > 0 && Model.Platy.Any())
 {
     sectionBgSwitch = !sectionBgSwitch;
     <section class="d-flex justify-content-center @(sectionBgSwitch ? "alter-bg-color" : "")">
