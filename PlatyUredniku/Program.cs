@@ -96,9 +96,9 @@ public class Program
             else
             {
                 app.UseExceptionHandler("/Home/StatusCode/500"); // Generic error handling
-                app.UseStatusCodePagesWithReExecute("/Home/StatusCode", "?code={0}"); // Handle specific status codes
                 app.UseHsts();
             }
+            app.UseStatusCodePagesWithReExecute("/Home/StatusCode", "?code={0}"); // Handle specific status codes
             
             app.UseWebOptimizer();
 
