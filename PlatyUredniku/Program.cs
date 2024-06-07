@@ -3,7 +3,6 @@ using HlidacStatu.LibCore.Extensions;
 using HlidacStatu.LibCore.MiddleWares;
 using HlidacStatu.LibCore.Services;
 using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
@@ -87,18 +86,17 @@ public class Program
 
             app.UseTimeMeasureMiddleware(new List<string>() { "/_blazor" });
             
-            //app.UseBannedIpsMiddleware(whitelist);
+            app.UseBannedIpsMiddleware(whitelist);
 
-            //todo: remove after
-            app.UseDeveloperExceptionPage();
             // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())
             {
+                app.UseDeveloperExceptionPage();
             }
             else
             {
-                app.UseExceptionHandler("/Home/Error");
-                // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
+                app.UseExceptionHandler("/Home/StatusCode/500"); // Generic error handling
+                app.UseStatusCodePagesWithReExecute("/Home/StatusCode", "?code={0}"); // Handle specific status codes
                 app.UseHsts();
             }
             

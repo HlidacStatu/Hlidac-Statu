@@ -439,4 +439,22 @@ public class HomeController : Controller
         sb.AppendLine("</urlset>");
         return Content(sb.ToString(), "application/xml");
     }
+    
+    public IActionResult Error()
+    {
+        return View();
+    }
+
+    public IActionResult StatusCode(int code)
+    {
+        if (code == 404)
+        {
+            return View("NotFound");
+        }
+        else if (code >= 500)
+        {
+            return View("ServerError");
+        }
+        return View("Error");
+    }
 }
