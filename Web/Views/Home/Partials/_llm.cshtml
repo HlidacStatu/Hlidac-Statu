@@ -1,0 +1,22 @@
+﻿@model HlidacStatu.Entities.Smlouva
+
+@{
+}
+
+<div class="container">
+    <div class="row">
+        <div class="col">
+        <input type="button" id="sendButton" value="Send Message" />
+        </div>
+    </div>
+    <div class="row">
+        <div class="col">
+            <pre id="llmresult"
+                 style="overflow-x: auto;white-space: pre-wrap;white-space: -moz-pre-wrap;white-space: -pre-wrap;white-space: -o-pre-wrap;word-wrap: break-word;"></pre>
+
+        </div>
+    </div>
+</div>
+
+<script src="/js/signalr/dist/browser/signalr.js"></script>
+<script src="/js/ollama.js"></script>
