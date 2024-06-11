@@ -27,8 +27,8 @@ namespace HlidacStatu.Web
             DBUpgrades.DBUpgrader.UpgradeDatabases(Connectors.DirectDB.DefaultCnnStr);
             
             builder.Services.ConfigureServices(configuration);
-            
-            var app = builder.Build();
+
+            WebApplication app = builder.Build();
             app.ConfigurePipeline();
             
             app.Run();

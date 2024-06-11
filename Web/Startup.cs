@@ -23,6 +23,8 @@ using System.Collections.Generic;
 using System.Security.Cryptography;
 using System.Threading.Tasks;
 using WasmComponents.Components.Autocomplete;
+using Microsoft.AspNetCore.SignalR;
+
 
 namespace HlidacStatu.Web
 {
@@ -134,7 +136,7 @@ namespace HlidacStatu.Web
 
         //Nastavení, jak budou zpracovány požadavky (Middleware).
         //!Záleží na pořadí
-        public static void ConfigurePipeline(this IApplicationBuilder app)
+        public static void ConfigurePipeline(this WebApplication app)
         {
             app.UseRequestTrackMiddleware(new RequestTrackMiddleware.Options()
             {

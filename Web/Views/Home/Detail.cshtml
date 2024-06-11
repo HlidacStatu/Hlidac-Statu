@@ -29,7 +29,7 @@
 }
 
 @section breadcrumb
-    {
+{
     <ol class="breadcrumb">
         <li>
             <a href="/">Hlídač Státu</a>
@@ -43,7 +43,7 @@
 
 
 
-@if (User.IsInRole("BetaTester") && Model?.Classification?.HasClassification() != null)
+@if (false && User.IsInRole("BetaTester") && Model?.Classification?.HasClassification() != null)
 {
     <table class="table table-new table-new--dotted table-hover" id="invalidItemWarn">
         <tbody>
@@ -71,20 +71,18 @@
         </tbody>
     </table>
 }
-@if (this.User?.IsInRole("canEditData") == true)
-{
-    <table class="table table-new table-new--dotted table-hover" id="invalidItemWarn">
-        <tbody>
 
-            <tr>
-                <td colspan="2">
-                    <br /><a href="/manage/zmenasmluvnichstran/@Model.Id" class="btn btn-warning btn-sm" target="_blank">Změnit smluvni strany</a>
+<div class="row mb-5">
+    <div class="col" style="">
+        <partial name="WebUtil/SmlouvaDetailLLMModal" model="@(Model)" />
 
-                </td>
-            </tr>
-        </tbody>
-    </table>
-}
+        @if (this.User?.IsInRole("canEditData") == true)
+        {
+            <a href="/manage/zmenasmluvnichstran/@Model.Id" class="btn btn-warning ms-3" target="_blank">Změnit smluvni strany</a>
+        }
+    </div>
+</div>
+
 
 
 <h3>
@@ -282,7 +280,7 @@
                 @if (Model.ciziMena != null && Model.ciziMena.mena != null)
                 {
                     @Html.Raw(Model.ciziMena.hodnota > 0 && Model.ciziMena.mena != "CZK" ?
-                $"<p>Cena v cizí měně: <b>{Smlouva.NicePrice(Model.ciziMena.hodnota, Model.ciziMena.mena, html: true)}</b></p>" : "")
+                             $"<p>Cena v cizí měně: <b>{Smlouva.NicePrice(Model.ciziMena.hodnota, Model.ciziMena.mena, html: true)}</b></p>" : "")
                 }
                 @if (string.IsNullOrWhiteSpace(Model.cenaNeuvedenaDuvod) == false)
                 {
@@ -383,6 +381,8 @@
 
                         </div>
                     }
+
+
                 }
                 else
                 {
@@ -519,7 +519,7 @@
 
 
 @section onlyembed
-    {
+{
     <cache expires-after="@Constants.CachedActionLength.Cache2H"
            vary-by="@(WebUtil.GenerateCacheKey(new object[] { User.Identity.IsAuthenticated, Model.Id }))">
         <partial name="Partials/Detail_Child_embed" model="Model" />
@@ -528,7 +528,7 @@
 }
 
 @section footerscripts
-    {
+{
     <style>
         /* Popover */
         /* Popover Header */

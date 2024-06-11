@@ -1,0 +1,69 @@
+@using Microsoft.AspNetCore.Http.Extensions
+@model HlidacStatu.Entities.Smlouva
+
+@{
+    var style = "btn btn-primary ";
+    var llm_IdPrefix = "llm_" + Devmasters.TextUtil.GenRandomString(9);
+}
+@if (User.Identity?.IsAuthenticated == true && User.IsInRole("Admin"))
+{
+    <!-- Modal -->
+    <button class="@style" data-bs-toggle="modal" data-bs-target="#@(llm_IdPrefix)fbForm">AI analýzy smlouvy</button>
+    <div class="modal fade" id="@(llm_IdPrefix)fbForm" tabindex="-1" role="dialog"
+         aria-labelledby="@(llm_IdPrefix)fbTitle" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <!-- Modal Header -->
+                <div class="modal-header">
+                    <h4 class="modal-title" id="@(llm_IdPrefix)fbTitle">
+                        AI Hlídače státu
+                    </h4>
+                    <button type="button" class="btn-close"
+                            data-bs-dismiss="modal">
+                        <span class="sr-only">Close</span>
+                    </button>
+                </div>
+
+                <!-- Modal Body -->
+                <div class="modal-body">
+                    <b>Shrnutí obsahu smlouvy:</b>
+                    <img src="/Content/Img/loading.gif" style="display:none" id="llm_loading" />
+                    <div id="html_llmresult" style="display:none"></div>
+                    <pre id="pre_llmresult"
+                         style="overflow-x: auto;white-space: pre-wrap;white-space: -moz-pre-wrap;white-space: -pre-wrap;white-space: -o-pre-wrap;word-wrap: break-word;"></pre>
+                </div>
+
+                <!-- Modal Footer -->
+                <div class="modal-footer">
+                    <div class="container text-center">
+                        <div class="row">
+                            <div class="col-3">
+                                <button type="button" class="btn btn-default" data-bs-dismiss="modal">
+                                    Zrušit
+                                </button>
+                            </div>
+                            <div class="col-8">
+                                <div class="input-group">
+
+                                    <input type="hidden" id="LLMsmlouvaId" value="@(Model.Id)" />
+                                    <input type="hidden" id="LLMinstruction" name="instruction" value="summaryjson" />
+                                    <select style="display:none" class="form-select form-select-lg text-end" id="LLMpocetbodu" aria-label="">
+                                        <option value="8">Stručné</option>
+                                        <option value="12">Podrobné</option>
+                                        <option value="18">Detailní po částech smlouvy</option>
+                                    </select>
+
+                                    <button type="button" id="send2LLM" class="btn btn-primary">Shrnutí smlouvy</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="/js/signalr/dist/browser/signalr.js"></script>
+    <script src="/js/ollama.js"></script>
+
+}
