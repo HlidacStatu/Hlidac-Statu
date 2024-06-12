@@ -211,7 +211,11 @@ inner join Firma_DS fds
     {
         await using var db = new DbEntities();
 
-        var orgs = await db.PuOrganizace.ToListAsync();
+        var orgs = await db.PuOrganizace
+            .AsNoTracking()
+            .Include(o => o.Tags)
+            .Where(o => o.Tags.Any())
+            .ToListAsync();
         var tip = orgs.TipOfTheDay();
 
         return await db.PuOrganizace

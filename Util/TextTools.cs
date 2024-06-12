@@ -13,6 +13,7 @@ public static class TextTools
     
     public static string CleanBadBytesFromText(this string text)
     {
+        text = text.Normalize(NormalizationForm.FormKC);
         StringBuilder cleaned = new StringBuilder();
 
         foreach (char c in text)
