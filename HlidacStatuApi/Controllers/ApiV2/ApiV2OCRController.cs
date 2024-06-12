@@ -84,7 +84,8 @@ namespace HlidacStatuApi.Controllers.ApiV2
                     {
                         ItemId = itemId,
                         ItemSubType = itemSubType,
-                        ItemType = itemType
+                        ItemType = itemType,
+                        Options = "{\"forceOCR\":true,\"ocrMissingOnly\":true,\"ocrLengthLessThan\":null,\"forceClassification\":false,\"forceTablesMining\":false,\"forceBlurredPages\":false}"
                     };
                 }
             }
