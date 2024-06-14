@@ -14,6 +14,14 @@ public static class TextTools
                 char.IsLetterOrDigit(c));
     }
     
+    public static bool IsBadChar(char c)
+    {
+        return (c > 0x2D67) || 
+               (c == 127) || //del
+               (c >= 0  && c <= 8);
+
+    }
+    
     public static string CleanBadBytesFromText(this string text)
     {
         text = text.Normalize(NormalizationForm.FormKC);
