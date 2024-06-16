@@ -5,7 +5,7 @@
     var style = "btn btn-primary ";
     var llm_IdPrefix = "llm_" + Devmasters.TextUtil.GenRandomString(9);
 }
-@if (User.Identity?.IsAuthenticated == true && User.IsInRole("Admin"))
+@if (User.Identity?.IsAuthenticated == true && User.IsInRole("BetaTester"))
 {
     <!-- Modal -->
     <button class="@style" data-bs-toggle="modal" data-bs-target="#@(llm_IdPrefix)fbForm">AI analýzy smlouvy</button>
