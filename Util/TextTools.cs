@@ -60,7 +60,6 @@ public static class TextTools
     
     public static string CleanBadBytesFromText(this string text)
     {
-        text = text.Normalize(NormalizationForm.FormKC);
         StringBuilder cleaned = new StringBuilder();
 
         for (var index = 0; index < text.Length; ++index)
