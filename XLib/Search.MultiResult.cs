@@ -17,6 +17,7 @@ namespace HlidacStatu.XLib
             public System.TimeSpan TotalSearchTime { get; set; } = System.TimeSpan.Zero;
             public System.TimeSpan AddOsobyTime { get; set; } = System.TimeSpan.Zero;
             public string Query { get; set; }
+            public Repositories.Searching.Search.GeneralResult<SearchPromo> SearchPromos { get; set; } = null;
             public SmlouvaSearchResult Smlouvy { get; set; } = null;
             public VerejnaZakazkaSearchData VZ { get; set; } = null;
             public OsobaSearchResult Osoby { get; set; } = null;
@@ -175,6 +176,23 @@ namespace HlidacStatu.XLib
                         _logger.Error(e, "MultiResult GeneralSearch for Smlouvy query" + query);
                     }
                 }));
+
+             taskList.Add(
+                 Task.Run(async () =>
+                 {
+                     try
+                     {
+                         Devmasters.DT.StopWatchEx sw = new Devmasters.DT.StopWatchEx();
+                         sw.Start();
+                         res.SearchPromos = await SearchPromoRepo.SimpleSearchAsync(query, 1, 5);
+                         sw.Stop();
+                         res.SearchPromos.ElapsedTime = sw.Elapsed;
+                     }
+                     catch (System.Exception e)
+                     {
+                         _logger.Error(e, "MultiResult GeneralSearch for SearchPromos query" + query);
+                     }
+                 }));
 
             taskList.Add(
                 Task.Run(async () =>

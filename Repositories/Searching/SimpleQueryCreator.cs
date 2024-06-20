@@ -66,7 +66,7 @@ namespace HlidacStatu.Repositories.Searching
         }
 
 
-        public static QueryContainer GetSimpleQuery<T>(string query, Rules.IRule[] rules)
+        public static QueryContainer GetSimpleQuery<T>(string query, Rules.IRule[] rules, string[] fields = null)
             where T : class
         {
             var sq = GetSimpleQuery(query, rules);
@@ -84,6 +84,7 @@ namespace HlidacStatu.Repositories.Searching
                     .QueryString(qs => qs
                         .Query(modifiedQ)
                         .DefaultOperator(Operator.And)
+                        .Fields(fields)
                     );
             }
             return qc;

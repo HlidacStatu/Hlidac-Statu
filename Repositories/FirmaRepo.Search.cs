@@ -17,13 +17,7 @@ namespace HlidacStatu.Repositories
     {
         public static class Searching
         {
-            public const int MaxResultWindow = 10000;
 
-            static string[] ignoredIcos = Config
-                .GetWebConfigValue("DontIndexFirmy")
-                .Split(new string[] { ";", "," }, StringSplitOptions.RemoveEmptyEntries)
-                .Select(m => m.ToLower())
-                .ToArray();
 
             public static async Task<Search.GeneralResult<Firma>> SimpleSearchAsync(string query, int page, int size)
             {
@@ -41,7 +35,7 @@ namespace HlidacStatu.Repositories
                     foreach (var ic in specifiedIcosInQuery.Skip((page - 1) * size).Take(size))
                     {
                         Firma f = Firmy.Get(ic);
-                        if (f.Valid && ignoredIcos.Contains(f.ICO) == false)
+                        if (f.Valid && FirmaRepo.IgnoredIcos.Contains(f.ICO) == false)
                         {
                             //nalezene ICO
                             found.Add(f);
@@ -58,7 +52,7 @@ namespace HlidacStatu.Repositories
                 if (page < 0)
                     page = 0;
 
-                if (page * size >= MaxResultWindow) //elastic limit
+                if (page * size >= Manager.MaxResultWindow) //elastic limit
                 {
                     page = 0;
                     size = 0; //return nothing
@@ -83,7 +77,7 @@ namespace HlidacStatu.Repositories
                     {
                         foreach (var i in res.Hits)
                         {
-                            if (ignoredIcos.Contains(i.Source.Ico) == false)
+                            if (FirmaRepo.IgnoredIcos.Contains(i.Source.Ico) == false)
                                 found.Add(Firmy.Get(i.Source.Ico));
                         }
 

@@ -1,0 +1,39 @@
+@model SearchPromo
+
+@using HlidacStatu.Entities
+@using HlidacStatu.Extensions
+@using HlidacStatu.Repositories
+@using HlidacStatu.DS.Graphs
+
+
+@if (Model == null)
+{
+    return;
+}
+else
+{
+
+    string box1Css = "col-sm-4 col-md-3";
+
+    <div class="@box1Css" style="border-right: #eee solid 1px; height: 120px !important; overflow: auto hidden; margin-top: 25px">
+        <div class="person-profile-thumb person-profile-thumb--small">
+            <a href="@Model.Url">
+                @if (!string.IsNullOrEmpty(Model.Icon))
+                {
+                    <div class="profile-picture border" style="background-image: url('@Model.Icon')"></div>
+                }
+                else
+                {
+                    <div class="profile-picture border" style="background-image: url('/content/searchpromo/info-color.png')"></div>
+                }
+            </a>
+            <div>
+                <a class="section-title link--blue" href="@Model.Url">@Model.Title</a>
+                <div class="new-p new-p--gray new-p--small">
+                        <span>@Html.Raw(Model.Description)</span>
+                    <br /><span><a class="link-danger" href="@Model.Url">@Html.Raw(Model.More)</a></span>
+                </div>
+            </div>
+        </div>
+    </div>
+}

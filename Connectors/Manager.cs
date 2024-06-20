@@ -21,6 +21,7 @@ namespace HlidacStatu.Connectors
 {
     public class Manager
     {
+        public const int MaxResultWindow = 10000;
 
         private static readonly ILogger _logger = Log.ForContext<Manager>();
         
@@ -51,7 +52,8 @@ namespace HlidacStatu.Connectors
             RPP_ISVS,
             InDocTableCells,
             DocumentHistory,
-            SplitSmlouvy
+            SplitSmlouvy,
+            SearchPromo
         }
 
         public static string defaultIndexName = "hlidacsmluv";
@@ -88,6 +90,7 @@ namespace HlidacStatu.Connectors
         public static string defaultIndexName_RPP_ISVS = "rpp_isvs";
 
         public static string defaultIndexName_SplitSmlouvy = "splitsmlouvy";
+        public static string defaultIndexName_SearchPromo = "searchpromo";
 
 
         private static SemaphoreSlim _clientSemaphore = new SemaphoreSlim(1, 1);
@@ -230,7 +233,11 @@ namespace HlidacStatu.Connectors
         {
             return GetESClientAsync(defaultIndexName_SplitSmlouvy, timeOut, connectionLimit, IndexType.SplitSmlouvy);
         }
-        
+        public static Task<ElasticClient> GetESClient_SearchPromoAsync(int timeOut = 60000, int connectionLimit = 80)
+        {
+            return GetESClientAsync(defaultIndexName_SearchPromo, timeOut, connectionLimit, IndexType.SearchPromo);
+        }
+
         //public static ElasticClient GetESClient_Uptime(int timeOut = 60000, int connectionLimit = 80)
         //{
         //    return GetESClient(defaultIndexName_Uptime, timeOut, connectionLimit, IndexType.UptimeItem);
@@ -567,6 +574,15 @@ namespace HlidacStatu.Connectors
                        .CreateAsync(indexName, i => i
                            .InitializeUsing(idxSt)
                            .Map<HlidacStatu.MLUtil.Splitter.SplitSmlouva>(map => map.AutoMap().DateDetection(false))
+                       );
+                    break;
+                case IndexType.SearchPromo:
+                    idxSt.Settings.NumberOfShards = 2;
+                    idxSt.Settings.RefreshInterval = "15s";
+                    res = await client.Indices
+                       .CreateAsync(indexName, i => i
+                           .InitializeUsing(idxSt)
+                           .Map<HlidacStatu.Entities.SearchPromo>(map => map.AutoMap().DateDetection(false))
                        );
                     break;
                 case IndexType.Dotace:

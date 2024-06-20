@@ -412,9 +412,10 @@ else if (Model.HasResults == false)
         var splQ = HlidacStatu.Repositories.Searching.SplittingQuery.SplitQuery(fixedQ);
         string[] prefixes = new string[] { "osobaid:", "ico:" };
         int parts = 0;
-        if (splQ.Parts.Any(m => prefixes.Contains(m.Prefix)))
+        if (splQ.Parts.Any(m => prefixes.Contains(m.Prefix)) || Model.SearchPromos.HasResult)
         {
             <div class="row" style="">
+                @* OSOBY *@
                 @foreach (var osP in splQ.Parts.Where(m => m.Prefix == "osobaid:"))
                 {
                     parts++;
@@ -431,6 +432,8 @@ else if (Model.HasResults == false)
                         <div class="clearfix d-none d-md-block d-lg-none"></div>
                     }
                 }
+
+                @* firmy *@
                 @foreach (var fP in splQ.Parts.Where(m => m.Prefix == "ico:"))
                 {
                     parts++;
@@ -444,6 +447,17 @@ else if (Model.HasResults == false)
                     if (parts % 3 == 0)
                     {
                         <div class="clearfix d-none d-md-block d-lg-none"></div>
+                    }
+
+                }
+
+                @if (User.IsInRole("Admin") && parts<5 && Model.SearchPromos.HasResult)
+                {
+                    foreach (var sp in Model.SearchPromos.Result.Take(5-parts))
+                    {
+                        parts++;
+                        <partial name="Partials/RenderSearchPromoBox" model="@sp" />
+                        
                     }
 
                 }
