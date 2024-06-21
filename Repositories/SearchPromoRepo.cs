@@ -2,9 +2,11 @@
 using Devmasters.Batch;
 using HlidacStatu.Connectors;
 using HlidacStatu.Entities;
+using HlidacStatu.Entities.KIndex;
 using HlidacStatu.Repositories.Searching;
 using HlidacStatu.Repositories.Searching.Rules;
 using HlidacStatu.Util;
+using HlidacStatu.Repositories.Analysis.KorupcniRiziko;
 using Nest;
 using Serilog;
 using System;
@@ -33,12 +35,15 @@ namespace HlidacStatu.Repositories
             //titulek max 19 znaků
             //description tak do 70 znaků  
 
-
-            // Platy
+            _logger.Information($"Starting SearchPromoRepo.FillDbAsync {(fullRebuild ? "with" : "without")} rebuild db");
             var dbSP = await HlidacStatu.Connectors.Manager.GetESClient_SearchPromoAsync();
-            var PUOrgs = (await PuRepo.ExportAllAsync(null, PuRepo.DefaultYear)).Where(t => t.Tags?.Count > 0).ToArray();
             using var db = new DbEntities();
+
+            // Platy uredniku
+            _logger.Information($"SearchPromoRepo.FillDbAsync PlatyUredniku loading all orgs");
+            var PUOrgs = (await PuRepo.ExportAllAsync(null, PuRepo.DefaultYear)).Where(t => t.Tags?.Count > 0).ToArray();
             int count = 0;
+            _logger.Information($"SearchPromoRepo.FillDbAsync PlatyUredniku saving searchpromo");
             await Devmasters.Batch.Manager.DoActionForAllAsync(PUOrgs,
                 async org =>
                 {
@@ -72,7 +77,65 @@ namespace HlidacStatu.Repositories
                 , outputWriter ?? Devmasters.Batch.Manager.DefaultOutputWriter, progressWriter ?? Devmasters.Batch.Manager.DefaultProgressWriter, true,
                 prefix: "FillDbAsync platy uredniku ", monitor: new MonitoredTaskRepo.ForBatch());
 
-            Console.WriteLine($"Platy uredniku:{count}");
+
+            _logger.Information($"SearchPromoRepo.FillDbAsync PlatyUredniku saved {count} records");
+
+            //=========================================================================
+            // K-Index
+            //=========================================================================
+
+            _logger.Information($"SearchPromoRepo.FillDbAsync KIndex loading all orgs");
+            IEnumerable<SubjectWithKIndex> KIndxOrgs = HlidacStatu.Repositories.Analysis.KorupcniRiziko.Statistics.GetStatistics(KIndexRepo.GetAvailableCalculationYears().Max()).SubjektOrderedListKIndexCompanyAsc();
+            count = 0;
+            _logger.Information($"SearchPromoRepo.FillDbAsync KIndex saving searchpromo");
+            
+            await Devmasters.Batch.Manager.DoActionForAllAsync(KIndxOrgs,
+                async rec =>
+                {
+
+                    KIndexData kidx = await KIndex.GetAsync(HlidacStatu.Util.ParseTools.NormalizeIco(rec.Ico));
+                    var infof = HlidacStatu.Util.InfoFact.RenderInfoFacts(kidx.InfoFacts(KIndexRepo.GetAvailableCalculationYears().Max()), 2, true, false, lineFormat: "{0}", html: false);
+                    var sp = new SearchPromo();
+
+                    sp.PromoType = "KIndex";
+                    sp.Id = sp.PromoType + "-" + rec.Ico;
+                    sp.Ico = rec.Ico;
+
+                    var lbl = KIndexData.CalculateLabel(rec.KIndex);
+
+                    sp.Icon = KIndexData.KIndexLabelIconUrl(lbl);
+                    sp.Url = $"/kindex/detail/{rec.Ico}";
+                    sp.Title = "Klíčová rizika";
+                    sp.More = "Více <i class=\"fa-solid fa-hand-point-right\"></i>";
+                    sp.Description = "<b>" + rec.Jmeno + "</b><br />"
+                        + infof.ShortenMe(70);
+                    sp.Fulltext = rec.Jmeno
+                            + " " + "kindex korupce 2020 2021 2022 2023 2024";
+                    if (Util.DataValidators.CheckCZICO(sp.Ico))
+                    {
+                        var zkratky = DirectDB.GetList<string>($"select text from AutocompleteSynonyms where query like 'ico:{sp.Ico}%'");
+                        sp.Fulltext = (string.Join(" ", zkratky) + " " + sp.Fulltext).Trim();
+                    }
+                    count++;
+                    await SaveAsync(sp);
+                    return new Devmasters.Batch.ActionOutputData();
+                }
+                , outputWriter ?? Devmasters.Batch.Manager.DefaultOutputWriter, progressWriter ?? Devmasters.Batch.Manager.DefaultProgressWriter, true,
+                prefix: "FillDbAsync KIndex ", monitor: new MonitoredTaskRepo.ForBatch());
+
+
+            //=========================================================================
+            // CEOS
+            //=========================================================================
+
+            var ceos = db.OsobaEvent.AsQueryable()
+                .Where(oe => oe.Ceo == 1 )
+                .Where(oe => oe.DatumDo == null || oe.DatumDo >= DateTime.Now.AddYears(-4))
+                .ToArray()
+                .Select(m => (OsobaRepo.GetByInternalId(m.OsobaId), m.DatumOd, m.DatumDo, m.AddInfo))
+                .ToArray();
+
+
         }
 
 

@@ -16,7 +16,7 @@
     margin-right: 1em;
 }
 
-    .navbar.hlidac .nav-item>a {
+    .navbar.hlidac .nav-item > a {
         line-height: 1.2em;
     }
 
@@ -33,6 +33,7 @@ a.nav-link.dropdown-toggle.mainmenu {
         border-right: 1px #d0d0d0 solid;
         border-left: 1px #d0d0d0 solid;
     }
+
 .card.card-body {
     display: inline-block;
 }
@@ -2072,25 +2073,45 @@ select {
             border: 1px #ddd solid;
         }
 
+        .person-profile-thumb .profile-picture.squared {
+            border-radius: 0;
+            background-size: contain;
+            background-repeat: no-repeat;
+        }
+
 .person-profile-thumb--small .profile-picture {
     width: 64px;
     height: 64px;
-    margin-left: 36px;
+    margin-left: 1px;
 }
 
     .person-profile-thumb--small .profile-picture.border {
         border: 1px #ddd solid;
     }
 
+    .person-profile-thumb--small .profile-picture.squared {
+        border-radius: 0px;
+        background-size: contain;
+        background-repeat: no-repeat;
+    }
+
 .person-profile-thumb--verysmall .profile-picture {
     width: 30px;
     height: 30px;
-    margin-left: 14px;
+    margin-left: 6px;
 }
 
     .person-profile-thumb--verysmall .profile-picture.border {
         border: 1px #ddd solid;
     }
+
+    .person-profile-thumb--verysmall .profile-picture.squared {
+        border-radius: 0px;
+        background-size: contain;
+        background-repeat: no-repeat;
+    }
+
+
 .detail-note {
     line-height: 18px;
     margin-top: 6px;

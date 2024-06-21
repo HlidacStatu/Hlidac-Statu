@@ -2053,14 +2053,22 @@ select {
         .person-profile-thumb .profile-picture.border {
             border: 1px #ddd solid;
         }
+        .person-profile-thumb .profile-picture.squared {
+            border-radius: 0;
+            background-size: contain !important;
+        }
 
 .person-profile-thumb--small .profile-picture {
     width: 64px;
     height: 64px;
-    
+    margin-left:1px;
 }
     .person-profile-thumb--small .profile-picture.border {
         border: 1px #ddd solid;
+    }
+    .person-profile-thumb--small .profile-picture.squared {
+        border-radius: 100px;
+        background-size:contain !important;
     }
 
 .detail-note {
