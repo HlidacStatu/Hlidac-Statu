@@ -15,7 +15,10 @@ namespace HlidacStatu.Repositories
         
         public static void AddOrUpdate(
             int osobaId, int vazbakOsobaId,
-            int kod_angm, string funkce, decimal? share, DateTime? fromDate, DateTime? toDate, string zdroj = ""
+            int kod_angm, string funkce, decimal? share, 
+            DateTime? fromDate, DateTime? toDate,
+            DateTime? zapisORfromDate, DateTime? zapisORtoDate,
+            string zdroj = ""
         )
         {
             using (DbEntities db = new DbEntities())
@@ -59,6 +62,8 @@ namespace HlidacStatu.Repositories
                     af.VazbakOsobaId = vazbakOsobaId;
                     af.DatumOd = fromDate;
                     af.DatumDo = toDate;
+                    af.ZapisOROd = zapisORfromDate;
+                    af.ZapisORDo = zapisORtoDate;
                     af.TypVazby = kod_angm;
                     af.PojmenovaniVazby = funkce;
                     af.Podil = share;
@@ -80,7 +85,10 @@ namespace HlidacStatu.Repositories
 
         public static void AddOrUpdate(
             int osobaId, string dcerinkaIco,
-            int kod_angm, string funkce, decimal? share, DateTime? fromDate, DateTime? toDate, string zdroj = ""
+            int kod_angm, string funkce, decimal? share, 
+            DateTime? fromDate, DateTime? toDate,
+            DateTime? zapisORfromDate, DateTime? zapisORtoDate,
+            string zdroj = ""
         )
         {
             using (DbEntities db = new DbEntities())
@@ -122,6 +130,8 @@ namespace HlidacStatu.Repositories
                     af.VazbakIco = dcerinkaIco;
                     af.DatumOd = fromDate;
                     af.DatumDo = toDate;
+                    af.ZapisOROd = zapisORfromDate;
+                    af.ZapisORDo = zapisORtoDate;
                     af.TypVazby = kod_angm;
                     af.PojmenovaniVazby = funkce;
                     af.Podil = share;

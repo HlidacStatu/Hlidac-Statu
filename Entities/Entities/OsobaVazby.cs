@@ -32,6 +32,12 @@ namespace HlidacStatu.Entities
         public DateTime? DatumOd { get; set; }
         [Column(TypeName = "date")]
         public DateTime? DatumDo { get; set; }
+
+        [Column(TypeName = "date")]
+        public DateTime? ZapisOROd { get; set; }
+        [Column(TypeName = "date")]
+        public DateTime? ZapisORDo { get; set; }
+
         [StringLength(50)]
         public string Zdroj { get; set; }
         [Column(TypeName = "date")]
