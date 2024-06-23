@@ -340,6 +340,7 @@ else if (Model.HasResults == false)
                             Description = Devmasters.Lang.CS.Plural.Get(ds.Total,"Nalezen jeden výsledek","Našli jsme {0} výsledky","Našli jsme {0} výsledků"),
                             More = SearchPromoRepo.MoreTextDefault,
                             Icon = "/content/searchpromo/info-color.png",
+                            Url = ds.DataSet.DatasetSearchUrl(ds.Q)
                         });
                 }
             }
