@@ -340,7 +340,8 @@ else if (Model.HasResults == false)
                             Description = Devmasters.Lang.CS.Plural.Get(ds.Total,"Nalezen jeden výsledek","Našli jsme {0} výsledky","Našli jsme {0} výsledků"),
                             More = SearchPromoRepo.MoreTextDefault,
                             Icon = "/content/searchpromo/info-color.png",
-                            Url = ds.DataSet.DatasetSearchUrl(ds.Q)
+                            Url = ds.DataSet.DatasetSearchUrl(ds.Q),
+                            Priority=50
                         });
                 }
             }
@@ -379,7 +380,6 @@ else if (Model.HasResults == false)
             }
         </div>
     </div>
-    <hr />
 }
 @{
     viewRenderTimesInt.Stop();
@@ -388,6 +388,7 @@ else if (Model.HasResults == false)
 @* box s výpisem datasetů *@
 @if (Model.DatasetRegistrations.Any())
 {
+    <hr />
     <div class="col-xs-12 col-sm-12">
         <div class="row">
             <h4>
@@ -409,7 +410,6 @@ else if (Model.HasResults == false)
             }
         </div>
     </div>
-    <hr />
 }
 
 
@@ -465,7 +465,7 @@ else if (Model.HasResults == false)
 
                 @if (parts < 8 && Model.SearchPromos.HasResult)
                 {
-                    foreach (var sp in Model.SearchPromos.Result.Take(8 - parts))
+                    foreach (var sp in Model.SearchPromos.Result.OrderByDescending(o=>o.Priority).Take(8 - parts))
                     {
                         parts++;
                         <partial name="Partials/RenderSearchPromoBox" model="@sp" />
@@ -474,13 +474,14 @@ else if (Model.HasResults == false)
 
                 }
             </div>
-            <hr style="margin-top:30px" />
         }
     }
 
     @*MAIN RESULT*@
     @if (paorder.Count > 0)
     {
+        <hr style="margin-top:30px" />
+
         var part = paorder[0];
         if (part == nameof(SmlouvaSearchResult))
         {

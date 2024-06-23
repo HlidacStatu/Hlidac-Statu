@@ -1,12 +1,12 @@
 ﻿using Devmasters;
 using Devmasters.Batch;
+using Devmasters.Collections;
 using HlidacStatu.Connectors;
 using HlidacStatu.Entities;
 using HlidacStatu.Entities.KIndex;
+using HlidacStatu.Repositories.Analysis.KorupcniRiziko;
 using HlidacStatu.Repositories.Searching;
 using HlidacStatu.Repositories.Searching.Rules;
-using HlidacStatu.Util;
-using HlidacStatu.Repositories.Analysis.KorupcniRiziko;
 using Nest;
 using Serilog;
 using System;
@@ -41,6 +41,54 @@ namespace HlidacStatu.Repositories
             var dbSP = await HlidacStatu.Connectors.Manager.GetESClient_SearchPromoAsync();
             using var db = new DbEntities();
 
+            // manualni 
+            await SaveAsync(new SearchPromo()
+            {
+                PromoType = "manual",
+                Id = "manual-001",
+                Icon = "/content/searchpromo/platy-uredniku.png",
+                Url = "https://platyuredniku.hlidacstatu.cz/",
+                Title = "Platy úředníků",
+                More = MoreTextDefault,
+                Description = "Platy TOP úředníků a zaměstnanců státu<br />Porovnání s platy v soukromé sféře",
+                Fulltext = "",
+            });
+            await SaveAsync(new SearchPromo()
+            {
+                PromoType = "manual",
+                Id = "manual-002",
+                Icon = "/content/searchpromo/bulb.png",
+                Url = "https://www.hlidacstatu.cz/adresar",
+                Title = "Adresář úřadů",
+                More = MoreTextDefault,
+                Description = "Seznam úřadů a státních firem, přehledně rozdělené",
+                Fulltext = "",
+            });
+            await SaveAsync(new SearchPromo()
+            {
+                PromoType = "manual",
+                Id = "manual-003",
+                Icon = "/content/searchpromo/bulb.png",
+                Url = "https://www.hlidacstatu.cz/kindex",
+                Title = "Klíčová rizika",
+                More = MoreTextDefault,
+                Description = "Index klíčových rizik 1300 největší úřadů a firem, <b>za období 2017 - 2023</b>",
+                Fulltext = "",
+            });
+            await SaveAsync(new SearchPromo()
+            {
+                PromoType = "manual",
+                Id = "manual-004",
+                Icon = KIndexData.KIndexLabelIconUrl(KIndexData.KIndexLabelValues.D),
+                Url = "https://www.hlidacstatu.cz/sponzori",
+                Title = "Sponzoři politiků",
+                More = MoreTextDefault,
+                Description = "Kompletní seznam sponzorů politických stran od 2012, osoby i firmy",
+                Fulltext = "",
+            });
+
+
+
             // Platy uredniku
             _logger.Information($"SearchPromoRepo.FillDbAsync PlatyUredniku loading all orgs");
             var PUOrgs = (await PuRepo.ExportAllAsync(null, PuRepo.DefaultYear)).Where(t => t.Tags?.Count > 0).ToArray();
@@ -59,9 +107,9 @@ namespace HlidacStatu.Repositories
                     sp.Url = org.GetUrl(false);
                     sp.Title = "Platy úředníků";
                     sp.More = MoreTextDefault;
-                    sp.Description = "<b>" + org.Nazev + "</b><br />" 
-                        + (org.Platy.AktualniRok().Count > 0 ? 
-                                $"Platy od {HlidacStatu.Util.RenderData.NicePrice(org.Platy.AktualniRok().Min(m => m.HrubyMesicniPlatVcetneOdmen))} do {HlidacStatu.Util.RenderData.NicePrice(org.Platy.AktualniRok().Max(m => m.HrubyMesicniPlatVcetneOdmen))}" 
+                    sp.Description = "<b>" + org.Nazev + "</b><br />"
+                        + (org.Platy.AktualniRok().Count > 0 ?
+                                $"Platy od {HlidacStatu.Util.RenderData.NicePrice(org.Platy.AktualniRok().Min(m => m.HrubyMesicniPlatVcetneOdmen))} do {HlidacStatu.Util.RenderData.NicePrice(org.Platy.AktualniRok().Max(m => m.HrubyMesicniPlatVcetneOdmen))}"
                                 : "Odmítli poskytnout platy")
                                 ;
                     sp.Fulltext = org.Nazev
@@ -90,7 +138,7 @@ namespace HlidacStatu.Repositories
             IEnumerable<SubjectWithKIndex> KIndxOrgs = HlidacStatu.Repositories.Analysis.KorupcniRiziko.Statistics.GetStatistics(KIndexRepo.GetAvailableCalculationYears().Max()).SubjektOrderedListKIndexCompanyAsc();
             count = 0;
             _logger.Information($"SearchPromoRepo.FillDbAsync KIndex saving searchpromo");
-            
+
             await Devmasters.Batch.Manager.DoActionForAllAsync(KIndxOrgs,
                 async rec =>
                 {
@@ -131,7 +179,7 @@ namespace HlidacStatu.Repositories
             //=========================================================================
 
             var ceos = db.OsobaEvent.AsQueryable()
-                .Where(oe => oe.Ceo == 1 )
+                .Where(oe => oe.Ceo == 1)
                 .Where(oe => oe.DatumDo == null || oe.DatumDo >= DateTime.Now.AddYears(-4))
                 .ToArray()
                 .Select(m => (OsobaRepo.GetByInternalId(m.OsobaId), m.DatumOd, m.DatumDo, m.AddInfo))
@@ -153,6 +201,23 @@ namespace HlidacStatu.Repositories
 
         }
 
+        static List<SearchPromo> manualItems = null;
+        public static async Task<Search.GeneralResult<SearchPromo>> SearchPromoForHledejAsync(string query, int page, int size)
+        {
+            if (manualItems == null)
+            {
+                manualItems = (await SimpleSearchAsync("promoType:manual", 1, 100))?.Result.ToList();
+            }
+            var result = await SimpleSearchAsync(query, page, size);
+            if (result.Total < size)
+            {
+                foreach (var item in manualItems.ShuffleMe().Take(4))
+                {
+                    result.AppendResult(item);
+                }
+            }
+            return result;
+        }
         public static async Task<Search.GeneralResult<SearchPromo>> SimpleSearchAsync(string query, int page, int size)
         {
             List<SearchPromo> found = new List<SearchPromo>();

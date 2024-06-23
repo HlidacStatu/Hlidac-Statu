@@ -184,7 +184,7 @@ namespace HlidacStatu.XLib
                      {
                          Devmasters.DT.StopWatchEx sw = new Devmasters.DT.StopWatchEx();
                          sw.Start();
-                         res.SearchPromos = await SearchPromoRepo.SimpleSearchAsync(query, 1, 5);
+                         res.SearchPromos = await SearchPromoRepo.SearchPromoForHledejAsync(query, 1, 8);
                          sw.Stop();
                          res.SearchPromos.ElapsedTime = sw.Elapsed;
                      }

@@ -36,7 +36,7 @@ else
     string box1Css = "col-sm-4 col-md-3";
     string box2Css = "col-sm-4 col-md-3";
 
-    <div class="@box1Css" style="border-right: #eee solid 1px; height: 120px !important; overflow: auto hidden;margin-top:25px">
+    <div class="@box1Css searchpromo-box" >
         <div class="person-profile-thumb">
             <a href="@Model.Osoba.GetUrl(true)">
                 <div class="profile-picture border" style="background-image: url('@Model.Osoba.GetPhotoUrl(true,Osoba.PhotoTypes.NoBackground)')">
@@ -61,7 +61,7 @@ else
     </div>
     @if (Model.Smaller == false)
     {
-        <div class="@box2Css" style="border-right: #eee solid 1px; height: 120px !important; overflow: auto hidden;margin-top:25px">
+        <div class="@box2Css searchpromo-box-smaller">
 
             @if (!string.IsNullOrWhiteSpace(funkceOsoba))
             {
