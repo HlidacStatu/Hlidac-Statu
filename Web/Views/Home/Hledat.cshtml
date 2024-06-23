@@ -26,15 +26,15 @@
 
 @section breadcrumb
 {
-<ol class="breadcrumb">
-    <li>
-        <a href="/">Hlídač Státu</a>
-    </li>
-    <li>
-        <a href="@Url.Action("Smlouvy", "Home")">Hledání</a>
-    </li>
-    <li title="@Model.Query">@(Devmasters.TextUtil.ShortenText(Model.Query, 60, "..."))</li>
-</ol>
+    <ol class="breadcrumb">
+        <li>
+            <a href="/">Hlídač Státu</a>
+        </li>
+        <li>
+            <a href="@Url.Action("Smlouvy", "Home")">Hledání</a>
+        </li>
+        <li title="@Model.Query">@(Devmasters.TextUtil.ShortenText(Model.Query, 60, "..."))</li>
+    </ol>
 }
 
 @if (string.IsNullOrEmpty(Model.Query))
@@ -57,7 +57,7 @@
         </div>
 
         <!-- otazky? -->
-    <div class="row">
+        <div class="row">
             <div class="col-sm-6">
                 <div class="searching__questions">
                     <div>
@@ -125,7 +125,7 @@ else if (Model.HasResults == false)
             </div>
         }
         <!-- otazky? -->
-    <div class="row">
+        <div class="row">
             <div class="col-sm-6">
                 <div class="searching__questions">
                     <div>
@@ -154,7 +154,7 @@ else if (Model.HasResults == false)
 }
 
 @{
-    if (Model.Query.Contains("\"") == false && Model.Query.Contains(" ") && Model.Query.Length>5)
+    if (Model.Query.Contains("\"") == false && Model.Query.Contains(" ") && Model.Query.Length > 5)
     {
         Osoba jmeno = Validators.JmenoInText(Model.Query, false);
         if (jmeno != null)
@@ -164,7 +164,7 @@ else if (Model.HasResults == false)
                 <div class="col-xs-12">
                     <div class="card bg-warning">
                         <div class="card-header">
-                            <h3 class="card-title" style="font-size:1.2em;font-weight:bold" >
+                            <h3 class="card-title" style="font-size:1.2em;font-weight:bold">
                                 <span class="text-warning fas fa-exclamation-circle" aria-hidden="true" title="Upozornění"></span>
                                 Upozornění!
                             </h3>
@@ -234,7 +234,7 @@ else if (Model.HasResults == false)
         if (paorder.Contains(nameof(DotaceSearchResult)) == false)
         {
             paorder.Add(nameof(DotaceSearchResult));
-            
+
             if (Model.HasInsolvence && Model.Insolvence.Total > Model.Dotace.Total * 2 && paorder.Contains(nameof(InsolvenceSearchResult)) == false)
             {
                 paorder.Insert(paorder.FindIndex(0, m => m == nameof(DotaceSearchResult)), nameof(InsolvenceSearchResult));
@@ -331,6 +331,17 @@ else if (Model.HasResults == false)
                 .OrderByDescending(m => m.Total))
             {
                 htmlLinks.Add(new Tuple<string, string>(ds.DataSet.DatasetSearchUrl(ds.Q), ds.Total + "&nbsp;v&nbsp;" + Devmasters.TextUtil.ShortenText((await ds.DataSet.RegistrationAsync()).name, 28)));
+                if (Model.SearchPromos != null)
+                {
+                    Model.SearchPromos.AppendResult(new SearchPromo()
+                        {
+                            Id = Guid.NewGuid().ToString(),
+                            Title = Devmasters.TextUtil.ShortenText((await ds.DataSet.RegistrationAsync()).name, 28),
+                            Description = Devmasters.Lang.CS.Plural.Get(ds.Total,"Nalezen jeden výsledek","Našli jsme {0} výsledky","Našli jsme {0} výsledků"),
+                            More = SearchPromoRepo.MoreTextDefault,
+                            Icon = "/content/searchpromo/info-color.png",
+                        });
+                }
             }
         }
     }
@@ -354,7 +365,7 @@ else if (Model.HasResults == false)
             <h4><span title="@Model.Query" class="emphasized">@Devmasters.TextUtil.ShortenText(Model.Query, 80, "...")</span> jsme nalezli v těchto databázích</h4>
             @foreach (var items in htmlLinks.Chunk((htmlLinks.Count / 3) + 1))
             {
-                <div class="col-xs-6 col-sm-3" >
+                <div class="col-xs-6 col-sm-3">
                     <ul style="list-style: none;margin-left: -10px;">
                         @foreach (var item in items)
                         {
@@ -381,20 +392,20 @@ else if (Model.HasResults == false)
             <h4>
                 <span title="@Model.Query" class="emphasized">@Devmasters.TextUtil.ShortenText(Model.Query, 80, "...")</span> se také vyskytuje v popisu, nebo názvu těchto databází
             </h4>
-             @foreach (var chunks in Model.DatasetRegistrations.Chunk((int)Math.Ceiling((Model.DatasetRegistrations.Count / 3d))))
-             {
-                 <div class="col-xs-6 col-sm-3">
+            @foreach (var chunks in Model.DatasetRegistrations.Chunk((int)Math.Ceiling((Model.DatasetRegistrations.Count / 3d))))
+            {
+                <div class="col-xs-6 col-sm-3">
                     <ul style="list-style: none;margin-left: -10px;">
-                         @foreach (var item in chunks)
-                         {
-                             var url = $"/data/Index/{item.datasetId}";
-                             <li>
+                        @foreach (var item in chunks)
+                        {
+                            var url = $"/data/Index/{item.datasetId}";
+                            <li>
                                 <i class="far fa-angle-double-right pe-2"></i><a href="@url">@Html.Raw(item.name)</a>
-                             </li>
-                         }
-                     </ul>
-                 </div>
-             }
+                            </li>
+                        }
+                    </ul>
+                </div>
+            }
         </div>
     </div>
     <hr />
@@ -451,13 +462,13 @@ else if (Model.HasResults == false)
 
                 }
 
-                @if (User.IsInRole("Admin") && parts<5 && Model.SearchPromos.HasResult)
+                @if (parts < 8 && Model.SearchPromos.HasResult)
                 {
-                    foreach (var sp in Model.SearchPromos.Result.Take(5-parts))
+                    foreach (var sp in Model.SearchPromos.Result.Take(8 - parts))
                     {
                         parts++;
                         <partial name="Partials/RenderSearchPromoBox" model="@sp" />
-                        
+
                     }
 
                 }
@@ -481,9 +492,9 @@ else if (Model.HasResults == false)
                     <h4>
                         Našli jsme
                         @Html.Raw(Devmasters.Lang.CS.Plural.Get(Model.Smlouvy.Total,
-        "ještě <b>jednu smlouvu</b>",
-        "celkem <b>{0} smlouvy</b>",
-        "celkem <b>{0} smluv</b>"))
+                                 "ještě <b>jednu smlouvu</b>",
+                                 "celkem <b>{0} smlouvy</b>",
+                                 "celkem <b>{0} smluv</b>"))
                         <span style="padding-left:10px;">
                             <a href="@Url.Action("HledatSmlouvy", "Home", Model.Smlouvy.ToRouteValues(1))">ukázat&nbsp;<i class="far fa-angle-double-right"></i></a>
                         </span>
@@ -515,9 +526,9 @@ else if (Model.HasResults == false)
                     <h4>
                         Našli jsme
                         @Html.Raw(Devmasters.Lang.CS.Plural.Get(Model.VZ.Total,
-        "ještě <b>jednu veřejnou zakázku</b>",
-        "celkem <b>{0} veřejné zakázky</b>",
-        "celkem <b>{0} veřejných zakázek</b>"))
+                                 "ještě <b>jednu veřejnou zakázku</b>",
+                                 "celkem <b>{0} veřejné zakázky</b>",
+                                 "celkem <b>{0} veřejných zakázek</b>"))
                         <span style="padding-left:10px;">
                             <a href="@Url.Action("Hledat", "VerejneZakazky", Model.VZ.ToRouteValues(1))">ukázat&nbsp;<i class="far fa-angle-double-right"></i></a>
                         </span>
@@ -549,9 +560,9 @@ else if (Model.HasResults == false)
                     <h4>
                         Našli jsme
                         @Html.Raw(Devmasters.Lang.CS.Plural.Get(Model.Dotace.Total,
-        "ještě <b>jednu dotaci</b>",
-        "celkem <b>{0} dotace</b>",
-        "celkem <b>{0} dotací</b>"))
+                                 "ještě <b>jednu dotaci</b>",
+                                 "celkem <b>{0} dotace</b>",
+                                 "celkem <b>{0} dotací</b>"))
                         <span style="padding-left:10px;">
                             <a href="@Url.Action("Hledat", "Dotace", Model.Dotace.ToRouteValues(1))">ukázat&nbsp;<i class="far fa-angle-double-right"></i></a>
                         </span>
@@ -581,9 +592,9 @@ else if (Model.HasResults == false)
                     <h4>
                         Našli jsme
                         @Html.Raw(Devmasters.Lang.CS.Plural.Get(Model.Insolvence.Total,
-        "ještě <b>jednu insolvenci</b>",
-        "celkem <b>{0} insolvence</b>",
-        "celkem <b>{0} insolvencí</b>"))
+                                 "ještě <b>jednu insolvenci</b>",
+                                 "celkem <b>{0} insolvence</b>",
+                                 "celkem <b>{0} insolvencí</b>"))
                         <span style="padding-left:10px;">
                             <a href="@Url.Action("Hledat", "Insolvence", Model.Insolvence.ToRouteValues(1))">ukázat&nbsp;<i class="far fa-angle-double-right"></i></a>
                         </span>
@@ -659,9 +670,9 @@ else if (Model.HasResults == false)
                     <h4>
                         Našli jsme
                         @Html.Raw(Devmasters.Lang.CS.Plural.Get(Model.Firmy.Total,
-        "ještě <b>jednu firmu</b>",
-        "celkem <b>{0} firmy</b>",
-        "celkem <b>{0} firem</b>"))
+                                 "ještě <b>jednu firmu</b>",
+                                 "celkem <b>{0} firmy</b>",
+                                 "celkem <b>{0} firem</b>"))
                         <span style="padding-left:10px;">
                             <a href="@Url.Action("HledatFirmy", "Home", new {q = Model.Query})">ukázat&nbsp;<i class="far fa-angle-double-right"></i></a>
                         </span>
@@ -706,9 +717,9 @@ else if (Model.HasResults == false)
                     <h4>
                         V dalších databázích jsme našli
                         @Html.Raw(Devmasters.Lang.CS.Plural.Get(Model.Datasets.Total,
-        "ještě <b>jeden výsledek</b>",
-        "celkem <b>{0} výsledky</b>",
-        "celkem <b>{0} výsledků</b>"))
+                                 "ještě <b>jeden výsledek</b>",
+                                 "celkem <b>{0} výsledky</b>",
+                                 "celkem <b>{0} výsledků</b>"))
                     </h4>
                     <div class="row" id="databaze">
                         <div class="col-xs-12">
@@ -742,7 +753,7 @@ else if (Model.HasResults == false)
                     <div class="row">
                         @{
                             var tabs = Model.Datasets.Results.Where(m => m.Total > 0).OrderByDescending(m => m.Total)
-                                                .Select(m => $"{m.DataSet.RegistrationAsync().GetAwaiter().GetResult().name}&nbsp;({HlidacStatu.Util.RenderData.Vysledky.PocetVysledku(m.Total)})");
+                            .Select(m => $"{m.DataSet.RegistrationAsync().GetAwaiter().GetResult().name}&nbsp;({HlidacStatu.Util.RenderData.Vysledky.PocetVysledku(m.Total)})");
                             List<string> results = new();
 
                             foreach (var rds in Model.Datasets.Results

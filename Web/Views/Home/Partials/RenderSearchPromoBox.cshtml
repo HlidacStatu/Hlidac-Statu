@@ -17,7 +17,7 @@ else
 
     <div class="@box1Css" style="border-right: #eee solid 1px; height: 120px !important; overflow: auto hidden; margin-top: 25px">
         <div class="person-profile-thumb person-profile-thumb--small">
-            <a href="@Model.Url">
+            <a href="@Model.Url" onclick="return trackOutLink(this,'SearchPromo_Title');">
                 @if (!string.IsNullOrEmpty(Model.Icon))
                 {
                     <div class="profile-picture squared" style="background-image: url('@Model.Icon')"></div>
@@ -28,10 +28,10 @@ else
                 }
             </a>
             <div>
-                <a class="section-title link--blue" href="@Model.Url">@Model.Title</a>
+                <a class="section-title link--blue" href="@Model.Url" onclick="return trackOutLink(this,'SearchPromo_Subtitle');">@Model.Title</a>
                 <div class="new-p new-p--gray new-p--small">
                         <span>@Html.Raw(Model.Description)</span>
-                    <br /><span><a class="link-danger" href="@Model.Url">@Html.Raw(Model.More)</a></span>
+                    <br /><span><a class="link-danger" href="@Model.Url" onclick="return trackOutLink(this,'SearchPromo_More');">@Html.Raw(Model.More)</a></span>
                 </div>
             </div>
         </div>

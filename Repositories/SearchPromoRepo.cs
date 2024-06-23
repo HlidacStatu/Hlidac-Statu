@@ -18,6 +18,8 @@ namespace HlidacStatu.Repositories
 {
     public class SearchPromoRepo
     {
+        public static string MoreTextDefault = "Více <i class=\"fa-solid fa-hand-point-right\"></i>";
+
         private static readonly ILogger _logger = Log.ForContext(typeof(SearchPromoRepo));
 
         public static IRule[] Irules = new IRule[] {
@@ -56,7 +58,7 @@ namespace HlidacStatu.Repositories
                     sp.Icon = "/content/searchpromo/platy-uredniku.png";
                     sp.Url = org.GetUrl(false);
                     sp.Title = "Platy úředníků";
-                    sp.More = "Více <i class=\"fa-solid fa-hand-point-right\"></i>";
+                    sp.More = MoreTextDefault;
                     sp.Description = "<b>" + org.Nazev + "</b><br />" 
                         + (org.Platy.AktualniRok().Count > 0 ? 
                                 $"Platy od {HlidacStatu.Util.RenderData.NicePrice(org.Platy.AktualniRok().Min(m => m.HrubyMesicniPlatVcetneOdmen))} do {HlidacStatu.Util.RenderData.NicePrice(org.Platy.AktualniRok().Max(m => m.HrubyMesicniPlatVcetneOdmen))}" 

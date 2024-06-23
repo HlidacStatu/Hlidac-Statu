@@ -23,6 +23,15 @@ namespace HlidacStatu.Repositories.Searching
             public string DataSource { get; set; }
             public TimeSpan ElapsedTime { get; set; } = TimeSpan.Zero;
 
+            public void AppendResult(T item)
+            {
+                if (Result == null) 
+                    Result = new List<T>();
+                Result = Result.Append(item);
+                IsValid= true;
+                Total = Result.Count();
+            }
+
             public virtual int MaxResultWindow() { return Repositories.Searching.Tools.MaxResultWindow; }
 
             public GeneralResult(string query, IEnumerable<T> result, int pageSize)
