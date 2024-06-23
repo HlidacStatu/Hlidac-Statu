@@ -52,6 +52,7 @@ namespace HlidacStatu.Repositories
                 More = MoreTextDefault,
                 Description = "Platy TOP úředníků a zaměstnanců státu<br />Porovnání s platy v soukromé sféře",
                 Fulltext = "",
+                Priority = 20,
             });
             await SaveAsync(new SearchPromo()
             {
@@ -63,6 +64,7 @@ namespace HlidacStatu.Repositories
                 More = MoreTextDefault,
                 Description = "Seznam úřadů a státních firem, přehledně rozdělené",
                 Fulltext = "",
+                Priority = 20,
             });
             await SaveAsync(new SearchPromo()
             {
@@ -74,6 +76,7 @@ namespace HlidacStatu.Repositories
                 More = MoreTextDefault,
                 Description = "Index klíčových rizik 1300 největší úřadů a firem, <b>za období 2017 - 2023</b>",
                 Fulltext = "",
+                Priority = 20,
             });
             await SaveAsync(new SearchPromo()
             {
@@ -85,6 +88,7 @@ namespace HlidacStatu.Repositories
                 More = MoreTextDefault,
                 Description = "Kompletní seznam sponzorů politických stran od 2012, osoby i firmy",
                 Fulltext = "",
+                Priority = 20,
             });
 
 
@@ -102,6 +106,7 @@ namespace HlidacStatu.Repositories
 
                     sp.PromoType = org.GetType().Name;
                     sp.Id = org.GetType().Name + "-" + org.Id;
+                    sp.Priority = 100;
                     sp.Ico = org.Ico;
                     sp.Icon = "/content/searchpromo/platy-uredniku.png";
                     sp.Url = org.GetUrl(false);
@@ -150,6 +155,7 @@ namespace HlidacStatu.Repositories
                     sp.PromoType = "KIndex";
                     sp.Id = sp.PromoType + "-" + rec.Ico;
                     sp.Ico = rec.Ico;
+                    sp.Priority = 100;
 
                     var lbl = KIndexData.CalculateLabel(rec.KIndex);
 
@@ -177,13 +183,6 @@ namespace HlidacStatu.Repositories
             //=========================================================================
             // CEOS
             //=========================================================================
-
-            var ceos = db.OsobaEvent.AsQueryable()
-                .Where(oe => oe.Ceo == 1)
-                .Where(oe => oe.DatumDo == null || oe.DatumDo >= DateTime.Now.AddYears(-4))
-                .ToArray()
-                .Select(m => (OsobaRepo.GetByInternalId(m.OsobaId), m.DatumOd, m.DatumDo, m.AddInfo))
-                .ToArray();
 
 
         }
