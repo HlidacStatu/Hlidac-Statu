@@ -285,6 +285,20 @@ else if (Model.HasResults == false)
         if (Model.HasSmlouvy)
         {
             htmlLinks.Add(new Tuple<string, string>(Url.Action("Hledat", "Home", Model.Smlouvy.ToRouteValues(1)), Devmasters.Lang.CS.Plural.Get(Model.Smlouvy.Total, "<b>jednu smlouvu</b>", "<b>{0} smlouvy</b>", "<b>{0} smluv</b>")));
+
+            if (Model.SearchPromos != null)
+            {
+                Model.SearchPromos.AppendResult(new SearchPromo()
+                            {
+                                Id = Guid.NewGuid().ToString(),
+                                Title = "Analýza smluv",
+                                Description = "<b>Detailní analýza smluvních vztahů</b> u nalezených smluv",
+                                More = SearchPromoRepo.MoreTextDefault,
+                                Icon = "/content/searchpromo/analysis.png",
+                                Url = "https://www.hlidacstatu.cz/analyza?q=" + System.Net.WebUtility.UrlEncode(Model.Query),
+                                Priority = 90
+                            });
+            }
         }
     }
     else if (part == nameof(VerejnaZakazkaSearchData))
