@@ -27,7 +27,12 @@
                 <!-- Modal Body -->
                 <div class="modal-body">
                     <b>Shrnutí obsahu smlouvy:</b>
-                    <img src="/Content/Img/loading.gif" style="display:none" id="llm_loading" />
+                    <div id="llm_loading" style="display:none;width:99%">
+                        @* <img src="/Content/Img/loading.gif"/> *@
+                        <div id="llm_loading_progressbar" class="progress" role="progressbar" aria-label="AI sumarizace" aria-valuenow="75" aria-valuemin="0" aria-valuemax="100" style="height: 3em">
+                            <div id="llm_loading_progressbar_body" class="progress-bar progress-bar-striped progress-bar-animated overflow-visible text-dark bg-warning" style="width: 0%"></div>
+                        </div>
+                    </div>
                     <div id="html_llmresult" style="display:none"></div>
                     <pre id="pre_llmresult"
                          style="overflow-x: auto;white-space: pre-wrap;white-space: -moz-pre-wrap;white-space: -pre-wrap;white-space: -o-pre-wrap;word-wrap: break-word;"></pre>
@@ -47,7 +52,7 @@
 
                                     <input type="hidden" id="LLMsmlouvaId" value="@(Model.Id)" />
                                     <input type="hidden" id="LLMinstruction" name="instruction" value="summaryjson" />
-                                    <select  class="form-select form-select-lg text-end" id="LLMpocetbodu" aria-label="">
+                                    <select class="form-select form-select-lg text-end" id="LLMpocetbodu" aria-label="">
                                         <option value="8">Stručné</option>
                                         <option value="12">Podrobné</option>
                                         <option value="18">Detailní</option>

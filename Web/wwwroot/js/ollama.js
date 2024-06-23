@@ -20,6 +20,24 @@ connection.on("ReceiveMessage", function (message) {
 });
 
 
+connection.on("ReceiveProgress", function (message) {
+    //document.getElementById("llmresult").appendChild(li);
+    if (message) { // Check if data is not null or empty
+        console.log(message)
+        //document.getElementById("llm_loading_progressbar_body")
+        var progressBar = document.getElementById('llm_loading_progressbar_body');
+        var roundedValue = (message.progress * 100).toFixed(1);
+        progressBar.style.width = roundedValue + '%';
+        progressBar.innerText = roundedValue + '% ' + message.message;
+        progressBar.setAttribute('aria-valuenow', roundedValue);
+
+    }
+    // We can assign user-supplied strings to an element's textContent because it
+    // is not interpreted as markup. If you're assigning in any other way, you 
+    // should be aware of possible script injection concerns.
+    //li.textContent = `${user} says ${message}`;
+});
+
 connection.on("ReceiveJsonSummaryMessage", function (message) {
     //document.getElementById("llmresult").appendChild(li);
     if (message) { // Check if data is not null or empty
@@ -67,6 +85,7 @@ document.getElementById("send2LLM").addEventListener("click", function (event) {
     var pocetbodu = document.getElementById("LLMpocetbodu").value;
     document.getElementById("pre_llmresult").value = '';
     document.getElementById("llm_loading").style.display = 'block';
+    document.getElementById('html_llmresult').innerHTML = '';
 
     //var numPriloha = document.getElementById("numPriloha").value;
     connection.invoke("AskLLM", instruction, smlouvaId, "",pocetbodu).catch(function (err) {
