@@ -16,19 +16,21 @@ namespace HlidacStatu.Web.Models
         public string LoadingText { get; set; }
         public string Style { get; set; }
 
-        public WidthSizeEnum WidthSize { get; set; }
+        public WidthSizeEnum WidthSize { get; set; } = WidthSizeEnum.Middle; 
 
         public DynamicModalViewModel(string dynamicContentRelUrl,
             string nazevOdkazu = "Opravit",
             string cssClass = "btn btn-link",
             string loadingText = "Nahrávám formulář",
-            string style = "", WidthSizeEnum width = WidthSizeEnum.Middle)
+            string style = "", 
+            WidthSizeEnum width = WidthSizeEnum.Middle)
         {
             DynamicContentRelUrl = dynamicContentRelUrl;
             NazevOdkazu = nazevOdkazu;
             CssClass = cssClass;
             LoadingText = loadingText;
             Style = style;
+            WidthSize = width;
 
             if (!DynamicContentRelUrl.EndsWith("&"))
             {
