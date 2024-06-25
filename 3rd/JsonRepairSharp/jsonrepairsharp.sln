@@ -1,0 +1,49 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.6.33829.357
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JsonRepairSharp", "JsonRepairSharp\JsonRepairSharp.csproj", "{569F55A1-B9EE-4D51-B7CA-9F185FAB6A7E}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JsonRepairSharp.Tests", "JsonRepairSharp.Tests\JsonRepairSharp.Tests.csproj", "{228E9852-AB2A-4BAF-A822-160BA7AFFF36}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JsonRepairSharp-Minimal", "JsonRepairSharp-Minimal\JsonRepairSharp-Minimal.csproj", "{9AB8B1E7-E46A-46D1-BBD4-889D0DCCF862}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JsonRepairSharp-CLI", "JsonRepairSharp-CLI\JsonRepairSharp-CLI.csproj", "{0E93551E-2341-4BD2-A8DD-5221F7C58B9D}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JsonRepairSharp-GUI", "JsonRepairSharp-GUI\JsonRepairSharp-GUI.csproj", "{6E346FD6-FE34-428C-AE17-9D1B5469E052}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{569F55A1-B9EE-4D51-B7CA-9F185FAB6A7E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{569F55A1-B9EE-4D51-B7CA-9F185FAB6A7E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{569F55A1-B9EE-4D51-B7CA-9F185FAB6A7E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{569F55A1-B9EE-4D51-B7CA-9F185FAB6A7E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{228E9852-AB2A-4BAF-A822-160BA7AFFF36}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{228E9852-AB2A-4BAF-A822-160BA7AFFF36}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{228E9852-AB2A-4BAF-A822-160BA7AFFF36}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{228E9852-AB2A-4BAF-A822-160BA7AFFF36}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9AB8B1E7-E46A-46D1-BBD4-889D0DCCF862}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9AB8B1E7-E46A-46D1-BBD4-889D0DCCF862}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9AB8B1E7-E46A-46D1-BBD4-889D0DCCF862}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9AB8B1E7-E46A-46D1-BBD4-889D0DCCF862}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0E93551E-2341-4BD2-A8DD-5221F7C58B9D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0E93551E-2341-4BD2-A8DD-5221F7C58B9D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0E93551E-2341-4BD2-A8DD-5221F7C58B9D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0E93551E-2341-4BD2-A8DD-5221F7C58B9D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6E346FD6-FE34-428C-AE17-9D1B5469E052}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6E346FD6-FE34-428C-AE17-9D1B5469E052}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6E346FD6-FE34-428C-AE17-9D1B5469E052}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6E346FD6-FE34-428C-AE17-9D1B5469E052}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {8F18053A-AE47-4F0B-A5D9-386AB012E984}
+	EndGlobalSection
+EndGlobal
