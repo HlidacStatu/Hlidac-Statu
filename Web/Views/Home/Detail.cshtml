@@ -74,7 +74,12 @@
 
 <div class="row mb-5">
     <div class="col" style="">
-        <partial name="WebUtil/SmlouvaDetailLLMModal" model="@(Model)" />
+        @if (User.Identity?.IsAuthenticated == true && User.IsInRole("BetaTester"))
+        {
+            <partial name="WebUtil/SmlouvaDetailLLMModal" model="@(Model)" />
+            <partial name="WebUtil/DynamicModal"
+                     model="@(new DynamicModalViewModel($"/api/v1/ModalAISummary/{Model.Id}", "<i class='fa-solid fa-microchip-ai'></i> AI shrnutí smlouvy","btn btn-success", loadingText: "Stahujeme AI data", style: "", width: DynamicModalViewModel.WidthSizeEnum.Large))" />
+        }
 
         @if (this.User?.IsInRole("canEditData") == true)
         {

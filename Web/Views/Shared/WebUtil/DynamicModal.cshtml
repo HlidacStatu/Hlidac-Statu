@@ -1,13 +1,29 @@
 @model DynamicModalViewModel
 
 @{
-    string modalId = $"m{Devmasters.TextUtil.GenRandomString(10)}"; 
+    string modalId = $"m{Devmasters.TextUtil.GenRandomString(10)}";
+    string widthCss = "";
+    switch (Model.WidthSize)
+    {
+        case DynamicModalViewModel.WidthSizeEnum.Small:
+            widthCss = "modal-sm";
+            break;
+        case DynamicModalViewModel.WidthSizeEnum.Large:
+            widthCss = "modal-lg";
+            break;
+        case DynamicModalViewModel.WidthSizeEnum.ExtraLarge:
+            widthCss = "modal-xl";
+            break;
+        default:
+            widthCss = "";
+            break;
+    }
 }
 <a href="#" data-bs-toggle="modal" id="btn@(modalId)" data-bs-target="#@(modalId)Form" data-remote="false" class="@Model.CssClass" style="@Model.Style">
-    <span class="fal fa-edit" aria-hidden="true"></span>@(Model.NazevOdkazu)
+    <span class="fal fa-edit" aria-hidden="true"></span>@Html.Raw(Model.NazevOdkazu)
 </a>
 <div class="modal fade" id="@(modalId)Form" tabindex="-1" role="dialog" aria-labelledby="@(modalId)Title" aria-hidden="true">
-    <div class="modal-dialog">
+    <div class="modal-dialog @widthCss">
         <div class="modal-content" id="@(modalId)content">
         </div>
     </div>

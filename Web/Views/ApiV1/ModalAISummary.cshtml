@@ -1,0 +1,75 @@
+﻿@using HlidacStatu.Extensions
+@using HlidacStatu.Repositories
+
+@model Tuple<HlidacStatu.Entities.PermanentLLM.BaseItem<HlidacStatu.AI.LLM.PrivateLLM.SumarizaceJSON>[],string>
+
+@{
+    Layout = null;
+
+    var aiDocs = Model.Item1;
+    var modalId = Model.Item2;
+
+    HlidacStatu.Entities.Smlouva smlouva = null;
+    if (aiDocs?.FirstOrDefault()?.DocumentID != null)
+    {
+        smlouva = await SmlouvaRepo.LoadAsync(aiDocs.FirstOrDefault().DocumentID,includePrilohy:false);
+    }
+}
+
+<!-- Modal Header -->
+<div class="modal-header" style="text-align:left;">
+    <button type="button" class="btn-close" data-bs-dismiss="modal">
+        <span aria-hidden="true">×</span>
+        <span class="sr-only">Close</span>
+    </button>
+    <h4 class="modal-title" id="@(modalId)Title">
+        Shrnutí obsahu smluv pomocí AI
+    </h4>
+</div>
+
+<!-- Modal Body -->
+    <div class="modal-body" style="text-align:left;">
+
+    @if (aiDocs?.Length>0)
+    {
+        foreach (var doc in aiDocs)
+        {
+            HlidacStatu.Entities.Smlouva.Priloha priloha = smlouva.Prilohy.FirstOrDefault(m=>m.UniqueHash() == doc.FileID);
+            
+            <h4>@(priloha?.nazevSouboru)</h4>
+            <ul>
+            @foreach(var part in doc.Parts.sumarizace)
+            {
+                    <li>@if (!string.IsNullOrEmpty(part.titulek))
+                        {
+                            <b>@(part.titulek): </b>
+                        }
+                        <div>@part.bod</div>
+                </li>
+            }
+            </ul>
+        }
+    }
+    else
+    {
+        <div class="alert alert-warning" role="alert">
+            Žádné shrnutí není k dispozici
+        </div>
+    }
+
+    </div>
+
+    <!-- Modal Footer -->
+    <div class="modal-footer">
+        <button type="button" class="btn btn-default" onclick="confirm@(modalId)();" data-bs-dismiss="modal">
+            OK
+        </button>
+    </div>
+
+<script>
+    function confirm@(modalId)() {
+        var prf = '#@(modalId)';
+        var url = $(prf + "Url").val();
+        window.location.reload();
+    }
+</script>

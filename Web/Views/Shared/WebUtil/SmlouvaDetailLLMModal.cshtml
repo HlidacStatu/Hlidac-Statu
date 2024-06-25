@@ -5,61 +5,58 @@
     var style = "btn btn-primary ";
     var llm_IdPrefix = "llm_" + Devmasters.TextUtil.GenRandomString(9);
 }
-@if (User.Identity?.IsAuthenticated == true && User.IsInRole("BetaTester"))
-{
-    <!-- Modal -->
-    <button class="@style" data-bs-toggle="modal" data-bs-target="#@(llm_IdPrefix)fbForm">AI analýzy smlouvy</button>
-    <div class="modal fade" id="@(llm_IdPrefix)fbForm" tabindex="-1" role="dialog"
-         aria-labelledby="@(llm_IdPrefix)fbTitle" aria-hidden="true">
-        <div class="modal-dialog modal-lg">
-            <div class="modal-content">
-                <!-- Modal Header -->
-                <div class="modal-header">
-                    <h4 class="modal-title" id="@(llm_IdPrefix)fbTitle">
-                        AI Hlídače státu
-                    </h4>
-                    <button type="button" class="btn-close"
-                            data-bs-dismiss="modal">
-                        <span class="sr-only">Close</span>
-                    </button>
-                </div>
+<!-- Modal -->
+<button class="@style" data-bs-toggle="modal" data-bs-target="#@(llm_IdPrefix)fbForm">AI analýzy smlouvy</button>
+<div class="modal fade" id="@(llm_IdPrefix)fbForm" tabindex="-1" role="dialog"
+     aria-labelledby="@(llm_IdPrefix)fbTitle" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <!-- Modal Header -->
+            <div class="modal-header">
+                <h4 class="modal-title" id="@(llm_IdPrefix)fbTitle">
+                    AI Hlídače státu
+                </h4>
+                <button type="button" class="btn-close"
+                        data-bs-dismiss="modal">
+                    <span class="sr-only">Close</span>
+                </button>
+            </div>
 
-                <!-- Modal Body -->
-                <div class="modal-body">
-                    <b>Shrnutí obsahu smlouvy:</b>
-                    <div id="llm_loading" style="display:none;width:99%">
-                        @* <img src="/Content/Img/loading.gif"/> *@
-                        <div id="llm_loading_progressbar" class="progress" role="progressbar" aria-label="AI sumarizace" aria-valuenow="75" aria-valuemin="0" aria-valuemax="100" style="height: 3em">
-                            <div id="llm_loading_progressbar_body" class="progress-bar progress-bar-striped progress-bar-animated overflow-visible text-dark bg-warning" style="width: 0%"></div>
-                        </div>
+            <!-- Modal Body -->
+            <div class="modal-body">
+                <b>Shrnutí obsahu smlouvy:</b>
+                <div id="llm_loading" style="display:none;width:99%">
+                    @* <img src="/Content/Img/loading.gif"/> *@
+                    <div id="llm_loading_progressbar" class="progress" role="progressbar" aria-label="AI sumarizace" aria-valuenow="75" aria-valuemin="0" aria-valuemax="100" style="height: 3em">
+                        <div id="llm_loading_progressbar_body" class="progress-bar progress-bar-striped progress-bar-animated overflow-visible text-dark bg-warning" style="width: 0%"></div>
                     </div>
-                    <div id="html_llmresult" style="display:none"></div>
-                    <pre id="pre_llmresult"
-                         style="overflow-x: auto;white-space: pre-wrap;white-space: -moz-pre-wrap;white-space: -pre-wrap;white-space: -o-pre-wrap;word-wrap: break-word;"></pre>
                 </div>
+                <div id="html_llmresult" style="display:none"></div>
+                <pre id="pre_llmresult"
+                     style="overflow-x: auto;white-space: pre-wrap;white-space: -moz-pre-wrap;white-space: -pre-wrap;white-space: -o-pre-wrap;word-wrap: break-word;"></pre>
+            </div>
 
-                <!-- Modal Footer -->
-                <div class="modal-footer">
-                    <div class="container text-center">
-                        <div class="row">
-                            <div class="col-3">
-                                <button type="button" class="btn btn-default" data-bs-dismiss="modal">
-                                    Zrušit
-                                </button>
-                            </div>
-                            <div class="col-8">
-                                <div class="input-group">
+            <!-- Modal Footer -->
+            <div class="modal-footer">
+                <div class="container text-center">
+                    <div class="row">
+                        <div class="col-3">
+                            <button type="button" class="btn btn-default" data-bs-dismiss="modal">
+                                Zrušit
+                            </button>
+                        </div>
+                        <div class="col-8">
+                            <div class="input-group">
 
-                                    <input type="hidden" id="LLMsmlouvaId" value="@(Model.Id)" />
-                                    <input type="hidden" id="LLMinstruction" name="instruction" value="summaryjson" />
-                                    <select class="form-select form-select-lg text-end" id="LLMpocetbodu" aria-label="">
-                                        <option value="8">Stručné</option>
-                                        <option value="12">Podrobné</option>
-                                        <option value="18">Detailní</option>
-                                    </select>
+                                <input type="hidden" id="LLMsmlouvaId" value="@(Model.Id)" />
+                                <input type="hidden" id="LLMinstruction" name="instruction" value="summaryjson" />
+                                <select class="form-select form-select-lg text-end" id="LLMpocetbodu" aria-label="">
+                                    <option value="8">Stručné</option>
+                                    <option value="12">Podrobné</option>
+                                    <option value="18">Detailní</option>
+                                </select>
 
-                                    <button type="button" id="send2LLM" class="btn btn-primary">Shrnutí smlouvy</button>
-                                </div>
+                                <button type="button" id="send2LLM" class="btn btn-primary">Shrnutí smlouvy</button>
                             </div>
                         </div>
                     </div>
@@ -67,8 +64,9 @@
             </div>
         </div>
     </div>
+</div>
 
-    <script src="/js/signalr/dist/browser/signalr.js"></script>
-    <script src="/js/ollama.js"></script>
+<script src="/js/signalr/dist/browser/signalr.js"></script>
+<script src="/js/ollama.js"></script>
 
-}
+

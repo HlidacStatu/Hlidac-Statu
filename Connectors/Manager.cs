@@ -53,7 +53,8 @@ namespace HlidacStatu.Connectors
             InDocTableCells,
             DocumentHistory,
             SplitSmlouvy,
-            SearchPromo
+            SearchPromo,
+            PermanentLLM
         }
 
         public static string defaultIndexName = "hlidacsmluv";
@@ -91,6 +92,7 @@ namespace HlidacStatu.Connectors
 
         public static string defaultIndexName_SplitSmlouvy = "splitsmlouvy";
         public static string defaultIndexName_SearchPromo = "searchpromo";
+        public static string defaultIndexName_PermanentLLM = "permanentllm";
 
 
         private static SemaphoreSlim _clientSemaphore = new SemaphoreSlim(1, 1);
@@ -236,6 +238,11 @@ namespace HlidacStatu.Connectors
         public static Task<ElasticClient> GetESClient_SearchPromoAsync(int timeOut = 60000, int connectionLimit = 80)
         {
             return GetESClientAsync(defaultIndexName_SearchPromo, timeOut, connectionLimit, IndexType.SearchPromo);
+        }
+
+        public static Task<ElasticClient> GetESClient_PermanentLLMAsync(int timeOut = 60000, int connectionLimit = 80)
+        {
+            return GetESClientAsync(defaultIndexName_PermanentLLM, timeOut, connectionLimit, IndexType.PermanentLLM);
         }
 
         //public static ElasticClient GetESClient_Uptime(int timeOut = 60000, int connectionLimit = 80)
@@ -583,6 +590,15 @@ namespace HlidacStatu.Connectors
                        .CreateAsync(indexName, i => i
                            .InitializeUsing(idxSt)
                            .Map<HlidacStatu.Entities.SearchPromo>(map => map.AutoMap().DateDetection(false))
+                       );
+                    break;
+                case IndexType.PermanentLLM:
+                    idxSt.Settings.NumberOfShards = 2;
+                    idxSt.Settings.RefreshInterval = "15s";
+                    res = await client.Indices
+                       .CreateAsync(indexName, i => i
+                           .InitializeUsing(idxSt)
+                           .Map<HlidacStatu.Entities.PermanentLLM.Summary>(map => map.AutoMap().DateDetection(false))  //TODO Summary to T or Object
                        );
                     break;
                 case IndexType.Dotace:
