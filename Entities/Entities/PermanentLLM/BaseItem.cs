@@ -2,8 +2,7 @@
 
 namespace HlidacStatu.Entities.PermanentLLM
 {
-    public class BaseItem<T>
-                where T : class
+    public class BaseItem
     {
 
         private string _id = null;
@@ -14,7 +13,7 @@ namespace HlidacStatu.Entities.PermanentLLM
             get
             {
                 if (_id == null)
-                    _id = GetId(this.DocumentType, this.DocumentID, this.FileID);
+                    _id = GetId(this.DocumentType, this.DocumentID, this.PartType, this.FileID);
 
                 return _id;
             }
@@ -22,17 +21,6 @@ namespace HlidacStatu.Entities.PermanentLLM
             {
                 _id = value;
             }
-        }
-
-        public static string GetId(string documentType, string documentId, string fileId)
-        {
-
-            if (string.IsNullOrWhiteSpace(documentId)
-                && string.IsNullOrWhiteSpace(documentType)
-                )
-                return null;
-            
-            return $"{documentType}-{documentId}-{fileId ?? "0"}";
         }
 
         [Nest.Keyword]
@@ -51,7 +39,31 @@ namespace HlidacStatu.Entities.PermanentLLM
         public DateTime Created { get; set; }
 
         [Nest.Keyword]
-        public string PartType { get; set; } = typeof(T).Name;
+        public virtual string PartType { get; set; }
+
+
+        public static string GetId(string documentType, string documentId, string partType, string fileId)
+        {
+
+            if (string.IsNullOrWhiteSpace(documentId)
+                && string.IsNullOrWhiteSpace(documentType)
+                )
+                return null;
+
+            return $"{documentType}-{partType}-{documentId}-{fileId ?? "0"}";
+        }
+
+
+    }
+
+    public class BaseItem<T> : BaseItem
+                where T : class
+    {
+
+
+        [Nest.Keyword]
+        public override string PartType { get; set; } = typeof(T).Name;
+
         [Nest.Object(Enabled = false)]
         public T Parts { get; set; } = default;
 

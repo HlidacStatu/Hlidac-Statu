@@ -66,10 +66,10 @@ namespace HlidacStatu.Web.Framework.SignalR
                         var sectSumm = await llm.SummarizeToJsonAsync(
                         HlidacStatu.AI.LLM.PrivateLLM.Profiles.AYA_Pravnik,
                         pocetOdrazek, t, 1024 * 4);
-                        if (sectSumm?.Count > 0)
+                        if (sectSumm?.sumarizace.Count() > 0)
                         {
-                            message = sectSumm.First().titulek;
-                            summ.AddRange(sectSumm);
+                            message = sectSumm.sumarizace.First().titulek;
+                            summ.AddRange(sectSumm.sumarizace);
                         }
 
                     }

@@ -653,6 +653,14 @@ namespace HlidacStatu.Repositories
                     Query = "icoPlatce:65993390 AND ( \"stavební práce v užším řízení\" OR \"jednací řízení bez uveřejnění\") ",
                     UrlTemplate = "/HledatSmlouvy?Q={0}"
                 });
+                Afery.Add("clenove-ictunie", new TemplatedQuery()
+                {
+                    Text = "Smlouvy členů ICT Unie",
+                    Description = @"Smlouvy uzavřené členy ICT Unie a jejich dcerami.",
+                    Query = "holding:00174939 OR holding:00533394 OR holding:00672416 OR holding:03136108 OR holding:04308697 OR holding:07366949 OR holding:09702652 OR holding:14482282 OR holding:14890992 OR holding:16188781 OR holding:17007909 OR holding:24738875 OR holding:24775487 OR holding:25146441 OR holding:25618067 OR holding:25625632 OR holding:25648101 OR holding:25788001 OR holding:26129558 OR holding:26298953 OR holding:26426331 OR holding:26482347 OR holding:26500281 OR holding:26851652 OR holding:27074358 OR holding:27367061 OR holding:27604977 OR holding:28606582 OR holding:40527514 OR holding:40766314 OR holding:43871020 OR holding:44797320 OR holding:44846029 OR holding:44851391 OR holding:45272808 OR holding:45786259 OR holding:47117087 OR holding:47123737 OR holding:47451084 OR holding:47903783 OR holding:48591254 OR holding:60193336 OR holding:61060631 OR holding:61498084 OR holding:61498483 OR holding:61855057 OR holding:62028235 OR holding:62911643 OR holding:63078236 OR holding:63911035 OR holding:63979462 OR holding:64949541",
+                    UrlTemplate = "/Hledat?Q={0}"
+                });
+
 
                 // hierarchie uradu
                 try

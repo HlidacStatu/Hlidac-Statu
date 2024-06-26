@@ -25,8 +25,8 @@ namespace HlidacStatu.Web.Controllers
         {
             string id = _id;
 
-            Entities.PermanentLLM.BaseItem<AI.LLM.PrivateLLM.SumarizaceJSON>[] AIdocs = await HlidacStatu.Repositories.PermanentLLMRepo<HlidacStatu.AI.LLM.PrivateLLM.SumarizaceJSON>
-                .SearchPerKeysAsync(HlidacStatu.Entities.PermanentLLM.Summary.DOCUMENTTYPE, _id);
+            HlidacStatu.Entities.PermanentLLM.FullSummary[] AIdocs = await HlidacStatu.Repositories.PermanentLLMRepo
+                .SearchPerKeysAsync<HlidacStatu.Entities.PermanentLLM.FullSummary>(HlidacStatu.Entities.PermanentLLM.FullSummary.DOCUMENTTYPE, _id);
 
 
             return View(new Tuple<Entities.PermanentLLM.BaseItem<AI.LLM.PrivateLLM.SumarizaceJSON>[],string>(AIdocs, modalId));
