@@ -20,7 +20,7 @@
     }
 }
 <a href="#" data-bs-toggle="modal" id="btn@(modalId)" data-bs-target="#@(modalId)Form" data-remote="false" class="@Model.CssClass" style="@Model.Style">
-    <span class="fal fa-edit" aria-hidden="true"></span>@Html.Raw(Model.NazevOdkazu)
+    @Html.Raw(Model.NazevOdkazu)
 </a>
 <div class="modal fade" id="@(modalId)Form" tabindex="-1" role="dialog" aria-labelledby="@(modalId)Title" aria-hidden="true">
     <div class="modal-dialog @widthCss">

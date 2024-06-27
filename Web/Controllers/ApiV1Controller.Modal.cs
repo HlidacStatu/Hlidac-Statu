@@ -25,11 +25,22 @@ namespace HlidacStatu.Web.Controllers
         {
             string id = _id;
 
-            HlidacStatu.Entities.PermanentLLM.FullSummary[] AIdocs = await HlidacStatu.Repositories.PermanentLLMRepo
-                .SearchPerKeysAsync<HlidacStatu.Entities.PermanentLLM.FullSummary>(HlidacStatu.Entities.PermanentLLM.FullSummary.DOCUMENTTYPE, _id);
+            HlidacStatu.Entities.PermanentLLM.FullSummary[] AIFulldocs = await HlidacStatu.Repositories.PermanentLLMRepo
+                .SearchPerKeysAsync<HlidacStatu.Entities.PermanentLLM.FullSummary>(
+                HlidacStatu.Entities.PermanentLLM.FullSummary.DOCUMENTTYPE,
+                _id,
+                HlidacStatu.Entities.PermanentLLM.FullSummary.PARTTYPE
+                );
 
+            HlidacStatu.Entities.PermanentLLM.ShortSummary[] AIShortdocs = await HlidacStatu.Repositories.PermanentLLMRepo
+                .SearchPerKeysAsync<HlidacStatu.Entities.PermanentLLM.ShortSummary>(
+                HlidacStatu.Entities.PermanentLLM.ShortSummary.DOCUMENTTYPE,
+                _id,
+                HlidacStatu.Entities.PermanentLLM.ShortSummary.PARTTYPE
+                );
 
-            return View(new Tuple<Entities.PermanentLLM.BaseItem<AI.LLM.PrivateLLM.SumarizaceJSON>[],string>(AIdocs, modalId));
+            return View(new Tuple<Entities.PermanentLLM.ShortSummary[], Entities.PermanentLLM.FullSummary[], string>(
+                AIShortdocs, AIFulldocs, modalId));
         }
 
     }

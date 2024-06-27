@@ -46,7 +46,7 @@ namespace HlidacStatu.Repositories
         }
 
         public static async Task<T[]> SearchPerKeysAsync<T>(
-            string documentType, string documentId, string fileId = null, string partType = null)
+            string documentType, string documentId, string partType, string fileId = null)
             where T : BaseItem
         {
             var dbSP = await HlidacStatu.Connectors.Manager.GetESClient_PermanentLLMAsync();

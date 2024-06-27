@@ -1,61 +1,114 @@
 ﻿@using HlidacStatu.Extensions
 @using HlidacStatu.Repositories
 
-@model Tuple<HlidacStatu.Entities.PermanentLLM.BaseItem<HlidacStatu.AI.LLM.PrivateLLM.SumarizaceJSON>[],string>
+@model Tuple<HlidacStatu.Entities.PermanentLLM.ShortSummary[], HlidacStatu.Entities.PermanentLLM.FullSummary[], string>
 
 @{
     Layout = null;
 
-    var aiDocs = Model.Item1;
-    var modalId = Model.Item2;
+    var aiShortDocs = Model.Item1;
+    var aiFullDocs= Model.Item2;
+    var modalId = Model.Item3;
 
     HlidacStatu.Entities.Smlouva smlouva = null;
-    if (aiDocs?.FirstOrDefault()?.DocumentID != null)
+    if (aiShortDocs?.FirstOrDefault()?.DocumentID != null)
     {
-        smlouva = await SmlouvaRepo.LoadAsync(aiDocs.FirstOrDefault().DocumentID,includePrilohy:false);
+        smlouva = await SmlouvaRepo.LoadAsync(aiShortDocs.FirstOrDefault().DocumentID, includePrilohy: false);
     }
+    else if (aiFullDocs?.FirstOrDefault()?.DocumentID != null)
+    {
+        smlouva = await SmlouvaRepo.LoadAsync(aiFullDocs.FirstOrDefault().DocumentID, includePrilohy: false);
+    }
+
 }
 
 <!-- Modal Header -->
 <div class="modal-header" style="text-align:left;">
+    <h4 class="modal-title" id="@(modalId)Title">
+        Shrnutí obsahu smluv pomocí AI
+    </h4>
     <button type="button" class="btn-close" data-bs-dismiss="modal">
         <span aria-hidden="true">×</span>
         <span class="sr-only">Close</span>
     </button>
-    <h4 class="modal-title" id="@(modalId)Title">
-        Shrnutí obsahu smluv pomocí AI
-    </h4>
 </div>
 
 <!-- Modal Body -->
     <div class="modal-body" style="text-align:left;">
-
-    @if (aiDocs?.Length>0)
-    {
-        foreach (var doc in aiDocs)
+    <ul class="nav nav-tabs" role="tablist">
+        @if (aiShortDocs != null)
         {
-            HlidacStatu.Entities.Smlouva.Priloha priloha = smlouva.Prilohy.FirstOrDefault(m=>m.UniqueHash() == doc.FileID);
-            
-            <h4>@(priloha?.nazevSouboru)</h4>
-            <ul>
-            @foreach(var part in doc.Parts.sumarizace)
-            {
-                    <li>@if (!string.IsNullOrEmpty(part.titulek))
-                        {
-                            <b>@(part.titulek): </b>
-                        }
-                        <div>@part.bod</div>
-                </li>
-            }
-            </ul>
+            <li role="presentation" class="nav-item"><a href="#@(modalId)simple" class="nav-link active" aria-controls="home" role="tab" data-bs-toggle="tab">Shrnutí</a></li>
         }
-    }
-    else
-    {
-        <div class="alert alert-warning" role="alert">
-            Žádné shrnutí není k dispozici
+        @if (aiFullDocs!= null)
+        {
+            <li role="presentation" class="nav-item"><a href="#@(modalId)full" class="nav-link" aria-controls="profile" role="tab" data-bs-toggle="tab">Delší shrnutí</a></li>
+        }
+    </ul>
+    <div class="tab-content">
+        <div role="tabpanel" class="tab-pane active" id="@(modalId)simple">
+            @if (aiShortDocs?.Length > 0)
+            {
+                foreach (var doc in aiShortDocs)
+                {
+                    HlidacStatu.Entities.Smlouva.Priloha priloha = smlouva?.Prilohy?.FirstOrDefault(m => m.UniqueHash() == doc.FileID);
+
+                    <div class="fs-5"><b>Příloha <code>@(priloha?.nazevSouboru)</code></b></div>
+                    <ul>
+                        @foreach (var part in doc.Parts.sumarizace)
+                        {
+                            <li>
+                                @if (!string.IsNullOrEmpty(part.titulek))
+                                {
+                                    <b>@(part.titulek): </b>
+                                }
+                                <div>@part.bod</div>
+                            </li>
+                        }
+                    </ul>
+                }
+            }
+            else
+            {
+                <div class="alert alert-warning" role="alert">
+                    Žádné shrnutí není k dispozici
+                </div>
+            }
+
         </div>
-    }
+        <div role="tabpanel" class="tab-pane" id="@(modalId)full">
+            @if (aiFullDocs?.Length > 0)
+            {
+                foreach (var doc in aiFullDocs)
+                {
+                    HlidacStatu.Entities.Smlouva.Priloha priloha = smlouva?.Prilohy?.FirstOrDefault(m => m.UniqueHash() == doc.FileID);
+
+                    <div class="fs-5"><b>Příloha <code>@(priloha?.nazevSouboru)</code></b></div>
+                    <ul>
+                        @foreach (var part in doc.Parts.sumarizace)
+                        {
+                            <li>
+                                @if (!string.IsNullOrEmpty(part.titulek))
+                                {
+                                    <b>@(part.titulek): </b>
+                                }
+                                <div>@part.bod</div>
+                            </li>
+                        }
+                    </ul>
+                }
+            }
+            else
+            {
+                <div class="alert alert-warning" role="alert">
+                    Žádné shrnutí není k dispozici
+                </div>
+            }
+        </div>
+
+       
+    </div>
+
 
     </div>
 

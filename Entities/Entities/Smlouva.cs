@@ -144,6 +144,8 @@ namespace HlidacStatu.Entities
 
         public decimal? hodnotaVcetneDph { get; set; }
 
+        public int AIready { get; set; } = 0;
+
         [Text]
         public string Id
         {

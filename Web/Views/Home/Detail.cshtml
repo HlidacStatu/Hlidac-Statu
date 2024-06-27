@@ -77,10 +77,12 @@
         @if (User.Identity?.IsAuthenticated == true && User.IsInRole("BetaTester"))
         {
             <partial name="WebUtil/SmlouvaDetailLLMModal" model="@(Model)" />
-            <partial name="WebUtil/DynamicModal"
-                     model="@(new DynamicModalViewModel($"/api/v1/ModalAISummary/{Model.Id}", "<i class='fa-solid fa-microchip-ai'></i> AI shrnutí smlouvy","btn btn-success", loadingText: "Stahujeme AI data", style: "", width: DynamicModalViewModel.WidthSizeEnum.Large))" />
         }
-
+        @if (Model.AIready == 1)
+        {
+            <partial name="WebUtil/DynamicModal"
+                        model="@(new DynamicModalViewModel($"/api/v1/ModalAISummary/{Model.Id}", "<i class='fa-solid fa-microchip-ai'></i> AI shrnutí smlouvy","btn btn-success", loadingText: "Stahujeme AI data", style: "", width: DynamicModalViewModel.WidthSizeEnum.Large))" />
+        }
         @if (this.User?.IsInRole("canEditData") == true)
         {
             <a href="/manage/zmenasmluvnichstran/@Model.Id" class="btn btn-warning ms-3" target="_blank">Změnit smluvni strany</a>
@@ -113,7 +115,7 @@
                                     </td>
                                     <td style="width:30%;padding:0;margin:0;line-height:13px;text-align:right">
                                         <partial name="WebUtil/DynamicModal"
-                                                 model="@(new DynamicModalViewModel($"/api/v1/ModalZneplatnenaSmlouva/{Model.Id}", "(Má být smlouva označena jako platná?).", loadingText: "Ověřuji platnost smlouvy v registru smluv", style: "padding:0;margin:0"))" />
+                                                 model="@(new DynamicModalViewModel($"/api/v1/ModalZneplatnenaSmlouva/{Model.Id}", "<span class='fal fa-edit' aria-hidden='true'></span>(Má být smlouva označena jako platná?).", loadingText: "Ověřuji platnost smlouvy v registru smluv", style: "padding:0;margin:0"))" />
                                     </td>
                                 </tr>
                             </table>
@@ -130,7 +132,7 @@
                                     </td>
                                     <td style="width:30%;padding:0;margin:0;line-height:13px;text-align:right">
                                         <partial name="WebUtil/DynamicModal"
-                                                 model="@(new DynamicModalViewModel($"/api/v1/ModalZneplatnenaSmlouva/{Model.Id}", "(Má být smlouva označena jako platná?).", loadingText: "Ověřuji platnost smlouvy v registru smluv", style: "padding:0;margin:0"))" />
+                                                 model="@(new DynamicModalViewModel($"/api/v1/ModalZneplatnenaSmlouva/{Model.Id}", "<span class='fal fa-edit' aria-hidden='true'></span>(Má být smlouva označena jako platná?).", loadingText: "Ověřuji platnost smlouvy v registru smluv", style: "padding:0;margin:0"))" />
                                     </td>
                                 </tr>
                             </table>
@@ -159,7 +161,7 @@
                                     </td>
                                     <td style="width:30%;padding:0;margin:0;line-height:13px;text-align:right">
                                         <partial name="WebUtil/DynamicModal"
-                                                 model="@(new DynamicModalViewModel($"/api/v1/ModalZneplatnenaSmlouva/{Model.Id}", "(Má být smlouva označena jako neplatná?).", loadingText: "Ověřuji platnost smlouvy v registru smluv", style: "padding:0;margin:0"))" />
+                                                 model="@(new DynamicModalViewModel($"/api/v1/ModalZneplatnenaSmlouva/{Model.Id}", "<span class='fal fa-edit' aria-hidden='true'></span>(Má být smlouva označena jako neplatná?).", loadingText: "Ověřuji platnost smlouvy v registru smluv", style: "padding:0;margin:0"))" />
                                     </td>
                                 </tr>
                             </table>
@@ -174,7 +176,7 @@
                                     <td style="width:50%;padding:0;margin:0;line-height:13px;">Toto je platná smlouva</td>
                                     <td style="width:50%;padding:0;margin:0;line-height:13px;text-align:right">
                                         <partial name="WebUtil/DynamicModal"
-                                                 model="@(new DynamicModalViewModel($"/api/v1/ModalZneplatnenaSmlouva/{Model.Id}", "(Má být smlouva označena jako neplatná?).", loadingText: "Ověřuji platnost smlouvy v registru smluv", style: "padding:0;margin:0"))" />
+                                                 model="@(new DynamicModalViewModel($"/api/v1/ModalZneplatnenaSmlouva/{Model.Id}", "<span class='fal fa-edit' aria-hidden='true'></span>(Má být smlouva označena jako neplatná?).", loadingText: "Ověřuji platnost smlouvy v registru smluv", style: "padding:0;margin:0"))" />
                                     </td>
                                 </tr>
                             </table>
@@ -258,12 +260,12 @@
                             @if (Model.GetRelevantClassification().Count() == 0)
                             {
                                 <partial name="WebUtil/DynamicModal"
-                                         model="@(new DynamicModalViewModel($"/api/v1/modalclassification/{Model.Id}", " Pomozte nám se správnou klasifikací, prosím."))" />
+                                         model="@(new DynamicModalViewModel($"/api/v1/modalclassification/{Model.Id}", " <span class='fal fa-edit' aria-hidden='true'></span>Pomozte nám se správnou klasifikací, prosím."))" />
                             }
                             else
                             {
                                 <partial name="WebUtil/DynamicModal"
-                                         model="@(new DynamicModalViewModel($"/api/v1/modalclassification/{Model.Id}", " Jsou oblasti špatně? Dejte nám vědět, prosím."))" />
+                                         model="@(new DynamicModalViewModel($"/api/v1/modalclassification/{Model.Id}", "<span class='fal fa-edit' aria-hidden='true'></span> Jsou oblasti špatně? Dejte nám vědět, prosím."))" />
                             }
                             <br />
                             <span class="small">
