@@ -7,8 +7,9 @@
     Layout = null;
 
     var aiShortDocs = Model.Item1;
-    var aiFullDocs= Model.Item2;
+    var aiFullDocs = Model.Item2;
     var modalId = Model.Item3;
+    var activateFirstBar = true;
 
     HlidacStatu.Entities.Smlouva smlouva = null;
     if (aiShortDocs?.FirstOrDefault()?.DocumentID != null)
@@ -34,15 +35,22 @@
 </div>
 
 <!-- Modal Body -->
-    <div class="modal-body" style="text-align:left;">
+<div class="modal-body" style="text-align:left;">
     <ul class="nav nav-tabs" role="tablist">
-        @if (aiShortDocs?.Length>0)
+
+        @if (aiShortDocs?.Length > 0)
         {
-            <li role="presentation" class="nav-item"><a href="#@(modalId)simple" class="nav-link active" aria-controls="home" role="tab" data-bs-toggle="tab">Shrnutí</a></li>
+            <li role="presentation" class="nav-item">
+                <a href="#@(modalId)simple" class="nav-link @(activateFirstBar ? "active" : "")" aria-controls="home" role="tab" data-bs-toggle="tab">Shrnutí</a>
+            </li>
+            activateFirstBar = false;
         }
         @if (aiFullDocs?.Length > 0)
         {
-            <li role="presentation" class="nav-item"><a href="#@(modalId)full" class="nav-link" aria-controls="profile" role="tab" data-bs-toggle="tab">Delší shrnutí</a></li>
+            <li role="presentation" class="nav-item">
+                <a href="#@(modalId)full" class="nav-link  @(activateFirstBar ? "active" : "")" aria-controls="profile" role="tab" data-bs-toggle="tab">Delší shrnutí</a>
+            </li>
+            activateFirstBar = false;
         }
     </ul>
     <div class="tab-content">
@@ -106,18 +114,18 @@
             }
         </div>
 
-       
-    </div>
-
 
     </div>
 
-    <!-- Modal Footer -->
-    <div class="modal-footer">
-        <button type="button" class="btn btn-default" onclick="confirm@(modalId)();" data-bs-dismiss="modal">
-            OK
-        </button>
-    </div>
+
+</div>
+
+<!-- Modal Footer -->
+<div class="modal-footer">
+    <button type="button" class="btn btn-default" onclick="confirm@(modalId)();" data-bs-dismiss="modal">
+        OK
+    </button>
+</div>
 
 <script>
     function confirm@(modalId)() {
