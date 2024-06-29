@@ -113,7 +113,7 @@ namespace HlidacStatu.Repositories
                 .Where(m =>
                         m.Source == sourceUri
                         && m.Status != (int)HlidacStatu.DS.Api.Voice2Text.Task.CheckState.Error
-                        && m.Result != "[]"
+                        //&& m.Result != "[]"
                 )
                 .AnyAsync();
                 if (q2)

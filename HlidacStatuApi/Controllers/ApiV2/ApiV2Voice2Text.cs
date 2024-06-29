@@ -21,7 +21,8 @@ namespace HlidacStatuApi.Controllers.ApiV2
         /// <returns></returns>
         [Authorize(Roles = "Admin,InternalQ")]
         [HttpPost("CreateTask")]
-        public async Task<ActionResult<long?>> CreateTask([FromBody] HlidacStatu.DS.Api.Voice2Text.Task task, [FromQuery] bool addDuplicated = false)
+        public async Task<ActionResult<long?>> CreateTask([FromBody] HlidacStatu.DS.Api.Voice2Text.Task task, 
+            [FromQuery] bool addDuplicated = false)
         {
             try
             {
