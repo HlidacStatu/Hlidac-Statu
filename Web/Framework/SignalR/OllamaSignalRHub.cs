@@ -30,14 +30,17 @@ namespace HlidacStatu.Web.Framework.SignalR
         public async Task SummaryJson( string smlouvaId, string prilohaId, string pocetbodu)
         {
             Uri ollamaUri = new Uri("http://10.10.100.113:18080/ollama/api");
-            HlidacStatu.AI.LLM.PrivateLLM llm = new(new HlidacStatu.AI.LLM.PrivateLLM.OllamaOpenWebUI(ollamaUri.AbsoluteUri, "sk-f53cf4b315c144528110af15cc315c11"));
+            var ollamaCl = new HlidacStatu.AI.LLM.Clients.OllamaOpenWebUI(ollamaUri.AbsoluteUri, "sk-f53cf4b315c144528110af15cc315c11");
+            HlidacStatu.AI.LLM.Summarization llm = new HlidacStatu.AI.LLM.Summarization(ollamaCl);
+
+            //HlidacStatu.AI.LLM.Summarization llm = new(new HlidacStatu.AI.LLM.Summarization.OllamaOpenWebUI(ollamaUri.AbsoluteUri, "sk-f53cf4b315c144528110af15cc315c11"));
 
 
             string content = "";
             var s = await HlidacStatu.Repositories.SmlouvaRepo.LoadAsync(smlouvaId, includePrilohy: true);
             if (s != null)
             {
-                List<HlidacStatu.AI.LLM.PrivateLLM.SumarizaceJSON.Item> summ = new List<HlidacStatu.AI.LLM.PrivateLLM.SumarizaceJSON.Item>();
+                List<HlidacStatu.AI.LLM.SumarizaceJSON.Item> summ = new List<HlidacStatu.AI.LLM.SumarizaceJSON.Item>();
                 var priloha = s.Prilohy.FirstOrDefault();// (m=>m.UniqueHash() == prilohaId);
                 if (priloha != null)
                 {
@@ -63,9 +66,7 @@ namespace HlidacStatu.Web.Framework.SignalR
                         if (tokens < 500)
                             pocetOdrazek = 1;
 
-                        var sectSumm = await llm.SummarizeToJsonAsync(
-                        HlidacStatu.AI.LLM.PrivateLLM.Profiles.AYA_Pravnik,
-                        pocetOdrazek, t, 1024 * 4);
+                        var sectSumm = await llm.SummarizeToJsonAsync(t,pocetOdrazek,true,4*1024, AI.LLM.Clients.BaseClient.Profiles.AYA_Pravnik);
                         if (sectSumm?.sumarizace.Count() > 0)
                         {
                             message = sectSumm.sumarizace.First().titulek;
@@ -110,16 +111,17 @@ namespace HlidacStatu.Web.Framework.SignalR
 
 
             Uri ollamaUri = new Uri("http://10.10.100.113:18080/ollama/api");
-            HlidacStatu.AI.LLM.PrivateLLM llm = new(new HlidacStatu.AI.LLM.PrivateLLM.OllamaOpenWebUI(ollamaUri.AbsoluteUri, "sk-f53cf4b315c144528110af15cc315c11"));
+            var ollamaCl = new HlidacStatu.AI.LLM.Clients.OllamaOpenWebUI(ollamaUri.AbsoluteUri, "sk-f53cf4b315c144528110af15cc315c11");
+            HlidacStatu.AI.LLM.Summarization llm = new HlidacStatu.AI.LLM.Summarization(ollamaCl);
+            //HlidacStatu.AI.LLM.Summarization llm = new(new HlidacStatu.AI.LLM.Summarization.OllamaOpenWebUI(ollamaUri.AbsoluteUri, "sk-f53cf4b315c144528110af15cc315c11"));
 
 
-            var llmRes = await llm.SummarizeStreamedAsync(
+            var llmRes = await llm.SummarizeStreamedAsync(content,int.Parse(pocetbodu),true,4*1024, 
+                AI.LLM.Clients.BaseClient.Profiles.AYA_Pravnik,
                 async t => {
                     System.Diagnostics.Debug.WriteLine(t);
                     await Clients.All.SendAsync("ReceiveMessage", t);
-                },
-
-                HlidacStatu.AI.LLM.PrivateLLM.Profiles.AYA_Pravnik, int.Parse(pocetbodu), content, 1024 * 4);
+                });
         }
 
         public override async Task OnConnectedAsync()

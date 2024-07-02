@@ -5,7 +5,7 @@ using System.Linq;
 
 namespace HlidacStatu.Entities.PermanentLLM
 {
-    public class ShortSummary : BaseItem<PrivateLLM.SumarizaceJSON>
+    public class ShortSummary : BaseItem<SumarizaceJSON>
     {
         public const string DOCUMENTTYPE = "smlouva";
         public const string PARTTYPE = "ShortSumarizaceJSON";
@@ -13,14 +13,14 @@ namespace HlidacStatu.Entities.PermanentLLM
         {
             //throw new NotImplementedException();
         }
-        public ShortSummary(string smlouvaId, string fileId, IEnumerable<PrivateLLM.SumarizaceJSON.Item> records)
-        : this(smlouvaId,fileId,new PrivateLLM.SumarizaceJSON() { sumarizace = records.ToArray() })
+        public ShortSummary(string smlouvaId, string fileId, IEnumerable<SumarizaceJSON.Item> records)
+        : this(smlouvaId,fileId,new SumarizaceJSON() { sumarizace = records.ToArray() })
         {
 
         }
         public override string PartType { get; set; } = "ShortSumarizaceJSON";
 
-        public ShortSummary(string smlouvaId, string fileId, PrivateLLM.SumarizaceJSON record)
+        public ShortSummary(string smlouvaId, string fileId, SumarizaceJSON record)
         {
             this.DocumentID = smlouvaId;
             this.FileID = fileId;
