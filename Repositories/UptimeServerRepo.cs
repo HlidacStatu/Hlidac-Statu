@@ -197,6 +197,7 @@ namespace HlidacStatu.Repositories
                 db.UptimeServers.Attach(uptimeServer);
                 if (uptimeServer.Id == 0)
                 {
+                    uptimeServer.Created = DateTime.Now;
                     db.Entry(uptimeServer).State = EntityState.Added;
                 }
                 else

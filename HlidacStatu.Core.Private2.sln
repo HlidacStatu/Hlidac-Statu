@@ -214,6 +214,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Extensions", "Extensions\Ex
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UnitPriceBooster", "..\Hlidac-Statu-Private\UnitPriceBooster\UnitPriceBooster.csproj", "{1C8B7547-D8C9-40C9-B692-DA60BF8AE25C}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "jsonrepairsharp", "3rd\JsonRepairSharp\jsonrepairsharp\jsonrepairsharp.csproj", "{065EE4B3-D58B-4A42-81A2-73BCD3E360AE}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -524,6 +526,10 @@ Global
 		{1C8B7547-D8C9-40C9-B692-DA60BF8AE25C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1C8B7547-D8C9-40C9-B692-DA60BF8AE25C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1C8B7547-D8C9-40C9-B692-DA60BF8AE25C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{065EE4B3-D58B-4A42-81A2-73BCD3E360AE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{065EE4B3-D58B-4A42-81A2-73BCD3E360AE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{065EE4B3-D58B-4A42-81A2-73BCD3E360AE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{065EE4B3-D58B-4A42-81A2-73BCD3E360AE}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -618,6 +624,7 @@ Global
 		{1328E292-FFA0-4DBE-8F6C-B9A55F2DB9CA} = {44E67082-D88E-41AE-AF07-4739BDC44B2D}
 		{139248A1-B45B-47AC-8114-DF9AC3EC5E6B} = {44E67082-D88E-41AE-AF07-4739BDC44B2D}
 		{1C8B7547-D8C9-40C9-B692-DA60BF8AE25C} = {AF9C295F-FA98-4C4C-9A87-25F1792C9E3D}
+		{065EE4B3-D58B-4A42-81A2-73BCD3E360AE} = {A9C52FA8-1F95-449B-9C04-7A01ABEFFD52}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {17143448-F5EA-41D1-886F-00E63AE50798}
