@@ -47,7 +47,7 @@ namespace HlidacStatu.Repositories
             
             string stemmerResponse = CallEndpoint("stemmer",
                 System.Text.Json.JsonSerializer.Serialize(s),
-                s.Id, TimeSpan.FromSeconds(180));
+                s.Id, TimeSpan.FromSeconds(600));
             try
             {
                 var jtoken = JToken.Parse(stemmerResponse);
@@ -139,7 +139,7 @@ namespace HlidacStatu.Repositories
             {
                 classifierResponse = CallEndpoint("classifier",
                     stems,
-                    s.Id, TimeSpan.FromSeconds(180));
+                    s.Id, TimeSpan.FromSeconds(600));
             }
             catch
             {
@@ -147,7 +147,7 @@ namespace HlidacStatu.Repositories
                 stems = GetRawStems(s.Id, true);
                 classifierResponse = CallEndpoint("classifier",
                     stems,
-                    s.Id, TimeSpan.FromSeconds(180));
+                    s.Id, TimeSpan.FromSeconds(600));
             }
 
 
@@ -202,7 +202,7 @@ namespace HlidacStatu.Repositories
             
             var response = CallEndpoint("explain_json",
                 System.Text.Json.JsonSerializer.Serialize(s),
-                idSmlouvy, TimeSpan.FromSeconds(180));
+                idSmlouvy, TimeSpan.FromSeconds(600));
             return System.Text.RegularExpressions.Regex.Unescape(response);
         }
 
