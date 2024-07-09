@@ -57,7 +57,7 @@ namespace HlidacStatu.Web.Framework.SignalR
                         await Clients.All.SendAsync("ReceiveProgress", new { progress = (count) / total, message = message });
 
                         string t = sect.ToText();
-                        long tokens = HlidacStatu.AI.LLM.Util.Tokenize(t).LongCount();
+                        long tokens = HlidacStatu.AI.LLM.Util.SimpleTokenize(t).LongCount();
                         //Console.Write($"({tokens}).");
 
                         int pocetOdrazek = 2;

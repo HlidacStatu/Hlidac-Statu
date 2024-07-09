@@ -1,17 +1,15 @@
-﻿using System;
+﻿using Devmasters;
+using Devmasters.Batch;
+using HlidacStatu.Entities;
+using Nest;
+using Serilog;
+using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
-
-using Devmasters;
-using Devmasters.Batch;
-
-using HlidacStatu.Entities;
-using Nest;
-using Serilog;
 using Manager = HlidacStatu.Connectors.Manager;
 
 namespace HlidacStatu.Repositories.Searching
@@ -19,7 +17,7 @@ namespace HlidacStatu.Repositories.Searching
     public static class Tools
     {
         private static readonly ILogger _logger = Log.ForContext(typeof(Tools));
-        
+
         public const int MaxResultWindow = 10000;
 
         static string regexInvalidQueryTemplate = @"(^|\s|[(])(?<q>$operator$\s{1} (?<v>(\w{1,})) )($|\s|[)])";
@@ -407,15 +405,15 @@ namespace HlidacStatu.Repositories.Searching
                             try
                             {
 
-                            Interlocked.Increment(ref processedCount);
-                            if (logOutputFunc != null && !string.IsNullOrEmpty(cancel.Log))
-                                logOutputFunc(cancel.Log);
+                                Interlocked.Increment(ref processedCount);
+                                if (logOutputFunc != null && !string.IsNullOrEmpty(cancel.Log))
+                                    logOutputFunc(cancel.Log);
 
-                            if (cancel.CancelRunning)
-                            {
-                                canceled = true;
-                                break;
-                            }
+                                if (cancel.CancelRunning)
+                                {
+                                    canceled = true;
+                                    break;
+                                }
                             }
                             catch (Exception e)
                             {
@@ -445,7 +443,7 @@ namespace HlidacStatu.Repositories.Searching
                     break;
             } while (result.Hits.Count() > 0);
             if (monitor != null)
-                monitor.Finish(true,null);
+                monitor.Finish(true, null);
 
             await client.ClearScrollAsync(c => c.ScrollId(scrollId));
 
@@ -598,7 +596,7 @@ namespace HlidacStatu.Repositories.Searching
             DateTime started = DateTime.Now;
             var allIds = new ConcurrentBag<string>();
             var res = new DataResultset<string>();
-            System.Collections.Concurrent.ConcurrentBag<Exception> exceptions = new ();
+            System.Collections.Concurrent.ConcurrentBag<Exception> exceptions = new();
 
             if (monitor != null)
                 monitor.Start();
@@ -637,10 +635,11 @@ namespace HlidacStatu.Repositories.Searching
 
                     _ = waitHandle.Set();
                 },
-                onCompleted: () => {
+                onCompleted: () =>
+                {
 
                     waitHandle.Set();
-                    }
+                }
             );
 
             var subscriber = scrollAllObservable.SubscribeSafe(scrollAllObserver);
@@ -655,11 +654,17 @@ namespace HlidacStatu.Repositories.Searching
         }
 
         public static List<string> SimpleGetAllIds(this ElasticClient sourceESClient, int maxDegreeOfParallelism,
-            QueryContainer query, int batchSize = 100)
+                string simplequery, int batchSize = 100)
+        {
+            var qs = Repositories.SmlouvaRepo.Searching.GetSimpleQuery(simplequery);
+            return SimpleGetAllIds(sourceESClient, maxDegreeOfParallelism, qs, batchSize);
+        }
+        public static List<string> SimpleGetAllIds(this ElasticClient sourceESClient, int maxDegreeOfParallelism,
+                QueryContainer query, int batchSize = 100)
         {
             if (maxDegreeOfParallelism < 2)
                 throw new ArgumentOutOfRangeException(nameof(maxDegreeOfParallelism), "maxDegreeOfParallelism cannot be smaller than 2");
-            
+
             var scrollAllObservable = sourceESClient.ScrollAll<object>("4m", maxDegreeOfParallelism, sc => sc
                 .MaxDegreeOfParallelism(maxDegreeOfParallelism)
                 .Search(s => s
@@ -691,10 +696,11 @@ namespace HlidacStatu.Repositories.Searching
                         sourceESClient.ConnectionSettings.DefaultIndex, query);
                     _ = waitHandle.Set();
                 },
-                onCompleted: () => {
+                onCompleted: () =>
+                {
 
                     waitHandle.Set();
-                    }
+                }
             );
 
             var subscriber = scrollAllObservable.SubscribeSafe(scrollAllObserver);
