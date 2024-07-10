@@ -18,14 +18,15 @@ namespace HlidacStatu.DS.Api.AITask
 
 
         public string Source { get; set; }
-        public Options SourceOptions { get; set; }
+        public Options Options { get; set; }
 
         public DateTime Created { get; set; }
 
         public DateTime? Done { get; set; }
         public DateTime? Started { get; set; } = DateTime.Now;
 
-        public Devmasters.SpeechToText.Term[] Result { get; set; }
+        public string ResultSerialized { get; set; }
+        public string ResultType { get; set; }
         public string Exception { get; set; }
 
         public CheckState Status { get; set; }
@@ -35,8 +36,10 @@ namespace HlidacStatu.DS.Api.AITask
             WaitingInQueue = 0,
             InProgress = 1,
             Done = 2,
+            AlreadyDone = 3,
             ResultTaken = 100,
             Error = -1,
+            ErrorDuringDeSerialization = -2,
         }
 
         public string ProcessEngine { get; set; }
@@ -46,8 +49,8 @@ namespace HlidacStatu.DS.Api.AITask
 
     public class Options
     {
-        public bool force { get; set; } = false;
+        public bool Force { get; set; } = false;
 
-
+        public int Summarize_numOfBullets { get; set; }
     }
 }

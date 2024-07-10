@@ -94,6 +94,10 @@ namespace HlidacStatu.Entities
                 entity.Property(e => e.Created).HasDefaultValueSql("(getdate())");
             });
 
+            _ = modelBuilder.Entity<QAITask>(entity =>
+            {
+                entity.Property(e => e.Created).HasDefaultValueSql("(getdate())");
+            });
 
             _ = modelBuilder.Entity<KodPf>(entity =>
             {
@@ -232,6 +236,7 @@ namespace HlidacStatu.Entities
         public virtual DbSet<UserOptions> UserOptions { get; set; }
         public virtual DbSet<ItemToOcrQueue> ItemToOcrQueue { get; set; }
         public virtual DbSet<QVoiceToText> QVoiceToText { get; set; }
+        public virtual DbSet<QAITask> QAITask { get; set; }
 
         public virtual DbSet<EventType> EventType { get; set; }
         public virtual DbSet<OsobaEvent> OsobaEvent { get; set; }

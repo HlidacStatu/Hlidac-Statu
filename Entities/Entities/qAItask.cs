@@ -4,7 +4,9 @@ using System;
 
 namespace HlidacStatu.Entities
 {
-    public partial class qAItask
+    [Table("QAITask")]
+
+    public partial class QAITask
     {
 
         [Key]
@@ -30,13 +32,13 @@ namespace HlidacStatu.Entities
         [Column("source")]
         public string Source { get; set; }
 
-        public T GetSourceOptions<T>()
+        public T GetOptions<T>()
     where T : class
         {
             try
             {
-                if (!string.IsNullOrEmpty(SourceOptionsRaw))
-                    return System.Text.Json.JsonSerializer.Deserialize<T>(this.SourceOptionsRaw);
+                if (!string.IsNullOrEmpty(OptionsRaw))
+                    return System.Text.Json.JsonSerializer.Deserialize<T>(this.OptionsRaw);
                 else
                     return null;
             }
@@ -46,18 +48,18 @@ namespace HlidacStatu.Entities
             }
         }
 
-        public void SetSourceOptions<T>(T data)
+        public void SetOptions<T>(T data)
             where T : class
         {
             if (data != null)
-                this.SourceOptionsRaw = System.Text.Json.JsonSerializer.Serialize(data);
+                this.OptionsRaw = System.Text.Json.JsonSerializer.Serialize(data);
             else
-                this.SourceOptionsRaw = null;
+                this.OptionsRaw = null;
 
         }
-        [Required]
-        [Column("sourceOptions")]
-        public string SourceOptionsRaw { get; set; }
+        
+        [Column("options")]
+        public string OptionsRaw { get; set; }
 
         [Column("created", TypeName = "datetime")]
         public DateTime Created { get; set; } = DateTime.Now;
@@ -74,11 +76,15 @@ namespace HlidacStatu.Entities
         [Column("result")]
         public string Result { get; set; }
 
+        [Column("resulttype")]
+        [StringLength(64)]
+        public string ResultType { get; set; }
+
         [Column("status")]
         public int? Status { get; set; }
 
         [Column("priority")]
-        public int? Priority { get; set; }
+        public int? Priority { get; set; } = 10;
 
         [Column("processEngine")]
         public string ProcessEngine { get; set; }

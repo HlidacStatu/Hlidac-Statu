@@ -1,0 +1,27 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFrameworks>net6.0;net7.0;net8.0</TargetFrameworks>
+		<AssemblyName>HlidacStatu.Api.AITask</AssemblyName>
+		<RootNamespace>HlidacStatu.Api.AITask</RootNamespace>
+		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+		<Version>2.6.0.0</Version>
+		<PackageReleaseNotes>API changes, duplicates</PackageReleaseNotes>
+		<Description>HlidacStatu.Api.AITask</Description>
+		<Title>$(AssemblyName)</Title>
+	</PropertyGroup>
+
+	<ItemGroup>
+
+		<PackageReference Include="Devmasters.Net" Version="5.0.22" />
+
+		<PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+	</ItemGroup>
+	
+	<ItemGroup>
+	  <ProjectReference Include="..\Datastructures\DataStructures.csproj" />
+	</ItemGroup>
+
+
+
+</Project>

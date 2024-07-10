@@ -7,41 +7,42 @@ using Swashbuckle.AspNetCore.Annotations;
 namespace HlidacStatuApi.Controllers.ApiV2
 {
 
-    [SwaggerTag("Voice 2 Text")]
+    [SwaggerTag("AITask")]
     [ApiExplorerSettings(IgnoreApi = false)]
-    [Route("api/v2/voice2text")]
-    public class ApiV2Voice2TextController : ControllerBase
+    [Route("api/v2/aitask")]
+    public class ApiV2AITaskController : ControllerBase
     {
-        private readonly Serilog.ILogger _logger = Serilog.Log.ForContext<ApiV2Voice2TextController>();
+        private readonly Serilog.ILogger _logger = Serilog.Log.ForContext<ApiV2AITaskController>();
 
         /// <summary>
         /// Vytvori task a ulozi do fronty. Vrati id tasku
         /// </summary>
-        /// <param name="task">Cislo id taasku</param>
+        /// <param name="task">Cislo id tasku</param>
         /// <returns></returns>
         [Authorize(Roles = "Admin,InternalQ")]
         [HttpPost("CreateTask")]
-        public async Task<ActionResult<long?>> CreateTask([FromBody] HlidacStatu.DS.Api.Voice2Text.Task task, 
+        public async Task<ActionResult<long?>> CreateTask([FromBody] HlidacStatu.DS.Api.AITask.Task task,
             [FromQuery] bool addDuplicated = false)
         {
             try
             {
                 //check duplication
-                if (addDuplicated == false && (await QVoiceToTextRepo.IsDuplicatedBySource(task.Source)))
-                    return StatusCode(204);
-                
+                var aiT = new QAITask();
+                aiT.Priority = task.Priority;
+                aiT.Source = task.Source;
+                if (task.Options != null)
+                    aiT.SetOptions<HlidacStatu.DS.Api.AITask.Options>(task.Options);
 
-                var qv2t = new QVoiceToText();
-                qv2t.Priority = task.Priority;
-                qv2t.Source = task.Source;
-                if (task.SourceOptions?.datasetName != null || task.SourceOptions?.deleteFileAfterProcess == true)
-                    qv2t.SetSourceOptions<HlidacStatu.DS.Api.Voice2Text.Options>(task.SourceOptions);
+                aiT.CallerId = task.CallerId;
+                aiT.CallerTaskId = task.CallerTaskId;
+                aiT.CallerTaskType = task.CallerTaskType;
+                aiT.Status = (int)HlidacStatu.DS.Api.AITask.Task.CheckState.WaitingInQueue;
 
-                qv2t.CallerId = task.CallerId;
-                qv2t.CallerTaskId = task.CallerTaskId;
-                qv2t.Status = (int)HlidacStatu.DS.Api.Voice2Text.Task.CheckState.WaitingInQueue;
-                var saved = await QVoiceToTextRepo.SaveAsync(qv2t);
-                return saved.QId;
+                var saved = await QAITaskRepo.CreateNewAsync(aiT);
+                if (saved.Item1)
+                    return saved.Item2.QId;
+                else
+                    return null;
             }
             catch (Exception e)
             {
@@ -63,22 +64,25 @@ namespace HlidacStatuApi.Controllers.ApiV2
         /// <returns>taskid</returns>
         [Authorize(Roles = "Admin,InternalQ")]
         [HttpGet("GetNextTask")]
-        public async Task<ActionResult<HlidacStatu.DS.Api.Voice2Text.Task>> GetNextTask([FromQuery] string processEngine)
+        public async Task<ActionResult<HlidacStatu.DS.Api.AITask.Task>> GetNextTask([FromQuery] string processEngine)
         {
-            var q = await QVoiceToTextRepo.GetNextToProcess(processEngine);
+            var q = await QAITaskRepo.GetNextToProcess(processEngine);
 
 
             if (q == null)
             {
                 return NotFound();
             }
-            return new HlidacStatu.DS.Api.Voice2Text.Task()
+            return new HlidacStatu.DS.Api.AITask.Task()
             {
                 QId = q.QId,
                 Created = q.Created,
                 Started = q.Started,
                 Source = q.Source,
-                SourceOptions = q.GetSourceOptions<HlidacStatu.DS.Api.Voice2Text.Options>()
+                CallerId = q.CallerId,
+                CallerTaskId = q.CallerTaskId,
+                CallerTaskType = q.CallerTaskType,
+                Options = q.GetOptions<HlidacStatu.DS.Api.AITask.Options>()
             };
         }
 
@@ -88,13 +92,12 @@ namespace HlidacStatuApi.Controllers.ApiV2
         /// <returns>taskid</returns>
         [Authorize(Roles = "Admin,InternalQ")]
         [HttpPost("TaskDone")]
-        public async Task<ActionResult> TaskDone([FromBody] HlidacStatu.DS.Api.Voice2Text.Task task)
+        public async Task<ActionResult> TaskDone([FromBody] HlidacStatu.DS.Api.AITask.Task task)
         {
             try
             {
-                string strResult = System.Text.Json.JsonSerializer.Serialize(task.Result);
 
-                var q = await QVoiceToTextRepo.Finish(task.QId, strResult, task.Status);
+                var q = await QAITaskRepo.Finish(task);
                 if (q == null)
                     return StatusCode(404);
                 else
@@ -109,11 +112,11 @@ namespace HlidacStatuApi.Controllers.ApiV2
 
         [Authorize(Roles = "Admin,InternalQ")]
         [HttpGet("SetTaskStatus")]
-        public async Task<ActionResult> SetTaskStatus([FromQuery] long qId, [FromQuery] HlidacStatu.DS.Api.Voice2Text.Task.CheckState status)
+        public async Task<ActionResult> SetTaskStatus([FromQuery] long qId, [FromQuery] HlidacStatu.DS.Api.AITask.Task.CheckState status)
         {
             try
             {
-                var q = await QVoiceToTextRepo.SetStatus(qId, status);
+                var q = await QAITaskRepo.SetStatus(qId, status);
                 if (q == null)
                     return StatusCode(404);
                 else
@@ -132,19 +135,20 @@ namespace HlidacStatuApi.Controllers.ApiV2
         {
             try
             {
-                var q = await QVoiceToTextRepo.GetOnlySpecific(qId);
+                var q = await QAITaskRepo.GetOnlySpecific(qId);
                 if (q == null)
                     return StatusCode(404);
                 else
                 {
-                    var nQ = new QVoiceToText();
+                    var nQ = new QAITask();
                     nQ.CallerId = q.CallerId;
                     nQ.CallerTaskId = q.CallerTaskId;
+                    nQ.CallerTaskType = q.CallerTaskType;
                     nQ.Priority = withPriority ?? q.Priority;
                     nQ.Source = q.Source;
-                    nQ.SourceOptionsRaw = q.SourceOptionsRaw;
-                    nQ.Status = (int)HlidacStatu.DS.Api.Voice2Text.Task.CheckState.WaitingInQueue;
-                    var saved = await QVoiceToTextRepo.SaveAsync(nQ);
+                    nQ.OptionsRaw = q.OptionsRaw;
+                    nQ.Status = (int)HlidacStatu.DS.Api.AITask.Task.CheckState.WaitingInQueue;
+                    var saved = await QAITaskRepo.SaveExistingAsync(nQ);
                     return saved.QId.ToString();
                 }
             }
@@ -157,8 +161,10 @@ namespace HlidacStatuApi.Controllers.ApiV2
 
         [Authorize(Roles = "Admin,InternalQ")]
         [HttpGet("GetTasks")]
-        public async Task<ActionResult<HlidacStatu.DS.Api.Voice2Text.Task[]>> GetTasks(
-            [FromQuery] int maxItems, [FromQuery] string? callerId, [FromQuery] string? callerTaskId = null, [FromQuery] HlidacStatu.DS.Api.Voice2Text.Task.CheckState? status = null)
+        public async Task<ActionResult<HlidacStatu.DS.Api.AITask.Task[]>> GetTasks(
+            [FromQuery] int maxItems, [FromQuery] string? callerId, 
+            [FromQuery] string? callerTaskId = null, 
+            [FromQuery] HlidacStatu.DS.Api.AITask.Task.CheckState? status = null)
         {
 
             if (maxItems > 50000)
@@ -168,12 +174,13 @@ namespace HlidacStatuApi.Controllers.ApiV2
             try
             {
 
-                QVoiceToText[] tasks = await QVoiceToTextRepo.GetByParameters(maxItems, callerId, callerTaskId, status: status);
-                var res = new List<HlidacStatu.DS.Api.Voice2Text.Task>();
-                foreach (var m in tasks) {
+                QAITask[] tasks = await QAITaskRepo.GetByParameters(maxItems, callerId, callerTaskId, status: status);
+                var res = new List<HlidacStatu.DS.Api.AITask.Task>();
+                foreach (var m in tasks)
+                {
                     try
                     {
-                        var r = new HlidacStatu.DS.Api.Voice2Text.Task()
+                        var r = new HlidacStatu.DS.Api.AITask.Task()
                         {
                             CallerId = m.CallerId,
                             CallerTaskId = m.CallerTaskId,
@@ -181,11 +188,11 @@ namespace HlidacStatuApi.Controllers.ApiV2
                             Done = m.Done,
                             Priority = m.Priority ?? 1,
                             QId = m.QId,
-                            Result = System.Text.Json.JsonSerializer.Deserialize<Devmasters.SpeechToText.Term[]>(m.Result, jsonSerOpt),
+                            ResultSerialized = m.Result,
                             Source = m.Source,
-                            SourceOptions = m.GetSourceOptions<HlidacStatu.DS.Api.Voice2Text.Options>(),
+                            Options = m.GetOptions<HlidacStatu.DS.Api.AITask.Options>(),
                             Started = m.Started,
-                            Status = ((HlidacStatu.DS.Api.Voice2Text.Task.CheckState)(m.Status ?? 0))
+                            Status = ((HlidacStatu.DS.Api.AITask.Task.CheckState)(m.Status ?? 0))
 
                         };
                         res.Add(r);
@@ -194,7 +201,7 @@ namespace HlidacStatuApi.Controllers.ApiV2
                     {
                         _logger.Error(e, "Cannot deserialize task result for {QiD}", m.QId);
                     }
-                }                    
+                }
 
                 return res.ToArray();
             }

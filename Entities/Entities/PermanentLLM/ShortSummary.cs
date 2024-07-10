@@ -18,7 +18,7 @@ namespace HlidacStatu.Entities.PermanentLLM
         {
 
         }
-        public override string PartType { get; set; } = "ShortSumarizaceJSON";
+        public override string PartType { get; set; } = PARTTYPE;
 
         public ShortSummary(string smlouvaId, string fileId, SumarizaceJSON record)
         {
