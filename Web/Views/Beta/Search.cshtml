@@ -96,6 +96,9 @@
                             callback();
                         },
                         success: function(res) {
+                            res.forEach(function(item) {
+                                item.id = item.id + '÷' + new Date().getTime();
+                            });
                             callback(res);
                         }
                     });
@@ -119,6 +122,9 @@
                     this.clearOptions();
                     this.close();
                 },
+                onOptionAdd: function (value, data){
+                    console.log("option added");
+                },
                 onBlur: function () {
                     this.clearOptions();
                     this.close();
@@ -132,7 +138,7 @@
             });
 
             $('#getValuesBtn').click(function() {
-                var selectedValues = selectizeInstance[0].selectize.getValue();
+                var selectedValues = $('#autocomplete')[0].selectize.getValue().map(item => item.split('÷')[0]);
 
                 // Parse the values into qs and qtl
                 var qs = "";
