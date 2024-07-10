@@ -5,254 +5,156 @@
 
 @section scripts
 {
-    <link href="/scripts/select2.min.css" rel="stylesheet" />
-    <link rel="stylesheet" href="/scripts/select2-bootstrap.min.css" />
-    <script src="/scripts/select2.full.min.js"></script>
-    <link rel="stylesheet" href="/Content/select2-search-over.css" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/selectize.js/0.12.6/css/selectize.default.css" rel="stylesheet" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/selectize.js/0.12.6/js/standalone/selectize.min.js"></script>
 
-    <script>
-        $(document).ready(function () {
-            var menuOpened = false;
-
-            $('#autocomsearch').select2({
-                theme: "bootstrap",
-                minimumInputLength: 2,
-                tags: true,
-                dataType: 'json',
-                placeholder: 'Zadejte dotaz, jméno úřadu, firmy, politika',
-                language: {
-                    inputTooShort: function () {
-                        return 'Prosím, zadejte alespoň 2 znaky';
-                    }
-                },
-                //tokenSeparators: [' '],
-                ajax: {
-                    type: 'POST',
-                    contentType: "application/json; charset=utf-8",
-                    dataType: 'json',
-                    delay: 250,
-                    url: function (params) {
-                        return '/beta/autocomplete/';// + params.term;
-                    },
-                    data: function (params) {
-                        var query = { q: params.term };
-                        return JSON.stringify(query);
-                    },
-                    params: { // extra parameters that will be passed to ajax
-                        contentType: "application/json; charset=utf-8",
-                    },
-                    processResults: function (data) {
-                        // Transforms the top-level key of the response object from 'items' to 'results'
-                        return {
-                            results: $.map(data, function (obj) {
-                                obj.id = obj.id || obj.Id;
-                                obj.text = obj.text || obj.Text;
-                                return obj;
-                            })
-                        };
-                    }
-                },
-                templateResult: formatOptions
-            });
-
-            //submit behaviour
-            $("#search-input").on('submit', function (e) {
-                var searchval = $('#autocomsearch').val().join(' ');
-
-                $('#autocomsearch').val("");
-                $('#query-data').val(searchval);
-
-            });
-
-            $('#autocomsearch').on("select2:open", function (e) {
-                menuOpened = true;
-            });
-            $('#autocomsearch').on("select2:close", function (e) {
-                menuOpened = false;
-            });
-
-            //on enter keypress
-            $('.select2-search__field').on('keydown', function (e) {
-                if (e.keyCode === 13 && menuOpened == false) {
-                    $("#search-input").submit();
-                }
-            });
-        });
-
-        function formatOptions(data) {
-            if (data.loading) {
-                return 'Hledám…';
-            }
-            if (typeof data.Description === 'undefined') {
-                data.ImageElement = "<i class='fas fa-search'></i>";
-                data.Description = "fulltextové vyhledávání";
-                data.Type = "fulltext";
-                data.Text = data.text;
-            }
-            var $container = $(
-                "<div class='select2-result-repository clearfix'>" +
-                "<div class='select2-result-repository__avatar'>" + data.ImageElement + "</div>" +
-                "<div class='select2-result-repository__meta'>" +
-                "<div class='select2-result-repository__title'>" + data.Text + "</div>" +
-                "<div class='select2-result-repository__description'>" + data.Description + "</div>" +
-                "<div class='select2-result-repository__statistics'>" +
-                "<div class='select2-result-repository__forks'><i>" + data.Type + "</i> </div>" +
-                "</div>" +
-                "</div>" +
-                "</div>"
-            );
-
-            return $container;
-            //+ ' <small class="new-p new-p--gray new-p--small">(' + data.type + ')</small></div></div>');
-        }
-    </script>
-
-    <style>
-        .select2-result-repository {
-            padding-top: 4px;
-            padding-bottom: 3px
-        }
-
-        .select2-result-repository__avatar {
-            float: left;
-            width: 45px;
-            margin-right: 10px;
-            font-size: 45px;
-            color: #CCCCCC;
-            position: relative;
-        }
-
-            .select2-result-repository__avatar > * {
-                position: absolute;
-                top: 0;
-            }
-
-            .select2-result-repository__avatar img {
-                width: 100%;
-                height: auto;
-                border-radius: 2px
-            }
-
-        .select2-result-repository__meta {
-            margin-left: 70px
-        }
-
-        .select2-result-repository__title {
-            color: black;
-            font-weight: 700;
-            word-wrap: break-word;
-            line-height: 1.1;
-            margin-bottom: 4px
-        }
-
-        .select2-result-repository__forks, .select2-result-repository__stargazers {
-            margin-right: 1em
-        }
-
-        .select2-result-repository__forks, .select2-result-repository__stargazers, .select2-result-repository__watchers {
-            display: inline-block;
-            color: #aaa;
-            font-size: 11px
-        }
-
-        .select2-result-repository__description {
-            font-size: 13px;
-            color: #777;
-            margin-top: 4px;
-            /*max-height: 35px;*/
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-        }
-
-        ul.select2-results__options {
-            max-height: 500px !important;
-        }
-
-        .select2-results__option--highlighted .select2-result-repository__title {
-            color: white
-        }
-
-        .select2-results__option--highlighted .select2-result-repository__forks, .select2-results__option--highlighted .select2-result-repository__stargazers, .select2-results__option--highlighted .select2-result-repository__description, .select2-results__option--highlighted .select2-result-repository__watchers {
-            color: #c6dcef
-        }
-
-        .select2.select2-container.select2-container--bootstrap
-        {
-            top: 5px;
-        }
-        .search_button_new {
-            border-top-left-radius: 0;
-            border-bottom-left-radius: 0;
-            line-height: 54px;
-            margin: 0;
-            color: #fff;
-            border-color: #0074e4;
-            background-color: #0074e4;
-            white-space: nowrap;
-            padding: 0 40px;
-            border-radius: 4px;
-            border: 1px solid #e0e6ed;
-            font-size: 14px;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            transition: .3s;
-        }
-        
-        .select2-container--bootstrap .select2-selection--multiple .select2-selection__rendered {
-            display: inline;
-            white-space:normal;
-        }
-        .select2-container--bootstrap .select2-selection--multiple .select2-selection__choice__remove {
-            font-size: 17px;
-            margin-left: -5px;
-            padding: 3px;
-            border: none;
-            background: none;
-        }
-    </style>
 }
 
 @section breadcrumb
 {
     <ol class="breadcrumb">
-        <li><a href="/">Hlídač Státu</a></li>
+        <li>
+            <a href="/">Hlídač Státu</a>
+        </li>
         <li class="active">@ViewBag.Title</li>
     </ol>
 }
+<style>
+    .selectize-dropdown-content {
+        max-height: none !important; /* Disable max-height */
+        overflow: visible !important; /* Ensure overflow is visible */
+    }
+</style>
 
 <h1>Našeptávání hledání - beta</h1>
 
 <div>
     <div class="container">
-        <div class="row">
-            <div class="col-md-7">
-
-                <form id="search-input" action="/hledat" method="get">
-                    <div class="select2-wrapper">
-                        <div class="input-group input-group-lg">
-                            <select class="form-control input-lg select2-multiple" id="autocomsearch" name="query" multiple="multiple"></select>
-                            <span class="input-group-btn">
-                                <button class="btn btn-primary" data-select2-open="autocomsearch" style="left:-7px"> hledat</button>
-                            </span>
-                            <input id="query-data" name="q" type="hidden" />
-                        </div>
-                    </div>
-                </form>
-            </div>
-        </div>
+        <select id="autocomplete" placeholder="Search..."></select>
+        <button id="getValuesBtn" class="btn btn-primary" style="margin-bottom:0;margin-top:0;padding-bottom:0">
+            Hledat
+        </button>
     </div>
 </div>
-<br />
-<br />
-<div>
-    <div class="col-md-5">
-        <p>Pomozte nám zlepšit novou funkci! Napadá vás, co vylepšit a změnit? Budeme rádi za všechny vaše připomínky. V případě delších podnětů můžete psát také na podpora@hlidacstatu.cz</p>
 
-    </div>
-    <div class="col-md-12">
-        <partial name="WebUtil/FeedbackModal" model="@(new FeedbackViewModel("Upozornit na chybu"))"/>
-    </div>
+    
+<script>
+        $(document).ready(function() {
+            $('#autocomplete').selectize({
+                plugins: ["remove_button"],
+                maxItems: null,
+                valueField: 'id',
+                labelField: 'text',
+                searchField: null,
+                create: true,
+                highlight: false,
+                maxOptions: 8,
+                loadingClass: null,
+                loadThrottle: 150,
+                render: {
+                    option: function(item, escape) {
+                        var smallClass = item.category === 'Hint' ? 'small' : '';
+                        var kIndexImage = item.kIndex ? '<img src="/Content/kindex/hranate/icon' + escape(item.kIndex) + '.svg" class="kindex" style="height: 20px; vertical-align: text-bottom; margin-right: 5px;">' : '';
 
-</div>
+                        var html = '<div class="d-flex align-items-center justify-content-start">' +
+                            '<div class="hs-avatar ' + smallClass + '">' + item.imageElement + '</div>' +
+                            '<div class="hs-autocomplete-description ' + smallClass + ' flex-grow-1 me-2">';
+
+                        if (item.category === 'Hint') {
+                            html += '<h6 class="align-middle">' + escape(item.text) + ' <span class="badge rounded-pill bg-secondary">' + escape(item.id) + '</span></h6>';
+                        } else {
+                            html += '<h6 class="fw-bold mb-0">' + kIndexImage + escape(item.text) + '</h6>' +
+                                '<small>' + escape(item.description) + '</small>' +
+                                '<p class="small text-muted mb-0"><i>' + escape(item.type) + '</i></p>';
+                        }
+
+                        html += '</div><div>';
+
+                        if (item.id.startsWith('osobaid:')) {
+                            html += '<a href="/osoba/' + escape(item.id.replace('osobaid:', '')) + '" class="text-muted">' +
+                                '<i class="fa-regular fa-arrow-up-right-from-square fa-lg"></i></a>';
+                        } else if (item.id.startsWith('ico:')) {
+                            html += '<a href="/subjekt/' + escape(item.id.replace('ico:', '')) + '" class="text-muted">' +
+                                '<i class="fa-regular fa-arrow-up-right-from-square fa-lg"></i></a>';
+                        }
+
+                        html += '</div></div>';
+
+                        return html;
+                    }
+                },
+                load: function(query, callback) {
+                    if (!query.length) return callback();
+                    $.ajax({
+                        url: 'https://ac.hlidacstatu.cz/autocomplete/autocomplete',
+                        type: 'GET',
+                        dataType: 'json',
+                        data: {
+                            q: query
+                        },
+                        error: function() {
+                            callback();
+                        },
+                        success: function(res) {
+                            callback(res);
+                        }
+                    });
+                },
+                score: function() {
+                    return function(item) {
+                        return 1; // All items have the same score, disable built-in filtering
+                    };
+                },
+                onType: function(str) {
+                    // Prevent local filtering, forcing server-side filtering
+                    if (str === ''){
+                        this.clearOptions();
+                        this.close();
+                    }
+                    this.clearOptions();
+                    this.load(this.settings.load.bind(this, str));
+                },
+                onItemAdd: function(value, $item) {
+                    // Clear all options when an item is added
+                    this.clearOptions();
+                    this.close();
+                },
+                onBlur: function () {
+                    this.clearOptions();
+                    this.close();
+                },
+                onDelete: function(values) {
+                    // Check if input is empty before clearing options
+                    this.clearOptions();
+                    this.close();
+                }
+                
+            });
+
+            $('#getValuesBtn').click(function() {
+                var selectedValues = selectizeInstance[0].selectize.getValue();
+
+                // Parse the values into qs and qtl
+                var qs = "";
+                var qtl = "";
+
+                for (var index = 0; index < selectedValues.length; index++) {
+                    var item = selectedValues[index];
+                    if (index === selectedValues.length - 1) {
+                        qtl += item.length;
+                        qs += item;
+                    } else {
+                        qtl += item.length + ",";
+                        qs += item + " ";
+                    }
+                }
+
+                // URL encode the qs string
+                var encodedQs = encodeURIComponent(qs);
+
+                // Navigate to the new URL with the query parameters
+                var newUrl = `/hledat?q=${encodedQs}&qtl=${qtl}`;
+                window.location.href = newUrl;
+            });
+        });
+    </script>
