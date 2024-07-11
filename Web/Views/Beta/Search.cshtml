@@ -1,4 +1,5 @@
-﻿@{
+﻿@using System.Text.Json
+@{
     ViewBag.Title = "Beta search";
 }
 
@@ -37,7 +38,12 @@
     </div>
 </div>
 
-    
+@{
+    var query = Context.Request.Query;
+    var inputTags = AutocompleteHelper.CreateInputTagsForJs(query);
+    var inputTagsJson = JsonSerializer.Serialize(inputTags);
+}
+
 <script>
         $(document).ready(function() {
             $('#autocomplete').selectize({
@@ -123,9 +129,6 @@
                     this.clearOptions();
                     this.close();
                 },
-                onOptionAdd: function (value, data){
-                    console.log("option added");
-                },
                 onBlur: function () {
                     this.clearOptions();
                     this.close();
@@ -134,7 +137,17 @@
                     // Check if input is empty before clearing options
                     this.clearOptions();
                     this.close();
-                }
+                },
+                onOptionRemove: function(value) {
+                    // Check if input is empty before clearing options
+                    this.clearOptions();
+                    this.close();
+                },
+                onItemRemove: function(value) {
+                    // Check if input is empty before clearing options
+                    this.clearOptions();
+                    this.close();
+                },
                 
             });
 
@@ -160,8 +173,27 @@
                 var encodedQs = encodeURIComponent(qs);
 
                 // Navigate to the new URL with the query parameters
-                var newUrl = `/hledat?q=${encodedQs}&qtl=${qtl}`;
+                //todo: set correct address
+                var newUrl = `/beta/search?q=${encodedQs}&qtl=${qtl}`;
                 window.location.href = newUrl;
             });
+
+            // Recreate selected tags
+            var initialItemsJson = '@Html.Raw(inputTagsJson)';
+            var initialItems = JSON.parse(initialItemsJson);
+
+            var selectizeControl = $('#autocomplete')[0].selectize;
+
+            // Extract the IDs to use with addItems
+            var counter = 0;
+            initialItems.forEach(function(item) {
+                var uniqueId = item.Id + '÷' + counter++;
+                // Add option if not already present
+                selectizeControl.addOption({ id: uniqueId, text: item.Text, imageElement: item.ImageElement, description: item.Description, type: item.Type, kIndex: item.KIndex, category: item.Category });
+                selectizeControl.addItem(uniqueId);
+            });
+
+            
+            
         });
     </script>
