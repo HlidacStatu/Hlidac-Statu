@@ -90,7 +90,7 @@
                 highlight: false,
                 maxOptions: 8,
                 loadingClass: null,
-                loadThrottle: 150,
+                loadThrottle: 250, //cant put smaller number or else it will start bugging
                 delimiter: '░',
                 render: {
                     option: function(item, escape) {
@@ -156,7 +156,8 @@
                         this.close();
                     }
                     this.clearOptions();
-                    this.load(this.settings.load.bind(this, str));
+                    
+                    //this.load(this.settings.load.bind(this, str));
                 },
                 onItemAdd: function(value, $item) {
                     // Clear all options when an item is added
