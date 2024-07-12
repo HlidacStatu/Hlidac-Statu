@@ -1,8 +1,4 @@
 ﻿@using System.Text.Json
-@{
-    ViewBag.Title = "Beta search";
-}
-
 
 @section scripts
 {
@@ -11,15 +7,6 @@
 
 }
 
-@section breadcrumb
-{
-    <ol class="breadcrumb">
-        <li>
-            <a href="/">Hlídač Státu</a>
-        </li>
-        <li class="active">@ViewBag.Title</li>
-    </ol>
-}
 <style>
     .selectize-dropdown-content {
         max-height: none !important; /* Disable max-height */
@@ -59,10 +46,19 @@
     .hs-autocomplete-description.small {
         margin-top: 10px;
     }
-    
-</style>
 
-<h1>Našeptávání hledání - beta</h1>
+    .selectize-control .selectize-input {
+        height: 100% !important;
+    }
+    
+    .selectize-control {
+        width: 100% !important;
+    }
+
+    .selectize-control.multi .selectize-input>div {
+        background-color: var(--bs-primary-bg-subtle)!important;
+    }
+</style>
 
 <div>
     <div class="hlidac-autocomplete d-flex">
@@ -190,7 +186,7 @@
             });
 
             $('#getValuesBtn').click(function() {
-                $('#searchSpiner').css('display', 'block');
+                $('#searchSpiner').css('display', 'inline-block;');
                 var selectedValues = $('#autocomplete')[0].selectize.getValue().map(item => item.split('÷')[0]);
 
                 // Parse the values into qs and qtl
@@ -212,8 +208,7 @@
                 var encodedQs = encodeURIComponent(qs);
 
                 // Navigate to the new URL with the query parameters
-                //todo: set correct address
-                var newUrl = `/beta/search?q=${encodedQs}&qtl=${qtl}`;
+                var newUrl = `/hledat?q=${encodedQs}&qtl=${qtl}`;
                 window.location.href = newUrl;
             });
 

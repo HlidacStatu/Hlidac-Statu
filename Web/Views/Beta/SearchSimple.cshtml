@@ -25,74 +25,29 @@
         max-height: none !important; /* Disable max-height */
         overflow: visible !important; /* Ensure overflow is visible */
     }
-
-    .hlidac-autocomplete {
-        /*border: 2px solid yellow;   */
-        position: relative;
-        padding: 0;
-        margin: 0;
-        z-index: 100;
-    }
-
-    .hs-avatar {
-        width: 50px;
-        height: auto;
-        color: #ccc;
-        font-size: 45px;
-    }
-
-    .hs-avatar.small {
-        font-size: 25px;
-    }
-
-    .hs-avatar img {
-        width: 50px;
-    }
-
-    .hs-autocomplete-description {
-        margin-left: 15px;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-    }
-
-    .hs-autocomplete-description.small {
-        margin-top: 10px;
-    }
-    
 </style>
 
 <h1>Našeptávání hledání - beta</h1>
 
 <div>
-    <div class="hlidac-autocomplete d-flex">
-        <select id="autocomplete" autocomplete="off" placeholder='Napište další vyhledávaný výraz, nebo stiskněte "Hledat"'></select>
+    <div class="container">
+        <select id="autocomplete" placeholder="Search..."></select>
         <button id="getValuesBtn" class="btn btn-primary" style="margin-bottom:0;margin-top:0;padding-bottom:0">
             Hledat
-            <span id="searchSpiner" style="display: none" class="spinner-border spinner-border-sm text-light align-middle mb-1 ms-1" role="status">
-                <span class="visually-hidden">Loading...</span>
-            </span>
         </button>
     </div>
 </div>
 
-@{
-    var query = Context.Request.Query;
-    var inputTags = AutocompleteHelper.CreateInputTagsForJs(query);
-    var inputTagsJson = JsonSerializer.Serialize(inputTags);
-}
 
 <script>
         $(document).ready(function() {
             $('#autocomplete').selectize({
-                plugins: ["remove_button"],
-                maxItems: null,
+                maxItems: 1,
                 valueField: 'id',
                 labelField: 'text',
                 searchField: null,
-                create: true,
                 highlight: false,
-                maxOptions: 8,
+                maxOptions: 10,
                 loadingClass: null,
                 loadThrottle: 150,
                 delimiter: '░',
@@ -162,11 +117,6 @@
                     this.clearOptions();
                     this.load(this.settings.load.bind(this, str));
                 },
-                onItemAdd: function(value, $item) {
-                    // Clear all options when an item is added
-                    this.clearOptions();
-                    this.close();
-                },
                 onBlur: function () {
                     this.clearOptions();
                     this.close();
@@ -176,62 +126,12 @@
                     this.clearOptions();
                     this.close();
                 },
-                onOptionRemove: function(value) {
-                    // Check if input is empty before clearing options
-                    this.clearOptions();
-                    this.close();
-                },
-                onItemRemove: function(value) {
-                    // Check if input is empty before clearing options
-                    this.clearOptions();
-                    this.close();
-                },
+                onItemAdd: function(value, item){
+                    var selectedValue = value.split('÷')[0];
+                    window.location.href = selectedValue;
+                }
                 
             });
-
-            $('#getValuesBtn').click(function() {
-                $('#searchSpiner').css('display', 'block');
-                var selectedValues = $('#autocomplete')[0].selectize.getValue().map(item => item.split('÷')[0]);
-
-                // Parse the values into qs and qtl
-                var qs = "";
-                var qtl = "";
-
-                for (var index = 0; index < selectedValues.length; index++) {
-                    var item = selectedValues[index];
-                    if (index === selectedValues.length - 1) {
-                        qtl += item.length;
-                        qs += item;
-                    } else {
-                        qtl += item.length + ",";
-                        qs += item + " ";
-                    }
-                }
-
-                // URL encode the qs string
-                var encodedQs = encodeURIComponent(qs);
-
-                // Navigate to the new URL with the query parameters
-                //todo: set correct address
-                var newUrl = `/beta/search?q=${encodedQs}&qtl=${qtl}`;
-                window.location.href = newUrl;
-            });
-
-            // Recreate selected tags
-            var initialItemsJson = '@Html.Raw(inputTagsJson)';
-            var initialItems = JSON.parse(initialItemsJson);
-
-            var selectizeControl = $('#autocomplete')[0].selectize;
-
-            // Extract the IDs to use with addItems
-            var counter = 0;
-            initialItems.forEach(function(item) {
-                var uniqueId = item.Id + '÷' + counter++;
-                // Add option if not already present
-                selectizeControl.addOption({ id: uniqueId, text: item.Text, imageElement: item.ImageElement, description: item.Description, type: item.Type, kIndex: item.KIndex, category: item.Category });
-                selectizeControl.addItem(uniqueId);
-            });
-
             
             
         });

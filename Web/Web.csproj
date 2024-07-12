@@ -114,7 +114,6 @@
       <ProjectReference Include="..\Plugin.Enhancers\Plugin.Enhancers.csproj" />
       <ProjectReference Include="..\Plugin.IssueAnalyzers\Plugin.IssueAnalyzers.csproj" />
       <ProjectReference Include="..\Util\Util.csproj" />
-      <ProjectReference Include="..\WasmComponents\WasmComponents.csproj" />
       <ProjectReference Include="..\Web.HealthChecks\Web.HealthChecks.csproj" />
       <ProjectReference Include="..\XLib\XLib.csproj" />
     </ItemGroup>
@@ -146,6 +145,12 @@
         <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
         <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
       </Content>
+    </ItemGroup>
+
+
+    <ItemGroup>
+      <_ContentIncludedByDefault Remove="Views\Shared\Components\Hokus.razor" />
+      <_ContentIncludedByDefault Remove="Views\Shared\Components\_Imports.razor" />
     </ItemGroup>
 
 

@@ -2,7 +2,6 @@
 
 @using System.Linq
 @using System.Net.Http
-@using System.Text.Json
 @using Devmasters.Collections
 @using HlidacStatu.Datasets
 @using HlidacStatu.Entities
@@ -13,9 +12,6 @@
 @using HlidacStatu.Web.TagHelpers
 @using HlidacStatu.XLib.Render
 @using Microsoft.AspNetCore.Mvc.TagHelpers
-@using WasmComponents.Components.Autocomplete
-
-
 
 @inject IHttpClientFactory HttpClientFactory
 
@@ -185,10 +181,8 @@
     @WebUtil.SetAutofocusOnId("Q")
 
 
-    <link href="/scripts/select2.min.css" rel="stylesheet"/>
-    <link rel="stylesheet" href="/scripts/select2-bootstrap.min.css"/>
-    <script src="/scripts/select2.full.min.js"></script>
-    <link rel="stylesheet" href="/Content/select2-search-over.css"/>
+    <link href="/scripts/selectize/selectize.bootstrap5.css" rel="stylesheet" />
+    <script src="/scripts/selectize/selectize.min.js"></script>
 
     <!-- Matomo -->
     <script>
@@ -213,9 +207,7 @@
     <!-- End Matomo Code -->
 
     <base href="~/"/>
-    <script src="_framework/blazor.server.js"></script>
-
-
+    
 </head>
 <body class="new-body">
 <div id="fb-root"></div>
@@ -383,17 +375,7 @@ else
     <!-- desktop menu items only -->
 
     <div class="header__search">
-        @{
-            var requestQuery = this.Context.Request.Query;
-            var inputTags = AutocompleteHelper.CreateInputTags(requestQuery);
-
-            var inputTagsJson = JsonSerializer.Serialize(inputTags);
-        }
-        <component type="typeof(AutocompleteWrap)" render-mode="Static"
-                   param-Endpoint="@("https://ac.hlidacstatu.cz")"
-                   param-SearchPath="@("hledat")"
-                   param-InputTagsJson="@inputTagsJson"/>
-
+        <partial name="_AutocompletePartial"/>
     </div>
 
 </div>

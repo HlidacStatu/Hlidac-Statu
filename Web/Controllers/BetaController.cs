@@ -27,6 +27,11 @@ namespace HlidacStatu.Web.Controllers
         {
             return View();
         }
+        
+        public ActionResult SearchSimple()
+        {
+            return View();
+        }
 
 
         public async Task<IActionResult> Autocomplete(string q, CancellationToken ctx)

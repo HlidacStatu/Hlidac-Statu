@@ -3,7 +3,6 @@ using HlidacStatu.LibCore.MiddleWares;
 using HlidacStatu.LibCore.Services;
 using HlidacStatu.Web.Filters;
 using HlidacStatu.Web.Framework;
-using HlidacStatu.Web.Views.Shared.Components;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
@@ -22,9 +21,6 @@ using System;
 using System.Collections.Generic;
 using System.Security.Cryptography;
 using System.Threading.Tasks;
-using WasmComponents.Components.Autocomplete;
-using Microsoft.AspNetCore.SignalR;
-
 
 namespace HlidacStatu.Web
 {
@@ -87,16 +83,12 @@ namespace HlidacStatu.Web
 
             services.AddResponseCaching();
 
+            services.AddSignalR();
+
             services.AddHttpClient(Constants.DefaultHttpClient)
                 .AddTransientHttpErrorPolicy(policyBuilder =>
                     policyBuilder.WaitAndRetryAsync(
                         3, retryNumber => TimeSpan.FromMilliseconds(10)));
-
-            services.AddRazorComponents()
-                .AddInteractiveServerComponents()
-                .AddInteractiveWebAssemblyComponents();
-
-            services.AddScoped<IErrorBoundaryLogger, AutocompleteErrorLogger>();
 
             services
                 .AddHealthChecks()
@@ -255,9 +247,6 @@ namespace HlidacStatu.Web
                     defaults: new { controller = "Data", action = "Index" });
 
                 endpoints.MapRazorPages();
-                endpoints.MapRazorComponents<AutocompleteWrap>()
-                    .AddInteractiveServerRenderMode()
-                    .AddInteractiveWebAssemblyRenderMode();
             });
         }
 
