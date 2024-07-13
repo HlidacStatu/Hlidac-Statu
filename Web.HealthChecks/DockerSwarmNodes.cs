@@ -49,10 +49,12 @@ namespace HlidacStatu.Web.HealthChecks
                     && (m.Role=="manager" || m.Role == "leader") 
                 );
 
-                sb.AppendLine($"active nodes {activeNodes}/{options.ExpectedNumberOfNodes}, ");
-                sb.AppendLine($"active managers {activeManagers}/{options.ExpectedNumberOfManagers}, ");
-                sb.AppendLine($"active services {swarm.Services.Length}, ");
-                sb.AppendLine($"active instance {swarm.Services.Sum(m=>m.RunningReplicas)}.");
+                
+                sb.AppendLine($"Active nodes {activeNodes}/{options.ExpectedNumberOfNodes}, ");
+                sb.AppendLine($"Active managers {activeManagers}/{options.ExpectedNumberOfManagers}, ");
+                sb.AppendLine($"Active services {swarm.Services.Length}, ");
+                sb.AppendLine($"Active instance {swarm.Services.Sum(m=>m.RunningReplicas)}.");
+
 
                 if ( activeNodes <= (options.ExpectedNumberOfNodes*0.7m)) 
                     return HealthCheckResult.Unhealthy(sb.ToString());
