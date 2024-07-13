@@ -43,8 +43,11 @@ namespace HlidacStatu.Web.HealthChecks
                     )
                     .Data;
 
-                int activeNodes = swarm.Nodes.Count(m => m.Availability == "active");
-                int activeManagers = swarm.Nodes.Count(m => m.Availability == "active" && m.Role=="manager" && m.ManagerState =="reacheble");
+                int activeNodes = swarm.Nodes.Count(m => m.Availability == "active" && m.State == "ready");
+                int activeManagers = swarm.Nodes.Count(m => 
+                    m.Availability == "active" && m.State == "ready"
+                    && (m.Role=="manager" || m.Role == "leader") 
+                );
 
                 sb.AppendLine($"active nodes {activeNodes}/{options.ExpectedNumberOfNodes}, ");
                 sb.AppendLine($"active managers {activeManagers}/{options.ExpectedNumberOfManagers}, ");

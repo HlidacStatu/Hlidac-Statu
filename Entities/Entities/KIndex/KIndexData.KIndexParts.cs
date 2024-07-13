@@ -22,7 +22,7 @@ namespace HlidacStatu.Entities.KIndex
 
             [GroupValue("Hlavni")]
             [SortValue(3)]
-            [NiceDisplayName("Podíl smluv uzavřených s firmami, jejichž majitelé či ony samy sponzorovali politické strany")]
+            [NiceDisplayName("Podíl smluv uzavřených s firmami, jejichž staturární zástupci či firmy samy sponzorovali politické strany")]
             PercSmlouvySPolitickyAngazovanouFirmou = 8,
 
             [SortValue(4)]
