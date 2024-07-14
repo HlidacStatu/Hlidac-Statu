@@ -105,7 +105,9 @@ namespace HlidacStatuApi.Controllers.ApiV2
             {
                 return NotFound($"Smlouva nenalezena");
             }
-            var s = Smlouva.Export(smlouva, HttpContext.User.IsInRole("Admin") || HttpContext.User.IsInRole("KomercniLicence"), HttpContext.User.IsInRole("Admin") || HttpContext.User.IsInRole("KomercniLicence"));
+            var s = Smlouva.Export(smlouva,
+                HttpContext.User.IsInRole("Admin") || HttpContext.User.IsInRole("KomercniLicence"),
+                true);
 
             return s;
         }
