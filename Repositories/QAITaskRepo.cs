@@ -99,6 +99,15 @@ namespace HlidacStatu.Repositories
                                 await HlidacStatu.Repositories.PermanentLLMRepo.SaveAsync(sum);
                             }
                         }
+                        if (task.CallerId == "smlouva")
+                        {
+                            var s = await SmlouvaRepo.LoadAsync(task.CallerTaskId);
+                            if (s != null && s.AIready != 1)
+                            {
+                                s.AIready = 1;
+                                await SmlouvaRepo.SaveAsync(s);
+                            }
+                        }
                     }
                     catch (Exception e)
                     {
