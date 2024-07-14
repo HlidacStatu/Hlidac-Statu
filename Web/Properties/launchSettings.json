@@ -24,9 +24,9 @@
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Production"
       },
-      "use64Bit": true,
       "applicationUrl": "https://localhost:5001;http://localhost:5000",
-      "dotnetRunMessages": "true"
+      "dotnetRunMessages": "true",
+      "use64Bit": true
     }
   },
   "iisSettings": {
