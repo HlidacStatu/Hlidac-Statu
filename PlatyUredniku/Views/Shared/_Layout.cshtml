@@ -130,9 +130,11 @@
     </script>
     @RenderSection("Scripts", required: false)
 
+    <link href="/scripts/selectize/selectize.bootstrap5.css" rel="stylesheet" />
+    <script src="/scripts/selectize/selectize.min.js"></script>
+
     <!-- Blazor -->
     <base href="~/"/>
-    <script src="_framework/blazor.web.js"></script>
 </head>
 <body class="new-body">
 <!-- ##head## -->
@@ -200,7 +202,7 @@
     <div class="header__content header__content--compact  d-print-none">
         <div class="header__search">
             <div id="new-search-input">
-                @(await Html.RenderComponentAsync<PlatyUredniku.Views.Shared.Components.AutocompleteWrap>(RenderMode.ServerPrerendered))
+                <partial name="_AutocompletePartial"/>
             </div>
         </div>
     </div>
