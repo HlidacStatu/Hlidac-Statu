@@ -6,7 +6,7 @@ using System.Linq;
 using System.Net;
 using System.Xml.Serialization;
 
-namespace HlidacStatu.Lib.Data.External.DatoveSchranky
+namespace HlidacStatu.Lib.Data.External.DatoveSchrankyOpenData
 {
 
 

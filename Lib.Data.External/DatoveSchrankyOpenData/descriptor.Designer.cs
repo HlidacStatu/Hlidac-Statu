@@ -5,7 +5,7 @@
 //  </auto-generated>
 // ------------------------------------------------------------------------------
 #pragma warning disable
-namespace HlidacStatu.Lib.Data.External.DatoveSchranky
+namespace HlidacStatu.Lib.Data.External.DatoveSchrankyOpenData
 {
     using System;
     using System.Diagnostics;

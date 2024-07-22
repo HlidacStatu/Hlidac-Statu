@@ -18,7 +18,7 @@
     <None Update="Connected Services\eAgri.DeMinimis.WS\HlidacStatu.Lib.Data.External.eAgri.DeMinimis.WS.Response.datasource">
       <DependentUpon>Reference.svcmap</DependentUpon>
     </None>
-    <None Update="DatoveSchranky\descriptor.xsd">
+    <None Update="DatoveSchrankyOpenData\descriptor.xsd">
       <SubType>Designer</SubType>
     </None>
     <None Update="StatniPokladna\monitorFin204U.xsd">

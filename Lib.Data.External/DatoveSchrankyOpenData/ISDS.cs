@@ -6,7 +6,7 @@ using System.Linq;
 using System.Xml.Serialization;
 using Serilog;
 
-namespace HlidacStatu.Lib.Data.External.DatoveSchranky
+namespace HlidacStatu.Lib.Data.External.DatoveSchrankyOpenData
 {
     public class ISDS
     {

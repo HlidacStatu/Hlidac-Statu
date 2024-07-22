@@ -218,7 +218,7 @@ namespace HlidacStatu.Repositories
                     {
                         list = db.UptimeServers
                             .AsNoTracking()
-                            .Where(m => m.Id == 444)
+                            .Where(m => m.Id == 440)
                             .ToList();
                     }
                     else

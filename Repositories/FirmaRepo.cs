@@ -2,7 +2,7 @@ using Devmasters;
 using HlidacStatu.Connectors;
 using HlidacStatu.Entities;
 using HlidacStatu.Extensions;
-using HlidacStatu.Lib.Data.External.DatoveSchranky;
+using HlidacStatu.Lib.Data.External.DatoveSchrankyOpenData;
 
 using System;
 using System.Collections.Generic;
@@ -413,7 +413,7 @@ namespace HlidacStatu.Repositories
 
         public static void RefreshDS(this Firma firma)
         {
-            firma.DatovaSchranka = Lib.Data.External.DatoveSchranky.ISDS.GetDatoveSchrankyForIco(firma.ICO);
+            firma.DatovaSchranka = Lib.Data.External.DatoveSchrankyOpenData.ISDS.GetDatoveSchrankyForIco(firma.ICO);
         }
 
     }
