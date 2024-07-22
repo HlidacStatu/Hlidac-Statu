@@ -53,7 +53,7 @@ namespace HlidacStatu.Repositories
                 var tbl = await db.QAITask
                     .AsQueryable()
                     .Where(m => m.Status == (int)HlidacStatu.DS.Api.AITask.Task.CheckState.WaitingInQueue)
-                    .OrderByDescending(m => m.Priority)
+                    .OrderByDescending(m => m.Priority).ThenBy(m=>m.Created)
                     .FirstOrDefaultAsync(cancellationToken);
 
                 if (tbl is null)
