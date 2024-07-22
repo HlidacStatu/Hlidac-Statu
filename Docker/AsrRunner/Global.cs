@@ -61,7 +61,7 @@ public static class Global
         "information" => LogEventLevel.Information,
         "error" => LogEventLevel.Error,
         "fatal" => LogEventLevel.Fatal,
-        _ => LogEventLevel.Warning
+        _ => LogEventLevel.Information
     };
 
     public static string LogStashUrl =>
