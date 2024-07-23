@@ -12,12 +12,13 @@ namespace PlatyUredniku.Controllers;
 [Route("autocomplete")]
 public class AutocompleteController : ControllerBase
 {
-    private readonly IFusionCache _cache;
     private readonly AutocompleteCacheService AutocompleteService;
+    private readonly AutocompleteCategoryCacheService AutocompleteCategoryService;
 
-    public AutocompleteController(AutocompleteCacheService autocompleteService)
+    public AutocompleteController(AutocompleteCacheService autocompleteService, AutocompleteCategoryCacheService autocompleteCategoryService)
     {
         AutocompleteService = autocompleteService;
+        AutocompleteCategoryService = autocompleteCategoryService;
     }
 
     [HttpGet("main")]
@@ -26,6 +27,22 @@ public class AutocompleteController : ControllerBase
         try
         {
             var results = AutocompleteService.Search(q).ToList();
+            return results;
+        }
+        catch (Exception e)
+        {
+            //todo: add logging
+        }
+        
+        return Enumerable.Empty<Autocomplete>().ToList();
+    }
+    
+    [HttpGet("category")]
+    public ActionResult<List<Autocomplete>> Category([FromQuery] string q)
+    {
+        try
+        {
+            var results = AutocompleteCategoryService.Search(q).ToList();
             return results;
         }
         catch (Exception e)
