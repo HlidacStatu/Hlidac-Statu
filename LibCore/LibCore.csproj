@@ -8,20 +8,20 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Devmasters.Cache" Version="5.1.1" />
-        <PackageReference Include="Devmasters.Core" Version="5.0.23" />
+        <PackageReference Include="Devmasters.Cache" Version="8.0.0" />
+        <PackageReference Include="Devmasters.Core" Version="8.0.0" />
         <PackageReference Include="Microsoft.AspNetCore.Http.Abstractions" Version="2.2.0" />
-        <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="8.0.6">
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="8.0.7">
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
-        <PackageReference Include="Elastic.CommonSchema.Serilog" Version="8.11.0" />
+        <PackageReference Include="Elastic.CommonSchema.Serilog" Version="8.11.1" />
         <PackageReference Include="Serilog.AspNetCore" Version="8.0.1" />
-        <PackageReference Include="Serilog.Enrichers.ClientInfo" Version="2.0.3" />
-        <PackageReference Include="Serilog.Enrichers.Environment" Version="2.3.0" />
+        <PackageReference Include="Serilog.Enrichers.ClientInfo" Version="2.1.0" />
+        <PackageReference Include="Serilog.Enrichers.Environment" Version="3.0.1" />
         <PackageReference Include="Serilog.Extensions.Hosting" Version="8.0.0" />
-        <PackageReference Include="Serilog.Sinks.Console" Version="5.0.1" />
-        <PackageReference Include="Serilog.Sinks.File" Version="5.0.0" />
+        <PackageReference Include="Serilog.Sinks.Console" Version="6.0.0" />
+        <PackageReference Include="Serilog.Sinks.File" Version="6.0.0" />
         <PackageReference Include="Serilog.Sinks.Http" Version="9.0.0" />
         <PackageReference Include="Serilog.Sinks.Udp" Version="10.0.0" />
         <PackageReference Include="Swashbuckle.AspNetCore.SwaggerGen" Version="6.6.2" />

@@ -7,9 +7,9 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Devmasters.Core" Version="5.0.23" />
+    <PackageReference Include="Devmasters.Core" Version="8.0.0" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
-    <PackageReference Include="NPOI" Version="2.7.0" />
+    <PackageReference Include="NPOI" Version="2.7.1" />
   </ItemGroup>
 
   <ItemGroup>

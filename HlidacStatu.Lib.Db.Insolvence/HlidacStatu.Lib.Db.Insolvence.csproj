@@ -8,13 +8,13 @@
     <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Devmasters.Batch" Version="5.0.22" />
-    <PackageReference Include="Devmasters.Collections" Version="5.0.22" />
-    <PackageReference Include="Devmasters.Core" Version="5.0.23" />
-    <PackageReference Include="Devmasters.DT" Version="5.0.22" />
-    <PackageReference Include="Devmasters.Lang" Version="5.0.22" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.6" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="8.0.6" />
+    <PackageReference Include="Devmasters.Batch" Version="8.0.0" />
+    <PackageReference Include="Devmasters.Collections" Version="8.0.0" />
+    <PackageReference Include="Devmasters.Core" Version="8.0.0" />
+    <PackageReference Include="Devmasters.DT" Version="8.0.0" />
+    <PackageReference Include="Devmasters.Lang" Version="8.0.0" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.7" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="8.0.7" />
     <PackageReference Include="System.ComponentModel.Annotations" Version="5.0.0" />
     <PackageReference Include="System.Data.DataSetExtensions" Version="4.5.0" />
     <PackageReference Include="System.Memory" Version="4.5.5" />
