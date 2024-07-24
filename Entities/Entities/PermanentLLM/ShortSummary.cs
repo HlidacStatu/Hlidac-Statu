@@ -13,21 +13,21 @@ namespace HlidacStatu.Entities.PermanentLLM
         {
             //throw new NotImplementedException();
         }
-        public ShortSummary(string smlouvaId, string fileId, IEnumerable<SumarizaceJSON.Item> records)
-        : this(smlouvaId,fileId,new SumarizaceJSON() { sumarizace = records.ToArray() })
+        public ShortSummary(string smlouvaId, string fileId, string generatorName, IEnumerable<SumarizaceJSON.Item> records)
+        : this(smlouvaId,fileId,generatorName, new SumarizaceJSON() { sumarizace = records.ToArray() })
         {
 
         }
         public override string PartType { get; set; } = PARTTYPE;
 
-        public ShortSummary(string smlouvaId, string fileId, SumarizaceJSON record)
+        public ShortSummary(string smlouvaId, string fileId, string generatorName, SumarizaceJSON record)
         {
             this.DocumentID = smlouvaId;
             this.FileID = fileId;
             this.DocumentType = DOCUMENTTYPE;
             this.Created = DateTime.Now;
             this.GeneratorVersion = "1.0.1";
-            this.GeneratorName = "aya:35b-hlidac.perSection";            
+            this.GeneratorName = generatorName;            
             this.Parts = record;
             this.PartType = PARTTYPE;
         }
