@@ -117,7 +117,7 @@ namespace HlidacStatu.Web.Framework.SignalR
 
 
             var llmRes = await llm.SummarizeStreamedAsync(content,int.Parse(pocetbodu),true,4*1024, 
-                AI.LLM.Clients.BaseClient.Profiles.AYA_Pravnik,
+                AI.LLM.Clients.BaseClient.Profiles.Default,
                 async t => {
                     System.Diagnostics.Debug.WriteLine(t);
                     await Clients.All.SendAsync("ReceiveMessage", t);

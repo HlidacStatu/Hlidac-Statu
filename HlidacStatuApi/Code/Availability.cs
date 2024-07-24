@@ -64,6 +64,7 @@ namespace HlidacStatuApi.Code
             }
             catch (Exception e)
             {
+                //var ex = e;
                 Log.ForContext<Availability>().Error(e, "Cannot read data from InfluxDb");
             }
 
