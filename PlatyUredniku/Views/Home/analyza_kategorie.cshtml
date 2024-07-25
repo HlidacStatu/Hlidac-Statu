@@ -4,10 +4,6 @@
 @using PlatyUredniku.Models
 @using HlidacStatu.Repositories;
 @using Microsoft.EntityFrameworkCore
-@using PlatyUredniku.Services
-
-@inject AutocompleteCategoryCacheService AutocompleteService
-
 
 @section scripts
 {
@@ -18,21 +14,146 @@
             $.fn.dataTable.tables({ visible: true, api: true }).columns.adjust();
         }
     </script>
-    <script>
-        function updateHiddenInput(hiddenId) {
-            const input = document.getElementById(hiddenId+'filter');
-            const hiddenInput = document.getElementById(hiddenId);
-            const datalist = document.getElementById('organizace_list');
-            const options = datalist.options;
-            hiddenInput.value = '';
-            for (let i = 0; i < options.length; i++) {
-                if (options[i].value === input.value) {
-                    hiddenInput.value = options[i].getAttribute('data-value');
-                    break;
+
+<script>
+    $(document).ready(function() {
+        $('#k1').selectize({
+            maxItems: 1,
+            valueField: 'id',
+            labelField: 'text',
+            searchField: null,
+            create: false,
+            highlight: false,
+            maxOptions: 10,
+            loadingClass: null,
+            loadThrottle: 250, //cant put smaller number or else it will start bugging
+            delimiter: '░',
+            load: function(query, callback) {
+                if (!query.length) return callback();
+                $.ajax({
+                    url: '/autocomplete/category',
+                    type: 'GET',
+                    dataType: 'json',
+                    data: {
+                        q: query
+                    },
+                    error: function() {
+                        callback();
+                    },
+                    success: function(res) {
+                        res.forEach(function(item) {
+                            item.id = item.id + '÷' + new Date().getTime();
+                        });
+                        callback(res);
+                    }
+                });
+            },
+            score: function() {
+                return function(item) {
+                    return 1; // All items have the same score, disable built-in filtering
+                };
+            },
+            onType: function(str) {
+                // Prevent local filtering, forcing server-side filtering
+                if (str === ''){
+                    this.clearOptions();
+                    this.close();
                 }
-            }
-        }
-    </script>
+                this.clearOptions();
+
+                //this.load(this.settings.load.bind(this, str));
+            },
+            onBlur: function () {
+                this.clearOptions();
+                this.close();
+            },
+            onDelete: function(values) {
+                // Check if input is empty before clearing options
+                this.clearOptions();
+                this.close();
+            },
+            onOptionRemove: function(value) {
+                // Check if input is empty before clearing options
+                this.clearOptions();
+                this.close();
+            },
+            onItemRemove: function(value) {
+                // Check if input is empty before clearing options
+                this.clearOptions();
+                this.close();
+            },
+
+        });
+        $('#k2').selectize({
+            maxItems: 1,
+            valueField: 'id',
+            labelField: 'text',
+            searchField: null,
+            create: false,
+            highlight: false,
+            maxOptions: 10,
+            loadingClass: null,
+            loadThrottle: 250, //cant put smaller number or else it will start bugging
+            delimiter: '░',
+            load: function(query, callback) {
+                if (!query.length) return callback();
+                $.ajax({
+                    url: '/autocomplete/category',
+                    type: 'GET',
+                    dataType: 'json',
+                    data: {
+                        q: query
+                    },
+                    error: function() {
+                        callback();
+                    },
+                    success: function(res) {
+                        res.forEach(function(item) {
+                            item.id = item.id + '÷' + new Date().getTime();
+                        });
+                        callback(res);
+                    }
+                });
+            },
+            score: function() {
+                return function(item) {
+                    return 1; // All items have the same score, disable built-in filtering
+                };
+            },
+            onType: function(str) {
+                // Prevent local filtering, forcing server-side filtering
+                if (str === ''){
+                    this.clearOptions();
+                    this.close();
+                }
+                this.clearOptions();
+
+                //this.load(this.settings.load.bind(this, str));
+            },
+            onBlur: function () {
+                this.clearOptions();
+                this.close();
+            },
+            onDelete: function(values) {
+                // Check if input is empty before clearing options
+                this.clearOptions();
+                this.close();
+            },
+            onOptionRemove: function(value) {
+                // Check if input is empty before clearing options
+                this.clearOptions();
+                this.close();
+            },
+            onItemRemove: function(value) {
+                // Check if input is empty before clearing options
+                this.clearOptions();
+                this.close();
+            },
+
+        });
+    });
+</script>
+   
 }
 
 @section breadcrumbs
@@ -96,21 +217,11 @@
             <div class="row">
                 <div class="col-md-6 col-sm-12">
                     <label for="k1" class="form-label">První kategorie</label>
-                    @(await Html.RenderComponentAsync<PlatyUredniku.Views.Shared.Components.AutocompleteSimpleWrap>(RenderMode.ServerPrerendered, new
-                    {
-                        Name = "k1",
-                        DefaultPlaceholder = "Začněte psát název zaměstnání",
-                        DefaultValue = k1
-                    }))
+                    <select id="k1" autocomplete="off" placeholder="Začněte psát název zaměstnání"></select>
                 </div>
                 <div class="col-md-6 col-sm-12">
                     <label for="k2" class="form-label">První kategorie</label>
-                    @(await Html.RenderComponentAsync<PlatyUredniku.Views.Shared.Components.AutocompleteSimpleWrap>(RenderMode.ServerPrerendered, new
-                    {
-                        Name = "k2",
-                        DefaultPlaceholder = "Začněte psát název druhého zaměstnání",
-                        DefaultValue = k2
-                    }))
+                    <select id="k2" autocomplete="off" placeholder="Začněte psát název druhého zaměstnání"></select>
                 </div>
                 <div class="col"><button class="btn btn-sm btn-primary" type="submit">Porovnat vývoj platů</button></div>
             </div>

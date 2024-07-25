@@ -11,7 +11,6 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using PlatyUredniku.Services;
-using PlatyUredniku.Views.Shared.Components;
 using Serilog;
 using System;
 using System.Collections.Generic;
@@ -65,8 +64,6 @@ public class Program
             builder.Services.AddFusionCache()
                 .WithDefaultEntryOptions(CachingOptions.Default);
 
-            
-            builder.Services.AddServerSideBlazor().AddInteractiveServerComponents();
             // builder.Services.AddScoped<IErrorBoundaryLogger, AutocompleteErrorLogger>();
 
             var app = builder.Build();
@@ -120,9 +117,7 @@ public class Program
                 pattern: "{controller=Home}/{action=Index}/{id?}");
             
             app.MapRazorPages();
-            app.MapRazorComponents<AutocompleteWrap>()
-                .AddInteractiveServerRenderMode();
-
+            
             app.Run();
         }
         catch (Exception e)

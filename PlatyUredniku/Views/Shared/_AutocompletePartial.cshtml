@@ -1,0 +1,176 @@
+﻿<style>
+    .selectize-dropdown-content {
+        max-height: none !important; /* Disable max-height */
+        overflow: visible !important; /* Ensure overflow is visible */
+    }
+
+    .hlidac-autocomplete {
+        /*border: 2px solid yellow;   */
+        position: relative;
+        padding: 0;
+        margin: 0;
+        z-index: 100;
+    }
+
+    .hs-avatar {
+        margin-left: 15px;
+        min-width: 50px;
+        height: auto;
+        color: #ccc;
+        font-size: 45px;
+    }
+
+    .hs-avatar.small {
+        font-size: 25px;
+    }
+
+    .hs-avatar img {
+        width: 50px;
+    }
+
+    .hs-autocomplete-description {
+        margin-left: 15px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .hs-autocomplete-description.small {
+        margin-top: 10px;
+    }
+
+    .selectize-control .selectize-input {
+        height: 100% !important;
+    }
+    
+    .selectize-control {
+        width: 100% !important;
+    }
+
+    .selectize-control.multi .selectize-input>div {
+        background-color: var(--bs-primary-bg-subtle)!important;
+    }
+</style>
+
+<div>
+    <div class="hlidac-autocomplete d-flex">
+        <select id="autocomplete" autocomplete="off" placeholder='Napište vyhledávaný výraz nebo tlačítko "Hledat"'></select>
+        
+        <span id="searchSpiner" style="display: none" class="spinner-border spinner-border-sm text-light align-middle mb-1 ms-1" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </span>
+    
+    </div>
+</div>
+
+<script>
+        $(document).ready(function() {
+            $('#autocomplete').selectize({
+                maxItems: 1,
+                valueField: 'id',
+                labelField: 'text',
+                searchField: null,
+                create: false,
+                highlight: false,
+                maxOptions: 10,
+                loadingClass: null,
+                loadThrottle: 250, //cant put smaller number or else it will start bugging
+                delimiter: '░',
+                render: {
+                    option: function(item, escape) {
+                        var smallClass = item.category === 'Hint' ? 'small' : '';
+                        var kIndexImage = item.kIndex ? '<img src="/Content/kindex/hranate/icon' + escape(item.kIndex) + '.svg" class="kindex" style="height: 20px; vertical-align: text-bottom; margin-right: 5px;">' : '';
+
+                        var html = '<div class="d-flex align-items-center justify-content-start">' +
+                            '<div class="hs-avatar ' + smallClass + '">' + item.imageElement + '</div>' +
+                            '<div class="hs-autocomplete-description ' + smallClass + ' flex-grow-1 me-2">';
+
+                        if (item.category === 'Hint') {
+                            html += '<h6 class="align-middle">' + escape(item.text) + ' <span class="badge rounded-pill bg-secondary">' + escape(item.id) + '</span></h6>';
+                        } else {
+                            html += '<h6 class="fw-bold mb-0">' + kIndexImage + escape(item.text) + '</h6>' +
+                                '<small>' + escape(item.description) + '</small>' +
+                                '<p class="small text-muted mb-0"><i>' + escape(item.type) + '</i></p>';
+                        }
+
+                        html += '</div><div>';
+
+                        if (item.id.startsWith('osobaid:')) {
+                            html += '<a href="/osoba/' + escape(item.id.replace('osobaid:', '')) + '" class="text-muted">' +
+                                '<i class="fa-regular fa-arrow-up-right-from-square fa-lg"></i></a>';
+                        } else if (item.id.startsWith('ico:')) {
+                            html += '<a href="/subjekt/' + escape(item.id.replace('ico:', '')) + '" class="text-muted">' +
+                                '<i class="fa-regular fa-arrow-up-right-from-square fa-lg"></i></a>';
+                        }
+
+                        html += '</div></div>';
+
+                        return html;
+                    }
+                },
+                load: function(query, callback) {
+                    if (!query.length) return callback();
+                    $.ajax({
+                        url: '/autocomplete/main',
+                        type: 'GET',
+                        dataType: 'json',
+                        data: {
+                            q: query
+                        },
+                        error: function() {
+                            callback();
+                        },
+                        success: function(res) {
+                            res.forEach(function(item) {
+                                item.id = item.id + '÷' + new Date().getTime();
+                            });
+                            callback(res);
+                        }
+                    });
+                },
+                score: function() {
+                    return function(item) {
+                        return 1; // All items have the same score, disable built-in filtering
+                    };
+                },
+                onType: function(str) {
+                    // Prevent local filtering, forcing server-side filtering
+                    if (str === ''){
+                        this.clearOptions();
+                        this.close();
+                    }
+                    this.clearOptions();
+                    
+                    //this.load(this.settings.load.bind(this, str));
+                },
+                onItemAdd: function(value, $item) {
+                    // Clear all options when an item is added
+                    this.clearOptions();
+                    this.close();
+                    $('#searchSpiner').css('display', 'inline-block;');
+                    window.location.href = value.split('÷')[0];
+                },
+                onBlur: function () {
+                    this.clearOptions();
+                    this.close();
+                },
+                onDelete: function(values) {
+                    // Check if input is empty before clearing options
+                    this.clearOptions();
+                    this.close();
+                },
+                onOptionRemove: function(value) {
+                    // Check if input is empty before clearing options
+                    this.clearOptions();
+                    this.close();
+                },
+                onItemRemove: function(value) {
+                    // Check if input is empty before clearing options
+                    this.clearOptions();
+                    this.close();
+                },
+                
+            });
+            
+        });
+    </script>
