@@ -8,6 +8,7 @@ namespace HlidacStatu.Entities
 
     public partial class QAITask
     {
+        public const int DefaultPriority = 10;
 
         [Key]
         [Column("qId")]
@@ -84,7 +85,7 @@ namespace HlidacStatu.Entities
         public int? Status { get; set; }
 
         [Column("priority")]
-        public int? Priority { get; set; } = 10;
+        public int? Priority { get; set; } = DefaultPriority;
 
         [Column("processEngine")]
         public string ProcessEngine { get; set; }

@@ -26,7 +26,7 @@ namespace HlidacStatu.Entities.PermanentLLM
             this.FileID = fileId;
             this.DocumentType = DOCUMENTTYPE;
             this.Created = DateTime.Now;
-            this.GeneratorVersion = "1.0.1";
+            this.GeneratorVersion = "1.0.2";
             this.GeneratorName = generatorName;            
             this.Parts = record;
             this.PartType = PARTTYPE;
