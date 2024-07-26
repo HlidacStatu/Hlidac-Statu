@@ -143,26 +143,21 @@ namespace HlidacStatu.Repositories
         {
             using (DbEntities db = new DbEntities())
             {
-                return Create(sponzoring, user, db);
+                if (sponzoring.OsobaIdDarce == 0
+                    && string.IsNullOrWhiteSpace(sponzoring.IcoDarce))
+                    throw new Exception(
+                        "Cant attach sponzoring to a person or to a company since their reference is empty");
+
+                sponzoring.Created = DateTime.Now;
+                sponzoring.Edited = DateTime.Now;
+                sponzoring.UpdatedBy = user;
+
+                db.Sponzoring.Add(sponzoring);
+                db.SaveChanges();
+
+                AuditRepo.Add(Audit.Operations.Create, user, sponzoring, null);
+                return sponzoring;
             }
-        }
-
-        private static Sponzoring Create(Sponzoring sponzoring, string user, DbEntities db)
-        {
-            if (sponzoring.OsobaIdDarce == 0
-                && string.IsNullOrWhiteSpace(sponzoring.IcoDarce))
-                throw new Exception(
-                    "Cant attach sponzoring to a person or to a company since their reference is empty");
-
-            sponzoring.Created = DateTime.Now;
-            sponzoring.Edited = DateTime.Now;
-            sponzoring.UpdatedBy = user;
-
-            db.Sponzoring.Add(sponzoring);
-            db.SaveChanges();
-
-            AuditRepo.Add(Audit.Operations.Create, user, sponzoring, null);
-            return sponzoring;
         }
 
         public static void MergeDonatingOsoba(int originalOsobaId, int duplicateOsobaId, string user)

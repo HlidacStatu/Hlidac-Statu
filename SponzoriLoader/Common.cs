@@ -46,7 +46,15 @@ public static class Common
                         Typ = (int)donation.GiftType
                     };
 
-                    osoba.AddSponsoring(sponzoring, user);
+                    try
+                    {
+                        osoba.AddSponsoring(sponzoring, user);
+                    }
+                    catch (Exception e)
+                    {
+                        Console.WriteLine($"{donor.Name} {donor.Surname} {donor.DateOfBirth}, {donation.Date} {donation.Amount} {zdroj} {donation.Description} failed");
+                    }
+                    
                 }
 
             }
@@ -89,7 +97,14 @@ public static class Common
                         Popis = donation.Description,
                         Typ = (int)donation.GiftType
                     };
-                    firma.AddSponsoring(sponzoring, user);
+                    try
+                    {
+                        firma.AddSponsoring(sponzoring, user);
+                    }
+                    catch (Exception e)
+                    {
+                        Console.WriteLine($"{donor.CompanyId}, {donation.Date} {donation.Amount} {zdroj} {donation.Description} failed");
+                    }
                 }
             }
         }

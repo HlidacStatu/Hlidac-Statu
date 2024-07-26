@@ -39,6 +39,22 @@ namespace HlidacStatu.Repositories
             p.Jmeno = Osoba.NormalizeJmeno(jmeno);
             p.Prijmeni = Osoba.NormalizePrijmeni(prijmeni);
 
+            //try to create name from surnames
+            if (string.IsNullOrWhiteSpace(p.Jmeno) && !string.IsNullOrWhiteSpace(p.Prijmeni))
+            {
+                var (name, surname) = SplitNameOrSurname(p.Prijmeni);
+                p.Jmeno = name;
+                p.Prijmeni = surname;
+            }
+            
+            //try to create surname from names
+            if (string.IsNullOrWhiteSpace(p.Prijmeni) && !string.IsNullOrWhiteSpace(p.Jmeno))
+            {
+                var (name, surname) = SplitNameOrSurname(p.Jmeno);
+                p.Jmeno = name;
+                p.Prijmeni = surname;
+            }
+
             if (narozeni.HasValue == false)
             {
                 p.Umrti = umrti;
@@ -64,6 +80,18 @@ namespace HlidacStatu.Repositories
             {
                 return exiO;
             }
+        }
+
+        private static (string Name, string Surname) SplitNameOrSurname(string fullname)
+        {
+            char[] separators = [' ', '\t', '\n'];
+            var splittedName = fullname.Split(separators, StringSplitOptions.TrimEntries 
+                                                              | StringSplitOptions.RemoveEmptyEntries);
+            
+            if(splittedName.Length > 1)
+                return (splittedName[0], string.Join(" ", splittedName[1..]));
+            return (string.Empty, fullname);
+
         }
 
 
