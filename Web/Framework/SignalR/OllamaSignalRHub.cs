@@ -66,7 +66,8 @@ namespace HlidacStatu.Web.Framework.SignalR
                         if (tokens < 500)
                             pocetOdrazek = 1;
 
-                        var sectSumm = await llm.SummarizeToJsonAsync(t,pocetOdrazek,true,4*1024, AI.LLM.Clients.BaseClient.Profiles.AYA_Pravnik);
+                        var sectSumm = await llm.SummarizeToJsonAsync(t,pocetOdrazek, 
+                            AI.LLM.Models.Model.Default, AI.LLM.LLMQuery.Languages.Czech);
                         if (sectSumm?.sumarizace.Count() > 0)
                         {
                             message = sectSumm.sumarizace.First().titulek;
@@ -116,8 +117,8 @@ namespace HlidacStatu.Web.Framework.SignalR
             //HlidacStatu.AI.LLM.Summarization llm = new(new HlidacStatu.AI.LLM.Summarization.OllamaOpenWebUI(ollamaUri.AbsoluteUri, "sk-f53cf4b315c144528110af15cc315c11"));
 
 
-            var llmRes = await llm.SummarizeStreamedAsync(content,int.Parse(pocetbodu),true,4*1024, 
-                AI.LLM.Clients.BaseClient.Profiles.Default,
+            var llmRes = await llm.SummarizeStreamedAsync(content,int.Parse(pocetbodu),
+                AI.LLM.Models.Model.Default, AI.LLM.LLMQuery.Languages.Czech,
                 async t => {
                     System.Diagnostics.Debug.WriteLine(t);
                     await Clients.All.SendAsync("ReceiveMessage", t);
