@@ -17,12 +17,66 @@ using HlidacStatu.Entities.KIndex;
 using Manager = HlidacStatu.Connectors.Manager;
 using Newtonsoft.Json.Linq;
 using Newtonsoft.Json;
+using HlidacStatu.MLUtil.Splitter;
+using System.Text;
 
 
 namespace HlidacStatu.Repositories
 {
     public static partial class SmlouvaRepo
     {
+
+        internal static AI.LLM.ContractParties.Result ToContractParties(this Smlouva smlouva)
+        {
+            AI.LLM.ContractParties.Result res = new AI.LLM.ContractParties.Result();
+            res.objednatel = new AI.LLM.ContractParties.Result.Subjekt(){
+                 IC = smlouva.Platce.ico,                 
+            };
+            res.poskytovatele = smlouva.Prijemce.Select(m => 
+                new AI.LLM.ContractParties.Result.Subjekt()
+                {
+                     IC = m.ico
+                })
+                .ToList();
+
+            return res;
+        }
+
+        public async static Task<bool?> CheckContractPartiesAsync(Smlouva smlouva, HlidacStatu.AI.LLM.Clients.BaseClient llmClient, int maxWordsFromBeginningOfTheText = 1000)
+        {
+            if (smlouva == null)
+                throw new ArgumentNullException(nameof(smlouva));
+
+            var smlouvaParties = ToContractParties(smlouva);
+
+            bool? ok = null;
+            HlidacStatu.AI.LLM.ContractParties llm = new AI.LLM.ContractParties(llmClient);
+            HlidacStatu.AI.LLM.Models.Model model = HlidacStatu.AI.LLM.Models.Model.Llama31;
+
+            StringBuilder t = new StringBuilder();
+            foreach (var p in smlouva.Prilohy)
+            {
+                SplitSmlouva smlSplit = SplitSmlouva.Create(smlouva.Id, p.UniqueHash(), p.PlainTextContent);
+                
+                for (int i = 0; i < smlSplit.Sections.Count; i++)
+                {
+                    var sect = smlSplit.Sections[i];
+                    t.AppendLine(sect.ToText());
+                    if (i >= 1 || HlidacStatu.AI.LLM.Util.TokenCount(t.ToString(), HlidacStatu.AI.LLM.Util.TokenizeAlgorithm.simple) > maxWordsFromBeginningOfTheText)
+                        break;
+                }
+                AI.LLM.ContractParties.Result contractPartiesRes = await llm.FindContractPartiesAsync(t.ToString(), maxWordsFromBeginningOfTheText, model);
+
+                string log = "";
+                ok=AI.LLM.ContractParties.Result.Compare(smlouvaParties, contractPartiesRes, out log);
+                if (ok == true)
+                    return ok;
+                                
+            }
+
+            return ok;
+        }
+
         public static Task<bool> DeleteAsync(Smlouva smlouva, ElasticClient client = null)
         {
             return DeleteAsync(smlouva.Id);
