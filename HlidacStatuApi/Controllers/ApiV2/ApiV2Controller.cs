@@ -46,8 +46,10 @@ namespace HlidacStatuApi.Controllers.ApiV2
         [ApiExplorerSettings(IgnoreApi = true)]
         [Authorize]
         [HttpGet("geterror/{id?}")]
-        public ActionResult<string> GetError([FromRoute] int? id = 200)
+        public ActionResult<string> GetError([FromRoute] int? id = 200, [FromQuery] long waitSec = 0)
         {
+            if (waitSec>0)
+                System.Threading.Thread.Sleep(TimeSpan.FromSeconds(waitSec));
             return StatusCode(id ?? 200, $"error {id}");
         }
 
