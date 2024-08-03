@@ -61,6 +61,7 @@ namespace HlidacStatu.Repositories
 
                 tbl.Status = (int)HlidacStatu.DS.Api.AITask.Task.CheckState.InProgress;
                 tbl.Started = DateTime.Now;
+                tbl.LastUpdate = tbl.Started;
                 tbl.ProcessEngine = processEngine;
 
                 await db.SaveChangesAsync(cancellationToken);
