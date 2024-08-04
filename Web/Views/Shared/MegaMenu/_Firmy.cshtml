@@ -7,7 +7,7 @@
     <div class="container-fluid">
         <div class="row">
             <div class="col-12 col-md-4 py-4 bg-body-tertiary">
-                <h3>Firmy / subjekty</h3>
+                <div class="mega-content-title">Firmy / subjekty</div>
                 <p>
                     Evidujeme všechny firmy, které jsou v českém Obchodním rejstříku. U firem evidovaných v Registru smluv a/nebo se účastnících veřejných zakázek provádíme detailní analýzy. V analýzách zjišťujeme  obchodování se státem, provázanost majitelů a statutárních orgánů a přímé i nepřímé sponzorování politických stran firmami či jejich majiteli.
                 </p>
@@ -17,7 +17,7 @@
                 </p>
                 <hr />
                 <p>
-                    <h5>Speciální reporty</h5>
+                    <div class="mega-content-subtitle">Speciální reporty</div>
                     <ul class="list-group">
                         <li class="list-group-item d-flex justify-content-between align-items-start">
                             <a onclick="return trackOutLink(this,'megamenu');" href="/Report/1">Firmy nejvíce obchodující se státem</a>
@@ -41,7 +41,7 @@
                 </p>
             </div>
             <div class="col-12 col-md-4 py-4">
-                <h3><a onclick="return trackOutLink(this,'megamenu');" href="/Sponzori">Sponzoři politických stran</a></h3>
+                <div class="mega-content-title"><a onclick="return trackOutLink(this,'megamenu');" href="/Sponzori">Sponzoři politických stran</a></div>
                 @{
                     var velkeStrany = await SponzoringRepo.PartiesPerYearsOverviewAsync(SponzoringRepo.DefaultLastSponzoringYear(), System.Threading.CancellationToken.None);
                     velkeStrany = velkeStrany.Where(s => SponzoringRepo.TopStrany
@@ -75,7 +75,7 @@
                 <a onclick="return trackOutLink(this,'megamenu');" href="/Sponzori/TopSponzoriFirmy?rok=@(SponzoringRepo.DefaultLastSponzoringYear())" class="btn btn-primary btn-sm">Top sponzorující firmy za @SponzoringRepo.DefaultLastSponzoringYear()</a>
             </div>
             <div class="col-12 col-md-4 py-4 bg-body-tertiary">
-                <h3><a onclick="return trackOutLink(this,'megamenu');" href="/osoby">Politici</a></h3>
+                <div class="mega-content-title"><a onclick="return trackOutLink(this,'megamenu');" href="/osoby">Politici</a></div>
                 <div class="card">
                     <div class="card-header">
 Politici, kteří podnikají a mají největší obchodní vztahy se státem <small class="text-light">náhodný výběr z největších</small></div>

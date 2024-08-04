@@ -66,6 +66,21 @@ a.nav-link.dropdown-toggle.mainmenu {
     line-height: 19px;
     font-weight: normal;
 }
+    .dropdown-menu .mega-content .mega-content-title {
+        box-sizing: border-box;
+        font-size: 1.75rem;
+        font-weight: 500;
+        line-height: 1.2;
+        list-style: none;
+        margin-bottom: .5rem;
+        margin-top: 0;
+        text-align: left;
+    }
+    .dropdown-menu .mega-content .mega-content-subtitle {
+        font-size: 1.25rem;
+        font-weight: 500;
+        line-height: 1.1;
+    }
 
 .back-to-top {
     cursor: pointer;

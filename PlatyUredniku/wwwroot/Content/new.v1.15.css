@@ -38,8 +38,18 @@ a.nav-link.dropdown-toggle.mainmenu {
     line-height: 19px;
     font-weight: normal;
 }
-
-.back-to-top {
+    .dropdown-menu .mega-content .mega-content-title {
+        box-sizing: border-box;
+        font-size: 1.75rem;
+        font-weight: 500;
+        line-height: 1.2;
+        list-style: none;
+        margin-bottom: .5rem;
+        margin-top: 0;
+        text-align: left;
+    }
+    
+ .back-to-top {
     cursor: pointer;
     position: fixed;
     bottom: 20px;
