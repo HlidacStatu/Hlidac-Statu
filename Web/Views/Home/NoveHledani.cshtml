@@ -1198,56 +1198,6 @@ viewrendertimes: @Html.Raw(string.Join("\n", viewRenderTimes.ToString()))
     </noscript>
 </div>
 
-
-<div id="dar-footer-msg-ceny">
-    <div class="modal fade" id="dar-footer-msg-ceny-modal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="dar-footer-msg-ceny-modal-label" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h1 class="modal-title fs-5" style="margin:0" id="dar-footer-msg-ceny-modal-label">Nejrozsáhlejší analýza cen ICT služeb</h1>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-
-                    <div class="row">
-                        @{
-                            int adNum = System.Random.Shared.Next(1, 12);
-                            string shadow = @" 0px 0px 13px 0px rgba(0,0,0,0.75);";
-                            string css = "-webkit-box-shadow:" + shadow + "-moz-box-shadow:" + shadow + "box-shadow:" + shadow;
-                        }
-                        <div class="text-center mb-4">
-                            <a href="https://www.watchdoganalytics.cz/?utm_source=popup&utm_medium=referral&utm_campaign=start&utm_content=popupImg_@(adNum)">
-                                <img src="/ad/1080x1080/@(adNum).jpg" style="width:80%;height:auto;@(css)"/>
-                            </a>
-                        </div>
-                    </div>
-                    <p>
-                        Navazujeme na <b>Přehled obvyklých cen ICT prací od Ministerstva vnitra</b> a nabízíme aktuální analýzy IT pro roky <b>2022, 2021 a 2020</b>.
-                    </p>
-                    <p>
-                        <i class="fa-solid fa-circle-right" style="color:orange"></i><b>Detailní nákupní ceny</b> IT služeb státu.
-                        <i class="fa-solid fa-circle-right" style="color:orange"></i><b>Porovnání</b> nabídek dodavatelů.
-                        <i class="fa-solid fa-circle-right" style="color:orange"></i><b>Cenové hladiny</b> zadavatelů a jejich porovnání.
-                        <i class="fa-solid fa-circle-right" style="color:orange"></i><b>Meziroční změny</b> cenových hladin a další.
-                    </p>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" onclick="_my_event('send', 'event', 'dar-footer-msg-ceny', 'zavri', '1');" data-bs-dismiss="modal">Zavřít</button>
-                    <button type="button" class="btn btn-primary" onclick="location.href='https://www.watchdoganalytics.cz/?utm_source=hp&utm_medium=referral&utm_campaign=start&utm_content=popup_btn_@(adNum)';return true;">Ukázat analýzy</button>
-                </div>
-            </div>
-        </div>
-    </div>
-    <noscript>
-        <style>
-                #dar-footer-msg-ceny {
-                    display: none;
-                }
-            </style>
-    </noscript>
-</div>
-
-
 @if (!(this.User?.Identity?.IsAuthenticated == true))
 {
     <div id="bookmarkInfoAnon" class="modal fade" tabindex="-1" role="dialog">
