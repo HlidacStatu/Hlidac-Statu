@@ -59,6 +59,7 @@
     .selectize-control.multi .selectize-input>div {
         background-color: var(--bs-primary-bg-subtle)!important;
     }
+
 </style>
 
 <div>
@@ -87,9 +88,9 @@
                 valueField: 'id',
                 labelField: 'text',
                 searchField: null,
-                create: true,
+                create: false,
                 highlight: false,
-                maxOptions: 8,
+                maxOptions: 9,
                 loadingClass: null,
                 loadThrottle: 250, //cant put smaller number or else it will start bugging
                 delimiter: '░',
@@ -138,6 +139,14 @@
                             callback();
                         },
                         success: function(res) {
+                            res.unshift({
+                                id: query,
+                                text: query,
+                                description: '',
+                                type: 'Vlastní hledání',
+                                imageElement: '<i class="fa-solid fa-pencil"></i>'
+                            });
+                            
                             res.forEach(function(item) {
                                 item.id = item.id + '÷' + new Date().getTime();
                             });
@@ -186,32 +195,9 @@
                 },
                 
             });
-
+            
             $('#getValuesBtn').click(function() {
-                $('#searchSpiner').css('display', 'inline-block;');
-                var selectedValues = $('#autocomplete')[0].selectize.getValue().map(item => item.split('÷')[0]);
-
-                // Parse the values into qs and qtl
-                var qs = "";
-                var qtl = "";
-
-                for (var index = 0; index < selectedValues.length; index++) {
-                    var item = selectedValues[index];
-                    if (index === selectedValues.length - 1) {
-                        qtl += item.length;
-                        qs += item;
-                    } else {
-                        qtl += item.length + ",";
-                        qs += item + " ";
-                    }
-                }
-
-                // URL encode the qs string
-                var encodedQs = encodeURIComponent(qs);
-
-                // Navigate to the new URL with the query parameters
-                var newUrl = `/hledat?q=${encodedQs}&qtl=${qtl}`;
-                window.location.href = newUrl;
+                search();
             });
 
             // Recreate selected tags
@@ -229,7 +215,39 @@
                 selectizeControl.addItem(uniqueId);
             });
 
-            
+
+            $('#autocomplete-selectized').on('keypress', function(event) {
+                if (event.which === 13) { // 13 is the keycode for Enter
+                    search();
+                }
+            });
             
         });
+
+        function search() {
+            $('#searchSpiner').css('display', 'inline-block;');
+            var selectedValues = $('#autocomplete')[0].selectize.getValue().map(item => item.split('÷')[0]);
+
+            // Parse the values into qs and qtl
+            var qs = "";
+            var qtl = "";
+
+            for (var index = 0; index < selectedValues.length; index++) {
+                var item = selectedValues[index];
+                if (index === selectedValues.length - 1) {
+                    qtl += item.length;
+                    qs += item;
+                } else {
+                    qtl += item.length + ",";
+                    qs += item + " ";
+                }
+            }
+
+            // URL encode the qs string
+            var encodedQs = encodeURIComponent(qs);
+
+            // Navigate to the new URL with the query parameters
+            var newUrl = `/hledat?q=${encodedQs}&qtl=${qtl}`;
+            window.location.href = newUrl;
+        }
     </script>
