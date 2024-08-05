@@ -5,9 +5,47 @@
 @using HlidacStatu.Repositories;
 @using Microsoft.EntityFrameworkCore
 
+@{
+    string k1 = "";
+    string k1Text = "";
+    string k2 = "";
+    string k2Text = "";
+    if (this.Context.Request.Query.TryGetValue("k1", out var rk1))
+    {
+        k1 = rk1.FirstOrDefault();
+    }
+
+    if (this.Context.Request.Query.TryGetValue("k2", out var rk2))
+    {
+        k2 = rk2.FirstOrDefault();
+    }
+
+    bool sectionBgSwitch = false;
+    using (var db = new HlidacStatu.Entities.DbEntities())
+    {
+        if (!string.IsNullOrWhiteSpace(k1))
+        {
+            k1Text = db.PuCZISCO
+                .AsNoTracking()
+                .Where(m => m.MameVydelky && m.Kod == k1)
+                .Select(m => m.Nazev)
+                .FirstOrDefault();
+        }
+
+        if (!string.IsNullOrWhiteSpace(k2))
+        {
+            k2Text = db.PuCZISCO
+                .AsNoTracking()
+                .Where(m => m.MameVydelky && m.Kod == k2)
+                .Select(m => m.Nazev)
+                .FirstOrDefault();
+        }
+    }
+}
+
 @section scripts
 {
-    <link rel="stylesheet" type="text/css" href="//cdn.datatables.net/1.13.4/css/jquery.dataTables.min.css" />
+    <link rel="stylesheet" type="text/css" href="//cdn.datatables.net/1.13.4/css/jquery.dataTables.min.css"/>
     <script type="text/javascript" charset="utf8" src="//cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
     <script>
         function adjustDataTablesWidth() {
@@ -15,7 +53,7 @@
         }
     </script>
 
-<script>
+    <script>
     $(document).ready(function() {
         $('#k1').selectize({
             maxItems: 1,
@@ -41,9 +79,6 @@
                         callback();
                     },
                     success: function(res) {
-                        res.forEach(function(item) {
-                            item.id = item.id + '÷' + new Date().getTime();
-                        });
                         callback(res);
                     }
                 });
@@ -108,9 +143,6 @@
                         callback();
                     },
                     success: function(res) {
-                        res.forEach(function(item) {
-                            item.id = item.id + '÷' + new Date().getTime();
-                        });
                         callback(res);
                     }
                 });
@@ -151,9 +183,44 @@
             },
 
         });
+
+        $('#analyzaFormButton').on('click', function(event) {
+            event.preventDefault(); // Prevent the default form submission
+
+            var k1Value = $('#k1')[0].selectize.getValue();
+            var k2Value = $('#k2')[0].selectize.getValue();
+
+            if (!k1Value || !k2Value) {
+                alert("Please select values for both categories.");
+                return;
+            }
+
+            $('#hiddenK1').val(k1Value);
+            $('#hiddenK2').val(k2Value);
+
+            $('#analyzaForm').submit();      
+            
+        });
+        
+        var k1InitVal = '@k1';
+        var k2InitVal = '@k2';
+        
+        if (k1InitVal.length > 0)
+        {
+            var selectizeControl1 = $('#k1')[0].selectize;
+            selectizeControl1.addOption({ id: k1InitVal, text: '@Html.Raw(k1Text)'});
+            selectizeControl1.addItem(k1InitVal);
+        }
+
+        if (k2InitVal.length > 0)
+        {
+            var selectizeControl2 = $('#k2')[0].selectize;
+            selectizeControl2.addOption({ id: k2InitVal, text: '@Html.Raw(k2Text)'});
+            selectizeControl2.addItem(k2InitVal);
+        }       
     });
 </script>
-   
+
 }
 
 @section breadcrumbs
@@ -170,66 +237,34 @@
         </li>
     </ol>
 }
-@{
-    string k1 = "";
-    string k1Text = "";
-    string k2 = "";
-    string k2Text = "";
-    if (this.Context.Request.Query.TryGetValue("k1", out var rk1))
-    {
-        k1 = rk1.FirstOrDefault();
-    }
-    if (this.Context.Request.Query.TryGetValue("k2", out var rk2))
-    {
-        k2 = rk2.FirstOrDefault();
-    }
-    bool sectionBgSwitch = false;
-    using (var db = new HlidacStatu.Entities.DbEntities())
-    {
-        if (!string.IsNullOrWhiteSpace(k1))
-        {
-            k1Text = db.PuCZISCO
-                .AsNoTracking()
-                .Where(m => m.MameVydelky && m.Kod == k1)
-                .Select(m => m.Nazev)
-                .FirstOrDefault();
-        }
 
-        if (!string.IsNullOrWhiteSpace(k2))
-        {
-            k2Text = db.PuCZISCO
-                .AsNoTracking()
-                .Where(m => m.MameVydelky && m.Kod == k2)
-                .Select(m => m.Nazev)
-                .FirstOrDefault();
-        }
-    }
-    
-}
 
 <section class="d-flex align-items-center justify-content-center @(sectionBgSwitch ? "alter-bg-color" : "")">
     <div class="container">
 
-
         <h2 class="pb-2 border-bottom">Porovnání kategorií zaměstnání</h2>
 
-        <form action="/analyza/kategorie" method="get" onkeydown="if(event.key === 'Enter') {return false;}">
+        <form id="analyzaForm" action="/analyza/kategorie" method="get" onkeydown="if(event.key === 'Enter') {return false;}">
             <div class="row">
                 <div class="col-md-6 col-sm-12">
                     <label for="k1" class="form-label">První kategorie</label>
                     <select id="k1" autocomplete="off" placeholder="Začněte psát název zaměstnání"></select>
+                    <input type="hidden" id="hiddenK1" name="k1">
                 </div>
                 <div class="col-md-6 col-sm-12">
                     <label for="k2" class="form-label">První kategorie</label>
                     <select id="k2" autocomplete="off" placeholder="Začněte psát název druhého zaměstnání"></select>
+                    <input type="hidden" id="hiddenK2" name="k2">
                 </div>
-                <div class="col"><button class="btn btn-sm btn-primary" type="submit">Porovnat vývoj platů</button></div>
+                <div class="col">
+                    <button id="analyzaFormButton" class="btn btn-sm btn-primary" type="button">Porovnat vývoj platů</button>
+                </div>
             </div>
         </form>
 
 
         @{
-            string[] compareTo = new string[] { k1,k2}.Where(m=>!string.IsNullOrWhiteSpace(m)).ToArray();
+            string[] compareTo = new string[] { k1, k2 }.Where(m => !string.IsNullOrWhiteSpace(m)).ToArray();
 
             if (compareTo?.Length > 0)
             {
@@ -245,19 +280,19 @@
                         var dName = d.OrderByDescending(m => m.Rok).Select(m => m.FullNazevKategorieZamestnani()).FirstOrDefault().ShortenMe(140);
                         data.Add(AreaRangePlot.ToAreaRangePlotWithPrumer(d, dName));
                     }
+
                     d = await PuRepo.LoadVydelekForZamestnaniAsync(compItem, HlidacStatu.Entities.PuVydelek.VydelekSektor.Soukromy);
                     if (d?.Any() == true)
                     {
                         var dName = d.OrderByDescending(m => m.Rok).Select(m => m.FullNazevKategorieZamestnani()).FirstOrDefault().ShortenMe(140);
                         data.Add(AreaRangePlot.ToAreaRangePlotWithPrumer(d, dName));
                     }
-
                 }
 
                 //calculate height
                 var height = 430
-                + data.Count() * 12 //pul radku na jednu serii
-                + (data.Count(m => m.Title.Length > 80) * 17); //dlouhe nazvy serii pocitej na cely radek
+                             + data.Count() * 12 //pul radku na jednu serii
+                             + (data.Count(m => m.Title.Length > 80) * 17); //dlouhe nazvy serii pocitej na cely radek
 
                 AreaRangeCompareRenderOptions chartModel = new AreaRangeCompareRenderOptions()
                 {
@@ -267,10 +302,9 @@
                 };
 
 
-                <partial name="Graphs/_AreaRangeComparePlot" model="@chartModel" />
+                <partial name="Graphs/_AreaRangeComparePlot" model="@chartModel"/>
             }
         }
 
     </div>
 </section>
-
