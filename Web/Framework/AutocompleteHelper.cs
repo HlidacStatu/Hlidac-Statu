@@ -32,6 +32,20 @@ public static class AutocompleteHelper
                     return CreateAutocompleteItemsFromparsedQuerieForJs(parsedQueries);
                 }
             }
+            
+            if (query.TryGetValue("qs", out var qs))
+            {
+                if (query.TryGetValue("qtl", out var qtl))
+                {
+                    var parsedQueries = ParseQueryStringWithOffsets(qs, qtl);
+                    return CreateAutocompleteItemsFromparsedQuerieForJs(parsedQueries);
+                }
+                else
+                {
+                    var parsedQueries = ParseQueryStringWithoutOffsets(qs);
+                    return CreateAutocompleteItemsFromparsedQuerieForJs(parsedQueries);
+                }
+            }
         }
         catch (Exception e)
         { 
