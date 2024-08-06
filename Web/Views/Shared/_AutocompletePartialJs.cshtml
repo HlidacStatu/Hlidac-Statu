@@ -217,7 +217,7 @@
 
 
             $('#autocomplete-selectized').on('keypress', function(event) {
-                if (event.which === 13) { // 13 is the keycode for Enter
+                if (event.which === 13 && $('#autocomplete-selectized')[0].value.length === 0) { // 13 is the keycode for Enter
                     search();
                 }
             });
