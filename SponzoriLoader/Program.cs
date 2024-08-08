@@ -33,10 +33,10 @@ namespace SponzoriLoader
         
         private static void LoadDataFromFiles(Donations peopleDonations, Donations companyDonations)
         {
-            LoadSponzoringFromFile.LoadOsoby(peopleDonations, @"d:\kdu osoby.tsv",
-                "00442704", _user, _zdroj);
-            LoadSponzoringFromFile.LoadFirmy(companyDonations, @"d:\kdu firmy.tsv",
-                "00442704", _user, _zdroj);
+            LoadSponzoringFromFile.LoadOsoby(peopleDonations, @"/Users/suchoss/Downloads/chromeloads/spd-dary-2023 - Osoby.tsv",
+                "04134940", _user, _zdroj);
+            LoadSponzoringFromFile.LoadFirmy(companyDonations, @"/Users/suchoss/Downloads/chromeloads/spd-dary-2023 - Firmy.tsv",
+                "04134940", _user, _zdroj);
         }
 
         private static readonly string _user = "sponzorLoader";
