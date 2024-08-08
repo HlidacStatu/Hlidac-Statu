@@ -54,13 +54,32 @@ namespace HlidacStatu.Repositories
                     return vsechnyDcerineVazbyInternal(o, 0, true, null);
                 },
                 TimeSpan.FromDays(3),
-                    Devmasters.Config.GetWebConfigValue("HazelcastServers").Split(','));
+                Devmasters.Config.GetWebConfigValue("HazelcastServers").Split(','));
 
+        public static void SmazVsechnyDcerineVazbyFirmy(string ico)
+        {
+            vazbyIcoCache.Delete(ico);
+        }
         public static List<HlidacStatu.DS.Graphs.Graph.Edge> VsechnyDcerineVazby(string ico, bool refresh = false)
         {
             if (refresh)
                 vazbyIcoCache.Delete(ico);
             return vazbyIcoCache.Get(ico);
+        }
+        public static void SmazVsechnyDcerineVazbyOsoby(long internalId)
+        {
+            var nameId = DirectDB.GetValue<string>("select nameid from Osoba where internalId=@internalId",
+                param: new IDataParameter[] { new SqlParameter("internalId", internalId) });
+            if (!string.IsNullOrEmpty(nameId))
+                vazbyOsobaNameIdCache.Delete(nameId);
+        }
+        public static void SmazVsechnyDcerineVazbyOsoby(string nameId)
+        {
+            vazbyOsobaNameIdCache.Delete(nameId);
+        }
+        public static void SmazVsechnyDcerineVazbyOsoby(Osoba person)
+        {
+            vazbyOsobaNameIdCache.Delete(person?.NameId);
         }
 
         public static List<HlidacStatu.DS.Graphs.Graph.Edge> VsechnyDcerineVazby(Osoba person, bool refresh = false)
@@ -119,14 +138,14 @@ namespace HlidacStatu.Repositories
             using (DbEntities db = new DbEntities())
             {
                 var navazaneOsoby = db.OsobaVazby.AsNoTracking()
-                    .Where(m => m.OsobaId == person.InternalId 
+                    .Where(m => m.OsobaId == person.InternalId
                         && m.VazbakOsobaId != null
                     )
                     .ToArray() //get data from DB
-                    //filter by date
-                    .Where(o =>Devmasters.DT.Util.IsOverlappingIntervals(datumOd,datumDo,o.DatumOd,o.DatumDo)==true)
+                               //filter by date
+                    .Where(o => Devmasters.DT.Util.IsOverlappingIntervals(datumOd, datumDo, o.DatumOd, o.DatumDo) == true)
                     .ToList();
-              
+
 
                 if (navazaneOsoby.Count > 0)
                     foreach (var ov in navazaneOsoby)
@@ -217,7 +236,8 @@ namespace HlidacStatu.Repositories
                         To = new HlidacStatu.DS.Graphs.Graph.Node() { Id = nodeId, Type = nodeType },
                         RelFrom = datumOd,
                         RelTo = datumDo,
-                        Distance = 0                    }
+                        Distance = 0
+                    }
                 );
             }
             //get zakladni informace o subj.
@@ -336,7 +356,7 @@ namespace HlidacStatu.Repositories
             }
 
 
-            List<DS.Graphs.Graph.Edge> relationsWithLongestEdges = 
+            List<DS.Graphs.Graph.Edge> relationsWithLongestEdges =
                 HlidacStatu.DS.Graphs.Graph.Edge.GetLongestEdges(relations).ToList();
 
             if (goDeep && relationsWithLongestEdges.Count > 0)
@@ -923,9 +943,9 @@ namespace HlidacStatu.Repositories
 
             IEnumerable<HlidacStatu.DS.Graphs.Graph.Edge> firstBatch = null;
             if (parent == null)
-                firstBatch = relations.Where(m => 
+                firstBatch = relations.Where(m =>
                     !relations.Any(r => r.To?.UniqId == m.From?.UniqId)
-                    || m.From?.UniqId == origRoot.To?.UniqId                
+                    || m.From?.UniqId == origRoot.To?.UniqId
                 );
             else
                 firstBatch = relations.Where(m => m.From?.UniqId == parent.To?.UniqId);
