@@ -2,10 +2,10 @@
 using HlidacStatu.Entities;
 using HlidacStatu.Repositories;
 using HlidacStatu.Repositories.Searching;
+using Serilog;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Serilog;
 
 namespace HlidacStatu.XLib
 {
@@ -26,6 +26,7 @@ namespace HlidacStatu.XLib
             public Datasets.Search.DatasetMultiResult Datasets { get; set; }
             public InsolvenceFulltextSearchResult Insolvence { get; set; } = new();
             public DotaceSearchResult Dotace { get; set; } = null;
+            public Repositories.Searching.Search.GeneralResult<HlidacStatu.Lib.Data.External.Wordpress.Searching.Result> Wordpress { get; set; } = null;
 
             public List<Registration> DatasetRegistrations { get; set; } = new();
 
@@ -36,6 +37,7 @@ namespace HlidacStatu.XLib
             public bool HasDatasets { get { return (Datasets != null && Datasets.HasResult); } }
             public bool HasInsolvence { get { return Insolvence != null && Insolvence.HasResult; } }
             public bool HasDotace { get { return Dotace != null && Dotace.HasResult; } }
+            public bool HasWordpress { get { return Wordpress != null && Wordpress.HasResult; } }
 
             public Dictionary<string, System.TimeSpan> SearchTimes()
             {
@@ -61,6 +63,8 @@ namespace HlidacStatu.XLib
                     times.Add("Insolvence", Insolvence.ElapsedTime);
                 if (Dotace != null)
                     times.Add("Dotace", Dotace.ElapsedTime);
+                if (Wordpress != null)
+                    times.Add("Wordpress", Wordpress.ElapsedTime);
                 if (AddOsobyTime.Ticks > 0)
                     times.Add("AddOsobyTime", AddOsobyTime);
 
@@ -91,6 +95,7 @@ namespace HlidacStatu.XLib
                         && (Datasets?.IsValid ?? false)
                         && (Insolvence?.IsValid ?? false)
                         && (Dotace?.IsValid ?? false)
+                        && (Wordpress?.IsValid ?? false)
                         ;
                 }
             }
@@ -99,7 +104,8 @@ namespace HlidacStatu.XLib
             {
                 get
                 {
-                    return HasSmlouvy || HasVZ || HasOsoby || HasFirmy || HasDatasets || HasInsolvence || HasDotace;
+                    return HasSmlouvy || HasVZ || HasOsoby || HasFirmy || HasDatasets
+                        || HasInsolvence || HasDotace || HasWordpress;
                 }
             }
 
@@ -122,6 +128,8 @@ namespace HlidacStatu.XLib
                         t += Insolvence.Total;
                     if (HasDotace)
                         t += Dotace.Total;
+                    if (HasWordpress)
+                        t += Wordpress.Total;
 
                     return t;
                 }
@@ -130,7 +138,7 @@ namespace HlidacStatu.XLib
         }
 
         private static readonly ILogger _logger = Log.ForContext<Search>();
-        
+
         public static async Task<MultiResult> GeneralSearchAsync(
             string query, int page = 1, bool showBeta = false, string order = null,
             System.Security.Principal.IPrincipal user = null,
@@ -177,22 +185,22 @@ namespace HlidacStatu.XLib
                     }
                 }));
 
-             taskList.Add(
-                 Task.Run(async () =>
-                 {
-                     try
-                     {
-                         Devmasters.DT.StopWatchEx sw = new Devmasters.DT.StopWatchEx();
-                         sw.Start();
-                         res.SearchPromos = await SearchPromoRepo.SearchPromoForHledejAsync(query, 1, 8);
-                         sw.Stop();
-                         res.SearchPromos.ElapsedTime = sw.Elapsed;
-                     }
-                     catch (System.Exception e)
-                     {
-                         _logger.Error(e, "MultiResult GeneralSearch for SearchPromos query" + query);
-                     }
-                 }));
+            taskList.Add(
+                Task.Run(async () =>
+                {
+                    try
+                    {
+                        Devmasters.DT.StopWatchEx sw = new Devmasters.DT.StopWatchEx();
+                        sw.Start();
+                        res.SearchPromos = await SearchPromoRepo.SearchPromoForHledejAsync(query, 1, 8);
+                        sw.Stop();
+                        res.SearchPromos.ElapsedTime = sw.Elapsed;
+                    }
+                    catch (System.Exception e)
+                    {
+                        _logger.Error(e, "MultiResult GeneralSearch for SearchPromos query" + query);
+                    }
+                }));
 
             taskList.Add(
                 Task.Run(async () =>
@@ -290,6 +298,33 @@ namespace HlidacStatu.XLib
                     catch (System.Exception e)
                     {
                         _logger.Error(e, "MultiResult GeneralSearch for insolvence query" + query);
+                    }
+                }));
+
+
+            taskList.Add(
+                Task.Run(async () =>
+                {
+                    try
+                    {
+                        Devmasters.DT.StopWatchEx sw = new Devmasters.DT.StopWatchEx();
+                        sw.Start();
+                        if (false)
+                        {
+                            var wpSearch = new HlidacStatu.Lib.Data.External.Wordpress.Searching(new System.Uri("http://texty.hlidacstatu.cz"));
+                            var wpRes = await wpSearch.SearchAsync(query, 1, 5);
+                            res.Wordpress = new Repositories.Searching.Search.GeneralResult<Lib.Data.External.Wordpress.Searching.Result>(query, wpRes, 5)
+                            {
+                                Page = 1
+                            };
+                        }
+                        sw.Stop();
+                        res.Wordpress.ElapsedTime = sw.Elapsed;
+
+                    }
+                    catch (System.Exception e)
+                    {
+                        _logger.Error(e, "MultiResult GeneralSearch for Wordpress query" + query);
                     }
                 }));
 

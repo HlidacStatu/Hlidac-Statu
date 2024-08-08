@@ -50,6 +50,7 @@
       <ProjectReference Include="..\Connectors\Connectors.csproj" />
       <ProjectReference Include="..\Datasets\Datasets.csproj" />
       <ProjectReference Include="..\Entities\Entities.csproj" />
+      <ProjectReference Include="..\Lib.Data.External\Lib.Data.External.csproj" />
       <ProjectReference Include="..\Repositories\Repositories.csproj" />
     </ItemGroup>
 
