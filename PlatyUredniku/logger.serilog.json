@@ -3,22 +3,31 @@
     "Using": [
       "Serilog.Sinks.Console",
       "Serilog.Sinks.File",
-      "Serilog.Sinks.Http"
+      "Serilog.Sinks.Http",
+      "Serilog.Sinks.Seq"
     ],
     "MinimumLevel": {
-      "Default": "Information",
+      "Default": "Debug",
       "Override": {
         "Microsoft": "Error",
         "Microsoft.Extensions": "Information",
         "System": "Error",
-        "Devmasters": "Information"
+        "Devmasters": "Information",
+        "ZiggyCreatures.Caching.Fusion" : "Warning"
       }
     },
     "WriteTo": [
       {
+        "Name": "Seq",
+        "Args": {
+          "apiKey": "kYIIhIQAPdJEZxrXjvl3",
+          "serverUrl": "http://10.10.100.141:5341"
+        }
+      },
+      {
         "Name": "File",
         "Args": {
-          "restrictedToMinimumLevel": "Warning",
+          "restrictedToMinimumLevel": "Information",
           "path": "c:/Data/Logs/HlidacStatu/PlatyUredniku/platy.txt",
           "formatter": "Elastic.CommonSchema.Serilog.EcsTextFormatter, Elastic.CommonSchema.Serilog",
           "rollingInterval": "Day",

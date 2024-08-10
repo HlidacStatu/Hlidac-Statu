@@ -170,7 +170,7 @@ public static class HlidacConfigExtensions
             .Enrich.WithProperty("application_name", System.Reflection.Assembly.GetEntryAssembly().GetName().Name)
             .Enrich.WithProperty("application_path", new FileInfo(System.Reflection.Assembly.GetEntryAssembly().Location).DirectoryName)
             .Enrich.WithClientIp()
-            .Enrich.FromLogContext()
+            .Enrich.FromLogContext()            
             .WriteTo.Console());
     }
 

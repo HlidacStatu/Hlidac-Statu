@@ -16,6 +16,7 @@ using System;
 using System.Collections.Generic;
 using PlatyUredniku.Cache;
 using ZiggyCreatures.Caching.Fusion;
+using Microsoft.Extensions.Logging;
 
 namespace PlatyUredniku;
 
@@ -31,7 +32,6 @@ public class Program
         Devmasters.Config.Init(builder.Configuration);
         // init logger
         var logger = Log.ForContext<Program>();
-
         try
         {
             System.Globalization.CultureInfo.DefaultThreadCurrentCulture = HlidacStatu.Util.Consts.czCulture;
@@ -67,7 +67,8 @@ public class Program
             // builder.Services.AddScoped<IErrorBoundaryLogger, AutocompleteErrorLogger>();
 
             var app = builder.Build();
-     
+
+
             StaticCache.Init(app.Services.GetService<IFusionCache>());
 
             var whitelistIps = Devmasters.Config.GetWebConfigValue("BanWhitelist")?.Split(',',
@@ -117,12 +118,12 @@ public class Program
                 pattern: "{controller=Home}/{action=Index}/{id?}");
             
             app.MapRazorPages();
-            
+            app.Logger.LogInformation("PlatyUredniku Web starting");
             app.Run();
         }
         catch (Exception e)
         {
-            logger.Fatal(e, "Hlidac admin se nepodařilo spustit");
+            logger.Fatal(e, "PlatyUredniku Wev se nepodařilo spustit");
             throw;
         }
     }
