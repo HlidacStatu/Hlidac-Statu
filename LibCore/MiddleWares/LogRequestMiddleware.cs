@@ -66,8 +66,9 @@ namespace HlidacStatu.LibCore.MiddleWares
                 {
                     if (_options.RequestToLogFilter(context))
                     {
-                        _logger.Write(_options.LogEventLevel, "{hostname} {method} {request} {elapsedMs} {statuscode} {@query} {@form}",
-                            hostname, method, request, sw.ElapsedMilliseconds, context.Response.StatusCode, querystring, formstring);
+                        _logger.Write(_options.LogEventLevel, "{hostname} {method} {request} {elapsedMs} {statuscode} {useragent} {@query} {@form}",
+                            hostname, method, request, sw.ElapsedMilliseconds, context.Response.StatusCode,
+                            context.Request.Headers["User-Agent"],querystring, formstring);
                     }
 
                 }
