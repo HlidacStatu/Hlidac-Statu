@@ -17,6 +17,11 @@ using Serilog;
 using System;
 using System.Collections.Generic;
 using ZiggyCreatures.Caching.Fusion;
+using System.Diagnostics;
+using OpenTelemetry.Resources;
+using OpenTelemetry.Trace;
+using OpenTelemetry.Exporter;
+
 
 namespace PlatyUredniku;
 
@@ -36,6 +41,24 @@ public class Program
         {
             System.Globalization.CultureInfo.DefaultThreadCurrentCulture = HlidacStatu.Util.Consts.czCulture;
             System.Globalization.CultureInfo.DefaultThreadCurrentUICulture = HlidacStatu.Util.Consts.csCulture;
+
+
+            builder.Services.AddOpenTelemetry()
+              .ConfigureResource(r => r.AddService(System.Reflection.Assembly.GetEntryAssembly().GetName().Name))
+              .WithTracing(tracing =>
+              {
+                  tracing.AddSource(System.Reflection.Assembly.GetEntryAssembly().GetName().Name);
+                  tracing.AddAspNetCoreInstrumentation();
+                  tracing.AddHttpClientInstrumentation();
+                  tracing.AddSqlClientInstrumentation();
+                  tracing.AddOtlpExporter(opt =>
+                  {
+                      opt.Endpoint = new Uri("http://10.10.100.141:5341/ingest/otlp/v1/traces");
+                      opt.Protocol = OtlpExportProtocol.HttpProtobuf;
+                      opt.Headers = "X-Seq-ApiKey=kYIIhIQAPdJEZxrXjvl3";
+                  });
+              });
+
 
             // Identity stuff for shared cookies with Hlidac
             string connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
