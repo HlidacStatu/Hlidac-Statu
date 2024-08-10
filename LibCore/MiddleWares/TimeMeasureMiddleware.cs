@@ -39,9 +39,9 @@ namespace HlidacStatu.LibCore.MiddleWares
             {
 
                 if (httpContext.User != null && httpContext.User.Identity != null && httpContext.User.Identity.Name != null)
-                    _logger.Debug("{webpage} with {query_params} for {user} done in {elapsed} ms", url, query, httpContext.User.Identity.Name, sw.ElapsedMilliseconds);
+                    _logger.Information("{webpage} with {query_params} for {user} done in {elapsed} ms", url, query, httpContext.User.Identity.Name, sw.ElapsedMilliseconds);
                 else
-                    _logger.Debug("{webpage} with {query_params} done in {elapsed} ms", url, query, sw.ElapsedMilliseconds);
+                    _logger.Information("{webpage} with {query_params} done in {elapsed} ms", url, query, sw.ElapsedMilliseconds);
 
             }
             else if (sw.ElapsedMilliseconds >= 2000)
