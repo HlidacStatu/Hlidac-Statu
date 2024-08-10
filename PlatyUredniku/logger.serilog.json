@@ -13,7 +13,8 @@
         "Microsoft.Extensions": "Information",
         "System": "Error",
         "Devmasters": "Information",
-        "ZiggyCreatures.Caching.Fusion" : "Warning"
+        "ZiggyCreatures.Caching.Fusion": "Warning",
+        "WebOptimizer.AssetBuilder" : "Warning"
       }
     },
     "WriteTo": [
