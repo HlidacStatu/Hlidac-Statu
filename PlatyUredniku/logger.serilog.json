@@ -14,7 +14,7 @@
         "System": "Error",
         "Devmasters": "Information",
         "ZiggyCreatures.Caching.Fusion": "Warning",
-        "WebOptimizer.AssetBuilder" : "Warning"
+        "WebOptimizer" : "Warning"
       }
     },
     "WriteTo": [
