@@ -10,6 +10,7 @@
       "Default": "Debug",
       "Override": {
         "Microsoft": "Error",
+        "Microsoft.AspNetCore": "Information",
         "Microsoft.Extensions": "Information",
         "System": "Error",
         "Devmasters": "Information",

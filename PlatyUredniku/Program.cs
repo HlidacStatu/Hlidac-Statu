@@ -17,7 +17,6 @@ using Serilog;
 using System;
 using System.Collections.Generic;
 using ZiggyCreatures.Caching.Fusion;
-using System.Diagnostics;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
 using OpenTelemetry.Exporter;
@@ -37,12 +36,13 @@ public class Program
         Devmasters.Config.Init(builder.Configuration);
         // init logger
         var logger = Log.ForContext<Program>();
+        
         try
         {
             System.Globalization.CultureInfo.DefaultThreadCurrentCulture = HlidacStatu.Util.Consts.czCulture;
             System.Globalization.CultureInfo.DefaultThreadCurrentUICulture = HlidacStatu.Util.Consts.csCulture;
-
-
+            
+            
             builder.Services.AddOpenTelemetry()
               .ConfigureResource(r => r.AddService(System.Reflection.Assembly.GetEntryAssembly().GetName().Name))
               .WithTracing(tracing =>
@@ -105,11 +105,11 @@ public class Program
                 }
             }
 
-            app.UseLogRequestMiddleware(new LogRequestMiddleware.Options()
-            {
-                LogEventLevel = Serilog.Events.LogEventLevel.Information,
-                RequestToLogFilter = (c) => c.Response.ContentType.StartsWith("text/html")
-            });
+            // app.UseLogRequestMiddleware(new LogRequestMiddleware.Options()
+            // {
+            //     LogEventLevel = Serilog.Events.LogEventLevel.Information,
+            //     RequestToLogFilter = (c) => c.Response.ContentType.StartsWith("text/html")
+            // });
 
             app.UseTimeMeasureMiddleware(new List<string>() { "/_blazor" });
 
