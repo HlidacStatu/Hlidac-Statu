@@ -24,8 +24,18 @@ namespace HlidacStatu.LibCore.MiddleWares
 
         public async Task Invoke(HttpContext context)
         {
+
+
+            var sw = new Stopwatch();
+            sw.Start();
+            await _next(context);
+            sw.Stop();
+
             try
             {
+                string method = context.Request.Method;
+                string hostname = context.Request.Host.Host;
+                string request = context.Request.Path;
 
 
                 string? ip = HlidacStatu.Util.RealIpAddress.GetIp(context)?.ToString();
@@ -52,23 +62,15 @@ namespace HlidacStatu.LibCore.MiddleWares
                     }
 
 
-                var sw = new Stopwatch();
-                sw.Start();
-                await _next(context);
-                sw.Stop();
-
-                string method = context.Request.Method;
-                string hostname = context.Request.Host.Host;
-                string request = context.Request.Path;
-
-
                 if (this._options.RequestToLogFilter != null)
                 {
                     if (_options.RequestToLogFilter(context))
                     {
-                        _logger.Write(_options.LogEventLevel, "{hostname} {method} {request} {elapsedMs} {statuscode} {useragent} {@query} {@form}",
-                            hostname, method, request, sw.ElapsedMilliseconds, context.Response.StatusCode,
-                            context.Request.Headers["User-Agent"],querystring, formstring);
+
+                        _logger.Write(_options.LogEventLevel,
+                            "{hostname} {method} {request} {elapsedMs} {statuscode} {useragent} {@query} {@form}",
+                            hostname, method, request, sw.ElapsedMilliseconds, context?.Response?.StatusCode,
+                            context.Request?.Headers["User-Agent"], querystring, formstring);
                     }
 
                 }
@@ -83,7 +85,57 @@ namespace HlidacStatu.LibCore.MiddleWares
         public class Options
         {
             public Serilog.Events.LogEventLevel LogEventLevel { get; set; } = Serilog.Events.LogEventLevel.Debug;
+
             public Func<HttpContext, bool> RequestToLogFilter { get; set; } = null;
+
+            //serilog {} style
+            public string LogMessageTemplate { get; set; } = "{hostname} {method} {request} {statuscode} {useragent} {@query} {@form}";
+
+            /// <summary>
+            /// Same
+            /// </summary>
+            Func<HttpContext, object>[] LogMessagePropertyValueSelectors { get; set; } = new Func<HttpContext, object>[]
+            {
+                context=>context?.Request?.Host,
+                context=>context?.Request?.Method,
+                context=>context?.Request?.Path,
+                context=>context?.Response?.StatusCode,
+                context=>context.Request?.Headers["User-Agent"],
+                context => GetQueryStringParams(context),
+                context => GetFormStringParams(context),
+
+
+            };
+        }
+
+        public static List<KeyValuePair<string, string>> GetQueryStringParams(HttpContext context)
+        {
+            List<KeyValuePair<string, string>> querystring = new();
+            if (context?.Request?.Query != null)
+                foreach (var item in context.Request.Query)
+                {
+                    foreach (var itemval in item.Value)
+                    {
+                        querystring.Add(new(item.Key, itemval));
+                    }
+                }
+
+            return querystring;
+        }
+
+        public static List<KeyValuePair<string, string>> GetFormStringParams(HttpContext context)
+        {
+            List<KeyValuePair<string, string>> querystring = new();
+            if (context?.Request?.Query != null)
+                foreach (var item in context.Request.Form)
+                {
+                    foreach (var itemval in item.Value)
+                    {
+                        querystring.Add(new(item.Key, itemval));
+                    }
+                }
+
+            return querystring;
         }
     }
 
@@ -96,6 +148,7 @@ namespace HlidacStatu.LibCore.MiddleWares
         }
 
     }
+
 
 
 }
