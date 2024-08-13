@@ -471,6 +471,7 @@
             <div class="header__search">
                 <form class="header__search__input-wrapper old-search-input" id="old-search-input" method="get" style="visibility:visible">
                     <input value="@ViewBag.Query" id="Q" name="Q" type="text" class="header__search__input" placeholder="Smluvní strana, Název instituce, Jméno osoby, IČO, téma smlouvy …">
+                    <input type="hidden" name="u" value="2"/> 
                     <button class="header__search__btn" formaction="/hledat">Hledat</button>
                 </form>
                 
