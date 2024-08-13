@@ -60,6 +60,11 @@ namespace HlidacStatu.Entities
                 entity.Property(e => e.Created).HasDefaultValueSql("(getdate())");
             });
 
+            _ = modelBuilder.Entity<Feedback>(entity =>
+            {
+                entity.Property(e => e.Created).HasDefaultValueSql("(getdate())");
+            });
+
             _ = modelBuilder.Entity<Bookmark>(entity =>
             {
                 entity.Property(e => e.Id).ValueGeneratedNever();
@@ -221,6 +226,7 @@ namespace HlidacStatu.Entities
         public virtual DbSet<CenyCustomer> CenyCustomer { get; set; }
 
         public virtual DbSet<Firma> Firma { get; set; }
+        public virtual DbSet<Feedback> Feedbacks { get; set; }
         public virtual DbSet<InDocTablesCheck> InDocTablesChecks { get; set; }
         
         public virtual DbSet<WatchDog> WatchDogs { get; set; }
