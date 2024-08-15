@@ -38,5 +38,9 @@
       <ProjectReference Include="..\MinimalEntities\MinimalEntities.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Folder Include="HlidacStatu.AI.LLM.Entities\" />
+    </ItemGroup>
+
 
 </Project>

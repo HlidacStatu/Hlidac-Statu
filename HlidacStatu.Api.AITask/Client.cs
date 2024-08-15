@@ -127,13 +127,22 @@ namespace HlidacStatu.Api.AITask
             }
         }
 
-        public async Task<HlidacStatu.DS.Api.AITask.Task> GetNextTaskAsync(string processEngine)
+        public async Task<HlidacStatu.DS.Api.AITask.Task> GetNextTaskAsync(string processEngine,
+            string filterByCallerId = null,
+            string filterByCallerTaskId = null,
+            string filterByCallerTaskType = null
+)
         {
             HlidacStatu.DS.Api.AITask.Task task = null;
             try
             {
                 task = await Simple.GetAsync<HlidacStatu.DS.Api.AITask.Task>(
-                    BaseApiUri.AbsoluteUri + $"api/v2/aitask/getnexttask?processEngine={System.Net.WebUtility.UrlEncode(processEngine)}",
+                    BaseApiUri.AbsoluteUri + 
+                    $"api/v2/aitask/getnexttask?processEngine={System.Net.WebUtility.UrlEncode(processEngine)}"
+                    + (filterByCallerId==null ? "" : $"&filterByCallerId={System.Net.WebUtility.UrlEncode(filterByCallerId)}")
+                    + (filterByCallerTaskId == null ? "" : $"&filterByCallerTaskId={System.Net.WebUtility.UrlEncode(filterByCallerTaskId)}")
+                    + (filterByCallerTaskType == null ? "" : $"&filterByCallerTaskType={System.Net.WebUtility.UrlEncode(filterByCallerTaskType)}")
+                    ,
                     false,
                     headers: new Dictionary<string, string>() { { "Authorization", this.ApiKey } },
                     timeout: this.TimeOut

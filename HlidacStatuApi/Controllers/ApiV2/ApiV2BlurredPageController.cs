@@ -198,7 +198,7 @@ namespace HlidacStatuApi.Controllers.ApiV2
                         TextArea = page.textArea
                     };
                     pagesMD.Add(pm);
-                    var t = PageMetadataRepo.SaveAsync(pm);
+                    Task t = PageMetadataRepo.SaveAsync(pm);
                     tasks.Add(t);
                     //t.Wait();
                 }

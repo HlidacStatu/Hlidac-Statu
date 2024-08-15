@@ -95,13 +95,13 @@ namespace HlidacStatu.Repositories
 
                 //TODO save to await HlidacStatu.Repositories.PermanentLLMRepo.SaveAsync(llmmm);
                 if (
-                    task.ResultType == typeof(HlidacStatu.Entities.PermanentLLM.ApiAITaskSummary).FullName
+                    task.ResultType == typeof(HlidacStatu.AI.LLM.Entities.ApiAITaskSummary).FullName
                     )
                 {
                     try
                     {
-                        HlidacStatu.Entities.PermanentLLM.ApiAITaskSummary summ =
-                            Newtonsoft.Json.JsonConvert.DeserializeObject<HlidacStatu.Entities.PermanentLLM.ApiAITaskSummary>(task.ResultSerialized);
+                        HlidacStatu.AI.LLM.Entities.ApiAITaskSummary summ =
+                            Newtonsoft.Json.JsonConvert.DeserializeObject<HlidacStatu.AI.LLM.Entities.ApiAITaskSummary>(task.ResultSerialized);
                         if (summ?.Summaries?.Length > 0)
                         {
                             foreach (var sum in summ.Summaries)

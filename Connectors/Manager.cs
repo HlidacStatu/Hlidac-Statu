@@ -598,7 +598,7 @@ namespace HlidacStatu.Connectors
                     res = await client.Indices
                        .CreateAsync(indexName, i => i
                            .InitializeUsing(idxSt)
-                           .Map<HlidacStatu.Entities.PermanentLLM.FullSummary>(map => map.AutoMap().DateDetection(false))  //TODO Summary to T or Object
+                           .Map<HlidacStatu.AI.LLM.Entities.FullSummary>(map => map.AutoMap().DateDetection(false))  //TODO Summary to T or Object
                        );
                     break;
                 case IndexType.Dotace:

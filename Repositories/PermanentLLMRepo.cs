@@ -1,4 +1,4 @@
-﻿using HlidacStatu.Entities.PermanentLLM;
+﻿using HlidacStatu.AI.LLM.Entities;
 using Nest;
 using System;
 using System.Linq;
@@ -75,7 +75,7 @@ namespace HlidacStatu.Repositories
         {
             var dbSP = await HlidacStatu.Connectors.Manager.GetESClient_PermanentLLMAsync();
 
-            var res = await dbSP.GetAsync<T>(Entities.PermanentLLM.BaseItem<T>
+            var res = await dbSP.GetAsync<T>(HlidacStatu.AI.LLM.Entities.BaseItem<T>
                 .GetId(documentType, documentId, partType, fileId));
             if (!res.Found && res.ServerError != null)
                 throw new ApplicationException(res.ServerError?.ToString());
@@ -89,7 +89,7 @@ namespace HlidacStatu.Repositories
         {
             var dbSP = await HlidacStatu.Connectors.Manager.GetESClient_PermanentLLMAsync();
 
-            var res = await dbSP.DocumentExistsAsync<object>(Entities.PermanentLLM.BaseItem
+            var res = await dbSP.DocumentExistsAsync<object>(HlidacStatu.AI.LLM.Entities.BaseItem
                 .GetId(documentType, documentId, partType, fileId));
             if (!res.IsValid && res.ServerError != null)
                 throw new ApplicationException(res.ServerError?.ToString());
@@ -130,7 +130,7 @@ namespace HlidacStatu.Repositories
         public static async Task<bool> ExistsAsync(string documentType, string documentId, string partType, string fileId = null)
         {
             if (
-                documentType == HlidacStatu.Entities.PermanentLLM.FullSummary.DOCUMENTTYPE
+                documentType == HlidacStatu.AI.LLM.Entities.FullSummary.DOCUMENTTYPE
                 && !string.IsNullOrEmpty(fileId)
                 )
                 return await _existsAsync(documentType, documentId, partType, fileId);

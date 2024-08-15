@@ -25,21 +25,21 @@ namespace HlidacStatu.Web.Controllers
         {
             string id = _id;
 
-            HlidacStatu.Entities.PermanentLLM.FullSummary[] AIFulldocs = await HlidacStatu.Repositories.PermanentLLMRepo
-                .SearchPerKeysAsync<HlidacStatu.Entities.PermanentLLM.FullSummary>(
-                HlidacStatu.Entities.PermanentLLM.FullSummary.DOCUMENTTYPE,
+            HlidacStatu.AI.LLM.Entities.FullSummary[] AIFulldocs = await HlidacStatu.Repositories.PermanentLLMRepo
+                .SearchPerKeysAsync<HlidacStatu.AI.LLM.Entities.FullSummary>(
+                HlidacStatu.AI.LLM.Entities.FullSummary.DOCUMENTTYPE,
                 _id,
-                HlidacStatu.Entities.PermanentLLM.FullSummary.PARTTYPE
+                HlidacStatu.AI.LLM.Entities.FullSummary.PARTTYPE
                 );
 
-            HlidacStatu.Entities.PermanentLLM.ShortSummary[] AIShortdocs = await HlidacStatu.Repositories.PermanentLLMRepo
-                .SearchPerKeysAsync<HlidacStatu.Entities.PermanentLLM.ShortSummary>(
-                HlidacStatu.Entities.PermanentLLM.ShortSummary.DOCUMENTTYPE,
+            HlidacStatu.AI.LLM.Entities.ShortSummary[] AIShortdocs = await HlidacStatu.Repositories.PermanentLLMRepo
+                .SearchPerKeysAsync<HlidacStatu.AI.LLM.Entities.ShortSummary>(
+                HlidacStatu.AI.LLM.Entities.ShortSummary.DOCUMENTTYPE,
                 _id,
-                HlidacStatu.Entities.PermanentLLM.ShortSummary.PARTTYPE
+                HlidacStatu.AI.LLM.Entities.ShortSummary.PARTTYPE
                 );
 
-            return View(new Tuple<Entities.PermanentLLM.ShortSummary[], Entities.PermanentLLM.FullSummary[], string>(
+            return View(new Tuple<HlidacStatu.AI.LLM.Entities.ShortSummary[], HlidacStatu.AI.LLM.Entities.FullSummary[], string>(
                 AIShortdocs, AIFulldocs, modalId));
         }
 

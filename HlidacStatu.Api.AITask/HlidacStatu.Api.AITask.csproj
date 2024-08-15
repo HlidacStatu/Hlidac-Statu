@@ -5,8 +5,8 @@
 		<AssemblyName>HlidacStatu.Api.AITask</AssemblyName>
 		<RootNamespace>HlidacStatu.Api.AITask</RootNamespace>
 		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-		<Version>2.6.0.0</Version>
-		<PackageReleaseNotes>API changes, duplicates</PackageReleaseNotes>
+		<Version>2.6.2.0</Version>
+		<PackageReleaseNotes>Update for API version 2.3.7.3</PackageReleaseNotes>
 		<Description>HlidacStatu.Api.AITask</Description>
 		<Title>$(AssemblyName)</Title>
 	</PropertyGroup>
