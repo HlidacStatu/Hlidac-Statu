@@ -45,14 +45,23 @@ namespace HlidacStatu.Repositories
         }
 
 
-        public static async Task<QAITask> GetNextToProcess(string processEngine, CancellationToken cancellationToken = default(CancellationToken))
+        public static async Task<QAITask> GetNextToProcess(string processEngine, 
+            string callerId = null,
+            string callerTaskId = null,
+            string callerTaskType = null,
+            CancellationToken cancellationToken = default(CancellationToken))
         {
             await using (DbEntities db = new DbEntities())
             {
 
                 var tbl = await db.QAITask
                     .AsQueryable()
-                    .Where(m => m.Status == (int)HlidacStatu.DS.Api.AITask.Task.CheckState.WaitingInQueue)
+                    .Where(m => 
+                        m.Status == (int)HlidacStatu.DS.Api.AITask.Task.CheckState.WaitingInQueue
+                        && (m.CallerId == callerId || callerId==null)
+                        && (m.CallerTaskId == callerTaskId || callerTaskId == null)
+                        && (m.CallerTaskType == callerTaskType || callerTaskType == null)
+                    )
                     .OrderByDescending(m => m.Priority).ThenBy(m=>m.Created)
                     .FirstOrDefaultAsync(cancellationToken);
 

@@ -64,9 +64,14 @@ namespace HlidacStatuApi.Controllers.ApiV2
         /// <returns>taskid</returns>
         [Authorize(Roles = "Admin,InternalQ")]
         [HttpGet("GetNextTask")]
-        public async Task<ActionResult<HlidacStatu.DS.Api.AITask.Task>> GetNextTask([FromQuery] string processEngine)
+        public async Task<ActionResult<HlidacStatu.DS.Api.AITask.Task>> GetNextTask(
+            [FromQuery] string processEngine,
+            [FromQuery] string filterByCallerId = null,
+            [FromQuery] string filterByCallerTaskId = null,
+            [FromQuery] string filterByCallerTaskType = null
+            )
         {
-            var q = await QAITaskRepo.GetNextToProcess(processEngine);
+            var q = await QAITaskRepo.GetNextToProcess(processEngine, filterByCallerId, filterByCallerTaskId, filterByCallerTaskType);
 
 
             if (q == null)
