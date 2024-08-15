@@ -19,6 +19,8 @@ namespace HlidacStatu.Entities
         [Required]
         [Column("query")]
         public string Query { get; set; }
+        [Column("queryPlaty")]
+        public string QueryPlaty { get; set; }
         [Required]
         [Column("type")]
         public string Type { get; set; }

@@ -276,6 +276,7 @@ namespace HlidacStatu.Entities
         public virtual DbSet<PuCZISCO> PuCZISCO { get; set; }
         public virtual DbSet<PuOrganizaceMetadata> PuOrganizaceMetadata { get; set; }
         public virtual DbSet<PuOrganizaceTag> PuOrganizaceTags { get; set; }
+        public virtual DbSet<AutocompleteSynonym> AutocompleteSynonyms { get; set; }
 
         //views
         public DbSet<FindPersonDTO> FindPersonView { get; set; }
