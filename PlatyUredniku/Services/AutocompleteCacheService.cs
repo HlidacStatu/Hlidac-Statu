@@ -71,8 +71,9 @@ public class AutocompleteCacheService
         var organizaceTask = LoadOrganizace(cancellationToken);
         var oblastTask = LoadOblasti(cancellationToken);
         var ceoTask = LoadCeos(cancellationToken);
+        var synonymsTask = LoadSynonyms(cancellationToken);
 
-        await Task.WhenAll(organizaceTask, oblastTask, ceoTask);
+        await Task.WhenAll(organizaceTask, oblastTask, ceoTask, synonymsTask);
 
         if (cancellationToken.IsCancellationRequested)
             return Enumerable.Empty<Autocomplete>().ToList();
@@ -80,6 +81,7 @@ public class AutocompleteCacheService
         results.AddRange(organizaceTask.Result);
         results.AddRange(oblastTask.Result);
         results.AddRange(ceoTask.Result);
+        results.AddRange(synonymsTask.Result);
 
         return results;
     }
@@ -169,10 +171,31 @@ public class AutocompleteCacheService
                 })
                 .ToList();
             results.AddRange(autocomplete);
-
-
         }
 
+        return results;
+    }
+    
+    private static async Task<List<Autocomplete>> LoadSynonyms(CancellationToken cancellationToken)
+    {
+        await using var db = new DbEntities();
+
+        var synonyma = await db.AutocompleteSynonyms.AsNoTracking()
+            .Where(p => p.QueryPlaty != null)
+            .Where(p => p.Active == 1)
+            .ToListAsync(cancellationToken: cancellationToken);
+
+        var results = synonyma.Select(s => new Autocomplete()
+        {
+            Id = $"/detail/{s.QueryPlaty}",
+            Text = s.Text,
+            Type = "instituce",
+            PriorityMultiplier = 1,
+            ImageElement = $"<i class='fas fa-university'></i>",
+            Description = "", //puvodne $"{o.Oblast}" //TODO zmenit na tagy?
+            Category = Autocomplete.CategoryEnum.Synonym
+        }).ToList();
+        
         return results;
     }
 }
