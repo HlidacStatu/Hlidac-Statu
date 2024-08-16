@@ -178,10 +178,10 @@ namespace HlidacStatuApi.Controllers.ApiV2
 
     public class TrackingData
     {
-        public string[] SelectedValues { get; set; }
-        public string SelectedValue { get; set; }
-        public string LastQuery { get; set; }
-        public string Source { get; set; }
-        public string Type { get; set; }
+        public string[]? SelectedValues { get; set; }
+        public string? SelectedValue { get; set; }
+        public string? LastQuery { get; set; }
+        public string? Source { get; set; }
+        public string? Type { get; set; }
     }
 }
