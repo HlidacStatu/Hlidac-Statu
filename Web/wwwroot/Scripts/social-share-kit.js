@@ -1,5 +1,5 @@
 /*!
- * Social Share Kit v1.0.15 (http://socialsharekit.com)
+ * Social Share Kit v1.0.14 (http://socialsharekit.com)
  * Copyright 2015 Social Share Kit / Kaspars Sprogis.
  * @Licensed under Creative Commons Attribution-NonCommercial 3.0 license:
  * https://github.com/darklow/social-share-kit/blob/master/LICENSE
@@ -35,14 +35,10 @@ var SocialShareKit = (function () {
                     }
 
                     if (el.getAttribute('data-ssk-ready'))
-                        if (options.reinitialize && el._skkListener) {
-                            removeEventListener(el, 'click', el._skkListener);
-                        } else
-                            return;
+                        return;
 
                     el.setAttribute('data-ssk-ready', true);
                     addEventListener(el, 'click', onClick);
-                    el._skkListener = onClick
 
                     // Gather icons with share counts
                     if (el.parentNode.className.indexOf('ssk-count') !== -1) {
@@ -167,13 +163,6 @@ var SocialShareKit = (function () {
                 handler.call(el);
             });
         }
-    }
-
-    function removeEventListener(el, eventName, handler) {
-        if (el.removeEventListener)
-            el.removeEventListener(eventName, handler);
-        else
-            el.detachEvent('on' + eventName, handler);
     }
 
     function elSupportsShare(el) {
