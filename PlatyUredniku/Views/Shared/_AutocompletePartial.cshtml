@@ -73,10 +73,9 @@
 
             // Prepare the data as a Blob
             const blobData = new Blob([JSON.stringify(data)], { type: 'application/json' });
-            const jsonData = JSON.stringify(data);
 
             // Send the data using the Beacon API
-            const success = navigator.sendBeacon(url, jsonData);
+            const success = navigator.sendBeacon(url, blobData);
 
             if (!success) {
                 console.error("Data could not be sent with sendBeacon");
