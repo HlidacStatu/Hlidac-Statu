@@ -34,7 +34,7 @@ namespace HlidacStatuApi.Controllers.ApiV2
         }
 
         [ApiExplorerSettings(IgnoreApi = true)]
-        [HttpGet("tracking")]
+        [HttpPost("tracking")]
         public async Task<ActionResult> Tracking([FromBody] TrackingData data)
         {
             //possible incomming objects:
