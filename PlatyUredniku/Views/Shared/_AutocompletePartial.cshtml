@@ -64,6 +64,27 @@
 </div>
 
 <script>
+    
+    var autocompleteLastQuery ='';
+
+    function sendTrackingDataToAPI(data) {
+        try {
+            const url = "https://api.hlidacstatu.cz/api/v2/tracking";
+
+            // Prepare the data as a Blob
+            const blobData = new Blob([JSON.stringify(data)], { type: 'application/json' });
+
+            // Send the data using the Beacon API
+            const success = navigator.sendBeacon(url, blobData);
+
+            if (!success) {
+                console.error("Data could not be sent with sendBeacon");
+            }
+        } catch (e) {
+            // If an exception occurs, do nothing (fire and forget)
+        }
+    }
+    
         $(document).ready(function() {
             $('#autocomplete').selectize({
                 maxItems: 1,
@@ -139,12 +160,22 @@
                         this.clearOptions();
                         this.close();
                     }
+                    autocompleteLastQuery = str;
                     this.clearOptions();
                     
                     //this.load(this.settings.load.bind(this, str));
                 },
                 onItemAdd: function(value, $item) {
                     // Clear all options when an item is added
+                    
+                    // send tracking
+                    let trackingData = {};
+                    trackingData.selectedValue = value.split('÷')[0];
+                    trackingData.lastQuery = autocompleteLastQuery;
+                    trackingData.source = window.location.href;
+                    trackingData.type = 'partialAutocomplete';
+                    sendTrackingDataToAPI(trackingData);
+                    
                     this.clearOptions();
                     this.close();
                     $('#searchSpiner').css('display', 'inline-block;');
@@ -173,4 +204,5 @@
             });
             
         });
-    </script>
+    
+</script>
