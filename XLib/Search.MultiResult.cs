@@ -309,7 +309,8 @@ namespace HlidacStatu.XLib
                     {
                         Devmasters.DT.StopWatchEx sw = new Devmasters.DT.StopWatchEx();
                         sw.Start();
-                        if (false)
+                        
+                        if (true)
                         {
                             var wpSearch = new HlidacStatu.Lib.Data.External.Wordpress.Searching(new System.Uri("http://texty.hlidacstatu.cz"));
                             var wpRes = await wpSearch.SearchAsync(query, 1, 5);
