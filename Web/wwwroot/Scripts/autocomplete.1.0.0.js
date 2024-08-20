@@ -1,11 +1,12 @@
 ﻿//autocomplete
 
 class AutocompleteManager {
-    constructor(selector, inputTagsJson, options = {}) {
+    constructor(selector, targetSearchUri, inputTagsJson, options = {}) {
         this.selector = selector;
         this.autocompleteLastQuery = '';
         this.options = options;
         this.inputTagsJson = inputTagsJson;
+        this.targetSearchUri = targetSearchUri;
         this.init();
     }
 
@@ -183,7 +184,7 @@ class AutocompleteManager {
         sendTrackingDataToAPI(trackingData);
 
         var encodedQs = encodeURIComponent(qs);
-        var newUrl = `/hledat?q=${encodedQs}&qtl=${qtl}&u=1`;
+        var newUrl = this.targetSearchUri + `?q=${encodedQs}&qtl=${qtl}&u=1`;
         window.location.href = newUrl;
     }
 

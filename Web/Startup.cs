@@ -289,9 +289,9 @@ namespace HlidacStatu.Web
                     "Scripts/Highcharts-8/js/highcharts.js",
                     "Scripts/highcharts.global.options.js");
 
-                pipeline.AddJavaScriptBundle("/bundles/typeahead",
-                    "Scripts/typeahead.bundle.min.js",
-                    "Scripts/bloodhound.min.js");
+                //pipeline.AddJavaScriptBundle("/bundles/typeahead",
+                //    "Scripts/typeahead.bundle.min.js",
+                //    "Scripts/bloodhound.min.js");
             });
         }
 
