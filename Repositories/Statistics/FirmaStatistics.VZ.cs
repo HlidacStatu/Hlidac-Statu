@@ -45,9 +45,16 @@ keyValueSelector: obj => obj.firma.ICO + "-" + obj.aktualnost.ToString());
             return _holdingVZCache.Get((firma, aktualnost));
         }
 
+        public static void RemoveStatisticsVZ(Firma firma)
+        {
+            _VZCache.Delete(firma);
+            _holdingVZCache.Delete((firma, HlidacStatu.DS.Graphs.Relation.AktualnostType.Aktualni));
+            _holdingVZCache.Delete((firma, HlidacStatu.DS.Graphs.Relation.AktualnostType.Nedavny));
+            _holdingVZCache.Delete((firma, HlidacStatu.DS.Graphs.Relation.AktualnostType.Libovolny));
+        }
         public static StatisticsSubjectPerYear<Firma.Statistics.VZ> CachedStatisticsVZ(
-            Firma firma,
-            bool forceUpdateCache = false)
+        Firma firma,
+        bool forceUpdateCache = false)
         {
 
             if (forceUpdateCache)

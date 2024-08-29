@@ -59,9 +59,18 @@ namespace HlidacStatu.Repositories.Statistics
         }
 
 
+        public static void RemoveStatisticsDotace(Firma firma)
+        {            
+            _dotaceCache.DeleteAsync(firma).ConfigureAwait(false).GetAwaiter().GetResult();
+            _holdingDotaceCache.Delete((firma, DS.Graphs.Relation.AktualnostType.Aktualni));
+            _holdingDotaceCache.Delete((firma, DS.Graphs.Relation.AktualnostType.Nedavny));
+            _holdingDotaceCache.Delete((firma, DS.Graphs.Relation.AktualnostType.Libovolny));
+
+        }
+
         public async static Task<StatisticsSubjectPerYear<Firma.Statistics.Dotace>> CachedStatisticsDotaceAsync(
-            Firma firma,
-            bool forceUpdateCache = false)
+        Firma firma,
+        bool forceUpdateCache = false)
         {
             await Task.Delay(100);
             if (forceUpdateCache)
