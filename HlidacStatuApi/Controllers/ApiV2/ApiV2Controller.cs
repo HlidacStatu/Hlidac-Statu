@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel;
 using System.Net;
+using HlidacStatu.Entities.Entities;
 using HlidacStatu.Repositories;
 using HlidacStatuApi.Models;
 using Microsoft.AspNetCore.Authorization;
@@ -83,6 +84,24 @@ namespace HlidacStatuApi.Controllers.ApiV2
             return StatusCode(id ?? 200, $"error {id}");
         }
 
+        [ApiExplorerSettings(IgnoreApi = true)]
+        [Authorize(Roles = "Admin")]
+        [HttpPost("setvazbasmlouvazakazka")]
+        public async Task<ActionResult> SetVazbaSmlouvaZakazka([FromBody] SmlouvaVerejnaZakazka data)
+        {
+            try
+            {
+                await SmlouvaVerejnaZakazkaRepo.Upsert(data);
+            }
+            catch (Exception e)
+            {
+                _logger.Error(e, "Error upserting smlouvaZakazka");
+                return StatusCode(500, $"error {e}");
+            }
+            
+            return Ok();
+        }
+        
         //[ApiExplorerSettings(IgnoreApi = true)]
         [Authorize]
         [HttpGet("getmyip")]

@@ -214,8 +214,9 @@ namespace HlidacStatu.Entities
                 _ = entity.Property(e => e.Created).HasDefaultValueSql("(getdate())");
             });
 
+            _ = modelBuilder.Entity<SmlouvaVerejnaZakazka>()
+                .HasKey(s => new { s.VzId, s.IdSmlouvy }); 
             
-
         }
 
         public virtual DbSet<UptimeServer> UptimeServers { get; set; }
@@ -277,6 +278,8 @@ namespace HlidacStatu.Entities
         public virtual DbSet<PuOrganizaceMetadata> PuOrganizaceMetadata { get; set; }
         public virtual DbSet<PuOrganizaceTag> PuOrganizaceTags { get; set; }
         public virtual DbSet<AutocompleteSynonym> AutocompleteSynonyms { get; set; }
+        
+        public virtual DbSet<SmlouvaVerejnaZakazka> SmlouvyVerejneZakazky { get; set; }
 
         //views
         public DbSet<FindPersonDTO> FindPersonView { get; set; }
