@@ -4,6 +4,7 @@ using HlidacStatuApi.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
+using ILogger = Serilog.ILogger;
 
 namespace HlidacStatuApi.Controllers.ApiV2
 {
@@ -11,6 +12,9 @@ namespace HlidacStatuApi.Controllers.ApiV2
     [Route("api/v2/verejnezakazky")]
     public class ApiV2VZController : ControllerBase
     {
+        
+        private readonly ILogger _logger = Serilog.Log.ForContext<ApiV2VZController>();
+
         /// <summary>
         /// Detail veřejné zakázky
         /// </summary>
@@ -91,6 +95,23 @@ namespace HlidacStatuApi.Controllers.ApiV2
 
                 return new SearchResultDTO<VerejnaZakazka>(result.Total, result.Page, zakazky);
             }
+        }
+        
+        [ApiExplorerSettings(IgnoreApi = true)]
+        [Authorize(Roles = "Admin")]
+        [HttpGet("hledatids")]
+        public async Task<ActionResult<List<string>>> HledatIds([FromQuery] int year)
+        {
+            try
+            {
+                return await VerejnaZakazkaRepo.Searching.GetAllIdsAsync(year);
+            }
+            catch (Exception e)
+            {
+                _logger.Error(e, "HledatIds failed during searching");
+                return StatusCode(500, $"error {e}");
+            }
+
         }
     }
 }

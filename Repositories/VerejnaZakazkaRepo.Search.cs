@@ -528,6 +528,38 @@ namespace HlidacStatu.Repositories
                 return YieldAllAsync(qc);
             }
 
+            public static async Task<List<string>> GetAllIdsAsync(int year)
+            {
+                List<string> ids2Process = new List<string>();
+                Func<int, int, Task<ISearchResponse<VerejnaZakazka>>> searchFunc = null;
+
+                string query = $"zverejneno:[{year}-01-01 TO {year}-12-31]";
+
+                searchFunc = async (size, page) =>
+                {
+                    var client = await Manager.GetESClient_VerejneZakazkyAsync();
+                    return await client.SearchAsync<VerejnaZakazka>(a => a
+                        .Size(size)
+                        .From(page * size)
+                        .Source(false)
+                        .Query(q => VerejnaZakazkaRepo.Searching.GetSimpleQuery(
+                            new Repositories.Searching.VerejnaZakazkaSearchData() { Q = query }))
+                        .Scroll("1m")
+                    );
+                };
+
+
+                await Repositories.Searching.Tools.DoActionForQueryAsync<VerejnaZakazka>(
+                    await Manager.GetESClient_VerejneZakazkyAsync(),
+                    searchFunc, (hit, param) =>
+                    {
+                        ids2Process.Add(hit.Id);
+                        return new Devmasters.Batch.ActionOutputData() { CancelRunning = false, Log = null };
+                    }, null, null, null, false, blockSize: 100, prefix: "ocr VZ ");
+                
+                return ids2Process;
+            }
+
             private static async IAsyncEnumerable<VerejnaZakazka> YieldAllAsync(QueryContainer query,
                 string scrollTimeout = "2m",
                 int scrollSize = 300)

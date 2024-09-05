@@ -10,5 +10,5 @@ public class SmlouvaVerejnaZakazka
     [MaxLength(255)]
     public string IdSmlouvy { get; set; }
     public double CosineSimilarity { get; set; }
-    public DateTime ModifiedDate { get; set; }
+    public DateTime ModifiedDate { get; set; } = DateTime.Now;
 }
