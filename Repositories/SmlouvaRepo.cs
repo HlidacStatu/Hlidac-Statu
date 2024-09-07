@@ -42,7 +42,8 @@ namespace HlidacStatu.Repositories
             return res;
         }
 
-        public async static Task<bool?> CheckContractPartiesAsync(Smlouva smlouva, HlidacStatu.AI.LLM.Clients.BaseClient llmClient, int maxWordsFromBeginningOfTheText = 1000)
+        public async static Task<bool?> CheckContractPartiesWithAIAsync(Smlouva smlouva, 
+            HlidacStatu.AI.LLM.Clients.BaseClient llmClient, int maxWordsFromBeginningOfTheText = 1000)
         {
             if (smlouva == null)
                 throw new ArgumentNullException(nameof(smlouva));
@@ -50,6 +51,7 @@ namespace HlidacStatu.Repositories
             var smlouvaParties = ToContractParties(smlouva);
 
             bool? ok = null;
+            
             HlidacStatu.AI.LLM.ContractParties llm = new AI.LLM.ContractParties(llmClient);
             HlidacStatu.AI.LLM.Models.Model model = HlidacStatu.AI.LLM.Models.Model.Llama31;
 
@@ -66,17 +68,19 @@ namespace HlidacStatu.Repositories
                         break;
                 }
                 AI.LLM.ContractParties.Result contractPartiesRes = await llm.FindContractPartiesAsync(t.ToString(), maxWordsFromBeginningOfTheText, model);
-
-                string log = "";
-                ok=AI.LLM.ContractParties.Result.Compare(smlouvaParties, contractPartiesRes, out log);
-                if (ok == true)
-                    return ok;
-                                
+               
             }
 
             return ok;
         }
 
+
+        /// <summary>
+        /// Deletes a Smlouva asynchronously.
+        /// </summary>
+        /// <param name="smlouva">The Smlouva to be deleted.</param>
+        /// <param name="client">Optional. The ElasticClient to use for the deletion. If not provided, a default client will be used.</param>
+        /// <returns>A Task representing the asynchronous operation. The task result contains a boolean indicating whether the deletion was successful.</returns>
         public static Task<bool> DeleteAsync(Smlouva smlouva, ElasticClient client = null)
         {
             return DeleteAsync(smlouva.Id);

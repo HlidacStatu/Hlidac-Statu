@@ -5,6 +5,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 
 namespace HlidacStatu.Entities.Entities;
+
 [Table("PU_Organizace")]
 public class PuOrganizace 
 {

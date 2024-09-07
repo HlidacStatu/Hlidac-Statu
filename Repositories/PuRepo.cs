@@ -223,7 +223,7 @@ inner join Firma_DS fds
             .Where(pu => pu.DS == tip.DS)
             .Include(o => o.Metadata)
             .Include(o => o.Tags)
-            .Include(o => o.FirmaDs)
+            //.Include(o => o.FirmaDs)
             .Include(o => o.Platy) // Include PuPlat
             .FirstOrDefaultAsync();
     }

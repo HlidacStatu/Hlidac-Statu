@@ -18,10 +18,10 @@ namespace HlidacStatu.Repositories
     {
 
         public static string[] IgnoredIcos = Config
-    .GetWebConfigValue("DontIndexFirmy")
-    .Split(new string[] { ";", "," }, StringSplitOptions.RemoveEmptyEntries)
-    .Select(m => m.ToLower())
-    .ToArray();
+            .GetWebConfigValue("DontIndexFirmy")
+            .Split(new string[] { ";", "," }, StringSplitOptions.RemoveEmptyEntries)
+            .Select(m => m.ToLower())
+            .ToArray();
 
 
         private static readonly ILogger _logger = Log.ForContext(typeof(FirmaRepo));

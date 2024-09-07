@@ -1,29 +1,46 @@
 using Devmasters;
-
+using HlidacStatu.Connectors;
 using HlidacStatu.DS.Graphs;
 using HlidacStatu.Entities;
+using HlidacStatu.Entities.Entities;
+using HlidacStatu.Entities.KIndex;
+using HlidacStatu.Entities.Views;
+using HlidacStatu.Lib.Data.External.RPP;
 using HlidacStatu.Repositories;
+using HlidacStatu.Repositories.Analysis.KorupcniRiziko;
 using HlidacStatu.Repositories.Statistics;
 using HlidacStatu.Util;
-
 using Microsoft.EntityFrameworkCore;
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
-using HlidacStatu.Connectors;
-using HlidacStatu.Entities.KIndex;
-using HlidacStatu.Entities.Views;
-using HlidacStatu.Lib.Data.External.RPP;
-using HlidacStatu.Repositories.Analysis.KorupcniRiziko;
-using Devmasters.Collections;
 
 namespace HlidacStatu.Extensions
 {
     public static class FirmaExtension
     {
+
+        public static async Task<PuPlatStat> GetPlatyStatAsync(this Firma firma, int rok = PuRepo.DefaultYear)
+        {
+            var org = await PuRepo.GetFullDetailAsync(firma.DatovaSchranka);
+            if (org == null)
+                return null;
+            var platyStat = new PuPlatStat(org.Platy);
+
+            return platyStat;
+        }
+
+        public static async Task<string> GetPlatyUrlAsync(this Firma firma)
+        {
+            var org = await PuRepo.GetFullDetailAsync(firma.DatovaSchranka);
+            if (org == null)
+                return null;
+            return org.GetUrl(false);
+        }
+
+
         public static IEnumerable<SocialContact> GetSocialContacts(this Firma firma)
         {
             return firma.Events(oe => oe.Type == (int)OsobaEvent.Types.SocialniSite)
@@ -71,15 +88,15 @@ namespace HlidacStatu.Extensions
             };
 
             var r = from oe in db.OsobaEvent
-                join os in db.Osoba on oe.OsobaId equals os.InternalId
-                where eventTypes.Any(et => et == oe.Type)
-                where oe.Ico == firma.ICO
-                orderby oe.DatumOd descending, oe.DatumDo descending 
-                select new NapojenaOsoba()
-                {
-                    Osoba = os,
-                    OsobaEvent = oe
-                };
+                    join os in db.Osoba on oe.OsobaId equals os.InternalId
+                    where eventTypes.Any(et => et == oe.Type)
+                    where oe.Ico == firma.ICO
+                    orderby oe.DatumOd descending, oe.DatumDo descending
+                    select new NapojenaOsoba()
+                    {
+                        Osoba = os,
+                        OsobaEvent = oe
+                    };
 
 
             return await r.ToListAsync();
@@ -119,15 +136,15 @@ namespace HlidacStatu.Extensions
         public static async Task<KategorieOVM[]> KategorieOVMAsync(this Firma firma)
         {
             Lib.Data.External.RPP.KategorieOVM[] _kategorieOVM = null;
-            
-            var client = await Manager.GetESClient_RPP_KategorieAsync(); 
+
+            var client = await Manager.GetESClient_RPP_KategorieAsync();
             var res = await client.SearchAsync<Lib.Data.External.RPP.KategorieOVM>(
                 s => s
                     .Query(q => q.QueryString(qs => qs.Query($"oVM_v_kategorii.kodOvm:{firma.ICO}")))
                     .Source(so => so.Excludes(ex => ex.Field("oVM_v_kategorii")))
                     .Size(150)
             );
-            
+
             if (res.IsValid)
                 _kategorieOVM = res.Hits
                     .Select(m => m.Source)
@@ -136,7 +153,7 @@ namespace HlidacStatu.Extensions
                     .ToArray();
             else
                 _kategorieOVM = new Lib.Data.External.RPP.KategorieOVM[] { };
-            
+
 
             return _kategorieOVM;
         }
@@ -153,7 +170,7 @@ namespace HlidacStatu.Extensions
             //STAT FIX
             //return new();
 
-            return FirmaStatistics.CachedStatisticsDotace(firma,forceUpdateCache);
+            return FirmaStatistics.CachedStatisticsDotace(firma, forceUpdateCache);
         }
         public static Lib.Analytics.StatisticsSubjectPerYear<Firma.Statistics.Dotace> HoldingStatistikaDotaci(
             this Firma firma,
@@ -162,7 +179,7 @@ namespace HlidacStatu.Extensions
             //STAT FIX
             //return new();
 
-            return FirmaStatistics.CachedHoldingStatisticsDotace(firma, aktualnost,forceUpdateCache);
+            return FirmaStatistics.CachedHoldingStatisticsDotace(firma, aktualnost, forceUpdateCache);
         }
 
         public static Lib.Analytics.StatisticsSubjectPerYear<Firma.Statistics.VZ> StatistikaVerejneZakazky(this Firma firma, bool forceUpdateCache = false)
@@ -284,7 +301,7 @@ namespace HlidacStatu.Extensions
         {
             List<(string jmeno, string prijmeni, DateTime? poslednizmena)> osoby = new List<(string jmeno, string prijmeni, DateTime? poslednizmena)>();
 
-            if (firma.Valid == false || string.IsNullOrEmpty(firma.ICO)) 
+            if (firma.Valid == false || string.IsNullOrEmpty(firma.ICO))
                 return osoby.ToArray();
 
             var client = await Manager.GetESClient_RPP_OVMAsync();
@@ -511,7 +528,7 @@ namespace HlidacStatu.Extensions
                     .Select(s => s.ToHtml())
                     .Take(take));
         }
-        
+
         public static IEnumerable<OsobaEvent> Events(this Firma firma, Expression<Func<OsobaEvent, bool>> predicate)
         {
             using (DbEntities db = new DbEntities())
@@ -535,7 +552,7 @@ namespace HlidacStatu.Extensions
             var result = SponzoringRepo.Create(sponzoring, user);
             return result;
         }
-        
+
         public static string Description(this Firma firma, bool html, Expression<Func<OsobaEvent, bool>> predicate,
             string template = "{0}", string itemTemplate = "{0}",
             string itemDelimeter = "<br/>", int numOfRecords = int.MaxValue)
@@ -560,7 +577,7 @@ namespace HlidacStatu.Extensions
                 else if (evs.Count > 0)
                 {
                     return string.Format(template,
-                        string.Join("\n",evs)
+                        string.Join("\n", evs)
                     );
                 }
                 else return string.Empty;
@@ -588,7 +605,7 @@ namespace HlidacStatu.Extensions
                 .Where(m => m.IcoDarce == firma.ICO && m.DarovanoDne < date)
                 .Any();
         }
-        
+
         static Devmasters.Cache.Redis.Manager<InfoFact[], Firma> _infoFactsCache()
         {
             var cache = Devmasters.Cache.Redis.Manager<InfoFact[], Firma>
