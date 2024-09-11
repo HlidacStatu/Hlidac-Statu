@@ -10,7 +10,7 @@ public static class SmlouvaVerejnaZakazkaRepo
     {
         await using DbEntities db = new DbEntities();
         
-        db.SmlouvyVerejneZakazky.Update(smlouvaVerejnaZakazka);
+        db.SmlouvaVerejnaZakazka.Update(smlouvaVerejnaZakazka);
 
         // Save changes to the database
         await db.SaveChangesAsync();

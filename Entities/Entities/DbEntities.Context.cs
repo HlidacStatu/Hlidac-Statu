@@ -279,7 +279,7 @@ namespace HlidacStatu.Entities
         public virtual DbSet<PuOrganizaceTag> PuOrganizaceTags { get; set; }
         public virtual DbSet<AutocompleteSynonym> AutocompleteSynonyms { get; set; }
         
-        public virtual DbSet<SmlouvaVerejnaZakazka> SmlouvyVerejneZakazky { get; set; }
+        public virtual DbSet<SmlouvaVerejnaZakazka> SmlouvaVerejnaZakazka { get; set; }
 
         //views
         public DbSet<FindPersonDTO> FindPersonView { get; set; }
