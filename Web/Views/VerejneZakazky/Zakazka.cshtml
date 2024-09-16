@@ -263,9 +263,9 @@ else
                        if (smlouva is not null)
                        {
                            <a asp-controller="Home" asp-action="Detail" asp-route-Id="@smlouvaForVz.IdSmlouvy">@smlouvaForVz.IdSmlouvy - @smlouva.predmet</a>
-                           if (smlouva.hodnotaVcetneDph.HasValue)
+                           if (smlouva.hodnotaBezDph.HasValue)
                            {
-                              <span>(Hodnota včetně dph - @RenderData.NicePriceHtml(smlouva.hodnotaVcetneDph.Value))</span><br/>
+                              <span>(@RenderData.NicePriceHtml(smlouva.hodnotaBezDph.Value))</span><br/>
                            }
                        }
                    }
