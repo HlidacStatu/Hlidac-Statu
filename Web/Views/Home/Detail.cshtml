@@ -298,16 +298,20 @@
 
     @{
         var vzForSmlouva = await SmlouvaVerejnaZakazkaRepo.GetVzForSmlouva(Model.Id);
-        var vz = await VerejnaZakazkaRepo.LoadFromESAsync(vzForSmlouva.VzId);
-    }
-    @if (vz is not null)
-    {
-        <tr>
-            <td>Veřejná zakázka dle které byla pravděpodobně uzavřena tato smlouva</td>
-            <td>
-                <a asp-controller="VerejneZakazky" asp-action="Zakazka" asp-route-Id="@vzForSmlouva.VzId">@vz.NazevZakazky</a>
-            </td>
-        </tr>
+        if (vzForSmlouva is not null)
+        {
+            var vz = await VerejnaZakazkaRepo.LoadFromESAsync(vzForSmlouva.VzId);
+            if (vz is not null)
+            {
+                <tr>
+                    <td>Veřejná zakázka dle které byla pravděpodobně uzavřena tato smlouva</td>
+                    <td>
+                        <a asp-controller="VerejneZakazky" asp-action="Zakazka" asp-route-Id="@vzForSmlouva.VzId">@vz.NazevZakazky</a>
+                    </td>
+                </tr>
+            }
+            
+        }
     }
         
     <tr>
