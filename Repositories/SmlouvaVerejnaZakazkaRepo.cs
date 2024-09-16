@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using HlidacStatu.Entities;
 using HlidacStatu.Entities.Entities;
@@ -27,5 +29,27 @@ public static class SmlouvaVerejnaZakazkaRepo
         }
         
         await db.SaveChangesAsync();
+    }
+
+    public static async Task<List<SmlouvaVerejnaZakazka>> GetSmlouvyForVz(string idVz)
+    {
+        await using DbEntities db = new DbEntities();
+        
+        var smlouvy = await db.SmlouvaVerejnaZakazka.Where( s => s.VzId == idVz && s.CosineSimilarity > 0.5d )
+            .ToListAsync();
+
+        return smlouvy;
+    }
+    
+    public static async Task<SmlouvaVerejnaZakazka> GetVzForSmlouva(string idsmlouvy)
+    {
+        await using DbEntities db = new DbEntities();
+        
+        var vz = await db.SmlouvaVerejnaZakazka
+            .Where( s => s.IdSmlouvy == idsmlouvy && s.CosineSimilarity > 0.5d )
+            .OrderByDescending(x => x.CosineSimilarity)
+            .FirstOrDefaultAsync();
+
+        return vz;
     }
 }

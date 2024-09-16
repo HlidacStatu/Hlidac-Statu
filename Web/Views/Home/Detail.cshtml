@@ -278,24 +278,39 @@
             </td>
         </tr>
 
-        <tr>
-            <td>Hodnota smlouvy</td>
-            <td>
+    <tr>
+        <td>Hodnota smlouvy</td>
+        <td>
 
-                @Html.Raw(Model.hodnotaBezDph.HasValue ? $"<p>Cena bez DPH: <b>{Smlouva.NicePrice(Model.hodnotaBezDph, html: true)}</b></p>" : "")
-                @Html.Raw(Model.hodnotaVcetneDph.HasValue ? $"<p>Cena s DPH: <b>{Smlouva.NicePrice(Model.hodnotaVcetneDph, html: true)}</b></p>" : "")
-                @if (Model.ciziMena != null && Model.ciziMena.mena != null)
-                {
-                    @Html.Raw(Model.ciziMena.hodnota > 0 && Model.ciziMena.mena != "CZK" ?
-                             $"<p>Cena v cizí měně: <b>{Smlouva.NicePrice(Model.ciziMena.hodnota, Model.ciziMena.mena, html: true)}</b></p>" : "")
-                }
-                @if (string.IsNullOrWhiteSpace(Model.cenaNeuvedenaDuvod) == false)
-                {
-                    <p>Důvod neuvedení ceny od zveřejňovatele: <code>@Model.cenaNeuvedenaDuvod</code></p>
-                }
+            @Html.Raw(Model.hodnotaBezDph.HasValue ? $"<p>Cena bez DPH: <b>{Smlouva.NicePrice(Model.hodnotaBezDph, html: true)}</b></p>" : "")
+            @Html.Raw(Model.hodnotaVcetneDph.HasValue ? $"<p>Cena s DPH: <b>{Smlouva.NicePrice(Model.hodnotaVcetneDph, html: true)}</b></p>" : "")
+            @if (Model.ciziMena != null && Model.ciziMena.mena != null)
+            {
+                @Html.Raw(Model.ciziMena.hodnota > 0 && Model.ciziMena.mena != "CZK" ?
+                    $"<p>Cena v cizí měně: <b>{Smlouva.NicePrice(Model.ciziMena.hodnota, Model.ciziMena.mena, html: true)}</b></p>" : "")
+            }
+            @if (string.IsNullOrWhiteSpace(Model.cenaNeuvedenaDuvod) == false)
+            {
+                <p>Důvod neuvedení ceny od zveřejňovatele: <code>@Model.cenaNeuvedenaDuvod</code></p>
+            }
+        </td>
+    </tr>
+
+    @{
+        var vzForSmlouva = await SmlouvaVerejnaZakazkaRepo.GetVzForSmlouva(Model.Id);
+        var vz = await VerejnaZakazkaRepo.LoadFromESAsync(vzForSmlouva.VzId);
+    }
+    @if (vz is not null)
+    {
+        <tr>
+            <td>Veřejná zakázka dle které byla pravděpodobně uzavřena tato smlouva</td>
+            <td>
+                <a asp-controller="VerejneZakazky" asp-action="Zakazka" asp-route-Id="@vzForSmlouva.VzId">@vz.NazevZakazky</a>
             </td>
         </tr>
-        <tr>
+    }
+        
+    <tr>
             <td>Přílohy</td>
             <td>
                 @if (Model.Prilohy != null && Model.Prilohy.Count() > 0)
