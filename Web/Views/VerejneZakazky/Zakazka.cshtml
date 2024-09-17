@@ -299,9 +299,11 @@ else
         <tr>
             <td>Další známé url</td>
             <td>
-                @foreach (var url in Model.UrlZakazky)
+                @foreach (var url in Model.UrlZakazky.Select(u => u.Replace("https://www.vestnikverejnychzakazek.cz/SearchForm/SearchContract?contractNumber=",
+                              "https://vvz.nipez.cz/formulare-zakazky/")))
                 {
-                    <a href="@url">@url</a><br/>
+                    <a href="@url">@url</a>
+                    <br/>
                 }
             </td>
         </tr>
