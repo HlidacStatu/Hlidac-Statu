@@ -125,6 +125,7 @@ namespace HlidacStatu.Repositories
             
             try
             {
+                
                 // try to find Ico
                 if (newVZ.Zadavatel.ICO is null)
                 {
@@ -136,6 +137,7 @@ namespace HlidacStatu.Repositories
                 // there might be issues to find proper ICO, so we have to save half-complete VZ
                 if (string.IsNullOrWhiteSpace(newVZ.Zadavatel?.ICO))
                 {
+                    FixOldUrl(newVZ);
                     await SaveIncompleteVzAsync(newVZ, elasticClient);
                     return;
                 }
@@ -189,6 +191,7 @@ namespace HlidacStatu.Repositories
                     SendToOcrQueue(newVZ);
 
                 FixPublicationDate(newVZ);
+                FixOldUrl(newVZ);
                 await elasticClient.IndexDocumentAsync<VerejnaZakazka>(newVZ);
                 AfterSave(newVZ);
             }
@@ -197,7 +200,15 @@ namespace HlidacStatu.Repositories
                 _logger.Error(e, $"VZ ERROR Upserting ID:{newVZ.Id} Size:{Newtonsoft.Json.JsonConvert.SerializeObject(newVZ).Length}");
             }
         }
-        
+
+        private static void FixOldUrl(VerejnaZakazka newVz)
+        {
+            newVz.UrlZakazky = newVz.UrlZakazky
+                .Select(u => u.Replace("https://www.vestnikverejnychzakazek.cz/SearchForm/SearchContract?contractNumber=", 
+                    "https://vvz.nipez.cz/formulare-zakazky/"))
+                .ToHashSet();
+        }
+
         public static async Task RedownloadVzFiles(VerejnaZakazka vz, ElasticClient elasticClient, HttpClient httpClient)
         {
             if (vz is null)
