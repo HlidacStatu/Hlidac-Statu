@@ -47,7 +47,7 @@ namespace HlidacStatu.Web.Framework
         }
 
 
-        public static byte[] GetScreenshot(string url, string cacheName = null, bool refreshCache = false)
+        public static byte[] GetScreenshot(string url, string ratio, string cacheName = null, bool refreshCache = false)
         {
             string[]? webShotServiceUrls = Devmasters.Config.GetWebConfigValue("WebShot.Service.Url")
                 ?.Split(';')
@@ -60,8 +60,11 @@ namespace HlidacStatu.Web.Framework
             var webShotServiceUrl = webShotServiceUrls[Util.Consts.Rnd.Next(webShotServiceUrls.Length)];
 
             //string scr = webShotServiceUrl + "/png?ratio=" + rat + "&url=" + System.Net.WebUtility.UrlEncode(url);
-            string scr = webShotServiceUrl + "/screenshot?vp_width=1920&vp_height=1080&url="
-                                           + System.Net.WebUtility.UrlEncode(url);
+            var sizeByRatio = ratio.Equals("1x1")
+                ? "/screenshot?vp_width=1000&vp_height=1000&url="
+                : "/screenshot?vp_width=1920&vp_height=1080&url=";
+            
+            string scr = webShotServiceUrl + sizeByRatio + System.Net.WebUtility.UrlEncode(url);
             return GetBinary(scr, cacheName, refreshCache);
         }
 

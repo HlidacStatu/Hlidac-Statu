@@ -1141,7 +1141,7 @@ text zpravy: {txt}
                 if (data == null && !string.IsNullOrEmpty(url))
                 {
 
-                    data = RemoteUrlFromWebCache.GetScreenshot(url, (id?.ToLower() ?? "null") + "-" + rat + "-" + v, HttpContext.Request.Query["refresh"] == "1");
+                    data = RemoteUrlFromWebCache.GetScreenshot(url, rat, (id?.ToLower() ?? "null") + "-" + rat + "-" + v, HttpContext.Request.Query["refresh"] == "1");
                 }
             }
             catch (Exception e)
