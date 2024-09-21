@@ -5,6 +5,7 @@
 @using HlidacStatu.Entities.VZ
 @using HlidacStatu.Extensions
 @using HlidacStatu.Repositories
+@using HlidacStatu.Util
 
 
 @{
@@ -248,6 +249,29 @@ else
             <td>Datum posledni změny zakázky</td>
             <td>@(Model.PosledniZmena?.ToShortDateString() ?? "")</td>
         </tr>
+        @{
+            var smlouvyForVz = await SmlouvaVerejnaZakazkaRepo.GetSmlouvyForVz(Model.Id);
+        }
+        @if (smlouvyForVz is not null && smlouvyForVz.Any())
+        {
+            <tr>
+                <td>Smlouvy které byly pravděpodobně uzavřené na základě této zakázky</td>
+                <td>
+                   @foreach (var smlouvaForVz in smlouvyForVz.OrderByDescending(x=>x.CosineSimilarity))
+                   {
+                       var smlouva = await SmlouvaRepo.LoadAsync(smlouvaForVz.IdSmlouvy);
+                       if (smlouva is not null)
+                       {
+                           <a asp-controller="Home" asp-action="Detail" asp-route-Id="@smlouvaForVz.IdSmlouvy">@smlouvaForVz.IdSmlouvy - @smlouva.predmet</a>
+                           if (smlouva.hodnotaBezDph.HasValue)
+                           {
+                              <span>(@RenderData.NicePriceHtml(smlouva.hodnotaBezDph.Value))</span><br/>
+                           }
+                       }
+                   }
+                </td>
+            </tr>
+        }
         <tr>
             <td>Sdílení</td>
             <td>
@@ -275,9 +299,11 @@ else
         <tr>
             <td>Další známé url</td>
             <td>
-                @foreach (var url in Model.UrlZakazky)
+                @foreach (var url in Model.UrlZakazky.Select(u => u.Replace("https://www.vestnikverejnychzakazek.cz/SearchForm/SearchContract?contractNumber=",
+                              "https://vvz.nipez.cz/formulare-zakazky/")))
                 {
-                    <a href="@url">@url</a><br/>
+                    <a href="@url">@url</a>
+                    <br/>
                 }
             </td>
         </tr>
