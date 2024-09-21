@@ -84,6 +84,32 @@ namespace HlidacStatuApi.Controllers.ApiV2
             return StatusCode(id ?? 200, $"error {id}");
         }
 
+
+        [ApiExplorerSettings(IgnoreApi = true)]
+        [Authorize(Roles = "Admin")]
+        [HttpGet("notification/{id?}")]
+        public async Task<ActionResult> Notification([FromRoute] string id, [FromQuery] string message)
+        {
+            if (id == null)
+                throw new ArgumentNullException("id");
+            if (message == null)
+                throw new ArgumentNullException("message");
+
+            string sender = Devmasters.Config.GetWebConfigValue("SignalSender");
+            string res = "";
+            var scl = new Devmasters.Comm.Signal.SimpleClient(new Uri(Devmasters.Config.GetWebConfigValue("SignalApiUrl")), sender);
+            if (id.StartsWith("+"))
+                res = await scl.SendAsync(id, message);
+            else if (id.ToLower() == "team")
+                res = await scl.SendToGroupNameAsync(Devmasters.Config.GetWebConfigValue("SignalTeamGroupName"), message);
+            else if (id.ToLower() == "admin")
+                res = await scl.SendAsync(Devmasters.Config.GetWebConfigValue("SignalTeamAdmins").Split(';'), message);
+            else
+                return StatusCode(404, $"Destination not found"); 
+            return Ok("ok");
+
+
+        }
         [ApiExplorerSettings(IgnoreApi = true)]
         [Authorize(Roles = "Admin")]
         [HttpPost("setvazbasmlouvazakazka")]
