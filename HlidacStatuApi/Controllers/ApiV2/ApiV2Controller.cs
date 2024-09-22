@@ -88,7 +88,6 @@ namespace HlidacStatuApi.Controllers.ApiV2
         public class NotificationPayload
         {
             public string message { get; set; }
-            public bool online { get; set; }
         }
 
         [ApiExplorerSettings(IgnoreApi = true)]
@@ -110,11 +109,11 @@ namespace HlidacStatuApi.Controllers.ApiV2
                 try
                 {
                     NotificationPayload payload = Newtonsoft.Json.JsonConvert.DeserializeObject<NotificationPayload>(body);
-                    message = $"{(payload.online ? "ONLINE" : "OFFLINE")} {payload.message}";
+                    message = $"{payload.message}";
                 }
                 catch (Exception e)
                 {
-                    throw new ArgumentNullException("body nemá formát { \"message\": \"zprava k odeslani\", \"online\": true }");
+                    throw new ArgumentNullException("body nemá formát { \"message\": \"zprava k odeslani\"}");
                 }
 
 
