@@ -89,11 +89,23 @@ namespace HlidacStatuApi.Controllers.ApiV2
         {
             public string message { get; set; }
         }
-
         [ApiExplorerSettings(IgnoreApi = true)]
         [Authorize(Roles = "Admin")]
         [HttpGet("notification/{id?}")]
-        public async Task<ActionResult> Notification([FromRoute] string id, [FromQuery] string message, [FromBody] string body)
+        public async Task<ActionResult> Notification([FromRoute] string id, [FromQuery] string? message = null)
+        {
+            return await SendNotification(id,message);
+        }
+
+        [ApiExplorerSettings(IgnoreApi = true)]
+        [Authorize(Roles = "Admin")]
+        [HttpPost("notification/{id?}")]
+        public async Task<ActionResult> NotificationPost([FromRoute] string id, [FromBody] NotificationPayload payload = null)
+        {
+            return await SendNotification(id, payload?.message);
+
+        }
+        private async Task<ActionResult> SendNotification(string id, string message)
         {
             if (id == null)
                 throw new ArgumentNullException("id");
@@ -101,40 +113,31 @@ namespace HlidacStatuApi.Controllers.ApiV2
 
             if (string.IsNullOrEmpty(message))
             {
-                if (string.IsNullOrEmpty(body))
-                    throw new ArgumentNullException("body i message jsou prazdne.");
-
-                //get payload from body
-
-                try
-                {
-                    NotificationPayload payload = Newtonsoft.Json.JsonConvert.DeserializeObject<NotificationPayload>(body);
-                    message = $"{payload.message}";
-                }
-                catch (Exception e)
-                {
-                    throw new ArgumentNullException("body nemá formát { \"message\": \"zprava k odeslani\"}");
-                }
-
-
+                return StatusCode(500, "text zpravy k poslani je prazdny");
             }
 
-
-            string sender = Devmasters.Config.GetWebConfigValue("SignalSender");
-            string res = "";
-            var scl = new Devmasters.Comm.Signal.SimpleClient(new Uri(Devmasters.Config.GetWebConfigValue("SignalApiUrl")), sender);
-            if (id.StartsWith("+"))
-                res = await scl.SendAsync(id, message);
-            else if (id.ToLower() == "team")
-                res = await scl.SendToGroupNameAsync(Devmasters.Config.GetWebConfigValue("SignalTeamGroupName"), message);
-            else if (id.ToLower() == "admin")
-                res = await scl.SendAsync(Devmasters.Config.GetWebConfigValue("SignalTeamAdmins").Split(';'), message);
-            else
-                return StatusCode(404, $"Destination not found");
-            return Ok("ok");
-
+            try
+            {
+                string sender = Devmasters.Config.GetWebConfigValue("SignalSender");
+                string res = "";
+                var scl = new Devmasters.Comm.Signal.SimpleClient(new Uri(Devmasters.Config.GetWebConfigValue("SignalApiUrl")), sender);
+                if (id.StartsWith("+"))
+                    res = await scl.SendAsync(id, message);
+                else if (id.ToLower() == "team")
+                    res = await scl.SendToGroupNameAsync(Devmasters.Config.GetWebConfigValue("SignalTeamGroupName"), message);
+                else if (id.ToLower() == "admin")
+                    res = await scl.SendAsync(Devmasters.Config.GetWebConfigValue("SignalTeamAdmins").Split(';'), message);
+                else
+                    return StatusCode(404, $"Destination not found");
+                return Ok("ok");
+            }
+            catch (Exception e)
+            {
+                return StatusCode(500, e.ToString());
+            }
 
         }
+
         [ApiExplorerSettings(IgnoreApi = true)]
         [Authorize(Roles = "Admin")]
         [HttpPost("setvazbasmlouvazakazka")]
