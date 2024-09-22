@@ -4,6 +4,7 @@ using HlidacStatu.LibCore.Extensions;
 using HlidacStatu.LibCore.Filters;
 using HlidacStatu.LibCore.MiddleWares;
 using HlidacStatu.LibCore.Services;
+using HlidacStatuApi.Code;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Identity;
@@ -80,7 +81,13 @@ AddIdentity(builder.Services);
 
 builder.Services.AddSingleton<AttackerDictionaryService>();
 
-builder.Services.AddControllers()
+builder.Services.AddControllers(
+    options =>
+    {
+        // Insert the custom formatter at the beginning of the list
+        options.InputFormatters.Insert(0, new TextPlainInputFormatter());
+    }
+    )
     .AddNewtonsoftJson(); // this needs to be added, so datasety's Registration string[,] property can be serialized 
 
 //swagger

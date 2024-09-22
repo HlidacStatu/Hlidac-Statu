@@ -94,15 +94,16 @@ namespace HlidacStatuApi.Controllers.ApiV2
         [HttpGet("notification/{id?}")]
         public async Task<ActionResult> Notification([FromRoute] string id, [FromQuery] string? message = null)
         {
-            return await SendNotification(id,message);
+            return await SendNotification(id, message);
         }
 
         [ApiExplorerSettings(IgnoreApi = true)]
         [Authorize(Roles = "Admin")]
         [HttpPost("notification/{id?}")]
-        public async Task<ActionResult> NotificationPost([FromRoute] string id, [FromBody] NotificationPayload payload = null)
+        [Consumes("text/plain", IsOptional = true )]
+        public async Task<ActionResult> NotificationPost([FromRoute] string id, [FromBody( EmptyBodyBehavior = Microsoft.AspNetCore.Mvc.ModelBinding.EmptyBodyBehavior.Allow)] string payload = null)
         {
-            return await SendNotification(id, payload?.message);
+            return await SendNotification(id, payload);
 
         }
         private async Task<ActionResult> SendNotification(string id, string message)
