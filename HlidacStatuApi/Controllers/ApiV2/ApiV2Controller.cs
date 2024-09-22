@@ -88,6 +88,7 @@ namespace HlidacStatuApi.Controllers.ApiV2
         public class NotificationPayload
         {
             public string message { get; set; }
+            public string to {  get; set; } 
         }
         [ApiExplorerSettings(IgnoreApi = true)]
         [Authorize(Roles = "Admin")]
@@ -108,19 +109,19 @@ namespace HlidacStatuApi.Controllers.ApiV2
         }
         [ApiExplorerSettings(IgnoreApi = true)]
         [Authorize(Roles = "Admin")]
-        [HttpPost("notification/{id?}")]
+        [HttpPost("notification")]
         [Consumes("application/json", IsOptional = true)]
-        public async Task<ActionResult> NotificationPostJson([FromRoute] string id, [FromBody] NotificationPayload payload = null)
+        public async Task<ActionResult> NotificationPostJson( [FromBody] NotificationPayload payload = null)
         {
-            return await SendNotification(id, payload?.message);
+            return await SendNotification(payload?.to, payload?.message);
 
         }
 
 
-        private async Task<ActionResult> SendNotification(string id, string message)
+        private async Task<ActionResult> SendNotification(string to, string message)
         {
-            if (id == null)
-                throw new ArgumentNullException("id");
+            if (string.IsNullOrEmpty(to))
+                throw new ArgumentNullException("to");
 
 
             if (string.IsNullOrEmpty(message))
@@ -133,11 +134,11 @@ namespace HlidacStatuApi.Controllers.ApiV2
                 string sender = Devmasters.Config.GetWebConfigValue("SignalSender");
                 string res = "";
                 var scl = new Devmasters.Comm.Signal.SimpleClient(new Uri(Devmasters.Config.GetWebConfigValue("SignalApiUrl")), sender);
-                if (id.StartsWith("+"))
-                    res = await scl.SendAsync(id, message);
-                else if (id.ToLower() == "team")
+                if (to.StartsWith("+"))
+                    res = await scl.SendAsync(to, message);
+                else if (to.ToLower() == "team")
                     res = await scl.SendToGroupNameAsync(Devmasters.Config.GetWebConfigValue("SignalTeamGroupName"), message);
-                else if (id.ToLower() == "admin")
+                else if (to.ToLower() == "admin")
                     res = await scl.SendAsync(Devmasters.Config.GetWebConfigValue("SignalTeamAdmins").Split(';'), message);
                 else
                     return StatusCode(404, $"Destination not found");
