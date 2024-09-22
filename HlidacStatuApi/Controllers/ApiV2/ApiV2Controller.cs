@@ -106,6 +106,17 @@ namespace HlidacStatuApi.Controllers.ApiV2
             return await SendNotification(id, payload);
 
         }
+        [ApiExplorerSettings(IgnoreApi = true)]
+        [Authorize(Roles = "Admin")]
+        [HttpPost("notification/{id?}")]
+        [Consumes("application/json", IsOptional = true)]
+        public async Task<ActionResult> NotificationPostJson([FromRoute] string id, [FromBody] NotificationPayload payload = null)
+        {
+            return await SendNotification(id, payload?.message);
+
+        }
+
+
         private async Task<ActionResult> SendNotification(string id, string message)
         {
             if (id == null)
