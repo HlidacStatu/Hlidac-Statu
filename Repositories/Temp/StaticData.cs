@@ -46,6 +46,8 @@ namespace HlidacStatu.Repositories
 
         public static Devmasters.Cache.AWS_S3.Cache<Tuple<Osoba.Statistics.RegistrSmluv, Entities.Insolvence.RizeniStatistic[]>[]> Insolvence_firem_politiku_Cache = null;
 
+        
+
         public static Devmasters.Cache.AWS_S3.Cache<AnalysisCalculation.VazbyFiremNaUradyStat> UradyObchodujiciSFirmami_s_vazbouNaPolitiky_aktualni_Cache = null;
         public static Devmasters.Cache.AWS_S3.Cache<AnalysisCalculation.VazbyFiremNaUradyStat> UradyObchodujiciSFirmami_s_vazbouNaPolitiky_nedavne_Cache = null;
         public static Devmasters.Cache.AWS_S3.Cache<AnalysisCalculation.VazbyFiremNaUradyStat> UradyObchodujiciSFirmami_s_vazbouNaPolitiky_vsechny_Cache = null;
@@ -550,6 +552,7 @@ namespace HlidacStatu.Repositories
                             .ConfigureAwait(false).GetAwaiter().GetResult();
                     }
                     );
+
                 UradyObchodujiciSFirmami_s_vazbouNaPolitiky_nedavne_Cache = new Devmasters.Cache.AWS_S3.Cache<AnalysisCalculation.VazbyFiremNaUradyStat>
                     (new string[] { Devmasters.Config.GetWebConfigValue("Minio.Cache.Endpoint") },
                     Devmasters.Config.GetWebConfigValue("Minio.Cache.Bucket"),
