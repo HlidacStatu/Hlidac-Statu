@@ -11,16 +11,16 @@
     border-right: #eee solid 1px;
     height: 138px !important;
     overflow: auto hidden;
-    margin-top: 10px
+    margin-top: 10px;
 }
 
 .searchpromo-box-smaller {
-    padding-top: 12px;
+    padding-top: 0;
     border-top: #eee solid 1px;
     border-right: #eee solid 1px;
     height: 120px !important;
     overflow: auto hidden;
-    margin-top: 8px
+    margin-top: 10px;
 }
 
 
