@@ -61,6 +61,7 @@ namespace HlidacStatu.Web.Areas.Identity.Pages.Account
             }
 
             returnUrl ??= Url.Content("~/");
+            returnUrl = returnUrl.Replace("/Identity/Account/Login?returnUrl=/", "");
 
             // Clear the existing external cookie to ensure a clean login process
             await HttpContext.SignOutAsync(IdentityConstants.ExternalScheme);
@@ -73,6 +74,7 @@ namespace HlidacStatu.Web.Areas.Identity.Pages.Account
         public async Task<IActionResult> OnPostAsync(string? returnUrl = null)
         {
             returnUrl ??= Url.Content("~/");
+            returnUrl = returnUrl.Replace("/Identity/Account/Login?returnUrl=/", "");
 
             ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
 
