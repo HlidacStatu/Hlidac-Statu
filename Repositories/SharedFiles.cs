@@ -79,7 +79,7 @@ namespace HlidacStatu.Repositories
 
         public Uri GetAdminUrl(string filename)
         {
-            return new Uri($"https://admin.hlidacstatu.cz/mvc/home/getfile?id={filename}");
+            return new Uri($"https://admin.hlidacstatu.cz/mvc/home/getfile?id={System.Net.WebUtility.UrlEncode(filename)}");
         }
 
         public class Info
