@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using HlidacStatu.Connectors;
 using HlidacStatu.Entities;
 using HlidacStatu.Entities.Views;
+using HlidacStatu.Extensions;
 using HlidacStatu.Util;
 using Microsoft.EntityFrameworkCore;
 using ZiggyCreatures.Caching.Fusion;
@@ -223,15 +224,37 @@ namespace HlidacStatu.Repositories
 
             return partiesPerYear;
         }
-        public static async Task<Dictionary<string, string>> StranyIco()
-        {
 
-            var res = DirectDB.GetList<string, string>(@"SELECT zs.KratkyNazev, IcoPrijemce as IcoStrany
+        static Devmasters.Cache.LocalMemory.Cache<Dictionary<string, string>> stranyIcoCache =
+            new Devmasters.Cache.LocalMemory.Cache<Dictionary<string, string>>(
+                TimeSpan.FromHours(1), "stranyIcoCache",
+                (o) =>
+                {
+                    var res = DirectDB.GetList<string, string>(@"SELECT  IcoPrijemce as IcoStrany, zs.KratkyNazev
                       FROM Sponzoring sp
                       Left Join ZkratkaStrany zs on sp.IcoPrijemce = zs.ICO
                       group by zs.KratkyNazev, IcoPrijemce");
-            return res.ToDictionary(k => k.Item1 ?? Firmy.GetJmeno(k.Item2), v => v.Item2);
+                    
+                    return res.ToDictionary(k => k.Item1 , v => v.Item2 ?? Firmy.GetJmeno(v.Item1));
 
+                });
+        public static Dictionary<string, string> StranyIco()
+        {
+            return stranyIcoCache.Get();
+
+        }
+
+        public static string IcoToKratkyNazev(string stranaIco)
+        {
+            if (StranyIco().ContainsKey(stranaIco))
+                return StranyIco().FirstOrDefault(m=>m.Key == stranaIco).Value;
+            return null;
+        }
+        public static string KratkyNazevToIco(string stranaKratkyNazev)
+        {
+            if (StranyIco().ContainsValue(stranaKratkyNazev))
+                return StranyIco().FirstOrDefault(m => m.Value == stranaKratkyNazev).Key;
+            return null;
         }
 
         public static async Task<Dictionary<int, decimal>> SponzoringPerYear(string party, int minYear, int maxYear, bool persons, bool companies)
@@ -274,6 +297,7 @@ namespace HlidacStatu.Repositories
 	                   ,sp.icoDarce as IcoDarce
 	                   ,RTRIM(LTRIM(isnull(os.TitulPred,'') + ' ' + os.Jmeno + ' ' + os.Prijmeni + ' ' + isnull(os.TitulPo,''))) as Jmeno
                        ,1 as typ
+                        ,0 as PolitickaStrana 
                     FROM Sponzoring sp
                     LEFT Join ZkratkaStrany zs on sp.IcoPrijemce = zs.ICO
                     join Osoba os on sp.OsobaIdDarce = os.InternalId
@@ -302,12 +326,13 @@ namespace HlidacStatu.Repositories
 	                           ,fi.ICO as Id
 	                           ,fi.Jmeno as Jmeno
                                ,2 as typ
+                               ,iif(fi.Kod_PF = {FirmaExtension.PolitickaStrana_kodPF},1,0) as PolitickaStrana 
                             FROM Sponzoring sp
                             LEFT Join ZkratkaStrany zs on sp.IcoPrijemce = zs.ICO
                             join Firma fi on sp.IcoDarce = fi.ICO
                             where IcoDarce is not null and sp.IcoPrijemce = {icoStrany}
                               and year(sp.DarovanoDne) >= {tenYearsBack}
-                            group by zs.KratkyNazev, IcoPrijemce, Year(DarovanoDne), fi.ICO, fi.Jmeno")
+                            group by zs.KratkyNazev, IcoPrijemce, Year(DarovanoDne), fi.ICO, fi.Jmeno, fi.kod_pf")
                     .ToListAsync(cancellationToken);
             }
         }
@@ -334,6 +359,7 @@ namespace HlidacStatu.Repositories
 	                           ,os.NameId as Id
 	                           ,RTRIM(LTRIM(isnull(os.TitulPred,'') + ' ' + os.Jmeno + ' ' + os.Prijmeni + ' ' + isnull(os.TitulPo,''))) as Jmeno
                                 ,1 as typ
+                                ,0 as politickaStrana
                             FROM Sponzoring sp
                             join Osoba os on sp.OsobaIdDarce = os.InternalId
                             where (year(sp.DarovanoDne) = {rok} or 1={yearSwitch}) and OsobaIdDarce > 0
@@ -370,11 +396,12 @@ namespace HlidacStatu.Repositories
 	                           ,fi.ICO as Id
 	                           ,fi.Jmeno as Jmeno
                                ,2 as typ
+                               ,iif(fi.Kod_PF = {FirmaExtension.PolitickaStrana_kodPF},1,0) as PolitickaStrana 
                             FROM Sponzoring sp
                             join Firma fi on sp.IcoDarce = fi.ICO
                             where (year(sp.DarovanoDne) = {rok} or 1={yearSwitch}) and IcoDarce is not null
                               and year(sp.DarovanoDne) >= {tenYearsBack}
-                            group by fi.ICO, fi.Jmeno")
+                            group by fi.ICO, fi.Jmeno, fi.kod_pf")
                     .OrderByDescending(x => x.DarCelkem); ;
 
                 if (take != null)

@@ -156,7 +156,7 @@
             <div class="block-col block-part">
                 <div class="block-table">
                     @{
-                        foreach (var sponzor in await biggestCompanySponsorsLastYear)
+                        foreach (var sponzor in (await biggestCompanySponsorsLastYear).Where(m=>m.PolitickaStrana == 0))
                         {
                             <div class="table-row">
                                 <div class="table-col">@HlidacStatu.Util.RenderData.NicePriceHtml(sponzor.DarCelkem, shortFormat: true)</div>

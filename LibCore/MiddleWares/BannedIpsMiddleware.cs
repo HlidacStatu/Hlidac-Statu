@@ -66,8 +66,16 @@ namespace HlidacStatu.LibCore.MiddleWares
             }
 
             string? lastPath = httpContext.Request.GetEncodedPathAndQuery();
+            try
+            {
+                await _next(httpContext);
 
-            await _next(httpContext);
+            }
+            catch (Exception e)
+            {
+
+                throw;
+            }
 
             // add new ip to blocked ones in case it is attacker
             int statusCode = httpContext.Response.StatusCode;

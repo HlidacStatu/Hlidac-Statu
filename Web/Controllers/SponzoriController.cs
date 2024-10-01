@@ -36,9 +36,12 @@ namespace HlidacStatu.Web.Controllers
             return View(filteredModel);
         }
 
+        [HlidacCache(12*3600, "rok", false)]
         public async Task<ActionResult> TopSponzoriFirmy(int? rok, CancellationToken cancellationToken)
         {
-            var model = await SponzoringRepo.BiggestCompanySponsorsAsync(rok, cancellationToken);
+            System.Collections.Generic.List<Entities.Views.SponzoringSummed> model = 
+                await SponzoringRepo.BiggestCompanySponsorsAsync(rok, cancellationToken);
+
             var filteredModel = model.Where(s => s.DarCelkem > 100000).ToList();
             ViewBag.Rok = rok ?? 0;
             var firstRow = filteredModel.FirstOrDefault();

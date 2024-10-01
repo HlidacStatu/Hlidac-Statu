@@ -30,6 +30,9 @@
     }
 
     string icoStrany = ZkratkaStranyRepo.IcoStrany((string)Model);
+    if (string.IsNullOrEmpty(icoStrany ))
+        icoStrany = ZkratkaStranyRepo.IcoStrany(System.Net.WebUtility.UrlDecode((string)Model));
+
     string stranaZkratka = "";
     Firma strana = Firmy.Get(icoStrany);
     if (strana.Valid == false)
@@ -52,12 +55,15 @@
 
 
     List<SponzoringSummed> osobySponzori = await SponzoringRepo.PeopleSponsorsAsync(icoStrany, System.Threading.CancellationToken.None);
-    List<SponzoringSummed> firmySponzori = await SponzoringRepo.CompanySponsorsAsync(icoStrany, System.Threading.CancellationToken.None);
+    List<SponzoringSummed> allfirmySponzori = await SponzoringRepo.CompanySponsorsAsync(icoStrany, System.Threading.CancellationToken.None);
+    List<SponzoringSummed> firmySponzori = allfirmySponzori.Where(m=>m.PolitickaStrana==0).ToList();
+    List<SponzoringSummed> mezistranamiList = allfirmySponzori.Where(m => m.PolitickaStrana == 1).ToList();
 
     if (rok.HasValue)
     {
         osobySponzori = osobySponzori.Where(m => m.Rok == rok).ToList();
         firmySponzori = firmySponzori.Where(m => m.Rok == rok).ToList();
+        mezistranamiList = mezistranamiList.Where(m => m.Rok == rok).ToList();
     }
 
 
@@ -74,6 +80,7 @@
             )
             .OrderByDescending(o => o.sponz.DarCelkem).ThenBy(o => o.sponz.Jmeno)
             .ToArray();
+
     (SponzoringSummed sponz, int[] roky)[] firmyTopSponzori = firmySponzori
             .GroupBy(k => k.Id, v => v, (k, v) => (sponz: new SponzoringSummed()
                     {
@@ -82,10 +89,25 @@
                         IcoStrany = v.First().IcoStrany,
                         Jmeno = v.First().Jmeno,
                         NazevStrany = v.First().NazevStrany,
-                        typ = v.First().typ
+                        typ = v.First().typ,
+                        PolitickaStrana = v.First().PolitickaStrana
                     }, roky: v.Select(r => r.Rok).Distinct().OrderBy(o => o).ToArray()))
             .OrderByDescending(o => o.sponz.DarCelkem).ThenBy(o => o.sponz.Jmeno)
             .ToArray();
+
+    (SponzoringSummed sponz, int[] roky)[] mezistranamiTopList = mezistranamiList
+        .GroupBy(k => k.Id, v => v, (k, v) => (sponz: new SponzoringSummed()
+        {
+            Id = k,
+            DarCelkem = v.Sum(x => x.DarCelkem),
+            IcoStrany = v.First().IcoStrany,
+            Jmeno = v.First().Jmeno,
+            NazevStrany = v.First().NazevStrany,
+            typ = v.First().typ,
+            PolitickaStrana = v.First().PolitickaStrana
+        }, roky: v.Select(r => r.Rok).Distinct().OrderBy(o => o).ToArray()))
+        .OrderByDescending(o => o.sponz.DarCelkem).ThenBy(o => o.sponz.Jmeno)
+        .ToArray();
 
     Osoba topOsoba = null;
     decimal? topOsobaAmount = null;
@@ -301,15 +323,64 @@ else
                     CssClass = "number"
                 }
         );
+
+
+    ReportDataSource<(SponzoringSummed sponz, int[] roky)> stranyTemplate = new(
+    new ReportDataSource<(SponzoringSummed sponz, int[] roky)>.Column()
+            {
+                Name = "Strana",
+                HtmlRender = (m) =>
+{
+            return $"<a href='/subjekt/{m.sponz.Id}'>{m.sponz.Jmeno}</a>";
+        }
+            },
+        new ReportDataSource<(SponzoringSummed sponz, int[] roky)>.Column()
+                {
+                    Name = "Částka",
+                    HtmlRender = (m) =>
+{
+                return HlidacStatu.Util.RenderData.NicePrice(m.sponz.DarCelkem, html: true);
+            },
+                    OrderValueRender = (m) => HlidacStatu.Util.RenderData.OrderValueFormat(m.sponz.DarCelkem),
+                    CssClass = "number"
+                },
+        new ReportDataSource<(SponzoringSummed sponz, int[] roky)>.Column()
+                {
+                    Name = "Sponzoring v letech",
+                    HtmlRender = (m) =>
+{
+                return string.Join(", ", m.roky);
+            },
+                    OrderValueRender = (m) => HlidacStatu.Util.RenderData.OrderValueFormat(m.roky.Max()),
+                    CssClass = "number"
+                }
+        );
+
     firmyTemplate.AddRows(firmyTopSponzori.Take(rok.HasValue ? int.MaxValue : 50));
     string topFirmy = Html.DataToHTMLTable(firmyTemplate, dataTableOptions: dataTableOptions).RenderRawHtml();
 
+    string meziStranami = "";
+    if (mezistranamiList.Count() > 0)
+    {
+        stranyTemplate.AddRows(mezistranamiTopList.Take(rok.HasValue ? int.MaxValue : 50));
+        meziStranami = Html.DataToHTMLTable(stranyTemplate, dataTableOptions: dataTableOptions).RenderRawHtml();
+    }
 }
-@Html.Toggleable(
-    topOsoby,"TOP osobní sponzoři",
-    topFirmy, "TOP firemní sponzoři"
-)
-
+@if (meziStranami != "")
+{
+    @Html.Toggleable3(
+        topOsoby,"TOP osobní sponzoři",
+        topFirmy, "TOP firemní sponzoři",
+        meziStranami, "Peníze mezi stranami"
+        )
+}
+else
+{
+    @Html.Toggleable(
+            topOsoby, "TOP osobní sponzoři",
+            topFirmy, "TOP firemní sponzoři"
+            )
+}
 
 
 <partial name="WebUtil/FeedbackModal" model="@(new FeedbackViewModel("Upozornit na chybu"))" />

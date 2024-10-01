@@ -20,5 +20,6 @@ namespace HlidacStatu.Entities.Views
         public string IcoStrany { get; set; }
         public string NazevStrany { get; set; }
         public ItemType typ { get; set; }
+        public int PolitickaStrana { get; set; }
     }
 }

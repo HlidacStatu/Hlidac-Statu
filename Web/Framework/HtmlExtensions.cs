@@ -255,7 +255,62 @@ namespace HlidacStatu.Web.Framework
 
             return htmlHelper.Raw(sb.ToString());
         }
+        public static IHtmlContent Toggleable3(this IHtmlHelper htmlHelper,
+            string first, string firstButton,
+            string second, string secondButton,
+            string third, string thirdButton
+            )
+        {
+            return Toggleable3(htmlHelper, new HtmlString(first), firstButton, new HtmlString(second), secondButton, new HtmlString(third), thirdButton);
 
+        }
+        public static IHtmlContent Toggleable3(this IHtmlHelper htmlHelper,
+            IHtmlContent first, string firstButton,
+            IHtmlContent second, string secondButton,
+            IHtmlContent third, string thirdButton
+            )
+        {
+            string random = Guid.NewGuid().ToString("N");
+            var sb = new System.Text.StringBuilder();
+
+            sb.Append($"<script>");
+            sb.Append($"$(function () {{");
+            sb.Append($"$('.{random}_first.btn').click(function () {{");
+            sb.Append($"$('.{random}_first.content').show();");
+            sb.Append($"$('.{random}_second.content').hide();");
+            sb.Append($"$('.{random}_third.content').hide();");
+            sb.Append($"$('.{random}_first.btn').addClass(\"btn-primary\");");
+            sb.Append($"$('.{random}_second.btn').removeClass(\"btn-primary\");");
+            sb.Append($"$('.{random}_third.btn').removeClass(\"btn-primary\");");
+            sb.Append($"}});");
+            sb.Append($"$('.{random}_second.btn').click(function () {{");
+            sb.Append($"$('.{random}_first.content').hide();");
+            sb.Append($"$('.{random}_third.content').hide();");
+            sb.Append($"$('.{random}_second.content').show();");
+            sb.Append($"$('.{random}_first.btn').removeClass(\"btn-primary\");");
+            sb.Append($"$('.{random}_third.btn').removeClass(\"btn-primary\");");
+            sb.Append($"$('.{random}_second.btn').addClass(\"btn-primary\");");
+            sb.Append($"}});");
+            sb.Append($"$('.{random}_third.btn').click(function () {{");
+            sb.Append($"$('.{random}_first.content').hide();");
+            sb.Append($"$('.{random}_second.content').hide();");
+            sb.Append($"$('.{random}_third.content').show();");
+            sb.Append($"$('.{random}_first.btn').removeClass(\"btn-primary\");");
+            sb.Append($"$('.{random}_second.btn').removeClass(\"btn-primary\");");
+            sb.Append($"$('.{random}_third.btn').addClass(\"btn-primary\");");
+            sb.Append($"}});");
+
+            sb.Append($"}});");
+            sb.Append($"</script>");
+            sb.Append($"<div class=\"btn btn-default {random}_first btn-primary\" style=\"border-top-right-radius: 0px;border-bottom-right-radius: 0px;\">{firstButton}</div>");
+            sb.Append($"<div class=\"btn btn-default {random}_second\" style=\"border-top-left-radius: 0px;border-bottom-left-radius: 0px;\">{secondButton}</div>");
+            sb.Append($"<div class=\"btn btn-default {random}_third\" style=\"border-top-left-radius: 0px;border-bottom-left-radius: 0px;\">{thirdButton}</div>");
+            sb.Append($"<div class=\"{random}_first content\">{first}</div>");
+            sb.Append($"<div class=\"{random}_second content\" style=\"display: none; \">{second}</div>");
+            sb.Append($"<div class=\"{random}_third content\" style=\"display: none; \">{third}</div>");
+
+            return htmlHelper.Raw(sb.ToString());
+        }
         public static IHtmlContent TimelineGraph(this IHtmlHelper htmlHelper,
             string name,
             string rowLabel,
