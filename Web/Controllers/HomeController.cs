@@ -709,7 +709,7 @@ text zpravy: {txt}
         public async Task<ActionResult> Hledat(string q, string order)
         {
             bool showBeta = User.Identity?.IsAuthenticated == true && User.IsInRole("BetaTester");
-
+            
             var res = await XLib.Search
                 .GeneralSearchAsync(q, 1, showBeta, order, this.User, smlouvySize: Repositories.Searching.SearchDataResult<object>.DefaultPageSizeGlobal);
             AuditRepo.Add(

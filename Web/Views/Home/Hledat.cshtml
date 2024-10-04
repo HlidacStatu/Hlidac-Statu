@@ -214,55 +214,55 @@ else if (Model.HasResults == false)
     List<string> paorder = new();
     if (Model.HasSmlouvy)
     {
-        paorder.Add(nameof(SmlouvaSearchResult));
+        paorder.Add(Model.Smlouvy.GetType().Name);
     }
     if (Model.HasVZ)
     {
-        paorder.Add(nameof(VerejnaZakazkaSearchData));
+        paorder.Add(Model.VZ.GetType().Name);
 
         if (Model.HasDotace && Model.Dotace.Total > Model.VZ.Total * 2)
         {
-            paorder.Insert(paorder.FindIndex(0, m => m == nameof(VerejnaZakazkaSearchData)), nameof(DotaceSearchResult));
+            paorder.Insert(paorder.FindIndex(0, m => m == Model.VZ.GetType().Name), Model.Dotace.GetType().Name);
         }
         else if (Model.HasInsolvence && Model.Insolvence.Total > Model.VZ.Total * 3)
         {
-            paorder.Insert(paorder.FindIndex(0, m => m == nameof(VerejnaZakazkaSearchData)), nameof(InsolvenceSearchResult));
+            paorder.Insert(paorder.FindIndex(0, m => m == Model.VZ.GetType().Name), Model.Insolvence.GetType().Name);
         }
     }
     if (Model.HasDotace)
     {
-        if (paorder.Contains(nameof(DotaceSearchResult)) == false)
+        if (paorder.Contains(Model.Dotace.GetType().Name) == false)
         {
-            paorder.Add(nameof(DotaceSearchResult));
+            paorder.Add(Model.Dotace.GetType().Name);
 
-            if (Model.HasInsolvence && Model.Insolvence.Total > Model.Dotace.Total * 2 && paorder.Contains(nameof(InsolvenceSearchResult)) == false)
+            if (Model.HasInsolvence && Model.Insolvence.Total > Model.Dotace.Total * 2 && paorder.Contains(Model.Insolvence.GetType().Name) == false)
             {
-                paorder.Insert(paorder.FindIndex(0, m => m == nameof(DotaceSearchResult)), nameof(InsolvenceSearchResult));
+                paorder.Insert(paorder.FindIndex(0, m => m == Model.Dotace.GetType().Name), Model.Insolvence.GetType().Name);
             }
         }
     }
     if (Model.HasFirmy)
     {
-        paorder.Add(nameof(Search.GeneralResult<Firma>));
+        paorder.Add(Model.Firmy.GetType().Name);
     }
 
     if (Model.HasInsolvence)
     {
-        if (paorder.Contains(nameof(InsolvenceSearchResult)) == false)
+        if (paorder.Contains(Model.Insolvence.GetType().Name) == false)
         {
-            paorder.Add(nameof(InsolvenceSearchResult));
+            paorder.Add(Model.Insolvence.GetType().Name);
         }
     }
 
     if (paorder.Count < 2)
     {
-        paorder.Add(nameof(OsobaSearchResult));
+        paorder.Add(Model.Osoby.GetType().Name);
     }
     else
     {
-        paorder.Insert(1, nameof(OsobaSearchResult));
+        paorder.Insert(1, Model.Osoby.GetType().Name);
     }
-    paorder.Add(nameof(HlidacStatu.Datasets.Search.DatasetMultiResult));
+    paorder.Add(Model.Datasets.GetType().Name);
 
     viewRenderTimesInt.Stop();
 
@@ -280,7 +280,7 @@ else if (Model.HasResults == false)
 {
     var part = paorder[ipart];
 
-    if (part == nameof(SmlouvaSearchResult))
+    if (part == Model.Smlouvy.GetType().Name)
     {
         if (Model.HasSmlouvy)
         {
@@ -291,8 +291,8 @@ else if (Model.HasResults == false)
                 Model.SearchPromos.AppendResult(new SearchPromo()
                             {
                                 Id = Guid.NewGuid().ToString(),
-                                Title = "Analýza smluv",
-                                Description = "<b>Detailní analýza smluvních vztahů</b> u nalezených smluv",
+                                Title = "Detailní analýza",
+                                Description = "<b>Detailní analýza nalezených smluv</b> - top vazby, top zakázky, porušení zákona",
                                 More = SearchPromoRepo.MoreTextDefault,
                                 Icon = "/content/searchpromo/analysis.png",
                                 Url = "https://www.hlidacstatu.cz/analyza?q=" + System.Net.WebUtility.UrlEncode(Model.Query),
@@ -301,42 +301,42 @@ else if (Model.HasResults == false)
             }
         }
     }
-    else if (part == nameof(VerejnaZakazkaSearchData))
+    else if (part == Model.VZ.GetType().Name)
     {
         if (Model.HasVZ)
         {
             htmlLinks.Add(new Tuple<string, string>(Url.Action("Hledat", "VerejneZakazky", Model.VZ.ToRouteValues(1)), Devmasters.Lang.CS.Plural.Get(Model.VZ.Total, "<b>jednu veřejnou zakázku</b>", "<b>{0} veřejné zakázky</b>", "<b>{0} veřejných zakázek</b>")));
         }
     }
-    else if (part == nameof(DotaceSearchResult))
+    else if (part == Model.Dotace.GetType().Name)
     {
         if (Model.HasDotace)
         {
             htmlLinks.Add(new Tuple<string, string>(Url.Action("Hledat", "Dotace", Model.Dotace.ToRouteValues(1)), Devmasters.Lang.CS.Plural.Get(Model.Dotace.Total, "<b>jednu dotaci</b>", "<b>{0} dotace</b>", "<b>{0} dotací</b>")));
         }
     }
-    else if (part == nameof(InsolvenceSearchResult))
+    else if (part == Model.Insolvence.GetType().Name)
     {
         if (Model.HasInsolvence)
         {
             htmlLinks.Add(new Tuple<string, string>(Url.Action("HledatFtx", "Insolvence", Model.Insolvence.ToRouteValues(1)), Devmasters.Lang.CS.Plural.Get(Model.Insolvence.Total, "<b>jednu insolvenci</b>", "<b>{0} insolvence</b>", "<b>{0} insolvencí</b>")));
         }
     }
-    else if (part == nameof(OsobaSearchResult))
+    else if (part == Model.Osoby.GetType().Name)
     {
         if (Model.HasOsoby)
         {
             htmlLinks.Add(new Tuple<string, string>(Url.Action("Hledat", "Osoby", Model.Osoby.ToRouteValues(1)), Devmasters.Lang.CS.Plural.Get(Model.Osoby.Total, "<b>jednu osobu</b>", "<b>{0} osoby</b>", "<b>{0} osob</b>")));
         }
     }
-    else if (part == nameof(Search.GeneralResult<Firma>))
+    else if (part == Model.Firmy.GetType().Name)
     {
         if (Model.HasFirmy)
         {
             htmlLinks.Add(new Tuple<string, string>(Url.Action("HledatFirmy", "Home", new { q = Model.Firmy.Query }), Devmasters.Lang.CS.Plural.Get(Model.Firmy.Total, "<b>jednu firmu</b>", "<b>{0} firmy</b>", "<b>{0} firem</b>")));
         }
     }
-    else if (part == nameof(HlidacStatu.Datasets.Search.DatasetMultiResult))
+    else if (part == Model.Datasets.GetType().Name)
     {
         if (Model.HasDatasets)
         {
@@ -348,15 +348,15 @@ else if (Model.HasResults == false)
                 if (Model.SearchPromos != null)
                 {
                     Model.SearchPromos.AppendResult(new SearchPromo()
-                        {
-                            Id = Guid.NewGuid().ToString(),
-                            Title = Devmasters.TextUtil.ShortenText((await ds.DataSet.RegistrationAsync()).name, 28),
-                            Description = Devmasters.Lang.CS.Plural.Get(ds.Total,"Nalezen jeden výsledek","Našli jsme {0} výsledky","Našli jsme {0} výsledků"),
-                            More = SearchPromoRepo.MoreTextDefault,
-                            Icon = "/content/searchpromo/info-color.png",
-                            Url = ds.DataSet.DatasetSearchUrl(ds.Q),
-                            Priority=50
-                        });
+                                {
+                                    Id = Guid.NewGuid().ToString(),
+                                    Title = Devmasters.TextUtil.ShortenText((await ds.DataSet.RegistrationAsync()).name, 28),
+                                    Description = Devmasters.Lang.CS.Plural.Get(ds.Total, "Nalezen jeden výsledek", "Našli jsme {0} výsledky", "Našli jsme {0} výsledků"),
+                                    More = SearchPromoRepo.MoreTextDefault,
+                                    Icon = "/content/searchpromo/info-color.png",
+                                    Url = ds.DataSet.DatasetSearchUrl(ds.Q),
+                                    Priority = 50
+                                });
                 }
             }
         }
@@ -479,7 +479,7 @@ else if (Model.HasResults == false)
 
                 @if (parts < 8 && Model.SearchPromos.HasResult)
                 {
-                    foreach (var sp in Model.SearchPromos.Result.OrderByDescending(o=>o.Priority).Take(8 - parts))
+                    foreach (var sp in Model.SearchPromos.Result.OrderByDescending(o => o.Priority).Take(8 - parts))
                     {
                         parts++;
                         <partial name="Partials/RenderSearchPromoBox" model="@sp" />
@@ -494,10 +494,38 @@ else if (Model.HasResults == false)
     @*MAIN RESULT*@
     @if (paorder.Count > 0)
     {
-        <hr style="margin-top:30px" />
+        <hr style="margin-top:3rem" />
 
         var part = paorder[0];
-        if (part == nameof(SmlouvaSearchResult))
+        if (Model.Wordpress?.HasResult == true)
+        {
+            <h3>Napsali jsme ...</h3>
+
+            <div class="row pt-3">
+                @foreach (var item in Model.Wordpress.Result.Take(3))
+                {
+                    <div class="col-12">
+                        <div class="p-3">
+                            <div class="d-flex align-items-center">
+                                <a href="@item.Url" onclick="return trackOutLink(this,'searchresults');">
+                                    <img src="@(string.IsNullOrEmpty(item.ImageUrl) ? "/Content/Img/logoonly.svg" :  item.ImageUrl)" alt="avatar" class="rounded-circle me-3" style="height:4rem;max-width:100px">
+                                <div>
+                                    <h4 class="mb-1">@item.Title</h4>
+                                    <p class="mb-0"><span class="text-muted">@(item.Published.ToString("dd. MM. yyyy"))</span> <a class="text-muted" href="@item.Url">@item.Url</a></p>
+                                    <p class="mb-1">@(Devmasters.TextUtil.RemoveHTML(item.Perex))</p>
+                                </div>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+
+            <hr style="margin-top:3rem" />
+
+        }
+
+        if (part == Model.Smlouvy.GetType().Name)
         {
             if (Model.HasSmlouvy)
             {
@@ -529,7 +557,7 @@ else if (Model.HasResults == false)
                 viewRenderTimesInt.Stop();
             }
         }
-        else if (part == nameof(VerejnaZakazkaSearchData))
+        else if (part == Model.VZ.GetType().Name)
         {
             if (Model.HasVZ)
             {
@@ -565,7 +593,7 @@ else if (Model.HasResults == false)
 
             }
         }
-        else if (part == nameof(DotaceSearchResult))
+        else if (part == Model.Dotace.GetType().Name)
         {
             viewRenderTimesInt = viewRenderTimes.StopPreviousAndStartNextLap("Result dotace");
             if (Model.HasDotace)
@@ -597,7 +625,7 @@ else if (Model.HasResults == false)
                 viewRenderTimesInt.Stop();
             }
         }
-        else if (part == nameof(InsolvenceSearchResult))
+        else if (part == Model.Insolvence.GetType().Name)
         {
             viewRenderTimesInt = viewRenderTimes.StopPreviousAndStartNextLap("Result insolvence");
             if (Model.HasInsolvence)
@@ -631,7 +659,7 @@ else if (Model.HasResults == false)
 
             }
         }
-        else if (part == nameof(OsobaSearchResult))
+        else if (part == Model.Osoby.GetType().Name)
         {
             viewRenderTimesInt = viewRenderTimes.StopPreviousAndStartNextLap("Result osoby");
             if (Model.HasOsoby)
@@ -675,7 +703,7 @@ else if (Model.HasResults == false)
                 viewRenderTimesInt.Stop();
             }
         }
-        else if (part == nameof(Search.GeneralResult<Firma>))
+        else if (part == Model.Firmy.GetType().Name)
         {
             viewRenderTimesInt = viewRenderTimes.StopPreviousAndStartNextLap("Result firmy");
             if (Model.HasFirmy)
@@ -719,7 +747,7 @@ else if (Model.HasResults == false)
                 viewRenderTimesInt.Stop();
             }
         }
-        else if (part == nameof(HlidacStatu.Datasets.Search.DatasetMultiResult))
+        else if (part == Model.Datasets.GetType().Name)
         {
             viewRenderTimesInt = viewRenderTimes.StopPreviousAndStartNextLap("Result smlouvy");
             if (Model.HasDatasets)
