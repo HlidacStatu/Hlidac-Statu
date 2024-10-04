@@ -1,14 +1,18 @@
 ﻿using System;
 using System.Linq;
 
-namespace HlidacStatu.Repositories.Searching.Rules
+namespace HlidacStatu.Searching
 {
     public class VZ_Oblast
         : RuleBase
     {
-        public VZ_Oblast(bool stopFurtherProcessing = false, string addLastCondition = "")
+        private readonly Func<string, string[]> cpvOblastToCpvFunc;
+
+        public VZ_Oblast(Func<string,string[]> cpvOblastToCpvFunc,  bool stopFurtherProcessing = false, string addLastCondition = "")
             : base("", stopFurtherProcessing, addLastCondition)
-        { }
+        {
+            this.cpvOblastToCpvFunc = cpvOblastToCpvFunc;
+        }
 
         public override string[] Prefixes
         {
@@ -27,8 +31,8 @@ namespace HlidacStatu.Repositories.Searching.Rules
             if (part.Prefix.Equals("oblast:", StringComparison.InvariantCultureIgnoreCase))
             {
                 var oblastVal = part.Value;
-                var cpvs = VerejnaZakazkaRepo.Searching.CpvOblastToCpv(oblastVal);
-                if (cpvs != null)
+                var cpvs = cpvOblastToCpvFunc(oblastVal);
+                if (cpvs?.Length > 0)
                 {
                     //var q_cpv = "cPV:(" + cpvs.Select(s => s + "*").Aggregate((f, s) => f + " OR " + s) + ")";
                     var q_cpv = " ( " + cpvs.Select(s => "cPV:" + s + "*").Aggregate((f, s) => f + " OR " + s) + " ) ";

@@ -3,13 +3,14 @@ using Devmasters.DT;
 using HlidacStatu.Entities;
 using HlidacStatu.Entities.Dotace;
 using HlidacStatu.Repositories.Searching;
-using HlidacStatu.Repositories.Searching.Rules;
+using HlidacStatu.Searching;
 using Nest;
 using System;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using HlidacStatu.Connectors;
+using HlidacStatu.Searching;
 
 namespace HlidacStatu.Repositories
 {
@@ -22,8 +23,8 @@ namespace HlidacStatu.Repositories
 
             public static readonly IRule[] Irules = new IRule[]
             {
-                new OsobaId("osobaid:", "ico:"),
-                new Holding(null, "ico:"),
+                new OsobaId(HlidacStatu.Repositories.OsobaVazbyRepo.Icos_s_VazbouNaOsobu, "osobaid:", "ico:"),
+                new Holding(HlidacStatu.Repositories.FirmaVazbyRepo.IcosInHolding, null, "ico:"),
                 //(prijemce.jmeno:${q} OR prijemce.obchodniJmeno:${q})
                 new TransformPrefix("ico:", "prijemce.ico:", null),
                 new TransformPrefixWithValue("jmeno:", "(prijemce.hlidacJmeno:${q} OR prijemce.obchodniJmeno:${q})",
@@ -86,7 +87,7 @@ namespace HlidacStatu.Repositories
                 var sw = new StopWatchEx();
                 sw.Start();
                 search.OrigQuery = search.Q;
-                search.Q = Tools.FixInvalidQuery(search.Q ?? "", QueryShorcuts(), QueryOperators);
+                search.Q = HlidacStatu.Searching.Tools.FixInvalidQuery(search.Q ?? "", QueryShorcuts(), QueryOperators);
 
                 ISearchResponse<Dotace> res = null;
                 try
@@ -98,7 +99,7 @@ namespace HlidacStatu.Repositories
                             .From(page * search.PageSize)
                             .Query(q => GetSimpleQuery(search))
                             .Sort(ss => GetSort(search.Order))
-                            .Highlight(h => Tools.GetHighlight<Dotace>(withHighlighting))
+                            .Highlight(h => Repositories.Searching.Tools.GetHighlight<Dotace>(withHighlighting))
                             .Aggregations(aggr => anyAggregation)
                             .TrackTotalHits((search.ExactNumOfResults || page * search.PageSize == 0)
                                 ? true
@@ -114,7 +115,7 @@ namespace HlidacStatu.Repositories
                                 .From(page * search.PageSize)
                                 .Query(q => GetSimpleQuery(search))
                                 .Sort(ss => GetSort(search.Order))
-                                .Highlight(h => Tools.GetHighlight<Dotace>(false))
+                                .Highlight(h => Repositories.Searching.Tools.GetHighlight<Dotace>(false))
                                 .Aggregations(aggr => anyAggregation)
                                 .TrackTotalHits(search.ExactNumOfResults || page * search.PageSize == 0
                                     ? true

@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
+using HlidacStatu.Searching;
 
 namespace HlidacStatu.Repositories
 {
@@ -68,6 +69,33 @@ namespace HlidacStatu.Repositories
             }
         }
 
+        public static string[] IcosInHolding(string icoOfMother)
+        {
+            string[] res = Array.Empty<string>();
+
+            Relation.AktualnostType aktualnost = Relation.AktualnostType.Nedavny;
+            Firma f = Firmy.Get(icoOfMother);
+            if (f != null && f.Valid)
+            {
+                var icos = new string[] { f.ICO }
+                    .Union(
+                        f.AktualniVazby(aktualnost)
+                        .Select(s => s.To.Id)
+                    )
+                    .Distinct();
+                var icosPresLidi = f.AktualniVazby(aktualnost)
+                        .Where(o => o.To.Type == HlidacStatu.DS.Graphs.Graph.Node.NodeType.Person)
+                        .Select(o => Osoby.GetById.Get(Convert.ToInt32(o.To.Id)))
+                        .Where(o => o != null)
+                        .SelectMany(o => o.AktualniVazby(aktualnost))
+                        .Select(v => v.To.Id)
+                        .Distinct();
+                icos = icos.Union(icosPresLidi).Distinct();
+
+                res = icos.ToArray();
+            }
+            return res;
+        }
         private static void UpdateVazby(this Firma firma, bool refresh = false)
         {
             try

@@ -1,7 +1,7 @@
 using HlidacStatu.Entities;
 using HlidacStatu.Repositories;
 using HlidacStatu.Repositories.Searching;
-using HlidacStatu.Repositories.Searching.Rules;
+using HlidacStatu.Searching;
 
 using Nest;
 
@@ -103,7 +103,7 @@ namespace HlidacStatu.Datasets
 
                 var esClient = await Manager.GetESClientAsync();
 
-                var esQuery = Repositories.Searching.Tools.FixInvalidQuery(query, QueryShorcuts, QueryOperators);
+                var esQuery = HlidacStatu.Searching.Tools.FixInvalidQuery(query, QueryShorcuts, QueryOperators);
 
                 List<QueryContainer> queryContainers = new();
                 foreach (var ds in datasets)
@@ -150,7 +150,7 @@ namespace HlidacStatu.Datasets
                 Devmasters.DT.StopWatchEx sw = new Devmasters.DT.StopWatchEx();
 
                 sw.Start();
-                var query = Repositories.Searching.Tools.FixInvalidQuery(queryString, QueryShorcuts, QueryOperators);
+                var query = HlidacStatu.Searching.Tools.FixInvalidQuery(queryString, QueryShorcuts, QueryOperators);
 
                 var res = await _searchDataAsync(ds, query, page, pageSize, sort, excludeBigProperties, withHighlighting,
                     exactNumOfResults);
@@ -207,7 +207,7 @@ namespace HlidacStatu.Datasets
                 string sort = null, bool excludeBigProperties = true, bool withHighlighting = false,
                 bool exactNumOfResults = false)
             {
-                var query = Repositories.Searching.Tools.FixInvalidQuery(queryString, QueryShorcuts, QueryOperators);
+                var query = HlidacStatu.Searching.Tools.FixInvalidQuery(queryString, QueryShorcuts, QueryOperators);
                 var res = await _searchDataAsync(ds, query, page, pageSize, sort, excludeBigProperties, withHighlighting,
                     exactNumOfResults);
                 if (!res.IsValid)
@@ -360,8 +360,8 @@ namespace HlidacStatu.Datasets
                 List<IRule> irules = new List<IRule>
                 {
                     new TransformPrefixWithValue("id:", idQuerypath, null),
-                    new OsobaId("osobaid:", icoQuerypath, addLastCondition: osobaIdQuerypath),
-                    new Holding(null, icoQuerypath),
+                    new OsobaId(HlidacStatu.Repositories.OsobaVazbyRepo.Icos_s_VazbouNaOsobu, "osobaid:", icoQuerypath, addLastCondition: osobaIdQuerypath),
+                    new Holding(HlidacStatu.Repositories.FirmaVazbyRepo.IcosInHolding, null, icoQuerypath),
 
                     new TransformPrefixWithValue("ico:", icoQuerypath, null),
                 };

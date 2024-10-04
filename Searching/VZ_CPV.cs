@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Linq;
 
-namespace HlidacStatu.Repositories.Searching.Rules
+namespace HlidacStatu.Searching
 {
     public class VZ_CPV
         : RuleBase

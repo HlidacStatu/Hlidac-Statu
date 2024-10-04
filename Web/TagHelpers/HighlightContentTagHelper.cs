@@ -19,7 +19,7 @@ namespace HlidacStatu.Web.TagHelpers
         public override void Process(TagHelperContext context, TagHelperOutput output)
         {
 
-            var result = Repositories.Searching.Highlighter.HighlightContentIntoHtmlBlock(
+            var result = HlidacStatu.Searching.Highlighter.HighlightContentIntoHtmlBlock(
                 Highlights, Path, ContentToCompare,
                 FoundContentFormat, NoHLContent, Prefix,
                 Postfix, HighlightPartDelimiter, Icon);

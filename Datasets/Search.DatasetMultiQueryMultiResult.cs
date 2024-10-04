@@ -1,5 +1,5 @@
 ﻿using HlidacStatu.Repositories.Searching;
-
+using HlidacStatu.Searching;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -9,7 +9,7 @@ namespace HlidacStatu.Datasets
     public partial class Search
     {
 
-        public class DatasetMultiQueryMultiResult : Repositories.Searching.Search.ISearchResult
+        public class DatasetMultiQueryMultiResult : HlidacStatu.Searching.Search.ISearchResult
         {
             public System.TimeSpan ElapsedTime { get; set; }
             public long Total { get { return Results.Sum(m => m.Total); } }

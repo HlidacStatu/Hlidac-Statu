@@ -28,15 +28,15 @@ namespace HlidacStatu.Extensions
 
             var cts = new CancellationTokenSource();
 
-            List<Task<Search.ISearchResult>> tasks = new()
+            List<Task<HlidacStatu.Searching.Search.ISearchResult>> tasks = new()
             {
-                Helper.CreateBaseTask<Search.ISearchResult, SmlouvaSearchResult>(
+                Helper.CreateBaseTask<HlidacStatu.Searching.Search.ISearchResult, SmlouvaSearchResult>(
                     SmlouvaRepo.Searching.SimpleSearchAsync("osobaid:" + osoba.NameId, 1, 1, 0,
                         cancellationToken: cts.Token)),
-                Helper.CreateBaseTask<Search.ISearchResult, VerejnaZakazkaSearchData>(
+                Helper.CreateBaseTask<HlidacStatu.Searching.Search.ISearchResult, VerejnaZakazkaSearchData>(
                     VerejnaZakazkaRepo.Searching.SimpleSearchAsync("osobaid:" + osoba.NameId, null, 1, 1, "0",
                         cancellationToken: cts.Token)),
-                Helper.CreateBaseTask<Search.ISearchResult, DotaceSearchResult>(
+                Helper.CreateBaseTask<HlidacStatu.Searching.Search.ISearchResult, DotaceSearchResult>(
                     DotaceRepo.Searching.SimpleSearchAsync("osobaid:" + osoba.NameId, 1, 1, "0",
                         cancellationToken: cts.Token)),
             };
@@ -46,7 +46,7 @@ namespace HlidacStatu.Extensions
             {
                 var completedTask = await Task.WhenAny(tasks);
                 tasks.Remove(completedTask);
-                Search.ISearchResult result = await completedTask;
+                HlidacStatu.Searching.Search.ISearchResult result = await completedTask;
                 if (result.Total > 0)
                 {
                     cts.Cancel();

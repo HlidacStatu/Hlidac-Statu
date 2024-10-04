@@ -2,7 +2,7 @@
 
 using System;
 
-namespace HlidacStatu.Repositories.Searching.Rules
+namespace HlidacStatu.Searching
 {
     public class Smlouva_Chyby
         : RuleBase

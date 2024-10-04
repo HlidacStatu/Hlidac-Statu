@@ -10,7 +10,7 @@ namespace HlidacStatu.Datasets
 {
     public partial class Search
     {
-        public class DatasetSumGeneralResult : Repositories.Searching.Search.GeneralResult<string>
+        public class DatasetSumGeneralResult : HlidacStatu.Searching.Search.GeneralResult<string>
         {
             public DataSet Dataset { get; set; }
             public DatasetSumGeneralResult(string query, long total, IEnumerable<string> results, int pageSize, DataSet dataset, TimeSpan searchElapsedTime)
@@ -24,7 +24,7 @@ namespace HlidacStatu.Datasets
 
         }
 
-        public class DatasetMultiResult : Repositories.Searching.Search.ISearchResult
+        public class DatasetMultiResult : HlidacStatu.Searching.Search.ISearchResult
         {
             public string Query { get; set; }
             public long Total { get { return Results.Sum(m => m.Total); } }
@@ -38,7 +38,7 @@ namespace HlidacStatu.Datasets
 
             public virtual int MaxResultWindow() { return Repositories.Searching.Tools.MaxResultWindow; }
 
-            public RouteValues ToRouteValues(int page)
+            public Searching.RouteValues ToRouteValues(int page)
             {
                 return new()
                 {

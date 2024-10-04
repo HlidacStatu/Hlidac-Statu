@@ -1,4 +1,4 @@
-namespace HlidacStatu.Repositories.Searching
+namespace HlidacStatu.Searching
 {
     public class RouteValues
     {

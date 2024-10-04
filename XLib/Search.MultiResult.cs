@@ -17,16 +17,16 @@ namespace HlidacStatu.XLib
             public System.TimeSpan TotalSearchTime { get; set; } = System.TimeSpan.Zero;
             public System.TimeSpan AddOsobyTime { get; set; } = System.TimeSpan.Zero;
             public string Query { get; set; }
-            public Repositories.Searching.Search.GeneralResult<SearchPromo> SearchPromos { get; set; } = null;
+            public HlidacStatu.Searching.Search.GeneralResult<SearchPromo> SearchPromos { get; set; } = null;
             public SmlouvaSearchResult Smlouvy { get; set; } = null;
             public VerejnaZakazkaSearchData VZ { get; set; } = null;
             public OsobaSearchResult Osoby { get; set; } = null;
             public bool OsobaFtx = false;
-            public Repositories.Searching.Search.GeneralResult<Firma> Firmy { get; set; } = null;
+            public HlidacStatu.Searching.Search.GeneralResult<Firma> Firmy { get; set; } = null;
             public Datasets.Search.DatasetMultiResult Datasets { get; set; }
             public InsolvenceFulltextSearchResult Insolvence { get; set; } = new();
             public DotaceSearchResult Dotace { get; set; } = null;
-            public Repositories.Searching.Search.GeneralResult<HlidacStatu.Lib.Data.External.Wordpress.Searching.Result> Wordpress { get; set; } = null;
+            public HlidacStatu.Searching.Search.GeneralResult<HlidacStatu.Lib.Data.External.Wordpress.Searching.Result> Wordpress { get; set; } = null;
 
             public List<Registration> DatasetRegistrations { get; set; } = new();
 
@@ -314,7 +314,7 @@ namespace HlidacStatu.XLib
                         {
                             var wpSearch = new HlidacStatu.Lib.Data.External.Wordpress.Searching(new System.Uri("http://texty.hlidacstatu.cz"));
                             var wpRes = await wpSearch.SearchAsync(query, 1, 5);
-                            res.Wordpress = new Repositories.Searching.Search.GeneralResult<Lib.Data.External.Wordpress.Searching.Result>(query, wpRes, 5)
+                            res.Wordpress = new HlidacStatu.Searching.Search.GeneralResult<Lib.Data.External.Wordpress.Searching.Result>(query, wpRes, 5)
                             {
                                 Page = 1
                             };

@@ -19,7 +19,7 @@
         @foreach (var item in Model.Dokumenty.OrderByDescending(d => d.DatumVlozeni))
         {
             //TODO na 
-            string hlres = HlidacStatu.Repositories.Searching.Highlighter.HighlightContent(highlightingData, "dokumenty.plainText", item.PlainText);
+            string hlres = HlidacStatu.Searching.Highlighter.HighlightContent(highlightingData, "dokumenty.plainText", item.PlainText);
         <tr>
             <td>
                 <span class="text-muted small">@item.DatumVlozeni.ToShortDateString()</span>

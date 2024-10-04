@@ -1,7 +1,7 @@
 using HlidacStatu.Entities;
 using HlidacStatu.Entities.OsobyES;
 using HlidacStatu.Repositories.Searching;
-using HlidacStatu.Repositories.Searching.Rules;
+using HlidacStatu.Searching;
 
 using Nest;
 

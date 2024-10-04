@@ -28,6 +28,11 @@ namespace HlidacStatu.Lib.Data.External.Wordpress
         }
         public async Task<IEnumerable<Result>> SearchAsync(string query, int page = 1, int pagesize = 5, IDictionary<string,string> customWPApiParams = null)
         {
+            //split query, change ico: holding: osobaid: na text
+            //var fixedQ = HlidacStatu.Searching.Tools.FixInvalidQuery(query, SmlouvaRepo.Searching.Irules, Tools.DefaultQueryOperators);
+            //var splQ = HlidacStatu.Repositories.Searching.SplittingQuery.SplitQuery(fixedQ);
+
+
             var raw = await SearchRawAsync(query, page, pagesize, customWPApiParams);
             if (raw?.Length>0)
             {

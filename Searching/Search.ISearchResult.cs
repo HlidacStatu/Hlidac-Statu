@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace HlidacStatu.Repositories.Searching
+﻿namespace HlidacStatu.Searching
 {
     public partial class Search
     {
@@ -25,4 +23,5 @@ namespace HlidacStatu.Repositories.Searching
 
 
     }
+
 }

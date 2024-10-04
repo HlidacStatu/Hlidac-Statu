@@ -2,7 +2,7 @@ using Devmasters;
 
 using HlidacStatu.Entities;
 using HlidacStatu.Repositories.Searching;
-using HlidacStatu.Repositories.Searching.Rules;
+using HlidacStatu.Searching;
 using Nest;
 
 using System;
@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using HlidacStatu.Connectors;
+using HlidacStatu.Searching;
 
 namespace HlidacStatu.Repositories
 {
@@ -17,7 +18,23 @@ namespace HlidacStatu.Repositories
     {
         public static class Searching
         {
+            static Searching()
+            {
+                AllValues = GetAllValuesAsync().ConfigureAwait(false).GetAwaiter().GetResult();
+            }
 
+            public readonly static Dictionary<int, string[]> AllValues = new();
+
+            private static async Task<Dictionary<int, string[]>> GetAllValuesAsync()
+            {
+                var client = await Manager.GetESClient_RPP_KategorieAsync();
+                var res = await client.SearchAsync<Lib.Data.External.RPP.KategorieOVM>(
+                    s => s.Query(q => q.MatchAll()).Size(2000)
+                    );
+                return res.Hits
+                    .Select(m => new { id = m.Source.id, icos = m.Source.OVM_v_kategorii.Select(o => o.kodOvm).ToArray() })
+                    .ToDictionary(k => k.id, v => v.icos);
+            }
 
             public static async Task<Search.GeneralResult<Firma>> SimpleSearchAsync(string query, int page, int size)
             {
@@ -25,7 +42,7 @@ namespace HlidacStatu.Repositories
 
                 string modifQ = SimpleQueryCreator
                     .GetSimpleQuery(query,
-                        new IRule[] { new Firmy_OVMKategorie() })
+                        new IRule[] { new Firmy_OVMKategorie(AllValues) })
                     .FullQuery();
 
                 string[] specifiedIcosInQuery =

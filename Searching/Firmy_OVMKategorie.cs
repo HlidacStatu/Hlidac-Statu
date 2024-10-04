@@ -2,16 +2,17 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using HlidacStatu.Connectors;
 
-namespace HlidacStatu.Repositories.Searching.Rules
+namespace HlidacStatu.Searching
 {
     public class Firmy_OVMKategorie
         : RuleBase
     {
-        public Firmy_OVMKategorie(bool stopFurtherProcessing = false, string addLastCondition = "")
+        public Firmy_OVMKategorie(Dictionary<int, string[]> validValues, bool stopFurtherProcessing = false, string addLastCondition = "")
             : base("", stopFurtherProcessing, addLastCondition)
-        { }
+        {
+            this.validValues = validValues;
+        }
 
         public override string[] Prefixes
         {
@@ -21,20 +22,8 @@ namespace HlidacStatu.Repositories.Searching.Rules
             }
         }
 
+        private readonly Dictionary<int, string[]> validValues;
 
-        public readonly static Dictionary<int, string[]> AllValues = GetAllValuesAsync()
-            .ConfigureAwait(false).GetAwaiter().GetResult();
-
-        private static async Task<Dictionary<int, string[]>> GetAllValuesAsync()
-        {
-            var client = await Manager.GetESClient_RPP_KategorieAsync();
-            var res = await client.SearchAsync<Lib.Data.External.RPP.KategorieOVM>(
-                s => s.Query(q => q.MatchAll()).Size(2000)
-                );
-            return res.Hits
-                .Select(m => new { id = m.Source.id, icos = m.Source.OVM_v_kategorii.Select(o => o.kodOvm).ToArray() })
-                .ToDictionary(k => k.id, v => v.icos);
-        }
         protected override RuleResult processQueryPart(SplittingQuery.Part part)
         {
             if (part == null)
@@ -43,11 +32,11 @@ namespace HlidacStatu.Repositories.Searching.Rules
             if (part.Prefix.Equals("kategorieid:", StringComparison.InvariantCultureIgnoreCase))
             {
                 var katId = part.Value;
-                foreach (var key in AllValues.Keys)
+                foreach (var key in validValues.Keys)
                 {
                     if (katId.Equals(key.ToString(), StringComparison.InvariantCultureIgnoreCase))
                     {
-                        string icosQuery = " ( " + AllValues[key]
+                        string icosQuery = " ( " + validValues[key]
                                 .Select(t => $"ico:{t}")
                                 .Aggregate((f, s) => f + " OR " + s) + " ) ";
                         return new RuleResult(SplittingQuery.SplitQuery($"{icosQuery}"), NextStep);

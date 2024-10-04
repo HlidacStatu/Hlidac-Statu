@@ -433,10 +433,11 @@ else if (Model.HasResults == false)
 
     @{
         //analyze query and show big boxes
-        var fixedQ = Tools.FixInvalidQuery(Model.Query, SmlouvaRepo.Searching.Irules, Tools.DefaultQueryOperators);
+        var fixedQ = HlidacStatu.Searching.Tools.FixInvalidQuery(Model.Query, SmlouvaRepo.Searching.Irules,
+        HlidacStatu.Searching.Tools.DefaultQueryOperators);
 
-        var splQ = HlidacStatu.Repositories.Searching.SplittingQuery.SplitQuery(fixedQ);
-        string[] prefixes = new string[] { "osobaid:", "ico:" };
+        var splQ = HlidacStatu.Searching.SplittingQuery.SplitQuery(fixedQ);
+        string[] prefixes = new string[] { "osobaid:", "ico:", "holding:" };
         int parts = 0;
         if (splQ.Parts.Any(m => prefixes.Contains(m.Prefix)) || Model.SearchPromos.HasResult)
         {
@@ -460,7 +461,7 @@ else if (Model.HasResults == false)
                 }
 
                 @* firmy *@
-                @foreach (var fP in splQ.Parts.Where(m => m.Prefix == "ico:"))
+                @foreach (var fP in splQ.Parts.Where(m => m.Prefix == "ico:" || m.Prefix == "holding:"))
                 {
                     parts++;
                     Firma fo = Firmy.Get(fP.Value);

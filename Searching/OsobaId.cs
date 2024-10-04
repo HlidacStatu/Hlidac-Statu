@@ -1,19 +1,16 @@
-﻿using HlidacStatu.DS.Graphs;
-using HlidacStatu.Entities;
+﻿using System.Text.RegularExpressions;
 
-using System;
-using System.Linq;
-using System.Text.RegularExpressions;
-
-namespace HlidacStatu.Repositories.Searching.Rules
+namespace HlidacStatu.Searching
 {
     public class OsobaId
         : RuleBase
     {
+        private readonly Func<string, string[]> icosConnectedToPerson;
         string _specificPrefix = null;
-        public OsobaId(string specificPrefix, string replaceWith, bool stopFurtherProcessing = false, string addLastCondition = "")
+        public OsobaId(Func<string, string[]> icosConnectedToPerson, string specificPrefix, string replaceWith, bool stopFurtherProcessing = false, string addLastCondition = "")
             : base(replaceWith, stopFurtherProcessing, addLastCondition)
         {
+            this.icosConnectedToPerson = icosConnectedToPerson;
             _specificPrefix = specificPrefix;
         }
 
@@ -65,48 +62,38 @@ namespace HlidacStatu.Repositories.Searching.Rules
                 {
                     //list of ICO connected to this person
                     string nameId = part.Value;
-                    Osoba p = Osoby.GetByNameId.Get(nameId);
                     string icosQuery = "";
 
-                    //string icoprefix = replaceWith;
                     var templ = $" ( {ReplaceWith}{{0}} ) ";
                     if (ReplaceWith.Contains("${q}"))
                         templ = $" ( {ReplaceWith.Replace("${q}", "{0}")} )";
-                    if (p != null)
+                    var icos = this.icosConnectedToPerson(nameId);
+                    if (icos != null && icos.Length > 0)
                     {
-                        var icos = p.AktualniVazby(Relation.AktualnostType.Nedavny)
-                                    .Where(w => !string.IsNullOrEmpty(w.To.Id))
-                                    //.Where(w => Analysis.ACore.GetBasicStatisticForICO(w.To.Id).Summary.Pocet > 0)
-                                    .Select(w => w.To.Id)
-                                    .Distinct().ToArray();
-
-
-                        if (icos != null && icos.Length > 0)
+                        icosQuery = " ( " + icos
+                            .Select(t => string.Format(templ, t))
+                            .Aggregate((f, s) => f + " OR " + s) + " ) ";
+                    }
+                    else
+                    {
+                        icosQuery = string.Format(templ, "noOne"); //$" ( {icoprefix}:noOne ) ";
+                    }
+                    bool lastCondAdded = false;
+                    if (!string.IsNullOrEmpty(AddLastCondition))
+                    {
+                        if (AddLastCondition.Contains("${q}"))
                         {
-                            icosQuery = " ( " + icos
-                                .Select(t => string.Format(templ, t))
-                                .Aggregate((f, s) => f + " OR " + s) + " ) ";
+                            icosQuery = Query.ModifyQueryOR(icosQuery, AddLastCondition.Replace("${q}", part.Value));
                         }
                         else
                         {
-                            icosQuery = string.Format(templ, "noOne"); //$" ( {icoprefix}:noOne ) ";
+                            icosQuery = Query.ModifyQueryOR(icosQuery, AddLastCondition);
                         }
-                        bool lastCondAdded = false;
-                        if (!string.IsNullOrEmpty(AddLastCondition))
-                        {
-                            if (AddLastCondition.Contains("${q}"))
-                            {
-                                icosQuery = Query.ModifyQueryOR(icosQuery, AddLastCondition.Replace("${q}", part.Value));
-                            }
-                            else
-                            {
-                                icosQuery = Query.ModifyQueryOR(icosQuery, AddLastCondition);
-                            }
-                            lastCondAdded = true;
-                            //this.AddLastCondition = null; //done, don't do it anywhere
-                        }
-                        return new RuleResult(SplittingQuery.SplitQuery($"{icosQuery}"), NextStep, lastCondAdded);
+                        lastCondAdded = true;
+                        //this.AddLastCondition = null; //done, don't do it anywhere
                     }
+                    return new RuleResult(SplittingQuery.SplitQuery($"{icosQuery}"), NextStep, lastCondAdded);
+
                 } // if (!string.IsNullOrWhiteSpace(this.ReplaceWith))
                 else if (!string.IsNullOrWhiteSpace(AddLastCondition))
                 {

@@ -49,7 +49,7 @@ namespace HlidacStatu.XLib.Render
                                 string path = System.Text.RegularExpressions.
                                     Regex.Replace(jobj.Path, @"\[\d{1,}\]", "")
                                     + ".DocumentPlainText";
-                                HLresult = Repositories.Searching.Highlighter.HighlightContentIntoHtmlBlock(highlightingData,
+                                HLresult = HlidacStatu.Searching.Highlighter.HighlightContentIntoHtmlBlock(highlightingData,
                                     path,
                                     jobj["DocumentPlainText"].Value<string>(), " ..... ",
                                     prefix: highlPrefix, postfix: highlPostfix);
@@ -364,7 +364,7 @@ namespace HlidacStatu.XLib.Render
 
 
                 return "<div class='highlighting'>"
-                    + Repositories.Searching.Highlighter.HighlightFullContent(highlightingData, attrPath, s)
+                    + Searching.Highlighter.HighlightFullContent(highlightingData, attrPath, s)
                     + "</div>";
                 //return s;
             }

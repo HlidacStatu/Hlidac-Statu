@@ -16,6 +16,7 @@
     <ItemGroup>
       <ProjectReference Include="..\Connectors\Connectors.csproj" />
       <ProjectReference Include="..\Repositories\Repositories.csproj" />
+      <ProjectReference Include="..\Searching\Searching.csproj" />
     </ItemGroup>
 
 </Project>

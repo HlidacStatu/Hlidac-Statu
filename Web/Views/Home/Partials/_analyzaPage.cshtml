@@ -273,7 +273,7 @@
                     <td>@(Firmy.GetJmeno(ico))</td>
                         @foreach (var y in Years)
                         {
-                            var query = HlidacStatu.Repositories.Searching.Query.ModifyQueryAND(Model.Query, $"ico:{ico}", $"datumUzavreni:[{y}-01-01 TO {(y + 1)}-01-01}}");
+                            var query = HlidacStatu.Searching.Query.ModifyQueryAND(Model.Query, $"ico:{ico}", $"datumUzavreni:[{y}-01-01 TO {(y + 1)}-01-01}}");
                             var urlQ = "/hledat?q=" + System.Net.WebUtility.UrlEncode(query);
 
                         <td>@Html.Raw(fStat[y].Formatted(true, urlQ, textIfZero:""))</td>
@@ -375,7 +375,7 @@
                     <td>@(Firmy.GetJmeno(ico))</td>
                         @foreach (var y in Years)
                         {
-                            var query = HlidacStatu.Repositories.Searching.Query.ModifyQueryAND(Model.Query, $"ico:{ico}", $"datumUzavreni:[{y}-01-01 TO {(y + 1)}-01-01}}");
+                            var query = HlidacStatu.Searching.Query.ModifyQueryAND(Model.Query, $"ico:{ico}", $"datumUzavreni:[{y}-01-01 TO {(y + 1)}-01-01}}");
                             var urlQ = "/hledat?q=" + System.Net.WebUtility.UrlEncode(query);
 
                         <td>@Html.Raw(fStat[y].Formatted(true, urlQ, textIfZero:""))</td>

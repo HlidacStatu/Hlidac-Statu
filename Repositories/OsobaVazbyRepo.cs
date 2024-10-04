@@ -1,21 +1,43 @@
 using HlidacStatu.DS.Graphs;
 using HlidacStatu.DS.Graphs2;
 using HlidacStatu.Entities;
-
-
+using Serilog;
 using System;
 using System.Linq;
-using Serilog;
 
 namespace HlidacStatu.Repositories
 {
     public static class OsobaVazbyRepo
     {
         private static readonly ILogger _logger = Log.ForContext(typeof(OsobaVazbyRepo));
-        
+
+
+
+        public static string[] Icos_s_VazbouNaOsobu(string nameId)
+        {
+            string[] res = Array.Empty<string>();
+            Osoba p = Osoby.GetByNameId.Get(nameId);
+
+            if (p != null)
+            {
+                var icos = p.AktualniVazby(Relation.AktualnostType.Nedavny)
+                            .Where(w => !string.IsNullOrEmpty(w.To.Id))
+                            //.Where(w => Analysis.ACore.GetBasicStatisticForICO(w.To.Id).Summary.Pocet > 0)
+                            .Select(w => w.To.Id)
+                            .Distinct().ToArray();
+
+
+                if (icos != null && icos.Length > 0)
+                {
+                    res = icos.ToArray();
+                }
+            }
+            return res;
+        }
+
         public static void AddOrUpdate(
             int osobaId, int vazbakOsobaId,
-            int kod_angm, string funkce, decimal? share, 
+            int kod_angm, string funkce, decimal? share,
             DateTime? fromDate, DateTime? toDate,
             DateTime? zapisORfromDate, DateTime? zapisORtoDate,
             string zdroj = ""
@@ -85,7 +107,7 @@ namespace HlidacStatu.Repositories
 
         public static void AddOrUpdate(
             int osobaId, string dcerinkaIco,
-            int kod_angm, string funkce, decimal? share, 
+            int kod_angm, string funkce, decimal? share,
             DateTime? fromDate, DateTime? toDate,
             DateTime? zapisORfromDate, DateTime? zapisORtoDate,
             string zdroj = ""
@@ -231,7 +253,7 @@ namespace HlidacStatu.Repositories
                 .Count() ?? 0;
         }
 
-        public static HlidacStatu.DS.Graphs.Graph.Edge[] AktualniVazby(this Osoba osoba, Relation.AktualnostType minAktualnost, bool refresh=false)
+        public static HlidacStatu.DS.Graphs.Graph.Edge[] AktualniVazby(this Osoba osoba, Relation.AktualnostType minAktualnost, bool refresh = false)
         {
             return Relation.AktualniVazby(osoba.Vazby(refresh), minAktualnost, osoba.VazbyRootEdge());
         }

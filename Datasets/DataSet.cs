@@ -1037,7 +1037,7 @@ namespace HlidacStatu.Datasets
 
         public async Task<IEnumerable<dynamic>> GetAllDataForQueryAsync(string queryString, string scrollTimeout = "2m", int scrollSize = 1000)
         {
-            var fixedQuery = Repositories.Searching.Tools.FixInvalidQuery(queryString,
+            var fixedQuery = Searching.Tools.FixInvalidQuery(queryString,
                 DatasetRepo.Searching.QueryShorcuts,
                 DatasetRepo.Searching.QueryOperators);
 

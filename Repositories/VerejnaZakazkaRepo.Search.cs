@@ -1,7 +1,7 @@
 using HlidacStatu.Entities;
 using HlidacStatu.Entities.VZ;
 using HlidacStatu.Repositories.Searching;
-using HlidacStatu.Repositories.Searching.Rules;
+using HlidacStatu.Searching;
 
 using Nest;
 using System;
@@ -11,6 +11,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using HlidacStatu.Connectors;
 using Serilog;
+using HlidacStatu.Searching;
 
 namespace HlidacStatu.Repositories
 {
@@ -21,18 +22,18 @@ namespace HlidacStatu.Repositories
         {
             public static IRule[] Rules = new IRule[]
             {
-                new OsobaId("osobaid:", "ico:"),
-                new OsobaId("osobaiddodavatel:", "icododavatel:"),
-                new OsobaId("osobaidzadavatel:", "icozadavatel:"),
+                new OsobaId(HlidacStatu.Repositories.OsobaVazbyRepo.Icos_s_VazbouNaOsobu, "osobaid:", "ico:"),
+                new OsobaId(HlidacStatu.Repositories.OsobaVazbyRepo.Icos_s_VazbouNaOsobu, "osobaiddodavatel:", "icododavatel:"),
+                new OsobaId(HlidacStatu.Repositories.OsobaVazbyRepo.Icos_s_VazbouNaOsobu, "osobaidzadavatel:", "icozadavatel:"),
 
-                new Holding("holding:", "ico:"),
-                new Holding("holdingdodavatel:", "icododavatel:"),
-                new Holding("holdingzadavatel:", "icozadavatel:"),
-                new Holding("holdingprijemce:", "icododavatel:"),
-                new Holding("holdingplatce:", "icozadavatel:"),
+                new Holding(HlidacStatu.Repositories.FirmaVazbyRepo.IcosInHolding, "holding:", "ico:"),
+                new Holding(HlidacStatu.Repositories.FirmaVazbyRepo.IcosInHolding, "holdingdodavatel:", "icododavatel:"),
+                new Holding(HlidacStatu.Repositories.FirmaVazbyRepo.IcosInHolding, "holdingzadavatel:", "icozadavatel:"),
+                new Holding(HlidacStatu.Repositories.FirmaVazbyRepo.IcosInHolding, "holdingprijemce:", "icododavatel:"),
+                new Holding(HlidacStatu.Repositories.FirmaVazbyRepo.IcosInHolding, "holdingplatce:", "icozadavatel:"),
 
                 new VZ_CPV(),
-                new VZ_Oblast(),
+                new VZ_Oblast(VerejnaZakazkaRepo.Searching.CpvOblastToCpv),
                 new VZ_Form(),
 
                 new TransformPrefixWithValue("zahajeny:", "stavVZ:<=100", "1"),
@@ -335,7 +336,7 @@ namespace HlidacStatu.Repositories
                 if (fixQuery)
                 {
                     search.OrigQuery = query;
-                    query = Tools.FixInvalidQuery(query, queryShorcuts, queryOperators);
+                    query = HlidacStatu.Searching.Tools.FixInvalidQuery(query, queryShorcuts, queryOperators);
                 }
 
                 search.Q = query;
@@ -350,7 +351,7 @@ namespace HlidacStatu.Repositories
                             .Query(q => GetSimpleQuery(search))
                             .Sort(ss => GetSort(search.Order))
                             .Aggregations(aggrFunc)
-                            .Highlight(h => Tools.GetHighlight<VerejnaZakazka>(withHighlighting))
+                            .Highlight(h => Repositories.Searching.Tools.GetHighlight<VerejnaZakazka>(withHighlighting))
                             .TrackTotalHits(search.ExactNumOfResults || page * search.PageSize == 0
                                 ? true
                                 : (bool?)null),
@@ -367,7 +368,7 @@ namespace HlidacStatu.Repositories
                                 .Query(q => GetSimpleQuery(search))
                                 .Sort(ss => GetSort(search.Order))
                                 .Aggregations(aggrFunc)
-                                .Highlight(h => Tools.GetHighlight<VerejnaZakazka>(false))
+                                .Highlight(h => Repositories.Searching.Tools.GetHighlight<VerejnaZakazka>(false))
                                 .TrackTotalHits(search.ExactNumOfResults || page * search.PageSize == 0
                                     ? true
                                     : (bool?)null),
@@ -522,7 +523,7 @@ namespace HlidacStatu.Repositories
 
             public static IAsyncEnumerable<VerejnaZakazka> GetVzForHoldingAsync(string holdingIco)
             {
-                string query = Tools.FixInvalidQuery($"holding:{holdingIco}", queryShorcuts, queryOperators);
+                string query = HlidacStatu.Searching.Tools.FixInvalidQuery($"holding:{holdingIco}", queryShorcuts, queryOperators);
                 var qc = SimpleQueryCreator.GetSimpleQuery<VerejnaZakazka>(query, Rules);
 
                 return YieldAllAsync(qc);

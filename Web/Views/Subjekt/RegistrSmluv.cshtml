@@ -19,7 +19,7 @@
     {
         if (year.HasValue)
         {
-            query = HlidacStatu.Repositories.Searching.Query.ModifyQueryAND(query, $"datumUzavreni:[{year}-01-01 TO {year + 1}-01-01}}");
+            query = HlidacStatu.Searching.Query.ModifyQueryAND(query, $"datumUzavreni:[{year}-01-01 TO {year + 1}-01-01}}");
         }
         return $"{url}?q={System.Net.WebUtility.UrlEncode(query)}";
     }
@@ -322,7 +322,7 @@
                                 HtmlRender = (m) =>
                                 {
                                     var t = ((Smlouva.SClassification.ClassificationsTypes)m.Key);
-                                    return $"<a href='{Smlouva.SClassification.Classification.GetSearchUrl(t)} AND ico:{Model.ICO} AND {HlidacStatu.Repositories.Searching.Query.Formatted("podepsano",new DateTime(y,1,1),new DateTime(y,12,31))}'>"
+                                    return $"<a href='{Smlouva.SClassification.Classification.GetSearchUrl(t)} AND ico:{Model.ICO} AND {HlidacStatu.Searching.Query.Formatted("podepsano",new DateTime(y,1,1),new DateTime(y,12,31))}'>"
                                     +$"{((Smlouva.SClassification.ClassificationsTypes)m.Key).ToNiceDisplayName()}"
                                     +$"</a>";
                                 }
@@ -374,7 +374,7 @@
                                 HtmlRender = (m) =>
                                 {
                                     var query = $"ico:{Model.ICO} AND ico:{m.Key} AND "
-                               + $"{HlidacStatu.Repositories.Searching.Query.Formatted("podepsano",new DateTime(y,1,1),new DateTime(y,12,31))}";
+                               + $"{HlidacStatu.Searching.Query.Formatted("podepsano",new DateTime(y,1,1),new DateTime(y,12,31))}";
                                    return $"<a href='/HledatSmlouvy?Q={System.Net.WebUtility.UrlEncode(query)}'>"
                                        +$"{HlidacStatu.Util.RenderData.NiceNumber(m.Value.Pocet)}"
                                        +$"</a>";

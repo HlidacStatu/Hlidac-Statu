@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
                 <TargetFramework>net8.0</TargetFramework>
@@ -16,6 +16,7 @@
       <ProjectReference Include="..\Lib.Analytics\Lib.Analytics.csproj" />
 <!--      <ProjectReference Include="..\Lib.Data.External\Lib.Data.External.csproj" />-->
       <ProjectReference Include="..\Lib.OCR.Api.Client\Lib.OCR.Api.Client.csproj" />
+      <ProjectReference Include="..\Searching\Searching.csproj" />
       <ProjectReference Include="..\Util\Util.csproj" />
     </ItemGroup>
 

@@ -5,7 +5,7 @@ using HlidacStatu.DS.Graphs;
 using HlidacStatu.Entities;
 using HlidacStatu.Extensions;
 using HlidacStatu.Repositories.Searching;
-using HlidacStatu.Repositories.Searching.Rules;
+using HlidacStatu.Searching;
 using Microsoft.EntityFrameworkCore;
 
 using Nest;

@@ -3,11 +3,11 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace HlidacStatu.Repositories.Searching
+namespace HlidacStatu.Searching
 {
     public static class SimpleQueryCreator
     {
-        public static SplittingQuery GetSimpleQuery(string query, Rules.IRule[] rules)
+        public static SplittingQuery GetSimpleQuery(string query, IRule[] rules)
         {
             var fixedQuery = Tools.FixInvalidQuery(query, rules) ?? "";
             var sq = SplittingQuery.SplitQuery(fixedQuery);
@@ -15,35 +15,35 @@ namespace HlidacStatu.Repositories.Searching
         }
 
 
-        public static SplittingQuery GetSimpleQuery(SplittingQuery sq, Rules.IRule[] rules)
+        public static SplittingQuery GetSimpleQuery(SplittingQuery sq, IRule[] rules)
         {
             SplittingQuery finalSq = new SplittingQuery();
 
             if (rules.Count() == 0)
                 finalSq = sq;
 
-            Dictionary<int, Rules.RuleResult> queryPartResults = new Dictionary<int, Rules.RuleResult>();
+            Dictionary<int, RuleResult> queryPartResults = new Dictionary<int, RuleResult>();
             for (int qi = 0; qi < sq.Parts.Length; qi++)
             {
                 //beru cast dotazu
-                queryPartResults.Add(qi, new Rules.RuleResult());
+                queryPartResults.Add(qi, new RuleResult());
 
                 //aplikuju na nej jednotliva pravidla, nasledujici na vysledek predchoziho
                 SplittingQuery.Part[] qToProcess = null;
-                List<Rules.RuleResult> qpResults = new List<Rules.RuleResult>();
+                List<RuleResult> qpResults = new List<RuleResult>();
                 foreach (var rule in rules)
                 {
                     qToProcess = qToProcess ?? new SplittingQuery.Part[] { sq.Parts[qi] };
-                    qpResults = new List<Rules.RuleResult>();
+                    qpResults = new List<RuleResult>();
                     foreach (var qp in qToProcess)
                     {
                         var partRest = rule.Process(qp);
                         if (partRest != null)
                             qpResults.Add(partRest);
                         else
-                            qpResults.Add(new Rules.RuleResult(qp, rule.NextStep));
+                            qpResults.Add(new RuleResult(qp, rule.NextStep));
                     }
-                    if (qpResults.Last().NextStep == Rules.NextStepEnum.StopFurtherProcessing)
+                    if (qpResults.Last().NextStep == NextStepEnum.StopFurtherProcessing)
                         break;
 
                     qToProcess = qpResults
@@ -53,7 +53,7 @@ namespace HlidacStatu.Repositories.Searching
 
                 } //rules
 
-                queryPartResults[qi] = new Rules.RuleResult(new SplittingQuery(qToProcess), qpResults.LastOrDefault()?.NextStep ?? Rules.NextStepEnum.Finished);
+                queryPartResults[qi] = new RuleResult(new SplittingQuery(qToProcess), qpResults.LastOrDefault()?.NextStep ?? NextStepEnum.Finished);
 
             } //qi all query parts
 
@@ -66,7 +66,7 @@ namespace HlidacStatu.Repositories.Searching
         }
 
 
-        public static QueryContainer GetSimpleQuery<T>(string query, Rules.IRule[] rules, string[] fields = null)
+        public static QueryContainer GetSimpleQuery<T>(string query, IRule[] rules, string[] fields = null)
             where T : class
         {
             var sq = GetSimpleQuery(query, rules);

@@ -1,18 +1,14 @@
-﻿using HlidacStatu.DS.Graphs;
-using HlidacStatu.Entities;
-
-using System;
-using System.Linq;
-
-namespace HlidacStatu.Repositories.Searching.Rules
+﻿namespace HlidacStatu.Searching
 {
     public class Holding
         : RuleBase
     {
+        private readonly Func<string, string[]> icosInHoldingFunc;
         string _specificPrefix = null;
-        public Holding(string specificPrefix, string replaceWith, bool stopFurtherProcessing = false, string addLastCondition = "")
+        public Holding(Func<string, string[]> icosInHoldingFunc, string specificPrefix, string replaceWith, bool stopFurtherProcessing = false, string addLastCondition = "")
             : base(replaceWith, stopFurtherProcessing, addLastCondition)
         {
+            this.icosInHoldingFunc = icosInHoldingFunc;
             _specificPrefix = specificPrefix;
         }
 
@@ -58,43 +54,27 @@ namespace HlidacStatu.Repositories.Searching.Rules
             {
                 //list of ICO connected to this holding
                 string holdingIco = part.Value;
-                Relation.AktualnostType aktualnost = Relation.AktualnostType.Nedavny;
-                Firma f = Firmy.Get(holdingIco);
-                if (f != null && f.Valid)
+                string[] holdingIcos = icosInHoldingFunc(holdingIco);
+
+                string icosQuery = "";
+
+                var templ = $" ( {ReplaceWith}{{0}} ) ";
+                if (ReplaceWith.Contains("${q}"))
+                    templ = $" ( {ReplaceWith.Replace("${q}", "{0}")} )";
+
+                if (holdingIcos != null && holdingIcos.Count() > 0)
                 {
-                    var icos = new string[] { f.ICO }
-                        .Union(
-                            f.AktualniVazby(aktualnost)
-                            .Select(s => s.To.Id)
-                        )
-                        .Distinct();
-                    string icosQuery = "";
-                    var icosPresLidi = f.AktualniVazby(aktualnost)
-                            .Where(o => o.To.Type == HlidacStatu.DS.Graphs.Graph.Node.NodeType.Person)
-                            .Select(o => Osoby.GetById.Get(Convert.ToInt32(o.To.Id)))
-                            .Where(o => o != null)
-                            .SelectMany(o => o.AktualniVazby(aktualnost))
-                            .Select(v => v.To.Id)
-                            .Distinct();
-                    icos = icos.Union(icosPresLidi).Distinct();
-
-                    var templ = $" ( {ReplaceWith}{{0}} ) ";
-                    if (ReplaceWith.Contains("${q}"))
-                        templ = $" ( {ReplaceWith.Replace("${q}", "{0}")} )";
-
-                    if (icos != null && icos.Count() > 0)
-                    {
-                        icosQuery = " ( " + icos
-                            .Select(t => string.Format(templ, t))
-                            .Aggregate((fi, s) => fi + " OR " + s) + " ) ";
-                    }
-                    else
-                    {
-                        icosQuery = string.Format(templ, "noOne"); //$" ( {icoprefix}:noOne ) ";
-                    }
-
-                    return new RuleResult(SplittingQuery.SplitQuery($"{icosQuery}"), NextStep);
+                    icosQuery = " ( " + holdingIcos
+                        .Select(t => string.Format(templ, t))
+                        .Aggregate((fi, s) => fi + " OR " + s) + " ) ";
                 }
+                else
+                {
+                    icosQuery = string.Format(templ, "noOne"); //$" ( {icoprefix}:noOne ) ";
+                }
+
+                return new RuleResult(SplittingQuery.SplitQuery($"{icosQuery}"), NextStep);
+
             }
 
             return null;

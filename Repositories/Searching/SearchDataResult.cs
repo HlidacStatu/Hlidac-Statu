@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace HlidacStatu.Repositories.Searching
 {
-    public class SearchDataResult<T> : Search.ISearchResult
+    public class SearchDataResult<T> : HlidacStatu.Searching.Search.ISearchResult
         where T : class
     {
 
@@ -14,7 +14,7 @@ namespace HlidacStatu.Repositories.Searching
         public virtual int MaxResultWindow() { return Tools.MaxResultWindow; }
         public string Query { get; set; } = "";
 
-        public RouteValues ToRouteValues(int page)
+        public HlidacStatu.Searching.RouteValues ToRouteValues(int page)
         {
             return new()
             {

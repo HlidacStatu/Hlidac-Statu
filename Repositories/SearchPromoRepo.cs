@@ -6,7 +6,8 @@ using HlidacStatu.Entities;
 using HlidacStatu.Entities.KIndex;
 using HlidacStatu.Repositories.Analysis.KorupcniRiziko;
 using HlidacStatu.Repositories.Searching;
-using HlidacStatu.Repositories.Searching.Rules;
+using HlidacStatu.Searching;
+using HlidacStatu.Searching;
 using Nest;
 using Serilog;
 using System;
@@ -23,12 +24,12 @@ namespace HlidacStatu.Repositories
         private static readonly ILogger _logger = Log.ForContext(typeof(SearchPromoRepo));
 
         public static IRule[] Irules = new IRule[] {
-            new OsobaId("osobaid:","ico:" ),
-            new Holding("holdingprijemce:","ico:" ),
-            new Holding("holdingplatce:","ico:" ),
-            new Holding("holdingdodavatel:","ico:" ),
-            new Holding("holdingzadavatel:","ico:" ),
-            new Holding(null,"ico:" ),
+            new OsobaId(HlidacStatu.Repositories.OsobaVazbyRepo.Icos_s_VazbouNaOsobu, "osobaid:","ico:" ),
+            new Holding(HlidacStatu.Repositories.FirmaVazbyRepo.IcosInHolding, "holdingprijemce:","ico:" ),
+            new Holding(HlidacStatu.Repositories.FirmaVazbyRepo.IcosInHolding, "holdingplatce:","ico:" ),
+            new Holding(HlidacStatu.Repositories.FirmaVazbyRepo.IcosInHolding, "holdingdodavatel:","ico:" ),
+            new Holding(HlidacStatu.Repositories.FirmaVazbyRepo.IcosInHolding, "holdingzadavatel:","ico:" ),
+            new Holding(HlidacStatu.Repositories.FirmaVazbyRepo.IcosInHolding, null,"ico:" ),
         };
 
         public static async Task FillDbAsync(bool fullRebuild = false, Action<string> outputWriter = null, Action<ActionProgressData> progressWriter = null)

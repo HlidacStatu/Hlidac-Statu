@@ -2,11 +2,12 @@ using HlidacStatu.Connectors;
 using HlidacStatu.Entities;
 using HlidacStatu.Entities.Insolvence;
 using HlidacStatu.Repositories.Searching;
-using HlidacStatu.Repositories.Searching.Rules;
+using HlidacStatu.Searching;
 using Nest;
 using System;
 using System.Threading.Tasks;
 using Serilog;
+using HlidacStatu.Searching;
 
 namespace HlidacStatu.Repositories
 {
@@ -51,15 +52,15 @@ namespace HlidacStatu.Repositories
 
                 IRule[] irules = new IRule[]
                 {
-                    new OsobaId("osobaid:", "ico:"),
-                    new OsobaId("osobaiddluznik:", "icodluznik:"),
-                    new OsobaId("osobaidveritel:", "icoveritel:"),
-                    new OsobaId("osobaidspravce:", "icospravce:"),
+                    new OsobaId(HlidacStatu.Repositories.OsobaVazbyRepo.Icos_s_VazbouNaOsobu, "osobaid:", "ico:"),
+                    new OsobaId(HlidacStatu.Repositories.OsobaVazbyRepo.Icos_s_VazbouNaOsobu, "osobaiddluznik:", "icodluznik:"),
+                    new OsobaId(HlidacStatu.Repositories.OsobaVazbyRepo.Icos_s_VazbouNaOsobu, "osobaidveritel:", "icoveritel:"),
+                    new OsobaId(HlidacStatu.Repositories.OsobaVazbyRepo.Icos_s_VazbouNaOsobu, "osobaidspravce:", "icospravce:"),
 
-                    new Holding("holding:", "ico:"),
-                    new Holding("holdindluznik:", "icoplatce:"),
-                    new Holding("holdingveritel:", "icoveritel:"),
-                    new Holding("holdingspravce:", "icospravce:"),
+                    new Holding(HlidacStatu.Repositories.FirmaVazbyRepo.IcosInHolding, "holding:", "ico:"),
+                    new Holding(HlidacStatu.Repositories.FirmaVazbyRepo.IcosInHolding, "holdindluznik:", "icoplatce:"),
+                    new Holding(HlidacStatu.Repositories.FirmaVazbyRepo.IcosInHolding, "holdingveritel:", "icoveritel:"),
+                    new Holding(HlidacStatu.Repositories.FirmaVazbyRepo.IcosInHolding, "holdingspravce:", "icospravce:"),
 
                     new TransformPrefixWithValue("ico:",
                         "(dluznici.iCO:${q} OR veritele.iCO:${q} OR spravci.iCO:${q}) ", null),
@@ -116,15 +117,15 @@ namespace HlidacStatu.Repositories
 
                 IRule[] irules = new IRule[]
                 {
-                    new OsobaId("osobaid:", "ico:"),
-                    new OsobaId("osobaiddluznik:", "icodluznik:"),
-                    new OsobaId("osobaidveritel:", "icoveritel:"),
-                    new OsobaId("osobaidspravce:", "icospravce:"),
+                    new OsobaId(HlidacStatu.Repositories.OsobaVazbyRepo.Icos_s_VazbouNaOsobu, "osobaid:", "ico:"),
+                    new OsobaId(HlidacStatu.Repositories.OsobaVazbyRepo.Icos_s_VazbouNaOsobu, "osobaiddluznik:", "icodluznik:"),
+                    new OsobaId(HlidacStatu.Repositories.OsobaVazbyRepo.Icos_s_VazbouNaOsobu, "osobaidveritel:", "icoveritel:"),
+                    new OsobaId(HlidacStatu.Repositories.OsobaVazbyRepo.Icos_s_VazbouNaOsobu, "osobaidspravce:", "icospravce:"),
 
-                    new Holding("holding:", "ico:"),
-                    new Holding("holdindluznik:", "icoplatce:"),
-                    new Holding("holdingveritel:", "icoveritel:"),
-                    new Holding("holdingspravce:", "icospravce:"),
+                    new Holding(HlidacStatu.Repositories.FirmaVazbyRepo.IcosInHolding, "holding:", "ico:"),
+                    new Holding(HlidacStatu.Repositories.FirmaVazbyRepo.IcosInHolding, "holdindluznik:", "icoplatce:"),
+                    new Holding(HlidacStatu.Repositories.FirmaVazbyRepo.IcosInHolding, "holdingveritel:", "icoveritel:"),
+                    new Holding(HlidacStatu.Repositories.FirmaVazbyRepo.IcosInHolding, "holdingspravce:", "icospravce:"),
 
                     new TransformPrefixWithValue("ico:",
                         "(rizeni.dluznici.iCO:${q} OR rizeni.veritele.iCO:${q} OR rizeni.spravci.iCO:${q}) ", null),
@@ -192,7 +193,7 @@ namespace HlidacStatu.Repositories
                 //check odstraneny
 
                 search.OrigQuery = search.Q;
-                search.Q = Tools.FixInvalidQuery(search.Q ?? "", queryShorcuts, queryOperators);
+                search.Q = HlidacStatu.Searching.Tools.FixInvalidQuery(search.Q ?? "", queryShorcuts, queryOperators);
                 var sq = GetSimpleQuery(search);
 
                 ISearchResponse<Rizeni> res = null;
@@ -208,7 +209,7 @@ namespace HlidacStatu.Repositories
                             .Query(q => sq)
                             //.Sort(ss => new SortDescriptor<Rizeni>().Field(m => m.Field(f => f.PosledniZmena).Descending()))
                             .Sort(ss => InsolvenceSearchResult.GetSort(search.Order))
-                            .Highlight(h => Tools.GetHighlight<Rizeni>(withHighlighting))
+                            .Highlight(h => Repositories.Searching.Tools.GetHighlight<Rizeni>(withHighlighting))
                             .Aggregations(aggr => anyAggregation)
                             .TrackTotalHits(search.ExactNumOfResults || page * search.PageSize == 0
                                 ? true
@@ -283,7 +284,7 @@ namespace HlidacStatu.Repositories
                 var sw = new Devmasters.DT.StopWatchEx();
                 sw.Start();
                 search.OrigQuery = search.Q;
-                search.Q = Tools.FixInvalidQuery(search.Q ?? "", queryShorcuts, queryOperators);
+                search.Q = HlidacStatu.Searching.Tools.FixInvalidQuery(search.Q ?? "", queryShorcuts, queryOperators);
                 var sq = GetSimpleFulltextQuery(search);
 
                 ISearchResponse<SearchableDocument> res = null;
@@ -341,7 +342,7 @@ namespace HlidacStatu.Repositories
         )
         //.Sort(ss => new SortDescriptor<Rizeni>().Field(m => m.Field(f => f.PosledniZmena).Descending()))
         .Sort(ss => InsolvenceFulltextSearchResult.GetSort(search.Order))
-        .Highlight(h => Tools.GetHighlight<Rizeni>(withHighlighting))
+        .Highlight(h => Repositories.Searching.Tools.GetHighlight<Rizeni>(withHighlighting))
         .Aggregations(aggr => anyAggregation)
         .TrackTotalHits(search.ExactNumOfResults || page * search.PageSize == 0
             ? true
@@ -368,7 +369,7 @@ namespace HlidacStatu.Repositories
                                 )
                                 //.Sort(ss => new SortDescriptor<Rizeni>().Field(m => m.Field(f => f.PosledniZmena).Descending()))
                                 .Sort(ss => InsolvenceFulltextSearchResult.GetSort(search.Order))
-                                .Highlight(h => Tools.GetHighlight<Rizeni>(false))
+                                .Highlight(h => Repositories.Searching.Tools.GetHighlight<Rizeni>(false))
                                 .Aggregations(aggr => anyAggregation)
                                 .TrackTotalHits(search.ExactNumOfResults || page * search.PageSize == 0
                                     ? true

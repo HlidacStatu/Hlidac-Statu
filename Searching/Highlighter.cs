@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 
-namespace HlidacStatu.Repositories.Searching
+namespace HlidacStatu.Searching
 {
 
     public class Highlighter

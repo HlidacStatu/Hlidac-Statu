@@ -38,7 +38,7 @@ namespace HlidacStatu.XLib
                         string html = string.Format("<a href='{0}'>{1}</a>", f.GetUrl(false), f.Jmeno);
                         if (!string.IsNullOrEmpty(query))
                         {
-                            html += $" /<span class='small'>ukázat&nbsp;<a href='/hledat?q={WebUtility.UrlEncode(Query.ModifyQueryAND("ico:" + f.ICO, query))}'>smlouvy</a></span>/";
+                            html += $" /<span class='small'>ukázat&nbsp;<a href='/hledat?q={WebUtility.UrlEncode(HlidacStatu.Searching.Query.ModifyQueryAND("ico:" + f.ICO, query))}'>smlouvy</a></span>/";
                         }
                         return html;
                     },

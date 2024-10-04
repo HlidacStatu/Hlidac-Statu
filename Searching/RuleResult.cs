@@ -1,4 +1,4 @@
-﻿namespace HlidacStatu.Repositories.Searching.Rules
+﻿namespace HlidacStatu.Searching
 {
     public class RuleResult
     {

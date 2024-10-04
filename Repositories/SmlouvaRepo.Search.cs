@@ -5,7 +5,6 @@ using Devmasters.Enums;
 
 using HlidacStatu.Entities;
 using HlidacStatu.Repositories.Searching;
-using HlidacStatu.Repositories.Searching.Rules;
 
 
 using Nest;
@@ -83,48 +82,48 @@ namespace HlidacStatu.Repositories
 
             }
 
-            public static IRule[] Irules = new IRule[] {
-               new OsobaId("osobaid:","ico:" ),
-               new Holding("holdingprijemce:","icoprijemce:" ),
-               new Holding("holdingplatce:","icoplatce:" ),
-               new Holding("holdingdodavatel:","icoprijemce:" ),
-               new Holding("holdingzadavatel:","icoplatce:" ),
-               new Holding(null,"ico:" ),
+            public static HlidacStatu.Searching.IRule[] Irules = new HlidacStatu.Searching.IRule[] {
+               new HlidacStatu.Searching.OsobaId(HlidacStatu.Repositories.OsobaVazbyRepo.Icos_s_VazbouNaOsobu, "osobaid:","ico:" ),
+               new HlidacStatu.Searching.Holding(HlidacStatu.Repositories.FirmaVazbyRepo.IcosInHolding, "holdingprijemce:","icoprijemce:" ),
+               new HlidacStatu.Searching.Holding(HlidacStatu.Repositories.FirmaVazbyRepo.IcosInHolding, "holdingplatce:","icoplatce:" ),
+               new HlidacStatu.Searching.Holding(HlidacStatu.Repositories.FirmaVazbyRepo.IcosInHolding, "holdingdodavatel:","icoprijemce:" ),
+               new HlidacStatu.Searching.Holding(HlidacStatu.Repositories.FirmaVazbyRepo.IcosInHolding, "holdingzadavatel:","icoplatce:" ),
+               new HlidacStatu.Searching.Holding(HlidacStatu.Repositories.FirmaVazbyRepo.IcosInHolding, null,"ico:" ),
 
-               new TransformPrefixWithValue("ds:","(prijemce.datovaSchranka:${q} OR platce.datovaSchranka:${q}) ",null ),
-               new TransformPrefix("dsprijemce:","prijemce.datovaSchranka:",null  ),
-               new TransformPrefix("dsplatce:","platce.datovaSchranka:",null  ),
-               new TransformPrefixWithValue("ico:","(prijemce.ico:${q} OR platce.ico:${q}) ",null ),
-               new TransformPrefix("icoprijemce:","prijemce.ico:",null ),
-               new TransformPrefix("icoplatce:","platce.ico:",null ),
-               new TransformPrefix("jmenoprijemce:","prijemce.nazev:",null ),
-               new TransformPrefix("jmenoplatce:","platce.nazev:",null ),
-               new TransformPrefix("id:","id:",null ),
-               new TransformPrefix("idverze:","id:",null ),
-               new TransformPrefix("idsmlouvy:","identifikator.idSmlouvy:",null ),
-               new TransformPrefix("predmet:","predmet:",null ),
-               new TransformPrefix("cislosmlouvy:","cisloSmlouvy:",null ),
-               new TransformPrefix("mena:","ciziMena.mena:",null ),
-               new TransformPrefix("cenasdph:","hodnotaVcetneDph:",null ),
-               new TransformPrefix("cenabezdph:","hodnotaBezDph:",null ),
-               new TransformPrefix("cena:","calculatedPriceWithVATinCZK:",null ),
-               new TransformPrefix("zverejneno:","casZverejneni:", "[<>]?[{\\[]+" ),
-               new TransformPrefixWithValue("zverejneno:","casZverejneni:[${q} TO ${q}||+1d}", "\\d+" ),
-               new TransformPrefix("podepsano:","datumUzavreni:", "[<>]?[{\\[]+" ),
-               new TransformPrefixWithValue("podepsano:","datumUzavreni:[${q} TO ${q}||+1d}", "\\d+"  ),
-               new TransformPrefix("schvalil:","schvalil:",null ),
-               new TransformPrefix("textsmlouvy:","prilohy.plainTextContent:",null ),
-               new Smlouva_Chyby(),
-               new Smlouva_Oblast(1),
-               new Smlouva_Oblast(2),
-               new Smlouva_Oblasti(),
+               new HlidacStatu.Searching.TransformPrefixWithValue("ds:","(prijemce.datovaSchranka:${q} OR platce.datovaSchranka:${q}) ",null ),
+               new HlidacStatu.Searching.TransformPrefix("dsprijemce:","prijemce.datovaSchranka:",null  ),
+               new HlidacStatu.Searching.TransformPrefix("dsplatce:","platce.datovaSchranka:",null  ),
+               new HlidacStatu.Searching.TransformPrefixWithValue("ico:","(prijemce.ico:${q} OR platce.ico:${q}) ",null ),
+               new HlidacStatu.Searching.TransformPrefix("icoprijemce:","prijemce.ico:",null ),
+               new HlidacStatu.Searching.TransformPrefix("icoplatce:","platce.ico:",null ),
+               new HlidacStatu.Searching.TransformPrefix("jmenoprijemce:","prijemce.nazev:",null ),
+               new HlidacStatu.Searching.TransformPrefix("jmenoplatce:","platce.nazev:",null ),
+               new HlidacStatu.Searching.TransformPrefix("id:","id:",null ),
+               new HlidacStatu.Searching.TransformPrefix("idverze:","id:",null ),
+               new HlidacStatu.Searching.TransformPrefix("idsmlouvy:","identifikator.idSmlouvy:",null ),
+               new HlidacStatu.Searching.TransformPrefix("predmet:","predmet:",null ),
+               new HlidacStatu.Searching.TransformPrefix("cislosmlouvy:","cisloSmlouvy:",null ),
+               new HlidacStatu.Searching.TransformPrefix("mena:","ciziMena.mena:",null ),
+               new HlidacStatu.Searching.TransformPrefix("cenasdph:","hodnotaVcetneDph:",null ),
+               new HlidacStatu.Searching.TransformPrefix("cenabezdph:","hodnotaBezDph:",null ),
+               new HlidacStatu.Searching.TransformPrefix("cena:","calculatedPriceWithVATinCZK:",null ),
+               new HlidacStatu.Searching.TransformPrefix("zverejneno:","casZverejneni:", "[<>]?[{\\[]+" ),
+               new HlidacStatu.Searching.TransformPrefixWithValue("zverejneno:","casZverejneni:[${q} TO ${q}||+1d}", "\\d+" ),
+               new HlidacStatu.Searching.TransformPrefix("podepsano:","datumUzavreni:", "[<>]?[{\\[]+" ),
+               new HlidacStatu.Searching.TransformPrefixWithValue("podepsano:","datumUzavreni:[${q} TO ${q}||+1d}", "\\d+"  ),
+               new HlidacStatu.Searching.TransformPrefix("schvalil:","schvalil:",null ),
+               new HlidacStatu.Searching.TransformPrefix("textsmlouvy:","prilohy.plainTextContent:",null ),
+               new HlidacStatu.Searching.Smlouva_Chyby(),
+               new HlidacStatu.Searching.Smlouva_Oblast(1),
+               new HlidacStatu.Searching.Smlouva_Oblast(2),
+               new HlidacStatu.Searching.Smlouva_Oblasti(),
 
             };
 
 
             public static QueryContainer GetSimpleQuery(string query)
             {
-                QueryContainer qc = SimpleQueryCreator.GetSimpleQuery<Smlouva>(query, Irules);
+                QueryContainer qc = HlidacStatu.Searching.SimpleQueryCreator.GetSimpleQuery<Smlouva>(query, Irules);
                 return qc;
             }
 
@@ -202,12 +201,12 @@ bool withHighlighting = false, bool exactNumOfResults = false)
 
                 if (fixQuery)
                 {
-                    query = Tools.FixInvalidQuery(query, Irules, Tools.DefaultQueryOperators);
+                    query = HlidacStatu.Searching.Tools.FixInvalidQuery(query, Irules, HlidacStatu.Searching.Tools.DefaultQueryOperators);
                     result.Q = query;
                 }
 
                 if (platnyZaznam.HasValue)
-                    query = Query.ModifyQueryAND(query, "platnyZaznam:" + platnyZaznam.Value.ToString().ToLower());
+                    query = HlidacStatu.Searching.Query.ModifyQueryAND(query, "platnyZaznam:" + platnyZaznam.Value.ToString().ToLower());
 
 
                 ISearchResponse<Smlouva> res =
@@ -247,7 +246,7 @@ bool withHighlighting = false, bool exactNumOfResults = false)
                 if (page < 0)
                     page = 0;
 
-                if (page * pageSize >= Tools.MaxResultWindow) //elastic limit
+                if (page * pageSize >= Repositories.Searching.Tools.MaxResultWindow) //elastic limit
                 {
                     page = 0; pageSize = 0; //return nothing
                 }
@@ -281,7 +280,7 @@ bool withHighlighting = false, bool exactNumOfResults = false)
                             .Source(m => m.Excludes(e => e.Field(o => o.Prilohy)))
                             .Sort(ss => GetSort(order))
                             .Aggregations(aggrFunc)
-                            .Highlight(h => Tools.GetHighlight<Smlouva>(withHighlighting))
+                            .Highlight(h => Repositories.Searching.Tools.GetHighlight<Smlouva>(withHighlighting))
                             .TrackTotalHits(exactNumOfResults || page * pageSize == 0 ? true : (bool?)null),
                             cancellationToken
                     );
@@ -297,7 +296,7 @@ bool withHighlighting = false, bool exactNumOfResults = false)
                                 .Source(m => m.Excludes(e => e.Field(o => o.Prilohy)))
                                 .Sort(ss => GetSort(order))
                                 .Aggregations(aggrFunc)
-                                .Highlight(h => Tools.GetHighlight<Smlouva>(withHighlighting))
+                                .Highlight(h => Repositories.Searching.Tools.GetHighlight<Smlouva>(withHighlighting))
                                 .TrackTotalHits(exactNumOfResults || page * pageSize == 0 ? true : (bool?)null),
                                 cancellationToken
                         );

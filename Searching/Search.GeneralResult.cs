@@ -1,15 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-
-namespace HlidacStatu.Repositories.Searching
+﻿namespace HlidacStatu.Searching
 {
     public partial class Search
     {
-        public static int Limit = 50;
-        public static int FirmyLimit = 1000;
-
-
         public class GeneralResult<T> : ISearchResult
         {
             public string Query { get; set; }
@@ -32,7 +24,7 @@ namespace HlidacStatu.Repositories.Searching
                 Total = Result.Count();
             }
 
-            public virtual int MaxResultWindow() { return Repositories.Searching.Tools.MaxResultWindow; }
+            public virtual int MaxResultWindow() { return Tools.MaxResultWindow; }
 
             public GeneralResult(string query, IEnumerable<T> result, int pageSize)
                 : this(query, result?.Count() ?? 0, result, pageSize, true)
