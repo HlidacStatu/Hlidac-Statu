@@ -2,9 +2,10 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.AspNetCore.Mvc;
-using MinimalEntities;
+
 using ZiggyCreatures.Caching.Fusion;
 using PlatyUredniku.Services;
+using HlidacStatu.DS.Api;
 
 namespace PlatyUredniku.Controllers;
 

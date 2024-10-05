@@ -313,7 +313,8 @@ namespace HlidacStatu.XLib
                         if (true)
                         {
                             var wpSearch = new HlidacStatu.Lib.Data.External.Wordpress.Searching(new System.Uri("http://texty.hlidacstatu.cz"));
-                            var wpRes = await wpSearch.SearchAsync(query, 1, 5);
+                            var parsedQ = Repositories.Searching.Tools.CreateAutocompleteItemsFromQuery(query);
+                            var wpRes = await wpSearch.SearchAsync(parsedQ, 1, 5);
                             res.Wordpress = new HlidacStatu.Searching.Search.GeneralResult<Lib.Data.External.Wordpress.Searching.Result>(query, wpRes, 5)
                             {
                                 Page = 1

@@ -1,4 +1,5 @@
 ﻿using Devmasters;
+using HlidacStatu.DS.Api;
 using Nest;
 using System;
 using System.Collections.Generic;
@@ -26,12 +27,15 @@ namespace HlidacStatu.Lib.Data.External.Wordpress
             public DateTime Published { get; set; }
             public string ImageUrl { get; set; }
         }
+        public async Task<IEnumerable<Result>> SearchAsync(IEnumerable<Autocomplete> query, int page = 1, int pagesize = 5, IDictionary<string, string> customWPApiParams = null)
+        {
+            string queryWithNames = string.Join(" ", query.Select(m => m.Text));
+            return await SearchAsync(queryWithNames, page, pagesize, customWPApiParams);
+        }
         public async Task<IEnumerable<Result>> SearchAsync(string query, int page = 1, int pagesize = 5, IDictionary<string,string> customWPApiParams = null)
         {
             //split query, change ico: holding: osobaid: na text
-            //var fixedQ = HlidacStatu.Searching.Tools.FixInvalidQuery(query, SmlouvaRepo.Searching.Irules, Tools.DefaultQueryOperators);
-            //var splQ = HlidacStatu.Repositories.Searching.SplittingQuery.SplitQuery(fixedQ);
-
+            //var fixedQ = HlidacStatu.Searching.Tools.FixInvalidQuery(query,SmlouvaRepo.Searching.Irules, Tools.DefaultQueryOperators);
 
             var raw = await SearchRawAsync(query, page, pagesize, customWPApiParams);
             if (raw?.Length>0)

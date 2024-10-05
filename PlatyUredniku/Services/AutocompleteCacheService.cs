@@ -1,3 +1,4 @@
+using HlidacStatu.DS.Api;
 using HlidacStatu.Entities;
 using HlidacStatu.Repositories;
 using Microsoft.EntityFrameworkCore;
@@ -7,7 +8,7 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using MinimalEntities;
+
 using Whisperer;
 
 namespace PlatyUredniku.Services;

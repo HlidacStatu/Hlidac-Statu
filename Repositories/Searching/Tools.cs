@@ -1,13 +1,13 @@
-﻿using Devmasters;
-using Devmasters.Batch;
+﻿using Devmasters.Batch;
+using HlidacStatu.DS.Api;
 using HlidacStatu.Entities;
+using HlidacStatu.Extensions;
 using Nest;
 using Serilog;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using Manager = HlidacStatu.Connectors.Manager;
@@ -20,7 +20,154 @@ namespace HlidacStatu.Repositories.Searching
 
         public const int MaxResultWindow = 10000;
 
+        public static List<string> ParseQueryStringWithoutOffsets(string queryString)
+        {
+            if (string.IsNullOrWhiteSpace(queryString))
+                return null;
 
+            return queryString.Split(" ", StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries)
+                .ToList();
+        }
+        /// <summary>
+        ///split query, change ico: holding: osobaid: a hodnoty za tim na nazev firmy/osoby
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        public static List<Autocomplete> CreateAutocompleteItemsFromQuery(string query)
+        {
+            List<string> parsedQuery = ParseQueryStringWithoutOffsets(query);
+            return CreateAutocompleteItemsFromParsedQuery(parsedQuery);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="parsedQueries"></param>
+        /// <returns></returns>
+        public static List<Autocomplete> CreateAutocompleteItemsFromParsedQuery(List<string>? parsedQueries)
+        {
+            if (parsedQueries is null)
+                return Enumerable.Empty<Autocomplete>().ToList();
+            return parsedQueries.AsParallel().Select(CreateAutocompleteItemFromQueryFor).ToList();
+        }
+
+
+        static string[] createAutocompleteItemFromQueryForPrefixes = SmlouvaRepo.Searching.Irules
+                                    .SelectMany(m => m.Prefixes)
+                                    .Where(m =>
+                                        m.Contains("ico", StringComparison.CurrentCultureIgnoreCase)
+                                        || m.Contains("holding", StringComparison.CurrentCultureIgnoreCase)
+                                        || m.Contains("osobaid", StringComparison.CurrentCultureIgnoreCase)
+                                        || m.StartsWith("ds", StringComparison.CurrentCultureIgnoreCase)
+                                    )
+                                    .Concat(
+                                        VerejnaZakazkaRepo.Searching.Rules
+                                            .SelectMany(m => m.Prefixes)
+                                            .Where(m =>
+                                                m.StartsWith("ico", StringComparison.CurrentCultureIgnoreCase)
+                                                || m.StartsWith("holding", StringComparison.CurrentCultureIgnoreCase)
+                                                || m.StartsWith("osobaid", StringComparison.CurrentCultureIgnoreCase)
+                                                || m.StartsWith("ds", StringComparison.CurrentCultureIgnoreCase)
+                                            )
+                                    )
+                                    .Distinct()
+                                    .ToArray();
+        private static HlidacStatu.DS.Api.Autocomplete CreateAutocompleteItemFromQueryFor(string queryPart)
+        {
+
+            var fixedQ = HlidacStatu.Searching.Tools.FixInvalidQuery(queryPart, createAutocompleteItemFromQueryForPrefixes, HlidacStatu.Searching.Tools.DefaultQueryOperators);
+            var splQ = HlidacStatu.Searching.SplittingQuery.SplitQuery(queryPart);
+
+            if (splQ.Parts.Any(m => m.Prefix.StartsWith("osobaid", StringComparison.InvariantCultureIgnoreCase)))
+            {
+                var part = splQ.Parts.First(m => m.Prefix.StartsWith("osobaid", StringComparison.InvariantCultureIgnoreCase));
+                var osoba = OsobaRepo.GetByNameId(part.Value);
+                if (osoba is not null)
+                {
+                    return new Autocomplete()
+                    {
+                        Id = queryPart,
+                        Text = osoba.FullName(),
+                        Category = Autocomplete.CategoryEnum.Person,
+                        Prefix = part.Prefix,
+                        PrefixValue = part.Value
+                    };
+                }
+            }
+            else if (splQ.Parts.Any(m => m.Prefix.StartsWith("ico", StringComparison.InvariantCultureIgnoreCase)))
+            {
+                var part = splQ.Parts.First(m => m.Prefix.StartsWith("ico", StringComparison.InvariantCultureIgnoreCase));
+                var firma = Firmy.Get(part.Value);
+                if (firma?.Valid == true)
+                {
+                    Autocomplete.CategoryEnum kategorie = Autocomplete.CategoryEnum.Company;
+                    if (firma.TypSubjektu == Firma.TypSubjektuEnum.Obec)
+                    {
+                        kategorie = Autocomplete.CategoryEnum.City;
+                    }
+                    else if (firma.Kod_PF > 110 && firma.JsemOVM() && firma.IsInRS == 1)
+                    {
+                        kategorie = Autocomplete.CategoryEnum.Authority;
+                    }
+
+                    return new Autocomplete()
+                    {
+                        Id = queryPart,
+                        Text = firma.Jmeno,
+                        Category = kategorie,
+                        Prefix = part.Prefix,
+                        PrefixValue = part.Value
+                    };
+                }
+            }
+            else if (splQ.Parts.Any(m => m.Prefix.StartsWith("ds", StringComparison.InvariantCultureIgnoreCase)))
+            {
+                var part = splQ.Parts.First(m => m.Prefix.StartsWith("ds", StringComparison.InvariantCultureIgnoreCase));
+                var firma = Firmy.GetByDS(part.Value);
+                if (firma?.Valid == true)
+                {
+                    Autocomplete.CategoryEnum kategorie = Autocomplete.CategoryEnum.Company;
+                    if (firma.TypSubjektu == Firma.TypSubjektuEnum.Obec)
+                    {
+                        kategorie = Autocomplete.CategoryEnum.City;
+                    }
+                    else if (firma.Kod_PF > 110 && firma.JsemOVM() && firma.IsInRS == 1)
+                    {
+                        kategorie = Autocomplete.CategoryEnum.Authority;
+                    }
+
+                    return new Autocomplete()
+                    {
+                        Id = queryPart,
+                        Text = firma.Jmeno,
+                        Category = kategorie,
+                        Prefix = part.Prefix,
+                        PrefixValue = part.Value
+                    };
+                }
+            }
+            else if (splQ.Parts.Any(m => m.Prefix.StartsWith("oblast:", StringComparison.InvariantCultureIgnoreCase)))
+            {
+                var part = splQ.Parts.First(m => m.Prefix.StartsWith("oblast:", StringComparison.InvariantCultureIgnoreCase));
+
+                return new Autocomplete()
+                {
+                    Id = queryPart,
+                    Text = queryPart,
+                    Category = Autocomplete.CategoryEnum.Oblast,
+                    Prefix = part.Prefix,
+                    PrefixValue = part.Value
+                };
+            }
+
+
+
+            return new Autocomplete()
+            {
+                Id = queryPart,
+                Text = queryPart
+            };
+        }
 
         public static HighlightDescriptor<T> GetHighlight<T>(bool enable)
             where T : class
@@ -342,7 +489,7 @@ namespace HlidacStatu.Repositories.Searching
             var qs = new QueryContainerDescriptor<T>().MatchAll();
             if (!string.IsNullOrEmpty(query))
             {
-                query =  HlidacStatu.Searching.Tools.FixInvalidQuery(query, Repositories.SmlouvaRepo.Searching.Irules,
+                query = HlidacStatu.Searching.Tools.FixInvalidQuery(query, Repositories.SmlouvaRepo.Searching.Irules,
                     HlidacStatu.Searching.Tools.DefaultQueryOperators);
 
                 qs = Repositories.SmlouvaRepo.Searching.GetSimpleQuery(query);
@@ -439,7 +586,7 @@ namespace HlidacStatu.Repositories.Searching
             var qs = new QueryContainerDescriptor<object>().MatchAll();
             if (!string.IsNullOrEmpty(query))
             {
-                query = HlidacStatu.Searching.Tools.FixInvalidQuery(query, Repositories.SmlouvaRepo.Searching.Irules, 
+                query = HlidacStatu.Searching.Tools.FixInvalidQuery(query, Repositories.SmlouvaRepo.Searching.Irules,
                     HlidacStatu.Searching.Tools.DefaultQueryOperators);
 
                 qs = Repositories.SmlouvaRepo.Searching.GetSimpleQuery(query);

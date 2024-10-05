@@ -1,11 +1,12 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using HlidacStatu.DS.Api;
 using HlidacStatu.Entities;
 using HlidacStatu.Extensions;
 using HlidacStatu.Repositories;
 using Microsoft.AspNetCore.Http;
-using MinimalEntities;
+
 using Serilog;
 
 namespace HlidacStatu.Web.Framework;
@@ -24,12 +25,11 @@ public static class AutocompleteHelper
                 if (query.TryGetValue("qtl", out var qtl))
                 {
                     var parsedQueries = ParseQueryStringWithOffsets(q, qtl);
-                    return CreateAutocompleteItemsFromparsedQuerieForJs(parsedQueries);
+                    return HlidacStatu.Repositories.Searching.Tools.CreateAutocompleteItemsFromParsedQuery(parsedQueries);
                 }
                 else
                 {
-                    var parsedQueries = ParseQueryStringWithoutOffsets(q);
-                    return CreateAutocompleteItemsFromparsedQuerieForJs(parsedQueries);
+                    return HlidacStatu.Repositories.Searching.Tools.CreateAutocompleteItemsFromQuery(q);
                 }
             }
             
@@ -38,12 +38,11 @@ public static class AutocompleteHelper
                 if (query.TryGetValue("qtl", out var qtl))
                 {
                     var parsedQueries = ParseQueryStringWithOffsets(qs, qtl);
-                    return CreateAutocompleteItemsFromparsedQuerieForJs(parsedQueries);
+                    return HlidacStatu.Repositories.Searching.Tools.CreateAutocompleteItemsFromParsedQuery(parsedQueries);
                 }
                 else
                 {
-                    var parsedQueries = ParseQueryStringWithoutOffsets(qs);
-                    return CreateAutocompleteItemsFromparsedQuerieForJs(parsedQueries);
+                    return HlidacStatu.Repositories.Searching.Tools.CreateAutocompleteItemsFromQuery(qs);
                 }
             }
         }
@@ -54,15 +53,19 @@ public static class AutocompleteHelper
 
         return Enumerable.Empty<Autocomplete>().ToList();
     }
-    
-    private static List<Autocomplete> CreateAutocompleteItemsFromparsedQuerieForJs(List<string>? parsedQueries)
+
+    [Obsolete("use HlidacStatu.Repositories.Searching.Tools.CreateAutocompleteItemsFromParsedQuery")]
+    private static List<Autocomplete> _CreateAutocompleteItemsFromparsedQuerieForJs(List<string>? parsedQueries)
     {
-        if (parsedQueries is null)
+        return null;
+/*        if (parsedQueries is null)
             return Enumerable.Empty<Autocomplete>().ToList();
         return parsedQueries.AsParallel().Select(CreateAutocompleteItemFromQueryForJs).ToList();
-    } 
-    
-    private static Autocomplete CreateAutocompleteItemFromQueryForJs(string parsedQuery)
+*/
+    }
+
+    [Obsolete("use HlidacStatu.Repositories.Searching.Tools.CreateAutocompleteItemsFromParsedQuery")]
+    private static Autocomplete _CreateAutocompleteItemFromQueryForJs(string parsedQuery)
     {
         try
         {
@@ -173,12 +176,4 @@ public static class AutocompleteHelper
         return results;
     }
 
-    public static List<string> ParseQueryStringWithoutOffsets(string queryString)
-    {
-        if (string.IsNullOrWhiteSpace(queryString))
-            return null;
-
-        return queryString.Split(" ", StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries)
-            .ToList();
-    }
 }
