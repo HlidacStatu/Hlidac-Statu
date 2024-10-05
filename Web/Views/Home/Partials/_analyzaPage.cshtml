@@ -9,7 +9,8 @@
 
 
 @{
-
+    Devmasters.DT.StopWatchLaps viewRenderTimes = new Devmasters.DT.StopWatchLaps();
+    viewRenderTimes.AddLap("statistiky");
 
     int[] Years = HlidacStatu.Lib.Analytics.Consts.RegistrSmluvYearsList.Where(m => m > 2018).ToArray();
 
@@ -25,25 +26,30 @@
     //var seasonStat = statistics.CurrentSeasonStatistics();
     var currentSeasonYear = statistics.CurrentSeasonYear();
     //var zmenaObjemuSmluv = statistics.ChangeBetweenYears(currentSeasonYear - 1, currentSeasonYear, s => s.CelkovaHodnotaSmluv);
-}
+
+    viewRenderTimes.StopPreviousAndStartNextLap("topDodavateleFull");
 
 
-@{
+
     var topDodavateleFull = await HlidacStatu.Repositories.ES.QueryGrouped.TopDodavatelePerYearStatsAsync(
                 Model.Query, Years);
 
     List<StatisticsSubjectPerYear<SimpleStat>> topDodavatele = topDodavateleFull.PerIco.CombinedTop(50);
     var topDodavateleCurrSeason = topDodavateleFull.PerYear.CombinedTop(currentSeasonYear, 10);
 
+    viewRenderTimes.StopPreviousAndStartNextLap("topZadavateleFull");
 
     var topZadavateleFull = await HlidacStatu.Repositories.ES.QueryGrouped.TopOdberatelePerYearStatsAsync(
                 Model.Query, Years);
 
     List<StatisticsSubjectPerYear<SimpleStat>> topZadavatele = topZadavateleFull.PerIco.CombinedTop(50);
     var topZadavateleCurrSeason = topZadavateleFull.PerYear.CombinedTop(currentSeasonYear, 10);
-
+    viewRenderTimes.StopAll();
 
 }
+<!-- 
+    @Html.Raw(viewRenderTimes.FormatSummary())
+-->
 <h1>
     Analýza dotazu v registru smluv
     <small>@Model.Query</small>
