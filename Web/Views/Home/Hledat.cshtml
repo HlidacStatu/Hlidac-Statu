@@ -3,7 +3,9 @@
 @using HlidacStatu.Entities;
 @using HlidacStatu.Repositories.Searching;
 @using HlidacStatu.Repositories
+@using HlidacStatu.Web.Models
 @using HlidacStatu.XLib.Render
+@using Devmasters;
 
 @{
     int numOfSmluv = SearchDataResult<object>.DefaultPageSizeGlobal;
@@ -433,21 +435,26 @@ else if (Model.HasResults == false)
 
     @{
         //analyze query and show big boxes
-        var fixedQ = HlidacStatu.Searching.Tools.FixInvalidQuery(Model.Query, SmlouvaRepo.Searching.Irules,
-        HlidacStatu.Searching.Tools.DefaultQueryOperators);
-
-        var splQ = HlidacStatu.Searching.SplittingQuery.SplitQuery(fixedQ);
-        string[] prefixes = new string[] { "osobaid:", "ico:", "holding:" };
         int parts = 0;
-        if (splQ.Parts.Any(m => prefixes.Contains(m.Prefix)) || Model.SearchPromos.HasResult)
+
+        var splQ = HlidacStatu.Repositories.Searching.Tools.CreateAutocompleteItemsFromQuery(Model.Query);
+        var qCategoriesToRender = new HlidacStatu.DS.Api.Autocomplete.CategoryEnum[]
+        {
+    HlidacStatu.DS.Api.Autocomplete.CategoryEnum.Company,
+    HlidacStatu.DS.Api.Autocomplete.CategoryEnum.StateCompany,
+    HlidacStatu.DS.Api.Autocomplete.CategoryEnum.Authority,
+    HlidacStatu.DS.Api.Autocomplete.CategoryEnum.City,
+    HlidacStatu.DS.Api.Autocomplete.CategoryEnum.Person,
+        };
+        if (splQ.Any(m => qCategoriesToRender.Contains(m.Category)) || Model.SearchPromos.HasResult)
         {
             <div class="row" style="">
                 @* OSOBY *@
-                @foreach (var osP in splQ.Parts.Where(m => m.Prefix == "osobaid:"))
+                @foreach (var osP in splQ.Where(m => m.Category == HlidacStatu.DS.Api.Autocomplete.CategoryEnum.Person))
                 {
                     parts++;
-                    Osoba fo = Osoby.GetByNameId.Get(osP.Value);
-                    var smaller = splQ.Parts.Count(m => m.Prefix == "osobaid:") > 1;
+                    Osoba fo = Osoby.GetByNameId.Get(osP.PrefixValue);
+                    var smaller = splQ.Count(m => m.Category == HlidacStatu.DS.Api.Autocomplete.CategoryEnum.Person) > 1;
                     <partial name="Partials/RenderOsobaBox" model="@(new RenderOsobaBoxViewModel(fo, smaller))" />
 
                     if (parts % 4 == 0)
@@ -461,10 +468,10 @@ else if (Model.HasResults == false)
                 }
 
                 @* firmy *@
-                @foreach (var fP in splQ.Parts.Where(m => m.Prefix == "ico:" || m.Prefix == "holding:"))
+                @foreach (var fP in splQ.Where(m => m.Category != HlidacStatu.DS.Api.Autocomplete.CategoryEnum.Person))
                 {
                     parts++;
-                    Firma fo = Firmy.Get(fP.Value);
+                    Firma fo = Firmy.Get(fP.PrefixValue);
                     <partial name="Partials/RenderFirmaBox" model="@fo" />
 
                     if (parts % 4 == 0)
@@ -510,12 +517,25 @@ else if (Model.HasResults == false)
                             <div class="d-flex align-items-center">
                                 <a href="@item.Url" onclick="return trackOutLink(this,'searchresults');">
                                     <img src="@(string.IsNullOrEmpty(item.ImageUrl) ? "/Content/Img/logoonly.svg" :  item.ImageUrl)" alt="avatar" class="rounded-circle me-3" style="height:4rem;max-width:100px">
-                                <div>
-                                    <h4 class="mb-1">@item.Title</h4>
-                                    <p class="mb-0"><span class="text-muted">@(item.Published.ToString("dd. MM. yyyy"))</span> <a class="text-muted" href="@item.Url">@item.Url</a></p>
-                                    <p class="mb-1">@(Devmasters.TextUtil.RemoveHTML(item.Perex))</p>
-                                </div>
                                 </a>
+                                <div class="overflow-x-hidden">
+
+                                    <h4 class="mb-1 text-nowrap overflow-x-hidden"><a href="@item.Url" onclick="return trackOutLink(this,'searchresults');">@item.Title</a></h4>
+                                    <p class="mb-0 text-nowrap overflow-x-hidden" style="max-width:60%">
+                                        <a href="@item.Url" onclick="return trackOutLink(this,'searchresults');">
+                                            <span class="text-muted">@(item.Published.ToString("dd. MM. yyyy")) -</span>
+                                            <span sty class="text-muted">@item.Url</span>
+                                        </a>
+                                    </p>
+
+                                    <p class="mb-1 text-body limited-text-rows" style="--lines: 2;">
+                                        <a href="@item.Url" class="text-body" onclick="return trackOutLink(this,'searchresults');">
+                                            @(Devmasters.TextUtil.RemoveHTML(item.Perex))
+                                        </a>
+                                    </p>
+
+                                </div>
+
                             </div>
                         </div>
                     </div>

@@ -1,6 +1,19 @@
 
-/* autocomplete JS*/
 
+
+/*
+<p class="limited-text" style="--lines: 2;">
+    This text will be limited to 2 lines.
+</p>
+*/
+.limited-text-rows {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    --lines: 3; /* Default number of lines */
+    -webkit-line-clamp: var(--lines);
+}
 
 /* search promo
 
