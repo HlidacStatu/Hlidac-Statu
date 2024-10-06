@@ -33,12 +33,9 @@
 
     List<StatisticsSubjectPerYear<SimpleStat>> topZadavatele = fullAnalysis.TopZadavatele;
     var topZadavateleCurrSeason = fullAnalysis.TopZadavateleCurrSeason;
-    viewRenderTimes.StopAll();
+    viewRenderTimes.AddLap("render"); 
 
 }
-<!-- 
-    @Html.Raw(viewRenderTimes.FormatSummary())
--->
 <h1>
     Analýza dotazu v registru smluv
     <small>@Model.Query</small>
@@ -381,3 +378,14 @@
     </table>
 
 </div>
+
+@{
+    viewRenderTimes.StopAll();
+
+}
+
+<!-- TIMES 
+
+@Html.Raw(viewRenderTimes.FormatSummary())
+
+-->
