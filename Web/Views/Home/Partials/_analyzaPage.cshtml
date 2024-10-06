@@ -10,7 +10,7 @@
 
 @{
     Devmasters.DT.StopWatchLaps viewRenderTimes = new Devmasters.DT.StopWatchLaps();
-    viewRenderTimes.AddLap("analysis");
+    viewRenderTimes.AddAndStartLap("analysis");
 
     var fullAnalysis = await HlidacStatu.XLib.Search.AnalysisAsync(Model.Query);
 
@@ -33,7 +33,7 @@
 
     List<StatisticsSubjectPerYear<SimpleStat>> topZadavatele = fullAnalysis.TopZadavatele;
     var topZadavateleCurrSeason = fullAnalysis.TopZadavateleCurrSeason;
-    viewRenderTimes.AddLap("render"); 
+    viewRenderTimes.StopPreviousAndStartNextLap("render"); 
 
 }
 <h1>
