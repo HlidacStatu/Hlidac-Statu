@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace HlidacStatu.XLib
 {
-    public class Search
+    public partial class Search
     {
 
         public class MultiResult

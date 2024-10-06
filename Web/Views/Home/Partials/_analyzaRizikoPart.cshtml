@@ -6,66 +6,67 @@
 
 @{
     Layout = null;
-    var statistics = Model.statistics.Summary(Model.statistics.YearsAfter2016());
+    var statSum = Model.statistics.Summary(Model.statistics.YearsAfter2016());
     string query = "";
     bool noRisk = true;
 }
 
-@if (statistics.PercentSmluvBezCeny > 0)
+@if (statSum.PercentSmluvBezCeny > 0)
 {
     noRisk = false;
     query = System.Net.WebUtility.UrlEncode($"( {Model.query.Query} ) AND ( hint.skrytaCena:1 ) ");//
     <p>
-        <i class="fas fa-exclamation-circle" style="color:@Riziko.RizikoColor(KIndexData.DetailInfo.KIndexLabelForPart(KIndexData.KIndexParts.PercentBezCeny, statistics.PercentSmluvBezCeny).AsRiziko());padding-right:20px;"></i> 
+        <i class="fas fa-exclamation-circle" style="color:@Riziko.RizikoColor(KIndexData.DetailInfo.KIndexLabelForPart(KIndexData.KIndexParts.PercentBezCeny, statSum.PercentSmluvBezCeny).AsRiziko());padding-right:20px;"></i> 
         <b>Počet uzavřených smluv bez uvedené ceny</b> <a href="/HledatSmlouvy?Q=@query"><i class='fas fa-link'></i></a>
         <br />
         <span style="padding-left:40px;">
             @Html.Raw(
                         Riziko.ToHtml(
-                            KIndexData.DetailInfo.KIndexLabelForPart(KIndexData.KIndexParts.PercentBezCeny, statistics.PercentSmluvBezCeny, statistics.PocetSmluv).AsRiziko()
+                            KIndexData.DetailInfo.KIndexLabelForPart(KIndexData.KIndexParts.PercentBezCeny, statSum.PercentSmluvBezCeny, statSum.PocetSmluv).AsRiziko()
                         )
                     ),
-            celkem <a href="/HledatSmlouvy?Q=@query"><b>@HlidacStatu.Util.RenderData.Vysledky.PocetSmluv(statistics.PocetSmluvBezCeny, HlidacStatu.Util.RenderData.CapitalizationStyle.FirstLetterUpperCap)</b></a>
+            celkem <a href="/HledatSmlouvy?Q=@query"><b>@HlidacStatu.Util.RenderData.Vysledky.PocetSmluv(statSum.PocetSmluvBezCeny, HlidacStatu.Util.RenderData.CapitalizationStyle.FirstLetterUpperCap)</b></a>
             bez uvedené ceny.
-            <span>Tj. @HlidacStatu.Util.RenderData.NicePercent(statistics.PercentSmluvBezCeny) z celkového počtu.</span>
+            <span>Tj. @HlidacStatu.Util.RenderData.NicePercent(statSum.PercentSmluvBezCeny) z celkového počtu.</span>
         </span>
     </p>
 }
-@if (statistics.PocetSmluvULimitu > 0)
+@if (statSum.PocetSmluvULimitu > 0)
 {
     noRisk = false;
     query = System.Net.WebUtility.UrlEncode($"( {Model.query.Query} ) AND ( hint.smlouvaULimitu:>0 ) ");//
     <p>
-        <i class="fas fa-exclamation-circle" style="color:@Riziko.RizikoColor(KIndexData.DetailInfo.KIndexLabelForPart(KIndexData.KIndexParts.PercSmluvUlimitu, statistics.PercentSmluvULimitu).AsRiziko());padding-right:20px;"></i> <b>Smlouvy s cenou těsně pod limitem pro veřejné zakázky</b> <a href="/HledatSmlouvy?Q=@query"><i class='fas fa-link'></i></a>
+        <i class="fas fa-exclamation-circle" style="color:@Riziko.RizikoColor(KIndexData.DetailInfo.KIndexLabelForPart(KIndexData.KIndexParts.PercSmluvUlimitu, statSum.PercentSmluvULimitu).AsRiziko());padding-right:20px;"></i> <b>Smlouvy s cenou těsně pod limitem pro veřejné zakázky</b> <a href="/HledatSmlouvy?Q=@query"><i class='fas fa-link'></i></a>
         <br />
         <span style="padding-left:40px;">
             @Html.Raw(
                         Riziko.ToHtml(
-                            KIndexData.DetailInfo.KIndexLabelForPart(KIndexData.KIndexParts.PercSmluvUlimitu, statistics.PercentSmluvULimitu, statistics.PocetSmluv).AsRiziko()
+                            KIndexData.DetailInfo.KIndexLabelForPart(KIndexData.KIndexParts.PercSmluvUlimitu, statSum.PercentSmluvULimitu, statSum.PocetSmluv).AsRiziko()
                         )
                     ),
-            celkem <a href="/HledatSmlouvy?Q=@query"><b>@HlidacStatu.Util.RenderData.Vysledky.PocetSmluv(statistics.PocetSmluvULimitu, HlidacStatu.Util.RenderData.CapitalizationStyle.FirstLetterUpperCap)</b></a>
+            celkem <a href="/HledatSmlouvy?Q=@query"><b>@HlidacStatu.Util.RenderData.Vysledky.PocetSmluv(statSum.PocetSmluvULimitu, HlidacStatu.Util.RenderData.CapitalizationStyle.FirstLetterUpperCap)</b></a>
             s cenou těsně pod limitem pro veřejné zakázky.
-            <span>Tj. @HlidacStatu.Util.RenderData.NicePercent(statistics.PercentSmluvULimitu) z celkového počtu.</span>
+            <span>Tj. @HlidacStatu.Util.RenderData.NicePercent(statSum.PercentSmluvULimitu) z celkového počtu.</span>
         </span>
     </p>
 }
-@if (statistics.PocetSmluvSeZasadnimNedostatkem > 0)
+@if (statSum.PocetSmluvSeZasadnimNedostatkem > 0)
 {
     noRisk = false;
     query = System.Net.WebUtility.UrlEncode($"( {Model.query.Query} ) AND ( chyby:zasadni ) ");//
     <p>
-        <i class="fas fa-exclamation-circle" style="color:@Riziko.RizikoColor(KIndexData.DetailInfo.KIndexLabelForPart(KIndexData.KIndexParts.PercSeZasadnimNedostatkem, statistics.PercentSmluvSeZasadnimNedostatkem).AsRiziko());padding-right:20px;"></i> <b>Smlouvy se zásadními nedostatky</b> <a href="/HledatSmlouvy?Q=@query"><i class='fas fa-link'></i></a>
+        <i class="fas fa-exclamation-circle" style="color:@Riziko.RizikoColor(KIndexData.DetailInfo.KIndexLabelForPart(KIndexData.KIndexParts.PercSeZasadnimNedostatkem, statSum.PercentSmluvSeZasadnimNedostatkem).AsRiziko());padding-right:20px;"></i> 
+        <b>Smlouvy se zásadními nedostatky</b> <a href="/HledatSmlouvy?Q=@query"><i class='fas fa-link'></i></a>
         <br />
         <span style="padding-left:40px;">
             @Html.Raw(
                         Riziko.ToHtml(
-                            KIndexData.DetailInfo.KIndexLabelForPart(KIndexData.KIndexParts.PercSmluvUlimitu, statistics.PercentSmluvULimitu, statistics.PocetSmluv).AsRiziko()
+                            KIndexData.DetailInfo.KIndexLabelForPart(KIndexData.KIndexParts.PercSmluvUlimitu, statSum.PercentSmluvULimitu, statSum.PocetSmluv).AsRiziko()
                         )
                     ),
-            celkem <a href="/HledatSmlouvy?Q=@query"><b>@HlidacStatu.Util.RenderData.Vysledky.PocetSmluv(statistics.PocetSmluvSeZasadnimNedostatkem, HlidacStatu.Util.RenderData.CapitalizationStyle.FirstLetterUpperCap)</b></a>
+            celkem <a href="/HledatSmlouvy?Q=@query"><b>@HlidacStatu.Util.RenderData.Vysledky.PocetSmluv(statSum.PocetSmluvSeZasadnimNedostatkem, HlidacStatu.Util.RenderData.CapitalizationStyle.FirstLetterUpperCap)</b></a>
             bez uvedené ceny.
-            <span>Tj. @HlidacStatu.Util.RenderData.NicePercent(statistics.PercentSmluvSeZasadnimNedostatkem) z celkového počtu.</span>
+            <span>Tj. @HlidacStatu.Util.RenderData.NicePercent(statSum.PercentSmluvSeZasadnimNedostatkem) z celkového počtu.</span>
         </span>
     </p>
 }
