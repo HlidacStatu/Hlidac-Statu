@@ -381,11 +381,11 @@
 
 @{
     viewRenderTimes.StopAll();
-
+    var statRender = viewRenderTimes.FormatSummary();
 }
 
 <!-- TIMES 
 
-@Html.Raw(viewRenderTimes.FormatSummary())
+@Html.Raw(statRender)
 
 -->
