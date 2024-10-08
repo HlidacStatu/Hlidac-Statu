@@ -26,11 +26,11 @@ namespace HlidacStatu.Lib.Data.External.Tables
                 var ret = false;
                 foreach (var pri in sml.Prilohy)
                 {
-                    var tbls = HlidacStatu.Lib.Data.External.Tables.SmlouvaPrilohaExtension.GetTablesFromPriloha(sml, pri);
+                    //var tbls = HlidacStatu.Lib.Data.External.Tables.SmlouvaPrilohaExtension.GetTablesFromPriloha(sml, pri);
 
 
                     if (force
-                        || (await DocTablesRepo.ExistsAsync(sml.Id, pri.UniqueHash()))
+                        || (await DocTablesRepo.ExistsAsync(sml.Id, pri.UniqueHash()))==false
                         )
                     {
                         var request = new HlidacStatu.DS.Api.TablesInDoc.Task()
