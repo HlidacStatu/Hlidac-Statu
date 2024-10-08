@@ -24,6 +24,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Net.Http.Headers;
 using Serilog;
+using static HlidacStatu.XLib.Search;
 using Visit = HlidacStatu.Web.Framework.Visit;
 
 
@@ -711,7 +712,7 @@ text zpravy: {txt}
             bool showBeta = User.Identity?.IsAuthenticated == true && User.IsInRole("BetaTester");
             
             var res = await XLib.Search
-                .GeneralSearchAsync(q, 1, showBeta, order, this.User, smlouvySize: Repositories.Searching.SearchDataResult<object>.DefaultPageSizeGlobal);
+                .GeneralSearchAsync(q, 1, PartsToSearch.All, showBeta, order, this.User, smlouvySize: Repositories.Searching.SearchDataResult<object>.DefaultPageSizeGlobal);
             AuditRepo.Add(
                 Audit.Operations.UserSearch
                 , User?.Identity?.Name

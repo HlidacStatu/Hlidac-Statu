@@ -114,7 +114,9 @@
             );
     }
 
-    var globalSearch = await HlidacStatu.XLib.Search.GeneralSearchAsync(Model.Query, 1,user: this.User, smlouvySize:5);
+    var globalSearch = await HlidacStatu.XLib.Search.GeneralSearchAsync(Model.Query, 1, 
+        HlidacStatu.XLib.Search.PartsToSearch.All,
+        user: this.User, smlouvySize:5);
 
 
 }

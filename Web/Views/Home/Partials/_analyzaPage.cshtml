@@ -10,7 +10,7 @@
 
 @{
     Devmasters.DT.StopWatchLaps viewRenderTimes = new Devmasters.DT.StopWatchLaps();
-    viewRenderTimes.AddAndStartLap("analysis");
+    viewRenderTimes.StopPreviousAndStartNextLap("analysis");
 
     var fullAnalysis = await HlidacStatu.XLib.Search.AnalysisAsync(Model.Query);
 
@@ -42,7 +42,7 @@
 </h1>
 @{
     var res = await HlidacStatu.XLib.Search
-        .GeneralSearchAsync(Model.Query, 1, false, "", this.User, smlouvySize:1);
+        .GeneralSearchAsync(Model.Query, 1, HlidacStatu.XLib.Search.PartsToSearch.All, false, "", this.User, smlouvySize:1);
 }
 <p>
     <a href="/hledatSmlouvy?q=@(System.Net.WebUtility.UrlEncode(Model.Query))" class="btn btn-primary btn-sm">Zobrazit výsledky tohoto dotazu</a>

@@ -402,7 +402,7 @@ else if (Model.HasResults == false)
 }
 
 @* box s výpisem datasetů *@
-@if (Model.DatasetRegistrations.Any())
+@if (Model.DatasetRegistrations.Result.Any())
 {
     <hr />
     <div class="col-xs-12 col-sm-12">
@@ -410,7 +410,7 @@ else if (Model.HasResults == false)
             <h4>
                 <span title="@Model.Query" class="emphasized">@Devmasters.TextUtil.ShortenText(Model.Query, 80, "...")</span> se také vyskytuje v popisu, nebo názvu těchto databází
             </h4>
-            @foreach (var chunks in Model.DatasetRegistrations.Chunk((int)Math.Ceiling((Model.DatasetRegistrations.Count / 3d))))
+            @foreach (var chunks in Model.DatasetRegistrations.Result.Chunk((int)Math.Ceiling((Model.DatasetRegistrations.Result.Count() / 3d))))
             {
                 <div class="col-xs-6 col-sm-3">
                     <ul style="list-style: none;margin-left: -10px;">
