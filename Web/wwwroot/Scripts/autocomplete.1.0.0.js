@@ -143,8 +143,8 @@ class AutocompleteManager {
     }
 
     attachEvents() {
-        $(this.selector).on('keypress', (event) => {
-            if (event.which === 13 && $(this.selector)[0].selectize.getValue().length === 0) {
+        $(this.selector + "-selectized").on('keypress', (event) => {
+            if (event.which === 13 && $(this.selector + "-selectized")[0].value.length === 0) {
                 this.search();
             }
         });
