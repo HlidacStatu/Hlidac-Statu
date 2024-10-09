@@ -2,7 +2,7 @@
 {
     public partial class TablesInDoc
     {
-        public static string TablesInDocProcessingQueueName = "tablesInDoc2Process";
+        //public static string TablesInDocProcessingQueueName = "tablesInDoc2Process";
         public enum Commands
         {
             stream,

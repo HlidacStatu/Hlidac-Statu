@@ -274,31 +274,7 @@ namespace HlidacStatuApi.Controllers.ApiV2
             return res;
         }
 
-        [ApiExplorerSettings(IgnoreApi = true)]
-        //[Authorize(Roles = "blurredAPIAccess")]
-        [HttpGet("GetMore")]
-        public async Task<ActionResult<HlidacStatu.DS.Api.OcrWork.Task[]>> GetMore(int numberOfTasks)
-        {
-            CheckRoleRecord(this.User.Identity.Name);
-
-            using HlidacStatu.Q.Simple.Queue<HlidacStatu.DS.Api.TablesInDoc.Task> q = new HlidacStatu.Q.Simple.Queue<HlidacStatu.DS.Api.TablesInDoc.Task>(
-                HlidacStatu.DS.Api.TablesInDoc.TablesInDocProcessingQueueName,
-                Devmasters.Config.GetWebConfigValue("RabbitMqConnectionString")
-                );
-
-            List<HlidacStatu.DS.Api.TablesInDoc.Task> tasks = new List<HlidacStatu.DS.Api.TablesInDoc.Task>();
-            for (int i = 0; i < numberOfTasks; i++)
-            {
-                ulong? id = null;
-                HlidacStatu.DS.Api.TablesInDoc.Task sq = q.GetAndAck(out id);
-                if (sq == null)
-                    break;
-                tasks.Add(sq);
-            }
-
-            return null; //TODO
-
-        }
+  
 
         //[ApiExplorerSettings(IgnoreApi = true)]
         //[Authorize(Roles = "blurredAPIAccess")]
