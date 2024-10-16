@@ -27,7 +27,7 @@ public class FileProcessor
                 var parser = _parserFactory.GetFileParser(file);
                 if (parser == null)
                 {
-                    Logger.Error($"No parser found for file: {file}");
+                    Logger.Error($"No parser found for file: {file}. If the file is an old binary .xls file, just export it to csv file(for a good reason).");
                     continue;
                 }
 

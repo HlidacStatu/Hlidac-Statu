@@ -4,7 +4,7 @@ public class FileParserFactory : IFileParserFactory
 {
     public IFileParser GetFileParser(string filePath)
     {
-        if (filePath.EndsWith(".csv"))
+        if (filePath.EndsWith(".csv") || filePath.EndsWith(".tsv"))
         {
             return new CsvParser();
         }
@@ -12,7 +12,7 @@ public class FileParserFactory : IFileParserFactory
         {
             return new JSONParser();
         }
-        if (filePath.EndsWith(".xls") || filePath.EndsWith(".xlsx"))
+        if (filePath.EndsWith(".xlsx"))
         {
             return new ExcelParser();
         }

@@ -21,12 +21,9 @@
     </ItemGroup>
 
     <ItemGroup>
-      <None Update="Dotace\Kraj Vysočina\Individualni dotace_2021-2023_final.xls">
-        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      </None>
-      <None Update="Dotace\Kraj Vysočina\systemove dotace_2021-2023_final.xls">
-        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      </None>
+        <Content Include="Dotace\**\*">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </Content>
     </ItemGroup>
-
+    
 </Project>

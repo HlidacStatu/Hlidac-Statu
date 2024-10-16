@@ -13,13 +13,11 @@ public class CsvParser : IFileParser
     public IEnumerable<IDictionary<string, object?>> Parse(Stream fileStream)
     {
         using var reader = new StreamReader(fileStream);
-        var delimiter = DetectDelimiter(reader);
-        reader.BaseStream.Seek(0, SeekOrigin.Begin); // Reset stream after detection
 
         using var csv = new CsvReader(reader, new CsvConfiguration(CultureInfo.InvariantCulture)
         {
             HasHeaderRecord = true,
-            Delimiter = delimiter,
+            DetectDelimiter = true,
             BadDataFound = ctx => Logger.Error($"Bad data found. Data: {ctx.RawRecord}, Field: {ctx.Field}"),
             MissingFieldFound = ctx => Logger.Warning($"Missing field at index {ctx.Index}. Header names: {ctx.HeaderNames}")
         });
@@ -27,20 +25,23 @@ public class CsvParser : IFileParser
         // Parse header and validate
         if (csv.Read())
         {
-            csv.ReadHeader();
-            Headers = csv.HeaderRecord?.Select(h => h.Trim()).ToList() ?? new List<string>(); // Trim whitespace in headers
-
-            if (Headers.Any(string.IsNullOrWhiteSpace))
+            if (csv.ReadHeader())
             {
-                Logger.Error("Empty header names detected.");
-                yield break;
-            }
+                Headers = csv.HeaderRecord?.Select(h => h.Trim()).ToList() ?? new List<string>(); // Trim whitespace in headers
 
-            if (Headers.Distinct().Count() != Headers.Count)
-            {
-                Logger.Error("Duplicate headers found.");
-                yield break;
+                if (Headers.Any(string.IsNullOrWhiteSpace))
+                {
+                    Logger.Error("Empty header names detected.");
+                    yield break;
+                }
+
+                if (Headers.Distinct().Count() != Headers.Count)
+                {
+                    Logger.Error("Duplicate headers found.");
+                    yield break;
+                }
             }
+            
         }
 
         // Parse data
@@ -64,17 +65,6 @@ public class CsvParser : IFileParser
     private bool IsEmptyRow(CsvReader csv)
     {
         return csv.Parser.Record?.All(string.IsNullOrWhiteSpace) == true;
-    }
-
-    private string DetectDelimiter(StreamReader reader)
-    {
-        var firstLine = reader.ReadLine();
-        if (string.IsNullOrWhiteSpace(firstLine)) return ","; // Default to comma if empty
-
-        var delimiters = new[] { ',', ';', '\t', '|' };
-        var delimiterCount = delimiters.ToDictionary(d => d, d => firstLine.Count(c => c == d));
-
-        return delimiterCount.Aggregate((x, y) => x.Value > y.Value ? x : y).Key.ToString();
     }
 
     private bool ValidateRecord(CsvReader csv)
