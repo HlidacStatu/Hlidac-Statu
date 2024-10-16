@@ -11,6 +11,6 @@ class Program
     {
         ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
         var fileProcessor = new FileProcessor();
-        await fileProcessor.ProcessFilesAsync(@"path_to_files_directory");
+        await fileProcessor.ProcessFilesAsync("Dotace");
     }
 }

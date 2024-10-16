@@ -42,7 +42,7 @@ public class Subsidy
         [Text]
         public string ProgramName { get; set; }
         [Date]
-        public DateTime ApprovedDate { get; set; }
+        public int? ApprovedYear { get; set; }
     }
     
     public class Recipient

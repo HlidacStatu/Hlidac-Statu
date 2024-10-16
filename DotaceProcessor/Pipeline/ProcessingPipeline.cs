@@ -19,7 +19,7 @@ public class ProcessingPipeline
         });
     }
 
-    public async Task StartProcessing(IDictionary<string, object> input)
+    public async Task StartProcessing(IDictionary<string, object?> input, string filename, int rowNumber)
     {
         HandlerDelegate next = _ => Task.CompletedTask; // Initial "next" does nothing
         foreach (var component in _components.Reverse())
@@ -29,7 +29,9 @@ public class ProcessingPipeline
 
         PipelineContext context = new()
         {
-            Input = input
+            Input = input,
+            FileName = filename,
+            RowNumber = rowNumber
         };
 
         await next(context);

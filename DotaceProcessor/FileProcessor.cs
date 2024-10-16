@@ -1,5 +1,6 @@
 using DotaceProcessor.FileParsers;
 using DotaceProcessor.Pipeline;
+using Serilog;
 
 namespace DotaceProcessor;
 
@@ -7,6 +8,8 @@ public class FileProcessor
 {
     private readonly IFileParserFactory _parserFactory;
     private readonly ProcessingPipeline _pipeline;
+    
+    private ILogger Logger { get; } = Log.ForContext<FileProcessor>();
 
     public FileProcessor()
     {
@@ -14,37 +17,37 @@ public class FileProcessor
         _pipeline = new ProcessingPipeline();
     }
 
-    public async Task ProcessFilesAsync(string directoryPath)
+    public async Task ProcessFilesAsync(string rootDirectoryPath)
     {
-        var files = Directory.EnumerateFiles(directoryPath);
-        foreach (var file in files)
+        foreach (var directory in Directory.EnumerateDirectories(rootDirectoryPath))
         {
-            var parser = _parserFactory.GetFileParser(file);
-            if (parser == null)
+            var files = Directory.EnumerateFiles(directory);
+            foreach (var file in files)
             {
-                Console.WriteLine($"No parser found for file: {file}");
-                continue;
-            }
+                var parser = _parserFactory.GetFileParser(file);
+                if (parser == null)
+                {
+                    Logger.Error($"No parser found for file: {file}");
+                    continue;
+                }
 
-            await using var stream = File.OpenRead(file);
-            var rows = parser.Parse(stream);
-            int rowNumber = 1;
-            foreach (var row in rows)
-            {
-                try
+                await using var stream = File.OpenRead(file);
+                var rows = parser.Parse(stream);
+                int rowNumber = 1;
+                foreach (var row in rows)
                 {
-                    var processedData = await _pipeline.ProcessAsync(file, row, rowNumber);
-                    if (processedData != null)
+                    try
                     {
-                        await _pipeline.StoreToElasticsearchAsync(processedData);
+                        Console.WriteLine(row.Count);
+                        //await _pipeline.StartProcessing(row, file, rowNumber);
                     }
+                    catch (Exception ex)
+                    {
+                        Logger.Error(ex, $"Error processing row {rowNumber} in file {file}: {ex.Message}");
+                    }
+                    rowNumber++;
                 }
-                catch (Exception ex)
-                {
-                    Console.WriteLine($"Error processing row {rowNumber} in file {file}: {ex.Message}");
-                }
-                rowNumber++;
-            }
+            }    
         }
     }
 }
