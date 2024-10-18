@@ -3,7 +3,7 @@
 @{
     if (ViewBag.RawDisplay == true)
     {
-        Layout = null;  
+        Layout = null;
     }
 
 
@@ -25,7 +25,10 @@
             if (priloha.hash?.Value == ViewBag.hashValue)
             {
                 found = true;
-                plainText = priloha.PlainTextContent;
+                if (!string.IsNullOrEmpty(priloha.PlainTextContent) && string.IsNullOrEmpty(plainText))
+                {
+                    plainText = priloha.PlainTextContent;
+                }
             }
         }
     }
@@ -70,18 +73,18 @@
         @* ReSharper disable once Razor.SectionNotResolved *@
         @section scripts {
         @*<script src="https://linker.zakonyprolidi.cz/lib/lite.js"></script>
-            <script>
-                $(function () {
-                    zpl_linker.ProcessNode(document.getElementById('processZPL'));
-                });
-            </script>*@
+    <script>
+    $(function () {
+    zpl_linker.ProcessNode(document.getElementById('processZPL'));
+    });
+    </script>*@
         }
 
 
         @* ReSharper disable once Razor.SectionNotResolved *@
         @section footerscripts
-        {
-            @if (!string.IsNullOrEmpty(query))
+    {
+        @if (!string.IsNullOrEmpty(query))
             {
                 <script>
                     var first = document.getElementById("found1");
@@ -90,16 +93,16 @@
                 </script>
             }
         }
-        
+
         @* ReSharper disable once Razor.SectionNotResolved *@
         @section breadcrumb
-        {
-            <ol class="breadcrumb">
-                <li><a href="/">Hlídač Státu</a></li>
-                <li><a href="@Url.Action("Smlouvy","Home")">Hlídač Smluv</a></li>
-                <li><a href="@Url.Action("Detail","Home", new { id = Model.Id })">@Model.FullTitle()</a></li>
-                <li class="active">@ViewBag.Title</li>
-            </ol>
+    {
+        <ol class="breadcrumb">
+            <li><a href="/">Hlídač Státu</a></li>
+            <li><a href="@Url.Action("Smlouvy","Home")">Hlídač Smluv</a></li>
+            <li><a href="@Url.Action("Detail","Home", new { id = Model.Id })">@Model.FullTitle()</a></li>
+            <li class="active">@ViewBag.Title</li>
+        </ol>
         }
     </text>
 }
@@ -126,7 +129,7 @@
                 <div class="col-xs-12">
                     <pre id="processZPL" style="overflow-x: auto;white-space: pre-wrap;white-space: -moz-pre-wrap;white-space: -pre-wrap;white-space: -o-pre-wrap;word-wrap: break-word;">
                         @Html.Raw(plainText)
-                    </pre>
+                                </pre>
                 </div>
 
             </div>
