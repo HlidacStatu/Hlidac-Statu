@@ -9,6 +9,8 @@ public static partial class HandlerFactory
     public static readonly Lazy<IHandler> RecipientNameHandler = new(CreateRecipientNameHandler);
     public static readonly Lazy<IHandler> RecipientIcoHandler = new(CreateRecipientIcoHandler);
     public static readonly Lazy<IHandler> RecipientCityHandler = new(CreateRecipientCityHandler);
+    public static readonly Lazy<IHandler> RecipientOkresHandler = new(CreateRecipientOkresHandler);
+    public static readonly Lazy<IHandler> RecipientPscHandler = new(CreateRecipientPscHandler);
 
     private static IHandler CreateProjectNameHandler()
     {

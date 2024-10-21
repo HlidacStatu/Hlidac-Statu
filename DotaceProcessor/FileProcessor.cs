@@ -19,11 +19,23 @@ public class FileProcessor
 
 
         var processMetadataHandler = new ProcessMetadataHandler();
-        
-        
-        
-        _pipeline.Use((context, next) => processMetadataHandler.HandleAsync(context, next))
-            .Use((context, next) => HandlerFactory.ProjectNameHandler.Value.HandleAsync(context, next));
+
+
+
+        _pipeline.Use((context, next) => processMetadataHandler.HandleAsync(context, next)) //todo: fix metadata before saving them in this step
+            .Use((context, next) => HandlerFactory.ApprovedYearHandler.Value.HandleAsync(context, next))
+            .Use((context, next) => HandlerFactory.PayedAmountHandler.Value.HandleAsync(context, next))
+            .Use((context, next) => HandlerFactory.ProgramCodeHandler.Value.HandleAsync(context, next))
+            .Use((context, next) => HandlerFactory.ProgramNameHandler.Value.HandleAsync(context, next))
+            .Use((context, next) => HandlerFactory.ProjectCodeHandler.Value.HandleAsync(context, next))
+            .Use((context, next) => HandlerFactory.ProjectNameHandler.Value.HandleAsync(context, next))
+            .Use((context, next) => HandlerFactory.RecipientCityHandler.Value.HandleAsync(context, next))
+            .Use((context, next) => HandlerFactory.RecipientIcoHandler.Value.HandleAsync(context, next))
+            .Use((context, next) => HandlerFactory.RecipientNameHandler.Value.HandleAsync(context, next))
+            .Use((context, next) => HandlerFactory.RecipientOkresHandler.Value.HandleAsync(context, next))
+            .Use((context, next) => HandlerFactory.RecipientPscHandler.Value.HandleAsync(context, next))
+            .Use((context, next) => HandlerFactory.SubsidyAmountHandler.Value.HandleAsync(context, next))
+            .Use((context, next) => HandlerFactory.YearOfBirthHandler.Value.HandleAsync(context, next));
     }
 
     public async Task ProcessFilesAsync(string rootDirectoryPath)

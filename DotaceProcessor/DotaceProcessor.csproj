@@ -13,6 +13,7 @@
     </ItemGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\LibCore\LibCore.csproj" />
       <ProjectReference Include="..\Repositories\Repositories.csproj" />
     </ItemGroup>
 
@@ -20,6 +21,17 @@
         <Content Include="Dotace\**\*">
             <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
         </Content>
+    </ItemGroup>
+
+    <ItemGroup>
+      <None Update="logger.serilog.json">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+      </None>
+      <None Update="appsettings.json">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+      </None>
     </ItemGroup>
     
 </Project>
