@@ -271,6 +271,36 @@ namespace HlidacStatu.Repositories
 
         }
 
+        public static IEnumerable<(string ico, string jmeno)> GetJmenoAndIcoTuples()
+        {
+            using (PersistLib p = new PersistLib())
+            {
+                var reader = p.ExecuteReader(DirectDB.DefaultCnnStr, CommandType.Text, "select ico, jmeno from firma where ISNUMERIC(ico) = 1", null);
+                while (reader.Read())
+                {
+                    string ico = reader.GetString(0).Trim();
+                    string name = reader.GetString(1).Trim();
+                    if (Devmasters.TextUtil.IsNumeric(ico))
+                    {
+                        ico = Util.ParseTools.NormalizeIco(ico);
+                        yield return (ico, name);
+                    }
+                }
+            }
+        }
+        
+        public static IEnumerable<string> GetEntrepreneurIcos()
+        {
+            using (PersistLib p = new PersistLib())
+            {
+                var reader = p.ExecuteReader(DirectDB.DefaultCnnStr, CommandType.Text, "select ico from firma where ISNUMERIC(ICO) = 1 AND Kod_PF <=110", null);
+                while (reader.Read())
+                {
+                    yield return reader.GetString(0).Trim();
+                }
+            }
+        }
+        
         public static IEnumerable<Firma> AllFromNameWildcards(string jmeno)
         {
 

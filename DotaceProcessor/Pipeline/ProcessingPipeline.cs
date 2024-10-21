@@ -13,10 +13,7 @@ public class ProcessingPipeline
     
     public ProcessingPipeline Use(Func<PipelineContext, HandlerDelegate, Task> middleware)
     {
-        return Use(next => async context =>
-        {
-            await middleware(context, next);
-        });
+        return Use(next => context => middleware(context, next));
     }
 
     public async Task StartProcessing(IDictionary<string, object?> input, string filename, int rowNumber)
@@ -31,7 +28,7 @@ public class ProcessingPipeline
         {
             Input = input,
             FileName = filename,
-            RowNumber = rowNumber
+            RecordNumber = rowNumber
         };
 
         await next(context);

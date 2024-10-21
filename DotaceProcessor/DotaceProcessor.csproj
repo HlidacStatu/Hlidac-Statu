@@ -17,10 +17,6 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Folder Include="Pipeline\SubsidyHandlers\" />
-    </ItemGroup>
-
-    <ItemGroup>
         <Content Include="Dotace\**\*">
             <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
         </Content>

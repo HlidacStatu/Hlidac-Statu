@@ -1,5 +1,6 @@
 using DotaceProcessor.FileParsers;
 using DotaceProcessor.Pipeline;
+using DotaceProcessor.Pipeline.SubsidyHandlers;
 using Serilog;
 
 namespace DotaceProcessor;
@@ -15,6 +16,14 @@ public class FileProcessor
     {
         _parserFactory = new FileParserFactory();
         _pipeline = new ProcessingPipeline();
+
+
+        var processMetadataHandler = new ProcessMetadataHandler();
+        
+        
+        
+        _pipeline.Use((context, next) => processMetadataHandler.HandleAsync(context, next))
+            .Use((context, next) => HandlerFactory.ProjectNameHandler.Value.HandleAsync(context, next));
     }
 
     public async Task ProcessFilesAsync(string rootDirectoryPath)
@@ -39,7 +48,7 @@ public class FileProcessor
                     try
                     {
                         Console.WriteLine(row.Count);
-                        //await _pipeline.StartProcessing(row, file, rowNumber);
+                        await _pipeline.StartProcessing(row, file, rowNumber);
                     }
                     catch (Exception ex)
                     {
