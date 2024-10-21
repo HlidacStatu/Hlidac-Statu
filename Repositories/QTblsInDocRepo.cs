@@ -14,17 +14,17 @@ namespace HlidacStatu.Repositories
     {
 
 
-        public static async Task<bool> CreateNewTaskAsync(string smlouvaId, bool force,int priority = 10 )
+        public static async Task<bool> CreateNewTaskAsync(string smlouvaId, bool force, int priority = 10)
         {
             var sml = await SmlouvaRepo.LoadAsync(smlouvaId, includePrilohy: false);
             if (sml != null)
             {
-                return await CreateNewTaskAsync(sml, force,priority);
+                return await CreateNewTaskAsync(sml, force, priority);
             }
             return false;
         }
 
-        public static async Task<bool> CreateNewTaskAsync(Smlouva sml, bool force, int priority = 10 )
+        public static async Task<bool> CreateNewTaskAsync(Smlouva sml, bool force, int priority = 10)
         {
             var ret = false;
             foreach (var pri in sml.Prilohy)
@@ -43,7 +43,7 @@ namespace HlidacStatu.Repositories
                         url = pri.LocalCopyUrl(sml.Id, true)
                     };
 
-                    await CreateNewTaskAsync(request,priority:priority);
+                    await CreateNewTaskAsync(request, priority: priority);
                 }
             }
             return ret;
@@ -55,7 +55,7 @@ namespace HlidacStatu.Repositories
             item.PrilohaId = req.prilohaId;
             item.Url = req.url;
             item.Priority = priority;
-            return await CreateNewTaskAsync(item,checkExisting,priority);
+            return await CreateNewTaskAsync(item, checkExisting, priority);
         }
         public static async Task<QTblsInDoc> CreateNewTaskAsync(QTblsInDoc tbl, bool checkExisting = true, int priority = 10, CancellationToken cancellationToken = default)
         {
@@ -168,15 +168,42 @@ namespace HlidacStatu.Repositories
 
         public static async Task<int> WaitingInQueueCountAsync(CancellationToken cancellationToken = default(CancellationToken))
         {
-            await using var db = new DbEntities();
-            var count = await db.QTblsInDoc
+            try
+            {
+                await using var db = new DbEntities();
+
+                var count = await db.QTblsInDoc
                 .AsNoTracking()
                 .Where(m => m.Started == null)
                 .CountAsync(cancellationToken);
 
-            return count;
-        }
+                return count;
+            }
+            catch (Exception e)
+            {
 
+                throw;
+            }
+        }
+        public static int WaitingInQueueCount()
+        {
+            try
+            {
+                using var db = new DbEntities();
+
+                var count = db.QTblsInDoc
+                .AsNoTracking()
+                .Where(m => m.Started == null)
+                .Count();
+
+                return count;
+            }
+            catch (Exception e)
+            {
+
+                throw;
+            }
+        }
 
     }
 }
