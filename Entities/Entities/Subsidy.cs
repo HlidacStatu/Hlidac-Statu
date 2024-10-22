@@ -13,7 +13,9 @@ public class Subsidy
     {
         get
         {
-            var bytes = SHA256.HashData(Encoding.UTF8.GetBytes($"{Source}_{FileName}_{RecordNumber}"));
+            //todo: při updatu se může měnit record number, je potřeba najít lepší klíč (permanentní)
+            
+            var bytes = SHA256.HashData(Encoding.UTF8.GetBytes($"{DataSource}_{Common.ProjectCode}_{Common.ProjectName}_{Common.ProgramName}_{Common.ProgramCode}_{Common.Recipient.Ico}_{Common.Recipient.Name}_{Common.Recipient.YearOfBirth}_{Common.Recipient.Obec}_{Common.ApprovedYear}_{Common.SubsidyProvider}_{Common.SubsidyProviderIco}"));
             return Convert.ToHexString(bytes);
         }
     }
@@ -23,6 +25,12 @@ public class Subsidy
     /// </summary>
     [Keyword]
     public string FileName { get; set; }
+    
+    /// <summary>
+    /// Who manages the data about this subsidy 
+    /// </summary>
+    [Text]
+    public string DataSource { get; set; }
     
     /// <summary>
     /// Order within a filename
@@ -49,35 +57,43 @@ public class Subsidy
     public string RawData { get; set; }
     
     /// <summary>
-    /// Who manages the data about this subsidy 
+    /// If true, then there was an update and this subsidy was missing in update file.
+    /// Basically it tells us if DataSource removed the subsidy.
     /// </summary>
-    [Text]
-    public string Source { get; set; }
-    
-    /// <summary>
-    /// Who manages the data about this subsidy 
-    /// </summary>
-    [Keyword]
-    public string SourceIco { get; set; }
-    
+    [Boolean]
+    public bool IsHidden { get; set; } = false;
+
     public class CommonInfo
     {
         [Object]
         public Recipient Recipient { get; set; } = new();
+
         [Number]
         public decimal? SubsidyAmount { get; set; }
+
         [Number]
         public decimal? PayedAmount { get; set; }
+
         [Text]
         public string ProjectCode { get; set; }
+
         [Text]
         public string ProjectName { get; set; }
+
         [Text]
         public string ProgramCode { get; set; }
+
         [Text]
         public string ProgramName { get; set; }
+
         [Date]
         public int? ApprovedYear { get; set; }
+
+        [Text]
+        public string SubsidyProvider { get; set; }
+        [Keyword]
+        public string SubsidyProviderIco { get; set; }
+        
     }
     
     public class Recipient
@@ -88,6 +104,8 @@ public class Subsidy
         public string Name { get; set; }
         [Text]
         public string HlidacName { get; set; }
+        [Keyword]
+        public string HlidacNameId { get; set; }
         [Number]
         public int? YearOfBirth { get; set; }
 
