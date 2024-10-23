@@ -5,11 +5,11 @@ using Nest;
 
 namespace HlidacStatu.Entities.Entities;
 
-[ElasticsearchType(IdProperty = nameof(UniqueId))]
+[ElasticsearchType(IdProperty = nameof(Id))]
 public class Subsidy
 {
     [Keyword]
-    public string UniqueId
+    public string Id
     {
         get
         {
