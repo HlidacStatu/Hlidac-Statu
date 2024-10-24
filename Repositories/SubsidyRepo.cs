@@ -69,7 +69,6 @@ namespace HlidacStatu.Repositories
     
             if (!updateByQueryResponse.IsValid)
             {
-                // Handle any errors here
                 throw new Exception(updateByQueryResponse.OriginalException.Message);
             }
         }
