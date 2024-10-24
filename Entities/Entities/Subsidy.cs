@@ -73,6 +73,9 @@ public class Subsidy
 
         [Number]
         public decimal? PayedAmount { get; set; }
+        
+        [Number]
+        public decimal? ReturnedAmount { get; set; }
 
         [Text]
         public string ProjectCode { get; set; }
