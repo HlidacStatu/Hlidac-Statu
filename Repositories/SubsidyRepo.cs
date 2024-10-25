@@ -25,19 +25,7 @@ namespace HlidacStatu.Repositories
 
             if (existingSubsidy.Found)
             {
-                // If the existing subsidy is not hidden and trying to overwrite, throw an exception
-                if (existingSubsidy.Source.IsHidden == false)
-                {
-                    var errorMessage = $"Attempt to overwrite non-hidden subsidy with Id: {subsidy.Id}. \n" +
-                        $"  ExistingSubsidy: DataSource [{existingSubsidy.Source.DataSource}]\n" +
-                        $"    FileName [{existingSubsidy.Source.FileName}]\n" +
-                        $"    RecordNumber [{existingSubsidy.Source.RecordNumber}]\n" +
-                        $"  NewSubsidy: DataSource [{subsidy.DataSource}]\n" +
-                        $"    FileName [{subsidy.FileName}]\n" +
-                        $"    RecordNumber [{subsidy.RecordNumber}]";
-                    _logger.Error(errorMessage);
-                    throw new InvalidOperationException(errorMessage);
-                }
+                subsidy = MergeSubsidy(existingSubsidy.Source, subsidy);
             }
 
             var res = await _subsidyClient.IndexAsync(subsidy, o => o.Id(subsidy.Id));
@@ -48,10 +36,22 @@ namespace HlidacStatu.Repositories
                 throw new ApplicationException(res.ServerError?.ToString());
             }
 
-            if(subsidy.Common.Recipient.Ico is not null)
-                RecalculateItemRepo.AddFirmaToProcessingQueue(subsidy.Common.Recipient.Ico, Entities.RecalculateItem.StatisticsTypeEnum.Dotace, $"VZ {subsidy.Id}");
+            //todo: uncomment once ready for statistic recalculation
+            // if(subsidy.Common.Recipient.Ico is not null)
+            //     RecalculateItemRepo.AddFirmaToProcessingQueue(subsidy.Common.Recipient.Ico, Entities.RecalculateItem.StatisticsTypeEnum.Dotace, $"VZ {subsidy.Id}");
         }
-        
+
+        private static Subsidy MergeSubsidy(Subsidy oldRecord, Subsidy newRecord)
+        {
+            _logger.Information($"Merging subsidy for {oldRecord.Id}, from {oldRecord.DataSource}/{oldRecord.FileName}, records [{newRecord.RecordNumber}] and [{oldRecord.RecordNumber}]");
+            newRecord.RawData += ",\n" + oldRecord.RawData;
+            newRecord.Common.SubsidyAmount += oldRecord.Common.SubsidyAmount;
+            newRecord.Common.PayedAmount += oldRecord.Common.PayedAmount;
+            newRecord.Common.ReturnedAmount += oldRecord.Common.ReturnedAmount;
+
+            return newRecord;
+        }
+
         public static async Task SetHiddenSubsidies(string fileName, string source)
         {
             var updateByQueryResponse = await _subsidyClient.UpdateByQueryAsync<Subsidy>(u => u

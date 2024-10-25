@@ -77,7 +77,7 @@ namespace HlidacStatu.Connectors
         public static string defaultIndexName_Insolvence = "insolvencnirestrik";
         public static string defaultIndexName_InsolvenceDocs = "insolvencedocs";
         public static string defaultIndexName_Dotace = "dotace";
-        public static string defaultIndexName_Subsidy = "dotace";
+        public static string defaultIndexName_Subsidy = "subsidy";
         public static string defaultIndexName_Uptime = "uptime";
         public static string defaultIndexName_UptimeSSL = "uptimessl";
 
