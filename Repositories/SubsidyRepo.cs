@@ -11,7 +11,7 @@ namespace HlidacStatu.Repositories
     {
         private static readonly ILogger _logger = Log.ForContext(typeof(SubsidyRepo));
 
-        private static readonly ElasticClient _subsidyClient = Manager.GetESClient_DotaceAsync()
+        private static readonly ElasticClient _subsidyClient = Manager.GetESClient_SubsidyAsync()
             .ConfigureAwait(false).GetAwaiter().GetResult();
         
 
@@ -28,13 +28,13 @@ namespace HlidacStatu.Repositories
                 // If the existing subsidy is not hidden and trying to overwrite, throw an exception
                 if (existingSubsidy.Source.IsHidden == false)
                 {
-                    var errorMessage = $"Attempt to overwrite non-hidden subsidy with Id: {subsidy.Id}. " +
-                        $"ExistingSubsidy: DataSource [{existingSubsidy.Source.DataSource}] " +
-                        $"FileName [{existingSubsidy.Source.FileName}] " +
-                        $"RecordNumber [{existingSubsidy.Source.RecordNumber}];" +
-                        $"NewSubsidy: DataSource [{subsidy.DataSource}] " +
-                        $"FileName [{subsidy.FileName}] " +
-                        $"RecordNumber [{subsidy.RecordNumber}];";
+                    var errorMessage = $"Attempt to overwrite non-hidden subsidy with Id: {subsidy.Id}. \n" +
+                        $"  ExistingSubsidy: DataSource [{existingSubsidy.Source.DataSource}]\n" +
+                        $"    FileName [{existingSubsidy.Source.FileName}]\n" +
+                        $"    RecordNumber [{existingSubsidy.Source.RecordNumber}]\n" +
+                        $"  NewSubsidy: DataSource [{subsidy.DataSource}]\n" +
+                        $"    FileName [{subsidy.FileName}]\n" +
+                        $"    RecordNumber [{subsidy.RecordNumber}]";
                     _logger.Error(errorMessage);
                     throw new InvalidOperationException(errorMessage);
                 }
@@ -48,7 +48,8 @@ namespace HlidacStatu.Repositories
                 throw new ApplicationException(res.ServerError?.ToString());
             }
 
-            RecalculateItemRepo.AddFirmaToProcessingQueue(subsidy.Common.Recipient.Ico, Entities.RecalculateItem.StatisticsTypeEnum.Dotace, $"VZ {subsidy.Id}");
+            if(subsidy.Common.Recipient.Ico is not null)
+                RecalculateItemRepo.AddFirmaToProcessingQueue(subsidy.Common.Recipient.Ico, Entities.RecalculateItem.StatisticsTypeEnum.Dotace, $"VZ {subsidy.Id}");
         }
         
         public static async Task SetHiddenSubsidies(string fileName, string source)

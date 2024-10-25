@@ -13,10 +13,11 @@ public class Subsidy
     {
         get
         {
-            //todo: při updatu se může měnit record number, je potřeba najít lepší klíč (permanentní)
-            
-            var bytes = SHA256.HashData(Encoding.UTF8.GetBytes($"{DataSource}_{Common.ProjectCode}_{Common.ProjectName}_{Common.ProgramName}_{Common.ProgramCode}_{Common.Recipient.Ico}_{Common.Recipient.Name}_{Common.Recipient.YearOfBirth}_{Common.Recipient.Obec}_{Common.ApprovedYear}_{Common.SubsidyProvider}_{Common.SubsidyProviderIco}"));
-            return Convert.ToHexString(bytes);
+            var recipientBytes = SHA256.HashData(Encoding.UTF8.GetBytes($"{Common.Recipient.Ico}_{Common.Recipient.Name}_{Common.Recipient.YearOfBirth}_{Common.Recipient.Obec}")); 
+            var databytes = SHA256.HashData(Encoding.UTF8.GetBytes($"{DataSource}_{Common.ProjectCode}_{Common.ProjectName}_{Common.ProgramName}_{Common.ProgramCode}_{Common.ApprovedDateString}_{Common.SubsidyProvider}_{Common.SubsidyProviderIco}"));
+            var dataHash = Convert.ToHexString(databytes);
+            var recipientHash = Convert.ToHexString(recipientBytes);
+            return $"{dataHash}_{recipientHash}";
         }
     }
     
@@ -91,7 +92,13 @@ public class Subsidy
 
         [Date]
         public int? ApprovedYear { get; set; }
-
+        
+        /// <summary>
+        /// Do not use this field - this is just for Id generation
+        /// </summary>
+        [Text]
+        public string ApprovedDateString { get; set; }
+        
         [Text]
         public string SubsidyProvider { get; set; }
         [Keyword]
