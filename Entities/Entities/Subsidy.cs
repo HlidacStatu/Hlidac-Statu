@@ -30,7 +30,7 @@ public class Subsidy
     /// <summary>
     /// Who manages the data about this subsidy 
     /// </summary>
-    [Text]
+    [Keyword]
     public string DataSource { get; set; }
     
     /// <summary>
