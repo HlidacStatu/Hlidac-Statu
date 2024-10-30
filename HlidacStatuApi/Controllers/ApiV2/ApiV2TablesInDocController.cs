@@ -51,14 +51,14 @@ namespace HlidacStatuApi.Controllers.ApiV2
         [HttpPost("Save")]
         public async Task<ActionResult> Save([FromBody] HlidacStatu.DS.Api.TablesInDoc.ApiResult2 data)
         {
-
+            List<Task> tasks = new List<Task>();
+            tasks.Add(QTblsInDocRepo.SetDoneAsync(data.task.smlouvaId, data.task.prilohaId));
             if (data?.results?.Count() > 0)
             {
                 HlidacStatu.DS.Api.TablesInDoc.Result[] tables = data.results;
-                var t1 = DocTablesRepo.SaveAsync(data.task.smlouvaId, data.task.prilohaId, tables);
-                var t2 = QTblsInDocRepo.SetDoneAsync(data.task.smlouvaId, data.task.prilohaId);
-                Task.WaitAll(t1, t2);
+                tasks.Add( DocTablesRepo.SaveAsync(data.task.smlouvaId, data.task.prilohaId, tables));
             }
+            Task.WaitAll(tasks.ToArray());
             return StatusCode(200);
         }
 
