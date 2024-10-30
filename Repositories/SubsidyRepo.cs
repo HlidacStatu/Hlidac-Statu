@@ -23,7 +23,8 @@ namespace HlidacStatu.Repositories
             // Check if subsidy already exists
             var existingSubsidy = await _subsidyClient.GetAsync<Subsidy>(subsidy.Id);
 
-            if (existingSubsidy.Found)
+            //do not merge hidden one - they are to be replaced
+            if (existingSubsidy.Found && existingSubsidy.Source.IsHidden == false)
             {
                 subsidy = MergeSubsidy(existingSubsidy.Source, subsidy);
             }
@@ -70,6 +71,7 @@ namespace HlidacStatu.Repositories
     
             if (!updateByQueryResponse.IsValid)
             {
+                _logger.Error(updateByQueryResponse.OriginalException, $"Problem during setting hidden subsidies. Filename: {fileName}, Source:{source},\n Debug info:{updateByQueryResponse.DebugInformation} ");
                 throw new Exception(updateByQueryResponse.OriginalException.Message);
             }
         }
