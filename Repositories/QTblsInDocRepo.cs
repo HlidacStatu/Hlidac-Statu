@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -14,26 +15,38 @@ namespace HlidacStatu.Repositories
     {
 
 
-        public static async Task<bool> CreateNewTaskAsync(string smlouvaId, bool force, int priority = 10)
+        public static async Task<bool> CreateNewTaskAsync(string smlouvaId, bool force, int priority = 10, Func<DocTables, bool> predicate = null)
         {
             var sml = await SmlouvaRepo.LoadAsync(smlouvaId, includePrilohy: false);
+            
             if (sml != null)
             {
-                return await CreateNewTaskAsync(sml, force, priority);
+                return await CreateNewTaskAsync(sml, force, priority, predicate);
             }
             return false;
         }
 
-        public static async Task<bool> CreateNewTaskAsync(Smlouva sml, bool force, int priority = 10)
+        public static async Task<bool> CreateNewTaskAsync(Smlouva sml, bool force, int priority = 10, Func<DocTables, bool> predicate = null)
         {
             var ret = false;
             foreach (var pri in sml.Prilohy)
             {
                 //var tbls = HlidacStatu.Lib.Data.External.Tables.SmlouvaPrilohaExtension.GetTablesFromPriloha(sml, pri);
 
+                bool exists = await DocTablesRepo.ExistsAsync(sml.Id, pri.UniqueHash());
+                bool predicateResult = false;
+                if ( exists && predicate != null)
+                {
+                    var docTbls = await DocTablesRepo.GetAsync(sml.Id, pri.UniqueHash());
+                    if (docTbls != null)
+                    {
+                        predicateResult = predicate(docTbls);
+                    }
+                }
 
                 if (force
-                    || (await DocTablesRepo.ExistsAsync(sml.Id, pri.UniqueHash())) == false
+                    || (exists == false)
+                    || predicateResult == true
                     )
                 {
                     var request = new HlidacStatu.DS.Api.TablesInDoc.Task()
@@ -45,6 +58,7 @@ namespace HlidacStatu.Repositories
 
                     await CreateNewTaskAsync(request, priority: priority);
                 }
+
             }
             return ret;
         }
