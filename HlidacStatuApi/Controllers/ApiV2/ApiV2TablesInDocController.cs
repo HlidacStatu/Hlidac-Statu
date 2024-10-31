@@ -53,7 +53,7 @@ namespace HlidacStatuApi.Controllers.ApiV2
         {
             List<Task> tasks = new List<Task>();
             tasks.Add(QTblsInDocRepo.SetDoneAsync(data.task.smlouvaId, data.task.prilohaId));
-            if (data?.results?.Count() > 0)
+            if (data?.results != null)
             {
                 HlidacStatu.DS.Api.TablesInDoc.Result[] tables = data.results;
                 tasks.Add( DocTablesRepo.SaveAsync(data.task.smlouvaId, data.task.prilohaId, tables));
