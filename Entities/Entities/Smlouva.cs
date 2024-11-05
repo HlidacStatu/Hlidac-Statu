@@ -48,22 +48,29 @@ namespace HlidacStatu.Entities
 
             //smluvni strany
 
+            this.Platce = null;
+            List<Subjekt> prijemci = new List<Subjekt>();
+
             //vkladatel je jasny
             VkladatelDoRejstriku = new Subjekt(item.smlouva.subjekt);
+            if (item.smlouva.subjekt.platce == true)
+                Platce = new Subjekt(item.smlouva.subjekt);
+            else if (item.smlouva.subjekt.platce == false)
+                prijemci.Add(new Subjekt(item.smlouva.subjekt));
 
             //pokud je nastaven parametr
             //<xs:documentation xml:lang="cs">1 = příjemce, 0 = plátce</xs:documentation>
             bool platceSpecified = item.smlouva.smluvniStrana.Any(m => m.prijemce.HasValue && m.prijemce == false);
             bool prijemceSpecified = item.smlouva.smluvniStrana.Any(m => m.prijemce.HasValue && m.prijemce == true);
 
-            if (platceSpecified)
+            if (platceSpecified && this.Platce == null)
                 Platce =
                     new Subjekt(item.smlouva
                         .smluvniStrana
                         .Where(m => m.prijemce.HasValue && m.prijemce == false)
                         .First()
                         );
-            else
+            else if (this.Platce == null)
             {
                 //copy from subjekt
                 Platce = new Subjekt(item.smlouva.subjekt);
@@ -71,47 +78,49 @@ namespace HlidacStatu.Entities
 
             if (prijemceSpecified)
             {
-                Prijemce = item.smlouva.smluvniStrana
-                    .Where(m => m.prijemce.HasValue && m.prijemce == true)
-                    .Select(m => new Subjekt(m))
-                    .ToArray();
+                foreach (var prij in item.smlouva.smluvniStrana)
+                {
+                    if (prijemci.Any(m=>m.ico == prij.ico || m.datovaSchranka == prij.datovaSchranka) == false)
+                        prijemci.Add(new Subjekt(prij));
+                }
 
                 //add missing from source
-                Prijemce = Prijemce
-                                        .ToArray()
-                                        .Union(
-                                                item.smlouva.smluvniStrana
-                                                    .Where(m => m.prijemce.HasValue == false)
-                                                    .Select(m => new Subjekt(m))
-                                        ).ToArray();
+                prijemci = prijemci
+                            .ToArray()
+                            .Union(
+                                    item.smlouva.smluvniStrana
+                                        .Where(m => m.prijemce.HasValue == false)
+                                        .Select(m => new Subjekt(m))
+                            ).ToList();
 
 
             }
             else
             {
-                Prijemce = item.smlouva.smluvniStrana
+                prijemci = item.smlouva.smluvniStrana
                     //.Where(m => m.ico != this.Platce.ico || m.datovaSchranka != this.Platce.datovaSchranka)
                     .Where(m => m.prijemce.HasValue == false && m.prijemce != false)
                     .Select(m => new Subjekt(m))
-                    .ToArray();
+                    .ToList();
             }
 
             //add missing from subject
             if (platceSpecified)
             {
-                if (Prijemce
+                if (prijemci
                         .Where(m => m.ico == VkladatelDoRejstriku.ico || m.datovaSchranka != VkladatelDoRejstriku.datovaSchranka)
                         .Count() == 0
                     )
                 {
-                    Prijemce = Prijemce
+                    prijemci = prijemci
                                         .ToArray()
                                         .Union(
                                                 new Subjekt[] { VkladatelDoRejstriku }
-                                        ).ToArray();
+                                        ).ToList();
                 }
 
             }
+            this.Prijemce = prijemci.ToArray();
 
         }
 

@@ -7,6 +7,12 @@
     </PropertyGroup>
 
     <ItemGroup>
+      <Compile Remove="HlidacStatu.AI.LLM.Entities\**" />
+      <EmbeddedResource Remove="HlidacStatu.AI.LLM.Entities\**" />
+      <None Remove="HlidacStatu.AI.LLM.Entities\**" />
+    </ItemGroup>
+
+    <ItemGroup>
       <PackageReference Include="CsvHelper" Version="33.0.1" />
       <PackageReference Include="Devmasters.Cache.AWS_S3" Version="8.0.1" />
       <PackageReference Include="Devmasters.Core" Version="8.0.1" />
@@ -35,10 +41,6 @@
       <ProjectReference Include="..\..\Hlidac-Statu-Private\AI\AI.csproj" />
       <ProjectReference Include="..\Datastructures\Datastructures.csproj" />
       <ProjectReference Include="..\Lib.Analytics\Lib.Analytics.csproj" />
-    </ItemGroup>
-
-    <ItemGroup>
-      <Folder Include="HlidacStatu.AI.LLM.Entities\" />
     </ItemGroup>
 
 
