@@ -65,7 +65,7 @@ public class HomeController : Controller
 
         return View();
     }
-        public async Task<IActionResult> Index()
+    public async Task<IActionResult> Index()
     {
         var platyTask = _cache.GetOrSetAsync<List<PuPlat>>(
             $"{nameof(PuRepo.GetPlatyAsync)}_{PuRepo.DefaultYear}",
