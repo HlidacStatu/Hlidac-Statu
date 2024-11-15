@@ -124,10 +124,11 @@
         </table>
     </div>
     <hr />
+@*  skryto na zadost Merk - otravuji je lidi
     Data firem nám poskytuje <a href="https://www.merk.cz" target="_blank" onclick="return trackOutLink(this,'Merk.cz');">Merk.cz</a>.
     <br />Moc děkujeme <i class="fa-solid fa-heart" style="color:red"></i>
     <hr />
-
+ *@
     @{
         HlidacStatu.Datasets.DataSet skutMajitDS = HlidacStatu.Datasets.DataSet.CachedDatasets.Get("skutecni-majitele");
         var skutMajitRes = (await skutMajitDS.SearchDataRawAsync("ico:" + Model.ICO, 1, 1)).Result.ToList();
