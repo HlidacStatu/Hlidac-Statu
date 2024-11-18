@@ -15,6 +15,7 @@
 
 	<ItemGroup>
 		<PackageReference Include="DeepCloner" Version="0.10.4" />
+		<PackageReference Include="Devmasters.Core" Version="8.0.1" />
 		<PackageReference Include="Devmasters.DT" Version="8.0.0" />
 		<PackageReference Include="Devmasters.Enums" Version="8.0.0" />
 		<PackageReference Include="Devmasters.SpeechToText" Version="8.0.0" />

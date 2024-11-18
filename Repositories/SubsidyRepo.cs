@@ -18,6 +18,7 @@ namespace HlidacStatu.Repositories
         //do not delete - it is used by another project
         public static async Task SaveAsync(Subsidy subsidy)
         {
+            _logger.Debug($"Saving subsidy {subsidy.RecordNumber} from {subsidy.DataSource}/{subsidy.FileName}");
             if (subsidy is null) throw new ArgumentNullException(nameof(subsidy));
 
             // Check if subsidy already exists
@@ -36,7 +37,8 @@ namespace HlidacStatu.Repositories
                 _logger.Error($"Failed to save subsidy for {subsidy.Id}. {res.OriginalException.Message}");
                 throw new ApplicationException(res.ServerError?.ToString());
             }
-
+            _logger.Debug($"Subsidy {subsidy.RecordNumber} from {subsidy.DataSource}/{subsidy.FileName} saved");
+            
             //todo: uncomment once ready for statistic recalculation
             // if(subsidy.Common.Recipient.Ico is not null)
             //     RecalculateItemRepo.AddFirmaToProcessingQueue(subsidy.Common.Recipient.Ico, Entities.RecalculateItem.StatisticsTypeEnum.Dotace, $"VZ {subsidy.Id}");
