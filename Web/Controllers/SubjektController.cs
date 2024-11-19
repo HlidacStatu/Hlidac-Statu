@@ -128,10 +128,8 @@ namespace HlidacStatu.Web.Controllers
         {
             if (TryGetCompany(id, out var firma, out var result))
             {
-                var popis = "Dceřiné společnosti";
-                if (firma.JsemOVM())
-                    popis = "Podřízené organizace";
-
+                var popis = "Osoby s vazbou na " + Firmy.GetJmeno(firma.ICO);
+            
                 if (aktualnost.HasValue == false)
                     aktualnost = Relation.AktualnostType.Nedavny;
 

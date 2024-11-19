@@ -135,11 +135,19 @@ namespace HlidacStatu.Entities
 
         public string Jmeno
         {
-            get { return _jmeno; }
+            get {
+                if (string.IsNullOrEmpty(_jmeno))
+                {
+                    return this.ICO;
+                }
+                return _jmeno; 
+            
+            }
             set
             {
                 _jmeno = value;
                 JmenoAscii = TextUtil.RemoveDiacritics(value);
+                
             }
         }
 
