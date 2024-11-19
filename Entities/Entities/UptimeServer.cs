@@ -77,15 +77,6 @@ namespace HlidacStatu.Entities
         public DateTime? LastAlertSent { get; set; }
 
 
-        public int UsePlugin { get; set; } = 0;
-
-        public UsePluginEnum UsePluginForCheck { get; set; }
-        public enum UsePluginEnum
-        {
-            No = 0,
-            IfAvailable = 1
-        }
-
 
     }
 }
