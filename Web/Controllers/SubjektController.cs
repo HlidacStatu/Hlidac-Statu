@@ -123,6 +123,26 @@ namespace HlidacStatu.Web.Controllers
             return result;
         }
 
+
+        public ActionResult VazbyOsoby(string id, Relation.AktualnostType? aktualnost)
+        {
+            if (TryGetCompany(id, out var firma, out var result))
+            {
+                var popis = "Dceřiné společnosti";
+                if (firma.JsemOVM())
+                    popis = "Podřízené organizace";
+
+                if (aktualnost.HasValue == false)
+                    aktualnost = Relation.AktualnostType.Nedavny;
+
+                ViewBag.Aktualnost = aktualnost;
+
+                (Firma firma, string viewName, string title) model = (firma, "VazbyOsoby", $"{firma.Jmeno} - {popis}");
+                return View("_subjektLayout", model);
+            }
+
+            return result;
+        }
         public ActionResult Odberatele(string id)
         {
             if (TryGetCompany(id, out var firma, out var result))

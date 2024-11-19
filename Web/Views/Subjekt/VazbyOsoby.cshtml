@@ -1,0 +1,83 @@
+﻿@using HlidacStatu.Entities
+@using HlidacStatu.Extensions
+@using HlidacStatu.Repositories
+@using HlidacStatu.DS.Graphs
+@model HlidacStatu.Entities.Firma
+
+@{
+    Layout = null;
+
+    Relation.AktualnostType aktualnost = Relation.AktualnostType.Nedavny;
+    if (EnumsNET.Enums.TryParse<Relation.AktualnostType>(ViewBag.Aktualnost.ToString(), out Relation.AktualnostType xen))
+    {
+        aktualnost = xen;
+    }
+
+}
+
+
+@* První sloupec *@
+<div class="col-sm-7 col-xs-12 order-1">
+
+    <p>
+        <a href="@Url.Action("VazbyOsoby", new { id = Model.ICO, aktualnost = Relation.AktualnostType.Aktualni })"
+        class="btn btn-@(aktualnost == Relation.AktualnostType.Aktualni ? "success" : "primary") btn-sm" role="button">
+            @(aktualnost == Relation.AktualnostType.Aktualni ? "Zobrazujeme" : "Ukázat") pouze aktuální vazby
+        </a>
+        <a href="@Url.Action("VazbyOsoby", new { id = Model.ICO, aktualnost = Relation.AktualnostType.Nedavny })"
+        class="btn btn-@(aktualnost == Relation.AktualnostType.Nedavny ? "success" : "primary") btn-sm" role="button">
+            @(aktualnost == Relation.AktualnostType.Nedavny ? "Zobrazujeme" : "Ukázat") aktuální a nedávno skončené vazby
+        </a>
+        <a href="@Url.Action("VazbyOsoby", new { id = Model.ICO, aktualnost = Relation.AktualnostType.Libovolny })"
+        class="btn btn-@(aktualnost == Relation.AktualnostType.Libovolny ? "success" : "primary") btn-sm" role="button">
+            @(aktualnost == Relation.AktualnostType.Libovolny ? "Zobrazujeme" : "Ukázat") všechny vazby včetně historických
+        </a>
+    </p>
+
+    <p style="padding-top:30px;">
+
+    <h3>Navázané osoby <small>z Obchodního rejstříku</small></h3>
+    </p>
+    @{
+        var data = Model.Osoby_v_OR(aktualnost);
+        Osoba[] osoby =  data.OrderBy(m => m.o.Prijmeni)
+                    .ThenBy(m=>m.o.Jmeno)
+                    .ThenBy(m=>m.o.Narozeni)
+                    .Select(m=>m.o)
+                    .Distinct()
+                    .ToArray();
+
+    }
+    <p style="padding-top:30px;">
+        @foreach (Osoba osoba in osoby)
+        {
+            var ovazby = data
+                    .Where(m => m.o == osoba)
+                    .OrderByDescending(m => (m.ov.DatumDo.HasValue ? m.ov.DatumDo.Value : DateTime.MaxValue))
+                    .Select(m=>m.ov);
+
+            <h4><a href="@osoba.GetUrl()">@(osoba.FullNameWithYear())</a></h4>
+            <ul>
+                @foreach (OsobaVazby ov in ovazby)
+                {
+                    <li>
+                        Od @(ov.DatumOd?.ToString("dd. MM. yyyy"))
+                        @if (ov.DatumDo.HasValue)
+                        {
+                            <span>do @(ov.DatumDo?.ToString("dd. MM. yyyy"))</span>
+                        }
+                        : @(ov.PojmenovaniVazby)
+                        @if (ov.Podil.HasValue || ov.Podil > 0)
+                        {
+                            <span>(podíl @(ov.Podil) %)</span>
+                        }
+                    </li>
+                }
+            </ul>
+        }
+    </p>
+
+    <partial name="PolitikDisclaimer" view-data="ViewData" />
+
+</div>
+
