@@ -7,7 +7,7 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <PackageReference Include="Devmasters.Core" Version="8.0.1" />
+      <PackageReference Include="Devmasters.Core" Version="8.0.2" />
       <PackageReference Include="Newtonsoft.Json.Schema" Version="3.0.15" />
     </ItemGroup>
 
