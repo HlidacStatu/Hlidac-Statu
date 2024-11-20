@@ -1,6 +1,7 @@
 using System;
 using System.Security.Cryptography;
 using System.Text;
+using System.Text.Json;
 using Nest;
 
 namespace HlidacStatu.Entities.Entities;
@@ -56,6 +57,11 @@ public class Subsidy
     /// </summary>
     [Object(Enabled = false)] //do not index, do not process, just store
     public string RawData { get; set; }
+
+    [Ignore]
+    public string RawDataFormatted => JsonSerializer.Serialize(
+        JsonSerializer.Deserialize<object>(RawData),
+        new JsonSerializerOptions { WriteIndented = true });
     
     /// <summary>
     /// If true, then there was an update and this subsidy was missing in update file.
@@ -63,6 +69,9 @@ public class Subsidy
     /// </summary>
     [Boolean]
     public bool IsHidden { get; set; } = false;
+    
+    [Number]
+    public decimal AssumedAmount => Common.PayedAmount ?? Common.SubsidyAmount ?? 0m;
 
     public class CommonInfo
     {

@@ -1,8 +1,11 @@
 using Nest;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using HlidacStatu.Connectors;
 using HlidacStatu.Entities.Entities;
+using HlidacStatu.Repositories.Searching;
 using Serilog;
 
 namespace HlidacStatu.Repositories
@@ -16,18 +19,21 @@ namespace HlidacStatu.Repositories
         
 
         //do not delete - it is used by another project
-        public static async Task SaveAsync(Subsidy subsidy)
+        public static async Task SaveAsync(Subsidy subsidy, bool shouldRewrite)
         {
             _logger.Debug($"Saving subsidy {subsidy.RecordNumber} from {subsidy.DataSource}/{subsidy.FileName}");
             if (subsidy is null) throw new ArgumentNullException(nameof(subsidy));
 
-            // Check if subsidy already exists
-            var existingSubsidy = await _subsidyClient.GetAsync<Subsidy>(subsidy.Id);
-
-            //do not merge hidden one - they are to be replaced
-            if (existingSubsidy.Found && existingSubsidy.Source.IsHidden == false)
+            if (!shouldRewrite)
             {
-                subsidy = MergeSubsidy(existingSubsidy.Source, subsidy);
+                // Check if subsidy already exists
+                var existingSubsidy = await _subsidyClient.GetAsync<Subsidy>(subsidy.Id);
+
+                //do not merge hidden one - they are to be replaced
+                if (existingSubsidy.Found)
+                {
+                    subsidy = MergeSubsidy(existingSubsidy.Source, subsidy);
+                }
             }
 
             var res = await _subsidyClient.IndexAsync(subsidy, o => o.Id(subsidy.Id));
@@ -55,29 +61,66 @@ namespace HlidacStatu.Repositories
             return newRecord;
         }
 
-        public static async Task SetHiddenSubsidies(string fileName, string source)
+        public static async Task SetHiddenSubsidies(HashSet<string> subsidiesToHideId)
         {
-            var updateByQueryResponse = await _subsidyClient.UpdateByQueryAsync<Subsidy>(u => u
-                .Query(q => q
-                    .Bool(b => b
-                        .Must(
-                            m => m.Term(t => t.FileName, fileName),
-                            m => m.Term(t => t.DataSource, source)
+            if(!subsidiesToHideId.Any())
+                return;
+
+            foreach (var subsidyToHideId in subsidiesToHideId)
+            {
+                var updateByQueryResponse = await _subsidyClient.UpdateByQueryAsync<Subsidy>(u => u
+                    .Query(q => q
+                        .Bool(b => b
+                            .Must(
+                                m => m.Term(t => t.Id, subsidyToHideId)
+                            )
                         )
                     )
-                )
-                .Script(s => s
-                    .Source("ctx._source.isHidden = true")
-                )
-            );
+                    .Script(s => s
+                        .Source("ctx._source.isHidden = true")
+                    )
+                );
     
-            if (!updateByQueryResponse.IsValid)
+                if (!updateByQueryResponse.IsValid)
+                {
+                    _logger.Error(updateByQueryResponse.OriginalException, $"Problem during setting hidden subsidies for {subsidiesToHideId},\n Debug info:{updateByQueryResponse.DebugInformation} ");
+                }
+            }
+            
+        }
+
+        public static HashSet<string> GetAllIds(string datasource, string fileName)
+        {
+            var query = new QueryContainerDescriptor<Subsidy>()
+                .Bool(b => b
+                    .Must(
+                        m => m.Term(t => t.DataSource, datasource),
+                        m => m.Term(t => t.FileName, fileName)
+                    )
+                );
+
+            try
             {
-                _logger.Error(updateByQueryResponse.OriginalException, $"Problem during setting hidden subsidies. Filename: {fileName}, Source:{source},\n Debug info:{updateByQueryResponse.DebugInformation} ");
-                throw new Exception(updateByQueryResponse.OriginalException.Message);
+                var ids = _subsidyClient.SimpleGetAllIds(5, query);
+                return ids.ToHashSet();
+            }
+            catch (Exception ex)
+            {
+                _logger.Fatal(ex, "Problem when loading ids for {datasource}/{fileName}. Aborting load", datasource, fileName);
+                throw;
             }
         }
         
+        public static async Task<Subsidy> GetAsync(string idDotace)
+        {
+            if (idDotace == null) throw new ArgumentNullException(nameof(idDotace));
+
+            var response = await _subsidyClient.GetAsync<Subsidy>(idDotace);
+
+            return response.IsValid
+                ? response.Source
+                : null;
+        }
 
     }
 }

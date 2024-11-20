@@ -1,6 +1,6 @@
 ﻿using System.Threading.Tasks;
 using HlidacStatu.Entities;
-using HlidacStatu.Entities.Dotace;
+using HlidacStatu.Entities.Entities;
 using HlidacStatu.Repositories;
 
 using Microsoft.AspNetCore.Mvc;
@@ -14,27 +14,27 @@ namespace HlidacStatu.Web.Controllers
             return View();
         }
 
-        public async Task<ActionResult> Hledat(Repositories.Searching.DotaceSearchResult model)
+        public async Task<ActionResult> Hledat(Repositories.Searching.SubsidySearchResult model)
         {
             if (model == null || ModelState.IsValid == false)
             {
-                return View(new Repositories.Searching.DotaceSearchResult());
+                return View(new Repositories.Searching.SubsidySearchResult());
             }
 
-            var aggs = new Nest.AggregationContainerDescriptor<Dotace>()
+            var aggs = new Nest.AggregationContainerDescriptor<Subsidy>()
                 .Sum("souhrn", s => s
-                    .Field(f => f.DotaceCelkem)
+                    .Field(f => f.AssumedAmount)
 
                 );
 
 
-            var res = await DotaceRepo.Searching.SimpleSearchAsync(model, anyAggregation: aggs);
+            var res = await SubsidyRepo.Searching.SimpleSearchAsync(model, anyAggregation: aggs);
 
             AuditRepo.Add(
                 Audit.Operations.UserSearch
                 , User?.Identity?.Name
                 , HlidacStatu.Util.RealIpAddress.GetIp(HttpContext)?.ToString()
-                , "Dotace"
+                , "Subsidy"
                 , res.IsValid ? "valid" : "invalid"
                 , res.Q, res.OrigQuery);
 
@@ -48,7 +48,7 @@ namespace HlidacStatu.Web.Controllers
             {
                 return Redirect("/dotace");
             }
-            var dotace = await DotaceRepo.GetAsync(id);
+            var dotace = await SubsidyRepo.GetAsync(id);
             if (dotace is null)
             {
                 return NotFound();
