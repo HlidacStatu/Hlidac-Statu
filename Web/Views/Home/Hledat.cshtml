@@ -470,19 +470,21 @@ else if (Model.HasResults == false)
                 @* firmy *@
                 @foreach (var fP in splQ.Where(m => m.Category != HlidacStatu.DS.Api.Autocomplete.CategoryEnum.Person))
                 {
-                    parts++;
                     Firma fo = Firmy.Get(fP.PrefixValue);
-                    <partial name="Partials/RenderFirmaBox" model="@fo" />
-
-                    if (parts % 4 == 0)
+                    if (fo.Valid)
                     {
-                        <div class="clearfix d-none d-sm-block d-md-none"></div>
-                    }
-                    if (parts % 3 == 0)
-                    {
-                        <div class="clearfix d-none d-md-block d-lg-none"></div>
-                    }
+                        parts++;
+                        <partial name="Partials/RenderFirmaBox" model="@fo" />
 
+                        if (parts % 4 == 0)
+                        {
+                            <div class="clearfix d-none d-sm-block d-md-none"></div>
+                        }
+                        if (parts % 3 == 0)
+                        {
+                            <div class="clearfix d-none d-md-block d-lg-none"></div>
+                        }
+                    }
                 }
 
                 @if (parts < 8 && Model.SearchPromos.HasResult)
