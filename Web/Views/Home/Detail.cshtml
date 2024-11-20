@@ -22,6 +22,10 @@
 
     IReadOnlyDictionary<string, IReadOnlyCollection<string>> highlightingData = ViewBag.Highlighting as IReadOnlyDictionary<string, IReadOnlyCollection<string>>;
     var otherVersion = await Model.OtherVersionsAsync();
+
+    //TODO - obsah do detailu podle hledaneho dotazu
+    var parsedQuery = HlidacStatu.Web.Framework.AutocompleteHelper.CreateInputTagsForJs(Context.Request.Query);
+
 }
 
 @section scripts
@@ -81,7 +85,7 @@
         @if (Model.AIready == 1)
         {
             <partial name="WebUtil/DynamicModal"
-                        model="@(new DynamicModalViewModel($"/api/v1/ModalAISummary/{Model.Id}", "<i class='fa-solid fa-microchip-ai'></i> AI shrnutí smlouvy","btn btn-success", loadingText: "Stahujeme AI data", style: "", width: DynamicModalViewModel.WidthSizeEnum.Large))" />
+                     model="@(new DynamicModalViewModel($"/api/v1/ModalAISummary/{Model.Id}", "<i class='fa-solid fa-microchip-ai'></i> AI shrnutí smlouvy","btn btn-success", loadingText: "Stahujeme AI data", style: "", width: DynamicModalViewModel.WidthSizeEnum.Large))" />
         }
         @if (this.User?.IsInRole("canEditData") == true)
         {
@@ -278,43 +282,43 @@
             </td>
         </tr>
 
-    <tr>
-        <td>Hodnota smlouvy</td>
-        <td>
+        <tr>
+            <td>Hodnota smlouvy</td>
+            <td>
 
-            @Html.Raw(Model.hodnotaBezDph.HasValue ? $"<p>Cena bez DPH: <b>{Smlouva.NicePrice(Model.hodnotaBezDph, html: true)}</b></p>" : "")
-            @Html.Raw(Model.hodnotaVcetneDph.HasValue ? $"<p>Cena s DPH: <b>{Smlouva.NicePrice(Model.hodnotaVcetneDph, html: true)}</b></p>" : "")
-            @if (Model.ciziMena != null && Model.ciziMena.mena != null)
-            {
-                @Html.Raw(Model.ciziMena.hodnota > 0 && Model.ciziMena.mena != "CZK" ?
-                    $"<p>Cena v cizí měně: <b>{Smlouva.NicePrice(Model.ciziMena.hodnota, Model.ciziMena.mena, html: true)}</b></p>" : "")
-            }
-            @if (string.IsNullOrWhiteSpace(Model.cenaNeuvedenaDuvod) == false)
-            {
-                <p>Důvod neuvedení ceny od zveřejňovatele: <code>@Model.cenaNeuvedenaDuvod</code></p>
-            }
-        </td>
-    </tr>
+                @Html.Raw(Model.hodnotaBezDph.HasValue ? $"<p>Cena bez DPH: <b>{Smlouva.NicePrice(Model.hodnotaBezDph, html: true)}</b></p>" : "")
+                @Html.Raw(Model.hodnotaVcetneDph.HasValue ? $"<p>Cena s DPH: <b>{Smlouva.NicePrice(Model.hodnotaVcetneDph, html: true)}</b></p>" : "")
+                @if (Model.ciziMena != null && Model.ciziMena.mena != null)
+                {
+                    @Html.Raw(Model.ciziMena.hodnota > 0 && Model.ciziMena.mena != "CZK" ?
+                             $"<p>Cena v cizí měně: <b>{Smlouva.NicePrice(Model.ciziMena.hodnota, Model.ciziMena.mena, html: true)}</b></p>" : "")
+                }
+                @if (string.IsNullOrWhiteSpace(Model.cenaNeuvedenaDuvod) == false)
+                {
+                    <p>Důvod neuvedení ceny od zveřejňovatele: <code>@Model.cenaNeuvedenaDuvod</code></p>
+                }
+            </td>
+        </tr>
 
-    @{
-        var vzForSmlouva = await SmlouvaVerejnaZakazkaRepo.GetVzForSmlouva(Model.Id);
-        if (vzForSmlouva is not null)
-        {
-            var vz = await VerejnaZakazkaRepo.LoadFromESAsync(vzForSmlouva.VzId);
-            if (vz is not null)
+        @{
+            var vzForSmlouva = await SmlouvaVerejnaZakazkaRepo.GetVzForSmlouva(Model.Id);
+            if (vzForSmlouva is not null)
             {
-                <tr>
-                    <td>Veřejná zakázka dle které byla pravděpodobně uzavřena tato smlouva</td>
-                    <td>
-                        <a asp-controller="VerejneZakazky" asp-action="Zakazka" asp-route-Id="@vzForSmlouva.VzId">@vz.NazevZakazky</a>
-                    </td>
-                </tr>
+                var vz = await VerejnaZakazkaRepo.LoadFromESAsync(vzForSmlouva.VzId);
+                if (vz is not null)
+                {
+                    <tr>
+                        <td>Veřejná zakázka dle které byla pravděpodobně uzavřena tato smlouva</td>
+                        <td>
+                            <a asp-controller="VerejneZakazky" asp-action="Zakazka" asp-route-Id="@vzForSmlouva.VzId">@vz.NazevZakazky</a>
+                        </td>
+                    </tr>
+                }
+
             }
-            
         }
-    }
-        
-    <tr>
+
+        <tr>
             <td>Přílohy</td>
             <td>
                 @if (Model.Prilohy != null && Model.Prilohy.Count() > 0)
@@ -483,6 +487,57 @@
                 </td>
             </tr>
         }
+
+
+        @if (parsedQuery.Any(m => m.Category == HlidacStatu.DS.Api.Autocomplete.CategoryEnum.Person))
+        {
+            var smlouvaIcos = Model.Prijemce.Select(m => m.ico)
+            .Union(new string[] { Model.VkladatelDoRejstriku.ico, Model.Platce.ico })
+            .Distinct();
+
+            <tr>
+                <td>
+                    Vazba na hledaný dotaz <br /><code>@(string.Join(" ", parsedQuery.Select(m => m.RenderText())))</code>
+                </td>
+                <td>
+                    @foreach (var osAc in parsedQuery.Where(m => m.Category == HlidacStatu.DS.Api.Autocomplete.CategoryEnum.Person))
+                    {
+                        Osoba fo = Osoby.GetByNameId.Get(osAc.PrefixValue);
+                        if (fo != null)
+                        {
+
+                            var data = fo.AktualniVazby(HlidacStatu.DS.Graphs.Relation.AktualnostType.Nedavny)
+                            .Where(v => v.To != null && v.To.Type == HlidacStatu.DS.Graphs.Graph.Node.NodeType.Company)
+                            .Where(m => smlouvaIcos.Contains(m.To.Id))
+                            .GroupBy(f => f.To.Id, v => v, (ico, v) => new
+                            {
+                                ICO = ico,
+                                FirmaName = v.First().To.PrintName(),//HlidacStatu.Lib.Data.External.FirmyDB.NameFromIco(ico, true),
+                                VazbyPerIco = fo.VazbyProICO(ico),
+                                stat = Firmy.Get(ico).StatistikaRegistruSmluv()
+                            })
+                            .OrderByDescending(m => m.stat.Summary().CelkovaHodnotaSmluv).ThenBy(m => m.ICO).ToList();
+                            if (data.Any())
+                            {
+                                <p>
+                                    <b>@fo.FullNameWithYear()</b>
+                                    <ul>
+                                        @foreach (var vPerIco in data)
+                                        {
+                                            <li>
+                                                <a class="fw-bold" href="/subjekt/@(vPerIco.ICO)">@vPerIco.FirmaName</a>:
+                                                @Html.RenderVazby(vPerIco.VazbyPerIco)
+                                            </li>
+                                        }
+                                    </ul>
+                                </p>
+                            }
+                        }
+                    }
+                </td>
+            </tr>
+        }
+
 
         <tr>
             <td>
