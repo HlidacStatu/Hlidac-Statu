@@ -27,7 +27,7 @@ public static class OsobaExtension2
             return showIt;
         
         var dotace = await DotaceRepo.Searching.SimpleSearchAsync("osobaid:" + osoba.NameId, 0, 0,
-            ((int)HlidacStatu.Repositories.Searching.DotaceSearchResult.DotaceOrderResult.FastestForScroll).ToString(),
+            ((int)HlidacStatu.Repositories.Searching.SubsidySearchResult.DotaceOrderResult.FastestForScroll).ToString(),
             exactNumOfResults: true);
         showIt = dotace.Total > 0;
         if (showIt)

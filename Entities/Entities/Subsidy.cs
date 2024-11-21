@@ -71,7 +71,10 @@ public class Subsidy
     public bool IsHidden { get; set; } = false;
     
     [Number]
-    public decimal AssumedAmount => Common.PayedAmount ?? Common.SubsidyAmount ?? 0m;
+    public decimal AssumedAmount => 
+        (Common.PayedAmount is null || Common.PayedAmount == 0) 
+            ? Common.SubsidyAmount ?? 0m 
+            : Common.PayedAmount.Value;
 
     public class CommonInfo
     {
@@ -106,6 +109,9 @@ public class Subsidy
         public string SubsidyProvider { get; set; }
         [Keyword]
         public string SubsidyProviderIco { get; set; }
+        
+        [Ignore]
+        public string DisplayProject => string.IsNullOrWhiteSpace(ProjectName) ? ProjectCode : ProjectName;
         
     }
     

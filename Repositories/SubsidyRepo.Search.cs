@@ -24,7 +24,7 @@ namespace HlidacStatu.Repositories
                 // Create a query for `isHidden = false`
                 var isHiddenQuery = new TermQuery
                 {
-                    Field = nameof(Subsidy.IsHidden),
+                    Field = "isHidden",
                     Value = false
                 };
 
@@ -43,8 +43,8 @@ namespace HlidacStatu.Repositories
                 new OsobaId(HlidacStatu.Repositories.OsobaVazbyRepo.Icos_s_VazbouNaOsobu, "osobaid:", "ico:"),
                 new Holding(HlidacStatu.Repositories.FirmaVazbyRepo.IcosInHolding, null, "ico:"),
                 //(prijemce.jmeno:${q} OR prijemce.obchodniJmeno:${q})
-                new TransformPrefix("ico:", "prijemce.ico:", null),
-                new TransformPrefixWithValue("jmeno:", "(prijemce.hlidacJmeno:${q} OR prijemce.obchodniJmeno:${q})",
+                new TransformPrefix("ico:", "common.recipient.ico:", null),
+                new TransformPrefixWithValue("jmeno:", "(common.recipient.name:${q} OR common.recipient.hlidacName:${q})",
                     null),
                 new TransformPrefix("projekt:", "common.projectName:", null),
                 new TransformPrefix("kodProjektu:", "common.projectCode:", null),
@@ -110,7 +110,7 @@ namespace HlidacStatu.Repositories
                 ISearchResponse<Subsidy> res = null;
                 try
                 {
-                    var client = await Manager.GetESClient_DotaceAsync();
+                    var client = await Manager.GetESClient_SubsidyAsync();
                     res = await client.SearchAsync<Subsidy>(s => s
                             .Size(search.PageSize)
                             .ExpandWildcards(Elasticsearch.Net.ExpandWildcards.All)

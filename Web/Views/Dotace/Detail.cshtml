@@ -37,11 +37,11 @@
 <link rel="stylesheet" type="text/css" href="//cdn.datatables.net/1.13.4/css/jquery.dataTables.css"/>
 <script type="text/javascript" charset="utf8" src="//cdn.datatables.net/1.13.4/js/jquery.dataTables.js"></script>
 
-<partial name="_SearchForm" model="@(new HlidacStatu.Repositories.Searching.DotaceSearchResult())"/>
+<partial name="_SearchForm" model="@(new HlidacStatu.Repositories.Searching.SubsidySearchResult())"/>
 
 <h2>
     <add-bookmark item="@Model"></add-bookmark>
-    Detail dotace "@Model.Common.ProjectName"
+    Detail dotace "@Model.Common.DisplayProject"
 </h2>
 
 @if (duplicity != null && duplicity.Count > 1)
@@ -59,7 +59,7 @@
         <th>Příjemce dotace</th>
         <td>
             @Model.Common.Recipient.DisplayName @(Model.Common.Recipient.YearOfBirth is null ? "" : $"({Model.Common.Recipient.YearOfBirth})")
-            @if (await Model.MaSkutecnehoMajiteleAsync() == true)
+            @if (await Model.MaSkutecnehoMajiteleAsync() == false)
             {
                 <br/>
                 <div class="alert alert-warning">
@@ -104,7 +104,7 @@
         <td>
             @if (!string.IsNullOrWhiteSpace(Model.Common.ProjectCode))
             {
-                <a href="/dotace/hledat?q=kod:@Model.Common.ProjectCode" title="Vyhledat podobné dotace">@Model.Common.ProjectCode</a>
+                <a href="/dotace/hledat?q=kodProjektu:@Model.Common.ProjectCode" title="Vyhledat podobné dotace">@Model.Common.ProjectCode</a>
             }
         </td>
     </tr>

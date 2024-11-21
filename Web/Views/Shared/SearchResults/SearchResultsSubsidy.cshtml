@@ -51,13 +51,13 @@
                 }
             </td>
             <td>
-                @dotaceItem.Common.ProjectName
+                @dotaceItem.Common.DisplayProject
             </td>
             <td class="text-nowrap">
                 @(dotaceItem.Common.ApprovedYear)
             </td>
             <td class="text-end number text-nowrap">
-                @HlidacStatu.Util.RenderData.NicePriceHtml(dotaceItem.AssumedAmount))
+                @HlidacStatu.Util.RenderData.NicePriceHtml(dotaceItem.AssumedAmount)
             </td>
         </tr>
     }
