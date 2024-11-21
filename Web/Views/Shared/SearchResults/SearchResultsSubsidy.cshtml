@@ -1,4 +1,7 @@
-@model HlidacStatu.Repositories.Searching.DotaceSearchResult
+@using HlidacStatu.Extensions
+@using HlidacStatu.Web.TagHelpers
+@using Microsoft.AspNetCore.Mvc.TagHelpers
+@model HlidacStatu.Repositories.Searching.SubsidySearchResult
 
 <table class="table table-hover">
     <thead>
@@ -7,8 +10,8 @@
         <th>Příjemce</th>
         <th class="d-none d-sm-table-cell d-md-table-cell d-lg-table-cell d-xl-table-cell d-xxl-table-cell">IČO příjemce</th>
         <th>Název projektu</th>
-        <th>Datum podpisu</th>
-        <th>Čerpaná částka</th>
+        <th>Rok podpisu</th>
+        <th>Odhadovaná výše dotace</th>
     </tr>
     </thead>
     <tbody>
@@ -18,8 +21,8 @@
         
         //find duplicates
         var hasSimilar = Model.ElasticResults.Hits
-            .Count(h => h.Source.Prijemce.Ico == dotaceItem.Prijemce.Ico
-                && h.Source.KodProjektu == dotaceItem.KodProjektu) > 1;
+            .Count(h => h.Source.Common.Recipient.Ico == dotaceItem.Common.Recipient.Ico
+                && h.Source.Common.ProjectCode == dotaceItem.Common.ProjectCode) > 1;
         
         <tr class="@(hasSimilar ? "alert alert-warning" : "") ">
             <td class="text-nowrap">
@@ -39,38 +42,22 @@
 
             </td>
             <td>
-                @(await Html.KIndexLabelLinkAsync(dotaceItem.Prijemce.Ico))@Devmasters.TextUtil.ShortenText((string.IsNullOrWhiteSpace(dotaceItem.Prijemce.HlidacJmeno) ?
-                                                                  dotaceItem.Prijemce.DisplayName :
-                                                                  dotaceItem.Prijemce.HlidacJmeno)
-                                                                  , 40)
+                @(await Html.KIndexLabelLinkAsync(dotaceItem.Common.Recipient.Ico))@Devmasters.TextUtil.ShortenText(dotaceItem.Common.Recipient.DisplayName, 40)
             </td>
             <td class="d-none d-sm-table-cell d-md-table-cell d-lg-table-cell d-xl-table-cell d-xxl-table-cell">
-                @if (dotaceItem.Prijemce.Ico != "00000000")
+                @if (dotaceItem.Common.Recipient.Ico is not null && dotaceItem.Common.Recipient.Ico != "00000000")
                 {
-                    <a href="/subjekt/@dotaceItem.Prijemce.Ico" title="Informace o subjektu">@dotaceItem.Prijemce.Ico</a>
+                    <a href="/subjekt/@dotaceItem.Common.Recipient.Ico" title="Informace o subjektu">@dotaceItem.Common.Recipient.Ico</a>
                 }
             </td>
             <td>
-                @dotaceItem.GetNazevDotace()
+                @dotaceItem.Common.ProjectName
             </td>
             <td class="text-nowrap">
-                @(dotaceItem.DatumPodpisu?.Date.ToString("dd.MM.yyyy") ?? "Neznámé")
+                @(dotaceItem.Common.ApprovedYear)
             </td>
             <td class="text-end number text-nowrap">
-                @if (dotaceItem.DotaceCelkem == null || dotaceItem.DotaceCelkem == 0)
-                {
-                    <code><i class="fas fa-exclamation-circle"></i> Hodnota neznámá</code>
-                }
-                else
-                {
-                    @Html.Raw(HlidacStatu.Util.RenderData.NicePriceHtml((decimal) dotaceItem.DotaceCelkem))
-                    if (dotaceItem.PujckaCelkem != null && dotaceItem.PujckaCelkem > 0)
-                    {
-                        <br/>
-                        <p class="text-muted">z toho @Html.Raw(HlidacStatu.Util.RenderData.NicePriceHtml((decimal) dotaceItem.PujckaCelkem)) je půjčka</p>
-                    }
-                }
-
+                @HlidacStatu.Util.RenderData.NicePriceHtml(dotaceItem.AssumedAmount))
             </td>
         </tr>
     }

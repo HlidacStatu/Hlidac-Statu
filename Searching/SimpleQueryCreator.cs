@@ -66,7 +66,6 @@ namespace HlidacStatu.Searching
         }
 
 
-        //todo: add is hidden = false
         public static QueryContainer GetSimpleQuery<T>(string query, IRule[] rules, string[] fields = null)
             where T : class
         {

@@ -18,6 +18,24 @@ namespace HlidacStatu.Repositories
         public static class Searching
         {
             public static readonly string[] QueryOperators = new string[] { "AND", "OR" };
+            
+            public static QueryContainer AddIsNotHiddenRule(QueryContainer query)
+            {
+                // Create a query for `isHidden = false`
+                var isHiddenQuery = new TermQuery
+                {
+                    Field = nameof(Subsidy.IsHidden),
+                    Value = false
+                };
+
+                // Combine the original query with the `isHidden` rule
+                return query == null
+                    ? isHiddenQuery
+                    : new BoolQuery
+                    {
+                        Must = new QueryContainer[] { query, isHiddenQuery }
+                    };
+            }
 
 
             public static readonly IRule[] Irules = new IRule[]
@@ -53,6 +71,7 @@ namespace HlidacStatu.Repositories
                 var query = searchdata.Q;
 
                 var qc = SimpleQueryCreator.GetSimpleQuery<Subsidy>(query, Irules);
+                qc = AddIsNotHiddenRule(qc);
 
                 return qc;
             }
@@ -138,7 +157,7 @@ namespace HlidacStatu.Repositories
                     }
                     else
                     {
-                        _logger.Error(e, "");
+                        Logger.Error(e, "");
                     }
 
                     throw;
