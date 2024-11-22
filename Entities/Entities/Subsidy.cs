@@ -14,32 +14,33 @@ public class Subsidy
     {
         get
         {
-            var recipientBytes = SHA256.HashData(Encoding.UTF8.GetBytes($"{Common.Recipient.Ico}_{Common.Recipient.Name}_{Common.Recipient.YearOfBirth}_{Common.Recipient.Obec}")); 
-            var databytes = SHA256.HashData(Encoding.UTF8.GetBytes($"{DataSource}_{Common.ProjectCode}_{Common.ProjectName}_{Common.ProgramName}_{Common.ProgramCode}_{Common.ApprovedYear}_{Common.SubsidyProvider}_{Common.SubsidyProviderIco}"));
-            var dataHash = Convert.ToHexString(databytes);
-            var recipientHash = Convert.ToHexString(recipientBytes);
-            return $"{dataHash}_{recipientHash}"; //add datasource here and merge recipient and data to one
+            var hashBytes = SHA256.HashData(Encoding.UTF8.GetBytes(
+                $"{Common.Recipient.Ico}_{Common.Recipient.Name}_{Common.Recipient.YearOfBirth}_{Common.Recipient.Obec}" +
+                $"_{Common.ProjectCode}_{Common.ProjectName}_{Common.ProgramName}_{Common.ProgramCode}" +
+                $"_{Common.ApprovedYear}_{Common.SubsidyProvider}_{Common.SubsidyProviderIco}"));
+            var hash = Convert.ToHexString(hashBytes);
+            return $"{DataSource}-{hash}";
         }
     }
-    
+
     /// <summary>
     /// Filename which was processed
     /// </summary>
     [Keyword]
     public string FileName { get; set; }
-    
+
     /// <summary>
     /// Who manages the data about this subsidy 
     /// </summary>
     [Keyword]
     public string DataSource { get; set; }
-    
+
     /// <summary>
     /// Order within a filename
     /// </summary>
     [Keyword]
     public int RecordNumber { get; set; }
-    
+
     /// <summary>
     /// Date when subsidy was processed.
     /// </summary>
@@ -51,7 +52,7 @@ public class Subsidy
     /// </summary>
     [Object]
     public CommonInfo Common { get; set; } = new();
-    
+
     /// <summary>
     /// Original record for people to display in case of need
     /// </summary>
@@ -62,18 +63,18 @@ public class Subsidy
     public string RawDataFormatted => JsonSerializer.Serialize(
         JsonSerializer.Deserialize<object>(RawData),
         new JsonSerializerOptions { WriteIndented = true });
-    
+
     /// <summary>
     /// If true, then there was an update and this subsidy was missing in update file.
     /// Basically it tells us if DataSource removed the subsidy.
     /// </summary>
     [Boolean]
     public bool IsHidden { get; set; } = false;
-    
+
     [Number]
-    public decimal AssumedAmount => 
-        (Common.PayedAmount is null || Common.PayedAmount == 0) 
-            ? Common.SubsidyAmount ?? 0m 
+    public decimal AssumedAmount =>
+        (Common.PayedAmount is null || Common.PayedAmount == 0)
+            ? Common.SubsidyAmount ?? 0m
             : Common.PayedAmount.Value;
 
     public class CommonInfo
@@ -86,7 +87,7 @@ public class Subsidy
 
         [Number]
         public decimal? PayedAmount { get; set; }
-        
+
         [Number]
         public decimal? ReturnedAmount { get; set; }
 
@@ -104,39 +105,44 @@ public class Subsidy
 
         [Date]
         public int? ApprovedYear { get; set; }
-        
+
         [Text]
         public string SubsidyProvider { get; set; }
+
         [Keyword]
         public string SubsidyProviderIco { get; set; }
-        
+
         [Ignore]
         public string DisplayProject => string.IsNullOrWhiteSpace(ProjectName) ? ProjectCode : ProjectName;
-        
     }
-    
+
     public class Recipient
     {
         [Keyword]
         public string Ico { get; set; }
+
         [Text]
         public string Name { get; set; }
+
         [Text]
         public string HlidacName { get; set; }
+
         [Keyword]
         public string HlidacNameId { get; set; }
+
         [Number]
         public int? YearOfBirth { get; set; }
 
         [Keyword]
         public string Obec { get; set; }
+
         [Keyword]
         public string Okres { get; set; }
+
         [Keyword]
         public string PSC { get; set; }
-        
+
         [Ignore]
         public string DisplayName => string.IsNullOrWhiteSpace(HlidacName) ? Name : HlidacName;
     }
-
 }
