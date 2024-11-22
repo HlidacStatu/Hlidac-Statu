@@ -70,7 +70,6 @@
   <ItemGroup>
     <PackageReference Include="InfluxDB.Client" Version="4.15.0" />
     <PackageReference Include="linqtotwitter" Version="6.15.0" />
-    <PackageReference Include="RestSharp" Version="111.4.0" />
     <PackageReference Include="System.ComponentModel.Annotations" Version="5.0.0" />
     <PackageReference Include="System.ServiceModel.Duplex" Version="6.0.0" />
         <!-- keep System.ServiceModel. in version 6.2.0 -->

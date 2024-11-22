@@ -18,7 +18,7 @@ public class Subsidy
             var databytes = SHA256.HashData(Encoding.UTF8.GetBytes($"{DataSource}_{Common.ProjectCode}_{Common.ProjectName}_{Common.ProgramName}_{Common.ProgramCode}_{Common.ApprovedYear}_{Common.SubsidyProvider}_{Common.SubsidyProviderIco}"));
             var dataHash = Convert.ToHexString(databytes);
             var recipientHash = Convert.ToHexString(recipientBytes);
-            return $"{dataHash}_{recipientHash}";
+            return $"{dataHash}_{recipientHash}"; //add datasource here and merge recipient and data to one
         }
     }
     
