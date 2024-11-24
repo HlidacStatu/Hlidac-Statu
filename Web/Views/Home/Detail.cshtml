@@ -24,7 +24,29 @@
     var otherVersion = await Model.OtherVersionsAsync();
 
     //TODO - obsah do detailu podle hledaneho dotazu
+    bool showQueryContext = false;
     var parsedQuery = HlidacStatu.Web.Framework.AutocompleteHelper.CreateInputTagsForJs(Context.Request.Query);
+    var parsedQueryIcosInContext = new List<string>();
+    var allIcosInSmlouva = Model.Prijemce.Select(m => m.ico)
+        .Union(new string[] { Model.VkladatelDoRejstriku.ico, Model.Platce.ico })
+        .Distinct();
+
+    showQueryContext = parsedQuery.Any(m => m.Category == HlidacStatu.DS.Api.Autocomplete.CategoryEnum.Person);
+
+    //TODO zatim vazby mezi firmama v hledani neresime
+    if (false && showQueryContext == false && parsedQuery.Any(m => m.Prefix.Contains("ico:") || m.Prefix.Contains("ds:")))
+    {
+        foreach (var item in parsedQuery.Where(m => m.Prefix.Contains("ico:") || m.Prefix.Contains("ds:")))
+        {
+            if (HlidacStatu.Util.DataValidators.CheckCZICO(item.PrefixValue)
+                && allIcosInSmlouva.Contains(item.PrefixValue)== false
+            )
+            {
+                parsedQueryIcosInContext.Add(item.PrefixValue);
+                showQueryContext = true;
+            }
+        }
+    }
 
 }
 
@@ -489,11 +511,8 @@
         }
 
 
-        @if (parsedQuery.Any(m => m.Category == HlidacStatu.DS.Api.Autocomplete.CategoryEnum.Person))
+        @if (showQueryContext)
         {
-            var smlouvaIcos = Model.Prijemce.Select(m => m.ico)
-            .Union(new string[] { Model.VkladatelDoRejstriku.ico, Model.Platce.ico })
-            .Distinct();
 
             <tr>
                 <td>
@@ -508,7 +527,7 @@
 
                             var data = fo.AktualniVazby(HlidacStatu.DS.Graphs.Relation.AktualnostType.Nedavny)
                             .Where(v => v.To != null && v.To.Type == HlidacStatu.DS.Graphs.Graph.Node.NodeType.Company)
-                            .Where(m => smlouvaIcos.Contains(m.To.Id))
+                            .Where(m => allIcosInSmlouva.Contains(m.To.Id))
                             .GroupBy(f => f.To.Id, v => v, (ico, v) => new
                             {
                                 ICO = ico,
