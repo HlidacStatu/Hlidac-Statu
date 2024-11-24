@@ -81,7 +81,7 @@ namespace HlidacStatu.Repositories.Searching
             if (splQ.Parts.Any(m => m.Prefix.StartsWith("osobaid", StringComparison.InvariantCultureIgnoreCase)))
             {
                 var part = splQ.Parts.First(m => m.Prefix.StartsWith("osobaid", StringComparison.InvariantCultureIgnoreCase));
-                var osoba = OsobaRepo.GetByNameId(part.Value);
+                var osoba = Osoby.GetByNameId.Get(part.Value);
                 if (osoba is not null)
                 {
                     return new Autocomplete()
