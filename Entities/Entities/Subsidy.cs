@@ -62,7 +62,10 @@ public class Subsidy
     [Ignore]
     public string RawDataFormatted => JsonSerializer.Serialize(
         JsonSerializer.Deserialize<object>(RawData),
-        new JsonSerializerOptions { WriteIndented = true });
+        new JsonSerializerOptions
+        {
+            WriteIndented = true, Encoder = System.Text.Encodings.Web.JavaScriptEncoder.UnsafeRelaxedJsonEscaping
+        });
 
     /// <summary>
     /// If true, then there was an update and this subsidy was missing in update file.
