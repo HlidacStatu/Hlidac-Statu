@@ -206,10 +206,10 @@ namespace HlidacStatu.Repositories
             }
         }
 
-        public static List<RecalculateItem> CascadeItems(RecalculateItem item, 
+        public static List<RecalculateItem> CascadeItems(RecalculateItem item,
             ref System.Collections.Concurrent.ConcurrentBag<RecalculateItem> alreadyOnList)
         {
-            
+
             List<RecalculateItem> list = new List<RecalculateItem>(alreadyOnList);
             if (item.ItemType == RecalculateItem.ItemTypeEnum.Subjekt)
             {
@@ -222,11 +222,11 @@ namespace HlidacStatu.Repositories
             {
                 var o = Osoby.GetById.Get(Convert.ToInt32(item.Id));
                 if (o != null)
-                    list = list.Union(OsobaForQueue(new List<RecalculateItem>(), o, item.StatisticsType, item.ProvokedBy,0), comparer)
+                    list = list.Union(OsobaForQueue(new List<RecalculateItem>(), o, item.StatisticsType, item.ProvokedBy, 0), comparer)
                         .ToList();
             }
             else
-                list = list.Union(new[] { item },comparer).ToList();
+                list = list.Union(new[] { item }, comparer).ToList();
 
             _logger.Debug("{method} expanding " + item.ItemType.ToString() + " {name} to {count} items",
                 MethodBase.GetCurrentMethod().Name, item.Id, list.Count);
@@ -338,7 +338,7 @@ namespace HlidacStatu.Repositories
                 var item = new RecalculateItem(vaz.o, statsType, provokeBy);
                 if (list.Contains(item, comparer) == false)
                 {
-                    list = list.Union(OsobaForQueue(list, vaz.o, statsType, provokeBy, deep+1),comparer).ToList();
+                    list = list.Union(OsobaForQueue(list, vaz.o, statsType, provokeBy, deep + 1), comparer).ToList();
                 }
             }
             return list;
@@ -477,26 +477,35 @@ namespace HlidacStatu.Repositories
         public static IEnumerable<RecalculateItem> GetItemsFromProcessingQueue(int count)
         {
 
+            try {
 
-            using (Entities.DbEntities db = new DbEntities())
-            {
-                var res = db.RecalculateItem
-                    .AsNoTracking()
-                    .Where(m => m.Started == null)
-                    .OrderBy(o => o.Created)
-                    .Take(count)
-                    .ToArray();
-
-                foreach (var batch in res.Split(1000))
+                using (Entities.DbEntities db = new DbEntities())
                 {
-                    var ids = string.Join(",", batch.Select(m=>m.Pk));
-                    var sql = $"update recalculateItemQueue set started=getdate() where pk in ({ids})";
-                    db.Database.ExecuteSqlRaw(sql);
+                    db.Database.SetCommandTimeout(120); //120 secs
+
+                    var res = db.RecalculateItem
+                        .AsNoTracking()
+                        .Where(m => m.Started == null)
+                        .OrderBy(o => o.Created)
+                        .Take(count)
+                        .ToArray();
+
+                    if (res.Any())
+                    {
+                        var ids = string.Join(",", res.Select(m => m.Pk));
+                        var sql = $"update recalculateItemQueue set started=GETUTCDATE() where pk in ({ids})";
+                        db.Database.ExecuteSqlRaw(sql);
+                        _logger.Debug("Setting recalculateItemQueue status {sql}", sql);
+                    }
+                    return res;
 
                 }
-                return res;
-
             }
+
+            catch {
+                return Array.Empty<RecalculateItem>();
+            }
+
 
 
         }

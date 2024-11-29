@@ -8,6 +8,7 @@
 
   <ItemGroup>
     <PackageReference Include="Devmasters.Core" Version="8.0.2" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="8.0.0" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
     <PackageReference Include="NPOI" Version="2.7.1" />
   </ItemGroup>

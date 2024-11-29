@@ -10,6 +10,7 @@
 
   <ItemGroup>
 	  <PackageReference Include="Devmasters.Batch" Version="8.0.0" />
+	  <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="8.0.0" />
 	  <PackageReference Include="NEST" Version="7.17.5" />
 	  <PackageReference Include="Devmasters.Core" Version="8.0.2" />
   </ItemGroup>

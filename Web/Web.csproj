@@ -2,7 +2,7 @@
 
     <PropertyGroup>
         <Version>1.1.0.0</Version>
-                <TargetFramework>net8.0</TargetFramework>
+        <TargetFramework>net8.0</TargetFramework>
         <UserSecretsId>aspnet-Web-D6658176-CBA9-44EA-823F-F6C01A8F3EE9</UserSecretsId>
         <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
         <AssemblyName>HlidacStatu.Web</AssemblyName>
@@ -82,6 +82,7 @@
           <PrivateAssets>all</PrivateAssets>
           <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
+        <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="8.0.0" />
         <PackageReference Include="Microsoft.Extensions.Diagnostics.HealthChecks.EntityFrameworkCore" Version="8.0.7" />
         <PackageReference Include="Microsoft.Extensions.Http.Polly" Version="8.0.7" />
         <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="8.0.3" />

@@ -30,6 +30,7 @@
         <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       </PackageReference>
       <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="8.0.7" />
+      <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="8.0.0" />
       <PackageReference Include="Microsoft.Extensions.Identity.Stores" Version="8.0.7" />
       <PackageReference Include="NEST" Version="7.17.5" />
       <PackageReference Include="Newtonsoft.Json.Schema" Version="3.0.15" />
