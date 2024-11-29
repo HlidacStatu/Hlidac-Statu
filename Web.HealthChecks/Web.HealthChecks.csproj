@@ -35,7 +35,7 @@
 		<PackageReference Include="Microsoft.Extensions.Diagnostics.HealthChecks.EntityFrameworkCore" Version="8.0.11" />
 		<PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="8.0.3" />
 		<PackageReference Include="Microsoft.Web.Administration" Version="11.1.0" />
-		<PackageReference Include="Newtonsoft.Json.Schema" Version="4.0.1" />
+		<PackageReference Include="Newtonsoft.Json.Schema" Version="3.0.16" />
 		<PackageReference Include="Ollama" Version="1.13.0" />
 		<PackageReference Include="RabbitMQ.Client" Version="6.8.1" />
 		<PackageReference Include="IPNetwork2" Version="3.0.667">
