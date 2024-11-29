@@ -17,13 +17,15 @@
 
 	<ItemGroup>
 		<PackageReference Include="Devmasters.Comm.Signal" Version="8.2.0" />
-		<PackageReference Include="Hangfire.AspNetCore" Version="1.8.14" />
-		<PackageReference Include="Hangfire.SqlServer" Version="1.8.14" />
+		<PackageReference Include="Hangfire.AspNetCore" Version="1.8.16" />
+		<PackageReference Include="Hangfire.SqlServer" Version="1.8.16" />
 		<PackageReference Include="Microsoft.AspNetCore.Identity.UI" Version="8.0.7" />
 		<PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="8.0.7" />
 		<PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="8.0.0" />
-		<PackageReference Include="Swashbuckle.AspNetCore" Version="6.6.2" />
-		<PackageReference Include="Swashbuckle.AspNetCore.Annotations" Version="6.6.2" />
+		<PackageReference Include="Ollama" Version="1.13.0" />
+		<PackageReference Include="Swashbuckle.AspNetCore" Version="7.1.0" />
+		<PackageReference Include="Swashbuckle.AspNetCore.Annotations" Version="7.1.0" />
+		<PackageReference Include="System.Security.Cryptography.Pkcs" Version="8.0.1" />
 		<PackageReference Include="System.Text.Encoding.CodePages" Version="8.0.0" />
 	</ItemGroup>
 

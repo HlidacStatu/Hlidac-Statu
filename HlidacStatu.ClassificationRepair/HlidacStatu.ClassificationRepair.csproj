@@ -9,7 +9,9 @@
         <None Remove="appsettings.json.sample" />
     </ItemGroup>
     <ItemGroup>
-        <PackageReference Include="MailKit" Version="4.7.1.1" />
+        <PackageReference Include="MailKit" Version="4.8.0" />
+        <PackageReference Include="Ollama" Version="1.13.0" />
+        <PackageReference Include="System.Security.Cryptography.Pkcs" Version="8.0.1" />
         <PackageReference Include="System.Text.Encoding.CodePages" Version="8.0.0" />
     </ItemGroup>
     <ItemGroup>

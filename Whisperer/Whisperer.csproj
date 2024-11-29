@@ -10,7 +10,7 @@
         <PackageReference Include="Lucene.Net" Version="4.8.0-beta00016" />
         <PackageReference Include="Lucene.Net.Analysis.Common" Version="4.8.0-beta00016" />
         <PackageReference Include="Lucene.Net.QueryParser" Version="4.8.0-beta00016" />
-        <PackageReference Include="Serilog" Version="4.0.0" />
+        <PackageReference Include="Serilog" Version="4.1.0" />
     </ItemGroup>
 
 </Project>

@@ -28,11 +28,14 @@
       <PackageReference Include="Microsoft.AspNetCore.Mvc.TagHelpers" Version="2.2.0" />
       <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="8.0.0" />
       <PackageReference Include="NEST" Version="7.17.5" />
-      <PackageReference Include="Polly.Core" Version="8.4.1" />
-      <PackageReference Include="Polly.RateLimiting" Version="8.4.1" />
+      <PackageReference Include="Newtonsoft.Json.Schema" Version="4.0.1" />
+      <PackageReference Include="Ollama" Version="1.13.0" />
+      <PackageReference Include="Polly.Core" Version="8.5.0" />
+      <PackageReference Include="Polly.RateLimiting" Version="8.5.0" />
       <PackageReference Include="Polly.Extensions.Http" Version="3.0.0" />
+      <PackageReference Include="System.Security.Cryptography.Pkcs" Version="8.0.1" />
       <PackageReference Include="System.Text.Encoding.CodePages" Version="8.0.0" />
-      <PackageReference Include="ZiggyCreatures.FusionCache" Version="1.2.0" />
+      <PackageReference Include="ZiggyCreatures.FusionCache" Version="1.4.1" />
     </ItemGroup>
 
     <ItemGroup>

@@ -68,15 +68,19 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="InfluxDB.Client" Version="4.15.0" />
+    <PackageReference Include="InfluxDB.Client" Version="4.18.0" />
     <PackageReference Include="linqtotwitter" Version="6.15.0" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="8.0.0" />
+    <PackageReference Include="Ollama" Version="1.13.0" />
     <PackageReference Include="System.ComponentModel.Annotations" Version="5.0.0" />
+    <PackageReference Include="System.Security.Cryptography.Pkcs" Version="8.0.1" />
     <PackageReference Include="System.ServiceModel.Duplex" Version="6.0.0" />
         <!-- keep System.ServiceModel. in version 6.2.0 -->
 	  <PackageReference Include="System.ServiceModel.Http" Version="6.2.0" />
 	  <PackageReference Include="System.ServiceModel.NetTcp" Version="6.2.0" />
 	  <PackageReference Include="System.ServiceModel.Federation" Version="6.2.0" />
+	  <!-- keep System.ServiceModel. in version 6.2.0 -->
+	  
 	  <PackageReference Include="Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers" Version="0.4.421302">
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
@@ -88,11 +92,11 @@
     <WCFMetadataStorage Include="Connected Services\eAgri.DeMinimis.WS\" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Autofac" Version="8.0.0" />
+    <PackageReference Include="Autofac" Version="8.1.1" />
     <PackageReference Include="CsvHelper" Version="33.0.1" />
     <PackageReference Include="Devmasters.Imaging" Version="8.0.0" />
     <PackageReference Include="EntityFramework" Version="6.5.1" />
-    <PackageReference Include="Newtonsoft.Json.Schema" Version="3.0.15" />
+    <PackageReference Include="Newtonsoft.Json.Schema" Version="4.0.1" />
     <PackageReference Include="Nito.AsyncEx.Context" Version="5.1.2" />
     <PackageReference Include="NitoAsyncEx.Context.StrongName" Version="1.1.0" />
     <PackageReference Include="System.Collections.Immutable" Version="8.0.0" />

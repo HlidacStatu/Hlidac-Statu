@@ -14,12 +14,14 @@
     </ItemGroup>
 
     <ItemGroup>
-      <PackageReference Include="HarfBuzzSharp.NativeAssets.Linux" Version="7.3.0.2" />
+      <PackageReference Include="HarfBuzzSharp.NativeAssets.Linux" Version="7.3.0.3" />
       <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="8.0.0" />
       <PackageReference Include="Microsoft.Extensions.Http.Polly" Version="8.0.7" />
+      <PackageReference Include="Ollama" Version="1.13.0" />
       <PackageReference Include="Polly.Extensions.Http" Version="3.0.0" />
-      <PackageReference Include="QuestPDF" Version="2024.7.1" />
-      <PackageReference Include="SkiaSharp.NativeAssets.Linux.NoDependencies" Version="2.88.8" />
+      <PackageReference Include="QuestPDF" Version="2024.10.4" />
+      <PackageReference Include="SkiaSharp.NativeAssets.Linux.NoDependencies" Version="2.88.9" />
+      <PackageReference Include="System.Security.Cryptography.Pkcs" Version="8.0.1" />
     </ItemGroup>
 
     <ItemGroup>
