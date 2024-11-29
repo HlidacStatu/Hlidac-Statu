@@ -63,7 +63,7 @@
         <PackageReference Include="AspNetCore.HealthChecks.UI.SqlServer.Storage" Version="8.0.1" />
         <PackageReference Include="AspNetCore.HealthChecks.Uris" Version="8.0.1" />
         <PackageReference Include="Devmasters.Cache.Memcached" Version="8.0.0" />
-        <PackageReference Include="Devmasters.Core" Version="8.0.2" />
+        <PackageReference Include="Devmasters.Core" Version="8.0.3" />
         <PackageReference Include="Devmasters.Lang" Version="8.0.0" />
         
         <PackageReference Include="HlidacStatu.Api.V2.Dataset" Version="2.4.1.1" />
