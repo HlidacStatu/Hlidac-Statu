@@ -10,6 +10,7 @@
     <UseVSHostingProcess>false</UseVSHostingProcess>
   </PropertyGroup>
   <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Components" Version="8.0.11" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="8.0.0" />
     <PackageReference Include="Newtonsoft.Json.Schema" Version="4.0.1" />
     <PackageReference Include="Ollama" Version="1.13.0" />

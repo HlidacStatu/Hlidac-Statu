@@ -21,11 +21,11 @@
 		<PackageReference Include="Devmasters.Enums" Version="8.0.0" />
 		<PackageReference Include="Devmasters.IO" Version="8.1.0" />
 		<PackageReference Include="Devmasters.Net" Version="8.0.5" />
-		<PackageReference Include="Microsoft.AspNetCore.Components" Version="8.0.7" />
+		<PackageReference Include="Microsoft.AspNetCore.Components" Version="8.0.11" />
 		<PackageReference Include="Microsoft.AspNetCore.Html.Abstractions" Version="2.2.0" />
 <!--		<PackageReference Include="jnm2.ReferenceAssemblies.net35" Version="1.0.1" />-->
 		<PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
-		<PackageReference Include="Microsoft.Extensions.Caching.StackExchangeRedis" Version="8.0.7" />
+		<PackageReference Include="Microsoft.Extensions.Caching.StackExchangeRedis" Version="8.0.11" />
 		<PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="8.0.0" />
 		<PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.3">
 			<PrivateAssets>all</PrivateAssets>

@@ -10,16 +10,17 @@
         <PackageReference Include="Devmasters.Core" Version="8.0.4" />
         <PackageReference Include="Devmasters.Imaging" Version="8.0.0" />
         <PackageReference Include="MathNet.Numerics" Version="5.0.0" />
-        <PackageReference Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="8.0.7" />
-        <PackageReference Include="Microsoft.AspNetCore.Identity.UI" Version="8.0.7" />
-        <PackageReference Include="Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation" Version="8.0.7" />
-        <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="8.0.7">
+        <PackageReference Include="Microsoft.AspNetCore.Components" Version="8.0.11" />
+        <PackageReference Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="8.0.11" />
+        <PackageReference Include="Microsoft.AspNetCore.Identity.UI" Version="8.0.11" />
+        <PackageReference Include="Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation" Version="8.0.11" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="8.0.11">
           <PrivateAssets>all</PrivateAssets>
           <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
         <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="8.0.3" />
-        <PackageReference Include="Microsoft.AspNetCore.Authentication.Google" Version="8.0.7" />
-        <PackageReference Include="Microsoft.AspNetCore.Authentication.OpenIdConnect" Version="8.0.7" />
+        <PackageReference Include="Microsoft.AspNetCore.Authentication.Google" Version="8.0.11" />
+        <PackageReference Include="Microsoft.AspNetCore.Authentication.OpenIdConnect" Version="8.0.11" />
         <PackageReference Include="Ollama" Version="1.13.0" />
         <PackageReference Include="System.Security.Cryptography.Pkcs" Version="8.0.1" />
         <PackageReference Include="System.Text.Encoding.CodePages" Version="8.0.0" />
