@@ -46,12 +46,21 @@ public class Subsidy
     /// </summary>
     [Date]
     public DateTime ProcessedDate { get; set; }
+    
+    /// <summary>
+    /// Oblast kam dotace patří
+    /// </summary>
+    [Keyword]
+    public string Category { get; set; }
 
     /// <summary>
     /// Important information about subsidy (what is displayed in hlidac)
     /// </summary>
     [Object]
     public CommonInfo Common { get; set; } = new();
+    
+    [Object]
+    public Hint Hints { get; set; } = new();
 
     /// <summary>
     /// Original record for people to display in case of need
@@ -147,5 +156,35 @@ public class Subsidy
 
         [Ignore]
         public string DisplayName => string.IsNullOrWhiteSpace(HlidacName) ? Name : HlidacName;
+    }
+    
+    public class Hint
+    {
+        /// <summary>
+        /// Info zda-li se jedná o pravděpodobnou duplicitní dotace
+        /// </summary>
+        [Keyword]
+        public bool IsDuplicate { get; set; }
+        
+        /// <summary>
+        /// Pokud jde o duplicitní dotaci, tak odkaz na originál zde
+        /// </summary>
+        [Keyword]
+        public string OriginalSubsidyId { get; set; }
+        
+        /// <summary>
+        /// Legislativa - info, jestli jde o státní/evropskou dotaci, krajskou, obecní a nebo investiční pobídka
+        /// </summary>
+        [Keyword]
+        public Type SubsidyType { get; set; }
+        
+        public enum Type
+        {
+            Evropska,
+            Krajska,
+            Obecni,
+            InvesticniPobidka
+        }
+        
     }
 }
