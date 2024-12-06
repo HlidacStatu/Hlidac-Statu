@@ -14,7 +14,7 @@ namespace HlidacStatu.Repositories
     {
         private static readonly ILogger Logger = Log.ForContext(typeof(SubsidyRepo));
 
-        private static readonly ElasticClient SubsidyClient = Manager.GetESClient_SubsidyAsync()
+        public static readonly ElasticClient SubsidyClient = Manager.GetESClient_SubsidyAsync()
             .ConfigureAwait(false).GetAwaiter().GetResult();
         
 
@@ -107,6 +107,64 @@ namespace HlidacStatu.Repositories
             catch (Exception ex)
             {
                 Logger.Fatal(ex, "Problem when loading ids for {datasource}/{fileName}. Aborting load", datasource, fileName);
+                throw;
+            }
+        }
+        
+        public static async Task<List<Subsidy>> FindDuplicatesAsync(Subsidy subsidy)
+        {
+            
+            // Build the conditional query for ProjectCode OR ProgramCode OR ProjectName
+            QueryContainer projectQuery = null;
+
+            if (!string.IsNullOrWhiteSpace(subsidy.Common.ProjectCode))
+            {
+                projectQuery |= new QueryContainerDescriptor<Subsidy>().Term(t => t.Common.ProjectCode, subsidy.Common.ProjectCode);
+            }
+
+            if (!string.IsNullOrWhiteSpace(subsidy.Common.ProgramCode))
+            {
+                projectQuery |= new QueryContainerDescriptor<Subsidy>().Term(t => t.Common.ProgramCode, subsidy.Common.ProgramCode);
+            }
+
+            if (!string.IsNullOrWhiteSpace(subsidy.Common.ProjectName))
+            {
+                projectQuery |= new QueryContainerDescriptor<Subsidy>().Term(t => t.Common.ProjectName, subsidy.Common.ProjectName);
+            }
+
+            // Build the main query
+            var query = new QueryContainerDescriptor<Subsidy>()
+                .Bool(b => b
+                    .Must(
+                        m => m.Term(t => t.Common.Recipient.Ico, subsidy.Common.Recipient.Ico),
+                        m => m.Term(t => t.Common.ApprovedYear, subsidy.Common.ApprovedYear),
+                        m => m.Term(t => t.AssumedAmount, subsidy.AssumedAmount),
+                        m => projectQuery // Add the conditional query
+                    )
+                );
+
+            try
+            {
+                var res = await SubsidyClient.SearchAsync<Subsidy>(s => s
+                        .Size(9000)
+                        .Query(q => query)
+                );
+
+                if (!res.IsValid) // try again
+                {
+                    await Task.Delay(500);
+                    res = await SubsidyClient.SearchAsync<Subsidy>(s => s
+                        .Size(9000)
+                        .Query(q => query)
+                    );  
+                }
+                
+                return res.Documents.ToList();
+                
+            }
+            catch (Exception ex)
+            {
+                Logger.Fatal(ex, $"Cant load duplicate subsidies for subsidyId={subsidy.Id}");
                 throw;
             }
         }
