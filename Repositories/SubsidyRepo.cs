@@ -14,7 +14,7 @@ namespace HlidacStatu.Repositories
     {
         private static readonly ILogger Logger = Log.ForContext(typeof(SubsidyRepo));
 
-        private static readonly ElasticClient SubsidyClient = Manager.GetESClient_SubsidyAsync()
+        public static readonly ElasticClient SubsidyClient = Manager.GetESClient_SubsidyAsync()
             .ConfigureAwait(false).GetAwaiter().GetResult();
         
 
@@ -107,6 +107,33 @@ namespace HlidacStatu.Repositories
             catch (Exception ex)
             {
                 Logger.Fatal(ex, "Problem when loading ids for {datasource}/{fileName}. Aborting load", datasource, fileName);
+                throw;
+            }
+        }
+        
+        public static async Task<List<Subsidy>> FindDuplicatesAsync(Subsidy subsidy)
+        {
+            var query = new QueryContainerDescriptor<Subsidy>()
+                .Bool(b => b
+                    .Must(
+                        m => m.Term(t => t.Common.Recipient.Ico, subsidy.Common.Recipient.Ico),
+                        m => m.Term(t => t.Common.ApprovedYear, subsidy.Common.ApprovedYear),
+                        m => m.Term(t => t.Common.ProjectCode, subsidy.Common.ProjectCode), //it should be ProjectCode or ProgramCode or ProjectName, but it has to be not null or not empty string
+                        m => m.Term(t => t.Common.ProgramCode, subsidy.Common.ProgramCode), //it should be ProjectCode or ProgramCode or ProjectName, but it has to be not null or not empty string
+                        m => m.Term(t => t.Common.ProjectName, subsidy.Common.ProjectName), //it should be ProjectCode or ProgramCode or ProjectName, but it has to be not null or not empty string
+                        m => m.Term(t => t.AssumedAmount, subsidy.AssumedAmount)
+                    )
+                );
+
+            try
+            {
+                var ids = SubsidyClient.SimpleGetAllIds(5, query);
+                throw new NotImplementedException();
+                
+            }
+            catch (Exception ex)
+            {
+                Logger.Fatal(ex, "Pfix");
                 throw;
             }
         }

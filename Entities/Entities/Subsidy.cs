@@ -103,13 +103,16 @@ public class Subsidy
         [Number]
         public decimal? ReturnedAmount { get; set; }
 
-        [Text]
+        [Keyword]
         public string ProjectCode { get; set; }
 
         [Text]
         public string ProjectName { get; set; }
 
         [Text]
+        public string ProjectDescription { get; set; }
+        
+        [Keyword]
         public string ProgramCode { get; set; }
 
         [Text]
@@ -164,7 +167,7 @@ public class Subsidy
         /// Info zda-li se jedná o pravděpodobnou duplicitní dotace
         /// </summary>
         [Keyword]
-        public bool IsDuplicate { get; set; }
+        public bool IsDuplicate { get; set; } = false;
         
         /// <summary>
         /// Pokud jde o duplicitní dotaci, tak odkaz na originál zde
@@ -180,10 +183,11 @@ public class Subsidy
         
         public enum Type
         {
+            Unknown,
             Evropska,
             Krajska,
             Obecni,
-            InvesticniPobidka
+            InvesticniPobidka,
         }
         
     }
