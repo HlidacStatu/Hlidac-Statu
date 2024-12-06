@@ -71,97 +71,59 @@ namespace HlidacStatu.Repositories
                     uniqueItems = items.Distinct(comparer).ToList();
                 }
 
+                Devmasters.Batch.Manager.DoActionForAll<RecalculateItem>(items,
+                    item =>
+                    {
+                        if (debug)
+                            _logger.Debug($"start statistics {item.ItemType.ToString()} {item.Id}");
+                        if (item.ItemType == RecalculateItem.ItemTypeEnum.Subjekt)
+                            RecalculateItemRepo.RecalculateFirma(item, false);
+                        else if (item.ItemType == RecalculateItem.ItemTypeEnum.Person)
+                            RecalculateItemRepo.RecalculateOsoba(item, false);
+
+                        if (debug)
+                            _logger.Debug($"end statistics {item.ItemType.ToString()} {item.Id}");
+
+                        return new Devmasters.Batch.ActionOutputData();
+                    },
+                    null, null,
+                    !System.Diagnostics.Debugger.IsAttached, maxDegreeOfParallelism: 2,
+                    monitor: null
+                    );
+                return;
             }
-            else
-            {
-                numFromQueue = RecalculateQueueLength();
 
-                allItems = GetFromProcessingQueueWithParents(numFromQueue, threads.Value,
-                    outputWriter, progressWriter, debug);
-                uniqueItems = allItems.Distinct(comparer).ToList();
-            }
-
-
-        //using (HlidacStatu.Q.Simple.Queue<RecalculateItem> q = new Q.Simple.Queue<RecalculateItem>(
-        //    RECALCULATIONQUEUENAME,
-        //    Devmasters.Config.GetWebConfigValue("RabbitMqConnectionString")
-        //    ))
-        //{
-        //    q.Send(uniqueItems);
-        //}
-
-        start:
-
-            _logger.Information("{method} Starting with {numOfThreads} threads", MethodBase.GetCurrentMethod().Name, threads.Value);
-            if (debug)
-                _logger.Debug($"getting from queue {uniqueItems.Count()} items");
-
-
-            //var queueItems = GetFromProcessingQueueWithParents(threads.Value*threads.Value, threads.Value, outputWriter, progressWriter, debug);
-            if (debug)
-                _logger.Debug($"got from queue {uniqueItems.Count()} items");
-
-            _logger.Information("{method} Starting Subjekt statistics recalculate for {count} subjects with {numOfThreads} threads",
-                uniqueItems.Count(m => m.ItemType == RecalculateItem.ItemTypeEnum.Subjekt), MethodBase.GetCurrentMethod().Name, threads.Value);
-            // rebuild cache for subjekt
-
-
-
-            Devmasters.Batch.Manager.DoActionForAll<RecalculateItem>(uniqueItems.Where(m => m.ItemType == RecalculateItem.ItemTypeEnum.Subjekt),
-                item =>
+            Devmasters.Batch.Manager.DoActionForAll<int>(Enumerable.Range(0, int.MaxValue - 1),
+                xx =>
                 {
-                    if (debug)
-                        _logger.Debug($"start statistics firma {item.Id}");
-                    RecalculateFirma(item, noRebuild);
-                    if (debug)
-                        _logger.Debug($"end statistics firma {item.Id}");
+                    var items = RecalculateItemRepo.GetFromProcessingQueueWithParents(1, 1, debug: debug);
+                    if (items.Count() == 0)
+                        return new Devmasters.Batch.ActionOutputData() { CancelRunning = true };
 
+                    Devmasters.Batch.Manager.DoActionForAll<RecalculateItem>(items,
+                        item =>
+                        {
+                            if (debug)
+                            _logger.Debug($"start statistics {item.ItemType.ToString()} {item.Id}");
+                            if (item.ItemType == RecalculateItem.ItemTypeEnum.Subjekt)
+                                RecalculateItemRepo.RecalculateFirma(item, false);
+                            else if (item.ItemType == RecalculateItem.ItemTypeEnum.Person)
+                                RecalculateItemRepo.RecalculateOsoba(item, false);
+                            if (debug)
+                                _logger.Debug($"end statistics {item.ItemType.ToString()} {item.Id}");
+
+                            return new Devmasters.Batch.ActionOutputData();
+                        },
+                        null, null,
+                        !System.Diagnostics.Debugger.IsAttached, maxDegreeOfParallelism: 2,
+                        monitor: null
+                        );
                     return new Devmasters.Batch.ActionOutputData();
                 },
-                outputWriter, progressWriter,
-                true, //!System.Diagnostics.Debugger.IsAttached, 
-                maxDegreeOfParallelism: threads,
-                monitor: new MonitoredTaskRepo.ForBatch()
-                );
-
-            _logger.Information("{method} Starting Subjekt-Holding statistics recalculate for {count} subjects with {numOfThreads} threads",
-                uniqueItems.Count(m => m.ItemType == RecalculateItem.ItemTypeEnum.Subjekt), MethodBase.GetCurrentMethod().Name, threads.Value);
-
-
-            _logger.Information("{method} Starting Osoba statistics recalculate for {count} subjects with {numOfThreads} threads",
-                uniqueItems.Count(m => m.ItemType == RecalculateItem.ItemTypeEnum.Person), MethodBase.GetCurrentMethod().Name, threads.Value);
-            // rebuild cache for person 
-            Devmasters.Batch.Manager.DoActionForAll<RecalculateItem>(
-                uniqueItems.Where(m => m.ItemType == RecalculateItem.ItemTypeEnum.Person),
-                item =>
-                {
-                    if (debug)
-                        _logger.Debug($"start statistics osoba {item.Id}");
-                    RecalculateOsoba(item, noRebuild);
-                    if (debug)
-                        _logger.Debug($"end statistics osoba {item.Id}");
-
-                    return new Devmasters.Batch.ActionOutputData();
-                },
-                outputWriter, progressWriter,
+                null, null,
                 !System.Diagnostics.Debugger.IsAttached, maxDegreeOfParallelism: threads,
-                monitor: new MonitoredTaskRepo.ForBatch()
+                monitor: null
                 );
-
-
-            if (debug)
-                _logger.Debug($"getting from queue {numFromQueue} items");
-            if (onlyIds)
-                uniqueItems.Clear();
-            else
-            {
-                allItems = GetFromProcessingQueueWithParents(numFromQueue, threads.Value,
-                    outputWriter, progressWriter, debug);
-                uniqueItems = allItems.ToList();
-            }
-            if (uniqueItems.Count > 0)
-                goto start;
-
 
             _logger.Information("Ends RecalculateTasks with {numOfThreads} threads", threads.Value);
 
@@ -477,7 +439,8 @@ namespace HlidacStatu.Repositories
         public static IEnumerable<RecalculateItem> GetItemsFromProcessingQueue(int count)
         {
 
-            try {
+            try
+            {
 
                 using (Entities.DbEntities db = new DbEntities())
                 {
@@ -502,7 +465,8 @@ namespace HlidacStatu.Repositories
                 }
             }
 
-            catch {
+            catch
+            {
                 return Array.Empty<RecalculateItem>();
             }
 
