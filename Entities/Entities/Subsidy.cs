@@ -118,7 +118,7 @@ public class Subsidy
         [Text]
         public string ProgramName { get; set; }
 
-        [Date]
+        [Number]
         public int? ApprovedYear { get; set; }
 
         [Text]
@@ -189,6 +189,10 @@ public class Subsidy
             Obecni,
             InvesticniPobidka,
         }
+        
+        [Date]
+        public DateTime? DuplicateCalculated { get; set; }
+        
         
     }
 }

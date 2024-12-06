@@ -146,7 +146,7 @@ namespace HlidacStatu.Repositories
             try
             {
                 var res = await SubsidyClient.SearchAsync<Subsidy>(s => s
-                        .Size(5000)
+                        .Size(9000)
                         .Query(q => query)
                 );
 
@@ -154,7 +154,7 @@ namespace HlidacStatu.Repositories
                 {
                     await Task.Delay(500);
                     res = await SubsidyClient.SearchAsync<Subsidy>(s => s
-                        .Size(5000)
+                        .Size(9000)
                         .Query(q => query)
                     );  
                 }
