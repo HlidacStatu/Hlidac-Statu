@@ -1,4 +1,5 @@
-﻿using HlidacStatu.Datasets;
+﻿using Google.Protobuf.WellKnownTypes;
+using HlidacStatu.Datasets;
 using HlidacStatu.DS.Graphs;
 using HlidacStatu.Entities;
 using HlidacStatu.Extensions;
@@ -155,6 +156,9 @@ namespace HlidacStatu.XLib.Render
 
             public static string fn_RenderCompanyWithLink(string ico, string missingCompanyName = "")
             {
+                if (ico == null)
+                    return string.Empty;
+
                 ico = HlidacStatu.Util.ParseTools.NormalizeIco(ico);
                 if (!string.IsNullOrEmpty(ico))
                 {
@@ -182,6 +186,8 @@ namespace HlidacStatu.XLib.Render
 
             public static string fn_RenderCompanyStatistic(string ico, bool twoLines = false, string prefix = "", string postfix = "")
             {
+                if (ico  == null)
+                    return string.Empty;
                 ico = HlidacStatu.Util.ParseTools.NormalizeIco(ico);
                 if (!string.IsNullOrEmpty(ico))
                 {
@@ -207,6 +213,9 @@ namespace HlidacStatu.XLib.Render
             public static string fn_RenderCompanyInformations(string ico, int numberOfInfos = 3, string prefix = "", string postfix = "",
                 string delimiterBetweenInfos = "")
             {
+                if (ico == null)
+                    return string.Empty;
+
                 ico = HlidacStatu.Util.ParseTools.NormalizeIco(ico);
                 if (!string.IsNullOrEmpty(ico))
                 {
@@ -331,6 +340,9 @@ namespace HlidacStatu.XLib.Render
 
             public static string fn_FormatPrice(dynamic value, string mena = null, bool html = true, bool shortFormat = false)
             {
+                if (value == null)
+                    return string.Empty;
+
                 mena = mena ?? "Kč";
                 decimal? val = Util.ParseTools.ToDecimal(value.ToString());
                 if (val.HasValue)
