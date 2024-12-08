@@ -37,11 +37,14 @@ namespace HlidacStatu.Repositories.Statistics
 
         public static StatisticsSubjectPerYear<Firma.Statistics.Dotace> CachedHoldingStatisticsDotace(
             Firma firma, HlidacStatu.DS.Graphs.Relation.AktualnostType aktualnost,
-            bool forceUpdateCache = false)
+            bool forceUpdateCache = false, bool invalidateOnly = false)
         {
-            if (forceUpdateCache)
+            if (forceUpdateCache || invalidateOnly)
                 _holdingDotaceCache.Delete((firma, aktualnost));
 
+            if (invalidateOnly)
+                return new();
+            else
             return _holdingDotaceCache.Get((firma, aktualnost));
         }
 

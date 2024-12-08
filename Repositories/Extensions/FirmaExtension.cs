@@ -161,16 +161,16 @@ namespace HlidacStatu.Extensions
         public static Lib.Analytics.StatisticsSubjectPerYear<Smlouva.Statistics.Data> StatistikaRegistruSmluv(
             this Firma firma, int? iclassif = null, bool forceUpdateCache = false)
         {
-            var ret = FirmaStatistics.GetStatistics(firma, iclassif, forceUpdateCache);
+            Lib.Analytics.StatisticsSubjectPerYear<Smlouva.Statistics.Data> ret = null;
+            ret = FirmaStatistics.GetStatistics(firma, iclassif, forceUpdateCache);
             return ret ?? new Lib.Analytics.StatisticsSubjectPerYear<Smlouva.Statistics.Data>();
         }
 
-        public static Lib.Analytics.StatisticsSubjectPerYear<Firma.Statistics.Dotace> StatistikaDotaci(this Firma firma, bool forceUpdateCache = false)
+        public static Lib.Analytics.StatisticsSubjectPerYear<Firma.Statistics.Dotace> StatistikaDotaci(
+            this Firma firma, bool forceUpdateCache = false)
         {
-            //STAT FIX
-            //return new();
-
             return FirmaStatistics.CachedStatisticsDotace(firma, forceUpdateCache);
+
         }
         public static Lib.Analytics.StatisticsSubjectPerYear<Firma.Statistics.Dotace> HoldingStatistikaDotaci(
             this Firma firma,
@@ -182,7 +182,8 @@ namespace HlidacStatu.Extensions
             return FirmaStatistics.CachedHoldingStatisticsDotace(firma, aktualnost, forceUpdateCache);
         }
 
-        public static Lib.Analytics.StatisticsSubjectPerYear<Firma.Statistics.VZ> StatistikaVerejneZakazky(this Firma firma, bool forceUpdateCache = false)
+        public static Lib.Analytics.StatisticsSubjectPerYear<Firma.Statistics.VZ> StatistikaVerejneZakazky(
+            this Firma firma, bool forceUpdateCache = false)
         {
             //STAT FIX
             //return new ();
@@ -391,10 +392,8 @@ namespace HlidacStatu.Extensions
             this Firma firma,
             Relation.AktualnostType aktualnost, int? obor = null, bool forceUpdateCache = false)
         {
-            //STAT FIX
-            //return new Lib.Analytics.StatisticsSubjectPerYear<Smlouva.Statistics.Data>();
-
             return FirmaStatistics.CachedHoldingStatisticsSmlouvy(firma, aktualnost, obor, forceUpdateCache);
+
         }
 
         public static bool PatrimStatuAlespon25procent(this Firma firma) => (firma.TypSubjektu == Firma.TypSubjektuEnum.PatrimStatu25perc);
@@ -620,15 +619,18 @@ namespace HlidacStatu.Extensions
 
             return cache;
         }
+        public static void InfoFactsInvalidate(this Firma firma) //otázka jestli tohle nebrat z cachce
+        {
+            _infoFactsCache().Delete(firma);
 
+        }
         public static InfoFact[] InfoFacts(this Firma firma, bool forceUpdateCache = false) //otázka jestli tohle nebrat z cachce
         {
             //STAT FIX
             //return Array.Empty<InfoFact>();
 
             if (forceUpdateCache)
-                _infoFactsCache().Delete(firma);
-
+                firma.InfoFactsInvalidate();
             var inf = _infoFactsCache().Get(firma);
             return inf;
         }

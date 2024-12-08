@@ -24,6 +24,14 @@ namespace HlidacStatu.Repositories.Statistics
                         keyValueSelector: obj => $"{obj.os.NameId}/{obj.aktualnost}/{(obj.obor ?? 0)}");
 
 
+        public static void RemoveCachedStatistics(Osoba os, int? obor)
+        {
+            _cache.Delete((os, (int)Relation.AktualnostType.Aktualni, obor));
+            _cache.Delete((os, (int)Relation.AktualnostType.Libovolny, obor));
+            _cache.Delete((os, (int)Relation.AktualnostType.Neaktualni, obor));
+            _cache.Delete((os, (int)Relation.AktualnostType.Nedavny, obor));
+
+        }
         public static Osoba.Statistics.RegistrSmluv CachedStatistics(Osoba os, Relation.AktualnostType aktualnost,
             int? obor, bool forceUpdateCache = false)
         {

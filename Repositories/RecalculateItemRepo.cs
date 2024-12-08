@@ -8,6 +8,7 @@ using System.Linq;
 using System.Reflection;
 using Serilog;
 using Devmasters.Collections;
+using HlidacStatu.Repositories.Statistics;
 
 namespace HlidacStatu.Repositories
 {
@@ -28,7 +29,8 @@ namespace HlidacStatu.Repositories
         public static void RecalculateTasks(int? threads = null, bool debug = false, string[] ids = null,
             Action<string> outputWriter = null,
             Action<Devmasters.Batch.ActionProgressData> progressWriter = null,
-            int? maxItemsInBatch = null, bool reloadAllTask = true, bool noRebuild = true
+            int? maxItemsInBatch = null, bool reloadAllTask = true, bool noRebuild = true,
+            bool invalidateOnly = false
             )
         {
             bool onlyIds = ids?.Count() > 0;
@@ -77,9 +79,9 @@ namespace HlidacStatu.Repositories
                         if (debug)
                             _logger.Debug($"start statistics {item.ItemType.ToString()} {item.Id}");
                         if (item.ItemType == RecalculateItem.ItemTypeEnum.Subjekt)
-                            RecalculateItemRepo.RecalculateFirma(item, false);
+                            RecalculateItemRepo.RecalculateFirma(item, false, invalidateOnly);
                         else if (item.ItemType == RecalculateItem.ItemTypeEnum.Person)
-                            RecalculateItemRepo.RecalculateOsoba(item, false);
+                            RecalculateItemRepo.RecalculateOsoba(item, false, invalidateOnly);
 
                         if (debug)
                             _logger.Debug($"end statistics {item.ItemType.ToString()} {item.Id}");
@@ -104,11 +106,11 @@ namespace HlidacStatu.Repositories
                         item =>
                         {
                             if (debug)
-                            _logger.Debug($"start statistics {item.ItemType.ToString()} {item.Id}");
+                                _logger.Debug($"start statistics {item.ItemType.ToString()} {item.Id}");
                             if (item.ItemType == RecalculateItem.ItemTypeEnum.Subjekt)
-                                RecalculateItemRepo.RecalculateFirma(item, false);
+                                RecalculateItemRepo.RecalculateFirma(item, false, invalidateOnly);
                             else if (item.ItemType == RecalculateItem.ItemTypeEnum.Person)
-                                RecalculateItemRepo.RecalculateOsoba(item, false);
+                                RecalculateItemRepo.RecalculateOsoba(item, false, invalidateOnly);
                             if (debug)
                                 _logger.Debug($"end statistics {item.ItemType.ToString()} {item.Id}");
 
@@ -129,19 +131,27 @@ namespace HlidacStatu.Repositories
 
         }
 
-        public static void RecalculateOsoba(RecalculateItem item, bool noRebuild)
+        public static void RecalculateOsoba(RecalculateItem item, bool noRebuild, bool invalidateOnly)
         {
             var o = Osoby.GetByNameId.Get(item.Id);
             if (o != null)
             {
-                _ = o.StatistikaRegistrSmluv(DS.Graphs.Relation.AktualnostType.Nedavny, forceUpdateCache: noRebuild ? false : true);
-                _ = o.InfoFactsCached(forceUpdateCache: noRebuild ? false : true);
+                if (invalidateOnly)
+                {
+                    OsobaStatistics.RemoveCachedStatistics(o, null);
+                    o.InfoFactsCacheInvalidate();
+                }
+                else
+                {
+                    _ = o.StatistikaRegistrSmluv(DS.Graphs.Relation.AktualnostType.Nedavny, forceUpdateCache: noRebuild ? false : true);
+                    _ = o.InfoFactsCached(forceUpdateCache: noRebuild ? false : true);
+                }
                 RecalculateItemRepo.Finish(item);
 
             }
         }
 
-        public static void RecalculateFirma(RecalculateItem item, bool noRebuild)
+        public static void RecalculateFirma(RecalculateItem item, bool noRebuild, bool invalidateOnly)
         {
             var f = Firmy.Get(item.Id);
             if (f != null)
@@ -149,21 +159,48 @@ namespace HlidacStatu.Repositories
                 switch (item.StatisticsType)
                 {
                     case RecalculateItem.StatisticsTypeEnum.Smlouva:
-                        _ = f.StatistikaRegistruSmluv(forceUpdateCache: true);
-                        _ = f.HoldingStatisticsRegistrSmluv(DS.Graphs.Relation.AktualnostType.Nedavny, forceUpdateCache: noRebuild ? false : true);
+                        if (invalidateOnly)
+                        {
+                            Statistics.FirmaStatistics.RemoveStatistics(f, null);
+                        }
+                        else
+                        {
+                            _ = f.StatistikaRegistruSmluv(forceUpdateCache: true);
+                            _ = f.HoldingStatisticsRegistrSmluv(DS.Graphs.Relation.AktualnostType.Nedavny,
+                                forceUpdateCache: noRebuild ? false : true);
+                        }
                         break;
                     case RecalculateItem.StatisticsTypeEnum.VZ:
-                        _ = f.StatistikaVerejneZakazky(forceUpdateCache: true);
-                        _ = f.HoldingStatistikaVerejneZakazky(DS.Graphs.Relation.AktualnostType.Nedavny, forceUpdateCache: noRebuild ? false : true);
+                        if (invalidateOnly)
+                        {
+                            Statistics.FirmaStatistics.RemoveStatisticsVZ(f);
+                        }
+                        else
+                        {
+                            _ = f.StatistikaVerejneZakazky(forceUpdateCache: true);
+                            _ = f.HoldingStatistikaVerejneZakazky(DS.Graphs.Relation.AktualnostType.Nedavny,
+                                forceUpdateCache: noRebuild ? false : true);
+                        }
                         break;
                     case RecalculateItem.StatisticsTypeEnum.Dotace:
-                        _ = f.StatistikaDotaci(forceUpdateCache: true);
-                        _ = f.HoldingStatistikaDotaci(DS.Graphs.Relation.AktualnostType.Nedavny, forceUpdateCache: noRebuild ? false : true);
+                        if (invalidateOnly)
+                        {
+                            Statistics.FirmaStatistics.RemoveStatisticsDotace(f);
+                        }
+                        else
+                        {
+                            _ = f.StatistikaDotaci(forceUpdateCache: true);
+                            _ = f.HoldingStatistikaDotaci(DS.Graphs.Relation.AktualnostType.Nedavny,
+                                forceUpdateCache: noRebuild ? false : true);
+                        }
                         break;
                     default:
                         break;
                 }
-                _ = f.InfoFacts(forceUpdateCache: noRebuild ? false : true);
+                if (invalidateOnly)
+                    f.InfoFactsInvalidate();
+                else
+                    _ = f.InfoFacts(forceUpdateCache: noRebuild ? false : true);
                 RecalculateItemRepo.Finish(item);
             }
         }

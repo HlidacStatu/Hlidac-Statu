@@ -39,10 +39,10 @@ keyValueSelector: obj => obj.firma.ICO + "-" + obj.aktualnost.ToString());
     Firma firma, HlidacStatu.DS.Graphs.Relation.AktualnostType aktualnost,
     bool forceUpdateCache = false)
         {
-            if (forceUpdateCache)
+            if (forceUpdateCache )
                 _holdingVZCache.Delete((firma, aktualnost));
 
-            return _holdingVZCache.Get((firma, aktualnost));
+                return _holdingVZCache.Get((firma, aktualnost));
         }
 
         public static void RemoveStatisticsVZ(Firma firma)
@@ -57,10 +57,10 @@ keyValueSelector: obj => obj.firma.ICO + "-" + obj.aktualnost.ToString());
         bool forceUpdateCache = false)
         {
 
-            if (forceUpdateCache)
+            if (forceUpdateCache )
                 _VZCache.Delete(firma);
 
-            return _VZCache.Get(firma);
+                return _VZCache.Get(firma);
         }
 
         private static StatisticsSubjectPerYear<Firma.Statistics.VZ> CalculateHoldingVZStat(Firma firma, HlidacStatu.DS.Graphs.Relation.AktualnostType aktualnost)

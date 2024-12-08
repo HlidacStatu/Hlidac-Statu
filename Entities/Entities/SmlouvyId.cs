@@ -17,5 +17,9 @@ namespace HlidacStatu.Entities
         public DateTime Updated { get; set; }
         [Column("active")]
         public int Active { get; set; }
+
+        [Column("icoOdberatele")]
+        [StringLength(30)]
+        public string IcoOdberatele { get; set; }
     }
 }

@@ -30,7 +30,7 @@ namespace HlidacStatu.Repositories.Statistics
             if (forceUpdateCache)
                 _holdingSmlouvaCache.Delete((firma, aktualnost, obor));
 
-            return _holdingSmlouvaCache.Get((firma, aktualnost, obor));
+                return _holdingSmlouvaCache.Get((firma, aktualnost, obor));
         }
 
         private static StatisticsSubjectPerYear<Smlouva.Statistics.Data> _holdingCalculateStats(

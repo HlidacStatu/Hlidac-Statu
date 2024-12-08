@@ -315,6 +315,12 @@ namespace HlidacStatu.Extensions
 
 
         //tohle do repositories
+        public static void RemoveStatistikaRegistrSmluv(this Osoba osoba,
+            int? obor = null)
+        {
+
+        }
+        //tohle do repositories
         public static Osoba.Statistics.RegistrSmluv StatistikaRegistrSmluv(this Osoba osoba,
             Relation.AktualnostType minAktualnost, int? obor = null, bool forceUpdateCache = false)
         {
@@ -344,13 +350,18 @@ namespace HlidacStatu.Extensions
                     Devmasters.Config.GetWebConfigValue("RedisCachePassword"),
                     keyValueSelector: obj => $"_infofacts_{obj.NameId}");
 
+        public static void InfoFactsCacheInvalidate(this Osoba osoba)
+        {
+            _cacheInfoFacts.Delete(osoba);
+
+        }
         public static InfoFact[] InfoFactsCached(this Osoba osoba, bool forceUpdateCache = false)
         {
             //STAT FIX
             //return Array.Empty<InfoFact>();
 
             if (forceUpdateCache)
-                _cacheInfoFacts.Delete(osoba);
+                osoba.InfoFactsCacheInvalidate();
 
             var _infof = _cacheInfoFacts.Get(osoba);
             return _infof;
