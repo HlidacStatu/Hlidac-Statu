@@ -93,7 +93,7 @@ namespace HlidacStatu.Repositories
                     },
                     null, null,
                     !System.Diagnostics.Debugger.IsAttached, maxDegreeOfParallelism: 2,
-                    monitor: null
+                    monitor: new MonitoredTaskRepo.ForBatch("Downloader ", "RecalculateTasks ids ")
                     );
                 return;
             }
