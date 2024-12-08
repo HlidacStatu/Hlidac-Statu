@@ -34,7 +34,7 @@ namespace HlidacStatu.Repositories
             )
         {
             bool onlyIds = ids?.Count() > 0;
-            if (allItemsInDb == false)
+            if (allItemsInDb == true)
                 _logger.Information($"Don't cascade to parents");
 
             maxItemsInBatch = maxItemsInBatch ?? int.MaxValue;
