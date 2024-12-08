@@ -65,13 +65,11 @@ namespace HlidacStatu.Repositories
                     .ToList();
                 System.Collections.Concurrent.ConcurrentBag<RecalculateItem> list = new(items);
 
-                if (reloadAllTask)
-                    uniqueItems = items.SelectMany(m => CascadeItems(m, ref list))
-                        .Distinct(comparer).ToList();
-                else
-                {
+                if (reloadAllTask )
                     uniqueItems = items.Distinct(comparer).ToList();
-                }
+                else
+                    uniqueItems = items.SelectMany(m => CascadeItems(m, ref list))
+                            .Distinct(comparer).ToList();
 
                 Devmasters.Batch.Manager.DoActionForAll<RecalculateItem>(items,
                     item =>
