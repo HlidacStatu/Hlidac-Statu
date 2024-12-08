@@ -92,7 +92,7 @@ namespace HlidacStatu.Repositories
                         return new Devmasters.Batch.ActionOutputData();
                     },
                     null, null,
-                    !System.Diagnostics.Debugger.IsAttached, maxDegreeOfParallelism: 2,
+                    !System.Diagnostics.Debugger.IsAttached, maxDegreeOfParallelism: threads,
                     monitor: new MonitoredTaskRepo.ForBatch("Downloader ", "RecalculateTasks ids ")
                     );
                 return;
@@ -127,7 +127,7 @@ namespace HlidacStatu.Repositories
                 },
                 null, null,
                 !System.Diagnostics.Debugger.IsAttached, maxDegreeOfParallelism: threads,
-                monitor: null
+                monitor: new MonitoredTaskRepo.ForBatch("Downloader ", "RecalculateTasks from queue ")
                 );
 
             _logger.Information("Ends RecalculateTasks with {numOfThreads} threads", threads.Value);
