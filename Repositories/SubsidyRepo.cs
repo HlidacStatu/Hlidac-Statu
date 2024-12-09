@@ -113,6 +113,9 @@ namespace HlidacStatu.Repositories
         
         public static async Task<List<Subsidy>> FindDuplicatesAsync(Subsidy subsidy)
         {
+            // můžeme hledat duplicity jen u firem, lidi nedokážeme správně identifikovat
+            if(string.IsNullOrWhiteSpace(subsidy.Common.Recipient.Ico))
+                return null;
             
             // Build the conditional query for ProjectCode OR ProgramCode OR ProjectName
             QueryContainer projectQuery = null;
