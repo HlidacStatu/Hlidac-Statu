@@ -32,7 +32,8 @@ public class Subsidy
     /// <summary>
     /// Who manages the data about this subsidy 
     /// </summary>
-    [Keyword]
+    [Text]
+    [Keyword(Name = "keyword")]
     public string DataSource { get; set; }
 
     /// <summary>
@@ -50,7 +51,8 @@ public class Subsidy
     /// <summary>
     /// Oblast kam dotace patří
     /// </summary>
-    [Keyword]
+    [Text]
+    [Keyword(Name = "keyword")]
     public string Category { get; set; }
 
     /// <summary>
@@ -103,10 +105,12 @@ public class Subsidy
         [Number]
         public decimal? ReturnedAmount { get; set; }
 
-        [Keyword]
+        [Text]
+        [Keyword(Name = "keyword")]
         public string ProjectCode { get; set; }
 
         [Text]
+        [Keyword(Name = "keyword")]
         public string ProjectName { get; set; }
 
         [Text]
@@ -116,12 +120,14 @@ public class Subsidy
         public string ProgramCode { get; set; }
 
         [Text]
+        [Keyword(Name = "keyword")]
         public string ProgramName { get; set; }
 
         [Number]
         public int? ApprovedYear { get; set; }
 
         [Text]
+        [Keyword(Name = "keyword")]
         public string SubsidyProvider { get; set; }
 
         [Keyword]
@@ -137,9 +143,11 @@ public class Subsidy
         public string Ico { get; set; }
 
         [Text]
+        [Keyword(Name = "keyword")]
         public string Name { get; set; }
 
         [Text]
+        [Keyword(Name = "keyword")]
         public string HlidacName { get; set; }
 
         [Keyword]
@@ -148,10 +156,12 @@ public class Subsidy
         [Number]
         public int? YearOfBirth { get; set; }
 
-        [Keyword]
+        [Text]
+        [Keyword(Name = "keyword")]
         public string Obec { get; set; }
 
-        [Keyword]
+        [Text]
+        [Keyword(Name = "keyword")]
         public string Okres { get; set; }
 
         [Keyword]
