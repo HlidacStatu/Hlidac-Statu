@@ -33,7 +33,7 @@ public class Subsidy
     /// Who manages the data about this subsidy 
     /// </summary>
     [Text]
-    [Keyword(Name = "keyword")]
+    [Keyword(Name = "dataSource.keyword")]
     public string DataSource { get; set; }
 
     /// <summary>
@@ -52,7 +52,7 @@ public class Subsidy
     /// Oblast kam dotace patří
     /// </summary>
     [Text]
-    [Keyword(Name = "keyword")]
+    [Keyword(Name = "category.keyword")]
     public string Category { get; set; }
 
     /// <summary>
@@ -106,11 +106,11 @@ public class Subsidy
         public decimal? ReturnedAmount { get; set; }
 
         [Text]
-        [Keyword(Name = "keyword")]
+        [Keyword(Name = "projectCode.keyword")]
         public string ProjectCode { get; set; }
 
         [Text]
-        [Keyword(Name = "keyword")]
+        [Keyword(Name = "projectName.keyword")]
         public string ProjectName { get; set; }
 
         [Text]
@@ -120,14 +120,14 @@ public class Subsidy
         public string ProgramCode { get; set; }
 
         [Text]
-        [Keyword(Name = "keyword")]
+        [Keyword(Name = "programName.keyword")]
         public string ProgramName { get; set; }
 
         [Number]
         public int? ApprovedYear { get; set; }
 
         [Text]
-        [Keyword(Name = "keyword")]
+        [Keyword(Name = "subsidyProvider.keyword")]
         public string SubsidyProvider { get; set; }
 
         [Keyword]
@@ -143,11 +143,11 @@ public class Subsidy
         public string Ico { get; set; }
 
         [Text]
-        [Keyword(Name = "keyword")]
+        [Keyword(Name = "name.keyword")]
         public string Name { get; set; }
 
         [Text]
-        [Keyword(Name = "keyword")]
+        [Keyword(Name = "hlidacName.keyword")]
         public string HlidacName { get; set; }
 
         [Keyword]
@@ -157,11 +157,11 @@ public class Subsidy
         public int? YearOfBirth { get; set; }
 
         [Text]
-        [Keyword(Name = "keyword")]
+        [Keyword(Name = "obec.keyword")]
         public string Obec { get; set; }
 
         [Text]
-        [Keyword(Name = "keyword")]
+        [Keyword(Name = "okres.keyword")]
         public string Okres { get; set; }
 
         [Keyword]
