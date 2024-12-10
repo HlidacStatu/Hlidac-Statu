@@ -499,7 +499,7 @@
             string durl = "/dotace/hledat?Q=ico%3A+" + Model.ICO;
             //var dotaceStat = dotaceSummary.PocetDotaci;
 
-            var sdotaceKc = " v celkové hodnotě <b>" + HlidacStatu.Util.RenderData.NicePriceHtml(dotaceSummary.CelkemCerpano) + "</b>.";
+            var sdotaceKc = " v celkové hodnotě <b>" + HlidacStatu.Util.RenderData.NicePriceHtml(dotaceSummary.CelkemPrideleno) + "</b>.";
         }
 
         @if (Model.JsemOVM())
@@ -533,12 +533,12 @@
             .Distinct()
             .Count();
 
-            decimal totalSumDotaceHolding = dotaceHoldingSummary.CelkemCerpano;
+            decimal totalSumDotaceHolding = dotaceHoldingSummary.CelkemPrideleno;
             int totalCountDotaceHolding = dotaceHoldingSummary.PocetDotaci;
 
             if (totalCountDotaceHolding - dotaceSummary.PocetDotaci > 0)
             {
-                var sdotaceHDiffKc = " v hodnotě <b>" + HlidacStatu.Util.RenderData.NicePriceHtml(totalSumDotaceHolding - dotaceSummary.CelkemCerpano) + "</b>.";
+                var sdotaceHDiffKc = " v hodnotě <b>" + HlidacStatu.Util.RenderData.NicePriceHtml(totalSumDotaceHolding - dotaceSummary.CelkemPrideleno) + "</b>.";
                 var sdotaceHKc = " v celkové hodnotě <b>" + HlidacStatu.Util.RenderData.NicePriceHtml(totalSumDotaceHolding) + "</b>.";
                 string durlH = "/dotace/hledat?Q=holding%3A+" + Model.ICO;
                 if (Model.JsemOVM())
@@ -633,7 +633,7 @@
         Data = holdingStats
         .Where(x => x.Year > 0)
         .OrderBy(x => x.Year)
-        .Select(x => new SeriesData(x.Year, x.Value.CelkemCerpano)).ToArray(),
+        .Select(x => new SeriesData(x.Year, x.Value.CelkemPrideleno)).ToArray(),
         SeriesTooltip = new SeriesTooltip()
         {
         ValueSuffix = " Kč"

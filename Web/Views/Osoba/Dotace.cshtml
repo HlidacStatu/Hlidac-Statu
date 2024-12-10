@@ -111,26 +111,26 @@
         //             .Sum("sum", ss => ss.Field(ff => ff.DotaceCelkem))
         //         )
         //     );
-        var dotaceSearchH = await DotaceRepo.Searching.SimpleSearchAsync("osobaid:" + Model.NameId, 1, 10000,
-            ((int)HlidacStatu.Repositories.Searching.SubsidySearchResult.DotaceOrderResult.FastestForScroll).ToString(),
+        var dotaceSearchH = await SubsidyRepo.Searching.SimpleSearchAsync("osobaid:" + Model.NameId, 1, 10000,
+            ((int)HlidacStatu.Repositories.Searching.SubsidySearchResult.SubsidyOrderResult.FastestForScroll).ToString(),
             exactNumOfResults: true);
 
         
         decimal sumH = 0;
-        var items = dotaceSearchH.Results.GroupBy(i => i.Prijemce.Ico).ToList(); // udělat agregaci ručně pro ičo - počet dokumentů a cena 
+        var items = dotaceSearchH.Results.GroupBy(i => i.Common.Recipient.Ico).ToList(); // udělat agregaci ručně pro ičo - počet dokumentů a cena 
         foreach (var item in items)
         {
             var ico = item.Key;
-            var dotaceCelkemProIco = item.Sum(x => x.DotaceCelkem ?? 0);
+            var dotaceCelkemProIco = item.Sum(x => x.AssumedAmount);
             var pocetDotaciProIco = item.Count();
 
             var vazby = Model.VazbyProICO(ico); //zjistit, jestli datum spadá pro vazby
             var dotaceStatutar = item.Where(i =>
-                vazby.Any(v =>
-                    Devmasters.DT.Util.IsDateInInterval(v.RelFrom, v.RelTo ?? DateTime.Today, i.DatumPodpisu)))
+                vazby.Any(v => v.RelFrom.HasValue && v.RelFrom.Value.Year <= i.Common.ApprovedYear
+                    && (v.RelTo?.Year ?? DateTime.Today.Year) >= i.Common.ApprovedYear))
                 .ToList();
 
-            var dotaceCelkemStatutar = dotaceStatutar.Sum(d => d.DotaceCelkem) ?? 0;
+            var dotaceCelkemStatutar = dotaceStatutar.Sum(d => d.AssumedAmount);
             var dotacePocetStatutar = dotaceStatutar.Count();
 
 

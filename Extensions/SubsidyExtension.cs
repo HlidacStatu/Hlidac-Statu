@@ -1,3 +1,4 @@
+using System.Dynamic;
 using HlidacStatu.Entities.Entities;
 using HlidacStatu.Repositories;
 
@@ -39,5 +40,36 @@ public static class SubsidyExtension
         }
         
         return true;
+    }
+
+    public static ExpandoObject FlatExport(this Subsidy subsidy)
+    {
+        dynamic v = new ExpandoObject();
+        v.Url = subsidy.GetUrl(false);
+        v.Id = subsidy.Id;
+        v.FileName = subsidy.FileName;
+        v.DataSource = subsidy.DataSource;
+        v.IsHidden = subsidy.IsHidden;
+        v.AssumedAmount = subsidy.AssumedAmount;
+        v.CommonInfoRecipientIco = subsidy.Common.Recipient.Ico;
+        v.CommonInfoRecipientName = subsidy.Common.Recipient.Name;
+        v.CommonInfoRecipientHlidacName = subsidy.Common.Recipient.HlidacName;
+        v.CommonInfoRecipientYearOfBirth = subsidy.Common.Recipient.YearOfBirth;
+        v.CommonInfoRecipientObec = subsidy.Common.Recipient.Obec;
+        v.CommonInfoRecipientOkres = subsidy.Common.Recipient.Okres;
+        v.CommonInfoRecipientPSC = subsidy.Common.Recipient.PSC;
+        v.CommonInfoSubsidyAmount = subsidy.Common.SubsidyAmount;
+        v.CommonInfoPayedAmount = subsidy.Common.PayedAmount;
+        v.CommonInfoReturnedAmount = subsidy.Common.ReturnedAmount;
+        v.CommonInfoProjectCode = subsidy.Common.ProjectCode;
+        v.CommonInfoProjectName = subsidy.Common.ProjectName;
+        v.CommonInfoProjectDescription = subsidy.Common.ProjectDescription;
+        v.CommonInfoProgramCode = subsidy.Common.ProgramCode;
+        v.CommonInfoProgramName = subsidy.Common.ProgramName;
+        v.CommonInfoApprovedYear = subsidy.Common.ApprovedYear;
+        v.CommonInfoSubsidyProvider = subsidy.Common.SubsidyProvider;
+        v.CommonInfoSubsidyProviderIco = subsidy.Common.SubsidyProviderIco;
+
+        return v;
     }
 }

@@ -12,6 +12,7 @@ using System.Dynamic;
 using System.Linq;
 using System.Threading.Tasks;
 using HlidacStatu.Connectors;
+using HlidacStatu.Extensions;
 using HlidacStatu.LibCore.Extensions;
 using Review = HlidacStatu.Entities.Review;
 
@@ -192,8 +193,7 @@ namespace HlidacStatu.Web.Controllers
                 else if (id == "dotace")
                 {
 
-                    string[] cpvs = Request.Query["cpv"].ToString().Split(',');
-                    var sres = await DotaceRepo.Searching.SimpleSearchAsync(q, 1, numOfRecords,
+                    var sres = await SubsidyRepo.Searching.SimpleSearchAsync(q, 1, numOfRecords,
                         (Util.ParseTools.ToInt(o) ?? 0).ToString());
 
                     if (sres.IsValid == false && !string.IsNullOrEmpty(sres.Q))

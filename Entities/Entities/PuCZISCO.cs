@@ -1,8 +1,5 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Dynamic;
-using Devmasters.Enums;
-using HlidacStatu.Entities.Dotace;
 
 namespace HlidacStatu.Entities;
 

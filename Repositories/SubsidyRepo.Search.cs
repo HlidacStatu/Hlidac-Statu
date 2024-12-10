@@ -18,25 +18,6 @@ namespace HlidacStatu.Repositories
         public static class Searching
         {
             public static readonly string[] QueryOperators = new string[] { "AND", "OR" };
-            
-            public static QueryContainer AddIsNotHiddenRule(QueryContainer query)
-            {
-                // Create a query for `isHidden = false`
-                var isHiddenQuery = new TermQuery
-                {
-                    Field = "isHidden",
-                    Value = false
-                };
-
-                // Combine the original query with the `isHidden` rule
-                return query == null
-                    ? isHiddenQuery
-                    : new BoolQuery
-                    {
-                        Must = new QueryContainer[] { query, isHiddenQuery }
-                    };
-            }
-
 
             public static readonly IRule[] Irules = new IRule[]
             {
@@ -77,7 +58,7 @@ namespace HlidacStatu.Repositories
             }
 
             public static Task<SubsidySearchResult> SimpleSearchAsync(string query, int page, int pagesize,
-                SubsidySearchResult.DotaceOrderResult order,
+                SubsidySearchResult.SubsidyOrderResult order,
                 bool withHighlighting = false,
                 AggregationContainerDescriptor<Subsidy> anyAggregation = null, bool exactNumOfResults = false)
                 => SimpleSearchAsync(query, page, pagesize, ((int)order).ToString(),
@@ -186,38 +167,38 @@ namespace HlidacStatu.Repositories
 
             public static SortDescriptor<Subsidy> GetSort(string sorder)
             {
-                SubsidySearchResult.DotaceOrderResult order = SubsidySearchResult.DotaceOrderResult.Relevance;
-                Enum.TryParse<SubsidySearchResult.DotaceOrderResult>(sorder, out order);
+                SubsidySearchResult.SubsidyOrderResult order = SubsidySearchResult.SubsidyOrderResult.Relevance;
+                Enum.TryParse<SubsidySearchResult.SubsidyOrderResult>(sorder, out order);
                 return GetSort(order);
             }
 
-            public static SortDescriptor<Subsidy> GetSort(SubsidySearchResult.DotaceOrderResult order)
+            public static SortDescriptor<Subsidy> GetSort(SubsidySearchResult.SubsidyOrderResult order)
             {
                 SortDescriptor<Subsidy> s = new SortDescriptor<Subsidy>().Field(f => f.Field("_score").Descending());
                 switch (order)
                 {
-                    case SubsidySearchResult.DotaceOrderResult.DateAddedDesc:
+                    case SubsidySearchResult.SubsidyOrderResult.DateAddedDesc:
                         s = new SortDescriptor<Subsidy>().Field(m => m.Field(f => f.Common.ApprovedYear).Descending());
                         break;
-                    case SubsidySearchResult.DotaceOrderResult.DateAddedAsc:
+                    case SubsidySearchResult.SubsidyOrderResult.DateAddedAsc:
                         s = new SortDescriptor<Subsidy>().Field(m => m.Field(f => f.Common.ApprovedYear).Ascending());
                         break;
-                    case SubsidySearchResult.DotaceOrderResult.LatestUpdateDesc:
+                    case SubsidySearchResult.SubsidyOrderResult.LatestUpdateDesc:
                         s = new SortDescriptor<Subsidy>().Field(m => m.Field(f => f.AssumedAmount).Descending());
                         break;
-                    case SubsidySearchResult.DotaceOrderResult.LatestUpdateAsc:
+                    case SubsidySearchResult.SubsidyOrderResult.LatestUpdateAsc:
                         s = new SortDescriptor<Subsidy>().Field(m => m.Field(f => f.AssumedAmount).Ascending());
                         break;
-                    case SubsidySearchResult.DotaceOrderResult.FastestForScroll:
+                    case SubsidySearchResult.SubsidyOrderResult.FastestForScroll:
                         s = new SortDescriptor<Subsidy>().Field(f => f.Field("_doc"));
                         break;
-                    case SubsidySearchResult.DotaceOrderResult.ICODesc:
+                    case SubsidySearchResult.SubsidyOrderResult.ICODesc:
                         s = new SortDescriptor<Subsidy>().Field(m => m.Field(f => f.Common.Recipient.Ico).Descending());
                         break;
-                    case SubsidySearchResult.DotaceOrderResult.ICOAsc:
+                    case SubsidySearchResult.SubsidyOrderResult.ICOAsc:
                         s = new SortDescriptor<Subsidy>().Field(m => m.Field(f => f.Common.Recipient.Ico).Ascending());
                         break;
-                    case SubsidySearchResult.DotaceOrderResult.Relevance:
+                    case SubsidySearchResult.SubsidyOrderResult.Relevance:
                     default:
                         break;
                 }

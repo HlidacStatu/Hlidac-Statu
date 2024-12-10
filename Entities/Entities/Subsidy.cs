@@ -32,8 +32,6 @@ public class Subsidy
     /// <summary>
     /// Who manages the data about this subsidy 
     /// </summary>
-    [Text]
-    [Keyword(Name = "dataSource.keyword")]
     public string DataSource { get; set; }
 
     /// <summary>
@@ -49,10 +47,14 @@ public class Subsidy
     public DateTime ProcessedDate { get; set; }
     
     /// <summary>
+    /// Date when subsidy was changed.
+    /// </summary>
+    [Date]
+    public DateTime ModifiedDate { get; set; }
+    
+    /// <summary>
     /// Oblast kam dotace patří
     /// </summary>
-    [Text]
-    [Keyword(Name = "category.keyword")]
     public string Category { get; set; }
 
     /// <summary>
@@ -104,13 +106,9 @@ public class Subsidy
 
         [Number]
         public decimal? ReturnedAmount { get; set; }
-
-        [Text]
-        [Keyword(Name = "projectCode.keyword")]
+        
         public string ProjectCode { get; set; }
 
-        [Text]
-        [Keyword(Name = "projectName.keyword")]
         public string ProjectName { get; set; }
 
         [Text]
@@ -119,15 +117,11 @@ public class Subsidy
         [Keyword]
         public string ProgramCode { get; set; }
 
-        [Text]
-        [Keyword(Name = "programName.keyword")]
         public string ProgramName { get; set; }
 
         [Number]
         public int? ApprovedYear { get; set; }
 
-        [Text]
-        [Keyword(Name = "subsidyProvider.keyword")]
         public string SubsidyProvider { get; set; }
 
         [Keyword]
@@ -142,12 +136,8 @@ public class Subsidy
         [Keyword]
         public string Ico { get; set; }
 
-        [Text]
-        [Keyword(Name = "name.keyword")]
         public string Name { get; set; }
 
-        [Text]
-        [Keyword(Name = "hlidacName.keyword")]
         public string HlidacName { get; set; }
 
         [Keyword]
@@ -156,12 +146,8 @@ public class Subsidy
         [Number]
         public int? YearOfBirth { get; set; }
 
-        [Text]
-        [Keyword(Name = "obec.keyword")]
         public string Obec { get; set; }
 
-        [Text]
-        [Keyword(Name = "okres.keyword")]
         public string Okres { get; set; }
 
         [Keyword]
@@ -202,7 +188,6 @@ public class Subsidy
         
         [Date]
         public DateTime? DuplicateCalculated { get; set; }
-        
         
     }
 }

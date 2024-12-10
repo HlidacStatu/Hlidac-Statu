@@ -1,4 +1,4 @@
-﻿using HlidacStatu.Entities.Dotace;
+﻿using HlidacStatu.Entities.Entities;
 using HlidacStatu.Repositories;
 using HlidacStatuApi.Models;
 using Microsoft.AspNetCore.Authorization;
@@ -29,7 +29,7 @@ namespace HlidacStatuApi.Controllers.ApiV2
         /// <returns></returns>
         [HttpGet("hledat")]
         [Authorize]
-        public async Task<ActionResult<SearchResultDTO<Dotace>>> Hledat([FromQuery] string? dotaz = null,
+        public async Task<ActionResult<SearchResultDTO<Subsidy>>> Hledat([FromQuery] string? dotaz = null,
             [FromQuery] int? strana = null, [FromQuery] int? razeni = null)
         {
             if (strana is null || strana < 1)
@@ -45,7 +45,7 @@ namespace HlidacStatuApi.Controllers.ApiV2
                 return BadRequest($"Hodnota dotaz chybí.");
             }
 
-            var result = await DotaceRepo.Searching.SimpleSearchAsync(dotaz, strana.Value,
+            var result = await SubsidyRepo.Searching.SimpleSearchAsync(dotaz, strana.Value,
                 ApiV2Controller.DefaultResultPageSize,
                 (razeni ?? 0).ToString());
 
@@ -59,25 +59,25 @@ namespace HlidacStatuApi.Controllers.ApiV2
                     .Select(m => m.Source)
                     .ToArray();
 
-                return new SearchResultDTO<Dotace>(result.Total, result.Page, filtered);
+                return new SearchResultDTO<Subsidy>(result.Total, result.Page, filtered);
             }
         }
 
         /// <summary>
-        /// Vrátí detail jedné dotace.
+        /// Vrátí detail jedné Subsidy.
         /// </summary>
-        /// <param name="id">id dotace</param>
-        /// <returns>detail dotace</returns>
+        /// <param name="id">id Subsidy</param>
+        /// <returns>detail Subsidy</returns>
         [HttpGet("{id?}")]
         [Authorize]
-        public async Task<ActionResult<Dotace>> Detail([FromRoute] string? id = null)
+        public async Task<ActionResult<Subsidy>> Detail([FromRoute] string? id = null)
         {
             if (string.IsNullOrWhiteSpace(id))
             {
                 return BadRequest($"Hodnota id chybí.");
             }
 
-            var dotace = await DotaceRepo.GetAsync(id);
+            var dotace = await SubsidyRepo.GetAsync(id);
             if (dotace == null)
             {
                 return NotFound($"Dotace nenalezena");

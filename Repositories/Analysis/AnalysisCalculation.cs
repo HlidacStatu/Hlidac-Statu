@@ -571,17 +571,17 @@ namespace HlidacStatu.Repositories.Analysis
             return badF;
         }
 
-        public static async IAsyncEnumerable<(string idDotace, string ico, int ageInDays)> CompanyAgeDuringSubsidyAsync()
+        public static async IAsyncEnumerable<(string idDotace, string ico, int ageInYears)> CompanyAgeDuringSubsidyAsync()
         {
-            await foreach (var dotace in DotaceRepo.GetAllAsync())
+            await foreach (var subsidy in SubsidyRepo.GetAllAsync(null))
             {
-                bool missingEssentialData = string.IsNullOrWhiteSpace(dotace.Prijemce?.Ico)
-                    || !dotace.DatumPodpisu.HasValue;
+                bool missingEssentialData = string.IsNullOrWhiteSpace(subsidy.Common.Recipient.Ico)
+                    || !subsidy.Common.ApprovedYear.HasValue;
 
                 if (missingEssentialData)
                     continue;
 
-                Firma firma = Firmy.Get(dotace.Prijemce.Ico);
+                Firma firma = Firmy.Get(subsidy.Common.Recipient.Ico);
 
                 if (firma.PatrimStatu()) //nechceme státní firmy
                     continue;
@@ -589,9 +589,11 @@ namespace HlidacStatu.Repositories.Analysis
                 if (!firma.Datum_Zapisu_OR.HasValue) //nechceme firmy s chybějící hodnotou data zapisu do OR
                     continue;
 
-                var companyAgeInDays = (dotace.DatumPodpisu.Value - firma.Datum_Zapisu_OR.Value).Days;
+                
+                
+                var companyAgeInDays = (subsidy.Common.ApprovedYear.Value - firma.Datum_Zapisu_OR.Value.Year);
 
-                yield return (idDotace: dotace.IdDotace, ico: firma.ICO, ageInDays: companyAgeInDays);
+                yield return (idDotace: subsidy.Id, ico: firma.ICO, ageInYears: companyAgeInDays);
             }
         }
     }

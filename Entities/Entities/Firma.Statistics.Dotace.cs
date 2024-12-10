@@ -8,11 +8,10 @@ namespace HlidacStatu.Entities
         public partial class Statistics
         {
 
-            public class Dotace : CoreStat, IAddable<Dotace>
+            public class Subsidy : CoreStat, IAddable<Subsidy>
             {
                 public int PocetDotaci { get; set; }
-                public int PocetCerpani { get; set; }
-                public decimal CelkemCerpano { get; set; }
+                public decimal CelkemPrideleno { get; set; }
                 
                 /// <summary>
                 /// Vyplněno pouze pro dotace holdingu
@@ -20,21 +19,19 @@ namespace HlidacStatu.Entities
                 public Dictionary<string, decimal> JednotliveFirmy { get; set; }
 
 
-                public Dotace Add(Dotace other)
+                public Subsidy Add(Subsidy other)
                 {
-                    return new Dotace()
+                    return new Subsidy()
                     {
-                        CelkemCerpano = CelkemCerpano + (other?.CelkemCerpano ?? 0),
-                        PocetCerpani = PocetCerpani + (other?.PocetCerpani ?? 0),
+                        CelkemPrideleno = CelkemPrideleno + (other?.CelkemPrideleno ?? 0),
                         PocetDotaci = PocetDotaci + (other?.PocetDotaci ?? 0)
                     };
                 }
-                public Dotace Subtract(Dotace other)
+                public Subsidy Subtract(Subsidy other)
                 {
-                    return new Dotace()
+                    return new Subsidy()
                     {
-                        CelkemCerpano = CelkemCerpano - (other?.CelkemCerpano ?? 0),
-                        PocetCerpani = PocetCerpani - (other?.PocetCerpani ?? 0),
+                        CelkemPrideleno = CelkemPrideleno - (other?.CelkemPrideleno ?? 0),
                         PocetDotaci = PocetDotaci - (other?.PocetDotaci ?? 0)
                     };
                 }

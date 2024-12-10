@@ -10,8 +10,8 @@ namespace HlidacStatu.Repositories.Statistics
 {
     public static partial class FirmaStatistics
     {
-        static Devmasters.Cache.Redis.ManagerAsync<StatisticsSubjectPerYear<Firma.Statistics.Dotace>, Firma>
-            _dotaceCache = Devmasters.Cache.Redis.ManagerAsync<StatisticsSubjectPerYear<Firma.Statistics.Dotace>, Firma>
+        static Devmasters.Cache.Redis.ManagerAsync<StatisticsSubjectPerYear<Firma.Statistics.Subsidy>, Firma>
+            _dotaceCache = Devmasters.Cache.Redis.ManagerAsync<StatisticsSubjectPerYear<Firma.Statistics.Subsidy>, Firma>
                 .GetSafeInstance("Firma_DotaceStatistics_v2",
                     async (firma) => await CalculateDotaceStatAsync(firma),
                     TimeSpan.Zero,
@@ -22,9 +22,9 @@ namespace HlidacStatu.Repositories.Statistics
                     keyValueSelector: f => f.ICO);
 
 
-        static Devmasters.Cache.Redis.Manager<StatisticsSubjectPerYear<Firma.Statistics.Dotace>, (Firma firma,
+        static Devmasters.Cache.Redis.Manager<StatisticsSubjectPerYear<Firma.Statistics.Subsidy>, (Firma firma,
                 HlidacStatu.DS.Graphs.Relation.AktualnostType aktualnost)>
-            _holdingDotaceCache = Devmasters.Cache.Redis.Manager<StatisticsSubjectPerYear<Firma.Statistics.Dotace>, (Firma firma,
+            _holdingDotaceCache = Devmasters.Cache.Redis.Manager<StatisticsSubjectPerYear<Firma.Statistics.Subsidy>, (Firma firma,
                     HlidacStatu.DS.Graphs.Relation.AktualnostType aktualnost)>
                 .GetSafeInstance("Holding_DotaceStatistics_v3",
                     (obj) => CalculateHoldingDotaceStat(obj.firma, obj.aktualnost),
@@ -35,7 +35,7 @@ namespace HlidacStatu.Repositories.Statistics
                     Devmasters.Config.GetWebConfigValue("RedisCachePassword"),
                     keyValueSelector: obj => obj.firma.ICO + "-" + obj.aktualnost.ToString());
 
-        public static StatisticsSubjectPerYear<Firma.Statistics.Dotace> CachedHoldingStatisticsDotace(
+        public static StatisticsSubjectPerYear<Firma.Statistics.Subsidy> CachedHoldingStatisticsDotace(
             Firma firma, HlidacStatu.DS.Graphs.Relation.AktualnostType aktualnost,
             bool forceUpdateCache = false, bool invalidateOnly = false)
         {
@@ -48,7 +48,7 @@ namespace HlidacStatu.Repositories.Statistics
             return _holdingDotaceCache.Get((firma, aktualnost));
         }
 
-        public static StatisticsSubjectPerYear<Firma.Statistics.Dotace> CachedStatisticsDotace(
+        public static StatisticsSubjectPerYear<Firma.Statistics.Subsidy> CachedStatisticsDotace(
             Firma firma,
             bool forceUpdateCache = false)
         {
@@ -56,7 +56,7 @@ namespace HlidacStatu.Repositories.Statistics
             {
                 _ = Task.Run(async () => { await _dotaceCache.DeleteAsync(firma); }).Wait(TimeSpan.FromSeconds(10));
             }
-            StatisticsSubjectPerYear<Firma.Statistics.Dotace> ret = new StatisticsSubjectPerYear<Firma.Statistics.Dotace>();
+            StatisticsSubjectPerYear<Firma.Statistics.Subsidy> ret = new StatisticsSubjectPerYear<Firma.Statistics.Subsidy>();
             _ = Task.Run(async () => { ret = await _dotaceCache.GetAsync(firma); }).Wait(TimeSpan.FromSeconds(20));
             return ret;
         }
@@ -71,7 +71,7 @@ namespace HlidacStatu.Repositories.Statistics
 
         }
 
-        public async static Task<StatisticsSubjectPerYear<Firma.Statistics.Dotace>> CachedStatisticsDotaceAsync(
+        public async static Task<StatisticsSubjectPerYear<Firma.Statistics.Subsidy>> CachedStatisticsDotaceAsync(
         Firma firma,
         bool forceUpdateCache = false)
         {
@@ -80,11 +80,11 @@ namespace HlidacStatu.Repositories.Statistics
             {
                 await _dotaceCache.DeleteAsync(firma);
             }
-            StatisticsSubjectPerYear<Firma.Statistics.Dotace> ret = new StatisticsSubjectPerYear<Firma.Statistics.Dotace>();
+            StatisticsSubjectPerYear<Firma.Statistics.Subsidy> ret = new StatisticsSubjectPerYear<Firma.Statistics.Subsidy>();
             ret = await _dotaceCache.GetAsync(firma);
             return ret;
         }
-        private static StatisticsSubjectPerYear<Firma.Statistics.Dotace> CalculateHoldingDotaceStat(Firma firma,
+        private static StatisticsSubjectPerYear<Firma.Statistics.Subsidy> CalculateHoldingDotaceStat(Firma firma,
             HlidacStatu.DS.Graphs.Relation.AktualnostType aktualnost)
         {
             var statistiky = firma.Holding(aktualnost)
@@ -92,64 +92,58 @@ namespace HlidacStatu.Repositories.Statistics
                 .Where(f => f.Valid)
                 .Select(f => new { f.ICO, dotaceStats = f.StatistikaDotaci() });
 
-            var statistikyPerIco = new Dictionary<string, StatisticsSubjectPerYear<Firma.Statistics.Dotace>>();
+            var statistikyPerIco = new Dictionary<string, StatisticsSubjectPerYear<Firma.Statistics.Subsidy>>();
             foreach (var ico in statistiky.Select(m => m.ICO).Distinct())
             {
-                statistikyPerIco[ico] = new StatisticsSubjectPerYear<Firma.Statistics.Dotace>();
-                statistikyPerIco[ico] = StatisticsSubjectPerYear<Firma.Statistics.Dotace>.Aggregate(statistikyPerIco.Where(w => w.Key == ico).Select(m => m.Value));
+                statistikyPerIco[ico] = new StatisticsSubjectPerYear<Firma.Statistics.Subsidy>();
+                statistikyPerIco[ico] = StatisticsSubjectPerYear<Firma.Statistics.Subsidy>.Aggregate(statistikyPerIco.Where(w => w.Key == ico).Select(m => m.Value));
             }
 
-            var aggregate = Lib.Analytics.StatisticsSubjectPerYear<Firma.Statistics.Dotace>.Aggregate(statistikyPerIco.Values);
+            var aggregate = Lib.Analytics.StatisticsSubjectPerYear<Firma.Statistics.Subsidy>.Aggregate(statistikyPerIco.Values);
 
             foreach (var year in aggregate)
             {
                 year.Value.JednotliveFirmy = statistikyPerIco
-                    .Where(s => s.Value.StatisticsForYear(year.Year).CelkemCerpano != 0)
-                    .ToDictionary(s => s.Key, s => s.Value.StatisticsForYear(year.Year).CelkemCerpano);
+                    .Where(s => s.Value.StatisticsForYear(year.Year).CelkemPrideleno != 0)
+                    .ToDictionary(s => s.Key, s => s.Value.StatisticsForYear(year.Year).CelkemPrideleno);
             }
 
             return aggregate;
         }
 
-        private static async Task<StatisticsSubjectPerYear<Firma.Statistics.Dotace>> CalculateDotaceStatAsync(Firma f)
+        private static async Task<StatisticsSubjectPerYear<Firma.Statistics.Subsidy>> CalculateDotaceStatAsync(Firma f)
         {
             await Task.Delay(100);
-            var dotaceFirmy = await DotaceRepo.GetDotaceForIcoAsync(f.ICO).ToListAsync();
+            var dotaceFirmy = await SubsidyRepo.GetDotaceForIcoAsync(f.ICO).ToListAsync();
 
             // doplnit počty dotací
-            var statistiky = dotaceFirmy.GroupBy(d => d.DatumPodpisu?.Year)
+            var statistiky = dotaceFirmy.GroupBy(d => d.Common.ApprovedYear)
                 .ToDictionary(g => g.Key ?? 0,
-                    g => new Firma.Statistics.Dotace()
+                    g => new Firma.Statistics.Subsidy()
                     {
                         PocetDotaci = g.Count()
                     }
                 );
-
-            var cerpani = dotaceFirmy
-                .SelectMany(d => d.Rozhodnuti)
-                .SelectMany(r => r.Cerpani);
-
-            var dataYearly = cerpani
-                .GroupBy(c => c.GuessedYear)
+            
+            var dataYearly = dotaceFirmy
+                .GroupBy(c => c.Common.ApprovedYear)
                 .ToDictionary(g => g.Key ?? 0,
-                    g => (CelkemCerpano: g.Sum(c => c.CastkaSpotrebovana ?? 0),
-                        PocetCerpani: g.Count(c => c.CastkaSpotrebovana.HasValue))
+                    g => g.Sum(c => c.AssumedAmount)
                 );
 
             foreach (var dy in dataYearly)
             {
                 if (!statistiky.TryGetValue(dy.Key, out var yearstat))
                 {
-                    yearstat = new Firma.Statistics.Dotace();
+                    yearstat = new Firma.Statistics.Subsidy();
                     statistiky.Add(dy.Key, yearstat);
                 }
 
-                yearstat.CelkemCerpano = dy.Value.CelkemCerpano;
-                yearstat.PocetCerpani = dy.Value.PocetCerpani;
+                yearstat.CelkemPrideleno = dy.Value;
             }
 
 
-            return new StatisticsSubjectPerYear<Firma.Statistics.Dotace>(f.ICO, statistiky);
+            return new StatisticsSubjectPerYear<Firma.Statistics.Subsidy>(f.ICO, statistiky);
         }
     }
 }

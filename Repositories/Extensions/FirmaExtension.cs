@@ -59,7 +59,7 @@ namespace HlidacStatu.Extensions
             return firma.IsSponzor()
                    || firma.StatistikaRegistruSmluv().Sum(s => s.PocetSmluv) > 0
                    || (await VerejnaZakazkaRepo.Searching.SimpleSearchAsync("ico:" + firma.ICO, null, 1, 1, "0")).Total > 0
-                   || (await DotaceRepo.Searching.SimpleSearchAsync("ico:" + firma.ICO, 1, 1, "0")).Total > 0;
+                   || (await SubsidyRepo.Searching.SimpleSearchAsync("ico:" + firma.ICO, 1, 1, "0")).Total > 0;
         }
 
         public static bool MaVazbyNaPolitikyPred(this Firma firma, DateTime date)
@@ -166,13 +166,13 @@ namespace HlidacStatu.Extensions
             return ret ?? new Lib.Analytics.StatisticsSubjectPerYear<Smlouva.Statistics.Data>();
         }
 
-        public static Lib.Analytics.StatisticsSubjectPerYear<Firma.Statistics.Dotace> StatistikaDotaci(
+        public static Lib.Analytics.StatisticsSubjectPerYear<Firma.Statistics.Subsidy> StatistikaDotaci(
             this Firma firma, bool forceUpdateCache = false)
         {
             return FirmaStatistics.CachedStatisticsDotace(firma, forceUpdateCache);
 
         }
-        public static Lib.Analytics.StatisticsSubjectPerYear<Firma.Statistics.Dotace> HoldingStatistikaDotaci(
+        public static Lib.Analytics.StatisticsSubjectPerYear<Firma.Statistics.Subsidy> HoldingStatistikaDotaci(
             this Firma firma,
             Relation.AktualnostType aktualnost, bool forceUpdateCache = false)
         {

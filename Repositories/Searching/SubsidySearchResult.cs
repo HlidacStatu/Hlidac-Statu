@@ -41,7 +41,7 @@ namespace HlidacStatu.Repositories.Searching
                 new Microsoft.AspNetCore.Mvc.Rendering.SelectListItem[]
                         { new Microsoft.AspNetCore.Mvc.Rendering.SelectListItem() { Value = "", Text = "---" } }
                     .Union(
-                        Devmasters.Enums.EnumTools.EnumToEnumerable(typeof(DotaceOrderResult))
+                        Devmasters.Enums.EnumTools.EnumToEnumerable(typeof(SubsidyOrderResult))
                             .Select(
                                 m => new Microsoft.AspNetCore.Mvc.Rendering.SelectListItem()
                                     { Value = m.Id.ToString(), Text = "Řadit " + m.Name }
@@ -50,13 +50,13 @@ namespace HlidacStatu.Repositories.Searching
                     .ToList();
         };
 
-        public static string GetSearchUrl(string pageUrl, string Q, DotaceOrderResult? order = null, int? page = null)
+        public static string GetSearchUrl(string pageUrl, string Q, SubsidyOrderResult? order = null, int? page = null)
         {
             return $"{pageUrl}{GetSearchUrlQueryString(Q, order, page)}";
         }
 
 
-        public static string GetSearchUrlQueryString(string Q, DotaceOrderResult? order = null, int? page = null)
+        public static string GetSearchUrlQueryString(string Q, SubsidyOrderResult? order = null, int? page = null)
         {
             string ret = $"?Q={System.Web.HttpUtility.UrlEncode(Q)}";
             if (order.HasValue)
@@ -68,7 +68,7 @@ namespace HlidacStatu.Repositories.Searching
 
 
         [Devmasters.Enums.ShowNiceDisplayName()]
-        public enum DotaceOrderResult
+        public enum SubsidyOrderResult
         {
             [Devmasters.Enums.SortValue(0)]
             [Devmasters.Enums.NiceDisplayName("podle relevance")]

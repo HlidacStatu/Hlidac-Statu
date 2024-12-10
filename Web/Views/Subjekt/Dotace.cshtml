@@ -20,7 +20,7 @@
             Data = Model.StatistikaDotaci()
                 .Where(x => x.Year > 0)
                 .OrderBy(x => x.Year)
-                .Select(x => new SeriesData(x.Year, x.Value.CelkemCerpano)).ToArray(),
+                .Select(x => new SeriesData(x.Year, x.Value.CelkemPrideleno)).ToArray(),
             SeriesTooltip = new SeriesTooltip()
             {
                 ValueSuffix = " Kč"
@@ -29,8 +29,8 @@
 
     };
 
-    var reportData = new ReportDataSource<(int Rok, Firma.Statistics.Dotace Dotace)> (
-        new ReportDataSource<(int Rok, Firma.Statistics.Dotace Dotace)>.Column[]
+    var reportData = new ReportDataSource<(int Rok, Firma.Statistics.Subsidy Dotace)> (
+        new ReportDataSource<(int Rok, Firma.Statistics.Subsidy Dotace)>.Column[]
         {
             new()
             {
@@ -43,9 +43,9 @@
             new()
             {
                 Name = "Čerpáno",
-                TextRender = (x) => $"{x.Dotace.CelkemCerpano.ToString("N0")} Kč",
-                HtmlRender = (x) => $"{x.Dotace.CelkemCerpano.ToString("N0")}&nbsp;Kč",
-                OrderValueRender = (x) => HlidacStatu.Util.RenderData.OrderValueFormat(x.Dotace.CelkemCerpano),
+                TextRender = (x) => $"{x.Dotace.CelkemPrideleno.ToString("N0")} Kč",
+                HtmlRender = (x) => $"{x.Dotace.CelkemPrideleno.ToString("N0")}&nbsp;Kč",
+                OrderValueRender = (x) => HlidacStatu.Util.RenderData.OrderValueFormat(x.Dotace.CelkemPrideleno),
                 CssClass = "number"
             },
             new()
@@ -57,7 +57,7 @@
         }
     );
 
-    foreach (var dot in Model.StatistikaDotaci().Where(d => d.Value.CelkemCerpano > 0).OrderBy(d=> d.Year))
+    foreach (var dot in Model.StatistikaDotaci().Where(d => d.Value.CelkemPrideleno > 0).OrderBy(d=> d.Year))
     {
         reportData.AddRow(dot);
     }
@@ -84,7 +84,7 @@
             Data = holdingStats
                 .Where(x => x.Year > 0)
                 .OrderBy(x => x.Year)
-                .Select(x => new SeriesData(x.Year, x.Value.CelkemCerpano)).ToArray(),
+                .Select(x => new SeriesData(x.Year, x.Value.CelkemPrideleno)).ToArray(),
             SeriesTooltip = new SeriesTooltip()
             {
                 ValueSuffix = " Kč"
@@ -106,9 +106,9 @@
         new()
         {
             Name = "Suma",
-            TextRender = (x) => $"{x.StatistikaDotaci().Sum(s => s.CelkemCerpano).ToString("N0")} Kč",
-            HtmlRender = (x) => $"{x.StatistikaDotaci().Sum(s => s.CelkemCerpano).ToString("N0")}&nbsp;Kč",
-            OrderValueRender = (x) => HlidacStatu.Util.RenderData.OrderValueFormat(x.StatistikaDotaci().Sum(s => s.CelkemCerpano)),
+            TextRender = (x) => $"{x.StatistikaDotaci().Sum(s => s.CelkemPrideleno).ToString("N0")} Kč",
+            HtmlRender = (x) => $"{x.StatistikaDotaci().Sum(s => s.CelkemPrideleno).ToString("N0")}&nbsp;Kč",
+            OrderValueRender = (x) => HlidacStatu.Util.RenderData.OrderValueFormat(x.StatistikaDotaci().Sum(s => s.CelkemPrideleno)),
             CssClass = "number"
         },
         new()
@@ -145,7 +145,7 @@
             @{
 
                 string durl = "/dotace/hledat?Q=ico%3A+" + Model.ICO;
-                var dotaceSuma = Model.StatistikaDotaci().Sum(s => s.CelkemCerpano);
+                var dotaceSuma = Model.StatistikaDotaci().Sum(s => s.CelkemPrideleno);
                 var dotacePocet = Model.StatistikaDotaci().Sum(v => v.PocetDotaci);
 
                 var sdotaceKc = $" v celkové hodnotě <b>{HlidacStatu.Util.RenderData.NicePriceHtml(dotaceSuma)}</b>.";
@@ -177,7 +177,7 @@
             @if (Model.AktualniVazby(Relation.AktualnostType.Nedavny).Count() > 0)
             {
 
-                decimal totalSumDotaceHolding = holdingStats.Sum(s => s.CelkemCerpano);
+                decimal totalSumDotaceHolding = holdingStats.Sum(s => s.CelkemPrideleno);
                 int totalCountDotaceHolding = holdingStats.Sum(s => s.PocetDotaci);
 
                 if (totalCountDotaceHolding - dotacePocet > 0)

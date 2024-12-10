@@ -13,7 +13,7 @@
     if (!string.IsNullOrWhiteSpace(Model.Common.Recipient.Ico)
         && !string.IsNullOrWhiteSpace(Model.Common.ProjectCode))
     {
-        var foundDuplicates = await SubsidyRepo.Searching.SimpleSearchAsync(duplicitaQuery, 0, 1000, SubsidySearchResult.DotaceOrderResult.FastestForScroll);
+        var foundDuplicates = await SubsidyRepo.Searching.SimpleSearchAsync(duplicitaQuery, 0, 1000, SubsidySearchResult.SubsidyOrderResult.FastestForScroll);
         if (foundDuplicates.HasResult)
         {
             duplicity = foundDuplicates.Results.ToList();

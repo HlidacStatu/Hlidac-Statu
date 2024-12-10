@@ -41,7 +41,6 @@ namespace HlidacStatu.Connectors
             DataSource,
             Insolvence,
             InsolvenceDocs,
-            Dotace,
             Subsidy,
             UptimeItem,
             UptimeSSL,
@@ -76,7 +75,6 @@ namespace HlidacStatu.Connectors
         //public static string defaultIndexName_DataSourceDb = "hlidacstatu_datasources";
         public static string defaultIndexName_Insolvence = "insolvencnirestrik";
         public static string defaultIndexName_InsolvenceDocs = "insolvencedocs";
-        public static string defaultIndexName_Dotace = "dotace";
         public static string defaultIndexName_Subsidy = "subsidy";
         public static string defaultIndexName_Uptime = "uptime";
         public static string defaultIndexName_UptimeSSL = "uptimessl";
@@ -261,11 +259,7 @@ namespace HlidacStatu.Connectors
         {
             return GetESClientAsync(defaultIndexName_UptimeSSL, timeOut, connectionLimit, IndexType.UptimeSSL);
         }
-
-        public static Task<ElasticClient> GetESClient_DotaceAsync(int timeOut = 60000, int connectionLimit = 80)
-        {
-            return GetESClientAsync(defaultIndexName_Dotace, timeOut, connectionLimit, IndexType.Dotace);
-        }
+        
         
         public static Task<ElasticClient> GetESClient_SubsidyAsync(int timeOut = 60000, int connectionLimit = 80)
         {
@@ -606,13 +600,6 @@ namespace HlidacStatu.Connectors
                        .CreateAsync(indexName, i => i
                            .InitializeUsing(idxSt)
                            .Map<HlidacStatu.AI.LLM.Entities.FullSummary>(map => map.AutoMap().DateDetection(false))  //TODO Summary to T or Object
-                       );
-                    break;
-                case IndexType.Dotace:
-                    res = await client.Indices
-                       .CreateAsync(indexName, i => i
-                           .InitializeUsing(idxSt)
-                           .Map<Entities.Dotace.Dotace>(map => map.AutoMap().DateDetection(false))
                        );
                     break;
                 case IndexType.Subsidy:

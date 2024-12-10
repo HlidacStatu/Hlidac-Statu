@@ -1,9 +1,7 @@
-﻿using Amazon.Runtime.Internal.Transform;
-using HlidacStatu.Datasets;
+﻿using HlidacStatu.Datasets;
 using HlidacStatu.Entities;
 using HlidacStatu.Repositories;
 using HlidacStatu.Repositories.Searching;
-using RazorEngine.Compilation.ImpromptuInterface.Dynamic;
 using Serilog;
 using System.Collections.Generic;
 using System.Linq;
@@ -26,7 +24,7 @@ namespace HlidacStatu.XLib
             public HlidacStatu.Searching.Search.GeneralResult<Firma> Firmy { get; set; } = null;
             public Datasets.Search.DatasetMultiResult Datasets { get; set; }
             public InsolvenceFulltextSearchResult Insolvence { get; set; } = new();
-            public DotaceSearchResult Dotace { get; set; } = null;
+            public SubsidySearchResult Dotace { get; set; } = null;
             public Searching.Search.GeneralResult<Lib.Data.External.Wordpress.Searching.Result> Wordpress { get; set; } = null;
 
             public Searching.Search.GeneralResult<Registration> DatasetRegistrations { get; set; } = null;
@@ -338,9 +336,9 @@ namespace HlidacStatu.XLib
                     {
                         Devmasters.DT.StopWatchEx sw = new Devmasters.DT.StopWatchEx();
                         sw.Start();
-                        res.Dotace = await DotaceRepo.Searching.SimpleSearchAsync(
-                                new DotaceSearchResult { Q = query, Page = 1, PageSize = dotaceSize, Order = order },
-                                anyAggregation: new Nest.AggregationContainerDescriptor<Entities.Dotace.Dotace>().Sum("souhrn", s => s.Field(f => f.DotaceCelkem))
+                        res.Dotace = await SubsidyRepo.Searching.SimpleSearchAsync(
+                                new SubsidySearchResult { Q = query, Page = 1, PageSize = dotaceSize, Order = order },
+                                anyAggregation: new Nest.AggregationContainerDescriptor<Entities.Entities.Subsidy>().Sum("souhrn", s => s.Field(f => f.AssumedAmount))
                             );
                         sw.Stop();
                         res.Dotace.ElapsedTime = sw.Elapsed;

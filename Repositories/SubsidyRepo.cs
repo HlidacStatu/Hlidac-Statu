@@ -17,6 +17,24 @@ namespace HlidacStatu.Repositories
         public static readonly ElasticClient SubsidyClient = Manager.GetESClient_SubsidyAsync()
             .ConfigureAwait(false).GetAwaiter().GetResult();
         
+        public static QueryContainer AddIsNotHiddenRule(QueryContainer query)
+        {
+            // Create a query for `isHidden = false`
+            var isHiddenQuery = new TermQuery
+            {
+                Field = "isHidden",
+                Value = false
+            };
+
+            // Combine the original query with the `isHidden` rule
+            return query == null
+                ? isHiddenQuery
+                : new BoolQuery
+                {
+                    Must = new QueryContainer[] { query, isHiddenQuery }
+                };
+        }
+        
 
         //do not delete - it is used by another project
         public static async Task SaveAsync(Subsidy subsidy, bool shouldRewrite)
@@ -36,6 +54,7 @@ namespace HlidacStatu.Repositories
                 }
             }
 
+            subsidy.ModifiedDate = DateTime.Now;
             var res = await SubsidyClient.IndexAsync(subsidy, o => o.Id(subsidy.Id));
 
             if (!res.IsValid)
@@ -181,6 +200,86 @@ namespace HlidacStatu.Repositories
             return response.IsValid
                 ? response.Source
                 : null;
+        }
+        
+        /// <summary>
+        /// Get all subsidies. If query is null, then it matches all except hidden ones
+        /// </summary>
+        /// <param name="query"></param>
+        /// <param name="scrollTimeout"></param>
+        /// <param name="scrollSize"></param>
+        /// <returns></returns>
+        /// <exception cref="Exception"></exception>
+        public static async IAsyncEnumerable<Subsidy> GetAllAsync(QueryContainer query,
+            bool excludeHidden = true,
+            string scrollTimeout = "5m",
+            int scrollSize = 300)
+        {
+            if (excludeHidden)
+            {
+                query = AddIsNotHiddenRule(query);
+            }
+
+            ISearchResponse<Subsidy> initialResponse = null;
+            if (query is null && excludeHidden)
+            {
+                initialResponse = await SubsidyClient.SearchAsync<Subsidy>(scr => scr
+                    .From(0)
+                    .Take(scrollSize)
+                    .Query(q => AddIsNotHiddenRule(null))
+                    .Scroll(scrollTimeout));
+            }
+            else if (query is null && !excludeHidden)
+            {
+                initialResponse = await SubsidyClient.SearchAsync<Subsidy>(scr => scr
+                    .From(0)
+                    .Take(scrollSize)
+                    .MatchAll()
+                    .Scroll(scrollTimeout));
+            }
+            else
+            {
+                initialResponse = await SubsidyClient.SearchAsync<Subsidy>(scr => scr
+                    .From(0)
+                    .Take(scrollSize)
+                    .Query(q => query)
+                    .Scroll(scrollTimeout));
+            }
+
+            if (!initialResponse.IsValid || string.IsNullOrEmpty(initialResponse.ScrollId))
+                throw new Exception(initialResponse.ServerError.Error.Reason);
+
+            if (initialResponse.Documents.Any())
+                foreach (var dotace in initialResponse.Documents)
+                {
+                    yield return dotace;
+                }
+
+            string scrollid = initialResponse.ScrollId;
+            bool isScrollSetHasData = true;
+            while (isScrollSetHasData)
+            {
+                ISearchResponse<Subsidy> loopingResponse = await SubsidyClient.ScrollAsync<Subsidy>(scrollTimeout, scrollid);
+                if (loopingResponse.IsValid)
+                {
+                    foreach (var dotace in loopingResponse.Documents)
+                    {
+                        yield return dotace;
+                    }
+                    scrollid = loopingResponse.ScrollId;
+                }
+                isScrollSetHasData = loopingResponse.Documents.Any();
+            }
+
+            _ = await SubsidyClient.ClearScrollAsync(new ClearScrollRequest(scrollid));
+        }
+        
+        public static IAsyncEnumerable<Subsidy> GetDotaceForIcoAsync(string ico)
+        {
+            QueryContainer qc = new QueryContainerDescriptor<Subsidy>()
+                .Term(f => f.Common.Recipient.Ico, ico);
+
+            return GetAllAsync(qc);
         }
 
     }
