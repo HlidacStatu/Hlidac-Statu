@@ -134,13 +134,22 @@ namespace HlidacStatu.Web.Controllers
                 foreach (var user in users)
                 {
                     string code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
-                    var callbackUrl = Url.Page("ConfirmEmail", "Account", new { userId = user.Id, code = code },
-                        protocol: Request.Scheme);
-                    //create email
-                    var email = XLib.Emails.EmailMsg.CreateEmailMsgFromPostalTemplate("ConfirmEmail");
-                    email.Model.CallbackUrl = callbackUrl;
-                    email.To = user.Email;
-                    email.SendMe();
+                    try
+                    {
+                        var callbackUrl = Url.Page("/ConfirmEmail", "Account", new { userId = user.Id, code = code },
+                            protocol: Request.Scheme);
+                        //create email
+                        var email = XLib.Emails.EmailMsg.CreateEmailMsgFromPostalTemplate("ConfirmEmail");
+                        email.Model.CallbackUrl = callbackUrl;
+                        email.To = user.Email;
+                        email.SendMe();
+
+                    }
+                    catch (Exception e)
+                    {
+
+                        throw;
+                    }
                 }
             }
 
