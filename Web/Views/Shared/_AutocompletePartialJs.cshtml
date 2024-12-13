@@ -76,7 +76,7 @@
 @{
     var query = Context.Request.Query;
     var inputTags = AutocompleteHelper.CreateInputTagsForJs(query);
-    var inputTagsJson = JsonSerializer.Serialize(inputTags);
+    var inputTagsJson = JsonSerializer.Serialize(inputTags).Replace(@"\", @"\\"); //JSON.parse need escaped `\`
 }
 
 <script>
