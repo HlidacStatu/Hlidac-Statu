@@ -1,0 +1,19 @@
+@model HlidacStatu.Repositories.Searching.SubsidySearchResult
+
+@{
+    ViewBag.Title = "Hlídač dotací";
+    ViewBag.SubTitle = "Report po letech";
+}
+
+@section breadcrumb
+{
+    <ol class="breadcrumb">
+        <li>
+            <a href="/">Hlídač Státu</a>
+        </li>
+        <li>
+            <a href="@Url.Action("Index", "Dotace")">Hlídač Dotací</a>
+        </li>
+        <li class="active">@ViewBag.SubTitle</li>
+    </ol>
+}

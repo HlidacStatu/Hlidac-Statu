@@ -141,7 +141,7 @@ namespace HlidacStatu.Repositories
 
             if (!string.IsNullOrWhiteSpace(subsidy.Common.ProjectCode))
             {
-                projectQuery |= new QueryContainerDescriptor<Subsidy>().Term(t => t.Common.ProjectCode, subsidy.Common.ProjectCode);
+                projectQuery |= new QueryContainerDescriptor<Subsidy>().Term(t => t.Common.ProjectCode.Suffix("keyword"), subsidy.Common.ProjectCode);
             }
 
             if (!string.IsNullOrWhiteSpace(subsidy.Common.ProgramCode))
@@ -151,7 +151,7 @@ namespace HlidacStatu.Repositories
 
             if (!string.IsNullOrWhiteSpace(subsidy.Common.ProjectName))
             {
-                projectQuery |= new QueryContainerDescriptor<Subsidy>().Term(t => t.Common.ProjectName, subsidy.Common.ProjectName);
+                projectQuery |= new QueryContainerDescriptor<Subsidy>().Term(t => t.Common.ProjectName.Suffix("keyword"), subsidy.Common.ProjectName);
             }
 
             // Build the main query
