@@ -47,37 +47,28 @@ namespace HlidacStatu.Repositories
             Dictionary<int, Dictionary<Subsidy.Hint.Type, decimal>> results = new();
 
             // Parse the aggregation results
-            if (res.ElasticResults.Aggregations.Terms("perYear") is TermsAggregate<string> perYearTerms)
+            if (res.ElasticResults.Aggregations["perYear"] is BucketAggregate perYearBA)
             {
-                foreach (KeyedBucket<string> yearBucket in perYearTerms.Buckets)
+                foreach (KeyedBucket<object> perYearBucket in perYearBA.Items)
                 {
-                    // Parse the year from the bucket key
-                    if (int.TryParse(yearBucket.Key, out int year))
+                    if (int.TryParse(perYearBucket.Key.ToString(), out int year))
                     {
-                        // Initialize the inner dictionary
-                        var subsidyTypeDict = new Dictionary<Subsidy.Hint.Type, decimal>();
-
-                        var typeBuckets = yearBucket["perSubsidyType"];
-                        if (typeBuckets is BucketAggregate bucketAggregate)
+                        results.Add(year, new Dictionary<Subsidy.Hint.Type, decimal>());
+                        
+                        if (perYearBucket["perSubsidyType"] is BucketAggregate subsidyTypeBA)
                         {
-                            foreach (KeyedBucket<object> item in bucketAggregate.Items)
+                            foreach (KeyedBucket<object> subsidyTypeBucket in subsidyTypeBA.Items)
                             {
-                                if (Enum.TryParse<Subsidy.Hint.Type>(item.Key.ToString(), out var subsidyType))
+                                if (Enum.TryParse<Subsidy.Hint.Type>(subsidyTypeBucket.Key.ToString(), out var subsidyType))
                                 {
-                                    //todo
-
+                                    if (subsidyTypeBucket["sumAssumedAmount"] is ValueAggregate sumBA)
+                                    {
+                                        results[year].Add(subsidyType, Convert.ToDecimal(sumBA.Value ?? 0) );
+                                        
+                                    }
                                 }
                             }
                         }
-
-                        foreach (var typeBucket in typeBuckets.Meta)
-                        {
-
-                        }
-
-
-                        // Add to the results dictionary
-                        results[year] = subsidyTypeDict;
                     }
                 }
             }

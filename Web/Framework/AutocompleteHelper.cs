@@ -2,9 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using HlidacStatu.DS.Api;
-using HlidacStatu.Entities;
-using HlidacStatu.Extensions;
-using HlidacStatu.Repositories;
 using Microsoft.AspNetCore.Http;
 
 using Serilog;
@@ -52,79 +49,6 @@ public static class AutocompleteHelper
         }
 
         return Enumerable.Empty<Autocomplete>().ToList();
-    }
-
-    [Obsolete("use HlidacStatu.Repositories.Searching.Tools.CreateAutocompleteItemsFromParsedQuery")]
-    private static List<Autocomplete> _CreateAutocompleteItemsFromparsedQuerieForJs(List<string>? parsedQueries)
-    {
-        return null;
-/*        if (parsedQueries is null)
-            return Enumerable.Empty<Autocomplete>().ToList();
-        return parsedQueries.AsParallel().Select(CreateAutocompleteItemFromQueryForJs).ToList();
-*/
-    }
-
-    [Obsolete("use HlidacStatu.Repositories.Searching.Tools.CreateAutocompleteItemsFromParsedQuery")]
-    private static Autocomplete _CreateAutocompleteItemFromQueryForJs(string parsedQuery)
-    {
-        try
-        {
-            if (parsedQuery.StartsWith("osobaid:", StringComparison.InvariantCultureIgnoreCase))
-            {
-                var osoba = OsobaRepo.GetByNameId(parsedQuery.Substring(8));
-                if (osoba is not null)
-                {
-                    return new Autocomplete()
-                    {
-                        Id = parsedQuery,
-                        Text = osoba.FullName(),
-                        Category = Autocomplete.CategoryEnum.Person
-                    };
-                }
-            }
-            else if (parsedQuery.StartsWith("ico:", StringComparison.InvariantCultureIgnoreCase))
-            {
-                var firma = FirmaRepo.FromIco(parsedQuery.Substring(4).Trim());
-                if (firma is not null)
-                {
-                    Autocomplete.CategoryEnum kategorie = Autocomplete.CategoryEnum.Company;
-                    if (firma.TypSubjektu == Firma.TypSubjektuEnum.Obec)
-                    {
-                        kategorie = Autocomplete.CategoryEnum.City;
-                    }
-                    else if (firma.Kod_PF > 110 && firma.JsemOVM() && firma.IsInRS == 1)
-                    {
-                        kategorie = Autocomplete.CategoryEnum.Authority;
-                    }
-        
-                    return new Autocomplete()
-                    {
-                        Id = parsedQuery,
-                        Text = firma.Jmeno,
-                        Category = kategorie
-                    };
-                }
-            }
-            else if (parsedQuery.StartsWith("oblast:", StringComparison.InvariantCultureIgnoreCase))
-            {
-                return new Autocomplete()
-                {
-                    Id = parsedQuery,
-                    Text = parsedQuery,
-                    Category = Autocomplete.CategoryEnum.Oblast
-                };
-            }
-        }
-        catch (Exception e)
-        {
-            _logger.Error(e, $"During autocomplete usage an error occured. CreateAutocompleteItemFromQuery in Wrapper. Parsed query [{parsedQuery}]");
-        }
-
-        return new Autocomplete()
-        {
-            Id = parsedQuery,
-            Text = parsedQuery
-        };
     }
     
     public static (string queryString, string queryTagLengths) CreateQueryWithOffsets(List<string> input)

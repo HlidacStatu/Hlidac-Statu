@@ -61,10 +61,10 @@ namespace HlidacStatu.Web.Controllers
         
         public async Task<ActionResult> PoLetech()
         {
-            Dictionary<int, Dictionary<Subsidy.Hint.Type, decimal>> dotace = null;
-
-
-            return View(dotace);
+            var data = await SubsidyRepo.PoLetechReportAsync();
+        
+        
+            return View(data);
         }    
     }
 }
