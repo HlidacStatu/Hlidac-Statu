@@ -61,68 +61,9 @@ namespace HlidacStatu.Web.Controllers
         
         public async Task<ActionResult> PoLetech()
         {
-            AggregationContainerDescriptor<Subsidy> aggs = new AggregationContainerDescriptor<Subsidy>()
-                .Terms("perYear", t => t
-                    .Field(f => f.Common.ApprovedYear)
-                    .Size(65500)
-                    .Aggregations(yearAggs => yearAggs
-                        .Terms("perSubsidyType", st => st
-                            .Field(f => f.Hints.SubsidyType)
-                            .Size(65500)
-                            .Aggregations(typeAggs => typeAggs
-                                .Sum("sumAssumedAmount", sa => sa
-                                    .Field(f => f.AssumedAmount)
-                                )
-                            )
-                        )
-                    )
-                );
-            
-            var dotace = await SubsidyRepo.Searching.SimpleSearchAsync("", 1, 0, "666", anyAggregation: aggs);
-            if (dotace is null)
-            {
-                return NotFound();
-            }
+            Dictionary<int, Dictionary<Subsidy.Hint.Type, decimal>> dotace = null;
 
-            // Initialize the results dictionary
-            Dictionary<int, Dictionary<Subsidy.Hint.Type, decimal>> results = new();
 
-            // Parse the aggregation results
-            if (dotace.ElasticResults.Aggregations.Terms("perYear") is TermsAggregate<string> perYearTerms)
-            {
-                foreach (var yearBucket in perYearTerms.Buckets)
-                {
-                    // Parse the year from the bucket key
-                    if (int.TryParse(yearBucket.Key, out int year))
-                    {
-                        // Initialize the inner dictionary
-                        var subsidyTypeDict = new Dictionary<Subsidy.Hint.Type, decimal>();
-                        
-                        var typeBuckets = yearBucket["perSubsidyType"];
-                        if (typeBuckets is BucketAggregate bucketAggregate)
-                        {
-                            foreach (var item in bucketAggregate.Items)
-                            {
-                                if (Enum.TryParse<Subsidy.Hint.Type>(item, out var subsidyType))
-                                {
-                                    //todo
-                                
-                                }
-                            }
-                        }
-                        
-                        foreach (var typeBucket in typeBuckets.Meta)
-                        {
-                            
-                        }
-                       
-
-                        // Add to the results dictionary
-                        results[year] = subsidyTypeDict;
-                    }
-                }
-            }
-            
             return View(dotace);
         }    
     }
