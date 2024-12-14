@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using HlidacStatu.Entities;
-using HlidacStatu.Entities.Entities;
+using HlidacStatu.Entities;
 using Microsoft.EntityFrameworkCore;
 
 namespace HlidacStatu.Repositories;

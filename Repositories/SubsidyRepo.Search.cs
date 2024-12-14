@@ -9,7 +9,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using HlidacStatu.Connectors;
-using HlidacStatu.Entities.Entities;
+using HlidacStatu.Entities;
 
 namespace HlidacStatu.Repositories
 {

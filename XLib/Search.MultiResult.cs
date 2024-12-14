@@ -338,7 +338,7 @@ namespace HlidacStatu.XLib
                         sw.Start();
                         res.Dotace = await SubsidyRepo.Searching.SimpleSearchAsync(
                                 new SubsidySearchResult { Q = query, Page = 1, PageSize = dotaceSize, Order = order },
-                                anyAggregation: new Nest.AggregationContainerDescriptor<Entities.Entities.Subsidy>().Sum("souhrn", s => s.Field(f => f.AssumedAmount))
+                                anyAggregation: new Nest.AggregationContainerDescriptor<Entities.Subsidy>().Sum("souhrn", s => s.Field(f => f.AssumedAmount))
                             );
                         sw.Stop();
                         res.Dotace.ElapsedTime = sw.Elapsed;

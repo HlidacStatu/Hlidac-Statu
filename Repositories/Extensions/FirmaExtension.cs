@@ -2,7 +2,7 @@ using Devmasters;
 using HlidacStatu.Connectors;
 using HlidacStatu.DS.Graphs;
 using HlidacStatu.Entities;
-using HlidacStatu.Entities.Entities;
+using HlidacStatu.Entities;
 using HlidacStatu.Entities.KIndex;
 using HlidacStatu.Entities.Views;
 using HlidacStatu.Lib.Data.External.RPP;

@@ -1,7 +1,7 @@
 @using HlidacStatu.Repositories
-@using HlidacStatu.Entities.Entities
+@using HlidacStatu.Entities
 
-@model List<HlidacStatu.Entities.Entities.PuOrganizace>
+@model List<HlidacStatu.Entities.PuOrganizace>
 
 @{
     var platyHlavounu = Model.SelectMany(o => o.Platy).Where(p => p.Rok == PuRepo.DefaultYear && p.JeHlavoun == true)

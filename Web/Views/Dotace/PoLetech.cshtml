@@ -1,6 +1,6 @@
-@using HlidacStatu.Entities.Entities
+@using HlidacStatu.Entities
 @using HlidacStatu.XLib.Render
-@model Dictionary<int, Dictionary<HlidacStatu.Entities.Entities.Subsidy.Hint.Type, decimal>>
+@model Dictionary<int, Dictionary<HlidacStatu.Entities.Subsidy.Hint.Type, decimal>>
 
 @{
     ViewBag.Title = "Hlídač dotací";
@@ -28,7 +28,7 @@
 }
 
 @{
-    Dictionary<HlidacStatu.Entities.Entities.Subsidy.Hint.Type, Dictionary<int, decimal>> objemyDotaci = new();
+    Dictionary<HlidacStatu.Entities.Subsidy.Hint.Type, Dictionary<int, decimal>> objemyDotaci = new();
     
     var dotaceData = new ReportDataSource<(int Rok, string TypDotace, decimal Castka)>(
         new[]

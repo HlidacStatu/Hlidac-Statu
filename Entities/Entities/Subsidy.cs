@@ -4,10 +4,10 @@ using System.Text;
 using System.Text.Json;
 using Nest;
 
-namespace HlidacStatu.Entities.Entities;
+namespace HlidacStatu.Entities;
 
 [ElasticsearchType(IdProperty = nameof(Id))]
-public class Subsidy
+public partial class Subsidy
 {
     [Keyword]
     public string Id
@@ -155,39 +155,5 @@ public class Subsidy
 
         [Ignore]
         public string DisplayName => string.IsNullOrWhiteSpace(HlidacName) ? Name : HlidacName;
-    }
-    
-    public class Hint
-    {
-        /// <summary>
-        /// Info zda-li se jedná o pravděpodobnou duplicitní dotace
-        /// </summary>
-        [Keyword]
-        public bool IsDuplicate { get; set; } = false;
-        
-        /// <summary>
-        /// Pokud jde o duplicitní dotaci, tak odkaz na originál zde
-        /// </summary>
-        [Keyword]
-        public string OriginalSubsidyId { get; set; }
-        
-        /// <summary>
-        /// Legislativa - info, jestli jde o státní/evropskou dotaci, krajskou, obecní a nebo investiční pobídka
-        /// </summary>
-        [Keyword]
-        public Type SubsidyType { get; set; }
-        
-        public enum Type
-        {
-            Unknown,
-            Evropska,
-            Krajska,
-            Obecni,
-            InvesticniPobidka,
-        }
-        
-        [Date]
-        public DateTime? DuplicateCalculated { get; set; }
-        
     }
 }

@@ -1,4 +1,4 @@
-﻿using HlidacStatu.Entities.Entities;
+﻿using HlidacStatu.Entities;
 using HlidacStatu.Entities.Views;
 
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;

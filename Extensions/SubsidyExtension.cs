@@ -1,5 +1,5 @@
 using System.Dynamic;
-using HlidacStatu.Entities.Entities;
+using HlidacStatu.Entities;
 using HlidacStatu.Repositories;
 
 namespace HlidacStatu.Extensions;

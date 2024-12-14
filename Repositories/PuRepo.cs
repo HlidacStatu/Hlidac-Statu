@@ -2,7 +2,7 @@ using Devmasters.Collections;
 using EnumsNET;
 using HlidacStatu.Connectors;
 using HlidacStatu.Entities;
-using HlidacStatu.Entities.Entities;
+using HlidacStatu.Entities;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;

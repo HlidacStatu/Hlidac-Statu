@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using HlidacStatu.Entities.Entities;
+using HlidacStatu.Entities;
 
 namespace HlidacStatu.Repositories.Searching
 {
