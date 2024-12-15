@@ -573,9 +573,17 @@ namespace HlidacStatu.Repositories.Searching
             return res;
         }
 
-
-        public static async Task<DataResultset<string>> GetAllIdsAsync(this ElasticClient sourceESClient, int maxDegreeOfParallelism,
+        public static async Task<DataResultset<string>> GetAllSmlouvyIdsAsync(this ElasticClient sourceESClient, int maxDegreeOfParallelism,
             string query = null, int batchSize = 100,
+            Action<string> logOutputFunc = null, Action<Devmasters.Batch.ActionProgressData> progressOutputFunc = null,
+            IMonitor monitor = null)
+        {
+            var qs = Repositories.SmlouvaRepo.Searching.GetSimpleQuery(query);
+            return await GetAllIdsAsync(sourceESClient, maxDegreeOfParallelism, qs, batchSize);
+
+        }
+        public static async Task<DataResultset<string>> GetAllIdsAsync(this ElasticClient sourceESClient, int maxDegreeOfParallelism,
+            QueryContainer query, int batchSize = 100,
             Action<string> logOutputFunc = null, Action<Devmasters.Batch.ActionProgressData> progressOutputFunc = null,
             IMonitor monitor = null)
         {
@@ -672,7 +680,7 @@ namespace HlidacStatu.Repositories.Searching
             return res;
         }
 
-        public static List<string> SimpleGetAllIds(this ElasticClient sourceESClient, int maxDegreeOfParallelism,
+        public static List<string> SimpleGetAllSmlouvyIds(this ElasticClient sourceESClient, int maxDegreeOfParallelism,
                 string simplequery, int batchSize = 100)
         {
             var qs = Repositories.SmlouvaRepo.Searching.GetSimpleQuery(simplequery);

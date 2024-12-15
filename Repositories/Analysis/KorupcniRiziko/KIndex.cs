@@ -38,7 +38,7 @@ namespace HlidacStatu.Repositories.Analysis.KorupcniRiziko
 
         private static void refreshCache()
         {
-            kindexReadyIcos = HlidacStatu.Repositories.Searching.Tools.GetAllIdsAsync(
+            kindexReadyIcos = HlidacStatu.Repositories.Searching.Tools.GetAllSmlouvyIdsAsync(
                 Manager.GetESClient_KIndexAsync().Result,
                 4,
                 "roky.kIndexReady:true"
