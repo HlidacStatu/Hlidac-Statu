@@ -49,8 +49,43 @@ namespace HlidacStatu.Repositories
             }
 
 
-            
+            private static volatile Devmasters.Cache.Redis.Manager<string[], QueryBatch> cacheSubsidy
+                = Devmasters.Cache.Redis.Manager<string[], QueryBatch>.GetSafeInstance(
+                    "cachedIdsSubsidy",
+                    q => GetSubsidyIdsAsync(q).ConfigureAwait(false).GetAwaiter().GetResult(),
+                    TimeSpan.FromHours(24),
+                    Devmasters.Config.GetWebConfigValue("RedisServerUrls").Split(';'),
+                    Devmasters.Config.GetWebConfigValue("RedisBucketName"),
+                    Devmasters.Config.GetWebConfigValue("RedisUsername"),
+                    Devmasters.Config.GetWebConfigValue("RedisCachePassword"),
+                    keyValueSelector: key => key.TaskPrefix + Devmasters.Crypto.Hash.ComputeHashToHex(key.Query)
+                    );
+
+            public static string[] Subsidy(QueryBatch query, bool forceUpdate = false)
+            {
+                if (forceUpdate)
+                {
+                    cacheSubsidy.Delete(query);
+                }
+
+                return cacheSubsidy.Get(query);
+
+            }
+
+
         }
+
+
+        public static async Task<string[]> GetSubsidyIdsAsync(QueryBatch query)
+        {
+            var client = await Manager.GetESClient_SubsidyAsync();
+
+            var ids = await Searching.Tools.GetAllIdsAsync(client, 10, query.Query,
+                logOutputFunc: query.LogOutputFunc, progressOutputFunc: query.ProgressOutputFunc);
+
+            return ids.Result.ToArray();
+        }
+
         public static async Task<string[]> GetSmlouvyIdAsync(QueryBatch query)
         {
             var client = await Manager.GetESClientAsync();
