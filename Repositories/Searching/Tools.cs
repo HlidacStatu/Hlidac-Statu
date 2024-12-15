@@ -578,19 +578,6 @@ namespace HlidacStatu.Repositories.Searching
             Action<string> logOutputFunc = null, Action<Devmasters.Batch.ActionProgressData> progressOutputFunc = null,
             IMonitor monitor = null)
         {
-            var qs = Repositories.SmlouvaRepo.Searching.GetSimpleQuery(query);
-            return await GetAllIdsAsync(sourceESClient, maxDegreeOfParallelism, qs, batchSize);
-
-        }
-        public static async Task<DataResultset<string>> GetAllIdsAsync(this ElasticClient sourceESClient, int maxDegreeOfParallelism,
-            QueryContainer query, int batchSize = 100,
-            Action<string> logOutputFunc = null, Action<Devmasters.Batch.ActionProgressData> progressOutputFunc = null,
-            IMonitor monitor = null)
-        {
-            if (maxDegreeOfParallelism < 2)
-                throw new ArgumentOutOfRangeException("maxDegreeOfParallelism", "maxDegreeOfParallelism cannot be smaller than 2");
-
-            long total = 0;
             var qs = new QueryContainerDescriptor<object>().MatchAll();
             if (!string.IsNullOrEmpty(query))
             {
@@ -599,10 +586,24 @@ namespace HlidacStatu.Repositories.Searching
 
                 qs = Repositories.SmlouvaRepo.Searching.GetSimpleQuery(query);
             }
+
+            return await GetAllIdsAsync(sourceESClient, maxDegreeOfParallelism, qs, batchSize,
+                logOutputFunc, progressOutputFunc, monitor);
+
+        }
+        public static async Task<DataResultset<string>> GetAllIdsAsync(this ElasticClient sourceESClient, int maxDegreeOfParallelism,
+            QueryContainer queryContainer, int batchSize = 100,
+            Action<string> logOutputFunc = null, Action<Devmasters.Batch.ActionProgressData> progressOutputFunc = null,
+            IMonitor monitor = null)
+        {
+            if (maxDegreeOfParallelism < 2)
+                throw new ArgumentOutOfRangeException("maxDegreeOfParallelism", "maxDegreeOfParallelism cannot be smaller than 2");
+
+            long total = 0;
             var resCount = await sourceESClient.SearchAsync<object>(a => a
                 .Source(false)
                 .Size(0)
-                .Query(q => qs)
+                .Query(q => queryContainer)
                 .TrackTotalHits(true)
                 );
             if (resCount.IsValid)
@@ -615,7 +616,7 @@ namespace HlidacStatu.Repositories.Searching
                 .Search(s => s
                     .Size(batchSize)
                     .Source(false)
-                    .Query(q => qs)
+                    .Query(q => queryContainer)
                 )
             );
 
@@ -651,7 +652,7 @@ namespace HlidacStatu.Repositories.Searching
                 },
                 onError: e =>
                 {
-                    _logger.Error(e, "Scroll error occured cl:{client} q:{query}", sourceESClient.ConnectionSettings.DefaultIndex, query);
+                    _logger.Error(e, "Scroll error occured cl:{client} q:{query}", sourceESClient.ConnectionSettings.DefaultIndex, queryContainer);
                     res.ErrorOccurred = true;
                     res.Exception = e;
                     if (logOutputFunc != null)
