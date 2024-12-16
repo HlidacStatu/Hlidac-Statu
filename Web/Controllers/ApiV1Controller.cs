@@ -136,8 +136,7 @@ namespace HlidacStatu.Web.Controllers
                     string code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
                     try
                     {
-                        var callbackUrl = Url.Page("/ConfirmEmail", "Account", new { userId = user.Id, code = code },
-                            protocol: Request.Scheme);
+                        var callbackUrl = $"https://www.hlidacstatu.cz/identity/account/ConfirmEmail?userId={user.Id}&code={code}"; 
                         //create email
                         var email = XLib.Emails.EmailMsg.CreateEmailMsgFromPostalTemplate("ConfirmEmail");
                         email.Model.CallbackUrl = callbackUrl;
