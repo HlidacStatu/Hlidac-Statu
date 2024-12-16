@@ -271,11 +271,11 @@ namespace HlidacStatu.Repositories
 
         }
 
-        public static IEnumerable<(string ico, string jmeno)> GetJmenoAndIcoTuples()
+        public static IEnumerable<(string ico, string jmeno)> GetJmenoAndIcoTuplesExceptFO()
         {
             using (PersistLib p = new PersistLib())
             {
-                var reader = p.ExecuteReader(DirectDB.DefaultCnnStr, CommandType.Text, "select ico, jmeno from firma where ISNUMERIC(ico) = 1", null);
+                var reader = p.ExecuteReader(DirectDB.DefaultCnnStr, CommandType.Text, "select ico, jmeno from firma where ISNUMERIC(ico) = 1 AND Kod_PF >= 110", null);
                 while (reader.Read())
                 {
                     string ico = reader.GetString(0).Trim();
