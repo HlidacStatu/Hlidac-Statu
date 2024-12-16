@@ -208,10 +208,14 @@ namespace HlidacStatu.Repositories
                 projectQuery |= new QueryContainerDescriptor<Subsidy>().Term(t => t.Common.ProgramCode, subsidy.Common.ProgramCode);
             }
 
-            if (!string.IsNullOrWhiteSpace(subsidy.Common.ProjectName))
+            // 255 there is because ES ignores 256+ chars when creating keywords...  
+            if (!string.IsNullOrWhiteSpace(subsidy.Common.ProjectName) && subsidy.Common.ProjectName.Length <= 255 )
             {
                 projectQuery |= new QueryContainerDescriptor<Subsidy>().Term(t => t.Common.ProjectName.Suffix("keyword"), subsidy.Common.ProjectName);
             }
+
+            if (projectQuery is null)
+                return null;
 
             // Build the main query
             var query = new QueryContainerDescriptor<Subsidy>()
