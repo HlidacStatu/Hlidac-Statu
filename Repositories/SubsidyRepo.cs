@@ -58,7 +58,7 @@ namespace HlidacStatu.Repositories
                     if (int.TryParse(perYearBucket.Key.ToString(), out int year))
                     {
                         results.Add(year, new Dictionary<Subsidy.Hint.Type, decimal>());
-                        
+
                         if (perYearBucket["perSubsidyType"] is BucketAggregate subsidyTypeBA)
                         {
                             foreach (KeyedBucket<object> subsidyTypeBucket in subsidyTypeBA.Items)
@@ -67,8 +67,8 @@ namespace HlidacStatu.Repositories
                                 {
                                     if (subsidyTypeBucket["sumAssumedAmount"] is ValueAggregate sumBA)
                                     {
-                                        results[year].Add(subsidyType, Convert.ToDecimal(sumBA.Value ?? 0) );
-                                        
+                                        results[year].Add(subsidyType, Convert.ToDecimal(sumBA.Value ?? 0));
+
                                     }
                                 }
                             }
@@ -98,8 +98,20 @@ namespace HlidacStatu.Repositories
                 };
         }
 
+        public static async Task<Subsidy.RawData> GetRawDataAsync(string subsidyId)
+        {
+            if (string.IsNullOrEmpty(subsidyId )) 
+                throw new ArgumentNullException(nameof(subsidyId));
 
-        public static async Task SaveRawData(string subsidyId, Dictionary<string, object?> data)
+            var response = await SubsidyRawDataClient.GetAsync<Subsidy.RawData>(subsidyId);
+
+            return response.IsValid
+                ? response.Source
+                : null;
+
+        }
+
+        public static async Task SaveRawDataAsync(string subsidyId, Dictionary<string, object?> data)
         {
             var item = new Subsidy.RawData()
             {
@@ -147,7 +159,7 @@ namespace HlidacStatu.Repositories
                 throw new ApplicationException(res.ServerError?.ToString());
             }
             Logger.Debug($"Subsidy {subsidy.Metadata.RecordNumber} from {subsidy.Metadata.DataSource}/{subsidy.Metadata.FileName} saved");
-            
+
             //todo: uncomment once ready for statistic recalculation
             // if(subsidy.Recipient.Ico is not null)
             //     RecalculateItemRepo.AddFirmaToProcessingQueue(subsidy.Recipient.Ico, Entities.RecalculateItem.StatisticsTypeEnum.Dotace, $"VZ {subsidy.Id}");
@@ -168,7 +180,7 @@ namespace HlidacStatu.Repositories
 
         public static async Task SetHiddenSubsidies(HashSet<string> subsidiesToHideId)
         {
-            if(!subsidiesToHideId.Any())
+            if (!subsidiesToHideId.Any())
                 return;
 
             foreach (var subsidyToHideId in subsidiesToHideId)
@@ -185,13 +197,13 @@ namespace HlidacStatu.Repositories
                         .Source("ctx._source.isHidden = true")
                     )
                 );
-    
+
                 if (!updateByQueryResponse.IsValid)
                 {
                     Logger.Error(updateByQueryResponse.OriginalException, $"Problem during setting hidden subsidies for {subsidiesToHideId},\n Debug info:{updateByQueryResponse.DebugInformation} ");
                 }
             }
-            
+
         }
 
         public static HashSet<string> GetAllIds(string datasource, string fileName)
@@ -215,13 +227,13 @@ namespace HlidacStatu.Repositories
                 throw;
             }
         }
-        
+
         public static async Task<List<Subsidy>> FindDuplicatesAsync(Subsidy subsidy)
         {
             // můžeme hledat duplicity jen u firem, lidi nedokážeme správně identifikovat
-            if(string.IsNullOrWhiteSpace(subsidy.Recipient.Ico))
+            if (string.IsNullOrWhiteSpace(subsidy.Recipient.Ico))
                 return null;
-            
+
             // Build the conditional query for ProjectCode OR ProgramCode OR ProjectName
             QueryContainer projectQuery = null;
 
@@ -236,7 +248,7 @@ namespace HlidacStatu.Repositories
             }
 
             // 255 there is because ES ignores 256+ chars when creating keywords...  
-            if (!string.IsNullOrWhiteSpace(subsidy.ProjectName) && subsidy.ProjectName.Length <= 255 )
+            if (!string.IsNullOrWhiteSpace(subsidy.ProjectName) && subsidy.ProjectName.Length <= 255)
             {
                 projectQuery |= new QueryContainerDescriptor<Subsidy>().Term(t => t.ProjectName.Suffix("keyword"), subsidy.ProjectName);
             }
@@ -268,11 +280,11 @@ namespace HlidacStatu.Repositories
                     res = await SubsidyClient.SearchAsync<Subsidy>(s => s
                         .Size(9000)
                         .Query(q => query)
-                    );  
+                    );
                 }
-                
+
                 return res.Documents.ToList();
-                
+
             }
             catch (Exception ex)
             {
@@ -280,7 +292,7 @@ namespace HlidacStatu.Repositories
                 throw;
             }
         }
-        
+
         public static async Task<Subsidy> GetAsync(string idDotace)
         {
             if (idDotace == null) throw new ArgumentNullException(nameof(idDotace));
@@ -291,7 +303,7 @@ namespace HlidacStatu.Repositories
                 ? response.Source
                 : null;
         }
-        
+
         /// <summary>
         /// Get all subsidies. If query is null, then it matches all except hidden ones
         /// </summary>
@@ -363,7 +375,7 @@ namespace HlidacStatu.Repositories
 
             _ = await SubsidyClient.ClearScrollAsync(new ClearScrollRequest(scrollid));
         }
-        
+
         public static IAsyncEnumerable<Subsidy> GetDotaceForIcoAsync(string ico)
         {
             QueryContainer qc = new QueryContainerDescriptor<Subsidy>()
