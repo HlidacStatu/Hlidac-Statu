@@ -136,6 +136,8 @@ namespace HlidacStatu.Repositories
             newRecord.SubsidyAmount += oldRecord.SubsidyAmount;
             newRecord.PayedAmount += oldRecord.PayedAmount;
             newRecord.ReturnedAmount += oldRecord.ReturnedAmount;
+            newRecord.Rozhodnuti.AddRange(oldRecord.Rozhodnuti);
+            newRecord.Cerpani.AddRange(oldRecord.Cerpani);
 
             return newRecord;
         }
