@@ -75,7 +75,7 @@ public partial class Subsidy
     public string DisplayProject => string.IsNullOrWhiteSpace(ProjectName) ? ProjectCode : ProjectName;
     
     [Object]
-    public List<MoneySourceItem> MoneySource { get; set; }
+    public List<RozhodnutiItem> Rozhodnuti { get; set; }
     [Object]
     public List<CerpaniItem> Cerpani { get; set; }
     
@@ -129,11 +129,6 @@ public partial class Subsidy
 
 
     }
-    
-    public class CommonInfo
-    {
-        
-    }
 
     public class SubsidyRecipient
     {
@@ -161,18 +156,18 @@ public partial class Subsidy
         public string DisplayName => string.IsNullOrWhiteSpace(HlidacName) ? Name : HlidacName;
     }
     
-    public class MoneySourceItem
+    public class RozhodnutiItem
     {
-        public string Payer { get; set; }
+        public string? FinancniZdroj { get; set; }
         [Number]
-        public decimal Amount { get; set; }
+        public decimal? Amount { get; set; }
     }
     
     public class CerpaniItem
     {
         [Number]
-        public int Year { get; set; }
+        public int? Year { get; set; }
         [Number]
-        public decimal Amount { get; set; }
+        public decimal? Amount { get; set; }
     }
 }
