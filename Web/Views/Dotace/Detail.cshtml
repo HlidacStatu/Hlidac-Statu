@@ -8,10 +8,10 @@
     ViewBag.Title = "Hlídač dotací";
     ViewBag.SubTitle = "Detail dotace";
 
-    string duplicitaQuery = $"ico:{Model.Common.Recipient.Ico} AND kodProjektu:\"{Model.Common.ProjectCode}\"";
+    string duplicitaQuery = $"ico:{Model.Recipient.Ico} AND kodProjektu:\"{Model.ProjectCode}\"";
     List<Subsidy> duplicity = null;
-    if (!string.IsNullOrWhiteSpace(Model.Common.Recipient.Ico)
-        && !string.IsNullOrWhiteSpace(Model.Common.ProjectCode))
+    if (!string.IsNullOrWhiteSpace(Model.Recipient.Ico)
+        && !string.IsNullOrWhiteSpace(Model.ProjectCode))
     {
         var foundDuplicates = await SubsidyRepo.Searching.SimpleSearchAsync(duplicitaQuery, 0, 1000, SubsidySearchResult.SubsidyOrderResult.FastestForScroll);
         if (foundDuplicates.HasResult)
@@ -34,14 +34,14 @@
     </ol>
 }
 
-<link rel="stylesheet" type="text/css" href="//cdn.datatables.net/1.13.4/css/jquery.dataTables.css"/>
-<script type="text/javascript" charset="utf8" src="//cdn.datatables.net/1.13.4/js/jquery.dataTables.js"></script>
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.13.4/css/jquery.dataTables.css"/>
+<script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.js"></script>
 
 <partial name="_SearchForm" model="@(new HlidacStatu.Repositories.Searching.SubsidySearchResult())"/>
 
 <h2>
     <add-bookmark item="@Model"></add-bookmark>
-    Detail dotace "@Model.Common.DisplayProject"
+    Detail dotace "@Model.DisplayProject"
 </h2>
 
 @if (duplicity != null && duplicity.Count > 1)
@@ -58,7 +58,7 @@
     <tr>
         <th>Příjemce dotace</th>
         <td>
-            @Model.Common.Recipient.DisplayName @(Model.Common.Recipient.YearOfBirth is null ? "" : $"({Model.Common.Recipient.YearOfBirth})")
+            @Model.Recipient.DisplayName @(Model.Recipient.YearOfBirth is null ? "" : $"({Model.Recipient.YearOfBirth})")
             @if (await Model.MaSkutecnehoMajiteleAsync() == false)
             {
                 <br/>
@@ -75,61 +75,61 @@
     <tr>
         <th>Příjemce dotace - jak je uvedeno v datech</th>
         <td>
-            @(await Html.KIndexLabelLinkAsync(Model.Common.Recipient.Ico))@Model.Common.Recipient.Name
+            @(await Html.KIndexLabelLinkAsync(Model.Recipient.Ico))@Model.Recipient.Name
         </td>
     </tr>
     <tr>
         <th>IČO</th>
         <td>
-            @if (Model.Common.Recipient.Ico != "00000000")
+            @if (Model.Recipient.Ico != "00000000")
             {
-                <a href="/dotace/hledat?q=ico:@Model.Common.Recipient.Ico" title="Vyhledat všechny dotace pro tento subjekt">@Model.Common.Recipient.Ico</a>
+                <a href="/dotace/hledat?q=ico:@Model.Recipient.Ico" title="Vyhledat všechny dotace pro tento subjekt">@Model.Recipient.Ico</a>
             }
         </td>
     </tr>
     <tr>
         <th>Obec příjemce</th>
         <td>
-            @(Model.Common.Recipient.Obec)
+            @(Model.Recipient.Obec)
         </td>
     </tr>
     <tr>
         <th>Okres příjemce</th>
         <td>
-            @(Model.Common.Recipient.Okres)
+            @(Model.Recipient.Okres)
         </td>
     </tr>
     <tr>
         <th>Kód projektu</th>
         <td>
-            @if (!string.IsNullOrWhiteSpace(Model.Common.ProjectCode))
+            @if (!string.IsNullOrWhiteSpace(Model.ProjectCode))
             {
-                <a href="/dotace/hledat?q=kodProjektu:@Model.Common.ProjectCode" title="Vyhledat podobné dotace">@Model.Common.ProjectCode</a>
+                <a href="/dotace/hledat?q=kodProjektu:@Model.ProjectCode" title="Vyhledat podobné dotace">@Model.ProjectCode</a>
             }
         </td>
     </tr>
     <tr>
         <th>Název projektu</th>
-        <td>@Model.Common.ProjectName</td>
+        <td>@Model.ProjectName</td>
     </tr>
     <tr>
         <th>Název programu</th>
-        <td>@(Model.Common.ProgramName ?? "neuveden")</td>
+        <td>@(Model.ProgramName ?? "neuveden")</td>
     </tr>
     <tr>
         <th>Kód programu</th>
-        <td>@(Model.Common.ProgramCode ?? "neuveden")</td>
+        <td>@(Model.ProgramCode ?? "neuveden")</td>
     </tr>
     <tr>
         <th>Rok schválení dotace</th>
-        <td>@(Model.Common.ApprovedYear)</td>
+        <td>@(Model.ApprovedYear)</td>
     </tr>
     <tr>
         <th>Schválená částka</th>
         <td>
-            @if (Model.Common.SubsidyAmount.HasValue)
+            @if (Model.SubsidyAmount.HasValue)
             {
-                @HlidacStatu.Util.RenderData.NicePriceHtml((decimal)Model.Common.SubsidyAmount)
+                @HlidacStatu.Util.RenderData.NicePriceHtml((decimal)Model.SubsidyAmount)
             }
             else
             {
@@ -140,9 +140,9 @@
     <tr>
         <th>Vyplacená částka</th>
         <td>
-            @if (Model.Common.PayedAmount.HasValue)
+            @if (Model.PayedAmount.HasValue)
             {
-                @HlidacStatu.Util.RenderData.NicePriceHtml((decimal)Model.Common.PayedAmount)
+                @HlidacStatu.Util.RenderData.NicePriceHtml((decimal)Model.PayedAmount)
             }
             else
             {
@@ -153,9 +153,9 @@
     <tr>
         <th>Vrácená částka</th>
         <td>
-            @if (Model.Common.ReturnedAmount.HasValue)
+            @if (Model.ReturnedAmount.HasValue)
             {
-                @HlidacStatu.Util.RenderData.NicePriceHtml((decimal)Model.Common.ReturnedAmount)
+                @HlidacStatu.Util.RenderData.NicePriceHtml((decimal)Model.ReturnedAmount)
             }
             else
             {
@@ -166,13 +166,13 @@
     <tr>
         <th>Správce dotace</th>
         <td>
-            @if (!string.IsNullOrWhiteSpace(Model.Common.SubsidyProviderIco))
+            @if (!string.IsNullOrWhiteSpace(Model.SubsidyProviderIco))
             {
-                <a asp-controller="Subjekt" asp-action="Index" asp-route-id="@Model.Common.SubsidyProviderIco">@(Model.Common.SubsidyProvider)</a>
+                <a asp-controller="Subjekt" asp-action="Index" asp-route-id="@Model.SubsidyProviderIco">@(Model.SubsidyProvider)</a>
             }
             else
             {
-                <p>@(Model.Common.SubsidyProvider)</p>
+                <p>@(Model.SubsidyProvider)</p>
             }
         </td>
     </tr>
@@ -180,19 +180,19 @@
     <tr>
         <th>Zdroj dat</th>
         <td>
-            @Model.DataSource
+            @Model.Metadata.DataSource
         </td>
     </tr>
     <tr>
         <th>Datový soubor</th>
         <td>
-            @Model.FileName
+            @Model.Metadata.FileName
         </td>
     </tr>
     <tr>
         <th>Datum zpracování</th>
         <td>
-            @Model.ProcessedDate.ToString("dd.MM.yyyy")
+            @Model.Metadata.ProcessedDate.ToString("dd.MM.yyyy")
         </td>
     </tr>
     <tr>

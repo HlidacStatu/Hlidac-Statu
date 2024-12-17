@@ -1,10 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using Devmasters.Enums;
 using Nest;
-using static HlidacStatu.Entities.Smlouva.SClassification;
 
 namespace HlidacStatu.Entities;
 
@@ -243,14 +241,14 @@ public partial class Subsidy
             if (!string.IsNullOrEmpty(item.Category))
                 cats.AddRange(CategoryNameToCalculatedCategory(item.Category) ?? Array.Empty<Category>());
 
-            if (!cats.Any() && HlidacStatu.Util.DataValidators.CheckCZICO(item.Common.SubsidyProviderIco))
-                cats.AddRange(_textToCalculatedCategory(CategoryNameDictionary, item.Common.SubsidyProviderIco));
+            if (!cats.Any() && HlidacStatu.Util.DataValidators.CheckCZICO(item.SubsidyProviderIco))
+                cats.AddRange(_textToCalculatedCategory(CategoryNameDictionary, item.SubsidyProviderIco));
 
-            if (!cats.Any() && !string.IsNullOrEmpty(item.Common.ProgramCode))
-                cats.AddRange(_textToCalculatedCategory(CategoryNameDictionary, item.Common.ProgramCode));
+            if (!cats.Any() && !string.IsNullOrEmpty(item.ProgramCode))
+                cats.AddRange(_textToCalculatedCategory(CategoryNameDictionary, item.ProgramCode));
 
-            if (!cats.Any() && !string.IsNullOrEmpty(item.Common.ProgramName))
-                cats.AddRange(_textToCalculatedCategory(CategoryNameDictionary, item.Common.ProgramName));
+            if (!cats.Any() && !string.IsNullOrEmpty(item.ProgramName))
+                cats.AddRange(_textToCalculatedCategory(CategoryNameDictionary, item.ProgramName));
 
             return cats;
         }
