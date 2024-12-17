@@ -7,6 +7,8 @@ using HlidacStatu.Connectors;
 using HlidacStatu.Entities;
 using HlidacStatu.Repositories.Searching;
 using Serilog;
+using Elasticsearch.Net;
+using Newtonsoft.Json;
 
 namespace HlidacStatu.Repositories
 {
@@ -16,7 +18,9 @@ namespace HlidacStatu.Repositories
 
         public static readonly ElasticClient SubsidyClient = Manager.GetESClient_SubsidyAsync()
             .ConfigureAwait(false).GetAwaiter().GetResult();
-        
+
+        public static readonly ElasticClient SubsidyRawDataClient = Manager.GetESClient_SubsidyRawDataAsync()
+            .ConfigureAwait(false).GetAwaiter().GetResult();
 
         public static async Task<Dictionary<int, Dictionary<Subsidy.Hint.Type, decimal>>> PoLetechReportAsync()
         {
@@ -93,8 +97,28 @@ namespace HlidacStatu.Repositories
                     Must = new QueryContainer[] { query, isHiddenQuery }
                 };
         }
-        
 
+
+        public static async Task SaveRawData(string subsidyId, Dictionary<string, object?> data)
+        {
+            var item = new Subsidy.RawData()
+            {
+                Id = subsidyId,
+                Items = data
+            };
+
+            string updatedData = JsonConvert.SerializeObject(item)
+                .Replace((char)160, ' '); //hard space to space
+            PostData pd = PostData.String(updatedData);
+
+            var tres = await SubsidyRawDataClient.LowLevel.IndexAsync<StringResponse>(SubsidyRawDataClient.ConnectionSettings.DefaultIndex, subsidyId, pd);
+
+            if (tres.Success)
+            {
+
+
+            }
+        }
         //do not delete - it is used by another project
         public static async Task SaveAsync(Subsidy subsidy, bool shouldRewrite)
         {

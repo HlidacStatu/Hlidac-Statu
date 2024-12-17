@@ -10,6 +10,7 @@ namespace HlidacStatu.Entities;
 [ElasticsearchType(IdProperty = nameof(Id))]
 public partial class Subsidy
 {
+
     [Keyword]
     public string Id
     {
