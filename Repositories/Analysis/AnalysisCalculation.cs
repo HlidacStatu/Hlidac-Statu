@@ -575,13 +575,13 @@ namespace HlidacStatu.Repositories.Analysis
         {
             await foreach (var subsidy in SubsidyRepo.GetAllAsync(null))
             {
-                bool missingEssentialData = string.IsNullOrWhiteSpace(subsidy.Common.Recipient.Ico)
-                    || !subsidy.Common.ApprovedYear.HasValue;
+                bool missingEssentialData = string.IsNullOrWhiteSpace(subsidy.Recipient.Ico)
+                    || !subsidy.ApprovedYear.HasValue;
 
                 if (missingEssentialData)
                     continue;
 
-                Firma firma = Firmy.Get(subsidy.Common.Recipient.Ico);
+                Firma firma = Firmy.Get(subsidy.Recipient.Ico);
 
                 if (firma.PatrimStatu()) //nechceme státní firmy
                     continue;
@@ -591,7 +591,7 @@ namespace HlidacStatu.Repositories.Analysis
 
                 
                 
-                var companyAgeInDays = (subsidy.Common.ApprovedYear.Value - firma.Datum_Zapisu_OR.Value.Year);
+                var companyAgeInDays = (subsidy.ApprovedYear.Value - firma.Datum_Zapisu_OR.Value.Year);
 
                 yield return (idDotace: subsidy.Id, ico: firma.ICO, ageInYears: companyAgeInDays);
             }

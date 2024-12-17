@@ -21,8 +21,8 @@
         
         //find duplicates
         var hasSimilar = Model.ElasticResults.Hits
-            .Count(h => h.Source.Common.Recipient.Ico == dotaceItem.Common.Recipient.Ico
-                && h.Source.Common.ProjectCode == dotaceItem.Common.ProjectCode) > 1;
+            .Count(h => h.Source.Recipient.Ico == dotaceItem.Recipient.Ico
+                && h.Source.ProjectCode == dotaceItem.ProjectCode) > 1;
         
         <tr class="@(hasSimilar ? "alert alert-warning" : "") ">
             <td class="text-nowrap">
@@ -42,19 +42,19 @@
 
             </td>
             <td>
-                @(await Html.KIndexLabelLinkAsync(dotaceItem.Common.Recipient.Ico))@Devmasters.TextUtil.ShortenText(dotaceItem.Common.Recipient.DisplayName, 40)
+                @(await Html.KIndexLabelLinkAsync(dotaceItem.Recipient.Ico))@Devmasters.TextUtil.ShortenText(dotaceItem.Recipient.DisplayName, 40)
             </td>
             <td class="d-none d-sm-table-cell d-md-table-cell d-lg-table-cell d-xl-table-cell d-xxl-table-cell">
-                @if (dotaceItem.Common.Recipient.Ico is not null && dotaceItem.Common.Recipient.Ico != "00000000")
+                @if (dotaceItem.Recipient.Ico is not null && dotaceItem.Recipient.Ico != "00000000")
                 {
-                    <a href="/subjekt/@dotaceItem.Common.Recipient.Ico" title="Informace o subjektu">@dotaceItem.Common.Recipient.Ico</a>
+                    <a href="/subjekt/@dotaceItem.Recipient.Ico" title="Informace o subjektu">@dotaceItem.Recipient.Ico</a>
                 }
             </td>
             <td>
-                @dotaceItem.Common.DisplayProject
+                @dotaceItem.DisplayProject
             </td>
             <td class="text-nowrap">
-                @(dotaceItem.Common.ApprovedYear)
+                @(dotaceItem.ApprovedYear)
             </td>
             <td class="text-end number text-nowrap">
                 @HlidacStatu.Util.RenderData.NicePriceHtml(dotaceItem.AssumedAmount)

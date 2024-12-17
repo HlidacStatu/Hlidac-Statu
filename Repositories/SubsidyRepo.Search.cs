@@ -178,10 +178,10 @@ namespace HlidacStatu.Repositories
                 switch (order)
                 {
                     case SubsidySearchResult.SubsidyOrderResult.DateAddedDesc:
-                        s = new SortDescriptor<Subsidy>().Field(m => m.Field(f => f.Common.ApprovedYear).Descending());
+                        s = new SortDescriptor<Subsidy>().Field(m => m.Field(f => f.ApprovedYear).Descending());
                         break;
                     case SubsidySearchResult.SubsidyOrderResult.DateAddedAsc:
-                        s = new SortDescriptor<Subsidy>().Field(m => m.Field(f => f.Common.ApprovedYear).Ascending());
+                        s = new SortDescriptor<Subsidy>().Field(m => m.Field(f => f.ApprovedYear).Ascending());
                         break;
                     case SubsidySearchResult.SubsidyOrderResult.LatestUpdateDesc:
                         s = new SortDescriptor<Subsidy>().Field(m => m.Field(f => f.AssumedAmount).Descending());
@@ -193,10 +193,10 @@ namespace HlidacStatu.Repositories
                         s = new SortDescriptor<Subsidy>().Field(f => f.Field("_doc"));
                         break;
                     case SubsidySearchResult.SubsidyOrderResult.ICODesc:
-                        s = new SortDescriptor<Subsidy>().Field(m => m.Field(f => f.Common.Recipient.Ico).Descending());
+                        s = new SortDescriptor<Subsidy>().Field(m => m.Field(f => f.Recipient.Ico).Descending());
                         break;
                     case SubsidySearchResult.SubsidyOrderResult.ICOAsc:
-                        s = new SortDescriptor<Subsidy>().Field(m => m.Field(f => f.Common.Recipient.Ico).Ascending());
+                        s = new SortDescriptor<Subsidy>().Field(m => m.Field(f => f.Recipient.Ico).Ascending());
                         break;
                     case SubsidySearchResult.SubsidyOrderResult.Relevance:
                     default:

@@ -117,7 +117,7 @@
 
         
         decimal sumH = 0;
-        var items = dotaceSearchH.Results.GroupBy(i => i.Common.Recipient.Ico).ToList(); // udělat agregaci ručně pro ičo - počet dokumentů a cena 
+        var items = dotaceSearchH.Results.GroupBy(i => i.Recipient.Ico).ToList(); // udělat agregaci ručně pro ičo - počet dokumentů a cena 
         foreach (var item in items)
         {
             var ico = item.Key;
@@ -126,8 +126,8 @@
 
             var vazby = Model.VazbyProICO(ico); //zjistit, jestli datum spadá pro vazby
             var dotaceStatutar = item.Where(i =>
-                vazby.Any(v => v.RelFrom.HasValue && v.RelFrom.Value.Year <= i.Common.ApprovedYear
-                    && (v.RelTo?.Year ?? DateTime.Today.Year) >= i.Common.ApprovedYear))
+                vazby.Any(v => v.RelFrom.HasValue && v.RelFrom.Value.Year <= i.ApprovedYear
+                    && (v.RelTo?.Year ?? DateTime.Today.Year) >= i.ApprovedYear))
                 .ToList();
 
             var dotaceCelkemStatutar = dotaceStatutar.Sum(d => d.AssumedAmount);

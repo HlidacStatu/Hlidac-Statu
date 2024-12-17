@@ -16,53 +16,63 @@ public partial class Subsidy
         get
         {
             var hashBytes = SHA256.HashData(Encoding.UTF8.GetBytes(
-                $"{Common.Recipient.Ico}_{Common.Recipient.Name}_{Common.Recipient.YearOfBirth}_{Common.Recipient.Obec}" +
-                $"_{Common.ProjectCode}_{Common.ProjectName}_{Common.ProgramName}_{Common.ProgramCode}" +
-                $"_{Common.ApprovedYear}_{Common.SubsidyProvider}_{Common.SubsidyProviderIco}"));
+                $"{Recipient.Ico}_{Recipient.Name}_{Recipient.YearOfBirth}_{Recipient.Obec}" +
+                $"_{ProjectCode}_{ProjectName}_{ProgramName}_{ProgramCode}" +
+                $"_{ApprovedYear}_{SubsidyProvider}_{SubsidyProviderIco}"));
             var hash = Convert.ToHexString(hashBytes);
-            return $"{DataSource}-{hash}";
+            return $"{Metadata}-{hash}";
         }
     }
 
-    /// <summary>
-    /// Filename which was processed
-    /// </summary>
-    [Keyword]
-    public string FileName { get; set; }
-
-    /// <summary>
-    /// Who manages the data about this subsidy 
-    /// </summary>
-    public string DataSource { get; set; }
-
-    /// <summary>
-    /// Order within a filename
-    /// </summary>
-    [Keyword]
-    public int RecordNumber { get; set; }
-
-    /// <summary>
-    /// Date when subsidy was processed.
-    /// </summary>
-    [Date]
-    public DateTime ProcessedDate { get; set; }
+    [Object]
+    public SubsidyMetadata Metadata { get; set; } = new();
     
-    /// <summary>
-    /// Date when subsidy was changed.
-    /// </summary>
-    [Date]
-    public DateTime ModifiedDate { get; set; }
+    [Number]
+    public decimal AssumedAmount =>
+        (PayedAmount is null || PayedAmount == 0)
+            ? SubsidyAmount ?? 0m
+            : PayedAmount.Value;
+    
     
     /// <summary>
     /// Oblast kam dotace patří
     /// </summary>
     public string Category { get; set; }
 
-    /// <summary>
-    /// Important information about subsidy (what is displayed in hlidac)
-    /// </summary>
     [Object]
-    public CommonInfo Common { get; set; } = new();
+    public SubsidyRecipient Recipient { get; set; } = new();
+
+    [Number]
+    public decimal? SubsidyAmount { get; set; }
+
+    [Number]
+    public decimal? PayedAmount { get; set; }
+
+    [Number]
+    public decimal? ReturnedAmount { get; set; }
+        
+    public string ProjectCode { get; set; }
+
+    public string ProjectName { get; set; }
+
+    [Text]
+    public string ProjectDescription { get; set; }
+        
+    [Keyword]
+    public string ProgramCode { get; set; }
+
+    public string ProgramName { get; set; }
+
+    [Number]
+    public int? ApprovedYear { get; set; }
+
+    public string SubsidyProvider { get; set; }
+
+    [Keyword]
+    public string SubsidyProviderIco { get; set; }
+
+    [Ignore]
+    public string DisplayProject => string.IsNullOrWhiteSpace(ProjectName) ? ProjectCode : ProjectName;
     
     [Object]
     public List<MoneySourceItem> MoneySource { get; set; }
@@ -86,58 +96,46 @@ public partial class Subsidy
             WriteIndented = true, Encoder = System.Text.Encodings.Web.JavaScriptEncoder.UnsafeRelaxedJsonEscaping
         });
 
-    /// <summary>
-    /// If true, then there was an update and this subsidy was missing in update file.
-    /// Basically it tells us if DataSource removed the subsidy.
-    /// </summary>
-    [Boolean]
-    public bool IsHidden { get; set; } = false;
+    
+    
+    public class SubsidyMetadata
+    {
+        [Keyword]
+        public string FileName { get; set; }
 
-    [Number]
-    public decimal AssumedAmount =>
-        (Common.PayedAmount is null || Common.PayedAmount == 0)
-            ? Common.SubsidyAmount ?? 0m
-            : Common.PayedAmount.Value;
+        /// <summary>
+        /// Who manages the data about this subsidy (Folder name) 
+        /// </summary>
+        public string DataSource { get; set; }
 
+        /// <summary>
+        /// Order within a filename
+        /// </summary>
+        [Keyword]
+        public int RecordNumber { get; set; }
+
+        [Date]
+        public DateTime ProcessedDate { get; set; }
+    
+        [Date]
+        public DateTime ModifiedDate { get; set; }
+        
+        /// <summary>
+        /// If true, then there was an update and this subsidy was missing in update file.
+        /// Basically it tells us if DataSource removed the subsidy.
+        /// </summary>
+        [Boolean]
+        public bool IsHidden { get; set; } = false;
+
+
+    }
+    
     public class CommonInfo
     {
-        [Object]
-        public Recipient Recipient { get; set; } = new();
-
-        [Number]
-        public decimal? SubsidyAmount { get; set; }
-
-        [Number]
-        public decimal? PayedAmount { get; set; }
-
-        [Number]
-        public decimal? ReturnedAmount { get; set; }
         
-        public string ProjectCode { get; set; }
-
-        public string ProjectName { get; set; }
-
-        [Text]
-        public string ProjectDescription { get; set; }
-        
-        [Keyword]
-        public string ProgramCode { get; set; }
-
-        public string ProgramName { get; set; }
-
-        [Number]
-        public int? ApprovedYear { get; set; }
-
-        public string SubsidyProvider { get; set; }
-
-        [Keyword]
-        public string SubsidyProviderIco { get; set; }
-
-        [Ignore]
-        public string DisplayProject => string.IsNullOrWhiteSpace(ProjectName) ? ProjectCode : ProjectName;
     }
 
-    public class Recipient
+    public class SubsidyRecipient
     {
         [Keyword]
         public string Ico { get; set; }
@@ -165,16 +163,16 @@ public partial class Subsidy
     
     public class MoneySourceItem
     {
-        string Payer { get; set; }
+        public string Payer { get; set; }
         [Number]
-        decimal Amount { get; set; }
+        public decimal Amount { get; set; }
     }
     
     public class CerpaniItem
     {
         [Number]
-        int Year { get; set; }
+        public int Year { get; set; }
         [Number]
-        decimal Amount { get; set; }
+        public decimal Amount { get; set; }
     }
 }

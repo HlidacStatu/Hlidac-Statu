@@ -343,7 +343,7 @@
         //var dotaceStat = Model.
         var dotaceAggsH = new Nest.AggregationContainerDescriptor<Subsidy>()
             .Terms("icos", s => s
-                .Field(f => f.Common.Recipient.Ico)
+                .Field(f => f.Recipient.Ico)
                 .Size(5000)
                 .Aggregations(a => a
                     .Sum("sum", ss => ss.Field(ff => ff.AssumedAmount))

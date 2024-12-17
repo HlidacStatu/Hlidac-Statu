@@ -117,7 +117,7 @@ namespace HlidacStatu.Repositories.Statistics
             var dotaceFirmy = await SubsidyRepo.GetDotaceForIcoAsync(f.ICO).ToListAsync();
 
             // doplnit počty dotací
-            var statistiky = dotaceFirmy.GroupBy(d => d.Common.ApprovedYear)
+            var statistiky = dotaceFirmy.GroupBy(d => d.ApprovedYear)
                 .ToDictionary(g => g.Key ?? 0,
                     g => new Firma.Statistics.Subsidy()
                     {
@@ -126,7 +126,7 @@ namespace HlidacStatu.Repositories.Statistics
                 );
             
             var dataYearly = dotaceFirmy
-                .GroupBy(c => c.Common.ApprovedYear)
+                .GroupBy(c => c.ApprovedYear)
                 .ToDictionary(g => g.Key ?? 0,
                     g => g.Sum(c => c.AssumedAmount)
                 );

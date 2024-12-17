@@ -22,13 +22,13 @@ public static class SubsidyExtension
     
     public static async Task<bool?> MaSkutecnehoMajiteleAsync(this Subsidy dotace)
     {
-        if (dotace.Common.ApprovedYear is null)
+        if (dotace.ApprovedYear is null)
             return null;
-        if (string.IsNullOrWhiteSpace(dotace.Common.Recipient.Ico))
+        if (string.IsNullOrWhiteSpace(dotace.Recipient.Ico))
             return null;
 
-        var datum = new DateTime(dotace.Common.ApprovedYear.Value, 1, 1);
-        var firma = FirmaRepo.FromIco(dotace.Common.Recipient.Ico);
+        var datum = new DateTime(dotace.ApprovedYear.Value, 1, 1);
+        var firma = FirmaRepo.FromIco(dotace.Recipient.Ico);
         
         if (SkutecniMajiteleRepo.PodlehaSkm(firma, datum))
         {
@@ -47,28 +47,28 @@ public static class SubsidyExtension
         dynamic v = new ExpandoObject();
         v.Url = subsidy.GetUrl(false);
         v.Id = subsidy.Id;
-        v.FileName = subsidy.FileName;
-        v.DataSource = subsidy.DataSource;
-        v.IsHidden = subsidy.IsHidden;
+        v.FileName = subsidy.Metadata.FileName;
+        v.DataSource = subsidy.Metadata.DataSource;
+        v.IsHidden = subsidy.Metadata.IsHidden;
         v.AssumedAmount = subsidy.AssumedAmount;
-        v.CommonInfoRecipientIco = subsidy.Common.Recipient.Ico;
-        v.CommonInfoRecipientName = subsidy.Common.Recipient.Name;
-        v.CommonInfoRecipientHlidacName = subsidy.Common.Recipient.HlidacName;
-        v.CommonInfoRecipientYearOfBirth = subsidy.Common.Recipient.YearOfBirth;
-        v.CommonInfoRecipientObec = subsidy.Common.Recipient.Obec;
-        v.CommonInfoRecipientOkres = subsidy.Common.Recipient.Okres;
-        v.CommonInfoRecipientPSC = subsidy.Common.Recipient.PSC;
-        v.CommonInfoSubsidyAmount = subsidy.Common.SubsidyAmount;
-        v.CommonInfoPayedAmount = subsidy.Common.PayedAmount;
-        v.CommonInfoReturnedAmount = subsidy.Common.ReturnedAmount;
-        v.CommonInfoProjectCode = subsidy.Common.ProjectCode;
-        v.CommonInfoProjectName = subsidy.Common.ProjectName;
-        v.CommonInfoProjectDescription = subsidy.Common.ProjectDescription;
-        v.CommonInfoProgramCode = subsidy.Common.ProgramCode;
-        v.CommonInfoProgramName = subsidy.Common.ProgramName;
-        v.CommonInfoApprovedYear = subsidy.Common.ApprovedYear;
-        v.CommonInfoSubsidyProvider = subsidy.Common.SubsidyProvider;
-        v.CommonInfoSubsidyProviderIco = subsidy.Common.SubsidyProviderIco;
+        v.CommonInfoRecipientIco = subsidy.Recipient.Ico;
+        v.CommonInfoRecipientName = subsidy.Recipient.Name;
+        v.CommonInfoRecipientHlidacName = subsidy.Recipient.HlidacName;
+        v.CommonInfoRecipientYearOfBirth = subsidy.Recipient.YearOfBirth;
+        v.CommonInfoRecipientObec = subsidy.Recipient.Obec;
+        v.CommonInfoRecipientOkres = subsidy.Recipient.Okres;
+        v.CommonInfoRecipientPSC = subsidy.Recipient.PSC;
+        v.CommonInfoSubsidyAmount = subsidy.SubsidyAmount;
+        v.CommonInfoPayedAmount = subsidy.PayedAmount;
+        v.CommonInfoReturnedAmount = subsidy.ReturnedAmount;
+        v.CommonInfoProjectCode = subsidy.ProjectCode;
+        v.CommonInfoProjectName = subsidy.ProjectName;
+        v.CommonInfoProjectDescription = subsidy.ProjectDescription;
+        v.CommonInfoProgramCode = subsidy.ProgramCode;
+        v.CommonInfoProgramName = subsidy.ProgramName;
+        v.CommonInfoApprovedYear = subsidy.ApprovedYear;
+        v.CommonInfoSubsidyProvider = subsidy.SubsidyProvider;
+        v.CommonInfoSubsidyProviderIco = subsidy.SubsidyProviderIco;
 
         return v;
     }

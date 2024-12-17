@@ -22,7 +22,7 @@ namespace HlidacStatu.Repositories
         {
             AggregationContainerDescriptor<Subsidy> aggs = new AggregationContainerDescriptor<Subsidy>()
                 .Terms("perYear", t => t
-                    .Field(f => f.Common.ApprovedYear)
+                    .Field(f => f.ApprovedYear)
                     .Size(65500)
                     .Aggregations(yearAggs => yearAggs
                         .Terms("perSubsidyType", st => st
@@ -98,7 +98,7 @@ namespace HlidacStatu.Repositories
         //do not delete - it is used by another project
         public static async Task SaveAsync(Subsidy subsidy, bool shouldRewrite)
         {
-            Logger.Debug($"Saving subsidy {subsidy.RecordNumber} from {subsidy.DataSource}/{subsidy.FileName}");
+            Logger.Debug($"Saving subsidy {subsidy.Metadata.RecordNumber} from {subsidy.Metadata.DataSource}/{subsidy.Metadata.FileName}");
             if (subsidy is null) throw new ArgumentNullException(nameof(subsidy));
 
             if (!shouldRewrite)
@@ -114,7 +114,7 @@ namespace HlidacStatu.Repositories
                 }
             }
 
-            subsidy.ModifiedDate = DateTime.Now;
+            subsidy.Metadata.ModifiedDate = DateTime.Now;
             var res = await SubsidyClient.IndexAsync(subsidy, o => o.Id(subsidy.Id));
 
             if (!res.IsValid)
@@ -122,20 +122,20 @@ namespace HlidacStatu.Repositories
                 Logger.Error($"Failed to save subsidy for {subsidy.Id}. {res.OriginalException.Message}");
                 throw new ApplicationException(res.ServerError?.ToString());
             }
-            Logger.Debug($"Subsidy {subsidy.RecordNumber} from {subsidy.DataSource}/{subsidy.FileName} saved");
+            Logger.Debug($"Subsidy {subsidy.Metadata.RecordNumber} from {subsidy.Metadata.DataSource}/{subsidy.Metadata.FileName} saved");
             
             //todo: uncomment once ready for statistic recalculation
-            // if(subsidy.Common.Recipient.Ico is not null)
-            //     RecalculateItemRepo.AddFirmaToProcessingQueue(subsidy.Common.Recipient.Ico, Entities.RecalculateItem.StatisticsTypeEnum.Dotace, $"VZ {subsidy.Id}");
+            // if(subsidy.Recipient.Ico is not null)
+            //     RecalculateItemRepo.AddFirmaToProcessingQueue(subsidy.Recipient.Ico, Entities.RecalculateItem.StatisticsTypeEnum.Dotace, $"VZ {subsidy.Id}");
         }
 
         private static Subsidy MergeSubsidy(Subsidy oldRecord, Subsidy newRecord)
         {
-            Logger.Information($"Merging subsidy for {oldRecord.Id}, from {oldRecord.DataSource}/{oldRecord.FileName}, records [{newRecord.RecordNumber}] and [{oldRecord.RecordNumber}]");
+            Logger.Information($"Merging subsidy for {oldRecord.Id}, from {oldRecord.Metadata.DataSource}/{oldRecord.Metadata.FileName}, records [{newRecord.Metadata.RecordNumber}] and [{oldRecord.Metadata.RecordNumber}]");
             newRecord.RawData += ",\n" + oldRecord.RawData;
-            newRecord.Common.SubsidyAmount += oldRecord.Common.SubsidyAmount;
-            newRecord.Common.PayedAmount += oldRecord.Common.PayedAmount;
-            newRecord.Common.ReturnedAmount += oldRecord.Common.ReturnedAmount;
+            newRecord.SubsidyAmount += oldRecord.SubsidyAmount;
+            newRecord.PayedAmount += oldRecord.PayedAmount;
+            newRecord.ReturnedAmount += oldRecord.ReturnedAmount;
 
             return newRecord;
         }
@@ -173,8 +173,8 @@ namespace HlidacStatu.Repositories
             var query = new QueryContainerDescriptor<Subsidy>()
                 .Bool(b => b
                     .Must(
-                        m => m.Term(t => t.DataSource.Suffix("keyword"), datasource),
-                        m => m.Term(t => t.FileName, fileName)
+                        m => m.Term(t => t.Metadata.DataSource.Suffix("keyword"), datasource),
+                        m => m.Term(t => t.Metadata.FileName, fileName)
                     )
                 );
 
@@ -193,26 +193,26 @@ namespace HlidacStatu.Repositories
         public static async Task<List<Subsidy>> FindDuplicatesAsync(Subsidy subsidy)
         {
             // můžeme hledat duplicity jen u firem, lidi nedokážeme správně identifikovat
-            if(string.IsNullOrWhiteSpace(subsidy.Common.Recipient.Ico))
+            if(string.IsNullOrWhiteSpace(subsidy.Recipient.Ico))
                 return null;
             
             // Build the conditional query for ProjectCode OR ProgramCode OR ProjectName
             QueryContainer projectQuery = null;
 
-            if (!string.IsNullOrWhiteSpace(subsidy.Common.ProjectCode))
+            if (!string.IsNullOrWhiteSpace(subsidy.ProjectCode))
             {
-                projectQuery |= new QueryContainerDescriptor<Subsidy>().Term(t => t.Common.ProjectCode.Suffix("keyword"), subsidy.Common.ProjectCode);
+                projectQuery |= new QueryContainerDescriptor<Subsidy>().Term(t => t.ProjectCode.Suffix("keyword"), subsidy.ProjectCode);
             }
 
-            if (!string.IsNullOrWhiteSpace(subsidy.Common.ProgramCode))
+            if (!string.IsNullOrWhiteSpace(subsidy.ProgramCode))
             {
-                projectQuery |= new QueryContainerDescriptor<Subsidy>().Term(t => t.Common.ProgramCode, subsidy.Common.ProgramCode);
+                projectQuery |= new QueryContainerDescriptor<Subsidy>().Term(t => t.ProgramCode, subsidy.ProgramCode);
             }
 
             // 255 there is because ES ignores 256+ chars when creating keywords...  
-            if (!string.IsNullOrWhiteSpace(subsidy.Common.ProjectName) && subsidy.Common.ProjectName.Length <= 255 )
+            if (!string.IsNullOrWhiteSpace(subsidy.ProjectName) && subsidy.ProjectName.Length <= 255 )
             {
-                projectQuery |= new QueryContainerDescriptor<Subsidy>().Term(t => t.Common.ProjectName.Suffix("keyword"), subsidy.Common.ProjectName);
+                projectQuery |= new QueryContainerDescriptor<Subsidy>().Term(t => t.ProjectName.Suffix("keyword"), subsidy.ProjectName);
             }
 
             if (projectQuery is null)
@@ -222,8 +222,8 @@ namespace HlidacStatu.Repositories
             var query = new QueryContainerDescriptor<Subsidy>()
                 .Bool(b => b
                     .Must(
-                        m => m.Term(t => t.Common.Recipient.Ico, subsidy.Common.Recipient.Ico),
-                        m => m.Term(t => t.Common.ApprovedYear, subsidy.Common.ApprovedYear),
+                        m => m.Term(t => t.Recipient.Ico, subsidy.Recipient.Ico),
+                        m => m.Term(t => t.ApprovedYear, subsidy.ApprovedYear),
                         m => m.Term(t => t.AssumedAmount, subsidy.AssumedAmount),
                         m => projectQuery // Add the conditional query
                     )
@@ -341,7 +341,7 @@ namespace HlidacStatu.Repositories
         public static IAsyncEnumerable<Subsidy> GetDotaceForIcoAsync(string ico)
         {
             QueryContainer qc = new QueryContainerDescriptor<Subsidy>()
-                .Term(f => f.Common.Recipient.Ico, ico);
+                .Term(f => f.Recipient.Ico, ico);
 
             return GetAllAsync(qc);
         }
