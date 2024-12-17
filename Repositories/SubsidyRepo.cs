@@ -107,6 +107,7 @@ namespace HlidacStatu.Repositories
                 var existingSubsidy = await SubsidyClient.GetAsync<Subsidy>(subsidy.Id);
 
                 //do not merge hidden one - they are to be replaced
+                // - update hidden subsidies are controlled by shouldRewrite
                 if (existingSubsidy.Found)
                 {
                     subsidy = MergeSubsidy(existingSubsidy.Source, subsidy);

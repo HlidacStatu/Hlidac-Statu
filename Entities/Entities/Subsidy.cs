@@ -74,7 +74,7 @@ public partial class Subsidy
 
     [Ignore]
     public string RawDataFormatted => JsonSerializer.Serialize(
-        JsonSerializer.Deserialize<object>(RawData),
+        JsonSerializer.Deserialize<object>($"[{RawData}]"),
         new JsonSerializerOptions
         {
             WriteIndented = true, Encoder = System.Text.Encodings.Web.JavaScriptEncoder.UnsafeRelaxedJsonEscaping
