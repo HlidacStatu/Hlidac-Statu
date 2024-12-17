@@ -173,7 +173,7 @@ namespace HlidacStatu.Repositories
             var query = new QueryContainerDescriptor<Subsidy>()
                 .Bool(b => b
                     .Must(
-                        m => m.Term(t => t.DataSource, datasource),
+                        m => m.Term(t => t.DataSource.Suffix("keyword"), datasource),
                         m => m.Term(t => t.FileName, fileName)
                     )
                 );

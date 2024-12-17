@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
@@ -62,6 +63,11 @@ public partial class Subsidy
     /// </summary>
     [Object]
     public CommonInfo Common { get; set; } = new();
+    
+    [Object]
+    public List<MoneySourceItem> MoneySource { get; set; }
+    [Object]
+    public List<CerpaniItem> Cerpani { get; set; }
     
     [Object]
     public Hint Hints { get; set; } = new();
@@ -155,5 +161,20 @@ public partial class Subsidy
 
         [Ignore]
         public string DisplayName => string.IsNullOrWhiteSpace(HlidacName) ? Name : HlidacName;
+    }
+    
+    public class MoneySourceItem
+    {
+        string Payer { get; set; }
+        [Number]
+        decimal Amount { get; set; }
+    }
+    
+    public class CerpaniItem
+    {
+        [Number]
+        int Year { get; set; }
+        [Number]
+        decimal Amount { get; set; }
     }
 }
