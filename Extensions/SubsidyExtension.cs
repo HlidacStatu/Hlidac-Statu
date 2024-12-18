@@ -1,4 +1,5 @@
 using System.Dynamic;
+using System.Text.Json;
 using HlidacStatu.Entities;
 using HlidacStatu.Repositories;
 
@@ -72,4 +73,18 @@ public static class SubsidyExtension
 
         return v;
     }
+
+    public static async Task<string?> GetRawDataNiceAsync(this Subsidy subsidy)
+    {
+        var rawData = await SubsidyRepo.GetRawDataAsync(subsidy.Id);
+        
+        if(rawData is null)
+            return null;
+        
+        return JsonSerializer.Serialize(rawData.Items, new JsonSerializerOptions
+        {
+            WriteIndented = true, Encoder = System.Text.Encodings.Web.JavaScriptEncoder.UnsafeRelaxedJsonEscaping
+        });
+    }
+        
 }

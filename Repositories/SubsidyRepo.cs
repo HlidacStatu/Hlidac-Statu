@@ -2,13 +2,14 @@ using Nest;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.Json;
 using System.Threading.Tasks;
 using HlidacStatu.Connectors;
 using HlidacStatu.Entities;
 using HlidacStatu.Repositories.Searching;
 using Serilog;
 using Elasticsearch.Net;
-using Newtonsoft.Json;
+// using Newtonsoft.Json;
 
 namespace HlidacStatu.Repositories
 {
@@ -100,7 +101,7 @@ namespace HlidacStatu.Repositories
 
         public static async Task<Subsidy.RawData> GetRawDataAsync(string subsidyId)
         {
-            if (string.IsNullOrEmpty(subsidyId )) 
+            if (string.IsNullOrEmpty(subsidyId)) 
                 throw new ArgumentNullException(nameof(subsidyId));
 
             var response = await SubsidyRawDataClient.GetAsync<Subsidy.RawData>(subsidyId);
@@ -111,24 +112,37 @@ namespace HlidacStatu.Repositories
 
         }
 
-        public static async Task SaveRawDataAsync(string subsidyId, Dictionary<string, object?> data)
+        public static async Task SaveRawDataAsync(string subsidyId, Dictionary<string, object?> data, bool shouldRewrite)
         {
-            var item = new Subsidy.RawData()
+            var newRawData = new Subsidy.RawData()
             {
-                Id = subsidyId,
-                Items = data
+                Id = subsidyId
             };
+            newRawData.Items.Add(data);
+            
+            if (!shouldRewrite) //merge
+            {
+                // Check if raw data already exists
+                var existingRawData = await GetRawDataAsync(subsidyId);
 
-            string updatedData = JsonConvert.SerializeObject(item)
-                .Replace((char)160, ' '); //hard space to space
+                if (existingRawData is not null && existingRawData.Items.Any())
+                {
+                    newRawData.Items.AddRange(existingRawData.Items);
+                }
+            }
+
+            string updatedData = JsonSerializer.Serialize(newRawData, 
+                new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase});
+
+            // string updatedData = JsonConvert.SerializeObject(newRawData)
+            //     .Replace((char)160, ' '); //hard space to space
             PostData pd = PostData.String(updatedData);
 
             var tres = await SubsidyRawDataClient.LowLevel.IndexAsync<StringResponse>(SubsidyRawDataClient.ConnectionSettings.DefaultIndex, subsidyId, pd);
 
-            if (tres.Success)
+            if (!tres.Success)
             {
-
-
+                Logger.Error($"Problem durning {nameof(SaveRawDataAsync)} - {tres.DebugInformation}");
             }
         }
         //do not delete - it is used by another project
@@ -168,7 +182,6 @@ namespace HlidacStatu.Repositories
         private static Subsidy MergeSubsidy(Subsidy oldRecord, Subsidy newRecord)
         {
             Logger.Information($"Merging subsidy for {oldRecord.Id}, from {oldRecord.Metadata.DataSource}/{oldRecord.Metadata.FileName}, records [{newRecord.Metadata.RecordNumber}] and [{oldRecord.Metadata.RecordNumber}]");
-            newRecord.RawData += ",\n" + oldRecord.RawData;
             newRecord.SubsidyAmount += oldRecord.SubsidyAmount;
             newRecord.PayedAmount += oldRecord.PayedAmount;
             newRecord.ReturnedAmount += oldRecord.ReturnedAmount;

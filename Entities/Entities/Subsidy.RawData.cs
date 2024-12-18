@@ -10,6 +10,6 @@ public partial class Subsidy
         public string Id { get; set; }
 
         [Nest.Object]
-        public Dictionary<string,object?> Items { get; set; }
+        public List<Dictionary<string, object?>> Items { get; set; } = new();
     }
 }

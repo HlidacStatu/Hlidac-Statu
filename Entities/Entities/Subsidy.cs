@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Security.Cryptography;
 using System.Text;
-using System.Text.Json;
 using Nest;
 
 namespace HlidacStatu.Entities;
@@ -21,7 +20,7 @@ public partial class Subsidy
                 $"_{ProjectCode}_{ProjectName}_{ProgramName}_{ProgramCode}" +
                 $"_{ApprovedYear}_{SubsidyProvider}_{SubsidyProviderIco}"));
             var hash = Convert.ToHexString(hashBytes);
-            return $"{Metadata}-{hash}";
+            return $"{Metadata.DataSource}-{hash}";
         }
     }
 
@@ -74,30 +73,14 @@ public partial class Subsidy
 
     [Ignore]
     public string DisplayProject => string.IsNullOrWhiteSpace(ProjectName) ? ProjectCode : ProjectName;
-    
+
     [Object]
-    public List<RozhodnutiItem> Rozhodnuti { get; set; }
+    public List<RozhodnutiItem> Rozhodnuti { get; set; } = new();
     [Object]
-    public List<CerpaniItem> Cerpani { get; set; }
+    public List<CerpaniItem> Cerpani { get; set; } = new();
     
     [Object]
     public Hint Hints { get; set; } = new();
-
-    /// <summary>
-    /// Original record for people to display in case of need
-    /// </summary>
-    [Object(Enabled = false)] //do not index, do not process, just store
-    public string RawData { get; set; }
-
-    [Ignore]
-    public string RawDataFormatted => JsonSerializer.Serialize(
-        JsonSerializer.Deserialize<object>($"[{RawData}]"),
-        new JsonSerializerOptions
-        {
-            WriteIndented = true, Encoder = System.Text.Encodings.Web.JavaScriptEncoder.UnsafeRelaxedJsonEscaping
-        });
-
-    
     
     public class SubsidyMetadata
     {
