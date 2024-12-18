@@ -320,8 +320,8 @@ namespace HlidacStatu.Datasets
                 return null;
 
             IDictionary<String, Object> eo = (IDictionary<String, Object>)obj;
-            var props = GetPropertyNamesFromSchema();
-            var toremove = eo.Keys.Where(m => props.Contains(m) == false).ToArray();
+            string[] props = GetPropertyNamesFromSchema();
+            var toremove = eo.Keys.Where(m => props.Contains(m, StringComparer.InvariantCultureIgnoreCase) == false).ToArray();
             for (int i = 0; i < toremove.Count(); i++)
             {
                 ((IDictionary<String, Object>)obj).Remove(toremove[i]);
