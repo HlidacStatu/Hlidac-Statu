@@ -86,5 +86,14 @@ public static class SubsidyExtension
             WriteIndented = true, Encoder = System.Text.Encodings.Web.JavaScriptEncoder.UnsafeRelaxedJsonEscaping
         });
     }
-        
+      
+    public static string? Describe(this Subsidy subsidy)
+    {
+        if (Subsidy.DataSourceDescription.TryGetValue(subsidy.Metadata.DataSource, out var description))
+        {
+            return description;
+        }
+
+        return null;
+    }
 }

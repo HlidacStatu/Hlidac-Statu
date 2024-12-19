@@ -181,6 +181,10 @@
         <th>Zdroj dat</th>
         <td>
             @Model.Metadata.DataSource
+            <br/>
+            <div class="alert alert-info" role="alert">
+                @Model.Describe()
+            </div>
         </td>
     </tr>
     <tr>
