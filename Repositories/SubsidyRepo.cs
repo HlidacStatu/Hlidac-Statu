@@ -86,7 +86,7 @@ namespace HlidacStatu.Repositories
             // Create a query for `isHidden = false`
             var isHiddenQuery = new TermQuery
             {
-                Field = "isHidden",
+                Field = "metadata.isHidden",
                 Value = false
             };
 
@@ -207,7 +207,7 @@ namespace HlidacStatu.Repositories
                         )
                     )
                     .Script(s => s
-                        .Source("ctx._source.isHidden = true")
+                        .Source("ctx._source.metadata.isHidden = true")
                     )
                 );
 
