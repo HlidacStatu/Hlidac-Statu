@@ -20,9 +20,6 @@ namespace HlidacStatu.Repositories
         public static readonly ElasticClient SubsidyClient = Manager.GetESClient_SubsidyAsync()
             .ConfigureAwait(false).GetAwaiter().GetResult();
 
-        public static readonly ElasticClient SubsidyRawDataClient = Manager.GetESClient_SubsidyRawDataAsync()
-            .ConfigureAwait(false).GetAwaiter().GetResult();
-
         public static async Task<Dictionary<int, Dictionary<Subsidy.Hint.Type, decimal>>> PoLetechReportAsync()
         {
             AggregationContainerDescriptor<Subsidy> aggs = new AggregationContainerDescriptor<Subsidy>()
@@ -99,53 +96,6 @@ namespace HlidacStatu.Repositories
                 };
         }
 
-        public static async Task<Subsidy.RawData> GetRawDataAsync(string subsidyId)
-        {
-            if (string.IsNullOrEmpty(subsidyId)) 
-                throw new ArgumentNullException(nameof(subsidyId));
-
-            var response = await SubsidyRawDataClient.GetAsync<Subsidy.RawData>(subsidyId);
-
-            return response.IsValid
-                ? response.Source
-                : null;
-
-        }
-
-        public static async Task SaveRawDataAsync(string subsidyId, Dictionary<string, object?> data, bool shouldRewrite)
-        {
-            var newRawData = new Subsidy.RawData()
-            {
-                Id = subsidyId
-            };
-            newRawData.Items.Add(data);
-            
-            if (!shouldRewrite) //merge
-            {
-                // Check if raw data already exists
-                var existingRawData = await GetRawDataAsync(subsidyId);
-
-                if (existingRawData is not null && existingRawData.Items.Any())
-                {
-                    newRawData.Items.AddRange(existingRawData.Items);
-                }
-            }
-
-            string updatedData = JsonSerializer.Serialize(newRawData, 
-                new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase});
-
-            // string updatedData = JsonConvert.SerializeObject(newRawData)
-            //     .Replace((char)160, ' '); //hard space to space
-            PostData pd = PostData.String(updatedData);
-
-            var tres = await SubsidyRawDataClient.LowLevel.IndexAsync<StringResponse>(SubsidyRawDataClient.ConnectionSettings.DefaultIndex, subsidyId, pd);
-
-            if (!tres.Success)
-            {
-                Logger.Error($"Problem durning {nameof(SaveRawDataAsync)} - {tres.DebugInformation}");
-            }
-        }
-        //do not delete - it is used by another project
         public static async Task SaveAsync(Subsidy subsidy, bool shouldRewrite)
         {
             Logger.Debug($"Saving subsidy {subsidy.Metadata.RecordNumber} from {subsidy.Metadata.DataSource}/{subsidy.Metadata.FileName}");
@@ -187,6 +137,7 @@ namespace HlidacStatu.Repositories
             newRecord.ReturnedAmount += oldRecord.ReturnedAmount;
             newRecord.Rozhodnuti.AddRange(oldRecord.Rozhodnuti);
             newRecord.Cerpani.AddRange(oldRecord.Cerpani);
+            newRecord.RawData.AddRange(oldRecord.RawData);
 
             return newRecord;
         }

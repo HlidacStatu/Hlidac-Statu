@@ -74,14 +74,12 @@ public static class SubsidyExtension
         return v;
     }
 
-    public static async Task<string?> GetRawDataNiceAsync(this Subsidy subsidy)
+    public static string? GetNiceRawData(this Subsidy subsidy)
     {
-        var rawData = await SubsidyRepo.GetRawDataAsync(subsidy.Id);
-        
-        if(rawData is null)
+        if(subsidy.RawData is null)
             return null;
         
-        return JsonSerializer.Serialize(rawData.Items, new JsonSerializerOptions
+        return JsonSerializer.Serialize(subsidy.RawData, new JsonSerializerOptions
         {
             WriteIndented = true, Encoder = System.Text.Encodings.Web.JavaScriptEncoder.UnsafeRelaxedJsonEscaping
         });

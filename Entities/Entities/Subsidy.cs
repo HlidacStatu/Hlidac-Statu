@@ -79,6 +79,12 @@ public partial class Subsidy
     [Object]
     public List<CerpaniItem> Cerpani { get; set; } = new();
     
+    /// <summary>
+    /// Original record for people to display in case of need
+    /// </summary>
+    [Object(Enabled = false)] //do not index, do not process, just store
+    public List<object> RawData { get; set; } = new();
+    
     [Object]
     public Hint Hints { get; set; } = new();
     
