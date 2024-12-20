@@ -1,12 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using HlidacStatu.Entities;
+﻿using System.Threading.Tasks;
 using HlidacStatu.Entities;
 using HlidacStatu.Repositories;
 
 using Microsoft.AspNetCore.Mvc;
-using Nest;
 
 namespace HlidacStatu.Web.Controllers
 {

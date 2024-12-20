@@ -181,6 +181,10 @@
         <th>Zdroj dat</th>
         <td>
             @Model.Metadata.DataSource
+            <br/>
+            <div class="alert alert-info" role="alert">
+                @Model.Describe()
+            </div>
         </td>
     </tr>
     <tr>
@@ -213,7 +217,7 @@
                 <h4 class="modal-title">Originální záznam</h4>
             </div>
             <div class="modal-body">
-                <pre><code>@await Model.GetRawDataNiceAsync()</code></pre>
+                <pre><code>@Model.GetNiceRawData()</code></pre>
             </div>
         </div>
     </div>
