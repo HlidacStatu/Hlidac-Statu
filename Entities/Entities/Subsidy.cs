@@ -2,6 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Security.Cryptography;
 using System.Text;
+using System.Text.RegularExpressions;
+using Devmasters;
 using Nest;
 
 namespace HlidacStatu.Entities;
@@ -23,6 +25,28 @@ public partial class Subsidy
             return $"{Metadata.DataSource}-{hash}";
         }
     }
+    
+    /// <summary>
+    /// Hash that helps to check duplicity
+    /// </summary>
+    [Keyword]
+    public string DuplaHash {
+        get
+        {
+            var hashBytes = SHA256.HashData(Encoding.UTF8.GetBytes(
+                $"{Recipient.Ico}_{ApprovedYear}_{AssumedAmount}"));
+            var hash = Convert.ToHexString(hashBytes);
+            return $"{Metadata.DataSource}-{hash}";
+        }
+    }
+    [Keyword]
+    public string ProjectCodeHash => CalculateDuplaHash(ProjectCode);
+    [Keyword]
+    public string ProgramCodeHash => CalculateDuplaHash(ProgramCode);
+    [Keyword]
+    public string ProjectNameHash => CalculateDuplaHash(ProgramName);
+    
+    
 
     [Object]
     public SubsidyMetadata Metadata { get; set; } = new();
@@ -159,5 +183,17 @@ public partial class Subsidy
         public int? Year { get; set; }
         [Number]
         public decimal? Amount { get; set; }
+    }
+    
+    private static string CalculateDuplaHash(string text)
+    {
+        if (text is null || string.IsNullOrWhiteSpace(text))
+            return null;
+
+        text = text.Trim().RemoveDiacritics();
+        text = Regex.Replace(text, @"\s{1,}", "_");
+        var hashBytes = SHA256.HashData(Encoding.UTF8.GetBytes(text));
+        return Convert.ToHexString(hashBytes);
+
     }
 }

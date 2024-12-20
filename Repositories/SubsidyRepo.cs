@@ -2,13 +2,12 @@ using Nest;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text.Json;
 using System.Threading.Tasks;
 using HlidacStatu.Connectors;
 using HlidacStatu.Entities;
 using HlidacStatu.Repositories.Searching;
 using Serilog;
-using Elasticsearch.Net;
+
 // using Newtonsoft.Json;
 
 namespace HlidacStatu.Repositories
@@ -19,6 +18,9 @@ namespace HlidacStatu.Repositories
 
         public static readonly ElasticClient SubsidyClient = Manager.GetESClient_SubsidyAsync()
             .ConfigureAwait(false).GetAwaiter().GetResult();
+        
+        public static readonly string[] SubsidyDuplicityOrdering = ["IsRed", "Cedr", "Eufondy", "Státní zemědělský intervenční fond"];
+
 
         public static async Task<Dictionary<int, Dictionary<Subsidy.Hint.Type, decimal>>> PoLetechReportAsync()
         {
@@ -192,31 +194,86 @@ namespace HlidacStatu.Repositories
             }
         }
 
-        public static async Task<List<Subsidy>> FindDuplicatesAsync(Subsidy subsidy)
+        /// <summary>
+        /// Finds if there are duplicates,
+        ///  - set their corresponding hints, and save them
+        ///  - set current subsidy hints
+        ///  - then this subsidy should be saved ??? cant rely on that
+        ///  -> this method should be called after save
+        ///    => this means that nothing is returned
+        ///    => all subsidies are fixed in DB, nothing in memory
+        ///    => win? problems? Fire & forget? :D :D EVIL, but...
+        /// </summary>
+        public static async Task SetDuplicates(Subsidy baseSubsidy)
         {
             // můžeme hledat duplicity jen u firem, lidi nedokážeme správně identifikovat
-            if (string.IsNullOrWhiteSpace(subsidy.Recipient.Ico))
-                return null;
+            if (string.IsNullOrWhiteSpace(baseSubsidy.Recipient.Ico))
+                return;
 
+            var allSubsidies = await FindDuplicatesAsync(baseSubsidy);
+            
+            //no duplicates exist 
+            if(allSubsidies is null) 
+                return;
+
+            if (!allSubsidies.Any())
+            {
+                Logger.Error($"For subsidy [{baseSubsidy.Id}] was not found anything.");
+                return;
+            }
+            
+            var orderedSubsidies = allSubsidies //subsidies ordered by sourceOrdering
+                .OrderBy(s => Array.IndexOf(SubsidyDuplicityOrdering, s.Metadata.DataSource) >= 0 
+                    ? Array.IndexOf(SubsidyDuplicityOrdering, s.Metadata.DataSource) 
+                    : 9999)
+                .ToList();
+            
+            Subsidy original = null;
+            foreach (var subsidy in orderedSubsidies)
+            {
+                // set duplicates
+                if (original == null)
+                {
+                    //set original
+                    subsidy.Hints.IsOriginal = true;
+                    subsidy.Hints.OriginalSubsidyId = null;
+                    subsidy.Hints.DuplicateCalculated = DateTime.Now;
+                    subsidy.Hints.Duplicates = orderedSubsidies.Where(s => s.Id != subsidy.Id).Select(s => s.Id).ToList();
+                    
+                    original = subsidy;
+                }
+                else
+                {
+                    //set 
+                    subsidy.Hints.IsOriginal = false;
+                    subsidy.Hints.OriginalSubsidyId = original.Id; 
+                    subsidy.Hints.DuplicateCalculated = DateTime.Now;
+                    subsidy.Hints.Duplicates = orderedSubsidies.Where(s => s.Id != subsidy.Id).Select(s => s.Id).ToList();
+                }
+                
+                //save subsidy
+                
+            }
+            
+            
+        }
+        
+        private static async Task<List<Subsidy>> FindDuplicatesAsync(Subsidy subsidy)
+        {
             // Build the conditional query for ProjectCode OR ProgramCode OR ProjectName
             QueryContainer projectQuery = null;
-
-            if (!string.IsNullOrWhiteSpace(subsidy.ProjectCode))
+            if (!string.IsNullOrWhiteSpace(subsidy.ProjectCodeHash))
             {
-                projectQuery |= new QueryContainerDescriptor<Subsidy>().Term(t => t.ProjectCode.Suffix("keyword"), subsidy.ProjectCode);
+                projectQuery |= new QueryContainerDescriptor<Subsidy>().Term(t => t.ProjectCodeHash, subsidy.ProjectCodeHash);
             }
-
-            if (!string.IsNullOrWhiteSpace(subsidy.ProgramCode))
+            if (!string.IsNullOrWhiteSpace(subsidy.ProgramCodeHash))
             {
-                projectQuery |= new QueryContainerDescriptor<Subsidy>().Term(t => t.ProgramCode, subsidy.ProgramCode);
+                projectQuery |= new QueryContainerDescriptor<Subsidy>().Term(t => t.ProgramCodeHash, subsidy.ProgramCodeHash);
             }
-
-            // 255 there is because ES ignores 256+ chars when creating keywords...  
-            if (!string.IsNullOrWhiteSpace(subsidy.ProjectName) && subsidy.ProjectName.Length <= 255)
+            if (!string.IsNullOrWhiteSpace(subsidy.ProjectNameHash))
             {
-                projectQuery |= new QueryContainerDescriptor<Subsidy>().Term(t => t.ProjectName.Suffix("keyword"), subsidy.ProjectName);
+                projectQuery |= new QueryContainerDescriptor<Subsidy>().Term(t => t.ProjectNameHash, subsidy.ProjectNameHash);
             }
-
             if (projectQuery is null)
                 return null;
 
@@ -224,9 +281,7 @@ namespace HlidacStatu.Repositories
             var query = new QueryContainerDescriptor<Subsidy>()
                 .Bool(b => b
                     .Must(
-                        m => m.Term(t => t.Recipient.Ico, subsidy.Recipient.Ico),
-                        m => m.Term(t => t.ApprovedYear, subsidy.ApprovedYear),
-                        m => m.Term(t => t.AssumedAmount, subsidy.AssumedAmount),
+                        m => m.Term(t => t.DuplaHash, subsidy.DuplaHash),
                         m => projectQuery // Add the conditional query
                     )
                 );
@@ -234,8 +289,8 @@ namespace HlidacStatu.Repositories
             try
             {
                 var res = await SubsidyClient.SearchAsync<Subsidy>(s => s
-                        .Size(9000)
-                        .Query(q => query)
+                    .Size(9000)
+                    .Query(q => query)
                 );
 
                 if (!res.IsValid) // try again
@@ -252,7 +307,7 @@ namespace HlidacStatu.Repositories
             }
             catch (Exception ex)
             {
-                Logger.Fatal(ex, $"Cant load duplicate subsidies for subsidyId={subsidy.Id}");
+                Logger.Error(ex, $"Cant load duplicate subsidies for subsidyId={subsidy.Id}");
                 throw;
             }
         }
