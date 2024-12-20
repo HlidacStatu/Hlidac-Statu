@@ -19,6 +19,7 @@ using Newtonsoft.Json.Linq;
 using Newtonsoft.Json;
 using HlidacStatu.MLUtil.Splitter;
 using System.Text;
+using static HlidacStatu.AI.LLM.ContractParties.Parsed;
 
 
 namespace HlidacStatu.Repositories
@@ -26,52 +27,77 @@ namespace HlidacStatu.Repositories
     public static partial class SmlouvaRepo
     {
 
-        internal static AI.LLM.ContractParties.Result ToContractParties(this Smlouva smlouva)
+
+        internal static AI.LLM.ContractParties.Parsed ToContractParties(this Smlouva smlouva)
         {
-            AI.LLM.ContractParties.Result res = new AI.LLM.ContractParties.Result();
-            res.objednatel = new AI.LLM.ContractParties.Result.Subjekt(){
-                 IC = smlouva.Platce.ico,                 
+            AI.LLM.ContractParties.Parsed res = new AI.LLM.ContractParties.Parsed();
+            res.objednatel = new AI.LLM.ContractParties.Parsed.Subjekt()
+            {
+                IC = smlouva.Platce.ico,
             };
-            res.poskytovatele = smlouva.Prijemce.Select(m => 
-                new AI.LLM.ContractParties.Result.Subjekt()
+            res.poskytovatele = smlouva.Prijemce.Select(m =>
+                new AI.LLM.ContractParties.Parsed.Subjekt()
                 {
-                     IC = m.ico
+                    IC = m.ico
                 })
                 .ToList();
 
             return res;
         }
 
-        public async static Task<bool?> CheckContractPartiesWithAIAsync(Smlouva smlouva, 
-            HlidacStatu.AI.LLM.Clients.BaseClient llmClient, int maxWordsFromBeginningOfTheText = 1000)
+        public async static Task<bool> SameContractPartiesWithAIAsync(Smlouva smlouva,
+            HlidacStatu.AI.LLM.Clients.BaseClient llmClient, int maxWordsFromBeginningOfTheText = 1000,
+            HlidacStatu.AI.LLM.Models.Model model = null)
         {
             if (smlouva == null)
                 throw new ArgumentNullException(nameof(smlouva));
 
-            var smlouvaParties = ToContractParties(smlouva);
-
-            bool? ok = null;
-            
-            HlidacStatu.AI.LLM.ContractParties llm = new AI.LLM.ContractParties(llmClient);
-            HlidacStatu.AI.LLM.Models.Model model = HlidacStatu.AI.LLM.Models.Model.Llama31;
-
-            StringBuilder t = new StringBuilder();
             foreach (var p in smlouva.Prilohy)
             {
-                SplitSmlouva smlSplit = SplitSmlouva.Create(smlouva.Id, p.UniqueHash(), p.PlainTextContent);
-                
-                for (int i = 0; i < smlSplit.Sections.Count; i++)
+                if (!string.IsNullOrEmpty(p?.PlainTextContent))
                 {
-                    var sect = smlSplit.Sections[i];
-                    t.AppendLine(sect.ToText());
-                    if (i >= 1 || HlidacStatu.AI.LLM.Util.TokenCount(t.ToString(), HlidacStatu.AI.LLM.Util.TokenizeAlgorithm.simple) > maxWordsFromBeginningOfTheText)
-                        break;
+                    HlidacStatu.AI.LLM.ContractParties.Comparison compareRes = await ContractPartiesComparisonWithAIAsync(
+                        smlouva, p, llmClient, maxWordsFromBeginningOfTheText, model);
+                    if (compareRes.Same)
+                        return true;
                 }
-                AI.LLM.ContractParties.Result contractPartiesRes = await llm.FindContractPartiesAsync(t.ToString(), maxWordsFromBeginningOfTheText, model);
-               
+
             }
 
-            return ok;
+            return false;
+        }
+
+        public async static Task<HlidacStatu.AI.LLM.ContractParties.Comparison> ContractPartiesComparisonWithAIAsync(
+                Smlouva smlouva, Smlouva.Priloha priloha,
+                    HlidacStatu.AI.LLM.Clients.BaseClient llmClient, int maxWordsFromBeginningOfTheText = 1000,
+                    HlidacStatu.AI.LLM.Models.Model model = null)
+        {
+            if (smlouva == null)
+                throw new ArgumentNullException(nameof(smlouva));
+            if (priloha == null)
+                throw new ArgumentNullException(nameof(priloha));
+
+
+            AI.LLM.ContractParties.Parsed smlouvaParties = ToContractParties(smlouva);
+
+
+            HlidacStatu.AI.LLM.ContractParties llm = new AI.LLM.ContractParties(llmClient);
+            model = model ?? HlidacStatu.AI.LLM.Models.Model.Llama31;
+
+            StringBuilder t = new StringBuilder();
+            SplitSmlouva smlSplit = SplitSmlouva.Create(smlouva.Id, priloha.UniqueHash(), priloha.PlainTextContent);
+
+            for (int i = 0; i < smlSplit.Sections.Count; i++)
+            {
+                var sect = smlSplit.Sections[i];
+                t.AppendLine(sect.ToText());
+                if (i >= 1 || HlidacStatu.AI.LLM.Util.TokenCount(t.ToString(), HlidacStatu.AI.LLM.Util.TokenizeAlgorithm.simple) > maxWordsFromBeginningOfTheText)
+                    break;
+            }
+
+            AI.LLM.ContractParties.Parsed contractPartiesRes = await llm.FindContractPartiesAsync(t.ToString(), maxWordsFromBeginningOfTheText, model);
+
+            return new HlidacStatu.AI.LLM.ContractParties.Comparison(smlouvaParties, contractPartiesRes);
         }
 
 
@@ -313,7 +339,7 @@ namespace HlidacStatu.Repositories
                 .Union(
                     StaticData.SponzorujiciFirmy_Vsechny?
                         .Get()?
-                        .Select(m => m.IcoDarce) 
+                        .Select(m => m.IcoDarce)
                         ?? new string[] { }
                 )?
                 .Distinct()
@@ -398,7 +424,7 @@ namespace HlidacStatu.Repositories
             int priority = (int)OcrWork.TaskPriority.Standard,
             DS.Api.OcrWork.TaskOptions options = null
             )
-        { 
+        {
             return AddToProcessingQueue(new string[] { smlouvaId }, priority, options);
         }
 
@@ -763,7 +789,7 @@ namespace HlidacStatu.Repositories
         }
         public static async Task<T[]> GetPartValuesAsync<T>(string idVerze, string elasticPropertyPath, string jsonPath = null,
            ElasticClient client = null)
-           //where T : class
+        //where T : class
         {
             jsonPath = jsonPath ?? elasticPropertyPath;
             bool specClient = client != null;

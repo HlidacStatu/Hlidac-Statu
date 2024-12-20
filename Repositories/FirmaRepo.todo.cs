@@ -731,8 +731,9 @@ namespace HlidacStatu.Repositories
                         .Reverse().Skip(skipWord).Reverse() // a ubirej od konce
                         .ToArray();
                     string wordCombination = cutWords.Aggregate((f, s) => f + " " + s);
-                    
-                    string firmaBezKoncovky = Firma.JmenoBezKoncovkyFull(wordCombination, out _);
+
+                    string koncovkaFirmy = "";
+                    string firmaBezKoncovky = Firma.JmenoBezKoncovkyAsciiFull(wordCombination, out koncovkaFirmy);
                     string simpleName = TextUtil.RemoveDiacritics(firmaBezKoncovky).ToLower().Trim();
                     //+ "|" + koncovka;
 
@@ -749,18 +750,21 @@ namespace HlidacStatu.Repositories
                             {
                                 var firmaFromText = TextUtil.ReplaceDuplicates(
                                     Regex.Replace(wordCombination, @"[,;_""']", " ", Validators.DefaultRegexOptions),
-                                    ' ');
+                                    ' ').ToLower();
                                 var firmaFromDB = TextUtil.ReplaceDuplicates(
-                                    Regex.Replace(f.Jmeno, @"[,;_""']", " ", Validators.DefaultRegexOptions), ' ');
+                                    Regex.Replace(f.JmenoBezKoncovky(), @"[,;_""']", " ", Validators.DefaultRegexOptions), ' ');
+                                firmaFromDB = TextUtil.RemoveDiacritics(firmaFromDB).ToLower();
                                 var rozdil = Validators.LevenshteinDistanceCompute(
-                                    TextUtil.RemoveDiacritics(firmaFromDB).ToLower(),
-                                    firmaFromText.ToLower()
+                                    firmaFromDB,
+                                    firmaFromText
                                 );
                                 var fKoncovka = f.KoncovkaFirmy();
                                 var nextWord = "";
                                 if (firstWord + cutWords.Length < words.Length - 1)
                                     nextWord = words[firstWord + cutWords.Length];
 
+                                if (rozdil == 0 && string.IsNullOrEmpty(koncovkaFirmy))
+                                    return f;
                                 if (string.IsNullOrEmpty(fKoncovka))
                                     return f;
                                 if (!string.IsNullOrEmpty(fKoncovka) &&

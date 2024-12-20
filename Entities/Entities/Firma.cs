@@ -140,14 +140,14 @@ namespace HlidacStatu.Entities
                 {
                     return this.ICO;
                 }
-                return _jmeno; 
-            
+                return _jmeno;
+
             }
             set
             {
                 _jmeno = value;
                 JmenoAscii = TextUtil.RemoveDiacritics(value);
-                
+
             }
         }
 
@@ -280,7 +280,7 @@ namespace HlidacStatu.Entities
             return koncovka;
         }
 
-        
+
         private static readonly Dictionary<string, List<string>> _koncovky = new()
         {
             ["s.r.o."] = new()
@@ -308,34 +308,43 @@ namespace HlidacStatu.Entities
             },
             ["s.p."] = new()
             {
-                "s.p.", 
+                "s.p.",
                 "s. p.",
                 "státní podnik",
             },
             ["o.z."] = new()
             {
                 "odštepný závod",
-                "o.z.", 
+                "o.z.",
                 "o. z.",
             },
             ["o.s."] = new()
             {
-                "o.s.", 
+                "o.s.",
                 "o. s.",
             },
             ["z.s."] = new()
             {
-                "z.s.", 
+                "z.s.",
                 "z. s.",
             },
             ["z.ú."] = new()
             {
-                "z.ú.", 
+                "z.ú.",
                 "z. ú.",
             },
         };
 
-        public static string[] Koncovky = _koncovky.SelectMany(k => k.Value).ToArray();
+        public static string[] Koncovky = _koncovky
+            .SelectMany(k => k.Value)
+            .Select(m => m.Trim().ToLower())
+            .Distinct()
+            .ToArray();
+        public static string[] KoncovkyAscii = _koncovky
+            .SelectMany(k =>  k.Value)
+            .Select(m=> Devmasters.TextUtil.RemoveAccents(m).Trim().ToLower())
+            .Distinct()
+            .ToArray();
 
 
         public static string NormalizedKoncovka(string koncovka)
@@ -348,15 +357,22 @@ namespace HlidacStatu.Entities
             string ret;
             return JmenoBezKoncovkyFull(name, out ret);
         }
-
+        public static string JmenoBezKoncovkyAsciiFull(string name, out string koncovka)
+        {
+            return _jmenoBezKoncovkyFull(KoncovkyAscii, name, out koncovka);
+        }
         public static string JmenoBezKoncovkyFull(string name, out string koncovka)
+        {
+            return _jmenoBezKoncovkyFull(Koncovky,name, out koncovka);
+        }
+        private static string _jmenoBezKoncovkyFull(string[] koncovky, string name, out string koncovka)
         {
             koncovka = string.Empty;
             if (string.IsNullOrEmpty(name))
                 return string.Empty;
 
             string modifNazev = name.Trim().Replace((char)160, ' ');
-            foreach (var k in Koncovky.OrderByDescending(m => m.Length))
+            foreach (var k in koncovky.OrderByDescending(m => m.Length))
             {
                 if (modifNazev.EndsWith(k))
                 {
