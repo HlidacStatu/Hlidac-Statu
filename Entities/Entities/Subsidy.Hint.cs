@@ -11,6 +11,13 @@ public partial class Subsidy
 {
     public class Hint
     {
+        private Subsidy _parentSubsidy;
+
+        public Hint(Subsidy parentSubsidy)
+        {
+            _parentSubsidy = parentSubsidy;
+        }
+        
         public Category? Category1 { get; set; }
         public Category? Category2 { get; set; }
         public Category? Category3 { get; set; }
@@ -26,6 +33,9 @@ public partial class Subsidy
         
         [Object]
         public List<string> Duplicates { get; set; } = new List<string>();
+        
+        [Object]
+        public List<string> HiddenDuplicates { get; set; } = new List<string>();
         
         [Keyword]
         public bool HasDuplicates => Duplicates.Any();
@@ -49,6 +59,32 @@ public partial class Subsidy
             InvesticniPobidka
         }
 
+
+        public void SetDuplicate(List<string> duplicates, List<string> hiddenDuplicates, string originalSubsidyId)
+        {
+            if(string.IsNullOrEmpty(originalSubsidyId))
+                return;
+                
+            if (originalSubsidyId == _parentSubsidy.Id)
+            {
+                //set as original
+                IsOriginal = true;
+                OriginalSubsidyId = null;
+                DuplicateCalculated = DateTime.Now;
+                Duplicates = duplicates.Where(d => d != _parentSubsidy.Id).ToList();
+                HiddenDuplicates = hiddenDuplicates.Where(d => d != _parentSubsidy.Id).ToList();;
+
+            }
+            else
+            {
+                //set as duplicate
+                IsOriginal = false;
+                OriginalSubsidyId = originalSubsidyId; 
+                DuplicateCalculated = DateTime.Now;
+                Duplicates = duplicates.Where(d => d != _parentSubsidy.Id).ToList();
+                HiddenDuplicates = hiddenDuplicates.Where(d => d != _parentSubsidy.Id).ToList();
+            }
+        }
 
         #region Categories
         

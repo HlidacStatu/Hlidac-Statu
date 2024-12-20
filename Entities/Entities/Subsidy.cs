@@ -11,6 +11,11 @@ namespace HlidacStatu.Entities;
 [ElasticsearchType(IdProperty = nameof(Id))]
 public partial class Subsidy
 {
+    //needed for backreference
+    public Subsidy()
+    {
+        Hints = new Hint(this);
+    }
 
     [Keyword]
     public string Id
@@ -110,7 +115,7 @@ public partial class Subsidy
     public List<object> RawData { get; set; } = new();
     
     [Object]
-    public Hint Hints { get; set; } = new();
+    public Hint Hints { get; set; }
     
     public class SubsidyMetadata
     {

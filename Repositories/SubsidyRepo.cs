@@ -1,7 +1,9 @@
 using Nest;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using HlidacStatu.Connectors;
 using HlidacStatu.Entities;
@@ -18,9 +20,12 @@ namespace HlidacStatu.Repositories
 
         public static readonly ElasticClient SubsidyClient = Manager.GetESClient_SubsidyAsync()
             .ConfigureAwait(false).GetAwaiter().GetResult();
-        
-        public static readonly string[] SubsidyDuplicityOrdering = ["IsRed", "Cedr", "Eufondy", "Státní zemědělský intervenční fond"];
 
+        public static readonly string[] SubsidyDuplicityOrdering =
+            ["IsRed", "Cedr", "Eufondy", "Státní zemědělský intervenční fond"];
+        
+        private static readonly ConcurrentDictionary<string, SemaphoreSlim> _subsidyLocks = new();
+        
 
         public static async Task<Dictionary<int, Dictionary<Subsidy.Hint.Type, decimal>>> PoLetechReportAsync()
         {
@@ -63,12 +68,12 @@ namespace HlidacStatu.Repositories
                         {
                             foreach (KeyedBucket<object> subsidyTypeBucket in subsidyTypeBA.Items)
                             {
-                                if (Enum.TryParse<Subsidy.Hint.Type>(subsidyTypeBucket.Key.ToString(), out var subsidyType))
+                                if (Enum.TryParse<Subsidy.Hint.Type>(subsidyTypeBucket.Key.ToString(),
+                                        out var subsidyType))
                                 {
                                     if (subsidyTypeBucket["sumAssumedAmount"] is ValueAggregate sumBA)
                                     {
                                         results[year].Add(subsidyType, Convert.ToDecimal(sumBA.Value ?? 0));
-
                                     }
                                 }
                             }
@@ -98,9 +103,35 @@ namespace HlidacStatu.Repositories
                 };
         }
 
+
         public static async Task SaveAsync(Subsidy subsidy, bool shouldRewrite)
         {
-            Logger.Debug($"Saving subsidy {subsidy.Metadata.RecordNumber} from {subsidy.Metadata.DataSource}/{subsidy.Metadata.FileName}");
+            // because of setting duplicates, this method can run only for one set of subsidies at the time
+            // otherwise, duplicates could rewrite/saved subsidies (RACE CONDITION)
+            // since duplicates are loaded/saved mainly for batches with the same "DuplaHash", 
+            // then we can afford to lock on that level and widen the bottleneck
+            
+            var semaphore = _subsidyLocks.GetOrAdd(subsidy.DuplaHash, _ => new SemaphoreSlim(1, 1));
+
+            Logger.Debug($"Waiting to acquire semaphore for subsidy {subsidy.Id}");
+            await semaphore.WaitAsync();
+            try
+            {
+                Logger.Debug($"Semaphore acquired for subsidy {subsidy.Id}");
+                await SaveThreadUnsafeAsync(subsidy, shouldRewrite);
+                await SetDuplicatesThreadUnsafeAsync(subsidy);
+            }
+            finally
+            {
+                Logger.Debug($"Releasing semaphore for subsidy {subsidy.Id}");
+                semaphore.Release();
+            }
+        }
+        
+        private static async Task SaveThreadUnsafeAsync(Subsidy subsidy, bool shouldRewrite)
+        {
+            Logger.Debug(
+                $"Saving subsidy {subsidy.Metadata.RecordNumber} from {subsidy.Metadata.DataSource}/{subsidy.Metadata.FileName}");
             if (subsidy is null) throw new ArgumentNullException(nameof(subsidy));
 
             if (!shouldRewrite)
@@ -116,15 +147,10 @@ namespace HlidacStatu.Repositories
                 }
             }
 
-            subsidy.Metadata.ModifiedDate = DateTime.Now;
-            var res = await SubsidyClient.IndexAsync(subsidy, o => o.Id(subsidy.Id));
+            await SaveSubsidyDirectlyToEs(subsidy);
 
-            if (!res.IsValid)
-            {
-                Logger.Error($"Failed to save subsidy for {subsidy.Id}. {res.OriginalException.Message}");
-                throw new ApplicationException(res.ServerError?.ToString());
-            }
-            Logger.Debug($"Subsidy {subsidy.Metadata.RecordNumber} from {subsidy.Metadata.DataSource}/{subsidy.Metadata.FileName} saved");
+            Logger.Debug(
+                $"Subsidy {subsidy.Metadata.RecordNumber} from {subsidy.Metadata.DataSource}/{subsidy.Metadata.FileName} saved");
 
             //todo: uncomment once ready for statistic recalculation
             // if(subsidy.Recipient.Ico is not null)
@@ -133,7 +159,8 @@ namespace HlidacStatu.Repositories
 
         private static Subsidy MergeSubsidy(Subsidy oldRecord, Subsidy newRecord)
         {
-            Logger.Information($"Merging subsidy for {oldRecord.Id}, from {oldRecord.Metadata.DataSource}/{oldRecord.Metadata.FileName}, records [{newRecord.Metadata.RecordNumber}] and [{oldRecord.Metadata.RecordNumber}]");
+            Logger.Information(
+                $"Merging subsidy for {oldRecord.Id}, from {oldRecord.Metadata.DataSource}/{oldRecord.Metadata.FileName}, records [{newRecord.Metadata.RecordNumber}] and [{oldRecord.Metadata.RecordNumber}]");
             newRecord.SubsidyAmount += oldRecord.SubsidyAmount;
             newRecord.PayedAmount += oldRecord.PayedAmount;
             newRecord.ReturnedAmount += oldRecord.ReturnedAmount;
@@ -142,34 +169,6 @@ namespace HlidacStatu.Repositories
             newRecord.RawData.AddRange(oldRecord.RawData);
 
             return newRecord;
-        }
-
-        public static async Task SetHiddenSubsidies(HashSet<string> subsidiesToHideId)
-        {
-            if (!subsidiesToHideId.Any())
-                return;
-
-            foreach (var subsidyToHideId in subsidiesToHideId)
-            {
-                var updateByQueryResponse = await SubsidyClient.UpdateByQueryAsync<Subsidy>(u => u
-                    .Query(q => q
-                        .Bool(b => b
-                            .Must(
-                                m => m.Term(t => t.Id, subsidyToHideId)
-                            )
-                        )
-                    )
-                    .Script(s => s
-                        .Source("ctx._source.metadata.isHidden = true")
-                    )
-                );
-
-                if (!updateByQueryResponse.IsValid)
-                {
-                    Logger.Error(updateByQueryResponse.OriginalException, $"Problem during setting hidden subsidies for {subsidiesToHideId},\n Debug info:{updateByQueryResponse.DebugInformation} ");
-                }
-            }
-
         }
 
         public static HashSet<string> GetAllIds(string datasource, string fileName)
@@ -189,91 +188,128 @@ namespace HlidacStatu.Repositories
             }
             catch (Exception ex)
             {
-                Logger.Fatal(ex, "Problem when loading ids for {datasource}/{fileName}. Aborting load", datasource, fileName);
+                Logger.Fatal(ex, "Problem when loading ids for {datasource}/{fileName}. Aborting load", datasource,
+                    fileName);
                 throw;
             }
         }
 
-        /// <summary>
-        /// Finds if there are duplicates,
-        ///  - set their corresponding hints, and save them
-        ///  - set current subsidy hints
-        ///  - then this subsidy should be saved ??? cant rely on that
-        ///  -> this method should be called after save
-        ///    => this means that nothing is returned
-        ///    => all subsidies are fixed in DB, nothing in memory
-        ///    => win? problems? Fire & forget? :D :D EVIL, but...
-        /// </summary>
-        public static async Task SetDuplicates(Subsidy baseSubsidy)
+        private static async Task SetDuplicatesThreadUnsafeAsync(Subsidy baseSubsidy)
         {
             // můžeme hledat duplicity jen u firem, lidi nedokážeme správně identifikovat
             if (string.IsNullOrWhiteSpace(baseSubsidy.Recipient.Ico))
                 return;
 
             var allSubsidies = await FindDuplicatesAsync(baseSubsidy);
-            
-            //no duplicates exist 
-            if(allSubsidies is null) 
-                return;
 
-            if (!allSubsidies.Any())
+            //no duplicates exist 
+            if (allSubsidies == null || !allSubsidies.Any())
             {
                 Logger.Error($"For subsidy [{baseSubsidy.Id}] was not found anything.");
                 return;
             }
             
-            var orderedSubsidies = allSubsidies //subsidies ordered by sourceOrdering
-                .OrderBy(s => Array.IndexOf(SubsidyDuplicityOrdering, s.Metadata.DataSource) >= 0 
-                    ? Array.IndexOf(SubsidyDuplicityOrdering, s.Metadata.DataSource) 
+            var visibleDuplicates = allSubsidies //subsidies ordered by sourceOrdering
+                .Where(s => s.Metadata.IsHidden == false)
+                .OrderBy(s => Array.IndexOf(SubsidyDuplicityOrdering, s.Metadata.DataSource) >= 0
+                    ? Array.IndexOf(SubsidyDuplicityOrdering, s.Metadata.DataSource)
                     : 9999)
                 .ToList();
+
+            var hiddenDuplicates = allSubsidies //hidden subsidies
+                .Where(s => s.Metadata.IsHidden == true)
+                .ToList();
+
+            var visibleDuplicateIds = visibleDuplicates.Select(s => s.Id).ToList();
+            var hiddenDuplicateIds = hiddenDuplicates.Select(hs => hs.Id).ToList();
             
             Subsidy original = null;
-            foreach (var subsidy in orderedSubsidies)
+            foreach (var visibleSubsidy in visibleDuplicates)
             {
                 // set duplicates
                 if (original == null)
                 {
-                    //set original
-                    subsidy.Hints.IsOriginal = true;
-                    subsidy.Hints.OriginalSubsidyId = null;
-                    subsidy.Hints.DuplicateCalculated = DateTime.Now;
-                    subsidy.Hints.Duplicates = orderedSubsidies.Where(s => s.Id != subsidy.Id).Select(s => s.Id).ToList();
-                    
-                    original = subsidy;
-                }
-                else
-                {
-                    //set 
-                    subsidy.Hints.IsOriginal = false;
-                    subsidy.Hints.OriginalSubsidyId = original.Id; 
-                    subsidy.Hints.DuplicateCalculated = DateTime.Now;
-                    subsidy.Hints.Duplicates = orderedSubsidies.Where(s => s.Id != subsidy.Id).Select(s => s.Id).ToList();
+                    original = visibleSubsidy;
                 }
                 
-                //save subsidy
-                
+                visibleSubsidy.Hints.SetDuplicate(visibleDuplicateIds, hiddenDuplicateIds, original.Id);
             }
             
+            foreach (var hiddenSubsidy in hiddenDuplicates)
+            {
+                // set duplicates - if there is no visible original, then we need to set hidden original
+                if (original == null)
+                {
+                    original = hiddenSubsidy;
+                }
+                
+                hiddenSubsidy.Hints.SetDuplicate(visibleDuplicateIds, hiddenDuplicateIds, original.Id);
+            }
             
+            await BulkSaveSubsidiesToEs(allSubsidies);
+        }
+
+        private static async Task SaveSubsidyDirectlyToEs(Subsidy subsidy)
+        {
+            subsidy.Metadata.ModifiedDate = DateTime.Now;
+
+            var res = await SubsidyClient.IndexAsync(subsidy, o => o.Id(subsidy.Id));
+
+            if (!res.IsValid)
+            {
+                Logger.Error($"Failed to save subsidy for {subsidy.Id}. {res.OriginalException.Message}");
+                throw new ApplicationException(res.ServerError?.ToString());
+            }
         }
         
+        private static async Task BulkSaveSubsidiesToEs(List<Subsidy> subsidies)
+        {
+            var bulkDescriptor = new BulkDescriptor();
+
+            foreach (var subsidy in subsidies)
+            {
+                subsidy.Metadata.ModifiedDate = DateTime.Now;
+
+                bulkDescriptor.Index<Subsidy>(op => op
+                    .Id(subsidy.Id)
+                    .Document(subsidy));
+            }
+
+            var res = await SubsidyClient.BulkAsync(bulkDescriptor);
+
+            if (!res.IsValid || res.Errors)
+            {
+                foreach (var item in res.ItemsWithErrors)
+                {
+                    Logger.Error($"Failed to save subsidy for {item.Id}. Error: {item.Error.Reason}");
+                }
+
+                throw new ApplicationException("Bulk save operation encountered errors.");
+            }
+        }
+
         private static async Task<List<Subsidy>> FindDuplicatesAsync(Subsidy subsidy)
         {
             // Build the conditional query for ProjectCode OR ProgramCode OR ProjectName
             QueryContainer projectQuery = null;
             if (!string.IsNullOrWhiteSpace(subsidy.ProjectCodeHash))
             {
-                projectQuery |= new QueryContainerDescriptor<Subsidy>().Term(t => t.ProjectCodeHash, subsidy.ProjectCodeHash);
+                projectQuery |=
+                    new QueryContainerDescriptor<Subsidy>().Term(t => t.ProjectCodeHash, subsidy.ProjectCodeHash);
             }
+
             if (!string.IsNullOrWhiteSpace(subsidy.ProgramCodeHash))
             {
-                projectQuery |= new QueryContainerDescriptor<Subsidy>().Term(t => t.ProgramCodeHash, subsidy.ProgramCodeHash);
+                projectQuery |=
+                    new QueryContainerDescriptor<Subsidy>().Term(t => t.ProgramCodeHash, subsidy.ProgramCodeHash);
             }
+
             if (!string.IsNullOrWhiteSpace(subsidy.ProjectNameHash))
             {
-                projectQuery |= new QueryContainerDescriptor<Subsidy>().Term(t => t.ProjectNameHash, subsidy.ProjectNameHash);
+                projectQuery |=
+                    new QueryContainerDescriptor<Subsidy>().Term(t => t.ProjectNameHash, subsidy.ProjectNameHash);
             }
+
             if (projectQuery is null)
                 return null;
 
@@ -303,7 +339,6 @@ namespace HlidacStatu.Repositories
                 }
 
                 return res.Documents.ToList();
-
             }
             catch (Exception ex)
             {
@@ -380,15 +415,18 @@ namespace HlidacStatu.Repositories
             bool isScrollSetHasData = true;
             while (isScrollSetHasData)
             {
-                ISearchResponse<Subsidy> loopingResponse = await SubsidyClient.ScrollAsync<Subsidy>(scrollTimeout, scrollid);
+                ISearchResponse<Subsidy> loopingResponse =
+                    await SubsidyClient.ScrollAsync<Subsidy>(scrollTimeout, scrollid);
                 if (loopingResponse.IsValid)
                 {
                     foreach (var dotace in loopingResponse.Documents)
                     {
                         yield return dotace;
                     }
+
                     scrollid = loopingResponse.ScrollId;
                 }
+
                 isScrollSetHasData = loopingResponse.Documents.Any();
             }
 
@@ -402,6 +440,5 @@ namespace HlidacStatu.Repositories
 
             return GetAllAsync(qc);
         }
-
     }
 }
