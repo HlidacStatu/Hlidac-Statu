@@ -20,7 +20,7 @@ namespace HlidacStatu.Repositories
     public static class StaticData
     {
         private static readonly ILogger _logger = Log.ForContext(typeof(StaticData));
-        
+
         [Serializable]
         public class FirmaName
         {
@@ -36,7 +36,7 @@ namespace HlidacStatu.Repositories
         public static string[] Mestske_Firmy = new string[] { };
 
 
-        public static Devmasters.Cache.AWS_S3.Cache<OrganizacniStrukturyUradu> OrganizacniStrukturyUraduCache = null;
+        public static Devmasters.Cache.AWS_S3.AutoUpdatebleCache<OrganizacniStrukturyUradu> OrganizacniStrukturyUraduCache = null;
         public static DateTime OrganizacniStrukturyUraduExportDate;
 
         public static Devmasters.Cache.AWS_S3.Cache<IEnumerable<AnalysisCalculation.IcoSmlouvaMinMax>> FirmyCasovePodezreleZalozene = null;
@@ -46,7 +46,7 @@ namespace HlidacStatu.Repositories
 
         public static Devmasters.Cache.AWS_S3.Cache<Tuple<Osoba.Statistics.RegistrSmluv, Entities.Insolvence.RizeniStatistic[]>[]> Insolvence_firem_politiku_Cache = null;
 
-        
+
 
         public static Devmasters.Cache.AWS_S3.Cache<AnalysisCalculation.VazbyFiremNaUradyStat> UradyObchodujiciSFirmami_s_vazbouNaPolitiky_aktualni_Cache = null;
         public static Devmasters.Cache.AWS_S3.Cache<AnalysisCalculation.VazbyFiremNaUradyStat> UradyObchodujiciSFirmami_s_vazbouNaPolitiky_nedavne_Cache = null;
@@ -675,7 +675,7 @@ namespace HlidacStatu.Repositories
                 // hierarchie uradu
                 try
                 {
-                    OrganizacniStrukturyUraduCache = new Devmasters.Cache.AWS_S3.Cache<OrganizacniStrukturyUradu>(
+                    OrganizacniStrukturyUraduCache = new Devmasters.Cache.AWS_S3.AutoUpdatebleCache<OrganizacniStrukturyUradu>(
                                             new string[] { Devmasters.Config.GetWebConfigValue("Minio.Cache.Endpoint") },
                     Devmasters.Config.GetWebConfigValue("Minio.Cache.Bucket"),
                     Devmasters.Config.GetWebConfigValue("Minio.Cache.AccessKey"),
@@ -771,18 +771,28 @@ namespace HlidacStatu.Repositories
 
         private static organizacni_struktura_sluzebnich_uradu ParseOssu()
         {
-            string url = "https://portal.isoss.cz/opendata/ISoSS_Opendata_OSYS_OSSS.xml";
-            string xml = Devmasters.Net.HttpClient.Simple.GetAsync(url).Result;
-
-            var ser = new XmlSerializer(typeof(organizacni_struktura_sluzebnich_uradu));
-
-            using (var streamReader = new StringReader(xml))
+            try
             {
-                using (var reader = XmlReader.Create(streamReader))
+
+                string url = "https://portal.isoss.gov.cz/opendata/ISoSS_Opendata_OSYS_OSSS.xml";
+                string xml = Devmasters.Net.HttpClient.Simple.GetAsync(url).Result;
+
+                var ser = new XmlSerializer(typeof(organizacni_struktura_sluzebnich_uradu));
+
+                using (var streamReader = new StringReader(xml))
                 {
-                    return (organizacni_struktura_sluzebnich_uradu)ser.Deserialize(reader);
+                    using (var reader = XmlReader.Create(streamReader))
+                    {
+                        return (organizacni_struktura_sluzebnich_uradu)ser.Deserialize(reader);
+                    }
                 }
             }
+            catch (Exception e)
+            {
+                _logger.Error(e, "organizacni_struktura_sluzebnich_uradu ParseOssu");
+                return new organizacni_struktura_sluzebnich_uradu();
+            }
+
         }
 
 
