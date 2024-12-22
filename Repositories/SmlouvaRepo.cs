@@ -70,7 +70,7 @@ namespace HlidacStatu.Repositories
         public async static Task<HlidacStatu.AI.LLM.ContractParties.Comparison> ContractPartiesComparisonWithAIAsync(
                 Smlouva smlouva, Smlouva.Priloha priloha,
                     HlidacStatu.AI.LLM.Clients.BaseClient llmClient, int maxWordsFromBeginningOfTheText = 1000,
-                    HlidacStatu.AI.LLM.Models.Model model = null)
+                    HlidacStatu.AI.LLM.Models.Model model = null, bool doubleCheck = false)
         {
             if (smlouva == null)
                 throw new ArgumentNullException(nameof(smlouva));
@@ -97,9 +97,44 @@ namespace HlidacStatu.Repositories
 
             AI.LLM.ContractParties.Parsed contractPartiesRes = await llm.FindContractPartiesAsync(t.ToString(), maxWordsFromBeginningOfTheText, model);
 
-            return new HlidacStatu.AI.LLM.ContractParties.Comparison(smlouvaParties, contractPartiesRes);
-        }
+            var res = new HlidacStatu.AI.LLM.ContractParties.Comparison(smlouvaParties, contractPartiesRes);
 
+            if (res.Same == false && doubleCheck)
+            {
+
+                bool objednatelIsTrue = false;
+                bool dodavateleAreTrue = true;
+                if (res.Status == AI.LLM.ContractParties.Comparison.StatusEnum.SwitchedContractParties
+                    ||
+                    res.Status == AI.LLM.ContractParties.Comparison.StatusEnum.DifferentPlatce
+                    )
+                {
+                    Firma objednatel = Firmy.Get(res.SecondToCompare.objednatel.GetOnlyIco());
+                    if (objednatel.Valid)
+                    {
+                        objednatelIsTrue = await llm.DoubleCheckParties(objednatel.Jmeno, objednatel.ICO, true, t.ToString());
+                    }
+                }
+                if (res.Status == AI.LLM.ContractParties.Comparison.StatusEnum.SwitchedContractParties
+                    ||
+                    res.Status == AI.LLM.ContractParties.Comparison.StatusEnum.DifferentPrijemce
+                    )
+                {
+                    foreach (var d in res.SecondToCompare.poskytovatele)
+                    {
+                        Firma dodavatel = Firmy.Get(res.SecondToCompare.objednatel.GetOnlyIco());
+                        if (dodavatel.Valid)
+                        {
+                            dodavateleAreTrue = dodavateleAreTrue &
+                                (
+                                    await llm.DoubleCheckParties(dodavatel.Jmeno, dodavatel.ICO, true, t.ToString())
+                                );
+                        }
+                    }
+                }
+            }
+            return res;
+        }
 
         /// <summary>
         /// Deletes a Smlouva asynchronously.
