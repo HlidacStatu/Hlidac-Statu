@@ -298,12 +298,6 @@ namespace HlidacStatu.Repositories
                     new QueryContainerDescriptor<Subsidy>().Term(t => t.ProjectCodeHash, subsidy.ProjectCodeHash);
             }
 
-            if (!string.IsNullOrWhiteSpace(subsidy.ProgramCodeHash))
-            {
-                projectQuery |=
-                    new QueryContainerDescriptor<Subsidy>().Term(t => t.ProgramCodeHash, subsidy.ProgramCodeHash);
-            }
-
             if (!string.IsNullOrWhiteSpace(subsidy.ProjectNameHash))
             {
                 projectQuery |=

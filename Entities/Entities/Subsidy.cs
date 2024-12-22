@@ -42,9 +42,7 @@ public partial class Subsidy
     [Keyword]
     public string ProjectCodeHash => CalculateDuplaHash(ProjectCode);
     [Keyword]
-    public string ProgramCodeHash => CalculateDuplaHash(ProgramCode);
-    [Keyword]
-    public string ProjectNameHash => CalculateDuplaHash(ProgramName);
+    public string ProjectNameHash => CalculateDuplaHash(ProjectName);
     
     
 
