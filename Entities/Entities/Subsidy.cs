@@ -11,11 +11,6 @@ namespace HlidacStatu.Entities;
 [ElasticsearchType(IdProperty = nameof(Id))]
 public partial class Subsidy
 {
-    //needed for backreference
-    public Subsidy()
-    {
-        Hints = new Hint(this);
-    }
 
     [Keyword]
     public string Id
@@ -39,9 +34,9 @@ public partial class Subsidy
         get
         {
             var hashBytes = SHA256.HashData(Encoding.UTF8.GetBytes(
-                $"{Recipient.Ico}_{ApprovedYear}_{AssumedAmount}"));
-            var hash = Convert.ToHexString(hashBytes);
-            return $"{Metadata.DataSource}-{hash}";
+                $"{Recipient.Ico}_{ApprovedYear}_{AssumedAmount:N0}"));
+            return Convert.ToHexString(hashBytes);
+            
         }
     }
     [Keyword]
@@ -113,9 +108,9 @@ public partial class Subsidy
     /// </summary>
     [Object(Enabled = false)] //do not index, do not process, just store
     public List<object> RawData { get; set; } = new();
-    
+
     [Object]
-    public Hint Hints { get; set; }
+    public Hint Hints { get; set; } = new();
     
     public class SubsidyMetadata
     {

@@ -232,7 +232,7 @@ namespace HlidacStatu.Repositories
                     original = visibleSubsidy;
                 }
                 
-                visibleSubsidy.Hints.SetDuplicate(visibleDuplicateIds, hiddenDuplicateIds, original.Id);
+                visibleSubsidy.Hints.SetDuplicate(visibleSubsidy, visibleDuplicateIds, hiddenDuplicateIds, original.Id);
             }
             
             foreach (var hiddenSubsidy in hiddenDuplicates)
@@ -243,7 +243,7 @@ namespace HlidacStatu.Repositories
                     original = hiddenSubsidy;
                 }
                 
-                hiddenSubsidy.Hints.SetDuplicate(visibleDuplicateIds, hiddenDuplicateIds, original.Id);
+                hiddenSubsidy.Hints.SetDuplicate(hiddenSubsidy, visibleDuplicateIds, hiddenDuplicateIds, original.Id);
             }
             
             await BulkSaveSubsidiesToEs(allSubsidies);
@@ -288,7 +288,7 @@ namespace HlidacStatu.Repositories
             }
         }
 
-        private static async Task<List<Subsidy>> FindDuplicatesAsync(Subsidy subsidy)
+        public static async Task<List<Subsidy>> FindDuplicatesAsync(Subsidy subsidy)
         {
             // Build the conditional query for ProjectCode OR ProgramCode OR ProjectName
             QueryContainer projectQuery = null;
