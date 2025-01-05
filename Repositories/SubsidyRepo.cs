@@ -23,9 +23,9 @@ namespace HlidacStatu.Repositories
 
         public static readonly string[] SubsidyDuplicityOrdering =
             ["IsRed", "Cedr", "Eufondy", "Státní zemědělský intervenční fond"];
-        
+
         private static readonly ConcurrentDictionary<string, SemaphoreSlim> _subsidyLocks = new();
-        
+
 
         public static async Task<Dictionary<int, Dictionary<Subsidy.Hint.Type, decimal>>> PoLetechReportAsync()
         {
@@ -110,7 +110,7 @@ namespace HlidacStatu.Repositories
             // otherwise, duplicates could rewrite/saved subsidies (RACE CONDITION)
             // since duplicates are loaded/saved mainly for batches with the same "DuplaHash", 
             // then we can afford to lock on that level and widen the bottleneck
-            
+
             var semaphore = _subsidyLocks.GetOrAdd(subsidy.DuplaHash, _ => new SemaphoreSlim(1, 1));
 
             Logger.Debug($"Waiting to acquire semaphore for subsidy {subsidy.Id}");
@@ -119,7 +119,7 @@ namespace HlidacStatu.Repositories
             {
                 Logger.Debug($"Semaphore acquired for subsidy {subsidy.Id}");
                 await SaveThreadUnsafeAsync(subsidy, shouldRewrite);
-                await SetDuplicatesThreadUnsafeAsync(subsidy);
+                await FindAndSetDuplicatesThreadUnsafeAsync(subsidy);
             }
             finally
             {
@@ -127,7 +127,7 @@ namespace HlidacStatu.Repositories
                 semaphore.Release();
             }
         }
-        
+
         private static async Task SaveThreadUnsafeAsync(Subsidy subsidy, bool shouldRewrite)
         {
             Logger.Debug(
@@ -193,22 +193,68 @@ namespace HlidacStatu.Repositories
                 throw;
             }
         }
-
-        private static async Task SetDuplicatesThreadUnsafeAsync(Subsidy baseSubsidy)
+        public static async Task FindAndSetDuplicatesThreadUnsafeAsync(Subsidy baseSubsidy)
         {
             // můžeme hledat duplicity jen u firem, lidi nedokážeme správně identifikovat
             if (string.IsNullOrWhiteSpace(baseSubsidy.Recipient.Ico))
                 return;
 
             var allSubsidies = await FindDuplicatesAsync(baseSubsidy);
-
             //no duplicates exist 
             if (allSubsidies == null || !allSubsidies.Any())
             {
                 Logger.Error($"For subsidy [{baseSubsidy.Id}] was not found anything.");
                 return;
             }
-            
+            //if baseIs Missing in allSubsidies
+            if (allSubsidies.Any(m => m.Id == baseSubsidy.Id) == false)
+                allSubsidies.Add(baseSubsidy);
+
+            //consolidate base on ids
+            var subsidyIds = allSubsidies.Where(m => m.Hints?.HasDuplicates == true).SelectMany(m => m.Hints.Duplicates)
+                .Concat(allSubsidies.Where(m => m.Hints?.HasHiddenDuplicates == true).SelectMany(m => m.Hints.HiddenDuplicates))
+                .Distinct()
+                .ToList();
+
+            await ConsolidatedAndSetDuplicatesThreadUnsafeAsync(subsidyIds);
+        }
+
+        public static async Task ConsolidatedAndSetDuplicatesThreadUnsafeAsync(List<string> subsidyIds)
+        {
+            List<Subsidy> subsidies = new List<Subsidy>();
+            //load all initial subsidies
+
+            load:
+            bool added = false;
+            foreach (var id in subsidyIds)
+            {
+                //add missing
+                if (subsidies.Any(m => m.Id == id) == false)
+                {
+                    var s = await GetAsync(id);
+                    if (s != null)
+                    {
+                        subsidies.Add(s);
+                        added = true;
+                    }
+                }
+            }
+
+            if (added)
+            {            //get all duplicates from all of them
+                subsidyIds= subsidies.Where(m => m.Hints?.HasDuplicates == true).SelectMany(m => m.Hints.Duplicates)
+                    .Concat(subsidies.Where(m => m.Hints?.HasHiddenDuplicates == true).SelectMany(m => m.Hints.HiddenDuplicates))
+                    .Distinct()
+                    .ToList();
+                goto load;
+            }
+            await SetDuplicatesThreadUnsafeAsync(subsidies);
+        }
+
+
+        public static async Task SetDuplicatesThreadUnsafeAsync(List<Subsidy> allSubsidies)
+        {
+
             var visibleDuplicates = allSubsidies //subsidies ordered by sourceOrdering
                 .Where(s => s.Metadata.IsHidden == false)
                 .OrderBy(s => Array.IndexOf(SubsidyDuplicityOrdering, s.Metadata.DataSource) >= 0
@@ -222,7 +268,7 @@ namespace HlidacStatu.Repositories
 
             var visibleDuplicateIds = visibleDuplicates.Select(s => s.Id).ToList();
             var hiddenDuplicateIds = hiddenDuplicates.Select(hs => hs.Id).ToList();
-            
+
             Subsidy original = null;
             foreach (var visibleSubsidy in visibleDuplicates)
             {
@@ -231,10 +277,10 @@ namespace HlidacStatu.Repositories
                 {
                     original = visibleSubsidy;
                 }
-                
+
                 visibleSubsidy.Hints.SetDuplicate(visibleSubsidy, visibleDuplicateIds, hiddenDuplicateIds, original.Id);
             }
-            
+
             foreach (var hiddenSubsidy in hiddenDuplicates)
             {
                 // set duplicates - if there is no visible original, then we need to set hidden original
@@ -242,14 +288,17 @@ namespace HlidacStatu.Repositories
                 {
                     original = hiddenSubsidy;
                 }
-                
+
                 hiddenSubsidy.Hints.SetDuplicate(hiddenSubsidy, visibleDuplicateIds, hiddenDuplicateIds, original.Id);
             }
-            
+
             await BulkSaveSubsidiesToEs(allSubsidies);
         }
 
-        private static async Task SaveSubsidyDirectlyToEs(Subsidy subsidy)
+        public static async Task UpdateAndSaveSubsidyDuplicates(string originalSubsidyId, IEnumerable<string> visibleDuplicates, IEnumerable<string> hiddenDuplicates)
+        {
+        }
+        public static async Task SaveSubsidyDirectlyToEs(Subsidy subsidy)
         {
             subsidy.Metadata.ModifiedDate = DateTime.Now;
 
@@ -261,7 +310,7 @@ namespace HlidacStatu.Repositories
                 throw new ApplicationException(res.ServerError?.ToString());
             }
         }
-        
+
         private static async Task BulkSaveSubsidiesToEs(List<Subsidy> subsidies)
         {
             var bulkDescriptor = new BulkDescriptor();
