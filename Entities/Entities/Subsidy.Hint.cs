@@ -30,7 +30,9 @@ public partial class Subsidy
         
         [Keyword]
         public bool HasDuplicates => Duplicates.Any();
-        
+        [Keyword]
+        public bool HasHiddenDuplicates => HiddenDuplicates.Any();
+
 
         /// <summary>
         ///     Legislativa - info, jestli jde o státní/evropskou dotaci, krajskou, obecní a nebo investiční pobídka
