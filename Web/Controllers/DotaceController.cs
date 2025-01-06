@@ -20,10 +20,25 @@ namespace HlidacStatu.Web.Controllers
                 return View(new Repositories.Searching.SubsidySearchResult());
             }
 
+            // var aggs = new Nest.AggregationContainerDescriptor<Subsidy>()
+            //     .Sum("souhrn", s => s
+            //         .Field(f => f.AssumedAmount)
+            //
+            //     );
+            
             var aggs = new Nest.AggregationContainerDescriptor<Subsidy>()
-                .Sum("souhrn", s => s
-                    .Field(f => f.AssumedAmount)
-
+                .Filter("filtered_sum", f => f
+                    .Filter(q => q
+                        .Term(t => t
+                            .Field(f => f.Hints.IsOriginal)
+                            .Value(true)
+                        )
+                    )
+                    .Aggregations(subAgg => subAgg
+                        .Sum("souhrn", s => s
+                            .Field(f => f.AssumedAmount)
+                        )
+                    )
                 );
 
 

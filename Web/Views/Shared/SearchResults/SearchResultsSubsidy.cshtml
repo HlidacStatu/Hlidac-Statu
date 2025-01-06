@@ -19,17 +19,13 @@
     {
         var dotaceItem = hit.Source;
         
-        //find duplicates
-        var hasSimilar = Model.ElasticResults.Hits
-            .Count(h => h.Source.Recipient.Ico == dotaceItem.Recipient.Ico
-                && h.Source.ProjectCode == dotaceItem.ProjectCode) > 1;
         
-        <tr class="@(hasSimilar ? "alert alert-warning" : "") ">
+        <tr class="@(!dotaceItem.Hints.IsOriginal ? "alert alert-warning" : "") ">
             <td class="text-nowrap">
 
-                @if (hasSimilar)
+                @if (!dotaceItem.Hints.IsOriginal)
                 {
-                    <i class="fas fa-exclamation-circle text-warning" title="Potencionální duplicita"></i>
+                    <i class="fas fa-exclamation-circle text-warning" title="Pravděpodobná duplicita"></i>
                 }
                 <add-bookmark item="dotaceItem"></add-bookmark>
 

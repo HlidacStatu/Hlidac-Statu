@@ -1,24 +1,9 @@
-﻿@using HlidacStatu.Entities
-@using HlidacStatu.Extensions
-@using HlidacStatu.Repositories
-@using HlidacStatu.Repositories.Searching
+﻿@using HlidacStatu.Extensions
 @model HlidacStatu.Entities.Subsidy
 
 @{
     ViewBag.Title = "Hlídač dotací";
     ViewBag.SubTitle = "Detail dotace";
-
-    string duplicitaQuery = $"ico:{Model.Recipient.Ico} AND kodProjektu:\"{Model.ProjectCode}\"";
-    List<Subsidy> duplicity = null;
-    if (!string.IsNullOrWhiteSpace(Model.Recipient.Ico)
-        && !string.IsNullOrWhiteSpace(Model.ProjectCode))
-    {
-        var foundDuplicates = await SubsidyRepo.Searching.SimpleSearchAsync(duplicitaQuery, 0, 1000, SubsidySearchResult.SubsidyOrderResult.FastestForScroll);
-        if (foundDuplicates.HasResult)
-        {
-            duplicity = foundDuplicates.Results.ToList();
-        }
-    }
 }
 
 @section breadcrumb
@@ -44,11 +29,35 @@
     Detail dotace "@Model.DisplayProject"
 </h2>
 
-@if (duplicity != null && duplicity.Count > 1)
+
+@if (Model.Hints.HasDuplicates)
 {
-    var text = Devmasters.Lang.CS.Plural.Get(duplicity.Count(), "pouze jednu možnou duplicitu", "{0} možné duplicity", "{0} možných duplicit");
-    <div class="alert alert-warning">
-        <i class="fas fa-exclamation-circle"></i> Nalezli jsme <a href="/Dotace/Hledat/?q=@duplicitaQuery">@text</a>.
+    var duplicates = Model.Hints.Duplicates;
+    var text = Devmasters.Lang.CS.Plural.Get(Model.Hints.Duplicates.Count, "jednoho dalšího zdroje", "{0} dalších zdrojů", "{0} dalších zdrojů");
+    <div class="alert alert-info">
+        <h3>O této dotaci máme informaci z <span>@text</span></h3>
+        @if (Model.Hints.IsOriginal)
+        {
+            <p>Informace z tohoto zdroje mají pravděpodobně nejlepší datovou kvalitu.</p>
+        }
+        else
+        {
+            duplicates.Remove(Model.Hints.OriginalSubsidyId);
+            <p><i class="fas fa-exclamation-circle"></i> Informace z tohoto zdroje nemusí mít nejlepší kvalitu, podívejte se proto i na <a asp-action="Detail" asp-route-id="@Model.Hints.OriginalSubsidyId">záznam s pravděpodobně lepší datovou kvalitou</a>.</p>
+        }
+
+        @if (duplicates.Any())
+        {
+            <h4>Porovnejte si informace o této dotaci také z následujících zdrojů:</h4>
+            <ul>
+                @foreach (var duplicate in duplicates)
+                {
+                    <li>
+                        <a href="@duplicate">@duplicate</a>
+                    </li>
+                }
+            </ul>
+        }
     </div>
 }
 
