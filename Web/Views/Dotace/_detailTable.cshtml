@@ -1,16 +1,19 @@
 ﻿@using HlidacStatu.Extensions
-@model HlidacStatu.Entities.Subsidy
+@model (HlidacStatu.Entities.Subsidy model, HlidacStatu.Web.Models.DotaceDetailOptions options)
 
+@{
+    var options = Model.options ?? new DotaceDetailOptions();
+}
 
-@if (Model != null)
+@if (Model.model != null)
 {
-    <table class="table table-new table-new--dotted">
+    <table class="table table-new table-new--dotted @(options.TableClass)" style="@(options.TableStyle)">
         <tbody>
             <tr>
                 <th>Příjemce dotace</th>
                 <td>
-                    @Model.Recipient.DisplayName @(Model.Recipient.YearOfBirth is null ? "" : $"({Model.Recipient.YearOfBirth})")
-                    @if (await Model.MaSkutecnehoMajiteleAsync() == false)
+                    @Model.model.Recipient.DisplayName @(Model.model.Recipient.YearOfBirth is null ? "" : $"({Model.model.Recipient.YearOfBirth})")
+                    @if (await Model.model.MaSkutecnehoMajiteleAsync() == false)
                     {
                         <br />
                         <div class="alert alert-warning">
@@ -26,61 +29,61 @@
             <tr>
                 <th>Příjemce dotace - jak je uvedeno v datech</th>
                 <td>
-                    @(await Html.KIndexLabelLinkAsync(Model.Recipient.Ico))@Model.Recipient.Name
+                    @(await Html.KIndexLabelLinkAsync(Model.model.Recipient.Ico))@Model.model.Recipient.Name
                 </td>
             </tr>
             <tr>
                 <th>IČO</th>
                 <td>
-                    @if (Model.Recipient.Ico != "00000000")
+                    @if (Model.model.Recipient.Ico != "00000000")
                     {
-                        <a href="/dotace/hledat?q=ico:@Model.Recipient.Ico" title="Vyhledat všechny dotace pro tento subjekt">@Model.Recipient.Ico</a>
+                        <a href="/dotace/hledat?q=ico:@Model.model.Recipient.Ico" title="Vyhledat všechny dotace pro tento subjekt">@Model.model.Recipient.Ico</a>
                     }
                 </td>
             </tr>
             <tr>
                 <th>Obec příjemce</th>
                 <td>
-                    @(Model.Recipient.Obec)
+                    @(Model.model.Recipient.Obec)
                 </td>
             </tr>
             <tr>
                 <th>Okres příjemce</th>
                 <td>
-                    @(Model.Recipient.Okres)
+                    @(Model.model.Recipient.Okres)
                 </td>
             </tr>
             <tr>
                 <th>Kód projektu</th>
                 <td>
-                    @if (!string.IsNullOrWhiteSpace(Model.ProjectCode))
+                    @if (!string.IsNullOrWhiteSpace(Model.model.ProjectCode))
                     {
-                        <a href="/dotace/hledat?q=kodProjektu:@Model.ProjectCode" title="Vyhledat podobné dotace">@Model.ProjectCode</a>
+                        <a href="/dotace/hledat?q=kodProjektu:@Model.model.ProjectCode" title="Vyhledat podobné dotace">@Model.model.ProjectCode</a>
                     }
                 </td>
             </tr>
             <tr>
                 <th>Název projektu</th>
-                <td>@Model.ProjectName</td>
+                <td>@Model.model.ProjectName</td>
             </tr>
             <tr>
                 <th>Název programu</th>
-                <td>@(Model.ProgramName ?? "neuveden")</td>
+                <td>@(Model.model.ProgramName ?? "neuveden")</td>
             </tr>
             <tr>
                 <th>Kód programu</th>
-                <td>@(Model.ProgramCode ?? "neuveden")</td>
+                <td>@(Model.model.ProgramCode ?? "neuveden")</td>
             </tr>
             <tr>
                 <th>Rok schválení dotace</th>
-                <td>@(Model.ApprovedYear)</td>
+                <td>@(Model.model.ApprovedYear)</td>
             </tr>
             <tr>
                 <th>Schválená částka</th>
                 <td>
-                    @if (Model.SubsidyAmount.HasValue)
+                    @if (Model.model.SubsidyAmount.HasValue)
                     {
-                        @HlidacStatu.Util.RenderData.NicePriceHtml((decimal)Model.SubsidyAmount)
+                        @HlidacStatu.Util.RenderData.NicePriceHtml((decimal)Model.model.SubsidyAmount)
                     }
                     else
                     {
@@ -91,9 +94,9 @@
             <tr>
                 <th>Vyplacená částka</th>
                 <td>
-                    @if (Model.PayedAmount.HasValue)
+                    @if (Model.model.PayedAmount.HasValue)
                     {
-                        @HlidacStatu.Util.RenderData.NicePriceHtml((decimal)Model.PayedAmount)
+                        @HlidacStatu.Util.RenderData.NicePriceHtml((decimal)Model.model.PayedAmount)
                     }
                     else
                     {
@@ -104,9 +107,9 @@
             <tr>
                 <th>Vrácená částka</th>
                 <td>
-                    @if (Model.ReturnedAmount.HasValue)
+                    @if (Model.model.ReturnedAmount.HasValue)
                     {
-                        @HlidacStatu.Util.RenderData.NicePriceHtml((decimal)Model.ReturnedAmount)
+                        @HlidacStatu.Util.RenderData.NicePriceHtml((decimal)Model.model.ReturnedAmount)
                     }
                     else
                     {
@@ -117,13 +120,13 @@
             <tr>
                 <th>Správce dotace</th>
                 <td>
-                    @if (!string.IsNullOrWhiteSpace(Model.SubsidyProviderIco))
+                    @if (!string.IsNullOrWhiteSpace(Model.model.SubsidyProviderIco))
                     {
-                        <a asp-controller="Subjekt" asp-action="Index" asp-route-id="@Model.SubsidyProviderIco">@(Model.SubsidyProvider)</a>
+                        <a asp-controller="Subjekt" asp-action="Index" asp-route-id="@Model.model.SubsidyProviderIco">@(Model.model.SubsidyProvider)</a>
                     }
                     else
                     {
-                        <p>@(Model.SubsidyProvider)</p>
+                        <p>@(Model.model.SubsidyProvider)</p>
                     }
                 </td>
             </tr>
@@ -131,34 +134,34 @@
             <tr>
                 <th>Zdroj dat</th>
                 <td>
-                    @Model.Metadata.DataSource
+                    @Model.model.Metadata.DataSource
                     <br />
                     <div class="alert alert-info" role="alert">
-                        @Model.Describe()
+                        @Model.model.Describe()
                     </div>
                 </td>
             </tr>
             <tr>
                 <th>Datový soubor</th>
                 <td>
-                    @Model.Metadata.FileName
+                    @Model.model.Metadata.FileName
                 </td>
             </tr>
             <tr>
                 <th>Datum zpracování</th>
                 <td>
-                    @Model.Metadata.ProcessedDate.ToString("dd.MM.yyyy")
+                    @Model.model.Metadata.ProcessedDate.ToString("dd.MM.yyyy")
                 </td>
             </tr>
             <tr>
                 <th>Odkaz na tento záznam</th>
                 <td class="overflow-auto">
-                    <a style="overflow-wrap: anywhere;" href="@(Model.GetUrl(false))" target="_blank">@(Model.GetUrl(false))</a>
+                    <a style="overflow-wrap: anywhere;" href="@(Model.model.GetUrl(false,false))" target="_blank">@(Model.model.GetUrl(false,false))</a>
                 </td>
             </tr>
             <tr>
                 <td colspan="2">
-                    <button type="button" class="btn btn-info" data-bs-toggle="modal" data-bs-target="#originalDM-@(Model.Id)">Zobrazit originální záznam</button>
+                    <button type="button" class="btn btn-info btn-sm" data-bs-toggle="modal" data-bs-target="#originalDM-@(Model.model.Id)">Zobrazit originální záznam z datového zdroje</button>
                 </td>
             </tr>
 
@@ -166,15 +169,15 @@
         </tbody>
     </table>
 
-    <div id="originalDM-@(Model.Id)" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="originalDataModal" aria-hidden="true">
-        <div class="modal-dialog">
+    <div id="originalDM-@(Model.model.Id)" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="originalDataModal" aria-hidden="true">
+        <div class="modal-dialog modal-fullscreen">
             <div class="modal-content">
                 <div class="modal-header">
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     <h4 class="modal-title">Originální záznam, který jsme zpracovali</h4>
                 </div>
                 <div class="modal-body">
-                    <pre><code>@Model.GetNiceRawData()</code></pre>
+                    <pre><code>@Model.model.GetNiceRawData()</code></pre>
                 </div>
             </div>
         </div>

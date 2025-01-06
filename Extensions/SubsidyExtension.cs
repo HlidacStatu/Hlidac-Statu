@@ -7,13 +7,18 @@ namespace HlidacStatu.Extensions;
 
 public static class SubsidyExtension
 {
-    public static string GetUrl(this Subsidy subsidy, bool local = true) => GetUrl(subsidy, local, string.Empty);
+    public static string GetUrl(this Subsidy subsidy, bool local = true, bool enableRedirectToOriginal = true) => GetUrl(subsidy, local, string.Empty, enableRedirectToOriginal);
 
-    public static string GetUrl(this Subsidy subsidy, bool local, string foundWithQuery)
+    public static string GetUrl(this Subsidy subsidy, bool local, string foundWithQuery, bool enableRedirectToOriginal = true)
     {
-        string url = "/Dotace/Detail/" + subsidy.Id;
+        string url = "/Dotace/Detail/" + subsidy.Id + "?";
         if (!string.IsNullOrEmpty(foundWithQuery))
-            url = url + "?qs=" + System.Net.WebUtility.UrlEncode(foundWithQuery);
+            url = url + "qs=" + System.Net.WebUtility.UrlEncode(foundWithQuery);
+        if (enableRedirectToOriginal == false)
+            url = url + "r=false";
+
+        if (url.EndsWith("?"))
+            url = url.Substring(0, url.Length - 1);
 
         if (local == false)
             return "https://www.hlidacstatu.cz" + url;

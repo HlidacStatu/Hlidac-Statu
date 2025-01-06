@@ -4,6 +4,11 @@
 @{
     ViewBag.Title = "Hlídač dotací";
     ViewBag.SubTitle = "Detail dotace";
+    HlidacStatu.Entities.Subsidy origSubsidy = null;
+    if (Model.Hints.IsOriginal == false)
+    {
+        origSubsidy = await HlidacStatu.Repositories.SubsidyRepo.GetAsync(Model.Hints.OriginalSubsidyId);
+    }
 }
 
 @section breadcrumb
@@ -26,11 +31,37 @@
 
 <h2>
     <add-bookmark item="@Model"></add-bookmark>
-    Detail dotace "@Model.DisplayProject"
+    Detail dotace "@Model.DisplayProject" <small>@((Model.Hints.IsOriginal ? "" : "(duplikátní záznam)"))</small>
 </h2>
 
 
-<partial name="_detailTable" model="@Model" />
+<div class="mt-3">
+    @if (Model.Hints.IsOriginal)
+    {
+
+    }
+    else
+    {
+        <div class="alert alert-warning">
+        <div class="fa-bold m-3">
+            <p><i class="fas fa-exclamation-circle"></i>
+                Stát dotace publikuje na mnoha místech různými způsoby
+                a v těchto datových zdrojích se některé dotace opakují.
+                Náš systém identifikoval, že uvedená dotace jsou stejná jako další dotace na naší databázi. 
+                Tuto dotaci považujeme za duplikátní a nezapočítáváme ji do statistik.
+            </p>
+            @if (origSubsidy != null)
+            {
+                <p>
+                    Zde <a href="@origSubsidy.GetUrl(false)">najdete plnohodnotný záznam této dotace</a>.
+                </p>
+            }
+        </div>
+        </div>
+    }
+</div>
+
+<partial name="_detailTable" model="(@Model,new DotaceDetailOptions())" />
 
 
 @if (Model.Hints.HasDuplicates)
@@ -40,12 +71,18 @@
         .Where(m => m != null)
         .ToArray();
 
+    @if (duplicates.Any())
+    {
 
-    var text = Devmasters.Lang.CS.Plural.Get(Model.Hints.Duplicates.Count, "jednoho dalšího zdroje", "{0} dalších zdrojů", "{0} dalších zdrojů");
-    <div class="alert alert-light">
+        var text = Devmasters.Lang.CS.Plural.Get(Model.Hints.Duplicates.Count, "v dalším datovém zdroji", "v {0} dalších datových zdrojích", "{0} dalších datových zdrojích");
+        <div class="alert alert-light mt-4">
 
-        @if (duplicates.Any())
-        {
+            <div class="fa-bold m-3">
+                <i class="fas fa-exclamation-circle"></i> Tuto dotaci jsme nalezli @text.
+                Stát dotace publikuje na mnoha místech různými způsoby
+                a v těchto datových zdrojích se některé dotace opakují.
+                Náš systém identifikoval, že níže uvedené záznamy jsou stejné jako výše zobrazená dotace. Níže uvedené duplikátní dotace uvádíme pro úplnost a transparentnost.
+            </div>
             <ul class="nav nav-tabs" role="tablist">
                 <li class="nav-item" role="presentation">
                     <button class="nav-link" id="disabled-tab" data-bs-toggle="tab" data-bs-target="#disabled-tab-pane" type="button" role="tab" aria-controls="disabled-tab-pane" aria-selected="false" disabled>Zdroje</button>
@@ -59,14 +96,14 @@
                     {
                         count++;
                         <li class="nav-item" role="presentation">
-                        <button class="@classAttributes"
-                                id="source-@(dot.Id)-tab"
-                                data-bs-toggle="tab"
-                                data-bs-target="#source-@(dot.Id)"
-                                type="button"
-                                role="tab">
-                            @(count). @(dot.Metadata.DataSource)
-                        </button>
+                            <button class="@classAttributes"
+                                    id="source-@(dot.Id)-tab"
+                                    data-bs-toggle="tab"
+                                    data-bs-target="#source-@(dot.Id)"
+                                    type="button"
+                                    role="tab">
+                                @(count). @(dot.Metadata.DataSource)
+                            </button>
                         </li>
 
                         classAttributes = "nav-link";
@@ -76,6 +113,7 @@
 
             <div class="tab-content width-75vp" id="myTabContent">
                 @{
+                    var tbloptions = new DotaceDetailOptions() { TableClass = "table-light" };
                     count = 0;
                     classAttributes = "tab-pane active "; //fade show width-75vp
 
@@ -85,25 +123,26 @@
                         count++;
                         <div class="@classAttributes" id="source-@(dot.Id)" role="tabpanel">
 
-                        <div class="mt-3">
-                            @if (dot.Hints.IsOriginal)
-                            {
-                                <p>Informace z tohoto zdroje mají pravděpodobně nejlepší datovou kvalitu.</p>
-                            }
-                            else
-                            {
-                                <p><i class="fas fa-exclamation-circle"></i> Informace z tohoto zdroje nemusí mít nejlepší kvalitu, považujeme ho za duplikátní záznam, který nepočítáme do statistik.</p>
-                            }
+                            <div class="mt-3">
+                                @if (dot.Hints.IsOriginal)
+                                {
+                                    <p><i class="fas fa-thumbs-up"></i> Toto je plnohodnotný záznam této dotace.</p>
+                                }
+                                else
+                                {
+                                    <p><i class="fas fa-exclamation-circle"></i> Informace z tohoto zdroje nemusí mít nejlepší kvalitu, považujeme ho za duplikátní záznam, který nepočítáme do statistik.</p>
+                                }
+                            </div>
+
+                            <partial name="_detailTable" model="(@dot, tbloptions)" />
                         </div>
 
-                            <partial name="_detailTable" model="@dot" /> 
-                        </div>
-        
                         classAttributes = "tab-pane width-75vp";
                     }
-            }
+                }
             </div>
-        }
-    </div>
+
+        </div>
+    }
 }
 
