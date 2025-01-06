@@ -193,6 +193,8 @@ namespace HlidacStatu.Repositories
                 throw;
             }
         }
+
+        static Subsidy.SubsidyComparer subsidyComparer = new();
         public static async Task FindAndSetDuplicatesThreadUnsafeAsync(Subsidy baseSubsidy)
         {
             // můžeme hledat duplicity jen u firem, lidi nedokážeme správně identifikovat
@@ -210,21 +212,42 @@ namespace HlidacStatu.Repositories
             if (allSubsidies.Any(m => m.Id == baseSubsidy.Id) == false)
                 allSubsidies.Add(baseSubsidy);
 
+            allSubsidies = allSubsidies.Distinct(subsidyComparer).ToList();
+
             //consolidate base on ids
-            var subsidyIds = allSubsidies.Where(m => m.Hints?.HasDuplicates == true).SelectMany(m => m.Hints.Duplicates)
-                .Concat(allSubsidies.Where(m => m.Hints?.HasHiddenDuplicates == true).SelectMany(m => m.Hints.HiddenDuplicates))
+            var subsidyIds = allSubsidies.SelectMany(m => m.Hints.Duplicates)
+                .Concat(allSubsidies.SelectMany(m => m.Hints.HiddenDuplicates))
                 .Distinct()
                 .ToList();
 
-            await ConsolidatedAndSetDuplicatesThreadUnsafeAsync(subsidyIds);
+            foreach (var id in subsidyIds)
+            {
+                //add missing
+                if (!allSubsidies.Any(m => m.Id == id))
+                {
+                    var s = await GetAsync(id);
+                    if (s != null)
+                    {
+                        allSubsidies.Add(s);
+                    }
+                }
+            }
+            await ConsolidatedAndSetDuplicatesThreadUnsafeAsync(allSubsidies);
         }
-
-        public static async Task ConsolidatedAndSetDuplicatesThreadUnsafeAsync(List<string> subsidyIds)
+        public static async Task ConsolidatedAndSetDuplicatesThreadUnsafeAsync(params Subsidy[] subsidies)
         {
-            List<Subsidy> subsidies = new List<Subsidy>();
-            //load all initial subsidies
+            await ConsolidatedAndSetDuplicatesThreadUnsafeAsync(new List<Subsidy>(subsidies));
+        }
+        public static async Task ConsolidatedAndSetDuplicatesThreadUnsafeAsync(List<Subsidy> subsidies)
+        {
+        //load all initial subsidies
 
-            load:
+        reload:
+            var subsidyIds = subsidies.Where(m => m.Hints?.HasDuplicates == true).SelectMany(m => m.Hints.Duplicates)
+                .Concat(subsidies.Where(m => m.Hints?.HasHiddenDuplicates == true).SelectMany(m => m.Hints.HiddenDuplicates))
+                .Distinct()
+                .ToList();
+
             bool added = false;
             foreach (var id in subsidyIds)
             {
@@ -241,13 +264,8 @@ namespace HlidacStatu.Repositories
             }
 
             if (added)
-            {            //get all duplicates from all of them
-                subsidyIds= subsidies.Where(m => m.Hints?.HasDuplicates == true).SelectMany(m => m.Hints.Duplicates)
-                    .Concat(subsidies.Where(m => m.Hints?.HasHiddenDuplicates == true).SelectMany(m => m.Hints.HiddenDuplicates))
-                    .Distinct()
-                    .ToList();
-                goto load;
-            }
+                goto reload;
+
             await SetDuplicatesThreadUnsafeAsync(subsidies);
         }
 
