@@ -46,7 +46,8 @@ namespace HlidacStatu.Repositories
                     )
                 );
 
-            var res = await SubsidyRepo.Searching.SimpleSearchAsync("hints.isOriginal:true", 1, 0, "666", anyAggregation: aggs);
+            var res = await SubsidyRepo.Searching.SimpleSearchAsync("hints.isOriginal:true", 1, 0, "666",
+                anyAggregation: aggs);
             if (res is null)
             {
                 return null;
@@ -84,6 +85,135 @@ namespace HlidacStatu.Repositories
 
             return results;
         }
+
+        public static async Task<Dictionary<string, (decimal Summary, int Count)>> TopPrijemciReportAsync(int? rok)
+        {
+            AggregationContainerDescriptor<Subsidy> aggs = new AggregationContainerDescriptor<Subsidy>()
+                .Terms("perIco", t => t
+                    .Field(f => f.Recipient.Ico)
+                    .Size(100)
+                    .Aggregations(typeAggs => typeAggs
+                        .Sum("sumAssumedAmount", sa => sa
+                            .Field(f => f.AssumedAmount)
+                        )
+                        .ValueCount("docCount", vc => vc
+                            .Field(f => f.AssumedAmount)
+                        )
+                    )
+                );
+
+            string query = "hints.isOriginal:true AND _exists_:recipient.ico AND NOT recipient.ico:\"\"";
+            if (rok is not null && rok > 0)
+            {
+                query += $" AND approvedYear:{rok}";
+            }
+            
+            var res = await SubsidyRepo.Searching.SimpleSearchAsync(query, 1, 0, "666", anyAggregation: aggs);
+            if (res is null)
+            {
+                return null;
+            }
+
+            // Initialize the results dictionary
+            Dictionary<string, (decimal Summary, int Count)> results = new();
+
+            // Parse the aggregation results
+            if (res.ElasticResults.Aggregations["perIco"] is BucketAggregate perIcoBa)
+            {
+                foreach (KeyedBucket<object> perIcoBucket in perIcoBa.Items)
+                {
+                    if (perIcoBucket.Key is not null && perIcoBucket.Key.ToString() is not null)
+                    {
+                        decimal sum = 0;
+                        int count = 0;
+                        if (perIcoBucket["sumAssumedAmount"] is ValueAggregate sumBA)
+                        {
+                            sum = Convert.ToDecimal(sumBA.Value ?? 0);
+                        }
+
+                        if (perIcoBucket["docCount"] is ValueAggregate docCountBA)
+                        {
+                            count = Convert.ToInt32(docCountBA.Value ?? 0);
+                        }
+
+
+                        results.Add(perIcoBucket.Key.ToString(), (sum, count));
+                    }
+                }
+            }
+
+            return results;
+        }
+
+        // public static async Task<Dictionary<int, List<(string Ico, decimal Summary, int Count)>>> TopPrijemciPoLetechReportAsync(int rok)
+        // {
+        //     AggregationContainerDescriptor<Subsidy> aggs = new AggregationContainerDescriptor<Subsidy>()
+        //         .Terms("perYear", t => t
+        //             .Field(f => f.ApprovedYear)
+        //             .Size(65500)
+        //             .Aggregations(yearAggs => yearAggs
+        //                 .Terms("perIco", st => st
+        //                     .Field(f => f.Recipient.Ico)
+        //                     .Size(100)
+        //                     .Aggregations(typeAggs => typeAggs
+        //                         .Sum("sumAssumedAmount", sa => sa
+        //                             .Field(f => f.AssumedAmount)
+        //                         )
+        //                         .ValueCount("docCount", vc => vc
+        //                             .Field(f => f.AssumedAmount)
+        //                         )
+        //                     )
+        //                 )
+        //             )
+        //         );
+        //
+        //     var res = await SubsidyRepo.Searching.SimpleSearchAsync(
+        //         "hints.isOriginal:true AND _exists_:recipient.ico AND NOT recipient.ico:\"\"", 1, 0, "666",
+        //         anyAggregation: aggs);
+        //     if (res is null)
+        //     {
+        //         return null;
+        //     }
+        //
+        //     // Initialize the results dictionary
+        //     Dictionary<int, List<(string Ico, decimal Summary, int Count)>> results = new();
+        //
+        //     // Parse the aggregation results
+        //     if (res.ElasticResults.Aggregations["perYear"] is BucketAggregate perYearBA)
+        //     {
+        //         foreach (KeyedBucket<object> perYearBucket in perYearBA.Items)
+        //         {
+        //             if (int.TryParse(perYearBucket.Key.ToString(), out int year))
+        //             {
+        //                 if (results.ContainsKey(year) == false)
+        //                     results.Add(year, new List<(string Ico, decimal Summary, int Count)>());
+        //
+        //                 if (perYearBucket["perIco"] is BucketAggregate subsidyIcoBA)
+        //                 {
+        //                     foreach (KeyedBucket<object> subsidyIcoBucket in subsidyIcoBA.Items)
+        //                     {
+        //                         decimal sum = 0;
+        //                         int count = 0;
+        //                         if (subsidyIcoBucket["sumAssumedAmount"] is ValueAggregate sumBA)
+        //                         {
+        //                             sum = Convert.ToDecimal(sumBA.Value ?? 0);
+        //                         }
+        //
+        //                         if (subsidyIcoBucket["docCount"] is ValueAggregate docCountBA)
+        //                         {
+        //                             count = Convert.ToInt32(docCountBA.Value ?? 0);
+        //                         }
+        //
+        //
+        //                         results[year].Add((subsidyIcoBucket.Key.ToString(), sum, count));
+        //                     }
+        //                 }
+        //             }
+        //         }
+        //     }
+        //
+        //     return results;
+        // }
 
         public static QueryContainer AddIsNotHiddenRule(QueryContainer query)
         {
@@ -208,6 +338,7 @@ namespace HlidacStatu.Repositories
                 Logger.Error($"For subsidy [{baseSubsidy.Id}] was not found anything.");
                 return;
             }
+
             //if baseIs Missing in allSubsidies
             if (allSubsidies.Any(m => m.Id == baseSubsidy.Id) == false)
                 allSubsidies.Add(baseSubsidy);
@@ -272,7 +403,6 @@ namespace HlidacStatu.Repositories
 
         public static async Task SetDuplicatesThreadUnsafeAsync(List<Subsidy> allSubsidies)
         {
-
             var visibleDuplicates = allSubsidies //subsidies ordered by sourceOrdering
                 .Where(s => s.Metadata.IsHidden == false)
                 .OrderBy(s => Array.IndexOf(SubsidyDuplicityOrdering, s.Metadata.DataSource) >= 0
@@ -313,9 +443,11 @@ namespace HlidacStatu.Repositories
             await BulkSaveSubsidiesToEs(allSubsidies);
         }
 
-        public static async Task UpdateAndSaveSubsidyDuplicates(string originalSubsidyId, IEnumerable<string> visibleDuplicates, IEnumerable<string> hiddenDuplicates)
+        public static async Task UpdateAndSaveSubsidyDuplicates(string originalSubsidyId,
+            IEnumerable<string> visibleDuplicates, IEnumerable<string> hiddenDuplicates)
         {
         }
+
         public static async Task SaveSubsidyDirectlyToEs(Subsidy subsidy)
         {
             subsidy.Metadata.ModifiedDate = DateTime.Now;
@@ -406,14 +538,6 @@ namespace HlidacStatu.Repositories
                 Logger.Error(ex, $"Cant load duplicate subsidies for subsidyId={subsidy.Id}");
                 throw;
             }
-        }
-        public static async Task<bool> ExistsAsync(string idDotace)
-        {
-            if (idDotace == null) throw new ArgumentNullException(nameof(idDotace));
-
-            var response = await SubsidyClient.DocumentExistsAsync<Subsidy>(idDotace);
-
-            return response.Exists;
         }
 
         public static async Task<Subsidy> GetAsync(string idDotace)
