@@ -201,7 +201,7 @@ namespace HlidacStatu.Repositories
             if (string.IsNullOrWhiteSpace(baseSubsidy.Recipient.Ico))
                 return;
 
-            var allSubsidies = await FindDuplicatesAsync(baseSubsidy);
+            var allSubsidies = await FindDuplicatesAsync(baseSubsidy); // err: proč zase ids
             //no duplicates exist 
             if (allSubsidies == null || !allSubsidies.Any())
             {
