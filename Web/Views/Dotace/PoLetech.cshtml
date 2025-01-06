@@ -30,22 +30,36 @@
 @{
     Dictionary<HlidacStatu.Entities.Subsidy.Hint.Type, Dictionary<int, decimal>> objemyDotaci = new();
     
-    var dotaceData = new ReportDataSource<(int Rok, string TypDotace, decimal Castka)>(
+    var dotaceDataKraj = new ReportDataSource<(int Rok, decimal Castka)>(
         new[]
         {
-            new ReportDataSource<(int Rok, string TypDotace, decimal Castka)>.Column()
+            new ReportDataSource<(int Rok, decimal Castka)>.Column()
             {
                 Name = "Rok",
                 CssClass = "number",
                 HtmlRender = (x) => x.Rok.ToString(),
                 TextRender = (x) => x.Rok.ToString()
             },
-            new ReportDataSource<(int Rok, string TypDotace, decimal Castka)>.Column()
+            new ReportDataSource<(int Rok, decimal Castka)>.Column()
             {
-                Name = "Typ dotace",
-                HtmlRender = (x) => x.TypDotace
+                Name = "Částka",
+                TextRender = (x) => $"{x.Castka:N0} Kč",
+                HtmlRender = (x) => $"{x.Castka:N0}&nbsp;Kč",
+                OrderValueRender = (x) => HlidacStatu.Util.RenderData.OrderValueFormat(x.Castka),
+                CssClass = "number"
+            }
+        });
+    var dotaceDataStat = new ReportDataSource<(int Rok, decimal Castka)>(
+        new[]
+        {
+            new ReportDataSource<(int Rok, decimal Castka)>.Column()
+            {
+                Name = "Rok",
+                CssClass = "number",
+                HtmlRender = (x) => x.Rok.ToString(),
+                TextRender = (x) => x.Rok.ToString()
             },
-            new ReportDataSource<(int Rok, string TypDotace, decimal Castka)>.Column()
+            new ReportDataSource<(int Rok, decimal Castka)>.Column()
             {
                 Name = "Částka",
                 TextRender = (x) => $"{x.Castka:N0} Kč",
@@ -60,7 +74,17 @@
         {
             foreach (var dotaceType in dataForYear.Keys.OrderBy(k => k))
             {
-                dotaceData.AddRow((year, dotaceType.ToString("G"), dataForYear[dotaceType]));
+                //populate data for table
+                if (dotaceType == Subsidy.Hint.Type.Krajska)
+                {
+                    dotaceDataKraj.AddRow((year, dataForYear[dotaceType]));
+                }
+                if (dotaceType == Subsidy.Hint.Type.Evropska)
+                {
+                    dotaceDataStat.AddRow((year, dataForYear[dotaceType]));
+                }
+               
+                //populate data for graph
                 if(objemyDotaci.TryGetValue(dotaceType, out var value))
                 {
                     value.Add(year, dataForYear[dotaceType]);
@@ -74,23 +98,23 @@
             
         }
     }
-
-    dotaceData.Title = "Přehled dotací po letech";
-
     
-    
-    var dotaceGraphData = new Series[]
+    var dotaceKrajskeGraphData = new Series[]
     {
         new()
         {
-            Name = "Objem smluv kraje",
+            Name = "Objem krajských dotací",
             Type = Series.SeriesType.column,
             Data = objemyDotaci[Subsidy.Hint.Type.Krajska]
                 .Select(x => new SeriesData(x.Key, x.Value)).ToArray(),
-        },
+        }
+    };
+    
+    var dotaceStatniGraphData = new Series[]
+    {
         new()
         {
-            Name = "objem smluv evropa",
+            Name = "Objem státních a evropských dotací",
             Type = Series.SeriesType.column,
             Data = objemyDotaci[Subsidy.Hint.Type.Evropska]
                 .Select(x => new SeriesData(x.Key, x.Value)).ToArray(),
@@ -99,11 +123,19 @@
     };
 }
 
+<h4>Přehled státních a evropských dotací</h4>
 <div>
-    <h4>Objemy dotací</h4>
-    @Html.DataToHTMLTable(dotaceData)
+    @Html.DataToHTMLTable(dotaceDataStat)
+</div>
+<div>
+    @Html.ColumnGraph("Státní a evropské dotace v jednotlivých letech", dotaceStatniGraphData, yTitleLeft: "Objem dotací v Kč")
+</div>
+
+<h4>Přehled krajských dotací</h4>
+<div>
+    @Html.DataToHTMLTable(dotaceDataKraj)
 </div>
 
 <div>
-    @Html.ColumnGraph("Objemy dotací po letech", dotaceGraphData, yTitleLeft: "Objem dotací v Kč")
+    @Html.ColumnGraph("Krajské dotace v jednotlivých letech", dotaceKrajskeGraphData, yTitleLeft: "Objem dotací v Kč")
 </div>

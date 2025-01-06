@@ -1,0 +1,103 @@
+@using HlidacStatu.Repositories
+@using HlidacStatu.XLib.Render
+@model Dictionary<string, (decimal Summary, int Count)>
+
+@{
+    int? rok = null;
+    if(ViewData.TryGetValue("rok", out var rokObj))
+    {
+        rok = (int?)rokObj;
+    }
+
+    string yearText = rok > 0 ? $" pro rok {rok}" :"";
+    
+    ViewBag.Title = "Hlídač dotací";
+    ViewBag.SubTitle = $"Top příjemci dotací{yearText}";
+    
+}
+
+@section breadcrumb
+{
+    <ol class="breadcrumb">
+        <li>
+            <a href="/">Hlídač Státu</a>
+        </li>
+        <li>
+            <a href="@Url.Action("Index", "Dotace")">Hlídač Dotací</a>
+        </li>
+        <li class="active">@ViewBag.SubTitle</li>
+    </ol>
+}
+
+@section scripts
+{
+    <link rel="stylesheet" type="text/css" href="//cdn.datatables.net/1.13.4/css/jquery.dataTables.css"/>
+    <script type="text/javascript" charset="utf8" src="//cdn.datatables.net/1.13.4/js/jquery.dataTables.js"></script>
+    <script src="~/bundles/highcharts"></script>
+}
+
+@{
+    var topPrijemci = new ReportDataSource<(string Ico, int Pocet, decimal Castka)>(
+        new[]
+        {
+            new ReportDataSource<(string Ico, int Pocet, decimal Castka)>.Column()
+            {
+                Name = "IČO",
+                CssClass = "text",
+                HtmlRender = (x) => $"<a href=/subjekt/{x.Ico}>{FirmaRepo.NameFromIco(x.Ico)}</a>",
+                TextRender = (x) => x.Ico
+            },
+            new ReportDataSource<(string Ico, int Pocet, decimal Castka)>.Column()
+            {
+                Name = "Počet dotací",
+                TextRender = (x) => $"{x.Pocet}",
+                HtmlRender = (x) => $"{x.Pocet}",
+                OrderValueRender = (x) => HlidacStatu.Util.RenderData.OrderValueFormat(x.Pocet),
+                CssClass = "number"
+            },
+            new ReportDataSource<(string Ico, int Pocet, decimal Castka)>.Column()
+            {
+                Name = "Celková částka",
+                TextRender = (x) => $"{x.Castka:N0} Kč",
+                HtmlRender = (x) => $"{x.Castka:N0}&nbsp;Kč",
+                OrderValueRender = (x) => HlidacStatu.Util.RenderData.OrderValueFormat(x.Castka),
+                CssClass = "number"
+            }
+        });
+
+    foreach (var modelItem in Model)
+    {
+        topPrijemci.AddRow((modelItem.Key, modelItem.Value.Count, modelItem.Value.Summary));
+    }
+    
+    // var dotaceKrajskeGraphData = new Series[]
+    // {
+    //     new()
+    //     {
+    //         Name = "Objem obdržených dotací",
+    //         Type = Series.SeriesType.column,
+    //         Data = Model.Select(x => new SeriesData(x.Key, x.Value)).ToArray(),
+    //     }
+    // };
+    //
+}
+
+<h4>Přehled největších příjemců dotací@(yearText)</h4>
+<div>
+    @{
+        string dataTableOptions = @"{
+                         'language': {
+                            'url': '//cdn.datatables.net/plug-ins/1.13.4/i18n/cs.json'
+                        },
+                        'order': [[2, 'desc']],
+                        'lengthChange': false,
+                        'info': false,
+                        }";
+    }
+    
+    @Html.DataToHTMLTable(topPrijemci, dataTableOptions:dataTableOptions)
+</div>
+@* <div> *@
+@*     @Html.ColumnGraph("Státní a evropské dotace v jednotlivých letech", dotaceStatniGraphData, yTitleLeft: "Objem dotací v Kč") *@
+@* </div> *@
+
