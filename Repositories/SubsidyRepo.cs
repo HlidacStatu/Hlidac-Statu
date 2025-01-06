@@ -550,6 +550,15 @@ namespace HlidacStatu.Repositories
                 ? response.Source
                 : null;
         }
+        
+        public static async Task<bool> ExistsAsync(string idDotace)
+        {
+            if (idDotace == null) throw new ArgumentNullException(nameof(idDotace));
+
+            var response = await SubsidyClient.DocumentExistsAsync<Subsidy>(idDotace);
+
+            return response.Exists;
+        }
 
         /// <summary>
         /// Get all subsidies. If query is null, then it matches all except hidden ones
