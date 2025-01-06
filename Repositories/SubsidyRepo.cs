@@ -46,7 +46,7 @@ namespace HlidacStatu.Repositories
                     )
                 );
 
-            var res = await SubsidyRepo.Searching.SimpleSearchAsync("*", 1, 0, "666", anyAggregation: aggs);
+            var res = await SubsidyRepo.Searching.SimpleSearchAsync("hints.isOriginal:true", 1, 0, "666", anyAggregation: aggs);
             if (res is null)
             {
                 return null;
