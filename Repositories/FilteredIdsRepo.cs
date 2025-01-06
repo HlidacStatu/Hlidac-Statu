@@ -76,12 +76,12 @@ namespace HlidacStatu.Repositories
         }
 
 
-        public static async Task<string[]> GetSubsidyIdsAsync(QueryBatch query, int maxDegreeOfParallelism = 10)
+        public static async Task<string[]> GetSubsidyIdsAsync(QueryBatch query, int maxDegreeOfParallelism = 10, Devmasters.Batch.IMonitor monitor = null)
         {
             var client = await Manager.GetESClient_SubsidyAsync();
             var sq = SubsidyRepo.Searching.GetSimpleQuery(query.Query);
             var ids = await Searching.Tools.GetAllIdsAsync(client, maxDegreeOfParallelism, sq,
-                logOutputFunc: query.LogOutputFunc, progressOutputFunc: query.ProgressOutputFunc);
+                logOutputFunc: query.LogOutputFunc, progressOutputFunc: query.ProgressOutputFunc,monitor:monitor);
 
             return ids.Result.ToArray();
         }
