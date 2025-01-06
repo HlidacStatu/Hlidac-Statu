@@ -407,6 +407,14 @@ namespace HlidacStatu.Repositories
                 throw;
             }
         }
+        public static async Task<bool> ExistsAsync(string idDotace)
+        {
+            if (idDotace == null) throw new ArgumentNullException(nameof(idDotace));
+
+            var response = await SubsidyClient.DocumentExistsAsync<Subsidy>(idDotace);
+
+            return response.Exists;
+        }
 
         public static async Task<Subsidy> GetAsync(string idDotace)
         {

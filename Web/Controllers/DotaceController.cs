@@ -56,7 +56,7 @@ namespace HlidacStatu.Web.Controllers
             return View(res);
         }
 
-        public async Task<ActionResult> Detail(string id)
+        public async Task<ActionResult> Detail(string id, bool? r = true)
         {
             if (string.IsNullOrWhiteSpace(id))
             {
@@ -67,6 +67,15 @@ namespace HlidacStatu.Web.Controllers
             {
                 return NotFound();
             }
+            if (r == true && dotace.Hints.IsOriginal == false && !string.IsNullOrEmpty(dotace.Hints.OriginalSubsidyId))
+            {
+                var dotaceOrigExists = await SubsidyRepo.ExistsAsync(dotace.Hints.OriginalSubsidyId);
+                if (dotaceOrigExists)
+                {
+                    return RedirectToAction(this.ControllerContext.ActionDescriptor.ActionName, this.ControllerContext.ActionDescriptor.ControllerName, new { id = dotace.Hints.OriginalSubsidyId });
+                }
+            }
+
             return View(dotace);
         }
         
