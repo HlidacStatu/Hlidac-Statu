@@ -10,8 +10,6 @@ using HlidacStatu.Entities;
 using HlidacStatu.Repositories.Searching;
 using Serilog;
 
-// using Newtonsoft.Json;
-
 namespace HlidacStatu.Repositories
 {
     public static partial class SubsidyRepo
@@ -25,6 +23,7 @@ namespace HlidacStatu.Repositories
             ["IsRed", "Cedr", "Eufondy", "Státní zemědělský intervenční fond"];
 
         private static readonly ConcurrentDictionary<string, SemaphoreSlim> _subsidyLocks = new();
+        private static readonly SemaphoreSlim _deleteLock = new SemaphoreSlim(1, 1);
 
 
         public static async Task<Dictionary<int, Dictionary<Subsidy.Hint.Type, decimal>>> PoLetechReportAsync()
@@ -107,7 +106,7 @@ namespace HlidacStatu.Repositories
             {
                 query += $" AND approvedYear:{rok}";
             }
-            
+
             var res = await SubsidyRepo.Searching.SimpleSearchAsync(query, 1, 0, "666", anyAggregation: aggs);
             if (res is null)
             {
@@ -258,6 +257,109 @@ namespace HlidacStatu.Repositories
             }
         }
 
+        public static async Task<List<Subsidy>> FindAllDuplicateReferers(string subsidyId)
+        {
+            var query = new QueryContainerDescriptor<Subsidy>()
+                .Bool(b => b
+                    .Should(
+                        s => s.Term(t => t
+                            .Field(f => f.Hints.Duplicates.Suffix("keyword"))
+                            .Value(subsidyId)
+                        ),
+                        s => s.Term(t => t
+                            .Field(f => f.Hints.HiddenDuplicates.Suffix("keyword"))
+                            .Value(subsidyId)
+                        )
+                    )
+                    .MinimumShouldMatch(1) // At least one of the conditions must be true
+                );
+
+            try
+            {
+                var res = await SubsidyClient.SearchAsync<Subsidy>(s => s
+                    .Size(10000)
+                    .Query(q => query)
+                );
+
+                if (!res.IsValid) // try again
+                {
+                    await Task.Delay(500);
+                    res = await SubsidyClient.SearchAsync<Subsidy>(s => s
+                        .Size(10000)
+                        .Query(q => query)
+                    );
+                }
+
+                return res.Documents.ToList();
+            }
+            catch (Exception ex)
+            {
+                Logger.Error(ex, $"Cant load duplicate referers for subsidyId={subsidyId}");
+                throw;
+            }
+        }
+
+        public static async Task DeleteAsync(string subsidyId)
+        {
+            Logger.Debug($"Removing subsidy {subsidyId} and all references to it.");
+            await _deleteLock.WaitAsync();
+            try
+            {
+                var subsidy = await GetAsync(subsidyId);
+                var referers = await FindAllDuplicateReferers(subsidyId);
+
+                string newOriginalId = null;
+                if (subsidy.Hints.IsOriginal)
+                {
+                    newOriginalId = subsidy.Hints.Duplicates.FirstOrDefault();
+                    if (string.IsNullOrWhiteSpace(newOriginalId) && referers.Any())
+                    {
+                        newOriginalId = referers.Where(r => r.Metadata.IsHidden == false)
+                            .OrderBy(s => Array.IndexOf(SubsidyDuplicityOrdering, s.Metadata.DataSource) >= 0
+                            ? Array.IndexOf(SubsidyDuplicityOrdering, s.Metadata.DataSource)
+                            : 9999)
+                            .FirstOrDefault()?.Id;
+                    }
+                }
+
+                if (referers.Any())
+                {
+                    foreach (var referer in referers)
+                    {
+                        referer.Hints.Duplicates.Remove(subsidyId);
+                        referer.Hints.HiddenDuplicates.Remove(subsidyId);
+                        if (!string.IsNullOrWhiteSpace(newOriginalId))
+                        {
+                            if (referer.Id == newOriginalId)
+                            {
+                                referer.Hints.IsOriginal = true;
+                            }
+                            else
+                            {
+                                referer.Hints.OriginalSubsidyId = newOriginalId;
+                            }
+                        }
+
+                        // Console.WriteLine("saving referer");
+                        await SaveSubsidyDirectlyToEs(referer);
+                    }
+                }
+
+                // Console.WriteLine("deleting subsidy");
+                await SubsidyClient.DeleteAsync<Subsidy>(subsidyId);
+                
+            }
+            catch (Exception ex)
+            {
+                Logger.Error(ex, $"Cant delete subsidy {subsidyId}");
+                throw;
+            }
+            finally
+            {
+                _deleteLock.Release();
+            }
+        }
+
         private static async Task SaveThreadUnsafeAsync(Subsidy subsidy, bool shouldRewrite)
         {
             Logger.Debug(
@@ -325,13 +427,14 @@ namespace HlidacStatu.Repositories
         }
 
         static Subsidy.SubsidyComparer subsidyComparer = new();
+
         public static async Task FindAndSetDuplicatesThreadUnsafeAsync(Subsidy baseSubsidy)
         {
             // můžeme hledat duplicity jen u firem, lidi nedokážeme správně identifikovat
             if (string.IsNullOrWhiteSpace(baseSubsidy.Recipient.Ico))
                 return;
 
-            var allSubsidies = await FindDuplicatesAsync(baseSubsidy); // err: proč zase ids
+            var allSubsidies = await FindDuplicatesAsync(baseSubsidy);
             //no duplicates exist 
             if (allSubsidies == null || !allSubsidies.Any())
             {
@@ -342,10 +445,8 @@ namespace HlidacStatu.Repositories
             //if baseIs Missing in allSubsidies
             if (allSubsidies.Any(m => m.Id == baseSubsidy.Id) == false)
                 allSubsidies.Add(baseSubsidy);
-
-            allSubsidies = allSubsidies.Distinct(subsidyComparer).ToList();
-
-            //consolidate base on ids
+            
+            //consolidate base on ids (find duplicates of duplicates)
             var subsidyIds = allSubsidies.SelectMany(m => m.Hints.Duplicates)
                 .Concat(allSubsidies.SelectMany(m => m.Hints.HiddenDuplicates))
                 .Distinct()
@@ -363,19 +464,23 @@ namespace HlidacStatu.Repositories
                     }
                 }
             }
+
             await ConsolidatedAndSetDuplicatesThreadUnsafeAsync(allSubsidies);
         }
+
         public static async Task ConsolidatedAndSetDuplicatesThreadUnsafeAsync(params Subsidy[] subsidies)
         {
             await ConsolidatedAndSetDuplicatesThreadUnsafeAsync(new List<Subsidy>(subsidies));
         }
+
         public static async Task ConsolidatedAndSetDuplicatesThreadUnsafeAsync(List<Subsidy> subsidies)
         {
-        //load all initial subsidies
+            //load all initial subsidies
 
-        reload:
+            reload:
             var subsidyIds = subsidies.Where(m => m.Hints?.HasDuplicates == true).SelectMany(m => m.Hints.Duplicates)
-                .Concat(subsidies.Where(m => m.Hints?.HasHiddenDuplicates == true).SelectMany(m => m.Hints.HiddenDuplicates))
+                .Concat(subsidies.Where(m => m.Hints?.HasHiddenDuplicates == true)
+                    .SelectMany(m => m.Hints.HiddenDuplicates))
                 .Distinct()
                 .ToList();
 
@@ -489,6 +594,17 @@ namespace HlidacStatu.Repositories
 
         public static async Task<List<Subsidy>> FindDuplicatesAsync(Subsidy subsidy)
         {
+            var hashDuplicateTask = FindDuplicatesByHashAsync(subsidy);
+            var originalIdDuplicateTask = FindDuplicatesByOriginalIdAsync(subsidy);
+            
+            var hashDuplicates = await hashDuplicateTask;
+            var originalIdDuplicates = await originalIdDuplicateTask;
+            
+            return hashDuplicates.Concat(originalIdDuplicates.Where(od => hashDuplicates.Any(hd => hd.Id == od.Id) == false)).ToList();
+        }
+        
+        private static async Task<List<Subsidy>> FindDuplicatesByHashAsync(Subsidy subsidy)
+        {
             // Build the conditional query for ProjectCode OR ProgramCode OR ProjectName
             QueryContainer projectQuery = null;
             if (!string.IsNullOrWhiteSpace(subsidy.ProjectCodeHash))
@@ -536,7 +652,45 @@ namespace HlidacStatu.Repositories
             catch (Exception ex)
             {
                 Logger.Error(ex, $"Cant load duplicate subsidies for subsidyId={subsidy.Id}");
-                throw;
+                return [];
+            }
+        }
+        
+        private static async Task<List<Subsidy>> FindDuplicatesByOriginalIdAsync(Subsidy subsidy)
+        {
+            if(string.IsNullOrWhiteSpace(subsidy.OriginalId))
+                return [];
+            
+            // Build the main query
+            var query = new QueryContainerDescriptor<Subsidy>()
+                .Bool(b => b
+                    .Must(
+                        m => m.Term(t => t.OriginalId, subsidy.OriginalId)
+                    )
+                );
+
+            try
+            {
+                var res = await SubsidyClient.SearchAsync<Subsidy>(s => s
+                    .Size(9000)
+                    .Query(q => query)
+                );
+
+                if (!res.IsValid) // try again
+                {
+                    await Task.Delay(500);
+                    res = await SubsidyClient.SearchAsync<Subsidy>(s => s
+                        .Size(9000)
+                        .Query(q => query)
+                    );
+                }
+
+                return res.Documents.ToList();
+            }
+            catch (Exception ex)
+            {
+                Logger.Error(ex, $"Cant load duplicate subsidies for subsidyId={subsidy.Id}");
+                return [];
             }
         }
 
@@ -550,7 +704,7 @@ namespace HlidacStatu.Repositories
                 ? response.Source
                 : null;
         }
-        
+
         public static async Task<bool> ExistsAsync(string idDotace)
         {
             if (idDotace == null) throw new ArgumentNullException(nameof(idDotace));

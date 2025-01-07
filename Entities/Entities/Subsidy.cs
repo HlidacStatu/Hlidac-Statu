@@ -44,6 +44,8 @@ public partial class Subsidy
     [Keyword]
     public string ProjectNameHash => CalculateDuplaHash(ProjectName);
     
+    [Keyword]
+    public string OriginalId { get; set; }
     
 
     [Object]
