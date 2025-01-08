@@ -144,6 +144,60 @@ namespace HlidacStatu.Repositories
             return results;
         }
 
+        public static async Task<Dictionary<int, Dictionary<string, decimal>>> PoLetechPoPoskytovatelichAsync()
+        {
+            AggregationContainerDescriptor<Subsidy> aggs = new AggregationContainerDescriptor<Subsidy>()
+                .Terms("perYear", t => t
+                    .Field(f => f.ApprovedYear)
+                    .Size(65500)
+                    .Aggregations(yearAggs => yearAggs
+                        .Terms("perProviderIco", st => st
+                            .Field(f => f.SubsidyProviderIco)
+                            .Size(65500)
+                            .Aggregations(typeAggs => typeAggs
+                                .Sum("sumAssumedAmount", sa => sa
+                                    .Field(f => f.AssumedAmount)
+                                )
+                            )
+                        )
+                    )
+                );
+
+            var res = await SubsidyRepo.Searching.SimpleSearchAsync("hints.isOriginal:true AND _exists_:subsidyProviderIco AND NOT subsidyProviderIco:\"\"", 1, 0, "666",
+                anyAggregation: aggs);
+            if (res is null)
+            {
+                return null;
+            }
+
+            // Initialize the results dictionary
+            Dictionary<int, Dictionary<string, decimal>> results = new();
+
+            // Parse the aggregation results
+            if (res.ElasticResults.Aggregations["perYear"] is BucketAggregate perYearBA)
+            {
+                foreach (KeyedBucket<object> perYearBucket in perYearBA.Items)
+                {
+                    if (int.TryParse(perYearBucket.Key.ToString(), out int year))
+                    {
+                        results.Add(year, new Dictionary<string, decimal>());
+
+                        if (perYearBucket["perProviderIco"] is BucketAggregate subsidyProviderBA)
+                        {
+                            foreach (KeyedBucket<object> subsidyProviderBucket in subsidyProviderBA.Items)
+                            {
+                                if (subsidyProviderBucket["sumAssumedAmount"] is ValueAggregate sumBA)
+                                {
+                                    results[year].Add(subsidyProviderBucket.Key.ToString(), Convert.ToDecimal(sumBA.Value ?? 0));
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            return results;
+        }
         // public static async Task<Dictionary<int, List<(string Ico, decimal Summary, int Count)>>> TopPrijemciPoLetechReportAsync(int rok)
         // {
         //     AggregationContainerDescriptor<Subsidy> aggs = new AggregationContainerDescriptor<Subsidy>()

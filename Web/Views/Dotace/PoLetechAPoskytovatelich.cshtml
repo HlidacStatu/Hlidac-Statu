@@ -1,0 +1,77 @@
+@using HlidacStatu.Entities
+@using HlidacStatu.Repositories
+@using HlidacStatu.XLib.Render
+@model Dictionary<int, Dictionary<string, decimal>>
+
+@{
+    ViewBag.Title = "Hlídač dotací";
+    ViewBag.SubTitle = "Report po letech a poskytovatelích";
+}
+
+@section breadcrumb
+{
+    <ol class="breadcrumb">
+        <li>
+            <a href="/">Hlídač Státu</a>
+        </li>
+        <li>
+            <a href="@Url.Action("Index", "Dotace")">Dotace</a>
+        </li>
+        <li class="active">@ViewBag.SubTitle</li>
+    </ol>
+}
+
+@section scripts
+{
+    <link rel="stylesheet" type="text/css" href="//cdn.datatables.net/1.13.4/css/jquery.dataTables.css"/>
+    <script type="text/javascript" charset="utf8" src="//cdn.datatables.net/1.13.4/js/jquery.dataTables.js"></script>
+    <script src="~/bundles/highcharts"></script>
+}
+
+@{
+    var dotacePoskytovatele = new ReportDataSource<(int Rok, string PoskytovatelIco, decimal Castka)>(
+        new[]
+        {
+            // /dotace/hledat?Q=ico:
+            new ReportDataSource<(int Rok, string PoskytovatelIco, decimal Castka)>.Column()
+            {
+                Name = "Rok",
+                CssClass = "number",
+                HtmlRender = (x) => x.Rok.ToString(),
+                TextRender = (x) => x.Rok.ToString()
+            },
+            new ReportDataSource<(int Rok, string PoskytovatelIco, decimal Castka)>.Column()
+            {
+                Name = "IČO",
+                CssClass = "text",
+                HtmlRender = (x) => $"<a href=/subjekt/{x.PoskytovatelIco}>{FirmaRepo.NameFromIco(x.PoskytovatelIco)}</a>",
+                TextRender = (x) => x.PoskytovatelIco
+            },
+            new ReportDataSource<(int Rok, string PoskytovatelIco, decimal Castka)>.Column()
+            {
+                Name = "Částka",
+                TextRender = (x) => $"{x.Castka:N0} Kč",
+                HtmlRender = (x) => $"<a href=/dotace/hledat?Q=subsidyProviderIco:{x.PoskytovatelIco}>{x.Castka:N0}&nbsp;Kč</a>",
+                OrderValueRender = (x) => HlidacStatu.Util.RenderData.OrderValueFormat(x.Castka),
+                CssClass = "number"
+            }
+        });
+    
+    for (var year = 2021; year < DateTime.Now.Year; year++)
+    {
+        if (Model.TryGetValue(year, out var dataForYear))
+        {
+            foreach (var dotacePoskytovatelIco in dataForYear.Keys.OrderBy(k => k))
+            {
+                dotacePoskytovatele.AddRow((year, dotacePoskytovatelIco, dataForYear[dotacePoskytovatelIco]));
+            }
+            
+        }
+    }
+    
+}
+
+<h4>Přehled dotací po letech a poskytovatelích</h4>
+<div>
+    @Html.DataToHTMLTable(dotacePoskytovatele)
+</div>

@@ -59,7 +59,7 @@
             {
                 Name = "Celková částka",
                 TextRender = (x) => $"{x.Castka:N0} Kč",
-                HtmlRender = (x) => $"{x.Castka:N0}&nbsp;Kč",
+                HtmlRender = (x) => $"<a href=/dotace/hledat?Q=ico:{x.Ico}>{x.Castka:N0}&nbsp;Kč</a>",
                 OrderValueRender = (x) => HlidacStatu.Util.RenderData.OrderValueFormat(x.Castka),
                 CssClass = "number"
             }

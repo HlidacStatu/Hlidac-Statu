@@ -94,6 +94,13 @@ namespace HlidacStatu.Web.Controllers
             return View(data);
         }
         
+        public async Task<ActionResult> PoLetechAPoskytovatelich()
+        {
+            var data = await SubsidyRepo.PoLetechPoPoskytovatelichAsync();
+            
+            return View(data);
+        }
+        
         // public async Task<ActionResult> TopPrijemciPoLetech(int rok)
         // {
         //     var data = await SubsidyRepo.TopPrijemciReportAsync(rok);
