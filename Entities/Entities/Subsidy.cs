@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -34,7 +35,7 @@ public partial class Subsidy
         get
         {
             var hashBytes = SHA256.HashData(Encoding.UTF8.GetBytes(
-                $"{Recipient.Ico}_{ApprovedYear}_{AssumedAmount:N0}"));
+                $"{Recipient.Ico}_{ApprovedYear}_{AssumedAmount.ToString("N0", CultureInfo.InvariantCulture)}"));
             return Convert.ToHexString(hashBytes);
             
         }
