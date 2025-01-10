@@ -91,12 +91,7 @@
 }
 
 <h4>Vyberte rok, za který chcete zobrazit data</h4>
-<a href="/dotace/topprijemci">Vše</a>
-@for (int year = 2014; year <= DateTime.Now.Year; year++)
-{
-    <a href="/dotace/topprijemci?rok=@year">@year</a>  
-}
-
+<partial name="_pager" model="@(ValueTuple.Create((int?)2014, (int?)null, "/Dotace/TopPrijemci"))"/>
 
 <h4>Přehled největších příjemců dotací@(yearText)</h4>
 <div>

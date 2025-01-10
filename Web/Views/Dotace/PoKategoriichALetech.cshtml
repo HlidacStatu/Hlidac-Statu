@@ -7,6 +7,16 @@
 @{
     ViewBag.Title = "Hlídač dotací";
     ViewBag.SubTitle = "Report po kategoriích a letech";
+
+    string columnOrder = ViewData["rok"] is null ? "3" : "2";
+    var dataTableOptions = $@"{{
+                         'language': {{
+                            'url': '//cdn.datatables.net/plug-ins/1.13.4/i18n/cs.json'
+                        }},
+                        'order': [[{columnOrder}, 'desc']],
+                        'lengthChange': false,
+                        'info': false,
+                        }}";
 }
 
 @section breadcrumb
@@ -29,58 +39,60 @@
     <script src="~/bundles/highcharts"></script>
 }
 
-@foreach (var category in Model.Select(m => m.Category).Distinct().OrderBy(m => m))
+<partial name="_pager" model="@(ValueTuple.Create((int?)2014, (int?)null, "/Dotace/PoKategoriichALetech"))"/>
+
+
+@foreach (var category in Model.Select(m => m.Category).Distinct().OrderBy(m => m.ToNiceDisplayName()))
 {
-    var data = new ReportDataSource<(string Ico, int Year, Subsidy.Hint.CalculatedCategories Category, decimal Sum)>(
-        new[]
+    List<ReportDataSource<(string Ico, int Year, Subsidy.Hint.CalculatedCategories Category, decimal Sum)>.Column> dataColumns =
+    [
+        new()
         {
-            new ReportDataSource<(string Ico, int Year, Subsidy.Hint.CalculatedCategories Category, decimal Sum)>.Column()
-            {
-                Name = "Rok",
-                CssClass = "number",
-                HtmlRender = (x) => x.Year.ToString(),
-                TextRender = (x) => x.Year.ToString()
-            },
-            new ReportDataSource<(string Ico, int Year, Subsidy.Hint.CalculatedCategories Category, decimal Sum)>.Column()
-            {
-                Name = "Kategorie",
-                CssClass = "text",
-                HtmlRender = (x) => $"<a href=/dotace/hledat?Q=hints.category1.typeValue:{x.Category:D}>{x.Category.ToNiceDisplayName()}</a>",
-                TextRender = (x) => x.Ico
-            },
-            new ReportDataSource<(string Ico, int Year, Subsidy.Hint.CalculatedCategories Category, decimal Sum)>.Column()
-            {
-                Name = "IČO",
-                CssClass = "text",
-                HtmlRender = (x) => $"<a href=/subjekt/{x.Ico}>{x.Ico}</a>",
-                TextRender = (x) => x.Ico
-            },
-            new ReportDataSource<(string Ico, int Year, Subsidy.Hint.CalculatedCategories Category, decimal Sum)>.Column()
-            {
-                Name = "Název příjemce",
-                CssClass = "text",
-                HtmlRender = (x) => $"{FirmaRepo.NameFromIco(x.Ico)}</a>",
-                TextRender = (x) => x.Ico
-            },
-            new ReportDataSource<(string Ico, int Year, Subsidy.Hint.CalculatedCategories Category, decimal Sum)>.Column()
-            {
-                Name = "Částka",
-                TextRender = (x) => $"{x.Sum:N0} Kč",
-                HtmlRender = (x) => $"<a href=/dotace/hledat?Q=Ico:{x.Ico}>{x.Sum:N0}&nbsp;Kč</a>",
-                OrderValueRender = (x) => HlidacStatu.Util.RenderData.OrderValueFormat(x.Sum),
-                CssClass = "number"
-            }
-        });
-    
+            Name = "IČO",
+            CssClass = "text",
+            HtmlRender = (x) => $"<a href=/subjekt/{x.Ico}>{x.Ico}</a>",
+            TextRender = (x) => x.Ico
+        },
+        new()
+        {
+            Name = "Název příjemce",
+            CssClass = "text",
+            HtmlRender = (x) => $"{FirmaRepo.NameFromIco(x.Ico)}</a>",
+            TextRender = (x) => x.Ico
+        },
+        new()
+        {
+            Name = "Částka",
+            TextRender = (x) => $"{x.Sum:N0} Kč",
+            HtmlRender = (x) => $"<a href=/dotace/hledat?Q=Ico:{x.Ico}>{x.Sum:N0}&nbsp;Kč</a>",
+            OrderValueRender = (x) => HlidacStatu.Util.RenderData.OrderValueFormat(x.Sum),
+            CssClass = "number"
+        }
+    ];
+
+    if (ViewData["rok"] is null)
+    {
+        var yearColumn = new ReportDataSource<(string Ico, int Year, Subsidy.Hint.CalculatedCategories Category, decimal Sum)>.Column()
+        {
+            Name = "Rok",
+            CssClass = "number",
+            HtmlRender = (x) => x.Year.ToString(),
+            TextRender = (x) => x.Year.ToString()
+        };
+        dataColumns.Insert(0, yearColumn);
+    }
+
+    var data = new ReportDataSource<(string Ico, int Year, Subsidy.Hint.CalculatedCategories Category, decimal Sum)>(dataColumns);
+
     for (var year = 2021; year < DateTime.Now.Year; year++)
     {
         data.AddRows(Model.Where(m => m.Year == year && m.Category == category).ToList());
     }
-    
-    
+
+
     <h4>@category.ToNiceDisplayName()</h4>
     <div>
-        @Html.DataToHTMLTable(data)
+        @Html.DataToHTMLTable(data, tableId:"dt" + category.ToString("G"), dataTableOptions: dataTableOptions)
     </div>
 }
 
