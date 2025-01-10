@@ -1,0 +1,7 @@
+﻿@model (int? RokOd, int? RokDo, string Url)
+
+<a href="@Model.Url">Vše</a>
+@for (int year = Model.RokOd ?? 2014; year <= (Model.RokDo ?? DateTime.Now.Year); year++)
+{
+    <a href="@Model.Url?rok=@year">@year</a>  
+}
