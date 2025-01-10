@@ -96,7 +96,9 @@ namespace HlidacStatu.Repositories.Statistics
             foreach (var ico in statistiky.Select(m => m.ICO).Distinct())
             {
                 statistikyPerIco[ico] = new StatisticsSubjectPerYear<Firma.Statistics.Subsidy>();
-                statistikyPerIco[ico] = StatisticsSubjectPerYear<Firma.Statistics.Subsidy>.Aggregate(statistikyPerIco.Where(w => w.Key == ico).Select(m => m.Value));
+                statistikyPerIco[ico] = (StatisticsSubjectPerYear<Firma.Statistics.Subsidy>
+                    .Aggregate(statistikyPerIco.Where(w => w.Key == ico)
+                    .Select(m => m.Value))) ?? new StatisticsSubjectPerYear<Firma.Statistics.Subsidy>(); 
             }
 
             var aggregate = Lib.Analytics.StatisticsSubjectPerYear<Firma.Statistics.Subsidy>.Aggregate(statistikyPerIco.Values);
