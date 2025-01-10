@@ -1,6 +1,7 @@
 @using HlidacStatu.Repositories
+@using HlidacStatu.Repositories.SharedModels
 @using HlidacStatu.XLib.Render
-@model Dictionary<string, (decimal Summary, int Count)>
+@model List<(string Ico, int Count, decimal Sum)>
 
 @{
     int? rok = null;
@@ -44,7 +45,14 @@
             {
                 Name = "IČO",
                 CssClass = "text",
-                HtmlRender = (x) => $"<a href=/subjekt/{x.Ico}>{FirmaRepo.NameFromIco(x.Ico)}</a>",
+                HtmlRender = (x) => $"<a href=/subjekt/{x.Ico}>{x.Ico}</a>",
+                TextRender = (x) => x.Ico
+            },
+            new ReportDataSource<(string Ico, int Pocet, decimal Castka)>.Column()
+            {
+                Name = "Název příjemce",
+                CssClass = "text",
+                HtmlRender = (x) => $"{FirmaRepo.NameFromIco(x.Ico)}</a>",
                 TextRender = (x) => x.Ico
             },
             new ReportDataSource<(string Ico, int Pocet, decimal Castka)>.Column()
@@ -65,39 +73,47 @@
             }
         });
 
-    foreach (var modelItem in Model)
-    {
-        topPrijemci.AddRow((modelItem.Key, modelItem.Value.Count, modelItem.Value.Summary));
-    }
+    var topPrijemciOrdered = Model.OrderByDescending(m => m.Sum).ToList(); 
     
-    // var dotaceKrajskeGraphData = new Series[]
-    // {
-    //     new()
-    //     {
-    //         Name = "Objem obdržených dotací",
-    //         Type = Series.SeriesType.column,
-    //         Data = Model.Select(x => new SeriesData(x.Key, x.Value)).ToArray(),
-    //     }
-    // };
-    //
+    topPrijemci.AddRows(topPrijemciOrdered.Take(100));
+
+
+    SimplePlot chartData = new SimplePlot()
+    {
+        Data = topPrijemciOrdered.Select(p => (double)p.Sum / 1_000_000).Take(20).ToList(),
+        Labels = topPrijemciOrdered.Select(p => FirmaRepo.NameFromIco(p.Ico)).Take(20).ToList(),
+        ChartType = "bar",
+        Title = $"Top příjemci dotací{yearText}",
+        Koncovka = "mil. Kč",
+        SeriesName = "Výše dotací"
+    };
+    
 }
 
+<h4>Vyberte rok, za který chcete zobrazit data</h4>
+<a href="/dotace/topprijemci">Vše</a>
+@for (int year = 2014; year <= DateTime.Now.Year; year++)
+{
+    <a href="/dotace/topprijemci?rok=@year">@year</a>  
+}
+
+
 <h4>Přehled největších příjemců dotací@(yearText)</h4>
+<div>
+    <partial name="Charts/_SimpleChart" model="chartData"/>
+</div>
 <div>
     @{
         string dataTableOptions = @"{
                          'language': {
                             'url': '//cdn.datatables.net/plug-ins/1.13.4/i18n/cs.json'
                         },
-                        'order': [[2, 'desc']],
+                        'order': [[3, 'desc']],
                         'lengthChange': false,
                         'info': false,
                         }";
     }
     
-    @Html.DataToHTMLTable(topPrijemci, dataTableOptions:dataTableOptions)
+    @Html.DataToHTMLTable(topPrijemci, tableId:"topPrijemciTab", dataTableOptions:dataTableOptions)
 </div>
-@* <div> *@
-@*     @Html.ColumnGraph("Státní a evropské dotace v jednotlivých letech", dotaceStatniGraphData, yTitleLeft: "Objem dotací v Kč") *@
-@* </div> *@
 

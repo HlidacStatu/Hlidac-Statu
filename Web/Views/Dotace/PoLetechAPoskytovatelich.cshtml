@@ -1,7 +1,6 @@
-@using HlidacStatu.Entities
 @using HlidacStatu.Repositories
 @using HlidacStatu.XLib.Render
-@model Dictionary<int, Dictionary<string, decimal>>
+@model List<(int Year, string IcoPoskytovatele, decimal Sum)>
 
 @{
     ViewBag.Title = "Hlídač dotací";
@@ -44,7 +43,14 @@
             {
                 Name = "IČO",
                 CssClass = "text",
-                HtmlRender = (x) => $"<a href=/subjekt/{x.PoskytovatelIco}>{FirmaRepo.NameFromIco(x.PoskytovatelIco)}</a>",
+                HtmlRender = (x) => $"<a href=/subjekt/{x.PoskytovatelIco}>{x.PoskytovatelIco}</a>",
+                TextRender = (x) => x.PoskytovatelIco
+            },
+            new ReportDataSource<(int Rok, string PoskytovatelIco, decimal Castka)>.Column()
+            {
+                Name = "Jméno poskytovatele",
+                CssClass = "text",
+                HtmlRender = (x) => $"{FirmaRepo.NameFromIco(x.PoskytovatelIco)}",
                 TextRender = (x) => x.PoskytovatelIco
             },
             new ReportDataSource<(int Rok, string PoskytovatelIco, decimal Castka)>.Column()
@@ -57,17 +63,7 @@
             }
         });
     
-    for (var year = 2021; year < DateTime.Now.Year; year++)
-    {
-        if (Model.TryGetValue(year, out var dataForYear))
-        {
-            foreach (var dotacePoskytovatelIco in dataForYear.Keys.OrderBy(k => k))
-            {
-                dotacePoskytovatele.AddRow((year, dotacePoskytovatelIco, dataForYear[dotacePoskytovatelIco]));
-            }
-            
-        }
-    }
+    dotacePoskytovatele.AddRows(Model.Where(s => s.Year >= 2021).ToList());
     
 }
 

@@ -1,0 +1,84 @@
+@model SimplePlot
+
+@using HlidacStatu.Repositories.SharedModels
+
+@{
+    string chartId = HlidacStatu.Util.Consts.Rnd.Next(999).ToString("000");
+}
+
+@if (Model.Data is null || !Model.Data.Any())
+{
+    if (!string.IsNullOrEmpty(Model.TextForNoData))
+    {
+        <div>@Model.TextForNoData</div>
+    }
+
+    return;
+}
+<figure>
+    <div id="chart-container-@chartId"></div>
+
+    @if (!string.IsNullOrEmpty(Model.Description))
+    { 
+        <div class="text-muted">@Model.Description</div>
+    }
+
+</figure>
+
+<script>
+    Highcharts.chart('chart-container-@(chartId)', {
+        chart: {
+            type: '@Model.ChartType',
+            height: '@Model.CssHeight' , // 16:6 ratio
+            width: null // 16:6 ratio
+        },
+        colors: ["#7cb5ec", 
+            "#8085e9", 
+            "#2b908f", 
+            "#91e8e1",
+            "#434348", 
+            "#90ed7d", 
+            "#f7a35c", 
+            "#f15c80", 
+            "#e4d354", 
+            "#f45b5b"],
+        
+        title: {
+            text: '@Html.Raw(Model.Title)',
+            align: 'left'
+        },
+        subtitle: {
+            text: '@Html.Raw(Model.Subtitle)',
+            align: 'left'
+        },
+        xAxis:{
+            categories: @Html.Raw(Model.DrawLabels()),
+            title: {
+                text: '@Html.Raw(Model.XAxisTitle)'
+            }
+        },
+        yAxis: {
+            min: 0,
+            title: {
+                text: '@Html.Raw(Model.YAxisTitle)'
+            },
+            labels: {
+                format: '{value:,.0f} @Html.Raw(Model.Koncovka)',
+                overflow: 'justify'
+            }
+        },
+        tooltip: {
+            crosshairs: true,
+            shared: true,
+            valueSuffix: ' @Html.Raw(Model.Koncovka)'
+        },
+        series: [
+            {
+                showInLegend: false,
+                name: '@Html.Raw(Model.SeriesName)',
+                data: @Model.DrawData(),
+            }]
+    });
+
+</script>
+

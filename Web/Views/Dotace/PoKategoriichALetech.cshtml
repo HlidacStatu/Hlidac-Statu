@@ -29,12 +29,6 @@
     <script src="~/bundles/highcharts"></script>
 }
 
-@{
-    
-    
-}
-
-
 @foreach (var category in Model.Select(m => m.Category).Distinct().OrderBy(m => m))
 {
     var data = new ReportDataSource<(string Ico, int Year, Subsidy.Hint.CalculatedCategories Category, decimal Sum)>(
@@ -58,14 +52,21 @@
             {
                 Name = "IČO",
                 CssClass = "text",
-                HtmlRender = (x) => $"<a href=/subjekt/{x.Ico}>{FirmaRepo.NameFromIco(x.Ico)}</a>",
+                HtmlRender = (x) => $"<a href=/subjekt/{x.Ico}>{x.Ico}</a>",
+                TextRender = (x) => x.Ico
+            },
+            new ReportDataSource<(string Ico, int Year, Subsidy.Hint.CalculatedCategories Category, decimal Sum)>.Column()
+            {
+                Name = "Název příjemce",
+                CssClass = "text",
+                HtmlRender = (x) => $"{FirmaRepo.NameFromIco(x.Ico)}</a>",
                 TextRender = (x) => x.Ico
             },
             new ReportDataSource<(string Ico, int Year, Subsidy.Hint.CalculatedCategories Category, decimal Sum)>.Column()
             {
                 Name = "Částka",
                 TextRender = (x) => $"{x.Sum:N0} Kč",
-                HtmlRender = (x) => $"<a href=/dotace/hledat?Q=subsidyProviderIco:{x.Ico}>{x.Sum:N0}&nbsp;Kč</a>",
+                HtmlRender = (x) => $"<a href=/dotace/hledat?Q=Ico:{x.Ico}>{x.Sum:N0}&nbsp;Kč</a>",
                 OrderValueRender = (x) => HlidacStatu.Util.RenderData.OrderValueFormat(x.Sum),
                 CssClass = "number"
             }

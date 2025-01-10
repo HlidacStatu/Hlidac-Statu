@@ -2,7 +2,6 @@ using Nest;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Drawing;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -27,7 +26,7 @@ namespace HlidacStatu.Repositories
         private static readonly SemaphoreSlim _deleteLock = new SemaphoreSlim(1, 1);
 
 
-        public static async Task<Dictionary<int, Dictionary<Subsidy.Hint.Type, decimal>>> ReportPoLetechAsync()
+        public static async Task<List<(int Year, Subsidy.Hint.Type SubsidyType, decimal Sum)>> ReportPoLetechAsync()
         {
             AggregationContainerDescriptor<Subsidy> aggs = new AggregationContainerDescriptor<Subsidy>()
                 .Terms("perYear", t => t
@@ -54,7 +53,7 @@ namespace HlidacStatu.Repositories
             }
 
             // Initialize the results dictionary
-            Dictionary<int, Dictionary<Subsidy.Hint.Type, decimal>> results = new();
+            List<(int Year, Subsidy.Hint.Type SubsidyType, decimal Sum)> results = new();
 
             // Parse the aggregation results
             if (res.ElasticResults.Aggregations["perYear"] is BucketAggregate perYearBA)
@@ -63,8 +62,6 @@ namespace HlidacStatu.Repositories
                 {
                     if (int.TryParse(perYearBucket.Key.ToString(), out int year))
                     {
-                        results.Add(year, new Dictionary<Subsidy.Hint.Type, decimal>());
-
                         if (perYearBucket["perSubsidyType"] is BucketAggregate subsidyTypeBA)
                         {
                             foreach (KeyedBucket<object> subsidyTypeBucket in subsidyTypeBA.Items)
@@ -74,7 +71,7 @@ namespace HlidacStatu.Repositories
                                 {
                                     if (subsidyTypeBucket["sumAssumedAmount"] is ValueAggregate sumBA)
                                     {
-                                        results[year].Add(subsidyType, Convert.ToDecimal(sumBA.Value ?? 0));
+                                        results.Add((year, subsidyType, Convert.ToDecimal(sumBA.Value ?? 0)));
                                     }
                                 }
                             }
@@ -86,7 +83,7 @@ namespace HlidacStatu.Repositories
             return results;
         }
 
-        public static async Task<Dictionary<string, (decimal Summary, int Count)>> ReportTopPrijemciAsync(int? rok)
+        public static async Task<List<(string Ico, int Count, decimal Sum)>> ReportTopPrijemciAsync(int? rok)
         {
             AggregationContainerDescriptor<Subsidy> aggs = new AggregationContainerDescriptor<Subsidy>()
                 .Terms("perIco", t => t
@@ -115,7 +112,7 @@ namespace HlidacStatu.Repositories
             }
 
             // Initialize the results dictionary
-            Dictionary<string, (decimal Summary, int Count)> results = new();
+            List<(string Ico, int Count, decimal Sum)> results = new();
 
             // Parse the aggregation results
             if (res.ElasticResults.Aggregations["perIco"] is BucketAggregate perIcoBa)
@@ -137,7 +134,7 @@ namespace HlidacStatu.Repositories
                         }
 
 
-                        results.Add(perIcoBucket.Key.ToString(), (sum, count));
+                        results.Add((perIcoBucket.Key.ToString(), count, sum));
                     }
                 }
             }
@@ -145,7 +142,7 @@ namespace HlidacStatu.Repositories
             return results;
         }
 
-        public static async Task<Dictionary<int, Dictionary<string, decimal>>> ReportPoskytovatelePoLetechAsync()
+        public static async Task<List<(int Year, string IcoPoskytovatele, decimal Sum)>> ReportPoskytovatelePoLetechAsync()
         {
             AggregationContainerDescriptor<Subsidy> aggs = new AggregationContainerDescriptor<Subsidy>()
                 .Terms("perYear", t => t
@@ -173,7 +170,7 @@ namespace HlidacStatu.Repositories
             }
 
             // Initialize the results dictionary
-            Dictionary<int, Dictionary<string, decimal>> results = new();
+            List<(int Year, string IcoPoskytovatele, decimal Sum)> results = new();
 
             // Parse the aggregation results
             if (res.ElasticResults.Aggregations["perYear"] is BucketAggregate perYearBA)
@@ -182,16 +179,14 @@ namespace HlidacStatu.Repositories
                 {
                     if (int.TryParse(perYearBucket.Key.ToString(), out int year))
                     {
-                        results.Add(year, new Dictionary<string, decimal>());
-
                         if (perYearBucket["perProviderIco"] is BucketAggregate subsidyProviderBA)
                         {
                             foreach (KeyedBucket<object> subsidyProviderBucket in subsidyProviderBA.Items)
                             {
                                 if (subsidyProviderBucket["sumAssumedAmount"] is ValueAggregate sumBA)
                                 {
-                                    results[year].Add(subsidyProviderBucket.Key.ToString(),
-                                        Convert.ToDecimal(sumBA.Value ?? 0));
+                                    results.Add((year, subsidyProviderBucket.Key.ToString(),
+                                        Convert.ToDecimal(sumBA.Value ?? 0)));
                                 }
                             }
                         }
@@ -488,10 +483,6 @@ namespace HlidacStatu.Repositories
 
         public static async Task FindAndSetDuplicatesThreadUnsafeAsync(Subsidy baseSubsidy)
         {
-            // můžeme hledat duplicity jen u firem, lidi nedokážeme správně identifikovat
-            if (string.IsNullOrWhiteSpace(baseSubsidy.Recipient.Ico))
-                return;
-
             var allSubsidies = await FindDuplicatesAsync(baseSubsidy);
             //no duplicates exist 
             if (allSubsidies == null || !allSubsidies.Any())
@@ -664,6 +655,10 @@ namespace HlidacStatu.Repositories
 
         private static async Task<List<Subsidy>> FindDuplicatesByHashAsync(Subsidy subsidy)
         {
+            //duplicity podle hashe můžeme hledat jen u firem, u lidí by to slučovalo nesmyslně
+            if (string.IsNullOrWhiteSpace(subsidy.Recipient.Ico))
+                return [];
+            
             // Build the conditional query for ProjectCode OR ProgramCode OR ProjectName
             QueryContainer projectQuery = null;
             if (!string.IsNullOrWhiteSpace(subsidy.ProjectCodeHash))
@@ -715,7 +710,7 @@ namespace HlidacStatu.Repositories
             }
         }
 
-        private static async Task<List<Subsidy>> FindDuplicatesByOriginalIdAsync(Subsidy subsidy)
+        public static async Task<List<Subsidy>> FindDuplicatesByOriginalIdAsync(Subsidy subsidy)
         {
             if (string.IsNullOrWhiteSpace(subsidy.OriginalId))
                 return [];
