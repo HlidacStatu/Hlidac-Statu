@@ -88,8 +88,6 @@ namespace HlidacStatu.Repositories.Statistics
         private static StatisticsSubjectPerYear<Firma.Statistics.Subsidy> CalculateHoldingDotaceStat(Firma firma,
             HlidacStatu.DS.Graphs.Relation.AktualnostType aktualnost)
         {
-            try
-            {
 
                 var statistiky = firma.Holding(aktualnost)
                     .Append(firma)
@@ -115,12 +113,6 @@ namespace HlidacStatu.Repositories.Statistics
                 }
 
                 return aggregate;
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine($"\n\n ERROR RecalculateFirma ico:{firma?.ICO} \n\n\n");
-                throw;
-            }
         }
 
         private static async Task<StatisticsSubjectPerYear<Firma.Statistics.Subsidy>> CalculateDotaceStatAsync(Firma f)
