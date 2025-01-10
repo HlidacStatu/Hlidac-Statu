@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.Json.Serialization;
 using Devmasters.Enums;
 using HlidacStatu.Util;
 using Nest;
@@ -20,14 +21,14 @@ public partial class Subsidy
         /// </summary>
         [Keyword]
         public bool IsOriginal { get; set; } = true;
-        
+
         [Keyword]
         public string? OriginalSubsidyId { get; set; }
-        
+
         public List<string> Duplicates { get; set; } = new List<string>();
-        
+
         public List<string> HiddenDuplicates { get; set; } = new List<string>();
-        
+
         [Keyword]
         public bool HasDuplicates => Duplicates.Any();
         [Keyword]
@@ -42,7 +43,34 @@ public partial class Subsidy
 
         [Date]
         public DateTime? DuplicateCalculated { get; set; }
-        
+
+
+        //recipient hints
+        public int RecipientTypSubjektu { get; set; } = -1; //Firma.TypSubjektuEnum
+
+        [Newtonsoft.Json.JsonIgnore]
+        [System.Text.Json.Serialization.JsonIgnore]
+        [Nest.Ignore]
+        public Firma.TypSubjektuEnum RecipientTypSubjektuEnum { get => (Firma.TypSubjektuEnum)this.RecipientTypSubjektu; }
+
+        public int RecipientStatus { get; set; } = -1; //Firma.Status
+
+        [Newtonsoft.Json.JsonIgnore]
+        [System.Text.Json.Serialization.JsonIgnore]
+        [Nest.Ignore]
+        public string RecipientStatusFull { get => Firma.StatusFull(this.RecipientStatus, false); }
+
+        public int RecipientPolitickyAngazovanySubjekt { get; set; } //HintSmlouva.PolitickaAngazovanostTyp
+
+        [Newtonsoft.Json.JsonIgnore]
+        [System.Text.Json.Serialization.JsonIgnore]
+        [Nest.Ignore]
+        public HintSmlouva.PolitickaAngazovanostTyp RecipientPolitickyAngazovanySubjektEnum { get => (HintSmlouva.PolitickaAngazovanostTyp)this.RecipientPolitickyAngazovanySubjekt; }
+
+        public int RecipientPocetLetOdZalozeni { get; set; } = 9999;
+
+        //recipient hints
+
         public enum Type
         {
             Unknown,
@@ -51,7 +79,6 @@ public partial class Subsidy
             Obecni,
             InvesticniPobidka
         }
-
 
         public void SetDuplicate(Subsidy subsidy, List<string> duplicates, List<string> hiddenDuplicates, string originalSubsidyId)
         {

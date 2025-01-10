@@ -9,6 +9,9 @@ using HlidacStatu.Connectors;
 using HlidacStatu.Entities;
 using HlidacStatu.Repositories.Searching;
 using Serilog;
+using HlidacStatu.Entities.XSD;
+using HlidacStatu.Extensions;
+using LinqToTwitter;
 
 namespace HlidacStatu.Repositories
 {
@@ -603,9 +606,38 @@ namespace HlidacStatu.Repositories
             await BulkSaveSubsidiesToEs(allSubsidies);
         }
 
-        public static async Task UpdateAndSaveSubsidyDuplicates(string originalSubsidyId,
-            IEnumerable<string> visibleDuplicates, IEnumerable<string> hiddenDuplicates)
+        public static bool UpdateHints(Subsidy item, bool forceRewriteHints)
         {
+            bool changed = false;
+            if (item.Hints?.Category1 == null || forceRewriteHints == true)
+            {
+                List<Subsidy.Hint.Category> cats = new();
+                cats.AddRange(Subsidy.Hint.ToCalculatedCategory(item));
+                item.Hints.SetCategories(cats);
+                changed = true;
+            }
+
+
+            Firma f = Firmy.Get(item.Recipient.Ico);
+            DateTime subsidyDate = new DateTime(item.ApprovedYear ?? 1970, 1, 1);
+            
+            if (f.Valid && (item.Hints.RecipientStatus == -1 || forceRewriteHints))
+            {
+                item.Hints.RecipientTypSubjektu = (int)f.TypSubjektu;
+
+                item.Hints.RecipientPolitickyAngazovanySubjekt = (int)HintSmlouva.PolitickaAngazovanostTyp.Neni;
+                if (f.IsSponzorBefore(subsidyDate))
+                    item.Hints.RecipientPolitickyAngazovanySubjekt =
+                        (int)HintSmlouva.PolitickaAngazovanostTyp.PrimoSubjekt;
+                else if (f.MaVazbyNaPolitikyPred(subsidyDate))
+                    item.Hints.RecipientPolitickyAngazovanySubjekt =
+                        (int)HintSmlouva.PolitickaAngazovanostTyp.AngazovanyMajitel;
+
+                item.Hints.RecipientPocetLetOdZalozeni = 99;
+                item.Hints.RecipientPocetLetOdZalozeni = (subsidyDate.Year - (f.Datum_Zapisu_OR ?? new DateTime(1990, 1, 1)).Year);
+                changed = true;
+            }
+            return changed;
         }
 
         public static async Task SaveSubsidyDirectlyToEs(Subsidy subsidy)

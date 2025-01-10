@@ -11,7 +11,7 @@ public static class SubsidyExtension
 
     public static string GetUrl(this Subsidy subsidy, bool local, string foundWithQuery, bool enableRedirectToOriginal = true)
     {
-        string url = "/Dotace/Detail/" + subsidy.Id + "?";
+        string url = "/Dotace/Detail/" + System.Net.WebUtility.UrlEncode(subsidy.Id) + "?";
         if (!string.IsNullOrEmpty(foundWithQuery))
             url = url + "qs=" + System.Net.WebUtility.UrlEncode(foundWithQuery);
         if (enableRedirectToOriginal == false)
