@@ -114,7 +114,7 @@
 
                             });
                             $megamenu_sml_cal.on('zabuto:calendar:day', function (e) {
-                                var url = 'https://www.hlidacstatu.cz/HledatSmlouvy?Q=zverejneno:' + e.date.getFullYear() + '-' + e.date.getMonth().toString().padStart(2, '0') + '-' + e.date.getDate().toString().padStart(2, '0');
+                                var url = 'https://www.hlidacstatu.cz/HledatSmlouvy?Q=zverejneno:' + e.date.getFullYear() + '-' + (e.date.getMonth()+1).toString().padStart(2, '0') + '-' + e.date.getDate().toString().padStart(2, '0');
                                 console.log(url);
                                 window.location = url;
                             });
