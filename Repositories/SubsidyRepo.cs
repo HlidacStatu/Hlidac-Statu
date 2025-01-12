@@ -624,7 +624,7 @@ namespace HlidacStatu.Repositories
             if (f.Valid && (item.Hints.RecipientStatus == -1 || forceRewriteHints))
             {
                 item.Hints.RecipientTypSubjektu = (int)f.TypSubjektu;
-
+                item.Hints.RecipientStatus = (int)f.Status;
                 item.Hints.RecipientPolitickyAngazovanySubjekt = (int)HintSmlouva.PolitickaAngazovanostTyp.Neni;
                 if (f.IsSponzorBefore(subsidyDate))
                     item.Hints.RecipientPolitickyAngazovanySubjekt =
@@ -635,6 +635,13 @@ namespace HlidacStatu.Repositories
 
                 item.Hints.RecipientPocetLetOdZalozeni = 99;
                 item.Hints.RecipientPocetLetOdZalozeni = (subsidyDate.Year - (f.Datum_Zapisu_OR ?? new DateTime(1990, 1, 1)).Year);
+                changed = true;
+            }
+            else
+            {
+                item.Hints.RecipientTypSubjektu = (int)Firma.TypSubjektuEnum.Soukromy;
+                item.Hints.RecipientStatus = 0;
+                item.Hints.RecipientPolitickyAngazovanySubjekt = (int)HintSmlouva.PolitickaAngazovanostTyp.Neni;
                 changed = true;
             }
             return changed;
