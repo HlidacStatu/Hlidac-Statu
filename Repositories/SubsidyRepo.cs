@@ -639,7 +639,7 @@ namespace HlidacStatu.Repositories
             }
             else
             {
-                item.Hints.RecipientTypSubjektu = (int)Firma.TypSubjektuEnum.Soukromy;
+                //item.Hints.RecipientTypSubjektu = (int)Firma.TypSubjektuEnum.Neznamy;
                 item.Hints.RecipientStatus = 0;
                 item.Hints.RecipientPolitickyAngazovanySubjekt = (int)HintSmlouva.PolitickaAngazovanostTyp.Neni;
                 changed = true;
