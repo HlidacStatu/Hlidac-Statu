@@ -3,8 +3,18 @@
 @model List<(int Year, string IcoPoskytovatele, decimal Sum)>
 
 @{
+    int? rok = null;
+    if(ViewData.TryGetValue("rok", out var rokObj))
+    {
+        rok = (int?)rokObj;
+    }
+    
+    string yearText = rok > 0 ? $" pro rok {rok}" :"";
+    
     ViewBag.Title = "Hlídač dotací";
-    ViewBag.SubTitle = "Report po letech a poskytovatelích";
+    ViewBag.SubTitle = $"Report po letech a poskytovatelích{yearText}";
+    
+    
 }
 
 @section breadcrumb
@@ -28,46 +38,54 @@
 }
 
 @{
-    var dotacePoskytovatele = new ReportDataSource<(int Rok, string PoskytovatelIco, decimal Castka)>(
-        new[]
+    List<ReportDataSource<(int Rok, string PoskytovatelIco, decimal Castka)>.Column> dataColumns =
+    [
+        new()
         {
-            // /dotace/hledat?Q=ico:
-            new ReportDataSource<(int Rok, string PoskytovatelIco, decimal Castka)>.Column()
-            {
-                Name = "Rok",
-                CssClass = "number",
-                HtmlRender = (x) => x.Rok.ToString(),
-                TextRender = (x) => x.Rok.ToString()
-            },
-            new ReportDataSource<(int Rok, string PoskytovatelIco, decimal Castka)>.Column()
-            {
-                Name = "IČO",
-                CssClass = "text",
-                HtmlRender = (x) => $"<a href=/subjekt/{x.PoskytovatelIco}>{x.PoskytovatelIco}</a>",
-                TextRender = (x) => x.PoskytovatelIco
-            },
-            new ReportDataSource<(int Rok, string PoskytovatelIco, decimal Castka)>.Column()
-            {
-                Name = "Jméno poskytovatele",
-                CssClass = "text",
-                HtmlRender = (x) => $"{FirmaRepo.NameFromIco(x.PoskytovatelIco)}",
-                TextRender = (x) => x.PoskytovatelIco
-            },
-            new ReportDataSource<(int Rok, string PoskytovatelIco, decimal Castka)>.Column()
-            {
-                Name = "Částka",
-                TextRender = (x) => $"{x.Castka:N0} Kč",
-                HtmlRender = (x) => $"<a href=/dotace/hledat?Q=subsidyProviderIco:{x.PoskytovatelIco}>{x.Castka:N0}&nbsp;Kč</a>",
-                OrderValueRender = (x) => HlidacStatu.Util.RenderData.OrderValueFormat(x.Castka),
-                CssClass = "number"
-            }
-        });
+            Name = "IČO",
+            CssClass = "text",
+            HtmlRender = (x) => $"<a href=/subjekt/{x.PoskytovatelIco}>{x.PoskytovatelIco}</a>",
+            TextRender = (x) => x.PoskytovatelIco
+        },
+        new()
+        {
+            Name = "Jméno poskytovatele",
+            CssClass = "text",
+            HtmlRender = (x) => $"{FirmaRepo.NameFromIco(x.PoskytovatelIco)}",
+            TextRender = (x) => x.PoskytovatelIco
+        },
+        new()
+        {
+            Name = "Částka",
+            TextRender = (x) => $"{x.Castka:N0} Kč",
+            HtmlRender = (x) => $"<a href=/dotace/hledat?Q=subsidyProviderIco:{x.PoskytovatelIco}>{x.Castka:N0}&nbsp;Kč</a>",
+            OrderValueRender = (x) => HlidacStatu.Util.RenderData.OrderValueFormat(x.Castka),
+            CssClass = "number"
+        }
+    ];
     
-    dotacePoskytovatele.AddRows(Model.Where(s => s.Year >= 2021).ToList());
+    if (ViewData["rok"] is null)
+    {
+        var yearColumn = new ReportDataSource<(int Rok, string PoskytovatelIco, decimal Castka)>.Column()
+        {
+            Name = "Rok",
+            CssClass = "number",
+            HtmlRender = (x) => x.Rok.ToString(),
+            TextRender = (x) => x.Rok.ToString()
+        };
+        dataColumns.Insert(0, yearColumn);
+    }
+    
+    var data = new ReportDataSource<(int Rok, string PoskytovatelIco, decimal Castka)>(dataColumns);
+
+    data.AddRows(Model);
     
 }
 
-<h4>Přehled dotací po letech a poskytovatelích</h4>
+<h4>Vyberte rok, za který chcete zobrazit data</h4>
+<partial name="_pager" model="@(ValueTuple.Create((int?)2014, (int?)null, "/Dotace/PoLetechAPoskytovatelich"))"/>
+
+<h4>Přehled dotací po letech a poskytovatelích@(yearText)</h4>
 <div>
-    @Html.DataToHTMLTable(dotacePoskytovatele)
+    @Html.DataToHTMLTable(data)
 </div>
