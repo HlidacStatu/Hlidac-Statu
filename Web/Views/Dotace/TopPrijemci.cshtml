@@ -9,15 +9,22 @@
     {
         rok = (int?)rokObj;
     }
-    int? typ = ViewData["typ"] as int?;
-
+    int? ftyp = ViewData["ftyp"] as int?;
+    int? dtyp = ViewData["dtyp"] as int?;
+    HlidacStatu.Entities.Subsidy.Hint.Type? dTypeEnum = null;
+    if (Enum.TryParse<HlidacStatu.Entities.Subsidy.Hint.Type>(dtyp?.ToString(), out HlidacStatu.Entities.Subsidy.Hint.Type t)) {
+        dTypeEnum = t;
+    }
 
     string yearText = rok > 0 ? $" pro rok {rok}" :"";
 
     ViewBag.Title = "Hlídač dotací";
-    ViewBag.SubTitle = $"Top příjemci dotací{yearText}"
-        + (typ != null ? " pro " + HlidacStatu.Entities.Firma.TypSubjektuDescription(typ, 4, false) : "");
-    ;
+    ViewBag.SubTitle = $"Top příjemci " 
+        + (dtyp != null ? " " + HlidacStatu.Entities.Subsidy.Hint.TypeDescription(dtyp, 4, false) : "")
+        + $" dotací{yearText}"
+        + (ftyp != null ? " pro " + HlidacStatu.Entities.Firma.TypSubjektuDescription(ftyp, 4, false) : "")
+        ;
+    
     
 }
 
@@ -96,9 +103,15 @@
 }
 
 <h4>Vyberte rok, za který chcete zobrazit data</h4>
-<partial name="_pager" model="@(ValueTuple.Create((int?)null, (int?)null, rok, "/Dotace/TopPrijemci" + (typ.HasValue ? $"?typ={typ}" : "")))"/>
+<partial name="_pager" 
+    model="@(ValueTuple.Create((int?)null, (int?)null, rok, 
+                "/Dotace/TopPrijemci?ftyp=" + (ftyp.HasValue ? $"{ftyp}" : "") + (dtyp.HasValue ? $"&dtyp={dtyp}" : "")
+                ))"    
+    />
 
-<h2 class="mt-4">Přehled největších příjemců dotací@(yearText) @((typ != null ? " pro " + HlidacStatu.Entities.Firma.TypSubjektuDescription(typ, 4, false) : ""))</h2>
+<h2 class="mt-4">Přehled největších příjemců
+    @((dtyp != null ? " " + HlidacStatu.Entities.Subsidy.Hint.TypeDescription(dtyp, 4, false) : ""))
+    @(yearText) @((ftyp != null ? " - pouze " + HlidacStatu.Entities.Firma.TypSubjektuDescription(ftyp, 4, false) : ""))</h2>
 <div>
     <partial name="Charts/_SimpleChart" model="chartData"/>
 </div>

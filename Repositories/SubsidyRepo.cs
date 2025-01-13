@@ -92,7 +92,8 @@ namespace HlidacStatu.Repositories
         }
 
         public static async Task<List<(string Ico, int Count, decimal Sum)>> ReportTopPrijemciAsync(int? rok,
-            Firma.TypSubjektuEnum? recipientType = null)
+            Firma.TypSubjektuEnum? recipientType = null,
+            Subsidy.Hint.Type? subsidyType = null)
         {
             AggregationContainerDescriptor<Subsidy> aggs = new AggregationContainerDescriptor<Subsidy>()
                 .Terms("perIco", t => t
@@ -111,6 +112,11 @@ namespace HlidacStatu.Repositories
             string query = "hints.isOriginal:true AND _exists_:recipient.ico AND NOT recipient.ico:\"\"";
             if (recipientType.HasValue)
                 query = query + " AND hints.recipientTypSubjektu:" + (int)recipientType.Value;
+
+            if (subsidyType.HasValue)
+                query = query + " AND hints.subsidyType:" + (int)subsidyType.Value;
+
+
             if (rok is not null && rok > 0)
             {
                 query += $" AND approvedYear:{rok}";

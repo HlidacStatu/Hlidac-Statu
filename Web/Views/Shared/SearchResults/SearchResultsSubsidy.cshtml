@@ -8,7 +8,7 @@
     <tr>
         <th></th>
         <th>Příjemce</th>
-        <th class="d-none d-sm-table-cell d-md-table-cell d-lg-table-cell d-xl-table-cell d-xxl-table-cell">IČO příjemce</th>
+        <th class="d-none d-sm-table-cell d-md-table-cell d-lg-table-cell d-xl-table-cell d-xxl-table-cell">Poskytovatel</th>
         <th>Název projektu</th>
         <th>Rok podpisu</th>
         <th>Odhadovaná výše dotace</th>
@@ -38,13 +38,18 @@
 
             </td>
             <td>
-                @(await Html.KIndexLabelLinkAsync(dotaceItem.Recipient.Ico))@Devmasters.TextUtil.ShortenText(dotaceItem.Recipient.DisplayName, 40)
+                @(await Html.KIndexLabelLinkAsync(dotaceItem.Recipient.Ico))
+                 @if (dotaceItem.Recipient.Ico is not null && dotaceItem.Recipient.Ico != "00000000")
+                {
+                    <a href="/subjekt/@dotaceItem.Recipient.Ico" title="Informace o subjektu">
+                        @Devmasters.TextUtil.ShortenText(dotaceItem.Recipient.DisplayName, 40)
+                    </a>
+                }
             </td>
             <td class="d-none d-sm-table-cell d-md-table-cell d-lg-table-cell d-xl-table-cell d-xxl-table-cell">
-                @if (dotaceItem.Recipient.Ico is not null && dotaceItem.Recipient.Ico != "00000000")
-                {
-                    <a href="/subjekt/@dotaceItem.Recipient.Ico" title="Informace o subjektu">@dotaceItem.Recipient.Ico</a>
-                }
+                    <a href="/subjekt/@dotaceItem.SubsidyProviderIco" title="Poskytovatel dotace">
+                        @Devmasters.TextUtil.ShortenText(dotaceItem.SubsidyProvider, 40)
+                    </a>
             </td>
             <td>
                 @dotaceItem.DisplayProject

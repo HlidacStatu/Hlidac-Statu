@@ -5,6 +5,7 @@ using System.Text.Json.Serialization;
 using Devmasters.Enums;
 using HlidacStatu.Util;
 using Nest;
+using static HlidacStatu.Entities.Firma;
 
 namespace HlidacStatu.Entities;
 
@@ -73,11 +74,90 @@ public partial class Subsidy
 
         public enum Type
         {
-            Unknown,
-            Evropska,
-            Krajska,
-            Obecni,
-            InvesticniPobidka
+            Unknown = 0,
+            Evropska = 1,
+            Krajska = 2,
+            Obecni = 3,
+            InvesticniPobidka = 4
+        }
+
+        public static string TypeDescription(int? typ, int pad, bool jednotne = true)
+        {
+            if (typ.HasValue)
+                return TypeDescription((Type)typ, pad, jednotne);
+            else
+                return "";
+        }
+        public static string TypeDescription(Type typ, int pad, bool jednotne = true)
+        {
+            if (jednotne)
+            {
+                switch (typ)
+                {
+                    case Type.Unknown:
+                        if (pad == 4)
+                            return "neznámé dotaci";
+                        else
+                            return "neznámá dotace";
+                    case Type.Evropska:
+                        if (pad == 4)
+                            return "evropské dotaci";
+                        else
+                            return "evropská dotace";
+                    case Type.Krajska:
+                        if (pad == 4)
+                            return "krajskou dotaci";
+                        else
+                            return "krajská dotace";
+                    case Type.Obecni:
+                        if (pad == 4)
+                            return "obecní dotaci";
+                        else
+                            return "obecní dotace";
+                    case Type.InvesticniPobidka:
+                        if (pad == 4)
+                            return "investiční pobídku";
+                        else
+                            return "investiční pobídka";
+                    default:
+                        return "";
+                }
+            }
+            else
+            {
+
+                switch (typ)
+                {
+                    case Type.Unknown:
+                        if (pad == 4)
+                            return "neznámých dotací";
+                        else
+                            return "neznáme dotace";
+                    case Type.Evropska:
+                        if (pad == 4)
+                            return "evropských dotací";
+                        else
+                            return "evropské dotace";
+                    case Type.Krajska:
+                        if (pad == 4)
+                            return "krajských dotací";
+                        else
+                            return "krajské dotace";
+                    case Type.Obecni:
+                        if (pad == 4)
+                            return "obecních dotací";
+                        else
+                            return "obecní dotace";
+                    case Type.InvesticniPobidka:
+                        if (pad == 4)
+                            return "investičních pobídek";
+                        else
+                            return "investiční pobídky";
+                    default:
+                        return "";
+
+                }
+            }
         }
 
         public void SetDuplicate(Subsidy subsidy, List<string> duplicates, List<string> hiddenDuplicates, string originalSubsidyId)

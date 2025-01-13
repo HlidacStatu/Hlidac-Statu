@@ -89,15 +89,23 @@ namespace HlidacStatu.Web.Controllers
         }
 
         [HlidacCache(22 * 60 * 60, "", false)]
-        public async Task<ActionResult> TopPrijemci(int? rok = null, int? typ = null)
+        public async Task<ActionResult> TopPrijemci(int? rok = null, int? ftyp = null, int? dtyp = null)
         {
             Firma.TypSubjektuEnum? typSubj = null;
-            if (Enum.TryParse<Firma.TypSubjektuEnum>(typ?.ToString(), out Firma.TypSubjektuEnum t))
+            if (Enum.TryParse<Firma.TypSubjektuEnum>(ftyp?.ToString(), out Firma.TypSubjektuEnum t))
                 typSubj = t;
 
-            var data = await SubsidyRepo.ReportTopPrijemciAsync(rok, typSubj);
+            Subsidy.Hint.Type? typDotace = null;
+            if (Enum.TryParse<Subsidy.Hint.Type>(dtyp?.ToString(), out Subsidy.Hint.Type td))
+                typDotace = td;
+
             ViewData["rok"] = rok;
-            ViewData["typ"] = typ;
+            ViewData["ftyp"] = ftyp;
+            ViewData["dtyp"] = dtyp;
+
+
+            var data = await SubsidyRepo.ReportTopPrijemciAsync(rok, typSubj, typDotace);
+
             return View(data);
         }
 
