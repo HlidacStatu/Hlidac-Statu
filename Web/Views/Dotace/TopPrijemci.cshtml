@@ -24,8 +24,17 @@
         + $" dotací{yearText}"
         + (ftyp != null ? " pro " + HlidacStatu.Entities.Firma.TypSubjektuDescription(ftyp, 4, false) : "")
         ;
-    
-    
+
+    string searchQuery = "";
+    if (rok.HasValue)
+    {
+        searchQuery = searchQuery + "%20AND%20approvedYear:" + rok.Value;
+    }
+    if (dtyp.HasValue)
+    {
+        searchQuery = searchQuery + "%20AND%20hints.subsidyType:" + dtyp.Value;
+    }
+
 }
 
 @section breadcrumb
@@ -54,24 +63,17 @@
         {
             new ReportDataSource<(string Ico, int Pocet, decimal Castka)>.Column()
             {
-                Name = "IČO",
+                Name = "Příjemce",
                 CssClass = "text",
-                HtmlRender = (x) => $"<a href=/subjekt/{x.Ico}>{x.Ico}</a>",
-                TextRender = (x) => x.Ico
+                HtmlRender = (x) => $"<a href=/subjekt/{x.Ico}>{FirmaRepo.NameFromIco(x.Ico)}</a>",
+                TextRender = (x) => FirmaRepo.NameFromIco(x.Ico)
             },
             new ReportDataSource<(string Ico, int Pocet, decimal Castka)>.Column()
             {
-                Name = "Název příjemce",
-                CssClass = "text",
-                HtmlRender = (x) => $"{FirmaRepo.NameFromIco(x.Ico)}</a>",
-                TextRender = (x) => x.Ico
-            },
-            new ReportDataSource<(string Ico, int Pocet, decimal Castka)>.Column()
-            {
-                Name = "Počet dotací",
+                Name = "Počet dotací" + (rok.HasValue ? $" za {rok}" : ""),
                 TextRender = (x) => HlidacStatu.Util.RenderData.NiceNumber(x.Pocet),
-                HtmlRender = (x) => $"<a title='Najit dotace subjektu' href=/dotace/hledat?Q=ico:{x.Ico}>{HlidacStatu.Util.RenderData.NiceNumber(x.Pocet)}</a>",
-                OrderValueRender = (x) => HlidacStatu.Util.RenderData.OrderValueFormat(x.Pocet),
+                HtmlRender = (x) => $"<a title='Najit dotace subjektu' href='/dotace/hledat?Q=ico:{x.Ico}{searchQuery}'>{HlidacStatu.Util.RenderData.NiceNumber(x.Pocet)}</a>",
+        OrderValueRender = (x) => HlidacStatu.Util.RenderData.OrderValueFormat(x.Pocet),
                 CssClass = "number"
             },
             new ReportDataSource<(string Ico, int Pocet, decimal Castka)>.Column()
