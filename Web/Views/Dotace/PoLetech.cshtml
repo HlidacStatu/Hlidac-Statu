@@ -41,8 +41,8 @@
             new ReportDataSource<(int Year, Subsidy.Hint.Type SubsidyType, decimal Sum)>.Column()
             {
                 Name = "Částka",
-                TextRender = (x) => $"{x.Sum:N0} Kč",
-                HtmlRender = (x) => $"{x.Sum:N0}&nbsp;Kč",
+                TextRender = (x) => HlidacStatu.Util.RenderData.NicePrice(x.Sum),
+                HtmlRender = (x) => HlidacStatu.Util.RenderData.NicePrice(x.Sum, html:true),
                 OrderValueRender = (x) => HlidacStatu.Util.RenderData.OrderValueFormat(x.Sum),
                 CssClass = "number"
             }
@@ -60,8 +60,8 @@
             new ReportDataSource<(int Year, Subsidy.Hint.Type SubsidyType, decimal Sum)>.Column()
             {
                 Name = "Částka",
-                TextRender = (x) => $"{x.Sum:N0} Kč",
-                HtmlRender = (x) => $"{x.Sum:N0}&nbsp;Kč",
+                TextRender = (x) => HlidacStatu.Util.RenderData.NicePrice(x.Sum),
+                HtmlRender = (x) => HlidacStatu.Util.RenderData.NicePrice(x.Sum, html:true),
                 OrderValueRender = (x) => HlidacStatu.Util.RenderData.OrderValueFormat(x.Sum),
                 CssClass = "number"
             }
@@ -104,7 +104,7 @@
     @Html.ColumnGraph("Státní a evropské dotace v jednotlivých letech", dotaceStatniGraphData, yTitleLeft: "Objem dotací v Kč")
 </div>
 <div>
-    @Html.DataToHTMLTable(dotaceDataStat)
+    @Html.DataToHTMLTable(dotaceDataStat, dataTableOptions: HtmlExtensions.DatatableOptions(orderColumnIdx: 0, orderDirection: "desc"))
 </div>
 
 <h4>Přehled krajských dotací</h4>
@@ -112,6 +112,6 @@
     @Html.ColumnGraph("Krajské dotace v jednotlivých letech", dotaceKrajskeGraphData, yTitleLeft: "Objem dotací v Kč")
 </div>
 <div>
-    @Html.DataToHTMLTable(dotaceDataKraj)
+    @Html.DataToHTMLTable(dotaceDataKraj, dataTableOptions: HtmlExtensions.DatatableOptions(orderColumnIdx: 0, orderDirection: "desc"))
 </div>
 

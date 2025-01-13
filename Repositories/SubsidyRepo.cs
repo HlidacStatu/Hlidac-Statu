@@ -28,9 +28,13 @@ namespace HlidacStatu.Repositories
         private static readonly ConcurrentDictionary<string, SemaphoreSlim> _subsidyLocks = new();
         private static readonly SemaphoreSlim _deleteLock = new SemaphoreSlim(1, 1);
 
+        public static readonly int[] DefaultLimitedYears = Enumerable.Range(2010, DateTime.Now.Year - 2010).ToArray();
 
-        public static async Task<List<(int Year, Subsidy.Hint.Type SubsidyType, decimal Sum)>> ReportPoLetechAsync()
+
+        public static async Task<List<(int Year, Subsidy.Hint.Type SubsidyType, decimal Sum)>> ReportPoLetechAsync(bool limitYears = true, int[] limitedYears = null)
         {
+            limitedYears = limitedYears ?? Enumerable.Range(2010, DateTime.Now.Year - 2010).ToArray() ;
+
             AggregationContainerDescriptor<Subsidy> aggs = new AggregationContainerDescriptor<Subsidy>()
                 .Terms("perYear", t => t
                     .Field(f => f.ApprovedYear)
@@ -74,7 +78,8 @@ namespace HlidacStatu.Repositories
                                 {
                                     if (subsidyTypeBucket["sumAssumedAmount"] is ValueAggregate sumBA)
                                     {
-                                        results.Add((year, subsidyType, Convert.ToDecimal(sumBA.Value ?? 0)));
+                                        if (limitYears == false || (limitYears & limitedYears.Contains(year)))
+                                            results.Add((year, subsidyType, Convert.ToDecimal(sumBA.Value ?? 0)));
                                     }
                                 }
                             }
@@ -86,7 +91,8 @@ namespace HlidacStatu.Repositories
             return results;
         }
 
-        public static async Task<List<(string Ico, int Count, decimal Sum)>> ReportTopPrijemciAsync(int? rok)
+        public static async Task<List<(string Ico, int Count, decimal Sum)>> ReportTopPrijemciAsync(int? rok,
+            Firma.TypSubjektuEnum? recipientType = null)
         {
             AggregationContainerDescriptor<Subsidy> aggs = new AggregationContainerDescriptor<Subsidy>()
                 .Terms("perIco", t => t
@@ -103,6 +109,8 @@ namespace HlidacStatu.Repositories
                 );
 
             string query = "hints.isOriginal:true AND _exists_:recipient.ico AND NOT recipient.ico:\"\"";
+            if (recipientType.HasValue)
+                query = query + " AND hints.recipientTypSubjektu:" + (int)recipientType.Value;
             if (rok is not null && rok > 0)
             {
                 query += $" AND approvedYear:{rok}";

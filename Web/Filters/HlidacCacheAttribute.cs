@@ -17,6 +17,10 @@ namespace HlidacStatu.Web.Filters
         
         private static readonly ILogger _logger = Log.ForContext<HlidacCacheAttribute>();
 
+        public HlidacCacheAttribute(double durationInSecond, string queryKeys, bool differAuth)
+            : this((long)durationInSecond,queryKeys, differAuth)
+        {
+        }
 
         public HlidacCacheAttribute(long durationInSeconds, string queryKeys, bool differAuth)
         {

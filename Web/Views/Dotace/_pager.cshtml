@@ -1,7 +1,17 @@
-﻿@model (int? RokOd, int? RokDo, string Url)
+﻿@model (int? RokOd, int? RokDo, int? selectedYear, string Url)
 
-<a href="@Model.Url">Vše</a>
-@for (int year = Model.RokOd ?? 2014; year <= (Model.RokDo ?? DateTime.Now.Year); year++)
+@using System.Linq;
+
+@{
+    int rokOd = Model.RokOd ?? HlidacStatu.Repositories.SubsidyRepo.DefaultLimitedYears.Min();
+    int rokDo = Model.RokDo ?? HlidacStatu.Repositories.SubsidyRepo.DefaultLimitedYears.Max();
+    string urlDelimiter = "?";
+    if (Model.Url.Contains("?")) {
+        urlDelimiter = "&";
+    }
+}
+<a class="btn btn-sm btn-@(Model.selectedYear == null ? "" : "outline-")primary" href="@Model.Url">Vše</a>
+@for (int year = rokOd; year <= rokDo; year++)
 {
-    <a href="@Model.Url?rok=@year">@year</a>  
+    <a class="btn btn-sm btn-@(Model.selectedYear == year ? "" : "outline-")primary" href="@Model.Url@(urlDelimiter)rok=@year">@year</a>
 }

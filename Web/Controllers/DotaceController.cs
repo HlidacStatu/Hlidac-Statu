@@ -1,8 +1,10 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 using HlidacStatu.Entities;
 using HlidacStatu.Repositories;
-
+using HlidacStatu.Web.Filters;
 using Microsoft.AspNetCore.Mvc;
+using Devmasters.Enums;
 
 namespace HlidacStatu.Web.Controllers
 {
@@ -78,28 +80,37 @@ namespace HlidacStatu.Web.Controllers
 
             return View(dotace);
         }
-        
+
+        [HlidacCache(22*60*60,"",false)]
         public async Task<ActionResult> PoLetech()
         {
             var data = await SubsidyRepo.ReportPoLetechAsync();
             return View(data);
-        }    
-        
-        public async Task<ActionResult> TopPrijemci(int? rok = null)
+        }
+
+        [HlidacCache(22 * 60 * 60, "", false)]
+        public async Task<ActionResult> TopPrijemci(int? rok = null, int? typ = null)
         {
-            var data = await SubsidyRepo.ReportTopPrijemciAsync(rok);
+            Firma.TypSubjektuEnum? typSubj = null;
+            if (Enum.TryParse<Firma.TypSubjektuEnum>(typ?.ToString(), out Firma.TypSubjektuEnum t))
+                typSubj = t;
+
+            var data = await SubsidyRepo.ReportTopPrijemciAsync(rok, typSubj);
             ViewData["rok"] = rok;
+            ViewData["typ"] = typ;
             return View(data);
         }
-        
-        public async Task<ActionResult> PoLetechAPoskytovatelich(int? rok = null)
+
+        [HlidacCache(22 * 60 * 60, "", false)]
+        public async Task<ActionResult> TopPoskytovatele(int? rok = null)
         {
             var data = await SubsidyRepo.ReportPoskytovatelePoLetechAsync(rok);
             ViewData["rok"] = rok;
             return View(data);
         }
-        
-        public async Task<ActionResult> PoKategoriichALetech(int? rok = null)
+
+        [HlidacCache(22 * 60 * 60, "", false)]
+        public async Task<ActionResult> TopKategorie(int? rok = null)
         {
             var data = await SubsidyRepo.ReportPrijemciPoKategoriichALetechAsync(rok);
             ViewData["rok"] = rok;

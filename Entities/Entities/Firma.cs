@@ -8,20 +8,116 @@ using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Text.RegularExpressions;
 using HlidacStatu.Util;
+using Devmasters.Enums;
 
 namespace HlidacStatu.Entities
 {
     public partial class Firma
         : IBookmarkable
     {
+        [ShowNiceDisplayName()]
         public enum TypSubjektuEnum
         {
+            [NiceDisplayName("Neznámý")]
             Neznamy = -1,
+            [NiceDisplayName("Soukromý")]
             Soukromy = 0,
+            [NiceDisplayName("Státní")]
             PatrimStatu = 1,
+            [NiceDisplayName("Státní (min 25%)")]
             PatrimStatu25perc = 2,
+
+            [NiceDisplayName("Úřad")]
             Ovm = 10,
+            [NiceDisplayName("Obec")]
             Obec = 20
+        }
+        public static string TypSubjektuDescription(int? typ, int pad, bool jednotne = true)
+        {
+            if (typ.HasValue)
+                return TypSubjektuDescription((TypSubjektuEnum)typ, pad, jednotne);
+            else
+                return "";
+        }
+        public static string TypSubjektuDescription(TypSubjektuEnum typ, int pad, bool jednotne = true)
+        {
+            if (jednotne)
+            {
+                switch (typ)
+                {
+                    case TypSubjektuEnum.Neznamy:
+                        if (pad == 4)
+                            return "neznámou firmu";
+                        else
+                            return "neznámá firma";
+                    case TypSubjektuEnum.Soukromy:
+                        if (pad == 4)
+                            return "soukromou firmu";
+                        else
+                            return "soukromá firma";
+                    case TypSubjektuEnum.PatrimStatu:
+                        if (pad == 4)
+                            return "firmu vlastněnou státem";
+                        else
+                            return "firma vlastněná státem";
+                    case TypSubjektuEnum.PatrimStatu25perc:
+                        if (pad == 4)
+                            return "firmu vlastněnou státem (podíl min 25%)";
+                        else
+                            return "firma vlastněná státem (podíl min 25%)";
+                    case TypSubjektuEnum.Ovm:
+                        if (pad == 4)
+                            return "úřad";
+                        else
+                            return "uřad";
+                    case TypSubjektuEnum.Obec:
+                        if (pad == 4)
+                            return "obec";
+                        else
+                            return "obec";
+                    default:
+                        return "";
+                }
+            }
+            else
+            {
+
+                switch (typ)
+                {
+                    case TypSubjektuEnum.Neznamy:
+                        if (pad == 4)
+                            return "neznámé firmy";
+                        else
+                            return "neznámé firmy";
+                    case TypSubjektuEnum.Soukromy:
+                        if (pad == 4)
+                            return "soukromé firmy";
+                        else
+                            return "soukromé firmý";
+                    case TypSubjektuEnum.PatrimStatu:
+                        if (pad == 4)
+                            return "firmy vlastněné státem";
+                        else
+                            return "firma vlastněná státem";
+                    case TypSubjektuEnum.PatrimStatu25perc:
+                        if (pad == 4)
+                            return "firmy vlastněné státem (podíl min 25%)";
+                        else
+                            return "firmy vlastněné státem (podíl min 25%)";
+                    case TypSubjektuEnum.Ovm:
+                        if (pad == 4)
+                            return "úřady";
+                        else
+                            return "uřady";
+                    case TypSubjektuEnum.Obec:
+                        if (pad == 4)
+                            return "obce";
+                        else
+                            return "obce";
+                    default:
+                        return "";
+                }
+            }
         }
 
         public static bool IsValid(Firma f)

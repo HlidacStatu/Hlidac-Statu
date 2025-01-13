@@ -83,9 +83,9 @@
 }
 
 <h4>Vyberte rok, za který chcete zobrazit data</h4>
-<partial name="_pager" model="@(ValueTuple.Create((int?)2014, (int?)null, "/Dotace/PoLetechAPoskytovatelich"))"/>
+<partial name="_pager" model="@(ValueTuple.Create((int?)null, (int?)null, rok, "/Dotace/PoLetechAPoskytovatelich"))"/>
 
-<h4>Přehled dotací po letech a poskytovatelích@(yearText)</h4>
+<h2 class="mt-4">Přehled dotací po letech a poskytovatelích@(yearText)</h2>
 <div>
-    @Html.DataToHTMLTable(data)
+    @Html.DataToHTMLTable(data, dataTableOptions: HtmlExtensions.DatatableOptions(orderColumnIdx: (rok.HasValue ? 2 : 3), orderDirection: "desc"))
 </div>
