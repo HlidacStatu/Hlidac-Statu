@@ -255,6 +255,8 @@ namespace HlidacStatu.Repositories
 
         public static bool AddFirmaToProcessingQueue(string ico, RecalculateItem.StatisticsTypeEnum statsType, string provokeBy)
         {
+            if (string.IsNullOrWhiteSpace(ico))
+                return true;
             return AddToProcessingQueue(
                new RecalculateItem()
                {
@@ -365,6 +367,8 @@ namespace HlidacStatu.Repositories
         }
         public static bool AddToProcessingQueue(RecalculateItem item)
         {
+            if (string.IsNullOrWhiteSpace(item.Id))
+                return true;
             try
             {
                 using (DbEntities db = new DbEntities())

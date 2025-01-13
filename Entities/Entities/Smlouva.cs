@@ -78,20 +78,23 @@ namespace HlidacStatu.Entities
 
             if (prijemceSpecified)
             {
-                foreach (var prij in item.smlouva.smluvniStrana)
+                foreach (var prij in item.smlouva.smluvniStrana.Where(m => m.prijemce.HasValue==false || m.prijemce == true))
                 {
-                    if (prijemci.Any(m=>m.ico == prij.ico || m.datovaSchranka == prij.datovaSchranka) == false)
-                        prijemci.Add(new Subjekt(prij));
+                    if (!string.IsNullOrEmpty(prij.ico) || !string.IsNullOrEmpty(prij.datovaSchranka))
+                    {
+                        //overim, zda v prijemcim uz neni stejne ico nebo ds
+                        if (prijemci.Any(m=>m.ico == prij.ico || m.datovaSchranka == prij.datovaSchranka) == false)
+                            prijemci.Add(new Subjekt(prij));
+                    }
+                    else
+                    {
+                        //prij nema ico ani datovku, tzn. asi zahranicni, porovnam nazev a 
+                        if (prijemci.Any(m => m.nazev == prij.nazev || m.adresa == prij.adresa) == false)
+                            prijemci.Add(new Subjekt(prij));
+
+                    }
                 }
 
-                //add missing from source
-                prijemci = prijemci
-                            .ToArray()
-                            .Union(
-                                    item.smlouva.smluvniStrana
-                                        .Where(m => m.prijemce.HasValue == false)
-                                        .Select(m => new Subjekt(m))
-                            ).ToList();
 
 
             }
