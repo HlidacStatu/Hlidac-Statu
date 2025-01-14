@@ -92,15 +92,17 @@ namespace HlidacStatu.Repositories.Statistics
                 var statistiky = firma.Holding(aktualnost)
                     .Append(firma)
                     .Where(f => f.Valid)
-                    .Select(f => new { f.ICO, dotaceStats = f.StatistikaDotaci() });
+                    .Select(f => new { f.ICO, dotaceStats = f.StatistikaDotaci() })
+                    .ToArray();
 
                 var statistikyPerIco = new Dictionary<string, StatisticsSubjectPerYear<Firma.Statistics.Subsidy>>();
                 foreach (var ico in statistiky.Select(m => m.ICO).Distinct())
                 {
                     statistikyPerIco[ico] = new StatisticsSubjectPerYear<Firma.Statistics.Subsidy>();
-                    statistikyPerIco[ico] = (StatisticsSubjectPerYear<Firma.Statistics.Subsidy>
-                        .Aggregate(statistikyPerIco.Where(w => w.Key == ico)
-                        .Select(m => m.Value))) ?? new StatisticsSubjectPerYear<Firma.Statistics.Subsidy>();
+                    statistikyPerIco[ico] = (StatisticsSubjectPerYear<Firma.Statistics.Subsidy>.Aggregate(
+                            statistiky.Where(w => w.ICO == ico).Select(m => m.dotaceStats).ToArray()
+                            )
+                        ) ?? new StatisticsSubjectPerYear<Firma.Statistics.Subsidy>();
                 }
 
                 var aggregate = Lib.Analytics.StatisticsSubjectPerYear<Firma.Statistics.Subsidy>.Aggregate(statistikyPerIco.Values);

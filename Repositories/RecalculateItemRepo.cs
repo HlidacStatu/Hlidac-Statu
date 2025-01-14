@@ -192,8 +192,8 @@ namespace HlidacStatu.Repositories
                         }
                         else
                         {
-                            _ = f.StatistikaDotaci(forceUpdateCache: true);
-                            _ = f.HoldingStatistikaDotaci(DS.Graphs.Relation.AktualnostType.Nedavny,
+                            var _debug1 = f.StatistikaDotaci(forceUpdateCache: true);
+                            var _debug2 = f.HoldingStatistikaDotaci(DS.Graphs.Relation.AktualnostType.Nedavny,
                                 forceUpdateCache: noRebuild ? false : true);
                         }
                         break;
