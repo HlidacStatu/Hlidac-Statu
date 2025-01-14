@@ -9,9 +9,7 @@ using HlidacStatu.Connectors;
 using HlidacStatu.Entities;
 using HlidacStatu.Repositories.Searching;
 using Serilog;
-using HlidacStatu.Entities.XSD;
 using HlidacStatu.Extensions;
-using LinqToTwitter;
 
 namespace HlidacStatu.Repositories
 {
@@ -290,6 +288,70 @@ namespace HlidacStatu.Repositories
                                 }
                             }
                         }
+                    }
+                }
+            }
+
+            return results;
+        }
+        
+        //Příjemci dotací z více krajů
+        public static async Task<List<(string Ico, int DataSourceCount, decimal SumAssumedAmmount)>> DotacniExperti(int? rok)
+        {
+            AggregationContainerDescriptor<Subsidy> aggs = new AggregationContainerDescriptor<Subsidy>()
+                .Terms("perIco", ta => ta
+                    .Field(f => f.Recipient.Ico)
+                    .Size(100)
+                    .Order(o => o
+                        .Descending("uniqueDataSource")
+                    )
+                    .Aggregations(aa => aa
+                        .Cardinality("uniqueDataSource", ca => ca
+                            .Field(f => f.Metadata.DataSource.Suffix("keyword"))
+                        )
+                        .Sum("sumAssumedAmount", sa => sa
+                            .Field(f => f.AssumedAmount)
+                        )
+                    )
+                );
+
+            string query = "hints.subsidyType:2 AND _exists_:recipient.ico AND NOT recipient.ico:\"\"";
+            
+            if (rok is not null && rok > 0)
+            {
+                query += $" AND approvedYear:{rok}";
+            }
+
+            var res = await SubsidyRepo.Searching.SimpleSearchAsync(query, 1, 0, "666", anyAggregation: aggs);
+            if (res is null)
+            {
+                return null;
+            }
+
+            // Initialize the results dictionary
+            List<(string Ico, int DataSourceCount, decimal SumAssumedAmmount)> results = new();
+
+            // Parse the aggregation results
+            if (res.ElasticResults.Aggregations["perIco"] is BucketAggregate perIcoBa)
+            {
+                foreach (KeyedBucket<object> perIcoBucket in perIcoBa.Items)
+                {
+                    if (perIcoBucket.Key is not null && perIcoBucket.Key.ToString() is not null)
+                    {
+                        decimal sum = 0;
+                        int count = 0;
+                        if (perIcoBucket["sumAssumedAmount"] is ValueAggregate sumBA)
+                        {
+                            sum = Convert.ToDecimal(sumBA.Value ?? 0);
+                        }
+
+                        if (perIcoBucket["uniqueDataSource"] is ValueAggregate dataSourceCountBA)
+                        {
+                            count = Convert.ToInt32(dataSourceCountBA.Value ?? 0);
+                        }
+
+
+                        results.Add((perIcoBucket.Key.ToString(), count, sum));
                     }
                 }
             }

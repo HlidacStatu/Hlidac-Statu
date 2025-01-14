@@ -59,6 +59,7 @@
         },
         yAxis: {
             min: 0,
+            @(Model.YAxisTickInterval.HasValue ? $"tickInterval: {Model.YAxisTickInterval.Value}," : "")
             title: {
                 text: '@Html.Raw(Model.YAxisTitle)'
             },

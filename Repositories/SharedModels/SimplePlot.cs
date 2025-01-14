@@ -26,6 +26,7 @@ public class SimplePlot
     
     public List<string> Labels { get; set; } = new();
     public List<double> Data { get; set; } = new();
+    public int? YAxisTickInterval { get; set; }
 
 
     public string DrawData() => $"[{string.Join(",", Data.Select(x => x.ToString("F1", CultureInfo.InvariantCulture)))}]";

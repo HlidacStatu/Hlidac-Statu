@@ -125,6 +125,13 @@ namespace HlidacStatu.Web.Controllers
             return View(data);
         }
         
+        public async Task<ActionResult> DotacniExperti(int? rok = null)
+        {
+            var data = await SubsidyRepo.DotacniExperti(rok);
+            ViewData["rok"] = rok;
+            return View(data);
+        }
+        
         // public async Task<ActionResult> TopPrijemciPoLetech(int rok)
         // {
         //     var data = await SubsidyRepo.TopPrijemciReportAsync(rok);
