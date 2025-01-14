@@ -358,6 +358,60 @@ namespace HlidacStatu.Repositories
 
             return results;
         }
+        
+        public static async Task<List<(string ProgramName, string ProgramCode, string SubsidyProviderIco, decimal AssumedAmountSummed)>> TopDotacniProgramy(Subsidy.Hint.Type typDotace, int? rok)
+        {
+            var aggs = new AggregationContainerDescriptor<Subsidy>()
+                .MultiTerms("distinct_programs", mt => mt
+                    .Size(10000)
+                    .Terms(t => 
+                        t.Field(f => f.ProgramName.Suffix("keyword")),
+                        t => t.Field(f => f.ProgramCode),
+                        t => t.Field(f => f.SubsidyProviderIco)
+                    )
+                    .Aggregations(aa => aa
+                        .Sum("sumAssumedAmount", sa => sa
+                            .Field(f => f.AssumedAmount)
+                        )
+                    )
+                );
+
+            string query = $"hints.subsidyType:{typDotace:D}";
+            
+            if (rok is not null && rok > 0)
+            {
+                query += $" AND approvedYear:{rok}";
+            }
+
+            var res = await SubsidyRepo.Searching.SimpleSearchAsync(query, 1, 0, "666", anyAggregation: aggs);
+            if (res is null)
+            {
+                return null;
+            }
+
+            // Initialize the results dictionary
+            List<(string ProgramName, string ProgramCode, string SubsidyProviderIco, decimal AssumedAmountSummed)> results = new();
+
+            // Parse the aggregation results
+            if (res.ElasticResults.Aggregations["distinct_programs"] is BucketAggregate perIcoBa)
+            {
+                foreach (KeyedBucket<object> perIcoBucket in perIcoBa.Items)
+                {
+                    if (perIcoBucket.Key is not null && perIcoBucket.Key is List<object> keyList)
+                    {
+                        decimal sum = 0;
+                        if (perIcoBucket["sumAssumedAmount"] is ValueAggregate sumBA)
+                        {
+                            sum = Convert.ToDecimal(sumBA.Value ?? 0);
+                        }
+                        
+                        results.Add((keyList[0].ToString(), keyList[1].ToString(), keyList[2].ToString(), sum));
+                    }
+                }
+            }
+
+            return results;
+        }
 
         public static QueryContainer AddIsNotHiddenRule(QueryContainer query)
         {

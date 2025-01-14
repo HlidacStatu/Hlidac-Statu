@@ -1,0 +1,110 @@
+@using HlidacStatu.Repositories
+@using HlidacStatu.XLib.Render
+@using Microsoft.AspNetCore.Mvc.TagHelpers
+@model List<(string ProgramName, string ProgramCode, string SubsidyProviderIco, decimal AssumedAmountSummed)>
+
+@{
+    int? rok = null;
+    if(ViewData.TryGetValue("rok", out var rokObj))
+    {
+        rok = (int?)rokObj;
+    }
+    string yearText = rok > 0 ? $" pro rok {rok}" :"";
+
+    int typDotace = (int)(ViewData["typDotace"] ?? 0); 
+    string typDotaceText = typDotace switch
+    {
+        1 => "evropské dotace",
+        2 => "krajské dotace",
+        3 => "obecní dotace",
+        _ => "nedefinováno"
+        
+    };
+
+    ViewBag.Title = "Hlídač dotací";
+    ViewBag.SubTitle = $"Přehled největších dotačních programů{yearText} pro {typDotaceText}";
+}
+
+@section breadcrumb
+{
+    <ol class="breadcrumb">
+        <li>
+            <a href="/">Hlídač Státu</a>
+        </li>
+        <li>
+            <a href="@Url.Action("Index", "Dotace")">Dotace</a>
+        </li>
+        <li class="active">@ViewBag.SubTitle</li>
+    </ol>
+}
+
+@section scripts
+{
+    <link rel="stylesheet" type="text/css" href="//cdn.datatables.net/1.13.4/css/jquery.dataTables.css"/>
+    <script type="text/javascript" charset="utf8" src="//cdn.datatables.net/1.13.4/js/jquery.dataTables.js"></script>
+    <script src="~/bundles/highcharts"></script>
+}
+
+@{
+    var dotacniProgramy = new ReportDataSource<(string ProgramName, string ProgramCode, string SubsidyProviderIco, decimal AssumedAmountSummed)>(
+        new[]
+        {
+            new ReportDataSource<(string ProgramName, string ProgramCode, string SubsidyProviderIco, decimal AssumedAmountSummed)>.Column()
+            {
+                Name = "Poskytovatel",
+                CssClass = "text",
+                HtmlRender = (x) => $"<a href=/subjekt/{x.SubsidyProviderIco}>{FirmaRepo.NameFromIco(x.SubsidyProviderIco)}</a>",
+                TextRender = (x) => FirmaRepo.NameFromIco(x.SubsidyProviderIco)
+            },
+            new ReportDataSource<(string ProgramName, string ProgramCode, string SubsidyProviderIco, decimal AssumedAmountSummed)>.Column()
+            {
+                Name = "Kód programu",
+                TextRender = (x) => x.ProgramCode,
+                HtmlRender = (x) => $"<a title='Najit dotace subjektu' href='/dotace/hledat?Q=ico:{x.SubsidyProviderIco} AND programCode:\"{x.ProgramCode}\" AND hints.subsidyType:{typDotace}'>{x.ProgramCode}</a>",
+                CssClass = "text"
+            },
+            new ReportDataSource<(string ProgramName, string ProgramCode, string SubsidyProviderIco, decimal AssumedAmountSummed)>.Column()
+            {
+                Name = "Název programu",
+                TextRender = (x) => x.ProgramName,
+                HtmlRender = (x) => $"<a title='Najit dotace subjektu' href='/dotace/hledat?Q=ico:{x.SubsidyProviderIco} AND programCode:\"{x.ProgramName}\" AND hints.subsidyType:{typDotace}'>{x.ProgramName}</a>",
+                CssClass = "text"
+            },
+            new ReportDataSource<(string ProgramName, string ProgramCode, string SubsidyProviderIco, decimal AssumedAmountSummed)>.Column()
+            {
+                Name = "Celková částka",
+                TextRender = (x) => HlidacStatu.Util.RenderData.NicePrice(x.AssumedAmountSummed, shortFormat:true),
+                HtmlRender = (x) => HlidacStatu.Util.RenderData.NicePrice(x.AssumedAmountSummed,html:true),
+                OrderValueRender = (x) => HlidacStatu.Util.RenderData.OrderValueFormat(x.AssumedAmountSummed),
+                CssClass = "number"
+            }
+        });
+    
+    dotacniProgramy.AddRows(Model.Take(100));
+    
+    
+    // SimplePlot chartData = new SimplePlot()
+    // {
+    //     Data = Model.Select(p => (double)p.DataSourceCount).Take(20).ToList(),
+    //     Labels = Model.Select(p => FirmaRepo.NameFromIco(p.Ico)).Take(20).ToList(),
+    //     ChartType = "bar",
+    //     Title = $"Příjemci dotací z více krajů{yearText}",
+    //     Koncovka = "krajů",
+    //     SeriesName = "krajů",
+    //     CssHeight = "600px",
+    //     YAxisTickInterval = 1
+    // };
+}
+<h4>Vyberte rok, za který chcete zobrazit data</h4>
+<partial name="_pager"
+         model="@(ValueTuple.Create((int?)2021, (int?)null, rok, $"/Dotace/TopDotacniProgramy?typDotace={typDotace}"))"
+/>
+
+<h4>@ViewBag.SubTitle</h4>
+@* <div> *@
+@*     <partial name="Charts/_SimpleChart" model="chartData"/> *@
+@* </div> *@
+<div>
+    @Html.DataToHTMLTable(dotacniProgramy, dataTableOptions: HtmlExtensions.DatatableOptions(orderColumnIdx: 3, orderDirection: "desc"))
+</div>
+

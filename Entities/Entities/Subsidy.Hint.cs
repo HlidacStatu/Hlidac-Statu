@@ -74,10 +74,15 @@ public partial class Subsidy
 
         public enum Type
         {
+            [NiceDisplayName("neznámý typ")]
             Unknown = 0,
+            [NiceDisplayName("Státní, nebo evropská dotace")]
             Evropska = 1,
+            [NiceDisplayName("Krajská dotace")]
             Krajska = 2,
+            [NiceDisplayName("Obecní dotace")]
             Obecni = 3,
+            [NiceDisplayName("Investiční pobídka")]
             InvesticniPobidka = 4
         }
 
