@@ -81,10 +81,10 @@
 }
 <h4>Vyberte rok, za který chcete zobrazit data</h4>
 <partial name="_pager"
-         model="@(ValueTuple.Create((int?)null, (int?)null, rok, "/Dotace/DotacniExperti"))"
+         model="@(ValueTuple.Create((int?)2021, (int?)null, rok, "/Dotace/DotacniExperti"))"
 />
 
-<h4>Přehled státních a evropských dotací</h4>
+<h4>@ViewBag.SubTitle</h4>
 <div>
     <partial name="Charts/_SimpleChart" model="chartData"/>
 </div>
