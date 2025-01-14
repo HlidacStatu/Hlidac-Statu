@@ -154,7 +154,7 @@ namespace HlidacStatu.Repositories
             }
         }
 
-        public static void RecalculateFirma(RecalculateItem item, bool noRebuild, bool invalidateOnly)
+        public static void RecalculateFirma(RecalculateItem item, bool noRebuild, bool invalidateOnly, bool firmaOnly = false, bool holdingOnly = false)
         {
             var f = Firmy.Get(item.Id);
             if (f != null)
@@ -168,8 +168,10 @@ namespace HlidacStatu.Repositories
                         }
                         else
                         {
-                            _ = f.StatistikaRegistruSmluv(forceUpdateCache: true);
-                            _ = f.HoldingStatisticsRegistrSmluv(DS.Graphs.Relation.AktualnostType.Nedavny,
+                            if (!holdingOnly || firmaOnly)
+                                _ = f.StatistikaRegistruSmluv(forceUpdateCache: true);
+                            if (holdingOnly || !firmaOnly)
+                                _ = f.HoldingStatisticsRegistrSmluv(DS.Graphs.Relation.AktualnostType.Nedavny,
                                 forceUpdateCache: noRebuild ? false : true);
                         }
                         break;
@@ -180,8 +182,10 @@ namespace HlidacStatu.Repositories
                         }
                         else
                         {
-                            _ = f.StatistikaVerejneZakazky(forceUpdateCache: true);
-                            _ = f.HoldingStatistikaVerejneZakazky(DS.Graphs.Relation.AktualnostType.Nedavny,
+                            if (!holdingOnly || firmaOnly)
+                                _ = f.StatistikaVerejneZakazky(forceUpdateCache: true);
+                            if (holdingOnly || !firmaOnly)
+                                _ = f.HoldingStatistikaVerejneZakazky(DS.Graphs.Relation.AktualnostType.Nedavny,
                                 forceUpdateCache: noRebuild ? false : true);
                         }
                         break;
@@ -192,8 +196,10 @@ namespace HlidacStatu.Repositories
                         }
                         else
                         {
-                            var _debug1 = f.StatistikaDotaci(forceUpdateCache: true);
-                            var _debug2 = f.HoldingStatistikaDotaci(DS.Graphs.Relation.AktualnostType.Nedavny,
+                            if (!holdingOnly || firmaOnly)
+                                _ = f.StatistikaDotaci(forceUpdateCache: true);
+                            if (holdingOnly || !firmaOnly)
+                                _ = f.HoldingStatistikaDotaci(DS.Graphs.Relation.AktualnostType.Nedavny,
                                 forceUpdateCache: noRebuild ? false : true);
                         }
                         break;
