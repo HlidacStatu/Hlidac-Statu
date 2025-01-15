@@ -12,7 +12,7 @@
     string yearText = rok > 0 ? $" pro rok {rok}" :"";
     
     ViewBag.Title = "Hlídač dotací";
-    ViewBag.SubTitle = $"Report po letech a poskytovatelích{yearText}";
+    ViewBag.SubTitle = $"Report podle poskytovatelů{yearText}";
     
     
 }
@@ -66,7 +66,7 @@
 <h4>Vyberte rok, za který chcete zobrazit data</h4>
 <partial name="_pager" model="@(ValueTuple.Create((int?)null, (int?)null, rok, "/Dotace/TopPoskytovatele"))"/>
 
-<h2 class="mt-4">Přehled dotací po letech a poskytovatelích@(yearText)</h2>
+<h2 class="mt-4">Přehled dotací podle poskytovatelů@(yearText)</h2>
 <div>
     @Html.DataToHTMLTable(data, dataTableOptions: HtmlExtensions.DatatableOptions(orderColumnIdx: 1, orderDirection: "desc"))
 </div>

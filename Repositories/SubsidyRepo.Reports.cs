@@ -187,26 +187,20 @@ namespace HlidacStatu.Repositories
             return results;
         }
 
-        public static async Task<List<(string Ico, int Year, Subsidy.Hint.CalculatedCategories Category, decimal Sum)>>
-            ReportPrijemciPoKategoriichALetechAsync(int? rok)
+        public static async Task<List<(string Ico, Subsidy.Hint.CalculatedCategories Category, decimal Sum)>>
+            ReportPrijemciPoKategoriichAsync(int? rok)
         {
             AggregationContainerDescriptor<Subsidy> aggs = new AggregationContainerDescriptor<Subsidy>()
-                .Terms("perYear", t => t
-                    .Field(f => f.ApprovedYear)
+                .Terms("perCategory", st => st
+                    .Field(f => f.Hints.Category1.TypeValue)
                     .Size(10000)
                     .Aggregations(yearAggs => yearAggs
-                        .Terms("perCategory", st => st
-                            .Field(f => f.Hints.Category1.TypeValue)
-                            .Size(10000)
-                            .Aggregations(yearAggs => yearAggs
-                                .Terms("perIco", st => st
-                                    .Field(f => f.Recipient.Ico)
-                                    .Size(100)
-                                    .Aggregations(typeAggs => typeAggs
-                                        .Sum("sumAssumedAmount", sa => sa
-                                            .Field(f => f.AssumedAmount)
-                                        )
-                                    )
+                        .Terms("perIco", st => st
+                            .Field(f => f.Recipient.Ico)
+                            .Size(100)
+                            .Aggregations(typeAggs => typeAggs
+                                .Sum("sumAssumedAmount", sa => sa
+                                    .Field(f => f.AssumedAmount)
                                 )
                             )
                         )
@@ -227,34 +221,25 @@ namespace HlidacStatu.Repositories
             }
 
             // Initialize the results dictionary
-            List<(string Ico, int Year, Subsidy.Hint.CalculatedCategories Category, decimal Sum)> results = new();
+            List<(string Ico, Subsidy.Hint.CalculatedCategories Category, decimal Sum)> results = new();
 
             // Parse the aggregation results
-            if (res.ElasticResults.Aggregations["perYear"] is BucketAggregate perYearBA)
+            if (res.ElasticResults.Aggregations["perCategory"] is BucketAggregate subsidyCategoryBA)
             {
-                foreach (KeyedBucket<object> perYearBucket in perYearBA.Items)
+                foreach (KeyedBucket<object> subsidyCategoryBucket in subsidyCategoryBA.Items)
                 {
-                    if (int.TryParse(perYearBucket.Key.ToString(), out int year))
+                    if (int.TryParse(subsidyCategoryBucket.Key.ToString(), out int subsidyCategoryTypeVal))
                     {
-                        if (perYearBucket["perCategory"] is BucketAggregate subsidyCategoryBA)
-                        {
-                            foreach (KeyedBucket<object> subsidyCategoryBucket in subsidyCategoryBA.Items)
-                            {
-                                if (int.TryParse(subsidyCategoryBucket.Key.ToString(), out int subsidyCategoryTypeVal))
-                                {
-                                    var subsidyCategory = (Subsidy.Hint.CalculatedCategories)subsidyCategoryTypeVal;
+                        var subsidyCategory = (Subsidy.Hint.CalculatedCategories)subsidyCategoryTypeVal;
 
-                                    if (subsidyCategoryBucket["perIco"] is BucketAggregate subsidyIcoBA)
-                                    {
-                                        foreach (KeyedBucket<object> subsidyIcoBucket in subsidyIcoBA.Items)
-                                        {
-                                            if (subsidyIcoBucket["sumAssumedAmount"] is ValueAggregate sumBA)
-                                            {
-                                                results.Add((subsidyIcoBucket.Key.ToString(), year, subsidyCategory,
-                                                    Convert.ToDecimal(sumBA.Value ?? 0)));
-                                            }
-                                        }
-                                    }
+                        if (subsidyCategoryBucket["perIco"] is BucketAggregate subsidyIcoBA)
+                        {
+                            foreach (KeyedBucket<object> subsidyIcoBucket in subsidyIcoBA.Items)
+                            {
+                                if (subsidyIcoBucket["sumAssumedAmount"] is ValueAggregate sumBA)
+                                {
+                                    results.Add((subsidyIcoBucket.Key.ToString(), subsidyCategory,
+                                        Convert.ToDecimal(sumBA.Value ?? 0)));
                                 }
                             }
                         }

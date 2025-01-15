@@ -120,7 +120,7 @@ namespace HlidacStatu.Web.Controllers
         [HlidacCache(22 * 60 * 60, "", false)]
         public async Task<ActionResult> TopKategorie(int? rok = null)
         {
-            var data = await SubsidyRepo.ReportPrijemciPoKategoriichALetechAsync(rok);
+            var data = await SubsidyRepo.ReportPrijemciPoKategoriichAsync(rok);
             ViewData["rok"] = rok;
             return View(data);
         }
