@@ -141,22 +141,16 @@ namespace HlidacStatu.Repositories
             return results;
         }
 
-        public static async Task<List<(int Year, string IcoPoskytovatele, decimal Sum)>>
+        public static async Task<List<(string IcoPoskytovatele, decimal Sum)>>
             ReportPoskytovatelePoLetechAsync(int? rok)
         {
             AggregationContainerDescriptor<Subsidy> aggs = new AggregationContainerDescriptor<Subsidy>()
-                .Terms("perYear", t => t
-                    .Field(f => f.ApprovedYear)
+                .Terms("perProviderIco", st => st
+                    .Field(f => f.SubsidyProviderIco)
                     .Size(10000)
-                    .Aggregations(yearAggs => yearAggs
-                        .Terms("perProviderIco", st => st
-                            .Field(f => f.SubsidyProviderIco)
-                            .Size(10000)
-                            .Aggregations(typeAggs => typeAggs
-                                .Sum("sumAssumedAmount", sa => sa
-                                    .Field(f => f.AssumedAmount)
-                                )
-                            )
+                    .Aggregations(typeAggs => typeAggs
+                        .Sum("sumAssumedAmount", sa => sa
+                            .Field(f => f.AssumedAmount)
                         )
                     )
                 );
@@ -176,26 +170,16 @@ namespace HlidacStatu.Repositories
             }
 
             // Initialize the results dictionary
-            List<(int Year, string IcoPoskytovatele, decimal Sum)> results = new();
+            List<(string IcoPoskytovatele, decimal Sum)> results = new();
 
             // Parse the aggregation results
-            if (res.ElasticResults.Aggregations["perYear"] is BucketAggregate perYearBA)
+            if (res.ElasticResults.Aggregations["perProviderIco"] is BucketAggregate subsidyProviderBA)
             {
-                foreach (KeyedBucket<object> perYearBucket in perYearBA.Items)
+                foreach (KeyedBucket<object> subsidyProviderBucket in subsidyProviderBA.Items)
                 {
-                    if (int.TryParse(perYearBucket.Key.ToString(), out int year))
+                    if (subsidyProviderBucket["sumAssumedAmount"] is ValueAggregate sumBA)
                     {
-                        if (perYearBucket["perProviderIco"] is BucketAggregate subsidyProviderBA)
-                        {
-                            foreach (KeyedBucket<object> subsidyProviderBucket in subsidyProviderBA.Items)
-                            {
-                                if (subsidyProviderBucket["sumAssumedAmount"] is ValueAggregate sumBA)
-                                {
-                                    results.Add((year, subsidyProviderBucket.Key.ToString(),
-                                        Convert.ToDecimal(sumBA.Value ?? 0)));
-                                }
-                            }
-                        }
+                        results.Add((subsidyProviderBucket.Key.ToString(), Convert.ToDecimal(sumBA.Value ?? 0)));
                     }
                 }
             }
@@ -302,7 +286,8 @@ namespace HlidacStatu.Repositories
                     )
                 );
 
-            string query = "hints.isOriginal:true AND hints.subsidyType:2 AND _exists_:recipient.ico AND NOT recipient.ico:\"\"";
+            string query =
+                "hints.isOriginal:true AND hints.subsidyType:2 AND _exists_:recipient.ico AND NOT recipient.ico:\"\"";
 
             if (rok is not null && rok > 0)
             {
@@ -385,7 +370,7 @@ namespace HlidacStatu.Repositories
                     if (perIcoBucket.Key is not null && perIcoBucket.Key.ToString() is not null)
                     {
                         decimal sum = 0;
-                       
+
                         if (perIcoBucket["sumAssumedAmount"] is ValueAggregate sumBA)
                         {
                             sum = Convert.ToDecimal(sumBA.Value ?? 0);
