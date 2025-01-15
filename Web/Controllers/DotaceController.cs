@@ -120,7 +120,7 @@ namespace HlidacStatu.Web.Controllers
         [HlidacCache(22 * 60 * 60, "", false)]
         public async Task<ActionResult> TopKategorie(int? rok = null)
         {
-            var data = await SubsidyRepo.ReportPrijemciPoKategoriichALetechAsync(rok);
+            var data = await SubsidyRepo.ReportPrijemciPoKategoriichAsync(rok);
             ViewData["rok"] = rok;
             return View(data);
         }
@@ -140,11 +140,16 @@ namespace HlidacStatu.Web.Controllers
             return View(data);
         }
         
-        // public async Task<ActionResult> TopPrijemciPoLetech(int rok)
-        // {
-        //     var data = await SubsidyRepo.TopPrijemciReportAsync(rok);
-        //
-        //     return View(data);
-        // }
+        public async Task<ActionResult> DotovaniSponzori(int? rok = null)
+        {
+            var data = await SubsidyRepo.DotovaniSponzori(rok);
+            ViewData["rok"] = rok;
+            return View(data);
+        }
+        
+        public ActionResult SeznamReportu()
+        {
+            return View();
+        }
     }
 }

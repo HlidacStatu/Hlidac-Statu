@@ -1,6 +1,6 @@
 @using HlidacStatu.Repositories
 @using HlidacStatu.XLib.Render
-@model List<(int Year, string IcoPoskytovatele, decimal Sum)>
+@model List<(string IcoPoskytovatele, decimal Sum)>
 
 @{
     int? rok = null;
@@ -12,7 +12,7 @@
     string yearText = rok > 0 ? $" pro rok {rok}" :"";
     
     ViewBag.Title = "Hlídač dotací";
-    ViewBag.SubTitle = $"Report po letech a poskytovatelích{yearText}";
+    ViewBag.SubTitle = $"Report podle poskytovatelů{yearText}";
     
     
 }
@@ -38,45 +38,26 @@
 }
 
 @{
-    List<ReportDataSource<(int Rok, string PoskytovatelIco, decimal Castka)>.Column> dataColumns =
+    List<ReportDataSource<(string IcoPoskytovatele, decimal Sum)>.Column> dataColumns =
     [
-        new()
-        {
-            Name = "IČO",
-            CssClass = "text",
-            HtmlRender = (x) => $"<a href=/subjekt/{x.PoskytovatelIco}>{x.PoskytovatelIco}</a>",
-            TextRender = (x) => x.PoskytovatelIco
-        },
         new()
         {
             Name = "Jméno poskytovatele",
             CssClass = "text",
-            HtmlRender = (x) => $"{FirmaRepo.NameFromIco(x.PoskytovatelIco)}",
-            TextRender = (x) => x.PoskytovatelIco
+            HtmlRender = (x) => $"<a href=/subjekt/{x.IcoPoskytovatele}>{FirmaRepo.NameFromIco(x.IcoPoskytovatele)}</a>",
+            TextRender = (x) => x.IcoPoskytovatele
         },
         new()
         {
             Name = "Částka",
-            TextRender = (x) => $"{x.Castka:N0} Kč",
-            HtmlRender = (x) => $"<a href=/dotace/hledat?Q=subsidyProviderIco:{x.PoskytovatelIco}>{x.Castka:N0}&nbsp;Kč</a>",
-            OrderValueRender = (x) => HlidacStatu.Util.RenderData.OrderValueFormat(x.Castka),
+            TextRender = (x) => $"{x.Sum:N0} Kč",
+            HtmlRender = (x) => $"<a href=/dotace/hledat?Q=subsidyProviderIco:{x.IcoPoskytovatele}>{x.Sum:N0}&nbsp;Kč</a>",
+            OrderValueRender = (x) => HlidacStatu.Util.RenderData.OrderValueFormat(x.Sum),
             CssClass = "number"
         }
     ];
     
-    if (ViewData["rok"] is null)
-    {
-        var yearColumn = new ReportDataSource<(int Rok, string PoskytovatelIco, decimal Castka)>.Column()
-        {
-            Name = "Rok",
-            CssClass = "number",
-            HtmlRender = (x) => x.Rok.ToString(),
-            TextRender = (x) => x.Rok.ToString()
-        };
-        dataColumns.Insert(0, yearColumn);
-    }
-    
-    var data = new ReportDataSource<(int Rok, string PoskytovatelIco, decimal Castka)>(dataColumns);
+    var data = new ReportDataSource<(string IcoPoskytovatele, decimal Sum)>(dataColumns);
 
     data.AddRows(Model);
     
@@ -85,7 +66,7 @@
 <h4>Vyberte rok, za který chcete zobrazit data</h4>
 <partial name="_pager" model="@(ValueTuple.Create((int?)null, (int?)null, rok, "/Dotace/TopPoskytovatele"))"/>
 
-<h2 class="mt-4">Přehled dotací po letech a poskytovatelích@(yearText)</h2>
+<h2 class="mt-4">Přehled dotací podle poskytovatelů@(yearText)</h2>
 <div>
-    @Html.DataToHTMLTable(data, dataTableOptions: HtmlExtensions.DatatableOptions(orderColumnIdx: (rok.HasValue ? 2 : 3), orderDirection: "desc"))
+    @Html.DataToHTMLTable(data, dataTableOptions: HtmlExtensions.DatatableOptions(orderColumnIdx: 1, orderDirection: "desc"))
 </div>

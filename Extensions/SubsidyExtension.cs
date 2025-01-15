@@ -51,30 +51,43 @@ public static class SubsidyExtension
     public static ExpandoObject FlatExport(this Subsidy subsidy)
     {
         dynamic v = new ExpandoObject();
-        v.Url = subsidy.GetUrl(false);
         v.Id = subsidy.Id;
         v.FileName = subsidy.Metadata.FileName;
         v.DataSource = subsidy.Metadata.DataSource;
         v.IsHidden = subsidy.Metadata.IsHidden;
+        v.Url = subsidy.GetUrl(false);
         v.AssumedAmount = subsidy.AssumedAmount;
-        v.CommonInfoRecipientIco = subsidy.Recipient.Ico;
-        v.CommonInfoRecipientName = subsidy.Recipient.Name;
-        v.CommonInfoRecipientHlidacName = subsidy.Recipient.HlidacName;
-        v.CommonInfoRecipientYearOfBirth = subsidy.Recipient.YearOfBirth;
-        v.CommonInfoRecipientObec = subsidy.Recipient.Obec;
-        v.CommonInfoRecipientOkres = subsidy.Recipient.Okres;
-        v.CommonInfoRecipientPSC = subsidy.Recipient.PSC;
-        v.CommonInfoSubsidyAmount = subsidy.SubsidyAmount;
-        v.CommonInfoPayedAmount = subsidy.PayedAmount;
-        v.CommonInfoReturnedAmount = subsidy.ReturnedAmount;
-        v.CommonInfoProjectCode = subsidy.ProjectCode;
-        v.CommonInfoProjectName = subsidy.ProjectName;
-        v.CommonInfoProjectDescription = subsidy.ProjectDescription;
-        v.CommonInfoProgramCode = subsidy.ProgramCode;
-        v.CommonInfoProgramName = subsidy.ProgramName;
-        v.CommonInfoApprovedYear = subsidy.ApprovedYear;
-        v.CommonInfoSubsidyProvider = subsidy.SubsidyProvider;
-        v.CommonInfoSubsidyProviderIco = subsidy.SubsidyProviderIco;
+        v.RecipientIco = subsidy.Recipient.Ico;
+        v.RecipientName = subsidy.Recipient.Name;
+        v.RecipientHlidacName = subsidy.Recipient.HlidacName;
+        v.RecipientYearOfBirth = subsidy.Recipient.YearOfBirth;
+        v.RecipientObec = subsidy.Recipient.Obec;
+        v.RecipientOkres = subsidy.Recipient.Okres;
+        v.RecipientPSC = subsidy.Recipient.PSC;
+        v.SubsidyAmount = subsidy.SubsidyAmount;
+        v.PayedAmount = subsidy.PayedAmount;
+        v.ReturnedAmount = subsidy.ReturnedAmount;
+        v.ProjectCode = subsidy.ProjectCode;
+        v.ProjectName = subsidy.ProjectName;
+        v.ProjectDescription = subsidy.ProjectDescription;
+        v.ProgramCode = subsidy.ProgramCode;
+        v.ProgramName = subsidy.ProgramName;
+        v.ApprovedYear = subsidy.ApprovedYear;
+        v.SubsidyProvider = subsidy.SubsidyProvider;
+        v.SubsidyProviderIco = subsidy.SubsidyProviderIco;
+        v.HintIsOriginal = subsidy.Hints.IsOriginal;
+        v.HintsOriginalSubsidyId = subsidy.Hints.OriginalSubsidyId;
+        v.HintsHasDuplicates = subsidy.Hints.HasDuplicates;
+        v.HintsCategory1 = subsidy.Hints.Category1;
+        v.HintsCategory2 = subsidy.Hints.Category2;
+        v.HintsCategory3 = subsidy.Hints.Category3;
+        v.HintsRecipientStatus = subsidy.Hints.RecipientStatus;
+        v.HintsSubsidyType = subsidy.Hints.SubsidyType;
+        v.HintsRecipientStatusFull = subsidy.Hints.RecipientStatusFull;
+        v.HintsRecipientTypSubjektu = subsidy.Hints.RecipientTypSubjektu;
+        v.HintsRecipientPolitickyAngazovanySubjekt = subsidy.Hints.RecipientPolitickyAngazovanySubjekt;
+        v.HintsRecipientPocetLetOdZalozeni = subsidy.Hints.RecipientPocetLetOdZalozeni;
+
 
         return v;
     }
