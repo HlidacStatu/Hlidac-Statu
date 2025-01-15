@@ -1,0 +1,86 @@
+@using HlidacStatu.Repositories
+@using HlidacStatu.XLib.Render
+@using Microsoft.AspNetCore.Mvc.TagHelpers
+@model List<(string Ico, decimal SumAssumedAmmount)>
+
+@{
+    int? rok = null;
+    if(ViewData.TryGetValue("rok", out var rokObj))
+    {
+        rok = (int?)rokObj;
+    }
+    string yearText = rok > 0 ? $" pro rok {rok}" :"";
+    
+    ViewBag.Title = "Hlídač dotací";
+    ViewBag.SubTitle = $"Přehled příjemců dotací, kteří jsou zároveň sponzory politických stran{yearText}";
+}
+
+@section breadcrumb
+{
+    <ol class="breadcrumb">
+        <li>
+            <a href="/">Hlídač Státu</a>
+        </li>
+        <li>
+            <a href="@Url.Action("Index", "Dotace")">Dotace</a>
+        </li>
+        <li class="active">@ViewBag.SubTitle</li>
+    </ol>
+}
+
+@section scripts
+{
+    <link rel="stylesheet" type="text/css" href="//cdn.datatables.net/1.13.4/css/jquery.dataTables.css"/>
+    <script type="text/javascript" charset="utf8" src="//cdn.datatables.net/1.13.4/js/jquery.dataTables.js"></script>
+    <script src="~/bundles/highcharts"></script>
+}
+
+@{
+    var dotace = new ReportDataSource<(string Ico, decimal SumAssumedAmmount)>(
+        new[]
+        {
+            new ReportDataSource<(string Ico, decimal SumAssumedAmmount)>.Column()
+            {
+                Name = "Poskytovatel",
+                CssClass = "text",
+                HtmlRender = (x) => $"<a href=/subjekt/{x.Ico}>{FirmaRepo.NameFromIco(x.Ico)}</a>",
+                TextRender = (x) => FirmaRepo.NameFromIco(x.Ico)
+            },
+            new ReportDataSource<(string Ico, decimal SumAssumedAmmount)>.Column()
+            {
+                Name = "Celková částka",
+                TextRender = (x) => HlidacStatu.Util.RenderData.NicePrice(x.SumAssumedAmmount, shortFormat:true),
+                HtmlRender = (x) => $"<a title='Najit dotace subjektu' href='/dotace/hledat?Q=ico:{x.Ico}'>{HlidacStatu.Util.RenderData.NicePrice(x.SumAssumedAmmount,html:true)}</a>",
+                OrderValueRender = (x) => HlidacStatu.Util.RenderData.OrderValueFormat(x.SumAssumedAmmount),
+                CssClass = "number"
+            }
+        });
+    
+    dotace.AddRows(Model.Take(100));
+    
+    
+    // SimplePlot chartData = new SimplePlot()
+    // {
+    //     Data = Model.Select(p => (double)p.DataSourceCount).Take(20).ToList(),
+    //     Labels = Model.Select(p => FirmaRepo.NameFromIco(p.Ico)).Take(20).ToList(),
+    //     ChartType = "bar",
+    //     Title = $"Příjemci dotací z více krajů{yearText}",
+    //     Koncovka = "krajů",
+    //     SeriesName = "krajů",
+    //     CssHeight = "600px",
+    //     YAxisTickInterval = 1
+    // };
+}
+<h4>Vyberte rok, za který chcete zobrazit data</h4>
+<partial name="_pager"
+         model="@(ValueTuple.Create((int?)2021, (int?)null, rok, $"/Dotace/DotovaniSponzori"))"
+/>
+
+<h4>@ViewBag.SubTitle</h4>
+@* <div> *@
+@*     <partial name="Charts/_SimpleChart" model="chartData"/> *@
+@* </div> *@
+<div>
+    @Html.DataToHTMLTable(dotace, dataTableOptions: HtmlExtensions.DatatableOptions(orderColumnIdx: 1, orderDirection: "desc"))
+</div>
+
