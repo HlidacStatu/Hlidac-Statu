@@ -20,6 +20,7 @@ namespace HlidacStatu.Repositories.Statistics
                     Devmasters.Config.GetWebConfigValue("RedisBucketName"),
                     Devmasters.Config.GetWebConfigValue("RedisUsername"),
                     Devmasters.Config.GetWebConfigValue("RedisCachePassword"),
+                    syncTimeoutInMs: 500 * 1000,
                     keyValueSelector: f => f.ICO);
 
 
@@ -34,6 +35,7 @@ namespace HlidacStatu.Repositories.Statistics
                     Devmasters.Config.GetWebConfigValue("RedisBucketName"),
                     Devmasters.Config.GetWebConfigValue("RedisUsername"),
                     Devmasters.Config.GetWebConfigValue("RedisCachePassword"),
+                    syncTimeoutInMs: 500 * 1000,
                     keyValueSelector: obj => obj.firma.ICO + "-" + obj.aktualnost.ToString());
 
         public static StatisticsSubjectPerYear<Firma.Statistics.Subsidy> CachedHoldingStatisticsDotace(
