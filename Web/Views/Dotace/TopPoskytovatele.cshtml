@@ -11,10 +11,18 @@
     
     string yearText = rok > 0 ? $" pro rok {rok}" :"";
     
+    int typDotace = (int)(ViewData["typDotace"] ?? 0); 
+    string typDotaceText = typDotace switch
+    {
+        1 => "evropské dotace",
+        2 => "krajské dotace",
+        3 => "obecní dotace",
+        _ => "nedefinováno"
+        
+    };
+    
     ViewBag.Title = "Hlídač dotací";
-    ViewBag.SubTitle = $"Report podle poskytovatelů{yearText}";
-    
-    
+    ViewBag.SubTitle = $"Report podle poskytovatelů{yearText} pro {typDotaceText}";
 }
 
 @section breadcrumb
@@ -64,7 +72,7 @@
 }
 
 <h4>Vyberte rok, za který chcete zobrazit data</h4>
-<partial name="_pager" model="@(ValueTuple.Create((int?)null, (int?)null, rok, "/Dotace/TopPoskytovatele"))"/>
+<partial name="_pager" model="@(ValueTuple.Create((int?)null, (int?)null, rok, $"/Dotace/TopPoskytovatele?typDotace={typDotace}"))"/>
 
 <h2 class="mt-4">Přehled dotací podle poskytovatelů@(yearText)</h2>
 <div>
