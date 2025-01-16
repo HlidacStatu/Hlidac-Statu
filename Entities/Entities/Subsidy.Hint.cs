@@ -276,8 +276,23 @@ public partial class Subsidy
             { CalculatedCategories.Ostatni, new string[] { } },
             { CalculatedCategories.DigiIt, new[] { 
                 "86594346",
-                "Digitální služby občanům a firmám","Digitální ekonomika a společnost, inovativní start-upy a nové technologie","Digitální transformace podniků","Digitální vysokorychlostní sítě","Národní plán obnovy - digitalizace agregace","Národní plán obnovy - Digitální služby občanům a firmám","Národní plán obnovy - Digitální systémy státní správy","Program digitální Evropa - projekt NCC-CZ (Národní koordinační centrum)","Program digitální Evropa - projekt TEST-CERT CZ","Středočeský Fond podpory cestovního ruchu - Digitalizace či modernizace TIC","Vytvoření evropských a národních center digitálních inovací (EDIHs) 1.5.01","Evropský metrologický program pro inovace a výzkum agregace","OP Podnikání a inovace","OP Výzkum a vývoj pro inovace","Informační a komunikační technologie","Rozvoj informační technologie","Umělá inteligence"
-            } },
+                    "1.1. Digitální služby občanům a firmám",
+                    "Digitální ekonomika a společnost, inovativní start-upy a nové technologie",
+                    "Digitální transformace podniků",
+                    "Digitální vysokorychlostní sítě",
+                    "Národní plán obnovy - digitalizace agregace",
+                    "Národní plán obnovy - Digitální služby občanům a firmám",
+                    "Národní plán obnovy - Digitální systémy státní správy",
+                    "Program digitální Evropa - projekt NCC-CZ (Národní koordinační centrum)",
+                    "Program digitální Evropa - projekt TEST-CERT CZ",
+                    "Středočeský Fond podpory cestovního ruchu - Digitalizace či modernizace TIC",
+                    "Vytvoření evropských a národních center digitálních inovací (EDIHs) 1.5.01",
+                    "Evropský metrologický program pro inovace a výzkum agregace",
+                    "OP Podnikání a inovace",
+                    "OP Výzkum a vývoj pro inovace",
+                    "Informační a komunikační technologie",
+                    "Rozvoj informační technologie",
+                    "Umělá inteligence pro bezpečnější společnost agregace"            } },
             {
                 CalculatedCategories.Doprava, new[]
                 {
@@ -1905,11 +1920,22 @@ public partial class Subsidy
         private static IEnumerable<Category> _textToCalculatedCategory(
             Dictionary<CalculatedCategories, string[]> keywords, string categoryName)
         {
-            categoryName = categoryName.ToLower();
+            //List<Category> res = new();
+            //categoryName = categoryName.ToLower();
+            //foreach (var cat in keywords)
+            //{
+            //    if (cat.Value.Any(m => m.Contains(categoryName, StringComparison.OrdinalIgnoreCase) || categoryName.Contains(m, StringComparison.OrdinalIgnoreCase)))
+            //    {
+            //        if (res.Any(m => m.TypeValue == (int)cat.Key) == false)
+            //            res.Add(new Category { TypeValue = (int)cat.Key, Created = DateTime.Now, Probability = 1 });
+            //    }
+
+            //}
+            //return res;
+
             var res = keywords
                 .Where(m => m.Value.Contains(categoryName, StringComparer.OrdinalIgnoreCase))
                 .Select(m => new Category { TypeValue = (int)m.Key, Created = DateTime.Now, Probability = 1 });
-
             return res;
         }
 
