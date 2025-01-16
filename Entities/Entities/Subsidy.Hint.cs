@@ -274,7 +274,10 @@ public partial class Subsidy
         public static readonly Dictionary<CalculatedCategories, string[]> CategoryNameDictionary = new()
         {
             { CalculatedCategories.Ostatni, new string[] { } },
-            { CalculatedCategories.DigiIt, new[] { "86594346" } },
+            { CalculatedCategories.DigiIt, new[] { 
+                "86594346",
+                "Digitální služby občanům a firmám","Digitální ekonomika a společnost, inovativní start-upy a nové technologie","Digitální transformace podniků","Digitální vysokorychlostní sítě","Národní plán obnovy - digitalizace agregace","Národní plán obnovy - Digitální služby občanům a firmám","Národní plán obnovy - Digitální systémy státní správy","Program digitální Evropa - projekt NCC-CZ (Národní koordinační centrum)","Program digitální Evropa - projekt TEST-CERT CZ","Středočeský Fond podpory cestovního ruchu - Digitalizace či modernizace TIC","Vytvoření evropských a národních center digitálních inovací (EDIHs) 1.5.01","Evropský metrologický program pro inovace a výzkum agregace","OP Podnikání a inovace","OP Výzkum a vývoj pro inovace","Informační a komunikační technologie","Rozvoj informační technologie","Umělá inteligence"
+            } },
             {
                 CalculatedCategories.Doprava, new[]
                 {
