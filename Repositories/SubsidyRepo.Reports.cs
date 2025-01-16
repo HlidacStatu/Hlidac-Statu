@@ -141,8 +141,8 @@ namespace HlidacStatu.Repositories
             return results;
         }
 
-        public static async Task<List<(string IcoPoskytovatele, decimal Sum)>>
-            ReportPoskytovatelePoLetechAsync(int? rok)
+        public static async Task<List<(string IcoPoskytovatele, decimal Sum)>> ReportPoskytovatelePoLetechAsync(
+            Subsidy.Hint.Type? typDotace, int? rok)
         {
             AggregationContainerDescriptor<Subsidy> aggs = new AggregationContainerDescriptor<Subsidy>()
                 .Terms("perProviderIco", st => st
@@ -156,6 +156,11 @@ namespace HlidacStatu.Repositories
                 );
 
             string query = "hints.isOriginal:true AND _exists_:subsidyProviderIco AND NOT subsidyProviderIco:\"\"";
+            if (typDotace.HasValue)
+            {
+                query += $" AND hints.subsidyType:{typDotace:D}";
+            }
+            
             if (rok is not null && rok > 0)
             {
                 query += $" AND approvedYear:{rok}";

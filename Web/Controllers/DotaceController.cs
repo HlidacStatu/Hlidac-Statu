@@ -110,10 +110,11 @@ namespace HlidacStatu.Web.Controllers
         }
 
         [HlidacCache(22 * 60 * 60, "", false)]
-        public async Task<ActionResult> TopPoskytovatele(int? rok = null)
+        public async Task<ActionResult> TopPoskytovatele(int typDotace, int? rok = null)
         {
-            var data = await SubsidyRepo.ReportPoskytovatelePoLetechAsync(rok);
+            var data = await SubsidyRepo.ReportPoskytovatelePoLetechAsync((Subsidy.Hint.Type)typDotace, rok);
             ViewData["rok"] = rok;
+            ViewData["typDotace"] = typDotace;
             return View(data);
         }
 
