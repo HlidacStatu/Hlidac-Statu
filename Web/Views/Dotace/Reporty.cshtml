@@ -1,63 +1,288 @@
-<h4>Podívejte se na naše dotační reporty</h4>
+@{
+    ViewBag.Title = "Dotační reporty";
+    ViewBag.SubTitle = $"Přehled reportů o dotacích";
+}
+
+
+@section breadcrumb
+{
+    <ol class="breadcrumb">
+        <li>
+            <a href="/">Hlídač Státu</a>
+        </li>
+        <li>
+            <a href="@Url.Action("Index", "Dotace")">Dotace</a>
+        </li>
+        <li class="active">@ViewBag.SubTitle</li>
+    </ol>
+}
+
 
 <div class="card text-bg-light mb-3">
     <ul class="list-group list-group-flush">
 
-        <li class="list-group-item list-group-item-dark">Přehled</li>
+        <li class="list-group-item list-group-item-dark fs-5 fw-bold">Celkové statistiky</li>
 
         <li class="list-group-item">
-            <i class="fa-solid fa-chart-pie"></i>
-            <a title="" href="/Dotace/PoLetech">Objemy dotací rozdělené na krajské a státní(+ evropské) po jednotlivých letech</a>
-        </li>
-        <li  class="list-group-item">
-            <i class="fa-solid fa-list-ol"></i><a title="" href="/Dotace/TopDotacniProgramy?typDotace=1">Největší státní a evropské dotační programy</a>
-        </li>
-        <li  class="list-group-item">
-            <i class="fa-solid fa-list-ol"></i>
-            <a title="" href="/Dotace/TopDotacniProgramy?typDotace=2">Největší krajské dotační programy</a>
+            <div class="row g-4 py-2 row-cols-1 row-cols-lg-3">
+                <div class="col d-flex align-items-start">
+                    <div>
+                        <i class="fa-solid fa-chart-pie fa-2x p-2 m-2 fa-border bg-body-secondary rounded-3"></i>
+                    </div>
+                    <div>
+                        <h3 class="pt-2 text-body-emphasis">Finanční zdroje dotací</h3>
+                        <p>
+                            Objemy poskytnutých dotací podle zdroje financování.
+                            (státní, krajské, evropské a další), souhrnně od roku @(HlidacStatu.Repositories.SubsidyRepo.DefaultLimitedYears.First()) i po jednotlivých letech.
+                        </p>
+                        <a href="/Dotace/PoLetech" class="btn btn-primary btn-sm">Celkem</a>
+                        @foreach (var rok in HlidacStatu.Repositories.SubsidyRepo.DefaultLimitedYears.Reverse().Take(3))
+                        {
+                            <a href="/Dotace/PoLetech?rok=@(rok)" class="btn btn-primary btn-sm">@rok</a>
+                        }
+                        <a href="/Dotace/PoLetech" class="btn btn-primary btn-sm">Další</a>
+                    </div>
+                </div>
+                <div class="col d-flex align-items-start">
+                    <div>
+                        <i class="fa-solid fa-solid fa-list-ol fa-2x p-2 m-2 fa-border bg-body-secondary rounded-3"></i>
+                    </div>
+                    <div>
+                        <h3 class="pt-2 text-body-emphasis">Celostátní dotační programy</h3>
+                        <p>
+                            Přehled největších státních a evropských dotačních programů, souhrnně od roku @(HlidacStatu.Repositories.SubsidyRepo.DefaultLimitedYears.First()) i po jednotlivých letech.
+                        </p>
+                        <a href="/Dotace/TopDotacniProgramy?typDotace=1" class="btn btn-primary btn-sm">Celkem</a>
+                        @foreach (var rok in HlidacStatu.Repositories.SubsidyRepo.DefaultLimitedYears.Reverse().Take(3))
+                        {
+                            <a href="/Dotace/TopDotacniProgramy?typDotace=1&rok=@(rok)" class="btn btn-primary btn-sm">@rok</a>
+                        }
+                        <a href="/Dotace/TopDotacniProgramy?typDotace=1" class="btn btn-primary btn-sm">Další</a>
+
+                    </div>
+                </div>
+                <div class="col d-flex align-items-start">
+                    <div>
+                        <i class="fa-solid fa-solid fa-list-ol fa-2x p-2 m-2 fa-border bg-body-secondary rounded-3"></i>
+                    </div>
+                    <div>
+                        <h3 class="pt-2 text-body-emphasis">Krajské dotační programy</h3>
+                        <p>
+                            Přehled největších krajských dotačních programů, souhrnně od roku @(HlidacStatu.Repositories.SubsidyRepo.DefaultKrajskeLimitedYears.First()) i po jednotlivých letech.
+                        </p>
+                        <a href="/Dotace/TopDotacniProgramy?typDotace=2" class="btn btn-primary btn-sm">Celkem</a>
+                        @foreach (var rok in HlidacStatu.Repositories.SubsidyRepo.DefaultLimitedYears.Reverse().Take(3))
+                        {
+                            <a href="/Dotace/TopDotacniProgramy?typDotace=1&rok=@(rok)" class="btn btn-primary btn-sm">@rok</a>
+
+                        }
+                        <a href="/Dotace/TopDotacniProgramy?typDotace=2" class="btn btn-primary btn-sm">Další</a>
+                    </div>
+                </div>
+            </div>
+
         </li>
 
-        <li class="list-group-item list-group-item-dark">Největší příjemci dotací</li>
-        <li  class="list-group-item">
-            <i class="fa-regular fa-gauge-high" aria-hidden="true"></i>
-            <a title="" href="/Dotace/TopPrijemci?ftyp=0">Největší příjemci dotací ze soukromého sektoru po jednotlivých letech</a>
-        </li>
-        <li  class="list-group-item">
-            <i class="fa-regular fa-gauge-high" aria-hidden="true"></i>
-            <a title="" href="/Dotace/TopPrijemci?ftyp=1">Největší příjemci dotací firem vlastněných státem po jednotlivých letech</a>
-        </li>
-        <li  class="list-group-item">
-            <i class="fa-regular fa-gauge-high" aria-hidden="true"></i>
-            <a title="" href="/Dotace/TopPrijemci?ftyp=1">Největší příjemci dotací firem, které stát spoluvlastní s podílem alespoň 25 % po jednotlivých letech</a>
-        </li>
-        <li  class="list-group-item">
-            <i class="fa-regular fa-gauge-high" aria-hidden="true"></i>
-            <a title="" href="/Dotace/TopPrijemci?ftyp=10">Nejvíce dotované úřady po jednotlivých letech</a>
-        </li>
-        <li  class="list-group-item">
-            <i class="fa-light fa-money-bill-wheat"></i>
-            <a title="" href="/Dotace/DotacniExperti">Příjemci, kteří obdrželi krajské dotace ve více krajích</a>
-        </li>
-        <li  class="list-group-item">
-            <i class="fa-solid fa-person-sign"></i>
-            <a title="" href="/Dotace/DotovaniSponzori">Příjemci dotací, kteří zároveň přímo, nebo nepřímo sponzorovali politickou stranu</a>
+    </ul>
+</div>
+<div class="card text-bg-light mb-2">
+    <ul class="list-group list-group-flush">
+
+        <li class="list-group-item list-group-item-dark fs-5 fw-bold">Největší příjemci dotací</li>
+        <li class="list-group-item">
+            <div class="row g-4 py-2 row-cols-1 row-cols-lg-3">
+                <div class="col d-flex align-items-start">
+                    <div>
+                        <i class="fa-solid fa-gauge-high fa-2x p-2 m-2 fa-border bg-body-secondary rounded-3"></i>
+                    </div>
+                    <div>
+                        <h3 class="pt-2 text-body-emphasis">Soukromé subjekty</h3>
+                        <p>
+                            Největší příjemci dotací ze soukromého sektoru, souhrnně od roku @(HlidacStatu.Repositories.SubsidyRepo.DefaultLimitedYears.First()) i po jednotlivých letech.
+                        </p>
+                        <a href="/Dotace/TopPrijemci?ftyp=0" class="btn btn-primary btn-sm">Celkem</a>
+                        @foreach (var rok in HlidacStatu.Repositories.SubsidyRepo.DefaultLimitedYears.Reverse().Take(3))
+                        {
+                            <a href="/Dotace/TopPrijemci?ftyp=0&rok=@(rok)" class="btn btn-primary btn-sm">@rok</a>
+                        }
+                        <a href="/Dotace/TopPrijemci?ftyp=0" class="btn btn-primary btn-sm">Další</a>
+
+                    </div>
+                </div>
+                <div class="col d-flex align-items-start">
+                    <div>
+                        <i class="fa-solid fa-gauge-high fa-2x p-2 m-2 fa-border bg-body-secondary rounded-3"></i>
+                    </div>
+                    <div>
+                        <h3 class="pt-2 text-body-emphasis">Soukromé holdingy</h3>
+                        <p>
+                            Holdingy a skupiny spřízněných firem, které jsou největšími příjemci dotací , souhrnně od roku @(HlidacStatu.Repositories.SubsidyRepo.DefaultLimitedYears.First()) i po jednotlivých letech.
+                        </p>
+                        <a href="#" class="btn btn-primary btn-sm disabled">Připravujeme</a>
+                        @* <a href="/Dotace/TopPrijemci?ftyp=0" class="btn btn-primary btn-sm">Celkem</a> *@
+                        @* @foreach (var rok in HlidacStatu.Repositories.SubsidyRepo.DefaultLimitedYears.Reverse().Take(3)) *@
+                        @* { *@
+                        @*     <a href="/Dotace/TopPrijemci?ftyp=0&rok=@(rok)" class="btn btn-primary btn-sm">@rok</a> *@
+                        @* } *@
+                        @* <a href="#" class="btn btn-primary btn-sm ">Další</a> *@
+
+                    </div>
+                </div>
+                <div class="col d-flex align-items-start">
+                    <div>
+                        <i class="fa-solid fa-gauge-high fa-2x p-2 m-2 fa-border bg-body-secondary rounded-3"></i>
+                    </div>
+                    <div>
+                        <h3 class="pt-2 text-body-emphasis">Státní firmy</h3>
+                        <p>
+                            Největší příjemci dotací ze skupiny firem vlastněných státem, souhrnně od roku @(HlidacStatu.Repositories.SubsidyRepo.DefaultLimitedYears.First()) i po jednotlivých letech.
+                        </p>
+                        <a href="/Dotace/TopPrijemci?ftyp=1" class="btn btn-primary btn-sm">Celkem</a>
+                        @foreach (var rok in HlidacStatu.Repositories.SubsidyRepo.DefaultLimitedYears.Reverse().Take(3))
+                        {
+                            <a href="/Dotace/TopPrijemci?ftyp=1&rok=@(rok)" class="btn btn-primary btn-sm">@rok</a>
+                        }
+                        <a href="/Dotace/TopPrijemci?ftyp=1" class="btn btn-primary btn-sm">Další</a>
+
+                    </div>
+                </div>
+                <div class="col d-flex align-items-start">
+                    <div>
+                        <i class="fa-solid fa-gauge-high fa-2x p-2 m-2 fa-border bg-body-secondary rounded-3"></i>
+                    </div>
+                    <div>
+                        <h3 class="pt-2 text-body-emphasis">Úřady</h3>
+                        <p>
+                            Úřady, které dostaly nejvíce dotací, souhrnně od roku @(HlidacStatu.Repositories.SubsidyRepo.DefaultLimitedYears.First()) i po jednotlivých letech.
+                        </p>
+                        <a href="/Dotace/TopPrijemci?ftyp=10" class="btn btn-primary btn-sm">Celkem</a>
+                        @foreach (var rok in HlidacStatu.Repositories.SubsidyRepo.DefaultLimitedYears.Reverse().Take(3))
+                        {
+                            <a href="/Dotace/TopPrijemci?ftyp=10&rok=@(rok)" class="btn btn-primary btn-sm">@rok</a>
+                        }
+                        <a href="/Dotace/TopPrijemci?ftyp=10" class="btn btn-primary btn-sm">Další</a>
+
+                    </div>
+                </div>
+            </div>
         </li>
 
-        <li class="list-group-item list-group-item-dark">Největší poskytovatelé dotací</li>
-
-        <li  class="list-group-item"><i class="fa-regular fa-hand-holding-dollar"></i><a title="" href="/Dotace/TopPoskytovatele?typDotace=1">Největší poskytovatelé státních dotací</a></li>
-        <li  class="list-group-item">
-            <i class="fa-regular fa-hand-holding-dollar"></i>
-            <a title="" href="/Dotace/TopPoskytovatele?typDotace=2">Největší poskytovatelé krajských dotací</a>
+        @* <li class="list-group-item list-group-item-dark fs-5 fw-bold">Největší příjemci dotací</li> *@
+        <li class="list-group-item">
+            <div class="row g-4 py-2 row-cols-1 row-cols-lg-3">
+                <div class="col d-flex align-items-start">
+                    <div>
+                        <i class="fa-solid fa-money-bill-wheat fa-2x p-2 m-2 fa-border bg-body-secondary rounded-3"></i>
+                    </div>
+                    <div>
+                        <h3 class="pt-2 text-body-emphasis">Úspěšní ve více krajích</h3>
+                        <p>
+                            Největší příjemci dotací příjemci, kteří obdrželi krajské dotace ve více krajích. Souhrnně od roku @(HlidacStatu.Repositories.SubsidyRepo.DefaultLimitedYears.First()) i po jednotlivých letech.
+                        </p>
+                        <a href="/Dotace/DotacniExperti" class="btn btn-primary btn-sm">Celkem</a>
+                        @foreach (var rok in HlidacStatu.Repositories.SubsidyRepo.DefaultLimitedYears.Reverse().Take(3))
+                        {
+                            <a href="/Dotace/DotacniExperti?rok=@(rok)" class="btn btn-primary btn-sm">@rok</a>
+                        }
+                        <a href="/Dotace/DotacniExperti" class="btn btn-primary btn-sm">Další</a>
+                    </div>
+                </div>
+                <div class="col d-flex align-items-start">
+                    <div>
+                        <i class="fa-solid fa-person-sign fa-2x p-2 m-2 fa-border bg-body-secondary rounded-3"></i>
+                    </div>
+                    <div>
+                        <h3 class="pt-2 text-body-emphasis">Sponzoři polit.stran</h3>
+                        <p>
+                            Příjemci dotací, kteří zároveň přímo, nebo nepřímo sponzorovali politickou stranu. Souhrnně od roku @(HlidacStatu.Repositories.SubsidyRepo.DefaultLimitedYears.First()) i po jednotlivých letech.
+                        </p>
+                        <a href="/Dotace/DotovaniSponzori" class="btn btn-primary btn-sm">Celkem</a>
+                        @foreach (var rok in HlidacStatu.Repositories.SubsidyRepo.DefaultLimitedYears.Reverse().Take(3))
+                        {
+                            <a href="/Dotace/DotovaniSponzori?rok=@(rok)" class="btn btn-primary btn-sm">@rok</a>
+                        }
+                        <a href="/Dotace/DotovaniSponzori" class="btn btn-primary btn-sm">Další</a>
+                    </div>
+                </div>
+            </div>
         </li>
+    </ul>
+</div>
+<div class="card text-bg-light mb-2">
+    <ul class="list-group list-group-flush">
 
-        <li class="list-group-item list-group-item-dark">Oblasti, do kterých dotace směřují</li>
-        <li  class="list-group-item">
-            <i class="fa-solid fa-chart-pie"></i>
-            <a title="" href="/Dotace/TopKategorie">Dotace rozdělené podle kategorií</a>
+        <li class="list-group-item list-group-item-dark fs-5 fw-bold">Největší poskytovatelé dotací</li>
+        <div class="row g-4 py-2 row-cols-1 row-cols-lg-3">
+            <div class="col d-flex align-items-start">
+                <div>
+                    <i class="fa-solid fa-hand-holding-dollar fa-2x p-2 m-2 fa-border bg-body-secondary rounded-3"></i>
+                </div>
+                <div>
+                    <h3 class="pt-2 text-body-emphasis">Státní dotace</h3>
+                    <p>
+                        Největší poskytovatelé státních dotací, souhrnně od roku @(HlidacStatu.Repositories.SubsidyRepo.DefaultLimitedYears.First()) i po jednotlivých letech.
+                    </p>
+                    <a href="/Dotace/TopPoskytovatele?typDotace=1" class="btn btn-primary btn-sm">Celkem</a>
+                    @foreach (var rok in HlidacStatu.Repositories.SubsidyRepo.DefaultLimitedYears.Reverse().Take(3))
+                    {
+                        <a href="/Dotace/TopPoskytovatele?typDotace=1&rok=@(rok)" class="btn btn-primary btn-sm">@rok</a>
+
+                    }
+                    <a href="/Dotace/TopPoskytovatele?typDotace=1" class="btn btn-primary btn-sm">Další</a>
+                </div>
+            </div>
+            <div class="col d-flex align-items-start">
+                <div>
+                    <i class="fa-solid fa-hand-holding-dollar fa-2x p-2 m-2 fa-border bg-body-secondary rounded-3"></i>
+                </div>
+                <div>
+                    <h3 class="pt-2 text-body-emphasis">Krajské dotace</h3>
+                    <p>
+                        Největší poskytovatelé krajských dotací, souhrnně od roku @(HlidacStatu.Repositories.SubsidyRepo.DefaultKrajskeLimitedYears.First()) i po jednotlivých letech.
+                    </p>
+                    <a href="/Dotace/TopPoskytovatele?typDotace=2" class="btn btn-primary btn-sm">Celkem</a>
+                    @foreach (var rok in HlidacStatu.Repositories.SubsidyRepo.DefaultLimitedYears.Reverse().Take(3))
+                    {
+                        <a href="/Dotace/TopPoskytovatele?typDotace=2&rok=@(rok)" class="btn btn-primary btn-sm">@rok</a>
+
+                    }
+                    <a href="/Dotace/TopPoskytovatele?typDotace=2" class="btn btn-primary btn-sm">Další</a>
+                </div>
+            </div>
+        </div>
+    </ul>
+</div>
+<div class="card text-bg-light mb-2">
+    <ul class="list-group list-group-flush">
+        <li class="list-group-item list-group-item-dark fs-5 fw-bold">Oblasti, do kterých dotace směřují</li>
+        <li class="list-group-item">
+            <div class="row">
+                <div class="col d-flex align-items-start">
+                    <div>
+                        <i class="fa-solid fa-chart-pie fa-2x p-2 m-2 fa-border bg-body-secondary rounded-3"></i>
+                    </div>
+                    <div>
+
+                        <h3 class="pt-2 text-body-emphasis">Kategorie dotací</h3>
+                        <p>
+                            Dotace rozdělené podle kategorií, souhrnně od roku @(HlidacStatu.Repositories.SubsidyRepo.DefaultLimitedYears.First()) i po jednotlivých letech.
+                        </p>
+                        <a href="/Dotace/TopKategorie" class="btn btn-primary btn-sm">Celkem</a>
+                        @foreach (var rok in HlidacStatu.Repositories.SubsidyRepo.DefaultLimitedYears.Reverse().Take(3))
+                        {
+                            <a href="/Dotace/TopKategorie?rok=@(rok)" class="btn btn-primary btn-sm">@rok</a>
+
+                        }
+                        <a href="/Dotace/TopKategorie" class="btn btn-primary btn-sm">Další</a>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-12">
+                        <partial name="_categoryDisclaimer" />
+                    </div>
+                </div>
+
         </li>
-
-
 
     </ul>
 </div>
