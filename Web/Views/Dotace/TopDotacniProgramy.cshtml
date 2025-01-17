@@ -97,7 +97,7 @@
 }
 <h4>Vyberte rok, za který chcete zobrazit data</h4>
 <partial name="_pager"
-         model="@(ValueTuple.Create((int?)2021, (int?)null, rok, $"/Dotace/TopDotacniProgramy?typDotace={typDotace}"))"
+         model="@(ValueTuple.Create((int?)(typDotace >= 2 ? 2021 : null), (int?)null, rok, $"/Dotace/TopDotacniProgramy?typDotace={typDotace}"))"
 />
 
 <h4>@ViewBag.SubTitle</h4>
