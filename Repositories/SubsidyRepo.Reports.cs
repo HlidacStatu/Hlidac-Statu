@@ -160,7 +160,7 @@ namespace HlidacStatu.Repositories
             {
                 query += $" AND hints.subsidyType:{typDotace:D}";
             }
-            
+
             if (rok is not null && rok > 0)
             {
                 query += $" AND approvedYear:{rok}";
@@ -192,8 +192,72 @@ namespace HlidacStatu.Repositories
             return results;
         }
 
-        public static async Task<List<(string Ico, Subsidy.Hint.CalculatedCategories Category, decimal Sum)>>
-            ReportPrijemciPoKategoriichAsync(int? rok)
+        public static async
+    Task<List<(Subsidy.Hint.CalculatedCategories Category, long Count, decimal Sum)>>
+    PoKategoriichAsync(int? rok = null, int? cat = null, string ico = null)
+        {
+            AggregationContainerDescriptor<Subsidy> aggs = new AggregationContainerDescriptor<Subsidy>()
+                .Terms("perCategory", st => st
+                    .Field(f => f.Hints.Category1.TypeValue)
+                    .Size(10000)
+                        .Aggregations(typeAggs => typeAggs
+                            .Sum("sumAssumedAmount", sa => sa
+                                .Field(f => f.AssumedAmount)
+                            )
+                        )
+                    );
+            string query = "hints.isOriginal:true AND _exists_:recipient.ico AND NOT recipient.ico:\"\"";
+            if (rok is not null && rok > 0)
+            {
+                query += $" AND approvedYear:{rok}";
+            }
+            if (cat is not null && cat > 0)
+            {
+                query += $" AND hints.category1.typeValue:{cat}";
+            }
+            if (ico is not null)
+            {
+                query += $" AND recipient.ico:{ico}";
+            }
+
+            var res = await SubsidyRepo.Searching.SimpleSearchAsync(
+                query, 1, 0, "666",
+                anyAggregation: aggs);
+            if (res is null)
+            {
+                return null;
+            }
+
+            // Initialize the results dictionary
+            List<(Subsidy.Hint.CalculatedCategories Category, long Count, decimal Sum)> results = new();
+
+            // Parse the aggregation results
+            if (res.ElasticResults.Aggregations["perCategory"] is BucketAggregate subsidyCategoryBA)
+            {
+                foreach (KeyedBucket<object> subsidyCategoryBucket in subsidyCategoryBA.Items)
+                {
+                    if (int.TryParse(subsidyCategoryBucket.Key.ToString(), out int subsidyCategoryTypeVal))
+                    {
+                        var subsidyCategory = (Subsidy.Hint.CalculatedCategories)subsidyCategoryTypeVal;
+
+                        if (subsidyCategoryBucket["sumAssumedAmount"] is ValueAggregate sumBA)
+                        {
+                            results.Add((
+                                subsidyCategory,
+                                subsidyCategoryBucket.DocCount ?? 0,
+                                Convert.ToDecimal(sumBA.Value ?? 0)
+                                ));
+                        }
+                    }
+                }
+            }
+
+            return results;
+        }
+
+        public static async
+            Task<List<(string Ico, Subsidy.Hint.CalculatedCategories Category, long Count, decimal Sum)>>
+            ReportPrijemciPoKategoriichAsync(int? rok = null, int? cat = null)
         {
             AggregationContainerDescriptor<Subsidy> aggs = new AggregationContainerDescriptor<Subsidy>()
                 .Terms("perCategory", st => st
@@ -216,6 +280,10 @@ namespace HlidacStatu.Repositories
             {
                 query += $" AND approvedYear:{rok}";
             }
+            if (cat is not null && cat > 0)
+            {
+                query += $" AND hints.category1.typeValue:{cat}";
+            }
 
             var res = await SubsidyRepo.Searching.SimpleSearchAsync(
                 query, 1, 0, "666",
@@ -226,7 +294,7 @@ namespace HlidacStatu.Repositories
             }
 
             // Initialize the results dictionary
-            List<(string Ico, Subsidy.Hint.CalculatedCategories Category, decimal Sum)> results = new();
+            List<(string Ico, Subsidy.Hint.CalculatedCategories Category, long Count, decimal Sum)> results = new();
 
             // Parse the aggregation results
             if (res.ElasticResults.Aggregations["perCategory"] is BucketAggregate subsidyCategoryBA)
@@ -243,8 +311,12 @@ namespace HlidacStatu.Repositories
                             {
                                 if (subsidyIcoBucket["sumAssumedAmount"] is ValueAggregate sumBA)
                                 {
-                                    results.Add((subsidyIcoBucket.Key.ToString(), subsidyCategory,
-                                        Convert.ToDecimal(sumBA.Value ?? 0)));
+                                    results.Add((
+                                        subsidyIcoBucket.Key.ToString(),
+                                        subsidyCategory,
+                                        subsidyIcoBucket.DocCount ?? 0,
+                                        Convert.ToDecimal(sumBA.Value ?? 0)
+                                        ));
                                 }
                             }
                         }

@@ -2,13 +2,15 @@
 @using HlidacStatu.Entities
 @using HlidacStatu.Repositories
 @using HlidacStatu.XLib.Render
-@model List<(string Ico, Subsidy.Hint.CalculatedCategories Category, decimal Sum)>
+@model List<(string Ico, Subsidy.Hint.CalculatedCategories Category, long Count, decimal Sum)>
 
 @{
     ViewBag.Title = "Hlídač dotací";
     ViewBag.SubTitle = "Report po kategoriích";
 
     int? rok = ViewData["rok"] as int?;
+    int? cat = ViewData["cat"] as int?;
+
     var dataTableOptions = $@"{{
                          'language': {{
                             'url': '//cdn.datatables.net/plug-ins/1.13.4/i18n/cs.json'
@@ -17,6 +19,17 @@
                         'lengthChange': false,
                         'info': false,
                         }}";
+
+    string searchQuery = "";
+    if (rok.HasValue)
+    {
+        searchQuery = searchQuery + "%20AND%20approvedYear:" + rok.Value;
+    }
+    if (cat.HasValue)
+    {
+        searchQuery = searchQuery + "%20AND%20hints.category1.typeValue:" + cat.Value;
+    }
+
 }
 
 @section breadcrumb
@@ -53,37 +66,46 @@
 <div class="mt-3"></div>
 @foreach (var category in Model.Select(m => m.Category).Distinct().OrderBy(m => m.ToNiceDisplayName()))
 {
-    List<ReportDataSource<(string Ico, Subsidy.Hint.CalculatedCategories Category, decimal Sum)>.Column> dataColumns =
+    List<ReportDataSource<(string Ico, Subsidy.Hint.CalculatedCategories Category, long Count, decimal Sum)>.Column> dataColumns =
     [
         new()
         {
             Name = "Příjemce",
             CssClass = "text",
             HtmlRender = (x) => $"<a href=/subjekt/{x.Ico}>{FirmaRepo.NameFromIco(x.Ico)}</a>",
-            TextRender = (x) => x.Ico
+            TextRender = (x) => FirmaRepo.NameFromIco(x.Ico) + $" (x.Ico)"
+        },
+        new()
+        {
+            Name = "Počet dotací",
+            TextRender = (x) => $"{x.Sum:N0} Kč",
+            HtmlRender = (x) => $"<a href='/dotace/hledat?Q=Ico:{x.Ico}{searchQuery}'>{HlidacStatu.Util.RenderData.NiceNumber(x.Count)}</a>",
+            OrderValueRender = (x) => HlidacStatu.Util.RenderData.OrderValueFormat(x.Sum),
+            CssClass = "number"
         },
         new()
         {
             Name = "Částka",
-            TextRender = (x) => $"{x.Sum:N0} Kč",
-            HtmlRender = (x) => $"<a href=/dotace/hledat?Q=Ico:{x.Ico}>{x.Sum:N0}&nbsp;Kč</a>",
+            TextRender = (x) => $"HlidacStatu.Util.RenderData.NiceNumber(x.Sum)",
+            HtmlRender = (x) => $"{HlidacStatu.Util.RenderData.NiceNumber(x.Sum, html:true)}",
             OrderValueRender = (x) => HlidacStatu.Util.RenderData.OrderValueFormat(x.Sum),
             CssClass = "number"
         }
     ];
     
 
-    var data = new ReportDataSource<(string Ico, Subsidy.Hint.CalculatedCategories Category, decimal Sum)>(dataColumns);
+    var data = new ReportDataSource<(string Ico, Subsidy.Hint.CalculatedCategories Category, long Count, decimal Sum)>(dataColumns);
 
-    for (var year = 2021; year < DateTime.Now.Year; year++)
-    {
+    //for (var year = 2021; year < DateTime.Now.Year; year++)
+    //{
         data.AddRows(Model.Where(m => m.Category == category).ToList());
-    }
+    //}
 
 
     <h4 id="cat_@((int)category)">@category.ToNiceDisplayName()</h4>
     <div>
-        @Html.DataToHTMLTable(data, tableId:"dt" + category.ToString("G"), dataTableOptions: dataTableOptions)
+        @Html.DataToHTMLTable(data, tableId: "dt" + category.ToString("G"), dataTableOptions: HtmlExtensions.DatatableOptions(orderColumnIdx: 3, orderDirection: "desc"))
     </div>
 }
 
+<partial name="_categoryDisclaimer" />

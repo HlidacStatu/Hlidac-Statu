@@ -119,11 +119,21 @@ namespace HlidacStatu.Web.Controllers
         }
 
         [HlidacCache(22 * 60 * 60, "", false)]
-        public async Task<ActionResult> TopKategorie(int? rok = null)
+        public async Task<ActionResult> TopKategorie(int? rok = null, int? cat = null)
         {
-            var data = await SubsidyRepo.ReportPrijemciPoKategoriichAsync(rok);
             ViewData["rok"] = rok;
-            return View(data);
+            ViewData["cat"] = cat;
+            if (cat == null)
+            {
+                var data = await SubsidyRepo.PoKategoriichAsync(rok, null);
+                return View("TopKategoriePrehled",data);
+
+            }
+            else
+            {
+                var data = await SubsidyRepo.ReportPrijemciPoKategoriichAsync(rok, cat);
+                return View(data);
+            }
         }
         
         public async Task<ActionResult> DotacniExperti(int? rok = null)
@@ -148,7 +158,7 @@ namespace HlidacStatu.Web.Controllers
             return View(data);
         }
         
-        public ActionResult SeznamReportu()
+        public ActionResult Reporty()
         {
             return View();
         }
