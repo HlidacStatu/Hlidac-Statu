@@ -10,6 +10,7 @@ namespace HlidacStatu.Repositories
     public static partial class SubsidyRepo
     {
         public static readonly int[] DefaultLimitedYears = Enumerable.Range(2010, DateTime.Now.Year - 2010).ToArray();
+        public static readonly int[] DefaultKrajskeLimitedYears = Enumerable.Range(2021, DateTime.Now.Year - 2010).ToArray();
 
 
         public static async Task<List<(int Year, Subsidy.Hint.Type SubsidyType, decimal Sum)>> ReportPoLetechAsync(
