@@ -1,0 +1,185 @@
+﻿@using HlidacStatu.Extensions
+@model (HlidacStatu.Entities.Subsidy model, HlidacStatu.Web.Models.DotaceDetailOptions options)
+
+@{
+    var options = Model.options ?? new DotaceDetailOptions();
+}
+
+@if (Model.model != null)
+{
+    <table class="table table-new table-new--dotted @(options.TableClass)" style="@(options.TableStyle)">
+        <tbody>
+            <tr>
+                <th>Příjemce dotace</th>
+                <td>
+                    @Model.model.Recipient.DisplayName @(Model.model.Recipient.YearOfBirth is null ? "" : $"({Model.model.Recipient.YearOfBirth})")
+                    @if (await Model.model.MaSkutecnehoMajiteleAsync() == false)
+                    {
+                        <br />
+                        <div class="alert alert-warning">
+                            <span class="fa-stack">
+                                <i class="fa-duotone fa-user fa-stack-2x"></i>
+                                <i class="fa-solid fa-question fa-stack-1x" style="margin-top: -6px;"></i>
+                            </span>U tohoto příjemce stát nezná skutečného majitele.
+                        </div>
+                        <br />
+                    }
+                </td>
+            </tr>
+            <tr>
+                <th>Příjemce dotace - jak je uvedeno v datech</th>
+                <td>
+                    @(await Html.KIndexLabelLinkAsync(Model.model.Recipient.Ico))@Model.model.Recipient.Name
+                </td>
+            </tr>
+            <tr>
+                <th>IČO</th>
+                <td>
+                    @if (Model.model.Recipient.Ico != "00000000")
+                    {
+                        <a href="/dotace/hledat?q=ico:@Model.model.Recipient.Ico" title="Vyhledat všechny dotace pro tento subjekt">@Model.model.Recipient.Ico</a>
+                    }
+                </td>
+            </tr>
+            <tr>
+                <th>Obec příjemce</th>
+                <td>
+                    @(Model.model.Recipient.Obec)
+                </td>
+            </tr>
+            <tr>
+                <th>Okres příjemce</th>
+                <td>
+                    @(Model.model.Recipient.Okres)
+                </td>
+            </tr>
+            <tr>
+                <th>Kód projektu</th>
+                <td>
+                    @if (!string.IsNullOrWhiteSpace(Model.model.ProjectCode))
+                    {
+                        <a href="/dotace/hledat?q=kodProjektu:@Model.model.ProjectCode" title="Vyhledat podobné dotace">@Model.model.ProjectCode</a>
+                    }
+                </td>
+            </tr>
+            <tr>
+                <th>Název projektu</th>
+                <td>@Model.model.ProjectName</td>
+            </tr>
+            <tr>
+                <th>Název programu</th>
+                <td>@(Model.model.ProgramName ?? "neuveden")</td>
+            </tr>
+            <tr>
+                <th>Kód programu</th>
+                <td>@(Model.model.ProgramCode ?? "neuveden")</td>
+            </tr>
+            <tr>
+                <th>Rok schválení dotace</th>
+                <td>@(Model.model.ApprovedYear)</td>
+            </tr>
+            <tr>
+                <th>Schválená částka</th>
+                <td>
+                    @if (Model.model.SubsidyAmount.HasValue)
+                    {
+                        @HlidacStatu.Util.RenderData.NicePriceHtml((decimal)Model.model.SubsidyAmount)
+                    }
+                    else
+                    {
+                        <p>hodnota neznámá</p>
+                    }
+                </td>
+            </tr>
+            <tr>
+                <th>Vyplacená částka</th>
+                <td>
+                    @if (Model.model.PayedAmount.HasValue)
+                    {
+                        @HlidacStatu.Util.RenderData.NicePriceHtml((decimal)Model.model.PayedAmount)
+                    }
+                    else
+                    {
+                        <p>hodnota neznámá</p>
+                    }
+                </td>
+            </tr>
+            <tr>
+                <th>Vrácená částka</th>
+                <td>
+                    @if (Model.model.ReturnedAmount.HasValue)
+                    {
+                        @HlidacStatu.Util.RenderData.NicePriceHtml((decimal)Model.model.ReturnedAmount)
+                    }
+                    else
+                    {
+                        <p>hodnota neznámá</p>
+                    }
+                </td>
+            </tr>
+            <tr>
+                <th>Poskytovatel dotace</th>
+                <td>
+                    @if (!string.IsNullOrWhiteSpace(Model.model.SubsidyProviderIco))
+                    {
+                        <a asp-controller="Subjekt" asp-action="Index" asp-route-id="@Model.model.SubsidyProviderIco">@(Model.model.SubsidyProvider)</a>
+                    }
+                    else
+                    {
+                        <p>@(Model.model.SubsidyProvider)</p>
+                    }
+                </td>
+            </tr>
+
+            <tr>
+                <th>Zdroj dat</th>
+                <td>
+                    @Model.model.Metadata.DataSource
+                    <br />
+                    <div class="alert alert-info" role="alert">
+                        @Model.model.Describe()
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <th>Datový soubor</th>
+                <td>
+                    @Model.model.Metadata.FileName
+                </td>
+            </tr>
+            <tr>
+                <th>Datum zpracování</th>
+                <td>
+                    @Model.model.Metadata.ProcessedDate.ToString("dd.MM.yyyy")
+                </td>
+            </tr>
+            <tr>
+                <th>Odkaz na tento záznam</th>
+                <td class="overflow-auto">
+                    <a style="overflow-wrap: anywhere;" href="@(Model.model.GetUrl(false,false))" target="_blank">@(Model.model.GetUrl(false,false))</a>
+                </td>
+            </tr>
+            <tr>
+                <td colspan="2">
+                    <button type="button" class="btn btn-info btn-sm" data-bs-toggle="modal" data-bs-target="#originalDM-@(Model.model.Id)">Zobrazit originální záznam z datového zdroje</button>
+                </td>
+            </tr>
+
+
+        </tbody>
+    </table>
+
+    <div id="originalDM-@(Model.model.Id)" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="originalDataModal" aria-hidden="true">
+        <div class="modal-dialog modal-fullscreen">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <h4 class="modal-title">Originální záznam, který jsme zpracovali</h4>
+                </div>
+                <div class="modal-body">
+                    <pre><code>@Model.model.GetNiceRawData()</code></pre>
+                </div>
+            </div>
+        </div>
+    </div>
+}
