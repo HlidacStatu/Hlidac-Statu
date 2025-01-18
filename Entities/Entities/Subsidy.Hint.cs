@@ -1921,8 +1921,9 @@ public partial class Subsidy
         private static IEnumerable<Category> _textToCalculatedCategory(
             Dictionary<CalculatedCategories, string[]> keywords, string categoryName)
         {
-            List<Category> res = new();
             categoryName = categoryName.ToLower();
+            //List<Category> res = new();
+            /*
             foreach (var cat in keywords)
             {
                 if (cat.Value.Any(m => m.Contains(categoryName, StringComparison.OrdinalIgnoreCase) || categoryName.Contains(m, StringComparison.OrdinalIgnoreCase)))
@@ -1933,10 +1934,10 @@ public partial class Subsidy
 
             }
             return res;
-
-            //var res = keywords
-            //    .Where(m => m.Value.Contains(categoryName, StringComparer.OrdinalIgnoreCase))
-            //    .Select(m => new Category { TypeValue = (int)m.Key, Created = DateTime.Now, Probability = 1 });
+            */
+            var res = keywords
+                .Where(m => m.Value.Contains(categoryName, StringComparer.OrdinalIgnoreCase))
+                .Select(m => new Category { TypeValue = (int)m.Key, Created = DateTime.Now, Probability = 1 });
             return res;
         }
 
@@ -1957,7 +1958,7 @@ public partial class Subsidy
             if (!cats.Any() && DataValidators.CheckCZICO(item.SubsidyProviderIco))
                 cats.AddRange(_textToCalculatedCategory(CategoryNameDictionary, item.SubsidyProviderIco));
 
-            if (!cats.Any() && !string.IsNullOrEmpty(item.ProgramCode))
+            if (!cats.Any() && !string.IsNullOrEmpty(item.ProgramCode) && item.ProgramCode?.Length > 3)
                 cats.AddRange(_textToCalculatedCategory(CategoryNameDictionary, item.ProgramCode));
 
             if (!cats.Any() && !string.IsNullOrEmpty(item.ProgramName))
