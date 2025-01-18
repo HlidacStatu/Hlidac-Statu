@@ -1961,6 +1961,9 @@ public partial class Subsidy
             if (!cats.Any() && !string.IsNullOrEmpty(item.ProgramCode) && item.ProgramCode?.Length > 3)
                 cats.AddRange(_textToCalculatedCategory(CategoryNameDictionary, item.ProgramCode));
 
+            if (!cats.Any() && !string.IsNullOrEmpty(item.ProgramCode) && item.ProgramCode?.Length > 3)
+                cats.AddRange(_textToCalculatedCategory(ProgramsDictionary, item.ProgramCode));
+
             if (!cats.Any() && !string.IsNullOrEmpty(item.ProgramName))
                 cats.AddRange(_textToCalculatedCategory(ProgramsDictionary, item.ProgramName));
 
