@@ -263,26 +263,26 @@
                             query += $"programName.keyword:\"{programName}\"";
 
                         if (!string.IsNullOrWhiteSpace(programName) && !string.IsNullOrWhiteSpace(programCode))
-                            query += " OR ";
+                            query += " AND ";
 
                         if (!string.IsNullOrWhiteSpace(programCode))
                             query += $"programCode:\"{programCode}\"";
 
                         query += ")";
-                        List<(string Ico, int Count, decimal Sum)> topPrijemci =
+                        List<(string Ico, long Count, decimal Sum)> topPrijemci =
                             await HlidacStatu.Repositories.SubsidyRepo.ReportTopPrijemciAsync(query);
 
-                        var topPrijemciRDS = new ReportDataSource<(string Ico, int Pocet, decimal Castka)>(
+                        var topPrijemciRDS = new ReportDataSource<(string Ico, long Pocet, decimal Castka)>(
                         new[]
                         {
-                    new ReportDataSource<(string Ico, int Pocet, decimal Castka)>.Column()
+                    new ReportDataSource<(string Ico, long Pocet, decimal Castka)>.Column()
                     {
                     Name = "Příjemce",
                     CssClass = "text",
                     HtmlRender = (x) => $"<a href=/subjekt/{x.Ico}>{FirmaRepo.NameFromIco(x.Ico)}</a>",
                     TextRender = (x) => FirmaRepo.NameFromIco(x.Ico)
                     },
-                    new ReportDataSource<(string Ico, int Pocet, decimal Castka)>.Column()
+                    new ReportDataSource<(string Ico, long Pocet, decimal Castka)>.Column()
                     {
                     Name = "Počet dotací",
                     TextRender = (x) => HlidacStatu.Util.RenderData.NiceNumber(x.Pocet),
@@ -290,7 +290,7 @@
                     OrderValueRender = (x) => HlidacStatu.Util.RenderData.OrderValueFormat(x.Pocet),
                     CssClass = "number"
                     },
-                    new ReportDataSource<(string Ico, int Pocet, decimal Castka)>.Column()
+                    new ReportDataSource<(string Ico, long Pocet, decimal Castka)>.Column()
                     {
                     Name = "Celková částka",
                     TextRender = (x) => HlidacStatu.Util.RenderData.NicePrice(x.Castka, shortFormat:true),

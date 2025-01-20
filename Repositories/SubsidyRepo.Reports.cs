@@ -245,7 +245,7 @@ namespace HlidacStatu.Repositories
             return results;
         }
 
-        public static async Task<List<(string Ico, int Count, decimal Sum)>> ReportTopPrijemciAsync(int? rok,
+        public static async Task<List<(string Ico, long Count, decimal Sum)>> ReportTopPrijemciAsync(int? rok,
             Firma.TypSubjektuEnum? recipientType = null,
             Subsidy.Hint.Type? subsidyType = null)
         {
@@ -263,7 +263,7 @@ namespace HlidacStatu.Repositories
             }
             return await ReportTopPrijemciAsync(query);
         }
-        public static async Task<List<(string Ico, int Count, decimal Sum)>> ReportTopPrijemciAsync(string query, int numOfItems = 100)
+        public static async Task<List<(string Ico, long Count, decimal Sum)>> ReportTopPrijemciAsync(string query, int numOfItems = 100)
         {
 
             AggregationContainerDescriptor<Subsidy> aggs = new AggregationContainerDescriptor<Subsidy>()
@@ -274,10 +274,8 @@ namespace HlidacStatu.Repositories
                         .Sum("sumAssumedAmount", sa => sa
                             .Field(f => f.AssumedAmount)
                         )
-                        .ValueCount("docCount", vc => vc
-                            .Field(f => f.AssumedAmount)
-                        )
                     )
+                    .Order(o=>o.Descending("sumAssumedAmount"))
                 );
 
 
@@ -289,7 +287,7 @@ namespace HlidacStatu.Repositories
             }
 
             // Initialize the results dictionary
-            List<(string Ico, int Count, decimal Sum)> results = new();
+            List<(string Ico, long Count, decimal Sum)> results = new();
 
             // Parse the aggregation results
             if (res.ElasticResults.Aggregations["perIco"] is BucketAggregate perIcoBa)
@@ -299,16 +297,15 @@ namespace HlidacStatu.Repositories
                     if (perIcoBucket.Key is not null && perIcoBucket.Key.ToString() is not null)
                     {
                         decimal sum = 0;
-                        int count = 0;
+                        long count = 0;
                         if (perIcoBucket["sumAssumedAmount"] is ValueAggregate sumBA)
                         {
                             sum = Convert.ToDecimal(sumBA.Value ?? 0);
                         }
 
-                        if (perIcoBucket["docCount"] is ValueAggregate docCountBA)
-                        {
-                            count = Convert.ToInt32(docCountBA.Value ?? 0);
-                        }
+                        
+                            count = perIcoBucket.DocCount ?? 0;
+                        
 
 
                         results.Add((perIcoBucket.Key.ToString(), count, sum));

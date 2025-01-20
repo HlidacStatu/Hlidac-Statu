@@ -158,7 +158,7 @@
                                 @if (!string.IsNullOrEmpty(Model.model.ProgramName))
                                 {
                                     <a href="@programDetailUrl"><i class="fa-solid fa-circle-info"></i> @(Model.model.ProgramName)</a>
-                                    <br /><a title="Najít další dotace k programu" href="/dotace/hledat?q=programCode:@(System.Web.HttpUtility.UrlEncode($"\"{Model.model.ProgramCode}\""))"><i class="fa-solid fa-magnifying-glass"></i> Najít dotace k programu</a>
+                                    <br /><a title="Najít další dotace k programu" href="/dotace/hledat?q=programName:@(System.Web.HttpUtility.UrlEncode($"\"{Model.model.ProgramName}\""))"><i class="fa-solid fa-magnifying-glass"></i> Najít dotace k programu</a>
                                 }
                                 else
                                 {

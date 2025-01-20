@@ -1,7 +1,7 @@
 @using HlidacStatu.Repositories
 @using HlidacStatu.Repositories.SharedModels
 @using HlidacStatu.XLib.Render
-@model List<(string Ico, int Count, decimal Sum)>
+@model List<(string Ico, long Count, decimal Sum)>
 
 @{
     int? rok = null;
@@ -58,17 +58,17 @@
 }
 
 @{
-    var topPrijemci = new ReportDataSource<(string Ico, int Pocet, decimal Castka)>(
+    var topPrijemci = new ReportDataSource<(string Ico, long Pocet, decimal Castka)>(
         new[]
         {
-            new ReportDataSource<(string Ico, int Pocet, decimal Castka)>.Column()
+            new ReportDataSource<(string Ico, long Pocet, decimal Castka)>.Column()
             {
                 Name = "Příjemce",
                 CssClass = "text",
                 HtmlRender = (x) => $"<a href=/subjekt/{x.Ico}>{FirmaRepo.NameFromIco(x.Ico)}</a>",
                 TextRender = (x) => FirmaRepo.NameFromIco(x.Ico)
             },
-            new ReportDataSource<(string Ico, int Pocet, decimal Castka)>.Column()
+            new ReportDataSource<(string Ico, long Pocet, decimal Castka)>.Column()
             {
                 Name = "Počet dotací" + (rok.HasValue ? $" za {rok}" : ""),
                 TextRender = (x) => HlidacStatu.Util.RenderData.NiceNumber(x.Pocet),
@@ -76,7 +76,7 @@
         OrderValueRender = (x) => HlidacStatu.Util.RenderData.OrderValueFormat(x.Pocet),
                 CssClass = "number"
             },
-            new ReportDataSource<(string Ico, int Pocet, decimal Castka)>.Column()
+            new ReportDataSource<(string Ico, long Pocet, decimal Castka)>.Column()
             {
                 Name = "Celková částka",
                 TextRender = (x) => HlidacStatu.Util.RenderData.NicePrice(x.Castka, shortFormat:true),
