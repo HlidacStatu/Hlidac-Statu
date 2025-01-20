@@ -183,10 +183,10 @@ namespace HlidacStatu.Repositories
                     case SubsidySearchResult.SubsidyOrderResult.DateAddedAsc:
                         s = new SortDescriptor<Subsidy>().Field(m => m.Field(f => f.ApprovedYear).Ascending());
                         break;
-                    case SubsidySearchResult.SubsidyOrderResult.LatestUpdateDesc:
+                    case SubsidySearchResult.SubsidyOrderResult.AmountDesc:
                         s = new SortDescriptor<Subsidy>().Field(m => m.Field(f => f.AssumedAmount).Descending());
                         break;
-                    case SubsidySearchResult.SubsidyOrderResult.LatestUpdateAsc:
+                    case SubsidySearchResult.SubsidyOrderResult.AmountAsc:
                         s = new SortDescriptor<Subsidy>().Field(m => m.Field(f => f.AssumedAmount).Ascending());
                         break;
                     case SubsidySearchResult.SubsidyOrderResult.FastestForScroll:

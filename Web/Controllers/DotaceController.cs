@@ -88,7 +88,7 @@ namespace HlidacStatu.Web.Controllers
             return View(data);
         }
 
-        [HlidacCache(22 * 60 * 60, "", false)]
+        [HlidacCache(22 * 60 * 60, "rok;ftyp;dtyp", false)]
         public async Task<ActionResult> TopPrijemci(int? rok = null, int? ftyp = null, int? dtyp = null)
         {
             Firma.TypSubjektuEnum? typSubj = null;
@@ -109,7 +109,7 @@ namespace HlidacStatu.Web.Controllers
             return View(data);
         }
 
-        [HlidacCache(22 * 60 * 60, "", false)]
+        [HlidacCache(22 * 60 * 60, "typdotace;rok", false)]
         public async Task<ActionResult> TopPoskytovatele(int typDotace, int? rok = null)
         {
             var data = await SubsidyRepo.ReportPoskytovatelePoLetechAsync((Subsidy.Hint.Type)typDotace, rok);
@@ -118,7 +118,7 @@ namespace HlidacStatu.Web.Controllers
             return View(data);
         }
 
-        [HlidacCache(22 * 60 * 60, "", false)]
+        [HlidacCache(22 * 60 * 60, "rok;cat", false)]
         public async Task<ActionResult> TopKategorie(int? rok = null, int? cat = null)
         {
             ViewData["rok"] = rok;
@@ -136,6 +136,7 @@ namespace HlidacStatu.Web.Controllers
             }
         }
 
+        [HlidacCache(22 * 60 * 60, "programname;programcode;rok", false)]
         public async Task<ActionResult> Program(string programName, string programCode)
         {
             var data = await SubsidyRepo.ProgramStatisticAsync(programName, programCode);
@@ -144,13 +145,15 @@ namespace HlidacStatu.Web.Controllers
             return View(data);
         }
 
+        [HlidacCache(22 * 60 * 60, "rok", false)]
         public async Task<ActionResult> DotacniExperti(int? rok = null)
         {
             var data = await SubsidyRepo.DotacniExperti(rok);
             ViewData["rok"] = rok;
             return View(data);
         }
-        
+
+        [HlidacCache(22 * 60 * 60, "typdotace;rok", false)]
         public async Task<ActionResult> TopDotacniProgramy(int typDotace, int? rok = null)
         {
             var data = await SubsidyRepo.TopDotacniProgramy((Subsidy.Hint.Type)typDotace , rok);
@@ -158,7 +161,8 @@ namespace HlidacStatu.Web.Controllers
             ViewData["typDotace"] = typDotace;
             return View(data);
         }
-        
+
+        [HlidacCache(22 * 60 * 60, "rok", false)]
         public async Task<ActionResult> DotovaniSponzori(int? rok = null)
         {
             var data = await SubsidyRepo.DotovaniSponzori(rok);

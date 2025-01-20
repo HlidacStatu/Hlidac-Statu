@@ -2,11 +2,25 @@
 @using HlidacStatu.Web.TagHelpers
 @using HlidacStatu.XLib.Render
 @using Microsoft.AspNetCore.Mvc.TagHelpers
+@using HlidacStatu.Entities
+@using HlidacStatu.XLib.Render
+
 @model List<HlidacStatu.Repositories.SubsidyRepo.ProgramStatistics>
 
 @{
-    ViewBag.Title = "Program " + "XXXX";
+    string programName = ViewData["programName"] as string;
+    string programCode = ViewData["programCode"] as string;
+
+    ViewBag.Title = "Dotační program " + programName;
     ViewBag.SubTitle = "Detail programu";
+
+    string searchQuery = $"&programName={System.Net.WebUtility.UrlEncode(programName)}&programCode={System.Net.WebUtility.UrlEncode(programCode)}";
+}
+@section scripts
+{
+    <link rel="stylesheet" type="text/css" href="//cdn.datatables.net/1.13.4/css/jquery.dataTables.css" />
+    <script type="text/javascript" charset="utf8" src="//cdn.datatables.net/1.13.4/js/jquery.dataTables.js"></script>
+    <script src="~/bundles/highcharts"></script>
 }
 
 @section breadcrumb
@@ -20,6 +34,12 @@
         </li>
         <li class="active">@ViewBag.SubTitle</li>
     </ol>
+}
+
+@if (Model == null || Model?.Any() == false)
+{
+    <h2>Dotační program nenalezen</h2>
+    return;
 }
 
 @{
@@ -50,11 +70,11 @@
                 OrderValueRender = (x) => HlidacStatu.Util.RenderData.OrderValueFormat(x.AvgAssumedAmount),
                 CssClass = "number"
             }
-        });
+                                        });
 
-    var topPrijemciOrdered = Model.OrderByDescending(m => m.Year).ToList(); 
-    
-    programPoLetech.AddRows(topPrijemciOrdered.Select(x => (x.Year, x.SumAssumedAmount, x.MinAssumedAmount, x.MaxAssumedAmount, x.AvgAssumedAmount)));
+    var programPoLetechOrdered = Model.OrderByDescending(m => m.Year).ToList();
+
+    programPoLetech.AddRows(programPoLetechOrdered.Select(x => (x.Year, x.SumAssumedAmount, x.MinAssumedAmount, x.MaxAssumedAmount, x.AvgAssumedAmount)));
 }
 
 <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.13.4/css/jquery.dataTables.css" />
@@ -64,7 +84,7 @@
 
 <h2>
     <add-bookmark item="@Model"></add-bookmark>
-    Detail programu "XXXX"
+    Detail programu @programName
 </h2>
 
 
@@ -76,11 +96,14 @@
         <div class="card-body border-bottom bg-light">
             <h2 class="h5 text-muted mb-2">Název programu</h2>
             <p class="h4 mb-0">
-                "XXXX"
+                @(programName)
             </p>
-            <p class="mt-2">
-                <b>Kód programu</b>: XXXXYYYY
-            </p>
+            @if (!string.IsNullOrEmpty(programCode))
+            {
+                <p class="mt-2">
+                    <b>Kód programu</b>: @programCode
+                </p>
+            }
         </div>
 
         <!-- Financial Summary -->
@@ -91,14 +114,7 @@
                         <div class="card-body">
                             <h3 class="h6 text-muted">Celkem vyplaceno</h3>
                             <p class="h4 mb-0">
-                                @if (Model.Any())
-                                {
-                                    @HlidacStatu.Util.RenderData.NicePriceHtml(Model.Sum(x => x.SumAssumedAmount))
-                                }
-                                else
-                                {
-                                    <p>hodnota neznámá</p>
-                                }
+                                @HlidacStatu.Util.RenderData.NicePriceHtml(Model.Sum(x => x.SumAssumedAmount))
                             </p>
                         </div>
                     </div>
@@ -108,14 +124,7 @@
                         <div class="card-body">
                             <h3 class="h6 text-muted">Počet dotovaných firem</h3>
                             <p class="h4 mb-0">
-                                @if (Model.Any())
-                                {
-                                    @Model.Sum(x => x.RecipientIcoCount)
-                                }
-                                else
-                                {
-                                    <p>hodnota neznámá</p>
-                                }
+                                @Model.Sum(x => x.RecipientIcoCount)
                             </p>
                         </div>
                     </div>
@@ -125,14 +134,11 @@
                         <div class="card-body">
                             <h3 class="h6 text-muted">Doba trvání programu</h3>
                             <p class="text-muted mb-0">
-                                @if (Model.Any())
-                                {
-                                    <span>@Model.Min(x => x.Year)</span><strong>-</strong><span>@Model.Max(x => x.Year)</span> 
-                                }
-                                else
-                                {
-                                    <p>hodnota neznámá</p>
-                                }
+                                <span>@Model.Min(x => x.Year)</span>
+
+                                <strong>-</strong>
+
+                                <span>@Model.Max(x => x.Year)</span>
                             </p>
                         </div>
                     </div>
@@ -145,30 +151,117 @@
             <div class="row g-4">
                 <div class="col-lg-6">
                     <h3 class="h5 mb-3">Informace o programu</h3>
-                    <div>
-                        @{
-                            string dataTableOptions = @"{
-                         'language': {
-                            'url': '//cdn.datatables.net/plug-ins/1.13.4/i18n/cs.json'
-                        },
-                        'order': [[2, 'desc']],
-                        'lengthChange': false,
-                        'info': false,
-                        }";
-                        }
-
-                        @Html.DataToHTMLTable(programPoLetech, tableId:"topPrijemciTab", dataTableOptions:dataTableOptions)
-                    </div>
+                    <dl class="row">
+                        <dt class="col-sm-4">Poskytovatel program</dt>
+                        <dd class="col-sm-8">
+                            <a asp-controller="Subjekt" asp-action="Index" asp-route-id="@Model.FirstOrDefault()?.ProviderIco">@(Model.FirstOrDefault()?.ProviderIco)</a>
+                        </dd>
+                        <dt class="col-sm-4">Rozsah vyplacených dotací</dt>
+                        <dd class="col-sm-8">
+                            @(HlidacStatu.Util.RenderData.ShortNicePrice(Model.Min(x => x.MinAssumedAmount)))
+                            -
+                            @(HlidacStatu.Util.RenderData.ShortNicePrice(Model.Min(x => x.MaxAssumedAmount)))
+                        </dd>
+                    </dl>
                 </div>
 
                 <div class="col-lg-6">
-                    <h3 class="h5 mb-3">Grafy</h3>
-                    
+                    <h3 class="h5 mb-3">Zajímavosti</h3>
+                    <dl class="row">
+                        <dt class="col-sm-4">Počet dotovaných firem s vazbou na politiky</dt>
+                        <dd class="col-sm-8">
+                            @(HlidacStatu.Util.RenderData.NiceNumber(Model.Sum(x => x.CountPolitickyAngazovanySubjekt)))
+                            @if (Model.Sum(x => x.CountPolitickyAngazovanySubjekt) > 0)
+                            {
+                                var xtop = Model.OrderByDescending(x => x.CountPolitickyAngazovanySubjekt).First();
+                                <span>Nejvíce v roce @(xtop.Year) - @(Devmasters.Lang.CS.Plural.Get(xtop.CountPolitickyAngazovanySubjekt, "jedna firma", "{0} firmy", "{0} firem")).</span>
+                            }
+                        </dd>
+                        <dt class="col-sm-4">Počet nově vzniklých dotovaných firem</dt>
+                        <dd class="col-sm-8">
+                            @(HlidacStatu.Util.RenderData.NiceNumber(Model.Sum(x => x.CountGrantedCompaniesFirstYear)))
+                            @if (Model.Sum(x => x.CountGrantedCompaniesFirstYear) > 0)
+                            {
+                                var xtop = Model.OrderByDescending(x => x.CountGrantedCompaniesFirstYear).First();
+                                <span>Nejvíce v roce @(xtop.Year) - @(Devmasters.Lang.CS.Plural.Get(xtop.CountGrantedCompaniesFirstYear, "jedna firma", "{0} firmy", "{0} firem")).</span>
+                            }
+                        </dd>
+                    </dl>
+
                 </div>
             </div>
         </div>
 
+
+        <!-- Details Grid -->
+        <div class="card-body">
+            <div class="row g-4">
+                <div class="col-12">
+                    <h3 class="h5 mb-3">Vyplacené dotace po letech</h3>
+                    <div>
+                        @Html.DataToHTMLTable(programPoLetech, tableId: "topPerYearTab", dataTableOptions: HtmlExtensions.DatatableOptions(orderColumnIdx: 0, orderDirection: "desc", paging:false, pageLength: 30, searching:false))
+                    </div>
+                </div>
+
+                <div class="col-12 mt-4">
+                    <h3 class="h5 mb-3">Největší příjemci dotací z toho programu</h3>
+                    @{
+                        string query = "hints.isOriginal:true AND _exists_:recipient.ico AND NOT recipient.ico:\"\"";
+                        query += " AND (";
+                        if (!string.IsNullOrWhiteSpace(programName))
+                            query += $"programName.keyword:\"{programName}\"";
+
+                        if (!string.IsNullOrWhiteSpace(programName) && !string.IsNullOrWhiteSpace(programCode))
+                            query += " OR ";
+
+                        if (!string.IsNullOrWhiteSpace(programCode))
+                            query += $"programCode:\"{programCode}\"";
+
+                        query += ")";
+                        List<(string Ico, int Count, decimal Sum)> topPrijemci =
+                            await HlidacStatu.Repositories.SubsidyRepo.ReportTopPrijemciAsync(query);
+
+                        var topPrijemciRDS = new ReportDataSource<(string Ico, int Pocet, decimal Castka)>(
+                        new[]
+                        {
+                    new ReportDataSource<(string Ico, int Pocet, decimal Castka)>.Column()
+                    {
+                    Name = "Příjemce",
+                    CssClass = "text",
+                    HtmlRender = (x) => $"<a href=/subjekt/{x.Ico}>{FirmaRepo.NameFromIco(x.Ico)}</a>",
+                    TextRender = (x) => FirmaRepo.NameFromIco(x.Ico)
+                    },
+                    new ReportDataSource<(string Ico, int Pocet, decimal Castka)>.Column()
+                    {
+                    Name = "Počet dotací",
+                    TextRender = (x) => HlidacStatu.Util.RenderData.NiceNumber(x.Pocet),
+                    HtmlRender = (x) => $"<a title='Najit dotace subjektu' href='/dotace/hledat?Q=ico:{x.Ico}{searchQuery}'>{HlidacStatu.Util.RenderData.NiceNumber(x.Pocet)}</a>",
+                    OrderValueRender = (x) => HlidacStatu.Util.RenderData.OrderValueFormat(x.Pocet),
+                    CssClass = "number"
+                    },
+                    new ReportDataSource<(string Ico, int Pocet, decimal Castka)>.Column()
+                    {
+                    Name = "Celková částka",
+                    TextRender = (x) => HlidacStatu.Util.RenderData.NicePrice(x.Castka, shortFormat:true),
+                    HtmlRender = (x) => HlidacStatu.Util.RenderData.NicePrice(x.Castka,html:true),
+                    OrderValueRender = (x) => HlidacStatu.Util.RenderData.OrderValueFormat(x.Castka),
+                    CssClass = "number"
+                    }
+            });
+
+                        var topPrijemciOrdered = topPrijemci.OrderByDescending(m => m.Sum).ToList();
+                        topPrijemciRDS.AddRows(topPrijemciOrdered.Take(100));
+
+                    }
+                    @Html.DataToHTMLTable(topPrijemciRDS, tableId: "topPrijemciTab", dataTableOptions: HtmlExtensions.DatatableOptions(orderColumnIdx: 2, orderDirection: "desc"))
+
+                </div>
+            </div>
+        </div>
+
+
         <!-- Footer with metadata -->
+        @*
         <div class="card-footer bg-light">
             <div class="row text-muted small">
                 <div class="col-md">
@@ -182,7 +275,7 @@
                     <p>sem se ještě něco vejde</p>
                 </div>
             </div>
-        </div>
+        </div>*@
     </div>
 </div>
 

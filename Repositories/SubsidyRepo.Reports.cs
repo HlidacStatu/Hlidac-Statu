@@ -99,7 +99,8 @@ namespace HlidacStatu.Repositories
                 query += ")";
             }
             
-            var res = await SubsidyRepo.Searching.SimpleSearchAsync(query, 1, 0, "666",
+            var res = await SubsidyRepo.Searching.SimpleSearchAsync(query, 1, 0,
+                Repositories.Searching.SubsidySearchResult.SubsidyOrderResult.FastestForScroll,
                 anyAggregation: aggs);
             if (res is null)
             {
@@ -179,6 +180,7 @@ namespace HlidacStatu.Repositories
                 }
             }
 
+                
             return results;
         }
 
@@ -247,20 +249,6 @@ namespace HlidacStatu.Repositories
             Firma.TypSubjektuEnum? recipientType = null,
             Subsidy.Hint.Type? subsidyType = null)
         {
-            AggregationContainerDescriptor<Subsidy> aggs = new AggregationContainerDescriptor<Subsidy>()
-                .Terms("perIco", t => t
-                    .Field(f => f.Recipient.Ico)
-                    .Size(100)
-                    .Aggregations(typeAggs => typeAggs
-                        .Sum("sumAssumedAmount", sa => sa
-                            .Field(f => f.AssumedAmount)
-                        )
-                        .ValueCount("docCount", vc => vc
-                            .Field(f => f.AssumedAmount)
-                        )
-                    )
-                );
-
             string query = "hints.isOriginal:true AND _exists_:recipient.ico AND NOT recipient.ico:\"\"";
             if (recipientType.HasValue)
                 query = query + " AND hints.recipientTypSubjektu:" + (int)recipientType.Value;
@@ -273,6 +261,26 @@ namespace HlidacStatu.Repositories
             {
                 query += $" AND approvedYear:{rok}";
             }
+            return await ReportTopPrijemciAsync(query);
+        }
+        public static async Task<List<(string Ico, int Count, decimal Sum)>> ReportTopPrijemciAsync(string query, int numOfItems = 100)
+        {
+
+            AggregationContainerDescriptor<Subsidy> aggs = new AggregationContainerDescriptor<Subsidy>()
+                .Terms("perIco", t => t
+                    .Field(f => f.Recipient.Ico)
+                    .Size(numOfItems)
+                    .Aggregations(typeAggs => typeAggs
+                        .Sum("sumAssumedAmount", sa => sa
+                            .Field(f => f.AssumedAmount)
+                        )
+                        .ValueCount("docCount", vc => vc
+                            .Field(f => f.AssumedAmount)
+                        )
+                    )
+                );
+
+
 
             var res = await SubsidyRepo.Searching.SimpleSearchAsync(query, 1, 0, "666", anyAggregation: aggs);
             if (res is null)

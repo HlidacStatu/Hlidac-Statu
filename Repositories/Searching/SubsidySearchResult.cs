@@ -74,21 +74,21 @@ namespace HlidacStatu.Repositories.Searching
             [Devmasters.Enums.NiceDisplayName("podle relevance")]
             Relevance = 0,
 
-            [Devmasters.Enums.SortValue(1)]
+            [Devmasters.Enums.SortValue(3)]
             [Devmasters.Enums.NiceDisplayName("podle roku vzniku od nejnovějších")]
             DateAddedDesc = 1,
 
             [Devmasters.Enums.NiceDisplayName("podle roku vzniku od nejstarších")]
-            [Devmasters.Enums.SortValue(2)]
+            [Devmasters.Enums.SortValue(4)]
             DateAddedAsc = 2,
 
-            [Devmasters.Enums.SortValue(3)]
+            [Devmasters.Enums.SortValue(5)]
             [Devmasters.Enums.NiceDisplayName("podle částky od největší")]
-            LatestUpdateDesc = 3,
+            AmountDesc = 3,
 
-            [Devmasters.Enums.SortValue(4)]
+            [Devmasters.Enums.SortValue(6)]
             [Devmasters.Enums.NiceDisplayName("podle částky od nejmenší")]
-            LatestUpdateAsc = 4,
+            AmountAsc = 4,
 
             [Devmasters.Enums.SortValue(5)]
             [Devmasters.Enums.NiceDisplayName("podle IČO od největšího")]
@@ -97,6 +97,7 @@ namespace HlidacStatu.Repositories.Searching
             [Devmasters.Enums.SortValue(6)]
             [Devmasters.Enums.NiceDisplayName("podle IČO od nejmenšího")]
             ICOAsc = 6,
+
 
             [Devmasters.Enums.Disabled]
             FastestForScroll = 666

@@ -5,6 +5,9 @@
 
 @{
     var options = Model.options ?? new DotaceDetailOptions();
+
+    string programDetailUrl = $"/dotace/program?programName={System.Net.WebUtility.UrlEncode(Model.model.ProjectName)}&programCode={System.Net.WebUtility.UrlEncode(Model.model.ProgramCode)}";
+
 }
 
 @if (Model.model != null)
@@ -151,15 +154,30 @@
                             </dd>
 
                             <dt class="col-sm-4">Název programu</dt>
-                            <dd class="col-sm-8">@(Model.model.ProgramName ?? "neuveden")
-                                <a title="Najít další dotace k programu" href="/dotace/hledat?q=programName:@(System.Web.HttpUtility.UrlEncode($"\"{Model.model.ProgramName}\""))"><i class="fa-solid fa-magnifying-glass"></i></a>
+                            <dd class="col-sm-8">
+                                @if (!string.IsNullOrEmpty(Model.model.ProgramName))
+                                {
+                                    <a href="@programDetailUrl"><i class="fa-solid fa-memo-circle-info"></i>@(Model.model.ProgramName)</a>
+                                    <a title="Najít další dotace k programu" href="/dotace/hledat?q=programName:@(System.Web.HttpUtility.UrlEncode($"\"{Model.model.ProgramName}\""))"><i class="fa-solid fa-magnifying-glass"></i></a>
+                                }
+                                else
+                                {
+                                    <span>neuveden</span>
+                                }
 
                             </dd>
 
                             <dt class="col-sm-4">Kód programu</dt>
                             <dd class="col-sm-8">
-                                @(Model.model.ProgramCode ?? "neuveden")
-                                <a title="Najít další dotace s tímto kódem" href="/dotace/hledat?q=programCode:@(System.Web.HttpUtility.UrlEncode($"\"{Model.model.ProgramCode}\""))"><i class="fa-solid fa-magnifying-glass"></i></a>
+                                @if (!string.IsNullOrEmpty(Model.model.ProgramCode))
+                                {
+                                    <a href="@programDetailUrl"><i class="fa-solid fa-memo-circle-info"></i>@(Model.model.ProgramCode)</a>
+                                    <a title="Najít další dotace k programu" href="/dotace/hledat?q=programCode:@(System.Web.HttpUtility.UrlEncode($"\"{Model.model.ProgramCode}\""))"><i class="fa-solid fa-magnifying-glass"></i></a>
+                                }
+                                else
+                                {
+                                    <span>neuveden</span>
+                                }
                             </dd>
 
                             <dt class="col-sm-4">Rok schválení</dt>
