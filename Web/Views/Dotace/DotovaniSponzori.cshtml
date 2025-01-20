@@ -50,7 +50,7 @@
             {
                 Name = "Celková částka",
                 TextRender = (x) => HlidacStatu.Util.RenderData.NicePrice(x.SumAssumedAmmount, shortFormat:true),
-                HtmlRender = (x) => $"<a title='Najit dotace subjektu' href='/dotace/hledat?Q=ico:{x.Ico}'>{HlidacStatu.Util.RenderData.NicePrice(x.SumAssumedAmmount,html:true)}</a>",
+                HtmlRender = (x) => $"<a title='Najit dotace subjektu' href='/dotace/hledat?Q=hints.isOriginal%3Atrue+AND+ico%3A{x.Ico}'>{HlidacStatu.Util.RenderData.NicePrice(x.SumAssumedAmmount,html:true)}</a>",
                 OrderValueRender = (x) => HlidacStatu.Util.RenderData.OrderValueFormat(x.SumAssumedAmmount),
                 CssClass = "number"
             }

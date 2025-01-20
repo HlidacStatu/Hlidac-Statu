@@ -50,7 +50,7 @@
             {
                 Name = "Počet krajů" + (rok.HasValue ? $" za {rok}" : "") + ", ze kterých bylo čerpáno",
                 TextRender = (x) => HlidacStatu.Util.RenderData.NiceNumber(x.Pocet),
-                HtmlRender = (x) => $"<a title='Najit dotace subjektu' href='/dotace/hledat?Q=ico:{x.Ico} AND hints.subsidyType:2'>{HlidacStatu.Util.RenderData.NiceNumber(x.Pocet)}</a>",
+                HtmlRender = (x) => $"<a title='Najit dotace subjektu' href='/dotace/hledat?Q=hints.isOriginal%3Atrue+AND+ico%3A{x.Ico}+AND+hints.subsidyType%3A2'>{HlidacStatu.Util.RenderData.NiceNumber(x.Pocet)}</a>",
                 OrderValueRender = (x) => HlidacStatu.Util.RenderData.OrderValueFormat(x.Pocet),
                 CssClass = "number"
             },

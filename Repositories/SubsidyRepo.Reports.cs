@@ -91,7 +91,7 @@ namespace HlidacStatu.Repositories
                     query += $"programName.keyword:\"{programName}\"";
 
                 if (!string.IsNullOrWhiteSpace(programName) && !string.IsNullOrWhiteSpace(programCode))
-                    query += " OR ";
+                    query += " AND ";
 
                 if (!string.IsNullOrWhiteSpace(programCode))
                     query += $"programCode:\"{programCode}\"";
