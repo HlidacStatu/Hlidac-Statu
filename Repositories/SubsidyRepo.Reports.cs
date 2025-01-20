@@ -9,9 +9,178 @@ namespace HlidacStatu.Repositories
 {
     public static partial class SubsidyRepo
     {
+        public class ProgramStatistics
+        {
+            public int Year { get; set; }
+            public string ProviderIco { get; set; }
+            public Subsidy.Hint.Type SubsidyType { get; set; }
+            public int RecipientIcoCount { get; set; }
+            public decimal SumAssumedAmount { get; set; }
+            public decimal MinAssumedAmount { get; set; }
+            public decimal MaxAssumedAmount { get; set; }
+            public decimal AvgAssumedAmount { get; set; }
+            public int CountGrantedCompaniesFirstYear { get; set; }
+            public int CountPolitickyAngazovanySubjekt { get; set; }
+            
+        }
+        
         public static readonly int[] DefaultLimitedYears = Enumerable.Range(2010, DateTime.Now.Year - 2010).ToArray();
         public static readonly int[] DefaultKrajskeLimitedYears = Enumerable.Range(2021, DateTime.Now.Year - 2010).ToArray();
 
+        public static async Task<List<ProgramStatistics>> ProgramStatisticAsync(string programName, string programCode)
+        {
+            
+            AggregationContainerDescriptor<Subsidy> aggs = new AggregationContainerDescriptor<Subsidy>()
+                .Terms("perYear", t => t
+                    .Field(f => f.ApprovedYear)
+                    .Size(10000)
+                    .Aggregations(yearAggs => yearAggs
+                        .Terms("perSubsidyType", st => st
+                            .Field(f => f.Hints.SubsidyType)
+                            .Size(10000)
+                            .Aggregations(stypeAggs => stypeAggs
+                                .Terms("perProviderIco", sty => sty
+                                    .Field(f => f.SubsidyProviderIco)
+                                    .Size(10000)
+                                    .Aggregations(providerAggs => providerAggs
+                                        .Sum("sumAssumedAmount", sa => sa
+                                            .Field(f => f.AssumedAmount)
+                                        )
+                                        .Min("minAssumedAmount", sa => sa
+                                            .Field(f => f.AssumedAmount)
+                                        )
+                                        .Max("maxAssumedAmount", sa => sa
+                                            .Field(f => f.AssumedAmount)
+                                        )
+                                        .Average("avgAssumedAmount", sa => sa
+                                            .Field(f => f.AssumedAmount)
+                                        )
+                                        .ValueCount("recipientCount", vc => vc
+                                            .Field(f => f.Recipient.Ico)
+                                        )
+                                        .Filter("recipientPocetLetOdZalozeniOne", filter => filter
+                                            .Filter(flt => flt
+                                                .Term(r => r
+                                                    .Field(f => f.Hints.RecipientPocetLetOdZalozeni)
+                                                    .Value(1)
+                                                )
+                                            )
+                                        )
+                                        .Filter("recipientPolitickyAngazovanySubjektPositive", filter => filter
+                                            .Filter(flt => flt
+                                                .Range(r => r
+                                                    .Field(f => f.Hints.RecipientPolitickyAngazovanySubjekt)
+                                                    .GreaterThan(0)
+                                                )
+                                            )
+                                        )
+                                    )
+                                )
+                                
+                            )
+                        )
+                    )
+                );
+
+            string query = "hints.isOriginal:true";
+
+            if (!string.IsNullOrWhiteSpace(programName) || !string.IsNullOrWhiteSpace(programCode))
+            {
+                query += " AND (";
+                if (!string.IsNullOrWhiteSpace(programName))
+                    query += $"programName.keyword:\"{programName}\"";
+
+                if (!string.IsNullOrWhiteSpace(programName) && !string.IsNullOrWhiteSpace(programCode))
+                    query += " OR ";
+
+                if (!string.IsNullOrWhiteSpace(programCode))
+                    query += $"programCode:\"{programCode}\"";
+
+                query += ")";
+            }
+            
+            var res = await SubsidyRepo.Searching.SimpleSearchAsync(query, 1, 0, "666",
+                anyAggregation: aggs);
+            if (res is null)
+            {
+                return null;
+            }
+
+            // Initialize the results dictionary
+            List<ProgramStatistics> results = new();
+
+            // Parse the aggregation results
+            if (res.ElasticResults.Aggregations["perYear"] is BucketAggregate perYearBA)
+            {
+                foreach (KeyedBucket<object> perYearBucket in perYearBA.Items)
+                {
+                    if (int.TryParse(perYearBucket.Key.ToString(), out int year))
+                    {
+                        if (perYearBucket["perSubsidyType"] is BucketAggregate subsidyTypeBA)
+                        {
+                            foreach (KeyedBucket<object> subsidyTypeBucket in subsidyTypeBA.Items)
+                            {
+                                if (subsidyTypeBucket["perProviderIco"] is BucketAggregate providerIcoBA)
+                                {
+                                    foreach (KeyedBucket<object> providerIcoBucket in providerIcoBA.Items)
+                                    {
+                                        var programStat = new ProgramStatistics()
+                                        {
+                                            Year = year,
+                                            ProviderIco = providerIcoBucket.Key.ToString(),
+                                        };
+                                        results.Add(programStat);
+                                        
+                                        if (Enum.TryParse<Subsidy.Hint.Type>(subsidyTypeBucket.Key.ToString(),
+                                                out var subsidyType))
+                                        {
+                                            programStat.SubsidyType = subsidyType;
+                                        }
+                                        
+                                        if (providerIcoBucket["sumAssumedAmount"] is ValueAggregate sumBA)
+                                        {
+                                            programStat.SumAssumedAmount = Convert.ToDecimal(sumBA.Value ?? 0);
+                                        }
+                                        
+                                        if (providerIcoBucket["minAssumedAmount"] is ValueAggregate minBA)
+                                        {
+                                            programStat.MinAssumedAmount = Convert.ToDecimal(minBA.Value ?? 0);
+                                        }
+                                        
+                                        if (providerIcoBucket["maxAssumedAmount"] is ValueAggregate maxBA)
+                                        {
+                                            programStat.MaxAssumedAmount = Convert.ToDecimal(maxBA.Value ?? 0);
+                                        }
+                                        
+                                        if (providerIcoBucket["avgAssumedAmount"] is ValueAggregate avgBA)
+                                        {
+                                            programStat.AvgAssumedAmount = Convert.ToDecimal(avgBA.Value ?? 0);
+                                        }
+                                        
+                                        if (providerIcoBucket["recipientCount"] is ValueAggregate recCount)
+                                        {
+                                            programStat.RecipientIcoCount = Convert.ToInt32(recCount.Value ?? 0);
+                                        }
+                                        
+                                        if (providerIcoBucket["recipientPocetLetOdZalozeniOne"] is SingleBucketAggregate recFirstYear)
+                                        {
+                                            programStat.CountGrantedCompaniesFirstYear = Convert.ToInt32(recFirstYear.DocCount);
+                                        }
+                                        
+                                        if (providerIcoBucket["recipientPolitickyAngazovanySubjektPositive"] is SingleBucketAggregate recPolitical)
+                                        {
+                                            programStat.CountPolitickyAngazovanySubjekt = Convert.ToInt32(recPolitical.DocCount);
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            return results;
+        }
 
         public static async Task<List<(int Year, Subsidy.Hint.Type SubsidyType, decimal Sum)>> ReportPoLetechAsync(
             bool limitYears = true, int[] limitedYears = null)
@@ -327,13 +496,7 @@ namespace HlidacStatu.Repositories
 
             return results;
         }
-
-        public static async Task<object> ProgramStatisticAsync(string programName)
-        {
-            object res = null;
-
-            return res;
-        }
+        
 
         //Příjemci dotací z více krajů
         public static async Task<List<(string Ico, int DataSourceCount, decimal SumAssumedAmmount)>>

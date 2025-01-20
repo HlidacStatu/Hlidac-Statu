@@ -136,12 +136,12 @@ namespace HlidacStatu.Web.Controllers
             }
         }
 
-        public async Task<ActionResult> Program(string programName)
+        public async Task<ActionResult> Program(string programName, string programCode)
         {
-            if (string.IsNullOrEmpty(programName))
-                return Redirect("/dotace");
-            //TODO
-            return View();
+            var data = await SubsidyRepo.ProgramStatisticAsync(programName, programCode);
+            ViewData["programName"] = programName;
+            ViewData["programCode"] = programCode;
+            return View(data);
         }
 
         public async Task<ActionResult> DotacniExperti(int? rok = null)
