@@ -14,7 +14,9 @@
     ViewBag.Title = "Dotační program " + programName;
     ViewBag.SubTitle = "Detail programu";
 
-    string searchQuery = $"&programName={System.Net.WebUtility.UrlEncode(programName)}&programCode={System.Net.WebUtility.UrlEncode(programCode)}";
+    string detailSearchQuery = $"&programName={System.Net.WebUtility.UrlEncode(programName)}&programCode={System.Net.WebUtility.UrlEncode(programCode)}";
+    string searchQuery = System.Net.WebUtility.UrlEncode($"programName:\"{programName}\" AND programCode:\"{programCode}\" ");
+
 }
 @section scripts
 {
@@ -122,7 +124,7 @@
                 <div class="col-md-4">
                     <div class="card h-100 bg-info bg-opacity-10 border-info">
                         <div class="card-body">
-                            <h3 class="h6 text-muted">Počet dotovaných firem</h3>
+                            <h3 class="h6 text-muted">Počet vyplacených dotací</h3>
                             <p class="h4 mb-0">
                                 @Model.Sum(x => x.RecipientIcoCount)
                             </p>
@@ -162,14 +164,18 @@
                             -
                             @(HlidacStatu.Util.RenderData.ShortNicePrice(Model.Min(x => x.MaxAssumedAmount)))
                         </dd>
+                        <dt class="col-sm-4"></dt>
+                        <dd class="col-sm-8">
+                            <a title="Najít další dotace k programu" href="/dotace/hledat?q=@(searchQuery)"><i class="fa-solid fa-magnifying-glass"></i> Najít dotace k programu</a>
+                        </dd>
                     </dl>
                 </div>
 
                 <div class="col-lg-6">
                     <h3 class="h5 mb-3">Zajímavosti</h3>
                     <dl class="row">
-                        <dt class="col-sm-4">Počet dotovaných firem s vazbou na politiky</dt>
-                        <dd class="col-sm-8">
+                        <dt class="col-sm-8">Počet dotovaných firem s vazbou na politiky</dt>
+                        <dd class="col-sm-4">
                             @(HlidacStatu.Util.RenderData.NiceNumber(Model.Sum(x => x.CountPolitickyAngazovanySubjekt)))
                             @if (Model.Sum(x => x.CountPolitickyAngazovanySubjekt) > 0)
                             {
@@ -177,8 +183,8 @@
                                 <span>Nejvíce v roce @(xtop.Year) - @(Devmasters.Lang.CS.Plural.Get(xtop.CountPolitickyAngazovanySubjekt, "jedna firma", "{0} firmy", "{0} firem")).</span>
                             }
                         </dd>
-                        <dt class="col-sm-4">Počet nově vzniklých dotovaných firem</dt>
-                        <dd class="col-sm-8">
+                        <dt class="col-sm-8">Počet nově vzniklých dotovaných firem</dt>
+                        <dd class="col-sm-4">
                             @(HlidacStatu.Util.RenderData.NiceNumber(Model.Sum(x => x.CountGrantedCompaniesFirstYear)))
                             @if (Model.Sum(x => x.CountGrantedCompaniesFirstYear) > 0)
                             {
@@ -235,7 +241,7 @@
                     {
                     Name = "Počet dotací",
                     TextRender = (x) => HlidacStatu.Util.RenderData.NiceNumber(x.Pocet),
-                    HtmlRender = (x) => $"<a title='Najit dotace subjektu' href='/dotace/hledat?Q=ico:{x.Ico}{searchQuery}'>{HlidacStatu.Util.RenderData.NiceNumber(x.Pocet)}</a>",
+                    HtmlRender = (x) => $"<a title='Najit dotace subjektu' href='/dotace/hledat?Q=ico:{x.Ico}%20AND%20{searchQuery}'>{HlidacStatu.Util.RenderData.NiceNumber(x.Pocet)}</a>",
                     OrderValueRender = (x) => HlidacStatu.Util.RenderData.OrderValueFormat(x.Pocet),
                     CssClass = "number"
                     },

@@ -6,7 +6,7 @@
 @{
     var options = Model.options ?? new DotaceDetailOptions();
 
-    string programDetailUrl = $"/dotace/program?programName={System.Net.WebUtility.UrlEncode(Model.model.ProjectName)}&programCode={System.Net.WebUtility.UrlEncode(Model.model.ProgramCode)}";
+    string programDetailUrl = $"/dotace/program?programName={System.Net.WebUtility.UrlEncode(Model.model.ProgramName)}&programCode={System.Net.WebUtility.UrlEncode(Model.model.ProgramCode)}";
 
 }
 
@@ -157,8 +157,8 @@
                             <dd class="col-sm-8">
                                 @if (!string.IsNullOrEmpty(Model.model.ProgramName))
                                 {
-                                    <a href="@programDetailUrl"><i class="fa-solid fa-memo-circle-info"></i>@(Model.model.ProgramName)</a>
-                                    <a title="Najít další dotace k programu" href="/dotace/hledat?q=programName:@(System.Web.HttpUtility.UrlEncode($"\"{Model.model.ProgramName}\""))"><i class="fa-solid fa-magnifying-glass"></i></a>
+                                    <a href="@programDetailUrl"><i class="fa-solid fa-circle-info"></i> @(Model.model.ProgramName)</a>
+                                    <br /><a title="Najít další dotace k programu" href="/dotace/hledat?q=programCode:@(System.Web.HttpUtility.UrlEncode($"\"{Model.model.ProgramCode}\""))"><i class="fa-solid fa-magnifying-glass"></i> Najít dotace k programu</a>
                                 }
                                 else
                                 {
@@ -171,8 +171,9 @@
                             <dd class="col-sm-8">
                                 @if (!string.IsNullOrEmpty(Model.model.ProgramCode))
                                 {
-                                    <a href="@programDetailUrl"><i class="fa-solid fa-memo-circle-info"></i>@(Model.model.ProgramCode)</a>
-                                    <a title="Najít další dotace k programu" href="/dotace/hledat?q=programCode:@(System.Web.HttpUtility.UrlEncode($"\"{Model.model.ProgramCode}\""))"><i class="fa-solid fa-magnifying-glass"></i></a>
+                                    <a href="@programDetailUrl"><i class="fa-solid fa-circle-info"></i> @(Model.model.ProgramCode)</a>
+                                    <br />
+                                    <a title="Najít další dotace k programu" href="/dotace/hledat?q=programCode:@(System.Web.HttpUtility.UrlEncode($"\"{Model.model.ProgramCode}\""))"><i class="fa-solid fa-magnifying-glass"></i> Najít dotace podle kodu</a>
                                 }
                                 else
                                 {
@@ -195,7 +196,7 @@
                                             (@(string.Join(',',
                                                Model.model.Hints.GetCategories().Skip(1).Select(m =>
                                                m.CalculatedCategoryDescription()
-                                               + $" <a title='Najít další takové dotace' href='@Model.model.Hints.GetCategories().First().GetSearchUrl(false)'><i class='fa-solid fa-magnifying-glass'></i>"
+                                               + $" <br /><a title='Najít další takové dotace' href='@Model.model.Hints.GetCategories().First().GetSearchUrl(false)'><i class='fa-solid fa-magnifying-glass'> Najít dotace v kategorii</i>"
                                                ))
                                                ))
                                         </span>
