@@ -47,10 +47,11 @@
 
 @section scripts
 {
-    <link rel="stylesheet" type="text/css" href="//cdn.datatables.net/1.13.4/css/jquery.dataTables.css"/>
+    <link rel="stylesheet" type="text/css" href="//cdn.datatables.net/1.13.4/css/jquery.dataTables.css" />
     <script type="text/javascript" charset="utf8" src="//cdn.datatables.net/1.13.4/js/jquery.dataTables.js"></script>
     <script src="~/bundles/highcharts"></script>
 }
+
 
 <partial name="_pager" model="@(ValueTuple.Create((int?)null, (int?)null, rok, "/Dotace/TopKategorie"))"/>
 
@@ -86,8 +87,8 @@
         new()
         {
             Name = "Částka",
-            TextRender = (x) => $"HlidacStatu.Util.RenderData.NiceNumber(x.Sum)",
-            HtmlRender = (x) => $"{HlidacStatu.Util.RenderData.NiceNumber(x.Sum, html:true)}",
+            TextRender = (x) => HlidacStatu.Util.RenderData.NiceNumber(x.Sum),
+            HtmlRender = (x) => $"{HlidacStatu.Util.RenderData.NiceNumber(x.Sum, showDecimal: HlidacStatu.Util.RenderData.ShowDecimalVal.Hide , html:true)}",
             OrderValueRender = (x) => HlidacStatu.Util.RenderData.OrderValueFormat(x.Sum),
             CssClass = "number"
         }
@@ -104,7 +105,8 @@
 
     <h4 id="cat_@((int)category)">@category.ToNiceDisplayName()</h4>
     <div>
-        @Html.DataToHTMLTable(data, tableId: "dt" + category.ToString("G"), dataTableOptions: HtmlExtensions.DatatableOptions(orderColumnIdx: 3, orderDirection: "desc"))
+        @Html.DataToHTMLTable(data, tableId: "dt" + category.ToString("G"), 
+        dataTableOptions: HtmlExtensions.DatatableOptions(orderColumnIdx: 2, orderDirection: "desc"))
     </div>
 }
 

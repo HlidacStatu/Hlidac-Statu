@@ -1,4 +1,6 @@
 ﻿@using HlidacStatu.Extensions
+@using System.Linq
+
 @model (HlidacStatu.Entities.Subsidy model, HlidacStatu.Web.Models.DotaceDetailOptions options)
 
 @{
@@ -18,13 +20,13 @@
                     <add-bookmark item="@Model.model"></add-bookmark>
                     "@Model.model.DisplayProject" <small>@((Model.model.Hints.IsOriginal ? "" : "(duplikátní záznam)"))</small>
                 </p>
-                    @if (!string.IsNullOrWhiteSpace(Model.model.ProjectCode))
-                    {
-                        <p class="mt-2">
+                @if (!string.IsNullOrWhiteSpace(Model.model.ProjectCode))
+                {
+                    <p class="mt-2">
                         <b>Kód projektu</b>: <a href="/dotace/hledat?q=kodProjektu:@Model.model.ProjectCode" title="Vyhledat podobné dotace">@Model.model.ProjectCode</a>
-                        </p>
-                    }                    
-                
+                    </p>
+                }
+
             </div>
 
             <!-- Financial Summary -->
@@ -90,7 +92,7 @@
                         <dl class="row">
                             <dt class="col-sm-4">Příjemce dotace</dt>
                             <dd class="col-sm-8">
-                                @Model.model.Recipient.DisplayName @(Model.model.Recipient.YearOfBirth is null ? "" : $"({Model.model.Recipient.YearOfBirth})")                               
+                                @Model.model.Recipient.DisplayName @(Model.model.Recipient.YearOfBirth is null ? "" : $"({Model.model.Recipient.YearOfBirth})")
                             </dd>
                             <dt class="col-sm-4">Příjemce jak je v datech</dt>
                             <dd class="col-sm-8">@(await Html.KIndexLabelLinkAsync(Model.model.Recipient.Ico))@Model.model.Recipient.Name</dd>
@@ -103,12 +105,13 @@
                             </dd>
 
                             <dt class="col-sm-4">Obec příjemce</dt>
-                            <dd class="col-sm-8">@(Model.model.Recipient.Obec)
+                            <dd class="col-sm-8">
+                                @(Model.model.Recipient.Obec)
                                 @if (!string.IsNullOrWhiteSpace(Model.model.Recipient.Okres))
                                 {
                                     <span>(okres @(Model.model.Recipient.Okres))</span>
                                 }
-                                </dd>
+                            </dd>
 
                         </dl>
                         @if (await Model.model.MaSkutecnehoMajiteleAsync() == false)
@@ -138,13 +141,39 @@
                             </dd>
 
                             <dt class="col-sm-4">Název programu</dt>
-                            <dd class="col-sm-8">@(Model.model.ProgramName ?? "neuveden")</dd>
+                            <dd class="col-sm-8">@(Model.model.ProgramName ?? "neuveden")
+                                <a title="Najít další dotace k programu" href="/dotace/hledat?q=programName:@(System.Web.HttpUtility.UrlEncode($"\"{Model.model.ProgramName}\""))"><i class="fa-solid fa-magnifying-glass"></i></a>
+
+                            </dd>
 
                             <dt class="col-sm-4">Kód programu</dt>
-                            <dd class="col-sm-8">@(Model.model.ProgramCode ?? "neuveden")</dd>
+                            <dd class="col-sm-8">
+                                @(Model.model.ProgramCode ?? "neuveden")
+                                <a title="Najít další dotace s tímto kódem" href="/dotace/hledat?q=programCode:@(System.Web.HttpUtility.UrlEncode($"\"{Model.model.ProgramCode}\""))"><i class="fa-solid fa-magnifying-glass"></i></a>
+                            </dd>
 
                             <dt class="col-sm-4">Rok schválení</dt>
                             <dd class="col-sm-8">@(Model.model.ApprovedYear)</dd>
+                            @if (Model.model.Hints.GetCategories().Count > 0)
+                            {
+                                <dt class="col-sm-4">
+                                    Kategorie <partial name="_categoryDisclaimer" model="@(new HlidacStatu.Web.Models.Dotace_categoryDisclaimer(){IconOnly= true})" />
+                                </dt>
+                                <dd class="col-sm-8">
+                                    @(Model.model.Hints.GetCategories().First().CalculatedCategoryDescription()) <a title="Najít další takové dotace" href="@Model.model.Hints.GetCategories().First().GetSearchUrl(false)"><i class="fa-solid fa-magnifying-glass"></i></a>
+                                    @if (Model.model.Hints.GetCategories().Count > 1)
+                                    {
+                                        <span>
+                                            (@(string.Join(',',
+                                               Model.model.Hints.GetCategories().Skip(1).Select(m =>
+                                               m.CalculatedCategoryDescription()
+                                               + $" <a title='Najít další takové dotace' href='@Model.model.Hints.GetCategories().First().GetSearchUrl(false)'><i class='fa-solid fa-magnifying-glass'></i>"
+                                               ))
+                                               ))
+                                        </span>
+                                    }
+                                </dd>
+                            }
                         </dl>
                     </div>
                 </div>

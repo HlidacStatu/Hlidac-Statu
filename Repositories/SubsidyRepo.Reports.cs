@@ -328,6 +328,13 @@ namespace HlidacStatu.Repositories
             return results;
         }
 
+        public static async Task<object> ProgramStatisticAsync(string programName)
+        {
+            object res = null;
+
+            return res;
+        }
+
         //Příjemci dotací z více krajů
         public static async Task<List<(string Ico, int DataSourceCount, decimal SumAssumedAmmount)>>
             DotacniExperti(int? rok)

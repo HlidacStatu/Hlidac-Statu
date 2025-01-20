@@ -2627,6 +2627,7 @@ public partial class Subsidy
 
         public void SetCategories(IEnumerable<Category> cats)
         {
+            _getCategories = null;
             if (cats?.Count() > 0)
             {
                 Category1 = cats.OrderByDescending(o => o.Probability).First();
@@ -2642,7 +2643,29 @@ public partial class Subsidy
                 Category3 = null;
             }
         }
-        
+
+        List<Category> _getCategories = null;
+
+        public List<Category> GetCategories()
+        {
+            if (_getCategories == null)
+            {
+                _getCategories = new List<Category>();
+                if (this.Category1 != null)
+                {
+                    _getCategories.Add(this.Category1);
+                }
+                if (this.Category2 != null)
+                {
+                    _getCategories.Add(this.Category2);
+                }
+                if (this.Category3 != null)
+                {
+                    _getCategories.Add(this.Category3);
+                }
+            }
+            return _getCategories;
+        }
         #endregion
     }
 }

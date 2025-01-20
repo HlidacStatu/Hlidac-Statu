@@ -40,7 +40,7 @@
 
 @section scripts
 {
-    <link rel="stylesheet" type="text/css" href="//cdn.datatables.net/1.13.4/css/jquery.dataTables.css"/>
+    <link rel="stylesheet" type="text/css" href="//cdn.datatables.net/1.13.4/css/jquery.dataTables.css" />
     <script type="text/javascript" charset="utf8" src="//cdn.datatables.net/1.13.4/js/jquery.dataTables.js"></script>
     <script src="~/bundles/highcharts"></script>
 }
@@ -76,5 +76,5 @@
 
 <h2 class="mt-4">Přehled dotací podle poskytovatelů@(yearText)</h2>
 <div>
-    @Html.DataToHTMLTable(data, dataTableOptions: HtmlExtensions.DatatableOptions(orderColumnIdx: 1, orderDirection: "desc"))
+    @Html.DataToHTMLTable(data, dataTableOptions: HtmlExtensions.DatatableOptions(orderColumnIdx: 2, orderDirection: "desc"))
 </div>

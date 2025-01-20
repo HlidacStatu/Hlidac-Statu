@@ -1,6 +1,7 @@
 ﻿using System;
 using Devmasters.Enums;
 using Nest;
+using static HlidacStatu.Entities.Firma.Statistics;
 
 namespace HlidacStatu.Entities;
 
@@ -28,6 +29,15 @@ public partial class Subsidy
             public string CalculatedCategoryDescription()
             {
                 return CalculatedCategory().ToNiceDisplayName();
+            }
+            public string GetSearchUrl(bool local) 
+            {
+                string url = $"/Dotace/hledat?q=oblast:{this.TypeValue}";
+
+                if (local == false)
+                    return "https://www.hlidacstatu.cz" + url;
+                else
+                    return url;
             }
         }
         
