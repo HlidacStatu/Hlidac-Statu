@@ -177,10 +177,10 @@
                     <div>
                         <h3 class="pt-2 text-body-emphasis">Úspěšní ve více krajích</h3>
                         <p>
-                            Největší příjemci dotací příjemci, kteří obdrželi krajské dotace ve více krajích. Souhrnně od roku @(HlidacStatu.Repositories.SubsidyRepo.DefaultLimitedYears.First()) i po jednotlivých letech.
+                            Největší příjemci dotací příjemci, kteří obdrželi krajské dotace ve více krajích. Souhrnně od roku @(HlidacStatu.Repositories.SubsidyRepo.DefaultKrajskeLimitedYears.First()) i po jednotlivých letech.
                         </p>
                         <a href="/Dotace/DotacniExperti" class="btn btn-primary btn-sm">Celkem</a>
-                        @foreach (var rok in HlidacStatu.Repositories.SubsidyRepo.DefaultLimitedYears.Reverse().Take(3))
+                        @foreach (var rok in HlidacStatu.Repositories.SubsidyRepo.DefaultKrajskeLimitedYears.Reverse().Take(3))
                         {
                             <a href="/Dotace/DotacniExperti?rok=@(rok)" class="btn btn-primary btn-sm">@rok</a>
                         }
@@ -281,7 +281,7 @@
                         <partial name="_categoryDisclaimer" />
                     </div>
                 </div>
-
+            </div>
         </li>
 
     </ul>
