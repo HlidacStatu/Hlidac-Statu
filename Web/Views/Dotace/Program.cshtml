@@ -15,7 +15,9 @@
     ViewBag.SubTitle = "Detail programu";
 
     string detailSearchQuery = $"&programName={System.Net.WebUtility.UrlEncode(programName)}&programCode={System.Net.WebUtility.UrlEncode(programCode)}";
-    string searchQuery = System.Net.WebUtility.UrlEncode($"hints.isOriginal:true AND programName:\"{programName}\" AND programCode:\"{programCode}\" ");
+    string prgQuery = (string.IsNullOrEmpty(programName) ? "" : $" AND programName:\"{programName}\"")
+        + (string.IsNullOrEmpty(programCode) ? "" : $" AND programCode:\"{programCode}\"");
+    string searchQuery = System.Net.WebUtility.UrlEncode($"hints.isOriginal:true {prgQuery} ");
 
 }
 @section scripts
