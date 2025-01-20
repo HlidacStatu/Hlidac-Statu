@@ -13,20 +13,31 @@ namespace HlidacStatu.Entities;
 public partial class Subsidy
 {
 
+    private string _id = null;
     [Keyword]
     public string Id
     {
         get
         {
-            var hashBytes = SHA256.HashData(Encoding.UTF8.GetBytes(
-                $"{Recipient.Ico}_{Recipient.Name}_{Recipient.YearOfBirth}_{Recipient.Obec}" +
-                $"_{ProjectCode}_{ProjectName}_{ProgramName}_{ProgramCode}" +
-                $"_{ApprovedYear}_{SubsidyProvider}_{SubsidyProviderIco}"));
-            var hash = Convert.ToHexString(hashBytes);
-            return $"{Metadata.DataSource}-{hash}";
+            if (_id == null)
+            {
+                var hashBytes = SHA256.HashData(Encoding.UTF8.GetBytes(
+                    $"{Recipient.Ico}_{Recipient.Name}_{Recipient.YearOfBirth}_{Recipient.Obec}" +
+                    $"_{ProjectCode}_{ProjectName}_{ProgramName}_{ProgramCode}" +
+                    $"_{ApprovedYear}_{SubsidyProvider}_{SubsidyProviderIco}"));
+                var hash = Convert.ToHexString(hashBytes);
+                _id = $"{Metadata.DataSource}-{hash}";
+            }
+            return _id;
+        }
+        set {
+            _id = value;
         }
     }
-    
+
+    public string NormalizedId => Id.RemoveAccents().Replace(" ", ".");
+
+
     /// <summary>
     /// Hash that helps to check duplicity
     /// </summary>

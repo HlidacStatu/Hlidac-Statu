@@ -9,13 +9,23 @@
 
 @if (Model.model != null)
 {
-    <div class="container py-4">
+    <div class=" pb-4">
         <!-- Main Card -->
         <div class="card shadow-sm">
 
             <!-- Project Title Section -->
             <div class="card-body border-bottom bg-light">
-                <h2 class="h5 text-muted mb-2">Název projektu</h2>
+                @if (Model.model.Hints.IsOriginal)
+                {
+                    <p class="text-success"><i class="fas fa-thumbs-up "></i> Toto je plnohodnotný záznam této dotace.</p>
+                }
+                else
+                {
+                    <p class="text-danger"><i class="fas fa-exclamation-circle "></i> Informace z tohoto zdroje nemusí mít nejlepší kvalitu, považujeme ho za duplikátní záznam, který nepočítáme do statistik.</p>
+                }
+
+
+                <h2 class="h5 text-muted mb-2">Název </h2>
                 <p class="h4 mb-0">
                     <add-bookmark item="@Model.model"></add-bookmark>
                     "@Model.model.DisplayProject" <small>@((Model.model.Hints.IsOriginal ? "" : "(duplikátní záznam)"))</small>
