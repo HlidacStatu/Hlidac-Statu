@@ -262,6 +262,9 @@ public partial class Subsidy
             [NiceDisplayName("Bilaterální zahraniční rozvojové spolupráce (ZRS), rozvoj občanské společnosti")]
             PodporaDoZahranici = 21000,
 
+            [NiceDisplayName("Investiční a dotační programy pro veřejnou správu")]
+            ProgramyProVerejnouSpravu = 40000,
+
             [NiceDisplayName("Fond hejtmana")]
             FondHejtmana = 51000,
 
@@ -300,6 +303,7 @@ public partial class Subsidy
             { CalculatedCategories.ObranaBezpecnost, new[] { "60162694", "krizové oddělení" } },
             { CalculatedCategories.CestovniRuchPamatky, new[] { "cestovní ruch" } },
             { CalculatedCategories.PravniStat, new string[] { } },
+            { CalculatedCategories.ProgramyProVerejnouSpravu, new string[] { } },
             { CalculatedCategories.PodporaPodnikani, new string[] { } },
             {
                 CalculatedCategories.ZamestnanostTrhPrace, new[]
@@ -420,7 +424,7 @@ public partial class Subsidy
                     "Informační a komunikační technologie 2023","FV02874",
                     "Pořízení, obnova a provozování ICT ve správě KPR","201011",
                     "Pořízení, obnova a provozování ICT ve správě KPR","201V01100",
-                    "SPH - pořízení, obnova a provozování ICT","101V01100", 
+                    "SPH - pořízení, obnova a provozování ICT","101V01100",
                 }
             },
             {
@@ -1142,6 +1146,38 @@ public partial class Subsidy
                     "Z980507000000",
                     "Fond pro neziskové organizace (NNO)","CZ 0004 01-04/05-0069-BG-0004-NROS",
                     "Podpora celostátních mezioborových sítí nestátních neziskových organizací agregace","Z040301000000",
+                }
+            },
+            {
+                CalculatedCategories.ProgramyProVerejnouSpravu, new string[]
+                {"235335",
+"Bankovní služby ČS a ČMZRB","398083",
+"Dotace na činnost SZIF","Z290201000000",
+"Dotace na činnost SZIF - Marketing","Z290202000000",
+"Obnova a dostavba areálu Lánské obory","201015",
+"Obnova a dostavba areálu pražského hradu","201012",
+"Obnova a dostavba areálu Pražského Hradu","301010",
+"Obnova a dostavba sídla prezidenta republiky v Lánech","201013",
+"Obnova a dostavba sídla prezidenta republiky v Lánech","301020",
+"Panel",
+"Pořízení a obnova movitého majetku ve správě KPR","201014",
+"Pořízení a tech. obnova invest. majetku Ministerstva zahraničních věcí na území České republiky","306010",
+"Pořízení a tech. obnova invest. majetku ve správě Ministerstva zemědělství","329010",
+"Pořízení a technická obnova investičního majetku v působnosti ČÚZK","346030",
+"Pořízení a technická obnova strojů a zařízení Kanceláře prezidenta","301030",
+"Program švýcarsko-české spolupráce - Fond partnerství","CH-CZ/FP",
+"Reprodukce majetku Českého báňského úřadu","348-248012",
+"Reprodukce majetku MZe a organizací systému řízení resortu","229012",
+"Reprodukce majetku MZe a organizací systému řízení resortu","129D01200",
+"Reprodukce majetku MZe a organizací systému řízení resortu","129V01200",
+"Reprodukce majetku MZe a organizací systému řízení resortu","329-229012",
+"Reprodukce majetku MZV na území ČR","206012",
+"Reprodukce majetku okresních úřadů a Státních okresních archivů","380011",
+"Reprodukce majetku organizací zřízených okresními úřady","380012",
+"Reprodukce majetku SÚJB","275012",
+"Reprodukce movitého majetku v OSS MZV","106V01300",
+"SPH – areál Pražského hradu a ostatní objekty","101V01200",
+"SPH – pořízení a obnova movitého majetku","101V01400",
                 }
             },
             {
