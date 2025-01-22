@@ -5,11 +5,11 @@ using HlidacStatu.Repositories;
 
 namespace HlidacStatu.Extensions;
 
-public static class SubsidyExtension
+public static class DotaceExtension
 {
-    public static string GetUrl(this Subsidy subsidy, bool local = true, bool enableRedirectToOriginal = true) => GetUrl(subsidy, local, string.Empty, enableRedirectToOriginal);
+    public static string GetUrl(this Dotace subsidy, bool local = true, bool enableRedirectToOriginal = true) => GetUrl(subsidy, local, string.Empty, enableRedirectToOriginal);
 
-    public static string GetUrl(this Subsidy subsidy, bool local, string foundWithQuery, bool enableRedirectToOriginal = true)
+    public static string GetUrl(this Dotace subsidy, bool local, string foundWithQuery, bool enableRedirectToOriginal = true)
     {
         //Uri.EscapeDataString instead of System.Net.WebUtility.UrlEncode to get space as %20 , not +
         string url = "/Dotace/Detail/" + Uri.EscapeDataString(subsidy.Id) + "?";
@@ -27,7 +27,7 @@ public static class SubsidyExtension
             return url;
     }
     
-    public static async Task<bool?> MaSkutecnehoMajiteleAsync(this Subsidy dotace)
+    public static async Task<bool?> MaSkutecnehoMajiteleAsync(this Dotace dotace)
     {
         if (dotace.ApprovedYear is null)
             return null;
@@ -49,13 +49,11 @@ public static class SubsidyExtension
         return true;
     }
 
-    public static ExpandoObject FlatExport(this Subsidy subsidy)
+    public static ExpandoObject FlatExport(this Dotace subsidy)
     {
         dynamic v = new ExpandoObject();
         v.Id = subsidy.Id;
-        v.FileName = subsidy.Metadata.FileName;
-        v.DataSource = subsidy.Metadata.DataSource;
-        v.IsHidden = subsidy.Metadata.IsHidden;
+        v.DataSource = subsidy.PrimaryDataSource;
         v.Url = subsidy.GetUrl(false);
         v.AssumedAmount = subsidy.AssumedAmount;
         v.RecipientIco = subsidy.Recipient.Ico;
@@ -104,9 +102,9 @@ public static class SubsidyExtension
         });
     }
       
-    public static string? Describe(this Subsidy subsidy)
+    public static string? Describe(this Dotace subsidy)
     {
-        if (Subsidy.DataSourceDescription.TryGetValue(subsidy.Metadata.DataSource, out var description))
+        if (Dotace.DataSourceDescription.TryGetValue(subsidy.PrimaryDataSource, out var description))
         {
             return description;
         }

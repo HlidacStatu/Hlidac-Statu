@@ -1,5 +1,6 @@
-﻿@using HlidacStatu.Extensions
-@model (HlidacStatu.Entities.Subsidy model, HlidacStatu.Web.Models.DotaceDetailOptions options)
+﻿@using HlidacStatu.Entities
+@using HlidacStatu.Extensions
+@model (HlidacStatu.Entities.Dotace model, HlidacStatu.Web.Models.DotaceDetailOptions options)
 
 @{
     var options = Model.options ?? new DotaceDetailOptions();
@@ -134,23 +135,18 @@
             <tr>
                 <th>Zdroj dat</th>
                 <td>
-                    @Model.model.Metadata.DataSource
+                    @Model.model.PrimaryDataSource
                     <br />
                     <div class="alert alert-info" role="alert">
                         @Model.model.Describe()
                     </div>
                 </td>
             </tr>
-            <tr>
-                <th>Datový soubor</th>
-                <td>
-                    @Model.model.Metadata.FileName
-                </td>
-            </tr>
+        
             <tr>
                 <th>Datum zpracování</th>
                 <td>
-                    @Model.model.Metadata.ProcessedDate.ToString("dd.MM.yyyy")
+                    @Model.model.ProcessedDate.ToString("dd.MM.yyyy")
                 </td>
             </tr>
             <tr>

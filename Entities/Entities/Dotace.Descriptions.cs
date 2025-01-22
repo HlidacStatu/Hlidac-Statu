@@ -2,7 +2,7 @@ using System.Collections.Generic;
 
 namespace HlidacStatu.Entities;
 
-public partial class Subsidy
+public partial class Dotace
 {
     
     public static readonly Dictionary<string, string> DataSourceDescription = new()

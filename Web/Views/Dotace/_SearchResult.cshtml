@@ -1,11 +1,11 @@
-﻿@model HlidacStatu.Repositories.Searching.SubsidySearchResult
+﻿@model HlidacStatu.Repositories.Searching.DotaceSearchResult
 @using HlidacStatu.Entities
 @using Nest
 
 <script>
     function changeOrder(sel) {
         var value = sel.value;
-        window.location.href = '@Html.Raw(HlidacStatu.Repositories.Searching.SubsidySearchResult.GetSearchUrl(
+        window.location.href = '@Html.Raw(HlidacStatu.Repositories.Searching.DotaceSearchResult.GetSearchUrl(
                                     Context.Request.Scheme + "://" + Context.Request.Host + Context.Request.Path
                                     , Model.Q))&order=' + value;
     }

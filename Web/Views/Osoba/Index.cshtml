@@ -341,7 +341,7 @@
 
     @{
         //var dotaceStat = Model.
-        var dotaceAggsH = new Nest.AggregationContainerDescriptor<Subsidy>()
+        var dotaceAggsH = new Nest.AggregationContainerDescriptor<Dotace>()
             .Terms("icos", s => s
                 .Field(f => f.Recipient.Ico)
                 .Size(5000)
@@ -349,8 +349,8 @@
                     .Sum("sum", ss => ss.Field(ff => ff.AssumedAmount))
                 )
             );
-        var dotaceSearchH = await SubsidyRepo.Searching.SimpleSearchAsync("osobaid:" + Model.NameId, 1, 1,
-            ((int)HlidacStatu.Repositories.Searching.SubsidySearchResult.SubsidyOrderResult.FastestForScroll).ToString(), false,
+        var dotaceSearchH = await DotaceRepo.Searching.SimpleSearchAsync("osobaid:" + Model.NameId, 1, 1,
+            ((int)HlidacStatu.Repositories.Searching.DotaceSearchResult.DotaceOrderResult.FastestForScroll).ToString(), false,
             dotaceAggsH, exactNumOfResults: true);
 
         decimal sumH = 0;

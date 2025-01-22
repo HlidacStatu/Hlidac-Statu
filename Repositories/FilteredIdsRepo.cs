@@ -49,10 +49,10 @@ namespace HlidacStatu.Repositories
             }
 
 
-            private static volatile Devmasters.Cache.Redis.Manager<string[], QueryBatch> cacheSubsidy
+            private static volatile Devmasters.Cache.Redis.Manager<string[], QueryBatch> cacheDotace
                 = Devmasters.Cache.Redis.Manager<string[], QueryBatch>.GetSafeInstance(
-                    "cachedIdsSubsidy",
-                    q => GetSubsidyIdsAsync(q).ConfigureAwait(false).GetAwaiter().GetResult(),
+                    "cachedIdsDotace",
+                    q => GetDotaceIdsAsync(q).ConfigureAwait(false).GetAwaiter().GetResult(),
                     TimeSpan.FromHours(24),
                     Devmasters.Config.GetWebConfigValue("RedisServerUrls").Split(';'),
                     Devmasters.Config.GetWebConfigValue("RedisBucketName"),
@@ -62,14 +62,14 @@ namespace HlidacStatu.Repositories
                     keyValueSelector: key => key.TaskPrefix + Devmasters.Crypto.Hash.ComputeHashToHex(key.Query)
                     );
 
-            public static string[] Subsidy(QueryBatch query, bool forceUpdate = false)
+            public static string[] Dotace(QueryBatch query, bool forceUpdate = false)
             {
                 if (forceUpdate)
                 {
-                    cacheSubsidy.Delete(query);
+                    cacheDotace.Delete(query);
                 }
 
-                return cacheSubsidy.Get(query);
+                return cacheDotace.Get(query);
 
             }
 
@@ -77,13 +77,13 @@ namespace HlidacStatu.Repositories
         }
 
 
-        public static async Task<string[]> GetSubsidyIdsAsync(QueryBatch query, int maxDegreeOfParallelism = 10, Devmasters.Batch.IMonitor monitor = null)
+        public static async Task<string[]> GetDotaceIdsAsync(QueryBatch query, int maxDegreeOfParallelism = 10, Devmasters.Batch.IMonitor monitor = null)
         {
-            var client = await Manager.GetESClient_SubsidyAsync();
-            var sq = SubsidyRepo.Searching.GetSimpleQuery(query.Query);
+            var client = await Manager.GetESClient_DotaceAsync();
+            var sq = DotaceRepo.Searching.GetSimpleQuery(query.Query);
             var ids = await Searching.Tools.GetAllIdsAsync(client, maxDegreeOfParallelism, sq,
                 logOutputFunc: query.LogOutputFunc, progressOutputFunc: query.ProgressOutputFunc,
-                monitor:(monitor ?? new MonitoredTaskRepo.ForBatch(part: $"GetSubsidyIdsAsync {query.Query}") ));
+                monitor:(monitor ?? new MonitoredTaskRepo.ForBatch(part: $"{nameof(GetDotaceIdsAsync)} {query.Query}") ));
 
             return ids.Result.ToArray();
         }

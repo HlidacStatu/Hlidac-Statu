@@ -2,7 +2,7 @@
 @using HlidacStatu.Entities
 @using HlidacStatu.Repositories
 @using HlidacStatu.XLib.Render
-@model List<(string Ico, Subsidy.Hint.CalculatedCategories Category, long Count, decimal Sum)>
+@model List<(string Ico, Dotace.Hint.CalculatedCategories Category, long Count, decimal Sum)>
 
 @{
     ViewBag.Title = "Hlídač dotací";
@@ -67,7 +67,7 @@
 <div class="mt-3"></div>
 @foreach (var category in Model.Select(m => m.Category).Distinct().OrderBy(m => m.ToNiceDisplayName()))
 {
-    List<ReportDataSource<(string Ico, Subsidy.Hint.CalculatedCategories Category, long Count, decimal Sum)>.Column> dataColumns =
+    List<ReportDataSource<(string Ico, Dotace.Hint.CalculatedCategories Category, long Count, decimal Sum)>.Column> dataColumns =
     [
         new()
         {
@@ -95,7 +95,7 @@
     ];
     
 
-    var data = new ReportDataSource<(string Ico, Subsidy.Hint.CalculatedCategories Category, long Count, decimal Sum)>(dataColumns);
+    var data = new ReportDataSource<(string Ico, Dotace.Hint.CalculatedCategories Category, long Count, decimal Sum)>(dataColumns);
 
     //for (var year = 2021; year < DateTime.Now.Year; year++)
     //{

@@ -193,7 +193,7 @@ namespace HlidacStatu.Web.Controllers
                 else if (id == "dotace")
                 {
 
-                    var sres = await SubsidyRepo.Searching.SimpleSearchAsync(q, 1, numOfRecords,
+                    var sres = await DotaceRepo.Searching.SimpleSearchAsync(q, 1, numOfRecords,
                         (Util.ParseTools.ToInt(o) ?? 0).ToString());
 
                     if (sres.IsValid == false && !string.IsNullOrEmpty(sres.Q))

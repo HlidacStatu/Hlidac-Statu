@@ -5,7 +5,7 @@
 @using HlidacStatu.Entities
 @using HlidacStatu.XLib.Render
 
-@model List<HlidacStatu.Repositories.SubsidyRepo.ProgramStatistics>
+@model List<HlidacStatu.Repositories.DotaceRepo.ProgramStatistics>
 
 @{
     string programName = ViewData["programName"] as string;
@@ -47,10 +47,10 @@
 }
 
 @{
-    var programPoLetech = new ReportDataSource<HlidacStatu.Repositories.SubsidyRepo.ProgramStatistics>(
+    var programPoLetech = new ReportDataSource<HlidacStatu.Repositories.DotaceRepo.ProgramStatistics>(
         new[]
         {
-            new ReportDataSource<HlidacStatu.Repositories.SubsidyRepo.ProgramStatistics>.Column()
+            new ReportDataSource<HlidacStatu.Repositories.DotaceRepo.ProgramStatistics>.Column()
             {
                 Name = "Rok",
                 TextRender = (x) => $"{x.Year}",
@@ -58,7 +58,7 @@
                 OrderValueRender = (x) => HlidacStatu.Util.RenderData.OrderValueFormat(x.Year),
                 CssClass = "number"
             },
-            new ReportDataSource<HlidacStatu.Repositories.SubsidyRepo.ProgramStatistics>.Column()
+            new ReportDataSource<HlidacStatu.Repositories.DotaceRepo.ProgramStatistics>.Column()
             {
                 Name = "Vyplaceno",
                 TextRender = (x) => HlidacStatu.Util.RenderData.NicePrice(x.SumAssumedAmount),
@@ -66,7 +66,7 @@
                 OrderValueRender = (x) => HlidacStatu.Util.RenderData.OrderValueFormat(x.SumAssumedAmount),
                 CssClass = "number"
             },
-            new ReportDataSource<HlidacStatu.Repositories.SubsidyRepo.ProgramStatistics>.Column()
+            new ReportDataSource<HlidacStatu.Repositories.DotaceRepo.ProgramStatistics>.Column()
             {
                 Name = "Průměrná dotace",
                 TextRender = (x) => HlidacStatu.Util.RenderData.NicePrice(x.AvgAssumedAmount),
@@ -74,7 +74,7 @@
                 OrderValueRender = (x) => HlidacStatu.Util.RenderData.OrderValueFormat(x.AvgAssumedAmount),
                 CssClass = "number"
             },
-            new ReportDataSource<HlidacStatu.Repositories.SubsidyRepo.ProgramStatistics>.Column()
+            new ReportDataSource<HlidacStatu.Repositories.DotaceRepo.ProgramStatistics>.Column()
             {
                 Name = "Maximální výše jednotlivé dotace",
                 TextRender = (x) => HlidacStatu.Util.RenderData.NicePrice(x.MaxAssumedAmount),
@@ -82,7 +82,7 @@
                 OrderValueRender = (x) => HlidacStatu.Util.RenderData.OrderValueFormat(x.MaxAssumedAmount),
                 CssClass = "number"
             },
-            new ReportDataSource<HlidacStatu.Repositories.SubsidyRepo.ProgramStatistics>.Column()
+            new ReportDataSource<HlidacStatu.Repositories.DotaceRepo.ProgramStatistics>.Column()
             {
                 Name = "Dotace pro firmy sponzorující polit.strany",
                 TextRender = (x) => HlidacStatu.Util.RenderData.NiceNumber(x.CountPolitickyAngazovanySubjekt),
@@ -90,7 +90,7 @@
                 OrderValueRender = (x) => HlidacStatu.Util.RenderData.OrderValueFormat(x.CountPolitickyAngazovanySubjekt),
                 CssClass = "number"
             },
-            new ReportDataSource<HlidacStatu.Repositories.SubsidyRepo.ProgramStatistics>.Column()
+            new ReportDataSource<HlidacStatu.Repositories.DotaceRepo.ProgramStatistics>.Column()
             {
                 Name = "Dotace pro nově založené firmy",
                 TextRender = (x) => HlidacStatu.Util.RenderData.NiceNumber(x.CountGrantedCompaniesFirstYear),
@@ -108,7 +108,7 @@
 <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.13.4/css/jquery.dataTables.css" />
 <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.js"></script>
 
-<partial name="_SearchForm" model="@(new HlidacStatu.Repositories.Searching.SubsidySearchResult())" />
+<partial name="_SearchForm" model="@(new HlidacStatu.Repositories.Searching.DotaceSearchResult())" />
 
 <h2>
     <add-bookmark item="@Model"></add-bookmark>
@@ -272,7 +272,7 @@
 
                         query += ")";
                         List<(string Ico, long Count, decimal Sum)> topPrijemci =
-                            await HlidacStatu.Repositories.SubsidyRepo.ReportTopPrijemciAsync(query);
+                            await HlidacStatu.Repositories.DotaceRepo.ReportTopPrijemciAsync(query);
 
                         var topPrijemciRDS = new ReportDataSource<(string Ico, long Pocet, decimal Castka)>(
                         new[]

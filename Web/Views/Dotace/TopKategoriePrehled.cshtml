@@ -3,7 +3,7 @@
 @using HlidacStatu.Repositories
 @using HlidacStatu.Repositories.SharedModels
 @using HlidacStatu.XLib.Render
-@model List<(Subsidy.Hint.CalculatedCategories Category, long Count, decimal Sum)>
+@model List<(Dotace.Hint.CalculatedCategories Category, long Count, decimal Sum)>
 
 @{
     ViewBag.Title = "Hlídač dotací";
@@ -32,7 +32,7 @@
     }
 
 
-    List<ReportDataSource<(Subsidy.Hint.CalculatedCategories Category, long Count, decimal Sum)>.Column> dataColumns =
+    List<ReportDataSource<(Dotace.Hint.CalculatedCategories Category, long Count, decimal Sum)>.Column> dataColumns =
     [
         new()
         {
@@ -58,7 +58,7 @@
             CssClass = "number"
         }
     ];
-    var data = new ReportDataSource<(Subsidy.Hint.CalculatedCategories Category, long Count, decimal Sum)>(dataColumns);
+    var data = new ReportDataSource<(Dotace.Hint.CalculatedCategories Category, long Count, decimal Sum)>(dataColumns);
 
     data.AddRows(Model.ToArray());
 

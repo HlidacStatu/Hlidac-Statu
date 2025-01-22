@@ -1,7 +1,7 @@
 ﻿@using HlidacStatu.Extensions
 @using System.Linq
 
-@model (HlidacStatu.Entities.Subsidy model, HlidacStatu.Web.Models.DotaceDetailOptions options)
+@model (HlidacStatu.Entities.Dotace model, HlidacStatu.Web.Models.DotaceDetailOptions options)
 
 @{
     var options = Model.options ?? new DotaceDetailOptions();
@@ -214,12 +214,11 @@
             <div class="card-footer bg-light">
                 <div class="row text-muted small">
                     <div class="col-md">
-                        <p class="mb-1">Datum zpracování: @Model.model.Metadata.ProcessedDate.ToString("dd.MM.yyyy")</p>
+                        <p class="mb-1">Datum zpracování: @Model.model.ProcessedDate.ToString("dd.MM.yyyy")</p>
                         <p class="mb-1">Stálý odkaz: <a style="overflow-wrap: anywhere;" href="@(Model.model.GetUrl(false,false))" target="_blank">@(Model.model.GetUrl(false, false))</a></p>
                     </div>
                     <div class="col-md text-md-end">
-                        <p class="mb-1">Zdroj dat: @Model.model.Metadata.DataSource</p>
-                        <p class="mb-1">Datový soubor: @Model.model.Metadata.FileName</p>
+                        <p class="mb-1">Zdroj dat: @Model.model.PrimaryDataSource</p>
                     </div>
                     <div class="col-md-12">
                         <button type="button" class="btn btn-info btn-sm" data-bs-toggle="modal" data-bs-target="#originalDM-@(Model.model.Id)">Zobrazit originální záznam z datového zdroje</button>

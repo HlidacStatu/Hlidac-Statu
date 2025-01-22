@@ -11,8 +11,8 @@
     }
     int? ftyp = ViewData["ftyp"] as int?;
     int? dtyp = ViewData["dtyp"] as int?;
-    HlidacStatu.Entities.Subsidy.Hint.Type? dTypeEnum = null;
-    if (Enum.TryParse<HlidacStatu.Entities.Subsidy.Hint.Type>(dtyp?.ToString(), out HlidacStatu.Entities.Subsidy.Hint.Type t)) {
+    HlidacStatu.Entities.Dotace.Hint.Type? dTypeEnum = null;
+    if (Enum.TryParse<HlidacStatu.Entities.Dotace.Hint.Type>(dtyp?.ToString(), out HlidacStatu.Entities.Dotace.Hint.Type t)) {
         dTypeEnum = t;
     }
 
@@ -20,7 +20,7 @@
 
     ViewBag.Title = "Hlídač dotací";
     ViewBag.SubTitle = $"Top příjemci " 
-        + (dtyp != null ? " " + HlidacStatu.Entities.Subsidy.Hint.TypeDescription(dtyp, 4, false) : "")
+        + (dtyp != null ? " " + HlidacStatu.Entities.Dotace.Hint.TypeDescription(dtyp, 4, false) : "")
         + $" dotací{yearText}"
         + (ftyp != null ? " pro " + HlidacStatu.Entities.Firma.TypSubjektuDescription(ftyp, 4, false) : "")
         ;
@@ -112,7 +112,7 @@
     />
 
 <h2 class="mt-4">Přehled největších příjemců
-    @((dtyp != null ? " " + HlidacStatu.Entities.Subsidy.Hint.TypeDescription(dtyp, 4, false) : ""))
+    @((dtyp != null ? " " + HlidacStatu.Entities.Dotace.Hint.TypeDescription(dtyp, 4, false) : ""))
     @(yearText) @((ftyp != null ? " - pouze " + HlidacStatu.Entities.Firma.TypSubjektuDescription(ftyp, 4, false) : ""))</h2>
 <div>
     <partial name="Charts/_SimpleChart" model="chartData"/>

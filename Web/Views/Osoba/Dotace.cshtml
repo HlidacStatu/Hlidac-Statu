@@ -111,8 +111,8 @@
         //             .Sum("sum", ss => ss.Field(ff => ff.DotaceCelkem))
         //         )
         //     );
-        var dotaceSearchH = await SubsidyRepo.Searching.SimpleSearchAsync("osobaid:" + Model.NameId, 1, 10000,
-            ((int)HlidacStatu.Repositories.Searching.SubsidySearchResult.SubsidyOrderResult.FastestForScroll).ToString(),
+        var dotaceSearchH = await DotaceRepo.Searching.SimpleSearchAsync("osobaid:" + Model.NameId, 1, 10000,
+            ((int)HlidacStatu.Repositories.Searching.DotaceSearchResult.DotaceOrderResult.FastestForScroll).ToString(),
             exactNumOfResults: true);
 
         

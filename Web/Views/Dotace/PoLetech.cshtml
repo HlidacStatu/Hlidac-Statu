@@ -1,6 +1,6 @@
 @using HlidacStatu.Entities
 @using HlidacStatu.XLib.Render
-@model List<(int Year, Subsidy.Hint.Type SubsidyType, decimal Sum)>
+@model List<(int Year, Dotace.Hint.Type DotaceType, decimal Sum)>
 
 @{
     ViewBag.Title = "Hlídač dotací";
@@ -28,17 +28,17 @@
 }
 
 @{
-    var dotaceDataKraj = new ReportDataSource<(int Year, Subsidy.Hint.Type SubsidyType, decimal Sum)>(
+    var dotaceDataKraj = new ReportDataSource<(int Year, Dotace.Hint.Type DotaceType, decimal Sum)>(
         new[]
         {
-            new ReportDataSource<(int Year, Subsidy.Hint.Type SubsidyType, decimal Sum)>.Column()
+            new ReportDataSource<(int Year, Dotace.Hint.Type DotaceType, decimal Sum)>.Column()
             {
                 Name = "Rok",
                 CssClass = "number",
                 HtmlRender = (x) => x.Year.ToString(),
                 TextRender = (x) => x.Year.ToString()
             },
-            new ReportDataSource<(int Year, Subsidy.Hint.Type SubsidyType, decimal Sum)>.Column()
+            new ReportDataSource<(int Year, Dotace.Hint.Type DotaceType, decimal Sum)>.Column()
             {
                 Name = "Částka",
                 TextRender = (x) => HlidacStatu.Util.RenderData.NicePrice(x.Sum),
@@ -47,17 +47,17 @@
                 CssClass = "number"
             }
         });
-    var dotaceDataStat = new ReportDataSource<(int Year, Subsidy.Hint.Type SubsidyType, decimal Sum)>(
+    var dotaceDataStat = new ReportDataSource<(int Year, Dotace.Hint.Type DotaceType, decimal Sum)>(
         new[]
         {
-            new ReportDataSource<(int Year, Subsidy.Hint.Type SubsidyType, decimal Sum)>.Column()
+            new ReportDataSource<(int Year, Dotace.Hint.Type DotaceType, decimal Sum)>.Column()
             {
                 Name = "Rok",
                 CssClass = "number",
                 HtmlRender = (x) => x.Year.ToString(),
                 TextRender = (x) => x.Year.ToString()
             },
-            new ReportDataSource<(int Year, Subsidy.Hint.Type SubsidyType, decimal Sum)>.Column()
+            new ReportDataSource<(int Year, Dotace.Hint.Type DotaceType, decimal Sum)>.Column()
             {
                 Name = "Částka",
                 TextRender = (x) => HlidacStatu.Util.RenderData.NicePrice(x.Sum),
@@ -67,8 +67,8 @@
             }
         });
     
-    dotaceDataKraj.AddRows(Model.Where(d => d.SubsidyType == Subsidy.Hint.Type.Krajska && d.Year >= 2021).ToList());
-    dotaceDataStat.AddRows(Model.Where(d => d.SubsidyType == Subsidy.Hint.Type.Evropska).ToList());
+    dotaceDataKraj.AddRows(Model.Where(d => d.DotaceType == Dotace.Hint.Type.Krajska && d.Year >= 2021).ToList());
+    dotaceDataStat.AddRows(Model.Where(d => d.DotaceType == Dotace.Hint.Type.Evropska).ToList());
     
    
     
@@ -78,7 +78,7 @@
         {
             Name = "Objem krajských dotací",
             Type = Series.SeriesType.column,
-            Data = Model.Where(d => d.SubsidyType == Subsidy.Hint.Type.Krajska && d.Year >= 2021)
+            Data = Model.Where(d => d.DotaceType == Dotace.Hint.Type.Krajska && d.Year >= 2021)
                 .OrderBy(s => s.Year)
                 .Select(s => new SeriesData(s.Year, s.Sum))
                 .ToArray(),
@@ -91,7 +91,7 @@
         {
             Name = "Objem státních a evropských dotací",
             Type = Series.SeriesType.column,
-            Data = Model.Where(d => d.SubsidyType == Subsidy.Hint.Type.Evropska)
+            Data = Model.Where(d => d.DotaceType == Dotace.Hint.Type.Evropska)
                 .OrderBy(s => s.Year)
                 .Select(s => new SeriesData(s.Year, s.Sum)).ToArray(),
 

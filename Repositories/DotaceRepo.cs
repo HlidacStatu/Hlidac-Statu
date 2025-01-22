@@ -2,13 +2,12 @@ using Nest;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
 using HlidacStatu.Connectors;
 using HlidacStatu.Entities;
-using HlidacStatu.Repositories.Searching;
 using Serilog;
 using HlidacStatu.Extensions;
+using HlidacStatu.Repositories.Searching;
 
 namespace HlidacStatu.Repositories
 {
@@ -24,7 +23,7 @@ namespace HlidacStatu.Repositories
         public static async Task SaveAsync(Dotace dotace)
         {
             Logger.Debug(
-                $"Saving Dotace {dotace.Metadata.RecordNumber} from {dotace.Metadata.DataSource}/{dotace.Metadata.FileName}");
+                $"Saving Dotace {dotace.Id} from {dotace.PrimaryDataSource}");
             if (dotace is null) throw new ArgumentNullException(nameof(dotace));
             
 
@@ -39,7 +38,7 @@ namespace HlidacStatu.Repositories
             }
 
             Logger.Debug(
-                $"Dotace {dotace.Metadata.RecordNumber} from {dotace.Metadata.DataSource}/{dotace.Metadata.FileName} saved");
+                $"Dotace {dotace.Id} from {dotace.PrimaryDataSource} saved");
         
         }
 
@@ -173,6 +172,38 @@ namespace HlidacStatu.Repositories
                 .Term(f => f.Recipient.Ico, ico);
 
             return GetAllAsync(qc);
+        }
+        
+        public static async Task MergeSubsidiesToDotaceAsync()
+        {
+            var originalsQuery = new QueryContainerDescriptor<Subsidy>()
+                .Bool(b => b
+                    .Must(
+                        m => m.Term(t => t.Metadata.IsHidden, false),
+                        m => m.Term(t => t.Hints.IsOriginal, true)
+                    )
+                );
+            
+            var idsToMerge = SubsidyRepo.SubsidyClient.SimpleGetAllIds(5, originalsQuery);
+
+            foreach (var idToMerge in idsToMerge)
+            {
+                var originalSubsidy = await SubsidyRepo.GetAsync(idToMerge);
+                Dotace dotaceRecord = new Dotace()
+                {
+
+                };
+                
+                foreach (var duplicateId in originalSubsidy.Hints.Duplicates)
+                {
+                    var duplicateSubsidy = await SubsidyRepo.GetAsync(duplicateId);
+                    UpdateUnsetProperties(originalSubsidy, duplicateSubsidy);
+                }
+
+                originalSubsidy.RawData = new();
+                
+            }
+            
         }
     }
 }

@@ -3,8 +3,8 @@
 @using System.Linq;
 
 @{
-    int rokOd = Model.RokOd ?? HlidacStatu.Repositories.SubsidyRepo.DefaultLimitedYears.Min();
-    int rokDo = Model.RokDo ?? HlidacStatu.Repositories.SubsidyRepo.DefaultLimitedYears.Max();
+    int rokOd = Model.RokOd ?? HlidacStatu.Repositories.DotaceRepo.DefaultLimitedYears.Min();
+    int rokDo = Model.RokDo ?? HlidacStatu.Repositories.DotaceRepo.DefaultLimitedYears.Max();
     string urlDelimiter = "?";
     if (Model.Url.Contains("?")) {
         urlDelimiter = "&";

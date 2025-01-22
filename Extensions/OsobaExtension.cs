@@ -29,8 +29,8 @@ public static class OsobaExtension2
         if (showIt)
             return showIt;
 
-        var dotace = await SubsidyRepo.Searching.SimpleSearchAsync("osobaid:" + osoba.NameId, 0, 0,
-            ((int)HlidacStatu.Repositories.Searching.SubsidySearchResult.SubsidyOrderResult.FastestForScroll).ToString(),
+        var dotace = await DotaceRepo.Searching.SimpleSearchAsync("osobaid:" + osoba.NameId, 0, 0,
+            ((int)HlidacStatu.Repositories.Searching.DotaceSearchResult.DotaceOrderResult.FastestForScroll).ToString(),
             exactNumOfResults: true);
         showIt = dotace.Total > 0;
         if (showIt)
@@ -59,8 +59,8 @@ public static class OsobaExtension2
             Util.Helper.CreateBaseTask<HlidacStatu.Searching.Search.ISearchResult, VerejnaZakazkaSearchData>(
                 VerejnaZakazkaRepo.Searching.SimpleSearchAsync("osobaid:" + osoba.NameId, null, 1, 1, "0",
                     cancellationToken: cts.Token)),
-            Util.Helper.CreateBaseTask<HlidacStatu.Searching.Search.ISearchResult, SubsidySearchResult>(
-                SubsidyRepo.Searching.SimpleSearchAsync("osobaid:" + osoba.NameId, 1, 1, "0",
+            Util.Helper.CreateBaseTask<HlidacStatu.Searching.Search.ISearchResult, DotaceSearchResult>(
+                DotaceRepo.Searching.SimpleSearchAsync("osobaid:" + osoba.NameId, 1, 1, "0",
                     cancellationToken: cts.Token)),
         };
 

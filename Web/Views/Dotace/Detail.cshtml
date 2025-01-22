@@ -1,21 +1,21 @@
 ﻿@using HlidacStatu.Extensions
-@model HlidacStatu.Entities.Subsidy
+@model HlidacStatu.Entities.Dotace
 
 @{
     ViewBag.Title = "Dotace " + Model.DisplayProject;
     ViewBag.SubTitle = "Detail dotace";
-    HlidacStatu.Entities.Subsidy origSubsidy = null;
+    HlidacStatu.Entities.Dotace origDotace = null;
     if (Model.Hints.IsOriginal == false)
     {
-        origSubsidy = await HlidacStatu.Repositories.SubsidyRepo.GetAsync(Model.Hints.OriginalSubsidyId);
+        origDotace = await HlidacStatu.Repositories.DotaceRepo.GetAsync(Model.Hints.OriginalSubsidyId);
     }
 
-    var allDotace = new List<HlidacStatu.Entities.Subsidy>();
+    var allDotace = new List<HlidacStatu.Entities.Dotace>();
     allDotace.Add(Model);
     if (Model.Hints.HasDuplicates)
     {
         allDotace.AddRange(Model.Hints.Duplicates
-            .Select(id => HlidacStatu.Repositories.SubsidyRepo.GetAsync(id).Result)
+            .Select(id => HlidacStatu.Repositories.DotaceRepo.GetAsync(id).Result)
             .Where(m => m != null));
     }
     allDotace = allDotace.OrderBy(o => o.Hints.IsOriginal == false).ToList();
@@ -40,7 +40,7 @@
 <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.13.4/css/jquery.dataTables.css" />
 <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.js"></script>
 
-<partial name="_SearchForm" model="@(new HlidacStatu.Repositories.Searching.SubsidySearchResult())" />
+<partial name="_SearchForm" model="@(new HlidacStatu.Repositories.Searching.DotaceSearchResult())" />
 
 <h2>
     <add-bookmark item="@Model"></add-bookmark>
@@ -64,10 +64,10 @@
                     Náš systém identifikoval, že uvedená dotace jsou stejná jako další dotace na naší databázi.
                     Tuto dotaci považujeme za duplikátní a nezapočítáváme ji do statistik.
                 </p>
-                @if (origSubsidy != null)
+                @if (origDotace != null)
                 {
                     <p>
-                        Zde <a href="@origSubsidy.GetUrl(false)">najdete plnohodnotný záznam této dotace</a>.
+                        Zde <a href="@origDotace.GetUrl(false)">najdete plnohodnotný záznam této dotace</a>.
                     </p>
                 }
             </div>
@@ -102,7 +102,7 @@
                         data-bs-target="#source-@(dot.NormalizedId)"
                         type="button"
                         role="tab">
-                    @Html.Raw(dot.Hints.IsOriginal ? $"Dotace <b>{Devmasters.TextUtil.ShortenText(dot.Metadata.DataSource, 20)}</b>" : $"Duplikát z {Devmasters.TextUtil.ShortenText(dot.Metadata.DataSource, 20)}")
+                    @Html.Raw(dot.Hints.IsOriginal ? $"Dotace <b>{Devmasters.TextUtil.ShortenText(dot.PrimaryDataSource, 20)}</b>" : $"Duplikát z {Devmasters.TextUtil.ShortenText(dot.PrimaryDataSource, 20)}")
                 </button>
             </li>
 

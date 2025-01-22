@@ -30,7 +30,7 @@ namespace HlidacStatu.Repositories
         public static async Task<List<ProgramStatistics>> ProgramStatisticAsync(string programName, string programCode)
         {
             
-            AggregationContainerDescriptor<Subsidy> aggs = new AggregationContainerDescriptor<Subsidy>()
+            AggregationContainerDescriptor<Dotace> aggs = new AggregationContainerDescriptor<Dotace>()
                 .Terms("perYear", t => t
                     .Field(f => f.ApprovedYear)
                     .Size(10000)
@@ -100,7 +100,7 @@ namespace HlidacStatu.Repositories
             }
             
             var res = await DotaceRepo.Searching.SimpleSearchAsync(query, 1, 0,
-                Repositories.Searching.SubsidySearchResult.SubsidyOrderResult.FastestForScroll,
+                Repositories.Searching.DotaceSearchResult.DotaceOrderResult.FastestForScroll,
                 anyAggregation: aggs);
             if (res is null)
             {
@@ -189,7 +189,7 @@ namespace HlidacStatu.Repositories
         {
             limitedYears = limitedYears ?? Enumerable.Range(2010, DateTime.Now.Year - 2010).ToArray();
 
-            AggregationContainerDescriptor<Subsidy> aggs = new AggregationContainerDescriptor<Subsidy>()
+            AggregationContainerDescriptor<Dotace> aggs = new AggregationContainerDescriptor<Dotace>()
                 .Terms("perYear", t => t
                     .Field(f => f.ApprovedYear)
                     .Size(10000)
@@ -266,7 +266,7 @@ namespace HlidacStatu.Repositories
         public static async Task<List<(string Ico, long Count, decimal Sum)>> ReportTopPrijemciAsync(string query, int numOfItems = 100)
         {
 
-            AggregationContainerDescriptor<Subsidy> aggs = new AggregationContainerDescriptor<Subsidy>()
+            AggregationContainerDescriptor<Dotace> aggs = new AggregationContainerDescriptor<Dotace>()
                 .Terms("perIco", t => t
                     .Field(f => f.Recipient.Ico)
                     .Size(numOfItems)
@@ -319,7 +319,7 @@ namespace HlidacStatu.Repositories
         public static async Task<List<(string IcoPoskytovatele, decimal Sum)>> ReportPoskytovatelePoLetechAsync(
             Dotace.Hint.Type? typDotace, int? rok)
         {
-            AggregationContainerDescriptor<Subsidy> aggs = new AggregationContainerDescriptor<Subsidy>()
+            AggregationContainerDescriptor<Dotace> aggs = new AggregationContainerDescriptor<Dotace>()
                 .Terms("perProviderIco", st => st
                     .Field(f => f.SubsidyProviderIco)
                     .Size(10000)
@@ -371,7 +371,7 @@ namespace HlidacStatu.Repositories
     Task<List<(Dotace.Hint.CalculatedCategories Category, long Count, decimal Sum)>>
     PoKategoriichAsync(int? rok = null, int? cat = null, string ico = null)
         {
-            AggregationContainerDescriptor<Subsidy> aggs = new AggregationContainerDescriptor<Subsidy>()
+            AggregationContainerDescriptor<Dotace> aggs = new AggregationContainerDescriptor<Dotace>()
                 .Terms("perCategory", st => st
                     .Field(f => f.Hints.Category1.TypeValue)
                     .Size(10000)
@@ -434,7 +434,7 @@ namespace HlidacStatu.Repositories
             Task<List<(string Ico, Dotace.Hint.CalculatedCategories Category, long Count, decimal Sum)>>
             ReportPrijemciPoKategoriichAsync(int? rok = null, int? cat = null)
         {
-            AggregationContainerDescriptor<Subsidy> aggs = new AggregationContainerDescriptor<Subsidy>()
+            AggregationContainerDescriptor<Dotace> aggs = new AggregationContainerDescriptor<Dotace>()
                 .Terms("perCategory", st => st
                     .Field(f => f.Hints.Category1.TypeValue)
                     .Size(10000)
@@ -507,7 +507,7 @@ namespace HlidacStatu.Repositories
         public static async Task<List<(string Ico, int DataSourceCount, decimal SumAssumedAmmount)>>
             DotacniExperti(int? rok)
         {
-            AggregationContainerDescriptor<Subsidy> aggs = new AggregationContainerDescriptor<Subsidy>()
+            AggregationContainerDescriptor<Dotace> aggs = new AggregationContainerDescriptor<Dotace>()
                 .Terms("perIco", ta => ta
                     .Field(f => f.Recipient.Ico)
                     .Size(100)
@@ -516,7 +516,7 @@ namespace HlidacStatu.Repositories
                     )
                     .Aggregations(aa => aa
                         .Cardinality("uniqueDataSource", ca => ca
-                            .Field(f => f.Metadata.DataSource.Suffix("keyword"))
+                            .Field(f => f.PrimaryDataSource.Suffix("keyword"))
                         )
                         .Sum("sumAssumedAmount", sa => sa
                             .Field(f => f.AssumedAmount)
@@ -572,7 +572,7 @@ namespace HlidacStatu.Repositories
         public static async Task<List<(string Ico, decimal SumAssumedAmmount)>>
             DotovaniSponzori(int? rok)
         {
-            AggregationContainerDescriptor<Subsidy> aggs = new AggregationContainerDescriptor<Subsidy>()
+            AggregationContainerDescriptor<Dotace> aggs = new AggregationContainerDescriptor<Dotace>()
                 .Terms("perIco", t => t
                     .Field(f => f.Recipient.Ico)
                     .Size(10000)
@@ -626,7 +626,7 @@ namespace HlidacStatu.Repositories
             Task<List<(string ProgramName, string ProgramCode, string SubsidyProviderIco, decimal AssumedAmountSummed)>>
             TopDotacniProgramy(Dotace.Hint.Type typDotace, int? rok)
         {
-            var aggs = new AggregationContainerDescriptor<Subsidy>()
+            var aggs = new AggregationContainerDescriptor<Dotace>()
                 .MultiTerms("distinct_programs", mt => mt
                     .Size(10000)
                     .Terms(t =>
