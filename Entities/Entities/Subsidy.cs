@@ -111,9 +111,9 @@ public partial class Subsidy
     public string DisplayProject => string.IsNullOrWhiteSpace(ProjectName) ? ProjectCode : ProjectName;
 
     [Object]
-    public List<RozhodnutiItem> Rozhodnuti { get; set; } = new();
+    public List<Dotace.RozhodnutiItem> Rozhodnuti { get; set; } = new();
     [Object]
-    public List<CerpaniItem> Cerpani { get; set; } = new();
+    public List<Dotace.CerpaniItem> Cerpani { get; set; } = new();
     
     /// <summary>
     /// Original record for people to display in case of need
@@ -180,21 +180,6 @@ public partial class Subsidy
 
         [Ignore]
         public string DisplayName => string.IsNullOrWhiteSpace(HlidacName) ? Name : HlidacName;
-    }
-    
-    public class RozhodnutiItem
-    {
-        public string? FinancniZdroj { get; set; }
-        [Number]
-        public decimal? Amount { get; set; }
-    }
-    
-    public class CerpaniItem
-    {
-        [Number]
-        public int? Year { get; set; }
-        [Number]
-        public decimal? Amount { get; set; }
     }
     
     private static string CalculateDuplaHash(string text)

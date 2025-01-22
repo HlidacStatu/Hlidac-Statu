@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Devmasters;
 using Nest;
 
@@ -10,16 +11,14 @@ public partial class Dotace
 {
 
     [Keyword]
-    public string Id {get; set;} 
-    
-    public string NormalizedId => Id.RemoveAccents().Replace(" ", ".");
+    public string Id { get; set; }
 
-    
+
     [Keyword]
-    public string[] SourceIds { get; set; }
-    
+    public HashSet<string> SourceIds { get; set; } = new();
+
     [Keyword]
-    public string[] Tags { get; set; }
+    public HashSet<string> Tags { get; set; } = new();
     
     
     public string PrimaryDataSource { get; set; } //no reason for this now?
@@ -127,6 +126,60 @@ public partial class Dotace
         public int? Year { get; set; }
         [Number]
         public decimal? Amount { get; set; }
+    }
+    
+    public void UpdateFromSubsidy(Subsidy subsidy)
+    {
+        bool isCreating = false;
+        if (string.IsNullOrWhiteSpace(subsidy.Id))
+        {
+            Id ??= subsidy.Id.RemoveAccents().Replace(" ", ".");
+            isCreating = true;
+            ProcessedDate = subsidy.Metadata.ProcessedDate;
+            PrimaryDataSource = subsidy.Metadata.DataSource;
+        }
+        
+        SourceIds.Add(subsidy.Id);
+        ApprovedYear ??= subsidy.ApprovedYear;
+        SubsidyAmount ??= subsidy.SubsidyAmount;
+        PayedAmount ??= subsidy.PayedAmount;
+        ReturnedAmount ??= subsidy.ReturnedAmount;
+        Category = string.IsNullOrWhiteSpace(Category) ? subsidy.Category : Category;
+        ProjectCode = string.IsNullOrWhiteSpace(ProjectCode) ? subsidy.ProjectCode : ProjectCode;
+        ProjectName = string.IsNullOrWhiteSpace(ProjectName) ? subsidy.ProjectName : ProjectName;
+        ProjectDescription = string.IsNullOrWhiteSpace(ProjectDescription) ? subsidy.ProjectDescription : ProjectDescription;
+        ProgramCode = string.IsNullOrWhiteSpace(ProgramCode) ? subsidy.ProgramCode : ProgramCode;
+        ProgramName = string.IsNullOrWhiteSpace(ProgramName) ? subsidy.ProgramName : ProgramName;
+        SubsidyProvider ??= subsidy.SubsidyProvider;
+        SubsidyProviderIco ??= subsidy.SubsidyProviderIco;
+        
+        Cerpani = !Cerpani.Any() ? subsidy.Cerpani : Cerpani;
+        Rozhodnuti = !Rozhodnuti.Any() ? subsidy.Rozhodnuti : Rozhodnuti;
+        
+        //copy all properties for recipient
+        Recipient.Ico ??= subsidy.Recipient.Ico;
+        Recipient.Name ??= subsidy.Recipient.Name;
+        Recipient.HlidacName ??= subsidy.Recipient.HlidacName;
+        Recipient.YearOfBirth ??= subsidy.Recipient.YearOfBirth;
+        Recipient.Obec ??= subsidy.Recipient.Obec;
+        Recipient.Okres ??= subsidy.Recipient.Okres;
+        Recipient.PSC ??= subsidy.Recipient.PSC;
+        Recipient.HlidacNameId ??= subsidy.Recipient.HlidacNameId;
+        
+        //copy all properties for hints
+        if (isCreating)
+        {
+            Hints.IsOriginal = subsidy.Hints.IsOriginal;
+            Hints.OriginalSubsidyId = subsidy.Hints.OriginalSubsidyId;
+            Hints.RecipientStatus = subsidy.Hints.RecipientStatus;
+            Hints.SubsidyType = subsidy.Hints.SubsidyType;
+            Hints.Category1 ??= subsidy.Hints.Category1;
+            Hints.Category2 ??= subsidy.Hints.Category2;
+            Hints.Category3 ??= subsidy.Hints.Category3;
+            Hints.RecipientTypSubjektu = subsidy.Hints.RecipientTypSubjektu;
+            Hints.RecipientPolitickyAngazovanySubjekt = subsidy.Hints.RecipientPolitickyAngazovanySubjekt;
+            Hints.RecipientPocetLetOdZalozeni = subsidy.Hints.RecipientPocetLetOdZalozeni;
+        }
     }
     
 }

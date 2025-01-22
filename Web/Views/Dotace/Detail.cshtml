@@ -97,9 +97,9 @@
             count++;
             <li class="nav-item " role="presentation">
                 <button class="@classAttributes "
-                        id="source-@(dot.NormalizedId)-tab"
+                        id="source-@(dot.Id)-tab"
                         data-bs-toggle="tab"
-                        data-bs-target="#source-@(dot.NormalizedId)"
+                        data-bs-target="#source-@(dot.Id)"
                         type="button"
                         role="tab">
                     @Html.Raw(dot.Hints.IsOriginal ? $"Dotace <b>{Devmasters.TextUtil.ShortenText(dot.PrimaryDataSource, 20)}</b>" : $"Duplikát z {Devmasters.TextUtil.ShortenText(dot.PrimaryDataSource, 20)}")
@@ -120,7 +120,7 @@
         {
 
             count++;
-            <div class="@classAttributes" id="source-@(dot.NormalizedId)" role="tabpanel">
+            <div class="@classAttributes" id="source-@(dot.Id)" role="tabpanel">
 
 
                 <partial name="_detailTable" model="(@dot, tbloptions)" />

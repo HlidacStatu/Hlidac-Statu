@@ -1,5 +1,6 @@
 using System.Dynamic;
 using System.Text.Json;
+using Devmasters;
 using HlidacStatu.Entities;
 using HlidacStatu.Repositories;
 
@@ -111,4 +112,5 @@ public static class DotaceExtension
 
         return null;
     }
+    
 }

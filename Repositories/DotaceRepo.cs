@@ -184,26 +184,81 @@ namespace HlidacStatu.Repositories
                     )
                 );
             
-            var idsToMerge = SubsidyRepo.SubsidyClient.SimpleGetAllIds(5, originalsQuery);
+            var originalSubsidyIds = SubsidyRepo.SubsidyClient.SimpleGetAllIds(5, originalsQuery);
 
-            foreach (var idToMerge in idsToMerge)
+            foreach (var originalSubsidyId in originalSubsidyIds)
             {
-                var originalSubsidy = await SubsidyRepo.GetAsync(idToMerge);
-                Dotace dotaceRecord = new Dotace()
-                {
-
-                };
+                Dotace dotaceRecord = new Dotace();
+                var originalSubsidy = await SubsidyRepo.GetAsync(originalSubsidyId);
+                FixRecipientFromRawData(originalSubsidy);
+                dotaceRecord.UpdateFromSubsidy(originalSubsidy);
                 
                 foreach (var duplicateId in originalSubsidy.Hints.Duplicates)
                 {
                     var duplicateSubsidy = await SubsidyRepo.GetAsync(duplicateId);
-                    UpdateUnsetProperties(originalSubsidy, duplicateSubsidy);
+                    FixRecipientFromRawData(duplicateSubsidy);
+                    dotaceRecord.UpdateFromSubsidy(duplicateSubsidy);
                 }
 
-                originalSubsidy.RawData = new();
-                
+                try
+                {
+                    await SaveAsync(dotaceRecord);
+                }
+                catch (Exception e)
+                {
+                    Logger.Error(e, $"Failed to save dotace for {originalSubsidy.Id}");
+                }
             }
             
+        }
+
+        public static void FixRecipientFromRawData(Subsidy subsidy)
+        {
+            try
+            {
+                //fix dotinfo
+                if (subsidy.Metadata.DataSource.ToLower() == "dotinfo")
+                {
+                    if (subsidy.RawData.FirstOrDefault() is Dictionary<string, object> dict &&
+                        dict.TryGetValue("ucastnik", out var ucastnikObj) &&
+                        ucastnikObj is Dictionary<string, object> ucastnikDict)
+                    {
+                        if (string.IsNullOrWhiteSpace(subsidy.Recipient.Name) && 
+                            ucastnikDict.TryGetValue("prijemce dotace jmeno", out var nameObj) && nameObj is string name)
+                        {
+                            subsidy.Recipient.Name = name;
+                        }
+                        
+                        if (subsidy.Recipient.YearOfBirth is null && 
+                            ucastnikDict.TryGetValue("rc ucastnika", out var rcObj) && rcObj is string rc)
+                        {
+                            //take first two letters and make a year from them
+                            var year = int.Parse(rc.Substring(0, 2));
+                            
+                            subsidy.Recipient.YearOfBirth = year < 40 ? 2000 + year : 1900 + year;
+                        }
+                        
+                    }
+                    
+                }
+                
+                //fix cedr
+                if (subsidy.Metadata.DataSource.ToLower() == "cedr")
+                {
+                    if (string.IsNullOrWhiteSpace(subsidy.Recipient.Name))
+                    {
+                        if (subsidy.RawData.FirstOrDefault() is Dictionary<string, object> dict &&
+                            dict.TryGetValue("prijemcejmeno", out var nameObj) && nameObj is string name)
+                        {
+                            subsidy.Recipient.Name = name;
+                        } 
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                Logger.Warning(e, $"Failed to unwrap data from raw with subsidy{subsidy.Id}");
+            }
         }
     }
 }
