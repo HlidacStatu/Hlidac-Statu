@@ -7,13 +7,13 @@ using HlidacStatu.Entities;
 
 namespace HlidacStatu.Repositories
 {
-    public static partial class SubsidyRepo
+    public static partial class DotaceRepo
     {
         public class ProgramStatistics
         {
             public int Year { get; set; }
             public string ProviderIco { get; set; }
-            public Subsidy.Hint.Type SubsidyType { get; set; }
+            public Dotace.Hint.Type SubsidyType { get; set; }
             public int RecipientIcoCount { get; set; }
             public decimal SumAssumedAmount { get; set; }
             public decimal MinAssumedAmount { get; set; }
@@ -99,7 +99,7 @@ namespace HlidacStatu.Repositories
                 query += ")";
             }
             
-            var res = await SubsidyRepo.Searching.SimpleSearchAsync(query, 1, 0,
+            var res = await DotaceRepo.Searching.SimpleSearchAsync(query, 1, 0,
                 Repositories.Searching.SubsidySearchResult.SubsidyOrderResult.FastestForScroll,
                 anyAggregation: aggs);
             if (res is null)
@@ -132,7 +132,7 @@ namespace HlidacStatu.Repositories
                                         };
                                         results.Add(programStat);
                                         
-                                        if (Enum.TryParse<Subsidy.Hint.Type>(subsidyTypeBucket.Key.ToString(),
+                                        if (Enum.TryParse<Dotace.Hint.Type>(subsidyTypeBucket.Key.ToString(),
                                                 out var subsidyType))
                                         {
                                             programStat.SubsidyType = subsidyType;
@@ -184,7 +184,7 @@ namespace HlidacStatu.Repositories
             return results;
         }
 
-        public static async Task<List<(int Year, Subsidy.Hint.Type SubsidyType, decimal Sum)>> ReportPoLetechAsync(
+        public static async Task<List<(int Year, Dotace.Hint.Type SubsidyType, decimal Sum)>> ReportPoLetechAsync(
             bool limitYears = true, int[] limitedYears = null)
         {
             limitedYears = limitedYears ?? Enumerable.Range(2010, DateTime.Now.Year - 2010).ToArray();
@@ -206,7 +206,7 @@ namespace HlidacStatu.Repositories
                     )
                 );
 
-            var res = await SubsidyRepo.Searching.SimpleSearchAsync("hints.isOriginal:true", 1, 0, "666",
+            var res = await DotaceRepo.Searching.SimpleSearchAsync("hints.isOriginal:true", 1, 0, "666",
                 anyAggregation: aggs);
             if (res is null)
             {
@@ -214,7 +214,7 @@ namespace HlidacStatu.Repositories
             }
 
             // Initialize the results dictionary
-            List<(int Year, Subsidy.Hint.Type SubsidyType, decimal Sum)> results = new();
+            List<(int Year, Dotace.Hint.Type SubsidyType, decimal Sum)> results = new();
 
             // Parse the aggregation results
             if (res.ElasticResults.Aggregations["perYear"] is BucketAggregate perYearBA)
@@ -227,7 +227,7 @@ namespace HlidacStatu.Repositories
                         {
                             foreach (KeyedBucket<object> subsidyTypeBucket in subsidyTypeBA.Items)
                             {
-                                if (Enum.TryParse<Subsidy.Hint.Type>(subsidyTypeBucket.Key.ToString(),
+                                if (Enum.TryParse<Dotace.Hint.Type>(subsidyTypeBucket.Key.ToString(),
                                         out var subsidyType))
                                 {
                                     if (subsidyTypeBucket["sumAssumedAmount"] is ValueAggregate sumBA)
@@ -247,7 +247,7 @@ namespace HlidacStatu.Repositories
 
         public static async Task<List<(string Ico, long Count, decimal Sum)>> ReportTopPrijemciAsync(int? rok,
             Firma.TypSubjektuEnum? recipientType = null,
-            Subsidy.Hint.Type? subsidyType = null)
+            Dotace.Hint.Type? subsidyType = null)
         {
             string query = "hints.isOriginal:true AND _exists_:recipient.ico AND NOT recipient.ico:\"\"";
             if (recipientType.HasValue)
@@ -280,7 +280,7 @@ namespace HlidacStatu.Repositories
 
 
 
-            var res = await SubsidyRepo.Searching.SimpleSearchAsync(query, 1, 0, "666", anyAggregation: aggs);
+            var res = await DotaceRepo.Searching.SimpleSearchAsync(query, 1, 0, "666", anyAggregation: aggs);
             if (res is null)
             {
                 return null;
@@ -317,7 +317,7 @@ namespace HlidacStatu.Repositories
         }
 
         public static async Task<List<(string IcoPoskytovatele, decimal Sum)>> ReportPoskytovatelePoLetechAsync(
-            Subsidy.Hint.Type? typDotace, int? rok)
+            Dotace.Hint.Type? typDotace, int? rok)
         {
             AggregationContainerDescriptor<Subsidy> aggs = new AggregationContainerDescriptor<Subsidy>()
                 .Terms("perProviderIco", st => st
@@ -341,7 +341,7 @@ namespace HlidacStatu.Repositories
                 query += $" AND approvedYear:{rok}";
             }
 
-            var res = await SubsidyRepo.Searching.SimpleSearchAsync(
+            var res = await DotaceRepo.Searching.SimpleSearchAsync(
                 query, 1, 0, "666",
                 anyAggregation: aggs);
             if (res is null)
@@ -368,7 +368,7 @@ namespace HlidacStatu.Repositories
         }
 
         public static async
-    Task<List<(Subsidy.Hint.CalculatedCategories Category, long Count, decimal Sum)>>
+    Task<List<(Dotace.Hint.CalculatedCategories Category, long Count, decimal Sum)>>
     PoKategoriichAsync(int? rok = null, int? cat = null, string ico = null)
         {
             AggregationContainerDescriptor<Subsidy> aggs = new AggregationContainerDescriptor<Subsidy>()
@@ -395,7 +395,7 @@ namespace HlidacStatu.Repositories
                 query += $" AND recipient.ico:{ico}";
             }
 
-            var res = await SubsidyRepo.Searching.SimpleSearchAsync(
+            var res = await DotaceRepo.Searching.SimpleSearchAsync(
                 query, 1, 0, "666",
                 anyAggregation: aggs);
             if (res is null)
@@ -404,7 +404,7 @@ namespace HlidacStatu.Repositories
             }
 
             // Initialize the results dictionary
-            List<(Subsidy.Hint.CalculatedCategories Category, long Count, decimal Sum)> results = new();
+            List<(Dotace.Hint.CalculatedCategories Category, long Count, decimal Sum)> results = new();
 
             // Parse the aggregation results
             if (res.ElasticResults.Aggregations["perCategory"] is BucketAggregate subsidyCategoryBA)
@@ -413,7 +413,7 @@ namespace HlidacStatu.Repositories
                 {
                     if (int.TryParse(subsidyCategoryBucket.Key.ToString(), out int subsidyCategoryTypeVal))
                     {
-                        var subsidyCategory = (Subsidy.Hint.CalculatedCategories)subsidyCategoryTypeVal;
+                        var subsidyCategory = (Dotace.Hint.CalculatedCategories)subsidyCategoryTypeVal;
 
                         if (subsidyCategoryBucket["sumAssumedAmount"] is ValueAggregate sumBA)
                         {
@@ -431,7 +431,7 @@ namespace HlidacStatu.Repositories
         }
 
         public static async
-            Task<List<(string Ico, Subsidy.Hint.CalculatedCategories Category, long Count, decimal Sum)>>
+            Task<List<(string Ico, Dotace.Hint.CalculatedCategories Category, long Count, decimal Sum)>>
             ReportPrijemciPoKategoriichAsync(int? rok = null, int? cat = null)
         {
             AggregationContainerDescriptor<Subsidy> aggs = new AggregationContainerDescriptor<Subsidy>()
@@ -460,7 +460,7 @@ namespace HlidacStatu.Repositories
                 query += $" AND hints.category1.typeValue:{cat}";
             }
 
-            var res = await SubsidyRepo.Searching.SimpleSearchAsync(
+            var res = await DotaceRepo.Searching.SimpleSearchAsync(
                 query, 1, 0, "666",
                 anyAggregation: aggs);
             if (res is null)
@@ -469,7 +469,7 @@ namespace HlidacStatu.Repositories
             }
 
             // Initialize the results dictionary
-            List<(string Ico, Subsidy.Hint.CalculatedCategories Category, long Count, decimal Sum)> results = new();
+            List<(string Ico, Dotace.Hint.CalculatedCategories Category, long Count, decimal Sum)> results = new();
 
             // Parse the aggregation results
             if (res.ElasticResults.Aggregations["perCategory"] is BucketAggregate subsidyCategoryBA)
@@ -478,7 +478,7 @@ namespace HlidacStatu.Repositories
                 {
                     if (int.TryParse(subsidyCategoryBucket.Key.ToString(), out int subsidyCategoryTypeVal))
                     {
-                        var subsidyCategory = (Subsidy.Hint.CalculatedCategories)subsidyCategoryTypeVal;
+                        var subsidyCategory = (Dotace.Hint.CalculatedCategories)subsidyCategoryTypeVal;
 
                         if (subsidyCategoryBucket["perIco"] is BucketAggregate subsidyIcoBA)
                         {
@@ -532,7 +532,7 @@ namespace HlidacStatu.Repositories
                 query += $" AND approvedYear:{rok}";
             }
 
-            var res = await SubsidyRepo.Searching.SimpleSearchAsync(query, 1, 0, "666", anyAggregation: aggs);
+            var res = await DotaceRepo.Searching.SimpleSearchAsync(query, 1, 0, "666", anyAggregation: aggs);
             if (res is null)
             {
                 return null;
@@ -591,7 +591,7 @@ namespace HlidacStatu.Repositories
                 query += $" AND approvedYear:{rok}";
             }
 
-            var res = await SubsidyRepo.Searching.SimpleSearchAsync(query, 1, 0, "666", anyAggregation: aggs);
+            var res = await DotaceRepo.Searching.SimpleSearchAsync(query, 1, 0, "666", anyAggregation: aggs);
             if (res is null)
             {
                 return null;
@@ -624,7 +624,7 @@ namespace HlidacStatu.Repositories
 
         public static async
             Task<List<(string ProgramName, string ProgramCode, string SubsidyProviderIco, decimal AssumedAmountSummed)>>
-            TopDotacniProgramy(Subsidy.Hint.Type typDotace, int? rok)
+            TopDotacniProgramy(Dotace.Hint.Type typDotace, int? rok)
         {
             var aggs = new AggregationContainerDescriptor<Subsidy>()
                 .MultiTerms("distinct_programs", mt => mt
@@ -648,7 +648,7 @@ namespace HlidacStatu.Repositories
                 query += $" AND approvedYear:{rok}";
             }
 
-            var res = await SubsidyRepo.Searching.SimpleSearchAsync(query, 1, 0, "666", anyAggregation: aggs);
+            var res = await DotaceRepo.Searching.SimpleSearchAsync(query, 1, 0, "666", anyAggregation: aggs);
             if (res is null)
             {
                 return null;

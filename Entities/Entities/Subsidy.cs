@@ -122,7 +122,7 @@ public partial class Subsidy
     public List<object> RawData { get; set; } = new();
 
     [Object]
-    public Hint Hints { get; set; } = new();
+    public Dotace.Hint Hints { get; set; } = new();
     
     public class SubsidyMetadata
     {

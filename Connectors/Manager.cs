@@ -54,7 +54,8 @@ namespace HlidacStatu.Connectors
             DocumentHistory,
             SplitSmlouvy,
             SearchPromo,
-            PermanentLLM
+            PermanentLLM,
+            Dotace
         }
 
         public static string defaultIndexName = "hlidacsmluv";
@@ -76,6 +77,7 @@ namespace HlidacStatu.Connectors
         public static string defaultIndexName_Insolvence = "insolvencnirestrik";
         public static string defaultIndexName_InsolvenceDocs = "insolvencedocs";
         public static string defaultIndexName_Subsidy = "subsidy3";
+        public static string defaultIndexName_Dotace = "dotace";
         public static string defaultIndexName_Uptime = "uptime";
         public static string defaultIndexName_UptimeSSL = "uptimessl";
 
@@ -264,6 +266,11 @@ namespace HlidacStatu.Connectors
         public static Task<ElasticClient> GetESClient_SubsidyAsync(int timeOut = 60000, int connectionLimit = 80)
         {
             return GetESClientAsync(defaultIndexName_Subsidy, timeOut, connectionLimit, IndexType.Subsidy);
+        }
+        
+        public static Task<ElasticClient> GetESClient_DotaceAsync(int timeOut = 60000, int connectionLimit = 80)
+        {
+            return GetESClientAsync(defaultIndexName_Dotace, timeOut, connectionLimit, IndexType.Dotace);
         }
 
         public static Task<ElasticClient> GetESClient_OsobyAsync(int timeOut = 60000, int connectionLimit = 80)

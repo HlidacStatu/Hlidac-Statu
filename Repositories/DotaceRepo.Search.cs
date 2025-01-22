@@ -9,11 +9,10 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using HlidacStatu.Connectors;
-using HlidacStatu.Entities;
 
 namespace HlidacStatu.Repositories
 {
-    public static partial class SubsidyRepo
+    public static partial class DotaceRepo
     {
         public static class Searching
         {
@@ -52,7 +51,6 @@ namespace HlidacStatu.Repositories
                 var query = searchdata.Q;
 
                 var qc = SimpleQueryCreator.GetSimpleQuery<Subsidy>(query, Irules);
-                qc = AddIsNotHiddenRule(qc);
 
                 return qc;
             }

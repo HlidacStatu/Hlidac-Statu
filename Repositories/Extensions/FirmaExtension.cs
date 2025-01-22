@@ -59,7 +59,7 @@ namespace HlidacStatu.Extensions
             return firma.IsSponzor()
                    || firma.StatistikaRegistruSmluv().Sum(s => s.PocetSmluv) > 0
                    || (await VerejnaZakazkaRepo.Searching.SimpleSearchAsync("ico:" + firma.ICO, null, 1, 1, "0")).Total > 0
-                   || (await SubsidyRepo.Searching.SimpleSearchAsync("ico:" + firma.ICO, 1, 1, "0")).Total > 0;
+                   || (await DotaceRepo.Searching.SimpleSearchAsync("ico:" + firma.ICO, 1, 1, "0")).Total > 0;
         }
 
         public static bool MaVazbyNaPolitikyPred(this Firma firma, DateTime date)

@@ -336,7 +336,7 @@ namespace HlidacStatu.XLib
                     {
                         Devmasters.DT.StopWatchEx sw = new Devmasters.DT.StopWatchEx();
                         sw.Start();
-                        res.Dotace = await SubsidyRepo.Searching.SimpleSearchAsync(
+                        res.Dotace = await DotaceRepo.Searching.SimpleSearchAsync(
                                 new SubsidySearchResult { Q = query, Page = 1, PageSize = dotaceSize, Order = order },
                                 anyAggregation: new Nest.AggregationContainerDescriptor<Entities.Subsidy>().Sum("souhrn", s => s.Field(f => f.AssumedAmount))
                             );

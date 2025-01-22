@@ -1,11 +1,10 @@
 ﻿using System;
 using Devmasters.Enums;
 using Nest;
-using static HlidacStatu.Entities.Firma.Statistics;
 
 namespace HlidacStatu.Entities;
 
-public partial class Subsidy
+public partial class Dotace
 {
     public partial class Hint
     {

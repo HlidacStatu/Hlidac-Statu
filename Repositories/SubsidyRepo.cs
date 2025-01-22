@@ -339,7 +339,7 @@ namespace HlidacStatu.Repositories
                     original = visibleSubsidy;
                 }
 
-                visibleSubsidy.Hints.SetDuplicate(visibleSubsidy, visibleDuplicateIds, hiddenDuplicateIds, original.Id);
+                SetDuplicate(visibleSubsidy, visibleDuplicateIds, hiddenDuplicateIds, original.Id);
             }
 
             foreach (var hiddenSubsidy in hiddenDuplicates)
@@ -350,51 +350,36 @@ namespace HlidacStatu.Repositories
                     original = hiddenSubsidy;
                 }
 
-                hiddenSubsidy.Hints.SetDuplicate(hiddenSubsidy, visibleDuplicateIds, hiddenDuplicateIds, original.Id);
+                SetDuplicate(hiddenSubsidy, visibleDuplicateIds, hiddenDuplicateIds, original.Id);
             }
 
             await BulkSaveSubsidiesToEs(allSubsidies);
         }
-
-        public static bool UpdateHints(Subsidy item, bool forceRewriteHints)
+        
+        private static void SetDuplicate(Subsidy subsidy, List<string> duplicates, List<string> hiddenDuplicates, string originalSubsidyId)
         {
-            bool changed = false;
-            if (item.Hints?.Category1 == null || forceRewriteHints == true)
+            if(string.IsNullOrEmpty(originalSubsidyId))
+                return;
+                
+            if (originalSubsidyId == subsidy.Id)
             {
-                List<Subsidy.Hint.Category> cats = new();
-                cats.AddRange(Subsidy.Hint.ToCalculatedCategory(item));
-                item.Hints.SetCategories(cats);
-                changed = true;
-            }
+                //set as original
+                subsidy.Hints.IsOriginal = true;
+                subsidy.Hints.OriginalSubsidyId = null;
+                subsidy.Hints.DuplicateCalculated = DateTime.Now;
+                subsidy.Hints.Duplicates = duplicates.Where(d => d != subsidy.Id).ToList();
+                subsidy.Hints.HiddenDuplicates = hiddenDuplicates.Where(d => d != subsidy.Id).ToList();;
 
-
-            Firma f = Firmy.Get(item.Recipient.Ico);
-            DateTime subsidyDate = new DateTime(item.ApprovedYear ?? 1970, 1, 1);
-            
-            if (f.Valid && (item.Hints.RecipientStatus == -1 || forceRewriteHints))
-            {
-                item.Hints.RecipientTypSubjektu = (int)f.TypSubjektu;
-                item.Hints.RecipientStatus = (int)f.Status;
-                item.Hints.RecipientPolitickyAngazovanySubjekt = (int)HintSmlouva.PolitickaAngazovanostTyp.Neni;
-                if (f.IsSponzorBefore(subsidyDate))
-                    item.Hints.RecipientPolitickyAngazovanySubjekt =
-                        (int)HintSmlouva.PolitickaAngazovanostTyp.PrimoSubjekt;
-                else if (f.MaVazbyNaPolitikyPred(subsidyDate))
-                    item.Hints.RecipientPolitickyAngazovanySubjekt =
-                        (int)HintSmlouva.PolitickaAngazovanostTyp.AngazovanyMajitel;
-
-                item.Hints.RecipientPocetLetOdZalozeni = 99;
-                item.Hints.RecipientPocetLetOdZalozeni = (subsidyDate.Year - (f.Datum_Zapisu_OR ?? new DateTime(1990, 1, 1)).Year);
-                changed = true;
             }
             else
             {
-                //item.Hints.RecipientTypSubjektu = (int)Firma.TypSubjektuEnum.Neznamy;
-                item.Hints.RecipientStatus = 0;
-                item.Hints.RecipientPolitickyAngazovanySubjekt = (int)HintSmlouva.PolitickaAngazovanostTyp.Neni;
-                changed = true;
+                //set as duplicate
+                subsidy.Hints.IsOriginal = false;
+                subsidy.Hints.OriginalSubsidyId = originalSubsidyId; 
+                subsidy.Hints.DuplicateCalculated = DateTime.Now;
+                subsidy.Hints.Duplicates = duplicates.Where(d => d != subsidy.Id).ToList();
+                subsidy.Hints.HiddenDuplicates = hiddenDuplicates.Where(d => d != subsidy.Id).ToList();
             }
-            return changed;
         }
 
         public static async Task SaveSubsidyDirectlyToEs(Subsidy subsidy)

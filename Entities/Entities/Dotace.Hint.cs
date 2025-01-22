@@ -1,15 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text.Json.Serialization;
 using Devmasters.Enums;
 using HlidacStatu.Util;
 using Nest;
-using static HlidacStatu.Entities.Firma;
 
 namespace HlidacStatu.Entities;
 
-public partial class Subsidy
+public partial class Dotace
 {
     public partial class Hint
     {
@@ -164,32 +162,7 @@ public partial class Subsidy
                 }
             }
         }
-
-        public void SetDuplicate(Subsidy subsidy, List<string> duplicates, List<string> hiddenDuplicates, string originalSubsidyId)
-        {
-            if(string.IsNullOrEmpty(originalSubsidyId))
-                return;
-                
-            if (originalSubsidyId == subsidy.Id)
-            {
-                //set as original
-                IsOriginal = true;
-                OriginalSubsidyId = null;
-                DuplicateCalculated = DateTime.Now;
-                Duplicates = duplicates.Where(d => d != subsidy.Id).ToList();
-                HiddenDuplicates = hiddenDuplicates.Where(d => d != subsidy.Id).ToList();;
-
-            }
-            else
-            {
-                //set as duplicate
-                IsOriginal = false;
-                OriginalSubsidyId = originalSubsidyId; 
-                DuplicateCalculated = DateTime.Now;
-                Duplicates = duplicates.Where(d => d != subsidy.Id).ToList();
-                HiddenDuplicates = hiddenDuplicates.Where(d => d != subsidy.Id).ToList();
-            }
-        }
+        
 
         #region Categories
         
@@ -2638,7 +2611,7 @@ public partial class Subsidy
         }
 
 
-        public static IEnumerable<Category> ToCalculatedCategory(Subsidy item)
+        public static IEnumerable<Category> ToCalculatedCategory(Dotace item)
         {
             if (item == null)
                 return Array.Empty<Category>();
