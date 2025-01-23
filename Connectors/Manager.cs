@@ -616,6 +616,13 @@ namespace HlidacStatu.Connectors
                             .Map<Entities.Subsidy>(map => map.AutoMap().DateDetection(false))
                         );
                     break;
+                case IndexType.Dotace:
+                    res = await client.Indices
+                        .CreateAsync(indexName, i => i
+                            .InitializeUsing(idxSt)
+                            .Map<Entities.Subsidy>(map => map.AutoMap().DateDetection(false))
+                        );
+                    break;
                 case IndexType.PageMetadata:
                     res = await client.Indices
                        .CreateAsync(indexName, i => i

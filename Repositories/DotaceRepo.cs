@@ -2,6 +2,7 @@ using Nest;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using HlidacStatu.Connectors;
 using HlidacStatu.Entities;
@@ -176,6 +177,10 @@ namespace HlidacStatu.Repositories
         
         public static async Task MergeSubsidiesToDotaceAsync()
         {
+            int maxDegreeOfParallelism = 40; // Adjust this value as needed
+            var semaphore = new SemaphoreSlim(maxDegreeOfParallelism);
+            int processedCount = 0;
+            
             var originalsQuery = new QueryContainerDescriptor<Subsidy>()
                 .Bool(b => b
                     .Must(
@@ -185,30 +190,47 @@ namespace HlidacStatu.Repositories
                 );
             
             var originalSubsidyIds = SubsidyRepo.SubsidyClient.SimpleGetAllIds(5, originalsQuery);
+            int totalCount = originalSubsidyIds.Count;
 
-            foreach (var originalSubsidyId in originalSubsidyIds)
+            var tasks = originalSubsidyIds.Select(async originalSubsidyId =>
             {
-                Dotace dotaceRecord = new Dotace();
-                var originalSubsidy = await SubsidyRepo.GetAsync(originalSubsidyId);
-                FixRecipientFromRawData(originalSubsidy);
-                dotaceRecord.UpdateFromSubsidy(originalSubsidy);
-                
-                foreach (var duplicateId in originalSubsidy.Hints.Duplicates)
-                {
-                    var duplicateSubsidy = await SubsidyRepo.GetAsync(duplicateId);
-                    FixRecipientFromRawData(duplicateSubsidy);
-                    dotaceRecord.UpdateFromSubsidy(duplicateSubsidy);
-                }
-
+                await semaphore.WaitAsync();
                 try
                 {
-                    await SaveAsync(dotaceRecord);
+                    Console.WriteLine($"Remaining to process: {totalCount - Interlocked.Increment(ref processedCount)}");
+                    Dotace dotaceRecord = new Dotace();
+                    var originalSubsidy = await SubsidyRepo.GetAsync(originalSubsidyId);
+                    FixRecipientFromRawData(originalSubsidy);
+                    dotaceRecord.UpdateFromSubsidy(originalSubsidy);
+                
+                    foreach (var duplicateId in originalSubsidy.Hints.Duplicates)
+                    {
+                        var duplicateSubsidy = await SubsidyRepo.GetAsync(duplicateId);
+                        FixRecipientFromRawData(duplicateSubsidy);
+                        dotaceRecord.UpdateFromSubsidy(duplicateSubsidy);
+                    }
+
+                    try
+                    {
+                        await SaveAsync(dotaceRecord);
+                    }
+                    catch (Exception e)
+                    {
+                        Logger.Error(e, $"Failed to save dotace for {originalSubsidy.Id}");
+                    }
                 }
                 catch (Exception e)
                 {
-                    Logger.Error(e, $"Failed to save dotace for {originalSubsidy.Id}");
+                    Console.WriteLine($"Error processing ID {originalSubsidyId}: {e}");
                 }
-            }
+                finally
+                {
+                    semaphore.Release();
+                }
+                
+            }).ToList();
+
+            await Task.WhenAll(tasks);
             
         }
 
