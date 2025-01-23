@@ -766,6 +766,7 @@ public partial class Dotace
             {
                 CalculatedCategories.Kultura, new[]
                 {
+                    "KUKVX0099OK0",
                     "KUL01-20",
 "KUL01-21",
 "KUL01-22",
@@ -2257,6 +2258,7 @@ public partial class Dotace
             {
                 CalculatedCategories.SocialniSluzby, new[]
                 {
+                    "KUKVX00AUE44",
                     "KHK21",
 "KHK22",
 "RP06-21",
@@ -3202,6 +3204,9 @@ public partial class Dotace
             {
                 CalculatedCategories.Zdravotnictvi, new[]
                 {
+                    "KUKVX00A25SN",
+"KUKVX00AODNU",
+"KUKVX00AODPK",
                     "RP16-20",
 "RP16-21",
 "RP16-22",
@@ -3385,6 +3390,8 @@ public partial class Dotace
             {
                 CalculatedCategories.ZivotniProstredi, new string[]
                 {
+                    "KUKVX009TFU5",
+"KUKVX00AKDQV",
                     "RP04-19",
 "RP04-20",
 "RP04-21",
