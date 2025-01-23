@@ -2,7 +2,7 @@
 @model HlidacStatu.Entities.Dotace
 
 @{
-    ViewBag.Title = "Dotace " + Model.DisplayProject;
+    ViewBag.Title = "Zdroje dotace " + Model.DisplayProject;
     ViewBag.SubTitle = "Zdrojová data";
  
     var allDotace = new List<HlidacStatu.Entities.Subsidy>();
@@ -28,7 +28,24 @@
         <li class="active">@ViewBag.SubTitle</li>
     </ol>
 }
+@section scripts
+{
+    <style>
+        .navbar .blue {
+            background-color: var(--bs-success-bg-subtle);
+        }
 
+        .nav-tabs .nav-link:hover {
+            background-color: var(--bs-primary-bg-subtle);
+            border-color: var(--bs-primary-bg-subtle);
+        }
+
+        .nav-tabs .nav-link.active {
+            background-color: var(--bs-primary-bg-subtle);
+            border-color: var(--bs-primary-bg-subtle);
+        }
+    </style>
+}
 <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.13.4/css/jquery.dataTables.css" />
 <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.js"></script>
 
@@ -36,13 +53,13 @@
 
 <h2>
     <add-bookmark item="@Model"></add-bookmark>
-    Detail dotace "@Model.DisplayProject" <small>@((Model.Hints.IsOriginal ? "" : "(duplikátní záznam)"))</small>
+    Zdroje dotace "@(Model.DisplayProject)"
 </h2>
 
 
 
 
-<ul class="nav nav-tabs" role="tablist" style="--nav-tabs-border-color: red;">
+<ul class="nav nav-tabs blue" role="tablist" >
 
     @{
         string classAttributes = "nav-link active";
@@ -58,7 +75,7 @@
                         data-bs-target="#source-@(dot.NormalizedId)"
                         type="button"
                         role="tab">
-                    @Html.Raw($"Dotace z <b>{Devmasters.TextUtil.ShortenText(dot.Metadata.DataSource, 20)}</b>")
+                    @Html.Raw($"Zdroj dotace z <b>{Devmasters.TextUtil.ShortenText(dot.Metadata.DataSource, 20)}</b>")
                 </button>
             </li>
 
@@ -77,28 +94,7 @@
 
             count++;
             <div class="@classAttributes" id="source-@(dot.NormalizedId)" role="tabpanel">
-
-
                 <partial name="_detailTable_subsidy" model="(@dot, tbloptions)" />
-
-                <p>
-                    <button type="button" class="btn btn-info btn-sm" data-bs-toggle="modal" data-bs-target="#originalDM-@(dot.NormalizedId)">
-                    Zobrazit originální záznam z datového zdroje '@(dot.Metadata.DataSource)'
-                    </button>
-                </p>
-                <div id="originalDM-@(dot.NormalizedId)" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="originalDataModal" aria-hidden="true">
-                    <div class="modal-dialog modal-fullscreen">
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                <h4 class="modal-title">Originální data ze zdroje</h4>
-                            </div>
-                            <div class="modal-body">
-                                <pre><code>@dot.GetNiceRawData()</code></pre>
-                            </div>
-                        </div>
-                    </div>
-                </div>
             </div>
 
             classAttributes = "tab-pane "; //fade show width-75vp
