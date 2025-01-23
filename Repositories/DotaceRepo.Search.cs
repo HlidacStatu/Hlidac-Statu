@@ -23,9 +23,8 @@ namespace HlidacStatu.Repositories
                 new OsobaId(HlidacStatu.Repositories.OsobaVazbyRepo.Icos_s_VazbouNaOsobu, "osobaid:", "ico:"),
                 new Holding(HlidacStatu.Repositories.FirmaVazbyRepo.IcosInHolding, null, "ico:"),
                 //(prijemce.jmeno:${q} OR prijemce.obchodniJmeno:${q})
-                new TransformPrefix("ico:", "recipient.ico:", null),
-                new TransformPrefixWithValue("jmeno:", "(recipient.name:${q} OR recipient.hlidacName:${q})",
-                    null),
+                new TransformPrefixWithValue("ico:", "(recipient.ico:${q} OR subsidyProviderIco:${q})",null),
+                new TransformPrefixWithValue("jmeno:", "(recipient.name:${q} OR recipient.hlidacName:${q})",null),
                 new TransformPrefix("projekt:", "projectName:", null),
                 new TransformPrefix("kodProjektu:", "projectCode:", null),
                 new TransformPrefix("castka:", "assumedAmount:", null),
@@ -34,6 +33,7 @@ namespace HlidacStatu.Repositories
                 new TransformPrefixWithValue("cena:", "assumedAmount:<${q} ", "<\\d"),
                 new TransformPrefixWithValue("cena:", "assumedAmount:>${q} ", ">\\d"),
                 new TransformPrefixWithValue("cena:", "assumedAmount:${q} ", null),
+                new HlidacStatu.Searching.Dotace_Oblast()
             };
 
             public static string[] QueryShorcuts()
@@ -101,7 +101,7 @@ namespace HlidacStatu.Repositories
                             .TrackTotalHits((search.ExactNumOfResults || page * search.PageSize == 0)
                                 ? true
                                 : (bool?)null)
-                            ,cancellationToken
+                            , cancellationToken
                         );
                     if (res.IsValid && withHighlighting &&
                         res.Shards.Failed > 0) //if some error, do it again without highlighting
@@ -124,7 +124,7 @@ namespace HlidacStatu.Repositories
                 {
                     if (e.Message == "A task was canceled.")
                         throw;
-                    
+
                     AuditRepo.Add(Audit.Operations.Search, "", "", "Dotace", "error", search.Q, null);
                     if (res != null && res.ServerError != null)
                     {
