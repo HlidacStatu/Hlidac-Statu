@@ -145,10 +145,14 @@ public partial class Dotace
         ProjectCode = string.IsNullOrWhiteSpace(ProjectCode) ? subsidy.ProjectCode : ProjectCode;
         ProjectName = string.IsNullOrWhiteSpace(ProjectName) ? subsidy.ProjectName : ProjectName;
         ProjectDescription = string.IsNullOrWhiteSpace(ProjectDescription) ? subsidy.ProjectDescription : ProjectDescription;
-        ProgramCode = string.IsNullOrWhiteSpace(ProgramCode) ? subsidy.ProgramCode : ProgramCode;
-        ProgramName = string.IsNullOrWhiteSpace(ProgramName) ? subsidy.ProgramName : ProgramName;
         SubsidyProvider ??= subsidy.SubsidyProvider;
         SubsidyProviderIco ??= subsidy.SubsidyProviderIco;
+
+        if (subsidy.Metadata.DataSource.ToLower() != "dotinfo") // dot info není spolehlivý zdroj a je potřeba programy nedpolňovat. jsou tam chyby
+        {
+            ProgramCode = string.IsNullOrWhiteSpace(ProgramCode) ? subsidy.ProgramCode : ProgramCode;
+            ProgramName = string.IsNullOrWhiteSpace(ProgramName) ? subsidy.ProgramName : ProgramName;
+        }
         
         Cerpani = !Cerpani.Any() ? subsidy.Cerpani : Cerpani;
         Rozhodnuti = !Rozhodnuti.Any() ? subsidy.Rozhodnuti : Rozhodnuti;
