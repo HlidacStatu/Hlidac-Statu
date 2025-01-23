@@ -281,7 +281,7 @@ public partial class Dotace
             { CalculatedCategories.Pamatky, new[] { "cestovní ruch" } },
             { CalculatedCategories.PravniStat, new string[] { } },
             { CalculatedCategories.VerejnaSprava, new string[] { } },
-            { CalculatedCategories.PodporaPodnikani, new string[] { } },
+            { CalculatedCategories.PodporaPodnikani, new string[] { "47609109" } },
             {
                 CalculatedCategories.TrhPrace, new[]
                 {
@@ -298,8 +298,8 @@ public partial class Dotace
                 }
             },
             { CalculatedCategories.Kriminalita, new string[] { } },
-            { CalculatedCategories.RegionalniRozvoj, new[] { "regionální politika", "rozvoj" } },
-            { CalculatedCategories.SocialniSluzby, new[] { "sociální věci" } },
+            { CalculatedCategories.RegionalniRozvoj, new[] { "regionální politika", "rozvoj", "66002222" } },
+            { CalculatedCategories.SocialniSluzby, new[] { "sociální věci", "00551023" } },
             {
                 CalculatedCategories.Sport, new[]
                 {
@@ -310,13 +310,13 @@ public partial class Dotace
             {
                 CalculatedCategories.Vzdelavani, new[]
                 {
-                    "školství"
+                    "školství","00022985"
                 }
             },
-            { CalculatedCategories.Zahranici, new string[] { } },
-            { CalculatedCategories.Zdravotnictvi, new[] { "zdravotnictví" } },
-            { CalculatedCategories.Zemedelstvi, new[] { "48133981" } },
-            { CalculatedCategories.ZivotniProstredi, new[] { "životní prostředí" } },
+            { CalculatedCategories.Zahranici, new string[] { "45769851" } },
+            { CalculatedCategories.Zdravotnictvi, new[] { "zdravotnictví", "00024341" } },
+            { CalculatedCategories.Zemedelstvi, new[] { "48133981", "00020478" } },
+            { CalculatedCategories.ZivotniProstredi, new[] { "životní prostředí", "00164801" } },
             { CalculatedCategories.FondHejtmana, new[] { "kancelář hejtmana" } },
             { CalculatedCategories.FondPrimatora, new string[] { } }
         };
@@ -3593,8 +3593,6 @@ public partial class Dotace
             if (!string.IsNullOrEmpty(item.Category))
                 cats.AddRange(CategoryNameToCalculatedCategory(item.Category) ?? Array.Empty<Category>());
 
-            if (!cats.Any() && DataValidators.CheckCZICO(item.SubsidyProviderIco))
-                cats.AddRange(_textToCalculatedCategory(CategoryNameDictionary, item.SubsidyProviderIco));
 
             if (!cats.Any() && !string.IsNullOrEmpty(item.ProgramCode) && item.ProgramCode?.Length > 3)
                 cats.AddRange(_textToCalculatedCategory(CategoryNameDictionary, item.ProgramCode));
@@ -3604,6 +3602,10 @@ public partial class Dotace
 
             if (!cats.Any() && !string.IsNullOrEmpty(item.ProgramName))
                 cats.AddRange(_textToCalculatedCategory(ProgramsDictionary, item.ProgramName));
+
+            //fallback to ICO
+            if (!cats.Any() && DataValidators.CheckCZICO(item.SubsidyProviderIco))
+                cats.AddRange(_textToCalculatedCategory(CategoryNameDictionary, item.SubsidyProviderIco));
 
             return cats;
         }
