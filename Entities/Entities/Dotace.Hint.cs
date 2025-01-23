@@ -267,7 +267,7 @@ public partial class Dotace
             {
                 CalculatedCategories.Doprava, new[]
                 {
-                    "70856508", "66003008","05553521"
+                    "70856508", "66003008","05553521",
                     "silniční hospodářství", "doprava"
                 }
             },
