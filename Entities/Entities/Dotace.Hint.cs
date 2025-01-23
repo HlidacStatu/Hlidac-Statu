@@ -267,13 +267,16 @@ public partial class Dotace
             {
                 CalculatedCategories.Doprava, new[]
                 {
-                    "70856508", "66003008",
+                    "70856508", "66003008","05553521"
                     "silniční hospodářství", "doprava"
                 }
             },
             { CalculatedCategories.Energetika, new string[] { } },
             { CalculatedCategories.HumanitarniPomoc, new string[] { } },
-            { CalculatedCategories.InovaceVyzkum, new[] { "48549037" } },
+            { CalculatedCategories.InovaceVyzkum, new[] { 
+                "48549037", "Akademie věd ČR",
+                "Technologická agentura České republiky",
+            } },
             {
                 CalculatedCategories.Kultura, new[]
                 {
@@ -291,6 +294,18 @@ public partial class Dotace
                 CalculatedCategories.TrhPrace, new[]
                 {
                     //urady prace
+"Úřad práce v Břeclavi",
+"Úřad práce v Hradci Králové",
+"Úřad práce v Kladně",
+"Úřad práce v Kutné Hoře",
+"Úřad práce v Mladé Boleslavi",
+"Úřad práce v Nymburku",
+"Úřad práce v Opavě",
+"Úřad práce v Rychnově nad Kněžnou",
+"Úřad práce v Třebíči",
+"Úřad práce v Uherském Hradišti",
+"Úřad práce v Ústí nad Orlicí",
+"Úřad práce ve Frýdku-Místku",
                     "00209554", "00567167", "72496991", "00564222", "00521108", "00522848", "00663875", "00508691",
                     "00663204", "00662348", "00559229", "00575771", "00555258", "00477273", "00515132", "00518514",
                     "00555720", "00653861", "00556556", "00521035", "00653977", "00214167", "00554715", "64095487",
@@ -321,7 +336,7 @@ public partial class Dotace
             { CalculatedCategories.Zahranici, new string[] { "45769851" } },
             { CalculatedCategories.Zdravotnictvi, new[] { "zdravotnictví", "00024341" } },
             { CalculatedCategories.Zemedelstvi, new[] { "48133981", "00020478" } },
-            { CalculatedCategories.ZivotniProstredi, new[] { "životní prostředí", "00164801" } },
+            { CalculatedCategories.ZivotniProstredi, new[] { "životní prostředí", "00164801", "00020729", } },
             { CalculatedCategories.FondHejtmana, new[] { "kancelář hejtmana" } },
             { CalculatedCategories.FondPrimatora, new string[] { } }
         };
@@ -3395,6 +3410,7 @@ public partial class Dotace
             {
                 CalculatedCategories.ZivotniProstredi, new string[]
                 {
+
                     "KUKVX009TFU5",
 "KUKVX00AKDQV",
                     "RP04-19",
@@ -3702,7 +3718,7 @@ Analyzuj text uvedený ve značkách <text></text> a vyber nejvhodnější kateg
             HlidacStatu.AI.LLM.Clients.OllamaServerClient llm = new HlidacStatu.AI.LLM.Clients.OllamaServerClient(ollamaUri.AbsoluteUri);
             HlidacStatu.AI.LLM.Models.Model model = HlidacStatu.AI.LLM.Models.Model.Llama31;
             var llmQuery = new LLMQuery(llmCategoryQuery.Replace("##TEXT##", item.ProjectName + " " + item.ProjectDescription),
-                LLMQuery.Templates.SystemRole_Pravnik_CZ, temperature: 0.3f, responseFormat: null);
+                "Odpovídej stručně, přesně, co nejpřesněji podle instrukcí.Pokud nevíš nebo si nejsi jist, odpověz pouze #NEVIM#", temperature: 0.3f, responseFormat: null);
 
             string resFull = "";
             int runs = 0;
