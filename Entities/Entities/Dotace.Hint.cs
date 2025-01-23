@@ -1,9 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.Json;
+using Devmasters;
 using Devmasters.Enums;
+using HlidacStatu.AI.LLM;
 using HlidacStatu.Util;
 using Nest;
+using Serilog;
 
 namespace HlidacStatu.Entities;
 
@@ -11,10 +15,11 @@ public partial class Dotace
 {
     public partial class Hint
     {
-        
+        private static ILogger _logger = Log.Logger.ForContext(typeof(Hint));
+
         [Keyword]
         public HashSet<string> Tags { get; set; } = new();
-        
+
         public Category? Category1 { get; set; }
         public Category? Category2 { get; set; }
         public Category? Category3 { get; set; }
@@ -166,10 +171,10 @@ public partial class Dotace
                 }
             }
         }
-        
+
 
         #region Categories
-        
+
         [ShowNiceDisplayName]
         public enum CalculatedCategories
         {
@@ -249,14 +254,14 @@ public partial class Dotace
             FondPrimatora = 52000
         }
 
-        
+
 
 
 
         public static readonly Dictionary<CalculatedCategories, string[]> CategoryNameDictionary = new()
         {
             { CalculatedCategories.Ostatni, new string[] { } },
-            { CalculatedCategories.Digi, new[] { 
+            { CalculatedCategories.Digi, new[] {
                 "86594346",
            } },
             {
@@ -3621,7 +3626,7 @@ public partial class Dotace
             { CalculatedCategories.FondHejtmana, new string[] { } },
             { CalculatedCategories.FondPrimatora, new string[] { } }
         };
-        
+
 
         private static IEnumerable<Category> _textToCalculatedCategory(
             Dictionary<CalculatedCategories, string[]> keywords, string categoryName)
@@ -3652,6 +3657,82 @@ public partial class Dotace
         }
 
 
+        static string llmCategoryQuery = @"Máš k dispozici pouze tyto kategorie. Každá kategorie je uvedena na samostatném řádku:
+Bilaterální zahraniční rozvojové spolupráce (ZRS), rozvoj občanské společnosti
+Digitální transformace a IT
+Doprava a infrastruktura
+Energetika a obnovitelné zdroje
+Fond hejtmana
+Fond primátora
+Humanitární pomoc a rozvojová spolupráce
+Inovace, výzkum a vývoj
+Investiční a dotační programy pro veřejnou správu
+Kultura, kreativní průmysly a média
+Malé a střední podniky (MSP)
+Obrana a bezpečnost
+Ostatní
+Památková péče a cestovní ruch
+Podpora demokracie a právního státu
+Podpora podnikání a investic
+Podpora zaměstnanosti a trhu práce
+Prevence kriminality a bezpečnost
+Regionální rozvoj, podpora, investice a soudržnost
+Sociální služby, začleňování a zaměstnanost
+Sport a volnočasové aktivity
+Vzdělávání,školství a mládež
+Zdraví a zdravotnické projekty
+Zemědělství, lesnictví a rozvoj venkova
+Životní prostředí, klima a ekologické projekty
+
+
+Analyzuj text uvedený ve značkách <text></text> a vyber nejvhodnější kategorii z uvedeného seznamu. Nevysvětluj svůj postoj, pouze uveď nejvhodnější kategorii.
+
+<text>##TEXT##</text>";
+        static Dictionary<string, CalculatedCategories> catsDescriptions = Enum.GetValues<CalculatedCategories>()
+            .Select(m => new { key = m.ToNiceDisplayName().ToLower().RemoveAccents().Replace(" ",""), val = m })
+            .ToDictionary(k => k.key, v => v.val);
+
+        public static IEnumerable<Category> ToCalculatedCategoryWithAI(Dotace item)
+        {
+            if (item == null)
+                return Array.Empty<Category>();
+            List<Category> cats = new();
+
+            Uri ollamaUri = new Uri("http://10.10.150.163:7862");
+            HlidacStatu.AI.LLM.Clients.OllamaServerClient llm = new HlidacStatu.AI.LLM.Clients.OllamaServerClient(ollamaUri.AbsoluteUri);
+            HlidacStatu.AI.LLM.Models.Model model = HlidacStatu.AI.LLM.Models.Model.Llama31;
+            var llmQuery = new LLMQuery(llmCategoryQuery.Replace("##TEXT##", item.ProjectName + " " + item.ProjectDescription),
+                LLMQuery.Templates.SystemRole_Pravnik_CZ, temperature: 0.3f, responseFormat: null);
+
+            string resFull = "";
+            int runs = 0;
+        start:
+            runs++;
+            try
+            {
+                resFull = llm.QueryAsync(llmQuery, null).ConfigureAwait(false).GetAwaiter().GetResult();
+            }
+            catch (Exception e)
+            {
+                _logger.Error(e, "llmquery {query}", llmQuery.Query);
+            }
+
+
+            resFull = resFull.Trim().ToLower().RemoveAccents().Replace(" ", "");
+            if (resFull.EndsWith("."))
+                resFull = resFull.Remove(resFull.Length - 1);
+            //{"kategorie": "Životní prostředí, klima a ekologické projekty"}
+
+            _logger.Information("AI result {category} for project {projectName}", resFull, item.ProjectName + " " + item.ProjectDescription);
+
+                if (catsDescriptions.ContainsKey(resFull.ToLower()))
+                    cats.Add(new Category() { Created = DateTime.Now, Probability = 0.8m, TypeValue = (int)catsDescriptions[resFull.ToLower()] });
+                else if (runs < 6)
+                    goto start;
+
+
+            return cats;
+        }
         public static IEnumerable<Category> ToCalculatedCategory(Dotace item)
         {
             if (item == null)
@@ -3675,6 +3756,9 @@ public partial class Dotace
                 cats.AddRange(_textToCalculatedCategory(CategoryNameDictionary, item.SubsidyProviderIco));
 
             return cats;
+        }
+        public void SetCategoriesWithAI(IEnumerable<Category> cats)
+        {
         }
 
         public void SetCategories(IEnumerable<Category> cats)
