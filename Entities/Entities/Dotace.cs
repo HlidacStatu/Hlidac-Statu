@@ -133,7 +133,7 @@ public partial class Dotace
         bool isCreating = false;
         if (string.IsNullOrWhiteSpace(subsidy.Id))
         {
-            Id ??= subsidy.Id.RemoveAccents().Replace(" ", ".");
+            Id = subsidy.Id.RemoveAccents().Replace(" ", ".");
             isCreating = true;
             ProcessedDate = subsidy.Metadata.ProcessedDate;
             PrimaryDataSource = subsidy.Metadata.DataSource;
