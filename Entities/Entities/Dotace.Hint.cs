@@ -673,6 +673,7 @@ public partial class Dotace
             {
                 CalculatedCategories.InovaceVyzkum, new[]
                 {
+                    "RP14-20",
                     "Fond pro podporu výzkumu","CZ 0046 01-04/05-0084-BG-46-MF",
                     "Pořízení a technická obnova invest.majetku organizací vědy a výzkumu", "313910",
                     "Dlouhodobý koncepční rozvoj výzkumných organizací agregace", "Z131301000000",
@@ -765,7 +766,19 @@ public partial class Dotace
             {
                 CalculatedCategories.Kultura, new[]
                 {
-                    "x","KUKVX00A25MH",
+                    "KUL01-20",
+"KUL01-21",
+"KUL01-22",
+"KUL03-21",
+"KUL03-22",
+"KUL04-19",
+"KUL04-20",
+"KUL04-22",
+"KUL05-19",
+"KUL05-22",
+"KUL06-21",
+"KUL06-22",
+                    "KUKVX00A25MH",
                     "Program COVID KULTURA agregace", "Z221601000000",
                     "Kulturní aktivity - OU", "Z340807000000", "Kulturní aktivity - OLK", "Z340808000000",
                     "Záchrana architektonického dědictví", "434D31200", "Veřejné informační služby knihoven agregace",
@@ -1635,6 +1648,9 @@ public partial class Dotace
             {
                 CalculatedCategories.PodporaPodnikani, new[]
                 {
+                    "RP21-21",
+"RP22-21",
+"RP22-22",
 "CZ.1.03 OP Podnikání a inovace","2.2 ITS03/760",
 "CZ.1.03 OP Podnikání a inovace","2.2 RV03/2644",
 "CZ.1.03 OP Podnikání a inovace","2.2 RV03/2671",
@@ -1962,6 +1978,15 @@ public partial class Dotace
             {
                 CalculatedCategories.RegionalniRozvoj, new[]
                 {
+                    "RP01-19",
+"RP01-20",
+"RP01-21",
+"RP01-22",
+"RP02-20",
+"RP02-21",
+"RP02-22",
+"RP12-21",
+"RP12-22",
 "Akce financované z rozhodnutí Poslanecké sněmovny Parlamentu","398-298112",
                     "CZ.1.08 OP Technická pomoc","73806",
 "CZ.1.08 OP Technická pomoc","73947",
@@ -2232,6 +2257,14 @@ public partial class Dotace
             {
                 CalculatedCategories.SocialniSluzby, new[]
                 {
+                    "KHK21",
+"KHK22",
+"RP06-21",
+"RP06-22",
+"RP07-21",
+"RP07-22",
+"SOC01-21",
+"SOC01-22",
                     "Fond pro neziskové organizace (NNO)","CZ 0004 01-04/05-0069-BG-0004-NROS",
 "Kontinuální výzva pro oblast podpory 3.1. - služby v oblasti sociální integrace (c)","CZ.1.06/3.1.02",
 "Podpora veřejně prospěšných aktivit spolků osob se zdravotním postižením agregace","Z040601000000",
@@ -2410,6 +2443,14 @@ public partial class Dotace
             {
                 CalculatedCategories.Sport, new[]
                 {
+                    "MAS01-21",
+"MAS01-22",
+"MAS02-21",
+"MAS05-20",
+"MAS06-22",
+"RP18-21",
+"RP18-22",
+                    "MAS03-22","MAS03-21","MAS02-22",
 "Akce financované z rozhodnutí Poslanecké sněmovny Parlamentu","298112",
                     "Podpora budování a obnovy míst aktivního a pasivního odpočinku", "117D8210H",
                     "Podpora obnovy sportovní infrastruktury", "117D8210B", "Podpora obnovy sportovní infrastruktury",
@@ -2526,6 +2567,12 @@ public partial class Dotace
             {
                 CalculatedCategories.Vzdelavani, new[]
                 {
+                    "RP11-21",
+"RP11-22",
+"RP19-19",
+"RP19-20",
+"RP19-21",
+"RP19-22",
 "CZ.1.07 OP Vzdělávání pro konkurenceschopnost","CZ.1.07/1.1.00/56.0003",
 "CZ.1.07 OP Vzdělávání pro konkurenceschopnost","CZ.1.07/1.1.00/56.0010",
 "CZ.1.07 OP Vzdělávání pro konkurenceschopnost","CZ.1.07/1.1.00/56.0014",
@@ -3155,6 +3202,9 @@ public partial class Dotace
             {
                 CalculatedCategories.Zdravotnictvi, new[]
                 {
+                    "RP16-20",
+"RP16-21",
+"RP16-22",
 "Časově uzavřená výzva pro oblast podpory 6.3.2.","CZ.1.06/3.2.01",
 "Časově uzavřená výzva pro oblast podpory 6.3.2.","CZ.1.06/3.2.01",
                     "Rozvoj a obnova mat tech základny lázeňské rehabilitační péče", "214043",
@@ -3275,6 +3325,11 @@ public partial class Dotace
             {
                 CalculatedCategories.Zemedelstvi, new[]
                 {
+                    "RP08-20",
+"RP08-21",
+"RP08-22",
+"RP17-21",
+"RP17-22",
 "CZ.1.25 OP Rybářství","CZ.1.25/2.1.00/14.00064",
 "CZ.1.25 OP Rybářství","CZ.1.25/2.1.00/14.00065",
 "CZ.1.25 OP Rybářství","CZ.1.25/2.1.00/14.00084",
@@ -3330,6 +3385,11 @@ public partial class Dotace
             {
                 CalculatedCategories.ZivotniProstredi, new string[]
                 {
+                    "RP04-19",
+"RP04-20",
+"RP04-21",
+"RP04-22",
+                    "KUKVX009TFU5",
                     "Z130901000000", "Operační program Životní prostředí", "00020729", "62933591",
                     "Podpora opatření na rybnících a malých vodních nádržích ve vlastnictví obcí", "129D29300",
                     "Podpora opatření na drobných vodních tocích rybnících a malých vodních nádržích", "129D29200",
