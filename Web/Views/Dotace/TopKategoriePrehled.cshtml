@@ -60,7 +60,7 @@
     ];
     var data = new ReportDataSource<(Dotace.Hint.CalculatedCategories Category, long Count, decimal Sum)>(dataColumns);
 
-    data.AddRows(Model.ToArray());
+    data.AddRows(Model.Select(m=> m).ToArray());
 
 
 
@@ -117,8 +117,8 @@
 
 
 <div>
-    @Html.DataToHTMLTable(data, tableId: "dt", dataTableOptions: HtmlExtensions.DatatableOptions(orderColumnIdx: 2, orderDirection: "desc", paging: false))
+    @Html.DataToHTMLTable(data, tableId: "dtx" , dataTableOptions: HtmlExtensions.DatatableOptions(orderColumnIdx: 2, orderDirection: "desc", paging: false))
 </div>
 
 
-<partial name="_categoryDisclaimer"  />
+<partial name="_categoryDisclaimer" model="@(new HlidacStatu.Web.Models.Dotace_categoryDisclaimer())" />
