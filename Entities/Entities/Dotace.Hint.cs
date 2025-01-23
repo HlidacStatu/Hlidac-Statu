@@ -11,6 +11,10 @@ public partial class Dotace
 {
     public partial class Hint
     {
+        
+        [Keyword]
+        public HashSet<string> Tags { get; set; } = new();
+        
         public Category? Category1 { get; set; }
         public Category? Category2 { get; set; }
         public Category? Category3 { get; set; }

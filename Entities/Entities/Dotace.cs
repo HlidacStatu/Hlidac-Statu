@@ -16,9 +16,6 @@ public partial class Dotace
 
     [Keyword]
     public HashSet<string> SourceIds { get; set; } = new();
-
-    [Keyword]
-    public HashSet<string> Tags { get; set; } = new();
     
     
     public string PrimaryDataSource { get; set; } //no reason for this now?
@@ -131,7 +128,7 @@ public partial class Dotace
     public void UpdateFromSubsidy(Subsidy subsidy)
     {
         bool isCreating = false;
-        if (string.IsNullOrWhiteSpace(subsidy.Id))
+        if (string.IsNullOrWhiteSpace(Id))
         {
             Id = subsidy.Id.RemoveAccents().Replace(" ", ".");
             isCreating = true;
