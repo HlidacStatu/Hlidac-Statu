@@ -3767,9 +3767,11 @@ Analyzuj text uvedený ve značkách <text></text> a vyber nejvhodnější kateg
             if (!cats.Any() && !string.IsNullOrEmpty(item.ProgramName))
                 cats.AddRange(_textToCalculatedCategory(ProgramsDictionary, item.ProgramName));
 
-            //fallback to ICO
+            //fallback to ICO a urad
             if (!cats.Any() && DataValidators.CheckCZICO(item.SubsidyProviderIco))
                 cats.AddRange(_textToCalculatedCategory(CategoryNameDictionary, item.SubsidyProviderIco));
+            if (!cats.Any() && DataValidators.CheckCZICO(item.SubsidyProviderIco))
+                cats.AddRange(_textToCalculatedCategory(CategoryNameDictionary, item.SubsidyProvider));
 
             return cats;
         }
