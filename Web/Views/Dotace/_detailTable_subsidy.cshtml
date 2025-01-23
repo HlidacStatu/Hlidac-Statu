@@ -1,7 +1,7 @@
 ﻿@using HlidacStatu.Extensions
 @using System.Linq
 
-@model (HlidacStatu.Entities.Dotace model, HlidacStatu.Web.Models.DotaceDetailOptions options)
+@model (HlidacStatu.Entities.Subsidy model, HlidacStatu.Web.Models.DotaceDetailOptions options)
 
 @{
     var options = Model.options ?? new DotaceDetailOptions();
@@ -119,15 +119,7 @@
                             </dd>
 
                         </dl>
-                        @if (await Model.model.MaSkutecnehoMajiteleAsync() == false)
-                        {
-                            <div class="alert alert-warning">
-                                <span class="fa-stack">
-                                    <i class="fa-duotone fa-user fa-stack-2x"></i>
-                                    <i class="fa-solid fa-question fa-stack-1x" style="margin-top: -6px;"></i>
-                                </span>U tohoto příjemce stát nezná skutečného majitele.
-                            </div>
-                        }
+
                     </div>
 
                     <div class="col-lg-6">
@@ -177,26 +169,7 @@
 
                             <dt class="col-sm-4">Rok schválení</dt>
                             <dd class="col-sm-8">@(Model.model.ApprovedYear)</dd>
-                            @if (Model.model.Hints.GetCategories().Count > 0)
-                            {
-                                <dt class="col-sm-4">
-                                    Kategorie <partial name="_categoryDisclaimer" model="@(new HlidacStatu.Web.Models.Dotace_categoryDisclaimer(){IconOnly= true})" />
-                                </dt>
-                                <dd class="col-sm-8">
-                                    @(Model.model.Hints.GetCategories().First().CalculatedCategoryDescription()) <a title="Najít další takové dotace" href="@Model.model.Hints.GetCategories().First().GetSearchUrl(false)"><i class="fa-solid fa-magnifying-glass"></i></a>
-                                    @if (Model.model.Hints.GetCategories().Count > 1)
-                                    {
-                                        <span>
-                                            (@(string.Join(',',
-                                               Model.model.Hints.GetCategories().Skip(1).Select(m =>
-                                               m.CalculatedCategoryDescription()
-                                               + $" <br /><a title='Najít další takové dotace' href='@Model.model.Hints.GetCategories().First().GetSearchUrl(false)'><i class='fa-solid fa-magnifying-glass'> Najít dotace v kategorii</i>"
-                                               ))
-                                               ))
-                                        </span>
-                                    }
-                                </dd>
-                            }
+                           
                         </dl>
                     </div>
                 </div>
@@ -206,11 +179,10 @@
             <div class="card-footer bg-light">
                 <div class="row text-muted small">
                     <div class="col-md">
-                        <p class="mb-1">Datum zpracování: @Model.model.ProcessedDate.ToString("dd.MM.yyyy")</p>
-                        <p class="mb-1">Stálý odkaz: <a style="overflow-wrap: anywhere;" href="@(Model.model.GetUrl(false,false))" target="_blank">@(Model.model.GetUrl(false, false))</a></p>
+                        <p class="mb-1">Datum zpracování: @Model.model.Metadata.ProcessedDate.ToString("dd.MM.yyyy")</p>
                     </div>
                     <div class="col-md text-md-end">
-                        <p class="mb-1">Zdroj dat: @Model.model.PrimaryDataSource</p>
+                        <p class="mb-1">Zdroj dat: @Model.model.Metadata.DataSource</p>
                     </div>
                 </div>
             </div>

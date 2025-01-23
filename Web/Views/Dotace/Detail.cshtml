@@ -4,23 +4,6 @@
 @{
     ViewBag.Title = "Dotace " + Model.DisplayProject;
     ViewBag.SubTitle = "Detail dotace";
-    HlidacStatu.Entities.Dotace origDotace = null;
-    if (Model.Hints.IsOriginal == false)
-    {
-        origDotace = await HlidacStatu.Repositories.DotaceRepo.GetAsync(Model.Hints.OriginalSubsidyId);
-    }
-
-    var allDotace = new List<HlidacStatu.Entities.Dotace>();
-    allDotace.Add(Model);
-    if (Model.Hints.HasDuplicates)
-    {
-        allDotace.AddRange(Model.Hints.Duplicates
-            .Select(id => HlidacStatu.Repositories.DotaceRepo.GetAsync(id).Result)
-            .Where(m => m != null));
-    }
-    allDotace = allDotace.OrderBy(o => o.Hints.IsOriginal == false).ToList();
-
-    var duplicatesText = Devmasters.Lang.CS.Plural.Get(Model.Hints.Duplicates.Count, "v dalším datovém zdroji", "v {0} dalších datových zdrojích", "{0} dalších datových zdrojích");
 
 }
 
@@ -48,90 +31,48 @@
 </h2>
 
 
-<div class="mt-3">
-    @if (Model.Hints.IsOriginal)
-    {
 
-    }
-    else
+
+
+@{
+    var tbloptions = new DotaceDetailOptions() { TableClass = "table-light" };
+}
+<partial name="_detailTable" model="(Model, tbloptions)" />
+
+
+@if (Model.SourceIds.Count>1)
+{
+    <div class="fa-bold m-3">
+        <i class="fas fa-exclamation-circle"></i> Tuto dotaci jsme nalezli v @(Model.SourceIds.Count) dalších datových zdrojích.
+        Stát dotace publikuje na mnoha místech různými způsoby a v těchto datových zdrojích se některé dotace opakují.
+        Náš systém identifikoval, že níže uvedené záznamy jsou stejné jako výše zobrazená dotace. Níže uvedené duplikátní dotace uvádíme pro úplnost a transparentnost.
+    </div>
+    <a href="/dotace/detailzdroj/@(Uri.EscapeDataString(Model.Id))" type="button" class="btn btn-info btn-sm">Zobrazit záznam této dotace ze všech datových zdrojů</a>
+
+}
+else
+{
+    var origSource = await HlidacStatu.Repositories.SubsidyRepo.GetAsync(Model.SourceIds.FirstOrDefault());
+    if (origSource != null)
     {
-        <div class="alert alert-warning">
-            <div class="fa-bold m-3">
-                <p>
-                    <i class="fas fa-exclamation-circle"></i>
-                    Stát dotace publikuje na mnoha místech různými způsoby
-                    a v těchto datových zdrojích se některé dotace opakují.
-                    Náš systém identifikoval, že uvedená dotace jsou stejná jako další dotace na naší databázi.
-                    Tuto dotaci považujeme za duplikátní a nezapočítáváme ji do statistik.
-                </p>
-                @if (origDotace != null)
-                {
-                    <p>
-                        Zde <a href="@origDotace.GetUrl(false)">najdete plnohodnotný záznam této dotace</a>.
-                    </p>
-                }
+        <p>
+        <button type="button" class="btn btn-info btn-sm" data-bs-toggle="modal" data-bs-target="#originalDM-@(origSource.NormalizedId)">Zobrazit originální záznam z datového zdroje</button>
+        </p>
+        <div id="originalDM-@(origSource.NormalizedId)" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="originalDataModal" aria-hidden="true">
+            <div class="modal-dialog modal-fullscreen">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        <h4 class="modal-title">Originální data, který jsme zpracovali</h4>
+                    </div>
+                    <div class="modal-body">
+                        <pre><code>@origSource.GetNiceRawData()</code></pre>
+                    </div>
+                </div>
             </div>
         </div>
     }
-</div>
-
-
-
-<div class="fa-bold m-3">
-    <i class="fas fa-exclamation-circle"></i> Tuto dotaci jsme nalezli @duplicatesText.
-    Stát dotace publikuje na mnoha místech různými způsoby
-    a v těchto datových zdrojích se některé dotace opakují.
-    Náš systém identifikoval, že níže uvedené záznamy jsou stejné jako výše zobrazená dotace. Níže uvedené duplikátní dotace uvádíme pro úplnost a transparentnost.
-</div>
-
-
-
-<ul class="nav nav-tabs" role="tablist" style="--nav-tabs-border-color: red;">
-
-    @{
-        string classAttributes = "nav-link active";
-        int count = 0;
-
-        foreach (var dot in allDotace)
-        {
-            count++;
-            <li class="nav-item " role="presentation">
-                <button class="@classAttributes "
-                        id="source-@(dot.Id)-tab"
-                        data-bs-toggle="tab"
-                        data-bs-target="#source-@(dot.Id)"
-                        type="button"
-                        role="tab">
-                    @Html.Raw(dot.Hints.IsOriginal ? $"Dotace <b>{Devmasters.TextUtil.ShortenText(dot.PrimaryDataSource, 20)}</b>" : $"Duplikát z {Devmasters.TextUtil.ShortenText(dot.PrimaryDataSource, 20)}")
-                </button>
-            </li>
-
-            classAttributes = "nav-link";
-        }
-    }
-</ul>
-
-<div class="tab-content width-75vp" id="myTabContent">
-    @{
-        var tbloptions = new DotaceDetailOptions() { TableClass = "table-light" };
-        count = 0;
-        classAttributes = "tab-pane active "; //fade show width-75vp
-        foreach (var dot in allDotace)
-        {
-
-            count++;
-            <div class="@classAttributes" id="source-@(dot.Id)" role="tabpanel">
-
-
-                <partial name="_detailTable" model="(@dot, tbloptions)" />
-
-            </div>
-
-            classAttributes = "tab-pane "; //fade show width-75vp
-
-        }
-    }
-</div>
+}
 
 
 @section footerscripts {

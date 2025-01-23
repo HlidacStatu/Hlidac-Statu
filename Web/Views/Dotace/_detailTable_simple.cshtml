@@ -155,27 +155,9 @@
                     <a style="overflow-wrap: anywhere;" href="@(Model.model.GetUrl(false,false))" target="_blank">@(Model.model.GetUrl(false,false))</a>
                 </td>
             </tr>
-            <tr>
-                <td colspan="2">
-                    <button type="button" class="btn btn-info btn-sm" data-bs-toggle="modal" data-bs-target="#originalDM-@(Model.model.Id)">Zobrazit originální záznam z datového zdroje</button>
-                </td>
-            </tr>
 
 
         </tbody>
     </table>
 
-    <div id="originalDM-@(Model.model.Id)" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="originalDataModal" aria-hidden="true">
-        <div class="modal-dialog modal-fullscreen">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    <h4 class="modal-title">Originální záznam, který jsme zpracovali</h4>
-                </div>
-                <div class="modal-body">
-                    <pre><code>@Model.model.GetNiceRawData()</code></pre>
-                </div>
-            </div>
-        </div>
-    </div>
 }

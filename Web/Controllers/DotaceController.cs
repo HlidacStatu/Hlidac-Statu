@@ -58,7 +58,7 @@ namespace HlidacStatu.Web.Controllers
             return View(res);
         }
 
-        public async Task<ActionResult> Detail(string id, bool? r = true)
+        public async Task<ActionResult> Detail(string id)
         {
             if (string.IsNullOrWhiteSpace(id))
             {
@@ -69,18 +69,23 @@ namespace HlidacStatu.Web.Controllers
             {
                 return NotFound();
             }
-            if (r == true && dotace.Hints.IsOriginal == false && !string.IsNullOrEmpty(dotace.Hints.OriginalSubsidyId))
+
+            return View(dotace);
+        }
+        public async Task<ActionResult> DetailZdroj(string id)
+        {
+            if (string.IsNullOrWhiteSpace(id))
             {
-                var dotaceOrigExists = await DotaceRepo.ExistsAsync(dotace.Hints.OriginalSubsidyId);
-                if (dotaceOrigExists)
-                {
-                    return RedirectToAction(this.ControllerContext.ActionDescriptor.ActionName, this.ControllerContext.ActionDescriptor.ControllerName, new { id = dotace.Hints.OriginalSubsidyId });
-                }
+                return Redirect("/dotace");
+            }
+            var dotace = await DotaceRepo.GetAsync(id);
+            if (dotace is null)
+            {
+                return NotFound();
             }
 
             return View(dotace);
         }
-
         [HlidacCache(22*60*60,"",false)]
         public async Task<ActionResult> PoLetech()
         {
