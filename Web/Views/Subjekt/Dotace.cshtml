@@ -260,6 +260,35 @@
                     }
                 }
             }
+
+            @* ---poskytovatel dotace--- *@
+            @{
+                var poskytnutoPoLetech = await DotaceRepo.SumyPoskytnutychDotaciPoLetechAsync(Model.ICO);
+                string vyplacenoKcText ="";
+                long celkovyPocetVyplacenychDotaci = 0;
+                decimal celkemVyplaceno = 0;
+                string platceUrl = "/dotace/hledat?Q=subsidyProviderIco%3A" + Model.ICO;
+                if (poskytnutoPoLetech.Any())
+                {
+                    celkemVyplaceno = poskytnutoPoLetech.Sum(x => x.Sum);
+                    celkovyPocetVyplacenychDotaci = poskytnutoPoLetech.Sum(x => x.Count);
+                    vyplacenoKcText = " v celkové hodnotě <b>" + HlidacStatu.Util.RenderData.NicePriceHtml(celkemVyplaceno) + "</b>.";
+                }
+
+            }
+
+
+            @if (poskytnutoPoLetech.Any())
+            {
+                <p>
+                    @(Model.JsemOVM() ? "Úřad" : "Subjekt") @Devmasters.TextUtil.ShortenText(Model.Jmeno, 35)
+                    @Html.Raw(Devmasters.Lang.CS.Plural.GetWithZero(celkovyPocetVyplacenychDotaci,
+                        " neposkytl žádnou dotaci.",
+                        " poskytl <a href='" + platceUrl + "'><b>jednu dotaci</b></a>" + vyplacenoKcText,
+                        " poskytl <a href='" + platceUrl + "'><b>{0} dotace</b></a>" + vyplacenoKcText,
+                        " poskytl <a href='" + platceUrl + "'><b>{0} dotací</b></a>" + vyplacenoKcText))
+                </p>
+            }
             <hr />
 
             <h4>Přehled subjektu</h4>
@@ -288,6 +317,76 @@
                 Html.DataToHTMLTable(holdingReportData, dataTableOptions: dataTableOptions),
                 "Tabulka"
            )
+
+            @if (poskytnutoPoLetech.Any())
+            {
+                <h4>Informace o poskytnutých dotacích</h4>
+
+                string subsidiesProvidedTitle = $"Přehled poskytnutých dotací ";
+                if (Model.JsemOVM())
+                {
+                    subsidiesProvidedTitle += "úřadu";
+                }
+                else
+                {
+                    subsidiesProvidedTitle += "firmy";
+                }
+
+                var providedSubsidyGraphData = new Series[]
+                {
+                    new()
+                    {
+                        Name = "Celkem Kč",
+                        Type = Series.SeriesType.column,
+                        Data = poskytnutoPoLetech
+                            .Where(x => x.Year > 0)
+                            .OrderBy(x => x.Year)
+                            .Select(x => new SeriesData(x.Year, x.Sum)).ToArray(),
+                        SeriesTooltip = new SeriesTooltip()
+                        {
+                            ValueSuffix = " Kč"
+                        }
+                    }
+                };
+                
+                var providerTableData = new ReportDataSource<(int Year, long Count, decimal Sum)>(
+                    new ReportDataSource<(int Year, long Count, decimal Sum)>.Column[]
+                    {
+                        new()
+                        {
+                            Name = "Rok",
+                            TextRender = (x) => $"{x.Year}",
+                            HtmlRender = (x) => $"<a title='Najit poskytnuté dotace pro rok {x.Year}' href='/dotace/hledat?Q=subsidyProviderIco:{Model.ICO} AND approvedYear:{x.Year}'>{x.Year}</a>",
+                            OrderValueRender = (x) => HlidacStatu.Util.RenderData.OrderValueFormat(x.Year),
+                            CssClass = "number"
+                        },
+                        new()
+                        {
+                            Name = "Počet",
+                            TextRender = (x) => $"{HlidacStatu.Util.RenderData.NiceNumber(x.Count)}",
+                            HtmlRender = (x) => $"{HlidacStatu.Util.RenderData.NiceNumber(x.Count)}",
+                            OrderValueRender = (x) => HlidacStatu.Util.RenderData.OrderValueFormat(x.Count),
+                            CssClass = "number"
+                        },
+                        new()
+                        {
+                            Name = "Suma",
+                            TextRender = (x) => HlidacStatu.Util.RenderData.NicePrice(x.Sum, shortFormat:true),
+                            HtmlRender = (x) => HlidacStatu.Util.RenderData.NicePrice(x.Sum,html:true),
+                            OrderValueRender = (x) => HlidacStatu.Util.RenderData.OrderValueFormat(x.Sum),
+                            CssClass = "number"
+                        },
+                    }
+                );
+                providerTableData.AddRows(poskytnutoPoLetech);
+                
+                @Html.Toggleable(
+                    Html.ColumnGraph(subsidiesProvidedTitle, providedSubsidyGraphData, yTitleLeft: "Celkem čerpáno", yTitleRight: ""),
+                    "Graf",
+                    Html.DataToHTMLTable(providerTableData, dataTableOptions: dataTableOptions),
+                    "Tabulka"
+                )
+            }
         </div>
 
     </div>
