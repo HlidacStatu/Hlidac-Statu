@@ -11,10 +11,14 @@ namespace HlidacStatu.Entities
             Limit2M = 1,
             Limit6M = 2
         }
+        [Devmasters.Enums.ShowNiceDisplayName]
         public enum PolitickaAngazovanostTyp
         {
+            [Devmasters.Enums.NiceDisplayName("Nesponzoruje politické strany")]
             Neni = 0,
+            [Devmasters.Enums.NiceDisplayName("Subjekt přímo sponzoroval politické strany")]
             PrimoSubjekt = 1,
+            [Devmasters.Enums.NiceDisplayName("Osoba propojená se subjektem sponzorovala politické strany")]
             AngazovanyMajitel = 2
         }
         public enum VztahSeSoukromymSubjektemTyp

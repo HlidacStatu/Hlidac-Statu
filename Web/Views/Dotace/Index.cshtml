@@ -1,10 +1,12 @@
 ﻿@{
 
     ViewBag.Title = "Hlídač dotací";
+    ViewBag.SubTitle = "Nový, vylepšený a doplněný";
+
 }
 @section scripts
 {
-    <link rel="stylesheet" type="text/css" href="//cdn.datatables.net/1.13.4/css/jquery.dataTables.css"/>
+    <link rel="stylesheet" type="text/css" href="//cdn.datatables.net/1.13.4/css/jquery.dataTables.css" />
     <script type="text/javascript" charset="utf8" src="//cdn.datatables.net/1.13.4/js/jquery.dataTables.js"></script>
     <script src="~/bundles/highcharts"></script>
 }
@@ -19,127 +21,130 @@
 
 <partial name="_SearchForm" model="@(new HlidacStatu.Repositories.Searching.DotaceSearchResult())" />
 
-<h2>Informace k dotacím</h2>
-<div>
-    <p>Zpracováváme dotace z následujících zdrojů:</p>
-    <ul>
-        <li>
-            Cedr - kompletní
-        </li>
-        <li>
-            EU Fondy - podařilo se nám dohledat dotace od roku 2014 do současnosti
-        </li>
-        <li>
-            DotInfo - kompletní
-        </li>
-        <li>
-            SZIF - od roku 2014 do roku 2018 (novější zatím nejsou k dispozici)
-        </li>
-        <li>
-            Czech Invest - kompletní
-        </li>
-    </ul>
-    <p>Některé dotace se mohou objevit vícekrát - strojově v tuto chvíli nejsme schopni detekovat duplicity, protože stav dat v jednotlivých zdrojích neumožní přesné detekování duplicit. Proto celková hodnota udávaná při vyhledávání je pouze orientační, námi vypočtená částka.</p>
 
+
+<div class="watcher-blocks">
+
+    <div class="watcher-blocks__wrapper">
+
+
+        <div class="watcher-block">
+
+            <div class="watcher__title">
+                <h3 class="new-title">
+                    Kompletně nový Hlídač dotací
+                </h3>
+            </div>
+            <div class="block-col ">
+                <p>
+                    Na tomto místě - jako jediném v ČR - najdete nejkompletnější přehled schválených a vyplacených státních a evropských dotací od roku 2010 (občas i starší).
+                    Úplně nově jsme doplnili také <b>krajské dotace od roku 2021</b>.
+                </p>
+                <p>
+                    Při zpracování dotací jsme se museli vypořádat z více než 2 miliony duplikátních záznamů,
+                    stovky tisíc záznamů jsme museli opravit a vyčistit (ano, data od státu jsou v příšerném stavu).
+                </p>
+                <p>
+                    Všechny dotace jsme navíc zatřídili do oblastí, kterých se týkají, aby se daly lépe porovnat preferované a dominantní cíle pro dotační podporu.
+                    300 000 dotací jsme dokonce museli <a target="_blank" href="https://x.com/HlidacStatu/status/1882775214293209292">roztřídit pomocí AI - umělé inteligence</a>, protože to jinak nešlo.
+                </p>
+            </div>
+        </div>
+        <div class="watcher-block">
+
+            <div class="watcher__title">
+                <h3 class="new-title">
+                    <a href="/dotace/reporty">Reporty, žebříčky a spousta překvapení</a>
+                </h3>
+            </div>
+            <div class="block-col ">
+                <p>
+                    <i class="fa-solid fa-hand-point-right" style="color:black"></i> Připravili jsme přehledové reporty o celé dotační ekonomice <br />
+                    <i class="fa-solid fa-hand-point-right" style="color:black"></i> Největší příjemce dotací, státních i krajských.<br />
+                    <i class="fa-solid fa-hand-point-right" style="color:black"></i> Porovnejte jednotlivé dotační programy i jednotlivé kraje.<br />
+                    <i class="fa-solid fa-hand-point-right" style="color:black"></i> Chybí vám tu některé analýzy? Napište nám, co byste si přáli doplnit.
+                </p>
+                <p>
+                    <a class="btn btn-warning btn-sm" href="/dotace/reporty">Reporty dotací</a>
+                </p>
+            </div>
+        </div>
+
+        <div class="watcher-block">
+            <div class="watcher__title">
+                <h2 class="new-title">
+                    Datové zdroje pro dotace
+                </h2>
+            </div>
+            <div class="block-col " style="width:100%">
+                <dl class="row">
+                    @foreach (var item in HlidacStatu.Entities.Dotace.DataSourceDescription)
+                    {
+                        <dt class="col-md-2 col-sm-4 col-xs-4">@item.Key</dt>
+                        <dd class="col-md-10 col-sm-8 col-xs-8">@item.Value</dd>
+                    }
+                </dl>
+            </div>
+        </div>
+
+        <div class="watcher-block">
+            <div class="watcher__title">
+                <h2 class="new-title">
+                    Jak vyhledávat v dotacích
+                </h2>
+            </div>
+            <div class="block-col " style="width:100%">
+                <p>
+                    <dl>
+                        <dt>Prohledávat specifické položky v databázích</dt>
+                        <dd>
+                            napište prefix s ":" bez mezery následovaný hledanou hodnotou<br><kbd>ico:44992785</kbd>
+                            hledá smlouvy kde je jednou ze stran Statutární město Brno (ICO 44992785).
+                            <br><br>
+                            Pokud hledaná hodnota obsahuje mezery, musí být v uvozovkách <kbd>jmeno:"Ředitelství silnic a dálnic"</kbd>
+                        </dd>
+                    </dl>
+                    <h2>Podporované prefixy / hledatelné položky v DB</h2>
+                    <dl>
+                        <dt>Fungující v dotacích</dt>
+                        <dd>
+                            <kbd>ico:12345678</kbd> - jedna ze smluvních stran má uvedené IČO<br>
+                            <kbd>osobaid:oznaceni-osoby</kbd> - smlouvy s vazbou na osobu. Oznacení osoby najdete u profilu osoby (např.
+                            andrej-babis)<br>
+                            <kbd>holding:12345678</kbd> - IČO matky holdingu, hledá se pro všechny firmy holdingu<br>
+                            <br>
+                            <br>
+                            <kbd>projekt:"název projektu"</kbd> - dotace se specifickým názvem projektu (např. "TJ Vodní stavby Tábor")<br />
+                            <kbd>kod:"kód projektu"</kbd> - dotace podle kódu projektu (např. "CZ.03.2.60/0.0/0.0/16_064/0006407")<br />
+                            <kbd>jmeno:"jméno příjemce"</kbd> - dotace, kde jméno příjemce odpovídá zadanému výrazu ("Ředitelství silnic a dálnic")<br />
+                            <kbd>castka:&gt;castka</kbd> - dotace s částkou vyšší než. Možno použí i <kbd>&gt;=</kbd> <kbd>&lt;=</kbd>
+                            <kbd>&lt;</kbd><br />
+                        </dd>
+                    </dl>
+                    <a href="/napoveda">Více o hledání v nápovědě.</a>
+                </p>
+                <p>
+                    <h4>Ukázky možností</h4>
+                    <ul>
+                        <li>
+                            Hledání podle IČO - <a href="/dotace/hledat?Q=ico:00190489">Nemocnice Pardubice</a>, <a href="/dotace/hledat?Q=ico:70994234">SŽDC</a>
+                        </li>
+                        <li>
+                            Hledání podle příjemce - <a href="/dotace/hledat?Q=jmeno:'Ředitelství silnic a dálnic ČR'">ŘSD</a>, <a href="/dotace/hledat?Q=jmeno:univerzita">Univerzita</a>
+                        </li>
+                        <li>
+                            Hledání podle osoby - <a href="/dotace/hledat?Q=osobaid:andrej-babis">Andrej Babiš</a>, <a href="/dotace/hledat?Q=osobaid:zdenek-bakala-2">Zdeněk Bakala</a>
+                        </li>
+
+                    </ul>
+                </p>
+            </div>
+        </div>
+    </div>
 </div>
 
 
-<h2>Jak vyhledávat v dotacích</h2>
-<div>
-    <dl>
-        <dt>Hledat všechna zadaná slova v různých tvarech</dt>
-        <dd>
-            <kbd>varhany výstavba</kbd> <a class="small"
-                                           href="/dotace/hledat?Q=varhany+výstavba" target="_blank">
-                Zkusit <i class="fas fa-external-link-alt"></i>
-            </a>
 
-            <br>Hledá dotace obsahující všechna uvedená slova v různých mluvnických tvarech
-        </dd>
-        <dt>Hledat přesně slovo nebo sousloví</dt>
-        <dd>
-            <kbd>"Stavíme dům"</kbd> <a class="small" href="/dotace/hledat?q=%22Stavíme dům%22"
-                                        target="_blank"><i class="fas fa-external-link-alt"></i></a>
-
-            <br>Hledá dotace obsahující uvedená slova či sousloví přesně jak je v uvozovkách
-        </dd>
-        <dt>Hledat kterékoliv ze zadaných slov</dt>
-        <dd>
-            mezi všechna požadovaná slova vložte operátor OR<br> <kbd>miniaturní OR standardní</kbd> <a class="small"
-                                                                                                        href="/dotace/hledat?Q=miniaturní+OR+standardní" target="_blank">
-                <i class="fas fa-external-link-alt"></i>
-            </a>
-
-            <br>Hledá dotace obsahující alespoň jedno z uvedených slov
-        </dd>
-        <dt>Toto slovo tam být nesmí</dt>
-        <dd>
-            Před slova, která nechcete, zadejte znaménko mínus<br><kbd>solární -systémy -systém</kbd> <a class="small"
-                                                                                                         href="/dotace/hledat?Q=solární+-systémy+-systém" target="_blank">
-                <i class="fas fa-external-link-alt"></i>
-            </a>
-
-            <br>Hledá dotace se slovem solární, kde se zároveň nevyskytují slova "systémy" a "systém"
-
-        </dd>
-        <dt>Kombinace výrazů</dt>
-        <dd>
-            Všechny výše i níže uvedené výrazy hledání je možné kombinovat logickými operátory <kbd>AND</kbd>
-            a <kbd>OR</kbd> (velká písmena jsou nutná).
-            Pokud jsou výrazy odděleny mezerou, je to stejné jako použití operátora <kbd>AND</kbd>.
-        </dd>
-        <dt>Logické a rozšiřující operátory</dt>
-        <dd>
-            Mezi jednotnotlivými částmi dotazu můžete používat operátory <kbd>AND</kbd> a <kbd>OR</kbd>.<br>
-            Můžete používat zástupné znaky (wildcards) <kbd>?</kbd> - zastupuje 1 znak, nebo <kbd>*</kbd>zastupující
-            více znaků. Příklad:<kbd>vila tug*</kbd><br>
-            Příklad: <kbd>ico:00216208 AND penb</kbd>
-        </dd>
-
-    </dl>
-    <h2>Specifické hledání podle konkrétních položek v dotacích</h2>
-
-    <dl>
-        <dt>Prohledávat specifické položky v databázích</dt>
-        <dd>
-            napište prefix s ":" bez mezery následovaný hledanou hodnotou<br><kbd>ico:44992785</kbd>
-            hledá smlouvy kde je jednou ze stran Statutární město Brno (ICO 44992785).
-            <br><br>
-            Pokud hledaná hodnota obsahuje mezery, musí být v uvozovkách <kbd>jmeno:"Ředitelství silnic a dálnic"</kbd>
-        </dd>
-    </dl>
-    <h2>Podporované prefixy / hledatelné položky v DB</h2>
-    <dl>
-        <dt>Fungující v dotacích</dt>
-        <dd>
-            <kbd>ico:12345678</kbd> - jedna ze smluvních stran má uvedené IČO<br>
-            <kbd>osobaid:oznaceni-osoby</kbd> - smlouvy s vazbou na osobu. Oznacení osoby najdete u profilu osoby (např.
-            andrej-babis)<br>
-            <kbd>holding:12345678</kbd> - IČO matky holdingu, hledá se pro všechny firmy holdingu<br>
-            <br>
-            <br>
-            <kbd>projekt:"název projektu"</kbd> - dotace se specifickým názvem projektu (např. "TJ Vodní stavby Tábor")<br />
-            <kbd>kod:"kód projektu"</kbd> - dotace podle kódu projektu (např. "CZ.03.2.60/0.0/0.0/16_064/0006407")<br />
-            <kbd>jmeno:"jméno příjemce"</kbd> - dotace, kde jméno příjemce odpovídá zadanému výrazu ("Ředitelství silnic a dálnic")<br />
-            <kbd>castka:&gt;castka</kbd> - dotace s částkou vyšší než. Možno použí i <kbd>&gt;=</kbd> <kbd>&lt;=</kbd>
-            <kbd>&lt;</kbd><br />
-        </dd>
-    </dl>
-</div>
-
-<h2>Ukázky možností</h2>
-<ul>
-    <li>
-        Hledání podle IČO - <a href="/dotace/hledat?Q=ico:00190489">Nemocnice Pardubice</a>, <a href="/dotace/hledat?Q=ico:70994234">SŽDC</a>
-    </li>
-    <li>
-        Hledání podle příjemce - <a href="/dotace/hledat?Q=jmeno:'Ředitelství silnic a dálnic ČR'">ŘSD</a>, <a href="/dotace/hledat?Q=jmeno:univerzita">Univerzita</a>
-    </li>
-    <li>
-        Hledání podle osoby - <a href="/dotace/hledat?Q=osobaid:andrej-babis">Andrej Babiš</a>, <a href="/dotace/hledat?Q=osobaid:zdenek-bakala-2">Zdeněk Bakala</a>
-    </li>
-
-</ul>
 
 
 

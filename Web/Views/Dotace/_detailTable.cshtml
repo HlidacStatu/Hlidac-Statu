@@ -1,5 +1,6 @@
 ﻿@using HlidacStatu.Extensions
 @using System.Linq
+@using Devmasters.Enums
 
 @model (HlidacStatu.Entities.Dotace model, HlidacStatu.Web.Models.DotaceDetailOptions options)
 
@@ -25,6 +26,13 @@
                     <add-bookmark item="@Model.model"></add-bookmark>
                     "@Model.model.DisplayProject" <small>@((Model.model.Hints.IsOriginal ? "" : "(duplikátní záznam)"))</small>
                 </p>
+                @if (!string.IsNullOrWhiteSpace(Model.model.ProjectDescription))
+                {
+                    <p class="mt-2">
+                        @Model.model.ProjectDescription
+                    </p>
+                }
+
                 @if (!string.IsNullOrWhiteSpace(Model.model.ProjectCode))
                 {
                     <p class="mt-2">
@@ -48,7 +56,7 @@
                                     }
                                     else
                                     {
-                                    <p>hodnota neznámá</p>
+                                        <p>hodnota neznámá</p>
                                     }
                                 </p>
                             </div>
@@ -65,7 +73,7 @@
                                     }
                                     else
                                     {
-                                    <p>hodnota neznámá</p>
+                                        <p>hodnota neznámá</p>
                                     }</p>
                             </div>
                         </div>
@@ -81,7 +89,7 @@
                                     }
                                     else
                                     {
-                                    <p>hodnota neznámá</p>
+                                        <p>hodnota neznámá</p>
                                     }</p>
                             </div>
                         </div>
@@ -98,6 +106,13 @@
                             <dt class="col-sm-4">Příjemce dotace</dt>
                             <dd class="col-sm-8">
                                 @Model.model.Recipient.DisplayName @(Model.model.Recipient.YearOfBirth is null ? "" : $"({Model.model.Recipient.YearOfBirth})")
+
+                                (@(Model.model.Hints.RecipientTypSubjektuEnum.ToNiceDisplayName()))
+
+                                @if(!string.IsNullOrWhiteSpace(Model.model.Hints.RecipientStatusFull))
+                                {
+                                    <div>@(Model.model.Hints.RecipientStatusFull)</div>
+                                }
                             </dd>
                             <dt class="col-sm-4">Příjemce jak je v datech</dt>
                             <dd class="col-sm-8">@(await Html.KIndexLabelLinkAsync(Model.model.Recipient.Ico))@Model.model.Recipient.Name</dd>
@@ -118,6 +133,28 @@
                                 }
                             </dd>
 
+
+                            @if (Model.model.Hints.RecipientPocetLetOdZalozeni < 9999)
+                            {
+                                <dt class="col-sm-4">Stáři při obdržení dotace</dt>
+                                <dd class="col-sm-8">Přibližně @(Model.model.Hints.RecipientPocetLetOdZalozeni) let</dd>
+
+                            }
+                            @if (Model.model.Hints.RecipientPolitickyAngazovanySubjektEnum > 0)
+                            {
+                                <dt class="col-sm-4">Politická angažovanost</dt>
+                                <dd class="col-sm-8"><b>@(Model.model.Hints.RecipientPolitickyAngazovanySubjektEnum.ToNiceDisplayName())</b> <a href="/subjekt/sponzoring/@(Model.model.Recipient.Ico)/">více</a></dd>
+
+                        }
+
+                            <dt class="col-sm-4">Obec příjemce</dt>
+                            <dd class="col-sm-8">
+                                @(Model.model.Recipient.Obec)
+                                @if (!string.IsNullOrWhiteSpace(Model.model.Recipient.Okres))
+                                {
+                                    <span>(okres @(Model.model.Recipient.Okres))</span>
+                                }
+                            </dd>
                         </dl>
                         @if (await Model.model.MaSkutecnehoMajiteleAsync() == false)
                         {
@@ -177,6 +214,13 @@
 
                             <dt class="col-sm-4">Rok schválení</dt>
                             <dd class="col-sm-8">@(Model.model.ApprovedYear)</dd>
+
+                            @if (Model.model.Hints.SubsidyType > 0)
+                            {
+                                <dt class="col-sm-4">Zdroj financování dotace</dt>
+                                <dd class="col-sm-8">@(Model.model.Hints.SubsidyType.ToNiceDisplayName())</dd>
+                            }
+
                             @if (Model.model.Hints.GetCategories().Count > 0)
                             {
                                 <dt class="col-sm-4">
@@ -210,7 +254,10 @@
                         <p class="mb-1">Stálý odkaz: <a style="overflow-wrap: anywhere;" href="@(Model.model.GetUrl(false,false))" target="_blank">@(Model.model.GetUrl(false, false))</a></p>
                     </div>
                     <div class="col-md text-md-end">
-                        <p class="mb-1">Zdroj dat: @Model.model.PrimaryDataSource</p>
+                        <p class="mb-1">
+                            Zdroj dat: @Model.model.PrimaryDataSource <a href="#" data-bs-toggle="tooltip" data-bs-title="@(HlidacStatu.Extensions.DotaceExtension.DescribeDataSource(Model.model))"><i class="fa-solid fa-circle-info"></i></a>
+
+                        </p>
                     </div>
                 </div>
             </div>

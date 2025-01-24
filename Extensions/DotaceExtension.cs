@@ -102,15 +102,19 @@ public static class DotaceExtension
             WriteIndented = true, Encoder = System.Text.Encodings.Web.JavaScriptEncoder.UnsafeRelaxedJsonEscaping
         });
     }
-      
-    public static string? Describe(this Dotace subsidy)
+    public static string? DescribeDataSource(string primaryDataSource)
     {
-        if (Dotace.DataSourceDescription.TryGetValue(subsidy.PrimaryDataSource, out var description))
+        if (Dotace.DataSourceDescription.TryGetValue(primaryDataSource, out var description))
         {
             return description;
         }
 
-        return null;
+        return string.Empty;
+    }
+
+    public static string? DescribeDataSource(this Dotace subsidy)
+    {
+        return DescribeDataSource(subsidy.PrimaryDataSource);
     }
     
 }

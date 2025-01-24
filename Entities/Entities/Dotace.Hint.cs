@@ -79,6 +79,7 @@ public partial class Dotace
 
         //recipient hints
 
+        [ShowNiceDisplayName()]
         public enum Type
         {
             [NiceDisplayName("neznámý typ")]
