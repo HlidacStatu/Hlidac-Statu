@@ -742,6 +742,34 @@
                 @Html.ColumnGraph(holdingSubsidiesTitle, holdingGraphData, yTitleLeft: "Celkem čerpáno", yTitleRight: "")
             </div>
         }
+        
+        
+        @{
+            var poskytnutoPoLetech = await DotaceRepo.SumyPoskytnutychDotaciPoLetechAsync(Model.ICO);
+            string vyplacenoKcText ="";
+            long celkovyPocetVyplacenychDotaci = 0;
+            decimal celkemVyplaceno = 0;
+            string platceUrl = "/dotace/hledat?Q=subsidyProviderIco%3A" + Model.ICO;
+            if (poskytnutoPoLetech.Any())
+            {
+                celkemVyplaceno = poskytnutoPoLetech.Sum(x => x.Sum);
+                celkovyPocetVyplacenychDotaci = poskytnutoPoLetech.Sum(x => x.Count);
+                vyplacenoKcText = " v celkové hodnotě <b>" + HlidacStatu.Util.RenderData.NicePriceHtml(celkemVyplaceno) + "</b>.";
+            }
+            
+        }
+        
+        @if (poskytnutoPoLetech.Any())
+        {
+            <p>
+                @(Model.JsemOVM() ? "Úřad" : "Subjekt") @Devmasters.TextUtil.ShortenText(Model.Jmeno, 35)
+                @Html.Raw(Devmasters.Lang.CS.Plural.GetWithZero(celkovyPocetVyplacenychDotaci,
+                    " neposkytl žádnou dotaci.",
+                    " dostal <a href='" + platceUrl + "'><b>jednu dotaci</b></a>" + vyplacenoKcText,
+                    " dostal <a href='" + platceUrl + "'><b>{0} dotace</b></a>" + vyplacenoKcText,
+                    " dostal <a href='" + platceUrl + "'><b>{0} dotací</b></a>" + vyplacenoKcText))
+            </p>
+        }
 
         <a href="/subjekt/Dotace/@Model.ICO" class="moreinfolink text-uppercase">
             <strong>Zobrazit podrobnosti o dotacích</strong>

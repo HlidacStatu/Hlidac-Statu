@@ -302,11 +302,8 @@ namespace HlidacStatu.Repositories
                         {
                             sum = Convert.ToDecimal(sumBA.Value ?? 0);
                         }
-
                         
-                            count = perIcoBucket.DocCount ?? 0;
-                        
-
+                        count = perIcoBucket.DocCount ?? 0;
 
                         results.Add((perIcoBucket.Key.ToString(), count, sum));
                     }
@@ -360,6 +357,51 @@ namespace HlidacStatu.Repositories
                     if (subsidyProviderBucket["sumAssumedAmount"] is ValueAggregate sumBA)
                     {
                         results.Add((subsidyProviderBucket.Key.ToString(), Convert.ToDecimal(sumBA.Value ?? 0)));
+                    }
+                }
+            }
+
+            return results;
+        }
+        
+        public static async Task<List<(int Year, long Count, decimal Sum)>> SumyPoskytnutychDotaciPoLetechAsync(string providerIco)
+        {
+            AggregationContainerDescriptor<Dotace> aggs = new AggregationContainerDescriptor<Dotace>()
+                .Terms("perYear", st => st
+                    .Field(f => f.ApprovedYear)
+                    .Size(10000)
+                    .Aggregations(typeAggs => typeAggs
+                        .Sum("sumAssumedAmount", sa => sa
+                            .Field(f => f.AssumedAmount)
+                        )
+                    )
+                );
+
+            string query = $"subsidyProviderIco:{providerIco}";
+
+            var res = await DotaceRepo.Searching.SimpleSearchAsync(
+                query, 1, 0, "666",
+                anyAggregation: aggs);
+            if (res is null)
+            {
+                return [];
+            }
+
+            // Initialize the results dictionary
+            List<(int Year, long Count, decimal Sum)> results = new();
+
+            // Parse the aggregation results
+            if (res.ElasticResults.Aggregations["perYear"] is BucketAggregate subsidyYearBA)
+            {
+                foreach (KeyedBucket<object> subsidyYearBucket in subsidyYearBA.Items)
+                {
+                    if (subsidyYearBucket["sumAssumedAmount"] is ValueAggregate sumBA)
+                    {
+                        if (int.TryParse(subsidyYearBucket.Key.ToString(), out int year))
+                        {
+                            results.Add((year, subsidyYearBucket.DocCount ?? 0, Convert.ToDecimal(sumBA.Value ?? 0)));    
+                        }
+                        
                     }
                 }
             }
