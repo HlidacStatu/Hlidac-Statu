@@ -82,11 +82,10 @@ namespace HlidacStatu.Repositories
                     )
                 );
 
-            string query = "hints.isOriginal:true";
+            string query = "";
 
             if (!string.IsNullOrWhiteSpace(programName) || !string.IsNullOrWhiteSpace(programCode))
             {
-                query += " AND (";
                 if (!string.IsNullOrWhiteSpace(programName))
                     query += $"programName.keyword:\"{programName}\"";
 
@@ -95,8 +94,6 @@ namespace HlidacStatu.Repositories
 
                 if (!string.IsNullOrWhiteSpace(programCode))
                     query += $"programCode:\"{programCode}\"";
-
-                query += ")";
             }
             
             var res = await DotaceRepo.Searching.SimpleSearchAsync(query, 1, 0,
@@ -206,7 +203,7 @@ namespace HlidacStatu.Repositories
                     )
                 );
 
-            var res = await DotaceRepo.Searching.SimpleSearchAsync("hints.isOriginal:true", 1, 0, "666",
+            var res = await DotaceRepo.Searching.SimpleSearchAsync("*", 1, 0, "666",
                 anyAggregation: aggs);
             if (res is null)
             {
@@ -249,7 +246,7 @@ namespace HlidacStatu.Repositories
             Firma.TypSubjektuEnum? recipientType = null,
             Dotace.Hint.Type? subsidyType = null)
         {
-            string query = "hints.isOriginal:true AND _exists_:recipient.ico AND NOT recipient.ico:\"\"";
+            string query = "_exists_:recipient.ico AND NOT recipient.ico:\"\"";
             if (recipientType.HasValue)
                 query = query + " AND hints.recipientTypSubjektu:" + (int)recipientType.Value;
 
@@ -302,11 +299,8 @@ namespace HlidacStatu.Repositories
                         {
                             sum = Convert.ToDecimal(sumBA.Value ?? 0);
                         }
-
                         
-                            count = perIcoBucket.DocCount ?? 0;
-                        
-
+                        count = perIcoBucket.DocCount ?? 0;
 
                         results.Add((perIcoBucket.Key.ToString(), count, sum));
                     }
@@ -330,7 +324,7 @@ namespace HlidacStatu.Repositories
                     )
                 );
 
-            string query = "hints.isOriginal:true AND _exists_:subsidyProviderIco AND NOT subsidyProviderIco:\"\"";
+            string query = "_exists_:subsidyProviderIco AND NOT subsidyProviderIco:\"\"";
             if (typDotace.HasValue)
             {
                 query += $" AND hints.subsidyType:{typDotace:D}";
@@ -366,6 +360,51 @@ namespace HlidacStatu.Repositories
 
             return results;
         }
+        
+        public static async Task<List<(int Year, long Count, decimal Sum)>> SumyPoskytnutychDotaciPoLetechAsync(string providerIco)
+        {
+            AggregationContainerDescriptor<Dotace> aggs = new AggregationContainerDescriptor<Dotace>()
+                .Terms("perYear", st => st
+                    .Field(f => f.ApprovedYear)
+                    .Size(10000)
+                    .Aggregations(typeAggs => typeAggs
+                        .Sum("sumAssumedAmount", sa => sa
+                            .Field(f => f.AssumedAmount)
+                        )
+                    )
+                );
+
+            string query = $"subsidyProviderIco:{providerIco}";
+
+            var res = await DotaceRepo.Searching.SimpleSearchAsync(
+                query, 1, 0, "666",
+                anyAggregation: aggs);
+            if (res is null)
+            {
+                return [];
+            }
+
+            // Initialize the results dictionary
+            List<(int Year, long Count, decimal Sum)> results = new();
+
+            // Parse the aggregation results
+            if (res.ElasticResults.Aggregations["perYear"] is BucketAggregate subsidyYearBA)
+            {
+                foreach (KeyedBucket<object> subsidyYearBucket in subsidyYearBA.Items)
+                {
+                    if (subsidyYearBucket["sumAssumedAmount"] is ValueAggregate sumBA)
+                    {
+                        if (int.TryParse(subsidyYearBucket.Key.ToString(), out int year))
+                        {
+                            results.Add((year, subsidyYearBucket.DocCount ?? 0, Convert.ToDecimal(sumBA.Value ?? 0)));    
+                        }
+                        
+                    }
+                }
+            }
+
+            return results;
+        }
 
         public static async
     Task<List<(Dotace.Hint.CalculatedCategories Category, long Count, decimal Sum)>>
@@ -381,7 +420,7 @@ namespace HlidacStatu.Repositories
                             )
                         )
                     );
-            string query = "hints.isOriginal:true AND _exists_:recipient.ico AND NOT recipient.ico:\"\"";
+            string query = "_exists_:recipient.ico AND NOT recipient.ico:\"\"";
             if (rok is not null && rok > 0)
             {
                 query += $" AND approvedYear:{rok}";
@@ -450,7 +489,7 @@ namespace HlidacStatu.Repositories
                         )
                     )
                 );
-            string query = "hints.isOriginal:true AND _exists_:recipient.ico AND NOT recipient.ico:\"\"";
+            string query = "_exists_:recipient.ico AND NOT recipient.ico:\"\"";
             if (rok is not null && rok > 0)
             {
                 query += $" AND approvedYear:{rok}";
@@ -524,8 +563,7 @@ namespace HlidacStatu.Repositories
                     )
                 );
 
-            string query =
-                "hints.isOriginal:true AND hints.subsidyType:2 AND _exists_:recipient.ico AND NOT recipient.ico:\"\"";
+            string query = "hints.subsidyType:2 AND _exists_:recipient.ico AND NOT recipient.ico:\"\"";
 
             if (rok is not null && rok > 0)
             {
@@ -584,7 +622,7 @@ namespace HlidacStatu.Repositories
                 );
 
             string query =
-                "hints.isOriginal:true AND hints.recipientPolitickyAngazovanySubjekt:>0 AND _exists_:recipient.ico AND NOT recipient.ico:\"\"";
+                "hints.recipientPolitickyAngazovanySubjekt:>0 AND _exists_:recipient.ico AND NOT recipient.ico:\"\"";
 
             if (rok is not null && rok > 0)
             {
@@ -641,7 +679,7 @@ namespace HlidacStatu.Repositories
                     )
                 );
 
-            string query = $"hints.isOriginal:true AND hints.subsidyType:{typDotace:D}";
+            string query = $"hints.subsidyType:{typDotace:D}";
 
             if (rok is not null && rok > 0)
             {
