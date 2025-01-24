@@ -30,6 +30,7 @@ public partial class Dotace
         ["Stredocesky Kraj"] = "Kvalitní zdroj s open source daty. Jediné co zde mohu vytknout je odkaz na sharepoint namísto přímého stažení dat.",
         ["Ustecky Kraj"] = "Data dodali v celkem dobré struktuře. Interpretaci některých údajů jsme si museli ověřit. Ve zdroji jsme nalezli několik (potencionálních) chyb, ke kterým stále nemáme vyjádření.",
         ["Zlinsky Kraj"] = "Po drobném upřesnění poslali data v dobré kvalitě v požadovaném formátu. Tento kraj podezříváme, že nám neposlal informace o všech dotacích. Chybí nám například informace o kotlíkových dotacích.",
+        ["Olomoucky Kraj"] = "Ten tu zatím nenajdete. <a href='https://x.com/HlidacStatu/status/1868713720098308352' target='_blank'>Za data o dotacích po nás chce 372 608 Kč. Opravdu.</a>",
 
     };
     

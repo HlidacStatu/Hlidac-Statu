@@ -81,7 +81,7 @@
                     @foreach (var item in HlidacStatu.Entities.Dotace.DataSourceDescription)
                     {
                         <dt class="col-md-2 col-sm-4 col-xs-4">@item.Key</dt>
-                        <dd class="col-md-10 col-sm-8 col-xs-8">@item.Value</dd>
+                        <dd class="col-md-10 col-sm-8 col-xs-8">@Html.Raw(item.Value)</dd>
                     }
                 </dl>
             </div>
