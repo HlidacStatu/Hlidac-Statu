@@ -274,7 +274,7 @@ public partial class Dotace
             },
             { CalculatedCategories.Energetika, new string[] { } },
             { CalculatedCategories.HumanitarniPomoc, new string[] { } },
-            { CalculatedCategories.InovaceVyzkum, new[] { 
+            { CalculatedCategories.InovaceVyzkum, new[] {
                 "48549037", "Akademie věd ČR",
                 "Technologická agentura České republiky",
             } },
@@ -3674,39 +3674,38 @@ public partial class Dotace
         }
 
 
-        static string llmCategoryQuery = @"Máš k dispozici pouze tyto kategorie. Každá kategorie je uvedena na samostatném řádku:
-Bilaterální zahraniční rozvojové spolupráce (ZRS), rozvoj občanské společnosti
-Digitální transformace a IT
-Doprava a infrastruktura
-Energetika a obnovitelné zdroje
-Fond hejtmana
-Fond primátora
-Humanitární pomoc a rozvojová spolupráce
-Inovace, výzkum a vývoj
-Investiční a dotační programy pro veřejnou správu
-Kultura, kreativní průmysly a média
-Malé a střední podniky (MSP)
-Obrana a bezpečnost
-Ostatní
-Památková péče a cestovní ruch
-Podpora demokracie a právního státu
-Podpora podnikání a investic
-Podpora zaměstnanosti a trhu práce
-Prevence kriminality a bezpečnost
-Regionální rozvoj, podpora, investice a soudržnost
-Sociální služby, začleňování a zaměstnanost
-Sport a volnočasové aktivity
-Vzdělávání,školství a mládež
-Zdraví a zdravotnické projekty
-Zemědělství, lesnictví a rozvoj venkova
-Životní prostředí, klima a ekologické projekty
+        static string llmCategoryQuery = @"Máš k dispozici pouze tyto kategorie, mezi znackami <kategorie></kategorie>. Každá kategorie je uvedena na samostatném řádku:
+<kategorie> 
+##Digi##	Digitální transformace, IT, výpočetní technika, software, cloud, AI, umělá inteligence, informační systém, IT infrastruktura, datové centrum
+##Doprava##	Doprava a infrastruktura, železnice, stanice, rekonstrukce, nákup autobusů, nákup vlaků, nákup vozidla, budova, násep, zařízení pro údržbu silnic, Dálnice D1, silnice, okruh
+##Energetika##	Energetika a obnovitelné zdroje, obnovitelné zdroje energie, dodávku elektřiny a plynu, uhlí, ropy, přenosová soustava, energetická soustava, elektrárna
+##FondHejtmana##	Fond hejtmana
+##FondPrimatora = 52000	Fond primátora
+##HumanitarniPomoc##	Humanitární pomoc a rozvojová spolupráce, Charita, uprchlíci, válečný konflikt, afrika, Ukrajina, Pomoc Ukrajině,červený kříž
+##InovaceVyzkum##	Inovace, výzkum a vývoj, Podpora VO, 
+##Kriminalita##	Prevence kriminality a bezpečnost
+##Kultura##	Kultura, kreativní průmysly a média, galerie, divadlo, představení, zpěv, recitace, festival
+##Obrana##	Obrana a bezpečnost
+##Pamatky##	Památková péče a cestovní ruch, turismus, cestovní kancelář, obnova památek, obnova sochy, rekonstrukce budovy, rekonstrukce zámku, turistický areál
+##PodporaPodnikani##	Podpora podnikání a investic
+##PravniStat##	Podpora demokracie a právního státu, volby, transparentnost, LGBT, vyloučené skupiny, znevýhodněné skupiny obyvatel
+##RegionalniRozvoj##	Regionální rozvoj, podpora, investice a soudržnost, Vybudování chodníku, Rekonstrukce MVN, obnova, vodovod, školní kuchyně, Rekonstrukce cest, hasiči, kapacita stanice, koupaliště
+##SocialniSluzby##	Sociální služby, začleňování a zaměstnanost, dlouhodobě nemocní, hospic, domov pro postižené, domov pro seniory, dům, 
+##Sport##	Sport a volnočasové aktivity, sportovní areál, cvičiště, sportovní závody, soutěž, stadión, běh
+##TrhPrace##	Podpora zaměstnanosti a trhu práce, odborné vzdělávání, 
+##VerejnaSprava##	Investiční a dotační programy pro veřejnou správu
+##Vzdelavani##	Vzdělávání,školství a mládež, školy, družiny, učitelé
+##Zahranici##	Bilaterální zahraniční rozvojové spolupráce (ZRS), rozvoj občanské společnosti, přeshraniční spolupráce, 
+##Zdravotnictvi##	Zdraví a zdravotnické projekty, geriatrického oddělení, léčebna, Rehabilitace, nemocnice, léky, zdravotní zařízení, oddělení
+##Zemedelstvi##	Zemědělství, lesnictví a rozvoj venkova, SZIF, les, remízek, stromy, lesní hospodářství, myslivost
+##ZivotniProstredi##	Životní prostředí, klima a ekologické projekty, podporu obnovitelných zdrojů, OZE, Odstraňování následků těžby, ZNHČ, povodeň, kvality vod, ochrana vod, Zateplení
+</kategorie> 
 
-
-Analyzuj text uvedený ve značkách <text></text> a vyber nejvhodnější kategorii z uvedeného seznamu. Nevysvětluj svůj postoj, pouze uveď nejvhodnější kategorii.
+Analyzuj text uvedený ve značkách <text></text> a vyber nejvhodnější kategorii z uvedeného seznamu. Nevysvětluj svůj postoj, pouze uveď nejvhodnější kategorii jako prostý text.
 
 <text>##TEXT##</text>";
         static Dictionary<string, CalculatedCategories> catsDescriptions = Enum.GetValues<CalculatedCategories>()
-            .Select(m => new { key = m.ToNiceDisplayName().ToLower().RemoveAccents().Replace(" ",""), val = m })
+            .Select(m => new { key = m.ToString(), val = m })
             .ToDictionary(k => k.key, v => v.val);
 
         public static IEnumerable<Category> ToCalculatedCategoryWithAI(Dotace item)
@@ -3742,10 +3741,19 @@ Analyzuj text uvedený ve značkách <text></text> a vyber nejvhodnější kateg
 
             _logger.Information("AI result {category} for project {projectName}", resFull, item.ProjectName + " " + item.ProjectDescription);
 
-                if (catsDescriptions.ContainsKey(resFull.ToLower()))
-                    cats.Add(new Category() { Created = DateTime.Now, Probability = 0.8m, TypeValue = (int)catsDescriptions[resFull.ToLower()] });
-                else if (runs < 6)
-                    goto start;
+            foreach (var kv in catsDescriptions)
+            {
+                if (
+                    resFull.Contains(kv.Key, StringComparison.InvariantCultureIgnoreCase)
+                    || resFull.Contains("##" + kv.Key + "##", StringComparison.InvariantCultureIgnoreCase)
+                    )
+                {
+                    cats.Add(new Category() { Created = DateTime.Now, Probability = 0.8m, TypeValue = (int)kv.Value });
+                    break;
+                }
+            }
+                if (cats.Count==0 &&  runs < 6)
+                goto start;
 
 
             return cats;
