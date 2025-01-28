@@ -241,9 +241,15 @@ namespace HlidacStatuApi.Controllers.ApiV2
                     Devmasters.DT.Util.ToDateTimeFromCode(
                         Devmasters.RegexUtil.GetRegexGroupValue(fn, regexStr, "date"));
                 string name = Devmasters.RegexUtil.GetRegexGroupValue(fn, regexStr, "name");
+                string nicename = name;
+                if (nicename.StartsWith("hs-"))
+                    nicename = nicename.Substring(3);
+                if (nicename.EndsWith("-01"))
+                    nicename = nicename.Substring(0, nicename.Length - 3);
+
                 string dtype = Devmasters.RegexUtil.GetRegexGroupValue(fn, regexStr, "type");
                 if (!string.IsNullOrEmpty(dtype))
-                    name = dtype + "." + name;
+                    nicename = dtype + "." + nicename;
                 data.Add(
                     new DumpInfoModel()
                     {
@@ -252,13 +258,16 @@ namespace HlidacStatuApi.Controllers.ApiV2
                         date = date,
                         fulldump = date.HasValue == false,
                         size = fi.Length,
-                        dataType = name
+                        dataType = nicename
                     }
                 );
                 ;
             }
 
-            return data.ToArray();
+            return data
+                .OrderByDescending(o=>o.created)
+                .ThenBy(o=>o.dataType)
+                .ToArray();
         }
     }
 
