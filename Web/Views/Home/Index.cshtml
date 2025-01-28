@@ -79,14 +79,11 @@
 
             <!-- MailerLite Universal -->
             <script>
-                (function (m, a, i, l, e, r) {
-                    m['MailerLiteObject'] = e; function f() {
-                        var c = { a: arguments, q: [] }; var r = this.push(c); return "number" != typeof r ? r : f.bind(c.q);
-                    }
-                    f.q = f.q || []; m[e] = m[e] || f.bind(f.q); m[e].q = m[e].q || f.q; r = a.createElement(i);
-                    var _ = a.getElementsByTagName(i)[0]; r.async = 1; r.src = l + '?v' + (~~(new Date().getTime() / 1000000));
-                    _.parentNode.insertBefore(r, _);
-                })(window, document, 'script', 'https://static.mailerlite.com/js/universal.js', 'ml');
+                (function(m,a,i,l,e,r){ m['MailerLiteObject']=e;function f(){
+                var c={ a:arguments,q:[]};var r=this.push(c);return "number"!=typeof r?r:f.bind(c.q);}
+                f.q=f.q||[];m[e]=m[e]||f.bind(f.q);m[e].q=m[e].q||f.q;r=a.createElement(i);
+                var _=a.getElementsByTagName(i)[0];r.async=1;r.src=l+'?v'+(~~(new Date().getTime()/1000000));
+                _.parentNode.insertBefore(r,_);})(window, document, 'script', 'https://static.mailerlite.com/js/universal.js', 'ml');
 
                 var ml_account = ml('accounts', '1727018', 'u8a0r9v8n8', 'load');
             </script>
@@ -102,10 +99,10 @@
                 </p>
                 <p>
                     <script>
-                        var ml_webform_4032532 = ml_account('webforms', '4032532', 'g4v0v6', 'load');
-                        ml_webform_4032532('animation', 'contentPush');
+                        var ml_webform_6077068 = ml_account('webforms', '6077068', 'u5g9s7', 'load');
+                        ml_webform_6077068('animation', 'fadeIn');
                     </script>
-                    <a class="btn btn-primary btn-sm" href="javascript:;" onclick="ml_webform_4032532('show')">Přihlásit k odběru</a>
+                    <a class="btn btn-primary btn-sm" href="javascript:;" onclick="ml_webform_6077068('show')">Přihlásit k odběru</a>
                 </p>
             </div>
 
