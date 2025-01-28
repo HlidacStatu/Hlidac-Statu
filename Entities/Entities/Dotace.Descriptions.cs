@@ -9,7 +9,7 @@ public partial class Dotace
     {
         // statni
         ["Cedr"] = "Jedná se o starý (neaktivní) informační zdroj, který může obsahovat chyby. Tento zdroj jsme se rozhodli zachovat čistě z archivačního důvodu. Jeho náhradou s aktuálními a opravenými daty je zdroj IsRed.",
-        ["CzechInvest"] = "Tento zdroj obsahuje pouze data s investičními pobídkami. Nejedná se přímo o dotace. Z našeho uvážení jsme se však rozhodli zařadit mezi dotace. Částka rozhodnutá zde nemusela být vůbec vyčerpána v plné výši.",
+        //["CzechInvest"] = "Tento zdroj obsahuje pouze data s investičními pobídkami. Nejedná se přímo o dotace. Z našeho uvážení jsme se však rozhodli zařadit mezi dotace. Částka rozhodnutá zde nemusela být vůbec vyčerpána v plné výši.",
         ["DeMinimis"] = "",
         ["DotInfo"] = "Jedná se o starý (neaktivní) informační zdroj, který může obsahovat hodně chyb. Tento zdroj jsme se rozhodli zachovat čistě z archivačního důvodu.",
         ["Eufondy"] = "Aktivní zdroj. Neobsahuje data v nejlepší kvalitě a proto, pokud existuje duplicita v tomto detailu, která vede na IsRed, doporučujeme se podívat na přesnější informace právě ze systému IsRed.",
@@ -31,6 +31,35 @@ public partial class Dotace
         ["Ustecky Kraj"] = "Data dodali v celkem dobré struktuře. Interpretaci některých údajů jsme si museli ověřit. Ve zdroji jsme nalezli několik (potencionálních) chyb, ke kterým stále nemáme vyjádření.",
         ["Zlinsky Kraj"] = "Po drobném upřesnění poslali data v dobré kvalitě v požadovaném formátu. Tento kraj podezříváme, že nám neposlal informace o všech dotacích. Chybí nám například informace o kotlíkových dotacích.",
         ["Olomoucky Kraj"] = "Ten tu zatím nenajdete. <a href='https://x.com/HlidacStatu/status/1868713720098308352' target='_blank'>Za data o dotacích po nás chce 372 608 Kč. Opravdu.</a>",
+
+    };
+    
+    public static readonly Dictionary<string, string> DataSourceNiceNames = new()
+    {
+        // statni
+        ["Cedr"] = "Centrální registr dotací",
+        //["CzechInvest"] = "CzechInvest",
+        ["DeMinimis"] = "DeMinimis",
+        ["DotInfo"] = "DotInfo",
+        ["Eufondy"] = "Eufondy",
+        ["IsRed"] = "Registr dotací",
+        ["Statni zemedelsky intervencni fond"] = "Státní zemědělský intervenční fond",
+        
+        // krajske
+        ["Hlavni mesto Praha"] = "Hlavní město Praha",
+        ["Jihocesky Kraj"] = "Jihočeský Kraj",
+        ["Jihomoravsky Kraj"] = "Jihomoravský Kraj",
+        ["Karlovarsky Kraj"] = "Karlovarský Kraj",
+        ["Kraj Vysocina"] = "Kraj Vysočina",
+        ["Kralovehradecky Kraj"] = "Královéhradecký Kraj",
+        ["Liberecky Kraj"] = "Liberecký Kraj",
+        ["Moravskoslezsky Kraj"] = "Moravskoslezský Kraj",
+        ["Pardubicky Kraj"] = "Pardubický Kraj",
+        ["Plzensky Kraj"] = "Plzeňský Kraj",
+        ["Stredocesky Kraj"] = "Středočeský Kraj",
+        ["Ustecky Kraj"] = "Ústecký Kraj",
+        ["Zlinsky Kraj"] = "Zlínský Kraj",
+        ["Olomoucky Kraj"] = "Olomoucký Kraj",
 
     };
     

@@ -29,7 +29,11 @@ namespace HlidacStatu.Repositories
             
 
             dotace.ModifiedDate = DateTime.Now;
-
+            
+            //recalc hints
+            UpdateHints(dotace, false);
+            FixSomeHints(dotace);
+            
             var res = await DotaceClient.IndexAsync(dotace, o => o.Id(dotace.Id));
 
             if (!res.IsValid)
@@ -175,19 +179,35 @@ namespace HlidacStatu.Repositories
             return GetAllAsync(qc);
         }
         
-        public static async Task MergeSubsidiesToDotaceAsync()
+        public static async Task MergeSubsidiesToDotaceAsync(string dataSource)
         {
             int maxDegreeOfParallelism = 40; // Adjust this value as needed
             var semaphore = new SemaphoreSlim(maxDegreeOfParallelism);
             int processedCount = 0;
+
+            QueryContainer originalsQuery;
             
-            var originalsQuery = new QueryContainerDescriptor<Subsidy>()
-                .Bool(b => b
-                    .Must(
-                        m => m.Term(t => t.Metadata.IsHidden, false),
-                        m => m.Term(t => t.Hints.IsOriginal, true)
-                    )
-                );
+            if (string.IsNullOrWhiteSpace(dataSource))
+            {
+                originalsQuery = new QueryContainerDescriptor<Subsidy>()
+                    .Bool(b => b
+                        .Must(
+                            m => m.Term(t => t.Metadata.IsHidden, false),
+                            m => m.Term(t => t.Hints.IsOriginal, true)
+                        )
+                    );
+            }
+            else
+            {
+                originalsQuery = new QueryContainerDescriptor<Subsidy>()
+                    .Bool(b => b
+                        .Must(
+                            m => m.Term(t => t.Metadata.IsHidden, false),
+                            // m => m.Term(t => t.Hints.IsOriginal, true), //v případě nahrávání solo zdroje můžeme a potřebujeme updatovat i duplikáty
+                            m => m.Match(t => t.Field(f => f.Metadata.DataSource).Query(dataSource))
+                        )
+                    );
+            }
             
             var originalSubsidyIds = SubsidyRepo.SubsidyClient.SimpleGetAllIds(5, originalsQuery);
             int totalCount = originalSubsidyIds.Count;
@@ -198,13 +218,39 @@ namespace HlidacStatu.Repositories
                 try
                 {
                     Console.WriteLine($"Remaining to process: {totalCount - Interlocked.Increment(ref processedCount)}");
+
                     Dotace dotaceRecord = new Dotace();
+                    
                     var originalSubsidy = await SubsidyRepo.GetAsync(originalSubsidyId);
+
+                    if (!originalSubsidy.Hints.IsOriginal)
+                    {
+                        var tryLoad = await GetAsync(originalSubsidy.Id);
+
+                        if (tryLoad != null)
+                        {
+                            //zkusíme load dotaceRecord a updatovat už hotová data
+                            dotaceRecord = tryLoad;
+                        }
+                        else
+                        { 
+                            // pokud jsme nenašli záznam v Dotace, pak načteme správně original
+                            originalSubsidy = await SubsidyRepo.GetAsync(originalSubsidy.Hints.OriginalSubsidyId);
+                            if (originalSubsidy == null)
+                            {
+                                throw new Exception($"Couldnt find original subsidy for {originalSubsidy.Id}");
+                            }
+                        }
+                    }
+                    
                     FixRecipientFromRawData(originalSubsidy);
                     dotaceRecord.UpdateFromSubsidy(originalSubsidy);
                 
                     foreach (var duplicateId in originalSubsidy.Hints.Duplicates)
                     {
+                        if(dotaceRecord.SourceIds.Contains(duplicateId))
+                            continue;
+                        
                         var duplicateSubsidy = await SubsidyRepo.GetAsync(duplicateId);
                         FixRecipientFromRawData(duplicateSubsidy);
                         dotaceRecord.UpdateFromSubsidy(duplicateSubsidy);
@@ -232,6 +278,29 @@ namespace HlidacStatu.Repositories
 
             await Task.WhenAll(tasks);
             
+        }
+
+        private static void FixSomeHints(Dotace dotace)
+        {
+            if (dotace.PrimaryDataSource.ToLower() == "deminimis")
+            {
+                dotace.Hints.Category1 = new Dotace.Hint.Category()
+                {
+                    Created = DateTime.Now,
+                    Probability = 1m,
+                    TypeValue = (int)Dotace.Hint.CalculatedCategories.MaleStredniPodniky
+                };
+            }
+            
+            if (dotace.PrimaryDataSource.ToLower() == "covid")
+            {
+                dotace.Hints.Category1 = new Dotace.Hint.Category()
+                {
+                    Created = DateTime.Now,
+                    Probability = 1m,
+                    TypeValue = (int)Dotace.Hint.CalculatedCategories.Covid
+                };
+            }
         }
 
         public static void FixRecipientFromRawData(Subsidy subsidy)
