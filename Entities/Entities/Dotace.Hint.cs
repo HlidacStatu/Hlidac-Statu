@@ -252,7 +252,10 @@ public partial class Dotace
             FondHejtmana = 51000,
 
             [NiceDisplayName("Fond primátora")]
-            FondPrimatora = 52000
+            FondPrimatora = 52000,
+            
+            [NiceDisplayName("Covidové dotace")]
+            Covid = 22000
         }
 
 
