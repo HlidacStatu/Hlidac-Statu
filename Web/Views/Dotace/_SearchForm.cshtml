@@ -1,15 +1,19 @@
-﻿@model HlidacStatu.Repositories.Searching.DotaceSearchResult
+﻿@using System.Text.Json
+@model HlidacStatu.Repositories.Searching.DotaceSearchResult
 
 
 <div class="form-search">
     <label class="sr-only" for="I">Hledat v dotac&#xED;ch</label>
 
-    <form method="get" action="/dotace/hledat" class="form-search__input-wrapper" role="form">
-        <input class="form-search__input" id="Q" name="Q" placeholder="Název společnosti, osoby, IČO, spisová značka, ..."
-               style="max-width: none;" type="text" value="@Model.RenderQuery()">
-
-        <button class="form-search__btn" type="submit">Hledat pouze v dotacích</button>
-    </form>
+    <div class="hlidac-autocomplete d-flex">
+        <select id="autocomplete-dotace" autocomplete="off" placeholder='Napište vyhledávaný výraz nebo stiskněte tlačítko "Hledat"'></select>
+        <button id="sendDotaceQuery" class="btn btn-primary" style="margin-bottom:0;margin-top:0;padding-bottom:0">Hledat
+            <span id="searchSpiner" style="display: none" class="spinner-border spinner-border-sm text-light align-middle mb-1 ms-1" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </span>
+        </button>
+    </div>
+    
     <div class="row">
         <div class="col-sm-10 col-xs-12">
         </div>
@@ -25,3 +29,20 @@
     
     <div class="clearfix" style="padding-bottom:20px;"></div>
 </div>
+
+@{
+    var query = Context.Request.Query;
+    var inputTags = AutocompleteHelper.CreateInputTagsForJs(query);
+    var inputTagsJson = JsonSerializer.Serialize(inputTags).Replace(@"\", @"\\"); //JSON.parse need escaped `\`
+}
+
+<script>
+
+$(document).ready(function () {
+    const inputTagsJson = '@Html.Raw(inputTagsJson)';
+    const autocomplete1 = new AutocompleteManager('#autocomplete-dotace','/dotace/hledat',inputTagsJson, '#sendDotaceQuery' );
+
+    // You can now initialize multiple instances with different selectors if needed
+    // const autocomplete2 = new AutocompleteManager('#anotherAutocomplete');
+});
+</script>

@@ -1,12 +1,13 @@
 ﻿//autocomplete
 
 class AutocompleteManager {
-    constructor(selector, targetSearchUri, inputTagsJson, options = {}) {
+    constructor(selector, targetSearchUri, inputTagsJson, buttonId, options = {}) {
         this.selector = selector;
         this.autocompleteLastQuery = '';
         this.options = options;
         this.inputTagsJson = inputTagsJson;
         this.targetSearchUri = targetSearchUri;
+        this.buttonId = buttonId;
         this.init();
     }
 
@@ -149,7 +150,7 @@ class AutocompleteManager {
             }
         });
 
-        $('#getValuesBtn').click(() => this.search());
+        $(this.buttonId).click(() => this.search());
 
         this.recreateSelectedTags();
     }
