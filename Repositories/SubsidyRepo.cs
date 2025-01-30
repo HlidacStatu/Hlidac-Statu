@@ -246,7 +246,10 @@ namespace HlidacStatu.Repositories
             //no duplicates exist 
             if (allSubsidies == null || !allSubsidies.Any())
             {
-                Logger.Error($"For subsidy [{baseSubsidy.Id}] was not found anything.");
+                if (!string.IsNullOrWhiteSpace(baseSubsidy.Recipient.Ico))
+                {
+                    Logger.Error($"For subsidy [{baseSubsidy.Id}] with duplaHash:[{baseSubsidy.DuplaHash}], projectCodeHash:[{baseSubsidy.ProjectCodeHash}], projectNameHash:[{baseSubsidy.ProjectNameHash}] was not found anything.");
+                }
                 return;
             }
 
