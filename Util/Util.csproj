@@ -5,6 +5,7 @@
 		<RootNamespace>HlidacStatu.Util</RootNamespace>
 		<AssemblyName>HlidacStatu.Util</AssemblyName>
 		<GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+		<Nullable>enable</Nullable>
 	</PropertyGroup>
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Stage|AnyCPU'">
 		<DebugSymbols>true</DebugSymbols>

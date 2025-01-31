@@ -4,6 +4,7 @@
                 <TargetFramework>net8.0</TargetFramework>
         <UserSecretsId>aspnet-HlidacStatu.JobsWeb-13E6255C-B0D5-414D-B3F6-120950C1DA69</UserSecretsId>
 		<GenerateRuntimeConfigDevFile>true</GenerateRuntimeConfigDevFile>
+		<Nullable>enable</Nullable>
 	</PropertyGroup>
 
     <ItemGroup>

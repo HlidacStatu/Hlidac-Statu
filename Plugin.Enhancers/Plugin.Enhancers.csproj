@@ -5,6 +5,7 @@
     <RootNamespace>HlidacStatu.Plugin.Enhancers</RootNamespace>
     <AssemblyName>HlidacStatu.Plugin.Enhancers</AssemblyName>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <Nullable>enable</Nullable>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <UseVSHostingProcess>false</UseVSHostingProcess>

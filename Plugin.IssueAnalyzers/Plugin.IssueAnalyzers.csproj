@@ -5,6 +5,7 @@
     <RootNamespace>HlidacStatu.Plugin.IssueAnalyzers</RootNamespace>
     <AssemblyName>HlidacStatu.Plugin.IssueAnalyzers</AssemblyName>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <Nullable>enable</Nullable>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <UseVSHostingProcess>false</UseVSHostingProcess>

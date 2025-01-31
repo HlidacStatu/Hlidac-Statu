@@ -4,6 +4,7 @@
     <OutputType>Exe</OutputType>
     <RootNamespace>Vybory_PSP</RootNamespace>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <Nullable>enable</Nullable>
   </PropertyGroup>
   <ItemGroup>
     <Content Include="appsettings.json" />

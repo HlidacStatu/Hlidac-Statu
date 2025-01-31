@@ -5,6 +5,7 @@
     <RootNamespace>HlidacStatu.Lib.Analytics</RootNamespace>
     <AssemblyName>HlidacStatu.Lib.Analytics</AssemblyName>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <Nullable>enable</Nullable>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <LangVersion>8.0</LangVersion>

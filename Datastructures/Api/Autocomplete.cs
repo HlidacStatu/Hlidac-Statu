@@ -59,7 +59,8 @@ namespace HlidacStatu.DS.Api
             Synonym,
             Operator,
             Hint,
-            Kindex
+            Kindex,
+            DotaceProgram,
         }
     }
 

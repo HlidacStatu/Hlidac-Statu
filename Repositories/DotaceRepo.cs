@@ -18,22 +18,21 @@ namespace HlidacStatu.Repositories
 
         public static readonly ElasticClient DotaceClient = Manager.GetESClient_DotaceAsync()
             .ConfigureAwait(false).GetAwaiter().GetResult();
-        
-        
+
 
         public static async Task SaveAsync(Dotace dotace)
         {
             Logger.Debug(
                 $"Saving Dotace {dotace.Id} from {dotace.PrimaryDataSource}");
             if (dotace is null) throw new ArgumentNullException(nameof(dotace));
-            
+
 
             dotace.ModifiedDate = DateTime.Now;
-            
+
             //recalc hints
             UpdateHints(dotace, false);
             FixSomeHints(dotace);
-            
+
             var res = await DotaceClient.IndexAsync(dotace, o => o.Id(dotace.Id));
 
             if (!res.IsValid)
@@ -44,7 +43,6 @@ namespace HlidacStatu.Repositories
 
             Logger.Debug(
                 $"Dotace {dotace.Id} from {dotace.PrimaryDataSource} saved");
-        
         }
 
         public static bool UpdateHints(Dotace item, bool forceRewriteHints)
@@ -61,7 +59,7 @@ namespace HlidacStatu.Repositories
 
             Firma f = Firmy.Get(item.Recipient.Ico);
             DateTime dotaceDate = new DateTime(item.ApprovedYear ?? 1970, 1, 1);
-            
+
             if (f.Valid && (item.Hints.RecipientStatus == -1 || forceRewriteHints))
             {
                 item.Hints.RecipientTypSubjektu = (int)f.TypSubjektu;
@@ -75,7 +73,8 @@ namespace HlidacStatu.Repositories
                         (int)HintSmlouva.PolitickaAngazovanostTyp.AngazovanyMajitel;
 
                 item.Hints.RecipientPocetLetOdZalozeni = 99;
-                item.Hints.RecipientPocetLetOdZalozeni = (dotaceDate.Year - (f.Datum_Zapisu_OR ?? new DateTime(1990, 1, 1)).Year);
+                item.Hints.RecipientPocetLetOdZalozeni =
+                    (dotaceDate.Year - (f.Datum_Zapisu_OR ?? new DateTime(1990, 1, 1)).Year);
                 changed = true;
             }
             else
@@ -85,10 +84,10 @@ namespace HlidacStatu.Repositories
                 item.Hints.RecipientPolitickyAngazovanySubjekt = (int)HintSmlouva.PolitickaAngazovanostTyp.Neni;
                 changed = true;
             }
+
             return changed;
         }
 
-        
 
         public static async Task<Dotace> GetAsync(string idDotace)
         {
@@ -178,7 +177,7 @@ namespace HlidacStatu.Repositories
 
             return GetAllAsync(qc);
         }
-        
+
         public static async Task MergeSubsidiesToDotaceAsync(string dataSource)
         {
             int maxDegreeOfParallelism = 40; // Adjust this value as needed
@@ -186,7 +185,7 @@ namespace HlidacStatu.Repositories
             int processedCount = 0;
 
             QueryContainer originalsQuery;
-            
+
             if (string.IsNullOrWhiteSpace(dataSource))
             {
                 originalsQuery = new QueryContainerDescriptor<Subsidy>()
@@ -208,7 +207,7 @@ namespace HlidacStatu.Repositories
                         )
                     );
             }
-            
+
             var originalSubsidyIds = SubsidyRepo.SubsidyClient.SimpleGetAllIds(5, originalsQuery);
             int totalCount = originalSubsidyIds.Count;
 
@@ -217,10 +216,11 @@ namespace HlidacStatu.Repositories
                 await semaphore.WaitAsync();
                 try
                 {
-                    Console.WriteLine($"Remaining to process: {totalCount - Interlocked.Increment(ref processedCount)}");
+                    Console.WriteLine(
+                        $"Remaining to process: {totalCount - Interlocked.Increment(ref processedCount)}");
 
                     Dotace dotaceRecord = new Dotace();
-                    
+
                     var originalSubsidy = await SubsidyRepo.GetAsync(originalSubsidyId);
 
                     if (!originalSubsidy.Hints.IsOriginal)
@@ -233,7 +233,7 @@ namespace HlidacStatu.Repositories
                             dotaceRecord = tryLoad;
                         }
                         else
-                        { 
+                        {
                             // pokud jsme nenašli záznam v Dotace, pak načteme správně original
                             originalSubsidy = await SubsidyRepo.GetAsync(originalSubsidy.Hints.OriginalSubsidyId);
                             if (originalSubsidy == null)
@@ -242,15 +242,15 @@ namespace HlidacStatu.Repositories
                             }
                         }
                     }
-                    
+
                     FixRecipientFromRawData(originalSubsidy);
                     dotaceRecord.UpdateFromSubsidy(originalSubsidy);
-                
+
                     foreach (var duplicateId in originalSubsidy.Hints.Duplicates)
                     {
-                        if(dotaceRecord.SourceIds.Contains(duplicateId))
+                        if (dotaceRecord.SourceIds.Contains(duplicateId))
                             continue;
-                        
+
                         var duplicateSubsidy = await SubsidyRepo.GetAsync(duplicateId);
                         FixRecipientFromRawData(duplicateSubsidy);
                         dotaceRecord.UpdateFromSubsidy(duplicateSubsidy);
@@ -273,11 +273,9 @@ namespace HlidacStatu.Repositories
                 {
                     semaphore.Release();
                 }
-                
             }).ToList();
 
             await Task.WhenAll(tasks);
-            
         }
 
         private static void FixSomeHints(Dotace dotace)
@@ -291,7 +289,7 @@ namespace HlidacStatu.Repositories
                     TypeValue = (int)Dotace.Hint.CalculatedCategories.MaleStredniPodniky
                 };
             }
-            
+
             if (dotace.PrimaryDataSource.ToLower() == "covid")
             {
                 dotace.Hints.Category1 = new Dotace.Hint.Category()
@@ -314,25 +312,24 @@ namespace HlidacStatu.Repositories
                         dict.TryGetValue("ucastnik", out var ucastnikObj) &&
                         ucastnikObj is Dictionary<string, object> ucastnikDict)
                     {
-                        if (string.IsNullOrWhiteSpace(subsidy.Recipient.Name) && 
-                            ucastnikDict.TryGetValue("prijemce dotace jmeno", out var nameObj) && nameObj is string name)
+                        if (string.IsNullOrWhiteSpace(subsidy.Recipient.Name) &&
+                            ucastnikDict.TryGetValue("prijemce dotace jmeno", out var nameObj) &&
+                            nameObj is string name)
                         {
                             subsidy.Recipient.Name = name;
                         }
-                        
-                        if (subsidy.Recipient.YearOfBirth is null && 
+
+                        if (subsidy.Recipient.YearOfBirth is null &&
                             ucastnikDict.TryGetValue("rc ucastnika", out var rcObj) && rcObj is string rc)
                         {
                             //take first two letters and make a year from them
                             var year = int.Parse(rc.Substring(0, 2));
-                            
+
                             subsidy.Recipient.YearOfBirth = year < 40 ? 2000 + year : 1900 + year;
                         }
-                        
                     }
-                    
                 }
-                
+
                 //fix cedr
                 if (subsidy.Metadata.DataSource.ToLower() == "cedr")
                 {
@@ -342,7 +339,7 @@ namespace HlidacStatu.Repositories
                             dict.TryGetValue("prijemcejmeno", out var nameObj) && nameObj is string name)
                         {
                             subsidy.Recipient.Name = name;
-                        } 
+                        }
                     }
                 }
             }
@@ -350,6 +347,49 @@ namespace HlidacStatu.Repositories
             {
                 Logger.Warning(e, $"Failed to unwrap data from raw with subsidy{subsidy.Id}");
             }
+        }
+
+        public static async Task<List<string>> GetDistinctProgramsAsync()
+        {
+            var scrollTimeout = "2m";
+            var batchSize = 5000;
+            var uniqueProgramNames = new HashSet<string>();
+
+            var searchResponse = await DotaceRepo.DotaceClient.SearchAsync<Dotace>(s => s
+                .Size(batchSize)
+                .Scroll(scrollTimeout)
+                .Source(src => src.Includes(f => f.Field("programName"))) // Fetch only needed field
+            );
+
+            var scrollId = searchResponse.ScrollId;
+
+            if (searchResponse.Documents != null)
+            {
+                foreach (var doc in searchResponse.Documents)
+                {
+                    if (!string.IsNullOrEmpty(doc.ProgramName))
+                        uniqueProgramNames.Add(doc.ProgramName);
+                }
+            }
+
+            while (!string.IsNullOrEmpty(scrollId) && searchResponse.Documents.Any())
+            {
+                searchResponse = await DotaceRepo.DotaceClient.ScrollAsync<Dotace>(scrollTimeout, scrollId);
+                scrollId = searchResponse.ScrollId;
+
+                if (searchResponse.Documents != null)
+                {
+                    foreach (var doc in searchResponse.Documents)
+                    {
+                        if (!string.IsNullOrEmpty(doc.ProgramName))
+                            uniqueProgramNames.Add(doc.ProgramName);
+                    }
+                }
+            }
+
+            await DotaceRepo.DotaceClient.ClearScrollAsync(cs => cs.ScrollId(scrollId));
+            
+            return uniqueProgramNames.ToList();
         }
     }
 }

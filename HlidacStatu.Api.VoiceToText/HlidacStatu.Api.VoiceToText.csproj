@@ -9,6 +9,7 @@
 		<PackageReleaseNotes>API changes, duplicates</PackageReleaseNotes>
 		<Description>HlidacStatu.Api.VoiceToText</Description>
 		<Title>$(AssemblyName)</Title>
+		<Nullable>enable</Nullable>
 	</PropertyGroup>
 
 	<ItemGroup>

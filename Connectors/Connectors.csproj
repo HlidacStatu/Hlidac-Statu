@@ -4,6 +4,7 @@
                 <TargetFramework>net8.0</TargetFramework>
         <AssemblyName>HlidacStatu.Connectors</AssemblyName>
         <RootNamespace>HlidacStatu.Connectors</RootNamespace>
+        <Nullable>enable</Nullable>
     </PropertyGroup>
 
     <ItemGroup>

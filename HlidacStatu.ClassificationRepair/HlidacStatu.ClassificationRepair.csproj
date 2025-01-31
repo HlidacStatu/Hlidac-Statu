@@ -4,6 +4,7 @@
         <AssemblyName>HlidacStatu.ClassificationRepair</AssemblyName>
         <RootNamespace>HlidacStatu.ClassificationRepair</RootNamespace>
         <Version>1.0.2</Version>
+        <Nullable>enable</Nullable>
     </PropertyGroup>
     <ItemGroup>
         <None Remove="appsettings.json.sample" />

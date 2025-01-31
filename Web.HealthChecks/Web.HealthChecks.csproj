@@ -4,6 +4,7 @@
 		<TargetFramework>net8.0</TargetFramework>
 		<AssemblyName>HlidacStatu.Web.HealthChecks</AssemblyName>
 		<RootNamespace>HlidacStatu.Web.HealthChecks</RootNamespace>
+		<Nullable>enable</Nullable>
 	</PropertyGroup>
 	<ItemGroup>
 		<PackageReference Include="AspNetCore.HealthChecks.Elasticsearch" Version="8.0.1" />

@@ -5,6 +5,7 @@
     <RootNamespace>HlidacStatu.DBUpgrader</RootNamespace>
     <AssemblyName>HlidacStatu.DBUpgrader</AssemblyName>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <Nullable>enable</Nullable>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Devmasters.Core" Version="8.0.4" />

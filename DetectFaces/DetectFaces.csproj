@@ -4,6 +4,7 @@
             <TargetFramework>net8.0</TargetFramework>
     <AssemblyName>HlidacStatu.DetectFaces</AssemblyName>
     <RootNamespace>HlidacStatu.DetectFaces</RootNamespace>
+    <Nullable>enable</Nullable>
   </PropertyGroup>
 
   <ItemGroup>

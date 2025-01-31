@@ -26,6 +26,7 @@ namespace HlidacStatu.Repositories
                 new TransformPrefixWithValue("ico:", "(recipient.ico:${q} OR subsidyProviderIco:${q})",null),
                 new TransformPrefixWithValue("jmeno:", "(recipient.name:${q} OR recipient.hlidacName:${q})",null),
                 new TransformPrefix("projekt:", "projectName:", null),
+                new TransformPrefix("program:", "programName:", null),
                 new TransformPrefix("kodProjektu:", "projectCode:", null),
                 new TransformPrefix("castka:", "assumedAmount:", null),
                 new TransformPrefixWithValue("cena:", "assumedAmount:<=${q} ", "<=\\d"),

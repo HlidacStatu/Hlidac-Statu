@@ -5,6 +5,7 @@
     <RootNamespace>HlidacStatu.Lib.OCR.Api.Client</RootNamespace>
     <AssemblyName>HlidacStatu.Lib.OCR.Api.Client</AssemblyName>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <Nullable>enable</Nullable>
   </PropertyGroup>
   
   <ItemGroup>

@@ -43,6 +43,7 @@ namespace HlidacStatu.Repositories
             IEnumerable<Autocomplete> oblasti = new List<Autocomplete>();
             IEnumerable<Autocomplete> synonyms = new List<Autocomplete>();
             IEnumerable<Autocomplete> operators = new List<Autocomplete>();
+            IEnumerable<Autocomplete> dotacePrograms = new List<Autocomplete>();
             //IEnumerable<Autocomplete> articles = new List<Autocomplete>();
 
             ParallelOptions po = new ParallelOptions();
@@ -101,6 +102,20 @@ namespace HlidacStatu.Repositories
                     catch (Exception e)
                     {
                         _logger.Error(e, "GenerateAutocomplete Oblasti error ");
+                    }
+                },
+                
+                () =>
+                {
+                    try
+                    {
+                        _logger.Information("GenerateAutocomplete Loading dotace programs");
+                        dotacePrograms = LoadDotacePrograms();
+                        _logger.Information("GenerateAutocomplete Loading dotace programs done");
+                    }
+                    catch (Exception e)
+                    {
+                        _logger.Error(e, "GenerateAutocomplete dotace programs error ");
                     }
                 },
 
@@ -469,6 +484,32 @@ namespace HlidacStatu.Repositories
             });
 
             return oblasti;
+        }
+        
+        private static IEnumerable<Autocomplete> LoadDotacePrograms()
+        {
+            
+            var programs = DotaceRepo.GetDistinctProgramsAsync().GetAwaiter().GetResult();
+            
+            var programy = programs.Select(p =>
+            {
+                
+                var program = new Autocomplete()
+                {
+                    Id = $"programName:\"{p}\"",
+                    Text = $"{p}",
+                    PriorityMultiplier = 1f,
+                    Type = "Dotační program",
+                    Description = $"Dotační program: {p}",
+                    ImageElement = $"<i class='fa-duotone fa-light fa-folder-open'></i>",
+                    Category = Autocomplete.CategoryEnum.DotaceProgram,
+                };
+            
+                
+                return program;
+            });
+            
+            return programy;
         }
 
         private static IEnumerable<Autocomplete> LoadOperators()

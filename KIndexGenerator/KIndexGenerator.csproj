@@ -5,6 +5,7 @@
     <RootNamespace>HlidacStatu.KIndexGenerator</RootNamespace>
     <LangVersion>8.0</LangVersion>
     <TargetFramework>netstandard2.0</TargetFramework>
+    <Nullable>enable</Nullable>
   </PropertyGroup>
 
   <ItemGroup>

@@ -3,6 +3,7 @@
   <PropertyGroup>
             <TargetFramework>net8.0</TargetFramework>
     <RootNamespace>Http_Echo</RootNamespace>
+    <Nullable>enable</Nullable>
   </PropertyGroup>
 
   <ItemGroup>
