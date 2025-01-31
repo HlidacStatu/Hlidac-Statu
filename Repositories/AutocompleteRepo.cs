@@ -496,7 +496,7 @@ namespace HlidacStatu.Repositories
                 
                 var program = new Autocomplete()
                 {
-                    Id = $"programName:\"{p}\"",
+                    Id = $"program:\"{p}\"",
                     Text = $"{p}",
                     PriorityMultiplier = 1f,
                     Type = "Dotační program",
