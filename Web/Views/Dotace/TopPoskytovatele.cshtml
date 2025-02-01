@@ -1,6 +1,6 @@
 @using HlidacStatu.Repositories
 @using HlidacStatu.XLib.Render
-@model List<(string IcoPoskytovatele, decimal Sum)>
+@model List<(string IcoPoskytovatele, long Count, decimal Sum)>
 
 @{
     int? rok = null;
@@ -46,7 +46,7 @@
 }
 
 @{
-    List<ReportDataSource<(string IcoPoskytovatele, decimal Sum)>.Column> dataColumns =
+    List<ReportDataSource<(string IcoPoskytovatele, long Count, decimal Sum)>.Column> dataColumns =
     [
         new()
         {
@@ -57,15 +57,23 @@
         },
         new()
         {
+            Name = "Počet poskytnutých dotací",
+            TextRender = (x) => $"{HlidacStatu.Util.RenderData.NiceNumber(x.Count)}",
+            HtmlRender = (x) => $"<a href=/dotace/hledat?Q=subsidyProviderIco:{x.IcoPoskytovatele}>{HlidacStatu.Util.RenderData.NiceNumber(x.Sum,true)}</a>",
+            OrderValueRender = (x) => HlidacStatu.Util.RenderData.OrderValueFormat(x.Sum),
+            CssClass = "number"        
+        },
+        new()
+        {
             Name = "Částka",
-            TextRender = (x) => $"{x.Sum:N0} Kč",
-            HtmlRender = (x) => $"<a href=/dotace/hledat?Q=subsidyProviderIco:{x.IcoPoskytovatele}>{x.Sum:N0}&nbsp;Kč</a>",
+            TextRender = (x) => $"{HlidacStatu.Util.RenderData.NicePrice(x.Sum)}",
+            HtmlRender = (x) => $"{x.IcoPoskytovatele}>{HlidacStatu.Util.RenderData.NicePrice(x.Sum,html:true)}",
             OrderValueRender = (x) => HlidacStatu.Util.RenderData.OrderValueFormat(x.Sum),
             CssClass = "number"
         }
     ];
     
-    var data = new ReportDataSource<(string IcoPoskytovatele, decimal Sum)>(dataColumns);
+    var data = new ReportDataSource<(string IcoPoskytovatele, long Count, decimal Sum)>(dataColumns);
 
     data.AddRows(Model);
     

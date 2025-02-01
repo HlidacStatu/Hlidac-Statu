@@ -114,6 +114,12 @@ namespace HlidacStatu.Web.Controllers
             return View(data);
         }
 
+        [HlidacCache(22 * 60 * 60, "*", false)]
+        public async Task<ActionResult> VyberDotaci()
+        {
+            return View();
+        }
+
         [HlidacCache(22 * 60 * 60, "typdotace;rok", false)]
         public async Task<ActionResult> TopPoskytovatele(int typDotace, int? rok = null)
         {

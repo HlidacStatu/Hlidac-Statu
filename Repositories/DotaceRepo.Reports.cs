@@ -310,7 +310,7 @@ namespace HlidacStatu.Repositories
             return results;
         }
 
-        public static async Task<List<(string IcoPoskytovatele, decimal Sum)>> ReportPoskytovatelePoLetechAsync(
+        public static async Task<List<(string IcoPoskytovatele, long Count, decimal Sum)>> ReportPoskytovatelePoLetechAsync(
             Dotace.Hint.Type? typDotace, int? rok)
         {
             AggregationContainerDescriptor<Dotace> aggs = new AggregationContainerDescriptor<Dotace>()
@@ -344,7 +344,7 @@ namespace HlidacStatu.Repositories
             }
 
             // Initialize the results dictionary
-            List<(string IcoPoskytovatele, decimal Sum)> results = new();
+            List<(string IcoPoskytovatele, long Count, decimal Sum)> results = new();
 
             // Parse the aggregation results
             if (res.ElasticResults.Aggregations["perProviderIco"] is BucketAggregate subsidyProviderBA)
@@ -353,7 +353,7 @@ namespace HlidacStatu.Repositories
                 {
                     if (subsidyProviderBucket["sumAssumedAmount"] is ValueAggregate sumBA)
                     {
-                        results.Add((subsidyProviderBucket.Key.ToString(), Convert.ToDecimal(sumBA.Value ?? 0)));
+                        results.Add((subsidyProviderBucket.Key.ToString(), subsidyProviderBucket.DocCount ?? 0, Convert.ToDecimal(sumBA.Value ?? 0)));
                     }
                 }
             }
