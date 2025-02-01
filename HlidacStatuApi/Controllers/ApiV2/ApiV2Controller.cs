@@ -3,8 +3,10 @@ using HlidacStatu.Repositories;
 using HlidacStatuApi.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Nest;
 using Swashbuckle.AspNetCore.Annotations;
 using System.ComponentModel;
+using System.IO.Compression;
 using System.Net;
 
 namespace HlidacStatuApi.Controllers.ApiV2
@@ -88,7 +90,7 @@ namespace HlidacStatuApi.Controllers.ApiV2
         public class NotificationPayload
         {
             public string message { get; set; }
-            public string to {  get; set; } 
+            public string to { get; set; }
         }
         [ApiExplorerSettings(IgnoreApi = true)]
         [Authorize(Roles = "Admin")]
@@ -101,8 +103,8 @@ namespace HlidacStatuApi.Controllers.ApiV2
         [ApiExplorerSettings(IgnoreApi = true)]
         [Authorize(Roles = "Admin")]
         [HttpPost("notification/{id?}")]
-        [Consumes("text/plain", IsOptional = true )]
-        public async Task<ActionResult> NotificationPost([FromRoute] string id, [FromBody( EmptyBodyBehavior = Microsoft.AspNetCore.Mvc.ModelBinding.EmptyBodyBehavior.Allow)] string payload = null)
+        [Consumes("text/plain", IsOptional = true)]
+        public async Task<ActionResult> NotificationPost([FromRoute] string id, [FromBody(EmptyBodyBehavior = Microsoft.AspNetCore.Mvc.ModelBinding.EmptyBodyBehavior.Allow)] string payload = null)
         {
             return await SendNotification(id, payload);
 
@@ -111,7 +113,7 @@ namespace HlidacStatuApi.Controllers.ApiV2
         [Authorize(Roles = "Admin")]
         [HttpPost("notification")]
         [Consumes("application/json", IsOptional = true)]
-        public async Task<ActionResult> NotificationPostJson( [FromBody] NotificationPayload payload = null)
+        public async Task<ActionResult> NotificationPostJson([FromBody] NotificationPayload payload = null)
         {
             return await SendNotification(payload?.to, payload?.message);
 
@@ -187,15 +189,15 @@ namespace HlidacStatuApi.Controllers.ApiV2
 
         [Authorize]
         [HttpGet("dump/{datatype}")]
-        public ActionResult<HttpResponseMessage> Dump([FromRoute] string datatype)
+        public ActionResult<HttpResponseMessage> Dump([FromRoute] string datatype, bool unzip = false)
         {
-            return Dump(datatype, "");
+            return Dump(datatype, "", unzip: unzip);
         }
 
         [Authorize]
         [HttpGet("dump/{datatype}/{date?}")]
         public ActionResult<HttpResponseMessage> Dump([FromRoute] string datatype,
-            [FromRoute(Name = "date")][DefaultValue("")] string? date = "null")
+            [FromRoute(Name = "date")][DefaultValue("")] string? date = "null", bool unzip = false)
         {
             if (datatype.Contains("..") || datatype.Contains(Path.DirectorySeparatorChar))
             {
@@ -212,7 +214,33 @@ namespace HlidacStatuApi.Controllers.ApiV2
             {
                 try
                 {
-                    return File(System.IO.File.ReadAllBytes(fn), "application/zip", Path.GetFileName(fn), true);
+                    if (unzip)
+                    {
+                        string zipFilePath = fn;
+
+                        using (FileStream zipStream = new FileStream(zipFilePath, FileMode.Open, FileAccess.Read))
+                        using (ZipArchive archive = new ZipArchive(zipStream, ZipArchiveMode.Read))
+                        {
+                            ZipArchiveEntry firstEntry = archive.Entries.FirstOrDefault(e => !string.IsNullOrEmpty(e.Name));
+
+                            if (firstEntry == null)
+                            {
+                                return NotFound("No valid files found in the ZIP archive.");
+                            }
+
+                            MemoryStream memoryStream = new MemoryStream();
+                            using (Stream entryStream = firstEntry.Open())
+                            {
+                                entryStream.CopyTo(memoryStream);
+                            }
+                            memoryStream.Position = 0; // Reset stream position
+
+                            // Return file as stream with correct content type
+                            return File(memoryStream, "application/json", firstEntry.Name);
+                        }
+                    }
+                    else
+                        return File(System.IO.File.ReadAllBytes(fn), "application/zip", Path.GetFileName(fn), true);
                 }
                 catch (Exception e)
                 {
@@ -249,7 +277,12 @@ namespace HlidacStatuApi.Controllers.ApiV2
 
                 string dtype = Devmasters.RegexUtil.GetRegexGroupValue(fn, regexStr, "type");
                 if (!string.IsNullOrEmpty(dtype))
+                {
                     nicename = dtype + "." + nicename;
+                    name = dtype + "." + name;
+
+                }
+                name = name.Replace(".dump", "").Replace(".zip", "");
                 data.Add(
                     new DumpInfoModel()
                     {
@@ -265,8 +298,8 @@ namespace HlidacStatuApi.Controllers.ApiV2
             }
 
             return data
-                .OrderByDescending(o=>o.created)
-                .ThenBy(o=>o.dataType)
+                .OrderByDescending(o => o.created)
+                .ThenBy(o => o.dataType)
                 .ToArray();
         }
     }
