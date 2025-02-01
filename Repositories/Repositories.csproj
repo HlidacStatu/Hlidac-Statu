@@ -4,7 +4,6 @@
                 <TargetFramework>net8.0</TargetFramework>
         <AssemblyName>HlidacStatu.Repositories</AssemblyName>
         <RootNamespace>HlidacStatu.Repositories</RootNamespace>
-        <Nullable>enable</Nullable>
     </PropertyGroup>
 
     <ItemGroup>
