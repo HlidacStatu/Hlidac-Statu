@@ -81,6 +81,12 @@ namespace HlidacStatu.Lib.Analytics
             return Years.Keys.Max();
         }
 
+        public Dictionary<int,T> Filter(Func<KeyValuePair<int,T>,bool> yearPredicate)
+        {
+            return Years.Where(yearPredicate)
+                .ToDictionary(k=>k.Key, v=>v.Value);
+        }
+
         public int Sum(Func<T, int> selector)
         {
             return Years.Values.Sum(selector);

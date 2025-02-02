@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using HlidacStatu.Entities;
+using HlidacStatu.Lib.Analytics;
 
 namespace HlidacStatu.Repositories
 {
@@ -21,15 +22,15 @@ namespace HlidacStatu.Repositories
             public decimal AvgAssumedAmount { get; set; }
             public int CountGrantedCompaniesFirstYear { get; set; }
             public int CountPolitickyAngazovanySubjekt { get; set; }
-            
+
         }
-        
+
         public static readonly int[] DefaultLimitedYears = Enumerable.Range(2010, DateTime.Now.Year - 2010).ToArray();
         public static readonly int[] DefaultKrajskeLimitedYears = Enumerable.Range(2021, DateTime.Now.Year - 2010).ToArray();
 
         public static async Task<List<ProgramStatistics>> ProgramStatisticAsync(string programName, string programCode)
         {
-            
+
             AggregationContainerDescriptor<Dotace> aggs = new AggregationContainerDescriptor<Dotace>()
                 .Terms("perYear", t => t
                     .Field(f => f.ApprovedYear)
@@ -76,7 +77,7 @@ namespace HlidacStatu.Repositories
                                         )
                                     )
                                 )
-                                
+
                             )
                         )
                     )
@@ -95,7 +96,7 @@ namespace HlidacStatu.Repositories
                 if (!string.IsNullOrWhiteSpace(programCode))
                     query += $"programCode:\"{programCode}\"";
             }
-            
+
             var res = await DotaceRepo.Searching.SimpleSearchAsync(query, 1, 0,
                 Repositories.Searching.DotaceSearchResult.DotaceOrderResult.FastestForScroll,
                 anyAggregation: aggs);
@@ -128,43 +129,43 @@ namespace HlidacStatu.Repositories
                                             ProviderIco = providerIcoBucket.Key.ToString(),
                                         };
                                         results.Add(programStat);
-                                        
+
                                         if (Enum.TryParse<Dotace.Hint.Type>(subsidyTypeBucket.Key.ToString(),
                                                 out var subsidyType))
                                         {
                                             programStat.SubsidyType = subsidyType;
                                         }
-                                        
+
                                         if (providerIcoBucket["sumAssumedAmount"] is ValueAggregate sumBA)
                                         {
                                             programStat.SumAssumedAmount = Convert.ToDecimal(sumBA.Value ?? 0);
                                         }
-                                        
+
                                         if (providerIcoBucket["minAssumedAmount"] is ValueAggregate minBA)
                                         {
                                             programStat.MinAssumedAmount = Convert.ToDecimal(minBA.Value ?? 0);
                                         }
-                                        
+
                                         if (providerIcoBucket["maxAssumedAmount"] is ValueAggregate maxBA)
                                         {
                                             programStat.MaxAssumedAmount = Convert.ToDecimal(maxBA.Value ?? 0);
                                         }
-                                        
+
                                         if (providerIcoBucket["avgAssumedAmount"] is ValueAggregate avgBA)
                                         {
                                             programStat.AvgAssumedAmount = Convert.ToDecimal(avgBA.Value ?? 0);
                                         }
-                                        
+
                                         if (providerIcoBucket["recipientCount"] is ValueAggregate recCount)
                                         {
                                             programStat.RecipientIcoCount = Convert.ToInt32(recCount.Value ?? 0);
                                         }
-                                        
+
                                         if (providerIcoBucket["recipientPocetLetOdZalozeniOne"] is SingleBucketAggregate recFirstYear)
                                         {
                                             programStat.CountGrantedCompaniesFirstYear = Convert.ToInt32(recFirstYear.DocCount);
                                         }
-                                        
+
                                         if (providerIcoBucket["recipientPolitickyAngazovanySubjektPositive"] is SingleBucketAggregate recPolitical)
                                         {
                                             programStat.CountPolitickyAngazovanySubjekt = Convert.ToInt32(recPolitical.DocCount);
@@ -177,22 +178,75 @@ namespace HlidacStatu.Repositories
                 }
             }
 
-                
+
             return results;
         }
 
-        public static async Task<List<(int Year, Dotace.Hint.Type SubsidyType, decimal Sum)>> ReportPoLetechAsync(
-            bool limitYears = true, int[] limitedYears = null)
+        public static async Task<StatisticsPerYear<SimpleStat>>
+            ReportPoLetechAsync(int[] limitedYears = null, string query = "*")
         {
-            limitedYears = limitedYears ?? Enumerable.Range(2010, DateTime.Now.Year - 2010).ToArray();
+            var stats = new Dictionary<int, SimpleStat>();
+
+            limitedYears = limitedYears ?? DefaultLimitedYears;
 
             AggregationContainerDescriptor<Dotace> aggs = new AggregationContainerDescriptor<Dotace>()
-                .Terms("perYear", t => t
-                    .Field(f => f.ApprovedYear)
-                    .Size(10000)
+                        .Terms("perYear", t => t
+                            .Field(f => f.ApprovedYear)
+                            .Size(10000)
+                            .Aggregations(typeAggs => typeAggs
+                                .Sum("sumAssumedAmount", sa => sa
+                                    .Field(f => f.AssumedAmount)
+                                )
+                            )
+                        );
+            var res = await DotaceRepo.Searching.SimpleSearchAsync(query, 1, 0, "666",
+                anyAggregation: aggs);
+            if (res is null)
+            {
+                return null;
+            }
+
+            // Initialize the results dictionary
+            //List<(int Year, Dotace.Hint.Type SubsidyType, decimal Sum)> results = new();
+
+            // Parse the aggregation results
+            if (res.ElasticResults.Aggregations["perYear"] is BucketAggregate subsidyTypeBA)
+            {
+                foreach (KeyedBucket<object> perYearBucket in subsidyTypeBA.Items)
+                {
+                    if (int.TryParse(perYearBucket.Key.ToString(), out int year))
+                    {
+                        if (perYearBucket["sumAssumedAmount"] is ValueAggregate sumBA)
+                        {
+                            if (limitedYears.Contains(year))
+                                stats[year] = new Lib.Analytics.SimpleStat()
+                                {
+                                    Pocet = perYearBucket.DocCount ?? 0,
+                                    CelkemCena = Convert.ToDecimal(sumBA.Value ?? 0)
+                                };
+                            //results.Add((year, subsidyType, Convert.ToDecimal(sumBA.Value ?? 0)));
+                        }
+                    }
+
+                }
+            }
+
+            return new StatisticsPerYear<SimpleStat>(stats);
+        }
+
+        public static async Task<Statistics.TypeStatsPerYear[]>
+            ReportPoLetechPerTypeAsync(int[] limitedYears = null, string query = "*")
+        {
+            var types = new List<Statistics.TypeStatsPerYear>();
+            limitedYears = limitedYears ?? DefaultLimitedYears;
+
+            AggregationContainerDescriptor<Dotace> aggs = new AggregationContainerDescriptor<Dotace>()
+            .Terms("perSubsidyType", st => st
+                .Field(f => f.Hints.SubsidyType)
+                .Size(10000)
                     .Aggregations(yearAggs => yearAggs
-                        .Terms("perSubsidyType", st => st
-                            .Field(f => f.Hints.SubsidyType)
+                        .Terms("perYear", t => t
+                            .Field(f => f.ApprovedYear)
                             .Size(10000)
                             .Aggregations(typeAggs => typeAggs
                                 .Sum("sumAssumedAmount", sa => sa
@@ -202,8 +256,7 @@ namespace HlidacStatu.Repositories
                         )
                     )
                 );
-
-            var res = await DotaceRepo.Searching.SimpleSearchAsync("*", 1, 0, "666",
+            var res = await DotaceRepo.Searching.SimpleSearchAsync(query, 1, 0, "666",
                 anyAggregation: aggs);
             if (res is null)
             {
@@ -211,35 +264,42 @@ namespace HlidacStatu.Repositories
             }
 
             // Initialize the results dictionary
-            List<(int Year, Dotace.Hint.Type SubsidyType, decimal Sum)> results = new();
+            //List<(int Year, Dotace.Hint.Type SubsidyType, decimal Sum)> results = new();
 
             // Parse the aggregation results
-            if (res.ElasticResults.Aggregations["perYear"] is BucketAggregate perYearBA)
+            if (res.ElasticResults.Aggregations["perSubsidyType"] is BucketAggregate perYearBA)
             {
-                foreach (KeyedBucket<object> perYearBucket in perYearBA.Items)
+                foreach (KeyedBucket<object> subsidyTypeBucket in perYearBA.Items)
                 {
-                    if (int.TryParse(perYearBucket.Key.ToString(), out int year))
+                    if (Enum.TryParse<Dotace.Hint.Type>(subsidyTypeBucket.Key.ToString(), out var subsidyType))
                     {
-                        if (perYearBucket["perSubsidyType"] is BucketAggregate subsidyTypeBA)
+                        var newHintType = new Statistics.TypeStatsPerYear() { DotaceType = subsidyType };
+
+                        if (subsidyTypeBucket["perYear"] is BucketAggregate subsidyTypeBA)
                         {
-                            foreach (KeyedBucket<object> subsidyTypeBucket in subsidyTypeBA.Items)
+                            foreach (KeyedBucket<object> perYearBucket in subsidyTypeBA.Items)
                             {
-                                if (Enum.TryParse<Dotace.Hint.Type>(subsidyTypeBucket.Key.ToString(),
-                                        out var subsidyType))
+                                if (int.TryParse(perYearBucket.Key.ToString(), out int year))
                                 {
-                                    if (subsidyTypeBucket["sumAssumedAmount"] is ValueAggregate sumBA)
+                                    if (perYearBucket["sumAssumedAmount"] is ValueAggregate sumBA)
                                     {
-                                        if (limitYears == false || (limitYears & limitedYears.Contains(year)))
-                                            results.Add((year, subsidyType, Convert.ToDecimal(sumBA.Value ?? 0)));
+                                        if (limitedYears.Contains(year))
+                                            newHintType[year] = new Lib.Analytics.SimpleStat()
+                                            {
+                                                Pocet = perYearBucket.DocCount ?? 0,
+                                                CelkemCena = Convert.ToDecimal(sumBA.Value ?? 0)
+                                            };
+                                        //results.Add((year, subsidyType, Convert.ToDecimal(sumBA.Value ?? 0)));
                                     }
                                 }
                             }
+                            types.Add(newHintType);
                         }
                     }
                 }
             }
 
-            return results;
+            return types.ToArray();
         }
 
         public static async Task<List<(string Ico, long Count, decimal Sum)>> ReportTopPrijemciAsync(int? rok,
@@ -272,7 +332,7 @@ namespace HlidacStatu.Repositories
                             .Field(f => f.AssumedAmount)
                         )
                     )
-                    .Order(o=>o.Descending("sumAssumedAmount"))
+                    .Order(o => o.Descending("sumAssumedAmount"))
                 );
 
 
@@ -299,7 +359,7 @@ namespace HlidacStatu.Repositories
                         {
                             sum = Convert.ToDecimal(sumBA.Value ?? 0);
                         }
-                        
+
                         count = perIcoBucket.DocCount ?? 0;
 
                         results.Add((perIcoBucket.Key.ToString(), count, sum));
@@ -360,7 +420,7 @@ namespace HlidacStatu.Repositories
 
             return results;
         }
-        
+
         public static async Task<List<(int Year, long Count, decimal Sum)>> SumyPoskytnutychDotaciPoLetechAsync(string providerIco)
         {
             AggregationContainerDescriptor<Dotace> aggs = new AggregationContainerDescriptor<Dotace>()
@@ -396,9 +456,9 @@ namespace HlidacStatu.Repositories
                     {
                         if (int.TryParse(subsidyYearBucket.Key.ToString(), out int year))
                         {
-                            results.Add((year, subsidyYearBucket.DocCount ?? 0, Convert.ToDecimal(sumBA.Value ?? 0)));    
+                            results.Add((year, subsidyYearBucket.DocCount ?? 0, Convert.ToDecimal(sumBA.Value ?? 0)));
                         }
-                        
+
                     }
                 }
             }
@@ -540,7 +600,7 @@ namespace HlidacStatu.Repositories
 
             return results;
         }
-        
+
 
         //Příjemci dotací z více krajů
         public static async Task<List<(string Ico, int DataSourceCount, decimal SumAssumedAmmount)>>

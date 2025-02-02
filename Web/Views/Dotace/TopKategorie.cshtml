@@ -5,30 +5,25 @@
 @model List<(string Ico, Dotace.Hint.CalculatedCategories Category, long Count, decimal Sum)>
 
 @{
-    ViewBag.Title = "Hlídač dotací";
-    ViewBag.SubTitle = "Report po kategoriích";
 
     int? rok = ViewData["rok"] as int?;
-    int? cat = ViewData["cat"] as int?;
+    int cat = (ViewData["cat"] as int?) ?? 0;
+    Dotace.Hint.CalculatedCategories calcCategory = (Dotace.Hint.CalculatedCategories)cat;
 
-    var dataTableOptions = $@"{{
-                         'language': {{
-                            'url': '//cdn.datatables.net/plug-ins/1.13.4/i18n/cs.json'
-                        }},
-                        'order': [[1, 'desc']],
-                        'lengthChange': false,
-                        'info': false,
-                        }}";
+    ViewBag.Title = "Hlídač dotací";
+    ViewBag.SubTitle = "Report pro " + calcCategory.ToNiceDisplayName();
 
+    string elasticQuery = "";
     string searchQuery = "";
+    searchQuery = searchQuery + "%20AND%20hints.category1.typeValue:" + cat;
+    elasticQuery = $"hints.category1.typeValue:{cat}";
+
     if (rok.HasValue)
     {
         searchQuery = searchQuery + "%20AND%20approvedYear:" + rok.Value;
+        elasticQuery = HlidacStatu.Searching.Query.ModifyQueryAND(elasticQuery, $"approvedYear:{rok.Value}");
     }
-    if (cat.HasValue)
-    {
-        searchQuery = searchQuery + "%20AND%20hints.category1.typeValue:" + cat.Value;
-    }
+    
 
 }
 
@@ -40,6 +35,9 @@
         </li>
         <li>
             <a href="@Url.Action("Index", "Dotace")">Dotace</a>
+        </li>
+        <li>
+            <a href="@Url.Action("Reporty", "Dotace")">Reporty</a>
         </li>
         <li class="active">@ViewBag.SubTitle</li>
     </ol>
@@ -53,17 +51,11 @@
 }
 
 
-<partial name="_pager" model="@(ValueTuple.Create((int?)null, (int?)null, rok, "/Dotace/TopKategorie"))"/>
+<partial name="_pager" model="@(ValueTuple.Create((int?)null, (int?)null, rok, "/Dotace/TopKategorie"))" />
 
 <h2 class="mt-4">Top kategorie dotací</h2>
 
-<h3>Obsah</h3>
-<p>
-@foreach (var category in Model.Select(m => m.Category).Distinct().OrderBy(m => m.ToNiceDisplayName()))
-{
-    <a href="#cat_@((int)category)">@category.ToNiceDisplayName()</a><br/>
-}
-</p>
+
 <div class="mt-3"></div>
 @foreach (var category in Model.Select(m => m.Category).Distinct().OrderBy(m => m.ToNiceDisplayName()))
 {
@@ -93,20 +85,41 @@
             CssClass = "number"
         }
     ];
-    
+
 
     var data = new ReportDataSource<(string Ico, Dotace.Hint.CalculatedCategories Category, long Count, decimal Sum)>(dataColumns);
 
     //for (var year = 2021; year < DateTime.Now.Year; year++)
     //{
-        data.AddRows(Model.Where(m => m.Category == category).ToList());
+    data.AddRows(Model.Where(m => m.Category == category).ToList());
     //}
 
 
     <h4 id="cat_@((int)category)">@category.ToNiceDisplayName()</h4>
+
+    @if (!rok.HasValue)
+    {
+        var perYearData = await DotaceRepo.ReportPoLetechAsync(query:elasticQuery);
+        var perYearChartData = new Series[]
+        {
+            new()
+            {
+                Name = "Objem dotací po letech",
+                Type = Series.SeriesType.column,
+                Data = perYearData.OrderBy(s => s.Year)
+                    .Select(s => new SeriesData(s.Year, s.Value.CelkemCena))
+                    .ToArray(),
+            },
+        };
+
+        <div>
+            @Html.ColumnGraph($"Objem dotací {Devmasters.TextUtil.ShortenText(calcCategory.ToNiceDisplayName(),35)} v jednotlivých letech", perYearChartData, yTitleLeft: "Objem dotací v Kč")
+        </div>
+    }
+
     <div>
-        @Html.DataToHTMLTable(data, tableId: "dt" + category.ToString("G"), 
-        dataTableOptions: HtmlExtensions.DatatableOptions(orderColumnIdx: 2, orderDirection: "desc"))
+        @Html.DataToHTMLTable(data, tableId: "dt" + category.ToString("G"),
+                dataTableOptions: HtmlExtensions.DatatableOptions(orderColumnIdx: 2, orderDirection: "desc"))
     </div>
 }
 

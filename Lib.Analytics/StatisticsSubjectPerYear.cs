@@ -10,8 +10,6 @@ namespace HlidacStatu.Lib.Analytics
         where T : CoreStat, IAddable<T>, new()
     {
         public string ICO { get; set; }
-        [JsonInclude]
-        private int _pokusek { get; set; }= 5;
         
         [JsonConstructor]
         public StatisticsSubjectPerYear()

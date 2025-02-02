@@ -1,6 +1,7 @@
+@using System.Linq
 @using HlidacStatu.Entities
 @using HlidacStatu.XLib.Render
-@model List<(int Year, Dotace.Hint.Type DotaceType, decimal Sum)>
+@model HlidacStatu.Repositories.DotaceRepo.Statistics.TypeStatsPerYear[]
 
 @{
     ViewBag.Title = "Hlídač dotací";
@@ -66,9 +67,17 @@
                 CssClass = "number"
             }
         });
-    
-    dotaceDataKraj.AddRows(Model.Where(d => d.DotaceType == Dotace.Hint.Type.Krajska && d.Year >= 2021).ToList());
-    dotaceDataStat.AddRows(Model.Where(d => d.DotaceType == Dotace.Hint.Type.Evropska).ToList());
+
+    dotaceDataKraj.AddRows(
+        Model.FirstOrDefault(d => d.DotaceType == Dotace.Hint.Type.Krajska)
+                .Filter(m=>m.Key >= HlidacStatu.Repositories.DotaceRepo.DefaultKrajskeLimitedYears.Min())
+                .Select(m=> (Year: m.Key, DotaceType: Dotace.Hint.Type.Krajska, Sum: m.Value.CelkemCena))
+    );
+    dotaceDataStat.AddRows(
+            Model.FirstOrDefault(d => d.DotaceType == Dotace.Hint.Type.Evropska)
+                .Filter(m => m.Key >= HlidacStatu.Repositories.DotaceRepo.DefaultLimitedYears.Min())
+                .Select(m => (Year: m.Key, DotaceType: Dotace.Hint.Type.Evropska, Sum: m.Value.CelkemCena))
+        );
     
    
     
@@ -78,9 +87,11 @@
         {
             Name = "Objem krajských dotací",
             Type = Series.SeriesType.column,
-            Data = Model.Where(d => d.DotaceType == Dotace.Hint.Type.Krajska && d.Year >= 2021)
-                .OrderBy(s => s.Year)
-                .Select(s => new SeriesData(s.Year, s.Sum))
+            Data = Model
+                .FirstOrDefault(d => d.DotaceType == Dotace.Hint.Type.Krajska)
+                .Filter(m=>m.Key >= HlidacStatu.Repositories.DotaceRepo.DefaultKrajskeLimitedYears.Min())
+                .OrderBy(s => s.Key)
+                .Select(s => new SeriesData(s.Key, s.Value.CelkemCena))
                 .ToArray(),
         }
     };
@@ -91,9 +102,12 @@
         {
             Name = "Objem státních a evropských dotací",
             Type = Series.SeriesType.column,
-            Data = Model.Where(d => d.DotaceType == Dotace.Hint.Type.Evropska)
-                .OrderBy(s => s.Year)
-                .Select(s => new SeriesData(s.Year, s.Sum)).ToArray(),
+            Data = Model
+                .FirstOrDefault(d => d.DotaceType == Dotace.Hint.Type.Evropska)
+                .Filter(m=>m.Key >= HlidacStatu.Repositories.DotaceRepo.DefaultLimitedYears.Min())
+                .OrderBy(s => s.Key)
+                .Select(s => new SeriesData(s.Key, s.Value.CelkemCena))
+                .ToArray(),
 
         },
     };

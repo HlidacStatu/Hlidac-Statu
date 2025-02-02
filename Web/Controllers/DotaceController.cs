@@ -89,7 +89,7 @@ namespace HlidacStatu.Web.Controllers
         [HlidacCache(22*60*60,"",false)]
         public async Task<ActionResult> PoLetech()
         {
-            var data = await DotaceRepo.ReportPoLetechAsync();
+            DotaceRepo.Statistics.TypeStatsPerYear[] data = await DotaceRepo.ReportPoLetechPerTypeAsync();
             return View(data);
         }
 
