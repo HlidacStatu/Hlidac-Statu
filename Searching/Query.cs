@@ -29,6 +29,10 @@ namespace HlidacStatu.Searching
             if (queryParts.Length == 0)
                 return string.Empty;
 
+            //pokud jen jeden string, vrat bez operatora
+            if (queryParts.Count(s => !string.IsNullOrWhiteSpace(s)) < 2)
+                return queryParts.FirstOrDefault(s => !string.IsNullOrWhiteSpace(s)) ?? "";
+
             foreach (string part in queryParts)
             {
                 var nq = part.Trim();

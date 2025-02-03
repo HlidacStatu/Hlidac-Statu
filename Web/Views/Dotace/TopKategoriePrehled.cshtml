@@ -3,7 +3,7 @@
 @using HlidacStatu.Repositories
 @using HlidacStatu.Repositories.SharedModels
 @using HlidacStatu.XLib.Render
-@model List<(Dotace.Hint.CalculatedCategories Category, long Count, decimal Sum)>
+@model Dictionary<Dotace.Hint.CalculatedCategories, HlidacStatu.Lib.Analytics.SimpleStat>
 
 @{
     ViewBag.Title = "Hlídač dotací";
@@ -32,35 +32,35 @@
     }
 
 
-    List<ReportDataSource<(Dotace.Hint.CalculatedCategories Category, long Count, decimal Sum)>.Column> dataColumns =
+    List<ReportDataSource<KeyValuePair<Dotace.Hint.CalculatedCategories, HlidacStatu.Lib.Analytics.SimpleStat>>.Column> dataColumns =
     [
         new()
         {
             Name = "Kategorie dotací",
             CssClass = "text",
-            HtmlRender = (x) => $"<a title='Ukázat top příjemce těchto dotací' href='/dotace/TopKategorie?cat={(int)x.Category}{urlParam}'>{x.Category.ToNiceDisplayName()} <i class='fa-solid fa-chart-simple-horizontal'></i></a>",
-            TextRender = (x) => x.Category.ToNiceDisplayName()
+            HtmlRender = (x) => $"<a title='Ukázat top příjemce těchto dotací' href='/dotace/TopKategorie?cat={(int)x.Key}{urlParam}'>{x.Key.ToNiceDisplayName()} <i class='fa-solid fa-chart-simple-horizontal'></i></a>",
+            TextRender = (x) => x.Key.ToNiceDisplayName()
         },
         new()
         {
             Name = "Počet dotací",
-            TextRender = (x) => HlidacStatu.Util.RenderData.NiceNumber(x.Count),
-            HtmlRender = (x) => $"<a title='Najít poskytnuté dotace' href='/dotace/hledat?q=hints.category1.typeValue:{(int)x.Category}{searchQuery}'>{HlidacStatu.Util.RenderData.NiceNumber(x.Count, html:true)} <i class='fa-solid fa-list'></i></a>",
-            OrderValueRender = (x) => HlidacStatu.Util.RenderData.OrderValueFormat(x.Count),
+            TextRender = (x) => HlidacStatu.Util.RenderData.NiceNumber(x.Value.Pocet),
+            HtmlRender = (x) => $"<a title='Najít poskytnuté dotace' href='/dotace/hledat?q=hints.category1.typeValue:{(int)x.Key}{searchQuery}'>{HlidacStatu.Util.RenderData.NiceNumber(x.Value.Pocet, html:true)} <i class='fa-solid fa-list'></i></a>",
+            OrderValueRender = (x) => HlidacStatu.Util.RenderData.OrderValueFormat(x.Value.Pocet),
             CssClass = "number"
         },
         new()
         {
             Name = "Celková částka",
-            TextRender = (x) => HlidacStatu.Util.RenderData.NicePrice(x.Sum),
-            HtmlRender = (x) => $"{HlidacStatu.Util.RenderData.NicePrice(x.Sum, html:true)}",
-            OrderValueRender = (x) => HlidacStatu.Util.RenderData.OrderValueFormat(x.Sum),
+            TextRender = (x) => HlidacStatu.Util.RenderData.NicePrice(x.Value.CelkemCena),
+            HtmlRender = (x) => $"{HlidacStatu.Util.RenderData.NicePrice(x.Value.CelkemCena, html:true)}",
+            OrderValueRender = (x) => HlidacStatu.Util.RenderData.OrderValueFormat(x.Value.CelkemCena),
             CssClass = "number"
         }
     ];
-    var data = new ReportDataSource<(Dotace.Hint.CalculatedCategories Category, long Count, decimal Sum)>(dataColumns);
+    var data = new ReportDataSource<KeyValuePair<Dotace.Hint.CalculatedCategories, HlidacStatu.Lib.Analytics.SimpleStat>>(dataColumns);
 
-    data.AddRows(Model.Select(m=> m).ToArray());
+    data.AddRows(Model.Select(m => m).ToArray());
 
 
 
@@ -99,14 +99,16 @@
 <div>
 
     @{
-        var _chartDataOrdered = data.Data
-                .OrderByDescending(o => o.First().Value.Sum)
-            .Select(p => new { sum = p.First().Value.Sum, label = p.First().Value.Category.ToNiceDisplayName() });
+        var _chartDataOrdered = Model
+        .Select(p => new { sum = p.Value.CelkemCena, label = p.Key.ToNiceDisplayName() })
+        .OrderByDescending(o => o.sum)
+
+        ;
 
         SimplePlot chartData = new SimplePlot()
             {
-                Data = _chartDataOrdered.Select(m=>(double)m.sum / 1_000_000).ToList(),
-                Labels = _chartDataOrdered.Select(m=>m.label).ToList(),
+                Data = _chartDataOrdered.Select(m => (double)m.sum / 1_000_000).ToList(),
+                Labels = _chartDataOrdered.Select(m => m.label).ToList(),
                 ChartType = "bar",
                 Title = $"Kategorie dotací",
                 Koncovka = "mil. Kč",
@@ -114,13 +116,13 @@
                 CssHeight = "600px"
             };
 
-    }    
-    <partial name="Charts/_SimpleChart" model="chartData" /> 
+    }
+    <partial name="Charts/_SimpleChart" model="chartData" />
 </div>
 
 
 <div>
-    @Html.DataToHTMLTable(data, tableId: "dtx" , dataTableOptions: HtmlExtensions.DatatableOptions(orderColumnIdx: 2, orderDirection: "desc", paging: false))
+    @Html.DataToHTMLTable(data, tableId: "dtx", dataTableOptions: HtmlExtensions.DatatableOptions(orderColumnIdx: 2, orderDirection: "desc", paging: false))
 </div>
 
 

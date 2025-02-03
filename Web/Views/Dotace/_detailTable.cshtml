@@ -56,7 +56,7 @@
                                     }
                                     else
                                     {
-                                        <p>hodnota neznámá</p>
+                                    <p>hodnota neznámá</p>
                                     }
                                 </p>
                             </div>
@@ -73,7 +73,7 @@
                                     }
                                     else
                                     {
-                                        <p>hodnota neznámá</p>
+                                    <p>hodnota neznámá</p>
                                     }</p>
                             </div>
                         </div>
@@ -89,7 +89,7 @@
                                     }
                                     else
                                     {
-                                        <p>hodnota neznámá</p>
+                                    <p>hodnota neznámá</p>
                                     }</p>
                             </div>
                         </div>
@@ -109,7 +109,7 @@
 
                                 (@(Model.model.Hints.RecipientTypSubjektuEnum.ToNiceDisplayName()))
 
-                                @if(!string.IsNullOrWhiteSpace(Model.model.Hints.RecipientStatusFull))
+                                @if (!string.IsNullOrWhiteSpace(Model.model.Hints.RecipientStatusFull))
                                 {
                                     <div>@(Model.model.Hints.RecipientStatusFull)</div>
                                 }
@@ -120,7 +120,7 @@
                             <dd class="col-sm-8">
                                 @if (Model.model.Recipient.Ico != "00000000" || !string.IsNullOrWhiteSpace(Model.model.Recipient.Ico))
                                 {
-                                    <a href="/dotace/hledat?q=ico:@Model.model.Recipient.Ico" title="Vyhledat všechny dotace pro tento subjekt">@Model.model.Recipient.Ico</a>
+                                    <a href="/subject/@Model.model.Recipient.Ico" title="Vyhledat všechny dotace pro tento subjekt">@(HlidacStatu.Repositories.Firmy.GetJmeno(Model.model.Recipient.Ico))</a>
                                 }
                             </dd>
 
@@ -137,7 +137,7 @@
                             @if (Model.model.Hints.RecipientPocetLetOdZalozeni < 9999)
                             {
                                 <dt class="col-sm-4">Stáři při obdržení dotace</dt>
-                                <dd class="col-sm-8">Přibližně @(Devmasters.Lang.CS.Plural.GetWithZero(Model.model.Hints.RecipientPocetLetOdZalozeni, "méně než rok", "jeden rok", "{0} roky","{0} let"))</dd>
+                                <dd class="col-sm-8">Přibližně @(Devmasters.Lang.CS.Plural.GetWithZero(Model.model.Hints.RecipientPocetLetOdZalozeni, "méně než rok", "jeden rok", "{0} roky", "{0} let"))</dd>
 
                             }
                             @if (Model.model.Hints.RecipientPolitickyAngazovanySubjektEnum > 0)
@@ -145,16 +145,15 @@
                                 <dt class="col-sm-4">Politická angažovanost</dt>
                                 <dd class="col-sm-8"><b>@(Model.model.Hints.RecipientPolitickyAngazovanySubjektEnum.ToNiceDisplayName())</b> <a href="/subjekt/sponzoring/@(Model.model.Recipient.Ico)/">více</a></dd>
 
-                        }
+                            }
 
-                            <dt class="col-sm-4">Obec příjemce</dt>
-                            <dd class="col-sm-8">
-                                @(Model.model.Recipient.Obec)
-                                @if (!string.IsNullOrWhiteSpace(Model.model.Recipient.Okres))
-                                {
-                                    <span>(okres @(Model.model.Recipient.Okres))</span>
-                                }
-                            </dd>
+                            @if (Model.model.Recipient.Ico != "00000000" || !string.IsNullOrWhiteSpace(Model.model.Recipient.Ico))
+                            {
+                                <dt class="col-sm-4">Další dotace tohoto příjemce</dt>
+                                <dd class="col-sm-8">
+                                    <a href="/dotace/hledat?q=ico:@Model.model.Recipient.Ico" title="Vyhledat všechny dotace pro tento subjekt">Vyhledat další dotace </a>
+                                </dd>
+                            }
                         </dl>
                         @if (await Model.model.MaSkutecnehoMajiteleAsync() == false)
                         {

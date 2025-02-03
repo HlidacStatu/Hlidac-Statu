@@ -136,7 +136,7 @@ namespace HlidacStatu.Web.Controllers
             ViewData["cat"] = cat;
             if (cat == null)
             {
-                var data = await DotaceRepo.PoKategoriichAsync(rok, null);
+                System.Collections.Generic.Dictionary<Dotace.Hint.CalculatedCategories, Lib.Analytics.SimpleStat> data = await DotaceRepo.PoKategoriichAsync(rok, null);
                 return View("TopKategoriePrehled",data);
 
             }

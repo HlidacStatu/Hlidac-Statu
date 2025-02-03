@@ -466,10 +466,13 @@ namespace HlidacStatu.Repositories
             return results;
         }
 
-        public static async
-    Task<List<(Dotace.Hint.CalculatedCategories Category, long Count, decimal Sum)>>
-    PoKategoriichAsync(int? rok = null, int? cat = null, string ico = null)
+        public static async Task<Dictionary<Dotace.Hint.CalculatedCategories, SimpleStat>> PoKategoriichAsync(
+            int? rok = null, int? cat = null, string ico = null, string query = null
+            )
         {
+
+            Dictionary<Dotace.Hint.CalculatedCategories, SimpleStat> stat = new();
+
             AggregationContainerDescriptor<Dotace> aggs = new AggregationContainerDescriptor<Dotace>()
                 .Terms("perCategory", st => st
                     .Field(f => f.Hints.Category1.TypeValue)
@@ -480,18 +483,21 @@ namespace HlidacStatu.Repositories
                             )
                         )
                     );
-            string query = "_exists_:recipient.ico AND NOT recipient.ico:\"\"";
-            if (rok is not null && rok > 0)
+            if (query == null)
             {
-                query += $" AND approvedYear:{rok}";
-            }
-            if (cat is not null && cat > 0)
-            {
-                query += $" AND hints.category1.typeValue:{cat}";
-            }
-            if (ico is not null)
-            {
-                query += $" AND recipient.ico:{ico}";
+                query = "";//"_exists_:recipient.ico AND NOT recipient.ico:\"\"";
+                if (rok is not null && rok > 0)
+                {
+                    query += HlidacStatu.Searching.Query.ModifyQueryAND(query, $"approvedYear:{rok}");
+                }
+                if (cat is not null && cat > 0)
+                {
+                    query += HlidacStatu.Searching.Query.ModifyQueryAND(query, $"hints.category1.typeValue:{cat}");
+                }
+                if (ico is not null)
+                {
+                    query += HlidacStatu.Searching.Query.ModifyQueryAND(query, $"recipient.ico:{ico}");
+                }
             }
 
             var res = await DotaceRepo.Searching.SimpleSearchAsync(
@@ -514,19 +520,21 @@ namespace HlidacStatu.Repositories
                     {
                         var subsidyCategory = (Dotace.Hint.CalculatedCategories)subsidyCategoryTypeVal;
 
+                        
+
                         if (subsidyCategoryBucket["sumAssumedAmount"] is ValueAggregate sumBA)
                         {
-                            results.Add((
-                                subsidyCategory,
-                                subsidyCategoryBucket.DocCount ?? 0,
-                                Convert.ToDecimal(sumBA.Value ?? 0)
-                                ));
+                            stat[subsidyCategory] = new SimpleStat() 
+                            {
+                                Pocet = subsidyCategoryBucket.DocCount ?? 0,
+                                CelkemCena = Convert.ToDecimal(sumBA.Value ?? 0)
+                            };
                         }
                     }
                 }
             }
 
-            return results;
+            return stat;
         }
 
         public static async

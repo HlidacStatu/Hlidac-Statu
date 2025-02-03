@@ -14,6 +14,11 @@ namespace HlidacStatu.Repositories
                 public HlidacStatu.Entities.Dotace.Hint.Type DotaceType { get; set; }
 
             }
+            public class CategoryStatsPerYear : StatisticsPerYear<SimpleStat>
+            {
+                public HlidacStatu.Entities.Dotace.Hint.CalculatedCategories Category { get; set; }
+
+            }
 
             public class PerYearResultMore<T> : CoreStat, IAddable<PerYearResultMore<T>>
             {
