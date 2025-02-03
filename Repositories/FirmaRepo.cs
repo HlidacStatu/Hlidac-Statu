@@ -271,19 +271,20 @@ namespace HlidacStatu.Repositories
 
         }
 
-        public static IEnumerable<(string ico, string jmeno)> GetJmenoAndIcoTuplesExceptFO()
+        public static IEnumerable<(string ico, string jmeno, bool isFop)> GetJmenoIcoAndFopTuples()
         {
             using (PersistLib p = new PersistLib())
             {
-                var reader = p.ExecuteReader(DirectDB.DefaultCnnStr, CommandType.Text, "select ico, jmeno from firma where ISNUMERIC(ico) = 1 AND Kod_PF >= 110", null);
+                var reader = p.ExecuteReader(DirectDB.DefaultCnnStr, CommandType.Text, "select ico, jmeno, CASE WHEN Kod_PF <= 110 OR Kod_PF IS NULL THEN CAST(1 AS BIT) ELSE CAST(0 AS BIT) END AS isFOP from firma where ISNUMERIC(ico) = 1", null);
                 while (reader.Read())
                 {
                     string ico = reader.GetString(0).Trim();
                     string name = reader.GetString(1).Trim();
+                    bool isFop = reader.GetBoolean(2);
                     if (Devmasters.TextUtil.IsNumeric(ico))
                     {
                         ico = Util.ParseTools.NormalizeIco(ico);
-                        yield return (ico, name);
+                        yield return (ico, name, isFop);
                     }
                 }
             }

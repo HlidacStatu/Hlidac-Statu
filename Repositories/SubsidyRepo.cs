@@ -195,10 +195,6 @@ namespace HlidacStatu.Repositories
 
             Logger.Debug(
                 $"Subsidy {subsidy.Metadata.RecordNumber} from {subsidy.Metadata.DataSource}/{subsidy.Metadata.FileName} saved");
-
-            //todo: uncomment once ready for statistic recalculation
-            // if(subsidy.Recipient.Ico is not null)
-            //     RecalculateItemRepo.AddFirmaToProcessingQueue(subsidy.Recipient.Ico, Entities.RecalculateItem.StatisticsTypeEnum.Dotace, $"VZ {subsidy.Id}");
         }
 
         private static Subsidy MergeSubsidy(Subsidy oldRecord, Subsidy newRecord)
@@ -385,7 +381,7 @@ namespace HlidacStatu.Repositories
             }
         }
 
-        public static async Task SaveSubsidyDirectlyToEs(Subsidy subsidy)
+        private static async Task SaveSubsidyDirectlyToEs(Subsidy subsidy)
         {
             subsidy.Metadata.ModifiedDate = DateTime.Now;
 
