@@ -137,7 +137,7 @@
                             @if (Model.model.Hints.RecipientPocetLetOdZalozeni < 9999)
                             {
                                 <dt class="col-sm-4">Stáři při obdržení dotace</dt>
-                                <dd class="col-sm-8">Přibližně @(Devmasters.Lang.CS.Plural.GetWithZero(Model.model.Hints.RecipientPocetLetOdZalozeni, "méně než rok", "jeden rok", "{0} roky","{} let"))</dd>
+                                <dd class="col-sm-8">Přibližně @(Devmasters.Lang.CS.Plural.GetWithZero(Model.model.Hints.RecipientPocetLetOdZalozeni, "méně než rok", "jeden rok", "{0} roky","{0} let"))</dd>
 
                             }
                             @if (Model.model.Hints.RecipientPolitickyAngazovanySubjektEnum > 0)
