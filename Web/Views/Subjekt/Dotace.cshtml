@@ -334,9 +334,9 @@
 
             @if (poskytnutoPoLetech.Any())
             {
-                <h4>Informace o poskytnutých dotacích</h4>
+                <h4>Informace o dotacích vyplacených tímto úřadem</h4>
 
-                string subsidiesProvidedTitle = $"Přehled poskytnutých dotací ";
+                string subsidiesProvidedTitle = $"Přehled vyplacených dotací ";
                 if (Model.JsemOVM())
                 {
                     subsidiesProvidedTitle += "úřadu";
@@ -378,7 +378,7 @@
         {
         Name = "Počet",
         TextRender = (x) => $"{HlidacStatu.Util.RenderData.NiceNumber(x.Count)}",
-        HtmlRender = (x) => $"<a title='Najit poskytnuté dotace pro rok {x.Year}' href='/dotace/hledat?Q=subsidyProviderIco:{Model.ICO} AND approvedYear:{x.Year}'>{x.Count}</a>",
+        HtmlRender = (x) => $"<a title='Najit vyplacené dotace pro rok {x.Year}' href='/dotace/hledat?Q=subsidyProviderIco:{Model.ICO} AND approvedYear:{x.Year}'>{x.Count}</a>",
         OrderValueRender = (x) => HlidacStatu.Util.RenderData.OrderValueFormat(x.Count),
         CssClass = "number"
         },
@@ -435,7 +435,7 @@
         <div class="mt-3">
 
             @Html.Toggleable(
-                     Html.PieChart("Kategorie poskytnutých dotací", pieData, yTitleLeft: "% dotací", tooltipFormat: "{series.name}: <b>{point.y:,.0f} Kč</b>"),
+                     Html.PieChart("Kategorie získaných dotací", pieData, yTitleLeft: "% dotací", tooltipFormat: "{series.name}: <b>{point.y:,.0f} Kč</b>"),
                      "Graf",
                      Html.DataToHTMLTable(categoryDataTable, dataTableOptions: HtmlExtensions.DatatableOptions(orderColumnIdx: 2, orderDirection: "desc")),
                      "Tabulka"
@@ -486,7 +486,7 @@
                 <div class="mt-3">
 
                     @Html.Toggleable(
-                             Html.PieChart("Kategorie poskytnutých dotací", pieHoldingData, yTitleLeft: "% dotací", tooltipFormat: "{series.name}: <b>{point.y:,.0f} Kč</b>"),
+                             Html.PieChart("Kategorie získaných dotací", pieHoldingData, yTitleLeft: "% dotací", tooltipFormat: "{series.name}: <b>{point.y:,.0f} Kč</b>"),
                              "Graf",
                              Html.DataToHTMLTable(categoryDataTable, dataTableOptions: HtmlExtensions.DatatableOptions(orderColumnIdx: 2, orderDirection: "desc")),
                              "Tabulka"
