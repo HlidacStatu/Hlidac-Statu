@@ -178,7 +178,7 @@ namespace HlidacStatu.Repositories
             return GetAllAsync(qc);
         }
 
-        public static async Task MergeSubsidiesToDotaceAsync(string dataSource)
+        public static async Task MergeSubsidiesToDotaceAsync(DateTime fromDate)
         {
             int maxDegreeOfParallelism = 40; // Adjust this value as needed
             var semaphore = new SemaphoreSlim(maxDegreeOfParallelism);
@@ -186,27 +186,18 @@ namespace HlidacStatu.Repositories
 
             QueryContainer originalsQuery;
 
-            if (string.IsNullOrWhiteSpace(dataSource))
-            {
-                originalsQuery = new QueryContainerDescriptor<Subsidy>()
-                    .Bool(b => b
-                        .Must(
-                            m => m.Term(t => t.Metadata.IsHidden, false),
-                            m => m.Term(t => t.Hints.IsOriginal, true)
+            originalsQuery = new QueryContainerDescriptor<Subsidy>()
+                .Bool(b => b
+                    .Must(
+                        m => m.Term(t => t.Metadata.IsHidden, false),
+                        m => m.Term(t => t.Hints.IsOriginal, true),
+                        m => m.DateRange(r => r
+                                .Field(f => f.Metadata.ModifiedDate)
+                                .GreaterThanOrEquals(fromDate)
                         )
-                    );
-            }
-            else
-            {
-                originalsQuery = new QueryContainerDescriptor<Subsidy>()
-                    .Bool(b => b
-                        .Must(
-                            m => m.Term(t => t.Metadata.IsHidden, false),
-                            // m => m.Term(t => t.Hints.IsOriginal, true), //v případě nahrávání solo zdroje můžeme a potřebujeme updatovat i duplikáty
-                            m => m.Match(t => t.Field(f => f.Metadata.DataSource).Query(dataSource))
-                        )
-                    );
-            }
+                    )
+                );
+            
 
             var originalSubsidyIds = SubsidyRepo.SubsidyClient.SimpleGetAllIds(5, originalsQuery);
             int totalCount = originalSubsidyIds.Count;
@@ -268,6 +259,62 @@ namespace HlidacStatu.Repositories
                 catch (Exception e)
                 {
                     Console.WriteLine($"Error processing ID {originalSubsidyId}: {e}");
+                }
+                finally
+                {
+                    semaphore.Release();
+                }
+            }).ToList();
+
+            await Task.WhenAll(tasks);
+        }
+        
+        public static async Task RemoveHiddenSubsidiesFromDotaceAsync(DateTime fromDate)
+        {
+            int maxDegreeOfParallelism = 40; // Adjust this value as needed
+            var semaphore = new SemaphoreSlim(maxDegreeOfParallelism);
+            int processedCount = 0;
+
+            QueryContainer originalsQuery;
+
+            originalsQuery = new QueryContainerDescriptor<Subsidy>()
+                .Bool(b => b
+                    .Must(
+                        m => m.DateRange(r => r
+                                .Field(f => f.Metadata.ModifiedDate)
+                                .GreaterThanOrEquals(fromDate)
+                        )
+                    )
+                    .Should( 
+                        s => s.Term(t => t.Metadata.IsHidden, true),
+                        s => s.Term(t => t.Hints.IsOriginal, false)
+                    )
+                    .MinimumShouldMatch(1)
+                );
+
+            var originalSubsidyIds = SubsidyRepo.SubsidyClient.SimpleGetAllIds(5, originalsQuery);
+            int totalCount = originalSubsidyIds.Count;
+
+            var tasks = originalSubsidyIds.Select(async originalSubsidyId =>
+            {
+                await semaphore.WaitAsync();
+                try
+                {
+                    Console.WriteLine(
+                        $"Remaining to remove: {totalCount - Interlocked.Increment(ref processedCount)}");
+
+                    try
+                    {
+                        await DotaceClient.DeleteAsync<Dotace>(originalSubsidyId);
+                    }
+                    catch (Exception e)
+                    {
+                        Logger.Error(e, $"Failed to remove dotace for {originalSubsidyId}");
+                    }
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine($"Error removing ID {originalSubsidyId}: {e}");
                 }
                 finally
                 {
