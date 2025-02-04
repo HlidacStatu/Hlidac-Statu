@@ -10,7 +10,8 @@
       "Override": {
         "Microsoft": "Error",
         "Microsoft.Extensions": "Information",
-        "System": "Error"
+        "System": "Error",
+        "Devmasters": "Error"
       }
     },
     "WriteTo": [
