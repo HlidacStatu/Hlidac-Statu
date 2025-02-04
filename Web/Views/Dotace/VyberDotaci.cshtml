@@ -8,9 +8,9 @@
     ViewBag.Title = "Výběr dotací";
     ViewBag.SubTitle = $"";
 
-    var poskytovateleIcos = await HlidacStatu.Repositories.DotaceRepo.ReportPoskytovatelePoLetechAsync(null,null);
+    var poskytovateleIcos = await HlidacStatu.Repositories.DotaceRepo.ReportPoskytovatelePoLetechAsync(null, null);
     var poskytovatele = poskytovateleIcos
-         .Select(i => ( Firmy.Get(i.IcoPoskytovatele), i.Count, i.Sum))
+         .Select(i => (Firmy.Get(i.IcoPoskytovatele), i.Count, i.Sum))
          .ToArray();
 
 
@@ -54,70 +54,81 @@
 
 <h2>Jaké dotace chcete dohledat a zanalyzovat?</h2>
 <p>Jednotlivé možnosti můžete zkombinovat</p>
-<div class="row g-3">
-    <div class="col-md-4">
-        <label for="typDotace" class="form-label">Typ dotace</label>
+<form action="/dotace/vyberdotaci?makequery=1" method="get">
+    <div class="row g-3">
+        <div class="col-md-4">
+            <label for="typDotace" class="form-label">Typ dotace</label>
 
-        <select class="form-select" id="typDotace" aria-label="Typ dotace">
-            <option selected>Libovolný</option>
-            @foreach (var item in Devmasters.Enums.EnumTools.EnumToEnumerable<HlidacStatu.Entities.Dotace.Hint.Type>()
-            .Where(m => m.Id > 0).OrderBy(o => o.Name)
-            )
-            {
-                <option value="@item.Value">@item.Name</option>
-            }
-        </select>
-    </div>
-    <div class="col-md-4">
-        <label for="oblastDotace" class="form-label">Oblast dotace</label>
+            <select class="form-select" id="typDotace" aria-label="Typ dotace">
+                <option selected>Libovolný</option>
+                @foreach (var item in Devmasters.Enums.EnumTools.EnumToEnumerable<HlidacStatu.Entities.Dotace.Hint.Type>()
+                .Where(m => m.Value > 0).OrderBy(o => o.Name)
+                )
+                {
+                    <option value="@item.Value">@item.Name</option>
+                }
+            </select>
+        </div>
+        <div class="col-md-4">
+            <label for="oblastDotace" class="form-label">Oblast dotace</label>
 
-        <select class="form-select" id="oblastDotace" aria-label="Oblast dotace">
-            <option selected>Libovolná</option>
-            @foreach (var item in Devmasters.Enums.EnumTools.EnumToEnumerable<HlidacStatu.Entities.Dotace.Hint.CalculatedCategories>()
+            <select class="form-select" id="oblastDotace" aria-label="Oblast dotace">
+                <option selected>Libovolná</option>
+                @foreach (var item in Devmasters.Enums.EnumTools.EnumToEnumerable<HlidacStatu.Entities.Dotace.Hint.CalculatedCategories>()
                 .Where(m => m.Id >= 0).OrderBy(o => o.Name)
-            )
-            {
-                <option value="@item.Value">@item.Name</option>
-            }
-        </select>
-    </div>
+                )
+                {
+                    <option value="@item.Value">@item.Name</option>
+                }
+            </select>
+        </div>
 
-    <div class="col-md-4">
-        <label for="druhPrijemce" class="form-label">Druh příjemce</label>
-        
-        <select class="form-select" id="druhPrijemce" aria-label="Druh příjemce">
-            <option selected>Libovolný</option>
-            @foreach (var item in Devmasters.Enums.EnumTools.EnumToEnumerable<HlidacStatu.Entities.Firma.TypSubjektuEnum>()
-            .Where(m => m.Id >= 0).OrderBy(o => o.Name)
-            )
-            {
-                <option value="@item.Value">@item.Name</option>
-            }
-        </select>
-    </div>
-    <div class="col-md-1">
-        <label for="rok" class="form-label">Vybraný rok</label>
+        <div class="col-md-4">
+            <label for="druhPrijemce" class="form-label">Druh příjemce</label>
 
-        <select class="form-select" id="rok" aria-label="Typ dotace">
-            <option selected>Libovolný</option>
-            @for (int i = HlidacStatu.Repositories.DotaceRepo.DefaultLimitedYears.Min(); i <= HlidacStatu.Repositories.DotaceRepo.DefaultLimitedYears.Max(); i++)
-            {
-                <option value="@i">@i</option>
-            }
-        </select>
-    </div>
+            <select class="form-select" id="druhPrijemce" aria-label="Druh příjemce">
+                <option selected>Libovolný</option>
+                @foreach (var item in Devmasters.Enums.EnumTools.EnumToEnumerable<HlidacStatu.Entities.Firma.TypSubjektuEnum>()
+                .Where(m => m.Id >= 0).OrderBy(o => o.Name)
+                )
+                {
+                    <option value="@item.Value">@item.Name</option>
+                }
+            </select>
+        </div>
+        <div class="col-md-2">
+            <label for="rok" class="form-label">Vybraný rok</label>
 
-    <div class="col-md-4">
-        <label for="poskytovatel" class="form-label">Poskytovatel dotace</label>
+            <select class="form-select" id="rok" aria-label="Typ dotace">
+                <option selected>Libovolný</option>
+                @for (int i = HlidacStatu.Repositories.DotaceRepo.DefaultLimitedYears.Min(); i <= HlidacStatu.Repositories.DotaceRepo.DefaultLimitedYears.Max(); i++)
+                {
+                    <option value="@i">@i</option>
+                }
+            </select>
+        </div>
 
-        <input class="form-control" list="poskytovatelDL" id="poskytovatel" placeholder="Poskytovatel dotace" style="height:2em">
-        <datalist id="poskytovatelDL">
-            <option value="" selected>Libovolný</option>
-            @foreach (var item in poskytovatele.OrderBy(o => o.Item1.Jmeno)
-            )
-            {
-                <option labelx="@($"{HlidacStatu.Util.RenderData.NiceNumber(item.Count)} dotací za {HlidacStatu.Util.RenderData.ShortNicePrice(item.Sum)}")" value="@item.Item1.ICO">@item.Item1.Jmeno</option>
-            }
-        </datalist>
+        <div class="col-md-4">
+            <label for="poskytovatel" class="form-label">Poskytovatel dotace</label>
+
+            <input class="form-control" list="poskytovatelDL" id="poskytovatel" placeholder="Poskytovatel dotace" style="height:2em">
+            <datalist id="poskytovatelDL">
+                <option value="" selected>Libovolný</option>
+                @foreach (var item in poskytovatele.OrderBy(o => o.Item1.Jmeno)
+                )
+                {
+                    <option labelx="@($"{HlidacStatu.Util.RenderData.NiceNumber(item.Count)} dotací za {HlidacStatu.Util.RenderData.ShortNicePrice(item.Sum)}")" value="@item.Item1.ICO">@item.Item1.Jmeno</option>
+                }
+            </datalist>
+        </div>
+        <div class="col-md-4">
+            <label for="poskytovatel" class="form-label">Název dotace,dotačního programu, libovolný text</label>
+
+            <input class="form-control" id="text" placeholder="Název dotace,dotačního programu, libovolný text" style="height:2em">
+        </div>
+        <div class="col-10">
+            <button id="btnAnalyza" class="btn btn-primary" type="submit">Zobrazit analýzu dotací včetně dotací</button>
+            <button id="btnQuery" class="btn btn-secondary" type="submit">Zobrazit pouze nalezené dotace</button>
+        </div>
     </div>
-</div>
+</form> 

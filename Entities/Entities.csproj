@@ -18,7 +18,7 @@
       <PackageReference Include="Devmasters.Core" Version="8.0.4" />
       <PackageReference Include="Devmasters.Crypto" Version="8.0.3" />
       <PackageReference Include="Devmasters.DT" Version="8.0.2" />
-      <PackageReference Include="Devmasters.Enums" Version="8.0.0" />
+      <PackageReference Include="Devmasters.Enums" Version="8.0.1" />
       <PackageReference Include="Devmasters.IO" Version="8.1.0" />
       <PackageReference Include="Devmasters.Lang" Version="8.0.0" />
       <PackageReference Include="Enums.NET" Version="5.0.0" />

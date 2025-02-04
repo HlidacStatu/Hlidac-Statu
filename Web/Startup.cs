@@ -258,7 +258,7 @@ namespace HlidacStatu.Web
                 {
                     "wwwroot/Content/GlobalSite.v1.15.css",
                     "wwwroot/Content/social-share-kit.css",
-                    "wwwroot/Content/new.v1.15.css" 
+                    "wwwroot/Content/new.v1.20.css" 
                 };
 
 
