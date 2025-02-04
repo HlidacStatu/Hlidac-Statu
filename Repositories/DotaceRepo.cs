@@ -292,10 +292,6 @@ namespace HlidacStatu.Repositories
                     .MinimumShouldMatch(1)
                 );
 
-            var res = await SubsidyRepo.SubsidyClient.SearchAsync<Subsidy>(s => s
-                .Query(q => originalsQuery)
-                .Size(10000));
-
             var originalSubsidyIds = SubsidyRepo.SubsidyClient.SimpleGetAllIds(5, originalsQuery);
             int totalCount = originalSubsidyIds.Count;
 
