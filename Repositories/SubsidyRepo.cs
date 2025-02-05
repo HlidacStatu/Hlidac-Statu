@@ -488,6 +488,62 @@ namespace HlidacStatu.Repositories
                 return [];
             }
         }
+        
+        public static async Task<List<Subsidy>> FindDeMinimisDuplicates(Subsidy subsidy)
+        {
+            //duplicity podle hashe můžeme hledat jen u firem, u lidí by to slučovalo nesmyslně
+            if (string.IsNullOrWhiteSpace(subsidy.Recipient.Ico))
+                return [];
+            
+            if(subsidy.Metadata.DataSource.ToLower() != "deminimis")
+                return [];
+            
+            var queryForDuplicates = new QueryContainerDescriptor<Subsidy>()
+                .Bool(b => b
+                    .Must(
+                        m => m.Term(t => t.Field("metadata.dataSource.keyword").Value("IsRed")),
+                        m => m.Term(t => t.Field(f => f.DuplaHash).Value(subsidy.DuplaHash))
+                    )
+                );
+
+            try
+            {
+                var res = await SubsidyClient.SearchAsync<Subsidy>(s => s
+                    .Size(9000)
+                    .Query(q => queryForDuplicates)
+                );
+
+                if (!res.IsValid) // try again
+                {
+                    await Task.Delay(500);
+                    res = await SubsidyClient.SearchAsync<Subsidy>(s => s
+                        .Size(9000)
+                        .Query(q => queryForDuplicates)
+                    );
+                }
+                
+                if(res.Documents.Count == 0)
+                    return [];
+
+                //check if project code is in project name
+                var returnList = res.Documents.ToList();
+                returnList = returnList
+                    .Where(
+                        s => subsidy.ProjectName.Contains(s.ProjectCode, StringComparison.InvariantCultureIgnoreCase))
+                    .ToList();
+                
+                if(!returnList.Any())
+                    return [];
+                
+                returnList.Add(subsidy);
+                return returnList;
+            }
+            catch (Exception ex)
+            {
+                Logger.Error(ex, $"Cant load duplicate subsidies for subsidyId={subsidy.Id}");
+                return [];
+            }
+        }
 
         public static async Task<List<Subsidy>> FindDuplicatesByOriginalIdAsync(Subsidy subsidy)
         {
