@@ -23,7 +23,7 @@ namespace HlidacStatu.Web.Controllers
                         var datasetsS = await DataSetDB.Instance.SearchDataRawAsync("*", 1, 200);
                         var datasets = datasetsS.Result
                             .Select(s => Newtonsoft.Json.JsonConvert.DeserializeObject<Registration>(s.Item2))
-                            .Where(m => m.id != null);
+                            .Where(m => m.id != null & m.hidden == false);
 
                     foreach (var ds in datasets)
                     {
