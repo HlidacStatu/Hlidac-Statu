@@ -414,7 +414,7 @@
 
 
                     @foreach (var ds in Model
-                    .Where(m => m.Ds.betaversion == false)
+                    .Where(m => m.Ds.betaversion == false && m.Ds.hidden == false)
                     .Where(m => alreadyRendered.Contains(m.Ds.id) == false)
                     .OrderBy(r => r.Ds.name).ThenBy(r => r.Ds.id))
                     {
