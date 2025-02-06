@@ -20,7 +20,7 @@ namespace HlidacStatu.Repositories
             .ConfigureAwait(false).GetAwaiter().GetResult();
 
 
-        public static async Task SaveAsync(Dotace dotace)
+        public static async Task SaveAsync(Dotace dotace, bool forceRewriteHints = false)
         {
             Logger.Debug(
                 $"Saving Dotace {dotace.Id} from {dotace.PrimaryDataSource}");
@@ -31,6 +31,21 @@ namespace HlidacStatu.Repositories
 
             //recalc hints
             UpdateHints(dotace, false);
+            if (!forceRewriteHints)
+            {
+                try
+                {
+                    var oldDotace = await GetAsync(dotace.Id);
+                    if (oldDotace is not null)
+                    {
+                        dotace.Hints = oldDotace.Hints;
+                    }
+                }
+                catch (Exception e)
+                {
+                    Logger.Warning(e, $"Failed to load old Dotace {dotace.Id} to preserve hints");
+                }
+            }
             FixSomeHints(dotace);
 
             var res = await DotaceClient.IndexAsync(dotace, o => o.Id(dotace.Id));
