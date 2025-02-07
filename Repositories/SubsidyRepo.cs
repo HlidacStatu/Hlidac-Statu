@@ -424,12 +424,21 @@ namespace HlidacStatu.Repositories
         {
             var hashDuplicateTask = FindDuplicatesByHashAsync(subsidy);
             var originalIdDuplicateTask = FindDuplicatesByOriginalIdAsync(subsidy);
+            var deMinimisDuplicateTask = FindDeMinimisDuplicates(subsidy);
 
             var hashDuplicates = await hashDuplicateTask;
             var originalIdDuplicates = await originalIdDuplicateTask;
+            var deMinimisDuplicates = await deMinimisDuplicateTask;
 
-            return hashDuplicates
-                .Concat(originalIdDuplicates.Where(od => hashDuplicates.Any(hd => hd.Id == od.Id) == false)).ToList();
+            var mergedDuplicates = hashDuplicates.ToList();
+            
+            mergedDuplicates = mergedDuplicates.Concat(
+                originalIdDuplicates.Where(od => mergedDuplicates.Any(hd => hd.Id == od.Id) == false)).ToList();
+            mergedDuplicates = mergedDuplicates.Concat(
+                deMinimisDuplicates.Where(od => mergedDuplicates.Any(hd => hd.Id == od.Id) == false)).ToList();
+
+            return mergedDuplicates;
+
         }
 
         private static async Task<List<Subsidy>> FindDuplicatesByHashAsync(Subsidy subsidy)
