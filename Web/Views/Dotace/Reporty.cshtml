@@ -73,7 +73,7 @@
                         <a href="/Dotace/TopDotacniProgramy?typDotace=2" class="btn btn-primary btn-sm">Celkem</a>
                         @foreach (var rok in HlidacStatu.Repositories.DotaceRepo.DefaultLimitedYears.Reverse().Take(3))
                         {
-                            <a href="/Dotace/TopDotacniProgramy?typDotace=1&rok=@(rok)" class="btn btn-primary btn-sm">@rok</a>
+                            <a href="/Dotace/TopDotacniProgramy?typDotace=2&rok=@(rok)" class="btn btn-primary btn-sm">@rok</a>
 
                         }
                         <a href="/Dotace/TopDotacniProgramy?typDotace=2" class="btn btn-primary btn-sm">Další</a>

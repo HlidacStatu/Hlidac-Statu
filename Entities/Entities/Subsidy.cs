@@ -26,7 +26,7 @@ public partial class Subsidy
                     $"_{ProjectCode}_{ProjectName}_{ProgramName}_{ProgramCode}" +
                     $"_{ApprovedYear}_{SubsidyProvider}_{SubsidyProviderIco}"));
                 var hash = Convert.ToHexString(hashBytes);
-                _id = $"{Metadata.DataSource}-{hash}";
+                _id = $"{Metadata.DataSource.RemoveAccents().Replace(" ", "")}-{hash}";
             }
             return _id;
         }

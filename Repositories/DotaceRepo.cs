@@ -244,7 +244,8 @@ namespace HlidacStatu.Repositories
                             originalSubsidy = await SubsidyRepo.GetAsync(originalSubsidy.Hints.OriginalSubsidyId);
                             if (originalSubsidy == null)
                             {
-                                throw new Exception($"Couldnt find original subsidy for {originalSubsidy.Id}");
+                                Logger.Warning($"Couldnt find original subsidy for {originalSubsidy.Id}");
+                                return;
                             }
                         }
                     }
@@ -452,6 +453,20 @@ namespace HlidacStatu.Repositories
             await DotaceRepo.DotaceClient.ClearScrollAsync(cs => cs.ScrollId(scrollId));
             
             return uniqueProgramNames.ToList();
+        }
+        
+        public static async Task DeleteAsync(string dotaceId)
+        {
+            Logger.Debug($"Removing dotace {dotaceId}.");
+            try
+            {
+                await DotaceClient.DeleteAsync<Dotace>(dotaceId);
+            }
+            catch (Exception ex)
+            {
+                Logger.Error(ex, $"Cant delete dotace {dotaceId}");
+                throw;
+            }
         }
     }
 }
