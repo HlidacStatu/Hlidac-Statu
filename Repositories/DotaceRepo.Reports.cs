@@ -729,8 +729,8 @@ namespace HlidacStatu.Repositories
         }
 
         public static async
-            Task<List<(string ProgramName, string ProgramCode, string SubsidyProviderIco, decimal AssumedAmountSummed)>>
-            TopDotacniProgramy(Dotace.Hint.Type typDotace, int? rok)
+            Task<List<(string ProgramName, string ProgramCode, string SubsidyProviderIco, long Count, decimal AssumedAmountSummed)>>
+            TopDotacniProgramy(Dotace.Hint.Type? typDotace = null, int? rok = null, string? customquery = null)
         {
             var aggs = new AggregationContainerDescriptor<Dotace>()
                 .MultiTerms("distinct_programs", mt => mt
@@ -747,11 +747,20 @@ namespace HlidacStatu.Repositories
                     )
                 );
 
-            string query = $"hints.subsidyType:{typDotace:D}";
 
-            if (rok is not null && rok > 0)
+            string query = "";
+            if (!string.IsNullOrWhiteSpace(customquery))
             {
-                query += $" AND approvedYear:{rok}";
+                query = customquery;
+            }
+            else
+            {
+                if ( typDotace != null ) 
+                    query = HlidacStatu.Searching.Query.ModifyQueryAND(query,  $"hints.subsidyType:{typDotace:D}");
+
+                if (rok is not null && rok > 0)
+                    query = HlidacStatu.Searching.Query.ModifyQueryAND(query, $"approvedYear:{rok}");
+                
             }
 
             var res = await DotaceRepo.Searching.SimpleSearchAsync(query, 1, 0, "666", anyAggregation: aggs);
@@ -761,7 +770,7 @@ namespace HlidacStatu.Repositories
             }
 
             // Initialize the results dictionary
-            List<(string ProgramName, string ProgramCode, string SubsidyProviderIco, decimal AssumedAmountSummed)>
+            List<(string ProgramName, string ProgramCode, string SubsidyProviderIco, long Count, decimal AssumedAmountSummed)>
                 results = new();
 
             // Parse the aggregation results
@@ -772,12 +781,13 @@ namespace HlidacStatu.Repositories
                     if (perIcoBucket.Key is not null && perIcoBucket.Key is List<object> keyList)
                     {
                         decimal sum = 0;
+                        long count = perIcoBucket.DocCount ?? 0;
                         if (perIcoBucket["sumAssumedAmount"] is ValueAggregate sumBA)
                         {
                             sum = Convert.ToDecimal(sumBA.Value ?? 0);
                         }
 
-                        results.Add((keyList[0].ToString(), keyList[1].ToString(), keyList[2].ToString(), sum));
+                        results.Add((keyList[0].ToString(), keyList[1].ToString(), keyList[2].ToString(), count, sum));
                     }
                 }
             }

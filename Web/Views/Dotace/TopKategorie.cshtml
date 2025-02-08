@@ -23,7 +23,7 @@
         searchQuery = searchQuery + "%20AND%20approvedYear:" + rok.Value;
         elasticQuery = HlidacStatu.Searching.Query.ModifyQueryAND(elasticQuery, $"approvedYear:{rok.Value}");
     }
-    
+
 
 }
 
@@ -99,25 +99,19 @@
 
     @if (!rok.HasValue)
     {
-        var perYearData = await DotaceRepo.ReportPoLetechAsync(query:elasticQuery);
-        var perYearChartData = new Series[]
-        {
-            new()
-            {
-                Name = "Objem dotací po letech",
-                Type = Series.SeriesType.column,
-                Data = perYearData.OrderBy(s => s.Year)
-                    .Select(s => new SeriesData(s.Year, s.Value.CelkemCena))
-                    .ToArray(),
-            },
-        };
+        var options = new HlidacStatu.Web.Models.DotaceAnalBoxes.ChartPoLetech()
+                    {
+                        Query = elasticQuery,
+                         Height = 300,
+                        Title = $"Objem dotací {Devmasters.TextUtil.ShortenText(calcCategory.ToNiceDisplayName(), 35)} v jednotlivých letech"
+                    };
 
-        <div>
-            @Html.ColumnGraph($"Objem dotací {Devmasters.TextUtil.ShortenText(calcCategory.ToNiceDisplayName(),35)} v jednotlivých letech", perYearChartData, yTitleLeft: "Objem dotací v Kč")
+        <div class="my-4">
+            <partial name="analBoxes/_chartPoLetech" model="options" />
         </div>
     }
 
-    <div>
+    <div class="my-3">
         @Html.DataToHTMLTable(data, tableId: "dt" + category.ToString("G"),
                 dataTableOptions: HtmlExtensions.DatatableOptions(orderColumnIdx: 2, orderDirection: "desc"))
     </div>

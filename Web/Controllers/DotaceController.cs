@@ -142,7 +142,8 @@ namespace HlidacStatu.Web.Controllers
             }
             else
             {
-                var data = await DotaceRepo.ReportPrijemciPoKategoriichAsync(rok, cat);
+                System.Collections.Generic.List<(string Ico, Dotace.Hint.CalculatedCategories Category, long Count, decimal Sum)> data = 
+                    await DotaceRepo.ReportPrijemciPoKategoriichAsync(rok, cat);
                 return View(data);
             }
         }
@@ -167,10 +168,9 @@ namespace HlidacStatu.Web.Controllers
         [HlidacCache(22 * 60 * 60, "typdotace;rok", false)]
         public async Task<ActionResult> TopDotacniProgramy(int typDotace, int? rok = null)
         {
-            var data = await DotaceRepo.TopDotacniProgramy((Dotace.Hint.Type)typDotace , rok);
             ViewData["rok"] = rok;
             ViewData["typDotace"] = typDotace;
-            return View(data);
+            return View();
         }
 
         [HlidacCache(22 * 60 * 60, "rok", false)]

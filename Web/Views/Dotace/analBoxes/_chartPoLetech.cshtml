@@ -1,0 +1,20 @@
+﻿@using Devmasters.Enums
+@using HlidacStatu.Entities
+@using HlidacStatu.Repositories
+@using HlidacStatu.XLib.Render
+@model HlidacStatu.Web.Models.DotaceAnalBoxes.ChartPoLetech
+
+@{
+    var perYearData = await DotaceRepo.ReportPoLetechAsync(query:Model.Query);
+        var perYearChartData = new Series[]
+        {
+            new()
+            {                
+                Type = Series.SeriesType.column,
+                Data = perYearData.OrderBy(s => s.Year)
+                    .Select(s => new SeriesData(s.Year, s.Value.CelkemCena))
+                    .ToArray(),
+            },
+        };
+}
+@Html.ColumnGraph(Model.Title, perYearChartData, yTitleLeft: "Objem dotací v Kč", height: Model.Height)

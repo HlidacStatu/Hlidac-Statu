@@ -1,0 +1,23 @@
+﻿@model HlidacStatu.Repositories.Searching.DotaceSearchResult
+@{
+
+    ViewBag.Title = "Hlídač Dotací: Hledání";
+    ViewBag.SubTitle = Model?.Q;
+
+    ViewBag.ShowBookmarkUrl = true;
+}
+
+
+@section breadcrumb
+{
+    <ol class="breadcrumb">
+        <li><a href="/">Hlídač Státu</a></li>
+        <li><a href="@Url.Action("Index","Dotace")">Hlídač Dotací</a></li>
+        <li>@ViewBag.SubTitle</li>
+    </ol>
+}
+<partial name="_SearchForm" model="@Model" />
+
+<partial name="_SearchResult" model="@Model" />
+
+

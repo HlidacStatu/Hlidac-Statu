@@ -1,0 +1,61 @@
+﻿@using Devmasters.Enums
+@using HlidacStatu.Entities
+@using HlidacStatu.Repositories
+@using HlidacStatu.XLib.Render
+@model HlidacStatu.Web.Models.DotaceAnalBoxes.TopProgramy
+
+@{
+    var data = await DotaceRepo.TopDotacniProgramy(customquery: Model.Query);
+    
+
+    var dotacniProgramy = new ReportDataSource<(string ProgramName, string ProgramCode, string SubsidyProviderIco, long Count, decimal AssumedAmountSummed)>(
+        new[]
+        {
+            new ReportDataSource<(string ProgramName, string ProgramCode, string SubsidyProviderIco, long Count, decimal AssumedAmountSummed)>.Column()
+            {
+                Name = "Poskytovatel",
+                CssClass = "text",
+                HtmlRender = (x) => $"<a href=/subjekt/{x.SubsidyProviderIco}>{FirmaRepo.NameFromIco(x.SubsidyProviderIco)}</a>",
+                TextRender = (x) => FirmaRepo.NameFromIco(x.SubsidyProviderIco)
+            },
+            new ReportDataSource<(string ProgramName, string ProgramCode, string SubsidyProviderIco, long Count, decimal AssumedAmountSummed)>.Column()
+            {
+                Name = "Programu (kód)",
+                TextRender = (x) => x.ProgramName+((!string.IsNullOrEmpty(x.ProgramCode)? $" ({x.ProgramCode})" : "")),
+                HtmlRender = (x) => $"<a href='/dotace/program?programName={System.Net.WebUtility.UrlEncode(x.ProgramName)}&programCode={System.Net.WebUtility.UrlEncode(x.ProgramCode)}'>{x.ProgramName+((!string.IsNullOrEmpty(x.ProgramCode) ? $" ({x.ProgramCode})" : ""))}</a>",
+                CssClass = "text"
+            },
+            new ReportDataSource<(string ProgramName, string ProgramCode, string SubsidyProviderIco, long Count,decimal AssumedAmountSummed)>.Column()
+            {
+                Name = "Počet dotací",
+                TextRender = (x) => HlidacStatu.Util.RenderData.NiceNumber(x.Count),
+                HtmlRender = (x) => "<a href='/dotace/hledat?q=" 
+                    + System.Net.WebUtility.UrlEncode(
+                        HlidacStatu.Searching.Query.ModifyQueryAND(
+                            Model.Query,
+                            HlidacStatu.Searching.Query.ModifyQueryAND(
+                                (!string.IsNullOrEmpty(x.ProgramName) ? $"program:\"{x.ProgramName}\" ": "" ), 
+                                (!string.IsNullOrEmpty(x.ProgramCode) ? $"kodProgramu:\"{x.ProgramCode}\" ": "" )
+                            )
+                        )
+                    )
+                    + $"'>{HlidacStatu.Util.RenderData.NiceNumber(x.Count,html:true)}</a>",
+                OrderValueRender = (x) => HlidacStatu.Util.RenderData.OrderValueFormat(x.Count),
+                CssClass = "number"
+            },
+            new ReportDataSource<(string ProgramName, string ProgramCode, string SubsidyProviderIco, long Count,decimal AssumedAmountSummed)>.Column()
+            {
+                Name = "Celková částka",
+                TextRender = (x) => HlidacStatu.Util.RenderData.NicePrice(x.AssumedAmountSummed, shortFormat:true),
+                HtmlRender = (x) => HlidacStatu.Util.RenderData.NicePrice(x.AssumedAmountSummed,html:true),
+                OrderValueRender = (x) => HlidacStatu.Util.RenderData.OrderValueFormat(x.AssumedAmountSummed),
+                CssClass = "number"
+            }
+        });
+    
+    dotacniProgramy.AddRows(data.Take(Model.Top));
+ 
+}
+
+@Html.DataToHTMLTable(dotacniProgramy, dataTableOptions: HtmlExtensions.DatatableOptions(orderColumnIdx: 3, orderDirection: "desc"))
+
