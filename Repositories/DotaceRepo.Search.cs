@@ -35,7 +35,8 @@ namespace HlidacStatu.Repositories
                 new TransformPrefixWithValue("cena:", "assumedAmount:<${q} ", "<\\d"),
                 new TransformPrefixWithValue("cena:", "assumedAmount:>${q} ", ">\\d"),
                 new TransformPrefixWithValue("cena:", "assumedAmount:${q} ", null),
-                new HlidacStatu.Searching.Dotace_Oblast()
+                new HlidacStatu.Searching.Dotace_Oblast(),
+                new HlidacStatu.Searching.Dotace_Typ(),
             };
 
             public static string[] QueryShorcuts()

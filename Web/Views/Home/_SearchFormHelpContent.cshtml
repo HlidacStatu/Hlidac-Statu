@@ -10,10 +10,10 @@
                 <a href="#smlouvy" class="nav-link" aria-controls="smlouvy" role="tab" data-bs-toggle="tab">Parametry pro <b>REGISTR SMLUV</b></a>
             </li>
             <li role="presentation" class="nav-item">
-                <a href="#vz" class="nav-link" aria-controls="vz" role="tab" data-bs-toggle="tab">Parametry pro <b>VEŘEJNÉ ZAKÁZKY</b></a>
+                <a href="#dotace" class="nav-link" aria-controls="dotace" role="tab" data-bs-toggle="tab">Parametry pro <b>DOTACE</b></a>
             </li>
             <li role="presentation" class="nav-item">
-                <a href="#dotace" class="nav-link" aria-controls="dotace" role="tab" data-bs-toggle="tab">Parametry pro <b>DOTACE</b></a>
+                <a href="#vz" class="nav-link" aria-controls="vz" role="tab" data-bs-toggle="tab">Parametry pro <b>VEŘEJNÉ ZAKÁZKY</b></a>
             </li>
             <li role="presentation" class="nav-item">
                 <a href="#insolvence" class="nav-link" aria-controls="insolvence" role="tab" data-bs-toggle="tab">Parametry pro <b>INSOLVENCE</b></a>
@@ -294,11 +294,31 @@
                             andrej-babis)<br>
                             <kbd>holding:12345678</kbd> - IČO matky holdingu, hledá se pro všechny firmy holdingu<br>
                             <br>
-                            <br>
                             <kbd>projekt:"název projektu"</kbd> - dotace se specifickým názvem projektu (např. "TJ Vodní stavby Tábor")<br>
                             <kbd>jmeno:"jméno příjemce"</kbd> - dotace, kde jméno příjemce odpovídá zadanému výrazu ("Ředitelství silnic a dálnic")<br>
-                            <kbd>castka:&gt;castka</kbd> - dotace s částkou vyšší než. Možno použí i <kbd>&gt;=</kbd> <kbd>&lt;=</kbd>
-                            <kbd>&lt;</kbd><br>
+                            <kbd>castka:&gt;castka</kbd> - dotace s částkou vyšší než. Možno použí i <kbd>&gt;=</kbd> <kbd>&lt;=</kbd><kbd>&lt;</kbd><br>
+                            <kbd>program:"název dotačního programu"</kbd> - dotace vyplacené z dotačního programu <br>
+                            <kbd>kodProgramu:"kód dotačního programu"</kbd> - dotace vyplacené z dotačního programu s kódem<br>
+                            <kbd>kodProjektu:"kód projektu jednotlivé dotace"</kbd><br>
+                            <br>
+                            <kbd>typ:"zdroj peněz dotačního programu"</kbd><br>
+                            Seznam hodnot zdrojů:
+                            <ul>
+                                @foreach (var v in Devmasters.Enums.EnumTools.EnumToEnumerable<HlidacStatu.Entities.Dotace.Hint.Type>().Where(m=> m.Id>0))
+                                {
+                                    <li><kbd>typ:@(v.Value.ToString())</kbd> -  @(v.Name)</li>
+                                }
+                            </ul>
+                            <br>
+                            <kbd>oblast:"oblast"</kbd> - veřejná oblast, do které dotace směřovala<br>
+                            Seznam hodnot oblastí:
+                            <ul>
+                                @foreach (var v in Devmasters.Enums.EnumTools.EnumToEnumerable<HlidacStatu.Entities.Dotace.Hint.CalculatedCategories>().Where(m => m.Id > 0).OrderBy(o=>o.Value.ToString()))
+                                {
+                                    <li><kbd>oblast:@(v.Value.ToString())</kbd> - @(v.Name)</li>
+                                }
+                            </ul>
+
                         </dd>
                     </dl>
                 </div>
