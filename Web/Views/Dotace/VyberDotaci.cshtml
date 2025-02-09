@@ -109,6 +109,10 @@
          */
         class TypeaheadSearch {
           constructor(options) {
+            // Throw an exception if the required container option is not provided.
+            if (!options || !options.container) {
+              throw new Error("TypeaheadSearch: The 'container' option is required.");
+            }
             this.container = options.container;
             this.labelText = options.labelText || "Search:";
             this.placeholder = options.placeholder || "Type to search...";
@@ -364,7 +368,7 @@
                     container: container,
                     labelText: "Poskytovatel dotace",
                     placeholder: "Najít úřad/firmu",
-                    endpoint: "/dotace/GetPoskytovatele/", // The component will append the query string.                   
+                    endpoint: "/dotace/GetPoskytovatele/", // The component will append the query string.
                     inputStyle: "height:2em",
                     inputName: "poskytovatel"
                   });
