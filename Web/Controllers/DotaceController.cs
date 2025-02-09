@@ -8,6 +8,8 @@ using Devmasters.Enums;
 using System.Collections.Generic;
 using System.Linq;
 using Devmasters;
+using System.Text.Json.Serialization;
+using Newtonsoft.Json;
 
 namespace HlidacStatu.Web.Controllers
 {
@@ -18,11 +20,18 @@ namespace HlidacStatu.Web.Controllers
             return View();
         }
 
-        private class poskytovateleCacheModel
+        private class poskytovateleCacheModel : HlidacStatu.Searching.SimpleAutocomplete.LocalItem
         {
-            public string Ico { get; set; }
-            public string FirmaNazev { get; set; }
+            public poskytovateleCacheModel(string text, string id, long count, decimal sum) : base(text, id)
+            {
+                this.Count = count;
+                this.Sum = sum;
+            }
+
+            [Newtonsoft.Json.JsonIgnore(),System.Text.Json.Serialization.JsonIgnore()]
             public long Count { get; set; }
+
+            [Newtonsoft.Json.JsonIgnore(),System.Text.Json.Serialization.JsonIgnore()]
             public decimal Sum { get; set; }
         }
         private static Devmasters.Cache.LocalMemory.AutoUpdatedCache<poskytovateleCacheModel[]> poskytovateleCache =
@@ -31,38 +40,30 @@ namespace HlidacStatu.Web.Controllers
             {
                 var poskytovateleIcos = HlidacStatu.Repositories.DotaceRepo.ReportPoskytovatelePoLetechAsync(null, null).ConfigureAwait(false).GetAwaiter().GetResult();
                 var poskytovatele = poskytovateleIcos
-                     .Select(i => new poskytovateleCacheModel()
-                     {
-                         Ico = i.IcoPoskytovatele,
-                         FirmaNazev = Firmy.GetJmeno(i.IcoPoskytovatele).RemoveAccents(),
-                         Count = i.Count,
-                         Sum = i.Sum
-                     })
+                     .Select(i => new poskytovateleCacheModel(
+                         Firmy.GetJmeno(i.IcoPoskytovatele).RemoveAccents(),
+                         i.IcoPoskytovatele,
+                         i.Count,
+                         i.Sum)
+                     )
                      .ToArray();
                 return poskytovatele;
             }
             );
         public async Task<ActionResult> GetPoskytovatele(string id)
         {
-            string[] s = id.RemoveAccents().Split(' ','.',',');
+            string[] s = id.RemoveAccents().Split(' ', '.', ',');
             var all = poskytovateleCache.Get();
-            var res = all.Where(m =>
-                            {
-                                foreach (var word in s)
-                                {
-                                    if (m.FirmaNazev.Contains(word, StringComparison.InvariantCultureIgnoreCase)
-                                    || m.Ico.Contains(word, StringComparison.InvariantCultureIgnoreCase)
-                                       )
-                                        return true;
-
-                                }
-                                return false;
-                            }
-                        )
-                .OrderByDescending(o => o.Sum).ThenBy(o => o.FirmaNazev)
+            var res = all.Select(m => new { hits = m.GetHits(s), item = m })
+                .Where(m => m.hits > 0)
+                .OrderByDescending(o => o.hits)
+                .Take(30)
+                .OrderByDescending(o => o.hits).ThenBy(o => o.item.Text)
                 .Take(10)
-                .Select(m => new { name = m.FirmaNazev, value = m.Ico })
+                .Select(m=>m.item)
                 .ToArray();
+
+
             return Json(res);
         }
 
@@ -115,7 +116,25 @@ namespace HlidacStatu.Web.Controllers
             {
                 return Redirect("/dotace");
             }
-            return View((object)q);
+
+            var qS = "";
+            Dictionary<string, string> qs = this.Request.Query
+                .ToDictionary(q => q.Key, q => q.Value.ToString());
+
+            var dotacePrefixes = DotaceRepo.Searching.Irules
+                                    .SelectMany(m => m.Prefixes)
+                                    .ToArray();
+            foreach (var qkey in qs.Keys)
+            {
+                if (dotacePrefixes.Any(m => m == qkey))
+                {
+                    if (!string.IsNullOrWhiteSpace(qs[qkey]))
+                        qS = HlidacStatu.Searching.Query.ModifyQueryAND(qS, $"{qs.Keys}{qs[qkey]}");
+                }
+
+            }
+
+            return View((object)qS);
         }
 
         public async Task<ActionResult> Detail(string id)
