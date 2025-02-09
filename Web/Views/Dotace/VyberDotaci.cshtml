@@ -1,17 +1,14 @@
 @using HlidacStatu.Repositories
 @using HlidacStatu.Repositories.SharedModels
 @using HlidacStatu.XLib.Render
-@model List<(string Ico, long Count, decimal Sum)>
 
 @{
 
     ViewBag.Title = "Výběr dotací";
     ViewBag.SubTitle = $"";
 
-    var poskytovateleIcos = await HlidacStatu.Repositories.DotaceRepo.ReportPoskytovatelePoLetechAsync(null, null);
-    var poskytovatele = poskytovateleIcos
-         .Select(i => (Firmy.Get(i.IcoPoskytovatele), i.Count, i.Sum))
-         .ToArray();
+    Dictionary<string, string> qs = this.Context.Request.Query
+        .ToDictionary(q => q.Key, q => q.Value.ToString());
 
 
     // var poskytovateleFirmyCache = new Devmasters.Cache.Redis.Cache<string ico, long Count, decimal Sum)[]>(TimeSpan.FromDays(1),
@@ -49,36 +46,284 @@
     <link rel="stylesheet" type="text/css" href="//cdn.datatables.net/1.13.4/css/jquery.dataTables.css" />
     <script type="text/javascript" charset="utf8" src="//cdn.datatables.net/1.13.4/js/jquery.dataTables.js"></script>
     <script src="~/bundles/highcharts"></script>
+
+    <style>
+        .whisp {
+            width: 100%;
+            text-align: left;
+            background-color: white;
+            border-left: 2px grey solid;
+            border-top: 0;
+            border-bottom: 1px grey dotted;
+            border-right: 2px grey solid;
+            padding-bottom: 2px;
+            cursor: pointer;
+        }
+
+            .whisp:focus {
+                background-color: lightblue;
+                outline: none;
+            }
+
+        .loading-spinner {
+            border: 10px solid #f3f3f3; /* Light grey */
+            border-top: 10px solid #3498db; /* Blue */
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 2s linear infinite;
+            position: absolute;
+            top: 29px;
+            right: 20px;
+            z-index: 10;
+            display: none;
+        }
+
+        @@keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+        /* Optional: suggestions container styling */
+        #suggestions-container {
+            position: absolute;
+            z-index: 10;
+            margin-top: 5px;
+            width: 100%;
+        }
+    </style>
+    <script>
+        /**
+         * A generic typeahead search component.
+         *
+         * Options:
+         * - container: DOM element in which to render the component.
+         * - labelText: (optional) Text for the label.
+         * - placeholder: (optional) Placeholder text for the input.
+         * - endpoint: Either a string (base URL) or a function(query) that returns a Promise resolving to an array.
+         * - onSelect: (optional) Callback function invoked when a suggestion is selected.
+         */
+        class TypeaheadSearch {
+          constructor(options) {
+            this.container = options.container;
+            this.labelText = options.labelText || "Search:";
+            this.placeholder = options.placeholder || "Type to search...";
+            this.endpoint = options.endpoint; // e.g. "/kindex/findcompany/" or a function(query){...}
+            this.onSelect = options.onSelect || this.defaultOnSelect.bind(this);
+            this.inputClass = options.inputClass || "form-control";
+            this.inputStyle = options.inputStyle || "";
+            this.selectedIndex = -1;
+            this.suggestions = [];
+            this.inputId = options.inputName || "typeahead-search-input-"+ Math.random().toString(36).substr(2, 9);
+            this.render();
+          }
+
+          render() {
+            // Create a wrapper with relative positioning.
+            this.wrapper = document.createElement("div");
+            this.wrapper.style.position = "relative";
+
+            // Create and append label.
+            this.label = document.createElement("label");
+            // Create a unique id for the input.
+            this.label.setAttribute("for", this.inputId+"-text");
+            this.label.textContent = this.labelText;
+            this.label.className = "form-label";
+            this.wrapper.appendChild(this.label);
+
+            // Create and append the text input.
+            this.input = document.createElement("input");
+            this.input.type = "text";
+            this.input.placeholder = this.placeholder;
+            this.input.id = this.inputId+"-text";
+            this.input.className = this.inputClass;
+            this.input.style = this.inputStyle;
+            this.wrapper.appendChild(this.input);
+
+             // Create and append the hidden input.
+            this.hiddenInput = document.createElement("input");
+            this.hiddenInput.id = this.inputId;
+            this.hiddenInput.type = "hidden";
+            this.hiddenInput.name = this.inputId;
+            this.wrapper.appendChild(this.hiddenInput);
+
+            // Create and append the spinner.
+            this.spinner = document.createElement("div");
+            this.spinner.className = "loading-spinner";
+            this.wrapper.appendChild(this.spinner);
+
+            // Create and append the suggestions container.
+            this.suggestionsContainer = document.createElement("div");
+            this.suggestionsContainer.id = "suggestions-container";
+            this.wrapper.appendChild(this.suggestionsContainer);
+
+            // Finally, add the wrapper to the provided container.
+            this.container.appendChild(this.wrapper);
+
+            // Attach event listeners.
+            this.input.addEventListener("input", (e) => this.handleInput(e));
+            this.input.addEventListener("keydown", (e) => this.handleKeyDown(e));
+          }
+
+          showSpinner() {
+            this.spinner.style.display = "block";
+          }
+
+          hideSpinner() {
+            this.spinner.style.display = "none";
+          }
+
+          handleInput(e) {
+            const query = e.target.value.trim();
+            if (!query) {
+              this.clearSuggestions();
+              return;
+            }
+            this.fetchSuggestions(query);
+          }
+
+          fetchSuggestions(query) {
+            this.showSpinner();
+            // If endpoint is a function, use it directly.
+            if (typeof this.endpoint === "function") {
+              this.endpoint(query)
+                .then(data => {
+                  this.hideSpinner();
+                  this.renderSuggestions(data);
+                })
+                .catch(err => {
+                  this.hideSpinner();
+                  console.error(err);
+                });
+            } else {
+              // Otherwise, assume endpoint is a URL string to which we append the query.
+              const url = this.endpoint + encodeURIComponent(query);
+              fetch(url)
+                .then(response => response.json())
+                .then(data => {
+                  this.hideSpinner();
+                  this.renderSuggestions(data);
+                })
+                .catch(err => {
+                  this.hideSpinner();
+                  console.error(err);
+                });
+            }
+          }
+
+          renderSuggestions(data) {
+            this.clearSuggestions();
+            this.suggestions = data;
+            this.selectedIndex = -1;
+            data.forEach((item, index) => {
+              const button = document.createElement("button");
+              button.type = "button";
+              button.textContent = item.name;
+              button.value = item.value;
+              button.className = "whisp";
+              // When clicked, select this suggestion.
+              button.addEventListener("click", () => this.selectSuggestion(index));
+              this.suggestionsContainer.appendChild(button);
+            });
+          }
+
+          clearSuggestions() {
+            this.suggestionsContainer.innerHTML = "";
+            this.suggestions = [];
+            this.selectedIndex = -1;
+          }
+
+          handleKeyDown(e) {
+            // Get the list of suggestion buttons.
+            const suggestionButtons = Array.from(this.suggestionsContainer.querySelectorAll("button.whisp"));
+            if (suggestionButtons.length === 0) return;
+
+            switch (e.keyCode) {
+              case 38: // Up arrow.
+                e.preventDefault();
+                if (this.selectedIndex > 0) {
+                  this.selectedIndex--;
+                } else {
+                  this.selectedIndex = 0;
+                }
+                suggestionButtons[this.selectedIndex].focus();
+                break;
+              case 40: // Down arrow.
+                e.preventDefault();
+                if (this.selectedIndex < suggestionButtons.length - 1) {
+                  this.selectedIndex++;
+                } else {
+                  this.selectedIndex = suggestionButtons.length - 1;
+                }
+                suggestionButtons[this.selectedIndex].focus();
+                break;
+              case 27: // Escape.
+                this.clearSuggestions();
+                this.input.value = "";
+                this.hiddenInput.value = "";
+
+                break;
+              default:
+                break;
+            }
+          }
+
+          selectSuggestion(index) {
+            if (index >= 0 && index < this.suggestions.length) {
+              const selectedItem = this.suggestions[index];
+              // Set the input value to the selected name.
+              this.input.value = selectedItem.name;
+              this.hiddenInput.value = selectedItem.value;
+
+              this.clearSuggestions();
+              this.showSpinner();
+              // Invoke the onSelect callback.
+              this.onSelect(selectedItem);
+            }
+          }
+
+          defaultOnSelect(item) {
+            // Default action: navigate to a detail page.
+            //window.location.href = `/kindex/detail/${item.ico}`;
+
+            this.hideSpinner();
+          }
+        }
+    </script>
 }
 
 
 <h2>Jaké dotace chcete dohledat a zanalyzovat?</h2>
 <p>Jednotlivé možnosti můžete zkombinovat</p>
-<form action="/dotace/vyberdotaci?makequery=1" method="get">
+<form action="/dotace/vyberdotaci?makequery=1" method="get" name="fff" id="xfff">
     <div class="row g-3">
         <div class="col-md-4">
             <label for="typDotace" class="form-label">Typ dotace</label>
 
-            <select class="form-select" id="typDotace" aria-label="Typ dotace">
-                <option selected>Libovolný</option>
+            <select class="form-select" id="typDotace" name="typDotace" aria-label="Typ dotace">
+                <option selected="@(qs["typDotace"] == "")" value="">Libovolný</option>
                 @foreach (var item in Devmasters.Enums.EnumTools.EnumToEnumerable<HlidacStatu.Entities.Dotace.Hint.Type>()
                 .Where(m => m.Value > 0).OrderBy(o => o.Name)
                 )
                 {
-                    <option value="@item.Value">@item.Name</option>
+                    <option value="@item.Value" selected="@(qs["typDotace"] == item.Value.ToString())">@item.Name</option>
                 }
             </select>
         </div>
         <div class="col-md-4">
             <label for="oblastDotace" class="form-label">Oblast dotace</label>
 
-            <select class="form-select" id="oblastDotace" aria-label="Oblast dotace">
-                <option selected>Libovolná</option>
+            <select class="form-select" id="oblastDotace" name="oblastDotace" aria-label="Oblast dotace">
+                <option selected="@(qs["oblastDotace"] == "")">Libovolná</option>
                 @foreach (var item in Devmasters.Enums.EnumTools.EnumToEnumerable<HlidacStatu.Entities.Dotace.Hint.CalculatedCategories>()
                 .Where(m => m.Id >= 0).OrderBy(o => o.Name)
                 )
                 {
-                    <option value="@item.Value">@item.Name</option>
+                    <option value="@item.Value" selected="@(qs["oblastDotace"] == item.Value.ToString())">@item.Name</option>
                 }
             </select>
         </div>
@@ -86,49 +331,55 @@
         <div class="col-md-4">
             <label for="druhPrijemce" class="form-label">Druh příjemce</label>
 
-            <select class="form-select" id="druhPrijemce" aria-label="Druh příjemce">
-                <option selected>Libovolný</option>
+            <select class="form-select" id="druhPrijemce" name="druhPrijemce" aria-label="Druh příjemce">
+                <option selected="@(qs["druhPrijemce"] == "")">Libovolný</option>
                 @foreach (var item in Devmasters.Enums.EnumTools.EnumToEnumerable<HlidacStatu.Entities.Firma.TypSubjektuEnum>()
                 .Where(m => m.Id >= 0).OrderBy(o => o.Name)
                 )
                 {
-                    <option value="@item.Value">@item.Name</option>
+                    <option value="@item.Value" selected="@(qs["druhPrijemce"] == item.Value.ToString())">@item.Name</option>
                 }
             </select>
         </div>
         <div class="col-md-2">
             <label for="rok" class="form-label">Vybraný rok</label>
 
-            <select class="form-select" id="rok" aria-label="Typ dotace">
-                <option selected>Libovolný</option>
+            <select class="form-select" id="rok" name="rok" aria-label="Typ dotace">
+                <option selected="@(qs["rok"] == "")">Libovolný</option>
                 @for (int i = HlidacStatu.Repositories.DotaceRepo.DefaultLimitedYears.Min(); i <= HlidacStatu.Repositories.DotaceRepo.DefaultLimitedYears.Max(); i++)
                 {
-                    <option value="@i">@i</option>
+                    <option value="@i" selected="@(qs["rok"] == i.ToString())">@i</option>
                 }
             </select>
         </div>
 
         <div class="col-md-4">
-            <label for="poskytovatel" class="form-label">Poskytovatel dotace</label>
+            <div id="company-search-container"></div>
+            <script>
 
-            <input class="form-control" list="poskytovatelDL" id="poskytovatel" placeholder="Poskytovatel dotace" style="height:2em">
-            <datalist id="poskytovatelDL">
-                <option value="" selected>Libovolný</option>
-                @foreach (var item in poskytovatele.OrderBy(o => o.Item1.Jmeno)
-                )
-                {
-                    <option labelx="@($"{HlidacStatu.Util.RenderData.NiceNumber(item.Count)} dotací za {HlidacStatu.Util.RenderData.ShortNicePrice(item.Sum)}")" value="@item.Item1.ICO">@item.Item1.Jmeno</option>
-                }
-            </datalist>
+                        // Example usage:
+                document.addEventListener("DOMContentLoaded", function() {
+                  const container = document.getElementById("company-search-container");
+                  const searchComponent = new TypeaheadSearch({
+                    container: container,
+                    labelText: "Poskytovatel dotace",
+                    placeholder: "Najít úřad/firmu",
+                    endpoint: "/dotace/GetPoskytovatele/", // The component will append the query string.                   
+                    inputStyle: "height:2em",
+                    inputName: "poskytovatel"
+                  });
+                });
+            </script>
+
         </div>
         <div class="col-md-4">
-            <label for="poskytovatel" class="form-label">Název dotace,dotačního programu, libovolný text</label>
+            <label for="text" class="form-label">Název dotace,dotačního programu, libovolný text</label>
 
-            <input class="form-control" id="text" placeholder="Název dotace,dotačního programu, libovolný text" style="height:2em">
+            <input class="form-control" id="text" value="@(qs["text"])" name="text" placeholder="Název dotace,dotačního programu, libovolný text" style="height:2em">
         </div>
         <div class="col-10">
-            <button id="btnAnalyza" class="btn btn-primary" type="submit">Zobrazit analýzu dotací včetně dotací</button>
-            <button id="btnQuery" class="btn btn-secondary" type="submit">Zobrazit pouze nalezené dotace</button>
+            <button id="btnAnalyza" name="btnAnalyza" class="btn btn-primary" type="submit">Zobrazit analýzu dotací včetně dotací</button>
+            <button id="btnQuery" name="btnQuery" class="btn btn-secondary" type="submit">Zobrazit pouze nalezené dotace</button>
         </div>
     </div>
 </form> 
