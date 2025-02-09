@@ -54,7 +54,14 @@ public partial class Dotace
 
 
         //recipient hints
-        public int RecipientTypSubjektu { get; set; } = -1; //Firma.TypSubjektuEnum
+        int _recipientTypSubjektu = -1; //Firma.TypSubjektuEnum
+        public int RecipientTypSubjektu { 
+            get { return _recipientTypSubjektu; }
+            set {
+                _recipientTypSubjektu = value;
+                if (_recipientTypSubjektu == 2) //kdyz je PatrimStatuAlespon25perc, tak nastav PatrimStatu
+                    _recipientTypSubjektu = 1;
+            } } 
 
         [Newtonsoft.Json.JsonIgnore]
         [System.Text.Json.Serialization.JsonIgnore]
