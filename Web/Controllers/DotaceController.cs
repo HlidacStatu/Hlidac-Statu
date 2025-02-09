@@ -5,6 +5,9 @@ using HlidacStatu.Repositories;
 using HlidacStatu.Web.Filters;
 using Microsoft.AspNetCore.Mvc;
 using Devmasters.Enums;
+using System.Collections.Generic;
+using System.Linq;
+using Devmasters;
 
 namespace HlidacStatu.Web.Controllers
 {
@@ -13,6 +16,54 @@ namespace HlidacStatu.Web.Controllers
         public ActionResult Index()
         {
             return View();
+        }
+
+        private class poskytovateleCacheModel
+        {
+            public string Ico { get; set; }
+            public string FirmaNazev { get; set; }
+            public long Count { get; set; }
+            public decimal Sum { get; set; }
+        }
+        private static Devmasters.Cache.LocalMemory.AutoUpdatedCache<poskytovateleCacheModel[]> poskytovateleCache =
+            new Devmasters.Cache.LocalMemory.AutoUpdatedCache<poskytovateleCacheModel[]>(
+            TimeSpan.FromHours(1), (o) =>
+            {
+                var poskytovateleIcos = HlidacStatu.Repositories.DotaceRepo.ReportPoskytovatelePoLetechAsync(null, null).ConfigureAwait(false).GetAwaiter().GetResult();
+                var poskytovatele = poskytovateleIcos
+                     .Select(i => new poskytovateleCacheModel()
+                     {
+                         Ico = i.IcoPoskytovatele,
+                         FirmaNazev = Firmy.GetJmeno(i.IcoPoskytovatele).RemoveAccents(),
+                         Count = i.Count,
+                         Sum = i.Sum
+                     })
+                     .ToArray();
+                return poskytovatele;
+            }
+            );
+        public async Task<ActionResult> GetPoskytovatele(string id)
+        {
+            string[] s = id.RemoveAccents().Split(' ','.',',');
+            var all = poskytovateleCache.Get();
+            var res = all.Where(m =>
+                            {
+                                foreach (var word in s)
+                                {
+                                    if (m.FirmaNazev.Contains(word, StringComparison.InvariantCultureIgnoreCase)
+                                    || m.Ico.Contains(word, StringComparison.InvariantCultureIgnoreCase)
+                                       )
+                                        return true;
+
+                                }
+                                return false;
+                            }
+                        )
+                .OrderByDescending(o => o.Sum).ThenBy(o => o.FirmaNazev)
+                .Take(10)
+                .Select(m => new { name = m.FirmaNazev, value = m.Ico })
+                .ToArray();
+            return Json(res);
         }
 
         public async Task<ActionResult> Hledat(Repositories.Searching.DotaceSearchResult model)
@@ -27,7 +78,7 @@ namespace HlidacStatu.Web.Controllers
             //         .Field(f => f.AssumedAmount)
             //
             //     );
-            
+
             var aggs = new Nest.AggregationContainerDescriptor<Dotace>()
                 .Filter("filtered_sum", f => f
                     .Filter(q => q
@@ -58,6 +109,15 @@ namespace HlidacStatu.Web.Controllers
             return View(res);
         }
 
+        public async Task<ActionResult> Analyza(string q)
+        {
+            if (string.IsNullOrWhiteSpace(q))
+            {
+                return Redirect("/dotace");
+            }
+            return View((object)q);
+        }
+
         public async Task<ActionResult> Detail(string id)
         {
             if (string.IsNullOrWhiteSpace(id))
@@ -86,7 +146,7 @@ namespace HlidacStatu.Web.Controllers
 
             return View(dotace);
         }
-        [HlidacCache(22*60*60,"",false)]
+        [HlidacCache(22 * 60 * 60, "", false)]
         public async Task<ActionResult> PoLetech()
         {
             DotaceRepo.Statistics.TypeStatsPerYear[] data = await DotaceRepo.ReportPoLetechPerTypeAsync();
@@ -114,9 +174,12 @@ namespace HlidacStatu.Web.Controllers
             return View(data);
         }
 
-        [HlidacCache(22 * 60 * 60, "*", false)]
-        public async Task<ActionResult> VyberDotaci()
+        public async Task<ActionResult> VyberDotaci(
+            [FromQuery] int makequery
+
+            )
         {
+
             return View();
         }
 
@@ -137,12 +200,12 @@ namespace HlidacStatu.Web.Controllers
             if (cat == null)
             {
                 System.Collections.Generic.Dictionary<Dotace.Hint.CalculatedCategories, Lib.Analytics.SimpleStat> data = await DotaceRepo.PoKategoriichAsync(rok, null);
-                return View("TopKategoriePrehled",data);
+                return View("TopKategoriePrehled", data);
 
             }
             else
             {
-                System.Collections.Generic.List<(string Ico, Dotace.Hint.CalculatedCategories Category, long Count, decimal Sum)> data = 
+                System.Collections.Generic.List<(string Ico, Dotace.Hint.CalculatedCategories Category, long Count, decimal Sum)> data =
                     await DotaceRepo.ReportPrijemciPoKategoriichAsync(rok, cat);
                 return View(data);
             }
@@ -180,7 +243,7 @@ namespace HlidacStatu.Web.Controllers
             ViewData["rok"] = rok;
             return View(data);
         }
-        
+
         public ActionResult Reporty()
         {
             return View();
