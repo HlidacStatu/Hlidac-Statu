@@ -24,6 +24,7 @@ namespace HlidacStatu.Repositories
                 new Holding(HlidacStatu.Repositories.FirmaVazbyRepo.IcosInHolding, null, "ico:"),
                 //(prijemce.jmeno:${q} OR prijemce.obchodniJmeno:${q})
                 new TransformPrefixWithValue("ico:", "(recipient.ico:${q} OR subsidyProviderIco:${q})",null),
+                new TransformPrefixWithValue("icoposkytovatel:", "subsidyProviderIco:${q}",null),
                 new TransformPrefixWithValue("jmeno:", "(recipient.name:${q} OR recipient.hlidacName:${q})",null),
                 new TransformPrefix("rok:", "approvedYear:", null),
                 new TransformPrefix("projekt:", "projectName:", null),

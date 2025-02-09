@@ -8,7 +8,7 @@
     ViewBag.SubTitle = $"";
 
     Dictionary<string, string> qs = this.Context.Request.Query
-        .ToDictionary(q => q.Key, q => q.Value.ToString());
+        .ToDictionary(q => q.Key, q => q.Value.ToString().Replace(HlidacStatu.Web.Controllers.DotaceController.EMPTY_FORM_VALUE,""));
 
 
     // var poskytovateleFirmyCache = new Devmasters.Cache.Redis.Cache<string ico, long Count, decimal Sum)[]>(TimeSpan.FromDays(1),
@@ -104,13 +104,13 @@
 
 <h2>Jaké dotace chcete dohledat a zanalyzovat?</h2>
 <p>Jednotlivé možnosti můžete zkombinovat</p>
-<form action="/dotace/vyberdotaci?makequery=1" method="get" name="fff" id="xfff">
+<form action="/dotace/vyberdotaci" method="get" name="fff" id="xfff">
     <div class="row g-3">
         <div class="col-md-4">
             <label for="typ" class="form-label">Typ dotace</label>
 
             <select class="form-select" id="typ" name="typ" aria-label="Typ dotace">
-                <option selected="@(qs.GetValueOrDefault("typ") == "")" value="">Libovolný</option>
+                <option selected="@(qs.GetValueOrDefault("typ") == "")" value="@(HlidacStatu.Web.Controllers.DotaceController.EMPTY_FORM_VALUE)">Libovolný</option>
                 @foreach (var item in Devmasters.Enums.EnumTools.EnumToEnumerable<HlidacStatu.Entities.Dotace.Hint.Type>()
                 .Where(m => m.Value > 0).OrderBy(o => o.Name)
                 )
@@ -123,7 +123,7 @@
             <label for="oblast" class="form-label">Oblast dotace</label>
 
             <select class="form-select" id="oblast" name="oblast" aria-label="Oblast dotace">
-                <option selected="@(qs.GetValueOrDefault("oblast") == "")">Libovolná</option>
+                <option selected="@(qs.GetValueOrDefault("oblast") == "")" value="@(HlidacStatu.Web.Controllers.DotaceController.EMPTY_FORM_VALUE)">Libovolná</option>
                 @foreach (var item in Devmasters.Enums.EnumTools.EnumToEnumerable<HlidacStatu.Entities.Dotace.Hint.CalculatedCategories>()
                 .Where(m => m.Id >= 0).OrderBy(o => o.Name)
                 )
@@ -134,15 +134,15 @@
         </div>
 
         <div class="col-md-4">
-            <label for="druhPrijemce" class="form-label">Druh příjemce</label>
+            <label for="hints_recipientTypSubjektu" class="form-label">Druh příjemce</label>
 
-            <select class="form-select" id="druhPrijemce" name="druhPrijemce" aria-label="Druh příjemce">
-                <option selected="@(qs.GetValueOrDefault("druhPrijemce") == "")">Libovolný</option>
+            <select class="form-select" id="hints_recipientTypSubjektu" name="hints.recipientTypSubjektu" aria-label="Druh příjemce">
+                <option selected="@(qs.GetValueOrDefault("druhPrijemce") == "")" value="@(HlidacStatu.Web.Controllers.DotaceController.EMPTY_FORM_VALUE)">Libovolný</option>
                 @foreach (var item in Devmasters.Enums.EnumTools.EnumToEnumerable<HlidacStatu.Entities.Firma.TypSubjektuEnum>()
                 .Where(m => m.Id >= 0).OrderBy(o => o.Name)
                 )
                 {
-                    <option value="@item.Value" selected="@(qs.GetValueOrDefault("druhPrijemce") == item.Value.ToString())">@item.Name</option>
+                    <option value="@((int)item.Value)" selected="@(qs.GetValueOrDefault("druhPrijemce") == ((int)item.Value).ToString())">@item.Name</option>
                 }
             </select>
         </div>
@@ -150,7 +150,7 @@
             <label for="rok" class="form-label">Vybraný rok</label>
 
             <select class="form-select" id="rok" name="rok" aria-label="Typ dotace">
-                <option selected="@(qs.GetValueOrDefault("rok") == "")">Libovolný</option>
+                <option selected="@(qs.GetValueOrDefault("rok") == "")" value="@(HlidacStatu.Web.Controllers.DotaceController.EMPTY_FORM_VALUE)">Libovolný</option>
                 @for (int i = HlidacStatu.Repositories.DotaceRepo.DefaultLimitedYears.Min(); i <= HlidacStatu.Repositories.DotaceRepo.DefaultLimitedYears.Max(); i++)
                 {
                     <option value="@i" selected="@(qs.GetValueOrDefault("rok") == i.ToString())">@i</option>
@@ -170,7 +170,7 @@
                     placeholder: "Najít úřad/firmu",
                     endpoint: "/dotace/GetPoskytovatele/", // The component will append the query string.
                     inputStyle: "height:2em",
-                    inputName: "poskytovatel"
+                    inputName: "icoposkytovatel"
                   });
                 });
             </script>

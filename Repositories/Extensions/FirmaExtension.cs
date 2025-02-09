@@ -396,7 +396,7 @@ namespace HlidacStatu.Extensions
 
         }
 
-        public static bool PatrimStatuAlespon25procent(this Firma firma) => (firma.TypSubjektu == Firma.TypSubjektuEnum.PatrimStatu25perc);
+        public static bool PatrimStatuAlespon25procent(this Firma firma) => (firma.TypSubjektu == Firma.TypSubjektuEnum.PatrimStatuAlespon25perc);
 
         internal static bool _patrimStatuAlespon25procent(this Firma firma)
         {
@@ -464,7 +464,11 @@ namespace HlidacStatu.Extensions
             else if (firma._jsemOVM())
                 firma.TypSubjektu = Firma.TypSubjektuEnum.Ovm;
             else if (firma._patrimStatuAlespon25procent())
-                firma.TypSubjektu = Firma.TypSubjektuEnum.PatrimStatu25perc;
+            {
+                firma.TypSubjektu = Firma.TypSubjektuEnum.PatrimStatuAlespon25perc;
+                if (firma._jsemStatniFirma())
+                    firma.TypSubjektu = Firma.TypSubjektuEnum.PatrimStatu;
+            }                
             else if (firma._jsemStatniFirma())
                 firma.TypSubjektu = Firma.TypSubjektuEnum.PatrimStatu;
             else
@@ -489,7 +493,7 @@ namespace HlidacStatu.Extensions
             return FirmaRepo.Urady_OVM.Contains(firma.ICO);
         }
 
-        public static bool JsemStatniFirma(this Firma firma) => firma.TypSubjektu == Firma.TypSubjektuEnum.PatrimStatu || firma.TypSubjektu == Firma.TypSubjektuEnum.PatrimStatu25perc;
+        public static bool JsemStatniFirma(this Firma firma) => firma.TypSubjektu == Firma.TypSubjektuEnum.PatrimStatu || firma.TypSubjektu == Firma.TypSubjektuEnum.PatrimStatuAlespon25perc;
         internal static bool _jsemStatniFirma(this Firma firma)
         {
             if (

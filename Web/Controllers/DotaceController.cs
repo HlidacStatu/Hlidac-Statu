@@ -15,6 +15,7 @@ namespace HlidacStatu.Web.Controllers
 {
     public class DotaceController : Controller
     {
+        public const string EMPTY_FORM_VALUE = "###e_m-p###";
         public ActionResult Index()
         {
             return View();
@@ -28,10 +29,10 @@ namespace HlidacStatu.Web.Controllers
                 this.Sum = sum;
             }
 
-            [Newtonsoft.Json.JsonIgnore(),System.Text.Json.Serialization.JsonIgnore()]
+            [Newtonsoft.Json.JsonIgnore(), System.Text.Json.Serialization.JsonIgnore()]
             public long Count { get; set; }
 
-            [Newtonsoft.Json.JsonIgnore(),System.Text.Json.Serialization.JsonIgnore()]
+            [Newtonsoft.Json.JsonIgnore(), System.Text.Json.Serialization.JsonIgnore()]
             public decimal Sum { get; set; }
         }
         private static Devmasters.Cache.LocalMemory.AutoUpdatedCache<poskytovateleCacheModel[]> poskytovateleCache =
@@ -60,7 +61,7 @@ namespace HlidacStatu.Web.Controllers
                 .Take(30)
                 .OrderByDescending(o => o.hits).ThenBy(o => o.item.Text)
                 .Take(10)
-                .Select(m=>m.item)
+                .Select(m => m.item)
                 .ToArray();
 
 
@@ -117,24 +118,7 @@ namespace HlidacStatu.Web.Controllers
                 return Redirect("/dotace");
             }
 
-            var qS = "";
-            Dictionary<string, string> qs = this.Request.Query
-                .ToDictionary(q => q.Key, q => q.Value.ToString());
-
-            var dotacePrefixes = DotaceRepo.Searching.Irules
-                                    .SelectMany(m => m.Prefixes)
-                                    .ToArray();
-            foreach (var qkey in qs.Keys)
-            {
-                if (dotacePrefixes.Any(m => m == qkey))
-                {
-                    if (!string.IsNullOrWhiteSpace(qs[qkey]))
-                        qS = HlidacStatu.Searching.Query.ModifyQueryAND(qS, $"{qs.Keys}{qs[qkey]}");
-                }
-
-            }
-
-            return View((object)qS);
+            return View((object)q);
         }
 
         public async Task<ActionResult> Detail(string id)
@@ -199,6 +183,41 @@ namespace HlidacStatu.Web.Controllers
             )
         {
 
+            var qS = "";
+            Dictionary<string, string> qss = this.Request.Query
+                .ToDictionary(q => q.Key, q => q.Value.ToString().Replace(EMPTY_FORM_VALUE,""));
+
+            if (qss.ContainsKey("btnAnalyza") || qss.ContainsKey("btnQuery"))
+            {
+                var dotacePrefixes = DotaceRepo.Searching.Irules
+                                        .SelectMany(m => m.Prefixes)
+                                        .ToArray();
+                foreach (var qkey in qss.Keys)
+                {
+                    if (dotacePrefixes.Any(m => string.Equals(m, qkey + ":", StringComparison.InvariantCultureIgnoreCase)))
+                    {
+                        if (!string.IsNullOrWhiteSpace(qss[qkey]))
+                            qS = HlidacStatu.Searching.Query.ModifyQueryAND(qS, $"{qkey}:{qss[qkey]}");
+                    }
+                    else if (!string.IsNullOrWhiteSpace(qss[qkey]))
+                    {
+                        if (qkey=="text")
+                            qS = HlidacStatu.Searching.Query.ModifyQueryAND(qS, $"{qss[qkey]}");
+                        else if (qkey== "poskytovatel")
+                            qS = HlidacStatu.Searching.Query.ModifyQueryAND(qS, $"icoposkytovatel:{qss[qkey]}");
+                        else if (qkey == "hints.subsidyType")
+                            qS = HlidacStatu.Searching.Query.ModifyQueryAND(qS, $"hints.subsidyType:{qss[qkey]}");
+                    }
+
+                }
+                if (!string.IsNullOrWhiteSpace(qS))
+                {
+                    if (qss.ContainsKey("btnAnalyza"))
+                        return Redirect("/dotace/analyza?q=" + System.Net.WebUtility.UrlEncode(qS));
+                    else if (qss.ContainsKey("btnQuery"))
+                        return Redirect("/dotace/hledat?q=" + System.Net.WebUtility.UrlEncode(qS));
+                }
+            }
             return View();
         }
 

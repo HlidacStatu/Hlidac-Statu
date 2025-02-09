@@ -22,7 +22,7 @@ namespace HlidacStatu.Searching
             }
         }
 
-        private static Dictionary<string, string> GetOblastiValues()
+        private static Dictionary<string, string> GetValues()
         {
             Dictionary<string, string> ret = new Dictionary<string, string>();
 
@@ -36,7 +36,7 @@ namespace HlidacStatu.Searching
             return ret;
         }
 
-        public readonly static Dictionary<string, string> AllValues = GetOblastiValues();
+        public readonly static Dictionary<string, string> AllValues = GetValues();
 
         protected override RuleResult processQueryPart(SplittingQuery.Part part)
         {

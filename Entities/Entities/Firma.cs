@@ -24,8 +24,10 @@ namespace HlidacStatu.Entities
             Soukromy = 0,
             [NiceDisplayName("Státní")]
             PatrimStatu = 1,
-            [NiceDisplayName("Státní (min 25%)")]
-            PatrimStatu25perc = 2,
+
+            [Devmasters.Enums.Disabled]
+            [NiceDisplayName("Částečně státní (podíl > 25%)")]
+            PatrimStatuAlespon25perc = 2,
 
             [NiceDisplayName("Úřad")]
             Ovm = 10,
@@ -60,7 +62,7 @@ namespace HlidacStatu.Entities
                             return "firmu vlastněnou státem";
                         else
                             return "firma vlastněná státem";
-                    case TypSubjektuEnum.PatrimStatu25perc:
+                    case TypSubjektuEnum.PatrimStatuAlespon25perc:
                         if (pad == 4)
                             return "firmu vlastněnou státem (podíl min 25%)";
                         else
@@ -99,7 +101,7 @@ namespace HlidacStatu.Entities
                             return "firmy vlastněné státem";
                         else
                             return "firma vlastněná státem";
-                    case TypSubjektuEnum.PatrimStatu25perc:
+                    case TypSubjektuEnum.PatrimStatuAlespon25perc:
                         if (pad == 4)
                             return "firmy vlastněné státem (podíl min 25%)";
                         else
