@@ -1,8 +1,8 @@
-﻿@model HlidacStatu.Repositories.Searching.DotaceSearchResult
+﻿@model string
 @{
 
     ViewBag.Title = "Hlídač Dotací: Hledání";
-    ViewBag.SubTitle = Model?.Q;
+    ViewBag.SubTitle = Model;
 
     ViewBag.ShowBookmarkUrl = true;
 }
@@ -16,8 +16,8 @@
         <li>@ViewBag.SubTitle</li>
     </ol>
 }
-<partial name="_SearchForm" model="@Model" />
 
-<partial name="_SearchResult" model="@Model" />
-
+<div>
+    @Model
+</div>
 
