@@ -258,7 +258,7 @@ namespace HlidacStatu.Repositories
             foreach (var id in subsidyIds)
             {
                 //add missing
-                if (!allSubsidies.Any(m => m.Id == id))
+                if (allSubsidies.All(m => m.Id != id))
                 {
                     var s = await GetAsync(id);
                     if (s != null)
