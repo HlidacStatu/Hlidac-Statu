@@ -47,6 +47,7 @@
     </ItemGroup>
     <ItemGroup>
       <Compile Remove="Controllers\StatniWebyOldController.cs" />
+      <Compile Remove="TagHelpers\xToggleableTagHelper.cs" />
     </ItemGroup>
     <ItemGroup>
       <Content Remove="Logger.serilog.json" />

@@ -51,5 +51,9 @@
  
 }
 
-@Html.DataToHTMLTable(dataTbl, dataTableOptions: HtmlExtensions.DatatableOptions(orderColumnIdx: 0, orderDirection: "asc"))
+@Html.DataToHTMLTable(dataTbl, 
+    dataTableOptions: HtmlExtensions.DatatableOptions(
+        orderColumnIdx: Model.TblOrderColumnIdx, orderDirection: Model.TblOrderDirection,
+                paging: Model.TblPaging, pageLength: Model.TblPageLength
+    ))
 

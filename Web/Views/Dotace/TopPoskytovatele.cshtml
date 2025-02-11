@@ -62,15 +62,15 @@
         {
             Name = "Počet poskytnutých dotací",
             TextRender = (x) => $"{HlidacStatu.Util.RenderData.NiceNumber(x.Count)}",
-            HtmlRender = (x) => $"<a href=/dotace/hledat?Q=subsidyProviderIco:{x.IcoPoskytovatele}>{HlidacStatu.Util.RenderData.NiceNumber(x.Sum,true)}</a>",
-            OrderValueRender = (x) => HlidacStatu.Util.RenderData.OrderValueFormat(x.Sum),
+            HtmlRender = (x) => $"<a href='/dotace/hledat?Q=subsidyProviderIco:{x.IcoPoskytovatele}'>{HlidacStatu.Util.RenderData.NiceNumber(x.Count,true)}</a>",
+            OrderValueRender = (x) => HlidacStatu.Util.RenderData.OrderValueFormat(x.Count),
             CssClass = "number"        
         },
         new()
         {
             Name = "Částka",
             TextRender = (x) => $"{HlidacStatu.Util.RenderData.NicePrice(x.Sum)}",
-            HtmlRender = (x) => $"{x.IcoPoskytovatele}>{HlidacStatu.Util.RenderData.NicePrice(x.Sum,html:true)}",
+            HtmlRender = (x) => $"{HlidacStatu.Util.RenderData.NicePrice(x.Sum,html:true)}",
             OrderValueRender = (x) => HlidacStatu.Util.RenderData.OrderValueFormat(x.Sum),
             CssClass = "number"
         }
