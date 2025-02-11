@@ -99,10 +99,10 @@
 
     @if (!rok.HasValue)
     {
-        var options = new HlidacStatu.Web.Models.DotaceAnalBoxes.ChartPoLetech()
+        var options = new HlidacStatu.Web.Models.DotaceAnalBoxes.GeneraModel()
                     {
                         Query = elasticQuery,
-                         Height = 300,
+                        Height = 300,
                         Title = $"Objem dotací {Devmasters.TextUtil.ShortenText(calcCategory.ToNiceDisplayName(), 35)} v jednotlivých letech"
                     };
 

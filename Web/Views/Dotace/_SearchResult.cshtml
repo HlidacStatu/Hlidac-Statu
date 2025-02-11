@@ -74,19 +74,15 @@ else
                         @HlidacStatu.Util.RenderData.Vysledky.PocetVysledku(Model.ElasticResults.HitsMetadata.Total, false, HlidacStatu.Util.RenderData.CapitalizationStyle.FirstLetterUpperCap)
                     </small>
                 </h3>
-                @if (Model?.ElasticResults?.Aggregations?.ContainsKey("filtered_sum") == true)
+                @if (Model?.ElasticResults?.Aggregations?.ContainsKey("sum") == true)
                 {
-                    var filteredSum = (SingleBucketAggregate)Model?.ElasticResults?.Aggregations["filtered_sum"];
-                    if (filteredSum?.TryGetValue("souhrn", out var souhrn) is true)
-                    {
-                        double? sum = ((ValueAggregate)souhrn)?.Value;
-                        <div>
-                            V celkové hodnotě @HlidacStatu.Util.RenderData.NicePriceHtml((decimal)sum). <sup>*)</sup>
-                            <div class="alert alert-info" role="alert">
-                                <b>*) Celková hodnota</b> je námi vypočítaná hodnota čerpaných dotací, kterou jsme získali z různých zdrojových databází. Takto získané údaje proto mohou být podle kvality vstupních dat zobrazeny v některých případech i duplicitně nebo neúplně. Veškeré údaje proto vždy doporučujeme ověřit.
-                            </div>
-                        </div>    
-                    }
+                    var sum = ((ValueAggregate)Model?.ElasticResults?.Aggregations["sum"])?.Value;
+                    <div>
+                        V celkové hodnotě @HlidacStatu.Util.RenderData.NicePriceHtml((decimal)sum). <sup>*)</sup>
+                        <div class="alert alert-info" role="alert">
+                            <b>*) Celková hodnota</b> je námi vypočítaná hodnota čerpaných dotací, kterou jsme získali z různých zdrojových databází. Takto získané údaje proto mohou být podle kvality vstupních dat zobrazeny v některých případech i duplicitně nebo neúplně. Veškeré údaje proto vždy doporučujeme ověřit.
+                        </div>
+                    </div>    
                 }
             </div>
             <div class="col-xs-12 col-sm-6">

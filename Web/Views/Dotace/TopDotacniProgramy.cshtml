@@ -27,7 +27,7 @@
     if (rok is not null && rok > 0)
         query = HlidacStatu.Searching.Query.ModifyQueryAND(query, $"approvedYear:{rok}");
 
-    var options = new HlidacStatu.Web.Models.DotaceAnalBoxes.TopProgramy()
+    var options = new HlidacStatu.Web.Models.DotaceAnalBoxes.GeneraModel()
     {
         Query = query
     };

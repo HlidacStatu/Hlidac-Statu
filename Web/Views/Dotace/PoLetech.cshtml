@@ -1,5 +1,6 @@
 @using System.Linq
 @using HlidacStatu.Entities
+@using HlidacStatu.Lib.Analytics
 @using HlidacStatu.XLib.Render
 @model HlidacStatu.Repositories.DotaceRepo.Statistics.TypeStatsPerYear[]
 
@@ -29,103 +30,45 @@
 }
 
 @{
-    var dotaceDataKraj = new ReportDataSource<(int Year, Dotace.Hint.Type DotaceType, decimal Sum)>(
-        new[]
-        {
-            new ReportDataSource<(int Year, Dotace.Hint.Type DotaceType, decimal Sum)>.Column()
-            {
-                Name = "Rok",
-                CssClass = "number",
-                HtmlRender = (x) => x.Year.ToString(),
-                TextRender = (x) => x.Year.ToString()
-            },
-            new ReportDataSource<(int Year, Dotace.Hint.Type DotaceType, decimal Sum)>.Column()
-            {
-                Name = "Částka",
-                TextRender = (x) => HlidacStatu.Util.RenderData.NicePrice(x.Sum),
-                HtmlRender = (x) => HlidacStatu.Util.RenderData.NicePrice(x.Sum, html:true),
-                OrderValueRender = (x) => HlidacStatu.Util.RenderData.OrderValueFormat(x.Sum),
-                CssClass = "number"
-            }
-        });
-    var dotaceDataStat = new ReportDataSource<(int Year, Dotace.Hint.Type DotaceType, decimal Sum)>(
-        new[]
-        {
-            new ReportDataSource<(int Year, Dotace.Hint.Type DotaceType, decimal Sum)>.Column()
-            {
-                Name = "Rok",
-                CssClass = "number",
-                HtmlRender = (x) => x.Year.ToString(),
-                TextRender = (x) => x.Year.ToString()
-            },
-            new ReportDataSource<(int Year, Dotace.Hint.Type DotaceType, decimal Sum)>.Column()
-            {
-                Name = "Částka",
-                TextRender = (x) => HlidacStatu.Util.RenderData.NicePrice(x.Sum),
-                HtmlRender = (x) => HlidacStatu.Util.RenderData.NicePrice(x.Sum, html:true),
-                OrderValueRender = (x) => HlidacStatu.Util.RenderData.OrderValueFormat(x.Sum),
-                CssClass = "number"
-            }
-        });
 
-    dotaceDataKraj.AddRows(
-        Model.FirstOrDefault(d => d.DotaceType == Dotace.Hint.Type.Krajska)
-                .Filter(m=>m.Key >= HlidacStatu.Repositories.DotaceRepo.DefaultKrajskeLimitedYears.Min())
-                .Select(m=> (Year: m.Key, DotaceType: Dotace.Hint.Type.Krajska, Sum: m.Value.CelkemCena))
-    );
-    dotaceDataStat.AddRows(
+
+    var statniData = new HlidacStatu.Web.Models.DotaceAnalBoxes.GeneraModel<StatisticsPerYear<SimpleStat>>();
+    var krajData = new HlidacStatu.Web.Models.DotaceAnalBoxes.GeneraModel<StatisticsPerYear<SimpleStat>>();
+
+    statniData.Data = new StatisticsPerYear<SimpleStat>(
             Model.FirstOrDefault(d => d.DotaceType == Dotace.Hint.Type.Evropska)
                 .Filter(m => m.Key >= HlidacStatu.Repositories.DotaceRepo.DefaultLimitedYears.Min())
-                .Select(m => (Year: m.Key, DotaceType: Dotace.Hint.Type.Evropska, Sum: m.Value.CelkemCena))
-        );
-    
-   
-    
-    var dotaceKrajskeGraphData = new Series[]
-    {
-        new()
-        {
-            Name = "Objem krajských dotací",
-            Type = Series.SeriesType.column,
-            Data = Model
-                .FirstOrDefault(d => d.DotaceType == Dotace.Hint.Type.Krajska)
-                .Filter(m=>m.Key >= HlidacStatu.Repositories.DotaceRepo.DefaultKrajskeLimitedYears.Min())
-                .OrderBy(s => s.Key)
-                .Select(s => new SeriesData(s.Key, s.Value.CelkemCena))
-                .ToArray(),
-        }
-    };
-    
-    var dotaceStatniGraphData = new Series[]
-    {
-        new()
-        {
-            Name = "Objem státních a evropských dotací",
-            Type = Series.SeriesType.column,
-            Data = Model
-                .FirstOrDefault(d => d.DotaceType == Dotace.Hint.Type.Evropska)
-                .Filter(m=>m.Key >= HlidacStatu.Repositories.DotaceRepo.DefaultLimitedYears.Min())
-                .OrderBy(s => s.Key)
-                .Select(s => new SeriesData(s.Key, s.Value.CelkemCena))
-                .ToArray(),
+                .Select(m => new KeyValuePair<int, SimpleStat>(m.Key, m.Value))
+                .ToDictionary()
 
-        },
-    };
+        );
+    krajData.Data = new StatisticsPerYear<SimpleStat>(
+            Model.FirstOrDefault(d => d.DotaceType == Dotace.Hint.Type.Krajska)
+                .Filter(m => m.Key >= HlidacStatu.Repositories.DotaceRepo.DefaultKrajskeLimitedYears.Min())
+                .Select(m => new KeyValuePair<int, SimpleStat>(m.Key, m.Value))
+                .ToDictionary()
+        );
+
 }
 
 <h4>Přehled státních a evropských dotací</h4>
 <div>
-    @Html.ColumnGraph("Státní a evropské dotace v jednotlivých letech", dotaceStatniGraphData, yTitleLeft: "Objem dotací v Kč")
+    <partial name="analBoxes/_chartPoLetech" model="statniData" />
+
+    @* @Html.ColumnGraph("Státní a evropské dotace v jednotlivých letech", dotaceStatniGraphData, yTitleLeft: "Objem dotací v Kč") *@
 </div>
 <div>
-    @Html.DataToHTMLTable(dotaceDataStat, dataTableOptions: HtmlExtensions.DatatableOptions(orderColumnIdx: 0, orderDirection: "desc"))
+    <partial name="analBoxes/_tblPoLetech" model="statniData" />
+    @* @Html.DataToHTMLTable(dotaceDataStat, dataTableOptions: HtmlExtensions.DatatableOptions(orderColumnIdx: 0, orderDirection: "desc")) *@
 </div>
 
 <h4>Přehled krajských dotací</h4>
 <div>
-    @Html.ColumnGraph("Krajské dotace v jednotlivých letech", dotaceKrajskeGraphData, yTitleLeft: "Objem dotací v Kč")
+    <partial name="analBoxes/_chartPoLetech" model="krajData" />
+    @* @Html.ColumnGraph("Krajské dotace v jednotlivých letech", dotaceKrajskeGraphData, yTitleLeft: "Objem dotací v Kč") *@
 </div>
 <div>
-    @Html.DataToHTMLTable(dotaceDataKraj, dataTableOptions: HtmlExtensions.DatatableOptions(orderColumnIdx: 0, orderDirection: "desc"))
+    <partial name="analBoxes/_tblPoLetech" model="krajData" />
+    @* @Html.DataToHTMLTable(dotaceDataKraj, dataTableOptions: HtmlExtensions.DatatableOptions(orderColumnIdx: 0, orderDirection: "desc")) *@
 </div>
 

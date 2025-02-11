@@ -1,0 +1,55 @@
+﻿@using Devmasters.Enums
+@using HlidacStatu.Entities
+@using HlidacStatu.Lib.Analytics
+@using HlidacStatu.Repositories
+@using HlidacStatu.XLib.Render
+@model HlidacStatu.Web.Models.DotaceAnalBoxes.GeneraModel<StatisticsPerYear<SimpleStat>>
+
+@{
+    StatisticsPerYear<SimpleStat> perYearData = null;
+    if (Model.Data == null)
+        perYearData = await DotaceRepo.ReportPoLetechAsync(query: Model.Query);
+    else
+        perYearData = Model.Data;
+
+
+    var dataTbl = new ReportDataSource<(int Year, long Count, decimal Sum)>(
+       new[]
+       {
+            new ReportDataSource<(int Year,  long Count,decimal Sum)>.Column()
+            {
+                Name = "Rok",
+                CssClass = "number",
+                HtmlRender = (x) => x.Year.ToString(),
+                TextRender = (x) => x.Year.ToString()
+            },
+            new ReportDataSource<(int Year,  long Count,decimal Sum)>.Column()
+            {
+                Name = "Počet dotací",
+                TextRender = (x) => HlidacStatu.Util.RenderData.NiceNumber(x.Count),
+                HtmlRender = (x) => "<a href='/dotace/hledat?q="
+                    + System.Net.WebUtility.UrlEncode(
+                        HlidacStatu.Searching.Query.ModifyQueryAND(Model.Query, $"program:{x.Year}")
+                    )
+                    + $"'>{HlidacStatu.Util.RenderData.NiceNumber(x.Count,html:true)}</a>",
+                OrderValueRender = (x) => HlidacStatu.Util.RenderData.OrderValueFormat(x.Count),
+                CssClass = "number"
+            },
+            new ReportDataSource<(int Year,  long Count,decimal Sum)>.Column()
+            {
+                Name = "Celková částka",
+                TextRender = (x) => HlidacStatu.Util.RenderData.NicePrice(x.Sum),
+                HtmlRender = (x) => HlidacStatu.Util.RenderData.NicePrice(x.Sum, html:true),
+                OrderValueRender = (x) => HlidacStatu.Util.RenderData.OrderValueFormat(x.Sum),
+                CssClass = "number"
+            }
+               });
+
+    dataTbl.AddRows(
+            perYearData.Select(m => (Year: m.Year,  Count: m.Value.Pocet, Sum: m.Value.CelkemCena))
+        );
+ 
+}
+
+@Html.DataToHTMLTable(dataTbl, dataTableOptions: HtmlExtensions.DatatableOptions(orderColumnIdx: 0, orderDirection: "asc"))
+

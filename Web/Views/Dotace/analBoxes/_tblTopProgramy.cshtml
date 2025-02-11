@@ -2,7 +2,7 @@
 @using HlidacStatu.Entities
 @using HlidacStatu.Repositories
 @using HlidacStatu.XLib.Render
-@model HlidacStatu.Web.Models.DotaceAnalBoxes.TopProgramy
+@model HlidacStatu.Web.Models.DotaceAnalBoxes.GeneraModel
 
 @{
     var data = await DotaceRepo.TopDotacniProgramy(customquery: Model.Query);
@@ -24,7 +24,7 @@
                 TextRender = (x) => x.ProgramName+((!string.IsNullOrEmpty(x.ProgramCode)? $" ({x.ProgramCode})" : "")),
                 HtmlRender = (x) => $"<a href='/dotace/program?programName={System.Net.WebUtility.UrlEncode(x.ProgramName)}&programCode={System.Net.WebUtility.UrlEncode(x.ProgramCode)}'>{x.ProgramName+((!string.IsNullOrEmpty(x.ProgramCode) ? $" ({x.ProgramCode})" : ""))}</a>",
                 CssClass = "text"
-            },
+            },  
             new ReportDataSource<(string ProgramName, string ProgramCode, string SubsidyProviderIco, long Count,decimal AssumedAmountSummed)>.Column()
             {
                 Name = "Počet dotací",

@@ -1,10 +1,22 @@
 ﻿@model string
+@using Devmasters
+@using HlidacStatu.Lib.Analytics
+@using Nest
+@using HlidacStatu.Web.Models
+
 @{
 
     ViewBag.Title = "Hlídač Dotací: Hledání";
-    ViewBag.SubTitle = Model;
+    ViewBag.SubTitle = Model.ShortenMe(40);
 
     ViewBag.ShowBookmarkUrl = true;
+
+    string query = Model;
+
+    var res = await HlidacStatu.Repositories.DotaceRepo.Searching.SimpleSearchAsync(
+        Model, 1, 0, "666", anyAggregation: HlidacStatu.Repositories.DotaceRepo.Searching.SummarySearchAggregation
+    );
+
 }
 
 
@@ -16,8 +28,41 @@
         <li>@ViewBag.SubTitle</li>
     </ol>
 }
+@section scripts
+{
+    <link rel="stylesheet" type="text/css" href="//cdn.datatables.net/1.13.4/css/jquery.dataTables.css"/>
+    <script type="text/javascript" charset="utf8" src="//cdn.datatables.net/1.13.4/js/jquery.dataTables.js"></script>
+    <script src="~/bundles/highcharts"></script>
+}
 
-<div>
-    @Model
+
+<h2>Analýza dotací</h2>
+<p>
+    Na té stránce analyzujeme vyhledané dotace podle dotazu "<code>@Model</code>".
+</p>
+<div class="row">
+    <div class="col-xs-12">
+        <h3>
+            Nalezené dotace
+            <small>
+                @HlidacStatu.Util.RenderData.Vysledky.PocetVysledku(res.ElasticResults.HitsMetadata.Total, false, HlidacStatu.Util.RenderData.CapitalizationStyle.FirstLetterUpperCap)
+            </small>
+        </h3>
+        @if (res?.ElasticResults?.Aggregations?.ContainsKey("sum") == true)
+        {
+            var sum = ((ValueAggregate)res?.ElasticResults?.Aggregations["sum"])?.Value;
+            <div>
+                V celkové hodnotě @HlidacStatu.Util.RenderData.NicePriceHtml((decimal)sum). <sup>*)</sup>
+                <div class="alert alert-info" role="alert">
+                    <b>*) Celková hodnota</b> je námi vypočítaná hodnota čerpaných dotací, kterou jsme získali z různých zdrojových databází. Takto získané údaje proto mohou být podle kvality vstupních dat zobrazeny v některých případech i duplicitně nebo neúplně. Veškeré údaje proto vždy doporučujeme ověřit.
+                </div>
+            </div>
+        }
+    </div>
+</div>
+<div class="row">
+    <div class="col-xs-12 col-sm-6">
+        <partial name="analBoxes/_chartPoLetech" model="new DotaceAnalBoxes.GeneraModel<StatisticsPerYear<SimpleStat>>(){ Query=query}" />
+    </div>
 </div>
 

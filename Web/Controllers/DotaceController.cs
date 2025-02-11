@@ -81,23 +81,7 @@ namespace HlidacStatu.Web.Controllers
             //
             //     );
 
-            var aggs = new Nest.AggregationContainerDescriptor<Dotace>()
-                .Filter("filtered_sum", f => f
-                    .Filter(q => q
-                        .Term(t => t
-                            .Field(f => f.Hints.IsOriginal)
-                            .Value(true)
-                        )
-                    )
-                    .Aggregations(subAgg => subAgg
-                        .Sum("souhrn", s => s
-                            .Field(f => f.AssumedAmount)
-                        )
-                    )
-                );
-
-
-            var res = await DotaceRepo.Searching.SimpleSearchAsync(model, anyAggregation: aggs);
+            var res = await DotaceRepo.Searching.SimpleSearchAsync(model, anyAggregation: DotaceRepo.Searching.SummarySearchAggregation);
 
             AuditRepo.Add(
                 Audit.Operations.UserSearch

@@ -1,12 +1,19 @@
 ﻿@using Devmasters.Enums
 @using HlidacStatu.Entities
+@using HlidacStatu.Lib.Analytics
 @using HlidacStatu.Repositories
 @using HlidacStatu.XLib.Render
-@model HlidacStatu.Web.Models.DotaceAnalBoxes.ChartPoLetech
+@model HlidacStatu.Web.Models.DotaceAnalBoxes.GeneraModel<StatisticsPerYear<SimpleStat>>
 
 @{
-    var perYearData = await DotaceRepo.ReportPoLetechAsync(query:Model.Query);
-        var perYearChartData = new Series[]
+    StatisticsPerYear<SimpleStat> perYearData = null;
+    if (Model.Data == null)
+        perYearData = await DotaceRepo.ReportPoLetechAsync(query: Model.Query);
+    else
+        perYearData = Model.Data;
+
+
+    var perYearChartData = new Series[]
         {
             new()
             {                

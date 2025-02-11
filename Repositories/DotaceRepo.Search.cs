@@ -60,6 +60,12 @@ namespace HlidacStatu.Repositories
                 return qc;
             }
 
+            public static Nest.AggregationContainerDescriptor<Dotace> SummarySearchAggregation = 
+                new Nest.AggregationContainerDescriptor<Dotace>()
+                    .Sum("sum", s => s
+                        .Field(f => f.AssumedAmount)
+                    );
+
             public static Task<DotaceSearchResult> SimpleSearchAsync(string query, int page, int pagesize,
                 DotaceSearchResult.DotaceOrderResult order,
                 bool withHighlighting = false,
