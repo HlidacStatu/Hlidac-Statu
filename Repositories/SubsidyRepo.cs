@@ -242,10 +242,6 @@ namespace HlidacStatu.Repositories
             //no duplicates exist 
             if (allSubsidies == null || !allSubsidies.Any())
             {
-                if (!string.IsNullOrWhiteSpace(baseSubsidy.Recipient.Ico))
-                {
-                    Logger.Error($"For subsidy [{baseSubsidy.Id}] with duplaHash:[{baseSubsidy.DuplaHash}], projectCodeHash:[{baseSubsidy.ProjectCodeHash}], projectNameHash:[{baseSubsidy.ProjectNameHash}] was not found anything.");
-                }
                 return;
             }
 
@@ -462,7 +458,7 @@ namespace HlidacStatu.Repositories
             }
 
             if (projectQuery is null)
-                return null;
+                return [];
 
             // Build the main query
             var query = new QueryContainerDescriptor<Subsidy>()
@@ -489,7 +485,10 @@ namespace HlidacStatu.Repositories
                     );
                 }
 
-                return res.Documents.ToList();
+                return res.Documents
+                    .Where(d => $"{d.Metadata.FileName}_{d.Metadata.DataSource}" !=
+                                $"{subsidy.Metadata.FileName}_{subsidy.Metadata.DataSource}")
+                    .ToList();
             }
             catch (Exception ex)
             {
