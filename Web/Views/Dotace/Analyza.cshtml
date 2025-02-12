@@ -61,16 +61,17 @@
     </div>
 </div>
 <div class="row">
-    <div class="col-xs-12 col-sm-6">
-
-        <toggleable>
-            <content buttontext="Graf">
+    <div class="col-xs-12 col-lg-6">
+        <div class="card">
+            <div class="card-header">
+                <h5>Vyplacené dotace po letech</h5>
+            </div>
+            <div class="card-body">
                 <partial name="analBoxes/_chartPoLetech" model="new DotaceAnalBoxes.GeneraModel<StatisticsPerYear<SimpleStat>>(){ Query=query}" />
-            </content>
-            <content buttontext="Tabulka">
                 <partial name="analBoxes/_tblPoLetech" model="new DotaceAnalBoxes.GeneraModel<StatisticsPerYear<SimpleStat>>(){ Query=query, TblPageLength = 5}" />
-            </content>
-        </toggleable>
+            </div>
+        </div>
+    
     </div>
 </div>
 

@@ -1,0 +1,33 @@
+﻿@using Devmasters.Enums
+@using HlidacStatu.Entities
+@using HlidacStatu.Lib.Analytics
+@using HlidacStatu.Repositories
+@using HlidacStatu.XLib.Render
+
+@{
+
+    Dictionary<Dotace.Hint.CalculatedCategories, HlidacStatu.Lib.Analytics.SimpleStat> data = null;
+    if (Model.Data == null)
+        data = await DotaceRepo.PoKategoriichAsync(query: Model.Query);
+    else
+        data = Model.Data;
+
+
+    var pieData = new SeriesTextValue()
+            {
+                ColorByPoint = true,
+                Name = "Kategorie",
+                Data = data
+            .OrderByDescending(o => o.Value.CelkemCena)
+            .Take(10)
+            .Select(m => new SeriesDataTextValue()
+            {
+                Y = m.Value.CelkemCena,
+                Name = m.Key.ToNiceDisplayName()
+            })
+            .ToArray()
+            };
+
+}
+@Html.PieChart("Kategorie získaných dotací", pieData, yTitleLeft: "% dotací", tooltipFormat: "{series.name}: <b>{point.y:,.0f} Kč</b>"),
+

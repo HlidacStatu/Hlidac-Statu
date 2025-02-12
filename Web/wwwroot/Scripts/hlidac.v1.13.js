@@ -71,7 +71,7 @@ function _my_event(p1, p2, p3, p4, p5, p6, p7) {
     //https://www.searchenginewatch.com/2018/03/19/how-to-set-up-event-tracking-in-google-analytics/
     //ga(p1, p2, p3, p4, p5, p6,p7);
 
-    
+
     //_paq.push(['trackEvent', category, action, name, value, { dimension1: 'DimensionValue' }]);
     //https://developer.matomo.org/guides/tracking-javascript-guide#manually-trigger-events
     _paq.push(['trackEvent', p3, p4, p5, p6, p7]);
@@ -272,6 +272,26 @@ function InitLowBox() {
     });
 
 }
+
+//HS Tabs
+$(function () {
+    // Process each tab component independently
+    $('.hstabs').each(function () {
+        var $container = $(this);
+        // Attach click event to all buttons with a data-tab attribute in the container
+        $container.find('.btn[data-tab]').click(function () {
+            var tabName = $(this).data('tab');
+            // Hide all content panels in this container
+            $container.find('.content[data-tab]').hide();
+            // Show only the matching content panel
+            $container.find('.content[data-tab="' + tabName + '"]').show();
+            // Update button styling: remove active class from all, then add it to the clicked button
+            $container.find('.btn[data-tab]').removeClass('btn-primary');
+            $(this).addClass('btn-primary');
+        });
+    });
+});
+
 
 
 var menuOpened = false;

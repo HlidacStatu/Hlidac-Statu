@@ -145,6 +145,10 @@
 
 
     <ItemGroup>
+      <Content Update="Views\Dotace\analBoxes\_tblKategorie.cshtml">
+        <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+        <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+      </Content>
       <Content Update="Views\Insolvence\_SearchResultFtx.cshtml">
         <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
         <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>

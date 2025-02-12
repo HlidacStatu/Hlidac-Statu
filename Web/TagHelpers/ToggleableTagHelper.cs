@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Microsoft.AspNetCore.Razor.TagHelpers;
+using Schema.NET;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -33,47 +34,42 @@ namespace HlidacStatu.Web.TagHelpers
             var modalContext = new List<ToggleableContext>();
             context.Items.Add(typeof(List<ToggleableContext>), modalContext);
             var childContent = await output.GetChildContentAsync();
-            var toggleableContent  = (List<ToggleableContext>)context.Items[typeof(List<ToggleableContext>)];
+            var toggleableContent = (List<ToggleableContext>)context.Items[typeof(List<ToggleableContext>)];
 
-            if (toggleableContent.Count > 2)
-            {
-                output.TagName = null;
-                output.Content.SetHtmlContent("<div>Jsou mozne pouze 2 bloky 'content'</div>");
-                return;
-            }
+            //if (toggleableContent.Count > 2)
+            //{
+            //    output.TagName = null;
+            //    output.Content.SetHtmlContent("<div>Jsou mozne pouze 2 bloky 'content'</div>");
+            //    return;
+            //}
 
             // Generate a unique identifier for CSS/JS selectors.
             string random = Guid.NewGuid().ToString("N");
-            var sb = new StringBuilder();
 
             // Build the script to wire up the toggling behavior.
-            sb.AppendLine("<script>");
-            sb.AppendLine("$(function () {");
-            sb.AppendLine($"  $('.{random}_first.btn').click(function () {{");
-            sb.AppendLine($"      $('.{random}_first.content').show();");
-            sb.AppendLine($"      $('.{random}_second.content').hide();");
-            sb.AppendLine($"      $('.{random}_first.btn').addClass('btn-primary');");
-            sb.AppendLine($"      $('.{random}_second.btn').removeClass('btn-primary');");
-            sb.AppendLine("  });");
-            sb.AppendLine($"  $('.{random}_second.btn').click(function () {{");
-            sb.AppendLine($"      $('.{random}_first.content').hide();");
-            sb.AppendLine($"      $('.{random}_second.content').show();");
-            sb.AppendLine($"      $('.{random}_first.btn').removeClass('btn-primary');");
-            sb.AppendLine($"      $('.{random}_second.btn').addClass('btn-primary');");
-            sb.AppendLine("  });");
-            sb.AppendLine("});");
-            sb.AppendLine("</script>");
+            var sb = new StringBuilder(1024);
 
-            var i1 = toggleableContent[0];
-            var i2 = toggleableContent[1];
+            sb.AppendLine(@"<div class='hstabs'>");
 
-            // Build the toggle buttons and the content areas.
-            sb.AppendLine($"<div class='btn btn-default {random}_first btn-primary' " +
-                          $"style='border-top-right-radius: 0px;border-bottom-right-radius: 0px;'>{i1.ButtonText}</div>");
-            sb.AppendLine($"<div class='btn btn-default {random}_second' " +
-                          $"style='border-top-left-radius: 0px;border-bottom-left-radius: 0px;'>{i2.ButtonText}</div>");
-            sb.AppendLine($"<div class='{random}_first content'>{i1.Content}</div>");
-            sb.AppendLine($"<div class='{random}_second content' style='display: none;'>{i2.Content}</div>");
+            sb.AppendLine(@"<div class='tab-buttons'>");
+            foreach (var item in toggleableContent)
+            {
+                sb.AppendLine($"<div class='btn btn-default {(item.Num == 0 ? "btn-primary" : "" )}' data-tab='tab{item.Num}' ");
+                sb.AppendLine($" style='border-top-right-radius: 0px; border-bottom-right-radius: 0px;'>");
+                sb.AppendLine(item.ButtonText);
+                sb.AppendLine($"</div>");
+            }
+            sb.AppendLine(@" </div>");
+            //Tab Content -->
+            sb.AppendLine(@"<div class='tab-content'>");
+            foreach (var item in toggleableContent)
+            {
+                sb.AppendLine($"<div class='content' data-tab='tab{item.Num}' style='display: {(item.Num == 0 ? "block" : "none")};'>");
+                sb.AppendLine(item.Content);
+                sb.AppendLine($"</div>");
+            }
+                sb.AppendLine(@"</div>");
+            sb.AppendLine(@"</div>");
 
 
             // Remove the outer tag and set the generated content.

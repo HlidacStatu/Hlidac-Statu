@@ -1,0 +1,55 @@
+﻿@using Devmasters.Enums
+@using HlidacStatu.Entities
+@using HlidacStatu.Lib.Analytics
+@using HlidacStatu.Repositories
+@using HlidacStatu.XLib.Render
+@model HlidacStatu.Web.Models.DotaceAnalBoxes.GeneraModel<Dictionary<Dotace.Hint.CalculatedCategories, HlidacStatu.Lib.Analytics.SimpleStat>>
+
+@{
+
+    Dictionary<Dotace.Hint.CalculatedCategories, HlidacStatu.Lib.Analytics.SimpleStat> data = null;
+    if (Model.Data == null)
+        data = await DotaceRepo.PoKategoriichAsync(query: Model.Query);
+    else
+        data = Model.Data;
+
+
+
+    var categoryDataTable = new ReportDataSource<KeyValuePair<Dotace.Hint.CalculatedCategories, HlidacStatu.Lib.Analytics.SimpleStat>>(
+        new ReportDataSource<KeyValuePair<Dotace.Hint.CalculatedCategories, HlidacStatu.Lib.Analytics.SimpleStat>>.Column[]
+        {
+            new()
+            {
+                Name = "Kategorie",
+                HtmlRender = (x) => x.Key.ToNiceDisplayName(),
+                TextRender = (x) => x.Key.ToNiceDisplayName()
+
+            },
+            new()
+            {
+                Name = "Počet dotací",
+                TextRender = (x) => $"{HlidacStatu.Util.RenderData.NiceNumber(x.Value.Pocet)}",
+                HtmlRender = (x) => $"<a href='/dotace/hledat?q=ico:{Model.ICO}%20AND%20oblast:{x.Key.ToString()}'>{HlidacStatu.Util.RenderData.NiceNumber(x.Value.Pocet,html:true)}</a>",
+                OrderValueRender = (x) => HlidacStatu.Util.RenderData.OrderValueFormat(x.Value.Pocet),
+                CssClass = "number"
+            },
+            new()
+            {
+                Name = "Výše dotací",
+                TextRender = (x) => $"{HlidacStatu.Util.RenderData.NicePrice(x.Value.CelkemCena)}",
+                HtmlRender = (x) => $"{HlidacStatu.Util.RenderData.NicePrice(x.Value.CelkemCena,html:true)}",
+                OrderValueRender = (x) => HlidacStatu.Util.RenderData.OrderValueFormat(x.Value.CelkemCena),
+                CssClass = "number"
+            }
+        }
+    );
+    categoryDataTable.AddRows(data);
+ 
+}
+
+@Html.DataToHTMLTable(categoryDataTable,
+    dataTableOptions: HtmlExtensions.DatatableOptions(
+        orderColumnIdx: Model.TblOrderColumnIdx, orderDirection: Model.TblOrderDirection,
+                paging: Model.TblPaging, pageLength: Model.TblPageLength
+    ))
+
