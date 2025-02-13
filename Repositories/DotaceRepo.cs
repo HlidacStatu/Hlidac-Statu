@@ -78,7 +78,7 @@ namespace HlidacStatu.Repositories
             if (f.Valid && (item.Hints.RecipientStatus == -1 || forceRewriteHints))
             {
                 item.Hints.RecipientTypSubjektu = (int)f.TypSubjektu;
-                item.Hints.RecipientStatus = (int)f.Status;
+                item.Hints.RecipientStatus = f.Status ?? 1;
                 item.Hints.RecipientPolitickyAngazovanySubjekt = (int)HintSmlouva.PolitickaAngazovanostTyp.Neni;
                 if (f.IsSponzorBefore(dotaceDate))
                     item.Hints.RecipientPolitickyAngazovanySubjekt =
