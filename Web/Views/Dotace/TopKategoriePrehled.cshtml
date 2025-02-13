@@ -45,7 +45,7 @@
         {
             Name = "Počet dotací",
             TextRender = (x) => HlidacStatu.Util.RenderData.NiceNumber(x.Value.Pocet),
-            HtmlRender = (x) => $"<a title='Najít poskytnuté dotace' href='/dotace/hledat?q=hints.category1.typeValue:{(int)x.Key}{searchQuery}'>{HlidacStatu.Util.RenderData.NiceNumber(x.Value.Pocet, html:true)} <i class='fa-solid fa-list'></i></a>",
+            HtmlRender = (x) => $"<a title='Najít poskytnuté dotace' href='/dotace/hledat?q=oblast:{(int)x.Key}{searchQuery}'>{HlidacStatu.Util.RenderData.NiceNumber(x.Value.Pocet, html:true)} <i class='fa-solid fa-list'></i></a>",
             OrderValueRender = (x) => HlidacStatu.Util.RenderData.OrderValueFormat(x.Value.Pocet),
             CssClass = "number"
         },

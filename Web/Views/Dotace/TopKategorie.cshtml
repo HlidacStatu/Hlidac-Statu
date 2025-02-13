@@ -15,8 +15,8 @@
 
     string elasticQuery = "";
     string searchQuery = "";
-    searchQuery = searchQuery + "%20AND%20hints.category1.typeValue:" + cat;
-    elasticQuery = $"hints.category1.typeValue:{cat}";
+    searchQuery = searchQuery + "%20AND%20oblast:" + cat;
+    elasticQuery = $"oblast:{cat}";
 
     if (rok.HasValue)
     {
@@ -99,7 +99,7 @@
 
     @if (!rok.HasValue)
     {
-        var options = new HlidacStatu.Web.Models.DotaceAnalBoxes.GeneraModel()
+        var options = new HlidacStatu.Web.Models.DotaceAnalBoxes.GeneraModel<HlidacStatu.Lib.Analytics.StatisticsPerYear<HlidacStatu.Lib.Analytics.SimpleStat>>() 
                     {
                         Query = elasticQuery,
                         Height = 300,

@@ -492,7 +492,7 @@ namespace HlidacStatu.Repositories
                 }
                 if (cat is not null && cat > 0)
                 {
-                    query += HlidacStatu.Searching.Query.ModifyQueryAND(query, $"hints.category1.typeValue:{cat}");
+                    query += HlidacStatu.Searching.Query.ModifyQueryAND(query, $"oblast:{cat}");
                 }
                 if (ico is not null)
                 {
@@ -551,9 +551,10 @@ namespace HlidacStatu.Repositories
                             .Size(100)
                             .Aggregations(typeAggs => typeAggs
                                 .Sum("sumAssumedAmount", sa => sa
-                                    .Field(f => f.AssumedAmount)
+                                    .Field(f => f.AssumedAmount)                                    
                                 )
                             )
+                            .Order(to=>to.Descending("sumAssumedAmount"))
                         )
                     )
                 );
@@ -564,7 +565,7 @@ namespace HlidacStatu.Repositories
             }
             if (cat is not null && cat > 0)
             {
-                query += $" AND hints.category1.typeValue:{cat}";
+                query += $" AND oblast:{cat}";
             }
 
             var res = await DotaceRepo.Searching.SimpleSearchAsync(

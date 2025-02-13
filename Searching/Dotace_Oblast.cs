@@ -48,7 +48,10 @@ namespace HlidacStatu.Searching
                 var oblastVal = part.Value;
                 foreach (var key in AllValues.Keys)
                 {
-                    if (oblastVal.Equals(key, StringComparison.InvariantCultureIgnoreCase))
+                    if (
+                        oblastVal.Equals(key, StringComparison.InvariantCultureIgnoreCase)
+                        || oblastVal.Equals(AllValues[key.ToLower()], StringComparison.InvariantCultureIgnoreCase)
+                        )
                     {
                         var q_obl = $"hints.category1.typeValue:" + AllValues[key.ToLower()];
                         return new RuleResult(SplittingQuery.SplitQuery($" {q_obl} "), NextStep);
