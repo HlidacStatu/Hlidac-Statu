@@ -48,25 +48,16 @@ namespace HlidacStatu.Repositories
 
         public static async Task SaveAsync(Subsidy subsidy, bool shouldRewrite)
         {
-            // because of setting duplicates, this method can run only for one set of subsidies at the time
-            // otherwise, duplicates could rewrite/saved subsidies (RACE CONDITION)
-            // since duplicates are loaded/saved mainly for batches with the same "DuplaHash", 
-            // then we can afford to lock on that level and widen the bottleneck
-
-            var semaphore = _subsidyLocks.GetOrAdd(subsidy.DuplaHash, _ => new SemaphoreSlim(1, 1));
-
             Logger.Debug($"Waiting to acquire semaphore for subsidy {subsidy.Id}");
-            await semaphore.WaitAsync();
             try
             {
                 Logger.Debug($"Semaphore acquired for subsidy {subsidy.Id}");
                 await SaveThreadUnsafeAsync(subsidy, shouldRewrite);
-                await FindAndSetDuplicatesThreadUnsafeAsync(subsidy);
+
             }
-            finally
+            catch (Exception e)
             {
-                Logger.Debug($"Releasing semaphore for subsidy {subsidy.Id}");
-                semaphore.Release();
+                Logger.Error(e, $"Failed to save subsidy with id=[{subsidy.Id}] from: {subsidy.Metadata.DataSource} - {subsidy.Metadata.FileName} - {subsidy.Metadata.RecordNumber}");
             }
         }
 
@@ -236,13 +227,13 @@ namespace HlidacStatu.Repositories
 
         static Subsidy.SubsidyComparer subsidyComparer = new();
 
-        public static async Task FindAndSetDuplicatesThreadUnsafeAsync(Subsidy baseSubsidy)
+        public static async Task<List<string>> FindAndSetDuplicatesThreadUnsafeAsync(Subsidy baseSubsidy)
         {
             var allSubsidies = await FindDuplicatesAsync(baseSubsidy);
             //no duplicates exist 
             if (allSubsidies == null || !allSubsidies.Any())
             {
-                return;
+                return [];
             }
 
             //if baseIs Missing in allSubsidies
@@ -268,15 +259,16 @@ namespace HlidacStatu.Repositories
                 }
             }
 
-            await ConsolidatedAndSetDuplicatesThreadUnsafeAsync(allSubsidies);
+            var ids = await ConsolidatedAndSetDuplicatesThreadUnsafeAsync(allSubsidies);
+            return ids;
         }
 
-        public static async Task ConsolidatedAndSetDuplicatesThreadUnsafeAsync(params Subsidy[] subsidies)
+        public static async Task<List<string>> ConsolidatedAndSetDuplicatesThreadUnsafeAsync(params Subsidy[] subsidies)
         {
-            await ConsolidatedAndSetDuplicatesThreadUnsafeAsync(new List<Subsidy>(subsidies));
+            return await ConsolidatedAndSetDuplicatesThreadUnsafeAsync(new List<Subsidy>(subsidies));
         }
 
-        public static async Task ConsolidatedAndSetDuplicatesThreadUnsafeAsync(List<Subsidy> subsidies)
+        public static async Task<List<string>> ConsolidatedAndSetDuplicatesThreadUnsafeAsync(List<Subsidy> subsidies)
         {
             //load all initial subsidies
 
@@ -306,6 +298,7 @@ namespace HlidacStatu.Repositories
                 goto reload;
 
             await SetDuplicatesThreadUnsafeAsync(subsidies);
+            return subsidies.Select(s => s.Id).ToList();
         }
 
 
