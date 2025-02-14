@@ -77,7 +77,8 @@ namespace HlidacStatu.Connectors
         public static string defaultIndexName_Insolvence = "insolvencnirestrik";
         public static string defaultIndexName_InsolvenceDocs = "insolvencedocs";
         public static string defaultIndexName_Subsidy = "subsidy3";
-        public static string defaultIndexName_Dotace = "dotace";
+        public static string defaultIndexName_Dotace = "dotace2";
+        public static string defaultIndexName_DotaceOld = "dotace";
         public static string defaultIndexName_Uptime = "uptime";
         public static string defaultIndexName_UptimeSSL = "uptimessl";
 
@@ -271,6 +272,11 @@ namespace HlidacStatu.Connectors
         public static Task<ElasticClient> GetESClient_DotaceAsync(int timeOut = 60000, int connectionLimit = 80)
         {
             return GetESClientAsync(defaultIndexName_Dotace, timeOut, connectionLimit, IndexType.Dotace);
+        }
+        
+        public static Task<ElasticClient> GetESClient_DotaceOldAsync(int timeOut = 60000, int connectionLimit = 80)
+        {
+            return GetESClientAsync(defaultIndexName_DotaceOld, timeOut, connectionLimit, IndexType.Dotace);
         }
 
         public static Task<ElasticClient> GetESClient_OsobyAsync(int timeOut = 60000, int connectionLimit = 80)
@@ -620,7 +626,7 @@ namespace HlidacStatu.Connectors
                     res = await client.Indices
                         .CreateAsync(indexName, i => i
                             .InitializeUsing(idxSt)
-                            .Map<Entities.Subsidy>(map => map.AutoMap().DateDetection(false))
+                            .Map<Entities.Dotace>(map => map.AutoMap().DateDetection(false))
                         );
                     break;
                 case IndexType.PageMetadata:
