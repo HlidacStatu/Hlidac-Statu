@@ -91,32 +91,33 @@ namespace HlidacStatu.Repositories.Statistics
             HlidacStatu.DS.Graphs.Relation.AktualnostType aktualnost)
         {
 
-                var statistiky = firma.Holding(aktualnost)
-                    .Append(firma)
-                    .Where(f => f.Valid)
-                    .Select(f => new { f.ICO, dotaceStats = f.StatistikaDotaci() })
-                    .ToArray();
+            var statistiky = firma.Holding(aktualnost)
+                .Append(firma)
+                .Where(f => f.Valid)
+                .Select(f => new { f.ICO, dotaceStats = f.StatistikaDotaci() })
+                .ToArray();
 
-                var statistikyPerIco = new Dictionary<string, StatisticsSubjectPerYear<Firma.Statistics.Subsidy>>();
-                foreach (var ico in statistiky.Select(m => m.ICO).Distinct())
-                {
-                    statistikyPerIco[ico] = new StatisticsSubjectPerYear<Firma.Statistics.Subsidy>();
-                    statistikyPerIco[ico] = (StatisticsSubjectPerYear<Firma.Statistics.Subsidy>.Aggregate(
-                            statistiky.Where(w => w.ICO == ico).Select(m => m.dotaceStats).ToArray()
-                            )
-                        ) ?? new StatisticsSubjectPerYear<Firma.Statistics.Subsidy>();
-                }
+            var statistikyPerIco = new Dictionary<string, StatisticsSubjectPerYear<Firma.Statistics.Subsidy>>();
 
-                var aggregate = Lib.Analytics.StatisticsSubjectPerYear<Firma.Statistics.Subsidy>.Aggregate(statistikyPerIco.Values);
+            foreach (var ico in statistiky.Select(m => m.ICO).Distinct())
+            {
+                statistikyPerIco[ico] = new StatisticsSubjectPerYear<Firma.Statistics.Subsidy>();
+                statistikyPerIco[ico] = (StatisticsSubjectPerYear<Firma.Statistics.Subsidy>.Aggregate(
+                        statistiky.Where(w => w.ICO == ico).Select(m => m.dotaceStats).ToArray()
+                        )
+                    ) ?? new StatisticsSubjectPerYear<Firma.Statistics.Subsidy>();
+            }
 
-                foreach (var year in aggregate)
-                {
-                    year.Value.JednotliveFirmy = statistikyPerIco
-                        .Where(s => s.Value.StatisticsForYear(year.Year).CelkemPrideleno != 0)
-                        .ToDictionary(s => s.Key, s => s.Value.StatisticsForYear(year.Year).CelkemPrideleno);
-                }
+            StatisticsSubjectPerYear<Firma.Statistics.Subsidy> aggregate = Lib.Analytics.StatisticsSubjectPerYear<Firma.Statistics.Subsidy>.Aggregate(statistikyPerIco.Values);
 
-                return aggregate;
+            foreach (var year in aggregate)
+            {
+                year.Value.JednotliveFirmy = statistikyPerIco
+                    .Where(s => s.Value.StatisticsForYear(year.Year).CelkemPrideleno != 0)
+                    .ToDictionary(s => s.Key, s => s.Value.StatisticsForYear(year.Year).CelkemPrideleno);
+            }
+
+            return aggregate;
         }
 
         private static async Task<StatisticsSubjectPerYear<Firma.Statistics.Subsidy>> CalculateDotaceStatAsync(Firma f)
