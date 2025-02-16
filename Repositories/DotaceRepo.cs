@@ -44,7 +44,7 @@ namespace HlidacStatu.Repositories
                 try
                 {
                     var oldDotace = await GetAsync(dotace.Id);
-                    if (oldDotace is not null)
+                    if (oldDotace?.Hints is not null)
                     {
                         dotace.Hints = oldDotace.Hints;
                     }
