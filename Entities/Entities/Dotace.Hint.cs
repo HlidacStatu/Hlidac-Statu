@@ -55,13 +55,16 @@ public partial class Dotace
 
         //recipient hints
         int _recipientTypSubjektu = -1; //Firma.TypSubjektuEnum
-        public int RecipientTypSubjektu { 
+        public int RecipientTypSubjektu
+        {
             get { return _recipientTypSubjektu; }
-            set {
+            set
+            {
                 _recipientTypSubjektu = value;
                 if (_recipientTypSubjektu == 2) //kdyz je PatrimStatuAlespon25perc, tak nastav PatrimStatu
                     _recipientTypSubjektu = 1;
-            } } 
+            }
+        }
 
         [Newtonsoft.Json.JsonIgnore]
         [System.Text.Json.Serialization.JsonIgnore]
@@ -260,7 +263,7 @@ public partial class Dotace
 
             [NiceDisplayName("Fond primátora")]
             FondPrimatora = 52000,
-            
+
             [NiceDisplayName("Covidové dotace")]
             Covid = 22000
         }
@@ -797,6 +800,7 @@ public partial class Dotace
             {
                 CalculatedCategories.Kultura, new[]
                 {
+                    "Grantový program Plzeňského kraje v oblasti kultury*",
                     "KUKVX0099OK0",
                     "KUL01-20",
 "KUL01-21",
@@ -1680,6 +1684,7 @@ public partial class Dotace
             {
                 CalculatedCategories.PodporaPodnikani, new[]
                 {
+                    "OBCHŮDEK*",
                     "RP21-21",
 "RP22-21",
 "RP22-22",
@@ -2010,6 +2015,9 @@ public partial class Dotace
             {
                 CalculatedCategories.RegionalniRozvoj, new[]
                 {
+                    "Dotace na havarijní stavy a naléhavé potřeby v roce*",
+                    "Neomezená výzva pro: fond vodního hospodářství ústeckého kraje*",
+                    "POH Výzva č.*","PSOV PK 20*",
                     "RP01-19",
 "RP01-20",
 "RP01-21",
@@ -2476,6 +2484,22 @@ public partial class Dotace
             {
                 CalculatedCategories.Sport, new[]
                 {
+                    "II. A. 1. Výstavba sportovišť či jejich rekonstrukce významného rozsahu (investice)","DOT/64/01/004652/2016",
+"II. C. Provoz veřejně přístupných sportovišť","DOT/64/01/006231/2018",
+"III. C. 2. Sportovní akce celopražského významu (pro akce konané od 1. 9. 2019 do 29. 2. 2020)","DOT/61/06/010285/2019",
+"III. Provoz sportovního zařízení","DOT/61/01/011727/2020",
+"III. Provoz sportovního zařízení","DOT/61/04/012720/2021",
+"III. Provoz sportovního zařízení","DOT/61/04/012742/2021",
+"III. Provoz sportovního zařízení","DOT/61/04/013100/2021",
+"IV. Sportovní akce","DOT/61/01/011586/2020",
+"IV. Sportovní akce","DOT/61/01/011741/2020",
+"IV. Sportovní akce","DOT/61/01/011750/2020",
+"IV. Sportovní akce","DOT/61/04/012770/2021",
+"IV. Sportovní akce","DOT/61/04/012864/2021",
+"IV. Sportovní akce","DOT/61/04/012976/2021",
+"Ostatní mimořádné dotace","07622012",
+"Ostatní mimořádné dotace","16062012",
+"Ostatní mimořádné dotace","16952012",
                     "MAS01-21",
 "MAS01-22",
 "MAS02-21",
@@ -3361,6 +3385,7 @@ public partial class Dotace
             {
                 CalculatedCategories.Zemedelstvi, new[]
                 {
+                    "Podpora myslivosti 2022 - Program pro rozvoj eko-agro oblastí v ÚK 2022 - 2025","22/SML2882",
                     "RP08-20",
 "RP08-21",
 "RP08-22",
@@ -3421,7 +3446,8 @@ public partial class Dotace
             {
                 CalculatedCategories.ZivotniProstredi, new string[]
                 {
-
+                    "Biodiverzita 20*",
+                    "EVVO 20*",
                     "KUKVX009TFU5",
 "KUKVX00AKDQV",
                     "RP04-19",
@@ -3656,14 +3682,35 @@ public partial class Dotace
 
 
         private static IEnumerable<Category> _textToCalculatedCategory(
-            Dictionary<CalculatedCategories, string[]> keywords, string categoryName)
+            Dictionary<CalculatedCategories, string[]> keywords, string text)
         {
-            categoryName = categoryName.ToLower();
-            //List<Category> res = new();
-            /*
+            text = text.ToLower();
+            List<Category> res = new();
+
             foreach (var cat in keywords)
             {
-                if (cat.Value.Any(m => m.Contains(categoryName, StringComparison.OrdinalIgnoreCase) || categoryName.Contains(m, StringComparison.OrdinalIgnoreCase)))
+                foreach (var name in cat.Value)
+                {
+                    bool found = false;
+                    if (name.EndsWith("*"))
+                    {
+                        if (name.StartsWith(text, StringComparison.InvariantCultureIgnoreCase))
+                            found = true;
+                    }
+                    else
+                    {
+                        if (name.Contains(text, StringComparison.InvariantCultureIgnoreCase))
+                            found = true;
+                    }
+                    if (found)
+                    {
+                        if (res.Any(m => m.TypeValue == (int)cat.Key) == false)
+                            res.Add(new Category { TypeValue = (int)cat.Key, Created = DateTime.Now, Probability = 1 });
+                        break;
+                    }
+                }
+                if (cat.Value.Any(m => m.Contains(text, StringComparison.OrdinalIgnoreCase)
+                || text.Contains(m, StringComparison.OrdinalIgnoreCase)))
                 {
                     if (res.Any(m => m.TypeValue == (int)cat.Key) == false)
                         res.Add(new Category { TypeValue = (int)cat.Key, Created = DateTime.Now, Probability = 1 });
@@ -3671,9 +3718,9 @@ public partial class Dotace
 
             }
             return res;
-            */
-            var res = keywords
-                .Where(m => m.Value.Contains(categoryName, StringComparer.OrdinalIgnoreCase))
+
+            var res2 = keywords
+                .Where(m => m.Value.Contains(text, StringComparer.OrdinalIgnoreCase))
                 .Select(m => new Category { TypeValue = (int)m.Key, Created = DateTime.Now, Probability = 1 });
             return res;
         }
@@ -3762,7 +3809,7 @@ Analyzuj text uvedený ve značkách <text></text> a vyber nejvhodnější kateg
                     break;
                 }
             }
-                if (cats.Count==0 &&  runs < 6)
+            if (cats.Count == 0 && runs < 6)
                 goto start;
 
 
@@ -3781,8 +3828,19 @@ Analyzuj text uvedený ve značkách <text></text> a vyber nejvhodnější kateg
                 cats.AddRange(_textToCalculatedCategory(CategoryNameDictionary, item.ProgramCode));
 
             if (!cats.Any() && !string.IsNullOrEmpty(item.ProgramCode) && item.ProgramCode?.Length > 3)
+            {
                 cats.AddRange(_textToCalculatedCategory(ProgramsDictionary, item.ProgramCode));
-
+                if (cats.Count>1 && !string.IsNullOrEmpty(item.ProgramName))
+                {
+                    //vice kategorii podle ProgramCode neni ok, overme, zda neni presnejsi podle programName
+                    var tmpCats = _textToCalculatedCategory(ProgramsDictionary, item.ProgramName);
+                    if (tmpCats.Any())
+                    {
+                        cats.Clear();
+                        cats.AddRange(tmpCats);
+                    }
+                }
+            }
             if (!cats.Any() && !string.IsNullOrEmpty(item.ProgramName))
                 cats.AddRange(_textToCalculatedCategory(ProgramsDictionary, item.ProgramName));
 
@@ -3793,9 +3851,6 @@ Analyzuj text uvedený ve značkách <text></text> a vyber nejvhodnější kateg
                 cats.AddRange(_textToCalculatedCategory(CategoryNameDictionary, item.SubsidyProvider));
 
             return cats;
-        }
-        public void SetCategoriesWithAI(IEnumerable<Category> cats)
-        {
         }
 
         public void SetCategories(IEnumerable<Category> cats)
