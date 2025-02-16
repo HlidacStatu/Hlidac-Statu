@@ -3821,6 +3821,9 @@ public partial class Dotace
         {
             if (item == null)
                 return Array.Empty<Category>();
+            if (string.IsNullOrWhiteSpace(item.ProjectName + " " + item.ProjectDescription))
+                return Array.Empty<Category>();
+
             List<Category> cats = new();
 
             Uri ollamaUri = new Uri("http://10.10.150.163:7862");
