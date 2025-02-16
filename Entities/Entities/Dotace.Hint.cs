@@ -3849,15 +3849,18 @@ public partial class Dotace
             resFull = resFull.Trim().ToLower().RemoveAccents().Replace(" ", "");
             if (resFull.EndsWith("."))
                 resFull = resFull.Remove(resFull.Length - 1);
+            resFull = resFull.Replace("<cat>", "").Replace("</cat>", "");
+            resFull = resFull.Replace("<", "").Replace(">", "");
+
             //{"kategorie": "Životní prostředí, klima a ekologické projekty"}
 
-            _logger.Information("AI result {category} for project {projectName}", resFull, item.ProjectName + " " + item.ProjectDescription);
+            _logger.Information("{id}: AI result {category} for project {projectName}", item.Id, resFull, (item.ProjectName + " " + item.ProjectDescription).ShortenMe(30));
 
             foreach (var kv in catsDescriptions)
             {
                 if (
                     resFull.Contains(kv.Key, StringComparison.InvariantCultureIgnoreCase)
-                    || resFull.Contains("##" + kv.Key + "##", StringComparison.InvariantCultureIgnoreCase)
+                    || resFull.Contains("<cat>" + kv.Key + "</cat>", StringComparison.InvariantCultureIgnoreCase)
                     )
                 {
                     cats.Add(new Category() { Created = DateTime.Now, Probability = 0.8m, TypeValue = (int)kv.Value });
