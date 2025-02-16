@@ -3731,36 +3731,88 @@ public partial class Dotace
         }
 
 
-        static string llmCategoryQuery = @"Máš k dispozici pouze tyto kategorie, mezi znackami <kategorie></kategorie>. Každá kategorie je uvedena na samostatném řádku:
-<kategorie> 
-##Digi##	Digitální transformace, IT, výpočetní technika, software, cloud, AI, umělá inteligence, informační systém, IT infrastruktura, datové centrum
-##Doprava##	Doprava a infrastruktura, železnice, stanice, rekonstrukce, nákup autobusů, nákup vlaků, nákup vozidla, budova, násep, zařízení pro údržbu silnic, Dálnice D1, silnice, okruh
-##Energetika##	Energetika a obnovitelné zdroje, obnovitelné zdroje energie, dodávku elektřiny a plynu, uhlí, ropy, přenosová soustava, energetická soustava, elektrárna
-##FondHejtmana##	Fond hejtmana
-##FondPrimatora = 52000	Fond primátora
-##HumanitarniPomoc##	Humanitární pomoc a rozvojová spolupráce, Charita, uprchlíci, válečný konflikt, afrika, Ukrajina, Pomoc Ukrajině,červený kříž
-##InovaceVyzkum##	Inovace, výzkum a vývoj, Podpora VO, 
-##Kriminalita##	Prevence kriminality a bezpečnost
-##Kultura##	Kultura, kreativní průmysly a média, galerie, divadlo, představení, zpěv, recitace, festival
-##Obrana##	Obrana a bezpečnost
-##Pamatky##	Památková péče a cestovní ruch, turismus, cestovní kancelář, obnova památek, obnova sochy, rekonstrukce budovy, rekonstrukce zámku, turistický areál
-##PodporaPodnikani##	Podpora podnikání a investic
-##PravniStat##	Podpora demokracie a právního státu, volby, transparentnost, LGBT, vyloučené skupiny, znevýhodněné skupiny obyvatel
-##RegionalniRozvoj##	Regionální rozvoj, podpora, investice a soudržnost, Vybudování chodníku, Rekonstrukce MVN, obnova, vodovod, školní kuchyně, Rekonstrukce cest, hasiči, kapacita stanice, koupaliště
-##SocialniSluzby##	Sociální služby, začleňování a zaměstnanost, dlouhodobě nemocní, hospic, domov pro postižené, domov pro seniory, dům, 
-##Sport##	Sport a volnočasové aktivity, sportovní areál, cvičiště, sportovní závody, soutěž, stadión, běh
-##TrhPrace##	Podpora zaměstnanosti a trhu práce, odborné vzdělávání, 
-##VerejnaSprava##	Investiční a dotační programy pro veřejnou správu
-##Vzdelavani##	Vzdělávání,školství a mládež, školy, družiny, učitelé
-##Zahranici##	Bilaterální zahraniční rozvojové spolupráce (ZRS), rozvoj občanské společnosti, přeshraniční spolupráce, 
-##Zdravotnictvi##	Zdraví a zdravotnické projekty, geriatrického oddělení, léčebna, Rehabilitace, nemocnice, léky, zdravotní zařízení, oddělení
-##Zemedelstvi##	Zemědělství, lesnictví a rozvoj venkova, SZIF, les, remízek, stromy, lesní hospodářství, myslivost
-##ZivotniProstredi##	Životní prostředí, klima a ekologické projekty, podporu obnovitelných zdrojů, OZE, Odstraňování následků těžby, ZNHČ, povodeň, kvality vod, ochrana vod, Zateplení
-</kategorie> 
+        static string llmCategoryQuery = @"Máš k dispozici pouze tyto kategorie, mezi znackami
+    <categories></categories>. Každá kategorie je uvedena na samostatném řádku: 
 
-Analyzuj text uvedený ve značkách <text></text> a vyber nejvhodnější kategorii z uvedeného seznamu. Nevysvětluj svůj postoj, pouze uveď nejvhodnější kategorii jako prostý text.
+    <categories> 
 
-<text>##TEXT##</text>";
+    <cat>Digi</cat>  Digitální transformace, IT, výpočetní technika, software,
+    cloud, AI, umělá inteligence, informační systém, IT infrastruktura, datové
+    centrum
+
+    <cat>Doprava</cat> Doprava a infrastruktura, železnice, stanice,
+    rekonstrukce, nákup autobusů, nákup vlaků, nákup vozidla, budova, násep,
+    zařízení pro údržbu silnic, Dálnice D1, silnice, okruh
+
+    <cat>Energetika</cat>  Energetika a obnovitelné zdroje, obnovitelné zdroje
+    energie, dodávku elektřiny a plynu, uhlí, ropy, přenosová soustava,
+    energetická soustava, elektrárna
+
+    <cat>FondHejtmana</cat>  Fond hejtmana
+
+    <cat>FondPrimatora = 52000 Fond primátora
+
+    <cat>HumanitarniPomoc</cat>  Humanitární pomoc a rozvojová spolupráce,
+    Charita, uprchlíci, válečný konflikt, afrika, Ukrajina, Pomoc
+    Ukrajině,červený kříž
+
+    <cat>InovaceVyzkum</cat> Inovace, výzkum a vývoj, Podpora VO, 
+
+    <cat>Kriminalita</cat> Prevence kriminality a bezpečnost
+
+    <cat>Kultura</cat> Kultura, kreativní průmysly a média, galerie, divadlo,
+    představení, zpěv, recitace, festival
+
+    <cat>Obrana</cat>  Obrana a bezpečnost
+
+    <cat>Pamatky</cat> Památková péče a cestovní ruch, turismus, cestovní
+    kancelář, obnova památek, obnova sochy, rekonstrukce budovy, rekonstrukce
+    zámku, turistický areál
+
+    <cat>PodporaPodnikani</cat>  Podpora podnikání a investic
+
+    <cat>PravniStat</cat>  Podpora demokracie a právního státu, volby,
+    transparentnost, LGBT, vyloučené skupiny, znevýhodněné skupiny obyvatel
+
+    <cat>RegionalniRozvoj</cat>  Regionální rozvoj, podpora, investice a
+    soudržnost, Vybudování chodníku, Rekonstrukce MVN, obnova, vodovod, školní
+    kuchyně, Rekonstrukce cest, hasiči, kapacita stanice, koupaliště
+
+    <cat>SocialniSluzby</cat>  Sociální služby, začleňování a zaměstnanost,
+    dlouhodobě nemocní, hospic, domov pro postižené, domov pro seniory, dům, 
+
+    <cat>Sport</cat> Sport a volnočasové aktivity, sportovní areál, cvičiště,
+    sportovní závody, soutěž, stadión, běh
+
+    <cat>TrhPrace</cat>  Podpora zaměstnanosti a trhu práce, odborné
+    vzdělávání, 
+
+    <cat>VerejnaSprava</cat> Investiční a dotační programy pro veřejnou správu
+
+    <cat>Vzdelavani</cat>  Vzdělávání,školství a mládež, školy, družiny, učitelé
+
+    <cat>Zahranici</cat> Bilaterální zahraniční rozvojové spolupráce (ZRS),
+    rozvoj občanské společnosti, přeshraniční spolupráce, 
+
+    <cat>Zdravotnictvi</cat> Zdraví a zdravotnické projekty, geriatrického
+    oddělení, léčebna, Rehabilitace, nemocnice, léky, zdravotní zařízení,
+    oddělení
+
+    <cat>Zemedelstvi</cat> Zemědělství, lesnictví a rozvoj venkova, SZIF, les,
+    remízek, stromy, lesní hospodářství, myslivost
+
+    <cat>ZivotniProstredi</cat>  Životní prostředí, klima a ekologické projekty,
+    podporu obnovitelných zdrojů, OZE, Odstraňování následků těžby, ZNHČ,
+    povodeň, kvality vod, ochrana vod, Zateplení 
+
+    </categories> 
+
+
+    Analyzuj text uvedený mezi značkami <text></text> a vyber nejvhodnější
+    kategorii z uvedeného seznamu. Nevysvětluj svůj postoj, neopakuj text, pouze
+    uveď název nejvhodnější kategorie uvedený mezi znaky <cat></cat>.
+
+    <text>##TEXT##</text>";
         static Dictionary<string, CalculatedCategories> catsDescriptions = Enum.GetValues<CalculatedCategories>()
             .Select(m => new { key = m.ToString(), val = m })
             .ToDictionary(k => k.key, v => v.val);
