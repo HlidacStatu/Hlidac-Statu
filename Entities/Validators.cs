@@ -26,9 +26,9 @@ namespace HlidacStatu.Entities
         static RegexOptions regexOptions = Util.Consts.DefaultRegexQueryOption;
 
         static Devmasters.Cache.AWS_S3.Cache<string> jmenaCache = new Devmasters.Cache.AWS_S3.Cache<string>(
-            new string[] { Devmasters.Config.GetWebConfigValue("Minio.Cache.Endpoint") }, 
-            Devmasters.Config.GetWebConfigValue("Minio.Cache.Bucket"), 
-            Devmasters.Config.GetWebConfigValue("Minio.Cache.AccessKey"), 
+            new string[] { Devmasters.Config.GetWebConfigValue("Minio.Cache.Endpoint") },
+            Devmasters.Config.GetWebConfigValue("Minio.Cache.Bucket"),
+            Devmasters.Config.GetWebConfigValue("Minio.Cache.AccessKey"),
             Devmasters.Config.GetWebConfigValue("Minio.Cache.SecretKey"),
             TimeSpan.Zero, "jmena.txt", (obj) =>
                 {
@@ -162,8 +162,10 @@ namespace HlidacStatu.Entities
             if (string.IsNullOrEmpty(text))
                 return null;
 
-            string normalizedText = TextUtil
-                .ReplaceDuplicates(Regex.Replace(text, @"[,;\[\]:]", " "), ' ');
+            string normalizedText = Regex.Replace(text, @"[^a-zA-Z\p{L}\p{M}.,]", " ");
+            normalizedText = TextUtil.ReplaceDuplicates(normalizedText, ' ').Trim();
+
+
             // Zakomentováno 12.12.2019 - při nahrávání dotací byl problém se jménem Ĺudovit
             //fix errors Ĺ => Í,ĺ => í 
             //normalizedText = normalizedText.Replace((char)314, (char)237).Replace((char)313, (char)205);
