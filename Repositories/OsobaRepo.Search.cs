@@ -13,6 +13,7 @@ using Nest;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace HlidacStatu.Repositories
@@ -21,6 +22,9 @@ namespace HlidacStatu.Repositories
     {
         public static class Searching
         {
+            public static readonly Regex DateRegex = new(@"(\d{1,2}[-./\\]\d{1,2}[-./\\]\d{2,4})|(\d{2,4}[-./\\]\d{1,2}[-./\\]\d{1,2})");
+            public static readonly Regex YearRegexLoose = new(@"(19|20)\d{2}");
+            
             public const int DefaultPageSize = 40;
             public const int MaxResultWindow = 200;
 
@@ -176,6 +180,106 @@ namespace HlidacStatu.Repositories
                                 m.Jmeno == jmeno
                                 && m.Prijmeni == prijmeni
                             ).ToArray();
+                }
+            }
+            
+            public static IEnumerable<Osoba> GetAllByName(string jmeno, string prijmeni, string datumNarozeni)
+            {
+                DateTime? fullDate = null;
+                DateTime? startDate = null;
+                DateTime? endDate = null;
+                if (!string.IsNullOrWhiteSpace(datumNarozeni))
+                {
+                    var dateString = FindDateInString(datumNarozeni);
+                    if (dateString is not null)
+                    {
+                        fullDate = Devmasters.DT.Util.ParseDateTime(dateString, null);
+                    }
+            
+                    if (fullDate is null)
+                    {
+                        var birthYear = GetYearFromString(datumNarozeni);
+                        if (birthYear is not null)
+                        {
+                            startDate = new DateTime(birthYear.Value, 1, 1);
+                            endDate = new DateTime(birthYear.Value, 12, 31);
+                            
+                        }
+                    }
+                }
+                
+                using (DbEntities db = new DbEntities())
+                {
+                    if (fullDate.HasValue)
+                        return db.Osoba.AsNoTracking()
+                            .Where(m =>
+                                m.Jmeno == jmeno
+                                && m.Prijmeni == prijmeni
+                                && m.Narozeni == fullDate
+                            ).ToArray();
+                    else if(startDate.HasValue)
+                        return db.Osoba.AsNoTracking()
+                            .Where(m =>
+                                m.Jmeno == jmeno
+                                && m.Prijmeni == prijmeni
+                                && m.Narozeni >= startDate && m.Narozeni <= endDate
+                            ).ToArray();
+                    return db.Osoba.AsNoTracking()
+                        .Where(m =>
+                            m.Jmeno == jmeno
+                            && m.Prijmeni == prijmeni
+                        ).ToArray();
+                }
+            }
+            
+            public static IEnumerable<Osoba> GetAllByNameAscii(string jmeno, string prijmeni, string datumNarozeni)
+            {
+                jmeno = jmeno.NormalizeToPureTextLower().RemoveAccents();
+                prijmeni = prijmeni.NormalizeToPureTextLower().RemoveAccents();
+                DateTime? fullDate = null;
+                DateTime? startDate = null;
+                DateTime? endDate = null;
+                if (!string.IsNullOrWhiteSpace(datumNarozeni))
+                {
+                    var dateString = FindDateInString(datumNarozeni);
+                    if (dateString is not null)
+                    {
+                        fullDate = Devmasters.DT.Util.ParseDateTime(dateString, null);
+                    }
+            
+                    if (fullDate is null)
+                    {
+                        var birthYear = GetYearFromString(datumNarozeni);
+                        if (birthYear is not null)
+                        {
+                            startDate = new DateTime(birthYear.Value, 1, 1);
+                            endDate = new DateTime(birthYear.Value, 12, 31);
+                            
+                        }
+                    }
+                }
+                
+                using (DbEntities db = new DbEntities())
+                {
+                    if (fullDate.HasValue)
+                        return db.Osoba.AsNoTracking()
+                            .Where(m =>
+                                m.JmenoAscii == jmeno
+                                && m.PrijmeniAscii == prijmeni
+                                && m.Narozeni == fullDate
+                            ).ToArray();
+                    else if(startDate.HasValue)
+                        return db.Osoba.AsNoTracking()
+                            .Where(m =>
+                                m.JmenoAscii == jmeno
+                                && m.PrijmeniAscii == prijmeni
+                                && m.Narozeni >= startDate && m.Narozeni <= endDate
+                            ).ToArray();
+                    return db.Osoba.AsNoTracking()
+                        .Where(m =>
+                            m.JmenoAscii == jmeno
+                            && m.PrijmeniAscii == prijmeni
+                        ).ToArray();
                 }
             }
 
@@ -408,7 +512,38 @@ namespace HlidacStatu.Repositories
                             ).ToArray();
                 }
             }
+            
+            private static int? GetYearFromString(string? yearstring)
+            {
+                if (yearstring is null)
+                    return null;
+
+                var match = YearRegexLoose.Match(yearstring);
+                if (match.Success)
+                {
+                    var year = int.Parse(match.Value);
+                    return year;
+                }
+
+                return null;
+            }
+    
+            private static string? FindDateInString(string? dateString)
+            {
+                if (dateString is null)
+                    return null;
+
+                var match = DateRegex.Match(dateString);
+                if (match.Success)
+                {
+                    return match.Value;
+                }
+
+                return null;
+            }
         }
+        
+        
 
 
     }

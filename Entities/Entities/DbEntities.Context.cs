@@ -279,6 +279,7 @@ namespace HlidacStatu.Entities
         
         public virtual DbSet<PuOrganizace> PuOrganizace { get; set; }
         public virtual DbSet<PuPlat> PuPlaty { get; set; }
+        public virtual DbSet<PuPolitikPrijem> PuPoliticiPrijmy { get; set; }
         public virtual DbSet<PuVydelek> PuVydelky { get; set; }
         public virtual DbSet<PuCZISCO> PuCZISCO { get; set; }
         public virtual DbSet<PuOrganizaceMetadata> PuOrganizaceMetadata { get; set; }
