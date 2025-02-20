@@ -194,7 +194,7 @@ public static class PpRepo
             origPlat = await dbContext.PuPoliticiPrijmy
                 .FirstOrDefaultAsync(p => p.IdOrganizace == prijemPolitika.IdOrganizace
                                           && p.Rok == prijemPolitika.Rok
-                                          && p.NazevFunkce == prijemPolitika.NazevFunkce);
+                                          && p.Nameid == prijemPolitika.Nameid);
         }
         else
         {
