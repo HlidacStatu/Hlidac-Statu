@@ -222,6 +222,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DotaceLoader", "..\Hlidac-S
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DotaceHints", "..\Hlidac-Statu-Private\DotaceHints\DotaceHints.csproj", "{3C83146B-1638-42BD-AF0D-F7F80E125000}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Regexes", "Regexes\Regexes.csproj", "{ECE26708-7880-4B04-BE99-13068E9C259F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -544,6 +546,10 @@ Global
 		{3C83146B-1638-42BD-AF0D-F7F80E125000}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3C83146B-1638-42BD-AF0D-F7F80E125000}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3C83146B-1638-42BD-AF0D-F7F80E125000}.Release|Any CPU.Build.0 = Release|Any CPU
+		{ECE26708-7880-4B04-BE99-13068E9C259F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{ECE26708-7880-4B04-BE99-13068E9C259F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{ECE26708-7880-4B04-BE99-13068E9C259F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{ECE26708-7880-4B04-BE99-13068E9C259F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -642,6 +648,7 @@ Global
 		{97090612-ACD6-4F96-9A70-0BE58AA208BB} = {A162EDEA-8EBD-4520-B039-16CF0B76966B}
 		{507884AE-EBBE-4018-8E06-2AA6E6FA1C7D} = {A162EDEA-8EBD-4520-B039-16CF0B76966B}
 		{3C83146B-1638-42BD-AF0D-F7F80E125000} = {A162EDEA-8EBD-4520-B039-16CF0B76966B}
+		{ECE26708-7880-4B04-BE99-13068E9C259F} = {44E67082-D88E-41AE-AF07-4739BDC44B2D}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {17143448-F5EA-41D1-886F-00E63AE50798}
