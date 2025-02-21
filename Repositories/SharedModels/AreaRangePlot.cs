@@ -62,6 +62,49 @@ public class AreaRangePlot
         else
             return null; 
     }
+    
+    public static AreaRangePlot ToAreaRangePlotWithPrumer(IEnumerable<PuPolitikPrijem> platy, string dataName,
+        string extraTitle = "Průměr ", string minMaxTitle = "Výdělek od-do ")
+    {
+
+        var salariesYearly = platy
+            .GroupBy(p => p.Rok, p => p)
+            .OrderBy(k => k.Key)
+            .ToDictionary(g => g.Key, g => g.Select(x => x).ToList());
+        if (salariesYearly.Any())
+        {
+            Dictionary<int, AreaRangePlot.PlotData?> plotData = new();
+
+            for (int year = salariesYearly.Keys.Min(); year <= salariesYearly.Keys.Max(); year++)
+            {
+                AreaRangePlot.PlotData? dataForYear = new AreaRangePlot.PlotData();
+
+                if (salariesYearly.TryGetValue(year, out var platyForYear))
+                {
+                    var hrubeMesicniPlaty = platyForYear
+                        .Select(p => (double)p.HrubyMesicniPlatVcetneOdmen)
+                        .ToList();
+                    dataForYear.Median = hrubeMesicniPlaty?.Median() ?? null;
+                    dataForYear.Min = hrubeMesicniPlaty?.Min() ?? null;
+                    dataForYear.Max = hrubeMesicniPlaty?.Max() ?? null;
+                }
+
+                plotData.Add(year, dataForYear);
+            }
+
+            var chartData = new AreaRangePlot()
+            {
+                Title = dataName,
+                Subtitle = "vývoj průměrného platu po letech",
+                ExtraTitle = "Průměr ",
+                MinMaxTitle = "Výdělek od-do ",
+                Values = plotData
+            };
+            return chartData;
+        }
+        else
+            return null; 
+    }
 
     public static AreaRangePlot ToAreaRangePlotWithPrumer(IEnumerable<PuVydelek> data, string dataName, string extraTitle= "Průměr ", string minMaxTitle= "Většina od-do ")
     {

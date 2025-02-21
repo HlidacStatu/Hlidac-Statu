@@ -10,7 +10,7 @@ public class PuOrganizaceMetadata
 {
     [Key]
     public int Id { get; set; }
-    
+
     public int IdOrganizace { get; set; }
     public int Rok { get; set; }
     public Komunikace? ZpusobKomunikace { get; set; }
@@ -19,6 +19,8 @@ public class PuOrganizaceMetadata
     public DateTime? DatumPrijetiOdpovedi { get; set; }
     public string PoznamkaHlidace { get; set; }
 
+    public TypMetadat Typ { get; set; }
+
     // Navigation properties
     [ForeignKey("IdOrganizace")]
     public virtual PuOrganizace Organizace { get; set; }
@@ -26,7 +28,18 @@ public class PuOrganizaceMetadata
     [ShowNiceDisplayName()]
     public enum Komunikace
     {
-        [NiceDisplayName("datová schránka")] [Display(Name="datová schránka", Description = "komunikuje datovou schránkou")]DatovaSchranka = 1,
-        [NiceDisplayName("e-mail")] [Display(Name="e-mail", Description = "komunikuje emailem")]Email = 2
+        [NiceDisplayName("datová schránka")]
+        [Display(Name = "datová schránka", Description = "komunikuje datovou schránkou")]
+        DatovaSchranka = 1,
+
+        [NiceDisplayName("e-mail")]
+        [Display(Name = "e-mail", Description = "komunikuje emailem")]
+        Email = 2
+    }
+
+    public enum TypMetadat
+    {
+        PlatyUredniku = 1,
+        PlatyPolitiku = 2
     }
 }

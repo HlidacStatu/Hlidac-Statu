@@ -23,7 +23,7 @@ public static class PpRepo
         return await db.PuOrganizace
             .AsNoTracking()
             .Where(pu => datovaSchranky.Contains(pu.DS) )
-            .Include(o => o.Metadata)
+            .Include(o => o.Metadata.Where(m => m.Typ == PuOrganizaceMetadata.TypMetadat.PlatyPolitiku))
             .Include(o => o.Tags)
             .Include(o => o.FirmaDs)
             .Include(o => o.Platy) // Include PuPlat

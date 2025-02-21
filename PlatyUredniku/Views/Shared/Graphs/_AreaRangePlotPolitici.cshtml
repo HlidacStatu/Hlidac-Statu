@@ -9,7 +9,7 @@
     string chartId = HlidacStatu.Util.Consts.Rnd.Next(999).ToString("000");
 
 
-    AreaRangePlot chartData = AreaRangePlot.ToAreaRangePlotWithPrumer(Model.Platy,"Vývoj platů úředníků ");
+    AreaRangePlot chartData = AreaRangePlot.ToAreaRangePlotWithPrumer(Model.PrijmyPolitiku, "Vývoj platů politiků ");
     
 }
 
@@ -69,12 +69,7 @@
             }
         },
         series: [
-            {
-                name: 'Plat šéfa',
-                color: 'red',
-                data: @chartData.DrawExtras(),
-                zIndex: 1
-            }, {
+             {
                 name: 'Medián',
                 data: @chartData.DrawMedians(),
                 zIndex: 1,

@@ -108,6 +108,7 @@ inner join Firma_DS fds
 
         PuRokOrganizaceStat stat = new PuRokOrganizaceStat();
         stat.PocetOslovenych = await db.PuOrganizaceMetadata
+            .Where(m => m.Typ == PuOrganizaceMetadata.TypMetadat.PlatyUredniku)
             .CountAsync(m => m.DatumOdeslaniZadosti.HasValue && m.Rok == rok);
 
         stat.PocetCoPoslaliPlat = await db.PuPlaty
@@ -171,7 +172,7 @@ inner join Firma_DS fds
         return await db.PuOrganizace
             .AsNoTracking()
             .Where(pu => datovaSchranky.Contains(pu.DS) )
-            .Include(o => o.Metadata)
+            .Include(o => o.Metadata.Where(m => m.Typ == PuOrganizaceMetadata.TypMetadat.PlatyUredniku))
             .Include(o => o.Tags)
             .Include(o => o.FirmaDs)
             .Include(o => o.Platy) // Include PuPlat
@@ -185,7 +186,7 @@ inner join Firma_DS fds
 
         IQueryable<PuOrganizace> query = db.PuOrganizace
             .AsNoTracking()
-            .Include(o => o.Metadata)
+            .Include(o => o.Metadata.Where(m => m.Typ == PuOrganizaceMetadata.TypMetadat.PlatyUredniku))
             .Include(o => o.Tags)
             .Include(o => o.FirmaDs)
             .Include(o => o.Platy);
@@ -222,7 +223,7 @@ inner join Firma_DS fds
         return await db.PuOrganizace
             .AsNoTracking()
             .Where(pu => pu.DS == tip.DS)
-            .Include(o => o.Metadata)
+            .Include(o => o.Metadata.Where(m => m.Typ == PuOrganizaceMetadata.TypMetadat.PlatyUredniku))
             .Include(o => o.Tags)
             //.Include(o => o.FirmaDs)
             .Include(o => o.Platy) // Include PuPlat
@@ -264,7 +265,7 @@ select distinct ds.DatovaSchranka, f.ico from firma f
             .AsNoTracking()
             .Where(t => tag == null || t.Tag.Equals(tag))
             .Include(t => t.Organizace).ThenInclude(o => o.FirmaDs)
-            .Include(t => t.Organizace).ThenInclude(o => o.Metadata)
+            .Include(t => t.Organizace).ThenInclude(o => o.Metadata.Where(m => m.Typ == PuOrganizaceMetadata.TypMetadat.PlatyUredniku))
             .Include(t => t.Organizace).ThenInclude(o => o.Platy)
             .Select(t => t.Organizace);
 

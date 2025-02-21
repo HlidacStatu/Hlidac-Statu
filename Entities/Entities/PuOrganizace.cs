@@ -1,3 +1,4 @@
+using System;
 using Devmasters;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -30,6 +31,13 @@ public class PuOrganizace
     public virtual ICollection<PuOrganizaceMetadata> Metadata { get; set; }
 
 
+    public bool HasMetadataForYear(int year, PuOrganizaceMetadata.TypMetadat typMetadat)
+    {
+        if (Metadata == null || Metadata.Count == 0) 
+            throw new Exception($"No metadata found for this organizace DS={DS}. Did you loaded it?");
+        
+        return Metadata.Any(m => m.Rok == year && m.Typ == typMetadat);
+    }
 
     public string GetUrl(bool relative = false)
     {
