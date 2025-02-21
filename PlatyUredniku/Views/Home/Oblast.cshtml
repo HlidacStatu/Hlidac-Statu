@@ -11,11 +11,13 @@
 
     List<PuOrganizace> goodOrgs = new();
     List<PuOrganizace> badOrgs = new();
+    List<PuOrganizace> notAskedOrgs = new();
     var neaktivniOrg = PuRepo.GetNeaktivniOrganizace().ToArray();
     if (Model is not null && Model.Any())
     {
-        goodOrgs = Model.Where(o => o.Platy.AktualniRok().Any()).ToList();
-        badOrgs = Model.Where(o => !o.Platy.AktualniRok().Any()).ToList();
+        goodOrgs = Model.Where(o => o.Platy.AktualniRok().Any()).OrderBy(o => o.Nazev).ToList();
+        badOrgs = Model.Where(o => !o.Platy.AktualniRok().Any() && o.Metadata.AktualniRok().Any()).OrderBy(o => o.Nazev).ToList();
+        notAskedOrgs = Model.Where(o => !o.Platy.AktualniRok().Any() && !o.Metadata.AktualniRok().Any()).OrderBy(o => o.Nazev).ToList();
     }
 
     var aktualniPlaty = goodOrgs.SelectMany(o => o.Platy.AktualniRok()).ToList();
@@ -69,7 +71,7 @@
                     <table class="table table-sm">
                         <tbody>
                             @{
-                                var sorted = badOrgs.Concat(Model.Where(m => m.Platy.AktualniRok().Count > 0).OrderBy(o => o.Nazev));
+                                var sorted = badOrgs.Concat(goodOrgs).Concat(notAskedOrgs);
                             }
                             @foreach (var org in sorted)
                             {
@@ -85,12 +87,19 @@
                                         else
                                         {
                                             <span>
-                                                @Html.Raw(Devmasters.Lang.CS.Plural.GetWithZero(org.Platy.AktualniRok().Count,
-                                                     "<span class='text-danger'><i class='fa-solid fa-circle-xmark'></i> Odmítli poskytnout platy</span>",
-                                                     "<span class='text-warning'><i class='fa-solid fa-circle-exclamation'></i></span> Evidujeme jeden plat jedné pozice",
-                                                     $"<span class='text-success'><i class='fa-solid fa-badge-check'></span></i> {{0}} platy",
-                                                     $"<span class='text-success'><i class='fa-solid fa-badge-check'></span></i> {{0}} platů")
-                                                     ).
+                                                @if (notAskedOrgs.Contains(org))
+                                                {
+                                                    <span class='text-info'><i class='fa-solid fa-circle-exclamation'></i>Této organizace jsme se na platy neptali.</span>
+                                                }
+                                                else
+                                                {
+                                                    @Html.Raw(Devmasters.Lang.CS.Plural.GetWithZero(org.Platy.AktualniRok().Count,
+                                                        "<span class='text-danger'><i class='fa-solid fa-circle-xmark'></i> Odmítli poskytnout platy.</span>",
+                                                        "<span class='text-warning'><i class='fa-solid fa-circle-exclamation'></i></span> Evidujeme jeden plat jedné pozice.",
+                                                        $"<span class='text-success'><i class='fa-solid fa-badge-check'></span></i> {{0}} platy.",
+                                                        $"<span class='text-success'><i class='fa-solid fa-badge-check'></span></i> {{0}} platů.")
+                                                    )
+                                                }
                                             </span>
                                         }
                                     </td>

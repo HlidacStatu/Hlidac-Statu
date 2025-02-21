@@ -175,6 +175,7 @@ inner join Firma_DS fds
             .Include(o => o.Tags)
             .Include(o => o.FirmaDs)
             .Include(o => o.Platy) // Include PuPlat
+            .Include(o => o.PrijmyPolitiku) // Include PuPrijmyPolitiku
             .FirstOrDefaultAsync();
     }
 
@@ -231,6 +232,11 @@ inner join Firma_DS fds
     public static List<PuPlat> AktualniRok(this ICollection<PuPlat> platy, int rok = DefaultYear)
     {
         return platy?.Where(m => m.Rok == rok).ToList();
+    }
+    
+    public static List<PuOrganizaceMetadata> AktualniRok(this ICollection<PuOrganizaceMetadata> metadata, int rok = DefaultYear)
+    {
+        return metadata?.Where(m => m.Rok == rok).ToList();
     }
 
     /// <summary>

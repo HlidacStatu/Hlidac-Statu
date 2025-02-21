@@ -1,5 +1,3 @@
-using Devmasters.Collections;
-using HlidacStatu.Connectors;
 using HlidacStatu.Entities;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -51,7 +49,7 @@ public static class PpRepo
             .FirstOrDefaultAsync();
     }
 
-    public static async Task<PuPolitikPrijem> GetPlatAsync(int idOrganizace, int rok, string nazevFunkce)
+    public static async Task<PuPolitikPrijem> GetPlatAsync(int idOrganizace, int rok, string nameid)
     {
         await using var db = new DbEntities();
 
@@ -59,7 +57,7 @@ public static class PpRepo
             .AsNoTracking()
             .FirstOrDefaultAsync(p => p.IdOrganizace == idOrganizace
                                       && p.Rok == rok
-                                      && p.NazevFunkce == nazevFunkce);
+                                      && p.Nameid == nameid);
     }
 
 
@@ -183,9 +181,12 @@ public static class PpRepo
         {
             throw new Exception("Chybí vyplněné id organizace");
         }
-
-        prijemPolitika.NazevFunkce = prijemPolitika.NazevFunkce.Trim();
-
+        
+        if (string.IsNullOrWhiteSpace(prijemPolitika.Nameid))
+        {
+            throw new Exception("Chybí vyplněné nameid");
+        }
+        
         PuPolitikPrijem origPlat;
 
         await using var dbContext = new DbEntities();
@@ -211,12 +212,12 @@ public static class PpRepo
             origPlat.NazevFunkce = prijemPolitika.NazevFunkce;
             origPlat.Plat = prijemPolitika.Plat;
             origPlat.Odmeny = prijemPolitika.Odmeny;
+            origPlat.Prispevky = prijemPolitika.Prispevky;
             origPlat.DisplayOrder = prijemPolitika.DisplayOrder;
-            origPlat.NefinancniBonus = prijemPolitika.NefinancniBonus;
             origPlat.PocetMesicu = prijemPolitika.PocetMesicu;
+            origPlat.NefinancniBonus = prijemPolitika.NefinancniBonus;
             origPlat.PoznamkaPlat = prijemPolitika.PoznamkaPlat;
             origPlat.SkrytaPoznamka = prijemPolitika.SkrytaPoznamka;
-            origPlat.Prispevky = prijemPolitika.Prispevky;
             origPlat.Uvolneny = prijemPolitika.Uvolneny;
             origPlat.NahradaAdministrativa = prijemPolitika.NahradaAdministrativa;
             origPlat.NahradaAsistent = prijemPolitika.NahradaAsistent;
@@ -225,6 +226,7 @@ public static class PpRepo
             origPlat.NahradaReprezentace = prijemPolitika.NahradaReprezentace;
             origPlat.NahradaTelefon = prijemPolitika.NahradaTelefon;
             origPlat.NahradaUbytovani = prijemPolitika.NahradaUbytovani;
+            
         }
 
         await dbContext.SaveChangesAsync();
