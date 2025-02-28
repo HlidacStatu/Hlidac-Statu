@@ -5,7 +5,15 @@
 <div class="form-search">
     <label class="sr-only" for="I">Hledat v dotac&#xED;ch</label>
 
-    <div class="hlidac-autocomplete d-flex">
+    <div class="hlidac-autocomplete d-flex" id="dotace-ac-old">
+        <form method="get">
+            <input value="@ViewBag.Query" id="Q" name="Q" type="text" class="header__search__input" placeholder='Napište vyhledávaný výraz nebo stiskněte tlačítko "Hledat"'>
+            <input type="hidden" name="u" value="2"/>
+            <button formaction="/hledat" class="btn btn-primary" style="margin-bottom:0;margin-top:0;padding-bottom:0">Hledat</button>
+        </form>
+    </div>
+    
+    <div class="hlidac-autocomplete d-flex" id="dotace-ac-new">
         <select id="autocomplete-dotace" autocomplete="off" placeholder='Napište vyhledávaný výraz nebo stiskněte tlačítko "Hledat"'></select>
         <button id="sendDotaceQuery" class="btn btn-primary" style="margin-bottom:0;margin-top:0;padding-bottom:0">Hledat
             <span id="searchSpiner" style="display: none" class="spinner-border spinner-border-sm text-light align-middle mb-1 ms-1" role="status">
@@ -13,6 +21,16 @@
             </span>
         </button>
     </div>
+
+    <div>
+        <button class="header__search__hint btn btn-link dotace-ac-new" style="margin-right: 5px; text-decoration: none; padding-top: 2px; font-size: 15px;color:#FFBF66">
+            <i class="fas fa-blind"></i> Přepnout na vyhledávání bez našeptávače
+        </button>
+        <button class="header__search__hint btn btn-link dotace-ac-old" style="margin-right: 5px; text-decoration: none; padding-top: 2px; font-size: 15px;color:#FFBF66">
+            <i class="fas fa-baby"></i> Přepnout na vyhledávání s našeptávačem
+        </button>
+    </div>
+    
     
     <div class="row">
         <div class="col-sm-10 col-xs-12">
@@ -44,5 +62,48 @@ $(document).ready(function () {
 
     // You can now initialize multiple instances with different selectors if needed
     // const autocomplete2 = new AutocompleteManager('#anotherAutocomplete');
+    var defaultSearch = parseInt(readCookie("defaultDotaceSearch"));
+
+    if (isNaN(defaultSearch) || defaultSearch === 0) {
+        $('#dotace-ac-old').removeClass('d-flex').addClass('d-none');
+        $('#dotace-ac-new').removeClass('d-none').addClass('d-flex');
+        $('button.dotace-ac-old').addClass('d-none');
+        $('button.dotace-ac-new').removeClass('d-none');
+    } else {
+        $('#dotace-ac-old').removeClass('d-none').addClass('d-flex');
+        $('#dotace-ac-new').removeClass('d-flex').addClass('d-none');
+        $('button.dotace-ac-old').removeClass('d-none');
+        $('button.dotace-ac-new').addClass('d-none');
+    }
+
+    $('button.dotace-ac-old').click(toggleDotaceSearchComponent);
+    $('button.dotace-ac-new').click(toggleDotaceSearchComponent);
 });
+
+function toggleDotaceSearchComponent() {
+    var isOldVisible = $('#dotace-ac-old').hasClass('d-none');
+
+    if (isOldVisible) {
+        $('#dotace-ac-old').removeClass('d-none').addClass('d-flex');
+        $('#dotace-ac-new').removeClass('d-flex').addClass('d-none');
+        $('button.dotace-ac-old').removeClass('d-none');
+        $('button.dotace-ac-new').addClass('d-none');
+        setOldDotaceSearchAsDefault();
+    } else {
+        $('#dotace-ac-old').removeClass('d-flex').addClass('d-none');
+        $('#dotace-ac-new').removeClass('d-none').addClass('d-flex');
+        $('button.dotace-ac-old').addClass('d-none');
+        $('button.dotace-ac-new').removeClass('d-none');
+        setNewDotaceSearchAsDefault();
+    }
+}
+
+function setOldDotaceSearchAsDefault() {
+    createCookie("defaultDotaceSearch", 1, 60);
+}
+
+function setNewDotaceSearchAsDefault() {
+    createCookie("defaultDotaceSearch", 0, 60);
+}
+
 </script>
