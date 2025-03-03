@@ -6,10 +6,10 @@
     <label class="sr-only" for="I">Hledat v dotac&#xED;ch</label>
 
     <div class="hlidac-autocomplete d-flex" id="dotace-ac-old">
-        <form method="get">
-            <input value="@ViewBag.Query" id="Q" name="Q" type="text" class="header__search__input" placeholder='Napište vyhledávaný výraz nebo stiskněte tlačítko "Hledat"'>
+        <form method="get" class="d-flex w-100">
+            <input value="@ViewBag.Query" id="Q" name="Q" type="text" class="header__search__input d-flex w-100" placeholder='Napište vyhledávaný výraz nebo stiskněte tlačítko "Hledat"'>
             <input type="hidden" name="u" value="2"/>
-            <button formaction="/hledat" class="btn btn-primary" style="margin-bottom:0;margin-top:0;padding-bottom:0">Hledat</button>
+            <button formaction="/dotace/hledat" class="btn btn-primary" style="margin-bottom:0;margin-top:0;padding-bottom:0">Hledat</button>
         </form>
     </div>
     
@@ -23,26 +23,15 @@
     </div>
 
     <div>
-        <button class="header__search__hint btn btn-link dotace-ac-new" style="margin-right: 5px; text-decoration: none; padding-top: 2px; font-size: 15px;color:#FFBF66">
+        <button class="header__search__hint btn btn-link dotace-ac-new" style="margin-right: 5px; text-decoration: none; padding-top: 0px; font-size: 15px; border: none !important">
             <i class="fas fa-blind"></i> Přepnout na vyhledávání bez našeptávače
         </button>
-        <button class="header__search__hint btn btn-link dotace-ac-old" style="margin-right: 5px; text-decoration: none; padding-top: 2px; font-size: 15px;color:#FFBF66">
+        <button class="header__search__hint btn btn-link dotace-ac-old" style="margin-right: 5px; text-decoration: none; padding-top: 0px; font-size: 15px; border: none !important">
             <i class="fas fa-baby"></i> Přepnout na vyhledávání s našeptávačem
         </button>
     </div>
     
     
-    <div class="row">
-        <div class="col-sm-10 col-xs-12">
-        </div>
-        <div class="col-sm-2 col-xs-12">
-            <p>
-                <a class="form-search__hint float-end" href="/napoveda">
-                    Jak vyhledávat?
-                </a>
-            </p>
-        </div>
-    </div>
     <partial name="_SearchFormHelp" />
     
     <div class="clearfix" style="padding-bottom:20px;"></div>
