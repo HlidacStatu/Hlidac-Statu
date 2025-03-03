@@ -1,6 +1,6 @@
 ﻿using System.Text.RegularExpressions;
 
-namespace Regexes;
+namespace HlidacStatu.Regexes;
 
 public static partial class All
 {
@@ -14,6 +14,9 @@ public static partial class All
     public static partial Regex MatchPSC();
     [GeneratedRegex(@"([^,.\\:;/-]+)[,.\\:;/-] ?\1")]
     public static partial Regex MatchRepeatedTextWithDelimiter();
+    [GeneratedRegex(@"\b(\d\s*){4,8}\b")]
+    public static partial Regex MatchIcoWithPossibleSpacesInBetweenNumbers();
+    
     
     
     [GeneratedRegex(@"\s{1,}")]
