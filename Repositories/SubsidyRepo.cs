@@ -25,7 +25,7 @@ namespace HlidacStatu.Repositories
 
         private static readonly ConcurrentDictionary<string, SemaphoreSlim> _subsidyLocks = new();
         private static readonly SemaphoreSlim _deleteLock = new SemaphoreSlim(1, 1);
-        
+
 
         public static QueryContainer AddIsNotHiddenRule(QueryContainer query)
         {
@@ -53,11 +53,11 @@ namespace HlidacStatu.Repositories
             {
                 Logger.Debug($"Semaphore acquired for subsidy {subsidy.Id}");
                 await SaveThreadUnsafeAsync(subsidy, shouldRewrite);
-
             }
             catch (Exception e)
             {
-                Logger.Error(e, $"Failed to save subsidy with id=[{subsidy.Id}] from: {subsidy.Metadata.DataSource} - {subsidy.Metadata.FileName} - {subsidy.Metadata.RecordNumber}");
+                Logger.Error(e,
+                    $"Failed to save subsidy with id=[{subsidy.Id}] from: {subsidy.Metadata.DataSource} - {subsidy.Metadata.FileName} - {subsidy.Metadata.RecordNumber}");
             }
         }
 
@@ -343,12 +343,13 @@ namespace HlidacStatu.Repositories
 
             await BulkSaveSubsidiesToEs(allSubsidies);
         }
-        
-        private static void SetDuplicate(Subsidy subsidy, List<string> duplicates, List<string> hiddenDuplicates, string originalSubsidyId)
+
+        private static void SetDuplicate(Subsidy subsidy, List<string> duplicates, List<string> hiddenDuplicates,
+            string originalSubsidyId)
         {
-            if(string.IsNullOrEmpty(originalSubsidyId))
+            if (string.IsNullOrEmpty(originalSubsidyId))
                 return;
-                
+
             if (originalSubsidyId == subsidy.Id)
             {
                 //set as original
@@ -356,14 +357,13 @@ namespace HlidacStatu.Repositories
                 subsidy.Hints.OriginalSubsidyId = null;
                 subsidy.Hints.DuplicateCalculated = DateTime.Now;
                 subsidy.Hints.Duplicates = duplicates.Where(d => d != subsidy.Id).ToList();
-                subsidy.Hints.HiddenDuplicates = hiddenDuplicates.Where(d => d != subsidy.Id).ToList();;
-
+                subsidy.Hints.HiddenDuplicates = hiddenDuplicates.Where(d => d != subsidy.Id).ToList();
             }
             else
             {
                 //set as duplicate
                 subsidy.Hints.IsOriginal = false;
-                subsidy.Hints.OriginalSubsidyId = originalSubsidyId; 
+                subsidy.Hints.OriginalSubsidyId = originalSubsidyId;
                 subsidy.Hints.DuplicateCalculated = DateTime.Now;
                 subsidy.Hints.Duplicates = duplicates.Where(d => d != subsidy.Id).ToList();
                 subsidy.Hints.HiddenDuplicates = hiddenDuplicates.Where(d => d != subsidy.Id).ToList();
@@ -422,7 +422,7 @@ namespace HlidacStatu.Repositories
             var euFondyDuplicates = await euFondyDuplicateTask;
 
             var mergedDuplicates = hashDuplicates.ToList();
-            
+
             mergedDuplicates = mergedDuplicates.Concat(
                 originalIdDuplicates.Where(od => mergedDuplicates.Any(hd => hd.Id == od.Id) == false)).ToList();
             mergedDuplicates = mergedDuplicates.Concat(
@@ -431,65 +431,72 @@ namespace HlidacStatu.Repositories
                 euFondyDuplicates.Where(od => mergedDuplicates.Any(hd => hd.Id == od.Id) == false)).ToList();
 
             return mergedDuplicates;
-
         }
 
         private static async Task<List<Subsidy>> FindDuplicatesByHashAsync(Subsidy subsidy)
         {
-            //duplicity podle hashe můžeme hledat jen u firem, u lidí by to slučovalo nesmyslně
-            if (string.IsNullOrWhiteSpace(subsidy.Recipient.Ico))
-                return [];
-            
-            // Build the conditional query for ProjectCode OR ProgramCode OR ProjectName
-            QueryContainer projectQuery = null;
-            if (!string.IsNullOrWhiteSpace(subsidy.ProjectCodeHash))
-            {
-                projectQuery |=
-                    new QueryContainerDescriptor<Subsidy>().Term(t => t.ProjectCodeHash, subsidy.ProjectCodeHash);
-            }
-
-            if (!string.IsNullOrWhiteSpace(subsidy.ProjectNameHash))
-            {
-                projectQuery |=
-                    new QueryContainerDescriptor<Subsidy>().Term(t => t.ProjectNameHash, subsidy.ProjectNameHash);
-            }
-
-            if (projectQuery is null)
-                return [];
-
-            // Build the main query
-            var query = new QueryContainerDescriptor<Subsidy>()
-                .Bool(b => b
-                    .Must(
-                        m => m.Term(t => t.DuplaHash, subsidy.DuplaHash),
-                        m => projectQuery // Add the conditional query
-                    )
-                );
-
             try
             {
-                var res = await SubsidyClient.SearchAsync<Subsidy>(s => s
-                    .Size(9000)
-                    .Query(q => query)
-                );
+                //duplicity podle hashe můžeme hledat jen u firem, u lidí by to slučovalo nesmyslně
+                if (string.IsNullOrWhiteSpace(subsidy.Recipient.Ico))
+                    return [];
 
-                if (!res.IsValid) // try again
+                // Build the conditional query for ProjectCode OR ProgramCode OR ProjectName
+                QueryContainer projectQuery = null;
+                if (!string.IsNullOrWhiteSpace(subsidy.ProjectCodeHash))
                 {
-                    await Task.Delay(500);
-                    res = await SubsidyClient.SearchAsync<Subsidy>(s => s
+                    projectQuery |=
+                        new QueryContainerDescriptor<Subsidy>().Term(t => t.ProjectCodeHash, subsidy.ProjectCodeHash);
+                }
+
+                if (!string.IsNullOrWhiteSpace(subsidy.ProjectNameHash))
+                {
+                    projectQuery |=
+                        new QueryContainerDescriptor<Subsidy>().Term(t => t.ProjectNameHash, subsidy.ProjectNameHash);
+                }
+
+                if (projectQuery is null)
+                    return [];
+
+                // Build the main query
+                var query = new QueryContainerDescriptor<Subsidy>()
+                    .Bool(b => b
+                        .Must(
+                            m => m.Term(t => t.DuplaHash, subsidy.DuplaHash),
+                            m => projectQuery // Add the conditional query
+                        )
+                    );
+
+                try
+                {
+                    var res = await SubsidyClient.SearchAsync<Subsidy>(s => s
                         .Size(9000)
                         .Query(q => query)
                     );
-                }
 
-                return res.Documents
-                    .Where(d => $"{d.Metadata.FileName}_{d.Metadata.DataSource}" !=
-                                $"{subsidy.Metadata.FileName}_{subsidy.Metadata.DataSource}")
-                    .ToList();
+                    if (!res.IsValid) // try again
+                    {
+                        await Task.Delay(500);
+                        res = await SubsidyClient.SearchAsync<Subsidy>(s => s
+                            .Size(9000)
+                            .Query(q => query)
+                        );
+                    }
+
+                    return res.Documents
+                        .Where(d => $"{d.Metadata.FileName}_{d.Metadata.DataSource}" !=
+                                    $"{subsidy.Metadata.FileName}_{subsidy.Metadata.DataSource}")
+                        .ToList();
+                }
+                catch (Exception ex)
+                {
+                    Logger.Error(ex, $"Cant load duplicate subsidies for subsidyId={subsidy.Id}");
+                    return [];
+                }
             }
-            catch (Exception ex)
+            catch (Exception e)
             {
-                Logger.Error(ex, $"Cant load duplicate subsidies for subsidyId={subsidy.Id}");
+                Logger.Error(e, $"Problem when finding duplicates by hash. Id={subsidy.Id}");
                 return [];
             }
         }
@@ -498,193 +505,225 @@ namespace HlidacStatu.Repositories
         {
             "eufondy", "cedr", "isred", "dotinfo"
         };
+
         private static async Task<List<Subsidy>> FindDuplicatesByEuFondyProjectCode(Subsidy subsidy)
         {
-            //duplicity podle hashe můžeme hledat jen u firem, u lidí by to slučovalo nesmyslně
-            if (string.IsNullOrWhiteSpace(subsidy.Recipient.Ico))
-                return [];
-
-            if (!subsidy.ProjectCode.ToLower().StartsWith("cz")) //only EU fondy project codes like "CZ.03.2.60/0.0/0.0/15_022/0001007"
-                return [];
-
-            if (!EufondyDataSources.Contains(subsidy.Metadata.DataSource.ToLower())) //only EU fondy data sources
-                return [];
-
-            List<Subsidy> results = new();
-            // Build the main query
-            var query = new QueryContainerDescriptor<Subsidy>()
-                .Bool(b => b
-                    .Must(
-                        m => m.Term(t => t.Recipient.Ico, subsidy.Recipient.Ico),
-                        m => m.Term(t => t.ProjectCode.Suffix("keyword"), subsidy.ProjectCode)
-                    )
-                );
-
             try
             {
-                var res = await SubsidyClient.SearchAsync<Subsidy>(s => s
-                    .Size(9000)
-                    .Query(q => query)
-                );
+                //duplicity podle hashe můžeme hledat jen u firem, u lidí by to slučovalo nesmyslně
+                if (string.IsNullOrWhiteSpace(subsidy.Recipient.Ico))
+                    return [];
 
-                if (!res.IsValid) // try again
+                if (string.IsNullOrWhiteSpace(subsidy.ProjectCode))
+                    return [];
+
+                if (!subsidy.ProjectCode.ToLower()
+                        .StartsWith("cz")) //only EU fondy project codes like "CZ.03.2.60/0.0/0.0/15_022/0001007"
+                    return [];
+
+                if (!EufondyDataSources.Contains(subsidy.Metadata.DataSource.ToLower())) //only EU fondy data sources
+                    return [];
+
+                List<Subsidy> results = new();
+                // Build the main query
+                var query = new QueryContainerDescriptor<Subsidy>()
+                    .Bool(b => b
+                        .Must(
+                            m => m.Term(t => t.Recipient.Ico, subsidy.Recipient.Ico),
+                            m => m.Term(t => t.ProjectCode.Suffix("keyword"), subsidy.ProjectCode)
+                        )
+                    );
+
+                try
                 {
-                    await Task.Delay(500);
-                    res = await SubsidyClient.SearchAsync<Subsidy>(s => s
+                    var res = await SubsidyClient.SearchAsync<Subsidy>(s => s
                         .Size(9000)
                         .Query(q => query)
                     );
+
+                    if (!res.IsValid) // try again
+                    {
+                        await Task.Delay(500);
+                        res = await SubsidyClient.SearchAsync<Subsidy>(s => s
+                            .Size(9000)
+                            .Query(q => query)
+                        );
+                    }
+
+                    var firstRes = res.Documents
+                        .Where(d => $"{d.Metadata.FileName}_{d.Metadata.DataSource}" !=
+                                    $"{subsidy.Metadata.FileName}_{subsidy.Metadata.DataSource}")
+                        .Where(d => EufondyDataSources.Contains(d.Metadata.DataSource
+                            .ToLower())) //only EU fondy data sources
+                        .ToList();
+
+                    results.AddRange(firstRes);
+                }
+                catch (Exception ex)
+                {
+                    Logger.Error(ex, $"Cant load eufondy duplicates for subsidyId={subsidy.Id}");
+                    return results;
                 }
 
-                var firstRes = res.Documents
-                    .Where(d => $"{d.Metadata.FileName}_{d.Metadata.DataSource}" !=
-                                $"{subsidy.Metadata.FileName}_{subsidy.Metadata.DataSource}")
-                    .Where(d => EufondyDataSources.Contains(d.Metadata.DataSource.ToLower())) //only EU fondy data sources
-                    .ToList();
-                
-                results.AddRange(firstRes);
-            }
-            catch (Exception ex)
-            {
-                Logger.Error(ex, $"Cant load eufondy duplicates for subsidyId={subsidy.Id}");
-                return results;
-            }
-            
-            // Build the de minimis query
-            var deMinimisQuery = new QueryContainerDescriptor<Subsidy>()
-                .Bool(b => b
-                    .Must(
-                        m => m.Term(t => t.Recipient.Ico, subsidy.Recipient.Ico),
-                        m => m.MatchPhrase(mp => mp
-                            .Field(f => f.ProjectName)
-                            .Query(subsidy.ProjectCode)
+                // Build the de minimis query
+                var deMinimisQuery = new QueryContainerDescriptor<Subsidy>()
+                    .Bool(b => b
+                        .Must(
+                            m => m.Term(t => t.Recipient.Ico, subsidy.Recipient.Ico),
+                            m => m.MatchPhrase(mp => mp
+                                .Field(f => f.ProjectName)
+                                .Query(subsidy.ProjectCode)
+                            )
                         )
-                    )
-                );
+                    );
 
-            try
-            {
-                var deMinimisRes = await SubsidyClient.SearchAsync<Subsidy>(s => s
-                    .Size(9000)
-                    .Query(q => deMinimisQuery)
-                );
-
-                if (!deMinimisRes.IsValid) // try again
+                try
                 {
-                    await Task.Delay(500);
-                    deMinimisRes = await SubsidyClient.SearchAsync<Subsidy>(s => s
+                    var deMinimisRes = await SubsidyClient.SearchAsync<Subsidy>(s => s
                         .Size(9000)
                         .Query(q => deMinimisQuery)
                     );
+
+                    if (!deMinimisRes.IsValid) // try again
+                    {
+                        await Task.Delay(500);
+                        deMinimisRes = await SubsidyClient.SearchAsync<Subsidy>(s => s
+                            .Size(9000)
+                            .Query(q => deMinimisQuery)
+                        );
+                    }
+
+                    var secondRes = deMinimisRes.Documents
+                        .Where(d => $"{d.Metadata.FileName}_{d.Metadata.DataSource}" !=
+                                    $"{subsidy.Metadata.FileName}_{subsidy.Metadata.DataSource}")
+                        .Where(d => EufondyDataSources.Contains(d.Metadata.DataSource
+                            .ToLower())) //only EU fondy data sources
+                        .ToList();
+
+                    results.AddRange(secondRes);
+                }
+                catch (Exception ex)
+                {
+                    Logger.Error(ex, $"Cant load eufony duplicates from deminimis for subsidyId={subsidy.Id}");
+                    return results;
                 }
 
-                var secondRes = deMinimisRes.Documents
-                    .Where(d => $"{d.Metadata.FileName}_{d.Metadata.DataSource}" !=
-                                $"{subsidy.Metadata.FileName}_{subsidy.Metadata.DataSource}")
-                    .Where(d => EufondyDataSources.Contains(d.Metadata.DataSource.ToLower())) //only EU fondy data sources
-                    .ToList();
-                
-                results.AddRange(secondRes);
-            }
-            catch (Exception ex)
-            {
-                Logger.Error(ex, $"Cant load eufony duplicates from deminimis for subsidyId={subsidy.Id}");
                 return results;
             }
-
-            return results;
+            catch (Exception e)
+            {
+                Logger.Error(e, $"Problem when finding duplicates by EuFondyProjectCode. Id={subsidy.Id}");
+                return [];
+            }
         }
-        
+
         public static async Task<List<Subsidy>> FindDeMinimisDuplicates(Subsidy subsidy)
         {
-            //duplicity podle hashe můžeme hledat jen u firem, u lidí by to slučovalo nesmyslně
-            if (string.IsNullOrWhiteSpace(subsidy.Recipient.Ico))
-                return [];
-            
-            if(subsidy.Metadata.DataSource.ToLower() != "deminimis")
-                return [];
-            
-            var queryForDuplicates = new QueryContainerDescriptor<Subsidy>()
-                .Bool(b => b
-                    .Must(
-                        m => m.Term(t => t.Field("metadata.dataSource.keyword").Value("IsRed")),
-                        m => m.Term(t => t.Field(f => f.DuplaHash).Value(subsidy.DuplaHash))
-                    )
-                );
-
             try
             {
-                var res = await SubsidyClient.SearchAsync<Subsidy>(s => s
-                    .Size(9000)
-                    .Query(q => queryForDuplicates)
-                );
+                //duplicity podle hashe můžeme hledat jen u firem, u lidí by to slučovalo nesmyslně
+                if (string.IsNullOrWhiteSpace(subsidy.Recipient.Ico))
+                    return [];
 
-                if (!res.IsValid) // try again
+                if (subsidy.Metadata.DataSource.ToLower() != "deminimis")
+                    return [];
+
+                var queryForDuplicates = new QueryContainerDescriptor<Subsidy>()
+                    .Bool(b => b
+                        .Must(
+                            m => m.Term(t => t.Field("metadata.dataSource.keyword").Value("IsRed")),
+                            m => m.Term(t => t.Field(f => f.DuplaHash).Value(subsidy.DuplaHash))
+                        )
+                    );
+
+                try
                 {
-                    await Task.Delay(500);
-                    res = await SubsidyClient.SearchAsync<Subsidy>(s => s
+                    var res = await SubsidyClient.SearchAsync<Subsidy>(s => s
                         .Size(9000)
                         .Query(q => queryForDuplicates)
                     );
-                }
-                
-                if(res.Documents.Count == 0)
-                    return [];
 
-                //check if project code is in project name
-                var returnList = res.Documents.ToList();
-                returnList = returnList
-                    .Where(
-                        s => subsidy.ProjectName.Contains(s.ProjectCode, StringComparison.InvariantCultureIgnoreCase))
-                    .ToList();
-                
-                if(!returnList.Any())
+                    if (!res.IsValid) // try again
+                    {
+                        await Task.Delay(500);
+                        res = await SubsidyClient.SearchAsync<Subsidy>(s => s
+                            .Size(9000)
+                            .Query(q => queryForDuplicates)
+                        );
+                    }
+
+                    if (res.Documents.Count == 0)
+                        return [];
+
+                    //check if project code is in project name
+                    var returnList = res.Documents.ToList();
+                    returnList = returnList
+                        .Where(
+                            s => subsidy.ProjectName.Contains(s.ProjectCode,
+                                StringComparison.InvariantCultureIgnoreCase))
+                        .ToList();
+
+                    if (!returnList.Any())
+                        return [];
+
+                    returnList.Add(subsidy);
+                    return returnList;
+                }
+                catch (Exception ex)
+                {
+                    Logger.Error(ex, $"Cant load duplicate subsidies for subsidyId={subsidy.Id}");
                     return [];
-                
-                returnList.Add(subsidy);
-                return returnList;
+                }
             }
-            catch (Exception ex)
+            catch (Exception e)
             {
-                Logger.Error(ex, $"Cant load duplicate subsidies for subsidyId={subsidy.Id}");
+                Logger.Error(e, $"Problem when finding duplicates in DeMinimis. Id={subsidy.Id}");
                 return [];
             }
         }
 
         public static async Task<List<Subsidy>> FindDuplicatesByOriginalIdAsync(Subsidy subsidy)
         {
-            if (string.IsNullOrWhiteSpace(subsidy.OriginalId))
-                return [];
-
-            // Build the main query
-            var query = new QueryContainerDescriptor<Subsidy>()
-                .Bool(b => b
-                    .Must(
-                        m => m.Term(t => t.OriginalId, subsidy.OriginalId)
-                    )
-                );
-
             try
             {
-                var res = await SubsidyClient.SearchAsync<Subsidy>(s => s
-                    .Size(9000)
-                    .Query(q => query)
-                );
+                if (string.IsNullOrWhiteSpace(subsidy.OriginalId))
+                    return [];
 
-                if (!res.IsValid) // try again
+                // Build the main query
+                var query = new QueryContainerDescriptor<Subsidy>()
+                    .Bool(b => b
+                        .Must(
+                            m => m.Term(t => t.OriginalId, subsidy.OriginalId)
+                        )
+                    );
+
+                try
                 {
-                    await Task.Delay(500);
-                    res = await SubsidyClient.SearchAsync<Subsidy>(s => s
+                    var res = await SubsidyClient.SearchAsync<Subsidy>(s => s
                         .Size(9000)
                         .Query(q => query)
                     );
-                }
 
-                return res.Documents.ToList();
+                    if (!res.IsValid) // try again
+                    {
+                        await Task.Delay(500);
+                        res = await SubsidyClient.SearchAsync<Subsidy>(s => s
+                            .Size(9000)
+                            .Query(q => query)
+                        );
+                    }
+
+                    return res.Documents.ToList();
+                }
+                catch (Exception ex)
+                {
+                    Logger.Error(ex, $"Cant load duplicate subsidies for subsidyId={subsidy.Id}");
+                    return [];
+                }
             }
-            catch (Exception ex)
+            catch (Exception e)
             {
-                Logger.Error(ex, $"Cant load duplicate subsidies for subsidyId={subsidy.Id}");
+                Logger.Error(e, $"Problem when finding duplicates by Original ID. Id={subsidy.Id}");
                 return [];
             }
         }
