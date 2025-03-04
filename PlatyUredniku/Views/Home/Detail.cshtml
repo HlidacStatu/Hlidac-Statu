@@ -417,89 +417,179 @@
 
     <section class="d-flex justify-content-center @(sectionBgSwitch ? "alter-bg-color" : "")">
         <div class="container">
-            <h3>Detaily komunikace instituce ohledně platů</h3>
-            <div class="nav flex-row nav-pills my-5" id="v-meta-pills-tab" role="tablist">
-                <button class="nav-link disabled" type="button" disabled="disabled">Rok</button>
-                @{
-                    string metadataClassAttributes = "nav-link active";
+            <div class="row">
+                <div class="@((this.User.IsInRole("Admin") && Model.MetadataPrijmyPolitiku.Any()) ? "col-md-6" : "")">
+                    <h3>Detaily komunikace instituce ohledně platů</h3>
+                    <div class="nav flex-row nav-pills my-5" id="v-meta-pills-tab" role="tablist">
+                        <button class="nav-link disabled" type="button" disabled="disabled">Rok</button>
+                        @{
+                            string metadataClassAttributes = "nav-link active";
 
-                    foreach (var metadata in Model.Metadata.OrderByDescending(m => m.Rok))
-                    {
-                        <button class="@metadataClassAttributes"
-                                id="meta-year-@metadata.Rok-tab"
-                                data-bs-toggle="pill"
-                                data-bs-target="#meta-year-@metadata.Rok"
-                                type="button"
-                                role="tab">
-                            @metadata.Rok
-                        </button>
+                            foreach (var metadata in Model.MetadataPlatyUredniku.OrderByDescending(m => m.Rok))
+                            {
+                                <button class="@metadataClassAttributes"
+                                        id="meta-year-@metadata.Rok-tab"
+                                        data-bs-toggle="pill"
+                                        data-bs-target="#meta-year-@metadata.Rok"
+                                        type="button"
+                                        role="tab">
+                                    @metadata.Rok
+                                </button>
 
-                        metadataClassAttributes = "nav-link";
-                    }
-                }
-            </div>
-            <div class="tab-content width-75vp">
-                @{
-                    metadataClassAttributes = "tab-pane width-75vp fade show active";
+                                metadataClassAttributes = "nav-link";
+                            }
+                        }
+                    </div>
+                    <div class="tab-content width-75vp">
+                        @{
+                            metadataClassAttributes = "tab-pane width-75vp fade show active";
 
-                    foreach (var metadataForYear in Model.Metadata.OrderByDescending(m => m.Rok))
-                    {
-                        <div class="@metadataClassAttributes" id="meta-year-@metadataForYear.Rok" role="tabpanel">
-                            <div>
-                                <div class="row g-4 py-5 row-cols-1 row-cols-lg-3">
-                                    <div class="col d-flex align-items-start">
-                                        <div class="icon-square text-body-emphasis bg-body-secondary d-inline-flex align-items-center justify-content-center fs-4 flex-shrink-0 me-3">
-                                            <svg class="bi" width="1em" height="1em">
-                                                <use xlink:href="#toggles2"></use>
-                                            </svg>
-                                        </div>
-                                        <div>
-                                            <h4 class="fw-bold">Doba trvání</h4>
-                                            <p>
-                                                Žádost o výši platů jsme odeslali @(metadataForYear.DatumOdeslaniZadosti?.ToString("dd.MM.yyyy"))
-                                                @if (metadataForYear.DatumPrijetiOdpovedi.HasValue)
-                                                {
-                                                    <span>
-                                                        a odpověď obdrželi po
-                                                        @(Devmasters.Lang.CS.Plural.Get((int)(metadataForYear.DatumPrijetiOdpovedi.Value - metadataForYear.DatumOdeslaniZadosti.Value).TotalDays, "jednom dni", "{0} dnech", "{0} dnech")).
-                                                    </span>
-                                                }
-                                            </p>
+                            foreach (var metadataForYear in Model.MetadataPlatyUredniku.OrderByDescending(m => m.Rok))
+                            {
+                                <div class="@metadataClassAttributes" id="meta-year-@metadataForYear.Rok" role="tabpanel">
+                                    <div>
+                                        <div class="row g-4 py-5 row-cols-1 row-cols-lg-3">
+                                            <div class="col d-flex align-items-start">
+                                                <div class="icon-square text-body-emphasis bg-body-secondary d-inline-flex align-items-center justify-content-center fs-4 flex-shrink-0 me-3">
+                                                    <svg class="bi" width="1em" height="1em">
+                                                        <use xlink:href="#toggles2"></use>
+                                                    </svg>
+                                                </div>
+                                                <div>
+                                                    <h4 class="fw-bold">Doba trvání</h4>
+                                                    <p>
+                                                        Žádost o výši platů jsme odeslali @(metadataForYear.DatumOdeslaniZadosti?.ToString("dd.MM.yyyy"))
+                                                        @if (metadataForYear.DatumPrijetiOdpovedi.HasValue)
+                                                        {
+                                                            <span>
+                                                                a odpověď obdrželi po
+                                                                @(Devmasters.Lang.CS.Plural.Get((int)(metadataForYear.DatumPrijetiOdpovedi.Value - metadataForYear.DatumOdeslaniZadosti.Value).TotalDays, "jednom dni", "{0} dnech", "{0} dnech")).
+                                                            </span>
+                                                        }
+                                                    </p>
+                                                </div>
+                                            </div>
+
+                                            <div class="col d-flex align-items-start">
+                                                <div class="icon-square text-body-emphasis bg-body-secondary d-inline-flex align-items-center justify-content-center fs-4 flex-shrink-0 me-3">
+                                                    <svg class="bi" width="1em" height="1em">
+                                                        <use xlink:href="#cpu-fill"></use>
+                                                    </svg>
+                                                </div>
+                                                <div>
+                                                    <h4 class="fw-bold">Zdůvodnění mimořádných odměn</h4>
+                                                    <p>Součástí naší žádosti byl požadavek na zaslání odůvodnění mimořádných odměn pracovníků. Toto odůvodnění jsme @(metadataForYear.ZduvodneniMimoradnychOdmen == true ? "dostali" : "nedostali").</p>
+                                                </div>
+                                            </div>
+
+                                            @if (!string.IsNullOrWhiteSpace(metadataForYear.PoznamkaHlidace))
+                                            {
+                                                <div class="col d-flex align-items-start">
+                                                    <div class="icon-square text-body-emphasis bg-body-secondary d-inline-flex align-items-center justify-content-center fs-4 flex-shrink-0 me-3">
+                                                        <svg class="bi" width="1em" height="1em">
+                                                            <use xlink:href="#cpu-fill"></use>
+                                                        </svg>
+                                                    </div>
+                                                    <div>
+                                                        <h4 class="fw-bold">Poznámka Hlídače</h4>
+                                                        <p>@metadataForYear.PoznamkaHlidace</p>
+                                                    </div>
+                                                </div>
+                                            }
                                         </div>
                                     </div>
-
-                                    <div class="col d-flex align-items-start">
-                                        <div class="icon-square text-body-emphasis bg-body-secondary d-inline-flex align-items-center justify-content-center fs-4 flex-shrink-0 me-3">
-                                            <svg class="bi" width="1em" height="1em">
-                                                <use xlink:href="#cpu-fill"></use>
-                                            </svg>
-                                        </div>
-                                        <div>
-                                            <h4 class="fw-bold">Zdůvodnění mimořádných odměn</h4>
-                                            <p>Součástí naší žádosti byl požadavek na zaslání odůvodnění mimořádných odměn pracovníků. Toto odůvodnění jsme @(metadataForYear.ZduvodneniMimoradnychOdmen == true ? "dostali" : "nedostali").</p>
-                                        </div>
-                                    </div>
-
-                                    @if (!string.IsNullOrWhiteSpace(metadataForYear.PoznamkaHlidace))
-                                    {
-                                        <div class="col d-flex align-items-start">
-                                            <div class="icon-square text-body-emphasis bg-body-secondary d-inline-flex align-items-center justify-content-center fs-4 flex-shrink-0 me-3">
-                                                <svg class="bi" width="1em" height="1em">
-                                                    <use xlink:href="#cpu-fill"></use>
-                                                </svg>
-                                            </div>
-                                            <div>
-                                                <h4 class="fw-bold">Poznámka Hlídače</h4>
-                                                <p>@metadataForYear.PoznamkaHlidace</p>
-                                            </div>
-                                        </div>
-                                    }
                                 </div>
-                            </div>
-                        </div>
-                        metadataClassAttributes = "tab-pane width-75vp";
-                    }
-                }
+                                metadataClassAttributes = "tab-pane width-75vp";
+                            }
+                        }
+                    </div>
+                </div>
+                <div class="@((this.User.IsInRole("Admin") && Model.MetadataPlatyUredniku.Any()) ? "col-md-6" : "") @(Model.MetadataPrijmyPolitiku.Any() ? "" : "d-none")">
+                    <h3>Detaily komunikace instituce ohledně příjmů politiků</h3>
+                    <div class="nav flex-row nav-pills my-5" id="v-meta-pills-tab" role="tablist">
+                        <button class="nav-link disabled" type="button" disabled="disabled">Rok</button>
+                        @{
+                            string metadataPrijmyClassAttributes = "nav-link active";
+
+                            foreach (var metadata in Model.MetadataPrijmyPolitiku.OrderByDescending(m => m.Rok))
+                            {
+                                <button class="@metadataPrijmyClassAttributes"
+                                        id="meta-year-@metadata.Rok-tab"
+                                        data-bs-toggle="pill"
+                                        data-bs-target="#meta-year-@metadata.Rok"
+                                        type="button"
+                                        role="tab">
+                                    @metadata.Rok
+                                </button>
+
+                                metadataPrijmyClassAttributes = "nav-link";
+                            }
+                        }
+                    </div>
+                    <div class="tab-content width-75vp">
+                        @{
+                            metadataPrijmyClassAttributes = "tab-pane width-75vp fade show active";
+
+                            foreach (var metadataForYear in Model.MetadataPrijmyPolitiku.OrderByDescending(m => m.Rok))
+                            {
+                                <div class="@metadataPrijmyClassAttributes" id="meta-year-@metadataForYear.Rok" role="tabpanel">
+                                    <div>
+                                        <div class="row g-4 py-5 row-cols-1 row-cols-lg-3">
+                                            <div class="col d-flex align-items-start">
+                                                <div class="icon-square text-body-emphasis bg-body-secondary d-inline-flex align-items-center justify-content-center fs-4 flex-shrink-0 me-3">
+                                                    <svg class="bi" width="1em" height="1em">
+                                                        <use xlink:href="#toggles2"></use>
+                                                    </svg>
+                                                </div>
+                                                <div>
+                                                    <h4 class="fw-bold">Doba trvání</h4>
+                                                    <p>
+                                                        Žádost o výši platů jsme odeslali @(metadataForYear.DatumOdeslaniZadosti?.ToString("dd.MM.yyyy"))
+                                                        @if (metadataForYear.DatumPrijetiOdpovedi.HasValue)
+                                                        {
+                                                            <span>
+                                                                a odpověď obdrželi po
+                                                                @(Devmasters.Lang.CS.Plural.Get((int)(metadataForYear.DatumPrijetiOdpovedi.Value - metadataForYear.DatumOdeslaniZadosti.Value).TotalDays, "jednom dni", "{0} dnech", "{0} dnech")).
+                                                            </span>
+                                                        }
+                                                    </p>
+                                                </div>
+                                            </div>
+
+                                            <div class="col d-flex align-items-start">
+                                                <div class="icon-square text-body-emphasis bg-body-secondary d-inline-flex align-items-center justify-content-center fs-4 flex-shrink-0 me-3">
+                                                    <svg class="bi" width="1em" height="1em">
+                                                        <use xlink:href="#cpu-fill"></use>
+                                                    </svg>
+                                                </div>
+                                                <div>
+                                                    <h4 class="fw-bold">Zdůvodnění mimořádných odměn</h4>
+                                                    <p>Součástí naší žádosti byl požadavek na zaslání odůvodnění mimořádných odměn pracovníků. Toto odůvodnění jsme @(metadataForYear.ZduvodneniMimoradnychOdmen == true ? "dostali" : "nedostali").</p>
+                                                </div>
+                                            </div>
+
+                                            @if (!string.IsNullOrWhiteSpace(metadataForYear.PoznamkaHlidace))
+                                            {
+                                                <div class="col d-flex align-items-start">
+                                                    <div class="icon-square text-body-emphasis bg-body-secondary d-inline-flex align-items-center justify-content-center fs-4 flex-shrink-0 me-3">
+                                                        <svg class="bi" width="1em" height="1em">
+                                                            <use xlink:href="#cpu-fill"></use>
+                                                        </svg>
+                                                    </div>
+                                                    <div>
+                                                        <h4 class="fw-bold">Poznámka Hlídače</h4>
+                                                        <p>@metadataForYear.PoznamkaHlidace</p>
+                                                    </div>
+                                                </div>
+                                            }
+                                        </div>
+                                    </div>
+                                </div>
+                                metadataPrijmyClassAttributes = "tab-pane width-75vp";
+                            }
+                        }
+                    </div>
+                </div>
             </div>
         </div>
     </section>

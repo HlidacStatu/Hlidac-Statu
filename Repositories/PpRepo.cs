@@ -16,17 +16,19 @@ public static class PpRepo
     {
         return await GetFullDetailAsync(new string[] { datovaSchranka });
     }
-    public static async Task<PuOrganizace> GetFullDetailAsync(string[] datovaSchranky)
+    
+    public static async Task<PuOrganizace> GetFullDetailAsync(string[] datoveSchranky)
     {
         await using var db = new DbEntities();
 
         return await db.PuOrganizace
             .AsNoTracking()
-            .Where(pu => datovaSchranky.Contains(pu.DS) )
-            .Include(o => o.Metadata.Where(m => m.Typ == PuOrganizaceMetadata.TypMetadat.PlatyPolitiku))
+            .Where(pu => datoveSchranky.Contains(pu.DS) )
+            .Include(o => o.Metadata)
             .Include(o => o.Tags)
             .Include(o => o.FirmaDs)
             .Include(o => o.Platy) // Include PuPlat
+            .Include(o => o.PrijmyPolitiku) // Include PuPrijmyPolitiku
             .FirstOrDefaultAsync();
     }
 

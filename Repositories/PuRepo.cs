@@ -172,7 +172,7 @@ inner join Firma_DS fds
         return await db.PuOrganizace
             .AsNoTracking()
             .Where(pu => datovaSchranky.Contains(pu.DS) )
-            .Include(o => o.Metadata.Where(m => m.Typ == PuOrganizaceMetadata.TypMetadat.PlatyUredniku))
+            .Include(o => o.Metadata)
             .Include(o => o.Tags)
             .Include(o => o.FirmaDs)
             .Include(o => o.Platy) // Include PuPlat
@@ -186,10 +186,11 @@ inner join Firma_DS fds
 
         IQueryable<PuOrganizace> query = db.PuOrganizace
             .AsNoTracking()
-            .Include(o => o.Metadata.Where(m => m.Typ == PuOrganizaceMetadata.TypMetadat.PlatyUredniku))
+            .Include(o => o.Metadata)
             .Include(o => o.Tags)
             .Include(o => o.FirmaDs)
-            .Include(o => o.Platy);
+            .Include(o => o.Platy)
+            .Include(o => o.PrijmyPolitiku);
 
         if (!string.IsNullOrEmpty(datovaSchranka))
         {

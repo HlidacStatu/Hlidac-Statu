@@ -44,4 +44,9 @@ public class PuOrganizace
         var url = $"/Detail/{this.DS}";
         return relative ? url : "https://platyuredniku.hlidacstatu.cz" + url;
     }
+
+    public IEnumerable<PuOrganizaceMetadata> MetadataPlatyUredniku =>
+        Metadata.Where(m => m.Typ == PuOrganizaceMetadata.TypMetadat.PlatyUredniku);
+    public IEnumerable<PuOrganizaceMetadata> MetadataPrijmyPolitiku =>
+        Metadata.Where(m => m.Typ == PuOrganizaceMetadata.TypMetadat.PlatyUredniku);
 }
