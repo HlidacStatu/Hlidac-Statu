@@ -180,8 +180,7 @@ namespace HlidacStatu.Repositories
             .Concat(oblasti)
             .Concat(synonyms)
             .Concat(operators)
-            //.Concat(articles)
-            ;
+            .Concat(dotacePrograms);
         }
 
         //používá se v administraci eventů pro naše politiky
