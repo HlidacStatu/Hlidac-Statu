@@ -26,7 +26,7 @@ namespace HlidacStatu.Repositories
         }
 
         public static readonly int[] DefaultLimitedYears = Enumerable.Range(2010, DateTime.Now.Year - 2010).ToArray();
-        public static readonly int[] DefaultKrajskeLimitedYears = Enumerable.Range(2021, DateTime.Now.Year - 2010).ToArray();
+        public static readonly int[] DefaultKrajskeLimitedYears = Enumerable.Range(2021, DateTime.Now.Year - 2021).ToArray();
 
         public static async Task<List<ProgramStatistics>> ProgramStatisticAsync(string programName, string programCode)
         {
