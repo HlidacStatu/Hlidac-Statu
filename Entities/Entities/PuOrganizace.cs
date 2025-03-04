@@ -45,8 +45,10 @@ public class PuOrganizace
         return relative ? url : "https://platyuredniku.hlidacstatu.cz" + url;
     }
 
+    [NotMapped]
     public IEnumerable<PuOrganizaceMetadata> MetadataPlatyUredniku =>
         Metadata.Where(m => m.Typ == PuOrganizaceMetadata.TypMetadat.PlatyUredniku);
+    [NotMapped]
     public IEnumerable<PuOrganizaceMetadata> MetadataPrijmyPolitiku =>
         Metadata.Where(m => m.Typ == PuOrganizaceMetadata.TypMetadat.PlatyUredniku);
 }
