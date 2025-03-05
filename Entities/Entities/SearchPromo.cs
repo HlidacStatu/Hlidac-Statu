@@ -38,9 +38,12 @@ namespace HlidacStatu.Entities
 
         [Nest.Keyword]
         public string OsobaId { get; set; } = null;
+
         [Nest.Keyword]
         public string Ico { get; set; } = null;
 
+        [Nest.Date]
+        public DateTime Created { get; set; } = DateTime.Now;
 
     }
 }
