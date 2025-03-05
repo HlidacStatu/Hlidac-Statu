@@ -50,7 +50,7 @@ namespace HlidacStatu.Entities
 
             public string IdentifikaceFull()
             {
-                switch (this.identifikace.ToLowerInvariant())
+                switch (this.identifikace?.ToLowerInvariant())
                 {
                     case "fo":
                         return "fyzická osoba";

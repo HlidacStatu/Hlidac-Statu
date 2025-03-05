@@ -706,6 +706,42 @@ text zpravy: {txt}
 
             return View(sres);
         }
+        public async Task<ActionResult> Hledat2(string q, string order)
+        {
+
+            var res = await XLib.Search
+                .GeneralSearchAsync(q, 1, PartsToSearch.All,false, order, this.User, smlouvySize: Repositories.Searching.SearchDataResult<object>.DefaultPageSizeGlobal);
+            AuditRepo.Add(
+                Audit.Operations.UserSearch
+                , User?.Identity?.Name
+                , HlidacStatu.Util.RealIpAddress.GetIp(HttpContext)?.ToString()
+                , "General"
+                , res.IsValid ? "valid" : "invalid"
+                , q, null);
+
+            if (System.Diagnostics.Debugger.IsAttached ||
+                Devmasters.Config.GetWebConfigValue("LogSearchTimes") == "true")
+            {
+                _logger.Information($"Search times: {q}\n" + res.SearchTimesReport());
+
+                var data = res.SearchTimes();
+
+
+                // Set up some properties:
+
+                //foreach (var kv in data)
+                //{
+                //    var metrics = new Dictionary<string, double> { { "web-search-" + kv.Key, kv.Value.TotalMilliseconds } };
+                //    var props = new Dictionary<string, string> { { "query", q }, { "database", kv.Key } };
+
+                //    Metric elaps = _telemetryClient.GetMetric("web-GlobalSearch_Elapsed", "Database");
+                //    _telemetryClient.TrackEvent("web-GlobalSearch_Elapsed", props, metrics);
+                //    var ok = elaps.TrackValue(kv.Value.TotalMilliseconds, kv.Key);
+                //}
+            }
+            string viewName = "Hledat2";
+            return View(viewName, res);
+        }
 
         public async Task<ActionResult> Hledat(string q, string order)
         {

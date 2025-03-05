@@ -1,0 +1,103 @@
+@model (HlidacStatu.Entities.Smlouva smlouva, HlidacStatu.Repositories.Searching.SmlouvaSearchResult res )
+
+@using Devmasters
+@using Devmasters.Enums
+@using HlidacStatu.Entities
+@{
+    Smlouva rec = Model.smlouva;
+    HlidacStatu.Repositories.Searching.SmlouvaSearchResult result = Model.res;
+
+    var confLevel = rec.GetConfidenceLevel();
+    string bgLevel = "", iconLevel = "";
+
+
+    if (confLevel > HlidacStatu.Entities.Issues.ImportanceLevel.Formal)
+    {
+        bgLevel = HlidacStatu.Entities.Issues.Importance.GetCssClass(confLevel, true);
+        iconLevel = HlidacStatu.Entities.Issues.Importance.GetIcon(confLevel);
+    }
+}
+<div class="mb-4">
+    <div class="d-flex align-items-center justify-content-between mb-2">
+        <div class="d-flex align-items-center">
+            <div class="d-flex align-items-center justify-content-center bg-success bg-opacity-25 rounded-circle me-3" style="width: 40px; height: 40px;">
+                <span class="text-success fw-bold">Sml</span>
+            </div>
+            <div>
+                <h3 class="fs-5 fw-normal mb-0 text-dark">
+                    @if (!string.IsNullOrEmpty(rec.Platce?.ico))
+                    {
+                        @(await Html.KIndexLabelLinkAsync(rec.Platce.ico))
+
+                        <a href="/Subjekt/@rec.Platce.ico">@rec.Platce.nazev.ShortenMe(80)</a>
+                    }
+                    else
+                    {
+                        @(rec.Platce?.nazev?.ShortenMe(80))
+                    }
+                </h3>
+                <small class="text-secondary">@rec.Platce?.IdentifikaceFull()</small>
+            </div>
+        </div>
+        <div class="text-secondary fs-4">⋮</div>
+    </div>
+    <div>
+        <div class="fs-5 mb-1 overflow-x-hidden"><a href="@rec.GetUrl(true, result.Q)"> @Devmasters.TextUtil.ShortenText(rec.predmet, 200)</a></div>
+        <p class="text-secondary mb-1">
+            @Html.Raw(iconLevel)
+
+            @if (rec.platnyZaznam)
+            {
+                @HlidacStatu.Util.RenderData.ToDate(rec.casZverejneni)
+            }
+            else
+            {
+                <span class="text-warning">Zneplatněná smlouva</span>
+            }
+            <span class="fw-bold text-body">
+                - @Html.Raw(rec.NicePrice(html: true, "Cena neuvedena"))
+            </span>
+            -
+            @if (rec.GetRelevantClassification().Any())
+            {
+                <span class="text-success"><b>Obor</b>: @(rec.GetRelevantClassification().First().ClassifTypeName())</span>
+            }
+            - Id: @(rec.Id)
+            @if(rec.predmet?.Length > 200)
+            {
+                <span>
+                    - @rec.predmet
+                </span>
+
+            }
+        </p>
+        <div class="mb-2">
+            @((rec.Prijemce.Count() < 2 ? "Dodavatel" : "Dodavatelé")):
+            @{
+                int max = 3;
+                int count = 0;
+            }
+            @foreach (var subj in rec.Prijemce.Take(max))
+            {
+                count++;
+
+                if (!string.IsNullOrEmpty(subj.ico))
+                {
+                    @(await Html.KIndexLabelLinkAsync(subj.ico))
+
+                    <a href="/Subjekt/@subj.ico" class="text-decoration-none me-3">@subj.nazev</a>
+                }
+                else
+                {
+                    @subj.nazev
+                }
+                @if (count < max)
+                {
+                    <span>&nbsp;·&nbsp;</span>
+                }
+            }
+        </div>
+    </div>
+</div>
+
+

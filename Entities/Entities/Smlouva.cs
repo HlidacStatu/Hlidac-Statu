@@ -392,9 +392,9 @@ namespace HlidacStatu.Entities
                 return true;
         }
 
-        public string NicePrice(bool html = false)
+        public string NicePrice(bool html = false, string neuvedenaCena = "Neuvedena")
         {
-            string res = "Neuvedena";
+            string res = neuvedenaCena;
             if (CalculatedPriceWithVATinCZK == 0)
                 return res;
             else
