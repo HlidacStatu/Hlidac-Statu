@@ -39,13 +39,13 @@
 <style>
 
     .my-0 {
-        margin-top: 0px;
-        margin-bottom: 0px;
+    margin-top: 0px;
+    margin-bottom: 0px;
     }
 
     .py-0 {
-        padding-top: 0px;
-        padding-bottom: 0px;
+    padding-top: 0px;
+    padding-bottom: 0px;
     }
 </style>
 
@@ -131,7 +131,8 @@ else
                     HlidacStatu.Lib.Analytics.StatisticsSubjectPerYear<Smlouva.Statistics.Data> stat = firma.StatistikaRegistruSmluv();
                     var ceo = firma.Ceo();
                     var platyStat = await firma.GetPlatyStatAsync();
-
+                    var platyOrgDetailMetadata = (await HlidacStatu.Repositories.PuRepo.GetFullDetailAsync(firma.DatovaSchranka))?
+                                                    .MetadataPlatyUredniku.FirstOrDefault(m=>m.Rok == PuRepo.DefaultYear);
                     <tr>
                         <td>
                             <h4>
@@ -143,16 +144,21 @@ else
                         </td>
                         <td>
                             <p>
-                            <a href="/hledat?q=@(System.Net.WebUtility.UrlEncode($"ico:{firma.ICO}"))">@Devmasters.Lang.CS.Plural.Get(stat.Summary().PocetSmluv, "{0} smlouva;{0} smlouvy;{0} smluv")</a> za
-                            celkem @Html.Raw(Smlouva.NicePrice(stat.Summary().CelkovaHodnotaSmluv, html: true, shortFormat: true))
-                            , skrývá cenu u <b>@stat.Summary().PercentSmluvBezCeny.ToString("P2")</b> smluv.
+                                <a href="/hledat?q=@(System.Net.WebUtility.UrlEncode($"ico:{firma.ICO}"))">@Devmasters.Lang.CS.Plural.Get(stat.Summary().PocetSmluv, "{0} smlouva;{0} smlouvy;{0} smluv")</a> za
+                                celkem @Html.Raw(Smlouva.NicePrice(stat.Summary().CelkovaHodnotaSmluv, html: true, shortFormat: true))
+                                , skrývá cenu u <b>@stat.Summary().PercentSmluvBezCeny.ToString("P2")</b> smluv.
                             </p>
-                            @if (platyStat != null && platyStat.Stats.ContainsKey(PuRepo.DefaultYear) == false)
+                            @if (platyStat != null 
+                           && platyStat.Stats.ContainsKey(PuRepo.DefaultYear) == false
+                          && platyOrgDetailMetadata != null
+                           )
                             {
-                                <p>
-                                    <a href="@firma.GetPlatyUrlAsync()">Odmítli poskytnout platy vedení.</a>
+                                <p>Komentář k neposkytnutým platům: 
+                                    <a href="@firma.GetPlatyUrlAsync()">
+                                        @(platyOrgDetailMetadata.PoznamkaHlidace)
+                                    </a>
                                 </p>
-                            }
+                             }
                             else if (platyStat != null && platyStat.Stats.ContainsKey(PuRepo.DefaultYear) == true)
                             {
                                 var pustat = platyStat.Stats[PuRepo.DefaultYear];
