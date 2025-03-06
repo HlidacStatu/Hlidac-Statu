@@ -415,11 +415,13 @@ namespace HlidacStatu.Repositories
             var originalIdDuplicateTask = FindDuplicatesByOriginalIdAsync(subsidy);
             var deMinimisDuplicateTask = FindDeMinimisDuplicates(subsidy);
             var euFondyDuplicateTask = FindDuplicatesByEuFondyProjectCode(subsidy);
+            var isRedDeMinimisDuplicateTask = FindIsRedDeMinimisDuplicates(subsidy);
 
             var hashDuplicates = await hashDuplicateTask;
             var originalIdDuplicates = await originalIdDuplicateTask;
             var deMinimisDuplicates = await deMinimisDuplicateTask;
             var euFondyDuplicates = await euFondyDuplicateTask;
+            var isRedDeMinimisDuplicates = await isRedDeMinimisDuplicateTask;
 
             var mergedDuplicates = hashDuplicates.ToList();
 
@@ -429,6 +431,9 @@ namespace HlidacStatu.Repositories
                 deMinimisDuplicates.Where(od => mergedDuplicates.Any(hd => hd.Id == od.Id) == false)).ToList();
             mergedDuplicates = mergedDuplicates.Concat(
                 euFondyDuplicates.Where(od => mergedDuplicates.Any(hd => hd.Id == od.Id) == false)).ToList();
+            mergedDuplicates = mergedDuplicates.Concat(
+                isRedDeMinimisDuplicates.Where(od => mergedDuplicates.Any(hd => hd.Id == od.Id) == false)).ToList();
+            
 
             return mergedDuplicates;
         }
@@ -469,23 +474,13 @@ namespace HlidacStatu.Repositories
 
                 try
                 {
-                    var res = await SubsidyClient.SearchAsync<Subsidy>(s => s
-                        .Size(9000)
-                        .Query(q => query)
-                    );
+                    var res = await QuerySearchAsync(query);
 
-                    if (!res.IsValid) // try again
-                    {
-                        await Task.Delay(500);
-                        res = await SubsidyClient.SearchAsync<Subsidy>(s => s
-                            .Size(9000)
-                            .Query(q => query)
-                        );
-                    }
-
-                    return res.Documents
+                    return res
                         .Where(d => $"{d.Metadata.FileName}_{d.Metadata.DataSource}" !=
                                     $"{subsidy.Metadata.FileName}_{subsidy.Metadata.DataSource}")
+                        //remove those where we try pair IsRed with Cedr and ProjectCode differs...
+                        .Where(d => !(subsidy.Metadata.DataSource == "IsRed" && d.Metadata.DataSource == "Cedr" && d.ProjectCodeHash != subsidy.ProjectCodeHash ))
                         .ToList();
                 }
                 catch (Exception ex)
@@ -518,7 +513,7 @@ namespace HlidacStatu.Repositories
                     return [];
 
                 if (!subsidy.ProjectCode.ToLower()
-                        .StartsWith("cz")) //only EU fondy project codes like "CZ.03.2.60/0.0/0.0/15_022/0001007"
+                        .StartsWith("cz.")) //only EU fondy project codes like "CZ.03.2.60/0.0/0.0/15_022/0001007"
                     return [];
 
                 if (!EufondyDataSources.Contains(subsidy.Metadata.DataSource.ToLower())) //only EU fondy data sources
@@ -536,21 +531,9 @@ namespace HlidacStatu.Repositories
 
                 try
                 {
-                    var res = await SubsidyClient.SearchAsync<Subsidy>(s => s
-                        .Size(9000)
-                        .Query(q => query)
-                    );
+                    var res = await QuerySearchAsync(query);
 
-                    if (!res.IsValid) // try again
-                    {
-                        await Task.Delay(500);
-                        res = await SubsidyClient.SearchAsync<Subsidy>(s => s
-                            .Size(9000)
-                            .Query(q => query)
-                        );
-                    }
-
-                    var firstRes = res.Documents
+                    var firstRes = res
                         .Where(d => $"{d.Metadata.FileName}_{d.Metadata.DataSource}" !=
                                     $"{subsidy.Metadata.FileName}_{subsidy.Metadata.DataSource}")
                         .Where(d => EufondyDataSources.Contains(d.Metadata.DataSource
@@ -579,21 +562,9 @@ namespace HlidacStatu.Repositories
 
                 try
                 {
-                    var deMinimisRes = await SubsidyClient.SearchAsync<Subsidy>(s => s
-                        .Size(9000)
-                        .Query(q => deMinimisQuery)
-                    );
+                    var deMinimisRes = await QuerySearchAsync(deMinimisQuery);
 
-                    if (!deMinimisRes.IsValid) // try again
-                    {
-                        await Task.Delay(500);
-                        deMinimisRes = await SubsidyClient.SearchAsync<Subsidy>(s => s
-                            .Size(9000)
-                            .Query(q => deMinimisQuery)
-                        );
-                    }
-
-                    var secondRes = deMinimisRes.Documents
+                    var secondRes = deMinimisRes
                         .Where(d => $"{d.Metadata.FileName}_{d.Metadata.DataSource}" !=
                                     $"{subsidy.Metadata.FileName}_{subsidy.Metadata.DataSource}")
                         .Where(d => EufondyDataSources.Contains(d.Metadata.DataSource
@@ -638,25 +609,8 @@ namespace HlidacStatu.Repositories
 
                 try
                 {
-                    var res = await SubsidyClient.SearchAsync<Subsidy>(s => s
-                        .Size(9000)
-                        .Query(q => queryForDuplicates)
-                    );
-
-                    if (!res.IsValid) // try again
-                    {
-                        await Task.Delay(500);
-                        res = await SubsidyClient.SearchAsync<Subsidy>(s => s
-                            .Size(9000)
-                            .Query(q => queryForDuplicates)
-                        );
-                    }
-
-                    if (res.Documents.Count == 0)
-                        return [];
-
-                    //check if project code is in project name
-                    var returnList = res.Documents.ToList();
+                    var returnList = await QuerySearchAsync(queryForDuplicates);
+                    
                     returnList = returnList
                         .Where(
                             s => subsidy.ProjectName.Contains(s.ProjectCode,
@@ -682,6 +636,55 @@ namespace HlidacStatu.Repositories
             }
         }
 
+        public static async Task<List<Subsidy>> FindIsRedDeMinimisDuplicates(Subsidy subsidy)
+        {
+            try
+            {
+                if (string.IsNullOrWhiteSpace(subsidy.Recipient.Ico)
+                    || subsidy.ApprovedYear is null
+                    || subsidy.Metadata.DataSource.ToLower() != "isred"
+                    || string.IsNullOrWhiteSpace(subsidy.ProjectName)
+                    || subsidy.ProgramName.Length < 20) // this is fail safe, so not some short nonsense like "2022" marks many results
+                    return [];
+                
+                var deMinimisQuery = new QueryContainerDescriptor<Subsidy>()
+                    .Bool(b => b
+                        .Must(
+                            m => m.Term(t => t.Metadata.DataSource.Suffix("keyword"), "DeMinimis"),
+                            m => m.Term(t => t.Recipient.Ico, subsidy.Recipient.Ico),
+                            m => m.Term(t => t.ApprovedYear, subsidy.ApprovedYear),
+                            m => m.Term(t => t.AssumedAmount, subsidy.AssumedAmount),
+                            m => m.Term(t => t.SubsidyProviderIco, subsidy.SubsidyProviderIco),
+                            m => m.QueryString(q => q.DefaultField(f => f.ProjectName).Query($"\"{subsidy.ProjectName.Replace("\"", "\\\"")}\""))
+                        )
+                    );
+
+                try
+                {
+                    var deMinimisSubsidies = await QuerySearchAsync(deMinimisQuery);
+                    if (deMinimisSubsidies is not null
+                        && deMinimisSubsidies.Count > 1)
+                    {
+                        // too many results - there should be only one
+                        return [];
+                    }
+
+
+                    return deMinimisSubsidies;
+                }
+                catch (Exception ex)
+                {
+                    Logger.Error(ex, $"Cant load duplicate subsidies from DeMinimis for subsidyId={subsidy.Id}");
+                    return [];
+                }
+            }
+            catch (Exception e)
+            {
+                Logger.Error(e, $"Problem when finding duplicates between IsRed and DeMinimis. Id={subsidy.Id}");
+                return [];
+            }
+        }
+        
         public static async Task<List<Subsidy>> FindDuplicatesByOriginalIdAsync(Subsidy subsidy)
         {
             try
@@ -699,21 +702,9 @@ namespace HlidacStatu.Repositories
 
                 try
                 {
-                    var res = await SubsidyClient.SearchAsync<Subsidy>(s => s
-                        .Size(9000)
-                        .Query(q => query)
-                    );
+                    var res = await QuerySearchAsync(query);
 
-                    if (!res.IsValid) // try again
-                    {
-                        await Task.Delay(500);
-                        res = await SubsidyClient.SearchAsync<Subsidy>(s => s
-                            .Size(9000)
-                            .Query(q => query)
-                        );
-                    }
-
-                    return res.Documents.ToList();
+                    return res;
                 }
                 catch (Exception ex)
                 {
@@ -829,6 +820,33 @@ namespace HlidacStatu.Repositories
                 .Term(f => f.Recipient.Ico, ico);
 
             return GetAllAsync(qc);
+        }
+        
+        public static async Task<List<Subsidy>> QuerySearchAsync(QueryContainer query)
+        {
+            try
+            {
+                var res = await SubsidyClient.SearchAsync<Subsidy>(s => s
+                    .Size(10000)
+                    .Query(q => query)
+                );
+
+                if (!res.IsValid) // try again
+                {
+                    await Task.Delay(500);
+                    res = await SubsidyClient.SearchAsync<Subsidy>(s => s
+                        .Size(10000)
+                        .Query(q => query)
+                    );
+                }
+
+                return res.Documents.ToList();
+            }
+            catch (Exception ex)
+            {
+                Logger.Error(ex, $"Cant load subsidies for query");
+                throw;
+            }
         }
     }
 }
