@@ -416,7 +416,7 @@ namespace HlidacStatu.Web.Framework
                     symbolWidth = 15,
                     squareSymbol = true
                 },
-                title = new
+                title = string.IsNullOrEmpty(title) ? (object)false : new
                 {
                     y = -10,
                     useHtml = true,

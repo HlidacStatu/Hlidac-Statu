@@ -17,32 +17,26 @@
         iconLevel = HlidacStatu.Entities.Issues.Importance.GetIcon(confLevel);
     }
 }
-<div class="mb-4">
-    <div class="d-flex align-items-center justify-content-between mb-2">
+<div class="mb-5">
+    <div class="d-flex align-items-center justify-content-start mb-2">
         <div class="d-flex align-items-center">
             <div class="d-flex align-items-center justify-content-center bg-success bg-opacity-25 rounded-circle me-3" style="width: 40px; height: 40px;">
                 <span class="text-success fw-bold">Sml</span>
             </div>
             <div>
-                <h3 class="fs-5 fw-normal mb-0 text-dark">
-                    @if (!string.IsNullOrEmpty(rec.Platce?.ico))
-                    {
-                        @(await Html.KIndexLabelLinkAsync(rec.Platce.ico))
-
-                        <a href="/Subjekt/@rec.Platce.ico">@rec.Platce.nazev.ShortenMe(80)</a>
-                    }
-                    else
-                    {
-                        @(rec.Platce?.nazev?.ShortenMe(80))
-                    }
-                </h3>
-                <small class="text-secondary">@rec.Platce?.IdentifikaceFull()</small>
+                <div class="fs-5 mb-1 overflow-x-hidden"><a href="@rec.GetUrl(true, result.Q)"> @Devmasters.TextUtil.ShortenText(rec.predmet, 200)</a></div>
+                
             </div>
         </div>
-        <div class="text-secondary fs-4">⋮</div>
+        @* pro dalsi menu *@ <div class="text-secondary fs-4 ms-5">⋮</div>
     </div>
     <div>
-        <div class="fs-5 mb-1 overflow-x-hidden"><a href="@rec.GetUrl(true, result.Q)"> @Devmasters.TextUtil.ShortenText(rec.predmet, 200)</a></div>
+        <div class="fs-5 mb-2">
+            <span class="fw-bold text-body">
+                @Html.Raw(rec.NicePrice(html: true, "Cena neuvedena"))
+            </span>
+
+        </div>
         <p class="text-secondary mb-1">
             @Html.Raw(iconLevel)
 
@@ -54,16 +48,13 @@
             {
                 <span class="text-warning">Zneplatněná smlouva</span>
             }
-            <span class="fw-bold text-body">
-                - @Html.Raw(rec.NicePrice(html: true, "Cena neuvedena"))
-            </span>
             -
             @if (rec.GetRelevantClassification().Any())
             {
                 <span class="text-success"><b>Obor</b>: @(rec.GetRelevantClassification().First().ClassifTypeName())</span>
             }
             - Id: @(rec.Id)
-            @if(rec.predmet?.Length > 200)
+            @if (rec.predmet?.Length > 200)
             {
                 <span>
                     - @rec.predmet
@@ -71,7 +62,21 @@
 
             }
         </p>
-        <div class="mb-2">
+        <div class="mt-1">
+            Objednatel/Plátce:
+            @if (!string.IsNullOrEmpty(rec.Platce?.ico))
+            {
+                @(await Html.KIndexLabelLinkAsync(rec.Platce.ico))
+
+                <a href="/Subjekt/@rec.Platce.ico">@rec.Platce.nazev.ShortenMe(80)</a>
+            }
+            else
+            {
+                @(rec.Platce?.nazev?.ShortenMe(80))
+            }
+            <small class="text-secondary">@rec.Platce?.IdentifikaceFull()</small>
+        </div>
+        <div class="mt-2">
             @((rec.Prijemce.Count() < 2 ? "Dodavatel" : "Dodavatelé")):
             @{
                 int max = 3;

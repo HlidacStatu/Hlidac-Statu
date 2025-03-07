@@ -12,7 +12,7 @@
     Devmasters.DT.StopWatchLaps viewRenderTimes = new Devmasters.DT.StopWatchLaps();
     viewRenderTimes.StopPreviousAndStartNextLap("analysis");
 
-    var fullAnalysis = await HlidacStatu.XLib.Search.AnalysisAsync(Model.Query);
+    HlidacStatu.XLib.Search.FullAnalysis fullAnalysis = await HlidacStatu.XLib.Search.AnalysisAsync(Model.Query);
 
     ViewBag.Title = Model.Text ?? $"Hlídač státu: Analýza příjemců peněz pro dotaz \"{Model.Query}\"";
 
@@ -41,12 +41,12 @@
     <small>@Model.Query</small>
 </h1>
 @{
-    var res = await HlidacStatu.XLib.Search
-        .GeneralSearchAsync(Model.Query, 1, HlidacStatu.XLib.Search.PartsToSearch.All, false, "", this.User, smlouvySize:1);
+    var resSmlouvy = await HlidacStatu.XLib.Search
+        .GeneralSearchAsync(Model.Query, 1, HlidacStatu.XLib.Search.PartsToSearch.Smlouvy, false, "", this.User, smlouvySize:1);
 }
 <p>
     <a href="/hledatSmlouvy?q=@(System.Net.WebUtility.UrlEncode(Model.Query))" class="btn btn-primary btn-sm">Zobrazit výsledky tohoto dotazu</a>
-    (v registru smluv @Devmasters.Lang.CS.Plural.GetWithZero(res.Smlouvy.Total,"nic nenalezeno","nalezen 1 výsledek","nalezeny {0} výsledky","nalezeno {0} výsledků")).
+    (v registru smluv @Devmasters.Lang.CS.Plural.GetWithZero(resSmlouvy.Smlouvy.Total,"nic nenalezeno","nalezen 1 výsledek","nalezeny {0} výsledky","nalezeno {0} výsledků")).
 </p>
 
 
