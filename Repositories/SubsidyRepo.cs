@@ -644,7 +644,7 @@ namespace HlidacStatu.Repositories
                     || subsidy.ApprovedYear is null
                     || subsidy.Metadata.DataSource.ToLower() != "isred"
                     || string.IsNullOrWhiteSpace(subsidy.ProjectName)
-                    || subsidy.ProgramName.Length < 20) // this is fail safe, so not some short nonsense like "2022" marks many results
+                    || subsidy.ProgramName?.Length < 20) // this is fail safe, so not some short nonsense like "2022" marks many results
                     return [];
                 
                 var deMinimisQuery = new QueryContainerDescriptor<Subsidy>()
