@@ -87,6 +87,13 @@
          model="@(ValueTuple.Create((int?)2021, (int?)null, rok, "/Dotace/DotacniExperti"))"
 />
 
+@if (rok > DotaceRepo.LastCompleteYear)
+{
+    <div class="alert alert-warning" role="alert">
+        @DotaceTexts.NekompletniDataAlert
+    </div>
+}
+
 <h4>@ViewBag.SubTitle</h4>
 <div>
     <partial name="Charts/_SimpleChart" model="chartData"/>

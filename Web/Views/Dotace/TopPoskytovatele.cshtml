@@ -85,6 +85,13 @@
 <h4>Vyberte rok, za který chcete zobrazit data</h4>
 <partial name="_pager" model="@(ValueTuple.Create((int?)null, (int?)null, rok, $"/Dotace/TopPoskytovatele?typDotace={typDotace}"))"/>
 
+@if (rok > DotaceRepo.LastCompleteYear)
+{
+    <div class="alert alert-warning" role="alert">
+        @DotaceTexts.NekompletniDataAlert
+    </div>
+}
+
 <h2 class="mt-4">Přehled dotací podle poskytovatelů@(yearText)</h2>
 <div>
     @Html.DataToHTMLTable(data, dataTableOptions: HtmlExtensions.DatatableOptions(orderColumnIdx: 1, orderDirection: "desc"))
