@@ -42,8 +42,8 @@
         kategorieHoldingData = await DotaceRepo.PoKategoriichAsync(query: $"holding:{Model.ICO}");
     }
 
-    var reportData = new ReportDataSource<(int Rok, Firma.Statistics.Subsidy Dotace)>(
-        new ReportDataSource<(int Rok, Firma.Statistics.Subsidy Dotace)>.Column[]
+    var reportData = new ReportDataSource<(int Rok, Firma.Statistics.Dotace Dotace)>(
+        new ReportDataSource<(int Rok, Firma.Statistics.Dotace Dotace)>.Column[]
         {
             new()
             {

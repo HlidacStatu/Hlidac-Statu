@@ -14,7 +14,7 @@ using System.Diagnostics.CodeAnalysis;
 namespace HlidacStatu.Entities
 {
     public partial class Firma
-        : IBookmarkable, IEqualityComparer<Firma>
+        : IBookmarkable
     {
         [ShowNiceDisplayName()]
         public enum TypSubjektuEnum

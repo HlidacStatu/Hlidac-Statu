@@ -166,13 +166,13 @@ namespace HlidacStatu.Extensions
             return ret ?? new Lib.Analytics.StatisticsSubjectPerYear<Smlouva.Statistics.Data>();
         }
 
-        public static Lib.Analytics.StatisticsSubjectPerYear<Firma.Statistics.Subsidy> StatistikaDotaci(
+        public static Lib.Analytics.StatisticsSubjectPerYear<Firma.Statistics.Dotace> StatistikaDotaci(
             this Firma firma, bool forceUpdateCache = false)
         {
             return FirmaStatistics.CachedStatisticsDotace(firma, forceUpdateCache);
 
         }
-        public static Lib.Analytics.StatisticsSubjectPerYear<Firma.Statistics.Subsidy> HoldingStatistikaDotaci(
+        public static Lib.Analytics.StatisticsSubjectPerYear<Firma.Statistics.Dotace> HoldingStatistikaDotaci(
             this Firma firma,
             Relation.AktualnostType aktualnost, bool forceUpdateCache = false)
         {
