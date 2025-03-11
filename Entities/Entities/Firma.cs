@@ -9,11 +9,12 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using HlidacStatu.Util;
 using Devmasters.Enums;
+using System.Diagnostics.CodeAnalysis;
 
 namespace HlidacStatu.Entities
 {
     public partial class Firma
-        : IBookmarkable
+        : IBookmarkable, IEqualityComparer<Firma>
     {
         [ShowNiceDisplayName()]
         public enum TypSubjektuEnum
@@ -549,6 +550,23 @@ namespace HlidacStatu.Entities
         public string BookmarkName()
         {
             return Jmeno;
+        }
+        }
+
+    public  class FirmaByIcoComparer : IEqualityComparer<Firma>
+    {
+        public bool Equals(Firma x, Firma y)
+        {
+            if (x == null || y == null)
+                return false;
+            if (x.Valid == false || y.Valid == false)
+                return false;
+            return x.ICO == y.ICO;
+        }
+
+        public int GetHashCode([DisallowNull] Firma obj)
+        {
+            return obj.ICO.GetHashCode();
         }
     }
 }

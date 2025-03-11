@@ -85,6 +85,8 @@ namespace HlidacStatu.Repositories.Statistics
             ret = await _dotaceCache.GetAsync(firma);
             return ret;
         }
+
+        static FirmaByIcoComparer byIcoOnly = new FirmaByIcoComparer();
         private static StatisticsSubjectPerYear<Firma.Statistics.Subsidy> CalculateHoldingDotaceStat(Firma firma,
             HlidacStatu.DS.Graphs.Relation.AktualnostType aktualnost)
         {
@@ -92,12 +94,19 @@ namespace HlidacStatu.Repositories.Statistics
             var statistiky = firma.Holding(aktualnost)
                 .Append(firma)
                 .Where(f => f.Valid)
+                .Distinct(byIcoOnly)
                 .Select(f => new { f.ICO, dotaceStats = f.StatistikaDotaci() })
                 .ToArray();
 
-            var statistikyPerIco = new Dictionary<string, StatisticsSubjectPerYear<Firma.Statistics.Subsidy>>();
+            if (statistiky.Length == 0)
+                return new StatisticsSubjectPerYear<Firma.Statistics.Subsidy>();    
+            if (statistiky.Length == 1)
+                return statistiky[0].dotaceStats;
 
-            foreach (var ico in statistiky.Select(m => m.ICO).Distinct())
+            Dictionary<string, StatisticsSubjectPerYear<Firma.Statistics.Subsidy>> statistikyPerIco = 
+                new Dictionary<string, StatisticsSubjectPerYear<Firma.Statistics.Subsidy>>();
+
+            foreach (var ico in statistiky.Select(m => m.ICO))
             {
                 statistikyPerIco[ico] = new StatisticsSubjectPerYear<Firma.Statistics.Subsidy>();
                 statistikyPerIco[ico] = (StatisticsSubjectPerYear<Firma.Statistics.Subsidy>.Aggregate(
