@@ -53,6 +53,13 @@
 
 <partial name="_pager" model="@(ValueTuple.Create((int?)null, (int?)null, rok, "/Dotace/TopKategorie"))" />
 
+@if (rok > DotaceRepo.LastCompleteYear)
+{
+    <div class="alert alert-warning" role="alert">
+        @DotaceTexts.NekompletniDataAlert
+    </div>
+}
+
 <h2 class="mt-4">Top kategorie dotací</h2>
 
 

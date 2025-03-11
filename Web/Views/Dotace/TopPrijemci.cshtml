@@ -109,10 +109,17 @@
 
 <h4>Vyberte rok, za který chcete zobrazit data</h4>
 <partial name="_pager" 
-    model="@(ValueTuple.Create((int?)null, (int?)null, rok, 
-                "/Dotace/TopPrijemci?ftyp=" + (ftyp.HasValue ? $"{ftyp}" : "") + (dtyp.HasValue ? $"&dtyp={dtyp}" : "")
+         model="@(ValueTuple.Create((int?)null, (int?)null, rok, 
+                    "/Dotace/TopPrijemci?ftyp=" + (ftyp.HasValue ? $"{ftyp}" : "") + (dtyp.HasValue ? $"&dtyp={dtyp}" : "")
                 ))"    
-    />
+/>
+
+@if (rok > DotaceRepo.LastCompleteYear)
+{
+    <div class="alert alert-warning" role="alert">
+        @DotaceTexts.NekompletniDataAlert
+    </div>
+}
 
 <h2 class="mt-4">Přehled největších příjemců
     @((dtyp != null ? " " + HlidacStatu.Entities.Dotace.Hint.TypeDescription(dtyp, 4, false) : ""))

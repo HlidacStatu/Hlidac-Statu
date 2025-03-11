@@ -19,6 +19,8 @@ namespace HlidacStatu.Repositories
         public static readonly ElasticClient DotaceClient = Manager.GetESClient_DotaceAsync()
             .ConfigureAwait(false).GetAwaiter().GetResult();
 
+        public const int LastCompleteYear = 2023;
+
 
         public static async Task SaveAsync(Dotace dotace, bool forceRewriteHints = false)
         {

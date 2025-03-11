@@ -65,6 +65,13 @@
          model="@(ValueTuple.Create((int?)(typDotace >= 2 ? 2021 : null), (int?)null, rok, $"/Dotace/TopDotacniProgramy?typDotace={typDotace}"))"
 />
 
+@if (rok > DotaceRepo.LastCompleteYear)
+{
+    <div class="alert alert-warning" role="alert">
+        @DotaceTexts.NekompletniDataAlert
+    </div>
+}
+
 <h4>@ViewBag.SubTitle</h4>
 
 <partial name="analBoxes/_tblTopProgramy" model="options" />

@@ -438,7 +438,7 @@ namespace HlidacStatu.Repositories
             return mergedDuplicates;
         }
 
-        private static async Task<List<Subsidy>> FindDuplicatesByHashAsync(Subsidy subsidy)
+        public static async Task<List<Subsidy>> FindDuplicatesByHashAsync(Subsidy subsidy)
         {
             try
             {
@@ -477,10 +477,14 @@ namespace HlidacStatu.Repositories
                     var res = await QuerySearchAsync(query);
 
                     return res
-                        .Where(d => $"{d.Metadata.FileName}_{d.Metadata.DataSource}" !=
-                                    $"{subsidy.Metadata.FileName}_{subsidy.Metadata.DataSource}")
+                        //Dotace není v rámci stejného zdroje
+                        .Where(d => d.Metadata.DataSource != subsidy.Metadata.DataSource)
                         //remove those where we try pair IsRed with Cedr and ProjectCode differs...
                         .Where(d => !(subsidy.Metadata.DataSource == "IsRed" && d.Metadata.DataSource == "Cedr" && d.ProjectCodeHash != subsidy.ProjectCodeHash ))
+                        //remove those where we try pair Cedr with IsRed and ProjectCode differs...
+                        .Where(d => !(subsidy.Metadata.DataSource == "Cedr" && d.Metadata.DataSource == "IsRed" && d.ProjectCodeHash != subsidy.ProjectCodeHash ))
+                        //remove multiples from DotInfo cross Cedr or IsRed
+                        .Where(d => !ShouldRemoveDotInfoEntry(subsidy, d))
                         .ToList();
                 }
                 catch (Exception ex)
@@ -494,6 +498,51 @@ namespace HlidacStatu.Repositories
                 Logger.Error(e, $"Problem when finding duplicates by hash. Id={subsidy.Id}");
                 return [];
             }
+        }
+
+        private static bool ShouldRemoveDotInfoEntry(Subsidy originalSubsidy, Subsidy checkedSubsidy)
+        {
+            var originalSource = originalSubsidy.Metadata.DataSource;
+            var checkedSource = checkedSubsidy.Metadata.DataSource;
+
+            bool isOriginalRedOrCedr = originalSource == "IsRed" || originalSource == "Cedr";
+            bool isCheckedRedOrCedr = checkedSource == "IsRed" || checkedSource == "Cedr";
+    
+            bool isOriginalDotInfo = originalSource == "DotInfo";
+            bool isCheckedDotInfo = checkedSource == "DotInfo";
+            
+            if(!((isOriginalRedOrCedr && isCheckedDotInfo) 
+                 || (isOriginalDotInfo && isCheckedRedOrCedr)))
+                return false;
+            
+            Subsidy dotInfoSubsidy = null;
+            Subsidy isRedSubsidy = null;
+            
+            if (isOriginalDotInfo)
+            {
+                dotInfoSubsidy = originalSubsidy;
+                isRedSubsidy = checkedSubsidy;
+            }
+            else
+            {
+                dotInfoSubsidy = checkedSubsidy;
+                isRedSubsidy = originalSubsidy;
+            }
+            
+            if (isRedSubsidy.ProjectCode.ToLower().Trim() == dotInfoSubsidy.ProjectCode.ToLower().Trim())
+                return false;
+
+            //Check if the project number is in another field in dotinfo
+            if (dotInfoSubsidy.RawData.Any(item =>
+                    item is Dictionary<string, object> dict &&
+                    dict.TryGetValue("dotace", out var dotaceObj) &&
+                    dotaceObj is Dictionary<string, object> dotaceDict &&
+                    dotaceDict.TryGetValue("evidencni cislo dotace", out var evidencniCisloObj) &&
+                    evidencniCisloObj?.ToString()?.ToLower().Trim() == isRedSubsidy.ProjectCode.ToLower().Trim()))
+                return false;
+            
+            //TBC....
+            return true;
         }
 
         private static string[] EufondyDataSources = new[]
@@ -553,6 +602,7 @@ namespace HlidacStatu.Repositories
                     .Bool(b => b
                         .Must(
                             m => m.Term(t => t.Recipient.Ico, subsidy.Recipient.Ico),
+                            m => m.Term(t => t.Metadata.DataSource.Suffix("keyword"), "DeMinimis"),
                             m => m.MatchPhrase(mp => mp
                                 .Field(f => f.ProjectName)
                                 .Query(subsidy.ProjectCode)
