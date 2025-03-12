@@ -87,13 +87,11 @@ namespace HlidacStatu.Repositories.Statistics
                 _smlouvaCache.DeleteAsync((firma, obor)).ConfigureAwait(false).GetAwaiter().GetResult();
 
             ret = _smlouvaCache.GetAsync((firma, obor)).ConfigureAwait(false).GetAwaiter().GetResult();
-            //_smlouvaCache.RemoveCacheInstance((firma, obor));
             return ret;
         }
         public static void SetStatistics(Firma firma, int? obor, StatisticsSubjectPerYear<Smlouva.Statistics.Data> data)
         {
-
-            _ = Task.Run(async () => { await _smlouvaCache.SetAsync((firma, obor), data); }).Wait(TimeSpan.FromSeconds(10));
+            _smlouvaCache.SetAsync((firma, obor), data).ConfigureAwait(false).GetAwaiter().GetResult();
         }
         private static async Task<StatisticsSubjectPerYear<Smlouva.Statistics.Data>> _calculateSmlouvyStatsAsync(Firma f, int? obor)
         {

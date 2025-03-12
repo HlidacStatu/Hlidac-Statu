@@ -55,10 +55,10 @@ namespace HlidacStatu.Repositories.Statistics
         {
             if (forceUpdateCache)
             {
-                _ = Task.Run(async () => { await _dotaceCache.DeleteAsync(firma); }).Wait(TimeSpan.FromSeconds(10));
+                _dotaceCache.DeleteAsync(firma).ConfigureAwait(false).GetAwaiter().GetResult();
             }
             StatisticsSubjectPerYear<Firma.Statistics.Dotace> ret = new StatisticsSubjectPerYear<Firma.Statistics.Dotace>();
-            _ = Task.Run(async () => { ret = await _dotaceCache.GetAsync(firma); }).Wait(TimeSpan.FromSeconds(120));
+            ret = _dotaceCache.GetAsync(firma).ConfigureAwait(false).GetAwaiter().GetResult();
             return ret;
         }
 

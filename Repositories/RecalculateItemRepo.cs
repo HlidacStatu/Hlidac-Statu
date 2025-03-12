@@ -97,39 +97,40 @@ namespace HlidacStatu.Repositories
                     );
                 return;
             }
+            if (allItemsInDb == false)
+            {
+                Devmasters.Batch.Manager.DoActionForAll<int>(Enumerable.Range(0, int.MaxValue - 1),
+                    xx =>
+                    {
+                        var items = RecalculateItemRepo.GetFromProcessingQueueWithParents(1, 1, debug: debug);
+                        if (items.Count() == 0)
+                            return new Devmasters.Batch.ActionOutputData() { CancelRunning = true };
 
-            Devmasters.Batch.Manager.DoActionForAll<int>(Enumerable.Range(0, int.MaxValue - 1),
-                xx =>
-                {
-                    var items = RecalculateItemRepo.GetFromProcessingQueueWithParents(1, 1, debug: debug);
-                    if (items.Count() == 0)
-                        return new Devmasters.Batch.ActionOutputData() { CancelRunning = true };
+                        Devmasters.Batch.Manager.DoActionForAll<RecalculateItem>(items,
+                            item =>
+                            {
+                                if (debug)
+                                    _logger.Debug($"start statistics {item.ItemType.ToString()} {item.Id}");
+                                if (item.ItemType == RecalculateItem.ItemTypeEnum.Subjekt)
+                                    RecalculateItemRepo.RecalculateFirma(item, false, invalidateOnly);
+                                else if (item.ItemType == RecalculateItem.ItemTypeEnum.Person)
+                                    RecalculateItemRepo.RecalculateOsoba(item, false, invalidateOnly);
+                                if (debug)
+                                    _logger.Debug($"end statistics {item.ItemType.ToString()} {item.Id}");
 
-                    Devmasters.Batch.Manager.DoActionForAll<RecalculateItem>(items,
-                        item =>
-                        {
-                            if (debug)
-                                _logger.Debug($"start statistics {item.ItemType.ToString()} {item.Id}");
-                            if (item.ItemType == RecalculateItem.ItemTypeEnum.Subjekt)
-                                RecalculateItemRepo.RecalculateFirma(item, false, invalidateOnly);
-                            else if (item.ItemType == RecalculateItem.ItemTypeEnum.Person)
-                                RecalculateItemRepo.RecalculateOsoba(item, false, invalidateOnly);
-                            if (debug)
-                                _logger.Debug($"end statistics {item.ItemType.ToString()} {item.Id}");
-
-                            return new Devmasters.Batch.ActionOutputData();
-                        },
-                        null, null,
-                        !System.Diagnostics.Debugger.IsAttached, maxDegreeOfParallelism: 2,
-                        monitor: null
-                        );
-                    return new Devmasters.Batch.ActionOutputData();
-                },
-                null, null,
-                !System.Diagnostics.Debugger.IsAttached, maxDegreeOfParallelism: threads,
-                monitor: new MonitoredTaskRepo.ForBatch("Downloader ", "RecalculateTasks from queue ")
-                );
-
+                                return new Devmasters.Batch.ActionOutputData();
+                            },
+                            null, null,
+                            !System.Diagnostics.Debugger.IsAttached, maxDegreeOfParallelism: 2,
+                            monitor: null
+                            );
+                        return new Devmasters.Batch.ActionOutputData();
+                    },
+                    null, null,
+                    !System.Diagnostics.Debugger.IsAttached, maxDegreeOfParallelism: threads,
+                    monitor: new MonitoredTaskRepo.ForBatch("Downloader ", "RecalculateTasks from queue ")
+                    );
+            }
             _logger.Information("Ends RecalculateTasks with {numOfThreads} threads", threads.Value);
 
         }
