@@ -16,6 +16,7 @@
 **Vyplacená částka\*)** - Kolik peněz nakonec žadatel na dotaci čerpal  
 
 \* U hvězdičkou označených položek nám bude stačit, když bude vyplněna alespoň jedna z nich. Pokud budou označeny obě, pak to bude ideální, ale ne nutné.
+
 \** Uveďte, pokud je k dispozici.
 
 
