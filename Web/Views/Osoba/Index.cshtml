@@ -100,9 +100,9 @@
                 <p>
                     @Model.FullName() přímo @(Model.Muz() ? "podpořil" : "podpořila")
                     <b>@Devmasters.Lang.CS.Plural.Get(sponzoringPrimy
-                            .Select(s => s.IcoPrijemce)
-                            .Distinct()
-                            .Count(), "jednu politickou stranu", "{0} politické strany", "{0} politických stran")</b>
+                                                .Select(s => s.IcoPrijemce)
+                                                .Distinct()
+                                                .Count(), "jednu politickou stranu", "{0} politické strany", "{0} politických stran")</b>
                     celkem
                     <b>@Devmasters.Lang.CS.Plural.Get(sponzoringPrimy.Count, "jedním darem", "{0} dary", "{0} dary")</b>
                     v hodnotě <b>@(sponzoringPrimy.Sum(s => s.Hodnota)?.ToString("N0"))&nbsp;Kč</b>.
@@ -119,18 +119,18 @@
             {
                 <p>
                     @Devmasters.Lang.CS.Plural.Get(sponzoringFirmy
-                        .Select(s => s.IcoDarce)
-                        .Distinct()
-                        .Count(), "Společnost", "Společnosti", "Společnosti")
+                                          .Select(s => s.IcoDarce)
+                                          .Distinct()
+                                          .Count(), "Společnost", "Společnosti", "Společnosti")
                     ve kterých @Model.FullName() @(Model.Muz() ? "působil" : "působila")
                     @Devmasters.Lang.CS.Plural.Get(sponzoringFirmy
-                        .Select(s => s.IcoDarce)
-                        .Distinct()
-                        .Count(), "podpořila", "podpořily", "podpořily")
+                                          .Select(s => s.IcoDarce)
+                                          .Distinct()
+                                          .Count(), "podpořila", "podpořily", "podpořily")
                     <b>@Devmasters.Lang.CS.Plural.Get(sponzoringFirmy
-                            .Select(s => s.IcoPrijemce)
-                            .Distinct()
-                            .Count(), "jednu politickou stranu", "{0} politické strany", "{0} politických stran")</b>
+                                                .Select(s => s.IcoPrijemce)
+                                                .Distinct()
+                                                .Count(), "jednu politickou stranu", "{0} politické strany", "{0} politických stran")</b>
                     celkem
                     <b>@Devmasters.Lang.CS.Plural.Get(sponzoringFirmy.Count, "jedním darem", "{0} dary", "{0} dary")</b>
                     v hodnotě <b>@(sponzoringFirmy.Sum(s => s.Hodnota)?.ToString("N0"))&nbsp;Kč</b>.
@@ -215,34 +215,34 @@
                     {
                         <span>(z toho v @Devmasters.Lang.CS.Plural.Get(statistics.SmlouvyStat_NeziskovkyCount(), "jedné neziskovce", "{0} neziskovkách", "{0} neziskovkách")):</span>
                     }
-                <ul>
-                    @foreach (var stat in statistics.SoukromeFirmy
-                                      .OrderByDescending(o => o.Value.Summary().CelkovaHodnotaSmluv)
-                                      .Take(statistics.SoukromeFirmy.Count <= listingNum + 1 ? listingNum + 1 : listingNum)
-                                 )
+                    <ul>
+                        @foreach (var stat in statistics.SoukromeFirmy
+                                        .OrderByDescending(o => o.Value.Summary().CelkovaHodnotaSmluv)
+                                        .Take(statistics.SoukromeFirmy.Count <= listingNum + 1 ? listingNum + 1 : listingNum)
+                                   )
+                        {
+                            <li>
+                                <a asp-controller="Subjekt" asp-action="Index" asp-route-id="@stat.Key">
+                                    @Firmy.GetJmeno(stat.Key)
+                                </a>
+                                (@Html.Raw(stat.Value.Summary().ToNiceString(null, true, customUrl: $"hledat?q=ico:{stat.Key}")) od
+                                2016
+                                @if (stat.Value.CurrentSeasonStatistics().PocetSmluv > 0)
+                                {
+                                    @($", {stat.Value.CurrentSeasonStatistics().ToNiceString(null, false)} v {stat.Value.CurrentSeasonYear()}")
+                                }
+                                )
+                            </li>
+                        }
+                    </ul>
+                    @if (statistics.SoukromeFirmy.Count > listingNum + 1)
                     {
-                        <li>
-                            <a asp-controller="Subjekt" asp-action="Index" asp-route-id="@stat.Key">
-                                @Firmy.GetJmeno(stat.Key)
+                        <p>
+                            <a asp-action="Vazby" asp-route-id="@Model.NameId" class="moreinfolink text-uppercase">
+                                <strong>Ukázat všechny</strong>
                             </a>
-                            (@Html.Raw(stat.Value.Summary().ToNiceString(null, true, customUrl: $"hledat?q=ico:{stat.Key}")) od
-                            2016
-                            @if (stat.Value.CurrentSeasonStatistics().PocetSmluv > 0)
-                            {
-                                @($", {stat.Value.CurrentSeasonStatistics().ToNiceString(null, false)} v {stat.Value.CurrentSeasonYear()}")
-                            }
-                            )
-                        </li>
+                        </p>
                     }
-                </ul>
-                @if (statistics.SoukromeFirmy.Count > listingNum + 1)
-                {
-                    <p>
-                        <a asp-action="Vazby" asp-route-id="@Model.NameId" class="moreinfolink text-uppercase">
-                            <strong>Ukázat všechny</strong>
-                        </a>
-                    </p>
-                }
 
                 </p>
             }
@@ -303,26 +303,26 @@
 
                             break;
                     }
-                <ul>
-                    @foreach (var stat in statistics.StatniFirmy
-                                      .OrderByDescending(o => o.Value.CurrentSeasonStatistics().CelkovaHodnotaSmluv)
-                                      .Take(statistics.StatniFirmy.Count <= listingNum + 1 ? listingNum + 1 : listingNum)
-                                 )
-                    {
-                        <li>
-                            <a asp-controller="Subjekt" asp-action="Index" asp-route-id="@stat.Key">
-                                @Firmy.GetJmeno(stat.Key)
-                            </a>
-                            (@Html.Raw(stat.Value.Summary().ToNiceString(null, true, customUrl: $"hledat?q=ico:{stat.Key}")) od
-                            2016
-                            @if (stat.Value.CurrentSeasonStatistics().PocetSmluv > 0)
-                            {
-                                @($", {stat.Value.CurrentSeasonStatistics().ToNiceString(null, false)} v {stat.Value.CurrentSeasonYear()}")
-                            }
-                            )
-                        </li>
-                    }
-                </ul>
+                    <ul>
+                        @foreach (var stat in statistics.StatniFirmy
+                                        .OrderByDescending(o => o.Value.CurrentSeasonStatistics().CelkovaHodnotaSmluv)
+                                        .Take(statistics.StatniFirmy.Count <= listingNum + 1 ? listingNum + 1 : listingNum)
+                                   )
+                        {
+                            <li>
+                                <a asp-controller="Subjekt" asp-action="Index" asp-route-id="@stat.Key">
+                                    @Firmy.GetJmeno(stat.Key)
+                                </a>
+                                (@Html.Raw(stat.Value.Summary().ToNiceString(null, true, customUrl: $"hledat?q=ico:{stat.Key}")) od
+                                2016
+                                @if (stat.Value.CurrentSeasonStatistics().PocetSmluv > 0)
+                                {
+                                    @($", {stat.Value.CurrentSeasonStatistics().ToNiceString(null, false)} v {stat.Value.CurrentSeasonYear()}")
+                                }
+                                )
+                            </li>
+                        }
+                    </ul>
                 </p>
             }
 
@@ -340,30 +340,15 @@
     }
 
     @{
-        //var dotaceStat = Model.
-        var dotaceAggsH = new Nest.AggregationContainerDescriptor<Dotace>()
-            .Terms("icos", s => s
-                .Field(f => f.Recipient.Ico)
-                .Size(5000)
-                .Aggregations(a => a
-                    .Sum("sum", ss => ss.Field(ff => ff.AssumedAmount))
-                )
-            );
-        var dotaceSearchH = await DotaceRepo.Searching.SimpleSearchAsync("osobaid:" + Model.NameId, 1, 1,
-            ((int)HlidacStatu.Repositories.Searching.DotaceSearchResult.DotaceOrderResult.FastestForScroll).ToString(), false,
-            dotaceAggsH, exactNumOfResults: true);
-
-        decimal sumH = 0;
-        var items = ((BucketAggregate)dotaceSearchH.ElasticResults.Aggregations["icos"]).Items;
-        foreach (KeyedBucket<object> item in items)
-        {
-            sumH += (decimal)item.Sum("sum").Value;
-        }
-
-        var sdotaceHKc = " v celkové hodnotě <b>" + HlidacStatu.Util.RenderData.NicePriceHtml(sumH) + "</b>.";
+        var dotaceStat = Model.StatistikaDotace(aktualnost);
+        var dotaceStatSum = dotaceStat.AllDotaceSummary().Summary();
+        int pocetFiremSdotaci = dotaceStat.SoukromeFirmy.Count(m => m.Value.Summary().PocetDotaci > 0) 
+            + dotaceStat.StatniFirmy.Count(m => m.Value.Summary().PocetDotaci > 0) 
+            + dotaceStat.Neziskovky.Count(m => m.Value.Summary().PocetDotaci > 0);
+        var sdotaceHKc = " v celkové hodnotě <b>" + HlidacStatu.Util.RenderData.NicePriceHtml(dotaceStatSum.CelkemPrideleno) + "</b>.";
         string durlH = "/dotace/hledat?Q=osobaid%3A" + Model.NameId;
     }
-    @if (dotaceSearchH.Total > 0)
+    @if (dotaceStatSum.PocetDotaci > 0)
     {
         <div>
             <h4>
@@ -371,14 +356,14 @@
             </h4>
 
             <p>
-                <b>@Devmasters.Lang.CS.Plural.Get(items.Count, "Jedna navázaná společnost", "{0} navázané společnosti", "{0} navázaných společností")</b>
+                <b>@Devmasters.Lang.CS.Plural.Get(pocetFiremSdotaci, "Jedna navázaná společnost", "{0} navázané společnosti", "{0} navázaných společností")</b>
                 na osobu @Model.Jmeno @Model.Prijmeni
-                @Devmasters.Lang.CS.Plural.Get(items.Count,
+                @Devmasters.Lang.CS.Plural.Get(pocetFiremSdotaci,
                     "dostala",
                     "dostaly",
                     "dostalo")
 
-                @Html.Raw(Devmasters.Lang.CS.Plural.Get((int)dotaceSearchH.Total,
+                @Html.Raw(Devmasters.Lang.CS.Plural.Get((int)dotaceStatSum.PocetDotaci,
                     " <a href='" + durlH + "'><b>jednu dotaci</b></a>" + sdotaceHKc,
                     " <a href='" + durlH + "'><b>{0} dotace</b></a>" + sdotaceHKc,
                     " <a href='" + durlH + "'><b>{0} dotací</b></a>" + sdotaceHKc))
