@@ -7,22 +7,27 @@
 **Žadatel rok** narození - Jedná se o rok narození osoby, která dostala přidělenu dotaci, pokud není identifikována pomocí IČO  
 **Název projektu** - Čeho se dotace týká (za/na co dostává žadatel peníze), nebo také jaký je účel dotace  
 **Datum schválení** - Kdy bylo schváleno. Stačí rok.  
-**\*Schválená částka** - Kolik peněz bylo schváleno k proplacení na požadovaný projekt  
-**\*Vyplacená částka** - Kolik peněz nakonec žadatel na dotaci čerpal  
 
-\* U hvězdičkou označených položek nám bude stačit, když bude vyplněna alespoň jedna z nich. Pokud budou označeny obě, pak to bude ideální, ale ne nutné.
+**Schválená částka\*)** - Kolik peněz bylo schváleno k proplacení na požadovaný projekt  
+**Vyplacená částka\*)** - Kolik peněz nakonec žadatel na dotaci čerpal  
 
-### Rádi bychom obdrželi (pokud něco z následujících položek není součástí exportu, nebo by bylo složité na dohledání, tak nevyplňujte):
+
+### Nepovinné (Pokud je součástí exportu, můžete data předat, jinak ručně nedohledávejte s dohledáváním a vyplňováním):
+
+**Název dotačního programu\**)** - Dotace jsou většinou rozdělovány na programové a individuální. Rádi bychom obdržely název programu, kterého se dotace týkají (např. Kotlíkové dotace, sportovní dotace mládež, kulturní dotace - divadla). Záleží na každé obci, jak dotace rozděluje, není potřeba vyplňovat programy uměle.  
+**Kód dotačního programu\**)** - Pokud má dotační program přidělen kód, pak vyplňte i kód tohoto programu   
 **Vrácená částka** - Pokud došlo k nějakým vratkám, pak částka, kolik bylo vráceno.  
-**Název dotačního programu** - Dotace jsou většinou rozdělovány na programové a individuální. Rádi bychom obdržely název programu, kterého se dotace týkají (např. Kotlíkové dotace, sportovní dotace mládež, kulturní dotace - divadla). Záleží na každé obci, jak dotace rozděluje, není potřeba vyplňovat programy uměle.  
-**Kód dotačního programu** - Pokud má dotační program přidělen kód, pak vyplňte i kód tohoto programu  
 **Žadatel PSČ**  
 **Žadatel obec**  
 **Žadatel okres**  
 
-### Nepovinné (Pokud je součástí exportu, můžete data předat, jinak se neobtěžujte s dohledáváním a vyplňováním):
 **Zdroje dotace** - Kdo poskytuje peníze. Většinou půjde o Obec, která dotace spravuje (vy).  
 **Zdroje dotace IČO** - Viz zdroje dotace - akorát IČO :)  
+
+\* U hvězdičkou označených položek nám bude stačit, když bude vyplněna alespoň jedna z nich. Pokud budou označeny obě, pak to bude ideální, ale ne nutné.  
+\** Uveďte, pokud je k dispozici.
+
+
 
 ## Maximální struktura pro dotace: 
 

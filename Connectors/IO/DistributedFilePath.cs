@@ -14,8 +14,17 @@ namespace HlidacStatu.Connectors.IO
         {
             hashLen = hashLength;
             this.root = root.Trim();
+
+            // Normalize all separators to the OS-specific one
+            if (Path.DirectorySeparatorChar == '\\')
+                root = root.Replace('/', Path.DirectorySeparatorChar);
+            if (Path.DirectorySeparatorChar == '/')
+                root = root.Replace('\\', Path.DirectorySeparatorChar);
+            
+            // Ensure the path ends with a directory separator
             if (!root.EndsWith(Path.DirectorySeparatorChar))
-                this.root = root + Path.DirectorySeparatorChar;
+                root += Path.DirectorySeparatorChar;
+            
             funcToGetId = getId;
         }
 
