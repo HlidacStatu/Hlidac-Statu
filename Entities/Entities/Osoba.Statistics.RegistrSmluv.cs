@@ -2,6 +2,7 @@
 using HlidacStatu.Lib.Analytics;
 
 using System.Collections.Generic;
+using System.Linq;
 
 namespace HlidacStatu.Entities
 {
@@ -35,7 +36,29 @@ namespace HlidacStatu.Entities
 
 
             }
+            public class Dotace
+            {
 
+                public string OsobaNameId { get; set; }
+                public Relation.AktualnostType Aktualnost { get; set; }
+
+                public Dictionary<string, StatisticsSubjectPerYear<Firma.Statistics.Dotace>> StatniFirmy { get; set; } = new();
+                public Dictionary<string, StatisticsSubjectPerYear<Firma.Statistics.Dotace>> SoukromeFirmy { get; set; } = new();
+                public Dictionary<string, StatisticsSubjectPerYear<Firma.Statistics.Dotace>> Neziskovky { get; set; } = new();
+
+                public StatisticsPerYear<Firma.Statistics.Dotace> AllDotaceSummary()
+                {
+                    var allDotace = StatniFirmy.Values                        
+                        .Concat(SoukromeFirmy.Values)
+                        .Concat(Neziskovky.Values);
+
+                    StatisticsPerYear<Firma.Statistics.Dotace> summ = StatisticsSubjectPerYear<Firma.Statistics.Dotace>
+                        .AggregateStats(allDotace);
+
+                    return summ;
+                }
+
+            }
 
 
         }

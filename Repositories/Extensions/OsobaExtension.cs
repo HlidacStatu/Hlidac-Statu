@@ -201,7 +201,7 @@ namespace HlidacStatu.Extensions
             //STAT FIX
             //return new();
 
-            var ret = OsobaStatistics.CachedStatistics(osoba, minAktualnost, obor, forceUpdateCache);
+            var ret = OsobaStatistics.CachedStatistics_Smlouvy(osoba, minAktualnost, obor, forceUpdateCache);
             foreach (var k in ret.SoukromeFirmy.Keys)
                 if (ret.SoukromeFirmy[k] == null)
                     ret.SoukromeFirmy[k] = new StatisticsSubjectPerYear<Smlouva.Statistics.Data>();
@@ -211,7 +211,17 @@ namespace HlidacStatu.Extensions
 
             return ret;
         }
+        public static Osoba.Statistics.Dotace StatistikaDotace(this Osoba osoba,
+    Relation.AktualnostType minAktualnost, bool forceUpdateCache = false)
+        {
+            //temporary fix for null values
+            //STAT FIX
+            //return new();
 
+            Osoba.Statistics.Dotace ret = OsobaStatistics.CachedStatistics_Dotace(osoba, minAktualnost, forceUpdateCache);
+
+            return ret;
+        }
         static Devmasters.Cache.Redis.Manager<InfoFact[], Osoba> _cacheInfoFacts =
             Devmasters.Cache.Redis.Manager<InfoFact[], Osoba>
                 .GetSafeInstance("Osoba_InfoFacts_v1_",
@@ -291,17 +301,17 @@ namespace HlidacStatu.Extensions
                 {
                     //ostatni
                     statDesc += $"Angažoval se {(stat.StatniFirmy.Count > 0 ? "také" : "")} v <b>";
-                    if (stat.NeziskovkyCount() > 0 && stat.KomercniFirmyCount() == 0)
+                    if (stat.SmlouvyStat_NeziskovkyCount() > 0 && stat.SmlouvyStat_KomercniFirmyCount() == 0)
                     {
                         statDesc +=
-                            $"{Plural.Get(stat.NeziskovkyCount(), "jedné neziskové organizaci", "{0} neziskových organizacích", "{0} neziskových organizacích")}";
+                            $"{Plural.Get(stat.SmlouvyStat_NeziskovkyCount(), "jedné neziskové organizaci", "{0} neziskových organizacích", "{0} neziskových organizacích")}";
                     }
-                    else if (stat.NeziskovkyCount() > 0)
+                    else if (stat.SmlouvyStat_NeziskovkyCount() > 0)
                     {
                         statDesc +=
-                            $"{Plural.Get(stat.NeziskovkyCount(), "jedné neziskové organizaci", "{0} neziskových organizacích", "{0} neziskových organizacích")}";
+                            $"{Plural.Get(stat.SmlouvyStat_NeziskovkyCount(), "jedné neziskové organizaci", "{0} neziskových organizacích", "{0} neziskových organizacích")}";
                         statDesc +=
-                            $" a {Plural.Get(stat.KomercniFirmyCount(), "jedné soukr.firmě", "{0} soukr.firmách", "{0} soukr.firmách")}";
+                            $" a {Plural.Get(stat.SmlouvyStat_KomercniFirmyCount(), "jedné soukr.firmě", "{0} soukr.firmách", "{0} soukr.firmách")}";
                     }
                     else
                     {

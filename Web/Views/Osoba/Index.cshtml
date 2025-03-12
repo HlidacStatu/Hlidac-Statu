@@ -151,7 +151,7 @@
     @{
         laps.StopPreviousAndStartNextLap("registr smluv");
     }
-    @if (statistics.SoukromeFirmySummary()?.Summary().PocetSmluv + statistics.NeziskovkySummary()?.Summary().PocetSmluv > 0)
+    @if (statistics.SmlouvyStat_SoukromeFirmySummary()?.Summary().PocetSmluv + statistics.SmlouvyStat_NeziskovkySummary()?.Summary().PocetSmluv > 0)
     {
         <div>
             <h4>
@@ -184,7 +184,7 @@
                 spoluvlastnila
                 nebo byla v orgánech společnosti, a to <b>@(aktualnost.ToNiceDisplayName().ToLower())</b>.
             </p>
-            @if (statistics.SoukromeFirmy.Count > 0 && statistics.SoukromeFirmySummary().Summary().PocetSmluv > 0)
+            @if (statistics.SoukromeFirmy.Count > 0 && statistics.SmlouvyStat_SoukromeFirmySummary().Summary().PocetSmluv > 0)
             {
                 <p>
                     @switch (aktualnost)
@@ -211,9 +211,9 @@
                             break;
                     }
 
-                    @if (statistics.NeziskovkyCount() > 0)
+                    @if (statistics.SmlouvyStat_NeziskovkyCount() > 0)
                     {
-                        <span>(z toho v @Devmasters.Lang.CS.Plural.Get(statistics.NeziskovkyCount(), "jedné neziskovce", "{0} neziskovkách", "{0} neziskovkách")):</span>
+                        <span>(z toho v @Devmasters.Lang.CS.Plural.Get(statistics.SmlouvyStat_NeziskovkyCount(), "jedné neziskovce", "{0} neziskovkách", "{0} neziskovkách")):</span>
                     }
                 <ul>
                     @foreach (var stat in statistics.SoukromeFirmy
@@ -246,7 +246,7 @@
 
                 </p>
             }
-            else if (statistics.SoukromeFirmy.Count > 0 && statistics.SoukromeFirmySummary().Summary().PocetSmluv == 0)
+            else if (statistics.SoukromeFirmy.Count > 0 && statistics.SmlouvyStat_SoukromeFirmySummary().Summary().PocetSmluv == 0)
             {
                 <p>
 

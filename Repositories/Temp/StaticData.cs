@@ -84,7 +84,7 @@ namespace HlidacStatu.Repositories
                 if (o != null)
                 {
                     var stat = o.StatistikaRegistrSmluv(Relation.AktualnostType.Nedavny);
-                    if (stat.SoukromeFirmySummary().HasStatistics && stat.SoukromeFirmySummary().Summary().PocetSmluv > 0)
+                    if (stat.SmlouvyStat_SoukromeFirmySummary().HasStatistics && stat.SmlouvyStat_SoukromeFirmySummary().Summary().PocetSmluv > 0)
                     {
                         allStats.Add(stat);
                     }
@@ -100,13 +100,13 @@ namespace HlidacStatu.Repositories
 
         Dictionary<int, Osoba.Statistics.VerySimple[]> res = new();
         res.Add(0,
-                allStats.OrderByDescending(o => o.SoukromeFirmySummary().Summary().CelkovaHodnotaSmluv).Take(100)
-                .Union(allStats.OrderByDescending(o => o.SoukromeFirmySummary().Summary().PocetSmluv).Take(100))
+                allStats.OrderByDescending(o => o.SmlouvyStat_SoukromeFirmySummary().Summary().CelkovaHodnotaSmluv).Take(100)
+                .Union(allStats.OrderByDescending(o => o.SmlouvyStat_SoukromeFirmySummary().Summary().PocetSmluv).Take(100))
                 .Select(m => new VerySimple()
                 {
                     OsobaNameId = m.OsobaNameId,
-                    CelkovaHodnotaSmluv = m.SoukromeFirmySummary().Summary().CelkovaHodnotaSmluv,
-                    PocetSmluv = m.SoukromeFirmySummary().Summary().PocetSmluv,
+                    CelkovaHodnotaSmluv = m.SmlouvyStat_SoukromeFirmySummary().Summary().CelkovaHodnotaSmluv,
+                    PocetSmluv = m.SmlouvyStat_SoukromeFirmySummary().Summary().PocetSmluv,
                     Year = 0,
                 }
                 )
@@ -115,13 +115,13 @@ namespace HlidacStatu.Repositories
         foreach (int year in HlidacStatu.Entities.KIndex.Consts.ToCalculationYears)
         {
             res.Add(year,
-                    allStats.OrderByDescending(o => o.SoukromeFirmySummary()[year].CelkovaHodnotaSmluv).Take(100)
-                    .Union(allStats.OrderByDescending(o => o.SoukromeFirmySummary()[year].PocetSmluv).Take(100))
+                    allStats.OrderByDescending(o => o.SmlouvyStat_SoukromeFirmySummary()[year].CelkovaHodnotaSmluv).Take(100)
+                    .Union(allStats.OrderByDescending(o => o.SmlouvyStat_SoukromeFirmySummary()[year].PocetSmluv).Take(100))
                     .Select(m => new VerySimple()
                     {
                         OsobaNameId = m.OsobaNameId,
-                        CelkovaHodnotaSmluv = m.SoukromeFirmySummary()[year].CelkovaHodnotaSmluv,
-                        PocetSmluv = m.SoukromeFirmySummary()[year].PocetSmluv,
+                        CelkovaHodnotaSmluv = m.SmlouvyStat_SoukromeFirmySummary()[year].CelkovaHodnotaSmluv,
+                        PocetSmluv = m.SmlouvyStat_SoukromeFirmySummary()[year].PocetSmluv,
                         Year = year,
                     }
                     )

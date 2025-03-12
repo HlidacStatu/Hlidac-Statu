@@ -169,7 +169,8 @@ namespace HlidacStatu.Extensions
         public static Lib.Analytics.StatisticsSubjectPerYear<Firma.Statistics.Dotace> StatistikaDotaci(
             this Firma firma, bool forceUpdateCache = false)
         {
-            return FirmaStatistics.CachedStatisticsDotace(firma, forceUpdateCache);
+            return FirmaStatistics.CachedStatisticsDotace(firma, forceUpdateCache) ?? 
+                new Lib.Analytics.StatisticsSubjectPerYear<Firma.Statistics.Dotace>() { ICO=firma.ICO };
 
         }
         public static Lib.Analytics.StatisticsSubjectPerYear<Firma.Statistics.Dotace> HoldingStatistikaDotaci(
@@ -179,7 +180,8 @@ namespace HlidacStatu.Extensions
             //STAT FIX
             //return new();
 
-            return FirmaStatistics.CachedHoldingStatisticsDotace(firma, aktualnost, forceUpdateCache);
+            return FirmaStatistics.CachedHoldingStatisticsDotace(firma, aktualnost, forceUpdateCache) ??
+                new Lib.Analytics.StatisticsSubjectPerYear<Firma.Statistics.Dotace>() { ICO = firma.ICO }; ;
         }
 
         public static Lib.Analytics.StatisticsSubjectPerYear<Firma.Statistics.VZ> StatistikaVerejneZakazky(
@@ -188,7 +190,8 @@ namespace HlidacStatu.Extensions
             //STAT FIX
             //return new ();
 
-            return FirmaStatistics.CachedStatisticsVZ(firma, forceUpdateCache);
+            return FirmaStatistics.CachedStatisticsVZ(firma, forceUpdateCache) ??
+                new Lib.Analytics.StatisticsSubjectPerYear<Firma.Statistics.VZ>() { ICO = firma.ICO };
         }
         public static Lib.Analytics.StatisticsSubjectPerYear<Firma.Statistics.VZ> HoldingStatistikaVerejneZakazky(
             this Firma firma,
@@ -197,7 +200,8 @@ namespace HlidacStatu.Extensions
             //STAT FIX
             //return new();
 
-            return FirmaStatistics.CachedHoldingStatisticsVZ(firma, aktualnost, forceUpdateCache);
+            return FirmaStatistics.CachedHoldingStatisticsVZ(firma, aktualnost, forceUpdateCache) ??
+                new Lib.Analytics.StatisticsSubjectPerYear<Firma.Statistics.VZ>() { ICO = firma.ICO };
         }
 
         public static Task<KIndexData> KindexAsync(this Firma firma, bool useTemp = false)
@@ -392,7 +396,8 @@ namespace HlidacStatu.Extensions
             this Firma firma,
             Relation.AktualnostType aktualnost, int? obor = null, bool forceUpdateCache = false)
         {
-            return FirmaStatistics.CachedHoldingStatisticsSmlouvy(firma, aktualnost, obor, forceUpdateCache);
+            return FirmaStatistics.CachedHoldingStatisticsSmlouvy(firma, aktualnost, obor, forceUpdateCache) ??
+                new Lib.Analytics.StatisticsSubjectPerYear<Smlouva.Statistics.Data>() { ICO = firma.ICO };
 
         }
 

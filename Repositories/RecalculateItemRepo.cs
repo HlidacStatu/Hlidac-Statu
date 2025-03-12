@@ -73,17 +73,39 @@ namespace HlidacStatu.Repositories
             var o = Osoby.GetByNameId.Get(item.Id);
             if (o != null)
             {
-                if (invalidateOnly)
+                switch (item.StatisticsType)
                 {
-                    OsobaStatistics.RemoveCachedStatistics(o, null);
-                    o.InfoFactsCacheInvalidate();
+                    case RecalculateItem.StatisticsTypeEnum.Smlouva:
+                        if (invalidateOnly)
+                        {
+                            OsobaStatistics.RemoveCachedStatistics_Smlouvy(o, null);
+                            o.InfoFactsCacheInvalidate();
+                        }
+                        else
+                        {
+
+                            _ = o.StatistikaRegistrSmluv(DS.Graphs.Relation.AktualnostType.Nedavny, forceUpdateCache: noRebuild ? false : true);
+                            _ = o.InfoFactsCached(forceUpdateCache: noRebuild ? false : true);
+                        }
+                        RecalculateItemRepo.Finish(item);
+                        break;
+                    case RecalculateItem.StatisticsTypeEnum.Dotace:
+                        if (invalidateOnly)
+                        {
+                            OsobaStatistics.RemoveCachedStatistics_Dotace(o);
+                            o.InfoFactsCacheInvalidate();
+                        }
+                        else
+                        {
+
+                            _ = o.StatistikaDotace(DS.Graphs.Relation.AktualnostType.Nedavny, forceUpdateCache: noRebuild ? false : true);
+                            _ = o.InfoFactsCached(forceUpdateCache: noRebuild ? false : true);
+                        }
+                        RecalculateItemRepo.Finish(item);
+                        break;
+                    default:
+                        break;
                 }
-                else
-                {
-                    _ = o.StatistikaRegistrSmluv(DS.Graphs.Relation.AktualnostType.Nedavny, forceUpdateCache: noRebuild ? false : true);
-                    _ = o.InfoFactsCached(forceUpdateCache: noRebuild ? false : true);
-                }
-                RecalculateItemRepo.Finish(item);
 
             }
         }
