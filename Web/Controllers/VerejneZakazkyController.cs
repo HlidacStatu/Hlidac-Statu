@@ -43,7 +43,7 @@ namespace HlidacStatu.Web.Controllers
 
             return View(vz);
         }
-
+        
         public async Task<ActionResult> TextDokumentu(string id, string sha)
         {
             var vz = await VerejnaZakazkaRepo.LoadFromESAsync(id);
