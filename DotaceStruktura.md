@@ -7,6 +7,11 @@
 **Žadatel rok** narození - Jedná se o rok narození osoby, která dostala přidělenu dotaci, pokud není identifikována pomocí IČO  
 **Název projektu** - Čeho se dotace týká (za/na co dostává žadatel peníze), nebo také jaký je účel dotace  
 **Datum schválení** - Kdy bylo schváleno. Stačí rok.  
+
+**Název dotačního programu** - Dotace jsou většinou rozdělovány na programové a individuální. Rádi bychom obdržely název programu, kterého se dotace týkají (např. Kotlíkové dotace, sportovní dotace mládež, kulturní dotace - divadla). Záleží na každé obci, jak dotace rozděluje, není potřeba vyplňovat programy uměle.  
+**Kód dotačního programu** - Pokud má dotační program přidělen kód, pak vyplňte i kód tohoto programu  
+
+
 **\*Schválená částka** - Kolik peněz bylo schváleno k proplacení na požadovaný projekt  
 **\*Vyplacená částka** - Kolik peněz nakonec žadatel na dotaci čerpal  
 
@@ -14,8 +19,6 @@
 
 ### Rádi bychom obdrželi (pokud něco z následujících položek není součástí exportu, nebo by bylo složité na dohledání, tak nevyplňujte):
 **Vrácená částka** - Pokud došlo k nějakým vratkám, pak částka, kolik bylo vráceno.  
-**Název dotačního programu** - Dotace jsou většinou rozdělovány na programové a individuální. Rádi bychom obdržely název programu, kterého se dotace týkají (např. Kotlíkové dotace, sportovní dotace mládež, kulturní dotace - divadla). Záleží na každé obci, jak dotace rozděluje, není potřeba vyplňovat programy uměle.  
-**Kód dotačního programu** - Pokud má dotační program přidělen kód, pak vyplňte i kód tohoto programu  
 **Žadatel PSČ**  
 **Žadatel obec**  
 **Žadatel okres**  
