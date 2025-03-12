@@ -27,78 +27,11 @@ namespace HlidacStatu.Repositories
         }
 
         public static void RecalculateTasks(int? threads = null, bool debug = false, string[] ids = null,
-            Action<string> outputWriter = null,
-            Action<Devmasters.Batch.ActionProgressData> progressWriter = null,
-            int? maxItemsInBatch = null, bool allItemsInDb = false, bool noRebuild = true,
+            Action<string> outputWriter = null,Action<Devmasters.Batch.ActionProgressData> progressWriter = null,
+            int? maxItemsInBatch = null, bool allItemsInDb = false,
             bool invalidateOnly = false
             )
         {
-            bool onlyIds = ids?.Count() > 0;
-            if (allItemsInDb == true)
-                _logger.Information($"Don't cascade to parents");
-
-            maxItemsInBatch = maxItemsInBatch ?? int.MaxValue;
-
-            threads = threads ?? 20;
-
-            int numFromQueue = 0;
-            List<RecalculateItem> uniqueItems = null;
-            IEnumerable<RecalculateItem> allItems = null;
-            if (onlyIds)
-            {
-                List<RecalculateItem> items = ids
-                    .Select(m => new RecalculateItem()
-                    {
-                        StatisticsType = RecalculateItem.StatisticsTypeEnum.Smlouva,
-                        Id = m,
-                        ItemType = RecalculateItem.ItemTypeEnum.Subjekt
-                    })
-                    .Concat(
-                        ids.Select(m => new RecalculateItem()
-                        {
-                            StatisticsType = RecalculateItem.StatisticsTypeEnum.Smlouva,
-                            Id = m,
-                            ItemType = RecalculateItem.ItemTypeEnum.Person
-                        })
-                    )
-                    .Distinct(comparer)
-                    .ToList();
-                System.Collections.Concurrent.ConcurrentBag<RecalculateItem> list = new(items);
-
-                if (allItemsInDb)
-                    uniqueItems = items.Distinct(comparer).ToList();
-                else
-                {
-                    Console.WriteLine($"Cascading {items.Count} items");
-                    uniqueItems = items.SelectMany(m => {
-                        Console.Write(".");
-                        return CascadeItems(m, ref list);
-                        })
-                            .Distinct(comparer).ToList();
-                }
-                Devmasters.Batch.Manager.DoActionForAll<RecalculateItem>(items,
-                    item =>
-                    {
-                        if (debug)
-                            _logger.Debug($"start statistics {item.ItemType.ToString()} {item.Id}");
-                        if (item.ItemType == RecalculateItem.ItemTypeEnum.Subjekt)
-                            RecalculateItemRepo.RecalculateFirma(item, false, invalidateOnly);
-                        else if (item.ItemType == RecalculateItem.ItemTypeEnum.Person)
-                            RecalculateItemRepo.RecalculateOsoba(item, false, invalidateOnly);
-
-                        if (debug)
-                            _logger.Debug($"end statistics {item.ItemType.ToString()} {item.Id}");
-
-                        return new Devmasters.Batch.ActionOutputData();
-                    },
-                    null, null,
-                    !System.Diagnostics.Debugger.IsAttached, maxDegreeOfParallelism: threads,
-                    monitor: new MonitoredTaskRepo.ForBatch("Downloader ", "RecalculateTasks ids ")
-                    );
-                return;
-            }
-            if (allItemsInDb == false)
-            {
                 Devmasters.Batch.Manager.DoActionForAll<int>(Enumerable.Range(0, int.MaxValue - 1),
                     xx =>
                     {
@@ -130,7 +63,7 @@ namespace HlidacStatu.Repositories
                     !System.Diagnostics.Debugger.IsAttached, maxDegreeOfParallelism: threads,
                     monitor: new MonitoredTaskRepo.ForBatch("Downloader ", "RecalculateTasks from queue ")
                     );
-            }
+            
             _logger.Information("Ends RecalculateTasks with {numOfThreads} threads", threads.Value);
 
         }
