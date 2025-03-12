@@ -39,7 +39,7 @@
     <ol class="breadcrumb">
         <li><a href="/">Hlídač Státu</a></li>
         <li><a href="@Url.Action("Index", "VerejneZakazky")">Hlídač Veřejných zakázek</a></li>
-        <li><a href="@Url.Action("Index", "VerejneZakazky", new { id=Model.Id })">Zakázka @Model.NazevZakazky</a></li>
+        <li><a href="@Url.Action("Zakazka", "VerejneZakazky", new { id=Model.Id })">Zakázka @Model.NazevZakazky</a></li>
         <li class="active">@ViewBag.SubTitle</li>
     </ol>
 }
