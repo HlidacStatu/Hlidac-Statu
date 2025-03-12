@@ -23,16 +23,16 @@ namespace HlidacStatu.Repositories.Statistics
                     Devmasters.Config.GetWebConfigValue("RedisCachePassword"),
                         keyValueSelector: obj => $"{obj.os.NameId}/{obj.aktualnost}/{(obj.obor ?? 0)}");
 
-        static Devmasters.Cache.Redis.Manager<Osoba.Statistics.Dotace, (Osoba os, int aktualnost)>
+        static Devmasters.Cache.AWS_S3.Manager<Osoba.Statistics.Dotace, (Osoba os, int aktualnost)>
       _cacheDotace
-          = Devmasters.Cache.Redis.Manager<Osoba.Statistics.Dotace, (Osoba os, int aktualnost)>
+          = Devmasters.Cache.AWS_S3.Manager<Osoba.Statistics.Dotace, (Osoba os, int aktualnost)>
               .GetSafeInstance("Osoba_DotaceStatistics_v1_",
                   (obj) => CalculateDotaceStat(obj.os, (Relation.AktualnostType)obj.aktualnost),
                   TimeSpan.Zero,
-              Devmasters.Config.GetWebConfigValue("RedisServerUrls").Split(';'),
-              Devmasters.Config.GetWebConfigValue("RedisBucketName"),
-              Devmasters.Config.GetWebConfigValue("RedisUsername"),
-              Devmasters.Config.GetWebConfigValue("RedisCachePassword"),
+                new string[] { Devmasters.Config.GetWebConfigValue("Minio.Cache.Endpoint") },
+                Devmasters.Config.GetWebConfigValue("Minio.Cache.Bucket"),
+                Devmasters.Config.GetWebConfigValue("Minio.Cache.AccessKey"),
+                Devmasters.Config.GetWebConfigValue("Minio.Cache.SecretKey"),
                   keyValueSelector: obj => $"{obj.os.NameId}/{obj.aktualnost}");
 
 
