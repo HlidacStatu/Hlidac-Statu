@@ -434,6 +434,19 @@ namespace HlidacStatu.Repositories
             mergedDuplicates = mergedDuplicates.Concat(
                 isRedDeMinimisDuplicates.Where(od => mergedDuplicates.Any(hd => hd.Id == od.Id) == false)).ToList();
             
+            
+            mergedDuplicates = FixDuplicateExceptions(subsidy, mergedDuplicates);
+            
+
+            return mergedDuplicates;
+        }
+
+        private static List<Subsidy> FixDuplicateExceptions(Subsidy subsidy, List<Subsidy> mergedDuplicates)
+        {
+            if (subsidy.ProjectCode == "MV-25297-33/PO-2009")
+            {
+                return mergedDuplicates.Where(md => md.ProjectName == subsidy.ProjectName).ToList();
+            }
 
             return mergedDuplicates;
         }
