@@ -18,9 +18,9 @@ namespace HlidacStatu.Connectors.IO
 
             // Normalize all separators to the OS-specific one
             if (Path.DirectorySeparatorChar == '\\')
-                this._root = rootPath.Replace('/', Path.DirectorySeparatorChar);
+                this._root = _root.Replace('/', Path.DirectorySeparatorChar);
             if (Path.DirectorySeparatorChar == '/')
-                this._root = rootPath.Replace('\\', Path.DirectorySeparatorChar);
+                this._root = _root.Replace('\\', Path.DirectorySeparatorChar);
             
             // Ensure the path ends with a directory separator
             if (!this._root.EndsWith(Path.DirectorySeparatorChar))
