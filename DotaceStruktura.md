@@ -4,7 +4,7 @@
 
 **Žadatel název** - Jedná se o jméno firmy, nebo osoby, která dostala přidělenu dotaci  
 **Žadatel IČO** - Jedná se o IČO firmy, nebo FOP, která dostala přidělenu dotaci  
-**Žadatel rok** narození - Jedná se o rok narození osoby, která dostala přidělenu dotaci, pokud není identifikována pomocí IČO  
+**Žadatel rok narození** - Jedná se o rok narození osoby, která dostala přidělenu dotaci, pokud není identifikována pomocí IČO  
 **Název projektu** - Čeho se dotace týká (za/na co dostává žadatel peníze), nebo také jaký je účel dotace  
 **Datum schválení** - Kdy bylo schváleno. Stačí rok.  
 
@@ -58,6 +58,7 @@ Struktura obsahuje vše, co má minimální struktura a navíc má rozpad financ
         "ulice": "28. října"
     },
     "program": {
+      "identifikator": "x1234",
       "kod": "CZ.03.1.51/0.0/0.0/19_101/0014322",
       "nazev": "Zelená úsporám",
       "uri": "https://novazelenausporam.cz/dokumenty/podminky-unor-2025/oprav-dum-po-babicce/",
@@ -132,5 +133,37 @@ Struktura obsahuje vše, co má minimální struktura a navíc má rozpad financ
     "spravce_dotace_nazev": "eufondy",
     "spravce_dotace_ico": "66002222",
     "datumaktualizaceudaju": "2024-11-14T23:42:29.935Z"
+}
+```
+
+Navíc ke struktuře dotace samotné by měl vzniknout i číselník programů, aby bylo možné vyhodnocovat jednotlivé programy, jejich efekt a aby bylo možné snáze zkontrolovat dodržení podmínek.
+
+```
+{
+    "identifikator": "x1234",
+    "kod": "CZ.03.1.51/0.0/0.0/19_101/0014322",
+    "nazev": "Zelená úsporám",
+    "uri": "https://novazelenausporam.cz/dokumenty/podminky-unor-2025/oprav-dum-po-babicce/",
+    "datum_pocatku": "2022-03-13T00:00:00.000Z",
+    "datum_konce": "2025-03-13T00:00:00.000Z",
+    "deadline_podani_zadosti": "2022-04-13T00:00:00.000Z",
+    "popis": "Tady by měl být klidně dlouhý popis programu - čemu slouží, co je cílem programu, proč vznikl, co do programu patří",
+    "podminky": "Tady by měl být seznam podmínek, které se v projektu vycházejícího z tohoto programu musí, nebo mají splnit",
+    "minimalni_cerpana_castka": 100000,
+    "maximalni_cerpana_castka": 10000000,
+    "zdroje_penez": [
+        {
+            "nazev": "Ministerstvo práce a sociálních věcí",
+            "ico": "00551023",
+            "alokace": 50,
+            "maximalni_castka": 5000000
+        },
+        {
+            "nazev": "Evropská unie",
+            "ico": "",
+            "alokace": 50,
+            "maximalni_castka": 5000000
+        }
+    ]
 }
 ```
