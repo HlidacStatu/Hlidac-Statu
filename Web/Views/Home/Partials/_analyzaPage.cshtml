@@ -20,7 +20,7 @@
 
     HlidacStatu.Lib.Analytics.StatisticsPerYear<Smlouva.Statistics.Data> statistics = fullAnalysis.Statistics;
     var statisticsAfter2016 = statistics
-        .Where(s => statistics.YearsAfter2016().Contains(s.Year))
+        .Where(s => statistics.YearsAfter2016().Contains(s.Year)).Where(m => m.Year < DateTime.Now.Year + 1)
         .OrderBy(s => s.Year).ToList();
 
     //var seasonStat = statistics.CurrentSeasonStatistics();

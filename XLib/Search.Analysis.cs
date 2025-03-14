@@ -37,7 +37,7 @@ namespace HlidacStatu.XLib
         public static async Task<FullAnalysis> AnalysisAsync(string query)
         {
 
-            int[] years = HlidacStatu.Lib.Analytics.Consts.RegistrSmluvYearsList.Where(m => m > 2018).ToArray();
+            int[] years = HlidacStatu.Lib.Analytics.Consts.RegistrSmluvYearsList.ToArray(); //.Where(m => m > 2018).ToArray();
 
 
             var t1 = SmlouvyStatistics.CalculateAsync(query);
