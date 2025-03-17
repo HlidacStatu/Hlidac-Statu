@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security;
 using System.Threading.Tasks;
 
 namespace HlidacStatu.Repositories.Searching
@@ -30,6 +31,80 @@ namespace HlidacStatu.Repositories.Searching
             }
         }
 
+        private class politikStem
+        {
+            public string NameId { get; set; }
+            public string JmenoStem { get; set; }
+            public string PrijmeniStem { get; set; }
+        }
+
+        public static Devmasters.Cache.AWS_S3.Cache<Dictionary<string, string>> CalculatedStemCache { get; set; } =
+            new Devmasters.Cache.AWS_S3.Cache<Dictionary<string, string>>(
+            new string[] { Devmasters.Config.GetWebConfigValue("Minio.Cache.Endpoint") },
+            Devmasters.Config.GetWebConfigValue("Minio.Cache.Bucket"),
+            Devmasters.Config.GetWebConfigValue("Minio.Cache.AccessKey"),
+            Devmasters.Config.GetWebConfigValue("Minio.Cache.SecretKey"),
+            TimeSpan.Zero,
+            "politiciSCalculatedStems",
+            (o) =>
+            {
+                return new Dictionary<string, string>();
+            });
+
+        private static Devmasters.Cache.AWS_S3.AutoUpdatebleCache<politikStem[]> PoliticiStemsCache =
+            new Devmasters.Cache.AWS_S3.AutoUpdatebleCache<politikStem[]>(
+            new string[] { Devmasters.Config.GetWebConfigValue("Minio.Cache.Endpoint") },
+            Devmasters.Config.GetWebConfigValue("Minio.Cache.Bucket"),
+            Devmasters.Config.GetWebConfigValue("Minio.Cache.AccessKey"),
+            Devmasters.Config.GetWebConfigValue("Minio.Cache.SecretKey"),
+            TimeSpan.FromDays(5),
+            "politiciStems",
+            (o) =>
+            {
+                var politici = OsobaRepo.Politici.Get();
+                var ret = new List<politikStem>();
+                var stemCache = CalculatedStemCache.Get();
+                foreach (var p in politici)
+                {
+                    Console.Write(".");
+                    string word1 = p.Jmeno.Trim();
+                    if (!stemCache.ContainsKey(word1))
+                    {
+                        try
+                        {
+                            stemCache[word1] = string.Join(" ", StemsAsync(p.Jmeno).ConfigureAwait(false).GetAwaiter().GetResult());
+                        }
+                        catch (Exception)
+                        {
+                            stemCache[word1] = p.Jmeno;
+                        }
+
+                    }
+                    string word2 = p.Prijmeni.Trim();
+                    if (!stemCache.ContainsKey(word2))
+                    {
+                        try
+                        {
+                            stemCache[word2] = string.Join(" ", StemsAsync(p.Prijmeni).ConfigureAwait(false).GetAwaiter().GetResult());
+                        }
+                        catch (Exception)
+                        {
+                            stemCache[word2] = p.Prijmeni;
+                        }
+                    }
+
+                    ret.Add(new politikStem()
+                    {
+                        NameId = p.NameId,
+                        JmenoStem = stemCache[word1],
+                        PrijmeniStem = stemCache[word2]
+                    });
+                }
+                CalculatedStemCache.ForceRefreshCache(stemCache);
+
+                return ret.ToArray();
+            });
+
         static List<Tuple<string, string[]>> InitPoliticiStems()
         {
             HashSet<string> slova = new HashSet<string>();
@@ -50,11 +125,11 @@ namespace HlidacStatu.Repositories.Searching
                 slova.Add(s);
             }
 
-            foreach (var p in OsobaRepo.Politici.Get())
+            foreach (var p in PoliticiStemsCache.Get())
             {
-                var cols = new string[] { p.Jmeno.ToLower(), p.Prijmeni.ToLower() };
+                var cols = new string[] { p.JmenoStem.ToLower(), p.PrijmeniStem.ToLower() };
                 var key = p.NameId;
-                
+
                 List<string> names = new List<string>();
                 for (int i = 1; i < cols.Length; i++)
                 {
@@ -88,11 +163,29 @@ namespace HlidacStatu.Repositories.Searching
 
         public static async Task<string[]> StemsAsync(string text, int ngramLength = 1)
         {
-            using var wc = new System.Net.Http.HttpClient();
-            var data = System.Net.Http.Json.JsonContent.Create(text);
-            var res = await wc.PostAsync(classificationBaseUrl() + "/text_stemmer_ngrams?ngrams="+ ngramLength, data).ConfigureAwait(false);
+            int tries = 0;
+        start:
+            try
+            {
+                tries++;
+                using var wc = new System.Net.Http.HttpClient();
+                var data = System.Net.Http.Json.JsonContent.Create(text);
+                var res = await wc.PostAsync(classificationBaseUrl() + "/text_stemmer_ngrams?ngrams=" + ngramLength, data).ConfigureAwait(false);
 
-            return Newtonsoft.Json.JsonConvert.DeserializeObject<string[]>(await res.Content.ReadAsStringAsync().ConfigureAwait(false));
+                return Newtonsoft.Json.JsonConvert.DeserializeObject<string[]>(await res.Content.ReadAsStringAsync().ConfigureAwait(false));
+
+            }
+            catch (Exception e)
+            {
+
+                if (tries < 6)
+                {
+                    System.Threading.Thread.Sleep(20 * tries);
+                    goto start;
+                }
+                else
+                    throw;
+            }
         }
 
         private static string classificationBaseUrl()
@@ -102,8 +195,8 @@ namespace HlidacStatu.Repositories.Searching
             //Dictionary<string, DateTime> liveEndpoints = new Dictionary<string, DateTime>();
             var url = baseUrl[Rnd.Next(baseUrl.Length)];
 
-            if (System.Diagnostics.Debugger.IsAttached)
-                url = "http://localhost:8080";
+            //if (System.Diagnostics.Debugger.IsAttached)
+            //    url = "http://localhost:8080";
 
 
             return url;
@@ -123,6 +216,7 @@ namespace HlidacStatu.Repositories.Searching
             //Console.WriteLine($"stemmer {stopw.ExactElapsedMiliseconds} ");
             stopw.Restart();
             List<string> found = new List<string>();
+            var debug = PoliticiStems.Where(m => m.Item1 == "martina-bartova-14").ToArray();
             foreach (var kv in PoliticiStems)
             {
                 string zkratka = kv.Item1;

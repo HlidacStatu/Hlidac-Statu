@@ -60,10 +60,13 @@ namespace HlidacStatu.Repositories
 
         public static Devmasters.Cache.LocalMemory.Cache<List<double>> BasicStatisticData = null;
 
-        public static Devmasters.Cache.AWS_S3.Cache<string> CzechDictCache = new Devmasters.Cache.AWS_S3.Cache<string>(new string[] { Devmasters.Config.GetWebConfigValue("Minio.Cache.Endpoint") }, Devmasters.Config.GetWebConfigValue("Minio.Cache.Bucket"), Devmasters.Config.GetWebConfigValue("Minio.Cache.AccessKey"), Devmasters.Config.GetWebConfigValue("Minio.Cache.SecretKey"),
+        public static Devmasters.Cache.AWS_S3.Cache<string> CzechDictCache = 
+            new Devmasters.Cache.AWS_S3.Cache<string>(
+                new string[] { Devmasters.Config.GetWebConfigValue("Minio.Cache.Endpoint") }, Devmasters.Config.GetWebConfigValue("Minio.Cache.Bucket"), Devmasters.Config.GetWebConfigValue("Minio.Cache.AccessKey"), Devmasters.Config.GetWebConfigValue("Minio.Cache.SecretKey"),
             TimeSpan.Zero, "Czech.3-2-5.dic.txt", (obj) =>
             {
-                return Devmasters.Net.HttpClient.Simple.GetAsync("https://somedata.hlidacstatu.cz/appdata/Czech.3-2-5.dic.txt").Result;
+                string s= Devmasters.Net.HttpClient.Simple.GetAsync("https://somedata.hlidacstatu.cz/appdata/Czech.3-2-5.dic.txt").Result;
+                return s;
             }, null);
         public static Devmasters.Cache.AWS_S3.Cache<string> CrawlerUserAgentsCache = new Devmasters.Cache.AWS_S3.Cache<string>(new string[] { Devmasters.Config.GetWebConfigValue("Minio.Cache.Endpoint") }, Devmasters.Config.GetWebConfigValue("Minio.Cache.Bucket"), Devmasters.Config.GetWebConfigValue("Minio.Cache.AccessKey"), Devmasters.Config.GetWebConfigValue("Minio.Cache.SecretKey"),
             TimeSpan.Zero, "crawler-user-agents.json", (obj) =>
