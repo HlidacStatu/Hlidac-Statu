@@ -1,35 +1,24 @@
-﻿@using HlidacStatu.Repositories
+﻿@using HlidacStatu.Entities
+@using HlidacStatu.Repositories
 @using HlidacStatu.Repositories.SharedModels
+@using PlatyUredniku.Models
+@inject ZiggyCreatures.Caching.Fusion.IFusionCache cache;
 @{
-    var stats = await PuRepo.GetGlobalStatAsync();
+    
+    List<PuPolitikPrijem> platy = (List<PuPolitikPrijem>?)ViewData["platy"];
 
-    var organizationOfTheDay = await PuRepo.GetOrganizationOfTheDayAsync();
-    var ceoOfTheDay = organizationOfTheDay.Platy.FirstOrDefault(p => p.JeHlavoun == true && p.Rok == PuRepo.DefaultYear);
+    var organizationOfTheDay = await PpRepo.GetOrganizationOfTheDayAsync();
+    var ceoOfTheDay = organizationOfTheDay.Platy.FirstOrDefault(p => p.JeHlavoun == true && p.Rok == PpRepo.DefaultYear);
     var dataForOrganizationOfTheDay = await StaticCache.GetFullDetailAsync(organizationOfTheDay.DS);
 }
 
 <section class="d-flex align-items-center justify-content-center">
     <div class="container">
         <h2>
-            Platy úředníků v @PuRepo.DefaultYear
+            Platy politiků v @PpRepo.DefaultYear
         </h2>
         <p class="">
-            V mnoha demokratických zemích je běžné, že veřejnost může kontrolovat odměňování těch, kteří hospodaří s penězi daňových poplatníků.
-            <b>Informace o platech a odměnách</b> vedoucích úřadů, státních podniků či příspěvkových organizací v ČR ale veřejně <b>dostupné či dohledatelné nejsou</b>.
-            Proto jsme tu my! Využíváme zákona o svobodném přístupu k informacím a na platy a odměny se ptáme už mnoho let.
-        </p>
-        <p>
-            Platy a odměny jsou stanoveny
-            <a asp-controller="Texty" asp-action="PlatyStatnichZamestnancu">nařízením vlády</a>
-            nebo
-            <a asp-controller="Texty" asp-action="Nejvyssi">zákonem</a>.
-
-        </p>
-        <p class="lead">
-        </p>
-        <p class="">
-            Nově jsme přidali také <strong><a asp-controller="Politici" asp-action="Index">Platy politiků</a></strong>.
-            Nebo se můžete podívat na staré dobré <strong><a asp-controller="Urednici" asp-action="Index">Platy úředníků</a></strong>.
+            Nové platy politiků - prozkoumejte a podívejte se, kolik akumulují
         </p>
     </div>
 </section>
@@ -37,12 +26,12 @@
 <section class="d-flex align-items-center justify-content-center alter-bg-color">
     <div class="container">
         <h5>
-            Za @PuRepo.DefaultYear jsme žádali o platy @(HlidacStatu.Util.RenderData.NiceNumber(stats.PocetOslovenych)) organizací
-            a plat nám @(DateTime.Now<new DateTime(2025,04,1)? "zatím":"") poskytlo @(HlidacStatu.Util.RenderData.NiceNumber(stats.PocetCoPoslaliPlat)) z nich.
+            Za @PpRepo.DefaultYear jsme žádali o platy @(HlidacStatu.Util.RenderData.NiceNumber(stats.PocetOslovenych)) organizací
+            a plat nám poskytlo @(HlidacStatu.Util.RenderData.NiceNumber(stats.PocetCoPoslaliPlat)) z nich.
 
         </h5>
         <p>
-            <a asp-controller="Urednici" asp-action="Oblasti" class="btn btn-primary btn-sm">Seznam všech organizací <span class="badge text-bg-danger">@(HlidacStatu.Util.RenderData.NiceNumber(stats.PocetOslovenych))</span></a>
+            <a class="btn btn-primary btn-sm" href="/oblasti">Seznam všech organizací <span class="badge text-bg-danger">@(HlidacStatu.Util.RenderData.NiceNumber(stats.PocetOslovenych))</span></a>
         </p>
         <p class="mb-2 mt-4 text-body-secondary">
         <p>Platy organizací v jednotlivých oblastech</p>
@@ -50,7 +39,7 @@
                 @{
                     int count = 0;
                 }
-                @foreach (var group in PuRepo.MainTags.Chunk(PuRepo.MainTags.Length / 4 + 1))
+                @foreach (var group in PpRepo.MainTags.Chunk(PpRepo.MainTags.Length / 4 + 1))
                 {
                     count = count + 1;
                 <div class="col-md-3 col-sm-6 col-6">
@@ -100,13 +89,12 @@
                              $"<span class='text-success'><i class='fa-solid fa-badge-check'></span></i>Dostali jsme celkem {{0}} platy vedení organizace",
                              $"<span class='text-success'><i class='fa-solid fa-badge-check'></span></i>Dostali jsme celkem {{0}} manažerských platů")
                              )
-                    za rok @(PuRepo.DefaultYear).
+                    za rok @(PpRepo.DefaultYear).
                 </p>
                 <p>
-                    <a asp-controller="Urednici"
-                       asp-action="Detail"
+                    <a asp-action="Detail"
                        asp-route-id="@organizationOfTheDay.DS"
-                       asp-route-rok="@PuRepo.DefaultYear"
+                       asp-route-rok="@PpRepo.DefaultYear"
                        class="btn btn-primary btn-sm">Detail o platech</a>
                 </p>
 

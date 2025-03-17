@@ -61,6 +61,18 @@ public static class PpRepo
                                       && p.Rok == rok
                                       && p.Nameid == nameid);
     }
+    
+    public static async Task<List<PuPolitikPrijem>> GetPrijmyPolitika(string nameid)
+    {
+        await using var db = new DbEntities();
+
+        return await db.PuPoliticiPrijmy
+            .AsNoTracking()
+            .Include(p => p.Organizace).ThenInclude(o => o.FirmaDs)
+            .Include(p => p.Organizace).ThenInclude(o => o.Tags)
+            .Where(p => p.Nameid == nameid)
+            .ToListAsync();
+    }
 
 
     public static async Task<int> GetPlatyCountAsync(int rok)
@@ -72,7 +84,30 @@ public static class PpRepo
             .Where(p => p.Rok == rok)
             .CountAsync();
     }
+    
+    public static async Task<List<PuOrganizace>> GetActiveOrganizaceForTagAsync(string tag, int limit = 0)
+    {
+        await using var db = new DbEntities();
 
+        var query = db.PuOrganizaceTags
+            .AsNoTracking()
+            .Where(t => tag == null || t.Tag.Equals(tag))
+            .Include(t => t.Organizace).ThenInclude(o => o.FirmaDs)
+            .Include(t => t.Organizace).ThenInclude(o => o.Metadata.Where(m => m.Typ == PuOrganizaceMetadata.TypMetadat.PlatyPolitiku))
+            .Include(t => t.Organizace).ThenInclude(o => o.PrijmyPolitiku)
+            .Select(t => t.Organizace);
+
+        if (limit > 0)
+            query = query.Take(limit);
+
+        return await query.ToListAsync();
+    }
+
+    public static readonly string[] MainTags =
+    [
+        "politici",
+    ];
+    
     public static async Task<List<PuPolitikPrijem>> GetPlatyAsync(int rok)
     {
         await using var db = new DbEntities();

@@ -1,0 +1,159 @@
+@using HlidacStatu.Lib.Web.UI
+@using HlidacStatu.Repositories
+@using HlidacStatu.XLib.Render
+@using PlatyUredniku.Models;
+@{
+
+    var ministerstva = await PuRepo.GetActiveOrganizaceForTagAsync("ministerstvo");
+    var ministerstvaPlatyNamestku = ministerstva.SelectMany(o =>
+        o.Platy.Where(p => p.NazevPozice.Contains("náměstek", StringComparison.InvariantCultureIgnoreCase))
+            .GroupBy(p => p.Rok)
+            .Select(g => new NamestciMinisterstevSummary()
+            {
+                Rok = g.Key,
+                NazevOrganizace = o.Nazev,
+                DatovaSchranka = o.DS,
+                SouhrnPlatu = (decimal?)g.Sum(p => p.HrubyMesicniPlatVcetneOdmen)
+            }))
+        .ToList();
+    var allYears = Enumerable.Range(ministerstvaPlatyNamestku.Min(p => p.Rok), PuRepo.DefaultYear - ministerstvaPlatyNamestku.Min(p => p.Rok)+1).ToList();
+    
+    //fill in gaps in years
+    foreach (var year in allYears)
+    {
+        foreach (var ministerstvo in ministerstva)
+        {
+            if (ministerstvaPlatyNamestku.Any(m => m.Rok == year && m.DatovaSchranka == ministerstvo.DS))
+                continue;
+            
+            ministerstvaPlatyNamestku.Add(new NamestciMinisterstevSummary()
+            {
+                Rok = year,
+                NazevOrganizace = ministerstvo.Nazev,
+                DatovaSchranka = ministerstvo.DS,
+                SouhrnPlatu = (decimal?)null
+            });
+            
+        }
+    }
+}
+
+@section breadcrumbs
+{
+    <ol class="breadcrumb">
+        <li>
+            <a asp-action="Index">Platy úředníků</a>
+        </li>
+        <li class="active">
+            Náměstci ministerstev
+        </li>
+    </ol>
+}
+
+@section scripts
+{
+    <link rel="stylesheet" type="text/css" href="//cdn.datatables.net/1.13.4/css/jquery.dataTables.min.css" />
+    <script type="text/javascript" charset="utf8" src="//cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
+}
+
+<section class="d-flex align-items-center justify-content-center">
+    <div class="container">
+        <h2>Přehled kolik vyplácela jednotlivá ministerstva svým náměstkům v letech</h2>
+        <p class="text-muted">Výplaty náměstkům</p>
+
+        <div style="height: 600px" id="perYchart"></div>
+        <script>
+            Highcharts.chart('perYchart', {
+                chart: {
+                    type: 'column'
+                },
+                title: { text:'' },
+                xAxis: {
+                    categories: [@Html.Raw(string.Join(",", allYears.Select(m => $"'{m}'").OrderBy(o => o))) ]
+                },
+                yAxis: {
+                    min: 0,
+                    title: {
+                        text: 'Suma odměn náměstků ministerstev'
+                    }
+                },
+                tooltip: {
+                    pointFormat: '<span style="color:{series.color}">{series.name}</span>: <b>{point.y}</b><br/>',
+                    shared: true
+                },
+                plotOptions: {
+                    column: {
+                        stacking: 'normal',
+                        dataLabels: {
+                            enabled: true,
+                            format: '{point.t}'
+                        }
+                    }
+                },
+                series: [
+                    @foreach (var item in ministerstvaPlatyNamestku.Select(m=>m.NazevOrganizace).Distinct().OrderBy(o=>o))
+                    {
+                        var data = ministerstvaPlatyNamestku
+                            .Where(m => m.NazevOrganizace == item)
+                            .OrderBy(o=>o.Rok)
+                            .Select(m=> new { y=(int)(m.SouhrnPlatu ?? 0), t=HlidacStatu.Util.RenderData.ShortNiceNumber(m.SouhrnPlatu ?? 0,exactScale:HlidacStatu.Util.RenderData.MaxScale.Milion) });
+                        <text>
+                            @Html.Raw($"{{ name:'{item}',data:[ {string.Join(",", data.Select(m=>$"{{ t:'{m.t}', y:{m.y} }}"))} ] }},")
+                        </text>
+                    }
+                    ]
+            });
+
+    </script>
+
+        <div class="tab-pane width-75vp" id="prehledOdmen" role="tabpanel">
+            <script>
+                $(document).ready(function () {
+                    $('#tblSum_prehledOdmen').DataTable(
+                        {
+                            'language': {
+                                'url': '//cdn.datatables.net/plug-ins/1.13.4/i18n/cs.json'
+                            },
+                            "searching": false,
+                            "paging": true,
+                            "pageLength": 20,
+                            "lengthChange": false,
+                            "ordering": true,
+                            "order": [[2,'desc']],
+                            "info": false
+                        });
+                });
+            </script>
+
+            <table class="table table-borderless table-hover table-striped " id="tblSum_prehledOdmen">
+                <thead class="table-dark">
+                <th>Organizace</th>
+                <th class="text-end">Rok</th>
+                <th class="text-end">Souhrnný průměrný plat včetně odměn</th>
+                </thead>
+                <tbody>
+                    @foreach (var platNamestku in ministerstvaPlatyNamestku.OrderBy(m => m.NazevOrganizace).ThenBy(m => m.Rok))
+                    {
+                        <tr>
+                            <td>
+                                <a asp-action="Detail" asp-route-id="@platNamestku.DatovaSchranka">@platNamestku.NazevOrganizace</a>
+                            </td>
+
+                        <td class="number" data-order="@(HlidacStatu.Util.RenderData.OrderValueFormat(platNamestku.Rok))">@platNamestku.Rok</td>
+                        <td class="number" data-order="@(HlidacStatu.Util.RenderData.OrderValueFormat(platNamestku.SouhrnPlatu ?? 0))">
+                        @if (platNamestku.SouhrnPlatu.HasValue)
+                        {
+                            @HlidacStatu.Util.RenderData.NicePriceHtml(platNamestku.SouhrnPlatu.Value)    
+                        }
+                        else
+                        {
+                            <span>nedostali jsme data</span>
+                        }
+                        </td>
+                    </tr>
+                }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</section>

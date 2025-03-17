@@ -44,7 +44,6 @@ inner join Firma_DS fds
         "kultura",
         "ministerstvo",
         "nemocnice",
-        "politici",
         "práce",
         "průmysl a obchod",
         "rozvoj",
@@ -179,7 +178,6 @@ inner join Firma_DS fds
             .Include(o => o.Tags)
             .Include(o => o.FirmaDs)
             .Include(o => o.Platy) // Include PuPlat
-            .Include(o => o.PrijmyPolitiku) // Include PuPrijmyPolitiku
             .FirstOrDefaultAsync();
     }
 
@@ -192,8 +190,7 @@ inner join Firma_DS fds
             .Include(o => o.Metadata)
             .Include(o => o.Tags)
             .Include(o => o.FirmaDs)
-            .Include(o => o.Platy)
-            .Include(o => o.PrijmyPolitiku);
+            .Include(o => o.Platy);
 
         if (!string.IsNullOrEmpty(datovaSchranka))
         {

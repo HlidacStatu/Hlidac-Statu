@@ -37,6 +37,26 @@
       <AdditionalFiles Include="Views\Shared\Components\AutocompleteWrap.razor" />
       <AdditionalFiles Include="Views\Shared\Components\HlidacAutocompleteMultitag.razor" />
       <AdditionalFiles Include="Views\Shared\Components\_Imports.razor" />
+      <AdditionalFiles Include="Views\Urednici\analyza_kategorie.cshtml" />
+      <AdditionalFiles Include="Views\Urednici\analyza_NamestciMinisterstev.cshtml" />
+      <AdditionalFiles Include="Views\Urednici\analyza_NejvyssiOdmeny.cshtml" />
+      <AdditionalFiles Include="Views\Urednici\analyza_ZmenaNejvyssihoPlatu.cshtml" />
+      <AdditionalFiles Include="Views\Urednici\analyza_ZmenaPlatuCeos.cshtml" />
+      <AdditionalFiles Include="Views\Urednici\analyzy.cshtml" />
+      <AdditionalFiles Include="Views\Urednici\Detail.cshtml" />
+      <AdditionalFiles Include="Views\Urednici\DlePlatu.cshtml" />
+      <AdditionalFiles Include="Views\Urednici\Error.cshtml" />
+      <AdditionalFiles Include="Views\Urednici\Index.cshtml" />
+      <AdditionalFiles Include="Views\Urednici\NotFound.cshtml" />
+      <AdditionalFiles Include="Views\Urednici\Oblast.cshtml" />
+      <AdditionalFiles Include="Views\Urednici\Oblasti.cshtml" />
+      <AdditionalFiles Include="Views\Urednici\OpenData.cshtml" />
+      <AdditionalFiles Include="Views\Urednici\Plat.cshtml" />
+      <AdditionalFiles Include="Views\Urednici\ServerError.cshtml" />
+      <AdditionalFiles Include="Views\Urednici\Statistika_Rusty.cshtml" />
+      <AdditionalFiles Include="Views\Urednici\Statistika_Rusty1.cshtml" />
+      <AdditionalFiles Include="Views\Urednici\Statistika_Rusty2.cshtml" />
+      <AdditionalFiles Include="Views\Urednici\_platDetail.cshtml" />
     </ItemGroup>
 
     <ItemGroup>

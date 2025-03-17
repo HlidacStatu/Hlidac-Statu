@@ -1,0 +1,41 @@
+@model Dictionary<string, List<HlidacStatu.Entities.PuOrganizace>>
+
+@section breadcrumbs
+{
+    <ol class="breadcrumb">
+        <li>
+            <a asp-action="Index">Platy úředníků</a>
+        </li>
+        <li class="active">Oblasti</li>
+    </ol>
+}
+
+<section class="d-flex align-items-center justify-content-center">
+    <div class="container">
+        <div>
+            <table class="table table-borderless table-hover">
+                <tbody>
+                @foreach (var kvp in Model)
+                {
+                    <tr>
+                        <td>
+                            <hashtag tag="@kvp.Key" style="font-size:1em;"></hashtag>
+                        </td>
+                        <td>
+                            @{
+                                var instituce = kvp.Value;
+                                var sample = ".";
+                                if (instituce.Count > 1)
+                                {
+                                    sample = $" jako např. {instituce[0].Nazev}, {instituce[1].Nazev} a další.";
+                                }
+                            }
+                                Oblast obsahuje celkem <a asp-action="oblast" asp-route-id="@kvp.Key"><b>@(instituce.Count)</b> institucí</a> @(sample)
+                        </td>
+                    </tr>
+                }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</section>

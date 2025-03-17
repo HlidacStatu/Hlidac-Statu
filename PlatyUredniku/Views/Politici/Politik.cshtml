@@ -1,0 +1,69 @@
+@using HlidacStatu.Repositories
+@using HlidacStatu.Entities
+@using HlidacStatu.Lib.Web.UI
+@using Microsoft.AspNetCore.Mvc.TagHelpers
+@model List<PuPolitikPrijem>
+
+
+@section breadcrumbs
+{
+    <ol class="breadcrumb">
+        <li>
+            <a asp-action="Index">Platy úředníků</a>
+        </li>
+        <li>
+            <a asp-action="Oblasti">Oblasti</a>
+        </li>
+        <li>
+            <hashtag tag="@ViewData["mainTag"]" style="font-size:13px; padding:0.2em"></hashtag>
+        </li>
+        <li>
+            <a asp-action="Detail" asp-route-id="@Model.Organizace.DS">@Model.Organizace.Nazev</a>
+        </li>
+        <li class="active">@Model.NazevPozice (@Model.Rok)</li>
+    </ol>
+}
+
+<section class="d-flex justify-content-center">
+    <div class="container">
+        <div>
+            <h2><i class="fa-regular fa-building-columns"></i>&nbsp;@Model.Organizace.Nazev</h2>
+
+            <h3 class="fw-bold"><i class="fa-regular fa-user"></i>&nbsp;@Model.NazevPozice</h3>
+            <div class="d-flex">
+
+                <div class="me-3">
+
+                    <div class="d-flex">
+                        <div>
+                            <div class="person-profile-thumb">
+                                <div class="photo">
+                                    <div class="profile-picture border"
+                                         style="background-image: url('@ceo.Osoba.GetPhotoUrl(false, Osoba.PhotoTypes.NoBackground)')"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mt-1">
+                            <p class="py-0 my-0 lead fw-bold">
+                                <a href="@ceo.Osoba.GetUrl(false)">@ceo.Osoba.FullName()</a>
+                            </p>
+                            <p style="display: none" class="py-0 my-0">@Html.Raw(ceo.Osoba.NarozeniYear(true))</p>
+                        </div>
+                    </div>
+                    
+                </div>
+                <div>
+
+                </div>
+            </div>
+        </div>
+
+
+    </div>
+</section>
+<section class="d-flex alter-bg-color">
+    <div class="container">
+        <h3>Detailní informace</h3>
+
+    </div>
+</section>

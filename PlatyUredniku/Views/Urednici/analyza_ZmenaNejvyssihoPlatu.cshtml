@@ -1,0 +1,119 @@
+@using HlidacStatu.Repositories
+@using PlatyUredniku.Models;
+@using System.Collections.Generic;
+@using HlidacStatu.Util;
+
+@{
+    bool max = this.Context.Request.Query.GetFirstQueryParameter("max") != "false";
+
+
+    int minYear = Devmasters.ParseText.ToInt(this.Context.Request.Query.GetFirstQueryParameter("minyear")) ?? 2021;
+    var orgs = await PuRepo.GetPlatyForYearsAsync(minYear, PuRepo.DefaultYear);
+
+    List<PrumerPlatu> rusty = new();
+    foreach (var org in orgs)
+    {
+        var platyBezCeos = org.Platy
+            .Where(plat => plat.JeHlavoun != true)
+            .Where(plat => plat.PocetMesicu == 12)
+            .ToList();
+        var platyPrvniRok = platyBezCeos.Where(p => p.Rok == minYear);
+        var platyPosledniRok = platyBezCeos.Where(p => p.Rok == PuRepo.DefaultYear);
+        if (!platyPrvniRok.Any() || !platyPosledniRok.Any())
+            continue;
+
+        var rustPlatu = new PrumerPlatu()
+                {
+                    DatovaSchrankaOrganizace = org.DS,
+                    NazevOrganizace = org.Nazev,
+                    PlatPrvniRok = platyPrvniRok.Max(p => p.HrubyMesicniPlatVcetneOdmen),
+                    PlatPosledniRok = platyPosledniRok.Max(p => p.HrubyMesicniPlatVcetneOdmen),
+                };
+
+        //filter results
+        if (rustPlatu.PlatPrvniRok > 0 && rustPlatu.PlatPosledniRok > 0)
+        {
+            rusty.Add(rustPlatu);
+        }
+
+    }
+}
+@section breadcrumbs
+{
+    <ol class="breadcrumb">
+        <li>
+            <a asp-action="Index">Platy úředníků</a>
+        </li>
+        <li>
+            <a asp-action="Analyzy">Analýzy</a>
+        </li>
+
+        <li class="active">
+            @(max ? "Největší navýšení" : "Největší snížení") platů nejvyšších představitelů od roku @minYear
+        </li>
+    </ol>
+}
+
+@section scripts
+{
+    <link rel="stylesheet" type="text/css" href="//cdn.datatables.net/1.13.4/css/jquery.dataTables.min.css" />
+    <script type="text/javascript" charset="utf8" src="//cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
+}
+
+<section class="d-flex align-items-center justify-content-center">
+    <div class="container">
+        <h2>@(max ? "Největší navýšení" : "Největší snížení") platů mimo ředitele v organizacích od roku @minYear</h2>
+        <p class="text-muted">
+            Přehled růstu nejvyššího platu včetně odměn mezi roky @minYear a @PuRepo.DefaultYear <sup>*)</sup> u pozic, která nejsou nejvyššími představiteli.
+            Porovnání provádíme u pozice s nejvyšším ročním příjmem včetně odměn v letech @minYear a @PuRepo.DefaultYear.
+            Tato pozice může být v obou letech rozdílná a nemusí odpovídat stejnému člověku.
+            <br />
+            Jinými slovy, jde o porovnání nárustu platů u rekordmanů v jednotlivých organizacích.
+        </p>
+
+        <div class="tab-pane width-75vp" id="rustPlatuCeo" role="tabpanel">
+            <script>
+                $(document).ready(function () {
+                    $('#tblSum_rustPlatuCeo').DataTable(
+                        {
+                            'language': {
+                                'url': '//cdn.datatables.net/plug-ins/1.13.4/i18n/cs.json'
+                            },
+                            "searching": false,
+                            "paging": true,
+                            "pageLength": 20,
+                            "lengthChange": false,
+                            "ordering": true,
+                            "order": [[3, @Html.Raw(max ? "'desc'" : "'asc'")]],
+                            "info": false
+                        });
+                });
+            </script>
+
+            <table class="table table-borderless table-striped table-hover" id="tblSum_rustPlatuCeo">
+                <thead class="table-dark">
+                <th>Organizace</th>
+                <th><abbr title="Průměrný měsíční plat přepočtený z ročního příjmu včetně odměn">Měsíční plat</abbr> v @minYear</th>
+                <th><abbr title="Průměrný měsíční plat přepočtený z ročního příjmu včetně odměn">Měsíční plat</abbr> v @PuRepo.DefaultYear</th>
+                <th>Změna v %</th>
+                <th>Změna v Kč</th>
+                </thead>
+                <tbody>
+                    @foreach (var prumerPlatu in rusty.OrderByDescending(p => p.NarustProcentualni))
+                    {
+                        <tr>
+                            <td>
+                                <a asp-action="Detail" asp-route-id="@prumerPlatu.DatovaSchrankaOrganizace">@prumerPlatu.NazevOrganizace</a>
+                            </td>
+                            <td class="number text-nowrap" data-order="@(HlidacStatu.Util.RenderData.OrderValueFormat(prumerPlatu.PlatPrvniRok ?? 0))">@HlidacStatu.Util.RenderData.NicePrice(prumerPlatu.PlatPrvniRok ?? 0)</td>
+                            <td class="number text-nowrap" data-order="@(HlidacStatu.Util.RenderData.OrderValueFormat(prumerPlatu.PlatPosledniRok ?? 0))">@HlidacStatu.Util.RenderData.NicePrice(prumerPlatu.PlatPosledniRok ?? 0)</td>
+                            <td class="number text-nowrap" data-order="@(HlidacStatu.Util.RenderData.OrderValueFormat(prumerPlatu.NarustProcentualni ?? 0))">@prumerPlatu.NarustProcentualni?.ToString("P")</td>
+                            <td class="number text-nowrap" data-order="@(HlidacStatu.Util.RenderData.OrderValueFormat(prumerPlatu.NarustAbsolutni ?? 0))">@HlidacStatu.Util.RenderData.NicePrice(prumerPlatu.NarustAbsolutni ?? 0)</td>
+
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</section>

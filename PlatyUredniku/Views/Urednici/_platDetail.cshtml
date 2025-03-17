@@ -1,0 +1,112 @@
+﻿@model (HlidacStatu.Entities.PuPlat plat, HlidacStatu.Entities.PuOrganizace organizace)
+
+@using HlidacStatu.Entities
+@using HlidacStatu.Lib.Web.UI
+@using HlidacStatu.Repositories
+
+
+@{
+    var plat = Model.plat;
+    var org = Model.organizace;
+}
+<section class="d-flex align-items-center justify-content-center" id="plat@(plat.Id)">
+    <div class="row boxes">
+
+        <h3>@plat.NazevPozice</h3>
+        @if (plat.JeHlavoun == true)
+        {
+            <div class="col-2">
+                @if (!string.IsNullOrWhiteSpace(plat.Organizace.Ico))
+                {
+                    var ceos = OsobaEventRepo.GetCeos(plat.Organizace.Ico, new DateTime(plat.Rok, 1, 1), new DateTime(plat.Rok, 12, 31));
+                    if (ceos is not null && ceos.Length > 0)
+                    {
+                        foreach (var ceo in ceos)
+                        {
+                            <div>
+                                <div>
+                                    <div class="person-profile-thumb">
+                                        <div class="photo">
+                                            <div class="profile-picture border" style="background-image: url('@ceo.Osoba.GetPhotoUrl(false, Osoba.PhotoTypes.NoBackground)')"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div>
+                                    <p class="py-0 my-0 lead">
+                                        <a href="@ceo.Osoba.GetUrl(false)">@ceo.Osoba.FullName()</a>
+                                    </p>
+                                    <p class="py-0 my-0">@Html.Raw(ceo.Osoba.NarozeniYear(true))</p>
+                                </div>
+                            </div>
+                        }
+                    }
+                }
+            </div>
+            <p>
+                <i class="fas fa-exclamation-circle" style="padding-right:20px;" aria-hidden="true"></i>
+                <b>Pozice představeného/vedoucího organizace</b>
+            </p>
+            <img src="https://user-images.githubusercontent.com/6562690/54934415-b4d25b80-4edb-11e9-8758-fb29ada50499.png" style="height:290px; width:80%"/>
+        }
+
+        <h4>Pracovní poměr</h4>
+        <p class="text-body-secondary">
+            <b>Úvazek</b> <mark>@HlidacStatu.Util.RenderData.NicePercent(plat.Uvazek, 0)</mark>
+        </p>
+        <p class="text-body-secondary">
+            <b>Počet odpracovaných měsíců</b> <mark>@HlidacStatu.Util.RenderData.NiceNumber(plat.PocetMesicu ?? 12)</mark>
+        </p>
+        <h4>Odměna za rok @plat.Rok</h4>
+        <div class="col">
+            <p>
+                <i class="fas fa-exclamation-circle" style="padding-right:20px;" aria-hidden="true"></i>
+                <b>Celkový příjem za rok @plat.Rok včetně odměn</b>
+
+                <mark>
+                    @HlidacStatu.Util.RenderData.NicePriceHtml(plat.CelkovyRocniPlatVcetneOdmen)
+                </mark>
+                @if (plat.Odmeny.HasValue)
+                {
+                    <span>
+
+                        , z toho <b>odměny</b> <mark>@HlidacStatu.Util.RenderData.NicePriceHtml(plat.Odmeny.Value)</mark>
+                    </span>
+                }
+
+            </p>
+            <p>
+                <i class="fas fa-exclamation-circle" style="padding-right:20px;" aria-hidden="true"></i>
+                <b>Přepočtený měsíční plat</b>
+                <mark>
+                    @HlidacStatu.Util.RenderData.NicePriceHtml(plat.HrubyMesicniPlatVcetneOdmen)
+                </mark>
+            </p>
+
+            @if (string.IsNullOrEmpty(plat.PoznamkaPlat) == false)
+            {
+                <p>
+                    <i style="padding-right:20px;" aria-hidden="true">
+                        @plat.PoznamkaPlat
+                    </i>
+                </p>
+            }
+            @if (string.IsNullOrEmpty(plat.NefinancniBonus) == false)
+            {
+                <p>
+                    <i class="fas fa-exclamation-circle" style="padding-right:20px;" aria-hidden="true"></i>
+                    <b>Nefinanční bonus</b> <span style="padding-left:40px;">@plat.NefinancniBonus</span>
+                </p>
+            }
+        </div>
+        <div class="col">
+            @Html.SemiCircleDonut(new Tuple<string, decimal>[]
+                {
+                    new Tuple<string, decimal>("Plat", plat.Plat.Value),
+                    new Tuple<string, decimal>("Odměna", plat.Odmeny ?? 0),
+                },
+                "Poměr základního platu a odměny", "Kč", 200)
+        </div>
+
+
+    </div>
+</section>

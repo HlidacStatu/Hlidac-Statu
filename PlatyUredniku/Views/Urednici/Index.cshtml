@@ -1,7 +1,11 @@
-﻿@using HlidacStatu.Repositories
+﻿@using HlidacStatu.Entities
+@using HlidacStatu.Repositories
 @using HlidacStatu.Repositories.SharedModels
+@using PlatyUredniku.Models
+@inject ZiggyCreatures.Caching.Fusion.IFusionCache cache;
 @{
     var stats = await PuRepo.GetGlobalStatAsync();
+    List<PuPlat> platy = (List<PuPlat>?)ViewData["platy"];
 
     var organizationOfTheDay = await PuRepo.GetOrganizationOfTheDayAsync();
     var ceoOfTheDay = organizationOfTheDay.Platy.FirstOrDefault(p => p.JeHlavoun == true && p.Rok == PuRepo.DefaultYear);
@@ -27,9 +31,9 @@
         </p>
         <p class="lead">
         </p>
-        <p class="">
-            Nově jsme přidali také <strong><a asp-controller="Politici" asp-action="Index">Platy politiků</a></strong>.
-            Nebo se můžete podívat na staré dobré <strong><a asp-controller="Urednici" asp-action="Index">Platy úředníků</a></strong>.
+        <p class="fs-5" style="display: none">
+            Polovina představených úřadů má plat nižší než @(HlidacStatu.Util.RenderData.NicePrice(stats.PercentilyPlatuHlavounu[50])),
+            čtvrtina má plat vyšší než @(HlidacStatu.Util.RenderData.NicePrice(stats.PercentilyPlatuHlavounu[75])) měsíčně včetně odměn.
         </p>
     </div>
 </section>
@@ -38,11 +42,11 @@
     <div class="container">
         <h5>
             Za @PuRepo.DefaultYear jsme žádali o platy @(HlidacStatu.Util.RenderData.NiceNumber(stats.PocetOslovenych)) organizací
-            a plat nám @(DateTime.Now<new DateTime(2025,04,1)? "zatím":"") poskytlo @(HlidacStatu.Util.RenderData.NiceNumber(stats.PocetCoPoslaliPlat)) z nich.
+            a plat nám poskytlo @(HlidacStatu.Util.RenderData.NiceNumber(stats.PocetCoPoslaliPlat)) z nich.
 
         </h5>
         <p>
-            <a asp-controller="Urednici" asp-action="Oblasti" class="btn btn-primary btn-sm">Seznam všech organizací <span class="badge text-bg-danger">@(HlidacStatu.Util.RenderData.NiceNumber(stats.PocetOslovenych))</span></a>
+            <a class="btn btn-primary btn-sm" href="/oblasti">Seznam všech organizací <span class="badge text-bg-danger">@(HlidacStatu.Util.RenderData.NiceNumber(stats.PocetOslovenych))</span></a>
         </p>
         <p class="mb-2 mt-4 text-body-secondary">
         <p>Platy organizací v jednotlivých oblastech</p>
@@ -103,8 +107,7 @@
                     za rok @(PuRepo.DefaultYear).
                 </p>
                 <p>
-                    <a asp-controller="Urednici"
-                       asp-action="Detail"
+                    <a asp-action="Detail"
                        asp-route-id="@organizationOfTheDay.DS"
                        asp-route-rok="@PuRepo.DefaultYear"
                        class="btn btn-primary btn-sm">Detail o platech</a>
