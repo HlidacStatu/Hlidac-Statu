@@ -42,7 +42,7 @@
     <div class="container">
         <h5>
             Za @PuRepo.DefaultYear jsme žádali o platy @(HlidacStatu.Util.RenderData.NiceNumber(stats.PocetOslovenych)) organizací
-            a plat nám poskytlo @(HlidacStatu.Util.RenderData.NiceNumber(stats.PocetCoPoslaliPlat)) z nich.
+            a plat nám @(DateTime.Now<new DateTime(2025,04,1)? "zatím":"") poskytlo @(HlidacStatu.Util.RenderData.NiceNumber(stats.PocetCoPoslaliPlat)) z nich.
 
         </h5>
         <p>

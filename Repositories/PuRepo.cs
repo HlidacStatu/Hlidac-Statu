@@ -27,7 +27,7 @@ inner join Firma_DS fds
 
      */
 
-    public const int DefaultYear = 2023;
+    public const int DefaultYear = 2024;
     public const int MinYear = 2016;
 
     public static int[] AllYears = Enumerable.Range(MinYear, DefaultYear-MinYear+1).ToArray();
