@@ -3,6 +3,7 @@ using EnumsNET;
 using HlidacStatu.Connectors;
 using HlidacStatu.Entities;
 using HlidacStatu.Entities;
+using Microsoft.CodeAnalysis;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -243,18 +244,104 @@ inner join Firma_DS fds
         return metadata?.Where(m => m.Rok == rok).ToList();
     }
 
+
+    public static PuOrganizaceMetadata.Description GetMetadataDescription(this PuOrganizace org, PuOrganizaceMetadata.TypMetadat typ, int rok = DefaultYear )
+    {
+        var res = new PuOrganizaceMetadata.Description();
+        
+        var metadataList = org.MetadataPlatyUredniku.Where(m => m.Rok == rok && m.Typ == typ).ToList();
+        //ted pracuju pouze s jednou
+        var metadata = metadataList.FirstOrDefault();
+
+        if (org.Platy.AktualniRok().Count == 0 && PuRepo.GetNeaktivniOrganizace().ToArray().Any(m => m.Item1 == org.DS))
+        {
+            res.TextStatus = "Této organizace jsme se na platy neptali";
+            res.Detail = "";
+            res.BootstrapStatus = "primary";
+            res.Icon = "fa-solid fa-question-circle";
+        }
+        else if (metadata == null)
+        {
+            res.TextStatus = "Této organizace jsme se na platy neptali";
+            res.Detail = "";
+            res.BootstrapStatus = "primary";
+            res.Icon = "fa-solid fa-question-circle";
+
+        }
+        else if (metadata.DatumPrijetiOdpovedi == null)
+        {
+            res.TextStatus = $"{metadata.DatumOdeslaniZadosti:d. M. yyyy} Odeslána žádost o platy";
+            res.Detail = "Data jsme zatím nedostali nebo nezpracovali.";
+            res.BootstrapStatus = "primary";
+            res.Icon = "fa-solid fa-question-circle";
+
+        }
+        else if (org.Platy.AktualniRok(rok).Count == 0)
+        {
+            res.TextStatus = "Odmítli poskytnout platy";
+            res.Detail = metadata.PoznamkaHlidace;
+            res.BootstrapStatus = "danger";
+            res.Icon = "fa-solid fa-circle-xmark";
+        }
+        else if (org.Platy.AktualniRok(rok).Count == 1)
+        {
+            res.TextStatus = "Evidujeme jeden plat jedné pozice";
+            res.Detail = metadata.PoznamkaHlidace;
+            res.BootstrapStatus = "warning";
+            res.Icon = "fa-solid fa-circle-exclamation";
+        }
+        else if (org.Platy.AktualniRok(rok).Count < 5)
+        {
+            res.TextStatus = $"{org.Platy.AktualniRok(rok).Count} platy";
+            res.Detail = metadata.PoznamkaHlidace;
+            res.BootstrapStatus = "success";
+            res.Icon = "fa-solid fa-badge-check";
+        }
+        else
+        {
+            res.TextStatus = $"{org.Platy.AktualniRok(rok).Count} platů";
+            res.Detail = metadata.PoznamkaHlidace;
+            res.BootstrapStatus = "success";
+            res.Icon = "fa-solid fa-badge-check";
+        }
+        return res;
+    }
+
+    public static string PlatyForYearUredniciDescription(this PuOrganizace org, int rok = DefaultYear)
+    {
+        var desc = org.GetMetadataDescription( PuOrganizaceMetadata.TypMetadat.PlatyUredniku, rok);
+        return desc.TextStatus;
+    }
+
+
+    public static string PlatyForYearUredniciDescriptionHtml(this PuOrganizace org, int rok = DefaultYear, bool withDetail = false)
+    {
+        var desc = org.GetMetadataDescription(PuOrganizaceMetadata.TypMetadat.PlatyUredniku, rok);
+
+        return $"<span class='text-{desc.BootstrapStatus}'><i class='{desc.Icon}'></i> {desc.TextStatus}{(withDetail ? $". {desc.Detail}" : "")}</span>";
+    }
+
+
+    static Devmasters.Cache.LocalMemory.AutoUpdatedCache<IEnumerable<Tuple<string, string>>> _neaktivniOrganizaceCache
+        = new Devmasters.Cache.LocalMemory.AutoUpdatedCache<IEnumerable<Tuple<string, string>>>(TimeSpan.FromHours(1), "NeaktivniOrganizace",
+            (o) => {
+                return DirectDB.GetList<string, string>(@"
+select distinct ds.DatovaSchranka, f.ico from firma f 
+	inner join Firma_DS ds on f.ICO=ds.ICO
+	inner join PU_Organizace puo on ds.DatovaSchranka = puo.DS
+	where f.status>1 	
+");
+            }
+
+            );
+
     /// <summary>
     /// dvojice datovaschranka , ICO
     /// </summary>
     /// <returns></returns>
     public static IEnumerable<Tuple<string, string>> GetNeaktivniOrganizace()
     {
-        IEnumerable<Tuple<string, string>> nonActiveDS = DirectDB.GetList<string, string>(@"
-select distinct ds.DatovaSchranka, f.ico from firma f 
-	inner join Firma_DS ds on f.ICO=ds.ICO
-	inner join PU_Organizace puo on ds.DatovaSchranka = puo.DS
-	where f.status>1 	
-");
+        IEnumerable<Tuple<string, string>> nonActiveDS =_neaktivniOrganizaceCache.Get();
 
         return nonActiveDS;
     }

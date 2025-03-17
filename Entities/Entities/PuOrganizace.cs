@@ -39,6 +39,8 @@ public class PuOrganizace
         return Metadata.Any(m => m.Rok == year && m.Typ == typMetadat);
     }
 
+
+
     public string GetUrl(bool relative = false)
     {
         var url = $"/Detail/{this.DS}";
@@ -51,4 +53,7 @@ public class PuOrganizace
     [NotMapped]
     public IEnumerable<PuOrganizaceMetadata> MetadataPrijmyPolitiku =>
         Metadata.Where(m => m.Typ == PuOrganizaceMetadata.TypMetadat.PlatyUredniku);
+
+
+
 }

@@ -15,7 +15,7 @@
     <script type="text/javascript" charset="utf8" src="//cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
     <script>
         function adjustDataTablesWidth() {
-            $.fn.dataTable.tables({ visible: true, api: true }).columns.adjust();
+        $.fn.dataTable.tables({ visible: true, api: true }).columns.adjust();
         }
     </script>
 }
@@ -58,20 +58,20 @@
         </div>
 
         <div class="row">
-        @if(Model.Platy.Any())
-        {
-            string cl = (this.User.IsInRole("Admin") && Model.PrijmyPolitiku.Any()) ? "col-md-6" : "";
-            <div class="@cl">
-                <partial name="Graphs/_AreaRangePlot" model="@(new AreaRangeRenderOptions(){ Platy= Model.Platy, CssHeight="380" })" />
-            </div>
-        }
-        @if(this.User.IsInRole("Admin") && Model.PrijmyPolitiku.Any())
-        {
+            @if(Model.Platy.Any())
+            {
+                string cl = (this.User.IsInRole("Admin") && Model.PrijmyPolitiku.Any()) ? "col-md-6" : "";
+                <div class="@cl">
+                    <partial name="Graphs/_AreaRangePlot" model="@(new AreaRangeRenderOptions(){ Platy= Model.Platy, CssHeight="380" })" />
+                </div>
+            }
+            @if(this.User.IsInRole("Admin") && Model.PrijmyPolitiku.Any())
+            {
                 string cl = Model.Platy.Any() ? "col-md-6" : "";
                 <div class="@cl">
-                <partial name="Graphs/_AreaRangePlotPolitici" model="@(new AreaRangeRenderOptions(){ PrijmyPolitiku= Model.PrijmyPolitiku, CssHeight="380" })" />
-            </div>
-        }
+                    <partial name="Graphs/_AreaRangePlotPolitici" model="@(new AreaRangeRenderOptions(){ PrijmyPolitiku= Model.PrijmyPolitiku, CssHeight="380" })" />
+                </div>
+            }
         </div>
     </div>
 </section>
@@ -109,7 +109,7 @@
 <section class="d-flex justify-content-center  @(sectionBgSwitch ? "alter-bg-color" : "")">
     <div class="container">
         <div class="row">
-            
+
             <div class="@((this.User.IsInRole("Admin") && Model.PrijmyPolitiku.Any()) ? "col-md-6" : "")">
                 <h3>Přehled platů</h3>
                 <div class="nav flex-row nav-pills my-5" id="v-pills-tab" role="tablist">
@@ -120,12 +120,12 @@
                         foreach (var platRok in platyPoLetech)
                         {
                             <button class="@classAttributes"
-                                    id="year-@platRok.Key-tab"
-                                    data-bs-toggle="pill"
-                                    data-bs-target="#year-@platRok.Key"
-                                    type="button"
-                                    role="tab"
-                                    onclick="adjustDataTablesWidth()">
+                            id="year-@platRok.Key-tab"
+                            data-bs-toggle="pill"
+                            data-bs-target="#year-@platRok.Key"
+                            type="button"
+                            role="tab"
+                            onclick="adjustDataTablesWidth()">
                                 @platRok.Key
                             </button>
 
@@ -142,17 +142,17 @@
                             <div class="@classAttributes" id="year-@platGroup.Key" role="tabpanel">
                                 <script>
                                     $(document).ready(function () {
-                                        $('#tblSum_urednik_@platGroup.Key').DataTable(
-                                            {
-                                                'language': {
-                                                    'url': '//cdn.datatables.net/plug-ins/1.13.4/i18n/cs.json'
-                                                },
-                                                "searching": false,
-                                                "paging": false,
-                                                "ordering": true,
-                                                "order": [],
-                                                "info": false
-                                            });
+                                    $('#tblSum_urednik_@platGroup.Key').DataTable(
+                                    {
+                                    'language': {
+                                    'url': '//cdn.datatables.net/plug-ins/1.13.4/i18n/cs.json'
+                                    },
+                                    "searching": false,
+                                    "paging": false,
+                                    "ordering": true,
+                                    "order": [],
+                                    "info": false
+                                    });
                                     });
                                 </script>
 
@@ -160,47 +160,50 @@
                                 {
                                     <table class="table table-borderless table-hover" id="tblSum_urednik_@platGroup.Key">
                                         <thead>
-                                        <tr>
-                                            <th>Název pozice</th>
-                                            <th class="text-end">Celkový roční příjem</th>
-                                            <th class="text-end">Přepočtený průměrný měsíční plat</th>
-                                            <th style="max-width:20rem">Nefinanční bonus</th>
-                                        </tr>
+                                            <tr>
+                                                <th>Název pozice</th>
+                                                <th class="text-end">Celkový roční příjem</th>
+                                                <th class="text-end">Přepočtený průměrný měsíční plat</th>
+                                                <th style="max-width:20rem">Nefinanční bonus</th>
+                                            </tr>
                                         </thead>
                                         <tbody>
-                                        @foreach (var plat in platGroup.Platy.OrderBy(p => p.DisplayOrder).ThenBy(p => p.NazevPozice))
-                                        {
-                                            <tr>
-                                                <td>
-                                                    <a asp-action="Plat" asp-route-id="@plat.Id">@plat.NazevPozice</a>
-                                                </td>
-                                                <td data-order="@(HlidacStatu.Util.RenderData.OrderValueFormat(plat.CelkovyRocniPlatVcetneOdmen))" class="number">
-                                                    @if (plat.PocetMesicu < 12)
-                                                    {
-                                                        <a href="#" class="link-danger me-2" data-bs-toggle="tooltip" data-bs-title="Plat je pouze za @Devmasters.Lang.CS.Plural.Get((long)plat.PocetMesicu.Value, "jeden měsíc", "{0} měsíce", "{0} měsíců") a může obsahovat odstupné či jinou smluvní odměnu"><i class="fa-solid fa-circle-info"></i></a>
-                                                    }
+                                            @foreach (var plat in platGroup.Platy.OrderBy(p => p.DisplayOrder).ThenBy(p => p.NazevPozice))
+                                            {
+                                                <tr>
+                                                    <td>
+                                                        <a asp-action="Plat" asp-route-id="@plat.Id">@plat.NazevPozice</a>
+                                                    </td>
+                                                    <td data-order="@(HlidacStatu.Util.RenderData.OrderValueFormat(plat.CelkovyRocniPlatVcetneOdmen))" class="number">
+                                                        @if (plat.PocetMesicu < 12)
+                                                        {
+                                                            <a href="#" class="link-danger me-2" data-bs-toggle="tooltip" data-bs-title="Plat je pouze za @Devmasters.Lang.CS.Plural.Get((long)plat.PocetMesicu.Value, "jeden měsíc", "{0} měsíce", "{0} měsíců") a může obsahovat odstupné či jinou smluvní odměnu"><i class="fa-solid fa-circle-info"></i></a>
+                                                        }
 
-                                                    @HlidacStatu.Util.RenderData.NicePrice(plat.CelkovyRocniPlatVcetneOdmen)</td>
-                                                <td data-order="@(HlidacStatu.Util.RenderData.OrderValueFormat(plat.HrubyMesicniPlatVcetneOdmen))" class="number">
-                                                    @if (plat.PocetMesicu < 12)
-                                                    {
-                                                        <a href="#" class="link-danger me-2" data-bs-toggle="tooltip" data-bs-title="Plat je pouze za @Devmasters.Lang.CS.Plural.Get((long)plat.PocetMesicu.Value, "jeden měsíc", "{0} měsíce", "{0} měsíců") a může obsahovat odstupné či jinou smluvní odměnu"><i class="fa-solid fa-circle-info"></i></a>
-                                                    }
-                                                    @HlidacStatu.Util.RenderData.NicePrice(plat.HrubyMesicniPlatVcetneOdmen)
-                                                </td>
-                                                <td>@plat.NefinancniBonus</td>
-                                            </tr>
-                                        }
+                                                        @HlidacStatu.Util.RenderData.NicePrice(plat.CelkovyRocniPlatVcetneOdmen)</td>
+                                                    <td data-order="@(HlidacStatu.Util.RenderData.OrderValueFormat(plat.HrubyMesicniPlatVcetneOdmen))" class="number">
+                                                        @if (plat.PocetMesicu < 12)
+                                                        {
+                                                            <a href="#" class="link-danger me-2" data-bs-toggle="tooltip" data-bs-title="Plat je pouze za @Devmasters.Lang.CS.Plural.Get((long)plat.PocetMesicu.Value, "jeden měsíc", "{0} měsíce", "{0} měsíců") a může obsahovat odstupné či jinou smluvní odměnu"><i class="fa-solid fa-circle-info"></i></a>
+                                                        }
+                                                        @HlidacStatu.Util.RenderData.NicePrice(plat.HrubyMesicniPlatVcetneOdmen)
+                                                    </td>
+                                                    <td>@plat.NefinancniBonus</td>
+                                                </tr>
+                                            }
                                         </tbody>
                                     </table>
                                 }
-                                else if (neaktivniOrg.Any(m => m.Item1 == Model.DS))
+                                else 
                                 {
-                                    <div class="alert alert-warning" role="alert">
-                                        <h4 class="alert-heading">Platy pro rok @platGroup.Key jsme nedostali</h4>
-                                        <p>@Model.Nazev je zaniklá organizace anebo v likvidaci.</p>
+                                    var desc = Model.GetMetadataDescription(PuOrganizaceMetadata.TypMetadat.PlatyUredniku, platGroup.Key);
+
+                                    <div class="alert alert-@(desc.BootstrapStatus)" role="alert">
+                                        <h4 class="alert-heading">@desc.TextStatus</h4>
+                                        <p>@desc.Detail.</p>
                                     </div>
                                 }
+                                @*
                                 else if (!Model.HasMetadataForYear(platGroup.Key, PuOrganizaceMetadata.TypMetadat.PlatyUredniku))
                                 {
                                     <div class="alert alert-info" role="alert">
@@ -219,7 +222,7 @@
                                         </p>
                                     </div>
                                 }
-
+                                *@
                             </div>
                             classAttributes = "tab-pane width-75vp";
                         }

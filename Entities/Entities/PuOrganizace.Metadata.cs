@@ -6,7 +6,7 @@ using Devmasters.Enums;
 namespace HlidacStatu.Entities;
 
 [Table("PU_OrganizaceMetadata")]
-public class PuOrganizaceMetadata
+public partial class PuOrganizaceMetadata
 {
     [Key]
     public int Id { get; set; }
@@ -36,7 +36,6 @@ public class PuOrganizaceMetadata
         [Display(Name = "e-mail", Description = "komunikuje emailem")]
         Email = 2
     }
-
     public enum TypMetadat
     {
         PlatyUredniku = 1,
