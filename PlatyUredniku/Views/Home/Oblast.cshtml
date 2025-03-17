@@ -58,11 +58,11 @@
                 $"poskytli plat {{0}} instituce",
                 $"poskytlo plat {{0}} institucí")).
                     @Html.Raw(Devmasters.Lang.CS.Plural.GetWithZero(badOrgs.Count,
-                             "",
-                             " Jedna instituce plat neposkytla.",
-                             $" Plat odmítly poskytnout {{0}} instituce.",
-                             $" Plat odmítlo poskytnout {{0}} institucí.")
-                             )
+                                      "",
+                                      " Jedna instituce plat neposkytla.",
+                                      $" Plat odmítly poskytnout {{0}} instituce.",
+                                      $" Plat odmítlo poskytnout {{0}} institucí.")
+                                      )
                 </p>
             </div>
 
@@ -75,6 +75,7 @@
                             }
                             @foreach (var org in sorted)
                             {
+                                var metadata = org.Metadata.AktualniRok().FirstOrDefault();
                                 <tr>
                                     <td class="col" style="overflow: hidden;white-space: nowrap;text-overflow: ellipsis;max-width: 20rem;">
                                         <a asp-action="Detail" asp-route-id="@org.DS">@org.Nazev</a>
@@ -91,8 +92,14 @@
                                                 {
                                                     <span class='text-info'><i class='fa-solid fa-circle-exclamation'></i>Této organizace jsme se na platy neptali.</span>
                                                 }
-                                                else
+                                                else if (metadata != null && metadata.DatumPrijetiOdpovedi == null )
                                                 {
+
+                                                    <span class=''><i class='fa-solid fa-question-circle'></i> @(metadata.DatumOdeslaniZadosti?.ToString("d. M. yyyy")) @(metadata.PoznamkaHlidace).</span>
+
+
+                                                }
+                                                else {
                                                     @Html.Raw(Devmasters.Lang.CS.Plural.GetWithZero(org.Platy.AktualniRok().Count,
                                                         "<span class='text-danger'><i class='fa-solid fa-circle-xmark'></i> Odmítli poskytnout platy.</span>",
                                                         "<span class='text-warning'><i class='fa-solid fa-circle-exclamation'></i></span> Evidujeme jeden plat jedné pozice.",
