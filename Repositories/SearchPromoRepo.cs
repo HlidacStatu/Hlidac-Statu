@@ -116,7 +116,7 @@ namespace HlidacStatu.Repositories
                     sp.Description = "<b>" + org.Nazev + "</b><br />"
                         + (org.Platy.AktualniRok().Count > 0 ?
                                 $"Platy od {HlidacStatu.Util.RenderData.NicePrice(org.Platy.AktualniRok().Min(m => m.HrubyMesicniPlatVcetneOdmen))} do {HlidacStatu.Util.RenderData.NicePrice(org.Platy.AktualniRok().Max(m => m.HrubyMesicniPlatVcetneOdmen))}"
-                                : "Odmítli poskytnout platy")
+                                : "Zatím platy neposkytly")
                                 ;
                     sp.Fulltext = org.Nazev
                             + " " + "plat úředník manažer management odměna"
