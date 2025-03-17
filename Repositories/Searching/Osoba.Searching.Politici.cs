@@ -86,11 +86,11 @@ namespace HlidacStatu.Repositories.Searching
             return politiciStems;
         }
 
-        public static async Task<string[]> StemsAsync(string text)
+        public static async Task<string[]> StemsAsync(string text, int ngramLength = 1)
         {
             using var wc = new System.Net.Http.HttpClient();
-            var data = new System.Net.Http.StringContent(Newtonsoft.Json.JsonConvert.ToString(text));
-            var res = await wc.PostAsync(classificationBaseUrl() + "/text_stemmer?ngrams=1", data).ConfigureAwait(false);
+            var data = System.Net.Http.Json.JsonContent.Create(text);
+            var res = await wc.PostAsync(classificationBaseUrl() + "/text_stemmer_ngrams?ngrams="+ ngramLength, data).ConfigureAwait(false);
 
             return Newtonsoft.Json.JsonConvert.DeserializeObject<string[]>(await res.Content.ReadAsStringAsync().ConfigureAwait(false));
         }
@@ -100,8 +100,13 @@ namespace HlidacStatu.Repositories.Searching
             string[] baseUrl = Devmasters.Config.GetWebConfigValue("Classification.Service.Url")
                 .Split(',', ';');
             //Dictionary<string, DateTime> liveEndpoints = new Dictionary<string, DateTime>();
+            var url = baseUrl[Rnd.Next(baseUrl.Length)];
 
-            return baseUrl[Rnd.Next(baseUrl.Length)];
+            if (System.Diagnostics.Debugger.IsAttached)
+                url = "http://localhost:8080";
+
+
+            return url;
         }
 
         /// <summary>
