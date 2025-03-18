@@ -24,11 +24,11 @@ public class PoliticiController : Controller
     public async Task<IActionResult> Index()
     {
         var platyTask = _cache.GetOrSetAsync<List<PuPolitikPrijem>>(
-            $"{nameof(PpRepo.GetPlatyAsync)}_{PpRepo.DefaultYear}",
+            $"{nameof(PpRepo.GetPlatyAsync)}_{PpRepo.DefaultYear}-politici",
             _ => PpRepo.GetPlatyAsync(PpRepo.DefaultYear)
         );
-
-        ViewData["platy"] = await platyTask;
+        var platyPolitiku = await platyTask;
+        ViewData["platy"] = platyPolitiku;
 
         return View();
     }
@@ -36,7 +36,7 @@ public class PoliticiController : Controller
     public async Task<IActionResult> Oblast(string id)
     {
         ValueTask<List<PuOrganizace>> organizaceForTagTask = _cache.GetOrSetAsync<List<PuOrganizace>>(
-            $"{nameof(PpRepo.GetActiveOrganizaceForTagAsync)}_{id}",
+            $"{nameof(PpRepo.GetActiveOrganizaceForTagAsync)}_{id}-politici",
             _ => PpRepo.GetActiveOrganizaceForTagAsync(id)
         );
 
@@ -60,7 +60,7 @@ public class PoliticiController : Controller
         foreach (var oblast in oblasti)
         {
             var organizace = await _cache.GetOrSetAsync<List<PuOrganizace>>(
-                $"{nameof(PpRepo.GetActiveOrganizaceForTagAsync)}_{oblast}",
+                $"{nameof(PpRepo.GetActiveOrganizaceForTagAsync)}_{oblast}-politici",
                 _ => PpRepo.GetActiveOrganizaceForTagAsync(oblast)
             );
 
@@ -88,7 +88,12 @@ public class PoliticiController : Controller
     
     public async Task<IActionResult> Detail(string id, int? rok = null)
     {
-        var detail = await StaticCache.GetFullDetailAsync(id);
+        ValueTask<PuOrganizace> fullDetailTask = _cache.GetOrSetAsync<PuOrganizace>(
+            $"{nameof(PpRepo.GetFullDetailAsync)}_{id}-politici",
+            _ => PpRepo.GetFullDetailAsync(id)
+        );
+
+        var detail = await fullDetailTask;
         
         ViewBag.Title = detail.Nazev;
 
@@ -104,7 +109,7 @@ public class PoliticiController : Controller
     public async Task<IActionResult> Politik(string id)
     {
         var detail = await _cache.GetOrSetAsync<List<PuPolitikPrijem>>(
-            $"{nameof(PpRepo.GetPrijmyPolitika)}_{id}",
+            $"{nameof(PpRepo.GetPrijmyPolitika)}_{id}-politici",
             _ => PpRepo.GetPrijmyPolitika(id)
         );
 

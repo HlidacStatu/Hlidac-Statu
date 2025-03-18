@@ -71,20 +71,6 @@
     </div>
 </section>
 
-
-@{
-    var platyPoLetech = Model.Platy.GroupBy(p => p.Rok)
-        .Select(m => new { Key = m.Key, Platy = m.ToList() })
-        .ToList();
-
-    if (platyPoLetech.Any(m => m.Key == PuRepo.DefaultYear) == false)
-    {
-        platyPoLetech.Add(new { Key = PuRepo.DefaultYear, Platy = new List<PuPlat>() });
-    }
-
-    platyPoLetech = platyPoLetech.OrderByDescending(pg => pg.Key).ToList();
-}
-
 @{
     var prijmyPoLetech = Model.PrijmyPolitiku.GroupBy(p => p.Rok)
         .Select(m => new { Key = m.Key, Platy = m.ToList() })
@@ -155,6 +141,7 @@
                             <table class="table table-borderless table-hover" id="tblSum_politik_@prijemGroup.Key">
                                 <thead>
                                 <tr>
+                                    <th>Jméno politika</th>
                                     <th>Název pozice</th>
                                     <th class="text-end">Celkový roční příjem</th>
                                     <th class="text-end">Přepočtený průměrný měsíční plat</th>
@@ -164,7 +151,12 @@
                                 <tbody>
                                 @foreach (var prijemPolitika in prijemGroup.Platy.OrderBy(p => p.DisplayOrder).ThenBy(p => p.NazevFunkce))
                                 {
+                                    var politik = OsobaRepo.GetByNameId(prijemPolitika.Nameid);
                                     <tr>
+                                        <td>
+                                            <a asp-action="Politik"
+                                               asp-route-id="@prijemPolitika.Nameid">@politik.ShortName()</a>
+                                        </td>
                                         <td>
                                             <a asp-action="Prijem"
                                                asp-route-id="@prijemPolitika.Id">@prijemPolitika.NazevFunkce</a>
@@ -174,7 +166,8 @@
                                             @if (prijemPolitika.PocetMesicu < 12)
                                             {
                                                 <a href="#" class="link-danger me-2" data-bs-toggle="tooltip"
-                                                   data-bs-title="Plat je pouze za @Devmasters.Lang.CS.Plural.Get((long)prijemPolitika.PocetMesicu.Value, "jeden měsíc", "{0} měsíce", "{0} měsíců") a může obsahovat odstupné či jinou smluvní odměnu"><i
+                                                   data-bs-title="Plat je pouze za @Devmasters.Lang.CS.Plural.Get((long)prijemPolitika.PocetMesicu.Value, "jeden měsíc", "{0} měsíce", "{0} měsíců") a může obsahovat odstupné či jinou smluvní odměnu">
+                                                    <i
                                                         class="fa-solid fa-circle-info"></i></a>
                                             }
 
@@ -185,7 +178,8 @@
                                             @if (prijemPolitika.PocetMesicu < 12)
                                             {
                                                 <a href="#" class="link-danger me-2" data-bs-toggle="tooltip"
-                                                   data-bs-title="Plat je pouze za @Devmasters.Lang.CS.Plural.Get((long)prijemPolitika.PocetMesicu.Value, "jeden měsíc", "{0} měsíce", "{0} měsíců") a může obsahovat odstupné či jinou smluvní odměnu"><i
+                                                   data-bs-title="Plat je pouze za @Devmasters.Lang.CS.Plural.Get((long)prijemPolitika.PocetMesicu.Value, "jeden měsíc", "{0} měsíce", "{0} měsíců") a může obsahovat odstupné či jinou smluvní odměnu">
+                                                    <i
                                                         class="fa-solid fa-circle-info"></i></a>
                                             }
                                             @HlidacStatu.Util.RenderData.NicePrice(prijemPolitika.HrubyMesicniPlatVcetneOdmen)

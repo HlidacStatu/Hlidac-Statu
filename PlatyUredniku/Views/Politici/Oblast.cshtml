@@ -4,23 +4,18 @@
 @model List<HlidacStatu.Entities.PuOrganizace>
 
 @{
-    var platyHlavounu = Model.SelectMany(o => o.Platy).Where(p => p.Rok == PuRepo.DefaultYear && p.JeHlavoun == true)
-        .ToList();
-
-    string? prumerHlavounu = platyHlavounu.Any() ? platyHlavounu.Average(p => p.HrubyMesicniPlatVcetneOdmen).ToString("N0") : null;
-
     List<PuOrganizace> goodOrgs = new();
     List<PuOrganizace> badOrgs = new();
     List<PuOrganizace> notAskedOrgs = new();
-    var neaktivniOrg = PuRepo.GetNeaktivniOrganizace().ToArray();
+
     if (Model is not null && Model.Any())
     {
-        goodOrgs = Model.Where(o => o.Platy.AktualniRok().Any()).OrderBy(o => o.Nazev).ToList();
-        badOrgs = Model.Where(o => !o.Platy.AktualniRok().Any() && o.Metadata.AktualniRok().Any()).OrderBy(o => o.Nazev).ToList();
-        notAskedOrgs = Model.Where(o => !o.Platy.AktualniRok().Any() && !o.Metadata.AktualniRok().Any()).OrderBy(o => o.Nazev).ToList();
+        goodOrgs = Model.Where(o => o.PrijmyPolitiku.AktualniRok().Any()).OrderBy(o => o.Nazev).ToList();
+        badOrgs = Model.Where(o => !o.PrijmyPolitiku.AktualniRok().Any() && o.Metadata.AktualniRok().Any()).OrderBy(o => o.Nazev).ToList();
+        notAskedOrgs = Model.Where(o => !o.PrijmyPolitiku.AktualniRok().Any() && !o.Metadata.AktualniRok().Any()).OrderBy(o => o.Nazev).ToList();
     }
 
-    var aktualniPlaty = goodOrgs.SelectMany(o => o.Platy.AktualniRok()).ToList();
+    var aktualniPlaty = goodOrgs.SelectMany(o => o.PrijmyPolitiku.AktualniRok()).ToList();
     var platyMin = aktualniPlaty.Any() ? aktualniPlaty.Min(p => p.HrubyMesicniPlatVcetneOdmen) : 0;
     var platyMax = aktualniPlaty.Any() ? aktualniPlaty.Max(p => p.HrubyMesicniPlatVcetneOdmen) : 0;
     var platyLength = platyMax - platyMin;
@@ -32,7 +27,7 @@
 {
     <ol class="breadcrumb">
         <li>
-            <a asp-action="Index">Platy úředníků</a>
+            <a asp-action="Index">Platy politiků</a>
         </li>
         <li>
             <a asp-action="Oblasti">Oblasti</a>
@@ -52,7 +47,7 @@
                     Instituce z oblasti <hashtag tag="@ViewData["oblast"]"></hashtag>
                 </h3>
                 <p>
-                    V roce @PuRepo.DefaultYear @Html.Raw(Devmasters.Lang.CS.Plural.GetWithZero(goodOrgs.Count,
+                    V roce @PpRepo.DefaultYear @Html.Raw(Devmasters.Lang.CS.Plural.GetWithZero(goodOrgs.Count,
                 "odmítli poskytnout platy všechny instituce",
                 "poskyla plat jedna instituce",
                 $"poskytli plat {{0}} instituce",
@@ -81,12 +76,12 @@
                                         <a asp-action="Detail" asp-route-id="@org.DS">@org.Nazev</a>
                                     </td>
                                     <td class="col-3">
-                                        @Html.Raw(org.PlatyForYearUredniciDescriptionHtml())
+                                        @Html.Raw(org.PlatyForYearPoliticiDescriptionHtml())
                                     </td>
-                                    @if (org.Platy.AktualniRok().Any())
+                                    @if (org.PrijmyPolitiku.AktualniRok().Any())
                                     {
-                                        var minimalniPlatOrganizace = org.Platy.AktualniRok().Min(m => m.HrubyMesicniPlatVcetneOdmen);
-                                        var maximalniPlatOrganizace = org.Platy.AktualniRok().Max(m => m.HrubyMesicniPlatVcetneOdmen);
+                                        var minimalniPlatOrganizace = org.PrijmyPolitiku.AktualniRok().Min(m => m.HrubyMesicniPlatVcetneOdmen);
+                                        var maximalniPlatOrganizace = org.PrijmyPolitiku.AktualniRok().Max(m => m.HrubyMesicniPlatVcetneOdmen);
                                         var startPer = Math.Round((minimalniPlatOrganizace - platyMin) / platyLength * 100);
                                         var endPer = Math.Round((maximalniPlatOrganizace - minimalniPlatOrganizace) / platyLength * 100);
                                         if (endPer == 0)

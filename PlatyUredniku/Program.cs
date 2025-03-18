@@ -95,7 +95,7 @@ public class Program
             var app = builder.Build();
 
 
-            StaticCache.Init(app.Services.GetService<IFusionCache>());
+            UredniciStaticCache.Init(app.Services.GetService<IFusionCache>());
 
             var whitelistIps = Devmasters.Config.GetWebConfigValue("BanWhitelist")?.Split(',',
                 StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
@@ -135,6 +135,10 @@ public class Program
             app.UseHttpsRedirection();
             app.UseStaticFiles();
 
+            
+            
+            app.UseRouting();
+
             // Redirect original platy uredniku from Home into /urednici
             app.Use(async (context, next) =>
             {
@@ -147,24 +151,26 @@ public class Program
                         .ActionDescriptors.Items
                         .OfType<ControllerActionDescriptor>();
 
-                    var existsInUrednici = actionDescriptors.Any(a =>
-                        a.ControllerName.Equals("Urednici", StringComparison.OrdinalIgnoreCase) &&
-                        a.ActionName.Equals(path, StringComparison.OrdinalIgnoreCase));
-
-                    if (existsInUrednici)
+                    var actionName = path.Split('/').FirstOrDefault();
+                    if (actionName is not null)
                     {
-                        // Preserve query parameters
-                        var queryString = context.Request.QueryString.Value;
-                        context.Response.Redirect($"/urednici/{path}{queryString}", permanent: true);
-                        return;
+                        var existsInUrednici = actionDescriptors.Any(a =>
+                            a.ControllerName.Equals("Urednici", StringComparison.OrdinalIgnoreCase) &&
+                            a.ActionName.Equals(actionName, StringComparison.OrdinalIgnoreCase));
+
+                        if (existsInUrednici)
+                        {
+                            // Preserve query parameters
+                            var queryString = context.Request.QueryString.Value;
+                            context.Response.Redirect($"/urednici/{path}{queryString}", permanent: true);
+                            return;
+                        }
                     }
                 }
 
                 await next();
             });
             
-            app.UseRouting();
-
             app.UseAuthentication();
             app.UseAuthorization();
 

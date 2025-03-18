@@ -242,11 +242,11 @@ inner join Firma_DS fds
     }
 
 
-    public static PuOrganizaceMetadata.Description GetMetadataDescription(this PuOrganizace org, PuOrganizaceMetadata.TypMetadat typ, int rok = DefaultYear )
+    public static PuOrganizaceMetadata.Description GetMetadataDescriptionUrednici(this PuOrganizace org, int rok = DefaultYear )
     {
         var res = new PuOrganizaceMetadata.Description();
         
-        var metadataList = org.MetadataPlatyUredniku.Where(m => m.Rok == rok && m.Typ == typ).ToList();
+        var metadataList = org.MetadataPlatyUredniku.Where(m => m.Rok == rok && m.Typ == PuOrganizaceMetadata.TypMetadat.PlatyUredniku).ToList();
         //ted pracuju pouze s jednou
         var metadata = metadataList.FirstOrDefault();
 
@@ -303,17 +303,19 @@ inner join Firma_DS fds
         }
         return res;
     }
+    
+    
 
     public static string PlatyForYearUredniciDescription(this PuOrganizace org, int rok = DefaultYear)
     {
-        var desc = org.GetMetadataDescription( PuOrganizaceMetadata.TypMetadat.PlatyUredniku, rok);
+        var desc = org.GetMetadataDescriptionUrednici(rok);
         return desc.TextStatus;
     }
 
 
     public static string PlatyForYearUredniciDescriptionHtml(this PuOrganizace org, int rok = DefaultYear, bool withDetail = false)
     {
-        var desc = org.GetMetadataDescription(PuOrganizaceMetadata.TypMetadat.PlatyUredniku, rok);
+        var desc = org.GetMetadataDescriptionUrednici(rok);
 
         return $"<span class='text-{desc.BootstrapStatus}'><i class='{desc.Icon}'></i> {desc.TextStatus}{(withDetail ? $". {desc.Detail}" : "")}</span>";
     }

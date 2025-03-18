@@ -27,7 +27,6 @@ public static class PpRepo
             .Include(o => o.Metadata)
             .Include(o => o.Tags)
             .Include(o => o.FirmaDs)
-            .Include(o => o.Platy) // Include PuPlat
             .Include(o => o.PrijmyPolitiku) // Include PuPrijmyPolitiku
             .FirstOrDefaultAsync();
     }
@@ -154,6 +153,75 @@ public static class PpRepo
             .AsNoTracking()
             .Where(p => p.Rok == rok)
             .ToListAsync();
+    }
+    
+    public static string PlatyForYearPoliticiDescriptionHtml(this PuOrganizace org, int rok = DefaultYear, bool withDetail = false)
+    {
+        var desc = org.GetMetadataDescriptionPolitici(rok);
+
+        return $"<span class='text-{desc.BootstrapStatus}'><i class='{desc.Icon}'></i> {desc.TextStatus}{(withDetail ? $". {desc.Detail}" : "")}</span>";
+    }
+    
+    public static PuOrganizaceMetadata.Description GetMetadataDescriptionPolitici(this PuOrganizace org, int rok = DefaultYear )
+    {
+        var res = new PuOrganizaceMetadata.Description();
+        
+        var metadataList = org.MetadataPlatyUredniku.Where(m => m.Rok == rok && m.Typ == PuOrganizaceMetadata.TypMetadat.PlatyPolitiku).ToList();
+        //ted pracuju pouze s jednou
+        var metadata = metadataList.FirstOrDefault();
+
+        if (org.PrijmyPolitiku.AktualniRok().Count == 0 && PuRepo.GetNeaktivniOrganizace().ToArray().Any(m => m.Item1 == org.DS))
+        {
+            res.TextStatus = "Této organizace jsme se na platy neptali";
+            res.Detail = "";
+            res.BootstrapStatus = "primary";
+            res.Icon = "fa-solid fa-question-circle";
+        }
+        else if (metadata == null)
+        {
+            res.TextStatus = "Této organizace jsme se na platy neptali";
+            res.Detail = "";
+            res.BootstrapStatus = "primary";
+            res.Icon = "fa-solid fa-question-circle";
+
+        }
+        else if (metadata.DatumPrijetiOdpovedi == null)
+        {
+            res.TextStatus = $"{metadata.DatumOdeslaniZadosti:d. M. yyyy} Odeslána žádost o platy";
+            res.Detail = "Data jsme zatím nedostali nebo nezpracovali.";
+            res.BootstrapStatus = "primary";
+            res.Icon = "fa-solid fa-question-circle";
+
+        }
+        else if (org.PrijmyPolitiku.AktualniRok(rok).Count == 0)
+        {
+            res.TextStatus = "Odmítli poskytnout platy";
+            res.Detail = metadata.PoznamkaHlidace;
+            res.BootstrapStatus = "danger";
+            res.Icon = "fa-solid fa-circle-xmark";
+        }
+        else if (org.PrijmyPolitiku.AktualniRok(rok).Count == 1)
+        {
+            res.TextStatus = "Evidujeme jeden plat jedné pozice";
+            res.Detail = metadata.PoznamkaHlidace;
+            res.BootstrapStatus = "warning";
+            res.Icon = "fa-solid fa-circle-exclamation";
+        }
+        else if (org.PrijmyPolitiku.AktualniRok(rok).Count < 5)
+        {
+            res.TextStatus = $"{org.PrijmyPolitiku.AktualniRok(rok).Count} platy";
+            res.Detail = metadata.PoznamkaHlidace;
+            res.BootstrapStatus = "success";
+            res.Icon = "fa-solid fa-badge-check";
+        }
+        else
+        {
+            res.TextStatus = $"{org.PrijmyPolitiku.AktualniRok(rok).Count} platů";
+            res.Detail = metadata.PoznamkaHlidace;
+            res.BootstrapStatus = "success";
+            res.Icon = "fa-solid fa-badge-check";
+        }
+        return res;
     }
 
     public static async Task<List<PuPolitikPrijem>> GetPlatyWithOrganizaceForYearAsync(int rok)

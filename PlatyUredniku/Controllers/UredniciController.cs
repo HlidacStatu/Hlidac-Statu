@@ -65,7 +65,7 @@ public class UredniciController : Controller
     public async Task<IActionResult> Index()
     {
         var platyTask = _cache.GetOrSetAsync<List<PuPlat>>(
-            $"{nameof(PuRepo.GetPlatyAsync)}_{PuRepo.DefaultYear}",
+            $"{nameof(PuRepo.GetPlatyAsync)}_{PuRepo.DefaultYear}-urednici",
             _ => PuRepo.GetPlatyAsync(PuRepo.DefaultYear)
         );
 
@@ -115,8 +115,8 @@ public class UredniciController : Controller
                 break;
         }
 
-        var platy = await StaticCache.GetPoziceDlePlatuAsync(range.Min, range.Max, PuRepo.DefaultYear);
-        var platyCount = await StaticCache.GetPlatyCountPerYearAsync(PuRepo.DefaultYear);
+        var platy = await UredniciStaticCache.GetPoziceDlePlatuAsync(range.Min, range.Max, PuRepo.DefaultYear);
+        var platyCount = await UredniciStaticCache.GetPlatyCountPerYearAsync(PuRepo.DefaultYear);
 
         ViewData["platy"] = platy;
         ViewData["rozsah"] = rozsah;
@@ -134,7 +134,7 @@ public class UredniciController : Controller
     public async Task<IActionResult> Oblast(string id)
     {
         ValueTask<List<PuOrganizace>> organizaceForTagTask = _cache.GetOrSetAsync<List<PuOrganizace>>(
-            $"{nameof(PuRepo.GetActiveOrganizaceForTagAsync)}_{id}",
+            $"{nameof(PuRepo.GetActiveOrganizaceForTagAsync)}_{id}-urednici",
             _ => PuRepo.GetActiveOrganizaceForTagAsync(id)
         );
 
@@ -158,7 +158,7 @@ public class UredniciController : Controller
         foreach (var oblast in oblasti)
         {
             var organizace = await _cache.GetOrSetAsync<List<PuOrganizace>>(
-                $"{nameof(PuRepo.GetActiveOrganizaceForTagAsync)}_{oblast}",
+                $"{nameof(PuRepo.GetActiveOrganizaceForTagAsync)}_{oblast}-urednici",
                 _ => PuRepo.GetActiveOrganizaceForTagAsync(oblast)
             );
 
@@ -185,7 +185,7 @@ public class UredniciController : Controller
 
     public async Task<IActionResult> Detail(string id, int? rok = null)
     {
-        var detail = await StaticCache.GetFullDetailAsync(id);
+        var detail = await UredniciStaticCache.GetFullDetailAsync(id);
         
         ViewBag.Title = detail.Nazev;
 
@@ -201,7 +201,7 @@ public class UredniciController : Controller
     public async Task<IActionResult> Plat(int id)
     {
         var detail = await _cache.GetOrSetAsync<PuPlat>(
-            $"{nameof(PuRepo.GetPlatAsync)}_{id}",
+            $"{nameof(PuRepo.GetPlatAsync)}_{id}-urednici",
             _ => PuRepo.GetPlatAsync(id)
         );
 

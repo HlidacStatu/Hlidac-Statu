@@ -8,7 +8,7 @@
 
     var organizationOfTheDay = await PuRepo.GetOrganizationOfTheDayAsync();
     var ceoOfTheDay = organizationOfTheDay.Platy.FirstOrDefault(p => p.JeHlavoun == true && p.Rok == PuRepo.DefaultYear);
-    var dataForOrganizationOfTheDay = await StaticCache.GetFullDetailAsync(organizationOfTheDay.DS);
+    var dataForOrganizationOfTheDay = await UredniciStaticCache.GetFullDetailAsync(organizationOfTheDay.DS);
 }
 
 <section class="d-flex align-items-center justify-content-center">

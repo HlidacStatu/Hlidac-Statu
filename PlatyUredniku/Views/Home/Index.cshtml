@@ -5,7 +5,7 @@
 
     var organizationOfTheDay = await PuRepo.GetOrganizationOfTheDayAsync();
     var ceoOfTheDay = organizationOfTheDay.Platy.FirstOrDefault(p => p.JeHlavoun == true && p.Rok == PuRepo.DefaultYear);
-    var dataForOrganizationOfTheDay = await StaticCache.GetFullDetailAsync(organizationOfTheDay.DS);
+    var dataForOrganizationOfTheDay = await UredniciStaticCache.GetFullDetailAsync(organizationOfTheDay.DS);
 }
 
 <section class="d-flex align-items-center justify-content-center">
@@ -27,10 +27,14 @@
         </p>
         <p class="lead">
         </p>
-        <p class="">
-            Nově jsme přidali také <strong><a asp-controller="Politici" asp-action="Index">Platy politiků</a></strong>.
-            Nebo se můžete podívat na staré dobré <strong><a asp-controller="Urednici" asp-action="Index">Platy úředníků</a></strong>.
-        </p>
+        @if (User.IsInRole("Admin"))
+        {
+            <p class="">
+                Nově jsme přidali také <strong><a asp-controller="Politici" asp-action="Index">Platy politiků</a></strong>.
+                Nebo se můžete podívat na staré dobré <strong><a asp-controller="Urednici" asp-action="Index">Platy úředníků</a></strong>.
+            </p>
+            
+        }
     </div>
 </section>
 
