@@ -62,6 +62,44 @@ public static class PpRepo
                                       && p.Nameid == nameid);
     }
     
+    public static async Task<PuRokPoliticiStat> GetGlobalStatAsync(int rok = DefaultYear)
+    {
+        await using var db = new DbEntities();
+
+        var stat = new PuRokPoliticiStat();
+        stat.PocetOslovenych = await db.PuOrganizaceMetadata
+            .Where(m => m.Typ == PuOrganizaceMetadata.TypMetadat.PlatyPolitiku)
+            .CountAsync(m => m.DatumOdeslaniZadosti.HasValue && m.Rok == rok);
+
+        stat.PocetCoPoslaliPlat = await db.PuPoliticiPrijmy
+            .Where(m => m.Rok == rok)
+            .Select(m => m.IdOrganizace)
+            .Distinct()
+            .CountAsync();
+
+        var platyRok = db.PuPoliticiPrijmy
+            .AsNoTracking()
+            .Where(m => m.Rok == rok)
+            .Select(m => new { mplat = m.HrubyMesicniPlatVcetneOdmen, plat = m, org = m.Organizace })
+            .ToArray()
+            .OrderBy(o => o.mplat)
+            .ToArray();
+
+        stat.PercentilyPlatu = new Dictionary<int, decimal>()
+        {
+            { 1, HlidacStatu.Util.MathTools.PercentileCont(0.01m, platyRok.Select(m => m.mplat)) },
+            { 5, HlidacStatu.Util.MathTools.PercentileCont(0.05m, platyRok.Select(m => m.mplat)) },
+            { 10, HlidacStatu.Util.MathTools.PercentileCont(0.10m, platyRok.Select(m => m.mplat)) },
+            { 25, HlidacStatu.Util.MathTools.PercentileCont(0.25m, platyRok.Select(m => m.mplat)) },
+            { 50, HlidacStatu.Util.MathTools.PercentileCont(0.50m, platyRok.Select(m => m.mplat)) },
+            { 75, HlidacStatu.Util.MathTools.PercentileCont(0.75m, platyRok.Select(m => m.mplat)) },
+            { 90, HlidacStatu.Util.MathTools.PercentileCont(0.90m, platyRok.Select(m => m.mplat)) },
+            { 95, HlidacStatu.Util.MathTools.PercentileCont(0.95m, platyRok.Select(m => m.mplat)) },
+            { 99, HlidacStatu.Util.MathTools.PercentileCont(0.99m, platyRok.Select(m => m.mplat)) },
+        };
+        return stat;
+    }
+    
     public static async Task<List<PuPolitikPrijem>> GetPrijmyPolitika(string nameid)
     {
         await using var db = new DbEntities();

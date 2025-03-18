@@ -6,15 +6,12 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
-using Devmasters.Enums;
 using ZiggyCreatures.Caching.Fusion;
-using System.Text;
-using System;
-using Microsoft.AspNetCore.OutputCaching;
-using Nest;
+using Microsoft.AspNetCore.Authorization;
 
 namespace PlatyUredniku.Controllers;
 
+[Authorize(Roles = "Admin")]
 public class PoliticiController : Controller
 {
     private readonly IFusionCache _cache;
@@ -112,8 +109,12 @@ public class PoliticiController : Controller
         );
 
         ViewBag.Title = $"Platy politika {id}";
+        var osoba = OsobaRepo.GetByNameId(id);
+        if (osoba is null)
+            return NotFound($"Politika {id} jsme nenašli.");
         
-        ViewData["osoba"] = OsobaRepo.GetByNameId(id);
+        
+        ViewData["osoba"] = osoba;
 
         return View(detail);
     }

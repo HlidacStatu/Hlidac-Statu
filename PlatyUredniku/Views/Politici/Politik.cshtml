@@ -4,56 +4,45 @@
 @using Microsoft.AspNetCore.Mvc.TagHelpers
 @model List<PuPolitikPrijem>
 
+@{
+    var politik = (Osoba?)ViewData["osoba"];
+    if (politik is null)
+        throw new Exception("Politik není znám");
+}
+
 
 @section breadcrumbs
 {
     <ol class="breadcrumb">
         <li>
-            <a asp-action="Index">Platy úředníků</a>
+            <a asp-action="Index">Platy politiků</a>
         </li>
-        <li>
-            <a asp-action="Oblasti">Oblasti</a>
-        </li>
-        <li>
-            <hashtag tag="@ViewData["mainTag"]" style="font-size:13px; padding:0.2em"></hashtag>
-        </li>
-        <li>
-            <a asp-action="Detail" asp-route-id="@Model.Organizace.DS">@Model.Organizace.Nazev</a>
-        </li>
-        <li class="active">@Model.NazevPozice (@Model.Rok)</li>
+        <li class="active">@politik.FullName()</li>
     </ol>
 }
 
 <section class="d-flex justify-content-center">
     <div class="container">
         <div>
-            <h2><i class="fa-regular fa-building-columns"></i>&nbsp;@Model.Organizace.Nazev</h2>
-
-            <h3 class="fw-bold"><i class="fa-regular fa-user"></i>&nbsp;@Model.NazevPozice</h3>
+            <h2><i class="fa-regular fa-building-columns"></i>&nbsp;@politik.FullName()</h2>
             <div class="d-flex">
-
                 <div class="me-3">
-
                     <div class="d-flex">
                         <div>
                             <div class="person-profile-thumb">
                                 <div class="photo">
                                     <div class="profile-picture border"
-                                         style="background-image: url('@ceo.Osoba.GetPhotoUrl(false, Osoba.PhotoTypes.NoBackground)')"></div>
+                                         style="background-image: url('@politik.GetPhotoUrl(false, Osoba.PhotoTypes.NoBackground)')"></div>
                                 </div>
                             </div>
                         </div>
                         <div class="mt-1">
                             <p class="py-0 my-0 lead fw-bold">
-                                <a href="@ceo.Osoba.GetUrl(false)">@ceo.Osoba.FullName()</a>
+                                <a href="@politik.GetUrl(false)">@politik.FullName()</a>
                             </p>
-                            <p style="display: none" class="py-0 my-0">@Html.Raw(ceo.Osoba.NarozeniYear(true))</p>
+                            <p style="display: none" class="py-0 my-0">@Html.Raw(politik.NarozeniYear(true))</p>
                         </div>
                     </div>
-                    
-                </div>
-                <div>
-
                 </div>
             </div>
         </div>
@@ -64,6 +53,12 @@
 <section class="d-flex alter-bg-color">
     <div class="container">
         <h3>Detailní informace</h3>
+        <ul class="list-group">
+            @foreach (var puPolitikPrijem in Model)
+            {
+                <li class="list-group-item">@puPolitikPrijem.Organizace.Nazev - @puPolitikPrijem.NazevFunkce - @puPolitikPrijem.HrubyMesicniPlatVcetneOdmen</li>
+            }
+        </ul>
 
     </div>
 </section>
