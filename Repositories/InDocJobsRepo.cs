@@ -70,7 +70,7 @@ namespace HlidacStatu.Repositories
                 if (Math.Abs(jobraw.Length - jobname.JobRaw.Length) > acceptableDistnace + 2)
                     continue;
 
-                var distance = Validators.LevenshteinDistanceCompute(jobraw, jobname.JobRaw);
+                var distance = HlidacStatu.Util.TextTools.LevenshteinDistanceCompute(jobraw, jobname.JobRaw);
                 if (distance < bestDistance)
                 {
                     bestDistance = distance;

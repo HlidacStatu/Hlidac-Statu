@@ -11,6 +11,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text.RegularExpressions;
 using Serilog;
+using Amazon.Runtime.Internal.Util;
 
 namespace HlidacStatu.Entities
 {
@@ -293,6 +294,43 @@ namespace HlidacStatu.Entities
                         return new Osoba()
                         { Jmeno = origWords[1], Prijmeni = origWords[0], TitulPred = titulPred, TitulPo = titulPo };
 
+                    //spocitej vahy
+                    int w0_prijmeni_weight = 0;
+                    if (w0.HasAnyFlags(CompareResult.FoundInTopPrijmeni))
+                        w0_prijmeni_weight = 2;
+                    else if (w0.HasAnyFlags(CompareResult.FoundInPrijmeni))
+                        w0_prijmeni_weight = 1;
+                    int w0_jmeno_weight = 0;
+                    if (w0.HasAnyFlags(CompareResult.FoundInTopJmeno))
+                        w0_jmeno_weight = 2;
+                    else if (w0.HasAnyFlags(CompareResult.FoundInJmeno))
+                        w0_jmeno_weight = 1;
+
+                    int w1_prijmeni_weight = 0;
+                    if (w1.HasAnyFlags(CompareResult.FoundInTopPrijmeni))
+                        w1_prijmeni_weight = 2;
+                    else if (w1.HasAnyFlags(CompareResult.FoundInPrijmeni))
+                        w1_prijmeni_weight = 1;
+                    int w1_jmeno_weight = 0;
+                    if (w1.HasAnyFlags(CompareResult.FoundInTopJmeno))
+                        w1_jmeno_weight = 2;
+                    else if (w1.HasAnyFlags(CompareResult.FoundInJmeno))
+                        w1_jmeno_weight = 1;
+
+                    if (w0_jmeno_weight>w0_prijmeni_weight && w1_prijmeni_weight>=w1_jmeno_weight)
+                        return new Osoba()
+                        { Jmeno = origWords[0], Prijmeni = origWords[1], TitulPred = titulPred, TitulPo = titulPo };
+                    if (w0_jmeno_weight >= w0_prijmeni_weight && w1_prijmeni_weight > w1_jmeno_weight)
+                        return new Osoba()
+                        { Jmeno = origWords[0], Prijmeni = origWords[1], TitulPred = titulPred, TitulPo = titulPo };
+
+                    if (w0_jmeno_weight < w0_prijmeni_weight && w1_prijmeni_weight <= w1_jmeno_weight)
+                        return new Osoba()
+                        { Jmeno = origWords[1], Prijmeni = origWords[0], TitulPred = titulPred, TitulPo = titulPo };
+                    if (w0_jmeno_weight >= w0_prijmeni_weight && w1_prijmeni_weight > w1_jmeno_weight)
+                        return new Osoba()
+                        { Jmeno = origWords[1], Prijmeni = origWords[0], TitulPred = titulPred, TitulPo = titulPo };
+
 
                     if (preferAccurateResult)
                         return null;
@@ -446,48 +484,6 @@ namespace HlidacStatu.Entities
 					)
 				)", DefaultRegexOptions);
 
-        /// <summary>
-        /// difference between two sequences. the Levenshtein distance between two words is the minimum number of single-character edits (i.e. insertions, deletions, or substitutions) required to change one word into the other.
-        /// </summary>
-        /// <param name="s"></param>
-        /// <param name="t"></param>
-        /// <returns></returns>
-        public static int LevenshteinDistanceCompute(string s, string t)
-        {
-            if (string.IsNullOrEmpty(s))
-            {
-                if (string.IsNullOrEmpty(t))
-                    return 0;
-                return t.Length;
-            }
-
-            if (string.IsNullOrEmpty(t))
-            {
-                return s.Length;
-            }
-
-            int n = s.Length;
-            int m = t.Length;
-            int[,] d = new int[n + 1, m + 1];
-
-            // initialize the top and right of the table to 0, 1, 2, ...
-            for (int i = 0; i <= n; d[i, 0] = i++) ;
-            for (int j = 1; j <= m; d[0, j] = j++) ;
-
-            for (int i = 1; i <= n; i++)
-            {
-                for (int j = 1; j <= m; j++)
-                {
-                    int cost = (t[j - 1] == s[i - 1]) ? 0 : 1;
-                    int min1 = d[i - 1, j] + 1;
-                    int min2 = d[i, j - 1] + 1;
-                    int min3 = d[i - 1, j - 1] + cost;
-                    d[i, j] = Math.Min(Math.Min(min1, min2), min3);
-                }
-            }
-
-            return d[n, m];
-        }
 
 
         /// <summary>

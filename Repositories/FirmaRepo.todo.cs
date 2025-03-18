@@ -754,7 +754,7 @@ namespace HlidacStatu.Repositories
                                 var firmaFromDB = TextUtil.ReplaceDuplicates(
                                     Regex.Replace(f.JmenoBezKoncovky(), @"[,;_""']", " ", Validators.DefaultRegexOptions), ' ');
                                 firmaFromDB = TextUtil.RemoveDiacritics(firmaFromDB).ToLower();
-                                var rozdil = Validators.LevenshteinDistanceCompute(
+                                var rozdil = HlidacStatu.Util.TextTools.LevenshteinDistanceCompute(
                                     firmaFromDB,
                                     firmaFromText
                                 );
@@ -768,10 +768,10 @@ namespace HlidacStatu.Repositories
                                 if (string.IsNullOrEmpty(fKoncovka))
                                     return f;
                                 if (!string.IsNullOrEmpty(fKoncovka) &&
-                                    Validators.LevenshteinDistanceCompute(cutWords.Last(), fKoncovka) < 2)
+                                    HlidacStatu.Util.TextTools.LevenshteinDistanceCompute(cutWords.Last(), fKoncovka) < 2)
                                     return f;
                                 if (!string.IsNullOrEmpty(fKoncovka) &&
-                                    Validators.LevenshteinDistanceCompute(nextWord, fKoncovka) < 2)
+                                    HlidacStatu.Util.TextTools.LevenshteinDistanceCompute(nextWord, fKoncovka) < 2)
                                     return f;
                             }
                         }

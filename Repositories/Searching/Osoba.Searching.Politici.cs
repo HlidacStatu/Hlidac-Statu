@@ -105,6 +105,41 @@ namespace HlidacStatu.Repositories.Searching
                 return ret.ToArray();
             });
 
+        static List<string> GetPermutations(string[] words)
+        {
+            return GetPermutations(words, 0, words.Length - 1)
+                .Select(m => string.Join(" ", m))
+                .ToList();
+        }
+        // Recursive function to generate permutations.
+            static List<string[]> GetPermutations(string[] words, int start, int end)
+        {
+            List<string[]> result = new List<string[]>();
+
+            if (start == end)
+            {
+                // Clone the array so changes in recursion don't affect it.
+                result.Add((string[])words.Clone());
+            }
+            else
+            {
+                for (int i = start; i <= end; i++)
+                {
+                    Swap(ref words[start], ref words[i]);
+                    result.AddRange(GetPermutations(words, start + 1, end));
+                    Swap(ref words[start], ref words[i]); // backtrack
+                }
+            }
+            return result;
+        }
+
+        // Helper method to swap two elements in the array.
+        static void Swap(ref string a, ref string b)
+        {
+            string temp = a;
+            a = b;
+            b = temp;
+        }
         static List<Tuple<string, string[]>> InitPoliticiStems()
         {
             HashSet<string> slova = new HashSet<string>();
@@ -127,18 +162,11 @@ namespace HlidacStatu.Repositories.Searching
 
             foreach (var p in PoliticiStemsCache.Get())
             {
-                var cols = new string[] { p.JmenoStem.ToLower(), p.PrijmeniStem.ToLower() };
+                //var cols = new string[] { p.JmenoStem.ToLower(), p.PrijmeniStem.ToLower() };
+                string[] fullnamewords = (p.JmenoStem.ToLower() + " " + p.PrijmeniStem.ToLower()).Split(' ');
+                var names = GetPermutations(fullnamewords);
                 var key = p.NameId;
 
-                List<string> names = new List<string>();
-                for (int i = 1; i < cols.Length; i++)
-                {
-                    string jmeno = cols[0];
-                    string prijmeni = cols.Skip(1).Take(i).Aggregate((f, s) => f + " " + s);
-                    names.Add(jmeno + " " + prijmeni);
-                    if (!slova.Contains(prijmeni))
-                        names.Add(prijmeni);
-                }
 
                 foreach (var n in names)
                 {
@@ -209,6 +237,11 @@ namespace HlidacStatu.Repositories.Searching
         /// <returns></returns>
         public static async Task<string[]> FindCitationsAsync(string text)
         {
+            Dictionary<string, string> compareVyjimky = new Dictionary<string, string>() {
+                { "jan","jana" },
+                { "jana","jan" }
+            };
+
             var stopw = new Devmasters.DT.StopWatchEx();
             stopw.Start();
             string[] sText = await StemsAsync(text);
@@ -216,7 +249,7 @@ namespace HlidacStatu.Repositories.Searching
             //Console.WriteLine($"stemmer {stopw.ExactElapsedMiliseconds} ");
             stopw.Restart();
             List<string> found = new List<string>();
-            var debug = PoliticiStems.Where(m => m.Item1 == "martina-bartova-14").ToArray();
+            var debug = PoliticiStems.Where(m => m.Item1 == "jana-mrackova-vildumetzova").ToArray();
             foreach (var kv in PoliticiStems)
             {
                 string zkratka = kv.Item1;
@@ -227,13 +260,19 @@ namespace HlidacStatu.Repositories.Searching
                     bool same = true;
                     for (int j = 0; j < politik.Length; j++)
                     {
+                        string stl = sText[i + j].ToLower();
                         if (sText[i + j] == politik[j])
                             same = same & true;
+                        else if (compareVyjimky.ContainsKey(stl))
+                        {
+                            same = same & (compareVyjimky[stl].Equals(politik[j], StringComparison.InvariantCultureIgnoreCase));
+                        }
                         else
                         {
                             same = false;
-                            break;
                         }
+                        if (same == false)
+                            break;
                     }
 
                     if (same)

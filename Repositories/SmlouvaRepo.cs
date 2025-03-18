@@ -67,22 +67,16 @@ namespace HlidacStatu.Repositories
             return false;
         }
 
-        public async static Task<HlidacStatu.AI.LLM.ContractParties.Comparison> ContractPartiesComparisonWithAIAsync(
-                Smlouva smlouva, Smlouva.Priloha priloha,
-                    HlidacStatu.AI.LLM.Clients.BaseClient llmClient, int maxWordsFromBeginningOfTheText = 1000,
-                    HlidacStatu.AI.LLM.Models.Model model = null, bool doubleCheck = false)
+
+        public static string GetBeginningOfTheContract(Smlouva smlouva, Smlouva.Priloha priloha,
+            int maxWordsFromBeginningOfTheText = 1000)
         {
+
             if (smlouva == null)
                 throw new ArgumentNullException(nameof(smlouva));
             if (priloha == null)
                 throw new ArgumentNullException(nameof(priloha));
 
-
-            AI.LLM.ContractParties.Parsed smlouvaParties = ToContractParties(smlouva);
-
-
-            HlidacStatu.AI.LLM.ContractParties llm = new AI.LLM.ContractParties(llmClient);
-            model = model ?? HlidacStatu.AI.LLM.Models.Model.Llama31;
 
             StringBuilder t = new StringBuilder();
             SplitSmlouva smlSplit = SplitSmlouva.Create(smlouva.Id, priloha.UniqueHash(), priloha.PlainTextContent);
@@ -95,7 +89,22 @@ namespace HlidacStatu.Repositories
                     break;
             }
 
-            AI.LLM.ContractParties.Parsed contractPartiesRes = await llm.FindContractPartiesAsync(t.ToString(), maxWordsFromBeginningOfTheText, model);
+            return t.ToString();
+        }
+        public async static Task<HlidacStatu.AI.LLM.ContractParties.Comparison> ContractPartiesComparisonWithAIAsync(
+                Smlouva smlouva, Smlouva.Priloha priloha,
+                    HlidacStatu.AI.LLM.Clients.BaseClient llmClient, int maxWordsFromBeginningOfTheText = 1000,
+                    HlidacStatu.AI.LLM.Models.Model model = null, bool doubleCheck = false)
+        {
+
+            AI.LLM.ContractParties.Parsed smlouvaParties = ToContractParties(smlouva);
+
+
+            HlidacStatu.AI.LLM.ContractParties llm = new AI.LLM.ContractParties(llmClient);
+            model = model ?? HlidacStatu.AI.LLM.Models.Model.Llama31;
+
+            string t = GetBeginningOfTheContract(smlouva, priloha, maxWordsFromBeginningOfTheText);
+            AI.LLM.ContractParties.Parsed contractPartiesRes = await llm.FindContractPartiesAsync(t, maxWordsFromBeginningOfTheText, model);
 
             var res = new HlidacStatu.AI.LLM.ContractParties.Comparison(smlouvaParties, contractPartiesRes);
 
