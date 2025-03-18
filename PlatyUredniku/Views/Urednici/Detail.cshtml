@@ -1,0 +1,388 @@
+@using Devmasters
+@using HlidacStatu.Entities
+@using HlidacStatu.Repositories.SharedModels
+@using Microsoft.AspNetCore.Mvc.TagHelpers
+@using PlatyUredniku.Models
+@using HlidacStatu.Repositories;
+@using PlatyUredniku.Views.Shared.TagHelpers
+
+
+@model HlidacStatu.Entities.PuOrganizace
+
+@section scripts
+{
+    <link rel="stylesheet" type="text/css" href="//cdn.datatables.net/1.13.4/css/jquery.dataTables.min.css"/>
+    <script type="text/javascript" charset="utf8"
+            src="//cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
+    <script>
+        function adjustDataTablesWidth() {
+            $.fn.dataTable.tables({visible: true, api: true}).columns.adjust();
+        }
+    </script>
+}
+
+@section breadcrumbs
+{
+    <ol class="breadcrumb">
+        <li>
+            <a asp-action="Index">Platy úředníků</a>
+        </li>
+        <li>
+            <a asp-action="Oblasti">Oblasti</a>
+        </li>
+        <li>
+            <hashtag tag="@ViewData["mainTag"]" style="font-size:13px; padding:0.2em"></hashtag>
+        </li>
+        <li class="active">@Model.Nazev</li>
+    </ol>
+}
+
+@{
+    bool sectionBgSwitch = false;
+    var neaktivniOrg = PuRepo.GetNeaktivniOrganizace().ToArray();
+}
+
+<section class="d-flex align-items-center justify-content-center @(sectionBgSwitch ? "alter-bg-color" : "")">
+    <div class="container">
+
+
+        <h2 class="pb-2 border-bottom">@Model.Nazev</h2>
+        <p>
+            IČO: <a href="https://www.hlidacstatu.cz/subjekt/@(Model.Ico)" target=”_blank”>@Model.Ico<i
+                    class="fa-solid fa-arrow-up-right-from-square"></i></a> <br/>
+            Datová schránka: @Model.DS <br/>
+        </p>
+        <div>
+            @foreach (var tag in Model.Tags)
+            {
+                <hashtag tag="@tag.Tag"></hashtag>
+            }
+        </div>
+
+        <div class="row">
+            @if (Model.Platy.Any())
+            {
+                <div>
+                    <partial name="Graphs/_AreaRangePlot"
+                             model="@(new AreaRangeRenderOptions() { Platy = Model.Platy, CssHeight = "380" })"/>
+                </div>
+            }
+        </div>
+    </div>
+</section>
+
+
+@{
+    var platyPoLetech = Model.Platy.GroupBy(p => p.Rok)
+        .Select(m => new { Key = m.Key, Platy = m.ToList() })
+        .ToList();
+
+    if (platyPoLetech.Any(m => m.Key == PuRepo.DefaultYear) == false)
+    {
+        platyPoLetech.Add(new { Key = PuRepo.DefaultYear, Platy = new List<PuPlat>() });
+    }
+
+    platyPoLetech = platyPoLetech.OrderByDescending(pg => pg.Key).ToList();
+}
+
+
+@{
+    sectionBgSwitch = !sectionBgSwitch;
+}
+<section class="d-flex justify-content-center  @(sectionBgSwitch ? "alter-bg-color" : "")">
+    <div class="container">
+
+        <h3>Přehled platů</h3>
+        <div class="nav flex-row nav-pills my-5" id="v-pills-tab" role="tablist">
+            <button class="nav-link disabled" type="button" disabled="disabled">Rok</button>
+            @{
+                string classAttributes = "nav-link active";
+
+                foreach (var platRok in platyPoLetech)
+                {
+                    <button class="@classAttributes"
+                            id="year-@platRok.Key-tab"
+                            data-bs-toggle="pill"
+                            data-bs-target="#year-@platRok.Key"
+                            type="button"
+                            role="tab"
+                            onclick="adjustDataTablesWidth()">
+                        @platRok.Key
+                    </button>
+
+                    classAttributes = "nav-link";
+                }
+            }
+        </div>
+        <div class="tab-content width-75vp">
+            @{
+                classAttributes = "tab-pane width-75vp fade show active";
+
+                foreach (var platGroup in platyPoLetech)
+                {
+                    <div class="@classAttributes" id="year-@platGroup.Key" role="tabpanel">
+                        <script>
+                            $(document).ready(function () {
+                                $('#tblSum_urednik_@platGroup.Key').DataTable(
+                                    {
+                                        'language': {
+                                            'url': '//cdn.datatables.net/plug-ins/1.13.4/i18n/cs.json'
+                                        },
+                                        "searching": false,
+                                        "paging": false,
+                                        "ordering": true,
+                                        "order": [],
+                                        "info": false
+                                    });
+                            });
+                        </script>
+
+                        @if (platGroup.Platy.Count > 0)
+                        {
+                            <table class="table table-borderless table-hover" id="tblSum_urednik_@platGroup.Key">
+                                <thead>
+                                <tr>
+                                    <th>Název pozice</th>
+                                    <th class="text-end">Celkový roční příjem</th>
+                                    <th class="text-end">Přepočtený průměrný měsíční plat</th>
+                                    <th style="max-width:20rem">Nefinanční bonus</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                @foreach (var plat in platGroup.Platy.OrderBy(p => p.DisplayOrder).ThenBy(p => p.NazevPozice))
+                                {
+                                    <tr>
+                                        <td>
+                                            <a asp-action="Plat" asp-route-id="@plat.Id">@plat.NazevPozice</a>
+                                        </td>
+                                        <td data-order="@(HlidacStatu.Util.RenderData.OrderValueFormat(plat.CelkovyRocniPlatVcetneOdmen))"
+                                            class="number">
+                                            @if (plat.PocetMesicu < 12)
+                                            {
+                                                <a href="#" class="link-danger me-2" data-bs-toggle="tooltip"
+                                                   data-bs-title="Plat je pouze za @Devmasters.Lang.CS.Plural.Get((long)plat.PocetMesicu.Value, "jeden měsíc", "{0} měsíce", "{0} měsíců") a může obsahovat odstupné či jinou smluvní odměnu"><i
+                                                        class="fa-solid fa-circle-info"></i></a>
+                                            }
+
+                                            @HlidacStatu.Util.RenderData.NicePrice(plat.CelkovyRocniPlatVcetneOdmen)
+                                        </td>
+                                        <td data-order="@(HlidacStatu.Util.RenderData.OrderValueFormat(plat.HrubyMesicniPlatVcetneOdmen))"
+                                            class="number">
+                                            @if (plat.PocetMesicu < 12)
+                                            {
+                                                <a href="#" class="link-danger me-2" data-bs-toggle="tooltip"
+                                                   data-bs-title="Plat je pouze za @Devmasters.Lang.CS.Plural.Get((long)plat.PocetMesicu.Value, "jeden měsíc", "{0} měsíce", "{0} měsíců") a může obsahovat odstupné či jinou smluvní odměnu"><i
+                                                        class="fa-solid fa-circle-info"></i></a>
+                                            }
+                                            @HlidacStatu.Util.RenderData.NicePrice(plat.HrubyMesicniPlatVcetneOdmen)
+                                        </td>
+                                        <td>@plat.NefinancniBonus</td>
+                                    </tr>
+                                }
+                                </tbody>
+                            </table>
+                        }
+                        else
+                        {
+                            var desc = Model.GetMetadataDescriptionUrednici(platGroup.Key);
+
+                            <div class="alert alert-@(desc.BootstrapStatus)" role="alert">
+                                <h4 class="alert-heading">@desc.TextStatus</h4>
+                                <p>@desc.Detail.</p>
+                            </div>
+                        }
+
+                    </div>
+                    classAttributes = "tab-pane width-75vp";
+                }
+            }
+        </div>
+           
+    </div>
+</section>
+
+@{
+    string[] compareTo = Model.CZISCO?.Split(new char[] { ',', ';', ' ' }, StringSplitOptions.RemoveEmptyEntries);
+}
+@if (compareTo?.Length > 0 && Model.Platy != null && Model.Platy.Any())
+{
+    sectionBgSwitch = !sectionBgSwitch;
+    <section class="d-flex justify-content-center @(sectionBgSwitch ? "alter-bg-color" : "")">
+        <div class="container">
+            <h3>Porovnání vývoje platů vzhledem k vybraným kategoriím pracovníků</h3>
+
+            @{
+                //AreaRangePlot uradData =
+                List<AreaRangePlot> data = new List<AreaRangePlot>();
+                data.Add(AreaRangePlot.ToAreaRangePlotWithPrumer(Model.Platy, Model.Nazev));
+                if (Model.Nazev.Contains("Ministerstvo"))
+                {
+                    data[0].ExtraTitle = "Ministr/yně";
+                }
+                else if (Model.Platy.Any(m => m.JeHlavoun == true))
+                {
+                    data[0].ExtraTitle = Model.Platy.Where(m => m.JeHlavoun == true).OrderByDescending(m => m.Rok).First().NazevPozice;
+                }
+                else
+                {
+                    data[0].ExtraTitle = "Nejvyšší představitel/ka organizace";
+                }
+
+                foreach (var compItem in compareTo)
+                {
+                    var d = await PuRepo.LoadVydelekForZamestnaniAsync(compItem, HlidacStatu.Entities.PuVydelek.VydelekSektor.StatSamosprava);
+                    if (d?.Any() == true)
+                    {
+                        var dName = d.OrderByDescending(m => m.Rok).Select(m => m.FullNazevKategorieZamestnani()).FirstOrDefault().ShortenMe(140);
+                        data.Add(AreaRangePlot.ToAreaRangePlotWithPrumer(d, dName));
+                    }
+
+                    d = await PuRepo.LoadVydelekForZamestnaniAsync(compItem, HlidacStatu.Entities.PuVydelek.VydelekSektor.Soukromy);
+                    if (d?.Any() == true)
+                    {
+                        var dName = d.OrderByDescending(m => m.Rok).Select(m => m.FullNazevKategorieZamestnani()).FirstOrDefault().ShortenMe(140);
+                        data.Add(AreaRangePlot.ToAreaRangePlotWithPrumer(d, dName));
+                    }
+                }
+
+                //calculate height
+                var height = 430
+                             + data.Count() * 12 //pul radku na jednu serii
+                             + (data.Count(m => m.Title.Length > 80) * 17); //dlouhe nazvy serii pocitej na cely radek
+
+                AreaRangeCompareRenderOptions chartModel = new AreaRangeCompareRenderOptions()
+                {
+                    CssHeight = height.ToString(),
+                    Data = data.ToArray(),
+                    Title = "Porovnání s jinými oblastmi trhu"
+                };
+                <partial name="Graphs/_AreaRangeComparePlot" model="@chartModel"/>
+            }
+
+        </div>
+    </section>
+}
+
+
+
+@if (Model.Metadata.Any())
+{
+    sectionBgSwitch = !sectionBgSwitch;
+
+    <section class="d-flex justify-content-center @(sectionBgSwitch ? "alter-bg-color" : "")">
+        <div class="container">
+
+            <h3>Detaily komunikace instituce ohledně platů</h3>
+            <div class="nav flex-row nav-pills my-5" id="v-meta-pills-tab" role="tablist">
+                <button class="nav-link disabled" type="button" disabled="disabled">Rok</button>
+                @{
+                    string metadataClassAttributes = "nav-link active";
+
+                    foreach (var metadata in Model.MetadataPlatyUredniku.OrderByDescending(m => m.Rok))
+                    {
+                        <button class="@metadataClassAttributes"
+                                id="meta-year-@metadata.Rok-tab"
+                                data-bs-toggle="pill"
+                                data-bs-target="#meta-year-@metadata.Rok"
+                                type="button"
+                                role="tab">
+                            @metadata.Rok
+                        </button>
+
+                        metadataClassAttributes = "nav-link";
+                    }
+                }
+            </div>
+            <div class="tab-content width-75vp">
+                @{
+                    metadataClassAttributes = "tab-pane width-75vp fade show active";
+
+                    foreach (var metadataForYear in Model.MetadataPlatyUredniku.OrderByDescending(m => m.Rok))
+                    {
+                        <div class="@metadataClassAttributes" id="meta-year-@metadataForYear.Rok" role="tabpanel">
+                            <div>
+                                <div class="row g-4 py-5 row-cols-1 row-cols-lg-3">
+                                    <div class="col d-flex align-items-start">
+                                        <div
+                                            class="icon-square text-body-emphasis bg-body-secondary d-inline-flex align-items-center justify-content-center fs-4 flex-shrink-0 me-3">
+                                            <svg class="bi" width="1em" height="1em">
+                                                <use xlink:href="#toggles2"></use>
+                                            </svg>
+                                        </div>
+                                        <div>
+                                            <h4 class="fw-bold">Doba trvání</h4>
+                                            <p>
+                                                Žádost o výši platů jsme
+                                                odeslali @(metadataForYear.DatumOdeslaniZadosti?.ToString("dd.MM.yyyy"))
+                                                @if (metadataForYear.DatumPrijetiOdpovedi.HasValue)
+                                                {
+                                                    <span>
+                                                                a odpověď obdrželi po
+                                                        @(Devmasters.Lang.CS.Plural.Get((int)(metadataForYear.DatumPrijetiOdpovedi.Value - metadataForYear.DatumOdeslaniZadosti.Value).TotalDays, "jednom dni", "{0} dnech", "{0} dnech")).
+                                                            </span>
+                                                }
+                                                else
+                                                {
+                                                    <span>odpověď jsem zatím neobdrželi nebo nezpracovali.</span>
+                                                }
+                                            </p>
+                                        </div>
+                                    </div>
+
+                                    <div class="col d-flex align-items-start">
+                                        <div
+                                            class="icon-square text-body-emphasis bg-body-secondary d-inline-flex align-items-center justify-content-center fs-4 flex-shrink-0 me-3">
+                                            <svg class="bi" width="1em" height="1em">
+                                                <use xlink:href="#cpu-fill"></use>
+                                            </svg>
+                                        </div>
+                                        <div>
+                                            <h4 class="fw-bold">Zdůvodnění mimořádných odměn</h4>
+                                            <p>Součástí naší žádosti byl požadavek na zaslání odůvodnění mimořádných
+                                                odměn pracovníků. Toto odůvodnění
+                                                jsme @(metadataForYear.ZduvodneniMimoradnychOdmen == true ? "dostali" : "nedostali").</p>
+                                        </div>
+                                    </div>
+
+                                    @if (!string.IsNullOrWhiteSpace(metadataForYear.PoznamkaHlidace))
+                                    {
+                                        <div class="col d-flex align-items-start">
+                                            <div
+                                                class="icon-square text-body-emphasis bg-body-secondary d-inline-flex align-items-center justify-content-center fs-4 flex-shrink-0 me-3">
+                                                <svg class="bi" width="1em" height="1em">
+                                                    <use xlink:href="#cpu-fill"></use>
+                                                </svg>
+                                            </div>
+                                            <div>
+                                                <h4 class="fw-bold">Poznámka Hlídače</h4>
+                                                <p>@metadataForYear.PoznamkaHlidace</p>
+                                            </div>
+                                        </div>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                        metadataClassAttributes = "tab-pane width-75vp";
+                    }
+                }
+            </div>
+        </div>
+
+    </section>
+}
+
+@{
+    sectionBgSwitch = !sectionBgSwitch;
+}
+<section class="d-flex justify-content-center  @(sectionBgSwitch ? "alter-bg-color" : "")">
+    <div class="container">
+        <h3>Open data</h3>
+        <p>Open data s kompletními platy pro <b>@(Model.Nazev)</b> za všechny dostupné roky</p>
+        <partial name="ExportModal"
+                 model="@(new ExportModalViewModel() { DatovaSchranka = Model.DS, Titulek = $"Export dat pro {Model.Nazev}", NazevTlacitka = $"Open data pro {Model.Nazev}" })"/>
+
+    </div>
+</section>
+
+
+<div class="pb-3"></div>

@@ -16,6 +16,9 @@ using PlatyUredniku.Services;
 using Serilog;
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using Microsoft.AspNetCore.Mvc.Controllers;
+using Microsoft.AspNetCore.Mvc.Infrastructure;
 using ZiggyCreatures.Caching.Fusion;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
@@ -92,7 +95,7 @@ public class Program
             var app = builder.Build();
 
 
-            StaticCache.Init(app.Services.GetService<IFusionCache>());
+            UredniciStaticCache.Init(app.Services.GetService<IFusionCache>());
 
             var whitelistIps = Devmasters.Config.GetWebConfigValue("BanWhitelist")?.Split(',',
                 StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
@@ -132,8 +135,42 @@ public class Program
             app.UseHttpsRedirection();
             app.UseStaticFiles();
 
+            
+            
             app.UseRouting();
 
+            // Redirect original platy uredniku from Home into /urednici
+            app.Use(async (context, next) =>
+            {
+                var path = context.Request.Path.Value?.Trim('/');
+    
+                if (!string.IsNullOrEmpty(path) && context.GetEndpoint() == null)
+                {
+                    var actionDescriptors = context.RequestServices
+                        .GetRequiredService<IActionDescriptorCollectionProvider>()
+                        .ActionDescriptors.Items
+                        .OfType<ControllerActionDescriptor>();
+
+                    var actionName = path.Split('/').FirstOrDefault();
+                    if (actionName is not null)
+                    {
+                        var existsInUrednici = actionDescriptors.Any(a =>
+                            a.ControllerName.Equals("Urednici", StringComparison.OrdinalIgnoreCase) &&
+                            a.ActionName.Equals(actionName, StringComparison.OrdinalIgnoreCase));
+
+                        if (existsInUrednici)
+                        {
+                            // Preserve query parameters
+                            var queryString = context.Request.QueryString.Value;
+                            context.Response.Redirect($"/urednici/{path}{queryString}", permanent: true);
+                            return;
+                        }
+                    }
+                }
+
+                await next();
+            });
+            
             app.UseAuthentication();
             app.UseAuthorization();
 

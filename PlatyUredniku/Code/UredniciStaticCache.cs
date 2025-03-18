@@ -7,7 +7,7 @@ using ZiggyCreatures.Caching.Fusion;
 
 namespace PlatyUredniku
 {
-    public static class StaticCache
+    public static class UredniciStaticCache
     {
         private static IFusionCache _cache;
 

@@ -1,0 +1,161 @@
+@using HlidacStatu.Repositories
+@using PlatyUredniku.Models;
+@using System.Collections.Generic;
+@using HlidacStatu.Util;
+
+
+@{
+    bool max = this.Context.Request.Query.GetFirstQueryParameter("max") != "false";
+
+    int minYear = Devmasters.ParseText.ToInt(this.Context.Request.Query.GetFirstQueryParameter("minyear")) ?? 2021;
+    var orgs = await PuRepo.GetPlatyForYearsAsync(minYear, PuRepo.DefaultYear);
+
+    List<PrumerPlatu> rusty = new();
+    foreach (var org in orgs)
+    {
+        var platyCeos = org.Platy.Where(plat => plat.JeHlavoun == true).ToList();
+        var platyPrvniRok = platyCeos.Where(p => p.Rok == minYear);
+        var platyPosledniRok = platyCeos.Where(p => p.Rok == PuRepo.DefaultYear);
+        if (!platyPrvniRok.Any() || !platyPosledniRok.Any())
+            continue;
+
+        var rustPlatu = new PrumerPlatu()
+        {
+            DatovaSchrankaOrganizace = org.DS,
+            NazevOrganizace = org.Nazev,
+            PlatPrvniRok = platyPrvniRok.Average(p => p.HrubyMesicniPlatVcetneOdmen),
+            PocetMesicuPrvniRok = platyPrvniRok.Sum(p => p.PocetMesicu),
+            PocetPlatuPrvniRok = platyPrvniRok.Count(),
+            
+            PlatPosledniRok = platyPosledniRok.Average(p => p.HrubyMesicniPlatVcetneOdmen),
+            PocetMesicuPosledniRok = platyPosledniRok.Sum(p => p.PocetMesicu),
+            PocetPlatuPosledniRok = platyPosledniRok.Count(),
+        };
+
+        //filter results
+        if (rustPlatu.PlatPrvniRok > 0 && rustPlatu.PlatPosledniRok > 0)
+        {
+            if (max && rustPlatu.NarustProcentualni > 0)
+                rusty.Add(rustPlatu);
+            else if (max == false && rustPlatu.NarustProcentualni < 0)
+                rusty.Add(rustPlatu);
+        }
+
+    }
+}
+@section breadcrumbs
+{
+    <ol class="breadcrumb">
+        <li>
+            <a asp-action="Index">Platy úředníků</a>
+        </li>
+        <li>
+            <a asp-action="Analyzy">Analýzy</a>
+        </li>
+        <li class="active">
+            @(max ? "Největší navýšení" : "Největší snížení") platů nejvyšších představitelů od roku @minYear
+        </li>
+    </ol>
+}
+
+@section scripts
+{
+    <link rel="stylesheet" type="text/css" href="//cdn.datatables.net/1.13.4/css/jquery.dataTables.min.css" />
+    <script type="text/javascript" charset="utf8" src="//cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
+}
+
+<section class="d-flex align-items-center justify-content-center">
+    <div class="container">
+        <h2>@(max ? "Největší navýšení" : "Největší snížení") platů nejvyšších představitelů od roku @minYear</h2>
+        <p class="text-muted">
+            Analýza @(max ? "největšího navýšení" : "největšího snížení")  platů včetně odměn
+            <b>nejvyšších představených</b> jednotlivých úřadů, státních podniků
+            či příspěvkových organizací mezi roky @minYear a @PuRepo.DefaultYear .
+        </p>
+
+        <div class="tab-pane width-75vp" id="rustPlatuCeo" role="tabpanel">
+            <script>
+                $(document).ready(function () {
+                    $('#tblSum_rustPlatuCeo').DataTable(
+                        {
+                            'language': {
+                                'url': '//cdn.datatables.net/plug-ins/1.13.4/i18n/cs.json'
+                            },
+                            "searching": false,
+                            "paging": true,
+                            "pageLength": 20,
+                            "lengthChange": false,
+                            "ordering": true,
+                            "order": [[3, @Html.Raw(max ? "'desc'" : "'asc'")]],
+                            "info": false
+                        });
+                });
+            </script>
+
+            <table class="table table-borderless table-striped table-hover" id="tblSum_rustPlatuCeo">
+                <thead class="table-light">
+                <th>Organizace</th>
+                <th><abbr title="Průměrný měsíční plat přepočtený z ročního příjmu včetně odměn">Měsíční plat</abbr> v @minYear</th>
+                <th><abbr title="Průměrný měsíční plat přepočtený z ročního příjmu včetně odměn">Měsíční plat</abbr> v @PuRepo.DefaultYear</th>
+                <th>Změna v %</th>
+                <th>Změna v Kč</th>
+                <th></th>
+                </thead>
+                <tbody>
+                    @foreach (var prumerPlatu in rusty.OrderByDescending(p => p.NarustProcentualni))
+                    {
+                        <tr>
+                            <td>
+                                <a asp-action="Detail" asp-route-id="@prumerPlatu.DatovaSchrankaOrganizace">@prumerPlatu.NazevOrganizace</a>
+                            </td>
+                            <td class="number text-nowrap" data-order="@(HlidacStatu.Util.RenderData.OrderValueFormat(prumerPlatu.PlatPrvniRok ?? 0))">@HlidacStatu.Util.RenderData.NicePrice(prumerPlatu.PlatPrvniRok ?? 0)</td>
+                            <td class="number text-nowrap" data-order="@(HlidacStatu.Util.RenderData.OrderValueFormat(prumerPlatu.PlatPosledniRok ?? 0))">@HlidacStatu.Util.RenderData.NicePrice(prumerPlatu.PlatPosledniRok ?? 0)</td>
+                            <td class="number text-nowrap" data-order="@(HlidacStatu.Util.RenderData.OrderValueFormat(prumerPlatu.NarustProcentualni ?? 0))">@prumerPlatu.NarustProcentualni?.ToString("P")</td>
+                            <td class="number text-nowrap" data-order="@(HlidacStatu.Util.RenderData.OrderValueFormat(prumerPlatu.NarustAbsolutni ?? 0))">@HlidacStatu.Util.RenderData.NicePrice(prumerPlatu.NarustAbsolutni ?? 0)</td>
+                            <td>
+                                @if (prumerPlatu.PocetPlatuPrvniRok >1 && prumerPlatu.PocetPlatuPosledniRok<2)
+                                {
+                                    <a href="#" class="link-danger" data-bs-toggle="tooltip" 
+                                    data-bs-title="Plat roku @(minYear) je spočítán jako průměr platů @Devmasters.Lang.CS.Plural.Get((long)prumerPlatu.PocetPlatuPrvniRok, "jednoho ředitele", "{0} ředitelů", "{0} ředitelů") a hodnota platu může obsahovat odstupné či jinou smluvní odměnu"><i class="fa-solid fa-circle-info"></i></a>
+                                }
+                                else if (prumerPlatu.PocetPlatuPosledniRok > 1 && prumerPlatu.PocetPlatuPrvniRok < 2)
+                                {
+                                    <a href="#" class="link-danger" data-bs-toggle="tooltip"
+                                       data-bs-title="Plat roku @(PuRepo.DefaultYear) je spočítán jako průměr platů @Devmasters.Lang.CS.Plural.Get((long)prumerPlatu.PocetPlatuPosledniRok, "jednoho ředitele", "{0} ředitelů", "{0} ředitelů") a hodnota platu může obsahovat odstupné či jinou smluvní odměnu"><i class="fa-solid fa-circle-info"></i></a>
+                                }
+                                else if (prumerPlatu.PocetPlatuPrvniRok > 1 && prumerPlatu.PocetPlatuPosledniRok > 1 )
+                                {
+                                    <a href="#" class="link-danger" data-bs-toggle="tooltip"
+                                       data-bs-title="Plat roku @(minYear) je spočítán jako průměr platů 
+                                            @Devmasters.Lang.CS.Plural.Get((long)prumerPlatu.PocetPlatuPrvniRok, "jednoho ředitele", "{0} ředitelů", "{0} ředitelů") 
+                                            a plat roku @(PuRepo.DefaultYear) je spočítán jako průměr platů
+                                            @Devmasters.Lang.CS.Plural.Get((long)prumerPlatu.PocetPlatuPosledniRok, "jednoho ředitele", "{0} ředitelů", "{0} ředitelů").
+                                            Hodnota platu tak může obsahovat jedno nebo více odstupné či jiné smluvní odměny."><i class="fa-solid fa-circle-info"></i></a>
+                                }
+                                else if (prumerPlatu.PocetPlatuPrvniRok == 1 && prumerPlatu.PocetMesicuPrvniRok < 12
+                                    && prumerPlatu.PocetPlatuPosledniRok == 1 && prumerPlatu.PocetMesicuPosledniRok < 12)
+                                {
+                                    <a href="#" class="link-danger me-2" data-bs-toggle="tooltip" data-bs-title="Plat roku @(minYear) je pouze za @Devmasters.Lang.CS.Plural.Get((long)prumerPlatu.PocetMesicuPrvniRok, "jeden měsíc", "{0} měsíce", "{0} měsíců"), plat roku @(PuRepo.DefaultYear) je pouze za @Devmasters.Lang.CS.Plural.Get((long)prumerPlatu.PocetMesicuPosledniRok, "jeden měsíc", "{0} měsíce", "{0} měsíců") a mohou obsahovat odstupné či jinou smluvní odměnu"><i class="fa-solid fa-circle-info"></i></a>
+                                }
+                                else if (prumerPlatu.PocetPlatuPrvniRok == 1 && prumerPlatu.PocetMesicuPrvniRok < 12)
+                                {
+                                    <a href="#" class="link-danger me-2" data-bs-toggle="tooltip" data-bs-title="Plat roku @(minYear) je pouze za @Devmasters.Lang.CS.Plural.Get((long)prumerPlatu.PocetMesicuPrvniRok, "jeden měsíc", "{0} měsíce", "{0} měsíců") a může obsahovat odstupné či jinou smluvní odměnu"><i class="fa-solid fa-circle-info"></i></a>
+                                }
+                                else if (prumerPlatu.PocetPlatuPosledniRok == 1 && prumerPlatu.PocetMesicuPosledniRok < 12)
+                                {
+                                    <a href="#" class="link-danger me-2" data-bs-toggle="tooltip" data-bs-title="Plat roku @(PuRepo.DefaultYear) je pouze za @Devmasters.Lang.CS.Plural.Get((long)prumerPlatu.PocetMesicuPosledniRok, "jeden měsíc", "{0} měsíce", "{0} měsíců") a může obsahovat odstupné či jinou smluvní odměnu"><i class="fa-solid fa-circle-info"></i></a>
+                                }
+
+                                else
+                                {
+                                    <text>&nbsp;</text>
+                                }
+
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</section>

@@ -52,7 +52,7 @@ public class PuOrganizace
         Metadata.Where(m => m.Typ == PuOrganizaceMetadata.TypMetadat.PlatyUredniku);
     [NotMapped]
     public IEnumerable<PuOrganizaceMetadata> MetadataPrijmyPolitiku =>
-        Metadata.Where(m => m.Typ == PuOrganizaceMetadata.TypMetadat.PlatyUredniku);
+        Metadata.Where(m => m.Typ == PuOrganizaceMetadata.TypMetadat.PlatyPolitiku);
 
 
 

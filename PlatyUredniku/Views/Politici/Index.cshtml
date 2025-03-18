@@ -1,0 +1,35 @@
+﻿@using HlidacStatu.Entities
+@using HlidacStatu.Repositories
+@inject ZiggyCreatures.Caching.Fusion.IFusionCache cache;
+@{
+    var stats = await PpRepo.GetGlobalStatAsync();
+    List<PuPolitikPrijem> platy = (List<PuPolitikPrijem>?)ViewData["platy"];
+}
+
+<section class="d-flex align-items-center justify-content-center">
+    <div class="container">
+        <h2>
+            Platy politiků v @PpRepo.DefaultYear
+        </h2>
+        <p class="">
+            Nové platy politiků - prozkoumejte a podívejte se, kolik akumulují
+        </p>
+    </div>
+</section>
+
+<section class="d-flex align-items-center justify-content-center alter-bg-color">
+    <div class="container">
+        <h5>
+            Za @PpRepo.DefaultYear jsme žádali o
+            platy @(HlidacStatu.Util.RenderData.NiceNumber(stats.PocetOslovenych)) organizací
+            a plat nám poskytlo @(HlidacStatu.Util.RenderData.NiceNumber(stats.PocetCoPoslaliPlat)) z nich.
+
+        </h5>
+        <p>
+            <a class="btn btn-primary btn-sm" href="/oblasti">Seznam všech organizací <span
+                    class="badge text-bg-danger">@(HlidacStatu.Util.RenderData.NiceNumber(stats.PocetOslovenych))</span></a>
+        </p>
+        <p class="mb-2 mt-4 text-body-secondary">
+    </div>
+</section>
+

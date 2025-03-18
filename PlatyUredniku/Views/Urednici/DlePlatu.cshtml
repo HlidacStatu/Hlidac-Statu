@@ -1,0 +1,81 @@
+﻿@using HlidacStatu.Entities
+@using HlidacStatu.Repositories
+@model List<HlidacStatu.Entities.PuPlat>
+
+
+@section breadcrumbs
+{
+    <ol class="breadcrumb">
+        <li>
+            <a asp-action="Index">Platy úředníků</a>
+        </li>
+        <li>
+            <a asp-action="Analyzy">Analýzy</a>
+        </li>
+        <li>
+            Přehled jednotlivých platů
+        </li>
+        <li class="active">
+            @ViewData["title"]
+        </li>
+    </ol>
+}
+
+
+<section class="d-flex align-items-center justify-content-center alter-bg-color pt-5">
+    <div class="container">
+        <h2>@ViewData["title"]</h2>
+        <p class="text-muted">Informace o <b>manažerských platech a odměnách vedoucích úřadů</b>, státních podniků či příspěvkových organizací za rok 2023.</p>
+        @if (!string.IsNullOrWhiteSpace((string?)ViewData["odkaz"]))
+        {
+            <div>Zajímají vás také @Html.Raw(ViewData["odkaz"].ToString().ToLower())?</div>
+        }
+
+    </div>
+</section>
+<section class="d-flex align-items-center justify-content-center">
+    <div class="container">
+        <p class="lead">@Html.Raw(ViewData["noteHtml"])</p>
+        <p>@Html.Raw(ViewData["rozsah"])</p>
+
+        <table class="table table-hover table-striped">
+            <thead class="xtable-light">
+            <th>Pozice</th>
+            <th>Organizace</th>
+            <th><abbr title="Průměrný měsíční plat přepočtený z ročního příjmu včetně odměn">Měsíční plat</abbr> v @PuRepo.DefaultYear</th>
+            <th>Nefinanční odměna</th>
+            </thead>
+            <tbody>
+                @foreach (PuPlat plat in Model.OrderByDescending(p => p.HrubyMesicniPlatVcetneOdmen))
+                {
+                    <tr>
+                        <td>
+                            <a asp-action="Plat" asp-route-id="@plat.Id"> @plat.NazevPozice</a>
+                        </td>
+                        <td>
+                            <a asp-action="Detail" asp-route-id="@plat.Organizace.DS">@plat.Organizace.Nazev</a>
+                        </td>
+                        <td class="number text-nowrap">
+                            @if (plat.PocetMesicu < 12)
+                            {
+                                <a href="#" class="link-danger" data-bs-toggle="tooltip" data-bs-title="Plat je pouze za @Devmasters.Lang.CS.Plural.Get((long)plat.PocetMesicu.Value, "jeden měsíc", "{0} měsíce", "{0} měsíců") a může obsahovat odstupné či jinou smluvní odměnu"><i class="fa-solid fa-circle-info"></i></a>
+                            }
+
+                            @HlidacStatu.Util.RenderData.NicePrice(plat.HrubyMesicniPlatVcetneOdmen)</td>
+                        <td style="max-width:25rem">
+
+                            <small>@plat.NefinancniBonus</small>
+                            </td>
+                    </tr>
+                }
+            </tbody>
+            <caption>Zobrazeno @(Model.Count) platů z celkem @(ViewData["pocetPlatuCelkem"])</caption>
+        </table>
+
+        @if (!string.IsNullOrWhiteSpace((string?)ViewData["odkaz"]))
+        {
+            <div class="my-5">Zajímají vás také @Html.Raw(ViewData["odkaz"].ToString().ToLower())?</div>
+        }
+
+    </div>
+</section>
