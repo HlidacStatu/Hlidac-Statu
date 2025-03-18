@@ -58,11 +58,11 @@
                 $"poskytli plat {{0}} instituce",
                 $"poskytlo plat {{0}} institucí")).
                     @Html.Raw(Devmasters.Lang.CS.Plural.GetWithZero(badOrgs.Count,
-                             "",
-                             " Jedna instituce plat neposkytla.",
-                             $" Plat odmítly poskytnout {{0}} instituce.",
-                             $" Plat odmítlo poskytnout {{0}} institucí.")
-                             )
+                                      "",
+                                      " Jedna instituce plat neposkytla.",
+                                      $" Plat odmítly poskytnout {{0}} instituce.",
+                                      $" Plat odmítlo poskytnout {{0}} institucí.")
+                                      )
                 </p>
             </div>
 
@@ -75,33 +75,13 @@
                             }
                             @foreach (var org in sorted)
                             {
+                                var metadata = org.Metadata.AktualniRok().FirstOrDefault();
                                 <tr>
                                     <td class="col" style="overflow: hidden;white-space: nowrap;text-overflow: ellipsis;max-width: 20rem;">
                                         <a asp-action="Detail" asp-route-id="@org.DS">@org.Nazev</a>
                                     </td>
                                     <td class="col-3">
-                                        @if(org.Platy.AktualniRok().Count==0 && neaktivniOrg.Any(m=>m.Item1 == org.DS))
-                                        {
-                                            <span class='text-warning'><i class='fa-solid fa-circle-exclamation'></i> Organizace je v likvidaci či zaniklá.</span>
-                                        }
-                                        else
-                                        {
-                                            <span>
-                                                @if (notAskedOrgs.Contains(org))
-                                                {
-                                                    <span class='text-info'><i class='fa-solid fa-circle-exclamation'></i>Této organizace jsme se na platy neptali.</span>
-                                                }
-                                                else
-                                                {
-                                                    @Html.Raw(Devmasters.Lang.CS.Plural.GetWithZero(org.Platy.AktualniRok().Count,
-                                                        "<span class='text-danger'><i class='fa-solid fa-circle-xmark'></i> Odmítli poskytnout platy.</span>",
-                                                        "<span class='text-warning'><i class='fa-solid fa-circle-exclamation'></i></span> Evidujeme jeden plat jedné pozice.",
-                                                        $"<span class='text-success'><i class='fa-solid fa-badge-check'></span></i> {{0}} platy.",
-                                                        $"<span class='text-success'><i class='fa-solid fa-badge-check'></span></i> {{0}} platů.")
-                                                    )
-                                                }
-                                            </span>
-                                        }
+                                        @Html.Raw(org.PlatyForYearUredniciDescriptionHtml())
                                     </td>
                                     @if (org.Platy.AktualniRok().Any())
                                     {

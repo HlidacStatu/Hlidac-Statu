@@ -1,7 +1,6 @@
 ﻿@using HlidacStatu.Entities
 @using HlidacStatu.Repositories
 @using HlidacStatu.Repositories.SharedModels
-@using PlatyUredniku.Models
 @inject ZiggyCreatures.Caching.Fusion.IFusionCache cache;
 @{
     var stats = await PuRepo.GetGlobalStatAsync();
@@ -42,7 +41,7 @@
     <div class="container">
         <h5>
             Za @PuRepo.DefaultYear jsme žádali o platy @(HlidacStatu.Util.RenderData.NiceNumber(stats.PocetOslovenych)) organizací
-            a plat nám poskytlo @(HlidacStatu.Util.RenderData.NiceNumber(stats.PocetCoPoslaliPlat)) z nich.
+            a plat nám @(DateTime.Now<new DateTime(2025,04,1)? "zatím":"") poskytlo @(HlidacStatu.Util.RenderData.NiceNumber(stats.PocetCoPoslaliPlat)) z nich.
 
         </h5>
         <p>
