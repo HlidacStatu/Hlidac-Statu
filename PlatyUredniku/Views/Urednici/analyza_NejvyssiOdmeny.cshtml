@@ -103,6 +103,12 @@
                                 {
                                     <a href="#" class="link-danger me-2" data-bs-toggle="tooltip" data-bs-title="Plat je pouze za @Devmasters.Lang.CS.Plural.Get((long)plat.PocetMesicu.Value, "jeden měsíc", "{0} měsíce", "{0} měsíců") a může obsahovat odstupné či jinou smluvní odměnu"><i class="fa-solid fa-circle-info"></i></a>
                                 }
+                                @if (plat.Uvazek != 1)
+                                {
+                                    <a href="#" class="link-warning me-2" data-bs-toggle="tooltip"
+                                       data-bs-title="Úvazek je @((plat.Uvazek ?? 0 * 100).ToString("N0")) standardního pracovního úvazku. (Běžně 40 hodin týdně.)"><i
+                                            class="fa-solid fa-circle-info"></i></a>
+                                }
 
                                 @plat.OsobniOhodnoceniPerc?.ToString("P")
                                 </td>
