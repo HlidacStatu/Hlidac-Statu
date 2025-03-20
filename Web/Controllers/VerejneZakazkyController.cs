@@ -63,7 +63,7 @@ namespace HlidacStatu.Web.Controllers
             if (zakazka is null)
                 return NotFound();
 
-            var document = zakazka.Dokumenty.FirstOrDefault(d => d.GetHlidacStorageId() == storageId);
+            Entities.VZ.VerejnaZakazka.Document? document = zakazka.Dokumenty.FirstOrDefault(d => d.GetHlidacStorageId() == storageId);
 
             if (document is null)
                 return NotFound();
