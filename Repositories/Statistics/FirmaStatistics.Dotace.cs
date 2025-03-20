@@ -49,17 +49,17 @@ namespace HlidacStatu.Repositories.Statistics
         {
             if (forceUpdateCache)
             {
-                _dotaceCache.DeleteAsync(firma).ConfigureAwait(false).GetAwaiter().GetResult();
+                _dotaceCache.Delete(firma);
             }
             StatisticsSubjectPerYear<Firma.Statistics.Dotace> ret = new StatisticsSubjectPerYear<Firma.Statistics.Dotace>();
-            ret = _dotaceCache.GetAsync(firma).ConfigureAwait(false).GetAwaiter().GetResult();
+            ret = _dotaceCache.Get(firma);
             return ret;
         }
 
 
         public static void RemoveStatisticsDotace(Firma firma)
         {
-            _dotaceCache.DeleteAsync(firma).ConfigureAwait(false).GetAwaiter().GetResult();
+            _dotaceCache.Delete(firma);
             _holdingDotaceCache.Delete((firma, DS.Graphs.Relation.AktualnostType.Aktualni));
             _holdingDotaceCache.Delete((firma, DS.Graphs.Relation.AktualnostType.Nedavny));
             _holdingDotaceCache.Delete((firma, DS.Graphs.Relation.AktualnostType.Libovolny));
@@ -70,13 +70,12 @@ namespace HlidacStatu.Repositories.Statistics
         Firma firma,
         bool forceUpdateCache = false)
         {
-            await Task.Delay(100);
             if (forceUpdateCache)
             {
-                await _dotaceCache.DeleteAsync(firma);
+                _dotaceCache.Delete(firma);
             }
             StatisticsSubjectPerYear<Firma.Statistics.Dotace> ret = new StatisticsSubjectPerYear<Firma.Statistics.Dotace>();
-            ret = await _dotaceCache.GetAsync(firma);
+            ret = _dotaceCache.Get(firma);
             return ret;
         }
 
@@ -123,7 +122,6 @@ namespace HlidacStatu.Repositories.Statistics
 
         private static async Task<StatisticsSubjectPerYear<Firma.Statistics.Dotace>> CalculateDotaceStatAsync(Firma f)
         {
-            await Task.Delay(100);
             var dotaceFirmy = await DotaceRepo.GetDotaceForIcoAsync(f.ICO).ToListAsync();
 
             // doplnit počty dotací
