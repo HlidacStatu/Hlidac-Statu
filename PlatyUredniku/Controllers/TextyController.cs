@@ -24,5 +24,10 @@ public class TextyController : Controller
     {
         return View();
     }
+    
+    public async Task<IActionResult> VypoctyPlatyUredniku()
+    {
+        return View();
+    }
 
 }
