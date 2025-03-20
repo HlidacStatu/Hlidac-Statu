@@ -4,14 +4,14 @@
     string title = ViewBag.Title;
     if (string.IsNullOrEmpty(title))
     {
-        title = "Manažerské platy ve státní správě a státních firmách. Veřejná kontrola odměňování.";
+        title = "Platy politiků, úředníků a manažerů ve státní správě a státních firmách. Veřejná kontrola odměňování.";
     }
     else
     {
-        title = title + " - " + "Platy úředníků.";
+        title = title + " - " + "Platy politiků a úředníků.";
     }
 
-    string description = "Platy úředníků - veřejná kontrola odměňování nejvyšších státních úředníků a top managementu státních firem. Projekt Hlídače státu.";
+    string description = "Platy politiků a úředníků - veřejná kontrola odměňování politiků, nejvyšších státních úředníků a top managementu státních firem. Projekt Hlídače státu.";
     if (!string.IsNullOrEmpty(ViewBag.Description))
     {
         description = ViewBag.Description + " Platy úředníků.";

@@ -27,11 +27,13 @@ public class HomeController : Controller
         );
 
         ViewData["platy"] = await platyTask;
-
-        return View();
+        if (this.User.IsInRole("Admin"))
+            return View("IndexNew");
+        else
+            return View();
     }
-    
-    
+
+
     public IActionResult OpenData()
     {
         ViewBag.Title = $"Open data";

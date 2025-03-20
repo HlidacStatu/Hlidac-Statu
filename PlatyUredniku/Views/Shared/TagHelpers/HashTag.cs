@@ -10,6 +10,7 @@ public class HashTag : TagHelper
     public string Style { get; set; }
     public int? Count { get; set; } = null;
 
+    public HlidacStatu.Entities.PuOrganizaceMetadata.TypMetadat typ { get; set; }
     public PlatyUredniku.Bootstrap.Colors Color { get; set; } = Bootstrap.Colors.Light;
 
     public override void Process(TagHelperContext context, TagHelperOutput output)
@@ -20,7 +21,11 @@ public class HashTag : TagHelper
         if (Count.HasValue)
             this.AdditionalClass += " position-relative me-3 mb-2";
 
-        output.Attributes.SetAttribute("href", $"Oblast/{Tag}");
+        if (this.typ == HlidacStatu.Entities.PuOrganizaceMetadata.TypMetadat.PlatyUredniku)
+            output.Attributes.SetAttribute("href", $"/urednici/Oblast/{Tag}");
+        else
+            output.Attributes.SetAttribute("href", $"/politici/Oblast/{Tag}");
+
         output.Attributes.SetAttribute("class", $"hashtag text-bg-{this.Color.ToString().ToLower()} {AdditionalClass}");
         if (!string.IsNullOrEmpty( Style ) )
         {

@@ -103,14 +103,26 @@ inner join Firma_DS fds
 
         return res;
     }
+    public static async Task<PuRokOrganizaceStat> GetGlobalStatAsync(PuOrganizaceMetadata.TypMetadat typ, int rok = DefaultYear)
+    {
+        return await _getGlobalStatAsync(typ, rok);
+    }
+    public static async Task<PuRokOrganizaceStat> GetGlobalStatPoliticiAsync(int rok = DefaultYear)
+    {
+        return await _getGlobalStatAsync(PuOrganizaceMetadata.TypMetadat.PlatyPolitiku, rok);
+    }
 
-    public static async Task<PuRokOrganizaceStat> GetGlobalStatAsync(int rok = DefaultYear)
+    public static async Task<PuRokOrganizaceStat> GetGlobalStatUredniciAsync(int rok = DefaultYear)
+    {
+        return await _getGlobalStatAsync(PuOrganizaceMetadata.TypMetadat.PlatyUredniku, rok);
+    }
+    private static async Task<PuRokOrganizaceStat> _getGlobalStatAsync(PuOrganizaceMetadata.TypMetadat typ, int rok = DefaultYear)
     {
         await using var db = new DbEntities();
 
         PuRokOrganizaceStat stat = new PuRokOrganizaceStat();
         stat.PocetOslovenych = await db.PuOrganizaceMetadata
-            .Where(m => m.Typ == PuOrganizaceMetadata.TypMetadat.PlatyUredniku)
+            .Where(m => m.Typ == typ)
             .CountAsync(m => m.DatumOdeslaniZadosti.HasValue && m.Rok == rok);
 
         stat.PocetCoPoslaliPlat = await db.PuPlaty

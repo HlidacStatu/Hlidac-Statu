@@ -1,8 +1,10 @@
 ﻿@using HlidacStatu.Repositories
 @using HlidacStatu.Repositories.SharedModels
 @{
+    ViewBag.Title = "";
 
     var stats = await PuRepo.GetGlobalStatUredniciAsync();
+    var statsPolitici = await PuRepo.GetGlobalStatPoliticiAsync();
 
     var organizationOfTheDay = await PuRepo.GetOrganizationOfTheDayAsync();
     var ceoOfTheDay = organizationOfTheDay.Platy.FirstOrDefault(p => p.JeHlavoun == true && p.Rok == PuRepo.DefaultYear);
@@ -11,65 +13,53 @@
 
 <section class="d-flex align-items-center justify-content-center">
     <div class="container">
-        <h2>
-            Platy úředníků v @PuRepo.DefaultYear
-        </h2>
         <p class="">
             V mnoha demokratických zemích je běžné, že veřejnost může kontrolovat odměňování těch, kteří hospodaří s penězi daňových poplatníků.
             <b>Informace o platech a odměnách</b> vedoucích úřadů, státních podniků či příspěvkových organizací v ČR ale veřejně <b>dostupné či dohledatelné nejsou</b>.
-            Proto jsme tu my! Využíváme zákona o svobodném přístupu k informacím a na platy a odměny se ptáme už mnoho let.
-        </p>
-        <p>
-            Platy a odměny jsou stanoveny
+            Proto jsme tu my! Využíváme zákona o svobodném přístupu k informacím a na platy a odměny se ptáme už mnoho let.             Platy a odměny jsou stanoveny
             <a asp-controller="Texty" asp-action="PlatyStatnichZamestnancu">nařízením vlády</a>
             nebo
             <a asp-controller="Texty" asp-action="Nejvyssi">zákonem</a>.
+        </p>
+        <hr class="mb-4" />
+        <div class="row">
+            <div class="col-sm-12 col-md-6 border-end">
+                <h3>Platy úředníků a manažerů</h3>
+                <p>
+                    Za @PuRepo.DefaultYear jsme žádali o platy @(HlidacStatu.Util.RenderData.NiceNumber(stats.PocetOslovenych)) organizací
+                    a plat nám @(DateTime.Now < new DateTime(2025, 04, 1) ? "zatím" : "") poskytlo @(HlidacStatu.Util.RenderData.NiceNumber(stats.PocetCoPoslaliPlat)) z nich.
 
-        </p>
-        <p class="lead">
-        </p>
-        @if (User.IsInRole("Admin"))
-        {
-            <p class="">
-                Nově jsme přidali také <strong><a asp-controller="Politici" asp-action="Index">Platy politiků</a></strong>.
-                Nebo se můžete podívat na staré dobré <strong><a asp-controller="Urednici" asp-action="Index">Platy úředníků</a></strong>.
-            </p>
-            
-        }
+                </p>
+                <p>
+                    <a asp-controller="Urednici" asp-action="Index" class="btn btn-primary btn-sm">Vše o platech úředníků a manažerů <span class="badge text-bg-danger">@(@PuRepo.DefaultYear)</span></a>
+                </p>
+                <p class="mb-2 mt-4 text-body-secondary">
+                    Oblasti:
+                        @foreach (var item in PuRepo.MainTags)
+                        {
+                        <hashtag tag="@item" typ="PlatyUredniku" additional-class="badge rounded-pill border me-3 mb-2" style="font-size:0.9em"></hashtag>
+                        }
+                </p>
+
+            </div>
+            <div class="col-sm-12 col-md-6">
+                <h3>Příjmy a kumulace politiků</h3>
+                <p>
+                    Za @PuRepo.DefaultYear jsme žádali o příjmy politiků v @(HlidacStatu.Util.RenderData.NiceNumber(statsPolitici.PocetOslovenych)) úřadech
+                    a plat nám @(DateTime.Now < new DateTime(2025, 04, 1) ? "zatím" : "") poskytlo @(HlidacStatu.Util.RenderData.NiceNumber(statsPolitici.PocetCoPoslaliPlat)) z nich.
+
+                </p>
+                <p>
+                    <a asp-controller="Politici" asp-action="Index" class="btn btn-primary btn-sm">Přjmy a placené funkce všech politiků <span class="badge text-bg-danger">@(@PuRepo.DefaultYear)</span></a>
+                </p>
+
+            </div>
+        </div>
     </div>
 </section>
 
 <section class="d-flex align-items-center justify-content-center alter-bg-color">
     <div class="container">
-        <h5>
-            Za @PuRepo.DefaultYear jsme žádali o platy @(HlidacStatu.Util.RenderData.NiceNumber(stats.PocetOslovenych)) organizací
-            a plat nám @(DateTime.Now<new DateTime(2025,04,1)? "zatím":"") poskytlo @(HlidacStatu.Util.RenderData.NiceNumber(stats.PocetCoPoslaliPlat)) z nich.
-
-        </h5>
-        <p>
-            <a asp-controller="Urednici" asp-action="Oblasti" class="btn btn-primary btn-sm">Seznam všech organizací <span class="badge text-bg-danger">@(HlidacStatu.Util.RenderData.NiceNumber(stats.PocetOslovenych))</span></a>
-        </p>
-        <p class="mb-2 mt-4 text-body-secondary">
-        <p>Platy organizací v jednotlivých oblastech</p>
-        <div class="row">
-                @{
-                    int count = 0;
-                }
-                @foreach (var group in PuRepo.MainTags.Chunk(PuRepo.MainTags.Length / 4 + 1))
-                {
-                    count = count + 1;
-                <div class="col-md-3 col-sm-6 col-6">
-
-                        @foreach (var item in group)
-                        {
-                        <hashtag tag="@item" additional-class="badge rounded-pill border me-3 mb-2 order-{@count}" style="font-size:0.9em"></hashtag>
-                        <br />
-                        }
-
-                </div>
-                }
-        </div>
-
     </div>
 </section>
 
@@ -98,7 +88,7 @@
                     </p>
 
                 }
-                <p>  
+                <p>
                     @Html.Raw(Devmasters.Lang.CS.Plural.GetWithZero(dataForOrganizationOfTheDay.Platy.AktualniRok().Count,
                              "<span class='text-danger'><i class='fa-solid fa-circle-xmark'></i> Odmítli nám poskytnout jakékoliv platy</span>",
                              "<span class='text-warning'><i class='fa-solid fa-circle-exclamation'></i></span> Evidujeme od organizace jeden plat jedné pozice",
@@ -135,7 +125,7 @@
 
         <partial name="_Analyzy_List" />
 
-        
+
     </div>
 </section>
 
