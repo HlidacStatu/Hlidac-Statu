@@ -20,6 +20,8 @@ namespace HlidacStatu.Repositories
 {
     public static partial class OsobaRepo
     {
+
+
         public static class Searching
         {
             public static readonly Regex DateRegex = new(@"(\d{1,2}[-./\\]\d{1,2}[-./\\]\d{2,4})|(\d{2,4}[-./\\]\d{1,2}[-./\\]\d{1,2})");
@@ -52,12 +54,31 @@ namespace HlidacStatu.Repositories
             };
 
 
+            /// <summary>
+            /// <summary>
+            /// Performs a simple search for an Osoba based on the provided query, page number, page size, and sorting order.
+            /// </summary>
+            /// <param name="query">The search query string.</param>
+            /// <param name="page">The page number for pagination.</param>
+            /// <param name="pageSize">The number of results per page.</param>
+            /// <param name="order">The order in which to sort the results.</param>
+            /// <param name="exactNumOfResults">Indicates whether to return an exact number of results.</param>
+            /// <returns>A task that represents the asynchronous operation, containing the search result.</returns>
             public static QueryContainer GetSimpleQuery(string query)
             {
                 var qc = SimpleQueryCreator.GetSimpleQuery<Smlouva>(query, irules);
                 return qc;
             }
 
+            /// <summary>
+            /// Performs a simple search for an Osoba based on the provided query, page number, page size, and sorting order.
+            /// </summary>
+            /// <param name="query">The search query string.</param>
+            /// <param name="page">The page number for pagination.</param>
+            /// <param name="pageSize">The number of results per page.</param>
+            /// <param name="order">The order in which to sort the results.</param>
+            /// <param name="exactNumOfResults">Indicates whether to return an exact number of results.</param>
+            /// <returns>A task that represents the asynchronous operation, containing the search result.</returns>
             public static Task<OsobaSearchResult> SimpleSearchAsync(string query, int page, int pageSize, string order,
                 bool exactNumOfResults = false)
             {
@@ -450,6 +471,8 @@ namespace HlidacStatu.Repositories
                 (int) OsobaEvent.Types.VolenaFunkce
             };
 
+
+            
             public static async Task<IEnumerable<Osoba>> GetAllPoliticiFromTextAsync(string text)
             {
                 var parsedName = await Repositories.Searching.Politici.FindCitationsAsync(text); //Validators.JmenoInText(text);
