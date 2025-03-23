@@ -21,7 +21,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <PackageReference Include="Devmasters.Cache.AWS_S3" Version="8.0.1" />
+      <PackageReference Include="Devmasters.Cache.AWS_S3" Version="8.0.2" />
       <PackageReference Include="Devmasters.Cache.Memcached" Version="8.0.0" />
       <PackageReference Include="Devmasters.Cache.Redis" Version="8.0.4" />
       <PackageReference Include="MathNet.Numerics" Version="5.0.0" />
