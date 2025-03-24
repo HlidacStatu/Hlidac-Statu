@@ -60,7 +60,7 @@
 
                         @foreach (var item in group)
                         {
-                        <hashtag tag="@item" additional-class="badge rounded-pill border me-3 mb-2 order-{@count}" style="font-size:0.9em"></hashtag>
+                        <hashtag tag="@item" typ="PlatyUredniku" additional-class="badge rounded-pill border me-3 mb-2 order-{@count}" style="font-size:0.9em"></hashtag>
                         <br />
                         }
 
@@ -83,7 +83,7 @@
                     Najdete ji v kategoriích:
                     @foreach (var tag in organizationOfTheDay.Tags)
                     {
-                        <hashtag tag="@tag.Tag"></hashtag>
+                        <hashtag tag="@tag.Tag" typ="PlatyUredniku"></hashtag>
                     }
                 </div>
                 <br />

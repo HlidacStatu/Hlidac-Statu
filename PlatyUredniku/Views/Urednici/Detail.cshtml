@@ -31,7 +31,7 @@
             <a asp-action="Oblasti">Oblasti</a>
         </li>
         <li>
-            <hashtag tag="@ViewData["mainTag"]" style="font-size:13px; padding:0.2em"></hashtag>
+            <hashtag tag="@ViewData["mainTag"]" typ="PlatyUredniku" style="font-size:13px; padding:0.2em"></hashtag>
         </li>
         <li class="active">@Model.Nazev</li>
     </ol>
@@ -55,7 +55,7 @@
         <div>
             @foreach (var tag in Model.Tags)
             {
-                <hashtag tag="@tag.Tag"></hashtag>
+                <hashtag tag="@tag.Tag" typ="PlatyUredniku"></hashtag>
             }
         </div>
 

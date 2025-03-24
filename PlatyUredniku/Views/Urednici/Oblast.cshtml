@@ -38,7 +38,7 @@
             <a asp-action="Oblasti">Oblasti</a>
         </li>
         <li class="active">
-            <hashtag tag="@ViewData["oblast"]" style="font-size:13px; padding:0.2em" additional-class=""></hashtag>
+            <hashtag tag="@ViewData["oblast"]" typ="PlatyUredniku" style="font-size:13px; padding:0.2em" additional-class=""></hashtag>
         </li>
     </ol>
 }
@@ -49,7 +49,7 @@
         <div class="container">
             <div>
                 <h3 class="pb-5">
-                    Instituce z oblasti <hashtag tag="@ViewData["oblast"]"></hashtag>
+                    Instituce z oblasti <hashtag tag="@ViewData["oblast"]" typ="PlatyUredniku"></hashtag>
                 </h3>
                 <p>
                     V roce @PuRepo.DefaultYear @Html.Raw(Devmasters.Lang.CS.Plural.GetWithZero(goodOrgs.Count,
