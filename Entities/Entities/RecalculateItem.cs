@@ -42,6 +42,20 @@ namespace HlidacStatu.Entities
     [PrimaryKey("Pk")]
     public class RecalculateItem
     {
+        public class DotaceOptions
+        {
+            public enum ChangeEnum
+            {
+                None = 0,
+                Insert = 1, Update = 2, Delete = 3,
+            }
+            public int Version { get; set; } = 1;
+            public string PoskytovatelIco { get; set; }
+            public string PrijemceIco { get; set; }
+            public bool ForceRecalculate { get; set; } = false;
+            public ChangeEnum Change { get; set; }
+        }
+
         public RecalculateItem() { }
         public RecalculateItem(Firma f, StatisticsTypeEnum statsType, string provokeBy = null)
         {
@@ -56,6 +70,14 @@ namespace HlidacStatu.Entities
             this.ItemType = ItemTypeEnum.Person;
             this.StatisticsType = statsType;
             this.ProvokedBy = provokeBy;
+        }
+        public RecalculateItem(Osoba o, StatisticsTypeEnum statsType, DotaceOptions dotaceOptions, string provokeBy = null)
+        {
+            this.Id = o.NameId;
+            this.ItemType = ItemTypeEnum.Person;
+            this.StatisticsType = statsType;
+            this.ProvokedBy = provokeBy;
+            this.Options = Newtonsoft.Json.JsonConvert.SerializeObject(dotaceOptions, Newtonsoft.Json.Formatting.None);
         }
         public enum ItemTypeEnum : int
         {
@@ -74,6 +96,8 @@ namespace HlidacStatu.Entities
 
         [StringLength(256)]
         public string Id { get; set; }
+
+        public string Options { get; set; }
 
         [Column(TypeName = "int")]
         public ItemTypeEnum ItemType { get; set; }
