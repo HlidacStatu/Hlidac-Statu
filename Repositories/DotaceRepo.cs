@@ -40,7 +40,7 @@ namespace HlidacStatu.Repositories
             {
                 Logger.Error(e, $"Error while updating Hints for dotace {dotace.Id}");
             }
-            
+
             if (!forceRewriteHints)
             {
                 try
@@ -204,7 +204,7 @@ namespace HlidacStatu.Repositories
             return GetAllAsync(qc);
         }
 
-        public static async Task MergeSubsidiesToDotaceAsync(DateTime fromDate)
+        public static async Task MergeAllSubsidiesToDotaceAsync(DateTime fromDate, bool rewriteAll = true)
         {
             int maxDegreeOfParallelism = 20; // Adjust this value as needed
             var semaphore = new SemaphoreSlim(maxDegreeOfParallelism);
@@ -224,7 +224,6 @@ namespace HlidacStatu.Repositories
                     )
                 );
 
-
             var originalSubsidyIds = SubsidyRepo.SubsidyClient.SimpleGetAllIds(5, originalsQuery);
             int totalCount = originalSubsidyIds.Count;
 
@@ -239,7 +238,7 @@ namespace HlidacStatu.Repositories
                     Dotace dotaceRecord = new Dotace();
 
                     var originalSubsidy = await SubsidyRepo.GetAsync(originalSubsidyId);
-                    
+
                     FixRecipientFromRawData(originalSubsidy);
                     dotaceRecord.UpdateFromSubsidy(originalSubsidy);
 
@@ -256,7 +255,33 @@ namespace HlidacStatu.Repositories
 
                     try
                     {
-                        await SaveAsync(dotaceRecord);
+                        bool isNew = false;
+                        bool isChanged = false;
+
+                        if (rewriteAll == false)
+                        {
+                            //check if dotace exists
+                            var dotaceOrig = await DotaceRepo.GetAsync(dotaceRecord.Id);
+                            if (dotaceOrig == null)
+                            {
+                                isNew = true;
+                            }
+                            else
+                            {
+                                isChanged = IsDotaceChanged(dotaceOrig, dotaceRecord);
+                            }
+                        }
+
+                        if (rewriteAll || isNew || isChanged)
+                        {
+                            await SaveAsync(dotaceRecord);
+
+                            //add to statistics
+                            RecalculateItem.DotaceOptions.ChangeEnum ce = isChanged
+                                ? RecalculateItem.DotaceOptions.ChangeEnum.Update
+                                : RecalculateItem.DotaceOptions.ChangeEnum.Insert;
+                            AddToProcessingQueue(dotaceRecord, ce);
+                        }
                     }
                     catch (Exception e)
                     {
@@ -275,6 +300,49 @@ namespace HlidacStatu.Repositories
 
             await Task.WhenAll(tasks);
         }
+
+        private static bool IsDotaceChanged(Dotace dotaceOriginal, Dotace dotaceNew)
+        {
+            if (dotaceOriginal.Id != dotaceNew.Id)
+                return true;
+
+
+            if (dotaceOriginal.ApprovedYear != dotaceNew.ApprovedYear
+                || dotaceOriginal.SubsidyAmount != dotaceNew.SubsidyAmount
+                || dotaceOriginal.PayedAmount != dotaceNew.PayedAmount
+                || dotaceOriginal.ReturnedAmount != dotaceNew.ReturnedAmount
+                || dotaceOriginal.Category != dotaceNew.Category
+                || dotaceOriginal.ProjectCode != dotaceNew.ProjectCode
+                || dotaceOriginal.ProjectName != dotaceNew.ProjectName
+                || dotaceOriginal.ProjectDescription != dotaceNew.ProjectDescription
+                || dotaceOriginal.ProgramCode != dotaceNew.ProgramCode
+                || dotaceOriginal.ProgramName != dotaceNew.ProgramName
+                || dotaceOriginal.SubsidyProvider != dotaceNew.SubsidyProvider
+                || dotaceOriginal.SubsidyProviderIco != dotaceNew.SubsidyProviderIco
+                || dotaceOriginal.Recipient.Ico != dotaceNew.Recipient.Ico
+                || dotaceOriginal.Recipient.Name != dotaceNew.Recipient.Name
+                || dotaceOriginal.Recipient.HlidacName != dotaceNew.Recipient.HlidacName
+                || dotaceOriginal.Recipient.YearOfBirth != dotaceNew.Recipient.YearOfBirth
+                || dotaceOriginal.Recipient.Obec != dotaceNew.Recipient.Obec
+                || dotaceOriginal.Recipient.Okres != dotaceNew.Recipient.Okres
+                || dotaceOriginal.Recipient.PSC != dotaceNew.Recipient.PSC
+                || dotaceOriginal.Recipient.HlidacNameId != dotaceNew.Recipient.HlidacNameId
+                || dotaceOriginal.Hints.IsOriginal != dotaceNew.Hints.IsOriginal
+                || dotaceOriginal.Hints.OriginalSubsidyId != dotaceNew.Hints.OriginalSubsidyId
+                || dotaceOriginal.PrimaryDataSource != dotaceNew.PrimaryDataSource
+               )
+            {
+                return true;
+            }
+
+            if (!dotaceOriginal.SourceIds.SetEquals(dotaceNew.SourceIds))
+            {
+                return true;
+            }
+
+            return false;
+        }
+
 
         public static async Task RemoveMissingSubsidiesFromDotaceAsync()
         {
@@ -298,7 +366,7 @@ namespace HlidacStatu.Repositories
 
             await Parallel.ForEachAsync(dotaceIdsToRemove,
                 new ParallelOptions { MaxDegreeOfParallelism = maxDegreeOfParallelism },
-                async (originalSubsidyId, cancellationToken) =>
+                async (dotaceToRemoveId, cancellationToken) =>
                 {
                     try
                     {
@@ -307,19 +375,44 @@ namespace HlidacStatu.Repositories
 
                         try
                         {
-                            await DotaceClient.DeleteAsync<Dotace>(originalSubsidyId, ct: cancellationToken);
+                            var dotaceToRemove = await DotaceRepo.GetAsync(dotaceToRemoveId);
+
+                            AddToProcessingQueue(dotaceToRemove, RecalculateItem.DotaceOptions.ChangeEnum.Delete);
+                            await DotaceClient.DeleteAsync<Dotace>(dotaceToRemoveId, ct: cancellationToken);
                         }
                         catch (Exception e)
                         {
-                            Logger.Error(e, $"Failed to remove dotace for {originalSubsidyId}");
+                            Logger.Error(e, $"Failed to remove dotace for {dotaceToRemoveId}");
                         }
                     }
                     catch (Exception e)
                     {
-                        Logger.Error(e, $"Error removing ID {originalSubsidyId}");
+                        Logger.Error(e, $"Error removing ID {dotaceToRemoveId}");
                     }
                 }
             );
+        }
+
+        private static void AddToProcessingQueue(Dotace dotace, RecalculateItem.DotaceOptions.ChangeEnum changeType)
+        {
+            var dotaceOptions = new RecalculateItem.DotaceOptions()
+            {
+                ForceRecalculate = false,
+                Version = 1,
+                PoskytovatelIco = dotace.SubsidyProviderIco,
+                PrijemceIco = dotace.Recipient.Ico,
+                Change = changeType
+            };
+
+            var recalculateItem = new RecalculateItem(dotace, dotaceOptions, "AddToProcessingQueueAsync");
+            try
+            {
+                RecalculateItemRepo.AddToProcessingQueue(recalculateItem);
+            }
+            catch (Exception e)
+            {
+                Logger.Error(e, $"AddToProcessingQueue failed to add dotaceId={dotace.Id} item from RecipientIco[{dotace.Recipient.Ico}] to processing queue;");
+            }
         }
 
         private static void FixSomeHints(Dotace dotace)
