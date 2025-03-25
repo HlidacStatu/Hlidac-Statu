@@ -6,8 +6,8 @@ namespace HlidacStatu.DBUpgrades
     {
         private partial class UpgradeDB
         {
-            [DatabaseUpgradeMethod("1.0.0.127")]
-            public static void Init_1_0_0_127(IDatabaseUpgrader du)
+            [DatabaseUpgradeMethod("1.0.0.128")]
+            public static void Init_1_0_0_128(IDatabaseUpgrader du)
             {
                 //du.AddColumnToTable("UsePlugin", "int", "UptimeServer", false);
 
@@ -16,7 +16,7 @@ ALTER TABLE dbo.RecalculateItemQueue ADD
 	Options nvarchar(MAX) NULL
 
 ";
-                //du.RunDDLCommands(sql);
+                du.RunDDLCommands(sql);
             }
         }
     }
