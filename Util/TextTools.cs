@@ -1,10 +1,48 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace HlidacStatu.Util;
 
 public static class TextTools
 {
+
+    public static List<string> GetPermutations(string[] words)
+    {
+        return _getPermutations(words, 0, words.Length - 1)
+            .Select(m => string.Join(" ", m))
+            .ToList();
+    }
+    // Recursive function to generate permutations.
+    static List<string[]> _getPermutations(string[] words, int start, int end)
+    {
+        List<string[]> result = new List<string[]>();
+
+        if (start == end)
+        {
+            // Clone the array so changes in recursion don't affect it.
+            result.Add((string[])words.Clone());
+        }
+        else
+        {
+            for (int i = start; i <= end; i++)
+            {
+                _swap(ref words[start], ref words[i]);
+                result.AddRange(_getPermutations(words, start + 1, end));
+                _swap(ref words[start], ref words[i]); // backtrack
+            }
+        }
+        return result;
+    }
+
+    // Helper method to swap two elements in the array.
+    static void _swap(ref string a, ref string b)
+    {
+        string temp = a;
+        a = b;
+        b = temp;
+    }
 
     /// <summary>
     /// difference between two sequences. the Levenshtein distance between two words is the minimum number of single-character edits (i.e. insertions, deletions, or substitutions) required to change one word into the other.
@@ -53,17 +91,17 @@ public static class TextTools
     public static bool IsValidCharacter(char c)
     {
         return (c <= 0x2D67) &&  //odfiltrovat čínštinu,... 
-               (char.IsWhiteSpace(c) || 
-                char.IsSeparator(c) || 
-                char.IsPunctuation(c) || 
+               (char.IsWhiteSpace(c) ||
+                char.IsSeparator(c) ||
+                char.IsPunctuation(c) ||
                 char.IsSymbol(c) ||
                 char.IsLetterOrDigit(c));
     }
-    
+
     /// <summary>
     /// Detects if character is binary value => unusable for text 
     /// </summary>
-    public static bool IsBadChar(char currentChar, char? nextChar )
+    public static bool IsBadChar(char currentChar, char? nextChar)
     {
         if (currentChar >= '\uD800')
         {
@@ -78,7 +116,7 @@ public static class TextTools
 
         return false;
     }
-    
+
     /// <summary>
     /// Detects if string contains binary value 
     /// </summary>
@@ -101,7 +139,7 @@ public static class TextTools
         }
         return false;
     }
-    
+
     public static string CleanBadBytesFromText(this string text)
     {
         StringBuilder cleaned = new StringBuilder();

@@ -78,6 +78,9 @@ namespace HlidacStatu.Extensions
         public static IQueryable<OsobaEvent> NoFilteredEvents(this Osoba osoba,
             Expression<Func<OsobaEvent, bool>> predicate)
         {
+            if (osoba.InternalId == 0)
+                return new List<OsobaEvent>().AsQueryable();
+
             IQueryable<OsobaEvent> oe = Osoby.CachedEvents.Get(osoba.InternalId)
                 .AsQueryable();
             return oe.Where(predicate);
@@ -491,7 +494,7 @@ namespace HlidacStatu.Extensions
         {
             return source.OrderBy(o =>
                     {
-                        var index = OsobaRepo.Searching.PolitikImportanceOrder.IndexOf(o.Status);
+                        var index = OsobaRepo.Searching.PolitikStatusImportanceOrder.IndexOf(o.Status);
                         return index == -1 ? int.MaxValue : index;
                     }
                 )

@@ -157,7 +157,32 @@ namespace HlidacStatu.Entities
 
             return (titlesFound.ToArray(), text);
         }
+        public static string[] JmenaPrijmeniInText(string text)
+        {
+            string normalizedText = Regex.Replace(text, @"[^a-zA-Z\p{L}\p{M}.,]", " ");
+            normalizedText = TextUtil.ReplaceDuplicates(normalizedText, ' ').Trim();
+            //remove tituly
+            normalizedText = SeparateNameFromTitles(normalizedText).jmeno;
 
+            var words = normalizedText.Split(new char[] { ' ', ',' }, StringSplitOptions.RemoveEmptyEntries);
+            List<string> ret = new List<string>();
+            foreach (var w in words)
+            {
+                var normalizedW = TextUtil.RemoveDiacritics(w).ToLower();
+                
+                if (!string.IsNullOrEmpty(normalizedW))
+                {
+                    CompareResult w0 = CompareName(normalizedW);
+                    if (w0.HasAnyFlags(CompareResult.FoundInTopJmeno | CompareResult.FoundInTopPrijmeni))
+                        ret.Add(w);
+                    else if (w0.HasAnyFlags(CompareResult.FoundInPrijmeni | CompareResult.FoundInJmeno))
+                        ret.Add(w);
+
+                }
+            }
+            return ret.ToArray();
+
+        }
         public static Osoba JmenoInText(string text, bool preferAccurateResult = false)
         {
             if (string.IsNullOrEmpty(text))
@@ -179,9 +204,15 @@ namespace HlidacStatu.Entities
 
             var titulPred = string.Empty;
             var titulPo = string.Empty;
-            foreach (var w in normalizedText
+
+            var normalizedWords = normalizedText
                 .Split(new char[] { ' ', ',' }, StringSplitOptions.RemoveEmptyEntries)
-            )
+                .Where(w=> !string.IsNullOrEmpty(w))
+                .Where(w=> titulyPo.Contains(w.RemoveDiacritics().ToLower()) == false)
+                .Where(w => titulyPred.Contains(w.RemoveDiacritics().ToLower()) == false)
+                .ToArray()
+                ;
+            foreach (var w in normalizedWords)
             {
                 var newW = w;
                 string cw = TextUtil.RemoveDiacritics(w).ToLower();

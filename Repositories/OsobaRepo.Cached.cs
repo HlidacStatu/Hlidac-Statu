@@ -41,7 +41,7 @@ namespace HlidacStatu.Repositories
                             .ToArray()
                             .OrderBy(o =>
                             {
-                                var index = OsobaRepo.Searching.PolitikImportanceOrder.IndexOf(o.Status);
+                                var index = OsobaRepo.Searching.PolitikStatusImportanceOrder.IndexOf(o.Status);
                                 return index == -1 ? int.MaxValue : index;
                             })
                             .ToList();
@@ -67,7 +67,7 @@ namespace HlidacStatu.Repositories
                             .ToArray()
                             .OrderBy(o =>
                             {
-                                var index = OsobaRepo.Searching.PolitikImportanceOrder.IndexOf(o.Status);
+                                var index = OsobaRepo.Searching.PolitikStatusImportanceOrder.IndexOf(o.Status);
                                 return index == -1 ? int.MaxValue : index;
                             });
                         osoby.AddRange(osobyQ);

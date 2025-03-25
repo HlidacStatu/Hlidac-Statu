@@ -105,41 +105,7 @@ namespace HlidacStatu.Repositories.Searching
                 return ret.ToArray();
             });
 
-        static List<string> GetPermutations(string[] words)
-        {
-            return GetPermutations(words, 0, words.Length - 1)
-                .Select(m => string.Join(" ", m))
-                .ToList();
-        }
-        // Recursive function to generate permutations.
-            static List<string[]> GetPermutations(string[] words, int start, int end)
-        {
-            List<string[]> result = new List<string[]>();
 
-            if (start == end)
-            {
-                // Clone the array so changes in recursion don't affect it.
-                result.Add((string[])words.Clone());
-            }
-            else
-            {
-                for (int i = start; i <= end; i++)
-                {
-                    Swap(ref words[start], ref words[i]);
-                    result.AddRange(GetPermutations(words, start + 1, end));
-                    Swap(ref words[start], ref words[i]); // backtrack
-                }
-            }
-            return result;
-        }
-
-        // Helper method to swap two elements in the array.
-        static void Swap(ref string a, ref string b)
-        {
-            string temp = a;
-            a = b;
-            b = temp;
-        }
         static List<Tuple<string, string[]>> InitPoliticiStems()
         {
             HashSet<string> slova = new HashSet<string>();
@@ -164,7 +130,7 @@ namespace HlidacStatu.Repositories.Searching
             {
                 //var cols = new string[] { p.JmenoStem.ToLower(), p.PrijmeniStem.ToLower() };
                 string[] fullnamewords = (p.JmenoStem.ToLower() + " " + p.PrijmeniStem.ToLower()).Split(' ');
-                var names = GetPermutations(fullnamewords);
+                var names = HlidacStatu.Util.TextTools.GetPermutations(fullnamewords);
                 var key = p.NameId;
 
 
@@ -231,7 +197,7 @@ namespace HlidacStatu.Repositories.Searching
         }
 
         /// <summary>
-        /// returns Osoba.NameId[]
+        /// returns Osoba.NameId
         /// </summary>
         /// <param name="text"></param>
         /// <returns></returns>
@@ -249,7 +215,7 @@ namespace HlidacStatu.Repositories.Searching
             //Console.WriteLine($"stemmer {stopw.ExactElapsedMiliseconds} ");
             stopw.Restart();
             List<string> found = new List<string>();
-            var debug = PoliticiStems.Where(m => m.Item1 == "jana-mrackova-vildumetzova").ToArray();
+            //var debug = PoliticiStems.Where(m => m.Item1 == "jana-mrackova-vildumetzova").ToArray();
             foreach (var kv in PoliticiStems)
             {
                 string zkratka = kv.Item1;

@@ -15,6 +15,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using static HlidacStatu.Connectors.External.RZP;
+using static HlidacStatu.Entities.Osoba;
 
 namespace HlidacStatu.Repositories
 {
@@ -26,7 +28,7 @@ namespace HlidacStatu.Repositories
         {
             public static readonly Regex DateRegex = new(@"(\d{1,2}[-./\\]\d{1,2}[-./\\]\d{2,4})|(\d{2,4}[-./\\]\d{1,2}[-./\\]\d{1,2})");
             public static readonly Regex YearRegexLoose = new(@"(19|20)\d{2}");
-            
+
             public const int DefaultPageSize = 40;
             public const int MaxResultWindow = 200;
 
@@ -96,7 +98,7 @@ namespace HlidacStatu.Repositories
                 .Select(m => m.ToLower())
                 .ToArray();
 
-            public static async Task<OsobaSearchResult> SimpleSearchAsync(string query, int page, int pageSize, 
+            public static async Task<OsobaSearchResult> SimpleSearchAsync(string query, int page, int pageSize,
                 OrderResult order, bool exactNumOfResults = false, int? osobaStatus = null)
             {
                 //fix without elastic
@@ -174,6 +176,163 @@ namespace HlidacStatu.Repositories
                 return s;
             }
 
+        
+
+            public record OsobaConfidence
+            {
+                public Osoba Osoba { get; set; }
+                public decimal Confidence { get; set; }
+
+                public FoundParts Found { get; set; } = FoundParts.None;
+
+                [System.Flags]
+                public enum FoundParts
+                {
+                    None = 0,
+                    Status = 1 << 0,
+                    DatumNarozeni = 1 << 1,
+                    PolitickeFunkce = 1 << 2,
+                    IcoMatch = 1 << 3,
+                    NameWithAccents = 1 << 4,
+                    All = ~0
+                }
+            }
+
+
+            /// <summary>
+            /// Represents a date that may be loose or imprecise, allowing for both specific dates and year ranges.
+            /// </summary>
+            public class LooseDate
+            {
+                /// <summary>
+                /// Initializes a new instance of the <see cref="LooseDate"/> class.
+                /// Attempts to parse the provided date string into a specific date or year.
+                /// </summary>
+                /// <param name="date">The date string to parse.</param>
+                public LooseDate(string date)
+                {
+                    var dateString = FindDateInString(date);
+                    if (dateString is not null)
+                    {
+                        this.Date = Devmasters.DT.Util.ParseDateTime(dateString, null);
+                    }
+
+                    if (this.Date is null)
+                    {
+                        this.Year = GetYearFromString(date);
+                    }
+                }
+
+                /// <summary>
+                /// Gets or sets the specific date if parsed successfully.
+                /// </summary>
+                public DateTime? Date { get; set; }
+
+                /// <summary>
+                /// Gets or sets the year if a specific date could not be parsed.
+                /// </summary>
+                public int? Year { get; set; }
+
+                private Devmasters.DT.DateInterval _di = null;
+
+                /// <summary>
+                /// Gets the year interval for the parsed year, if available.
+                /// </summary>
+                public Devmasters.DT.DateInterval YearInterval
+                {
+                    get
+                    {
+                        if (_di == null)
+                        {
+                            if (this.Year.HasValue)
+                            {
+                                _di = new Devmasters.DT.DateInterval(new DateTime(this.Year.Value, 1, 1), new DateTime(this.Year.Value, 12, 31));
+                            }
+                        }
+                        return _di;
+                    }
+                }
+            }
+            private static OsobaConfidence OsobaConfidenceCalculation(Osoba o, DateTime? datumnarozeni,
+                bool foundWithAccent,
+                string[] isInIco = null)
+            {
+                isInIco = isInIco ?? Array.Empty<string>();
+                decimal c = 0;
+                var res = new OsobaConfidence() { Osoba = o, Confidence = 0 };
+                if (foundWithAccent)
+                {
+                    c += 1;
+                    res.Found |= OsobaConfidence.FoundParts.NameWithAccents;
+                }
+
+                //je to politik?
+                var index = _politikStatusImportanceOrder.IndexOf(o.Status);
+                if (index >= 0)
+                {
+                    c += 1 + ((_politikStatusImportanceOrder.Count - index) / 10m);
+                    res.Found |= OsobaConfidence.FoundParts.Status;
+                }
+                if (datumnarozeni.HasValue && o.Narozeni.HasValue
+                    && datumnarozeni == o.Narozeni)
+                {
+                    c = c + 10;
+                    res.Found |= OsobaConfidence.FoundParts.DatumNarozeni;
+
+                }
+                //politicke funkce
+                if (o.Events().Any(e => _politikImportanceEventTypes.Contains(e.Type)))
+                {
+                    c = c + (o.Events().Count(e => _politikImportanceEventTypes.Contains(e.Type)) / 10m);
+                    res.Found |= OsobaConfidence.FoundParts.PolitickeFunkce;
+                }
+
+                if (isInIco != null && isInIco.Length > 0)
+                {
+                    var countIcos = o.Events()
+                        .Where(m => !string.IsNullOrEmpty(m.Ico))
+                        .Count(m => isInIco.Contains(m.Ico));
+                    if (countIcos > 0)
+                    {
+                        c = c + 1 + (countIcos / 10);
+                        res.Found |= OsobaConfidence.FoundParts.IcoMatch;
+                    }
+                }
+
+                res.Confidence = c;
+                return res;
+            }
+            public static OsobaConfidence[] FindOsobyWithConfidence(string jmeno_prijmeni, string datumNarozeni,
+                string[] isInIco = null
+                )
+            {
+                isInIco = isInIco ?? Array.Empty<string>();
+
+                DateTime? fullDate = Devmasters.DT.Util.ToDate(FindDateInString(datumNarozeni));
+
+                var nameParts = HlidacStatu.Entities.Validators.JmenaPrijmeniInText(jmeno_prijmeni);
+                List<string> nameCombinations = HlidacStatu.Util.TextTools.GetPermutations(nameParts);
+                List<OsobaConfidence> foundOsoby = new();
+                foreach (var c in nameCombinations)
+                {
+                    var found = GetAllByName(c, datumNarozeni);
+                    foundOsoby.AddRange(found.Select(m => OsobaConfidenceCalculation(m, fullDate, true, isInIco)));
+                }
+                if (foundOsoby.Count == 0)
+                {
+                    foreach (var c in nameCombinations)
+                    {
+                        var found = GetAllByNameAscii(c, datumNarozeni);
+                        foundOsoby.AddRange(found.Select(m => OsobaConfidenceCalculation(m, fullDate,false, isInIco)));
+                    }
+
+                }
+
+                return foundOsoby
+                    .OrderByDescending(o => o.Confidence)
+                    .ToArray();
+            }
+
             public static Osoba GetByName(string jmeno, string prijmeni, DateTime narozeni)
             {
                 var osoba = GetAllByName(jmeno, prijmeni, narozeni).FirstOrDefault();
@@ -184,66 +343,59 @@ namespace HlidacStatu.Repositories
                 return osoba.GetOriginal();
             }
 
-            public static IEnumerable<Osoba> GetAllByName(string jmeno, string prijmeni, DateTime? narozeni)
+
+
+            /// Retrieves all Osoba entities matching the specified name and surname, with an optional date of birth.
+            /// </summary>
+            /// <param name="jmeno">The first name of the Osoba.</param>
+            /// <param name="prijmeni">The surname of the Osoba.</param>
+            /// <param name="narozeni">The date of birth of the Osoba, if available.</param>
+            /// <returns>An enumerable collection of Osoba entities that match the specified criteria.</returns>
+            public static Osoba[] GetAllByName(string jmeno, string prijmeni, DateTime? narozeni)
             {
                 using (DbEntities db = new DbEntities())
                 {
                     if (narozeni.HasValue)
+                    {
                         return db.Osoba.AsNoTracking()
-                            .Where(m =>
-                                m.Jmeno == jmeno
-                                && m.Prijmeni == prijmeni
-                                && m.Narozeni == narozeni
-                            ).ToArray();
+                              .Where(m =>
+                                  m.Jmeno == jmeno
+                                  && m.Prijmeni == prijmeni
+                                  && m.Narozeni == narozeni
+                              ).ToArray();
+                    }
                     else
+                    {
                         return db.Osoba.AsNoTracking()
-                            .Where(m =>
-                                m.Jmeno == jmeno
-                                && m.Prijmeni == prijmeni
-                            ).ToArray();
+                          .Where(m =>
+                              m.Jmeno == jmeno
+                              && m.Prijmeni == prijmeni
+                          ).ToArray();
+                    }
                 }
             }
-            
+
+
+
             public static IEnumerable<Osoba> GetAllByName(string jmeno, string prijmeni, string datumNarozeni)
             {
-                DateTime? fullDate = null;
-                DateTime? startDate = null;
-                DateTime? endDate = null;
-                if (!string.IsNullOrWhiteSpace(datumNarozeni))
-                {
-                    var dateString = FindDateInString(datumNarozeni);
-                    if (dateString is not null)
-                    {
-                        fullDate = Devmasters.DT.Util.ParseDateTime(dateString, null);
-                    }
-            
-                    if (fullDate is null)
-                    {
-                        var birthYear = GetYearFromString(datumNarozeni);
-                        if (birthYear is not null)
-                        {
-                            startDate = new DateTime(birthYear.Value, 1, 1);
-                            endDate = new DateTime(birthYear.Value, 12, 31);
-                            
-                        }
-                    }
-                }
-                
+                LooseDate ld = new LooseDate(datumNarozeni);
+
                 using (DbEntities db = new DbEntities())
                 {
-                    if (fullDate.HasValue)
+                    if (ld.Date.HasValue)
                         return db.Osoba.AsNoTracking()
                             .Where(m =>
                                 m.Jmeno == jmeno
                                 && m.Prijmeni == prijmeni
-                                && m.Narozeni == fullDate
+                                && m.Narozeni == ld.Date
                             ).ToArray();
-                    else if(startDate.HasValue)
+                    else if (ld.Year.HasValue)
                         return db.Osoba.AsNoTracking()
                             .Where(m =>
                                 m.Jmeno == jmeno
                                 && m.Prijmeni == prijmeni
-                                && m.Narozeni >= startDate && m.Narozeni <= endDate
+                                && m.Narozeni >= ld.YearInterval.From && m.Narozeni <= ld.YearInterval.To
                             ).ToArray();
                     return db.Osoba.AsNoTracking()
                         .Where(m =>
@@ -252,49 +404,27 @@ namespace HlidacStatu.Repositories
                         ).ToArray();
                 }
             }
-            
+
             public static IEnumerable<Osoba> GetAllByNameAscii(string jmeno, string prijmeni, string datumNarozeni)
             {
-                jmeno = jmeno.NormalizeToPureTextLower().RemoveAccents();
-                prijmeni = prijmeni.NormalizeToPureTextLower().RemoveAccents();
-                DateTime? fullDate = null;
-                DateTime? startDate = null;
-                DateTime? endDate = null;
-                if (!string.IsNullOrWhiteSpace(datumNarozeni))
-                {
-                    var dateString = FindDateInString(datumNarozeni);
-                    if (dateString is not null)
-                    {
-                        fullDate = Devmasters.DT.Util.ParseDateTime(dateString, null);
-                    }
-            
-                    if (fullDate is null)
-                    {
-                        var birthYear = GetYearFromString(datumNarozeni);
-                        if (birthYear is not null)
-                        {
-                            startDate = new DateTime(birthYear.Value, 1, 1);
-                            endDate = new DateTime(birthYear.Value, 12, 31);
-                            
-                        }
-                    }
-                }
-                
+                LooseDate ld = new LooseDate(datumNarozeni);
+
+
                 using (DbEntities db = new DbEntities())
                 {
-                    if (fullDate.HasValue)
+                    if (ld.Date.HasValue)
                         return db.Osoba.AsNoTracking()
                             .Where(m =>
                                 m.JmenoAscii == jmeno
                                 && m.PrijmeniAscii == prijmeni
-                                && m.Narozeni == fullDate
+                                && m.Narozeni == ld.Date
                             ).ToArray();
-                    else if(startDate.HasValue)
+                    else if (ld.Year.HasValue)
                         return db.Osoba.AsNoTracking()
                             .Where(m =>
                                 m.JmenoAscii == jmeno
                                 && m.PrijmeniAscii == prijmeni
-                                && m.Narozeni >= startDate && m.Narozeni <= endDate
+                                && m.Narozeni >= ld.YearInterval.From && m.Narozeni <= ld.YearInterval.To
                             ).ToArray();
                     return db.Osoba.AsNoTracking()
                         .Where(m =>
@@ -303,6 +433,60 @@ namespace HlidacStatu.Repositories
                         ).ToArray();
                 }
             }
+
+
+            public static IEnumerable<Osoba> GetAllByName(string jmenoprijmeni, string datumNarozeni)
+            {
+                LooseDate ld = new LooseDate(datumNarozeni);
+
+                using (DbEntities db = new DbEntities())
+                {
+                    if (ld.Date.HasValue)
+                        return db.Osoba.AsNoTracking()
+                            .Where(m =>
+                                (m.Jmeno + " " + m.Prijmeni) == jmenoprijmeni
+                                && m.Narozeni == ld.Date.Value
+                            ).ToArray();
+                    else if (ld.Year.HasValue)
+                        return db.Osoba.AsNoTracking()
+                            .Where(m =>
+                                (m.Jmeno + " " + m.Prijmeni) == jmenoprijmeni
+                                && m.Narozeni >= ld.YearInterval.From && m.Narozeni <= ld.YearInterval.To
+                            ).ToArray();
+                    return db.Osoba.AsNoTracking()
+                        .Where(m =>
+                                (m.Jmeno + " " + m.Prijmeni) == jmenoprijmeni
+                        ).ToArray();
+                }
+            }
+
+            public static IEnumerable<Osoba> GetAllByNameAscii(string jmenoprijmeni, string datumNarozeni)
+            {
+                jmenoprijmeni = jmenoprijmeni.NormalizeToPureTextLower().RemoveAccents();
+                LooseDate ld = new LooseDate(datumNarozeni);
+
+
+                using (DbEntities db = new DbEntities())
+                {
+                    if (ld.Date.HasValue)
+                        return db.Osoba.AsNoTracking()
+                            .Where(m =>
+                                (m.JmenoAscii + " " + m.PrijmeniAscii) == jmenoprijmeni
+                                && m.Narozeni == ld.Date
+                            ).ToArray();
+                    else if (ld.Year.HasValue)
+                        return db.Osoba.AsNoTracking()
+                            .Where(m =>
+                                (m.JmenoAscii + " " + m.PrijmeniAscii) == jmenoprijmeni
+                                && m.Narozeni >= ld.YearInterval.From && m.Narozeni <= ld.YearInterval.To
+                            ).ToArray();
+                    return db.Osoba.AsNoTracking()
+                        .Where(m =>
+                                (m.JmenoAscii + " " + m.PrijmeniAscii) == jmenoprijmeni
+                        ).ToArray();
+                }
+            }
+
 
             // search all people by name, surname and dob
             public static IEnumerable<Osoba> FindAll(string name, string birthYear, bool extendedSearch = true, int take = 200)
@@ -463,16 +647,30 @@ namespace HlidacStatu.Repositories
                 return res;
             }
 
-            public static List<int> PolitikImportanceOrder = new List<int>() { 3, 4, 2, 1, 0 };
 
+            public static List<int> PolitikStatusImportanceOrder = new List<int>() { 3, 4, 2, 1, 0 };
             public static int[] PolitikImportanceEventTypes = new int[]
             {
                 (int) OsobaEvent.Types.Politicka, (int) OsobaEvent.Types.PolitickaExekutivni,
                 (int) OsobaEvent.Types.VolenaFunkce
             };
 
+            static List<int> _politikStatusImportanceOrder = new List<int>() {
+                (int)StatusOsobyEnum.Politik,
+                (int)StatusOsobyEnum.ByvalyPolitik,
+                (int)StatusOsobyEnum.VazbyNaPolitiky,
+                (int)StatusOsobyEnum.Sponzor,
+                (int)StatusOsobyEnum.VysokyUrednik,
+            };
 
-            
+            static int[] _politikImportanceEventTypes = new int[]
+            {
+                (int) OsobaEvent.Types.Politicka, (int) OsobaEvent.Types.PolitickaExekutivni,
+                (int) OsobaEvent.Types.VolenaFunkce
+            };
+
+
+
             public static async Task<IEnumerable<Osoba>> GetAllPoliticiFromTextAsync(string text)
             {
                 var parsedName = await Repositories.Searching.Politici.FindCitationsAsync(text); //Validators.JmenoInText(text);
@@ -535,7 +733,7 @@ namespace HlidacStatu.Repositories
                             ).ToArray();
                 }
             }
-            
+
             private static int? GetYearFromString(string? yearstring)
             {
                 if (yearstring is null)
@@ -550,7 +748,7 @@ namespace HlidacStatu.Repositories
 
                 return null;
             }
-    
+
             private static string? FindDateInString(string? dateString)
             {
                 if (dateString is null)
@@ -565,8 +763,8 @@ namespace HlidacStatu.Repositories
                 return null;
             }
         }
-        
-        
+
+
 
 
     }
