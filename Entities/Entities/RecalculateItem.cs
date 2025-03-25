@@ -71,16 +71,17 @@ namespace HlidacStatu.Entities
             this.StatisticsType = statsType;
             this.ProvokedBy = provokeBy;
         }
-        public RecalculateItem(Osoba o, StatisticsTypeEnum statsType, DotaceOptions dotaceOptions, string provokeBy = null)
+        public RecalculateItem(Dotace d,  DotaceOptions dotaceOptions, string provokeBy = null)
         {
-            this.Id = o.NameId;
-            this.ItemType = ItemTypeEnum.Person;
-            this.StatisticsType = statsType;
+            this.Id = d.Id;
+            this.ItemType = ItemTypeEnum.Other;
+            this.StatisticsType =  StatisticsTypeEnum.Dotace;
             this.ProvokedBy = provokeBy;
             this.Options = Newtonsoft.Json.JsonConvert.SerializeObject(dotaceOptions, Newtonsoft.Json.Formatting.None);
         }
         public enum ItemTypeEnum : int
         {
+            Other = 0,
             Subjekt = 1,
             Person = 2,
         }
