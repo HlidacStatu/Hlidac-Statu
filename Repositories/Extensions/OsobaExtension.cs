@@ -215,11 +215,8 @@ namespace HlidacStatu.Extensions
             return ret;
         }
         public static Osoba.Statistics.Dotace StatistikaDotace(this Osoba osoba,
-    Relation.AktualnostType minAktualnost, bool forceUpdateCache = false)
+            Relation.AktualnostType minAktualnost, bool forceUpdateCache = false)
         {
-            //temporary fix for null values
-            //STAT FIX
-            //return new();
 
             Osoba.Statistics.Dotace ret = OsobaStatistics.CachedStatistics_Dotace(osoba, minAktualnost, forceUpdateCache);
 
