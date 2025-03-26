@@ -30,39 +30,6 @@
             <h2><i class="fa-regular fa-building-columns"></i>&nbsp;@Model.Organizace.Nazev</h2>
 
             <h3 class="fw-bold"><i class="fa-regular fa-user"></i>&nbsp;@Model.NazevPozice</h3>
-            <div class="d-flex">
-
-                <div class="me-3">
-                    @if (Model.JeHlavoun == true && Model.Rok >= 2022 && !string.IsNullOrWhiteSpace(Model.Organizace.Ico))
-                    {
-                        var ceos = OsobaEventRepo.GetCeos(Model.Organizace.Ico, new DateTime(Model.Rok, 1, 1), new DateTime(Model.Rok, 12, 31));
-                        if (ceos is not null && ceos.Length > 0)
-                        {
-                            foreach (var ceo in ceos)
-                            {
-                                <div class="d-flex">
-                                    <div>
-                                        <div class="person-profile-thumb">
-                                            <div class="photo">
-                                                <div class="profile-picture border" style="background-image: url('@ceo.Osoba.GetPhotoUrl(false, Osoba.PhotoTypes.NoBackground)')"></div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="mt-1">
-                                        <p class="py-0 my-0 lead fw-bold">
-                                            <a href="@ceo.Osoba.GetUrl(false)">@ceo.Osoba.FullName()</a>
-                                        </p>
-                                        <p style="display: none" class="py-0 my-0">@Html.Raw(ceo.Osoba.NarozeniYear(true))</p>
-                                    </div>
-                                </div>
-                            }
-                        }
-                    }
-                </div>
-                <div>
-
-                </div>
-            </div>
         </div>
 
 
