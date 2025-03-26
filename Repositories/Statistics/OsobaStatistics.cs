@@ -136,7 +136,7 @@ namespace HlidacStatu.Repositories.Statistics
 
                 if (it.f.PatrimStatu())
                     statni.Add(it.f.ICO, it.ss);
-                if (it.f.JsemNeziskovka())
+                else if (it.f.JsemNeziskovka())
                     nezisk.Add(it.f.ICO, it.ss);
                 else
                     soukr.Add(it.f.ICO, it.ss);
