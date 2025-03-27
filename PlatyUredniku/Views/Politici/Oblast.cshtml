@@ -48,16 +48,16 @@
                 </h3>
                 <p>
                     V roce @PpRepo.DefaultYear @Html.Raw(Devmasters.Lang.CS.Plural.GetWithZero(goodOrgs.Count,
-                "odmítli poskytnout platy všechny instituce",
+                "informace o platech nemáme od žádné instituce",
                 "poskyla plat jedna instituce",
                 $"poskytli plat {{0}} instituce",
                 $"poskytlo plat {{0}} institucí")).
                     @Html.Raw(Devmasters.Lang.CS.Plural.GetWithZero(badOrgs.Count,
-                                      "",
-                                      " Jedna instituce plat neposkytla.",
-                                      $" Plat odmítly poskytnout {{0}} instituce.",
-                                      $" Plat odmítlo poskytnout {{0}} institucí.")
-                                      )
+                        "",
+                        " Informace o platech nemáme od jedné instituce.",
+                        $" Informace o platech nemáme od {{0}} institucí.",
+                        $" Informace o platech nemáme od {{0}} institucí.")
+                    )
                 </p>
             </div>
 
