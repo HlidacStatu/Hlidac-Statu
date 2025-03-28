@@ -214,7 +214,7 @@ namespace HlidacStatu.Repositories
                     var dateString = FindDateInString(date);
                     if (dateString is not null)
                     {
-                        this.Date = Devmasters.DT.Util.ParseDateTime(dateString, null);
+                        this.Date = Devmasters.DT.Util.ToDate(dateString);
                     }
 
                     if (this.Date is null)
