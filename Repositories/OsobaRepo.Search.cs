@@ -328,8 +328,22 @@ namespace HlidacStatu.Repositories
 
                 }
 
+                var duplicates = foundOsoby.Where(oc => oc.Osoba.Status == (int)Osoba.StatusOsobyEnum.Duplicita);
+                foreach (var duplicate in duplicates)
+                {
+                    if (duplicate.Osoba.OriginalId is not null)
+                    {
+                        var originalOsoba = OsobaRepo.GetByInternalId(duplicate.Osoba.OriginalId.Value);
+                        if (originalOsoba != null)
+                            duplicate.Osoba = originalOsoba;
+                    }
+                }
+                
+                
+
                 return foundOsoby
                     .OrderByDescending(o => o.Confidence)
+                    .DistinctBy(oc => oc.Osoba.NameId)
                     .ToArray();
             }
 
