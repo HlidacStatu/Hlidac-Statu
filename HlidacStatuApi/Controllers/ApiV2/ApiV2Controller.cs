@@ -191,7 +191,7 @@ namespace HlidacStatuApi.Controllers.ApiV2
         [Authorize]
         [HttpGet("dumpItems/{datatype}")]
         [Produces("application/json")]
-        public ActionResult<FileStreamResult> DumpItems([FromRoute] string datatype,
+        public ActionResult DumpItems([FromRoute] string datatype,
             [FromRoute(Name = "date")][DefaultValue("")] string? date = "null")
         {
             if (datatype.Contains("..") || datatype.Contains(Path.DirectorySeparatorChar))
