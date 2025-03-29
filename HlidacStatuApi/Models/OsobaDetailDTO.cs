@@ -15,6 +15,7 @@ namespace HlidacStatuApi.Models
             this.TitulPo = o.TitulPo;
             this.Narozeni = o.Narozeni;
             this.NameId = o.NameId;
+            this.PolitickaStrana = o.CurrentPoliticalParty();
             this.Profile = o.GetUrl();
             this.Sponzoring = o.Sponzoring()
                 .Select(ev => new OsobaEventDTO()
@@ -56,6 +57,7 @@ namespace HlidacStatuApi.Models
         public DateTime? Narozeni { get; set; }
         public string NameId { get; set; }
         public string Profile { get; set; }
+        public string PolitickaStrana { get; set; }
         public List<OsobaEventDTO> Sponzoring { get; set; }
         public List<OsobaEventDTO> Udalosti { get; set; }
         public List<SocialNetworkDTO> SocialniSite { get; set; }

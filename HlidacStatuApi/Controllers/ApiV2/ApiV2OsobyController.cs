@@ -64,6 +64,15 @@ namespace HlidacStatuApi.Controllers.ApiV2
                 strana = 1;
             if (status == 1)
                 status = -1;
+
+            if (status == 0
+                && !(this.User.IsInRole("Admin") || User.IsInRole("KomercniLicence"))
+                )
+            {
+                return Unauthorized("Je potreba komercni licence. viz https://texty.hlidacstatu.cz/licence/");
+            }
+
+
             var osoby = await OsobaRepo.Searching.SimpleSearchAsync(ftxDotaz,
                 strana.Value, 30, OsobaRepo.Searching.OrderResult.Relevance, osobaStatus: status);
 
@@ -71,6 +80,43 @@ namespace HlidacStatuApi.Controllers.ApiV2
 
             return result;
         }
+
+
+        [Authorize(Roles = "TeamMember")]
+        public async Task<ActionResult> PolitikFromText(string text)
+        {
+            var oo = await OsobaRepo.Searching.GetFirstPolitikFromTextAsync(text);
+
+            if (oo != null)
+            {
+                return Content(Newtonsoft.Json.JsonConvert.SerializeObject(
+                    new { osobaid = oo.NameId, jmeno = oo.Jmeno, prijmeni = oo.Prijmeni }
+                ), "application/json");
+            }
+            else
+            {
+                return Content("{}", "application/json");
+            }
+        }
+
+        [Authorize(Roles = "TeamMember")]
+        public async Task<ActionResult> PoliticiFromText(string text)
+        {
+            var oo = await OsobaRepo.Searching.GetBestPoliticiFromTextAsync(text);
+
+            if (oo != null)
+            {
+                return Content(Newtonsoft.Json.JsonConvert.SerializeObject(
+                    oo.Select(o => new { osobaid = o.NameId, jmeno = o.Jmeno, prijmeni = o.Prijmeni })
+                        .ToArray()
+                ), "application/json");
+            }
+            else
+            {
+                return Content("[]", "application/json");
+            }
+        }
+
 
         [Authorize]
         [HttpGet, Route("hledat")]
@@ -80,6 +126,7 @@ namespace HlidacStatuApi.Controllers.ApiV2
             {
                 return BadRequest("Jmeno, prijmeni i datum narozeni jsou povinne.");
             }
+
 
             DateTime narozeni;
             if (DateTime.TryParseExact(datumNarozeni, "yyyy-MM-dd", HlidacStatu.Util.Consts.czCulture, System.Globalization.DateTimeStyles.AssumeLocal, out narozeni))
