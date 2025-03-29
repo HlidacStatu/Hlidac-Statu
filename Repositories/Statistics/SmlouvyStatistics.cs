@@ -29,60 +29,60 @@ namespace HlidacStatu.Repositories.Statistics
         public static async Task<StatisticsPerYear<Smlouva.Statistics.Data>> CalculateAsync(string query)
         {
             StatisticsPerYear<SimpleStat> _calc_SeZasadnimNedostatkem =
-                await ES.QueryGrouped.SmlouvyPerYearAsync($"( chyby:zasadni ) AND ( {query} )  ", Consts.AllYears);
+                await ES.QueryGrouped.SmlouvyPerYearAsync($"( chyby:zasadni ) AND ( {query} )  ", Consts.RegistrSmluvYearsList);
 
             StatisticsPerYear<SimpleStat> _calc_UzavrenoOVikendu =
                 await ES.QueryGrouped.SmlouvyPerYearAsync($"({query}) AND (hint.denUzavreni:>0)",
-                    Consts.AllYears);
+                    Consts.RegistrSmluvYearsList);
 
             StatisticsPerYear<SimpleStat> _calc_Zacerneno = 
                 await ES.QueryGrouped.SmlouvyPerYearAsync($"({query}) AND (prilohy.blurredPages.numOfExtensivelyBlurredPages:>0)",
-                    Consts.AllYears);
+                    Consts.RegistrSmluvYearsList);
 
             StatisticsPerYear<SimpleStat> _calc_ULimitu =
                 await ES.QueryGrouped.SmlouvyPerYearAsync($"({query}) AND ( hint.smlouvaULimitu:>0 )",
-                    Consts.AllYears);
+                    Consts.RegistrSmluvYearsList);
 
             StatisticsPerYear<SimpleStat> _calc_NovaFirmaDodavatel =
                 await ES.QueryGrouped.SmlouvyPerYearAsync(
                     $"({query}) AND ( hint.pocetDniOdZalozeniFirmy:>-50 AND hint.pocetDniOdZalozeniFirmy:<30 )",
-                    Consts.AllYears);
+                    Consts.RegistrSmluvYearsList);
 
             StatisticsPerYear<SimpleStat> _calc_smlouvy =
-                await ES.QueryGrouped.SmlouvyPerYearAsync($"({query}) ", Consts.AllYears);
+                await ES.QueryGrouped.SmlouvyPerYearAsync($"({query}) ", Consts.RegistrSmluvYearsList);
 
             StatisticsPerYear<SimpleStat> _calc_bezCeny =
                 await ES.QueryGrouped.SmlouvyPerYearAsync($"({query}) AND ( hint.skrytaCena:1 ) ",
-                    Consts.AllYears);
+                    Consts.RegistrSmluvYearsList);
 
             StatisticsPerYear<SimpleStat> _calc_bezSmlStran =
                 await ES.QueryGrouped.SmlouvyPerYearAsync($"({query}) AND ( issues.issueTypeId:18 OR issues.issueTypeId:12 ) ",
-                    Consts.AllYears);
+                    Consts.RegistrSmluvYearsList);
 
             StatisticsPerYear<SimpleStat> _calc_sVazbouNaPolitikyNedavne =
                 await ES.QueryGrouped.SmlouvyPerYearAsync($"({query}) AND ( hint.smlouvaSPolitickyAngazovanymSubjektem:>0 OR sVazbouNaPolitikyNedavne:true  ) ",
-                    Consts.AllYears);
+                    Consts.RegistrSmluvYearsList);
 
             StatisticsPerYear<SimpleStat> _calc_sVazbouNaPolitikyBezCenyNedavne =
                 await ES.QueryGrouped.SmlouvyPerYearAsync(
                     $"({query}) AND ( hint.skrytaCena:1 ) AND ( hint.smlouvaSPolitickyAngazovanymSubjektem:>0 OR sVazbouNaPolitikyNedavne:true ) ",
-                    Consts.AllYears);
+                    Consts.RegistrSmluvYearsList);
 
             StatisticsPerYear<SimpleStat> _calc_soukrome =
                 await ES.QueryGrouped.SmlouvyPerYearAsync($"({query}) AND ( hint.vztahSeSoukromymSubjektem:>0 ) ",
-                    Consts.AllYears);
+                    Consts.RegistrSmluvYearsList);
             
             StatisticsPerYear<SimpleStat> _calc_soukromeBezCeny =
                 await ES.QueryGrouped.SmlouvyPerYearAsync(
                     $"({query}) AND ( hint.skrytaCena:1 ) AND ( hint.vztahSeSoukromymSubjektem:>0 ) ",
-                    Consts.AllYears);
-            //ES.QueryGrouped.SmlouvyPerYear($"({query}) AND ( issues.skrytaCena:1 ) AND ( hint.vztahSeSoukromymSubjektem:>0 ) ", Consts.AllYears);
+                    Consts.RegistrSmluvYearsList);
+            //ES.QueryGrouped.SmlouvyPerYear($"({query}) AND ( issues.skrytaCena:1 ) AND ( hint.vztahSeSoukromymSubjektem:>0 ) ", Consts.RegistrSmluvYearsList);
 
             var _calc_poOblastech =
-                await ES.QueryGrouped.OblastiPerYearAsync($"( {query} )", Consts.AllYears);
+                await ES.QueryGrouped.OblastiPerYearAsync($"( {query} )", Consts.RegistrSmluvYearsList);
 
             Dictionary<int, Smlouva.Statistics.Data> data = new Dictionary<int, Smlouva.Statistics.Data>();
-            foreach (var year in Consts.AllYears)
+            foreach (var year in Consts.RegistrSmluvYearsList)
             {
                 data.Add(year, new Smlouva.Statistics.Data()
                 {
