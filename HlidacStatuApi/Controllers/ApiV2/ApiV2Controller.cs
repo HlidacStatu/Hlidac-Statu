@@ -1,4 +1,5 @@
-﻿using HlidacStatu.Entities;
+﻿using Amazon.Runtime.Internal.Endpoints.StandardLibrary;
+using HlidacStatu.Entities;
 using HlidacStatu.Repositories;
 using HlidacStatuApi.Models;
 using Microsoft.AspNetCore.Authorization;
@@ -188,72 +189,103 @@ namespace HlidacStatuApi.Controllers.ApiV2
 
 
         [Authorize]
-        [HttpGet("dump/{datatype}")]
-        public ActionResult<HttpResponseMessage> Dump([FromRoute] string datatype, bool unzip = false)
-        {
-            return Dump(datatype, "", unzip: unzip);
-        }
-
-        [Authorize]
-        [HttpGet("dump/{datatype}/{date?}")]
-        public ActionResult<HttpResponseMessage> Dump([FromRoute] string datatype,
-            [FromRoute(Name = "date")][DefaultValue("")] string? date = "null", bool unzip = false)
+        [HttpGet("dumpItems/{datatype}")]
+        [Produces("application/json")]
+        public ActionResult<FileStreamResult> DumpItems([FromRoute] string datatype,
+            [FromRoute(Name = "date")][DefaultValue("")] string? date = "null")
         {
             if (datatype.Contains("..") || datatype.Contains(Path.DirectorySeparatorChar))
             {
                 _logger.Error("Wrong datatype name.");
                 return StatusCode(466);
             }
+            try
+            {
+                var bin = _dump(datatype, date);
+                using (MemoryStream zipStream = new MemoryStream(bin))
+                {
+                    using (ZipArchive archive = new ZipArchive(zipStream, ZipArchiveMode.Read))
+                    {
+                        ZipArchiveEntry firstEntry = archive.Entries.FirstOrDefault(e => !string.IsNullOrEmpty(e.Name));
+
+                        if (firstEntry == null)
+                        {
+                            return NotFound("No valid files found in the ZIP archive.");
+                        }
+
+                        MemoryStream memoryStream = new MemoryStream();
+                        using (Stream entryStream = firstEntry.Open())
+                        {
+                            entryStream.CopyTo(memoryStream);
+                        }
+                        memoryStream.Position = 0; // Reset stream position
+
+                        // Return file as stream with correct content type
+                        return File(memoryStream, "application/json", firstEntry.Name);
+                    }
+                }
+            }
+            catch (System.IO.FileNotFoundException)
+            {
+                return StatusCode(404);
+            }
+            catch (Exception e)
+            {
+                return StatusCode(500, e.Message);
+            }
+
+        }
+
+        [Authorize]
+        [HttpGet("dumpZip/{datatype}/{date?}")]
+        public ActionResult<byte[]> DumpZip([FromRoute] string datatype,
+            [FromRoute(Name = "date")][DefaultValue("")] string? date = "null")
+        {
+            if (datatype.Contains("..") || datatype.Contains(Path.DirectorySeparatorChar))
+            {
+                _logger.Error("Wrong datatype name.");
+                return StatusCode(466);
+            }
+            try
+            {
+                return _dump(datatype, date);
+
+            }
+            catch (System.IO.FileNotFoundException)
+            {
+                return StatusCode(404);
+            }
+            catch (Exception e)
+            {
+                return StatusCode(500, e.Message);
+            }
+
+        }
+        private byte[] _dump([FromRoute] string datatype,
+            [FromRoute(Name = "date")][DefaultValue("")] string? date = "null")
+        {
 
             DateTime? specificDate = Devmasters.DT.Util.ToDateTime(date, "yyyy-MM-dd");
             string onlyfile = $"{datatype}.dump" +
                               (specificDate.HasValue ? "-" + specificDate.Value.ToString("yyyy-MM-dd") : "");
             if (datatype.ToLower().StartsWith("dataset."))
-                onlyfile = $"{datatype.Replace("dataset.","dataset.hs-")}-01.dump" +
+                onlyfile = $"{datatype.Replace("dataset.", "dataset.hs-")}-01.dump" +
                               (specificDate.HasValue ? "-" + specificDate.Value.ToString("yyyy-MM-dd") : "");
             string fn = StaticData.Dumps_Path + $"{onlyfile}" + ".zip";
             if (System.IO.File.Exists(fn))
-        {
+            {
                 try
                 {
-                    if (unzip)
-                    {
-                        string zipFilePath = fn;
-
-                        using (FileStream zipStream = new FileStream(zipFilePath, FileMode.Open, FileAccess.Read))
-                        using (ZipArchive archive = new ZipArchive(zipStream, ZipArchiveMode.Read))
-                        {
-                            ZipArchiveEntry firstEntry = archive.Entries.FirstOrDefault(e => !string.IsNullOrEmpty(e.Name));
-
-                            if (firstEntry == null)
-                            {
-                                return NotFound("No valid files found in the ZIP archive.");
-                            }
-
-                            MemoryStream memoryStream = new MemoryStream();
-                            using (Stream entryStream = firstEntry.Open())
-                            {
-                                entryStream.CopyTo(memoryStream);
-                            }
-                            memoryStream.Position = 0; // Reset stream position
-
-                            // Return file as stream with correct content type
-                            return File(memoryStream, "application/json", firstEntry.Name);
-                        }
-                    }
-                    else
-                        return File(System.IO.File.ReadAllBytes(fn), "application/zip", Path.GetFileName(fn), true);
+                    return System.IO.File.ReadAllBytes(fn);
                 }
                 catch (Exception e)
                 {
-                    _logger.Error(e, "DUMP exception?" + date);
-                    return StatusCode((int)HttpStatusCode.InternalServerError);
+                    throw;
                 }
             }
             else
             {
-                _logger.Error("API DUMP : not found file " + fn);
-                return NotFound($"Dump {datatype} for date:{date} nenalezen.");
+                throw new System.IO.FileNotFoundException();
             }
         }
 

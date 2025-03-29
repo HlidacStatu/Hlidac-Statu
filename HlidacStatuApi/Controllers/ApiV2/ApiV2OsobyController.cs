@@ -83,6 +83,7 @@ namespace HlidacStatuApi.Controllers.ApiV2
 
 
         [Authorize(Roles = "TeamMember")]
+        [HttpGet, Route("PolitikFromText")]
         public async Task<ActionResult> PolitikFromText(string text)
         {
             var oo = await OsobaRepo.Searching.GetFirstPolitikFromTextAsync(text);
@@ -100,6 +101,7 @@ namespace HlidacStatuApi.Controllers.ApiV2
         }
 
         [Authorize(Roles = "TeamMember")]
+        [HttpGet, Route("PoliticiFromText")]
         public async Task<ActionResult> PoliticiFromText(string text)
         {
             var oo = await OsobaRepo.Searching.GetBestPoliticiFromTextAsync(text);
