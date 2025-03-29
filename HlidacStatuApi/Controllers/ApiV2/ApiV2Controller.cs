@@ -201,17 +201,19 @@ namespace HlidacStatuApi.Controllers.ApiV2
         {
             if (datatype.Contains("..") || datatype.Contains(Path.DirectorySeparatorChar))
             {
-                _logger.Error("Wrong datatype name");
+                _logger.Error("Wrong datatype name.");
                 return StatusCode(466);
             }
 
             DateTime? specificDate = Devmasters.DT.Util.ToDateTime(date, "yyyy-MM-dd");
             string onlyfile = $"{datatype}.dump" +
                               (specificDate.HasValue ? "-" + specificDate.Value.ToString("yyyy-MM-dd") : "");
+            if (datatype.ToLower().StartsWith("dataset."))
+                onlyfile = $"{datatype.Replace("dataset.","dataset.hs-")}-01.dump" +
+                              (specificDate.HasValue ? "-" + specificDate.Value.ToString("yyyy-MM-dd") : "");
             string fn = StaticData.Dumps_Path + $"{onlyfile}" + ".zip";
-
             if (System.IO.File.Exists(fn))
-            {
+        {
                 try
                 {
                     if (unzip)
