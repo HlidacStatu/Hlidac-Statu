@@ -1,7 +1,8 @@
 ﻿# Connect
 open ftpes://nuget:nunuget@10.10.100.103/ -certificate="*"
 
-put .\bin\Debug\*.nupkg / -latest -transfer=binary
+#put .\bin\Debug\*.nupkg / -latest -transfer=binary
+synchronize remote -criteria=time,size -transfer=binary .\bin\Debug / -filemask=*.nupkg
 
 # Disconnect
 close
