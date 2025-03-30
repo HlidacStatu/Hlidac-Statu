@@ -180,6 +180,13 @@ namespace HlidacStatuApi.Controllers.ApiV2
             return HlidacStatu.Util.RealIpAddress.GetIp(HttpContext)?.ToString();
         }
 
+        [HttpGet("Check")]
+        public async Task<ActionResult> Check(int returnStatus = 200)
+        {
+            return StatusCode(returnStatus, $"Returned status {returnStatus}");
+        }
+
+
         [Authorize]
         [HttpGet("dumps")]
         public ActionResult<DumpInfoModel[]> Dumps()
@@ -320,7 +327,8 @@ namespace HlidacStatuApi.Controllers.ApiV2
                 data.Add(
                     new DumpInfoModel()
                     {
-                        url = baseUrl + $"dump/{name}/{date?.ToString("yyyy-MM-dd") ?? ""}",
+                        urlJson = baseUrl + $"dumpItems/{nicename}/{date?.ToString("yyyy-MM-dd") ?? ""}",
+                        urlZip = baseUrl + $"dumpZip/{nicename}/{date?.ToString("yyyy-MM-dd") ?? ""}",
                         created = fi.LastWriteTimeUtc,
                         date = date,
                         fulldump = date.HasValue == false,

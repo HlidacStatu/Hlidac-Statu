@@ -5,7 +5,7 @@
 		<ImplicitUsings>enable</ImplicitUsings>
 		<GenerateDocumentationFile>true</GenerateDocumentationFile>
 		<UserSecretsId>7a3ddc60-02ba-4df4-a642-a69adfa64221</UserSecretsId>
-		<Version>2.4.0.1</Version>
+		<Version>2.4.1.0</Version>
 		<RootNamespace>HlidacStatuApi</RootNamespace>
 		<AssemblyName>HlidacStatuApi</AssemblyName>
 	</PropertyGroup>
