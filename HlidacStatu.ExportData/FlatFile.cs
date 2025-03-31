@@ -19,6 +19,7 @@ namespace HlidacStatu.ExportData
             config.Encoding = Encoding.UTF8;
         }
         public string Delimiter { get; set; }
+        public string ArrayItemDelimiter { get; set; } = ";";
 
         public byte[] ExportData(Data data)
         {
@@ -102,6 +103,11 @@ namespace HlidacStatu.ExportData
                                             csv.WriteField(data.Rows[r].Values[c].ToString());
                                         }
                                     } //types
+                                    else if (col.ValueType.IsArray)
+                                    {
+                                        var sval = string.Join(ArrayItemDelimiter, (object[])data.Rows[r].Values[c]);
+                                        csv.WriteField(sval);
+                                    }
 
                                 }
 

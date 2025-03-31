@@ -1016,7 +1016,11 @@ namespace HlidacStatu.Datasets
             if (string.IsNullOrEmpty(data))
                 return (dynamic)null;
             else
-                return JObject.Parse(data);
+            {
+                var converter = new ExpandoObjectConverter();
+
+                return JsonConvert.DeserializeObject<ExpandoObject>(data,converter);
+            }
         }
 
         /// <summary>
