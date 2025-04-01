@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Devmasters.Collections;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security;
@@ -31,11 +32,10 @@ namespace HlidacStatu.Repositories.Searching
             }
         }
 
-        private class politikStem
+        internal class politikStem
         {
             public string NameId { get; set; }
-            public string JmenoStem { get; set; }
-            public string PrijmeniStem { get; set; }
+            public string[] Stems { get; set; }
         }
 
         public static Devmasters.Cache.AWS_S3.Cache<Dictionary<string, string>> CalculatedStemCache { get; set; } =
@@ -58,53 +58,89 @@ namespace HlidacStatu.Repositories.Searching
             Devmasters.Config.GetWebConfigValue("Minio.Cache.AccessKey"),
             Devmasters.Config.GetWebConfigValue("Minio.Cache.SecretKey"),
             TimeSpan.FromDays(5),
-            "politiciStems",
+            "politiciStems_v2",
             (o) =>
             {
-                var politici = OsobaRepo.Politici.Get();
-                var ret = new List<politikStem>();
-                var stemCache = CalculatedStemCache.Get();
-                foreach (var p in politici)
+                return RecalculatePoliticiStems();
+            });
+
+        internal static politikStem[] RecalculatePoliticiStems()
+        {
+            var politici = OsobaRepo.Politici.Get();
+            var ret = new List<politikStem>();
+            var stemCache = CalculatedStemCache.Get();
+            foreach (var p in politici)
+            {
+                Console.Write(".");
+                string word1 = (p.Jmeno + " " + p.Prijmeni).Trim();
+                string[] stems1 = null;
+                if (!stemCache.ContainsKey(word1))
                 {
-                    Console.Write(".");
-                    string word1 = p.Jmeno.Trim();
-                    if (!stemCache.ContainsKey(word1))
+                    try
                     {
-                        try
-                        {
-                            stemCache[word1] = string.Join(" ", StemsAsync(p.Jmeno).ConfigureAwait(false).GetAwaiter().GetResult());
-                        }
-                        catch (Exception)
-                        {
-                            stemCache[word1] = p.Jmeno;
-                        }
-
+                        stems1 = StemsAsync(word1).ConfigureAwait(false).GetAwaiter().GetResult();
+                        stemCache[word1] = string.Join(" ", stems1);
                     }
-                    string word2 = p.Prijmeni.Trim();
-                    if (!stemCache.ContainsKey(word2))
+                    catch (Exception)
                     {
-                        try
-                        {
-                            stemCache[word2] = string.Join(" ", StemsAsync(p.Prijmeni).ConfigureAwait(false).GetAwaiter().GetResult());
-                        }
-                        catch (Exception)
-                        {
-                            stemCache[word2] = p.Prijmeni;
-                        }
+                        stemCache[word1] = word1;
                     }
 
+                }
+
+                stems1 = stemCache[word1].Split(' ');
+
+                bool addOpposite = false;
+                string[] stems2 = null;
+                string word2 = (p.Prijmeni + " " + p.Jmeno).Trim();
+                if (!stemCache.ContainsKey(word2))
+                {
+                    try
+                    {
+                        stems2 = StemsAsync(word2).ConfigureAwait(false).GetAwaiter().GetResult();
+                        stemCache[word2] = string.Join(" ", stems2);
+
+                        //jsou rozdilne stemy pro opacne jmeno a prijmeni?
+                        addOpposite = stems2.Except(stems1).Any();
+                    }
+                    catch (Exception)
+                    {
+                        stemCache[word2] = word2;
+                    }
+
+                }
+
+                stems2 = stemCache[word2].Split(' ');
+
+
+                ret.Add(new politikStem()
+                {
+                    NameId = p.NameId,
+                    Stems = stems1
+                });
+                if (addOpposite)
+                {
                     ret.Add(new politikStem()
                     {
                         NameId = p.NameId,
-                        JmenoStem = stemCache[word1],
-                        PrijmeniStem = stemCache[word2]
+                        Stems = stems2
                     });
                 }
-                CalculatedStemCache.ForceRefreshCache(stemCache);
+                //if (p.Jmeno != stemCache[word1] || p.Prijmeni != stemCache[word2])
+                //{
 
-                return ret.ToArray();
-            });
+                //    ret.Add(new politikStem()
+                //    {
+                //        NameId = p.NameId,
+                //        JmenoStem = p.Jmeno,
+                //        PrijmeniStem = p.Prijmeni
+                //    });
+                //}
+            }
+            CalculatedStemCache.ForceRefreshCache(stemCache);
 
+            return ret.ToArray();
+        }
 
         static List<Tuple<string, string[]>> InitPoliticiStems()
         {
@@ -125,12 +161,17 @@ namespace HlidacStatu.Repositories.Searching
             {
                 slova.Add(s);
             }
+            if (false && System.Diagnostics.Debugger.IsAttached)
+            {
+                politikStem[] newStems = RecalculatePoliticiStems();
+                PoliticiStemsCache.ForceRefreshCache(newStems);
+            }
 
             foreach (var p in PoliticiStemsCache.Get())
             {
                 //var cols = new string[] { p.JmenoStem.ToLower(), p.PrijmeniStem.ToLower() };
-                string[] fullnamewords = (p.JmenoStem.ToLower() + " " + p.PrijmeniStem.ToLower()).Split(' ');
-                var names = HlidacStatu.Util.TextTools.GetPermutations(fullnamewords);
+                string[] nameStems = p.Stems;
+                var names = HlidacStatu.Util.TextTools.GetPermutations(nameStems);
                 var key = p.NameId;
 
 
@@ -215,7 +256,7 @@ namespace HlidacStatu.Repositories.Searching
             //Console.WriteLine($"stemmer {stopw.ExactElapsedMiliseconds} ");
             stopw.Restart();
             List<string> found = new List<string>();
-            //var debug = PoliticiStems.Where(m => m.Item1 == "jana-mrackova-vildumetzova").ToArray();
+            var debug = PoliticiStems.Where(m => m.Item1 == "jozef-sikela").ToArray();
             foreach (var kv in PoliticiStems)
             {
                 string zkratka = kv.Item1;

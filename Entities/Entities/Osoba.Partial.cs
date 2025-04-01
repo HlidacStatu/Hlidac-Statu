@@ -85,6 +85,13 @@ namespace HlidacStatu.Entities
             //return base.ToString();
             return FullNameWithNarozeni();
         }
+        public string FullNameBezTitulu(bool html = false)
+        {
+            string ret = string.Format("{1} {2}", Jmeno, Prijmeni).Trim();
+            if (html)
+                ret = ret.Replace(" ", "&nbsp;");
+            return ret;
+        }
 
         public string FullName(bool html = false)
         {
