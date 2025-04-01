@@ -215,7 +215,7 @@ namespace HlidacStatu.Connectors
 
             foreach (SqlParameter p in _comm.Parameters)
             {
-                query = Regex.Replace(query,$@"(\b|^|\s|[();$]){Regex.Escape("@" + p.ParameterName)}\b",
+                query = Regex.Replace(query,$@"{Regex.Escape("@" + p.ParameterName)}\b",
                     ParameterValueForSQL(p), RegexOptions.IgnoreCase | RegexOptions.CultureInvariant);
                 //query = query.Replace("@" + p.ParameterName, ParameterValueForSQL(p));
             }
