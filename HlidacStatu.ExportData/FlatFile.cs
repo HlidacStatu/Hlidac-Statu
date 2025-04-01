@@ -9,16 +9,19 @@ namespace HlidacStatu.ExportData
 {
     public abstract class FlatFile : IExport
     {
-        protected static CsvHelper.Configuration.CsvConfiguration DefaultConfig = new CsvHelper.Configuration.CsvConfiguration(CultureInfo.InvariantCulture);
+        protected static CsvHelper.Configuration.CsvConfiguration DefaultConfig = 
+            new CsvHelper.Configuration.CsvConfiguration(CultureInfo.InvariantCulture);
 
-        CsvHelper.Configuration.CsvConfiguration config = new CsvHelper.Configuration.CsvConfiguration(CultureInfo.InvariantCulture);
-        public FlatFile(string delimiter, char quote)
+        CsvHelper.Configuration.CsvConfiguration config = 
+            new CsvHelper.Configuration.CsvConfiguration(CultureInfo.InvariantCulture);
+        public FlatFile(string delimiter, char quote, bool quoteAll)
         {
             config.Delimiter = delimiter;
             config.Quote = quote;
             config.Encoding = Encoding.UTF8;
+            if (quoteAll)
+                config.ShouldQuote =  (args) => true;// Force quoting for all fields
         }
-        public string Delimiter { get; set; }
         public string ArrayItemDelimiter { get; set; } = ";";
 
         public byte[] ExportData(Data data)
