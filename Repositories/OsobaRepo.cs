@@ -46,7 +46,7 @@ namespace HlidacStatu.Repositories
                 p.Jmeno = name;
                 p.Prijmeni = surname;
             }
-            
+
             //try to create surname from names
             if (string.IsNullOrWhiteSpace(p.Prijmeni) && !string.IsNullOrWhiteSpace(p.Jmeno))
             {
@@ -85,10 +85,10 @@ namespace HlidacStatu.Repositories
         private static (string Name, string Surname) SplitNameOrSurname(string fullname)
         {
             char[] separators = [' ', '\t', '\n'];
-            var splittedName = fullname.Split(separators, StringSplitOptions.TrimEntries 
+            var splittedName = fullname.Split(separators, StringSplitOptions.TrimEntries
                                                               | StringSplitOptions.RemoveEmptyEntries);
-            
-            if(splittedName.Length > 1)
+
+            if (splittedName.Length > 1)
                 return (splittedName[0], string.Join(" ", splittedName[1..]));
             return (string.Empty, fullname);
 
@@ -577,6 +577,32 @@ namespace HlidacStatu.Repositories
                       from Osoba os
                      where os.status = {(int)Osoba.StatusOsobyEnum.Sponzor}")
                 .ToListAsync(cancellationToken: cancellationToken);
+            return results;
+        }
+
+        public static async Task<List<Osoba>> PeopleWithAnySponzoringRecordAsync(Expression<Func<Osoba, bool>> predicate, CancellationToken cancellationToken = default)
+        {
+            predicate = predicate ?? (s => true);
+            await using var db = new DbEntities();
+
+            var neniPolitik = (int)Osoba.StatusOsobyEnum.NeniPolitik;
+            var sponzor = (int)Osoba.StatusOsobyEnum.Sponzor;
+
+            var query1 = db.Osoba
+                .Where(os => db.Sponzoring.Any(s => s.OsobaIdDarce == os.InternalId))
+                .Where(predicate)
+                .Distinct();
+
+            var query2 = db.Osoba
+                .Where(os => os.Status == sponzor)
+                .Where(predicate)
+                .Distinct();
+
+            var results = await query1
+                .Union(query2)
+                .Distinct()
+                .ToListAsync(cancellationToken);
+
             return results;
         }
 
