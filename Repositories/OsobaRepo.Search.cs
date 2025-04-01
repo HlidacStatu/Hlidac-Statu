@@ -176,7 +176,7 @@ namespace HlidacStatu.Repositories
                 return s;
             }
 
-        
+
 
             public record OsobaConfidence
             {
@@ -194,6 +194,7 @@ namespace HlidacStatu.Repositories
                     PolitickeFunkce = 1 << 2,
                     IcoMatch = 1 << 3,
                     NameWithAccents = 1 << 4,
+                    SponzorPolitiku = 1 << 5,
                     All = ~0
                 }
             }
@@ -204,6 +205,16 @@ namespace HlidacStatu.Repositories
             /// </summary>
             public class LooseDate
             {
+                public static LooseDate FromVek(int vek, DateTime forDate)
+                {
+                    throw new NotImplementedException();
+                    return new LooseDate()
+                    {
+
+                    };
+                }
+                public LooseDate()
+                { }
                 /// <summary>
                 /// Initializes a new instance of the <see cref="LooseDate"/> class.
                 /// Attempts to parse the provided date string into a specific date or year.
@@ -299,6 +310,16 @@ namespace HlidacStatu.Repositories
                     }
                 }
 
+                //sponzoruje politiky
+                bool sponzoruje = OsobaRepo.PeopleWithAnySponzoringRecordAsync(m => m.InternalId == o.InternalId)
+                    .ConfigureAwait(false).GetAwaiter().GetResult()
+                    .Any();
+                if (sponzoruje)
+                {
+                    c = c + 1;
+                    res.Found |= OsobaConfidence.FoundParts.SponzorPolitiku;
+                }
+
                 res.Confidence = c;
                 return res;
             }
@@ -323,7 +344,7 @@ namespace HlidacStatu.Repositories
                     foreach (var c in nameCombinations)
                     {
                         var found = GetAllByNameAscii(c, datumNarozeni);
-                        foundOsoby.AddRange(found.Select(m => OsobaConfidenceCalculation(m, fullDate,false, isInIco)));
+                        foundOsoby.AddRange(found.Select(m => OsobaConfidenceCalculation(m, fullDate, false, isInIco)));
                     }
 
                 }
@@ -338,8 +359,8 @@ namespace HlidacStatu.Repositories
                             duplicate.Osoba = originalOsoba;
                     }
                 }
-                
-                
+
+
 
                 return foundOsoby
                     .OrderByDescending(o => o.Confidence)
