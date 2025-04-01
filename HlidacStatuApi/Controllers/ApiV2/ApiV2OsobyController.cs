@@ -1,4 +1,5 @@
 ﻿using HlidacStatu.Entities;
+using HlidacStatu.Extensions;
 using HlidacStatu.Repositories;
 using HlidacStatuApi.Models;
 using Microsoft.AspNetCore.Authorization;
@@ -91,8 +92,8 @@ namespace HlidacStatuApi.Controllers.ApiV2
             if (oo != null)
             {
                 return Content(Newtonsoft.Json.JsonConvert.SerializeObject(
-                    new { osobaid = oo.NameId, jmeno = oo.Jmeno, prijmeni = oo.Prijmeni }
-                ), "application/json");
+                    new { osobaid = oo.NameId, jmeno = oo.Jmeno, prijmeni = oo.Prijmeni, politickaStrana = oo.CurrentPoliticalParty() }
+                ), "application/json", System.Text.Encoding.UTF8);
             }
             else
             {
@@ -109,9 +110,9 @@ namespace HlidacStatuApi.Controllers.ApiV2
             if (oo != null)
             {
                 return Content(Newtonsoft.Json.JsonConvert.SerializeObject(
-                    oo.Select(o => new { osobaid = o.NameId, jmeno = o.Jmeno, prijmeni = o.Prijmeni })
+                    oo.Select(o => new { osobaid = o.NameId, jmeno = o.Jmeno, prijmeni = o.Prijmeni, politickaStrana = o.CurrentPoliticalParty() })
                         .ToArray()
-                ), "application/json");
+                ), "application/json", System.Text.Encoding.UTF8);
             }
             else
             {
