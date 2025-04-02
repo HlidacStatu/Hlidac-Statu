@@ -226,6 +226,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Regexes", "Regexes\Regexes.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FullOCRMinion", "..\Hlidac-Statu-Private\Docker\FullOCRMinion\FullOCRMinion.csproj", "{9C3A4598-7BD4-4942-A3AC-B134D02890BF}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PlatyUrednikuImporter", "..\Hlidac-Statu-Private\PlatyUrednikuImporter\PlatyUrednikuImporter.csproj", "{2DB686B1-7B36-4AB2-A7DB-F9C64922A5D6}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -556,6 +558,10 @@ Global
 		{9C3A4598-7BD4-4942-A3AC-B134D02890BF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9C3A4598-7BD4-4942-A3AC-B134D02890BF}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9C3A4598-7BD4-4942-A3AC-B134D02890BF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2DB686B1-7B36-4AB2-A7DB-F9C64922A5D6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2DB686B1-7B36-4AB2-A7DB-F9C64922A5D6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2DB686B1-7B36-4AB2-A7DB-F9C64922A5D6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2DB686B1-7B36-4AB2-A7DB-F9C64922A5D6}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -656,6 +662,7 @@ Global
 		{3C83146B-1638-42BD-AF0D-F7F80E125000} = {A162EDEA-8EBD-4520-B039-16CF0B76966B}
 		{ECE26708-7880-4B04-BE99-13068E9C259F} = {44E67082-D88E-41AE-AF07-4739BDC44B2D}
 		{9C3A4598-7BD4-4942-A3AC-B134D02890BF} = {ACC852FC-5016-48E7-80DF-ABD60A162FB8}
+		{2DB686B1-7B36-4AB2-A7DB-F9C64922A5D6} = {87D50816-C7A9-4B83-A5E3-5EEE0265C2F5}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {17143448-F5EA-41D1-886F-00E63AE50798}
