@@ -311,8 +311,7 @@ namespace HlidacStatu.Repositories
                 }
 
                 //sponzoruje politiky
-                bool sponzoruje = OsobaRepo.PeopleWithAnySponzoringRecordAsync(m => m.InternalId == o.InternalId)
-                    .ConfigureAwait(false).GetAwaiter().GetResult()
+                bool sponzoruje = OsobaRepo.PeopleWithAnySponzoringRecord(m => m.InternalId == o.InternalId)
                     .Any();
                 if (sponzoruje)
                 {

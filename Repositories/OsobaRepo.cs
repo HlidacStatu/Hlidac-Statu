@@ -580,10 +580,10 @@ namespace HlidacStatu.Repositories
             return results;
         }
 
-        public static async Task<List<Osoba>> PeopleWithAnySponzoringRecordAsync(Expression<Func<Osoba, bool>> predicate, CancellationToken cancellationToken = default)
+        public static  List<Osoba> PeopleWithAnySponzoringRecord(Expression<Func<Osoba, bool>> predicate)
         {
             predicate = predicate ?? (s => true);
-            await using var db = new DbEntities();
+            using var db = new DbEntities();
 
             var neniPolitik = (int)Osoba.StatusOsobyEnum.NeniPolitik;
             var sponzor = (int)Osoba.StatusOsobyEnum.Sponzor;
@@ -591,17 +591,19 @@ namespace HlidacStatu.Repositories
             var query1 = db.Osoba
                 .Where(os => db.Sponzoring.Any(s => s.OsobaIdDarce == os.InternalId))
                 .Where(predicate)
-                .Distinct();
+                .Distinct()
+                .ToArray();
 
             var query2 = db.Osoba
                 .Where(os => os.Status == sponzor)
                 .Where(predicate)
-                .Distinct();
+                .Distinct()
+                .ToArray();
 
-            var results = await query1
+            var results = query1
                 .Union(query2)
                 .Distinct()
-                .ToListAsync(cancellationToken);
+                .ToList();
 
             return results;
         }
