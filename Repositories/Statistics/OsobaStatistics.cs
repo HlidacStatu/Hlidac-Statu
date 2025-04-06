@@ -81,6 +81,8 @@ namespace HlidacStatu.Repositories.Statistics
                 new Dictionary<string, StatisticsSubjectPerYear<Smlouva.Statistics.Data>>();
             Dictionary<string, StatisticsSubjectPerYear<Smlouva.Statistics.Data>> soukr =
                 new Dictionary<string, StatisticsSubjectPerYear<Smlouva.Statistics.Data>>();
+            Dictionary<string, StatisticsSubjectPerYear<Smlouva.Statistics.Data>> nezisk =
+                new Dictionary<string, StatisticsSubjectPerYear<Smlouva.Statistics.Data>>();
 
             var perIcoStat = o.AktualniVazby(aktualnost)
                 .Where(v => !string.IsNullOrEmpty(v.To?.UniqId)
@@ -94,16 +96,18 @@ namespace HlidacStatu.Repositories.Statistics
 
             foreach (var it in perIcoStat)
             {
-
-                if (it.f.PatrimStatu())
+                if (it.f.PatrimStatu() && statni.ContainsKey(it.f.ICO) == false)
                     statni.Add(it.f.ICO, it.ss);
-                else
+                else if (it.f.JsemNeziskovka() && nezisk.ContainsKey(it.f.ICO) == false)
+                    nezisk.Add(it.f.ICO, it.ss);
+                else if (soukr.ContainsKey(it.f.ICO) == false)
                     soukr.Add(it.f.ICO, it.ss);
+
             }
 
             res.StatniFirmy = statni;
             res.SoukromeFirmy = soukr;
-
+            res.Neziskovky = nezisk;
             return res;
         }
 
@@ -133,12 +137,11 @@ namespace HlidacStatu.Repositories.Statistics
 
             foreach (var it in perIcoStat)
             {
-
-                if (it.f.PatrimStatu())
+                if (it.f.PatrimStatu() && statni.ContainsKey(it.f.ICO) == false)
                     statni.Add(it.f.ICO, it.ss);
-                else if (it.f.JsemNeziskovka())
+                else if (it.f.JsemNeziskovka() && nezisk.ContainsKey(it.f.ICO) == false)
                     nezisk.Add(it.f.ICO, it.ss);
-                else
+                else if (soukr.ContainsKey(it.f.ICO) == false)
                     soukr.Add(it.f.ICO, it.ss);
             }
 
@@ -189,10 +192,7 @@ namespace HlidacStatu.Repositories.Statistics
         public static StatisticsPerYear<Smlouva.Statistics.Data> SmlouvyStat_NeziskovkySummary(this Osoba.Statistics.RegistrSmluv registrSmluv)
         {
             if (registrSmluv._neziskovkySummary == null)
-                registrSmluv._neziskovkySummary = registrSmluv.SoukromeFirmy?
-                    .Where(k => registrSmluv.SmlouvyStat_Neziskovky().Contains(k.Key))
-                    .Select(m => m.Value)
-                    .AggregateStats();
+                registrSmluv._neziskovkySummary = registrSmluv.Neziskovky?.Values.AggregateStats();
 
             return registrSmluv._neziskovkySummary;
         }

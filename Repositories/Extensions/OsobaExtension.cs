@@ -205,6 +205,8 @@ namespace HlidacStatu.Extensions
             //return new();
 
             var ret = OsobaStatistics.CachedStatistics_Smlouvy(osoba, minAktualnost, obor, forceUpdateCache);
+            if (ret == null)
+                return null;
             foreach (var k in ret.SoukromeFirmy.Keys)
                 if (ret.SoukromeFirmy[k] == null)
                     ret.SoukromeFirmy[k] = new StatisticsSubjectPerYear<Smlouva.Statistics.Data>();
