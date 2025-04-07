@@ -63,6 +63,23 @@
 <section class="d-flex align-items-center justify-content-center">
     <div class="container">
         <h2>@(max ? "Největší navýšení" : "Největší snížení") platů mimo ředitele v organizacích od roku @minYear</h2>
+        
+        <div class="nav flex-row nav-pills">
+            <button class="nav-link disabled" type="button" disabled="disabled">Zobrazit data od roku</button>
+            @{
+
+                foreach (var y in PuRepo.AllYears.Where(y => y < PuRepo.DefaultYear && y >= 2021))
+                {
+                    <a href="@(this.Context.Request.GetCurrentUrl("minyear",y.ToString()))"
+                       class="@($"nav-link {(minYear == y ? "active" :  "")}")"
+                       type="button"
+                       role="tab">
+                        @y
+                    </a>
+                }
+            }
+        </div>
+        
         <p class="text-muted">
             Přehled růstu nejvyššího platu včetně odměn mezi roky @minYear a @PuRepo.DefaultYear <sup>*)</sup> u pozic, která nejsou nejvyššími představiteli.
             Porovnání provádíme u pozice s nejvyšším ročním příjmem včetně odměn v letech @minYear a @PuRepo.DefaultYear.
@@ -70,6 +87,7 @@
             <br />
             Jinými slovy, jde o porovnání nárustu platů u rekordmanů v jednotlivých organizacích.
         </p>
+        
 
         <div class="tab-pane width-75vp" id="rustPlatuCeo" role="tabpanel">
             <script>
