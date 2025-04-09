@@ -1,5 +1,6 @@
 using HlidacStatu.Entities;
 using Microsoft.EntityFrameworkCore;
+using Polly.Caching;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,6 +18,7 @@ public static class PpRepo
         return await GetFullDetailAsync(new string[] { datovaSchranka });
     }
     
+
     public static async Task<PuOrganizace> GetFullDetailAsync(string[] datoveSchranky)
     {
         await using var db = new DbEntities();
@@ -247,6 +249,68 @@ public static class PpRepo
             .Where(p => (((p.Plat ?? 0) + (p.Odmeny ?? 0)) / (p.PocetMesicu ?? 12)) <= rangeMax)
             .Include(p => p.Organizace).ThenInclude(o => o.FirmaDs)
             .ToListAsync();
+    }
+    public static async Task UpsertEventAsync(PpEvent _event)
+    {
+        PpEvent ev = _event;
+        await using var dbContext = new DbEntities();
+
+        if (string.IsNullOrWhiteSpace(ev.IcoOrganizace))
+        {
+            throw new ArgumentException("ICO is missing");
+        }
+        if (string.IsNullOrWhiteSpace(ev.OsobaNameId))
+        {
+            throw new ArgumentException("OsobaNameId is missing");
+        }
+
+        var original = await dbContext.PpEvents.FirstOrDefaultAsync(o => o.Pk == ev.Pk);
+        if (original is null || ev.Pk == 0)
+        {
+            dbContext.PpEvents.Add(ev);
+        }
+        else
+        {
+            dbContext.PpEvents.Attach(ev);
+            dbContext.Entry(ev).State = EntityState.Modified;
+        }
+
+        await dbContext.SaveChangesAsync();
+
+    }
+    public static async Task<string> GetNewCisloJednaciAsync()
+    {
+        await using var dbContext = new DbEntities();
+        var existing= await dbContext.PpEvents
+            .AsNoTracking()
+            .Where(m=>m.NaseCJ !=null)
+            .Select(m => m.NaseCJ)
+            .Distinct()
+            .ToArrayAsync();
+
+        if (existing.Any() == false)
+            return $"1/{DateTime.Now.Year}";
+
+        var parts = existing
+            .Select(m => m.Split('/'))
+            .Where(m => m.Length == 2)
+            .Select(m => new { cislo = int.Parse(m[0]), rok = int.Parse(m[1]) })
+            .Where(m => m.rok == DateTime.Now.Year)
+            .OrderByDescending(m => m.cislo)
+            .FirstOrDefault();
+        if (parts == null)
+            return $"1/{DateTime.Now.Year}";
+
+        return $"{parts.cislo + 1}/{DateTime.Now.Year}";
+    }
+
+    public static async Task<PpEvent> GetEventAsync(int id)
+    {
+        await using var dbContext = new DbEntities();
+        return await dbContext.PpEvents
+            .AsNoTracking()
+            .Where(e => e.Pk == id)
+            .FirstOrDefaultAsync();
     }
 
     public static async Task UpsertOrganizaceAsync(PuOrganizace organizace)

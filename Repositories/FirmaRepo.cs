@@ -11,6 +11,8 @@ using System.Data.SqlClient;
 using System.Linq;
 using System.Threading.Tasks;
 using Serilog;
+using Nest;
+using Devmasters.Enums;
 
 namespace HlidacStatu.Repositories
 {
@@ -67,22 +69,22 @@ namespace HlidacStatu.Repositories
                     }
 
 
-/*                    if (firma.DatovaSchranka != null)
-                    {
-                        HlidacStatu.Connectors.DirectDB.NoResult("delete from firma_DS where ico=@ico",
-                            new IDataParameter[]
-                            {
-                                new SqlParameter("ico", firma.ICO)
-                            });
-                        foreach (var ds in firma.DatovaSchranka.Distinct())
-                        {
-                            HlidacStatu.Connectors.DirectDB.NoResult(sqlDS, new IDataParameter[]
-                            {
-                                new SqlParameter("ico", firma.ICO),
-                                new SqlParameter("DatovaSchranka", ds),
-                            });
-                        }
-                    }*/
+                    /*                    if (firma.DatovaSchranka != null)
+                                        {
+                                            HlidacStatu.Connectors.DirectDB.NoResult("delete from firma_DS where ico=@ico",
+                                                new IDataParameter[]
+                                                {
+                                                    new SqlParameter("ico", firma.ICO)
+                                                });
+                                            foreach (var ds in firma.DatovaSchranka.Distinct())
+                                            {
+                                                HlidacStatu.Connectors.DirectDB.NoResult(sqlDS, new IDataParameter[]
+                                                {
+                                                    new SqlParameter("ico", firma.ICO),
+                                                    new SqlParameter("DatovaSchranka", ds),
+                                                });
+                                            }
+                                        }*/
 
                     if (firma.NACE != null)
                     {
@@ -220,7 +222,7 @@ namespace HlidacStatu.Repositories
                 f = db.Firma.FirstOrDefault(m => m.ICO == ico);
                 if (f is null)
                     return Firma.NotFound;
-                
+
                 f.ICO = HlidacStatu.Util.ParseTools.NormalizeIco(f.ICO);
 
                 if (f != null)
@@ -251,7 +253,7 @@ namespace HlidacStatu.Repositories
             else
                 res = AllFromExactName(jmeno);
             return res.FirstOrDefault(Firma.NotFound);
-            
+
         }
 
         public static IEnumerable<Firma> AllFromExactName(string jmeno)
@@ -289,7 +291,7 @@ namespace HlidacStatu.Repositories
                 }
             }
         }
-        
+
         public static IEnumerable<string> GetEntrepreneurIcos()
         {
             using (PersistLib p = new PersistLib())
@@ -301,7 +303,7 @@ namespace HlidacStatu.Repositories
                 }
             }
         }
-        
+
         public static IEnumerable<Firma> AllFromNameWildcards(string jmeno)
         {
 
@@ -365,22 +367,22 @@ namespace HlidacStatu.Repositories
         }
 
         //don;t use it, 
-/*        public static IEnumerable<Firma> AllFirmyInRS(bool skipDS_Nace = false)
-        {
-            return AllIcoInRS()
-                .Select(m => FromIco(m))
-                .ToArray()
-                .Where(m => m.Valid);
+        /*        public static IEnumerable<Firma> AllFirmyInRS(bool skipDS_Nace = false)
+                {
+                    return AllIcoInRS()
+                        .Select(m => FromIco(m))
+                        .ToArray()
+                        .Where(m => m.Valid);
 
-        }
-*/
+                }
+        */
         private static Firma FromDataRow(DataRow dr, bool skipDS_Nace = false)
         {
             Firma f = new Firma();
             f.ICO = (string)dr["ico"];
             f.DIC = (string)PersistLib.IsNull(dr["dic"], string.Empty);
             f.Datum_Zapisu_OR = (DateTime?)PersistLib.IsNull(dr["datum_zapisu_or"], null);
-            f.Stav_subjektu = (byte) Convert.ToInt32(PersistLib.IsNull(dr["Stav_subjektu"], 1));
+            f.Stav_subjektu = (byte)Convert.ToInt32(PersistLib.IsNull(dr["Stav_subjektu"], 1));
             f.Status = Convert.ToInt32(PersistLib.IsNull(dr["Status"], 1));
             f.Jmeno = (string)PersistLib.IsNull(dr["jmeno"], string.Empty);
             f.JmenoAscii = (string)PersistLib.IsNull(dr["jmenoascii"], string.Empty);
@@ -447,5 +449,202 @@ namespace HlidacStatu.Repositories
             firma.DatovaSchranka = Lib.Data.External.DatoveSchrankyOpenData.ISDS.GetDatoveSchrankyForIco(firma.ICO);
         }
 
+        public static HlidacStatu.DS.Api.Firmy.SubjektDetailInfo GetDetailInfo(string ico, string name)
+        {
+            HlidacStatu.DS.Api.Firmy.SubjektDetailInfo res = null;
+            Firma f = null;
+            DS.Graphs.Relation.AktualnostType aktualnost = DS.Graphs.Relation.AktualnostType.Nedavny;
+
+            if (HlidacStatu.Util.DataValidators.CheckCZICO(ico) == false)
+            {
+                if (!string.IsNullOrEmpty(name))
+                {
+                    var fname = Firma.JmenoBezKoncovky(name);
+                    var found = (FirmaRepo.Searching.FindAllAsync(name, 2).ConfigureAwait(false).GetAwaiter().GetResult())
+                        .FirstOrDefault();
+                    if (found != null)
+                    {
+                        f = Firmy.Get(found.ICO);
+                    }
+                }
+            }
+            else
+            {
+                f = Firmy.Get(ico);
+            }
+
+
+            if (f == null || f.Valid == false)
+            {
+                return null;
+            }
+
+            // do work
+            res = new();
+            res.ZdrojUrl = f.GetUrl(false);
+            res.Ico = f.ICO;
+            res.Jmeno = f.Jmeno;
+            res.OmezeniCinnosti = f.StatusFull();
+
+            if (f.JsemNeziskovka())
+                res.Charakter = DS.Api.Firmy.SubjektDetailInfo.CharakterEnum.NeziskovaOrganizace;
+            else if (f.JsemOVM())
+                res.Charakter = DS.Api.Firmy.SubjektDetailInfo.CharakterEnum.StatniOrgan;
+            else if (f.JsemPolitickaStrana())
+                res.Charakter = DS.Api.Firmy.SubjektDetailInfo.CharakterEnum.PolitickaStrana;
+            else if (f.TypSubjektu == Firma.TypSubjektuEnum.PatrimStatu
+                || f.TypSubjektu == Firma.TypSubjektuEnum.PatrimStatuAlespon25perc
+                || f.JsemStatniFirma())
+                res.Charakter = DS.Api.Firmy.SubjektDetailInfo.CharakterEnum.FirmaPatriStatu;
+            else if (f.Registrovana_v_zahranici)
+                res.Charakter = DS.Api.Firmy.SubjektDetailInfo.CharakterEnum.ZahranicniFirma;
+            else if (f.JsemSoukromaFirma())
+                res.Charakter = DS.Api.Firmy.SubjektDetailInfo.CharakterEnum.SoukromaFirma;
+
+            //KINDEX
+            Entities.KIndex.KIndexData kindex = f.KindexAsync().ConfigureAwait(false).GetAwaiter().GetResult();
+            if (kindex != null)
+            {
+                for (int i = 2020; i <= HlidacStatu.Util.ParseTools.ToInt(Devmasters.Config.GetWebConfigValue("KIndexMaxYear")); i++)
+                {
+                    var kidx = kindex.ForYear(i);
+                    if (kidx != null)
+                    {
+                        res.KIndex.Add(new HlidacStatu.DS.Api.Firmy.SubjektDetailInfo.KIndexData()
+                        {
+                            KIndex = kidx.KIndexLabel.ToString(),
+                            ObrazekUrl = kidx.KIndexLabelIconUrl(false),
+                            Popis = HlidacStatu.Util.InfoFact.RenderInfoFacts(kindex.InfoFacts(i), 3, true, true, ", "),
+                            Rok = i
+                        });
+                    }
+                }
+            }
+
+            //Smlouvy
+            var smlouvyStat = f.StatistikaRegistruSmluv();
+            if (smlouvyStat != null)
+            {
+                res.RegistrSmluvCelkem = new HlidacStatu.DS.Api.Firmy.SubjektDetailInfo.SmlouvyData()
+                {
+                    Rok = 0,
+                    CelkovaHodnotaSmluv = smlouvyStat.Summary().CelkovaHodnotaSmluv,
+                    HlavniOblasti = smlouvyStat.Summary().PoOblastech
+                                .OrderByDescending(o => o.Value.CelkemCena)
+                                .ThenByDescending(o => o.Value.Pocet)
+                                .Take(3)
+                                .Select(m => ((Smlouva.SClassification.ClassificationsTypes?)m.Key).ToNiceDisplayName())
+                                .ToArray(),
+                    PocetSmluv = smlouvyStat.Summary().PocetSmluv,
+                    PocetSmluvBezCeny = smlouvyStat.Summary().PocetSmluvBezCeny,
+                    PocetSmluvSeZasadnimNedostatkem = smlouvyStat.Summary().PocetSmluvSeZasadnimNedostatkem,
+                    PocetSmluvULimitu = smlouvyStat.Summary().PocetSmluvULimitu
+                };
+
+                res.RegistrSmluv = smlouvyStat
+                    .Select(smlouvyStat => new HlidacStatu.DS.Api.Firmy.SubjektDetailInfo.SmlouvyData()
+                    {
+                        Rok = smlouvyStat.Year,
+                        CelkovaHodnotaSmluv = smlouvyStat.Value.CelkovaHodnotaSmluv,
+                        HlavniOblasti = smlouvyStat.Value.PoOblastech
+                                .OrderByDescending(o => o.Value.CelkemCena)
+                                .ThenByDescending(o => o.Value.Pocet)
+                                .Take(3)
+                                .Select(m => ((Smlouva.SClassification.ClassificationsTypes?)m.Key).ToNiceDisplayName())
+                                .ToArray(),
+                        PocetSmluv = smlouvyStat.Value.PocetSmluv,
+                        PocetSmluvBezCeny = smlouvyStat.Value.PocetSmluvBezCeny,
+                        PocetSmluvSeZasadnimNedostatkem = smlouvyStat.Value.PocetSmluvSeZasadnimNedostatkem,
+                        PocetSmluvULimitu = smlouvyStat.Value.PocetSmluvULimitu
+                    })
+                    .ToList();
+            }
+
+
+            //dotace
+            var dotaceStat = f.StatistikaDotaci();
+            if (dotaceStat != null)
+            {
+                res.DotaceCelkem = new HlidacStatu.DS.Api.Firmy.SubjektDetailInfo.DotaceData()
+                {
+                    Rok = 0,
+                    CelkemPrideleno = dotaceStat.Summary().CelkemPrideleno,
+                    PocetDotaci = dotaceStat.Summary().PocetDotaci
+                };
+
+                res.Dotace = dotaceStat
+                    .Select(dotaceStat => new HlidacStatu.DS.Api.Firmy.SubjektDetailInfo.DotaceData()
+                    {
+                        Rok = dotaceStat.Year,
+                        CelkemPrideleno = dotaceStat.Value.CelkemPrideleno,
+                        PocetDotaci = dotaceStat.Value.PocetDotaci
+                    })
+                    .ToList();
+            }
+            if (f.Holding(aktualnost)?.Any() == true)
+            {
+                var smlouvyStatHolding = f.HoldingStatisticsRegistrSmluv(aktualnost);
+                if (smlouvyStatHolding != null)
+                {
+                    res.RegistrSmluvHoldingCelkem = new HlidacStatu.DS.Api.Firmy.SubjektDetailInfo.SmlouvyData()
+                    {
+                        Rok = 0,
+                        CelkovaHodnotaSmluv = smlouvyStatHolding.Summary().CelkovaHodnotaSmluv,
+                        HlavniOblasti = smlouvyStatHolding.Summary().PoOblastech
+                            .OrderByDescending(o => o.Value.CelkemCena)
+                            .ThenByDescending(o => o.Value.Pocet)
+                            .Take(3)
+                            .Select(m => ((Smlouva.SClassification.ClassificationsTypes?)m.Key).ToNiceDisplayName())
+                            .ToArray(),
+                        PocetSmluv = smlouvyStatHolding.Summary().PocetSmluv,
+                        PocetSmluvBezCeny = smlouvyStatHolding.Summary().PocetSmluvBezCeny,
+                        PocetSmluvSeZasadnimNedostatkem = smlouvyStatHolding.Summary().PocetSmluvSeZasadnimNedostatkem,
+                        PocetSmluvULimitu = smlouvyStatHolding.Summary().PocetSmluvULimitu
+                    };
+                    res.RegistrSmluvHolding = smlouvyStatHolding
+                        .Select(smlouvyStat => new HlidacStatu.DS.Api.Firmy.SubjektDetailInfo.SmlouvyData()
+                        {
+                            Rok = smlouvyStat.Year,
+                            CelkovaHodnotaSmluv = smlouvyStat.Value.CelkovaHodnotaSmluv,
+                            HlavniOblasti = smlouvyStat.Value.PoOblastech
+                                    .OrderByDescending(o => o.Value.CelkemCena)
+                                    .ThenByDescending(o => o.Value.Pocet)
+                                    .Take(3)
+                                    .Select(m => ((Smlouva.SClassification.ClassificationsTypes?)m.Key).ToNiceDisplayName())
+                                    .ToArray(),
+                            PocetSmluv = smlouvyStat.Value.PocetSmluv,
+                            PocetSmluvBezCeny = smlouvyStat.Value.PocetSmluvBezCeny,
+                            PocetSmluvSeZasadnimNedostatkem = smlouvyStat.Value.PocetSmluvSeZasadnimNedostatkem,
+                            PocetSmluvULimitu = smlouvyStat.Value.PocetSmluvULimitu
+                        })
+                        .ToList();
+                }
+
+                var dotaceStatHolding = f.HoldingStatistikaDotaci(aktualnost);
+                if (dotaceStatHolding != null)
+                {
+                    res.DotaceCelkemHolding = new HlidacStatu.DS.Api.Firmy.SubjektDetailInfo.DotaceData()
+                    {
+                        Rok = 0,
+                        CelkemPrideleno = dotaceStatHolding.Summary().CelkemPrideleno,
+                        PocetDotaci = dotaceStatHolding.Summary().PocetDotaci
+                    };
+
+                    res.DotaceHolding = dotaceStatHolding
+                        .Select(dotaceStat => new HlidacStatu.DS.Api.Firmy.SubjektDetailInfo.DotaceData()
+                        {
+                            Rok = dotaceStat.Year,
+                            CelkemPrideleno = dotaceStat.Value.CelkemPrideleno,
+                            PocetDotaci = dotaceStat.Value.PocetDotaci
+                        })
+                        .ToList();
+                }
+            } //if has holding
+
+            return res;
+        }
+
     }
+
+
 }

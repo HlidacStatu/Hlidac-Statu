@@ -1,4 +1,5 @@
 using Devmasters;
+using Devmasters.Collections;
 using HlidacStatu.Connectors;
 using HlidacStatu.DS.Graphs;
 using HlidacStatu.Entities;
@@ -396,9 +397,11 @@ namespace HlidacStatu.Extensions
             this Firma firma,
             Relation.AktualnostType aktualnost, int? obor = null, bool forceUpdateCache = false)
         {
-            return FirmaStatistics.CachedHoldingStatisticsSmlouvy(firma, aktualnost, obor, forceUpdateCache) ??
+
+            var ret = FirmaStatistics.CachedHoldingStatisticsSmlouvy(firma, aktualnost, obor, forceUpdateCache) ??
                 new Lib.Analytics.StatisticsSubjectPerYear<Smlouva.Statistics.Data>() { ICO = firma.ICO };
 
+            return ret;
         }
 
         public static bool PatrimStatuAlespon25procent(this Firma firma) => (firma.TypSubjektu == Firma.TypSubjektuEnum.PatrimStatuAlespon25perc);

@@ -28,18 +28,18 @@ namespace HlidacStatu.Entities.KIndex
         }
 
         //todo: neměl by tenhle být deprecated a používat se lastReadyKindex
-        [Obsolete("Použij LastReadyKIndex")]
-        public Annual LastKIndex(int? maxYear = null)
-        {
-            maxYear = maxYear ?? HlidacStatu.Util.ParseTools.ToInt(Devmasters.Config.GetWebConfigValue("KIndexMaxYear"));
-            if (maxYear.HasValue)
-                return roky?
-                    .Where(m => m.Rok <= maxYear.Value)?
-                    .OrderByDescending(m => m.Rok)?
-                    .FirstOrDefault();
-            else
-                return LastReadyKIndex(maxYear) ?? roky?.OrderByDescending(m => m.Rok)?.FirstOrDefault();
-        }
+        //[Obsolete("Použij LastReadyKIndex")]
+        //public Annual LastKIndex(int? maxYear = null)
+        //{
+        //    maxYear = maxYear ?? HlidacStatu.Util.ParseTools.ToInt(Devmasters.Config.GetWebConfigValue("KIndexMaxYear"));
+        //    if (maxYear.HasValue)
+        //        return roky?
+        //            .Where(m => m.Rok <= maxYear.Value)?
+        //            .OrderByDescending(m => m.Rok)?
+        //            .FirstOrDefault();
+        //    else
+        //        return LastReadyKIndex(maxYear) ?? roky?.OrderByDescending(m => m.Rok)?.FirstOrDefault();
+        //}
 
         public Annual LastReadyKIndex(int? maxYear = null)
         {

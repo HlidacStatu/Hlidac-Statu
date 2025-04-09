@@ -147,6 +147,48 @@ namespace HlidacStatuApi.Controllers.ApiV2
 
         }
 
+        /// <summary>
+        /// Vrátí detailní informace o firmách na základě IČO nebo názvů firem.
+        /// 
+        /// </summary>
+        /// <param name="icos">IČO nebo seznam IČO oddělený | (pipe)</param>
+        /// <param name="names">Jmeno firmy nebo seznam jmen firem oddělený znakem '|' (pipe)</param>
+        /// <returns></returns>
+        [Authorize(Roles = "Admin,Media")]
+        [HttpGet("GetDetailInfo")]
+        public ActionResult<List<HlidacStatu.DS.Api.Firmy.SubjektDetailInfo>> GetDetailInfo([FromQuery] string icos, [FromQuery] string names)
+        {
+            List<HlidacStatu.DS.Api.Firmy.SubjektDetailInfo> res = new List<HlidacStatu.DS.Api.Firmy.SubjektDetailInfo>();
+
+            if (!string.IsNullOrEmpty(icos))
+            {
+                var icosList = icos.Split('|').Select(i => i.Trim()).ToList();
+                foreach (var ico in icosList)
+                {
+                    var inf = HlidacStatu.Repositories.FirmaRepo.GetDetailInfo(ico,"");
+                    if (inf != null)
+                    {
+                        res.Add(inf);
+                    }   
+                }
+            }
+            if (!string.IsNullOrEmpty(names))
+            {
+                var namesList = names.Split('|').Select(i => i.Trim()).ToList();
+                foreach (var nam in namesList)
+                {
+                    var inf = HlidacStatu.Repositories.FirmaRepo.GetDetailInfo("", nam);
+                    if (inf != null)
+                    {
+                        res.Add(inf);
+                    }
+                }
+            }
+
+            return res;
+        }
+
+
         private FirmaSocialDTO TransformEventsToFirmaSocial(IGrouping<string, OsobaEvent> groupedEvents)
         {
             var firma = FirmaRepo.FromIco(groupedEvents.Key);
