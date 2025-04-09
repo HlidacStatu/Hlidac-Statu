@@ -2,6 +2,7 @@ using HlidacStatu.Entities;
 using HlidacStatu.Entities.XSD;
 using HlidacStatu.Repositories;
 using HlidacStatu.Util;
+using HlidacStatu.Entities.Facts;
 
 using Nest;
 
@@ -12,6 +13,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using HlidacStatu.Connectors;
 using Serilog;
+using HlidacStatu.Entities.Facts;
 
 namespace HlidacStatu.Extensions
 {
@@ -231,7 +233,7 @@ namespace HlidacStatu.Extensions
         public static string SocialInfoBody(this Smlouva smlouva)
         {
             return "<ul>" +
-                   InfoFact.RenderInfoFacts(smlouva.InfoFacts(), 4, true, true, "", "<li>{0}</li>", true)
+                   InfoFact.RenderFacts(smlouva.InfoFacts(), 4, true, true, "", "<li>{0}</li>", true)
                    + "</ul>";
         }
 

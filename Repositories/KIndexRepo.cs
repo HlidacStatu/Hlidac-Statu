@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using HlidacStatu.Connectors;
 using HlidacStatu.Entities;
+using HlidacStatu.Entities.Facts;
 using HlidacStatu.Entities.KIndex;
 using HlidacStatu.Util;
 using Nest;

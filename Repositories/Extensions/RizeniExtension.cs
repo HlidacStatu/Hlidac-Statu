@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Serilog;
 using Rizeni = HlidacStatu.Entities.Insolvence.Rizeni;
+using HlidacStatu.Entities.Facts;
 
 namespace HlidacStatu.Extensions
 {
@@ -63,7 +64,7 @@ namespace HlidacStatu.Extensions
         public static string SocialInfoBody(this Rizeni rizeni)
         {
             return "<ul>" +
-                   InfoFact.RenderInfoFacts(rizeni.InfoFacts(), 4, true, true, "", "<li>{0}</li>", true)
+                   InfoFact.RenderFacts(rizeni.InfoFacts(), 4, true, true, "", "<li>{0}</li>", true)
                    + "</ul>";
         }
 

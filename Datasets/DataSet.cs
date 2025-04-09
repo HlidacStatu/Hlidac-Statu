@@ -22,6 +22,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using HlidacStatu.Connectors;
 using Serilog;
+using HlidacStatu.Entities.Facts;
 
 namespace HlidacStatu.Datasets
 {
@@ -1215,7 +1216,7 @@ namespace HlidacStatu.Datasets
         public string SocialInfoBody()
         {
             var infoFacts = InfoFactsAsync().ConfigureAwait(false).GetAwaiter().GetResult();
-            return InfoFact.RenderInfoFacts(infoFacts, 2, true, html: true);
+            return InfoFact.RenderFacts(infoFacts, 2, true, html: true);
         }
 
         public string SocialInfoFooter()

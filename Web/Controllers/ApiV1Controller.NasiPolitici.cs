@@ -15,6 +15,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
+using HlidacStatu.Entities.Facts;
 
 namespace HlidacStatu.Web.Controllers
 {
@@ -107,12 +108,12 @@ namespace HlidacStatu.Web.Controllers
 
 
             var statDescription =
-                InfoFact.RenderInfoFacts((o.InfoFactsCached())
+                InfoFact.RenderFacts((o.InfoFactsCached())
                     .Where(i => i.Level != InfoFact.ImportanceLevel.Stat).ToArray()
                     , 4, true, true, "", "{0}");
 
             var angazovanost =
-                InfoFact.RenderInfoFacts((o.InfoFactsCached())
+                InfoFact.RenderFacts((o.InfoFactsCached())
                     .Where(m => m.Level == InfoFact.ImportanceLevel.Stat).ToArray()
                     , 4, true, true, "", "{0}");
 

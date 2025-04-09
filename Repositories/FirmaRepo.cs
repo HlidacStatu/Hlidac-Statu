@@ -485,6 +485,8 @@ namespace HlidacStatu.Repositories
             res.Ico = f.ICO;
             res.Jmeno = f.Jmeno;
             res.OmezeniCinnosti = f.StatusFull();
+            //res.Rizika = f.InfoFacts;
+
 
             if (f.JsemNeziskovka())
                 res.Charakter = DS.Api.Firmy.SubjektDetailInfo.CharakterEnum.NeziskovaOrganizace;
@@ -514,7 +516,7 @@ namespace HlidacStatu.Repositories
                         {
                             KIndex = kidx.KIndexLabel.ToString(),
                             ObrazekUrl = kidx.KIndexLabelIconUrl(false),
-                            Popis = HlidacStatu.Util.InfoFact.RenderInfoFacts(kindex.InfoFacts(i), 3, true, true, ", "),
+                            Popis = HlidacStatu.Entities.Facts.InfoFact.RenderFacts(kindex.InfoFacts(i), 3, true, true, ", "),
                             Rok = i
                         });
                     }

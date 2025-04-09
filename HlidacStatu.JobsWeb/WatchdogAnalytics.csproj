@@ -9,6 +9,9 @@
 
     <ItemGroup>
       <Compile Remove="wwwroot\assets\vendor\**" />
+      <Content Remove="wwwroot\assets\vendor\**" />
+      <EmbeddedResource Remove="wwwroot\assets\vendor\**" />
+      <None Remove="wwwroot\assets\vendor\**" />
     </ItemGroup>
 
     <ItemGroup>

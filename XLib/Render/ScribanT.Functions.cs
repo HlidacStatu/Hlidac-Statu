@@ -222,7 +222,7 @@ namespace HlidacStatu.XLib.Render
                     var o = Firmy.instanceByIco.Get(ico);
                     if (o?.Valid == true)
                     {
-                        string niceString = HlidacStatu.Util.InfoFact.RenderInfoFacts(o.InfoFacts(), numberOfInfos, true, false, delimiterBetweenInfos);
+                        string niceString = HlidacStatu.Entities.Facts.InfoFact.RenderFacts(o.InfoFacts(), numberOfInfos, true, false, delimiterBetweenInfos);
 
                         return $"<span>{prefix}{niceString}{postfix}</span>";
                     }

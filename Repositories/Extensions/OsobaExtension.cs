@@ -3,6 +3,7 @@ using Devmasters.Enums;
 using Devmasters.Lang.CS;
 using HlidacStatu.DS.Graphs;
 using HlidacStatu.Entities;
+using HlidacStatu.Entities.Facts;
 using HlidacStatu.Lib.Analytics;
 using HlidacStatu.Repositories;
 using HlidacStatu.Repositories.Searching;
@@ -474,7 +475,7 @@ namespace HlidacStatu.Extensions
         public static string SocialInfoBody(this Osoba osoba)
         {
             return "<ul>"
-                   + InfoFact.RenderInfoFacts(osoba.InfoFactsCached(),
+                   + InfoFact.RenderFacts(osoba.InfoFactsCached(),
                        4, true, true, "", "<li>{0}</li>", true)
                    + "</ul>";
         }

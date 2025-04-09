@@ -326,7 +326,7 @@ else
     <div class="onlyembed">
         <div class="container text">
             <h3>Insolvence @Devmasters.TextUtil.ShortenText(Model.Rizeni.SpisovaZnacka, 60)</h3>
-            <p>@Html.Raw(HlidacStatu.Util.InfoFact.RenderInfoFacts(Model.Rizeni.InfoFacts(), 2, true, true, html: true)) </p>
+            <p>@Html.Raw(HlidacStatu.Entities.Facts.InfoFact.RenderFacts(Model.Rizeni.InfoFacts(), 2, true, true, html: true)) </p>
             <p><a href="@Model.GetUrl(true)" target="_top">Více informací o insolvenčním řízení</a></p>
         </div>
         <img src="@($"/socialbanner/insolvence?d={DateTime.Now.ToString("yyMMdd")}&v={Model.Rizeni.SpisovaZnacka}")"

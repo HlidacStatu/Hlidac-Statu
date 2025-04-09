@@ -1,3 +1,4 @@
+using HlidacStatu.Entities.Facts;
 using HlidacStatu.Entities.VZ;
 using HlidacStatu.Repositories;
 using HlidacStatu.Util;
@@ -43,7 +44,7 @@ namespace HlidacStatu.Extensions
         public static string SocialInfoBody(this VerejnaZakazka verejnaZakazka)
         {
             return "<ul>" +
-                   InfoFact.RenderInfoFacts(verejnaZakazka.InfoFacts(), 4, true, true, "", "<li>{0}</li>", true)
+                   InfoFact.RenderFacts(verejnaZakazka.InfoFacts(), 4, true, true, "", "<li>{0}</li>", true)
                    + "</ul>";
         }
 

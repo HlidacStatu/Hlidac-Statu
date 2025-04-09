@@ -313,7 +313,7 @@ else
     <div class="onlyembed">
         <div class="container text">
             <h3>@Devmasters.TextUtil.ShortenText(Model.NazevZakazky, 60)</h3>
-            <p>@Html.Raw(HlidacStatu.Util.InfoFact.RenderInfoFacts(Model.InfoFacts(), 2, true, true, html: true)) </p>
+            <p>@Html.Raw(HlidacStatu.Entities.Facts.InfoFact.RenderFacts(Model.InfoFacts(), 2, true, true, html: true)) </p>
             <p>
                 <a href="@Model.GetUrl(true)" target="_top">Více informací o zakázce</a>
             </p>

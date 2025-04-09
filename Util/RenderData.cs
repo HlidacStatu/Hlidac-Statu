@@ -20,13 +20,13 @@ namespace HlidacStatu.Util
             NoChange,
         }
 
-        public static string RenderInfoFacts(this IEnumerable<InfoFact> infofacts, int number,
-            bool takeSummary = true, bool shuffle = false,
-            string delimiterBetween = " ",
-            string lineFormat = "{0}", bool html = false)
-        {
-            return InfoFact.RenderInfoFacts(infofacts.ToArray(), number, takeSummary, shuffle, delimiterBetween, lineFormat, html);
-        }
+        //public static string RenderInfoFacts(this IEnumerable<InfoFact> infofacts, int number,
+        //    bool takeSummary = true, bool shuffle = false,
+        //    string delimiterBetween = " ",
+        //    string lineFormat = "{0}", bool html = false)
+        //{
+        //    return InfoFact.RenderFacts(infofacts.ToArray(), number, takeSummary, shuffle, delimiterBetween, lineFormat, html);
+        //}
 
         public static string GetIntervalString(DateTime from, DateTime to)
         {

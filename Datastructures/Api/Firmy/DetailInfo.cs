@@ -47,6 +47,9 @@ namespace HlidacStatu.DS.Api.Firmy
         /// </summary>
         public CharakterEnum Charakter { get; set; }
 
+        public string Rizika { get; set; } = string.Empty;
+
+
         /// <summary>
         /// Odkaz na zdrojová data subjektu. Nutno uvést při použití dat.
         /// </summary>

@@ -3,12 +3,12 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace HlidacStatu.Util
+namespace HlidacStatu.Entities.Facts
 {
-    public class InfoFact
+    public abstract class Fact
     {
-        public InfoFact() { }
-        public InfoFact(string txt, ImportanceLevel level)
+        public Fact() { }
+        public Fact(string txt, ImportanceLevel level)
         {
             Text = txt;
             Level = level;
@@ -35,20 +35,20 @@ namespace HlidacStatu.Util
                 return Devmasters.TextUtil.RemoveHTML(Text);
         }
 
-        public static string RenderInfoFacts(InfoFact[] infofacts, int number,
+        public static string RenderFacts(Fact[] Facts, int number,
             bool takeSummary = true, bool shuffle = false,
             string delimiterBetween = " ",
             string lineFormat = "{0}", bool html = false)
         {
-            if ((infofacts?.Count() ?? 0) == 0)
+            if ((Facts?.Count() ?? 0) == 0)
                 return string.Empty;
 
-            IEnumerable<InfoFact> infof = infofacts
+            IEnumerable<Fact> infof = Facts
                 .Where(m => m.Level != ImportanceLevel.Summary)
                 .OrderByDescending(o => o.Level).ToArray();
-            InfoFact summaryIf = infofacts.FirstOrDefault(m => m.Level == ImportanceLevel.Summary);
+            Fact summaryIf = Facts.FirstOrDefault(m => m.Level == ImportanceLevel.Summary);
 
-            var taken = new List<InfoFact>();
+            var taken = new List<Fact>();
 
             if (takeSummary && summaryIf != null)
                 taken.Add(summaryIf);

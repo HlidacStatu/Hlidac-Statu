@@ -3,7 +3,7 @@ using Devmasters.Collections;
 using HlidacStatu.Connectors;
 using HlidacStatu.DS.Graphs;
 using HlidacStatu.Entities;
-using HlidacStatu.Entities;
+using HlidacStatu.Entities.Facts;
 using HlidacStatu.Entities.KIndex;
 using HlidacStatu.Entities.Views;
 using HlidacStatu.Lib.Data.External.RPP;
@@ -263,7 +263,7 @@ namespace HlidacStatu.Extensions
         public static string SocialInfoBody(this Firma firma)
         {
             return "<ul>" +
-                   InfoFact.RenderInfoFacts(firma.InfoFacts(), 4, true, true, "", "<li>{0}</li>", true)
+                   InfoFact.RenderFacts(firma.InfoFacts(), 4, true, true, "", "<li>{0}</li>", true)
                    + "</ul>";
         }
 
@@ -636,6 +636,9 @@ namespace HlidacStatu.Extensions
             _infoFactsCache().Delete(firma);
 
         }
+
+
+
         public static InfoFact[] InfoFacts(this Firma firma, bool forceUpdateCache = false) //otázka jestli tohle nebrat z cachce
         {
             //STAT FIX
@@ -910,6 +913,8 @@ namespace HlidacStatu.Extensions
 
             return infofacts;
         }
+
+
 
     }
 }

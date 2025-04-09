@@ -405,7 +405,7 @@ text zpravy: {txt}";
             if (kidx != null)
             {
                 KIndexData.KIndexLabelValues label;
-                Util.InfoFact[] infoFacts;
+                HlidacStatu.Entities.Facts.InfoFact[] infoFacts;
                 int year;
                 if (rok is null)
                 {
@@ -423,7 +423,7 @@ text zpravy: {txt}";
 
                 KIndexGenerator.IndexLabel img = new KIndexGenerator.IndexLabel(Connectors.Init.WebAppDataPath);
                 data = img.GenerateImageByteArray(kidx.Jmeno,
-                    Util.InfoFact.RenderInfoFacts(infoFacts,
+                    HlidacStatu.Entities.Facts.InfoFact.RenderFacts(infoFacts,
                         3,
                         takeSummary: (label == KIndexData.KIndexLabelValues.None),
                         shuffle: false,
