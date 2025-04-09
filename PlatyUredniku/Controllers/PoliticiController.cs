@@ -23,7 +23,7 @@ public class PoliticiController : Controller
     
     public async Task<IActionResult> Index()
     {
-        var platyTask = _cache.GetOrSetAsync<List<PuPolitikPrijem>>(
+        var platyTask = _cache.GetOrSetAsync<List<PpPrijem>>(
             $"{nameof(PpRepo.GetPlatyAsync)}_{PpRepo.DefaultYear}-politici",
             _ => PpRepo.GetPlatyAsync(PpRepo.DefaultYear)
         );
@@ -108,7 +108,7 @@ public class PoliticiController : Controller
 
     public async Task<IActionResult> Politik(string id)
     {
-        var detail = await _cache.GetOrSetAsync<List<PuPolitikPrijem>>(
+        var detail = await _cache.GetOrSetAsync<List<PpPrijem>>(
             $"{nameof(PpRepo.GetPrijmyPolitika)}_{id}-politici",
             _ => PpRepo.GetPrijmyPolitika(id)
         );

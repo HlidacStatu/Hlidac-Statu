@@ -252,6 +252,13 @@ namespace HlidacStatu.Repositories
                 .Distinct()?
                 .Count() ?? 0;
         }
+        public static HlidacStatu.DS.Graphs.Graph.Edge[] PrimaAngazovanost(this Osoba osoba, Relation.AktualnostType minAktualnost, bool refresh = false)
+        {
+            var vazby = Relation.AktualniVazby(osoba.Vazby(refresh), minAktualnost, osoba.VazbyRootEdge());
+
+            var res = vazby.Where(v => v.Distance == 1).ToArray();
+            return res;
+        }
 
         public static HlidacStatu.DS.Graphs.Graph.Edge[] AktualniVazby(this Osoba osoba, Relation.AktualnostType minAktualnost, bool refresh = false)
         {

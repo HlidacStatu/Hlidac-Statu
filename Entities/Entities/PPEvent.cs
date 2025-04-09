@@ -5,7 +5,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 namespace HlidacStatu.Entities;
 
 [Table("PP_Event")]
-public class PPevent
+public class PpEvent
 {
     public enum TypUdalosti : int
     {
@@ -27,6 +27,13 @@ public class PPevent
         ZpravaOdNas = 1,
         ZpravaProNas = 2
     }
+    public enum KomunikacniKanal : int
+    {
+        Jiny = 0,
+        DatovaSchranka = 1,
+        Email = 2,
+        Telefon = 3,
+    }
 
     [Key]
     [Column("pk")]
@@ -38,12 +45,14 @@ public class PPevent
     public TypUdalosti Typ { get; set; } = 0;
     public SmerKomunikace Smer { get; set; } = 0;
 
-    public int IcoOrganizace { get; set; }
+    public KomunikacniKanal Kanal { get; set; } = 0;
+    public string IcoOrganizace { get; set; }
     public DateTime Datum { get; set; }
 
-    public string NaseCJ { get; set; }
-    public string Poznamka { get; set; }
+    public string? NaseCJ { get; set; }
+    public string? Poznamka { get; set; }
 
-    public string PoznamkaSkryta { get; set; }
+    public string? PoznamkaSkryta { get; set; }
+
 
 }

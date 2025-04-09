@@ -33,16 +33,16 @@ public static class PpRepo
 
     
 
-    public static List<PuPolitikPrijem> AktualniRok(this ICollection<PuPolitikPrijem> prijmy, int rok = DefaultYear)
+    public static List<PpPrijem> AktualniRok(this ICollection<PpPrijem> prijmy, int rok = DefaultYear)
     {
         return prijmy?.Where(m => m.Rok == rok).ToList();
     }
 
-    public static async Task<PuPolitikPrijem> GetPrijemAsync(int id)
+    public static async Task<PpPrijem> GetPrijemAsync(int id)
     {
         await using var db = new DbEntities();
 
-        return await db.PuPoliticiPrijmy
+        return await db.PpPrijmy
             .AsNoTracking()
             .Include(p => p.Organizace).ThenInclude(o => o.FirmaDs)
             .Include(p => p.Organizace).ThenInclude(o => o.Tags)
@@ -50,11 +50,11 @@ public static class PpRepo
             .FirstOrDefaultAsync();
     }
 
-    public static async Task<PuPolitikPrijem> GetPlatAsync(int idOrganizace, int rok, string nameid)
+    public static async Task<PpPrijem> GetPlatAsync(int idOrganizace, int rok, string nameid)
     {
         await using var db = new DbEntities();
 
-        return await db.PuPoliticiPrijmy
+        return await db.PpPrijmy
             .AsNoTracking()
             .FirstOrDefaultAsync(p => p.IdOrganizace == idOrganizace
                                       && p.Rok == rok
@@ -70,13 +70,13 @@ public static class PpRepo
             .Where(m => m.Typ == PuOrganizaceMetadata.TypMetadat.PlatyPolitiku)
             .CountAsync(m => m.DatumOdeslaniZadosti.HasValue && m.Rok == rok);
 
-        stat.PocetCoPoslaliPlat = await db.PuPoliticiPrijmy
+        stat.PocetCoPoslaliPlat = await db.PpPrijmy
             .Where(m => m.Rok == rok)
             .Select(m => m.IdOrganizace)
             .Distinct()
             .CountAsync();
 
-        var platyRok = db.PuPoliticiPrijmy
+        var platyRok = db.PpPrijmy
             .AsNoTracking()
             .Where(m => m.Rok == rok)
             .Select(m => new { mplat = m.HrubyMesicniPlatVcetneOdmen, plat = m, org = m.Organizace })
@@ -99,11 +99,11 @@ public static class PpRepo
         return stat;
     }
     
-    public static async Task<List<PuPolitikPrijem>> GetPrijmyPolitika(string nameid)
+    public static async Task<List<PpPrijem>> GetPrijmyPolitika(string nameid)
     {
         await using var db = new DbEntities();
 
-        return await db.PuPoliticiPrijmy
+        return await db.PpPrijmy
             .AsNoTracking()
             .Include(p => p.Organizace).ThenInclude(o => o.FirmaDs)
             .Include(p => p.Organizace).ThenInclude(o => o.Tags)
@@ -116,7 +116,7 @@ public static class PpRepo
     {
         await using var db = new DbEntities();
 
-        return await db.PuPoliticiPrijmy
+        return await db.PpPrijmy
             .AsNoTracking()
             .Where(p => p.Rok == rok)
             .CountAsync();
@@ -145,11 +145,11 @@ public static class PpRepo
         "politici",
     ];
     
-    public static async Task<List<PuPolitikPrijem>> GetPlatyAsync(int rok)
+    public static async Task<List<PpPrijem>> GetPlatyAsync(int rok)
     {
         await using var db = new DbEntities();
-
-        return await db.PuPoliticiPrijmy
+        
+        return await db.PpPrijmy
             .AsNoTracking()
             .Where(p => p.Rok == rok)
             .ToListAsync();
@@ -224,11 +224,11 @@ public static class PpRepo
         return res;
     }
 
-    public static async Task<List<PuPolitikPrijem>> GetPlatyWithOrganizaceForYearAsync(int rok)
+    public static async Task<List<PpPrijem>> GetPlatyWithOrganizaceForYearAsync(int rok)
     {
         await using var db = new DbEntities();
 
-        return await db.PuPoliticiPrijmy
+        return await db.PpPrijmy
             .AsNoTracking()
             .Include(p => p.Organizace)
             .ThenInclude(o => o.FirmaDs)
@@ -236,11 +236,11 @@ public static class PpRepo
             .ToListAsync();
     }
 
-    public static async Task<List<PuPolitikPrijem>> GetPoziceDlePlatuAsync(int rangeMin, int rangeMax, int year)
+    public static async Task<List<PpPrijem>> GetPoziceDlePlatuAsync(int rangeMin, int rangeMax, int year)
     {
         await using var db = new DbEntities();
 
-        return await db.PuPoliticiPrijmy
+        return await db.PpPrijmy
             .AsNoTracking()
             .Where(p => p.Rok == year)
             .Where(p => (((p.Plat ?? 0) + (p.Odmeny ?? 0)) / (p.PocetMesicu ?? 12)) >= rangeMin)
@@ -308,7 +308,7 @@ public static class PpRepo
         }
     }
 
-    public static async Task UpsertPrijemPolitikaAsync(PuPolitikPrijem prijemPolitika)
+    public static async Task UpsertPrijemPolitikaAsync(PpPrijem prijemPolitika)
     {
         if (string.IsNullOrWhiteSpace(prijemPolitika.NazevFunkce))
         {
@@ -330,25 +330,25 @@ public static class PpRepo
             throw new Exception("Chybí vyplněné nameid");
         }
         
-        PuPolitikPrijem origPlat;
+        PpPrijem origPlat;
 
         await using var dbContext = new DbEntities();
         if (prijemPolitika.Id == 0)
         {
-            origPlat = await dbContext.PuPoliticiPrijmy
+            origPlat = await dbContext.PpPrijmy
                 .FirstOrDefaultAsync(p => p.IdOrganizace == prijemPolitika.IdOrganizace
                                           && p.Rok == prijemPolitika.Rok
                                           && p.Nameid == prijemPolitika.Nameid);
         }
         else
         {
-            origPlat = await dbContext.PuPoliticiPrijmy
+            origPlat = await dbContext.PpPrijmy
                 .FirstOrDefaultAsync(p => p.Id == prijemPolitika.Id);
         }
 
         if (origPlat is null)
         {
-            dbContext.PuPoliticiPrijmy.Add(prijemPolitika);
+            dbContext.PpPrijmy.Add(prijemPolitika);
         }
         else
         {

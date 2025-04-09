@@ -275,11 +275,13 @@ namespace HlidacStatu.Entities
         public virtual DbSet<TypOvm> TypOvm { get; set; }
         public virtual DbSet<ConfigurationValue> ConfigurationValues { get; set; }
         
-        public virtual DbSet<PlatUrednika> PlatyUredniku { get; set; }
         
         public virtual DbSet<PuOrganizace> PuOrganizace { get; set; }
         public virtual DbSet<PuPlat> PuPlaty { get; set; }
-        public virtual DbSet<PuPolitikPrijem> PuPoliticiPrijmy { get; set; }
+        public virtual DbSet<PpPrijem> PpPrijmy { get; set; }
+
+        public virtual DbSet<PpEvent> PpEvents{ get; set; }
+
         public virtual DbSet<PuVydelek> PuVydelky { get; set; }
         public virtual DbSet<PuCZISCO> PuCZISCO { get; set; }
         public virtual DbSet<PuOrganizaceMetadata> PuOrganizaceMetadata { get; set; }

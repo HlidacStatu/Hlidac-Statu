@@ -63,7 +63,7 @@ public class AreaRangePlot
             return null; 
     }
     
-    public static AreaRangePlot ToAreaRangePlotWithPrumer(IEnumerable<PuPolitikPrijem> platy, string dataName,
+    public static AreaRangePlot ToAreaRangePlotWithPrumer(IEnumerable<PpPrijem> platy, string dataName,
         string extraTitle = "Průměr ", string minMaxTitle = "Výdělek od-do ")
     {
 

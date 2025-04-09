@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 namespace HlidacStatu.Entities;
 
 [Table("PU_PolitikPrijem")]
-public class PuPolitikPrijem
+public class PpPrijem
 {
     [Key]
     public int Id { get; set; }

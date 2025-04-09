@@ -3,7 +3,7 @@
 @inject ZiggyCreatures.Caching.Fusion.IFusionCache cache;
 @{
     var stats = await PpRepo.GetGlobalStatAsync();
-    List<PuPolitikPrijem> platy = (List<PuPolitikPrijem>?)ViewData["platy"];
+    List<PpPrijem> platy = (List<PpPrijem>?)ViewData["platy"];
 }
 
 <section class="d-flex align-items-center justify-content-center">

@@ -30,6 +30,8 @@ namespace HlidacStatu.Util
         public static System.Globalization.CultureInfo csCulture = System.Globalization.CultureInfo.GetCultureInfo("cs");
         public static Random Rnd = new Random();
 
+        public static string RootPath = System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
+
         //todo: what to do here? IDK - we should get rid of devmasters log logger, since it can rewrite global logger
         public static Devmasters.Log.Logger LW = Devmasters.Log.Logger.CreateLogger("progress writer",
             new LoggerConfiguration().WriteTo.Console(), false);

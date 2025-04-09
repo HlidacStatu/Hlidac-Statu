@@ -27,7 +27,7 @@ public class PuOrganizace
     public virtual FirmaDs FirmaDs { get; set; }
     public virtual ICollection<PuOrganizaceTag> Tags { get; set; }
     public virtual ICollection<PuPlat> Platy { get; set; }
-    public virtual ICollection<PuPolitikPrijem> PrijmyPolitiku { get; set; }
+    public virtual ICollection<PpPrijem> PrijmyPolitiku { get; set; }
     public virtual ICollection<PuOrganizaceMetadata> Metadata { get; set; }
 
 

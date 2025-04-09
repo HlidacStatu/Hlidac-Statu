@@ -78,7 +78,7 @@
 
     if (prijmyPoLetech.Any(m => m.Key == PpRepo.DefaultYear) == false)
     {
-        prijmyPoLetech.Add(new { Key = PpRepo.DefaultYear, Platy = new List<PuPolitikPrijem>() });
+        prijmyPoLetech.Add(new { Key = PpRepo.DefaultYear, Platy = new List<PpPrijem>() });
     }
 
     prijmyPoLetech = prijmyPoLetech.OrderByDescending(pg => pg.Key).ToList();
