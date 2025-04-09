@@ -1,6 +1,7 @@
 ﻿@model (string id, int? rok, string priv)
 @using System.Linq;
 @using HlidacStatu.Entities
+@using HlidacStatu.Entities.Facts
 @using HlidacStatu.Entities.KIndex
 @using HlidacStatu.Repositories
 @using HlidacStatu.Repositories.Analysis.KorupcniRiziko
@@ -34,7 +35,7 @@
     if (f.Valid && kidx != null)
     {
         ViewBag.SocialShareTitle = $"Index klíčových rizik pro " + f.Jmeno;
-        ViewBag.SocialShareText = HlidacStatu.Entities.Facts.InfoFact.RenderFacts(kidx.InfoFacts(), 4, true, true, ", ");
+        ViewBag.SocialShareText = kidx.InfoFacts().RenderFacts(4, true, true, ", ");
         ViewBag.SocialShareType = "article";
         ViewBag.SocialImage = "https://www.hlidacstatu.cz/socialbanner/kindex?v=" + Model.id;
         ViewBag.OpenGraphMore = "<meta property=\"og:image:width\" content=\"1000\" />\n"

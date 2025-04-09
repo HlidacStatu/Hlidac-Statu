@@ -12,7 +12,7 @@
     ViewBag.SubTitle = "Smlouva číslo " + Model.Id;
 
     ViewBag.SocialShareTitle = $"Smlouva {Model.Id}. {Model.predmet}";
-    ViewBag.SocialShareText = HlidacStatu.Entities.Facts.InfoFact.RenderFacts(Model.InfoFacts(), 4, true, true, ", ");
+    ViewBag.SocialShareText = Model.InfoFacts().RenderFacts(4, true, true, ", ");
     ViewBag.SocialShareType = "article";
     ViewBag.SocialImage = $"https://www.hlidacstatu.cz/socialbanner/smlouva?d={DateTime.Now.ToString("yyMMdd")}&v=" + Model.Id;
     ViewBag.OpenGraphMore = "<meta property=\"og:image:width\" content=\"1920\" />\n"

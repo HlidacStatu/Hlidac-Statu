@@ -233,7 +233,7 @@ namespace HlidacStatu.Extensions
         public static string SocialInfoBody(this Smlouva smlouva)
         {
             return "<ul>" +
-                   InfoFact.RenderFacts(smlouva.InfoFacts(), 4, true, true, "", "<li>{0}</li>", true)
+                   smlouva.InfoFacts().RenderFacts(4, true, true, "", "<li>{0}</li>", true)
                    + "</ul>";
         }
 

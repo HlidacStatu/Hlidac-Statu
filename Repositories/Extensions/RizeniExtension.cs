@@ -64,7 +64,7 @@ namespace HlidacStatu.Extensions
         public static string SocialInfoBody(this Rizeni rizeni)
         {
             return "<ul>" +
-                   InfoFact.RenderFacts(rizeni.InfoFacts(), 4, true, true, "", "<li>{0}</li>", true)
+                   rizeni.InfoFacts().RenderFacts( 4, true, true, "", "<li>{0}</li>", true)
                    + "</ul>";
         }
 

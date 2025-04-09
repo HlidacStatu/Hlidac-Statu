@@ -35,42 +35,6 @@ namespace HlidacStatu.Entities.Facts
                 return Devmasters.TextUtil.RemoveHTML(Text);
         }
 
-        public static string RenderFacts(Fact[] Facts, int number,
-            bool takeSummary = true, bool shuffle = false,
-            string delimiterBetween = " ",
-            string lineFormat = "{0}", bool html = false)
-        {
-            if ((Facts?.Count() ?? 0) == 0)
-                return string.Empty;
-
-            IEnumerable<Fact> infof = Facts
-                .Where(m => m.Level != ImportanceLevel.Summary)
-                .OrderByDescending(o => o.Level).ToArray();
-            Fact summaryIf = Facts.FirstOrDefault(m => m.Level == ImportanceLevel.Summary);
-
-            var taken = new List<Fact>();
-
-            if (takeSummary && summaryIf != null)
-                taken.Add(summaryIf);
-
-
-            if (taken.Count < number)
-            {
-                if (shuffle && taken.Count() > 1)
-                    taken.AddRange(infof.ShuffleMe().Take(number - taken.Count));
-                else
-                    taken.AddRange(infof.Take(number - taken.Count));
-            }
-
-            bool useStringF = lineFormat.Contains("{0}");
-
-            if (taken.Count == 0)
-                return "";
-            else
-                return taken
-                    .Select(t => useStringF ? string.Format(lineFormat, t.Render(html)) : t.Render(html))
-                    .Aggregate((f, s) => f + delimiterBetween + s);
-        }
 
     }
 }

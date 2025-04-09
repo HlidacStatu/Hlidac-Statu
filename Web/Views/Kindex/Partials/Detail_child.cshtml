@@ -4,6 +4,7 @@
 @using System.Linq;
 @using System.Net
 @using HlidacStatu.Entities
+@using HlidacStatu.Entities.Facts
 @using HlidacStatu.Entities.KIndex
 @using HlidacStatu.Repositories
 @using HlidacStatu.Repositories.Analysis.KorupcniRiziko
@@ -178,7 +179,7 @@ else
                 </div>
                 <div class="col-sm-10">
                     <div style="font-size:26px;line-height:30px;">
-                        @Html.Raw(HlidacStatu.Entities.Facts.InfoFact.RenderFacts(Model.InfoFacts(currYear.Rok), 3, true, false, lineFormat: "<div>{0}</div>", html: true))
+                        @Html.Raw(Model.InfoFacts(currYear.Rok).RenderFacts(3, true, false, lineFormat: "<div>{0}</div>", html: true))
                     </div>
                 </div>
             </div>

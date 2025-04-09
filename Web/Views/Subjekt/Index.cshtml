@@ -6,6 +6,7 @@
 @using HlidacStatu.Datasets
 @using HlidacStatu.DS.Graphs
 @using HlidacStatu.Entities
+@using HlidacStatu.Entities.Facts
 @using HlidacStatu.Extensions
 @using HlidacStatu.Repositories
 @using HlidacStatu.XLib
@@ -119,7 +120,7 @@
                 </div>
                 <div class="col-sm-10">
                     <div>
-                        @Html.Raw(HlidacStatu.Entities.Facts.InfoFact.RenderFacts(kindex.InfoFacts(kindex.LastReadyKIndex(HtmlExtensions.MaxKIndexYearToShow(this.User)).Rok), 3, true, false, lineFormat: "<p>{0}</p>", html: true))
+                        @Html.Raw(kindex.InfoFacts(kindex.LastReadyKIndex(HtmlExtensions.MaxKIndexYearToShow(this.User)).Rok).RenderFacts(3, true, false, lineFormat: "<p>{0}</p>", html: true))
                     </div>
                 </div>
             </div>
@@ -153,7 +154,7 @@
         @if (OnSankcniSeznam)
         {
             <p>
-                <i class="fas fa-exclamation-circle" style="color:@Riziko.RizikoColor(Riziko.RizikoValues.F);padding-right:20px;"></i>
+                <i class="fas fa-exclamation-circle" style="color:@HlidacStatu.Entities.Analysis.Riziko.RizikoColor(HlidacStatu.Entities.Analysis.Riziko.RizikoValues.F);padding-right:20px;"></i>
                 <b>Firma je pravděpodobně na sankčním seznamu @(string.Join(" a ", sankcniSeznamRes))</b>
                 <a href="/data/Hledat/firmy-na-sankcnim-seznamu?Q=ico:@Model.ICO">
                     <i class='fas fa-link'></i>

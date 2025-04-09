@@ -475,7 +475,7 @@ namespace HlidacStatu.Extensions
         public static string SocialInfoBody(this Osoba osoba)
         {
             return "<ul>"
-                   + InfoFact.RenderFacts(osoba.InfoFactsCached(),
+                   + osoba.InfoFactsCached().RenderFacts(
                        4, true, true, "", "<li>{0}</li>", true)
                    + "</ul>";
         }

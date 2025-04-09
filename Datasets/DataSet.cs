@@ -1,6 +1,7 @@
 ﻿using Elasticsearch.Net;
 using HlidacStatu.DS.Api;
 using HlidacStatu.Entities;
+using HlidacStatu.Entities.Facts;
 using HlidacStatu.Repositories;
 using HlidacStatu.Util;
 
@@ -1216,7 +1217,7 @@ namespace HlidacStatu.Datasets
         public string SocialInfoBody()
         {
             var infoFacts = InfoFactsAsync().ConfigureAwait(false).GetAwaiter().GetResult();
-            return InfoFact.RenderFacts(infoFacts, 2, true, html: true);
+            return infoFacts.RenderFacts( 2, true, html: true);
         }
 
         public string SocialInfoFooter()

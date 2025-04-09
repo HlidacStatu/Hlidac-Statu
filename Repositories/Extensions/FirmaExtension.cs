@@ -263,7 +263,7 @@ namespace HlidacStatu.Extensions
         public static string SocialInfoBody(this Firma firma)
         {
             return "<ul>" +
-                   InfoFact.RenderFacts(firma.InfoFacts(), 4, true, true, "", "<li>{0}</li>", true)
+                   firma.InfoFacts().RenderFacts( 4, true, true, "", "<li>{0}</li>", true)
                    + "</ul>";
         }
 

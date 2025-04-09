@@ -3,6 +3,7 @@ using Devmasters.Batch;
 using Devmasters.Collections;
 using HlidacStatu.Connectors;
 using HlidacStatu.Entities;
+using HlidacStatu.Entities.Facts;
 using HlidacStatu.Entities.KIndex;
 using HlidacStatu.Repositories.Analysis.KorupcniRiziko;
 using HlidacStatu.Repositories.Searching;
@@ -150,7 +151,7 @@ namespace HlidacStatu.Repositories
                 {
 
                     KIndexData kidx = await KIndex.GetAsync(HlidacStatu.Util.ParseTools.NormalizeIco(rec.Ico));
-                    var infof = HlidacStatu.Entities.Facts.InfoFact.RenderFacts(kidx.InfoFacts(KIndexRepo.GetAvailableCalculationYears().Max()), 2, true, false, lineFormat: "{0}", html: false);
+                    var infof = kidx.InfoFacts(KIndexRepo.GetAvailableCalculationYears().Max()).RenderFacts(2, true, false, lineFormat: "{0}", html: false);
                     var sp = new SearchPromo();
 
                     sp.PromoType = "KIndex";

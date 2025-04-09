@@ -1,6 +1,7 @@
 ﻿using Devmasters.Enums;
 
 using HlidacStatu.Entities;
+using HlidacStatu.Entities.Facts;
 using HlidacStatu.Repositories;
 using HlidacStatu.Web.Filters;
 
@@ -423,8 +424,7 @@ text zpravy: {txt}";
 
                 KIndexGenerator.IndexLabel img = new KIndexGenerator.IndexLabel(Connectors.Init.WebAppDataPath);
                 data = img.GenerateImageByteArray(kidx.Jmeno,
-                    HlidacStatu.Entities.Facts.InfoFact.RenderFacts(infoFacts,
-                        3,
+                    infoFacts.RenderFacts(3,
                         takeSummary: (label == KIndexData.KIndexLabelValues.None),
                         shuffle: false,
                         " "),

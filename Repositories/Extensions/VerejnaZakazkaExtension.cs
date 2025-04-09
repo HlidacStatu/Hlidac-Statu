@@ -44,7 +44,7 @@ namespace HlidacStatu.Extensions
         public static string SocialInfoBody(this VerejnaZakazka verejnaZakazka)
         {
             return "<ul>" +
-                   InfoFact.RenderFacts(verejnaZakazka.InfoFacts(), 4, true, true, "", "<li>{0}</li>", true)
+                   verejnaZakazka.InfoFacts().RenderFacts(4, true, true, "", "<li>{0}</li>", true)
                    + "</ul>";
         }
 

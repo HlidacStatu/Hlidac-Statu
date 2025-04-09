@@ -108,14 +108,14 @@ namespace HlidacStatu.Web.Controllers
 
 
             var statDescription =
-                InfoFact.RenderFacts((o.InfoFactsCached())
+                o.InfoFactsCached()
                     .Where(i => i.Level != InfoFact.ImportanceLevel.Stat).ToArray()
-                    , 4, true, true, "", "{0}");
+                    .RenderFacts(4, true, true, "", "{0}");
 
             var angazovanost =
-                InfoFact.RenderFacts((o.InfoFactsCached())
+                o.InfoFactsCached()
                     .Where(m => m.Level == InfoFact.ImportanceLevel.Stat).ToArray()
-                    , 4, true, true, "", "{0}");
+                    .RenderFacts(4, true, true, "", "{0}");
 
 
             int[] types = {

@@ -1,6 +1,7 @@
 using Devmasters;
 using HlidacStatu.Connectors;
 using HlidacStatu.Entities;
+using HlidacStatu.Entities.Facts;
 using HlidacStatu.Extensions;
 using HlidacStatu.Lib.Data.External.DatoveSchrankyOpenData;
 
@@ -516,7 +517,7 @@ namespace HlidacStatu.Repositories
                         {
                             KIndex = kidx.KIndexLabel.ToString(),
                             ObrazekUrl = kidx.KIndexLabelIconUrl(false),
-                            Popis = HlidacStatu.Entities.Facts.InfoFact.RenderFacts(kindex.InfoFacts(i), 3, true, true, ", "),
+                            Popis = kindex.InfoFacts(i).RenderFacts(3, true, true, ", "),
                             Rok = i
                         });
                     }

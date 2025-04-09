@@ -428,9 +428,9 @@ namespace HlidacStatu.Repositories
                             PriorityMultiplier = priority,
                             Type = o.StatusOsoby().ToNiceDisplayName(),
                             ImageElement = $"<img src='{o.GetPhotoUrl(false, Osoba.PhotoTypes.NoBackground)}' />",
-                            Description = InfoFact.RenderFacts((await 
-                                o.InfoFactsAsync(excludedInfoFactImportanceLevels)).ToArray(),
-                                2, true, false, "", "{0}", false),
+                            Description = (await 
+                                o.InfoFactsAsync(excludedInfoFactImportanceLevels)).ToArray()
+                                .RenderFacts(2, true, false, "", "{0}", false),
                             Category = Autocomplete.CategoryEnum.Person
                         };
  

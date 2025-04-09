@@ -2,6 +2,7 @@
 using HlidacStatu.Datasets;
 using HlidacStatu.DS.Graphs;
 using HlidacStatu.Entities;
+using HlidacStatu.Entities.Facts;
 using HlidacStatu.Extensions;
 using HlidacStatu.Lib.Analytics;
 using HlidacStatu.Repositories;
@@ -222,7 +223,7 @@ namespace HlidacStatu.XLib.Render
                     var o = Firmy.instanceByIco.Get(ico);
                     if (o?.Valid == true)
                     {
-                        string niceString = HlidacStatu.Entities.Facts.InfoFact.RenderFacts(o.InfoFacts(), numberOfInfos, true, false, delimiterBetweenInfos);
+                        string niceString = o.InfoFacts().RenderFacts(numberOfInfos, true, false, delimiterBetweenInfos);
 
                         return $"<span>{prefix}{niceString}{postfix}</span>";
                     }
