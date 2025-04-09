@@ -50,14 +50,15 @@
                 foreach (var y in PuRepo.AllYears.Reverse())
                 {
                     <a href="@(this.Context.Request.GetCurrentUrl("rok",y.ToString()))" 
-                            class="@($"nav-link {(rok ==y ? "active" :  "")}")"
-                            type="button"
-                            role="tab">
+                       class="@($"nav-link {(rok ==y ? "active" :  "")}")"
+                       type="button"
+                       role="tab">
                         @y
                     </a>
                 }
             }
         </div>
+        <br/>
 
         <div class="tab-pane width-75vp" id="prehledOdmen" role="tabpanel">
             <script>
