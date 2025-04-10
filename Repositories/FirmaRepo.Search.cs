@@ -36,7 +36,7 @@ namespace HlidacStatu.Repositories
                     .ToDictionary(k => k.id, v => v.icos);
             }
 
-            public static async Task<Search.GeneralResult<Firma>> SimpleSearchAsync(string query, int page, int size)
+            public static async Task<Search.GeneralResult<Firma>> SimpleSearchAsync(string query, int page, int size, bool keepOnlyActive = false)
             {
                 List<Firma> found = new List<Firma>();
 
@@ -98,6 +98,9 @@ namespace HlidacStatu.Repositories
                                 found.Add(Firmy.Get(i.Source.Ico));
                         }
 
+                        if (keepOnlyActive)
+                            found = found.Where(m => m.Status < 6).ToList(); //see Firma.StatusFull()
+
                         return new Search.GeneralResult<Firma>(query, res.Total, found, size, true)
                         { Page = page };
                     }
@@ -125,9 +128,9 @@ namespace HlidacStatu.Repositories
             }
 
 
-            public static async Task<IEnumerable<Firma>> FindAllAsync(string query, int limit)
+            public static async Task<IEnumerable<Firma>> FindAllAsync(string query, int limit, bool keepOnlyActive = false)
             {
-                return (await SimpleSearchAsync(query, 0, limit)).Result;
+                return (await SimpleSearchAsync(query, 0, limit,keepOnlyActive)).Result;
             }
 
         }

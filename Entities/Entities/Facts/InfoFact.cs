@@ -8,9 +8,8 @@ namespace HlidacStatu.Entities.Facts
     {
         public InfoFact() { }
         public InfoFact(string txt, ImportanceLevel level)
+            : base(txt, level)
         {
-            Text = txt;
-            Level = level;
         }
 
     }

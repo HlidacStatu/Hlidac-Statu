@@ -35,5 +35,13 @@ namespace HlidacStatu.Util
         //todo: what to do here? IDK - we should get rid of devmasters log logger, since it can rewrite global logger
         public static Devmasters.Log.Logger LW = Devmasters.Log.Logger.CreateLogger("progress writer",
             new LoggerConfiguration().WriteTo.Console(), false);
+
+
+        public static int CalculatedCurrentYearSmlouvy => DateTime.Now.Month < 4 ? DateTime.Now.Year - 1 : DateTime.Now.Year;
+        public static int CalculatedCurrentYearPlaty => DateTime.Now.Month < 4 ? DateTime.Now.Year - 1 : DateTime.Now.Year;
+        public static int CalculatedCurrentYearDotace => DateTime.Now.Month < 7 ? DateTime.Now.Year - 1 : DateTime.Now.Year;
+        public static int CalculatedCurrentYearVerejneZakazky => DateTime.Now.Month < 4 ? DateTime.Now.Year - 1 : DateTime.Now.Year;
+        public static int CalculatedCurrentYearKIndex => HlidacStatu.Util.ParseTools.ToInt(Devmasters.Config.GetWebConfigValue("KIndexMaxYear")).Value;
+
     }
 }

@@ -461,11 +461,21 @@ namespace HlidacStatu.Repositories
                 if (!string.IsNullOrEmpty(name))
                 {
                     var fname = Firma.JmenoBezKoncovky(name);
-                    var found = (FirmaRepo.Searching.FindAllAsync(name, 2).ConfigureAwait(false).GetAwaiter().GetResult())
-                        .FirstOrDefault();
-                    if (found != null)
-                    {
-                        f = Firmy.Get(found.ICO);
+                    var found = FirmaRepo.Searching.FindAllAsync(name, 5, true).ConfigureAwait(false).GetAwaiter().GetResult();
+
+                    List<(Firma f, int diffs)> diff = found
+                        .Select(m=> (m,HlidacStatu.Util.TextTools.LevenshteinDistanceCompute(name, m.Jmeno.Trim())) )
+                        .ToList();
+                    if (diff.Any(m=>m.diffs == 0) == false)
+                        diff = found
+                            .Select(m => (m, HlidacStatu.Util.TextTools.LevenshteinDistanceCompute(fname, m.JmenoBezKoncovky())))
+                            .ToList();
+
+                    if (diff.Any(m => m.diffs == 0))
+                        f = diff.First(m => m.diffs == 0).f;
+                    else if (diff.Any(m => m.diffs <= 1))
+                    { 
+                        f = diff.First(m => m.diffs <= 1).f;
                     }
                 }
             }
@@ -504,13 +514,16 @@ namespace HlidacStatu.Repositories
             else if (f.JsemSoukromaFirma())
                 res.Charakter = DS.Api.Firmy.SubjektDetailInfo.CharakterEnum.SoukromaFirma;
 
+
+
             //KINDEX
             Entities.KIndex.KIndexData kindex = f.KindexAsync().ConfigureAwait(false).GetAwaiter().GetResult();
             if (kindex != null)
             {
-                for (int i = 2020; i <= HlidacStatu.Util.ParseTools.ToInt(Devmasters.Config.GetWebConfigValue("KIndexMaxYear")); i++)
+                var maxY = HlidacStatu.Util.Consts.CalculatedCurrentYearKIndex;
+                for (int i = 0; i <= 3; i++)
                 {
-                    var kidx = kindex.ForYear(i);
+                    var kidx = kindex.ForYear(maxY-i);
                     if (kidx != null)
                     {
                         res.KIndex.Add(new HlidacStatu.DS.Api.Firmy.SubjektDetailInfo.KIndexData()
@@ -528,6 +541,7 @@ namespace HlidacStatu.Repositories
             var smlouvyStat = f.StatistikaRegistruSmluv();
             if (smlouvyStat != null)
             {
+                var maxY = HlidacStatu.Util.Consts.CalculatedCurrentYearSmlouvy;
                 res.RegistrSmluvCelkem = new HlidacStatu.DS.Api.Firmy.SubjektDetailInfo.SmlouvyData()
                 {
                     Rok = 0,
@@ -543,22 +557,25 @@ namespace HlidacStatu.Repositories
                     PocetSmluvSeZasadnimNedostatkem = smlouvyStat.Summary().PocetSmluvSeZasadnimNedostatkem,
                     PocetSmluvULimitu = smlouvyStat.Summary().PocetSmluvULimitu
                 };
-
+                
                 res.RegistrSmluv = smlouvyStat
-                    .Select(smlouvyStat => new HlidacStatu.DS.Api.Firmy.SubjektDetailInfo.SmlouvyData()
+                    .Where(m => m.Year <= maxY && m.Year >= maxY - 3)
+                    .Select(ss => new HlidacStatu.DS.Api.Firmy.SubjektDetailInfo.SmlouvyData()
                     {
-                        Rok = smlouvyStat.Year,
-                        CelkovaHodnotaSmluv = smlouvyStat.Value.CelkovaHodnotaSmluv,
-                        HlavniOblasti = smlouvyStat.Value.PoOblastech
+                        Rok = ss.Year,
+                        CelkovaHodnotaSmluv = ss.Value.CelkovaHodnotaSmluv,
+                        HlavniOblasti = ss.Value.PoOblastech
                                 .OrderByDescending(o => o.Value.CelkemCena)
                                 .ThenByDescending(o => o.Value.Pocet)
                                 .Take(3)
                                 .Select(m => ((Smlouva.SClassification.ClassificationsTypes?)m.Key).ToNiceDisplayName())
                                 .ToArray(),
-                        PocetSmluv = smlouvyStat.Value.PocetSmluv,
-                        PocetSmluvBezCeny = smlouvyStat.Value.PocetSmluvBezCeny,
-                        PocetSmluvSeZasadnimNedostatkem = smlouvyStat.Value.PocetSmluvSeZasadnimNedostatkem,
-                        PocetSmluvULimitu = smlouvyStat.Value.PocetSmluvULimitu
+                        PocetSmluv = ss.Value.PocetSmluv,
+                        PocetSmluvBezCeny = ss.Value.PocetSmluvBezCeny,
+                        PocetSmluvSeZasadnimNedostatkem = ss.Value.PocetSmluvSeZasadnimNedostatkem,
+                        PocetSmluvULimitu = ss.Value.PocetSmluvULimitu,
+                        ZmenaHodnotySmluv = ss.Year == maxY ? null : new DS.Api.StatisticChange(ss.Year, maxY, "Hodnota smluv", ss.Value.CelkovaHodnotaSmluv, smlouvyStat.StatisticsForYear(maxY).CelkovaHodnotaSmluv),
+                        ZmenaPoctuSmluv = ss.Year == maxY ? null : new DS.Api.StatisticChange(ss.Year, maxY, "Počet smluv", ss.Value.PocetSmluv, smlouvyStat.StatisticsForYear(maxY).PocetSmluv),
                     })
                     .ToList();
             }
@@ -568,6 +585,7 @@ namespace HlidacStatu.Repositories
             var dotaceStat = f.StatistikaDotaci();
             if (dotaceStat != null)
             {
+                var maxY = HlidacStatu.Util.Consts.CalculatedCurrentYearDotace;
                 res.DotaceCelkem = new HlidacStatu.DS.Api.Firmy.SubjektDetailInfo.DotaceData()
                 {
                     Rok = 0,
@@ -576,17 +594,21 @@ namespace HlidacStatu.Repositories
                 };
 
                 res.Dotace = dotaceStat
-                    .Select(dotaceStat => new HlidacStatu.DS.Api.Firmy.SubjektDetailInfo.DotaceData()
+                    .Where(m => m.Year <= maxY && m.Year >= maxY - 3)
+                    .Select(ds => new HlidacStatu.DS.Api.Firmy.SubjektDetailInfo.DotaceData()
                     {
-                        Rok = dotaceStat.Year,
-                        CelkemPrideleno = dotaceStat.Value.CelkemPrideleno,
-                        PocetDotaci = dotaceStat.Value.PocetDotaci
+                        Rok = ds.Year,
+                        CelkemPrideleno = ds.Value.CelkemPrideleno,
+                        PocetDotaci = ds.Value.PocetDotaci,
+                        ZmenaHodnotyDotaci = ds.Year == maxY ? null : new DS.Api.StatisticChange(ds.Year, maxY, "Hodnota smluv", ds.Value.CelkemPrideleno, dotaceStat.StatisticsForYear(maxY).CelkemPrideleno),
+                        ZmenaPoctuDotaci = ds.Year == maxY ? null : new DS.Api.StatisticChange(ds.Year, maxY, "Počet smluv", ds.Value.PocetDotaci, dotaceStat.StatisticsForYear(maxY).PocetDotaci),
                     })
                     .ToList();
             }
             if (f.Holding(aktualnost)?.Any() == true)
             {
                 var smlouvyStatHolding = f.HoldingStatisticsRegistrSmluv(aktualnost);
+                var maxY = HlidacStatu.Util.Consts.CalculatedCurrentYearSmlouvy;
                 if (smlouvyStatHolding != null)
                 {
                     res.RegistrSmluvHoldingCelkem = new HlidacStatu.DS.Api.Firmy.SubjektDetailInfo.SmlouvyData()
@@ -604,26 +626,31 @@ namespace HlidacStatu.Repositories
                         PocetSmluvSeZasadnimNedostatkem = smlouvyStatHolding.Summary().PocetSmluvSeZasadnimNedostatkem,
                         PocetSmluvULimitu = smlouvyStatHolding.Summary().PocetSmluvULimitu
                     };
+                    
                     res.RegistrSmluvHolding = smlouvyStatHolding
-                        .Select(smlouvyStat => new HlidacStatu.DS.Api.Firmy.SubjektDetailInfo.SmlouvyData()
+                        .Where(m => m.Year <= maxY && m.Year >= maxY - 3)
+                        .Select(ss => new HlidacStatu.DS.Api.Firmy.SubjektDetailInfo.SmlouvyData()
                         {
-                            Rok = smlouvyStat.Year,
-                            CelkovaHodnotaSmluv = smlouvyStat.Value.CelkovaHodnotaSmluv,
-                            HlavniOblasti = smlouvyStat.Value.PoOblastech
+                            Rok = ss.Year,
+                            CelkovaHodnotaSmluv = ss.Value.CelkovaHodnotaSmluv,
+                            HlavniOblasti = ss.Value.PoOblastech
                                     .OrderByDescending(o => o.Value.CelkemCena)
                                     .ThenByDescending(o => o.Value.Pocet)
                                     .Take(3)
                                     .Select(m => ((Smlouva.SClassification.ClassificationsTypes?)m.Key).ToNiceDisplayName())
                                     .ToArray(),
-                            PocetSmluv = smlouvyStat.Value.PocetSmluv,
-                            PocetSmluvBezCeny = smlouvyStat.Value.PocetSmluvBezCeny,
-                            PocetSmluvSeZasadnimNedostatkem = smlouvyStat.Value.PocetSmluvSeZasadnimNedostatkem,
-                            PocetSmluvULimitu = smlouvyStat.Value.PocetSmluvULimitu
+                            PocetSmluv = ss.Value.PocetSmluv,
+                            PocetSmluvBezCeny = ss.Value.PocetSmluvBezCeny,
+                            PocetSmluvSeZasadnimNedostatkem = ss.Value.PocetSmluvSeZasadnimNedostatkem,
+                            PocetSmluvULimitu = ss.Value.PocetSmluvULimitu,
+                            ZmenaHodnotySmluv = ss.Year == maxY ? null : new DS.Api.StatisticChange(ss.Year, maxY, "Hodnota smluv", ss.Value.CelkovaHodnotaSmluv, smlouvyStatHolding.StatisticsForYear(maxY).CelkovaHodnotaSmluv),
+                            ZmenaPoctuSmluv = ss.Year == maxY ? null : new DS.Api.StatisticChange(ss.Year, maxY, "Počet smluv", ss.Value.PocetSmluv, smlouvyStatHolding.StatisticsForYear(maxY).PocetSmluv),
                         })
                         .ToList();
                 }
 
                 var dotaceStatHolding = f.HoldingStatistikaDotaci(aktualnost);
+                maxY = HlidacStatu.Util.Consts.CalculatedCurrentYearDotace;
                 if (dotaceStatHolding != null)
                 {
                     res.DotaceCelkemHolding = new HlidacStatu.DS.Api.Firmy.SubjektDetailInfo.DotaceData()
@@ -634,11 +661,14 @@ namespace HlidacStatu.Repositories
                     };
 
                     res.DotaceHolding = dotaceStatHolding
-                        .Select(dotaceStat => new HlidacStatu.DS.Api.Firmy.SubjektDetailInfo.DotaceData()
+                        .Where(m => m.Year <= HlidacStatu.Util.Consts.CalculatedCurrentYearDotace && m.Year >= HlidacStatu.Util.Consts.CalculatedCurrentYearDotace - 3)
+                        .Select(ds => new HlidacStatu.DS.Api.Firmy.SubjektDetailInfo.DotaceData()
                         {
-                            Rok = dotaceStat.Year,
-                            CelkemPrideleno = dotaceStat.Value.CelkemPrideleno,
-                            PocetDotaci = dotaceStat.Value.PocetDotaci
+                            Rok = ds.Year,
+                            CelkemPrideleno = ds.Value.CelkemPrideleno,
+                            PocetDotaci = ds.Value.PocetDotaci,
+                            ZmenaHodnotyDotaci = ds.Year == maxY ? null : new DS.Api.StatisticChange(ds.Year, maxY, "Hodnota smluv", ds.Value.CelkemPrideleno, dotaceStatHolding.StatisticsForYear(maxY).CelkemPrideleno),
+                            ZmenaPoctuDotaci = ds.Year == maxY ? null : new DS.Api.StatisticChange(ds.Year, maxY, "Počet smluv", ds.Value.PocetDotaci, dotaceStatHolding.StatisticsForYear(maxY).PocetDotaci),
                         })
                         .ToList();
                 }

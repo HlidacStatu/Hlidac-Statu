@@ -27,7 +27,7 @@ namespace HlidacStatu.Entities.Facts
             NotAtAll = 1
         }
 
-        public string Render(bool html = true)
+        public virtual string Render(bool html = true)
         {
             if (html)
                 return Text;

@@ -170,8 +170,8 @@ namespace HlidacStatu.Extensions
         public static Lib.Analytics.StatisticsSubjectPerYear<Firma.Statistics.Dotace> StatistikaDotaci(
             this Firma firma, bool forceUpdateCache = false)
         {
-            return FirmaStatistics.CachedStatisticsDotace(firma, forceUpdateCache) ?? 
-                new Lib.Analytics.StatisticsSubjectPerYear<Firma.Statistics.Dotace>() { ICO=firma.ICO };
+            return FirmaStatistics.CachedStatisticsDotace(firma, forceUpdateCache) ??
+                new Lib.Analytics.StatisticsSubjectPerYear<Firma.Statistics.Dotace>() { ICO = firma.ICO };
 
         }
         public static Lib.Analytics.StatisticsSubjectPerYear<Firma.Statistics.Dotace> HoldingStatistikaDotaci(
@@ -263,7 +263,7 @@ namespace HlidacStatu.Extensions
         public static string SocialInfoBody(this Firma firma)
         {
             return "<ul>" +
-                   firma.InfoFacts().RenderFacts( 4, true, true, "", "<li>{0}</li>", true)
+                   firma.InfoFacts().RenderFacts(4, true, true, "", "<li>{0}</li>", true)
                    + "</ul>";
         }
 
@@ -476,7 +476,7 @@ namespace HlidacStatu.Extensions
                 firma.TypSubjektu = Firma.TypSubjektuEnum.PatrimStatuAlespon25perc;
                 if (firma._jsemStatniFirma())
                     firma.TypSubjektu = Firma.TypSubjektuEnum.PatrimStatu;
-            }                
+            }
             else if (firma._jsemStatniFirma())
                 firma.TypSubjektu = Firma.TypSubjektuEnum.PatrimStatu;
             else
@@ -621,8 +621,8 @@ namespace HlidacStatu.Extensions
         {
             var cache = Devmasters.Cache.Redis.Manager<InfoFact[], Firma>
                 .GetSafeInstance("Firma_InfoFacts",
-                    (firma) => GetInfoFactsAsync(firma).ConfigureAwait(false).GetAwaiter().GetResult(),
-                    TimeSpan.Zero,
+                    (firma) => GetDirectInfoFactsAsync(firma).ConfigureAwait(false).GetAwaiter().GetResult(),
+                    TimeSpan.FromDays(2),
                     Devmasters.Config.GetWebConfigValue("RedisServerUrls").Split(';'),
                     Devmasters.Config.GetWebConfigValue("RedisBucketName"),
                     Devmasters.Config.GetWebConfigValue("RedisUsername"),
@@ -631,6 +631,170 @@ namespace HlidacStatu.Extensions
 
             return cache;
         }
+
+
+        static Devmasters.Cache.Redis.Manager<Riziko[], (Firma f, int rok)> _rizikoCache()
+        {
+            var cache = Devmasters.Cache.Redis.Manager<Riziko[], (Firma f, int rok)>
+                .GetSafeInstance("Firma_Rizika",
+                    (o) => getDirectRiziko(o.f, o.rok),
+                    TimeSpan.FromDays(2),
+                    Devmasters.Config.GetWebConfigValue("RedisServerUrls").Split(';'),
+                    Devmasters.Config.GetWebConfigValue("RedisBucketName"),
+                    Devmasters.Config.GetWebConfigValue("RedisUsername"),
+                    Devmasters.Config.GetWebConfigValue("RedisCachePassword"),
+                    keyValueSelector: o => $"{o.rok}-{o.f.ICO}");
+
+            return cache;
+        }
+
+        private static Riziko[] getDirectRiziko(Firma firma, int rok)
+        {
+            List<Riziko> res = new List<Riziko>();
+            var statistics = firma.StatistikaRegistruSmluv().StatisticsForYear(rok);
+            var kindex = firma.KindexAsync().ConfigureAwait(false).GetAwaiter().GetResult()?.ForYear(rok);
+
+
+            if (statistics.PercentSmluvBezCeny > 0)
+            {
+                string query = System.Net.WebUtility.UrlEncode($"ico:{firma.ICO} AND ( hint.skrytaCena:1 ) AND datumUzavreni:[{rok}-01-01 TO {rok + 1}-01-01}}"); //
+                string html = @$"
+                    <p>
+                        <i class=""fas fa-exclamation-circle"" style=""color:{HlidacStatu.Entities.Analysis.Riziko.RizikoColor(KIndexData.DetailInfo.KIndexLabelForPart(KIndexData.KIndexParts.PercentBezCeny, statistics.PercentSmluvBezCeny).AsRiziko())};padding-right:20px;""></i>
+                        <b>Počet uzavřených smluv bez uvedené ceny</b>
+                        <a href=""/HledatSmlouvy?Q={query}"">
+                            <i class='fas fa-link'></i>
+                        </a>
+                        <br/>
+                        <span style=""padding-left:40px;"">
+                            {HlidacStatu.Entities.Analysis.Riziko.ToHtml(
+                                    KIndexData.DetailInfo.KIndexLabelForPart(KIndexData.KIndexParts.PercentBezCeny, statistics.PercentSmluvBezCeny, statistics.PocetSmluv).AsRiziko()
+                                    )},
+                            celkem
+                            <a href=""/HledatSmlouvy?Q={query}"">
+                                <b>{HlidacStatu.Util.RenderData.Vysledky.PocetSmluv(statistics.PocetSmluvBezCeny, HlidacStatu.Util.RenderData.CapitalizationStyle.FirstLetterUpperCap)}</b>
+                            </a>
+                            bez uvedené ceny.
+                            <span>Tj. {HlidacStatu.Util.RenderData.NicePercent(statistics.PercentSmluvBezCeny)} z celkového počtu.</span>
+                        </span>
+                    </p>";
+                string text = $"celkem {HlidacStatu.Util.RenderData.NicePercent(statistics.PercentSmluvBezCeny)} smluv bez uvedené ceny,"
+                    + $" {HlidacStatu.Entities.Analysis.Riziko.RizikoText(
+                    KIndexData.DetailInfo.KIndexLabelForPart(KIndexData.KIndexParts.PercentBezCeny, statistics.PercentSmluvBezCeny, statistics.PocetSmluv).AsRiziko()
+                    )} riziko";
+                res.Add(new Riziko(html, text, Fact.ImportanceLevel.Medium ));
+            }
+
+            if(statistics.PocetSmluvULimitu > 0)
+            {
+                string query = System.Net.WebUtility.UrlEncode($"ico:{firma.ICO} AND ( hint.smlouvaULimitu:>0 ) AND datumUzavreni:[{rok}-01-01 TO {rok + 1}-01-01}}"); 
+                                                                                                                                                                             
+                string html = @$"
+                    <p>
+                        <i class=""fas fa-exclamation-circle"" style=""color:{Entities.Analysis.Riziko.RizikoColor(KIndexData.DetailInfo.KIndexLabelForPart(KIndexData.KIndexParts.PercSmluvUlimitu, statistics.PercentSmluvULimitu).AsRiziko())};padding-right:20px;""></i> <b>Smlouvy s cenou těsně pod limitem pro veřejné zakázky</b>
+                        <a href=""/HledatSmlouvy?Q={query}"">
+                            <i class='fas fa-link'></i>
+                        </a>
+                        <br/>
+                        <span style=""padding-left:40px;"">
+                            {
+                                HlidacStatu.Entities.Analysis.Riziko.ToHtml(
+                                    KIndexData.DetailInfo.KIndexLabelForPart(KIndexData.KIndexParts.PercSmluvUlimitu, statistics.PercentSmluvULimitu, statistics.PocetSmluv).AsRiziko()
+                                    )
+                                },
+                            celkem
+                            <a href=""/HledatSmlouvy?Q={query}"">
+                                <b>{HlidacStatu.Util.RenderData.Vysledky.PocetSmluv(statistics.PocetSmluvULimitu, HlidacStatu.Util.RenderData.CapitalizationStyle.FirstLetterUpperCap)}</b>
+                            </a>
+                            s cenou těsně pod limitem pro veřejné zakázky.
+                            <span>Tj. {HlidacStatu.Util.RenderData.NicePercent(statistics.PercentSmluvULimitu)} z celkového počtu.</span>
+                        </span>
+                    </p>
+                ";
+                string text = $"celkem {HlidacStatu.Util.RenderData.NicePercent(statistics.PercentSmluvULimitu)} smluv bez uvedené ceny,"
+                    + $" {HlidacStatu.Entities.Analysis.Riziko.RizikoText(
+                    KIndexData.DetailInfo.KIndexLabelForPart(KIndexData.KIndexParts.PercSmluvUlimitu, statistics.PercentSmluvULimitu, statistics.PocetSmluv).AsRiziko()
+                    )} riziko";
+                res.Add(new Riziko(html, text, Fact.ImportanceLevel.Medium));
+            }
+
+            if (statistics.PocetSmluvSeZasadnimNedostatkem > 0)
+            {
+                string query = System.Net.WebUtility.UrlEncode($"ico:{firma.ICO} AND ( chyby:zasadni ) AND datumUzavreni:[{rok}-01-01 TO {rok + 1}-01-01}}");
+
+                string html = @$"
+                    <p>
+                        <i class=""fas fa-exclamation-circle"" style=""color:{Entities.Analysis.Riziko.RizikoColor(KIndexData.DetailInfo.KIndexLabelForPart(KIndexData.KIndexParts.PercSeZasadnimNedostatkem, statistics.PercentSmluvSeZasadnimNedostatkem).AsRiziko())};padding-right:20px;""></i> <b>Smlouvy se zásadními nedostatky</b>
+                        <a href=""/HledatSmlouvy?Q={query}"">
+                            <i class='fas fa-link'></i>
+                        </a>
+                        <br/>
+                        <span style=""padding-left:40px;"">
+                            @{Entities.Analysis.Riziko.ToHtml(
+                                    KIndexData.DetailInfo.KIndexLabelForPart(KIndexData.KIndexParts.PercSmluvUlimitu, statistics.PercentSmluvULimitu, statistics.PocetSmluv).AsRiziko()
+                                    )
+                                },
+                            celkem
+                            <a href=""/HledatSmlouvy?Q={query}"">
+                                <b>{HlidacStatu.Util.RenderData.Vysledky.PocetSmluv(statistics.PocetSmluvSeZasadnimNedostatkem, HlidacStatu.Util.RenderData.CapitalizationStyle.FirstLetterUpperCap)}</b>
+                            </a>
+                            bez uvedené ceny.
+                            <span>Tj. {HlidacStatu.Util.RenderData.NicePercent(statistics.PercentSmluvSeZasadnimNedostatkem)} z celkového počtu.</span>
+                        </span>
+                    </p>
+
+                ";
+                string text = $"celkem {HlidacStatu.Util.RenderData.NicePercent(statistics.PercentSmluvSeZasadnimNedostatkem)} smluv se zasadním nedostatkem,"
+                    + $" {HlidacStatu.Entities.Analysis.Riziko.RizikoText(
+                    KIndexData.DetailInfo.KIndexLabelForPart(KIndexData.KIndexParts.PercSeZasadnimNedostatkem, statistics.PercentSmluvSeZasadnimNedostatkem, statistics.PocetSmluv).AsRiziko()
+                    )} riziko";
+                res.Add(new Riziko(html, text, Fact.ImportanceLevel.Medium));
+            }
+                if (kindex != null && kindex?.CelkovaKoncentraceDodavatelu != null)
+                {
+                    var value = kindex?.CelkovaKoncentraceDodavatelu.Herfindahl_Hirschman_Modified;
+                    var lbl = KIndexData.DetailInfo.KIndexLabelForPart(KIndexData.KIndexParts.CelkovaKoncentraceDodavatelu, value).AsRiziko();
+                    var lblText = "";
+                    switch (lbl)
+                    {
+                        case Entities.Analysis.Riziko.RizikoValues.A:
+                            lblText = "smlouvy se nekoncentrují u u žádných smluvních partnerů.";
+                            break;
+                        case Entities.Analysis.Riziko.RizikoValues.B:
+                        case Entities.Analysis.Riziko.RizikoValues.C:
+                            lblText = "žádný smluvní partner nedominuje nad ostatními.";
+                            break;
+                        case Entities.Analysis.Riziko.RizikoValues.D:
+                        case Entities.Analysis.Riziko.RizikoValues.E:
+                            lblText = "smlouvy se koncentrují u malého počtu partnerů.";
+                            break;
+                        case Entities.Analysis.Riziko.RizikoValues.F:
+                            lblText = $"většina smluv dle počtu či objemu je uzavřena s {Devmasters.Lang.CS.Plural.Get(kindex.CelkovaKoncentraceDodavatelu.TopDodavatele().Count(), "jedním smluvním partnerem;s {0} smluvními partnery;s {0} smluvními partnery")}.";
+                            break;
+                        default:
+                            lblText = "";
+                            break;
+                    }
+
+                string html = @$"
+                    <p>
+                        <i class=""fas fa-exclamation-circle"" style=""color:{Entities.Analysis.Riziko.RizikoColor(lbl)};padding-right:20px;""></i> <b>Koncentrace smluvních partnerů</b>
+                        <a href=""/kindex/detail/{firma.ICO}#detail_CelkovaKoncentraceDodavatelu"">
+                            <i class='fas fa-link'></i>
+                        </a>
+                        <br/>
+                        <span style=""padding-left:40px;"">
+                            {Entities.Analysis.Riziko.ToHtml(lbl)},
+                            {lblText}
+                        </span>
+                    </p>";
+                string text = $"{lblText} smluv se zasadním nedostatkem,"
+                    + $" {HlidacStatu.Entities.Analysis.Riziko.RizikoText(lbl)} riziko";
+                res.Add(new Riziko(html, text, Fact.ImportanceLevel.Medium));
+            }
+            return res.ToArray();
+        }
+
         public static void InfoFactsInvalidate(this Firma firma) //otázka jestli tohle nebrat z cachce
         {
             _infoFactsCache().Delete(firma);
@@ -638,6 +802,15 @@ namespace HlidacStatu.Extensions
         }
 
 
+        public static Riziko[] Rizika(this Firma firma, int rok, bool forceUpdateCache = false) //otázka jestli tohle nebrat z cachce
+        {
+            //STAT FIX
+            //return Array.Empty<InfoFact>();
+            if (forceUpdateCache)
+                _rizikoCache().Delete((firma,rok));
+            var inf = _rizikoCache().Get((firma, rok));
+            return inf;
+        }
 
         public static InfoFact[] InfoFacts(this Firma firma, bool forceUpdateCache = false) //otázka jestli tohle nebrat z cachce
         {
@@ -649,7 +822,7 @@ namespace HlidacStatu.Extensions
             var inf = _infoFactsCache().Get(firma);
             return inf;
         }
-        public static async Task<InfoFact[]> GetInfoFactsAsync(Firma firma)
+        public static async Task<InfoFact[]> GetDirectInfoFactsAsync(Firma firma)
         {
             var sName = firma.ObecneJmeno();
             bool sMuzsky = sName == uradName;

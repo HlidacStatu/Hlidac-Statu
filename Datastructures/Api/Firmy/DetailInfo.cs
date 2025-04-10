@@ -90,10 +90,14 @@ namespace HlidacStatu.DS.Api.Firmy
         /// </summary>
         public class SmlouvyData
         {
+
             public int Rok { get; set; }
 
             public long PocetSmluv { get; set; } = 0;
+
+            /// <summary>       
             public decimal CelkovaHodnotaSmluv { get; set; } = 0;
+
 
             /// <summary>
             /// počet smluv bez uvedené ceny
@@ -114,6 +118,9 @@ namespace HlidacStatu.DS.Api.Firmy
             /// Tři hlavní oblasti, ve kterých subjekt uzavírá smlouvy
             /// </summary>
             public string[] HlavniOblasti { get; set; } = null;
+
+            public DS.Api.StatisticChange ZmenaPoctuSmluv { get; set; } = null;
+            public DS.Api.StatisticChange ZmenaHodnotySmluv { get; set; } = null;
         }
 
         /// <summary>
@@ -145,6 +152,15 @@ namespace HlidacStatu.DS.Api.Firmy
             public int Rok { get; set; }
             public int PocetDotaci { get; set; } = 0;
             public decimal CelkemPrideleno { get; set; } = 0m;
+
+            /// <summary>
+            /// Změna počtu ročních dotací oproti aktuálnímu roku
+            /// </summary>
+            public DS.Api.StatisticChange ZmenaPoctuDotaci { get; set; } = null;
+            /// <summary>
+            /// Změna objemu ročních dotací oproti aktuálnímu roku
+            /// </summary>
+            public DS.Api.StatisticChange ZmenaHodnotyDotaci { get; set; } = null;
         }
         public DotaceData DotaceCelkem { get; set; } = new();
         public DotaceData DotaceCelkemHolding { get; set; } = new();
