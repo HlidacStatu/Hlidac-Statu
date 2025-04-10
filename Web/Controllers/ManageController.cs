@@ -21,6 +21,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using HlidacStatu.Entities.KIndex;
 using Serilog;
+using HlidacStatu.Lib.Web.UI.Attributes;
 
 namespace HlidacStatu.Web.Controllers
 {

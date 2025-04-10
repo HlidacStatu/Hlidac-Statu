@@ -99,7 +99,7 @@
             }
         </div>
         <div class="col">
-            @Html.SemiCircleDonut(new Tuple<string, decimal>[]
+            @ChartUtilExtensions.SemiCircleDonut(new Tuple<string, decimal>[]
                 {
                     new Tuple<string, decimal>("Plat", plat.Plat.Value),
                     new Tuple<string, decimal>("Odměna", plat.Odmeny ?? 0),

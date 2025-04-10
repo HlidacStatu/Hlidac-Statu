@@ -18,6 +18,7 @@ using HlidacStatu.LibCore;
 using HlidacStatu.Repositories.Analysis.KorupcniRiziko;
 using HlidacStatu.Web.Framework;
 using Serilog;
+using HlidacStatu.Lib.Web.UI.Attributes;
 
 
 namespace HlidacStatu.Web.Controllers

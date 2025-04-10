@@ -34,6 +34,7 @@
 		<ProjectReference Include="..\Datastructures\Datastructures.csproj" />
 		<ProjectReference Include="..\Extensions\Extensions.csproj" />
 		<ProjectReference Include="..\HlidacStatu.Q.Simple\HlidacStatu.Q.Simple.csproj" />
+		<ProjectReference Include="..\Lib.Web.UI\Lib.Web.UI.csproj" />
 		<ProjectReference Include="..\LibCore\LibCore.csproj" />
 		<ProjectReference Include="..\Repositories\Repositories.csproj" />
 		<ProjectReference Include="..\Web.HealthChecks\Web.HealthChecks.csproj" />

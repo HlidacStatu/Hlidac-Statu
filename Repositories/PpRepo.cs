@@ -124,14 +124,19 @@ public static class PpRepo
         "politici",
     ];
 
-    public static async Task<List<PpPrijem>> GetPlatyAsync(int rok)
+    public static async Task<List<PpPrijem>> GetPlatyAsync(int rok, bool withDetails = false)
     {
         await using var db = new DbEntities();
 
-        return await db.PpPrijmy
-            .AsNoTracking()
-            .Where(p => p.Rok == rok)
-            .ToListAsync();
+        var q = db.PpPrijmy
+            .AsNoTracking();
+        if (withDetails)
+            q = q.Include(i => i.Organizace).ThenInclude(o => o.FirmaDs);
+        q = q.Where(p => p.Rok == rok);
+
+        var res = await q.ToListAsync();
+
+        return res;
     }
 
     public static string PlatyForYearPoliticiDescriptionHtml(this PuOrganizace org, int rok = DefaultYear, bool withDetail = false)

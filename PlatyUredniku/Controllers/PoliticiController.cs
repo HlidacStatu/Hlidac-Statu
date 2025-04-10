@@ -8,6 +8,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using ZiggyCreatures.Caching.Fusion;
 using Microsoft.AspNetCore.Authorization;
+using HlidacStatu.Lib.Web.UI.Attributes;
 
 namespace PlatyUredniku.Controllers;
 
@@ -105,6 +106,19 @@ public class PoliticiController : Controller
 
         return View(detail);
     }
+
+    [HlidacCache(60 * 60)]
+    public async Task<IActionResult> Seznam()
+    {
+        return View();
+    }
+
+    [HlidacCache(60*60)]
+    public async Task<IActionResult> Organizace()
+    {
+        return View();
+    }
+
 
     public async Task<IActionResult> Politik(string id)
     {

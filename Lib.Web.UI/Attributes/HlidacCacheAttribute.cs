@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.Caching.Memory;
 using Serilog;
 
-namespace HlidacStatu.Web.Filters
+namespace HlidacStatu.Lib.Web.UI.Attributes
 {
     public class HlidacCacheAttribute : Attribute, IResourceFilter
     {
@@ -17,12 +17,12 @@ namespace HlidacStatu.Web.Filters
         
         private static readonly ILogger _logger = Log.ForContext<HlidacCacheAttribute>();
 
-        public HlidacCacheAttribute(double durationInSecond, string queryKeys, bool differAuth)
+        public HlidacCacheAttribute(double durationInSecond, string queryKeys = "", bool differAuth = false)
             : this((long)durationInSecond,queryKeys, differAuth)
         {
         }
 
-        public HlidacCacheAttribute(long durationInSeconds, string queryKeys, bool differAuth)
+        public HlidacCacheAttribute(long durationInSeconds, string queryKeys = "", bool differAuth = false)
         {
             queryKeys = queryKeys ?? "";
             _duration = durationInSeconds;

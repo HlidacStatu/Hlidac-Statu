@@ -21,6 +21,7 @@ using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using Serilog;
+using HlidacStatu.Lib.Web.UI.Attributes;
 
 namespace HlidacStatu.Web.Controllers
 {
@@ -72,7 +73,7 @@ namespace HlidacStatu.Web.Controllers
             return View();
         }
 
-        [Filters.HlidacCache(60, "", false)]
+        [HlidacCache(60, "", false)]
         public ActionResult BpStat()
         {
             return View();
