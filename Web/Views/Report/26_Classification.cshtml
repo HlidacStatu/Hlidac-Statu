@@ -148,14 +148,14 @@
 
 <div class="row">
     <div class="col-xs-12">
-        @ChartUtil.RenderReportChart("Věcné oblasti",
+        @ChartUtilExtensions.RenderReportChart("Věcné oblasti",
                     Html.SimpleBarChart(
                          false, false,
                          400, "xx", "Oblast", "Počet smluv",
                          rds.Filter(new int[] { 0, 1 }, 15)))
         <hr />
 
-        @ChartUtil.RenderReportTableT("Věcné oblasti", rds, @"{
+        @ChartUtilExtensions.RenderReportTableT("Věcné oblasti", rds, @"{
              'language': {
                 'url': '//cdn.datatables.net/plug-ins/1.13.4/i18n/cs.json'
             },

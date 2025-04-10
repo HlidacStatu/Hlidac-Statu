@@ -37,7 +37,7 @@
             Vyberte rok, pro který chcete zobrazit sponzory.
         </h4>
     </div>
-    @ChartUtil.RenderReportTableT("", Model,HtmlExtensions.DatatableOptions(orderColumnIdx:0,orderDirection:"asc",ordering:false, paging:false))
+    @ChartUtilExtensions.RenderReportTableT("", Model,HtmlExtensions.DatatableOptions(orderColumnIdx:0,orderDirection:"asc",ordering:false, paging:false))
 }
 else if (ViewBag.SponzoriFirmy == true)
 {
@@ -50,7 +50,7 @@ else if (ViewBag.SponzoriFirmy == true)
             <li class="active">Firemní sponzoři</li>
         </ol>
     }
-    @ChartUtil.RenderReportTableT("",Model,HtmlExtensions.DatatableOptions(orderColumnIdx:2,orderDirection:"desc",ordering:false, paging:true))
+    @ChartUtilExtensions.RenderReportTableT("",Model,HtmlExtensions.DatatableOptions(orderColumnIdx:2,orderDirection:"desc",ordering:false, paging:true))
 }
 else
 {
@@ -66,7 +66,7 @@ else
         <div>
             <add-bookmark name="@(ViewBag.Title + " " + ViewBag.SubTitle)" url="@Context.Request.GetDisplayUrl()" style="font-size:200%" ></add-bookmark>
         </div>
-    @ChartUtil.RenderReportTableT("",Model,HtmlExtensions.DatatableOptions(orderColumnIdx:2,orderDirection:"desc",ordering:false, paging:true))
+    @ChartUtilExtensions.RenderReportTableT("",Model,HtmlExtensions.DatatableOptions(orderColumnIdx:2,orderDirection:"desc",ordering:false, paging:true))
 
     }
 

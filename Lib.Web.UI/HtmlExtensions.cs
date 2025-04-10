@@ -10,11 +10,33 @@ using System.Linq;
 using System.Threading.Tasks;
 using HlidacStatu.Entities.KIndex;
 using HlidacStatu.Repositories.Analysis.KorupcniRiziko;
+using Newtonsoft.Json.Schema;
+using System.Security.Principal;
+using System.Text;
 
 namespace HlidacStatu.Lib.Web.UI
 {
     public static class HtmlExtensions
     {
+
+
+        public static bool IsAuthenticatedRequest(this IHtmlHelper htmlHelper)
+        {
+            return htmlHelper.ViewContext.IsAuthenticatedRequest();
+        }
+
+        public static IIdentity? GetUserIdentity(this IHtmlHelper htmlHelper)
+        {
+            return htmlHelper.ViewContext.GetUserIdentity();
+        }
+
+        public static IHtmlContent GAClick(this IHtmlHelper htmlHelper)
+        {
+            return new HtmlString(
+                $" onclick=\"_my_event('send', 'event', 'logoffBtn', 'click','{htmlHelper.GetRequestPath()}')\" ");
+        }
+
+
         public static bool IsDebug(this IHtmlHelper htmlHelper)
         {
 #if DEBUG
@@ -24,7 +46,191 @@ namespace HlidacStatu.Lib.Web.UI
 #endif
         }
 
-         public static bool IfInRoles(System.Security.Principal.IPrincipal user, params string[] roles)
+
+        public static IHtmlContent LowBox(this IHtmlHelper htmlHelper, int width, string content,
+            string? gaPageEventId = null)
+        {
+            //gaPageEventId ??= htmlHelper.GetRequestPath();
+
+            var sb = new StringBuilder($"<div class=\"low-box\" style=\"max-height:{width}px\">");
+            sb.Append(
+                $"<div class=\"low-box-line\" style=\"top:{width - 55}px\"><a href=\"#\"  class=\"more\"></a></div>");
+            sb.Append("<div class=\"low-box-content\">");
+            sb.Append(content);
+            sb.Append("</div></div>");
+            return new HtmlString(sb.ToString());
+        }
+
+
+        public static IHtmlContent RenderBreadcrumb(this IHtmlHelper htmlHelper, Schema.NET.BreadcrumbList data)
+        {
+            Uri baseUri = new Uri("https://www.hlidacstatu.cz");
+            if (data == null)
+                return htmlHelper.Raw(string.Empty);
+            if (data.ItemListElement.Count == 0)
+                return htmlHelper.Raw(string.Empty);
+
+            System.Text.StringBuilder sb = new System.Text.StringBuilder();
+            sb.AppendLine("<ol class=\"breadcrumb\">");
+            var loc = 1;
+            foreach (Schema.NET.IListItem item in data.ItemListElement)
+            {
+                item.Position = loc;
+
+                if (item.Item.HasOne && item.Item.First().Url.HasOne)
+                {
+                    sb.AppendLine($"<li><a href=\"/{baseUri.MakeRelativeUri(item.Item.First().Url.First()).ToString()}\">{htmlHelper.Encode(item.Item.First().Name)}</a></li>");
+                }
+                else
+                    sb.AppendLine($"<li>{htmlHelper.Encode(item.Item.First().Name)}</li>");
+                loc++;
+            }
+            sb.AppendLine("</ol>");
+            sb.AppendLine("<script type=\"application/ld+json\">");
+            sb.AppendLine(data.ToHtmlEscapedString());
+            sb.AppendLine("</script>");
+
+
+            return htmlHelper.Raw(sb.ToString());
+        }
+
+
+        public static Task<IHtmlContent> KIndexIconAsync(this IHtmlHelper htmlHelper, string ico, int heightInPx = 15, string hPadding = "3px", string vPadding = "0", bool showNone = false, bool useTemp = false)
+        {
+            return htmlHelper.KIndexIconAsync(ico, $"padding:{vPadding} {hPadding};height:{heightInPx}px;width:auto", showNone, useTemp);
+        }
+        public static async Task<IHtmlContent> KIndexIconAsync(this IHtmlHelper htmlHelper, string ico, string style, bool showNone = false, bool useTemp = false)
+        {
+            if (string.IsNullOrEmpty(ico))
+                return htmlHelper.Raw("");
+
+            ico = Util.ParseTools.NormalizeIco(ico);
+            Tuple<int?, KIndexData.KIndexLabelValues> lbl = await KIndex.GetLastLabelAsync(ico, useTemp);
+            if (lbl != null)
+            {
+                if (showNone || lbl.Item2 != KIndexData.KIndexLabelValues.None)
+                    return KIndexIcon(htmlHelper, lbl.Item2, style, showNone);
+            }
+            return htmlHelper.Raw("");
+        }
+        public static IHtmlContent KIndexIcon(this IHtmlHelper htmlHelper, KIndexData.KIndexLabelValues label,
+            int heightInPx = 15, string hPadding = "3px", string vPadding = "0", bool showNone = false, bool useTemp = false)
+        {
+            return htmlHelper.KIndexIcon(label, $"padding:{vPadding} {hPadding};height:{heightInPx}px;width:auto", showNone, useTemp: useTemp);
+        }
+
+        public static IHtmlContent KIndexIcon(this IHtmlHelper htmlHelper, KIndexData.KIndexLabelValues label,
+            string style, bool showNone = false, string title = "", bool useTemp = false)
+        {
+            return htmlHelper.Raw(KIndexData.KindexImageIcon(label, style, showNone, title));
+        }
+
+        public static Task<IHtmlContent> KIndexLabelLinkAsync(this IHtmlHelper htmlHelper, string ico,
+            int heightInPx = 15, string hPadding = "3px", string vPadding = "0", bool showNone = false,
+            int? rok = null, bool linkToKindex = false)
+        {
+            return htmlHelper.KIndexLabelLinkAsync(ico, $"padding:{vPadding} {hPadding};height:{heightInPx}px;width:auto", showNone, rok, linkToKindex);
+        }
+
+        public static async Task<IHtmlContent> KIndexLabelLinkAsync(this IHtmlHelper htmlHelper, string ico, string style, bool showNone = false, int? rok = null, bool linkToKindex = false)
+        {
+            if (string.IsNullOrEmpty(ico))
+                return htmlHelper.Raw("");
+
+            ico = Util.ParseTools.NormalizeIco(ico);
+            var user = htmlHelper.ViewContext.HttpContext.User;
+            Tuple<int?, KIndexData.KIndexLabelValues>? kidx = await KIndex.GetLastLabelAsync(ico);
+            if (kidx == null)
+                return htmlHelper.Raw("");
+
+            KIndexData.KIndexLabelValues lbl = kidx.Item2;
+            return htmlHelper.KIndexLabelLinkAsync(ico, lbl, style, showNone, rok, linkToKindex: linkToKindex);
+        }
+        public static IHtmlContent KIndexLabelLinkAsync(this IHtmlHelper htmlHelper, string ico,
+            KIndexData.KIndexLabelValues label,
+            string style, bool showNone = false, int? rok = null, bool linkToKindex = false)
+        {
+            if (string.IsNullOrEmpty(ico))
+                return htmlHelper.Raw("");
+
+            if (linkToKindex)
+            {
+                if (label != KIndexData.KIndexLabelValues.None || showNone)
+                {
+                    if (label == KIndexData.KIndexLabelValues.None)
+                        return htmlHelper.KIndexIcon(label, style, showNone);
+                    else
+                        return htmlHelper.Raw($"<a href='{KIndexDetailUrl(htmlHelper, ico, rok)}'>"
+                        + KIndexIcon(htmlHelper, label, style, showNone).ToString()
+                        + "</a>");
+                }
+            }
+            else
+            {
+                if (label != KIndexData.KIndexLabelValues.None || showNone)
+                {
+                    if (label == KIndexData.KIndexLabelValues.None)
+                        return htmlHelper.KIndexIcon(label, style, showNone);
+                    else
+                        return htmlHelper.Raw($"<a href='/Subjekt/{ico}'>"
+                        + KIndexIcon(htmlHelper, label, style, showNone).ToString()
+                        + "</a>");
+                }
+            }
+
+            return htmlHelper.Raw("");
+
+        }
+
+        public static string KIndexDetailUrl(this IHtmlHelper htmlHelper, string ico, int? rok)
+        {
+            return $"/kindex/detail/{ico}{(rok.HasValue ? "?rok=" + rok.Value : "")}";
+        }
+
+        public static IHtmlContent KIndexLimitedRaw(this IHtmlHelper htmlHelper, params IHtmlContent[] htmls)
+        {
+            var user = htmlHelper.ViewContext.HttpContext.User;
+            var s = string.Join("", htmls.Select(m => m.ToString().Replace("\n", "").Trim()));
+            return htmlHelper.Raw(s);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="user"></param>
+        /// <param name="rok"></param>
+        /// <returns></returns>
+        public static int MaxKIndexYearToShow(System.Security.Principal.IPrincipal user, int? rok = null)
+        {
+            if (rok.HasValue)
+                return Math.Min(rok.Value, MaxKIndexYearToShow(user));
+            else
+                return MaxKIndexYearToShow(user);
+        }
+        public static int MaxKIndexYearToShow(System.Security.Principal.IPrincipal user)
+        {
+            int lastY = Devmasters.ParseText.ToInt(Devmasters.Config.GetWebConfigValue("KIndexMaxYear"))
+                ?? KIndexRepo.GetAvailableCalculationYears().Max();
+            if (
+                IfInRoles(user, "TK-KIndex-2021")
+                || IfInRoles(user, "Admin")
+                )
+                return KIndexRepo.GetAvailableCalculationYears().Max();
+            else
+                return lastY;
+        }
+
+        public static bool ShowFutureKIndex(System.Security.Principal.IPrincipal user)
+        {
+            return true;
+            //return IfInRoles(user, "TK-KIndex-2021");
+        }
+
+        public static Restricted ShowFutureKIndex(this IHtmlHelper self, System.Security.Principal.IPrincipal user)
+        {
+            return new(self, ShowFutureKIndex(user));
+        }
+        public static bool IfInRoles(System.Security.Principal.IPrincipal user, params string[] roles)
         {
             bool show = false;
             if (roles.Count() > 0)
@@ -46,6 +252,10 @@ namespace HlidacStatu.Lib.Web.UI
             return show;
         }
 
+        public static Restricted IfInRoles(this IHtmlHelper self, System.Security.Principal.IPrincipal user, params string[] roles)
+        {
+            return new(self, IfInRoles(user, roles));
+        }
 
         public static IHtmlContent Toggleable(this IHtmlHelper htmlHelper,
             string first, string firstButton,
@@ -80,6 +290,62 @@ namespace HlidacStatu.Lib.Web.UI
             sb.Append($"<div class=\"btn btn-default {random}_second\" style=\"border-top-left-radius: 0px;border-bottom-left-radius: 0px;\">{secondButton}</div>");
             sb.Append($"<div class=\"{random}_first content\">{first}</div>");
             sb.Append($"<div class=\"{random}_second content\" style=\"display: none; \">{second}</div>");
+
+            return htmlHelper.Raw(sb.ToString());
+        }
+        public static IHtmlContent Toggleable3(this IHtmlHelper htmlHelper,
+            string first, string firstButton,
+            string second, string secondButton,
+            string third, string thirdButton
+            )
+        {
+            return Toggleable3(htmlHelper, new HtmlString(first), firstButton, new HtmlString(second), secondButton, new HtmlString(third), thirdButton);
+
+        }
+        public static IHtmlContent Toggleable3(this IHtmlHelper htmlHelper,
+            IHtmlContent first, string firstButton,
+            IHtmlContent second, string secondButton,
+            IHtmlContent third, string thirdButton
+            )
+        {
+            string random = Guid.NewGuid().ToString("N");
+            var sb = new System.Text.StringBuilder();
+
+            sb.Append($"<script>");
+            sb.Append($"$(function () {{");
+            sb.Append($"$('.{random}_first.btn').click(function () {{");
+            sb.Append($"$('.{random}_first.content').show();");
+            sb.Append($"$('.{random}_second.content').hide();");
+            sb.Append($"$('.{random}_third.content').hide();");
+            sb.Append($"$('.{random}_first.btn').addClass(\"btn-primary\");");
+            sb.Append($"$('.{random}_second.btn').removeClass(\"btn-primary\");");
+            sb.Append($"$('.{random}_third.btn').removeClass(\"btn-primary\");");
+            sb.Append($"}});");
+            sb.Append($"$('.{random}_second.btn').click(function () {{");
+            sb.Append($"$('.{random}_first.content').hide();");
+            sb.Append($"$('.{random}_third.content').hide();");
+            sb.Append($"$('.{random}_second.content').show();");
+            sb.Append($"$('.{random}_first.btn').removeClass(\"btn-primary\");");
+            sb.Append($"$('.{random}_third.btn').removeClass(\"btn-primary\");");
+            sb.Append($"$('.{random}_second.btn').addClass(\"btn-primary\");");
+            sb.Append($"}});");
+            sb.Append($"$('.{random}_third.btn').click(function () {{");
+            sb.Append($"$('.{random}_first.content').hide();");
+            sb.Append($"$('.{random}_second.content').hide();");
+            sb.Append($"$('.{random}_third.content').show();");
+            sb.Append($"$('.{random}_first.btn').removeClass(\"btn-primary\");");
+            sb.Append($"$('.{random}_second.btn').removeClass(\"btn-primary\");");
+            sb.Append($"$('.{random}_third.btn').addClass(\"btn-primary\");");
+            sb.Append($"}});");
+
+            sb.Append($"}});");
+            sb.Append($"</script>");
+            sb.Append($"<div class=\"btn btn-default {random}_first btn-primary\" style=\"border-top-right-radius: 0px;border-bottom-right-radius: 0px;\">{firstButton}</div>");
+            sb.Append($"<div class=\"btn btn-default {random}_second\" style=\"border-top-left-radius: 0px;border-bottom-left-radius: 0px;\">{secondButton}</div>");
+            sb.Append($"<div class=\"btn btn-default {random}_third\" style=\"border-top-left-radius: 0px;border-bottom-left-radius: 0px;\">{thirdButton}</div>");
+            sb.Append($"<div class=\"{random}_first content\">{first}</div>");
+            sb.Append($"<div class=\"{random}_second content\" style=\"display: none; \">{second}</div>");
+            sb.Append($"<div class=\"{random}_third content\" style=\"display: none; \">{third}</div>");
 
             return htmlHelper.Raw(sb.ToString());
         }
@@ -198,9 +464,9 @@ namespace HlidacStatu.Lib.Web.UI
 
         public static object DatatableOptionsObject(
             bool paging = true, int? pageLength = 10, bool info = false, bool filter = true, string dom = "Bfrtip",
-            bool lengthChange = false, bool exportButtons = true, bool searching=true,
+            bool lengthChange = false, bool exportButtons = true, bool searching = true,
             bool ordering = true, int? orderColumnIdx = null, string? orderDirection = null,
-            Dictionary<string,object> customObjs = null
+            Dictionary<string, object> customObjs = null
             )
         {
             dynamic conf = new
@@ -211,12 +477,12 @@ namespace HlidacStatu.Lib.Web.UI
                 },
                 lengthChange = lengthChange,
                 paging = paging,
-                pageLength = pageLength.HasValue? pageLength.Value : (int?)null,
+                pageLength = pageLength.HasValue ? pageLength.Value : (int?)null,
                 info = info,
                 filter = filter,
                 searching = searching,
                 dom = dom,
-                buttons = exportButtons==false ? null : new[] {
+                buttons = exportButtons == false ? null : new[] {
                     new {
                         extend ="csvHtml5",
                         text = "Export do CSV",
@@ -235,7 +501,7 @@ namespace HlidacStatu.Lib.Web.UI
                     },
                 },
                 ordering = ordering,
-                order = orderColumnIdx.HasValue == false ? null : new[] {new object[] {orderColumnIdx.Value, orderDirection}}
+                order = orderColumnIdx.HasValue == false ? null : new[] { new object[] { orderColumnIdx.Value, orderDirection } }
             };
 
             if (customObjs?.Count > 0)
@@ -260,7 +526,7 @@ namespace HlidacStatu.Lib.Web.UI
             bool ordering = true, int? orderColumnIdx = null, string? orderDirection = null)
         {
             return Newtonsoft.Json.JsonConvert.SerializeObject(
-                DatatableOptionsObject(paging, pageLength,info,filter,dom,lengthChange,exportButtons,searching, ordering, orderColumnIdx,orderDirection)
+                DatatableOptionsObject(paging, pageLength, info, filter, dom, lengthChange, exportButtons, searching, ordering, orderColumnIdx, orderDirection)
                 );
         }
 
@@ -276,6 +542,39 @@ namespace HlidacStatu.Lib.Web.UI
                         'info': false,
                         }",
             string customTableHeader = null)
+        {
+            var tblHtml = renderDataToHTMLTable(rds, tableId, dataTableOptions, customTableHeader);
+            return htmlHelper.Raw(tblHtml);
+        }
+        public static IHtmlContent DataToHTMLTable<T>(
+         ReportDataSource<T> rds,
+         string tableId = "",
+         string dataTableOptions = @"{
+                         'language': {
+                            'url': '//cdn.datatables.net/plug-ins/1.13.4/i18n/cs.json'
+                        },
+                        'order': [],
+                        'lengthChange': false,
+                        'info': false,
+                        }",
+         string customTableHeader = null)
+        {
+            var tblHtml = renderDataToHTMLTable(rds, tableId, dataTableOptions, customTableHeader);
+            return new HtmlString(tblHtml);
+        }
+
+        private static string renderDataToHTMLTable<T>(
+          ReportDataSource<T> rds,
+          string tableId = "",
+          string dataTableOptions = @"{
+                         'language': {
+                            'url': '//cdn.datatables.net/plug-ins/1.13.4/i18n/cs.json'
+                        },
+                        'order': [],
+                        'lengthChange': false,
+                        'info': false,
+                        }",
+          string customTableHeader = null)
         {
             string _tableId = tableId;
             if (string.IsNullOrEmpty(tableId))
@@ -333,7 +632,7 @@ $(document).ready(function () {
                 sb.Append("</tr>");
             }
             sb.Append("</table>");
-            return htmlHelper.Raw(sb.ToString());
+            return sb.ToString();
         }
 
 
@@ -366,7 +665,6 @@ $(document).ready(function () {
                     return self.Raw("");
             }
         }
-
 
     }
 }

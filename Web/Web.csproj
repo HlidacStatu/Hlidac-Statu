@@ -47,6 +47,7 @@
     </ItemGroup>
     <ItemGroup>
       <Compile Remove="Controllers\StatniWebyOldController.cs" />
+      <Compile Remove="Framework\ViewContextExtensions.cs" />
       <Compile Remove="TagHelpers\xToggleableTagHelper.cs" />
     </ItemGroup>
     <ItemGroup>
@@ -114,6 +115,7 @@
       <ProjectReference Include="..\KIndexGenerator\KIndexGenerator.csproj" />
       <ProjectReference Include="..\Lib.Data.External.Tables\Lib.Data.External.Tables.csproj" />
       <ProjectReference Include="..\Lib.Data.External\Lib.Data.External.csproj" />
+      <ProjectReference Include="..\Lib.Web.UI\Lib.Web.UI.csproj" />
       <ProjectReference Include="..\LibCore\LibCore.csproj" />
       <ProjectReference Include="..\Plugin.Enhancers\Plugin.Enhancers.csproj" />
       <ProjectReference Include="..\Plugin.IssueAnalyzers\Plugin.IssueAnalyzers.csproj" />

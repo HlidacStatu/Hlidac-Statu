@@ -115,7 +115,7 @@ HtmlRender = (s) => {
             <div class="col-xs-12">
                 @foreach (var q in model.GetQueue("newCompanies"))
         {
-                @ChartUtil.RenderReport(q, @"{
+                @ChartUtilExtensions.RenderReport(q, @"{
                      'language': {
                         'url': '//cdn.datatables.net/plug-ins/1.13.4/i18n/cs.json'
                     },

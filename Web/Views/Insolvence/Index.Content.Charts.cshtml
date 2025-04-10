@@ -58,7 +58,7 @@
                                 </p>
                             </div>
                             <div class="box-stats__media">
-                                @ChartUtil.RenderSimpleTimeChart(data.Where(m => m.Date < thisMonth), 230, 135, "Počet nových insolvencí", true)
+                                @ChartUtilExtensions.RenderSimpleTimeChart(data.Where(m => m.Date < thisMonth), 230, 135, "Počet nových insolvencí", true)
 
                                 @*<img src="/Content/temp/stats-graph.png" width height alt class="box-stats__image">*@
                             </div>
@@ -112,7 +112,7 @@
                                 </p>
                             </div>
                             <div class="box-stats__media">
-                                @ChartUtil.RenderSimpleTimeChart(data, 230, 135, "Počet schválených oddlužení", true)
+                                @ChartUtilExtensions.RenderSimpleTimeChart(data, 230, 135, "Počet schválených oddlužení", true)
                             </div>
                         </div>
                     </div>

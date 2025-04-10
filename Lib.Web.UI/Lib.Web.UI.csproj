@@ -12,6 +12,8 @@
     <PackageReference Include="Microsoft.AspNetCore.Mvc.ViewFeatures" Version="2.2.0" />
     <PackageReference Include="Ollama" Version="1.13.0" />
     <PackageReference Include="System.Security.Cryptography.Pkcs" Version="8.0.1" />
+	  <PackageReference Include="Schema.NET" Version="13.0.0" />
+
   </ItemGroup>
 
   <ItemGroup>

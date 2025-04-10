@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using System;
 using System.Text;
 
-namespace HlidacStatu.Web.Framework
+namespace HlidacStatu.Lib.Web.UI
 {
     class DisposableHelper : IDisposable
     {

@@ -185,7 +185,7 @@ return sb.ToString();
     </b> za <b>@HlidacStatu.Util.RenderData.ShortNicePrice(topSumFirma.CelkemCena)</b>.
 </p>
 
-@ChartUtil.RenderReport(typeof(BasicDataForSubject<List<BasicData<string>>>),
+@ChartUtilExtensions.RenderReport(typeof(BasicDataForSubject<List<BasicData<string>>>),
         new ReportModel.QueueItem()
         {
             Type = ReportModel.QueueItem.types.table,

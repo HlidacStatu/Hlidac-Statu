@@ -36,7 +36,7 @@
     <div class="col-sm-6 col-xs-12">
         @foreach (var q in model.GetQueue("perIcoChart", "perIcoTable"))
         {
-            @ChartUtil.RenderReport(q, HtmlExtensions.DatatableOptions(ordering: false), q.Key)
+            @ChartUtilExtensions.RenderReport(q, HtmlExtensions.DatatableOptions(ordering: false), q.Key)
         }
 
 
@@ -44,7 +44,7 @@
     <div class="col-sm-6 col-xs-12">
         @foreach (var q in model.GetQueue("perPriceChart", "perPriceTable"))
         {
-            @ChartUtil.RenderReport(q, HtmlExtensions.DatatableOptions(ordering: false), q.Key)
+            @ChartUtilExtensions.RenderReport(q, HtmlExtensions.DatatableOptions(ordering: false), q.Key)
         }
     </div>
 </div>

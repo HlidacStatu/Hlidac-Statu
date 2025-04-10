@@ -95,7 +95,7 @@
     <div class="col-xs-12 dontembed">
         @foreach (var q in model.GetQueue("perIcoChart_d"))
         {
-            @ChartUtil.RenderReport(q, HtmlExtensions.DatatableOptions(orderColumnIdx:3, orderDirection:"desc"), q.Key)
+            @ChartUtilExtensions.RenderReport(q, HtmlExtensions.DatatableOptions(orderColumnIdx:3, orderDirection:"desc"), q.Key)
         }
 
 
@@ -103,7 +103,7 @@
     <div class="col-xs-12">
         @foreach (var q in model.GetQueue("perIcoTable"))
         {
-            @ChartUtil.RenderReport(q, HtmlExtensions.DatatableOptions(orderColumnIdx:3, orderDirection:"desc"), q.Key)
+            @ChartUtilExtensions.RenderReport(q, HtmlExtensions.DatatableOptions(orderColumnIdx:3, orderDirection:"desc"), q.Key)
         }
     </div>
 </div>

@@ -1,4 +1,5 @@
 using HlidacStatu.Entities;
+using HlidacStatu.Lib.Web.UI;
 using HlidacStatu.Repositories;
 
 using Microsoft.AspNetCore.Html;
@@ -15,26 +16,6 @@ namespace HlidacStatu.Web.Framework
 {
     public static class WebUtil
     {
-        public static string GetRequestPath(this IHtmlHelper htmlHelper)
-        {
-            return htmlHelper.ViewContext.GetRequestPath();
-        }
-
-        public static bool IsAuthenticatedRequest(this IHtmlHelper htmlHelper)
-        {
-            return htmlHelper.ViewContext.IsAuthenticatedRequest();
-        }
-
-        public static IIdentity? GetUserIdentity(this IHtmlHelper htmlHelper)
-        {
-            return htmlHelper.ViewContext.GetUserIdentity();
-        }
-
-        public static IHtmlContent GAClick(this IHtmlHelper htmlHelper)
-        {
-            return new HtmlString(
-                $" onclick=\"_my_event('send', 'event', 'logoffBtn', 'click','{htmlHelper.GetRequestPath()}')\" ");
-        }
 
         public static IHtmlContent IfExists(bool showExists, string exists, string ifEmpty = "")
         {
@@ -129,20 +110,6 @@ window.onload = function() {{
         public static string GenerateCacheKey(object[] objects)
         {
             return string.Join("_", objects);
-        }
-
-        public static IHtmlContent LowBox(this IHtmlHelper htmlHelper, int width, string content,
-            string? gaPageEventId = null)
-        {
-            gaPageEventId ??= htmlHelper.GetRequestPath();
-
-            var sb = new StringBuilder($"<div class=\"low-box\" style=\"max-height:{width}px\">");
-            sb.Append(
-                $"<div class=\"low-box-line\" style=\"top:{width - 55}px\"><a href=\"#\"  class=\"more\"></a></div>");
-            sb.Append("<div class=\"low-box-content\">");
-            sb.Append(content);
-            sb.Append("</div></div>");
-            return new HtmlString(sb.ToString());
         }
 
         public static string RenderProperty(JToken jp, int level, int maxLevel, int? maxLength = null)

@@ -194,7 +194,7 @@
                         ve středně těžkém stavu <b>@(chartdata.First(m => m.date == currDate).data.Pacienti_stredni)</b>,
                         v těžkém stavu <b>@(chartdata.First(m => m.date == currDate).data.Pacienti_tezky)</b>.
                     </p>        <p>
-                        @ChartUtil.SimpleStackedChart(new (string name, IEnumerable<ReportDataTimeValue> values)[] {
+                        @ChartUtilExtensions.SimpleStackedChart(new (string name, IEnumerable<ReportDataTimeValue> values)[] {
                                 (name:"Těžký stav",
                                     values:chartdata.Where(m=>m.data.Pacienti_tezky>0).Select(m=>new ReportDataTimeValue(){ Date = m.date, Value = m.data.Pacienti_tezky } )
                                 ),
@@ -220,7 +220,7 @@
                     </p>
                     <p>&nbsp;<br />&nbsp;</p>
                     <p>
-                        @ChartUtil.SimpleLineChart(new (string name, IEnumerable<ReportDataTimeValue> values)[] {
+                        @ChartUtilExtensions.SimpleLineChart(new (string name, IEnumerable<ReportDataTimeValue> values)[] {
                                 (name:"Počet úmrtí COVID pacientů tento den",
                                     values:chartdata.Where(m=>m.data.Pacienti_zemreli>0).Select(m=>new ReportDataTimeValue(){ Date = m.date, Value = m.data.Pacienti_zemreli} )
                                 )
@@ -243,7 +243,7 @@
                     Změna volných od @first.lastUpdated.ToString("dd.MM."): <span style="font-weight:normal;color:@TColor(diffH.AROJIP_luzka_covid)">@(diffH.AROJIP_luzka_covid.ToString("+#;-#;0"))</span> / <span style="font-weight:normal;color:@TColor(diffH.AROJIP_luzka_necovid)">@(diffH.AROJIP_luzka_necovid.ToString("+#;-#;0"))</span>
                 </p>
                 <p>
-                    @ChartUtil.SimpleLineChart(new (string name, IEnumerable<ReportDataTimeValue> values)[] {
+                    @ChartUtilExtensions.SimpleLineChart(new (string name, IEnumerable<ReportDataTimeValue> values)[] {
                             (name:"ARO+JIP volná neCOVID lůžka",
                                 values:chartdata.Select(m=>new ReportDataTimeValue(){ Date = m.date, Value = m.data.AROJIP_luzka_necovid } )
                             ),
@@ -269,7 +269,7 @@
                     Změna volných od @first.lastUpdated.ToString("dd.MM."): <span style="font-weight:normal;color:@TColor(diffH.Standard_luzka_s_kyslikem_covid)">@(diffH.Standard_luzka_s_kyslikem_covid.ToString("+#;-#;0"))</span> / <span style="font-weight:normal;color:@TColor(diffH.Standard_luzka_s_kyslikem_necovid)">@(diffH.Standard_luzka_s_kyslikem_necovid.ToString("+#;-#;0"))</span>
                 </p>
                 <p>
-                    @ChartUtil.SimpleLineChart(new (string name, IEnumerable<ReportDataTimeValue> values)[] {
+                    @ChartUtilExtensions.SimpleLineChart(new (string name, IEnumerable<ReportDataTimeValue> values)[] {
                             (name:"volná neCOVID lůžka s kyslíkem",
                                 values:chartdata.Select(m=>new ReportDataTimeValue(){ Date = m.date, Value = m.data.Standard_luzka_s_kyslikem_necovid} )
                             ),
@@ -298,7 +298,7 @@
                     Změna volných od @first.lastUpdated.ToString("dd.MM."): <span style="font-weight:normal;color:@TColor(diffH.ECMO_volna)">@(diffH.ECMO_volna.ToString("+#;-#;0"))</span>
                 </p>
                 <p>
-                    @ChartUtil.SimpleLineChart(new (string name, IEnumerable<ReportDataTimeValue> values)[] {
+                    @ChartUtilExtensions.SimpleLineChart(new (string name, IEnumerable<ReportDataTimeValue> values)[] {
                             (name:"Přístroje ECMO celkem",
                                 values:chartdata.Select(m=>new ReportDataTimeValue(){ Date = m.date, Value = m.data.ECMO_celkem } )
                             ),
@@ -319,7 +319,7 @@
                     Změna volných od @first.lastUpdated.ToString("dd.MM."): <span style="font-weight:normal;color:@TColor(diffH.UPV_volna)">@(diffH.UPV_volna.ToString("+#;-#;0"))</span>
                 </p>
                 <p>
-                    @ChartUtil.SimpleLineChart(new (string name, IEnumerable<ReportDataTimeValue> values)[] {
+                    @ChartUtilExtensions.SimpleLineChart(new (string name, IEnumerable<ReportDataTimeValue> values)[] {
                             (name:"Přístroje UPV celkem",
                                 values:chartdata.Select(m=>new ReportDataTimeValue(){ Date = m.date, Value = m.data.UPV_celkem } )
                             ),
@@ -344,7 +344,7 @@
                     Změna volných od @first.lastUpdated.ToString("dd.MM."): <span style="font-weight:normal;color:@TColor(diffH.CRRT_volna)">@(diffH.CRRT_volna.ToString("+#;-#;0"))</span>
                 </p>
                 <p>
-                    @ChartUtil.SimpleLineChart(new (string name, IEnumerable<ReportDataTimeValue> values)[] {
+                    @ChartUtilExtensions.SimpleLineChart(new (string name, IEnumerable<ReportDataTimeValue> values)[] {
                             (name:"Přístroje CRRT celkem",
                                 values:chartdata.Select(m=>new ReportDataTimeValue(){ Date = m.date, Value = m.data.CRRT_celkem } )
                             ),
@@ -364,7 +364,7 @@
                     <br /><span class="text-info">pozor na měřítko, osa Y nezačíná na nule</span>
                 </p>
                 <p>
-                    @ChartUtil.SimpleLineChart(new (string name, IEnumerable<ReportDataTimeValue> values)[] {
+                    @ChartUtilExtensions.SimpleLineChart(new (string name, IEnumerable<ReportDataTimeValue> values)[] {
                             (name:"Dostupné ventilátory přenosné+oper.sál",
                                 values:chartdata.Select(m=>new ReportDataTimeValue(){ Date = m.date, Value = m.data.Ventilatory_prenosne_celkem+m.data.Ventilatory_operacnisal_celkem } )
                             )

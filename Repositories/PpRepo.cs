@@ -12,12 +12,12 @@ public static class PpRepo
 {
     public const int DefaultYear = 2024;
     public const int MinYear = 2024;
-    
+
     public static async Task<PuOrganizace> GetFullDetailAsync(string datovaSchranka)
     {
         return await GetFullDetailAsync(new string[] { datovaSchranka });
     }
-    
+
 
     public static async Task<PuOrganizace> GetFullDetailAsync(string[] datoveSchranky)
     {
@@ -25,7 +25,7 @@ public static class PpRepo
 
         return await db.PuOrganizace
             .AsNoTracking()
-            .Where(pu => datoveSchranky.Contains(pu.DS) )
+            .Where(pu => datoveSchranky.Contains(pu.DS))
             .Include(o => o.Metadata)
             .Include(o => o.Tags)
             .Include(o => o.FirmaDs)
@@ -33,7 +33,7 @@ public static class PpRepo
             .FirstOrDefaultAsync();
     }
 
-    
+
 
     public static List<PpPrijem> AktualniRok(this ICollection<PpPrijem> prijmy, int rok = DefaultYear)
     {
@@ -62,45 +62,22 @@ public static class PpRepo
                                       && p.Rok == rok
                                       && p.Nameid == nameid);
     }
-    
-    public static async Task<PuRokPoliticiStat> GetGlobalStatAsync(int rok = DefaultYear)
+
+    public static async Task<PpStat> GetGlobalStatAsync(int rok = DefaultYear)
     {
         await using var db = new DbEntities();
 
-        var stat = new PuRokPoliticiStat();
-        stat.PocetOslovenych = await db.PuOrganizaceMetadata
-            .Where(m => m.Typ == PuOrganizaceMetadata.TypMetadat.PlatyPolitiku)
-            .CountAsync(m => m.DatumOdeslaniZadosti.HasValue && m.Rok == rok);
-
-        stat.PocetCoPoslaliPlat = await db.PpPrijmy
-            .Where(m => m.Rok == rok)
-            .Select(m => m.IdOrganizace)
-            .Distinct()
-            .CountAsync();
-
-        var platyRok = db.PpPrijmy
-            .AsNoTracking()
-            .Where(m => m.Rok == rok)
-            .Select(m => new { mplat = m.HrubyMesicniPlatVcetneOdmen, plat = m, org = m.Organizace })
-            .ToArray()
-            .OrderBy(o => o.mplat)
-            .ToArray();
-
-        stat.PercentilyPlatu = new Dictionary<int, decimal>()
-        {
-            { 1, HlidacStatu.Util.MathTools.PercentileCont(0.01m, platyRok.Select(m => m.mplat)) },
-            { 5, HlidacStatu.Util.MathTools.PercentileCont(0.05m, platyRok.Select(m => m.mplat)) },
-            { 10, HlidacStatu.Util.MathTools.PercentileCont(0.10m, platyRok.Select(m => m.mplat)) },
-            { 25, HlidacStatu.Util.MathTools.PercentileCont(0.25m, platyRok.Select(m => m.mplat)) },
-            { 50, HlidacStatu.Util.MathTools.PercentileCont(0.50m, platyRok.Select(m => m.mplat)) },
-            { 75, HlidacStatu.Util.MathTools.PercentileCont(0.75m, platyRok.Select(m => m.mplat)) },
-            { 90, HlidacStatu.Util.MathTools.PercentileCont(0.90m, platyRok.Select(m => m.mplat)) },
-            { 95, HlidacStatu.Util.MathTools.PercentileCont(0.95m, platyRok.Select(m => m.mplat)) },
-            { 99, HlidacStatu.Util.MathTools.PercentileCont(0.99m, platyRok.Select(m => m.mplat)) },
-        };
+        PpStat stat = new PpStat(rok,
+            db.PpPrijmy
+                .AsNoTracking()
+                .Where(m => m.Rok == rok)
+                .Select(m =>
+                    new PpStat.SimplePlatData() { organizace = m.IdOrganizace.ToString(), osoba = m.Nameid, plat = m.HrubyMesicniPlatVcetneOdmen }
+                )
+            );
         return stat;
     }
-    
+
     public static async Task<List<PpPrijem>> GetPrijmyPolitika(string nameid)
     {
         await using var db = new DbEntities();
@@ -123,7 +100,7 @@ public static class PpRepo
             .Where(p => p.Rok == rok)
             .CountAsync();
     }
-    
+
     public static async Task<List<PuOrganizace>> GetActiveOrganizaceForTagAsync(string tag, int limit = 0)
     {
         await using var db = new DbEntities();
@@ -146,28 +123,28 @@ public static class PpRepo
     [
         "politici",
     ];
-    
+
     public static async Task<List<PpPrijem>> GetPlatyAsync(int rok)
     {
         await using var db = new DbEntities();
-        
+
         return await db.PpPrijmy
             .AsNoTracking()
             .Where(p => p.Rok == rok)
             .ToListAsync();
     }
-    
+
     public static string PlatyForYearPoliticiDescriptionHtml(this PuOrganizace org, int rok = DefaultYear, bool withDetail = false)
     {
         var desc = org.GetMetadataDescriptionPolitici(rok);
 
         return $"<span class='text-{desc.BootstrapStatus}'><i class='{desc.Icon}'></i> {desc.TextStatus}{(withDetail ? $". {desc.Detail}" : "")}</span>";
     }
-    
-    public static PuOrganizaceMetadata.Description GetMetadataDescriptionPolitici(this PuOrganizace org, int rok = DefaultYear )
+
+    public static PuOrganizaceMetadata.Description GetMetadataDescriptionPolitici(this PuOrganizace org, int rok = DefaultYear)
     {
         var res = new PuOrganizaceMetadata.Description();
-        
+
         var metadataList = org.MetadataPlatyUredniku.Where(m => m.Rok == rok && m.Typ == PuOrganizaceMetadata.TypMetadat.PlatyPolitiku).ToList();
         //ted pracuju pouze s jednou
         var metadata = metadataList.FirstOrDefault();
@@ -281,9 +258,9 @@ public static class PpRepo
     public static async Task<string> GetNewCisloJednaciAsync()
     {
         await using var dbContext = new DbEntities();
-        var existing= await dbContext.PpEvents
+        var existing = await dbContext.PpEvents
             .AsNoTracking()
-            .Where(m=>m.NaseCJ !=null)
+            .Where(m => m.NaseCJ != null)
             .Select(m => m.NaseCJ)
             .Distinct()
             .ToArrayAsync();
@@ -388,12 +365,12 @@ public static class PpRepo
         {
             throw new Exception("Chybí vyplněné id organizace");
         }
-        
+
         if (string.IsNullOrWhiteSpace(prijemPolitika.Nameid))
         {
             throw new Exception("Chybí vyplněné nameid");
         }
-        
+
         PpPrijem origPlat;
 
         await using var dbContext = new DbEntities();
@@ -433,7 +410,7 @@ public static class PpRepo
             origPlat.NahradaReprezentace = prijemPolitika.NahradaReprezentace;
             origPlat.NahradaTelefon = prijemPolitika.NahradaTelefon;
             origPlat.NahradaUbytovani = prijemPolitika.NahradaUbytovani;
-            
+
         }
 
         await dbContext.SaveChangesAsync();

@@ -28,17 +28,16 @@
                 <p>
                     Za @PuRepo.DefaultYear jsme žádali o platy @(HlidacStatu.Util.RenderData.NiceNumber(stats.PocetOslovenych)) organizací
                     a plat nám @(DateTime.Now < new DateTime(2025, 04, 1) ? "zatím" : "") poskytlo @(HlidacStatu.Util.RenderData.NiceNumber(stats.PocetCoPoslaliPlat)) z nich.
-
                 </p>
                 <p>
                     <a asp-controller="Urednici" asp-action="Index" class="btn btn-primary btn-sm">Vše o platech úředníků a manažerů <span class="badge text-bg-danger">@(@PuRepo.DefaultYear)</span></a>
                 </p>
                 <p class="mb-2 mt-4 text-body-secondary">
                     Oblasti:
-                        @foreach (var item in PuRepo.MainTags)
-                        {
+                    @foreach (var item in PuRepo.MainTags)
+                    {
                         <hashtag tag="@item" typ="PlatyUredniku" additional-class="badge rounded-pill border me-3 mb-2" style="font-size:0.9em"></hashtag>
-                        }
+                    }
                 </p>
 
             </div>

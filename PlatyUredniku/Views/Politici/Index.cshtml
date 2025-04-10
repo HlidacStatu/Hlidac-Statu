@@ -1,35 +1,62 @@
 ﻿@using HlidacStatu.Entities
 @using HlidacStatu.Repositories
+@using HlidacStatu.Util
+
 @inject ZiggyCreatures.Caching.Fusion.IFusionCache cache;
 @{
     var stats = await PpRepo.GetGlobalStatAsync();
     List<PpPrijem> platy = (List<PpPrijem>?)ViewData["platy"];
 }
 
+@section breadcrumbs
+{
+    <ol class="breadcrumb">
+        <li>
+            <a asp-action="Index" asp-controller="Home">Platy</a>
+        </li>
+        <li class="active">Politici</li>
+    </ol>
+}
+
 <section class="d-flex align-items-center justify-content-center">
     <div class="container">
-        <h2>
-            Platy politiků v @PpRepo.DefaultYear
-        </h2>
+        <h1>
+            Příjmy a benefity politiků v @PpRepo.DefaultYear
+        </h1>
+        <p class="lead">
+            Platy politiků - detailní přehled politických a z daní placených působnostech politiků a jejich příjmy z veřejných prostředků.
+        </p>
         <p class="">
-            Nové platy politiků - prozkoumejte a podívejte se, kolik akumulují
+            Za @PpRepo.DefaultYear jsme máme informace o @(RenderData.NiceNumber(stats.PocetPrijmu)) příjmech a benefitech @(RenderData.NiceNumber(stats.PocetOsob)) politiků z
+            @(RenderData.NiceNumber(stats.PocetOrganizaci)) organizací.
         </p>
     </div>
 </section>
 
 <section class="d-flex align-items-center justify-content-center alter-bg-color">
     <div class="container">
-        <h5>
-            Za @PpRepo.DefaultYear jsme žádali o
-            platy @(HlidacStatu.Util.RenderData.NiceNumber(stats.PocetOslovenych)) organizací
-            a plat nám poskytlo @(HlidacStatu.Util.RenderData.NiceNumber(stats.PocetCoPoslaliPlat)) z nich.
-
-        </h5>
-        <p>
-            <a class="btn btn-primary btn-sm" href="/oblasti">Seznam všech organizací <span
-                    class="badge text-bg-danger">@(HlidacStatu.Util.RenderData.NiceNumber(stats.PocetOslovenych))</span></a>
-        </p>
-        <p class="mb-2 mt-4 text-body-secondary">
+        <div class="row">
+            <div class="col">
+                <p>
+                    <a class="btn btn-primary btn-sm" href="/politici/organizace">
+                        Seznam všech organizací <span class="badge text-bg-danger">@(HlidacStatu.Util.RenderData.NiceNumber(stats.PocetOrganizaci))</span>
+                    </a>
+                </p>
+                <p class="mb-2 mt-4 text-body-secondary">
+                    Nejvíce politiků působí v ... 
+                </p>
+            </div>
+            <div class="col">
+                <p>
+                    <a class="btn btn-primary btn-sm" href="/politici/seznam">
+                        Seznam všech politiků a jejich příjmů <span class="badge text-bg-danger">@(HlidacStatu.Util.RenderData.NiceNumber(stats.PocetOrganizaci))</span>
+                    </a>
+                </p>
+                <p class="mb-2 mt-4 text-body-secondary">
+                    Nejvyšší příjmy mají ...
+                </p>
+            </div>
+        </div>
     </div>
 </section>
 

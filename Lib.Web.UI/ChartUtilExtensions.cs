@@ -75,6 +75,8 @@ namespace HlidacStatu.Lib.Web.UI
             }
         }
 
+    
+
 
 
         public static IHtmlContent PieChart(this IHtmlHelper htmlHelper,
@@ -273,10 +275,10 @@ namespace HlidacStatu.Lib.Web.UI
         }
 
 
-        public static IHtmlContent SimpleStackedChart(this IHtmlHelper htmlHelper,
-            IEnumerable<(string name, IEnumerable<ReportDataTimeValue> values)> data,
-            string title, string valueName,
-            int height, string addStyle = "", int? minY = null, bool showMarker = true, string chartType = "column")
+        public static IHtmlContent SimpleStackedChart(
+    IEnumerable<(string name, IEnumerable<ReportDataTimeValue> values)> data,
+    string title, string valueName,
+    int height, string addStyle = "", int? minY = null, bool showMarker = true, string chartType = "column")
         {
             string containerId = "chart_" + Guid.NewGuid().ToString("N");
             List<string> sdata = new List<string>();
@@ -344,12 +346,12 @@ xAxis: {
     ]
 });</script>");
 
-            //return htmlHelper.Raw(sb.ToString());
             return new HtmlString(sb.ToString());
         }
 
 
-        public static IHtmlContent SimpleLineChart(this IHtmlHelper htmlHelper,
+
+        public static IHtmlContent SimpleLineChart(
             IEnumerable<(string name, IEnumerable<ReportDataTimeValue> values)> data,
             string title, string valueName,
             int height, string addStyle = "", int? minY = null, bool showMarker = true)
@@ -425,15 +427,14 @@ Highcharts.chart('" + containerId + @"', {
         }
 
 
-        public static IHtmlContent SemiCircleDonut(this IHtmlHelper htmlHelper,
-            IEnumerable<Tuple<string, decimal>> data,
+        public static IHtmlContent SemiCircleDonut(IEnumerable<Tuple<string, decimal>> data,
             string title, string valueName,
             int height, string addStyle = "")
         {
             //https://jsfiddle.net/gh/get/library/pure/highcharts/highcharts/tree/master/samples/highcharts/demo/pie-semi-circle
             string containerId = "chart_" + Guid.NewGuid().ToString("N");
             string sdata = data
-                .Select(m => $"['{m.Item1.Replace("'","\'")}',{m.Item2.ToString(HlidacStatu.Util.Consts.enCulture)}]")
+                .Select(m => $"['{m.Item1.Replace("'", "\'")}',{m.Item2.ToString(HlidacStatu.Util.Consts.enCulture)}]")
                 .Aggregate((f, s) => f + "," + s);
 
             var sb = @"
@@ -460,22 +461,21 @@ point: {
         }
 },
     plotOptions: {
-        pie: {
-            dataLabels: {
-                enabled: true,
-                distance: -30,
-                format: '{point.name} {point.percentage:.1f}%',
+pie: {
+    dataLabels: {
+        enabled: false,
+                distance: -50,
                 style: {
-                fontWeight: 'bold',
+            fontWeight: 'bold',
                     color: 'white'
-                    }
-            },
-        startAngle: -90,
-        endAngle: 90,
-        center: ['50%', '75%'],
-        size: '110%'
+                }
         },
-    },
+            startAngle: -90,
+            endAngle: 90,
+            center: ['50%', '75%'],
+            size: '150%'
+        }
+        },
     series: [{
         type: 'pie',
         name: '" + valueName + @"',
@@ -485,12 +485,9 @@ point: {
 });</script>
 ";
             return new HtmlString(sb);
-
-            //return htmlHelper.Raw(sb);
         }
 
-        public static IHtmlContent RenderSimpleTimeChart(this IHtmlHelper htmlHelper,
-            IEnumerable<ReportDataTimeValue> data,
+        public static IHtmlContent RenderSimpleTimeChart(IEnumerable<ReportDataTimeValue> data,
             int width, int height, string valueName,
             bool showMaxLine = false)
         {
@@ -617,8 +614,8 @@ point: {
             sb.AppendLine($"    height:\"{(rds.Count() > 1 ? height + 62 : height)}\",");
             sb.AppendLine($"    type:\"{(columnType ? "column" : "bar")}\"");
             sb.AppendLine("},");
-            sb.AppendLine("legend: { enabled: " + ((rds.Count() > 1) ? "true" : "false") +
-                          ",reversed: true},");
+            sb.AppendLine("\"legend\": { \"enabled\": " + ((rds.Count() > 1) ? "true" : "false") +
+                          ",\"reversed\": true},");
             sb.AppendLine(
                 $"\"plotOptions\": {{ \"bar\": {{ \"animation\": true, \"borderWidth\": 0, \"groupPadding\": 0, \"shadow\": true }}, \"column\": {{ \"animation\": true, \"borderWidth\": 0, \"groupPadding\": 0, \"shadow\": true }}{stackingElement} }}, ");
             sb.AppendLine("title: {text : undefined},");
@@ -627,9 +624,9 @@ point: {
             sb.AppendLine("\"xAxis\": {");
             if (timeData == false)
             {
-                sb.AppendLine("	categories: [" +
+                sb.AppendLine("	\"categories\": [" +
                  string.Join(",",
-                         rds[0].Data.Select(v => "'" + v[0].Column.TextRender(v[0].Value) + "'")
+                         rds[0].Data.Select(v => "\"" + v[0].Column.TextRender(v[0].Value) + "\"")
                          ) + "],"
                   );
             }
@@ -650,12 +647,12 @@ point: {
             sb.AppendLine("			\"type\": \"linear\"");
             sb.AppendLine("		},");
             sb.AppendLine("\"navigation\": { \"buttonOptions\": { \"enabled\": false } }, ");
-            sb.AppendLine("					\"series\": [{");
+            sb.AppendLine("					\"series\": [");
 
             foreach (var rdsItem in rds)
             {
-                sb.AppendLine($"				{{\"name\": \"{rdsItem.Title}\",");
-                sb.AppendLine($"				\"data\": [");
+                sb.AppendLine($"				{{\"name\":\"{rdsItem.Title}\",");
+                sb.AppendLine($"				\"data\":[");
                 foreach (var item in rdsItem.Data)
                 {
                     sb.AppendLine(
@@ -665,7 +662,7 @@ point: {
                 sb.AppendLine("                          ]},");
             }
 
-            sb.AppendLine("					}]");
+            sb.AppendLine("					]");
             sb.AppendLine(" 	  });");
             sb.AppendLine("	});");
             sb.AppendLine("</script>");
@@ -744,66 +741,14 @@ point: {
                 string JsDataTableOptions = null, string JsDataTableId = null)
         //  where T : class
         {
-            return DataToHTMLTable(title, item, JsDataTableId, JsDataTableOptions);
+            if (item == null)
+            {
+                return HtmlString.Empty;
+            }
+            item.Title = title;
+            return HtmlExtensions.DataToHTMLTable(item, JsDataTableId, JsDataTableOptions);
         }
 
-
-        public static IHtmlContent DataToHTMLTable<T>(string title, ReportDataSource<T> rds,
-                string tableId = "", string dataTableOptions = "", string customTableHeader = null)
-        //   where T : class
-        {
-            System.Text.StringBuilder sb = new(1024);
-            string _tableId = tableId;
-            if (string.IsNullOrEmpty(tableId))
-            {
-                _tableId = Devmasters.TextUtil.GenRandomString("abcdefghijklmnopqrstuvwxyz", 10);
-            }
-
-            sb.AppendLine(@"<script>
-var tbl_" + _tableId + @";
-$(document).ready(function () {
-tbl_" + _tableId + @" = $('#" + _tableId + @"').DataTable(" + dataTableOptions + @");
-});
-</script>");
-
-            sb.AppendFormat("<h3>{0}</h3>", rds?.Title ?? "");
-            sb.AppendFormat("<table id=\"{0}\" class=\"table-sorted table table-bordered table-striped\">", _tableId);
-            if (customTableHeader == null)
-            {
-                sb.Append("<thead><tr>");
-                foreach (var column in rds.Columns)
-                {
-                    sb.AppendFormat("<th>{0}</th>", column.Name);
-                }
-
-                sb.Append("</tr></thead>");
-            }
-            else
-            {
-                sb.AppendFormat(customTableHeader, _tableId);
-            }
-
-            sb.Append("<tbody class=\"list\">");
-            foreach (var row in rds.Data)
-            {
-                sb.Append("<tr>");
-                foreach (var d in row)
-                {
-                    sb.AppendFormat("<td {2} class=\"{0}\">{1}</td>",
-                        d.Column.CssClass,
-                        d.Column.HtmlRender(d.Value),
-                        string.IsNullOrEmpty(d.Column.OrderValueRender(d.Value))
-                            ? string.Empty
-                            : string.Format("data-order=\"{0}\"", d.Column.OrderValueRender(d.Value))
-                    );
-                }
-
-                sb.Append("</tr>");
-            }
-
-            sb.Append("</table>");
-            return new HtmlString(sb.ToString());
-        }
 
 
         public static IHtmlContent RenderReport(ReportModel.QueueItem item,
@@ -869,6 +814,7 @@ tbl_" + _tableId + @" = $('#" + _tableId + @"').DataTable(" + dataTableOptions +
                     JsDataTableOptions, JsDataTableId);
             }
         }
+
 
 
     }

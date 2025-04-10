@@ -227,7 +227,7 @@ else
                     <div style="position:relative;top:33px;">
                         <share-widget url="@($"{Context.Request.GetDisplayUrl()}&part={currPart}")" title="Vložit tuto tabulku do vlastní stránky"></share-widget>
                     </div>
-                    @Html.Raw(ChartUtil.RenderReport(p, HtmlExtensions.DatatableOptions(orderColumnIdx:6, orderDirection:"desc", pageLength:20), p.Key)
+                    @Html.Raw(ChartUtilExtensions.RenderReport(p, HtmlExtensions.DatatableOptions(orderColumnIdx:6, orderDirection:"desc", pageLength:20), p.Key)
                                   )
                 </div>
 
@@ -238,7 +238,7 @@ else
                     <div style="position:relative;left:16px;">
                         <share-widget url="@($"{Context.Request.GetDisplayUrl()}&part={currPart}")" title="Vložit tento graf do vlastní stránky"></share-widget>
                     </div>
-                    @Html.Raw(ChartUtil.RenderReport(p, @"", p.Key))
+                    @Html.Raw(ChartUtilExtensions.RenderReport(p, @"", p.Key))
                 </div>
             }
         }

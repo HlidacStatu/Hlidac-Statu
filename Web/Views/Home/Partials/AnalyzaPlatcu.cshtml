@@ -147,7 +147,7 @@
 <div class="row">
     <div class="col-xs-12 col-sm-6">
         <h4>Hodnota uzavřených smluv v Kč pro tento dotaz</h4>
-        @ChartUtil.RenderReport("Hodnota uzavřených smluv v Kč v jednotlivých letech", ReportModel.QueueItem.types.chart,
+        @ChartUtilExtensions.RenderReport("Hodnota uzavřených smluv v Kč v jednotlivých letech", ReportModel.QueueItem.types.chart,
                     Html.SimpleBarChart(true, true, 360, "price_year_chart",
                      "Rok", "Kč",
                         await HlidacStatu.Web.Framework.Report.GlobalStatistics.HodnotaSmluvPerUzavreniAsync(Model.Query, Nest.DateInterval.Year),
@@ -158,7 +158,7 @@
     </div>
     <div class="col-xs-12 col-sm-6">
         <h4>Objem smluv pro jednotlivé plátce za poslední 4 celé roky</h4>
-        @ChartUtil.RenderReport("Suma ročních kontraktů pro jednotlivé plátce", ReportModel.QueueItem.types.chart,
+        @ChartUtilExtensions.RenderReport("Suma ročních kontraktů pro jednotlivé plátce", ReportModel.QueueItem.types.chart,
                 Html.SimpleBarChart(
                     false, false, 300, "chartinfo", "Plátci", "Kč",
                     Enumerable.Range(minDateYear, maxDateYear-minDateYear+1)
@@ -180,7 +180,7 @@
 <div class="row">
     <div class="col-xs-12 col-sm-6">
         <h4>Počet uzavřených smluv pro tento dotaz</h4>
-        @ChartUtil.RenderReport("Počet uzavřených smluv v jednotlivých letech", ReportModel.QueueItem.types.chart,
+        @ChartUtilExtensions.RenderReport("Počet uzavřených smluv v jednotlivých letech", ReportModel.QueueItem.types.chart,
                     Html.SimpleBarChart(true, true, 360, "price_year_chart_pocet", "Rok", "Počet",
                         await HlidacStatu.Web.Framework.Report.GlobalStatistics.PocetSmluvPerUzavreniAsync(Model.Query, Nest.DateInterval.Year), xValueFormat: "{value:%Y}")
                         , ""
@@ -189,7 +189,7 @@
     </div>
     <div class="col-xs-12 col-sm-6">
         <h4>Počet smluv pro jednotlivé plátce za poslední 2 roky</h4>
-        @ChartUtil.RenderReport("Počet smluv pro jednotlivé plátce", ReportModel.QueueItem.types.chart,
+        @ChartUtilExtensions.RenderReport("Počet smluv pro jednotlivé plátce", ReportModel.QueueItem.types.chart,
                 Html.SimpleBarChart(
                     false, false, 300, "chartinfoPocet", "Plátci", "Počet",
                         new[] {
@@ -206,7 +206,7 @@
 <div class="row">
     <div class="col-xs-12 col-sm-12">
         <h4>Nalezené smlouvy pouze měsíce uzavření (poslední 4 roky)</h4>
-        @ChartUtil.RenderReport("Hodnota uzavřených smluv za poslední 2 roky po měsících", ReportModel.QueueItem.types.chart,
+        @ChartUtilExtensions.RenderReport("Hodnota uzavřených smluv za poslední 2 roky po měsících", ReportModel.QueueItem.types.chart,
                     Html.SimpleBarChart(true, true, 360, "price_yearmonth_chart_pocet", "Měsíc a rok", "Hodnota smluv v Kč",
                         await HlidacStatu.Web.Framework.Report.GlobalStatistics.HodnotaSmluvPerUzavreniAsync(Model.Query, Nest.DateInterval.Month, minDate: Devmasters.DT.Util.FirstDayOfMonth(DateTime.Now).AddYears(-4))
                         //, xValueFormat: "{value:%Y}"
@@ -220,7 +220,7 @@
 <h3>Všechny nalezení plátci</h3>
 
 @Html.Raw(
-    ChartUtil.RenderReportTableT("",
+    ChartUtilExtensions.RenderReportTableT("",
         coreRDS.Filter(
             new string[] {
                 "Title",
