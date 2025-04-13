@@ -1,13 +1,13 @@
 using HlidacStatu.Entities;
 using HlidacStatu.Lib.Web.UI;
 using HlidacStatu.Repositories;
-using HlidacStatu.Web.Framework;
 
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Microsoft.AspNetCore.Razor.TagHelpers;
 
-namespace HlidacStatu.Web.TagHelpers
+
+namespace HlidacStatu.Lib.Web.UI.TagHelpers
 {
     /// <summary>
     /// Přidání ikonky k zabookmarkování stránky. Je potřeba buď vyplnit atribut item="".

@@ -1,7 +1,8 @@
 using Microsoft.AspNetCore.Razor.TagHelpers;
 
-namespace HlidacStatu.Web.TagHelpers
+namespace HlidacStatu.Lib.Web.UI.TagHelpers
 {
+    [HtmlTargetElement("lowbox")]
     public class LowBoxTagHelper : TagHelper
     {
         public int? Width { get; set; } = 120;

@@ -122,19 +122,7 @@ window.onload = function() {{
             return string.Join("_", objects);
         }
 
-        public static IHtmlContent LowBox(this IHtmlHelper htmlHelper, int width, string content,
-            string? gaPageEventId = null)
-        {
-            gaPageEventId ??= htmlHelper.GetRequestPath();
-
-            var sb = new StringBuilder($"<div class=\"low-box\" style=\"max-height:{width}px\">");
-            sb.Append(
-                $"<div class=\"low-box-line\" style=\"top:{width - 55}px\"><a href=\"#\"  class=\"more\"></a></div>");
-            sb.Append("<div class=\"low-box-content\">");
-            sb.Append(content);
-            sb.Append("</div></div>");
-            return new HtmlString(sb.ToString());
-        }
+  
 
         public static string RenderProperty(JToken jp, int level, int maxLevel, int? maxLength = null)
         {
