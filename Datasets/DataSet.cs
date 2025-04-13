@@ -1019,9 +1019,10 @@ namespace HlidacStatu.Datasets
                 return (dynamic)null;
             else
             {
-                var converter = new ExpandoObjectConverter();
+                //var converter = new ExpandoObjectConverter();
+                //return JsonConvert.DeserializeObject<ExpandoObject>(data,converter);
+                return JObject.Parse(data);
 
-                return JsonConvert.DeserializeObject<ExpandoObject>(data,converter);
             }
         }
 
