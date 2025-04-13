@@ -5,6 +5,8 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <RootNamespace>HlidacStatu.$(MSBuildProjectName.Replace(" ", "_"))</RootNamespace>
+	<AssemblyName>HlidacStatu.Lib.Web.UI</AssemblyName>
+
   </PropertyGroup>
 
   <ItemGroup>

@@ -107,32 +107,39 @@ public class PoliticiController : Controller
         return View(detail);
     }
 
-    [HlidacCache(60 * 60)]
-    public async Task<IActionResult> Seznam()
+    [HlidacCache(60 * 60, "*")]
+    public async Task<IActionResult> Seznam(string ico, string start)
     {
-        return View();
+        List<PpPrijem> platy = null;
+            platy = await PpRepo.GetPlatyAsync(PpRepo.DefaultYear, true, ico);
+
+        return View(platy);
     }
 
-    [HlidacCache(60*60)]
-    public async Task<IActionResult> Organizace()
+    [HlidacCache(60*60,"*")]
+    public async Task<IActionResult> Organizace(string id, int rok = PpRepo.DefaultYear )
     {
-        return View();
+        if (HlidacStatu.Util.DataValidators.CheckCZICO(id))
+            return View((id, rok));
+
+        return View("Organizace.Seznam");
+
     }
 
 
     public async Task<IActionResult> Politik(string id)
     {
+
+        ViewBag.Title = $"Platy politika {id}";
+        var osoba = Osoby.GetByNameId.Get(id);
+        if (osoba is null)
+            return NotFound($"Politika {id} jsme nenašli.");
+
         var detail = await _cache.GetOrSetAsync<List<PpPrijem>>(
             $"{nameof(PpRepo.GetPrijmyPolitika)}_{id}-politici",
             _ => PpRepo.GetPrijmyPolitika(id)
         );
 
-        ViewBag.Title = $"Platy politika {id}";
-        var osoba = OsobaRepo.GetByNameId(id);
-        if (osoba is null)
-            return NotFound($"Politika {id} jsme nenašli.");
-        
-        
         ViewData["osoba"] = osoba;
 
         return View(detail);

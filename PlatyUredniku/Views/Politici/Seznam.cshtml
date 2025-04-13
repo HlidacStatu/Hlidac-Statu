@@ -1,3 +1,5 @@
+@model List<PpPrijem>
+
 @using HlidacStatu.Entities
 @using HlidacStatu.Lib.Web.UI
 @using HlidacStatu.Repositories
@@ -19,7 +21,7 @@
 }
 
 @{
-    var platy = await PpRepo.GetPlatyAsync(PpRepo.DefaultYear,true);
+    List<PpPrijem> platy = Model;
 
     ReportDataSource<PpPrijem[]> rds = new(
         new ReportDataSource<PpPrijem[]>.Column()
@@ -53,7 +55,7 @@
                             Name = "Působí v organizacích",
                             HtmlRender = (m) =>
                                 {
-                                    return string.Join("<br />",m.Select(n=>n.Organizace.Nazev));
+                                    return string.Join("<br />",m.Select(n=>n.Organizace.Nazev).Distinct());
                                 },
                         }
 
