@@ -365,6 +365,7 @@ select distinct ds.DatovaSchranka, f.ico from firma f
         var query = db.PuOrganizaceTags
             .AsNoTracking()
             .Where(t => tag == null || t.Tag.Equals(tag))
+            .Where(t => t.Organizace.Metadata.Any(m => m.Typ == PuOrganizaceMetadata.TypMetadat.PlatyUredniku))
             .Include(t => t.Organizace).ThenInclude(o => o.FirmaDs)
             .Include(t => t.Organizace).ThenInclude(o => o.Metadata.Where(m => m.Typ == PuOrganizaceMetadata.TypMetadat.PlatyUredniku))
             .Include(t => t.Organizace).ThenInclude(o => o.Platy)
