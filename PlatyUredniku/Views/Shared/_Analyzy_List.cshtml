@@ -7,23 +7,23 @@
     <ul class="list-group list-group-flush">
         <li class="list-group-item list-group-item-dark">Žebříčky</li>
         <li class="list-group-item">
-            <i class="fa-regular fa-gauge-min"></i> <a asp-action="DlePlatu" asp-route-id="1">Platy nižší než je nástupní plat pokladní v Lidlu</a>
+            <i class="fa-regular fa-gauge-min"></i> <a asp-controller="Urednici" asp-action="DlePlatu" asp-route-id="1">Platy nižší než je nástupní plat pokladní v Lidlu</a>
         </li>
         <li class="list-group-item">
-            <i class="fa-regular fa-gauge-low"></i> <a asp-action="DlePlatu" asp-route-id="2">Platy nižší než průměrné platy</a>
+            <i class="fa-regular fa-gauge-low"></i> <a asp-controller="Urednici" asp-action="DlePlatu" asp-route-id="2">Platy nižší než průměrné platy</a>
         </li>
         <li class="list-group-item">
-            <i class="fa-regular fa-gauge-high"></i> <a asp-action="DlePlatu" asp-route-id="3">Platy vyšší než průměrné platy</a>
+            <i class="fa-regular fa-gauge-high"></i> <a asp-controller="Urednici" asp-action="DlePlatu" asp-route-id="3">Platy vyšší než průměrné platy</a>
         </li>
         <li class="list-group-item">
-            <i class="fa-regular fa-gauge-max"></i> <a asp-action="DlePlatu" asp-route-id="4">Nejvyšší platy ve veřejné správě</a>
+            <i class="fa-regular fa-gauge-max"></i> <a asp-controller="Urednici" asp-action="DlePlatu" asp-route-id="4">Nejvyšší platy ve veřejné správě</a>
         </li>
         <li class="list-group-item list-group-item-dark">Nejvyšší nárůsty a poklesy platů</li>
         <li class="list-group-item">
             <i class="fa-regular fa-display-chart-up-circle-dollar"></i> <a href="/analyza/ZmenaPlatuCeos">Přehled nejvyšších nárůstů ředitelských platů od roku <b>2021</b></a>
             @foreach (var y in PuRepo.AllYears.Where(y => y < PuRepo.DefaultYear && y > 2021))
             {
-                <text>, <a href="/analyza/ZmenaPlatuCeos?minyear=@y">@y</a></text>
+                <text>, <a href="/urednici/analyza/ZmenaPlatuCeos?minyear=@y">@y</a></text>
             }.
 
         </li>
@@ -31,7 +31,7 @@
             <i class="fa-regular fa-chart-line-down"></i> <a href="/analyza/ZmenaPlatuCeos?max=false">Přehled nejvyšších poklesů ředitelských platů od roku <b>2021</b></a>
             @foreach (var y in PuRepo.AllYears.Where(y => y < PuRepo.DefaultYear && y > 2021))
             {
-                <text>, <a href="/analyza/ZmenaPlatuCeos?minyear=@y&max=false">@y</a></text>
+                <text>, <a href="/urednici/analyza/ZmenaPlatuCeos?minyear=@y&max=false">@y</a></text>
             }.
 
         </li>
@@ -39,7 +39,7 @@
             <i class="fa-regular fa-display-chart-up-circle-dollar"></i> <a href="/analyza/ZmenaNejvyssihoPlatu">Přehled nejvyšších nárůstů neředitelských platů od roku <b>2021</b></a>
             @foreach (var y in PuRepo.AllYears.Where(y => y < PuRepo.DefaultYear && y > 2021))
             {
-                <text>, <a href="/analyza/ZmenaNejvyssihoPlatu?minyear=@y">@y</a></text>
+                <text>, <a href="/urednici/analyza/ZmenaNejvyssihoPlatu?minyear=@y">@y</a></text>
             }.
 
         </li>
@@ -47,7 +47,7 @@
             <i class="fa-regular fa-chart-line-down"></i> <a href="/analyza/ZmenaNejvyssihoPlatu?max=false">Přehled nejvyšších poklesů neředitelských platů za <b>2021</b></a>
             @foreach (var y in PuRepo.AllYears.Where(y => y < PuRepo.DefaultYear && y > 2021))
             {
-                <text>, <a href="/analyza/ZmenaNejvyssihoPlatu?minyear=@y&max=false">@y</a></text>
+                <text>, <a href="/urednici/analyza/ZmenaNejvyssihoPlatu?minyear=@y&max=false">@y</a></text>
             }.
 
         </li>
@@ -56,7 +56,7 @@
             @foreach (var y in PuRepo.AllYears.Reverse().Where(y => y < PuRepo.DefaultYear))
             {
                 <text>
-                    , <a href="/analyza/NejvyssiOdmeny?rok=@y">@y</a>
+                    , <a href="/urednici/analyza/NejvyssiOdmeny?rok=@y">@y</a>
                 </text>
             }.
 
@@ -64,16 +64,16 @@
         </li>
         <li class="list-group-item list-group-item-dark">Porovnání s průměrnými výdělky v různých oborech ve veřejné i soukromé sféře</li>
         <li class="list-group-item">
-            <i class="fa-regular fa-code-compare"></i> <a href="/analyza/kategorie">Porovnání a vývoj platů a mezd v různých kategoriích zaměstnání</a>
+            <i class="fa-regular fa-code-compare"></i> <a href="/urednici/analyza/kategorie">Porovnání a vývoj platů a mezd v různých kategoriích zaměstnání</a>
         </li>
         <li class="list-group-item">
-            <i class="fa-regular fa-caret-right"></i> <i class="fa-regular fa-code-compare"></i> <a href="/analyza/kategorie?k1=2341&k2=2330">Např. vývoj platů učitelů 1. stupně základní školy a srovnání se soukromými školami</a>
+            <i class="fa-regular fa-caret-right"></i> <i class="fa-regular fa-code-compare"></i> <a href="/urednici/analyza/kategorie?k1=2341&k2=2330">Např. vývoj platů učitelů 1. stupně základní školy a srovnání se soukromými školami</a>
         </li>
         <li class="list-group-item">
-            <i class="fa-regular fa-caret-right"></i> <i class="fa-regular fa-code-compare"></i> <a href="/analyza/kategorie?k1=2212&k2=2211">Např. vývoj a porovnání platů lékařů specialistů a praktických lékařů v soukromém i veřejném sektoru</a>
+            <i class="fa-regular fa-caret-right"></i> <i class="fa-regular fa-code-compare"></i> <a href="/urednici/analyza/kategorie?k1=2212&k2=2211">Např. vývoj a porovnání platů lékařů specialistů a praktických lékařů v soukromém i veřejném sektoru</a>
         </li>
         <li class="list-group-item">
-            <i class="fa-regular fa-caret-right"></i> <i class="fa-regular fa-code-compare"></i> <a href="/analyza/kategorie?k1=1345&k2=">Např. vývoj a porovnání výdělků manažerů ve vzdělávání v soukromém a veřejném sektoru</a>
+            <i class="fa-regular fa-caret-right"></i> <i class="fa-regular fa-code-compare"></i> <a href="/urednici/analyza/kategorie?k1=1345&k2=">Např. vývoj a porovnání výdělků manažerů ve vzdělávání v soukromém a veřejném sektoru</a>
         </li>
 
         @* <li class="list-group-item">
