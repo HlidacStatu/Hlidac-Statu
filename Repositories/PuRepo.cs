@@ -31,7 +31,7 @@ inner join Firma_DS fds
     public const int DefaultYear = 2024;
     public const int MinYear = 2016;
 
-    public static int[] AllYears = Enumerable.Range(MinYear, DefaultYear-MinYear+1).ToArray();
+    public static int[] AllYears = Enumerable.Range(MinYear, DefaultYear - MinYear + 1).ToArray();
 
     public static readonly string[] MainTags =
     [
@@ -185,7 +185,7 @@ inner join Firma_DS fds
 
         return await db.PuOrganizace
             .AsNoTracking()
-            .Where(pu => datovaSchranky.Contains(pu.DS) )
+            .Where(pu => datovaSchranky.Contains(pu.DS))
             .Include(o => o.Metadata)
             .Include(o => o.Tags)
             .Include(o => o.FirmaDs)
@@ -247,17 +247,17 @@ inner join Firma_DS fds
     {
         return platy?.Where(m => m.Rok == rok).ToList();
     }
-    
+
     public static List<PuOrganizaceMetadata> AktualniRok(this ICollection<PuOrganizaceMetadata> metadata, int rok = DefaultYear)
     {
         return metadata?.Where(m => m.Rok == rok).ToList();
     }
 
 
-    public static PuOrganizaceMetadata.Description GetMetadataDescriptionUrednici(this PuOrganizace org, int rok = DefaultYear )
+    public static PuOrganizaceMetadata.Description GetMetadataDescriptionUrednici(this PuOrganizace org, int rok = DefaultYear)
     {
         var res = new PuOrganizaceMetadata.Description();
-        
+
         var metadataList = org.MetadataPlatyUredniku.Where(m => m.Rok == rok && m.Typ == PuOrganizaceMetadata.TypMetadat.PlatyUredniku).ToList();
         //ted pracuju pouze s jednou
         var metadata = metadataList.FirstOrDefault();
@@ -315,8 +315,8 @@ inner join Firma_DS fds
         }
         return res;
     }
-    
-    
+
+
 
     public static string PlatyForYearUredniciDescription(this PuOrganizace org, int rok = DefaultYear)
     {
@@ -335,7 +335,8 @@ inner join Firma_DS fds
 
     static Devmasters.Cache.LocalMemory.AutoUpdatedCache<IEnumerable<Tuple<string, string>>> _neaktivniOrganizaceCache
         = new Devmasters.Cache.LocalMemory.AutoUpdatedCache<IEnumerable<Tuple<string, string>>>(TimeSpan.FromHours(1), "NeaktivniOrganizace",
-            (o) => {
+            (o) =>
+            {
                 return DirectDB.GetList<string, string>(@"
 select distinct ds.DatovaSchranka, f.ico from firma f 
 	inner join Firma_DS ds on f.ICO=ds.ICO
@@ -352,7 +353,7 @@ select distinct ds.DatovaSchranka, f.ico from firma f
     /// <returns></returns>
     public static IEnumerable<Tuple<string, string>> GetNeaktivniOrganizace()
     {
-        IEnumerable<Tuple<string, string>> nonActiveDS =_neaktivniOrganizaceCache.Get();
+        IEnumerable<Tuple<string, string>> nonActiveDS = _neaktivniOrganizaceCache.Get();
 
         return nonActiveDS;
     }
@@ -687,5 +688,68 @@ select distinct ds.DatovaSchranka, f.ico from firma f
             x.o.Platy = x.Platy; // Assign the filtered Platy list back to the PuOrganizace entity
             return x.o;
         }).ToList();
+    }
+    public static async Task<PuEvent> UpsertEventAsync(PuEvent _event, bool addNewCj)
+    {
+        PuEvent ev = _event;
+        ev.DotazovanaInformace = PuEvent.DruhDotazovaneInformace.Politik;
+        await using var dbContext = new DbEntities();
+
+        if (string.IsNullOrWhiteSpace(ev.IcoOrganizace))
+        {
+            throw new ArgumentException("ICO is missing");
+        }
+        if (string.IsNullOrWhiteSpace(ev.OsobaNameId))
+        {
+            throw new ArgumentException("OsobaNameId is missing");
+        }
+
+        var original = await dbContext.PuEvents.FirstOrDefaultAsync(o => o.Pk == ev.Pk);
+        if (original is null || ev.Pk == 0)
+        {
+            dbContext.PuEvents.Add(ev);
+        }
+        else
+        {
+            dbContext.PuEvents.Attach(ev);
+            dbContext.Entry(ev).State = EntityState.Modified;
+        }
+        if (addNewCj && string.IsNullOrEmpty(ev.NaseCJ))
+            ev.NaseCJ = await GetNewCisloJednaciAsync(ev.DotazovanaInformace);
+        await dbContext.SaveChangesAsync();
+
+        return ev;
+
+    }
+    public static async Task<string> GetNewCisloJednaciAsync(PuEvent.DruhDotazovaneInformace druh)
+    {
+        string postfix = "OB";
+        if (druh == PuEvent.DruhDotazovaneInformace.Urednik)
+            postfix = "UR";
+        else if (druh == PuEvent.DruhDotazovaneInformace.Politik)
+            postfix = "PO";
+
+        await using var dbContext = new DbEntities();
+        var existing = await dbContext.PuEvents
+            .AsNoTracking()
+            .Where(m => m.NaseCJ != null)
+            .Select(m => m.NaseCJ)
+            .Distinct()
+            .ToArrayAsync();
+
+        if (existing.Any() == false)
+            return $"1/{DateTime.Now.Year}/{postfix}";
+
+        var parts = existing
+            .Select(m => m.Split('/'))
+            .Where(m => m.Length == 3)
+            .Select(m => new { cislo = int.Parse(m[0]), rok = int.Parse(m[1]), druh = m[2] })
+            .Where(m => m.rok == DateTime.Now.Year && m.druh==postfix)
+            .OrderByDescending(m => m.cislo)
+            .FirstOrDefault();
+        if (parts == null)
+            return $"1/{DateTime.Now.Year}/{postfix}";
+
+        return $"{parts.cislo + 1}/{DateTime.Now.Year}/{postfix}";
     }
 }

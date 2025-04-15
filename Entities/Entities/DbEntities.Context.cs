@@ -3,6 +3,7 @@ using HlidacStatu.Entities.Views;
 
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using System.Linq;
 
 namespace HlidacStatu.Entities
 {
@@ -220,8 +221,9 @@ namespace HlidacStatu.Entities
             });
 
             _ = modelBuilder.Entity<SmlouvaVerejnaZakazka>()
-                .HasKey(s => new { s.VzId, s.IdSmlouvy }); 
-            
+                .HasKey(s => new { s.VzId, s.IdSmlouvy });
+
+
         }
 
         public virtual DbSet<UptimeServer> UptimeServers { get; set; }
@@ -280,7 +282,7 @@ namespace HlidacStatu.Entities
         public virtual DbSet<PuPlat> PuPlaty { get; set; }
         public virtual DbSet<PpPrijem> PpPrijmy { get; set; }
 
-        public virtual DbSet<PpEvent> PpEvents{ get; set; }
+        public virtual DbSet<PuEvent> PuEvents{ get; set; }
 
         public virtual DbSet<PuVydelek> PuVydelky { get; set; }
         public virtual DbSet<PuCZISCO> PuCZISCO { get; set; }

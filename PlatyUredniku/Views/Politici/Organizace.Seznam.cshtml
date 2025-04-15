@@ -23,80 +23,106 @@
 }
 
 @{
-    var platy = await PpRepo.GetPlatyAsync(PpRepo.DefaultYear, true);
-
-    ReportDataSource<PpPrijem[]> rds = new(
-        new ReportDataSource<PpPrijem[]>.Column()
-                {
-                    Name = "Organizace",
-                    HtmlRender = (m) =>
-{
-            var f = Firmy.GetByDS(m.First().Organizace.DS);
-
-            return $"<a href='/politici/organizace/{f.ICO}'>{f.Jmeno} (IČ:{f.ICO})</a>";
-        },
-                    OrderValueRender = (m) =>
-{
-            var f = Firmy.GetByDS(m.First().Organizace.DS);
-            return $"{f.Jmeno}";
-        },
-                },
-                new ReportDataSource<PpPrijem[]>.Column()
-                        {
-                            Name = "Působící politici",
-                            HtmlRender = (m) =>
-                            {
-                                var s = string.Join(",", m.Take(3).Select(n => $"<a href='/politici/politik/{n.Nameid}'>{Osoby.GetByNameId.Get(n.Nameid).FullName()}</a>"));
-                                if (m.Count() > 3)
-                                {
-                                    s =s + $" a {Devmasters.Lang.CS.Plural.Get(m.Count()-3, "další jeden politik", "další {0} politici", "dalších {0} politiků")}";
-                                }
-                                return s;
-                            },
-                            OrderValueRender = (m) => HlidacStatu.Util.RenderData.OrderValueFormat(m.Count()),
-                            CssClass = "number"
-                        },
-                new ReportDataSource<PpPrijem[]>.Column()
-                        {
-                            Name = "Roční příjem",
-                            HtmlRender = (m) =>
-    {
-                        string s = "";
-                        decimal min = m.Min(v => v.CelkovyRocniPlatVcetneOdmen);
-                        decimal max = m.Max(v => v.CelkovyRocniPlatVcetneOdmen);
-                        if (min == max)
-                        {
-                            s =  $"{HlidacStatu.Util.RenderData.NicePrice(min, html: true)}";
-                        }
-                        else
-                        {
-                    s = $"<span style='white-space:nowrap'>{HlidacStatu.Util.RenderData.NicePrice(min, html: true)} - {HlidacStatu.Util.RenderData.NicePrice(max, html: true)}</span>";
-                        }
-
-                        return s;
-                    },
-                            OrderValueRender = (m) => HlidacStatu.Util.RenderData.OrderValueFormat(m.Max(v => v.CelkovyRocniPlatVcetneOdmen)),
-                        }
-
+    var orgs = await PpRepo.GetActiveOrganizaceAsync(PpRepo.DefaultYear);
+    var allEventsPoskytnuto = await PpRepo.GetAllEventsAsync(PpRepo.DefaultYear,
+        m =>m.DotazovanaInformace == PuEvent.DruhDotazovaneInformace.Politik 
+            && m.Typ == PuEvent.TypUdalosti.PoskytnutiInformace || m.Typ == PuEvent.TypUdalosti.PoskytnutiInformace
     );
-    foreach (var org in platy.Select(m => m.IdOrganizace).Distinct())
-    {
-        var platyPerPolitik = platy.Where(m => m.IdOrganizace == org).ToArray();
-        rds.AddRow(platyPerPolitik);
-    }
-    //rds.AddRows(platyPerPolitik);
+    var havePlatyOrgs = orgs
+        .Where(o => allEventsPoskytnuto.Any(m => m.IdOrganizace == o.Id) && o.PrijmyPolitiku.Any())
+        .OrderBy(o => o.Nazev)
+        .ToList();
+    var goodOrgs = orgs
+        .Where(o => allEventsPoskytnuto.Any(m=>m.IdOrganizace == o.Id) && o.PrijmyPolitiku.Any()==false)
+        .OrderBy(o => o.Nazev)
+        .ToList();
+    var badOrgs = orgs
+        .Where(o => goodOrgs.Any(m => m.Id == o.Id) == false && havePlatyOrgs.Any(m=>m.Id == o.Id)==false) //not in good
+        .OrderBy(o => o.Nazev)
+        .ToList();
+
+    var aktualniPlaty = havePlatyOrgs.SelectMany(o => o.PrijmyPolitiku.AktualniRok()).ToList();
+    var platyMin = aktualniPlaty.Any() ? aktualniPlaty.Min(p => p.HrubyMesicniPlatVcetneOdmen) : 0;
+    var platyMax = aktualniPlaty.Any() ? aktualniPlaty.Max(p => p.HrubyMesicniPlatVcetneOdmen) : 0;
+    var platyLength = platyMax - platyMin;
+    if (platyLength == 0)
+        platyLength = 0.01m;
 
 }
 
-
 <section class="d-flex align-items-center justify-content-center">
     <div class="container">
-        <h2>@ViewBag.Title</h2>
         <div>
+            <h3 class="pb-5">
+                @ViewBag.Title
+            </h3>
             <p>
-                @Html.DataToHTMLTable(rds,
-                         dataTableOptions: HtmlExtensions.DatatableOptions(orderColumnIdx: 0, orderDirection: "asc", paging: false))
+                V roce @PpRepo.DefaultYear @Html.Raw(Devmasters.Lang.CS.Plural.GetWithZero(havePlatyOrgs.Count,
+                "informace o platech nemáme od žádné instituce",
+                "poskyla plat jedna instituce",
+                $"poskytli plat {{0}} instituce",
+                $"poskytlo plat {{0}} institucí")).
+                @Html.Raw(Devmasters.Lang.CS.Plural.GetWithZero(badOrgs.Count,
+                         "",
+                         " Informace o platech nemáme od jedné instituce.",
+                         $" Informace o platech nemáme od {{0}} institucí.",
+                         $" Informace o platech nemáme od {{0}} institucí.")
+                         )
             </p>
+        </div>
+
+        <div>
+            <div>
+                <table class="table table-sm">
+                    <tbody>
+                        @{
+                            var sorted = havePlatyOrgs.Concat(goodOrgs).Concat(badOrgs);
+                        }
+                        @foreach (var org in sorted)
+                        {
+                            <tr>
+                                <td class="col" style="overflow: hidden;white-space: nowrap;text-overflow: ellipsis;max-width: 20rem;">
+                                    <a asp-action="Detail" asp-route-id="@org.DS">@org.Nazev</a>
+                                </td>
+                                <td class="col-3">
+                                    @Html.Raw(org.PlatyForYearPoliticiDescriptionHtml())
+                                </td>
+                                @if (org.PrijmyPolitiku.AktualniRok().Any())
+                                {
+                                    var minimalniPlatOrganizace = org.PrijmyPolitiku.AktualniRok().Min(m => m.HrubyMesicniPlatVcetneOdmen);
+                                    var maximalniPlatOrganizace = org.PrijmyPolitiku.AktualniRok().Max(m => m.HrubyMesicniPlatVcetneOdmen);
+                                    var startPer = Math.Round((minimalniPlatOrganizace - platyMin) / platyLength * 100);
+                                    var endPer = Math.Round((maximalniPlatOrganizace - minimalniPlatOrganizace) / platyLength * 100);
+                                    if (endPer == 0)
+                                        endPer = 1;
+                                    var minimalniPlatAsString = HlidacStatu.Util.RenderData.NicePrice(minimalniPlatOrganizace).Replace(" ", "&nbsp;");
+                                    var maximalniPlatAsString = HlidacStatu.Util.RenderData.NicePrice(maximalniPlatOrganizace).Replace(" ", "&nbsp;");
+
+                                    <td class="col" title="Přepočtený hrubý měsíční plat v organizaci.">
+                                        <span>@Html.Raw(minimalniPlatAsString)&nbsp;-&nbsp;@Html.Raw(maximalniPlatAsString)</span>
+                                    </td>
+                                    <td class="col-2 text-start d-none d-md-table-cell d-lg-table-cell d-xl-table-cell d-xxl-table-cell" title="Přepočtený hrubý měsíční plat v organizaci.">
+                                        <div class="d-flex"
+                                             style="width: 100%;height: 1rem;background: linear-gradient(90deg, hsl(216deg 100% 87%) 0%, hsl(216deg 100% 26.67%) 100%);">
+                                            <div class="border-start  bg-light" style="width: @startPer%;height: 1rem"></div>
+                                            <div class="bg-transparent rounded-pill position-relative"
+                                                 style="width: @endPer%;height: 1rem;">
+                                            </div>
+                                            <div class="border-end bg-light" style="width: @(100 - endPer - startPer)%;height: 1rem"></div>
+                                        </div>
+                                    </td>
+                                }
+                                else
+                                {
+                                    <td></td>
+                                }
+
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
 </section>
+}

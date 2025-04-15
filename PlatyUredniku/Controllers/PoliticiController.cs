@@ -36,9 +36,9 @@ public class PoliticiController : Controller
 
     public async Task<IActionResult> Oblast(string id)
     {
-        ValueTask<List<PuOrganizace>> organizaceForTagTask = _cache.GetOrSetAsync<List<PuOrganizace>>(
-            $"{nameof(PpRepo.GetActiveOrganizaceForTagAsync)}_{id}-politici",
-            _ => PpRepo.GetActiveOrganizaceForTagAsync(id)
+/*        ValueTask<List<PuOrganizace>> organizaceForTagTask = _cache.GetOrSetAsync<List<PuOrganizace>>(
+            $"{nameof(PpRepo.GetActiveOrganizaceAsync)}_{id}-politici",
+            _ => PpRepo.GetActiveOrganizaceAsync(id)
         );
 
         var organizace = await organizaceForTagTask;
@@ -48,10 +48,11 @@ public class PoliticiController : Controller
         ViewData["context"] = $"{id}";
 
         ViewBag.Title = "Prijmy politiku a organizace v oblasti #" + id;
-
-        return View(organizace);
+*/
+        return View(null);// organizace);
     }
 
+    /*
     public async Task<IActionResult> Oblasti()
     {
         var sw = new Stopwatch();
@@ -61,8 +62,8 @@ public class PoliticiController : Controller
         foreach (var oblast in oblasti)
         {
             var organizace = await _cache.GetOrSetAsync<List<PuOrganizace>>(
-                $"{nameof(PpRepo.GetActiveOrganizaceForTagAsync)}_{oblast}-politici",
-                _ => PpRepo.GetActiveOrganizaceForTagAsync(oblast)
+                $"{nameof(PpRepo.GetActiveOrganizaceAsync)}_{oblast}-politici",
+                _ => PpRepo.GetActiveOrganizaceAsync(oblast)
             );
 
             model.Add(oblast, organizace);
@@ -85,7 +86,7 @@ public class PoliticiController : Controller
 
         return View(model);
     }
-
+    */
     
     public async Task<IActionResult> Detail(string id, int? rok = null)
     {

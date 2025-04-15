@@ -3,7 +3,9 @@ using Microsoft.EntityFrameworkCore;
 using Polly.Caching;
 using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
 
 namespace HlidacStatu.Repositories;
@@ -101,18 +103,61 @@ public static class PpRepo
             .CountAsync();
     }
 
-    public static async Task<List<PuOrganizace>> GetActiveOrganizaceForTagAsync(string tag, int limit = 0)
+    public static async Task<List<PuEvent>> GetOrganizationEventsAsync(this PuOrganizace org, int rok,
+        Expression<Func<PuEvent, bool>> predicate = null)
     {
         await using var db = new DbEntities();
 
-        var query = db.PuOrganizaceTags
+        var query = db.PuEvents
             .AsNoTracking()
-            .Where(t => tag == null || t.Tag.Equals(tag))
-            .Where(t => t.Organizace.Metadata.Any(m => m.Typ == PuOrganizaceMetadata.TypMetadat.PlatyPolitiku))
-            .Include(t => t.Organizace).ThenInclude(o => o.FirmaDs)
-            .Include(t => t.Organizace).ThenInclude(o => o.Metadata.Where(m => m.Typ == PuOrganizaceMetadata.TypMetadat.PlatyPolitiku))
-            .Include(t => t.Organizace).ThenInclude(o => o.PrijmyPolitiku)
-            .Select(t => t.Organizace);
+            .Where(m => m.IdOrganizace == org.Id && m.ProRok == rok)
+            ;
+        if (predicate != null)
+        {
+            query = query.Where(predicate);
+        }
+
+        return await query.ToListAsync();
+
+    }
+
+    public static async Task<List<PuEvent>> GetAllEventsAsync(int rok,
+        Expression<Func<PuEvent, bool>> predicate = null)
+    {
+        await using var db = new DbEntities();
+
+        var query = db.PuEvents
+            .AsNoTracking()
+            .Where(m => m.ProRok == rok)
+            ;
+        if (predicate != null)
+        {
+            query = query.Where(predicate);
+        }
+
+        return await query.ToListAsync();
+
+    }
+
+    public static async Task<List<PuOrganizace>> GetActiveOrganizaceAsync(int rok, string tag = null, string ico = null,
+        string ds = null, int limit = 0)
+    {
+        await using var db = new DbEntities();
+        var orgsInEvents = db.PuEvents
+            .Where(m => m.ProRok == rok && m.DotazovanaInformace == PuEvent.DruhDotazovaneInformace.Politik)
+            .Select(m => m.IdOrganizace)
+            .Distinct();
+
+        var query = db.PuOrganizace
+            .AsNoTracking()
+            .Where(m=>orgsInEvents.Contains(m.Id))
+            .Include(t => t.FirmaDs)
+            .Include(t => t.PrijmyPolitiku.Where(p => p.Rok == rok))
+            .Include(t => t.Tags)
+            .Where(m => tag == null || m.Tags.Any(t => t.Tag == tag))
+            .Where(m => ico == null || m.FirmaDs.Ico == ico)
+            .Where(m => ds == null || m.DS == ds)
+            ;
 
         if (limit > 0)
             query = query.Take(limit);
@@ -155,58 +200,65 @@ public static class PpRepo
     {
         var res = new PuOrganizaceMetadata.Description();
 
-        var metadataList = org.MetadataPlatyUredniku.Where(m => m.Rok == rok && m.Typ == PuOrganizaceMetadata.TypMetadat.PlatyPolitiku).ToList();
-        //ted pracuju pouze s jednou
-        var metadata = metadataList.FirstOrDefault();
+        var events = org.GetOrganizationEventsAsync(rok, m=>m.DotazovanaInformace == PuEvent.DruhDotazovaneInformace.Politik)
+                .ConfigureAwait(false).GetAwaiter().GetResult();
+                // MetadataPlatyUredniku.Where(m => m.Rok == rok && m.Typ == PuOrganizaceMetadata.TypMetadat.PlatyPolitiku).ToList();
 
-        if (org.PrijmyPolitiku.AktualniRok().Count == 0 && PuRepo.GetNeaktivniOrganizace().ToArray().Any(m => m.Item1 == org.DS))
+        if (
+            events.Any(m => m.Typ == PuEvent.TypUdalosti.ZaslaniZadosti) == false
+            && events.Any(m => m.Typ == PuEvent.TypUdalosti.PoskytnutiInformace) == false
+
+            )
         {
             res.TextStatus = "Této organizace jsme se na platy neptali";
             res.Detail = "";
             res.BootstrapStatus = "primary";
             res.Icon = "fa-solid fa-question-circle";
         }
-        else if (metadata == null)
+        else if (
+            events.Any(m => m.Typ == PuEvent.TypUdalosti.ZaslaniZadosti)
+            &&
+            events.Any(m => m.Typ == PuEvent.TypUdalosti.PoskytnutiInformace) == false
+            )
         {
-            res.TextStatus = "Této organizace jsme se na platy neptali";
-            res.Detail = "";
-            res.BootstrapStatus = "primary";
-            res.Icon = "fa-solid fa-question-circle";
-
-        }
-        else if (metadata.DatumPrijetiOdpovedi == null)
-        {
-            res.TextStatus = $"{metadata.DatumOdeslaniZadosti:d. M. yyyy} Odeslána žádost o platy";
+            res.TextStatus = $"{events.Max(m => m.Datum):d. M. yyyy} Odeslána žádost o platy";
             res.Detail = "Data jsme zatím nedostali nebo nezpracovali.";
             res.BootstrapStatus = "primary";
             res.Icon = "fa-solid fa-question-circle";
 
         }
-        else if (org.PrijmyPolitiku.AktualniRok(rok).Count == 0)
+        else if (
+            events.Any(m => m.Typ == PuEvent.TypUdalosti.ZaslaniZadosti)
+            &&
+            events.Any(m => m.Typ == PuEvent.TypUdalosti.UplneOdmitnutiPoskytnutiInformaci)
+            )
         {
             res.TextStatus = "Odmítli poskytnout platy";
-            res.Detail = metadata.PoznamkaHlidace;
+            res.Detail = string.Join(". ", events
+                .Where(m => m.Typ == PuEvent.TypUdalosti.UplneOdmitnutiPoskytnutiInformaci)
+                .Select(m => m.Poznamka));
             res.BootstrapStatus = "danger";
             res.Icon = "fa-solid fa-circle-xmark";
         }
-        else if (org.PrijmyPolitiku.AktualniRok(rok).Count == 1)
+        else if (
+            events.Any(m => m.Typ == PuEvent.TypUdalosti.ZaslaniZadosti)
+            &&
+            events.Any(m => m.Typ == PuEvent.TypUdalosti.CastecneOdmitnutiPoskytnutiInformaci)
+            )
         {
-            res.TextStatus = "Evidujeme jeden plat jedné pozice";
-            res.Detail = metadata.PoznamkaHlidace;
-            res.BootstrapStatus = "warning";
-            res.Icon = "fa-solid fa-circle-exclamation";
-        }
-        else if (org.PrijmyPolitiku.AktualniRok(rok).Count < 5)
-        {
-            res.TextStatus = $"{org.PrijmyPolitiku.AktualniRok(rok).Count} platy";
-            res.Detail = metadata.PoznamkaHlidace;
-            res.BootstrapStatus = "success";
-            res.Icon = "fa-solid fa-badge-check";
+            res.TextStatus = "Poskytli pouze část požadovaných informací";
+            res.Detail = string.Join(". ", events
+                .Where(m => m.Typ == PuEvent.TypUdalosti.CastecneOdmitnutiPoskytnutiInformaci)
+                .Select(m => m.Poznamka));
+            res.BootstrapStatus = "danger";
+            res.Icon = "fa-solid fa-circle-xmark";
         }
         else
         {
-            res.TextStatus = $"{org.PrijmyPolitiku.AktualniRok(rok).Count} platů";
-            res.Detail = metadata.PoznamkaHlidace;
+            res.TextStatus = $"Požadované platy nám poskytli v plném rozsahu";
+            res.Detail = string.Join(". ", events
+                .Where(m => m.Typ == PuEvent.TypUdalosti.PoskytnutiInformace)
+                .Select(m => m.Poznamka));
             res.BootstrapStatus = "success";
             res.Icon = "fa-solid fa-badge-check";
         }
@@ -237,64 +289,12 @@ public static class PpRepo
             .Include(p => p.Organizace).ThenInclude(o => o.FirmaDs)
             .ToListAsync();
     }
-    public static async Task UpsertEventAsync(PpEvent _event)
-    {
-        PpEvent ev = _event;
-        await using var dbContext = new DbEntities();
 
-        if (string.IsNullOrWhiteSpace(ev.IcoOrganizace))
-        {
-            throw new ArgumentException("ICO is missing");
-        }
-        if (string.IsNullOrWhiteSpace(ev.OsobaNameId))
-        {
-            throw new ArgumentException("OsobaNameId is missing");
-        }
 
-        var original = await dbContext.PpEvents.FirstOrDefaultAsync(o => o.Pk == ev.Pk);
-        if (original is null || ev.Pk == 0)
-        {
-            dbContext.PpEvents.Add(ev);
-        }
-        else
-        {
-            dbContext.PpEvents.Attach(ev);
-            dbContext.Entry(ev).State = EntityState.Modified;
-        }
-
-        await dbContext.SaveChangesAsync();
-
-    }
-    public static async Task<string> GetNewCisloJednaciAsync()
+    public static async Task<PuEvent> GetEventAsync(int id)
     {
         await using var dbContext = new DbEntities();
-        var existing = await dbContext.PpEvents
-            .AsNoTracking()
-            .Where(m => m.NaseCJ != null)
-            .Select(m => m.NaseCJ)
-            .Distinct()
-            .ToArrayAsync();
-
-        if (existing.Any() == false)
-            return $"1/{DateTime.Now.Year}";
-
-        var parts = existing
-            .Select(m => m.Split('/'))
-            .Where(m => m.Length == 2)
-            .Select(m => new { cislo = int.Parse(m[0]), rok = int.Parse(m[1]) })
-            .Where(m => m.rok == DateTime.Now.Year)
-            .OrderByDescending(m => m.cislo)
-            .FirstOrDefault();
-        if (parts == null)
-            return $"1/{DateTime.Now.Year}";
-
-        return $"{parts.cislo + 1}/{DateTime.Now.Year}";
-    }
-
-    public static async Task<PpEvent> GetEventAsync(int id)
-    {
-        await using var dbContext = new DbEntities();
-        return await dbContext.PpEvents
+        return await dbContext.PuEvents
             .AsNoTracking()
             .Where(e => e.Pk == id)
             .FirstOrDefaultAsync();

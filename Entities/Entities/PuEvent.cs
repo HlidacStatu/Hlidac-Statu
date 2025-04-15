@@ -4,8 +4,8 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace HlidacStatu.Entities;
 
-[Table("PP_Event")]
-public class PpEvent
+[Table("PU_Event")]
+public class PuEvent
 {
     public enum TypUdalosti : int
     {
@@ -34,25 +34,35 @@ public class PpEvent
         Email = 2,
         Telefon = 3,
     }
+    public enum DruhDotazovaneInformace
+    {
+        Neuveden = 0,
+        Urednik = 1,
+        Politik = 2
+    }
 
     [Key]
     [Column("pk")]
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
     public int Pk { get; set; }
 
-    public string OsobaNameId { get; set; }
+    public int? ProRok { get; set; } 
+    public string? OsobaNameId { get; set; }
 
     public TypUdalosti Typ { get; set; } = 0;
     public SmerKomunikace Smer { get; set; } = 0;
 
     public KomunikacniKanal Kanal { get; set; } = 0;
+    public DruhDotazovaneInformace DotazovanaInformace { get; set; } = 0;
+
+    public int IdOrganizace { get; set; }
     public string IcoOrganizace { get; set; }
+    public string DsOrganizace { get; set; }
     public DateTime Datum { get; set; }
 
     public string? NaseCJ { get; set; }
     public string? Poznamka { get; set; }
 
     public string? PoznamkaSkryta { get; set; }
-
 
 }
