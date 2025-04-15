@@ -22,17 +22,40 @@ public class PoliticiController : Controller
         _cache = cache;
     }
     
-    public async Task<IActionResult> Index()
+    public async Task<IActionResult> Index(string id)
     {
-        var platyTask = _cache.GetOrSetAsync<List<PpPrijem>>(
-            $"{nameof(PpRepo.GetPlatyAsync)}_{PpRepo.DefaultYear}-politici",
-            _ => PpRepo.GetPlatyAsync(PpRepo.DefaultYear)
-        );
-        var platyPolitiku = await platyTask;
-        ViewData["platy"] = platyPolitiku;
+        if (string.IsNullOrEmpty(id))
+        {
+            //titulka politiku
+            var platyTask = _cache.GetOrSetAsync<List<PpPrijem>>(
+                $"{nameof(PpRepo.GetPlatyAsync)}_{PpRepo.DefaultYear}-politici",
+                _ => PpRepo.GetPlatyAsync(PpRepo.DefaultYear)
+            );
+            var platyPolitiku = await platyTask;
+            ViewData["platy"] = platyPolitiku;
 
-        return View();
+            return View();
+        } else
+        {
+            //detail politika
+
+            ViewBag.Title = $"Platy politika {id}";
+            var osoba = Osoby.GetByNameId.Get(id);
+            if (osoba is null)
+                return View();
+
+            var detail = await _cache.GetOrSetAsync<List<PpPrijem>>(
+                $"{nameof(PpRepo.GetPrijmyPolitika)}_{id}-politici",
+                _ => PpRepo.GetPrijmyPolitika(id)
+            );
+
+            ViewData["osoba"] = osoba;
+
+            return View("Politik",detail);
+        }
     }
+
+
 
     public async Task<IActionResult> Oblast(string id)
     {
@@ -90,20 +113,24 @@ public class PoliticiController : Controller
     
     public async Task<IActionResult> Detail(string id, int? rok = null)
     {
-        ValueTask<PuOrganizace> fullDetailTask = _cache.GetOrSetAsync<PuOrganizace>(
-            $"{nameof(PpRepo.GetFullDetailAsync)}_{id}-politici",
-            _ => PpRepo.GetFullDetailAsync(id)
-        );
 
-        var detail = await fullDetailTask;
-        
-        ViewBag.Title = detail.Nazev;
+        PuOrganizace detail = null;
+        if (HlidacStatu.Util.DataValidators.CheckCZICO(id))
+        {
+            //ico
+            detail = await PpRepo.GetOrganizaceFullDetailPerIcoAsync(id);
+            ViewData["rok"] = rok ?? (detail.PrijmyPolitiku.Any() ? detail.PrijmyPolitiku.Max(m => m.Rok) : PpRepo.DefaultYear);
+        }
+        else
+        {
+            //datovka
+            detail = await PpRepo.GetOrganizaceFullDetailAsync(id);
+            ViewData["rok"] = rok ?? (detail.PrijmyPolitiku.Any() ? detail.PrijmyPolitiku.Max(m => m.Rok) : PpRepo.DefaultYear);
+        }
 
-        ViewData["mainTag"] = detail.Tags.FirstOrDefault(t => PpRepo.MainTags.Contains(t.Tag))?.Tag;
-        ViewData["platy"] = detail.PrijmyPolitiku.ToList();
-        ViewData["rok"] = rok ?? (detail.PrijmyPolitiku.Any() ? detail.PrijmyPolitiku.Max(m => m.Rok) : PpRepo.DefaultYear);
-        ViewData["id"] = id;
-        ViewData["context"] = detail.FirmaDs.DsSubjName;
+        if (detail == null)
+            return NotFound($"Organizaci {id} jsme nenašli.");
+
 
         return View(detail);
     }
@@ -120,29 +147,24 @@ public class PoliticiController : Controller
     [HlidacCache(60*60,"*")]
     public async Task<IActionResult> Organizace(string id, int rok = PpRepo.DefaultYear )
     {
+        ViewData["rok"] = rok;
+        PuOrganizace detail = null;
         if (HlidacStatu.Util.DataValidators.CheckCZICO(id))
-            return View((id, rok));
+        {
+            //ico
+            detail = await PpRepo.GetOrganizaceFullDetailPerIcoAsync(id);
 
-        return View("Organizace.Seznam");
+        }
+        else if (!string.IsNullOrEmpty(id))
+        {
+            //datovka
+            detail = await PpRepo.GetOrganizaceFullDetailAsync(id);
+        }
 
-    }
+        if (detail == null)
+            return View("Organizace.Seznam");
+        else
+            return View(detail);
 
-
-    public async Task<IActionResult> Politik(string id)
-    {
-
-        ViewBag.Title = $"Platy politika {id}";
-        var osoba = Osoby.GetByNameId.Get(id);
-        if (osoba is null)
-            return NotFound($"Politika {id} jsme nenašli.");
-
-        var detail = await _cache.GetOrSetAsync<List<PpPrijem>>(
-            $"{nameof(PpRepo.GetPrijmyPolitika)}_{id}-politici",
-            _ => PpRepo.GetPrijmyPolitika(id)
-        );
-
-        ViewData["osoba"] = osoba;
-
-        return View(detail);
     }
 }

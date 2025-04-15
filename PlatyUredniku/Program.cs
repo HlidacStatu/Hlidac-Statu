@@ -175,13 +175,19 @@ public class Program
             app.UseAuthorization();
 
             app.MapControllerRoute(
-                name: "onlyAction",
+                name: "default",
+                pattern: "{controller=Home}/{action=Index}/{id?}");
+
+            app.MapControllerRoute(
+                name: "home",
                 pattern: "{action=Index}/{id?}",
                 defaults: new { controller = "Home" });
 
             app.MapControllerRoute(
-                name: "default",
-                pattern: "{controller=Home}/{action=Index}/{id?}");
+                name: "directIndex",
+                pattern: "{controller}/{id?}",
+                defaults: new { action = "Index" });
+
 
             app.MapRazorPages();
             app.Logger.LogInformation("PlatyUredniku Web starting");
@@ -189,7 +195,7 @@ public class Program
         }
         catch (Exception e)
         {
-            logger.Fatal(e, "PlatyUredniku Wev se nepodařilo spustit");
+            logger.Fatal(e, "PlatyUredniku Web se nepodařilo spustit");
             throw;
         }
     }

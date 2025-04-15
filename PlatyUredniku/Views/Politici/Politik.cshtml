@@ -34,6 +34,11 @@
         template: "<ul>{0}</ul>", itemTemplate: "<li>{0}</li>", itemDelimeter: "");
 
     int[] roky = Model.Select(m => m.Rok).Distinct().OrderBy(o => o).ToArray();
+    int rok = PuRepo.DefaultYear;
+    if (roky.Any())
+    {
+        rok = roky.Max();
+    }
 }
 
 
@@ -59,26 +64,28 @@
                             <div class="person-profile-thumb">
                                 <div class="photo">
                                     <div class="profile-picture border"
-                                         style="background-image: url('@politik.GetPhotoUrl(false, Osoba.PhotoTypes.NoBackground)')"></div>
+                                    style="background-image: url('@politik.GetPhotoUrl(false, Osoba.PhotoTypes.NoBackground)')"></div>
                                 </div>
                             </div>
                         </div>
                         <div class="mt-1">
-                            <h3>Příjmy z veřejných funkcí</h3>
-                            <div>
-                                @foreach (var rok in roky)
-                                {
+                            <h3>Celkové říjmy z veřejných funkcí</h3>
+                            <div>                                
+                                @{
                                     var _platyZaRok = Model.Where(m => m.Rok == rok);
-                                    <dl class="row">
-                                        <dt class="col col-sm-12 text-nowrap fs-4">@(rok)</dt>
-                                        <dt class="col col-sm-6 text-nowrap fs-4">Roční osobní příjem</dt>
-                                        <dd class="col col-sm-6 text-nowrap fs-4">@HlidacStatu.Util.RenderData.NicePriceHtml(_platyZaRok.Sum(m => m.CelkovyRocniPlatVcetneOdmen))</dd>
-                                        @if (_platyZaRok.Sum(m => m.Nahrady)>0) {
-                                            <dt class="col col-sm-6 text-nowrap fs-4">Ostatní náhrady</dt>
-                                            <dd class="col col-sm-6 text-nowrap fs-4">@HlidacStatu.Util.RenderData.NicePriceHtml(_platyZaRok.Sum(m => m.Nahrady))</dd>
-                                        }
-                                    </dl>
                                 }
+                                <dl class="row">
+                                    <dt class="col-12 col-sm-12 text-nowrap fs-3">@(rok)</dt>
+                                    <dt class="col-6 col-sm-6 col-md-3 text-nowrap fs-5">Roční osobní příjem</dt>
+                                    <dd class="col-6 col-sm-6 col-md-9 text-nowrap fs-5">@HlidacStatu.Util.RenderData.NicePriceHtml(_platyZaRok.Sum(m => m.CelkovyRocniPlatVcetneOdmen))</dd>
+                                    @if (_platyZaRok.Sum(m => m.CelkoveRocniNahrady)>0) {
+                                        <dt class="col-6 col-sm-6 col-md-3 text-nowrap fs-5">Ostatní náhrady</dt>
+                                        <dd class="col-6 col-sm-6 col-md-9 text-nowrap fs-5">@HlidacStatu.Util.RenderData.NicePriceHtml(_platyZaRok.Sum(m => m.CelkoveRocniNahrady))</dd>
+                                    }
+                                    <dt class="col-6 col-sm-6 col-md-3 text-nowrap fs-5">Evidujeme příjmy od </dt>
+                                    <dd class="col-6 col-sm-6 col-md-9">@(string.Join(", ", _platyZaRok.Select(m => m.Organizace.FirmaDs.DsSubjName)))</dd>
+                                </dl>
+
                             </div>
                         </div>
                     </div>
@@ -92,17 +99,25 @@
 <section class="d-flex alter-bg-color">
     <div class="container">
         @{
-            int aktualniRok = PpRepo.DefaultYear;
-            var platyZaRok = Model.Where(m => m.Rok == aktualniRok);
+            var platyZaRok = Model.Where(m => m.Rok == rok);
             //TODO dodelat vyber roku
         }
-        <h3>Detailní informace o příjmech po organizacích v @aktualniRok</h3>
+        <h3>Detailní informace o příjmech po organizacích v @rok</h3>
         @foreach (var pprijem in platyZaRok)
         {
-            <h5>@pprijem.Organizace.Nazev</h5>
 
+            <h5>@pprijem.Organizace.Nazev</h5>
+            @if (pprijem.Status == PpPrijem.StatusPlatu.Zjistujeme)            
+            {
+                PuEvent _ev = (await PpRepo.GetAllEventsAsync(rok, m=>m.IdOrganizace == pprijem.IdOrganizace && m.OsobaNameId == politik.NameId)).OrderByDescending(o=>o.Datum).FirstOrDefault();
+                <table class="table table-hover caption-top">
+                    <tr><td><div>Příjem od této organizace právě zjišťujeme@((_ev != null ? $" od {_ev.Datum:d. M. yyyy}":"")).</div></td></tr>
+                </table>
+            }
+            else
+            {
             <table class="table table-hover caption-top">
-                <caption>Všechny odměny jsou uvedeny v hrubém za kalendářní rok</caption>
+                <caption>Všechny odměny jsou uvedeny v hrubém za kalendářní rok @rok</caption>
                 <tbody>
                     <tr>
                         <th class="text-nowrap">Počet odpracovaných měsíců</th>
@@ -186,7 +201,7 @@
                     </tr>
                 </tbody>
             </table>
-
+            }
         }
 
 

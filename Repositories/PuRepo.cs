@@ -468,8 +468,9 @@ select distinct ds.DatovaSchranka, f.ico from firma f
             .ToListAsync();
     }
 
-    public static async Task UpsertOrganizaceAsync(PuOrganizace organizace)
+    public static async Task<PuOrganizace> UpsertOrganizaceAsync(PuOrganizace organizace)
     {
+        PuOrganizace res = null;
         await using var dbContext = new DbEntities();
 
         if (string.IsNullOrWhiteSpace(organizace.DS))
@@ -492,14 +493,17 @@ select distinct ds.DatovaSchranka, f.ico from firma f
         if (original is null || original.Id == 0)
         {
             dbContext.PuOrganizace.Add(organizace);
+            await dbContext.SaveChangesAsync();
+            res = organizace;
         }
         else
         {
             original.Info = organizace.Info;
             original.HiddenNote = organizace.HiddenNote;
+            await dbContext.SaveChangesAsync();
+            res = organizace;
         }
 
-        await dbContext.SaveChangesAsync();
 
 
         if (metadata is not null)
@@ -525,6 +529,7 @@ select distinct ds.DatovaSchranka, f.ico from firma f
                 await UpsertPlatAsync(plat);
             }
         }
+        return res;
     }
 
     public static async Task UpsertMetadataAsync(PuOrganizaceMetadata metadatum)
@@ -689,10 +694,12 @@ select distinct ds.DatovaSchranka, f.ico from firma f
             return x.o;
         }).ToList();
     }
+    
+
     public static async Task<PuEvent> UpsertEventAsync(PuEvent _event, bool addNewCj)
     {
         PuEvent ev = _event;
-        ev.DotazovanaInformace = PuEvent.DruhDotazovaneInformace.Politik;
+        
         await using var dbContext = new DbEntities();
 
         if (string.IsNullOrWhiteSpace(ev.IcoOrganizace))
@@ -721,6 +728,7 @@ select distinct ds.DatovaSchranka, f.ico from firma f
         return ev;
 
     }
+
     public static async Task<string> GetNewCisloJednaciAsync(PuEvent.DruhDotazovaneInformace druh)
     {
         string postfix = "OB";

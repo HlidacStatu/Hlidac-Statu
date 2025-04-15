@@ -1,5 +1,7 @@
+using Devmasters;
 using HlidacStatu.Entities;
 using Microsoft.EntityFrameworkCore;
+using Nest;
 using Polly.Caching;
 using System;
 using System.Collections.Generic;
@@ -7,6 +9,7 @@ using System.Drawing;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
+using static Azure.Core.HttpHeader;
 
 namespace HlidacStatu.Repositories;
 
@@ -15,11 +18,20 @@ public static class PpRepo
     public const int DefaultYear = 2024;
     public const int MinYear = 2024;
 
-    public static async Task<PuOrganizace> GetFullDetailAsync(string datovaSchranka)
+    public static async Task<PuOrganizace> GetOrganizaceFullDetailAsync(string datovaSchranka)
     {
         return await GetFullDetailAsync(new string[] { datovaSchranka });
     }
 
+    public static async Task<PuOrganizace> GetOrganizaceFullDetailPerIcoAsync(string ico)
+    {
+        if (HlidacStatu.Util.DataValidators.CheckCZICO(ico))
+        {
+            Firma f = Firmy.Get(ico);
+            return await GetFullDetailAsync(f.DatovaSchranka);
+        }
+        else return null;
+    }
 
     public static async Task<PuOrganizace> GetFullDetailAsync(string[] datoveSchranky)
     {
@@ -92,6 +104,14 @@ public static class PpRepo
             .ToListAsync();
     }
 
+    public static Osoba GetOsoba(this PpPrijem prijem)
+    {
+        if (string.IsNullOrEmpty(prijem.Nameid))
+            return null;
+        else
+            return Osoby.GetByNameId.Get(prijem.Nameid);
+    }
+
 
     public static async Task<int> GetPlatyCountAsync(int rok)
     {
@@ -119,6 +139,57 @@ public static class PpRepo
 
         return await query.ToListAsync();
 
+    }
+    public static async Task<PuEvent> ZahajeniDotazovaniPlatuPolitikaAsync(Firma firma, string osobaNameId, int rok, string naseCj)
+    {
+        await using var db = new DbEntities();
+
+        //existuje PuOrganizace?
+        var exists = await PpRepo.GetActiveOrganizaceAsync(rok, null, firma.ICO);
+        var puorg = exists.FirstOrDefault();
+        if (puorg == null)
+            puorg = await PuRepo.UpsertOrganizaceAsync(new PuOrganizace()
+            {
+                DS = firma.DatovaSchranka.FirstOrDefault()
+            });
+
+        PuEvent ev = new PuEvent()
+        {
+            ProRok = rok,
+            DotazovanaInformace = PuEvent.DruhDotazovaneInformace.Politik,
+            IdOrganizace = puorg.Id,
+            IcoOrganizace = firma.ICO,
+            DsOrganizace = firma.DatovaSchranka.FirstOrDefault() ?? "",
+            Datum = DateTime.Now,
+            Typ = PuEvent.TypUdalosti.ZaslaniZadosti,
+            Smer = PuEvent.SmerKomunikace.ZpravaOdNas,
+            Kanal = PuEvent.KomunikacniKanal.DatovaSchranka,
+            NaseCJ = naseCj,
+            Poznamka = "Zaslání žádosti o informace o platech a odměnách",
+            OsobaNameId = osobaNameId,
+        };
+        ev = await PuRepo.UpsertEventAsync(ev, false);
+
+        //existuje zaznam s platem?
+        var existsPlat = await db.PpPrijmy
+            .AsNoTracking()
+            .Where(m => m.IdOrganizace == puorg.Id && m.Rok == rok && m.Nameid == osobaNameId)
+            .FirstOrDefaultAsync();
+        if (existsPlat == null)
+        {
+            await PpRepo.UpsertPrijemPolitikaAsync(new PpPrijem()
+            {
+                IdOrganizace = puorg.Id,
+                Rok = rok,
+                Nameid = osobaNameId,
+                NazevFunkce="",
+                Plat = 0,
+                PocetMesicu = 0,
+                Status = PpPrijem.StatusPlatu.Zjistujeme                
+            });
+
+        }
+        return ev;
     }
 
     public static async Task<List<PuEvent>> GetAllEventsAsync(int rok,
@@ -150,7 +221,7 @@ public static class PpRepo
 
         var query = db.PuOrganizace
             .AsNoTracking()
-            .Where(m=>orgsInEvents.Contains(m.Id))
+            .Where(m => orgsInEvents.Contains(m.Id))
             .Include(t => t.FirmaDs)
             .Include(t => t.PrijmyPolitiku.Where(p => p.Rok == rok))
             .Include(t => t.Tags)
@@ -200,9 +271,9 @@ public static class PpRepo
     {
         var res = new PuOrganizaceMetadata.Description();
 
-        var events = org.GetOrganizationEventsAsync(rok, m=>m.DotazovanaInformace == PuEvent.DruhDotazovaneInformace.Politik)
+        var events = org.GetOrganizationEventsAsync(rok, m => m.DotazovanaInformace == PuEvent.DruhDotazovaneInformace.Politik)
                 .ConfigureAwait(false).GetAwaiter().GetResult();
-                // MetadataPlatyUredniku.Where(m => m.Rok == rok && m.Typ == PuOrganizaceMetadata.TypMetadat.PlatyPolitiku).ToList();
+        // MetadataPlatyUredniku.Where(m => m.Rok == rok && m.Typ == PuOrganizaceMetadata.TypMetadat.PlatyPolitiku).ToList();
 
         if (
             events.Any(m => m.Typ == PuEvent.TypUdalosti.ZaslaniZadosti) == false

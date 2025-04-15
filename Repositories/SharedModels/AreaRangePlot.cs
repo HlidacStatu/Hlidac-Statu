@@ -20,6 +20,12 @@ public class AreaRangePlot
             .GroupBy(p => p.Rok, p => p)
             .OrderBy(k => k.Key)
             .ToDictionary(g => g.Key, g => g.Select(x => x).ToList());
+        if (salariesYearly.Keys.Count() == 1)
+        {
+            //zkopiruj rok do dalsiho, aby byl graf hezci
+            salariesYearly[salariesYearly.Keys.Max() + 1] = salariesYearly[salariesYearly.Keys.Max()];
+        }
+
         if (salariesYearly.Any())
         {
             Dictionary<int, AreaRangePlot.PlotData?> plotData = new();
@@ -73,6 +79,11 @@ public class AreaRangePlot
             .ToDictionary(g => g.Key, g => g.Select(x => x).ToList());
         if (salariesYearly.Any())
         {
+            if (salariesYearly.Keys.Count() == 1)
+            {
+                //zkopiruj rok do dalsiho, aby byl graf hezci
+                salariesYearly[salariesYearly.Keys.Max() + 1] = salariesYearly[salariesYearly.Keys.Max()];
+            }
             Dictionary<int, AreaRangePlot.PlotData?> plotData = new();
 
             for (int year = salariesYearly.Keys.Min(); year <= salariesYearly.Keys.Max(); year++)

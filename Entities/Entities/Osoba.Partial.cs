@@ -100,6 +100,13 @@ namespace HlidacStatu.Entities
                 ret = ret.Replace(" ", "&nbsp;");
             return ret;
         }
+        public string PrijmeniJmeno(bool html = false)
+        {
+            string ret = $"{this.Prijmeni} {this.Jmeno}".Trim();
+            if (html)
+                ret = ret.Replace(" ", "&nbsp;");
+            return ret;
+        }
 
         public string FullNameWithYear(bool html = false)
         {
