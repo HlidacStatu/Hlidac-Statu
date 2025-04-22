@@ -107,10 +107,10 @@ public class UredniciController : Controller
                 break;
             case 1:
             default:
-                range = (0_000, 33_000);
+                range = (0_000, 35_300);
                 title = $"Manažerské platy ve veřejné správě za rok {PuRepo.DefaultYear} nižší než nástupní plat pokladní/ho v Lidlu ";
-                noteHtml = "Nástupní plat pokladní v Lidl v Praze byl <a href='https://www.idnes.cz/ekonomika/domaci/lidl-mzdy-prodavaci-obchod-retezec.A231213_161827_ekonomika_ven' target='_blank'>podle iDnes</a> <b>33 700 Kč hrubého</b>.";
-                rozsah = $"Rozsah zobrazovaných platů manažerů ve veřejné správě je od nuly až po nástupní plat pokladní/ho v Lidlu (<b>33 700 Kč</b>).";
+                noteHtml = "Nástupní plat pokladní v Lidl v Praze byl <a href='https://spolecnost.lidl.cz/pro-novinare/tiskove-zpravy/spolecnost-lidl-navysuje-mzdy-a-rozsiruje-benefity' target='_blank'>podle iDnes</a> <b>35 300 Kč hrubého</b>.";
+                rozsah = $"Rozsah zobrazovaných platů manažerů ve veřejné správě je od nuly až po nástupní plat pokladní/ho v Lidlu (<b>35 300 Kč</b>).";
                 odkaz = $"<a href=\"/DlePlatu/2\">Nižší než průměrné platy</a>";
                 break;
         }
