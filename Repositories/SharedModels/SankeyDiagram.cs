@@ -1,6 +1,9 @@
-﻿using HlidacStatu.Entities;
+﻿using System;
+using HlidacStatu.Entities;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
+using System.Text.Json;
 
 namespace HlidacStatu.Repositories.SharedModels;
 
@@ -17,41 +20,75 @@ public class SankeyDiagram
 
     public string DrawData()
     {
-        // [
-        //   ['Total', 'Alice', 1000, color:'#999999'],
-        //   ['Total', 'Bob', 2000, color:'#999999'],
-        //   ['Total', 'Charlie', 1500, color:'#999999'],
-        //   ['Total', 'Charlie2', 1500, color:'#999999'],
-        //   ['Total', 'Charlie3', 100, color:'#999999']
-        // ]
-        var data = PrijmyPolitiku.Select(p => $"['Celkový příjem','{p.Organizace.Nazev}',{DrawNakladyPerYear(p)},'{LinkColor}']");
 
-        return $"[{string.Join(",", data)}]";
+        var nakladyTotal = PrijmyPolitiku.Sum(p => p.CeloveRocniNakladyNaPolitika);
+        var data = PrijmyPolitiku.Select(prijem => 
+            new {
+                from = "Celkový příjem",
+                to = prijem.Organizace.Nazev,
+                weight = DrawNakladyPerYear(prijem, nakladyTotal),
+                color = prijem.Status == PpPrijem.StatusPlatu.Zjistujeme ? "#000000" : "#999999",
+                custom = new {
+                    value = prijem.CeloveRocniNakladyNaPolitika,
+                    link = $"#{prijem.Organizace.DS}"
+                }
+            });
+
+        var options = new JsonSerializerOptions
+        {
+            PropertyNamingPolicy = JsonNamingPolicy.CamelCase // matches JS expectations (e.g. from, to, weight)
+        };
+
+        return JsonSerializer.Serialize(data, options);
     }
-
+    
     public string DrawNodes()
     {
-        // [
-        // { id: 'Alice', custom: { link: '#alice' } },
-        // { id: 'Bob', custom: { link: '#bob' } },
-        // { id: 'Charlie', custom: { link: '#charlie' } },
-        // { id: 'Charlie2', custom: { link: '#charlie2' } },
-        // { id: 'Charlie3', custom: { link: '#charlie3' } }
-        // ]
-        var data = PrijmyPolitiku.Select(p => $"{{id:'{p.Organizace.Nazev}',custom:{{link: '#{p.Organizace.DS}'}} }}");
+        var total = PrijmyPolitiku.Sum(p => p.CeloveRocniNakladyNaPolitika);
 
-        return $"[{string.Join(",", data)}]";
-    }
-
-    private string DrawNakladyPerYear(PpPrijem input)
-    {
-        if (input.Status == PpPrijem.StatusPlatu.Zjistujeme) // neposlali plat
+        var nodes = new List<object>
         {
-            return "0.00001";
+            new
+            {
+                id = "Celkový příjem",
+                custom = new
+                {
+                    value = total
+                }
+            }
+        };
+
+        nodes.AddRange(PrijmyPolitiku.Select(p => new
+        {
+            id = p.Organizace.Nazev,
+            custom = new
+            {
+                value = p.CeloveRocniNakladyNaPolitika,
+                link = $"#{p.Organizace.DS}"
+            }
+        }));
+
+        var options = new JsonSerializerOptions
+        {
+            PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+        };
+
+        return JsonSerializer.Serialize(nodes, options);
+    }
+    
+    
+    private double DrawNakladyPerYear(PpPrijem input, decimal nakladyTotal)
+    {
+        if (input.Status == PpPrijem.StatusPlatu.Zjistujeme)
+        {
+            return 1; // fake-small value to make the line appear
         }
-        
-        return input.CeloveRocniNakladyNaPolitika.ToString("F0");
-        
+
+        double realValue = (double)input.CeloveRocniNakladyNaPolitika;
+        double max = (double)nakladyTotal;
+
+        double scaled = 1 + 99 * (Math.Log10(realValue + 1) / Math.Log10(max + 1));
+        return scaled;
     }
 
     private string CheckMissingValue(PpPrijem input)

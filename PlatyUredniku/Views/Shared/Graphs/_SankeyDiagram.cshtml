@@ -39,17 +39,19 @@
                 const formatNumber = num =>
                     new Intl.NumberFormat('cs-CZ', { maximumFractionDigits: 0 }).format(num);
 
+                const value = this.point.custom?.value ?? 0;
+                
                 if (this.point.isNode) {
-                    if (this.point.sum < 1e-3) {
+                    if (value < 1e-3) {
                         return `<b>${this.point.name}</b><br/><i>Neznámá částka - hodnotu se nám nepodařilo zjistit</i>`;
                     } else {
-                        return `<b>${this.point.name}</b><br/>${formatNumber(this.point.sum)} Kč`;
+                        return `<b>${this.point.name}</b><br/>${formatNumber(value)} Kč`;
                     }
                 } else {
-                    if (this.point.weight < 1e-3) {
+                    if (value < 1e-3) {
                         return `<b>${this.point.to}</b><br/><i>Neznámá částka - hodnotu se nám nepodařilo zjistit</i>`;
                     } else {
-                        return `<b>${this.point.to}</b><br/>${formatNumber(this.point.weight)} Kč`;
+                        return `<b>${this.point.to}</b><br/>${formatNumber(value)} Kč`;
                     }
                 }
             }
@@ -57,6 +59,7 @@
         series: [{
             keys: ['from', 'to', 'weight', 'color'],
             data: @Html.Raw(Model.DrawData()),
+            nodes: @Html.Raw(Model.DrawNodes()),
             type: 'sankey',
             name: 'Money Flow',
             colorByPoint: false,
@@ -65,7 +68,6 @@
             nodePadding: 60,
             linkOpacity: 0.5,
             nodeWidth: 150,
-            nodes: @Html.Raw(Model.DrawNodes())
         }],
         plotOptions: {
             sankey: {
