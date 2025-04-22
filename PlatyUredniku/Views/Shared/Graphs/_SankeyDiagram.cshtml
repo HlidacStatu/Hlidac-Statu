@@ -1,0 +1,89 @@
+@model SankeyDiagram
+
+@using HlidacStatu.Repositories.SharedModels
+
+@{
+    string chartId = HlidacStatu.Util.Consts.Rnd.Next(999).ToString("000");
+}
+
+@if (Model is null)
+{
+    <div>Pro vykreslení grafu chybí zdrojová data</div>
+    return;
+}
+<figure >
+    <div id="chart-container-@chartId"></div>
+
+    @if (!string.IsNullOrEmpty(Model.Description))
+    {
+        <div class="text-muted">@Model.Description</div>
+    }
+</figure>
+
+<script>
+    Highcharts.chart('chart-container-@(chartId)', {
+        chart: {
+            height: '@Model.CssHeight' , // 16:6 ratio
+            width: null // 16:6 ratio
+        },
+        title: {
+            text: '@Html.Raw(Model.Title)',
+            align: 'left'
+        },
+        subtitle: {
+            text: '@Html.Raw(Model.Subtitle)',
+            align: 'left'
+        },
+        tooltip: {
+            formatter: function () {
+                const formatNumber = num =>
+                    new Intl.NumberFormat('cs-CZ', { maximumFractionDigits: 0 }).format(num);
+
+                if (this.point.isNode) {
+                    if (this.point.sum < 1e-3) {
+                        return `<b>${this.point.name}</b><br/><i>Neznámá částka - hodnotu se nám nepodařilo zjistit</i>`;
+                    } else {
+                        return `<b>${this.point.name}</b><br/>${formatNumber(this.point.sum)} Kč`;
+                    }
+                } else {
+                    if (this.point.weight < 1e-3) {
+                        return `<b>${this.point.to}</b><br/><i>Neznámá částka - hodnotu se nám nepodařilo zjistit</i>`;
+                    } else {
+                        return `<b>${this.point.to}</b><br/>${formatNumber(this.point.weight)} Kč`;
+                    }
+                }
+            }
+        },
+        series: [{
+            keys: ['from', 'to', 'weight', 'color'],
+            data: @Html.Raw(Model.DrawData()),
+            type: 'sankey',
+            name: 'Money Flow',
+            colorByPoint: false,
+            // color: '#003688',
+            curveFactor: 0.4,
+            nodePadding: 60,
+            linkOpacity: 0.5,
+            nodeWidth: 150,
+            nodes: @Html.Raw(Model.DrawNodes())
+        }],
+        plotOptions: {
+            sankey: {
+                point: {
+                    events: {
+                        click: function () {
+                            const anchor = this.custom?.link?.replace('#', '');
+                            const el = document.getElementById(anchor);
+                            if (el) {
+                                el.scrollIntoView({ behavior: 'smooth' }); // optional smooth scroll
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        
+    });
+
+</script>
+

@@ -1,11 +1,9 @@
 @using HlidacStatu.Repositories
 @using HlidacStatu.Entities
 @using HlidacStatu.Extensions
-@using HlidacStatu.Lib.Web.UI
-@using Microsoft.AspNetCore.Mvc.TagHelpers
+@using HlidacStatu.Repositories.SharedModels
 @model List<PpPrijem>
 @addTagHelper *, HlidacStatu.Lib.Web.UI.TagHelpers
-
 
 @{
     var politik = (Osoba?)ViewData["osoba"];
@@ -13,8 +11,6 @@
         throw new Exception("Politik není znám");
 
     ViewBag.Title = politik.FullName();
-
-
 
     int[] othtypes = {
         (int)OsobaEvent.Types.VerejnaSpravaJine,
@@ -69,7 +65,7 @@
                             </div>
                         </div>
                         <div class="mt-1">
-                            <h3>Celkové říjmy z veřejných funkcí</h3>
+                            <h3>Celkové příjmy z veřejných funkcí</h3>
                             <div>                                
                                 @{
                                     var _platyZaRok = Model.Where(m => m.Rok == rok);
@@ -86,6 +82,16 @@
                                     <dd class="col-6 col-sm-6 col-md-9">@(string.Join(", ", _platyZaRok.Select(m => m.Organizace.FirmaDs.DsSubjName)))</dd>
                                 </dl>
 
+                            </div>
+                            <div>
+                                @* Graf here *@
+                                @if(Model.Count > 1)
+                                {
+                                    <div>
+                                        <partial name="Graphs/_SankeyDiagram"
+                                                 model="@(new SankeyDiagram() { PrijmyPolitiku = Model, Title="Přehled celkových ročních příjmů", CssHeight = "380" })"/>
+                                    </div>
+                                }
                             </div>
                         </div>
                     </div>
@@ -106,7 +112,7 @@
         @foreach (var pprijem in platyZaRok)
         {
 
-            <h5>@pprijem.Organizace.Nazev</h5>
+            <h5 id="@pprijem.Organizace.DS">@pprijem.Organizace.Nazev</h5>
             @if (pprijem.Status == PpPrijem.StatusPlatu.Zjistujeme)            
             {
                 PuEvent _ev = (await PpRepo.GetAllEventsAsync(rok, m=>m.IdOrganizace == pprijem.IdOrganizace && m.OsobaNameId == politik.NameId)).OrderByDescending(o=>o.Datum).FirstOrDefault();

@@ -244,6 +244,7 @@ public class Program
             pipeline.AddJavaScriptBundle("/bundles/highcharts11",
                 "Scripts/Highcharts-11/highcharts.js",
                 "Scripts/Highcharts-11/highcharts-more.js",
+                "Scripts/Highcharts-11/modules/sankey.js",
                 "Scripts/highcharts.global.options.js");
 
             pipeline.AddJavaScriptBundle("/bundles/typeahead",

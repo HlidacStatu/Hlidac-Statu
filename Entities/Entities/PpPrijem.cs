@@ -50,10 +50,11 @@ public class PpPrijem
     public virtual PuOrganizace Organizace { get; set; }
 
     //todo: tohle je potřeba projít a případně zakomponovat náhrady...
+    public decimal CeloveRocniNakladyNaPolitika => CelkovyRocniPlatVcetneOdmen + CelkoveRocniNahrady;
     public decimal CelkovyRocniPlatVcetneOdmen => (Plat ?? 0) + (Odmeny ?? 0) + (Prispevky ?? 0) 
                                                   + (NahradaReprezentace ?? 0) + (NahradaCestovni ?? 0) + (NahradaUbytovani ?? 0);
-    public decimal HrubyMesicniPlatVcetneOdmen => (PocetMesicu==0) ? 0 : CelkovyRocniPlatVcetneOdmen / (PocetMesicu ?? 12);
     public decimal CelkoveRocniNahrady => (NahradaKancelar ?? 0) + (NahradaAdministrativa ?? 0) + (NahradaAsistent ?? 0) + (NahradaTelefon ?? 0);
+    public decimal HrubyMesicniPlatVcetneOdmen => (PocetMesicu==0) ? 0 : CelkovyRocniPlatVcetneOdmen / (PocetMesicu ?? 12);
     public decimal? PlatMesicne => (PocetMesicu == 0) ? 0 : ((Plat ?? 0) / (PocetMesicu ?? 12));
     public decimal? OdmenyMesicne => (PocetMesicu == 0) ? 0 : ((Odmeny ?? 0) / (PocetMesicu ?? 12));
     public decimal? OsobniOhodnoceniPerc => ((Plat + Odmeny) == 0 || Plat == 0) ? null : Odmeny / (Plat + Odmeny);
