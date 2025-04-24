@@ -20,13 +20,12 @@ public class SankeyDiagram
 
     public string DrawData()
     {
-
-        var nakladyTotal = PrijmyPolitiku.Sum(p => p.CeloveRocniNakladyNaPolitika);
+        var nakladyMax = PrijmyPolitiku.Max(p => p.CeloveRocniNakladyNaPolitika);
         var data = PrijmyPolitiku.Select(prijem => 
             new {
                 from = "Celkový příjem",
                 to = prijem.Organizace.Nazev,
-                weight = DrawNakladyPerYear(prijem, nakladyTotal),
+                weight = DrawNakladyPerYear(prijem, nakladyMax),
                 color = prijem.Status == PpPrijem.StatusPlatu.Zjistujeme ? "#000000" : "#999999",
                 custom = new {
                     value = prijem.CeloveRocniNakladyNaPolitika,
@@ -87,7 +86,7 @@ public class SankeyDiagram
         double realValue = (double)input.CeloveRocniNakladyNaPolitika;
         double max = (double)nakladyTotal;
 
-        double scaled = 1 + 99 * (Math.Log10(realValue + 1) / Math.Log10(max + 1));
+        double scaled = realValue/max * 100;
         return scaled;
     }
 
