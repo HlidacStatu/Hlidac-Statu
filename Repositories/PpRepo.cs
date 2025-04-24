@@ -1,15 +1,10 @@
-using Devmasters;
 using HlidacStatu.Entities;
 using Microsoft.EntityFrameworkCore;
-using Nest;
-using Polly.Caching;
 using System;
 using System.Collections.Generic;
-using System.Drawing;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
-using static Azure.Core.HttpHeader;
 
 namespace HlidacStatu.Repositories;
 
@@ -44,6 +39,17 @@ public static class PpRepo
             .Include(o => o.Tags)
             .Include(o => o.FirmaDs)
             .Include(o => o.PrijmyPolitiku) // Include PuPrijmyPolitiku
+            .FirstOrDefaultAsync();
+    }
+    
+    public static async Task<PuOrganizace> GetOrganizaceOnly(string datovaSchranka)
+    {
+        await using var db = new DbEntities();
+
+        return await db.PuOrganizace
+            .AsNoTracking()
+            .Where(pu => pu.DS == datovaSchranka)
+            .Include(o => o.FirmaDs)
             .FirstOrDefaultAsync();
     }
 

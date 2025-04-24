@@ -19,6 +19,7 @@ public class PuEvent
         Stiznost = 7,
         Odvolani = 8,
         Jine = 9,
+        NahraniUdaju = 10,
     }
 
     public enum SmerKomunikace : int
