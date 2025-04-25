@@ -438,11 +438,6 @@ public static class PpRepo
 
     public static async Task UpsertPrijemPolitikaAsync(PpPrijem prijemPolitika)
     {
-        if (string.IsNullOrWhiteSpace(prijemPolitika.NazevFunkce))
-        {
-            throw new Exception("Chybí vyplněný název pozice");
-        }
-
         if (prijemPolitika.Rok == 0)
         {
             throw new Exception("Chybí vyplněný rok pozice");

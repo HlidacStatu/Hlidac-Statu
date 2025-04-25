@@ -711,8 +711,24 @@ select distinct ds.DatovaSchranka, f.ico from firma f
             throw new ArgumentException("OsobaNameId is missing");
         }
 
-        var original = await dbContext.PuEvents.FirstOrDefaultAsync(o => o.Pk == ev.Pk);
-        if (original is null || ev.Pk == 0)
+        PuEvent? original = null;
+        if (ev.Pk == 0)
+        {
+            original = await dbContext.PuEvents.FirstOrDefaultAsync(o => o.IdOrganizace == ev.IdOrganizace 
+                                                                         && o.OsobaNameId == ev.OsobaNameId 
+                                                                         && o.Kanal == ev.Kanal 
+                                                                         && o.ProRok == ev.ProRok
+                                                                         && o.DotazovanaInformace == ev.DotazovanaInformace
+                                                                         && o.Smer == ev.Smer
+                                                                         && o.Typ == ev.Typ
+                                                                         && o.Kanal == ev.Kanal);
+        }
+        else
+        {
+            original = await dbContext.PuEvents.FirstOrDefaultAsync(o => o.Pk == ev.Pk);
+        }
+        
+        if (original is null)
         {
             dbContext.PuEvents.Add(ev);
         }
