@@ -18,6 +18,22 @@ namespace HlidacStatu.Connectors
         {
             return GetList<T>(GetRowValues<T>, sql, type, param, cnnString).FirstOrDefault();
         }
+        public static string ListResultToHtmlTable<T>(IEnumerable<T> data)
+        {
+            System.Text.StringBuilder sb = new System.Text.StringBuilder(1024);
+            sb.AppendLine("<table>");
+            foreach (var item in data)
+            {
+                sb.AppendLine("<tr>");
+                foreach (var prop in item.GetType().GetProperties())
+                {
+                    sb.AppendLine($"<td>{prop.GetValue(item)}</td>");
+                }
+                sb.AppendLine("</tr>");
+            }
+            sb.AppendLine("</table>");
+            return sb.ToString();
+        }
 
         public static IEnumerable<T> GetList<T>(string sql, CommandType type = CommandType.Text, IDataParameter[] param = null, string cnnString = null)
         {
