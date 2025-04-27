@@ -41,6 +41,9 @@ namespace HlidacStatu.Entities
         [Column("priority")]
         public int? Priority { get; set; } = 10;
 
+        [Column("tries")]
+        public int? Tries { get; set; } = 10;
+
         public HlidacStatu.DS.Api.TablesInDoc.Task ToTablesInDocTask()
         {
             return new DS.Api.TablesInDoc.Task()
