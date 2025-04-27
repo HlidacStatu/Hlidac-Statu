@@ -20,10 +20,10 @@
         </li>
         <li class="list-group-item list-group-item-dark">Nejvyšší nárůsty a poklesy platů</li>
         <li class="list-group-item">
-            <i class="fa-regular fa-display-chart-up-circle-dollar"></i> <a href="/analyza/ZmenaPlatuCeos">Přehled nejvyšších nárůstů ředitelských platů od roku <b>2021</b></a>
-            @foreach (var y in PuRepo.AllYears.Where(y => y < PuRepo.DefaultYear && y > 2021))
+            <i class="fa-regular fa-display-chart-up-circle-dollar"></i> <a href="/urednici/analyza/ZmenaPlatuCeos">Přehled nejvyšších nárůstů ředitelských platů mezi roky <b>@(PuRepo.DefaultYear-1)-@(PuRepo.DefaultYear-2000)</b></a>
+            @foreach (var y in PuRepo.AllYears.Where(y => y < PuRepo.DefaultYear && y > 2021).Reverse)
             {
-                <text>, <a href="/urednici/analyza/ZmenaPlatuCeos?minyear=@y">@y</a></text>
+                <text>, <a href="/urednici/analyza/ZmenaPlatuCeos?minyear=@y">@y-@(PuRepo.DefaultYear-2000)</a></text>
             }.
 
         </li>
