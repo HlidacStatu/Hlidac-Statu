@@ -475,24 +475,8 @@ public static class PpRepo
         }
         else
         {
-            origPlat.NazevFunkce = prijemPolitika.NazevFunkce;
-            origPlat.Plat = prijemPolitika.Plat;
-            origPlat.Odmeny = prijemPolitika.Odmeny;
-            origPlat.Prispevky = prijemPolitika.Prispevky;
-            origPlat.DisplayOrder = prijemPolitika.DisplayOrder;
-            origPlat.PocetMesicu = prijemPolitika.PocetMesicu;
-            origPlat.NefinancniBonus = prijemPolitika.NefinancniBonus;
-            origPlat.PoznamkaPlat = prijemPolitika.PoznamkaPlat;
-            origPlat.SkrytaPoznamka = prijemPolitika.SkrytaPoznamka;
-            origPlat.Uvolneny = prijemPolitika.Uvolneny;
-            origPlat.NahradaAdministrativa = prijemPolitika.NahradaAdministrativa;
-            origPlat.NahradaAsistent = prijemPolitika.NahradaAsistent;
-            origPlat.NahradaCestovni = prijemPolitika.NahradaCestovni;
-            origPlat.NahradaKancelar = prijemPolitika.NahradaKancelar;
-            origPlat.NahradaReprezentace = prijemPolitika.NahradaReprezentace;
-            origPlat.NahradaTelefon = prijemPolitika.NahradaTelefon;
-            origPlat.NahradaUbytovani = prijemPolitika.NahradaUbytovani;
-
+            prijemPolitika.Id = origPlat.Id;
+            dbContext.Entry(origPlat).CurrentValues.SetValues(prijemPolitika);
         }
 
         await dbContext.SaveChangesAsync();

@@ -698,50 +698,48 @@ select distinct ds.DatovaSchranka, f.ico from firma f
 
     public static async Task<PuEvent> UpsertEventAsync(PuEvent _event, bool addNewCj)
     {
-        PuEvent ev = _event;
-        
         await using var dbContext = new DbEntities();
 
-        if (string.IsNullOrWhiteSpace(ev.IcoOrganizace))
+        if (string.IsNullOrWhiteSpace(_event.IcoOrganizace))
         {
             throw new ArgumentException("ICO is missing");
         }
-        if (string.IsNullOrWhiteSpace(ev.OsobaNameId))
+        if (string.IsNullOrWhiteSpace(_event.OsobaNameId))
         {
             throw new ArgumentException("OsobaNameId is missing");
         }
 
         PuEvent? original = null;
-        if (ev.Pk == 0)
+        if (_event.Pk == 0)
         {
-            original = await dbContext.PuEvents.FirstOrDefaultAsync(o => o.IdOrganizace == ev.IdOrganizace 
-                                                                         && o.OsobaNameId == ev.OsobaNameId 
-                                                                         && o.Kanal == ev.Kanal 
-                                                                         && o.ProRok == ev.ProRok
-                                                                         && o.DotazovanaInformace == ev.DotazovanaInformace
-                                                                         && o.Smer == ev.Smer
-                                                                         && o.Typ == ev.Typ
-                                                                         && o.Kanal == ev.Kanal);
+            original = await dbContext.PuEvents.FirstOrDefaultAsync(o => o.IdOrganizace == _event.IdOrganizace 
+                                                                         && o.OsobaNameId == _event.OsobaNameId 
+                                                                         && o.Kanal == _event.Kanal 
+                                                                         && o.ProRok == _event.ProRok
+                                                                         && o.DotazovanaInformace == _event.DotazovanaInformace
+                                                                         && o.Smer == _event.Smer
+                                                                         && o.Typ == _event.Typ
+                                                                         && o.Kanal == _event.Kanal);
         }
         else
         {
-            original = await dbContext.PuEvents.FirstOrDefaultAsync(o => o.Pk == ev.Pk);
+            original = await dbContext.PuEvents.FirstOrDefaultAsync(o => o.Pk == _event.Pk);
         }
         
         if (original is null)
         {
-            dbContext.PuEvents.Add(ev);
+            dbContext.PuEvents.Add(_event);
         }
         else
         {
-            dbContext.PuEvents.Attach(ev);
-            dbContext.Entry(ev).State = EntityState.Modified;
+            _event.Pk = original.Pk;
+            dbContext.Entry(original).CurrentValues.SetValues(_event);
         }
-        if (addNewCj && string.IsNullOrEmpty(ev.NaseCJ))
-            ev.NaseCJ = await GetNewCisloJednaciAsync(ev.DotazovanaInformace);
+        if (addNewCj && string.IsNullOrEmpty(_event.NaseCJ))
+            _event.NaseCJ = await GetNewCisloJednaciAsync(_event.DotazovanaInformace);
         await dbContext.SaveChangesAsync();
 
-        return ev;
+        return _event;
 
     }
 
