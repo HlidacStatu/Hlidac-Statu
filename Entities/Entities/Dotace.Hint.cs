@@ -5,6 +5,7 @@ using System.Text.Json;
 using Devmasters;
 using Devmasters.Enums;
 using HlidacStatu.AI.LLM;
+using HlidacStatu.AI.LLM.Clients.Options;
 using HlidacStatu.Util;
 using Nest;
 using Serilog;
@@ -3846,7 +3847,7 @@ public partial class Dotace
             List<Category> cats = new();
 
             Uri ollamaUri = new Uri("http://10.10.150.163:7862");
-            HlidacStatu.AI.LLM.Clients.OllamaServerClient llm = new HlidacStatu.AI.LLM.Clients.OllamaServerClient(ollamaUri.AbsoluteUri);
+            HlidacStatu.AI.LLM.Clients.OllamaServerClient<CoreOptions> llm = new HlidacStatu.AI.LLM.Clients.OllamaServerClient<CoreOptions>(ollamaUri.AbsoluteUri);
             HlidacStatu.AI.LLM.Models.Model model = HlidacStatu.AI.LLM.Models.Model.Llama31;
             var llmQuery = new LLMQuery(llmCategoryQuery.Replace("##TEXT##", item.ProjectName + " " + item.ProjectDescription),
                 "Odpovídej stručně, přesně, co nejpřesněji podle instrukcí.Pokud nevíš nebo si nejsi jist, odpověz pouze #NEVIM#", temperature: 0.3f, responseFormat: null);

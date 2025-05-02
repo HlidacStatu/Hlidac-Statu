@@ -20,6 +20,7 @@ using Newtonsoft.Json;
 using HlidacStatu.MLUtil.Splitter;
 using System.Text;
 using static HlidacStatu.AI.LLM.ContractParties.Parsed;
+using HlidacStatu.AI.LLM.Clients.Options;
 
 
 namespace HlidacStatu.Repositories
@@ -46,8 +47,9 @@ namespace HlidacStatu.Repositories
         }
 
         public async static Task<bool> SameContractPartiesWithAIAsync(Smlouva smlouva,
-            HlidacStatu.AI.LLM.Clients.BaseClient llmClient, int maxWordsFromBeginningOfTheText = 1000,
+            HlidacStatu.AI.LLM.Clients.BaseClient<CoreOptions> llmClient, int maxWordsFromBeginningOfTheText = 1000,
             HlidacStatu.AI.LLM.Models.Model model = null)
+            
         {
             if (smlouva == null)
                 throw new ArgumentNullException(nameof(smlouva));
@@ -93,7 +95,7 @@ namespace HlidacStatu.Repositories
         }
         public async static Task<HlidacStatu.AI.LLM.ContractParties.Comparison> ContractPartiesComparisonWithAIAsync(
                 Smlouva smlouva, Smlouva.Priloha priloha,
-                    HlidacStatu.AI.LLM.Clients.BaseClient llmClient, int maxWordsFromBeginningOfTheText = 1000,
+                    HlidacStatu.AI.LLM.Clients.BaseClient<CoreOptions> llmClient, int maxWordsFromBeginningOfTheText = 1000,
                     HlidacStatu.AI.LLM.Models.Model model = null, bool doubleCheck = false)
         {
 
