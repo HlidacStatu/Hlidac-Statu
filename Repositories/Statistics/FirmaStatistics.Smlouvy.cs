@@ -14,7 +14,7 @@ namespace HlidacStatu.Repositories.Statistics
         static Devmasters.Cache.Redis.Manager<StatisticsSubjectPerYear<Smlouva.Statistics.Data>, (Firma firma, HlidacStatu.DS.Graphs.Relation.AktualnostType aktualnost, int? obor)>
             _holdingSmlouvaCache
             = Devmasters.Cache.Redis.Manager<StatisticsSubjectPerYear<Smlouva.Statistics.Data>, (Firma firma, HlidacStatu.DS.Graphs.Relation.AktualnostType aktualnost, int? obor)>
-                .GetSafeInstance("Holding_SmlouvyStatistics_v1_",
+                .GetSafeInstance("Holding_SmlouvyStatistics_v4_",
                     (obj) => _holdingCalculateStats(obj.firma, obj.aktualnost, obj.obor),
                     TimeSpan.Zero,
                     Devmasters.Config.GetWebConfigValue("RedisServerUrls").Split(';'),
@@ -50,7 +50,7 @@ namespace HlidacStatu.Repositories.Statistics
         static Devmasters.Cache.Redis.ManagerAsync<StatisticsSubjectPerYear<Smlouva.Statistics.Data>, (Firma firma, int? obor)>
             _smlouvaCache
             = Devmasters.Cache.Redis.ManagerAsync<StatisticsSubjectPerYear<Smlouva.Statistics.Data>, (Firma firma, int? obor)>
-                .GetSafeInstance("Firma_SmlouvyStatistics_v3_",
+                .GetSafeInstance("Firma_SmlouvyStatistics_v4_",
                     async (obj) => await _calculateSmlouvyStatsAsync(obj.firma, obj.obor),
                     TimeSpan.Zero,
                     Devmasters.Config.GetWebConfigValue("RedisServerUrls").Split(';'),
