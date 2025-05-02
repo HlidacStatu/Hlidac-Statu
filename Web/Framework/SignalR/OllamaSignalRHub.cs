@@ -30,7 +30,7 @@ namespace HlidacStatu.Web.Framework.SignalR
         public async Task SummaryJson( string smlouvaId, string prilohaId, string pocetbodu)
         {
             Uri ollamaUri = new Uri("http://10.10.100.113:18080/ollama/api");
-            var ollamaCl = new HlidacStatu.AI.LLM.Clients.OllamaOpenWebUI(ollamaUri.AbsoluteUri, "sk-f53cf4b315c144528110af15cc315c11");
+            var ollamaCl = new HlidacStatu.AI.LLM.Clients.OllamaServerClient<HlidacStatu.AI.LLM.Clients.Options.SummaryOptions>(ollamaUri.AbsoluteUri);
             HlidacStatu.AI.LLM.Summarization llm = new HlidacStatu.AI.LLM.Summarization(ollamaCl);
 
             //HlidacStatu.AI.LLM.Summarization llm = new(new HlidacStatu.AI.LLM.Summarization.OllamaOpenWebUI(ollamaUri.AbsoluteUri, "sk-f53cf4b315c144528110af15cc315c11"));
@@ -112,7 +112,7 @@ namespace HlidacStatu.Web.Framework.SignalR
 
 
             Uri ollamaUri = new Uri("http://10.10.100.113:18080/ollama/api");
-            var ollamaCl = new HlidacStatu.AI.LLM.Clients.OllamaOpenWebUI(ollamaUri.AbsoluteUri, "sk-f53cf4b315c144528110af15cc315c11");
+            var ollamaCl = new HlidacStatu.AI.LLM.Clients.OllamaServerClient<HlidacStatu.AI.LLM.Clients.Options.SummaryOptions>(ollamaUri.AbsoluteUri);
             HlidacStatu.AI.LLM.Summarization llm = new HlidacStatu.AI.LLM.Summarization(ollamaCl);
             //HlidacStatu.AI.LLM.Summarization llm = new(new HlidacStatu.AI.LLM.Summarization.OllamaOpenWebUI(ollamaUri.AbsoluteUri, "sk-f53cf4b315c144528110af15cc315c11"));
 
