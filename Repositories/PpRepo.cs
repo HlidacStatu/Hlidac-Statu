@@ -15,7 +15,7 @@ public static class PpRepo
 
     public static async Task<PuOrganizace> GetOrganizaceFullDetailAsync(string datovaSchranka)
     {
-        return await GetFullDetailAsync(new string[] { datovaSchranka });
+        return await GetOrganizaceFullDetailAsync(new string[] { datovaSchranka });
     }
 
     public static async Task<PuOrganizace> GetOrganizaceFullDetailPerIcoAsync(string ico)
@@ -23,12 +23,12 @@ public static class PpRepo
         if (HlidacStatu.Util.DataValidators.CheckCZICO(ico))
         {
             Firma f = Firmy.Get(ico);
-            return await GetFullDetailAsync(f.DatovaSchranka);
+            return await GetOrganizaceFullDetailAsync(f.DatovaSchranka);
         }
         else return null;
     }
 
-    public static async Task<PuOrganizace> GetFullDetailAsync(string[] datoveSchranky)
+    public static async Task<PuOrganizace> GetOrganizaceFullDetailAsync(string[] datoveSchranky)
     {
         await using var db = new DbEntities();
 
@@ -151,8 +151,7 @@ public static class PpRepo
         await using var db = new DbEntities();
 
         //existuje PuOrganizace?
-        var exists = await PpRepo.GetActiveOrganizaceAsync(rok, null, firma.ICO);
-        var puorg = exists.FirstOrDefault();
+        var puorg = await PpRepo.GetOrganizaceFullDetailAsync(firma.DatovaSchranka);
         if (puorg == null)
             puorg = await PuRepo.UpsertOrganizaceAsync(new PuOrganizace()
             {
