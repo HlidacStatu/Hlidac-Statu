@@ -1,4 +1,5 @@
 using HlidacStatu.Entities;
+using HlidacStatu.Extensions;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -41,7 +42,7 @@ public static class PpRepo
             .Include(o => o.PrijmyPolitiku) // Include PuPrijmyPolitiku
             .FirstOrDefaultAsync();
     }
-    
+
     public static async Task<PuOrganizace> GetOrganizaceOnly(string datovaSchranka)
     {
         await using var db = new DbEntities();
@@ -71,7 +72,36 @@ public static class PpRepo
             .Where(p => p.Id == id)
             .FirstOrDefaultAsync();
     }
+    static IEqualityComparer<Firma> icoComparer = new FirmaByIcoComparer();
+    public static async Task<List<Firma>> FindStatniFirmy(string nameId, Devmasters.DT.DateInterval obdobi)
+    {
+        /// ico- nameid[]
+        List<Firma> res = new();
 
+        Osoba o = Osoby.GetByNameId.Get(nameId);
+        if (o != null)
+        {
+            var vazby = o.PrimaAngazovanost(HlidacStatu.DS.Graphs.Relation.AktualnostType.Nedavny);
+            var d1 = vazby  
+                    .Where(v=>Devmasters.DT.DateInterval.IsOverlappingIntervals(new Devmasters.DT.DateInterval(v.RelFrom,v.RelTo),obdobi))
+                    .Select(m => m.To.Id)
+                    .Select(m => Firmy.Get(m)).Where(f => f.Valid).ToArray();
+            var d2 = d1
+                    .Where(f => f.JsemStatniFirma() || f.JsemOVM()).ToArray();
+            if (d2.Any())
+            {
+                //Console.WriteLine($" : {string.Join(",", d2.Select(m => m.Jmeno).Distinct())}");
+                var d3 = d2
+                        .Distinct(icoComparer).ToArray();
+                res.AddRange(d3);
+            }
+
+        }
+
+
+
+        return res;
+    }
     public static async Task<PpPrijem> GetPlatAsync(int idOrganizace, int rok, string nameid)
     {
         await using var db = new DbEntities();
@@ -187,10 +217,10 @@ public static class PpRepo
                 IdOrganizace = puorg.Id,
                 Rok = rok,
                 Nameid = osobaNameId,
-                NazevFunkce="",
+                NazevFunkce = "",
                 Plat = 0,
                 PocetMesicu = 0,
-                Status = PpPrijem.StatusPlatu.Zjistujeme                
+                Status = PpPrijem.StatusPlatu.Zjistujeme
             });
 
         }
