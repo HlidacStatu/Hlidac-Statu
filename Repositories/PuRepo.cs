@@ -501,7 +501,7 @@ select distinct ds.DatovaSchranka, f.ico from firma f
             original.Info = organizace.Info;
             original.HiddenNote = organizace.HiddenNote;
             await dbContext.SaveChangesAsync();
-            res = organizace;
+            res = original;
         }
 
 
