@@ -3,49 +3,46 @@
 
 <div class="card mb-3">
     <h5 class="card-header">Politické strany</h5>
-    <div class="row g-0">
-        <div class="col-sm-3 col-xl-2">
-            <div class="d-grid gap-2 mx-auto">
-                <button class="btn btn-success" @onclick="@(AddPartyAffiliation)">Přidat info o působení v politické straně</button>
-                <button class="btn btn-success" @onclick="@(Save)">Uložit osobu</button>
-                <button class="btn btn-danger" @onclick="@(Cancel)">Zrušit změny</button>
-            </div>
-        </div>
-        <div class="col-sm-9 col-xl-10">
-            <div class="card-body">
-                <div class="mx-auto">
-                    @foreach (var politicalParty in PoliticalParties)
-                    {
-                        <div class="form-floating">
-                            <input type="text" id="polStrana"
-                                   class="form-control"
-                                   @bind="@politicalParty.Organizace"/>
-                            <label for="polStrana">Politická strana</label>
-                        </div>
-                        <div class="form-floating">
-                            <input type="text" id="datefrom"
-                                   class="form-control"
-                                   @bind="@politicalParty.DatumOd"/>
-                            <label for="datefrom">Datum působení od</label>
-                        </div>
-                        <div class="form-floating">
-                            <input type="text" id="dateto"
-                                   class="form-control"
-                                   @bind="@politicalParty.DatumDo"/>
-                            <label for="dateto">Datum působení do</label>
-                        </div>
-                        <div class="form-floating">
-                            <input type="text" id="funkce"
-                                   class="form-control"
-                                   @bind="@politicalParty.AddInfo"/>
-                            <label for="funkce">Funkce v politické straně</label>
-                        </div>
-                    }
+    <div class="card-body">
+        <div class="mx-auto">
+            @foreach (var politicalParty in PoliticalParties)
+            {
+                <div class="row">
+                    <div class="col-3 form-floating">
+                        <input type="text" id="polStrana"
+                               class="form-control"
+                               @bind="@politicalParty.Organizace"/>
+                        <label for="polStrana">Politická strana</label>
+                    </div>
+                    <div class="col-3 form-floating">
+                        <input type="date" id="datefrom"
+                               class="form-control"
+                               @bind="@politicalParty.DatumOd"/>
+                        <label for="datefrom">Datum působení od</label>
+                    </div>
+                    <div class="col-3 form-floating">
+                        <input type="date" id="dateto"
+                               class="form-control"
+                               @bind="@politicalParty.DatumDo"/>
+                        <label for="dateto">Datum působení do</label>
+                    </div>
+                    <div class="col-3 form-floating">
+                        <input type="text" id="funkce"
+                               class="form-control"
+                               @bind="@politicalParty.AddInfo"/>
+                        <label for="funkce">Funkce v politické straně</label>
+                    </div>
                 </div>
-
-            </div>
+            }
         </div>
     </div>
+    
+    <div class="card-footer text-body-secondary">
+        <button class="btn btn-primary" @onclick="@(AddPartyAffiliation)">Přidat působení ve straně</button>
+        <button class="btn btn-success" @onclick="@(Save)">Uložit změny</button>
+        <button class="btn btn-warning" @onclick="@(Cancel)">Zrušit změny</button>
+    </div>
+
 </div>
 
 @code
@@ -55,14 +52,13 @@
 
     private List<OsobaEvent> PoliticalParties { get; set; } = new();
 
-    
 
     private void AddPartyAffiliation()
     {
         OsobaEvent newEvent = new OsobaEvent()
         {
             OsobaId = OsobaId,
-            Type = (int) OsobaEvent.Types.PolitickaStrana
+            Type = (int)OsobaEvent.Types.PolitickaStrana
         };
         PoliticalParties.Insert(0, newEvent);
     }
@@ -71,7 +67,7 @@
     {
         PoliticalParties = OsobaEventRepo
             .GetByOsobaId(OsobaId, x => x.Type == (int)OsobaEvent.Types.PolitickaStrana)
-            .OrderBy(p => p.DatumDo).ToList();
+            .OrderBy(p => p.DatumOd).ToList();
 
         base.OnParametersSet();
     }
