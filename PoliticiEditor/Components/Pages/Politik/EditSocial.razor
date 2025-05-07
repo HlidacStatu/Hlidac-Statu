@@ -1,8 +1,8 @@
 ﻿@using HlidacStatu.Entities
 @using HlidacStatu.Repositories
-<a href="">Editovat sociální sítě</a>
+
 <div class="card mb-3">
-    <h5 class="card-header">@Osoba.NameId</h5>
+    <h5 class="card-header">Sociální sítě</h5>
     <div class="row g-0">
         <div class="col-sm-3 col-xl-2">
             <div class="d-grid gap-2 mx-auto">
@@ -123,7 +123,8 @@
     {
         OsobaEvent newEvent = new OsobaEvent()
         {
-            OsobaId = OsobaId
+            OsobaId = OsobaId,
+            Type = (int) OsobaEvent.Types.SocialniSite
         };
         SocialNetworks.Add(newEvent);
         return newEvent;
@@ -136,5 +137,14 @@
         
         base.OnParametersSet();
     }
-    
+
+    private Task Save()
+    {
+        throw new NotImplementedException();
+    }
+
+    private Task Cancel()
+    {
+        throw new NotImplementedException();
+    }
 }

@@ -99,12 +99,7 @@ public static class OsobaExtension2
     public static string CurrentPoliticalParty(this Osoba osoba)
     {
         return osoba.Events(ev =>
-                ev.Type == (int)OsobaEvent.Types.Politicka
-                && (ev.AddInfo == "člen strany"
-                    || ev.AddInfo == "předseda strany"
-                    || ev.AddInfo == "předsedkyně strany"
-                    || ev.AddInfo == "místopředseda strany"
-                    || ev.AddInfo == "místopředsedkyně strany")
+                ev.Type == (int)OsobaEvent.Types.PolitickaStrana
                 && (!ev.DatumDo.HasValue
                     || ev.DatumDo >= DateTime.Now)
             )
