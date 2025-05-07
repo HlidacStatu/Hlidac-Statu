@@ -1,0 +1,140 @@
+﻿@using HlidacStatu.Entities
+@using HlidacStatu.Repositories
+<a href="">Editovat sociální sítě</a>
+<div class="card mb-3">
+    <h5 class="card-header">@Osoba.NameId</h5>
+    <div class="row g-0">
+        <div class="col-sm-3 col-xl-2">
+            <div class="d-grid gap-2 mx-auto">
+                <button class="btn btn-success" @onclick="@(Save)">Uložit osobu</button>
+                <button class="btn btn-danger" @onclick="@(Cancel)">Zrušit změny</button>
+            </div>
+        </div>
+        <div class="col-sm-9 col-xl-10">
+            <div class="card-body">
+                <div class="mx-auto">
+                    <div class="form-floating">
+                        <input type="text" id="twitter"
+                               class="form-control"
+                               @bind:get="@(GetSocialNetwork("Twitter"))"
+                               @bind:set="@(val => SetSocialNetwork("Twitter", val))"/>
+                        <label for="twitter">Twitter</label>
+                    </div>
+                </div>
+                <div class="mx-auto">
+                    <div class="form-floating">
+                        <input type="text" id="facebookpage"
+                               class="form-control"
+                               @bind:get="@(GetSocialNetwork("Facebook_page"))"
+                               @bind:set="@(val => SetSocialNetwork("Facebook_page", val))"/>
+                        <label for="facebookpage">Facebook page</label>
+                    </div>
+                </div>
+                <div class="mx-auto">
+                    <div class="form-floating">
+                        <input type="text" id="facebookprofile"
+                               class="form-control"
+                               @bind:get="@(GetSocialNetwork("Facebook_profile"))"
+                               @bind:set="@(val => SetSocialNetwork("Facebook_profile", val))"/>
+                        <label for="facebookprofile">Facebook profile</label>
+                    </div>
+                </div>
+                <div class="mx-auto">
+                    <div class="form-floating">
+                        <input type="text" id="instagram"
+                               class="form-control"
+                               @bind:get="@(GetSocialNetwork("Instagram"))"
+                               @bind:set="@(val => SetSocialNetwork("Instagram", val))"/>
+                        <label for="instagram">Instagram</label>
+                    </div>
+                </div>
+                <div class="mx-auto">
+                    <div class="form-floating">
+                        <input type="text" id="youtube"
+                               class="form-control"
+                               @bind:get="@(GetSocialNetwork("Youtube"))"
+                               @bind:set="@(val => SetSocialNetwork("Youtube", val))"/>
+                        <label for="youtube">Youtube</label>
+                    </div>
+                </div>
+                <div class="mx-auto">
+                    <div class="form-floating">
+                        <input type="text" id="tictoc"
+                               class="form-control"
+                               @bind:get="@(GetSocialNetwork("Tictoc"))"
+                               @bind:set="@(val => SetSocialNetwork("Tictoc", val))"/>
+                        <label for="tictoc">Youtube</label>
+                    </div>
+                </div>
+                <div class="mx-auto">
+                    <div class="form-floating">
+                        <input type="text" id="linkedin"
+                               class="form-control"
+                               @bind:get="@(GetSocialNetwork("LinkedIn"))"
+                               @bind:set="@(val => SetSocialNetwork("LinkedIn", val))"/>
+                        <label for="linkedin">LinkedIn</label>
+                    </div>
+                </div>
+                <div class="mx-auto">
+                    <div class="form-floating">
+                        <input type="text" id="web"
+                               class="form-control"
+                               @bind:get="@(GetSocialNetwork("WWW"))"
+                               @bind:set="@(val => SetSocialNetwork("WWW", val))"/>
+                        <label for="web">webové stránky</label>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code
+{
+    [Parameter]
+    public int OsobaId { get; set; }
+
+    private List<OsobaEvent> SocialNetworks { get; set; } = new();
+    
+
+    private string GetSocialNetwork(string networkName)
+    {
+        var socialNetwork = SocialNetworks
+            .FirstOrDefault(sn => sn.Organizace.Equals(networkName, StringComparison.InvariantCultureIgnoreCase));
+
+        if (socialNetwork is not null)
+            return socialNetwork.AddInfo;
+
+        return "";
+    }
+    
+    private void SetSocialNetwork(string networkName, string value)
+    {
+        var socialNetwork = SocialNetworks
+            .FirstOrDefault(sn => sn.Organizace.Equals(networkName, StringComparison.InvariantCultureIgnoreCase));
+
+        if (socialNetwork is null)
+            socialNetwork = CreateNewSocialNetwork();
+
+        socialNetwork.AddInfo = value;
+    }
+
+    private OsobaEvent CreateNewSocialNetwork()
+    {
+        OsobaEvent newEvent = new OsobaEvent()
+        {
+            OsobaId = OsobaId
+        };
+        SocialNetworks.Add(newEvent);
+        return newEvent;
+    }
+
+
+    protected override void OnParametersSet()
+    {
+        SocialNetworks = OsobaEventRepo.GetByOsobaId(OsobaId, x => x.Type == (int)OsobaEvent.Types.SocialniSite);
+        
+        base.OnParametersSet();
+    }
+    
+}

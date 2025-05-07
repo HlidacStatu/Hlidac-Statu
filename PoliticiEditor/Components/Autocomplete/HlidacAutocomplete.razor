@@ -1,0 +1,177 @@
+@typeparam TItem
+
+<div class="hlidac-autocomplete">
+    <input class="hlidac-autocomplete-input form-control" type="text"
+           autocomplete="off"
+           placeholder="Začněte psát pro hledání"
+           @bind-value="@_inputBoxValue"
+           @oninput="@(async (e) => await SearchAsync(e))"
+           @onkeydown="OnInputKeyDown"/>
+    @if (items is not null && items.Any())
+    {
+        <div class="hlidac-autocomplete-list">
+            <div class="list-group">
+                @for (var index = 0; index < items.Count; index++)
+                {
+                    var item = items[index];
+                    if (ItemTemplate is not null)
+                    {
+                        int option = index; // we have to do it like this, because index is from the outer scope
+                        <button class="list-group-item list-group-item-action @(option == _selectedOption ? "active" : "")" 
+                                @onmouseleave="@(() => OnDeselectOption(option))" 
+                                @onmouseenter="@(() => OnSelectOption(option))"
+                                @onclick="@(() => SelectItemAsync(option))">
+                            @ItemTemplate(item)
+                        </button>
+                    }
+                }
+            </div>
+        </div>
+    }
+</div>
+
+@code {
+
+    [Parameter]
+    public RenderFragment<TItem>? ItemTemplate { get; set; }
+    
+    [Parameter]
+    public Func<string, CancellationToken, Task<List<TItem>>> SearchFuncAsync { get; set; } = null!;
+    
+    [Parameter]
+    public Func<TItem, string>? TextSelector { get; set; }
+
+    [Parameter]
+    public EventCallback<TItem> OnAutocompleteItemSelected { get; set; }
+
+    [Parameter]
+    public EventCallback<string> OnAutocompleteTextSelected { get; set; }
+    
+    [Parameter]
+    public string? DefaultTextValue { get; set; }
+
+    private CancellationTokenSource? _cts;
+    private Task<List<TItem>>? _searchTask;
+
+    private string _inputBoxValue;
+    private List<TItem>? items;
+
+    private int _selectedOption = -1;
+
+    protected override Task OnInitializedAsync()
+    {
+        if (DefaultTextValue is not null)
+        {
+            _inputBoxValue = DefaultTextValue;
+        }
+        return base.OnInitializedAsync();
+    }
+
+    protected override Task OnParametersSetAsync()
+    {
+        // _inputBoxValue = InputBoxValue ?? string.Empty;
+        return base.OnParametersSetAsync();
+    }
+    
+    private async Task SearchAsync(ChangeEventArgs eventArgs)
+    {
+        string? query = eventArgs.Value?.ToString();
+
+        CancelRunningTask();
+
+    // if query is empty, we can cleanup task and data
+        if (string.IsNullOrWhiteSpace(query))
+        {
+            CloseOptions();
+            return;
+        }
+
+        _cts = new CancellationTokenSource();
+
+    // here we can also add delay when typing before sending a request
+
+        try
+        {
+            _searchTask = SearchFuncAsync.Invoke(query, _cts.Token);
+
+            var data = await _searchTask;
+
+            if (!_searchTask.IsCanceled)
+                items = data;
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+        }
+    }
+
+    private void CloseOptions()
+    {
+        items = null;
+        _searchTask = null;
+        _selectedOption = -1;
+    }
+
+    private void CancelRunningTask()
+    {
+        if (_searchTask is not null && !_searchTask.IsCompleted && !_searchTask.IsCanceled
+            && _cts is not null && !_cts.IsCancellationRequested)
+            _cts.Cancel();
+    }
+
+
+    private void OnSelectOption(int option)
+    {
+        Interlocked.Exchange(ref _selectedOption, option);
+    }
+
+    private void OnDeselectOption(int option)
+    {
+        Interlocked.CompareExchange(ref _selectedOption, -1, option);
+    }
+
+    private async Task SelectItemAsync(int option)
+    {
+        if (items is not null && option >= 0 && option <= items.Count)
+        {
+            if (TextSelector is not null)
+            {
+                _inputBoxValue = TextSelector(items[option]);
+            }
+            await OnAutocompleteItemSelected.InvokeAsync(items[option]);
+        }
+        await OnAutocompleteTextSelected.InvokeAsync(_inputBoxValue);
+        // await InputBoxValueChanged.InvokeAsync(_inputBoxValue);
+
+        CloseOptions();   
+    }
+
+    private async Task OnInputKeyDown(KeyboardEventArgs eventArgs)
+    {
+        switch (eventArgs.Code)
+        {
+            case "ArrowUp":
+                if (_selectedOption < 0) // selected item is at the top
+                    _selectedOption = items?.Count - 1 ?? -1;
+                else
+                    _selectedOption--;
+                break;
+            case "ArrowDown":
+                if (_selectedOption == items?.Count - 1) // selected item is at the bottom
+                    _selectedOption = 0;
+                else
+                    _selectedOption++;
+                break;
+            case "Escape":
+                CancelRunningTask();
+                CloseOptions();
+                return;
+            case "Enter":
+                await SelectItemAsync(_selectedOption);
+                break;
+            default:
+                break;
+        }
+    }
+
+}

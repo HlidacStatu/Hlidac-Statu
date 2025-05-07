@@ -230,6 +230,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DatovkaSender", "..\Hlidac-
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PlatyISPVImporter", "..\Hlidac-Statu-Private\PlatyISPVImporter\PlatyISPVImporter.csproj", "{3ECE6204-1EAB-45F4-B50F-0A71B19A0733}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PoliticiEditor", "PoliticiEditor\PoliticiEditor.csproj", "{E4AED6DC-21F8-439E-A61B-7DFC79D9D162}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -568,6 +570,10 @@ Global
 		{3ECE6204-1EAB-45F4-B50F-0A71B19A0733}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3ECE6204-1EAB-45F4-B50F-0A71B19A0733}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3ECE6204-1EAB-45F4-B50F-0A71B19A0733}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E4AED6DC-21F8-439E-A61B-7DFC79D9D162}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E4AED6DC-21F8-439E-A61B-7DFC79D9D162}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E4AED6DC-21F8-439E-A61B-7DFC79D9D162}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E4AED6DC-21F8-439E-A61B-7DFC79D9D162}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -670,6 +676,7 @@ Global
 		{9C3A4598-7BD4-4942-A3AC-B134D02890BF} = {ACC852FC-5016-48E7-80DF-ABD60A162FB8}
 		{8D602A19-AFFE-429B-AF58-385992E175C5} = {87D50816-C7A9-4B83-A5E3-5EEE0265C2F5}
 		{3ECE6204-1EAB-45F4-B50F-0A71B19A0733} = {87D50816-C7A9-4B83-A5E3-5EEE0265C2F5}
+		{E4AED6DC-21F8-439E-A61B-7DFC79D9D162} = {034892EA-BACB-4BDE-8161-6F8DB0166FB5}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {17143448-F5EA-41D1-886F-00E63AE50798}

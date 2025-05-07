@@ -74,7 +74,11 @@ namespace HlidacStatu.Entities
             SocialniSite = 12,
             [NiceDisplayName("Centrální registr oznámení")]
             [Display(Name="Centrální registr oznámení", Description = "Události z CRO - aktuálně neaktualizované")]
-            CentralniRegistrOznameni = 13
+            CentralniRegistrOznameni = 13,
+            [NiceDisplayName("Politická strana")]
+            [Display(Name="Politická strana", Description = "Události spojené s politickou stranou")]
+            PolitickaStrana = 14,
+            
         }
 
         [JsonConverter(typeof(StringEnumConverter))]
