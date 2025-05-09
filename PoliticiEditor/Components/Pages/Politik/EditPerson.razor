@@ -1,0 +1,130 @@
+﻿@using HlidacStatu.Entities
+@using HlidacStatu.Repositories
+@using HlidacStatu.Repositories.Auditing
+@using Microsoft.EntityFrameworkCore
+
+@inject AuthenticationStateProvider AuthenticationStateProvider
+
+@implements IAsyncDisposable
+
+
+<div class="card mb-3">
+        <h5 class="card-header">@Osoba.NameId</h5>
+        <div class="row g-0">
+            <div class="col-sm-3 col-xl-2">
+                <img src="@Osoba.GetPhotoUrl()" class="img-fluid rounded-start mb-3" alt="Fotka">
+                <div class="d-grid gap-2 mx-auto">
+                    <button class="btn btn-success" @onclick="@(Save)">Uložit osobu</button>
+                    <button class="btn btn-danger" @onclick="@(Cancel)">Zrušit změny</button>
+                    <button class="btn btn-primary" @onclick="@(EditPhoto)">Upravit fotku</button>
+                </div>
+            </div>
+            <div class="col-sm-9 col-xl-10">
+                <div class="card-body">
+                    <div class="mx-auto">
+                        <div class="form-floating">
+                            <input type="text" id="titulPred"
+                                   class="@(EditModeInputClass)"
+                                   @bind="@Osoba.TitulPred"/>
+                            <label for="titulPred">Titul před jménem</label>
+                        </div>
+                    </div>
+                    <div class="mx-auto">
+                        <div class="form-floating">
+                            <input type="text" id="jmeno"
+                                   class="@(ReadModeInputClass)"
+                                   readonly
+                                   value="@Osoba.Jmeno"/>
+                            <label for="jmeno">Jméno</label>
+                        </div>
+                    </div>
+                    <div class="mx-auto">
+                        <div class="form-floating">
+                            <input type="text" id="prijmeni"
+                                   class="@(ReadModeInputClass)"
+                                   readonly
+                                   value="@Osoba.Prijmeni"/>
+                            <label for="prijmeni">Příjmení</label>
+                        </div>
+                    </div>
+                    <div class="mx-auto">
+                        <div class="form-floating">
+                            <input type="text" id="titulZa"
+                                   class="@(EditModeInputClass)"
+                                   @bind="@Osoba.TitulPo"/>
+                            <label for="titulZa">Titul za jménem</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+@code
+{
+    [Parameter]
+    public int OsobaId { get; set; }
+
+    private Osoba? Osoba { get; set; }
+    
+    private DbEntities? _db = new();
+    
+    private string? UserName { get; set; }
+    
+    const string ReadModeInputClass = "form-control-plaintext";
+    const string EditModeInputClass = "form-control";
+
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+        UserName = user.Identity?.Name;
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        await RefreshContextAsync();
+    }
+    
+    private async Task RefreshContextAsync()
+    {
+        if (_db is not null)
+            await _db.DisposeAsync();
+
+        _db = new DbEntities();
+
+        Osoba = OsobaRepo.GetByInternalIdTracked(_db, OsobaId);
+    }
+    
+    public async ValueTask DisposeAsync()
+    {
+        if (_db is not null)
+        {
+            await _db.DisposeAsync();
+        }
+    }
+
+    private async Task Save()
+    {
+
+        //todo: this should be probably created after db.save? So we get prop. Ids?
+        var auditLogs = ChangeTracker.CreateAuditLogs(_db, UserName);
+
+        throw new NotImplementedException();
+        
+        await _db.SaveChangesAsync();
+        ChangeTracker.SaveAuditLog(auditLogs);
+        
+        await RefreshContextAsync();
+    }
+
+    private async Task Cancel()
+    {
+        await RefreshContextAsync();
+    }
+
+    private Task EditPhoto()
+    {
+        throw new NotImplementedException();
+    }
+}

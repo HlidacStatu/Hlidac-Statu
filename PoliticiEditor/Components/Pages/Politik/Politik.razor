@@ -1,79 +1,18 @@
 ﻿@page "/politik/{NameId}"
-@using HlidacStatu.Entities
 @using HlidacStatu.Repositories
 @rendermode InteractiveServer
 
 <PageTitle>@NameId</PageTitle>
-@if (Osoba is not null)
+@if (OsobaInternalId is not null)
 {
-    //person edit
-    
-    <div class="card mb-3">
-        <h5 class="card-header">@Osoba.NameId</h5>
-        <div class="row g-0">
-            <div class="col-sm-3 col-xl-2">
-                <img src="@Osoba.GetPhotoUrl()" class="img-fluid rounded-start mb-3" alt="Fotka">
-                <div class="d-grid gap-2 mx-auto">
-                    @if (_isInReadMode)
-                    {
-                        <button class="btn btn-primary" @onclick="@(() => _isInReadMode = false)">Editovat osobu</button>
-                    }
-                    else
-                    {
-                        <button class="btn btn-success" @onclick="@(Save)">Uložit osobu</button>
-                        <button class="btn btn-danger" @onclick="@(Cancel)">Zrušit změny</button>
-                        <button class="btn btn-primary" @onclick="@(EditPhoto)">Upravit fotku</button>
-                    }
-                </div>
-            </div>
-            <div class="col-sm-9 col-xl-10">
-                <div class="card-body">
-                    <div class="mx-auto">
-                        <div class="form-floating">
-                            <input type="text" id="titulPred"
-                                   class="@(_isInReadMode ? ReadModeInputClass : EditModeInputClass)"
-                                   readonly="@_isInReadMode"
-                                   @bind="@Osoba.TitulPred"/>
-                            <label for="titulPred">Titul před jménem</label>
-                        </div>
-                    </div>
-                    <div class="mx-auto">
-                        <div class="form-floating">
-                            <input type="text" id="jmeno"
-                                   class="@(_isInReadMode ? ReadModeInputClass : EditModeInputClass)"
-                                   readonly="@_isInReadMode"
-                                   @bind="@Osoba.Jmeno"/>
-                            <label for="jmeno">Jméno</label>
-                        </div>
-                    </div>
-                    <div class="mx-auto">
-                        <div class="form-floating">
-                            <input type="text" id="prijmeni"
-                                   class="@(_isInReadMode ? ReadModeInputClass : EditModeInputClass)"
-                                   readonly="@_isInReadMode"
-                                   @bind="@Osoba.Prijmeni"/>
-                            <label for="prijmeni">Příjmení</label>
-                        </div>
-                    </div>
-                    <div class="mx-auto">
-                        <div class="form-floating">
-                            <input type="text" id="titulZa"
-                                   class="@(_isInReadMode ? ReadModeInputClass : EditModeInputClass)"
-                                   readonly="@_isInReadMode"
-                                   @bind="@Osoba.TitulPo"/>
-                            <label for="titulZa">Titul za jménem</label>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-    
+    // person edit
+    <EditPerson OsobaId="OsobaInternalId.Value"/>
     // Social networks
-    <EditSocial OsobaId="Osoba.InternalId"/>
+    <EditSocial OsobaId="OsobaInternalId.Value"/>
+    // political party
+    <EditParty OsobaId="OsobaInternalId.Value"/>
     
-    <EditParty OsobaId="Osoba.InternalId"/>
-    
+    // todo: přidávání platů
     <a href="">Editovat platy</a>
 }
 
@@ -83,41 +22,18 @@
     
     [Parameter]
     public string NameId { get; set; }
-    
-    private Osoba? Osoba { get; set; }
-    
-    private List<OsobaEvent> SocialNetworks { get; set; }
-    private List<OsobaEvent> PoliticalParties { get; set; }
 
-    private bool _isInReadMode = true;
-    const string ReadModeInputClass = "form-control-plaintext";
-    const string EditModeInputClass = "form-control";
-
+    private int? OsobaInternalId { get; set; } = null;
+    
     protected override void OnParametersSet()
     {
         if(string.IsNullOrWhiteSpace(NameId))
             return;
-        Osoba = OsobaRepo.GetByNameId(NameId);
-
-        SocialNetworks = OsobaEventRepo.GetByOsobaId(Osoba.InternalId, x => x.Type == (int)OsobaEvent.Types.SocialniSite);
-        PoliticalParties = OsobaEventRepo.GetByOsobaId(Osoba.InternalId, x => x.Type == (int)OsobaEvent.Types.Politicka);
+        var osoba = OsobaRepo.GetByNameId(NameId);
+        if (osoba is not null)
+            OsobaInternalId = osoba.InternalId;
         
         base.OnParametersSet();
-    }
-
-    private Task Save()
-    {
-        throw new NotImplementedException();
-    }
-
-    private Task Cancel()
-    {
-        throw new NotImplementedException();
-    }
-
-    private Task EditPhoto()
-    {
-        throw new NotImplementedException();
     }
 
 }

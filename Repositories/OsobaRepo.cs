@@ -260,17 +260,24 @@ namespace HlidacStatu.Repositories
         {
             using (DbEntities db = new DbEntities())
             {
-                var osoba = db.Osoba.AsQueryable()
-                    .Where(m =>
-                        m.InternalId == id
-                    )
-                    .FirstOrDefault();
-
-                if (canReturnDuplicate)
-                    return osoba;
-
-                return osoba?.GetOriginal();
+                return GetByInternalIdTracked(db, id, canReturnDuplicate);
             }
+        }
+        
+        public static Osoba GetByInternalIdTracked(DbEntities db, int id, bool canReturnDuplicate = false)
+        {
+            var osoba = db.Osoba.FirstOrDefault(m => m.InternalId == id);
+
+            if (canReturnDuplicate)
+                return osoba;
+
+            while (osoba is not null && osoba.Status == (int)Osoba.StatusOsobyEnum.Duplicita)
+            {
+                osoba = db.Osoba.FirstOrDefault(m => m.InternalId == osoba.OriginalId);
+            }
+
+            return osoba;
+            
         }
 
         private static Osoba GetOriginal(this Osoba osoba)
@@ -280,9 +287,9 @@ namespace HlidacStatu.Repositories
 
             using (DbEntities db = new DbEntities())
             {
-                var originalOsoba = db.Osoba.AsQueryable()
-                    .Where(o => o.InternalId == osoba.OriginalId)
-                    .FirstOrDefault();
+                var originalOsoba = db.Osoba
+                    .AsQueryable()
+                    .FirstOrDefault(o => o.InternalId == osoba.OriginalId);
 
                 return originalOsoba?.GetOriginal();
             }

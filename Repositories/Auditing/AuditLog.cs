@@ -24,7 +24,7 @@ public class AuditLog
         public object OldValue { get; set; }
         public object NewValue { get; set; }
         
-        public bool IsProperChange => OldValue is null && NewValue is null;
+        public bool IsProperChange => OldValue is not null || NewValue is not null;
     }
 }
 
