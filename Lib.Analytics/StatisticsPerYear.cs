@@ -159,11 +159,9 @@ namespace HlidacStatu.Lib.Analytics
             var firstValue = selector(firstStat);
             var lastValue = selector(lastStat);
 
-            if (firstValue == 0)
-                return (0, null);
 
             decimal change = lastValue - firstValue;
-            decimal percentage = change / firstValue;
+            decimal? percentage = (firstValue == 0) ? (decimal?)null : change / firstValue;
 
             return (change, percentage);
         }

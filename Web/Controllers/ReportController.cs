@@ -106,6 +106,16 @@ namespace HlidacStatu.Web.Controllers
             return View("999_COVID_Nakazeni");
         }
 
+        [Route("33")]
+        [HlidacCache(24 * 60 * 60, "id;obdobi;typ", true)]
+        public IActionResult TopNarustySmluv(int? id, string obdobi = "", string typ = "abs")
+        {
+
+            ViewBag.Title = "Neobvykle vysoké nárusty zakázek";
+            ViewBag.SubTitle = "Seznam největších angažovaností";
+            return View("33_TopNarustySmluv", (obdobi, typ));
+
+        }
 
         [Route("{id:int}")]
         [HlidacCache(12 * 60 * 60, "id", true)]

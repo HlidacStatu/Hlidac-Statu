@@ -1,0 +1,94 @@
+﻿@model (string obdobi, string typ)
+@using System.Linq
+@using Devmasters
+@using HlidacStatu.Entities
+@using HlidacStatu.Extensions
+@using HlidacStatu.Lib.Analytics
+@using HlidacStatu.XLib.Render
+@using HlidacStatu.Repositories
+
+@{
+    Layout = "_ReportLayout";
+    string obdobi = "";
+    CalculatedChangeBetweenYears<string>[] data = null;
+
+    switch (Model.obdobi?.ToLower())
+    {
+        case "mezirocne":
+            data = HlidacStatu.Repositories.Analysis.AnalysisCalculation.NarustySmluvTop100_AbsolutPrice_MaxInYear.Get();
+            break;
+        case "vlada2018":
+            data = HlidacStatu.Repositories.Analysis.AnalysisCalculation.NarustySmluvTop100_AbsolutPrice_Vlada2018.Get();
+            obdobi = "za vlády A.Babiše";
+            break;
+        case "vlada2022":
+            data = HlidacStatu.Repositories.Analysis.AnalysisCalculation.NarustySmluvTop100_AbsolutPrice_Vlada2022.Get();
+            obdobi = "za vlády P.Fialy";
+            break;
+        case "2020_24":
+        default:
+            obdobi = "od roku 2020";
+            data = HlidacStatu.Repositories.Analysis.AnalysisCalculation.NarustySmluvTop100_AbsolutPrice_2020_24.Get();
+            break;
+    }
+
+
+
+    ReportDataSource<CalculatedChangeBetweenYears<string>> tbl = new(
+        new ReportDataSource<CalculatedChangeBetweenYears<string>>.Column[]
+    {
+        new() { Name="Firma",
+            HtmlRender = (s) => {
+                Firma f = Firmy.Get(s.data);
+                return string.Format($"<a href='{f.ICO}'>{f.Jmeno?.ShortenMe(30)}</a>");
+            },
+            OrderValueRender = (s) => {
+                Firma f = Firmy.Get(s.data);
+                return string.Format($"{f.Jmeno}");
+            }
+        },
+        new() {
+            Name ="Období",
+            HtmlRender = (s) => {
+                if (string.IsNullOrEmpty(obdobi))
+                {
+                    return $"{s.firstYear}-{s.lastYear}";
+                }
+                else return obdobi ;
+            },
+            OrderValueRender = (s) => {
+                return "";
+            }
+        },
+        new() {
+            Name ="Nárůst objemu kontraktů v Kč",
+            HtmlRender = (s) => {
+                return HlidacStatu.Util.RenderData.NicePrice( s.valueChange, html:true,shortFormat:true);
+            },
+            OrderValueRender = (s) => {
+                return HlidacStatu.Util.RenderData.OrderValueFormat(s.valueChange);;
+            }
+        },
+        new() {
+            Name ="Nárůsta objemu kontraků v %",
+            HtmlRender = (s) => {
+                if (s.percChange.HasValue)
+                    return HlidacStatu.Util.RenderData.NicePercent( s.percChange, html:true);
+                else
+                    return "růst od nuly";    
+            },
+            OrderValueRender = (s) => {
+                return HlidacStatu.Util.RenderData.OrderValueFormat(s.percChange);
+            }
+        }
+    });
+
+    tbl.AddRows(data);
+}
+
+<h2 id="tblHead">Neobvykle vysoké nárusty zakázek</h2>
+<p>Zanalyzovali jsme všechny smlouvy a vztahy dodavatelů a zadavatelů a nalezli jsme tyto neobvyklé nárůsty smluvních vztahů</p>
+
+@ChartUtilExtensions.RenderReport("",ReportModel.QueueItem.types.table, tbl, 
+    HtmlExtensions.DatatableOptions(orderColumnIdx: 2, orderDirection: "desc", pageLength:50))
+
