@@ -1,5 +1,12 @@
 ﻿@using HlidacStatu.Entities
 @using HlidacStatu.Repositories
+@using HlidacStatu.Repositories.Auditing
+@using Microsoft.EntityFrameworkCore
+
+@inject AuthenticationStateProvider AuthenticationStateProvider
+
+@implements IAsyncDisposable
+
 
 <div class="card mb-3">
     <h5 class="card-header">Sociální sítě</h5>
@@ -56,7 +63,7 @@
                        class="form-control"
                        @bind:get="@(GetSocialNetwork("Tictoc"))"
                        @bind:set="@(val => SetSocialNetwork("Tictoc", val))"/>
-                <label for="tictoc">Youtube</label>
+                <label for="tictoc">TicToc</label>
             </div>
         </div>
         <div class="mx-auto">
@@ -81,7 +88,7 @@
     
     <div class="card-footer text-body-secondary">
         <button class="btn btn-success" @onclick="@(Save)">Uložit změny</button>
-        <button class="btn btn-warning" @onclick="@(Save)">Zrušit změny</button>
+        <button class="btn btn-warning" @onclick="@(Cancel)">Zrušit změny</button>
     </div>
 
 </div>
@@ -92,6 +99,10 @@
     public int OsobaId { get; set; }
 
     private List<OsobaEvent> SocialNetworks { get; set; } = new();
+    
+    private DbEntities? _db = new();
+    
+    private string? UserName { get; set; }
 
 
     private string GetSocialNetwork(string networkName)
@@ -108,40 +119,75 @@
     private void SetSocialNetwork(string networkName, string value)
     {
         var socialNetwork = SocialNetworks
-            .FirstOrDefault(sn => sn.Organizace.Equals(networkName, StringComparison.InvariantCultureIgnoreCase));
-
-        if (socialNetwork is null)
-            socialNetwork = CreateNewSocialNetwork();
+            .FirstOrDefault(sn => sn.Organizace?.Equals(networkName, StringComparison.InvariantCultureIgnoreCase) == true, 
+                CreateNewSocialNetwork(networkName));
 
         socialNetwork.AddInfo = value;
     }
 
-    private OsobaEvent CreateNewSocialNetwork()
+    private OsobaEvent CreateNewSocialNetwork(string networkName)
     {
         OsobaEvent newEvent = new OsobaEvent()
         {
             OsobaId = OsobaId,
-            Type = (int)OsobaEvent.Types.SocialniSite
+            Type = (int)OsobaEvent.Types.SocialniSite,
+            Organizace = networkName
         };
         SocialNetworks.Add(newEvent);
+        if (_db is not null)
+        {
+            _db.OsobaEvent.Add(newEvent);
+        }
         return newEvent;
     }
 
-
-    protected override void OnParametersSet()
+    protected override async Task OnInitializedAsync()
     {
-        SocialNetworks = OsobaEventRepo.GetByOsobaId(OsobaId, x => x.Type == (int)OsobaEvent.Types.SocialniSite);
-
-        base.OnParametersSet();
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+        UserName = user.Identity?.Name;
     }
 
-    private Task Save()
+    protected override async Task OnParametersSetAsync()
     {
-        throw new NotImplementedException();
+        await RefreshContextAsync();
+    }
+    
+    private async Task RefreshContextAsync()
+    {
+        if (_db is not null)
+            await _db.DisposeAsync();
+
+        _db = new DbEntities();
+        
+        SocialNetworks = await OsobaEventRepo.GetByOsobaIdTracked(_db, OsobaId, x => x.Type == (int)OsobaEvent.Types.SocialniSite)
+            .ToListAsync();
+    }
+    
+    public async ValueTask DisposeAsync()
+    {
+        if (_db is not null)
+        {
+            await _db.DisposeAsync();
+        }
     }
 
-    private Task Cancel()
+    private async Task Save()
     {
+
+        //todo: this should be probably created after db.save? So we get prop. Ids?
+        var auditLogs = ChangeTracker.CreateAuditLogs(_db, UserName);
+
         throw new NotImplementedException();
+        
+        await _db.SaveChangesAsync();
+        ChangeTracker.SaveAuditLog(auditLogs);
+        
+        await RefreshContextAsync();
+    }
+
+    private async Task Cancel()
+    {
+        await RefreshContextAsync();
     }
 }

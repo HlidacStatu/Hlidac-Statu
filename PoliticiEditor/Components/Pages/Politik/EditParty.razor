@@ -1,5 +1,10 @@
 ﻿@using HlidacStatu.Entities
 @using HlidacStatu.Repositories
+@using HlidacStatu.Repositories.Auditing
+
+@inject AuthenticationStateProvider AuthenticationStateProvider
+
+@implements IAsyncDisposable
 
 <div class="card mb-3">
     <h5 class="card-header">Politické strany</h5>
@@ -51,6 +56,10 @@
     public int OsobaId { get; set; }
 
     private List<OsobaEvent> PoliticalParties { get; set; } = new();
+    
+    private DbEntities? _db = new();
+    
+    private string? UserName { get; set; }
 
 
     private void AddPartyAffiliation()
@@ -61,24 +70,60 @@
             Type = (int)OsobaEvent.Types.PolitickaStrana
         };
         PoliticalParties.Insert(0, newEvent);
+        if (_db is not null)
+        {
+            _db.OsobaEvent.Add(newEvent);
+        }
     }
 
-    protected override void OnParametersSet()
+    protected override async Task OnParametersSetAsync()
     {
+        await RefreshContextAsync();
+    }
+    
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+        UserName = user.Identity?.Name;
+    }
+
+    private async Task RefreshContextAsync()
+    {
+        if (_db is not null)
+            await _db.DisposeAsync();
+
+        _db = new DbEntities();
+        
         PoliticalParties = OsobaEventRepo
-            .GetByOsobaId(OsobaId, x => x.Type == (int)OsobaEvent.Types.PolitickaStrana)
+            .GetByOsobaIdTracked(_db, OsobaId, x => x.Type == (int)OsobaEvent.Types.PolitickaStrana)
             .OrderBy(p => p.DatumOd).ToList();
-
-        base.OnParametersSet();
+    }
+    
+    public async ValueTask DisposeAsync()
+    {
+        if (_db is not null)
+        {
+            await _db.DisposeAsync();
+        }
     }
 
-    private Task Save()
+    private async Task Save()
     {
+
+        //todo: this should be probably created after db.save? So we get prop. Ids?
+        var auditLogs = ChangeTracker.CreateAuditLogs(_db, UserName);
+
         throw new NotImplementedException();
+        
+        await _db.SaveChangesAsync();
+        ChangeTracker.SaveAuditLog(auditLogs);
+        
+        await RefreshContextAsync();
     }
 
-    private Task Cancel()
+    private async Task Cancel()
     {
-        throw new NotImplementedException();
+        await RefreshContextAsync();
     }
 }

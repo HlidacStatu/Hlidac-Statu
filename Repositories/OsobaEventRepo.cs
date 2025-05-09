@@ -40,15 +40,20 @@ namespace HlidacStatu.Repositories
         public static List<OsobaEvent> GetByOsobaId(int osobaId, Expression<Func<OsobaEvent, bool>> predicate = null)
         {
             using DbEntities db = new DbEntities();
-
+            
+            return GetByOsobaIdTracked(db, osobaId, predicate).AsNoTracking().ToList();
+        }
+        
+        
+        public static IQueryable<OsobaEvent> GetByOsobaIdTracked(DbEntities db, int osobaId, Expression<Func<OsobaEvent, bool>> predicate = null)
+        {
             var query = db.OsobaEvent
-                .AsNoTracking()
                 .Where(m => m.OsobaId == osobaId);
 
             if (predicate is not null)
                 query = query.Where(predicate);
             
-            return query.ToList();
+            return query;
         }
         
         public static List<OsobaEvent> GetByIco(string ico, Expression<Func<OsobaEvent, bool>> predicate = null)
