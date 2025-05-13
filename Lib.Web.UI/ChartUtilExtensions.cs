@@ -154,7 +154,8 @@ namespace HlidacStatu.Lib.Web.UI
             string yTitleRight = "",
             bool allowDecimals = false,
             bool stacked = false,
-            string showStackedSummaryFormat = "{total}"
+            string showStackedSummaryFormat = "{total}",
+            bool showLegend = true
             )
         {
             string random = Guid.NewGuid().ToString("N");
@@ -178,7 +179,7 @@ namespace HlidacStatu.Lib.Web.UI
                 },
                 legend = new
                 {
-                    //enabled = false,
+                    enabled = showLegend,
                     //reversed = true,
                     symbolHeight = 15,
                     symbolWidth = 15,
@@ -556,8 +557,8 @@ pie: {
             return new HtmlString(sb.ToString());
         }
 
-        public static IHtmlContent SimpleBarChart<T>(this IHtmlHelper htmlHelper, bool columnType, bool timeData,
-                int height,
+        public static IHtmlContent SimpleBarChart<T>(this IHtmlHelper htmlHelper, 
+                bool columnType, bool timeData, int height,
                 string containerId, string xAxisName, string yAxisName,
                 ReportDataSource<T> rds, string tooltipValueSuffix = "",
                 string xValueFormat = null, string yValueFormat = null, string tooltipFormatFull = null,

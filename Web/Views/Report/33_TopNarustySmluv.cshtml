@@ -79,18 +79,35 @@
             CssClass="number"
         },
         new() {
-            Name ="Nárůsta objemu kontraků v %",
+            Name ="",
             HtmlRender = (s) => {
-                if (s.change.PercentChange.HasValue)
-                    return HlidacStatu.Util.RenderData.NicePercent( s.change.PercentChange, html:true);
-                else
-                    return "růst od nuly";
-            },
-            OrderValueRender = (s) => {
-                return HlidacStatu.Util.RenderData.OrderValueFormat(s.change.PercentChange);
-            },
-            CssClass="number"
-        }
+                string res = "";
+                Firma f = Firmy.Get(s.data);
+                if (f.Valid)
+                {
+                    var stat = f.StatistikaRegistruSmluv();
+                    var chartData = new Series[]
+                    {
+                        new()
+                        {
+                        Name = "objem smluv",
+                        Type = Series.SeriesType.column,
+                        Data = stat
+                            .Where(x => x.Year > 0)
+                            .OrderBy(x => x.Year)
+                            .Select(x => new SeriesData(x.Year, x.Value.CelkovaHodnotaSmluv)).ToArray(),
+                        SeriesTooltip = new SeriesTooltip()
+                            {
+                            ValueSuffix = " Kč"
+                            }
+                        }
+                    };
+                    res = Html.ColumnGraph("", chartData, yTitleLeft: "", yTitleRight: "",height:150, showLegend:false).RenderRawHtml();
+            }
+            return res;
+
+            }
+        } 
     });
 
     tbl.AddRows(data);
