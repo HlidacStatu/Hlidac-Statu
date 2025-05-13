@@ -386,7 +386,7 @@ else
             <b>@Firmy.Get(ki.Ico).Jmeno</b>
         </td>}
                 </tr>
-                @foreach (var cl in Smlouva.SClassification.AllTypes.Where(m => m.MainType))
+                @foreach (var cl in Smlouva.SClassification.AllTypes.Where(m => m.IsMainType))
                 {
     <tr>
         <td style="text-align:right">

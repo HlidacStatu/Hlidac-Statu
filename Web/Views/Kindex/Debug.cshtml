@@ -327,7 +327,7 @@
                     @for (int y = fromY; y <= toY; y++)
                     {
             <td>
-                @foreach (var cl in Smlouva.SClassification.AllTypes.Where(m => m.MainType))
+                @foreach (var cl in Smlouva.SClassification.AllTypes.Where(m => m.IsMainType))
                 {
             <p>
                 @if (Model.ForYear(y).KoncetraceDodavateluProObor(cl.Value) == null)

@@ -151,7 +151,7 @@
                             <ul>
                                 @foreach (var v in HlidacStatu.Entities.Smlouva.SClassification.AllTypes)
                                 {
-                                    <li style='@(v.MainType ? "padding-top:10px;" : "" )'><kbd>oblast:@v.SearchShortcut</kbd> - @(v.MainType ? "Všechny oblasti v " : "" )@(v.Fullname)</li>
+                                    <li style='@(v.IsMainType ? "padding-top:10px;" : "" )'><kbd>oblast:@v.SearchShortcut</kbd> - @(v.IsMainType ? "Všechny oblasti v " : "" )@(v.Fullname)</li>
                                 }
                             </ul>
 

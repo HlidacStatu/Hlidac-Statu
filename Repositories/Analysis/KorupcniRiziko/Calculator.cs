@@ -236,7 +236,7 @@ namespace HlidacStatu.Repositories.Analysis.KorupcniRiziko
 
                     Dictionary<int, string> obory = Smlouva.SClassification
                         .AllTypes
-                        .Where(m => m.MainType)
+                        .Where(m => m.IsMainType)
                         .OrderBy(m => m.Value)
                         .ToDictionary(k => k.Value, v => v.SearchShortcut);
 

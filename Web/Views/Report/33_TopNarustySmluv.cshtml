@@ -6,6 +6,7 @@
 @using HlidacStatu.Lib.Analytics
 @using HlidacStatu.XLib.Render
 @using HlidacStatu.Repositories
+@using HlidacStatu.Lib.Web.UI
 
 @{
     Layout = "_ReportLayout";
@@ -89,6 +90,8 @@
 <h2 id="tblHead">Neobvykle vysoké nárusty zakázek</h2>
 <p>Zanalyzovali jsme všechny smlouvy a vztahy dodavatelů a zadavatelů a nalezli jsme tyto neobvyklé nárůsty smluvních vztahů</p>
 
-@ChartUtilExtensions.RenderReport("",ReportModel.QueueItem.types.table, tbl, 
-    HtmlExtensions.DatatableOptions(orderColumnIdx: 2, orderDirection: "desc", pageLength:50))
 
+
+@* @ChartUtilExtensions.RenderReportTableT<CalculatedChangeBetweenYears<string>>("",tbl, HtmlExtensions.DatatableOptions(orderColumnIdx: 2, orderDirection: "desc", pageLength: 50), "tbl") *@
+
+@ChartUtilExtensions.RenderReportTableT("",tbl, HtmlExtensions.DatatableOptions(orderColumnIdx: 2, orderDirection: "desc", pageLength: 50), "tbl")

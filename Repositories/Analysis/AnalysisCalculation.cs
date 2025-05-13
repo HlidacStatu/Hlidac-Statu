@@ -633,130 +633,128 @@ namespace HlidacStatu.Repositories.Analysis
                     });
 
 
-        public static Devmasters.Cache.AWS_S3.Cache<CalculatedChangeBetweenYears<string>[]> NarustySmluvTop100_AbsolutPrice_Vlada2018 =
-            new Devmasters.Cache.AWS_S3.Cache<CalculatedChangeBetweenYears<string>[]>
-                    (new string[] { Devmasters.Config.GetWebConfigValue("Minio.Cache.Endpoint") },
-                    Devmasters.Config.GetWebConfigValue("Minio.Cache.Bucket"),
-                    Devmasters.Config.GetWebConfigValue("Minio.Cache.AccessKey"),
-                    Devmasters.Config.GetWebConfigValue("Minio.Cache.SecretKey"), TimeSpan.Zero,
-
-                    "NarustySmluvTop100_AbsolutPrice_Vlada2018",
+        public static Devmasters.Cache.AWS_S3.Manager<CalculatedChangeBetweenYears<string>[], int?> NarustySmluvTop100_AbsolutPrice_Vlada2018 =
+            Devmasters.Cache.AWS_S3.Manager<CalculatedChangeBetweenYears<string>[], int?>.GetSafeInstance(
+                    "NarustySmluvTop100_AbsolutPrice_Vlada2018_",
                     (o) =>
                     {
-                        var res=BetweenYearsCalculatedChanges_AbsValue(allStatisticsData.Get(), 2018, 2021);
+                        var res = BetweenYearsCalculatedChanges_AbsValue(allStatisticsData.Get(), 2018, 2021);
                         return res;
-                    }
-                    );
-        public static Devmasters.Cache.AWS_S3.Cache<CalculatedChangeBetweenYears<string>[]> NarustySmluvTop100_Percent_Vlada2018 =
-            new Devmasters.Cache.AWS_S3.Cache<CalculatedChangeBetweenYears<string>[]>
-                    (new string[] { Devmasters.Config.GetWebConfigValue("Minio.Cache.Endpoint") },
+                    }, TimeSpan.Zero,
+                    new string[] { Devmasters.Config.GetWebConfigValue("Minio.Cache.Endpoint") },
                     Devmasters.Config.GetWebConfigValue("Minio.Cache.Bucket"),
                     Devmasters.Config.GetWebConfigValue("Minio.Cache.AccessKey"),
-                    Devmasters.Config.GetWebConfigValue("Minio.Cache.SecretKey"), TimeSpan.Zero,
-
-                    "NarustySmluvTop100_Percent_Vlada2018",
+                    Devmasters.Config.GetWebConfigValue("Minio.Cache.SecretKey"),
+                    keyValueSelector: key => "NarustySmluvTop100_AbsolutPrice_Vlada2018_" + (key ?? 0).ToString()
+                    );
+        public static Devmasters.Cache.AWS_S3.Manager<CalculatedChangeBetweenYears<string>[], int?> NarustySmluvTop100_Percent_Vlada2018 =
+            Devmasters.Cache.AWS_S3.Manager<CalculatedChangeBetweenYears<string>[], int?>.GetSafeInstance(
+                    "NarustySmluvTop100_Percent_Vlada2018_",
                     (o) =>
                     {
                         var res = BetweenYearsCalculatedChanges_Percent(allStatisticsData.Get(), 2018, 2021);
                         return res;
-                    }
+                    }, TimeSpan.Zero,
+                    new string[] { Devmasters.Config.GetWebConfigValue("Minio.Cache.Endpoint") },
+                    Devmasters.Config.GetWebConfigValue("Minio.Cache.Bucket"),
+                    Devmasters.Config.GetWebConfigValue("Minio.Cache.AccessKey"),
+                    Devmasters.Config.GetWebConfigValue("Minio.Cache.SecretKey"),
+                    keyValueSelector: key => "NarustySmluvTop100_Percent_Vlada2018_" + (key ?? 0).ToString()
                     );
 
-        public static Devmasters.Cache.AWS_S3.Cache<CalculatedChangeBetweenYears<string>[]> NarustySmluvTop100_AbsolutPrice_Vlada2022 =
-           new Devmasters.Cache.AWS_S3.Cache<CalculatedChangeBetweenYears<string>[]>
-                   (new string[] { Devmasters.Config.GetWebConfigValue("Minio.Cache.Endpoint") },
-                   Devmasters.Config.GetWebConfigValue("Minio.Cache.Bucket"),
-                   Devmasters.Config.GetWebConfigValue("Minio.Cache.AccessKey"),
-                   Devmasters.Config.GetWebConfigValue("Minio.Cache.SecretKey"), TimeSpan.Zero,
-
-                   "NarustySmluvTop100_AbsolutPrice_Vlada2022",
+        public static Devmasters.Cache.AWS_S3.Manager<CalculatedChangeBetweenYears<string>[], int?> NarustySmluvTop100_AbsolutPrice_Vlada2022 =
+           Devmasters.Cache.AWS_S3.Manager<CalculatedChangeBetweenYears<string>[], int?>.GetSafeInstance(
+                   "NarustySmluvTop100_AbsolutPrice_Vlada2022_",
                    (o) =>
                    {
                        var res = BetweenYearsCalculatedChanges_AbsValue(allStatisticsData.Get(), 2021, 2025);
                        return res;
-                   }
+                   }, TimeSpan.Zero,
+                   new string[] { Devmasters.Config.GetWebConfigValue("Minio.Cache.Endpoint") },
+                   Devmasters.Config.GetWebConfigValue("Minio.Cache.Bucket"),
+                   Devmasters.Config.GetWebConfigValue("Minio.Cache.AccessKey"),
+                   Devmasters.Config.GetWebConfigValue("Minio.Cache.SecretKey"),
+                   keyValueSelector: key => "NarustySmluvTop100_AbsolutPrice_Vlada2022_" + (key ?? 0).ToString()
                    );
-        public static Devmasters.Cache.AWS_S3.Cache<CalculatedChangeBetweenYears<string>[]> NarustySmluvTop100_Percent_Vlada2022 =
-            new Devmasters.Cache.AWS_S3.Cache<CalculatedChangeBetweenYears<string>[]>
-                    (new string[] { Devmasters.Config.GetWebConfigValue("Minio.Cache.Endpoint") },
-                    Devmasters.Config.GetWebConfigValue("Minio.Cache.Bucket"),
-                    Devmasters.Config.GetWebConfigValue("Minio.Cache.AccessKey"),
-                    Devmasters.Config.GetWebConfigValue("Minio.Cache.SecretKey"), TimeSpan.Zero,
-
-                    "NarustySmluvTop100_Percent_Vlada2022",
+        public static Devmasters.Cache.AWS_S3.Manager<CalculatedChangeBetweenYears<string>[], int?> NarustySmluvTop100_Percent_Vlada2022 =
+            Devmasters.Cache.AWS_S3.Manager<CalculatedChangeBetweenYears<string>[], int?>.GetSafeInstance(
+                "NarustySmluvTop100_Percent_Vlada2022_",
                     (o) =>
                     {
                         var res = BetweenYearsCalculatedChanges_Percent(allStatisticsData.Get(), 2022, 2025);
                         return res;
-                    }
+                    }, TimeSpan.Zero,
+                    new string[] { Devmasters.Config.GetWebConfigValue("Minio.Cache.Endpoint") },
+                    Devmasters.Config.GetWebConfigValue("Minio.Cache.Bucket"),
+                    Devmasters.Config.GetWebConfigValue("Minio.Cache.AccessKey"),
+                    Devmasters.Config.GetWebConfigValue("Minio.Cache.SecretKey"),
+
+                    keyValueSelector: key => "NarustySmluvTop100_Percent_Vlada2022_" + (key ?? 0).ToString()
                     );
 
-        public static Devmasters.Cache.AWS_S3.Cache<CalculatedChangeBetweenYears<string>[]> NarustySmluvTop100_AbsolutPrice_2020_24 =
-       new Devmasters.Cache.AWS_S3.Cache<CalculatedChangeBetweenYears<string>[]>
-               (new string[] { Devmasters.Config.GetWebConfigValue("Minio.Cache.Endpoint") },
-               Devmasters.Config.GetWebConfigValue("Minio.Cache.Bucket"),
-               Devmasters.Config.GetWebConfigValue("Minio.Cache.AccessKey"),
-               Devmasters.Config.GetWebConfigValue("Minio.Cache.SecretKey"), TimeSpan.Zero,
-
-               "NarustySmluvTop100_AbsolutPrice_2020_24",
+        public static Devmasters.Cache.AWS_S3.Manager<CalculatedChangeBetweenYears<string>[], int?> NarustySmluvTop100_AbsolutPrice_2020_24 =
+       Devmasters.Cache.AWS_S3.Manager<CalculatedChangeBetweenYears<string>[], int?>.GetSafeInstance(
+"NarustySmluvTop100_AbsolutPrice_2020_24_",
                (o) =>
                {
                    var res = BetweenYearsCalculatedChanges_AbsValue(allStatisticsData.Get(), 2020, 2024);
                    return res;
-               }
-               );
-        public static Devmasters.Cache.AWS_S3.Cache<CalculatedChangeBetweenYears<string>[]> NarustySmluvTop100_Percent_2020_24 =
-            new Devmasters.Cache.AWS_S3.Cache<CalculatedChangeBetweenYears<string>[]>
-                    (new string[] { Devmasters.Config.GetWebConfigValue("Minio.Cache.Endpoint") },
-                    Devmasters.Config.GetWebConfigValue("Minio.Cache.Bucket"),
-                    Devmasters.Config.GetWebConfigValue("Minio.Cache.AccessKey"),
-                    Devmasters.Config.GetWebConfigValue("Minio.Cache.SecretKey"), TimeSpan.Zero,
-
-                    "NarustySmluvTop100_Percent_2020_24",
-                    (o) =>
-                    {
-                        var res = BetweenYearsCalculatedChanges_Percent(allStatisticsData.Get(), 2020, 2024);
-                        return res;
-                    }
-                    );
-
-        public static Devmasters.Cache.AWS_S3.Cache<CalculatedChangeBetweenYears<string>[]> NarustySmluvTop100_AbsolutPrice_MaxInYear =
-       new Devmasters.Cache.AWS_S3.Cache<CalculatedChangeBetweenYears<string>[]>
-               (new string[] { Devmasters.Config.GetWebConfigValue("Minio.Cache.Endpoint") },
+               }, TimeSpan.Zero,
+               new string[] { Devmasters.Config.GetWebConfigValue("Minio.Cache.Endpoint") },
                Devmasters.Config.GetWebConfigValue("Minio.Cache.Bucket"),
                Devmasters.Config.GetWebConfigValue("Minio.Cache.AccessKey"),
-               Devmasters.Config.GetWebConfigValue("Minio.Cache.SecretKey"), TimeSpan.Zero,
+               Devmasters.Config.GetWebConfigValue("Minio.Cache.SecretKey"),
+                keyValueSelector: key => "NarustySmluvTop100_AbsolutPrice_2020_24_" + (key ?? 0).ToString()
+                );
+        public static Devmasters.Cache.AWS_S3.Manager<CalculatedChangeBetweenYears<string>[], int?> NarustySmluvTop100_Percent_2020_24 =
+            Devmasters.Cache.AWS_S3.Manager<CalculatedChangeBetweenYears<string>[], int?>.GetSafeInstance(
+                "NarustySmluvTop100_Percent_2020_24_",
+                                    (o) =>
+                                    {
+                                        var res = BetweenYearsCalculatedChanges_Percent(allStatisticsData.Get(), 2020, 2024);
+                                        return res;
+                                    }, TimeSpan.Zero,
 
-               "NarustySmluvTop100_AbsolutPrice_MaxInYear",
+                new string[] { Devmasters.Config.GetWebConfigValue("Minio.Cache.Endpoint") },
+                    Devmasters.Config.GetWebConfigValue("Minio.Cache.Bucket"),
+                    Devmasters.Config.GetWebConfigValue("Minio.Cache.AccessKey"),
+                    Devmasters.Config.GetWebConfigValue("Minio.Cache.SecretKey"),
+                    keyValueSelector: key => "NarustySmluvTop100_Percent_2020_24_" + (key ?? 0).ToString()
+                    );
+
+        public static Devmasters.Cache.AWS_S3.Manager<CalculatedChangeBetweenYears<string>[], int?> NarustySmluvTop100_AbsolutPrice_MaxInYear =
+       Devmasters.Cache.AWS_S3.Manager<CalculatedChangeBetweenYears<string>[], int?>.GetSafeInstance(
+               "NarustySmluvTop100_AbsolutPrice_MaxInYear_",
                (o) =>
                {
                    List<CalculatedChangeBetweenYears<string>> data = new();
                    for (int i = 2018; i <= DateTime.Now.Year - 1; i++)
                    {
-
                        var _r = BetweenYearsCalculatedChanges_AbsValue(allStatisticsData.Get(), i, i + 1);
                        data.AddRange(_r);
                    }
                    var res = data.OrderByDescending(o => o.valueChange)
                        .Take(100).ToArray();
                    return res;
-               }
+               },
+               TimeSpan.Zero,
+               new string[] { Devmasters.Config.GetWebConfigValue("Minio.Cache.Endpoint") },
+               Devmasters.Config.GetWebConfigValue("Minio.Cache.Bucket"),
+               Devmasters.Config.GetWebConfigValue("Minio.Cache.AccessKey"),
+               Devmasters.Config.GetWebConfigValue("Minio.Cache.SecretKey"),
+               keyValueSelector: key => "NarustySmluvTop100_AbsolutPrice_MaxInYear_" + (key ?? 0).ToString()
                );
-        public static Devmasters.Cache.AWS_S3.Cache<CalculatedChangeBetweenYears<string>[]> NarustySmluvTop100_Percent_MaxInYear =
-            new Devmasters.Cache.AWS_S3.Cache<CalculatedChangeBetweenYears<string>[]>
-                    (new string[] { Devmasters.Config.GetWebConfigValue("Minio.Cache.Endpoint") },
-                    Devmasters.Config.GetWebConfigValue("Minio.Cache.Bucket"),
-                    Devmasters.Config.GetWebConfigValue("Minio.Cache.AccessKey"),
-                    Devmasters.Config.GetWebConfigValue("Minio.Cache.SecretKey"), TimeSpan.Zero,
 
-                    "NarustySmluvTop100_Percent_MaxInYear",
+        public static Devmasters.Cache.AWS_S3.Manager<CalculatedChangeBetweenYears<string>[], int?> NarustySmluvTop100_Percent_MaxInYear =
+            Devmasters.Cache.AWS_S3.Manager<CalculatedChangeBetweenYears<string>[], int?>.GetSafeInstance(
+                "NarustySmluvTop100_Percent_MaxInYear",
                     (o) =>
                     {
                         List<CalculatedChangeBetweenYears<string>> data = new();
-                        for (int i = 2018; i <= DateTime.Now.Year-1; i++)
+                        for (int i = 2018; i <= DateTime.Now.Year - 1; i++)
                         {
 
-                            var _r = BetweenYearsCalculatedChanges_Percent(allStatisticsData.Get(),i, i + 1);
+                            var _r = BetweenYearsCalculatedChanges_Percent(allStatisticsData.Get(), i, i + 1);
                             data.AddRange(_r);
                         }
                         var res = data
@@ -764,7 +762,12 @@ namespace HlidacStatu.Repositories.Analysis
                             .ThenByDescending(o => o.valueChange)
                             .Take(100).ToArray();
                         return res;
-                    }
+                    }, TimeSpan.Zero,
+                    new string[] { Devmasters.Config.GetWebConfigValue("Minio.Cache.Endpoint") },
+                    Devmasters.Config.GetWebConfigValue("Minio.Cache.Bucket"),
+                    Devmasters.Config.GetWebConfigValue("Minio.Cache.AccessKey"),
+                    Devmasters.Config.GetWebConfigValue("Minio.Cache.SecretKey"),
+                    keyValueSelector: key => "NarustySmluvTop100_Percent_MaxInYear_" + (key ?? 0).ToString()
                     );
 
 

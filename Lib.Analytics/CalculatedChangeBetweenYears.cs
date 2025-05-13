@@ -13,6 +13,8 @@ namespace HlidacStatu.Lib.Analytics
         public int firstYear { get; set; }
         public int lastYear { get; set; }
 
+        public decimal firstValue { get; set; }
+
     }
 
 

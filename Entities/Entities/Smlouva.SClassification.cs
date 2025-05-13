@@ -17,7 +17,8 @@ namespace HlidacStatu.Entities
                 public string SearchExpression { get; set; }
                 public string SearchShortcut { get; set; }
                 public string Fullname { get; set; }
-                public bool MainType { get; set; }
+                public bool IsMainType { get; set; }
+                public int MainTypeValue { get; set; }
             }
 
 
@@ -48,13 +49,15 @@ namespace HlidacStatu.Entities
                                 string range = $"[{sval.Substring(0, 3)}00 TO {sval.Substring(0, 3)}99]";
                                 cf.SearchExpression = range;
                                 cf.SearchShortcut = sname.Replace("_obecne", "");
-                                cf.MainType = true;
+                                cf.IsMainType = true;
+                                cf.MainTypeValue = cf.Value;
                             }
                             else
                             {
                                 cf.SearchExpression = sval;
                                 cf.SearchShortcut = sname;
-                                cf.MainType = false;
+                                cf.IsMainType = false;
+                                cf.MainTypeValue = (int)Math.Round(cf.Value/100m)*100;
                             }
                             AllTypes.Add(cf);
                         }

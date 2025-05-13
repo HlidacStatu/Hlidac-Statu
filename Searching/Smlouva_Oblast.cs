@@ -36,7 +36,7 @@ namespace HlidacStatu.Searching
 
             foreach (var v in Smlouva.SClassification.AllTypes)
             {
-                if (v.MainType)
+                if (v.IsMainType)
                 {
                     ret.Add(v.SearchShortcut, v.SearchExpression);
                     ret.Add(v.SearchShortcut + "_obecne", v.SearchExpression);
