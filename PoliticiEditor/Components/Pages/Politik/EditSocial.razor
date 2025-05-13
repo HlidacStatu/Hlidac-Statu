@@ -174,14 +174,10 @@
 
     private async Task Save()
     {
-
         //todo: this should be probably created after db.save? So we get prop. Ids?
         var auditLogs = ChangeTracker.CreateAuditLogs(_db, UserName);
-
-        throw new NotImplementedException();
-        
         await _db.SaveChangesAsync();
-        ChangeTracker.SaveAuditLog(auditLogs);
+        await ChangeTracker.SaveAuditLogAsync(auditLogs);
         
         await RefreshContextAsync();
     }

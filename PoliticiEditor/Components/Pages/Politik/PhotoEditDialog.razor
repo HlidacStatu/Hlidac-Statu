@@ -1,0 +1,298 @@
+@using HlidacStatu.Entities
+@using HlidacStatu.Repositories
+@using System.Security.Claims
+@using Serilog
+
+@inject AuthenticationStateProvider AuthenticationStateProvider
+
+@inject IHttpClientFactory HttpClientFactory
+
+
+<!-- Button trigger modal -->
+<button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#photoEditModal">
+    Upravit fotku
+</button>
+
+<!-- Modal -->
+<div class="modal fade" id="photoEditModal" tabindex="-1" aria-labelledby="photoEditModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="photoEditModalLabel">Změna fotky @osoba.ToString()</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"
+                        @onclick="@(Cancel)"></button>
+            </div>
+            <div class="modal-body">
+                @if (!AnyFacesDetected)
+                {
+                    <ul class="nav nav-tabs">
+                        <li class="nav-item">
+                            <button class="nav-link @(_choice == Choice.FromPC ? "active" : "")"
+                                    @onclick="() => Choose(Choice.FromPC)">Nahrát z počítače
+                            </button>
+                        </li>
+                        <li class="nav-item">
+                            <button class="nav-link @(_choice == Choice.FromWeb ? "active" : "")"
+                                    @onclick="() => Choose(Choice.FromWeb)">Stáhnout z webu
+                            </button>
+                        </li>
+
+                    </ul>
+
+                    @* Nahrát z počítače *@
+                    if (_choice == Choice.FromPC)
+                    {
+                        <div class="mt-4">
+                            <div class="mb-3">
+                                <label for="fromFile" class="form-label">Vyberte soubor s fotografií</label>
+                                <InputFile id="fromFile" class="form-control"
+                                           OnChange="@((InputFileChangeEventArgs e) => HandleFileSelected(e))"/>
+                                <div class="ml-3 form-text">Nejlepší je portrét, čím větší fotka, tím lépe.</div>
+                            </div>
+                            <div class="mb-3 form-floating">
+                                <input type="text" id="zdroj" class="form-control" @bind="@_zdroj"/>
+                                <label for="zdroj">Zdroj, odkud jsem čerpal informaci</label>
+                            </div>
+                        </div>
+                    }
+
+                    @* Nahrát z webu *@
+                    if (_choice == Choice.FromWeb)
+                    {
+                        <div class="mt-4">
+                            <div class="mb-3 form-floating">
+                                <input type="text" id="web" class="form-control" @bind="@_zdroj"/>
+                                <label for="web">Url obrázku</label>
+                                <div class="ml-3 form-text">Napište URL obrázku, ne URL stránky kde je obrázek.</div>
+                            </div>
+                        </div>
+                    }
+                }
+                else
+                {
+                    <div class="col-xs-12">
+                        <button cclass="btn btn-secondary" @onclick="@(Cancel)" data-bs-dismiss="modal">Žádná fotka není správná</button>
+                    </div>
+                    foreach (var f in _faces)
+                    {
+                        <div class="col-xs-6 col-sm-4">
+                            <img style="width:250px;height:auto; border:solid #d0d0d0 1px; margin:5px;"
+                                 src="data:image/jpeg;base64,@Convert.ToBase64String(File.ReadAllBytes(f), Base64FormattingOptions.None)">
+                            <br/>
+                            <button type="submit" class="btn btn-success" @onclick="()=>PickPhoto(f)">Toto je
+                                správná/nejlepší fotka
+                            </button>
+                        </div>
+                    }
+                }
+
+                <div class="row mb-3 justify-content-end">
+                    @if (!AnyFacesDetected)
+                    {
+                        <button class="btn btn-success" @onclick="@(Next)">Pokračovat</button>
+                    }
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" @onclick="@(Cancel)" data-bs-dismiss="modal">Zrušit změny</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+
+@code {
+
+    [Parameter]
+    public Osoba osoba { get; set; }
+
+    private ClaimsPrincipal? User { get; set; }
+
+    private ILogger _logger = Log.ForContext<PhotoEditDialog>();
+
+    private string? _zdroj;
+    private byte[]? _fileBytes;
+
+
+    private string[]? _faces;
+    private bool AnyFacesDetected => _faces is not null && _faces.Any();
+
+    protected override async Task OnParametersSetAsync()
+    {
+        await base.OnParametersSetAsync();
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        User = authState?.User;
+    }
+
+    private enum Choice
+    {
+        FromPC,
+        FromWeb
+    }
+
+
+    private Choice _choice = Choice.FromPC;
+
+    private Task Choose(Choice choice)
+    {
+        _choice = choice;
+        return Task.CompletedTask;
+    }
+
+    private async Task HandleFileSelected(InputFileChangeEventArgs e)
+    {
+        var file = e.File;
+        //var buffer = new byte[file.Size];
+
+        var ms = new MemoryStream();
+        // cca 12 MB max
+        await e.File.OpenReadStream(maxAllowedSize: 13_000_000).CopyToAsync(ms);
+        //_ = await file.OpenReadStream(maxAllowedSize: 13_000_000).ReadAsync(buffer);
+        _fileBytes = ms.ToArray();
+    }
+
+
+    private Task Cancel()
+    {
+        if (AnyFacesDetected)
+        {
+            CleanupPhotoDirectory(_faces.FirstOrDefault());
+        }
+
+        _zdroj = null;
+        _fileBytes = null;
+        _faces = null;
+
+        return Task.CompletedTask;
+    }
+    
+    private async Task Next()
+    {
+        if (string.IsNullOrWhiteSpace(_zdroj))
+        {
+            return;
+        }
+
+        if (_choice == Choice.FromWeb)
+        {
+            var httpClient = HttpClientFactory.CreateClient();
+
+            try
+            {
+                _fileBytes = await httpClient.GetByteArrayAsync(_zdroj);
+            }
+            catch (Exception e)
+            {
+                _logger.Error(e, $"Chyba při načítání fotky z webu");
+                return;
+            }
+        }
+
+        if (_fileBytes is null || !_fileBytes.Any())
+        {
+            return;
+        }
+
+        try
+        {
+            var path = osoba.GetPhotoPath(Osoba.PhotoTypes.UploadedOriginal, true); //Init.OsobaFotky.GetFullPath(osoba, "original.uploaded.jpg");
+            var pathTxt = osoba.GetPhotoPath(Osoba.PhotoTypes.SourceOfPhoto, true); // Init.OsobaFotky.GetFullPath(osoba, "source.txt");
+            _faces = HlidacStatu.DetectFaces.FromImage.DetectAndParseFacesIntoFiles(_fileBytes, 150, 40).ToArray();
+            if (_fileBytes != null && _faces.Length > 0)
+            {
+                await Task.WhenAll(File.WriteAllTextAsync(pathTxt, _zdroj),
+                    File.WriteAllBytesAsync(path, _fileBytes));
+            }
+        }
+        catch (Exception e)
+        {
+            _logger.Error(e, "Chyba při detekci obličejů.");
+        }
+    }
+
+    private async Task PickPhoto(string path)
+    {
+        if (string.IsNullOrEmpty(path) ||
+            !path.Contains(Path.GetTempPath()) ||
+            !File.Exists(path))
+        {
+            return;
+        }
+
+
+        try
+        {
+            using Devmasters.Imaging.InMemoryImage imi = new Devmasters.Imaging.InMemoryImage(path);
+            if (User?.IsInRole("Admin") == true)
+            {
+                imi.Resize(new SixLabors.ImageSharp.Size(300, 300), true, Devmasters.Imaging.InMemoryImage.InterpolationsQuality.High, true);
+                imi.SaveAsJPEG(osoba.GetPhotoPath(Osoba.PhotoTypes.Small, true), 80);
+
+                var noBackGr = await HlidacStatu.AI.Photo.RemoveBackgroundAsync(
+                    new Uri(Devmasters.Config.GetWebConfigValue("RemoveBackgroundAPI")),
+                    System.IO.File.ReadAllBytes(osoba.GetPhotoPath(Osoba.PhotoTypes.Small)),
+                    HlidacStatu.AI.Photo.RemoveBackgroundStyles.Person);
+                if (noBackGr != null)
+                    System.IO.File.WriteAllBytes(osoba.GetPhotoPath(Osoba.PhotoTypes.NoBackground, true), noBackGr);
+            }
+            else
+            {
+                imi.SaveAsJPEG(osoba.GetPhotoPath(Osoba.PhotoTypes.UploadedSmall, true), 80);
+                await using DbEntities db = new DbEntities();
+                var r = new Review()
+                {
+                    Created = DateTime.Now,
+                    CreatedBy = User?.Identity?.Name,
+                    itemType = "osobaPhoto",
+                    NewValue = Newtonsoft.Json.JsonConvert.SerializeObject(new { nameId = osoba.NameId, file = osoba.GetPhotoPath(Osoba.PhotoTypes.UploadedSmall, true) }),
+                };
+
+                db.Review.Add(r);
+                using (System.Net.Mail.SmtpClient smtp = new System.Net.Mail.SmtpClient())
+                {
+                    smtp.Host = Devmasters.Config.GetWebConfigValue("SmtpHost");
+                    smtp.Send("info@hlidacstatu.cz", "michal@michalblaha.cz", "Photo review",
+                        Newtonsoft.Json.JsonConvert.SerializeObject(r, Newtonsoft.Json.Formatting.Indented)
+                    );
+                }
+
+                await db.SaveChangesAsync();
+            }
+
+            Devmasters.IO.IOTools.DeleteFile(path);
+        }
+        catch (Exception e)
+        {
+            _logger.Error(e, "Chyba během výběru souboru.");
+            return;
+        }
+
+        CleanupPhotoDirectory(path);
+    }
+
+    private void CleanupPhotoDirectory(string path)
+    {
+        var rootPath = Devmasters.RegexUtil.GetRegexGroupValue(path, @"(?<tempfn>.*)\.\d{1,2}\.faces\.jpg$", "tempfn");
+        if (string.IsNullOrWhiteSpace(rootPath))
+            return;
+
+        try
+        {
+            foreach (var f in Directory.EnumerateFiles(Path.GetDirectoryName(rootPath), Path.GetFileName(rootPath) + ".*"))
+            {
+                Devmasters.IO.IOTools.DeleteFile(f);
+            }
+
+            _faces = Array.Empty<string>();
+        }
+        catch (Exception e)
+        {
+            _logger.Warning(e, $"Při čištění složky {rootPath}, došlo k chybě.");
+            // ignored
+        }
+    }
+
+}

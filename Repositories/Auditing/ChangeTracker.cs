@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.Json;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 
@@ -41,7 +42,7 @@ public static class ChangeTracker
     }
     
     
-    public static async Task SaveAuditLog(List<AuditLog> audits)
+    public static Task SaveAuditLogAsync(List<AuditLog> audits)
     {
         foreach (var audit in audits.Where(a => a.EntityId == null && a.EntryReference != null))
         {
@@ -54,6 +55,10 @@ public static class ChangeTracker
             audit.EntryReference = null; // clear to avoid serialization issues
         }
 
-        throw new NotImplementedException("Here should be implementation to save data to elasticsearch");
+        
+        //todo: save this log into es
+        Console.WriteLine("Saving audit logs");
+        Console.WriteLine(JsonSerializer.Serialize(audits));
+        return Task.CompletedTask;
     }
 }

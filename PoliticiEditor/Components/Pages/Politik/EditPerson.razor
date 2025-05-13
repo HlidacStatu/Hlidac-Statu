@@ -1,7 +1,6 @@
 ﻿@using HlidacStatu.Entities
 @using HlidacStatu.Repositories
 @using HlidacStatu.Repositories.Auditing
-@using Microsoft.EntityFrameworkCore
 
 @inject AuthenticationStateProvider AuthenticationStateProvider
 
@@ -14,9 +13,9 @@
             <div class="col-sm-3 col-xl-2">
                 <img src="@Osoba.GetPhotoUrl()" class="img-fluid rounded-start mb-3" alt="Fotka">
                 <div class="d-grid gap-2 mx-auto">
-                    <button class="btn btn-success" @onclick="@(Save)">Uložit osobu</button>
+                    <button class="btn btn-success" @onclick="@(Save)">Uložit změny</button>
                     <button class="btn btn-danger" @onclick="@(Cancel)">Zrušit změny</button>
-                    <button class="btn btn-primary" @onclick="@(EditPhoto)">Upravit fotku</button>
+                    <PhotoEditDialog osoba="Osoba"/>
                 </div>
             </div>
             <div class="col-sm-9 col-xl-10">
@@ -106,15 +105,12 @@
 
     private async Task Save()
     {
-
         //todo: this should be probably created after db.save? So we get prop. Ids?
         var auditLogs = ChangeTracker.CreateAuditLogs(_db, UserName);
-
-        throw new NotImplementedException();
         
         await _db.SaveChangesAsync();
-        ChangeTracker.SaveAuditLog(auditLogs);
         
+        await ChangeTracker.SaveAuditLogAsync(auditLogs);
         await RefreshContextAsync();
     }
 
@@ -122,9 +118,5 @@
     {
         await RefreshContextAsync();
     }
-
-    private Task EditPhoto()
-    {
-        throw new NotImplementedException();
-    }
+    
 }
