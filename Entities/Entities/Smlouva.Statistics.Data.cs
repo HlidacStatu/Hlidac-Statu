@@ -33,6 +33,26 @@ namespace HlidacStatu.Entities
                 public long PocetSmluvNovaFirma { get; set; }
 
                 public Dictionary<int, SimpleStat> PoOblastech { get; set; } = new Dictionary<int, SimpleStat>();
+                public SimpleStat PoOblastechHierarchicky(int oblast)
+                {
+                    var rootCat = Smlouva.SClassification.AllTypes.Any(t => t.IsMainType && t.Value == oblast);
+                    if (rootCat)
+                    {
+                        var list= PoOblastech.Keys
+                            .Where(k => k >= oblast && k <= oblast + 99)
+                            .Select(m => PoOblastech[m]);
+                        SimpleStat res = SimpleStat.Zero;
+                        foreach (var l in list)
+                        {
+                            res = res.Add(l);
+                        }
+                        return res;
+                    }
+                    else
+                    {
+                        return PoOblastech.GetValueOrDefault(oblast);
+                    }
+                }
 
                 [JsonIgnore]
                 public decimal PercentSmluvBezCeny => (PocetSmluv == 0 ? 0 : (decimal)PocetSmluvBezCeny / (decimal)PocetSmluv);

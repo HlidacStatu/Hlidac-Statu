@@ -3,6 +3,8 @@
 
     public class SimpleStat : CoreStat, IAddable<SimpleStat>
     {
+        public readonly static SimpleStat Zero = new SimpleStat();
+
         public long Pocet { get; set; } = 0;
         public decimal CelkemCena { get; set; } = 0;
 

@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Amazon.Runtime.Internal.Endpoints.StandardLibrary;
 using Devmasters.Batch;
 using Devmasters.Enums;
+using EnumsNET;
 using HlidacStatu.DS.Graphs;
 using HlidacStatu.Entities;
 using HlidacStatu.Entities.Analysis;
@@ -13,6 +14,7 @@ using HlidacStatu.Lib.Analytics;
 using Microsoft.AspNetCore.Components.Forms;
 using Nest;
 using Serilog;
+using static HlidacStatu.Connectors.External.RZP;
 using Manager = HlidacStatu.Connectors.Manager;
 
 namespace HlidacStatu.Repositories.Analysis
@@ -632,13 +634,42 @@ namespace HlidacStatu.Repositories.Analysis
                         return getData.ToArray();
                     });
 
+        public static Devmasters.Cache.AWS_S3.Manager<CalculatedChangeBetweenYears<string>[], int?> NarustySmluvOdNulyTop100_AbsolutPrice_2020_24 =
+            Devmasters.Cache.AWS_S3.Manager<CalculatedChangeBetweenYears<string>[], int?>.GetSafeInstance(
+                    "NarustySmluvOdNulyTop100_AbsolutPrice_2020_24_",
+                    (o) =>
+                    {
+                        var res = BetweenYearsCalculatedChanges(allStatisticsData.Get(), o, 2018, 2021);
+                        return res;
+                    }, TimeSpan.Zero,
+                    new string[] { Devmasters.Config.GetWebConfigValue("Minio.Cache.Endpoint") },
+                    Devmasters.Config.GetWebConfigValue("Minio.Cache.Bucket"),
+                    Devmasters.Config.GetWebConfigValue("Minio.Cache.AccessKey"),
+                    Devmasters.Config.GetWebConfigValue("Minio.Cache.SecretKey"),
+                    keyValueSelector: key => "NarustySmluvOdNulyTop100_AbsolutPrice_2020_24_" + (key ?? 0).ToString()
+                    );
+        public static Devmasters.Cache.AWS_S3.Manager<CalculatedChangeBetweenYears<string>[], int?> NarustySmluvOdNulyTop100_Percent_2020_24 =
+            Devmasters.Cache.AWS_S3.Manager<CalculatedChangeBetweenYears<string>[], int?>.GetSafeInstance(
+                    "NarustySmluvOdNulyTop100_Percent_2020_24_",
+                    (o) =>
+                    {
+                        var res = BetweenYearsCalculatedChanges_Percent(allStatisticsData.Get(), o, 2018, 2021);
+                        return res;
+                    }, TimeSpan.Zero,
+                    new string[] { Devmasters.Config.GetWebConfigValue("Minio.Cache.Endpoint") },
+                    Devmasters.Config.GetWebConfigValue("Minio.Cache.Bucket"),
+                    Devmasters.Config.GetWebConfigValue("Minio.Cache.AccessKey"),
+                    Devmasters.Config.GetWebConfigValue("Minio.Cache.SecretKey"),
+                    keyValueSelector: key => "NarustySmluvTop100_Percent_Vlada2018_" + (key ?? 0).ToString()
+                    );
+
 
         public static Devmasters.Cache.AWS_S3.Manager<CalculatedChangeBetweenYears<string>[], int?> NarustySmluvTop100_AbsolutPrice_Vlada2018 =
             Devmasters.Cache.AWS_S3.Manager<CalculatedChangeBetweenYears<string>[], int?>.GetSafeInstance(
                     "NarustySmluvTop100_AbsolutPrice_Vlada2018_",
                     (o) =>
                     {
-                        var res = BetweenYearsCalculatedChanges_AbsValue(allStatisticsData.Get(), 2018, 2021);
+                        var res = BetweenYearsCalculatedChanges(allStatisticsData.Get(), o, 2018, 2021);
                         return res;
                     }, TimeSpan.Zero,
                     new string[] { Devmasters.Config.GetWebConfigValue("Minio.Cache.Endpoint") },
@@ -652,7 +683,7 @@ namespace HlidacStatu.Repositories.Analysis
                     "NarustySmluvTop100_Percent_Vlada2018_",
                     (o) =>
                     {
-                        var res = BetweenYearsCalculatedChanges_Percent(allStatisticsData.Get(), 2018, 2021);
+                        var res = BetweenYearsCalculatedChanges_Percent(allStatisticsData.Get(), o, 2018, 2021);
                         return res;
                     }, TimeSpan.Zero,
                     new string[] { Devmasters.Config.GetWebConfigValue("Minio.Cache.Endpoint") },
@@ -667,7 +698,7 @@ namespace HlidacStatu.Repositories.Analysis
                    "NarustySmluvTop100_AbsolutPrice_Vlada2022_",
                    (o) =>
                    {
-                       var res = BetweenYearsCalculatedChanges_AbsValue(allStatisticsData.Get(), 2021, 2025);
+                       var res = BetweenYearsCalculatedChanges(allStatisticsData.Get(), o, 2021, 2025);
                        return res;
                    }, TimeSpan.Zero,
                    new string[] { Devmasters.Config.GetWebConfigValue("Minio.Cache.Endpoint") },
@@ -681,7 +712,7 @@ namespace HlidacStatu.Repositories.Analysis
                 "NarustySmluvTop100_Percent_Vlada2022_",
                     (o) =>
                     {
-                        var res = BetweenYearsCalculatedChanges_Percent(allStatisticsData.Get(), 2022, 2025);
+                        var res = BetweenYearsCalculatedChanges_Percent(allStatisticsData.Get(), o, 2022, 2025);
                         return res;
                     }, TimeSpan.Zero,
                     new string[] { Devmasters.Config.GetWebConfigValue("Minio.Cache.Endpoint") },
@@ -692,12 +723,14 @@ namespace HlidacStatu.Repositories.Analysis
                     keyValueSelector: key => "NarustySmluvTop100_Percent_Vlada2022_" + (key ?? 0).ToString()
                     );
 
+
+
         public static Devmasters.Cache.AWS_S3.Manager<CalculatedChangeBetweenYears<string>[], int?> NarustySmluvTop100_AbsolutPrice_2020_24 =
        Devmasters.Cache.AWS_S3.Manager<CalculatedChangeBetweenYears<string>[], int?>.GetSafeInstance(
 "NarustySmluvTop100_AbsolutPrice_2020_24_",
                (o) =>
                {
-                   var res = BetweenYearsCalculatedChanges_AbsValue(allStatisticsData.Get(), 2020, 2024);
+                   var res = BetweenYearsCalculatedChanges(allStatisticsData.Get(), o, 2020, 2024);
                    return res;
                }, TimeSpan.Zero,
                new string[] { Devmasters.Config.GetWebConfigValue("Minio.Cache.Endpoint") },
@@ -711,7 +744,7 @@ namespace HlidacStatu.Repositories.Analysis
                 "NarustySmluvTop100_Percent_2020_24_",
                                     (o) =>
                                     {
-                                        var res = BetweenYearsCalculatedChanges_Percent(allStatisticsData.Get(), 2020, 2024);
+                                        var res = BetweenYearsCalculatedChanges_Percent(allStatisticsData.Get(), o, 2020, 2024);
                                         return res;
                                     }, TimeSpan.Zero,
 
@@ -730,10 +763,10 @@ namespace HlidacStatu.Repositories.Analysis
                    List<CalculatedChangeBetweenYears<string>> data = new();
                    for (int i = 2018; i <= DateTime.Now.Year - 1; i++)
                    {
-                       var _r = BetweenYearsCalculatedChanges_AbsValue(allStatisticsData.Get(), i, i + 1);
+                       var _r = BetweenYearsCalculatedChanges(allStatisticsData.Get(), o, i, i );
                        data.AddRange(_r);
                    }
-                   var res = data.OrderByDescending(o => o.valueChange)
+                   var res = data.OrderByDescending(o => o.change.ValueChange)
                        .Take(100).ToArray();
                    return res;
                },
@@ -754,12 +787,12 @@ namespace HlidacStatu.Repositories.Analysis
                         for (int i = 2018; i <= DateTime.Now.Year - 1; i++)
                         {
 
-                            var _r = BetweenYearsCalculatedChanges_Percent(allStatisticsData.Get(), i, i + 1);
+                            var _r = BetweenYearsCalculatedChanges_Percent(allStatisticsData.Get(), o, i, i );
                             data.AddRange(_r);
                         }
                         var res = data
-                            .OrderByDescending(o => (o.percChange ?? int.MaxValue))
-                            .ThenByDescending(o => o.valueChange)
+                            .OrderByDescending(o => (o.change.PercentChange ?? int.MaxValue))
+                            .ThenByDescending(o => o.change.ValueChange)
                             .Take(100).ToArray();
                         return res;
                     }, TimeSpan.Zero,
@@ -771,54 +804,98 @@ namespace HlidacStatu.Repositories.Analysis
                     );
 
 
-        private static CalculatedChangeBetweenYears<string>[] BetweenYearsCalculatedChanges_AbsValue(
+        public static CalculatedChangeBetweenYears<string>[] BetweenYearsCalculatedChanges(
             StatisticsSubjectPerYear<Smlouva.Statistics.Data>[] allData,
-          int yStart,
-          int yEnd,
-          decimal minChange = 1_000_000)
+            int? obor,
+            int yStart,
+            int yEnd,
+            decimal minChange = 1_000_000,
+            decimal? minStartValue = null //2_000_000
+            )
         {
+            int yPreStart = yStart - (yEnd - yStart) - 1; //start predchoziho obdobi
 
-            var res = allData
-                .Select(m => new { item = m, change = m.ChangeBetweenYears(yStart, yEnd, m => m.CelkovaHodnotaSmluv) })
-                .Select(m => new CalculatedChangeBetweenYears<string>()
+            CalculatedChangeBetweenYears<string>[] res = null;
+
+            var _items = allData
+                .Select(m => new
                 {
-                    data = m.item.ICO,
-                    valueChange = m.change.change,
-                    percChange = m.change.percentage,
-                    firstYear = yStart,
-                    lastYear = yEnd,
-                })
-                .Where(m => m.valueChange >= minChange)
-                //.OrderByDescending(o => (o.percChange ?? int.MaxValue))
-                .OrderByDescending(o => o.valueChange)
-                .Take(100)
-                .ToArray()
-                ;
+                    item = m,
+                    change = obor.HasValue ? m.ChangeBetweenIntervals(yStart, yEnd, m => m.PoOblastechHierarchicky(obor.Value).CelkemCena) : m.ChangeBetweenIntervals(yStart, yEnd, m => m.CelkovaHodnotaSmluv)
+                });
+            if (minStartValue.HasValue)
+                _items = _items.Where(m =>
+                    m.item.Summary(Enumerable.Range(yPreStart, yStart - yPreStart).ToArray()).CelkovaHodnotaSmluv <= minStartValue.Value
+                );
+
+
+            res = _items
+            .Select(m => new CalculatedChangeBetweenYears<string>()
+            {
+                data = m.item.ICO,
+                change = m.change,
+                firstYear = yStart,
+                lastYear = yEnd,
+            })
+            .Where(m => m.change.ValueChange > 999_999)
+            //.OrderByDescending(o => (o.percChange ?? int.MaxValue))
+            .OrderByDescending(o => o.change.ValueChange)
+            .Take(1000)
+            .Where(m => Firmy.Get(m.data).JsemSoukromaFirma())
+            .Take(100)
+            .ToArray()
+            ;
+
+
             return res;
         }
-        private static CalculatedChangeBetweenYears<string>[] BetweenYearsCalculatedChanges_Percent(
+
+
+
+        public static CalculatedChangeBetweenYears<string>[] BetweenYearsCalculatedChanges_Percent(
             StatisticsSubjectPerYear<Smlouva.Statistics.Data>[] allData,
-          int yStart,
-          int yEnd,
-          decimal minChange = 1_000_000)
+            int? obor,
+            int yStart,
+            int yEnd,
+            decimal minChange = 1_000_000,
+            decimal? minStartValue = null //2_000_000
+            )
         {
-            var res = allData
-                .Select(m => new { item = m, change = m.ChangeBetweenYears(yStart, yEnd, m => m.CelkovaHodnotaSmluv) })
-                .Where(m => m.change.change > minChange)
-                .OrderByDescending(o => (o.change.percentage ?? int.MaxValue))
-                .ThenByDescending(o => o.change.change)
+            int yPreStart = yStart - (yEnd - yStart) - 1; //start predchoziho obdobi
+            CalculatedChangeBetweenYears<string>[] res = null;
+            var _items = allData
+                .Select(m => new
+                {
+                    item = m,
+                    change = obor.HasValue ? m.ChangeBetweenIntervals(yStart, yEnd, m => m.PoOblastechHierarchicky(obor.Value).CelkemCena) : m.ChangeBetweenIntervals(yStart, yEnd, m => m.CelkovaHodnotaSmluv)
+                });
+            if (minStartValue.HasValue)
+                _items = _items.Where(m =>
+                    m.item.Summary(Enumerable.Range(yPreStart, yStart - yPreStart).ToArray()).CelkovaHodnotaSmluv <= minStartValue.Value
+                );
+
+            res = _items
+                .Where(m => m.change.ValueChange > 10_000_000)
+                .OrderByDescending(o => (o.change.PercentChange ?? int.MaxValue))
+                .ThenByDescending(o => o.change.ValueChange)
                 .Select(m => new CalculatedChangeBetweenYears<string>()
                 {
                     data = m.item.ICO,
-                    valueChange = m.change.change,
-                    percChange = m.change.percentage,
+                    change = m.change,
                     firstYear = yStart,
                     lastYear = yEnd,
                 })
+                .Take(1000)
+                .Where(m => Firmy.Get(m.data).JsemSoukromaFirma())
                 .Take(100)
                 .ToArray()
                 ;
+
+
             return res;
         }
+
+
+
     }
 }

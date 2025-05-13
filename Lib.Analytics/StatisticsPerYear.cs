@@ -9,7 +9,7 @@ using System.Text.Json.Serialization;
 namespace HlidacStatu.Lib.Analytics
 {
     [JsonConverter(typeof(StatisticsPerYearConverter))]
-    public class StatisticsPerYear<T> : IEnumerable<(int Year, T Value)>
+    public partial class StatisticsPerYear<T> : IEnumerable<(int Year, T Value)>
         where T : CoreStat, IAddable<T>, new()
     {
         [JsonInclude]
@@ -165,6 +165,43 @@ namespace HlidacStatu.Lib.Analytics
 
             return (change, percentage);
         }
+
+        public (decimal change, decimal? percentage) ChangeBetweenValues(decimal firstValue,int lastValue)
+        {
+
+            decimal change = lastValue - firstValue;
+            decimal? percentage = (firstValue == 0) ? (decimal?)null : change / firstValue;
+
+            return (change, percentage);
+        }
+
+
+        public ChangeInValues ChangeBetweenIntervals(int firstYear, int lastYear, Func<T, decimal> selector)
+        {
+            var firstStat = this[firstYear];
+            var lastStat = this[lastYear];
+
+            int yPreStart = firstYear - (lastYear - firstYear) - 1; //start predchoziho obdobi
+            int[] prevYears = Enumerable.Range(yPreStart, firstYear - yPreStart).ToArray();
+            int[] years = Enumerable.Range(firstYear, lastYear - firstYear+1).ToArray();
+
+            var prevIntervalSum = this.Sum(prevYears, selector);
+            var currIntervalSum = this.Sum(years, selector);
+
+
+            decimal change = currIntervalSum - prevIntervalSum;
+            decimal? percentage = (prevIntervalSum == 0) ? (decimal?)null : change / prevIntervalSum;
+
+            return
+                new ChangeInValues() { 
+                    PrevValue=prevIntervalSum,
+                    CurrValue=currIntervalSum,
+                    ValueChange=change,
+                    PercentChange=percentage
+                };
+        }
+
+
 
         public virtual int CurrentSeasonYear()
         {

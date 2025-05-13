@@ -8,12 +8,10 @@ namespace HlidacStatu.Lib.Analytics
 {
     public class CalculatedChangeBetweenYears
     {
-        public decimal valueChange { get; set; }
-        public decimal? percChange { get; set; }
         public int firstYear { get; set; }
         public int lastYear { get; set; }
 
-        public decimal firstValue { get; set; }
+        public ChangeInValues change { get; set; }
 
     }
 

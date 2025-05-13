@@ -107,13 +107,13 @@ namespace HlidacStatu.Web.Controllers
         }
 
         [Route("33")]
-        [HlidacCache(24 * 60 * 60, "id;obdobi;typ", true)]
-        public IActionResult TopNarustySmluv(int? id, string obdobi = "", string typ = "abs")
+        [HlidacCache(24 * 60 * 60, "id;obdobi;typ;obor", true)]
+        public IActionResult TopNarustySmluv(int? id, string obdobi = "", int? obor = null, string typ = "abs")
         {
 
             ViewBag.Title = "Neobvykle vysoké nárusty zakázek";
             ViewBag.SubTitle = "Seznam největších angažovaností";
-            return View("33_TopNarustySmluv", (obdobi, typ));
+            return View("33_TopNarustySmluv", (obdobi, typ, obor));
 
         }
 
