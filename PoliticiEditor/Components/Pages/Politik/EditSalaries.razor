@@ -1,8 +1,10 @@
-﻿@using HlidacStatu.Entities
+﻿@using System.Security.Claims
+@using HlidacStatu.Entities
 @using HlidacStatu.Repositories.Auditing
 @using Microsoft.EntityFrameworkCore
+@using PoliticiEditor.Components.Account
 
-@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject UserHelper UserHelper
 
 @implements IAsyncDisposable
 
@@ -10,111 +12,62 @@
     <h5 class="card-header">Přidat příjem</h5>
     <div class="card-body">
         <div>
-            <div class="form-floating">
+            <div class="mb-3">
+                <label for="titulPred">Organizace, která platí</label>
                 <orginput/>
-                <label for="titulPred">Titul před jménem</label>
             </div>
-            <div class="form-floating">
+            <div class="mb-3">
+                <label for="Rok">Uveďte, za který kalendářní rok vyplňujete příjem</label>
                 <input id="Rok" type="number"
                        class="form-control @(IsValidYear(NewIncome.Rok) ? "" : "is-invalid")"
                        @bind="NewIncome.Rok"/>
-                <label for="Rok">Uveďte, za který kalendářní rok vyplňujete příjem</label>
             </div>
-            <div class="form-floating">
+            <div class="mb-3">
+                <label for="PocetMesicu">Uveďte kolik měsíců jste v daném roce vykonával funkci</label>
                 <input id="PocetMesicu" type="text"
                        class="form-control"
                        @bind:get="@NewIncome.PocetMesicu?.ToString("N0")"
                        @bind:set="(value) => NewIncome.PocetMesicu = ParseDecimal(value)"/>
-                <label for="PocetMesicu">Uveďte kolik měsíců jste v daném roce vykonával funkci</label>
             </div>
             <div class="form-check">
+                <label for="Uvolneny">Byl jste při vykonávání funkce uvolněný?</label>
                 <input id="Uvolneny" type="checkbox"
                        class="form-check-input"
                        @bind:get="@(NewIncome.Uvolneny == 1)"
                        @bind:set="(value) => NewIncome.Uvolneny = value ? 1 : 0"/>
-                <label for="Uvolneny">Byl jste při vykonávání funkce uvolněný?</label>
             </div>
-            <div class="form-floating">
-                <input id="NazevFunkce" class="form-control" @bind="NewIncome.NazevFunkce"/>
+            <div class="mb-3">
                 <label for="NazevFunkce">Uveďte název funkce, kterou jste vykonával</label>
+                <input id="NazevFunkce" class="form-control" @bind="NewIncome.NazevFunkce"/>
             </div>
-            <div class="form-floating">
+            <div class="mb-3">
+                <label for="Plat">Jaký jste za danou funkci dostával plat</label>
                 <input id="Plat" type="text"
                        class="form-control"
                        @bind:get="@NewIncome.Plat?.ToString("N2")"
                        @bind:set="(value) => NewIncome.Plat = ParseDecimal(value)"/>
-                <label for="Plat">Jaký jste za danou funkci dostával plat</label>
             </div>
-            <div class="form-floating">
+            <div class="mb-3">
+                <label for="Odmeny">Jaké mimořádné odměny jste za funkci dostal</label>
                 <input id="Odmeny" type="text"
                        class="form-control"
                        @bind:get="@NewIncome.Odmeny?.ToString("N2")"
                        @bind:set="(value) => NewIncome.Odmeny = ParseDecimal(value)"/>
-                <label for="Odmeny">Jaké mimořádné odměny jste za funkci dostal</label>
             </div>
-            <div class="form-floating">
+            <div class="mb-3">
+                <label for="Prispevky">Uveďte výši dalších příspěvků, které jste dostával</label>
                 <input id="Prispevky" type="text"
                        class="form-control"
                        @bind:get="@NewIncome.Prispevky?.ToString("N2")"
                        @bind:set="(value) => NewIncome.Prispevky = ParseDecimal(value)"/>
-                <label for="Prispevky">Uveďte výši dalších příspěvků, které jste dostával</label>
             </div>
-            <div class="form-floating">
-                <input id="NefinancniBonus" class="form-control" @bind="NewIncome.NefinancniBonus"/>
+            <div class="mb-3">
                 <label for="NefinancniBonus">Vyplňte, pokud jste měl i nějaký nefinanční bonus</label>
+                <input id="NefinancniBonus" class="form-control" @bind="NewIncome.NefinancniBonus"/>
             </div>
-            <div class="form-floating">
-                <input id="PoznamkaPlat" class="form-control" @bind="NewIncome.PoznamkaPlat"/>
+            <div class="mb-3">
                 <label for="PoznamkaPlat">Chcete uvést poznámku? Tady je vhodné místo</label>
-            </div>
-            <div class="form-floating">
-                <input id="NahradaAdministrativa" type="text"
-                       class="form-control"
-                       @bind:get="@NewIncome.NahradaAdministrativa?.ToString("N2")"
-                       @bind:set="(value) => NewIncome.NahradaAdministrativa = ParseDecimal(value)"/>
-                <label for="NahradaAdministrativa">Uveďte výši administrativních náhrad</label>
-            </div>
-            <div class="form-floating">
-                <input id="NahradaAsistent" type="text"
-                       class="form-control"
-                       @bind:get="@NewIncome.NahradaAsistent?.ToString("N2")"
-                       @bind:set="(value) => NewIncome.NahradaAsistent = ParseDecimal(value)"/>
-                <label for="NahradaAsistent">Uveďte výši náhrad na asistenta</label>
-            </div>
-            <div class="form-floating">
-                <input id="NahradaCestovni" type="text"
-                       class="form-control"
-                       @bind:get="@NewIncome.NahradaCestovni?.ToString("N2")"
-                       @bind:set="(value) => NewIncome.NahradaCestovni = ParseDecimal(value)"/>
-                <label for="NahradaCestovni">Uveďte výši cestovních náhrad</label>
-            </div>
-            <div class="form-floating">
-                <input id="NahradaKancelar" type="text"
-                       class="form-control"
-                       @bind:get="@NewIncome.NahradaKancelar?.ToString("N2")"
-                       @bind:set="(value) => NewIncome.NahradaKancelar = ParseDecimal(value)"/>
-                <label for="NahradaKancelar">Uveďte výši náhrad na kancelář</label>
-            </div>
-            <div class="form-floating">
-                <input id="NahradaReprezentace" type="text"
-                       class="form-control"
-                       @bind:get="@NewIncome.NahradaReprezentace?.ToString("N2")"
-                       @bind:set="(value) => NewIncome.NahradaReprezentace = ParseDecimal(value)"/>
-                <label for="NahradaReprezentace">Uveďte výši reprezentačních náhrad</label>
-            </div>
-            <div class="form-floating">
-                <input id="NahradaTelefon" type="text"
-                       class="form-control"
-                       @bind:get="@NewIncome.NahradaTelefon?.ToString("N2")"
-                       @bind:set="(value) => NewIncome.NahradaTelefon = ParseDecimal(value)"/>
-                <label for="NahradaTelefon">Uveďte výši náhrad na telefon</label>
-            </div>
-            <div class="form-floating">
-                <input id="NahradaUbytovani" type="text"
-                       class="form-control"
-                       @bind:get="@NewIncome.NahradaUbytovani?.ToString("N2")"
-                       @bind:set="(value) => NewIncome.NahradaUbytovani = ParseDecimal(value)"/>
-                <label for="NahradaUbytovani">Uveďte výši ubytovacích náhrad</label>
+                <input id="PoznamkaPlat" class="form-control" @bind="NewIncome.PoznamkaPlat"/>
             </div>
         </div>
     </div>
@@ -127,7 +80,7 @@
 </div>
 
 <div class="card mb-3">
-    <h5 class="card-header">Přehled příjmů</h5>
+    <h5 class="card-header">Přehled příjmů o kterých víme</h5>
     <div class="card-body">
         <div>
             <table class="table table-bordered table-sm align-middle auto-width">
@@ -135,21 +88,6 @@
                 <tr class="table-light">
                     <th>Organizace</th>
                     <th>Rok</th>
-                    <th>PocetMesicu</th>
-                    <th>Uvolneny</th>
-                    <th>NazevFunkce</th>
-                    <th>Plat</th>
-                    <th>Odmeny</th>
-                    <th>Prispevky</th>
-                    <th>NefinancniBonus</th>
-                    <th>PoznamkaPlat</th>
-                    <th>NahradaAdministrativa</th>
-                    <th>NahradaAsistent</th>
-                    <th>NahradaCestovni</th>
-                    <th>NahradaKancelar</th>
-                    <th>NahradaReprezentace</th>
-                    <th>NahradaTelefon</th>
-                    <th>NahradaUbytovani</th>
                 </tr>
                 </thead>
                 <tbody>
@@ -160,28 +98,6 @@
                             @(GetOrgName(platyItem.IdOrganizace))
                         </td>
                         <td>@platyItem.Rok.ToString("F0")</td>
-                        <td>@platyItem.PocetMesicu?.ToString("F0")</td>
-                        <td>
-                            @(platyItem.Uvolneny switch
-                            {
-                                1 => "Uvolněný",
-                                0 => "Neuvolněný",
-                                _ => ""
-                            })
-                        </td>
-                        <td>@platyItem.NazevFunkce</td>
-                        <td>@platyItem.Plat?.ToString("N0")</td>
-                        <td>@platyItem.Odmeny?.ToString("N0")</td>
-                        <td>@platyItem.Prispevky?.ToString("N0")</td>
-                        <td>@platyItem.NefinancniBonus</td>
-                        <td>@platyItem.PoznamkaPlat</td>
-                        <td>@platyItem.NahradaAdministrativa?.ToString("N0")</td>
-                        <td>@platyItem.NahradaAsistent?.ToString("N0")</td>
-                        <td>@platyItem.NahradaCestovni?.ToString("N0")</td>
-                        <td>@platyItem.NahradaKancelar?.ToString("N0")</td>
-                        <td>@platyItem.NahradaReprezentace?.ToString("N0")</td>
-                        <td>@platyItem.NahradaTelefon?.ToString("N0")</td>
-                        <td>@platyItem.NahradaUbytovani?.ToString("N0")</td>
                     </tr>
                 }
                 </tbody>
@@ -196,7 +112,7 @@
     [Parameter]
     public string NameId { get; set; }
 
-    private string? UserName { get; set; }
+    private ClaimsPrincipal User { get; set; }
     private DbEntities? _db = new();
 
     private List<PpPrijem> Platy { get; set; } = new();
@@ -212,9 +128,7 @@
 
     protected override async Task OnInitializedAsync()
     {
-        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
-        var user = authState.User;
-        UserName = user.Identity?.Name;
+        User = await UserHelper.GetCurrentUserAsync();
     }
 
     private async Task RefreshContextAsync()
@@ -255,7 +169,7 @@
         
         //todo: udělat kontroly jestli jsou data ok (např. jestli se neposílají pitomosti)
         
-        var auditLogs = ChangeTracker.CreateAuditLogs(_db, UserName);
+        var auditLogs = ChangeTracker.CreateAuditLogs(_db, UserHelper.GetNameId(User));
         await _db.SaveChangesAsync();
         await ChangeTracker.SaveAuditLogAsync(auditLogs); //this needs to be called after db changes are made
 

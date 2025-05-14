@@ -1,11 +1,10 @@
 using HlidacStatu.Entities;
 using HlidacStatu.LibCore.Extensions;
 using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.EntityFrameworkCore;
 using PoliticiEditor.Components;
+using PoliticiEditor.Components.Account;
 using PoliticiEditor.Components.Autocomplete;
-using PoliticiEditor.Components.Pages.Account;
 using PoliticiEditor.Data;
 using Serilog;
 
@@ -38,12 +37,18 @@ builder.Services.AddCascadingAuthenticationState(); // dont know if necessarry
 builder.Services.AddAuthorization();
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<IdentityRedirectManager>();
+builder.Services.AddScoped<UserHelper>();
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(options =>
     {
-        options.LoginPath = "/login";
         options.ExpireTimeSpan = TimeSpan.FromDays(2);
         options.SlidingExpiration = true;
+        options.Cookie.SecurePolicy = CookieSecurePolicy.Always; // 🔥 always HTTPS
+        options.Cookie.HttpOnly = true; // 🔥 cookie not accessible to JavaScript
+        options.Cookie.SameSite = SameSiteMode.Strict; // (optional) protects against CSRF better
+        options.Cookie.Name = "PoliticiAuth";
+        options.LoginPath = "/Account/Login";
+        options.LogoutPath = "/Account/Logout"; // (optional) if you have logout there
     });
 
 var identityDbConnectionString = builder.Configuration.GetConnectionString("IdentityConnection") ??
@@ -51,7 +56,6 @@ var identityDbConnectionString = builder.Configuration.GetConnectionString("Iden
 builder.Services.AddDbContext<PoliticiLoginsDbContext>(options =>
     options.UseSqlite(identityDbConnectionString));
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
-
 
 var app = builder.Build();
 

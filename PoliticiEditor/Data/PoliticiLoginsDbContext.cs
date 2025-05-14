@@ -17,6 +17,7 @@ public class PoliticiLoginsDbContext(DbContextOptions<PoliticiLoginsDbContext> o
             entity.HasKey(e => e.Id);
             entity.Property(e => e.NameId).IsRequired();
             entity.HasIndex(e => e.NameId).IsUnique();
+            entity.HasIndex(e => e.EmailUpper);
         });
 
         modelBuilder.Entity<LoginToken>(entity =>

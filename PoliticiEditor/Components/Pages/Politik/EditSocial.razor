@@ -1,9 +1,11 @@
-﻿@using HlidacStatu.Entities
+﻿@using System.Security.Claims
+@using HlidacStatu.Entities
 @using HlidacStatu.Repositories
 @using HlidacStatu.Repositories.Auditing
 @using Microsoft.EntityFrameworkCore
+@using PoliticiEditor.Components.Account
 
-@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject UserHelper UserHelper
 
 @implements IAsyncDisposable
 
@@ -13,75 +15,75 @@
     
     <div class="card-body">
         <div class="mx-auto">
-            <div class="form-floating">
+            <div class="mb-3">
+                <label for="twitter">Twitter</label>
                 <input type="text" id="twitter"
                        class="form-control"
                        @bind:get="@(GetSocialNetwork("Twitter"))"
                        @bind:set="@(val => SetSocialNetwork("Twitter", val))"/>
-                <label for="twitter">Twitter</label>
             </div>
         </div>
         <div class="mx-auto">
-            <div class="form-floating">
+            <div class="mb-3">
+                <label for="facebookpage">Facebook page</label>
                 <input type="text" id="facebookpage"
                        class="form-control"
                        @bind:get="@(GetSocialNetwork("Facebook_page"))"
                        @bind:set="@(val => SetSocialNetwork("Facebook_page", val))"/>
-                <label for="facebookpage">Facebook page</label>
             </div>
         </div>
         <div class="mx-auto">
-            <div class="form-floating">
+            <div class="mb-3">
+                <label for="facebookprofile">Facebook profile</label>
                 <input type="text" id="facebookprofile"
                        class="form-control"
                        @bind:get="@(GetSocialNetwork("Facebook_profile"))"
                        @bind:set="@(val => SetSocialNetwork("Facebook_profile", val))"/>
-                <label for="facebookprofile">Facebook profile</label>
             </div>
         </div>
         <div class="mx-auto">
-            <div class="form-floating">
+            <div class="mb-3">
+                <label for="instagram">Instagram</label>
                 <input type="text" id="instagram"
                        class="form-control"
                        @bind:get="@(GetSocialNetwork("Instagram"))"
                        @bind:set="@(val => SetSocialNetwork("Instagram", val))"/>
-                <label for="instagram">Instagram</label>
             </div>
         </div>
         <div class="mx-auto">
-            <div class="form-floating">
+            <div class="mb-3">
+                <label for="youtube">Youtube</label>
                 <input type="text" id="youtube"
                        class="form-control"
                        @bind:get="@(GetSocialNetwork("Youtube"))"
                        @bind:set="@(val => SetSocialNetwork("Youtube", val))"/>
-                <label for="youtube">Youtube</label>
             </div>
         </div>
         <div class="mx-auto">
-            <div class="form-floating">
+            <div class="mb-3">
+                <label for="tictoc">TicToc</label>
                 <input type="text" id="tictoc"
                        class="form-control"
                        @bind:get="@(GetSocialNetwork("Tictoc"))"
                        @bind:set="@(val => SetSocialNetwork("Tictoc", val))"/>
-                <label for="tictoc">TicToc</label>
             </div>
         </div>
         <div class="mx-auto">
-            <div class="form-floating">
+            <div class="mb-3">
+                <label for="linkedin">LinkedIn</label>
                 <input type="text" id="linkedin"
                        class="form-control"
                        @bind:get="@(GetSocialNetwork("LinkedIn"))"
                        @bind:set="@(val => SetSocialNetwork("LinkedIn", val))"/>
-                <label for="linkedin">LinkedIn</label>
             </div>
         </div>
         <div class="mx-auto">
-            <div class="form-floating">
+            <div class="mb-3">
+                <label for="web">webové stránky</label>
                 <input type="text" id="web"
                        class="form-control"
                        @bind:get="@(GetSocialNetwork("WWW"))"
                        @bind:set="@(val => SetSocialNetwork("WWW", val))"/>
-                <label for="web">webové stránky</label>
             </div>
         </div>
     </div>
@@ -102,7 +104,7 @@
     
     private DbEntities? _db = new();
     
-    private string? UserName { get; set; }
+    private ClaimsPrincipal User { get; set; }
 
 
     private string GetSocialNetwork(string networkName)
@@ -143,9 +145,7 @@
 
     protected override async Task OnInitializedAsync()
     {
-        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
-        var user = authState.User;
-        UserName = user.Identity?.Name;
+        User = await UserHelper.GetCurrentUserAsync();
     }
 
     protected override async Task OnParametersSetAsync()
@@ -175,7 +175,7 @@
     private async Task Save()
     {
         //todo: this should be probably created after db.save? So we get prop. Ids?
-        var auditLogs = ChangeTracker.CreateAuditLogs(_db, UserName);
+        var auditLogs = ChangeTracker.CreateAuditLogs(_db, UserHelper.GetNameId(User));
         await _db.SaveChangesAsync();
         await ChangeTracker.SaveAuditLogAsync(auditLogs);
         

@@ -3,9 +3,12 @@ using System.Security.Claims;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
 
-namespace PoliticiEditor.Components.Pages.Account;
+namespace PoliticiEditor.Components.Account;
 
-internal sealed class IdentityRedirectManager(NavigationManager navigationManager, AuthenticationStateProvider authenticationStateProvider)
+internal sealed class IdentityRedirectManager(
+    NavigationManager navigationManager,
+    AuthenticationStateProvider authenticationStateProvider,
+    UserHelper userHelper)
 {
     public const string StatusCookieName = "Identity.StatusMessage";
 
@@ -45,7 +48,7 @@ internal sealed class IdentityRedirectManager(NavigationManager navigationManage
 
     private string CurrentPath => navigationManager.ToAbsoluteUri(navigationManager.Uri).GetLeftPart(UriPartial.Path);
 
-    [DoesNotReturn]
+
     public async Task RedirectIfUserIsNotAuthorized(string nameId)
     {
         var authState = await authenticationStateProvider.GetAuthenticationStateAsync();
@@ -54,16 +57,14 @@ internal sealed class IdentityRedirectManager(NavigationManager navigationManage
         if (!user.Identity?.IsAuthenticated ?? true)
         {
             RedirectTo("/Account/login");
+            return;
         }
-        
-        var userNameId = user.FindFirstValue("NameId");
+
+        var userNameId = userHelper.GetNameId(user);
         if (userNameId is null || !string.Equals(userNameId, nameId, StringComparison.OrdinalIgnoreCase))
         {
             RedirectTo("/Account/login");
+            return;
         }
-        
-        RedirectTo($"/politik/{userNameId}"); // přesměrovat na politika, kterého mohou editovat
     }
-
-   
 }

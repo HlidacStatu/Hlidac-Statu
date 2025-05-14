@@ -1,9 +1,10 @@
+@using System.Security.Claims
 @using HlidacStatu.Entities
 @using HlidacStatu.Repositories
-@using System.Security.Claims
+@using PoliticiEditor.Components.Account
 @using Serilog
 
-@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject UserHelper UserHelper
 
 @inject IHttpClientFactory HttpClientFactory
 
@@ -49,9 +50,9 @@
                                            OnChange="@((InputFileChangeEventArgs e) => HandleFileSelected(e))"/>
                                 <div class="ml-3 form-text">Nejlepší je portrét, čím větší fotka, tím lépe.</div>
                             </div>
-                            <div class="mb-3 form-floating">
-                                <input type="text" id="zdroj" class="form-control" @bind="@_zdroj"/>
+                            <div class="mb-3">
                                 <label for="zdroj">Zdroj, odkud jsem čerpal informaci</label>
+                                <input type="text" id="zdroj" class="form-control" @bind="@_zdroj"/>
                             </div>
                         </div>
                     }
@@ -60,9 +61,9 @@
                     if (_choice == Choice.FromWeb)
                     {
                         <div class="mt-4">
-                            <div class="mb-3 form-floating">
-                                <input type="text" id="web" class="form-control" @bind="@_zdroj"/>
+                            <div class="mb-3">
                                 <label for="web">Url obrázku</label>
+                                <input type="text" id="web" class="form-control" @bind="@_zdroj"/>
                                 <div class="ml-3 form-text">Napište URL obrázku, ne URL stránky kde je obrázek.</div>
                             </div>
                         </div>
@@ -109,7 +110,7 @@
     [Parameter]
     public Osoba osoba { get; set; }
 
-    private ClaimsPrincipal? User { get; set; }
+    private ClaimsPrincipal User { get; set; }
 
     private ILogger _logger = Log.ForContext<PhotoEditDialog>();
 
@@ -122,9 +123,7 @@
 
     protected override async Task OnParametersSetAsync()
     {
-        await base.OnParametersSetAsync();
-        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
-        User = authState?.User;
+        User = await UserHelper.GetCurrentUserAsync();
     }
 
     private enum Choice
@@ -226,41 +225,16 @@
         try
         {
             using Devmasters.Imaging.InMemoryImage imi = new Devmasters.Imaging.InMemoryImage(path);
-            if (User?.IsInRole("Admin") == true)
-            {
-                imi.Resize(new SixLabors.ImageSharp.Size(300, 300), true, Devmasters.Imaging.InMemoryImage.InterpolationsQuality.High, true);
-                imi.SaveAsJPEG(osoba.GetPhotoPath(Osoba.PhotoTypes.Small, true), 80);
+            
+            imi.Resize(new SixLabors.ImageSharp.Size(300, 300), true, Devmasters.Imaging.InMemoryImage.InterpolationsQuality.High, true);
+            imi.SaveAsJPEG(osoba.GetPhotoPath(Osoba.PhotoTypes.Small, true), 80);
 
-                var noBackGr = await HlidacStatu.AI.Photo.RemoveBackgroundAsync(
-                    new Uri(Devmasters.Config.GetWebConfigValue("RemoveBackgroundAPI")),
-                    System.IO.File.ReadAllBytes(osoba.GetPhotoPath(Osoba.PhotoTypes.Small)),
-                    HlidacStatu.AI.Photo.RemoveBackgroundStyles.Person);
-                if (noBackGr != null)
-                    System.IO.File.WriteAllBytes(osoba.GetPhotoPath(Osoba.PhotoTypes.NoBackground, true), noBackGr);
-            }
-            else
-            {
-                imi.SaveAsJPEG(osoba.GetPhotoPath(Osoba.PhotoTypes.UploadedSmall, true), 80);
-                await using DbEntities db = new DbEntities();
-                var r = new Review()
-                {
-                    Created = DateTime.Now,
-                    CreatedBy = User?.Identity?.Name,
-                    itemType = "osobaPhoto",
-                    NewValue = Newtonsoft.Json.JsonConvert.SerializeObject(new { nameId = osoba.NameId, file = osoba.GetPhotoPath(Osoba.PhotoTypes.UploadedSmall, true) }),
-                };
-
-                db.Review.Add(r);
-                using (System.Net.Mail.SmtpClient smtp = new System.Net.Mail.SmtpClient())
-                {
-                    smtp.Host = Devmasters.Config.GetWebConfigValue("SmtpHost");
-                    smtp.Send("info@hlidacstatu.cz", "michal@michalblaha.cz", "Photo review",
-                        Newtonsoft.Json.JsonConvert.SerializeObject(r, Newtonsoft.Json.Formatting.Indented)
-                    );
-                }
-
-                await db.SaveChangesAsync();
-            }
+            var noBackGr = await HlidacStatu.AI.Photo.RemoveBackgroundAsync(
+                new Uri(Devmasters.Config.GetWebConfigValue("RemoveBackgroundAPI")),
+                System.IO.File.ReadAllBytes(osoba.GetPhotoPath(Osoba.PhotoTypes.Small)),
+                HlidacStatu.AI.Photo.RemoveBackgroundStyles.Person);
+            if (noBackGr != null)
+                System.IO.File.WriteAllBytes(osoba.GetPhotoPath(Osoba.PhotoTypes.NoBackground, true), noBackGr);
 
             Devmasters.IO.IOTools.DeleteFile(path);
         }

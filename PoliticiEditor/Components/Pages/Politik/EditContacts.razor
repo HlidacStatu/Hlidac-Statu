@@ -1,8 +1,10 @@
-﻿@using HlidacStatu.Entities
+﻿@using System.Security.Claims
+@using HlidacStatu.Entities
 @using HlidacStatu.Repositories
 @using HlidacStatu.Repositories.Auditing
+@using PoliticiEditor.Components.Account
 
-@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject UserHelper UserHelper
 
 @implements IAsyncDisposable
 
@@ -12,30 +14,30 @@
         <div class="mx-auto">
             @foreach (var politicalParty in PoliticalParties)
             {
-                <div class="row">
-                    <div class="col-3 form-floating">
+                <div class="row mb-3">
+                    <div class="col-3">
+                        <label for="polStrana">Politická strana</label>
                         <input type="text" id="polStrana"
                                class="form-control"
                                @bind="@politicalParty.Organizace"/>
-                        <label for="polStrana">Politická strana</label>
                     </div>
-                    <div class="col-3 form-floating">
+                    <div class="col-3">
+                        <label for="datefrom">Datum působení od</label>
                         <input type="date" id="datefrom"
                                class="form-control"
                                @bind="@politicalParty.DatumOd"/>
-                        <label for="datefrom">Datum působení od</label>
                     </div>
-                    <div class="col-3 form-floating">
+                    <div class="col-3">
+                        <label for="dateto">Datum působení do</label>
                         <input type="date" id="dateto"
                                class="form-control"
                                @bind="@politicalParty.DatumDo"/>
-                        <label for="dateto">Datum působení do</label>
                     </div>
-                    <div class="col-3 form-floating">
+                    <div class="col-3">
+                        <label for="funkce">Funkce v politické straně</label>
                         <input type="text" id="funkce"
                                class="form-control"
                                @bind="@politicalParty.AddInfo"/>
-                        <label for="funkce">Funkce v politické straně</label>
                     </div>
                 </div>
             }
@@ -59,7 +61,7 @@
     
     private DbEntities? _db = new();
     
-    private string? UserName { get; set; }
+    private ClaimsPrincipal User { get; set; }
 
 
     private void AddPartyAffiliation()
@@ -83,9 +85,7 @@
     
     protected override async Task OnInitializedAsync()
     {
-        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
-        var user = authState.User;
-        UserName = user.Identity?.Name;
+        User = await UserHelper.GetCurrentUserAsync();
     }
 
     private async Task RefreshContextAsync()
@@ -111,7 +111,7 @@
     private async Task Save()
     {
         //todo: this should be probably created after db.save? So we get prop. Ids?
-        var auditLogs = ChangeTracker.CreateAuditLogs(_db, UserName);
+        var auditLogs = ChangeTracker.CreateAuditLogs(_db, UserHelper.GetNameId(User));
         
         await _db.SaveChangesAsync();
         

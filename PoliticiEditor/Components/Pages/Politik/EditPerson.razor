@@ -1,8 +1,10 @@
-﻿@using HlidacStatu.Entities
+﻿@using System.Security.Claims
+@using HlidacStatu.Entities
 @using HlidacStatu.Repositories
 @using HlidacStatu.Repositories.Auditing
+@using PoliticiEditor.Components.Account
 
-@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject UserHelper UserHelper
 
 @implements IAsyncDisposable
 
@@ -16,37 +18,37 @@
             </div>
             <div class="col-sm-9 col-xl-10">
                 <div class="mx-auto">
-                    <div class="form-floating">
+                    <div class="mb-3">
+                        <label for="titulPred">Titul před jménem</label>
                         <input type="text" id="titulPred"
                                class="@(EditModeInputClass)"
                                @bind="@Osoba.TitulPred"/>
-                        <label for="titulPred">Titul před jménem</label>
                     </div>
                 </div>
                 <div class="mx-auto">
-                    <div class="form-floating">
+                    <div class="mb-3">
+                        <label for="jmeno">Jméno</label>
                         <input type="text" id="jmeno"
                                class="@(ReadModeInputClass)"
                                readonly
                                value="@Osoba.Jmeno"/>
-                        <label for="jmeno">Jméno</label>
                     </div>
                 </div>
                 <div class="mx-auto">
-                    <div class="form-floating">
+                    <div class="mb-3">
+                        <label for="prijmeni">Příjmení</label>
                         <input type="text" id="prijmeni"
                                class="@(ReadModeInputClass)"
                                readonly
                                value="@Osoba.Prijmeni"/>
-                        <label for="prijmeni">Příjmení</label>
                     </div>
                 </div>
                 <div class="mx-auto">
-                    <div class="form-floating">
+                    <div class="mb-3">
+                        <label for="titulZa">Titul za jménem</label>
                         <input type="text" id="titulZa"
                                class="@(EditModeInputClass)"
                                @bind="@Osoba.TitulPo"/>
-                        <label for="titulZa">Titul za jménem</label>
                     </div>
                 </div>
             </div>
@@ -69,16 +71,14 @@
 
     private DbEntities? _db = new();
 
-    private string? UserName { get; set; }
+    private ClaimsPrincipal User { get; set; }
 
     const string ReadModeInputClass = "form-control-plaintext";
     const string EditModeInputClass = "form-control";
 
     protected override async Task OnInitializedAsync()
     {
-        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
-        var user = authState.User;
-        UserName = user.Identity?.Name;
+        User = await UserHelper.GetCurrentUserAsync();
     }
 
     protected override async Task OnParametersSetAsync()
@@ -107,7 +107,7 @@
     private async Task Save()
     {
         //todo: this should be probably created after db.save? So we get prop. Ids?
-        var auditLogs = ChangeTracker.CreateAuditLogs(_db, UserName);
+        var auditLogs = ChangeTracker.CreateAuditLogs(_db, UserHelper.GetNameId(User));
 
         await _db.SaveChangesAsync();
 

@@ -3,12 +3,12 @@
 @using Microsoft.AspNetCore.Authentication
 @using Microsoft.AspNetCore.Authentication.Cookies
 @using Microsoft.EntityFrameworkCore
-@using PoliticiEditor.Components.Pages.Account
 @using PoliticiEditor.Data
 
 @inject IdentityRedirectManager RedirectManager
 @inject PoliticiLoginsDbContext DbContext
 @inject IHttpContextAccessor HttpContextAccessor
+@inject UserHelper UserHelper
 
 
 @code {
@@ -37,20 +37,15 @@
 
         loginToken.Used = true;
         await DbContext.SaveChangesAsync();
-        
-        var claims = new List<Claim>
-        {
-            new(ClaimTypes.NameIdentifier, user.Id.ToString()),
-            new("NameId", user.NameId),
-            new(ClaimTypes.Email, user.Email ?? ""),
-            new(ClaimTypes.Name, user.Name ?? "")
-        };
+
+        var claims = UserHelper.CreateClaims(user);
 
         var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
         var principal = new ClaimsPrincipal(identity);
         
         await HttpContextAccessor.HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal);
-        
+        RedirectManager.RedirectTo($"/Politik/{user.NameId}");
+
     }
 
 }
