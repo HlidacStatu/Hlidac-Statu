@@ -1,14 +1,17 @@
 ﻿using HlidacStatu.Entities;
 using HlidacStatu.Lib.Analytics;
-
+using Serilog;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace HlidacStatu.Repositories.Statistics
 {
     public static class SmlouvyStatistics
     {
+        private static readonly ILogger _logger = Log.ForContext(typeof(SmlouvyStatistics));
+
         static Devmasters.Cache.Memcached.Manager<StatisticsPerYear<Smlouva.Statistics.Data>, string> _cache
             = Devmasters.Cache.Memcached.Manager<StatisticsPerYear<Smlouva.Statistics.Data>, string>
                 .GetSafeInstance("SmlouvyStatistics_Query_v3_",
@@ -81,9 +84,28 @@ namespace HlidacStatu.Repositories.Statistics
             var _calc_poOblastech =
                 await ES.QueryGrouped.OblastiPerYearAsync($"( {query} )", Consts.RegistrSmluvYearsList);
 
+
             Dictionary<int, Smlouva.Statistics.Data> data = new Dictionary<int, Smlouva.Statistics.Data>();
             foreach (var year in Consts.RegistrSmluvYearsList)
             {
+                //double check po oblastech stat
+                var xoblasti = _calc_poOblastech[year];
+                var xoblastiCelkem = xoblasti.Values.Sum(m=>m.CelkemCena);
+                var xoblastiPocet = xoblasti.Values.Sum(m => m.Pocet);
+                if (xoblastiCelkem != _calc_smlouvy[year].CelkemCena)
+                {
+                    _logger.Error("StatisticsDoubleCheck CelkemCena error Sum of Oblasti.CelkemCena is diff from year.CelkemCena. year value:{year_value} != oblastSum value:{oblasti_sum_value} query:{query} year:{year}",
+                        _calc_smlouvy[year].CelkemCena, xoblastiCelkem, query, year);
+                    //throw new ArgumentOutOfRangeException("Oblasti Celkem Cena", $"Sum of Oblasti.CelkemCena is diff from year.CelkemCena. year value:{_calc_smlouvy[year].CelkemCena} != oblastSum value:{xoblastiCelkem} query:{query} year:{year}");
+                }
+                if (xoblastiPocet != _calc_smlouvy[year].Pocet)
+                {
+                    _logger.Error("StatisticsDoubleCheck Pocer error Sum of Oblasti.Pocet is diff from year.Pocet. year value:{year_value} != oblastSum value:{oblasti_sum_value} query:{query} year:{year}",
+                        _calc_smlouvy[year].Pocet, xoblastiPocet, query, year);
+                    //throw new ArgumentOutOfRangeException("Oblasti Celkem Pocet", $"Sum of Oblasti.Pocet is diff from year.Pocet. year value:{_calc_smlouvy[year].Pocet} != oblastSum value:{xoblastiPocet} query:{query} year:{year}");
+                }
+
+
                 data.Add(year, new Smlouva.Statistics.Data()
                 {
                     PocetSmluv = _calc_smlouvy[year].Pocet,

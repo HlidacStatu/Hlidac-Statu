@@ -763,7 +763,7 @@ namespace HlidacStatu.Repositories.Analysis
                    List<CalculatedChangeBetweenYears<string>> data = new();
                    for (int i = 2018; i <= DateTime.Now.Year - 1; i++)
                    {
-                       var _r = BetweenYearsCalculatedChanges(allStatisticsData.Get(), o, i, i );
+                       var _r = BetweenYearsCalculatedChanges(allStatisticsData.Get(), o, i, i);
                        data.AddRange(_r);
                    }
                    var res = data.OrderByDescending(o => o.change.ValueChange)
@@ -787,7 +787,7 @@ namespace HlidacStatu.Repositories.Analysis
                         for (int i = 2018; i <= DateTime.Now.Year - 1; i++)
                         {
 
-                            var _r = BetweenYearsCalculatedChanges_Percent(allStatisticsData.Get(), o, i, i );
+                            var _r = BetweenYearsCalculatedChanges_Percent(allStatisticsData.Get(), o, i, i);
                             data.AddRange(_r);
                         }
                         var res = data
@@ -821,13 +821,21 @@ namespace HlidacStatu.Repositories.Analysis
                 .Select(m => new
                 {
                     item = m,
-                    change = obor.HasValue ? m.ChangeBetweenIntervals(yStart, yEnd, m => m.PoOblastechHierarchicky(obor.Value).CelkemCena) : m.ChangeBetweenIntervals(yStart, yEnd, m => m.CelkovaHodnotaSmluv)
+                    change = obor.HasValue ?
+                        m.ChangeBetweenIntervals(yStart, yEnd, m => m.PoOblastechHierarchicky(obor.Value).CelkemCena)
+                        : m.ChangeBetweenIntervals(yStart, yEnd, m => m.CelkovaHodnotaSmluv)
                 });
             if (minStartValue.HasValue)
-                _items = _items.Where(m =>
-                    m.item.Summary(Enumerable.Range(yPreStart, yStart - yPreStart).ToArray()).CelkovaHodnotaSmluv <= minStartValue.Value
-                );
-
+            {
+                if (obor.HasValue)
+                    _items = _items.Where(m =>
+                        m.item.Summary(Enumerable.Range(yPreStart, yStart - yPreStart).ToArray()).PoOblastechHierarchicky(obor.Value).CelkemCena <= minStartValue.Value
+                    );
+                else
+                    _items = _items.Where(m =>
+                        m.item.Summary(Enumerable.Range(yPreStart, yStart - yPreStart).ToArray()).CelkovaHodnotaSmluv <= minStartValue.Value
+                    );
+            }
 
             res = _items
             .Select(m => new CalculatedChangeBetweenYears<string>()

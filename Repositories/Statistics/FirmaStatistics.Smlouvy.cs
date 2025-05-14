@@ -1,7 +1,8 @@
+using HlidacStatu.Connectors;
 using HlidacStatu.Entities;
 using HlidacStatu.Extensions;
 using HlidacStatu.Lib.Analytics;
-
+using Serilog;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
@@ -10,6 +11,8 @@ namespace HlidacStatu.Repositories.Statistics
 {
     public static partial class FirmaStatistics
     {
+        private static readonly ILogger _logger = Log.ForContext(typeof(FirmaStatistics));
+
 
         static Devmasters.Cache.Redis.Manager<StatisticsSubjectPerYear<Smlouva.Statistics.Data>, (Firma firma, HlidacStatu.DS.Graphs.Relation.AktualnostType aktualnost, int? obor)>
             _holdingSmlouvaCache
