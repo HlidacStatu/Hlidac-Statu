@@ -1,9 +1,11 @@
 using System.Diagnostics.CodeAnalysis;
+using System.Security.Claims;
 using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Authorization;
 
-namespace PoliticiEditor.Components.Account;
+namespace PoliticiEditor.Components.Pages.Account;
 
-internal sealed class IdentityRedirectManager(NavigationManager navigationManager)
+internal sealed class IdentityRedirectManager(NavigationManager navigationManager, AuthenticationStateProvider authenticationStateProvider)
 {
     public const string StatusCookieName = "Identity.StatusMessage";
 
@@ -41,19 +43,27 @@ internal sealed class IdentityRedirectManager(NavigationManager navigationManage
         RedirectTo(newUri);
     }
 
-    [DoesNotReturn]
-    public void RedirectToWithStatus(string uri, string message, HttpContext context)
-    {
-        context.Response.Cookies.Append(StatusCookieName, message, StatusCookieBuilder.Build(context));
-        RedirectTo(uri);
-    }
-
     private string CurrentPath => navigationManager.ToAbsoluteUri(navigationManager.Uri).GetLeftPart(UriPartial.Path);
 
     [DoesNotReturn]
-    public void RedirectToCurrentPage() => RedirectTo(CurrentPath);
+    public async Task RedirectIfUserIsNotAuthorized(string nameId)
+    {
+        var authState = await authenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
 
-    [DoesNotReturn]
-    public void RedirectToCurrentPageWithStatus(string message, HttpContext context)
-        => RedirectToWithStatus(CurrentPath, message, context);
+        if (!user.Identity?.IsAuthenticated ?? true)
+        {
+            RedirectTo("/Account/login");
+        }
+        
+        var userNameId = user.FindFirstValue("NameId");
+        if (userNameId is null || !string.Equals(userNameId, nameId, StringComparison.OrdinalIgnoreCase))
+        {
+            RedirectTo("/Account/login");
+        }
+        
+        RedirectTo($"/politik/{userNameId}"); // přesměrovat na politika, kterého mohou editovat
+    }
+
+   
 }

@@ -1,0 +1,56 @@
+﻿@page "/Account/Login-Callback/{Token}"
+@using System.Security.Claims
+@using Microsoft.AspNetCore.Authentication
+@using Microsoft.AspNetCore.Authentication.Cookies
+@using Microsoft.EntityFrameworkCore
+@using PoliticiEditor.Components.Pages.Account
+@using PoliticiEditor.Data
+
+@inject IdentityRedirectManager RedirectManager
+@inject PoliticiLoginsDbContext DbContext
+@inject IHttpContextAccessor HttpContextAccessor
+
+
+@code {
+    
+    [Parameter]
+    public string Token { get; set; }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        var loginToken = await DbContext.LoginTokens
+            .FirstOrDefaultAsync(t => t.Token == Token && !t.Used && t.ExpiresAt > DateTime.Now);
+
+        if (loginToken == null)
+        {
+            RedirectManager.RedirectTo("/Account/AccessDenied");
+            return;
+        }
+
+        var user = await DbContext.PoliticiEditorUsers
+            .FirstOrDefaultAsync(u => u.Id == loginToken.UserId);
+
+        if (user is null)
+        {
+            throw new Exception($"User {loginToken.UserId} not found");
+        }
+
+        loginToken.Used = true;
+        await DbContext.SaveChangesAsync();
+        
+        var claims = new List<Claim>
+        {
+            new(ClaimTypes.NameIdentifier, user.Id.ToString()),
+            new("NameId", user.NameId),
+            new(ClaimTypes.Email, user.Email ?? ""),
+            new(ClaimTypes.Name, user.Name ?? "")
+        };
+
+        var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+        var principal = new ClaimsPrincipal(identity);
+        
+        await HttpContextAccessor.HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal);
+        
+    }
+
+}

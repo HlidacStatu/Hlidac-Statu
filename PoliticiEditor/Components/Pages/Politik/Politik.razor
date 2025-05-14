@@ -1,5 +1,11 @@
 ﻿@page "/politik/{NameId}"
 @using HlidacStatu.Repositories
+@using PoliticiEditor.Components.Pages.Account
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject NavigationManager Navigation
+@inject IdentityRedirectManager RedirectManager
+
+
 @rendermode InteractiveServer
 
 <PageTitle>@NameId</PageTitle>
@@ -22,16 +28,22 @@
     public string NameId { get; set; }
 
     private int? OsobaInternalId { get; set; } = null;
-    
-    protected override void OnParametersSet()
+
+    protected override async Task OnParametersSetAsync()
     {
         if(string.IsNullOrWhiteSpace(NameId))
             return;
+
+        await RedirectManager.RedirectIfUserIsNotAuthorized(NameId);
+        
+        
         var osoba = OsobaRepo.GetByNameId(NameId);
         if (osoba is not null)
             OsobaInternalId = osoba.InternalId;
-        
-        base.OnParametersSet();
+
+        await base.OnParametersSetAsync();
     }
+    
+    
 
 }

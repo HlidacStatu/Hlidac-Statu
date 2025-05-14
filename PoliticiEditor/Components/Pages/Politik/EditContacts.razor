@@ -1,0 +1,126 @@
+﻿@using HlidacStatu.Entities
+@using HlidacStatu.Repositories
+@using HlidacStatu.Repositories.Auditing
+
+@inject AuthenticationStateProvider AuthenticationStateProvider
+
+@implements IAsyncDisposable
+
+<div class="card mb-3">
+    <h5 class="card-header">Kontakty</h5>
+    <div class="card-body">
+        <div class="mx-auto">
+            @foreach (var politicalParty in PoliticalParties)
+            {
+                <div class="row">
+                    <div class="col-3 form-floating">
+                        <input type="text" id="polStrana"
+                               class="form-control"
+                               @bind="@politicalParty.Organizace"/>
+                        <label for="polStrana">Politická strana</label>
+                    </div>
+                    <div class="col-3 form-floating">
+                        <input type="date" id="datefrom"
+                               class="form-control"
+                               @bind="@politicalParty.DatumOd"/>
+                        <label for="datefrom">Datum působení od</label>
+                    </div>
+                    <div class="col-3 form-floating">
+                        <input type="date" id="dateto"
+                               class="form-control"
+                               @bind="@politicalParty.DatumDo"/>
+                        <label for="dateto">Datum působení do</label>
+                    </div>
+                    <div class="col-3 form-floating">
+                        <input type="text" id="funkce"
+                               class="form-control"
+                               @bind="@politicalParty.AddInfo"/>
+                        <label for="funkce">Funkce v politické straně</label>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+    
+    <div class="card-footer text-body-secondary">
+        <button class="btn btn-primary" @onclick="@(AddPartyAffiliation)">Přidat působení ve straně</button>
+        <button class="btn btn-success" @onclick="@(Save)">Uložit změny</button>
+        <button class="btn btn-warning" @onclick="@(Cancel)">Zrušit změny</button>
+    </div>
+
+</div>
+
+@code
+{
+    [Parameter]
+    public int OsobaId { get; set; }
+
+    private List<OsobaEvent> PoliticalParties { get; set; } = new();
+    
+    private DbEntities? _db = new();
+    
+    private string? UserName { get; set; }
+
+
+    private void AddPartyAffiliation()
+    {
+        OsobaEvent newEvent = new OsobaEvent()
+        {
+            OsobaId = OsobaId,
+            Type = (int)OsobaEvent.Types.PolitickaStrana
+        };
+        PoliticalParties.Insert(0, newEvent);
+        if (_db is not null)
+        {
+            _db.OsobaEvent.Add(newEvent);
+        }
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        await RefreshContextAsync();
+    }
+    
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+        UserName = user.Identity?.Name;
+    }
+
+    private async Task RefreshContextAsync()
+    {
+        if (_db is not null)
+            await _db.DisposeAsync();
+
+        _db = new DbEntities();
+        
+        PoliticalParties = OsobaEventRepo
+            .GetByOsobaIdTracked(_db, OsobaId, x => x.Type == (int)OsobaEvent.Types.PolitickaStrana)
+            .OrderBy(p => p.DatumOd).ToList();
+    }
+    
+    public async ValueTask DisposeAsync()
+    {
+        if (_db is not null)
+        {
+            await _db.DisposeAsync();
+        }
+    }
+
+    private async Task Save()
+    {
+        //todo: this should be probably created after db.save? So we get prop. Ids?
+        var auditLogs = ChangeTracker.CreateAuditLogs(_db, UserName);
+        
+        await _db.SaveChangesAsync();
+        
+        await ChangeTracker.SaveAuditLogAsync(auditLogs);
+        await RefreshContextAsync();
+    }
+
+    private async Task Cancel()
+    {
+        await RefreshContextAsync();
+    }
+}

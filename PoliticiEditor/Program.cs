@@ -1,67 +1,56 @@
 using HlidacStatu.Entities;
 using HlidacStatu.LibCore.Extensions;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Components.Authorization;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using PoliticiEditor.Components;
-using PoliticiEditor.Components.Account;
 using PoliticiEditor.Components.Autocomplete;
+using PoliticiEditor.Components.Pages.Account;
 using PoliticiEditor.Data;
 using Serilog;
-using ApplicationUser = PoliticiEditor.Data.ApplicationUser;
 
 var builder = WebApplication.CreateBuilder(args);
 // add Hlidac app bootstrap (loading configs, ...)
 builder.ConfigureHostForWeb(args); 
 
-//init statics and others
+// init statics and others
 Devmasters.Config.Init(builder.Configuration);
-var logger = Log.ForContext<Program>();
-
-
-builder.Services.AddHttpClient();
-builder.Services.AddSingleton<AutocompleteService>();
-
-
 System.Globalization.CultureInfo.DefaultThreadCurrentCulture = HlidacStatu.Util.Consts.czCulture;
 System.Globalization.CultureInfo.DefaultThreadCurrentUICulture = HlidacStatu.Util.Consts.csCulture;
+var logger = Log.ForContext<Program>();
+
+// custom services
+builder.Services.AddHttpClient();
+builder.Services.AddSingleton<AutocompleteService>();
 
 string connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ??
                           throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
 builder.Services.AddDbContext<DbEntities>(options =>
     options.UseSqlServer(connectionString));
-
-
+    
 
 // Default services
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 
-builder.Services.AddCascadingAuthenticationState();
-builder.Services.AddScoped<IdentityUserAccessor>();
+// Identity
+builder.Services.AddCascadingAuthenticationState(); // dont know if necessarry
+builder.Services.AddAuthorization();
+builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<IdentityRedirectManager>();
-builder.Services.AddScoped<AuthenticationStateProvider, IdentityRevalidatingAuthenticationStateProvider>();
-
-builder.Services.AddAuthentication(options =>
+builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+    .AddCookie(options =>
     {
-        options.DefaultScheme = IdentityConstants.ApplicationScheme;
-        options.DefaultSignInScheme = IdentityConstants.ExternalScheme;
-    })
-    .AddIdentityCookies();
+        options.LoginPath = "/login";
+        options.ExpireTimeSpan = TimeSpan.FromDays(2);
+        options.SlidingExpiration = true;
+    });
 
 var identityDbConnectionString = builder.Configuration.GetConnectionString("IdentityConnection") ??
                        throw new InvalidOperationException("Connection string 'IdentityConnection' not found.");
-builder.Services.AddDbContext<ApplicationDbContext>(options =>
+builder.Services.AddDbContext<PoliticiLoginsDbContext>(options =>
     options.UseSqlite(identityDbConnectionString));
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
-
-builder.Services.AddIdentityCore<ApplicationUser>(options => options.SignIn.RequireConfirmedAccount = true)
-    .AddEntityFrameworkStores<ApplicationDbContext>()
-    .AddSignInManager()
-    .AddDefaultTokenProviders();
-
-builder.Services.AddSingleton<IEmailSender<ApplicationUser>, IdentityNoOpEmailSender>();
-
 
 
 var app = builder.Build();
@@ -83,8 +72,5 @@ app.UseAntiforgery();
 
 app.MapRazorComponents<App>()
     .AddInteractiveServerRenderMode();
-
-// Add additional endpoints required by the Identity /Account Razor components.
-app.MapAdditionalIdentityEndpoints();
 
 app.Run();

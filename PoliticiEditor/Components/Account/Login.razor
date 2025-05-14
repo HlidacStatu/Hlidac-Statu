@@ -1,0 +1,96 @@
+﻿@page "/Account/Login"
+
+@using System.ComponentModel.DataAnnotations
+@using Microsoft.AspNetCore.Authentication
+@using Microsoft.AspNetCore.Identity
+@using Microsoft.EntityFrameworkCore
+@using PoliticiEditor.Data
+
+@inject PoliticiLoginsDbContext DbContext
+
+
+<PageTitle>Log in</PageTitle>
+
+<h1>Přihlášení</h1>
+<div class="row">
+    <div class="col-md-4">
+        <section>
+            <StatusMessage Message="@errorMessage"/>
+            <EditForm Model="Input" method="post" OnValidSubmit="LoginUser" FormName="login">
+                <DataAnnotationsValidator/>
+                <h2>Use a local account to log in.</h2>
+                <hr/>
+                <ValidationSummary class="text-danger" role="alert"/>
+                <div class="form-floating mb-3">
+                    <InputText @bind-Value="Input.Email" class="form-control" autocomplete="username" aria-required="true" placeholder="name@example.com"/>
+                    <label for="email" class="form-label">Email</label>
+                    <ValidationMessage For="() => Input.Email" class="text-danger"/>
+                </div>
+                <div>
+                    <button type="submit" class="w-100 btn btn-lg btn-primary">Log in</button>
+                </div>
+            </EditForm>
+        </section>
+    </div>
+    <div class="col-md-6 col-md-offset-2">
+        <section>
+            <a href="@_loginToken">přihlašovací token !!! TEST</a>
+        </section>
+    </div>
+</div>
+
+@code {
+    private string? errorMessage;
+
+    [CascadingParameter]
+    private HttpContext HttpContext { get; set; } = default!;
+
+    [SupplyParameterFromForm]
+    private InputModel Input { get; set; } = new();
+
+    private string _loginToken;
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (HttpMethods.IsGet(HttpContext.Request.Method))
+        {
+            // Clear the existing external cookie to ensure a clean login process
+            await HttpContext.SignOutAsync(IdentityConstants.ExternalScheme);
+        }
+    }
+
+    public async Task LoginUser()
+    {
+        if (string.IsNullOrWhiteSpace(Input.Email))
+        {
+            errorMessage = "Email nebyl vyplněn.";
+            return;
+        }
+
+        var user = await DbContext.PoliticiEditorUsers
+            .FirstOrDefaultAsync(u => u.EmailUpper == Input.Email.ToUpperInvariant());
+
+        if (user is null)
+        {
+            errorMessage = "Email nebyl nalezen. Kontaktujte podporu";
+            return;
+        }
+
+        var loginToken = LoginToken.CreateTokenForUser(user.Id);
+
+        DbContext.LoginTokens.Add(loginToken);
+        await DbContext.SaveChangesAsync();
+
+        //todo: poslat mailem, 
+        _loginToken = $"https://localhost/Account/Login-Callback/{loginToken.Token}";
+
+    }
+
+    private sealed class InputModel
+    {
+        [Required]
+        [EmailAddress]
+        public string Email { get; set; } = "";
+    }
+
+}

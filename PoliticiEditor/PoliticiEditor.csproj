@@ -24,4 +24,12 @@
       <ProjectReference Include="..\Repositories\Repositories.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <_ContentIncludedByDefault Remove="Components\Pages\Account\AccessDenied.razor" />
+      <_ContentIncludedByDefault Remove="Components\Pages\Account\Login.razor" />
+      <_ContentIncludedByDefault Remove="Components\Pages\Account\LoginCallback.razor" />
+      <_ContentIncludedByDefault Remove="Components\Pages\Account\RedirectToLogin.razor" />
+      <_ContentIncludedByDefault Remove="Components\Pages\Account\StatusMessage.razor" />
+    </ItemGroup>
+
 </Project>
