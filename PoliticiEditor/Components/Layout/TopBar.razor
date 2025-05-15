@@ -4,31 +4,32 @@
 
 <nav class="navbar navbar-expand-lg navbar-light bg-light">
     <div class="container-fluid">
-        <a class="navbar-brand" href="#">Navbar</a>
+        <a class="navbar-brand" href="/">B-R-A-N-D</a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
         @if (IsAuthenticated)
         {
-            <div class="navbar-nav">
-                <a class="nav-link active" aria-current="page" href="/">Home</a>
-                <a class="nav-link" href="/EditPhoto">Foto</a>
-                <a class="nav-link" href="/EditPerson">Osobní údaje</a>
-                <a class="nav-link" href="/EditParty">Politická strana</a>
-                <a class="nav-link" href="/EditSocial">Sociální sítě</a>
-                <a class="nav-link" href="/EditContacts">Kontakt</a>
-                <a class="nav-link" href="/EditSalaries">Platy</a>
+            <div class="navbar-nav me-auto">
+                <NavLink class="nav-link text-primary" href="/EditPhoto">Foto</NavLink>
+                <NavLink class="nav-link text-primary" href="/EditPerson">Osobní údaje</NavLink>
+                <NavLink class="nav-link text-primary" href="/EditParty">Politická strana</NavLink>
+                <NavLink class="nav-link text-primary" href="/EditSocial">Sociální sítě</NavLink>
+                <NavLink class="nav-link text-primary" href="/EditContacts">Kontakt</NavLink>
+                <NavLink class="nav-link text-primary" href="/EditSalaries">Platy</NavLink>
             </div>
-            <span class="navbar-text">
-                Přihlášen jako: @LoggedInNameId
-            </span>
-            <Logout/>
+            <div class="d-flex">
+                <span class="navbar-text me-3">
+                    Přihlášen jako: @LoggedInNameId
+                </span>
+                <Logout/>
+            </div>
         }
         else
         {
             <span class="navbar-text">
-                Je potřeba se nejprve přihlásit
+                Pro editaci je potřeba se nejprve přihlásit.
             </span>
         }
         </div>

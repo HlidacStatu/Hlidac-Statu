@@ -1,7 +1,7 @@
 @using Microsoft.AspNetCore.Authentication
 @using Microsoft.AspNetCore.Authentication.Cookies
 
-<button class="btn btn-outline-primary" @onclick="RemoveCookie">Odhlásit</button>
+<button class="btn btn-sm btn-outline-primary" @onclick="RemoveCookie">Odhlásit</button>
 
 @code {
     [Inject] private NavigationManager Navigation { get; set; }
