@@ -42,7 +42,7 @@
         var principal = new ClaimsPrincipal(identity);
         
         await HttpContextAccessor.HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal);
-        RedirectManager.RedirectTo($"/Politik/{user.NameId}");
+        RedirectManager.RedirectTo($"/");
 
     }
 

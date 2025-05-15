@@ -1,10 +1,12 @@
 using HlidacStatu.Entities;
 using HlidacStatu.LibCore.Extensions;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.EntityFrameworkCore;
 using PoliticiEditor.Components;
 using PoliticiEditor.Components.Account;
 using PoliticiEditor.Components.Autocomplete;
+using PoliticiEditor.Components.Toasts;
 using PoliticiEditor.Data;
 using Serilog;
 
@@ -21,6 +23,7 @@ var logger = Log.ForContext<Program>();
 // custom services
 builder.Services.AddHttpClient();
 builder.Services.AddSingleton<AutocompleteService>();
+builder.Services.AddSingleton<ToastService>();
 
 string connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ??
                           throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
@@ -69,8 +72,16 @@ app.UseHttpsRedirection();
 
 app.UseStaticFiles();
 app.UseAntiforgery();
+//app.UseAuthentication();
+//app.UseAuthorization();
 
 app.MapRazorComponents<App>()
     .AddInteractiveServerRenderMode();
+
+app.MapPost("/account/logoutp", async (HttpContext context) =>
+{
+    await context.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+    return Results.Ok();
+});
 
 app.Run();

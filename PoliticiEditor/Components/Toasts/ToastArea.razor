@@ -1,0 +1,36 @@
+@inject ToastService Toaster
+@implements IDisposable
+@rendermode InteractiveServer
+
+<div aria-live="polite" aria-atomic="true" class="position-relative">
+    <!-- Position it: -->
+    <!-- - `.toast-container` for spacing between toasts -->
+    <!-- - `.position-absolute`, `top-0` & `end-0` to position the toasts in the upper right corner -->
+    <!-- - `.p-3` to prevent the toasts from sticking to the edge of the container  -->
+    <div class="toast-container position-absolute top-0 end-0 p-3">
+
+        @foreach (var message in Toaster.GetVisibleMessages())
+        {
+            <Toast @key="message" Message="message" />
+        }
+    </div>
+</div>
+
+@code {
+    
+    protected override void OnInitialized()
+    {
+        Toaster.OnMessagesChange += Refresh;
+    }
+
+    private void Refresh()
+    {
+        InvokeAsync(StateHasChanged);
+    }
+
+    public void Dispose()
+    {
+        Toaster.OnMessagesChange -= Refresh;
+    }
+    
+}

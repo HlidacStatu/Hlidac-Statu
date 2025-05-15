@@ -1,15 +1,36 @@
+﻿@page "/Account/Logout"
+
 @using Microsoft.AspNetCore.Authentication
 @using Microsoft.AspNetCore.Authentication.Cookies
 
-<button class="btn btn-sm btn-outline-primary" @onclick="RemoveCookie">Odhlásit</button>
+@inject IdentityRedirectManager RedirectManager
+@inject IHttpContextAccessor HttpContextAccessor
+
+<PageTitle>Odhlášení</PageTitle>
+
+@if (IsLoggedOff)
+{
+    <h1>Byli jste úspěšně odhlášeni</h1>
+
+    <p>Chcete-li se opět přihlásit, přihlašte se <a href="/">na hlavní stránce</a>.</p>
+}
+else
+{
+    <p>Odhlašuji...</p>
+}
+
 
 @code {
-    [Inject] private NavigationManager Navigation { get; set; }
-    [Inject] private IHttpContextAccessor HttpContextAccessor { get; set; }
 
-    private async Task RemoveCookie()
+    private bool IsLoggedOff { get; set; } = false;
+    
+    protected override async Task OnParametersSetAsync()
     {
-        await HttpContextAccessor.HttpContext!.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
-        Navigation.NavigateTo("/", forceLoad: true);
+        IsLoggedOff = false;
+        await HttpContextAccessor.HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+        IsLoggedOff = true;
+        
+        RedirectManager.RedirectTo("/");
     }
+
 }
