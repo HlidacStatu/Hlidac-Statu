@@ -1,33 +1,58 @@
-﻿@page "/Account/Login"
-
-@using System.ComponentModel.DataAnnotations
+﻿@using System.ComponentModel.DataAnnotations
 @using System.Net
 @using Microsoft.EntityFrameworkCore
 @using PoliticiEditor.Data
 
 @inject PoliticiLoginsDbContext DbContext
 
-
-<PageTitle>Log in</PageTitle>
-
-<h1>Přihlášení</h1>
+<h2>Přihlášení</h2>
+<p>Pro pokračování je potřeba se nejprve přihlásit</p>
 <div class="row">
     <div class="col-md-4">
         <section>
-            <StatusMessage Message="@errorMessage"/>
-            <EditForm Model="Input" method="post" OnValidSubmit="LoginUser" FormName="login">
+            <StatusMessage Message="@statusMessage"/>
+            <EditForm EditContext="editContext" method="post" OnValidSubmit="LoginUser" FormName="login">
                 <DataAnnotationsValidator/>
-                <h2>Use a local account to log in.</h2>
+                <h3>Zadejte svůj email, kam Vám zašleme odkaz pro přihlášení</h3>
                 <hr/>
                 <ValidationSummary class="text-danger" role="alert"/>
                 <div class="mb-3">
-                    <InputText @bind-Value="Input.Email" class="form-control" autocomplete="username" aria-required="true" placeholder="name@example.com"/>
+                    <InputText @bind-Value="Input.Email" id="email" class="form-control" autocomplete="username" aria-required="true" placeholder="jmeno@domena.cz"/>
                     <label for="email" class="form-label">Email</label>
                     <ValidationMessage For="() => Input.Email" class="text-danger"/>
                 </div>
                 <div>
-                    <button type="submit" class="w-100 btn btn-lg btn-primary">Log in</button>
+                    <button type="submit" class="w-100 btn btn-lg btn-primary">Přihlásit</button>
                 </div>
+                @if (ShowRegistration)
+                {
+                    <h3>Zadaný email jsme nenalezli mezi zaregistrovanými</h3>
+                    <p>Vyplněním položek níže se můžete zaregistrovat.</p>
+                    <div class="mb-3">
+                        <InputText @bind-Value="Input.Name" class="form-control" id="name" aria-required="true" placeholder="Adam"/>
+                        <label for="name" class="form-label">Jméno</label>
+                        <ValidationMessage For="() => Input.Name" class="text-danger"/>
+                    </div>
+                    <div class="mb-3">
+                        <InputText @bind-Value="Input.Surname" class="form-control" id="surname" aria-required="true" placeholder="Novák"/>
+                        <label for="surname" class="form-label">Příjmení</label>
+                        <ValidationMessage For="() => Input.Surname" class="text-danger"/>
+                    </div>
+                    <div class="mb-3">
+                        <InputText @bind-Value="Input.BirthYearOrDate" class="form-control" id="dob" aria-required="true" placeholder="1.1.1999"/>
+                        <label for="dob" class="form-label">Datum nebo rok narození <small>(datum narození nezveřejňujeme, pouze používáme pro jednoznačnou identifikaci)</small></label>
+                        <ValidationMessage For="() => Input.BirthYearOrDate" class="text-danger"/>
+                    </div>
+                    <div class="mb-3">
+                        <InputText @bind-Value="Input.RegistrationInfo" class="form-control" id="reginfo" aria-required="true"/>
+                        <label for="reginfo" class="form-label">Odkaz, kde můžeme ověřit email</label>
+                        <ValidationMessage For="() => Input.RegistrationInfo" class="text-danger"/>
+                    </div>
+                    <div>
+                        <button type="button" class="w-100 btn btn-lg btn-primary" @onclick="RegisterAsync">Registrovat</button>
+                    </div>
+                    
+                }
             </EditForm>
         </section>
     </div>
@@ -39,7 +64,7 @@
 </div>
 
 @code {
-    private string? errorMessage;
+    private string? statusMessage;
 
     [CascadingParameter]
     private HttpContext HttpContext { get; set; } = default!;
@@ -47,13 +72,23 @@
     [SupplyParameterFromForm]
     private InputModel Input { get; set; } = new();
 
+    private bool ShowRegistration { get; set; } = false;
+    
     private string _loginToken;
 
+    private EditContext editContext;
+    private ValidationMessageStore messageStore;
+    protected override void OnInitialized()
+    {
+        editContext = new EditContext(Input);
+        messageStore = new ValidationMessageStore(editContext);
+    }
+    
     public async Task LoginUser()
     {
         if (string.IsNullOrWhiteSpace(Input.Email))
         {
-            errorMessage = "Email nebyl vyplněn.";
+            statusMessage = "Email nebyl vyplněn.";
             return;
         }
 
@@ -62,9 +97,11 @@
 
         if (user is null)
         {
-            errorMessage = "Email nebyl nalezen. Kontaktujte podporu";
+            statusMessage = "Email nebyl nalezen. Můžete zkusit jiný email, nebo se zaregistrovat";
+            ShowRegistration = true;
             return;
         }
+        ShowRegistration = false;
         
         var loginToken = LoginToken.CreateTokenForUser(user.Id);
 
@@ -73,6 +110,8 @@
 
         //todo: poslat mailem, 
         _loginToken = $"https://localhost:7174/Account/Login-Callback/{WebUtility.UrlEncode(loginToken.Token)}";
+        
+        statusMessage = "Na vaší emailovou adresu byl odeslán email s přihlašovacímmi údaji.";
 
     }
 
@@ -81,6 +120,75 @@
         [Required]
         [EmailAddress]
         public string Email { get; set; } = "";
+        
+        public string Name { get; set; } = "";
+        public string Surname { get; set; } = "";
+        public string BirthYearOrDate { get; set; } = "";
+        
+        public string RegistrationInfo { get; set; } = "";
+    }
+
+    private async Task RegisterAsync()
+    {
+        messageStore.Clear();
+        editContext.NotifyValidationStateChanged();
+
+        bool hasError = false;
+
+        if (string.IsNullOrWhiteSpace(Input.Name))
+        {
+            messageStore.Add(() => Input.Name, "Vyplňte prosím jméno.");
+            hasError = true;
+        }
+
+        if (string.IsNullOrWhiteSpace(Input.Surname))
+        {
+            messageStore.Add(() => Input.Surname, "Vyplňte prosím příjmení.");
+            hasError = true;
+        }
+
+        if (string.IsNullOrWhiteSpace(Input.BirthYearOrDate))
+        {
+            messageStore.Add(() => Input.BirthYearOrDate, "Vyplňte prosím datum nebo rok narození.");
+            hasError = true;
+        }
+
+        if (string.IsNullOrWhiteSpace(Input.RegistrationInfo))
+        {
+            messageStore.Add(() => Input.RegistrationInfo, "Vyplňte prosím registrační informaci.");
+            hasError = true;
+        }
+
+        if (string.IsNullOrWhiteSpace(Input.Email) || !new EmailAddressAttribute().IsValid(Input.Email))
+        {
+            messageStore.Add(() => Input.Email, "Neplatný email.");
+            hasError = true;
+        }
+
+        if (hasError)
+        {
+            editContext.NotifyValidationStateChanged();
+            return;
+        }
+
+        throw new NotImplementedException("not implemented further");
+
+        // // Passed all checks - continue registration
+        // var newUser = new PoliticiEditorUser
+        // {
+        //     Name = Input.Name.Trim(),
+        //     Surname = Input.Surname.Trim(),
+        //     Email = Input.Email.Trim(),
+        //     EmailUpper = Input.Email.Trim().ToUpperInvariant(),
+        //     BirthYearOrDate = Input.BirthYearOrDate.Trim(),
+        //     RegistrationInfo = Input.RegistrationInfo.Trim(),
+        // };
+        //
+        // DbContext.PoliticiEditorUsers.Add(newUser);
+        // await DbContext.SaveChangesAsync();
+
+        statusMessage = "Registrace úspěšná. Zkontrolujte email.";
+        ShowRegistration = false;
     }
 
 }

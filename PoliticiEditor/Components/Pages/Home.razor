@@ -1,63 +1,52 @@
 ﻿@page "/"
-@using HlidacStatu.DS.Api
-@using PoliticiEditor.Components.Autocomplete
-@inject AutocompleteService AutocompleteService
-@inject NavigationManager Navigation
+@using System.Security.Claims
+@using PoliticiEditor.Components.Account
+
+@inject UserHelper UserHelper
+
 @rendermode InteractiveServer
 
 <PageTitle>Výtejte v administraci politiků</PageTitle>
 
 <h1>Na těchto stránkách můžete editovat informace o sobě</h1>
 
-
-<p>Co lze:</p>
-<ul>
-    <li>Změnit osobní údaje - tituly</li>
-    <li>Nahrát svoji fotku - pokud se vám nelíbí foto, které jsme pro vás vybrali</li>
-    <li>Doplnit důležité informace o příjmech</li>
-</ul>
-
-<p>Protože nejste přihlášen, můžete se nejprve dohledat pomocí našeptávání</p>
-
-<HlidacAutocomplete 
-    SearchFuncAsync="@((s, token) => OnSearch(s, token))"
-    OnAutocompleteItemSelected="@(item => Navigate(item))"
-    TextSelector="@((autocomplete) => autocomplete.Text)"
-    TItem="Autocomplete">
-    <ItemTemplate>
-        <div>
-            <h6>@context.Text</h6>
-            <small>@context.Description</small>
-        </div>
-    </ItemTemplate>
-</HlidacAutocomplete>
-
+@if (User is null || User.Identity?.IsAuthenticated == false)
+{
+    <Login/>
+}
+else
+{
+    <h2>Co byste chtěli upravit o sobě</h2>
+    <ul>
+        <li>
+            <a class="btn btn-primary" href="/EditPhoto">Změnit svou fotografii</a>
+        </li>
+        <li>
+            <a class="btn btn-primary" href="/EditPerson">Změnit některé své osobní údaje</a>
+        </li>
+        <li>
+            <a class="btn btn-primary" href="/EditParty">Přidat/opravit působení v politických stranách</a>
+        </li>
+        <li>
+            <a class="btn btn-primary" href="/EditSocial">Upravit odkazy na sociální sítě</a>
+        </li>
+        <li>
+            <a class="btn btn-primary" href="/EditContacts">Upravit kontaktní údaje</a>
+        </li>
+        <li>
+            <a class="btn btn-primary" href="/EditSalaries">Přidat informaci o platu</a>
+        </li>
+    </ul>
+}
 
 
 @code {
-    private async Task<List<Autocomplete>> OnSearch(string query, CancellationToken cancellationToken)
+
+    private ClaimsPrincipal? User { get; set; } 
+
+    protected override async Task OnInitializedAsync()
     {
-        var result = await AutocompleteService.FindPerson(query, cancellationToken);
-        return result;
-    }
-
-
-    private void Navigate(Autocomplete item)
-    {
-        //$"osobaid:{o.NameId}",
-        if (string.IsNullOrWhiteSpace(item.Id) || item.Id.Contains("osobaid") == false)
-        {
-            return;
-        }
-
-        if (item.Id.Contains("osobaid:", StringComparison.InvariantCultureIgnoreCase))
-        {
-            var nameId = item.Id.Substring(8);
-            
-            Navigation.NavigateTo($"/politik/{nameId}");
-            
-        }
-
+        User = await UserHelper.GetCurrentUserAsync();
     }
 
 }

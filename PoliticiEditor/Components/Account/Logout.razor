@@ -1,0 +1,15 @@
+@using Microsoft.AspNetCore.Authentication
+@using Microsoft.AspNetCore.Authentication.Cookies
+
+<button class="btn btn-outline-primary" @onclick="RemoveCookie">Odhlásit</button>
+
+@code {
+    [Inject] private NavigationManager Navigation { get; set; }
+    [Inject] private IHttpContextAccessor HttpContextAccessor { get; set; }
+
+    private async Task RemoveCookie()
+    {
+        await HttpContextAccessor.HttpContext!.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+        Navigation.NavigateTo("/", forceLoad: true);
+    }
+}

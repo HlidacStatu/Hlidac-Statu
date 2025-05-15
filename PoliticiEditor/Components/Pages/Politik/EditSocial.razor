@@ -1,18 +1,22 @@
-﻿@using System.Security.Claims
+﻿@page "/EditSocial"
+
+@using System.Security.Claims
 @using HlidacStatu.Entities
 @using HlidacStatu.Repositories
 @using HlidacStatu.Repositories.Auditing
+@using Microsoft.AspNetCore.Authorization
 @using Microsoft.EntityFrameworkCore
 @using PoliticiEditor.Components.Account
 
-@inject UserHelper UserHelper
-
 @implements IAsyncDisposable
 
+@inject UserHelper UserHelper
+
+@attribute [Authorize]
 
 <div class="card mb-3">
     <h5 class="card-header">Sociální sítě</h5>
-    
+
     <div class="card-body">
         <div class="mx-auto">
             <div class="mb-3">
@@ -87,7 +91,7 @@
             </div>
         </div>
     </div>
-    
+
     <div class="card-footer text-body-secondary">
         <button class="btn btn-success" @onclick="@(Save)">Uložit změny</button>
         <button class="btn btn-warning" @onclick="@(Cancel)">Zrušit změny</button>
@@ -95,17 +99,34 @@
 
 </div>
 
+
+
+
 @code
 {
-    [Parameter]
-    public int OsobaId { get; set; }
+    private Osoba? Osoba { get; set; }
 
     private List<OsobaEvent> SocialNetworks { get; set; } = new();
-    
+
     private DbEntities? _db = new();
-    
+
     private ClaimsPrincipal User { get; set; }
 
+    protected override async Task OnInitializedAsync()
+    {
+        User = await UserHelper.GetCurrentUserAsync();
+        var nameId = User.GetNameId();
+        Osoba = OsobaRepo.GetByNameId(nameId);
+        if (Osoba is null)
+        {
+            throw new Exception("Osobu nejde najít");
+        }
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        await RefreshContextAsync();
+    }
 
     private string GetSocialNetwork(string networkName)
     {
@@ -121,7 +142,7 @@
     private void SetSocialNetwork(string networkName, string value)
     {
         var socialNetwork = SocialNetworks
-            .FirstOrDefault(sn => sn.Organizace?.Equals(networkName, StringComparison.InvariantCultureIgnoreCase) == true, 
+            .FirstOrDefault(sn => sn.Organizace?.Equals(networkName, StringComparison.InvariantCultureIgnoreCase) == true,
                 CreateNewSocialNetwork(networkName));
 
         socialNetwork.AddInfo = value;
@@ -131,7 +152,7 @@
     {
         OsobaEvent newEvent = new OsobaEvent()
         {
-            OsobaId = OsobaId,
+            OsobaId = Osoba.InternalId,
             Type = (int)OsobaEvent.Types.SocialniSite,
             Organizace = networkName
         };
@@ -140,30 +161,21 @@
         {
             _db.OsobaEvent.Add(newEvent);
         }
+
         return newEvent;
     }
 
-    protected override async Task OnInitializedAsync()
-    {
-        User = await UserHelper.GetCurrentUserAsync();
-    }
-
-    protected override async Task OnParametersSetAsync()
-    {
-        await RefreshContextAsync();
-    }
-    
     private async Task RefreshContextAsync()
     {
         if (_db is not null)
             await _db.DisposeAsync();
 
         _db = new DbEntities();
-        
-        SocialNetworks = await OsobaEventRepo.GetByOsobaIdTracked(_db, OsobaId, x => x.Type == (int)OsobaEvent.Types.SocialniSite)
+
+        SocialNetworks = await OsobaEventRepo.GetByOsobaIdTracked(_db, Osoba.InternalId, x => x.Type == (int)OsobaEvent.Types.SocialniSite)
             .ToListAsync();
     }
-    
+
     public async ValueTask DisposeAsync()
     {
         if (_db is not null)
@@ -175,10 +187,10 @@
     private async Task Save()
     {
         //todo: this should be probably created after db.save? So we get prop. Ids?
-        var auditLogs = ChangeTracker.CreateAuditLogs(_db, UserHelper.GetNameId(User));
+        var auditLogs = ChangeTracker.CreateAuditLogs(_db, User.GetNameId());
         await _db.SaveChangesAsync();
         await ChangeTracker.SaveAuditLogAsync(auditLogs);
-        
+
         await RefreshContextAsync();
     }
 

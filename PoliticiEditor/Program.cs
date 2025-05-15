@@ -47,7 +47,7 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
         options.Cookie.HttpOnly = true; // 🔥 cookie not accessible to JavaScript
         options.Cookie.SameSite = SameSiteMode.Strict; // (optional) protects against CSRF better
         options.Cookie.Name = "PoliticiAuth";
-        options.LoginPath = "/Account/Login";
+        options.LoginPath = "/";
         options.LogoutPath = "/Account/Logout"; // (optional) if you have logout there
     });
 

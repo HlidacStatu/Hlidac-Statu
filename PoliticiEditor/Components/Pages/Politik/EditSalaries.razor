@@ -1,12 +1,17 @@
-﻿@using System.Security.Claims
+﻿@page "/EditSalaries"
+
+@using System.Security.Claims
 @using HlidacStatu.Entities
 @using HlidacStatu.Repositories.Auditing
+@using Microsoft.AspNetCore.Authorization
 @using Microsoft.EntityFrameworkCore
 @using PoliticiEditor.Components.Account
 
+@implements IAsyncDisposable
+
 @inject UserHelper UserHelper
 
-@implements IAsyncDisposable
+@attribute [Authorize]
 
 <div class="card mb-3">
     <h5 class="card-header">Přidat příjem</h5>
@@ -109,8 +114,7 @@
 
 @code
 {
-    [Parameter]
-    public string NameId { get; set; }
+    private string? NameId { get; set; }
 
     private ClaimsPrincipal User { get; set; }
     private DbEntities? _db = new();
@@ -129,6 +133,11 @@
     protected override async Task OnInitializedAsync()
     {
         User = await UserHelper.GetCurrentUserAsync();
+        NameId = User.GetNameId();
+        if (NameId is null)
+        {
+            throw new Exception("Osobu nejde najít");
+        }
     }
 
     private async Task RefreshContextAsync()
@@ -169,7 +178,7 @@
         
         //todo: udělat kontroly jestli jsou data ok (např. jestli se neposílají pitomosti)
         
-        var auditLogs = ChangeTracker.CreateAuditLogs(_db, UserHelper.GetNameId(User));
+        var auditLogs = ChangeTracker.CreateAuditLogs(_db, User.GetNameId());
         await _db.SaveChangesAsync();
         await ChangeTracker.SaveAuditLogAsync(auditLogs); //this needs to be called after db changes are made
 

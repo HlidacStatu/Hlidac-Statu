@@ -6,14 +6,16 @@ namespace PoliticiEditor.Components.Account;
 
 internal sealed class UserHelper(AuthenticationStateProvider authenticationStateProvider)
 {
-    
     public async Task<ClaimsPrincipal> GetCurrentUserAsync()
     {
         var authState = await authenticationStateProvider.GetAuthenticationStateAsync();
         return authState.User;
     }
+}
 
-    public List<Claim> CreateClaims(PoliticiEditorUser user)
+internal static class UserExtensions
+{
+    public static List<Claim> CreateClaims(this PoliticiEditorUser user)
     {
         return
         [
@@ -22,21 +24,20 @@ internal sealed class UserHelper(AuthenticationStateProvider authenticationState
             new(ClaimTypes.Name, user.Name ?? ""),
         ];
     }
-
-    public string? GetNameId(ClaimsPrincipal user)
+    
+    public static string? GetNameId(this ClaimsPrincipal user)
     {
         return user.FindFirstValue(ClaimTypes.NameIdentifier);
     }
     
-    public string? GetEmail(ClaimsPrincipal user)
+    public static string? GetEmail(this ClaimsPrincipal user)
     {
         return user.FindFirstValue(ClaimTypes.Email);
     }
     
-    public string? GetName(ClaimsPrincipal user)
+    public static string? GetName(this ClaimsPrincipal user)
     {
         return user.FindFirstValue(ClaimTypes.Name);
     }
-
-   
+    
 }

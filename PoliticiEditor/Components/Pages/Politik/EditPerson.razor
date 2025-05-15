@@ -1,13 +1,17 @@
-﻿@using System.Security.Claims
+﻿@page "/EditPerson"
+
+@using System.Security.Claims
 @using HlidacStatu.Entities
 @using HlidacStatu.Repositories
 @using HlidacStatu.Repositories.Auditing
+@using Microsoft.AspNetCore.Authorization
 @using PoliticiEditor.Components.Account
-
-@inject UserHelper UserHelper
 
 @implements IAsyncDisposable
 
+@inject UserHelper UserHelper
+
+@attribute [Authorize]
 
 <div class="card mb-3">
     <h5 class="card-header">@Osoba.NameId</h5>
@@ -19,7 +23,7 @@
             <div class="col-sm-9 col-xl-10">
                 <div class="mx-auto">
                     <div class="mb-3">
-                        <label for="titulPred">Titul před jménem</label>
+                        <label for="titulPred">Titul(y) před jménem oddělené čárkou</label>
                         <input type="text" id="titulPred"
                                class="@(EditModeInputClass)"
                                @bind="@Osoba.TitulPred"/>
@@ -27,36 +31,28 @@
                 </div>
                 <div class="mx-auto">
                     <div class="mb-3">
-                        <label for="jmeno">Jméno</label>
-                        <input type="text" id="jmeno"
-                               class="@(ReadModeInputClass)"
-                               readonly
-                               value="@Osoba.Jmeno"/>
-                    </div>
-                </div>
-                <div class="mx-auto">
-                    <div class="mb-3">
-                        <label for="prijmeni">Příjmení</label>
-                        <input type="text" id="prijmeni"
-                               class="@(ReadModeInputClass)"
-                               readonly
-                               value="@Osoba.Prijmeni"/>
-                    </div>
-                </div>
-                <div class="mx-auto">
-                    <div class="mb-3">
-                        <label for="titulZa">Titul za jménem</label>
+                        <label for="titulZa">Titul(y) za jménem oddělené čárkou</label>
                         <input type="text" id="titulZa"
                                class="@(EditModeInputClass)"
                                @bind="@Osoba.TitulPo"/>
                     </div>
                 </div>
+                @if (Osoba.Narozeni is null)
+                {
+                    <div class="mx-auto">
+                        <div class="mb-3">
+                            <label for="narozeni">Datum narození</label>
+                            <input type="date" id="narozeni"
+                                   class="@(EditModeInputClass)"
+                                   @bind="@Osoba.Narozeni"/>
+                        </div>
+                    </div>
+                }
             </div>
         </div>
     </div>
 
     <div class="card-footer text-body-secondary">
-        <PhotoEditDialog osoba="Osoba"/>
         <button class="btn btn-success" @onclick="@(Save)">Uložit změny</button>
         <button class="btn btn-warning" @onclick="@(Cancel)">Zrušit změny</button>
     </div>
@@ -64,16 +60,12 @@
 
 @code
 {
-    [Parameter]
-    public int OsobaId { get; set; }
-
     private Osoba? Osoba { get; set; }
 
     private DbEntities? _db = new();
 
     private ClaimsPrincipal User { get; set; }
 
-    const string ReadModeInputClass = "form-control-plaintext";
     const string EditModeInputClass = "form-control";
 
     protected override async Task OnInitializedAsync()
@@ -93,7 +85,12 @@
 
         _db = new DbEntities();
 
-        Osoba = OsobaRepo.GetByInternalIdTracked(_db, OsobaId);
+        var nameId = User.GetNameId();
+        Osoba = OsobaRepo.GetByNameIdTracked(_db, nameId);
+        if (Osoba is null)
+        {
+            throw new Exception("Osobu nejde najít");
+        }
     }
 
     public async ValueTask DisposeAsync()
@@ -107,9 +104,9 @@
     private async Task Save()
     {
         //todo: this should be probably created after db.save? So we get prop. Ids?
-        var auditLogs = ChangeTracker.CreateAuditLogs(_db, UserHelper.GetNameId(User));
+        var auditLogs = ChangeTracker.CreateAuditLogs(_db, User.GetNameId());
 
-        await _db.SaveChangesAsync();
+        await _db!.SaveChangesAsync();
 
         await ChangeTracker.SaveAuditLogAsync(auditLogs);
         await RefreshContextAsync();

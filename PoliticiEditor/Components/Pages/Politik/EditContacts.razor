@@ -1,51 +1,28 @@
-﻿@using System.Security.Claims
+﻿@page "/EditContacts"
+
+@using System.Security.Claims
 @using HlidacStatu.Entities
 @using HlidacStatu.Repositories
 @using HlidacStatu.Repositories.Auditing
+@using Microsoft.AspNetCore.Authorization
 @using PoliticiEditor.Components.Account
+
+@implements IAsyncDisposable
 
 @inject UserHelper UserHelper
 
-@implements IAsyncDisposable
+@attribute [Authorize]
 
 <div class="card mb-3">
     <h5 class="card-header">Kontakty</h5>
     <div class="card-body">
         <div class="mx-auto">
-            @foreach (var politicalParty in PoliticalParties)
-            {
-                <div class="row mb-3">
-                    <div class="col-3">
-                        <label for="polStrana">Politická strana</label>
-                        <input type="text" id="polStrana"
-                               class="form-control"
-                               @bind="@politicalParty.Organizace"/>
-                    </div>
-                    <div class="col-3">
-                        <label for="datefrom">Datum působení od</label>
-                        <input type="date" id="datefrom"
-                               class="form-control"
-                               @bind="@politicalParty.DatumOd"/>
-                    </div>
-                    <div class="col-3">
-                        <label for="dateto">Datum působení do</label>
-                        <input type="date" id="dateto"
-                               class="form-control"
-                               @bind="@politicalParty.DatumDo"/>
-                    </div>
-                    <div class="col-3">
-                        <label for="funkce">Funkce v politické straně</label>
-                        <input type="text" id="funkce"
-                               class="form-control"
-                               @bind="@politicalParty.AddInfo"/>
-                    </div>
-                </div>
-            }
+            <p>TODO TODO TODO</p>
         </div>
     </div>
     
     <div class="card-footer text-body-secondary">
-        <button class="btn btn-primary" @onclick="@(AddPartyAffiliation)">Přidat působení ve straně</button>
+        
         <button class="btn btn-success" @onclick="@(Save)">Uložit změny</button>
         <button class="btn btn-warning" @onclick="@(Cancel)">Zrušit změny</button>
     </div>
@@ -111,7 +88,7 @@
     private async Task Save()
     {
         //todo: this should be probably created after db.save? So we get prop. Ids?
-        var auditLogs = ChangeTracker.CreateAuditLogs(_db, UserHelper.GetNameId(User));
+        var auditLogs = ChangeTracker.CreateAuditLogs(_db, User.GetNameId());
         
         await _db.SaveChangesAsync();
         

@@ -8,8 +8,6 @@
 @inject IdentityRedirectManager RedirectManager
 @inject PoliticiLoginsDbContext DbContext
 @inject IHttpContextAccessor HttpContextAccessor
-@inject UserHelper UserHelper
-
 
 @code {
     
@@ -38,7 +36,7 @@
         loginToken.Used = true;
         await DbContext.SaveChangesAsync();
 
-        var claims = UserHelper.CreateClaims(user);
+        var claims = user.CreateClaims();
 
         var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
         var principal = new ClaimsPrincipal(identity);

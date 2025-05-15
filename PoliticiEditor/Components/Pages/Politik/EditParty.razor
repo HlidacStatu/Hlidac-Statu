@@ -1,12 +1,17 @@
-﻿@using System.Security.Claims
+﻿@page "/EditParty"
+
+@using System.Security.Claims
 @using HlidacStatu.Entities
 @using HlidacStatu.Repositories
 @using HlidacStatu.Repositories.Auditing
+@using Microsoft.AspNetCore.Authorization
 @using PoliticiEditor.Components.Account
+
+@implements IAsyncDisposable
 
 @inject UserHelper UserHelper
 
-@implements IAsyncDisposable
+@attribute [Authorize]
 
 <div class="card mb-3">
     <h5 class="card-header">Politické strany</h5>
@@ -54,29 +59,10 @@
 
 @code
 {
-    [Parameter]
-    public int OsobaId { get; set; }
-
+    private Osoba Osoba { get; set; }
     private List<OsobaEvent> PoliticalParties { get; set; } = new();
-    
     private DbEntities? _db = new();
-    
     private ClaimsPrincipal User { get; set; }
-    
-    private void AddPartyAffiliation()
-    {
-        OsobaEvent newEvent = new OsobaEvent()
-        {
-            OsobaId = OsobaId,
-            Type = (int)OsobaEvent.Types.PolitickaStrana
-        };
-        PoliticalParties.Insert(0, newEvent);
-        if (_db is not null)
-        {
-            _db.OsobaEvent.Add(newEvent);
-        }
-    }
-
     protected override async Task OnParametersSetAsync()
     {
         await RefreshContextAsync();
@@ -85,6 +71,26 @@
     protected override async Task OnInitializedAsync()
     {
         User = await UserHelper.GetCurrentUserAsync();
+        var nameId = User.GetNameId();
+        Osoba = OsobaRepo.GetByNameId(nameId);
+        if (Osoba is null)
+        {
+            throw new Exception("Osobu nejde najít");
+        }
+    }
+    
+    private void AddPartyAffiliation()
+    {
+        OsobaEvent newEvent = new OsobaEvent()
+        {
+            OsobaId = Osoba.InternalId,
+            Type = (int)OsobaEvent.Types.PolitickaStrana
+        };
+        PoliticalParties.Insert(0, newEvent);
+        if (_db is not null)
+        {
+            _db.OsobaEvent.Add(newEvent);
+        }
     }
 
     private async Task RefreshContextAsync()
@@ -95,7 +101,7 @@
         _db = new DbEntities();
         
         PoliticalParties = OsobaEventRepo
-            .GetByOsobaIdTracked(_db, OsobaId, x => x.Type == (int)OsobaEvent.Types.PolitickaStrana)
+            .GetByOsobaIdTracked(_db, Osoba.InternalId, x => x.Type == (int)OsobaEvent.Types.PolitickaStrana)
             .OrderBy(p => p.DatumOd).ToList();
     }
     
@@ -109,8 +115,7 @@
 
     private async Task Save()
     {
-        //todo: this should be probably created after db.save? So we get prop. Ids?
-        var auditLogs = ChangeTracker.CreateAuditLogs(_db, UserHelper.GetNameId(User));
+        var auditLogs = ChangeTracker.CreateAuditLogs(_db, User.GetNameId());
         
         await _db.SaveChangesAsync();
         

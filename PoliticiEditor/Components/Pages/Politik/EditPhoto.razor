@@ -1,0 +1,195 @@
+@page "/EditPhoto"
+
+@using System.Security.Claims
+@using HlidacStatu.Entities
+@using HlidacStatu.Repositories
+@using Microsoft.AspNetCore.Authorization
+@using PoliticiEditor.Components.Account
+@using Serilog
+
+@inject UserHelper UserHelper
+
+@attribute [Authorize]
+
+<div class="card mb-3">
+    <h5 class="card-header">Změna fotky</h5>
+    <div class="card-body">
+        @if (!AnyFacesDetected)
+        {
+            <div class="mt-4">
+                <div class="mb-3">
+                    <label for="fromFile" class="form-label">Vyberte soubor s fotografií</label>
+                    <InputFile id="fromFile" class="form-control"
+                               OnChange="@((InputFileChangeEventArgs e) => HandleFileSelected(e))"/>
+                    <div class="ml-3 form-text">Nejlepší je portrét, čím větší fotka, tím lépe.</div>
+                </div>
+                <div class="mb-3">
+                    <label for="zdroj">Zdroj, odkud jsem čerpal informaci</label>
+                    <input type="text" id="zdroj" class="form-control" @bind="@_zdroj"/>
+                </div>
+            </div>
+        }
+        else
+        {
+            foreach (var f in _faces)
+            {
+                <div class="col-xs-6 col-sm-4">
+                    <img style="width:250px;height:auto; border:solid #d0d0d0 1px; margin:5px;"
+                         src="data:image/jpeg;base64,@Convert.ToBase64String(File.ReadAllBytes(f), Base64FormattingOptions.None)">
+                    <br/>
+                    <button type="submit" class="btn btn-success" @onclick="()=>PickPhoto(f)">Toto je
+                        správná/nejlepší fotka
+                    </button>
+                </div>
+            }
+        }
+    </div>
+
+    <div class="card-footer text-body-secondary">
+        @if (!AnyFacesDetected)
+        {
+            <button class="btn btn-success" @onclick="@(Next)">Pokračovat</button>
+        }
+        else
+        {
+            <button cclass="btn btn-secondary" @onclick="@(Cancel)" data-bs-dismiss="modal">Žádná fotka není správná</button>
+        }
+    </div>
+</div>
+
+
+
+@code {
+
+    [Parameter]
+    public Osoba osoba { get; set; }
+
+    private ClaimsPrincipal User { get; set; }
+
+    private ILogger _logger = Log.ForContext<EditPhoto>();
+
+    private string? _zdroj;
+    private byte[]? _fileBytes;
+
+
+    private string[]? _faces;
+    private bool AnyFacesDetected => _faces is not null && _faces.Any();
+
+    protected override async Task OnParametersSetAsync()
+    {
+        User = await UserHelper.GetCurrentUserAsync();
+    }
+
+    private async Task HandleFileSelected(InputFileChangeEventArgs e)
+    {
+        var file = e.File;
+        //var buffer = new byte[file.Size];
+
+        var ms = new MemoryStream();
+        // cca 12 MB max
+        await e.File.OpenReadStream(maxAllowedSize: 13_000_000).CopyToAsync(ms);
+        //_ = await file.OpenReadStream(maxAllowedSize: 13_000_000).ReadAsync(buffer);
+        _fileBytes = ms.ToArray();
+    }
+
+
+    private Task Cancel()
+    {
+        if (AnyFacesDetected)
+        {
+            CleanupPhotoDirectory(_faces.FirstOrDefault());
+        }
+
+        _zdroj = null;
+        _fileBytes = null;
+        _faces = null;
+
+        return Task.CompletedTask;
+    }
+    
+    private async Task Next()
+    {
+        if (string.IsNullOrWhiteSpace(_zdroj))
+        {
+            return;
+        }
+        
+        if (_fileBytes is null || !_fileBytes.Any())
+        {
+            return;
+        }
+
+        try
+        {
+            var path = osoba.GetPhotoPath(Osoba.PhotoTypes.UploadedOriginal, true); //Init.OsobaFotky.GetFullPath(osoba, "original.uploaded.jpg");
+            var pathTxt = osoba.GetPhotoPath(Osoba.PhotoTypes.SourceOfPhoto, true); // Init.OsobaFotky.GetFullPath(osoba, "source.txt");
+            _faces = HlidacStatu.DetectFaces.FromImage.DetectAndParseFacesIntoFiles(_fileBytes, 150, 40).ToArray();
+            if (_fileBytes != null && _faces.Length > 0)
+            {
+                await Task.WhenAll(File.WriteAllTextAsync(pathTxt, _zdroj),
+                    File.WriteAllBytesAsync(path, _fileBytes));
+            }
+        }
+        catch (Exception e)
+        {
+            _logger.Error(e, "Chyba při detekci obličejů.");
+        }
+    }
+
+    private async Task PickPhoto(string path)
+    {
+        if (string.IsNullOrEmpty(path) ||
+            !path.Contains(Path.GetTempPath()) ||
+            !File.Exists(path))
+        {
+            return;
+        }
+
+        try
+        {
+            using Devmasters.Imaging.InMemoryImage imi = new Devmasters.Imaging.InMemoryImage(path);
+
+            imi.Resize(new SixLabors.ImageSharp.Size(300, 300), true, Devmasters.Imaging.InMemoryImage.InterpolationsQuality.High, true);
+            imi.SaveAsJPEG(osoba.GetPhotoPath(Osoba.PhotoTypes.Small, true), 80);
+
+            var noBackGr = await HlidacStatu.AI.Photo.RemoveBackgroundAsync(
+                new Uri(Devmasters.Config.GetWebConfigValue("RemoveBackgroundAPI")),
+                System.IO.File.ReadAllBytes(osoba.GetPhotoPath(Osoba.PhotoTypes.Small)),
+                HlidacStatu.AI.Photo.RemoveBackgroundStyles.Person);
+            if (noBackGr != null)
+                System.IO.File.WriteAllBytes(osoba.GetPhotoPath(Osoba.PhotoTypes.NoBackground, true), noBackGr);
+
+            Devmasters.IO.IOTools.DeleteFile(path);
+        }
+        catch (Exception e)
+        {
+            _logger.Error(e, "Chyba během výběru souboru.");
+            return;
+        }
+
+        CleanupPhotoDirectory(path);
+    }
+
+    private void CleanupPhotoDirectory(string path)
+    {
+        var rootPath = Devmasters.RegexUtil.GetRegexGroupValue(path, @"(?<tempfn>.*)\.\d{1,2}\.faces\.jpg$", "tempfn");
+        if (string.IsNullOrWhiteSpace(rootPath))
+            return;
+
+        try
+        {
+            foreach (var f in Directory.EnumerateFiles(Path.GetDirectoryName(rootPath), Path.GetFileName(rootPath) + ".*"))
+            {
+                Devmasters.IO.IOTools.DeleteFile(f);
+            }
+
+            _faces = Array.Empty<string>();
+        }
+        catch (Exception e)
+        {
+            _logger.Warning(e, $"Při čištění složky {rootPath}, došlo k chybě.");
+            // ignored
+        }
+    }
+
+}

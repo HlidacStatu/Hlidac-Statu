@@ -255,6 +255,16 @@ namespace HlidacStatu.Repositories
                 return osoba?.GetOriginal();
             }
         }
+        
+        public static Osoba GetByNameIdTracked(DbEntities db, string nameId, bool canReturnDuplicate = false)
+        {
+            var osoba = db.Osoba.FirstOrDefault(m => m.NameId == nameId);
+
+            if (canReturnDuplicate)
+                return osoba;
+
+            return osoba.GetOriginalTracked(db);
+        }
 
         public static Osoba GetByInternalId(int id, bool canReturnDuplicate = false)
         {
@@ -270,14 +280,8 @@ namespace HlidacStatu.Repositories
 
             if (canReturnDuplicate)
                 return osoba;
-
-            while (osoba is not null && osoba.Status == (int)Osoba.StatusOsobyEnum.Duplicita)
-            {
-                osoba = db.Osoba.FirstOrDefault(m => m.InternalId == osoba.OriginalId);
-            }
-
-            return osoba;
             
+            return osoba.GetOriginalTracked(db);
         }
 
         private static Osoba GetOriginal(this Osoba osoba)
@@ -287,12 +291,18 @@ namespace HlidacStatu.Repositories
 
             using (DbEntities db = new DbEntities())
             {
-                var originalOsoba = db.Osoba
-                    .AsQueryable()
-                    .FirstOrDefault(o => o.InternalId == osoba.OriginalId);
-
-                return originalOsoba?.GetOriginal();
+                return osoba?.GetOriginalTracked(db);
             }
+        }
+        
+        private static Osoba GetOriginalTracked(this Osoba osoba, DbEntities db)
+        {
+            while (osoba is not null && osoba.Status == (int)Osoba.StatusOsobyEnum.Duplicita)
+            {
+                osoba = db.Osoba.FirstOrDefault(m => m.InternalId == osoba.OriginalId);
+            }
+
+            return osoba;
         }
 
         public static Osoba GetByExternalID(string exId, OsobaExternalId.Source source)
