@@ -94,13 +94,13 @@ namespace HlidacStatu.Repositories.Statistics
                 var xoblastiPocet = xoblasti.Values.Sum(m => m.Pocet);
                 if (xoblastiCelkem > _calc_smlouvy[year].CelkemCena)
                 {
-                    _logger.Error("StatisticsDoubleCheck CelkemCena error Sum of Oblasti.CelkemCena is bigger from year.CelkemCena. oblastSum value:{oblasti_sum_value} > year value:{year_value}    query:{query} year:{year}",
+                    _logger.Warning("StatisticsDoubleCheck CelkemCena error Sum of Oblasti.CelkemCena is bigger from year.CelkemCena. oblastSum value:{oblasti_sum_value} > year value:{year_value}    query:{query} year:{year}",
                         _calc_smlouvy[year].CelkemCena, xoblastiCelkem, query, year);
                     //throw new ArgumentOutOfRangeException("Oblasti Celkem Cena", $"Sum of Oblasti.CelkemCena is diff from year.CelkemCena. year value:{_calc_smlouvy[year].CelkemCena} != oblastSum value:{xoblastiCelkem} query:{query} year:{year}");
                 }
                 if (xoblastiPocet > _calc_smlouvy[year].Pocet)
                 {
-                    _logger.Error("StatisticsDoubleCheck Pocer error Sum of Oblasti.Pocet is bigger from year.Pocet. oblastSum value:{oblasti_sum_value} > year value:{year_value}   query:{query} year:{year}",
+                    _logger.Warning("StatisticsDoubleCheck Pocer error Sum of Oblasti.Pocet is bigger from year.Pocet. oblastSum value:{oblasti_sum_value} > year value:{year_value}   query:{query} year:{year}",
                         _calc_smlouvy[year].Pocet, xoblastiPocet, query, year);
                     //throw new ArgumentOutOfRangeException("Oblasti Celkem Pocet", $"Sum of Oblasti.Pocet is diff from year.Pocet. year value:{_calc_smlouvy[year].Pocet} != oblastSum value:{xoblastiPocet} query:{query} year:{year}");
                 }

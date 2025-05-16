@@ -12,12 +12,12 @@ namespace HlidacStatu.Repositories.Statistics
     public static partial class FirmaStatistics
     {
         private static readonly ILogger _logger = Log.ForContext(typeof(FirmaStatistics));
-
+        private static readonly string _version = "v4a";
 
         static Devmasters.Cache.Redis.Manager<StatisticsSubjectPerYear<Smlouva.Statistics.Data>, (Firma firma, HlidacStatu.DS.Graphs.Relation.AktualnostType aktualnost, int? obor)>
             _holdingSmlouvaCache
             = Devmasters.Cache.Redis.Manager<StatisticsSubjectPerYear<Smlouva.Statistics.Data>, (Firma firma, HlidacStatu.DS.Graphs.Relation.AktualnostType aktualnost, int? obor)>
-                .GetSafeInstance("Holding_SmlouvyStatistics_v4_",
+                .GetSafeInstance($"Holding_SmlouvyStatistics_{_version}_",
                     (obj) => _holdingCalculateStats(obj.firma, obj.aktualnost, obj.obor),
                     TimeSpan.Zero,
                     Devmasters.Config.GetWebConfigValue("RedisServerUrls").Split(';'),
@@ -53,7 +53,7 @@ namespace HlidacStatu.Repositories.Statistics
         static Devmasters.Cache.Redis.ManagerAsync<StatisticsSubjectPerYear<Smlouva.Statistics.Data>, (Firma firma, int? obor)>
             _smlouvaCache
             = Devmasters.Cache.Redis.ManagerAsync<StatisticsSubjectPerYear<Smlouva.Statistics.Data>, (Firma firma, int? obor)>
-                .GetSafeInstance("Firma_SmlouvyStatistics_v4_",
+                .GetSafeInstance($"Firma_SmlouvyStatistics_{_version}_",
                     async (obj) => await _calculateSmlouvyStatsAsync(obj.firma, obj.obor),
                     TimeSpan.Zero,
                     Devmasters.Config.GetWebConfigValue("RedisServerUrls").Split(';'),

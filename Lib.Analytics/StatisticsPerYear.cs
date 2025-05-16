@@ -178,8 +178,10 @@ namespace HlidacStatu.Lib.Analytics
 
         public ChangeInValues ChangeBetweenIntervals(int firstYear, int lastYear, Func<T, decimal> selector)
         {
-            var firstStat = this[firstYear];
+            T firstStat = this[firstYear];
             var lastStat = this[lastYear];
+
+
 
             int yPreStart = firstYear - (lastYear - firstYear) - 1; //start predchoziho obdobi
             int[] prevYears = Enumerable.Range(yPreStart, firstYear - yPreStart).ToArray();

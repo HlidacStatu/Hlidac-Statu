@@ -842,7 +842,7 @@ namespace HlidacStatu.Repositories.Analysis
             {
                 data = m.item.ICO,
                 change = m.change,
-                firstYear = yStart,
+                firstYear = (yStart == yEnd) ? yStart-1 : yStart,
                 lastYear = yEnd,
             })
             .Where(m => m.change.ValueChange > 999_999)
