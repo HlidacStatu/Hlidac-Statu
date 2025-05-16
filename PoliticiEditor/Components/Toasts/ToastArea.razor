@@ -1,6 +1,7 @@
 @inject ToastService Toaster
 @implements IDisposable
-@rendermode InteractiveServer
+@rendermode @(new InteractiveServerRenderMode(prerender: false))
+
 
 <div aria-live="polite" aria-atomic="true" class="position-relative">
     <!-- Position it: -->
