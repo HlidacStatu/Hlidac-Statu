@@ -1,14 +1,19 @@
 ﻿@page "/EditSalaries"
 
 @using System.Security.Claims
+@using HlidacStatu.DS.Api
 @using HlidacStatu.Entities
+@using HlidacStatu.Repositories
 @using HlidacStatu.Repositories.Auditing
 @using Microsoft.AspNetCore.Authorization
 @using Microsoft.EntityFrameworkCore
 @using PoliticiEditor.Components.Account
+@using PoliticiEditor.Components.Autocomplete
+
 
 @implements IAsyncDisposable
 
+@inject AutocompleteService AutocompleteService
 @inject UserHelper UserHelper
 
 @rendermode @(new InteractiveServerRenderMode(prerender: false))
@@ -19,8 +24,19 @@
     <div class="card-body">
         <div>
             <div class="mb-3">
-                <label for="titulPred">Organizace, která platí</label>
-                <orginput/>
+                <label for="Organizace">Organizace, která platí</label>
+                <HlidacAutocomplete SearchFuncAsync="@((s, token) => OnSearch(s, token))"
+                                    OnAutocompleteItemSelected="@(item => FillOrganizace(item))"
+                                    TextSelector="@((autocomplete) => autocomplete.Text)"
+                                    TItem="Autocomplete"
+                                    id="Organizace">
+                    <ItemTemplate>
+                        <div>
+                            <h6>@context.Text</h6>
+                            <small>@context.Description</small>
+                        </div>
+                    </ItemTemplate>
+                </HlidacAutocomplete>
             </div>
             <div class="mb-3">
                 <label for="Rok">Uveďte, za který kalendářní rok vyplňujete příjem</label>
@@ -231,5 +247,78 @@
     }
     
     private bool IsValidYear(int year) => year is > 2000 and < 2200;
+    
+    private async Task<List<Autocomplete>> OnSearch(string query, CancellationToken cancellationToken)
+    {
+        var result = await AutocompleteService.FindCompany(query, cancellationToken);
+        //we need to have company - there is no place for free text here
+        // result.Insert(0, new Autocomplete()
+        // {
+        //     Text = query,
+        //     DisplayText = query
+        // });
+        return result;
+    }
 
+    private async Task FillOrganizace(Autocomplete item)
+    {
+        string? ico = null;
+        if (item.Id?.Contains("ico:") == true)
+        {
+            ico = item.Id.Replace("ico:", "").Trim();
+        }
+
+        if (ico is null)
+            return;
+        
+        var foundFirmy = await _db!.FirmaDs.AsNoTracking()
+            .Where(o => o.Ico == ico).ToListAsync();
+
+        if (foundFirmy is null || !foundFirmy.Any())
+            return;
+
+        int? orgId = null;
+        foreach (var foundFirma in foundFirmy)
+        {
+            var foundPuOrg = await _db!.PuOrganizace.AsNoTracking()
+                .Where(o => o.DS == foundFirma.DatovaSchranka)
+                .FirstOrDefaultAsync();
+
+            if (foundPuOrg is not null)
+            {
+                orgId = foundPuOrg.Id;
+                break;
+            }
+        }
+
+        if (orgId is null)
+        {
+            var firstCompany = foundFirmy.FirstOrDefault();
+            if(firstCompany is null)
+                throw new Exception("Firma nenalezena!");
+            
+            // create new org
+            var newOrganizace = new PuOrganizace()
+            {
+                DS = firstCompany.DatovaSchranka
+            };
+            await PpRepo.UpsertOrganizaceAsync(newOrganizace);
+            orgId = newOrganizace.Id;
+        }
+
+        if (orgId is null)
+        {
+            throw new Exception("id stale nenalezeno");
+        }
+        
+        
+        //try update preloadedOrgs
+        if (!PreloadedOrgs.ContainsKey(orgId.Value))
+        {
+            PreloadedOrgs.Add(orgId.Value, item.Text);
+        }
+
+        NewIncome.IdOrganizace = orgId.Value;
+
+    }
 }

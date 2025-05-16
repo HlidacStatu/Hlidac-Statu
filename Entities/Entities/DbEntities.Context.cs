@@ -278,6 +278,7 @@ namespace HlidacStatu.Entities
         public virtual DbSet<ConfigurationValue> ConfigurationValues { get; set; }
         
         
+        public virtual DbSet<FirmaDs> FirmaDs { get; set; }
         public virtual DbSet<PuOrganizace> PuOrganizace { get; set; }
         public virtual DbSet<PuPlat> PuPlaty { get; set; }
         public virtual DbSet<PpPrijem> PpPrijmy { get; set; }
