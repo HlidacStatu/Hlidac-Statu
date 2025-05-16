@@ -25,6 +25,13 @@ public class AutocompleteService
         return await RunAutocompleteQuery(ctx, autocompletePath);
     }
     
+    public async Task<List<HlidacStatu.DS.Api.Autocomplete>> FindCompany(string q, CancellationToken ctx)
+    {
+        var autocompletePath = $"/autocomplete/autocomplete?q={q}&category=Company StateCompany Authority City";
+
+        return await RunAutocompleteQuery(ctx, autocompletePath);
+    }
+    
 
     private async Task<List<HlidacStatu.DS.Api.Autocomplete>> RunAutocompleteQuery(CancellationToken ctx, string autocompletePath)
     {

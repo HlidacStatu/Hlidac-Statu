@@ -3,7 +3,7 @@
 @using Microsoft.AspNetCore.Authentication
 @using Microsoft.AspNetCore.Authentication.Cookies
 
-@inject IdentityRedirectManager RedirectManager
+@inject NavigationManager NavigationManager
 @inject IHttpContextAccessor HttpContextAccessor
 
 <PageTitle>Odhlášení</PageTitle>
@@ -29,8 +29,7 @@ else
         IsLoggedOff = false;
         await HttpContextAccessor.HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
         IsLoggedOff = true;
-        
-        RedirectManager.RedirectTo("/");
+        NavigationManager.NavigateTo("/", forceLoad: true);
     }
 
 }

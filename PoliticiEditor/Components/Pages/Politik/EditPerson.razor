@@ -10,9 +10,12 @@
 @implements IAsyncDisposable
 
 @inject UserHelper UserHelper
+@inject ToastService Toaster
 
-@rendermode InteractiveServer
+@rendermode @(new InteractiveServerRenderMode(prerender: false))
+
 @attribute [Authorize]
+
 
 <div class="card mb-3">
     <h5 class="card-header">@Osoba.NameId</h5>
@@ -59,19 +62,18 @@
     </div>
 </div>
 
+
 @code
 {
     private Osoba? Osoba { get; set; }
-
     private DbEntities? _db = new();
-
     private ClaimsPrincipal User { get; set; }
-
     const string EditModeInputClass = "form-control";
 
     protected override async Task OnInitializedAsync()
     {
         User = await UserHelper.GetCurrentUserAsync();
+        await RefreshContextAsync();
     }
 
     protected override async Task OnParametersSetAsync()

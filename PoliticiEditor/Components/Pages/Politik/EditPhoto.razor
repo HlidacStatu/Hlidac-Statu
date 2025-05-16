@@ -9,7 +9,7 @@
 
 @inject UserHelper UserHelper
 
-@rendermode InteractiveServer
+@rendermode @(new InteractiveServerRenderMode(prerender: false))
 @attribute [Authorize]
 
 <div class="card mb-3">
@@ -61,24 +61,25 @@
 
 
 @code {
-
-    [Parameter]
-    public Osoba osoba { get; set; }
-
+    
+    private Osoba Osoba { get; set; }
     private ClaimsPrincipal User { get; set; }
-
     private ILogger _logger = Log.ForContext<EditPhoto>();
 
     private string? _zdroj;
     private byte[]? _fileBytes;
-
-
     private string[]? _faces;
     private bool AnyFacesDetected => _faces is not null && _faces.Any();
 
     protected override async Task OnParametersSetAsync()
     {
         User = await UserHelper.GetCurrentUserAsync();
+        var nameId = User.GetNameId();
+        Osoba = OsobaRepo.GetByNameId(nameId);
+        if (Osoba is null)
+        {
+            throw new Exception("Osobu nejde najít");
+        }
     }
 
     private async Task HandleFileSelected(InputFileChangeEventArgs e)
@@ -122,8 +123,8 @@
 
         try
         {
-            var path = osoba.GetPhotoPath(Osoba.PhotoTypes.UploadedOriginal, true); //Init.OsobaFotky.GetFullPath(osoba, "original.uploaded.jpg");
-            var pathTxt = osoba.GetPhotoPath(Osoba.PhotoTypes.SourceOfPhoto, true); // Init.OsobaFotky.GetFullPath(osoba, "source.txt");
+            var path = Osoba.GetPhotoPath(Osoba.PhotoTypes.UploadedOriginal, true); //Init.OsobaFotky.GetFullPath(osoba, "original.uploaded.jpg");
+            var pathTxt = Osoba.GetPhotoPath(Osoba.PhotoTypes.SourceOfPhoto, true); // Init.OsobaFotky.GetFullPath(osoba, "source.txt");
             _faces = HlidacStatu.DetectFaces.FromImage.DetectAndParseFacesIntoFiles(_fileBytes, 150, 40).ToArray();
             if (_fileBytes != null && _faces.Length > 0)
             {
@@ -151,14 +152,14 @@
             using Devmasters.Imaging.InMemoryImage imi = new Devmasters.Imaging.InMemoryImage(path);
 
             imi.Resize(new SixLabors.ImageSharp.Size(300, 300), true, Devmasters.Imaging.InMemoryImage.InterpolationsQuality.High, true);
-            imi.SaveAsJPEG(osoba.GetPhotoPath(Osoba.PhotoTypes.Small, true), 80);
+            imi.SaveAsJPEG(Osoba.GetPhotoPath(Osoba.PhotoTypes.Small, true), 80);
 
             var noBackGr = await HlidacStatu.AI.Photo.RemoveBackgroundAsync(
                 new Uri(Devmasters.Config.GetWebConfigValue("RemoveBackgroundAPI")),
-                System.IO.File.ReadAllBytes(osoba.GetPhotoPath(Osoba.PhotoTypes.Small)),
+                System.IO.File.ReadAllBytes(Osoba.GetPhotoPath(Osoba.PhotoTypes.Small)),
                 HlidacStatu.AI.Photo.RemoveBackgroundStyles.Person);
             if (noBackGr != null)
-                System.IO.File.WriteAllBytes(osoba.GetPhotoPath(Osoba.PhotoTypes.NoBackground, true), noBackGr);
+                System.IO.File.WriteAllBytes(Osoba.GetPhotoPath(Osoba.PhotoTypes.NoBackground, true), noBackGr);
 
             Devmasters.IO.IOTools.DeleteFile(path);
         }

@@ -1,17 +1,20 @@
 ﻿@page "/EditParty"
 
 @using System.Security.Claims
+@using HlidacStatu.DS.Api
 @using HlidacStatu.Entities
 @using HlidacStatu.Repositories
 @using HlidacStatu.Repositories.Auditing
 @using Microsoft.AspNetCore.Authorization
 @using PoliticiEditor.Components.Account
+@using PoliticiEditor.Components.Autocomplete
 
 @implements IAsyncDisposable
 
 @inject UserHelper UserHelper
+@inject AutocompleteService AutocompleteService
 
-@rendermode InteractiveServer
+@rendermode @(new InteractiveServerRenderMode(prerender: false))
 @attribute [Authorize]
 
 <div class="card mb-3">
@@ -23,6 +26,21 @@
                 <div class="row mb-3">
                     <div class="col-3">
                         <label for="polStrana">Politická strana</label>
+                        <HlidacAutocomplete 
+                            @key="politicalParty"
+                            DefaultTextValue="@politicalParty.Organizace"
+                            SearchFuncAsync="@((s, token) => OnSearch(s, token))"
+                            OnAutocompleteItemSelected="@(item => FillPoliticalParty(politicalParty,item))"
+                            TextSelector="@((autocomplete) => autocomplete.Text)"
+                            TItem="Autocomplete">
+                            <ItemTemplate>
+                                <div>
+                                    <h6>@context.Text</h6>
+                                    <small>@context.Description</small>
+                                </div>
+                            </ItemTemplate>
+                        </HlidacAutocomplete>
+                        
                         <input type="text" id="polStrana"
                                class="form-control"
                                @bind="@politicalParty.Organizace"/>
@@ -64,11 +82,6 @@
     private List<OsobaEvent> PoliticalParties { get; set; } = new();
     private DbEntities? _db = new();
     private ClaimsPrincipal User { get; set; }
-    protected override async Task OnParametersSetAsync()
-    {
-        await RefreshContextAsync();
-    }
-    
     protected override async Task OnInitializedAsync()
     {
         User = await UserHelper.GetCurrentUserAsync();
@@ -78,6 +91,11 @@
         {
             throw new Exception("Osobu nejde najít");
         }
+    }
+    
+    protected override async Task OnParametersSetAsync()
+    {
+        await RefreshContextAsync();
     }
     
     private void AddPartyAffiliation()
@@ -127,5 +145,25 @@
     private async Task Cancel()
     {
         await RefreshContextAsync();
+    }
+    
+    private async Task<List<Autocomplete>> OnSearch(string query, CancellationToken cancellationToken)
+    {
+        var result = await AutocompleteService.FindCompany(query, cancellationToken);
+        result.Insert(0, new Autocomplete()
+        {
+            Text = query,
+            DisplayText = query
+        });
+        return result;
+    }
+
+    private void FillPoliticalParty(OsobaEvent politicalParty, Autocomplete item)
+    {
+        politicalParty.Organizace = item.DisplayText.Trim();
+        if (item.Id?.Contains("ico:") == true)
+        {
+            politicalParty.Ico = item.Id.Replace("ico:", "").Trim();
+        }
     }
 }

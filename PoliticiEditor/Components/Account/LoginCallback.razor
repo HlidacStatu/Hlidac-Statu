@@ -5,9 +5,11 @@
 @using Microsoft.EntityFrameworkCore
 @using PoliticiEditor.Data
 
-@inject IdentityRedirectManager RedirectManager
+@inject NavigationManager NavigationManager
 @inject PoliticiLoginsDbContext DbContext
 @inject IHttpContextAccessor HttpContextAccessor
+
+<h1>Přihlašuju...</h1>
 
 @code {
     
@@ -21,7 +23,7 @@
 
         if (loginToken == null)
         {
-            RedirectManager.RedirectTo("/Account/AccessDenied");
+            NavigationManager.NavigateTo("/Account/AccessDenied", forceLoad: true);
             return;
         }
 
@@ -42,8 +44,15 @@
         var principal = new ClaimsPrincipal(identity);
         
         await HttpContextAccessor.HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal);
-        RedirectManager.RedirectTo($"/");
+        
+        //We need to let cookie properly sit, so we have to redirect twice!
+        NavigationManager.NavigateTo("/Account/Login-Redirect", forceLoad: true);
 
     }
+
+    // protected override async Task OnAfterRenderAsync(bool firstRender)
+    // {
+    //     await JS.InvokeVoidAsync("eval", "window.location.href = '/'");
+    // }
 
 }

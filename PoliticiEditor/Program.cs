@@ -39,7 +39,6 @@ builder.Services.AddRazorComponents()
 builder.Services.AddCascadingAuthenticationState(); // dont know if necessarry
 builder.Services.AddAuthorization();
 builder.Services.AddHttpContextAccessor();
-builder.Services.AddScoped<IdentityRedirectManager>();
 builder.Services.AddScoped<UserHelper>();
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(options =>

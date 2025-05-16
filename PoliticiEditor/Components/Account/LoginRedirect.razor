@@ -1,0 +1,17 @@
+﻿@page "/Account/Login-Redirect/"
+
+@inject NavigationManager NavigationManager
+
+@* This component here is to renew circuit after login, so the cookie is properly set 
+* This component is just a workaround here...
+*@
+
+@code {
+
+    protected override async Task OnParametersSetAsync()
+    {
+        await Task.Delay(100);
+        NavigationManager.NavigateTo("/", forceLoad: true);
+    }
+
+}

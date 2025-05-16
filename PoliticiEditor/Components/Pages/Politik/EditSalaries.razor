@@ -11,7 +11,7 @@
 
 @inject UserHelper UserHelper
 
-@rendermode InteractiveServer
+@rendermode @(new InteractiveServerRenderMode(prerender: false))
 @attribute [Authorize]
 
 <div class="card mb-3">
@@ -116,20 +116,11 @@
 @code
 {
     private string? NameId { get; set; }
-
     private ClaimsPrincipal User { get; set; }
     private DbEntities? _db = new();
-
     private List<PpPrijem> Platy { get; set; } = new();
     private Dictionary<int, string?> PreloadedOrgs = new();
-
     private PpPrijem NewIncome { get; set; }
-    
-
-    protected override async Task OnParametersSetAsync()
-    {
-        await RefreshContextAsync();
-    }
 
     protected override async Task OnInitializedAsync()
     {
@@ -139,6 +130,11 @@
         {
             throw new Exception("Osobu nejde najít");
         }
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        await RefreshContextAsync();
     }
 
     private async Task RefreshContextAsync()

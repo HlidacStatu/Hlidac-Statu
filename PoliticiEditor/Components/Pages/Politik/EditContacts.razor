@@ -11,7 +11,7 @@
 
 @inject UserHelper UserHelper
 
-@rendermode InteractiveServer
+@rendermode @(new InteractiveServerRenderMode(prerender: false))
 @attribute [Authorize]
 
 <div class="card mb-3">

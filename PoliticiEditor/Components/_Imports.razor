@@ -10,3 +10,10 @@
 @using PoliticiEditor.Components
 @using PoliticiEditor.Components.Toasts
 @using static Microsoft.AspNetCore.Components.Web.RenderMode
+
+@code
+{
+    public static IComponentRenderMode InteractiveServerWithoutPrerendering { get; } = 
+        new InteractiveServerRenderMode(prerender: false);
+    
+}
