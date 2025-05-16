@@ -1,6 +1,6 @@
 using HlidacStatu.Lib.Web.UI.Attributes;
 using HlidacStatu.Web.Filters;
-
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.Mvc;
 
@@ -106,6 +106,7 @@ namespace HlidacStatu.Web.Controllers
             return View("999_COVID_Nakazeni");
         }
 
+        [Authorize(Roles = "Admin")]
         [Route("33")]
         [HlidacCache(24 * 60 * 60, "id;obdobi;typ;obor", true)]
         public IActionResult TopNarustySmluv(int? id, string obdobi = "", int? obor = null, string typ = "abs")
