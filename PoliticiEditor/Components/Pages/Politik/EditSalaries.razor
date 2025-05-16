@@ -28,8 +28,7 @@
                 <HlidacAutocomplete SearchFuncAsync="@((s, token) => OnSearch(s, token))"
                                     OnAutocompleteItemSelected="@(item => FillOrganizace(item))"
                                     TextSelector="@((autocomplete) => autocomplete.Text)"
-                                    TItem="Autocomplete"
-                                    id="Organizace">
+                                    TItem="Autocomplete">
                     <ItemTemplate>
                         <div>
                             <h6>@context.Text</h6>
@@ -267,30 +266,30 @@
         {
             ico = item.Id.Replace("ico:", "").Trim();
         }
-
+    
         if (ico is null)
             return;
         
         var foundFirmy = await _db!.FirmaDs.AsNoTracking()
             .Where(o => o.Ico == ico).ToListAsync();
-
+    
         if (foundFirmy is null || !foundFirmy.Any())
             return;
-
+    
         int? orgId = null;
         foreach (var foundFirma in foundFirmy)
         {
             var foundPuOrg = await _db!.PuOrganizace.AsNoTracking()
                 .Where(o => o.DS == foundFirma.DatovaSchranka)
                 .FirstOrDefaultAsync();
-
+    
             if (foundPuOrg is not null)
             {
                 orgId = foundPuOrg.Id;
                 break;
             }
         }
-
+    
         if (orgId is null)
         {
             var firstCompany = foundFirmy.FirstOrDefault();
@@ -305,7 +304,7 @@
             await PpRepo.UpsertOrganizaceAsync(newOrganizace);
             orgId = newOrganizace.Id;
         }
-
+    
         if (orgId is null)
         {
             throw new Exception("id stale nenalezeno");
@@ -317,8 +316,8 @@
         {
             PreloadedOrgs.Add(orgId.Value, item.Text);
         }
-
+    
         NewIncome.IdOrganizace = orgId.Value;
-
+    
     }
 }

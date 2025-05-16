@@ -11,5 +11,5 @@ public class FirmaDs
     public string Ico { get; set; }
     public string DsParent { get; set; }
     public string DsSubjName { get; set; }
-    public bool IsActive { get; set; }
+    public bool? IsActive { get; set; }
 }
