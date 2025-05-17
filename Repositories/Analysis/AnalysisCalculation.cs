@@ -614,7 +614,7 @@ namespace HlidacStatu.Repositories.Analysis
                     (o) =>
                     {
                         var allicos = FirmaRepo.AllIcoInRS().ToArray();
-                        var getData = new List<HlidacStatu.Lib.Analytics.StatisticsSubjectPerYear<Smlouva.Statistics.Data>>();
+                        var getData = new System.Collections.Concurrent.ConcurrentBag<HlidacStatu.Lib.Analytics.StatisticsSubjectPerYear<Smlouva.Statistics.Data>>();
                         Devmasters.Batch.Manager.DoActionForAll(allicos,
                             ico =>
                             {
