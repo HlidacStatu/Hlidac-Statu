@@ -15,6 +15,7 @@
 
 @inject AutocompleteService AutocompleteService
 @inject UserHelper UserHelper
+@inject ToastService Toaster
 
 @rendermode @(new InteractiveServerRenderMode(prerender: false))
 @attribute [Authorize]
@@ -195,11 +196,13 @@
         await ChangeTracker.SaveAuditLogAsync(auditLogs); //this needs to be called after db changes are made
 
         await RefreshContextAsync();
+        Toaster.AddInfoMessage("Uloženo", "Změny byly úspěšně uloženy.");
     }
 
     private async Task Cancel()
     {
         await RefreshContextAsync();
+        Toaster.AddInfoMessage("Zrušeno", "Změny byly zrušeny.");
     }
 
     private async Task<string?> GetOrgNameForId(int? platyItemIdOrganizace)

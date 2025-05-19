@@ -1,0 +1,27 @@
+﻿@page "/Error"
+@using System.Diagnostics
+
+<PageTitle>Chyba</PageTitle>
+
+<h1 class="text-danger">Chyba.</h1>
+<h2 class="text-danger">Během vaší žádosti došlo k chybě.</h2>
+<p>Nebojte se, chyba není ve vás, je to námi. Náš programátor to zpackal a asi dostane přes prsty.</p>
+
+@if (ShowRequestId)
+{
+    <p>
+        <strong>Request ID:</strong> <code>@RequestId</code>
+    </p>
+}
+
+
+@code{
+    [CascadingParameter]
+    private HttpContext? HttpContext { get; set; }
+    
+    private string? RequestId { get; set; }
+    private bool ShowRequestId => !string.IsNullOrEmpty(RequestId);
+
+    protected override void OnInitialized() =>
+        RequestId = Activity.Current?.Id ?? HttpContext?.TraceIdentifier;
+}

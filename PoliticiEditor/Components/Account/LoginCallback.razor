@@ -47,7 +47,7 @@
         var principal = new ClaimsPrincipal(identity);
         
         await HttpContextAccessor.HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal);
-        
+        await Task.Delay(300);
         //We need to let cookie properly sit, so we have to redirect twice!
         NavigationManager.NavigateTo("/Account/Login-Redirect", forceLoad: true);
 

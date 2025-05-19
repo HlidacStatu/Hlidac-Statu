@@ -92,7 +92,8 @@
         Osoba = OsobaRepo.GetByNameIdTracked(_db, nameId);
         if (Osoba is null)
         {
-            throw new Exception("Osobu nejde najít");
+            Toaster.AddMessage("Chyba", $"Osobu {nameId} se nepodařilo najít", importance: ToastService.ToastMessage.ImportanceLevel.Error);
+            return;
         }
     }
 
@@ -112,11 +113,13 @@
 
         await ChangeTracker.SaveAuditLogAsync(auditLogs);
         await RefreshContextAsync();
+        Toaster.AddInfoMessage("Uloženo", "Změny byly úspěšně uloženy.");
     }
 
     private async Task Cancel()
     {
         await RefreshContextAsync();
+        Toaster.AddInfoMessage("Zrušeno", "Změny byly zrušeny.");
     }
 
 }

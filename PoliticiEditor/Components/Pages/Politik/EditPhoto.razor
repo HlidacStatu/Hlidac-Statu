@@ -8,6 +8,7 @@
 @using Serilog
 
 @inject UserHelper UserHelper
+@inject ToastService Toaster
 
 @rendermode @(new InteractiveServerRenderMode(prerender: false))
 @attribute [Authorize]
@@ -78,7 +79,7 @@
         Osoba = OsobaRepo.GetByNameId(nameId);
         if (Osoba is null)
         {
-            throw new Exception("Osobu nejde najít");
+            Toaster.AddErrorMessage("Chyba", "Osobu nejde najít.");
         }
     }
 
@@ -105,7 +106,7 @@
         _zdroj = null;
         _fileBytes = null;
         _faces = null;
-
+        Toaster.AddInfoMessage("Zrušeno", "Změny byly zrušeny.");
         return Task.CompletedTask;
     }
     

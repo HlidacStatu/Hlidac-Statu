@@ -20,6 +20,44 @@ public sealed class ToastService
 
         AddMessage(toast);
     }
+    public void AddInfoMessage(string title, string message)
+    {
+        var toast = new ToastMessage()
+        {
+            Title = title,
+            Message = message,
+            Duration = TimeSpan.FromSeconds(5),
+            Importance = ToastMessage.ImportanceLevel.Info
+        };
+
+        AddMessage(toast);
+    }
+    public void AddWarningMessage(string title, string message)
+    {
+        var toast = new ToastMessage()
+        {
+            Title = title,
+            Message = message,
+            Duration = TimeSpan.FromSeconds(5),
+            Importance = ToastMessage.ImportanceLevel.Warning
+        };
+
+        AddMessage(toast);
+
+        AddMessage(toast);
+    }
+    public void AddErrorMessage(string title, string message)
+    {
+        var toast = new ToastMessage()
+        {
+            Title = title,
+            Message = message,
+            Duration = TimeSpan.FromSeconds(5),
+            Importance = ToastMessage.ImportanceLevel.Error
+        };
+
+        AddMessage(toast);
+    }
 
     public void AddMessage(ToastMessage toast)
     {
