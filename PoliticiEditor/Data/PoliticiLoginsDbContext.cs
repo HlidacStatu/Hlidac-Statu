@@ -6,7 +6,7 @@ public class PoliticiLoginsDbContext(DbContextOptions<PoliticiLoginsDbContext> o
     : DbContext(options)
 {
     public DbSet<PoliticiEditorUser> PoliticiEditorUsers { get; set; }
-    public DbSet<LoginToken> LoginTokens { get; set; }
+    public DbSet<PoliticiLoginToken> PoliticiLoginTokens { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -20,7 +20,7 @@ public class PoliticiLoginsDbContext(DbContextOptions<PoliticiLoginsDbContext> o
             entity.HasIndex(e => e.EmailUpper);
         });
 
-        modelBuilder.Entity<LoginToken>(entity =>
+        modelBuilder.Entity<PoliticiLoginToken>(entity =>
         {
             entity.HasKey(e => e.Id);
             entity.Property(e => e.Token).IsRequired();

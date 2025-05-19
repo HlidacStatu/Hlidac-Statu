@@ -104,13 +104,19 @@
 
         ShowRegistration = false;
 
-        var loginToken = LoginToken.CreateTokenForUser(user.Id);
+        if (user.IsApproved == false)
+        {
+            statusMessage = "Uživatel existuje, ale ještě není schválen. Schválení musí proběhnout interním procesem Hlídače Státu";
+            return;
+        }
 
-        DbContext.LoginTokens.Add(loginToken);
+        var loginToken = PoliticiLoginToken.CreateTokenForUser(user.Id);
+
+        DbContext.PoliticiLoginTokens.Add(loginToken);
         await DbContext.SaveChangesAsync();
 
         //todo: poslat mailem, 
-        _loginToken = $"https://localhost:7174/Account/Login-Callback/{WebUtility.UrlEncode(loginToken.Token)}";
+        _loginToken = $"https://localhost:7174/Account/Login-Callback/{WebUtility.UrlEncode(loginToken.Token)}/{WebUtility.UrlEncode(user.EmailHash)}";
 
         statusMessage = "Na vaší emailovou adresu byl odeslán email s přihlašovacímmi údaji.";
     }
@@ -131,21 +137,20 @@
         if(!IsValidToRegister())
             return;
 
-        throw new NotImplementedException("not implemented further");
-
         // // Passed all checks - continue registration
-        // var newUser = new PoliticiEditorUser
-        // {
-        //     Name = Input.Name.Trim(),
-        //     Surname = Input.Surname.Trim(),
-        //     Email = Input.Email.Trim(),
-        //     EmailUpper = Input.Email.Trim().ToUpperInvariant(),
-        //     BirthYearOrDate = Input.BirthYearOrDate.Trim(),
-        //     RegistrationInfo = Input.RegistrationInfo.Trim(),
-        // };
-        //
-        // DbContext.PoliticiEditorUsers.Add(newUser);
-        // await DbContext.SaveChangesAsync();
+        var newUser = new PoliticiEditorUser
+        {
+            Name = $"{Input.Name.Trim()} {Input.Surname.Trim()}",
+            Email = Input.Email.Trim(),
+            EmailUpper = Input.Email.Trim().ToUpperInvariant(),
+            EmailHash = PoliticiEditorUser.GetEmailHash(Input.Email),
+            BirthYearOrDate = Input.BirthYearOrDate.Trim(),
+            RegistrationInfo = Input.RegistrationInfo.Trim(),
+            IsApproved = false,
+        };
+        
+        DbContext.PoliticiEditorUsers.Add(newUser);
+        await DbContext.SaveChangesAsync();
 
         statusMessage = "Registrace úspěšná. Zkontrolujte email.";
         ShowRegistration = false;
