@@ -1,16 +1,20 @@
 ﻿@page "/EditContacts"
 
+@using System.ComponentModel.DataAnnotations
 @using System.Security.Claims
-@using HlidacStatu.Entities
-@using HlidacStatu.Repositories
-@using HlidacStatu.Repositories.Auditing
-@using Microsoft.AspNetCore.Authorization
-@using PoliticiEditor.Components.Account
 
-@implements IAsyncDisposable
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.EntityFrameworkCore
+@using PoliticiEditor.Components.Account
+@using PoliticiEditor.Data
+@using Serilog
 
 @inject UserHelper UserHelper
 @inject ToastService Toaster
+@inject NavigationManager NavigationManager
+
+@inject PoliticiLoginsDbContext DbContext
+
 
 @rendermode @(new InteractiveServerRenderMode(prerender: false))
 @attribute [Authorize]
@@ -19,12 +23,35 @@
     <h5 class="card-header">Kontakty</h5>
     <div class="card-body">
         <div class="mx-auto">
-            <p>TODO TODO TODO</p>
+            <EditForm EditContext="editContext" FormName="login">
+                <DataAnnotationsValidator/>
+                <h3>Zde můžete editovat své přihlašovací údaje</h3>
+                <hr/>
+                <ValidationSummary class="text-danger" role="alert"/>
+                @foreach (var contact in model.UserLogins)
+                {
+                    <div class="col-3">
+                        <label for="email">Email</label>
+                        <input type="text" id="email"
+                               class="form-control"
+                               @bind:get="@contact.Email"
+                               @bind:set="@(x => SetEmail(contact, x))"/>
+                        <ValidationMessage For="() => contact.Email" class="text-danger"/>
+                    </div>
+                    <div class="col-3">
+                        <label for="phone">Telefon</label>
+                        <input type="text" id="phone"
+                               class="form-control"
+                               @bind="@contact.PhoneNumber"/>
+                        <ValidationMessage For="() => contact.PhoneNumber" class="text-danger"/>
+                    </div>
+                }
+            </EditForm>
         </div>
     </div>
-    
+
     <div class="card-footer text-body-secondary">
-        
+        <button class="btn btn-primary" @onclick="@(AddContact)">Přidat kontakt</button>
         <button class="btn btn-success" @onclick="@(Save)">Uložit změny</button>
         <button class="btn btn-warning" @onclick="@(Cancel)">Zrušit změny</button>
     </div>
@@ -33,74 +60,116 @@
 
 @code
 {
-    [Parameter]
-    public int OsobaId { get; set; }
 
-    private List<OsobaEvent> PoliticalParties { get; set; } = new();
-    
-    private DbEntities? _db = new();
-    
+    private EditContactsModel model = new();
+
+    // private List<PoliticiEditorUser> UserLogins { get; set; } = new();
     private ClaimsPrincipal User { get; set; }
+    private ILogger _logger = Log.ForContext<EditContacts>();
 
+    private EditContext editContext;
+    private ValidationMessageStore messageStore;
 
-    private void AddPartyAffiliation()
+    private class EditContactsModel
     {
-        OsobaEvent newEvent = new OsobaEvent()
-        {
-            OsobaId = OsobaId,
-            Type = (int)OsobaEvent.Types.PolitickaStrana
-        };
-        PoliticalParties.Insert(0, newEvent);
-        if (_db is not null)
-        {
-            _db.OsobaEvent.Add(newEvent);
-        }
+        public List<PoliticiEditorUser> UserLogins { get; set; } = new();
     }
 
-    protected override async Task OnParametersSetAsync()
-    {
-        await RefreshContextAsync();
-    }
-    
     protected override async Task OnInitializedAsync()
     {
         User = await UserHelper.GetCurrentUserAsync();
-    }
+        var nameId = User.GetNameId();
 
-    private async Task RefreshContextAsync()
-    {
-        if (_db is not null)
-            await _db.DisposeAsync();
+        if (string.IsNullOrWhiteSpace(nameId))
+            return;
 
-        _db = new DbEntities();
+        model.UserLogins = await DbContext.PoliticiEditorUsers.Where(u => u.NameId == nameId).ToListAsync();
         
-        PoliticalParties = OsobaEventRepo
-            .GetByOsobaIdTracked(_db, OsobaId, x => x.Type == (int)OsobaEvent.Types.PolitickaStrana)
-            .OrderBy(p => p.DatumOd).ToList();
-    }
-    
-    public async ValueTask DisposeAsync()
-    {
-        if (_db is not null)
-        {
-            await _db.DisposeAsync();
-        }
+        editContext = new EditContext(model);
+        messageStore = new ValidationMessageStore(editContext);
     }
 
     private async Task Save()
     {
-        var auditLogs = ChangeTracker.CreateAuditLogs(_db, User.GetNameId());
+        //todo: set email and hash
         
-        await _db.SaveChangesAsync();
         
-        await ChangeTracker.SaveAuditLogAsync(auditLogs);
-        await RefreshContextAsync();
-        Toaster.AddInfoMessage("Uloženo", "Změny byly úspěšně uloženy.");
+        try
+        {
+            await DbContext.SaveChangesAsync();
+
+            Toaster.AddInfoMessage("Uloženo", "Změny byly úspěšně uloženy.");
+        }
+        catch (Exception e)
+        {
+            Toaster.AddErrorMessage("Chyba", "Během ukládání došlo k chybě.");
+            _logger.Error(e, "Couldnt save social data.");
+        }
+
+        NavigationManager.Refresh(true);
     }
 
-    private async Task Cancel()
+    private void Cancel()
     {
-        await RefreshContextAsync();
         Toaster.AddInfoMessage("Zrušeno", "Změny byly zrušeny.");
+        NavigationManager.Refresh(true);
+    }
+
+    private void SetEmail(PoliticiEditorUser contact, string? value)
+    {
+        throw new NotImplementedException();
+    }
+
+    private void AddContact()
+    {
+        PoliticiEditorUser newContact = new()
+        {
+            NameId = User.GetNameId(),
+            IsApproved = true,
+            IsLockedOut = false,
+            Name = User.GetName(),
+            RegistrationInfo = "Created in selfadmin"
+                
+        };
+        model.UserLogins.Insert(0, newContact);
+        DbContext.PoliticiEditorUsers.Add(newContact);
+
+    }
+
+    private bool AreContactsValid()
+    {
+        messageStore.Clear();
+        editContext.NotifyValidationStateChanged();
+        bool hasError = false;
+        foreach (var login in model.UserLogins)
+        {
+            if (!IsValidContact(login))
+                hasError = true;
+        }
+        
+        if(hasError)
+            editContext.NotifyValidationStateChanged();
+
+        return !hasError;
+    }
+
+    private bool IsValidContact(PoliticiEditorUser user)
+    {
+        bool hasError = false;
+        
+        if (string.IsNullOrWhiteSpace(user.Email) || !new EmailAddressAttribute().IsValid(user.Email))
+        {
+            messageStore.Add(() => user.Email, "Neplatný email.");
+            hasError = true;
+        }
+        
+        
+        //dont know if i need this
+        if (hasError)
+        {
+            editContext.NotifyValidationStateChanged();
+        }
+
+        return !hasError;
     }
 }

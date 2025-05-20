@@ -46,16 +46,14 @@
         var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
         var principal = new ClaimsPrincipal(identity);
         
+        //if any issues arises then stuff from following page is needed to be implemented as well: 
+        // https://learn.microsoft.com/en-us/aspnet/core/blazor/security/authentication-state?view=aspnetcore-9.0&pivots=server
+        
         await HttpContextAccessor.HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal);
         await Task.Delay(300);
-        //We need to let cookie properly sit, so we have to redirect twice!
-        NavigationManager.NavigateTo("/Account/Login-Redirect", forceLoad: true);
+        HttpContextAccessor.HttpContext.Response.Redirect("/");
+        
 
     }
-
-    // protected override async Task OnAfterRenderAsync(bool firstRender)
-    // {
-    //     await JS.InvokeVoidAsync("eval", "window.location.href = '/'");
-    // }
 
 }

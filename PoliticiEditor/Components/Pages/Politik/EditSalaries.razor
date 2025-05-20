@@ -9,7 +9,7 @@
 @using Microsoft.EntityFrameworkCore
 @using PoliticiEditor.Components.Account
 @using PoliticiEditor.Components.Autocomplete
-
+@using Serilog
 
 @implements IAsyncDisposable
 
@@ -137,6 +137,8 @@
     private List<PpPrijem> Platy { get; set; } = new();
     private Dictionary<int, string?> PreloadedOrgs = new();
     private PpPrijem NewIncome { get; set; }
+    private ILogger _logger = Log.ForContext<EditSalaries>();
+
 
     protected override async Task OnInitializedAsync()
     {
@@ -144,12 +146,11 @@
         NameId = User.GetNameId();
         if (NameId is null)
         {
-            throw new Exception("Osobu nejde najít");
+            Toaster.AddMessage("Chyba", $"Data se nepodařilo načíst", importance: ToastService.ToastMessage.ImportanceLevel.Error);
+            _logger.Error($"Osoba is null for user with Name Id:{User.GetNameId()}");
+            return;
         }
-    }
 
-    protected override async Task OnParametersSetAsync()
-    {
         await RefreshContextAsync();
     }
 
@@ -188,15 +189,10 @@
         {
             _db.PpPrijmy.Add(NewIncome);
         }
-        
-        //todo: udělat kontroly jestli jsou data ok (např. jestli se neposílají pitomosti)
-        
-        var auditLogs = ChangeTracker.CreateAuditLogs(_db, User.GetNameId());
-        await _db.SaveChangesAsync();
-        await ChangeTracker.SaveAuditLogAsync(auditLogs); //this needs to be called after db changes are made
+
+        await Helpers.Save(_db, User.GetNameId(), Toaster, _logger);
 
         await RefreshContextAsync();
-        Toaster.AddInfoMessage("Uloženo", "Změny byly úspěšně uloženy.");
     }
 
     private async Task Cancel()
@@ -236,7 +232,7 @@
     {
         return PreloadedOrgs.TryGetValue(idOrganizace, out var name) ? name : null;
     }
-    
+
     private decimal? ParseDecimal(string? inputValue)
     {
         string cleanInput = inputValue.Replace(" ", "");
@@ -247,9 +243,9 @@
 
         return null;
     }
-    
+
     private bool IsValidYear(int year) => year is > 2000 and < 2200;
-    
+
     private async Task<List<Autocomplete>> OnSearch(string query, CancellationToken cancellationToken)
     {
         var result = await AutocompleteService.FindCompany(query, cancellationToken);
@@ -269,36 +265,36 @@
         {
             ico = item.Id.Replace("ico:", "").Trim();
         }
-    
+
         if (ico is null)
             return;
-        
+
         var foundFirmy = await _db!.FirmaDs.AsNoTracking()
             .Where(o => o.Ico == ico).ToListAsync();
-    
+
         if (foundFirmy is null || !foundFirmy.Any())
             return;
-    
+
         int? orgId = null;
         foreach (var foundFirma in foundFirmy)
         {
             var foundPuOrg = await _db!.PuOrganizace.AsNoTracking()
                 .Where(o => o.DS == foundFirma.DatovaSchranka)
                 .FirstOrDefaultAsync();
-    
+
             if (foundPuOrg is not null)
             {
                 orgId = foundPuOrg.Id;
                 break;
             }
         }
-    
+
         if (orgId is null)
         {
             var firstCompany = foundFirmy.FirstOrDefault();
-            if(firstCompany is null)
+            if (firstCompany is null)
                 throw new Exception("Firma nenalezena!");
-            
+
             // create new org
             var newOrganizace = new PuOrganizace()
             {
@@ -307,20 +303,19 @@
             await PpRepo.UpsertOrganizaceAsync(newOrganizace);
             orgId = newOrganizace.Id;
         }
-    
+
         if (orgId is null)
         {
             throw new Exception("id stale nenalezeno");
         }
-        
-        
+
+
         //try update preloadedOrgs
         if (!PreloadedOrgs.ContainsKey(orgId.Value))
         {
             PreloadedOrgs.Add(orgId.Value, item.Text);
         }
-    
+
         NewIncome.IdOrganizace = orgId.Value;
-    
     }
 }

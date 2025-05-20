@@ -5,12 +5,13 @@
 @* This component here is to renew circuit after login, so the cookie is properly set 
 * This component is just a workaround here...
 *@
+<h3>Přesměrovávám...</h3>
 
 @code {
 
     protected override async Task OnParametersSetAsync()
     {
-        await Task.Delay(300);
+        await Task.Delay(3000);
         NavigationManager.NavigateTo("/", forceLoad: true);
     }
 

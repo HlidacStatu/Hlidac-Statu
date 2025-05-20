@@ -6,6 +6,7 @@
 @using HlidacStatu.Repositories.Auditing
 @using Microsoft.AspNetCore.Authorization
 @using PoliticiEditor.Components.Account
+@using Serilog
 
 @implements IAsyncDisposable
 
@@ -16,51 +17,59 @@
 
 @attribute [Authorize]
 
-
-<div class="card mb-3">
-    <h5 class="card-header">@Osoba.NameId</h5>
-    <div class="card-body">
-        <div class="row g-0">
-            <div class="col-sm-3 col-xl-2">
-                <img src="@Osoba.GetPhotoUrl()" class="img-fluid rounded-start mb-3" alt="Fotka">
-            </div>
-            <div class="col-sm-9 col-xl-10">
-                <div class="mx-auto">
-                    <div class="mb-3">
-                        <label for="titulPred">Titul(y) před jménem oddělené čárkou</label>
-                        <input type="text" id="titulPred"
-                               class="@(EditModeInputClass)"
-                               @bind="@Osoba.TitulPred"/>
-                    </div>
+@if (Osoba is null)
+{
+    <p class="text-warning">Nepodařilo se načíst osobu.</p>
+    <a href="" target="_self">Zkusit znovu</a>
+}
+else
+{
+    <div class="card mb-3">
+        <h5 class="card-header">@Osoba.NameId</h5>
+        <div class="card-body">
+            <div class="row g-0">
+                <div class="col-sm-3 col-xl-2">
+                    <img src="@Osoba.GetPhotoUrl()" class="img-fluid rounded-start mb-3" alt="Fotka">
                 </div>
-                <div class="mx-auto">
-                    <div class="mb-3">
-                        <label for="titulZa">Titul(y) za jménem oddělené čárkou</label>
-                        <input type="text" id="titulZa"
-                               class="@(EditModeInputClass)"
-                               @bind="@Osoba.TitulPo"/>
-                    </div>
-                </div>
-                @if (Osoba.Narozeni is null)
-                {
+                <div class="col-sm-9 col-xl-10">
                     <div class="mx-auto">
                         <div class="mb-3">
-                            <label for="narozeni">Datum narození</label>
-                            <input type="date" id="narozeni"
+                            <label for="titulPred">Titul(y) před jménem oddělené čárkou</label>
+                            <input type="text" id="titulPred"
                                    class="@(EditModeInputClass)"
-                                   @bind="@Osoba.Narozeni"/>
+                                   @bind="@Osoba.TitulPred"/>
                         </div>
                     </div>
-                }
+                    <div class="mx-auto">
+                        <div class="mb-3">
+                            <label for="titulZa">Titul(y) za jménem oddělené čárkou</label>
+                            <input type="text" id="titulZa"
+                                   class="@(EditModeInputClass)"
+                                   @bind="@Osoba.TitulPo"/>
+                        </div>
+                    </div>
+                    @if (Osoba.Narozeni is null)
+                    {
+                        <div class="mx-auto">
+                            <div class="mb-3">
+                                <label for="narozeni">Datum narození</label>
+                                <input type="date" id="narozeni"
+                                       class="@(EditModeInputClass)"
+                                       @bind="@Osoba.Narozeni"/>
+                            </div>
+                        </div>
+                    }
+                </div>
             </div>
         </div>
-    </div>
 
-    <div class="card-footer text-body-secondary">
-        <button class="btn btn-success" @onclick="@(Save)">Uložit změny</button>
-        <button class="btn btn-warning" @onclick="@(Cancel)">Zrušit změny</button>
+        <div class="card-footer text-body-secondary">
+            <button class="btn btn-success" @onclick="@(Save)">Uložit změny</button>
+            <button class="btn btn-warning" @onclick="@(Cancel)">Zrušit změny</button>
+        </div>
     </div>
-</div>
+}
+
 
 
 @code
@@ -69,15 +78,11 @@
     private DbEntities? _db = new();
     private ClaimsPrincipal User { get; set; }
     const string EditModeInputClass = "form-control";
+    private ILogger _logger = Log.ForContext<EditPerson>();
 
     protected override async Task OnInitializedAsync()
     {
         User = await UserHelper.GetCurrentUserAsync();
-        await RefreshContextAsync();
-    }
-
-    protected override async Task OnParametersSetAsync()
-    {
         await RefreshContextAsync();
     }
 
@@ -92,7 +97,8 @@
         Osoba = OsobaRepo.GetByNameIdTracked(_db, nameId);
         if (Osoba is null)
         {
-            Toaster.AddMessage("Chyba", $"Osobu {nameId} se nepodařilo najít", importance: ToastService.ToastMessage.ImportanceLevel.Error);
+            Toaster.AddMessage("Chyba", $"Data se nepodařilo načíst", importance: ToastService.ToastMessage.ImportanceLevel.Error);
+            _logger.Error($"Osoba is null for user with Name Id:{User.GetNameId()}");
             return;
         }
     }
@@ -107,13 +113,8 @@
 
     private async Task Save()
     {
-        var auditLogs = ChangeTracker.CreateAuditLogs(_db, User.GetNameId());
-
-        await _db!.SaveChangesAsync();
-
-        await ChangeTracker.SaveAuditLogAsync(auditLogs);
+        await Helpers.Save(_db, User.GetNameId(), Toaster, _logger);
         await RefreshContextAsync();
-        Toaster.AddInfoMessage("Uloženo", "Změny byly úspěšně uloženy.");
     }
 
     private async Task Cancel()

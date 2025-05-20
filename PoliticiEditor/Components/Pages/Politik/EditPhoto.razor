@@ -13,52 +13,59 @@
 @rendermode @(new InteractiveServerRenderMode(prerender: false))
 @attribute [Authorize]
 
-<div class="card mb-3">
-    <h5 class="card-header">Změna fotky</h5>
-    <div class="card-body">
-        @if (!AnyFacesDetected)
-        {
-            <div class="mt-4">
-                <div class="mb-3">
-                    <label for="fromFile" class="form-label">Vyberte soubor s fotografií</label>
-                    <InputFile id="fromFile" class="form-control"
-                               OnChange="@((InputFileChangeEventArgs e) => HandleFileSelected(e))"/>
-                    <div class="ml-3 form-text">Nejlepší je portrét, čím větší fotka, tím lépe.</div>
-                </div>
-                <div class="mb-3">
-                    <label for="zdroj">Zdroj, odkud jsem čerpal informaci</label>
-                    <input type="text" id="zdroj" class="form-control" @bind="@_zdroj"/>
-                </div>
-            </div>
-        }
-        else
-        {
-            foreach (var f in _faces)
+@if (Osoba is null)
+{
+    <p class="text-warning">Nepodařilo se načíst data.</p>
+    <a href="" target="_self">Zkusit znovu</a>
+}
+else
+{
+    <div class="card mb-3">
+        <h5 class="card-header">Změna fotky</h5>
+        <div class="card-body">
+            @if (!AnyFacesDetected)
             {
-                <div class="col-xs-6 col-sm-4">
-                    <img style="width:250px;height:auto; border:solid #d0d0d0 1px; margin:5px;"
-                         src="data:image/jpeg;base64,@Convert.ToBase64String(File.ReadAllBytes(f), Base64FormattingOptions.None)">
-                    <br/>
-                    <button type="submit" class="btn btn-success" @onclick="()=>PickPhoto(f)">Toto je
-                        správná/nejlepší fotka
-                    </button>
+                <div class="mt-4">
+                    <div class="mb-3">
+                        <label for="fromFile" class="form-label">Vyberte soubor s fotografií</label>
+                        <InputFile id="fromFile" class="form-control"
+                                   OnChange="@((InputFileChangeEventArgs e) => HandleFileSelected(e))"/>
+                        <div class="ml-3 form-text">Nejlepší je portrét, čím větší fotka, tím lépe.</div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="zdroj">Zdroj, odkud jsem čerpal informaci</label>
+                        <input type="text" id="zdroj" class="form-control" @bind="@_zdroj"/>
+                    </div>
                 </div>
             }
-        }
-    </div>
+            else
+            {
+                foreach (var f in _faces)
+                {
+                    <div class="col-xs-6 col-sm-4">
+                        <img style="width:250px;height:auto; border:solid #d0d0d0 1px; margin:5px;"
+                             src="data:image/jpeg;base64,@Convert.ToBase64String(File.ReadAllBytes(f), Base64FormattingOptions.None)">
+                        <br/>
+                        <button type="submit" class="btn btn-success" @onclick="() => PickPhoto(f)">Toto je
+                            správná/nejlepší fotka
+                        </button>
+                    </div>
+                }
+            }
+        </div>
 
-    <div class="card-footer text-body-secondary">
-        @if (!AnyFacesDetected)
-        {
-            <button class="btn btn-success" @onclick="@(Next)">Pokračovat</button>
-        }
-        else
-        {
-            <button cclass="btn btn-secondary" @onclick="@(Cancel)" data-bs-dismiss="modal">Žádná fotka není správná</button>
-        }
+        <div class="card-footer text-body-secondary">
+            @if (!AnyFacesDetected)
+            {
+                <button class="btn btn-success" @onclick="@(Next)">Pokračovat</button>
+            }
+            else
+            {
+                <button cclass="btn btn-secondary" @onclick="@(Cancel)" data-bs-dismiss="modal">Žádná fotka není správná</button>
+            }
+        </div>
     </div>
-</div>
-
+}
 
 
 @code {
@@ -79,7 +86,9 @@
         Osoba = OsobaRepo.GetByNameId(nameId);
         if (Osoba is null)
         {
-            Toaster.AddErrorMessage("Chyba", "Osobu nejde najít.");
+            Toaster.AddMessage("Chyba", $"Data se nepodařilo načíst", importance: ToastService.ToastMessage.ImportanceLevel.Error);
+            _logger.Error($"Osoba is null for user with Name Id:{User.GetNameId()}");
+            return;
         }
     }
 

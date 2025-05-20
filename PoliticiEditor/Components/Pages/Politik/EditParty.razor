@@ -8,6 +8,7 @@
 @using Microsoft.AspNetCore.Authorization
 @using PoliticiEditor.Components.Account
 @using PoliticiEditor.Components.Autocomplete
+@using Serilog
 
 @implements IAsyncDisposable
 
@@ -18,64 +19,72 @@
 @rendermode @(new InteractiveServerRenderMode(prerender: false))
 @attribute [Authorize]
 
-<div class="card mb-3">
-    <h5 class="card-header">Politické strany</h5>
-    <div class="card-body">
-        <div class="mx-auto">
-            @foreach (var politicalParty in PoliticalParties)
-            {
-                <div class="row mb-3">
-                    <div class="col-3">
-                        <label for="polStrana">Politická strana</label>
-                        <HlidacAutocomplete 
-                            @key="politicalParty"
-                            DefaultTextValue="@politicalParty.Organizace"
-                            SearchFuncAsync="@((s, token) => OnSearch(s, token))"
-                            OnAutocompleteItemSelected="@(item => FillPoliticalParty(politicalParty,item))"
-                            TextSelector="@((autocomplete) => autocomplete.Text)"
-                            TItem="Autocomplete">
-                            <ItemTemplate>
-                                <div>
-                                    <h6>@context.Text</h6>
-                                    <small>@context.Description</small>
-                                </div>
-                            </ItemTemplate>
-                        </HlidacAutocomplete>
-                        
-                        <input type="text" id="polStrana"
-                               class="form-control"
-                               @bind="@politicalParty.Organizace"/>
-                    </div>
-                    <div class="col-3">
-                        <label for="datefrom">Datum působení od</label>
-                        <input type="date" id="datefrom"
-                               class="form-control"
-                               @bind="@politicalParty.DatumOd"/>
-                    </div>
-                    <div class="col-3">
-                        <label for="dateto">Datum působení do</label>
-                        <input type="date" id="dateto"
-                               class="form-control"
-                               @bind="@politicalParty.DatumDo"/>
-                    </div>
-                    <div class="col-3">
-                        <label for="funkce">Funkce v politické straně</label>
-                        <input type="text" id="funkce"
-                               class="form-control"
-                               @bind="@politicalParty.AddInfo"/>
-                    </div>
-                </div>
-            }
-        </div>
-    </div>
-    
-    <div class="card-footer text-body-secondary">
-        <button class="btn btn-primary" @onclick="@(AddPartyAffiliation)">Přidat působení ve straně</button>
-        <button class="btn btn-success" @onclick="@(Save)">Uložit změny</button>
-        <button class="btn btn-warning" @onclick="@(Cancel)">Zrušit změny</button>
-    </div>
+@if (Osoba is null)
+{
+    <p class="text-warning">Nepodařilo se načíst data.</p>
+    <a href="" target="_self">Zkusit znovu</a>
+}
+else
+{
+    <div class="card mb-3">
+        <h5 class="card-header">Politické strany</h5>
+        <div class="card-body">
+            <div class="mx-auto">
+                @foreach (var politicalParty in PoliticalParties)
+                {
+                    <div class="row mb-3">
+                        <div class="col-3">
+                            <label for="polStrana">Politická strana</label>
+                            <HlidacAutocomplete
+                                @key="politicalParty"
+                                DefaultTextValue="@politicalParty.Organizace"
+                                SearchFuncAsync="@((s, token) => OnSearch(s, token))"
+                                OnAutocompleteItemSelected="@(item => FillPoliticalParty(politicalParty, item))"
+                                TextSelector="@((autocomplete) => autocomplete.Text)"
+                                TItem="Autocomplete">
+                                <ItemTemplate>
+                                    <div>
+                                        <h6>@context.Text</h6>
+                                        <small>@context.Description</small>
+                                    </div>
+                                </ItemTemplate>
+                            </HlidacAutocomplete>
 
-</div>
+                            <input type="text" id="polStrana"
+                                   class="form-control"
+                                   @bind="@politicalParty.Organizace"/>
+                        </div>
+                        <div class="col-3">
+                            <label for="datefrom">Datum působení od</label>
+                            <input type="date" id="datefrom"
+                                   class="form-control"
+                                   @bind="@politicalParty.DatumOd"/>
+                        </div>
+                        <div class="col-3">
+                            <label for="dateto">Datum působení do</label>
+                            <input type="date" id="dateto"
+                                   class="form-control"
+                                   @bind="@politicalParty.DatumDo"/>
+                        </div>
+                        <div class="col-3">
+                            <label for="funkce">Funkce v politické straně</label>
+                            <input type="text" id="funkce"
+                                   class="form-control"
+                                   @bind="@politicalParty.AddInfo"/>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+
+        <div class="card-footer text-body-secondary">
+            <button class="btn btn-primary" @onclick="@(AddPartyAffiliation)">Přidat působení ve straně</button>
+            <button class="btn btn-success" @onclick="@(Save)">Uložit změny</button>
+            <button class="btn btn-warning" @onclick="@(Cancel)">Zrušit změny</button>
+        </div>
+
+    </div>
+}
 
 @code
 {
@@ -83,6 +92,8 @@
     private List<OsobaEvent> PoliticalParties { get; set; } = new();
     private DbEntities? _db = new();
     private ClaimsPrincipal User { get; set; }
+    private ILogger _logger = Log.ForContext<EditParty>();
+
     protected override async Task OnInitializedAsync()
     {
         User = await UserHelper.GetCurrentUserAsync();
@@ -90,15 +101,14 @@
         Osoba = OsobaRepo.GetByNameId(nameId);
         if (Osoba is null)
         {
-            throw new Exception("Osobu nejde najít");
+            Toaster.AddMessage("Chyba", $"Data se nepodařilo načíst", importance: ToastService.ToastMessage.ImportanceLevel.Error);
+            _logger.Error($"Osoba is null for user with Name Id:{User.GetNameId()}");
+            return;
         }
-    }
-    
-    protected override async Task OnParametersSetAsync()
-    {
+
         await RefreshContextAsync();
     }
-    
+
     private void AddPartyAffiliation()
     {
         OsobaEvent newEvent = new OsobaEvent()
@@ -119,12 +129,12 @@
             await _db.DisposeAsync();
 
         _db = new DbEntities();
-        
+
         PoliticalParties = OsobaEventRepo
             .GetByOsobaIdTracked(_db, Osoba.InternalId, x => x.Type == (int)OsobaEvent.Types.PolitickaStrana)
             .OrderBy(p => p.DatumOd).ToList();
     }
-    
+
     public async ValueTask DisposeAsync()
     {
         if (_db is not null)
@@ -135,21 +145,16 @@
 
     private async Task Save()
     {
-        var auditLogs = ChangeTracker.CreateAuditLogs(_db, User.GetNameId());
-        
-        await _db.SaveChangesAsync();
-        
-        await ChangeTracker.SaveAuditLogAsync(auditLogs);
+        await Helpers.Save(_db, User.GetNameId(), Toaster, _logger);
         await RefreshContextAsync();
-        Toaster.AddInfoMessage("Uloženo", "Změny byly úspěšně uloženy.");
     }
 
     private async Task Cancel()
     {
-        await RefreshContextAsync();
         Toaster.AddInfoMessage("Zrušeno", "Změny byly zrušeny.");
+        await RefreshContextAsync();
     }
-    
+
     private async Task<List<Autocomplete>> OnSearch(string query, CancellationToken cancellationToken)
     {
         var result = await AutocompleteService.FindCompany(query, cancellationToken);

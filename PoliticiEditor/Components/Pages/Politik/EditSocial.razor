@@ -3,10 +3,10 @@
 @using System.Security.Claims
 @using HlidacStatu.Entities
 @using HlidacStatu.Repositories
-@using HlidacStatu.Repositories.Auditing
 @using Microsoft.AspNetCore.Authorization
 @using Microsoft.EntityFrameworkCore
 @using PoliticiEditor.Components.Account
+@using Serilog
 
 @implements IAsyncDisposable
 
@@ -16,91 +16,119 @@
 @rendermode @(new InteractiveServerRenderMode(prerender: false))
 @attribute [Authorize]
 
-<div class="card mb-3">
-    <h5 class="card-header">Sociální sítě</h5>
+@if (Osoba is null)
+{
+    <p class="text-warning">Nepodařilo se načíst data.</p>
+    <a href="" target="_self">Zkusit znovu</a>
+}
+else
+{
+    <div class="card mb-3">
+        <h5 class="card-header">Sociální sítě</h5>
 
-    <div class="card-body">
-        <div class="mx-auto">
-            <div class="mb-3">
-                <label for="twitter">Twitter</label>
-                <input type="text" id="twitter"
-                       class="form-control"
-                       @bind:get="@(GetSocialNetwork("Twitter"))"
-                       @bind:set="@(val => SetSocialNetwork("Twitter", val))"/>
+        <div class="card-body">
+            <div class="mx-auto">
+                <div class="mb-3">
+                    <label for="twitter">Twitter / X</label>
+                    <div class="input-group mb-3">
+                        <span class="input-group-text" id="basic-addon3">https://x.com/</span>
+                        <input type="text" id="twitter"
+                               class="form-control"
+                               @bind:get="@(GetSocialNetwork("Twitter"))"
+                               @bind:set="@(val => SetSocialNetwork("Twitter", val))"/>
+                    </div>
+                </div>
+            </div>
+            <div class="mx-auto">
+                <div class="mb-3">
+                    <label for="facebookpage">Facebook page</label>
+                    <div class="input-group mb-3">
+                        <span class="input-group-text" id="basic-addon3">https://facebook.com/</span>
+                        <input type="text" id="facebookpage"
+                               class="form-control"
+                               @bind:get="@(GetSocialNetwork("Facebook_page"))"
+                               @bind:set="@(val => SetSocialNetwork("Facebook_page", val))"/>
+                    </div>
+                </div>
+            </div>
+            <div class="mx-auto">
+                <div class="mb-3">
+                    <div class="input-group mb-3">
+                        <span class="input-group-text" id="basic-addon3">https://facebook.com/</span>
+                        <label for="facebookprofile">Facebook profile</label>
+                        <input type="text" id="facebookprofile"
+                               class="form-control"
+                               @bind:get="@(GetSocialNetwork("Facebook_profile"))"
+                               @bind:set="@(val => SetSocialNetwork("Facebook_profile", val))"/>
+                    </div>
+                </div>
+            </div>
+            <div class="mx-auto">
+                <div class="mb-3">
+                    <label for="instagram">Instagram</label>
+                    <div class="input-group mb-3">
+                        <span class="input-group-text" id="basic-addon3">https://instagram.com/</span>
+                        <input type="text" id="instagram"
+                               class="form-control"
+                               @bind:get="@(GetSocialNetwork("Instagram"))"
+                               @bind:set="@(val => SetSocialNetwork("Instagram", val))"/>
+                    </div>
+                </div>
+            </div>
+            <div class="mx-auto">
+                <div class="mb-3">
+                    <label for="youtube">Youtube</label>
+                    <div class="input-group mb-3">
+                        <span class="input-group-text" id="basic-addon3">https://youtube.com/</span>
+                        <input type="text" id="youtube"
+                               class="form-control"
+                               @bind:get="@(GetSocialNetwork("Youtube"))"
+                               @bind:set="@(val => SetSocialNetwork("Youtube", val))"/>
+                    </div>
+                </div>
+            </div>
+            <div class="mx-auto">
+                <div class="mb-3">
+                    <label for="tictoc">TicToc</label>
+                    <div class="input-group mb-3">
+                        <span class="input-group-text" id="basic-addon3">https://tictoc.com/</span>
+                        <input type="text" id="tictoc"
+                               class="form-control"
+                               @bind:get="@(GetSocialNetwork("Tictoc"))"
+                               @bind:set="@(val => SetSocialNetwork("Tictoc", val))"/>
+                    </div>
+                </div>
+            </div>
+            <div class="mx-auto">
+                <div class="mb-3">
+                    <label for="linkedin">LinkedIn</label>
+                    <div class="input-group mb-3">
+                        <span class="input-group-text" id="basic-addon3">https://linkedin.com/</span>
+                        <input type="text" id="linkedin"
+                               class="form-control"
+                               @bind:get="@(GetSocialNetwork("LinkedIn"))"
+                               @bind:set="@(val => SetSocialNetwork("LinkedIn", val))"/>
+                    </div>
+                </div>
+            </div>
+            <div class="mx-auto">
+                <div class="mb-3">
+                    <label for="web">webové stránky</label>
+                    <input type="text" id="web"
+                           class="form-control"
+                           @bind:get="@(GetSocialNetwork("WWW"))"
+                           @bind:set="@(val => SetSocialNetwork("WWW", val))"/>
+                </div>
             </div>
         </div>
-        <div class="mx-auto">
-            <div class="mb-3">
-                <label for="facebookpage">Facebook page</label>
-                <input type="text" id="facebookpage"
-                       class="form-control"
-                       @bind:get="@(GetSocialNetwork("Facebook_page"))"
-                       @bind:set="@(val => SetSocialNetwork("Facebook_page", val))"/>
-            </div>
+
+        <div class="card-footer text-body-secondary">
+            <button class="btn btn-success" @onclick="@(Save)">Uložit změny</button>
+            <button class="btn btn-warning" @onclick="@(Cancel)">Zrušit změny</button>
         </div>
-        <div class="mx-auto">
-            <div class="mb-3">
-                <label for="facebookprofile">Facebook profile</label>
-                <input type="text" id="facebookprofile"
-                       class="form-control"
-                       @bind:get="@(GetSocialNetwork("Facebook_profile"))"
-                       @bind:set="@(val => SetSocialNetwork("Facebook_profile", val))"/>
-            </div>
-        </div>
-        <div class="mx-auto">
-            <div class="mb-3">
-                <label for="instagram">Instagram</label>
-                <input type="text" id="instagram"
-                       class="form-control"
-                       @bind:get="@(GetSocialNetwork("Instagram"))"
-                       @bind:set="@(val => SetSocialNetwork("Instagram", val))"/>
-            </div>
-        </div>
-        <div class="mx-auto">
-            <div class="mb-3">
-                <label for="youtube">Youtube</label>
-                <input type="text" id="youtube"
-                       class="form-control"
-                       @bind:get="@(GetSocialNetwork("Youtube"))"
-                       @bind:set="@(val => SetSocialNetwork("Youtube", val))"/>
-            </div>
-        </div>
-        <div class="mx-auto">
-            <div class="mb-3">
-                <label for="tictoc">TicToc</label>
-                <input type="text" id="tictoc"
-                       class="form-control"
-                       @bind:get="@(GetSocialNetwork("Tictoc"))"
-                       @bind:set="@(val => SetSocialNetwork("Tictoc", val))"/>
-            </div>
-        </div>
-        <div class="mx-auto">
-            <div class="mb-3">
-                <label for="linkedin">LinkedIn</label>
-                <input type="text" id="linkedin"
-                       class="form-control"
-                       @bind:get="@(GetSocialNetwork("LinkedIn"))"
-                       @bind:set="@(val => SetSocialNetwork("LinkedIn", val))"/>
-            </div>
-        </div>
-        <div class="mx-auto">
-            <div class="mb-3">
-                <label for="web">webové stránky</label>
-                <input type="text" id="web"
-                       class="form-control"
-                       @bind:get="@(GetSocialNetwork("WWW"))"
-                       @bind:set="@(val => SetSocialNetwork("WWW", val))"/>
-            </div>
-        </div>
+
     </div>
-
-    <div class="card-footer text-body-secondary">
-        <button class="btn btn-success" @onclick="@(Save)">Uložit změny</button>
-        <button class="btn btn-warning" @onclick="@(Cancel)">Zrušit změny</button>
-    </div>
-
-</div>
-
+}
 
 
 
@@ -110,6 +138,8 @@
     private List<OsobaEvent> SocialNetworks { get; set; } = new();
     private DbEntities? _db = new();
     private ClaimsPrincipal User { get; set; }
+    private ILogger _logger = Log.ForContext<EditSocial>();
+
 
     protected override async Task OnInitializedAsync()
     {
@@ -118,12 +148,11 @@
         Osoba = OsobaRepo.GetByNameId(nameId);
         if (Osoba is null)
         {
-            throw new Exception("Osobu nejde najít");
+            Toaster.AddMessage("Chyba", $"Data se nepodařilo načíst", importance: ToastService.ToastMessage.ImportanceLevel.Error);
+            _logger.Error($"Osoba is null for user with Name Id:{User.GetNameId()}");
+            return;
         }
-    }
 
-    protected override async Task OnParametersSetAsync()
-    {
         await RefreshContextAsync();
     }
 
@@ -171,6 +200,9 @@
 
         _db = new DbEntities();
 
+        if (Osoba is null)
+            return;
+
         SocialNetworks = await OsobaEventRepo.GetByOsobaIdTracked(_db, Osoba.InternalId, x => x.Type == (int)OsobaEvent.Types.SocialniSite)
             .ToListAsync();
     }
@@ -185,12 +217,8 @@
 
     private async Task Save()
     {
-        var auditLogs = ChangeTracker.CreateAuditLogs(_db, User.GetNameId());
-        await _db.SaveChangesAsync();
-        await ChangeTracker.SaveAuditLogAsync(auditLogs);
-
+        await Helpers.Save(_db, User.GetNameId(), Toaster, _logger);
         await RefreshContextAsync();
-        Toaster.AddInfoMessage("Uloženo", "Změny byly úspěšně uloženy.");
     }
 
     private async Task Cancel()

@@ -3,7 +3,6 @@
 @using PoliticiEditor.Components.Account
 
 @inject UserHelper UserHelper
-@inject ToastService Toaster
 
 <PageTitle>Výtejte v administraci politiků</PageTitle>
 
@@ -36,8 +35,6 @@ else
             <a class="btn btn-primary" href="/EditSalaries">Přidat informaci o platu</a>
         </li>
     </ul>
-    
-    <button @onclick="Showtoast">Showtoast</button>
 }
 
 
@@ -49,12 +46,4 @@ else
     {
         User = await UserHelper.GetCurrentUserAsync();
     }
-
-
-    int toastNumber = 0;
-    private void Showtoast()
-    {
-        Toaster.AddMessage("toast Ti-Tl-E", $"Hello from toast - {toastNumber++}", 10, ToastService.ToastMessage.ImportanceLevel.Warning);
-    }
-
 }
