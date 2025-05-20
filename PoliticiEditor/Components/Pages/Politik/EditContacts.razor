@@ -10,6 +10,7 @@
 @implements IAsyncDisposable
 
 @inject UserHelper UserHelper
+@inject ToastService Toaster
 
 @rendermode @(new InteractiveServerRenderMode(prerender: false))
 @attribute [Authorize]
@@ -94,10 +95,12 @@
         
         await ChangeTracker.SaveAuditLogAsync(auditLogs);
         await RefreshContextAsync();
+        Toaster.AddInfoMessage("Uloženo", "Změny byly úspěšně uloženy.");
     }
 
     private async Task Cancel()
     {
         await RefreshContextAsync();
+        Toaster.AddInfoMessage("Zrušeno", "Změny byly zrušeny.");
     }
 }

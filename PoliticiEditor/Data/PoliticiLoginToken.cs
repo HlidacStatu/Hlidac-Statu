@@ -3,7 +3,7 @@ using System.Security.Cryptography;
 namespace PoliticiEditor.Data;
 
 // Add profile data for application users by adding properties to the ApplicationUser class
-public class LoginToken
+public class PoliticiLoginToken
 {
     public int Id { get; set; }
     public string Token { get; set; }
@@ -12,11 +12,11 @@ public class LoginToken
     public DateTime ExpiresAt { get; set; }
     public bool Used { get; set; }
 
-    public static LoginToken CreateTokenForUser(int userId)
+    public static PoliticiLoginToken CreateTokenForUser(int userId)
     {
         var token = Convert.ToBase64String(RandomNumberGenerator.GetBytes(32));
 
-        return new LoginToken
+        return new PoliticiLoginToken
         {
             CreatedAt = DateTime.Now,
             ExpiresAt = DateTime.Now.AddHours(3),

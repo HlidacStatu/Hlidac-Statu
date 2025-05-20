@@ -1,4 +1,4 @@
-﻿@page "/Account/Login-Callback/{Token}"
+﻿@page "/Account/Login-Callback/{Token}/{Mhash}"
 @using System.Security.Claims
 @using Microsoft.AspNetCore.Authentication
 @using Microsoft.AspNetCore.Authentication.Cookies
@@ -15,24 +15,27 @@
     
     [Parameter]
     public string Token { get; set; }
+    [Parameter]
+    public string Mhash { get; set; }
 
     protected override async Task OnParametersSetAsync()
     {
-        var loginToken = await DbContext.LoginTokens
-            .FirstOrDefaultAsync(t => t.Token == Token && !t.Used && t.ExpiresAt > DateTime.Now);
+        var user = await DbContext.PoliticiEditorUsers
+            .FirstOrDefaultAsync(u => u.EmailHash == Mhash);
+        
+        if (user is null || user.IsApproved == false)
+        {
+            NavigationManager.NavigateTo("/Account/AccessDenied", forceLoad: true);
+            return;
+        }
+        
+        var loginToken = await DbContext.PoliticiLoginTokens
+            .FirstOrDefaultAsync(t => t.Token == Token && !t.Used && t.ExpiresAt > DateTime.Now && t.UserId == user.Id);
 
         if (loginToken == null)
         {
             NavigationManager.NavigateTo("/Account/AccessDenied", forceLoad: true);
             return;
-        }
-
-        var user = await DbContext.PoliticiEditorUsers
-            .FirstOrDefaultAsync(u => u.Id == loginToken.UserId);
-
-        if (user is null)
-        {
-            throw new Exception($"User {loginToken.UserId} not found");
         }
 
         loginToken.Used = true;
@@ -44,7 +47,7 @@
         var principal = new ClaimsPrincipal(identity);
         
         await HttpContextAccessor.HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal);
-        
+        await Task.Delay(300);
         //We need to let cookie properly sit, so we have to redirect twice!
         NavigationManager.NavigateTo("/Account/Login-Redirect", forceLoad: true);
 

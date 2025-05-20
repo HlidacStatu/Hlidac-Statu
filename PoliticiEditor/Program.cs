@@ -53,10 +53,10 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
         options.LogoutPath = "/Account/Logout"; // (optional) if you have logout there
     });
 
-var identityDbConnectionString = builder.Configuration.GetConnectionString("IdentityConnection") ??
-                       throw new InvalidOperationException("Connection string 'IdentityConnection' not found.");
+var identityDbConnectionString = builder.Configuration.GetConnectionString("DefaultConnection") ??
+                       throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
 builder.Services.AddDbContext<PoliticiLoginsDbContext>(options =>
-    options.UseSqlite(identityDbConnectionString));
+    options.UseSqlServer(identityDbConnectionString));
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
 var app = builder.Build();
