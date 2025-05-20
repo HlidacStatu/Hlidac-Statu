@@ -6,6 +6,7 @@ using Serilog;
 
 namespace HlidacStatu.Entities.KIndex
 {
+
     public class FinanceData
     {
         //r12
@@ -19,6 +20,10 @@ namespace HlidacStatu.Entities.KIndex
 
 
     }
+
+    /// <summary>
+    /// TODO monitor nefunguje, brat z open dat
+    /// </summary>
     public class FinanceDataCalculator
     {
         private static readonly ILogger _logger = Log.ForContext<FinanceDataCalculator>();
