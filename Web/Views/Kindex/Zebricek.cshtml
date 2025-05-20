@@ -61,7 +61,7 @@
 </style>
 
 <cache expires-after="@(Constants.IsDevelopment() ? Constants.CachedActionLength.NoCache : Constants.CachedActionLength.Cache24H)" 
-       vary-by="@($"{id}_{Model.rok}_{Model.group}_{Model.kraj}_{part}")">
+       vary-by="@($"{id}_{Model.rok}_{Model.group}_{Model.kraj}_{part}_{this.User.IsInRole("Admin")}")">
     @{        
         
         KIndexData.KIndexParts? selectedPart = null;
