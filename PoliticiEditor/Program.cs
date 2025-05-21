@@ -24,6 +24,8 @@ var logger = Log.ForContext<Program>();
 builder.Services.AddHttpClient();
 builder.Services.AddSingleton<AutocompleteService>();
 builder.Services.AddSingleton<ToastService>();
+builder.Services.AddSingleton<LocallyCachedAutocompleteService>();
+builder.Services.AddHostedService<AutocompleteBackgroundTimer>();
 
 string connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ??
                           throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
@@ -61,9 +63,9 @@ builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
 var app = builder.Build();
 
+app.UseExceptionHandler("/Error", createScopeForErrors: true);
 if (!app.Environment.IsDevelopment())
 {
-    app.UseExceptionHandler("/Error", createScopeForErrors: true);
     app.UseHsts();
 }
 

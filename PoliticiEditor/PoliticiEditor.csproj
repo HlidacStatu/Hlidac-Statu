@@ -18,6 +18,7 @@
       <ProjectReference Include="..\DetectFaces\DetectFaces.csproj" />
       <ProjectReference Include="..\LibCore\LibCore.csproj" />
       <ProjectReference Include="..\Repositories\Repositories.csproj" />
+      <ProjectReference Include="..\Whisperer\Whisperer.csproj" />
     </ItemGroup>
 
     <ItemGroup>

@@ -39,7 +39,7 @@ namespace HlidacStatu.Repositories
             }
         }
 
-        public static string[,] NazvyStranŹkratky = {
+        public static string[,] NazvyStranZkratky = {
             {"strana zelených","SZ"},
             {"česká pirátská strana","Piráti" },
             {"pirátská strana","Piráti" },
@@ -57,10 +57,10 @@ namespace HlidacStatu.Repositories
 
             var lstrana = strana.ToLower();
             //je na seznamu?
-            for (int i = 0; i < NazvyStranŹkratky.GetLength(0); i++)
+            for (int i = 0; i < NazvyStranZkratky.GetLength(0); i++)
             {
-                if (NazvyStranŹkratky[i, 0] == lstrana)
-                    return NazvyStranŹkratky[i, 1];
+                if (NazvyStranZkratky[i, 0] == lstrana)
+                    return NazvyStranZkratky[i, 1];
             }
 
             var words = Devmasters.TextUtil.GetWords(strana);

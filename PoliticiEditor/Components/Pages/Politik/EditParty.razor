@@ -4,7 +4,6 @@
 @using HlidacStatu.DS.Api
 @using HlidacStatu.Entities
 @using HlidacStatu.Repositories
-@using HlidacStatu.Repositories.Auditing
 @using Microsoft.AspNetCore.Authorization
 @using PoliticiEditor.Components.Account
 @using PoliticiEditor.Components.Autocomplete
@@ -49,10 +48,6 @@ else
                                     </div>
                                 </ItemTemplate>
                             </HlidacAutocomplete>
-
-                            <input type="text" id="polStrana"
-                                   class="form-control"
-                                   @bind="@politicalParty.Organizace"/>
                         </div>
                         <div class="col-3">
                             <label for="datefrom">Datum působení od</label>
@@ -157,21 +152,20 @@ else
 
     private async Task<List<Autocomplete>> OnSearch(string query, CancellationToken cancellationToken)
     {
-        var result = await AutocompleteService.FindCompany(query, cancellationToken);
+        var result = AutocompleteService.FindPolitickaStrana(query);
         result.Insert(0, new Autocomplete()
         {
             Text = query,
-            DisplayText = query
         });
         return result;
     }
 
     private void FillPoliticalParty(OsobaEvent politicalParty, Autocomplete item)
     {
-        politicalParty.Organizace = item.DisplayText.Trim();
-        if (item.Id?.Contains("ico:") == true)
+        politicalParty.Organizace = item.Text.Trim();
+        if (!string.IsNullOrWhiteSpace(item.Id))
         {
-            politicalParty.Ico = item.Id.Replace("ico:", "").Trim();
+            politicalParty.Ico = item.Id.Trim();
         }
     }
 }

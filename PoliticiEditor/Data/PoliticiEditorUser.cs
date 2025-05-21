@@ -5,8 +5,8 @@ public class PoliticiEditorUser
     public int Id { get; set; }
     public string? NameId { get; set; }
     public string? Email { get; set; }
-    public string? EmailUpper { get; set; }
-    public string? EmailHash { get; set; }
+    public string? EmailUpper { get; private set; }
+    public string? EmailHash { get; private set; }
     
     public string? PhoneNumber { get; set; }
     public string? Name { get; set; }
@@ -15,6 +15,16 @@ public class PoliticiEditorUser
     public bool IsApproved { get; set; }
     public string? RegistrationInfo { get; set; }
     public string? BirthYearOrDate { get; set; }
+
+    public void SetEmailProperties()
+    {
+        if(Email is null)
+            return;
+        
+        Email = Email.Trim();
+        EmailUpper = Email.Trim().ToUpperInvariant();
+        EmailHash = GetEmailHash(Email);
+    }
     
     public static string GetEmailHash(string email)
     {

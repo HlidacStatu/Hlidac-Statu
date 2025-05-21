@@ -142,12 +142,11 @@
         {
             Name = $"{Input.Name.Trim()} {Input.Surname.Trim()}",
             Email = Input.Email.Trim(),
-            EmailUpper = Input.Email.Trim().ToUpperInvariant(),
-            EmailHash = PoliticiEditorUser.GetEmailHash(Input.Email),
             BirthYearOrDate = Input.BirthYearOrDate.Trim(),
             RegistrationInfo = Input.RegistrationInfo.Trim(),
             IsApproved = false,
         };
+        newUser.SetEmailProperties();
         
         DbContext.PoliticiEditorUsers.Add(newUser);
         await DbContext.SaveChangesAsync();

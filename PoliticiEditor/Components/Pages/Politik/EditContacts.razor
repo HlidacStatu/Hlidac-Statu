@@ -23,12 +23,12 @@
     <h5 class="card-header">Kontakty</h5>
     <div class="card-body">
         <div class="mx-auto">
-            <EditForm EditContext="editContext" FormName="login">
+            <EditForm EditContext="editContext" FormName="login" Model="_model">
                 <DataAnnotationsValidator/>
                 <h3>Zde můžete editovat své přihlašovací údaje</h3>
                 <hr/>
                 <ValidationSummary class="text-danger" role="alert"/>
-                @foreach (var contact in model.UserLogins)
+                @foreach (var contact in _model.UserLogins)
                 {
                     <div class="col-3">
                         <label for="email">Email</label>
@@ -61,7 +61,7 @@
 @code
 {
 
-    private EditContactsModel model = new();
+    private EditContactsModel _model = new();
 
     // private List<PoliticiEditorUser> UserLogins { get; set; } = new();
     private ClaimsPrincipal User { get; set; }
@@ -83,15 +83,18 @@
         if (string.IsNullOrWhiteSpace(nameId))
             return;
 
-        model.UserLogins = await DbContext.PoliticiEditorUsers.Where(u => u.NameId == nameId).ToListAsync();
+        _model.UserLogins = await DbContext.PoliticiEditorUsers.Where(u => u.NameId == nameId).ToListAsync();
         
-        editContext = new EditContext(model);
+        editContext = new EditContext(_model);
         messageStore = new ValidationMessageStore(editContext);
     }
 
     private async Task Save()
     {
         //todo: set email and hash
+        if(!AreContactsValid())
+            return;
+        
         
         
         try
@@ -117,7 +120,8 @@
 
     private void SetEmail(PoliticiEditorUser contact, string? value)
     {
-        throw new NotImplementedException();
+        contact.Email = value;
+        contact.SetEmailProperties();
     }
 
     private void AddContact()
@@ -131,7 +135,7 @@
             RegistrationInfo = "Created in selfadmin"
                 
         };
-        model.UserLogins.Insert(0, newContact);
+        _model.UserLogins.Insert(0, newContact);
         DbContext.PoliticiEditorUsers.Add(newContact);
 
     }
@@ -141,7 +145,7 @@
         messageStore.Clear();
         editContext.NotifyValidationStateChanged();
         bool hasError = false;
-        foreach (var login in model.UserLogins)
+        foreach (var login in _model.UserLogins)
         {
             if (!IsValidContact(login))
                 hasError = true;

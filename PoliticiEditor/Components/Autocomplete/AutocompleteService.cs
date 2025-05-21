@@ -7,15 +7,18 @@ public class AutocompleteService
     private static readonly string Endpoint = Devmasters.Config.GetWebConfigValue("AutocompleteEndpoint");
 
     private readonly IHttpClientFactory _httpClientFactory;
+    
+    private readonly LocallyCachedAutocompleteService _localAutocompleteService;
 
     private JsonSerializerOptions? _jsonSerializerOptions = new()
     {
         PropertyNameCaseInsensitive = true
     };
 
-    public AutocompleteService(IHttpClientFactory httpClientFactory)
+    public AutocompleteService(IHttpClientFactory httpClientFactory, LocallyCachedAutocompleteService localAutocompleteService)
     {
         _httpClientFactory = httpClientFactory;
+        _localAutocompleteService = localAutocompleteService;
     }
 
     public async Task<List<HlidacStatu.DS.Api.Autocomplete>> FindPerson(string q, CancellationToken ctx)
@@ -30,6 +33,18 @@ public class AutocompleteService
         var autocompletePath = $"/autocomplete/autocomplete?q={q}&category=Company StateCompany Authority City";
 
         return await RunAutocompleteQuery(ctx, autocompletePath);
+    }
+    
+    public List<HlidacStatu.DS.Api.Autocomplete> FindPolitickaStrana(string query)
+    {
+        if (_localAutocompleteService.PolitickeStranyAutocomplete is null)
+            return [];
+
+        return _localAutocompleteService.PolitickeStranyAutocomplete.Search(query, numResults: 15)
+            .OrderByDescending(s => s.Score)
+            .Take(8)
+            .Select(s => s.Document)
+            .ToList();
     }
     
 
