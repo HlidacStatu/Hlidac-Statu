@@ -201,7 +201,7 @@ else
 {
 
     <cache expires-after="@Constants.CachedActionLength.Cache24H"
-           vary-by="@($"{Model.id}_{Model.rok}_{Model.priv}")">
+           vary-by="@($"{Model.id}_{Model.rok}_{Model.priv}_{this.User.IsInRole("Admin")}")">
         @{
             ViewBag.ICO = Model.id;
             ViewBag.FutureData = futureData;
