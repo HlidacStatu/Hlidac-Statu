@@ -13,54 +13,63 @@
 
 @inject UserHelper UserHelper
 @inject ToastService Toaster
-@inject NavigationManager NavigationManager
 
 @rendermode @(new InteractiveServerRenderMode(prerender: false))
 @attribute [Authorize]
 
-<div class="card mb-3">
-    <h5 class="card-header">Kontakty</h5>
-    <div class="card-body">
-        <div class="mx-auto">
-            <EditForm EditContext="editContext" FormName="login">
-                <DataAnnotationsValidator/>
-                <h3>Zde můžete editovat své přihlašovací údaje</h3>
-                <hr/>
-                <ValidationSummary class="text-danger" role="alert"/>
-                @foreach (var contact in _model.UserLogins)
-                {
-                    <div class="col-3">
-                        <label for="email">Email</label>
-                        <input type="text" id="email"
-                               class="form-control"
-                               @bind:get="@contact.Email"
-                               @bind:set="@(x => SetEmail(contact, x))"/>
-                        <ValidationMessage For="() => contact.Email" class="text-danger"/>
-                    </div>
-                    <div class="col-3">
-                        <label for="phone">Telefon</label>
-                        <input type="text" id="phone"
-                               class="form-control"
-                               @bind="@contact.PhoneNumber"/>
-                        <ValidationMessage For="() => contact.PhoneNumber" class="text-danger"/>
-                    </div>
-                }
-            </EditForm>
-        </div>
-    </div>
-
-    <div class="card-footer text-body-secondary d-flex">
-        <button class="btn btn-primary" @onclick="@(AddContact)">Přidat kontakt</button>
-        @if (_db?.ChangeTracker.HasChanges() == true)
-        {
-            <div class="ms-auto">
-                <button class="btn btn-success" @onclick="@(Save)">Uložit změny</button>
-                <button class="btn btn-warning" @onclick="@(Cancel)">Zrušit změny</button>
+@if (IsInitialized)
+{
+    <div class="card mb-3">
+        <h5 class="card-header">Kontakty</h5>
+        <div class="card-body">
+            <div class="mx-auto">
+                <EditForm EditContext="editContext" FormName="login">
+                    <DataAnnotationsValidator/>
+                    <h3>Zde můžete editovat své přihlašovací údaje</h3>
+                    <hr/>
+                    <ValidationSummary class="text-danger" role="alert"/>
+                    @foreach (var contact in _model.UserLogins)
+                    {
+                        <div class="row">
+                            <div class="col-3">
+                                <label for="email">Email</label>
+                                <input type="text" id="email"
+                                       class="form-control"
+                                       @bind:get="@contact.Email"
+                                       @bind:set="@(x => SetEmail(contact, x))"/>
+                                <ValidationMessage For="() => contact.Email" class="text-danger"/>
+                            </div>
+                            <div class="col-3">
+                                <label for="phone">Telefon</label>
+                                <input type="text" id="phone"
+                                       class="form-control"
+                                       @bind="@contact.PhoneNumber"/>
+                                <ValidationMessage For="() => contact.PhoneNumber" class="text-danger"/>
+                            </div>
+                        </div>
+                    }
+                </EditForm>
             </div>
-        }
-    </div>
+        </div>
 
-</div>
+        <div class="card-footer text-body-secondary d-flex">
+            <button class="btn btn-primary" @onclick="@(AddContact)">Přidat kontakt</button>
+            @if (_db?.ChangeTracker.HasChanges() == true)
+            {
+                <div class="ms-auto">
+                    <button class="btn btn-success" @onclick="@(Save)">Uložit změny</button>
+                    <button class="btn btn-warning" @onclick="@(Cancel)">Zrušit změny</button>
+                </div>
+            }
+        </div>
+
+    </div>
+}
+else
+{
+    <p>načítám data</p>
+}
+
 
 @code
 {
@@ -74,7 +83,8 @@
 
     private EditContext editContext;
     private ValidationMessageStore messageStore;
-
+    private bool IsInitialized = false;
+    
     private class EditContactsModel
     {
         public List<PoliticiEditorUser> UserLogins { get; set; } = new();
@@ -96,6 +106,7 @@
     
     private async Task RefreshContextAsync()
     {
+        IsInitialized = false;
         if (_db is not null)
             await _db.DisposeAsync();
 
@@ -108,6 +119,7 @@
         };
         editContext = new EditContext(_model);
         messageStore = new ValidationMessageStore(editContext);
+        IsInitialized = true;
     }
 
     private async Task Save()
