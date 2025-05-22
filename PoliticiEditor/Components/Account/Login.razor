@@ -120,7 +120,7 @@
         await _db.SaveChangesAsync();
 
         //todo: poslat mailem, 
-        _loginToken = $"https://localhost:7174/Account/Login-Callback/{WebUtility.UrlEncode(loginToken.Token)}/{WebUtility.UrlEncode(user.EmailHash)}";
+        _loginToken = $"https://admin.politici.hlidacstatu.cz/Account/Login-Callback/{WebUtility.UrlEncode(loginToken.Token)}/{WebUtility.UrlEncode(user.EmailHash)}";
 
         statusMessage = "Na vaší emailovou adresu byl odeslán email s přihlašovacímmi údaji.";
     }
