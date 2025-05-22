@@ -1,9 +1,12 @@
 ﻿@using System.ComponentModel.DataAnnotations
 @using System.Net
+@using HlidacStatu.Entities
+@using HlidacStatu.Entities.Entities.PoliticiSelfAdmin
 @using Microsoft.EntityFrameworkCore
-@using PoliticiEditor.Data
 
-@inject PoliticiLoginsDbContext DbContext
+@implements IAsyncDisposable
+
+
 @rendermode InteractiveServer
 
 <h2>Přihlášení</h2>
@@ -74,7 +77,8 @@
     private InputModel Input { get; set; } = new();
 
     private bool ShowRegistration { get; set; } = false;
-    
+    private DbEntities? _db = new();
+
     //todo: later delete this
     private string _loginToken;
 
@@ -87,12 +91,12 @@
         messageStore = new ValidationMessageStore(editContext);
     }
 
-    public async Task LoginUser()
+    private async Task LoginUser()
     {
         if(!IsValidToLogin())
             return;
 
-        var user = await DbContext.PoliticiEditorUsers
+        var user = await _db.PoliticiEditorUsers
             .FirstOrDefaultAsync(u => u.EmailUpper == Input.Email.ToUpperInvariant());
 
         if (user is null)
@@ -112,8 +116,8 @@
 
         var loginToken = PoliticiLoginToken.CreateTokenForUser(user.Id);
 
-        DbContext.PoliticiLoginTokens.Add(loginToken);
-        await DbContext.SaveChangesAsync();
+        _db.PoliticiLoginTokens.Add(loginToken);
+        await _db.SaveChangesAsync();
 
         //todo: poslat mailem, 
         _loginToken = $"https://localhost:7174/Account/Login-Callback/{WebUtility.UrlEncode(loginToken.Token)}/{WebUtility.UrlEncode(user.EmailHash)}";
@@ -148,8 +152,8 @@
         };
         newUser.SetEmailProperties();
         
-        DbContext.PoliticiEditorUsers.Add(newUser);
-        await DbContext.SaveChangesAsync();
+        _db.PoliticiEditorUsers.Add(newUser);
+        await _db.SaveChangesAsync();
 
         statusMessage = "Registrace úspěšná. Zkontrolujte email.";
         ShowRegistration = false;
@@ -217,6 +221,14 @@
         }
 
         return !hasError;
+    }
+    
+    public async ValueTask DisposeAsync()
+    {
+        if (_db is not null)
+        {
+            await _db.DisposeAsync();
+        }
     }
 
 }

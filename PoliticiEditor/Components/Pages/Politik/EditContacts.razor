@@ -2,19 +2,18 @@
 
 @using System.ComponentModel.DataAnnotations
 @using System.Security.Claims
-
+@using HlidacStatu.Entities
+@using HlidacStatu.Entities.Entities.PoliticiSelfAdmin
 @using Microsoft.AspNetCore.Authorization
 @using Microsoft.EntityFrameworkCore
 @using PoliticiEditor.Components.Account
-@using PoliticiEditor.Data
 @using Serilog
+
+@implements IAsyncDisposable
 
 @inject UserHelper UserHelper
 @inject ToastService Toaster
 @inject NavigationManager NavigationManager
-
-@inject PoliticiLoginsDbContext DbContext
-
 
 @rendermode @(new InteractiveServerRenderMode(prerender: false))
 @attribute [Authorize]
@@ -23,7 +22,7 @@
     <h5 class="card-header">Kontakty</h5>
     <div class="card-body">
         <div class="mx-auto">
-            <EditForm EditContext="editContext" FormName="login" Model="_model">
+            <EditForm EditContext="editContext" FormName="login">
                 <DataAnnotationsValidator/>
                 <h3>Zde můžete editovat své přihlašovací údaje</h3>
                 <hr/>
@@ -50,10 +49,15 @@
         </div>
     </div>
 
-    <div class="card-footer text-body-secondary">
+    <div class="card-footer text-body-secondary d-flex">
         <button class="btn btn-primary" @onclick="@(AddContact)">Přidat kontakt</button>
-        <button class="btn btn-success" @onclick="@(Save)">Uložit změny</button>
-        <button class="btn btn-warning" @onclick="@(Cancel)">Zrušit změny</button>
+        @if (_db?.ChangeTracker.HasChanges() == true)
+        {
+            <div class="ms-auto">
+                <button class="btn btn-success" @onclick="@(Save)">Uložit změny</button>
+                <button class="btn btn-warning" @onclick="@(Cancel)">Zrušit změny</button>
+            </div>
+        }
     </div>
 
 </div>
@@ -62,10 +66,11 @@
 {
 
     private EditContactsModel _model = new();
-
-    // private List<PoliticiEditorUser> UserLogins { get; set; } = new();
-    private ClaimsPrincipal User { get; set; }
     private ILogger _logger = Log.ForContext<EditContacts>();
+    private DbEntities? _db = new();
+
+    private string? NameId { get; set; }
+    private ClaimsPrincipal User { get; set; }
 
     private EditContext editContext;
     private ValidationMessageStore messageStore;
@@ -78,44 +83,54 @@
     protected override async Task OnInitializedAsync()
     {
         User = await UserHelper.GetCurrentUserAsync();
-        var nameId = User.GetNameId();
-
-        if (string.IsNullOrWhiteSpace(nameId))
+        NameId = User.GetNameId();
+        if (NameId is null)
+        {
+            Toaster.AddMessage("Chyba", $"Data se nepodařilo načíst", importance: ToastService.ToastMessage.ImportanceLevel.Error);
+            _logger.Error($"Osoba is null for user with Name Id:{User.GetNameId()}");
             return;
+        }
 
-        _model.UserLogins = await DbContext.PoliticiEditorUsers.Where(u => u.NameId == nameId).ToListAsync();
-        
+        await RefreshContextAsync();
+    }
+    
+    private async Task RefreshContextAsync()
+    {
+        if (_db is not null)
+            await _db.DisposeAsync();
+
+        _db = new DbEntities();
+
+        var logins = await _db.PoliticiEditorUsers.Where(u => u.NameId == NameId).ToListAsync();
+        _model = new EditContactsModel
+        {
+            UserLogins = logins
+        };
         editContext = new EditContext(_model);
         messageStore = new ValidationMessageStore(editContext);
     }
 
     private async Task Save()
     {
-        //todo: set email and hash
         if(!AreContactsValid())
             return;
         
-        
-        
-        try
-        {
-            await DbContext.SaveChangesAsync();
-
-            Toaster.AddInfoMessage("Uloženo", "Změny byly úspěšně uloženy.");
-        }
-        catch (Exception e)
-        {
-            Toaster.AddErrorMessage("Chyba", "Během ukládání došlo k chybě.");
-            _logger.Error(e, "Couldnt save social data.");
-        }
-
-        NavigationManager.Refresh(true);
+        await Helpers.Save(_db, User.GetNameId(), Toaster, _logger);
+        await RefreshContextAsync();
     }
 
-    private void Cancel()
+    private async Task Cancel()
     {
+        await RefreshContextAsync();
         Toaster.AddInfoMessage("Zrušeno", "Změny byly zrušeny.");
-        NavigationManager.Refresh(true);
+    }
+    
+    public async ValueTask DisposeAsync()
+    {
+        if (_db is not null)
+        {
+            await _db.DisposeAsync();
+        }
     }
 
     private void SetEmail(PoliticiEditorUser contact, string? value)
@@ -136,7 +151,10 @@
                 
         };
         _model.UserLogins.Insert(0, newContact);
-        DbContext.PoliticiEditorUsers.Add(newContact);
+        if (_db is not null)
+        {
+            _db.PoliticiEditorUsers.Add(newContact);
+        }
 
     }
 

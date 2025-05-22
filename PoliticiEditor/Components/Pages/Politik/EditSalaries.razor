@@ -4,7 +4,6 @@
 @using HlidacStatu.DS.Api
 @using HlidacStatu.Entities
 @using HlidacStatu.Repositories
-@using HlidacStatu.Repositories.Auditing
 @using Microsoft.AspNetCore.Authorization
 @using Microsoft.EntityFrameworkCore
 @using PoliticiEditor.Components.Account
@@ -94,9 +93,11 @@
         </div>
     </div>
 
-    <div class="card-footer text-body-secondary">
-        <button class="btn btn-primary" @onclick="@(Save)">Přidat příjem</button>
-        <button class="btn btn-danger" @onclick="@(Cancel)">Zrušit změny</button>
+    <div class="card-footer text-body-secondary d-flex">
+        <div class="ms-auto">
+            <button class="btn btn-success" @onclick="@(Save)">Uložit změny</button>
+            <button class="btn btn-warning" @onclick="@(Cancel)">Zrušit změny</button>
+        </div>
     </div>
 
 </div>

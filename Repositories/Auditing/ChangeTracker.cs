@@ -44,6 +44,9 @@ public static class ChangeTracker
     
     public static Task SaveAuditLogAsync(List<AuditLog> audits)
     {
+        if (audits == null || audits.Count == 0)
+            return Task.CompletedTask;
+        
         foreach (var audit in audits.Where(a => a.EntityId == null && a.EntryReference != null))
         {
             var pkName = audit.EntryReference.Metadata.FindPrimaryKey()?.Properties.FirstOrDefault()?.Name;

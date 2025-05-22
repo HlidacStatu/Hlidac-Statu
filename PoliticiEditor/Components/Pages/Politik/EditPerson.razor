@@ -63,9 +63,14 @@ else
             </div>
         </div>
 
-        <div class="card-footer text-body-secondary">
-            <button class="btn btn-success" @onclick="@(Save)">Uložit změny</button>
-            <button class="btn btn-warning" @onclick="@(Cancel)">Zrušit změny</button>
+        <div class="card-footer text-body-secondary d-flex">
+            @if (_db?.ChangeTracker.HasChanges() == true)
+            {
+                <div class="ms-auto">
+                    <button class="btn btn-success" @onclick="@(Save)">Uložit změny</button>
+                    <button class="btn btn-warning" @onclick="@(Cancel)">Zrušit změny</button>
+                </div>
+            }
         </div>
     </div>
 }

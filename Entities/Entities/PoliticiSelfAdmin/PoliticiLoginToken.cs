@@ -1,6 +1,7 @@
+using System;
 using System.Security.Cryptography;
 
-namespace PoliticiEditor.Data;
+namespace HlidacStatu.Entities.Entities.PoliticiSelfAdmin;
 
 // Add profile data for application users by adding properties to the ApplicationUser class
 public class PoliticiLoginToken

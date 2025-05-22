@@ -66,8 +66,8 @@ public sealed class ToastService
             _messages.Add(toast);
         }
 
-        OnMessagesChange?.Invoke();
         _ = HandleDisplayAsync(toast); //fire and forget
+        OnMessagesChange?.Invoke();
     }
 
     public void RemoveMessage(ToastMessage toast)

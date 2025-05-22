@@ -4,6 +4,7 @@ using HlidacStatu.Entities.Views;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using System.Linq;
+using HlidacStatu.Entities.Entities.PoliticiSelfAdmin;
 
 namespace HlidacStatu.Entities
 {
@@ -292,6 +293,9 @@ namespace HlidacStatu.Entities
         public virtual DbSet<AutocompleteSynonym> AutocompleteSynonyms { get; set; }
         
         public virtual DbSet<SmlouvaVerejnaZakazka> SmlouvaVerejnaZakazka { get; set; }
+        
+        public DbSet<PoliticiEditorUser> PoliticiEditorUsers { get; set; }
+        public DbSet<PoliticiLoginToken> PoliticiLoginTokens { get; set; }
 
         //views
         public DbSet<FindPersonDTO> FindPersonView { get; set; }

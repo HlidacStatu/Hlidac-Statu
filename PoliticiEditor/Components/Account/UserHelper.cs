@@ -1,6 +1,6 @@
 using System.Security.Claims;
+using HlidacStatu.Entities.Entities.PoliticiSelfAdmin;
 using Microsoft.AspNetCore.Components.Authorization;
-using PoliticiEditor.Data;
 
 namespace PoliticiEditor.Components.Account;
 

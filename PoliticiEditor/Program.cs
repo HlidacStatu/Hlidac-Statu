@@ -7,7 +7,6 @@ using PoliticiEditor.Components;
 using PoliticiEditor.Components.Account;
 using PoliticiEditor.Components.Autocomplete;
 using PoliticiEditor.Components.Toasts;
-using PoliticiEditor.Data;
 using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -27,11 +26,10 @@ builder.Services.AddSingleton<ToastService>();
 builder.Services.AddSingleton<LocallyCachedAutocompleteService>();
 builder.Services.AddHostedService<AutocompleteBackgroundTimer>();
 
-string connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ??
-                          throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
-builder.Services.AddDbContext<DbEntities>(options =>
-    options.UseSqlServer(connectionString));
-    
+// string connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ??
+//                           throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
+// builder.Services.AddDbContext<DbEntities>(options =>
+//     options.UseSqlServer(connectionString));
 
 // Default services
 builder.Services.AddRazorComponents()
@@ -55,10 +53,6 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
         options.LogoutPath = "/Account/Logout"; // (optional) if you have logout there
     });
 
-var identityDbConnectionString = builder.Configuration.GetConnectionString("DefaultConnection") ??
-                       throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
-builder.Services.AddDbContext<PoliticiLoginsDbContext>(options =>
-    options.UseSqlServer(identityDbConnectionString));
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
 var app = builder.Build();

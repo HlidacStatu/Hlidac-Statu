@@ -1,4 +1,6 @@
-namespace PoliticiEditor.Data;
+using System;
+
+namespace HlidacStatu.Entities.Entities.PoliticiSelfAdmin;
 
 public class PoliticiEditorUser
 {

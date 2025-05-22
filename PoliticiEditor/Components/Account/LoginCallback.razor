@@ -1,12 +1,13 @@
 ﻿@page "/Account/Login-Callback/{Token}/{Mhash}"
 @using System.Security.Claims
+@using HlidacStatu.Entities
 @using Microsoft.AspNetCore.Authentication
 @using Microsoft.AspNetCore.Authentication.Cookies
 @using Microsoft.EntityFrameworkCore
-@using PoliticiEditor.Data
+
+@implements IAsyncDisposable
 
 @inject NavigationManager NavigationManager
-@inject PoliticiLoginsDbContext DbContext
 @inject IHttpContextAccessor HttpContextAccessor
 
 <h1>Přihlašuju...</h1>
@@ -17,10 +18,13 @@
     public string Token { get; set; }
     [Parameter]
     public string Mhash { get; set; }
+    
+    private DbEntities? _db = new();
+
 
     protected override async Task OnParametersSetAsync()
     {
-        var user = await DbContext.PoliticiEditorUsers
+        var user = await _db.PoliticiEditorUsers
             .FirstOrDefaultAsync(u => u.EmailHash == Mhash);
         
         if (user is null || user.IsApproved == false)
@@ -29,7 +33,7 @@
             return;
         }
         
-        var loginToken = await DbContext.PoliticiLoginTokens
+        var loginToken = await _db.PoliticiLoginTokens
             .FirstOrDefaultAsync(t => t.Token == Token && !t.Used && t.ExpiresAt > DateTime.Now && t.UserId == user.Id);
 
         if (loginToken == null)
@@ -39,7 +43,7 @@
         }
 
         loginToken.Used = true;
-        await DbContext.SaveChangesAsync();
+        await _db.SaveChangesAsync();
 
         var claims = user.CreateClaims();
 
@@ -54,6 +58,14 @@
         HttpContextAccessor.HttpContext.Response.Redirect("/");
         
 
+    }
+    
+    public async ValueTask DisposeAsync()
+    {
+        if (_db is not null)
+        {
+            await _db.DisposeAsync();
+        }
     }
 
 }
