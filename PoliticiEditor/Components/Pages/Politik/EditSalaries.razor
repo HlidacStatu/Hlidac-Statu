@@ -53,6 +53,13 @@
     <div class="card-body">
         <div>
             <div class="mb-3">
+                <label for="Rok">Kalendářní rok za který vyplňujete příjem</label>
+                <input id="Rok" type="number"
+                       class="form-control @(IsValidYear(NewIncome.Rok) ? "" : "is-invalid")"
+                       disabled
+                       @bind="NewIncome.Rok"/>
+            </div>
+            <div class="mb-3">
                 <label for="Organizace">Organizace, která platí</label>
                 <HlidacAutocomplete SearchFuncAsync="@((s, token) => OnSearch(s, token))"
                                     OnAutocompleteItemSelected="@(item => FillOrganizace(item))"
@@ -65,12 +72,6 @@
                         </div>
                     </ItemTemplate>
                 </HlidacAutocomplete>
-            </div>
-            <div class="mb-3">
-                <label for="Rok">Uveďte, za který kalendářní rok vyplňujete příjem</label>
-                <input id="Rok" type="number"
-                       class="form-control @(IsValidYear(NewIncome.Rok) ? "" : "is-invalid")"
-                       @bind="NewIncome.Rok"/>
             </div>
             <div class="mb-3">
                 <label for="PocetMesicu">Uveďte kolik měsíců jste v daném roce vykonával funkci</label>
@@ -163,6 +164,7 @@
         NewIncome = new PpPrijem()
         {
             Nameid = NameId,
+            Rok = PpRepo.DefaultYear,
             SkrytaPoznamka = $"Plat přidal manuálně {NameId} dne {DateTime.Now:s}"
         };
 
