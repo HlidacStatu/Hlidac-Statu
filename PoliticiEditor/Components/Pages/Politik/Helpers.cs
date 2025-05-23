@@ -12,7 +12,7 @@ public static class Helpers
         {
             var auditLogs = ChangeTracker.CreateAuditLogs(db, getNameId);
             await db.SaveChangesAsync();
-            await ChangeTracker.SaveAuditLogAsync(auditLogs);
+            await ChangeTracker.SaveAuditsLogAsync(auditLogs);
             toaster.AddInfoMessage("Uloženo", "Změny byly úspěšně uloženy.");
         }
         catch (Exception e)

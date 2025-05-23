@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
+using HlidacStatu.Entities;
 using Microsoft.EntityFrameworkCore;
 
 namespace HlidacStatu.Repositories.Auditing;
@@ -42,10 +43,10 @@ public static class ChangeTracker
     }
     
     
-    public static Task SaveAuditLogAsync(List<AuditLog> audits)
+    public static async Task SaveAuditsLogAsync(List<AuditLog> audits)
     {
         if (audits == null || audits.Count == 0)
-            return Task.CompletedTask;
+            return;
         
         foreach (var audit in audits.Where(a => a.EntityId == null && a.EntryReference != null))
         {
@@ -58,10 +59,6 @@ public static class ChangeTracker
             audit.EntryReference = null; // clear to avoid serialization issues
         }
 
-        
-        //todo: save this log into es
-        Console.WriteLine("Saving audit logs");
-        Console.WriteLine(JsonSerializer.Serialize(audits));
-        return Task.CompletedTask;
+        await AuditLogRepo.BulkSaveAsync(audits);
     }
 }

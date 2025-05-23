@@ -55,7 +55,9 @@ namespace HlidacStatu.Connectors
             SplitSmlouvy,
             SearchPromo,
             PermanentLLM,
-            Dotace
+            Dotace,
+            AuditLog
+            
         }
 
         public static string defaultIndexName = "hlidacsmluv";
@@ -78,6 +80,7 @@ namespace HlidacStatu.Connectors
         public static string defaultIndexName_InsolvenceDocs = "insolvencedocs";
         public static string defaultIndexName_Subsidy = "subsidy3";
         public static string defaultIndexName_Dotace = "dotace3";
+        public static string defaultIndexName_AuditLog = "audit_log";
         public static string defaultIndexName_DotaceOld = "dotace";
         public static string defaultIndexName_Uptime = "uptime";
         public static string defaultIndexName_UptimeSSL = "uptimessl";
@@ -307,6 +310,11 @@ namespace HlidacStatu.Connectors
         public static Task<ElasticClient> GetESClient_KindexFeedbackAsync(int timeOut = 60000, int connectionLimit = 80)
         {
             return GetESClientAsync(defaultIndexName_KindexFeedback, timeOut, connectionLimit, IndexType.KindexFeedback);
+        }
+        
+        public static Task<ElasticClient> GetESClient_AuditLogAsync(int timeOut = 60000, int connectionLimit = 80)
+        {
+            return GetESClientAsync(defaultIndexName_AuditLog, timeOut, connectionLimit, IndexType.AuditLog);
         }
 
         public const string DataSourceIndexNamePrefix = "data_";
@@ -627,6 +635,13 @@ namespace HlidacStatu.Connectors
                         .CreateAsync(indexName, i => i
                             .InitializeUsing(idxSt)
                             .Map<Entities.Dotace>(map => map.AutoMap().DateDetection(false))
+                        );
+                    break;
+                case IndexType.AuditLog:
+                    res = await client.Indices
+                        .CreateAsync(indexName, i => i
+                            .InitializeUsing(idxSt)
+                            .Map<Entities.AuditLog>(map => map.AutoMap().DateDetection(false))
                         );
                     break;
                 case IndexType.PageMetadata:
