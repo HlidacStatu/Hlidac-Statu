@@ -4,9 +4,8 @@
 
 @inject UserHelper UserHelper
 
-<PageTitle>Výtejte v administraci politiků</PageTitle>
+<PageTitle>Vítejte v administraci politiků Hlídače státu</PageTitle>
 
-<h1>Na těchto stránkách můžete editovat informace o sobě</h1>
 
 @if (User is null || User.Identity?.IsAuthenticated == false)
 {
@@ -14,7 +13,25 @@
 }
 else
 {
-    <h2>Co byste chtěli upravit o sobě</h2>
+    <h1>Na těchto stránkách můžete editovat informace o sobě</h1>
+
+    <div class="person-profile-thumb">
+        <a href="/">
+            <div class="profile-picture border" style="background-image: url(/Photo/andrej-babis)">
+                <!-- diky pouziti background image nezalezi na pomeru stran obrazku a neni poteba tvorit thumbnaily na serveru -->
+            </div>
+        </a>
+        <div>
+            <a class="section-title link--blue" href="/">
+                Andrej Babiš
+            </a>
+            <div class="new-p new-p--gray new-p--small">
+                (*1954)
+            </div>
+        </div>
+    </div>
+
+    <h2>@osoba.FullNameWithYear()</h2>
     <ul>
         <li>
             <a class="btn btn-primary" href="/EditPhoto">Změnit svou fotografii</a>
@@ -41,9 +58,11 @@ else
 @code {
 
     private ClaimsPrincipal? User { get; set; } 
+    private HlidacStatu.Entities.Osoba osoba { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
         User = await UserHelper.GetCurrentUserAsync();
+        osoba = HlidacStatu.Repositories.Osoby.GetByNameId.Get(User.GetNameId());
     }
 }
