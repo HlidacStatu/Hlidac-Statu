@@ -19,6 +19,35 @@
 @rendermode @(new InteractiveServerRenderMode(prerender: false))
 @attribute [Authorize]
 
+
+<div class="card mb-3">
+    <h5 class="card-header">Přehled příjmů od státních a polostátních organizací či veřejných institucí, které aktuálně evidujeme za rok 2024</h5>
+    <div class="card-body">
+        <div>
+            <table class="table table-bordered table-sm align-middle auto-width">
+                <thead>
+                    <tr class="table-light">
+                        <th>Organizace</th>
+                        <th>Rok</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var platyItem in Platy)
+                    {
+                        <tr>
+                            <td>
+                                @(GetOrgName(platyItem.IdOrganizace))
+                            </td>
+                            <td>@platyItem.Rok.ToString("F0")</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+
 <div class="card mb-3">
     <h5 class="card-header">Přidat příjem</h5>
     <div class="card-body">
@@ -102,32 +131,6 @@
 
 </div>
 
-<div class="card mb-3">
-    <h5 class="card-header">Přehled příjmů o kterých víme</h5>
-    <div class="card-body">
-        <div>
-            <table class="table table-bordered table-sm align-middle auto-width">
-                <thead>
-                <tr class="table-light">
-                    <th>Organizace</th>
-                    <th>Rok</th>
-                </tr>
-                </thead>
-                <tbody>
-                @foreach (var platyItem in Platy)
-                {
-                    <tr>
-                        <td>
-                            @(GetOrgName(platyItem.IdOrganizace))
-                        </td>
-                        <td>@platyItem.Rok.ToString("F0")</td>
-                    </tr>
-                }
-                </tbody>
-            </table>
-        </div>
-    </div>
-</div>
 
 
 @code
@@ -169,7 +172,8 @@
         _db = new DbEntities();
 
         Platy = await _db.PpPrijmy
-            .Where(p => p.Nameid == NameId)
+            .Where(p => p.Nameid == NameId && p.Rok== HlidacStatu.Repositories.PuRepo.DefaultYear)
+
             .ToListAsync();
 
         await PreloadOrgs();
