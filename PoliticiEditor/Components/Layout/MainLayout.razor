@@ -1,15 +1,13 @@
 ﻿@inherits LayoutComponentBase
 
-<div class="page">
-    <main>
-            <TopBar/>
-            <ToastArea/>
-
-            <article class="content px-4">
-                @Body
-            </article>
-    </main>
+<div>
+    <TopBar/>
 </div>
+<ToastArea/>
+<div>
+    @Body
+</div>
+<Footer/>
 
 <div id="blazor-error-ui">
     Došlo k neočekávané chybě

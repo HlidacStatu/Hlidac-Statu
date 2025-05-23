@@ -30,7 +30,7 @@
             <div>
                 <button type="button" class="w-100 btn btn-lg btn-primary" @onclick="LoginUser">Přihlásit</button>
             </div>
-            @if (ShowRegistration)
+            @if (false)
             {
                 <h3>Zadaný email jsme nenalezli mezi zaregistrovanými</h3>
                 <p>Vyplněním položek níže se můžete zaregistrovat.</p>
@@ -101,7 +101,7 @@
 
         if (user is null)
         {
-            statusMessage = "Email nebyl nalezen. Můžete zkusit jiný email, nebo se zaregistrovat";
+            statusMessage = "Email nebyl nalezen. Zkuste jiný mail, který máte u nás zaregistrovaný";
             ShowRegistration = true;
             return;
         }
