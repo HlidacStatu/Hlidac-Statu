@@ -57,60 +57,60 @@
     <script>
         // Radialize the colors
         Highcharts.setOptions({
-            colors: Highcharts.map(Highcharts.getOptions().colors, function (color) {
-                return {
-                    radialGradient: {
-                        cx: 0.5,
-                        cy: 0.3,
-                        r: 0.7
-                    },
-                    stops: [
-                        [0, color],
-                        [1, Highcharts.color(color).brighten(-0.3).get('rgb')] // darken
-                    ]
-                };
-            })
+        colors: Highcharts.map(Highcharts.getOptions().colors, function (color) {
+        return {
+        radialGradient: {
+        cx: 0.5,
+        cy: 0.3,
+        r: 0.7
+        },
+        stops: [
+        [0, color],
+        [1, Highcharts.color(color).brighten(-0.3).get('rgb')] // darken
+        ]
+        };
+        })
         });
 
         $(document).ready(function () {
 
-            $("#sel_obory").change(function () {
-                $(this).find("option:selected").each(function () {
-                    var optionValue = $(this).attr("value");
-                    if (optionValue) {
-                        $(".boxobor").not("." + optionValue).hide();
-                        $(".boxobor." + optionValue).show();
-                        InitLowBox();
-                    } else {
-                        $(".boxobor").hide();
-                    }
-                });
-            }).change();
+        $("#sel_obory").change(function () {
+        $(this).find("option:selected").each(function () {
+        var optionValue = $(this).attr("value");
+        if (optionValue) {
+        $(".boxobor").not("." + optionValue).hide();
+        $(".boxobor." + optionValue).show();
+        InitLowBox();
+        } else {
+        $(".boxobor").hide();
+        }
+        });
+        }).change();
 
-            var shown = readCookie("kindexDisclaimerNoteShown");
-            if (shown != "yes") {
-                createCookie("kindexDisclaimerNoteShown", "yes", 2);
-                $('#kindexDisclaimerPopupfbForm').modal('show');
-            }
+        var shown = readCookie("kindexDisclaimerNoteShown");
+        if (shown != "yes") {
+        createCookie("kindexDisclaimerNoteShown", "yes", 2);
+        $('#kindexDisclaimerPopupfbForm').modal('show');
+        }
 
-            var urihash = window.location.hash;
-            if (urihash) {
-                $('html,body').animate({ scrollTop: $(urihash).offset().top }, 500);
-                $(urihash).click();
-            }
+        var urihash = window.location.hash;
+        if (urihash) {
+        $('html,body').animate({ scrollTop: $(urihash).offset().top }, 500);
+        $(urihash).click();
+        }
 
 
         });
         function showHelp(btn, id) {
-            var visible = $(btn).text().includes('@Html.Raw(ukazatTxt)');
-            if (visible) {
-                $(id).show(300, function () { InitLowBox(); });
-                $(btn).text('@Html.Raw(schovatTxt)');
-            }
-            else {
-                $(id).hide(300);
-                $(btn).text('@Html.Raw(ukazatTxt)');
-            }
+        var visible = $(btn).text().includes('@Html.Raw(ukazatTxt)');
+        if (visible) {
+        $(id).show(300, function () { InitLowBox(); });
+        $(btn).text('@Html.Raw(schovatTxt)');
+        }
+        else {
+        $(id).hide(300);
+        $(btn).text('@Html.Raw(ukazatTxt)');
+        }
         }
     </script>
 
@@ -156,12 +156,21 @@
                     var kidxP = kidxPublic?.ForYear(rok);
                     var kidxF = kidxFuture?.ForYear(rok);
                     //var prevP = kidxPublic.GetPreviousVersions()?.Select(m => m?.KIndex?.ForYear(rok)?.KIndex)?.Where(m=>m!=null);
-                    var prevF = (await kidxFuture?.GetPreviousVersionsAsync(true))?
-                    .OrderByDescending(o => o.Created)?
-                    .Select(m => m?.KIndex?.ForYear(rok)?.KIndex)?
-                    .Where(m => m != null)?
-                    .Select(m => m.Value.ToString("N2"))
-                    .ToList();
+                    IOrderedEnumerable<Backup> prevVersions = null;
+                        if (kidxFuture != null)
+                        { 
+                            prevVersions= await kidxFuture?.GetPreviousVersionsAsync(true);
+                        }
+
+                    List<string> prevF = null;
+                        if (prevVersions != null) {
+                            prevF = prevVersions
+                                .OrderByDescending(o => o.Created)?
+                                .Select(m => m?.KIndex?.ForYear(rok)?.KIndex)?
+                                .Where(m => m != null)?
+                                .Select(m => m.Value.ToString("N2"))?
+                                .ToList();
+                        }
                     <tr>
                         <td>@rok</td>
                         <td>@(kidxP?.KIndexReady)</td>
