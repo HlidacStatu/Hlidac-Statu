@@ -1,8 +1,7 @@
-using HlidacStatu.Entities;
 using HlidacStatu.LibCore.Extensions;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.EntityFrameworkCore;
+using PoliticiEditor;
 using PoliticiEditor.Components;
 using PoliticiEditor.Components.Account;
 using PoliticiEditor.Components.Autocomplete;
@@ -25,6 +24,14 @@ builder.Services.AddSingleton<AutocompleteService>();
 builder.Services.AddSingleton<ToastService>();
 builder.Services.AddSingleton<LocallyCachedAutocompleteService>();
 builder.Services.AddHostedService<AutocompleteBackgroundTimer>();
+
+builder.Services.Configure<SmtpSettings>(options =>
+{
+    options.Server = builder.Configuration.GetValue<string>("AppSettings:SmtpHost");
+    options.Port = 25;
+    options.FromAddress = "podpora@hlidacstatu.cz";
+});
+builder.Services.AddScoped<IEmailService, EmailService>();
 
 // string connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ??
 //                           throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
