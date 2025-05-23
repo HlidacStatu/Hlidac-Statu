@@ -73,7 +73,7 @@ public static class PpRepo
             .FirstOrDefaultAsync();
     }
     static IEqualityComparer<Firma> icoComparer = new FirmaByIcoComparer();
-    public static async Task<List<Firma>> FindStatniFirmy(string nameId, Devmasters.DT.DateInterval obdobi)
+    public static async Task<List<Firma>> FindStatniFirmyAsync(string nameId, Devmasters.DT.DateInterval obdobi)
     {
         /// ico- nameid[]
         List<Firma> res = new();
