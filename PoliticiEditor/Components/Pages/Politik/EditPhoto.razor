@@ -23,35 +23,42 @@ else
     <div class="card mb-3">
         <h5 class="card-header">Změna fotky</h5>
         <div class="card-body">
-            @if (!AnyFacesDetected)
-            {
-                <div class="mt-4">
-                    <div class="mb-3">
-                        <label for="fromFile" class="form-label">Vyberte soubor s fotografií</label>
-                        <InputFile id="fromFile" class="form-control"
-                                   OnChange="@((InputFileChangeEventArgs e) => HandleFileSelected(e))"/>
-                        <div class="ml-3 form-text">Nejlepší je portrét, čím větší fotka, tím lépe.</div>
-                    </div>
-                    <div class="mb-3">
-                        <label for="zdroj">Zdroj, odkud jsem čerpal informaci</label>
-                        <input type="text" id="zdroj" class="form-control" @bind="@_zdroj"/>
-                    </div>
+            <div class="row g-0">
+                <div class="col-sm-3 col-xl-2">
+                    <img src="@Osoba.GetPhotoUrl()" class="img-fluid rounded-start mb-3" alt="Fotka">
                 </div>
-            }
-            else
-            {
-                foreach (var f in _faces)
-                {
-                    <div class="col-xs-6 col-sm-4">
-                        <img style="width:250px;height:auto; border:solid #d0d0d0 1px; margin:5px;"
-                             src="data:image/jpeg;base64,@Convert.ToBase64String(File.ReadAllBytes(f), Base64FormattingOptions.None)">
-                        <br/>
-                        <button type="submit" class="btn btn-success" @onclick="() => PickPhoto(f)">Toto je
-                            správná/nejlepší fotka
-                        </button>
-                    </div>
-                }
-            }
+                <div class="col-sm-9 col-xl-10">
+                    @if (!AnyFacesDetected)
+                    {
+                        <div class="mt-4">
+                            <div class="mb-3">
+                                <label for="fromFile" class="form-label">Vyberte soubor s fotografií</label>
+                                <InputFile id="fromFile" class="form-control"
+                                           OnChange="@((InputFileChangeEventArgs e) => HandleFileSelected(e))"/>
+                                <div class="ml-3 form-text">Nejlepší je portrét, čím větší fotka, tím lépe.</div>
+                            </div>
+                            <div class="mb-3">
+                                <label for="zdroj">Zdroj, odkud jsem čerpal informaci</label>
+                                <input type="text" id="zdroj" class="form-control" @bind="@_zdroj"/>
+                            </div>
+                        </div>
+                    }
+                    else
+                    {
+                        foreach (var f in _faces)
+                        {
+                            <div class="col-xs-6 col-sm-4">
+                                <img style="width:250px;height:auto; border:solid #d0d0d0 1px; margin:5px;"
+                                     src="data:image/jpeg;base64,@Convert.ToBase64String(File.ReadAllBytes(f), Base64FormattingOptions.None)">
+                                <br/>
+                                <button type="submit" class="btn btn-success" @onclick="() => PickPhoto(f)">Toto je
+                                    správná/nejlepší fotka
+                                </button>
+                            </div>
+                        }
+                    }
+                </div>
+            </div>
         </div>
 
         <div class="card-footer text-body-secondary">
