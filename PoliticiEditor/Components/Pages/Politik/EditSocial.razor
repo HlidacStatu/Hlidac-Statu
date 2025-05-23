@@ -178,6 +178,13 @@ else
             .FirstOrDefault(sn => sn.Organizace?.Equals(networkName, StringComparison.InvariantCultureIgnoreCase) == true,
                 CreateNewSocialNetwork(networkName));
 
+        if (!networkName.Equals("WWW") && value.Contains(".com/", StringComparison.InvariantCultureIgnoreCase))
+        {
+            var lastIndex = value.LastIndexOf(".com/", StringComparison.InvariantCultureIgnoreCase);
+            value = value.Substring(lastIndex + 5);
+        }
+
+        
         socialNetwork.AddInfo = value;
     }
 
