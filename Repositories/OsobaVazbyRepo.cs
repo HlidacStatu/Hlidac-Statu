@@ -236,6 +236,9 @@ namespace HlidacStatu.Repositories
 
         public static HlidacStatu.DS.Graphs.Graph.Edge[] Vazby(this Osoba osoba, bool refresh = false)
         {
+            if (osoba == null)
+                return new DS.Graphs.Graph.Edge[0];
+
             if (refresh || osoba._vazby == null)
             {
                 osoba.updateVazby(refresh);

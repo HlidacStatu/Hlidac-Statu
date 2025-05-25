@@ -29,37 +29,47 @@
                     <tr class="table-light">
                         <th>Organizace</th>
                         <th>Rok</th>
+                        <th>Celkový hrubý příjem (před zdaněním)</th>
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach (var platyItem in Platy)
-                    {
-                        <tr>
-                            <td>
-                                @(GetOrgName(platyItem.IdOrganizace))
-                            </td>
-                            <td>@platyItem.Rok.ToString("F0")</td>
-                        </tr>
+                    @if(Platy.Any()) {
+                        @foreach (var platyItem in Platy)
+                        {
+                            <tr>
+                                <td>
+                                    @(GetOrgName(platyItem.IdOrganizace))
+                                </td>
+                                <td>@platyItem.Rok.ToString("F0")</td>
+                                <td>@HlidacStatu.Util.RenderData.NicePrice(platyItem.CelkovyRocniPlatVcetneOdmen)</td>
+
+                            </tr>
+                        }
                     }
+                    else
+                    {
+                        <b>Žádné příjmy z jiných firem a organizací u Vás neevidujeme.</b>
+                    }
+
                 </tbody>
             </table>
         </div>
     </div>
 </div>
 
-
-<div class="card mb-3">
+<h3 class="mb-4">Přidání chybějícího příjmu</h3>
+<div class="card mb-3 border-success" style="max-width:50em">
     <h5 class="card-header">Přidat příjem</h5>
     <div class="card-body">
         <div>
             <div class="mb-3">
-                <label for="Rok">Kalendářní rok za který vyplňujete příjem</label>
+                <label for="Rok">Kalendářní rok, za který vyplňujete příjem</label>
                 <input id="Rok" type="number"
-                       class="form-control @(IsValidYear(NewIncome.Rok) ? "" : "is-invalid")"
+                       class="form-control @(IsValidYear(NewIncome.Rok) ? "" : "is-invalid") "
                        disabled
                        @bind="NewIncome.Rok"/>
             </div>
-            <div class="mb-3">
+            <div class="mb-3 border-top">
                 <label for="Organizace">Organizace, která platí</label>
                 <HlidacAutocomplete SearchFuncAsync="@((s, token) => OnSearch(s, token))"
                                     OnAutocompleteItemSelected="@(item => FillOrganizace(item))"
@@ -73,51 +83,53 @@
                     </ItemTemplate>
                 </HlidacAutocomplete>
             </div>
-            <div class="mb-3">
+            <div class="mb-3 border-top">
                 <label for="PocetMesicu">Uveďte kolik měsíců jste v daném roce vykonával funkci</label>
                 <input id="PocetMesicu" type="text"
                        class="form-control"
                        @bind:get="@NewIncome.PocetMesicu?.ToString("N0")"
                        @bind:set="(value) => NewIncome.PocetMesicu = ParseDecimal(value)"/>
             </div>
-            <div class="form-check">
-                <label for="Uvolneny">Byl jste při vykonávání funkce uvolněný?</label>
-                <input id="Uvolneny" type="checkbox"
-                       class="form-check-input"
-                       @bind:get="@(NewIncome.Uvolneny == 1)"
-                       @bind:set="(value) => NewIncome.Uvolneny = value ? 1 : 0"/>
-            </div>
-            <div class="mb-3">
-                <label for="NazevFunkce">Uveďte název funkce, kterou jste vykonával</label>
+
+            @* <div class="mb-3 form-check border-top"> *@
+            @*     <label for="Uvolneny">Byl jste při vykonávání funkce uvolněný? (uveďte pouze pro situace kdy je to relevantní ze zákona)</label> *@
+            @*     <input id="Uvolneny" type="checkbox" *@
+            @*            class="form-check-input" *@
+            @*            @bind:get="@(NewIncome.Uvolneny == 1)" *@
+            @*            @bind:set="(value) => NewIncome.Uvolneny = value ? 1 : 0"/> *@
+            @* </div> *@
+
+            <div class="mb-3 border-top">
+                <label for="NazevFunkce">Uveďte název funkce/pozice, kterou jste vykonával</label>
                 <input id="NazevFunkce" class="form-control" @bind="NewIncome.NazevFunkce"/>
             </div>
-            <div class="mb-3">
-                <label for="Plat">Jaký jste za danou funkci dostával plat</label>
+            <div class="mb-3 border-top">
+                <label for="Plat">Plat či základní příjem bez odměn. <b>Uveďte celkovou roční hrubou částku před zdaněním.</b></label>
                 <input id="Plat" type="text"
                        class="form-control"
                        @bind:get="@NewIncome.Plat?.ToString("N2")"
                        @bind:set="(value) => NewIncome.Plat = ParseDecimal(value)"/>
             </div>
-            <div class="mb-3">
-                <label for="Odmeny">Jaké mimořádné odměny jste za funkci dostal</label>
+            <div class="mb-3 border-top">
+                <label for="Odmeny">Mimořádné finanční odměny. <b>Uveďte celkovou roční hrubou částku před zdaněním.</b></label>
                 <input id="Odmeny" type="text"
                        class="form-control"
                        @bind:get="@NewIncome.Odmeny?.ToString("N2")"
                        @bind:set="(value) => NewIncome.Odmeny = ParseDecimal(value)"/>
             </div>
-            <div class="mb-3">
-                <label for="Prispevky">Uveďte výši dalších příspěvků, které jste dostával</label>
+            <div class="mb-3 border-top">
+                <label for="Prispevky">Jiné finanční příjmy či příspěvky. <b>Uveďte celkovou roční hrubou částku před zdaněním.</b></label>
                 <input id="Prispevky" type="text"
                        class="form-control"
                        @bind:get="@NewIncome.Prispevky?.ToString("N2")"
                        @bind:set="(value) => NewIncome.Prispevky = ParseDecimal(value)"/>
             </div>
-            <div class="mb-3">
-                <label for="NefinancniBonus">Vyplňte, pokud jste měl i nějaký nefinanční bonus</label>
+            <div class="mb-3 border-top">
+                <label for="NefinancniBonus">Nefinanční bonus (např. služební auto, pojištění apod.). Uveďte slovně.</label>
                 <input id="NefinancniBonus" class="form-control" @bind="NewIncome.NefinancniBonus"/>
             </div>
-            <div class="mb-3">
-                <label for="PoznamkaPlat">Chcete uvést poznámku? Tady je vhodné místo</label>
+            <div class="mb-3 border-top">
+                <label for="PoznamkaPlat">Poznámku či upřesnění.</label>
                 <input id="PoznamkaPlat" class="form-control" @bind="NewIncome.PoznamkaPlat"/>
             </div>
         </div>

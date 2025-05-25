@@ -4,7 +4,7 @@
 <nav class="navbar navbar-expand-lg navbar-light shadow hlidac" data-enhance-nav="false">
     <div class="container-fluid">
         <a class="navbar-brand" href="/" style="margin-right:1em;">
-            <a href="https://www.hlidacstatu.cz/" class="logo">
+            <a class="logo">
                 <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="46px"
                      height="46px" viewBox="0 0 46 46" version="1.1">
                     <g id="Page-2" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
@@ -45,8 +45,11 @@
         <div class="collapse navbar-collapse" id="navbar-content">
         @if (IsAuthenticated)
         {
-            <ul class="d-none d-lg-block navbar-nav me-auto mr-auto mb-2 mb-lg-0 mainmenu">
-                <li class="nav-item dropdown dropdown-mega position-static mainmenu">
+            <ul class="d-none d-lg-block navbar-nav me-auto mr-auto mb-2 mb-lg-0 mainmenu ms-4">
+                    <li class="nav-item dropdown dropdown-mega position-static mainmenu">
+                        <NavLink class="nav-link mainmenu" href="/">Úvodní stránka<br />editace politika</NavLink>
+                    </li>
+                    <li class="nav-item dropdown dropdown-mega position-static mainmenu">
                     <NavLink class="nav-link mainmenu" href="/EditPhoto">Foto</NavLink>
                 </li>
                 <li class="nav-item dropdown dropdown-mega position-static mainmenu">
