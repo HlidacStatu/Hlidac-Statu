@@ -50,14 +50,14 @@ namespace HlidacStatu.Repositories.Analysis.KorupcniRiziko
         public async Task<KIndexData> GetDataAsync(bool refreshData = false, bool forceCalculateAllYears = false)
         {
             if (refreshData || forceCalculateAllYears)
-                kindex = null;
+                this.kindex = null;
             
             await _semaphoreSlim.WaitAsync();
             try
             {
-                if (kindex == null)
+                if (this.kindex == null)
                 {
-                    kindex = await CalculateSourceDataAsync(forceCalculateAllYears);
+                    this.kindex = await CalculateSourceDataAsync(forceCalculateAllYears);
                 }
             }
             finally
@@ -311,14 +311,20 @@ namespace HlidacStatu.Repositories.Analysis.KorupcniRiziko
 
             CalculateKIndex(ret);
 
-            if (
-                ret.Statistika.PocetSmluvSeSoukromymSubj >= Consts.MinSmluvPerYear
-                ||
-                ret.Statistika.CelkovaHodnotaSmluvSeSoukrSubj >= Consts.MinSumSmluvPerYear
+            bool kindexInLimits = (
+                (ret.Statistika.PocetSmluvSeSoukromymSubj >= Consts.MinPocetSmluvPerYear
                 ||
                 (ret.Statistika.CelkovaHodnotaSmluvSeSoukrSubj + ret.Statistika.PrumernaHodnotaSmluvSeSoukrSubj *
-                    ret.Statistika.PocetSmluvBezCenySeSoukrSubj) >= Consts.MinSumSmluvPerYear
-            )
+                    ret.Statistika.PocetSmluvBezCenySeSoukrSubj) >= Consts.MinSmluvySummaryPerYear
+                )
+                ||
+                (ret.Statistika.CelkovaHodnotaSmluvSeSoukrSubj >= Consts.MinSmluvySummaryPerYear)
+            );
+            //hard limit. Musi mit alespon 20 smluv v registru
+            kindexInLimits = kindexInLimits && (ret.Statistika.PocetSmluvSeSoukromymSubj >= Consts.MinPocetSmluvPerYearIfHasSummarySmluv);
+
+
+            if (kindexInLimits)
             {
                 ret.KIndexReady = true;
                 ret.KIndexIssues = null;
@@ -349,7 +355,7 @@ namespace HlidacStatu.Repositories.Analysis.KorupcniRiziko
                     ret.KIndexReady = false;
                     ret.KIndexIssues = new string[]
                     {
-                        $"K-Index nespočítán. Méně než {Consts.MinSmluvPerYear} smluv za rok nebo malý objem smluv."
+                        $"K-Index nespočítán. Méně než {Consts.MinPocetSmluvPerYear} smluv za rok nebo malý objem smluv."
                     };
                 }
                 else

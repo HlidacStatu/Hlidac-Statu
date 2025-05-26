@@ -88,13 +88,13 @@ public static class KIndexRepo
             List<InfoFact> facts = new List<InfoFact>();
             if (ann == null || ann.KIndexReady == false)
             {
-                facts.Add(new InfoFact($"K-Index nespočítán. Organizace má méně než {Consts.MinSmluvPerYear} smluv za rok nebo malý objem smluv.", InfoFact.ImportanceLevel.Summary));
+                facts.Add(new InfoFact($"K-Index nespočítán. Organizace má méně než {Consts.MinPocetSmluvPerYear} smluv za rok nebo malý objem smluv.", InfoFact.ImportanceLevel.Summary));
                 return facts.ToArray();
             }
             switch (ann.KIndexLabel)
             {
                 case KIndexData.KIndexLabelValues.None:
-                    facts.Add(new InfoFact($"K-Index nespočítán. Organizace má méně než {Consts.MinSmluvPerYear} smluv za rok nebo malý objem smluv.", InfoFact.ImportanceLevel.Summary));
+                    facts.Add(new InfoFact($"K-Index nespočítán. Organizace má méně než {Consts.MinPocetSmluvPerYear} smluv za rok nebo malý objem smluv.", InfoFact.ImportanceLevel.Summary));
                     return facts.ToArray();
 
                 case KIndexData.KIndexLabelValues.A:

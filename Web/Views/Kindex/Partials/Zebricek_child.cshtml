@@ -182,7 +182,7 @@
                         $"<a href=\"/subjekt/{r.Ico}\" >{Html.KIndexIcon(KIndexData.KIndexLabelValues.None, 15, showNone: true)}{r.Jmeno}</a>"
                     ).ToArray();
             }
-            <p>K-Index nebyl spočítán pro @(rest.Count() > 1 ? "následující" : "" ) organizace, které mají méně než @(Consts.MinSmluvPerYear) smluv za rok nebo malý objem smluv.</p>
+            <p>K-Index nebyl spočítán pro @(rest.Count() > 1 ? "následující" : "" ) organizace, které mají méně než @(Consts.MinPocetSmluvPerYear) smluv za rok nebo malý objem smluv.</p>
             <p>
 
                 @Html.Raw(string.Join(", ", rest))

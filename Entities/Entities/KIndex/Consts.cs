@@ -18,8 +18,9 @@ namespace HlidacStatu.Entities.KIndex
         public const decimal Limit2bezDPH_From = Limit2bezDPH_To - (Limit2bezDPH_To * IntervalOkolo);
 
 
-        public const int MinSmluvPerYear = 60;
-        public const int MinSumSmluvPerYear = 48000000;
+        public const int MinPocetSmluvPerYearIfHasSummarySmluv = 30;
+        public const int MinPocetSmluvPerYear = 60;
+        public const int MinSmluvySummaryPerYear = 48_000_000;
         public const decimal MinSmluvPerYearKIndexValue = -10000m;
 
         public const decimal BonusPod50K_1 = 0.25m;

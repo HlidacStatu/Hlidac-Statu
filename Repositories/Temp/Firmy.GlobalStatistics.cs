@@ -102,7 +102,7 @@ namespace HlidacStatu.Repositories
                             if (f.PatrimStatu())
                             {
                                 if (f.StatistikaRegistruSmluv().Any(m =>
-                                        m.Value.PocetSmluv >= Entities.KIndex.Consts.MinSmluvPerYear)
+                                        m.Value.PocetSmluv >= Entities.KIndex.Consts.MinPocetSmluvPerYear)
                                    )
                                     icos.Add(ico);
                             }
@@ -131,7 +131,7 @@ namespace HlidacStatu.Repositories
                             if (f.PatrimStatu())
                             {
                                 if (f.StatistikaRegistruSmluv().Any(m =>
-                                        m.Value.PocetSmluv >= Entities.KIndex.Consts.MinSmluvPerYear)
+                                        m.Value.PocetSmluv >= Entities.KIndex.Consts.MinPocetSmluvPerYear)
                                    )
                                     icos.Add(ico);
                             }
