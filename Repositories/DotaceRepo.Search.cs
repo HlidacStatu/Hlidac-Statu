@@ -100,7 +100,7 @@ namespace HlidacStatu.Repositories
                 ISearchResponse<Dotace> res = null;
                 try
                 {
-                    var client = await Manager.GetESClient_DotaceAsync();
+                    var client = Manager.GetESClient_Dotace();
                     res = await client.SearchAsync<Dotace>(s => s
                             .Size(search.PageSize)
                             .ExpandWildcards(Elasticsearch.Net.ExpandWildcards.All)

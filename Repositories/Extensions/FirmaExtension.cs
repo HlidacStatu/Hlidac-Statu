@@ -138,7 +138,7 @@ namespace HlidacStatu.Extensions
         {
             Lib.Data.External.RPP.KategorieOVM[] _kategorieOVM = null;
 
-            var client = await Manager.GetESClient_RPP_KategorieAsync();
+            var client = Manager.GetESClient_RPP_Kategorie();
             var res = await client.SearchAsync<Lib.Data.External.RPP.KategorieOVM>(
                 s => s
                     .Query(q => q.QueryString(qs => qs.Query($"oVM_v_kategorii.kodOvm:{firma.ICO}")))
@@ -310,7 +310,7 @@ namespace HlidacStatu.Extensions
             if (firma.Valid == false || string.IsNullOrEmpty(firma.ICO))
                 return osoby.ToArray();
 
-            var client = await Manager.GetESClient_RPP_OVMAsync();
+            var client = Manager.GetESClient_RPP_OVM();
             var rppReq = await client.GetAsync<HlidacStatu.Lib.Data.External.RPP.OVMFull>(firma.ICO);
             if (rppReq.Found && rppReq.Source.angazovaneOsoby?.Count() > 0)
             {
@@ -330,7 +330,7 @@ namespace HlidacStatu.Extensions
         public static async Task<OVMFull.Osoba[]> CeosFromRPP_FullAsync(this Firma firma)
         {
             List<(string jmeno, string prijmeni, DateTime? poslednizmena)> osoby = new List<(string jmeno, string prijmeni, DateTime? poslednizmena)>();
-            var client = await Manager.GetESClient_RPP_OVMAsync();
+            var client = Manager.GetESClient_RPP_OVM();
             var rppReq = await client.GetAsync<HlidacStatu.Lib.Data.External.RPP.OVMFull>(firma.ICO);
             if (rppReq.Found && rppReq.Source.angazovaneOsoby?.Count() > 0)
             {

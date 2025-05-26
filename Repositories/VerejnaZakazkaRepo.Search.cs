@@ -313,7 +313,7 @@ namespace HlidacStatu.Repositories
                 bool withHighlighting = false, CancellationToken cancellationToken = default)
             {
                 if (client == null)
-                    client = await Manager.GetESClient_VerejneZakazkyAsync();
+                    client = Manager.GetESClient_VerejneZakazky();
 
                 string query = search.Q ?? "";
 
@@ -538,7 +538,7 @@ namespace HlidacStatu.Repositories
 
                 searchFunc = async (size, page) =>
                 {
-                    var client = await Manager.GetESClient_VerejneZakazkyAsync();
+                    var client = Manager.GetESClient_VerejneZakazky();
                     return await client.SearchAsync<VerejnaZakazka>(a => a
                         .Size(size)
                         .From(page * size)
@@ -551,7 +551,7 @@ namespace HlidacStatu.Repositories
 
 
                 await Repositories.Searching.Tools.DoActionForQueryAsync<VerejnaZakazka>(
-                    await Manager.GetESClient_VerejneZakazkyAsync(),
+                    Manager.GetESClient_VerejneZakazky(),
                     searchFunc, (hit, param) =>
                     {
                         ids2Process.Add(hit.Id);
@@ -565,7 +565,7 @@ namespace HlidacStatu.Repositories
                 string scrollTimeout = "2m",
                 int scrollSize = 300)
             {
-                var client = await Manager.GetESClient_VerejneZakazkyAsync();
+                var client = Manager.GetESClient_VerejneZakazky();
                 ISearchResponse<VerejnaZakazka> initialResponse = null;
                 if (query is null)
                 {

@@ -35,17 +35,17 @@
 
     var now = DateTime.Now;
 
-    var pagesCountLast7dT = (await Manager.GetESClient_PageMetadataAsync())
+    var pagesCountLast7dT = (Manager.GetESClient_PageMetadata())
                             .CountAsync<HlidacStatu.Entities.PageMetadata>(q => q
                                 .Query(qs => qs.QueryString(q => q.Query($"blurred.created:" + HlidacStatu.Repositories.Searching.Tools.ToElasticDateInterval(now.AddDays(-7), now)))
                                 )
                             );
-    var pagesCountLast1dT = (await Manager.GetESClient_PageMetadataAsync())
+    var pagesCountLast1dT = (Manager.GetESClient_PageMetadata())
                             .CountAsync<HlidacStatu.Entities.PageMetadata>(q => q
                                 .Query(qs => qs.QueryString(q => q.Query($"blurred.created:" + HlidacStatu.Repositories.Searching.Tools.ToElasticDateInterval(now.AddDays(-1), now)))
                                 )
                             );
-    var pagesCountT = (await Manager.GetESClient_PageMetadataAsync())
+    var pagesCountT = (Manager.GetESClient_PageMetadata())
                             .CountAsync<HlidacStatu.Entities.PageMetadata>();
 
     var pagesCount = (await pagesCountT).Count;

@@ -108,7 +108,7 @@ namespace InsolvencniRejstrik.Fixes
 
 		private Rizeni LoadRizeni(string spisovaZnacka)
 		{
-			var res = Manager.GetESClient_InsolvenceAsync().ConfigureAwait(false).GetAwaiter().GetResult().Get<Rizeni>(spisovaZnacka);
+			var res = Manager.GetESClient_Insolvence().Get<Rizeni>(spisovaZnacka);
 			return res.Found ? res.Source : null;
 		}
 

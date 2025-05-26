@@ -15,7 +15,7 @@ namespace HlidacStatu.Repositories
             new Devmasters.Cache.LocalMemory.AutoUpdatedCache<UptimeSSL[]>(TimeSpan.FromHours(2), (obj) =>
                 {
                     UptimeSSL[] res = new UptimeSSL[] { };
-                    var client = Manager.GetESClient_UptimeSSLAsync().ConfigureAwait(false).GetAwaiter().GetResult();
+                    var client = Manager.GetESClient_UptimeSSL();
                     var resX = client
                         .SearchAsync<UptimeSSL>(s => s
                             .Query(q => q.MatchAll())
@@ -56,7 +56,7 @@ namespace HlidacStatu.Repositories
         {
             try
             {
-                var client = await Manager.GetESClient_UptimeSSLAsync();
+                var client = Manager.GetESClient_UptimeSSL();
                 await client.IndexAsync<UptimeSSL>(item, m => m.Id(item.Id));
 
             }
@@ -70,7 +70,7 @@ namespace HlidacStatu.Repositories
         }
         public static async Task<UptimeSSL> LoadLatestAsync(string domain)
         {
-            var cl = await Manager.GetESClient_UptimeSSLAsync();
+            var cl = Manager.GetESClient_UptimeSSL();
 
             var res = await cl.SearchAsync<UptimeSSL>(s => s
                 .Query(q=>q

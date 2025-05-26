@@ -39,7 +39,7 @@ namespace HlidacStatu.Repositories
 
         public static async Task<InsolvenceDetail> LoadFromEsAsync(string id, bool includeDocumentsPlainText, bool limitedView)
         {
-            var client = await Manager.GetESClient_InsolvenceAsync();
+            var client = Manager.GetESClient_Insolvence();
             var spisovaZnacka = ParseId(id);
 
             try
@@ -106,7 +106,7 @@ namespace HlidacStatu.Repositories
         {
             Func<int, int, Task<ISearchResponse<Rizeni>>> searchFunc = async (size, page) =>
             {
-                var client = await Manager.GetESClient_InsolvenceAsync();
+                var client = Manager.GetESClient_Insolvence();
                 return await client.SearchAsync<Rizeni>(a => a
                     .Size(size)
                     .Source(false)
@@ -118,7 +118,7 @@ namespace HlidacStatu.Repositories
             };
 
             List<string> ids = new List<string>();
-            await Tools.DoActionForQueryAsync<Rizeni>(await Manager.GetESClient_InsolvenceAsync(),
+            await Tools.DoActionForQueryAsync<Rizeni>(Manager.GetESClient_Insolvence(),
                 searchFunc, (hit, param) =>
                 {
                     ids.Add(hit.Id);

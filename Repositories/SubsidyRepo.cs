@@ -17,8 +17,7 @@ namespace HlidacStatu.Repositories
     {
         private static readonly ILogger Logger = Log.ForContext(typeof(SubsidyRepo));
 
-        public static readonly ElasticClient SubsidyClient = Manager.GetESClient_SubsidyAsync()
-            .ConfigureAwait(false).GetAwaiter().GetResult();
+        public static readonly ElasticClient SubsidyClient = Manager.GetESClient_Subsidy();
 
         public static readonly string[] SubsidyDuplicityOrdering =
             ["IsRed", "Cedr", "Eufondy", "Státní zemědělský intervenční fond"];

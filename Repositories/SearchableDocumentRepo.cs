@@ -14,7 +14,7 @@ namespace HlidacStatu.Repositories
         public static async Task<Entities.Insolvence.SearchableDocument[]> GetAllAsync(string spisovaZnacka, bool includePrilohy = false)
         {
 
-            var client = await Manager.GetESClient_InsolvenceDocsAsync();
+            var client = Manager.GetESClient_InsolvenceDocs();
 
             var res = includePrilohy ?
                 await client.SearchAsync<SearchableDocument>(s => s
@@ -47,7 +47,7 @@ namespace HlidacStatu.Repositories
         }
         public static async Task<Entities.Insolvence.SearchableDocument> GetAsync(string searchableDocId, bool includePrilohy = false)
         {
-            var client = await Manager.GetESClient_InsolvenceDocsAsync();
+            var client = Manager.GetESClient_InsolvenceDocs();
             var res = includePrilohy
                 ? await client.GetAsync<SearchableDocument>(searchableDocId)
                 : await client.GetAsync<SearchableDocument>(searchableDocId, s => s.SourceExcludes(s => s.PlainText));
@@ -66,7 +66,7 @@ namespace HlidacStatu.Repositories
         public static async Task<bool> Exists(string spisovaZnacka, string dokumentId)
         {
 
-            var client = await Manager.GetESClient_InsolvenceDocsAsync();
+            var client = Manager.GetESClient_InsolvenceDocs();
 
             spisovaZnacka = Rizeni.NormalizedId(spisovaZnacka);
             var docid = SearchableDocument.GetDocumentId(spisovaZnacka, dokumentId);
@@ -80,7 +80,7 @@ namespace HlidacStatu.Repositories
         public static async Task<long> HowMany(string spisovaZnacka)
         {
 
-            var client = await Manager.GetESClient_InsolvenceDocsAsync();
+            var client = Manager.GetESClient_InsolvenceDocs();
 
             var res = await client.SearchAsync<SearchableDocument>(s => s
                     .Query(q => q
@@ -99,7 +99,7 @@ namespace HlidacStatu.Repositories
         public static async Task<string[]> AllIds(string spisovaZnacka)
         {
 
-            var client = await Manager.GetESClient_InsolvenceDocsAsync();
+            var client = Manager.GetESClient_InsolvenceDocs();
 
             var res = await client.SearchAsync<SearchableDocument>(s => s
                         .Query(q => q
@@ -127,7 +127,7 @@ namespace HlidacStatu.Repositories
                 throw new ApplicationException("Cannot save partial SearchableDocument document ");
 
             if (client == null)
-                client = await Manager.GetESClient_InsolvenceDocsAsync();
+                client = Manager.GetESClient_InsolvenceDocs();
 
 
 
@@ -159,7 +159,7 @@ namespace HlidacStatu.Repositories
                 throw new ApplicationException("Cannot save partial SearchableDocument document ");
 
             if (client == null)
-                client = await Manager.GetESClient_InsolvenceDocsAsync();
+                client = Manager.GetESClient_InsolvenceDocs();
 
 
             var res = await client.IndexAsync<SearchableDocument>(sDoc,

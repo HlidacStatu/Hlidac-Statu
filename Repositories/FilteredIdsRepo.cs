@@ -79,7 +79,7 @@ namespace HlidacStatu.Repositories
 
         public static async Task<string[]> GetDotaceIdsAsync(QueryBatch query, int maxDegreeOfParallelism = 10, Devmasters.Batch.IMonitor monitor = null)
         {
-            var client = await Manager.GetESClient_DotaceAsync();
+            var client = Manager.GetESClient_Dotace();
             var sq = DotaceRepo.Searching.GetSimpleQuery(query.Query);
             var ids = await Searching.Tools.GetAllIdsAsync(client, maxDegreeOfParallelism, sq,
                 logOutputFunc: query.LogOutputFunc, progressOutputFunc: query.ProgressOutputFunc,
@@ -90,7 +90,7 @@ namespace HlidacStatu.Repositories
 
         public static async Task<string[]> GetSmlouvyIdAsync(QueryBatch query)
         {
-            var client = await Manager.GetESClientAsync();
+            var client = Manager.GetESClient();
 
             var ids = await Searching.Tools.GetAllSmlouvyIdsAsync(client, 10, query.Query, 
                 logOutputFunc: query.LogOutputFunc, progressOutputFunc: query.ProgressOutputFunc);
@@ -109,7 +109,7 @@ namespace HlidacStatu.Repositories
 
             Func<int, int, Task<ISearchResponse<Smlouva>>> searchFunc = async (size, page) =>
             {
-                var client = await Manager.GetESClientAsync();
+                var client = Manager.GetESClient();
                 return await client.SearchAsync<Smlouva>(a => a
                     .Size(size)
                     .Source(false)
@@ -120,7 +120,7 @@ namespace HlidacStatu.Repositories
             };
 
             List<string> ids2Process = new List<string>();
-            await Repositories.Searching.Tools.DoActionForQueryAsync<Smlouva>(await Manager.GetESClientAsync(),
+            await Repositories.Searching.Tools.DoActionForQueryAsync<Smlouva>(Manager.GetESClient(),
                 searchFunc, (hit, param) =>
                 {
                     ids2Process.Add(hit.Id);

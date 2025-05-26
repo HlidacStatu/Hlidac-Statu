@@ -28,7 +28,7 @@ namespace InsolvencniRejstrik.ByEvents
 
         public Rizeni GetInsolvencyProceeding_old(string spisovaZnacka, Func<string, Rizeni> createNewInsolvencyProceeding)
 		{
-			var res = Manager.GetESClient_InsolvenceAsync().ConfigureAwait(false).GetAwaiter().GetResult()
+			var res = Manager.GetESClient_Insolvence()
 				.Search<Rizeni>(s => s
 					.Size(1)
 					.Query(q => q

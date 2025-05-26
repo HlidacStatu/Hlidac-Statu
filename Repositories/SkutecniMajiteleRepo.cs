@@ -26,8 +26,8 @@ namespace HlidacStatu.Repositories
             1, 2, 10, 20
         };
 
-        private static ElasticClient _skmClient = Manager.GetESClientAsync("skutecni-majitele", idxType: Manager.IndexType.DataSource)
-            .ConfigureAwait(false).GetAwaiter().GetResult();
+        private static ElasticClient _skmClient =
+            Manager.GetESClient("skutecni-majitele", idxType: Manager.IndexType.DataSource);
 
         public static bool PodlehaSkm(Firma firma, DateTime datumPocatku)
         {

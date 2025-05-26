@@ -14,7 +14,7 @@ public static class RejstrikTrestuRepo
 
     public static async Task<List<RejstrikTrestu>> FindTrestyAsync(string ico)
     {
-        var client = await Manager.GetESClientAsync(_indexName, idxType: _indexType);
+        var client = Manager.GetESClient(_indexName, idxType: _indexType);
         Nest.ISearchResponse<RejstrikTrestu> result;
         try
         {
@@ -40,7 +40,7 @@ public static class RejstrikTrestuRepo
     
     public static async Task<RejstrikTrestu> FindTrestByIdAsync(string id)
     {
-        var client = await Manager.GetESClientAsync(_indexName, idxType: _indexType);
+        var client = Manager.GetESClient(_indexName, idxType: _indexType);
 
         try
         {
@@ -63,7 +63,7 @@ public static class RejstrikTrestuRepo
     //     if (rejstrikTrestu == null) throw new ArgumentNullException(nameof(rejstrikTrestu));
     //     
     //     
-    //     var client = await Manager.GetESClientAsync(_indexName, idxType: _indexType);
+    //     var client = Manager.GetESClientAsync(_indexName, idxType: _indexType);
     //
     //     var res = await client.IndexAsync(rejstrikTrestu, o => o.Id(rejstrikTrestu.Id));
     //     if (!res.IsValid)

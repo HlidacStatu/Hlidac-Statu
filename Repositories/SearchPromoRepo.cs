@@ -40,7 +40,7 @@ namespace HlidacStatu.Repositories
             //description tak do 70 znaků  
 
             _logger.Information($"Starting SearchPromoRepo.FillDbAsync {(fullRebuild ? "with" : "without")} rebuild db");
-            var dbSP = await HlidacStatu.Connectors.Manager.GetESClient_SearchPromoAsync();
+            var dbSP = HlidacStatu.Connectors.Manager.GetESClient_SearchPromo();
             using var db = new DbEntities();
 
             // manualni 
@@ -192,7 +192,7 @@ namespace HlidacStatu.Repositories
 
         public static async Task SaveAsync(SearchPromo sp)
         {
-            var dbSP = await HlidacStatu.Connectors.Manager.GetESClient_SearchPromoAsync();
+            var dbSP = HlidacStatu.Connectors.Manager.GetESClient_SearchPromo();
 
             var res = await dbSP.IndexAsync<SearchPromo>(sp, m => m.Id(sp.Id));
             if (!res.IsValid)
@@ -246,7 +246,7 @@ namespace HlidacStatu.Repositories
             ISearchResponse<SearchPromo> res = null;
             try
             {
-                var client = await HlidacStatu.Connectors.Manager.GetESClient_SearchPromoAsync();
+                var client = HlidacStatu.Connectors.Manager.GetESClient_SearchPromo();
                 res = await client.SearchAsync<SearchPromo>(s => s
                         .Size(size)
                         .From(page * size)

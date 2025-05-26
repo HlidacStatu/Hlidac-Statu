@@ -203,7 +203,7 @@ namespace HlidacStatu.Repositories.Searching
 
         public static async Task<ValidateQueryResponse> ValidateQueryRawAsync(string query)
         {
-            return await ValidateSpecificQueryRawAsync<Smlouva>(await Manager.GetESClientAsync(),
+            return await ValidateSpecificQueryRawAsync<Smlouva>(Manager.GetESClient(),
                 SmlouvaRepo.Searching.GetSimpleQuery(query));
         }
 
@@ -238,7 +238,7 @@ namespace HlidacStatu.Repositories.Searching
         {
             prefix = prefix ?? HlidacStatu.Util.StackReport.GetCallingMethod(false, skipFrames: 1);
 
-            var client = elasticClient ?? await Manager.GetESClientAsync();
+            var client = elasticClient ?? Manager.GetESClient();
 
             Func<int, int, Task<ISearchResponse<T>>> searchFunc = null;
 

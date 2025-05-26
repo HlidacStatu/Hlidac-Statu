@@ -8,8 +8,7 @@ namespace HlidacStatu.Repositories
 {
     public static class DocTablesRepo
     {
-        private static ElasticClient _doTablesClient = Manager.GetESClient_DocTablesAsync()
-    .ConfigureAwait(false).GetAwaiter().GetResult();
+        private static ElasticClient _doTablesClient = Manager.GetESClient_DocTables();
         static Devmasters.Cache.AWS_S3.CacheProvider<HlidacStatu.DS.Api.TablesInDoc.Result[]> awsClient = null;
 
         static DocTablesRepo()

@@ -39,7 +39,7 @@ namespace HlidacStatu.Repositories.Analysis.KorupcniRiziko
         private static void refreshCache()
         {
             kindexReadyIcos = HlidacStatu.Repositories.Searching.Tools.GetAllSmlouvyIdsAsync(
-                Manager.GetESClient_KIndexAsync().Result,
+                Manager.GetESClient_KIndex(),
                 4,
                 "roky.kIndexReady:true"
                 ).Result
@@ -85,9 +85,9 @@ namespace HlidacStatu.Repositories.Analysis.KorupcniRiziko
         {
             useTempDb = useTempDb ?? !string.IsNullOrEmpty(Devmasters.Config.GetWebConfigValue("UseKindexTemp"));
 
-            var client = await Manager.GetESClient_KIndexAsync();
+            var client = Manager.GetESClient_KIndex();
             if (useTempDb.Value)
-                client = await Manager.GetESClient_KIndexTempAsync();
+                client = Manager.GetESClient_KIndexTemp();
 
 
             ISearchResponse<KIndexData> initialResponse = await client.SearchAsync<KIndexData>

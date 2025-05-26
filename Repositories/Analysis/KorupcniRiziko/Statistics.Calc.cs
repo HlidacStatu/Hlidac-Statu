@@ -35,9 +35,9 @@ namespace HlidacStatu.Repositories.Analysis.KorupcniRiziko
 
         public static async Task<IEnumerable<Statistics>> CalculateAsync(string[] forIcos = null, bool futureKIDX = false)
         {
-            var client = await Manager.GetESClient_KIndexAsync();
+            var client = Manager.GetESClient_KIndex();
             if (futureKIDX)
-                client = await Manager.GetESClient_KIndexTempAsync();
+                client = Manager.GetESClient_KIndexTemp();
 
             int[] calculationYears = Consts.ToCalculationYears;
             Func<int, int, Task<ISearchResponse<KIndexData>>> searchfnc = null;

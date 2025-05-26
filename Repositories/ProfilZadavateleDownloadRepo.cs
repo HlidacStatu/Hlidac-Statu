@@ -9,7 +9,7 @@ namespace HlidacStatu.Repositories
     {
         public static async Task SaveAsync(ProfilZadavateleDownload profilZadavatele, ElasticClient client = null)
         {
-            var es = await (client ?? await Manager.GetESClient_LogsAsync())
+            var es = await (client ?? Manager.GetESClient_Logs())
                 .IndexDocumentAsync<ProfilZadavateleDownload>(profilZadavatele);
         }
 

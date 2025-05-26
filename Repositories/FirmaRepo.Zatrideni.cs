@@ -227,7 +227,7 @@ namespace HlidacStatu.Repositories
 
             private static async Task<string[]> GetSubjektyFromRppAsync(int rpp_kategorie_id)
             {
-                var client = await Manager.GetESClient_RPP_KategorieAsync();
+                var client = Manager.GetESClient_RPP_Kategorie();
                 var res = await client.GetAsync<Lib.Data.External.RPP.KategorieOVM>(rpp_kategorie_id.ToString());
                 if (res.Found)
                     return res.Source.OVM_v_kategorii.Select(m => m.kodOvm).ToArray();
@@ -237,7 +237,7 @@ namespace HlidacStatu.Repositories
 
             private static async Task<string[]> GetAllSubjektyFromRppAsync()
             {
-                var client = await Manager.GetESClient_RPP_KategorieAsync(); 
+                var client = Manager.GetESClient_RPP_Kategorie(); 
                 var res = await client.SearchAsync<Lib.Data.External.RPP.KategorieOVM>(s => s.Size(9000).Query(q => q.MatchAll()));
                 if (res.IsValid)
                     return res.Hits

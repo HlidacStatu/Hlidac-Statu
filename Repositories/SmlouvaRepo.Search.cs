@@ -262,9 +262,9 @@ bool withHighlighting = false, bool exactNumOfResults = false)
                 ISearchResponse<Smlouva> res = null;
                 try
                 {
-                    var client = await Manager.GetESClientAsync();
+                    var client = Manager.GetESClient();
                     if (platnyZaznam.HasValue && platnyZaznam == false)
-                        client = await Manager.GetESClient_SneplatneAsync();
+                        client = Manager.GetESClient_Sneplatne();
                     Indices indexes = client.ConnectionSettings.DefaultIndex;
                     if (includeNeplatne)
                     {

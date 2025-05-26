@@ -33,7 +33,7 @@ namespace HlidacStatu.Repositories.ProfilZadavatelu
                         return new ActionOutputData();
                     }, null,
                     outputWriter ?? Manager.DefaultOutputWriter, progressWriter ?? Manager.DefaultProgressWriter,
-                    false, elasticClient: await Connectors.Manager.GetESClient_VerejneZakazkyAsync(), prefix: "profil zadavatelu ");
+                    false, elasticClient: Connectors.Manager.GetESClient_VerejneZakazky(), prefix: "profil zadavatelu ");
 
                 Console.WriteLine("Let's go mining");
 
@@ -45,7 +45,7 @@ namespace HlidacStatu.Repositories.ProfilZadavatelu
                 Console.WriteLine("Reading profily zadavatelu with HTTP error");
                 Func<int, int, Task<ISearchResponse<ProfilZadavateleDownload>>> searchFunc = async (size, page) =>
                 {
-                    var client = await Connectors.Manager.GetESClient_LogsAsync(); 
+                    var client = Connectors.Manager.GetESClient_Logs(); 
                     return await client.SearchAsync<ProfilZadavateleDownload>(a => a
                                 .Size(size)
                                 .Source(ss => ss.Excludes(f => f.Fields("xmlError", "xmlInvalidContent", "httpError")))
@@ -56,7 +56,7 @@ namespace HlidacStatu.Repositories.ProfilZadavatelu
                                 );
                 };
                 
-                await Searching.Tools.DoActionForQueryAsync<ProfilZadavateleDownload>(await Connectors.Manager.GetESClient_LogsAsync(), searchFunc, (pzd, obj) =>
+                await Searching.Tools.DoActionForQueryAsync<ProfilZadavateleDownload>(Connectors.Manager.GetESClient_Logs(), searchFunc, (pzd, obj) =>
                     {
                         var profileId = pzd.Source.ProfileId;
                         if (!profily2.Any(m => m.Id == profileId))

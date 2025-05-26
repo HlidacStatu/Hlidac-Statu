@@ -101,7 +101,7 @@ namespace HlidacStatu.Datasets
 
                 datasets ??= DataSetDB.ProductionDataSets.Get();
 
-                var esClient = await Manager.GetESClientAsync();
+                var esClient = Manager.GetESClient();
 
                 var esQuery = HlidacStatu.Searching.Tools.FixInvalidQuery(query, QueryShorcuts, QueryOperators);
 
@@ -297,7 +297,7 @@ namespace HlidacStatu.Datasets
 
                 }
 
-                ElasticClient client = await Manager.GetESClientAsync(ds.DatasetId, idxType: Manager.IndexType.DataSource);
+                ElasticClient client = Manager.GetESClient(ds.DatasetId, idxType: Manager.IndexType.DataSource);
 
                 QueryContainer qc = await GetSimpleQueryAsync(ds, queryString);
 

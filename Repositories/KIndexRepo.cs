@@ -209,9 +209,9 @@ public static class KIndexRepo
 
         //calculate fields before saving
         kIndexData.LastSaved = DateTime.Now;
-        var client = await Manager.GetESClient_KIndexAsync();
+        var client = Manager.GetESClient_KIndex();
         if (useTempDb)
-            client = await Manager.GetESClient_KIndexTempAsync();
+            client = Manager.GetESClient_KIndexTemp();
 
         var res = await client.IndexAsync<KIndexData>(kIndexData, o => o.Id(kIndexData.Ico)); //druhy parametr musi byt pole, ktere je unikatni
         if (!res.IsValid)
@@ -222,9 +222,9 @@ public static class KIndexRepo
     
     public static async Task<IOrderedEnumerable<Backup>> GetPreviousVersionsAsync(this KIndexData kIndexData, bool futureData = false)
     {
-        ElasticClient client = await Manager.GetESClient_KIndexBackupAsync();
+        ElasticClient client = Manager.GetESClient_KIndexBackup();
         if (futureData)
-            client = await Manager.GetESClient_KIndexBackupTempAsync();
+            client = Manager.GetESClient_KIndexBackupTemp();
 
         ISearchResponse<Backup> searchResults = null;
         try
@@ -260,9 +260,9 @@ public static class KIndexRepo
 
         public static async Task<Backup> GetPreviousVersionAsync(string id)
         {
-            ElasticClient client = await Manager.GetESClient_KIndexBackupAsync();
+            ElasticClient client = Manager.GetESClient_KIndexBackup();
             if (!string.IsNullOrEmpty(Devmasters.Config.GetWebConfigValue("UseKindexTemp")))
-                client = await Manager.GetESClient_KIndexBackupTempAsync();
+                client = Manager.GetESClient_KIndexBackupTemp();
 
             try
             {
@@ -288,9 +288,9 @@ public static class KIndexRepo
         if (Consts.KIndexExceptions.Contains(param.ico) && param.useTempDb == false)
             return null;
 
-        var client = await Manager.GetESClient_KIndexAsync();
+        var client = Manager.GetESClient_KIndex();
         if (param.useTempDb)
-            client = await Manager.GetESClient_KIndexTempAsync();
+            client = Manager.GetESClient_KIndexTemp();
 
 
         var res = await client.GetAsync<KIndexData>(param.ico);
@@ -326,9 +326,9 @@ public static class KIndexRepo
         b.Id = $"{kidx.Ico}_{b.Created:s}";
         b.Comment = comment;
         b.KIndex = kidx;
-        var client = await Manager.GetESClient_KIndexBackupAsync();
+        var client = Manager.GetESClient_KIndexBackup();
         if (useTempDb)
-            client = await Manager.GetESClient_KIndexBackupTempAsync();
+            client = Manager.GetESClient_KIndexBackupTemp();
 
         var res = await client.IndexAsync<Backup>(b, o => o.Id(b.Id)); //druhy parametr musi byt pole, ktere je unikatni
         if (!res.IsValid)
@@ -360,7 +360,7 @@ public static class KIndexRepo
                 kindexFeedback.Company = firma.Jmeno;
             }
 
-            var client = await Manager.GetESClient_KindexFeedbackAsync();
+            var client = Manager.GetESClient_KindexFeedback();
             var res = await client.IndexDocumentAsync(kindexFeedback); //druhy parametr musi byt pole, ktere je unikatni
             if (!res.IsValid)
             {
@@ -370,7 +370,7 @@ public static class KIndexRepo
 
         public static async Task<IEnumerable<KindexFeedback>> GetKindexFeedbacksAsync(string ico, int year)
         {
-            ElasticClient esClient = await Manager.GetESClient_KindexFeedbackAsync();
+            ElasticClient esClient = Manager.GetESClient_KindexFeedback();
 
             ISearchResponse<KindexFeedback> searchResults = null;
             try
@@ -411,7 +411,7 @@ public static class KIndexRepo
         public static async Task<KindexFeedback> GetByIdAsync(string id)
         {
 
-            ElasticClient esClient = await Manager.GetESClient_KindexFeedbackAsync();
+            ElasticClient esClient = Manager.GetESClient_KindexFeedback();
 
             ISearchResponse<KindexFeedback> searchResults = null;
             try

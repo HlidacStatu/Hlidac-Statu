@@ -13,7 +13,7 @@ namespace HlidacStatu.Repositories
         public static async Task SaveAsync<T>(T item)
             where T : BaseItem
         {
-            var dbSP = await HlidacStatu.Connectors.Manager.GetESClient_PermanentLLMAsync();
+            var dbSP = HlidacStatu.Connectors.Manager.GetESClient_PermanentLLM();
 
             var res = await dbSP.IndexAsync(item, m => m.Id(item.Id));
             if (!res.IsValid)
@@ -28,7 +28,7 @@ namespace HlidacStatu.Repositories
             string queryString, int count)
             where T : BaseItem
         {
-            var dbSP = await HlidacStatu.Connectors.Manager.GetESClient_PermanentLLMAsync();
+            var dbSP = HlidacStatu.Connectors.Manager.GetESClient_PermanentLLM();
 
             var res = await dbSP.SearchAsync<T>(s => s
                     .Query(q => q
@@ -49,7 +49,7 @@ namespace HlidacStatu.Repositories
             string documentType, string documentId, string partType, string fileId = null)
             where T : BaseItem
         {
-            var dbSP = await HlidacStatu.Connectors.Manager.GetESClient_PermanentLLMAsync();
+            var dbSP = HlidacStatu.Connectors.Manager.GetESClient_PermanentLLM();
 
             var res = await dbSP.SearchAsync<T>(s => s
                     .Query(q => q
@@ -73,7 +73,7 @@ namespace HlidacStatu.Repositories
             )
             where T : BaseItem
         {
-            var dbSP = await HlidacStatu.Connectors.Manager.GetESClient_PermanentLLMAsync();
+            var dbSP = HlidacStatu.Connectors.Manager.GetESClient_PermanentLLM();
 
             var res = await dbSP.GetAsync<T>(HlidacStatu.AI.LLM.Entities.BaseItem<T>
                 .GetId(documentType, documentId, partType, fileId));
@@ -87,7 +87,7 @@ namespace HlidacStatu.Repositories
 
         public static async Task<bool> _existsAsync(string documentType, string documentId, string partType, string fileId)
         {
-            var dbSP = await HlidacStatu.Connectors.Manager.GetESClient_PermanentLLMAsync();
+            var dbSP = HlidacStatu.Connectors.Manager.GetESClient_PermanentLLM();
 
             var res = await dbSP.DocumentExistsAsync<object>(HlidacStatu.AI.LLM.Entities.BaseItem
                 .GetId(documentType, documentId, partType, fileId));
@@ -99,7 +99,7 @@ namespace HlidacStatu.Repositories
         public static async Task<bool> DeleteAsync(string documentId)
         {
 
-            var dbSP = await HlidacStatu.Connectors.Manager.GetESClient_PermanentLLMAsync();
+            var dbSP = HlidacStatu.Connectors.Manager.GetESClient_PermanentLLM();
 
             var deleted = await dbSP.DeleteAsync<object>(documentId);
             return deleted.IsValid;
@@ -107,7 +107,7 @@ namespace HlidacStatu.Repositories
         public static async Task<long> DeleteAsync(string documentType, string documentId, string partType, string fileId = null)
         {
 
-            var dbSP = await HlidacStatu.Connectors.Manager.GetESClient_PermanentLLMAsync();
+            var dbSP = HlidacStatu.Connectors.Manager.GetESClient_PermanentLLM();
 
             var deleted = await dbSP.DeleteByQueryAsync<object>(s => s
                     .Query(q => q
@@ -136,7 +136,7 @@ namespace HlidacStatu.Repositories
                 return await _existsAsync(documentType, documentId, partType, fileId);
 
 
-            var dbSP = await HlidacStatu.Connectors.Manager.GetESClient_PermanentLLMAsync();
+            var dbSP = HlidacStatu.Connectors.Manager.GetESClient_PermanentLLM();
 
             var res = await dbSP.SearchAsync<object>(s => s
                     .Query(q => q

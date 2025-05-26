@@ -25,7 +25,7 @@ public static class ZakazkaRawRepo
         if (save)
         {
             zakazkaRaw.LastUpdate = DateTime.Now;
-            var cli = client ?? await Manager.GetESClient_VerejneZakazkyNaProfiluRawAsync();
+            var cli = client ?? Manager.GetESClient_VerejneZakazkyNaProfiluRaw();
             var es = await (client ?? cli).IndexDocumentAsync<ZakazkaRaw>(zakazkaRaw);
         }
     }
@@ -33,7 +33,7 @@ public static class ZakazkaRawRepo
 
     public static async Task<ZakazkaRaw> GetLatestAsync(string zakazkaId, ElasticClient client = null)
     {
-        client = client ?? await Manager.GetESClient_VerejneZakazkyNaProfiluRawAsync();
+        client = client ?? Manager.GetESClient_VerejneZakazkyNaProfiluRaw();
 
         var res = await client.SearchAsync<ZakazkaRaw>(s => s
             .Query(q => q

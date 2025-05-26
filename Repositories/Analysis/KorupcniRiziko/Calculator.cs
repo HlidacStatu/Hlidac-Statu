@@ -638,7 +638,7 @@ namespace HlidacStatu.Repositories.Analysis.KorupcniRiziko
         {
             Func<int, int, Task<ISearchResponse<Smlouva>>> searchFunc = async (size, page) =>
             {
-                var client = await Manager.GetESClientAsync();
+                var client = Manager.GetESClient();
                 return await client.SearchAsync<Smlouva>(a => a
                     .Size(size)
                     .Source(ss => ss.Excludes(sml => sml.Field(ff => ff.Prilohy)))
@@ -650,7 +650,7 @@ namespace HlidacStatu.Repositories.Analysis.KorupcniRiziko
                 
 
             List<smlouvaStat> smlStat = new List<smlouvaStat>();
-            await Repositories.Searching.Tools.DoActionForQueryAsync<Smlouva>(await Manager.GetESClientAsync(),
+            await Repositories.Searching.Tools.DoActionForQueryAsync<Smlouva>(Manager.GetESClient(),
                 searchFunc,
                 (h, o) =>
                 {

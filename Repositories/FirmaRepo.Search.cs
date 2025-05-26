@@ -27,7 +27,7 @@ namespace HlidacStatu.Repositories
 
             private static async Task<Dictionary<int, string[]>> GetAllValuesAsync()
             {
-                var client = await Manager.GetESClient_RPP_KategorieAsync();
+                var client = Manager.GetESClient_RPP_Kategorie();
                 var res = await client.SearchAsync<Lib.Data.External.RPP.KategorieOVM>(
                     s => s.Query(q => q.MatchAll()).Size(2000)
                     );
@@ -82,7 +82,7 @@ namespace HlidacStatu.Repositories
                 ISearchResponse<FirmaInElastic> res = null;
                 try
                 {
-                    var client = await Manager.GetESClient_FirmyAsync(); 
+                    var client = Manager.GetESClient_Firmy(); 
                     res = await client.SearchAsync<FirmaInElastic>(s => s
                             .Size(size)
                             .From(page * size)

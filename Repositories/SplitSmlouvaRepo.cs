@@ -13,7 +13,7 @@ namespace HlidacStatu.Repositories
         private static readonly ILogger _logger = Log.ForContext(typeof(SplitSmlouvaRepo));
         public static async Task<bool> ExistsAsync(string smlouvaId, string prilohaId)
         {
-            Nest.ElasticClient client = await Manager.GetESClient_SplitSmlouvyAsync();
+            Nest.ElasticClient client = Manager.GetESClient_SplitSmlouvy();
 
             string id = SplitSmlouva.GetId(smlouvaId, prilohaId);
             var res = await client.DocumentExistsAsync<SplitSmlouva>(id);
@@ -25,7 +25,7 @@ namespace HlidacStatu.Repositories
 
         public static async Task<SplitSmlouva> LoadAsync(string smlouvaId, string prilohaId)
         {
-            Nest.ElasticClient client = await Manager.GetESClient_SplitSmlouvyAsync();
+            Nest.ElasticClient client = Manager.GetESClient_SplitSmlouvy();
 
             var res = await client.GetAsync<SplitSmlouva>(SplitSmlouva.GetId(smlouvaId, prilohaId));
             if (res.IsValid && res.Found)
@@ -35,7 +35,7 @@ namespace HlidacStatu.Repositories
         }
         public static async Task<IEnumerable<SplitSmlouva>> SearchAsync(string elasticQueryString, int page, int pageSize = 20)
         {
-            Nest.ElasticClient client = await Manager.GetESClient_SplitSmlouvyAsync();
+            Nest.ElasticClient client = Manager.GetESClient_SplitSmlouvy();
             var res = client.Search<SplitSmlouva>(s => s
                 .Size(pageSize)
                 .From(page * pageSize)
@@ -59,7 +59,7 @@ namespace HlidacStatu.Repositories
 
             try
             {
-                var client = await Manager.GetESClient_SplitSmlouvyAsync();
+                var client = Manager.GetESClient_SplitSmlouvy();
                 var res = await client.IndexAsync<SplitSmlouva>(item, m => m.Id(item.Id));
 
                 if (res.IsValid == false)

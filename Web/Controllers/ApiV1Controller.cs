@@ -280,7 +280,7 @@ namespace HlidacStatu.Web.Controllers
         {
 
             List<VZProfilesListRes> list = new();
-            var client = await Manager.GetESClient_VerejneZakazkyNaProfiluRawAsync();
+            var client = Manager.GetESClient_VerejneZakazkyNaProfiluRaw();
             var res = await client.SearchAsync<ZakazkaRaw>(s => s
                     .Query(q => q.Bool(b => b.MustNot(mn => mn.Term(t => t.Field(f => f.Converted).Value(1)))))
                     .Size(0)
@@ -296,7 +296,7 @@ namespace HlidacStatu.Web.Controllers
             {
                 foreach (KeyedBucket<object> val in ((BucketAggregate)res.Aggregations["profiles"]).Items)
                 {
-                    var vzClient = await Manager.GetESClient_VerejneZakazkyAsync();
+                    var vzClient = Manager.GetESClient_VerejneZakazky();
                     var resProf = await client.GetAsync<ProfilZadavatele>((string)val.Key);
                     list.Add(new VZProfilesListRes()
                     { profileId = (string)val.Key, url = resProf?.Source?.Url, count = val.DocCount });
@@ -315,7 +315,7 @@ namespace HlidacStatu.Web.Controllers
             if (string.IsNullOrEmpty(id))
                 return new NotFoundResult();
 
-            var client = await Manager.GetESClient_VerejneZakazkyNaProfiluRawAsync();
+            var client = Manager.GetESClient_VerejneZakazkyNaProfiluRaw();
             var res = await client.SearchAsync<ZakazkaRaw>(s => s
                     .Query(q => q
                         .QueryString(qs =>
@@ -345,7 +345,7 @@ namespace HlidacStatu.Web.Controllers
             if (string.IsNullOrEmpty(id))
                 return new NotFoundResult();
 
-            var client = await Manager.GetESClient_VerejneZakazkyNaProfiluRawAsync();
+            var client = Manager.GetESClient_VerejneZakazkyNaProfiluRaw();
             var res = await client.SearchAsync<ZakazkaRaw>(s => s
                     .Query(q => q
                         .QueryString(qs => qs.DefaultOperator(Operator.And).Query("zakazkaId:\"" + id + "\""))
@@ -379,7 +379,7 @@ namespace HlidacStatu.Web.Controllers
             string nodes = "-------------------------\n";
             try
             {
-                var client = await Manager.GetESClientAsync();
+                var client = Manager.GetESClient();
                 res = client.Cluster.Health();
                 num = res?.NumberOfNodes ?? 0;
                 status = res?.Status.ToString() ?? "unknown";

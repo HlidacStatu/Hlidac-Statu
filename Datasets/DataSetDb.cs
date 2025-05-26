@@ -58,8 +58,8 @@ namespace HlidacStatu.Datasets
 
             if (client == null)
             {
-                client = Manager.GetESClientAsync(DataSourcesDbName, idxType: Manager.IndexType.DataSource)
-                    .ConfigureAwait(false).GetAwaiter().GetResult();
+                client = Manager.GetESClient(DataSourcesDbName, idxType: Manager.IndexType.DataSource);
+                    
                 var ret = client.Indices.ExistsAsync(client.ConnectionSettings.DefaultIndex)
                     .ConfigureAwait(false).GetAwaiter().GetResult();
                 if (!ret.Exists)
@@ -71,7 +71,7 @@ namespace HlidacStatu.Datasets
                         datasetId = DataSourcesDbName,
                         jsonSchema = jsonG.Generate(typeof(Registration)).ToString()
                     };
-                    Manager.CreateIndexAsync(client).ConfigureAwait(false).GetAwaiter().GetResult();
+                    Manager.CreateIndex(client);
 
                     //add record
                     Elasticsearch.Net.PostData pd = Elasticsearch.Net.PostData.String(Newtonsoft.Json.JsonConvert.SerializeObject(reg));
@@ -190,7 +190,7 @@ namespace HlidacStatu.Datasets
 
             datasetId = datasetId.ToLower();
             var res = await DeleteDataAsync(datasetId);
-            var idxClient = await Manager.GetESClientAsync(datasetId, idxType: Manager.IndexType.DataSource);
+            var idxClient = Manager.GetESClient(datasetId, idxType: Manager.IndexType.DataSource);
 
             //delete /hs-data_rozhodnuti-uohs*
             for (int i = 1; i < 99; i++)

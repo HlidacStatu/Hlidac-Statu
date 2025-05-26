@@ -12,8 +12,7 @@ namespace HlidacStatu.Repositories.Auditing
 
         private static readonly ILogger _logger = Log.ForContext(typeof(AuditLogRepo));
 
-        public static readonly ElasticClient AuditLogClient = Manager.GetESClient_AuditLogAsync()
-            .ConfigureAwait(false).GetAwaiter().GetResult();
+        public static readonly ElasticClient AuditLogClient = Manager.GetESClient_AuditLog();
         
         public static async Task<bool> BulkSaveAsync(List<AuditLog> auditLogs)
         {
