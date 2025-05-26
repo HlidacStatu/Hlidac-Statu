@@ -179,6 +179,7 @@ else
                 System.IO.File.WriteAllBytes(Osoba.GetPhotoPath(Osoba.PhotoTypes.NoBackground, true), noBackGr);
 
             Devmasters.IO.IOTools.DeleteFile(path);
+            Toaster.AddInfoMessage("Nahráno", "Fotka byla úspěšně změněna. Chvíli může trvat, než se změny projeví.");
         }
         catch (Exception e)
         {
