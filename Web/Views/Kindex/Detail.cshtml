@@ -209,7 +209,7 @@
 else
 {
 
-    <cache expires-after="@Constants.CachedActionLength.Cache24H"
+    <cache enabled="@(!this.User.IsInRole("Admin"))" expires-after="@Constants.CachedActionLength.Cache24H"
            vary-by="@($"{Model.id}_{Model.rok}_{Model.priv}_{this.User.IsInRole("Admin")}")">
         @{
             ViewBag.ICO = Model.id;
