@@ -6,19 +6,20 @@
       "Serilog.Sinks.Http"
     ],
     "MinimumLevel": {
-      "Default": "Debug",
+      "Default": "Information",
       "Override": {
         "Microsoft": "Error",
         "Microsoft.Extensions": "Information",
-        "System": "Error"
+        "System": "Error",
+        "Devmasters": "Information"
       }
     },
     "WriteTo": [
       {
         "Name": "File",
         "Args": {
-          "path": "Logs/sponzoriLoader.txt",
-          "formatter": "Elastic.CommonSchema.Serilog.EcsTextFormatter, Elastic.CommonSchema.Serilog",
+          "restrictedToMinimumLevel": "Warning",
+          "path": "c:/Data/Logs/HlidacStatu/PoliticiEditor/log.txt",
           "rollingInterval": "Day",
           "fileSizeLimitBytes": null,
           "retainedFileCountLimit": 9,

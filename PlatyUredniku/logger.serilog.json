@@ -41,7 +41,7 @@
       {
         "Name": "Http",
         "Args": {
-          "requestUri": "http://10.10.150.203:5000",
+          "requestUri": "http://10.10.100.144:5000",
           "textFormatter": "Elastic.CommonSchema.Serilog.EcsTextFormatter, Elastic.CommonSchema.Serilog",
           "batchFormatter": "Serilog.Sinks.Http.BatchFormatters.ArrayBatchFormatter, Serilog.Sinks.Http",
           "queueLimitBytes": 1048576

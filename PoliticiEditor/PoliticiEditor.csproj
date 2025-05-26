@@ -29,4 +29,10 @@
       <_ContentIncludedByDefault Remove="Components\Pages\Account\StatusMessage.razor" />
     </ItemGroup>
 
+    <ItemGroup>
+      <None Include="logger.serilog.json">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </None>
+    </ItemGroup>
+
 </Project>
