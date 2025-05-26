@@ -60,7 +60,7 @@
     }
 </style>
 
-<cache expires-after="@(Constants.IsDevelopment() ? Constants.CachedActionLength.NoCache : Constants.CachedActionLength.Cache24H)" 
+<cache enabled="@(!this.User.IsInRole("Admin"))" expires-after="@(Constants.IsDevelopment() ? Constants.CachedActionLength.NoCache : Constants.CachedActionLength.Cache24H)"
        vary-by="@($"{id}_{Model.rok}_{Model.group}_{Model.kraj}_{part}_{this.User.IsInRole("Admin")}")">
     @{        
         
