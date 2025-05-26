@@ -10,7 +10,7 @@ public class AuditLog
 {
     [Keyword]
     public int Id { get; set; }
-    public object EntityId { get; set; }
+    public string EntityId { get; set; }
     public string EntityName { get; set; }
     public EntityState Action { get; set; }
     [Text]

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
@@ -21,8 +22,9 @@ public static class ChangeTracker
                 
                 var audit = new AuditLog
                 {
-                    EntityId = pkValue,
+                    EntityId = StringifyObjectValue(pkValue),
                     EntityName = entry.Entity.GetType().Name,
+                    EntryReference = entry,
                     Action = entry.State,
                     Username = userName,
                     Timestamp = DateTime.UtcNow,
@@ -48,17 +50,33 @@ public static class ChangeTracker
         if (audits == null || audits.Count == 0)
             return;
         
-        foreach (var audit in audits.Where(a => a.EntityId == null && a.EntryReference != null))
+        foreach (var audit in audits.Where(a => a.EntryReference != null && a.Action == EntityState.Added))
         {
             var pkName = audit.EntryReference.Metadata.FindPrimaryKey()?.Properties.FirstOrDefault()?.Name;
             if (pkName != null)
             {
-                audit.EntityId = audit.EntryReference.Property(pkName).CurrentValue;
+                var idObj = audit.EntryReference.Property(pkName).CurrentValue;
+                audit.EntityId = StringifyObjectValue(idObj);
             }
 
             audit.EntryReference = null; // clear to avoid serialization issues
         }
 
         await AuditLogRepo.BulkSaveAsync(audits);
+    }
+
+    public static string StringifyObjectValue(object value)
+    {
+        string result = value switch
+        {
+            null               => null,
+            string s           => s,
+            // this covers string, all numeric IFormattable types (int, long, decimal, etc.),
+            // and falls back to ToString() for anything else
+            IFormattable form  => form.ToString(null, CultureInfo.InvariantCulture),
+            _                   => value.ToString()
+        };
+
+        return result;
     }
 }

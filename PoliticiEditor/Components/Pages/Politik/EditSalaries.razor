@@ -21,35 +21,37 @@
 
 
 <div class="card mb-3">
-    <h5 class="card-header">Přehled příjmů od státních a polostátních organizací či veřejných institucí, které aktuálně evidujeme za rok 2024</h5>
+    <h5 class="card-header">Přehled příjmů od státních a polostátních organizací či veřejných institucí, které aktuálně
+        evidujeme za rok 2024</h5>
     <div class="card-body">
         <div>
             <table class="table table-bordered table-sm align-middle auto-width">
                 <thead>
-                    <tr class="table-light">
-                        <th>Organizace</th>
-                        <th>Rok</th>
-                        <th>Celkový hrubý příjem (před zdaněním)</th>
-                    </tr>
+                <tr class="table-light">
+                    <th>Organizace</th>
+                    <th>Rok</th>
+                    <th>Celkový hrubý příjem (před zdaněním)</th>
+                </tr>
                 </thead>
                 <tbody>
-                    @if(Platy.Any()) {
-                        @foreach (var platyItem in Platy)
-                        {
-                            <tr>
-                                <td>
-                                    @(GetOrgName(platyItem.IdOrganizace))
-                                </td>
-                                <td>@platyItem.Rok.ToString("F0")</td>
-                                <td>@HlidacStatu.Util.RenderData.NicePrice(platyItem.CelkovyRocniPlatVcetneOdmen)</td>
-
-                            </tr>
-                        }
-                    }
-                    else
+                @if (Platy.Any())
+                {
+                    @foreach (var platyItem in Platy)
                     {
-                        <b>Žádné příjmy z jiných firem a organizací u Vás neevidujeme.</b>
+                        <tr>
+                            <td>
+                                @(GetOrgName(platyItem.IdOrganizace))
+                            </td>
+                            <td>@platyItem.Rok.ToString("F0")</td>
+                            <td>@HlidacStatu.Util.RenderData.NicePrice(platyItem.CelkovyRocniPlatVcetneOdmen)</td>
+
+                        </tr>
                     }
+                }
+                else
+                {
+                    <b>Žádné příjmy z jiných firem a organizací u Vás neevidujeme.</b>
+                }
 
                 </tbody>
             </table>
@@ -61,77 +63,85 @@
 <div class="card mb-3 border-success" style="max-width:50em">
     <h5 class="card-header">Přidat příjem</h5>
     <div class="card-body">
-        <div>
-            <div class="mb-3">
-                <label for="Rok">Kalendářní rok, za který vyplňujete příjem</label>
-                <input id="Rok" type="number"
-                       class="form-control @(IsValidYear(NewIncome.Rok) ? "" : "is-invalid") "
-                       disabled
-                       @bind="NewIncome.Rok"/>
-            </div>
-            <div class="mb-3 border-top">
-                <label for="Organizace">Organizace, která platí</label>
-                <HlidacAutocomplete SearchFuncAsync="@((s, token) => OnSearch(s, token))"
-                                    OnAutocompleteItemSelected="@(item => FillOrganizace(item))"
-                                    TextSelector="@((autocomplete) => autocomplete.Text)"
-                                    TItem="Autocomplete">
-                    <ItemTemplate>
-                        <div>
-                            <h6>@context.Text</h6>
-                            <small>@context.Description</small>
-                        </div>
-                    </ItemTemplate>
-                </HlidacAutocomplete>
-            </div>
-            <div class="mb-3 border-top">
-                <label for="PocetMesicu">Uveďte kolik měsíců jste v daném roce vykonával funkci</label>
-                <input id="PocetMesicu" type="text"
-                       class="form-control"
-                       @bind:get="@NewIncome.PocetMesicu?.ToString("N0")"
-                       @bind:set="(value) => NewIncome.PocetMesicu = ParseDecimal(value)"/>
-            </div>
-
-            @* <div class="mb-3 form-check border-top"> *@
-            @*     <label for="Uvolneny">Byl jste při vykonávání funkce uvolněný? (uveďte pouze pro situace kdy je to relevantní ze zákona)</label> *@
-            @*     <input id="Uvolneny" type="checkbox" *@
-            @*            class="form-check-input" *@
-            @*            @bind:get="@(NewIncome.Uvolneny == 1)" *@
-            @*            @bind:set="(value) => NewIncome.Uvolneny = value ? 1 : 0"/> *@
-            @* </div> *@
-
-            <div class="mb-3 border-top">
-                <label for="NazevFunkce">Uveďte název funkce/pozice, kterou jste vykonával</label>
-                <input id="NazevFunkce" class="form-control" @bind="NewIncome.NazevFunkce"/>
-            </div>
-            <div class="mb-3 border-top">
-                <label for="Plat">Plat či základní příjem bez odměn. <b>Uveďte celkovou roční hrubou částku před zdaněním.</b></label>
-                <input id="Plat" type="text"
-                       class="form-control"
-                       @bind:get="@NewIncome.Plat?.ToString("N2")"
-                       @bind:set="(value) => NewIncome.Plat = ParseDecimal(value)"/>
-            </div>
-            <div class="mb-3 border-top">
-                <label for="Odmeny">Mimořádné finanční odměny. <b>Uveďte celkovou roční hrubou částku před zdaněním.</b></label>
-                <input id="Odmeny" type="text"
-                       class="form-control"
-                       @bind:get="@NewIncome.Odmeny?.ToString("N2")"
-                       @bind:set="(value) => NewIncome.Odmeny = ParseDecimal(value)"/>
-            </div>
-            <div class="mb-3 border-top">
-                <label for="Prispevky">Jiné finanční příjmy či příspěvky. <b>Uveďte celkovou roční hrubou částku před zdaněním.</b></label>
-                <input id="Prispevky" type="text"
-                       class="form-control"
-                       @bind:get="@NewIncome.Prispevky?.ToString("N2")"
-                       @bind:set="(value) => NewIncome.Prispevky = ParseDecimal(value)"/>
-            </div>
-            <div class="mb-3 border-top">
-                <label for="NefinancniBonus">Nefinanční bonus (např. služební auto, pojištění apod.). Uveďte slovně.</label>
-                <input id="NefinancniBonus" class="form-control" @bind="NewIncome.NefinancniBonus"/>
-            </div>
-            <div class="mb-3 border-top">
-                <label for="PoznamkaPlat">Poznámku či upřesnění.</label>
-                <input id="PoznamkaPlat" class="form-control" @bind="NewIncome.PoznamkaPlat"/>
-            </div>
+        <div class="mx-auto">
+            <EditForm EditContext="editContext" FormName="editSalaries">
+                <DataAnnotationsValidator/>
+                <h3>Zde můžete editovat své přihlašovací údaje</h3>
+                <hr/>
+                <ValidationSummary class="text-danger" role="alert"/>
+                <div class="mb-3">
+                    <label for="Rok">Kalendářní rok, za který vyplňujete příjem</label>
+                    <input id="Rok" type="number"
+                           class="form-control @(IsValidYear(NewIncome.Rok) ? "" : "is-invalid") "
+                           disabled
+                           @bind="NewIncome.Rok"/>
+                </div>
+                <div class="mb-3 border-top">
+                    <label for="Organizace">Organizace, která platí</label>
+                    <HlidacAutocomplete SearchFuncAsync="@((s, token) => OnSearch(s, token))"
+                                        OnAutocompleteItemSelected="@(item => FillOrganizace(item))"
+                                        TextSelector="@((autocomplete) => autocomplete.Text)"
+                                        Context="autocompleteCtx"
+                                        TItem="Autocomplete">
+                        <ItemTemplate>
+                            <div>
+                                <h6>@autocompleteCtx.Text</h6>
+                                <small>@autocompleteCtx.Description</small>
+                            </div>
+                        </ItemTemplate>
+                    </HlidacAutocomplete>
+                    <ValidationMessage For="() => NewIncome.IdOrganizace" class="text-danger"/>
+                </div>
+                <div class="mb-3 border-top">
+                    <label for="PocetMesicu">Uveďte kolik měsíců jste v daném roce vykonával funkci</label>
+                    <input id="PocetMesicu" type="text"
+                           class="form-control"
+                           @bind:get="@NewIncome.PocetMesicu?.ToString("N0")"
+                           @bind:set="(value) => NewIncome.PocetMesicu = ParseDecimal(value)"/>
+                    <ValidationMessage For="() => NewIncome.PocetMesicu" class="text-danger"/>
+                </div>
+                <div class="mb-3 border-top">
+                    <label for="NazevFunkce">Uveďte název funkce/pozice, kterou jste vykonával</label>
+                    <input id="NazevFunkce" class="form-control" @bind="NewIncome.NazevFunkce"/>
+                </div>
+                <div class="mb-3 border-top">
+                    <label for="Plat">Plat či základní příjem bez odměn. <b>Uveďte celkovou roční hrubou částku před
+                            zdaněním.</b></label>
+                    <input id="Plat" type="text"
+                           class="form-control"
+                           @bind:get="@NewIncome.Plat?.ToString("N2")"
+                           @bind:set="(value) => NewIncome.Plat = ParseDecimal(value)"/>
+                    <ValidationMessage For="() => NewIncome.Plat" class="text-danger"/>
+                </div>
+                <div class="mb-3 border-top">
+                    <label for="Odmeny">Mimořádné finanční odměny. <b>Uveďte celkovou roční hrubou částku před
+                            zdaněním.</b></label>
+                    <input id="Odmeny" type="text"
+                           class="form-control"
+                           @bind:get="@NewIncome.Odmeny?.ToString("N2")"
+                           @bind:set="(value) => NewIncome.Odmeny = ParseDecimal(value)"/>
+                    <ValidationMessage For="() => NewIncome.Odmeny" class="text-danger"/>
+                </div>
+                <div class="mb-3 border-top">
+                    <label for="Prispevky">Jiné finanční příjmy či příspěvky. <b>Uveďte celkovou roční hrubou částku
+                            před zdaněním.</b></label>
+                    <input id="Prispevky" type="text"
+                           class="form-control"
+                           @bind:get="@NewIncome.Prispevky?.ToString("N2")"
+                           @bind:set="(value) => NewIncome.Prispevky = ParseDecimal(value)"/>
+                    <ValidationMessage For="() => NewIncome.Prispevky" class="text-danger"/>
+                </div>
+                <div class="mb-3 border-top">
+                    <label for="NefinancniBonus">Nefinanční bonus (např. služební auto, pojištění apod.). Uveďte
+                        slovně.</label>
+                    <input id="NefinancniBonus" class="form-control" @bind="NewIncome.NefinancniBonus"/>
+                    <ValidationMessage For="() => NewIncome.NefinancniBonus" class="text-danger"/>
+                </div>
+                <div class="mb-3 border-top">
+                    <label for="PoznamkaPlat">Poznámku či upřesnění.</label>
+                    <input id="PoznamkaPlat" class="form-control" @bind="NewIncome.PoznamkaPlat"/>
+                </div>
+            </EditForm>
         </div>
     </div>
 
@@ -155,6 +165,9 @@
     private Dictionary<int, string?> PreloadedOrgs = new();
     private PpPrijem NewIncome { get; set; }
     private ILogger _logger = Log.ForContext<EditSalaries>();
+    
+    private EditContext editContext;
+    private ValidationMessageStore messageStore;
 
 
     protected override async Task OnInitializedAsync()
@@ -179,6 +192,9 @@
             Rok = PpRepo.DefaultYear,
             SkrytaPoznamka = $"Plat přidal manuálně {NameId} dne {DateTime.Now:s}"
         };
+        
+        editContext = new EditContext(NewIncome);
+        messageStore = new ValidationMessageStore(editContext);
 
         if (_db is not null)
             await _db.DisposeAsync();
@@ -186,8 +202,7 @@
         _db = new DbEntities();
 
         Platy = await _db.PpPrijmy
-            .Where(p => p.Nameid == NameId && p.Rok== HlidacStatu.Repositories.PuRepo.DefaultYear)
-
+            .Where(p => p.Nameid == NameId && p.Rok == HlidacStatu.Repositories.PuRepo.DefaultYear)
             .ToListAsync();
 
         await PreloadOrgs();
@@ -203,6 +218,9 @@
 
     private async Task Save()
     {
+        if(!IsValidForm())
+            return;
+        
         // připojit nový záznam
         if (_db is not null)
         {
@@ -269,11 +287,7 @@
     {
         var result = await AutocompleteService.FindCompany(query, cancellationToken);
         //we need to have company - there is no place for free text here
-        // result.Insert(0, new Autocomplete()
-        // {
-        //     Text = query,
-        //     DisplayText = query
-        // });
+        
         return result;
     }
 
@@ -336,5 +350,41 @@
         }
 
         NewIncome.IdOrganizace = orgId.Value;
+    }
+    
+    private bool IsValidForm()
+    {
+        messageStore.Clear();
+        editContext.NotifyValidationStateChanged();
+        bool hasError = false;
+
+        if (NewIncome.IdOrganizace == 0)
+        {
+            messageStore.Add(() => NewIncome.IdOrganizace, "Vyberte organizaci");
+            hasError = true;
+        }
+
+        if (NewIncome.Plat is null && NewIncome.Prispevky is null && NewIncome.Odmeny is null 
+            && string.IsNullOrWhiteSpace(NewIncome.NefinancniBonus))
+        {
+            messageStore.Add(() => NewIncome.Plat, "Musí být vyplněn alespoň jeden údaj");
+            messageStore.Add(() => NewIncome.Prispevky, "Musí být vyplněn alespoň jeden údaj");
+            messageStore.Add(() => NewIncome.Odmeny, "Musí být vyplněn alespoň jeden údaj");
+            messageStore.Add(() => NewIncome.NefinancniBonus, "Musí být vyplněn alespoň jeden údaj");
+            hasError = true;
+        }
+
+        if (NewIncome.PocetMesicu is not null && (NewIncome.PocetMesicu < 1 || NewIncome.PocetMesicu > 12))
+        {
+            messageStore.Add(() => NewIncome.PocetMesicu, "Počet měsíců musí být v rozsahu od 1 do 12");
+            hasError = true;
+        }
+
+        if (hasError)
+        {
+            editContext.NotifyValidationStateChanged();
+        }
+
+        return !hasError;
     }
 }
