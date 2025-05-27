@@ -28,6 +28,9 @@ else
     <div class="card mb-3">
         <h5 class="card-header">Politické strany</h5>
         <div class="card-body">
+            <h4>Upravte nebo doplňte členství v politické straně nebo hnutí. </h4>
+            <p>V případě, že nejste členkou/členem žádné strany nebo hnutí, nic nevyplňujte. </p>
+            <p>Neznáte-li přesné datum zahájení/ukončení členství, uveďte alespoň roky a to od 01.01.RRRR do 31.12.RRRR. Pokud členství trvá, uveďte jen datum zahájení.</p>
             <div class="mx-auto">
                 @foreach (var politicalParty in PoliticalParties)
                 {
@@ -50,13 +53,13 @@ else
                             </HlidacAutocomplete>
                         </div>
                         <div class="col-3">
-                            <label for="datefrom">Datum působení od</label>
+                            <label for="datefrom">Datum zahájení členství</label>
                             <input type="date" id="datefrom"
                                    class="form-control"
                                    @bind="@politicalParty.DatumOd"/>
                         </div>
                         <div class="col-3">
-                            <label for="dateto">Datum působení do</label>
+                            <label for="dateto">Datum ukončení členství</label>
                             <input type="date" id="dateto"
                                    class="form-control"
                                    @bind="@politicalParty.DatumDo"/>

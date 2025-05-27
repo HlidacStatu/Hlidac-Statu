@@ -241,7 +241,12 @@
 
     private string EmailBody(string loginLink)
     {
-        return $"<h1>Váš odkaz pro přihlášení do http://admin.politici.hlidacstatu.cz/</h1><br /> <a href=\"{loginLink}\">{loginLink}</a>";
+        return $"<h1>Váš odkaz pro přihlášení do administrace politiků na Hlídači státu</h1><br />" +
+               $"<p>Dobrý den,</p>" +
+               $"<p>Děkujeme za rozhodnutí pomoci nám při kontrole, opravě nebo doplnění chybějících údajů u Vaší osoby na našem webu.</p>" +
+               $"<p>Právě Vám byl přidělen jednorázový přístup do administrace části webu, kde evidujeme informace o Vaší osobě. Kliknutím na tento odkaz se přihlásíte.<br /></p>" +
+               $"<p><a href=\"{loginLink}\">{loginLink}</a></p>" +
+               $"<p>Vaší spolupráce si vážíme<br />S pozdravem<br />Hlídač státu, z.ú.<br />";
     }
 
 }

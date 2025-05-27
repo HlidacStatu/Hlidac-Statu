@@ -28,13 +28,13 @@ else
         <h5 class="card-header">@Osoba.NameId</h5>
         <div class="card-body">
             <div class="row g-0">
-                <div class="col-sm-3 col-xl-2">
+                <div class="col-sm-3 col-xl-2 me-2">
                     <img src="@Osoba.GetPhotoUrl()" class="img-fluid rounded-start mb-3" alt="Fotka">
                 </div>
-                <div class="col-sm-9 col-xl-10">
+                <div class="col-sm-8 col-xl-9">
                     <div class="mx-auto">
                         <div class="mb-3">
-                            <label for="titulPred">Titul(y) před jménem oddělené čárkou</label>
+                            <label for="titulPred">Titul(y) před jménem</label>
                             <input type="text" id="titulPred"
                                    class="@(EditModeInputClass)"
                                    @bind="@Osoba.TitulPred"/>
@@ -42,7 +42,7 @@ else
                     </div>
                     <div class="mx-auto">
                         <div class="mb-3">
-                            <label for="titulZa">Titul(y) za jménem oddělené čárkou</label>
+                            <label for="titulZa">Titul(y) za jménem</label>
                             <input type="text" id="titulZa"
                                    class="@(EditModeInputClass)"
                                    @bind="@Osoba.TitulPo"/>
@@ -50,9 +50,10 @@ else
                     </div>
                     @if (Osoba.Narozeni is null)
                     {
+                        <p>Prosíme o kontrolu nebo doplnění data narození, které nebude zveřejněno. Pro nás je toto datum nezbytné pro korektní identifikaci osoby.</p>
                         <div class="mx-auto">
                             <div class="mb-3">
-                                <label for="narozeni">Datum narození</label>
+                                <label for="narozeni">Datum narození (DD.MM.RRRR)</label>
                                 <input type="date" id="narozeni"
                                        class="@(EditModeInputClass)"
                                        @bind="@Osoba.Narozeni"/>
