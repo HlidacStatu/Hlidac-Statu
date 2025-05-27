@@ -52,12 +52,9 @@
         
         //if any issues arises then stuff from following page is needed to be implemented as well: 
         // https://learn.microsoft.com/en-us/aspnet/core/blazor/security/authentication-state?view=aspnetcore-9.0&pivots=server
-        
         await HttpContextAccessor.HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal);
         await Task.Delay(300);
         HttpContextAccessor.HttpContext.Response.Redirect("/");
-        
-
     }
     
     public async ValueTask DisposeAsync()

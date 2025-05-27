@@ -37,10 +37,6 @@ else
                                            OnChange="@((InputFileChangeEventArgs e) => HandleFileSelected(e))"/>
                                 <div class="ml-3 form-text">Nejlepší je portrét, čím větší fotka, tím lépe.</div>
                             </div>
-                            <div class="mb-3">
-                                <label for="zdroj">Zdroj, odkud jsem čerpal informaci</label>
-                                <input type="text" id="zdroj" class="form-control" @bind="@_zdroj"/>
-                            </div>
                         </div>
                     }
                     else
@@ -81,7 +77,7 @@ else
     private ClaimsPrincipal User { get; set; }
     private ILogger _logger = Log.ForContext<EditPhoto>();
 
-    private string? _zdroj;
+    private string? _nameId;
     private byte[]? _fileBytes;
     private string[]? _faces;
     private bool AnyFacesDetected => _faces is not null && _faces.Any();
@@ -89,8 +85,8 @@ else
     protected override async Task OnParametersSetAsync()
     {
         User = await UserHelper.GetCurrentUserAsync();
-        var nameId = User.GetNameId();
-        Osoba = OsobaRepo.GetByNameId(nameId);
+        _nameId = User.GetNameId();
+        Osoba = OsobaRepo.GetByNameId(_nameId);
         if (Osoba is null)
         {
             Toaster.AddMessage("Chyba", $"Data se nepodařilo načíst", importance: ToastService.ToastMessage.ImportanceLevel.Error);
@@ -98,7 +94,7 @@ else
             return;
         }
     }
-
+    
     private async Task HandleFileSelected(InputFileChangeEventArgs e)
     {
         var file = e.File;
@@ -110,8 +106,7 @@ else
         //_ = await file.OpenReadStream(maxAllowedSize: 13_000_000).ReadAsync(buffer);
         _fileBytes = ms.ToArray();
     }
-
-
+    
     private Task Cancel()
     {
         if (AnyFacesDetected)
@@ -119,7 +114,6 @@ else
             CleanupPhotoDirectory(_faces.FirstOrDefault());
         }
 
-        _zdroj = null;
         _fileBytes = null;
         _faces = null;
         Toaster.AddInfoMessage("Zrušeno", "Změny byly zrušeny.");
@@ -128,11 +122,6 @@ else
     
     private async Task Next()
     {
-        if (string.IsNullOrWhiteSpace(_zdroj))
-        {
-            return;
-        }
-        
         if (_fileBytes is null || !_fileBytes.Any())
         {
             return;
@@ -145,7 +134,7 @@ else
             _faces = HlidacStatu.DetectFaces.FromImage.DetectAndParseFacesIntoFiles(_fileBytes, 150, 40).ToArray();
             if (_fileBytes != null && _faces.Length > 0)
             {
-                await Task.WhenAll(File.WriteAllTextAsync(pathTxt, _zdroj),
+                await Task.WhenAll(File.WriteAllTextAsync(pathTxt, _nameId),
                     File.WriteAllBytesAsync(path, _fileBytes));
             }
         }

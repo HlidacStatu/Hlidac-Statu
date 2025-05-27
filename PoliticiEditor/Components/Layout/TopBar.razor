@@ -1,10 +1,12 @@
 ﻿@using PoliticiEditor.Components.Account
 @inject UserHelper UserHelper
 
+@rendermode @(new InteractiveServerRenderMode(prerender: false))
+
 <nav class="navbar navbar-expand-lg navbar-light shadow hlidac" data-enhance-nav="false">
     <div class="container-fluid">
         <a class="navbar-brand" href="/" style="margin-right:1em;">
-            <a class="logo">
+            <div class="logo">
                 <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="46px"
                      height="46px" viewBox="0 0 46 46" version="1.1">
                     <g id="Page-2" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
@@ -33,7 +35,7 @@
                         <strong>státu</strong>
                     </div>
                 </div>
-            </a>
+            </div>
         </a>
         <button class="navbar-toggler collapsed" type="button" data-bs-toggle="collapse"
                 data-bs-target="#navbar-content">

@@ -121,7 +121,7 @@
         await _db.SaveChangesAsync();
 
         _loginToken = $"/Account/Login-Callback/{WebUtility.UrlEncode(loginToken.Token)}/{WebUtility.UrlEncode(user.EmailHash)}";
-        var loginLink = $"http://admin.politici.hlidacstatu.cz/Account/Login-Callback/{WebUtility.UrlEncode(loginToken.Token)}/{WebUtility.UrlEncode(user.EmailHash)}";
+        var loginLink = $"https://admin.politici.hlidacstatu.cz/Account/Login-Callback/{WebUtility.UrlEncode(loginToken.Token)}/{WebUtility.UrlEncode(user.EmailHash)}";
         try
         {
             await EmailService.SendEmailAsync([user.Email], "Přihlašovací token", EmailBody(loginLink));
