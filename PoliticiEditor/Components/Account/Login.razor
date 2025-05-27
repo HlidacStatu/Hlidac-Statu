@@ -73,12 +73,16 @@
 </section>
 
 @code {
+    [Parameter]
+    public string? MailHash { get; set; }
+
     private string? statusMessage;
 
     private InputModel Input { get; set; } = new();
 
     private bool ShowRegistration { get; set; } = false;
     private DbEntities? _db = new();
+    
 
     //todo: later delete this
     private string _loginToken;
@@ -90,6 +94,15 @@
     {
         editContext = new EditContext(Input);
         messageStore = new ValidationMessageStore(editContext);
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (MailHash is not null && _db is not null)
+        {
+            var user = await _db.PoliticiEditorUsers.FirstOrDefaultAsync(u => u.EmailHash == MailHash);
+            Input.Email = user?.Email ?? "";
+        }
     }
 
     private async Task LoginUser()

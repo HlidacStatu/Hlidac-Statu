@@ -1,4 +1,4 @@
-﻿@page "/"
+﻿@page "/{MailHash?}"
 @using System.Security.Claims
 @using PoliticiEditor.Components.Account
 @using HlidacStatu.Extensions;
@@ -12,7 +12,7 @@
 
 @if (User is null || User.Identity?.IsAuthenticated == false)
 {
-    <Login/>
+    <Login MailHash="@MailHash"/>
 }
 else
 {
@@ -61,7 +61,9 @@ else
 
 @code {
 
-    private ClaimsPrincipal? User { get; set; } 
+    [Parameter]
+    public string? MailHash { get; set; }
+    private ClaimsPrincipal? User { get; set; }
     private HlidacStatu.Entities.Osoba osoba { get; set; }
 
     protected override async Task OnInitializedAsync()
@@ -69,4 +71,6 @@ else
         User = await UserHelper.GetCurrentUserAsync();
         osoba = HlidacStatu.Repositories.Osoby.GetByNameId.Get(User.GetNameId());
     }
+    
+    
 }
