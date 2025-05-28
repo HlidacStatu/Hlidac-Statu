@@ -20,25 +20,25 @@ public sealed class ToastService
 
         AddMessage(toast);
     }
-    public void AddInfoMessage(string title, string message)
+    public void AddInfoMessage(string title, string message, int durationInSeconds = 5)
     {
         var toast = new ToastMessage()
         {
             Title = title,
             Message = message,
-            Duration = TimeSpan.FromSeconds(5),
+            Duration = TimeSpan.FromSeconds(durationInSeconds),
             Importance = ToastMessage.ImportanceLevel.Info
         };
 
         AddMessage(toast);
     }
-    public void AddWarningMessage(string title, string message)
+    public void AddWarningMessage(string title, string message, int durationInSeconds = 5)
     {
         var toast = new ToastMessage()
         {
             Title = title,
             Message = message,
-            Duration = TimeSpan.FromSeconds(5),
+            Duration = TimeSpan.FromSeconds(durationInSeconds),
             Importance = ToastMessage.ImportanceLevel.Warning
         };
 
@@ -46,13 +46,13 @@ public sealed class ToastService
 
         AddMessage(toast);
     }
-    public void AddErrorMessage(string title, string message)
+    public void AddErrorMessage(string title, string message, int durationInSeconds = 5)
     {
         var toast = new ToastMessage()
         {
             Title = title,
             Message = message,
-            Duration = TimeSpan.FromSeconds(5),
+            Duration = TimeSpan.FromSeconds(durationInSeconds),
             Importance = ToastMessage.ImportanceLevel.Error
         };
 

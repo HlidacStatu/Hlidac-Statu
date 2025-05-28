@@ -3,10 +3,12 @@
 @using HlidacStatu.Entities
 @using HlidacStatu.Entities.Entities.PoliticiSelfAdmin
 @using Microsoft.EntityFrameworkCore
+@using Serilog
 
 @implements IAsyncDisposable
 
 @inject IEmailService EmailService
+@inject ToastService Toaster
 
 @rendermode InteractiveServer
 
@@ -15,8 +17,6 @@
 
 <section>
     <div class="col-4">
-        
-        <StatusMessage Message="@statusMessage"/>
         <EditForm EditContext="editContext" FormName="login">
             <DataAnnotationsValidator/>
             <h3>Zadejte svůj email, kam Vám zašleme odkaz pro přihlášení</h3>
@@ -50,18 +50,21 @@
                 <div class="mb-3">
                     <label for="dob" class="form-label">Datum nebo rok narození
                         <small>(datum narození nezveřejňujeme, pouze
-                            <InputText @bind-Value="Input.BirthYearOrDate" class="form-control" id="dob" aria-required="true"
+                            <InputText @bind-Value="Input.BirthYearOrDate" class="form-control" id="dob"
+                                       aria-required="true"
                                        placeholder="1.1.1999"/>
                             používáme pro jednoznačnou identifikaci)</small></label>
                     <ValidationMessage For="() => Input.BirthYearOrDate" class="text-danger"/>
                 </div>
                 <div class="mb-3">
                     <label for="reginfo" class="form-label">Odkaz, kde můžeme ověřit email</label>
-                    <InputText @bind-Value="Input.RegistrationInfo" class="form-control" id="reginfo" aria-required="true"/>
+                    <InputText @bind-Value="Input.RegistrationInfo" class="form-control" id="reginfo"
+                               aria-required="true"/>
                     <ValidationMessage For="() => Input.RegistrationInfo" class="text-danger"/>
                 </div>
                 <div>
-                    <button type="button" class="w-100 btn btn-lg btn-primary" @onclick="RegisterAsync">Registrovat</button>
+                    <button type="button" class="w-100 btn btn-lg btn-primary" @onclick="RegisterAsync">Registrovat
+                    </button>
                 </div>
             }
         </EditForm>
@@ -73,16 +76,17 @@
 </section>
 
 @code {
+
     [Parameter]
     public string? MailHash { get; set; }
-
-    private string? statusMessage;
 
     private InputModel Input { get; set; } = new();
 
     private bool ShowRegistration { get; set; } = false;
     private DbEntities? _db = new();
     
+    private ILogger _logger = Log.ForContext<Login>();
+
 
     //todo: later delete this
     private string _loginToken;
@@ -107,7 +111,7 @@
 
     private async Task LoginUser()
     {
-        if(!IsValidToLogin())
+        if (!IsValidToLogin())
             return;
 
         var user = await _db.PoliticiEditorUsers
@@ -115,7 +119,7 @@
 
         if (user is null)
         {
-            statusMessage = "Email nebyl nalezen. Zkuste jiný mail, který máte u nás zaregistrovaný";
+            Toaster.AddWarningMessage("Email nenalezen", "Email nebyl nalezen. Zkuste jiný mail, který máte u nás zaregistrovaný");
             ShowRegistration = true;
             return;
         }
@@ -124,7 +128,9 @@
 
         if (user.IsApproved == false)
         {
-            statusMessage = "Uživatel existuje, ale ještě není schválen. Schválení musí proběhnout interním procesem Hlídače Státu";
+            Toaster.AddWarningMessage("Uživatel nebyl schválen", 
+                "Víme o Vás, ale ještě nemáte schválený email. Schválení musí proběhnout interním procesem Hlídače Státu. Pokud Vám přijde, že nám to trvá, zkuste nám napsat na podporu.",
+                durationInSeconds: 15);
             return;
         }
 
@@ -138,11 +144,14 @@
         try
         {
             await EmailService.SendEmailAsync([user.Email], "Přihlašovací token", EmailBody(loginLink));
-            statusMessage = "Na vaší emailovou adresu byl odeslán email s přihlašovacímmi údaji.";
+            Toaster.AddInfoMessage("Skvělé", 
+                "Pro přihlášení už zbývá jen jeden krok - kliknout na odkaz, který jsme poslali do Vaší emailové schránky.", 
+                durationInSeconds:15);
         }
         catch (Exception e)
         {
-            statusMessage = "Při odesílání emailu došlo k chybě";
+            _logger.Error(e, "Nepodařilo se odeslat email politikovi.");
+            Toaster.AddErrorMessage("Došlo u nás k chybě", "Nepodařilo se nám odeslat email.");
         }
     }
 
@@ -159,7 +168,7 @@
 
     private async Task RegisterAsync()
     {
-        if(!IsValidToRegister())
+        if (!IsValidToRegister())
             return;
 
         // // Passed all checks - continue registration
@@ -172,11 +181,10 @@
             IsApproved = false,
         };
         newUser.SetEmailProperties();
-        
+
         _db.PoliticiEditorUsers.Add(newUser);
         await _db.SaveChangesAsync();
 
-        statusMessage = "Registrace úspěšná. Zkontrolujte email.";
         ShowRegistration = false;
     }
 
@@ -199,7 +207,7 @@
 
         return !hasError;
     }
-    
+
     private bool IsValidToRegister()
     {
         messageStore.Clear();
@@ -243,7 +251,7 @@
 
         return !hasError;
     }
-    
+
     public async ValueTask DisposeAsync()
     {
         if (_db is not null)
