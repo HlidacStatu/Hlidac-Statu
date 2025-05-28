@@ -37,52 +37,57 @@
                 </div>
             </div>
         </a>
-        <button class="navbar-toggler collapsed" type="button" data-bs-toggle="collapse"
-                data-bs-target="#navbar-content">
-            <div class="hamburger-toggle">
-                <div class="hamburger">
-                </div>
-            </div>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
         </button>
-        <div class="collapse navbar-collapse" id="navbar-content">
-        @if (IsAuthenticated)
-        {
-            <ul class="d-none d-lg-block navbar-nav me-auto mr-auto mb-2 mb-lg-0 mainmenu ms-4">
-                    <li class="nav-item dropdown dropdown-mega position-static mainmenu">
-                        <NavLink class="nav-link mainmenu" href="/">Úvodní stránka<br />editace politika</NavLink>
+
+        @* <button class="navbar-toggler collapsed" type="button" data-bs-toggle="collapse" *@
+        @*         data-bs-target="#navbar-content"> *@
+        @*     <div class="hamburger-toggle"> *@
+        @*         <div class="hamburger"> *@
+        @*         </div> *@
+        @*     </div> *@
+        @* </button> *@
+        <div class="collapse navbar-collapse" id="navbarNav">
+            @if (IsAuthenticated)
+            {
+                <ul class="navbar-nav me-auto mr-auto mb-2 mb-lg-0 ms-4">
+                    <li class="nav-item mainmenu">
+                        <NavLink Match="NavLinkMatch.All" class="nav-link mainmenu" href="/">Úvodní stránka<br/>editace politika</NavLink>
                     </li>
-                    <li class="nav-item dropdown dropdown-mega position-static mainmenu">
-                    <NavLink class="nav-link mainmenu" href="/EditPhoto">Foto</NavLink>
-                </li>
-                <li class="nav-item dropdown dropdown-mega position-static mainmenu">
-                    <NavLink class="nav-link mainmenu" href="/EditPerson">Osobní údaje</NavLink>
-                </li>
-                <li class="nav-item dropdown dropdown-mega position-static mainmenu">
-                    <NavLink class="nav-link mainmenu" href="/EditParty">Politická strana</NavLink>
-                </li>
-                <li class="nav-item dropdown dropdown-mega position-static mainmenu">
-                    <NavLink class="nav-link mainmenu" href="/EditSocial">Sociální sítě</NavLink>
-                </li>
-                <li class="nav-item dropdown dropdown-mega position-static mainmenu">
-                    <NavLink class="nav-link mainmenu" href="/EditSalaries">Platy</NavLink>
-                </li>
-                <li class="nav-item dropdown dropdown-mega position-static mainmenu">
-                    <NavLink class="nav-link mainmenu" href="/EditContacts">Kontakt</NavLink>
-                </li>
-            </ul>
-            <div class="d-flex">
+                    <li class="nav-item mainmenu">
+                        <NavLink class="nav-link mainmenu" href="/EditPhoto">Foto</NavLink>
+                    </li>
+                    <li class="nav-item mainmenu">
+                        <NavLink class="nav-link mainmenu" href="/EditPerson">Osobní údaje</NavLink>
+                    </li>
+                    <li class="nav-item mainmenu">
+                        <NavLink class="nav-link mainmenu" href="/EditParty">Politická strana</NavLink>
+                    </li>
+                    <li class="nav-item mainmenu">
+                        <NavLink class="nav-link mainmenu" href="/EditSocial">Sociální sítě</NavLink>
+                    </li>
+                    <li class="nav-item mainmenu">
+                        <NavLink class="nav-link mainmenu" href="/EditSalaries">Platy</NavLink>
+                    </li>
+                    <li class="nav-item mainmenu">
+                        <NavLink class="nav-link mainmenu" href="/EditContacts">Kontakt</NavLink>
+                    </li>
+                </ul>
+                <div class="d-flex">
                 <span class="navbar-text me-3">
                     Přihlášen jako: @LoggedInNameId
                 </span>
-                <LogoutButton/>
-            </div>
-        }
-        else
-        {
-            <span class="navbar-text">
+                    <LogoutButton/>
+                </div>
+            }
+            else
+            {
+                <span class="navbar-text">
                 Pro editaci je potřeba se nejprve přihlásit.
             </span>
-        }
+            }
         </div>
         <div class="d-none d-lg-flex rightmenu">
         </div>

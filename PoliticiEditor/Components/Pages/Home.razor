@@ -20,40 +20,46 @@ else
 
     <div class="person-profile-thumb">
         <a href="/">
-            <div class="profile-picture border" style="background-image: url('https://www.hlidacstatu.cz/Photo/@(osoba.NameId)')">
+            <div class="profile-picture border" style="background-image: url('https://www.hlidacstatu.cz/Photo/@(Osoba.NameId)')">
                 <!-- diky pouziti background image nezalezi na pomeru stran obrazku a neni poteba tvorit thumbnaily na serveru -->
             </div>
         </a>
         <div>
             <a class="section-title link--blue" href="/">
-                <h3>@osoba.FullNameWithYear()</h3>
+                <h3>@Osoba.FullNameWithYear()</h3>
             </a>
             <div class="new-p new-p--gray new-p--small">
-                @osoba.CurrentPoliticalParty()
+                @Osoba.CurrentPoliticalParty()
             </div>
         </div>
     </div>
-
+    
+    <p>
+        Informace, které zde doplníte budou dále zobrazeny na webu <a href="@Osoba.GetUrl(local:false)">Hlídače státu</a> a na webu <a href="https://platyuredniku.hlidacstatu.cz/politici/@Osoba.NameId">platů</a>.
+    </p>
+    
+    <p>
+        Pokud o sobě najdete informace, které nejsou správné, nebo by Vám cokoliv nefungovalo, můžete nás kontaktovat na emailu <a href="mailto:podpora@hlidacstatu.cz">podpora@hlidacstatu.cz</a>
+    </p>
 
     <h3 class="row mt-5">Jaké informace o sobě můžete změnit</h3>
     <div class="row m-3 mb-5">
-        <div class="col"><a class="btn btn-primary" href="/EditPhoto">Změnit svou fotografii</a></div>
+        <div class="col"><a class="btn btn-sm btn-primary" href="/EditPhoto">Změnit svou fotografii</a></div>
     
-    
         <div class="col">
-            <a class="btn btn-primary" href="/EditPerson">Změnit některé své osobní údaje</a>
+            <a class="btn btn-sm btn-primary" href="/EditPerson">Změnit některé své osobní údaje</a>
         </div>
         <div class="col">
-            <a class="btn btn-primary" href="/EditParty">Přidat/opravit působení v politických stranách</a>
+            <a class="btn btn-sm btn-primary" href="/EditParty">Přidat/opravit působení v politických stranách</a>
         </div>
         <div class="col">
-            <a class="btn btn-primary" href="/EditSocial">Upravit odkazy na sociální sítě</a>
+            <a class="btn btn-sm btn-primary" href="/EditSocial">Upravit odkazy na sociální sítě</a>
         </div>
         <div class="col">
-            <a class="btn btn-primary" href="/EditContacts">Upravit kontaktní údaje</a>
+            <a class="btn btn-sm btn-primary" href="/EditContacts">Upravit kontaktní údaje</a>
         </div>
         <div class="col">
-            <a class="btn btn-primary" href="/EditSalaries">Přidat informaci o platu</a>
+            <a class="btn btn-sm btn-primary" href="/EditSalaries">Přidat informaci o platu</a>
         </div>
     </div>
 }
@@ -64,12 +70,12 @@ else
     [Parameter]
     public string? MailHash { get; set; }
     private ClaimsPrincipal? User { get; set; }
-    private HlidacStatu.Entities.Osoba osoba { get; set; }
+    private HlidacStatu.Entities.Osoba Osoba { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
         User = await UserHelper.GetCurrentUserAsync();
-        osoba = HlidacStatu.Repositories.Osoby.GetByNameId.Get(User.GetNameId());
+        Osoba = HlidacStatu.Repositories.Osoby.GetByNameId.Get(User.GetNameId());
     }
     
     
