@@ -12,6 +12,22 @@
 
 @if (User is null || User.Identity?.IsAuthenticated == false)
 {
+    <h2>Vítejte v administrativní části politiků od Hlídače státu</h2>
+    <p>
+        Tyto stránky jsou určeny výhradně pro politiky, kteří chtějí aktivně spravovat a sdílet své veřejné informace s občany. 
+        Naším cílem je podpořit větší otevřenost a důvěru mezi volenými zástupci a jejich voliči.
+    </p>
+    <p>
+        Abychom zajistili bezpečnost a autenticitu, přihlášení probíhá prostřednictvím přístupového odkazu, který vám zašleme na Váš e-mail. 
+        Stačí zadat Vaši e-mailovou adresu a během několika okamžiků obdržíte odkaz, díky kterému se přihlásíte.
+    </p>
+    <p>Po přihlášení budete mít možnost:</p>
+    <ul>
+        <li>upravovat své osobní údaje a profilovou fotografii,</li>
+        <li>aktualizovat informace o své politické příslušnosti,</li>
+        <li>zadávat a měnit údaje o svých příjmech a mnohé další.</li>
+    </ul>
+    <p>Vaše aktivní účast v tomto projektu přispívá k větší transparentnosti a povede ke zvýšení důvěry voličů v politiky.</p>
     <Login MailHash="@MailHash"/>
 }
 else
@@ -35,31 +51,31 @@ else
     </div>
     
     <p>
-        Informace, které zde doplníte budou dále zobrazeny na webu <a href="@Osoba.GetUrl(local:false)">Hlídače státu</a> a na webu <a href="https://platyuredniku.hlidacstatu.cz/politici/@Osoba.NameId">platů</a>.
+        Informace, které zde vyplníte, budou dále zobrazeny na webu <a href="@Osoba.GetUrl(local:false)">Hlídače státu</a> a na webu <a href="https://platyuredniku.hlidacstatu.cz/politici/@Osoba.NameId">platů politiků</a>.
     </p>
     
     <p>
-        Pokud o sobě najdete informace, které nejsou správné, nebo by Vám cokoliv nefungovalo, můžete nás kontaktovat na emailu <a href="mailto:podpora@hlidacstatu.cz">podpora@hlidacstatu.cz</a>
+        Pokud o sobě najdete jakékoliv informace, které nejsou správné, nebo by Vám cokoliv nefungovalo, kontaktujte nás na emailu <a href="mailto:podpora@hlidacstatu.cz">podpora@hlidacstatu.cz</a>
     </p>
 
-    <h3 class="row mt-5">Jaké informace o sobě můžete změnit</h3>
+    <h3 class="row mt-5">Upravit profil</h3>
     <div class="row m-3 mb-5">
-        <div class="col"><a class="btn btn-sm btn-primary" href="/EditPhoto">Změnit svou fotografii</a></div>
+        <div class="col"><a class="btn btn-sm btn-primary" href="/EditPhoto">profilová fotografie</a></div>
     
         <div class="col">
-            <a class="btn btn-sm btn-primary" href="/EditPerson">Změnit některé své osobní údaje</a>
+            <a class="btn btn-sm btn-primary" href="/EditPerson">osobní údaje</a>
         </div>
         <div class="col">
-            <a class="btn btn-sm btn-primary" href="/EditParty">Přidat/opravit působení v politických stranách</a>
+            <a class="btn btn-sm btn-primary" href="/EditParty">působení v politických stranách</a>
         </div>
         <div class="col">
-            <a class="btn btn-sm btn-primary" href="/EditSocial">Upravit odkazy na sociální sítě</a>
+            <a class="btn btn-sm btn-primary" href="/EditSocial">odkazy na sociální sítě</a>
         </div>
         <div class="col">
-            <a class="btn btn-sm btn-primary" href="/EditContacts">Upravit kontaktní údaje</a>
+            <a class="btn btn-sm btn-primary" href="/EditContacts">kontaktní údaje</a>
         </div>
         <div class="col">
-            <a class="btn btn-sm btn-primary" href="/EditSalaries">Přidat informaci o platu</a>
+            <a class="btn btn-sm btn-primary" href="/EditSalaries">informace o platu</a>
         </div>
     </div>
 }

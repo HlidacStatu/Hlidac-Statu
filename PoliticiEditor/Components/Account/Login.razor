@@ -12,14 +12,11 @@
 
 @rendermode InteractiveServer
 
-<h2>Přihlášení</h2>
-<p>Pro pokračování je potřeba se nejprve přihlásit</p>
-
 <section>
     <div class="col-4">
         <EditForm EditContext="editContext" FormName="login">
             <DataAnnotationsValidator/>
-            <h3>Zadejte svůj email, kam Vám zašleme odkaz pro přihlášení</h3>
+            <h3>Zadejte svůj email, kam Vám zašleme odkaz pro přihlášení:</h3>
             <hr/>
             <ValidationSummary class="text-danger" role="alert"/>
             <div class="mb-3">
@@ -264,10 +261,10 @@
     {
         return $"<h1>Váš odkaz pro přihlášení do administrace politiků na Hlídači státu</h1><br />" +
                $"<p>Dobrý den,</p>" +
-               $"<p>Děkujeme za rozhodnutí pomoci nám při kontrole, opravě nebo doplnění chybějících údajů u Vaší osoby na našem webu.</p>" +
-               $"<p>Právě Vám byl přidělen jednorázový přístup do administrace části webu, kde evidujeme informace o Vaší osobě. Kliknutím na tento odkaz se přihlásíte.<br /></p>" +
-               $"<p><a href=\"{loginLink}\">{loginLink}</a></p>" +
-               $"<p>Vaší spolupráce si vážíme<br />S pozdravem<br />Hlídač státu, z.ú.<br />";
+               $"<p>děkujeme za rozhodnutí pomoci nám při kontrole, opravě nebo doplnění chybějících údajů u Vaší osoby na našem webu.</p>" +
+               $"<p>Právě Vám byl přidělen unikátní přístup do administrace části webu, kde evidujeme informace o Vaší osobě. Kliknutím na <br />" +
+               $"<a href=\"{loginLink}\">{loginLink}</a> se přihlásíte.</p>" +
+               $"<p>Vaší spolupráce si vážíme.<br />S pozdravem<br />Hlídač státu, z.ú.<br />";
     }
 
 }
