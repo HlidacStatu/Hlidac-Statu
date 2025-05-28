@@ -3,12 +3,8 @@
 @rendermode @(new InteractiveServerRenderMode(prerender: false))
 
 
-<div aria-live="polite" aria-atomic="true" class="position-relative">
-    <!-- Position it: -->
-    <!-- - `.toast-container` for spacing between toasts -->
-    <!-- - `.position-absolute`, `top-0` & `end-0` to position the toasts in the upper right corner -->
-    <!-- - `.p-3` to prevent the toasts from sticking to the edge of the container  -->
-    <div class="toast-container position-absolute top-0 end-0 p-3">
+<div aria-live="polite" aria-atomic="true" class="position-sticky bottom-0 end-0 z-3">
+    <div class="toast-container position-fixed bottom-0 end-0 p-3">
 
         @foreach (var message in Toaster.GetVisibleMessages())
         {
