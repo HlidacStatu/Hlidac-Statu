@@ -1,4 +1,5 @@
-﻿@page "/{MailHash?}"
+﻿@page "/"
+@page "/login/{MailHash?}"
 @using System.Security.Claims
 @using PoliticiEditor.Components.Account
 @using HlidacStatu.Extensions;
@@ -58,25 +59,14 @@ else
         Pokud o sobě najdete jakékoliv informace, které nejsou správné, nebo by Vám cokoliv nefungovalo, kontaktujte nás na emailu <a href="mailto:podpora@hlidacstatu.cz">podpora@hlidacstatu.cz</a>
     </p>
 
-    <h3 class="row mt-5">Upravit profil</h3>
-    <div class="row m-3 mb-5">
+    <h3 class="mt-5">Upravit profil</h3>
+    <div class="m-3 mb-5">
         <div class="col"><a class="btn btn-sm btn-primary" href="/EditPhoto">profilová fotografie</a></div>
-    
-        <div class="col">
-            <a class="btn btn-sm btn-primary" href="/EditPerson">osobní údaje</a>
-        </div>
-        <div class="col">
-            <a class="btn btn-sm btn-primary" href="/EditParty">působení v politických stranách</a>
-        </div>
-        <div class="col">
-            <a class="btn btn-sm btn-primary" href="/EditSocial">odkazy na sociální sítě</a>
-        </div>
-        <div class="col">
-            <a class="btn btn-sm btn-primary" href="/EditContacts">kontaktní údaje</a>
-        </div>
-        <div class="col">
-            <a class="btn btn-sm btn-primary" href="/EditSalaries">informace o platu</a>
-        </div>
+        <div class="col"><a class="btn btn-sm btn-primary" href="/EditPerson">osobní údaje</a></div>
+        <div class="col"><a class="btn btn-sm btn-primary" href="/EditParty">působení v politických stranách</a></div>
+        <div class="col"><a class="btn btn-sm btn-primary" href="/EditSocial">odkazy na sociální sítě</a></div>
+        <div class="col"><a class="btn btn-sm btn-primary" href="/EditContacts">kontaktní údaje</a></div>
+        <div class="col"><a class="btn btn-sm btn-primary" href="/EditSalaries">informace o platu</a></div>
     </div>
 }
 

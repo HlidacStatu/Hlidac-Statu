@@ -66,8 +66,6 @@
         <div class="mx-auto">
             <EditForm EditContext="editContext" FormName="editSalaries">
                 <DataAnnotationsValidator/>
-                <h3>Zde můžete editovat své přihlašovací údaje</h3>
-                <hr/>
                 <ValidationSummary class="text-danger" role="alert"/>
                 <div class="mb-3">
                     <label for="Rok">Kalendářní rok, za který vyplňujete příjem</label>
@@ -76,7 +74,7 @@
                            disabled
                            @bind="NewIncome.Rok"/>
                 </div>
-                <div class="mb-3 border-top">
+                <div class="mb-3">
                     <label for="Organizace">Organizace, která platí</label>
                     <HlidacAutocomplete SearchFuncAsync="@((s, token) => OnSearch(s, token))"
                                         OnAutocompleteItemSelected="@(item => FillOrganizace(item))"
@@ -92,7 +90,7 @@
                     </HlidacAutocomplete>
                     <ValidationMessage For="() => NewIncome.IdOrganizace" class="text-danger"/>
                 </div>
-                <div class="mb-3 border-top">
+                <div class="mb-3">
                     <label for="PocetMesicu">Uveďte kolik měsíců jste v daném roce vykonával funkci</label>
                     <input id="PocetMesicu" type="text"
                            class="form-control"
@@ -100,11 +98,11 @@
                            @bind:set="(value) => NewIncome.PocetMesicu = ParseDecimal(value)"/>
                     <ValidationMessage For="() => NewIncome.PocetMesicu" class="text-danger"/>
                 </div>
-                <div class="mb-3 border-top">
+                <div class="mb-3">
                     <label for="NazevFunkce">Uveďte název funkce/pozice, kterou jste vykonával</label>
                     <input id="NazevFunkce" class="form-control" @bind="NewIncome.NazevFunkce"/>
                 </div>
-                <div class="mb-3 border-top">
+                <div class="mb-3">
                     <label for="Plat">Plat či základní příjem bez odměn. <b>Uveďte celkovou roční hrubou částku před
                             zdaněním.</b></label>
                     <input id="Plat" type="text"
@@ -113,7 +111,7 @@
                            @bind:set="(value) => NewIncome.Plat = ParseDecimal(value)"/>
                     <ValidationMessage For="() => NewIncome.Plat" class="text-danger"/>
                 </div>
-                <div class="mb-3 border-top">
+                <div class="mb-3">
                     <label for="Odmeny">Mimořádné finanční odměny. <b>Uveďte celkovou roční hrubou částku před
                             zdaněním.</b></label>
                     <input id="Odmeny" type="text"
@@ -122,7 +120,7 @@
                            @bind:set="(value) => NewIncome.Odmeny = ParseDecimal(value)"/>
                     <ValidationMessage For="() => NewIncome.Odmeny" class="text-danger"/>
                 </div>
-                <div class="mb-3 border-top">
+                <div class="mb-3">
                     <label for="Prispevky">Jiné finanční příjmy či příspěvky. <b>Uveďte celkovou roční hrubou částku
                             před zdaněním.</b></label>
                     <input id="Prispevky" type="text"
@@ -131,13 +129,13 @@
                            @bind:set="(value) => NewIncome.Prispevky = ParseDecimal(value)"/>
                     <ValidationMessage For="() => NewIncome.Prispevky" class="text-danger"/>
                 </div>
-                <div class="mb-3 border-top">
+                <div class="mb-3">
                     <label for="NefinancniBonus">Nefinanční bonus (např. služební auto, pojištění apod.). Uveďte
                         slovně.</label>
                     <input id="NefinancniBonus" class="form-control" @bind="NewIncome.NefinancniBonus"/>
                     <ValidationMessage For="() => NewIncome.NefinancniBonus" class="text-danger"/>
                 </div>
-                <div class="mb-3 border-top">
+                <div class="mb-3">
                     <label for="PoznamkaPlat">Poznámku či upřesnění.</label>
                     <input id="PoznamkaPlat" class="form-control" @bind="NewIncome.PoznamkaPlat"/>
                 </div>

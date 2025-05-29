@@ -27,7 +27,7 @@ else
         <h5 class="card-header">Sociální sítě</h5>
 
         <div class="card-body">
-            <p>Doplňte/opravte pouze unikátní konec url, který obsahuje název Vašeho profilu na sociálních sítích, a to u těch sítí, kde máte veřejný profil. </p>
+            <p>Vyplňte url Vašeho profilu na sociálních sítích. </p>
             <div class="mx-auto">
                 <div class="mb-3">
                     <label for="twitter">Twitter / X</label>
@@ -121,9 +121,25 @@ else
                            @bind:set="@(val => SetSocialNetwork("WWW", val))"/>
                 </div>
             </div>
+            
+            @if (_showHelp)
+            {
+                <div class="mt-2">
+                <hr/>
+                <h5>Jak vyplnit odkaz</h5>
+                <ol>
+                    <li>Otevřete si svůj profil na sociální síti.</li>
+                    <li>Klikněte do adresního řádku prohlížeče (ctrl+l).</li>
+                    <li>Zkopírujte celý odkaz z horního řádku prohlížeče (ctrl+c).</li>
+                    <li>Zkopírovaný odkaz vložte do políčka k příslušné sociální síti (ctrl+v).</li>
+                </ol>
+                <img src="Content/Img/WhereIsAddressBar.png" alt="Kde najdu adresní řádek" class="img-fluid p-5 col-8" />
+                </div>
+            }
         </div>
-
+        
         <div class="card-footer text-body-secondary d-flex">
+            <button class="btn btn-outline-primary" @onclick="@(TriggerHelp)">@(_showHelp? "Skrýt" : "Zobrazit") návod</button>
             @if (_db?.ChangeTracker.HasChanges() == true)
             {
                 <div class="ms-auto">
@@ -145,6 +161,8 @@ else
     private DbEntities? _db = new();
     private ClaimsPrincipal User { get; set; }
     private ILogger _logger = Log.ForContext<EditSocial>();
+
+    private bool _showHelp = false;
 
 
     protected override async Task OnInitializedAsync()
@@ -183,6 +201,12 @@ else
         {
             var lastIndex = value.LastIndexOf(".com/", StringComparison.InvariantCultureIgnoreCase);
             value = value.Substring(lastIndex + 5);
+
+            var indexOfRedundantPart = value.IndexOf('/');
+            if (indexOfRedundantPart != -1)
+            {
+                value = value.Substring(0, indexOfRedundantPart);
+            }
         }
 
         
@@ -238,5 +262,10 @@ else
     {
         await RefreshContextAsync();
         Toaster.AddInfoMessage("Zrušeno", "Změny byly zrušeny.");
+    }
+
+    private void TriggerHelp()
+    {
+        _showHelp = !_showHelp;
     }
 }

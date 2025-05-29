@@ -13,21 +13,20 @@
 @rendermode InteractiveServer
 
 <section>
-    <div class="col-4">
+    <h3>Zadejte svůj email, kam Vám zašleme odkaz pro přihlášení:</h3>
+    <div>
         <EditForm EditContext="editContext" FormName="login">
             <DataAnnotationsValidator/>
-            <h3>Zadejte svůj email, kam Vám zašleme odkaz pro přihlášení:</h3>
-            <hr/>
             <ValidationSummary class="text-danger" role="alert"/>
-            <div class="mb-3">
-                <label for="email" class="form-label">Email</label>
+
+            <label for="email" class="form-label">Email</label>
+            <div class="input-group mb-3">
                 <InputText @bind-Value="Input.Email" id="email" class="form-control" autocomplete="username"
                            aria-required="true" placeholder="jmeno@domena.cz"/>
-                <ValidationMessage For="() => Input.Email" class="text-danger"/>
+                <button type="button" class="btn btn-lg btn-primary" style="margin: 0;" @onclick="LoginUser">Přihlásit</button>
             </div>
-            <div>
-                <button type="button" class="w-100 btn btn-lg btn-primary" @onclick="LoginUser">Přihlásit</button>
-            </div>
+            <ValidationMessage For="() => Input.Email" class="text-danger"/>
+            
             @if (false)
             {
                 <h3>Zadaný email jsme nenalezli mezi zaregistrovanými</h3>
@@ -81,7 +80,7 @@
 
     private bool ShowRegistration { get; set; } = false;
     private DbEntities? _db = new();
-    
+
     private ILogger _logger = Log.ForContext<Login>();
 
 
@@ -125,7 +124,7 @@
 
         if (user.IsApproved == false)
         {
-            Toaster.AddWarningMessage("Uživatel nebyl schválen", 
+            Toaster.AddWarningMessage("Uživatel nebyl schválen",
                 "Víme o Vás, ale ještě nemáte schválený email. Schválení musí proběhnout interním procesem Hlídače Státu. Pokud Vám přijde, že nám to trvá, zkuste nám napsat na podporu.",
                 durationInSeconds: 15);
             return;
@@ -141,9 +140,9 @@
         try
         {
             await EmailService.SendEmailAsync([user.Email], "Přihlašovací token", EmailBody(loginLink));
-            Toaster.AddInfoMessage("Skvělé", 
-                "Pro přihlášení už zbývá jen jeden krok - kliknout na odkaz, který jsme poslali do Vaší emailové schránky.", 
-                durationInSeconds:15);
+            Toaster.AddInfoMessage("Skvělé",
+                "Pro přihlášení už zbývá jen jeden krok - kliknout na odkaz, který jsme poslali do Vaší emailové schránky.",
+                durationInSeconds: 15);
         }
         catch (Exception e)
         {

@@ -25,7 +25,10 @@
             <div class="mx-auto">
                 <EditForm EditContext="editContext" FormName="login">
                     <DataAnnotationsValidator/>
-                    <h3>Zde můžete editovat své přihlašovací údaje</h3>
+                    <p>Zde můžete přidávat další kontakty - přístup - pro editaci tohoto profilu.</p>
+                    <p>
+                        Telefonní číslo nebude zveřejněno. Jeho vyplněním souhlasíte s tím, že vás v případě potřeby či nejasností můžeme kontaktovat z Hlídače státu.
+                    </p>
                     <hr/>
                     <ValidationSummary class="text-danger" role="alert"/>
                     @foreach (var contact in _model.UserLogins)
