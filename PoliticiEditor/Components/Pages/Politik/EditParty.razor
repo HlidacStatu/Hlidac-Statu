@@ -36,7 +36,7 @@ else
                 {
                     <div class="row mb-3">
                         <div class="col-6">
-                            <label for="polStrana">Politická strana</label>
+                            <label for="polStrana">Politická strana nebo hnutí</label>
                             <HlidacAutocomplete
                                 @key="politicalParty"
                                 DefaultTextValue="@politicalParty.Organizace"
@@ -71,13 +71,10 @@ else
 
         <div class="card-footer text-body-secondary d-flex">
             <button class="btn btn-primary" @onclick="@(AddPartyAffiliation)">Přidat působení ve straně</button>
-            @if (_db?.ChangeTracker.HasChanges() == true)
-            {
-                <div class="ms-auto">
-                    <button class="btn btn-success" @onclick="@(Save)">Uložit změny</button>
-                    <button class="btn btn-warning" @onclick="@(Cancel)">Zrušit změny</button>
-                </div>
-            }
+            <div class="ms-auto">
+                <button class="btn btn-success" @onclick="@(Save)">Uložit změny</button>
+                <button class="btn btn-warning" @onclick="@(Cancel)">Zrušit změny</button>
+            </div>
         </div>
 
     </div>

@@ -25,9 +25,12 @@
             <div class="mx-auto">
                 <EditForm EditContext="editContext" FormName="login">
                     <DataAnnotationsValidator/>
-                    <p>Zde můžete přidávat další kontakty - přístup - pro editaci tohoto profilu.</p>
+                    <p>Zde můžete přidávat další e-maily, skrz které se přihlásíte do systému a můžete editovat tento profil.</p>
                     <p>
-                        Telefonní číslo nebude zveřejněno. Jeho vyplněním souhlasíte s tím, že vás v případě potřeby či nejasností můžeme kontaktovat z Hlídače státu.
+                        <strong>
+                            Telefonní číslo není povinné. Pokud ho zadáte, nebude zveřejněno.
+                            Jeho vyplněním pouze souhlasíte s tím, že vás v případě potřeby či nejasností můžeme za Hlídač státu kontaktovat.
+                        </strong> 
                     </p>
                     <hr/>
                     <ValidationSummary class="text-danger" role="alert"/>
@@ -35,7 +38,7 @@
                     {
                         <div class="row">
                             <div class="col-3">
-                                <label for="email">Email</label>
+                                <label for="email">E-mail</label>
                                 <input type="text" id="email"
                                        class="form-control"
                                        @bind:get="@contact.Email"
@@ -57,13 +60,10 @@
 
         <div class="card-footer text-body-secondary d-flex">
             <button class="btn btn-primary" @onclick="@(AddContact)">Přidat kontakt</button>
-            @if (_db?.ChangeTracker.HasChanges() == true)
-            {
-                <div class="ms-auto">
-                    <button class="btn btn-success" @onclick="@(Save)">Uložit změny</button>
-                    <button class="btn btn-warning" @onclick="@(Cancel)">Zrušit změny</button>
-                </div>
-            }
+            <div class="ms-auto">
+                <button class="btn btn-success" @onclick="@(Save)">Uložit změny</button>
+                <button class="btn btn-warning" @onclick="@(Cancel)">Zrušit změny</button>
+            </div>
         </div>
 
     </div>
@@ -196,7 +196,7 @@ else
         
         if (string.IsNullOrWhiteSpace(user.Email) || !new EmailAddressAttribute().IsValid(user.Email))
         {
-            messageStore.Add(() => user.Email, "Neplatný email.");
+            messageStore.Add(() => user.Email, "Neplatný e-mail.");
             hasError = true;
         }
         

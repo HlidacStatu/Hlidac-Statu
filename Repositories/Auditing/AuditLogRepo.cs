@@ -27,5 +27,18 @@ namespace HlidacStatu.Repositories.Auditing
             return result.Errors;
         }
         
+        // public static async Task<bool> SaveAsync(AuditLog auditLog)
+        // {
+        //     var result = await AuditLogClient.IndexAsync<AuditLog>(auditLog);
+        //
+        //     if (!result.IsValid)
+        //     {
+        //         var a = result.DebugInformation;
+        //         _logger.Error($"Error when saving auditlog to ES: {a}");
+        //     }
+        //
+        //     return result.IsValid;
+        // }
+        
     }
 }

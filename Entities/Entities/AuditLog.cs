@@ -9,7 +9,7 @@ namespace HlidacStatu.Entities;
 public class AuditLog
 {
     [Keyword]
-    public int Id { get; set; }
+    public string Id { get; set; } = Guid.NewGuid().ToString();
     public string EntityId { get; set; }
     public string EntityName { get; set; }
     public EntityState Action { get; set; }
@@ -27,7 +27,9 @@ public class AuditLog
     {
         [Keyword]
         public string Property { get; set; } = null;
+        [Keyword]
         public object OldValue { get; set; }
+        [Keyword]
         public object NewValue { get; set; }
         
         public bool IsProperChange => OldValue is not null || NewValue is not null;

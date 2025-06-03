@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
-using System.Text.Json;
 using System.Threading.Tasks;
 using HlidacStatu.Entities;
 using Microsoft.EntityFrameworkCore;
@@ -50,16 +49,34 @@ public static class ChangeTracker
         if (audits == null || audits.Count == 0)
             return;
         
-        foreach (var audit in audits.Where(a => a.EntryReference != null && a.Action == EntityState.Added))
+        foreach (var audit in audits)
         {
-            var pkName = audit.EntryReference.Metadata.FindPrimaryKey()?.Properties.FirstOrDefault()?.Name;
-            if (pkName != null)
+            if(audit.EntryReference is null)
+                continue;
+            
+            //find and set new id (for new records)
+            if (audit.Action == EntityState.Added)
             {
-                var idObj = audit.EntryReference.Property(pkName).CurrentValue;
-                audit.EntityId = StringifyObjectValue(idObj);
+                //find pk name
+                var pkName = audit.EntryReference.Metadata.FindPrimaryKey()?.Properties.FirstOrDefault()?.Name;
+                if (pkName != null)
+                {
+                    //finds pk value
+                    var idObj = audit.EntryReference.Property(pkName).CurrentValue;
+                    audit.EntityId = StringifyObjectValue(idObj);
+                }
+
+                //update inner Audit object (Changes) to reflect/save correct PK
+                foreach (var change in audit.Changes)
+                {
+                    if (change.Property == pkName)
+                    {
+                        change.NewValue = audit.EntityId;
+                    }
+                }
             }
 
-            audit.EntryReference = null; // clear to avoid serialization issues
+            audit.EntryReference = null;
         }
 
         await AuditLogRepo.BulkSaveAsync(audits);

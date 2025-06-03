@@ -30,22 +30,51 @@
                 <tr class="table-light">
                     <th>Organizace</th>
                     <th>Rok</th>
-                    <th>Celkový hrubý příjem (před zdaněním)</th>
+                    <th>Počet měsíců ve funkci</th>
+                    <th>Plat (roční hrubá částka před zdaněním)</th>
+                    <th>Mimořádné odměny</th>
+                    <th>Jiné fin. příspěvky</th>
+                    <th>Nefinanční bonus</th>
+                    <th>Poznámka</th>
+                    <th>Akce</th>
                 </tr>
                 </thead>
                 <tbody>
                 @if (Platy.Any())
                 {
-                    @foreach (var platyItem in Platy)
+                    foreach (var platyItem in Platy)
                     {
-                        <tr>
-                            <td>
-                                @(GetOrgName(platyItem.IdOrganizace))
-                            </td>
-                            <td>@platyItem.Rok.ToString("F0")</td>
-                            <td>@HlidacStatu.Util.RenderData.NicePrice(platyItem.CelkovyRocniPlatVcetneOdmen)</td>
-
-                        </tr>
+                        if (platyItem.Id == _noteForPrijemId)
+                        {
+                            <tr>
+                                <td>@(GetOrgName(platyItem.IdOrganizace))</td>
+                                <td colspan="7">
+                                    <label for="poznamka">Poznámka</label>
+                                    <input type="text" id="poznamka" class="form-control" @bind="platyItem.PoznamkaPlat"/>
+                                </td>
+                                <td>
+                                    <button class="btn btn-sm btn-success" @onclick="@(() => SaveNote(platyItem))">Uložit poznámku</button>
+                                    <button class="btn btn-sm btn-warning" @onclick="@(() => _noteForPrijemId = null)">Zrušit poznámku</button>
+                                </td>
+                            </tr>
+                            
+                        }
+                        else
+                        {
+                            <tr>
+                                <td>
+                                    @(GetOrgName(platyItem.IdOrganizace))
+                                </td>
+                                <td>@platyItem.Rok.ToString("F0")</td>
+                                <td>@platyItem.PocetMesicu?.ToString("F0")</td>
+                                <td>@platyItem.Plat?.ToString("F0")</td>
+                                <td>@platyItem.Odmeny?.ToString("F0")</td>
+                                <td>@platyItem.Prispevky?.ToString("F0")</td>
+                                <td>@platyItem.NefinancniBonus</td>
+                                <td>@platyItem.PoznamkaPlat</td>
+                                <td><button class="btn btn-sm btn-outline-success" @onclick="@(() => _noteForPrijemId = platyItem.Id)"><i class="fa-solid fa-file-pen"></i></button></td>
+                            </tr>
+                        }
                     }
                 }
                 else
@@ -56,6 +85,7 @@
                 </tbody>
             </table>
         </div>
+        <p>Pokud o sobě najdete jakékoliv informace, které nejsou správné, kontaktujte nás na e-mailu <a href="mailto:podpora@hlidacstatu.cz">podpora@hlidacstatu.cz</a></p>
     </div>
 </div>
 
@@ -136,7 +166,7 @@
                     <ValidationMessage For="() => NewIncome.NefinancniBonus" class="text-danger"/>
                 </div>
                 <div class="mb-3">
-                    <label for="PoznamkaPlat">Poznámku či upřesnění.</label>
+                    <label for="PoznamkaPlat">Poznámka či upřesnění.</label>
                     <input id="PoznamkaPlat" class="form-control" @bind="NewIncome.PoznamkaPlat"/>
                 </div>
             </EditForm>
@@ -166,6 +196,8 @@
     
     private EditContext editContext;
     private ValidationMessageStore messageStore;
+
+    private int? _noteForPrijemId = null;
 
 
     protected override async Task OnInitializedAsync()
@@ -385,4 +417,24 @@
 
         return !hasError;
     }
+
+    private async Task SaveNote(PpPrijem ppPrijem)
+    {
+        await using (var noteDbContext = new DbEntities())
+        {
+            var prijem = await noteDbContext.PpPrijmy.FirstOrDefaultAsync(p => p.Id == ppPrijem.Id);
+            if (prijem is null)
+            {
+                Toaster.AddErrorMessage("Chyba", $"Nepodařilo se správně uložit poznámku.");
+                _logger.Error($"ppPrijem {ppPrijem.Id} was not found.");
+                return;
+            }
+            prijem.PoznamkaPlat = ppPrijem.PoznamkaPlat;
+            await Helpers.Save(noteDbContext, User.GetNameId(), Toaster, _logger);
+        }
+
+        await RefreshContextAsync();
+        _noteForPrijemId = null;
+    }
+    
 }

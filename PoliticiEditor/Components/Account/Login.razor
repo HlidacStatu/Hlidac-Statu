@@ -13,7 +13,7 @@
 @rendermode InteractiveServer
 
 <section>
-    <h3>Zadejte svůj email, kam Vám zašleme odkaz pro přihlášení:</h3>
+    <h3>Zadejte svůj e-mail, kam Vám zašleme odkaz pro přihlášení:</h3>
     <div>
         <EditForm EditContext="editContext" FormName="login">
             <DataAnnotationsValidator/>
@@ -115,7 +115,7 @@
 
         if (user is null)
         {
-            Toaster.AddWarningMessage("Email nenalezen", "Email nebyl nalezen. Zkuste jiný mail, který máte u nás zaregistrovaný");
+            Toaster.AddWarningMessage("E-mail nenalezen", "E-mail nebyl nalezen. Zkuste jiný e-mail, který máte u nás zaregistrovaný");
             ShowRegistration = true;
             return;
         }
@@ -125,7 +125,7 @@
         if (user.IsApproved == false)
         {
             Toaster.AddWarningMessage("Uživatel nebyl schválen",
-                "Víme o Vás, ale ještě nemáte schválený email. Schválení musí proběhnout interním procesem Hlídače Státu. Pokud Vám přijde, že nám to trvá, zkuste nám napsat na podporu.",
+                "Víme o Vás, ale ještě nemáte schválený e-mail. Schválení musí proběhnout interním procesem Hlídače Státu. Pokud Vám přijde, že nám to trvá, zkuste nám napsat na podporu.",
                 durationInSeconds: 15);
             return;
         }
@@ -141,13 +141,13 @@
         {
             await EmailService.SendEmailAsync([user.Email], "Přihlašovací token", EmailBody(loginLink));
             Toaster.AddInfoMessage("Skvělé",
-                "Pro přihlášení už zbývá jen jeden krok - kliknout na odkaz, který jsme poslali do Vaší emailové schránky.",
+                "Pro přihlášení už zbývá jen jeden krok - kliknout na odkaz, který jsme poslali do Vaší e-mailové schránky.",
                 durationInSeconds: 15);
         }
         catch (Exception e)
         {
-            _logger.Error(e, "Nepodařilo se odeslat email politikovi.");
-            Toaster.AddErrorMessage("Došlo u nás k chybě", "Nepodařilo se nám odeslat email.");
+            _logger.Error(e, "Nepodařilo se odeslat e-mail politikovi.");
+            Toaster.AddErrorMessage("Došlo u nás k chybě", "Nepodařilo se nám odeslat e-mail.");
         }
     }
 
@@ -192,7 +192,7 @@
 
         if (string.IsNullOrWhiteSpace(Input.Email) || !new EmailAddressAttribute().IsValid(Input.Email))
         {
-            messageStore.Add(() => Input.Email, "Neplatný email.");
+            messageStore.Add(() => Input.Email, "Neplatný e-mail.");
             hasError = true;
         }
 
