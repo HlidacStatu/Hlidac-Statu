@@ -1,3 +1,4 @@
+using System;
 using HlidacStatu.Entities;
 using HlidacStatu.Repositories;
 using Microsoft.AspNetCore.Mvc;
@@ -136,12 +137,14 @@ public class PoliticiController : Controller
     }
 
     [HlidacCache(60 * 60, "*")]
-    public async Task<IActionResult> Seznam(string ico, string start)
+    public async Task<IActionResult> Seznam(string groupName, int? year)
     {
-        List<PpPrijem> platy = null;
-            platy = await PpRepo.GetPlatyAsync(PpRepo.DefaultYear, true, ico);
+        if (!Enum.TryParse<PpRepo.PoliticianGroup>(groupName, out var politicianGroup))
+        {
+            politicianGroup = PpRepo.PoliticianGroup.Vse;
+        }
 
-        return View(platy);
+        return View((Group: politicianGroup, Year: year ?? PpRepo.DefaultYear));
     }
 
     [HlidacCache(60*60,"*")]

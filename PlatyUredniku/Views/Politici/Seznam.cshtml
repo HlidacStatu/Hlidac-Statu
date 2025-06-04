@@ -1,9 +1,9 @@
-@model List<PpPrijem>
+@model (PpRepo.PoliticianGroup Group, int Year)
 
 @using HlidacStatu.Entities
-@using HlidacStatu.Lib.Web.UI
 @using HlidacStatu.Repositories
 @using HlidacStatu.XLib.Render
+
 @section breadcrumbs
 {
     <ol class="breadcrumb">
@@ -14,59 +14,67 @@
         <li class="active">Seznam politiků</li>
     </ol>
 }
+
 @section Scripts
 {
-    <link rel="stylesheet" type="text/css" href="//cdn.datatables.net/1.13.4/css/jquery.dataTables.css" />
+    <link rel="stylesheet" type="text/css" href="//cdn.datatables.net/1.13.4/css/jquery.dataTables.css"/>
     <script type="text/javascript" charset="utf8" src="//cdn.datatables.net/1.13.4/js/jquery.dataTables.js"></script>
 }
 
 @{
-    List<PpPrijem> platy = Model;
+    var ica = PpRepo.GetIcaForGroup(PpRepo.PoliticianGroup.Vse);
+    List<PpPrijem> vsechnyPlaty = await PpRepo.GetPrijmyForIcoAsync(ica, Model.Year);
+
+    List<string> nameIdFilter = [];
+    if (Model.Group == PpRepo.PoliticianGroup.Vse)
+    {
+        nameIdFilter = vsechnyPlaty.Select(m => m.Nameid).Distinct().ToList();
+    }
+    else
+    {
+        var filterIca = PpRepo.GetIcaForGroup(Model.Group);
+        nameIdFilter = await PpRepo.GetNameIdsForGroup(filterIca, Model.Year);
+        
+    }
 
     ReportDataSource<PpPrijem[]> rds = new(
         new ReportDataSource<PpPrijem[]>.Column()
-                {
-                    Name = "Politik",
-                    HtmlRender = (m) =>
-                    {
-                        var o = Osoby.GetByNameId.Get(m.First().Nameid);
+        {
+            Name = "Politik",
+            HtmlRender = (m) =>
+            {
+                var o = Osoby.GetByNameId.Get(m.First().Nameid);
 
-                        return $"<a href='/politici/{o.NameId}'>{o.FullNameWithYear()}</a> <a href='{o.GetUrl(false)}' class='small'>(profil)</a>";
-                    },
-                    OrderValueRender = (m) =>
-                            {
-                                var o = Osoby.GetByNameId.Get(m.First().Nameid);
-                                return $"{o.Prijmeni} {o.Jmeno}";
-                            },
-                },
-                new ReportDataSource<PpPrijem[]>.Column()
-                {
-                    Name = "Celkový roční příjem",
-                    HtmlRender = (m) =>
-                            {
-                                var o = Osoby.GetByNameId.Get(m.First().Nameid);
-                                return $"<a href='/politici/politik/{o.NameId}'>{HlidacStatu.Util.RenderData.NicePrice(m.Sum(v=>v.CelkovyRocniPlatVcetneOdmen),html:true)}</a>";
-                    },
-                    OrderValueRender = (m) => HlidacStatu.Util.RenderData.OrderValueFormat(m.Sum(v => v.CelkovyRocniPlatVcetneOdmen)),
-                    CssClass = "number"
-                },
-                new ReportDataSource<PpPrijem[]>.Column()
-                        {
-                            Name = "Působí v organizacích",
-                            HtmlRender = (m) =>
-                                {
-                                    return string.Join("<br />",m.Select(n=>n.Organizace.Nazev).Distinct());
-                                },
-                        }
-
+                return $"<a href='/politici/{o.NameId}'>{o.FullNameWithYear()}</a> <a href='{o.GetUrl(false)}' class='small'>(profil)</a>";
+            },
+            OrderValueRender = (m) =>
+            {
+                var o = Osoby.GetByNameId.Get(m.First().Nameid);
+                return $"{o.Prijmeni} {o.Jmeno}";
+            },
+        },
+        new ReportDataSource<PpPrijem[]>.Column()
+        {
+            Name = "Celkový roční příjem",
+            HtmlRender = (m) =>
+            {
+                return $"<a href='/politici/politik/{m.First().Nameid}'>{HlidacStatu.Util.RenderData.NicePrice(m.Sum(v => v.CelkovyRocniPlatVcetneOdmen), html: true)}</a>";
+            },
+            OrderValueRender = (m) => HlidacStatu.Util.RenderData.OrderValueFormat(m.Sum(v => v.CelkovyRocniPlatVcetneOdmen)),
+            CssClass = "number"
+        },
+        new ReportDataSource<PpPrijem[]>.Column()
+        {
+            Name = "Působí v organizacích",
+            HtmlRender = (m) => { return string.Join("<br />", m.Select(n => n.Organizace.Nazev).Distinct()); },
+        }
     );
-    foreach (var pol in platy.Select(m=>m.Nameid).Distinct())
+    foreach (var pol in nameIdFilter)
     {
-        var platyPerPolitik = platy.Where(m => m.Nameid == pol).ToArray();
-       rds.AddRow(platyPerPolitik);        
+        var platyPerPolitik = vsechnyPlaty.Where(m => m.Nameid == pol).ToArray();
+        rds.AddRow(platyPerPolitik);
     }
     //rds.AddRows(platyPerPolitik);
-
 }
 
 
@@ -74,9 +82,9 @@
     <div class="container">
         <h2>Seznam politiků</h2>
         <div>
-            <p>@Html.DataToHTMLTable(rds, 
-                dataTableOptions: HtmlExtensions.DatatableOptions(orderColumnIdx: 1, orderDirection: "desc"))
-                </p>
+            <p>@Html.DataToHTMLTable(rds,
+                    dataTableOptions: HtmlExtensions.DatatableOptions(orderColumnIdx: 1, orderDirection: "desc"))
+            </p>
         </div>
     </div>
 </section>

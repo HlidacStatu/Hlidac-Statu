@@ -510,4 +510,62 @@ public static class PpRepo
 
         await dbContext.SaveChangesAsync();
     }
+
+    public enum PoliticianGroup
+    {
+        Vse,
+        Poslanci,
+        Senatori,
+        KrajstiZastupitele
+    }
+
+    public static string[] GetIcaForGroup(PoliticianGroup group) =>
+        group switch
+        {
+            PoliticianGroup.Vse => [],
+            PoliticianGroup.Poslanci => ["00006572"],
+            PoliticianGroup.Senatori => ["63839407"],
+            PoliticianGroup.KrajstiZastupitele => ["70890650", "70888337", "70891168", "70890749", "70890366",
+                "70889546", "70891508", "70890692", "60609460", "70892822", "70891095", "70892156", "70891320", "00064581"],
+            _ => []
+            
+        };
+    
+    public static async Task<List<PpPrijem>> GetPrijmyForIcoAsync(string[] ica, int year = DefaultYear)
+    {
+        await using var db = new DbEntities();
+
+        var query = db.PpPrijmy
+            .AsNoTracking()
+            .Where(p => p.Rok == year);
+
+        if (ica.Any())
+            query = query.Where(p => p.Organizace.FirmaDs != null &&
+                                     ica.Contains(p.Organizace.FirmaDs.Ico));
+        
+        var prijmy = await query
+            .Include(p => p.Organizace).ThenInclude(o => o.FirmaDs)
+            .ToListAsync();
+                     
+        
+        return prijmy;
+    }
+    
+    public static async Task<List<string>> GetNameIdsForGroup(string[] ica, int year = DefaultYear)
+    {
+        await using var db = new DbEntities();
+
+        var query = db.PpPrijmy
+            .AsNoTracking()
+            .Where(p => p.Rok == year);
+
+        if (ica.Any())
+            query = query.Where(p => p.Organizace.FirmaDs != null &&
+                                     ica.Contains(p.Organizace.FirmaDs.Ico));
+        
+        var nameids = await query.Select(p=> p.Nameid).Distinct().ToListAsync();
+                     
+        
+        return nameids;
+    }
 }

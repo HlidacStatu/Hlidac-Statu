@@ -70,6 +70,15 @@
                     <a class="btn btn-primary btn-sm" href="/politici/seznam">
                         Seznam všech politiků a jejich příjmů <span class="badge text-bg-danger">@(HlidacStatu.Util.RenderData.NiceNumber(stats.PocetOrganizaci))</span>
                     </a>
+                    <a class="btn btn-primary btn-sm" href="/politici/seznam?groupName=@(PpRepo.PoliticianGroup.Poslanci.ToString("G"))&year=@(PpRepo.DefaultYear)">
+                        Seznam pouze poslanců a jejich příjmů
+                    </a>
+                    <a class="btn btn-primary btn-sm" href="/politici/seznam?groupName=@(PpRepo.PoliticianGroup.Senatori.ToString("G"))&year=@(PpRepo.DefaultYear)">
+                        Seznam pouze senátorů a jejich příjmů
+                    </a>
+                    <a class="btn btn-primary btn-sm" href="/politici/seznam?groupName=@(PpRepo.PoliticianGroup.KrajstiZastupitele.ToString("G"))&year=@(PpRepo.DefaultYear)">
+                        Seznam pouze krajských zastupitelů a jejich příjmů
+                    </a>
                 </p>
                 <p class="mb-2 mt-4 text-body-secondary">
                     Nejvyšší příjmy mají ...

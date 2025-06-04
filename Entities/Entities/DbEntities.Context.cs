@@ -313,6 +313,5 @@ namespace HlidacStatu.Entities
         public DbSet<RecalculateItem> RecalculateItem { get; set; }
         
         public DbSet<NapojenaOsoba> NapojeneOsobyView { get; set; }
-
     }
 }
