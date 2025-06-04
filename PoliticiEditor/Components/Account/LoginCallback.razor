@@ -9,6 +9,7 @@
 
 @inject NavigationManager NavigationManager
 @inject IHttpContextAccessor HttpContextAccessor
+@inject UserHelper UserHelper
 
 <h1>Přihlašuju...</h1>
 
@@ -24,6 +25,12 @@
 
     protected override async Task OnParametersSetAsync()
     {
+        var loggedUser = await UserHelper.GetCurrentUserAsync();
+        if (loggedUser.Identity?.IsAuthenticated == true)
+        {
+            NavigationManager.NavigateTo("/");
+        }
+        
         var user = await _db.PoliticiEditorUsers
             .FirstOrDefaultAsync(u => u.EmailHash == Mhash);
         
