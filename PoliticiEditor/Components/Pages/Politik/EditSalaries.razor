@@ -54,7 +54,7 @@
                                 </td>
                                 <td>
                                     <button class="btn btn-sm btn-success" @onclick="@(() => SaveNote(platyItem))">Uložit poznámku</button>
-                                    <button class="btn btn-sm btn-warning" @onclick="@(() => _noteForPrijemId = null)">Zrušit poznámku</button>
+                                    <button class="btn btn-sm btn-warning" @onclick="@(Cancel)">Zrušit poznámku</button>
                                 </td>
                             </tr>
                             
@@ -72,7 +72,7 @@
                                 <td>@platyItem.Prispevky?.ToString("F0")</td>
                                 <td>@platyItem.NefinancniBonus</td>
                                 <td>@platyItem.SkrytaPoznamka</td>
-                                <td><button class="btn btn-sm btn-outline-success" @onclick="@(() => _noteForPrijemId = platyItem.Id)"><i class="fa-solid fa-file-pen"></i></button></td>
+                                <td><button class="btn btn-sm btn-outline-success" @onclick="@(() => _noteForPrijemId = platyItem.Id)">Přidat poznámku</button></td>
                             </tr>
                         }
                     }
