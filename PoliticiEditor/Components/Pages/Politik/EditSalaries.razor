@@ -50,7 +50,7 @@
                                 <td>@(GetOrgName(platyItem.IdOrganizace))</td>
                                 <td colspan="7">
                                     <label for="poznamka">Poznámka</label>
-                                    <input type="text" id="poznamka" class="form-control" @bind="platyItem.PoznamkaPlat"/>
+                                    <input type="text" id="poznamka" class="form-control" @bind="platyItem.SkrytaPoznamka"/>
                                 </td>
                                 <td>
                                     <button class="btn btn-sm btn-success" @onclick="@(() => SaveNote(platyItem))">Uložit poznámku</button>
@@ -71,7 +71,7 @@
                                 <td>@platyItem.Odmeny?.ToString("F0")</td>
                                 <td>@platyItem.Prispevky?.ToString("F0")</td>
                                 <td>@platyItem.NefinancniBonus</td>
-                                <td>@platyItem.PoznamkaPlat</td>
+                                <td>@platyItem.SkrytaPoznamka</td>
                                 <td><button class="btn btn-sm btn-outline-success" @onclick="@(() => _noteForPrijemId = platyItem.Id)"><i class="fa-solid fa-file-pen"></i></button></td>
                             </tr>
                         }
@@ -166,8 +166,8 @@
                     <ValidationMessage For="() => NewIncome.NefinancniBonus" class="text-danger"/>
                 </div>
                 <div class="mb-3">
-                    <label for="PoznamkaPlat">Poznámka či upřesnění.</label>
-                    <input id="PoznamkaPlat" class="form-control" @bind="NewIncome.PoznamkaPlat"/>
+                    <label for="SkrytaPoznamka">Poznámka či upřesnění pro Hlídač státu.</label>
+                    <input id="SkrytaPoznamka" class="form-control" @bind="NewIncome.SkrytaPoznamka"/>
                 </div>
             </EditForm>
         </div>
@@ -429,7 +429,7 @@
                 _logger.Error($"ppPrijem {ppPrijem.Id} was not found.");
                 return;
             }
-            prijem.PoznamkaPlat = ppPrijem.PoznamkaPlat;
+            prijem.SkrytaPoznamka = ppPrijem.SkrytaPoznamka;
             await Helpers.Save(noteDbContext, User.GetNameId(), Toaster, _logger);
         }
 
