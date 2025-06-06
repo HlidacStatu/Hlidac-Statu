@@ -1,9 +1,11 @@
+using System.Text;
 using HlidacStatu.Datasets;
 using HlidacStatu.DS.Graphs;
 using HlidacStatu.Entities;
 using HlidacStatu.Repositories;
 using HlidacStatu.Repositories.Searching;
 using HlidacStatu.Repositories.Statistics;
+using HlidacStatu.Entities.Entities;
 
 namespace HlidacStatu.Extensions;
 
@@ -107,6 +109,113 @@ public static class OsobaExtension2
             .Select(ev => ev.Organizace)
             .FirstOrDefault();
     }
+
+    public static string MainRoles(this Osoba osoba, DateTime forDate)
+    {
+        var events = osoba.Events(ev =>
+                (ev.Type == (int)OsobaEvent.Types.PolitickaExekutivni
+                 || ev.Type == (int)OsobaEvent.Types.VolenaFunkce)
+                && (ev.DatumDo == null || ev.DatumDo >= forDate)
+                && (ev.DatumOd == null || ev.DatumOd <= forDate))
+            .ToList();
+        
+        return AssembleRoles(events);
+    }
+    
+    public static string MainRoles(this Osoba osoba, int forYear)
+    {
+        var events = osoba.Events(ev =>
+                (ev.Type == (int)OsobaEvent.Types.PolitickaExekutivni
+                 || ev.Type == (int)OsobaEvent.Types.VolenaFunkce)
+                && ev.AddInfo != null
+                && (ev.DatumDo == null || ev.DatumDo.Value.Year >= forYear)
+                && (ev.DatumOd == null || ev.DatumOd.Value.Year <= forYear))
+            .ToList();
+
+        try
+        {
+            return AssembleRoles(events);
+
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+        }
+        return "null";
+    }
+
+    private static string AssembleRoles(List<OsobaEvent> events)
+    {
+        if (events is null || !events.Any())
+            return "";
+        
+        List<string> roles = new();
+
+        if (events.Any(e => 
+                e.Type == (int)OsobaEvent.Types.PolitickaExekutivni
+                && (e.AddInfo.ToLower().StartsWith("předseda vlády")
+                    || e.AddInfo.ToLower().StartsWith("předsedkyně vlády"))
+                && (e.Organizace?.ToLower().StartsWith("úřad vlády") == true
+                    || e.Ico?.Trim() == Constants.Ica.UradVlady)))
+        {
+            roles.Add("předseda vlády");
+        }
+        
+        if (events.Any(e => 
+                e.Type == (int)OsobaEvent.Types.PolitickaExekutivni
+                && e.AddInfo.ToLower().StartsWith("ministr")
+                && (e.Organizace?.ToLower().StartsWith("ministerstvo") == true
+                    || Constants.Ica.Vlada.Contains(e.Ico?.Trim()))))
+        {
+            roles.Add("ministr");
+        }
+        
+        if (events.Any(e => 
+                e.Type == (int)OsobaEvent.Types.VolenaFunkce
+                && (e.AddInfo.ToLower().StartsWith("poslanec") ||
+                    e.AddInfo.ToLower().StartsWith("poslankyně"))
+                && (e.Organizace?.ToLower().StartsWith("poslanecká sněmovna pčr") == true
+                    || e.Ico?.Trim() == Constants.Ica.KancelarPoslaneckeSnemovny)))
+        {
+            roles.Add("poslanec");
+        }
+        
+        if (events.Any(e => 
+                e.Type == (int)OsobaEvent.Types.VolenaFunkce
+                && e.AddInfo.ToLower().StartsWith("senát")
+                && (e.Organizace?.ToLower().StartsWith("senát") == true
+                    || e.Ico?.Trim() == Constants.Ica.Senat)))
+        {
+            roles.Add("senátor");
+        }
+        
+        if (events.Any(e => 
+                e.Type == (int)OsobaEvent.Types.VolenaFunkce
+                && (e.AddInfo.ToLower().StartsWith("poslanec ep") ||
+                    e.AddInfo.ToLower().StartsWith("poslankyně ep"))
+                && e.Organizace?.ToLower().StartsWith("evropský parlament") == true))
+        {
+            roles.Add("europoslanec");
+        }
+        
+        if (events.Any(e => 
+                e.Type == (int)OsobaEvent.Types.PolitickaExekutivni
+                && e.AddInfo.ToLower().StartsWith("hejtman")))
+        {
+            roles.Add("hejtman");
+        }
+        
+        if (events.Any(e => 
+                e.Type == (int)OsobaEvent.Types.VolenaFunkce
+                && e.AddInfo.ToLower().StartsWith("zastupitel")
+                && Constants.Ica.Kraje.Contains(e.Ico?.Trim())))
+        {
+            roles.Add("krajský zastupitel");
+        }
+        
+        return string.Join(", ", roles);
+    }
+    
 
     /// <summary>
     /// returns true if changed

@@ -27,6 +27,7 @@
     </ItemGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\Extensions\Extensions.csproj" />
       <ProjectReference Include="..\HlidacStatu.ExportData\HlidacStatu.ExportData.csproj" />
       <ProjectReference Include="..\Lib.Web.UI\Lib.Web.UI.csproj" />
       <ProjectReference Include="..\LibCore\LibCore.csproj" />

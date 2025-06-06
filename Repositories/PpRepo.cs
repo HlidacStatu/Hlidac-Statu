@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
+using HlidacStatu.Entities.Entities;
 
 namespace HlidacStatu.Repositories;
 
@@ -527,18 +528,13 @@ public static class PpRepo
         Vlada
     }
 
-    public static string[] GetIcaForGroup(PoliticianGroup group) =>
+    private static string[] GetIcaForGroup(PoliticianGroup group) =>
         group switch
         {
             PoliticianGroup.Vse => [],
-            PoliticianGroup.Poslanci => ["00006572"],
-            PoliticianGroup.Senatori => ["63839407"],
-            PoliticianGroup.KrajstiZastupitele =>
-            [
-                "70890650", "70888337", "70891168", "70890749", "70890366",
-                "70889546", "70891508", "70890692", "60609460", "70892822", "70891095", "70892156", "70891320",
-                "00064581"
-            ],
+            PoliticianGroup.Poslanci => [Constants.Ica.KancelarPoslaneckeSnemovny],
+            PoliticianGroup.Senatori => [Constants.Ica.Senat],
+            PoliticianGroup.KrajstiZastupitele => Constants.Ica.Kraje,
             _ => []
         };
 
