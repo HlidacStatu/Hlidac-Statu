@@ -70,6 +70,9 @@
                     <a class="btn btn-primary btn-sm" href="/politici/seznam">
                         Seznam všech politiků a jejich příjmů <span class="badge text-bg-danger">@(HlidacStatu.Util.RenderData.NiceNumber(stats.PocetOrganizaci))</span>
                     </a>
+                    <a class="btn btn-primary btn-sm" href="/politici/seznam?groupName=@(PpRepo.PoliticianGroup.Vlada.ToString("G"))&year=@(PpRepo.DefaultYear)">
+                        Seznam vládců a jejich příjmů
+                    </a>
                     <a class="btn btn-primary btn-sm" href="/politici/seznam?groupName=@(PpRepo.PoliticianGroup.Poslanci.ToString("G"))&year=@(PpRepo.DefaultYear)">
                         Seznam pouze poslanců a jejich příjmů
                     </a>

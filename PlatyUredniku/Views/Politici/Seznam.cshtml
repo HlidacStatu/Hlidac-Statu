@@ -22,8 +22,7 @@
 }
 
 @{
-    var ica = PpRepo.GetIcaForGroup(PpRepo.PoliticianGroup.Vse);
-    List<PpPrijem> vsechnyPlaty = await PpRepo.GetPrijmyForIcoAsync(ica, Model.Year);
+    List<PpPrijem> vsechnyPlaty = await PpRepo.GetPrijmyForGroupAsync(PpRepo.PoliticianGroup.Vse, Model.Year);
 
     List<string> nameIdFilter = [];
     if (Model.Group == PpRepo.PoliticianGroup.Vse)
@@ -32,9 +31,7 @@
     }
     else
     {
-        var filterIca = PpRepo.GetIcaForGroup(Model.Group);
-        nameIdFilter = await PpRepo.GetNameIdsForGroup(filterIca, Model.Year);
-        
+        nameIdFilter = await PpRepo.GetNameIdsForGroupAsync(Model.Group, Model.Year);
     }
 
     ReportDataSource<PpPrijem[]> rds = new(
@@ -72,7 +69,8 @@
     foreach (var pol in nameIdFilter)
     {
         var platyPerPolitik = vsechnyPlaty.Where(m => m.Nameid == pol).ToArray();
-        rds.AddRow(platyPerPolitik);
+        if(platyPerPolitik.Any())
+            rds.AddRow(platyPerPolitik);
     }
     //rds.AddRows(platyPerPolitik);
 }

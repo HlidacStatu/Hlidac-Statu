@@ -753,6 +753,8 @@ namespace HlidacStatu.Repositories
             Europoslanec,
             [NiceDisplayName("Poradce předsedy vlády")]
             PoradcePredsedyVlady,
+            [NiceDisplayName("Předseda vlády")]
+            PredsedaVlady,
 
         }
 
@@ -782,6 +784,17 @@ namespace HlidacStatu.Repositories
                             e.Type == (int)OsobaEvent.Types.PolitickaExekutivni
                             && e.AddInfo.ToLower().StartsWith("ministr")
                             && (e.Organizace.ToLower().StartsWith("ministerstvo")
+                                || e.Ico.Trim() == "00006599")
+                            && (e.DatumDo == null || e.DatumDo >= toDate)
+                            && (e.DatumOd == null || e.DatumOd <= toDate))
+                        .ToList();
+                
+                case Zatrideni.PredsedaVlady:
+                    return GetByEvent(e =>
+                            e.Type == (int)OsobaEvent.Types.PolitickaExekutivni
+                            && (e.AddInfo.ToLower().StartsWith("předseda vlády")
+                                || e.AddInfo.ToLower().StartsWith("předsedkyně vlády"))
+                            && (e.Organizace.ToLower().StartsWith("úřad vlády")
                                 || e.Ico.Trim() == "00006599")
                             && (e.DatumDo == null || e.DatumDo >= toDate)
                             && (e.DatumOd == null || e.DatumOd <= toDate))
@@ -836,9 +849,112 @@ namespace HlidacStatu.Repositories
                             e.Type == (int)OsobaEvent.Types.PolitickaExekutivni
                             && (e.AddInfo.ToLower().StartsWith("poradce předsedy vlády") ||
                                 e.AddInfo.ToLower().StartsWith("poradkyně předsedy vlády"))
-                            && e.Organizace.ToLower().StartsWith("úřad vlády čr")
+                            && (e.Organizace.ToLower().StartsWith("úřad vlády")
+                                || e.Ico.Trim() == "00006599")
                             && (e.DatumDo == null || e.DatumDo >= toDate)
                             && (e.DatumOd == null || e.DatumOd <= toDate))
+                        .ToList();
+
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(zatrideni), zatrideni, null);
+            }
+        }
+        
+        /// <summary>
+        /// vrací všechny osoby pro daný rok
+        /// </summary>
+        public static List<Osoba> GetByZatrideni(Zatrideni zatrideni, int year)
+        {
+            switch (zatrideni)
+            {
+                case Zatrideni.Politik:
+                    var politickeEventy = new HashSet<int>()
+                    {
+                        (int)OsobaEvent.Types.Politicka,
+                        (int)OsobaEvent.Types.PolitickaExekutivni,
+                        // Patří sem i volená?
+                    };
+
+                    return GetByEvent(e =>
+                            politickeEventy.Any(pe => pe == e.Type)
+                            && (e.DatumDo == null || e.DatumDo.Value.Year >= year)
+                            && (e.DatumOd == null || e.DatumOd.Value.Year <= year))
+                        .ToList();
+
+                case Zatrideni.Ministr:
+                    return GetByEvent(e =>
+                            e.Type == (int)OsobaEvent.Types.PolitickaExekutivni
+                            && e.AddInfo.ToLower().StartsWith("ministr")
+                            && (e.Organizace.ToLower().StartsWith("ministerstvo")
+                                || e.Ico.Trim() == "00006599")
+                            && (e.DatumDo == null || e.DatumDo.Value.Year >= year)
+                            && (e.DatumOd == null || e.DatumOd.Value.Year <= year))
+                        .ToList();
+                
+                case Zatrideni.PredsedaVlady:
+                    return GetByEvent(e =>
+                            e.Type == (int)OsobaEvent.Types.PolitickaExekutivni
+                            && (e.AddInfo.ToLower().StartsWith("předseda vlády")
+                                || e.AddInfo.ToLower().StartsWith("předsedkyně vlády"))
+                            && (e.Organizace.ToLower().StartsWith("úřad vlády")
+                                || e.Ico.Trim() == "00006599")
+                            && (e.DatumDo == null || e.DatumDo.Value.Year >= year)
+                            && (e.DatumOd == null || e.DatumOd.Value.Year <= year))
+                        .ToList();
+
+                case Zatrideni.Hejtman:
+                    return GetByEvent(e =>
+                            e.Type == (int)OsobaEvent.Types.PolitickaExekutivni
+                            && e.AddInfo.ToLower().StartsWith("hejtman")
+                            && (e.DatumDo == null || e.DatumDo.Value.Year >= year)
+                            && (e.DatumOd == null || e.DatumOd.Value.Year <= year))
+                        .ToList();
+
+                case Zatrideni.Poslanec:
+                    return GetByEvent(e =>
+                            e.Type == (int)OsobaEvent.Types.VolenaFunkce
+                            && (e.AddInfo.ToLower().StartsWith("poslanec") ||
+                                e.AddInfo.ToLower().StartsWith("poslankyně"))
+                            && e.Organizace.ToLower().StartsWith("poslanecká sněmovna pčr")
+                            && (e.DatumDo == null || e.DatumDo.Value.Year >= year)
+                            && (e.DatumOd == null || e.DatumOd.Value.Year <= year))
+                        .ToList();
+
+                case Zatrideni.Europoslanec:
+                    return GetByEvent(e =>
+                            e.Type == (int)OsobaEvent.Types.VolenaFunkce
+                            && (e.AddInfo.ToLower().StartsWith("poslanec ep") ||
+                                e.AddInfo.ToLower().StartsWith("poslankyně ep"))
+                            && e.Organizace.ToLower().StartsWith("evropský parlament")
+                            && (e.DatumDo == null || e.DatumDo.Value.Year >= year)
+                            && (e.DatumOd == null || e.DatumOd.Value.Year <= year))
+                        .ToList();
+
+                case Zatrideni.SefUradu:
+                    return GetByEvent(e =>
+                            e.Ceo == 1
+                            && (e.DatumDo == null || e.DatumDo.Value.Year >= year)
+                            && (e.DatumOd == null || e.DatumOd.Value.Year <= year))
+                        .ToList();
+
+                case Zatrideni.Senator:
+                    return GetByEvent(e =>
+                            e.Type == (int)OsobaEvent.Types.VolenaFunkce
+                            && e.AddInfo.ToLower().StartsWith("senát")
+                            && e.Organizace.ToLower().StartsWith("senát")
+                            && (e.DatumDo == null || e.DatumDo.Value.Year >= year)
+                            && (e.DatumOd == null || e.DatumOd.Value.Year <= year))
+                        .ToList();
+
+                case Zatrideni.PoradcePredsedyVlady:
+                    return GetByEvent(e =>
+                            e.Type == (int)OsobaEvent.Types.PolitickaExekutivni
+                            && (e.AddInfo.ToLower().StartsWith("poradce předsedy vlády") ||
+                                e.AddInfo.ToLower().StartsWith("poradkyně předsedy vlády"))
+                            && (e.Organizace.ToLower().StartsWith("úřad vlády")
+                                || e.Ico.Trim() == "00006599")
+                            && (e.DatumDo == null || e.DatumDo.Value.Year >= year)
+                            && (e.DatumOd == null || e.DatumOd.Value.Year <= year))
                         .ToList();
 
                 default:

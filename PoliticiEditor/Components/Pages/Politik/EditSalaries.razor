@@ -23,7 +23,13 @@
 <div class="card mb-3">
     <h5 class="card-header">Přehled příjmů od státních a polostátních organizací či veřejných institucí, které aktuálně
         evidujeme za rok 2024</h5>
-    <p>Pokud o sobě najdete jakékoliv informace, které nejsou správné, kontaktujte nás na e-mailu <a href="mailto:podpora@hlidacstatu.cz">podpora@hlidacstatu.cz</a></p>
+    <p>
+        Údaje vychází z informací od dotčených úřadů a institucí. Pokud máte dojem nesrovnalosti či chcete doplnit 
+        komentář, využijte tlačítko „<strong>Přidat poznámku</strong>“. Poznámka se zobrazí pouze týmu Hlídače státu. Pokud nějaký příjem 
+        chybí, doplňte ho prosím níže v sekci „<strong>Přidání chybějícího příjmu</strong>“. V případě jiných obtíží nás kontaktujte na 
+        e-mailu <a href="mailto:podpora@hlidacstatu.cz">podpora@hlidacstatu.cz</a>.
+        
+    </p>
     <div class="card-body">
         <div>
             <table class="table table-bordered table-sm align-middle auto-width">
@@ -105,7 +111,7 @@
                            @bind="NewIncome.Rok"/>
                 </div>
                 <div class="mb-3">
-                    <label for="Organizace">Organizace, která platí</label>
+                    <label for="Organizace">Organizace, která příjem poskytla</label>
                     <HlidacAutocomplete SearchFuncAsync="@((s, token) => OnSearch(s, token))"
                                         OnAutocompleteItemSelected="@(item => FillOrganizace(item))"
                                         TextSelector="@((autocomplete) => autocomplete.Text)"
@@ -121,7 +127,7 @@
                     <ValidationMessage For="() => NewIncome.IdOrganizace" class="text-danger"/>
                 </div>
                 <div class="mb-3">
-                    <label for="PocetMesicu">Uveďte kolik měsíců jste v daném roce vykonával funkci</label>
+                    <label for="PocetMesicu">Uveďte, kolik měsíců jste v daném roce vykonával funkci</label>
                     <input id="PocetMesicu" type="text"
                            class="form-control"
                            @bind:get="@NewIncome.PocetMesicu?.ToString("N0")"
@@ -133,8 +139,8 @@
                     <input id="NazevFunkce" class="form-control" @bind="NewIncome.NazevFunkce"/>
                 </div>
                 <div class="mb-3">
-                    <label for="Plat">Plat či základní příjem bez odměn. <b>Uveďte celkovou roční hrubou částku před
-                            zdaněním.</b></label>
+                    <label for="Plat">Plat či základní příjem bez odměn - <b>Uveďte celkovou roční hrubou částku před
+                            zdaněním</b></label>
                     <input id="Plat" type="text"
                            class="form-control"
                            @bind:get="@NewIncome.Plat?.ToString("N2")"
@@ -142,8 +148,8 @@
                     <ValidationMessage For="() => NewIncome.Plat" class="text-danger"/>
                 </div>
                 <div class="mb-3">
-                    <label for="Odmeny">Mimořádné finanční odměny. <b>Uveďte celkovou roční hrubou částku před
-                            zdaněním.</b></label>
+                    <label for="Odmeny">Mimořádné finanční odměny - <b>Uveďte celkovou roční hrubou částku před
+                            zdaněním</b></label>
                     <input id="Odmeny" type="text"
                            class="form-control"
                            @bind:get="@NewIncome.Odmeny?.ToString("N2")"
@@ -151,8 +157,8 @@
                     <ValidationMessage For="() => NewIncome.Odmeny" class="text-danger"/>
                 </div>
                 <div class="mb-3">
-                    <label for="Prispevky">Jiné finanční příjmy či příspěvky. <b>Uveďte celkovou roční hrubou částku
-                            před zdaněním.</b></label>
+                    <label for="Prispevky">Jiné finanční příjmy či příspěvky - <b>Uveďte celkovou roční hrubou částku
+                            před zdaněním</b></label>
                     <input id="Prispevky" type="text"
                            class="form-control"
                            @bind:get="@NewIncome.Prispevky?.ToString("N2")"
@@ -160,13 +166,12 @@
                     <ValidationMessage For="() => NewIncome.Prispevky" class="text-danger"/>
                 </div>
                 <div class="mb-3">
-                    <label for="NefinancniBonus">Nefinanční bonus (např. služební auto, pojištění apod.). Uveďte
-                        slovně.</label>
+                    <label for="NefinancniBonus">Nefinanční bonus (např. služební auto, pojištění apod.) - <b>Uveďte slovně</b></label>
                     <input id="NefinancniBonus" class="form-control" @bind="NewIncome.NefinancniBonus"/>
                     <ValidationMessage For="() => NewIncome.NefinancniBonus" class="text-danger"/>
                 </div>
                 <div class="mb-3">
-                    <label for="SkrytaPoznamka">Poznámka či upřesnění pro Hlídač státu.</label>
+                    <label for="SkrytaPoznamka">Poznámka či upřesnění pro Hlídač státu</label>
                     <input id="SkrytaPoznamka" class="form-control" @bind="NewIncome.SkrytaPoznamka"/>
                 </div>
             </EditForm>

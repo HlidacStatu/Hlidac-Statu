@@ -8,21 +8,21 @@
 
 @rendermode @(new InteractiveServerRenderMode(prerender: false))
 
-<PageTitle>Vítejte v administraci politiků Hlídače státu</PageTitle>
+<PageTitle>Vítejte v administrativní sekci Hlídače státu pro politiky</PageTitle>
 
 
 @if (User is null || User.Identity?.IsAuthenticated == false)
 {
-    <h2>Vítejte v administrativní části politiků od Hlídače státu</h2>
+    <h2>Vítejte v administrativní sekci Hlídače státu pro politiky</h2>
     <p>
-        Tyto stránky jsou určeny výhradně pro politiky, kteří chtějí aktivně spravovat a veřejně sdílet své informace s občany. 
-        Naším cílem je podpořit větší otevřenost a důvěru mezi volenými zástupci a jejich voliči.
+        Tyto stránky jsou určeny výhradně pro politiky, kteří chtějí aktivně spravovat a veřejně sdílet své informace 
+        s občany. Naším cílem je podpořit větší otevřenost a důvěru mezi volenými zástupci a jejich voliči.
     </p>
     <p>
-        Abychom zajistili bezpečnost a autenticitu, přihlášení probíhá prostřednictvím přístupového odkazu, který vám zašleme do e-mailu. 
-        Stačí zadat Vaši e-mailovou adresu a během několika okamžiků obdržíte odkaz, díky kterému se přihlásíte. 
-        Prosím využijte pro tyto účely pouze e-mailovou adresu, na které jsme vás kontaktovali. 
-        Následně budete v systému moci přidat i další e-maily, skrz které bude možné se přihlásit.
+        Abychom zajistili bezpečnost a autenticitu, přihlášení probíhá prostřednictvím jednorázového přístupového odkazu, 
+        který Vám zašleme do e-mailu. Stačí zadat Vaši e-mailovou adresu a během několika okamžiků obdržíte odkaz, 
+        díky kterému se přihlásíte. Prosím využijte pro tyto účely pouze e-mailovou adresu, na které jsme Vás kontaktovali. 
+        Následně budete v systému moci přidat i další e-maily, skrz které bude možné se v budoucnu přihlásit.
     </p>
     <p>Po přihlášení budete mít možnost:</p>
     <ul>
