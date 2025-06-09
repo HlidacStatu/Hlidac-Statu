@@ -66,8 +66,9 @@
         },
         new ReportDataSource<(PpPrijem[] Prijem, Osoba Osoba)>.Column()
         {
-            Name = "Působí v organizacích",
-            HtmlRender = (m) => { return string.Join("<br />", m.Prijem.Select(n => n.Organizace.Nazev).Distinct()); }
+            Name = "Působí v organizacích (řazeno podle počtu)",
+            HtmlRender = (m) => { return string.Join("<br />", m.Prijem.Select(n => n.Organizace.Nazev).Distinct()); },
+            OrderValueRender = (m) => HlidacStatu.Util.RenderData.OrderValueFormat(m.Prijem.Count()),
         }
     );
     foreach (var pol in nameIdFilter)
