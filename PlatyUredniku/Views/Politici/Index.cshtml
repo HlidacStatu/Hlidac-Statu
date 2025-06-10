@@ -6,6 +6,10 @@
 @{
     var stats = await PpRepo.GetGlobalStatAsync();
     List<PpPrijem> platy = (List<PpPrijem>?)ViewData["platy"];
+    
+    var prumernyRocniPlatPoslance = (await PpRepo.GetPrijmyForGroupAsync(PpRepo.PoliticianGroup.Poslanci)).Average(x => x.CelkovyRocniPlatVcetneOdmen);
+    var prumernyRocniPlatSenatora = (await PpRepo.GetPrijmyForGroupAsync(PpRepo.PoliticianGroup.Senatori)).Average(x => x.CelkovyRocniPlatVcetneOdmen);
+    var prumernyRocniPlatMinistra = (await PpRepo.GetPrijmyForGroupAsync(PpRepo.PoliticianGroup.Vlada)).Average(x => x.CelkovyRocniPlatVcetneOdmen);
 }
 
 @section breadcrumbs
@@ -17,6 +21,73 @@
         <li class="active">Politici</li>
     </ol>
 }
+<section class="d-flex align-items-center justify-content-start">
+    <div class="container d-flex">
+        <div class="p-2 flex-grow-1">
+            <div class="fs-2 fw-bold">Kolik berou čeští politici?</div>
+            <p>Projekt "Platy politiků" je součástí Hlídače státu. Zjistěte, jaký příjem mají politici a kolik zastávají funkcí.
+                Data jsme shromáždili na základě oficiální žádosti podle zákona o svobodném přístupu k informacím.
+                Jedná se o příjmy z výkonu politické či exekutivní funkce.
+                <strong>od státních, polostátních nebo ? organizací,
+                    kde působí. (teda všechno z daní?)</strong>
+            </p>
+            <button class="btn btn-primary">Hledat podle jména, funkce nebo organizace</button>
+        </div>
+        <div class="p-2">
+            <img class="img-fluid" src="Content/Img/politik u pultu.jpg" alt="politik u pultu"/>
+        </div>
+    </div>
+</section>
+<section class="d-flex align-items-center justify-content-center alter-bg-color">
+    <div class="container">
+        <div class="row">
+            <div class="col h-100">
+                <div id="carouselExampleIndicators" class="carousel carousel-dark slide" data-bs-ride="carousel">
+                    <div class="carousel-indicators top-0">
+                        <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
+                        <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="1" aria-label="Slide 2"></button>
+                        <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="2" aria-label="Slide 3"></button>
+                    </div>
+                    <div class="carousel-inner">
+                        <div class="carousel-item active">
+                            <div class="col d-flex flex-column justify-content-center d-block w-100">
+                                <img src="Content/Img/Mince.svg" height="200px" class="img-fluid" alt="domky"/>
+                                <div class="fs-3 fw-bold text-center">Průměrný roční plat poslance</div>
+                                <div class="fs-3 fw-bold text-center">@RenderData.NicePriceHtml(prumernyRocniPlatPoslance)</div>
+                            </div>
+                        </div>
+                        <div class="carousel-item">
+                            <div class="col d-flex flex-column justify-content-center d-block w-100">
+                                <img src="Content/Img/Mince.svg" height="200px" class="img-fluid" alt="domky"/>
+                                <div class="fs-3 fw-bold text-center">Průměrný roční plat senátora</div>
+                                <div class="fs-3 fw-bold text-center">@RenderData.NicePriceHtml(prumernyRocniPlatSenatora)</div>
+                            </div>
+                        </div>
+                        <div class="carousel-item">
+                            <div class="col d-flex flex-column justify-content-center d-block w-100">
+                                <img src="Content/Img/Mince.svg" height="200px" class="img-fluid" alt="domky"/>
+                                <div class="fs-3 fw-bold text-center">Průměrný roční plat ministra</div>
+                                <div class="fs-3 fw-bold text-center">@RenderData.NicePriceHtml(prumernyRocniPlatMinistra)</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col h-100 d-flex flex-column justify-content-center">
+                <img src="Content/Img/Vertikalni vlna.svg" height="200px" class="img-fluid" alt="domky"/>
+                <div class="fs-3 fw-bold text-center">Počet politiků v databázi</div>
+                <div class="fs-3 fw-bold text-center">@(HlidacStatu.Util.RenderData.NiceNumber(stats.PocetOsob))</div>
+            </div>
+            <div class="col h-100 d-flex flex-column justify-content-center">
+                <img src="Content/Img/Panelak.svg" height="200px" class="img-fluid" alt="domky"/>
+                <div class="fs-3 fw-bold text-center">Počet organizací v databázi</div>
+                <div class="fs-3 fw-bold text-center">@(HlidacStatu.Util.RenderData.NiceNumber(stats.PocetOrganizaci))</div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<hr/>
 
 <section class="d-flex align-items-center justify-content-center">
     <div class="container">
