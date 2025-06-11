@@ -50,7 +50,7 @@ public class PpPrijem
     public virtual PuOrganizace Organizace { get; set; }
 
     //todo: tohle je potřeba projít a případně zakomponovat náhrady...
-    public decimal CeloveRocniNakladyNaPolitika => CelkovyRocniPlatVcetneOdmen + CelkoveRocniNahrady;
+    public decimal CelkoveRocniNakladyNaPolitika => CelkovyRocniPlatVcetneOdmen + CelkoveRocniNahrady;
     public decimal CelkovyRocniPlatVcetneOdmen => (Plat ?? 0) + (Odmeny ?? 0) + (Prispevky ?? 0) 
                                                   + (NahradaReprezentace ?? 0) + (NahradaCestovni ?? 0) + (NahradaUbytovani ?? 0);
     public decimal CelkoveRocniNahrady => (NahradaKancelar ?? 0) + (NahradaAdministrativa ?? 0) + (NahradaAsistent ?? 0) + (NahradaTelefon ?? 0);

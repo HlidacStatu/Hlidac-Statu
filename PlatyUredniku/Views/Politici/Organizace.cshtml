@@ -157,7 +157,7 @@
                                         <th>Jméno politika</th>
                                         <th class="text-end">Celkový roční osobní příjem</th>
                                         <th class="text-end">Ostatní náhrady za rok</th>
-                                        <th class="text-end">Celkový příjen za rok</th>
+                                        <th class="text-end">Přepočtený hrubý měsíční příjem včetně odměn</th>
                                         <th style="max-width:20rem">Nefinanční benefity</th>
                                     </tr>
                                 </thead>
@@ -181,7 +181,7 @@
 
                                                 @HlidacStatu.Util.RenderData.NicePriceHtml(prijemPolitika.CelkovyRocniPlatVcetneOdmen)
                                             </td>
-                                            <td data-order="@(HlidacStatu.Util.RenderData.OrderValueFormat(prijemPolitika.CelkovyRocniPlatVcetneOdmen))"
+                                            <td data-order="@(HlidacStatu.Util.RenderData.OrderValueFormat(prijemPolitika.CelkoveRocniNahrady))"
                                                 class="number text-nowrap">
                                                 @if (prijemPolitika.PocetMesicu < 12)
                                                 {
