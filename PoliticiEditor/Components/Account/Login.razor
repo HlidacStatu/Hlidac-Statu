@@ -67,10 +67,6 @@
     </div>
 </section>
 
-<section>
-    <a href="@_loginToken" target="_blank">přihlašovací token !!! TEST</a>
-</section>
-
 @code {
 
     [Parameter]
@@ -82,11 +78,7 @@
     private DbEntities? _db = new();
 
     private ILogger _logger = Log.ForContext<Login>();
-
-
-    //todo: later delete this
-    private string _loginToken;
-
+    
     private EditContext editContext;
     private ValidationMessageStore messageStore;
 
@@ -134,8 +126,7 @@
 
         _db.PoliticiLoginTokens.Add(loginToken);
         await _db.SaveChangesAsync();
-
-        _loginToken = $"/Account/Login-Callback/{WebUtility.UrlEncode(loginToken.Token)}/{WebUtility.UrlEncode(user.EmailHash)}";
+        
         var loginLink = $"https://admin.politici.hlidacstatu.cz/Account/Login-Callback/{WebUtility.UrlEncode(loginToken.Token)}/{WebUtility.UrlEncode(user.EmailHash)}";
         try
         {

@@ -41,9 +41,7 @@ public sealed class ToastService
             Duration = TimeSpan.FromSeconds(durationInSeconds),
             Importance = ToastMessage.ImportanceLevel.Warning
         };
-
-        AddMessage(toast);
-
+        
         AddMessage(toast);
     }
     public void AddErrorMessage(string title, string message, int durationInSeconds = 5)
