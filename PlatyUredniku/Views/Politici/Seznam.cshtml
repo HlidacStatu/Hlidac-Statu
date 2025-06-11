@@ -87,6 +87,23 @@
 <section class="d-flex align-items-center justify-content-center">
     <div class="container">
         <h2>Seznam politiků</h2>
+        <div class="row">
+            <a class="btn btn-primary btn-sm col" href="/politici/seznam">
+                Všichni politici
+            </a>
+            <a class="btn btn-primary btn-sm col" href="/politici/seznam?groupName=@(PpRepo.PoliticianGroup.Vlada.ToString("G"))&year=@(PpRepo.DefaultYear)">
+                Ministři a premiér
+            </a>
+            <a class="btn btn-primary btn-sm col" href="/politici/seznam?groupName=@(PpRepo.PoliticianGroup.Poslanci.ToString("G"))&year=@(PpRepo.DefaultYear)">
+                Poslanci
+            </a>
+            <a class="btn btn-primary btn-sm col" href="/politici/seznam?groupName=@(PpRepo.PoliticianGroup.Senatori.ToString("G"))&year=@(PpRepo.DefaultYear)">
+                Senátoři
+            </a>
+            <a class="btn btn-primary btn-sm col" href="/politici/seznam?groupName=@(PpRepo.PoliticianGroup.KrajstiZastupitele.ToString("G"))&year=@(PpRepo.DefaultYear)">
+                Krajští zastupitelé
+            </a>
+        </div>
         <div>
             <p>@Html.DataToHTMLTable(rds,
                     dataTableOptions: HtmlExtensions.DatatableOptions(orderColumnIdx: 1, orderDirection: "desc"))

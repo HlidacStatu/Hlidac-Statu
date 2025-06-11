@@ -20,7 +20,7 @@ public class SankeyDiagram
 
     public string DrawData()
     {
-        var nakladyMax = PrijmyPolitiku.Max(p => p.CeloveRocniNakladyNaPolitika);
+        var nakladyMax = PrijmyPolitiku.Max(p => p.CelkoveRocniNakladyNaPolitika);
         var data = PrijmyPolitiku.Select(prijem => 
             new {
                 from = "Celkový příjem",
@@ -28,7 +28,7 @@ public class SankeyDiagram
                 weight = DrawNakladyPerYear(prijem, nakladyMax),
                 color = prijem.Status == PpPrijem.StatusPlatu.Zjistujeme ? "#000000" : "#999999",
                 custom = new {
-                    value = prijem.CeloveRocniNakladyNaPolitika,
+                    value = prijem.CelkoveRocniNakladyNaPolitika,
                     link = $"#{prijem.Organizace.DS}"
                 }
             });
@@ -43,7 +43,7 @@ public class SankeyDiagram
     
     public string DrawNodes()
     {
-        var total = PrijmyPolitiku.Sum(p => p.CeloveRocniNakladyNaPolitika);
+        var total = PrijmyPolitiku.Sum(p => p.CelkoveRocniNakladyNaPolitika);
 
         var nodes = new List<object>
         {
@@ -62,7 +62,7 @@ public class SankeyDiagram
             id = p.Organizace.Nazev,
             custom = new
             {
-                value = p.CeloveRocniNakladyNaPolitika,
+                value = p.CelkoveRocniNakladyNaPolitika,
                 link = $"#{p.Organizace.DS}"
             }
         }));
@@ -83,7 +83,7 @@ public class SankeyDiagram
             return 1; // fake-small value to make the line appear
         }
 
-        double realValue = (double)input.CeloveRocniNakladyNaPolitika;
+        double realValue = (double)input.CelkoveRocniNakladyNaPolitika;
         double max = (double)nakladyTotal;
 
         double scaled = realValue/max * 100;

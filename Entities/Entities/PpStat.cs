@@ -47,6 +47,4 @@ public class PpStat
     public int PocetOsob { get; set; }
     public int PocetOrganizaci { get; set; }
     public Dictionary<int, decimal> PercentilyPlatu { get;  set; }
-    
-
 }
