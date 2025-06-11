@@ -180,9 +180,9 @@
                 <div class="col-lg-6">
                     <h3 class="h5 mb-3">Informace o programu</h3>
                     <dl class="row">
-                        <dt class="col-sm-4">Poskytovatel program</dt>
+                        <dt class="col-sm-4">Poskytovatel programu</dt>
                         <dd class="col-sm-8">
-                            <a asp-controller="Subjekt" asp-action="Index" asp-route-id="@Model.FirstOrDefault()?.ProviderIco">@(Model.FirstOrDefault()?.ProviderIco)</a>
+                            <a asp-controller="Subjekt" asp-action="Index" asp-route-id="@Model.FirstOrDefault()?.ProviderIco">@Firmy.GetJmeno(Model.FirstOrDefault()?.ProviderIco)</a>
                         </dd>
                         <dt class="col-sm-4">Rozsah vyplacených dotací</dt>
                         <dd class="col-sm-8">
