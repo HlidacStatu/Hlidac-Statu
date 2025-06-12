@@ -125,9 +125,9 @@ public partial class Dotace
                             return "neznámá dotace";
                     case Type.Evropska:
                         if (pad == 4)
-                            return "evropské dotaci";
+                            return "státní, nebo evropské dotaci";
                         else
-                            return "evropská dotace";
+                            return "státní, nebo evropská dotace";
                     case Type.Krajska:
                         if (pad == 4)
                             return "krajskou dotaci";
@@ -159,9 +159,9 @@ public partial class Dotace
                             return "neznáme dotace";
                     case Type.Evropska:
                         if (pad == 4)
-                            return "evropských dotací";
+                            return "státní, nebo evropských dotací";
                         else
-                            return "evropské dotace";
+                            return "státní, nebo evropské dotace";
                     case Type.Krajska:
                         if (pad == 4)
                             return "krajských dotací";
