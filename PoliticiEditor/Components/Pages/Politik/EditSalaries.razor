@@ -260,6 +260,8 @@
         if (_db is not null)
         {
             _db.PpPrijmy.Add(NewIncome);
+            NewIncome.CreatedBy = User.GetEmail();
+            NewIncome.DateCreated = DateTime.Now;
         }
 
         await Helpers.Save(_db, User.GetNameId(), Toaster, _logger);

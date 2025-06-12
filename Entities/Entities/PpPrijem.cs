@@ -1,3 +1,4 @@
+using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -45,6 +46,11 @@ public class PpPrijem
     public decimal? Prispevky { get; set; }
 
     public StatusPlatu Status { get; set; } = 0;
+    
+    public string CreatedBy { get; set; }
+    public string ModifiedBy { get; set; }
+    public DateTime? DateCreated { get; set; } = DateTime.Now;
+    public DateTime? DateModified { get; set; } = DateTime.Now;
 
     [ForeignKey("IdOrganizace")]
     public virtual PuOrganizace Organizace { get; set; }
