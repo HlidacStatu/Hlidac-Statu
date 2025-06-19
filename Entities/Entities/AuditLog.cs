@@ -13,7 +13,6 @@ public class AuditLog
     public string EntityId { get; set; }
     public string EntityName { get; set; }
     public EntityState Action { get; set; }
-    [Text]
     public string Username { get; set; }
     [Date]
     public DateTime Timestamp { get; set; }

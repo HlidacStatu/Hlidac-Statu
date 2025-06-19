@@ -621,4 +621,17 @@ public static class PpRepo
         
         return await query.Select(p => p.Nameid).Distinct().ToListAsync();
     }
+
+    public static async Task<string> GetOrganizaceNameAsync(int organizaceId)
+    {
+        await using var db = new DbEntities();
+        var org = await db.PuOrganizace
+            .Include(o => o.FirmaDs)
+            .FirstOrDefaultAsync(o => o.Id == organizaceId);
+
+        if (org is null)
+            return "";
+
+        return org.Nazev;
+    }
 }
