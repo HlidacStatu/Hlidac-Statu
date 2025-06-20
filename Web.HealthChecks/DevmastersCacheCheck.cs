@@ -31,22 +31,22 @@ namespace HlidacStatu.Web.HealthChecks
                 await Task.Delay(20);
                 var x2 = this.cache.Get();
                 if (x != x2)
-                    return HealthCheckResult.Unhealthy("Different cache content");
+                    return HealthCheckResult.Degraded("Different cache item content");
 
                 string newContent = "new content";
                 this.cache.ForceRefreshCache(newContent);
                 x = this.cache.Get();
                 if (x != newContent)
-                    return HealthCheckResult.Unhealthy("Different cache new content");
+                    return HealthCheckResult.Degraded("Different cache item new content");
 
                 var exists = this.cache.Exists();
                 if (!exists)
-                    return HealthCheckResult.Unhealthy("Cache doesn't exists");
+                    return HealthCheckResult.Degraded("Cache item doesn't exists");
 
                 this.cache.Invalidate();
                 exists = this.cache.Exists();
                 if (exists)
-                    return HealthCheckResult.Unhealthy("Cache should be deleted");
+                    return HealthCheckResult.Degraded("Cache Item not deleted after invalidation");
 
                 return HealthCheckResult.Healthy($"Cache {this.cache.GetType().Name} is OK.");
             }

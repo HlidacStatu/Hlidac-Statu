@@ -10,6 +10,13 @@ namespace HlidacStatu.Web.HealthChecks
 {
     public class OCRQueue : IHealthCheck
     {
+        public OCRQueue(HealthStatus? failureStatus = default)
+        {
+            FailureStatus = failureStatus ?? HealthStatus.Degraded;
+        }
+
+        public HealthStatus FailureStatus { get; }
+
         public Task<HealthCheckResult> CheckHealthAsync(HealthCheckContext context, CancellationToken cancellationToken = default)
         {
             try
@@ -32,49 +39,49 @@ namespace HlidacStatu.Web.HealthChecks
 
                 List<string> issues = new List<string>();
 
-                bool degraded = false;
-                bool bad = false;
+                var currFailureStatus = HealthStatus.Healthy;
 
 
                 if (ocrQueue.Where(m => m.Item1 == "VerejnaZakazka").FirstOrDefault()?.Item2 > 10000)
                 {
                     issues.Add($"ERR: VerejnaZakazka pouze {ocrQueue.Where(m => m.Item1 == "VerejnaZakazka").First().Item2} hotovo!\n");
-                    bad = true;
+                    currFailureStatus = (HealthStatus)Math.Max( (int)this.FailureStatus, (int)HealthStatus.Unhealthy);
                 }
                 if (ocrQueue.Where(m => m.Item1 == "VerejnaZakazka").FirstOrDefault()?.Item2 > 6000)
                 {
                     issues.Add($"Warn: VerejnaZakazka  {ocrQueue.Where(m => m.Item1 == "VerejnaZakazka").First().Item2} hotovo!\n");
-                    degraded = true;
+                    currFailureStatus = (HealthStatus)Math.Max((int)this.FailureStatus, (int)HealthStatus.Degraded);
                 }
 
                 if (ocrQueue.Where(m => m.Item1 == "Smlouva").FirstOrDefault()?.Item2 > 6000)
                 {
                     issues.Add($"ERR: Smlouvy pouze {ocrQueue.Where(m => m.Item1 == "Smlouva").First().Item2} hotovo!\n");
-                    bad = true;
+                    currFailureStatus = (HealthStatus)Math.Max((int)this.FailureStatus, (int)HealthStatus.Unhealthy);
                 }
                 if (ocrQueue.Where(m => m.Item1 == "Smlouva").FirstOrDefault()?.Item2 > 4000)
                 {
                     issues.Add($"Warn: Smlouvy  {ocrQueue.Where(m => m.Item1 == "Smlouva").First().Item2} hotovo!\n");
-                    degraded = true;
+                    currFailureStatus = (HealthStatus)Math.Max((int)this.FailureStatus, (int)HealthStatus.Degraded);
                 }
 
                 if (ocrQueue.Where(m => m.Item1 == "Dataset").FirstOrDefault()?.Item2 > 3000)
                 {
                     issues.Add($"ERR: Dataset pouze {ocrQueue.Where(m => m.Item1 == "Dataset").First().Item2} hotovo!\n");
-                    bad = true;
+                    currFailureStatus = (HealthStatus)Math.Max((int)this.FailureStatus, (int)HealthStatus.Unhealthy);
                 }
                 if (ocrQueue.Where(m => m.Item1 == "Smlouva").FirstOrDefault()?.Item2 > 1000)
                 {
                     issues.Add($"Warn: Dataset  {ocrQueue.Where(m => m.Item1 == "Dataset").First().Item2} hotovo!\n");
-                    degraded = true;
+                    currFailureStatus = (HealthStatus)Math.Max((int)this.FailureStatus, (int)HealthStatus.Degraded);
                 }
 
-                if (bad)
+
+                if (currFailureStatus == HealthStatus.Unhealthy)
                     return Task.FromResult(HealthCheckResult.Unhealthy(report + "\n" + string.Join("", issues)));
-                else if (degraded)
+                else if (currFailureStatus == HealthStatus.Degraded)
                     return Task.FromResult(HealthCheckResult.Degraded(report + "\n" + string.Join("", issues)));
                 else
-                    return Task.FromResult(HealthCheckResult.Healthy(report));
+                    return Task.FromResult(HealthCheckResult.Healthy(report + "\n" + string.Join("", issues)));
 
             }
             catch (Exception e)
