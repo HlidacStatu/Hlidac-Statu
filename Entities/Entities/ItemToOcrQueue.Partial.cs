@@ -70,52 +70,19 @@ namespace HlidacStatu.Entities
             }
         }
 
-        static object lockTakeFromQueue = new object();
         public static IEnumerable<ItemToOcrQueue> TakeFromQueue(OcrWork.DocTypes? itemType = null, string itemSubType = null, int maxItems = 30)
         {
             using (DbEntities db = new DbEntities())
             {
-                lock (lockTakeFromQueue)
-                {
-                    var strategy = db.Database.CreateExecutionStrategy();
-                    ItemToOcrQueue[] res = strategy.Execute(() =>
-                    {
+                var query = $@"exec OCR_TakeFromQueue  
+                   @itemType = {(itemType != null ? $"'{((int)itemType)}'" : "NULL")},  
+                   @itemSubType = {(itemSubType != null ? $"'{itemSubType}'" : "NULL")}";
 
-                        using (var dbTran = db.Database.BeginTransaction(System.Data.IsolationLevel.RepeatableRead))
-                        {
-
-                            try
-                            {
-                                IQueryable<ItemToOcrQueue> sql = CreateQuery(db, itemType, itemSubType);
-
-                                sql = sql
-                                    .OrderByDescending(m => m.Priority)
-                                    .ThenBy(m => m.Created)
-                                    .Take(maxItems);
-                                var res = sql.ToArray();
-                                foreach (var i in res)
-                                {
-                                    i.Started = DateTime.Now;
-                                }
-                                db.SaveChanges();
-                                dbTran.Commit();
-                                return res;
-                            }
-                            catch (Exception)
-                            {
-                                dbTran.Rollback();
-                                throw;
-                            }
-                        }
-                    });
-
-                    return res;
-                }
-
+                var res = db.ItemToOcrQueue.FromSqlRaw(query);
+                return res.ToList();
             }
+
         }
-
-
        
 
 
