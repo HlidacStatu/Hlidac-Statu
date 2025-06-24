@@ -401,7 +401,7 @@ AllIcosInDotaceCache = new Devmasters.Cache.AWS_S3.Cache<string[]>
 
         private static StatisticsSubjectPerYear<Firma.Statistics.Dotace>[] _reportTopPrijemciHoldingy()
         {
-
+            throw new NotImplementedException();
 
         }
 
