@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using HlidacStatu.Entities;
 using HlidacStatu.Lib.Analytics;
+using System.Configuration;
 
 namespace HlidacStatu.Repositories
 {
@@ -320,7 +321,8 @@ namespace HlidacStatu.Repositories
             }
             return await ReportTopPrijemciAsync(query);
         }
-        public static async Task<List<(string Ico, long Count, decimal Sum)>> ReportTopPrijemciAsync(string query, int numOfItems = 100)
+        public static async Task<List<(string Ico, long Count, decimal Sum)>> ReportTopPrijemciAsync(string query, 
+            int numOfItems = 100)
         {
 
             AggregationContainerDescriptor<Dotace> aggs = new AggregationContainerDescriptor<Dotace>()
@@ -368,6 +370,39 @@ namespace HlidacStatu.Repositories
             }
 
             return results;
+        }
+
+
+        public static Devmasters.Cache.AWS_S3.Cache<StatisticsSubjectPerYear<Firma.Statistics.Dotace>[]>
+    TopPrijemciHoldingyCache = new Devmasters.Cache.AWS_S3.Cache<StatisticsSubjectPerYear<Firma.Statistics.Dotace>[]>
+        (
+                new string[] { Devmasters.Config.GetWebConfigValue("Minio.Cache.Endpoint") },
+            Devmasters.Config.GetWebConfigValue("Minio.Cache.Bucket"),
+            Devmasters.Config.GetWebConfigValue("Minio.Cache.AccessKey"),
+            Devmasters.Config.GetWebConfigValue("Minio.Cache.SecretKey"),
+
+            TimeSpan.Zero, 
+            "dotaceTopPrijemciHoldingy",
+            (obj) => _reportTopPrijemciHoldingy()
+            );
+
+        public static Devmasters.Cache.AWS_S3.Cache<string[]>
+AllIcosInDotaceCache = new Devmasters.Cache.AWS_S3.Cache<string[]>
+(
+                new string[] { Devmasters.Config.GetWebConfigValue("Minio.Cache.Endpoint") },
+            Devmasters.Config.GetWebConfigValue("Minio.Cache.Bucket"),
+            Devmasters.Config.GetWebConfigValue("Minio.Cache.AccessKey"),
+            Devmasters.Config.GetWebConfigValue("Minio.Cache.SecretKey"),
+
+            TimeSpan.Zero, "_allIcosInDotaceCache",
+            (obj) => { return Array.Empty<string>(); }//don't calculate online, use Tasks.RebuildAllIcosInDotaceAsync()
+        );
+
+
+        private static StatisticsSubjectPerYear<Firma.Statistics.Dotace>[] _reportTopPrijemciHoldingy()
+        {
+
+
         }
 
         public static async Task<List<(string IcoPoskytovatele, long Count, decimal Sum)>> ReportPoskytovatelePoLetechAsync(
