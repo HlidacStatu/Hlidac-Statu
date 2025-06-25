@@ -518,6 +518,13 @@ public static class PpRepo
 
         await dbContext.SaveChangesAsync();
     }
+    
+    public static async Task DeletePrijemPolitikaAsync(PpPrijem prijemPolitika)
+    {
+        await using var dbContext = new DbEntities();
+        dbContext.PpPrijmy.Remove(prijemPolitika);
+        await dbContext.SaveChangesAsync();
+    }
 
     public enum PoliticianGroup
     {

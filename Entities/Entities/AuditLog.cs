@@ -18,6 +18,9 @@ public class AuditLog
     public DateTime Timestamp { get; set; }
     public List<AuditChange> Changes { get; set; }
     
+    [Keyword]
+    public AuditState State { get; set; } = AuditState.New;
+    
     //this reference is for setting proper Id
     [Ignore]
     public Microsoft.EntityFrameworkCore.ChangeTracking.EntityEntry EntryReference { get; set; }
@@ -32,6 +35,14 @@ public class AuditLog
         public object NewValue { get; set; }
         
         public bool IsProperChange => OldValue is not null || NewValue is not null;
+    }
+
+    public enum AuditState
+    {
+        New,
+        Approved,
+        Reverted,
+        Deleted
     }
 }
 

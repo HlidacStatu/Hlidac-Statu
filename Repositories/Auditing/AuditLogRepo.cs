@@ -86,5 +86,16 @@ namespace HlidacStatu.Repositories.Auditing
 
             await AuditLogClient.DeleteAsync<AuditLog>(auditItem.Id);
         }
+
+        public static async Task SaveAsync(AuditLog auditItem)
+        {
+            var result = await AuditLogClient.IndexAsync<AuditLog>(auditItem, o => o.Id(auditItem.Id));
+
+            if (!result.IsValid)
+            {
+                var a = result.DebugInformation;
+                _logger.Error($"Error when saving auditlog to ES: {a}");
+            }
+        }
     }
 }
