@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -85,6 +86,45 @@ return Devmasters.Net.HttpClient.Simple.GetAsync("https://somedata.hlidacstatu.c
 
         }
 
+        /// <summary>
+        /// Returns true if <paramref name="code"/> is a valid ISO 639 language code.
+        /// </summary>
+        /// <param name="code">Candidate code (“en”, “fr”, “spa”, …)</param>
+        /// <param name="alpha">
+        /// 2  → check against ISO 639-1 (two-letter codes)  
+        /// 3  → check against ISO 639-2/3 (three-letter codes)
+        /// </param>
+        public static bool IsIso639LanguageCode(string code)
+        {
+            if (string.IsNullOrWhiteSpace(code))
+                return false;
+
+            code = code.Trim().ToLowerInvariant();
+
+            // Neutral cultures = language-only, no region info (e.g. "en", not "en-US")
+            var cultures = CultureInfo.GetCultures(CultureTypes.NeutralCultures);
+            int alpha = code.Length;
+            switch (alpha)
+            {
+                case 2:
+                    return cultures
+                           .Select(c => c.TwoLetterISOLanguageName.ToLowerInvariant())
+                           .Distinct()
+                           .Contains(code);
+
+                case 3:
+                    // Some cultures have 3-letter fallback “ivl” etc.; filter to length 3
+                    return cultures
+                           .Select(c => c.ThreeLetterISOLanguageName.ToLowerInvariant())
+                           .Where(s => s.Length == 3)
+                           .Distinct()
+                           .Contains(code);
+
+                default:
+                    //throw new ArgumentOutOfRangeException(nameof(alpha), alpha, "alpha must be 2 or 3");
+                    return false;
+            }
+        }
 
         public static string FirmaIcoZahranicni(string ico)
         {
