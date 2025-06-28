@@ -386,8 +386,8 @@ namespace HlidacStatu.Repositories
             (obj) => _reportTopPrijemciHoldingy()
             );
 
-        public static Devmasters.Cache.AWS_S3.Cache<string[]>
-AllIcosInDotaceCache = new Devmasters.Cache.AWS_S3.Cache<string[]>
+        public static Devmasters.Cache.AWS_S3.Cache<string[]> AllIcosInDotaceCache 
+            = new Devmasters.Cache.AWS_S3.Cache<string[]>
 (
                 new string[] { Devmasters.Config.GetWebConfigValue("Minio.Cache.Endpoint") },
             Devmasters.Config.GetWebConfigValue("Minio.Cache.Bucket"),
@@ -396,6 +396,22 @@ AllIcosInDotaceCache = new Devmasters.Cache.AWS_S3.Cache<string[]>
 
             TimeSpan.Zero, "_allIcosInDotaceCache",
             (obj) => { return Array.Empty<string>(); }//don't calculate online, use Tasks.RebuildAllIcosInDotaceAsync()
+        );
+
+        public static Devmasters.Cache.AWS_S3.Cache<StatisticsSubjectPerYear<Firma.Statistics.Dotace>[]> TopDotaceHoldingCache
+            = new Devmasters.Cache.AWS_S3.Cache<StatisticsSubjectPerYear<Firma.Statistics.Dotace>[]>
+(
+                new string[] { Devmasters.Config.GetWebConfigValue("Minio.Cache.Endpoint") },
+            Devmasters.Config.GetWebConfigValue("Minio.Cache.Bucket"),
+            Devmasters.Config.GetWebConfigValue("Minio.Cache.AccessKey"),
+            Devmasters.Config.GetWebConfigValue("Minio.Cache.SecretKey"),
+
+            TimeSpan.Zero, "_topDotaceHoldingCache",
+            (obj) => {
+                //don't calculate online, use Tasks.RebuildAllIcosInDotaceAsync()
+                return Array.Empty<StatisticsSubjectPerYear<Firma.Statistics.Dotace>>(); 
+            }
+
         );
 
 
