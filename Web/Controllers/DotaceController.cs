@@ -162,6 +162,27 @@ namespace HlidacStatu.Web.Controllers
             return View(data);
         }
 
+        [HlidacCache(22 * 60 * 60, "rok;ftyp;dtyp", false)]
+        public async Task<ActionResult> TopHoldingy(int? rok = null, int? ftyp = null, int? dtyp = null)
+        {
+            Firma.TypSubjektuEnum? typSubj = null;
+            if (Enum.TryParse<Firma.TypSubjektuEnum>(ftyp?.ToString(), out Firma.TypSubjektuEnum t))
+                typSubj = t;
+
+            Dotace.Hint.Type? typDotace = null;
+            if (Enum.TryParse<Dotace.Hint.Type>(dtyp?.ToString(), out Dotace.Hint.Type td))
+                typDotace = td;
+
+            ViewData["rok"] = rok;
+            ViewData["ftyp"] = ftyp;
+            ViewData["dtyp"] = dtyp;
+
+
+            Lib.Analytics.StatisticsSubjectPerYear<Firma.Statistics.Dotace>[] data = DotaceRepo.TopDotaceHoldingCache.Get();
+
+            return View(data);
+        }
+
         public async Task<ActionResult> VyberDotaci(
             [FromQuery] int makequery
 
