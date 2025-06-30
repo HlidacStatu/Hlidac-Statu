@@ -29,11 +29,20 @@ namespace HlidacStatu.Repositories.Auditing
             return result.Errors;
         }
         
-        public static async Task<List<AuditLog>> LoadAsync(string username = null)
+        public static async Task<List<AuditLog>> LoadUntouchedAuditLogsAsync(string username = null)
         {
             // Step 1: Get all usernames sorted alphabetically
             var userAgg = await AuditLogClient.SearchAsync<AuditLog>(s => s
                 .Size(0)
+                .Query(q => q
+                    .Bool(b => b
+                        .Should(
+                            sh => sh.Term(t => t.Field(f => f.State).Value((int)AuditLog.AuditState.New)),
+                            sh => sh.Bool(bb => bb.MustNot(mn => mn.Exists(e => e.Field(f => f.State))))
+                        )
+                        .MinimumShouldMatch(1)
+                    )
+                )
                 .Aggregations(a => a
                     .Terms("usernames", t => t
                             .Field(f => f.Username.Suffix("keyword"))
@@ -66,6 +75,30 @@ namespace HlidacStatu.Repositories.Auditing
                 .Size(10000)
                 .Query(q => q
                     .Term(t => t.Field(f => f.Username.Suffix("keyword")).Value(resolvedUsername))
+                )
+            );
+
+        
+            if (!result.IsValid)
+            {
+                var a = result.DebugInformation;
+                _logger.Error($"Error when Loading auditlog from ES: {a}");
+            }
+        
+            return result.Documents.ToList();
+        }
+        
+        public static async Task<List<AuditLog>> LoadAuditLogsAsync(string username, string entityName, string entityId)
+        {
+            var result = await AuditLogClient.SearchAsync<AuditLog>(s => s
+                .Size(10000)
+                .Query(q => q
+                    .Bool(b => b
+                        .Must(m => m.Term(t => t.Field(f => f.Username.Suffix("keyword")).Value(username)),
+                            m => m.Term(t => t.Field(f => f.EntityName.Suffix("keyword")).Value(entityName)),
+                            m => m.Term(t => t.Field(f => f.EntityId.Suffix("keyword")).Value(entityId))
+                        )
+                    )
                 )
             );
 
