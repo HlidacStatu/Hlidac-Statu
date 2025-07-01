@@ -1,7 +1,7 @@
 @using HlidacStatu.Repositories
 @using HlidacStatu.Repositories.SharedModels
 @using HlidacStatu.XLib.Render
-@model HlidacStatu.Lib.Analytics.StatisticsSubjectPerYear<HlidacStatu.Entities.Firma.Statistics.Dotace>[]
+@model List<HlidacStatu.Lib.Analytics.StatisticsSubjectPerYear<HlidacStatu.Entities.Firma.Statistics.Dotace>>
 
 
 @{
@@ -9,10 +9,11 @@
     if(ViewData.TryGetValue("rok", out var rokObj))
     {
         rok = (int?)rokObj;
+        rok ??= DotaceRepo.LastCompleteYear;
         if (rok > DotaceRepo.LastCompleteYear+5)
         {
             rok = DotaceRepo.LastCompleteYear+5; // pokud je rok v budoucnosti, tak ho ignorujeme
-        };
+        }
     }
     int? ftyp = ViewData["ftyp"] as int?;
     int? dtyp = ViewData["dtyp"] as int?;

@@ -178,7 +178,7 @@ namespace HlidacStatu.Web.Controllers
             ViewData["dtyp"] = dtyp;
 
 
-            Lib.Analytics.StatisticsSubjectPerYear<Firma.Statistics.Dotace>[] data = DotaceRepo.TopDotaceHoldingCache.Get();
+            var data = DotaceRepo.TopDotaceHoldingCache.Get().ToList();
 
             return View(data);
         }

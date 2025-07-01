@@ -656,7 +656,7 @@ $(document).ready(function () {
                 case OsobaEvent.SocialNetwork.WWW:
                     return self.Raw($"<a title='Webová stránka' {(intoNewTab ? "target='_blank'" : "")}href='{value}'><i class='fas fa-link {htmlclass}'></i></a>");
                 case OsobaEvent.SocialNetwork.Youtube:
-                    return self.Raw($"<a title='Youtube' {(intoNewTab ? "target='_blank'" : "")}href='{value}'><i class='fab fa-youtube {htmlclass}'></i></a>");
+                    return self.Raw($"<a title='Youtube' {(intoNewTab ? "target='_blank'" : "")}href='https://www.youtube.com/{value}'><i class='fab fa-youtube {htmlclass}'></i></a>");
                 case OsobaEvent.SocialNetwork.Zaznam_zastupitelstva:
                     return self.Raw(
                         $"<a title='Záznam zastupitelstva' {(intoNewTab ? "target='_blank'" : "")}href='{value}'><i class='fab fa-youtube {htmlclass}'></i></a>"
