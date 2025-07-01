@@ -224,6 +224,7 @@ namespace HlidacStatuApi.Controllers.ApiV2
 
         [Authorize]
         [HttpGet("dumpZip/{datatype}/{date?}")]
+        [Produces("application/zip")]
         public ActionResult<byte[]> DumpZip([FromRoute] string datatype,
             [FromRoute(Name = "date")][DefaultValue("")] string? date = "null")
         {
@@ -254,7 +255,7 @@ namespace HlidacStatuApi.Controllers.ApiV2
                         memoryStream.Position = 0; // Reset stream position
 
                         // Return file as stream with correct content type
-                        return File(memoryStream, "application/json", firstEntry.Name);
+                        return File(memoryStream, KnownMimeTypes.Zip, firstEntry.Name);
                     }
                 }
             }
