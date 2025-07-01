@@ -9,6 +9,7 @@ using Swashbuckle.AspNetCore.Annotations;
 using System.ComponentModel;
 using System.IO.Compression;
 using System.Net;
+using MimeMapping;
 
 namespace HlidacStatuApi.Controllers.ApiV2
 {
@@ -208,6 +209,31 @@ namespace HlidacStatuApi.Controllers.ApiV2
             }
             try
             {
+                return File(_dump(datatype, date), KnownMimeTypes.Zip);
+
+            }
+            catch (System.IO.FileNotFoundException)
+            {
+                return StatusCode(404);
+            }
+            catch (Exception e)
+            {
+                return StatusCode(500, e.Message);
+            }
+        }
+
+        [Authorize]
+        [HttpGet("dumpZip/{datatype}/{date?}")]
+        public ActionResult<byte[]> DumpZip([FromRoute] string datatype,
+            [FromRoute(Name = "date")][DefaultValue("")] string? date = "null")
+        {
+            if (datatype.Contains("..") || datatype.Contains(Path.DirectorySeparatorChar))
+            {
+                _logger.Error("Wrong datatype name.");
+                return StatusCode(466);
+            }
+            try
+            {
                 var bin = _dump(datatype, date);
                 using (MemoryStream zipStream = new MemoryStream(bin))
                 {
@@ -240,33 +266,6 @@ namespace HlidacStatuApi.Controllers.ApiV2
             {
                 return StatusCode(500, e.Message);
             }
-
-        }
-
-        [Authorize]
-        [HttpGet("dumpZip/{datatype}/{date?}")]
-        public ActionResult<byte[]> DumpZip([FromRoute] string datatype,
-            [FromRoute(Name = "date")][DefaultValue("")] string? date = "null")
-        {
-            if (datatype.Contains("..") || datatype.Contains(Path.DirectorySeparatorChar))
-            {
-                _logger.Error("Wrong datatype name.");
-                return StatusCode(466);
-            }
-            try
-            {
-                return _dump(datatype, date);
-
-            }
-            catch (System.IO.FileNotFoundException)
-            {
-                return StatusCode(404);
-            }
-            catch (Exception e)
-            {
-                return StatusCode(500, e.Message);
-            }
-
         }
         private byte[] _dump([FromRoute] string datatype,
             [FromRoute(Name = "date")][DefaultValue("")] string? date = "null")
