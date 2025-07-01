@@ -245,7 +245,8 @@ namespace HlidacStatuApi.Controllers.ApiV2
 
         [Authorize]
         [HttpGet("dumpZip/{datatype}/{date?}")]
-        public ActionResult<byte[]> DumpZip([FromRoute] string datatype,
+        [Produces("application/zip")]
+        public ActionResult DumpZip([FromRoute] string datatype,
             [FromRoute(Name = "date")][DefaultValue("")] string? date = "null")
         {
             if (datatype.Contains("..") || datatype.Contains(Path.DirectorySeparatorChar))
@@ -255,8 +256,7 @@ namespace HlidacStatuApi.Controllers.ApiV2
             }
             try
             {
-                return _dump(datatype, date);
-
+                return File(_dump(datatype, date), "application/zip");
             }
             catch (System.IO.FileNotFoundException)
             {
