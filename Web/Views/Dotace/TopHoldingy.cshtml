@@ -35,15 +35,19 @@
     List<(string Ico, long Pocet, decimal Castka)> data = new();
     if (rok.HasValue && rok > 0)
     {
-        data = Model.OrderByDescending(m => m.Summary(rok.Value).CelkemPrideleno)
+        data = Model
+        .Where(m=>!string.IsNullOrEmpty(m.ICO))
+        .OrderByDescending(m => m.Summary(rok.Value).CelkemPrideleno)
         .Take(100)
         .Select(m => (Ico:m.ICO, Pocet:(long)(m.Summary(rok.Value).PocetDotaci), Castka: m.Summary(rok.Value).CelkemPrideleno))
         .ToList();
     }
     else
     {
-        data = Model.OrderByDescending(m => m.Summary().CelkemPrideleno)
-               .Take(100)
+        data = Model
+        .Where(m => !string.IsNullOrEmpty(m.ICO))
+        .OrderByDescending(m => m.Summary().CelkemPrideleno)
+        .Take(100)
         .Select(m => (Ico: m.ICO, Pocet: (long)(m.Summary(rok.Value).PocetDotaci), Castka: m.Summary(rok.Value).CelkemPrideleno))
         .ToList();
         ;

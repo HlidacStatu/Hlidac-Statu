@@ -413,7 +413,21 @@ namespace HlidacStatu.Repositories
             }
 
         );
+        public static Devmasters.Cache.AWS_S3.Cache<StatisticsSubjectPerYear<Firma.Statistics.Dotace>[]> TopDotaceHoldingStatniCache
+    = new Devmasters.Cache.AWS_S3.Cache<StatisticsSubjectPerYear<Firma.Statistics.Dotace>[]>
+(
+        new string[] { Devmasters.Config.GetWebConfigValue("Minio.Cache.Endpoint") },
+    Devmasters.Config.GetWebConfigValue("Minio.Cache.Bucket"),
+    Devmasters.Config.GetWebConfigValue("Minio.Cache.AccessKey"),
+    Devmasters.Config.GetWebConfigValue("Minio.Cache.SecretKey"),
 
+    TimeSpan.Zero, "_topDotaceHoldingStatniCache",
+    (obj) => {
+        //don't calculate online, use Tasks.RebuildAllIcosInDotaceAsync()
+        return Array.Empty<StatisticsSubjectPerYear<Firma.Statistics.Dotace>>();
+    }
+
+);
 
         private static StatisticsSubjectPerYear<Firma.Statistics.Dotace>[] _reportTopPrijemciHoldingy()
         {

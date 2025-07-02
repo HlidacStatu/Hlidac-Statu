@@ -527,6 +527,7 @@
         {
             var subjectsWithSubsidiesCount = dotaceHoldingStat
             .Select(y => y.Value)
+            .Where(v => v.JednotliveFirmy != null)
             .SelectMany(v => v.JednotliveFirmy.Keys)
             .Distinct()
             .Count();
