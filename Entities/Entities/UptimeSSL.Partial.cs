@@ -220,7 +220,7 @@ namespace HlidacStatu.Entities
                     case SSLGrades.T:
                         txt = "HTTPS používá nedůveryhodný certifikát";
                         if (longVersion)
-                            txt = "Služba je chráněna certifikátem od certifikační autority, kterou hlavní prohlížeče neznají hlavní prohlížeče neznají nebo jí nedůvěřují. V českých podmínkách to znamená nejspíše certifikáty vydané našimi vnitrostátními autoritami (ICA, PostSignum a eIdentity), které sice stát zákonem prohlásil za důvěryhodné, ale které nesplňují mezinárodní podmínky nutné proto, aby je za důvěryhodné pokládali i autoři prohlížečů.";
+                            txt = "Služba je chráněna certifikátem od certifikační autority, kterou hlavní prohlížeče neznají nebo jí nedůvěřují. V českých podmínkách to znamená nejspíše certifikáty vydané našimi vnitrostátními autoritami (ICA, PostSignum a eIdentity), které sice stát zákonem prohlásil za důvěryhodné, ale které nesplňují mezinárodní podmínky nutné proto, aby je za důvěryhodné pokládali i autoři prohlížečů.";
                         break;
                     case SSLGrades.M:
                         txt = "Služba používá certifikát pro jiný server.";
