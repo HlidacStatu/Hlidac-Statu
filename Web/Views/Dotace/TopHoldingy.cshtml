@@ -1,3 +1,4 @@
+@using HlidacStatu.Extensions
 @using HlidacStatu.Repositories
 @using HlidacStatu.Repositories.SharedModels
 @using HlidacStatu.XLib.Render
@@ -6,13 +7,21 @@
 
 @{
     int? rok = null;
+    var deb1 = Model.FirstOrDefault(m => m.ICO == "00544957");
+    var debf1 = Firmy.Get("00544957");
+    var debfv = debf1.AktualniVazby(HlidacStatu.DS.Graphs.Relation.AktualnostType.Nedavny);
+    var debhd = debf1.HoldingStatistikaDotaci(HlidacStatu.DS.Graphs.Relation.AktualnostType.Nedavny);
+
     if(ViewData.TryGetValue("rok", out var rokObj))
     {
-        rok = (int?)rokObj;
-        rok ??= DotaceRepo.LastCompleteYear;
-        if (rok > DotaceRepo.LastCompleteYear+5)
+        if (rokObj != null)
         {
-            rok = DotaceRepo.LastCompleteYear+5; // pokud je rok v budoucnosti, tak ho ignorujeme
+            rok = (int?)rokObj;
+            rok ??= DotaceRepo.LastCompleteYear;
+            if (rok > DotaceRepo.LastCompleteYear + 5)
+            {
+                rok = DotaceRepo.LastCompleteYear + 5; // pokud je rok v budoucnosti, tak ho ignorujeme
+            }
         }
     }
     int? ftyp = ViewData["ftyp"] as int?;
@@ -48,7 +57,7 @@
         .Where(m => !string.IsNullOrEmpty(m.ICO))
         .OrderByDescending(m => m.Summary().CelkemPrideleno)
         .Take(100)
-        .Select(m => (Ico: m.ICO, Pocet: (long)(m.Summary(rok.Value).PocetDotaci), Castka: m.Summary(rok.Value).CelkemPrideleno))
+        .Select(m => (Ico: m.ICO, Pocet: (long)(m.Summary().PocetDotaci), Castka: m.Summary().CelkemPrideleno))
         .ToList();
         ;
     }
