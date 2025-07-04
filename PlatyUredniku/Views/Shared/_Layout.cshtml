@@ -24,7 +24,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
     <title>@title</title>
-    <link rel="canonical" href="https://platyuredniku.hlidacstatu.cz@(Context.Request.GetEncodedPathAndQuery())"/>
+    @if (ViewData["CanonicalUrl"] is string canonicalUrl)
+    {
+        <link rel="canonical" href="@canonicalUrl" />
+    }
+    else
+    {
+        <link rel="canonical" href="https://platyuredniku.hlidacstatu.cz@(Context.Request.GetEncodedPathAndQuery())"/>
+        
+    }
     <meta name="description" content="@description"/>
     <meta name="author" content="Hlídač státu"/>
     <meta name="keywords" content="e-gov, e-government, platy úředníků, platy ministrů, platy ve státní správě, odměny úředníků, manažerské platy ve státní správě">

@@ -360,12 +360,13 @@ select distinct ds.DatovaSchranka, f.ico from firma f
 
     public static async Task<List<PuOrganizace>> GetActiveOrganizaceForTagAsync(string tag, int limit = 0)
     {
+        var normalizedTag = PuOrganizaceTag.NormalizeTag(tag);
+        
         await using var db = new DbEntities();
-
 
         var query = db.PuOrganizaceTags
             .AsNoTracking()
-            .Where(t => tag == null || t.Tag.Equals(tag))
+            .Where(t => tag == null || t.TagNormalized.Equals(normalizedTag))
             .Where(t => t.Organizace.Metadata.Any(m => m.Typ == PuOrganizaceMetadata.TypMetadat.PlatyUredniku))
             .Include(t => t.Organizace).ThenInclude(o => o.FirmaDs)
             .Include(t => t.Organizace).ThenInclude(o => o.Metadata.Where(m => m.Typ == PuOrganizaceMetadata.TypMetadat.PlatyUredniku))
@@ -376,6 +377,15 @@ select distinct ds.DatovaSchranka, f.ico from firma f
             query = query.Take(limit);
 
         return await query.ToListAsync();
+    }
+    
+    public static async Task<PuOrganizaceTag> GetTagAsync(string tag)
+    {
+        var normalizedTag = PuOrganizaceTag.NormalizeTag(tag);
+        
+        await using var db = new DbEntities();
+
+        return await db.PuOrganizaceTags.AsNoTracking().FirstOrDefaultAsync(t => t.TagNormalized.Equals(normalizedTag));
     }
 
     public static async Task<int> GetOrganizaceCountForTagAsync(string tag, int rok)

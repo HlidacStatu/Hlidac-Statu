@@ -123,7 +123,7 @@ public class AutocompleteCacheService
             .Distinct()
             .Select(tag => new Autocomplete()
             {
-                Id = $"/oblast/{tag}",
+                Id = $"/oblast/{PuOrganizaceTag.NormalizeTag(tag)}",
                 Text = $"{tag}",
                 AdditionalHiddenSearchText = $"tag # oblast {tag}",
                 PriorityMultiplier = 1.2f,

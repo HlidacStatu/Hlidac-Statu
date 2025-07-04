@@ -108,7 +108,7 @@ public class HomeController : Controller
         )
         {
             sb.AppendLine("<url>");
-            sb.AppendLine($"<loc>https://platyuredniku.hlidacstatu.cz/analyza/{System.Security.SecurityElement.Escape(item)}</loc>");
+            sb.AppendLine($"<loc>https://platyuredniku.hlidacstatu.cz/Urednici/analyza/{System.Security.SecurityElement.Escape(item)}</loc>");
             sb.AppendLine($"<lastmod>{modif}</lastmod>");
             sb.AppendLine($"<priority>0.80</priority>");
             sb.AppendLine($"</url>");
@@ -117,7 +117,7 @@ public class HomeController : Controller
         foreach (var item in PuRepo.MainTags)
         {
             sb.AppendLine("<url>");
-            sb.AppendLine($"<loc>https://platyuredniku.hlidacstatu.cz/Oblast/{System.Security.SecurityElement.Escape(item)}</loc>");
+            sb.AppendLine($"<loc>https://platyuredniku.hlidacstatu.cz/Urednici/Oblast/{System.Security.SecurityElement.Escape(PuOrganizaceTag.NormalizeTag(item))}</loc>");
             sb.AppendLine($"<lastmod>{modif}</lastmod>");
             sb.AppendLine($"<priority>0.80</priority>");
             sb.AppendLine($"</url>");
@@ -125,14 +125,14 @@ public class HomeController : Controller
         foreach (var org in (await PuRepo.GetPlatyForYearsAsync(PuRepo.MinYear,PuRepo.DefaultYear)))
         {
             sb.AppendLine("<url>");
-            sb.AppendLine($"<loc>https://platyuredniku.hlidacstatu.cz/detail/{System.Security.SecurityElement.Escape(org.DS)}</loc>");
+            sb.AppendLine($"<loc>https://platyuredniku.hlidacstatu.cz/Urednici/detail/{System.Security.SecurityElement.Escape(org.DS)}</loc>");
             sb.AppendLine($"<lastmod>{modif}</lastmod>");
             sb.AppendLine($"<priority>0.80</priority>");
             sb.AppendLine($"</url>");
             foreach (var item in org.Platy)
             {
                 sb.AppendLine("<url>");
-                sb.AppendLine($"<loc>https://platyuredniku.hlidacstatu.cz/Plat/{System.Security.SecurityElement.Escape(item.Id.ToString())}</loc>");
+                sb.AppendLine($"<loc>https://platyuredniku.hlidacstatu.cz/Urednici/Plat/{System.Security.SecurityElement.Escape(item.Id.ToString())}</loc>");
                 sb.AppendLine($"<lastmod>{modif}</lastmod>");
                 sb.AppendLine($"<priority>0.60</priority>");
                 sb.AppendLine($"</url>");

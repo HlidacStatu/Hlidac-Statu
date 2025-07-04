@@ -56,61 +56,10 @@ public class PoliticiController : Controller
         }
     }
 
-
-
     public async Task<IActionResult> Oblast(string id)
     {
-/*        ValueTask<List<PuOrganizace>> organizaceForTagTask = _cache.GetOrSetAsync<List<PuOrganizace>>(
-            $"{nameof(PpRepo.GetActiveOrganizaceAsync)}_{id}-politici",
-            _ => PpRepo.GetActiveOrganizaceAsync(id)
-        );
-
-        var organizace = await organizaceForTagTask;
-
-        ViewData["platy"] = organizace.SelectMany(o => o.PrijmyPolitiku).ToList();
-        ViewData["oblast"] = id;
-        ViewData["context"] = $"{id}";
-
-        ViewBag.Title = "Prijmy politiku a organizace v oblasti #" + id;
-*/
         return View(null);// organizace);
     }
-
-    /*
-    public async Task<IActionResult> Oblasti()
-    {
-        var sw = new Stopwatch();
-        sw.Start();
-        var oblasti = PpRepo.MainTags;
-        var model = new Dictionary<string, List<PuOrganizace>>();
-        foreach (var oblast in oblasti)
-        {
-            var organizace = await _cache.GetOrSetAsync<List<PuOrganizace>>(
-                $"{nameof(PpRepo.GetActiveOrganizaceAsync)}_{oblast}-politici",
-                _ => PpRepo.GetActiveOrganizaceAsync(oblast)
-            );
-
-            model.Add(oblast, organizace);
-        }
-
-        List<Breadcrumb> breadcrumbs = new()
-        {
-            new Breadcrumb()
-            {
-                Name = nameof(Oblasti),
-                Link = $"{nameof(Oblasti)}"
-            }
-        };
-
-        ViewData["breadcrumbs"] = breadcrumbs;
-        sw.Stop();
-        ViewData["sw"] = sw.ElapsedMilliseconds;
-
-        ViewBag.Title = "Prijmy politiku a organizace v různých oborech";
-
-        return View(model);
-    }
-    */
     
     public async Task<IActionResult> Detail(string id, int? rok = null)
     {

@@ -1,3 +1,4 @@
+using System;
 using HlidacStatu.Entities;
 using HlidacStatu.Repositories;
 using Microsoft.AspNetCore.Mvc;
@@ -133,18 +134,31 @@ public class UredniciController : Controller
 
     public async Task<IActionResult> Oblast(string id)
     {
+        var normalizedTag = PuOrganizaceTag.NormalizeTag(id);
+        if (string.IsNullOrWhiteSpace(normalizedTag))
+            return NotFound();
+        
         ValueTask<List<PuOrganizace>> organizaceForTagTask = _cache.GetOrSetAsync<List<PuOrganizace>>(
-            $"{nameof(PuRepo.GetActiveOrganizaceForTagAsync)}_{id}-urednici",
-            _ => PuRepo.GetActiveOrganizaceForTagAsync(id)
+            $"{nameof(PuRepo.GetActiveOrganizaceForTagAsync)}_{normalizedTag}-urednici",
+            _ => PuRepo.GetActiveOrganizaceForTagAsync(normalizedTag)
         );
 
         var organizace = await organizaceForTagTask;
 
+        var tag = await PuRepo.GetTagAsync(normalizedTag);
+        var oblast = tag is null ? id : tag.Tag;
+        
         ViewData["platy"] = organizace.SelectMany(o => o.Platy).ToList();
-        ViewData["oblast"] = id;
+        ViewData["oblast"] = oblast;
         ViewData["context"] = $"{id}";
 
-        ViewBag.Title = "Platy a organizace v oblasti #" + id;
+        if (tag is not null && 
+            tag.TagNormalized.Equals(tag.Tag, StringComparison.InvariantCultureIgnoreCase) == false)
+        {
+            ViewData["CanonicalUrl"] = $"https://platyuredniku.hlidacstatu.cz{Url.Action("Oblast", new { id = tag.TagNormalized })}";
+        }
+
+        ViewBag.Title = "Platy a organizace v oblasti #" + oblast;
 
         return View(organizace);
     }
