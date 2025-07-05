@@ -1,3 +1,4 @@
+using HlidacStatu.Entities;
 using Microsoft.AspNetCore.Razor.TagHelpers;
 
 namespace PlatyUredniku.Views.Shared.TagHelpers;
@@ -22,9 +23,9 @@ public class HashTag : TagHelper
             this.AdditionalClass += " position-relative me-3 mb-2";
 
         if (this.Typ == HlidacStatu.Entities.PuOrganizaceMetadata.TypMetadat.PlatyUredniku)
-            output.Attributes.SetAttribute("href", $"/urednici/Oblast/{Tag}");
+            output.Attributes.SetAttribute("href", $"/urednici/Oblast/{PuOrganizaceTag.NormalizeTag(Tag)}");
         else
-            output.Attributes.SetAttribute("href", $"/politici/Oblast/{Tag}");
+            output.Attributes.SetAttribute("href", $"/politici/Oblast/{PuOrganizaceTag.NormalizeTag(Tag)}");
 
         output.Attributes.SetAttribute("class", $"hashtag text-bg-{this.Color.ToString().ToLower()} {AdditionalClass}");
         if (!string.IsNullOrEmpty( Style ) )

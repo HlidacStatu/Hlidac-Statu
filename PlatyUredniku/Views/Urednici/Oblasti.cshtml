@@ -1,3 +1,4 @@
+@using HlidacStatu.Entities
 @model Dictionary<string, List<HlidacStatu.Entities.PuOrganizace>>
 
 @section breadcrumbs
@@ -30,7 +31,7 @@
                                     sample = $" jako např. {instituce[0].Nazev}, {instituce[1].Nazev} a další.";
                                 }
                             }
-                                Oblast obsahuje celkem <a asp-controller="Urednici" asp-action="oblast" asp-route-id="@kvp.Key"><b>@(instituce.Count)</b> institucí</a> @(sample)
+                                Oblast obsahuje celkem <a asp-controller="Urednici" asp-action="oblast" asp-route-id="@PuOrganizaceTag.NormalizeTag(kvp.Key)"><b>@(instituce.Count)</b> institucí</a> @(sample)
                         </td>
                     </tr>
                 }

@@ -15,6 +15,7 @@
     }
 
     var statistics = Model.StatistikaRegistrSmluv(aktualnost);
+    var vazbyPodleAktualnosti = Model.AktualniVazby(aktualnost);
 
 }
 
@@ -162,7 +163,7 @@
         @Html.Raw(
         HlidacStatu.Repositories.Graph.TiskVazeb(
         Model.FullName(),Model.VazbyRootEdge(),
-        Model.AktualniVazby(aktualnost),
+        vazbyPodleAktualnosti,
         Relation.TiskEnum.Html
         )
         )
@@ -173,7 +174,7 @@
     </p>
     <h2>Podrobný výpis vazeb</h2>
     @{
-        var data = Model.AktualniVazby(aktualnost)
+        var data = vazbyPodleAktualnosti
         .Where(v => v.To != null && v.To.Type == HlidacStatu.DS.Graphs.Graph.Node.NodeType.Company)
         .GroupBy(f => f.To.Id, v => v, (ico, v) => new
         {
