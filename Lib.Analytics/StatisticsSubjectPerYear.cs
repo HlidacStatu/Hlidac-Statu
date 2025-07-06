@@ -25,10 +25,16 @@ namespace HlidacStatu.Lib.Analytics
     {
         public string ICO { get; set; }
 
+
         [JsonConstructor]
         public StatisticsSubjectPerYear()
         : base()
         { }
+
+        public StatisticsSubjectPerYear(string ico)
+        {
+            ICO = ico;
+        }
 
         public StatisticsSubjectPerYear(string ico, StatisticsPerYear<T> baseObj)
             : base(baseObj)
@@ -53,8 +59,20 @@ namespace HlidacStatu.Lib.Analytics
             ICO = ico;
         }
 
+        public static StatisticsSubjectPerYear<T> Aggregate(string ico, IEnumerable<StatisticsSubjectPerYear<T>> statistics)
+        {
+            if (statistics is null)
+                return new StatisticsSubjectPerYear<T>() { ICO=ico };
 
-        public static StatisticsSubjectPerYear<T> Aggregate(IEnumerable<StatisticsSubjectPerYear<T>> statistics)
+            var aggregatedStatistics = new StatisticsSubjectPerYear<T>(
+                $"{ico}",
+                AggregateStats(statistics));
+
+            return aggregatedStatistics;
+        }
+
+        [Obsolete()]
+        public static StatisticsSubjectPerYear<T> _Aggregate(IEnumerable<StatisticsSubjectPerYear<T>> statistics)
         {
             if (statistics is null)
                 return new StatisticsSubjectPerYear<T>();

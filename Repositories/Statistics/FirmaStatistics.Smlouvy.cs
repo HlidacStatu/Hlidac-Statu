@@ -44,7 +44,7 @@ namespace HlidacStatu.Repositories.Statistics
             var statistiky = firmy.Select(f => f.StatistikaRegistruSmluv(obor)).Append(f.StatistikaRegistruSmluv(obor))
                 .ToArray();
 
-            var aggregate = Lib.Analytics.StatisticsSubjectPerYear<Smlouva.Statistics.Data>.Aggregate(statistiky);
+            var aggregate = Lib.Analytics.StatisticsSubjectPerYear<Smlouva.Statistics.Data>.Aggregate(f.ICO,statistiky);
 
             return aggregate;
 

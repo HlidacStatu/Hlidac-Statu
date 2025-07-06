@@ -69,7 +69,7 @@ keyValueSelector: obj => obj.firma.ICO + "-" + obj.aktualnost.ToString());
 
             var statistiky = firmy.Select(f => f.StatistikaVerejneZakazky()).Append(firma.StatistikaVerejneZakazky()).ToArray();
 
-            var aggregate = Lib.Analytics.StatisticsSubjectPerYear<Firma.Statistics.VZ>.Aggregate(statistiky);
+            var aggregate = Lib.Analytics.StatisticsSubjectPerYear<Firma.Statistics.VZ>.Aggregate(firma.ICO,statistiky);
 
             return aggregate;
 

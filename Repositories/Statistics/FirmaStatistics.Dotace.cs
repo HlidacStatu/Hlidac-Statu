@@ -92,7 +92,7 @@ namespace HlidacStatu.Repositories.Statistics
                 .ToArray();
 
             if (statistiky.Length == 0)
-                return new StatisticsSubjectPerYear<Firma.Statistics.Dotace>();    
+                return new StatisticsSubjectPerYear<Firma.Statistics.Dotace>(firma.ICO);    
             if (statistiky.Length == 1)
                 return statistiky[0].dotaceStats;
 
@@ -102,13 +102,14 @@ namespace HlidacStatu.Repositories.Statistics
             foreach (var ico in statistiky.Select(m => m.ICO))
             {
                 statistikyPerIco[ico] = new StatisticsSubjectPerYear<Firma.Statistics.Dotace>();
-                statistikyPerIco[ico] = (StatisticsSubjectPerYear<Firma.Statistics.Dotace>.Aggregate(
+                statistikyPerIco[ico] = (StatisticsSubjectPerYear<Firma.Statistics.Dotace>.Aggregate(firma.ICO,
                         statistiky.Where(w => w.ICO == ico).Select(m => m.dotaceStats).ToArray()
                         )
                     ) ?? new StatisticsSubjectPerYear<Firma.Statistics.Dotace>();
             }
 
-            StatisticsSubjectPerYear<Firma.Statistics.Dotace> aggregate = Lib.Analytics.StatisticsSubjectPerYear<Firma.Statistics.Dotace>.Aggregate(statistikyPerIco.Values);
+            StatisticsSubjectPerYear<Firma.Statistics.Dotace> aggregate = 
+                Lib.Analytics.StatisticsSubjectPerYear<Firma.Statistics.Dotace>.Aggregate(firma.ICO, statistikyPerIco.Values);
 
             foreach (var year in aggregate)
             {
