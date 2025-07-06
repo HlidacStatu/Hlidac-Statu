@@ -1,6 +1,7 @@
 ﻿using HlidacStatu.Entities;
 using HlidacStatu.Extensions;
 using HlidacStatu.Lib.Analytics;
+using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -25,7 +26,7 @@ namespace HlidacStatu.Repositories.Statistics
             _holdingDotaceCache = Devmasters.Cache.Memcached.Manager<StatisticsSubjectPerYear<Firma.Statistics.Dotace>, (Firma firma,
                     HlidacStatu.DS.Graphs.Relation.AktualnostType aktualnost)>
                 .GetSafeInstance("Holding_DotaceStatistics_v3",
-                    (obj) => CalculateHoldingDotaceStat(obj.firma, obj.aktualnost),
+                    (obj) => _calculateHoldingDotaceStat(obj.firma, obj.aktualnost),
                     TimeSpan.Zero,
                     Devmasters.Config.GetWebConfigValue("HazelcastServers").Split(','),
                     keyValueSelector: obj => obj.firma.ICO + "-" + obj.aktualnost.ToString());
@@ -80,7 +81,7 @@ namespace HlidacStatu.Repositories.Statistics
         }
 
         static FirmaByIcoComparer byIcoOnly = new FirmaByIcoComparer();
-        private static StatisticsSubjectPerYear<Firma.Statistics.Dotace> CalculateHoldingDotaceStat(Firma firma,
+        private static StatisticsSubjectPerYear<Firma.Statistics.Dotace> _calculateHoldingDotaceStat(Firma firma,
             HlidacStatu.DS.Graphs.Relation.AktualnostType aktualnost)
         {
 
@@ -89,6 +90,7 @@ namespace HlidacStatu.Repositories.Statistics
                 .Where(f => f.Valid)
                 .Distinct(byIcoOnly)
                 .Select(f => new { f.ICO, dotaceStats = f.StatistikaDotaci() })
+                .Where(m => !string.IsNullOrEmpty(m.ICO))
                 .ToArray();
 
             if (statistiky.Length == 0)
@@ -99,7 +101,7 @@ namespace HlidacStatu.Repositories.Statistics
             Dictionary<string, StatisticsSubjectPerYear<Firma.Statistics.Dotace>> statistikyPerIco = 
                 new Dictionary<string, StatisticsSubjectPerYear<Firma.Statistics.Dotace>>();
 
-            foreach (var ico in statistiky.Select(m => m.ICO))
+            foreach (var ico in statistiky.Select(m => m.ICO).Where(m => !string.IsNullOrEmpty(m)))
             {
                 statistikyPerIco[ico] = new StatisticsSubjectPerYear<Firma.Statistics.Dotace>();
                 statistikyPerIco[ico] = (StatisticsSubjectPerYear<Firma.Statistics.Dotace>.Aggregate(firma.ICO,
