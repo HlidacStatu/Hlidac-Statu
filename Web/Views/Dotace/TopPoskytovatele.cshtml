@@ -20,7 +20,14 @@
         _ => "nedefinováno"
         
     };
-    
+    string query = "";
+    if (typDotace > 0)
+        query = HlidacStatu.Searching.Query.ModifyQueryAND(query, $"hints.subsidyType:{typDotace:D}");
+
+    if (rok is not null && rok > 0)
+        query = HlidacStatu.Searching.Query.ModifyQueryAND(query, $"approvedYear:{rok}");
+
+
     ViewBag.Title = "Hlídač dotací";
     ViewBag.SubTitle = $"Report podle poskytovatelů{yearText} pro {typDotaceText}";
 }
@@ -60,15 +67,26 @@
         },
         new()
         {
+            Name = "Seznam dotačních programů",
+            TextRender = (x) => $"",
+            HtmlRender = (x) => $"<a href='/dotace/TopDotacniProgramy?icoPoskytovatele={x.IcoPoskytovatele}&rok={rok}'>Poskytované dotační programy{(rok==null? "" : " v roce "+ rok)}</a>",
+            //OrderValueRender = (x) => HlidacStatu.Util.RenderData.OrderValueFormat(x.Count),
+            //CssClass = "number"
+        },
+        new()
+        {
             Name = "Počet poskytnutých dotací",
             TextRender = (x) => $"{HlidacStatu.Util.RenderData.NiceNumber(x.Count)}",
-            HtmlRender = (x) => $"<a href='/dotace/hledat?Q=subsidyProviderIco:{x.IcoPoskytovatele}'>{HlidacStatu.Util.RenderData.NiceNumber(x.Count,true)}</a>",
+            HtmlRender = (x) => $"<a href='/dotace/hledat?Q=" + System.Net.WebUtility.UrlEncode(
+                HlidacStatu.Searching.Query.ModifyQueryAND($"subsidyProviderIco:{x.IcoPoskytovatele}",query)
+            )
+            + $"'>{HlidacStatu.Util.RenderData.NiceNumber(x.Count,true)}</a>",
             OrderValueRender = (x) => HlidacStatu.Util.RenderData.OrderValueFormat(x.Count),
             CssClass = "number"        
         },
         new()
         {
-            Name = "Částka",
+            Name = "Poskytnutá částka",
             TextRender = (x) => $"{HlidacStatu.Util.RenderData.NicePrice(x.Sum)}",
             HtmlRender = (x) => $"{HlidacStatu.Util.RenderData.NicePrice(x.Sum,html:true)}",
             OrderValueRender = (x) => HlidacStatu.Util.RenderData.OrderValueFormat(x.Sum),

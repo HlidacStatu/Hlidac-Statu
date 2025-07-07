@@ -53,6 +53,11 @@ namespace HlidacStatu.Repositories
         }
         public static string GetJmeno(string ico)
         {
+            if (string.IsNullOrWhiteSpace(ico))
+                return string.Empty;
+            if (Util.DataValidators.CheckCZICO(ico)==false)
+                return string.Empty;
+
             return instanceNameOnlyByIco.Get(Util.ParseTools.NormalizeIco(ico));
         }
         public static Firma Get(int ICO)

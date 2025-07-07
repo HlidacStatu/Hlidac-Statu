@@ -8,16 +8,18 @@
     {
         rok = (int?)rokObj;
     }
+    string icoPoskytovatele = (string)ViewData["icoPoskytovatele"];
+    string icoPrijemce = (string)ViewData["icoPrijemce"];
+
     string yearText = rok > 0 ? $" pro rok {rok}" :"";
 
     int typDotace = (int)(ViewData["typDotace"] ?? 0); 
     string typDotaceText = typDotace switch
     {
-        1 => "státní, nebo evropské dotace",
-        2 => "krajské dotace",
-        3 => "obecní dotace",
-        _ => "nedefinováno"
-
+        1 => "pro státní a evropské dotace",
+        2 => "pro krajské dotace",
+        3 => "pro obecní dotace",
+        _ => ""
     };
 
     string query = "";
@@ -26,6 +28,9 @@
 
     if (rok is not null && rok > 0)
         query = HlidacStatu.Searching.Query.ModifyQueryAND(query, $"approvedYear:{rok}");
+    
+    if (!string.IsNullOrWhiteSpace(icoPoskytovatele))
+        query = HlidacStatu.Searching.Query.ModifyQueryAND(query, $"subsidyProviderIco:{icoPoskytovatele}");
 
     var options = new HlidacStatu.Web.Models.DotaceAnalBoxes.GeneraModel()
     {
@@ -33,7 +38,7 @@
     };
 
     ViewBag.Title = "Hlídač dotací";
-    ViewBag.SubTitle = $"Přehled největších dotačních programů{yearText} pro {typDotaceText}";
+    ViewBag.SubTitle = $"{(string.IsNullOrWhiteSpace(icoPoskytovatele) ? "" : Firmy.GetJmeno(icoPoskytovatele)+": ")} Přehled největších dotačních programů{yearText} {typDotaceText}";
 }
 
 @section breadcrumb
@@ -62,8 +67,7 @@
 
 <h4>Vyberte rok, za který chcete zobrazit data</h4>
 <partial name="_pager"
-         model="@(ValueTuple.Create((int?)(typDotace >= 2 ? 2021 : null), (int?)null, rok, $"/Dotace/TopDotacniProgramy?typDotace={typDotace}"))"
-/>
+         model="@(ValueTuple.Create((int?)(typDotace >= 2 ? 2021 : null), (int?)null, rok, $"/Dotace/TopDotacniProgramy?typDotace={typDotace}&icoPoskytovatele={icoPoskytovatele}&icoPrijemce={icoPrijemce}"))" />
 
 @if (rok > DotaceRepo.LastCompleteYear)
 {
@@ -72,6 +76,6 @@
     </div>
 }
 
-<h4>@ViewBag.SubTitle</h4>
+<h3 class="pt-4">@ViewBag.SubTitle</h3>
 
 <partial name="analBoxes/_tblTopProgramy" model="options" />

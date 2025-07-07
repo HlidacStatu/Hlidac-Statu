@@ -118,16 +118,31 @@
                         <p>
                             Holdingy a skupiny spřízněných firem, které jsou největšími příjemci dotací , souhrnně od roku @(HlidacStatu.Repositories.DotaceRepo.DefaultLimitedYears.First()) i po jednotlivých letech.
                         </p>
-                        <a href="#" class="btn btn-primary btn-sm disabled">Připravujeme</a>
-                        @* <a href="/Dotace/TopPrijemci?ftyp=0" class="btn btn-primary btn-sm">Celkem</a> *@
-                        @* @foreach (var rok in HlidacStatu.Repositories.DotaceRepo.DefaultLimitedYears.Reverse().Take(3)) *@
-                        @* { *@
-                        @*     <a href="/Dotace/TopPrijemci?ftyp=0&rok=@(rok)" class="btn btn-primary btn-sm">@rok</a> *@
-                        @* } *@
-                        @* <a href="#" class="btn btn-primary btn-sm ">Další</a> *@
-
+                        <a href="/Dotace/TopHoldingy?ftyp=0" class="btn btn-primary btn-sm">Celkem</a>
+                        @foreach (var rok in HlidacStatu.Repositories.DotaceRepo.DefaultLimitedYears.Reverse().Take(3))
+                        {
+                            <a href="/Dotace/TopHoldingy?ftyp=0&rok=@(rok)" class="btn btn-primary btn-sm">@rok</a>
+                        }
+                        <a href="/Dotace/TopHoldingy?ftyp=0" class="btn btn-primary btn-sm ">Další</a>
                     </div>
                 </div>
+                <div class="col d-flex align-items-start">
+                    <div>
+                        <i class="fa-solid fa-gauge-high fa-2x p-2 m-2 fa-border bg-body-secondary rounded-3"></i>
+                    </div>
+                    <div>
+                        <h3 class="pt-2 text-body-emphasis">Státní holdingy</h3>
+                        <p>
+                            Holdingy a skupiny spřízněných firem vlastněné státem, které jsou největšími příjemci dotací , souhrnně od roku @(HlidacStatu.Repositories.DotaceRepo.DefaultLimitedYears.First()) i po jednotlivých letech.
+                        </p>
+                        <a href="/Dotace/TopHoldingy?ftyp=1" class="btn btn-primary btn-sm">Celkem</a>
+                        @foreach (var rok in HlidacStatu.Repositories.DotaceRepo.DefaultLimitedYears.Reverse().Take(3))
+                        {
+                            <a href="/Dotace/TopHoldingy?ftyp=1&rok=@(rok)" class="btn btn-primary btn-sm">@rok</a>
+                        }
+                        <a href="/Dotace/TopHoldingy?ftyp=1" class="btn btn-primary btn-sm ">Další</a>
+                    </div>
+                </div> 
                 <div class="col d-flex align-items-start">
                     <div>
                         <i class="fa-solid fa-gauge-high fa-2x p-2 m-2 fa-border bg-body-secondary rounded-3"></i>

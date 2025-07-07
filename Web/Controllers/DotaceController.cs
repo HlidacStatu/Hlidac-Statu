@@ -178,7 +178,11 @@ namespace HlidacStatu.Web.Controllers
             ViewData["dtyp"] = dtyp;
 
 
-            var data = DotaceRepo.TopDotaceHoldingCache.Get().ToList();
+            List<Lib.Analytics.StatisticsSubjectPerYear<Firma.Statistics.Dotace>> data = null;
+            if (ftyp.HasValue && ftyp.Value == (int)Firma.TypSubjektuEnum.PatrimStatu)
+                data = DotaceRepo.TopDotaceHoldingStatniCache.Get().ToList();
+            else
+                data = DotaceRepo.TopDotaceHoldingCache.Get().ToList();
 
             return View(data);
         }
@@ -272,11 +276,13 @@ namespace HlidacStatu.Web.Controllers
             return View(data);
         }
 
-        [HlidacCache(22 * 60 * 60, "typdotace;rok", false)]
-        public async Task<ActionResult> TopDotacniProgramy(int typDotace, int? rok = null)
+        [HlidacCache(22 * 60 * 60, "typdotace;rok;icoPoskytovatele;icoPrijemce", false)]
+        public async Task<ActionResult> TopDotacniProgramy(int typDotace, int? rok = null, string icoPoskytovatele= null, string icoPrijemce = null)
         {
             ViewData["rok"] = rok;
             ViewData["typDotace"] = typDotace;
+            ViewData["icoPoskytovatele"] = icoPoskytovatele;
+            ViewData["icoPrijemce"] = icoPrijemce;
             return View();
         }
 

@@ -784,7 +784,7 @@ namespace HlidacStatu.Repositories
 
         public static async
             Task<List<(string ProgramName, string ProgramCode, string SubsidyProviderIco, long Count, decimal AssumedAmountSummed)>>
-            TopDotacniProgramy(Dotace.Hint.Type? typDotace = null, int? rok = null, string? customquery = null)
+            TopDotacniProgramy(Dotace.Hint.Type? typDotace = null, int? rok = null, string? subsidyProviderIco=null, string? customquery = null)
         {
             var aggs = new AggregationContainerDescriptor<Dotace>()
                 .MultiTerms("distinct_programs", mt => mt
@@ -809,6 +809,9 @@ namespace HlidacStatu.Repositories
             }
             else
             {
+                if (subsidyProviderIco != null)
+                    query = HlidacStatu.Searching.Query.ModifyQueryAND(query, $"subsidyProviderIco:{subsidyProviderIco}");
+
                 if ( typDotace != null ) 
                     query = HlidacStatu.Searching.Query.ModifyQueryAND(query,  $"hints.subsidyType:{typDotace:D}");
 
