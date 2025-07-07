@@ -28,7 +28,8 @@ namespace SponzoriLoader
             // "https://zpravy.udhpsh.cz/zpravy/vfz2020.json",
             // "https://zpravy.udhpsh.cz/zpravy/vfz2021.json",
             // "https://zpravy.udhpsh.cz/zpravy/vfz2022.json",
-            "https://zpravy.udhpsh.cz/zpravy/vfz2023.json"
+            // "https://zpravy.udhpsh.cz/zpravy/vfz2023.json"
+            "https://zpravy.udhpsh.cz/zpravy/vfz2024.json"
         };
         
         private static void LoadDataFromFiles(Donations peopleDonations, Donations companyDonations)
