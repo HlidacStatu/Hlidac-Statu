@@ -335,58 +335,18 @@
         {
             ico = item.Id.Replace("ico:", "").Trim();
         }
+        
+        var organizace = await PuRepo.GetOrganizaceForIcoAsync(ico);
 
-        if (ico is null)
-            return;
-
-        var foundFirmy = await _db!.FirmaDs.AsNoTracking()
-            .Where(o => o.Ico == ico).ToListAsync();
-
-        if (foundFirmy is null || !foundFirmy.Any())
-            return;
-
-        int? orgId = null;
-        foreach (var foundFirma in foundFirmy)
-        {
-            var foundPuOrg = await _db!.PuOrganizace.AsNoTracking()
-                .Where(o => o.DS == foundFirma.DatovaSchranka)
-                .FirstOrDefaultAsync();
-
-            if (foundPuOrg is not null)
-            {
-                orgId = foundPuOrg.Id;
-                break;
-            }
-        }
-
-        if (orgId is null)
-        {
-            var firstCompany = foundFirmy.FirstOrDefault();
-            if (firstCompany is null)
-                throw new Exception("Firma nenalezena!");
-
-            // create new org
-            var newOrganizace = new PuOrganizace()
-            {
-                DS = firstCompany.DatovaSchranka
-            };
-            await PpRepo.UpsertOrganizaceAsync(newOrganizace);
-            orgId = newOrganizace.Id;
-        }
-
-        if (orgId is null)
-        {
-            throw new Exception("id stale nenalezeno");
-        }
-
-
+        var orgId = organizace.Id;
+        
         //try update preloadedOrgs
-        if (!PreloadedOrgs.ContainsKey(orgId.Value))
+        if (!PreloadedOrgs.ContainsKey(orgId))
         {
-            PreloadedOrgs.Add(orgId.Value, item.Text);
+            PreloadedOrgs.Add(orgId, item.Text);
         }
 
-        NewIncome.IdOrganizace = orgId.Value;
+        NewIncome.IdOrganizace = orgId;
     }
     
     private bool IsValidForm()
