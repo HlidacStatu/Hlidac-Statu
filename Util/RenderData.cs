@@ -527,6 +527,27 @@ namespace HlidacStatu.Util
                 return increaseTxt.Contains("{0") ? string.Format(increaseTxt, change) : increaseTxt;
         }
 
+        public static string TimeSpanToDaysHoursMinutes(TimeSpan timeSpan)
+        {
+            int days = timeSpan.Days;
+            int hours = timeSpan.Hours;
+            int minutes = timeSpan.Minutes;
+
+            var parts = new List<string>();
+
+            if (days > 0)
+                parts.Add(Devmasters.Lang.CS.Plural.Get(days, "jeden den", "{0} dny", "{0} dnů"));
+
+            if (hours > 0)
+                parts.Add(Devmasters.Lang.CS.Plural.Get(hours, "jedna hodina", "{0} hodiny", "{0} hodin"));
+
+            if (minutes > 0)
+                parts.Add(Devmasters.Lang.CS.Plural.Get(days, "jenda minuta", "{0} minuty", "{0} minut"));
+
+            return parts.Count > 0 ? string.Join(", ", parts) : "méně než minuta";
+        }
+
+
         const string accentedCharacters = "àèìòùÀÈÌÒÙáéíóúýÁÉÍÓÚÝâêîôûÂÊÎÔÛãñõÃÑÕäëïöüÿÄËÏÖÜŸçÇßØøÅåÆæœčČšŠřŘžŽťŤňŇďĎĺĹěĚúÚůŮ";
         static HashSet<string> stopWords = new Devmasters.Lang.CS.CzechStemmerAgressive().StopWords;
         static HashSet<string> stopWordsAscii = new Devmasters.Lang.CS.CzechStemmerAgressive().StopWords
