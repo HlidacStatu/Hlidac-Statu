@@ -191,7 +191,7 @@ namespace HlidacStatu.Connectors
             {
                 try
                 {
-                    p.ExecuteNonQuery(DefaultCnnStr, type, sql, param);
+                    p.ExecuteNonQuery(cnnString ?? DefaultCnnStr, type, sql, param);
 
                 }
                 catch (Exception e)
@@ -211,10 +211,10 @@ namespace HlidacStatu.Connectors
             return GetRawSql(CommandType.Text, text, pars);
 
         }
-            public static string GetRawSql(CommandType typ, string text, IDataParameter[] pars)
+            public static string GetRawSql(CommandType typ, string text, IDataParameter[] pars, string connString = null)
         {
             // vytahne spoj a inicializuje
-            string _connStr = DefaultCnnStr;
+            string _connStr = connString ?? DefaultCnnStr;
             var conn = new SqlConnection(_connStr);
 
             // nastaveni prikazu
