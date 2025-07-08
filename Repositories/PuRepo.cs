@@ -784,4 +784,42 @@ select distinct ds.DatovaSchranka, f.ico from firma f
 
         return $"{parts.cislo + 1}/{DateTime.Now.Year}/{postfix}";
     }
+
+    public static async Task<PuOrganizace> GetOrganizaceForIcoAsync(string ico)
+    {
+        if (string.IsNullOrWhiteSpace(ico))
+            return null;
+
+        await using var db = new DbEntities();
+        
+        var foundFirmy = await db.FirmaDs.AsNoTracking()
+            .Where(o => o.Ico == ico && o.DsParent == null)
+            .ToListAsync();
+
+        if (foundFirmy is null || !foundFirmy.Any())
+            return null;
+
+        foreach (var foundFirma in foundFirmy)
+        {
+            var foundPuOrg = await db.PuOrganizace.AsNoTracking()
+                .Where(o => o.DS == foundFirma.DatovaSchranka)
+                .FirstOrDefaultAsync();
+
+            if (foundPuOrg is not null)
+            {
+                return foundPuOrg;
+            }
+        }
+        
+        var firstCompany = foundFirmy.FirstOrDefault();
+        
+        // create new org
+        var newOrganizace = new PuOrganizace()
+        {
+            DS = firstCompany.DatovaSchranka
+        };
+        await PpRepo.UpsertOrganizaceAsync(newOrganizace);
+        
+        return newOrganizace;
+    }
 }
