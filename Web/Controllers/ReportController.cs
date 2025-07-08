@@ -94,6 +94,14 @@ namespace HlidacStatu.Web.Controllers
 
         }
 
+        [Route("34")]
+        public IActionResult ProslovyPSP(int? obdobi)
+        {
+            ViewBag.Title = "Žvanírna ve Sněmovně parlamentu";
+            return View("34_ProslovyPSP",obdobi);
+        }
+
+
         [Route("99")]
         public IActionResult CovidUmrti()
         {
