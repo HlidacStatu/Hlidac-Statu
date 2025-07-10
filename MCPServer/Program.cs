@@ -60,6 +60,7 @@ if (enableAuth)
 builder.Services.AddMcpServer()
     .WithHttpTransport()
     .WithTools<ReverseEchoTool>()
+    .WithTools<Firmy>()
     ;
 
 builder.Services.AddOpenTelemetry()
