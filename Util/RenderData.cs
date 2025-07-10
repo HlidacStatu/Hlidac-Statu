@@ -527,11 +527,12 @@ namespace HlidacStatu.Util
                 return increaseTxt.Contains("{0") ? string.Format(increaseTxt, change) : increaseTxt;
         }
 
-        public static string TimeSpanToDaysHoursMinutes(TimeSpan timeSpan)
+        public static string TimeSpanToDaysHoursMinutes(TimeSpan timeSpan, bool withSeconds = false)
         {
             int days = timeSpan.Days;
             int hours = timeSpan.Hours;
             int minutes = timeSpan.Minutes;
+            int seconds = timeSpan.Seconds;
 
             var parts = new List<string>();
 
@@ -542,7 +543,10 @@ namespace HlidacStatu.Util
                 parts.Add(Devmasters.Lang.CS.Plural.Get(hours, "jedna hodina", "{0} hodiny", "{0} hodin"));
 
             if (minutes > 0)
-                parts.Add(Devmasters.Lang.CS.Plural.Get(days, "jenda minuta", "{0} minuty", "{0} minut"));
+                parts.Add(Devmasters.Lang.CS.Plural.Get(minutes, "jedna minuta", "{0} minuty", "{0} minut"));
+
+            if (withSeconds && seconds > 0)
+                parts.Add(Devmasters.Lang.CS.Plural.Get(seconds, "1 s", "{0} s", "{0} s"));
 
             return parts.Count > 0 ? string.Join(", ", parts) : "méně než minuta";
         }

@@ -95,6 +95,7 @@ namespace HlidacStatu.Web.Controllers
         }
 
         [Route("34")]
+        [HlidacCache(12 * 60 * 60, "obdobi", true)]
         public IActionResult ProslovyPSP(int? obdobi)
         {
             ViewBag.Title = "Žvanírna ve Sněmovně parlamentu";

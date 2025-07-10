@@ -60,12 +60,12 @@ namespace HlidacStatu.Repositories
 
         public static Devmasters.Cache.LocalMemory.Cache<List<double>> BasicStatisticData = null;
 
-        public static Devmasters.Cache.AWS_S3.Cache<string> CzechDictCache = 
+        public static Devmasters.Cache.AWS_S3.Cache<string> CzechDictCache =
             new Devmasters.Cache.AWS_S3.Cache<string>(
                 new string[] { Devmasters.Config.GetWebConfigValue("Minio.Cache.Endpoint") }, Devmasters.Config.GetWebConfigValue("Minio.Cache.Bucket"), Devmasters.Config.GetWebConfigValue("Minio.Cache.AccessKey"), Devmasters.Config.GetWebConfigValue("Minio.Cache.SecretKey"),
             TimeSpan.Zero, "Czech.3-2-5.dic.txt", (obj) =>
             {
-                string s= Devmasters.Net.HttpClient.Simple.GetAsync("https://somedata.hlidacstatu.cz/appdata/Czech.3-2-5.dic.txt").Result;
+                string s = Devmasters.Net.HttpClient.Simple.GetAsync("https://somedata.hlidacstatu.cz/appdata/Czech.3-2-5.dic.txt").Result;
                 return s;
             }, null);
         public static Devmasters.Cache.AWS_S3.Cache<string> CrawlerUserAgentsCache = new Devmasters.Cache.AWS_S3.Cache<string>(new string[] { Devmasters.Config.GetWebConfigValue("Minio.Cache.Endpoint") }, Devmasters.Config.GetWebConfigValue("Minio.Cache.Bucket"), Devmasters.Config.GetWebConfigValue("Minio.Cache.AccessKey"), Devmasters.Config.GetWebConfigValue("Minio.Cache.SecretKey"),
@@ -239,6 +239,73 @@ namespace HlidacStatu.Repositories
             "lubomir-wenzl","milan-wenzl","renata-zajickova","miroslav-zborovsky-2","vladimir-zlinsky","michal-zuna"
         };
 
+        public static string[] Poslanci2021Vsichni = new string[] {
+            "alena-schillerova","ales-dufek","ales-juchelka","andrea-babisova","andrej-babis","antonin-tesarik",
+            "barbora-urbanova-5","berenika-pestova-1","bohuslav-svoboda","cerny-oldrich","david-kasal","david-prazak-5",
+            "david-simek-15","david-stolpa","drahoslav-ryba","dvorak-jaroslav-1","eliska-olsakova","eva-decroix",
+            "eva-fialova-8","frantisek-petrtyl","hana-naiclerova","hayato-okamura","helena-langsadlova","helena-valkova",
+            "hubert-lang","igor-hendrych-3","ivan-adamec","ivan-bartos","ivan-jac-4","ivana-madlova","iveta-stefanova-1",
+            "ivo-vondrak","jakub-janda","jakub-michalek","jan-bartosek","jan-bauer","berenika-pestova-1","jan-bures",
+            "jan-farsky","jan-hofmann","jan-hrncir","jan-jakob","jan-kubik-9","jan-kuchar-13","jan-lacina-1","jan-richter",
+            "jan-sila-10","jan-skopecek","jan-volny","jana-bacikova","jana-berkovcova","jana-cernochova","jana-hanzlikova",
+            "jana-krutakova","jana-mrackova-vildumetzova","jana-pastuchova","jarmila-levko","jaromir-dedecek-1","jaroslav-basta",
+            "jaroslav-bzoch-1","jaroslav-faltynek","jaroslav-foldyna","jaroslava-pokorna-jermanova","jiri-carbol",
+            "jiri-hajek-62","jiri-havranek-25","jiri-horak","jiri-kobza-2","jiri-masek-50","jiri-navratil","jiri-slavik-28",
+            "jiri-strycek","josef-belica","josef-bernard","josef-cogan","josef-flek-6","josef-kott","josef-vana-25",
+            "julius-spicak","kamal-farhan","kamila-blahova-3","karel-haas","karel-havlicek-3","karel-krejza","karel-rais",
+            "karel-sladecek-1","karel-smetana-16","karel-turecek","karla-marikova","klara-dostalova","klara-kocmanova",
+            "ladislav-oklestek","lenka-drazilova","lenka-knechtova","libor-turek","lubomir-broz-3","lubomir-metnar",
+            "lubomir-wenzl","lucie--safrankova","lucie-potuckova","lukas-vlcek","marcel-dlask","marek-benda","marek-novak-12",
+            "marek-vyborny","marek-zenisek","margita-balastikova","marian-jurecka","marie-jilkova","marie-posarova",
+            "marketa-pekarova-adamova","martin-baxa","martin-dlouhy","martin-exner-1","martin-hajek-2","martin-kolovratnik",
+            "martin-kukla-1","martin-kupka","martin-major","martina-ochodnicka","matej-ondrej-havel","michael-kohajda",
+            "michael-rataj","michaela-opltova","michaela-sebelova-1","michal-kucera","michal-ratiborsky","michal-zuna",
+            "milada-voborska","milan-brazdil","milan-feranec","milan-wenzl","milos-novy","miloslav-janulik",
+            "miroslav-zborovsky-2","monika-oborna","nina-novakova","olga-richterova","ondrej-babka","ondrej-benesik",
+            "ondrej-kolar","ondrej-lochman","patrik-nacher","pavel-belobradek","pavel-blazek","pavel-kasnik","pavel-klima-31",
+            "pavel-ruzicka-19","pavel-stanek","pavel-svoboda-199","pavel-zacek","pavla-golasowska","pavla-vankova-4",
+            "petr-beitl","petr-bendl","petr-fiala","petr-fifka","petr-gazdik","petr-letocha","petr-liska","petr-sadovsky-4",
+            "petr-vrana-2","petra-quittova","radek-koten","radek-rozvoral","radek-vondracek","radim-fiala","radovan-vich-1",
+            "renata-oulehlova-1","renata-zajickova","richard-brabec","robert-kralicek","robert-strzinek","robert-teleky",
+            "roman-belor","roman-kubicek","romana-belohlavkova","romana-fischerova-1","rudolf-salvetr","silvia-dousova",
+            "simon-heller","stanislav-berkovec","stanislav-blaha","stanislav-fridrich-2","tatana-mala-2","tom-philipp",
+            "tomas-dubsky-10","tomas-helebrant-3","tomas-kohoutek-7","tomas-muller-39","tomio-okamura","vaclav-kral",
+            "vera-adamkova-1","vera-kovarova","viktor-vojtko","vit-kankovsky","vit-rakusan","vit-vomacka","vladimir-balas",
+            "vladimir-zlinsky","vladimira-lesenska","vlastimil-valek","vojtech-munzar","zbynek-stanjura","zdenek-kettner-3",
+            "zdenka-nemeckova-crkvenjas","zuzana-ozanova","jan-berki","radim-holis","bohuslav-hudec","radim-jirout",
+            "miroslav-samas"
+        };
+        public static Osoba[] Poslanci2021VsichniOsoby = Poslanci2021Vsichni
+            .Select(m=>Osoby.GetByNameId.Get(m))
+            .ToArray();
+
+        public static string[] Poslanci2021OdesliDrive = new string[] {
+            "jan-farsky",
+            "david-simek-15",
+            "jana-mrackova-vildumetzova",
+            "jaroslav-basta",
+            "jaroslav-bzoch-1",
+            "jaroslava-pokorna-jermanova",
+            "klara-dostalova",
+            "milan-feranec",
+            "ondrej-kolar",
+            "ondrej-lochman",
+            "radim-holis"
+        };
+
+        public static string[] Poslanci2021NastoupiliPozdeji = new string[] {
+            "jaromir-dedecek-1",
+            "kamila-blahova-3",
+            "marcel-dlask",
+            "martin-dlouhy",
+            "silvia-dousova",
+            "josef-vana-25",
+            "jarmila-levko",
+            "margita-balastikova",
+            "bohuslav-hudec",
+            "radim-jirout",
+            "miroslav-samas"
+        };
 
         static StaticData()
         {

@@ -12,7 +12,7 @@
 
 @{
     Layout = "_ReportLayout";
-    int[] obdobiList = new int[] { 1998, 2002, 2006, 2010, 2013, 2017, 2021, 2025 };
+
     string cnn = Devmasters.Config.GetWebConfigValue("MetabaseCnn");
     HlidacStatu.Web.Models.ProslovyContext _context = new HlidacStatu.Web.Models.ProslovyContext(
         new DbContextOptionsBuilder<ProslovyContext>().UseSqlServer(cnn).Options
@@ -21,8 +21,40 @@
     int? aktualniObdobi = _context.Proslovy.Max(x => x.obdobi);
     int obdobi = Model ?? aktualniObdobi.Value;
 
+    int[] obdobiList = new int[] { 1998, 2002, 2006, 2010, 2013, 2017, 2021, 2025 };
+    Dictionary<int, string> obdobiOdDo = new();
+    @for (int i = 0; i < obdobiList.Length - 1; i++)
+    {
+        var o = obdobiList[i];
+        var oo = obdobiList[i + 1];
+        obdobiOdDo.Add(o, $"{o}-{oo}");
+    }
+
+    if (obdobiOdDo.ContainsKey(obdobi) == false)
+    {
+        obdobi = obdobiOdDo.Last().Key;
+    }
+
+
+
     int? minuleObdobi = _context.Proslovy.Where(x => x.obdobi != aktualniObdobi).Max(x => x.obdobi);
     //int? aktualniRok = _context.Proslovy.Max(x => x.datum.HasValue ? x.datum.Value.Year : 0);
+
+    //srovnani obdobi
+    var porovnaniObdobi = HlidacStatu.Connectors.DirectDB.GetList<int, double, double, double, double>(
+                @"SELECT DISTINCT obdobi
+      ,PERCENTILE_CONT(0.5) WITHIN GROUP (ORDER BY dobaproslovusec)
+                            OVER (PARTITION BY obdobi) AS m50
+      ,PERCENTILE_CONT(0.75) WITHIN GROUP (ORDER BY stenozaznamy.dobaproslovusec)
+                            OVER (PARTITION BY obdobi) AS m75
+      ,PERCENTILE_CONT(0.9) WITHIN GROUP (ORDER BY dobaproslovusec)
+                            OVER (PARTITION BY obdobi) AS m90
+      ,PERCENTILE_CONT(0.99) WITHIN GROUP (ORDER BY dobaproslovusec)
+                            OVER (PARTITION BY obdobi) AS m99
+    FROM stenozaznamy
+    where dobaProslovuSec > 60
+    order by obdobi", cnnString: cnn);
+
 
     // Nejdéle hovořící poslanci v tomto období
     var topHovorici = _context.Proslovy
@@ -36,10 +68,24 @@
     // Nejméně hovořící poslanci v tomto období (kteří mají aspoň 1 záznam)
     var minHovorici = _context.Proslovy
         .Where(s => s.obdobi == obdobi)
-        .Where(s => !string.IsNullOrEmpty(s.politiciZminky) && !string.IsNullOrEmpty(s.OsobaId))
+        .Where(s => !string.IsNullOrEmpty(s.OsobaId))
         .GroupBy(s => new { s.OsobaId, s.celeJmeno, s.politickaStrana })
-        .Select(g => new { g.Key.OsobaId, Jmeno = g.Key.celeJmeno, Strana = g.Key.politickaStrana, DobaCelkem = g.Sum(x => x.dobaProslovuSec) ?? 0 })
-        .OrderBy(x => x.DobaCelkem).Take(5).ToList();
+        .Select(g => new MinHovoriciDto { OsobaId = g.Key.OsobaId, Jmeno = g.Key.celeJmeno, Strana = g.Key.politickaStrana, DobaCelkem = g.Sum(x => x.dobaProslovuSec) ?? 0 })
+        .OrderBy(x => x.DobaCelkem)
+        .ToList();
+    if (obdobi == aktualniObdobi)
+    {
+        // Pro @(obdobiOdDo[obdobi]) bereme jen poslance, kteří mají aspoň 1 záznam
+        var vsichni_poslanci = HlidacStatu.Repositories.StaticData.Poslanci2021VsichniOsoby
+            .Where(m => minHovorici.Any(mh => mh.OsobaId == m.NameId) == false)
+            .Select(m => new MinHovoriciDto { OsobaId = m.NameId, Jmeno = m.FullName(), Strana = m.CurrentPoliticalParty(), DobaCelkem = 0 })
+            .ToList();
+        minHovorici = minHovorici
+            .Concat(vsichni_poslanci)
+            .OrderBy(x => x.DobaCelkem)
+            .ToList();
+    }
+    minHovorici = minHovorici.Take(10).ToList();
 
     // Politici nejčastěji zmínění v projevech ostatních
 
@@ -58,28 +104,32 @@
         .Where(s => s.obdobi == obdobi)
         .GroupBy(s => s.schuze)
         .Select(g => new { Schuze = g.Key, DobaCelkem = g.Sum(x => x.dobaProslovuSec) ?? 0 })
-        .OrderByDescending(x => x.DobaCelkem).Take(5).ToList();
+        .OrderByDescending(x => x.DobaCelkem)
+        .Take(10).ToList();
 
     // Schůze, na kterých se v součtu řečnilo nejméně
     var schuzeNejkratsi = _context.Proslovy
         .Where(s => s.obdobi == obdobi)
         .GroupBy(s => s.schuze)
         .Select(g => new { Schuze = g.Key, DobaCelkem = g.Sum(x => x.dobaProslovuSec) ?? 0 })
-        .OrderBy(x => x.DobaCelkem).Take(5).ToList();
+        .OrderBy(x => x.DobaCelkem)
+        .Take(10).ToList();
 
     // Body programu, u kterých se nejdéle v součtu řečnilo
     var bodyNejdelsi = _context.Proslovy
         .Where(s => s.obdobi == obdobi && !string.IsNullOrEmpty(s.tema))
         .GroupBy(s => s.tema)
         .Select(g => new { Tema = g.Key, DobaCelkem = g.Sum(x => x.dobaProslovuSec) ?? 0 })
-        .OrderByDescending(x => x.DobaCelkem).Take(5).ToList();
+        .OrderByDescending(x => x.DobaCelkem)
+        .Take(10).ToList();
 
     // Body programu, u kterých se v součtu řečnilo nejméně
     var bodyNejkratsi = _context.Proslovy
         .Where(s => s.obdobi == obdobi && !string.IsNullOrEmpty(s.tema))
         .GroupBy(s => s.tema)
         .Select(g => new { Tema = g.Key, DobaCelkem = g.Sum(x => x.dobaProslovuSec) ?? 0 })
-        .OrderBy(x => x.DobaCelkem).Take(5).ToList();
+        .OrderBy(x => x.DobaCelkem)
+        .Take(10).ToList();
 
     // Nejvíce výřečné/nejméně výřečné strany (celkový čas za stranu / počet poslanců)
     var strany = _context.Proslovy
@@ -92,42 +142,112 @@
             PocetPoslancu = g.Select(x => x.OsobaId).Distinct().Count(),
             PrumerNaPoslance = (g.Sum(x => x.dobaProslovuSec) ?? 0) / (g.Select(x => x.OsobaId).Distinct().Count() == 0 ? 1 : g.Select(x => x.OsobaId).Distinct().Count())
         })
-        .OrderByDescending(x => x.PrumerNaPoslance).Take(5).ToList();
-
-    // Top 5 nejdelších jednorázových projevů v aktuálním období
-    var topProjevy = _context.Proslovy
-        .Where(s => s.obdobi == obdobi)
-        .OrderByDescending(s => s.dobaProslovuSec)
-        .Take(5)
-        .ToList();
+        .OrderByDescending(x => x.PrumerNaPoslance)
+        .Take(10).ToList();
 
 
 }
 
-<h2 id="tblHead">
-    Jednání a proslovy poslanců v Poslanecké sněmovně Parlamentu ČR   
-</h2>
+@functions {
+    public class MinHovoriciDto
+    {
+        public string? OsobaId { get; set; }
+        public string? Jmeno { get; set; }
+        public string? Strana { get; set; }
+        public double DobaCelkem { get; set; }
+    }
+}
 
+<h2 id="tblHead">
+    Jednání a proslovy poslanců v Poslanecké sněmovně Parlamentu ČR
+</h2>
+<p class="lead">Zanalyzovali jsme všechny smlouvy a vztahy dodavatelů a zadavatelů a nalezli jsme tyto neobvyklé nárůsty smluvních vztahů</p>
+
+
+
+<h2>Porovnání délek proslovů v jednotlivých volebních období</h2>
+<p>Do srovnání jsme zahrnuli pouze proslovy dlouhe alespoň 1 minutu</p>
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Počátek volebního období</th>
+            <th class="d-none d-md-table-cell">Mediánová délka proslovu byla</th>
+            <th>75% proslovů bylo kratších než</th>
+            <th class ="d-none d-md-table-cell">10% proslovů bylo delších než</th>
+            <th>1% proslovů bylo delších než</th>
+        </tr>
+    </thead>
+    <tbody>
+        @* (int obdobi, double m50, double m75, double m90) *@
+        @{
+            Tuple<int, double, double, double, double> prev = null;
+            double topVal2 = porovnaniObdobi.Max(m => m.Item2);
+            double topVal3 = porovnaniObdobi.Max(m => m.Item3);
+            double topVal4 = porovnaniObdobi.Max(m => m.Item4);
+            double topVal5 = porovnaniObdobi.Max(m => m.Item5);
+        }
+        @foreach (var p in porovnaniObdobi)
+        {
+            <tr>
+                <td>@(obdobiOdDo[p.Item1])</td>
+                <td class="d-none d-md-table-cell">
+                    @HlidacStatu.Util.RenderData.TimeSpanToDaysHoursMinutes(TimeSpan.FromSeconds(p.Item2), true)
+                    @if (prev != null)
+                    {
+                        double zmena = (p.Item2 - prev.Item2) / prev.Item2;
+                        <span class="text-@(zmena > 0 ? "danger" : "success") ms-3 @(p.Item2 == topVal2 ? "fw-bold" : "")">@($"{(zmena > 0 ? "+" : "")}{zmena:P2}")</span>
+                    }
+                </td>
+                <td>
+                    @HlidacStatu.Util.RenderData.TimeSpanToDaysHoursMinutes(TimeSpan.FromSeconds(p.Item3), true)
+                    @if (prev != null)
+                    {
+                        double zmena = (p.Item3 - prev.Item3) / prev.Item3;
+                        <span class="text-@(zmena > 0 ? "danger" : "success") ms-3 @(p.Item3 == topVal3 ? "fw-bold" : "")">@($"{(zmena > 0 ? "+" : "")}{zmena:P2}")</span>
+                    }
+
+                </td>
+                <td class="d-none d-md-table-cell">
+                    @HlidacStatu.Util.RenderData.TimeSpanToDaysHoursMinutes(TimeSpan.FromSeconds(p.Item4), true)
+                    @if (prev != null)
+                    {
+                        double zmena = (p.Item4 - prev.Item4) / prev.Item4;
+                        <span class="text-@(zmena > 0 ? "danger" : "success") ms-3 @(p.Item4 == topVal4 ? "fw-bold" : "")">@($"{(zmena > 0 ? "+" : "")}{zmena:P2}")</span>
+                    }
+                </td>
+                <td>
+                    @HlidacStatu.Util.RenderData.TimeSpanToDaysHoursMinutes(TimeSpan.FromSeconds(p.Item5), true)
+                    @if (prev != null)
+                    {
+                        double zmena = (p.Item5 - prev.Item5) / prev.Item5;
+                        <span class="text-@(zmena > 0 ? "danger" : "success") ms-3 @(p.Item5 == topVal5 ? "fw-bold" : "")">@($"{(zmena > 0 ? "+" : "")}{zmena:P2}")</span>
+                    }
+                </td>
+            </tr>
+            prev = p;
+        }
+    </tbody>
+</table>
+<hr />
 <p>
 
     <div class="btn-group btn-group-sm" role="group">
-        <span class="input-group-text">Období</span>
-        @for (int i = 0; i < obdobiList.Length-1; i++)
+        <span class="input-group-text">Sstatistika pro </span>
+        @for (int i = 0; i < obdobiList.Length - 1; i++)
         {
             var o = obdobiList[i];
             var oo = obdobiList[i + 1];
-            <a href="@Html.GetRequestPath()?obdobi=@(o)" type="button" class="btn btn-sm btn-@((obdobi == o ? "":"outline-"))primary">@o-@oo</a>
+            <a href="@Html.GetRequestPath()?obdobi=@(o)" type="button" class="btn btn-sm btn-@((obdobi == o ? "" : "outline-"))primary">@o-@oo</a>
         }
     </div>
 </p>
 
-<p>Zanalyzovali jsme všechny smlouvy a vztahy dodavatelů a zadavatelů a nalezli jsme tyto neobvyklé nárůsty smluvních vztahů</p>
 
 
 <p>
 
-    <h2>Top 5 nejdéle hovořících poslanců (aktuální období)</h2>
-    <table class="table table-striped">
+    <h2>Top 10 nejdéle hovořících poslanců (@(obdobiOdDo[obdobi]))</h2>
+    <table class="table table-striped table-sm">
         <thead>
             <tr>
                 <th>Jméno</th>
@@ -141,37 +261,16 @@
                 <tr>
                     <td>@p.Jmeno</td>
                     <td>@p.Strana</td>
-                    <td>@HlidacStatu.Util.RenderData.TimeSpanToDaysHoursMinutes(TimeSpan.FromSeconds(p.DobaCelkem) )</td>
-                </tr>
-            }
+                    <td>
+                        @(p.DobaCelkem == 0 ? "nepromluvil/a" : HlidacStatu.Util.RenderData.TimeSpanToDaysHoursMinutes(TimeSpan.FromSeconds(p.DobaCelkem))
+                                            )
+                </td>
+            </tr>
+                        }
         </tbody>
     </table>
 
-    <h2 class="mt-5">Top 5 nejdelších jednorázových projevů (aktuální období)</h2>
-    <table class="table table-striped">
-        <thead>
-            <tr>
-                <th>Jméno</th>
-                <th>Strana</th>
-                <th>Schůze</th>
-                <th>Bod programu</th>
-                <th>Délka projevu (min)</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var s in topProjevy)
-            {
-                <tr>
-                    <td>@s.celeJmeno</td>
-                    <td>@s.politickaStrana</td>
-                    <td>@s.schuze</td>
-                    <td>@s.tema</td>
-                    <td>@(Math.Round(((double?)s.dobaProslovuSec ?? 0) / 60, 1))</td>
-                </tr>
-            }
-        </tbody>
-    </table>
-    <h2 class="mt-5">Top 5 nejméně hovořících poslanců (aktuální období)</h2>
+    <h2 class="mt-5">Top 10 nejméně hovořících poslanců (@(obdobiOdDo[obdobi]))</h2>
     <table class="table table-striped">
         <thead>
             <tr>
@@ -186,7 +285,7 @@
                 <tr>
                     <td>@p.Jmeno</td>
                     <td>@p.Strana</td>
-                    <td>@(Math.Round(((double)p.DobaCelkem) / 3600, 2))</td>
+                    <td>@HlidacStatu.Util.RenderData.TimeSpanToDaysHoursMinutes(TimeSpan.FromSeconds(p.DobaCelkem))</td>
                 </tr>
             }
         </tbody>
@@ -212,7 +311,7 @@
     @*     </tbody> *@
     @* </table>  *@
 
-    <h2 class="mt-5">Schůze s nejdelší řečnickou dobou (aktuální období)</h2>
+    <h2 class="mt-5">Schůze s nejdelší řečnickou dobou (@(obdobiOdDo[obdobi]))</h2>
     <table class="table table-striped">
         <thead>
             <tr>
@@ -225,13 +324,13 @@
             {
                 <tr>
                     <td>@s.Schuze</td>
-                    <td>@(Math.Round(((double)s.DobaCelkem) / 3600, 2))</td>
+                    <td>@HlidacStatu.Util.RenderData.TimeSpanToDaysHoursMinutes(TimeSpan.FromSeconds(s.DobaCelkem))</td>
                 </tr>
             }
         </tbody>
     </table>
 
-    <h2 class="mt-5">Schůze s nejkratší řečnickou dobou (aktuální období)</h2>
+    <h2 class="mt-5">Schůze s nejkratší řečnickou dobou (@(obdobiOdDo[obdobi]))</h2>
     <table class="table table-striped">
         <thead>
             <tr>
@@ -244,13 +343,13 @@
             {
                 <tr>
                     <td>@s.Schuze</td>
-                    <td>@(Math.Round(((double)s.DobaCelkem) / 3600, 2))</td>
+                    <td>@HlidacStatu.Util.RenderData.TimeSpanToDaysHoursMinutes(TimeSpan.FromSeconds(s.DobaCelkem))</td>
                 </tr>
             }
         </tbody>
     </table>
 
-    <h2 class="mt-5">Body programu s nejdelší řečnickou dobou (aktuální období)</h2>
+    <h2 class="mt-5">Body programu s nejdelší řečnickou dobou (@(obdobiOdDo[obdobi]))</h2>
     <table class="table table-striped">
         <thead>
             <tr>
@@ -263,13 +362,13 @@
             {
                 <tr>
                     <td>@b.Tema</td>
-                    <td>@(Math.Round(((double)b.DobaCelkem) / 3600, 2))</td>
+                    <td>@HlidacStatu.Util.RenderData.TimeSpanToDaysHoursMinutes(TimeSpan.FromSeconds(b.DobaCelkem))</td>
                 </tr>
             }
         </tbody>
     </table>
 
-    <h2 class="mt-5">Body programu s nejkratší řečnickou dobou (aktuální období)</h2>
+    <h2 class="mt-5">Body programu s nejkratší řečnickou dobou (@(obdobiOdDo[obdobi]))</h2>
     <table class="table table-striped">
         <thead>
             <tr>
@@ -282,34 +381,37 @@
             {
                 <tr>
                     <td>@b.Tema</td>
-                    <td>@(Math.Round(((double)b.DobaCelkem) / 3600, 2))</td>
+                    <td>@HlidacStatu.Util.RenderData.TimeSpanToDaysHoursMinutes(TimeSpan.FromSeconds(b.DobaCelkem))</td>
                 </tr>
             }
         </tbody>
     </table>
 
-    <h2 class="mt-5">Nejvíce výřečné strany (průměrný čas na poslance, aktuální období)</h2>
-    <table class="table table-striped">
-        <thead>
-            <tr>
-                <th>Strana</th>
-                <th>Celkový čas (hod)</th>
-                <th>Počet poslanců</th>
-                <th>Průměr na poslance (hod)</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var s in strany)
-            {
+    @if (false)
+    {
+        <h2 class="mt-5">Nejvíce výřečné strany (průměrný čas na poslance, @(obdobiOdDo[obdobi]))</h2>
+        <table class="table table-striped">
+            <thead>
                 <tr>
-                    <td>@s.Strana</td>
-                    <td>@(Math.Round(((double)s.DobaCelkem) / 3600, 2))</td>
-                    <td>@s.PocetPoslancu</td>
-                    <td>@(Math.Round(((double)s.PrumerNaPoslance) / 3600, 2))</td>
+                    <th>Strana</th>
+                    <th>Celkový čas (hod)</th>
+                    <th>Počet poslanců</th>
+                    <th>Průměr na poslance (hod)</th>
                 </tr>
-            }
-        </tbody>
-    </table>
+            </thead>
+            <tbody>
+                @foreach (var s in strany.OrderByDescending(o => o.DobaCelkem))
+                {
+                    <tr>
+                        <td>@s.Strana</td>
+                        <td>@HlidacStatu.Util.RenderData.TimeSpanToDaysHoursMinutes(TimeSpan.FromSeconds(s.DobaCelkem))</td>
+                        <td>@s.PocetPoslancu</td>
+                        <td>@HlidacStatu.Util.RenderData.TimeSpanToDaysHoursMinutes(TimeSpan.FromSeconds(s.DobaCelkem / s.PocetPoslancu))</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
 
 </p>
 
