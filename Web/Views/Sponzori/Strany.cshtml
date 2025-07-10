@@ -99,7 +99,7 @@ order by sumaLastY desc, suma desc
 
 }
 
-    <h2>Politické strany zastoupené v Parlamentu</h2>
+    <h2>Politické strany zastoupené ve Sněmovně</h2>
     <p>
         @{
             stranyTemplate.Clear();
@@ -108,7 +108,7 @@ order by sumaLastY desc, suma desc
         @Html.DataToHTMLTable(stranyTemplate, dataTableOptions: dataTableOptions)
     </p>
 
-    <h2>Ostatní parlamentní strany</h2>
+    <h2>Ostatní politické strany</h2>
     <p>
     @{
         stranyTemplate.Clear();
