@@ -156,9 +156,9 @@ namespace HlidacStatuApi.Controllers.ApiV2
         /// <returns></returns>
         [Authorize(Roles = "Admin,Media")]
         [HttpGet("GetDetailInfo")]
-        public ActionResult<List<HlidacStatu.DS.Api.Firmy.SubjektDetailInfo>> GetDetailInfo([FromQuery] string icos, [FromQuery] string names)
+        public ActionResult<List<HlidacStatu.DS.Api.Firmy.FirmaDetailInfo>> GetDetailInfo([FromQuery] string icos, [FromQuery] string names)
         {
-            List<HlidacStatu.DS.Api.Firmy.SubjektDetailInfo> res = new List<HlidacStatu.DS.Api.Firmy.SubjektDetailInfo>();
+            List<HlidacStatu.DS.Api.Firmy.FirmaDetailInfo> res = new List<HlidacStatu.DS.Api.Firmy.FirmaDetailInfo>();
 
             if (!string.IsNullOrEmpty(icos))
             {

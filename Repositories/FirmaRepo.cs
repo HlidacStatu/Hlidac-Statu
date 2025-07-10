@@ -450,9 +450,9 @@ namespace HlidacStatu.Repositories
             firma.DatovaSchranka = Lib.Data.External.DatoveSchrankyOpenData.ISDS.GetDatoveSchrankyForIco(firma.ICO);
         }
 
-        public static HlidacStatu.DS.Api.Firmy.SubjektDetailInfo GetDetailInfo(string ico, string name)
+        public static HlidacStatu.DS.Api.Firmy.FirmaDetailInfo GetDetailInfo(string ico, string name)
         {
-            HlidacStatu.DS.Api.Firmy.SubjektDetailInfo res = null;
+            HlidacStatu.DS.Api.Firmy.FirmaDetailInfo res = null;
             Firma f = null;
             DS.Graphs.Relation.AktualnostType aktualnost = DS.Graphs.Relation.AktualnostType.Nedavny;
 
@@ -494,25 +494,25 @@ namespace HlidacStatu.Repositories
             res = new();
             res.ZdrojUrl = f.GetUrl(false);
             res.Ico = f.ICO;
-            res.Jmeno = f.Jmeno;
+            res.JmenoFirmy = f.Jmeno;
             res.OmezeniCinnosti = f.StatusFull();
             //res.Rizika = f.InfoFacts;
 
 
             if (f.JsemNeziskovka())
-                res.Charakter = DS.Api.Firmy.SubjektDetailInfo.CharakterEnum.NeziskovaOrganizace;
+                res.CharakterFirmy = DS.Api.Firmy.FirmaDetailInfo.CharakterEnum.NeziskovaOrganizace;
             else if (f.JsemOVM())
-                res.Charakter = DS.Api.Firmy.SubjektDetailInfo.CharakterEnum.StatniOrgan;
+                res.CharakterFirmy = DS.Api.Firmy.FirmaDetailInfo.CharakterEnum.StatniOrgan;
             else if (f.JsemPolitickaStrana())
-                res.Charakter = DS.Api.Firmy.SubjektDetailInfo.CharakterEnum.PolitickaStrana;
+                res.CharakterFirmy = DS.Api.Firmy.FirmaDetailInfo.CharakterEnum.PolitickaStrana;
             else if (f.TypSubjektu == Firma.TypSubjektuEnum.PatrimStatu
                 || f.TypSubjektu == Firma.TypSubjektuEnum.PatrimStatuAlespon25perc
                 || f.JsemStatniFirma())
-                res.Charakter = DS.Api.Firmy.SubjektDetailInfo.CharakterEnum.FirmaPatriStatu;
+                res.CharakterFirmy = DS.Api.Firmy.FirmaDetailInfo.CharakterEnum.FirmaPatriStatu;
             else if (f.Registrovana_v_zahranici)
-                res.Charakter = DS.Api.Firmy.SubjektDetailInfo.CharakterEnum.ZahranicniFirma;
+                res.CharakterFirmy = DS.Api.Firmy.FirmaDetailInfo.CharakterEnum.ZahranicniFirma;
             else if (f.JsemSoukromaFirma())
-                res.Charakter = DS.Api.Firmy.SubjektDetailInfo.CharakterEnum.SoukromaFirma;
+                res.CharakterFirmy = DS.Api.Firmy.FirmaDetailInfo.CharakterEnum.SoukromaFirma;
 
 
 
@@ -526,7 +526,7 @@ namespace HlidacStatu.Repositories
                     var kidx = kindex.ForYear(maxY-i);
                     if (kidx != null)
                     {
-                        res.KIndex.Add(new HlidacStatu.DS.Api.Firmy.SubjektDetailInfo.KIndexData()
+                        res.KIndex.Add(new HlidacStatu.DS.Api.Firmy.FirmaDetailInfo.KIndexData()
                         {
                             KIndex = kidx.KIndexLabel.ToString(),
                             ObrazekUrl = kidx.KIndexLabelIconUrl(false),
@@ -542,7 +542,7 @@ namespace HlidacStatu.Repositories
             if (smlouvyStat != null)
             {
                 var maxY = HlidacStatu.Util.Consts.CalculatedCurrentYearSmlouvy;
-                res.RegistrSmluvCelkem = new HlidacStatu.DS.Api.Firmy.SubjektDetailInfo.SmlouvyData()
+                res.RegistrSmluvCelkem = new HlidacStatu.DS.Api.Firmy.FirmaDetailInfo.SmlouvyData()
                 {
                     Rok = 0,
                     CelkovaHodnotaSmluv = smlouvyStat.Summary().CelkovaHodnotaSmluv,
@@ -560,7 +560,7 @@ namespace HlidacStatu.Repositories
                 
                 res.RegistrSmluv = smlouvyStat
                     .Where(m => m.Year <= maxY && m.Year >= maxY - 3)
-                    .Select(ss => new HlidacStatu.DS.Api.Firmy.SubjektDetailInfo.SmlouvyData()
+                    .Select(ss => new HlidacStatu.DS.Api.Firmy.FirmaDetailInfo.SmlouvyData()
                     {
                         Rok = ss.Year,
                         CelkovaHodnotaSmluv = ss.Value.CelkovaHodnotaSmluv,
@@ -586,7 +586,7 @@ namespace HlidacStatu.Repositories
             if (dotaceStat != null)
             {
                 var maxY = HlidacStatu.Util.Consts.CalculatedCurrentYearDotace;
-                res.DotaceCelkem = new HlidacStatu.DS.Api.Firmy.SubjektDetailInfo.DotaceData()
+                res.DotaceCelkem = new HlidacStatu.DS.Api.Firmy.FirmaDetailInfo.DotaceData()
                 {
                     Rok = 0,
                     CelkemPrideleno = dotaceStat.Summary().CelkemPrideleno,
@@ -595,7 +595,7 @@ namespace HlidacStatu.Repositories
 
                 res.Dotace = dotaceStat
                     .Where(m => m.Year <= maxY && m.Year >= maxY - 3)
-                    .Select(ds => new HlidacStatu.DS.Api.Firmy.SubjektDetailInfo.DotaceData()
+                    .Select(ds => new HlidacStatu.DS.Api.Firmy.FirmaDetailInfo.DotaceData()
                     {
                         Rok = ds.Year,
                         CelkemPrideleno = ds.Value.CelkemPrideleno,
@@ -611,7 +611,7 @@ namespace HlidacStatu.Repositories
                 var maxY = HlidacStatu.Util.Consts.CalculatedCurrentYearSmlouvy;
                 if (smlouvyStatHolding != null)
                 {
-                    res.RegistrSmluvHoldingCelkem = new HlidacStatu.DS.Api.Firmy.SubjektDetailInfo.SmlouvyData()
+                    res.RegistrSmluvHoldingCelkem = new HlidacStatu.DS.Api.Firmy.FirmaDetailInfo.SmlouvyData()
                     {
                         Rok = 0,
                         CelkovaHodnotaSmluv = smlouvyStatHolding.Summary().CelkovaHodnotaSmluv,
@@ -629,7 +629,7 @@ namespace HlidacStatu.Repositories
                     
                     res.RegistrSmluvHolding = smlouvyStatHolding
                         .Where(m => m.Year <= maxY && m.Year >= maxY - 3)
-                        .Select(ss => new HlidacStatu.DS.Api.Firmy.SubjektDetailInfo.SmlouvyData()
+                        .Select(ss => new HlidacStatu.DS.Api.Firmy.FirmaDetailInfo.SmlouvyData()
                         {
                             Rok = ss.Year,
                             CelkovaHodnotaSmluv = ss.Value.CelkovaHodnotaSmluv,
@@ -653,7 +653,7 @@ namespace HlidacStatu.Repositories
                 maxY = HlidacStatu.Util.Consts.CalculatedCurrentYearDotace;
                 if (dotaceStatHolding != null)
                 {
-                    res.DotaceCelkemHolding = new HlidacStatu.DS.Api.Firmy.SubjektDetailInfo.DotaceData()
+                    res.DotaceCelkemHolding = new HlidacStatu.DS.Api.Firmy.FirmaDetailInfo.DotaceData()
                     {
                         Rok = 0,
                         CelkemPrideleno = dotaceStatHolding.Summary().CelkemPrideleno,
@@ -662,7 +662,7 @@ namespace HlidacStatu.Repositories
 
                     res.DotaceHolding = dotaceStatHolding
                         .Where(m => m.Year <= HlidacStatu.Util.Consts.CalculatedCurrentYearDotace && m.Year >= HlidacStatu.Util.Consts.CalculatedCurrentYearDotace - 3)
-                        .Select(ds => new HlidacStatu.DS.Api.Firmy.SubjektDetailInfo.DotaceData()
+                        .Select(ds => new HlidacStatu.DS.Api.Firmy.FirmaDetailInfo.DotaceData()
                         {
                             Rok = ds.Year,
                             CelkemPrideleno = ds.Value.CelkemPrideleno,

@@ -9,7 +9,7 @@ namespace HlidacStatu.DS.Api.Firmy
     /// <summary>
     /// Detailní informace o firmě
     /// </summary>
-    public class SubjektDetailInfo
+    public class FirmaDetailInfo
     {
         /// <summary>
         /// Charakter subjektu
@@ -34,7 +34,7 @@ namespace HlidacStatu.DS.Api.Firmy
         /// <summary>
         /// Název subjektu
         /// </summary>
-        public string Jmeno { get; set; }
+        public string JmenoFirmy { get; set; }
 
         /// <summary>
         /// Omezení činnosti. Pokud prázdné, tak normálně fungující firma.
@@ -45,7 +45,7 @@ namespace HlidacStatu.DS.Api.Firmy
         /// <summary>
         /// Charakter subjektu
         /// </summary>
-        public CharakterEnum Charakter { get; set; }
+        public CharakterEnum CharakterFirmy { get; set; }
 
         public string Rizika { get; set; } = string.Empty;
 
