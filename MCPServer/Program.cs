@@ -3,6 +3,7 @@ using HlidacStatu.LibCore.Extensions;
 using HlidacStatu.LibCore.Filters;
 using HlidacStatu.LibCore.MiddleWares;
 using HlidacStatu.LibCore.Services;
+using HlidacStatu.MCPServer.Tools;
 using HlidacStatuApi.Code;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.DataProtection;
@@ -10,13 +11,12 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.OpenApi.Models;
-using Serilog;
-using ILogger = Serilog.ILogger;
-
+using ModelContextProtocol.Server;
 using OpenTelemetry;
 using OpenTelemetry.Metrics;
 using OpenTelemetry.Trace;
-using HlidacStatu.MCPServer.Tools;
+using Serilog;
+using ILogger = Serilog.ILogger;
 
 string CORSPolicy = "from_hlidacstatu.cz";
 
@@ -56,10 +56,20 @@ if (enableAuth)
 }
 
 
+McpServerOptions mcp_server_options = new()
+{
+    ServerInfo = new ModelContextProtocol.Protocol.Implementation{ Name = "Hlidac statu MCP Server", Version = "0.2.0.0" },
+};
 
-builder.Services.AddMcpServer()
+builder.Services.AddMcpServer(
+    o=> o.ServerInfo = new ModelContextProtocol.Protocol.Implementation() {
+        Name = "Hlidac statu MCP Server",
+        Version = "0.2.0.0"
+    }
+    )
     .WithHttpTransport()
     .WithTools<Firmy>()
+    .WithTools<Smlouvy>()
     ;
 
 builder.Services.AddOpenTelemetry()

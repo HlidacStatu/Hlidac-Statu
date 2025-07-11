@@ -17,6 +17,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using HlidacStatu.Connectors;
 using Serilog;
+using System.ComponentModel;
 
 namespace HlidacStatu.Repositories
 {
@@ -34,52 +35,65 @@ namespace HlidacStatu.Repositories
             {
                 [SortValue(0)]
                 [NiceDisplayName("podle relevance")]
+                [Description("By relevance")]
                 Relevance = 0,
 
                 [SortValue(5)]
                 [NiceDisplayName("nově zveřejněné první")]
+                [Description("Newly published first")]
                 DateAddedDesc = 1,
 
                 [NiceDisplayName("nově zveřejněné poslední")]
                 [SortValue(6)]
+                [Description("Newly published last")]
                 DateAddedAsc = 2,
 
                 [SortValue(1)]
                 [NiceDisplayName("nejlevnější první")]
+                [Description("Cheapest first")]
                 PriceAsc = 3,
 
                 [SortValue(2)]
                 [NiceDisplayName("nejdražší první")]
+                [Description("Most expensive first")]
                 PriceDesc = 4,
 
                 [SortValue(7)]
                 [NiceDisplayName("nově uzavřené první")]
+                [Description("Newly closed first")]
                 DateSignedDesc = 5,
 
                 [NiceDisplayName("nově uzavřené poslední")]
                 [SortValue(8)]
+                [Description("Newly closed last")]
                 DateSignedAsc = 6,
 
                 [NiceDisplayName("nejvíce chybové první")]
                 [SortValue(10)]
+                [Description("Most errors first")]
                 ConfidenceDesc = 7,
 
                 [NiceDisplayName("podle odběratele")]
                 [SortValue(98)]
+                [Description("By customer")]
                 CustomerAsc = 8,
 
                 [NiceDisplayName("podle dodavatele")]
                 [SortValue(99)]
+                [Description("By contractor")]
                 ContractorAsc = 9,
 
                 [Disabled]
+                [Description("Classification relevance")]
                 ClassificationRelevance = 665,
 
                 [Disabled]
+                [Description("Fastest for scroll")]
                 FastestForScroll = 666,
-                [Disabled]
-                LastUpdate = 667,
 
+                [Disabled]
+                [Description("Last update")]
+                LastUpdate = 667,
             }
 
             public static HlidacStatu.Searching.IRule[] Irules = new HlidacStatu.Searching.IRule[] {
