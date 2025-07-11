@@ -59,7 +59,6 @@ if (enableAuth)
 
 builder.Services.AddMcpServer()
     .WithHttpTransport()
-    .WithTools<ReverseEchoTool>()
     .WithTools<Firmy>()
     ;
 

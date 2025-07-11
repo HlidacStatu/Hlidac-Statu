@@ -102,6 +102,7 @@
         {2010, new Tuple<DateTime,string>(new DateTime(2010, 7, 13), "Nečasova vláda")},
         {2014, new Tuple<DateTime,string>(new DateTime(2014,1,17),"Sobotkova vláda" )},
         {2017, new Tuple<DateTime,string>(new DateTime(2017,12,6),"Babišova vláda" )},
+        {2021, new Tuple<DateTime,string>(new DateTime(2021,12,17),"Fialova vláda" )},
     };
 
     DateTime startDate = DateTime.MinValue;
@@ -118,7 +119,7 @@
 
     string[] ignore = new string[] { "Předseda vlády", "Místopředseda", "Ministr bez portfeje" };
 
-    List<ministr> ministriAll = (await ds.SearchDataAsync("*", 1, 1000))
+    List<ministr> ministriAll = (await ds.SearchDataAsync("*", 1, 2000))
                                 .Result.Select(m =>
                                     new ministr()
                                     {
