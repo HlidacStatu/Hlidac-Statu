@@ -7,18 +7,18 @@ using System.ComponentModel;
 namespace HlidacStatu.MCPServer.Tools
 {
     [McpServerToolType]
-    public class Smlouvy
+    public class MCPSmlouvy
     {
 
         [McpServerTool(
-            Name = "get_contract_detail_info",
+            Name = "get_contract_detail",
             Title = "Get detail of specific contract of czech government.  "),
         Description("Return detail of specific contract between government and company")]
         public async static Task<HlidacStatu.Entities.Smlouva> ContractDetailInfo(
             [Description("ID of contract.")]
             string contract_id,
 
-            [Description("set true to get full text of contract")]
+            [Description("Set true to get full text of contract. Text of contract can be a very long text.")]
             [DefaultValue(false)]
             bool include_text_of_contract = false)
         {

@@ -68,8 +68,8 @@ builder.Services.AddMcpServer(
     }
     )
     .WithHttpTransport()
-    .WithTools<Firmy>()
-    .WithTools<Smlouvy>()
+    .WithTools<MCPFirmy>()
+    .WithTools<MCPSmlouvy>()
     ;
 
 builder.Services.AddOpenTelemetry()
