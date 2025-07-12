@@ -257,8 +257,8 @@ namespace HlidacStatu.Entities
         public int? ObratKod { get; set; } = null;
         public int? PlatceDPHKod { get; set; } = null;
         public decimal? CompanyIndexKod { get; set; } = null;
-        public int? je_nespolehlivym_platcem_DPHKod { get; set; } = null;
-        public int? ma_dluh_vzp { get; set; } = null;
+        public int? Je_nespolehlivym_platcem_DPHKod { get; set; } = null;
+        public int? Ma_dluh_vzp { get; set; } = null;
 
 
         public string KodOkresu { get; set; }
