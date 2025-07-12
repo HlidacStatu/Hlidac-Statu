@@ -9,7 +9,7 @@ namespace HlidacStatu.DS.Api.Firmy
     /// <summary>
     /// Detailní informace o firmě
     /// </summary>
-    public class FirmaDetailInfo
+    public class SubjektDetailInfo
     {
         /// <summary>
         /// Charakter subjektu
@@ -49,6 +49,8 @@ namespace HlidacStatu.DS.Api.Firmy
 
         public string Rizika { get; set; } = string.Empty;
 
+
+        public string[] Kategorie_Organu_Verejne_Moci = null;
 
         /// <summary>
         /// Odkaz na zdrojová data subjektu. Nutno uvést při použití dat.

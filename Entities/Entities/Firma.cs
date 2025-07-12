@@ -252,11 +252,14 @@ namespace HlidacStatu.Entities
 
         public string JmenoAscii { get; set; }
 
-        public int? PocetZam { get; set; }
-        public int? PocetZamDo { get; set; }
+        public int? PocetZamKod { get; set; }
+        public int? IndustryKod { get; set; }
+        public int? ObratKod { get; set; } = null;
+        public int? PlatceDPHKod { get; set; } = null;
+        public decimal? CompanyIndexKod { get; set; } = null;
+        public int? je_nespolehlivym_platcem_DPHKod { get; set; } = null;
+        public int? ma_dluh_vzp { get; set; } = null;
 
-        public int? ObratOd { get; set; } = null;
-        public int? ObratDo { get; set; } = null;
 
         public string KodOkresu { get; set; }
         public string ICZUJ { get; set; }

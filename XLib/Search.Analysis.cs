@@ -16,7 +16,7 @@ namespace HlidacStatu.XLib
 
         public class FullAnalysis
         {
-            public class Riziko
+            public class KidxRiziko
             {
                 public string Name { get; set; }
                 public KIndexData.KIndexParts KIndexPart { get; set; }
@@ -32,7 +32,7 @@ namespace HlidacStatu.XLib
             public Repositories.Searching.SmlouvaSearchResult Smlouvy { get; set; }
             public int CurrentSeasonYear { get; set; }
             public int[] Years { get; set; }
-            public List<Riziko> Rizika { get; set; } = new();
+            public List<KidxRiziko> Rizika { get; set; } = new();
         }
         public static async Task<FullAnalysis> AnalysisAsync(string query)
         {
@@ -94,7 +94,7 @@ namespace HlidacStatu.XLib
             if (statSum.PercentSmluvBezCeny > 0)
             {
                 res.Rizika.Add(
-                    new FullAnalysis.Riziko()
+                    new FullAnalysis.KidxRiziko()
                     {
                         Name = "Smlouvy bez uvedené ceny",
                         KIndexPart = KIndexData.KIndexParts.PercentBezCeny,
@@ -106,7 +106,7 @@ namespace HlidacStatu.XLib
             if (statSum.PocetSmluvULimitu > 0)
             {
                 res.Rizika.Add(
-                    new FullAnalysis.Riziko()
+                    new FullAnalysis.KidxRiziko()
                     {
                         Name = "Smlouvy těsně pod limitem pro veřejné zakázky",
                         KIndexPart = KIndexData.KIndexParts.PercSmluvUlimitu,
@@ -119,7 +119,7 @@ namespace HlidacStatu.XLib
             if (statSum.PocetSmluvSeZasadnimNedostatkem > 0)
             {
                 res.Rizika.Add(
-                    new FullAnalysis.Riziko()
+                    new FullAnalysis.KidxRiziko()
                     {
                         Name = "Smlouvy těsně pod limitem pro veřejné zakázky",
                         KIndexPart = KIndexData.KIndexParts.PercSeZasadnimNedostatkem,

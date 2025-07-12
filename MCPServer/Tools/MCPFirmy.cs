@@ -15,7 +15,7 @@ namespace HlidacStatu.MCPServer.Tools
             Name = "get_legal_entity_detail",
             Title = "Return detail information about Czech company with ICO"),
         Description("Returns the Czech Legal entity by its ICO (included companies and corporations,Government agencies and institutions, Cities and municipalities, Non-profit organizations adn all other subjects with legal personality).")]
-        public static HlidacStatu.DS.Api.Firmy.FirmaDetailInfo SubjektDetailInfo(
+        public static HlidacStatu.DS.Api.Firmy.SubjektDetailInfo SubjektDetailInfo(
             [Description("IČO of Legal entity to get detail information about.")]
             string ico,
             [Description("Name of Legal entity to get detail information about. If ICO is specified, the name is not used for filtering.")]
@@ -28,7 +28,7 @@ namespace HlidacStatu.MCPServer.Tools
             if (Util.DataValidators.CheckCZICO(ico) == false)
                 return null;
 
-            DS.Api.Firmy.FirmaDetailInfo res = HlidacStatu.Repositories.FirmaRepo.GetDetailInfo(ico, companyName);
+            DS.Api.Firmy.SubjektDetailInfo res = HlidacStatu.Repositories.FirmaRepo.GetDetailInfo(ico, companyName);
 
             return res;
 

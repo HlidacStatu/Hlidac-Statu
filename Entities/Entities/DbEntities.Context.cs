@@ -134,8 +134,8 @@ namespace HlidacStatu.Entities
                     .HasName("PK_Firma");
 
                 _ = entity.Property(e => e.VersionUpdate).HasDefaultValue<int>(0);
-                _ = entity.Property(e => e.PocetZam).HasDefaultValue<int?>(0);
-                _ = entity.Property(e => e.PocetZamDo).HasDefaultValue<int?>(0);
+                _ = entity.Property(e => e.PocetZamKod).HasDefaultValue<int?>(0);
+                
 
             });
 
