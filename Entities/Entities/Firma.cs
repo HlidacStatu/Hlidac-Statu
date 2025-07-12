@@ -253,7 +253,7 @@ namespace HlidacStatu.Entities
         public string JmenoAscii { get; set; }
 
         public int? PocetZamKod { get; set; }
-        public int? IndustryKod { get; set; }
+        public string? IndustryKod { get; set; }
         public int? ObratKod { get; set; } = null;
         public int? PlatceDPHKod { get; set; } = null;
         public decimal? CompanyIndexKod { get; set; } = null;
