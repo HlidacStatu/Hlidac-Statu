@@ -457,7 +457,7 @@ namespace HlidacStatu.Repositories
                 return null;
             }
             HlidacStatu.DS.Api.Firmy.SubjektFinancialInfo res = new ();
-            res.ZdrojUrl = f.GetUrl(false);
+            res.Source_Url = f.GetUrl(false);
             res.Ico = f.ICO;
             res.JmenoFirmy = f.Jmeno;
             res.OmezeniCinnosti = string.IsNullOrWhiteSpace( f.StatusFull()) ? null : f.StatusFull() ;
@@ -512,12 +512,12 @@ namespace HlidacStatu.Repositories
             if (res.Business_info != null)
             {
                 //remove here to avoid duplicated data
-                res.Business_info.ZdrojUrl = null;
+                res.Business_info.Source_Url = null;
                 res.Business_info.Copyright = null;
                 res.Business_info.JmenoFirmy = null;
             }
 
-            res.ZdrojUrl = f.GetUrl(false);
+            res.Source_Url = f.GetUrl(false);
             res.Ico = f.ICO;
             res.JmenoFirmy = f.Jmeno;
             res.Rizika = f.InfoFacts().RenderFacts(4, true, false);

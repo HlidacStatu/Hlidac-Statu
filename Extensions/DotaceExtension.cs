@@ -8,25 +8,6 @@ namespace HlidacStatu.Extensions;
 
 public static class DotaceExtension
 {
-    public static string GetUrl(this Dotace subsidy, bool local = true, bool enableRedirectToOriginal = true) => GetUrl(subsidy, local, string.Empty, enableRedirectToOriginal);
-
-    public static string GetUrl(this Dotace subsidy, bool local, string foundWithQuery, bool enableRedirectToOriginal = true)
-    {
-        //Uri.EscapeDataString instead of System.Net.WebUtility.UrlEncode to get space as %20 , not +
-        string url = "/Dotace/Detail/" + Uri.EscapeDataString(subsidy.Id) + "?";
-        if (!string.IsNullOrEmpty(foundWithQuery))
-            url = url + "qs=" + System.Net.WebUtility.UrlEncode(foundWithQuery);
-        if (enableRedirectToOriginal == false)
-            url = url + "r=false";
-
-        if (url.EndsWith("?"))
-            url = url.Substring(0, url.Length - 1);
-
-        if (local == false)
-            return "https://www.hlidacstatu.cz" + url;
-        else
-            return url;
-    }
     
     public static async Task<bool?> MaSkutecnehoMajiteleAsync(this Dotace dotace)
     {

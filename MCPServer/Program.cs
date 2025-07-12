@@ -70,6 +70,7 @@ builder.Services.AddMcpServer(
     .WithHttpTransport()
     .WithTools<MCPFirmy>()
     .WithTools<MCPSmlouvy>()
+    .WithTools<MCPDotace>()
     ;
 
 builder.Services.AddOpenTelemetry()

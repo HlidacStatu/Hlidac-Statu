@@ -48,7 +48,7 @@ namespace HlidacStatu.DS.Api.Firmy
         /// <summary>
         /// Odkaz na zdrojová data subjektu. Nutno uvést při použití dat.
         /// </summary>
-        public string ZdrojUrl { get; set; } = "https://www.hlidacstatu.cz";
+        public string Source_Url { get; set; } = "https://www.hlidacstatu.cz";
         public string Copyright { get; set; } = $"(c) {DateTime.Now.Year} Hlídač Státu z.ú.";
 
     }

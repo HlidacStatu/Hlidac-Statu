@@ -100,7 +100,9 @@ namespace HlidacStatu.MCPServer.Tools
 
             if (!string.IsNullOrWhiteSpace(negative_keywords))
             {
-                query += " " + negative_keywords.ToString().Split(splitChars, StringSplitOptions.RemoveEmptyEntries).Select(s => s.StartsWith("-") ? s : "-" + s).Aggregate((f, s) => f + " " + s);
+                query += " NOT ( " 
+                    + negative_keywords.ToString().Split(splitChars, StringSplitOptions.RemoveEmptyEntries).Select(s => s.StartsWith("-") ? s : "-" + s).Aggregate((f, s) => f + " " + s)
+                    + " ) ";
             }
 
             List<KeyValuePair<string, string>> icos = new();
