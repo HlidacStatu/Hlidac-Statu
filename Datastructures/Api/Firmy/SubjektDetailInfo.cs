@@ -40,8 +40,8 @@ namespace HlidacStatu.DS.Api.Firmy
         /// Omezení činnosti. Pokud prázdné, tak normálně fungující firma.
         /// Typicka omezeni: v likvidaci,v insolvenci,v likvidaci,v nucené správě,zaniklý subjekt,pozastavená činností,nezahájená činnost
         /// </summary>
-        public string OmezeniCinnosti { get; set; }
 
+        public SubjektFinancialInfo Business_info { get; set; } = null;
         /// <summary>
         /// Charakter subjektu
         /// </summary>

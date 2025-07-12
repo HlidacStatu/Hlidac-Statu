@@ -22,9 +22,7 @@ namespace HlidacStatu.MCPServer.Tools
           )
         {
 
-            if (string.IsNullOrWhiteSpace(ico))
-                return null;
-            if (Util.DataValidators.CheckCZICO(ico) == false)
+            if (string.IsNullOrWhiteSpace(ico) && string.IsNullOrWhiteSpace(companyName))
                 return null;
 
             SubjektFinancialInfo res = HlidacStatu.Repositories.FirmaRepo.GetFinancialInfo(ico, companyName);

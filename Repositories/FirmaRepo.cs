@@ -460,24 +460,19 @@ namespace HlidacStatu.Repositories
             res.ZdrojUrl = f.GetUrl(false);
             res.Ico = f.ICO;
             res.JmenoFirmy = f.Jmeno;
-            res.OmezeniCinnosti = f.StatusFull();
-            res.Kategorie_Organu_Verejne_Moci = f.KategorieOVMAsync().ConfigureAwait(false).GetAwaiter().GetResult()
+            res.OmezeniCinnosti = string.IsNullOrWhiteSpace( f.StatusFull()) ? null : f.StatusFull() ;
+
+            res.Kategorie_Organu_Verejne_Moci = null;
+            var _kategorie_Organu_Verejne_Moci = f.KategorieOVMAsync().ConfigureAwait(false).GetAwaiter().GetResult()
                 .Select(m => m.nazev)
                 .ToArray();
-            
-            res.PocetZam = FirmaRepo.Merk.MerkEnumConverters.ConvertCompanyMagnitude(f.PocetZamKod.ToString())?.Pretty;
-            res.Obrat = FirmaRepo.Merk.MerkEnumConverters.ConvertCompanyTurnover(f.ObratKod.ToString())?.Pretty;
+            if (_kategorie_Organu_Verejne_Moci?.Length > 0)
+                res.Kategorie_Organu_Verejne_Moci = _kategorie_Organu_Verejne_Moci;
 
-            var industry = FirmaRepo.Merk.MerkEnumConverters.ConvertCompanyIndustry(f.IndustryKod.ToString());
-            if (industry != null)
-            {
-                if (!string.IsNullOrEmpty(industry.Parent))
-                {
-                    var parentIndu = FirmaRepo.Merk.MerkEnumConverters.ConvertCompanyIndustry(industry.Parent);
-                    res.Industry = $"{parentIndu.Text} ({industry.Parent})";
-                }
-            }
-            res.Industry = FirmaRepo.Merk.MerkEnumConverters.ConvertCompanyIndustryToFullName(f.IndustryKod.ToString(),true,true);
+            res.PocetZam = FirmaRepo.Merk.MerkEnumConverters.ConvertCompanyMagnitude(f.PocetZamKod?.ToString())?.Pretty;
+            res.Obrat = FirmaRepo.Merk.MerkEnumConverters.ConvertCompanyTurnover(f.ObratKod?.ToString())?.Pretty;
+
+            res.Industry = FirmaRepo.Merk.MerkEnumConverters.ConvertCompanyIndustryToFullName(f.IndustryKod?.ToString(),true,true);
             res.PlatceDPH = f.PlatceDPHKod switch
             {
                 1 => "Je plátce DPH",
@@ -512,10 +507,19 @@ namespace HlidacStatu.Repositories
 
             // do work
             HlidacStatu.DS.Api.Firmy.SubjektDetailInfo res = new();
+
+            res.Business_info = GetFinancialInfo(f.ICO, f.Jmeno);
+            if (res.Business_info != null)
+            {
+                //remove here to avoid duplicated data
+                res.Business_info.ZdrojUrl = null;
+                res.Business_info.Copyright = null;
+                res.Business_info.JmenoFirmy = null;
+            }
+
             res.ZdrojUrl = f.GetUrl(false);
             res.Ico = f.ICO;
             res.JmenoFirmy = f.Jmeno;
-            res.OmezeniCinnosti = f.StatusFull();
             res.Rizika = f.InfoFacts().RenderFacts(4, true, false);
             res.Kategorie_Organu_Verejne_Moci = f.KategorieOVMAsync().ConfigureAwait(false).GetAwaiter().GetResult()
                 .Select(m => m.nazev)
@@ -715,6 +719,10 @@ namespace HlidacStatu.Repositories
                     if (diff.Any(m => m.diffs == 0) == false)
                         diff = found
                             .Select(m => (m, HlidacStatu.Util.TextTools.LevenshteinDistanceCompute(fname, m.JmenoBezKoncovky())))
+                            .ToList();
+                    if (diff.Any(m => m.diffs == 0) == false)
+                        diff = found
+                            .Select(m => (m, HlidacStatu.Util.TextTools.LevenshteinDistanceCompute(fname.Trim().ToLower(), m.JmenoBezKoncovky().Trim().ToLower())))
                             .ToList();
 
                     if (diff.Any(m => m.diffs == 0))

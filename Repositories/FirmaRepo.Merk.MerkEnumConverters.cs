@@ -212,95 +212,152 @@ namespace HlidacStatu.Repositories
                 // Conversion methods for each category
                 public static BasicEnumItem ConvertCountryCode(string key)
                 {
+                    if (string.IsNullOrWhiteSpace(key))
+                        return null;
+
                     return _data.CountryCodes?.TryGetValue(key, out var value) == true ? value : null;
                 }
 
                 public static FinancialStatementItem ConvertCompanyFinancialStatement(string key)
                 {
+                    if (string.IsNullOrWhiteSpace(key))
+                        return null;
+
                     return _data.CompanyFinancialStatements?.TryGetValue(key, out var value) == true ? value : null;
                 }
 
                 public static RangeEnumItem ConvertCompanyMagnitude(string key)
                 {
+                    if (string.IsNullOrWhiteSpace(key))
+                        return null;
+
                     return _data.CompanyMagnitude?.TryGetValue(key, out var value) == true ? value : null;
                 }
 
                 public static BasicEnumItem ConvertCompanyOwningType(string key)
                 {
+                    if (string.IsNullOrWhiteSpace(key))
+                        return null;
+
                     return _data.CompanyOwningType?.TryGetValue(key, out var value) == true ? value : null;
                 }
 
                 public static BasicEnumItem ConvertDistrict(string key)
                 {
+                    if (string.IsNullOrWhiteSpace(key))
+                        return null;
+
                     return _data.District?.TryGetValue(key, out var value) == true ? value : null;
                 }
 
                 public static BasicEnumItem ConvertCompanyLicenseType(string key)
                 {
+                    if (string.IsNullOrWhiteSpace(key))
+                        return null;
+
                     return _data.CompanyLicenseType?.TryGetValue(key, out var value) == true ? value : null;
                 }
 
                 public static RegionItem ConvertRegion(string key)
                 {
+                    if (string.IsNullOrWhiteSpace(key))
+                        return null;
+
                     return _data.Region?.TryGetValue(key, out var value) == true ? value : null;
                 }
 
                 public static BasicEnumItem ConvertCompanyInsolvencyType(string key)
                 {
+                    if (string.IsNullOrWhiteSpace(key))
+                        return null;
+
                     return _data.CompanyInsolvencyType?.TryGetValue(key, out var value) == true ? value : null;
                 }
 
                 public static BasicEnumItem ConvertCompanyEvents(string key)
                 {
+                    if (string.IsNullOrWhiteSpace(key))
+                        return null;
+
                     return _data.CompanyEvents?.TryGetValue(key, out var value) == true ? value : null;
                 }
 
                 public static BasicEnumItem ConvertCompanyInsolvencyStatus(string key)
                 {
+                    if (string.IsNullOrWhiteSpace(key))
+                        return null;
+
                     return _data.CompanyInsolvencyStatuses?.TryGetValue(key, out var value) == true ? value : null;
                 }
 
                 public static BasicEnumItem ConvertCompanyStatus(string key)
                 {
+                    if (string.IsNullOrWhiteSpace(key))
+                        return null;
+
                     return _data.CompanyStatus?.TryGetValue(key, out var value) == true ? value : null;
                 }
 
                 public static BasicEnumItem ConvertCompanyBusinessPremisesType(string key)
                 {
+                    if (string.IsNullOrWhiteSpace(key))
+                        return null;
+
                     return _data.CompanyBusinessPremisesTypes?.TryGetValue(key, out var value) == true ? value : null;
                 }
 
                 public static BasicEnumItem ConvertCompanyEsiStatus(string key)
                 {
+                    if (string.IsNullOrWhiteSpace(key))
+                        return null;
+
                     return _data.CompanyEsiStatus?.TryGetValue(key, out var value) == true ? value : null;
                 }
 
                 public static BasicEnumItem ConvertCompanyEventsAction(string key)
                 {
+                    if (string.IsNullOrWhiteSpace(key))
+                        return null;
+
                     return _data.CompanyEventsActions?.TryGetValue(key, out var value) == true ? value : null;
                 }
 
                 public static BasicEnumItem ConvertCompanyLicenseStatus(string key)
                 {
+                    if (string.IsNullOrWhiteSpace(key))
+                        return null;
+
                     return _data.CompanyLicenseStatus?.TryGetValue(key, out var value) == true ? value : null;
                 }
 
                 public static BasicEnumItem ConvertBank(string key)
                 {
+                    if (string.IsNullOrWhiteSpace(key))
+                        return null;
+
                     return _data.Banks?.TryGetValue(key, out var value) == true ? value : null;
                 }
 
                 public static BasicEnumItem ConvertCompanyRole(string key)
                 {
+                    if (string.IsNullOrWhiteSpace(key))
+                        return null;
+
                     return _data.CompanyRole?.TryGetValue(key, out var value) == true ? value : null;
                 }
 
                 public static IndustryItem ConvertCompanyIndustry(string key)
                 {
+                    if (string.IsNullOrWhiteSpace(key))
+                        return null;
+
                     return _data.CompanyIndustry?.TryGetValue(key, out var value) == true ? value : null;
                 }
                 public static string ConvertCompanyIndustryToFullName(string key, bool wholePath, bool includedB2B_B2C, string delimiter = " - ")
                 {
+                    if (string.IsNullOrWhiteSpace(key))
+                        return null;
+
                     StringBuilder sb = new StringBuilder();
                     var industry = ConvertCompanyIndustry(key);
                     bool first = true;
@@ -341,16 +398,23 @@ namespace HlidacStatu.Repositories
 
                 public static BasicEnumItem ConvertCompanyCourt(string key)
                 {
+                    if (string.IsNullOrWhiteSpace(key))
+                        return null;
+
                     return _data.CompanyCourt?.TryGetValue(key, out var value) == true ? value : null;
                 }
 
                 public static BasicEnumItem ConvertCompanyLegalForm(string key)
                 {
+                    if (string.IsNullOrWhiteSpace(key))
+                        return null;
                     return _data.CompanyLegalForm?.TryGetValue(key, out var value) == true ? value : null;
                 }
 
                 public static RangeEnumItem ConvertCompanyTurnover(string key)
                 {
+                    if (string.IsNullOrWhiteSpace(key))
+                        return null;
                     return _data.CompanyTurnover?.TryGetValue(key, out var value) == true ? value : null;
                 }
 
