@@ -14,7 +14,7 @@ namespace HlidacStatu.MCPServer.Tools
             Name = "get_contract_detail",
             Title = "Get detail of specific contract of czech government.  "),
         Description("Return detail of specific contract between government and company")]
-        public async static Task<HlidacStatu.Entities.Smlouva> ContractDetailInfo(
+        public async static Task<HlidacStatu.Entities.Smlouva> Get_contract_detail(
             [Description("ID of contract.")]
             string contract_id,
 
@@ -38,7 +38,7 @@ namespace HlidacStatu.MCPServer.Tools
             Name = "search_contracts",
             Title = "Find contracts based on parameters"),
         Description("Search contract of Czech government for specified parameters. You can combine any of parameters.")]
-        public async static Task<HlidacStatu.Entities.Smlouva[]> Search(
+        public async static Task<HlidacStatu.Entities.Smlouva[]> Search_contracts(
 
                 [Description("Array of contract classification types to filter search results by specific categories")]
     HlidacStatu.Entities.Smlouva.SClassification.ClassificationsTypes[]? categories = null,
@@ -66,6 +66,15 @@ namespace HlidacStatu.MCPServer.Tools
 
     [Description("Space-separated keywords to exclude from results. Contracts containing any of these terms will be filtered out")]
     string? negative_keywords = null,
+
+    [Description("Set to true to get only contracts with value close to the legal limit for public procurement")]
+    bool close_to_public_procurement_limit_only = false,
+
+   [Description("Set to true to get only contracts with hidden value ")]
+    bool with_hidden_value_only = false,
+
+    [Description("Set to true to get only contracts with serious legal issues ")]
+    bool with_serious_issues_only = false,
 
     [Description("Maximum number of contract records to return per page for pagination purposes. Default value is 10")]
     int number_of_results = 10,
@@ -150,6 +159,19 @@ namespace HlidacStatu.MCPServer.Tools
                 query += " ( " 
                     + string.Join(" OR ", categories.Select(obor => "oblast:" + obor.ToString().ToLowerInvariant()))
                     + " ) ";
+            }
+
+            if (close_to_public_procurement_limit_only)
+            {
+                query += " (hint.smlouvaULimitu:>0) ";
+            }
+            if (with_hidden_value_only)
+            {
+                query += " (hint.skrytaCena:1) ";
+            }
+            if (with_serious_issues_only)
+            {
+                query += " (chyby:zasadni) ";
             }
 
             query = query.Trim();

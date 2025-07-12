@@ -26,8 +26,24 @@ namespace HlidacStatu.DS.Api.Firmy
         /// </summary>
         public CharakterEnum CharakterFirmy { get; set; }
 
-
         public string[] Kategorie_Organu_Verejne_Moci = null;
+
+        public string PocetZam { get; set; }
+        public string Industry { get; set; }
+        public string Obrat { get; set; } = null;
+        public string PlatceDPH { get; set; } = null;
+        //public string CompanyIndexKod { get; set; } = null;
+        public string Je_nespolehlivym_platcem_DPHKod { get; set; } = null;
+        public string Ma_dluh_vzp { get; set; } = null;
+
+
+        public string KodOkresu { get; set; }
+        public string ICZUJ { get; set; }
+        public string KODADM { get; set; }
+        public string Adresa { get; set; }
+        public string PSC { get; set; }
+        public string Obec { get; set; }
+
 
         /// <summary>
         /// Odkaz na zdrojová data subjektu. Nutno uvést při použití dat.

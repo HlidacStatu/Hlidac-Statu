@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Text;
 using static HlidacStatu.Entities.Osoba;
 
 namespace HlidacStatu.Repositories
@@ -34,8 +35,8 @@ namespace HlidacStatu.Repositories
                        new string[] { Devmasters.Config.GetWebConfigValue("Minio.Cache.Endpoint") }, Devmasters.Config.GetWebConfigValue("Minio.Cache.Bucket"), Devmasters.Config.GetWebConfigValue("Minio.Cache.AccessKey"), Devmasters.Config.GetWebConfigValue("Minio.Cache.SecretKey"),
                    TimeSpan.FromDays(20), "merk.enums.json", (obj) =>
                    {
-                   //curl -X GET -H 'Authorization: Token merk-api-token' 'https://api.merk.cz//enums/?country_code=cz'
-                   string s = "";
+                       //curl -X GET -H 'Authorization: Token merk-api-token' 'https://api.merk.cz//enums/?country_code=cz'
+                       string s = "";
                        try
                        {
                            Dictionary<string, string> headers = new();
@@ -297,6 +298,45 @@ namespace HlidacStatu.Repositories
                 public static IndustryItem ConvertCompanyIndustry(string key)
                 {
                     return _data.CompanyIndustry?.TryGetValue(key, out var value) == true ? value : null;
+                }
+                public static string ConvertCompanyIndustryToFullName(string key, bool wholePath, bool includedB2B_B2C, string delimiter = " - ")
+                {
+                    StringBuilder sb = new StringBuilder();
+                    var industry = ConvertCompanyIndustry(key);
+                    bool first = true;
+                    while (industry != null)
+                    {
+                        var item = industry.Text;
+                        if (includedB2B_B2C && (industry.IsB2B || industry.IsB2C))
+                        {
+                            if (industry.IsB2B && industry.IsB2C)
+                                item += "(B2B, B2C)";
+                            else if (industry.IsB2B)
+                                item += " (B2B)";
+                            else
+                                item += " (B2C)";
+                        }
+
+                        if (wholePath == false)
+                            break;
+
+                        if (!string.IsNullOrWhiteSpace(industry.Parent))
+                        {
+                            industry = ConvertCompanyIndustry(industry.Parent);
+                        }
+                        else
+                        {
+                            industry = null;
+                            if (first)
+                                sb.Insert(0, item);
+                            else
+                                sb.Insert(0, item + delimiter);
+                        }
+
+                        first = false;
+                    }
+
+                    return sb.ToString();
                 }
 
                 public static BasicEnumItem ConvertCompanyCourt(string key)

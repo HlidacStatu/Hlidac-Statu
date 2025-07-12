@@ -10,9 +10,30 @@ namespace HlidacStatu.MCPServer.Tools
     [McpServerToolType]
     public class MCPFirmy
     {
-
         [McpServerTool(
-            Name = "get_legal_entity_detail",
+          Name = "get_legal_entity_business_info",
+          Title = "Return detail information about Czech company with ICO"),
+      Description("Returns the Czech Legal entity by its ICO (included companies and corporations,Government agencies and institutions, Cities and municipalities, Non-profit organizations adn all other subjects with legal personality).")]
+        public static HlidacStatu.DS.Api.Firmy.SubjektFinancialInfo SubjektFinancialInfo(
+          [Description("IČO of Legal entity to get detail information about.")]
+            string ico,
+          [Description("Name of Legal entity to get detail information about. If ICO is specified, the name is not used for filtering.")]
+            string companyName
+          )
+        {
+
+            if (string.IsNullOrWhiteSpace(ico))
+                return null;
+            if (Util.DataValidators.CheckCZICO(ico) == false)
+                return null;
+
+            SubjektFinancialInfo res = HlidacStatu.Repositories.FirmaRepo.GetFinancialInfo(ico, companyName);
+
+            return res;
+
+        }
+        [McpServerTool(
+            Name = "get_legal_entity_full_detail",
             Title = "Return detail information about Czech company with ICO"),
         Description("Returns the Czech Legal entity by its ICO (included companies and corporations,Government agencies and institutions, Cities and municipalities, Non-profit organizations adn all other subjects with legal personality).")]
         public static HlidacStatu.DS.Api.Firmy.SubjektDetailInfo SubjektDetailInfo(
