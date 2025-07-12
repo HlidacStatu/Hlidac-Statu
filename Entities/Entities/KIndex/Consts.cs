@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace HlidacStatu.Entities.KIndex
@@ -10,12 +11,28 @@ namespace HlidacStatu.Entities.KIndex
         public static int[] XAvailableCalculationYears = null;
         public static int[] ToCalculationYears = null;
 
-        public const decimal IntervalOkolo = 0.11m;
+        //interval pod limit
+        public static decimal IntervalOkolo = 0.11m;
 
-        public const decimal Limit1bezDPH_To = 2000000;
-        public const decimal Limit1bezDPH_From = Limit1bezDPH_To - (Limit1bezDPH_To * IntervalOkolo);
-        public const decimal Limit2bezDPH_To = 6000000;
-        public const decimal Limit2bezDPH_From = Limit2bezDPH_To - (Limit2bezDPH_To * IntervalOkolo);
+
+        //ceny bez DPH
+        public static Dictionary<HintSmlouva.ULimituTyp, decimal> LimityDo2025 = new()
+            {
+                { HintSmlouva.ULimituTyp.LimitMalehoRozsahuDodavkySluzby, 2_000_000m }, //do 3.4.2025
+                { HintSmlouva.ULimituTyp.LimitMalehoRozsahuStavebniPrace, 6_000_000m }, //do 3.4.2025
+                { HintSmlouva.ULimituTyp.LimitPodlimitniDodavkySluzbyUstredniOrgany, 3_494_000m }, //do 3.4.2025
+                { HintSmlouva.ULimituTyp.LimitPodlimitniDodavkySluzby, 5_401_000m }, //do 3.4.2025
+                { HintSmlouva.ULimituTyp.LimitPodlimitniStavebniPrace, 135_348_000 }
+            };
+        public static DateTime ZmenaLimituZZVZ_2025 = new DateTime(2025, 4, 3);
+        public static Dictionary<HintSmlouva.ULimituTyp, decimal> LimityOd2025 = new()
+            {
+                { HintSmlouva.ULimituTyp.LimitMalehoRozsahuDodavkySluzby, 3_000_000m }, //od 3.4.2025
+                { HintSmlouva.ULimituTyp.LimitMalehoRozsahuStavebniPrace, 9_000_000m }, //od 3.4.2025
+                { HintSmlouva.ULimituTyp.LimitPodlimitniDodavkySluzbyUstredniOrgany, 3_494_000m }, //od 3.4.2025
+                { HintSmlouva.ULimituTyp.LimitPodlimitniDodavkySluzby, 5_401_000m }, //od 3.4.2025
+                { HintSmlouva.ULimituTyp.LimitPodlimitniStavebniPrace, 135_348_000 }
+            };
 
 
         public const int MinPocetSmluvPerYearIfHasSummarySmluv = 30;

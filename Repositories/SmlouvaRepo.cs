@@ -49,7 +49,7 @@ namespace HlidacStatu.Repositories
         public async static Task<bool> SameContractPartiesWithAIAsync(Smlouva smlouva,
             HlidacStatu.AI.LLM.Clients.BaseClient<CoreOptions> llmClient, int maxWordsFromBeginningOfTheText = 1000,
             HlidacStatu.AI.LLM.Models.Model model = null)
-            
+
         {
             if (smlouva == null)
                 throw new ArgumentNullException(nameof(smlouva));
@@ -283,39 +283,61 @@ namespace HlidacStatu.Repositories
                     smlouva.Hint.VztahSeSoukromymSubjektem = (int)HintSmlouva.VztahSeSoukromymSubjektemTyp.Kombinovane;
             }
 
+
+            ////////////////////////////////////////////////////////////////
             //U limitu
             smlouva.Hint.SmlouvaULimitu = (int)HintSmlouva.ULimituTyp.OK;
             //vyjimky
             //smlouvy s bankama o repo a vkladech
-            bool vyjimkaNaLimit = false;
-            if (vyjimkaNaLimit == false)
+
+            Dictionary<HintSmlouva.ULimituTyp, decimal> limity = null;
+            if (smlouva.casZverejneni < Consts.ZmenaLimituZZVZ_2025)
+                limity = Consts.LimityDo2025;
+            else
+                limity = Consts.LimityOd2025;
+
+
+            bool zadavatelUstredniOrganStatniSpravy = false;
+            var vsechny_ustredni_organy_statni_spravy = HlidacStatu.Repositories.FirmaRepo.Zatrideni.Subjekty(Firma.Zatrideni.SubjektyObory.Vsechny_ustredni_organy_statni_spravy);
+            zadavatelUstredniOrganStatniSpravy = vsechny_ustredni_organy_statni_spravy.Any(m => m.Ico == smlouva.Platce.ico);
+
+            foreach (var limit in limity)
             {
-                if (
-                    (
-                        smlouva.hodnotaBezDph >= Consts.Limit1bezDPH_From
-                        && smlouva.hodnotaBezDph <= Consts.Limit1bezDPH_To
-                    )
-                    ||
-                    (
-                        smlouva.CalculatedPriceWithVATinCZK > Consts.Limit1bezDPH_From * 1.21m
-                        && smlouva.CalculatedPriceWithVATinCZK <= Consts.Limit1bezDPH_To * 1.21m
-                    )
-                )
-                    smlouva.Hint.SmlouvaULimitu = (int)HintSmlouva.ULimituTyp.Limit2M;
+
+                if (zadavatelUstredniOrganStatniSpravy && 
+                    limit.Key == HintSmlouva.ULimituTyp.LimitPodlimitniDodavkySluzby)
+                {
+                    continue;
+                }
+
+                if (zadavatelUstredniOrganStatniSpravy==false &&
+                    limit.Key == HintSmlouva.ULimituTyp.LimitPodlimitniDodavkySluzbyUstredniOrgany)
+                {
+                    continue;
+                }
+
+                decimal limitBezDPHFrom = limit.Value - (limit.Value * Consts.IntervalOkolo);
+                decimal limitbezDPHTo = limit.Value * 1.21m; //vzhledem k DPH
 
                 if (
                     (
-                        smlouva.hodnotaBezDph >= Consts.Limit2bezDPH_From
-                        && smlouva.hodnotaBezDph <= Consts.Limit2bezDPH_To
+                        smlouva.hodnotaBezDph >= limitBezDPHFrom
+                        && smlouva.hodnotaBezDph <= limitbezDPHTo
                     )
                     ||
                     (
-                        smlouva.CalculatedPriceWithVATinCZK > Consts.Limit2bezDPH_From * 1.21m
-                        && smlouva.CalculatedPriceWithVATinCZK <= Consts.Limit2bezDPH_To * 1.21m
+                        smlouva.CalculatedPriceWithVATinCZK > limitBezDPHFrom * 1.21m
+                        && smlouva.CalculatedPriceWithVATinCZK <= limitbezDPHTo * 1.21m
                     )
                 )
-                    smlouva.Hint.SmlouvaULimitu = (int)HintSmlouva.ULimituTyp.Limit6M;
+                {
+                    smlouva.Hint.SmlouvaULimitu = (int)limit.Key;
+                    break;
+                }
             }
+            //U limitu
+            ////////////////////////////////////////////////////////////////
+
 
             if (smlouva.Prilohy != null)
             {
