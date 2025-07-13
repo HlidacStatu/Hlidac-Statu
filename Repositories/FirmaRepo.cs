@@ -1,19 +1,19 @@
 using Devmasters;
+using Devmasters.Enums;
 using HlidacStatu.Connectors;
+using HlidacStatu.DS.Api.Firmy;
 using HlidacStatu.Entities;
 using HlidacStatu.Entities.Facts;
 using HlidacStatu.Extensions;
 using HlidacStatu.Lib.Data.External.DatoveSchrankyOpenData;
-
+using Nest;
+using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
 using System.Linq;
 using System.Threading.Tasks;
-using Serilog;
-using Nest;
-using Devmasters.Enums;
 
 namespace HlidacStatu.Repositories
 {
@@ -493,17 +493,24 @@ namespace HlidacStatu.Repositories
                 _ => null
             };
             res.Osoby_s_vazbou_na_firmu = f.Osoby_v_OR(aktualnost)
+                .DistinctBy(m=>m.o.NameId)
                 .OrderBy(m => m.o.Prijmeni)
                     .ThenBy(m => m.o.Jmeno)
                     .ThenBy(m => m.o.Narozeni)
-                    .Select(m => new HlidacStatu.DS.Api.Firmy.SubjektFinancialInfo.Osoba()
-                    {
-                        Full_Name = m.o.FullName(),
-                        Person_Id = m.o.NameId,
-                        Year_Of_Birth = m.o.Narozeni.HasValue ? m.o.Narozeni.Value.Year.ToString() : null,
-                    })
+                    .Select(m => m.o.ToApiOsobaListItem())
                     .ToArray()
                 ;
+
+            res.Dcerine_spolecnosti = f.IcosInHolding(aktualnost)
+                    .Select(m => new SimpleDetailInfo()
+                    {
+                        Ico = m,
+                        Jmeno = HlidacStatu.Repositories.Firmy.GetJmeno(m),
+                        Source_Url = null
+                    })
+                    .ToArray();
+            ;
+
 
             return res; 
         }

@@ -53,13 +53,6 @@ namespace HlidacStatu.DS.Api.Firmy
 
         public string[] Kategorie_Organu_Verejne_Moci { get; set; } = null;
 
-        public class Osoba
-        {
-            public string Full_Name { get; set; }
-            public string Person_Id { get; set; }
-            public string Year_Of_Birth { get; set; }
-        }
-
         /// <summary>
         /// Index klíčových rizik
         /// </summary>

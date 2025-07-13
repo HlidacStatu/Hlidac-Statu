@@ -98,18 +98,6 @@ public static class OsobaExtension2
     }
 
 
-    public static string CurrentPoliticalParty(this Osoba osoba)
-    {
-        return osoba.Events(ev =>
-                ev.Type == (int)OsobaEvent.Types.PolitickaStrana
-                && (!ev.DatumDo.HasValue
-                    || ev.DatumDo >= DateTime.Now)
-            )
-            .OrderByDescending(ev => ev.DatumOd)
-            .Select(ev => ev.Organizace)
-            .FirstOrDefault();
-    }
-
     public static string MainRoles(this Osoba osoba, DateTime forDate)
     {
         var events = osoba.Events(ev =>

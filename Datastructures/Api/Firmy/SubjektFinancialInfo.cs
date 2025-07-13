@@ -49,13 +49,9 @@ namespace HlidacStatu.DS.Api.Firmy
         public string PSC { get; set; }
         public string Obec { get; set; }
 
-        public Osoba[] Osoby_s_vazbou_na_firmu { get; set; } = null;
+        public DS.Api.Osoba.ListItem[] Osoby_s_vazbou_na_firmu { get; set; } = null;
 
-        public class Osoba
-        {
-            public string Full_Name { get; set; }
-            public string Person_Id { get; set; }
-            public string Year_Of_Birth { get; set; }
-        }
+        public DS.Api.Firmy.SimpleDetailInfo[] Dcerine_spolecnosti { get; set; } = null;
+
     }
 }

@@ -20,9 +20,84 @@ namespace HlidacStatu.Extensions
 {
     public static class OsobaExtension
     {
-        
 
-        
+
+
+        public static string CurrentPoliticalParty(this Osoba osoba)
+        {
+            return osoba.Events(ev =>
+                    ev.Type == (int)OsobaEvent.Types.PolitickaStrana
+                    && (!ev.DatumDo.HasValue
+                        || ev.DatumDo >= DateTime.Now)
+                )
+                .OrderByDescending(ev => ev.DatumOd)
+                .Select(ev => ev.Organizace)
+                .FirstOrDefault();
+        }
+        public static HlidacStatu.DS.Api.Osoba.ListItem ToApiOsobaListItem(this Osoba osoba)
+        {
+            var res = new HlidacStatu.DS.Api.Osoba.ListItem
+            {
+                Person_Id = osoba.NameId,
+                Name = osoba.Jmeno,
+                Surname = osoba.Prijmeni,
+                Year_Of_Birth = osoba.Narozeni.HasValue ? osoba.Narozeni.Value.Year.ToString() : null,
+                Political_Involvement = osoba.StatusOsoby().ToNiceDisplayName(),
+                Photo_Url = osoba.HasPhoto() ? osoba.GetPhotoUrl(false) : null,
+                Current_Political_Party = osoba.CurrentPoliticalParty() ?? "None",
+                Have_More_Details = true,
+                Involved_In_Companies_Count = osoba.AktualniVazby(DS.Graphs.Relation.AktualnostType.Nedavny)
+                        .Where(v => v.To != null && v.To.Type == HlidacStatu.DS.Graphs.Graph.Node.NodeType.Company)
+                        .GroupBy(f => f.To.Id, v => v, (ico, v) => new
+                        {
+                            ICO = ico,
+                            FirmaName = v.First().To.PrintName(),//HlidacStatu.Lib.Data.External.FirmyDB.NameFromIco(ico, true),
+                        }).Count(),
+            };
+            return res;
+        }
+
+        public static HlidacStatu.DS.Api.Osoba.Detail ToApiOsobaDetail(this Osoba osoba, DateTime? historyLimit = null)
+        {
+            historyLimit ??= DateTime.Now.AddYears(-100);
+
+            var res = new HlidacStatu.DS.Api.Osoba.Detail
+            {
+                Person_Id = osoba.NameId,
+                Name = osoba.Jmeno,
+                Surname = osoba.Prijmeni,
+                Year_Of_Birth = osoba.Narozeni.HasValue ? osoba.Narozeni.Value.Year.ToString() : null,
+                Political_Involvement = osoba.StatusOsoby().ToNiceDisplayName(),
+                Photo_Url = osoba.HasPhoto() ? osoba.GetPhotoUrl(false) : null,
+                Current_Political_Party = osoba.CurrentPoliticalParty() ?? "None",
+
+                Recent_Public_Activities_Description = osoba.Description(false, m => m.DatumDo == null || m.DatumDo > historyLimit, 5, itemDelimeter: ", "),
+
+                Involved_In_Companies = osoba.AktualniVazby(DS.Graphs.Relation.AktualnostType.Nedavny)
+                    .Where(v => v.To != null && v.To.Type == HlidacStatu.DS.Graphs.Graph.Node.NodeType.Company)
+                    .GroupBy(f => f.To.Id, v => v, (ico, v) => new
+                    {
+                        ICO = ico,
+                        FirmaName = v.First().To.PrintName(),//HlidacStatu.Lib.Data.External.FirmyDB.NameFromIco(ico, true),
+                    })
+                    .Select(m => new HlidacStatu.DS.Api.Osoba.Detail.Subject
+                    {
+                        Ico = m.ICO,
+                        Name = m.FirmaName
+                    }).ToArray(),
+
+                Business_Contracts_With_Government = osoba.StatistikaRegistrSmluv(DS.Graphs.Relation.AktualnostType.Nedavny)
+                .SmlouvyStat_SoukromeFirmySummary()
+                    .Select(m => new HlidacStatu.DS.Api.Osoba.Detail.Stats
+                    {
+                        Year = m.Year,
+                        Number_Of_Contracts = m.Value.PocetSmluv,
+                        Total_Contract_Value = m.Value.CelkovaHodnotaSmluv
+                    }).ToArray()
+
+            };
+            return res;
+        }
 
         
 

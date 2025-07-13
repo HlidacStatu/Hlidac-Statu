@@ -15,7 +15,8 @@ namespace HlidacStatu.MCPServer.Tools
         [McpServerTool(
           Name = "get_legal_entity_business_info",
           Title = "Return detail information about Czech company with ICO"),
-      Description("Returns the Czech Legal entity by its ICO (included companies and corporations,Government agencies and institutions, Cities and municipalities, Non-profit organizations adn all other subjects with legal personality)."
+        Description("Returns basic business info abou the Czech Legal entity (included corporations, government institutions, municipalities, NGO and all other subjects )."
+            + "Specify legal entity by ICO or name. Use primary ICO if it's available."
             + " For person detail use tool 'get_person_detail' with parameter 'person_id'.")]
         public static HlidacStatu.DS.Api.Firmy.SubjektFinancialInfo SubjektFinancialInfo(
           [Description("IČO of Legal entity to get detail information about.")]
@@ -34,9 +35,10 @@ namespace HlidacStatu.MCPServer.Tools
 
         }
         [McpServerTool(
-            Name = "get_legal_entity_full_detail",
+            Name = "get_business_between_legal_entity_and_government",
             Title = "Return detail information about Czech company with ICO"),
-        Description("Returns the Czech Legal entity by its ICO (included companies and corporations, Government agencies and institutions, Cities and municipalities, Non-profit organizations adn all other subjects with legal personality)."
+        Description("Returns detail of business contracts, subsidies and statistics between the legal entity and the Czech government. " 
+            + "Specify legal entity by ICO or name. Use primary ICO if it's available."
             + " For person detail use tool 'get_person_detail' with parameter 'person_id'.")]
         public static HlidacStatu.DS.Api.Firmy.SubjektDetailInfo SubjektDetailInfo(
             [Description("IČO of Legal entity to get detail information about.")]
