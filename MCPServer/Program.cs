@@ -56,15 +56,15 @@ if (enableAuth)
 }
 
 
-McpServerOptions mcp_server_options = new()
-{
-    ServerInfo = new ModelContextProtocol.Protocol.Implementation{ Name = "Hlidac statu MCP Server", Version = "0.2.0.0" },
-};
+//McpServerOptions mcp_server_options = new()
+//{
+//    ServerInfo = new ModelContextProtocol.Protocol.Implementation{ Name = "Hlidac statu MCP Server", Version = System.Reflection.Assembly.GetEntryAssembly().GetName().Version.ToString() },
+//};
 
 builder.Services.AddMcpServer(
     o=> o.ServerInfo = new ModelContextProtocol.Protocol.Implementation() {
         Name = "Hlidac statu MCP Server",
-        Version = "0.2.0.0"
+        Version = System.Reflection.Assembly.GetEntryAssembly().GetName().Version.ToString()
     }
     )
     .WithHttpTransport()
