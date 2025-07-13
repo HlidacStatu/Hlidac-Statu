@@ -1,5 +1,6 @@
 ﻿using HlidacStatu.DS.Api.MCP;
 using System;
+using System.Collections.Generic;
 using static HlidacStatu.DS.Api.Firmy.SubjektDetailInfo;
 
 namespace HlidacStatu.DS.Api.Firmy
@@ -27,7 +28,10 @@ namespace HlidacStatu.DS.Api.Firmy
         /// </summary>
         public CharakterEnum Charakter_Firmy { get; set; }
 
-        public string[] Kategorie_Organu_Verejne_Moci = null;
+        /// <summary>
+        /// 
+        /// </summary>
+        public string[] Kategorie_Organu_Verejne_Moci { get; set; } = null;
 
         public string Pocet_Zamestnancu { get; set; }
         public string Obor_Podnikani { get; set; }
@@ -45,7 +49,7 @@ namespace HlidacStatu.DS.Api.Firmy
         public string PSC { get; set; }
         public string Obec { get; set; }
 
-        public Osoba[] Osoby_s_vazbou_na_firmu = null;
+        public Osoba[] Osoby_s_vazbou_na_firmu { get; set; } = null;
 
         public class Osoba
         {

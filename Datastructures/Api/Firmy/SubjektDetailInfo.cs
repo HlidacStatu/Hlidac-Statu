@@ -51,9 +51,7 @@ namespace HlidacStatu.DS.Api.Firmy
         public string Rizika { get; set; } = string.Empty;
 
 
-        public string[] Kategorie_Organu_Verejne_Moci = null;
-
-        public Osoba[] Osoby_s_vazbou_na_firmu = null;
+        public string[] Kategorie_Organu_Verejne_Moci { get; set; } = null;
 
         public class Osoba
         {
@@ -124,8 +122,8 @@ namespace HlidacStatu.DS.Api.Firmy
             /// </summary>
             public string[] HlavniOblasti { get; set; } = null;
 
-            public DS.Api.StatisticChange ZmenaPoctuSmluv { get; set; } = null;
-            public DS.Api.StatisticChange ZmenaHodnotySmluv { get; set; } = null;
+            //public DS.Api.StatisticChange ZmenaPoctuSmluv { get; set; } = null;
+            //public DS.Api.StatisticChange ZmenaHodnotySmluv { get; set; } = null;
         }
 
         /// <summary>

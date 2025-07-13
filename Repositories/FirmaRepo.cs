@@ -533,20 +533,7 @@ namespace HlidacStatu.Repositories
             res.Source_Url = f.GetUrl(false);
             res.Ico = f.ICO;
             res.Jmeno_Firmy = f.Jmeno;
-            res.Rizika = f.InfoFacts().RenderFacts(4, true, false);
-            
-            res.Osoby_s_vazbou_na_firmu = f.Osoby_v_OR(aktualnost)
-                .OrderBy(m => m.o.Prijmeni)
-                    .ThenBy(m => m.o.Jmeno)
-                    .ThenBy(m => m.o.Narozeni)
-                    .Select(m => new HlidacStatu.DS.Api.Firmy.SubjektDetailInfo.Osoba()
-                    {
-                        Full_Name = m.o.FullName(),
-                        Person_Id = m.o.NameId,
-                        Year_Of_Birth = m.o.Narozeni.HasValue ? m.o.Narozeni.Value.Year.ToString() : null,
-                    })
-                    .ToArray()
-                ;
+            res.Rizika = f.InfoFacts().RenderFacts(4, true, false);           
 
 
             res.Kategorie_Organu_Verejne_Moci = f.KategorieOVMAsync().ConfigureAwait(false).GetAwaiter().GetResult()
@@ -628,8 +615,8 @@ namespace HlidacStatu.Repositories
                         PocetSmluvBezCeny = ss.Value.PocetSmluvBezCeny,
                         PocetSmluvSeZasadnimNedostatkem = ss.Value.PocetSmluvSeZasadnimNedostatkem,
                         PocetSmluvULimitu = ss.Value.PocetSmluvULimitu,
-                        ZmenaHodnotySmluv = ss.Year == maxY ? null : new DS.Api.StatisticChange(ss.Year, maxY, "Hodnota smluv", ss.Value.CelkovaHodnotaSmluv, smlouvyStat.StatisticsForYear(maxY).CelkovaHodnotaSmluv),
-                        ZmenaPoctuSmluv = ss.Year == maxY ? null : new DS.Api.StatisticChange(ss.Year, maxY, "Počet smluv", ss.Value.PocetSmluv, smlouvyStat.StatisticsForYear(maxY).PocetSmluv),
+                        //ZmenaHodnotySmluv = ss.Year == maxY ? null : new DS.Api.StatisticChange(ss.Year, maxY, "Hodnota smluv", ss.Value.CelkovaHodnotaSmluv, smlouvyStat.StatisticsForYear(maxY).CelkovaHodnotaSmluv),
+                        //ZmenaPoctuSmluv = ss.Year == maxY ? null : new DS.Api.StatisticChange(ss.Year, maxY, "Počet smluv", ss.Value.PocetSmluv, smlouvyStat.StatisticsForYear(maxY).PocetSmluv),
                     })
                     .ToList();
             }
@@ -697,8 +684,8 @@ namespace HlidacStatu.Repositories
                             PocetSmluvBezCeny = ss.Value.PocetSmluvBezCeny,
                             PocetSmluvSeZasadnimNedostatkem = ss.Value.PocetSmluvSeZasadnimNedostatkem,
                             PocetSmluvULimitu = ss.Value.PocetSmluvULimitu,
-                            ZmenaHodnotySmluv = ss.Year == maxY ? null : new DS.Api.StatisticChange(ss.Year, maxY, "Hodnota smluv", ss.Value.CelkovaHodnotaSmluv, smlouvyStatHolding.StatisticsForYear(maxY).CelkovaHodnotaSmluv),
-                            ZmenaPoctuSmluv = ss.Year == maxY ? null : new DS.Api.StatisticChange(ss.Year, maxY, "Počet smluv", ss.Value.PocetSmluv, smlouvyStatHolding.StatisticsForYear(maxY).PocetSmluv),
+                            //ZmenaHodnotySmluv = ss.Year == maxY ? null : new DS.Api.StatisticChange(ss.Year, maxY, "Hodnota smluv", ss.Value.CelkovaHodnotaSmluv, smlouvyStatHolding.StatisticsForYear(maxY).CelkovaHodnotaSmluv),
+                            //ZmenaPoctuSmluv = ss.Year == maxY ? null : new DS.Api.StatisticChange(ss.Year, maxY, "Počet smluv", ss.Value.PocetSmluv, smlouvyStatHolding.StatisticsForYear(maxY).PocetSmluv),
                         })
                         .ToList();
                 }
