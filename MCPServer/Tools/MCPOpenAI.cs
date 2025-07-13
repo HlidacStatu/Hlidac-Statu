@@ -173,10 +173,10 @@ url - a URL to the document or search result item. Useful for citing specific re
         public async static Task<OpenAiResultItem> fetch(string id)
         {
             if (string.IsNullOrWhiteSpace(id))
-                return Array.Empty<OpenAiResultItem>();
+                return new OpenAiResultItem();
             string[] parts = id.Split('-');
             if (parts.Length < 2)
-                return Array.Empty<OpenAiResultItem>();
+                return new OpenAiResultItem();
             string type = parts[0];
             string value = string.Join("-", parts.Skip(1));
 
@@ -227,7 +227,7 @@ url - a URL to the document or search result item. Useful for citing specific re
                     };
                     break;
                 default:
-                    return Array.Empty<OpenAiResultItem>();
+                    return new OpenAiResultItem();
             }
             return res;
 
