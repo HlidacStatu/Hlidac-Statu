@@ -74,19 +74,21 @@ namespace HlidacStatu.MCPServer.Tools
             [Description("full name of person")]
             string name,
             [Description("Year of Birth of person, optional")]
-            int? year_of_birth = null
+            string? year_of_birth = null
             )
         {
             int numOfResults = 10;
 
-            var ofound = OsobaRepo.Searching.FindAll(name, year_of_birth?.ToString(), false)
+
+
+            var ofound = OsobaRepo.Searching.FindAll(name, year_of_birth, false)
                      .OrderByDescending(o => o.Status)
                      .ThenByDescending(o => o.Narozeni ?? new DateTime(1970, 1, 1))
                      .Take(numOfResults)
                      .ToList();
 
             if (ofound.Any() == false)
-                ofound = OsobaRepo.Searching.FindAll(name, year_of_birth?.ToString(), true)
+                ofound = OsobaRepo.Searching.FindAll(name, year_of_birth, true)
                     .OrderByDescending(o => o.Status)
                     .ThenByDescending(o => o.Narozeni ?? new DateTime(1970, 1, 1))
                     .Take(numOfResults)
