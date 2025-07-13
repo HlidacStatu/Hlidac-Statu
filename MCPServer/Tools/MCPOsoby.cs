@@ -39,6 +39,11 @@ namespace HlidacStatu.MCPServer.Tools
                 return null;
             Entities.Osoba o = HlidacStatu.Repositories.Osoby.GetByNameId.Get(person_id);
 
+            if (o == null)
+            {
+                _logger.Warning("Person with ID {person_id} not found", person_id);
+                return null;
+            }
 
             var res = o.ToApiOsobaDetail(DateTime.Now.AddYears(-10));
             return res;

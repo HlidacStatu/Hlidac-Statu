@@ -36,6 +36,9 @@ namespace HlidacStatu.Extensions
         }
         public static HlidacStatu.DS.Api.Osoba.ListItem ToApiOsobaListItem(this Osoba osoba)
         {
+            if (osoba == null)
+                return null;
+
             var res = new HlidacStatu.DS.Api.Osoba.ListItem
             {
                 Person_Id = osoba.NameId,
@@ -60,6 +63,8 @@ namespace HlidacStatu.Extensions
         public static HlidacStatu.DS.Api.Osoba.Detail ToApiOsobaDetail(this Osoba osoba, DateTime? historyLimit = null)
         {
             historyLimit ??= DateTime.Now.AddYears(-100);
+            if (osoba == null )
+                return null;
 
             var res = new HlidacStatu.DS.Api.Osoba.Detail
             {
