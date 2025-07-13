@@ -1,4 +1,5 @@
-﻿using HlidacStatu.Entities.Issues;
+﻿using Devmasters.Enums;
+using HlidacStatu.Entities.Issues;
 using HlidacStatu.Entities.XSD;
 using HlidacStatu.Util;
 using Nest;
@@ -78,12 +79,12 @@ namespace HlidacStatu.Entities
 
             if (prijemceSpecified)
             {
-                foreach (var prij in item.smlouva.smluvniStrana.Where(m => m.prijemce.HasValue==false || m.prijemce == true))
+                foreach (var prij in item.smlouva.smluvniStrana.Where(m => m.prijemce.HasValue == false || m.prijemce == true))
                 {
                     if (!string.IsNullOrEmpty(prij.ico) || !string.IsNullOrEmpty(prij.datovaSchranka))
                     {
                         //overim, zda v prijemcim uz neni stejne ico nebo ds
-                        if (prijemci.Any(m=>m.ico == prij.ico || m.datovaSchranka == prij.datovaSchranka) == false)
+                        if (prijemci.Any(m => m.ico == prij.ico || m.datovaSchranka == prij.datovaSchranka) == false)
                             prijemci.Add(new Subjekt(prij));
                     }
                     else
@@ -309,7 +310,7 @@ namespace HlidacStatu.Entities
             return string.Format("Smlouva č. {0}: {1}", Id, Devmasters.TextUtil.ShortenText(predmet ?? "", 70));
         }
 
-        public ImportanceLevel GetConfidenceLevel()
+        public ImportanceLevel GetLegalRisksLevel()
         {
             if (ConfidenceValue <= 0 || Issues == null)
             {
@@ -370,7 +371,7 @@ namespace HlidacStatu.Entities
         {
             return GetUrl(this.Id, local, foundWithQuery);
         }
-        public static string GetUrl(string id, bool local=true, string foundWithQuery=null)
+        public static string GetUrl(string id, bool local = true, string foundWithQuery = null)
         {
             string url = "/Detail/" + id;// E49DE92B876B0C66C2F29457EB61C7B7
             if (!string.IsNullOrEmpty(foundWithQuery))
@@ -580,5 +581,34 @@ namespace HlidacStatu.Entities
 
         static DateTime pravniRamce01072017 = new DateTime(2017, 7, 1);
 
+
+        public HlidacStatu.DS.Api.Smlouva.ListItem ToApiSmlouvaListItem()
+        {
+            return new HlidacStatu.DS.Api.Smlouva.ListItem
+            {
+                Contract_Id = this.Id,
+                Contract_Category = this.GetRelevantClassification()?.Count() > 0 ?
+                    this.GetRelevantClassification().First().ClassifTypeName() : null,
+
+                Contract_Name = Devmasters.TextUtil.ShortenText(predmet, 200),
+                Signed_On = datumUzavreni,
+                Contract_Provider = new HlidacStatu.DS.Api.Smlouva.ListItem.Subject
+                {
+                    Ico = Platce.ico,
+                    Name = Platce.nazev
+                },
+                Amount_Received = CalculatedPriceWithVATinCZK,
+                Contract_Recipients = Prijemce.Select(m => new HlidacStatu.DS.Api.Smlouva.ListItem.Subject
+                {
+                    Ico = m.ico,
+                    Name = m.nazev
+                }).ToArray(),
+                Legal_Risk_Level = this.GetLegalRisksLevel() > ImportanceLevel.Minor
+                    ? this.GetLegalRisksLevel().ToNiceDisplayName() : null,
+            };
+            {
+            }
+            ;
+        }
     }
 }

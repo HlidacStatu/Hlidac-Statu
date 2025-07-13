@@ -9,6 +9,7 @@ namespace HlidacStatu.MCPServer.Tools
     [McpServerToolType]
     public class MCPDotace
     {
+        static Serilog.ILogger _logger = Serilog.Log.ForContext<MCPDotace>();
 
 
         [McpServerTool(
@@ -32,7 +33,7 @@ namespace HlidacStatu.MCPServer.Tools
     Name = "search_subsidies",
     Title = "Find subsidies based on parameters"),
 Description("Search subsidies from Czech government for specified parameters. You can combine any of parameters.")]
-        public async static Task<HlidacStatu.Entities.Smlouva[]> Search_subsidies(
+        public async static Task<DS.Api.Subsidy.SearchResult> Search_subsidies(
 
 
 [Description("Year filter in YYYY format. Only subsidies from this year onwards will be included")]
@@ -67,11 +68,9 @@ Description("Search subsidies from Czech government for specified parameters. Yo
     int page = 1,
 
 [Description("Sorting order for search results. Determines how subsidies are ordered in the response (e.g., by relevance, date, price)")]
-    SmlouvaRepo.Searching.OrderResult order_result = SmlouvaRepo.Searching.OrderResult.Relevance
-
+    Repositories.Searching.DotaceSearchResult.DotaceOrderResult order_result = Repositories.Searching.DotaceSearchResult.DotaceOrderResult.Relevance
     )
         {
-            Smlouva[] res = Array.Empty<Smlouva>();
 
             string[] splitChars = new string[] { " " };
             string query = "";
@@ -110,24 +109,31 @@ Description("Search subsidies from Czech government for specified parameters. Yo
                 query += $" approvedYear:{for_year}";
             }
 
-
             query = query.Trim();
             if (query.Length == 0)
             {
+                return null;
+            }
+
+            var sres = await DotaceRepo.Searching.SimpleSearchAsync(query, page,
+                number_of_results,
+                order_result);
+
+            if (sres?.IsValid == true && sres?.Results?.Count() > 0)
+            {
+                var res = new DS.Api.Subsidy.SearchResult()
+                {
+                    Total_Found_Results = sres.Total,
+                    Current_Page = sres.Page,
+                    Page_Size = number_of_results,
+                    Found_subsidies = sres.Results.Select(m => m.ToApiSubsidyListItem()).ToArray(),                    
+                };
+
                 return res;
             }
 
-            var sres = await SmlouvaRepo.Searching.SimpleSearchAsync(query, page,
-                number_of_results,
-                order_result,
-                includeNeplatne: false,
-                anyAggregation: new Nest.AggregationContainerDescriptor<Smlouva>().Sum("sumKc", m => m.Field(f => f.CalculatedPriceWithVATinCZK)),
-                logError: false);
-
-            if (sres?.IsValid == true && sres?.Results?.Count() > 0)
-                res = sres.Results.ToArray();
-
-            return res;
+            
+            return null;
 
         }
     }

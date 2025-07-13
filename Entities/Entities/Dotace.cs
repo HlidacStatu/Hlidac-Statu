@@ -245,7 +245,7 @@ public partial class Dotace
                 Ico = Recipient.Ico,
                 Name = Recipient.DisplayName
             },
-            Source_Url = this.GetUrl(false),
+            Subsidy_Detail_Url = this.GetUrl(false),
         };
     }
 }

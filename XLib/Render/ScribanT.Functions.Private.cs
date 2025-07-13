@@ -16,7 +16,7 @@ namespace HlidacStatu.XLib.Render
                 if (s != null)
                 {
                     string tmplt = "<span color='{0}' style='padding:3px 6px 3px 6px;margin-right:4px;font-weight:bold;background-color:{0};color:white;'><b>!</b></span>";
-                    var confLevel = s.GetConfidenceLevel();
+                    var confLevel = s.GetLegalRisksLevel();
                     switch (confLevel)
                     {
                         case Entities.Issues.ImportanceLevel.Minor:

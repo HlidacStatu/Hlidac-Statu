@@ -1,4 +1,5 @@
-﻿using System;
+﻿using HlidacStatu.DS.Api.MCP;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -9,7 +10,7 @@ namespace HlidacStatu.DS.Api.Firmy
     /// <summary>
     /// Detailní informace o firmě
     /// </summary>
-    public class SubjektDetailInfo
+    public class SubjektDetailInfo : MCPBaseResponse
     {
         /// <summary>
         /// Charakter subjektu
@@ -34,7 +35,7 @@ namespace HlidacStatu.DS.Api.Firmy
         /// <summary>
         /// Název subjektu
         /// </summary>
-        public string JmenoFirmy { get; set; }
+        public string Jmeno_Firmy { get; set; }
 
         /// <summary>
         /// Omezení činnosti. Pokud prázdné, tak normálně fungující firma.
@@ -45,19 +46,21 @@ namespace HlidacStatu.DS.Api.Firmy
         /// <summary>
         /// Charakter subjektu
         /// </summary>
-        public CharakterEnum CharakterFirmy { get; set; }
+        public CharakterEnum Charakter_Firmy { get; set; }
 
         public string Rizika { get; set; } = string.Empty;
 
 
         public string[] Kategorie_Organu_Verejne_Moci = null;
 
-        /// <summary>
-        /// Odkaz na zdrojová data subjektu. Nutno uvést při použití dat.
-        /// </summary>
-        public string Source_Url { get; set; } = "https://www.hlidacstatu.cz";
-        public string Copyright { get; set; } = $"(c) {DateTime.Now.Year} Hlídač Státu z.ú.";
+        public Osoba[] Osoby_s_vazbou_na_firmu = null;
 
+        public class Osoba
+        {
+            public string Full_Name { get; set; }
+            public string Person_Id { get; set; }
+            public string Year_Of_Birth { get; set; }
+        }
 
         /// <summary>
         /// Index klíčových rizik
@@ -79,7 +82,7 @@ namespace HlidacStatu.DS.Api.Firmy
             /// <summary>
             /// URL obrázku, který se zobrazuje hodnotu indexu
             /// </summary>
-            public string ObrazekUrl { get; set; }
+            public string Obrazek_Url { get; set; }
         }
 
         /// <summary>
@@ -128,22 +131,22 @@ namespace HlidacStatu.DS.Api.Firmy
         /// <summary>
         /// Smlouvy a kontrakty subjektu se státem od 2016 to současnosti
         /// </summary>
-        public SmlouvyData RegistrSmluvCelkem { get; set; } = new();
+        public SmlouvyData Statistika_Registr_Smluv { get; set; } = new();
         /// <summary>
         /// Pokud subjekt vlastní dceřinné společnosti, tak statistiky smluv a kontraktů firmy a těchto dceřinných společností dohromady
         /// od 2016 to současnosti
         /// </summary>
-        public SmlouvyData RegistrSmluvHoldingCelkem { get; set; } = new();
+        public SmlouvyData Statistika_Registr_Smluv_pro_Holding { get; set; } = new();
 
         /// <summary>
         /// Smlouvy a kontrakty subjektu se státem po letech
         /// </summary>
-        public List<SmlouvyData> RegistrSmluv { get; set; } = new();
+        public List<SmlouvyData> Statistiky_Registr_Smluv_po_Letech { get; set; } = new();
 
         /// <summary>
         /// Pokud subjekt vlastní dceřinné společnosti, tak statistiky smluv a kontraktů firmy a těchto dceřinných společností dohromady
         /// </summary>
-        public List<SmlouvyData> RegistrSmluvHolding { get; set; } = new();
+        public List<SmlouvyData> Statisticky_Registr_Smluv_pro_Holding_po_Letech { get; set; } = new();
 
 
         /// <summary>
@@ -152,22 +155,22 @@ namespace HlidacStatu.DS.Api.Firmy
         public class DotaceData
         {
             public int Rok { get; set; }
-            public int PocetDotaci { get; set; } = 0;
-            public decimal CelkemPrideleno { get; set; } = 0m;
+            public int Pocet_Dotaci { get; set; } = 0;
+            public decimal Celkem_Prideleno { get; set; } = 0m;
 
             /// <summary>
             /// Změna počtu ročních dotací oproti aktuálnímu roku
             /// </summary>
-            public DS.Api.StatisticChange ZmenaPoctuDotaci { get; set; } = null;
+            //public DS.Api.StatisticChange ZmenaPoctuDotaci { get; set; } = null;
             /// <summary>
             /// Změna objemu ročních dotací oproti aktuálnímu roku
             /// </summary>
-            public DS.Api.StatisticChange ZmenaHodnotyDotaci { get; set; } = null;
+            //public DS.Api.StatisticChange ZmenaHodnotyDotaci { get; set; } = null;
         }
-        public DotaceData DotaceCelkem { get; set; } = new();
-        public DotaceData DotaceCelkemHolding { get; set; } = new();
+        public DotaceData Statistika_Dotace { get; set; } = new();
+        public DotaceData Statistika_Dotace_pro_Holding { get; set; } = new();
 
-        public List<DotaceData> Dotace { get; set; } = new();
-        public List<DotaceData> DotaceHolding { get; set; } = new();
+        public List<DotaceData> Statistika_Dotace_po_Letech { get; set; } = new();
+        public List<DotaceData> Statistika_Dotace_pro_Holding_po_Letech { get; set; } = new();
     }
 }

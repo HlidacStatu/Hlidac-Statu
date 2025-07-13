@@ -1,4 +1,5 @@
-﻿using System;
+﻿using HlidacStatu.DS.Api.MCP;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -6,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace HlidacStatu.DS.Api.Dotace
 {
-    public class Detail
+    public class Detail : MCPBaseResponse
     {
         public string Subsidy_Id { get; set; } = null;
         public string Subsidy_Category { get; set; } = null;
@@ -27,8 +28,6 @@ namespace HlidacStatu.DS.Api.Dotace
         public Subject Subsidy_Recipient { get; set; } = null;
 
         public string Subsidy_Type { get; set; } = null;
-        public string Source_Url { get; set; } = "https://www.hlidacstatu.cz";
-        public string Copyright { get; set; } = $"(c) {DateTime.Now.Year} Hlídač Státu z.ú.";
 
         public class Subject
         {

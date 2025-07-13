@@ -23,7 +23,7 @@ namespace HlidacStatu.DS.Api.Dotace
         public Subject Subsidy_Recipient { get; set; } = null;
 
         public string Subsidy_Type { get; set; } = null;
-        public string Source_Url { get; set; } = "https://www.hlidacstatu.cz";
-        public string Copyright { get; set; } = $"(c) {DateTime.Now.Year} Hlídač Státu z.ú.";
+
+        public string Subsidy_Detail_Url { get; set; } = null;
     }
 }

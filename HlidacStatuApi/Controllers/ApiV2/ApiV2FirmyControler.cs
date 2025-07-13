@@ -154,7 +154,7 @@ namespace HlidacStatuApi.Controllers.ApiV2
         /// <param name="icos">IČO nebo seznam IČO oddělený | (pipe)</param>
         /// <param name="names">Jmeno firmy nebo seznam jmen firem oddělený znakem '|' (pipe)</param>
         /// <returns></returns>
-        [Authorize(Roles = "Admin,Media")]
+        [Authorize(Roles = "Admin")]
         [HttpGet("GetDetailInfo")]
         public ActionResult<List<HlidacStatu.DS.Api.Firmy.SubjektDetailInfo>> GetDetailInfo([FromQuery] string icos, [FromQuery] string names)
         {

@@ -58,7 +58,7 @@ namespace HlidacStatu.Entities
         [ShowNiceDisplayName()]
         public enum StatusOsobyEnum
         {
-            [NiceDisplayName("Nepolitická osoba")]
+            [NiceDisplayName("Bez vazby na politiku")]
             NeniPolitik = 0,
 
             [NiceDisplayName("Bývalý politik")]

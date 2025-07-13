@@ -9,6 +9,8 @@ namespace HlidacStatu.MCPServer.Tools
     [McpServerToolType]
     public class MCPSmlouvy
     {
+        static Serilog.ILogger _logger = Serilog.Log.ForContext<MCPSmlouvy>();
+
 
         [McpServerTool(
             Name = "get_contract_detail",
@@ -29,6 +31,8 @@ namespace HlidacStatu.MCPServer.Tools
                 return null;
 
             var res = await HlidacStatu.Repositories.SmlouvaRepo.LoadAsync(contract_id, includePrilohy: include_text_of_contract);
+            
+            res = Smlouva.Export(res, false, include_text_of_contract);
 
             return res;
 
@@ -38,7 +42,7 @@ namespace HlidacStatu.MCPServer.Tools
             Name = "search_contracts",
             Title = "Find contracts based on parameters"),
         Description("Search contract of Czech government for specified parameters. You can combine any of parameters.")]
-        public async static Task<HlidacStatu.Entities.Smlouva[]> Search_contracts(
+        public async static Task<DS.Api.Smlouva.SearchResult> Search_contracts(
 
                 [Description("Array of contract classification types to filter search results by specific categories")]
     HlidacStatu.Entities.Smlouva.SClassification.ClassificationsTypes[]? categories = null,
@@ -87,7 +91,6 @@ namespace HlidacStatu.MCPServer.Tools
 
             )
         {
-            Smlouva[] res = Array.Empty<Smlouva>();
 
             string[] splitChars = new string[] { " " };
             string query = "";
@@ -179,7 +182,7 @@ namespace HlidacStatu.MCPServer.Tools
             query = query.Trim();
             if (query.Length == 0)
             {
-                return res;
+                return null;
             }
 
             var sres = await SmlouvaRepo.Searching.SimpleSearchAsync(query, page,
@@ -190,9 +193,16 @@ namespace HlidacStatu.MCPServer.Tools
                 logError: false);
 
             if (sres?.IsValid == true && sres?.Results?.Count() > 0)
-                res = sres.Results.ToArray();
-
-            return res;
+            {
+                var res = new DS.Api.Smlouva.SearchResult
+                {
+                    Total_Value_Of_Found_Contracts = sres.ElasticResults.Aggregations?.ContainsKey("sumKc") == true ?
+                         (decimal?)((Nest.ValueAggregate)sres.ElasticResults.Aggregations["sumKc"]).Value : (decimal?)null,
+                    Found_Contracts = sres.Results.Select(m => m.ToApiSmlouvaListItem()).ToArray()
+                };
+                return res;
+            }
+            return null;
 
         }
     }

@@ -451,7 +451,8 @@ namespace HlidacStatu.Repositories
         }
         public static HlidacStatu.DS.Api.Firmy.SubjektFinancialInfo GetFinancialInfo(string ico, string name)
         {
-            Firma f = NajdiFirmuPodleIcoJmena(ico, name);
+            DS.Graphs.Relation.AktualnostType aktualnost = DS.Graphs.Relation.AktualnostType.Nedavny;
+                Firma f = NajdiFirmuPodleIcoJmena(ico, name, aktualnost);
             if (f == null || f.Valid == false)
             {
                 return null;
@@ -459,8 +460,8 @@ namespace HlidacStatu.Repositories
             HlidacStatu.DS.Api.Firmy.SubjektFinancialInfo res = new ();
             res.Source_Url = f.GetUrl(false);
             res.Ico = f.ICO;
-            res.JmenoFirmy = f.Jmeno;
-            res.OmezeniCinnosti = string.IsNullOrWhiteSpace( f.StatusFull()) ? null : f.StatusFull() ;
+            res.Jmeno_Firmy = f.Jmeno;
+            res.Omezeni_Cinnosti = string.IsNullOrWhiteSpace( f.StatusFull()) ? null : f.StatusFull() ;
 
             res.Kategorie_Organu_Verejne_Moci = null;
             var _kategorie_Organu_Verejne_Moci = f.KategorieOVMAsync().ConfigureAwait(false).GetAwaiter().GetResult()
@@ -469,11 +470,11 @@ namespace HlidacStatu.Repositories
             if (_kategorie_Organu_Verejne_Moci?.Length > 0)
                 res.Kategorie_Organu_Verejne_Moci = _kategorie_Organu_Verejne_Moci;
 
-            res.PocetZam = FirmaRepo.Merk.MerkEnumConverters.ConvertCompanyMagnitude(f.PocetZamKod?.ToString())?.Pretty;
+            res.Pocet_Zamestnancu = FirmaRepo.Merk.MerkEnumConverters.ConvertCompanyMagnitude(f.PocetZamKod?.ToString())?.Pretty;
             res.Obrat = FirmaRepo.Merk.MerkEnumConverters.ConvertCompanyTurnover(f.ObratKod?.ToString())?.Pretty;
 
-            res.Industry = FirmaRepo.Merk.MerkEnumConverters.ConvertCompanyIndustryToFullName(f.IndustryKod?.ToString(),true,true);
-            res.PlatceDPH = f.PlatceDPHKod switch
+            res.Obor_Podnikani = FirmaRepo.Merk.MerkEnumConverters.ConvertCompanyIndustryToFullName(f.IndustryKod?.ToString(),true,true);
+            res.Platce_DPH = f.PlatceDPHKod switch
             {
                 1 => "Je plátce DPH",
                 0 => "Není plátce DPH",
@@ -491,6 +492,18 @@ namespace HlidacStatu.Repositories
                 1 => "Má dluh vůči VZP",
                 _ => null
             };
+            res.Osoby_s_vazbou_na_firmu = f.Osoby_v_OR(aktualnost)
+                .OrderBy(m => m.o.Prijmeni)
+                    .ThenBy(m => m.o.Jmeno)
+                    .ThenBy(m => m.o.Narozeni)
+                    .Select(m => new HlidacStatu.DS.Api.Firmy.SubjektFinancialInfo.Osoba()
+                    {
+                        Full_Name = m.o.FullName(),
+                        Person_Id = m.o.NameId,
+                        Year_Of_Birth = m.o.Narozeni.HasValue ? m.o.Narozeni.Value.Year.ToString() : null,
+                    })
+                    .ToArray()
+                ;
 
             return res; 
         }
@@ -514,31 +527,46 @@ namespace HlidacStatu.Repositories
                 //remove here to avoid duplicated data
                 res.Business_info.Source_Url = null;
                 res.Business_info.Copyright = null;
-                res.Business_info.JmenoFirmy = null;
+                res.Business_info.Jmeno_Firmy = null;
             }
 
             res.Source_Url = f.GetUrl(false);
             res.Ico = f.ICO;
-            res.JmenoFirmy = f.Jmeno;
+            res.Jmeno_Firmy = f.Jmeno;
             res.Rizika = f.InfoFacts().RenderFacts(4, true, false);
+            
+            res.Osoby_s_vazbou_na_firmu = f.Osoby_v_OR(aktualnost)
+                .OrderBy(m => m.o.Prijmeni)
+                    .ThenBy(m => m.o.Jmeno)
+                    .ThenBy(m => m.o.Narozeni)
+                    .Select(m => new HlidacStatu.DS.Api.Firmy.SubjektDetailInfo.Osoba()
+                    {
+                        Full_Name = m.o.FullName(),
+                        Person_Id = m.o.NameId,
+                        Year_Of_Birth = m.o.Narozeni.HasValue ? m.o.Narozeni.Value.Year.ToString() : null,
+                    })
+                    .ToArray()
+                ;
+
+
             res.Kategorie_Organu_Verejne_Moci = f.KategorieOVMAsync().ConfigureAwait(false).GetAwaiter().GetResult()
                 .Select(m => m.nazev)
                 .ToArray();
 
             if (f.JsemNeziskovka())
-                res.CharakterFirmy = DS.Api.Firmy.SubjektDetailInfo.CharakterEnum.NeziskovaOrganizace;
+                res.Charakter_Firmy = DS.Api.Firmy.SubjektDetailInfo.CharakterEnum.NeziskovaOrganizace;
             else if (f.JsemOVM())
-                res.CharakterFirmy = DS.Api.Firmy.SubjektDetailInfo.CharakterEnum.StatniOrgan;
+                res.Charakter_Firmy = DS.Api.Firmy.SubjektDetailInfo.CharakterEnum.StatniOrgan;
             else if (f.JsemPolitickaStrana())
-                res.CharakterFirmy = DS.Api.Firmy.SubjektDetailInfo.CharakterEnum.PolitickaStrana;
+                res.Charakter_Firmy = DS.Api.Firmy.SubjektDetailInfo.CharakterEnum.PolitickaStrana;
             else if (f.TypSubjektu == Firma.TypSubjektuEnum.PatrimStatu
                 || f.TypSubjektu == Firma.TypSubjektuEnum.PatrimStatuAlespon25perc
                 || f.JsemStatniFirma())
-                res.CharakterFirmy = DS.Api.Firmy.SubjektDetailInfo.CharakterEnum.FirmaPatriStatu;
+                res.Charakter_Firmy = DS.Api.Firmy.SubjektDetailInfo.CharakterEnum.FirmaPatriStatu;
             else if (f.Registrovana_v_zahranici)
-                res.CharakterFirmy = DS.Api.Firmy.SubjektDetailInfo.CharakterEnum.ZahranicniFirma;
+                res.Charakter_Firmy = DS.Api.Firmy.SubjektDetailInfo.CharakterEnum.ZahranicniFirma;
             else if (f.JsemSoukromaFirma())
-                res.CharakterFirmy = DS.Api.Firmy.SubjektDetailInfo.CharakterEnum.SoukromaFirma;
+                res.Charakter_Firmy = DS.Api.Firmy.SubjektDetailInfo.CharakterEnum.SoukromaFirma;
 
 
 
@@ -555,7 +583,7 @@ namespace HlidacStatu.Repositories
                         res.KIndex.Add(new HlidacStatu.DS.Api.Firmy.SubjektDetailInfo.KIndexData()
                         {
                             KIndex = kidx.KIndexLabel.ToString(),
-                            ObrazekUrl = kidx.KIndexLabelIconUrl(false),
+                            Obrazek_Url = kidx.KIndexLabelIconUrl(false),
                             Popis = kindex.InfoFacts(i).RenderFacts(3, true, true, ", "),
                             Rok = i
                         });
@@ -568,7 +596,7 @@ namespace HlidacStatu.Repositories
             if (smlouvyStat != null)
             {
                 var maxY = HlidacStatu.Util.Consts.CalculatedCurrentYearSmlouvy;
-                res.RegistrSmluvCelkem = new HlidacStatu.DS.Api.Firmy.SubjektDetailInfo.SmlouvyData()
+                res.Statistika_Registr_Smluv = new HlidacStatu.DS.Api.Firmy.SubjektDetailInfo.SmlouvyData()
                 {
                     Rok = 0,
                     CelkovaHodnotaSmluv = smlouvyStat.Summary().CelkovaHodnotaSmluv,
@@ -584,7 +612,7 @@ namespace HlidacStatu.Repositories
                     PocetSmluvULimitu = smlouvyStat.Summary().PocetSmluvULimitu
                 };
 
-                res.RegistrSmluv = smlouvyStat
+                res.Statistiky_Registr_Smluv_po_Letech = smlouvyStat
                     .Where(m => m.Year <= maxY && m.Year >= maxY - 3)
                     .Select(ss => new HlidacStatu.DS.Api.Firmy.SubjektDetailInfo.SmlouvyData()
                     {
@@ -612,22 +640,22 @@ namespace HlidacStatu.Repositories
             if (dotaceStat != null)
             {
                 var maxY = HlidacStatu.Util.Consts.CalculatedCurrentYearDotace;
-                res.DotaceCelkem = new HlidacStatu.DS.Api.Firmy.SubjektDetailInfo.DotaceData()
+                res.Statistika_Dotace = new HlidacStatu.DS.Api.Firmy.SubjektDetailInfo.DotaceData()
                 {
                     Rok = 0,
-                    CelkemPrideleno = dotaceStat.Summary().CelkemPrideleno,
-                    PocetDotaci = dotaceStat.Summary().PocetDotaci
+                    Celkem_Prideleno = dotaceStat.Summary().CelkemPrideleno,
+                    Pocet_Dotaci = dotaceStat.Summary().PocetDotaci
                 };
 
-                res.Dotace = dotaceStat
+                res.Statistika_Dotace_po_Letech = dotaceStat
                     .Where(m => m.Year <= maxY && m.Year >= maxY - 3)
                     .Select(ds => new HlidacStatu.DS.Api.Firmy.SubjektDetailInfo.DotaceData()
                     {
                         Rok = ds.Year,
-                        CelkemPrideleno = ds.Value.CelkemPrideleno,
-                        PocetDotaci = ds.Value.PocetDotaci,
-                        ZmenaHodnotyDotaci = ds.Year == maxY ? null : new DS.Api.StatisticChange(ds.Year, maxY, "Hodnota smluv", ds.Value.CelkemPrideleno, dotaceStat.StatisticsForYear(maxY).CelkemPrideleno),
-                        ZmenaPoctuDotaci = ds.Year == maxY ? null : new DS.Api.StatisticChange(ds.Year, maxY, "Počet smluv", ds.Value.PocetDotaci, dotaceStat.StatisticsForYear(maxY).PocetDotaci),
+                        Celkem_Prideleno = ds.Value.CelkemPrideleno,
+                        Pocet_Dotaci = ds.Value.PocetDotaci,
+                        //ZmenaHodnotyDotaci = ds.Year == maxY ? null : new DS.Api.StatisticChange(ds.Year, maxY, "Hodnota smluv", ds.Value.CelkemPrideleno, dotaceStat.StatisticsForYear(maxY).CelkemPrideleno),
+                        //ZmenaPoctuDotaci = ds.Year == maxY ? null : new DS.Api.StatisticChange(ds.Year, maxY, "Počet smluv", ds.Value.PocetDotaci, dotaceStat.StatisticsForYear(maxY).PocetDotaci),
                     })
                     .ToList();
             }
@@ -637,7 +665,7 @@ namespace HlidacStatu.Repositories
                 var maxY = HlidacStatu.Util.Consts.CalculatedCurrentYearSmlouvy;
                 if (smlouvyStatHolding != null)
                 {
-                    res.RegistrSmluvHoldingCelkem = new HlidacStatu.DS.Api.Firmy.SubjektDetailInfo.SmlouvyData()
+                    res.Statistika_Registr_Smluv_pro_Holding = new HlidacStatu.DS.Api.Firmy.SubjektDetailInfo.SmlouvyData()
                     {
                         Rok = 0,
                         CelkovaHodnotaSmluv = smlouvyStatHolding.Summary().CelkovaHodnotaSmluv,
@@ -653,7 +681,7 @@ namespace HlidacStatu.Repositories
                         PocetSmluvULimitu = smlouvyStatHolding.Summary().PocetSmluvULimitu
                     };
 
-                    res.RegistrSmluvHolding = smlouvyStatHolding
+                    res.Statisticky_Registr_Smluv_pro_Holding_po_Letech = smlouvyStatHolding
                         .Where(m => m.Year <= maxY && m.Year >= maxY - 3)
                         .Select(ss => new HlidacStatu.DS.Api.Firmy.SubjektDetailInfo.SmlouvyData()
                         {
@@ -679,22 +707,22 @@ namespace HlidacStatu.Repositories
                 maxY = HlidacStatu.Util.Consts.CalculatedCurrentYearDotace;
                 if (dotaceStatHolding != null)
                 {
-                    res.DotaceCelkemHolding = new HlidacStatu.DS.Api.Firmy.SubjektDetailInfo.DotaceData()
+                    res.Statistika_Dotace_pro_Holding = new HlidacStatu.DS.Api.Firmy.SubjektDetailInfo.DotaceData()
                     {
                         Rok = 0,
-                        CelkemPrideleno = dotaceStatHolding.Summary().CelkemPrideleno,
-                        PocetDotaci = dotaceStatHolding.Summary().PocetDotaci
+                        Celkem_Prideleno = dotaceStatHolding.Summary().CelkemPrideleno,
+                        Pocet_Dotaci = dotaceStatHolding.Summary().PocetDotaci
                     };
 
-                    res.DotaceHolding = dotaceStatHolding
+                    res.Statistika_Dotace_pro_Holding_po_Letech = dotaceStatHolding
                         .Where(m => m.Year <= HlidacStatu.Util.Consts.CalculatedCurrentYearDotace && m.Year >= HlidacStatu.Util.Consts.CalculatedCurrentYearDotace - 3)
                         .Select(ds => new HlidacStatu.DS.Api.Firmy.SubjektDetailInfo.DotaceData()
                         {
                             Rok = ds.Year,
-                            CelkemPrideleno = ds.Value.CelkemPrideleno,
-                            PocetDotaci = ds.Value.PocetDotaci,
-                            ZmenaHodnotyDotaci = ds.Year == maxY ? null : new DS.Api.StatisticChange(ds.Year, maxY, "Hodnota smluv", ds.Value.CelkemPrideleno, dotaceStatHolding.StatisticsForYear(maxY).CelkemPrideleno),
-                            ZmenaPoctuDotaci = ds.Year == maxY ? null : new DS.Api.StatisticChange(ds.Year, maxY, "Počet smluv", ds.Value.PocetDotaci, dotaceStatHolding.StatisticsForYear(maxY).PocetDotaci),
+                            Celkem_Prideleno = ds.Value.CelkemPrideleno,
+                            Pocet_Dotaci = ds.Value.PocetDotaci,
+                            //ZmenaHodnotyDotaci = ds.Year == maxY ? null : new DS.Api.StatisticChange(ds.Year, maxY, "Hodnota smluv", ds.Value.CelkemPrideleno, dotaceStatHolding.StatisticsForYear(maxY).CelkemPrideleno),
+                            //ZmenaPoctuDotaci = ds.Year == maxY ? null : new DS.Api.StatisticChange(ds.Year, maxY, "Počet smluv", ds.Value.PocetDotaci, dotaceStatHolding.StatisticsForYear(maxY).PocetDotaci),
                         })
                         .ToList();
                 }

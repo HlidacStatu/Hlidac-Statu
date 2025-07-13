@@ -10,10 +10,13 @@ namespace HlidacStatu.MCPServer.Tools
     [McpServerToolType]
     public class MCPFirmy
     {
+        static Serilog.ILogger _logger = Serilog.Log.ForContext<MCPFirmy>();
+
         [McpServerTool(
           Name = "get_legal_entity_business_info",
           Title = "Return detail information about Czech company with ICO"),
-      Description("Returns the Czech Legal entity by its ICO (included companies and corporations,Government agencies and institutions, Cities and municipalities, Non-profit organizations adn all other subjects with legal personality).")]
+      Description("Returns the Czech Legal entity by its ICO (included companies and corporations,Government agencies and institutions, Cities and municipalities, Non-profit organizations adn all other subjects with legal personality)."
+            + " For person detail use tool 'get_person_detail' with parameter 'person_id'.")]
         public static HlidacStatu.DS.Api.Firmy.SubjektFinancialInfo SubjektFinancialInfo(
           [Description("IČO of Legal entity to get detail information about.")]
             string ico,
@@ -33,7 +36,8 @@ namespace HlidacStatu.MCPServer.Tools
         [McpServerTool(
             Name = "get_legal_entity_full_detail",
             Title = "Return detail information about Czech company with ICO"),
-        Description("Returns the Czech Legal entity by its ICO (included companies and corporations,Government agencies and institutions, Cities and municipalities, Non-profit organizations adn all other subjects with legal personality).")]
+        Description("Returns the Czech Legal entity by its ICO (included companies and corporations, Government agencies and institutions, Cities and municipalities, Non-profit organizations adn all other subjects with legal personality)."
+            + " For person detail use tool 'get_person_detail' with parameter 'person_id'.")]
         public static HlidacStatu.DS.Api.Firmy.SubjektDetailInfo SubjektDetailInfo(
             [Description("IČO of Legal entity to get detail information about.")]
             string ico,
@@ -68,7 +72,7 @@ namespace HlidacStatu.MCPServer.Tools
                                         Ico = m.Ico,
                                         Jmeno = m.Jmeno,
                                         Kraj = m.Kraj,
-                                        ZdrojUrl = HlidacStatu.Entities.Firma.GetUrl(m.Ico, false),
+                                        Source_Url = HlidacStatu.Entities.Firma.GetUrl(m.Ico, false),
                                     })
                     .DistinctBy(m=>m.Ico)
                     .ToArray();
@@ -104,7 +108,7 @@ namespace HlidacStatu.MCPServer.Tools
                     {
                         Ico = m,
                         Jmeno = HlidacStatu.Repositories.Firmy.GetJmeno(m),
-                        ZdrojUrl = HlidacStatu.Entities.Firma.GetUrl(m, false),
+                        Source_Url = HlidacStatu.Entities.Firma.GetUrl(m, false),
                     })
                     .ToArray();
             ;
