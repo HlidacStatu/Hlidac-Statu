@@ -4,7 +4,7 @@
 		<TargetFramework>net8.0</TargetFramework>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<GenerateDocumentationFile>true</GenerateDocumentationFile>
-		<Version>0.3.2.0</Version>
+		<Version>0.3.2.1</Version>
 		<RootNamespace>HlidacStatu.MCPServer</RootNamespace>
 		<AssemblyName>HlidacStatu.MCPServer</AssemblyName>
 	</PropertyGroup>
@@ -43,10 +43,6 @@
 	  <Content Update="logger.serilog.json">
 	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 	  </Content>
-	</ItemGroup>
-
-	<ItemGroup>
-	  <Folder Include="Resources\" />
 	</ItemGroup>
 
 </Project>

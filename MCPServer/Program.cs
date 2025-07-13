@@ -3,6 +3,7 @@ using HlidacStatu.LibCore.Extensions;
 using HlidacStatu.LibCore.Filters;
 using HlidacStatu.LibCore.MiddleWares;
 using HlidacStatu.LibCore.Services;
+using HlidacStatu.MCPServer.Resources;
 using HlidacStatu.MCPServer.Tools;
 using HlidacStatuApi.Code;
 using Microsoft.AspNetCore.Authorization;
@@ -64,11 +65,13 @@ if (enableAuth)
 builder.Services.AddMcpServer(
     o=> o.ServerInfo = new ModelContextProtocol.Protocol.Implementation() {
         Name = "Hlidac statu MCP Server",
-        Version = System.Reflection.Assembly.GetEntryAssembly().GetName().Version.ToString()
+        Version = System.Reflection.Assembly.GetEntryAssembly().GetName().Version.ToString(),
+        Title = "Hlidac statu MCP Server",
     }
     )
     .WithHttpTransport()
     .WithToolsFromAssembly()
+    .WithResourcesFromAssembly()
     ;
 
 builder.Services.AddOpenTelemetry()

@@ -93,7 +93,7 @@ namespace HlidacStatu.MCPServer.Tools
             string ico, 
             [Description("Historic view to get subsidiaries. Valid values are: \n" 
             + "Aktualni : current status; \n"
-            + "Nedavny : AktCurrently according to the commercial register or the last 5 years; \n"
+            + "Nedavny : Currently according to the commercial register or the last 5 years; \n"
             + "Libovolny : Currently according to the commercial register or at any time in the past")]
             DS.Graphs.Relation.AktualnostType historic_view = DS.Graphs.Relation.AktualnostType.Nedavny)
         {
