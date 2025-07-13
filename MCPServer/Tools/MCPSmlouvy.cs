@@ -41,7 +41,7 @@ namespace HlidacStatu.MCPServer.Tools
         [McpServerTool(
             Name = "search_contracts",
             Title = "Find contracts based on parameters"),
-        Description("Search contract of Czech government for specified parameters. You can combine any of parameters.")]
+        Description("Find contracts of Czech government for specified parameters. You can combine any of parameters.")]
         public async static Task<DS.Api.Smlouva.SearchResult> Search_contracts(
 
                 [Description("Array of contract classification types to filter search results by specific categories")]

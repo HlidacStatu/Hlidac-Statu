@@ -77,7 +77,7 @@ namespace HlidacStatuApi.Controllers.ApiV2
             var osoby = await OsobaRepo.Searching.SimpleSearchAsync(ftxDotaz,
                 strana.Value, 30, OsobaRepo.Searching.OrderResult.Relevance, osobaStatus: status);
 
-            var result = osoby.Results.Select(o => new OsobaDTO(o)).ToList();
+            var result = osoby.Result.Select(o => new OsobaDTO(o)).ToList();
 
             return result;
         }

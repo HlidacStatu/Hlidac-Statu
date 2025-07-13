@@ -67,7 +67,7 @@ namespace HlidacStatu.Datasets
                 return agg;
             }
 
-            public static async Task<DatasetMultiResult> GeneralSearchAsync(string query, IEnumerable<DataSet> datasets = null, int page = 1, int pageSize = 20, string sort = null)
+            public static async Task<DatasetMultiResult> GeneralSearchAsync(string query, IEnumerable<DataSet> datasets = null, int page = 1, int pageSize = 20, string sort = null, bool withHighlighting = false)
             {
                 DatasetMultiResult res = new DatasetMultiResult() { Query = query, DataSource = "DatasetMultiResult.GeneralSearch" };
 
@@ -93,7 +93,7 @@ namespace HlidacStatu.Datasets
                     {
                         try
                         {
-                            var rds = await ds.SearchDataAsync(query, page, pageSize, sort);
+                            var rds = await ds.SearchDataAsync(query, page, pageSize, sort, withHighlighting: withHighlighting);
                             if (rds.IsValid)
                             {
                                 res.Results.Add(rds);

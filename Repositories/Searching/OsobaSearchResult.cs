@@ -13,7 +13,7 @@ namespace HlidacStatu.Repositories.Searching
         {
         }
 
-        public IEnumerable<Osoba> Results { get; set; }
+        public IEnumerable<Osoba> Result { get; set; }
 
         public override int MaxResultWindow()
         {

@@ -142,7 +142,7 @@ namespace HlidacStatu.Repositories
                 result.Total = total;
                 result.Q = query;
                 result.ElasticResults = null; //TODO
-                result.Results = foundPepole;
+                result.Result = foundPepole;
                 result.Page = page;
                 result.PageSize = pageSize;
                 result.Order = order.ToString();
