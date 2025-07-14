@@ -44,7 +44,7 @@ url - a URL to the document or search result item. Useful for citing specific re
         [McpServerTool(
             Name = "search",
             Title = "search tool for OpenAI deep search functionality. "),
-            Description("return a list of contracts of Czech government for query.")]
+            Description("Find contracts of Czech government for query.")]
         public async static Task<OpenAiResultItem[]> search(string query)
         {
             int maxResults = 50;

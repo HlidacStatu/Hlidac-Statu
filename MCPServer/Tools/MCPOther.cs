@@ -1,4 +1,6 @@
-﻿using ModelContextProtocol.Server;
+﻿using HlidacStatu.Entities;
+using Microsoft.AspNetCore.Identity;
+using ModelContextProtocol.Server;
 using System.ComponentModel;
 
 namespace HlidacStatu.MCPServer.Tools
@@ -7,6 +9,17 @@ namespace HlidacStatu.MCPServer.Tools
     public class MCPOther
     {
         static Serilog.ILogger _logger = Serilog.Log.ForContext<MCPOther>();
+
+        [McpServerTool(
+            Name = "ping",
+            Title = "Simple Echo tool"),
+        Description("Simple Echo tool.")]
+        public static string Ping([Description("sup sem")] string text)
+        {
+            //Console.WriteLine("HttpContext: " + _ctx?.HttpContext?.ToString());
+            return "Pong: " + text;
+        }
+
 
         [McpServerTool(
             Name = "send_feedback",

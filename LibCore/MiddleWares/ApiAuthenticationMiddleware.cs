@@ -25,51 +25,19 @@ namespace HlidacStatu.LibCore.MiddleWares
         public async Task Invoke(HttpContext context)
         {
             var userName = context.User.Identity.Name;
-            if (string.IsNullOrEmpty(userName) 
-                && 
+            if (string.IsNullOrEmpty(userName)
+                &&
                 (context.Request.Path.StartsWithSegments("/api") || context.Request.Path.StartsWithSegments("/health"))
                 )
             {
-                var authToken = context.GetAuthToken();
-                authToken = authToken.Replace("Token ", "").Trim();
+                //var authToken = context.GetAuthTokenValue();
+                //authToken = authToken.Replace("Token ", "").Trim();
 
-                ApplicationUser user = null;
-
-                if (!string.IsNullOrEmpty(authToken) && Guid.TryParse(authToken, out var guid))
+                var authUser = context.GetAuthPrincipal();
+                if (authUser != null && authUser.Identity.IsAuthenticated)
                 {
-                    using (DbEntities db = new())
-                    {
+                    context.User = authUser;
 
-                        user = await db.Users.FromSqlInterpolated(
-                                $"select u.* from AspNetUsers u join AspNetUserApiTokens a on u.Id = a.Id where a.Token = {guid}")
-                            .AsQueryable()
-                            .FirstOrDefaultAsync();
-
-                    }
-
-                    if (user != null)
-                    {
-                        var roles = user.GetRoles();
-
-                        var claims = new List<Claim> {
-                                new(ClaimTypes.NameIdentifier, user.Id.ToString()),
-                                new(ClaimTypes.Name, user.UserName),
-                                new(ClaimTypes.Email, user.Email),
-                            };
-
-                        foreach (var role in roles)
-                        {
-                            claims.Add(new Claim(ClaimTypes.Role, role));
-                        }
-
-                        var identity = new ClaimsIdentity(claims, "Api");
-                        var principal = new ClaimsPrincipal(identity);
-                        context.User = principal;
-
-                        // var ticket = new AuthenticationTicket(principal, Scheme.Name);
-                        // context.User.AddIdentity(identity);
-                        // context.User
-                    }
                 }
             }
 

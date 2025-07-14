@@ -5,7 +5,6 @@ using HlidacStatu.LibCore.MiddleWares;
 using HlidacStatu.LibCore.Services;
 using HlidacStatu.MCPServer.Resources;
 using HlidacStatu.MCPServer.Tools;
-using HlidacStatuApi.Code;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Identity;
@@ -17,6 +16,7 @@ using OpenTelemetry;
 using OpenTelemetry.Metrics;
 using OpenTelemetry.Trace;
 using Serilog;
+using static NPOI.SS.Formula.Functions.Countif;
 using ILogger = Serilog.ILogger;
 
 string CORSPolicy = "from_hlidacstatu.cz";
@@ -50,11 +50,8 @@ builder.Services.AddDataProtection()
 
 bool enableAuth = false;
 
-if (enableAuth)
-{
-    AddIdentity(builder.Services);
-    builder.Services.AddSingleton<IAuthorizationMiddlewareResultHandler, HlidacStatuApi.Code.SpecificApiAuthorizationMiddlewareResultHandler>();
-}
+
+
 
 
 //McpServerOptions mcp_server_options = new()
@@ -62,25 +59,33 @@ if (enableAuth)
 //    ServerInfo = new ModelContextProtocol.Protocol.Implementation{ Name = "Hlidac statu MCP Server", Version = System.Reflection.Assembly.GetEntryAssembly().GetName().Version.ToString() },
 //};
 
-builder.Services.AddMcpServer(
-    o=> o.ServerInfo = new ModelContextProtocol.Protocol.Implementation() {
-        Name = "Hlidac statu MCP Server",
-        Version = System.Reflection.Assembly.GetEntryAssembly().GetName().Version.ToString(),
-        Title = "Hlidac statu MCP Server",
+_ = builder.Services.AddMcpServer(
+    o => {
+        o.ServerInfo = new ModelContextProtocol.Protocol.Implementation()
+        {
+            Name = "Hlidac statu MCP Server",
+            Version = System.Reflection.Assembly.GetEntryAssembly().GetName().Version.ToString(),
+            Title = "Hlidac statu MCP Server",
+        };
+        o.ServerInstructions = "This is MCP server for Hlidac statu. It provides access to data about Czech companies, contracts with Czech government, subsidies, czech politicians and other entities. Use tools to query data.";
     }
     )
-    .WithHttpTransport()
+    .WithHttpTransport(opt =>
+    {
+        opt.ConfigureSessionOptions = HlidacStatu.MCPServer.Code.Auth.ConfigureSessionCheckCookieAsync;
+        //opt.RunSessionHandler = HlidacStatu.MCPServer.Code.Auth.RunSessionCheckCookieAsync;
+    })
     .WithToolsFromAssembly()
     .WithResourcesFromAssembly()
     ;
 
-builder.Services.AddOpenTelemetry()
+_ = builder.Services.AddOpenTelemetry()
     .WithTracing(b => b.AddSource("*")
         .AddAspNetCoreInstrumentation()
         .AddHttpClientInstrumentation())
     .WithMetrics(b => b.AddMeter("*")
         .AddAspNetCoreInstrumentation()
-        .AddHttpClientInstrumentation())   
+        .AddHttpClientInstrumentation())
     .UseOtlpExporter();
 
 

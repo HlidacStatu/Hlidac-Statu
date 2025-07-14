@@ -12,5 +12,6 @@ namespace HlidacStatu.LibCore.Extensions
         {
             return ApplicationUser.GetByEmail(user.Identity?.Name).EmailConfirmed;
         }
+
     }
 }
