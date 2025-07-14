@@ -1,7 +1,9 @@
 ﻿using HlidacStatu.Entities;
+using HlidacStatu.Repositories;
 using Microsoft.AspNetCore.Identity;
 using ModelContextProtocol.Server;
 using System.ComponentModel;
+using System.Reflection;
 
 namespace HlidacStatu.MCPServer.Tools
 {
@@ -14,8 +16,16 @@ namespace HlidacStatu.MCPServer.Tools
             Name = "ping",
             Title = "Simple Echo tool"),
         Description("Simple Echo tool.")]
-        public static string Ping([Description("sup sem")] string text)
+        public static string Ping(IMcpServer server, 
+            [Description("text to send back")] string text)
         {
+            _=AuditRepo.Add(Audit.Operations.Call, 
+                server?.ServerOptions?.KnownClientInfo?.Name?.Split('|')?.FirstOrDefault(),
+                server?.ServerOptions?.KnownClientInfo?.Name?.Split('|')?.LastOrDefault(), 
+                AuditRepo.GetClassAndMethodName(MethodBase.GetCurrentMethod()),"",
+                AuditRepo.GetMethodParametersWithValues(MethodBase.GetCurrentMethod().GetParameters().Skip(1), text),
+                null);
+
             //Console.WriteLine("HttpContext: " + _ctx?.HttpContext?.ToString());
             return "Pong: " + text;
         }
@@ -25,10 +35,23 @@ namespace HlidacStatu.MCPServer.Tools
             Name = "send_feedback",
             Title = "Send feedback to Hlidac statu team"),
         Description("Send feedback to Hlídač státu team. Ask user for his email. Its mandatory parameter.")]
-        public static string SendFeedback(string from_email, string text, string from_name = "")
+        public static string SendFeedback(IMcpServer server,
+            [Description("Email address of user")]
+            string user_email,
+            [Description("Text of feedback message")]
+            string text, 
+            [Description("Name of user, if available. If not, empty string is used.")]
+            string from_name = "")
         {
-            string email = from_email.Trim();
-            if (Devmasters.TextUtil.IsValidEmail(from_email) == false)
+            _ = AuditRepo.Add(Audit.Operations.Call,
+                server?.ServerOptions?.KnownClientInfo?.Name?.Split('|')?.FirstOrDefault(),
+                server?.ServerOptions?.KnownClientInfo?.Name?.Split('|')?.LastOrDefault(),
+                AuditRepo.GetClassAndMethodName(MethodBase.GetCurrentMethod()), "",
+                AuditRepo.GetMethodParametersWithValues(MethodBase.GetCurrentMethod().GetParameters().Skip(1), user_email,text,from_name), 
+                null);
+
+            string email = user_email.Trim();
+            if (Devmasters.TextUtil.IsValidEmail(user_email) == false)
             {
                 email = "mcp@hlidacstatu.cz";
             }
@@ -38,7 +61,7 @@ namespace HlidacStatu.MCPServer.Tools
             string body = $@"
 Zpráva z MCP API:
 
-Od uzivatele:{from_email} 
+Od uzivatele:{user_email} 
 
 text zpravy: {text}";
             try

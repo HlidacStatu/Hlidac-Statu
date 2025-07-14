@@ -1,5 +1,11 @@
 ﻿using HlidacStatu.LibCore.Extensions;
+using HlidacStatu.Repositories;
+using IdentityModel.Client;
 using ModelContextProtocol.Server;
+using OpenTelemetry.Trace;
+using System.ServiceModel;
+using static Corsinvest.ProxmoxVE.Api.Shared.Models.Cluster.ClusterCephStatus;
+using static Corsinvest.ProxmoxVE.Api.Shared.Models.Vm.VmQemuAgentNetworkGetInterfaces;
 
 namespace HlidacStatu.MCPServer.Code
 {
@@ -11,20 +17,58 @@ namespace HlidacStatu.MCPServer.Code
         {
             var authUser = ctx.GetAuthPrincipal();
             if (authUser?.IsInRole("BetaTester") == true)
-            //if (ctx.Request.Headers.TryGetValue("Authorization", out var token))
-            { }
+            {
+                if (mcpsOpt.KnownClientInfo == null)
+                    mcpsOpt.KnownClientInfo = new ModelContextProtocol.Protocol.Implementation()
+                    {
+                        Name = authUser.Identity.Name + "|"+ctx.GetRemoteIp(),
+                        Version = ""
+                    };
+                else
+                    mcpsOpt.KnownClientInfo.Name = authUser.Identity.Name;
+
+                var audit = new Entities.Audit()
+                {
+                    machineName = Environment.MachineName,
+                    applicationName = mcpsOpt.ServerInfo.Name + " " + mcpsOpt.ServerInfo.Version,
+                    date = DateTime.Now,
+                    operation = Entities.Audit.Operations.Call.ToString(),
+                    userId = authUser.Identity.Name,
+                    IP = ctx.GetRemoteIp(),
+                    method = "starting MCP Session",
+                    requestUrl = "https://mcp.api.hlidacstatu.cz",
+                    statusCode = 200,
+                };
+                AuditRepo.Add(audit);
+            }
             else //no valid user
             {
                 mcpsOpt.Capabilities = new ModelContextProtocol.Protocol.ServerCapabilities
                 {
                     Tools = new ModelContextProtocol.Protocol.ToolsCapability() { ToolCollection = null },
-                    Resources = new ModelContextProtocol.Protocol.ResourcesCapability() { ResourceCollection = null },                     
+                    Resources = new ModelContextProtocol.Protocol.ResourcesCapability() { ResourceCollection = null },
                 };
                 mcpsOpt.ServerInstructions = UnAuthorizedInstruction;
+
+
+                var audit = new Entities.Audit()
+                {
+                    machineName = Environment.MachineName,
+                    applicationName = mcpsOpt.ServerInfo.Name + " " + mcpsOpt.ServerInfo.Version,
+                    date = DateTime.Now,
+                    operation = Entities.Audit.Operations.Call.ToString(),
+                    IP = ctx.GetRemoteIp(),
+                    method = "starting MCP Session",
+                    exception = "Unauthorized user",
+                    requestUrl = "https://mcp.api.hlidacstatu.cz",
+                    statusCode = 401,
+                };
+                AuditRepo.Add(audit);
+
             }
         }
 
-        public static async Task RunSessionCheckCookieAsync(HttpContext ctx, IMcpServer mcps, CancellationToken cancellationToken)  
+        public static async Task RunSessionCheckCookieAsync(HttpContext ctx, IMcpServer mcps, CancellationToken cancellationToken)
         {
             // this is needed to set the user identity for the session
             if (ctx.Request.Headers.TryGetValue("Authorization", out var token))

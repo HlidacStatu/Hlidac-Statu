@@ -63,7 +63,7 @@ _ = builder.Services.AddMcpServer(
     o => {
         o.ServerInfo = new ModelContextProtocol.Protocol.Implementation()
         {
-            Name = "Hlidac statu MCP Server",
+            Name = "HlidacStatu.MCPServer",
             Version = System.Reflection.Assembly.GetEntryAssembly().GetName().Version.ToString(),
             Title = "Hlidac statu MCP Server",
         };

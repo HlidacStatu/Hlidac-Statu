@@ -6,6 +6,7 @@ using HlidacStatu.Lib.Data.External.StatniPokladna;
 using HlidacStatu.Repositories;
 using ModelContextProtocol.Server;
 using System.ComponentModel;
+using System.Reflection;
 using System.Text.Json;
 using static HlidacStatu.Repositories.SmlouvaRepo.Searching;
 using static HlidacStatu.XLib.Search;
@@ -45,8 +46,18 @@ url - a URL to the document or search result item. Useful for citing specific re
             Name = "search",
             Title = "search tool for OpenAI deep search functionality. "),
             Description("Find contracts of Czech government for query.")]
-        public async static Task<OpenAiResultItem[]> search(string query)
+        public async static Task<OpenAiResultItem[]> search(IMcpServer server,
+            [Description("Query string to search for.")]
+            string query)
         {
+            _ = AuditRepo.Add(Audit.Operations.Call,
+                server?.ServerOptions?.KnownClientInfo?.Name?.Split('|')?.FirstOrDefault(),
+                server?.ServerOptions?.KnownClientInfo?.Name?.Split('|')?.LastOrDefault(),
+                AuditRepo.GetClassAndMethodName(MethodBase.GetCurrentMethod()), "",
+                AuditRepo.GetMethodParametersWithValues(MethodBase.GetCurrentMethod().GetParameters().Skip(1), query),
+                null);
+
+
             int maxResults = 50;
             int maxPartSize = 5;
             Dictionary<PartsToSearch, int> parts = new() {
@@ -170,8 +181,17 @@ url - a URL to the document or search result item. Useful for citing specific re
             Name = "fetch",
             Title = "search tool for OpenAI deep search functionality. "),
             Description("return a list of contracts of Czech government for query.")]
-        public async static Task<OpenAiResultItem> fetch(string id)
+        public async static Task<OpenAiResultItem> fetch(IMcpServer server,
+            [Description("ID of item to fetch. It can be smlouva-<id>, dotace-<id>, firma-<ico> or osoba-<nameId>.")]
+            string id)
         {
+            _ = AuditRepo.Add(Audit.Operations.Call,
+                server?.ServerOptions?.KnownClientInfo?.Name?.Split('|')?.FirstOrDefault(),
+                server?.ServerOptions?.KnownClientInfo?.Name?.Split('|')?.LastOrDefault(),
+                AuditRepo.GetClassAndMethodName(MethodBase.GetCurrentMethod()), "",
+                AuditRepo.GetMethodParametersWithValues(MethodBase.GetCurrentMethod().GetParameters().Skip(1), id),
+                null);
+
             if (string.IsNullOrWhiteSpace(id))
                 return new OpenAiResultItem();
             string[] parts = id.Split('-');

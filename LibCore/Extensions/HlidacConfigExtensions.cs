@@ -1,15 +1,16 @@
+using Devmasters.Log;
 using HlidacStatu.LibCore.ConfigurationProviders;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Serilog;
+using Serilog.Filters;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
-using Devmasters.Log;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Hosting;
 
 namespace HlidacStatu.LibCore.Extensions;
 
@@ -67,7 +68,13 @@ public static class HlidacConfigExtensions
                 .Enrich.WithProperty("application_path", new FileInfo(System.Reflection.Assembly.GetEntryAssembly().Location).DirectoryName)
                 .Enrich.WithClientIp()
                 .Enrich.FromLogContext()
+                // ──► SPECIAL SINK ONLY for AuditRepo
+                .WriteTo.Logger(lc => lc
+                    .Filter.ByIncludingOnly(Matching.FromSource("HlidacStatu.Repositories.AuditRepo"))
+                    .AddLogStash(new Uri(Environment.GetEnvironmentVariable("LogStashAuditUrl" ?? "http://10.10.100.145:5001")))
+                    )
                 .WriteTo.Console();
+
             if (Uri.TryCreate(logStashUrl, UriKind.Absolute, out Uri logStashUri))
             {
                 configuration.AddLogStash(logStashUri);
@@ -103,6 +110,7 @@ public static class HlidacConfigExtensions
         if (string.IsNullOrWhiteSpace(environment))
             environment = FallbackEnvironment;
 
+
         return hostBuilder.ConfigureAppConfiguration((context, configuration) =>
         {
             configuration.AddMsSqlConfiguration(connectionString, environment, tag);
@@ -122,6 +130,11 @@ public static class HlidacConfigExtensions
             .Enrich.WithProperty("application_path", new FileInfo(System.Reflection.Assembly.GetEntryAssembly().Location).DirectoryName)
             .Enrich.WithClientIp()
             .Enrich.FromLogContext()
+                // ──► SPECIAL SINK ONLY for AuditRepo
+                .WriteTo.Logger(lc => lc
+                    .Filter.ByIncludingOnly(Matching.FromSource("HlidacStatu.Repositories.AuditRepo"))
+                    .AddLogStash(new Uri(context.Configuration.GetValue<string>("AppSettings:LogStashAuditUrl") ?? "http://10.10.100.145:5001"))
+                    )
             .WriteTo.Console());
     }
     
@@ -151,16 +164,18 @@ public static class HlidacConfigExtensions
         if (string.IsNullOrWhiteSpace(environment))
             environment = FallbackEnvironment;
 
-        var builderConfiguration = webBuilder.Configuration;
+        var configuration = webBuilder.Configuration;
         
-        builderConfiguration.AddMsSqlConfiguration(connectionString, environment, tag);
-        builderConfiguration.AddJsonFile("appsettings.json", optional: true, reloadOnChange: false);
-        builderConfiguration.AddJsonFile("logger.serilog.json", optional: true, reloadOnChange: false);
-        builderConfiguration.AddJsonFile("appsettings.Development.json", optional: true, reloadOnChange: false);
-        builderConfiguration.AddJsonFile($"appsettings.{environment}.json", optional: true, reloadOnChange: false);
-        builderConfiguration.AddEnvironmentVariables();
-        builderConfiguration.AddCommandLine(args);
+        configuration.AddMsSqlConfiguration(connectionString, environment, tag);
+        configuration.AddJsonFile("appsettings.json", optional: true, reloadOnChange: false);
+        configuration.AddJsonFile("logger.serilog.json", optional: true, reloadOnChange: false);
+        configuration.AddJsonFile("appsettings.Development.json", optional: true, reloadOnChange: false);
+        configuration.AddJsonFile($"appsettings.{environment}.json", optional: true, reloadOnChange: false);
+        configuration.AddEnvironmentVariables();
+        configuration.AddCommandLine(args);
         
+        var logStashAuditUrl = configuration.GetValue<string>("AppSettings:LogStashAuditUrl");
+
         webBuilder.Host.UseSerilog((context, services, configuration) => configuration
             .ReadFrom.Configuration(context.Configuration)
             .ReadFrom.Services(services)
@@ -170,7 +185,12 @@ public static class HlidacConfigExtensions
             .Enrich.WithProperty("application_name", System.Reflection.Assembly.GetEntryAssembly().GetName().Name)
             .Enrich.WithProperty("application_path", new FileInfo(System.Reflection.Assembly.GetEntryAssembly().Location).DirectoryName)
             .Enrich.WithClientIp()
-            .Enrich.FromLogContext()            
+            .Enrich.FromLogContext()
+            // ──► SPECIAL SINK ONLY for AuditRepo
+            .WriteTo.Logger(lc => lc
+                .Filter.ByIncludingOnly(Matching.FromSource("HlidacStatu.Repositories.AuditRepo"))
+                .AddLogStash(new Uri(logStashAuditUrl ?? "http://10.10.100.145:5001"))
+                )
             .WriteTo.Console());
     }
 
@@ -228,6 +248,8 @@ public static class HlidacConfigExtensions
             .AddInMemoryCollection(overridenLogPaths)
             .Build();
 
+        var logStashAuditUrl = configuration.GetValue<string>("AppSettings:LogStashAuditUrl");
+
         Log.Logger = new LoggerConfiguration()
             .ReadFrom.Configuration(configuration)
             .Enrich.WithProperty("hostname", Environment.GetEnvironmentVariable("HOSTNAME") ?? "unknown_hostname")
@@ -237,6 +259,11 @@ public static class HlidacConfigExtensions
             .Enrich.WithProperty("application_path", new FileInfo(System.Reflection.Assembly.GetEntryAssembly().Location).DirectoryName)
             .Enrich.FromLogContext()
             .WriteTo.Console()
+            // ──► SPECIAL SINK ONLY for AuditRepo
+            .WriteTo.Logger(lc => lc
+                .Filter.ByIncludingOnly(Matching.FromSource("HlidacStatu.Repositories.AuditRepo"))
+                .AddLogStash(new Uri(logStashAuditUrl ?? "http://10.10.100.145:5001"))
+                )
             .CreateLogger();
 
         return configuration;

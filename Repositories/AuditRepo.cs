@@ -1,6 +1,11 @@
 using HlidacStatu.Entities;
 using System;
 using Serilog;
+using System.Reflection;
+using System.Security.AccessControl;
+using LinqToTwitter;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace HlidacStatu.Repositories
 {
@@ -76,7 +81,7 @@ namespace HlidacStatu.Repositories
             }
 
         }
-        
+
         public static Audit Add(Audit audit)
         {
             if (Enum.TryParse<Audit.Operations>(audit.operation, out var operation))
@@ -114,6 +119,27 @@ namespace HlidacStatu.Repositories
 
             return audit;
 
+        }
+        public static string GetClassAndMethodName(MethodBase method)
+        {
+            if (method == null)
+                return "";
+            var className = method.DeclaringType?.Name ?? "";
+            var methodName = method.Name;
+            return $"{className}.{methodName}";
+        }
+        public static string GetMethodParametersWithValues(IEnumerable<ParameterInfo> parameters, params object[] args)
+        {
+            if (parameters == null)
+                return "";
+            var arrParams = parameters.ToArray();
+            List<string> list = new List<string>();
+            for (int i = 0; i < Math.Min(arrParams.Length, args.Length); i++)
+            {
+                list.Add($"{arrParams[i].Name}={args[i]?.ToString()}");
+            }
+
+            return string.Join("|", list);
         }
     }
 }

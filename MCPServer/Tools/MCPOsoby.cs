@@ -1,10 +1,12 @@
 ﻿using Devmasters.Enums;
+using HlidacStatu.Entities;
 using HlidacStatu.Extensions;
 using HlidacStatu.Repositories;
 using HlidacStatu.Repositories.Statistics;
 using ModelContextProtocol.Server;
 using NPOI.SS.Formula.Functions;
 using System.ComponentModel;
+using System.Reflection;
 
 namespace HlidacStatu.MCPServer.Tools
 {
@@ -18,11 +20,17 @@ namespace HlidacStatu.MCPServer.Tools
     Title = "Get detail of specific politician in Czech Republic"),
     Description("Return detail of specific politician in Czech Republic by his ID. Use method 'find_person_by_name' or 'find_politician_by_name' to find person's ID. "
     + " For company detail use tool 'get_legal_entity_full_detail' with parameter 'ico'.")]
-        public static HlidacStatu.DS.Api.Osoba.Detail get_politician_detail(
+        public static HlidacStatu.DS.Api.Osoba.Detail get_politician_detail(IMcpServer server,
     [Description("ID of person.")]
             string person_id)
         {
-            return get_person_detail(person_id);
+            _ = AuditRepo.Add(Audit.Operations.Call,
+                server?.ServerOptions?.KnownClientInfo?.Name?.Split('|')?.FirstOrDefault(),
+                server?.ServerOptions?.KnownClientInfo?.Name?.Split('|')?.LastOrDefault(),
+                AuditRepo.GetClassAndMethodName(MethodBase.GetCurrentMethod()), "",
+                AuditRepo.GetMethodParametersWithValues(MethodBase.GetCurrentMethod().GetParameters().Skip(1), person_id),
+                null);
+            return get_person_detail(server, person_id);
         }
 
 
@@ -31,10 +39,17 @@ namespace HlidacStatu.MCPServer.Tools
             Title = "Get detail of specific person in Czech Republic"),
             Description("Return detail of specific person in Czech Republic by his ID. Use method 'find_person_by_name' to find person's ID. "
             + " For company detail use tool 'get_legal_entity_full_detail' with parameter 'ico'.")]
-        public static HlidacStatu.DS.Api.Osoba.Detail get_person_detail(
+        public static HlidacStatu.DS.Api.Osoba.Detail get_person_detail(IMcpServer server,
             [Description("ID of person.")]
             string person_id)
         {
+            _ = AuditRepo.Add(Audit.Operations.Call,
+                server?.ServerOptions?.KnownClientInfo?.Name?.Split('|')?.FirstOrDefault(),
+                server?.ServerOptions?.KnownClientInfo?.Name?.Split('|')?.LastOrDefault(),
+                AuditRepo.GetClassAndMethodName(MethodBase.GetCurrentMethod()), "",
+                AuditRepo.GetMethodParametersWithValues(MethodBase.GetCurrentMethod().GetParameters().Skip(1), person_id),
+                null);
+
             if (string.IsNullOrWhiteSpace(person_id) || string.IsNullOrWhiteSpace(person_id))
                 return null;
             Entities.Osoba o = HlidacStatu.Repositories.Osoby.GetByNameId.Get(person_id);
@@ -55,13 +70,20 @@ namespace HlidacStatu.MCPServer.Tools
             Description("Find politicians by searching with their name. Always use order 'first name' and 'last name'. You may also provide a year of birth parameter to enhance the precision of search results. "
             + "Find other poeple by using tool 'find_persons_by_name'. "
             + " For person detail use tool 'get_politician_detail' with parameter 'person_id'.")]
-        public static HlidacStatu.DS.Api.Osoba.SearchResult find_politicians_by_name(
+        public static HlidacStatu.DS.Api.Osoba.SearchResult find_politicians_by_name(IMcpServer server,
             [Description("full name of person")]
             string name,
             [Description("Year of Birth of person, optional")]
             string? year_of_birth = null
             )
         {
+            _ = AuditRepo.Add(Audit.Operations.Call,
+                server?.ServerOptions?.KnownClientInfo?.Name?.Split('|')?.FirstOrDefault(),
+                server?.ServerOptions?.KnownClientInfo?.Name?.Split('|')?.LastOrDefault(),
+                AuditRepo.GetClassAndMethodName(MethodBase.GetCurrentMethod()), "",
+                AuditRepo.GetMethodParametersWithValues(MethodBase.GetCurrentMethod().GetParameters().Skip(1), name, year_of_birth),
+                null);
+
             int numOfResults = 10;
             return _find_persons_by_name(numOfResults, name, year_of_birth, true);
         }
@@ -71,19 +93,26 @@ namespace HlidacStatu.MCPServer.Tools
         Title = "Find persons by name and optional by year of birth."),
         Description("Find people by searching with their name. Always use order 'first name' and 'last name'. You may also provide a year of birth parameter to enhance the precision of search results. "
         + " For person detail use tool 'get_person_detail' with parameter 'person_id'.")]
-        public static HlidacStatu.DS.Api.Osoba.SearchResult find_persons_by_name(
+        public static HlidacStatu.DS.Api.Osoba.SearchResult find_persons_by_name(IMcpServer server,
         [Description("full name of person")]
             string name,
         [Description("Year of Birth of person, optional")]
             string? year_of_birth = null
         )
         {
+            _ = AuditRepo.Add(Audit.Operations.Call,
+    server?.ServerOptions?.KnownClientInfo?.Name?.Split('|')?.FirstOrDefault(),
+    server?.ServerOptions?.KnownClientInfo?.Name?.Split('|')?.LastOrDefault(),
+    AuditRepo.GetClassAndMethodName(MethodBase.GetCurrentMethod()), "",
+    AuditRepo.GetMethodParametersWithValues(MethodBase.GetCurrentMethod().GetParameters().Skip(1), name, year_of_birth),
+    null);
+
             int numOfResults = 10;
             return _find_persons_by_name(numOfResults, name, year_of_birth, false);
         }
 
 
-        public static HlidacStatu.DS.Api.Osoba.SearchResult _find_persons_by_name(
+        private static HlidacStatu.DS.Api.Osoba.SearchResult _find_persons_by_name(
             int numOfResults,
             string name,
             string? year_of_birth = null,

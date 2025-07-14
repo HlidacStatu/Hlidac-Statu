@@ -3,6 +3,7 @@ using HlidacStatu.Repositories;
 using ModelContextProtocol.Server;
 using RazorEngine.Compilation.ImpromptuInterface;
 using System.ComponentModel;
+using System.Reflection;
 
 namespace HlidacStatu.MCPServer.Tools
 {
@@ -16,7 +17,7 @@ namespace HlidacStatu.MCPServer.Tools
             Name = "get_contract_detail",
             Title = "Get detail of specific contract of czech government.  "),
         Description("Return detail of specific contract between government and company")]
-        public async static Task<HlidacStatu.Entities.Smlouva> Get_contract_detail(
+        public async static Task<HlidacStatu.Entities.Smlouva> Get_contract_detail(IMcpServer server,
             [Description("ID of contract.")]
             string contract_id,
 
@@ -24,6 +25,12 @@ namespace HlidacStatu.MCPServer.Tools
             [DefaultValue(false)]
             bool include_text_of_contract = false)
         {
+            _ = AuditRepo.Add(Audit.Operations.Call,
+server?.ServerOptions?.KnownClientInfo?.Name?.Split('|')?.FirstOrDefault(),
+server?.ServerOptions?.KnownClientInfo?.Name?.Split('|')?.LastOrDefault(),
+AuditRepo.GetClassAndMethodName(MethodBase.GetCurrentMethod()), "",
+AuditRepo.GetMethodParametersWithValues(MethodBase.GetCurrentMethod().GetParameters().Skip(1), contract_id,include_text_of_contract ),
+null);
 
             if (string.IsNullOrWhiteSpace(contract_id))
                 return null;
@@ -42,7 +49,7 @@ namespace HlidacStatu.MCPServer.Tools
             Name = "search_contracts",
             Title = "Find contracts based on parameters"),
         Description("Find contracts of Czech government for specified parameters. You can combine any of parameters.")]
-        public async static Task<DS.Api.Smlouva.SearchResult> Search_contracts(
+        public async static Task<DS.Api.Smlouva.SearchResult> Search_contracts(IMcpServer server,
 
                 [Description("Array of contract classification types to filter search results by specific categories")]
     HlidacStatu.Entities.Smlouva.SClassification.ClassificationsTypes[]? categories = null,
@@ -91,6 +98,14 @@ namespace HlidacStatu.MCPServer.Tools
 
             )
         {
+
+            _ = AuditRepo.Add(Audit.Operations.Call,
+server?.ServerOptions?.KnownClientInfo?.Name?.Split('|')?.FirstOrDefault(),
+server?.ServerOptions?.KnownClientInfo?.Name?.Split('|')?.LastOrDefault(),
+AuditRepo.GetClassAndMethodName(MethodBase.GetCurrentMethod()), "",
+AuditRepo.GetMethodParametersWithValues(MethodBase.GetCurrentMethod().GetParameters().Skip(1),categories, from_date, to_date, minimal_price,maximal_price,ICOs_of_contracting_party,ICOs_of_contracting_party,ICO_of_holding_structure,keywords,negative_keywords,close_to_public_procurement_limit_only,with_hidden_value_only,with_serious_issues_only, number_of_results, page, order_result ),
+null);
+
 
             string[] splitChars = new string[] { " " };
             string query = "";

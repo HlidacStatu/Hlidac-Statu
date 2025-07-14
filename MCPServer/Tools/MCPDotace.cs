@@ -3,6 +3,7 @@ using HlidacStatu.Repositories;
 using ModelContextProtocol.Server;
 using OpenAI.Moderations;
 using System.ComponentModel;
+using System.Reflection;
 
 namespace HlidacStatu.MCPServer.Tools
 {
@@ -16,10 +17,17 @@ namespace HlidacStatu.MCPServer.Tools
             Name = "get_subsidy_detail",
             Title = "Get detail of specific subsidy from czech government or EU"),
         Description("Return detail of specific subsidy from czech government or EU")]
-        public async static Task<HlidacStatu.DS.Api.Dotace.Detail> Get_subsidy_detail(
+        public async static Task<HlidacStatu.DS.Api.Dotace.Detail> Get_subsidy_detail(IMcpServer server,
             [Description("ID of subsidy")]
             string subsidy_id)
         {
+            _ = AuditRepo.Add(Audit.Operations.Call,
+                server?.ServerOptions?.KnownClientInfo?.Name?.Split('|')?.FirstOrDefault(),
+                server?.ServerOptions?.KnownClientInfo?.Name?.Split('|')?.LastOrDefault(),
+                AuditRepo.GetClassAndMethodName(MethodBase.GetCurrentMethod()), "",
+                AuditRepo.GetMethodParametersWithValues(MethodBase.GetCurrentMethod().GetParameters().Skip(1), subsidy_id),
+                null);
+
             if (string.IsNullOrWhiteSpace(subsidy_id))
                 return null;
 
@@ -33,7 +41,7 @@ namespace HlidacStatu.MCPServer.Tools
     Name = "search_subsidies",
     Title = "Find subsidies based on parameters"),
 Description("Search subsidies from Czech government for specified parameters. You can combine any of parameters.")]
-        public async static Task<DS.Api.Subsidy.SearchResult> Search_subsidies(
+        public async static Task<DS.Api.Subsidy.SearchResult> Search_subsidies(IMcpServer server,
 
 
 [Description("Year filter in YYYY format. Only subsidies from this year onwards will be included")]
@@ -71,6 +79,12 @@ Description("Search subsidies from Czech government for specified parameters. Yo
     Repositories.Searching.DotaceSearchResult.DotaceOrderResult order_result = Repositories.Searching.DotaceSearchResult.DotaceOrderResult.Relevance
     )
         {
+            _ = AuditRepo.Add(Audit.Operations.Call,
+    server?.ServerOptions?.KnownClientInfo?.Name?.Split('|')?.FirstOrDefault(),
+    server?.ServerOptions?.KnownClientInfo?.Name?.Split('|')?.LastOrDefault(),
+    AuditRepo.GetClassAndMethodName(MethodBase.GetCurrentMethod()), "",
+    AuditRepo.GetMethodParametersWithValues(MethodBase.GetCurrentMethod().GetParameters().Skip(1),for_year,minimal_amount,maximal_amount,subsidy_provider_ICO,subsidy_recipient_ICO,ICO_of_holding_structure,keywords,negative_keywords,number_of_results,page, order_result ),
+    null);
 
             string[] splitChars = new string[] { " " };
             string query = "";
