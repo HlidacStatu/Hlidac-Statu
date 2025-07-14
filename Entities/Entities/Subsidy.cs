@@ -124,6 +124,9 @@ public partial class Subsidy
     [Object]
     public Dotace.Hint Hints { get; set; } = new();
     
+    [Keyword]
+    public string IdDotacniVyzvy { get; set; }
+    
     public class SubsidyMetadata
     {
         [Keyword]

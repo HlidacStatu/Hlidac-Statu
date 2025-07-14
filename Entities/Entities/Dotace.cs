@@ -1,8 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Devmasters;
-using Devmasters.Enums;
 using Nest;
 
 namespace HlidacStatu.Entities;
@@ -79,6 +77,9 @@ public partial class Dotace
     public List<RozhodnutiItem> Rozhodnuti { get; set; } = new();
     [Object]
     public List<CerpaniItem> Cerpani { get; set; } = new();
+    
+    [Keyword]
+    public string IdDotacniVyzvy { get; set; }
     
     [Object]
     public Hint Hints { get; set; } = new();
