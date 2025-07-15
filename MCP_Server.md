@@ -22,6 +22,9 @@ Lokace konfiguračního souboru: (nebo jde otevřít přes "Settings" z aplikace
 - macOS: ~/Library/Application\ Support/Claude/claude_desktop_config.json
 - Windows: %APPDATA%\Claude\claude_desktop_config.json
 
+text `api-token-hlidace` nahradťě tokenem získaným postupem výše.
+
+
 ```
 {
     "globalShortcut": "",
@@ -50,6 +53,9 @@ pak použijte přístup k MCP serveru přes lokální skript.
 URL: `https://mcp.api.hlidacstatu.cz`
 
 HTTP header: `Authorization: Token api-token-hlidace`
+
+text `api-token-hlidace` nahradťě tokenem získaným postupem výše.
+
 
 ### Feedback
 
