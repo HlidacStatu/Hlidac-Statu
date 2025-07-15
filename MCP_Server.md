@@ -50,6 +50,8 @@ text `api-token-hlidace` nahradťě tokenem získaným postupem výše.
 Pokud to klient umožňuje, můžete použít přímo komunikaci přes HTTP. Podmínkou je, že můžete pro komunikaci nastavit HTTP Headers. Pokud to klient neumožňuje (k datu vzniku dokumentace např. Claude.AI),
 pak použijte přístup k MCP serveru přes lokální skript.
 
+** Pozor! OAuth zatim nepodporujeme!! **
+
 URL: `https://mcp.api.hlidacstatu.cz`
 
 HTTP header: `Authorization: Token api-token-hlidace`
