@@ -3,6 +3,7 @@
 ## Řízený přístup k betaverzi
 15.7.2025
 
+**UPOZORNĚNÍ:** funkčnost a změny rozhraní mohou v beta provozu nastat kdykoliv. Stejně tak kdykoliv může dojít k nečekanému ukončení provozu rozhraní. Využívejte také MCP server s rozumem, ladíme ho nyní na funkčnost, není optimalizován na rychlost a vysokou zátěž.
 
 ### Příprava
 Podmínkou je existující a potvrzený (potvrzuje se platnost mailu hned po registraci) účet na www.hlidacstatu.cz. 
