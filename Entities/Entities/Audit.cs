@@ -41,7 +41,7 @@ namespace HlidacStatu.Entities
         public int statusCode { get; set; }
 
         [Nest.Number]
-        public long timeElapsed { get; set; }
+        public long timeElapsedInMs { get; set; }
         
         public string exception { get; set; }
         [Nest.Keyword]

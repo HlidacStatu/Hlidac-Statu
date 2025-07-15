@@ -50,131 +50,135 @@ url - a URL to the document or search result item. Useful for citing specific re
             [Description("Query string to search for.")]
             string query)
         {
-            _ = AuditRepo.Add(Audit.Operations.Call,
+            return await AuditRepo.AddWithElapsedTimeMeasureAsync(
+                Audit.Operations.Call,
                 server?.ServerOptions?.KnownClientInfo?.Name?.Split('|')?.FirstOrDefault(),
                 server?.ServerOptions?.KnownClientInfo?.Name?.Split('|')?.LastOrDefault(),
                 AuditRepo.GetClassAndMethodName(MethodBase.GetCurrentMethod()), "",
                 AuditRepo.GetMethodParametersWithValues(MethodBase.GetCurrentMethod().GetParameters().Skip(1), query),
-                null);
+                null, async () =>
+                {
 
 
-            int maxResults = 50;
-            int maxPartSize = 5;
-            Dictionary<PartsToSearch, int> parts = new() {
+                    int maxResults = 50;
+                    int maxPartSize = 5;
+                    Dictionary<PartsToSearch, int> parts = new() {
                     { PartsToSearch.Smlouvy ,0 },
                     { PartsToSearch.Dotace ,0 },
                     { PartsToSearch.Firmy ,0 },
                     { PartsToSearch.Osoby ,0 } };
 
-            //PartsToSearch partsLogical = PartsToSearch.Smlouvy | PartsToSearch.Dotace | PartsToSearch.Firmy | PartsToSearch.Osoby;
-            PartsToSearch partsLogical = parts.Keys.Aggregate((current, next) => current | next);
+                    //PartsToSearch partsLogical = PartsToSearch.Smlouvy | PartsToSearch.Dotace | PartsToSearch.Firmy | PartsToSearch.Osoby;
+                    PartsToSearch partsLogical = parts.Keys.Aggregate((current, next) => current | next);
 
 
-            var sres = await XLib.Search
-                .GeneralSearchAsync(query, 1, partsLogical, false, null,
-                smlouvySize: maxResults,
-                firmySize: maxResults,
-                osobySize: maxResults,
-                dotaceSize: maxResults,
-                withHighlighting: true
-                );
+                    var sres = await XLib.Search
+                        .GeneralSearchAsync(query, 1, partsLogical, false, null,
+                        smlouvySize: maxResults,
+                        firmySize: maxResults,
+                        osobySize: maxResults,
+                        dotaceSize: maxResults,
+                        withHighlighting: true
+                        );
 
 
-            List<OpenAiResultItem> res = new List<OpenAiResultItem>();
+                    List<OpenAiResultItem> res = new List<OpenAiResultItem>();
 
 
-            while (res.Count < maxResults)
-            {
-                foreach (PartsToSearch p in Enum.GetValues<PartsToSearch>())
-                {
-                    if (partsLogical.HasFlag(p))
+                    while (res.Count < maxResults)
                     {
-                        switch (p)
+                        foreach (PartsToSearch p in Enum.GetValues<PartsToSearch>())
                         {
-                            case PartsToSearch.Smlouvy:
-                                if (sres.HasSmlouvy)
+                            if (partsLogical.HasFlag(p))
+                            {
+                                switch (p)
                                 {
-                                    res.AddRange(
-                                        sres.Smlouvy.ElasticResults.Hits
-                                            .Skip(parts[p])
-                                            .Take(maxPartSize)
-                                            .Select(x => new OpenAiResultItem
-                                            {
-                                                id = "smlouva-" + x.Source.Id,
-                                                title = x.Source.predmet,
-                                                text = string.Join(" ... ",
-                                                        x.Highlight
-                                                        .Where(m => m.Value?.Count > 0)
-                                                        .Select(m => string.Join(" ", m.Value.Distinct()))
-                                                        .Select(s => s.Replace("<highl>", "").Replace("</highl>", ""))
-                                                        .Distinct()
-                                                    ),
-                                                url = Smlouva.GetUrl(x.Source.Id, false)
-                                            }).ToArray()
-                                        );
+                                    case PartsToSearch.Smlouvy:
+                                        if (sres.HasSmlouvy)
+                                        {
+                                            res.AddRange(
+                                                sres.Smlouvy.ElasticResults.Hits
+                                                    .Skip(parts[p])
+                                                    .Take(maxPartSize)
+                                                    .Select(x => new OpenAiResultItem
+                                                    {
+                                                        id = "smlouva-" + x.Source.Id,
+                                                        title = x.Source.predmet,
+                                                        text = string.Join(" ... ",
+                                                                x.Highlight
+                                                                .Where(m => m.Value?.Count > 0)
+                                                                .Select(m => string.Join(" ", m.Value.Distinct()))
+                                                                .Select(s => s.Replace("<highl>", "").Replace("</highl>", ""))
+                                                                .Distinct()
+                                                            ),
+                                                        url = Smlouva.GetUrl(x.Source.Id, false)
+                                                    }).ToArray()
+                                                );
+                                        }
+                                        break;
+                                    case PartsToSearch.Dotace:
+                                        res.AddRange(
+                                                sres.Dotace.ElasticResults.Hits
+                                                    .Skip(parts[p])
+                                                    .Take(maxPartSize)
+                                                    .Select(x => new OpenAiResultItem
+                                                    {
+                                                        id = "dotace-" + x.Source.Id,
+                                                        title = x.Source.ProjectName ?? x.Source.DisplayProject,
+                                                        text = string.Join(" ... ",
+                                                                x.Highlight
+                                                                .Where(m => m.Value?.Count > 0)
+                                                                .Select(m => string.Join(" ", m.Value.Distinct()))
+                                                                .Select(s => s.Replace("<highl>", "").Replace("</highl>", ""))
+                                                                .Distinct()
+                                                            ),
+                                                        url = x.Source.GetUrl(false)
+                                                    }).ToArray()
+                                                );
+                                        break;
+                                    case PartsToSearch.Firmy:
+                                        res.AddRange(
+                                            sres.Firmy.Result
+                                                .Skip(parts[p])
+                                                .Take(maxPartSize)
+                                                .Select(x => new OpenAiResultItem
+                                                {
+                                                    id = "firma-" + x.ICO,
+                                                    title = x.Jmeno,
+                                                    text = x.InfoFacts().RenderFacts(2, true),
+                                                    url = x.GetUrl(false)
+                                                }).ToArray()
+                                            );
+                                        break;
+                                    case PartsToSearch.Osoby:
+                                        res.AddRange(
+                                            sres.Osoby.Result
+                                                    .Skip(parts[p])
+                                                    .Take(maxPartSize)
+                                                .Select(x => new OpenAiResultItem
+                                                {
+                                                    id = "osoba-" + x.NameId,
+                                                    title = x.FullNameWithYear(),
+                                                    text = x.InfoFactsAsync().ConfigureAwait(false).GetAwaiter().GetResult().RenderFacts(2, true),
+                                                    url = x.GetUrl(false)
+                                                }).ToArray()
+                                            );
+                                        break;
+                                    default:
+                                        break;
                                 }
-                                break;
-                            case PartsToSearch.Dotace:
-                                res.AddRange(
-                                        sres.Dotace.ElasticResults.Hits
-                                            .Skip(parts[p])
-                                            .Take(maxPartSize)
-                                            .Select(x => new OpenAiResultItem
-                                            {
-                                                id = "dotace-" + x.Source.Id,
-                                                title = x.Source.ProjectName ?? x.Source.DisplayProject,
-                                                text = string.Join(" ... ",
-                                                        x.Highlight
-                                                        .Where(m => m.Value?.Count > 0)
-                                                        .Select(m => string.Join(" ", m.Value.Distinct()))
-                                                        .Select(s => s.Replace("<highl>", "").Replace("</highl>", ""))
-                                                        .Distinct()
-                                                    ),
-                                                url = x.Source.GetUrl(false)
-                                            }).ToArray()
-                                        );
-                                break;
-                            case PartsToSearch.Firmy:
-                                res.AddRange(
-                                    sres.Firmy.Result
-                                        .Skip(parts[p])
-                                        .Take(maxPartSize)
-                                        .Select(x => new OpenAiResultItem
-                                        {
-                                            id = "firma-" + x.ICO,
-                                            title = x.Jmeno,
-                                            text = x.InfoFacts().RenderFacts(2, true),
-                                            url = x.GetUrl(false)
-                                        }).ToArray()
-                                    );
-                                break;
-                            case PartsToSearch.Osoby:
-                                res.AddRange(
-                                    sres.Osoby.Result
-                                            .Skip(parts[p])
-                                            .Take(maxPartSize)
-                                        .Select(x => new OpenAiResultItem
-                                        {
-                                            id = "osoba-" + x.NameId,
-                                            title = x.FullNameWithYear(),
-                                            text = x.InfoFactsAsync().ConfigureAwait(false).GetAwaiter().GetResult().RenderFacts(2, true),
-                                            url = x.GetUrl(false)
-                                        }).ToArray()
-                                    );
-                                break;
-                            default:
+                                if (parts.ContainsKey(p))
+                                    parts[p] += maxPartSize;
+                            }
+                            if (res.Count >= maxResults)
                                 break;
                         }
-                        if (parts.ContainsKey(p))
-                            parts[p] += maxPartSize;
-                    }
-                    if (res.Count >= maxResults)
-                        break;
-                }
 
-            }
-            
-            return res.ToArray();
+                    }
+
+                    return res.ToArray();
+                });
+        
         }
 
         [McpServerTool(
@@ -185,72 +189,74 @@ url - a URL to the document or search result item. Useful for citing specific re
             [Description("ID of item to fetch. It can be smlouva-<id>, dotace-<id>, firma-<ico> or osoba-<nameId>.")]
             string id)
         {
-            _ = AuditRepo.Add(Audit.Operations.Call,
+            return await AuditRepo.AddWithElapsedTimeMeasureAsync(
+                Audit.Operations.Call,
                 server?.ServerOptions?.KnownClientInfo?.Name?.Split('|')?.FirstOrDefault(),
                 server?.ServerOptions?.KnownClientInfo?.Name?.Split('|')?.LastOrDefault(),
                 AuditRepo.GetClassAndMethodName(MethodBase.GetCurrentMethod()), "",
                 AuditRepo.GetMethodParametersWithValues(MethodBase.GetCurrentMethod().GetParameters().Skip(1), id),
-                null);
+                null, async () =>
+                {
 
-            if (string.IsNullOrWhiteSpace(id))
-                return new OpenAiResultItem();
-            string[] parts = id.Split('-');
-            if (parts.Length < 2)
-                return new OpenAiResultItem();
-            string type = parts[0];
-            string value = string.Join("-", parts.Skip(1));
+                    if (string.IsNullOrWhiteSpace(id))
+                        return new OpenAiResultItem();
+                    string[] parts = id.Split('-');
+                    if (parts.Length < 2)
+                        return new OpenAiResultItem();
+                    string type = parts[0];
+                    string value = string.Join("-", parts.Skip(1));
 
-            OpenAiResultItem res = null;
-            switch (type)
-            {
-                case "smlouva":
-                    var smlouva = await SmlouvaRepo.LoadAsync(value, includePrilohy: true);
-                    res = new OpenAiResultItem
+                    OpenAiResultItem res = null;
+                    switch (type)
                     {
-                        id = smlouva.Id,
-                        title = smlouva.predmet,
-                        text = string.Join(" \n \n", smlouva.Prilohy.Select(m=>m.PlainTextContent)),
-                        url = Smlouva.GetUrl(smlouva.Id, false),
-                        metadata = ToDictionary(smlouva.ToApiSmlouvaListItem())
-                    };
-                    break;
-                case "dotace":
-                    var dotace = await DotaceRepo.GetAsync(value);
-                    res = new OpenAiResultItem
-                    {
-                        id = dotace.Id,
-                        title = dotace.ProjectName ?? dotace.DisplayProject,
-                        text = dotace.ProjectDescription ?? "",
-                        url = dotace.GetUrl(false),
-                        metadata = ToDictionary(dotace.ToApiSubsidyDetail())
-                    };
-                    break;
-                case "firma":
-                    var firma = Firmy.Get(value);
-                    res = new OpenAiResultItem
-                    {
-                        id = firma.ICO,
-                        title = firma.Jmeno,
-                        text = firma.InfoFacts().RenderFacts(2, true),
-                        url = firma.GetUrl(false)                        
-                    };
-                    break;
-                case "osoba":
-                    var osoba = Osoby.GetByNameId.Get(value);
-                    res = new OpenAiResultItem
-                    {
-                        id = osoba.NameId,
-                        title = osoba.FullNameWithYear(),
-                        text = (await osoba.InfoFactsAsync()).RenderFacts(5, true),
-                        url = osoba.GetUrl(false),
-                        metadata = ToDictionary(osoba.ToApiOsobaDetail(DateTime.Now.AddYears(-10)))
-                    };
-                    break;
-                default:
-                    return new OpenAiResultItem();
-            }
-            return res;
-
+                        case "smlouva":
+                            var smlouva = await SmlouvaRepo.LoadAsync(value, includePrilohy: true);
+                            res = new OpenAiResultItem
+                            {
+                                id = smlouva.Id,
+                                title = smlouva.predmet,
+                                text = string.Join(" \n \n", smlouva.Prilohy.Select(m => m.PlainTextContent)),
+                                url = Smlouva.GetUrl(smlouva.Id, false),
+                                metadata = ToDictionary(smlouva.ToApiSmlouvaListItem())
+                            };
+                            break;
+                        case "dotace":
+                            var dotace = await DotaceRepo.GetAsync(value);
+                            res = new OpenAiResultItem
+                            {
+                                id = dotace.Id,
+                                title = dotace.ProjectName ?? dotace.DisplayProject,
+                                text = dotace.ProjectDescription ?? "",
+                                url = dotace.GetUrl(false),
+                                metadata = ToDictionary(dotace.ToApiSubsidyDetail())
+                            };
+                            break;
+                        case "firma":
+                            var firma = Firmy.Get(value);
+                            res = new OpenAiResultItem
+                            {
+                                id = firma.ICO,
+                                title = firma.Jmeno,
+                                text = firma.InfoFacts().RenderFacts(2, true),
+                                url = firma.GetUrl(false)
+                            };
+                            break;
+                        case "osoba":
+                            var osoba = Osoby.GetByNameId.Get(value);
+                            res = new OpenAiResultItem
+                            {
+                                id = osoba.NameId,
+                                title = osoba.FullNameWithYear(),
+                                text = (await osoba.InfoFactsAsync()).RenderFacts(5, true),
+                                url = osoba.GetUrl(false),
+                                metadata = ToDictionary(osoba.ToApiOsobaDetail(DateTime.Now.AddYears(-10)))
+                            };
+                            break;
+                        default:
+                            return new OpenAiResultItem();
+                    }
+                    return res;
+                });
 
         }
 

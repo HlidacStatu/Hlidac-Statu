@@ -79,7 +79,7 @@ namespace HlidacStatu.LibCore.MiddleWares
                 requestUrl = requestUrl,
                 statusCode = statusCode,
                 additionalData = customData,
-                timeElapsed = timeElapsed,
+                timeElapsedInMs = timeElapsed,
                 exception = exceptionDetail,
                 
             };

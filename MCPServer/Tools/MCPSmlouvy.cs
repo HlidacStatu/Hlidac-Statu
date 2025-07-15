@@ -25,23 +25,26 @@ namespace HlidacStatu.MCPServer.Tools
             [DefaultValue(false)]
             bool include_text_of_contract = false)
         {
-            _ = AuditRepo.Add(Audit.Operations.Call,
-server?.ServerOptions?.KnownClientInfo?.Name?.Split('|')?.FirstOrDefault(),
-server?.ServerOptions?.KnownClientInfo?.Name?.Split('|')?.LastOrDefault(),
-AuditRepo.GetClassAndMethodName(MethodBase.GetCurrentMethod()), "",
-AuditRepo.GetMethodParametersWithValues(MethodBase.GetCurrentMethod().GetParameters().Skip(1), contract_id,include_text_of_contract ),
-null);
+            return await AuditRepo.AddWithElapsedTimeMeasureAsync(
+                Audit.Operations.Call,
+                server?.ServerOptions?.KnownClientInfo?.Name?.Split('|')?.FirstOrDefault(),
+                server?.ServerOptions?.KnownClientInfo?.Name?.Split('|')?.LastOrDefault(),
+                AuditRepo.GetClassAndMethodName(MethodBase.GetCurrentMethod()), "",
+                AuditRepo.GetMethodParametersWithValues(MethodBase.GetCurrentMethod().GetParameters().Skip(1), contract_id, include_text_of_contract),
+                null, async () =>
+                {
 
-            if (string.IsNullOrWhiteSpace(contract_id))
-                return null;
-            if (Util.DataValidators.CheckCZICO(contract_id) == false)
-                return null;
+                    if (string.IsNullOrWhiteSpace(contract_id))
+                        return null;
+                    if (Util.DataValidators.CheckCZICO(contract_id) == false)
+                        return null;
 
-            var res = await HlidacStatu.Repositories.SmlouvaRepo.LoadAsync(contract_id, includePrilohy: include_text_of_contract);
-            
-            res = Smlouva.Export(res, false, include_text_of_contract);
+                    var res = await HlidacStatu.Repositories.SmlouvaRepo.LoadAsync(contract_id, includePrilohy: include_text_of_contract);
 
-            return res;
+                    res = Smlouva.Export(res, false, include_text_of_contract);
+
+                    return res;
+                });
 
         }
 
@@ -99,126 +102,129 @@ null);
             )
         {
 
-            _ = AuditRepo.Add(Audit.Operations.Call,
-server?.ServerOptions?.KnownClientInfo?.Name?.Split('|')?.FirstOrDefault(),
-server?.ServerOptions?.KnownClientInfo?.Name?.Split('|')?.LastOrDefault(),
-AuditRepo.GetClassAndMethodName(MethodBase.GetCurrentMethod()), "",
-AuditRepo.GetMethodParametersWithValues(MethodBase.GetCurrentMethod().GetParameters().Skip(1),categories, from_date, to_date, minimal_price,maximal_price,ICOs_of_contracting_party,ICOs_of_contracting_party,ICO_of_holding_structure,keywords,negative_keywords,close_to_public_procurement_limit_only,with_hidden_value_only,with_serious_issues_only, number_of_results, page, order_result ),
-null);
-
-
-            string[] splitChars = new string[] { " " };
-            string query = "";
-
-
-            if (!string.IsNullOrWhiteSpace(keywords))
-            {
-                query += " " + keywords;
-            }
-
-            if (!string.IsNullOrWhiteSpace(negative_keywords))
-            {
-                query += " NOT ( " 
-                    + negative_keywords.ToString().Split(splitChars, StringSplitOptions.RemoveEmptyEntries).Select(s => s.StartsWith("-") ? s : "-" + s).Aggregate((f, s) => f + " " + s)
-                    + " ) ";
-            }
-
-            List<KeyValuePair<string, string>> icos = new();
-            if (ICOs_of_contracting_party != null)
-                foreach (var val in ICOs_of_contracting_party
-                    .Where(s => !string.IsNullOrWhiteSpace(s))
-                    .Where(s=> Devmasters.TextUtil.IsNumeric(s))
-                    )
+            return await AuditRepo.AddWithElapsedTimeMeasureAsync(
+                Audit.Operations.Call,
+                server?.ServerOptions?.KnownClientInfo?.Name?.Split('|')?.FirstOrDefault(),
+                server?.ServerOptions?.KnownClientInfo?.Name?.Split('|')?.LastOrDefault(),
+                AuditRepo.GetClassAndMethodName(MethodBase.GetCurrentMethod()), "",
+                AuditRepo.GetMethodParametersWithValues(MethodBase.GetCurrentMethod().GetParameters().Skip(1), categories, from_date, to_date, minimal_price, maximal_price, ICOs_of_contracting_party, ICOs_of_contracting_party, ICO_of_holding_structure, keywords, negative_keywords, close_to_public_procurement_limit_only, with_hidden_value_only, with_serious_issues_only, number_of_results, page, order_result),
+                null, async () =>
                 {
-                    icos.Add(new KeyValuePair<string, string>("ico", val));
-                }
-
-            List<KeyValuePair<string, string>> holding = new();
-            if (ICO_of_holding_structure != null && Devmasters.TextUtil.IsNumeric(ICO_of_holding_structure))
-            {
-                holding.Add(new KeyValuePair<string, string>("holding", ICO_of_holding_structure));
-            }
 
 
-            if (icos.Count(m => !string.IsNullOrWhiteSpace(m.Value)) > 1)
-            { // into ()
-                query += " ("
-                        + icos.Where(m => !string.IsNullOrWhiteSpace(m.Value)).Select(m => m.Key + ":" + m.Value).Aggregate((f, s) => f + " OR " + s)
-                        + ")";
-            }
-            
-            if (holding.Count(m => !string.IsNullOrWhiteSpace(m.Value)) == 1)
-            {
-                query += " " + holding.Where(m => !string.IsNullOrWhiteSpace(m.Value)).Select(m => m.Key + ":" + m.Value).First();
-            }
-
-            if (Devmasters.TextUtil.IsNumeric(minimal_price))
-                query += " cena:>=" + minimal_price;
-
-            if (Devmasters.TextUtil.IsNumeric(maximal_price))
-                query += " cena:<=" + maximal_price;
-
-            var fdate = Devmasters.DT.Util.ToDate(from_date);
-            var tdate = Devmasters.DT.Util.ToDate(to_date);
-            if (fdate.HasValue && tdate.HasValue)
-            {
-                query += $" zverejneno:[{fdate:yyyy-MM-dd} TO {tdate:yyyy-MM-dd}]";
-            }
-            else if (fdate.HasValue)
-            {
-                query += $" zverejneno:[{fdate:yyyy-MM-dd} TO *]";
-            }
-            else if (tdate.HasValue)
-            {
-                query += $" zverejneno:[* TO {tdate:yyyy-MM-dd}]";
-            }
+                    string[] splitChars = new string[] { " " };
+                    string query = "";
 
 
-            if (categories?.Length > 0)
-            {
-                query += " ( " 
-                    + string.Join(" OR ", categories.Select(obor => "oblast:" + obor.ToString().ToLowerInvariant()))
-                    + " ) ";
-            }
+                    if (!string.IsNullOrWhiteSpace(keywords))
+                    {
+                        query += " " + keywords;
+                    }
 
-            if (close_to_public_procurement_limit_only)
-            {
-                query += " (hint.smlouvaULimitu:>0) ";
-            }
-            if (with_hidden_value_only)
-            {
-                query += " (hint.skrytaCena:1) ";
-            }
-            if (with_serious_issues_only)
-            {
-                query += " (chyby:zasadni) ";
-            }
+                    if (!string.IsNullOrWhiteSpace(negative_keywords))
+                    {
+                        query += " NOT ( "
+                            + negative_keywords.ToString().Split(splitChars, StringSplitOptions.RemoveEmptyEntries).Select(s => s.StartsWith("-") ? s : "-" + s).Aggregate((f, s) => f + " " + s)
+                            + " ) ";
+                    }
 
-            query = query.Trim();
-            if (query.Length == 0)
-            {
-                return null;
-            }
+                    List<KeyValuePair<string, string>> icos = new();
+                    if (ICOs_of_contracting_party != null)
+                        foreach (var val in ICOs_of_contracting_party
+                            .Where(s => !string.IsNullOrWhiteSpace(s))
+                            .Where(s => Devmasters.TextUtil.IsNumeric(s))
+                            )
+                        {
+                            icos.Add(new KeyValuePair<string, string>("ico", val));
+                        }
 
-            var sres = await SmlouvaRepo.Searching.SimpleSearchAsync(query, page,
-                number_of_results,
-                order_result,
-                includeNeplatne: false,
-                anyAggregation: new Nest.AggregationContainerDescriptor<Smlouva>().Sum("sumKc", m => m.Field(f => f.CalculatedPriceWithVATinCZK)),
-                logError: false);
+                    List<KeyValuePair<string, string>> holding = new();
+                    if (ICO_of_holding_structure != null && Devmasters.TextUtil.IsNumeric(ICO_of_holding_structure))
+                    {
+                        holding.Add(new KeyValuePair<string, string>("holding", ICO_of_holding_structure));
+                    }
 
-            if (sres?.IsValid == true && sres?.Results?.Count() > 0)
-            {
-                var res = new DS.Api.Smlouva.SearchResult
-                {
-                    Total_Value_Of_Found_Contracts = sres.ElasticResults.Aggregations?.ContainsKey("sumKc") == true ?
-                         (decimal?)((Nest.ValueAggregate)sres.ElasticResults.Aggregations["sumKc"]).Value : (decimal?)null,
-                    Found_Contracts = sres.Results.Select(m => m.ToApiSmlouvaListItem()).ToArray()
-                };
-                return res;
-            }
-            return null;
 
+                    if (icos.Count(m => !string.IsNullOrWhiteSpace(m.Value)) > 1)
+                    { // into ()
+                        query += " ("
+                                + icos.Where(m => !string.IsNullOrWhiteSpace(m.Value)).Select(m => m.Key + ":" + m.Value).Aggregate((f, s) => f + " OR " + s)
+                                + ")";
+                    }
+
+                    if (holding.Count(m => !string.IsNullOrWhiteSpace(m.Value)) == 1)
+                    {
+                        query += " " + holding.Where(m => !string.IsNullOrWhiteSpace(m.Value)).Select(m => m.Key + ":" + m.Value).First();
+                    }
+
+                    if (Devmasters.TextUtil.IsNumeric(minimal_price))
+                        query += " cena:>=" + minimal_price;
+
+                    if (Devmasters.TextUtil.IsNumeric(maximal_price))
+                        query += " cena:<=" + maximal_price;
+
+                    var fdate = Devmasters.DT.Util.ToDate(from_date);
+                    var tdate = Devmasters.DT.Util.ToDate(to_date);
+                    if (fdate.HasValue && tdate.HasValue)
+                    {
+                        query += $" zverejneno:[{fdate:yyyy-MM-dd} TO {tdate:yyyy-MM-dd}]";
+                    }
+                    else if (fdate.HasValue)
+                    {
+                        query += $" zverejneno:[{fdate:yyyy-MM-dd} TO *]";
+                    }
+                    else if (tdate.HasValue)
+                    {
+                        query += $" zverejneno:[* TO {tdate:yyyy-MM-dd}]";
+                    }
+
+
+                    if (categories?.Length > 0)
+                    {
+                        query += " ( "
+                            + string.Join(" OR ", categories.Select(obor => "oblast:" + obor.ToString().ToLowerInvariant()))
+                            + " ) ";
+                    }
+
+                    if (close_to_public_procurement_limit_only)
+                    {
+                        query += " (hint.smlouvaULimitu:>0) ";
+                    }
+                    if (with_hidden_value_only)
+                    {
+                        query += " (hint.skrytaCena:1) ";
+                    }
+                    if (with_serious_issues_only)
+                    {
+                        query += " (chyby:zasadni) ";
+                    }
+
+                    query = query.Trim();
+                    if (query.Length == 0)
+                    {
+                        return null;
+                    }
+
+                    var sres = await SmlouvaRepo.Searching.SimpleSearchAsync(query, page,
+                        number_of_results,
+                        order_result,
+                        includeNeplatne: false,
+                        anyAggregation: new Nest.AggregationContainerDescriptor<Smlouva>().Sum("sumKc", m => m.Field(f => f.CalculatedPriceWithVATinCZK)),
+                        logError: false);
+
+                    if (sres?.IsValid == true && sres?.Results?.Count() > 0)
+                    {
+                        var res = new DS.Api.Smlouva.SearchResult
+                        {
+                            Total_Value_Of_Found_Contracts = sres.ElasticResults.Aggregations?.ContainsKey("sumKc") == true ?
+                                 (decimal?)((Nest.ValueAggregate)sres.ElasticResults.Aggregations["sumKc"]).Value : (decimal?)null,
+                            Found_Contracts = sres.Results.Select(m => m.ToApiSmlouvaListItem()).ToArray()
+                        };
+                        return res;
+                    }
+                    return null;
+
+                });//end of AuditRepo.AddWithElapsedTimeMeasureAsync
         }
     }
 }

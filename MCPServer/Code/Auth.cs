@@ -35,7 +35,7 @@ namespace HlidacStatu.MCPServer.Code
                     operation = Entities.Audit.Operations.Call.ToString(),
                     userId = authUser.Identity.Name,
                     IP = ctx.GetRemoteIp(),
-                    method = "starting MCP Session",
+                    objectId = "starting MCP Session",
                     requestUrl = "https://mcp.api.hlidacstatu.cz",
                     statusCode = 200,
                 };

@@ -6,6 +6,7 @@ using System.Security.AccessControl;
 using LinqToTwitter;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace HlidacStatu.Repositories
 {
@@ -28,9 +29,79 @@ namespace HlidacStatu.Repositories
             );
         }
 
+        public static TResult AddWithElapsedTimeMeasure<TResult>(Audit.Operations operation, string user, string ipAddress,
+            string objectId, string objectType,
+            string newObjSer, string prevObjSer, Func<TResult> codeToExecute)
+        {
+            Audit a = new Audit();
+            a.date = DateTime.Now;
+            a.objectId = objectId;
+            a.objectType = objectType;
+            a.operation = operation.ToString();
+            a.IP = ipAddress;
+            a.userId = user ?? "";
+            a.valueBefore = prevObjSer;
+            a.valueAfter = newObjSer ?? "";
+
+            Devmasters.DT.StopWatchEx sw = new Devmasters.DT.StopWatchEx();
+            TResult res = default;
+            try
+            {
+                sw.Start();
+                res = codeToExecute();
+
+            }
+            catch (Exception e)
+            {
+                a.exception = e.ToString();
+            }
+            finally
+            {
+                sw.Stop();
+                a.timeElapsedInMs = sw.ElapsedMilliseconds;
+                _ = Add(a);
+            }
+            return res;
+
+        }
+        public async static Task<TResult> AddWithElapsedTimeMeasureAsync<TResult>(Audit.Operations operation, string user, string ipAddress,
+          string objectId, string objectType,
+          string newObjSer, string prevObjSer, Func<Task<TResult>> codeToExecuteAsync)
+        {
+            Audit a = new Audit();
+            a.date = DateTime.Now;
+            a.objectId = objectId;
+            a.objectType = objectType;
+            a.operation = operation.ToString();
+            a.IP = ipAddress;
+            a.userId = user ?? "";
+            a.valueBefore = prevObjSer;
+            a.valueAfter = newObjSer ?? "";
+
+            Devmasters.DT.StopWatchEx sw = new Devmasters.DT.StopWatchEx();
+            TResult res = default;
+            try
+            {
+                sw.Start();
+                res = await codeToExecuteAsync().ConfigureAwait(false);
+
+            }
+            catch (Exception e)
+            {
+                a.exception = e.ToString();
+            }
+            finally
+            {
+                sw.Stop();
+                a.timeElapsedInMs = sw.ElapsedMilliseconds;
+                _ = Add(a);
+            }
+            return res;
+
+        }
         public static Audit Add(Audit.Operations operation, string user, string ipAddress,
             string objectId, string objectType,
-            string newObjSer, string prevObjSer)
+            string newObjSer, string prevObjSer, long timeElapsedInMs = 0)
         {
             try
             {
@@ -43,6 +114,7 @@ namespace HlidacStatu.Repositories
                 a.userId = user ?? "";
                 a.valueBefore = prevObjSer;
                 a.valueAfter = newObjSer ?? "";
+                a.timeElapsedInMs = timeElapsedInMs;
 
                 if (operation == Audit.Operations.Search)
                 {

@@ -12,23 +12,23 @@ namespace HlidacStatu.MCPServer.Tools
     {
         static Serilog.ILogger _logger = Serilog.Log.ForContext<MCPOther>();
 
-        [McpServerTool(
-            Name = "ping",
-            Title = "Simple Echo tool"),
-        Description("Simple Echo tool.")]
-        public static string Ping(IMcpServer server, 
-            [Description("text to send back")] string text)
-        {
-            _=AuditRepo.Add(Audit.Operations.Call, 
-                server?.ServerOptions?.KnownClientInfo?.Name?.Split('|')?.FirstOrDefault(),
-                server?.ServerOptions?.KnownClientInfo?.Name?.Split('|')?.LastOrDefault(), 
-                AuditRepo.GetClassAndMethodName(MethodBase.GetCurrentMethod()),"",
-                AuditRepo.GetMethodParametersWithValues(MethodBase.GetCurrentMethod().GetParameters().Skip(1), text),
-                null);
+        //[McpServerTool(
+        //    Name = "ping",
+        //    Title = "Simple Echo tool"),
+        //Description("Simple Echo tool.")]
+        //public static string Ping(IMcpServer server, 
+        //    [Description("text to send back")] string text)
+        //{
+        //    _=AuditRepo.Add(Audit.Operations.Call, 
+        //        server?.ServerOptions?.KnownClientInfo?.Name?.Split('|')?.FirstOrDefault(),
+        //        server?.ServerOptions?.KnownClientInfo?.Name?.Split('|')?.LastOrDefault(), 
+        //        AuditRepo.GetClassAndMethodName(MethodBase.GetCurrentMethod()),"",
+        //        AuditRepo.GetMethodParametersWithValues(MethodBase.GetCurrentMethod().GetParameters().Skip(1), text),
+        //        null);
 
-            //Console.WriteLine("HttpContext: " + _ctx?.HttpContext?.ToString());
-            return "Pong: " + text;
-        }
+        //    //Console.WriteLine("HttpContext: " + _ctx?.HttpContext?.ToString());
+        //    return "Pong: " + text;
+        //}
 
 
         [McpServerTool(
@@ -39,43 +39,46 @@ namespace HlidacStatu.MCPServer.Tools
             [Description("Email address of user")]
             string user_email,
             [Description("Text of feedback message")]
-            string text, 
+            string text,
             [Description("Name of user, if available. If not, empty string is used.")]
             string from_name = "")
         {
-            _ = AuditRepo.Add(Audit.Operations.Call,
+            return AuditRepo.AddWithElapsedTimeMeasure(
+                Audit.Operations.Call,
                 server?.ServerOptions?.KnownClientInfo?.Name?.Split('|')?.FirstOrDefault(),
                 server?.ServerOptions?.KnownClientInfo?.Name?.Split('|')?.LastOrDefault(),
                 AuditRepo.GetClassAndMethodName(MethodBase.GetCurrentMethod()), "",
-                AuditRepo.GetMethodParametersWithValues(MethodBase.GetCurrentMethod().GetParameters().Skip(1), user_email,text,from_name), 
-                null);
+                AuditRepo.GetMethodParametersWithValues(MethodBase.GetCurrentMethod().GetParameters().Skip(1), user_email, text, from_name),
+                null, () =>
+                {
 
-            string email = user_email.Trim();
-            if (Devmasters.TextUtil.IsValidEmail(user_email) == false)
-            {
-                email = "mcp@hlidacstatu.cz";
-            }
-            string to = "podpora@hlidacstatu.cz";
-            string subject = "Zprava z MCP API HlidacStatu.cz od AI";
+                    string email = user_email.Trim();
+                    if (Devmasters.TextUtil.IsValidEmail(user_email) == false)
+                    {
+                        email = "mcp@hlidacstatu.cz";
+                    }
+                    string to = "podpora@hlidacstatu.cz";
+                    string subject = "Zprava z MCP API HlidacStatu.cz od AI";
 
-            string body = $@"
+                    string body = $@"
 Zpráva z MCP API:
 
 Od uzivatele:{user_email} 
 
 text zpravy: {text}";
-            try
-            {
-                Util.SMTPTools.SendSimpleMailToPodpora(subject, body, email);
+                    try
+                    {
+                        Util.SMTPTools.SendSimpleMailToPodpora(subject, body, email);
 
-            }
-            catch (Exception ex)
-            {
+                    }
+                    catch (Exception ex)
+                    {
 
-                _logger.Fatal(ex,"Cannot send email with {email} and {body}",email, body);
-                return "Feedback failed.";
-            }
-            return "Feedback sent. Thanks a lot";
+                        _logger.Fatal(ex, "Cannot send email with {email} and {body}", email, body);
+                        return "Feedback failed.";
+                    }
+                    return "Feedback sent. Thanks a lot";
+                });
         }
     }
 }

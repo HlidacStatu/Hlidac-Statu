@@ -21,19 +21,22 @@ namespace HlidacStatu.MCPServer.Tools
             [Description("ID of subsidy")]
             string subsidy_id)
         {
-            _ = AuditRepo.Add(Audit.Operations.Call,
+            return await AuditRepo.AddWithElapsedTimeMeasureAsync(
+                Audit.Operations.Call,
                 server?.ServerOptions?.KnownClientInfo?.Name?.Split('|')?.FirstOrDefault(),
                 server?.ServerOptions?.KnownClientInfo?.Name?.Split('|')?.LastOrDefault(),
                 AuditRepo.GetClassAndMethodName(MethodBase.GetCurrentMethod()), "",
                 AuditRepo.GetMethodParametersWithValues(MethodBase.GetCurrentMethod().GetParameters().Skip(1), subsidy_id),
-                null);
+                null, async () =>
+                {
 
-            if (string.IsNullOrWhiteSpace(subsidy_id))
-                return null;
+                    if (string.IsNullOrWhiteSpace(subsidy_id))
+                        return null;
 
-            Entities.Dotace dotace = await HlidacStatu.Repositories.DotaceRepo.GetAsync(subsidy_id);
+                    Entities.Dotace dotace = await HlidacStatu.Repositories.DotaceRepo.GetAsync(subsidy_id);
 
-            return dotace.ToApiSubsidyDetail();
+                    return dotace.ToApiSubsidyDetail();
+                });
         }
 
 
@@ -79,76 +82,78 @@ Description("Search subsidies from Czech government for specified parameters. Yo
     Repositories.Searching.DotaceSearchResult.DotaceOrderResult order_result = Repositories.Searching.DotaceSearchResult.DotaceOrderResult.Relevance
     )
         {
-            _ = AuditRepo.Add(Audit.Operations.Call,
-    server?.ServerOptions?.KnownClientInfo?.Name?.Split('|')?.FirstOrDefault(),
-    server?.ServerOptions?.KnownClientInfo?.Name?.Split('|')?.LastOrDefault(),
-    AuditRepo.GetClassAndMethodName(MethodBase.GetCurrentMethod()), "",
-    AuditRepo.GetMethodParametersWithValues(MethodBase.GetCurrentMethod().GetParameters().Skip(1),for_year,minimal_amount,maximal_amount,subsidy_provider_ICO,subsidy_recipient_ICO,ICO_of_holding_structure,keywords,negative_keywords,number_of_results,page, order_result ),
-    null);
-
-            string[] splitChars = new string[] { " " };
-            string query = "";
-
-
-            if (!string.IsNullOrWhiteSpace(keywords))
-            {
-                query += " " + keywords;
-            }
-
-            if (!string.IsNullOrWhiteSpace(negative_keywords))
-            {
-                query += " NOT ( "
-                    + negative_keywords.ToString().Split(splitChars, StringSplitOptions.RemoveEmptyEntries).Select(s => s.StartsWith("-") ? s : "-" + s).Aggregate((f, s) => f + " " + s)
-                    + " ) ";
-            }
-
-            if (subsidy_recipient_ICO != null && Devmasters.TextUtil.IsNumeric(subsidy_recipient_ICO))
-                query += " recipient.ico:" + subsidy_recipient_ICO;
-
-            if (subsidy_provider_ICO != null && Devmasters.TextUtil.IsNumeric(subsidy_provider_ICO))
-                query += " subsidyProviderIco:" + subsidy_provider_ICO;
-
-            if (ICO_of_holding_structure != null && Devmasters.TextUtil.IsNumeric(ICO_of_holding_structure))
-                query += " holding:" + ICO_of_holding_structure;
-
-
-            if (Devmasters.TextUtil.IsNumeric(minimal_amount))
-                query += " castka:>=" + minimal_amount;
-
-            if (Devmasters.TextUtil.IsNumeric(maximal_amount))
-                query += " castka:<=" + maximal_amount;
-
-            if (for_year.HasValue)
-            {
-                query += $" approvedYear:{for_year}";
-            }
-
-            query = query.Trim();
-            if (query.Length == 0)
-            {
-                return null;
-            }
-
-            var sres = await DotaceRepo.Searching.SimpleSearchAsync(query, page,
-                number_of_results,
-                order_result);
-
-            if (sres?.IsValid == true && sres?.Results?.Count() > 0)
-            {
-                var res = new DS.Api.Subsidy.SearchResult()
+            return await AuditRepo.AddWithElapsedTimeMeasureAsync(Audit.Operations.Call,
+                server?.ServerOptions?.KnownClientInfo?.Name?.Split('|')?.FirstOrDefault(),
+                server?.ServerOptions?.KnownClientInfo?.Name?.Split('|')?.LastOrDefault(),
+                AuditRepo.GetClassAndMethodName(MethodBase.GetCurrentMethod()), "",
+                AuditRepo.GetMethodParametersWithValues(MethodBase.GetCurrentMethod().GetParameters().Skip(1), for_year, minimal_amount, maximal_amount, subsidy_provider_ICO, subsidy_recipient_ICO, ICO_of_holding_structure, keywords, negative_keywords, number_of_results, page, order_result),
+                null, async () =>
                 {
-                    Total_Found_Results = sres.Total,
-                    Current_Page = sres.Page,
-                    Page_Size = number_of_results,
-                    Found_subsidies = sres.Results.Select(m => m.ToApiSubsidyListItem()).ToArray(),                    
-                };
 
-                return res;
-            }
+                    string[] splitChars = new string[] { " " };
+                    string query = "";
 
-            
-            return null;
 
+                    if (!string.IsNullOrWhiteSpace(keywords))
+                    {
+                        query += " " + keywords;
+                    }
+
+                    if (!string.IsNullOrWhiteSpace(negative_keywords))
+                    {
+                        query += " NOT ( "
+                            + negative_keywords.ToString().Split(splitChars, StringSplitOptions.RemoveEmptyEntries).Select(s => s.StartsWith("-") ? s : "-" + s).Aggregate((f, s) => f + " " + s)
+                            + " ) ";
+                    }
+
+                    if (subsidy_recipient_ICO != null && Devmasters.TextUtil.IsNumeric(subsidy_recipient_ICO))
+                        query += " recipient.ico:" + subsidy_recipient_ICO;
+
+                    if (subsidy_provider_ICO != null && Devmasters.TextUtil.IsNumeric(subsidy_provider_ICO))
+                        query += " subsidyProviderIco:" + subsidy_provider_ICO;
+
+                    if (ICO_of_holding_structure != null && Devmasters.TextUtil.IsNumeric(ICO_of_holding_structure))
+                        query += " holding:" + ICO_of_holding_structure;
+
+
+                    if (Devmasters.TextUtil.IsNumeric(minimal_amount))
+                        query += " castka:>=" + minimal_amount;
+
+                    if (Devmasters.TextUtil.IsNumeric(maximal_amount))
+                        query += " castka:<=" + maximal_amount;
+
+                    if (for_year.HasValue)
+                    {
+                        query += $" approvedYear:{for_year}";
+                    }
+
+                    query = query.Trim();
+                    if (query.Length == 0)
+                    {
+                        return null;
+                    }
+
+                    var sres = await DotaceRepo.Searching.SimpleSearchAsync(query, page,
+                        number_of_results,
+                        order_result);
+
+                    if (sres?.IsValid == true && sres?.Results?.Count() > 0)
+                    {
+                        var res = new DS.Api.Subsidy.SearchResult()
+                        {
+                            Total_Found_Results = sres.Total,
+                            Current_Page = sres.Page,
+                            Page_Size = number_of_results,
+                            Found_subsidies = sres.Results.Select(m => m.ToApiSubsidyListItem()).ToArray(),
+                        };
+
+                        return res;
+                    }
+
+
+                    return null;
+
+                });
         }
     }
 }

@@ -26,25 +26,31 @@ namespace HlidacStatu.MCPServer.Tools
             string company_Name
           )
         {
-            _ = AuditRepo.Add(Audit.Operations.Call,
+            return AuditRepo.AddWithElapsedTimeMeasure(
+                Audit.Operations.Call,
                 server?.ServerOptions?.KnownClientInfo?.Name?.Split('|')?.FirstOrDefault(),
                 server?.ServerOptions?.KnownClientInfo?.Name?.Split('|')?.LastOrDefault(),
                 AuditRepo.GetClassAndMethodName(MethodBase.GetCurrentMethod()), "",
                 AuditRepo.GetMethodParametersWithValues(MethodBase.GetCurrentMethod().GetParameters().Skip(1), ico, company_Name),
-                null);
+                null, () =>
+                {
 
-            if (string.IsNullOrWhiteSpace(ico) && string.IsNullOrWhiteSpace(company_Name))
-                return null;
+                    if (string.IsNullOrWhiteSpace(ico) && string.IsNullOrWhiteSpace(company_Name))
+                        return null;
 
-            SubjektFinancialInfo res = HlidacStatu.Repositories.FirmaRepo.GetFinancialInfo(ico, company_Name);
+                    SubjektFinancialInfo res = HlidacStatu.Repositories.FirmaRepo.GetFinancialInfo(ico, company_Name);
 
-            return res;
+                    return res;
+                });
 
         }
+
+
+
         [McpServerTool(
             Name = "get_business_between_legal_entity_and_government",
             Title = "Return detail information about Czech company with ICO"),
-        Description("Returns detail of business contracts, subsidies and statistics between the legal entity and the Czech government. " 
+        Description("Returns detail of business contracts, subsidies and statistics between the legal entity and the Czech government. "
             + "Specify legal entity by ICO or name. Use primary ICO if it's available."
             + " For person detail use tool 'get_person_detail' with parameter 'person_id'.")]
         public static HlidacStatu.DS.Api.Firmy.SubjektDetailInfo SubjektDetailInfo(IMcpServer server,
@@ -54,22 +60,24 @@ namespace HlidacStatu.MCPServer.Tools
             string company_Name
             )
         {
-            _ = AuditRepo.Add(Audit.Operations.Call,
-    server?.ServerOptions?.KnownClientInfo?.Name?.Split('|')?.FirstOrDefault(),
-    server?.ServerOptions?.KnownClientInfo?.Name?.Split('|')?.LastOrDefault(),
-    AuditRepo.GetClassAndMethodName(MethodBase.GetCurrentMethod()), "",
-    AuditRepo.GetMethodParametersWithValues(MethodBase.GetCurrentMethod().GetParameters().Skip(1), ico, company_Name),
-    null);
+            return AuditRepo.AddWithElapsedTimeMeasure(
+                Audit.Operations.Call,
+                server?.ServerOptions?.KnownClientInfo?.Name?.Split('|')?.FirstOrDefault(),
+                server?.ServerOptions?.KnownClientInfo?.Name?.Split('|')?.LastOrDefault(),
+                AuditRepo.GetClassAndMethodName(MethodBase.GetCurrentMethod()), "",
+                AuditRepo.GetMethodParametersWithValues(MethodBase.GetCurrentMethod().GetParameters().Skip(1), ico, company_Name),
+                null, () =>
+                {
 
-            if (string.IsNullOrWhiteSpace(ico))
-                return null;
-            if (Util.DataValidators.CheckCZICO(ico) == false)
-                return null;
+                    if (string.IsNullOrWhiteSpace(ico))
+                        return null;
+                    if (Util.DataValidators.CheckCZICO(ico) == false)
+                        return null;
 
-            DS.Api.Firmy.SubjektDetailInfo res = HlidacStatu.Repositories.FirmaRepo.GetDetailInfo(ico, company_Name);
+                    DS.Api.Firmy.SubjektDetailInfo res = HlidacStatu.Repositories.FirmaRepo.GetDetailInfo(ico, company_Name);
 
-            return res;
-
+                    return res;
+                });
         }
 
         [McpServerTool(
@@ -81,27 +89,30 @@ namespace HlidacStatu.MCPServer.Tools
             Entities.Firma.Zatrideni.SubjektyObory type
             )
         {
-            _ = AuditRepo.Add(Audit.Operations.Call,
-    server?.ServerOptions?.KnownClientInfo?.Name?.Split('|')?.FirstOrDefault(),
-    server?.ServerOptions?.KnownClientInfo?.Name?.Split('|')?.LastOrDefault(),
-    AuditRepo.GetClassAndMethodName(MethodBase.GetCurrentMethod()), "",
-    AuditRepo.GetMethodParametersWithValues(MethodBase.GetCurrentMethod().GetParameters().Skip(1), type),
-    null);
+            return AuditRepo.AddWithElapsedTimeMeasure(
+                Audit.Operations.Call,
+                server?.ServerOptions?.KnownClientInfo?.Name?.Split('|')?.FirstOrDefault(),
+                server?.ServerOptions?.KnownClientInfo?.Name?.Split('|')?.LastOrDefault(),
+                AuditRepo.GetClassAndMethodName(MethodBase.GetCurrentMethod()), "",
+                AuditRepo.GetMethodParametersWithValues(MethodBase.GetCurrentMethod().GetParameters().Skip(1), type),
+                null, () =>
+                {
 
-            var res = FirmaRepo.Zatrideni.Subjekty(type)
-                                    .Select(m => new SimpleDetailInfo()
-                                    {
-                                        Ico = m.Ico,
-                                        Jmeno = m.Jmeno,
-                                        Kraj = m.Kraj,
-                                        Source_Url = HlidacStatu.Entities.Firma.GetUrl(m.Ico, false),
-                                    })
-                    .DistinctBy(m=>m.Ico)
-                    .ToArray();
-            ;
+                    var res = FirmaRepo.Zatrideni.Subjekty(type)
+                                            .Select(m => new SimpleDetailInfo()
+                                            {
+                                                Ico = m.Ico,
+                                                Jmeno = m.Jmeno,
+                                                Kraj = m.Kraj,
+                                                Source_Url = HlidacStatu.Entities.Firma.GetUrl(m.Ico, false),
+                                            })
+                            .DistinctBy(m => m.Ico)
+                            .ToArray();
+                    ;
 
 
-            return res;
+                    return res;
+                });
         }
 
         [McpServerTool(
@@ -110,42 +121,45 @@ namespace HlidacStatu.MCPServer.Tools
             Description("Get list of IČO and name of all subsidiaries of Czech legal entity with provided IČO.")]
         public static SimpleDetailInfo[] get_subsidiaries_of_legal_entity(IMcpServer server,
             [Description("IČO of Legal entity to get subsidiaries of.")]
-            string ico, 
-            [Description("Historic view to get subsidiaries. Valid values are: \n" 
+            string ico,
+            [Description("Historic view to get subsidiaries. Valid values are: \n"
             + "Aktualni : current status; \n"
             + "Nedavny : Currently according to the commercial register or the last 5 years; \n"
             + "Libovolny : Currently according to the commercial register or at any time in the past")]
             DS.Graphs.Relation.AktualnostType historic_view = DS.Graphs.Relation.AktualnostType.Nedavny)
         {
 
-            _ = AuditRepo.Add(Audit.Operations.Call,
-    server?.ServerOptions?.KnownClientInfo?.Name?.Split('|')?.FirstOrDefault(),
-    server?.ServerOptions?.KnownClientInfo?.Name?.Split('|')?.LastOrDefault(),
-    AuditRepo.GetClassAndMethodName(MethodBase.GetCurrentMethod()), "",
-    AuditRepo.GetMethodParametersWithValues(MethodBase.GetCurrentMethod().GetParameters().Skip(1), ico, historic_view),
-    null);
+            return AuditRepo.AddWithElapsedTimeMeasure(
+                Audit.Operations.Call,
+                server?.ServerOptions?.KnownClientInfo?.Name?.Split('|')?.FirstOrDefault(),
+                server?.ServerOptions?.KnownClientInfo?.Name?.Split('|')?.LastOrDefault(),
+                AuditRepo.GetClassAndMethodName(MethodBase.GetCurrentMethod()), "",
+                AuditRepo.GetMethodParametersWithValues(MethodBase.GetCurrentMethod().GetParameters().Skip(1), ico, historic_view),
+                null, () =>
+                {
 
 
-            if (string.IsNullOrWhiteSpace(ico))
-                return null;
-            if (Util.DataValidators.CheckCZICO(ico) == false)
-                return null;
-            Firma f = HlidacStatu.Repositories.Firmy.Get(ico);
-            if (f.Valid == false)
-                return null;
+                    if (string.IsNullOrWhiteSpace(ico))
+                        return null;
+                    if (Util.DataValidators.CheckCZICO(ico) == false)
+                        return null;
+                    Firma f = HlidacStatu.Repositories.Firmy.Get(ico);
+                    if (f.Valid == false)
+                        return null;
 
-            var res = f.IcosInHolding(historic_view)
-                    .Select(m => new SimpleDetailInfo()
-                    {
-                        Ico = m,
-                        Jmeno = HlidacStatu.Repositories.Firmy.GetJmeno(m),
-                        Source_Url = HlidacStatu.Entities.Firma.GetUrl(m, false),
-                    })
-                    .ToArray();
-            ;
+                    var res = f.IcosInHolding(historic_view)
+                            .Select(m => new SimpleDetailInfo()
+                            {
+                                Ico = m,
+                                Jmeno = HlidacStatu.Repositories.Firmy.GetJmeno(m),
+                                Source_Url = HlidacStatu.Entities.Firma.GetUrl(m, false),
+                            })
+                            .ToArray();
+                    ;
 
 
-            return res;
+                    return res;
+                });
         }
 
     }
