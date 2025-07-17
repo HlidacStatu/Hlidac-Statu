@@ -42,6 +42,7 @@ namespace HlidacStatu.Connectors
             Insolvence,
             InsolvenceDocs,
             Subsidy,
+            DotacniVyzva,
             UptimeItem,
             UptimeSSL,
             PageMetadata,
@@ -79,6 +80,7 @@ namespace HlidacStatu.Connectors
         public static string defaultIndexName_Insolvence = "insolvencnirestrik";
         public static string defaultIndexName_InsolvenceDocs = "insolvencedocs";
         public static string defaultIndexName_Subsidy = "subsidy3";
+        public static string defaultIndexName_DotacniVyzva = "dotacnivyzva";
         public static string defaultIndexName_Dotace = "dotace3";
         public static string defaultIndexName_AuditLog = "audit_log";
         public static string defaultIndexName_DotaceOld = "dotace";
@@ -238,6 +240,11 @@ namespace HlidacStatu.Connectors
         public static ElasticClient GetESClient_Subsidy(int timeOut = 60000, int connectionLimit = 80)
         {
             return GetESClient(defaultIndexName_Subsidy, timeOut, connectionLimit, IndexType.Subsidy);
+        }
+        
+        public static ElasticClient GetESClient_DotacniVyzva(int timeOut = 60000, int connectionLimit = 80)
+        {
+            return GetESClient(defaultIndexName_DotacniVyzva, timeOut, connectionLimit, IndexType.DotacniVyzva);
         }
         
         public static ElasticClient GetESClient_Dotace(int timeOut = 60000, int connectionLimit = 80)
@@ -581,6 +588,13 @@ namespace HlidacStatu.Connectors
                         .Create(indexName, i => i
                             .InitializeUsing(idxSt)
                             .Map<Entities.Subsidy>(map => map.AutoMap().DateDetection(false))
+                        );
+                    break;
+                case IndexType.DotacniVyzva:
+                    res = client.Indices
+                        .Create(indexName, i => i
+                            .InitializeUsing(idxSt)
+                            .Map<Entities.DotacniVyzva>(map => map.AutoMap().DateDetection(false))
                         );
                     break;
                 case IndexType.Dotace:

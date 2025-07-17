@@ -48,9 +48,16 @@ public partial class DotacniVyzva
     [Number]
     public decimal? Allocation { get; set; }
     
+    [Object(Enabled = false)] //do not index, do not process, just store
+    public List<object> RawData { get; set; } = new();
+    
     //Our enrichment
     public string Category { get; set; }
     [Keyword]
     public string DataSource { get; set; }
+    [Keyword]
+    public string FileName { get; set; }
+    [Number]
+    public int RecordNumber { get; set; }
     
 }
