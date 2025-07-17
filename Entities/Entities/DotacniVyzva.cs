@@ -40,7 +40,7 @@ public partial class DotacniVyzva
     public List<string> Targets { get; set; }
     
     [Text]
-    public List<string> Fonds { get; set; }
+    public HashSet<string> Fonds { get; set; }
 
     [Number]
     public decimal? Allocation { get; set; }
