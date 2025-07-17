@@ -285,8 +285,18 @@ text zpravy: {txt}";
             return Content("");
         }
 
+        [Authorize]
         public ActionResult ClassificationFeedback(string typ, string email, string txt, string url, string data)
         {
+            AuditRepo.Add(
+                Audit.Operations.Call
+                , User?.Identity?.Name
+                , HlidacStatu.Util.RealIpAddress.GetIp(HttpContext)?.ToString()
+                , "ClassificationFeedback"
+                , "email"
+                , email
+                , "");
+
             // create a task, so user doesn't have to wait for anything
             _ = Task.Run(async () =>
             {
