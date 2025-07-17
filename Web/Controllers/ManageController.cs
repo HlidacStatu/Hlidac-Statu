@@ -36,6 +36,23 @@ namespace HlidacStatu.Web.Controllers
             _userManager = userManager;
         }
 
+        public async Task<ActionResult> LockUser()
+        {
+            
+            var emailsToLock = new[] { "kwebeb@email.cz", "sample@email.tst" };
+
+            foreach (var email in emailsToLock)
+            {
+                var user = await _userManager.FindByEmailAsync(email);
+                if (user != null)
+                {
+                    await _userManager.UpdateSecurityStampAsync(user); // invalidate cookies
+                    await _userManager.UpdateAsync(user);
+                }
+            }
+
+            return Ok();
+        }
 
         //
         // GET: /Manage/Index
