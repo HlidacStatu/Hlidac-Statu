@@ -29,9 +29,10 @@
                 @if (!string.IsNullOrWhiteSpace(Model.model.ProjectDescription))
                 {
                     <p class="mt-2">
-                        @Model.model.ProjectDescription
+                        @Html.Raw(Html.Encode(Model.model.ProjectDescription).Replace("\n", "<br/>"))
                     </p>
                 }
+                
 
                 @if (!string.IsNullOrWhiteSpace(Model.model.ProjectCode))
                 {

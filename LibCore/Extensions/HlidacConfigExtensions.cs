@@ -71,7 +71,7 @@ public static class HlidacConfigExtensions
                 // ──► SPECIAL SINK ONLY for AuditRepo
                 .WriteTo.Logger(lc => lc
                     .Filter.ByIncludingOnly(Matching.FromSource("HlidacStatu.Repositories.AuditRepo"))
-                    .AddLogStash(new Uri(Environment.GetEnvironmentVariable("LogStashAuditUrl" ?? "http://10.10.100.145:5001")))
+                    .AddLogStash(new Uri(Environment.GetEnvironmentVariable("LogStashAuditUrl") ?? "http://10.10.100.145:5001"))
                     )
                 .WriteTo.Console();
 
