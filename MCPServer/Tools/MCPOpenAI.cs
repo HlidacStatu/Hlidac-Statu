@@ -7,6 +7,7 @@ using HlidacStatu.Repositories;
 using ModelContextProtocol.Server;
 using System.ComponentModel;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using System.Text.Json;
 using static HlidacStatu.Repositories.SmlouvaRepo.Searching;
 using static HlidacStatu.XLib.Search;
@@ -42,6 +43,7 @@ text - a relevant snippet of text for the search terms
 url - a URL to the document or search result item. Useful for citing specific resources in research.
 
          */
+        [MethodImpl(MethodImplOptions.NoInlining)]
         [McpServerTool(
             Name = "search",
             Title = "search tool for OpenAI deep search functionality. "),
@@ -181,6 +183,7 @@ url - a URL to the document or search result item. Useful for citing specific re
         
         }
 
+        [MethodImpl(MethodImplOptions.NoInlining)]
         [McpServerTool(
             Name = "fetch",
             Title = "search tool for OpenAI deep search functionality. "),

@@ -4,6 +4,7 @@ using ModelContextProtocol.Server;
 using RazorEngine.Compilation.ImpromptuInterface;
 using System.ComponentModel;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 
 namespace HlidacStatu.MCPServer.Tools
 {
@@ -13,6 +14,7 @@ namespace HlidacStatu.MCPServer.Tools
         static Serilog.ILogger _logger = Serilog.Log.ForContext<MCPSmlouvy>();
 
 
+        [MethodImpl(MethodImplOptions.NoInlining)]
         [McpServerTool(
             Name = "get_contract_detail",
             Title = "Get detail of specific contract of czech government.  "),
@@ -48,6 +50,7 @@ namespace HlidacStatu.MCPServer.Tools
 
         }
 
+        [MethodImpl(MethodImplOptions.NoInlining)]
         [McpServerTool(
             Name = "search_contracts",
             Title = "Find contracts based on parameters"),

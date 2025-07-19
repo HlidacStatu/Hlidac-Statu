@@ -4,6 +4,7 @@ using ModelContextProtocol.Server;
 using OpenAI.Moderations;
 using System.ComponentModel;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 
 namespace HlidacStatu.MCPServer.Tools
 {
@@ -13,6 +14,7 @@ namespace HlidacStatu.MCPServer.Tools
         static Serilog.ILogger _logger = Serilog.Log.ForContext<MCPDotace>();
 
 
+        [MethodImpl(MethodImplOptions.NoInlining)]
         [McpServerTool(
             Name = "get_subsidy_detail",
             Title = "Get detail of specific subsidy from czech government or EU"),
@@ -40,6 +42,7 @@ namespace HlidacStatu.MCPServer.Tools
         }
 
 
+        [MethodImpl(MethodImplOptions.NoInlining)]
         [McpServerTool(
     Name = "search_subsidies",
     Title = "Find subsidies based on parameters"),
@@ -79,9 +82,13 @@ Description("Search subsidies from Czech government for specified parameters. Yo
     int page = 1,
 
 [Description("Sorting order for search results. Determines how subsidies are ordered in the response (e.g., by relevance, date, price)")]
-    Repositories.Searching.DotaceSearchResult.DotaceOrderResult order_result = Repositories.Searching.DotaceSearchResult.DotaceOrderResult.Relevance
+    Repositories.Searching.DotaceSearchResult.DotaceOrderResult order_result = Repositories.Searching.DotaceSearchResult.DotaceOrderResult.Relevance,
+[CallerMemberName] string methodname = ""
     )
         {
+            var x = AuditRepo.GetClassAndMethodName(MethodBase.GetCurrentMethod());
+            var y = AuditRepo.GetMethodParametersWithValues(MethodBase.GetCurrentMethod().GetParameters().Skip(1), for_year, minimal_amount, maximal_amount, subsidy_provider_ICO, subsidy_recipient_ICO, ICO_of_holding_structure, keywords, negative_keywords, number_of_results, page, order_result);
+
             return await AuditRepo.AddWithElapsedTimeMeasureAsync(Audit.Operations.Call,
                 server?.ServerOptions?.KnownClientInfo?.Name?.Split('|')?.FirstOrDefault(),
                 server?.ServerOptions?.KnownClientInfo?.Name?.Split('|')?.LastOrDefault(),
