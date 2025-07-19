@@ -13,21 +13,21 @@
 		<CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
 	</PropertyGroup>
 	<ItemGroup>
-		<PackageReference Include="Devmasters.Batch" Version="8.0.0" />
+		<PackageReference Include="Devmasters.Batch" Version="8.0.2" />
 		<PackageReference Include="Devmasters.Cache.AWS_S3" Version="8.0.2" />
 		<PackageReference Include="Devmasters.Collections" Version="8.0.0" />
-		<PackageReference Include="Devmasters.Core" Version="8.0.7" />
-		<PackageReference Include="Devmasters.DT" Version="8.1.0" />
+		<PackageReference Include="Devmasters.Core" Version="8.0.9" />
+		<PackageReference Include="Devmasters.DT" Version="8.1.2" />
 		
 		<PackageReference Include="Devmasters.Enums" Version="8.0.1" />
-		<PackageReference Include="Devmasters.IO" Version="8.1.0" />
-		<PackageReference Include="Devmasters.Net" Version="8.0.5" />
+		<PackageReference Include="Devmasters.IO" Version="8.1.2" />
+		<PackageReference Include="Devmasters.Net" Version="8.0.6" />
 		<PackageReference Include="Microsoft.AspNetCore.Components" Version="8.0.11" />
 		<PackageReference Include="Microsoft.AspNetCore.Html.Abstractions" Version="2.2.0" />
 <!--		<PackageReference Include="jnm2.ReferenceAssemblies.net35" Version="1.0.1" />-->
 		<PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
 		<PackageReference Include="Microsoft.Extensions.Caching.StackExchangeRedis" Version="8.0.11" />
-		<PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="8.0.1" />
+		<PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="9.0.7" />
 		<PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.3">
 			<PrivateAssets>all</PrivateAssets>
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
@@ -44,7 +44,7 @@
 		<PackageReference Include="Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers" Version="0.4.421302">
 			<PrivateAssets>all</PrivateAssets>
 		</PackageReference>
-		<PackageReference Include="System.Text.Json" Version="9.0.1" />
+		<PackageReference Include="System.Text.Json" Version="9.0.7" />
 		<PackageReference Include="ZiggyCreatures.FusionCache.Serialization.SystemTextJson" Version="1.4.1" />
 	</ItemGroup>
 	<ItemGroup>
