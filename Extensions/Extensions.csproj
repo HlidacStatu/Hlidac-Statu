@@ -1,24 +1,21 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
-
-    <PropertyGroup>
-        <TargetFramework>net8.0</TargetFramework>
-        <ImplicitUsings>enable</ImplicitUsings>
-        <Nullable>enable</Nullable>
-        <AssemblyName>HlidacStatu.Extensions</AssemblyName>
-        <RootNamespace>HlidacStatu.Extensions</RootNamespace>
-    </PropertyGroup>
-
-    <ItemGroup>
-      <PackageReference Include="Microsoft.AspNetCore.Components" Version="8.0.11" />
-      <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="9.0.7" />
-      <PackageReference Include="Newtonsoft.Json.Schema" Version="3.0.16" />
-      <PackageReference Include="Ollama" Version="1.13.0" />
-      <PackageReference Include="System.Security.Cryptography.Pkcs" Version="8.0.1" />
-    </ItemGroup>
-
-    <ItemGroup>
-      <ProjectReference Include="..\Datasets\Datasets.csproj" />
-      <ProjectReference Include="..\Repositories\Repositories.csproj" />
-    </ItemGroup>
-
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <AssemblyName>HlidacStatu.Extensions</AssemblyName>
+    <RootNamespace>HlidacStatu.Extensions</RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Components" Version="8.0.18" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="9.0.7" />
+    <PackageReference Include="Newtonsoft.Json.Schema" Version="3.0.16" />
+    <PackageReference Include="Ollama" Version="1.15.0" />
+    <PackageReference Include="System.Security.Cryptography.Pkcs" Version="9.0.7" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Datasets\Datasets.csproj" />
+    <ProjectReference Include="..\Repositories\Repositories.csproj" />
+  </ItemGroup>
 </Project>

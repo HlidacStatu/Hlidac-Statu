@@ -1,64 +1,63 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
-
-	<PropertyGroup>
-		<TargetFramework>net8.0</TargetFramework>
-		<AssemblyName>HlidacStatu.Web.HealthChecks</AssemblyName>
-		<RootNamespace>HlidacStatu.Web.HealthChecks</RootNamespace>
-		<Nullable>enable</Nullable>
-	</PropertyGroup>
-	<ItemGroup>
-		<PackageReference Include="AspNetCore.HealthChecks.Elasticsearch" Version="8.0.1" />
-		<PackageReference Include="AspNetCore.HealthChecks.Network" Version="8.0.1" />
-		<PackageReference Include="AspNetCore.HealthChecks.Rabbitmq" Version="8.0.2" />
-		<PackageReference Include="AspNetCore.HealthChecks.SqlServer" Version="8.0.2" />
-		<PackageReference Include="AspNetCore.HealthChecks.System" Version="8.0.1" />
-		<PackageReference Include="AspNetCore.HealthChecks.UI" Version="8.0.2" />
-		<PackageReference Include="AspNetCore.HealthChecks.UI.Client" Version="8.0.1" />
-		<PackageReference Include="AspNetCore.HealthChecks.UI.SqlServer.Storage" Version="8.0.1" />
-		<PackageReference Include="AspNetCore.HealthChecks.Uris" Version="8.0.1" />
-		<PackageReference Include="Corsinvest.ProxmoxVE.Api.Extension" Version="8.2.5" />
-		<PackageReference Include="Corsinvest.ProxmoxVE.Api.Shared" Version="8.2.5" />
-		<PackageReference Include="Devmasters.Core" Version="8.0.9" />
-		<PackageReference Include="Docker.DotNet" Version="3.125.15" />
-		<PackageReference Include="HlidacStatu.Api.V2.Dataset" Version="2.4.1.1" />
-		<PackageReference Include="Microsoft.AspNetCore.Components" Version="8.0.11" />
-		<PackageReference Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="8.0.11" />
-		<PackageReference Include="Microsoft.AspNetCore.Http.Abstractions" Version="2.3.0" />
-		<PackageReference Include="Microsoft.AspNetCore.Identity.UI" Version="8.0.11" />
-		<PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="8.0.11" />
-		<PackageReference Include="Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation" Version="8.0.11" />
-		<PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="8.0.11" />
-		<PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="8.0.11">
-			<PrivateAssets>all</PrivateAssets>
-			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-		</PackageReference>
-		<PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="9.0.7" />
-		<PackageReference Include="Microsoft.Extensions.Diagnostics.HealthChecks.EntityFrameworkCore" Version="8.0.11" />
-		<PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="8.0.3" />
-		<PackageReference Include="Microsoft.Web.Administration" Version="11.1.0" />
-		<PackageReference Include="Newtonsoft.Json.Schema" Version="3.0.16" />
-		<PackageReference Include="Ollama" Version="1.13.0" />
-		<PackageReference Include="RabbitMQ.Client" Version="6.8.1" />
-		<PackageReference Include="IPNetwork2" Version="3.0.667">
-			<!--			This is hack => it uses ipnetwork from .net 8 now - hope it works-->
-			<Aliases>IPNetwork2</Aliases>
-		</PackageReference>
-		<PackageReference Include="System.Security.Cryptography.Pkcs" Version="8.0.1" />
-	</ItemGroup>
-
-	<ItemGroup>
-		<ProjectReference Include="..\Datasets\Datasets.csproj" />
-		<ProjectReference Include="..\Entities\Entities.csproj" />
-		<ProjectReference Include="..\HlidacStatu.ExportData\HlidacStatu.ExportData.csproj" />
-		<ProjectReference Include="..\HlidacStatu.Q.Messages\HlidacStatu.Q.Messages.csproj" />
-		<ProjectReference Include="..\HlidacStatu.Q.Simple\HlidacStatu.Q.Simple.csproj" />
-		<ProjectReference Include="..\HlidacStatu.Q\HlidacStatu.Q.csproj" />
-		<ProjectReference Include="..\KIndexGenerator\KIndexGenerator.csproj" />
-		<ProjectReference Include="..\Lib.Data.External.Tables\Lib.Data.External.Tables.csproj" />
-		<ProjectReference Include="..\LibCore\LibCore.csproj" />
-		<ProjectReference Include="..\Plugin.Enhancers\Plugin.Enhancers.csproj" />
-		<ProjectReference Include="..\Plugin.IssueAnalyzers\Plugin.IssueAnalyzers.csproj" />
-		<ProjectReference Include="..\Util\Util.csproj" />
-		<ProjectReference Include="..\XLib\XLib.csproj" />
-	</ItemGroup>
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <AssemblyName>HlidacStatu.Web.HealthChecks</AssemblyName>
+    <RootNamespace>HlidacStatu.Web.HealthChecks</RootNamespace>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="AspNetCore.HealthChecks.Elasticsearch" Version="8.0.1" />
+    <PackageReference Include="AspNetCore.HealthChecks.Network" Version="8.0.1" />
+    <PackageReference Include="AspNetCore.HealthChecks.Rabbitmq" Version="8.0.2" />
+    <PackageReference Include="AspNetCore.HealthChecks.SqlServer" Version="8.0.2" />
+    <PackageReference Include="AspNetCore.HealthChecks.System" Version="8.0.1" />
+    <PackageReference Include="AspNetCore.HealthChecks.UI" Version="8.0.2" />
+    <PackageReference Include="AspNetCore.HealthChecks.UI.Client" Version="8.0.1" />
+    <PackageReference Include="AspNetCore.HealthChecks.UI.SqlServer.Storage" Version="8.0.1" />
+    <PackageReference Include="AspNetCore.HealthChecks.Uris" Version="8.0.1" />
+    <PackageReference Include="Corsinvest.ProxmoxVE.Api.Extension" Version="8.4.1" />
+    <PackageReference Include="Corsinvest.ProxmoxVE.Api.Shared" Version="8.4.1" />
+    <PackageReference Include="Devmasters.Core" Version="8.0.9" />
+    <PackageReference Include="Docker.DotNet" Version="3.125.15" />
+    <PackageReference Include="HlidacStatu.Api.V2.Dataset" Version="2.4.1.1" />
+    <PackageReference Include="Microsoft.AspNetCore.Components" Version="8.0.18" />
+    <PackageReference Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="8.0.12" />
+    <PackageReference Include="Microsoft.AspNetCore.Http.Abstractions" Version="2.3.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Identity.UI" Version="8.0.11" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="8.0.11" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation" Version="8.0.11" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="8.0.11" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="8.0.11">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="9.0.7" />
+    <PackageReference Include="Microsoft.Extensions.Diagnostics.HealthChecks.EntityFrameworkCore" Version="8.0.11" />
+    <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="8.0.7" />
+    <PackageReference Include="Microsoft.Web.Administration" Version="11.1.0" />
+    <PackageReference Include="Newtonsoft.Json.Schema" Version="3.0.16" />
+    <PackageReference Include="Ollama" Version="1.15.0" />
+    <PackageReference Include="RabbitMQ.Client" Version="6.8.1" />
+    <PackageReference Include="IPNetwork2" Version="3.0.667">
+      <!--			This is hack => it uses ipnetwork from .net 8 now - hope it works-->
+      <Aliases>IPNetwork2</Aliases>
+    </PackageReference>
+    <PackageReference Include="System.Security.Cryptography.Pkcs" Version="9.0.7" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Datasets\Datasets.csproj" />
+    <ProjectReference Include="..\Entities\Entities.csproj" />
+    <ProjectReference Include="..\HlidacStatu.ExportData\HlidacStatu.ExportData.csproj" />
+    <ProjectReference Include="..\HlidacStatu.Q.Messages\HlidacStatu.Q.Messages.csproj" />
+    <ProjectReference Include="..\HlidacStatu.Q.Simple\HlidacStatu.Q.Simple.csproj" />
+    <ProjectReference Include="..\HlidacStatu.Q\HlidacStatu.Q.csproj" />
+    <ProjectReference Include="..\KIndexGenerator\KIndexGenerator.csproj" />
+    <ProjectReference Include="..\Lib.Data.External.Tables\Lib.Data.External.Tables.csproj" />
+    <ProjectReference Include="..\LibCore\LibCore.csproj" />
+    <ProjectReference Include="..\Plugin.Enhancers\Plugin.Enhancers.csproj" />
+    <ProjectReference Include="..\Plugin.IssueAnalyzers\Plugin.IssueAnalyzers.csproj" />
+    <ProjectReference Include="..\Util\Util.csproj" />
+    <ProjectReference Include="..\XLib\XLib.csproj" />
+  </ItemGroup>
 </Project>

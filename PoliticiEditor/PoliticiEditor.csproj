@@ -1,38 +1,33 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk.Web">
-
-    <PropertyGroup>
-        <TargetFramework>net8.0</TargetFramework>
-        <Nullable>enable</Nullable>
-        <ImplicitUsings>enable</ImplicitUsings>
-        <UserSecretsId>aspnet-PoliticiEditor-fba912bd-c0de-4fa0-bfba-51f691e83d49</UserSecretsId>
-    </PropertyGroup>
-
-    <ItemGroup>
-        <PackageReference Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="8.0.12" />
-        <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="8.0.12" />
-        <PackageReference Include="MailKit" Version="4.8.0" />
-    </ItemGroup>
-
-    <ItemGroup>
-      <ProjectReference Include="..\DetectFaces\DetectFaces.csproj" />
-      <ProjectReference Include="..\Extensions\Extensions.csproj" />
-      <ProjectReference Include="..\LibCore\LibCore.csproj" />
-      <ProjectReference Include="..\Repositories\Repositories.csproj" />
-      <ProjectReference Include="..\Whisperer\Whisperer.csproj" />
-    </ItemGroup>
-
-    <ItemGroup>
-      <_ContentIncludedByDefault Remove="Components\Pages\Account\AccessDenied.razor" />
-      <_ContentIncludedByDefault Remove="Components\Pages\Account\Login.razor" />
-      <_ContentIncludedByDefault Remove="Components\Pages\Account\LoginCallback.razor" />
-      <_ContentIncludedByDefault Remove="Components\Pages\Account\RedirectToLogin.razor" />
-      <_ContentIncludedByDefault Remove="Components\Pages\Account\StatusMessage.razor" />
-    </ItemGroup>
-
-    <ItemGroup>
-      <None Include="logger.serilog.json">
-        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      </None>
-    </ItemGroup>
-
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <UserSecretsId>aspnet-PoliticiEditor-fba912bd-c0de-4fa0-bfba-51f691e83d49</UserSecretsId>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="8.0.12" />
+    <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="8.0.12" />
+    <PackageReference Include="MailKit" Version="4.8.0" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\DetectFaces\DetectFaces.csproj" />
+    <ProjectReference Include="..\Extensions\Extensions.csproj" />
+    <ProjectReference Include="..\LibCore\LibCore.csproj" />
+    <ProjectReference Include="..\Repositories\Repositories.csproj" />
+    <ProjectReference Include="..\Whisperer\Whisperer.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <_ContentIncludedByDefault Remove="Components\Pages\Account\AccessDenied.razor" />
+    <_ContentIncludedByDefault Remove="Components\Pages\Account\Login.razor" />
+    <_ContentIncludedByDefault Remove="Components\Pages\Account\LoginCallback.razor" />
+    <_ContentIncludedByDefault Remove="Components\Pages\Account\RedirectToLogin.razor" />
+    <_ContentIncludedByDefault Remove="Components\Pages\Account\StatusMessage.razor" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="logger.serilog.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
 </Project>

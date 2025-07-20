@@ -1,47 +1,42 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
-
-    <PropertyGroup>
-                <TargetFramework>net8.0</TargetFramework>
-        <AssemblyName>HlidacStatu.Repositories</AssemblyName>
-        <RootNamespace>HlidacStatu.Repositories</RootNamespace>
-    </PropertyGroup>
-
-    <ItemGroup>
-      <ProjectReference Include="..\..\Hlidac-Statu-Private\AI\AI.csproj" />
-      <ProjectReference Include="..\Datastructures\Datastructures.csproj" />
-      <ProjectReference Include="..\Connectors\Connectors.csproj" />
-      <ProjectReference Include="..\Entities\Entities.csproj" />
-      <ProjectReference Include="..\HlidacStatu.Lib.Db.Insolvence\HlidacStatu.Lib.Db.Insolvence.csproj" />
-      <ProjectReference Include="..\HlidacStatu.Q.Simple\HlidacStatu.Q.Simple.csproj" />
-      <ProjectReference Include="..\Lib.Analytics\Lib.Analytics.csproj" />
-<!--      <ProjectReference Include="..\Lib.Data.External\Lib.Data.External.csproj" />-->
-      <ProjectReference Include="..\Lib.OCR.Api.Client\Lib.OCR.Api.Client.csproj" />
-      <ProjectReference Include="..\Searching\Searching.csproj" />
-      <ProjectReference Include="..\Util\Util.csproj" />
-    </ItemGroup>
-
-    <ItemGroup>
-      <PackageReference Include="Devmasters.Cache.AWS_S3" Version="8.0.2" />
-      <PackageReference Include="Devmasters.Cache.Memcached" Version="8.0.0" />
-      <PackageReference Include="Devmasters.Cache.Redis" Version="8.0.4" />
-      <PackageReference Include="MathNet.Numerics" Version="5.0.0" />
-      <PackageReference Include="Microsoft.AspNetCore.Components" Version="8.0.11" />
-      <PackageReference Include="Microsoft.AspNetCore.Mvc.TagHelpers" Version="2.2.0" />
-      <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="9.0.7" />
-      <PackageReference Include="NEST" Version="7.17.5" />
-      <PackageReference Include="Newtonsoft.Json.Schema" Version="3.0.16" />
-      <PackageReference Include="Ollama" Version="1.13.0" />
-      <PackageReference Include="Polly.Core" Version="8.5.0" />
-      <PackageReference Include="Polly.RateLimiting" Version="8.5.0" />
-      <PackageReference Include="Polly.Extensions.Http" Version="3.0.0" />
-      <PackageReference Include="System.Security.Cryptography.Pkcs" Version="8.0.1" />
-      <PackageReference Include="System.Text.Encoding.CodePages" Version="8.0.0" />
-      <PackageReference Include="ZiggyCreatures.FusionCache" Version="1.4.1" />
-    </ItemGroup>
-
-    <ItemGroup>
-      <WCFMetadataStorage Include="Temp\Connected Services\Data.External.NespolehlivyPlatceDPH" />
-    </ItemGroup>
-
-
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <AssemblyName>HlidacStatu.Repositories</AssemblyName>
+    <RootNamespace>HlidacStatu.Repositories</RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\Hlidac-Statu-Private\AI\AI.csproj" />
+    <ProjectReference Include="..\Datastructures\Datastructures.csproj" />
+    <ProjectReference Include="..\Connectors\Connectors.csproj" />
+    <ProjectReference Include="..\Entities\Entities.csproj" />
+    <ProjectReference Include="..\HlidacStatu.Lib.Db.Insolvence\HlidacStatu.Lib.Db.Insolvence.csproj" />
+    <ProjectReference Include="..\HlidacStatu.Q.Simple\HlidacStatu.Q.Simple.csproj" />
+    <ProjectReference Include="..\Lib.Analytics\Lib.Analytics.csproj" />
+    <!--      <ProjectReference Include="..\Lib.Data.External\Lib.Data.External.csproj" />-->
+    <ProjectReference Include="..\Lib.OCR.Api.Client\Lib.OCR.Api.Client.csproj" />
+    <ProjectReference Include="..\Searching\Searching.csproj" />
+    <ProjectReference Include="..\Util\Util.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Devmasters.Cache.AWS_S3" Version="8.0.2" />
+    <PackageReference Include="Devmasters.Cache.Memcached" Version="8.0.4" />
+    <PackageReference Include="Devmasters.Cache.Redis" Version="8.0.4" />
+    <PackageReference Include="MathNet.Numerics" Version="5.0.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Components" Version="8.0.18" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.TagHelpers" Version="2.2.0" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="9.0.7" />
+    <PackageReference Include="NEST" Version="7.17.5" />
+    <PackageReference Include="Newtonsoft.Json.Schema" Version="3.0.16" />
+    <PackageReference Include="Ollama" Version="1.15.0" />
+    <PackageReference Include="Polly.Core" Version="8.5.0" />
+    <PackageReference Include="Polly.RateLimiting" Version="8.5.0" />
+    <PackageReference Include="Polly.Extensions.Http" Version="3.0.0" />
+    <PackageReference Include="System.Security.Cryptography.Pkcs" Version="9.0.7" />
+    <PackageReference Include="System.Text.Encoding.CodePages" Version="8.0.0" />
+    <PackageReference Include="ZiggyCreatures.FusionCache" Version="1.4.1" />
+  </ItemGroup>
+  <ItemGroup>
+    <WCFMetadataStorage Include="Temp\Connected Services\Data.External.NespolehlivyPlatceDPH" />
+  </ItemGroup>
 </Project>

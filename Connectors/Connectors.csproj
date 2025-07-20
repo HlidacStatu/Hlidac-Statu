@@ -1,25 +1,22 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
-
-    <PropertyGroup>
-                <TargetFramework>net8.0</TargetFramework>
-        <AssemblyName>HlidacStatu.Connectors</AssemblyName>
-        <RootNamespace>HlidacStatu.Connectors</RootNamespace>
-        <Nullable>enable</Nullable>
-    </PropertyGroup>
-
-    <ItemGroup>
-      <PackageReference Include="Devmasters.Core" Version="8.0.9" />
-      <PackageReference Include="Microsoft.AspNetCore.Components" Version="8.0.11" />
-      <PackageReference Include="Newtonsoft.Json.Schema" Version="3.0.16" />
-      <PackageReference Include="Ollama" Version="1.13.0" />
-      <PackageReference Include="System.Security.Cryptography.Pkcs" Version="8.0.1" />
-    </ItemGroup>
-
-    <ItemGroup>
-      <ProjectReference Include="..\..\Hlidac-Statu-Private\MLUtils\MLUtil.csproj" />
-      <ProjectReference Include="..\Entities\Entities.csproj" />
-      <ProjectReference Include="..\Lib.Data.External\Lib.Data.External.csproj" />
-      <ProjectReference Include="..\Util\Util.csproj" />
-    </ItemGroup>
-
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <AssemblyName>HlidacStatu.Connectors</AssemblyName>
+    <RootNamespace>HlidacStatu.Connectors</RootNamespace>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Devmasters.Core" Version="8.0.9" />
+    <PackageReference Include="Microsoft.AspNetCore.Components" Version="8.0.18" />
+    <PackageReference Include="Newtonsoft.Json.Schema" Version="3.0.16" />
+    <PackageReference Include="Ollama" Version="1.15.0" />
+    <PackageReference Include="System.Security.Cryptography.Pkcs" Version="9.0.7" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\Hlidac-Statu-Private\MLUtils\MLUtil.csproj" />
+    <ProjectReference Include="..\Entities\Entities.csproj" />
+    <ProjectReference Include="..\Lib.Data.External\Lib.Data.External.csproj" />
+    <ProjectReference Include="..\Util\Util.csproj" />
+  </ItemGroup>
 </Project>

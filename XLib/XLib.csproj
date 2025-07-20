@@ -1,80 +1,74 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
-
-    <PropertyGroup>
-<TargetFramework>net8.0</TargetFramework>
-        <AssemblyName>HlidacStatu.XLib</AssemblyName>
-        <RootNamespace>HlidacStatu.XLib</RootNamespace>
-        <Nullable>enable</Nullable>
-    </PropertyGroup>
-
-    <ItemGroup>
-      <EmbeddedResource Include="Emails\Templates\ConfirmEmail.cshtml" />
-      <EmbeddedResource Include="Emails\Templates\ConfirmEmail.Html.cshtml" />
-      <EmbeddedResource Include="Emails\Templates\ConfirmEmail.Text.cshtml" />
-      <EmbeddedResource Include="Emails\Templates\FoundContracts.cshtml" />
-      <EmbeddedResource Include="Emails\Templates\FoundContracts.Html.cshtml" />
-      <EmbeddedResource Include="Emails\Templates\FoundContracts.Text.cshtml" />
-      <EmbeddedResource Include="Emails\Templates\FoundContractsIssues.cshtml" />
-      <EmbeddedResource Include="Emails\Templates\FoundContractsIssues.Html.cshtml" />
-      <EmbeddedResource Include="Emails\Templates\FoundContractsIssues.Text.cshtml" />
-      <EmbeddedResource Include="Emails\Templates\FoundContractsIssuesNoPayment.cshtml" />
-      <EmbeddedResource Include="Emails\Templates\FoundContractsIssuesNoPayment.Html.cshtml" />
-      <EmbeddedResource Include="Emails\Templates\FoundContractsIssuesNoPayment.Text.cshtml" />
-      <EmbeddedResource Include="Emails\Templates\FoundDataset.cshtml" />
-      <EmbeddedResource Include="Emails\Templates\FoundDataset.Html.cshtml" />
-      <EmbeddedResource Include="Emails\Templates\FoundDataset.Text.cshtml" />
-      <EmbeddedResource Include="Emails\Templates\FoundInsolvence.cshtml" />
-      <EmbeddedResource Include="Emails\Templates\FoundInsolvence.Html.cshtml" />
-      <EmbeddedResource Include="Emails\Templates\FoundInsolvence.Text.cshtml" />
-      <EmbeddedResource Include="Emails\Templates\FoundZakazky.cshtml" />
-      <EmbeddedResource Include="Emails\Templates\FoundZakazky.Html.cshtml" />
-      <EmbeddedResource Include="Emails\Templates\FoundZakazky.Text.cshtml" />
-      <EmbeddedResource Include="Emails\Templates\FoundZakazkyMarkdownPost.cshtml" />
-      <EmbeddedResource Include="Emails\Templates\FoundZakazkyMarkdownPost.Text.cshtml" />
-      <EmbeddedResource Include="Emails\Templates\GDPR.cshtml" />
-      <EmbeddedResource Include="Emails\Templates\GDPR.Html.cshtml" />
-      <EmbeddedResource Include="Emails\Templates\GDPR.Text.cshtml" />
-      <EmbeddedResource Include="Emails\Templates\NotFoundZakazkyMarkdownPost.cshtml" />
-      <EmbeddedResource Include="Emails\Templates\NotFoundZakazkyMarkdownPost.Text.cshtml" />
-      <EmbeddedResource Include="Emails\Templates\Register.cshtml" />
-      <EmbeddedResource Include="Emails\Templates\Register.Html.cshtml" />
-      <EmbeddedResource Include="Emails\Templates\Register.Text.cshtml" />
-      <EmbeddedResource Include="Emails\Templates\ResetPassword_WatchdogAnalytics.cshtml" />
-      <EmbeddedResource Include="Emails\Templates\ResetPassword_WatchdogAnalytics.Html.cshtml" />
-      <EmbeddedResource Include="Emails\Templates\ResetPassword_WatchdogAnalytics.Text.cshtml" />
-      <EmbeddedResource Include="Emails\Templates\ResetPassword.cshtml" />
-      <EmbeddedResource Include="Emails\Templates\ResetPassword.Html.cshtml" />
-      <EmbeddedResource Include="Emails\Templates\ResetPassword.Text.cshtml" />
-    </ItemGroup>
-
-    <ItemGroup>
-      <ProjectReference Include="..\Connectors\Connectors.csproj" />
-      <ProjectReference Include="..\Datasets\Datasets.csproj" />
-      <ProjectReference Include="..\Entities\Entities.csproj" />
-      <ProjectReference Include="..\Lib.Data.External\Lib.Data.External.csproj" />
-      <ProjectReference Include="..\Repositories\Repositories.csproj" />
-    </ItemGroup>
-
-    <ItemGroup>
-      <Compile Remove="Watchdogs\DotaceService.Watchdog.cs" />
-    </ItemGroup>
-
-    <ItemGroup>
-      <None Remove="Emails\Templates\ResetPassword_WatchdogAnalytics.cshtml" />
-      <None Remove="Emails\Templates\ResetPassword_WatchdogAnalytics.Html.cshtml" />
-      <None Remove="Emails\Templates\ResetPassword_WatchdogAnalytics.Text.cshtml" />
-    </ItemGroup>
-
-    <ItemGroup>
-      <PackageReference Include="Devmasters.Cache.Memcached" Version="8.0.0" />
-      <PackageReference Include="Microsoft.AspNetCore.Components" Version="8.0.11" />
-      <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="9.0.7" />
-      <PackageReference Include="Newtonsoft.Json.Schema" Version="3.0.16" />
-      <PackageReference Include="Ollama" Version="1.13.0" />
-      <PackageReference Include="RazorEngine.NetCore" Version="3.1.0" />
-      <PackageReference Include="Scriban" Version="5.12.0" />
-      <PackageReference Include="System.Security.Cryptography.Pkcs" Version="8.0.1" />
-      <PackageReference Include="System.Text.Encoding.CodePages" Version="8.0.0" />
-    </ItemGroup>
-
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <AssemblyName>HlidacStatu.XLib</AssemblyName>
+    <RootNamespace>HlidacStatu.XLib</RootNamespace>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Emails\Templates\ConfirmEmail.cshtml" />
+    <EmbeddedResource Include="Emails\Templates\ConfirmEmail.Html.cshtml" />
+    <EmbeddedResource Include="Emails\Templates\ConfirmEmail.Text.cshtml" />
+    <EmbeddedResource Include="Emails\Templates\FoundContracts.cshtml" />
+    <EmbeddedResource Include="Emails\Templates\FoundContracts.Html.cshtml" />
+    <EmbeddedResource Include="Emails\Templates\FoundContracts.Text.cshtml" />
+    <EmbeddedResource Include="Emails\Templates\FoundContractsIssues.cshtml" />
+    <EmbeddedResource Include="Emails\Templates\FoundContractsIssues.Html.cshtml" />
+    <EmbeddedResource Include="Emails\Templates\FoundContractsIssues.Text.cshtml" />
+    <EmbeddedResource Include="Emails\Templates\FoundContractsIssuesNoPayment.cshtml" />
+    <EmbeddedResource Include="Emails\Templates\FoundContractsIssuesNoPayment.Html.cshtml" />
+    <EmbeddedResource Include="Emails\Templates\FoundContractsIssuesNoPayment.Text.cshtml" />
+    <EmbeddedResource Include="Emails\Templates\FoundDataset.cshtml" />
+    <EmbeddedResource Include="Emails\Templates\FoundDataset.Html.cshtml" />
+    <EmbeddedResource Include="Emails\Templates\FoundDataset.Text.cshtml" />
+    <EmbeddedResource Include="Emails\Templates\FoundInsolvence.cshtml" />
+    <EmbeddedResource Include="Emails\Templates\FoundInsolvence.Html.cshtml" />
+    <EmbeddedResource Include="Emails\Templates\FoundInsolvence.Text.cshtml" />
+    <EmbeddedResource Include="Emails\Templates\FoundZakazky.cshtml" />
+    <EmbeddedResource Include="Emails\Templates\FoundZakazky.Html.cshtml" />
+    <EmbeddedResource Include="Emails\Templates\FoundZakazky.Text.cshtml" />
+    <EmbeddedResource Include="Emails\Templates\FoundZakazkyMarkdownPost.cshtml" />
+    <EmbeddedResource Include="Emails\Templates\FoundZakazkyMarkdownPost.Text.cshtml" />
+    <EmbeddedResource Include="Emails\Templates\GDPR.cshtml" />
+    <EmbeddedResource Include="Emails\Templates\GDPR.Html.cshtml" />
+    <EmbeddedResource Include="Emails\Templates\GDPR.Text.cshtml" />
+    <EmbeddedResource Include="Emails\Templates\NotFoundZakazkyMarkdownPost.cshtml" />
+    <EmbeddedResource Include="Emails\Templates\NotFoundZakazkyMarkdownPost.Text.cshtml" />
+    <EmbeddedResource Include="Emails\Templates\Register.cshtml" />
+    <EmbeddedResource Include="Emails\Templates\Register.Html.cshtml" />
+    <EmbeddedResource Include="Emails\Templates\Register.Text.cshtml" />
+    <EmbeddedResource Include="Emails\Templates\ResetPassword_WatchdogAnalytics.cshtml" />
+    <EmbeddedResource Include="Emails\Templates\ResetPassword_WatchdogAnalytics.Html.cshtml" />
+    <EmbeddedResource Include="Emails\Templates\ResetPassword_WatchdogAnalytics.Text.cshtml" />
+    <EmbeddedResource Include="Emails\Templates\ResetPassword.cshtml" />
+    <EmbeddedResource Include="Emails\Templates\ResetPassword.Html.cshtml" />
+    <EmbeddedResource Include="Emails\Templates\ResetPassword.Text.cshtml" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Connectors\Connectors.csproj" />
+    <ProjectReference Include="..\Datasets\Datasets.csproj" />
+    <ProjectReference Include="..\Entities\Entities.csproj" />
+    <ProjectReference Include="..\Lib.Data.External\Lib.Data.External.csproj" />
+    <ProjectReference Include="..\Repositories\Repositories.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Remove="Watchdogs\DotaceService.Watchdog.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Remove="Emails\Templates\ResetPassword_WatchdogAnalytics.cshtml" />
+    <None Remove="Emails\Templates\ResetPassword_WatchdogAnalytics.Html.cshtml" />
+    <None Remove="Emails\Templates\ResetPassword_WatchdogAnalytics.Text.cshtml" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Devmasters.Cache.Memcached" Version="8.0.4" />
+    <PackageReference Include="Microsoft.AspNetCore.Components" Version="8.0.18" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="9.0.7" />
+    <PackageReference Include="Newtonsoft.Json.Schema" Version="3.0.16" />
+    <PackageReference Include="Ollama" Version="1.15.0" />
+    <PackageReference Include="RazorEngine.NetCore" Version="3.1.0" />
+    <PackageReference Include="Scriban" Version="5.12.0" />
+    <PackageReference Include="System.Security.Cryptography.Pkcs" Version="9.0.7" />
+    <PackageReference Include="System.Text.Encoding.CodePages" Version="8.0.0" />
+  </ItemGroup>
 </Project>

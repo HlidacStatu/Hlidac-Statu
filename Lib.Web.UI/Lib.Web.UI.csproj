@@ -1,25 +1,20 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
-
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <RootNamespace>HlidacStatu.$(MSBuildProjectName.Replace(" ", "_"))</RootNamespace>
-	<AssemblyName>HlidacStatu.Lib.Web.UI</AssemblyName>
-
+    <AssemblyName>HlidacStatu.Lib.Web.UI</AssemblyName>
   </PropertyGroup>
-
   <ItemGroup>
-    <PackageReference Include="Microsoft.AspNetCore.Components" Version="8.0.11" />
+    <PackageReference Include="Microsoft.AspNetCore.Components" Version="8.0.18" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc.ViewFeatures" Version="2.2.0" />
-    <PackageReference Include="Ollama" Version="1.13.0" />
-    <PackageReference Include="System.Security.Cryptography.Pkcs" Version="8.0.1" />
-	  <PackageReference Include="Schema.NET" Version="13.0.0" />
-
+    <PackageReference Include="Ollama" Version="1.15.0" />
+    <PackageReference Include="System.Security.Cryptography.Pkcs" Version="9.0.7" />
+    <PackageReference Include="Schema.NET" Version="13.0.0" />
   </ItemGroup>
-
   <ItemGroup>
     <ProjectReference Include="..\XLib\XLib.csproj" />
   </ItemGroup>
-
 </Project>

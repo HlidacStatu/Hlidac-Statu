@@ -1,55 +1,49 @@
-﻿<Project Sdk="Microsoft.NET.Sdk.Web">
-
-	<PropertyGroup>
-		<TargetFramework>net8.0</TargetFramework>
-		<ImplicitUsings>enable</ImplicitUsings>
-		<GenerateDocumentationFile>true</GenerateDocumentationFile>
-		<UserSecretsId>7a3ddc60-02ba-4df4-a642-a69adfa64221</UserSecretsId>
-		<Version>2.4.1.0</Version>
-		<RootNamespace>HlidacStatuApi</RootNamespace>
-		<AssemblyName>HlidacStatuApi</AssemblyName>
-	</PropertyGroup>
-
-	<ItemGroup>
-		<Compile Remove="Controllers\HomeController.cs" />
-	</ItemGroup>
-
-	<ItemGroup>
-		<PackageReference Include="Devmasters.Comm.Signal" Version="8.2.0" />
-		<PackageReference Include="Hangfire.AspNetCore" Version="1.8.16" />
-		<PackageReference Include="Hangfire.SqlServer" Version="1.8.16" />
-		<PackageReference Include="Microsoft.AspNetCore.Components" Version="8.0.11" />
-		<PackageReference Include="Microsoft.AspNetCore.Identity.UI" Version="8.0.11" />
-		<PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="8.0.11" />
-		<PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="9.0.7" />
-		<PackageReference Include="Ollama" Version="1.13.0" />
-		<PackageReference Include="Swashbuckle.AspNetCore" Version="7.1.0" />
-		<PackageReference Include="Swashbuckle.AspNetCore.Annotations" Version="7.1.0" />
-		<PackageReference Include="System.Security.Cryptography.Pkcs" Version="8.0.1" />
-		<PackageReference Include="System.Text.Encoding.CodePages" Version="8.0.0" />
-	</ItemGroup>
-
-	<ItemGroup>
-		<ProjectReference Include="..\Datasets\Datasets.csproj" />
-		<ProjectReference Include="..\Datastructures\Datastructures.csproj" />
-		<ProjectReference Include="..\Extensions\Extensions.csproj" />
-		<ProjectReference Include="..\HlidacStatu.Q.Simple\HlidacStatu.Q.Simple.csproj" />
-		<ProjectReference Include="..\Lib.Web.UI\Lib.Web.UI.csproj" />
-		<ProjectReference Include="..\LibCore\LibCore.csproj" />
-		<ProjectReference Include="..\Repositories\Repositories.csproj" />
-		<ProjectReference Include="..\Web.HealthChecks\Web.HealthChecks.csproj" />
-	</ItemGroup>
-
-	<ItemGroup>
-		<None Update="StartFromCmd.bat">
-			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-		</None>
-	</ItemGroup>
-
-	<ItemGroup>
-	  <Content Update="logger.serilog.json">
-	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-	  </Content>
-	</ItemGroup>
-
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project Sdk="Microsoft.NET.Sdk.Web">
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <UserSecretsId>7a3ddc60-02ba-4df4-a642-a69adfa64221</UserSecretsId>
+    <Version>2.4.1.0</Version>
+    <RootNamespace>HlidacStatuApi</RootNamespace>
+    <AssemblyName>HlidacStatuApi</AssemblyName>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Remove="Controllers\HomeController.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Devmasters.Comm.Signal" Version="8.2.0" />
+    <PackageReference Include="Hangfire.AspNetCore" Version="1.8.16" />
+    <PackageReference Include="Hangfire.SqlServer" Version="1.8.16" />
+    <PackageReference Include="Microsoft.AspNetCore.Components" Version="8.0.18" />
+    <PackageReference Include="Microsoft.AspNetCore.Identity.UI" Version="8.0.11" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="8.0.11" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="9.0.7" />
+    <PackageReference Include="Ollama" Version="1.15.0" />
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="7.1.0" />
+    <PackageReference Include="Swashbuckle.AspNetCore.Annotations" Version="7.1.0" />
+    <PackageReference Include="System.Security.Cryptography.Pkcs" Version="9.0.7" />
+    <PackageReference Include="System.Text.Encoding.CodePages" Version="8.0.0" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Datasets\Datasets.csproj" />
+    <ProjectReference Include="..\Datastructures\Datastructures.csproj" />
+    <ProjectReference Include="..\Extensions\Extensions.csproj" />
+    <ProjectReference Include="..\HlidacStatu.Q.Simple\HlidacStatu.Q.Simple.csproj" />
+    <ProjectReference Include="..\Lib.Web.UI\Lib.Web.UI.csproj" />
+    <ProjectReference Include="..\LibCore\LibCore.csproj" />
+    <ProjectReference Include="..\Repositories\Repositories.csproj" />
+    <ProjectReference Include="..\Web.HealthChecks\Web.HealthChecks.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Update="StartFromCmd.bat">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Update="logger.serilog.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
 </Project>

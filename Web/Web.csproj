@@ -1,170 +1,149 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk.Web">
-
-    <PropertyGroup>
-        <Version>1.1.0.0</Version>
-        <TargetFramework>net8.0</TargetFramework>
-        <UserSecretsId>aspnet-Web-D6658176-CBA9-44EA-823F-F6C01A8F3EE9</UserSecretsId>
-        <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
-        <AssemblyName>HlidacStatu.Web</AssemblyName>
-        <RootNamespace>HlidacStatu.Web</RootNamespace>
-<!--    Zapíná kontrolu (warningy) na potencionální null reference error -->
-        <Nullable>enable</Nullable>
-<!--    Generuje XML dokumentaci (komentáře metod) pro swagger -->
-        <GenerateDocumentationFile>true</GenerateDocumentationFile>
-        <NoWarn>8601;8602;8600;8618;8603;8629;8604</NoWarn>
-		<GenerateRuntimeConfigDevFile>true</GenerateRuntimeConfigDevFile>
-
-	</PropertyGroup>
-
-<!--    Některé soubory (automaticky kopírované) je potřeba nejprve odstranit ze seznamu, 
+  <PropertyGroup>
+    <Version>1.1.0.0</Version>
+    <TargetFramework>net8.0</TargetFramework>
+    <UserSecretsId>aspnet-Web-D6658176-CBA9-44EA-823F-F6C01A8F3EE9</UserSecretsId>
+    <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
+    <AssemblyName>HlidacStatu.Web</AssemblyName>
+    <RootNamespace>HlidacStatu.Web</RootNamespace>
+    <!--    Zapíná kontrolu (warningy) na potencionální null reference error -->
+    <Nullable>enable</Nullable>
+    <!--    Generuje XML dokumentaci (komentáře metod) pro swagger -->
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <NoWarn>8601;8602;8600;8618;8603;8629;8604</NoWarn>
+    <GenerateRuntimeConfigDevFile>true</GenerateRuntimeConfigDevFile>
+  </PropertyGroup>
+  <!--    Některé soubory (automaticky kopírované) je potřeba nejprve odstranit ze seznamu, 
         aby při publish nevznikla chyba -->
-    <ItemGroup>
-        <None Remove="_app_offline.htm" />
-        <Compile Remove="publish\**" />
-        <Compile Remove="Views\StatniWeby.old\**" />
-        <Content Remove="App_Data\**" />
-        <Content Remove="publish\**" />
-        <Content Remove="Views\StatniWeby.old\**" />
-        <Compile Remove="NewFolder\**" />
-        <None Remove="NewFolder\**" />
-        <Content Remove="NewFolder\**" />
-        <Content Update="appsettings.Development.json">
-          <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-          <CopyToPublishDirectory>Never</CopyToPublishDirectory>
-        </Content>
-    </ItemGroup>
-
-<!--    Potom je potřeba nakopírovat obsah složky App_data a soubor _app_offline.htm -->
-    <ItemGroup>
-        <Content Include="App_Data\**" CopyToPublishDirectory="PreserveNewest" />
-    </ItemGroup>
-    <ItemGroup>
-      <EmbeddedResource Remove="publish\**" />
-      <EmbeddedResource Remove="Views\StatniWeby.old\**" />
-      <None Remove="publish\**" />
-      <None Remove="Views\StatniWeby.old\**" />
-      <EmbeddedResource Remove="NewFolder\**" />
-    </ItemGroup>
-    <ItemGroup>
-      <Compile Remove="Controllers\StatniWebyOldController.cs" />
-      <Compile Remove="Framework\ViewContextExtensions.cs" />
-      <Compile Remove="TagHelpers\xToggleableTagHelper.cs" />
-    </ItemGroup>
-    <ItemGroup>
-      <Content Remove="Logger.serilog.json" />
-    </ItemGroup>
-
-    <ItemGroup>
-        <PackageReference Include="AspNetCore.HealthChecks.Elasticsearch" Version="8.0.1" />
-        <PackageReference Include="AspNetCore.HealthChecks.Network" Version="8.0.1" />
-        <PackageReference Include="AspNetCore.HealthChecks.Rabbitmq" Version="8.0.2" />
-        <PackageReference Include="AspNetCore.HealthChecks.SqlServer" Version="8.0.2" />
-        <PackageReference Include="AspNetCore.HealthChecks.System" Version="8.0.1" />
-        <PackageReference Include="AspNetCore.HealthChecks.UI" Version="8.0.2" />
-        <PackageReference Include="AspNetCore.HealthChecks.UI.Client" Version="8.0.1" />
-        <PackageReference Include="AspNetCore.HealthChecks.UI.SqlServer.Storage" Version="8.0.1" />
-        <PackageReference Include="AspNetCore.HealthChecks.Uris" Version="8.0.1" />
-        <PackageReference Include="Devmasters.Cache.Memcached" Version="8.0.0" />
-        <PackageReference Include="Devmasters.Core" Version="8.0.9" />
-        <PackageReference Include="Devmasters.Lang" Version="8.0.2" />
-        
-        <PackageReference Include="HlidacStatu.Api.V2.Dataset" Version="2.4.1.1" />
-        <PackageReference Include="LigerShark.WebOptimizer.Core" Version="3.0.433" />
-        <PackageReference Include="Microsoft.AspNetCore.Authentication.Google" Version="8.0.11" />
-        <PackageReference Include="Microsoft.AspNetCore.Authentication.OpenIdConnect" Version="8.0.11" />
-        <PackageReference Include="Microsoft.AspNetCore.Components" Version="8.0.11" />
-        <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Server" Version="8.0.11" />
-        <PackageReference Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="8.0.11" />
-        <PackageReference Include="Microsoft.AspNetCore.Http.Abstractions" Version="2.3.0" />
-        <PackageReference Include="Microsoft.AspNetCore.Identity.UI" Version="8.0.11" />
-		<PackageReference Include="Microsoft.AspNetCore.SignalR.Client" Version="8.0.11" />
-		<PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="8.0.11" />
-        <PackageReference Include="Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation" Version="8.0.11" />
-        <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="8.0.11" />
-        <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="8.0.11">
-          <PrivateAssets>all</PrivateAssets>
-          <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-        </PackageReference>
-        <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="9.0.7" />
-        <PackageReference Include="Microsoft.Extensions.Diagnostics.HealthChecks.EntityFrameworkCore" Version="8.0.11" />
-        <PackageReference Include="Microsoft.Extensions.Http.Polly" Version="8.0.11" />
-        <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="8.0.7" />
-        <PackageReference Include="Ollama" Version="1.13.0" />
-        <PackageReference Include="PDFtoImage" Version="4.1.1" />
-        <PackageReference Include="QuestPDF" Version="2024.10.4" />
-        
-        <PackageReference Include="Schema.NET" Version="13.0.0" />
-        <PackageReference Include="Swashbuckle.AspNetCore" Version="7.1.0" />
-        <PackageReference Include="Swashbuckle.AspNetCore.Annotations" Version="7.1.0" />
-        <PackageReference Include="System.Security.Cryptography.Pkcs" Version="8.0.1" />
-        <PackageReference Include="System.Text.Encoding.CodePages" Version="8.0.0" />
-    </ItemGroup>
-
-    <ItemGroup>
-      <ProjectReference Include="..\..\Hlidac-Statu-Private\AI\AI.csproj" />
-      <ProjectReference Include="..\..\Hlidac-Statu-Private\HlidacStatu.DetectJobs\HlidacStatu.DetectJobs.csproj" />
-      <ProjectReference Include="..\Datasets\Datasets.csproj" />
-      <ProjectReference Include="..\DBUpgrader\DBUpgrader.csproj" />
-      <ProjectReference Include="..\DetectFaces\DetectFaces.csproj" />
-      <ProjectReference Include="..\Entities\Entities.csproj" />
-      <ProjectReference Include="..\Extensions\Extensions.csproj" />
-      
-      <ProjectReference Include="..\HlidacStatu.ExportData\HlidacStatu.ExportData.csproj" />
-      <ProjectReference Include="..\HlidacStatu.Q.Messages\HlidacStatu.Q.Messages.csproj" />
-      <ProjectReference Include="..\HlidacStatu.Q\HlidacStatu.Q.csproj" />
-      <ProjectReference Include="..\KIndexGenerator\KIndexGenerator.csproj" />
-      <ProjectReference Include="..\Lib.Data.External.Tables\Lib.Data.External.Tables.csproj" />
-      <ProjectReference Include="..\Lib.Data.External\Lib.Data.External.csproj" />
-      <ProjectReference Include="..\Lib.Web.UI\Lib.Web.UI.csproj" />
-      <ProjectReference Include="..\LibCore\LibCore.csproj" />
-      <ProjectReference Include="..\Plugin.Enhancers\Plugin.Enhancers.csproj" />
-      <ProjectReference Include="..\Plugin.IssueAnalyzers\Plugin.IssueAnalyzers.csproj" />
-      <ProjectReference Include="..\Util\Util.csproj" />
-      <ProjectReference Include="..\Web.HealthChecks\Web.HealthChecks.csproj" />
-      <ProjectReference Include="..\XLib\XLib.csproj" />
-    </ItemGroup>
-
-
-    <ItemGroup>
-      <None Update="cs_CZ.aff">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </None>
-      <None Update="cs_CZ.dic">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </None>
-      <None Update="cs_CZ.stopwords">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </None>
-    </ItemGroup>
-
-
-    <ItemGroup>
-      <None Include="..\.editorconfig" Link=".editorconfig" />
-      <None Include="logger.serilog.json">
-        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      </None>
-    </ItemGroup>
-
-
-    <ItemGroup>
-      <Content Update="Views\Dotace\analBoxes\_tblKategorie.cshtml">
-        <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
-        <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
-      </Content>
-      <Content Update="Views\Insolvence\_SearchResultFtx.cshtml">
-        <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
-        <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
-      </Content>
-    </ItemGroup>
-
-
-    <ItemGroup>
-      <_ContentIncludedByDefault Remove="Views\Shared\Components\Hokus.razor" />
-      <_ContentIncludedByDefault Remove="Views\Shared\Components\_Imports.razor" />
-    </ItemGroup>
-
-
-
-
-
+  <ItemGroup>
+    <None Remove="_app_offline.htm" />
+    <Compile Remove="publish\**" />
+    <Compile Remove="Views\StatniWeby.old\**" />
+    <Content Remove="App_Data\**" />
+    <Content Remove="publish\**" />
+    <Content Remove="Views\StatniWeby.old\**" />
+    <Compile Remove="NewFolder\**" />
+    <None Remove="NewFolder\**" />
+    <Content Remove="NewFolder\**" />
+    <Content Update="appsettings.Development.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <CopyToPublishDirectory>Never</CopyToPublishDirectory>
+    </Content>
+  </ItemGroup>
+  <!--    Potom je potřeba nakopírovat obsah složky App_data a soubor _app_offline.htm -->
+  <ItemGroup>
+    <Content Include="App_Data\**" CopyToPublishDirectory="PreserveNewest" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Remove="publish\**" />
+    <EmbeddedResource Remove="Views\StatniWeby.old\**" />
+    <None Remove="publish\**" />
+    <None Remove="Views\StatniWeby.old\**" />
+    <EmbeddedResource Remove="NewFolder\**" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Remove="Controllers\StatniWebyOldController.cs" />
+    <Compile Remove="Framework\ViewContextExtensions.cs" />
+    <Compile Remove="TagHelpers\xToggleableTagHelper.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Remove="Logger.serilog.json" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="AspNetCore.HealthChecks.Elasticsearch" Version="8.0.1" />
+    <PackageReference Include="AspNetCore.HealthChecks.Network" Version="8.0.1" />
+    <PackageReference Include="AspNetCore.HealthChecks.Rabbitmq" Version="8.0.2" />
+    <PackageReference Include="AspNetCore.HealthChecks.SqlServer" Version="8.0.2" />
+    <PackageReference Include="AspNetCore.HealthChecks.System" Version="8.0.1" />
+    <PackageReference Include="AspNetCore.HealthChecks.UI" Version="8.0.2" />
+    <PackageReference Include="AspNetCore.HealthChecks.UI.Client" Version="8.0.1" />
+    <PackageReference Include="AspNetCore.HealthChecks.UI.SqlServer.Storage" Version="8.0.1" />
+    <PackageReference Include="AspNetCore.HealthChecks.Uris" Version="8.0.1" />
+    <PackageReference Include="Devmasters.Cache.Memcached" Version="8.0.4" />
+    <PackageReference Include="Devmasters.Core" Version="8.0.9" />
+    <PackageReference Include="Devmasters.Lang" Version="8.0.2" />
+    <PackageReference Include="HlidacStatu.Api.V2.Dataset" Version="2.4.1.1" />
+    <PackageReference Include="LigerShark.WebOptimizer.Core" Version="3.0.433" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.Google" Version="8.0.11" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.OpenIdConnect" Version="8.0.11" />
+    <PackageReference Include="Microsoft.AspNetCore.Components" Version="8.0.18" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Server" Version="8.0.11" />
+    <PackageReference Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="8.0.12" />
+    <PackageReference Include="Microsoft.AspNetCore.Http.Abstractions" Version="2.3.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Identity.UI" Version="8.0.11" />
+    <PackageReference Include="Microsoft.AspNetCore.SignalR.Client" Version="8.0.11" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="8.0.11" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation" Version="8.0.11" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="8.0.11" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="8.0.11">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="9.0.7" />
+    <PackageReference Include="Microsoft.Extensions.Diagnostics.HealthChecks.EntityFrameworkCore" Version="8.0.11" />
+    <PackageReference Include="Microsoft.Extensions.Http.Polly" Version="8.0.11" />
+    <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="8.0.7" />
+    <PackageReference Include="Ollama" Version="1.15.0" />
+    <PackageReference Include="PDFtoImage" Version="4.1.1" />
+    <PackageReference Include="QuestPDF" Version="2024.10.4" />
+    <PackageReference Include="Schema.NET" Version="13.0.0" />
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="7.1.0" />
+    <PackageReference Include="Swashbuckle.AspNetCore.Annotations" Version="7.1.0" />
+    <PackageReference Include="System.Security.Cryptography.Pkcs" Version="9.0.7" />
+    <PackageReference Include="System.Text.Encoding.CodePages" Version="8.0.0" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\Hlidac-Statu-Private\AI\AI.csproj" />
+    <ProjectReference Include="..\..\Hlidac-Statu-Private\HlidacStatu.DetectJobs\HlidacStatu.DetectJobs.csproj" />
+    <ProjectReference Include="..\Datasets\Datasets.csproj" />
+    <ProjectReference Include="..\DBUpgrader\DBUpgrader.csproj" />
+    <ProjectReference Include="..\DetectFaces\DetectFaces.csproj" />
+    <ProjectReference Include="..\Entities\Entities.csproj" />
+    <ProjectReference Include="..\Extensions\Extensions.csproj" />
+    <ProjectReference Include="..\HlidacStatu.ExportData\HlidacStatu.ExportData.csproj" />
+    <ProjectReference Include="..\HlidacStatu.Q.Messages\HlidacStatu.Q.Messages.csproj" />
+    <ProjectReference Include="..\HlidacStatu.Q\HlidacStatu.Q.csproj" />
+    <ProjectReference Include="..\KIndexGenerator\KIndexGenerator.csproj" />
+    <ProjectReference Include="..\Lib.Data.External.Tables\Lib.Data.External.Tables.csproj" />
+    <ProjectReference Include="..\Lib.Data.External\Lib.Data.External.csproj" />
+    <ProjectReference Include="..\Lib.Web.UI\Lib.Web.UI.csproj" />
+    <ProjectReference Include="..\LibCore\LibCore.csproj" />
+    <ProjectReference Include="..\Plugin.Enhancers\Plugin.Enhancers.csproj" />
+    <ProjectReference Include="..\Plugin.IssueAnalyzers\Plugin.IssueAnalyzers.csproj" />
+    <ProjectReference Include="..\Util\Util.csproj" />
+    <ProjectReference Include="..\Web.HealthChecks\Web.HealthChecks.csproj" />
+    <ProjectReference Include="..\XLib\XLib.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Update="cs_CZ.aff">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="cs_CZ.dic">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="cs_CZ.stopwords">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\.editorconfig" Link=".editorconfig" />
+    <None Include="logger.serilog.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Update="Views\Dotace\analBoxes\_tblKategorie.cshtml">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Update="Views\Insolvence\_SearchResultFtx.cshtml">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <_ContentIncludedByDefault Remove="Views\Shared\Components\Hokus.razor" />
+    <_ContentIncludedByDefault Remove="Views\Shared\Components\_Imports.razor" />
+  </ItemGroup>
 </Project>

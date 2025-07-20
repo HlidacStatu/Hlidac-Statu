@@ -1,91 +1,83 @@
-﻿<Project Sdk="Microsoft.NET.Sdk.Web">
-
-    <PropertyGroup>
-        <TargetFramework>net8.0</TargetFramework>
-        <Nullable>enable</Nullable>
-		<GenerateRuntimeConfigDevFile>true</GenerateRuntimeConfigDevFile>
-		<UserSecretsId>aspnet-PlatyUredniku-CDBD91C6-CE60-4F51-93CF-128B527169E1</UserSecretsId>
-		<AssemblyName>HlidacStatu.PlatyUredniku</AssemblyName>
-	</PropertyGroup>
-
-    <ItemGroup>
-        <PackageReference Include="MathNet.Numerics" Version="5.0.0" />
-        <PackageReference Include="Microsoft.AspNetCore.Components" Version="8.0.11" />
-        <PackageReference Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="8.0.11" />
-        <PackageReference Include="Microsoft.AspNetCore.Identity.UI" Version="8.0.11" />
-        <PackageReference Include="LigerShark.WebOptimizer.Core" Version="3.0.433" />
-        <PackageReference Include="Ollama" Version="1.13.0" />
-        <PackageReference Include="OpenTelemetry.Exporter.OpenTelemetryProtocol" Version="1.10.0" />
-        <PackageReference Include="OpenTelemetry.Extensions.Hosting" Version="1.10.0" />
-        <PackageReference Include="OpenTelemetry.Instrumentation.AspNetCore" Version="1.9.0" />
-        <PackageReference Include="OpenTelemetry.Instrumentation.Http" Version="1.10.0" />
-        <PackageReference Include="OpenTelemetry.Instrumentation.Runtime" Version="1.9.0" />
-        <PackageReference Include="OpenTelemetry.Instrumentation.SqlClient" Version="1.9.0-beta.1" />
-        <PackageReference Include="Serilog.Sinks.Seq" Version="9.0.0" />
-        <PackageReference Include="System.Security.Cryptography.Pkcs" Version="8.0.1" />
-        <PackageReference Include="ZiggyCreatures.FusionCache" Version="1.4.1" />
-    </ItemGroup>
-
-    <ItemGroup>
-      <ProjectReference Include="..\Extensions\Extensions.csproj" />
-      <ProjectReference Include="..\HlidacStatu.ExportData\HlidacStatu.ExportData.csproj" />
-      <ProjectReference Include="..\Lib.Web.UI\Lib.Web.UI.csproj" />
-      <ProjectReference Include="..\LibCore\LibCore.csproj" />
-      <ProjectReference Include="..\Whisperer\Whisperer.csproj" />
-    </ItemGroup>
-
-    <ItemGroup>
-      <AdditionalFiles Include="Views\Shared\Components\AutocompleteWrap.razor" />
-      <AdditionalFiles Include="Views\Shared\Components\HlidacAutocompleteMultitag.razor" />
-      <AdditionalFiles Include="Views\Shared\Components\_Imports.razor" />
-      <AdditionalFiles Include="Views\Urednici\analyza_kategorie.cshtml" />
-      <AdditionalFiles Include="Views\Urednici\analyza_NamestciMinisterstev.cshtml" />
-      <AdditionalFiles Include="Views\Urednici\analyza_NejvyssiOdmeny.cshtml" />
-      <AdditionalFiles Include="Views\Urednici\analyza_ZmenaNejvyssihoPlatu.cshtml" />
-      <AdditionalFiles Include="Views\Urednici\analyza_ZmenaPlatuCeos.cshtml" />
-      <AdditionalFiles Include="Views\Urednici\analyzy.cshtml" />
-      <AdditionalFiles Include="Views\Urednici\Detail.cshtml" />
-      <AdditionalFiles Include="Views\Urednici\DlePlatu.cshtml" />
-      <AdditionalFiles Include="Views\Urednici\Index.cshtml" />
-      <AdditionalFiles Include="Views\Urednici\Oblast.cshtml" />
-      <AdditionalFiles Include="Views\Urednici\Oblasti.cshtml" />
-      <AdditionalFiles Include="Views\Urednici\OpenData.cshtml" />
-      <AdditionalFiles Include="Views\Urednici\Plat.cshtml" />
-      <AdditionalFiles Include="Views\Urednici\Statistika_Rusty.cshtml" />
-      <AdditionalFiles Include="Views\Urednici\Statistika_Rusty1.cshtml" />
-      <AdditionalFiles Include="Views\Urednici\Statistika_Rusty2.cshtml" />
-      <AdditionalFiles Include="Views\Urednici\_platDetail.cshtml" />
-    </ItemGroup>
-
-    <ItemGroup>
-      <None Include="logger.serilog.json">
-        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      </None>
-		<None Remove="AutocompleteCache_False\**" />
-		<None Remove="AutocompleteCache_True\**" />
-		<None Remove="AutocompleteCategoryCache_False\**" />
-		<None Remove="AutocompleteCategoryCache_True\**" />
-
-	</ItemGroup>
-	<ItemGroup>
-		<Compile Remove="AutocompleteCache_False\**" />
-		<Compile Remove="AutocompleteCache_True\**" />
-		<Compile Remove="AutocompleteCategoryCache_False\**" />
-		<Compile Remove="AutocompleteCategoryCache_True\**" />
-	</ItemGroup>
-
-	<ItemGroup>
-		<EmbeddedResource Remove="AutocompleteCache_False\**" />
-		<EmbeddedResource Remove="AutocompleteCache_True\**" />
-		<EmbeddedResource Remove="AutocompleteCategoryCache_False\**" />
-		<EmbeddedResource Remove="AutocompleteCategoryCache_True\**" />
-	</ItemGroup>
-
-	<ItemGroup>
-		<Content Remove="AutocompleteCache_False\**" />
-		<Content Remove="AutocompleteCache_True\**" />
-		<Content Remove="AutocompleteCategoryCache_False\**" />
-		<Content Remove="AutocompleteCategoryCache_True\**" />
-	</ItemGroup>
-
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project Sdk="Microsoft.NET.Sdk.Web">
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <GenerateRuntimeConfigDevFile>true</GenerateRuntimeConfigDevFile>
+    <UserSecretsId>aspnet-PlatyUredniku-CDBD91C6-CE60-4F51-93CF-128B527169E1</UserSecretsId>
+    <AssemblyName>HlidacStatu.PlatyUredniku</AssemblyName>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="MathNet.Numerics" Version="5.0.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Components" Version="8.0.18" />
+    <PackageReference Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="8.0.12" />
+    <PackageReference Include="Microsoft.AspNetCore.Identity.UI" Version="8.0.11" />
+    <PackageReference Include="LigerShark.WebOptimizer.Core" Version="3.0.433" />
+    <PackageReference Include="Ollama" Version="1.15.0" />
+    <PackageReference Include="OpenTelemetry.Exporter.OpenTelemetryProtocol" Version="1.12.0" />
+    <PackageReference Include="OpenTelemetry.Extensions.Hosting" Version="1.12.0" />
+    <PackageReference Include="OpenTelemetry.Instrumentation.AspNetCore" Version="1.12.0" />
+    <PackageReference Include="OpenTelemetry.Instrumentation.Http" Version="1.12.0" />
+    <PackageReference Include="OpenTelemetry.Instrumentation.Runtime" Version="1.9.0" />
+    <PackageReference Include="OpenTelemetry.Instrumentation.SqlClient" Version="1.9.0-beta.1" />
+    <PackageReference Include="Serilog.Sinks.Seq" Version="9.0.0" />
+    <PackageReference Include="System.Security.Cryptography.Pkcs" Version="9.0.7" />
+    <PackageReference Include="ZiggyCreatures.FusionCache" Version="1.4.1" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Extensions\Extensions.csproj" />
+    <ProjectReference Include="..\HlidacStatu.ExportData\HlidacStatu.ExportData.csproj" />
+    <ProjectReference Include="..\Lib.Web.UI\Lib.Web.UI.csproj" />
+    <ProjectReference Include="..\LibCore\LibCore.csproj" />
+    <ProjectReference Include="..\Whisperer\Whisperer.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <AdditionalFiles Include="Views\Shared\Components\AutocompleteWrap.razor" />
+    <AdditionalFiles Include="Views\Shared\Components\HlidacAutocompleteMultitag.razor" />
+    <AdditionalFiles Include="Views\Shared\Components\_Imports.razor" />
+    <AdditionalFiles Include="Views\Urednici\analyza_kategorie.cshtml" />
+    <AdditionalFiles Include="Views\Urednici\analyza_NamestciMinisterstev.cshtml" />
+    <AdditionalFiles Include="Views\Urednici\analyza_NejvyssiOdmeny.cshtml" />
+    <AdditionalFiles Include="Views\Urednici\analyza_ZmenaNejvyssihoPlatu.cshtml" />
+    <AdditionalFiles Include="Views\Urednici\analyza_ZmenaPlatuCeos.cshtml" />
+    <AdditionalFiles Include="Views\Urednici\analyzy.cshtml" />
+    <AdditionalFiles Include="Views\Urednici\Detail.cshtml" />
+    <AdditionalFiles Include="Views\Urednici\DlePlatu.cshtml" />
+    <AdditionalFiles Include="Views\Urednici\Index.cshtml" />
+    <AdditionalFiles Include="Views\Urednici\Oblast.cshtml" />
+    <AdditionalFiles Include="Views\Urednici\Oblasti.cshtml" />
+    <AdditionalFiles Include="Views\Urednici\OpenData.cshtml" />
+    <AdditionalFiles Include="Views\Urednici\Plat.cshtml" />
+    <AdditionalFiles Include="Views\Urednici\Statistika_Rusty.cshtml" />
+    <AdditionalFiles Include="Views\Urednici\Statistika_Rusty1.cshtml" />
+    <AdditionalFiles Include="Views\Urednici\Statistika_Rusty2.cshtml" />
+    <AdditionalFiles Include="Views\Urednici\_platDetail.cshtml" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="logger.serilog.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Remove="AutocompleteCache_False\**" />
+    <None Remove="AutocompleteCache_True\**" />
+    <None Remove="AutocompleteCategoryCache_False\**" />
+    <None Remove="AutocompleteCategoryCache_True\**" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Remove="AutocompleteCache_False\**" />
+    <Compile Remove="AutocompleteCache_True\**" />
+    <Compile Remove="AutocompleteCategoryCache_False\**" />
+    <Compile Remove="AutocompleteCategoryCache_True\**" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Remove="AutocompleteCache_False\**" />
+    <EmbeddedResource Remove="AutocompleteCache_True\**" />
+    <EmbeddedResource Remove="AutocompleteCategoryCache_False\**" />
+    <EmbeddedResource Remove="AutocompleteCategoryCache_True\**" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Remove="AutocompleteCache_False\**" />
+    <Content Remove="AutocompleteCache_True\**" />
+    <Content Remove="AutocompleteCategoryCache_False\**" />
+    <Content Remove="AutocompleteCategoryCache_True\**" />
+  </ItemGroup>
 </Project>

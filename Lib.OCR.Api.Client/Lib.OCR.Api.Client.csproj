@@ -1,13 +1,13 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-		        <TargetFramework>net8.0</TargetFramework>
+    <TargetFramework>net8.0</TargetFramework>
     <OutputType>Library</OutputType>
     <RootNamespace>HlidacStatu.Lib.OCR.Api.Client</RootNamespace>
     <AssemblyName>HlidacStatu.Lib.OCR.Api.Client</AssemblyName>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
     <Nullable>enable</Nullable>
   </PropertyGroup>
-  
   <ItemGroup>
     <PackageReference Include="Devmasters.Core" Version="8.0.9" />
     <PackageReference Include="Devmasters.DT" Version="8.1.2" />
