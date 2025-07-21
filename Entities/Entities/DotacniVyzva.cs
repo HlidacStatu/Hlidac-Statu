@@ -26,10 +26,10 @@ public partial class DotacniVyzva
     public string Name { get; set; }
 
     [Text]
-    public List<string> Rules { get; set; }
+    public List<string> Rules { get; set; } = new();
 
     [Keyword]
-    public List<string> UrlLinks { get; set; }
+    public List<string> UrlLinks { get; set; } = new();
 
     [Keyword]
     public string ProgramCode { get; set; }
@@ -37,10 +37,10 @@ public partial class DotacniVyzva
     public string ProgramName { get; set; }
 
     [Text]
-    public List<string> Targets { get; set; }
-    
+    public List<string> Targets { get; set; } = new();
+
     [Text]
-    public HashSet<string> Fonds { get; set; }
+    public HashSet<string> Fonds { get; set; } = new();
 
     [Number]
     public decimal? Allocation { get; set; }
