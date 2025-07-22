@@ -11,7 +11,7 @@ namespace HlidacStatu.Repositories
     {
         private static readonly ILogger Logger = Log.ForContext(typeof(DotacniVyzvaRepo));
 
-        public static readonly ElasticClient DotacniVyzvaClient = Manager.GetESClient_Subsidy();
+        public static readonly ElasticClient DotacniVyzvaClient = Manager.GetESClient_DotacniVyzva();
 
         public static async Task SaveAsync(DotacniVyzva dotacniVyzva, bool shouldRewrite = true)
         {
