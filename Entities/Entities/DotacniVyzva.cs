@@ -1,5 +1,8 @@
 using System;
 using System.Collections.Generic;
+using System.Security.Cryptography;
+using System.Text;
+using Devmasters;
 using Nest;
 
 namespace HlidacStatu.Entities;
@@ -7,8 +10,24 @@ namespace HlidacStatu.Entities;
 [ElasticsearchType(IdProperty = nameof(Id))]
 public partial class DotacniVyzva
 {
+    private string _id = null;
     [Keyword]
-    public string Id { get; set; }
+    public string Id
+    {
+        get
+        {
+            if (_id == null)
+            {
+                var hashBytes = SHA256.HashData(Encoding.UTF8.GetBytes(
+                    $"{Name}_{TheirId}"));
+                var hash = Convert.ToHexString(hashBytes);
+                _id = $"{DataSource.RemoveAccents().Replace(" ", "")}-" +
+                      $"{FileName.RemoveAccents().Replace(" ", "").Replace(".", "")}-{hash}";
+            }
+            return _id;
+        }
+        set => _id = value;
+    }
     
     [Keyword]
     public string TheirId { get; set; }

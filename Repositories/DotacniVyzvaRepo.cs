@@ -1,5 +1,7 @@
 using Nest;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using HlidacStatu.Connectors;
 using HlidacStatu.Entities;
@@ -51,7 +53,6 @@ namespace HlidacStatu.Repositories
                 ? response.Source
                 : null;
         }
-
         
     }
 }

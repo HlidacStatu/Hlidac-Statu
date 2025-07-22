@@ -34,9 +34,9 @@ namespace SponzoriLoader
         
         private static void LoadDataFromFiles(Donations peopleDonations, Donations companyDonations)
         {
-            LoadSponzoringFromFile.LoadOsoby(peopleDonations, @"/Users/suchoss/Downloads/chromeloads/spd-dary-2023 - Osoby.tsv",
-                "04134940", _user, _zdroj);
-            LoadSponzoringFromFile.LoadFirmy(companyDonations, @"/Users/suchoss/Downloads/chromeloads/spd-dary-2023 - Firmy.tsv",
+            LoadSponzoringFromFile.LoadOsoby(peopleDonations, @"/Users/suchoss/Downloads/06070108-PRAHA-SOBE-2024 - Lidi.tsv",
+                "06070108", _user, _zdroj);
+            LoadSponzoringFromFile.LoadFirmy(companyDonations, @"/Users/suchoss/Downloads/06070108-PRAHA-SOBE-2024 - Lidi.tsv",
                 "04134940", _user, _zdroj);
         }
 
@@ -50,7 +50,7 @@ namespace SponzoriLoader
             //Before running
             //- update source
             //- select true or false below
-            bool loadDataFromFiles = false;
+            bool loadDataFromFiles = true;
             
             IConfiguration configuration = HlidacConfigExtensions.InitializeConsoleConfiguration(args);
             Devmasters.Config.Init(configuration);

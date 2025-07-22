@@ -910,5 +910,34 @@ namespace HlidacStatu.Repositories
                 throw;
             }
         }
+        
+        public static async Task<DotacniVyzva> GetVyzvaForSubsidyAsync(Subsidy subsidy)
+        {
+            if (subsidy == null) throw new ArgumentNullException(nameof(subsidy));
+
+            //if we know id, then return it immediatelly
+            if(! string.IsNullOrWhiteSpace(subsidy.IdDotacniVyzvy))
+                return await DotacniVyzvaRepo.GetAsync(subsidy.IdDotacniVyzvy);
+
+            if (subsidy.Metadata.DataSource.Equals("Eufondy", StringComparison.InvariantCultureIgnoreCase))
+            {
+                foreach (object rawData in subsidy.RawData)
+                {
+                    if (rawData is Dictionary<string, object> dict 
+                        && dict.TryGetValue("idVyzva", out var idVyzvyObj)
+                        && idVyzvyObj is string idVyzvy)
+                    {
+                        
+                        var vyzvaResponse = await DotacniVyzvaRepo.DotacniVyzvaClient.GetAsync<DotacniVyzva>(idVyzvy);
+                        
+                        if(vyzvaResponse.IsValid) 
+                            return vyzvaResponse.Source;
+                    }
+                }
+            }
+            
+            //No vyzva found
+            return null;
+        }
     }
 }

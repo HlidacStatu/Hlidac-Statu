@@ -135,7 +135,7 @@ namespace HlidacStatu.Repositories
         }
 
         /// <summary>
-        /// Get all subsidies. If query is null, then it matches all except hidden ones
+        /// Get all dotace. If query is null, then it matches all except hidden ones
         /// </summary>
         /// <param name="query"></param>
         /// <param name="scrollTimeout"></param>
@@ -540,6 +540,61 @@ namespace HlidacStatu.Repositories
                 Logger.Error(ex, $"Cant delete dotace {dotaceId}");
                 throw;
             }
+        }
+        
+        /// <summary>
+        /// Pokud známe id výzvy, pak vracíme výzvu.
+        /// Pokud neznáme id výzvy, pak ji zkusíme dohledat:
+        /// a) pokud výzvu dohledáme, updatuje se objekt Subsidy a Dotace
+        /// b) pokud výzvu nenajdeme, tak se nic neděje
+        /// </summary>
+        public static async Task FillDotacniVyzvaInDotaceAsync()
+        {
+            int maxDegreeOfParallelism = 20; // Adjust this value as needed
+            var semaphore = new SemaphoreSlim(maxDegreeOfParallelism);
+            int processedCount = 0;
+
+            var dotaceQuery = new QueryContainerDescriptor<Dotace>().MatchAll();
+            var allDotaceIds = DotaceRepo.DotaceClient.SimpleGetAllIds(5, dotaceQuery);
+            
+            int totalCount = allDotaceIds.Count;
+
+            var tasks = allDotaceIds.Select(async dotaceId =>
+            {
+                await semaphore.WaitAsync();
+                try
+                {
+                    Console.WriteLine(
+                        $"Remaining to process: {totalCount - Interlocked.Increment(ref processedCount)}");
+
+                    var dotace = await DotaceRepo.GetAsync(dotaceId);
+
+                    foreach (var dotaceSourceId in dotace.SourceIds)
+                    {
+                        var subsidy = await SubsidyRepo.GetAsync(dotaceSourceId);
+                        var dotacniVyzva = await SubsidyRepo.GetVyzvaForSubsidyAsync(subsidy);
+
+                        if (dotacniVyzva is not null)
+                        {
+                            subsidy.IdDotacniVyzvy = dotacniVyzva.Id;
+                            dotace.IdDotacniVyzvy = dotacniVyzva.Id;
+
+                            await SubsidyRepo.SaveAsync(subsidy, true);
+                            await DotaceRepo.SaveAsync(dotace, forceRewriteHints: false);
+                        }
+                    }
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine($"Error when updating dotacniVyzva for dotace ID {dotaceId}: {e}");
+                }
+                finally
+                {
+                    semaphore.Release();
+                }
+            }).ToList();
+
+            await Task.WhenAll(tasks);
         }
     }
 }
