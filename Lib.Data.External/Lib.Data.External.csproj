@@ -79,10 +79,10 @@
     <PackageReference Include="System.Security.Cryptography.Pkcs" Version="9.0.7" />
     <PackageReference Include="System.ServiceModel.Duplex" Version="6.0.0" />
     <!-- keep System.ServiceModel. in version 6.2.0 -->
-    <PackageReference Include="System.ServiceModel.Http" Version="6.2.0" />
-    <PackageReference Include="System.ServiceModel.NetTcp" Version="6.2.0" />
-    <PackageReference Include="System.ServiceModel.Federation" Version="6.2.0" />
-    <!-- keep System.ServiceModel. in version 6.2.0 -->
+	  <PackageReference Include="System.ServiceModel.Http" Version="6.2.0" />
+	  <PackageReference Include="System.ServiceModel.NetTcp" Version="6.2.0" />
+	  <PackageReference Include="System.ServiceModel.Federation" Version="6.2.0" />
+	  <!-- keep System.ServiceModel. in version 6.2.0 -->
     <PackageReference Include="Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers" Version="0.4.421302">
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>

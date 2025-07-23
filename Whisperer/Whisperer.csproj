@@ -1,16 +1,14 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk">
-
-    <PropertyGroup>
-                <TargetFramework>net8.0</TargetFramework>
-        <ImplicitUsings>enable</ImplicitUsings>
-        <Nullable>enable</Nullable>
-    </PropertyGroup>
-
-    <ItemGroup>
-        <PackageReference Include="Lucene.Net" Version="4.8.0-beta00016" />
-        <PackageReference Include="Lucene.Net.Analysis.Common" Version="4.8.0-beta00016" />
-        <PackageReference Include="Lucene.Net.QueryParser" Version="4.8.0-beta00016" />
-        <PackageReference Include="Serilog" Version="4.3.0" />
-    </ItemGroup>
-
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Lucene.Net" Version="4.8.0-beta00016" />
+    <PackageReference Include="Lucene.Net.Analysis.Common" Version="4.8.0-beta00016" />
+    <PackageReference Include="Lucene.Net.QueryParser" Version="4.8.0-beta00016" />
+    <PackageReference Include="Serilog" Version="4.3.0" />
+  </ItemGroup>
 </Project>
