@@ -2,7 +2,7 @@
 @using HlidacStatu.Repositories.SharedModels
 @{
 
-    var stats = await PuRepo.GetGlobalStatUredniciAsync();
+    var stats = await PuRepo.GetGlobalStatOrganizaceAsync();
 
     var organizationOfTheDay = await PuRepo.GetOrganizationOfTheDayAsync();
     var ceoOfTheDay = organizationOfTheDay.Platy.FirstOrDefault(p => p.JeHlavoun == true && p.Rok == PuRepo.DefaultYear);

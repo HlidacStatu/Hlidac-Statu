@@ -4,7 +4,7 @@
 
 @inject ZiggyCreatures.Caching.Fusion.IFusionCache cache;
 @{
-    var stats = await PpRepo.GetGlobalStatAsync();
+    var stats = await PpRepo.GetGlobalStatAsync(PuRepo.DefaultYear);
     List<PpPrijem> platy = (List<PpPrijem>?)ViewData["platy"];
 
     var prumernyRocniPlatPoslance = (await PpRepo.GetPrijmyForGroupAsync(PpRepo.PoliticianGroup.Poslanci)).Average(x => x.CelkovyRocniPlatVcetneOdmen);
@@ -96,7 +96,7 @@
                 <i class="fa-duotone fa-solid fa-people-group fa-7x mb-2"
                    style="--fa-primary-color: #2668d9; --fa-secondary-color: #2668d9;"></i>
                 <div class="fs-3 fw-bold text-center">Počet politiků v databázi</div>
-                <div class="fs-3 fw-bold text-center">@(HlidacStatu.Util.RenderData.NiceNumber(stats.PocetOsob))</div>
+                <div class="fs-3 fw-bold text-center">@(HlidacStatu.Util.RenderData.NiceNumber(stats.PocetOsobPozadano))</div>
 
             </a>
             <a class="col h-100 d-flex flex-column justify-content-center text-center" href="/politici/organizace">
@@ -104,7 +104,7 @@
                 <i class="fa-light fa-building-magnifying-glass fa-7x mb-2" style="--fa-primary-color: #2668d9;"></i>
                 <div class="fs-3 fw-bold text-center">Počet organizací v databázi</div>
                 <div
-                    class="fs-3 fw-bold text-center">@(HlidacStatu.Util.RenderData.NiceNumber(stats.PocetOrganizaci))</div>
+                    class="fs-3 fw-bold text-center">@(HlidacStatu.Util.RenderData.NiceNumber(stats.PocetOrganizaciPozadano))</div>
 
             </a>
         </div>

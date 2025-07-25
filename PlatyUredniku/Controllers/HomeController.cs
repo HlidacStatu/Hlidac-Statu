@@ -7,6 +7,7 @@ using ZiggyCreatures.Caching.Fusion;
 using System.Text;
 using System;
 using Microsoft.AspNetCore.OutputCaching;
+using HlidacStatu.Lib.Web.UI.Attributes;
 
 namespace PlatyUredniku.Controllers;
 
@@ -42,7 +43,7 @@ public class HomeController : Controller
     }
     
 
-    [OutputCache(Duration = 3600*24*7)]
+    [HlidacCache(3600*24*7)]
     public async Task<IActionResult> SiteMap()
     {
         string modif = DateTime.Now.Date.ToString("yyyy-MM-dd") + "T09:00:00+00:00";

@@ -173,7 +173,7 @@
 
                                             @HlidacStatu.Util.RenderData.NicePrice(prijemPolitika.CelkovyRocniPlatVcetneOdmen)
                                         </td>
-                                        <td data-order="@(HlidacStatu.Util.RenderData.OrderValueFormat(prijemPolitika.HrubyMesicniPlatVcetneOdmen))"
+                                        <td data-order="@(HlidacStatu.Util.RenderData.OrderValueFormat(prijemPolitika.PrumernyMesicniPrijemVcetneOdmen))"
                                             class="number">
                                             @if (prijemPolitika.PocetMesicu < 12)
                                             {
@@ -182,7 +182,7 @@
                                                     <i
                                                         class="fa-solid fa-circle-info"></i></a>
                                             }
-                                            @HlidacStatu.Util.RenderData.NicePrice(prijemPolitika.HrubyMesicniPlatVcetneOdmen)
+                                            @HlidacStatu.Util.RenderData.NicePrice(prijemPolitika.PrumernyMesicniPrijemVcetneOdmen)
                                         </td>
                                         <td>@prijemPolitika.NefinancniBonus</td>
                                     </tr>

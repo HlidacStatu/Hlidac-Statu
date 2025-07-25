@@ -42,8 +42,8 @@
         .ToList();
 
     var aktualniPlaty = havePlatyOrgs.SelectMany(o => o.PrijmyPolitiku.AktualniRok()).ToList();
-    var platyMin = aktualniPlaty.Any() ? aktualniPlaty.Min(p => p.HrubyMesicniPlatVcetneOdmen) : 0;
-    var platyMax = aktualniPlaty.Any() ? aktualniPlaty.Max(p => p.HrubyMesicniPlatVcetneOdmen) : 0;
+    var platyMin = aktualniPlaty.Any() ? aktualniPlaty.Min(p => p.PrumernyMesicniPrijemVcetneOdmen) : 0;
+    var platyMax = aktualniPlaty.Any() ? aktualniPlaty.Max(p => p.PrumernyMesicniPrijemVcetneOdmen) : 0;
     var platyLength = platyMax - platyMin;
     if (platyLength == 0)
         platyLength = 0.01m;
@@ -89,8 +89,8 @@
                                 </td>
                                 @if (org.PrijmyPolitiku.AktualniRok().Any())
                                 {
-                                    var minimalniPlatOrganizace = org.PrijmyPolitiku.AktualniRok().Min(m => m.HrubyMesicniPlatVcetneOdmen);
-                                    var maximalniPlatOrganizace = org.PrijmyPolitiku.AktualniRok().Max(m => m.HrubyMesicniPlatVcetneOdmen);
+                                    var minimalniPlatOrganizace = org.PrijmyPolitiku.AktualniRok().Min(m => m.PrumernyMesicniPrijemVcetneOdmen);
+                                    var maximalniPlatOrganizace = org.PrijmyPolitiku.AktualniRok().Max(m => m.PrumernyMesicniPrijemVcetneOdmen);
                                     var startPer = Math.Round((minimalniPlatOrganizace - platyMin) / platyLength * 100);
                                     var endPer = Math.Round((maximalniPlatOrganizace - minimalniPlatOrganizace) / platyLength * 100);
                                     if (endPer == 0)

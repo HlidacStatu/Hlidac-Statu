@@ -3,7 +3,7 @@
 @using HlidacStatu.Repositories.SharedModels
 @inject ZiggyCreatures.Caching.Fusion.IFusionCache cache;
 @{
-    var stats = await PuRepo.GetGlobalStatUredniciAsync();
+    var stats = await PuRepo.GetGlobalStatOrganizaceAsync();
     List<PuPlat> platy = (List<PuPlat>?)ViewData["platy"];
 
     var organizationOfTheDay = await PuRepo.GetOrganizationOfTheDayAsync();
