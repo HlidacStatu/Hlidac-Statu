@@ -1,26 +1,10 @@
 @model (PpRepo.PoliticianGroup Group, int Year)
 
+@using Devmasters.Enums
 @using HlidacStatu.Entities
 @using HlidacStatu.Extensions
 @using HlidacStatu.Repositories
 @using HlidacStatu.XLib.Render
-
-@section breadcrumbs
-{
-    <ol class="breadcrumb">
-        <li>
-            <a asp-action="Index" asp-controller="Home">Platy</a>
-        </li>
-        <li><a asp-action="Index" asp-controller="Politici">Politici</a></li>
-        <li class="active">Seznam politiků</li>
-    </ol>
-}
-
-@section Scripts
-{
-    <link rel="stylesheet" type="text/css" href="//cdn.datatables.net/1.13.4/css/jquery.dataTables.css"/>
-    <script type="text/javascript" charset="utf8" src="//cdn.datatables.net/1.13.4/js/jquery.dataTables.js"></script>
-}
 
 @{
     List<PpPrijem> vsechnyPlaty = await PpRepo.GetPrijmyForGroupAsync(PpRepo.PoliticianGroup.Vse, Model.Year);
@@ -29,10 +13,13 @@
     if (Model.Group == PpRepo.PoliticianGroup.Vse)
     {
         nameIdFilter = vsechnyPlaty.Select(m => m.Nameid).Distinct().ToList();
+        ViewBag.Title = $"Seznam platů politiků";
+
     }
     else
     {
         nameIdFilter = await PpRepo.GetNameIdsForGroupAsync(Model.Group, Model.Year);
+        ViewBag.Title = $"Seznam platů politiků - " + Model.Group.ToNiceDisplayName();
     }
 
     ReportDataSource<(PpPrijem[] Prijem, Osoba Osoba)> rds = new(
@@ -77,36 +64,55 @@
         if (platyPerPolitik.Any())
         {
             rds.AddRow((platyPerPolitik, Osoby.GetByNameId.Get(pol)));
-            
+
         }
     }
     //rds.AddRows(platyPerPolitik);
 }
 
 
+@section breadcrumbs
+{
+    <ol class="breadcrumb">
+        <li>
+            <a asp-action="Index" asp-controller="Home">Platy</a>
+        </li>
+        <li><a asp-action="Index" asp-controller="Politici">Politici</a></li>
+        <li class="active">Seznam politiků</li>
+    </ol>
+}
+
+@section Scripts
+{
+    <link rel="stylesheet" type="text/css" href="//cdn.datatables.net/1.13.4/css/jquery.dataTables.css" />
+    <script type="text/javascript" charset="utf8" src="//cdn.datatables.net/1.13.4/js/jquery.dataTables.js"></script>
+}
+
 <section class="d-flex align-items-center justify-content-center">
     <div class="container">
-        <h2>Seznam politiků</h2>
+        <h2>@ViewBag.Title </h2>
         <div class="row">
-            <a class="btn btn-primary btn-sm col" href="/politici/seznam">
-                Všichni politici
-            </a>
-            <a class="btn btn-primary btn-sm col" href="/politici/seznam?groupName=@(PpRepo.PoliticianGroup.Vlada.ToString("G"))&year=@(PpRepo.DefaultYear)">
-                Ministři a premiér
-            </a>
-            <a class="btn btn-primary btn-sm col" href="/politici/seznam?groupName=@(PpRepo.PoliticianGroup.Poslanci.ToString("G"))&year=@(PpRepo.DefaultYear)">
-                Poslanci
-            </a>
-            <a class="btn btn-primary btn-sm col" href="/politici/seznam?groupName=@(PpRepo.PoliticianGroup.Senatori.ToString("G"))&year=@(PpRepo.DefaultYear)">
-                Senátoři
-            </a>
-            <a class="btn btn-primary btn-sm col" href="/politici/seznam?groupName=@(PpRepo.PoliticianGroup.KrajstiZastupitele.ToString("G"))&year=@(PpRepo.DefaultYear)">
-                Krajští zastupitelé
-            </a>
+            @{
+                var groupList = new PpRepo.PoliticianGroup[]
+                {
+                        PpRepo.PoliticianGroup.Vse,
+                        PpRepo.PoliticianGroup.Vlada,
+                        PpRepo.PoliticianGroup.Poslanci,
+                        PpRepo.PoliticianGroup.Senatori,
+                        PpRepo.PoliticianGroup.KrajstiZastupitele,
+                };
+            }
+            @foreach (var item in groupList)
+            {
+                <a class="btn btn@(Model.Group == item ? "" : "-outline")-primary btn-sm col @(Model.Group == item ? "disabled" : "")" href="/politici/seznam?groupName=@(item.ToString())&year=@(PpRepo.DefaultYear)" role="button">
+                    @(item.ToNiceDisplayName())
+                </a>
+            }
         </div>
         <div>
-            <p>@Html.DataToHTMLTable(rds,
-                    dataTableOptions: HtmlExtensions.DatatableOptions(orderColumnIdx: 1, orderDirection: "desc"))
+            <p>
+                @Html.DataToHTMLTable(rds,
+                dataTableOptions: HtmlExtensions.DatatableOptions(orderColumnIdx: 2, orderDirection: "desc"))
             </p>
         </div>
     </div>

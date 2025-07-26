@@ -7,6 +7,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
 using HlidacStatu.Entities.Entities;
+using Devmasters.Enums;
 
 namespace HlidacStatu.Repositories;
 
@@ -520,12 +521,19 @@ public static class PpRepo
         await dbContext.SaveChangesAsync();
     }
 
+    [Devmasters.Enums.ShowNiceDisplayName]
     public enum PoliticianGroup
     {
+        [NiceDisplayName("Všichni politici")]
         Vse,
+        [NiceDisplayName("Poslanci")]
+
         Poslanci,
+        [NiceDisplayName("Senátoři")]
         Senatori,
+        [NiceDisplayName("Krajští zastupitelé")]
         KrajstiZastupitele,
+        [NiceDisplayName("Členové vlády")]
         Vlada
     }
 

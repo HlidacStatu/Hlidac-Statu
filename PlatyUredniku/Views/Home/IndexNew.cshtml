@@ -45,10 +45,12 @@
             <div class="col-sm-12 col-md-6">
                 <h3>Příjmy politiků a kumulace funkcí</h3>
                 <p>
-                    Za @PuRepo.DefaultYear jsme žádali o celkem <b>@(HlidacStatu.Util.RenderData.NiceNumber(statsPolitici.PocetPrijmuPozadano))</b> příjmů <b>@(HlidacStatu.Util.RenderData.NiceNumber(statsPolitici.PocetOsobPozadano))</b> politiků.
-                    Dostali jsme jich <b>@(HlidacStatu.Util.RenderData.NiceNumber(statsPolitici.PocetPrijmu))</b>. Alespoň jeden plat nám poskytlo <b>@(HlidacStatu.Util.RenderData.NiceNumber(statsPolitici.PocetOrganizaciDaliPlat))</b> z celkově @(HlidacStatu.Util.RenderData.NiceNumber(statsPolitici.PocetOrganizaciPozadano)) oslovených.
+                    Za @PuRepo.DefaultYear jsme získali informace o <b>@(HlidacStatu.Util.RenderData.NiceNumber(statsPolitici.PocetPrijmu))</b> příjmech od celkem
+                    <b>@(HlidacStatu.Util.RenderData.NiceNumber(statsPolitici.PocetOsobPozadano))</b> politiků.
+
+                    Alespoň jeden plat nám poskytlo <b>@(HlidacStatu.Util.RenderData.NiceNumber(statsPolitici.PocetOrganizaciDaliPlat))</b>.
                 </p>
-                <p>Kromě organizací jsme jednotlivě oslovili většinu politiků s existujícím či funkčním kontaktem.</p>
+                <p>Ohledně platů jsme oslovili jak organizace, kde politici působí, tak většiny samotných politiků.</p>
                 <p>
                     <a asp-controller="Politici" asp-action="Index" class="btn btn-primary btn-sm">Příjmy a placené funkce všech politiků <span class="badge text-bg-danger">@(@PuRepo.DefaultYear)</span></a>
                 </p>
