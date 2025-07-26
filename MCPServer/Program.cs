@@ -81,6 +81,8 @@ _ = builder.Services.AddMcpServer(
     .WithResourcesFromAssembly()
     ;
 
+builder.Services.AddHttpContextAccessor();
+
 _ = builder.Services.AddOpenTelemetry()
     .WithTracing(b => b.AddSource("*")
         .AddAspNetCoreInstrumentation()

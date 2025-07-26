@@ -219,6 +219,7 @@ namespace HlidacStatu.MCPServer.Tools
                         {
                             Total_Value_Of_Found_Contracts = sres.ElasticResults.Aggregations?.ContainsKey("sumKc") == true ?
                                  (decimal?)((Nest.ValueAggregate)sres.ElasticResults.Aggregations["sumKc"]).Value : (decimal?)null,
+                            Total_Number_Of_Found_Contracts = sres.Total,
                             Found_Contracts = sres.Results.Select(m => m.ToApiSmlouvaListItem()).ToArray()
                         };
                         return res;

@@ -10,6 +10,8 @@ namespace HlidacStatu.DS.Api.Smlouva
     {
 
         public decimal? Total_Value_Of_Found_Contracts { get; set; } = 0;
+        public long? Total_Number_Of_Found_Contracts { get; set; } = 0;
+
 
         public ListItem[] Found_Contracts { get; set; } = null;
     }
