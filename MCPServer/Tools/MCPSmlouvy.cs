@@ -38,8 +38,6 @@ namespace HlidacStatu.MCPServer.Tools
 
                     if (string.IsNullOrWhiteSpace(contract_id))
                         return null;
-                    if (Util.DataValidators.CheckCZICO(contract_id) == false)
-                        return null;
 
                     var res = await HlidacStatu.Repositories.SmlouvaRepo.LoadAsync(contract_id, includePrilohy: include_text_of_contract);
 
