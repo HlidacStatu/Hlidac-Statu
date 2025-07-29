@@ -12,30 +12,37 @@ namespace HlidacStatu.MCPServer.Tools
     {
         static Serilog.ILogger _logger = Serilog.Log.ForContext<MCPOther>();
 
-        //[McpServerTool(
-        //    Name = "ping",
-        //    Title = "Simple Echo tool"),
-        //Description("Simple Echo tool.")]
-        //public static string Ping(IMcpServer server, 
-        //    [Description("text to send back")] string text)
-        //{
-        //    _=AuditRepo.Add(Audit.Operations.Call, 
-        //        server?.ServerOptions?.KnownClientInfo?.Name?.Split('|')?.FirstOrDefault(),
-        //        server?.ServerOptions?.KnownClientInfo?.Name?.Split('|')?.LastOrDefault(), 
-        //        AuditRepo.GetClassAndMethodName(MethodBase.GetCurrentMethod()),"",
-        //        AuditRepo.GetMethodParametersWithValues(MethodBase.GetCurrentMethod().GetParameters().Skip(1), text),
-        //        null);
+        private readonly IHttpContextAccessor _httpCtx;
 
-        //    //Console.WriteLine("HttpContext: " + _ctx?.HttpContext?.ToString());
-        //    return "Pong: " + text;
-        //}
+        public MCPOther(IHttpContextAccessor httpContextAccessor)
+        {
+            _httpCtx = httpContextAccessor;
+        }
+
+        [McpServerTool(UseStructuredContent = false,
+            Name = "ping",
+            Title = "Simple Echo tool"),
+        Description("Simple Echo tool.")]
+        public string Ping(IMcpServer server, 
+            [Description("text to send back")] string text)
+        {
+            _=AuditRepo.Add(Audit.Operations.Call, 
+                server?.ServerOptions?.KnownClientInfo?.Name?.Split('|')?.FirstOrDefault(),
+                server?.ServerOptions?.KnownClientInfo?.Name?.Split('|')?.LastOrDefault(), 
+                AuditRepo.GetClassAndMethodName(MethodBase.GetCurrentMethod()),"",
+                AuditRepo.GetMethodParametersWithValues(MethodBase.GetCurrentMethod().GetParameters().Skip(1), text),
+                null);
+
+            Console.WriteLine("HttpContext: " + _httpCtx?.HttpContext?.ToString());
+            return "Pong: " + text;
+        }
 
 
         [McpServerTool(
             Name = "send_feedback",
             Title = "Send feedback to Hlidac statu team"),
         Description("Send feedback to Hlídač státu team. Ask user for his email. Its mandatory parameter.")]
-        public static string SendFeedback(IMcpServer server,
+        public  string SendFeedback(IMcpServer server,
             [Description("Email address of user")]
             string user_email,
             [Description("Text of feedback message")]

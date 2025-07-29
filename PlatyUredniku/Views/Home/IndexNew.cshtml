@@ -4,8 +4,11 @@
 @{
     ViewBag.Title = "";
 
-    var stats = await PuRepo.GetGlobalStatOrganizaceAsync();
-    PpGlobalStat statsPolitici = await PpRepo.GetGlobalStatAsync(PpRepo.DefaultYear);
+    var puPlatyStats = await PuRepo.GetPlatyPerYearStatCache.GetAsync(PuRepo.DefaultYear);
+    var puOrgStats = await PuRepo.GetGlobalStatOrganizaceAsync();
+    PpGlobalStat polStats = await PpRepo.GetGlobalStatAsync(PpRepo.DefaultYear);
+
+    DateTime stopNovinkaPolitici = new DateTime(2025, 10, 15);
 
     var organizationOfTheDay = await PuRepo.GetOrganizationOfTheDayAsync();
     var ceoOfTheDay = organizationOfTheDay.Platy.FirstOrDefault(p => p.JeHlavoun == true && p.Rok == PuRepo.DefaultYear);
@@ -14,26 +17,56 @@
 
 <section class="d-flex align-items-center justify-content-center">
     <div class="container">
-        <p class="">
-            V mnoha demokratických zemích je běžné, že veřejnost může kontrolovat odměňování těch, kteří hospodaří s penězi daňových poplatníků.
-            <b>Informace o platech a odměnách</b> vedoucích úřadů, státních podniků či příspěvkových organizací v ČR ale veřejně <b>dostupné či dohledatelné nejsou</b>.
-            Proto jsme tu my! Využíváme zákona o svobodném přístupu k informacím a na platy a odměny se ptáme už mnoho let.             Platy a odměny jsou stanoveny
+        <h2>Platy politiků a úředníků</h2>
+        <p class="lead">
+            Projekt <b>Platy</b> je součástí Hlídače státu. <br />
+            <i class="fa-solid fa-circle-1"></i> Zjistěte, jaký roční příjem mají významní politici či kolik zastávají funkcí. Jde o novinku, ptáme se poprvé na rok 2024. A budeme to opakovat každý rok.
+            <br />
+            <i class="fa-solid fa-circle-2"></i> Informace o platech a odměnách</b> soudců, vedení úřadů, státních podniků či příspěvkových organizací v ČR u nás najdete už spoustu let.
+        </p>
+        <p>
+            Data shromážďujeme na základě oficiální žádosti podle zákona o svobodném přístupu k informacím.             Platy a odměny jsou stanoveny
             <a asp-controller="Texty" asp-action="PlatyStatnichZamestnancu">nařízením vlády</a>
             nebo
             <a asp-controller="Texty" asp-action="Nejvyssi">zákonem</a>.
+            <br />
+            <i class="fa-solid fa-circle-heart" style="color:red"></i> Sesbírat platy tisíců manažerů a dalších tisiců politiků je obrovské množství práce. <a target="_blank" href="https://texty.hlidacstatu.cz/jak-podporit-hlidac-statu-fungovani-ceska/">Podpořte nás v tom, abychom mohli získat platy i příští rok! Díky!!</a>
         </p>
         <hr class="mb-4" />
         <div class="row">
             <div class="col-sm-12 col-md-6 border-end">
+                <h3>Příjmy politiků a kumulace funkcí 
+                    @if (DateTime.Now < stopNovinkaPolitici ) {
+                        <small class="ps-1 text-danger-emphasis">Novinka!</small>
+                    }
+                    </h3>
+                <p>
+                    <img src="/Content//politik.png" class="float-start w-25 p-3" alt="Politik">
+
+                    Za rok @PuRepo.DefaultYear jsme získali <b>@(HlidacStatu.Util.RenderData.NiceNumber(polStats.PocetPrijmu))</b> příjmů od celkem
+                    <b>@(HlidacStatu.Util.RenderData.NiceNumber(polStats.PocetOsobPozadano))</b> politiků.
+
+                    Alespoň jeden plat nám poskytlo <b>@(HlidacStatu.Util.RenderData.NiceNumber(polStats.PocetOrganizaciDaliPlat))</b> organizací.
+                </p>
+                <p>Ohledně platů jsme oslovili jak  organizace, kde politici působí, tak 911 samotných politiků <small>(na které jsme našli platný email)</small>.</p>
+                <p>
+                    <a asp-controller="Politici" asp-action="Index" class="btn btn-primary btn-sm">Příjmy a placené funkce všech politiků <span class="badge text-bg-danger">@(@PuRepo.DefaultYear)</span></a>
+                </p>
+
+            </div>
+            <div class="col-sm-12 col-md-6">
                 <h3>Platy úředníků a manažerů</h3>
                 <p>
-                    Za @PuRepo.DefaultYear jsme žádali o platy @(HlidacStatu.Util.RenderData.NiceNumber(stats.PocetOslovenych)) organizací
-                    a plat nám @(DateTime.Now < new DateTime(2025, 04, 1) ? "zatím" : "") poskytlo @(HlidacStatu.Util.RenderData.NiceNumber(stats.PocetCoPoslaliPlat)) z nich.
+                    <img src="/Content//manazer.png" class="float-start w-25 p-3" alt="Politik">
+                    Za @PuRepo.DefaultYear jsme žádali o platy @(HlidacStatu.Util.RenderData.NiceNumber(puOrgStats.PocetOslovenych)) organizací
+                    a plat nám @(DateTime.Now < new DateTime(2025, 04, 1) ? "zatím" : "") poskytlo @(HlidacStatu.Util.RenderData.NiceNumber(puOrgStats.PocetCoPoslaliPlat)) z nich.
+                    Najdete u nás platy @(HlidacStatu.Util.RenderData.NiceNumber(puPlatyStats.Pocet)) lidí a pozic.
                 </p>
                 <p>
                     <a asp-controller="Urednici" asp-action="Index" class="btn btn-primary btn-sm">Vše o platech úředníků a manažerů <span class="badge text-bg-danger">@(@PuRepo.DefaultYear)</span></a>
                 </p>
-                <p class="mb-2 mt-4 text-body-secondary">
+                <div class="clearfix"></div>
+                <p class="mb-2 mt-4 text-body-secondary ">
                     Oblasti:
                     @foreach (var item in PuRepo.MainTags)
                     {
@@ -42,20 +75,7 @@
                 </p>
 
             </div>
-            <div class="col-sm-12 col-md-6">
-                <h3>Příjmy politiků a kumulace funkcí</h3>
-                <p>
-                    Za @PuRepo.DefaultYear jsme získali informace o <b>@(HlidacStatu.Util.RenderData.NiceNumber(statsPolitici.PocetPrijmu))</b> příjmech od celkem
-                    <b>@(HlidacStatu.Util.RenderData.NiceNumber(statsPolitici.PocetOsobPozadano))</b> politiků.
 
-                    Alespoň jeden plat nám poskytlo <b>@(HlidacStatu.Util.RenderData.NiceNumber(statsPolitici.PocetOrganizaciDaliPlat))</b>.
-                </p>
-                <p>Ohledně platů jsme oslovili jak organizace, kde politici působí, tak většiny samotných politiků.</p>
-                <p>
-                    <a asp-controller="Politici" asp-action="Index" class="btn btn-primary btn-sm">Příjmy a placené funkce všech politiků <span class="badge text-bg-danger">@(@PuRepo.DefaultYear)</span></a>
-                </p>
-
-            </div>
         </div>
     </div>
 </section>

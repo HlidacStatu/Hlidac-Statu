@@ -5,6 +5,17 @@
 @model List<PpPrijem>
 @addTagHelper *, HlidacStatu.Lib.Web.UI.TagHelpers
 
+@functions {
+    private bool _sectionBgSwitch = false;
+
+    public string GetBgClass(bool toggle = true)
+    {
+        if (toggle)
+            _sectionBgSwitch = !_sectionBgSwitch;
+
+        return _sectionBgSwitch ? "alter-bg-color" : "";
+    }
+}
 @{
     var politik = (Osoba?)ViewData["osoba"];
     if (politik is null)
@@ -35,6 +46,9 @@
     {
         rok = roky.Max();
     }
+
+    var platyZaRok = Model.Where(m => m.Rok == rok);
+
 }
 
 
@@ -52,7 +66,7 @@
 <section class="d-flex justify-content-center">
     <div class="container">
         <div>
-            <h2><i class="fa-regular fa-building-columns"></i>&nbsp;@politik.FullName()</h2>
+            <h2><i class="fa-regular fa-building-columns"></i>&nbsp;@politik.FullName()</h2> 
             <div class="d-flex">
                 <div class="me-3">
                     <div class="d-flex">
@@ -60,36 +74,36 @@
                             <div class="person-profile-thumb">
                                 <div class="photo">
                                     <div class="profile-picture border"
-                                    style="background-image: url('@politik.GetPhotoUrl(false, Osoba.PhotoTypes.NoBackground)')"></div>
+                                         style="background-image: url('@politik.GetPhotoUrl(false, Osoba.PhotoTypes.NoBackground)')"></div>
                                 </div>
                             </div>
+                            <p class="mt-4"><hr class="dotted gray w-75" /><a href="@politik.GetUrl()"><i class="fa-solid fa-arrow-up-right-from-square"></i> kompletní profil na Hlídač státu</a></p>
                         </div>
                         <div class="mt-1">
+                            
                             <h3>Celkové příjmy z veřejných funkcí</h3>
-                            <div>                                
-                                @{
-                                    var _platyZaRok = Model.Where(m => m.Rok == rok);
-                                }
+                            <div>
                                 <dl class="row">
                                     <dt class="col-12 col-sm-12 text-nowrap fs-3">@(rok)</dt>
                                     <dt class="col-6 col-sm-6 col-md-3 text-nowrap fs-5">Roční osobní příjem</dt>
-                                    <dd class="col-6 col-sm-6 col-md-9 text-nowrap fs-5">@HlidacStatu.Util.RenderData.NicePriceHtml(_platyZaRok.Sum(m => m.CelkovyRocniPlatVcetneOdmen))</dd>
-                                    @if (_platyZaRok.Sum(m => m.CelkoveRocniNahrady)>0) {
+                                    <dd class="col-6 col-sm-6 col-md-9 text-nowrap fs-5">@HlidacStatu.Util.RenderData.NicePriceHtml(platyZaRok.Sum(m => m.CelkovyRocniPlatVcetneOdmen))</dd>
+                                    @if (platyZaRok.Sum(m => m.CelkoveRocniNahrady) > 0)
+                                    {
                                         <dt class="col-6 col-sm-6 col-md-3 text-nowrap fs-5">Ostatní náhrady</dt>
-                                        <dd class="col-6 col-sm-6 col-md-9 text-nowrap fs-5">@HlidacStatu.Util.RenderData.NicePriceHtml(_platyZaRok.Sum(m => m.CelkoveRocniNahrady))</dd>
+                                        <dd class="col-6 col-sm-6 col-md-9 text-nowrap fs-5">@HlidacStatu.Util.RenderData.NicePriceHtml(platyZaRok.Sum(m => m.CelkoveRocniNahrady))</dd>
                                     }
                                     <dt class="col-6 col-sm-6 col-md-3 text-nowrap fs-5">Evidujeme příjmy od </dt>
-                                    <dd class="col-6 col-sm-6 col-md-9">@(string.Join(", ", _platyZaRok.Select(m => m.Organizace.FirmaDs.DsSubjName)))</dd>
+                                    <dd class="col-6 col-sm-6 col-md-9">@(string.Join(", ", platyZaRok.Select(m => m.Organizace.FirmaDs.DsSubjName)))</dd>
                                 </dl>
 
                             </div>
                             <div>
                                 @* Graf here *@
-                                @if(Model.Count > 1)
+                                @if (Model.Count > 1)
                                 {
                                     <div>
                                         <partial name="Graphs/_SankeyDiagram"
-                                                 model="@(new SankeyDiagram() { PrijmyPolitiku = Model, Title="Přehled celkových ročních příjmů", CssHeight = "380" })"/>
+                                                 model="@(new SankeyDiagram() { PrijmyPolitiku = Model, Title = "Přehled celkových ročních příjmů", CssHeight = "380" })" />
                                     </div>
                                 }
                             </div>
@@ -102,118 +116,150 @@
 
     </div>
 </section>
-<section class="d-flex alter-bg-color">
-    <div class="container">
-        @{
-            var platyZaRok = Model.Where(m => m.Rok == rok);
-            //TODO dodelat vyber roku
-        }
-        <h3>Detailní informace o příjmech po organizacích v @rok</h3>
-        @foreach (var pprijem in platyZaRok)
-        {
+@if (platyZaRok.Count() > 1)
+{
+    <section class="d-flex @(GetBgClass())">
+        <div class="container">
+            <h2>Rychlý souhrn platů</h2>
+            <table class="table table-bordered table-striped table-hover caption-top" style="width:initial">
+                <caption>Všechny odměny jsou uvedeny v hrubém za kalendářní rok @rok</caption>
+                <thead>
+                    <tr>
+                        <td class="text-nowrap">Organizace</td>
+                        <td class="text-nowrap">Celkový roční příjem včetně odměn</td>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var pprijem in platyZaRok)
+                    {
+                        <tr>
+                            <td>@pprijem.Organizace.Nazev</td>
+                            <td class="number">@HlidacStatu.Util.RenderData.NicePriceHtml(pprijem.CelkovyRocniPlatVcetneOdmen)</td>
+                        </tr>
+                    }
+                </tbody>
+                <tfoot>
+                    <tr class="table-secondary">
+                        <td class="fa-bold">Celkem</td>
+                        <td class="number fa-bold">@HlidacStatu.Util.RenderData.NicePriceHtml(platyZaRok.Sum(m => m.CelkovyRocniPlatVcetneOdmen))</td>
+                    </tr>
+                </tfoot>
+            </table>
 
-            <h5 id="@pprijem.Organizace.DS">@pprijem.Organizace.Nazev</h5>
-            @if (pprijem.Status == PpPrijem.StatusPlatu.Zjistujeme)            
+        </div>
+    </section>
+}
+<div class="container mt-5 mb-0">
+    <h2>Detailní informace o příjmech po organizacích v @rok</h2>
+</div>
+@foreach (var pprijem in platyZaRok)
+{
+    <section class="d-flex small-padding @(GetBgClass())">
+        <div class="container">
+
+            <h3 id="@pprijem.Organizace.DS">@pprijem.Organizace.Nazev</h3>
+            @if (pprijem.Status == PpPrijem.StatusPlatu.Zjistujeme)
             {
-                PuEvent _ev = (await PpRepo.GetAllEventsAsync(rok, m=>m.IdOrganizace == pprijem.IdOrganizace && m.OsobaNameId == politik.NameId)).OrderByDescending(o=>o.Datum).FirstOrDefault();
+                PuEvent _ev = (await PpRepo.GetAllEventsAsync(rok, m => m.IdOrganizace == pprijem.IdOrganizace && m.OsobaNameId == politik.NameId)).OrderByDescending(o => o.Datum).FirstOrDefault();
                 <table class="table table-hover caption-top">
-                    <tr><td><div>Příjem od této organizace právě zjišťujeme@((_ev != null ? $" od {_ev.Datum:d. M. yyyy}":"")).</div></td></tr>
+                    <tr><td><div>Příjem od této organizace právě zjišťujeme@((_ev != null ? $" od {_ev.Datum:d. M. yyyy}" : "")).</div></td></tr>
                 </table>
             }
             else
             {
-            <table class="table table-hover caption-top">
-                <caption>Všechny odměny jsou uvedeny v hrubém za kalendářní rok @rok</caption>
-                <tbody>
-                    <tr>
-                        <th class="text-nowrap">Počet odpracovaných měsíců</th>
-                        <td width="100%">@(pprijem.PocetMesicu.Value.ToString("N0"))</td>
-                    </tr>
-                    <tr>
-                        <th>Základní odměna</th>
-                        <td>@HlidacStatu.Util.RenderData.NicePriceHtml(pprijem.Plat ?? 0)</td>
-                    </tr>
-                    <tr>
-                        <th>Mimořádná odměna</th>
-                        <td>@HlidacStatu.Util.RenderData.NicePriceHtml(pprijem.Odmeny ?? 0)</td>
-                    </tr>
-                    @if (pprijem.NahradaReprezentace.HasValue)
-                    {
+                <table class="table table-hover caption-top">
+                    <caption>Všechny odměny jsou uvedeny v hrubém za kalendářní rok @rok</caption>
+                    <tbody>
                         <tr>
-                            <th>Náhrady na reprezentaci</th>
-                            <td>@HlidacStatu.Util.RenderData.NicePriceHtml(pprijem.NahradaReprezentace ?? 0)</td>
+                            <th class="text-nowrap">Počet odpracovaných měsíců</th>
+                            <td width="100%">@(pprijem.PocetMesicu.Value.ToString("N0"))</td>
                         </tr>
-                    }
-                    @if (pprijem.NahradaCestovni.HasValue)
-                    {
                         <tr>
-                            <th>Náhrady cestovní</th>
-                            <td>@HlidacStatu.Util.RenderData.NicePriceHtml(pprijem.NahradaCestovni ?? 0)</td>
+                            <th>Základní odměna</th>
+                            <td>@HlidacStatu.Util.RenderData.NicePriceHtml(pprijem.Plat ?? 0)</td>
                         </tr>
-                    }
-                    @if (pprijem.NahradaUbytovani.HasValue)
-                    {
                         <tr>
-                            <th>Náhrady na ubytování</th>
-                            <td>@HlidacStatu.Util.RenderData.NicePriceHtml(pprijem.NahradaUbytovani?? 0)</td>
+                            <th>Mimořádná odměna</th>
+                            <td>@HlidacStatu.Util.RenderData.NicePriceHtml(pprijem.Odmeny ?? 0)</td>
                         </tr>
-                    }
-                    @if (pprijem.NahradaAdministrativa.HasValue)
-                    {
-                        <tr>
-                            <th>Náhrady na administrativu</th>
-                            <td>@HlidacStatu.Util.RenderData.NicePriceHtml(pprijem.NahradaAdministrativa?? 0)</td>
-                        </tr>
-                    }
-                    @if (pprijem.NahradaAsistent.HasValue)
-                    {
-                        <tr>
-                            <th>Náhrady na asistenty</th>
-                            <td>@HlidacStatu.Util.RenderData.NicePriceHtml(pprijem.NahradaAsistent ?? 0)</td>
-                        </tr>
-                    }
-                    @if (pprijem.NahradaTelefon.HasValue)
-                    {
-                        <tr>
-                            <th>Náhrady na pronájem a provoz kanceláře</th>
-                            <td>@HlidacStatu.Util.RenderData.NicePriceHtml(pprijem.NahradaTelefon?? 0)</td>
-                        </tr>
-                    }
-                    @if (pprijem.NahradaKancelar.HasValue)
-                    {
-                        <tr>
-                            <th>Náhrady na pronájem a provoz kanceláře</th>
-                            <td>@HlidacStatu.Util.RenderData.NicePriceHtml(pprijem.NahradaKancelar ?? 0)</td>
-                        </tr>
-                    }
-                    @if (pprijem.NahradaKancelar.HasValue)
-                    {
-                        <tr>
-                            <th>Náhrady na pronájem a provoz kanceláře</th>
-                            <td>@HlidacStatu.Util.RenderData.NicePriceHtml(pprijem.NahradaKancelar ?? 0)</td>
-                        </tr>
-                    }
+                        @if (pprijem.NahradaReprezentace.HasValue)
+                        {
+                            <tr>
+                                <th>Náhrady na reprezentaci</th>
+                                <td>@HlidacStatu.Util.RenderData.NicePriceHtml(pprijem.NahradaReprezentace ?? 0)</td>
+                            </tr>
+                        }
+                        @if (pprijem.NahradaCestovni.HasValue)
+                        {
+                            <tr>
+                                <th>Náhrady cestovní</th>
+                                <td>@HlidacStatu.Util.RenderData.NicePriceHtml(pprijem.NahradaCestovni ?? 0)</td>
+                            </tr>
+                        }
+                        @if (pprijem.NahradaUbytovani.HasValue)
+                        {
+                            <tr>
+                                <th>Náhrady na ubytování</th>
+                                <td>@HlidacStatu.Util.RenderData.NicePriceHtml(pprijem.NahradaUbytovani ?? 0)</td>
+                            </tr>
+                        }
+                        @if (pprijem.NahradaAdministrativa.HasValue)
+                        {
+                            <tr>
+                                <th>Náhrady na administrativu</th>
+                                <td>@HlidacStatu.Util.RenderData.NicePriceHtml(pprijem.NahradaAdministrativa ?? 0)</td>
+                            </tr>
+                        }
+                        @if (pprijem.NahradaAsistent.HasValue)
+                        {
+                            <tr>
+                                <th>Náhrady na asistenty</th>
+                                <td>@HlidacStatu.Util.RenderData.NicePriceHtml(pprijem.NahradaAsistent ?? 0)</td>
+                            </tr>
+                        }
+                        @if (pprijem.NahradaTelefon.HasValue)
+                        {
+                            <tr>
+                                <th>Náhrady na pronájem a provoz kanceláře</th>
+                                <td>@HlidacStatu.Util.RenderData.NicePriceHtml(pprijem.NahradaTelefon ?? 0)</td>
+                            </tr>
+                        }
+                        @if (pprijem.NahradaKancelar.HasValue)
+                        {
+                            <tr>
+                                <th>Náhrady na pronájem a provoz kanceláře</th>
+                                <td>@HlidacStatu.Util.RenderData.NicePriceHtml(pprijem.NahradaKancelar ?? 0)</td>
+                            </tr>
+                        }
+                        @if (pprijem.NahradaKancelar.HasValue)
+                        {
+                            <tr>
+                                <th>Náhrady na pronájem a provoz kanceláře</th>
+                                <td>@HlidacStatu.Util.RenderData.NicePriceHtml(pprijem.NahradaKancelar ?? 0)</td>
+                            </tr>
+                        }
 
-                    <tr>
-                        <th>
-                            Další benefity
-                            <a href="#" class="link-default me-2" data-bs-toggle="tooltip"
-                               data-bs-title="(např. stravenky,ošatné = příspěvek na úpravu zevnějšku, aj.) peněžní i nepeněžní">
-                                <i class="fa-solid fa-circle-info"></i>
-                            </a>
+                        <tr>
+                            <th>
+                                Další benefity
+                                <a href="#" class="link-default me-2" data-bs-toggle="tooltip"
+                                   data-bs-title="(např. stravenky,ošatné = příspěvek na úpravu zevnějšku, aj.) peněžní i nepeněžní">
+                                    <i class="fa-solid fa-circle-info"></i>
+                                </a>
 
-                        </th>
-                        <td>@pprijem.NefinancniBonus</td>
-                    </tr>
-                </tbody>
-            </table>
+                            </th>
+                            <td>@pprijem.NefinancniBonus</td>
+                        </tr>
+                    </tbody>
+                </table>
             }
-        }
 
 
-    </div>
-</section>
-<section class="d-flex bg-color">
+        </div>
+    </section>
+}
+
+<section class="d-flex @GetBgClass()">
     <div class="container">
         <h3>Přehled funkcí</h3>
 

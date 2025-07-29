@@ -1,15 +1,16 @@
-using System;
 using HlidacStatu.Entities;
+using HlidacStatu.Lib.Web.UI.Attributes;
 using HlidacStatu.Repositories;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Nest;
 using PlatyUredniku.Models;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using ZiggyCreatures.Caching.Fusion;
-using Microsoft.AspNetCore.Authorization;
-using HlidacStatu.Lib.Web.UI.Attributes;
 
 namespace PlatyUredniku.Controllers;
 
@@ -22,11 +23,10 @@ public class PoliticiController : Controller
     {
         _cache = cache;
     }
-    
-    public async Task<IActionResult> Index(string id)
+
+    [HlidacCache(60 * 60,"rok")]
+    public async Task<IActionResult> Index(int rok = PpRepo.DefaultYear)
     {
-        if (string.IsNullOrEmpty(id))
-        {
             //titulka politiku
             var platyTask = _cache.GetOrSetAsync<List<PpPrijem>>(
                 $"{nameof(PpRepo.GetPlatyAsync)}_{PpRepo.DefaultYear}-politici",
@@ -36,8 +36,12 @@ public class PoliticiController : Controller
             ViewData["platy"] = platyPolitiku;
 
             return View();
-        } else
-        {
+        
+    }
+
+    [HlidacCache(60 * 60, "id;rok")]
+    public async Task<IActionResult> Politik(string id, int rok=PpRepo.DefaultYear)
+    {
             //detail politika
 
             ViewBag.Title = $"Platy politika {id}";
@@ -52,15 +56,20 @@ public class PoliticiController : Controller
 
             ViewData["osoba"] = osoba;
 
-            return View("Politik",detail);
-        }
+            return View(detail);
+        
     }
 
+
+
+    [HlidacCache(60 * 60, "id;rok")]
     public async Task<IActionResult> Oblast(string id)
     {
         return View(null);// organizace);
     }
-    
+
+    [HlidacCache(60 * 60, "id;rok")]
+
     public async Task<IActionResult> Detail(string id, int? rok = null)
     {
 

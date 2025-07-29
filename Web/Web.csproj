@@ -62,7 +62,7 @@
     <PackageReference Include="AspNetCore.HealthChecks.Uris" Version="8.0.1" />
     <PackageReference Include="Devmasters.Cache.Memcached" Version="8.0.4" />
     <PackageReference Include="Devmasters.Core" Version="8.0.9" />
-    <PackageReference Include="Devmasters.Lang" Version="8.0.2" />
+    <PackageReference Include="Devmasters.Lang" Version="8.1.1" />
     <PackageReference Include="HlidacStatu.Api.V2.Dataset" Version="2.4.1.1" />
     <PackageReference Include="LigerShark.WebOptimizer.Core" Version="3.0.433" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.Google" Version="8.0.11" />

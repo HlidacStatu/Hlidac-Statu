@@ -10,7 +10,7 @@
     <DockerfileContext>..\..\..</DockerfileContext>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Devmasters.Logging" Version="8.0.0" />
+    <PackageReference Include="Devmasters.Logging" Version="8.0.2" />
     <PackageReference Include="FluentFTP" Version="51.1.0" />
     <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.21.2" />
     <PackageReference Include="Polly.Extensions.Http" Version="3.0.0" />

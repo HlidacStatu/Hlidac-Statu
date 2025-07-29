@@ -1852,7 +1852,7 @@ hr {
 }
 
     hr.gray {
-        border-top-color: #E0E6ED
+        border-top-color: #E0E6ED !important;
     }
 
     hr.dotted {

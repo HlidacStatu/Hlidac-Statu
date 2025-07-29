@@ -1,15 +1,27 @@
-﻿@using HlidacStatu.Entities
+﻿@using Devmasters.Enums
+@using HlidacStatu.Entities
 @using HlidacStatu.Repositories
 @using HlidacStatu.Util
 
 @inject ZiggyCreatures.Caching.Fusion.IFusionCache cache;
 @{
-    var stats = await PpRepo.GetGlobalStatAsync(PuRepo.DefaultYear);
+    int rok = PpRepo.DefaultYear;
+    var stats = await PpRepo.GetGlobalStatAsync(rok);
     List<PpPrijem> platy = (List<PpPrijem>?)ViewData["platy"];
 
-    var prumernyRocniPlatPoslance = (await PpRepo.GetPrijmyForGroupAsync(PpRepo.PoliticianGroup.Poslanci)).Average(x => x.CelkovyRocniPlatVcetneOdmen);
-    var prumernyRocniPlatSenatora = (await PpRepo.GetPrijmyForGroupAsync(PpRepo.PoliticianGroup.Senatori)).Average(x => x.CelkovyRocniPlatVcetneOdmen);
-    var prumernyRocniPlatMinistra = (await PpRepo.GetPrijmyForGroupAsync(PpRepo.PoliticianGroup.Vlada)).Average(x => x.CelkovyRocniPlatVcetneOdmen);
+    var prumernyRocniPlatPoslance = (await PpRepo.GetPrijmyForGroupAsync(PpRepo.PoliticianGroup.Poslanci, rok)).Average(x => x.CelkovyRocniPlatVcetneOdmen);
+    var prumernyRocniPlatSenatora = (await PpRepo.GetPrijmyForGroupAsync(PpRepo.PoliticianGroup.Senatori, rok)).Average(x => x.CelkovyRocniPlatVcetneOdmen);
+    var prumernyRocniPlatMinistra = (await PpRepo.GetPrijmyForGroupAsync(PpRepo.PoliticianGroup.Vlada, rok)).Average(x => x.CelkovyRocniPlatVcetneOdmen);
+
+    var vsichniNameIds = await PpRepo.GetNameIdsForGroupAsync(PpRepo.PoliticianGroup.Vse, rok);
+    var prumernyRocniPlatMuzi = (await PpRepo.GetPrijmyBySex(false)).Average(x => x.CelkovyRocniPlatVcetneOdmen);
+    var prumernyRocniPlatZeny = (await PpRepo.GetPrijmyBySex(true)).Average(x => x.CelkovyRocniPlatVcetneOdmen);
+
+    decimal pocetFunkci = (decimal)(await PpRepo.GetPrijmyForGroupAsync(PpRepo.PoliticianGroup.Vse, rok))
+            .GroupBy(k => k.Nameid, (k, v) => new { nameid = k, count = v.Count() })
+            .Average(a => a.count);
+
+    ;
 }
 
 @section breadcrumbs
@@ -26,87 +38,130 @@
     <div class="container d-flex">
         <div class="p-2 flex-grow-1">
             <div class="fs-2 fw-bold">Kolik berou čeští politici?</div>
-            <p>Projekt "Platy politiků" je součástí Hlídače státu. Zjistěte, jaký příjem mají politici a kolik zastávají
+            <p>
+                Projekt "Platy politiků" je součástí Hlídače státu. Zjistěte, jaký příjem mají politici a kolik zastávají
                 funkcí.
                 Data jsme shromáždili na základě oficiální žádosti podle zákona o svobodném přístupu k informacím.
                 Jedná se o příjmy z výkonu politické či exekutivní funkce.
-                <strong>od státních, polostátních nebo ? organizací,
-                    kde působí. (teda všechno z daní?)</strong>
+                <strong>
+                    od státních, polostátních nebo ? organizací,
+                    kde působí. (teda všechno z daní?)
+                </strong>
             </p>
-            <a href="/politici/seznam" class="btn btn-primary">Přehled platů všech politiků</a>
+
+            @{
+                var groupList = new PpRepo.PoliticianGroup[]
+                {
+                        PpRepo.PoliticianGroup.Vlada,
+                        PpRepo.PoliticianGroup.Poslanci,
+                        PpRepo.PoliticianGroup.Senatori,
+                        PpRepo.PoliticianGroup.KrajstiZastupitele,
+                        PpRepo.PoliticianGroup.Vse,
+                };
+            }
+            @foreach (var item in groupList)
+            {
+                <a class="btn btn-primary " href="/politici/seznam?groupName=@(item.ToString())&year=@(PpRepo.DefaultYear)" role="button">
+                    @(item.ToNiceDisplayName())
+                    <span class="badge text-bg-secondary bg-danger">@((await PpRepo.GetNameIdsForGroupAsync(item, rok)).Count)</span>
+                </a>
+
+                <br />
+            }
+
         </div>
         <div class="p-2">
-            <img class="img-fluid" src="Content/Img/politik u pultu.jpg" alt="politik u pultu"/>
+            <img class="img-fluid" src="Content/Img/politik u pultu.jpg" alt="politik u pultu" />
         </div>
     </div>
 </section>
 <section class="d-flex align-items-center justify-content-center alter-bg-color">
     <div class="container">
         <div class="row">
-            <div class="col h-100">
-                <div id="carouselExampleIndicators" class="carousel carousel-dark slide pb-3 mb-4"
-                     data-bs-ride="carousel">
-                    <div class="carousel-indicators top-100">
-                        <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="0"
-                                class="active" aria-current="true" aria-label="Slide 1"></button>
-                        <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="1"
-                                aria-label="Slide 2"></button>
-                        <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="2"
-                                aria-label="Slide 3"></button>
-                    </div>
-                    <div class="carousel-inner">
-                        <div class="carousel-item active">
-                            <a class="col d-flex flex-column justify-content-center d-block w-100 text-center"
-                               href="/politici/seznam?groupName=@(PpRepo.PoliticianGroup.Poslanci.ToString("G"))&year=@(PpRepo.DefaultYear)">
-
-                                <i class="fa-light fa-money-bill-1-wave fa-7x mb-2"
-                                   style="--fa-primary-color: #2668d9;"></i>
-                                <div class="fs-3 fw-bold text-center">Průměrný roční plat poslance</div>
-                                <div
-                                    class="fs-3 fw-bold text-center">@RenderData.NicePriceHtml(prumernyRocniPlatPoslance)</div>
-
-                            </a>
-                        </div>
-                        <div class="carousel-item">
-                            <a class="col d-flex flex-column justify-content-center d-block w-100 text-center"
-                               href="/politici/seznam?groupName=@(PpRepo.PoliticianGroup.Senatori.ToString("G"))&year=@(PpRepo.DefaultYear)">
-                                <i class="fa-light fa-money-bill-1-wave fa-7x mb-2 fa-rotate-by"
-                                   style="--fa-primary-color: #2668d9; --fa-rotate-angle: 30deg;"></i>
-                                <div class="fs-3 fw-bold text-center">Průměrný roční plat senátora</div>
-                                <div
-                                    class="fs-3 fw-bold text-center">@RenderData.NicePriceHtml(prumernyRocniPlatSenatora)</div>
-                            </a>
-                        </div>
-                        <div class="carousel-item">
-                            <a class="col d-flex flex-column justify-content-center d-block w-100 text-center"
-                               href="/politici/seznam?groupName=@(PpRepo.PoliticianGroup.Vlada.ToString("G"))&year=@(PpRepo.DefaultYear)">
-
-                                <i class="fa-light fa-money-bill-1-wave fa-7x mb-2 fa-rotate-by"
-                                   style="--fa-primary-color: #2668d9; --fa-rotate-angle: 60deg;"></i>
-                                <div class="fs-3 fw-bold text-center">Průměrný roční plat ministra</div>
-                                <div
-                                    class="fs-3 fw-bold text-center">@RenderData.NicePriceHtml(prumernyRocniPlatMinistra)</div>
-                            </a>
-                        </div>
-                    </div>
+            
+            <a class="col justify-content-center text-center align-text-bottom"
+               href="/politici/seznam?groupName=@(PpRepo.PoliticianGroup.Senatori.ToString("G"))&year=@(PpRepo.DefaultYear)">
+                <i class="fa-light fa-venus fa-3x mb-2"
+                   style="--fa-primary-color: #2668d9"></i>
+                <div class="fs-5 fw-bold text-center">Průměrný roční plat političek</div>
+                <div class="fs-4 fw-bold text-center badge rounded-pill text-bg-warning">
+                    @RenderData.NicePriceHtml(prumernyRocniPlatZeny)
                 </div>
-            </div>
-            <a class="col h-100 d-flex flex-column justify-content-center text-center" href="/politici/seznam">
+            </a>
+            <a class="col justify-content-center text-center align-text-bottom"
+               href="/politici/seznam?groupName=@(PpRepo.PoliticianGroup.Senatori.ToString("G"))&year=@(PpRepo.DefaultYear)">
+                <i class="fa-light fa-mars fa-3x mb-2"
+                   style="--fa-primary-color: #2668d9;"></i>
+                <div class="fs-5 fw-bold text-center">Průměrný roční plat politiků</div>
+                <div class="fs-4 fw-bold text-center badge rounded-pill text-bg-warning">
+                    @RenderData.NicePriceHtml(prumernyRocniPlatMuzi)
+                </div>
+            </a>
 
-                <i class="fa-duotone fa-solid fa-people-group fa-7x mb-2"
+            <a class="col justify-content-center text-center align-text-bottom"
+               href="/politici/seznam">
+
+                <i class="fa-duotone fa-solid fa-people-group fa-3x mb-2"
                    style="--fa-primary-color: #2668d9; --fa-secondary-color: #2668d9;"></i>
-                <div class="fs-3 fw-bold text-center">Počet politiků v databázi</div>
-                <div class="fs-3 fw-bold text-center">@(HlidacStatu.Util.RenderData.NiceNumber(stats.PocetOsobPozadano))</div>
+                <div class="fs-5 fw-bold text-center">Počet politiků<br />v databázi</div>
+                <div class="fs-4 fw-bold text-center badge rounded-pill text-bg-warning">@(HlidacStatu.Util.RenderData.NiceNumber(stats.PocetOsobPozadano))</div>
 
             </a>
-            <a class="col h-100 d-flex flex-column justify-content-center text-center" href="/politici/organizace">
+            <a class="col justify-content-center text-center align-text-bottom"
+               href="/politici/organizace">
 
-                <i class="fa-light fa-building-magnifying-glass fa-7x mb-2" style="--fa-primary-color: #2668d9;"></i>
-                <div class="fs-3 fw-bold text-center">Počet organizací v databázi</div>
-                <div
-                    class="fs-3 fw-bold text-center">@(HlidacStatu.Util.RenderData.NiceNumber(stats.PocetOrganizaciPozadano))</div>
+                <i class="fa-light fa-building-magnifying-glass fa-3x mb-2" style="--fa-primary-color: #2668d9;"></i>
+                <div class="fs-5 fw-bold text-center">Počet organizací<br />v databázi</div>
+                <div class="fs-4 fw-bold text-center badge rounded-pill text-bg-warning">
+                    @(HlidacStatu.Util.RenderData.NiceNumber(stats.PocetOrganizaciPozadano))
+                </div>
 
             </a>
+        </div>
+        <div class="row mt-5">
+
+            <a class="col justify-content-center text-center align-text-bottom"
+               href="/politici/seznam?groupName=@(PpRepo.PoliticianGroup.Poslanci.ToString("G"))&year=@(PpRepo.DefaultYear)">
+
+                <i class="fa-light fa-money-bill-wheat fa-3x mb-2"
+                   style="--fa-primary-color: #2668d9;"></i>
+                <div class="fs-5 fw-bold text-center">Průměrný počet placených pozic</div>
+                <div class="fs-4 fw-bold text-center badge rounded-pill text-bg-warning">
+                    @RenderData.NiceNumber(pocetFunkci, showDecimal: RenderData.ShowDecimalVal.Show)
+                </div>
+            </a>
+
+            <a class="col justify-content-center text-center align-text-bottom"
+               href="/politici/seznam?groupName=@(PpRepo.PoliticianGroup.Poslanci.ToString("G"))&year=@(PpRepo.DefaultYear)">
+
+                <i class="fa-light fa-money-bill-1-wave fa-3x mb-2"
+                   style="--fa-primary-color: #2668d9;"></i>
+                <div class="fs-5 fw-bold text-center">Průměrný roční plat poslance</div>
+                <div class="fs-4 fw-bold text-center badge rounded-pill text-bg-warning">
+                    @RenderData.NicePriceHtml(prumernyRocniPlatPoslance)
+                </div>
+            </a>
+
+            <a class="col justify-content-center text-center align-text-bottom"
+               href="/politici/seznam?groupName=@(PpRepo.PoliticianGroup.Senatori.ToString("G"))&year=@(PpRepo.DefaultYear)">
+                <i class="fa-light fa-money-bill-1-wave fa-3x mb-2 fa-rotate-by"
+                   style="--fa-primary-color: #2668d9; --fa-rotate-angle: 30deg;"></i>
+                <div class="fs-5 fw-bold text-center">Průměrný roční plat senátora</div>
+                <div class="fs-4 fw-bold text-center badge rounded-pill text-bg-warning">
+                    @RenderData.NicePriceHtml(prumernyRocniPlatSenatora)
+                </div>
+            </a>
+            <a class="col justify-content-center text-center align-text-bottom"
+               href="/politici/seznam?groupName=@(PpRepo.PoliticianGroup.Vlada.ToString("G"))&year=@(PpRepo.DefaultYear)">
+
+                <i class="fa-light fa-money-bill-1-wave fa-3x mb-2 fa-rotate-by"
+                   style="--fa-primary-color: #2668d9; --fa-rotate-angle: 60deg;"></i>
+                <div class="fs-5 fw-bold text-center">Průměrný roční plat ministra</div>
+                <div class="fs-4 fw-bold text-center badge rounded-pill text-bg-warning">
+                    @RenderData.NicePriceHtml(prumernyRocniPlatMinistra)
+                </div>
+            </a>
+
         </div>
     </div>
 </section>
@@ -132,7 +187,8 @@
                 <div class="position-relative fa-beat fa-7x mb-2" style="--fa-animation-duration: 2s;">
                     <i class="fa-duotone fa-solid fa-box-ballot"></i>
                     <div class="position-absolute translate-middle"
-                         style="left: 50%;top: 70%;font-weight: 700;font-size: 0.25em;color: #a7a8a9;">Volby
+                         style="left: 50%;top: 70%;font-weight: 700;font-size: 0.25em;color: #a7a8a9;">
+                        Volby
                     </div>
                 </div>
                 <div class="fs-3 fw-bold text-center">Jak jsou voleni?</div>
@@ -140,7 +196,7 @@
         </div>
     </div>
 </section>
-<hr/>
+<hr />
 
 @* <section class="d-flex align-items-center justify-content-center"> *@
 @*     <div class="container"> *@

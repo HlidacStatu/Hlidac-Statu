@@ -196,6 +196,13 @@ namespace HlidacStatu.Repositories
                 osoba.PrijmeniAscii = TextUtil.RemoveDiacritics(osoba.Prijmeni);
                 osoba.PuvodniPrijmeniAscii = TextUtil.RemoveDiacritics(osoba.PuvodniPrijmeni);
 
+                //trim all
+                osoba.Jmeno = osoba.Jmeno?.Trim();
+                osoba.Prijmeni = osoba.Prijmeni?.Trim();
+                osoba.PuvodniPrijmeni = osoba.PuvodniPrijmeni?.Trim();
+                osoba.TitulPred = osoba.TitulPred?.Trim();
+                osoba.TitulPo = osoba.TitulPo?.Trim();
+
                 if (string.IsNullOrEmpty(osoba.NameId))
                 {
                     osoba.NameId = GetUniqueNamedId(osoba);
@@ -205,7 +212,7 @@ namespace HlidacStatu.Repositories
 
                 if (osoba.Pohlavi != "f" || osoba.Pohlavi != "m")
                 {
-                    var sex = osoba.PohlaviCalculated();
+                    osoba.Pohlavi = osoba.PohlaviCalculated();
                 }
 
                 db.Osoba.Attach(osoba);

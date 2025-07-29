@@ -28,7 +28,7 @@
             Name = "Politik",
             HtmlRender = (m) =>
             {
-                return $"<a href='/politici/{m.Osoba.NameId}'>{m.Osoba.FullNameWithYear()}</a> <a href='{m.Osoba.GetUrl(false)}' class='small'>(profil)</a>";
+                return $"<a href='/politici/politik/{m.Osoba.NameId}'>{m.Osoba.FullNameWithYear()}</a>";
             },
             OrderValueRender = (m) =>
             {

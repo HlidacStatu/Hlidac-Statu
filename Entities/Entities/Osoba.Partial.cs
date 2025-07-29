@@ -95,7 +95,7 @@ namespace HlidacStatu.Entities
 
         public string FullName(bool html = false)
         {
-            string ret = string.Format("{0} {1} {2}{3}", TitulPred, Jmeno, Prijmeni, string.IsNullOrEmpty(TitulPo) ? "" : ", " + TitulPo).Trim();
+            string ret = string.Format("{0} {1} {2}{3}", TitulPred?.Trim(), Jmeno?.Trim(), Prijmeni?.Trim(), string.IsNullOrWhiteSpace(TitulPo) ? "" : ", " + TitulPo?.Trim()).Trim();
             if (html)
                 ret = ret.Replace(" ", "&nbsp;");
             return ret;
@@ -145,7 +145,7 @@ namespace HlidacStatu.Entities
 
         public string PohlaviCalculated()
         {
-            var sex = new Devmasters.Lang.CS.Vokativ(FullName()).Sex;
+            var sex = Devmasters.Lang.CS.SexFromName.GetSex(this.Jmeno.Trim(),this.Prijmeni.Trim());
             switch (sex)
             {
                 case Devmasters.Lang.CS.Vokativ.SexEnum.Woman:

@@ -9,6 +9,9 @@ section {
     padding-top: 4rem;
     padding-bottom: 1rem;
 }
+section .small-padding {
+    padding-top: 1rem;
+}
 
 .alter-bg-color {
     background: #f2f5f7;

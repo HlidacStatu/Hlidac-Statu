@@ -70,6 +70,23 @@ public static class PpRepo
             .Where(m=> m.Status == PpPrijem.StatusPlatu.Potvrzen);
     }
 
+    public static string[] AllNameId(bool? zeny, int rok = DefaultYear)
+    {
+        using var db = new DbEntities();
+        var q = BasePotvrzenePlaty(db, rok)
+            .AsNoTracking()
+            .Join(db.Osoba,
+                p => p.Nameid,
+                o => o.NameId,
+                (p, o) => o);
+        if (zeny.HasValue)
+            q = q.Where(o => o.Pohlavi == (zeny.Value ? "f" : "m"));
+        var qres = q.Select(o => o.NameId)
+            .Distinct();
+        var res = qres.ToArray();
+        return res;
+    }
+
     public static List<PpPrijem> AktualniRok(this ICollection<PpPrijem> prijmy, int rok = DefaultYear)
     {
         using var db = new DbEntities();
@@ -537,6 +554,28 @@ public static class PpRepo
         Vlada
     }
 
+    public async static Task<List<PpPrijem>> GetPrijmyBySex(bool? woman, int year = DefaultYear)
+    {
+        await using var db = new DbEntities();
+
+        var filterosoby = db.Osoba.AsQueryable();
+        if (woman.HasValue)
+        {
+            var pohlavi = woman.Value ? "f" : "m";
+            filterosoby = filterosoby.Where(m => m.Pohlavi == pohlavi);
+        }
+        var q = BasePotvrzenePlaty(db, DefaultYear)
+            .AsNoTracking()
+            .Join(filterosoby,
+                p => p.Nameid,
+                o => o.NameId,
+                (p, o) => p)
+            .Include(p => p.Organizace).ThenInclude(o => o.FirmaDs)
+            ;
+
+        return await q.ToListAsync();
+    }
+
     private static string[] GetIcaForGroup(PoliticianGroup group) =>
         group switch
         {
@@ -561,13 +600,6 @@ public static class PpRepo
             case PoliticianGroup.Poslanci:
             case PoliticianGroup.Senatori:
             case PoliticianGroup.KrajstiZastupitele:
-                var ica = GetIcaForGroup(group);
-                query = BasePotvrzenePlaty(db,year)
-                    .AsNoTracking()
-                    .Where(p => p.Organizace.FirmaDs != null &&
-                                ica.Contains(p.Organizace.FirmaDs.Ico));
-                break;
-            
             case PoliticianGroup.Vlada:
                 var nameIds = await GetNameIdsForGroupAsync(group, year);
                 query = BasePotvrzenePlaty(db,year)

@@ -103,6 +103,20 @@ inner join Firma_DS fds
 
         return res;
     }
+
+    public static Devmasters.Cache.LocalMemory.ManagerAsync<PuPlatStat, int> GetPlatyPerYearStatCache =
+        new Devmasters.Cache.LocalMemory.ManagerAsync<PuPlatStat, int>("GetPlatyUrednikuPerYearStatCache",
+            async rok =>
+            {
+                var data = await PuRepo.GetPlatyAsync(rok);
+                if (data == null)
+                    return new PuPlatStat(Array.Empty<PuPlat>());
+                var platyStat = new PuPlatStat(data);
+
+                return platyStat;
+            }, TimeSpan.FromMinutes(60), m => m.ToString());
+
+
     public static async Task<PuRokOrganizaceStat> GetGlobalStatOrganizaceAsync(int rok = DefaultYear)
     {
      
