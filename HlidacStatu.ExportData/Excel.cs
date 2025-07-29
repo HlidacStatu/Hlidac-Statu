@@ -10,7 +10,7 @@ namespace HlidacStatu.ExportData
 
         public byte[] ExportData(Data data)
         {
-            ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
+            ExcelPackage.License.SetNonCommercialOrganization("HlidacStatu");
             using (var p = new ExcelPackage())
             {
                 //A workbook must have at least on cell, so lets add one... 
