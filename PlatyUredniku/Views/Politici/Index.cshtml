@@ -4,18 +4,33 @@
 @using HlidacStatu.Util
 
 @inject ZiggyCreatures.Caching.Fusion.IFusionCache cache;
+@functions {
+    private bool _sectionBgSwitch = true;
+
+    public string GetBgClass(bool toggle = true)
+    {
+        if (toggle)
+            _sectionBgSwitch = !_sectionBgSwitch;
+
+        return _sectionBgSwitch ? "alter-bg-color" : "";
+    }
+}
+
 @{
     int rok = PpRepo.DefaultYear;
     var stats = await PpRepo.GetGlobalStatAsync(rok);
-    List<PpPrijem> platy = (List<PpPrijem>?)ViewData["platy"];
+    Dictionary<string, PpPrijem[]> platyPerNameId = (Dictionary<string, PpPrijem[]>?)ViewData["platy"];
 
-    var prumernyRocniPlatPoslance = (await PpRepo.GetPrijmyForGroupAsync(PpRepo.PoliticianGroup.Poslanci, rok)).Average(x => x.CelkovyRocniPlatVcetneOdmen);
-    var prumernyRocniPlatSenatora = (await PpRepo.GetPrijmyForGroupAsync(PpRepo.PoliticianGroup.Senatori, rok)).Average(x => x.CelkovyRocniPlatVcetneOdmen);
-    var prumernyRocniPlatMinistra = (await PpRepo.GetPrijmyForGroupAsync(PpRepo.PoliticianGroup.Vlada, rok)).Average(x => x.CelkovyRocniPlatVcetneOdmen);
+    var prumernyRocniPlatPoslance = (await PpRepo.GetPrijmyForGroupAsync(PpRepo.PoliticianGroup.Poslanci, rok)).Where(x => x.CelkovyRocniPlatVcetneOdmen > 0).Average(x => x.CelkovyRocniPlatVcetneOdmen);
+    var prumernyRocniPlatSenatora = (await PpRepo.GetPrijmyForGroupAsync(PpRepo.PoliticianGroup.Senatori, rok)).Where(x => x.CelkovyRocniPlatVcetneOdmen > 0).Average(x => x.CelkovyRocniPlatVcetneOdmen);
+    var prumernyRocniPlatMinistra = (await PpRepo.GetPrijmyForGroupAsync(PpRepo.PoliticianGroup.Vlada, rok)).Where(x => x.CelkovyRocniPlatVcetneOdmen > 0).Average(x => x.CelkovyRocniPlatVcetneOdmen);
 
     var vsichniNameIds = await PpRepo.GetNameIdsForGroupAsync(PpRepo.PoliticianGroup.Vse, rok);
-    var prumernyRocniPlatMuzi = (await PpRepo.GetPrijmyBySex(false)).Average(x => x.CelkovyRocniPlatVcetneOdmen);
-    var prumernyRocniPlatZeny = (await PpRepo.GetPrijmyBySex(true)).Average(x => x.CelkovyRocniPlatVcetneOdmen);
+    var prumernyRocniPlatMuzi = (await PpRepo.GetPrijmyBySexAsync(false))
+        .Select(m => m.Value.Sum(m => m.CelkovyRocniPlatVcetneOdmen)).Average();
+
+    var prumernyRocniPlatZeny = (await PpRepo.GetPrijmyBySexAsync(true))
+        .Select(m => m.Value.Sum(m => m.CelkovyRocniPlatVcetneOdmen)).Average();
 
     decimal pocetFunkci = (decimal)(await PpRepo.GetPrijmyForGroupAsync(PpRepo.PoliticianGroup.Vse, rok))
             .GroupBy(k => k.Nameid, (k, v) => new { nameid = k, count = v.Count() })
@@ -34,145 +49,154 @@
     </ol>
 }
 
-<section class="d-flex align-items-center justify-content-start">
-    <div class="container d-flex">
-        <div class="p-2 flex-grow-1">
-            <div class="fs-2 fw-bold">Kolik berou čeští politici?</div>
-            <p>
-                Projekt "Platy politiků" je součástí Hlídače státu. Zjistěte, jaký příjem mají politici a kolik zastávají
-                funkcí.
-                Data jsme shromáždili na základě oficiální žádosti podle zákona o svobodném přístupu k informacím.
-                Jedná se o příjmy z výkonu politické či exekutivní funkce.
-                <strong>
-                    od státních, polostátních nebo ? organizací,
-                    kde působí. (teda všechno z daní?)
-                </strong>
-            </p>
-
-            @{
-                var groupList = new PpRepo.PoliticianGroup[]
-                {
-                        PpRepo.PoliticianGroup.Vlada,
-                        PpRepo.PoliticianGroup.Poslanci,
-                        PpRepo.PoliticianGroup.Senatori,
-                        PpRepo.PoliticianGroup.KrajstiZastupitele,
-                        PpRepo.PoliticianGroup.Vse,
-                };
-            }
-            @foreach (var item in groupList)
-            {
-                <a class="btn btn-primary " href="/politici/seznam?groupName=@(item.ToString())&year=@(PpRepo.DefaultYear)" role="button">
-                    @(item.ToNiceDisplayName())
-                    <span class="badge text-bg-secondary bg-danger">@((await PpRepo.GetNameIdsForGroupAsync(item, rok)).Count)</span>
-                </a>
-
-                <br />
-            }
-
-        </div>
-        <div class="p-2">
-            <img class="img-fluid" src="Content/Img/politik u pultu.jpg" alt="politik u pultu" />
-        </div>
-    </div>
-</section>
-<section class="d-flex align-items-center justify-content-center alter-bg-color">
+<section class="d-flex align-items-center justify-content-start @(GetBgClass()) " style="padding-top:1rem;">
     <div class="container">
         <div class="row">
-            
-            <a class="col justify-content-center text-center align-text-bottom"
-               href="/politici/seznam?groupName=@(PpRepo.PoliticianGroup.Senatori.ToString("G"))&year=@(PpRepo.DefaultYear)">
-                <i class="fa-light fa-venus fa-3x mb-2"
-                   style="--fa-primary-color: #2668d9"></i>
-                <div class="fs-5 fw-bold text-center">Průměrný roční plat političek</div>
-                <div class="fs-4 fw-bold text-center badge rounded-pill text-bg-warning">
-                    @RenderData.NicePriceHtml(prumernyRocniPlatZeny)
-                </div>
-            </a>
-            <a class="col justify-content-center text-center align-text-bottom"
-               href="/politici/seznam?groupName=@(PpRepo.PoliticianGroup.Senatori.ToString("G"))&year=@(PpRepo.DefaultYear)">
-                <i class="fa-light fa-mars fa-3x mb-2"
-                   style="--fa-primary-color: #2668d9;"></i>
-                <div class="fs-5 fw-bold text-center">Průměrný roční plat politiků</div>
-                <div class="fs-4 fw-bold text-center badge rounded-pill text-bg-warning">
-                    @RenderData.NicePriceHtml(prumernyRocniPlatMuzi)
-                </div>
-            </a>
+            <div class="col">
+                <p>
+                    Projekt "Platy politiků" je součástí Hlídače státu. Zjistěte, jaký příjem mají politici a kolik zastávají
+                    funkcí.
+                    Data jsme shromáždili na základě oficiální žádosti podle zákona o svobodném přístupu k informacím.
+                    Jedná se o příjmy z výkonu politické či exekutivní funkce.
+                    <strong>
+                        od státních, polostátních nebo ? organizací,
+                        kde působí. (teda všechno z daní?)
+                    </strong>
+                </p>
+                <h2>Kolik berou čeští politici?</h2>
 
-            <a class="col justify-content-center text-center align-text-bottom"
-               href="/politici/seznam">
-
-                <i class="fa-duotone fa-solid fa-people-group fa-3x mb-2"
-                   style="--fa-primary-color: #2668d9; --fa-secondary-color: #2668d9;"></i>
-                <div class="fs-5 fw-bold text-center">Počet politiků<br />v databázi</div>
-                <div class="fs-4 fw-bold text-center badge rounded-pill text-bg-warning">@(HlidacStatu.Util.RenderData.NiceNumber(stats.PocetOsobPozadano))</div>
-
-            </a>
-            <a class="col justify-content-center text-center align-text-bottom"
-               href="/politici/organizace">
-
-                <i class="fa-light fa-building-magnifying-glass fa-3x mb-2" style="--fa-primary-color: #2668d9;"></i>
-                <div class="fs-5 fw-bold text-center">Počet organizací<br />v databázi</div>
-                <div class="fs-4 fw-bold text-center badge rounded-pill text-bg-warning">
-                    @(HlidacStatu.Util.RenderData.NiceNumber(stats.PocetOrganizaciPozadano))
-                </div>
-
-            </a>
+            </div>
         </div>
-        <div class="row mt-5">
+        <div class="row">
+            <div class="col-12 col-lg-4">
+                <h5>Přehled politiků</h5>
 
-            <a class="col justify-content-center text-center align-text-bottom"
-               href="/politici/seznam?groupName=@(PpRepo.PoliticianGroup.Poslanci.ToString("G"))&year=@(PpRepo.DefaultYear)">
 
-                <i class="fa-light fa-money-bill-wheat fa-3x mb-2"
-                   style="--fa-primary-color: #2668d9;"></i>
-                <div class="fs-5 fw-bold text-center">Průměrný počet placených pozic</div>
-                <div class="fs-4 fw-bold text-center badge rounded-pill text-bg-warning">
-                    @RenderData.NiceNumber(pocetFunkci, showDecimal: RenderData.ShowDecimalVal.Show)
-                </div>
-            </a>
+                @{
+                    var groupList = new PpRepo.PoliticianGroup[]
+                    {
+                                PpRepo.PoliticianGroup.Vlada,
+                                PpRepo.PoliticianGroup.Poslanci,
+                                PpRepo.PoliticianGroup.Senatori,
+                                PpRepo.PoliticianGroup.KrajstiZastupitele,
+                                PpRepo.PoliticianGroup.Vse,
+                    };
+                }
+                <table style="border:none">
+                    @foreach (var item in groupList)
+                    {
+                        <tr>
+                            <td>
+                                <a class="btn btn-outline-primary btn-sm text-bg-light w-100" href="/politici/seznam/@(item.ToString())?year=@(PpRepo.DefaultYear)" role="button">
+                                    @(item.ToNiceDisplayName())
+                                    <span class="badge text-bg-secondary bg-danger">@((await PpRepo.GetNameIdsForGroupAsync(item, rok)).Count)</span>
+                                </a>
+                                <br />
+                            </td>
 
-            <a class="col justify-content-center text-center align-text-bottom"
-               href="/politici/seznam?groupName=@(PpRepo.PoliticianGroup.Poslanci.ToString("G"))&year=@(PpRepo.DefaultYear)">
+                        </tr>
+                    }
+                </table>
+            </div>
+            <div class="col-12 col-lg-4">
+                <h5>Top příjmy</h5>
+                <table class="table table-striped table-hover">
+                    <thead>
+                        <tr>
+                            <th>Jméno</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var plat in platyPerNameId.OrderByDescending(p => p.Value.Sum(m => m.CelkovyRocniPlatVcetneOdmen)).Take(3))
+                        {
+                            <tr>
+                                <td>@Osoby.GetByNameId.Get(plat.Key).FullName()</td>
+                                <td class="number">@Html.Raw(HlidacStatu.Util.RenderData.ShortNicePrice(plat.Value.Sum(m => m.CelkovyRocniPlatVcetneOdmen), html: true))</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+                <a class="btn btn-primary btn-sm" href="/politici/seznam/@(PpRepo.PoliticianGroup.Vse.ToString("G"))?year=@(PpRepo.DefaultYear)">Všechny platy politiků</a>
+            </div>
+            <div class="col-12 col-lg-4">
+                <h5>Top kumulace</h5>
+                <table class="table table-striped table-hover">
+                    <thead>
+                        <tr>
+                            <th>Jméno</th>
+                            <th colspan="2">Počet funkc9</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var plat in platyPerNameId.OrderByDescending(p => p.Value.Where(m => m.CelkovyRocniPlatVcetneOdmen > 0).Count()).Take(3))
+                        {
+                            <tr>
+                                <td>@Osoby.GetByNameId.Get(plat.Key).FullName()</td>
+                                <td class="number">@(plat.Value.Count())</td>
+                                <td class="number">@Html.Raw(HlidacStatu.Util.RenderData.ShortNicePrice(plat.Value.Sum(m => m.CelkovyRocniPlatVcetneOdmen), html: true))</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+                <a class="btn btn-primary btn-sm" href="/politici/reporty">Další reporty a analýzy</a>
 
-                <i class="fa-light fa-money-bill-1-wave fa-3x mb-2"
-                   style="--fa-primary-color: #2668d9;"></i>
-                <div class="fs-5 fw-bold text-center">Průměrný roční plat poslance</div>
-                <div class="fs-4 fw-bold text-center badge rounded-pill text-bg-warning">
-                    @RenderData.NicePriceHtml(prumernyRocniPlatPoslance)
-                </div>
-            </a>
-
-            <a class="col justify-content-center text-center align-text-bottom"
-               href="/politici/seznam?groupName=@(PpRepo.PoliticianGroup.Senatori.ToString("G"))&year=@(PpRepo.DefaultYear)">
-                <i class="fa-light fa-money-bill-1-wave fa-3x mb-2 fa-rotate-by"
-                   style="--fa-primary-color: #2668d9; --fa-rotate-angle: 30deg;"></i>
-                <div class="fs-5 fw-bold text-center">Průměrný roční plat senátora</div>
-                <div class="fs-4 fw-bold text-center badge rounded-pill text-bg-warning">
-                    @RenderData.NicePriceHtml(prumernyRocniPlatSenatora)
-                </div>
-            </a>
-            <a class="col justify-content-center text-center align-text-bottom"
-               href="/politici/seznam?groupName=@(PpRepo.PoliticianGroup.Vlada.ToString("G"))&year=@(PpRepo.DefaultYear)">
-
-                <i class="fa-light fa-money-bill-1-wave fa-3x mb-2 fa-rotate-by"
-                   style="--fa-primary-color: #2668d9; --fa-rotate-angle: 60deg;"></i>
-                <div class="fs-5 fw-bold text-center">Průměrný roční plat ministra</div>
-                <div class="fs-4 fw-bold text-center badge rounded-pill text-bg-warning">
-                    @RenderData.NicePriceHtml(prumernyRocniPlatMinistra)
-                </div>
-            </a>
-
+            </div>
         </div>
     </div>
 </section>
-<section class="d-flex align-items-center justify-content-start">
-    <div class="container d-flex flex-column">
-        <div class="p-2">Politici s největším příjmem</div>
-        <div class="p-2">Politici s největším počtem funkcí</div>
-        <div class="p-2">Politici bez kumulace funkcí</div>
+<section class="d-flex align-items-center justify-content-center  @(GetBgClass()) ">
+    <div class="container">
+        <div class="row">
+            <div class="col-6 col-lg-3 justify-content-center text-center align-text-bottom">
+                <a class=""
+                   href="/politici/reporty/">
+                    <i class="fa-light fa-venus fa-3x mb-2"
+                       style="--fa-primary-color: #2668d9"></i>
+                    <div class="fs-5 fw-bold text-center">Průměrný roční plat političek</div>
+                    <div class="fs-4 fw-bold text-center badge rounded-pill text-bg-warning">
+                        @RenderData.NicePriceHtml(prumernyRocniPlatZeny)
+                    </div>
+                </a>
+            </div>
+            <div class="col-6 col-lg-3 justify-content-center text-center align-text-bottom">
+
+                <a class=""
+                   href="/politici/seznam">
+
+                    <i class="fa-duotone fa-solid fa-people-group fa-3x mb-2"
+                       style="--fa-primary-color: #2668d9; --fa-secondary-color: #2668d9;"></i>
+                    <div class="fs-5 fw-bold text-center">Počet politiků<br />v databázi</div>
+                    <div class="fs-4 fw-bold text-center badge rounded-pill text-bg-warning">@(HlidacStatu.Util.RenderData.NiceNumber(stats.PocetOsobPozadano))</div>
+
+                </a>
+            </div>
+            <div class="col-6 col-lg-3 justify-content-center text-center align-text-bottom">
+                <a href="/politici/reporty">
+
+                    <i class="fa-light fa-money-bill-wheat fa-3x mb-2"
+                       style="--fa-primary-color: #2668d9;"></i>
+                    <div class="fs-5 fw-bold text-center">Průměrný počet placených pozic</div>
+                    <div class="fs-4 fw-bold text-center badge rounded-pill text-bg-warning">
+                        @RenderData.NiceNumber(pocetFunkci, showDecimal: RenderData.ShowDecimalVal.Show)
+                    </div>
+                </a>
+            </div>
+            <div class="col-6 col-lg-3 justify-content-center text-center align-text-bottom">
+                <a href="/politici/reporty">
+
+                    <i class="fa-light fa-chart-area fa-3x mb-2 text-warning"></i>
+                    <div class="fs-5 fw-bold text-center">Žebříčky, analýzy, přehledy</div>
+                    <div class="fs-4 fw-bold text-center badge rounded-pill text-bg-warning">
+                        Další reporty a statistiky
+                    </div>
+                </a>
+            </div>
+        </div>
     </div>
 </section>
-<section class="d-flex align-items-center justify-content-center alter-bg-color">
+
+<section class="d-flex align-items-center justify-content-center  @(GetBgClass()) ">
     <div class="container">
         <div class="row">
             <div class="col h-100 d-flex flex-column justify-content-center text-center">

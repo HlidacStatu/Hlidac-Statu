@@ -24,8 +24,8 @@ public class HashTag : TagHelper
 
         if (this.Typ == HlidacStatu.Entities.PuOrganizaceMetadata.TypMetadat.PlatyUredniku)
             output.Attributes.SetAttribute("href", $"/urednici/Oblast/{PuOrganizaceTag.NormalizeTag(Tag)}");
-        else
-            output.Attributes.SetAttribute("href", $"/politici/Oblast/{PuOrganizaceTag.NormalizeTag(Tag)}");
+        //else
+        //    output.Attributes.SetAttribute("href", $"/politici/Oblast/{PuOrganizaceTag.NormalizeTag(Tag)}");
 
         output.Attributes.SetAttribute("class", $"hashtag text-bg-{this.Color.ToString().ToLower()} {AdditionalClass}");
         if (!string.IsNullOrEmpty( Style ) )

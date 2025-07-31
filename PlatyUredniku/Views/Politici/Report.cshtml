@@ -1,0 +1,46 @@
+﻿@using HlidacStatu.Entities
+@using HlidacStatu.Repositories
+
+
+@section breadcrumbs
+{
+    <ol class="breadcrumb">
+        <li>
+            <a asp-action="Index">Platy úředníků</a>
+        </li>
+        <li>
+            <a asp-action="Analyzy">Analýzy</a>
+        </li>
+        <li>
+            Přehled jednotlivých platů
+        </li>
+        <li class="active">
+            @ViewData["title"]
+        </li>
+    </ol>
+}
+
+@functions {
+    private bool _sectionBgSwitch = true;
+
+    public string GetBgClass(bool toggle = true)
+    {
+        if (toggle)
+            _sectionBgSwitch = !_sectionBgSwitch;
+
+        return _sectionBgSwitch ? "alter-bg-color" : "";
+    }
+}
+
+<section class="d-flex align-items-center justify-content-center  @(GetBgClass()) pt-5">
+    <div class="container">
+        <h2>@ViewData["title"]</h2>
+
+    </div>
+</section>
+<section class="d-flex align-items-center justify-content-center  @(GetBgClass())">
+    <div class="container">
+        <p class="lead">@Html.Raw(ViewData["noteHtml"])</p>
+
+    </div>
+</section>

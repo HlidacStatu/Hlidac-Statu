@@ -22,7 +22,7 @@
             Projekt <b>Platy</b> je součástí Hlídače státu. <br />
             <i class="fa-solid fa-circle-1"></i> Zjistěte, jaký roční příjem mají významní politici či kolik zastávají funkcí. Jde o novinku, ptáme se poprvé na rok 2024. A budeme to opakovat každý rok.
             <br />
-            <i class="fa-solid fa-circle-2"></i> Informace o platech a odměnách</b> soudců, vedení úřadů, státních podniků či příspěvkových organizací v ČR u nás najdete už spoustu let.
+            <i class="fa-solid fa-circle-2"></i> Informace o platech a odměnách soudců, vedení úřadů, státních podniků či příspěvkových organizací v ČR u nás najdete už spoustu let.
         </p>
         <p>
             Data shromážďujeme na základě oficiální žádosti podle zákona o svobodném přístupu k informacím.             Platy a odměny jsou stanoveny
@@ -50,7 +50,7 @@
                 </p>
                 <p>Ohledně platů jsme oslovili jak  organizace, kde politici působí, tak 911 samotných politiků <small>(na které jsme našli platný email)</small>.</p>
                 <p>
-                    <a asp-controller="Politici" asp-action="Index" class="btn btn-primary btn-sm">Příjmy a placené funkce všech politiků <span class="badge text-bg-danger">@(@PuRepo.DefaultYear)</span></a>
+                    <a asp-controller="Politici" asp-action="Index" class="btn btn-primary btn-sm">Příjmy a placené funkce všech politiků</a>
                 </p>
 
             </div>
@@ -63,15 +63,7 @@
                     Najdete u nás platy @(HlidacStatu.Util.RenderData.NiceNumber(puPlatyStats.Pocet)) lidí a pozic.
                 </p>
                 <p>
-                    <a asp-controller="Urednici" asp-action="Index" class="btn btn-primary btn-sm">Vše o platech úředníků a manažerů <span class="badge text-bg-danger">@(@PuRepo.DefaultYear)</span></a>
-                </p>
-                <div class="clearfix"></div>
-                <p class="mb-2 mt-4 text-body-secondary ">
-                    Oblasti:
-                    @foreach (var item in PuRepo.MainTags)
-                    {
-                        <hashtag tag="@item" typ="PlatyUredniku" additional-class="badge rounded-pill border me-3 mb-2" style="font-size:0.9em"></hashtag>
-                    }
+                    <a asp-controller="Urednici" asp-action="Index" class="btn btn-primary btn-sm">Vše o platech úředníků a manažerů</span></a>
                 </p>
 
             </div>
@@ -80,16 +72,6 @@
     </div>
 </section>
 
-<section class="d-flex align-items-center justify-content-center alter-bg-color">
-    <div class="container">
-        <div class="row">
-            <div class="col-sm-12 col-md-6 border-end border-black">
-            </div>
-            <div class="col-sm-12 col-md-6">
-            </div>
-        </div>
-    </div>
-</section>
 
 <p class="m-5">
 

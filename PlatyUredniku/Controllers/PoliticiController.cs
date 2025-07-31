@@ -24,80 +24,60 @@ public class PoliticiController : Controller
         _cache = cache;
     }
 
-    [HlidacCache(60 * 60,"rok")]
+    [HlidacCache(60 * 60, "rok")]
     public async Task<IActionResult> Index(int rok = PpRepo.DefaultYear)
     {
-            //titulka politiku
-            var platyTask = _cache.GetOrSetAsync<List<PpPrijem>>(
-                $"{nameof(PpRepo.GetPlatyAsync)}_{PpRepo.DefaultYear}-politici",
-                _ => PpRepo.GetPlatyAsync(PpRepo.DefaultYear)
-            );
-            var platyPolitiku = await platyTask;
-            ViewData["platy"] = platyPolitiku;
+        //titulka politiku
+        var platyTask = _cache.GetOrSetAsync<Dictionary<string, PpPrijem[]>>(
+            $"{nameof(PpRepo.GetPlatyGroupedByNameIdAsync)}_{rok}-politici",
+            _ => PpRepo.GetPlatyGroupedByNameIdAsync(rok)
+        );
+        var platyPolitiku = await platyTask;
+        ViewData["platy"] = platyPolitiku;
 
+        return View();
+
+    }
+
+    [HlidacCache(60 * 60, "id;rok")]
+    public async Task<IActionResult> Politik(string id, int rok = PpRepo.DefaultYear)
+    {
+        //detail politika
+
+        ViewBag.Title = $"Platy politika {id}";
+        var osoba = Osoby.GetByNameId.Get(id);
+        if (osoba is null)
             return View();
-        
-    }
 
-    [HlidacCache(60 * 60, "id;rok")]
-    public async Task<IActionResult> Politik(string id, int rok=PpRepo.DefaultYear)
-    {
-            //detail politika
+        var detail = await _cache.GetOrSetAsync<List<PpPrijem>>(
+            $"{nameof(PpRepo.GetPrijmyPolitika)}_{id}-politici",
+            _ => PpRepo.GetPrijmyPolitika(id)
+        );
 
-            ViewBag.Title = $"Platy politika {id}";
-            var osoba = Osoby.GetByNameId.Get(id);
-            if (osoba is null)
-                return View();
-
-            var detail = await _cache.GetOrSetAsync<List<PpPrijem>>(
-                $"{nameof(PpRepo.GetPrijmyPolitika)}_{id}-politici",
-                _ => PpRepo.GetPrijmyPolitika(id)
-            );
-
-            ViewData["osoba"] = osoba;
-
-            return View(detail);
-        
-    }
-
-
-
-    [HlidacCache(60 * 60, "id;rok")]
-    public async Task<IActionResult> Oblast(string id)
-    {
-        return View(null);// organizace);
-    }
-
-    [HlidacCache(60 * 60, "id;rok")]
-
-    public async Task<IActionResult> Detail(string id, int? rok = null)
-    {
-
-        PuOrganizace detail = null;
-        if (HlidacStatu.Util.DataValidators.CheckCZICO(id))
-        {
-            //ico
-            detail = await PpRepo.GetOrganizaceFullDetailPerIcoAsync(id);
-            ViewData["rok"] = rok ?? (detail.PrijmyPolitiku.Any() ? detail.PrijmyPolitiku.Max(m => m.Rok) : PpRepo.DefaultYear);
-        }
-        else
-        {
-            //datovka
-            detail = await PpRepo.GetOrganizaceFullDetailAsync(id);
-            ViewData["rok"] = rok ?? (detail.PrijmyPolitiku.Any() ? detail.PrijmyPolitiku.Max(m => m.Rok) : PpRepo.DefaultYear);
-        }
-
-        if (detail == null)
-            return NotFound($"Organizaci {id} jsme nenašli.");
-
+        ViewData["osoba"] = osoba;
 
         return View(detail);
+
     }
 
-    [HlidacCache(60 * 60, "*")]
-    public async Task<IActionResult> Seznam(string groupName, int? year)
+
+    public async Task<IActionResult> Reporty()
     {
-        if (!Enum.TryParse<PpRepo.PoliticianGroup>(groupName, out var politicianGroup))
+        return View();
+    }
+
+
+    [Route("Politici/Report/{id}")]
+    public async Task<IActionResult> Report(string id)
+    {
+        return View("reporty/report"+id);
+    }
+
+
+    [HlidacCache(60 * 60, "*")]
+    public async Task<IActionResult> Seznam(string id, int? year)
+    {
+        if (!Enum.TryParse<PpRepo.PoliticianGroup>(id, out var politicianGroup))
         {
             politicianGroup = PpRepo.PoliticianGroup.Vse;
         }
@@ -105,8 +85,8 @@ public class PoliticiController : Controller
         return View((Group: politicianGroup, Year: year ?? PpRepo.DefaultYear));
     }
 
-    [HlidacCache(60*60,"*")]
-    public async Task<IActionResult> Organizace(string id, int rok = PpRepo.DefaultYear )
+    [HlidacCache(60 * 60, "*")]
+    public async Task<IActionResult> Organizace(string id, int rok = PpRepo.DefaultYear)
     {
         ViewData["rok"] = rok;
         PuOrganizace detail = null;

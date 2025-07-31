@@ -54,7 +54,13 @@
         new ReportDataSource<(PpPrijem[] Prijem, Osoba Osoba)>.Column()
         {
             Name = "Působí v organizacích (řazeno podle počtu)",
-            HtmlRender = (m) => { return string.Join("<br />", m.Prijem.Select(n => n.Organizace.Nazev).Distinct()); },
+            HtmlRender = (m) => { return string.Join("<br />", m.Prijem
+                                            .Select(n => n.Organizace)
+                                            .Distinct()
+                                            .Select(o => $"<a href='/politici/organizace/{o.DS}'>{Devmasters.TextUtil.ShortenMe(o.Nazev,25)}</a>")
+            ); 
+            
+            },
             OrderValueRender = (m) => HlidacStatu.Util.RenderData.OrderValueFormat(m.Prijem.Count()),
         }
     );
@@ -104,7 +110,7 @@
             }
             @foreach (var item in groupList)
             {
-                <a class="btn btn@(Model.Group == item ? "" : "-outline")-primary btn-sm col @(Model.Group == item ? "disabled" : "")" href="/politici/seznam?groupName=@(item.ToString())&year=@(PpRepo.DefaultYear)" role="button">
+                <a class="btn btn@(Model.Group == item ? "" : "-outline")-primary btn-sm col @(Model.Group == item ? "disabled" : "")" href="/politici/seznam/@(item.ToString())?year=@(PpRepo.DefaultYear)" role="button">
                     @(item.ToNiceDisplayName())
                 </a>
             }

@@ -294,7 +294,23 @@ public static class PpRepo
     [
         "politici",
     ];
+    public static async Task<Dictionary<string, PpPrijem[]>> GetPlatyGroupedByNameIdAsync(int rok, bool withDetails = false, string ico = null)
+    {
+    
+        await using var db = new DbEntities();
+        var q = BasePotvrzenePlaty(db, rok)
+            .AsNoTracking();
+        if (withDetails || string.IsNullOrEmpty(ico) == false)
+            q = q.Include(i => i.Organizace).ThenInclude(o => o.FirmaDs);
+        if (!string.IsNullOrEmpty(ico))
+            q = q.Where(m => m.Organizace.FirmaDs.Ico == ico);
+        q = q.Where(p => p.Rok == rok);
 
+        var qGrouped = q
+            .GroupBy(k => k.Nameid, v=>v, (k, v) => new { nameId = k, platy = v.ToArray()});
+
+        return await qGrouped.ToDictionaryAsync(k => k.nameId, v => v.platy);
+    }
     public static async Task<List<PpPrijem>> GetPlatyAsync(int rok, bool withDetails = false, string ico = null)
     {
         await using var db = new DbEntities();
@@ -554,7 +570,7 @@ public static class PpRepo
         Vlada
     }
 
-    public async static Task<List<PpPrijem>> GetPrijmyBySex(bool? woman, int year = DefaultYear)
+    public async static Task<Dictionary<string, PpPrijem[]>> GetPrijmyBySexAsync(bool? woman, int year = DefaultYear)
     {
         await using var db = new DbEntities();
 
@@ -564,16 +580,19 @@ public static class PpRepo
             var pohlavi = woman.Value ? "f" : "m";
             filterosoby = filterosoby.Where(m => m.Pohlavi == pohlavi);
         }
-        var q = BasePotvrzenePlaty(db, DefaultYear)
+        var nameIds = await BasePotvrzenePlaty(db, DefaultYear)
             .AsNoTracking()
             .Join(filterosoby,
                 p => p.Nameid,
                 o => o.NameId,
-                (p, o) => p)
-            .Include(p => p.Organizace).ThenInclude(o => o.FirmaDs)
-            ;
+                (p, o) => p.Nameid)
+            .ToArrayAsync();
 
-        return await q.ToListAsync();
+        Dictionary<string, PpPrijem[]> res = (await GetPlatyGroupedByNameIdAsync(year, false))
+            .Where(m => nameIds.Contains(m.Key))
+            .ToDictionary();
+        
+        return res;
     }
 
     private static string[] GetIcaForGroup(PoliticianGroup group) =>

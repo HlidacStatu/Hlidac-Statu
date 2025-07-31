@@ -6,7 +6,7 @@
 @addTagHelper *, HlidacStatu.Lib.Web.UI.TagHelpers
 
 @functions {
-    private bool _sectionBgSwitch = false;
+    private bool _sectionBgSwitch = true;
 
     public string GetBgClass(bool toggle = true)
     {
@@ -63,7 +63,7 @@
     </ol>
 }
 
-<section class="d-flex justify-content-center">
+<section class="d-flex justify-content-center  @(GetBgClass())">
     <div class="container">
         <div>
             <h2><i class="fa-regular fa-building-columns"></i>&nbsp;@politik.FullName()</h2> 
