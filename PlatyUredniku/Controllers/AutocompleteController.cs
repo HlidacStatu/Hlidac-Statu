@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using ZiggyCreatures.Caching.Fusion;
 using PlatyUredniku.Services;
 using HlidacStatu.DS.Api;
+using Microsoft.AspNetCore.Authorization;
 
 namespace PlatyUredniku.Controllers;
 
@@ -27,7 +28,7 @@ public class AutocompleteController : ControllerBase
     {
         try
         {
-            var results = AutocompleteService.Search(q).ToList();
+            var results = AutocompleteService.Search(q, "instituce oblast osoba").ToList();
             return results;
         }
         catch (Exception e)
@@ -44,6 +45,23 @@ public class AutocompleteController : ControllerBase
         try
         {
             var results = AutocompleteCategoryService.Search(q).ToList();
+            return results;
+        }
+        catch (Exception e)
+        {
+            //todo: add logging
+        }
+        
+        return Enumerable.Empty<Autocomplete>().ToList();
+    }
+    
+    [Authorize]
+    [HttpGet("admin")]
+    public ActionResult<List<Autocomplete>> Admin([FromQuery] string q)
+    {
+        try
+        {
+            var results = AutocompleteService.Search(q).ToList();
             return results;
         }
         catch (Exception e)

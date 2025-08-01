@@ -8,7 +8,7 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-
+using HlidacStatu.Extensions;
 using Whisperer;
 
 namespace PlatyUredniku.Services;
@@ -36,12 +36,12 @@ public class AutocompleteCacheService
         _alternateDirectory = !_alternateDirectory;
     }
 
-    public IEnumerable<Autocomplete> Search(string query)
+    public IEnumerable<Autocomplete> Search(string query, string? filter = null)
     {
         if (AutocompleteCache is null)
-            return Enumerable.Empty<Autocomplete>();
+            return [];
         
-        return AutocompleteCache.Search(query, numResults: 15)
+        return AutocompleteCache.Search(query, numResults: 15, filter)
             .OrderByDescending(s => s.Score)
             .Take(8)
             .Select(s => s.Document);
@@ -55,7 +55,8 @@ public class AutocompleteCacheService
         var autocompleteData = await LoadDataForAutocompleteAsync(cancellationToken);
         index.AddDocuments(autocompleteData,
             textSelector: ts => $"{ts.Text} {ts.AdditionalHiddenSearchText}",
-            boostSelector: bs => bs.PriorityMultiplier);
+            boostSelector: bs => bs.PriorityMultiplier,
+            filterSelector: fs => fs.Type);
 
         var oldCache = AutocompleteCache;
         AutocompleteCache = index;
@@ -73,8 +74,9 @@ public class AutocompleteCacheService
         var oblastTask = LoadOblasti(cancellationToken);
         var ceoTask = LoadCeos(cancellationToken);
         var synonymsTask = LoadSynonyms(cancellationToken);
+        var politiciTask = LoadPolitici(cancellationToken);
 
-        await Task.WhenAll(organizaceTask, oblastTask, ceoTask, synonymsTask);
+        await Task.WhenAll(organizaceTask, oblastTask, ceoTask, synonymsTask, politiciTask);
 
         if (cancellationToken.IsCancellationRequested)
             return Enumerable.Empty<Autocomplete>().ToList();
@@ -83,6 +85,7 @@ public class AutocompleteCacheService
         results.AddRange(oblastTask.Result);
         results.AddRange(ceoTask.Result);
         results.AddRange(synonymsTask.Result);
+        results.AddRange(politiciTask.Result);
 
         return results;
     }
@@ -197,6 +200,41 @@ public class AutocompleteCacheService
             Category = Autocomplete.CategoryEnum.Synonym
         }).ToList();
         
+        return results;
+    }
+    
+    private async Task<List<Autocomplete>> LoadPolitici(CancellationToken cancellationToken)
+    {
+        await using var db = new DbEntities();
+
+        var nameIds = await db.PpPrijmy.AsNoTracking()
+            .Where(p => p.Status == PpPrijem.StatusPlatu.Potvrzen)
+            .Select(p => p.Nameid)
+            .Distinct()
+            .ToListAsync(cancellationToken: cancellationToken);
+
+        var results = new List<Autocomplete>();
+        foreach (var nameId in nameIds)
+        {
+            if(cancellationToken.IsCancellationRequested)
+                break;
+
+            var osoba = OsobaRepo.GetByNameId(nameId);
+
+            var autocomplete = new Autocomplete()
+            {
+                Id = $"/politici/politik/{osoba.NameId}",
+                Text = $"{osoba.Jmeno} {osoba.Prijmeni}{Osoba.AppendTitle(osoba.TitulPred, osoba.TitulPo)}",
+                PriorityMultiplier = 1.3f,
+                Type = "politik",
+                ImageElement = $"<img src='{osoba.GetPhotoUrl(false, Osoba.PhotoTypes.NoBackground)}' />",
+                Description = $"{osoba.MainRoles(PpRepo.DefaultYear)}",
+                Category = Autocomplete.CategoryEnum.Person,
+            };
+            
+            results.Add(autocomplete);
+        }
+
         return results;
     }
 }

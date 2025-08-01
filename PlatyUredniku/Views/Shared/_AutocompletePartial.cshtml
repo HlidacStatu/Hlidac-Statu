@@ -63,6 +63,10 @@
     </div>
 </div>
 
+@{
+    var link = User.IsInRole("Admin") ? "/autocomplete/admin" : "/autocomplete/main"; 
+}
+
 <script>
     
     var autocompleteLastQuery ='';
@@ -132,7 +136,7 @@
                 load: function(query, callback) {
                     if (!query.length) return callback();
                     $.ajax({
-                        url: '/autocomplete/main',
+                        url: '@link',
                         type: 'GET',
                         dataType: 'json',
                         data: {
