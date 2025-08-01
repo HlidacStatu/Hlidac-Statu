@@ -43,6 +43,11 @@ public static class LoadSponzoringFromFile
             var darovanoDne = DateTime.Parse(record.DarovanoDne, HlidacStatu.Util.Consts.czCulture);
             var amount = Decimal.Parse(record.Hodnota);
             
+            var popis = record.Popis?.Trim();
+            var giftType = string.IsNullOrWhiteSpace(popis)
+                ? Sponzoring.TypDaru.FinancniDar
+                : Sponzoring.TypDaru.NefinancniDar;
+            
             Donor donor = new Donor()
             {
                 Name = cleanedName.jmeno,
@@ -58,7 +63,8 @@ public static class LoadSponzoringFromFile
                 ICO = icoStrany,
                 Party = partyNames[icoStrany],
                 Date = darovanoDne,
-                GiftType = Sponzoring.TypDaru.FinancniDar
+                Description = popis,
+                GiftType = giftType
             };
             peopleDonations.AddDonation(donor, gift);
         }
@@ -84,6 +90,11 @@ public static class LoadSponzoringFromFile
             var darovanoDne = DateTime.Parse(record.DarovanoDne, HlidacStatu.Util.Consts.czCulture);
             var amount = Decimal.Parse(record.Hodnota);
             
+            var popis = record.Popis?.Trim();
+            var giftType = string.IsNullOrWhiteSpace(popis)
+                ? Sponzoring.TypDaru.FinancniDar
+                : Sponzoring.TypDaru.NefinancniDar;
+            
             Donor donor = new Donor()
             {
                 CompanyId = record.Ico
@@ -94,7 +105,8 @@ public static class LoadSponzoringFromFile
                 ICO = icoStrany,
                 Party = partyNames[icoStrany],
                 Date = darovanoDne,
-                GiftType = Sponzoring.TypDaru.FinancniDar
+                Description = popis,
+                GiftType = giftType
             };
             companyDonations.AddDonation(donor, gift);
         }
@@ -108,6 +120,7 @@ public class SponzorujiciOsoba
     public string Narozeni { get; init; }
     public string DarovanoDne { get; init; }
     public string Hodnota { get; init; }
+    public string Popis { get; init; }
 }
 
 public class SponzorujiciFirma
@@ -116,6 +129,7 @@ public class SponzorujiciFirma
     public string Ico { get; init; }
     public string DarovanoDne { get; init; }
     public string Hodnota { get; init; }
+    public string Popis { get; init; }
 }
 
 public sealed class OsobaMap : ClassMap<SponzorujiciOsoba>
@@ -127,6 +141,7 @@ public sealed class OsobaMap : ClassMap<SponzorujiciOsoba>
         Map(m => m.Narozeni).Index(2);
         Map(m => m.DarovanoDne).Index(3);
         Map(m => m.Hodnota).Index(4);
+        Map(m => m.Popis).Name("Popis").Optional();
     }
 }
 
@@ -138,5 +153,6 @@ public sealed class FirmaMap : ClassMap<SponzorujiciFirma>
         Map(m => m.Ico).Index(1);
         Map(m => m.DarovanoDne).Index(2);
         Map(m => m.Hodnota).Index(3);
+        Map(m => m.Popis).Name("Popis").Optional();
     }
 }

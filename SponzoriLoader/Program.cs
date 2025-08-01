@@ -34,9 +34,9 @@ namespace SponzoriLoader
         
         private static void LoadDataFromFiles(Donations peopleDonations, Donations companyDonations)
         {
-            LoadSponzoringFromFile.LoadOsoby(peopleDonations, @"/Users/suchoss/Downloads/06070108-PRAHA-SOBE-2024 - Lidi.tsv",
-                "06070108", _user, _zdroj);
-            LoadSponzoringFromFile.LoadFirmy(companyDonations, @"/Users/suchoss/Downloads/06070108-PRAHA-SOBE-2024 - Lidi.tsv",
+            LoadSponzoringFromFile.LoadOsoby(peopleDonations, @"/Users/suchoss/Downloads/vfz2022-spd - dary - Lidi.tsv",
+                "04134940", _user, _zdroj);
+            LoadSponzoringFromFile.LoadFirmy(companyDonations, @"/Users/suchoss/Downloads/vfz2022-spd - dary - Firmy.tsv",
                 "04134940", _user, _zdroj);
         }
 

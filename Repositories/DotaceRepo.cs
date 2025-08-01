@@ -26,10 +26,7 @@ namespace HlidacStatu.Repositories
             Logger.Debug(
                 $"Saving Dotace {dotace.Id} from {dotace.PrimaryDataSource}");
             if (dotace is null) throw new ArgumentNullException(nameof(dotace));
-
-
-            dotace.ModifiedDate = DateTime.Now;
-
+            
             //recalc hints
             try
             {
@@ -58,6 +55,7 @@ namespace HlidacStatu.Repositories
 
             FixSomeHints(dotace);
 
+            dotace.ModifiedDate = DateTime.Now;
             var res = await DotaceClient.IndexAsync(dotace, o => o.Id(dotace.Id));
 
             if (!res.IsValid)
@@ -300,7 +298,7 @@ namespace HlidacStatu.Repositories
             await Task.WhenAll(tasks);
         }
 
-        private static bool IsDotaceChanged(Dotace dotaceOriginal, Dotace dotaceNew)
+        public static bool IsDotaceChanged(Dotace dotaceOriginal, Dotace dotaceNew)
         {
             if (dotaceOriginal.Id != dotaceNew.Id)
                 return true;
