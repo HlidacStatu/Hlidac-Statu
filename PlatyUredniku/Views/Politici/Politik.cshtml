@@ -2,6 +2,8 @@
 @using HlidacStatu.Entities
 @using HlidacStatu.Extensions
 @using HlidacStatu.Repositories.SharedModels
+@using HlidacStatu.Entities.Facts
+
 @model List<PpPrijem>
 @addTagHelper *, HlidacStatu.Lib.Web.UI.TagHelpers
 
@@ -23,6 +25,7 @@
 
     ViewBag.Title = politik.FullName();
 
+
     int[] othtypes = {
         (int)OsobaEvent.Types.VerejnaSpravaJine,
         (int)OsobaEvent.Types.VerejnaSpravaExekutivni,
@@ -41,13 +44,26 @@
         template: "<ul>{0}</ul>", itemTemplate: "<li>{0}</li>", itemDelimeter: "");
 
     int[] roky = Model.Select(m => m.Rok).Distinct().OrderBy(o => o).ToArray();
-    int rok = PuRepo.DefaultYear;
+    int rok = PpRepo.DefaultYear;
     if (roky.Any())
     {
         rok = roky.Max();
     }
 
     var platyZaRok = Model.Where(m => m.Rok == rok);
+
+    ViewBag.SocialShareTitle = $"{politik.FullNameWithYear()}";
+    //ViewBag.SocialShareText = politik.InfoFactsCached().RenderFacts(4, true, true, ", ");
+    ViewBag.SocialShareText = $"{politik.FullNameWithYear()} měl v {PpRepo.DefaultYear} roční příjem {HlidacStatu.Util.RenderData.NicePrice(platyZaRok.Sum(m => m.CelkovyRocniPlatVcetneOdmen))}"
+    + $" {Devmasters.Lang.CS.Plural.Get(platyZaRok.Count(), "z jedné pozice", "ze {0} pozic", "z {0} pozic")}.";
+
+    ViewBag.SocialShareType = "article";
+    ViewBag.SocialImage = $"https://www.hlidacstatu.cz/socialbanner/osoba?d={DateTime.Now.ToString("yyMMdd")}&v=" + politik.NameId;
+    ViewBag.OpenGraphMore = "<meta property=\"og:image:width\" content=\"1920\" />\n"
+                            + "<meta property=\"og:image:height\" content=\"1080\" />"
+                            + "<meta property=\"og:image:type\" content=\"image/png\" />";
+
+
 
 }
 
@@ -58,15 +74,17 @@
         <li>
             <a asp-action="Index" asp-controller="Home">Platy</a>
         </li>
-        <li><a asp-action="Index" asp-controller="Politici">Politici</a></li>
-        <li class="active">@politik.FullName()</li>
+        <li>
+            <a asp-action="Index" asp-controller="Politici">Platy politiků</a>
+        </li>
+        <li class="active">@ViewBag.Title</li>
     </ol>
 }
 
 <section class="d-flex justify-content-center  @(GetBgClass())">
     <div class="container">
         <div>
-            <h2><i class="fa-regular fa-building-columns"></i>&nbsp;@politik.FullName()</h2> 
+            <h2><i class="fa-regular fa-building-columns"></i>&nbsp;@politik.FullName()</h2>
             <div class="d-flex">
                 <div class="me-3">
                     <div class="d-flex">
@@ -80,7 +98,7 @@
                             <p class="mt-4"><hr class="dotted gray w-75" /><a href="@politik.GetUrl()"><i class="fa-solid fa-arrow-up-right-from-square"></i> kompletní profil na Hlídač státu</a></p>
                         </div>
                         <div class="mt-1">
-                            
+
                             <h3>Celkové příjmy z veřejných funkcí</h3>
                             <div>
                                 <dl class="row">
@@ -134,8 +152,16 @@
                     {
                         <tr>
                             <td>@pprijem.Organizace.Nazev</td>
-                            <td class="number">@HlidacStatu.Util.RenderData.NicePriceHtml(pprijem.CelkovyRocniPlatVcetneOdmen)</td>
+                            @if (pprijem.Status == PpPrijem.StatusPlatu.Zjistujeme)
+                            {
+                                <td class="number"><span class="text-warning">Neposkytla nám informace o platu politika</span></td>
+                            }
+                            else
+                            {
+                                <td class="number">@HlidacStatu.Util.RenderData.NicePriceHtml(pprijem.CelkovyRocniPlatVcetneOdmen)</td>
+                            }
                         </tr>
+
                     }
                 </tbody>
                 <tfoot>
@@ -160,10 +186,26 @@
             <h3 id="@pprijem.Organizace.DS">@pprijem.Organizace.Nazev</h3>
             @if (pprijem.Status == PpPrijem.StatusPlatu.Zjistujeme)
             {
-                PuEvent _ev = (await PpRepo.GetAllEventsAsync(rok, m => m.IdOrganizace == pprijem.IdOrganizace && m.OsobaNameId == politik.NameId)).OrderByDescending(o => o.Datum).FirstOrDefault();
-                <table class="table table-hover caption-top">
-                    <tr><td><div>Příjem od této organizace právě zjišťujeme@((_ev != null ? $" od {_ev.Datum:d. M. yyyy}" : "")).</div></td></tr>
-                </table>
+                <p class="lead text-warning">Organizace nám pro @politik.FullName() neposkytla žádné informace o platu.</p>
+                <h4>Průběh komunikace s organizací</h4>
+                <p>
+                    <ol class="list-group" style="max-width:800px;">
+
+                        @foreach (var evd in (await PpRepo.GetEventsForPolitikAndOrganizace(politik.NameId, pprijem.IdOrganizace)).OrderBy(o => o.Datum).Select(m => m.GetEventDescription()))
+                        {
+                            <li class="list-group-item list-group-item-@(evd.BootStrapColor())">
+                                <div class="d-flex w-100 justify-content-between">
+                                    <h5 class="mb-1">@evd.Title</h5>
+                                    <small>@(evd.Date.ToString("d.M.yyyy"))</small>
+                                </div>
+                                @if (!string.IsNullOrWhiteSpace(evd.Note))
+                                {
+                                    <small>@evd.Note</small>
+                                }
+                            </li>
+                        }
+                    </ol>
+                </p>
             }
             else
             {
@@ -252,6 +294,27 @@
                         </tr>
                     </tbody>
                 </table>
+                <lowbox width="130">
+                    <h4>Průběh komunikace s organizací</h4>
+                    <p>
+                        <ol class="list-group" style="max-width:800px;">
+
+                            @foreach (var evd in (await PpRepo.GetEventsForPolitikAndOrganizace(politik.NameId, pprijem.IdOrganizace)).OrderBy(o => o.Datum).Select(m => m.GetEventDescription()))
+                            {
+                                <li class="list-group-item list-group-item-@(evd.BootStrapColor())">
+                                    <div class="d-flex w-100 justify-content-between">
+                                        <h5 class="mb-1">@evd.Title</h5>
+                                        <small>@(evd.Date.ToString("d.M.yyyy"))</small>
+                                    </div>
+                                    @if (!string.IsNullOrWhiteSpace(evd.Note))
+                                    {
+                                        <small>@evd.Note</small>
+                                    }
+                                </li>
+                            }
+                        </ol>
+                    </p>
+                </lowbox>
             }
 
 
@@ -259,9 +322,10 @@
     </section>
 }
 
+
 <section class="d-flex @GetBgClass()">
     <div class="container">
-        <h3>Přehled funkcí</h3>
+        <h3>Přehled funkcí @politik.FullName()</h3>
 
         <div>
             @if (!string.IsNullOrWhiteSpace(volenaFunkceOsoba))

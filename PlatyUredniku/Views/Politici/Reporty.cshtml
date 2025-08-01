@@ -29,19 +29,15 @@
 {
     <ol class="breadcrumb">
         <li>
-            <a asp-action="Index">Platy úředníků</a>
+            <a asp-action="Index" asp-controller="Home">Platy</a>
         </li>
         <li>
-            <a asp-action="Analyzy">Analýzy</a>
+            <a asp-action="Index" asp-controller="Politici">Platy politiků</a>
         </li>
-        <li>
-            Přehled jednotlivých platů
-        </li>
-        <li class="active">
-            @ViewData["title"]
-        </li>
+        <li class="active">@ViewBag.Title</li>
     </ol>
 }
+
 
 @functions {
     private bool _sectionBgSwitch = true;

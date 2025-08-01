@@ -452,16 +452,16 @@ namespace HlidacStatu.Repositories
         public static HlidacStatu.DS.Api.Firmy.SubjektFinancialInfo GetFinancialInfo(string ico, string name)
         {
             DS.Graphs.Relation.AktualnostType aktualnost = DS.Graphs.Relation.AktualnostType.Nedavny;
-                Firma f = NajdiFirmuPodleIcoJmena(ico, name, aktualnost);
+            Firma f = NajdiFirmuPodleIcoJmena(ico, name, aktualnost);
             if (f == null || f.Valid == false)
             {
                 return null;
             }
-            HlidacStatu.DS.Api.Firmy.SubjektFinancialInfo res = new ();
+            HlidacStatu.DS.Api.Firmy.SubjektFinancialInfo res = new();
             res.Source_Url = f.GetUrl(false);
             res.Ico = f.ICO;
             res.Jmeno_Firmy = f.Jmeno;
-            res.Omezeni_Cinnosti = string.IsNullOrWhiteSpace( f.StatusFull()) ? null : f.StatusFull() ;
+            res.Omezeni_Cinnosti = string.IsNullOrWhiteSpace(f.StatusFull()) ? null : f.StatusFull();
 
             res.Kategorie_Organu_Verejne_Moci = null;
             var _kategorie_Organu_Verejne_Moci = f.KategorieOVMAsync().ConfigureAwait(false).GetAwaiter().GetResult()
@@ -473,7 +473,7 @@ namespace HlidacStatu.Repositories
             res.Pocet_Zamestnancu = FirmaRepo.Merk.MerkEnumConverters.ConvertCompanyMagnitude(f.PocetZamKod?.ToString())?.Pretty;
             res.Obrat = FirmaRepo.Merk.MerkEnumConverters.ConvertCompanyTurnover(f.ObratKod?.ToString())?.Pretty;
 
-            res.Obor_Podnikani = FirmaRepo.Merk.MerkEnumConverters.ConvertCompanyIndustryToFullName(f.IndustryKod?.ToString(),true,true);
+            res.Obor_Podnikani = FirmaRepo.Merk.MerkEnumConverters.ConvertCompanyIndustryToFullName(f.IndustryKod?.ToString(), true, true);
             res.Platce_DPH = f.PlatceDPHKod switch
             {
                 1 => "Je plátce DPH",
@@ -493,7 +493,7 @@ namespace HlidacStatu.Repositories
                 _ => null
             };
             res.Osoby_s_vazbou_na_firmu = f.Osoby_v_OR(aktualnost)
-                .DistinctBy(m=>m.o.NameId)
+                .DistinctBy(m => m.o.NameId)
                 .OrderBy(m => m.o.Prijmeni)
                     .ThenBy(m => m.o.Jmeno)
                     .ThenBy(m => m.o.Narozeni)
@@ -512,7 +512,7 @@ namespace HlidacStatu.Repositories
             ;
 
 
-            return res; 
+            return res;
         }
         public static HlidacStatu.DS.Api.Firmy.SubjektDetailInfo GetDetailInfo(string ico, string name)
         {
@@ -540,7 +540,7 @@ namespace HlidacStatu.Repositories
             res.Source_Url = f.GetUrl(false);
             res.Ico = f.ICO;
             res.Jmeno_Firmy = f.Jmeno;
-            res.Rizika = f.InfoFacts().RenderFacts(4, true, false);           
+            res.Rizika = f.InfoFacts().RenderFacts(4, true, false);
 
 
             res.Kategorie_Organu_Verejne_Moci = f.KategorieOVMAsync().ConfigureAwait(false).GetAwaiter().GetResult()

@@ -43,13 +43,13 @@
                 
                 if (this.point.isNode) {
                     if (value < 1e-3) {
-                        return `<b>${this.point.name}</b><br/><i>Neznámá částka - hodnotu se nám nepodařilo zjistit</i>`;
+                        return `<b>${this.point.name}</b><br/><i>Neznámá částka - plat nám nebyl poskytnut</i>`;
                     } else {
                         return `<b>${this.point.name}</b><br/>${formatNumber(value)} Kč`;
                     }
                 } else {
                     if (value < 1e-3) {
-                        return `<b>${this.point.to}</b><br/><i>Neznámá částka - hodnotu se nám nepodařilo zjistit</i>`;
+                        return `<b>${this.point.to}</b><br/><i>Neznámá částka - plat nám nebyl poskytnut</i>`;
                     } else {
                         return `<b>${this.point.to}</b><br/>${formatNumber(value)} Kč`;
                     }

@@ -85,7 +85,7 @@ public class PoliticiController : Controller
         return View((Group: politicianGroup, Year: year ?? PpRepo.DefaultYear));
     }
 
-    [HlidacCache(60 * 60, "*")]
+    [HlidacCache(48*60 * 60, "*")]
     public async Task<IActionResult> Organizace(string id, int rok = PpRepo.DefaultYear)
     {
         ViewData["rok"] = rok;

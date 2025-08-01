@@ -16,7 +16,7 @@
 
     string ico = Model.Ico;
     Firma f = Firmy.Get(ico);
-    ViewBag.Title = $"{f.Jmeno} ({rok})" ;
+    ViewBag.Title = $"Politici v {f.Jmeno} ({rok})" ;
 
     var platy = await PpRepo.GetPlatyAsync(rok, true, ico);
 
@@ -27,7 +27,7 @@
         <li>
             <a asp-action="Index" asp-controller="Home">Platy</a>
         </li>
-        <li><a asp-action="Index" asp-controller="Politici">Politici</a></li>
+        <li><a asp-action="Index" asp-controller="Politici">Platy politiků</a></li>
         <li class="active">@ViewBag.Title</li>
     </ol>
 }
@@ -59,22 +59,6 @@
             </a> <br />
             Datová schránka: @Model.DS <br />
         </p>
-        <div>
-            @foreach (var tag in Model.Tags)
-            {
-                <hashtag tag="@tag.Tag"></hashtag>
-            }
-        </div>
-
-        <div>
-            @if (Model.PrijmyPolitiku.Any())
-            {
-                <div>
-                    <partial name="Graphs/_AreaRangePlotPolitici"
-                             model="@(new AreaRangeRenderOptions() { PrijmyPolitiku = Model.PrijmyPolitiku, CssHeight = "380" })" />
-                </div>
-            }
-        </div>
     </div>
 </section>
 
@@ -248,68 +232,6 @@
     </div>
 
 </section>
-
-@{
-    string[] compareTo = Model.CZISCO?.Split(new char[] { ',', ';', ' ' }, StringSplitOptions.RemoveEmptyEntries);
-}
-@if (compareTo?.Length > 0 && Model.Platy != null && Model.Platy.Any())
-{
-    sectionBgSwitch = !sectionBgSwitch;
-    <section class="d-flex justify-content-center @(sectionBgSwitch ? "alter-bg-color" : "")">
-        <div class="container">
-            <h3>Porovnání vývoje platů vzhledem k vybraným kategoriím pracovníků</h3>
-
-            @{
-                //AreaRangePlot uradData =
-                List<AreaRangePlot> data = new List<AreaRangePlot>();
-                data.Add(AreaRangePlot.ToAreaRangePlotWithPrumer(Model.Platy, Model.Nazev));
-                if (Model.Nazev.Contains("Ministerstvo"))
-                {
-                    data[0].ExtraTitle = "Ministr/yně";
-                }
-                else if (Model.Platy.Any(m => m.JeHlavoun == true))
-                {
-                    data[0].ExtraTitle = Model.Platy.Where(m => m.JeHlavoun == true).OrderByDescending(m => m.Rok).First().NazevPozice;
-                }
-                else
-                {
-                    data[0].ExtraTitle = "Nejvyšší představitel/ka organizace";
-                }
-
-                foreach (var compItem in compareTo)
-                {
-                    var d = await PuRepo.LoadVydelekForZamestnaniAsync(compItem, HlidacStatu.Entities.PuVydelek.VydelekSektor.StatSamosprava);
-                    if (d?.Any() == true)
-                    {
-                        var dName = d.OrderByDescending(m => m.Rok).Select(m => m.FullNazevKategorieZamestnani()).FirstOrDefault().ShortenMe(140);
-                        data.Add(AreaRangePlot.ToAreaRangePlotWithPrumer(d, dName));
-                    }
-
-                    d = await PuRepo.LoadVydelekForZamestnaniAsync(compItem, HlidacStatu.Entities.PuVydelek.VydelekSektor.Soukromy);
-                    if (d?.Any() == true)
-                    {
-                        var dName = d.OrderByDescending(m => m.Rok).Select(m => m.FullNazevKategorieZamestnani()).FirstOrDefault().ShortenMe(140);
-                        data.Add(AreaRangePlot.ToAreaRangePlotWithPrumer(d, dName));
-                    }
-                }
-
-                //calculate height
-                var height = 430
-                + data.Count() * 12 //pul radku na jednu serii
-                + (data.Count(m => m.Title.Length > 80) * 17); //dlouhe nazvy serii pocitej na cely radek
-
-                AreaRangeCompareRenderOptions chartModel = new AreaRangeCompareRenderOptions()
-                {
-                    CssHeight = height.ToString(),
-                    Data = data.ToArray(),
-                    Title = "Porovnání s jinými oblastmi trhu"
-                };
-                <partial name="Graphs/_AreaRangeComparePlot" model="@chartModel" />
-            }
-
-        </div>
-    </section>
-}
 
 
 @{

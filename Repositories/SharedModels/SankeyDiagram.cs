@@ -13,6 +13,7 @@ public class SankeyDiagram
     public string? Subtitle { get; set; }
     public string? Description { get; set; }
     public ICollection<PpPrijem> PrijmyPolitiku { get; set; }
+    public IEnumerable<string> OrgBezUvedeniPlatu { get; set; }
     
     public string CssWidth { get; set; } = "100%";
     public string CssHeight { get; set; } = "100%"; //$"{9 / 16 * 100}%'"; //16:9
@@ -31,7 +32,26 @@ public class SankeyDiagram
                     value = prijem.CelkoveRocniNakladyNaPolitika,
                     link = $"#{prijem.Organizace.DS}"
                 }
-            });
+            }).ToList();
+        if (OrgBezUvedeniPlatu?.Count() > 0)
+        {
+            data.AddRange(
+                    OrgBezUvedeniPlatu.Select(f=>
+                        new
+                        {
+                            from = "Celkový příjem",
+                            to = Firmy.GetJmeno(f),
+                            weight = DrawNakladyPerYear(new PpPrijem() { }, nakladyMax),
+                            color = "#000000",
+                            custom = new
+                            {
+                                value = 0m,
+                                link = $"#{f}"
+                            }
+                        }
+                        )
+                );
+        }
 
         var options = new JsonSerializerOptions
         {

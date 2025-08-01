@@ -145,7 +145,8 @@ public class HomeController : Controller
         return Content(sb.ToString(), "application/xml");
     }
     
-    public IActionResult Error()
+    public IActionResult 
+        Error()
     {
         return View();
     }

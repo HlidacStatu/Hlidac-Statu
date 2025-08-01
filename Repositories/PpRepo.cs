@@ -1,13 +1,15 @@
+using Devmasters.Enums;
 using HlidacStatu.Entities;
+using HlidacStatu.Entities.Entities;
 using HlidacStatu.Extensions;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Text;
 using System.Threading.Tasks;
-using HlidacStatu.Entities.Entities;
-using Devmasters.Enums;
+using static HlidacStatu.Entities.PuEvent;
 
 namespace HlidacStatu.Repositories;
 
@@ -19,6 +21,154 @@ public static class PpRepo
     public static async Task<PuOrganizace> GetOrganizaceFullDetailAsync(string datovaSchranka)
     {
         return await GetOrganizaceFullDetailAsync(new string[] { datovaSchranka });
+    }
+
+    public static async Task<List<string>> GetOrganizaceBezPlatuAsync(string nameId = null, string ico = null, int rok = PpRepo.DefaultYear)
+    {
+        await using var db = new DbEntities();
+        var allOrgs = BasePotvrzenePlaty(db, rok).Select(m => m.IdOrganizace).Distinct();
+
+        var query = db.PuEvents
+            .AsNoTracking()
+            .Where(m => m.ProRok == rok
+                        && m.DotazovanaInformace == PuEvent.DruhDotazovaneInformace.Politik
+                        && !allOrgs.Contains(m.IdOrganizace));
+        ;
+        if (!string.IsNullOrEmpty(ico))
+        {
+            query = query.Where(m => m.IcoOrganizace == ico);
+        }
+        if (!string.IsNullOrEmpty(nameId))
+        {
+            query = query.Where(m => m.OsobaNameId == nameId);
+        }
+
+        var res = await query
+            .Select(m => m.IcoOrganizace)
+            .Distinct()
+            .ToListAsync();
+
+        return res;
+    }
+
+
+    public static string GetEventFormatedDescription(this PuEvent.EventDescription evd, bool html = false)
+    {
+        throw new NotImplementedException();
+        //StringBuilder sb = new StringBuilder();
+        //sb.AppendFormat("<span class='text-{0}'>", evd.Negativity.GetBootstrapStatus());
+        //if (html)
+        //    sb.AppendFormat("<i class='{0}'></i> ", evd.Negativity.GetIcon());
+        //sb.AppendFormat("{0} {1:d. M. yyyy}", evd.Title, evd.Date);
+        //if (!string.IsNullOrEmpty(evd.Note))
+        //    sb.AppendFormat(" <span class='note'>{0}</span>", evd.Note);
+        //sb.Append("</span>");
+        //return sb.ToString();
+    }
+    public static PuEvent.EventDescription GetEventDescription(this PuEvent ev)
+    {
+
+        EventDescription evd = new EventDescription();
+        evd.Date = ev.Datum;
+        evd.Smer = ev.Smer;
+        evd.Note = ev.Poznamka;
+        switch (ev.Typ)
+        {
+            case PuEvent.TypUdalosti.Neurceno:
+                evd.Title = ev.Poznamka;
+
+                if (ev.Poznamka?.EndsWith(".") == false)
+                    evd.Title += ".";
+                break;
+            case PuEvent.TypUdalosti.ZaslaniZadosti:
+
+                evd.Title = $"Zaslali jsme žádost o informace o platech a odměnách.";
+                break;
+            case PuEvent.TypUdalosti.Upresneni:
+                evd.Negativity = PuEvent.EventDescription.NegativityLevel.LowIssue;
+                if (ev.Smer == PuEvent.SmerKomunikace.ZpravaProNas)
+                    evd.Title = $"jsme dostali žádost o upřesnění žádosti.";
+                else
+                    evd.Title = $"jsme upřesnili žádost o informace.";
+                break;
+            case PuEvent.TypUdalosti.UplneOdmitnutiPoskytnutiInformaci:
+                evd.Title = $"Obdrželi jsme úplné odmítnutí poskytnutí informací.";
+                evd.Negativity = EventDescription.NegativityLevel.HighIssue;
+                break;
+            case PuEvent.TypUdalosti.CastecneOdmitnutiPoskytnutiInformaci:
+                evd.Negativity = EventDescription.NegativityLevel.HighIssue;
+                evd.Title = $"Obdrželi jsme částečné odmítnutí poskytnutí informací.";
+                break;
+            case PuEvent.TypUdalosti.PoskytnutiInformace:
+                evd.Negativity = EventDescription.NegativityLevel.Ok;
+                evd.Title = $"Obdrželi jsme informace o platech a odměnách.";
+                break;
+            case PuEvent.TypUdalosti.Zadost_o_UhraduNakladu:
+                evd.Negativity = EventDescription.NegativityLevel.LowIssue;
+                evd.Title = $"Obdrželi jsme žádost o úhradu nákladů spojených s poskytnutím informací.";
+                break;
+            case PuEvent.TypUdalosti.Stiznost:
+                evd.Negativity = EventDescription.NegativityLevel.HighIssue;
+                if (ev.Smer == PuEvent.SmerKomunikace.ZpravaProNas)
+                    evd.Title = "Dostali jsme reakci na stížnost pro porušení zákona.";
+                else
+                    evd.Title = $"Podali jsme stížnost na porušení zákona.";
+                break;
+            case PuEvent.TypUdalosti.Odvolani:
+                if (ev.Smer == PuEvent.SmerKomunikace.ZpravaProNas)
+                    evd.Title = "Dostali jsme reakci na odvolání proti postupu organizace.";
+                else
+                    evd.Title = $"Podali odvolání proti postupu či rozhodnutí úřadu.";
+                break;
+            case PuEvent.TypUdalosti.Jine:
+                evd.Note = "";
+                if (ev.Smer == PuEvent.SmerKomunikace.ZpravaProNas)
+                    evd.Title = $"Obdrželi jsme zprávu: {ev.Poznamka}";                
+                else
+                    evd.Title = $"Poslali jsme zprávu: {ev.Poznamka}";
+                break;
+            case PuEvent.TypUdalosti.NahraniUdaju:
+                evd.Title = $"Nahráli jsme údaje do databáze.";
+                break;
+            default:
+                break;
+        }
+        return evd;
+    }
+    public static string GetEventsTextDescription(this IEnumerable<PuEvent> events, 
+        string template = "{0}", string itemTemplate = "{0}",
+            string itemDelimeter = "<br/>")
+    {
+        throw new NotImplementedException();
+        StringBuilder sb = new StringBuilder();
+        
+        foreach (var ev in events.OrderBy(o => o.Datum).Select(m=> m.GetEventDescription()))
+        {
+            //sb.AppendFormat(itemTemplate, ev.GetEventTextDescription());
+            //evd.Title = itemDelimeter);
+        }
+
+        return string.Format(template,sb.ToString());
+    }
+
+    public static async Task<List<PuEvent>> GetEventsForPolitikAndOrganizace(string nameId, int idOrganizace, int year = PpRepo.DefaultYear)
+    {
+        var events = await GetAllEventsAsync(year,
+            m => m.DotazovanaInformace == PuEvent.DruhDotazovaneInformace.Politik
+                && m.IdOrganizace == idOrganizace
+                && m.OsobaNameId == nameId);
+
+        return events;
+
+    }
+    public static async Task<List<PuEvent>> GetEventsForPolitikAndOrganizace(string nameId, string ico, int year = PpRepo.DefaultYear)
+    {
+        var events = await GetAllEventsAsync(year,
+            m => m.DotazovanaInformace == PuEvent.DruhDotazovaneInformace.Politik
+                && m.IcoOrganizace == ico
+                && m.OsobaNameId == nameId);
+        return events;
+
     }
 
     public static async Task<PuOrganizace> GetOrganizaceFullDetailPerIcoAsync(string ico)
@@ -44,7 +194,19 @@ public static class PpRepo
             .Include(o => o.PrijmyPolitiku) // Include PuPrijmyPolitiku
             .FirstOrDefaultAsync();
     }
+    public static async Task<PuOrganizace> GetOrganizaceFullDetailAsync(int idOrganizace)
+    {
+        await using var db = new DbEntities();
 
+        return await db.PuOrganizace
+            .AsNoTracking()
+            .Where(pu => pu.Id == idOrganizace)
+            .Include(o => o.Metadata)
+            .Include(o => o.Tags)
+            .Include(o => o.FirmaDs)
+            .Include(o => o.PrijmyPolitiku) // Include PuPrijmyPolitiku
+            .FirstOrDefaultAsync();
+    }
     public static async Task<PuOrganizace> GetOrganizaceOnly(string datovaSchranka)
     {
         await using var db = new DbEntities();
@@ -52,6 +214,16 @@ public static class PpRepo
         return await db.PuOrganizace
             .AsNoTracking()
             .Where(pu => pu.DS == datovaSchranka)
+            .Include(o => o.FirmaDs)
+            .FirstOrDefaultAsync();
+    }
+    public static async Task<PuOrganizace> GetOrganizaceOnly(int idOrganizace)
+    {
+        await using var db = new DbEntities();
+
+        return await db.PuOrganizace
+            .AsNoTracking()
+            .Where(pu => pu.Id == idOrganizace)
             .Include(o => o.FirmaDs)
             .FirstOrDefaultAsync();
     }
@@ -67,7 +239,7 @@ public static class PpRepo
     {
 
         return BaseAllPlaty(db, rok)
-            .Where(m=> m.Status == PpPrijem.StatusPlatu.Potvrzen);
+            .Where(m => m.Status == PpPrijem.StatusPlatu.Potvrzen);
     }
 
     public static string[] AllNameId(bool? zeny, int rok = DefaultYear)
@@ -89,9 +261,7 @@ public static class PpRepo
 
     public static List<PpPrijem> AktualniRok(this ICollection<PpPrijem> prijmy, int rok = DefaultYear)
     {
-        using var db = new DbEntities();
-
-        return BasePotvrzenePlaty(db,rok).Where(m => m.Rok == rok).ToList();
+        return prijmy.Where(m => m.Rok == rok).ToList();
     }
 
     public static async Task<PpPrijem> GetPrijemAsync(int id)
@@ -141,18 +311,18 @@ public static class PpRepo
     {
         await using var db = new DbEntities();
 
-        return await BasePotvrzenePlaty(db,rok)
+        return await BasePotvrzenePlaty(db, rok)
             .AsNoTracking()
-            .FirstOrDefaultAsync(p => p.IdOrganizace == idOrganizace                                      
+            .FirstOrDefaultAsync(p => p.IdOrganizace == idOrganizace
                                       && p.Nameid == nameid);
     }
 
 
-    public static async Task<List<PpPrijem>> GetPrijmyPolitika(string nameid, int rok = DefaultYear)
+    public static async Task<List<PpPrijem>> GetPrijmyPolitika(string nameid, int rok = DefaultYear, bool pouzePotvrzene = false)
     {
         await using var db = new DbEntities();
-
-        return await BasePotvrzenePlaty(db, rok)
+        var baseData = pouzePotvrzene ? BasePotvrzenePlaty(db, rok) : BaseAllPlaty(db, rok);
+        return await baseData
             .AsNoTracking()
             .Include(p => p.Organizace).ThenInclude(o => o.FirmaDs)
             .Include(p => p.Organizace).ThenInclude(o => o.Tags)
@@ -173,7 +343,7 @@ public static class PpRepo
     {
         await using var db = new DbEntities();
 
-        return await BasePotvrzenePlaty(db,rok)
+        return await BasePotvrzenePlaty(db, rok)
             .AsNoTracking()
             .CountAsync();
     }
@@ -296,7 +466,7 @@ public static class PpRepo
     ];
     public static async Task<Dictionary<string, PpPrijem[]>> GetPlatyGroupedByNameIdAsync(int rok, bool withDetails = false, string ico = null)
     {
-    
+
         await using var db = new DbEntities();
         var q = BasePotvrzenePlaty(db, rok)
             .AsNoTracking();
@@ -307,7 +477,7 @@ public static class PpRepo
         q = q.Where(p => p.Rok == rok);
 
         var qGrouped = q
-            .GroupBy(k => k.Nameid, v=>v, (k, v) => new { nameId = k, platy = v.ToArray()});
+            .GroupBy(k => k.Nameid, v => v, (k, v) => new { nameId = k, platy = v.ToArray() });
 
         return await qGrouped.ToDictionaryAsync(k => k.nameId, v => v.platy);
     }
@@ -315,7 +485,7 @@ public static class PpRepo
     {
         await using var db = new DbEntities();
 
-        var q = BasePotvrzenePlaty(db,rok)
+        var q = BasePotvrzenePlaty(db, rok)
             .AsNoTracking();
 
         if (withDetails || string.IsNullOrEmpty(ico) == false)
@@ -413,7 +583,7 @@ public static class PpRepo
     {
         await using var db = new DbEntities();
 
-        return await BasePotvrzenePlaty(db,rok)
+        return await BasePotvrzenePlaty(db, rok)
             .AsNoTracking()
             .Include(p => p.Organizace)
             .ThenInclude(o => o.FirmaDs)
@@ -424,7 +594,7 @@ public static class PpRepo
     {
         await using var db = new DbEntities();
 
-        return await BasePotvrzenePlaty(db,year)
+        return await BasePotvrzenePlaty(db, year)
             .AsNoTracking()
             .Where(p => (((p.Plat ?? 0) + (p.Odmeny ?? 0)) / (p.PocetMesicu ?? 12)) >= rangeMin)
             .Where(p => (((p.Plat ?? 0) + (p.Odmeny ?? 0)) / (p.PocetMesicu ?? 12)) <= rangeMax)
@@ -546,7 +716,7 @@ public static class PpRepo
 
         await dbContext.SaveChangesAsync();
     }
-    
+
     public static async Task DeletePrijemPolitikaAsync(PpPrijem prijemPolitika)
     {
         await using var dbContext = new DbEntities();
@@ -591,7 +761,7 @@ public static class PpRepo
         Dictionary<string, PpPrijem[]> res = (await GetPlatyGroupedByNameIdAsync(year, false))
             .Where(m => nameIds.Contains(m.Key))
             .ToDictionary();
-        
+
         return res;
     }
 
@@ -605,38 +775,38 @@ public static class PpRepo
             _ => []
         };
 
-    public static async Task<List<PpPrijem>> GetPrijmyForGroupAsync(PoliticianGroup group, int year = DefaultYear)
+    public static async Task<List<PpPrijem>> GetPrijmyForGroupAsync(PoliticianGroup group, int rok = DefaultYear, bool pouzePotvrzene = false)
     {
         await using var db = new DbEntities();
         IQueryable<PpPrijem> query;
         switch (group)
         {
             case PoliticianGroup.Vse:
-                query = BasePotvrzenePlaty(db, year)
+                query = pouzePotvrzene ? BasePotvrzenePlaty(db, rok) : BaseAllPlaty(db, rok)
                     .AsNoTracking();
                 break;
-            
+
             case PoliticianGroup.Poslanci:
             case PoliticianGroup.Senatori:
             case PoliticianGroup.KrajstiZastupitele:
             case PoliticianGroup.Vlada:
-                var nameIds = await GetNameIdsForGroupAsync(group, year);
-                query = BasePotvrzenePlaty(db,year)
+                var nameIds = await GetNameIdsForGroupAsync(group, rok, pouzePotvrzene);
+                query = pouzePotvrzene ? BasePotvrzenePlaty(db, rok) : BaseAllPlaty(db, rok)
                     .AsNoTracking()
                     .Where(p => nameIds.Contains(p.Nameid));
                 break;
-                
+
             default:
                 query = Enumerable.Empty<PpPrijem>().AsQueryable();
                 break;
         }
-        
+
         return await query
             .Include(p => p.Organizace).ThenInclude(o => o.FirmaDs)
-            .ToListAsync();;
+            .ToListAsync(); ;
     }
 
-    public static async Task<List<string>> GetNameIdsForGroupAsync(PoliticianGroup group, int year = DefaultYear)
+    public static async Task<List<string>> GetNameIdsForGroupAsync(PoliticianGroup group, int rok = DefaultYear, bool pouzePotvrzene = false)
     {
         await using var db = new DbEntities();
         IQueryable<PpPrijem> query = null;
@@ -644,26 +814,26 @@ public static class PpRepo
         switch (group)
         {
             case PoliticianGroup.Vse:
-                query = BasePotvrzenePlaty(db,year)
+                query = pouzePotvrzene ? BasePotvrzenePlaty(db, rok) : BaseAllPlaty(db, rok)
                     .AsNoTracking();
                 break;
-            
+
             case PoliticianGroup.Poslanci:
             case PoliticianGroup.Senatori:
             case PoliticianGroup.KrajstiZastupitele:
                 var ica = GetIcaForGroup(group);
-                query = BasePotvrzenePlaty(db,year)
+                query = pouzePotvrzene ? BasePotvrzenePlaty(db, rok) : BaseAllPlaty(db, rok)
                     .AsNoTracking()
                     .Where(p => p.Organizace.FirmaDs != null &&
                                 ica.Contains(p.Organizace.FirmaDs.Ico));
                 break;
-            
+
             case PoliticianGroup.Vlada:
-                var ministri = OsobaRepo.GetByZatrideni(OsobaRepo.Zatrideni.Ministr, year).Select(o => o.NameId);
-                var predseda = OsobaRepo.GetByZatrideni(OsobaRepo.Zatrideni.PredsedaVlady, year).Select(o => o.NameId);
+                var ministri = OsobaRepo.GetByZatrideni(OsobaRepo.Zatrideni.Ministr, rok).Select(o => o.NameId);
+                var predseda = OsobaRepo.GetByZatrideni(OsobaRepo.Zatrideni.PredsedaVlady, rok).Select(o => o.NameId);
                 nameIds = ministri.Concat(predseda).Distinct().ToList();
                 break;
-            
+
             default:
                 query = Enumerable.Empty<PpPrijem>().AsQueryable();
                 break;
@@ -673,7 +843,7 @@ public static class PpRepo
         {
             return nameIds;
         }
-        
+
         return await query.Select(p => p.Nameid).Distinct().ToListAsync();
     }
 
@@ -683,6 +853,19 @@ public static class PpRepo
         var org = await db.PuOrganizace
             .Include(o => o.FirmaDs)
             .FirstOrDefaultAsync(o => o.Id == organizaceId);
+
+        if (org is null)
+            return "";
+
+        return org.Nazev;
+    }
+    public static async Task<string> GetOrganizaceNameAsync(string ico)
+    {
+        await using var db = new DbEntities();
+        var q = db.PuOrganizace
+            .Include(o => o.FirmaDs)
+            .Where(o => o.FirmaDs.Ico == ico);
+        var org = await q.FirstOrDefaultAsync();
 
         if (org is null)
             return "";
@@ -704,7 +887,7 @@ public static class PpRepo
         res.PocetPrijmuPozadano = await db.PuEvents
             .AsNoTracking()
             .Where(m => m.ProRok == rok && m.DotazovanaInformace == PuEvent.DruhDotazovaneInformace.Politik)
-            .Where(m => m.Typ == PuEvent.TypUdalosti.ZaslaniZadosti )
+            .Where(m => m.Typ == PuEvent.TypUdalosti.ZaslaniZadosti)
             .Distinct()
             .CountAsync();
 
@@ -726,7 +909,7 @@ public static class PpRepo
             .AsNoTracking()
             .Where(m => m.ProRok == rok && m.DotazovanaInformace == PuEvent.DruhDotazovaneInformace.Politik)
             .Where(m => m.Typ == PuEvent.TypUdalosti.ZaslaniZadosti || m.Typ == PuEvent.TypUdalosti.Neurceno
-                || m.Typ == PuEvent.TypUdalosti.Upresneni || m.Typ == PuEvent.TypUdalosti.Stiznost 
+                || m.Typ == PuEvent.TypUdalosti.Upresneni || m.Typ == PuEvent.TypUdalosti.Stiznost
                 || m.Typ == PuEvent.TypUdalosti.Odvolani || m.Typ == PuEvent.TypUdalosti.Jine || m.Typ == PuEvent.TypUdalosti.NahraniUdaju)
             .Select(m => m.IdOrganizace)
             .Distinct()

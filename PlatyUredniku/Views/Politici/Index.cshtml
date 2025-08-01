@@ -45,7 +45,7 @@
         <li>
             <a asp-action="Index" asp-controller="Home">Platy</a>
         </li>
-        <li class="active">Politici</li>
+        <li class="active">Platy politiků</li>
     </ol>
 }
 
@@ -70,7 +70,7 @@
         <div class="row">
             <div class="col-12 col-lg-4">
                 <h5>Přehled politiků</h5>
-
+                <p>Přehledný seznam všech osob, platy a pozice</p>
 
                 @{
                     var groupList = new PpRepo.PoliticianGroup[]
@@ -82,21 +82,16 @@
                                 PpRepo.PoliticianGroup.Vse,
                     };
                 }
-                <table style="border:none">
+                <ul class="list-group">
+
                     @foreach (var item in groupList)
                     {
-                        <tr>
-                            <td>
-                                <a class="btn btn-outline-primary btn-sm text-bg-light w-100" href="/politici/seznam/@(item.ToString())?year=@(PpRepo.DefaultYear)" role="button">
-                                    @(item.ToNiceDisplayName())
-                                    <span class="badge text-bg-secondary bg-danger">@((await PpRepo.GetNameIdsForGroupAsync(item, rok)).Count)</span>
-                                </a>
-                                <br />
-                            </td>
-
-                        </tr>
+                        <a class="list-group-item list-group-item-action d-flex justify-content-between align-items-center lh-lg" href="/politici/seznam/@(item.ToString())?year=@(PpRepo.DefaultYear)" role="button">
+                            @(item.ToNiceDisplayName())
+                            <span class="badge text-bg-info rounded-pill">@((await PpRepo.GetNameIdsForGroupAsync(item, rok)).Count)</span>
+                         </a>
                     }
-                </table>
+                </ul>
             </div>
             <div class="col-12 col-lg-4">
                 <h5>Top příjmy</h5>
@@ -108,7 +103,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                        @foreach (var plat in platyPerNameId.OrderByDescending(p => p.Value.Sum(m => m.CelkovyRocniPlatVcetneOdmen)).Take(3))
+                        @foreach (var plat in platyPerNameId.OrderByDescending(p => p.Value.Sum(m => m.CelkovyRocniPlatVcetneOdmen)).Take(5))
                         {
                             <tr>
                                 <td>@Osoby.GetByNameId.Get(plat.Key).FullName()</td>
@@ -117,7 +112,6 @@
                         }
                     </tbody>
                 </table>
-                <a class="btn btn-primary btn-sm" href="/politici/seznam/@(PpRepo.PoliticianGroup.Vse.ToString("G"))?year=@(PpRepo.DefaultYear)">Všechny platy politiků</a>
             </div>
             <div class="col-12 col-lg-4">
                 <h5>Top kumulace</h5>
@@ -129,7 +123,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                        @foreach (var plat in platyPerNameId.OrderByDescending(p => p.Value.Where(m => m.CelkovyRocniPlatVcetneOdmen > 0).Count()).Take(3))
+                        @foreach (var plat in platyPerNameId.OrderByDescending(p => p.Value.Where(m => m.CelkovyRocniPlatVcetneOdmen > 0).Count()).Take(5))
                         {
                             <tr>
                                 <td>@Osoby.GetByNameId.Get(plat.Key).FullName()</td>
@@ -139,7 +133,9 @@
                         }
                     </tbody>
                 </table>
-                <a class="btn btn-primary btn-sm" href="/politici/reporty">Další reporty a analýzy</a>
+            </div>
+            <div class="col-12 text-center">
+                <a class="btn btn-primary btn-sm" href="/politici/reporty">Další reporty, statistiky a analýzy platů politiků</a>
 
             </div>
         </div>

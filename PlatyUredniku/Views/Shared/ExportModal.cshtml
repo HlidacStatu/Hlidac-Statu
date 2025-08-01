@@ -40,7 +40,7 @@
                             </ul>
                         </div>
                         <div class="panel-footer">
-                            <a href="https://creativecommons.org/licenses/by/3.0/cz/legalcode">Plný text licenčních podmínek</a>.<br>
+                            <a href="https://texty.hlidacstatu.cz/licence/">Plný text licenčních podmínek</a>.<br>
                             Pokud máte pochyby či vám tato licence nevyhovuje,&nbsp;<a href="https://texty.hlidacstatu.cz/Kontakt">kontaktujte nás</a>.
                         </div>
                     </div>
@@ -54,7 +54,7 @@
                     <a href="https://texty.hlidacstatu.cz/licence/" target="_blank" class="alert-link">licenční podmínky</a>.
                 </div>
                 <p>
-                    <a asp-controller="Home" asp-action="Export"
+                    <a asp-controller="@Model.Part" asp-action="Export"
                        asp-route-type="excel"
                        asp-route-rok="@Model.Rok"
                        asp-route-datovaSchranka="@Model.DatovaSchranka"
@@ -63,7 +63,7 @@
                        target="_blank">
                         Export do Excelu
                     </a>
-                    <a asp-controller="Home" asp-action="Export"
+                    <a asp-controller="@Model.Part" asp-action="Export"
                        asp-route-type="tsv"
                        asp-route-rok="@Model.Rok"
                        asp-route-datovaSchranka="@Model.DatovaSchranka"

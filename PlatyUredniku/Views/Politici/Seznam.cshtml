@@ -5,9 +5,13 @@
 @using HlidacStatu.Extensions
 @using HlidacStatu.Repositories
 @using HlidacStatu.XLib.Render
+@using HlidacStatu.Util
+@using PlatyUredniku.Cache
 
 @{
     List<PpPrijem> vsechnyPlaty = await PpRepo.GetPrijmyForGroupAsync(PpRepo.PoliticianGroup.Vse, Model.Year);
+
+    string grouName = Model.Group.ToNiceDisplayName();
 
     List<string> nameIdFilter = [];
     if (Model.Group == PpRepo.PoliticianGroup.Vse)
@@ -22,46 +26,47 @@
         ViewBag.Title = $"Seznam platů politiků - " + Model.Group.ToNiceDisplayName();
     }
 
-    ReportDataSource<(PpPrijem[] Prijem, Osoba Osoba)> rds = new(
-        new ReportDataSource<(PpPrijem[] Prijem, Osoba Osoba)>.Column()
+    ReportDataSource<PpPrijem[]> rds = new(
+        new ReportDataSource<PpPrijem[]>.Column()
         {
             Name = "Politik",
             HtmlRender = (m) =>
             {
-                return $"<a href='/politici/politik/{m.Osoba.NameId}'>{m.Osoba.FullNameWithYear()}</a>";
+                return $"<a href='/politici/politik/{m.First().Nameid}'>{OsobyRolesCache.Get(m.First().Nameid).FullName}</a>";
             },
             OrderValueRender = (m) =>
             {
-                return $"{m.Osoba.Prijmeni} {m.Osoba.Jmeno}";
+                return $"{OsobyRolesCache.Get(m.First().Nameid).Prijmeni} {OsobyRolesCache.Get(m.First().Nameid).Jmeno}";
             },
         },
-        new ReportDataSource<(PpPrijem[] Prijem, Osoba Osoba)>.Column()
+        new ReportDataSource<PpPrijem[]>.Column()
         {
             Name = "Politické role",
-            HtmlRender = (m) => m.Osoba.MainRoles(Model.Year),
-            OrderValueRender = (m) => m.Osoba.MainRoles(Model.Year),
+            HtmlRender = (m) => OsobyRolesCache.Get(m.First().Nameid).Role,
+            OrderValueRender = (m) => OsobyRolesCache.Get(m.First().Nameid).Role,
         },
-        new ReportDataSource<(PpPrijem[] Prijem, Osoba Osoba)>.Column()
+        new ReportDataSource<PpPrijem[]>.Column()
         {
             Name = "Celkový roční příjem",
             HtmlRender = (m) =>
             {
-                return $"<a href='/politici/politik/{m.Osoba.NameId}'>{HlidacStatu.Util.RenderData.NicePrice(m.Prijem.Sum(v => v.CelkovyRocniPlatVcetneOdmen), html: true)}</a>";
+                return $"<a href='/politici/politik/{m.First().Nameid}'>{HlidacStatu.Util.RenderData.NicePrice(m.Sum(v => v.CelkovyRocniPlatVcetneOdmen), html: true)}</a>";
             },
-            OrderValueRender = (m) => HlidacStatu.Util.RenderData.OrderValueFormat(m.Prijem.Sum(v => v.CelkovyRocniPlatVcetneOdmen)),
+            OrderValueRender = (m) => HlidacStatu.Util.RenderData.OrderValueFormat(m.Sum(v => v.CelkovyRocniPlatVcetneOdmen)),
             CssClass = "number"
         },
-        new ReportDataSource<(PpPrijem[] Prijem, Osoba Osoba)>.Column()
+        new ReportDataSource<PpPrijem[]>.Column()
         {
             Name = "Působí v organizacích (řazeno podle počtu)",
-            HtmlRender = (m) => { return string.Join("<br />", m.Prijem
+            HtmlRender = (m) => { return "<ol>" + string.Join("", m
                                             .Select(n => n.Organizace)
                                             .Distinct()
-                                            .Select(o => $"<a href='/politici/organizace/{o.DS}'>{Devmasters.TextUtil.ShortenMe(o.Nazev,25)}</a>")
-            ); 
-            
+                                            .Select(o => $"<li><a href='/politici/organizace/{o.DS}'>{o.Nazev}</a></li>")
+                                            ) + "</ul>";
+
             },
-            OrderValueRender = (m) => HlidacStatu.Util.RenderData.OrderValueFormat(m.Prijem.Count()),
+            OrderValueRender = (m) => HlidacStatu.Util.RenderData.OrderValueFormat(m.Count()),
+            //CssClass = "text-nowrap overflow-x-hidden "
         }
     );
     foreach (var pol in nameIdFilter)
@@ -69,7 +74,7 @@
         var platyPerPolitik = vsechnyPlaty.Where(m => m.Nameid == pol).ToArray();
         if (platyPerPolitik.Any())
         {
-            rds.AddRow((platyPerPolitik, Osoby.GetByNameId.Get(pol)));
+            rds.AddRow(platyPerPolitik);
 
         }
     }
@@ -83,8 +88,13 @@
         <li>
             <a asp-action="Index" asp-controller="Home">Platy</a>
         </li>
-        <li><a asp-action="Index" asp-controller="Politici">Politici</a></li>
+        <li>
+            <a asp-action="Index" asp-controller="Politici">Platy politiků</a>
+        </li>
         <li class="active">Seznam politiků</li>
+        <li>
+            <a href="@(this.Context.Request.GetCurrentUrl("rok", Model.Year.ToString()))">@ViewBag.Title</a>
+        </li>
     </ol>
 }
 

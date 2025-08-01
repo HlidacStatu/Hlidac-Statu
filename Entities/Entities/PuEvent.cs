@@ -1,3 +1,4 @@
+﻿using Devmasters.Enums;
 using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -5,20 +6,33 @@ using System.ComponentModel.DataAnnotations.Schema;
 namespace HlidacStatu.Entities;
 
 [Table("PU_Event")]
-public class PuEvent
+public partial class PuEvent
 {
+
+    [ShowNiceDisplayName]
     public enum TypUdalosti : int
     {
+        [NiceDisplayName("Ostatní")]
         Neurceno = 0,
+        [NiceDisplayName("Zaslání žádosti")]
         ZaslaniZadosti = 1,
+        [NiceDisplayName("Upřesnění žádosti")]
         Upresneni = 2,
+        [NiceDisplayName("Úplné odmítnutí poskytnutí informací")]
         UplneOdmitnutiPoskytnutiInformaci = 3,
+        [NiceDisplayName("Částečné odmítnutí poskytnutí informací")]
         CastecneOdmitnutiPoskytnutiInformaci = 4,
+        [NiceDisplayName("Poskytnutí informací")]
         PoskytnutiInformace = 5,
+        [NiceDisplayName("Žádost o úhradu nákladů")]
         Zadost_o_UhraduNakladu = 6,
+        [NiceDisplayName("Stížnost")]
         Stiznost = 7,
+        [NiceDisplayName("Odvolání")]
         Odvolani = 8,
+        [NiceDisplayName("Jiné")]
         Jine = 9,
+        [NiceDisplayName("Zapsání zaslaných údajů do naší databáze")]
         NahraniUdaju = 10,
     }
 

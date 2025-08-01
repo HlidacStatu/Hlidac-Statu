@@ -2,7 +2,7 @@
 @using HlidacStatu.Repositories
 @using HlidacStatu.Repositories.SharedModels
 @{
-    ViewBag.Title = "";
+    ViewBag.Title = "Platy politiků a úředníků";
 
     var puPlatyStats = await PuRepo.GetPlatyPerYearStatCache.GetAsync(PuRepo.DefaultYear);
     var puOrgStats = await PuRepo.GetGlobalStatOrganizaceAsync();
@@ -15,6 +15,13 @@
     var dataForOrganizationOfTheDay = await UredniciStaticCache.GetFullDetailAsync(organizationOfTheDay.DS);
 }
 
+@section breadcrumbs
+{
+    <ol class="breadcrumb">
+        <li class="active">@ViewBag.Title</li>
+    </ol>
+}
+
 <section class="d-flex align-items-center justify-content-center">
     <div class="container">
         <h2>Platy politiků a úředníků</h2>
@@ -25,7 +32,7 @@
             <i class="fa-solid fa-circle-2"></i> Informace o platech a odměnách soudců, vedení úřadů, státních podniků či příspěvkových organizací v ČR u nás najdete už spoustu let.
         </p>
         <p>
-            Data shromážďujeme na základě oficiální žádosti podle zákona o svobodném přístupu k informacím.             Platy a odměny jsou stanoveny
+            Data shromažďujeme na základě oficiální žádosti podle zákona o svobodném přístupu k informacím.             Platy a odměny jsou stanoveny
             <a asp-controller="Texty" asp-action="PlatyStatnichZamestnancu">nařízením vlády</a>
             nebo
             <a asp-controller="Texty" asp-action="Nejvyssi">zákonem</a>.

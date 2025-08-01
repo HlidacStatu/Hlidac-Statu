@@ -18,7 +18,7 @@
     <PackageReference Include="AspNetCore.HealthChecks.Uris" Version="8.0.1" />
     <PackageReference Include="Corsinvest.ProxmoxVE.Api.Extension" Version="8.4.1" />
     <PackageReference Include="Corsinvest.ProxmoxVE.Api.Shared" Version="8.4.1" />
-    <PackageReference Include="Devmasters.Core" Version="8.0.10" />
+    <PackageReference Include="Devmasters.Core" Version="8.0.11" />
     <PackageReference Include="Docker.DotNet" Version="3.125.15" />
     <PackageReference Include="HlidacStatu.Api.V2.Dataset" Version="2.4.1.1" />
     <PackageReference Include="Microsoft.AspNetCore.Components" Version="8.0.18" />

@@ -110,7 +110,7 @@ public static class OsobaExtension2
         return AssembleRoles(events);
     }
     
-    public static string MainRoles(this Osoba osoba, int forYear)
+    public static string MainRolesToString(this Osoba osoba, int forYear, string delimiter = ", ")
     {
         var events = osoba.Events(ev =>
                 (ev.Type == (int)OsobaEvent.Types.PolitickaExekutivni
@@ -122,17 +122,17 @@ public static class OsobaExtension2
 
         try
         {
-            return AssembleRoles(events);
+            return AssembleRoles(events,delimiter);
 
         }
         catch (Exception e)
         {
             Console.WriteLine(e);
         }
-        return "null";
+        return "";
     }
 
-    private static string AssembleRoles(List<OsobaEvent> events)
+    private static string AssembleRoles(List<OsobaEvent> events, string delimiter = ", ")
     {
         if (events is null || !events.Any())
             return "";
@@ -201,7 +201,7 @@ public static class OsobaExtension2
             roles.Add("krajský zastupitel");
         }
         
-        return string.Join(", ", roles);
+        return string.Join(delimiter, roles);
     }
     
 

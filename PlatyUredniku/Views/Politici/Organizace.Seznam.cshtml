@@ -4,7 +4,7 @@
 @using HlidacStatu.XLib.Render
 
 @{
-    ViewBag.Title = "Seznam organizací";
+    ViewBag.Title = "Seznam organizací platicích politiky";
 }
 @section breadcrumbs
 {
@@ -23,8 +23,10 @@
 }
 
 @{
-    var orgs = await PpRepo.GetActiveOrganizaceAsync(PpRepo.DefaultYear);
-    var allEventsPoskytnuto = await PpRepo.GetAllEventsAsync(PpRepo.DefaultYear,
+    var rok = PpRepo.DefaultYear;
+
+    var orgs = await PpRepo.GetActiveOrganizaceAsync(rok);
+    var allEventsPoskytnuto = await PpRepo.GetAllEventsAsync(rok,
         m =>m.DotazovanaInformace == PuEvent.DruhDotazovaneInformace.Politik 
             && m.Typ == PuEvent.TypUdalosti.PoskytnutiInformace || m.Typ == PuEvent.TypUdalosti.PoskytnutiInformace
     );
@@ -41,9 +43,9 @@
         .OrderBy(o => o.Nazev)
         .ToList();
 
-    var aktualniPlaty = havePlatyOrgs.SelectMany(o => o.PrijmyPolitiku.AktualniRok()).ToList();
-    var platyMin = aktualniPlaty.Any() ? aktualniPlaty.Min(p => p.PrumernyMesicniPrijemVcetneOdmen) : 0;
-    var platyMax = aktualniPlaty.Any() ? aktualniPlaty.Max(p => p.PrumernyMesicniPrijemVcetneOdmen) : 0;
+    //var aktualniPlaty = havePlatyOrgs.SelectMany(o => o.PrijmyPolitiku.AktualniRok()).ToList();
+    var platyMin = (await PpRepo.GetPlatyAsync(rok)).Min(m => m.CelkovyRocniPlatVcetneOdmen);
+    var platyMax = (await PpRepo.GetPlatyAsync(rok)).Max(m => m.CelkovyRocniPlatVcetneOdmen);
     var platyLength = platyMax - platyMin;
     if (platyLength == 0)
         platyLength = 0.01m;
@@ -57,7 +59,7 @@
                 @ViewBag.Title
             </h3>
             <p>
-                V roce @PpRepo.DefaultYear @Html.Raw(Devmasters.Lang.CS.Plural.GetWithZero(havePlatyOrgs.Count,
+                V roce @rok @Html.Raw(Devmasters.Lang.CS.Plural.GetWithZero(havePlatyOrgs.Count,
                 "informace o platech nemáme od žádné instituce",
                 "poskyla plat jedna instituce",
                 $"poskytli plat {{0}} instituce",
@@ -78,7 +80,7 @@
                         @{
                             var sorted = havePlatyOrgs.Concat(goodOrgs).Concat(badOrgs);
                         }
-                        @foreach (var org in sorted)
+                        @foreach (var org in sorted.OrderByDescending(o=>o.PrijmyPolitiku?.Count ?? 0))
                         {
                             <tr>
                                 <td class="col" style="overflow: hidden;white-space: nowrap;text-overflow: ellipsis;max-width: 20rem;">
@@ -91,6 +93,7 @@
                                 {
                                     var minimalniPlatOrganizace = org.PrijmyPolitiku.AktualniRok().Min(m => m.PrumernyMesicniPrijemVcetneOdmen);
                                     var maximalniPlatOrganizace = org.PrijmyPolitiku.AktualniRok().Max(m => m.PrumernyMesicniPrijemVcetneOdmen);
+
                                     var startPer = Math.Round((minimalniPlatOrganizace - platyMin) / platyLength * 100);
                                     var endPer = Math.Round((maximalniPlatOrganizace - minimalniPlatOrganizace) / platyLength * 100);
                                     if (endPer == 0)
