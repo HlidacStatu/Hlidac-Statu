@@ -29,8 +29,8 @@ public class PoliticiController : Controller
     {
         //titulka politiku
         var platyTask = _cache.GetOrSetAsync<Dictionary<string, PpPrijem[]>>(
-            $"{nameof(PpRepo.GetPlatyGroupedByNameIdAsync)}_{rok}-politici",
-            _ => PpRepo.GetPlatyGroupedByNameIdAsync(rok)
+            $"{nameof(PpRepo.GetPrijmyGroupedByNameIdAsync)}_{rok}-politici",
+            _ => PpRepo.GetPrijmyGroupedByNameIdAsync(rok)
         );
         var platyPolitiku = await platyTask;
         ViewData["platy"] = platyPolitiku;
@@ -75,14 +75,14 @@ public class PoliticiController : Controller
 
 
     [HlidacCache(60 * 60, "*")]
-    public async Task<IActionResult> Seznam(string id, int? year)
+    public async Task<IActionResult> Seznam(string id, int? year, int? top = null, string sort = null, string report = null)
     {
         if (!Enum.TryParse<PpRepo.PoliticianGroup>(id, out var politicianGroup))
         {
             politicianGroup = PpRepo.PoliticianGroup.Vse;
         }
 
-        return View((Group: politicianGroup, Year: year ?? PpRepo.DefaultYear));
+        return View((Group: politicianGroup, Year: year ?? PpRepo.DefaultYear, top: top ?? int.MaxValue-1, sort: sort, report: report));
     }
 
     [HlidacCache(48*60 * 60, "*")]

@@ -1,4 +1,4 @@
-@model (PpRepo.PoliticianGroup Group, int Year)
+@model (PpRepo.PoliticianGroup Group, int Year, int top, string sort, string report)
 
 @using Devmasters.Enums
 @using HlidacStatu.Entities
@@ -9,72 +9,131 @@
 @using PlatyUredniku.Cache
 
 @{
-    List<PpPrijem> vsechnyPlaty = await PpRepo.GetPrijmyForGroupAsync(PpRepo.PoliticianGroup.Vse, Model.Year);
+    //reporty parameters templates
+    var group = Model.Group;
+    var year = Model.Year;
+    var top = Model.top;
+    var sort = Model.sort;
+    var report = Model.report;
 
-    string grouName = Model.Group.ToNiceDisplayName();
+
+    string grouName = group.ToNiceDisplayName();
 
     List<string> nameIdFilter = [];
-    if (Model.Group == PpRepo.PoliticianGroup.Vse)
+    if (group == PpRepo.PoliticianGroup.Vse)
     {
-        nameIdFilter = vsechnyPlaty.Select(m => m.Nameid).Distinct().ToList();
+
         ViewBag.Title = $"Seznam platů politiků";
 
     }
     else
     {
-        nameIdFilter = await PpRepo.GetNameIdsForGroupAsync(Model.Group, Model.Year);
-        ViewBag.Title = $"Seznam platů politiků - " + Model.Group.ToNiceDisplayName();
+        nameIdFilter = await PpRepo.GetNameIdsForGroupAsync(group, year);
+        ViewBag.Title = $"Seznam platů politiků - " + group.ToNiceDisplayName();
+    }
+    Dictionary<string, PpPrijem[]> vsechnyPlaty = null;
+
+    switch (report)
+    {
+        case "zeny":
+            ViewBag.Title = "Pouze političky";
+            vsechnyPlaty = await PpRepo.GetPrijmyBySexAsync(true, year);
+            break;
+        case "muzi":
+            ViewBag.Title = "Pouze politici";
+            vsechnyPlaty = await PpRepo.GetPrijmyBySexAsync(false, year);
+            break;
+        case "transparentnost":
+            top = 100;
+            ViewBag.Title = "Politici nejvíce tající své příjmy";
+            vsechnyPlaty = vsechnyPlaty            
+                .OrderByDescending(kv => kv.Value.Count(m=>m.Status == PpPrijem.StatusPlatu.Zjistujeme))
+                .Take(top)
+                .ToDictionary(kv => kv.Key, kv => kv.Value);
+            break;
+        case "top-prijem":
+            top = 100;
+            sort = "celkem";
+            break;
+        case "top-funkce":
+            top = 100;
+            sort = "funkce";
+            break;
+    }
+   
+    if (vsechnyPlaty == null)
+    {
+        vsechnyPlaty = await PpRepo.GetPrijmyGroupedByNameIdAsync(year, true, onlyNameIds: nameIdFilter.ToArray());
     }
 
-    ReportDataSource<PpPrijem[]> rds = new(
-        new ReportDataSource<PpPrijem[]>.Column()
+    var dataToRender = vsechnyPlaty.AsQueryable();
+
+    dataToRender = sort switch
+    {
+        "name" => dataToRender.OrderBy(o => OsobyRolesCache.Get(o.Key).Prijmeni),
+        "role" => dataToRender.OrderBy(o => OsobyRolesCache.Get(o.Key).Role),
+        "funkce" => dataToRender.OrderByDescending(o => o.Value.Count()),
+        "celkem" => dataToRender.OrderByDescending(o => o.Value.Sum(m => m.CelkovyRocniPlatVcetneOdmen)),
+        _ => dataToRender.OrderByDescending(o => o.Value.Sum(m => m.CelkovyRocniPlatVcetneOdmen))
+    };
+
+
+    ReportDataSource<KeyValuePair<string, PpPrijem[]>> rds = new(
+        new ReportDataSource<KeyValuePair<string, PpPrijem[]>>.Column()
         {
             Name = "Politik",
             HtmlRender = (m) =>
             {
-                return $"<a href='/politici/politik/{m.First().Nameid}'>{OsobyRolesCache.Get(m.First().Nameid).FullName}</a>";
+                return $"<a href='/politici/politik/{m.Key}'>{OsobyRolesCache.Get(m.Key).FullName}</a>";
             },
             OrderValueRender = (m) =>
             {
-                return $"{OsobyRolesCache.Get(m.First().Nameid).Prijmeni} {OsobyRolesCache.Get(m.First().Nameid).Jmeno}";
+                return $"{OsobyRolesCache.Get(m.Key).Prijmeni} {OsobyRolesCache.Get(m.Key).Jmeno}";
             },
         },
-        new ReportDataSource<PpPrijem[]>.Column()
+        new ReportDataSource<KeyValuePair<string, PpPrijem[]>>.Column()
         {
             Name = "Politické role",
-            HtmlRender = (m) => OsobyRolesCache.Get(m.First().Nameid).Role,
-            OrderValueRender = (m) => OsobyRolesCache.Get(m.First().Nameid).Role,
+            HtmlRender = (m) => OsobyRolesCache.Get(m.Key).Role,
+            OrderValueRender = (m) => OsobyRolesCache.Get(m.Key).Role,
         },
-        new ReportDataSource<PpPrijem[]>.Column()
+        new ReportDataSource<KeyValuePair<string, PpPrijem[]>>.Column()
         {
             Name = "Celkový roční příjem",
             HtmlRender = (m) =>
             {
-                return $"<a href='/politici/politik/{m.First().Nameid}'>{HlidacStatu.Util.RenderData.NicePrice(m.Sum(v => v.CelkovyRocniPlatVcetneOdmen), html: true)}</a>";
+                return $"<a href='/politici/politik/{m.Key}'>{HlidacStatu.Util.RenderData.NicePrice(m.Value.Sum(v => v.CelkovyRocniPlatVcetneOdmen), html: true)}</a>";
             },
-            OrderValueRender = (m) => HlidacStatu.Util.RenderData.OrderValueFormat(m.Sum(v => v.CelkovyRocniPlatVcetneOdmen)),
+            OrderValueRender = (m) => HlidacStatu.Util.RenderData.OrderValueFormat(m.Value.Sum(v => v.CelkovyRocniPlatVcetneOdmen)),
             CssClass = "number"
         },
-        new ReportDataSource<PpPrijem[]>.Column()
+        new ReportDataSource<KeyValuePair<string, PpPrijem[]>>.Column()
         {
             Name = "Působí v organizacích (řazeno podle počtu)",
-            HtmlRender = (m) => { return "<ol>" + string.Join("", m
+            HtmlRender = (m) => { return "<ol>" + string.Join("", m.Value
                                             .Select(n => n.Organizace)
                                             .Distinct()
                                             .Select(o => $"<li><a href='/politici/organizace/{o.DS}'>{o.Nazev}</a></li>")
                                             ) + "</ul>";
 
             },
-            OrderValueRender = (m) => HlidacStatu.Util.RenderData.OrderValueFormat(m.Count()),
+            OrderValueRender = (m) => HlidacStatu.Util.RenderData.OrderValueFormat(m.Value.Count()),
             //CssClass = "text-nowrap overflow-x-hidden "
         }
     );
-    foreach (var pol in nameIdFilter)
+  
+
+    dataToRender.OrderByDescending(o => o.Value.Sum(m => m.CelkovyRocniPlatVcetneOdmen));
+
+    if (top < int.MaxValue-1)
+        dataToRender = dataToRender.Take(top);
+
+    foreach (var kv in dataToRender)
     {
-        var platyPerPolitik = vsechnyPlaty.Where(m => m.Nameid == pol).ToArray();
-        if (platyPerPolitik.Any())
+        //var platyPerPolitik = vsechnyPlaty.Where(m => m.Nameid == pol).ToArray();
+        if (kv.Value.Any())
         {
-            rds.AddRow(platyPerPolitik);
+            rds.AddRow(kv);
 
         }
     }
@@ -93,7 +152,7 @@
         </li>
         <li class="active">Seznam politiků</li>
         <li>
-            <a href="@(this.Context.Request.GetCurrentUrl("rok", Model.Year.ToString()))">@ViewBag.Title</a>
+            <a href="@(this.Context.Request.GetCurrentUrl("rok", year.ToString()))">@ViewBag.Title</a>
         </li>
     </ol>
 }
@@ -120,7 +179,7 @@
             }
             @foreach (var item in groupList)
             {
-                <a class="btn btn@(Model.Group == item ? "" : "-outline")-primary btn-sm col @(Model.Group == item ? "disabled" : "")" href="/politici/seznam/@(item.ToString())?year=@(PpRepo.DefaultYear)" role="button">
+                <a class="btn btn@(group == item ? "" : "-outline")-primary btn-sm col @(group == item ? "disabled" : "")" href="/politici/seznam/@(item.ToString())?year=@(PpRepo.DefaultYear)" role="button">
                     @(item.ToNiceDisplayName())
                 </a>
             }

@@ -464,17 +464,20 @@ public static class PpRepo
     [
         "politici",
     ];
-    public static async Task<Dictionary<string, PpPrijem[]>> GetPlatyGroupedByNameIdAsync(int rok, bool withDetails = false, string ico = null)
+    public static async Task<Dictionary<string, PpPrijem[]>> GetPrijmyGroupedByNameIdAsync(int rok, bool withDetails = false, string ico = null, string[] onlyNameIds = null, bool pouzePotvrzene = false)
     {
 
         await using var db = new DbEntities();
-        var q = BasePotvrzenePlaty(db, rok)
+        var q = pouzePotvrzene ? BasePotvrzenePlaty(db, rok) : BaseAllPlaty(db, rok)
             .AsNoTracking();
         if (withDetails || string.IsNullOrEmpty(ico) == false)
             q = q.Include(i => i.Organizace).ThenInclude(o => o.FirmaDs);
         if (!string.IsNullOrEmpty(ico))
             q = q.Where(m => m.Organizace.FirmaDs.Ico == ico);
         q = q.Where(p => p.Rok == rok);
+
+        if (onlyNameIds?.Count()>0)
+            q = q.Where(p => onlyNameIds.Contains(p.Nameid));
 
         var qGrouped = q
             .GroupBy(k => k.Nameid, v => v, (k, v) => new { nameId = k, platy = v.ToArray() });
@@ -758,7 +761,7 @@ public static class PpRepo
                 (p, o) => p.Nameid)
             .ToArrayAsync();
 
-        Dictionary<string, PpPrijem[]> res = (await GetPlatyGroupedByNameIdAsync(year, false))
+        Dictionary<string, PpPrijem[]> res = (await GetPrijmyGroupedByNameIdAsync(year, false))
             .Where(m => nameIds.Contains(m.Key))
             .ToDictionary();
 
