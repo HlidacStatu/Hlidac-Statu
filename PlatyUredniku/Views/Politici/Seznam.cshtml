@@ -16,6 +16,7 @@
     var sort = Model.sort;
     var report = Model.report;
 
+    bool showGroupsButtons = (top > (int.MaxValue - 10)) && string.IsNullOrEmpty(sort) && string.IsNullOrEmpty(report);
 
     string grouName = group.ToNiceDisplayName();
 
@@ -37,17 +38,18 @@
     {
         case "zeny":
             ViewBag.Title = "Pouze političky";
-            vsechnyPlaty = await PpRepo.GetPrijmyBySexAsync(true, year);
+            vsechnyPlaty = await PpRepo.GetPrijmyBySexAsync(true, true, year);
             break;
         case "muzi":
             ViewBag.Title = "Pouze politici";
-            vsechnyPlaty = await PpRepo.GetPrijmyBySexAsync(false, year);
+            vsechnyPlaty = await PpRepo.GetPrijmyBySexAsync(false, true, year);
             break;
         case "transparentnost":
             top = 100;
             ViewBag.Title = "Politici nejvíce tající své příjmy";
-            vsechnyPlaty = vsechnyPlaty            
-                .OrderByDescending(kv => kv.Value.Count(m=>m.Status == PpPrijem.StatusPlatu.Zjistujeme))
+            vsechnyPlaty = await PpRepo.GetPrijmyGroupedByNameIdAsync(year, true);
+            vsechnyPlaty = vsechnyPlaty
+                .OrderByDescending(kv => kv.Value.Count(m => m.Status == PpPrijem.StatusPlatu.Zjistujeme))
                 .Take(top)
                 .ToDictionary(kv => kv.Key, kv => kv.Value);
             break;
@@ -60,7 +62,7 @@
             sort = "funkce";
             break;
     }
-   
+
     if (vsechnyPlaty == null)
     {
         vsechnyPlaty = await PpRepo.GetPrijmyGroupedByNameIdAsync(year, true, onlyNameIds: nameIdFilter.ToArray());
@@ -110,10 +112,12 @@
         new ReportDataSource<KeyValuePair<string, PpPrijem[]>>.Column()
         {
             Name = "Působí v organizacích (řazeno podle počtu)",
-            HtmlRender = (m) => { return "<ol>" + string.Join("", m.Value
+            HtmlRender = (m) =>
+            {
+                return "<ol>" + string.Join("", m.Value
                                             .Select(n => n.Organizace)
                                             .Distinct()
-                                            .Select(o => $"<li><a href='/politici/organizace/{o.DS}'>{o.Nazev}</a></li>")
+                                            .Select(o => $"<li><a href='/politici/organizace/{o?.DS}'>{o?.Nazev}</a></li>")
                                             ) + "</ul>";
 
             },
@@ -121,14 +125,13 @@
             //CssClass = "text-nowrap overflow-x-hidden "
         }
     );
-  
 
-    dataToRender.OrderByDescending(o => o.Value.Sum(m => m.CelkovyRocniPlatVcetneOdmen));
 
-    if (top < int.MaxValue-1)
+    if (top < int.MaxValue - 3)
         dataToRender = dataToRender.Take(top);
 
-    foreach (var kv in dataToRender)
+    var data = dataToRender.ToArray();
+    foreach (var kv in data)
     {
         //var platyPerPolitik = vsechnyPlaty.Where(m => m.Nameid == pol).ToArray();
         if (kv.Value.Any())
@@ -137,7 +140,6 @@
 
         }
     }
-    //rds.AddRows(platyPerPolitik);
 }
 
 
@@ -150,9 +152,18 @@
         <li>
             <a asp-action="Index" asp-controller="Politici">Platy politiků</a>
         </li>
-        <li class="active">Seznam politiků</li>
-        <li>
-            <a href="@(this.Context.Request.GetCurrentUrl("rok", year.ToString()))">@ViewBag.Title</a>
+        @if (showGroupsButtons)
+        {
+            <li>Seznam politiků</li>
+        }
+        else
+        {
+            <li>
+                <a asp-action="Reporty" asp-controller="Politici">Reporty a statistiky</a>
+            </li>
+        }
+        <li class="active">
+            @ViewBag.Title
         </li>
     </ol>
 }
@@ -166,28 +177,32 @@
 <section class="d-flex align-items-center justify-content-center">
     <div class="container">
         <h2>@ViewBag.Title </h2>
-        <div class="row">
-            @{
-                var groupList = new PpRepo.PoliticianGroup[]
-                {
+
+        @if (showGroupsButtons)
+        {
+            <div class="row mb-3">
+                @{
+                    var groupList = new PpRepo.PoliticianGroup[]
+                    {
                         PpRepo.PoliticianGroup.Vse,
                         PpRepo.PoliticianGroup.Vlada,
                         PpRepo.PoliticianGroup.Poslanci,
                         PpRepo.PoliticianGroup.Senatori,
                         PpRepo.PoliticianGroup.KrajstiZastupitele,
-                };
-            }
-            @foreach (var item in groupList)
-            {
-                <a class="btn btn@(group == item ? "" : "-outline")-primary btn-sm col @(group == item ? "disabled" : "")" href="/politici/seznam/@(item.ToString())?year=@(PpRepo.DefaultYear)" role="button">
-                    @(item.ToNiceDisplayName())
-                </a>
-            }
-        </div>
+                    };
+                }
+                @foreach (var item in groupList)
+                {
+                    <a class="btn btn@(group == item ? "" : "-outline")-primary btn-sm col @(group == item ? "disabled" : "")" href="/politici/seznam/@(item.ToString())?year=@(PpRepo.DefaultYear)" role="button">
+                        @(item.ToNiceDisplayName())
+                    </a>
+                }
+            </div>
+        }
         <div>
             <p>
                 @Html.DataToHTMLTable(rds,
-                dataTableOptions: HtmlExtensions.DatatableOptions(orderColumnIdx: 2, orderDirection: "desc"))
+                dataTableOptions: HtmlExtensions.DatatableOptions(orderColumnIdx: 2, orderDirection: "desc", dom: "<\"top\"Bfp>rt<\"bottom\"ip><\"clear\">"))
             </p>
         </div>
     </div>

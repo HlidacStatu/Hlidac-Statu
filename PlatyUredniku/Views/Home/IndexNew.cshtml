@@ -42,37 +42,43 @@
         <hr class="mb-4" />
         <div class="row">
             <div class="col-sm-12 col-md-6 border-end">
-                <h3>Příjmy politiků a kumulace funkcí 
-                    @if (DateTime.Now < stopNovinkaPolitici ) {
+                <h3>
+                    Příjmy politiků a kumulace funkcí
+                    @if (DateTime.Now < stopNovinkaPolitici)
+                    {
                         <small class="ps-1 text-danger-emphasis">Novinka!</small>
                     }
-                    </h3>
-                <p>
+                </h3>
+                <div>
                     <img src="/Content//politik.png" class="float-start w-25 p-3" alt="Politik">
+                    <p>
+                        Za rok @PuRepo.DefaultYear jsme získali <b>@(HlidacStatu.Util.RenderData.NiceNumber(polStats.PocetPrijmu))</b> příjmů od celkem
+                        <b>@(HlidacStatu.Util.RenderData.NiceNumber(polStats.PocetOsobPozadano))</b> politiků.
 
-                    Za rok @PuRepo.DefaultYear jsme získali <b>@(HlidacStatu.Util.RenderData.NiceNumber(polStats.PocetPrijmu))</b> příjmů od celkem
-                    <b>@(HlidacStatu.Util.RenderData.NiceNumber(polStats.PocetOsobPozadano))</b> politiků.
-
-                    Alespoň jeden plat nám poskytlo <b>@(HlidacStatu.Util.RenderData.NiceNumber(polStats.PocetOrganizaciDaliPlat))</b> organizací.
-                </p>
-                <p>Ohledně platů jsme oslovili jak  organizace, kde politici působí, tak 911 samotných politiků <small>(na které jsme našli platný email)</small>.</p>
-                <p>
-                    <a asp-controller="Politici" asp-action="Index" class="btn btn-primary btn-sm">Příjmy a placené funkce všech politiků</a>
-                </p>
+                        Alespoň jeden plat nám poskytlo <b>@(HlidacStatu.Util.RenderData.NiceNumber(polStats.PocetOrganizaciDaliPlat))</b> organizací.
+                    </p>
+                    <p>Ohledně platů jsme oslovili jak  organizace, kde politici působí, tak 911 samotných politiků <small>(na které jsme našli platný email)</small>.</p>
+                    <p class="clearfix"></p>
+                    <p>
+                        <a asp-controller="Politici" asp-action="Index" class="btn btn-primary">Příjmy a placené funkce všech politiků</a>
+                    </p>
+                </div>
 
             </div>
             <div class="col-sm-12 col-md-6">
                 <h3>Platy úředníků a manažerů</h3>
-                <p>
+                <div>
                     <img src="/Content//manazer.png" class="float-start w-25 p-3" alt="Politik">
-                    Za @PuRepo.DefaultYear jsme žádali o platy @(HlidacStatu.Util.RenderData.NiceNumber(puOrgStats.PocetOslovenych)) organizací
-                    a plat nám @(DateTime.Now < new DateTime(2025, 04, 1) ? "zatím" : "") poskytlo @(HlidacStatu.Util.RenderData.NiceNumber(puOrgStats.PocetCoPoslaliPlat)) z nich.
-                    Najdete u nás platy @(HlidacStatu.Util.RenderData.NiceNumber(puPlatyStats.Pocet)) lidí a pozic.
-                </p>
-                <p>
-                    <a asp-controller="Urednici" asp-action="Index" class="btn btn-primary btn-sm">Vše o platech úředníků a manažerů</a>
-                </p>
-
+                    <p>
+                        Za @PuRepo.DefaultYear jsme žádali o platy @(HlidacStatu.Util.RenderData.NiceNumber(puOrgStats.PocetOslovenych)) organizací
+                        a plat nám @(DateTime.Now < new DateTime(2025, 04, 1) ? "zatím" : "") poskytlo @(HlidacStatu.Util.RenderData.NiceNumber(puOrgStats.PocetCoPoslaliPlat)) z nich.
+                        Najdete u nás platy @(HlidacStatu.Util.RenderData.NiceNumber(puPlatyStats.Pocet)) lidí a pozic.
+                    </p>
+                    <div class="clearfix"></div>
+                    <p>
+                        <a asp-controller="Urednici" asp-action="Index" class="btn btn-primary">Vše o platech úředníků a manažerů</a>
+                    </p>
+                </div>
             </div>
 
         </div>

@@ -479,10 +479,10 @@ public static class PpRepo
         if (onlyNameIds?.Count()>0)
             q = q.Where(p => onlyNameIds.Contains(p.Nameid));
 
-        var qGrouped = q
+        var qGrouped = (await q.ToArrayAsync())
             .GroupBy(k => k.Nameid, v => v, (k, v) => new { nameId = k, platy = v.ToArray() });
 
-        return await qGrouped.ToDictionaryAsync(k => k.nameId, v => v.platy);
+        return qGrouped.ToDictionary(k => k.nameId, v => v.platy);
     }
     public static async Task<List<PpPrijem>> GetPlatyAsync(int rok, bool withDetails = false, string ico = null)
     {
@@ -743,7 +743,7 @@ public static class PpRepo
         Vlada
     }
 
-    public async static Task<Dictionary<string, PpPrijem[]>> GetPrijmyBySexAsync(bool? woman, int year = DefaultYear)
+    public async static Task<Dictionary<string, PpPrijem[]>> GetPrijmyBySexAsync(bool? woman, bool withDetails = false, int year = DefaultYear)
     {
         await using var db = new DbEntities();
 
@@ -761,8 +761,7 @@ public static class PpRepo
                 (p, o) => p.Nameid)
             .ToArrayAsync();
 
-        Dictionary<string, PpPrijem[]> res = (await GetPrijmyGroupedByNameIdAsync(year, false))
-            .Where(m => nameIds.Contains(m.Key))
+        Dictionary<string, PpPrijem[]> res = (await GetPrijmyGroupedByNameIdAsync(year, withDetails, onlyNameIds: nameIds))
             .ToDictionary();
 
         return res;
@@ -803,10 +802,10 @@ public static class PpRepo
                 query = Enumerable.Empty<PpPrijem>().AsQueryable();
                 break;
         }
+        query = query
+            .Include(p => p.Organizace).ThenInclude(o => o.FirmaDs);
 
-        return await query
-            .Include(p => p.Organizace).ThenInclude(o => o.FirmaDs)
-            .ToListAsync(); ;
+        return await query.ToListAsync(); ;
     }
 
     public static async Task<List<string>> GetNameIdsForGroupAsync(PoliticianGroup group, int rok = DefaultYear, bool pouzePotvrzene = false)
@@ -847,7 +846,8 @@ public static class PpRepo
             return nameIds;
         }
 
-        return await query.Select(p => p.Nameid).Distinct().ToListAsync();
+        return await query.Select(p => p.Nameid).Distinct()
+            .ToListAsync();
     }
 
     public static async Task<string> GetOrganizaceNameAsync(int organizaceId)

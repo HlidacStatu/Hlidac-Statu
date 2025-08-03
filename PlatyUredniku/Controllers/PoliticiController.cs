@@ -77,7 +77,7 @@ public class PoliticiController : Controller
     [HlidacCache(60 * 60, "*")]
     public async Task<IActionResult> Seznam(string id, int? year, int? top = null, string sort = null, string report = null)
     {
-        if (!Enum.TryParse<PpRepo.PoliticianGroup>(id, out var politicianGroup))
+        if (!Enum.TryParse<PpRepo.PoliticianGroup>(id,true, out var politicianGroup))
         {
             politicianGroup = PpRepo.PoliticianGroup.Vse;
         }
