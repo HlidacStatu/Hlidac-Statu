@@ -4,13 +4,15 @@ for details on configuring this project to bundle and minify static web assets. 
     line-height: 1.2em;
 }
 
-section {
+section.pageblock {
     min-height: 30vh;
     padding-top: 4rem;
     padding-bottom: 1rem;
 }
-section .small-padding {
-    padding-top: 1rem;
+section.pageblock-small {
+    min-height: 30vh;
+    padding-top: 2rem;
+    padding-bottom: 1rem;
 }
 
 .alter-bg-color {
@@ -152,3 +154,15 @@ nav[data-toggle='toc'] .nav .nav {
   display: block;
 }
 */
+
+a.link-cta {
+    font-size: 1rem;
+    letter-spacing: 1px;
+    text-decoration: underline 2px;
+    text-transform: uppercase;
+    text-underline-offset: .375rem
+}
+
+   a.link-cta:hover {
+        color: #0163ee
+    }

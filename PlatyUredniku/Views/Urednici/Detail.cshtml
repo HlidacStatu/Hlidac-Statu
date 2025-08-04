@@ -42,7 +42,7 @@
     var neaktivniOrg = PuRepo.GetNeaktivniOrganizace().ToArray();
 }
 
-<section class="d-flex align-items-center justify-content-center @(sectionBgSwitch ? "alter-bg-color" : "")">
+<section class="d-flex align-items-center justify-content-center @(sectionBgSwitch ? "alter-bg-color" : "") pageblock-small">
     <div class="container">
 
 
@@ -89,7 +89,7 @@
 @{
     sectionBgSwitch = !sectionBgSwitch;
 }
-<section class="d-flex justify-content-center  @(sectionBgSwitch ? "alter-bg-color" : "")">
+<section class="d-flex justify-content-center  @(sectionBgSwitch ? "alter-bg-color" : "") pageblock">
     <div class="container">
 
         <h3>Přehled platů</h3>
@@ -220,7 +220,7 @@
 @if (compareTo?.Length > 0 && Model.Platy != null && Model.Platy.Any())
 {
     sectionBgSwitch = !sectionBgSwitch;
-    <section class="d-flex justify-content-center @(sectionBgSwitch ? "alter-bg-color" : "")">
+    <section class="d-flex justify-content-center @(sectionBgSwitch ? "alter-bg-color" : "") pageblock">
         <div class="container">
             <h3>Porovnání vývoje platů vzhledem k vybraným kategoriím pracovníků</h3>
 
@@ -282,7 +282,7 @@
 {
     sectionBgSwitch = !sectionBgSwitch;
 
-    <section class="d-flex justify-content-center @(sectionBgSwitch ? "alter-bg-color" : "")">
+    <section class="d-flex justify-content-center @(sectionBgSwitch ? "alter-bg-color" : "") pageblock">
         <div class="container">
 
             <h3>Detaily komunikace instituce ohledně platů</h3>
@@ -387,7 +387,7 @@
 @{
     sectionBgSwitch = !sectionBgSwitch;
 }
-<section class="d-flex justify-content-center  @(sectionBgSwitch ? "alter-bg-color" : "")">
+<section class="d-flex justify-content-center  @(sectionBgSwitch ? "alter-bg-color" : "") pageblock">
     <div class="container">
         <h3>Open data</h3>
         <p>Open data s kompletními platy pro <b>@(Model.Nazev)</b> za všechny dostupné roky</p>

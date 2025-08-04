@@ -22,7 +22,7 @@
 }
 
 
-<section class="d-flex align-items-center justify-content-center alter-bg-color pt-5">
+<section class="d-flex align-items-center justify-content-center alter-bg-color pt-5 pageblock-small">
     <div class="container">
         <h2>@ViewData["title"]</h2>
         <p class="text-muted">Informace o <b>manažerských platech a odměnách vedoucích úřadů</b>, státních podniků či příspěvkových organizací za rok @PuRepo.DefaultYear.</p>
@@ -33,7 +33,7 @@
 
     </div>
 </section>
-<section class="d-flex align-items-center justify-content-center">
+<section class="d-flex align-items-center justify-content-center pageblock">
     <div class="container">
         <p class="lead">@Html.Raw(ViewData["noteHtml"])</p>
         <p>@Html.Raw(ViewData["rozsah"])</p>

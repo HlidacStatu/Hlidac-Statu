@@ -81,7 +81,7 @@
     </ol>
 }
 
-<section class="d-flex justify-content-center  @(GetBgClass())">
+<section class="d-flex justify-content-center  @(GetBgClass()) pageblock-small">
     <div class="container">
         <div>
             <h2><i class="fa-regular fa-building-columns"></i>&nbsp;@politik.FullName()</h2>
@@ -136,7 +136,7 @@
 </section>
 @if (platyZaRok.Count() > 1)
 {
-    <section class="d-flex @(GetBgClass())">
+    <section class="d-flex @(GetBgClass()) pageblock">
         <div class="container">
             <h2>Rychlý souhrn platů</h2>
             <table class="table table-bordered table-striped table-hover caption-top" style="width:initial">
@@ -180,7 +180,7 @@
 </div>
 @foreach (var pprijem in platyZaRok)
 {
-    <section class="d-flex small-padding @(GetBgClass())">
+    <section class="d-flex block @(GetBgClass()) pageblock">
         <div class="container">
 
             <h3 id="@pprijem.Organizace.DS">@pprijem.Organizace.Nazev</h3>
@@ -323,7 +323,7 @@
 }
 
 
-<section class="d-flex @GetBgClass()">
+<section class="d-flex @GetBgClass() pageblock">
     <div class="container">
         <h3>Přehled funkcí @politik.FullName()</h3>
 

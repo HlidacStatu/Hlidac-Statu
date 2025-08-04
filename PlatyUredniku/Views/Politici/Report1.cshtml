@@ -33,13 +33,13 @@
     }
 }
 
-<section class="d-flex align-items-center justify-content-center  @(GetBgClass()) pt-5">
+<section class="d-flex align-items-center justify-content-center  @(GetBgClass()) pt-5 pageblock-small">
     <div class="container">
         <h2>@ViewData["title"]</h2>
 
     </div>
 </section>
-<section class="d-flex align-items-center justify-content-center  @(GetBgClass())">
+<section class="d-flex align-items-center justify-content-center  @(GetBgClass()) pageblock">
     <div class="container">
         <p class="lead">@Html.Raw(ViewData["noteHtml"])</p>
 
