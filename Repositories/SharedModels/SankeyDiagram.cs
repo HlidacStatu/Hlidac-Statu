@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Text.Json;
+using HlidacStatu.Util;
 
 namespace HlidacStatu.Repositories.SharedModels;
 
@@ -22,26 +23,60 @@ public class SankeyDiagram
     public string DrawData()
     {
         var nakladyMax = PrijmyPolitiku.Max(p => p.CelkoveRocniNakladyNaPolitika);
-        var data = PrijmyPolitiku.Select(prijem => 
-            new {
-                from = "Celkový příjem",
-                to = prijem.Organizace.Nazev,
-                weight = DrawNakladyPerYear(prijem, nakladyMax),
-                color = prijem.Status == PpPrijem.StatusPlatu.Zjistujeme ? "#000000" : "#999999",
+        List<object> data = new List<object>();
+        
+        foreach (var prijemPolitika in PrijmyPolitiku)
+        {
+            // prijem
+            data.Add(new {
+                from = "Celkové roční náklady na politika",
+                to = prijemPolitika.Organizace.Nazev,
+                weight = DrawNakladyPerYear(prijemPolitika.CelkovyRocniPlatVcetneOdmen, nakladyMax),
+                color = prijemPolitika.Status == PpPrijem.StatusPlatu.Zjistujeme ? "#000000" : "#999999",
+                dataLabels = new
+                {
+                    enabled = true, 
+                    format = prijemPolitika.CelkoveRocniNahrady > 1? 
+                        $"Celkový roční plat {RenderData.NicePrice(prijemPolitika.CelkovyRocniPlatVcetneOdmen)}" : 
+                        RenderData.NicePrice(prijemPolitika.CelkovyRocniPlatVcetneOdmen)
+                },
                 custom = new {
-                    value = prijem.CelkoveRocniNakladyNaPolitika,
-                    link = $"#{prijem.Organizace.DS}"
+                    value = prijemPolitika.CelkovyRocniPlatVcetneOdmen,
+                    link = $"#{prijemPolitika.Organizace.DS}"
                 }
-            }).ToList();
+            });
+
+            // nahrady
+            if (prijemPolitika.CelkoveRocniNahrady > 1)
+            {
+                data.Add(new {
+                    from = "Celkové roční náklady na politika",
+                    to = prijemPolitika.Organizace.Nazev,
+                    weight = DrawNakladyPerYear(prijemPolitika.CelkoveRocniNahrady, nakladyMax),
+                    color = "#123456",
+                    dataLabels = new
+                    {
+                        enabled = true, 
+                        format = $"Celkové roční náhrady {RenderData.NicePrice(prijemPolitika.CelkoveRocniNahrady)}"
+                    },
+                    custom = new {
+                        value = prijemPolitika.CelkoveRocniNahrady,
+                        link = $"#{prijemPolitika.Organizace.DS}"
+                    }
+                });
+            }
+            
+        }
+        
         if (OrgBezUvedeniPlatu?.Count() > 0)
         {
             data.AddRange(
                     OrgBezUvedeniPlatu.Select(f=>
                         new
                         {
-                            from = "Celkový příjem",
+                            from = "Celkové roční náklady na politika",
                             to = Firmy.GetJmeno(f),
-                            weight = DrawNakladyPerYear(new PpPrijem() { }, nakladyMax),
+                            weight = DrawNakladyPerYear(1, nakladyMax),
                             color = "#000000",
                             custom = new
                             {
@@ -96,14 +131,9 @@ public class SankeyDiagram
     }
     
     
-    private double DrawNakladyPerYear(PpPrijem input, decimal nakladyTotal)
+    private double DrawNakladyPerYear(decimal hodnota, decimal nakladyTotal)
     {
-        if (input.Status == PpPrijem.StatusPlatu.Zjistujeme)
-        {
-            return 1; // fake-small value to make the line appear
-        }
-
-        double realValue = (double)input.CelkoveRocniNakladyNaPolitika;
+        double realValue = (double)hodnota;
         double max = (double)nakladyTotal;
 
         double scaled = realValue/max * 100;
