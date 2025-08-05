@@ -3,12 +3,8 @@ using HlidacStatu.Lib.Web.UI.Attributes;
 using HlidacStatu.Repositories;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Nest;
-using PlatyUredniku.Models;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
 using System.Threading.Tasks;
 using ZiggyCreatures.Caching.Fusion;
 
@@ -26,6 +22,21 @@ public class PoliticiController : Controller
 
     [HlidacCache(60 * 60, "rok")]
     public async Task<IActionResult> Index(int rok = PpRepo.DefaultYear)
+    {
+        //titulka politiku
+        var platyTask = _cache.GetOrSetAsync<Dictionary<string, PpPrijem[]>>(
+            $"{nameof(PpRepo.GetPrijmyGroupedByNameIdAsync)}_{rok}-politici",
+            _ => PpRepo.GetPrijmyGroupedByNameIdAsync(rok)
+        );
+        var platyPolitiku = await platyTask;
+        ViewData["platy"] = platyPolitiku;
+
+        return View();
+
+    }
+    
+    [HlidacCache(60 * 60, "rok")]
+    public async Task<IActionResult> IndexAlternative(int rok = PpRepo.DefaultYear)
     {
         //titulka politiku
         var platyTask = _cache.GetOrSetAsync<Dictionary<string, PpPrijem[]>>(
