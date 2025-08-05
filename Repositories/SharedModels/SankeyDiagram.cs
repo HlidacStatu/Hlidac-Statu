@@ -32,7 +32,7 @@ public class SankeyDiagram
                 from = "Celkové roční náklady na politika",
                 to = prijemPolitika.Organizace.Nazev,
                 weight = DrawNakladyPerYear(prijemPolitika.CelkovyRocniPlatVcetneOdmen, nakladyMax),
-                color = prijemPolitika.Status == PpPrijem.StatusPlatu.Zjistujeme ? "#000000" : "#999999",
+                color = prijemPolitika.Status == PpPrijem.StatusPlatu.Zjistujeme_zadost_106 ? "#000000" : "#999999",
                 dataLabels = new
                 {
                     enabled = true, 
@@ -142,6 +142,6 @@ public class SankeyDiagram
 
     private string CheckMissingValue(PpPrijem input)
     {
-        return input.Status == PpPrijem.StatusPlatu.Zjistujeme ? "true" : "false";
+        return input.Status == PpPrijem.StatusPlatu.Zjistujeme_zadost_106 ? "true" : "false";
     }
 }

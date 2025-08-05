@@ -239,7 +239,7 @@ public static class PpRepo
     {
 
         return BaseAllPlaty(db, rok)
-            .Where(m => m.Status == PpPrijem.StatusPlatu.Potvrzen);
+            .Where(m => m.Status == PpPrijem.StatusPlatu.PotvrzenyPlat_od_politika);
     }
 
     public static string[] AllNameId(bool? zeny, int rok = DefaultYear)
@@ -410,7 +410,7 @@ public static class PpRepo
                 NazevFunkce = "",
                 Plat = 0,
                 PocetMesicu = 0,
-                Status = PpPrijem.StatusPlatu.Zjistujeme
+                Status = PpPrijem.StatusPlatu.Zjistujeme_zadost_106
             });
         }
 
@@ -447,7 +447,7 @@ public static class PpRepo
                 .AsNoTracking()
                 .Where(m => orgsInEvents.Contains(m.Id))
                 .Include(t => t.FirmaDs)
-                .Include(t => t.PrijmyPolitiku.Where(p => p.Rok == rok && p.Status == PpPrijem.StatusPlatu.Potvrzen))
+                .Include(t => t.PrijmyPolitiku.Where(p => p.Rok == rok && p.Status == PpPrijem.StatusPlatu.PotvrzenyPlat_od_politika))
                 .Include(t => t.Tags)
                 .Where(m => tag == null || m.Tags.Any(t => t.Tag == tag))
                 .Where(m => ico == null || m.FirmaDs.Ico == ico)
@@ -906,7 +906,7 @@ public static class PpRepo
 
 
         res.PocetOsobMaPlat = await data
-            .Where(m => m.Status == PpPrijem.StatusPlatu.Potvrzen)
+            .Where(m => m.Status == PpPrijem.StatusPlatu.PotvrzenyPlat_od_politika)
             .Select(m => m.Nameid)
             .Distinct()
             .CountAsync();

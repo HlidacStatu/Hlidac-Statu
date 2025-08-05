@@ -208,7 +208,7 @@ public class AutocompleteCacheService
         await using var db = new DbEntities();
 
         var nameIds = await db.PpPrijmy.AsNoTracking()
-            .Where(p => p.Status == PpPrijem.StatusPlatu.Potvrzen)
+            .Where(p => p.Status == PpPrijem.StatusPlatu.PotvrzenyPlat_od_politika)
             .Select(p => p.Nameid)
             .Distinct()
             .ToListAsync(cancellationToken: cancellationToken);

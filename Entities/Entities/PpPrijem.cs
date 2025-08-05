@@ -9,8 +9,12 @@ public class PpPrijem
 {
     public enum StatusPlatu
     {
-        Zjistujeme = 0,
-        Potvrzen = 1,
+        Zaslano_od_politika_neodsouhlaseny = -2,
+        Zaslano_od_politika_nezkontrolovan = -1,
+        Zjistujeme_zadost_106 = 0,
+        PotvrzenyPlat_od_organizace = 1,
+        PotvrzenyPlat_od_politika = 2,
+
     }
 
     [Key]
