@@ -87,9 +87,6 @@
                 </div>
             </div>
         </div>
-        <div class="col-lg">
-            <img src="assets/img/revenue.svg" class="img-fluid d-none d-lg-block" alt="">
-        </div>
     </div>
 </section>
 
@@ -108,7 +105,9 @@
                     do @(HlidacStatu.Util.RenderData.NicePriceHtml(@rocniPlatSenatoru.Max())) Kč ročně.
                     Senátorů a senátorek u nás najdete <b>@(HlidacStatu.Util.RenderData.NiceNumber(senatori.Count))</b>.
             </p>
+                
             </a>
+            <p><a href="/politici/seznam/senatori" class="btn btn-outline-primary">Senátorky a senátoři</a></p>
         </li>
         <li class="col">
             <a href="/politici/seznam/vlada">
@@ -122,6 +121,7 @@
                     Senátorů a senátorek u nás najdete <b>@(HlidacStatu.Util.RenderData.NiceNumber(vlada.Count))</b>.
                 </p>
             </a>
+            <p><a href="/politici/seznam/vlada" class="btn btn-secondary">Členové vlády</a></p>
         </li>
         <li class="col">
             <a href="/politici/seznam/KrajstiZastupitele">
@@ -135,6 +135,7 @@
                     Najdete u nás celkem <b>@(HlidacStatu.Util.RenderData.NiceNumber(vlada.Count))</b> zastupitelů.
                 </p>
             </a>
+            <p><a href="/politici/seznam/KrajstiZastupitele" class="btn btn-secondary btn-sm">Senátorky a senátoři</a></p>
 
         </li>
         <li class="col">
