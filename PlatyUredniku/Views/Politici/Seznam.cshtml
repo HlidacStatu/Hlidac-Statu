@@ -49,7 +49,7 @@
             ViewBag.Title = "Politici nejvíce tající své příjmy";
             vsechnyPlaty = await PpRepo.GetPrijmyGroupedByNameIdAsync(year, true);
             vsechnyPlaty = vsechnyPlaty
-                .OrderByDescending(kv => kv.Value.Count(m => m.Status == PpPrijem.StatusPlatu.Zjistujeme))
+                .OrderByDescending(kv => kv.Value.Count(m => m.Status == PpPrijem.StatusPlatu.Zjistujeme_zadost_106))
                 .Take(top)
                 .ToDictionary(kv => kv.Key, kv => kv.Value);
             break;
