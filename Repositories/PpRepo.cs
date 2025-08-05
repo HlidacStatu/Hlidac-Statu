@@ -464,7 +464,9 @@ public static class PpRepo
     [
         "politici",
     ];
-    public static async Task<Dictionary<string, PpPrijem[]>> GetPrijmyGroupedByNameIdAsync(int rok, bool withDetails = false, string ico = null, string[] onlyNameIds = null, PoliticianGroup? group=null, bool pouzePotvrzene = false)
+    public static async Task<Dictionary<string, PpPrijem[]>> GetPrijmyGroupedByNameIdAsync(int rok, bool withDetails = false, 
+        string ico = null, string[] onlyNameIds = null, PoliticianGroup? group=null, bool pouzePotvrzene = false,
+        Expression<Func<PpPrijem, bool>> predicate = null)
     {
 
         await using var db = new DbEntities();
@@ -478,6 +480,8 @@ public static class PpRepo
 
         if (onlyNameIds?.Count()>0)
             q = q.Where(p => onlyNameIds.Contains(p.Nameid));
+        if (predicate != null)
+            q = q.Where(predicate);
 
         if (group.HasValue)
         {
