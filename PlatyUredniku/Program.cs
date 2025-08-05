@@ -114,7 +114,7 @@ public class Program
             //     RequestToLogFilter = (c) => c.Response.ContentType.StartsWith("text/html")
             // });
 
-            //app.UseTimeMeasureMiddleware(new List<string>() { "/_blazor" });
+            app.UseTimeMeasureMiddleware(new List<string>() { "/_blazor" });
 
             app.UseBannedIpsMiddleware(whitelist);
 
