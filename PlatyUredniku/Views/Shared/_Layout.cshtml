@@ -12,9 +12,9 @@
     }
 
     string description = "Platy politiků a úředníků - veřejná kontrola odměňování politiků, nejvyšších státních úředníků a top managementu státních firem. Projekt Hlídače státu.";
-    if (!string.IsNullOrEmpty(ViewBag.Description))
+    if (!string.IsNullOrEmpty(ViewBag?.Description))
     {
-        description = ViewBag.Description + " Platy úředníků.";
+        description = ViewBag?.Description + " Platy úředníků.";
     }
 }
 <!DOCTYPE html>
