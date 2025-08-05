@@ -18,7 +18,7 @@
     Firma f = Firmy.Get(ico);
     ViewBag.Title = $"Politici v {f.Jmeno} ({rok})" ;
 
-    var platy = await PpRepo.GetPlatyAsync(rok, true, ico);
+    var platy = await PpRepo.GetJednotlivePlatyAsync(rok, true, ico);
 
 }
 @section breadcrumbs

@@ -10,6 +10,16 @@ namespace HlidacStatu.Repositories.SharedModels;
 
 public class SankeyDiagram
 {
+    public const string Color_primary_light = "#8BB1E5";
+    public const string Color_primary = "#0366d6";
+    public const string Color_secondary = "#999999";
+    public const string Color_secondary_light = "#CCCCCC";
+    public const string Color_dark = "#000000";
+
+    public string Color_zjistujeme { get; set; } = Color_dark;
+    public string Color_prijem { get; set; } = Color_primary;
+    public string Color_nahrady { get; set; } = Color_secondary;
+
     public string? Title { get; set; }
     public string? Subtitle { get; set; }
     public string? Description { get; set; }
@@ -32,7 +42,7 @@ public class SankeyDiagram
                 from = "Celkové roční náklady na politika",
                 to = prijemPolitika.Organizace.Nazev,
                 weight = DrawNakladyPerYear(prijemPolitika.CelkovyRocniPlatVcetneOdmen, nakladyMax),
-                color = prijemPolitika.Status == PpPrijem.StatusPlatu.Zjistujeme_zadost_106 ? "#000000" : "#999999",
+                color = prijemPolitika.Status == PpPrijem.StatusPlatu.Zjistujeme_zadost_106 ? Color_zjistujeme : Color_prijem,
                 dataLabels = new
                 {
                     enabled = true, 
@@ -53,7 +63,7 @@ public class SankeyDiagram
                     from = "Celkové roční náklady na politika",
                     to = prijemPolitika.Organizace.Nazev,
                     weight = DrawNakladyPerYear(prijemPolitika.CelkoveRocniNahrady, nakladyMax),
-                    color = "#123456",
+                    color = Color_nahrady,
                     dataLabels = new
                     {
                         enabled = true, 

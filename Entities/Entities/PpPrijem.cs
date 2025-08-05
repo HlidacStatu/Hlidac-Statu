@@ -7,12 +7,24 @@ namespace HlidacStatu.Entities;
 [Table("PU_PolitikPrijem")]
 public class PpPrijem
 {
+    /// <summary>
+    /// Represents the status of a request or process in the system.
+    /// </summary>
+    /// <remarks>The <see cref="StatusPlatu"/> enumeration defines various states that a request or process
+    /// can be in,  ranging from initial submission to confirmation by different entities. Each value corresponds to a 
+    /// specific stage in the workflow.</remarks>
+    [Devmasters.Enums.ShowNiceDisplayName]
     public enum StatusPlatu
     {
-        Zaslano_od_politika_neodsouhlaseny = -2,
-        Zaslano_od_politika_nezkontrolovan = -1,
+        [Devmasters.Enums.NiceDisplayName("Příjem od politika, který jsme nepřijali jako správný")]
+        Prijem_od_politika_neodsouhlaseny = -2,
+        [Devmasters.Enums.NiceDisplayName("Příjem od politika, který jsme zatím nezkontrolovali")]
+        Prijem_od_politika_nezkontrolovan = -1,
+        [Devmasters.Enums.NiceDisplayName("Žádáme organizaci o příjem")]
         Zjistujeme_zadost_106 = 0,
+        [Devmasters.Enums.NiceDisplayName("Příjem zaslaný organizací")]
         PotvrzenyPlat_od_organizace = 1,
+        [Devmasters.Enums.NiceDisplayName("Příjem zaslaný politikem")]
         PotvrzenyPlat_od_politika = 2,
 
     }

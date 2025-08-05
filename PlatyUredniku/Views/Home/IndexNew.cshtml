@@ -15,12 +15,6 @@
     var dataForOrganizationOfTheDay = await UredniciStaticCache.GetFullDetailAsync(organizationOfTheDay.DS);
 }
 
-@section breadcrumbs
-{
-    <ol class="breadcrumb">
-        <li class="active">@ViewBag.Title</li>
-    </ol>
-}
 
 <section class="py-5 text-center container pageblock-small">
     <div class="row py-lg-5">
@@ -30,9 +24,22 @@
                 Mapujeme reálné <b>platy úředníků a manažerů státních organizací</b>. Nově ukazujeme i <b>příjmy politiků</b> z jejich hlavních i vedlejších funkcí, abychom vám umožnili kontrolovat, jak se nakládá s veřejnými penězi
             </p>
             <p>
-                <a href="/politici" class="btn btn-primary my-2">Příjmy <span class="badge text-bg-light mx-1">@(HlidacStatu.Util.RenderData.NiceNumber(polStats.PocetOsobPozadano))</span> politiků.</a>
-                <a href="/urednici" class="btn btn-secondary my-2">Platy <span class="badge text-bg-light mx-1">@(HlidacStatu.Util.RenderData.NiceNumber(puPlatyStats.Pocet))</span> úředníků a státních manažerů.</a>
+                <a href="/politici" class="btn btn-primary my-3">Příjmy <span class="badge text-bg-light mx-1">@(HlidacStatu.Util.RenderData.NiceNumber(polStats.PocetOsobPozadano))</span> politiků.</a>
+                <a href="/urednici" class="btn btn-info my-3" style="margin-left:30px">Platy <span class="badge text-bg-light mx-1">@(HlidacStatu.Util.RenderData.NiceNumber(puPlatyStats.Pocet))</span> úředníků.</a>
             </p>
+        </div>
+    </div>
+    <div class="row justify-content-center">
+        <div class="col-auto">
+            <table class="table table-responsive">
+                    <tr>
+                        <td class="align-middle"><i class="fa-solid fa-circle-heart fa-2x mx-3" style="color:red"></i></td>
+                        <td class="fs-6">
+                            Sesbírat platy tisíců politiků, dalších tisiců úředníků a manažerů je obrovské množství práce.
+                            <br /><a target="_blank" href="https://texty.hlidacstatu.cz/jak-podporit-hlidac-statu-fungovani-ceska/">Podpořte nás v tom, abychom mohli získat platy i příští rok! Díky!!</a>
+                        </td>
+                    </tr>
+            </table>
         </div>
     </div>
 </section>
@@ -51,8 +58,7 @@
                     <a asp-controller="Texty" asp-action="PlatyStatnichZamestnancu">nařízením vlády</a>
                     nebo
                     <a asp-controller="Texty" asp-action="Nejvyssi">zákonem</a>.
-                    <br />
-                    <i class="fa-solid fa-circle-heart" style="color:red"></i> Sesbírat platy tisíců manažerů a dalších tisiců politiků je obrovské množství práce. <a target="_blank" href="https://texty.hlidacstatu.cz/jak-podporit-hlidac-statu-fungovani-ceska/">Podpořte nás v tom, abychom mohli získat platy i příští rok! Díky!!</a>
+
                 </p>
 
             </div>

@@ -464,7 +464,10 @@ public static class PpRepo
     [
         "politici",
     ];
-    public static async Task<Dictionary<string, PpPrijem[]>> GetPrijmyGroupedByNameIdAsync(int rok, bool withDetails = false, 
+
+
+    public static async Task<Dictionary<string, PpPrijem[]>> GetPrijmyGroupedByNameIdAsync(
+        int rok, bool withDetails = false, 
         string ico = null, string[] onlyNameIds = null, PoliticianGroup? group=null, bool pouzePotvrzene = false,
         Expression<Func<PpPrijem, bool>> predicate = null)
     {
@@ -490,11 +493,11 @@ public static class PpRepo
             q = q.Where(m => nameids.Contains(m.Nameid));
         }
         var qGrouped = (await q.ToArrayAsync())
-            .GroupBy(k => k.Nameid, v => v, (k, v) => new { nameId = k, platy = v.ToArray() });
+            .GroupBy(k => k.Nameid, v => v, (k, v) => new { nameId = k, platy = v.Where(p=>p.Status>=0).ToArray() });
 
         return qGrouped.ToDictionary(k => k.nameId, v => v.platy);
     }
-    public static async Task<List<PpPrijem>> GetPlatyAsync(int rok, bool withDetails = false, string ico = null)
+    public static async Task<List<PpPrijem>> GetJednotlivePlatyAsync(int rok, bool withDetails = false, string ico = null)
     {
         await using var db = new DbEntities();
 

@@ -41,7 +41,7 @@
     <div class="container">
         <h5>
             Za @PuRepo.DefaultYear jsme žádali o platy @(HlidacStatu.Util.RenderData.NiceNumber(stats.PocetOslovenych)) organizací
-            a plat nám @(DateTime.Now<new DateTime(2025,04,1)? "zatím":"") poskytlo @(HlidacStatu.Util.RenderData.NiceNumber(stats.PocetCoPoslaliPlat)) z nich.
+            a plat nám @(DateTime.Now < new DateTime(2025, 04, 1) ? "zatím" : "") poskytlo @(HlidacStatu.Util.RenderData.NiceNumber(stats.PocetCoPoslaliPlat)) z nich.
 
         </h5>
         <p>
@@ -50,22 +50,22 @@
         <p class="mb-2 mt-4 text-body-secondary">
         <p>Platy organizací v jednotlivých oblastech</p>
         <div class="row">
-                @{
-                    int count = 0;
-                }
-                @foreach (var group in PuRepo.MainTags.Chunk(PuRepo.MainTags.Length / 4 + 1))
-                {
-                    count = count + 1;
+            @{
+                int count = 0;
+            }
+            @foreach (var group in PuRepo.MainTags.Chunk(PuRepo.MainTags.Length / 4 + 1))
+            {
+                count = count + 1;
                 <div class="col-md-3 col-sm-6 col-6">
 
-                        @foreach (var item in group)
-                        {
+                    @foreach (var item in group)
+                    {
                         <hashtag tag="@item" typ="PlatyUredniku" additional-class="badge rounded-pill border me-3 mb-2 order-{@count}" style="font-size:0.9em"></hashtag>
                         <br />
-                        }
+                    }
 
                 </div>
-                }
+            }
         </div>
 
     </div>
@@ -96,13 +96,13 @@
                     </p>
 
                 }
-                <p>  
+                <p>
                     @Html.Raw(Devmasters.Lang.CS.Plural.GetWithZero(dataForOrganizationOfTheDay.Platy.AktualniRok().Count,
-                             "<span class='text-danger'><i class='fa-solid fa-circle-xmark'></i> Odmítli nám poskytnout jakékoliv platy</span>",
-                             "<span class='text-warning'><i class='fa-solid fa-circle-exclamation'></i></span> Evidujeme od organizace jeden plat jedné pozice",
-                             $"<span class='text-success'><i class='fa-solid fa-badge-check'></span></i>Dostali jsme celkem {{0}} platy vedení organizace",
-                             $"<span class='text-success'><i class='fa-solid fa-badge-check'></span></i>Dostali jsme celkem {{0}} manažerských platů")
-                             )
+                    "<span class='text-danger'><i class='fa-solid fa-circle-xmark'></i> Odmítli nám poskytnout jakékoliv platy</span>",
+                                        "<span class='text-warning'><i class='fa-solid fa-circle-exclamation'></i></span> Evidujeme od organizace jeden plat jedné pozice",
+                                        $"<span class='text-success'><i class='fa-solid fa-badge-check'></span></i>Dostali jsme celkem {{0}} platy vedení organizace",
+                                        $"<span class='text-success'><i class='fa-solid fa-badge-check'></span></i>Dostali jsme celkem {{0}} manažerských platů")
+                                        )
                     za rok @(PuRepo.DefaultYear).
                 </p>
                 <p>
@@ -116,7 +116,7 @@
             <div class="col-12 col-lg-6">
 
                 <div>
-                    <partial name="Graphs/_AreaRangePlot" model="@(new AreaRangeRenderOptions(){ Platy= dataForOrganizationOfTheDay.Platy, CssHeight="250"})" />
+                    <partial name="Graphs/_AreaRangePlot" model="@(new AreaRangeRenderOptions() { Platy = dataForOrganizationOfTheDay.Platy, CssHeight = "250" })" />
                 </div>
             </div>
         </div>
@@ -132,7 +132,20 @@
 
         <partial name="_Analyzy_List" />
 
-        
+
+    </div>
+</section>
+
+<section class="d-flex align-items-center justify-content-center pageblock">
+    <div class="container">
+        <ul>
+            <li class="">
+                <a asp-controller="Texty" asp-action="PlatyStatnichZamestnancu" class="nav-link mainmenu">Jak určuje platy st. zaměstnanců zákon?</a>
+            </li>
+            <li class="">
+                <a asp-controller="Texty" asp-action="Nejvyssi" class="nav-link mainmenu">Výpočet platů úředníků a soudců</a>
+            </li>
+        </ul>
     </div>
 </section>
 

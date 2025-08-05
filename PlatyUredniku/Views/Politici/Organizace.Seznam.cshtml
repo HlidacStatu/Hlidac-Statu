@@ -44,8 +44,8 @@
         .ToList();
 
     //var aktualniPlaty = havePlatyOrgs.SelectMany(o => o.PrijmyPolitiku.AktualniRok()).ToList();
-    var platyMin = (await PpRepo.GetPlatyAsync(rok)).Min(m => m.CelkovyRocniPlatVcetneOdmen);
-    var platyMax = (await PpRepo.GetPlatyAsync(rok)).Max(m => m.CelkovyRocniPlatVcetneOdmen);
+    var platyMin = (await PpRepo.GetJednotlivePlatyAsync(rok)).Min(m => m.CelkovyRocniPlatVcetneOdmen);
+    var platyMax = (await PpRepo.GetJednotlivePlatyAsync(rok)).Max(m => m.CelkovyRocniPlatVcetneOdmen);
     var platyLength = platyMax - platyMin;
     if (platyLength == 0)
         platyLength = 0.01m;

@@ -264,6 +264,13 @@ namespace HlidacStatu.Entities
             return Capitalize(modifNazev);
 
         }
+        public bool Zena()
+        {
+            if (string.IsNullOrEmpty(Pohlavi))
+                Pohlavi = PohlaviCalculated();
+
+            return Pohlavi == "f";
+        }
 
         public bool Muz()
         {
