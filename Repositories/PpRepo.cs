@@ -480,6 +480,7 @@ public static class PpRepo
 
         if (onlyNameIds?.Count()>0)
             q = q.Where(p => onlyNameIds.Contains(p.Nameid));
+
         if (predicate != null)
             q = q.Where(predicate);
 
