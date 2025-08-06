@@ -506,7 +506,8 @@ namespace HlidacStatu.Repositories
                     {
                         Ico = m,
                         Jmeno = HlidacStatu.Repositories.Firmy.GetJmeno(m),
-                        Source_Url = null
+                        Source_Url = null,
+                        Copyright = null
                     })
                     .ToArray();
             ;

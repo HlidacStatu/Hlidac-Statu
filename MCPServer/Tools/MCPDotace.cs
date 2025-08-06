@@ -16,7 +16,7 @@ namespace HlidacStatu.MCPServer.Tools
 
         [MethodImpl(MethodImplOptions.NoInlining)]
         [McpServerTool(
-            UseStructuredContent = true,
+            //UseStructuredContent = true,
             Name = "get_subsidy_detail",
             Title = "Get detail of specific subsidy from czech government or EU"),
         Description("Return detail of specific subsidy from czech government or EU")]
@@ -45,7 +45,7 @@ namespace HlidacStatu.MCPServer.Tools
 
         [MethodImpl(MethodImplOptions.NoInlining)]
         [McpServerTool(
-            UseStructuredContent = true,
+            //UseStructuredContent = true,
     Name = "search_subsidies",
     Title = "Find subsidies based on parameters"),
 Description("Search subsidies from Czech government for specified parameters. You can combine any of parameters.")]

@@ -19,7 +19,7 @@ namespace HlidacStatu.MCPServer.Tools
             _httpCtx = httpContextAccessor;
         }
 
-        [McpServerTool(UseStructuredContent = false,
+        [McpServerTool(//UseStructuredContent = false,
             Name = "ping",
             Title = "Simple Echo tool"),
         Description("Simple Echo tool.")]

@@ -45,7 +45,7 @@ url - a URL to the document or search result item. Useful for citing specific re
          */
         [MethodImpl(MethodImplOptions.NoInlining)]
         [McpServerTool(
-            UseStructuredContent = true,
+            //UseStructuredContent = true,
             Name = "search",
             Title = "search tool for OpenAI deep search functionality. "),
             Description("Find contracts of Czech government for query.")]
@@ -186,7 +186,7 @@ url - a URL to the document or search result item. Useful for citing specific re
 
         [MethodImpl(MethodImplOptions.NoInlining)]
         [McpServerTool(
-            UseStructuredContent = true,
+            //UseStructuredContent = true,
             Name = "fetch",
             Title = "search tool for OpenAI deep search functionality. "),
             Description("return a list of contracts of Czech government for query.")]
