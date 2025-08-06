@@ -64,7 +64,7 @@
 
 @{
     var prijmyPoLetech = Model.PrijmyPolitiku.GroupBy(p => p.Rok)
-        .Select(m => new { Key = m.Key, Platy = m.OrderByDescending(o=>o.CelkovyRocniPlatVcetneOdmen).ThenBy(o=>$"{o.GetOsoba().PrijmeniJmeno()}").ToList() })
+        .Select(m => new { Key = m.Key, Platy = m.OrderByDescending(o => o.CelkoveRocniNakladyNaPolitika).ThenBy(o => $"{o.GetOsoba().PrijmeniJmeno()}").ToList() })
         .ToList();
 
     if (prijmyPoLetech.Any(m => m.Key == PpRepo.DefaultYear) == false)
@@ -153,7 +153,7 @@
                                             <td>
                                                 <a href="/politici/@prijemPolitika.Nameid">@politik.FullName()</a>
                                             </td>
-                                            <td data-order="@(HlidacStatu.Util.RenderData.OrderValueFormat(prijemPolitika.CelkovyRocniPlatVcetneOdmen))"
+                                            <td data-order="@(HlidacStatu.Util.RenderData.OrderValueFormat(prijemPolitika.CelkoveRocniNakladyNaPolitika))"
                                                 class="number text-nowrap">
                                                 @if (prijemPolitika.PocetMesicu < 12)
                                                 {
@@ -163,7 +163,7 @@
                                                     </a>
                                                 }
 
-                                                @HlidacStatu.Util.RenderData.NicePriceHtml(prijemPolitika.CelkovyRocniPlatVcetneOdmen)
+                                                @HlidacStatu.Util.RenderData.NicePriceHtml(prijemPolitika.CelkoveRocniNakladyNaPolitika)
                                             </td>
                                             <td data-order="@(HlidacStatu.Util.RenderData.OrderValueFormat(prijemPolitika.CelkoveRocniNahrady))"
                                                 class="number text-nowrap">

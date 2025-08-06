@@ -75,8 +75,8 @@
         "name" => dataToRender.OrderBy(o => OsobyRolesCache.Get(o.Key).Prijmeni),
         "role" => dataToRender.OrderBy(o => OsobyRolesCache.Get(o.Key).Role),
         "funkce" => dataToRender.OrderByDescending(o => o.Value.Count()),
-        "celkem" => dataToRender.OrderByDescending(o => o.Value.Sum(m => m.CelkovyRocniPlatVcetneOdmen)),
-        _ => dataToRender.OrderByDescending(o => o.Value.Sum(m => m.CelkovyRocniPlatVcetneOdmen))
+        "celkem" => dataToRender.OrderByDescending(o => o.Value.Sum(m => m.CelkoveRocniNakladyNaPolitika)),
+        _ => dataToRender.OrderByDescending(o => o.Value.Sum(m => m.CelkoveRocniNakladyNaPolitika))
     };
 
 
@@ -104,9 +104,9 @@
             Name = "Celkový roční příjem",
             HtmlRender = (m) =>
             {
-                return $"<a href='/politici/politik/{m.Key}'>{HlidacStatu.Util.RenderData.NicePrice(m.Value.Sum(v => v.CelkovyRocniPlatVcetneOdmen), html: true)}</a>";
+                return $"<a href='/politici/politik/{m.Key}'>{HlidacStatu.Util.RenderData.NicePrice(m.Value.Sum(v => v.CelkoveRocniNakladyNaPolitika), html: true)}</a>";
             },
-            OrderValueRender = (m) => HlidacStatu.Util.RenderData.OrderValueFormat(m.Value.Sum(v => v.CelkovyRocniPlatVcetneOdmen)),
+            OrderValueRender = (m) => HlidacStatu.Util.RenderData.OrderValueFormat(m.Value.Sum(v => v.CelkoveRocniNakladyNaPolitika)),
             CssClass = "number"
         },
         new ReportDataSource<KeyValuePair<string, PpPrijem[]>>.Column()
