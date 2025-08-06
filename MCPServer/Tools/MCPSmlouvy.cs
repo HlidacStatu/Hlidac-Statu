@@ -16,6 +16,7 @@ namespace HlidacStatu.MCPServer.Tools
 
         [MethodImpl(MethodImplOptions.NoInlining)]
         [McpServerTool(
+            UseStructuredContent = true,
             Name = "get_contract_detail",
             Title = "Get detail of specific contract of czech government.  "),
         Description("Return detail of specific contract between government and company")]
@@ -50,6 +51,7 @@ namespace HlidacStatu.MCPServer.Tools
 
         [MethodImpl(MethodImplOptions.NoInlining)]
         [McpServerTool(
+            UseStructuredContent = true,
             Name = "search_contracts",
             Title = "Find contracts based on parameters"),
         Description("Find contracts of Czech government for specified parameters. You can combine any of parameters.")]

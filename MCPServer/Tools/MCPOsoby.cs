@@ -16,6 +16,7 @@ namespace HlidacStatu.MCPServer.Tools
         static Serilog.ILogger _logger = Serilog.Log.ForContext<MCPOsoby>();
 
         [McpServerTool(
+            UseStructuredContent = true,
     Name = "get_politician_detail",
     Title = "Get detail of specific politician in Czech Republic"),
     Description("Return detail of specific politician in Czech Republic by his ID. Use method 'find_person_by_name' or 'find_politician_by_name' to find person's ID. "
@@ -38,6 +39,7 @@ namespace HlidacStatu.MCPServer.Tools
 
 
         [McpServerTool(
+            UseStructuredContent = true,
         Name = "get_person_detail",
         Title = "Get detail of specific person in Czech Republic"),
         Description("Return detail of specific person in Czech Republic by his ID. Use method 'find_person_by_name' to find person's ID. "
@@ -74,6 +76,7 @@ namespace HlidacStatu.MCPServer.Tools
         }
 
         [McpServerTool(
+            UseStructuredContent = true,
             Name = "find_politicians_by_name",
             Title = "Find politicians by name and optional by year of birth."),
             Description("Find politicians by searching with their name. Always use order 'first name' and 'last name'. You may also provide a year of birth parameter to enhance the precision of search results. "
@@ -100,6 +103,7 @@ namespace HlidacStatu.MCPServer.Tools
         }
 
         [McpServerTool(
+            UseStructuredContent = true,
         Name = "find_persons_by_name",
         Title = "Find persons by name and optional by year of birth."),
         Description("Find people by searching with their name. Always use order 'first name' and 'last name'. You may also provide a year of birth parameter to enhance the precision of search results. "

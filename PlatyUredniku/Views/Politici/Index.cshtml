@@ -94,7 +94,7 @@
                     <a class="btn btn-primary" href="/politici/seznam">Zobrazit všechny politiky</a>
                 </div>
                 <div class="col-sm-auto">
-                    <a class="link-cta" href="/politici/reporty">Statistiky, reporty a analýzy příjmů politiků</a>
+                    <a class="link-cta" href="/politici/reporty"><i class="fa-solid fa-chart-pie-simple-circle-dollar"></i> Statistiky, reporty a analýzy příjmů politiků</a>
                 </div>
             </div>
         </div>
@@ -214,7 +214,7 @@
     </ul>
 </section>
 
-@if (true)
+@if (false)
 {
     <hr />
     <hr />
@@ -272,11 +272,11 @@
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach (var plat in platyPerNameId.OrderByDescending(p => p.Value.Sum(m => m.CelkovyRocniPlatVcetneOdmen)).Take(5))
+                            @foreach (var plat in platyPerNameId.OrderByDescending(p => p.Value.Sum(m => m.CelkoveRocniNakladyNaPolitika)).Take(5))
                             {
                                 <tr>
                                     <td>@Osoby.GetByNameId.Get(plat.Key).FullName()</td>
-                                    <td class="number">@Html.Raw(HlidacStatu.Util.RenderData.ShortNicePrice(plat.Value.Sum(m => m.CelkovyRocniPlatVcetneOdmen), html: true))</td>
+                                    <td class="number">@Html.Raw(HlidacStatu.Util.RenderData.ShortNicePrice(plat.Value.Sum(m => m.CelkoveRocniNakladyNaPolitika), html: true))</td>
                                 </tr>
                             }
                         </tbody>

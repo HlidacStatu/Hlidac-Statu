@@ -14,6 +14,7 @@ namespace HlidacStatu.MCPServer.Tools
         static Serilog.ILogger _logger = Serilog.Log.ForContext<MCPFirmy>();
 
         [McpServerTool(
+          UseStructuredContent =true,
           Name = "get_legal_entity_business_info",
           Title = "Return detail information about Czech company with ICO"),
         Description("Returns basic business info abou the Czech Legal entity (included corporations, government institutions, municipalities, NGO and all other subjects )."
@@ -48,6 +49,7 @@ namespace HlidacStatu.MCPServer.Tools
 
 
         [McpServerTool(
+            UseStructuredContent = true,
             Name = "get_business_between_legal_entity_and_government",
             Title = "Return detail information about Czech company with ICO"),
         Description("Returns detail of business contracts, subsidies and statistics between the legal entity and the Czech government. "
@@ -81,6 +83,7 @@ namespace HlidacStatu.MCPServer.Tools
         }
 
         [McpServerTool(
+            UseStructuredContent = true,
             Name = "get_government_offices_by_type",
             Title = "Get list of Czech government offices by type"),
             Description("Returns list of Czech government offices or cities by type. You can filter by type of it.")]
@@ -116,6 +119,7 @@ namespace HlidacStatu.MCPServer.Tools
         }
 
         [McpServerTool(
+            UseStructuredContent = true,
             Name = "get_subsidiaries_of_legal_entity",
             Title = "Get list of IČO and name of all subsidiaries of Czech legal entity with provided IČO"),
             Description("Get list of IČO and name of all subsidiaries of Czech legal entity with provided IČO.")]
