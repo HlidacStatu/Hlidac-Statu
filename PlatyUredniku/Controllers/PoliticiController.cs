@@ -66,12 +66,14 @@ public class PoliticiController : Controller
     }
 
 
+    [HlidacCache(60 * 60, "rok")]
     public async Task<IActionResult> Reporty()
     {
         return View();
     }
 
 
+    [HlidacCache(60 * 60, "*")]
     [Route("Politici/Report/{id}")]
     public async Task<IActionResult> Report(string id)
     {
