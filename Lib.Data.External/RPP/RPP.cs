@@ -19,7 +19,7 @@ namespace HlidacStatu.Lib.Data.External.RPP
                 authCook = res.Context;
             }
             var wch = new HttpClientHandler() { CookieContainer = new System.Net.CookieContainer() };
-            wch.CookieContainer.Add(authCook.Cookies["JSessionID"]);
+            wch.CookieContainer.Add(authCook.Cookies.First(m=>m.Name.StartsWith("BIGipServerais")));
             wc = new HttpClient(wch);
             wc.DefaultRequestHeaders.Accept.Add(new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue("application/json"));
             wc.DefaultRequestHeaders.Add("Sec-Fetch-Site", "same-origin");
