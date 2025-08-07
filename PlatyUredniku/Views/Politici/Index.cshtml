@@ -20,7 +20,6 @@
 @{
     int rok = PpRepo.DefaultYear;
     var stats = await PpRepo.GetGlobalStatAsync(rok);
-    Dictionary<string, PpPrijem[]> platyPerNameId = (Dictionary<string, PpPrijem[]>?)ViewData["platy"];
 
     var senatori = await PpRepo.GetPrijmyGroupedByNameIdAsync(rok, group: PpRepo.PoliticianGroup.Senatori);
     var poslanci = await PpRepo.GetPrijmyGroupedByNameIdAsync(rok, group: PpRepo.PoliticianGroup.Poslanci);
@@ -178,7 +177,7 @@
                     <br />
                     @(pocetLidiXjobs) politiků působí na více než <b>@minJobCount</b> pozicích. 
                     @{
-                        var topJob = platyPerNameId
+                        var topJob = vsichni
                             .OrderByDescending(p => p.Value.Count())
                             .ThenByDescending(o => o.Value.Sum(m => m.CelkoveRocniNakladyNaPolitika))
                             .First();
@@ -272,7 +271,7 @@
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach (var plat in platyPerNameId.OrderByDescending(p => p.Value.Sum(m => m.CelkoveRocniNakladyNaPolitika)).Take(5))
+                            @foreach (var plat in vsichni.OrderByDescending(p => p.Value.Sum(m => m.CelkoveRocniNakladyNaPolitika)).Take(5))
                             {
                                 <tr>
                                     <td>@Osoby.GetByNameId.Get(plat.Key).FullName()</td>
@@ -292,7 +291,7 @@
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach (var plat in platyPerNameId.OrderByDescending(p => p.Value.Where(m => m.CelkovyRocniPlatVcetneOdmen > 0).Count()).Take(5))
+                            @foreach (var plat in vsichni.OrderByDescending(p => p.Value.Where(m => m.CelkovyRocniPlatVcetneOdmen > 0).Count()).Take(5))
                             {
                                 <tr>
                                     <td>@Osoby.GetByNameId.Get(plat.Key).FullName()</td>

@@ -24,12 +24,6 @@ public class PoliticiController : Controller
     public async Task<IActionResult> Index(int rok = PpRepo.DefaultYear)
     {
         //titulka politiku
-        var platyTask = _cache.GetOrSetAsync<Dictionary<string, PpPrijem[]>>(
-            $"{nameof(PpRepo.GetPrijmyGroupedByNameIdAsync)}_{rok}-politici",
-            _ => PpRepo.GetPrijmyGroupedByNameIdAsync(rok)
-        );
-        var platyPolitiku = await platyTask;
-        ViewData["platy"] = platyPolitiku;
 
         return View();
 

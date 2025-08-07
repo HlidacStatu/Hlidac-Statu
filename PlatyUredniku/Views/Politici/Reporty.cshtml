@@ -1,28 +1,45 @@
 ﻿@using HlidacStatu.Entities
 @using HlidacStatu.Repositories
 @using HlidacStatu.Util
+@using MathNet.Numerics.Statistics;
+
 @{
     ViewBag.Title = "Reporty a statistiky";
 
     int rok = PpRepo.DefaultYear;
     var stats = await PpRepo.GetGlobalStatAsync(rok);
-    Dictionary<string, PpPrijem[]> platyPerNameId = (Dictionary<string, PpPrijem[]>?)ViewData["platy"];
 
-    var prumernyRocniPlatPoslance = (await PpRepo.GetPrijmyForGroupAsync(PpRepo.PoliticianGroup.Poslanci, rok)).Where(x => x.CelkovyRocniPlatVcetneOdmen > 0).Average(x => x.CelkovyRocniPlatVcetneOdmen);
-    var prumernyRocniPlatSenatora = (await PpRepo.GetPrijmyForGroupAsync(PpRepo.PoliticianGroup.Senatori, rok)).Where(x => x.CelkovyRocniPlatVcetneOdmen > 0).Average(x => x.CelkovyRocniPlatVcetneOdmen);
-    var prumernyRocniPlatMinistra = (await PpRepo.GetPrijmyForGroupAsync(PpRepo.PoliticianGroup.Vlada, rok)).Where(x => x.CelkovyRocniPlatVcetneOdmen > 0).Average(x => x.CelkovyRocniPlatVcetneOdmen);
+
+    var senatori = await PpRepo.GetPrijmyGroupedByNameIdAsync(rok, group: PpRepo.PoliticianGroup.Senatori);
+    var poslanci = await PpRepo.GetPrijmyGroupedByNameIdAsync(rok, group: PpRepo.PoliticianGroup.Poslanci);
+    var vlada = await PpRepo.GetPrijmyGroupedByNameIdAsync(rok, group: PpRepo.PoliticianGroup.Vlada);
+    var kraj = await PpRepo.GetPrijmyGroupedByNameIdAsync(rok, group: PpRepo.PoliticianGroup.KrajstiZastupitele);
+    var vsichni = await PpRepo.GetPrijmyGroupedByNameIdAsync(rok, group: PpRepo.PoliticianGroup.Vse);
+
+    var rocniPlatPoslancu = poslanci.Select(x => x.Value.Sum(m => m.CelkoveRocniNakladyNaPolitika));
+    var rocniPlatSenatoru = senatori.Select(x => x.Value.Sum(m => m.CelkoveRocniNakladyNaPolitika));
+    var rocniPlatMinistru = vlada.Select(x => x.Value.Sum(m => m.CelkoveRocniNakladyNaPolitika));
+    var rocniPlatKraju = kraj.Select(x => x.Value.Sum(m => m.CelkoveRocniNakladyNaPolitika));
 
     var vsichniNameIds = await PpRepo.GetNameIdsForGroupAsync(PpRepo.PoliticianGroup.Vse, rok);
-    var prumernyRocniPlatMuzi = (await PpRepo.GetPrijmyBySexAsync(false))
-        .Select(m => m.Value.Sum(m => m.CelkovyRocniPlatVcetneOdmen)).Average();
+    var rocniPlatMuzi = (await PpRepo.GetPrijmyBySexAsync(false))
+        .Select(m => m.Value.Sum(m => m.CelkoveRocniNakladyNaPolitika));
 
-    var prumernyRocniPlatZeny = (await PpRepo.GetPrijmyBySexAsync(true))
-        .Select(m => m.Value.Sum(m => m.CelkovyRocniPlatVcetneOdmen)).Average();
+    var rocniPlatZeny = (await PpRepo.GetPrijmyBySexAsync(true))
+        .Select(m => m.Value.Sum(m => m.CelkoveRocniNakladyNaPolitika));
 
-    decimal pocetFunkci = (decimal)(await PpRepo.GetPrijmyForGroupAsync(PpRepo.PoliticianGroup.Vse, rok))
-            .GroupBy(k => k.Nameid, (k, v) => new { nameid = k, count = v.Count() })
-            .Average(a => a.count);
+    decimal pocetFunkci = (decimal)vsichni
+            .Average(a => a.Value.Count());
 
+    int minJobCount = 4;
+    decimal pocetLidiXjobs = (decimal)vsichni
+            .Count(a => a.Value.Count() >= minJobCount);
+
+    decimal pocetFunkci50thPercentile = (decimal)vsichni
+            .Select(a => (double)a.Value.Count())
+            .Percentile(50);
+
+    decimal prumernyMzdaCR = 46_165 * 12;
 }
 
 @section breadcrumbs
@@ -53,39 +70,135 @@
 
 <section class="d-flex align-items-center justify-content-center  @(GetBgClass()) pageblock-small">
     <div class="container">
-        <h2>Vybrané statistiky</h2>
-        <div class="row">
-            <div class="col-4 col-lg-2 justify-content-center text-center align-text-bottom pt-3 mt-3">
-                <a href="/politici/seznam?report=zeny&year=@(PpRepo.DefaultYear)">
-                    <i class="fa-light fa-venus fa-3x mb-2"
-                       style="--fa-primary-color: #2668d9"></i>
-                    <div class="fs-6 fw-bold text-center">Průměrný roční plat političek</div>
-                    <div class="fs-5 fw-bold text-center badge rounded-pill text-bg-warning">
-                        @RenderData.NicePriceHtml(prumernyRocniPlatZeny)
+        <h2>Zajímavé statistiky</h2>
+        <div class="row gy-3">
+            <div class="col-6 col-lg-4">
+                <div class="h-md-100  card h-100">
+                    <div class="pb-0 card-header">
+                        <h4 class="">Příjmy: Ženy <i class="fa-regular fa-venus-mars fa-xs"></i> muži</h4>
                     </div>
-                </a>
-            </div>
-            <div class="col-4 col-lg-2 justify-content-center text-center align-text-bottom pt-3 mt-3">
-                <a href="/politici/seznam?report=muzi&year=@(PpRepo.DefaultYear)">
-                    <i class="fa-light fa-mars fa-3x mb-2"
-                       style="--fa-primary-color: #2668d9;"></i>
-                    <div class="fs-6 fw-bold text-center">Průměrný roční plat politiků</div>
-                    <div class="fs-5 fw-bold text-center badge rounded-pill text-bg-warning">
-                        @RenderData.NicePriceHtml(prumernyRocniPlatMuzi)
+                    <div class="d-flex  card-body">
+                        <div>
+                            <h5 class="mb-2 text-700 fw-normal lh-1">
+                                <span class="text-nowrap">
+                                    @((rocniPlatZeny.Average() / 1_000_000m).ToString("F2")) 
+                                        vs.
+                                    @((rocniPlatMuzi.Average() / 1_000_000m).ToString("F2")) mil. Kč
+                                </span>
+                            </h5>
+                            Političky mají průměrný příjem <div class="me-2 badge text-bg-warning">
+                                @(HlidacStatu.Util.MathTools.DifferenceInPercentText(rocniPlatMuzi.Average(), rocniPlatZeny.Average()))
+                            </div> než muži.
+                        </div>
                     </div>
-                </a>
+                </div>
             </div>
-            <div class="col-4 col-lg-2 justify-content-center text-center align-text-bottom pt-3 mt-3">
-                <a href="/politici/seznam">
-
-                    <i class="fa-duotone fa-solid fa-people-group fa-3x mb-2"
-                       style="--fa-primary-color: #2668d9; --fa-secondary-color: #2668d9;"></i>
-                    <div class="fs-6 fw-bold text-center">Počet politiků<br />v databázi</div>
-                    <div class="fs-5 fw-bold text-center badge rounded-pill text-bg-warning">@(HlidacStatu.Util.RenderData.NiceNumber(stats.PocetOsobPozadano))</div>
-
-                </a>
+            <div class="col-6 col-lg-4">
+                <div class="h-md-100  card h-100">
+                    <div class="pb-0 card-header">
+                        <h4 class="">Průměrný roční příjem <b>poslanců</b></h4>
+                    </div>
+                    <div class="d-flex  card-body">
+                        <div>
+                            <h5 class="mb-2 text-700 fw-normal lh-1">
+                                @HlidacStatu.Util.RenderData.NicePriceHtml(rocniPlatPoslancu.Average())
+                            </h5>
+                            Poslanci mají průměrný příjem 
+                             <div class="me-2 badge text-bg-warning">
+                                @(HlidacStatu.Util.MathTools.DifferenceInPercentText(prumernyMzdaCR, rocniPlatPoslancu.Average()))
+                            </div> než je 
+                            <abbr title="Průměrná měsíční mzda rok @PpRepo.DefaultYear je @HlidacStatu.Util.RenderData.NicePrice(prumernyMzdaCR/12). Roční je  @HlidacStatu.Util.RenderData.NicePrice(prumernyMzdaCR)">průměrná roční mzda v ČR.</abbr>.
+                        </div>
+                    </div>
+                </div>
             </div>
-            <div class="col-4 col-lg-2 justify-content-center text-center align-text-bottom pt-3 mt-3">
+            <div class="col-6 col-lg-4">
+                <div class="h-md-100  card h-100">
+                    <div class="pb-0 card-header">
+                        <h4 class="">Průměrný roční příjem <b>členů vlády</b></h4>
+                    </div>
+                    <div class="d-flex  card-body">
+                        <div>
+                            <h5 class="mb-2 text-700 fw-normal lh-1">
+                                @HlidacStatu.Util.RenderData.NicePriceHtml(rocniPlatMinistru.Average())
+                            </h5>
+                            Premiér a ministři mají průměrný příjem
+                            <div class="me-2 badge text-bg-warning">
+                                @(HlidacStatu.Util.MathTools.DifferenceText(prumernyMzdaCR, rocniPlatMinistru.Average()))
+                            </div> než je
+                            <abbr title="Průměrná měsíční mzda rok @PpRepo.DefaultYear je @HlidacStatu.Util.RenderData.NicePrice(prumernyMzdaCR / 12). Roční je  @HlidacStatu.Util.RenderData.NicePrice(prumernyMzdaCR)">průměrná roční mzda v ČR.</abbr>.
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-6 col-lg-4">
+                <div class="h-md-100  card h-100">
+                    <div class="pb-0 card-header">
+                        <h4 class="">Průměrný roční příjem <b>členů Senátu</b></h4>
+                    </div>
+                    <div class="d-flex  card-body">
+                        <div>
+                            <h5 class="mb-2 text-700 fw-normal lh-1">
+                                @HlidacStatu.Util.RenderData.NicePriceHtml(rocniPlatSenatoru.Average())
+                            </h5>
+                            Poslanci mají průměrný příjem
+                            <div class="me-2 badge text-bg-warning">
+                                @(HlidacStatu.Util.MathTools.DifferenceInPercentText(prumernyMzdaCR, rocniPlatSenatoru.Average()))
+                            </div> než je
+                            <abbr title="Průměrná měsíční mzda rok @PpRepo.DefaultYear je @HlidacStatu.Util.RenderData.NicePrice(prumernyMzdaCR / 12). Roční je  @HlidacStatu.Util.RenderData.NicePrice(prumernyMzdaCR)">průměrná roční mzda v ČR.</abbr>.
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-6 col-lg-4">
+                <div class="h-md-100  card h-100">
+                    <div class="pb-0 card-header">
+                        <h4 class="">Průměrný roční příjem <b>kr. zastupitelů</b></h4>
+                    </div>
+                    <div class="d-flex  card-body">
+                        <div>
+                            <h5 class="mb-2 text-700 fw-normal lh-1">
+                                @HlidacStatu.Util.RenderData.NicePriceHtml(rocniPlatKraju.Average())
+                            </h5>
+                            Krajští zastupitelé mají průměrný příjem
+                            <div class="me-2 badge text-bg-warning">
+                                o @HlidacStatu.Util.RenderData.NicePrice(rocniPlatKraju.Average() - prumernyMzdaCR ) Kč vyšší
+                            </div> než je
+                            <abbr title="Průměrná měsíční mzda rok @PpRepo.DefaultYear je @HlidacStatu.Util.RenderData.NicePrice(prumernyMzdaCR / 12). Roční je  @HlidacStatu.Util.RenderData.NicePrice(prumernyMzdaCR)">průměrná roční mzda v ČR.</abbr>.
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-6 col-lg-4">
+                <div class="h-md-100  card h-100">
+                    <div class="pb-0 card-header">
+                        <h4 class="">Nejvytíženější politici</h4>
+                    </div>
+                    <div class="d-flex  card-body">
+                        <div>
+                            <h5 class="mb-2 text-700 fw-normal lh-1">
+                                Průměrně @RenderData.NiceNumber(pocetFunkci, showDecimal: RenderData.ShowDecimalVal.Show)</b> funkcí
+                            </h5>
+                            @(pocetLidiXjobs) politiků působí na více než <b>@minJobCount</b> pozicích.
+                            @{
+                                var topJob = vsichni
+                                .OrderByDescending(p => p.Value.Count())
+                                .ThenByDescending(o => o.Value.Sum(m => m.CelkoveRocniNakladyNaPolitika))
+                                .First();
+                            }
+                            <p>
+                                Vede <b>@(Osoby.GetByNameId.Get(topJob.Key).FullName())</b> s 
+                                <span class="me-2 badge text-bg-warning">
+                                    @topJob.Value.Count()</b> funkcemi</span> a celkovým ročním příjmem
+                                <span class="me-2 badge text-bg-warning">@Html.Raw(HlidacStatu.Util.RenderData.ShortNicePrice(topJob.Value.Sum(m => m.CelkoveRocniNakladyNaPolitika), html: true))</span>.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            @* <div class="col-4 col-lg-2 justify-content-center text-center align-text-bottom pt-3 mt-3">
                 <a href="/politici/organizace">
 
                     <i class="fa-light fa-building-magnifying-glass fa-3x mb-2" style="--fa-primary-color: #2668d9;"></i>
@@ -95,52 +208,7 @@
                     </div>
 
                 </a>
-            </div>
-            <div class="col-4 col-lg-2 justify-content-center text-center align-text-bottom pt-3 mt-3">
-                <a href="/politici/seznam?year=@(PpRepo.DefaultYear)&top=100&sort=funkce">
-
-                    <i class="fa-light fa-money-bill-wheat fa-3x mb-2"
-                       style="--fa-primary-color: #2668d9;"></i>
-                    <div class="fs-6 fw-bold text-center">Průměrný počet placených pozic</div>
-                    <div class="fs-5 fw-bold text-center badge rounded-pill text-bg-warning">
-                        @RenderData.NiceNumber(pocetFunkci, showDecimal: RenderData.ShowDecimalVal.Show)
-                    </div>
-                </a>
-
-            </div>
-            <div class="col-4 col-lg-2 justify-content-center text-center align-text-bottom pt-3 mt-3">
-                <a href="/politici/seznam/@(PpRepo.PoliticianGroup.Poslanci.ToString("G"))?year=@(PpRepo.DefaultYear)">
-
-                    <i class="fa-light fa-money-bill-1-wave fa-3x mb-2"
-                       style="--fa-primary-color: #2668d9;"></i>
-                    <div class="fs-6 fw-bold text-center">Průměrný roční plat poslance</div>
-                    <div class="fs-5 fw-bold text-center badge rounded-pill text-bg-warning">
-                        @RenderData.NicePriceHtml(prumernyRocniPlatPoslance)
-                    </div>
-                </a>
-            </div>
-            <div class="col-4 col-lg-2 justify-content-center text-center align-text-bottom pt-3 mt-3">
-                <a href="/politici/seznam/@(PpRepo.PoliticianGroup.Senatori.ToString("G"))?year=@(PpRepo.DefaultYear)">
-                    <i class="fa-light fa-money-bill-1-wave fa-3x mb-2 fa-rotate-by"
-                       style="--fa-primary-color: #2668d9; --fa-rotate-angle: 30deg;"></i>
-                    <div class="fs-6 fw-bold text-center">Průměrný roční plat senátora</div>
-                    <div class="fs-5 fw-bold text-center badge rounded-pill text-bg-warning">
-                        @RenderData.NicePriceHtml(prumernyRocniPlatSenatora)
-                    </div>
-                </a>
-            </div>
-            <div class="col-4 col-lg-2 justify-content-center text-center align-text-bottom pt-3 mt-3">
-                <a href="/politici/seznam/@(PpRepo.PoliticianGroup.Vlada.ToString("G"))?year=@(PpRepo.DefaultYear)">
-
-                    <i class="fa-light fa-money-bill-1-wave fa-3x mb-2 fa-rotate-by"
-                       style="--fa-primary-color: #2668d9; --fa-rotate-angle: 60deg;"></i>
-                    <div class="fs-6 fw-bold text-center">Průměrný roční plat ministra</div>
-                    <div class="fs-5 fw-bold text-center badge rounded-pill text-bg-warning">
-                        @RenderData.NicePriceHtml(prumernyRocniPlatMinistra)
-                    </div>
-                </a>
-            </div>
-
+            </div> *@
         </div>
     </div>
 </section>

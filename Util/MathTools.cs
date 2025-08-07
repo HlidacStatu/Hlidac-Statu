@@ -120,5 +120,52 @@ namespace HlidacStatu.Util
             else
                 return elements[elements.Length - 1];
         }
+
+        public static decimal ChangeInPercent(decimal first, decimal second)
+        {
+            decimal change = second - first;
+            decimal percentage = (first == 0) ? 0 : change / first;
+            return percentage;
+        }
+        public static decimal DifferenceInPercent(decimal baseValue, decimal anotherValue)
+        {
+            //if (baseValue > anotherValue)
+            //{
+            //    (baseValue, anotherValue) = (anotherValue, baseValue);
+            //}
+
+
+            decimal percentage = ( anotherValue - baseValue) / baseValue;
+            return percentage;
+        }
+
+        public static string DifferenceInPercentText(decimal baseValue, decimal anotherValue, 
+            string prefix = "o", string bigger = "vyšší", string lower="nižší", string same = "stejné",
+            string numberFormat = "P1")
+        {
+            //if (baseValue > anotherValue)
+            //{
+            //    (baseValue, anotherValue) = (anotherValue, baseValue);
+            //}
+            decimal change = DifferenceInPercent(baseValue, anotherValue);
+            if (change < 0)
+                return $"{prefix} {change.ToString(numberFormat)} {lower}";
+            else if (change > 0)
+                return $"{prefix} {change.ToString(numberFormat)} {bigger}";
+            else
+                return $"{same}";
+        }
+        public static string DifferenceText(decimal baseValue, decimal anotherValue,
+            string prefix = "", string postfix="-krát", string bigger = "vyšší", string lower = "nižší", string same = "stejný",
+            string numberFormat = "F1")
+        {
+            decimal change = anotherValue / baseValue;
+            if (change < 1)
+                return $"{prefix} {change.ToString(numberFormat)}{postfix} {lower}";
+            else if (change > 0)
+                return $"{prefix} {change.ToString(numberFormat)}{postfix} {bigger}";
+            else
+                return $"{same}";
+        }
     }
 }
