@@ -1,0 +1,227 @@
+@using System.Reflection
+@using System.Text.Json
+@using PlatyUredniku.Controllers
+@model (PlatyUredniku.Controllers.PoliticiController.PoliticiFilter Filter, List<PlatyUredniku.Controllers.PoliticiController.PoliticiViewData> Data, string DataEndpointUrl)
+
+<div class="row">
+  <div class="col-2">
+    <form id="filterForm" class="my-4">
+      <div class="accordion" id="filterAccordion">
+        @{
+          var filterProperties = Model.Filter.GetType().GetProperties();
+          int idx = 0;
+          foreach (var filterProperty in filterProperties)
+          {
+            var filterAttribute = filterProperty.GetCustomAttribute<FilterTypeAttribute>();
+            var filterType = filterAttribute?.Type;
+            if (filterType == null) continue;
+            string paneId = $"filterPane{idx++}";
+            string filterPropertyName = filterProperty.Name;
+            <div class="accordion-item">
+              <h2 class="accordion-header" id="heading-@paneId">
+                <button
+                  class="accordion-button collapsed"
+                  type="button"
+                  data-bs-toggle="collapse"
+                  data-bs-target="#collapse-@paneId"
+                  aria-expanded="false"
+                  aria-controls="collapse-@paneId">
+                  @(filterAttribute?.Name ?? filterProperty.Name)
+                </button>
+              </h2>
+              <div
+                id="collapse-@paneId"
+                class="accordion-collapse collapse"
+                aria-labelledby="heading-@paneId"
+              >
+                <div class="accordion-body">
+                  @* Radio buttons *@
+                  @if (filterType == FilterTypes.RadioButton)
+                  {
+                    var options = (string[])filterProperty.GetValue(Model.Filter);
+                    foreach (var opt in options)
+                    {
+                      string id = $"{filterPropertyName}_{opt}";
+                      <div class="form-check">
+                        <input
+                          class="form-check-input"
+                          type="radio"
+                          name="@filterPropertyName"
+                          id="@id"
+                          value="@opt"
+                          @(opt == options.First() ? "checked" : "")/>
+                        <label class="form-check-label" for="@id">@opt</label>
+                      </div>
+                    }
+                  }
+                  @* Checkboxes *@
+                  else if (filterType == FilterTypes.CheckBox)
+                  {
+                    var options = (string[])filterProperty.GetValue(Model.Filter);
+                    foreach (var opt in options)
+                    {
+                      string id = $"{filterPropertyName}_{opt}";
+                      <div class="form-check">
+                        <input
+                          class="form-check-input"
+                          type="checkbox"
+                          name="@filterPropertyName"
+                          id="@id"
+                          value="@opt"
+                          checked/>
+                        <label class="form-check-label" for="@id">@opt</label>
+                      </div>
+                    }
+                  }
+                  @* Range *@
+                  else if (filterType == FilterTypes.Range)
+                  {
+                    var range = (int[])filterProperty.GetValue(Model.Filter);
+                    <div class="range-inputs">
+                      <input
+                        type="number"
+                        class="form-control form-control--small"
+                        id="@($"{filterPropertyName}Min")"
+                        name="@filterPropertyName"
+                        placeholder="Min"
+                        value="@range[0]"/>
+                      <label class="form-check-label" for="@($"{filterPropertyName}Min")">od</label>
+                      <input
+                        type="number"
+                        class="form-control form-control--small"
+                        id="@($"{filterPropertyName}Max")"
+                        name="@filterPropertyName"
+                        placeholder="Max"
+                        value="@range[1]"/>
+                      <label class="form-check-label" for="@($"{filterPropertyName}Max")">do</label>
+                    </div>
+                  }
+                </div>
+              </div>
+            </div>
+          }
+        }
+      </div>
+    </form>
+  </div>
+
+  <div class="col-10">
+    @{
+      // reflect view-data columns
+      var dataProps = typeof(PoliticiController.PoliticiViewData)
+        .GetProperties()
+        .Select(p => (Prop: p, Attr: p.GetCustomAttribute<HtmlTableDefinition.ColumnAttribute>()))
+        .Where(x => x.Attr is null || x.Attr.Type != HtmlTableDefinition.ColumnType.Hidden)
+        .ToList();
+    }
+    <table id="myFilteredTable" class="table table-striped table-bordered">
+      <thead>
+      <tr>
+        @foreach (var col in dataProps)
+        {
+          <th>@(col.Attr?.Name ?? col.Prop.Name)</th>
+        }
+      </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </div>
+</div>
+
+<script>
+  $(function () {
+    // build columns config for DataTables
+    const dtColumns = @Html.Raw(JsonSerializer.Serialize(
+                        dataProps.Select(col => new
+                        {
+                          data = JsonNamingPolicy.CamelCase.ConvertName(col.Prop.Name),
+                          name = JsonNamingPolicy.CamelCase.ConvertName(col.Prop.Name)
+                        }), JsonSerializerOptions.Web));
+
+    const numberIdxTargets = @Html.Raw(JsonSerializer.Serialize(
+                               dataProps.Select((x, i) => new { x, i })
+                                 .Where(t => t.x.Attr?.Type == HtmlTableDefinition.ColumnType.Number)
+                                 .Select(t => t.i),
+                               JsonSerializerOptions.Web));
+
+    const priceIdxTargets = @Html.Raw(JsonSerializer.Serialize(
+                              dataProps.Select((x, i) => new { x, i })
+                                .Where(t => t.x.Attr?.Type == HtmlTableDefinition.ColumnType.Price)
+                                .Select(t => t.i),
+                              JsonSerializerOptions.Web));
+
+    const table = $('#myFilteredTable').DataTable({
+      data: @Html.Raw(JsonSerializer.Serialize(Model.Data, JsonSerializerOptions.Web)),
+      columns: dtColumns,
+      columnDefs: [
+        {
+          targets: numberIdxTargets,
+          className: 'number',
+          type: 'num'
+        },
+        {
+          targets: priceIdxTargets,
+          className: 'number',       // right-align if your CSS does that for .number
+          type: 'num',               // keep numeric sorting
+          render: function (data, type) {
+            // use raw number for sorting/searching
+            const n = (typeof data === 'number')
+              ? data
+              : parseFloat(String(data ?? '').replace(/\s|[^\d.-]/g, ''));
+            if (type === 'sort' || type === 'type' || type === 'filter') return isNaN(n) ? null : n;
+
+            // pretty display (no decimals, CZK)
+            if (isNaN(n)) return '';
+            return new Intl.NumberFormat('cs-CZ', {
+              style: 'currency',
+              currency: 'CZK',
+              minimumFractionDigits: 0,
+              maximumFractionDigits: 0
+            }).format(n);
+          }
+        }
+      ],
+      language: {'url': '//cdn.datatables.net/plug-ins/1.13.4/i18n/cs.json'},
+      lengthChange: false,
+      info: false,
+      pageLength: 25,
+    });
+
+    // ajax
+    const form = $('#filterForm');
+
+    function debounce(fn, delay) {
+      let t;
+      return function (...args) {
+        clearTimeout(t);
+        t = setTimeout(() => fn.apply(this, args), delay);
+      };
+    }
+
+    let inflight = null;
+    const fetchAndRender = debounce(function () {
+      if (inflight) inflight.abort();
+      inflight = $.ajax({
+        url: '@Model.DataEndpointUrl',
+        method: 'GET',
+        data: form.serialize()
+      }).done(data => {
+        table.clear().rows.add(data).draw();
+      }).always(() => {
+        inflight = null;
+      });
+    }, 200);
+
+    form.off('.filters'); // avoid duplicate bindings if partial is re-rendered
+    form.on('submit.filters', e => e.preventDefault());
+
+    // radios/checkboxes/selects: use change (ignore the radio that got unchecked)
+    form.on('change.filters', 'input[type=radio], input[type=checkbox], select', function () {
+      if (this.type === 'radio' && !this.checked) return;
+      fetchAndRender();
+    });
+
+    // numeric/text/range: use input so typing doesn’t spam requests (debounced)
+    form.on('input.filters', 'input[type=number], input[type=range], input[type=text], input[type=search]', fetchAndRender);
+  });
+</script>

@@ -237,9 +237,8 @@ public static class PpRepo
 
     public static IQueryable<PpPrijem> BasePotvrzenePlaty(DbEntities db, int rok = DefaultYear)
     {
-
         return BaseAllPlaty(db, rok)
-            .Where(m => m.Status == PpPrijem.StatusPlatu.PotvrzenyPlat_od_politika);
+            .Where(m => m.Status > 0);
     }
 
     public static string[] AllNameId(bool? zeny, int rok = DefaultYear)
@@ -740,13 +739,12 @@ public static class PpRepo
         await dbContext.SaveChangesAsync();
     }
 
-    [Devmasters.Enums.ShowNiceDisplayName]
+    [ShowNiceDisplayName]
     public enum PoliticianGroup
     {
         [NiceDisplayName("Všichni politici")]
         Vse,
         [NiceDisplayName("Poslanci")]
-
         Poslanci,
         [NiceDisplayName("Senátoři")]
         Senatori,
