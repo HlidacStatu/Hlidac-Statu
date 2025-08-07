@@ -318,7 +318,7 @@ public static class PpRepo
     }
 
 
-    public static async Task<List<PpPrijem>> GetPrijmyPolitika(string nameid, int rok = DefaultYear, bool pouzePotvrzene = false)
+    public static async Task<List<PpPrijem>> GetPrijmyPolitika(string nameid, int rok = DefaultYear, bool pouzePotvrzene = true)
     {
         await using var db = new DbEntities();
         var baseData = pouzePotvrzene ? BasePotvrzenePlaty(db, rok) : BaseAllPlaty(db, rok);
@@ -468,7 +468,7 @@ public static class PpRepo
 
     public static async Task<Dictionary<string, PpPrijem[]>> GetPrijmyGroupedByNameIdAsync(
         int rok, bool withDetails = false, 
-        string ico = null, string[] onlyNameIds = null, PoliticianGroup? group=null, bool pouzePotvrzene = false,
+        string ico = null, string[] onlyNameIds = null, PoliticianGroup? group=null, bool pouzePotvrzene = true,
         Expression<Func<PpPrijem, bool>> predicate = null)
     {
 
@@ -790,7 +790,7 @@ public static class PpRepo
             _ => []
         };
 
-    public static async Task<List<PpPrijem>> GetPrijmyForGroupAsync(PoliticianGroup group, int rok = DefaultYear, bool pouzePotvrzene = false)
+    public static async Task<List<PpPrijem>> GetPrijmyForGroupAsync(PoliticianGroup group, int rok = DefaultYear, bool pouzePotvrzene = true)
     {
         await using var db = new DbEntities();
         IQueryable<PpPrijem> query;
@@ -821,7 +821,7 @@ public static class PpRepo
         return await query.ToListAsync(); ;
     }
 
-    public static async Task<List<string>> GetNameIdsForGroupAsync(PoliticianGroup group, int rok = DefaultYear, bool pouzePotvrzene = false)
+    public static async Task<List<string>> GetNameIdsForGroupAsync(PoliticianGroup group, int rok = DefaultYear, bool pouzePotvrzene = true)
     {
         await using var db = new DbEntities();
         IQueryable<PpPrijem> query = null;
@@ -893,7 +893,7 @@ public static class PpRepo
     {
         var res = new PpGlobalStat() { Rok = rok };
         using var db = new DbEntities();
-        var data = BaseAllPlaty(db, rok)
+        var data = BasePotvrzenePlaty(db, rok)
             .AsNoTracking();
         if (predicate != null)
             data = data.Where(predicate);
