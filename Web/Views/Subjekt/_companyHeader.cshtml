@@ -1,0 +1,183 @@
+﻿@model Firma
+@using HlidacStatu.DS.Graphs
+@using HlidacStatu.Extensions;
+@using HlidacStatu.Entities.Facts;
+@using System.Linq;
+@using Devmasters;
+@using HlidacStatu.Entities
+@using HlidacStatu.Repositories
+@using HlidacStatu.Repositories.SharedModels
+@using Newtonsoft.Json.Linq;
+
+@{
+    Layout = null;
+
+    var ceo = Model.Ceo();
+
+
+}
+
+
+@* company header *@
+
+
+<cache enabled="@(!System.Diagnostics.Debugger.IsAttached)" expires-after="@Constants.CachedActionLength.Cache12H" vary-by="@($"{Model.ICO}")">
+    <partial name="WebUtil/CompanySummary" model="@Model" />
+</cache>
+
+<div class="row">
+    <div class="col">
+        <div class="row">
+            @if (ceo.Osoba != null && ceo.Osoba.IsValid())
+            {
+                <div class="col-sm-4">
+                    <div class="person-profile-thumb">
+                        <a href="@ceo.Osoba.GetUrl()">
+                            <div class="photo">
+                                <div class="profile-picture border" style="background-image: url('@ceo.Osoba.GetPhotoUrl(local: true, phototype: Osoba.PhotoTypes.NoBackground)')"></div>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+                <div class="col-sm-8">
+                    <p class="py-0 my-0 text-muted">@ceo.Role</p>
+                    <p class="py-0 my-0 lead">
+                        <a href="@ceo.Osoba.GetUrl()">@ceo.Osoba.FullName()</a>
+                    </p>
+                    <p class="py-0 my-0">od @(ceo.From?.ToString("dd.MM.yyyy"))</p>
+                    @if (ceo.Osoba.GetSocialContacts().Any())
+                    {
+                        <p class="py-0 my-0 text-muted">
+                            @foreach (var ev in ceo.Osoba.GetSocialContacts())
+                            {
+                                <span>@Html.SocialLinkWithIcon(ev.Network, ev.Contact, "", "")</span>
+                            }
+                        </p>
+                    }
+
+                </div>
+            }
+            else
+            {
+                var rppOsoby = await Model.CeosFromRPPAsync();
+                if (rppOsoby.Count() > 0)
+                {
+                    <div class="col-sm-4">
+                        <div class="person-profile-thumb">
+                            <div class="photo">
+                                <div class="profile-picture border" style="background-image: url('/photo/unknown')"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-8">
+                        <p class="py-0 my-0 text-muted">Zastupovaný</p>
+                        @foreach (var os in rppOsoby)
+                        {
+                            <p class="py-0 my-0 lead">@($"{os.jmeno.Capitalize()} {os.prijmeni.Capitalize()}")</p>
+                            <p class="py-0 my-0 text-muted small">změna @(os.poslednizmena?.ToString("dd.MM.yyyy"))</p>
+                        }
+                    </div>
+                }
+            }
+
+        </div> @* CEO *@
+    </div>
+    <div class="col">
+        @* COMPANY INFO *@
+        <table>
+            <tr>
+                <td class="text-nowrap text-muted col-sm-5">Založeno</td>
+                <td class="col-sm-7">@(Model.Datum_Zapisu_OR?.ToString("dd.MM.yyyy"))</td>
+            </tr>
+            @if (Model.DatumZaniku is not null)
+            {
+                <tr>
+                    <td class="text-nowrap text-muted col-sm-5">Zaniklo</td>
+                    <td class="col-sm-7">@(Model.DatumZaniku?.ToString("dd.MM.yyyy"))</td>
+                </tr>
+            }
+            <tr>
+                <td class="text-nowrap text-muted col-sm-5">IČO</td>
+                <td class="col-sm-7">@Model.ICO</td>
+            </tr>
+            <tr>
+                <td class="text-nowrap text-muted col-sm-5">Datová schránka</td>
+                <td class="col-sm-5">@string.Join(", ", Model.DatovaSchranka)</td>
+            </tr>
+            @if (Model.GetSocialContacts().Any(m => m.Network == OsobaEvent.SocialNetwork.Zaznam_zastupitelstva))
+            {
+                <tr>
+                    <td class="text-nowrap text-muted col-sm-5">Záznamy zastupitelstva</td>
+                    <td class="col-sm-5">
+                        @foreach (var ev in Model.GetSocialContacts().Where(m => m.Network == OsobaEvent.SocialNetwork.Zaznam_zastupitelstva))
+                        {
+                            <span>@Html.SocialLinkWithIcon(ev.Network, ev.Contact, Model.ICO, "")</span>
+                        }
+                    </td>
+                </tr>
+            }
+
+            @if (Model.GetSocialContacts().Any(m => m.Network != OsobaEvent.SocialNetwork.Zaznam_zastupitelstva))
+            {
+                <tr>
+                    <td class="text-nowrap text-muted col-sm-5">Odkazy</td>
+                    <td class="col-sm-5">
+                        @foreach (var ev in Model.GetSocialContacts().Where(m => m.Network != OsobaEvent.SocialNetwork.Zaznam_zastupitelstva))
+                        {
+                            <span>@Html.SocialLinkWithIcon(ev.Network, ev.Contact, Model.ICO, "")</span>
+                        }
+                    </td>
+                </tr>
+            }
+
+        </table>
+    </div>
+</div>
+
+<div class="watcher">
+    <h4>Hlídání nových smluv, zakázek, dotací a dalšího </h4>
+    <div>
+        
+        @{
+            {
+                var wdModel = new WatchdogViewModel(null,
+                $"ico:{Model.ICO}",
+                $"Upozornit u {TextUtil.ShortenText(Model.Jmeno, 30)}",
+                prefillWDname: $"Novinky pro {Model.Jmeno}",
+                buttonCss: "btn btn-warning btn-xs",
+                showWdList: false, preButtonText: "");
+
+                <partial name="WebUtil/AddWatchdog" model="wdModel" />
+            }
+        }
+        @if (Model.AktualniVazby(Relation.AktualnostType.Nedavny).Any())
+        {
+            if (Model.JsemOVM())
+            {
+                {
+                    var wdModel = new WatchdogViewModel(null,
+                    $"holding:{Model.ICO}",
+                    $"Upozornit u subjektu + {Devmasters.Lang.CS.Plural.Get(Model.PocetPodrizenychSubjektu(Relation.AktualnostType.Nedavny), "v jedné podřízené organizaci", "ve {0} podřízených organizacích", "v {0} podřízených organizacích")}",
+                    prefillWDname: $"Novinky pro holding {Model.Jmeno}",
+                    buttonCss: "btn btn-warning btn-xs",
+                    showWdList: false, preButtonText: "");
+
+                    <partial name="WebUtil/AddWatchdog" model="wdModel" />
+                }
+            }
+            else
+            {
+                {
+                    var wdModel = new WatchdogViewModel(null,
+                    $"holding:{Model.ICO}",
+                    $"Upozornit u subjektu + {Devmasters.Lang.CS.Plural.Get(Model.PocetPodrizenychSubjektu(Relation.AktualnostType.Nedavny), "v jedné dceřiné společnosti", "ve {0} dceřiných společnostech", "v {0} dceřiných společnostech")}",
+                    prefillWDname: $"Novinky pro holding {Model.Jmeno}",
+                    buttonCss: "btn btn-warning btn-xs",
+                    showWdList: false, preButtonText: "");
+
+                    <partial name="WebUtil/AddWatchdog" model="wdModel" />
+                }
+            }
+        }
+    </div>
+</div>

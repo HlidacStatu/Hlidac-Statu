@@ -32,19 +32,7 @@ public class PoliticiController : Controller
         return View();
     }
 
-    [HlidacCache(60 * 60, "rok")]
-    public async Task<IActionResult> IndexAlternative(int rok = PpRepo.DefaultYear)
-    {
-        //titulka politiku
-        var platyTask = _cache.GetOrSetAsync<Dictionary<string, PpPrijem[]>>(
-            $"{nameof(PpRepo.GetPrijmyGroupedByNameIdAsync)}_{rok}-politici",
-            _ => PpRepo.GetPrijmyGroupedByNameIdAsync(rok)
-        );
-        var platyPolitiku = await platyTask;
-        ViewData["platy"] = platyPolitiku;
-
-        return View();
-    }
+    
 
     [HlidacCache(60 * 60, "id;rok")]
     public async Task<IActionResult> Politik(string id, int rok = PpRepo.DefaultYear)

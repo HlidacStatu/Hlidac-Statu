@@ -129,44 +129,7 @@
     <br />Moc děkujeme <i class="fa-solid fa-heart" style="color:red"></i>
     <hr />
  *@
-    @{
-        HlidacStatu.Datasets.DataSet skutMajitDS = HlidacStatu.Datasets.DataSet.CachedDatasets.Get("skutecni-majitele");
-        var skutMajitRes = (await skutMajitDS.SearchDataRawAsync("ico:" + Model.ICO, 1, 1)).Result.ToList();
-    }
-    @if (skutMajitRes.Any()
-    && Devmasters.Config.GetWebConfigValue("HiddenSkutecniMajiteleICO")?.Split(",")?.Contains(Model.ICO) == false
-    )
-    {
-        Newtonsoft.Json.Linq.JObject obj = Newtonsoft.Json.Linq.JObject.Parse(skutMajitRes.First().Item2);
-        if (obj["skutecni_majitele"]?.Count() > 0)
-        {
-            var aktualniMajitele = obj["skutecni_majitele"].Where(m => ((JValue)m["datum_vymaz"]).Value == null);
-            var vymazaniMajitele = obj["skutecni_majitele"].Where(m => ((JValue)m["datum_vymaz"]).Value != null);
-            if (aktualniMajitele.Count() > 0)
-            {
-                <h4>@(aktualniMajitele.Count() > 1 ? "Skuteční majitelé" : "Skutečný majitel")</h4>
-                <partial name="_renderSkutecniMajitele" model="@aktualniMajitele" />
-                <div style="padding-bottom:10px;">&nbsp;</div>
-            }
 
-
-            if (vymazaniMajitele.Count() > 0)
-            {
-                <h4>@(vymazaniMajitele.Count() > 1 ? "Vymazaní majitelé" : "Vymazaný majitel")</h4>
-                <partial name="_renderSkutecniMajitele" model="@vymazaniMajitele" />
-            }
-        }
-        <hr />
-    }
-    else if (Model.Registrovana_v_zahranici == false)
-    {
-        <h4>Skuteční majitelé</h4>
-        <div>
-            <a href="https://esm.justice.cz/ias/issm/rejstrik-$sm?ico=@(Model.ICO)&jenPlatne=PLATNE&polozek=50&typHledani=STARTS_WITH&typHledaniSpolku=ALL">Najít v Evidenci skutečných majitelů<i class="fa-regular fa-arrow-up-right-from-square"></i></a>
-        </div>
-        <div style="padding-bottom:10px;">&nbsp;</div>
-
-    }
 
     @{
         var platyUrednikuOrg = await PuRepo.GetFullDetailAsync(Model.DatovaSchranka);
@@ -267,55 +230,7 @@
         }
     }
 
-    <div class="watcher">
-        <hr />
-        <h4>Chci hlídat</h4>
-        <div>
-            @{
-                {
-                    var wdModel = new WatchdogViewModel(null,
-                    $"ico:{Model.ICO}",
-                    $"Všechny změny o {TextUtil.ShortenText(Model.Jmeno, 30)}",
-                    prefillWDname: $"Novinky pro {Model.Jmeno}",
-                    buttonCss: "btn btn-warning btn-xs",
-                    showWdList: false, preButtonText: "");
-
-                    <partial name="WebUtil/AddWatchdog" model="wdModel" />
-                }
-            }
-        </div>
-        <div>
-            @if (Model.AktualniVazby(Relation.AktualnostType.Nedavny).Any())
-            {
-                if (Model.JsemOVM())
-                {
-                    {
-                        var wdModel = new WatchdogViewModel(null,
-                        $"holding:{Model.ICO}",
-                        $"Změny i {Devmasters.Lang.CS.Plural.Get(Model.PocetPodrizenychSubjektu(Relation.AktualnostType.Nedavny), "v jedné podřízené organizaci", "ve {0} podřízených organizacích", "v {0} podřízených organizacích")}",
-                        prefillWDname: $"Novinky pro {Model.Jmeno}",
-                        buttonCss: "btn btn-warning btn-xs",
-                        showWdList: false, preButtonText: "");
-
-                        <partial name="WebUtil/AddWatchdog" model="wdModel" />
-                    }
-                }
-                else
-                {
-                    {
-                        var wdModel = new WatchdogViewModel(null,
-                        $"holding:{Model.ICO}",
-                        $"Změny i {Devmasters.Lang.CS.Plural.Get(Model.PocetPodrizenychSubjektu(Relation.AktualnostType.Nedavny), "v jedné dceřiné společnosti", "ve {0} dceřiných společnostech", "v {0} dceřiných společnostech")}",
-                        prefillWDname: $"Novinky pro {Model.Jmeno}",
-                        buttonCss: "btn btn-warning btn-xs",
-                        showWdList: false, preButtonText: "");
-
-                        <partial name="WebUtil/AddWatchdog" model="wdModel" />
-                    }
-                }
-            }
-        </div>
-    </div>
+    
     <hr />
     <div>
         <span class="text-muted">Chci sdílet s ostatními</span>
@@ -329,11 +244,12 @@
         </div>
     </div>
 
-    <div id="div_toc" class="sticky-top">
+    <div id="div_toc_side" class="sticky-top">
         <p class="pt-4" style="display:none">
             <b>Obsah stránky</b>
         </p>
-        <nav id="toc"></nav>
+        <nav id="toc_side"></nav>
+
     </div>
 
 </div>

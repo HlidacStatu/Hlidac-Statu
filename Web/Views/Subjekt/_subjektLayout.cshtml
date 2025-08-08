@@ -1,11 +1,22 @@
 ﻿@using HlidacStatu.DS.Graphs
 @using HlidacStatu.Extensions;
 @using HlidacStatu.Entities.Facts;
+@using System.Linq;
+@using Devmasters;
+@using HlidacStatu.Entities
+@using HlidacStatu.Repositories
+@using HlidacStatu.Repositories.SharedModels
+@using Newtonsoft.Json.Linq;
 
 @model (HlidacStatu.Entities.Firma firma, string viewName, string title)
 
 @{
-    string[] tocOn = new string[] {"registrsmluv" };
+    List<string> tocOn = new() { "registrsmluv" };
+
+    if (this.User.IsInRole("Admin"))
+    {
+        tocOn.Add("index");
+    }
 
 
     ViewBag.Title = Model.title;
@@ -21,12 +32,15 @@
 
 
     Relation.AktualnostType? aktualnost = ViewBag.Aktualnost;
+
+    var ceo = Model.firma.Ceo();
+
 }
 @section metatags
 {
 
     @if (Model.firma != null
- && HlidacStatu.Web.Framework.Constants.DontIndexICOS.Contains(Model.firma.ICO.ToLower()))
+                     && HlidacStatu.Web.Framework.Constants.DontIndexICOS.Contains(Model.firma.ICO.ToLower()))
     {
         <meta name="robots" content="noindex, noarchive">
     }
@@ -117,21 +131,23 @@
     @* Přidá barevnou paletu ke grafům *@
     @Html.GraphTheme()
 
-    @if (tocOn.Contains(Model.viewName.ToLower()))
+    @if (true || tocOn.Contains(Model.viewName.ToLower()))
     {
-        <link rel="stylesheet" href="~/js/bootstrap-toc.min.css"/>
+        <link rel="stylesheet" href="~/js/bootstrap-toc.min.css" />
         <script src="~/js/bootstrap-toc.1.0.2.min.js"></script>
 
         <script>
             $(document).ready(function() {
-                $("#div_toc > p").show();
-                Toc.init({
-                    $nav: $("#toc"),
-                    $scope: $("#subjcontent_toc h2, #subjcontent_toc h3, #subjcontent_toc h4")
-                });
-                new bootstrap.ScrollSpy(document.body, {
-                    target: '#toc'
-                })
+                if ($("#subjcontent_toc").length) {
+                    $("#div_toc_side > p").show();
+                    Toc.init({
+                        $nav: $("#toc"),
+                        $scope: $("#subjcontent_toc h2, #subjcontent_toc h3, #subjcontent_toc h4")
+                    });
+                    new bootstrap.ScrollSpy(document.body, {
+                        target: '#toc'
+                    })
+                }
             });
         </script>
     }
@@ -195,12 +211,14 @@
         margin-bottom: 34px;
     }
 
-    h4 { padding-top:30px;}
+    h4 {
+        padding-top: 30px;
+    }
 </style>
 
 <div class="head">
     <h3>
-        <add-bookmark name="@(ViewBag.Title + " " + ViewBag.SubTitle)" item="@Model.firma" style="font-size:0.7em;vertical-align:top;"></add-bookmark>
+        <add-bookmark name="@(ViewBag.Title + " " + ViewBag.SubTitle)" item="@Model" style="font-size:0.7em;vertical-align:top;"></add-bookmark>
         @(await Html.KIndexLabelLinkAsync(Model.firma.ICO, 30, linkToKindex: true))@Model.title
         @if (this.User?.IsInRole("canEditData") == true)
         {
@@ -210,22 +228,36 @@
         }
     </h3>
     <cache enabled="@(!System.Diagnostics.Debugger.IsAttached)" expires-after="@Constants.CachedActionLength.Cache12H" vary-by="@($"{Model.firma.ICO}")">
-        <partial name="WebUtil/CompanySummary" model="@Model.firma" />
-    </cache>
-</div>
-<hr />
-
-
-<div class="row boxes">
-    @* Pravý sloupec *@
-    <cache enabled="@(!System.Diagnostics.Debugger.IsAttached)" expires-after="@Constants.CachedActionLength.Cache12H" vary-by="@($"{Model.firma.ICO}_{User.Identity.IsAuthenticated}")">
-        <partial name="RightColumn" model="@Model.firma" />
-    </cache>
-
-    @* Prázdný sloupec *@
-    <div class="col-sm-1 order-2"></div>
-    <cache enabled="@(!System.Diagnostics.Debugger.IsAttached)" expires-after="@Constants.CachedActionLength.Cache12H" vary-by="@($"{Model.firma.ICO}_{Model.viewName}_{User.Identity.IsAuthenticated}_{this.Context.Request.QueryString.ToString()}")">
-        <partial name="@Model.viewName" model="@Model.firma" />
+        <partial name="_companyHeader" model="@Model.firma" />
     </cache>
 
 </div>
+<div class="row boxes gx-4 mt-5">
+
+    @* levy toc sloupec *@
+    <div class="col-sm-2 col-xs-12 border-end">
+        <cache enabled="@(!System.Diagnostics.Debugger.IsAttached)" expires-after="@Constants.CachedActionLength.Cache12H" vary-by="@($"{Model.firma.ICO}_{User.Identity.IsAuthenticated}")">
+            <partial name="Toc_Column" model="@Model.firma" />
+        </cache>
+    </div>
+    <div class="col-sm-10 col-xs-12">
+        <cache enabled="@(!System.Diagnostics.Debugger.IsAttached)" expires-after="@Constants.CachedActionLength.Cache12H" vary-by="@($"{Model.firma.ICO}_{Model.viewName}_{User.Identity.IsAuthenticated}_{this.Context.Request.QueryString.ToString()}")">
+            <partial name="@Model.viewName" model="@Model.firma" />
+        </cache>
+    </div>
+</div>
+
+
+@* <div class="row boxes">
+        
+        <cache enabled="@(!System.Diagnostics.Debugger.IsAttached)" expires-after="@Constants.CachedActionLength.Cache12H" vary-by="@($"{Model.firma.ICO}_{User.Identity.IsAuthenticated}")">
+            <partial name="RightColumn" model="@Model.firma" />
+        </cache>
+
+        
+        <div class="col-sm-1 order-2"></div>
+        <cache enabled="@(!System.Diagnostics.Debugger.IsAttached)" expires-after="@Constants.CachedActionLength.Cache12H" vary-by="@($"{Model.firma.ICO}_{Model.viewName}_{User.Identity.IsAuthenticated}_{this.Context.Request.QueryString.ToString()}")">
+            <partial name="@Model.viewName" model="@Model.firma" />
+        </cache>
+    </div> *@
+

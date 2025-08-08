@@ -8,8 +8,8 @@
 
 
     @* První sloupec *@
-    <div class="col-sm-7 col-xs-12 order-1">
-        <div>
+<div id="subjcontent_toc">
+    <div>
             <h4>Insolvenční rejstřík</h4>
 
             @{ var insDluznik = await InsolvenceRepo.Searching.SimpleSearchAsync("icodluznik:" + Model.ICO, 1, 1, (int)HlidacStatu.Repositories.Searching.InsolvenceSearchResult.InsolvenceOrderResult.FastestForScroll, false, InsolvenceLimitedView.IsLimited(User));
