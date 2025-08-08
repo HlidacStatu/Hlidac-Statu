@@ -235,12 +235,12 @@
 <div class="row boxes gx-4 mt-5">
 
     @* levy toc sloupec *@
-    <div class="col-sm-2 col-xs-12 border-end">
+    <div class="col-sm-2 col-md-3 col-sm-12 border-end">
         <cache enabled="@(!System.Diagnostics.Debugger.IsAttached)" expires-after="@Constants.CachedActionLength.Cache12H" vary-by="@($"{Model.firma.ICO}_{User.Identity.IsAuthenticated}")">
             <partial name="Toc_Column" model="@Model.firma" />
         </cache>
     </div>
-    <div class="col-sm-10 col-xs-12">
+    <div class="col-sm-10 col-md-9 col-sm-12">
         <cache enabled="@(!System.Diagnostics.Debugger.IsAttached)" expires-after="@Constants.CachedActionLength.Cache12H" vary-by="@($"{Model.firma.ICO}_{Model.viewName}_{User.Identity.IsAuthenticated}_{this.Context.Request.QueryString.ToString()}")">
             <partial name="@Model.viewName" model="@Model.firma" />
         </cache>
