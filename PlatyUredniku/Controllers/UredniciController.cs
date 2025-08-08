@@ -155,7 +155,7 @@ public class UredniciController : Controller
         if (tag is not null && 
             tag.TagNormalized.Equals(tag.Tag, StringComparison.InvariantCultureIgnoreCase) == false)
         {
-            ViewData["CanonicalUrl"] = $"https://platyuredniku.hlidacstatu.cz{Url.Action("Oblast", new { id = tag.TagNormalized })}";
+            ViewData["CanonicalUrl"] = $"https://platy.hlidacstatu.cz{Url.Action("Oblast", new { id = tag.TagNormalized })}";
         }
 
         ViewBag.Title = "Platy a organizace v oblasti #" + oblast;

@@ -51,53 +51,53 @@ public class HomeController : Controller
         sb.AppendLine(@$"<urlset xmlns=""http://www.sitemaps.org/schemas/sitemap/0.9"" xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"" xsi:schemaLocation=""http://www.sitemaps.org/schemas/sitemap/0.9
             http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd"">
     <url>
-        <loc>https://platyuredniku.hlidacstatu.cz/</loc>
+        <loc>https://platy.hlidacstatu.cz/</loc>
         <lastmod>{modif}</lastmod>
         <priority>1.00</priority>
     </url>
     <url>
-        <loc>https://platyuredniku.hlidacstatu.cz/Texty/OProjektu</loc>
+        <loc>https://platy.hlidacstatu.cz/Texty/OProjektu</loc>
         <lastmod>{modif}</lastmod>
         <priority>0.80</priority>
     </url>
     <url>
-        <loc>https://platyuredniku.hlidacstatu.cz/Texty/PlatyStatnichZamestnancu</loc>
+        <loc>https://platy.hlidacstatu.cz/Texty/PlatyStatnichZamestnancu</loc>
         <lastmod>{modif}</lastmod>
         <priority>0.80</priority>
     </url>
     <url>
-        <loc>https://platyuredniku.hlidacstatu.cz/Texty/Nejvyssi</loc>
+        <loc>https://platy.hlidacstatu.cz/Texty/Nejvyssi</loc>
         <lastmod>{modif}</lastmod>
         <priority>0.80</priority>
     </url>
 
     <url>
-        <loc>https://platyuredniku.hlidacstatu.cz/DlePlatu/1</loc>
+        <loc>https://platy.hlidacstatu.cz/DlePlatu/1</loc>
         <lastmod>{modif}</lastmod>
         <priority>0.80</priority>
     </url>
     <url>
-        <loc>https://platyuredniku.hlidacstatu.cz/DlePlatu/2</loc>
+        <loc>https://platy.hlidacstatu.cz/DlePlatu/2</loc>
         <lastmod>{modif}</lastmod>
         <priority>0.80</priority>
     </url>
     <url>
-        <loc>https://platyuredniku.hlidacstatu.cz/DlePlatu/3</loc>
+        <loc>https://platy.hlidacstatu.cz/DlePlatu/3</loc>
         <lastmod>{modif}</lastmod>
         <priority>0.80</priority>
     </url>
     <url>
-        <loc>https://platyuredniku.hlidacstatu.cz/DlePlatu/4</loc>
+        <loc>https://platy.hlidacstatu.cz/DlePlatu/4</loc>
         <lastmod>{modif}</lastmod>
         <priority>0.80</priority>
     </url>
     <url>
-        <loc>https://platyuredniku.hlidacstatu.cz/analyzy</loc>
+        <loc>https://platy.hlidacstatu.cz/analyzy</loc>
         <lastmod>{modif}</lastmod>
         <priority>0.80</priority>
     </url>
     <url>
-        <loc>https://platyuredniku.hlidacstatu.cz/analyza/</loc>
+        <loc>https://platy.hlidacstatu.cz/analyza/</loc>
         <lastmod>{modif}</lastmod>
         <priority>0.80</priority>
     </url>
@@ -109,7 +109,7 @@ public class HomeController : Controller
         )
         {
             sb.AppendLine("<url>");
-            sb.AppendLine($"<loc>https://platyuredniku.hlidacstatu.cz/Urednici/analyza/{System.Security.SecurityElement.Escape(item)}</loc>");
+            sb.AppendLine($"<loc>https://platy.hlidacstatu.cz/Urednici/analyza/{System.Security.SecurityElement.Escape(item)}</loc>");
             sb.AppendLine($"<lastmod>{modif}</lastmod>");
             sb.AppendLine($"<priority>0.80</priority>");
             sb.AppendLine($"</url>");
@@ -118,7 +118,7 @@ public class HomeController : Controller
         foreach (var item in PuRepo.MainTags)
         {
             sb.AppendLine("<url>");
-            sb.AppendLine($"<loc>https://platyuredniku.hlidacstatu.cz/Urednici/Oblast/{System.Security.SecurityElement.Escape(PuOrganizaceTag.NormalizeTag(item))}</loc>");
+            sb.AppendLine($"<loc>https://platy.hlidacstatu.cz/Urednici/Oblast/{System.Security.SecurityElement.Escape(PuOrganizaceTag.NormalizeTag(item))}</loc>");
             sb.AppendLine($"<lastmod>{modif}</lastmod>");
             sb.AppendLine($"<priority>0.80</priority>");
             sb.AppendLine($"</url>");
@@ -126,14 +126,14 @@ public class HomeController : Controller
         foreach (var org in (await PuRepo.GetPlatyForYearsAsync(PuRepo.MinYear,PuRepo.DefaultYear)))
         {
             sb.AppendLine("<url>");
-            sb.AppendLine($"<loc>https://platyuredniku.hlidacstatu.cz/Urednici/detail/{System.Security.SecurityElement.Escape(org.DS)}</loc>");
+            sb.AppendLine($"<loc>https://platy.hlidacstatu.cz/Urednici/detail/{System.Security.SecurityElement.Escape(org.DS)}</loc>");
             sb.AppendLine($"<lastmod>{modif}</lastmod>");
             sb.AppendLine($"<priority>0.80</priority>");
             sb.AppendLine($"</url>");
             foreach (var item in org.Platy)
             {
                 sb.AppendLine("<url>");
-                sb.AppendLine($"<loc>https://platyuredniku.hlidacstatu.cz/Urednici/Plat/{System.Security.SecurityElement.Escape(item.Id.ToString())}</loc>");
+                sb.AppendLine($"<loc>https://platy.hlidacstatu.cz/Urednici/Plat/{System.Security.SecurityElement.Escape(item.Id.ToString())}</loc>");
                 sb.AppendLine($"<lastmod>{modif}</lastmod>");
                 sb.AppendLine($"<priority>0.60</priority>");
                 sb.AppendLine($"</url>");

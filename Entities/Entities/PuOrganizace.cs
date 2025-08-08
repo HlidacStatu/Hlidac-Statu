@@ -44,7 +44,7 @@ public class PuOrganizace
     public string GetUrl(bool relative = false)
     {
         var url = $"/Detail/{this.DS}";
-        return relative ? url : "https://platyuredniku.hlidacstatu.cz" + url;
+        return relative ? url : "https://platy.hlidacstatu.cz" + url;
     }
 
     [NotMapped]

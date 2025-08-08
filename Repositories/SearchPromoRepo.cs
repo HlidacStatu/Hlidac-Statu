@@ -49,7 +49,7 @@ namespace HlidacStatu.Repositories
                 PromoType = "manual",
                 Id = "manual-001",
                 Icon = "/content/searchpromo/platy-uredniku.png",
-                Url = "https://platyuredniku.hlidacstatu.cz/",
+                Url = "https://platy.hlidacstatu.cz/",
                 Title = "Platy úředníků",
                 More = MoreTextDefault,
                 Description = "Platy TOP úředníků a zaměstnanců státu<br />Porovnání s platy v soukromé sféře",
