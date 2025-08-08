@@ -8,6 +8,14 @@ namespace PlatyUredniku.Cache
 {
     public static class OsobyRolesCache
     {
+        static OsobyRolesCache()
+        {
+            // Initialize the cache manager
+            for (int rok = PpRepo.DefaultYear; rok >= PpRepo.MinYear; rok--)
+            {
+                _ = _cacheRolesManager.Get(rok);
+            }
+        }
         public class osobaInfo
         {
             public string Jmeno { get; set; }
@@ -15,11 +23,12 @@ namespace PlatyUredniku.Cache
             public string Prijmeni { get; set; }
             public string FullName => $"{Jmeno} {Prijmeni}".Trim();
             public string Role { get; set; }
+            public string strana { get; set; }
         }
-        private static Devmasters.Cache.LocalMemory.AutoUpdatedCache<Dictionary<string, osobaInfo>> _cacheRoles =
-            new Devmasters.Cache.LocalMemory.AutoUpdatedCache<Dictionary<string, osobaInfo>>(
-                TimeSpan.FromHours(12), "OsobyRolesCache",
-                (obj) =>
+        private static Devmasters.Cache.LocalMemory.AutoUpdateCacheManager<Dictionary<string, osobaInfo>, int> _cacheRolesManager =
+            new Devmasters.Cache.LocalMemory.AutoUpdateCacheManager<Dictionary<string, osobaInfo>, int>(
+                "OsobyRolesCache",
+                (rok) =>
                 {
                     System.Collections.Concurrent.ConcurrentDictionary<string, osobaInfo> res = new System.Collections.Concurrent.ConcurrentDictionary<string, osobaInfo>();
                     var nameids = PpRepo.GetNameIdsForGroupAsync(PpRepo.PoliticianGroup.Vse)
@@ -36,7 +45,7 @@ namespace PlatyUredniku.Cache
                                 {
                                     Jmeno = o.Jmeno,
                                     Prijmeni = o.Prijmeni,
-                                    Role = o.MainRolesToString(PpRepo.DefaultYear)
+                                    Role = o.MainRolesToString(rok)
                                 };
                             }
                             return new Devmasters.Batch.ActionOutputData();
@@ -46,27 +55,27 @@ namespace PlatyUredniku.Cache
                         prefix: "OsobyRolesCache ", monitor: new MonitoredTaskRepo.ForBatch()
                     );
                     return res.ToDictionary();
-                });
+                }, TimeSpan.FromHours(12), rok => rok.ToString());
 
-        public static osobaInfo Get(string nameId)
+        public static osobaInfo Get(string nameId, int rok = PpRepo.DefaultYear)
         {
-            if (_cacheRoles.Get().ContainsKey(nameId))
+            if (_cacheRolesManager.Get(rok).ContainsKey(nameId))
             {
-                return _cacheRoles.Get()[nameId];
+                return _cacheRolesManager.Get(rok)[nameId];
             }
             else
             {
                 var o = Osoby.GetByNameId.Get(nameId);
                 if (o != null)
                 {
-                    var allDict = _cacheRoles.Get();
+                    var allDict = _cacheRolesManager.Get(rok);
                     allDict[nameId] = new osobaInfo()
                     {
                         Jmeno = o.Jmeno,
                         Prijmeni = o.Prijmeni,
                         Role = o.MainRolesToString(PpRepo.DefaultYear)
                     };
-                    _= _cacheRoles.ForceRefreshCache(allDict);
+                    _= _cacheRolesManager.Set(rok,allDict);
                     return allDict[nameId];
 
                 }
