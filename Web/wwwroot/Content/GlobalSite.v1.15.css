@@ -1842,11 +1842,11 @@ kbd {
     border-bottom-left-radius: 0;
 }
 
-.bg-warning {
+.bg-warning-alt {
     background-color: #fcf8e3 !important;
 }
 
-.bg-danger {
+.bg-danger-alt {
     background-color: #f2dede !important;
 }
 

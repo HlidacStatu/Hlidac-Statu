@@ -7,7 +7,7 @@ namespace HlidacStatu.XLib
 {
     public static class Extensions
     {
-        public static string ToNiceString(this Smlouva.Statistics.Data stat, IBookmarkable item,
+        public static string ToNiceLinkString(this Smlouva.Statistics.Data stat, IBookmarkable item,
             bool html = true, string customUrl = null, bool twoLines = false)
         {
             if (html)

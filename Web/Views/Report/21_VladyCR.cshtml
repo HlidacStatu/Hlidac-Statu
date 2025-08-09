@@ -40,12 +40,12 @@
                 {
                     foreach (var v in o.StatistikaRegistrSmluv(Relation.AktualnostType.Nedavny).SoukromeFirmy.Take(2))
                     {
-                        sout = sout + v.Value.Summary(HlidacStatu.Lib.Analytics.CoreStat.UsualYearsInterval.FromUsualFirstYearUntilNow).ToNiceString(null, true) + "<br/>";
+                        sout = sout + v.Value.Summary(HlidacStatu.Lib.Analytics.CoreStat.UsualYearsInterval.FromUsualFirstYearUntilNow).ToNiceLinkString(null, true) + "<br/>";
                     }
                     if (o.StatistikaRegistrSmluv(Relation.AktualnostType.Nedavny).SoukromeFirmy.Count() == 3)
                     {
                         sout = sout + o.StatistikaRegistrSmluv(Relation.AktualnostType.Nedavny).SoukromeFirmy
-                            .Skip(2).First().Value.Summary(HlidacStatu.Lib.Analytics.CoreStat.UsualYearsInterval.FromUsualFirstYearUntilNow).ToNiceString(null, true);
+                            .Skip(2).First().Value.Summary(HlidacStatu.Lib.Analytics.CoreStat.UsualYearsInterval.FromUsualFirstYearUntilNow).ToNiceLinkString(null, true);
                     }
                     else if (o.StatistikaRegistrSmluv(Relation.AktualnostType.Nedavny).SoukromeFirmy.Count() > 2)
                     {

@@ -67,13 +67,13 @@
                     {
                         if(v.Value is null)
                             continue;
-                        sout = sout + v.Value.Summary(HlidacStatu.Lib.Analytics.CoreStat.UsualYearsInterval.FromUsualFirstYearUntilNow).ToNiceString(null,true, customUrl: customUrl) + "<br/>";
+                        sout = sout + v.Value.Summary(HlidacStatu.Lib.Analytics.CoreStat.UsualYearsInterval.FromUsualFirstYearUntilNow).ToNiceLinkString(null,true, customUrl: customUrl) + "<br/>";
                     }
                     if (o.StatistikaRegistrSmluv(Relation.AktualnostType.Nedavny).SoukromeFirmy.Count() == 3)
                     {
                         sout = sout + o.StatistikaRegistrSmluv(Relation.AktualnostType.Nedavny).SoukromeFirmy
                         .Skip(2).First()
-                        .Value.Summary(HlidacStatu.Lib.Analytics.CoreStat.UsualYearsInterval.FromUsualFirstYearUntilNow).ToNiceString(null,true, customUrl: customUrl);
+                        .Value.Summary(HlidacStatu.Lib.Analytics.CoreStat.UsualYearsInterval.FromUsualFirstYearUntilNow).ToNiceLinkString(null,true, customUrl: customUrl);
                     }
                     else if (o.StatistikaRegistrSmluv(Relation.AktualnostType.Nedavny).SoukromeFirmy.Count() > 2)
                     {

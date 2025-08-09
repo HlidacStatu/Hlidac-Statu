@@ -19,7 +19,7 @@
                 var f = Firmy.Get(s.Ico);
                 return string.Format("<a href='/subjekt/{0}'>{1}</a> <br/> {2}", s.Ico,
                     f.Jmeno,
-                    f.StatistikaRegistruSmluv().Summary().ToNiceString(null, true, "/subjekt/" + s.Ico)
+                    f.StatistikaRegistruSmluv().Summary().ToNiceLinkString(null, true, "/subjekt/" + s.Ico)
                     );
             },
             OrderValueRender = (s) => { return Firmy.GetJmeno(s.Ico); }

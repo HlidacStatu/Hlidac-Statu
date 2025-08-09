@@ -120,7 +120,7 @@ namespace HlidacStatu.XLib.Render
                         var s = stat.SoukromeFirmy.Values
                                         .AggregateStats()
                                         .Summary(CoreStat.UsualYearsInterval.FromUsualFirstYearUntilSeassonYear)
-                                        .ToNiceString(o, true, customUrl: "/hledatSmlouvy?q=osobaId:" + o.NameId, twoLines: twoLines);
+                                        .ToNiceLinkString(o, true, customUrl: "/hledatSmlouvy?q=osobaId:" + o.NameId, twoLines: twoLines);
 
                         return $"<span>{prefix}{s}{postfix}</span>";
                     }

@@ -75,10 +75,10 @@
                         <a asp-controller="Subjekt" asp-action="Index" asp-route-id="@stat.Key">
                             @Firmy.GetJmeno(stat.Key)
                         </a>
-                        (@Html.Raw(stat.Value.Summary().ToNiceString(null,true, customUrl: $"hledat?q=ico:{stat.Key}")) od 2016
+                        (@Html.Raw(stat.Value.Summary().ToNiceLinkString(null,true, customUrl: $"hledat?q=ico:{stat.Key}")) od 2016
                         @if (stat.Value.CurrentSeasonStatistics().PocetSmluv > 0)
                         {
-                            @($", {stat.Value.CurrentSeasonStatistics().ToNiceString(null, false)} v {stat.Value.CurrentSeasonYear()}")
+                            @($", {stat.Value.CurrentSeasonStatistics().ToNiceLinkString(null, false)} v {stat.Value.CurrentSeasonYear()}")
                         })
                     </li>
                 }
@@ -145,10 +145,10 @@
                     <li>
                         <a asp-controller="Subjekt" asp-action="Index" asp-route-id="@stat.Key">
                             @Firmy.GetJmeno(stat.Key)
-                        </a> (@Html.Raw(stat.Value.Summary().ToNiceString(null,true, customUrl: $"hledat?q=ico:{stat.Key}")) od 2016
+                        </a> (@Html.Raw(stat.Value.Summary().ToNiceLinkString(null,true, customUrl: $"hledat?q=ico:{stat.Key}")) od 2016
                         @if (stat.Value.CurrentSeasonStatistics().PocetSmluv > 0)
                         {
-                            @($", {stat.Value.CurrentSeasonStatistics().ToNiceString(null, false)} v {stat.Value.CurrentSeasonYear()}")
+                            @($", {stat.Value.CurrentSeasonStatistics().ToNiceLinkString(null, false)} v {stat.Value.CurrentSeasonYear()}")
                         }
                         )
                     </li>
