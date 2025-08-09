@@ -75,7 +75,7 @@ namespace PlatyUredniku.Cache
                         Prijmeni = o.Prijmeni,
                         Role = o.MainRolesToString(PpRepo.DefaultYear)
                     };
-                    _= _cacheRolesManager.Set(rok,allDict);
+                    _cacheRolesManager.Set(rok,allDict);
                     return allDict[nameId];
 
                 }

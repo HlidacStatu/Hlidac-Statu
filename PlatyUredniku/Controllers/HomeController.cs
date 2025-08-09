@@ -8,6 +8,8 @@ using System.Text;
 using System;
 using Microsoft.AspNetCore.OutputCaching;
 using HlidacStatu.Lib.Web.UI.Attributes;
+using System.Data.Entity;
+using System.Linq;
 
 namespace PlatyUredniku.Controllers;
 
@@ -33,7 +35,51 @@ public class HomeController : Controller
         else
             return View();
     }
+   
+    [HlidacCache(48 * 60 * 60, "*")]
+    public async Task<IActionResult> Organizace(string id)
+    {
+        string[] ds = null;
+        PuOrganizace detail = null;
+        if (HlidacStatu.Util.DataValidators.CheckCZICO(id))
+        {
+            //ico
+            var f = Firmy.Get(id);
+            if (f.Valid)
+                ds = f.DatovaSchranka;
 
+        }
+        else 
+            ds = new[] { id };
+        if (ds?.Length>0)
+        {
+            await using var db = new DbEntities();
+
+            var f1 = await PuRepo.GetFullDetailAsync(ds);
+            var f2 = await PpRepo.GetOrganizaceFullDetailAsync(ds);
+            detail = f1;
+            if (detail == null)
+            {
+                detail = f2;
+            }
+            detail.PrijmyPolitiku = f2.PrijmyPolitiku;
+        }
+
+        if (detail == null)
+            return Redirect("/");
+        if (detail.Platy?.Count> 0 && detail.PrijmyPolitiku?.Count>0)
+        {
+            return View(detail);
+        }
+
+        if (detail.Platy?.Count > 0)
+            return RedirectToAction("Detail", "Urednici", new { ds = detail.DS });
+        if (detail.Platy?.Count > 0)
+            return RedirectToAction("organizace", "Politici", new { ds = detail.DS });
+
+        else
+            return View(detail);
+    }
 
     public IActionResult OpenData()
     {

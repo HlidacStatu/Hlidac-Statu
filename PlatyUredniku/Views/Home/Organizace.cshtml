@@ -1,0 +1,276 @@
+@using Devmasters
+@using HlidacStatu.Entities
+@using HlidacStatu.Lib.Web.UI
+@using HlidacStatu.Repositories
+@using HlidacStatu.Repositories.SharedModels
+@using HlidacStatu.XLib.Render
+@using PlatyUredniku.Models
+@using HlidacStatu.Extensions
+
+@model HlidacStatu.Entities.PuOrganizace
+
+@{
+    string mainTag = Model.Tags.FirstOrDefault(t => PpRepo.MainTags.Contains(t.Tag))?.Tag;
+
+    string ico = Model.Ico;
+    Firma f = Firmy.Get(ico);
+    ViewBag.Title = $"{Model.Nazev}";
+    var ceo = f.Ceo();
+
+}
+
+@section breadcrumbs
+{
+    <ol class="breadcrumb">
+        <li>
+            <a asp-action="Index" asp-controller="Home">Platy</a>
+        </li>
+        <li class="active">@ViewBag.Title</li>
+    </ol>
+}
+@section Scripts
+{
+    <link rel="stylesheet" type="text/css" href="//cdn.datatables.net/1.13.4/css/jquery.dataTables.min.css" />
+    <script type="text/javascript" charset="utf8"
+            src="//cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
+    <script>
+        function adjustDataTablesWidth() {
+            $.fn.dataTable.tables({visible: true, api: true}).columns.adjust();
+        }
+    </script>
+}
+
+@functions {
+    private bool _sectionBgSwitch = true;
+
+    public string GetBgClass(bool toggle = true)
+    {
+        if (toggle)
+            _sectionBgSwitch = !_sectionBgSwitch;
+
+        return _sectionBgSwitch ? "alter-bg-color" : "";
+    }
+}
+
+<section class="d-flex align-items-center justify-content-center @(GetBgClass()) pageblock-small">
+    <div class="container">
+        <h2 class="pb-2 border-bottom">@Model.Nazev</h2>
+
+        <div class="row">
+            <div class="col">
+                <div class="row">
+                    @if (ceo.Osoba != null && ceo.Osoba.IsValid())
+                    {
+                        <div class="col-sm-4">
+                            <div class="person-profile-thumb">
+                                <a href="@ceo.Osoba.GetUrl()">
+                                    <div class="photo">
+                                        <div class="profile-picture border" style="background-image: url('@ceo.Osoba.GetPhotoUrl(local: false, phototype: Osoba.PhotoTypes.NoBackground)')"></div>
+                                    </div>
+                                </a>
+                            </div>
+                        </div>
+                        <div class="col-sm-8">
+                            <p class="py-0 my-0 text-muted">@ceo.Role</p>
+                            <p class="py-0 my-0 lead">
+                                <a href="@ceo.Osoba.GetUrl()">@ceo.Osoba.FullName()</a>
+                            </p>
+                            <p class="py-0 my-0">od @(ceo.From?.ToString("dd.MM.yyyy"))</p>
+                            @if (ceo.Osoba.GetSocialContacts().Any())
+                            {
+                                <p class="py-0 my-0 text-muted">
+                                    @foreach (var ev in ceo.Osoba.GetSocialContacts())
+                                    {
+                                        <span>@Html.SocialLinkWithIcon(ev.Network, ev.Contact, "", "")</span>
+                                    }
+                                </p>
+                            }
+
+                        </div>
+                    }
+                    else
+                    {
+                        var rppOsoby = await f.CeosFromRPPAsync();
+                        if (rppOsoby.Count() > 0)
+                        {
+                            <div class="col-sm-4">
+                                <div class="person-profile-thumb">
+                                    <div class="photo">
+                                        <div class="profile-picture border" style="background-image: url('/photo/unknown')"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-8">
+                                <p class="py-0 my-0 text-muted">Zastupovaný</p>
+                                @foreach (var os in rppOsoby)
+                                {
+                                    <p class="py-0 my-0 lead">@($"{os.jmeno.Capitalize()} {os.prijmeni.Capitalize()}")</p>
+                                    <p class="py-0 my-0 text-muted small">změna @(os.poslednizmena?.ToString("dd.MM.yyyy"))</p>
+                                }
+                            </div>
+                        }
+                    }
+
+                </div> @* CEO *@
+            </div>
+            <div class="col">
+                @* COMPANY INFO *@
+                <table>
+                    <tr>
+                        <td class="text-nowrap text-muted col-sm-5">Založeno</td>
+                        <td class="col-sm-7">@(f.Datum_Zapisu_OR?.ToString("dd.MM.yyyy"))</td>
+                    </tr>
+                    @if (f.DatumZaniku is not null)
+                    {
+                        <tr>
+                            <td class="text-nowrap text-muted col-sm-5">Zaniklo</td>
+                            <td class="col-sm-7">@(f.DatumZaniku?.ToString("dd.MM.yyyy"))</td>
+                        </tr>
+                    }
+                    <tr>
+                        <td class="text-nowrap text-muted col-sm-5">IČO</td>
+                        <td class="col-sm-7">@f.ICO</td>
+                    </tr>
+                    <tr>
+                        <td class="text-nowrap text-muted col-sm-5">Datová schránka</td>
+                        <td class="col-sm-5">@string.Join(", ", f.DatovaSchranka)</td>
+                    </tr>
+                    @if (f.GetSocialContacts().Any(m => m.Network == OsobaEvent.SocialNetwork.Zaznam_zastupitelstva))
+                    {
+                        <tr>
+                            <td class="text-nowrap text-muted col-sm-5">Záznamy zastupitelstva</td>
+                            <td class="col-sm-5">
+                                @foreach (var ev in f.GetSocialContacts().Where(m => m.Network == OsobaEvent.SocialNetwork.Zaznam_zastupitelstva))
+                                {
+                                    <span>@Html.SocialLinkWithIcon(ev.Network, ev.Contact, f.ICO, "")</span>
+                                }
+                            </td>
+                        </tr>
+                    }
+
+                    @if (f.GetSocialContacts().Any(m => m.Network != OsobaEvent.SocialNetwork.Zaznam_zastupitelstva))
+                    {
+                        <tr>
+                            <td class="text-nowrap text-muted col-sm-5">Odkazy</td>
+                            <td class="col-sm-5">
+                                @foreach (var ev in f.GetSocialContacts().Where(m => m.Network != OsobaEvent.SocialNetwork.Zaznam_zastupitelstva))
+                                {
+                                    <span>@Html.SocialLinkWithIcon(ev.Network, ev.Contact, f.ICO, "")</span>
+                                }
+                            </td>
+                        </tr>
+                    }
+
+                </table>
+            </div>
+        </div>
+    </div>
+</section>
+<section class="d-flex align-items-center justify-content-center @(GetBgClass()) pageblock">
+    <div class="container">
+        <div class="row row-cols-1 row-cols-lg-2 g-2">
+            @if (Model.PrijmyPolitiku?.Count > 0)
+            {
+                int pocetPolitiku = Model.PrijmyPolitiku.Select(m => m.Nameid).Distinct().Count();
+                <div class="col">
+                    <h4>Platy politiků</h4>
+                    <p>
+                        U této organizace evidujeme platy
+                        @(Devmasters.Lang.CS.Plural.Get(pocetPolitiku, "jednoho politika", "{0} politiků", "{0} politiků"))
+                        za roky @(string.Join(", ", Model.PrijmyPolitiku.Select(m => m.Rok).Distinct())).
+                    </p>
+                    <p>
+                        @if (Model.PrijmyPolitiku.Count(m => m.Rok == PpRepo.DefaultYear) < 5)
+                        {
+                            <ul>
+                                @foreach (var pr in Model.PrijmyPolitiku.OrderByDescending(o => o.CelkoveRocniNakladyNaPolitika))
+                                {
+                                    <li>
+                                        <a href="/politici/politik/@(pr.Nameid)">@pr.GetOsoba().FullName()</a>
+                                        @HlidacStatu.Util.RenderData.NicePriceHtml(pr.CelkovyRocniPlatVcetneOdmen)
+                                        @if (pr.CelkoveRocniNahrady > 0)
+                                        {
+                                            <span class="text-muted"> + @HlidacStatu.Util.RenderData.NicePriceHtml(pr.CelkoveRocniNahrady) náhrady</span>
+                                        }
+                                    </li>
+                                }
+                            </ul>
+                        }
+                        else
+                        {
+                            <ul>
+                                @foreach (var pr in Model.PrijmyPolitiku.OrderByDescending(o => o.CelkoveRocniNakladyNaPolitika).Take(3))
+                                {
+                                    <li>
+                                        <a href="/politici/politik/@(pr.Nameid)">@pr.GetOsoba().FullName()</a>
+                                        @HlidacStatu.Util.RenderData.NicePriceHtml(pr.CelkovyRocniPlatVcetneOdmen)
+                                        @if (pr.CelkoveRocniNahrady > 0)
+                                        {
+                                            <span class="text-muted"> + @HlidacStatu.Util.RenderData.NicePriceHtml(pr.CelkoveRocniNahrady) náhrady</span>
+                                        }
+                                    </li>
+                                }
+                            </ul>
+                            <span>
+                                a
+                                <a href="/politici/organizace/@Model.DS"> @Devmasters.Lang.CS.Plural.Get(pocetPolitiku - 3, "", "další {0} politici", "dalších {0} politiků")</a>.
+                            </span>
+                        }
+                    </p>
+                    <p class="text-center">
+                        <a href="/politici/organizace/@Model.DS" class="btn btn-primary my-3">Všichni příjmy politiků v této organizaci</a>
+                    </p>
+                </div>
+            }
+
+            @if (Model.Platy?.Count > 0)
+            {
+                int pocetPlatu = Model.Platy.Count();
+                <div class="col">
+                    <h4>Platy @(f.JsemOVM() ? "úředníků" : "manažerů")</h4>
+                    <p>
+                        U této organizace evidujeme
+                        @(Devmasters.Lang.CS.Plural.Get(pocetPlatu, "jeden plat", "{0} platy", "{0} platů"))
+                        za roky @(string.Join(", ", Model.Platy.Select(m => m.Rok).Distinct())).
+                    </p>
+                    <p>
+                        @if (Model.Platy.Count(m => m.Rok == PpRepo.DefaultYear) < 5)
+                        {
+                            <ul>
+                                @foreach (var pl in Model.Platy.OrderByDescending(o => o.CelkovyRocniPlatVcetneOdmen))
+                                {
+                                    <li>
+                                        <a href="/urednici/plat/@(pl.Id)">@pl.NazevPozice</a>
+                                        @HlidacStatu.Util.RenderData.NicePriceHtml(pl.CelkovyRocniPlatVcetneOdmen)
+                                    </li>
+                                }
+                            </ul>
+                        }
+                        else
+                        {
+                            <ul>
+                                @foreach (var pl in Model.Platy.Where(m => m.Rok == PuRepo.DefaultYear).OrderByDescending(o => o.CelkovyRocniPlatVcetneOdmen).Take(3))
+                                {
+                                    <li>
+                                        <a href="/urednici/plat/@(pl.Id)">@pl.NazevPozice</a>
+                                        @HlidacStatu.Util.RenderData.NicePriceHtml(pl.CelkovyRocniPlatVcetneOdmen)
+                                    </li>
+                                }
+                            </ul>
+                            <span>
+                                a
+                                <a href="/urednici/detail/@Model.DS"> @Devmasters.Lang.CS.Plural.Get(pocetPlatu - 3, "", "další {0} platy", "dalších {0} platů") </a>.
+                            </span>
+                        }
+                    </p>
+                    <p class="text-center">
+                        <a href="/urednici/detail/@Model.DS" class="btn btn-info my-3">Všechny platy  @(f.JsemOVM() ? "úředníků" : "manažerů") v této organizaci</a>
+                    </p>
+                </div>
+            }
+        </div>
+
+    </div>
+</section>
+
+<div class="pb-3"></div>
