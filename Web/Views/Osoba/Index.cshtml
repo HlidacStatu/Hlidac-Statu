@@ -124,11 +124,12 @@
             </p>
             @if (funkceOsobaNum > listingNum + 1)
             {
-                <a asp-action="Funkce" asp-route-id="@Model.NameId" class="moreinfolink text-uppercase">
-                    <strong>
-                        Zobrazit @Devmasters.Lang.CS.Plural.Get(funkceOsobaNum, "všechny funkce", "všechny funnkce", "všech {0} funkcí") osoby
-                    </strong>
-                </a>
+                <p class="text-center">
+                    <a href="https://platy.hlidacstatu.cz/politici/politik/@Model.NameId" class="btn btn-primary btn-sm my-3 position-relative">
+                        Zobrazit všechny politické a veřejné funkce
+                        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">@(HlidacStatu.Util.RenderData.NicePrice(funkceOsobaNum))</span>
+                    </a>
+                </p>
             }
         </div>
         <hr />
