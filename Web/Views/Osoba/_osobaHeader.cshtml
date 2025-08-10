@@ -1,0 +1,88 @@
+﻿@model Osoba
+@using Devmasters.Enums
+@using HlidacStatu.DS.Graphs
+@using HlidacStatu.Extensions;
+@using HlidacStatu.Entities.Facts;
+@using System.Linq;
+@using Devmasters;
+@using HlidacStatu.Entities
+@using HlidacStatu.Repositories
+@using HlidacStatu.Repositories.SharedModels
+@using Newtonsoft.Json.Linq;
+
+@{
+    Layout = null;
+
+
+}
+
+
+<div class="row row-cols-2 row-cols-md-1 g-4">
+    <div class="col">
+
+        <div class="row">
+
+            <div class="col-sm-4">
+                <div class="person-profile-thumb">
+                    <div class="photo">
+                        <a href="@Model.GetUrl()">
+                            <div class="profile-picture border" style="background-image: url('@Model.GetPhotoUrl(local: true, phototype: HlidacStatu.Entities.Osoba.PhotoTypes.NoBackground)')"></div>
+                        </a>
+                        <div style="padding-right: 16px; position: relative;" class="text-muted small text-center">
+                            @if (Model.HasPhoto())
+                            {
+                                <a href="/manage/changephoto/@(Model.NameId)">změnit foto</a>
+                            }
+                            else
+                            {
+                                <a href="/manage/changephoto/@(Model.NameId)">přidat foto</a>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-8">
+                <p class="py-0 my-0 text-muted">@Model.StatusOsoby().ToNiceDisplayName()</p>
+                <p class="py-0 my-0 lead">
+                    <a href="@Model.GetUrl()">@Model.FullName()</a>
+                </p>
+                <p class="py-0 my-0">@Html.Raw(Model.NarozeniYear(true))</p>
+
+                @if (Model.GetSocialContacts().Any())
+                {
+                    <p class="py-0 my-0 text-muted">
+                        @foreach (var ev in Model.GetSocialContacts())
+                        {
+                            <span>@Html.SocialLinkWithIcon(ev.Network, ev.Contact, "", "")</span>
+                        }
+                    </p>
+                }
+
+            </div>
+
+
+        </div>
+    </div>
+
+    <div class="col">
+
+        <div class="watcher">
+            <h4>Hlídání nových smluv, zakázek, dotací a dalšího </h4>
+            <p class="text-muted sub-header-info">
+                Jednou denně, obvykle ráno, vám zašleme mail s informacemi o nových smlouvách, veřejných zakázkách, dotacích a dalších událostech týkajících se této osoby.
+            </p>
+
+            <div>
+                @{
+                    var wdModel = new WatchdogViewModel(null, $"OsobaId:{Model.NameId}", $"Vše o <b>{Model.FullName()}</b>",
+                    buttonCss: "btn btn-warning btn-xs", prefillWDname: $"Novinky pro {Model.FullName()}",
+                    showWdList: false, preButtonText: "");
+
+                    <partial name="WebUtil/AddWatchdog" model="wdModel" />
+                }
+
+            </div>
+        </div>
+
+    </div>
+</div>

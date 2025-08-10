@@ -109,7 +109,26 @@
     <script src="/scripts/highcharts-6/modules/heatmap.js"></script>
     <script src="/scripts/highcharts-6/modules/treemap.js"></script>
     @* Přidá barevnou paletu ke grafům *@
-    @Html.GraphTheme()
+    @Html.SetChartGraphTheme()
+
+    <link rel="stylesheet" href="~/js/bootstrap-toc.min.css" />
+    <script src="~/js/bootstrap-toc.1.0.2.min.js"></script>
+
+    <script>
+        $(document).ready(function() {
+            if ($("#subjcontent_toc").length) {
+                $("#div_toc_side > p").show();
+                Toc.init({
+                    $nav: $("#toc"),
+                    $scope: $("#subjcontent_toc h2, #subjcontent_toc h3, #subjcontent_toc h4")
+                });
+                new bootstrap.ScrollSpy(document.body, {
+                    target: '#toc'
+                })
+            }
+        });
+    </script>
+
 }
 
 @section onlyembed
@@ -194,39 +213,27 @@
             </a>
         }
     </h3>
+    <cache enabled="@(!System.Diagnostics.Debugger.IsAttached)" expires-after="@Constants.CachedActionLength.Cache12H" vary-by="@($"{Model.osoba.NameId}")">
+        <partial name="_osobaHeader" model="@Model.osoba" />
+    </cache>
+
 </div>
 <hr/>
 
 
-<div class="row boxes">
-    @* Pravý sloupec *@
-    <div class="col-sm-4 col-xs-12 order-md-3 order-sm-0">
-    @if (Model.viewName != "NoInfo")
-    {
-        <cache expires-after="@Constants.CachedActionLength.Cache12H" vary-by="@($"{Model.osoba.NameId}_{User.Identity.IsAuthenticated}")">
-            <partial name="RightColumn" model="@Model.osoba"/>
+
+<div class="row boxes gx-4 mt-5">
+
+    @* levy toc sloupec *@
+    <div class="col-lg-2 col-md-3 col-sm-12 border-end border-sm-0 border-md-0">
+        <cache enabled="@(!System.Diagnostics.Debugger.IsAttached)" expires-after="@Constants.CachedActionLength.Cache12H" vary-by="@($"{Model.osoba.NameId}_{User.Identity.IsAuthenticated}")">
+            <partial name="_ToC_Column" model="@Model.osoba" />
         </cache>
-    }
     </div>
-
-    @* Prázdný sloupec *@
-    <div class="col-sm-1 order-2"></div>
-    <cache enabled="@(!Html.IsDebug())" expires-after="@Constants.CachedActionLength.Cache12H" vary-by="@($"{Model.osoba.NameId}_{Model.viewName}_{User.Identity.IsAuthenticated}_{this.Context.Request.QueryString.ToString()}")">
-        @{
-            if (!Html.IsDebug())
-            {
-                <text>
-                    <!-- cached -->
-                </text>
-            }
-            else
-            {
-                <text>
-                    <!-- not cached -->
-                </text>
-            }
-        }
-        <partial name="@Model.viewName" model="@Model.osoba"/>
-    </cache>
-
+    <div class="col-lg-10 col-md-9 col-sm-12">
+        <cache enabled="@(!System.Diagnostics.Debugger.IsAttached)" expires-after="@Constants.CachedActionLength.Cache12H" vary-by="@($"{Model.osoba.NameId}_{Model.viewName}_{User.Identity.IsAuthenticated}_{this.Context.Request.QueryString.ToString()}")">
+            <partial name="@Model.viewName" model="@Model.osoba" />
+        </cache>
+    </div>
 </div>
+

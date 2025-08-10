@@ -129,28 +129,26 @@
     <script src="/scripts/highcharts-7/modules/heatmap.js"></script>
     <script src="/scripts/highcharts-7/modules/treemap.js"></script>
     @* Přidá barevnou paletu ke grafům *@
-    @Html.GraphTheme()
+    @Html.SetChartGraphTheme()
 
-    @if (true || tocOn.Contains(Model.viewName.ToLower()))
-    {
-        <link rel="stylesheet" href="~/js/bootstrap-toc.min.css" />
-        <script src="~/js/bootstrap-toc.1.0.2.min.js"></script>
+    <link rel="stylesheet" href="~/js/bootstrap-toc.min.css" />
+    <script src="~/js/bootstrap-toc.1.0.2.min.js"></script>
 
-        <script>
-            $(document).ready(function() {
-                if ($("#subjcontent_toc").length) {
-                    $("#div_toc_side > p").show();
-                    Toc.init({
-                        $nav: $("#toc"),
-                        $scope: $("#subjcontent_toc h2, #subjcontent_toc h3, #subjcontent_toc h4")
-                    });
-                    new bootstrap.ScrollSpy(document.body, {
-                        target: '#toc'
-                    })
-                }
-            });
-        </script>
-    }
+    <script>
+        $(document).ready(function() {
+            if ($("#subjcontent_toc").length) {
+                $("#div_toc_side > p").show();
+                Toc.init({
+                    $nav: $("#toc"),
+                    $scope: $("#subjcontent_toc h2, #subjcontent_toc h3, #subjcontent_toc h4")
+                });
+                new bootstrap.ScrollSpy(document.body, {
+                    target: '#toc'
+                })
+            }
+        });
+    </script>
+    
 }
 @section onlyembed
 {
@@ -235,12 +233,12 @@
 <div class="row boxes gx-4 mt-5">
 
     @* levy toc sloupec *@
-    <div class="col-sm-2 col-md-3 col-sm-12 border-end">
+    <div class="col-lg-2 col-md-3 col-sm-12 border-end border-sm-0 border-md-0">
         <cache enabled="@(!System.Diagnostics.Debugger.IsAttached)" expires-after="@Constants.CachedActionLength.Cache12H" vary-by="@($"{Model.firma.ICO}_{User.Identity.IsAuthenticated}")">
-            <partial name="Toc_Column" model="@Model.firma" />
+            <partial name="_ToC_Column" />
         </cache>
     </div>
-    <div class="col-sm-10 col-md-9 col-sm-12">
+    <div class="col-lg-10 col-md-9 col-sm-12">
         <cache enabled="@(!System.Diagnostics.Debugger.IsAttached)" expires-after="@Constants.CachedActionLength.Cache12H" vary-by="@($"{Model.firma.ICO}_{Model.viewName}_{User.Identity.IsAuthenticated}_{this.Context.Request.QueryString.ToString()}")">
             <partial name="@Model.viewName" model="@Model.firma" />
         </cache>

@@ -350,7 +350,7 @@ namespace HlidacStatu.Lib.Web.UI
             return htmlHelper.Raw(sb.ToString());
         }
 
-        public static IHtmlContent GraphTheme(this IHtmlHelper htmlHelper)
+        public static IHtmlContent SetChartGraphTheme(this IHtmlHelper htmlHelper)
         {
             var sb = new System.Text.StringBuilder();
 
