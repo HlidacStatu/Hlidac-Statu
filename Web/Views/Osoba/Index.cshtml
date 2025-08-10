@@ -33,6 +33,61 @@
 
 @* První sloupec *@
 <div id="subjcontent_toc">
+
+
+    @{
+        var prijmyPolitikaDict = await PpRepo.GetPrijmyGroupedByNameIdAsync(PpRepo.DefaultYear, withDetails: true, onlyNameIds: new string[] { Model.NameId });
+    }
+    @if (Devmasters.Config.GetWebConfigValue("ShowPrijmyPolitiku") == "true"
+        || this.User.IsInRole("Admin")
+        )
+    {
+        @if (prijmyPolitikaDict.Any())
+        {
+            var prijmyPolitika = prijmyPolitikaDict.FirstOrDefault().Value;
+            <div>
+                <h4>
+                    Příjmy z veřejných funkcí (@PpRepo.DefaultYear)  <span class="badge badge-warning">NOVINKA!</span>
+                </h4>
+                <p class="text-muted sub-header-info">
+                    Přehled politických a veřejných funkcí
+                </p>
+                <p>
+                    <dl class="row">
+                        <dt class="col-6 col-sm-6 col-md-3 text-nowrap">
+                            Roční osobní příjem
+                            <i class="fa-solid fa-circle-info" style="cursor:pointer" data-bs-toggle="tooltip"
+                               data-bs-title="Plat, odměny, bonusy, osobní příspěvky a náhrady (např. ubytování, cestovní náhrady, reprezentace)"></i>
+                        </dt>
+                        <dd class="col-6 col-sm-6 col-md-9 text-nowrap">@HlidacStatu.Util.RenderData.NicePriceHtml(prijmyPolitika.Sum(m => m.CelkovyRocniPlatVcetneOdmen))</dd>
+                        @if (prijmyPolitika.Sum(m => m.CelkoveRocniNahrady) > 0)
+                        {
+                            <dt class="col-6 col-sm-6 col-md-3 text-nowrap">
+                                Ostatní náhrady
+                                <i class="fa-solid fa-circle-info" style="cursor:pointer" data-bs-toggle="tooltip"
+                                   data-bs-title="peněžní a nepeněžní, účelově vázané náhrady (např. kancelář, administrativa, asistenti)"></i>
+
+
+                            </dt>
+                            <dd class="col-6 col-sm-6 col-md-9 text-nowrap">@HlidacStatu.Util.RenderData.NicePriceHtml(prijmyPolitika.Sum(m => m.CelkoveRocniNahrady))</dd>
+                        }
+                        <dt class="col-6 col-sm-6 col-md-3 text-nowrap">Evidujeme příjmy od </dt>
+                        <dd class="col-6 col-sm-6 col-md-9">@(string.Join(", ", prijmyPolitika.Select(m => m.Organizace.FirmaDs.DsSubjName)))</dd>
+                    </dl>
+                </p>
+
+                <p class="text-center">
+                    <a href="https://platy.hlidacstatu.cz/politici/politik/@Model.NameId" class="btn btn-primary btn-sm my-3 position-relative">
+                        Podrobnosti o příjmech politika z veřejných funkcí
+                        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">@(HlidacStatu.Util.RenderData.NicePrice(prijmyPolitika.Sum(m => m.CelkoveRocniNakladyNaPolitika)))</span>
+                    </a>
+                </p>
+
+            </div>
+            <hr />
+        }
+
+    }
     @{
         laps.StopPreviousAndStartNextLap("funkce");
     }
@@ -339,7 +394,7 @@
                 <a href="/osoba/vazby/@Model.NameId" class="btn btn-primary btn-sm my-3 position-relative">
                     Podrobnosti o smlouvách firem, kde se osoba angažuje
                     <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
-                        @(HlidacStatu.Util.RenderData.NiceNumber((statistics?.StatniFirmy?.Count ?? 0) + (statistics?.SoukromeFirmy?.Count ?? 0)+ (statistics?.Neziskovky?.Count ?? 0)))
+                        @(HlidacStatu.Util.RenderData.NiceNumber((statistics?.StatniFirmy?.Count ?? 0) + (statistics?.SoukromeFirmy?.Count ?? 0) + (statistics?.Neziskovky?.Count ?? 0)))
                     </span>
                 </a>
             </p>
@@ -484,7 +539,7 @@
 
             <p class="text-center">
                 <a href="@(WebUtil.GetSearchUrl("/insolvence/hledat", $"osobaid:" + Model.NameId))" class="btn btn-primary btn-sm my-3 position-relative">
-                    Podrobnosti o insolvencích 
+                    Podrobnosti o insolvencích
                     <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
                         @(HlidacStatu.Util.RenderData.NiceNumber(oinsDluznik.Total + oinsVeritel.Total + oinsSpravce.Total + insDluznik.Total + insVeritel.Total + insSpravce.Total))
                     </span>
@@ -540,7 +595,7 @@
 
             <p class="text-center">
                 <a href="@(WebUtil.GetSearchUrl("/verejnezakazky/hledat", $"osobaid:" + Model.NameId))" class="btn btn-primary btn-sm my-3 position-relative">
-                    Podrobnosti o veřejných zakázkách 
+                    Podrobnosti o veřejných zakázkách
                     <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
                         @(HlidacStatu.Util.RenderData.NiceNumber(resVZdodav.Total + resVZzadav.Total))
                     </span>

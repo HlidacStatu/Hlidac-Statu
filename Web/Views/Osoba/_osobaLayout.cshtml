@@ -213,6 +213,8 @@
             </a>
         }
     </h3>
+    <p class="lead">@Model.osoba.MainRolesToString(PpRepo.DefaultYear)</p>
+
     <cache enabled="@(!System.Diagnostics.Debugger.IsAttached)" expires-after="@Constants.CachedActionLength.Cache12H" vary-by="@($"{Model.osoba.NameId}")">
         <partial name="_osobaHeader" model="@Model.osoba" />
     </cache>
