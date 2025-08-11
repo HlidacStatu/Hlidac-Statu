@@ -73,7 +73,7 @@
         <h2>Zajímavé statistiky</h2>
         <div class="row gy-3">
             <div class="col-6 col-lg-4">
-                <div class="h-md-100  card h-100">
+                <div class="  card h-100">
                     <div class="pb-0 card-header">
                         <h4 class="">Příjmy: Ženy <i class="fa-regular fa-venus-mars fa-xs"></i> muži</h4>
                     </div>
@@ -81,8 +81,8 @@
                         <div>
                             <h5 class="mb-2 text-700 fw-normal lh-1">
                                 <span class="text-nowrap">
-                                    @((rocniPlatZeny.Average() / 1_000_000m).ToString("F2")) 
-                                        vs.
+                                    @((rocniPlatZeny.Average() / 1_000_000m).ToString("F2"))
+                                    vs.
                                     @((rocniPlatMuzi.Average() / 1_000_000m).ToString("F2")) mil. Kč
                                 </span>
                             </h5>
@@ -94,7 +94,7 @@
                 </div>
             </div>
             <div class="col-6 col-lg-4">
-                <div class="h-md-100  card h-100">
+                <div class="  card h-100">
                     <div class="pb-0 card-header">
                         <h4 class="">Průměrný roční příjem <b>poslanců</b></h4>
                     </div>
@@ -103,17 +103,17 @@
                             <h5 class="mb-2 text-700 fw-normal lh-1">
                                 @HlidacStatu.Util.RenderData.NicePriceHtml(rocniPlatPoslancu.Average())
                             </h5>
-                            Poslanci mají průměrný příjem 
-                             <div class="me-2 badge text-bg-warning">
+                            Poslanci mají průměrný příjem
+                            <div class="me-2 badge text-bg-warning">
                                 @(HlidacStatu.Util.MathTools.DifferenceInPercentText(prumernyMzdaCR, rocniPlatPoslancu.Average()))
-                            </div> než je 
-                            <abbr title="Průměrná měsíční mzda rok @PpRepo.DefaultYear je @HlidacStatu.Util.RenderData.NicePrice(prumernyMzdaCR/12). Roční je  @HlidacStatu.Util.RenderData.NicePrice(prumernyMzdaCR)">průměrná roční mzda v ČR.</abbr>.
+                            </div> než je
+                            <abbr title="Průměrná měsíční mzda rok @PpRepo.DefaultYear je @HlidacStatu.Util.RenderData.NicePrice(prumernyMzdaCR / 12). Roční je  @HlidacStatu.Util.RenderData.NicePrice(prumernyMzdaCR)">průměrná roční mzda v ČR.</abbr>.
                         </div>
                     </div>
                 </div>
             </div>
             <div class="col-6 col-lg-4">
-                <div class="h-md-100  card h-100">
+                <div class="  card h-100">
                     <div class="pb-0 card-header">
                         <h4 class="">Průměrný roční příjem <b>členů vlády</b></h4>
                     </div>
@@ -133,7 +133,7 @@
             </div>
 
             <div class="col-6 col-lg-4">
-                <div class="h-md-100  card h-100">
+                <div class="  card h-100">
                     <div class="pb-0 card-header">
                         <h4 class="">Průměrný roční příjem <b>členů Senátu</b></h4>
                     </div>
@@ -152,7 +152,7 @@
                 </div>
             </div>
             <div class="col-6 col-lg-4">
-                <div class="h-md-100  card h-100">
+                <div class="  card h-100">
                     <div class="pb-0 card-header">
                         <h4 class="">Průměrný roční příjem <b>kr. zastupitelů</b></h4>
                     </div>
@@ -163,7 +163,7 @@
                             </h5>
                             Krajští zastupitelé mají průměrný příjem
                             <div class="me-2 badge text-bg-warning">
-                                o @HlidacStatu.Util.RenderData.NicePrice(rocniPlatKraju.Average() - prumernyMzdaCR ) Kč vyšší
+                                o @HlidacStatu.Util.RenderData.NicePrice(rocniPlatKraju.Average() - prumernyMzdaCR) Kč vyšší
                             </div> než je
                             <abbr title="Průměrná měsíční mzda rok @PpRepo.DefaultYear je @HlidacStatu.Util.RenderData.NicePrice(prumernyMzdaCR / 12). Roční je  @HlidacStatu.Util.RenderData.NicePrice(prumernyMzdaCR)">průměrná roční mzda v ČR.</abbr>.
                         </div>
@@ -172,7 +172,7 @@
             </div>
 
             <div class="col-6 col-lg-4">
-                <div class="h-md-100  card h-100">
+                <div class="  card h-100">
                     <div class="pb-0 card-header">
                         <h4 class="">Nejvytíženější politici</h4>
                     </div>
@@ -189,9 +189,10 @@
                                 .First();
                             }
                             <p>
-                                Vede <b>@(Osoby.GetByNameId.Get(topJob.Key).FullName())</b> s 
+                                Vede <b>@(Osoby.GetByNameId.Get(topJob.Key).FullName())</b> s
                                 <span class="me-2 badge text-bg-warning">
-                                    @topJob.Value.Count()</b> funkcemi</span> a celkovým ročním příjmem
+                                    @topJob.Value.Count()</b> funkcemi
+                                </span> a celkovým ročním příjmem
                                 <span class="me-2 badge text-bg-warning">@Html.Raw(HlidacStatu.Util.RenderData.ShortNicePrice(topJob.Value.Sum(m => m.CelkoveRocniNakladyNaPolitika), html: true))</span>.
                             </p>
                         </div>
