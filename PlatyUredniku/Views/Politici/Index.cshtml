@@ -245,7 +245,7 @@
                 </div>
                 <div class="card-footer">
                     <p class="text-center">
-                        <a href="https://platy.hlidacstatu.cz/Texty/OProjektu" class="btn btn-primary btn-sm">O projektu</a>
+                        <a href="https://texty.hlidacstatu.cz/o-projektu/" class="btn btn-primary btn-sm">O projektu</a>
                     </p>
                 </div>
 
@@ -351,159 +351,26 @@
 
 </section>
 
-@if (false)
-{
-    <hr />
-    <hr />
-    <section class="d-flex align-items-center justify-content-start @(GetBgClass())  pageblock-small" style="padding-top:1rem;">
-        <div class="container">
-            <div class="row">
-                <div class="col">
-                    <p>
-                        Projekt "Platy politiků" je součástí Hlídače státu. Zjistěte, jaký příjem mají politici a kolik zastávají
-                        funkcí.
-                        Data jsme shromáždili na základě oficiální žádosti podle zákona o svobodném přístupu k informacím.
-                        Jedná se o příjmy z výkonu politické či exekutivní funkce.
-                        <strong>
-                            od státních, polostátních nebo ? organizací,
-                            kde působí. (teda všechno z daní?)
-                        </strong>
-                    </p>
-                    <h2>Kolik berou čeští politici?</h2>
-
-                </div>
-            </div>
-            <div class="row">
-                <div class="col-12 col-lg-4">
-                    <h5>Přehled politiků</h5>
-                    <p>Přehledný seznam všech osob, platy a pozice</p>
-
-                    @{
-                        var groupList = new PpRepo.PoliticianGroup[]
-                        {
-                                PpRepo.PoliticianGroup.Vlada,
-                                PpRepo.PoliticianGroup.Poslanci,
-                                PpRepo.PoliticianGroup.Senatori,
-                                PpRepo.PoliticianGroup.KrajstiZastupitele,
-                                PpRepo.PoliticianGroup.Vse,
-                        };
-                    }
-                    <ul class="list-group">
-
-                        @foreach (var item in groupList)
-                        {
-                            <a class="list-group-item list-group-item-action d-flex justify-content-between align-items-center lh-lg" href="/politici/seznam/@(item.ToString())?year=@(PpRepo.DefaultYear)" role="button">
-                                @(item.ToNiceDisplayName())
-                                <span class="badge text-bg-info rounded-pill">@((await PpRepo.GetNameIdsForGroupAsync(item, rok)).Count)</span>
-                            </a>
-                        }
-                    </ul>
-                </div>
-                <div class="col-12 col-lg-4">
-                    <h5>Top příjmy</h5>
-                    <table class="table table-striped table-hover">
-                        <thead>
-                            <tr>
-                                <th>Jméno</th>
-                                <th></th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach (var plat in vsichni.OrderByDescending(p => p.Value.Sum(m => m.CelkoveRocniNakladyNaPolitika)).Take(5))
-                            {
-                                <tr>
-                                    <td>@Osoby.GetByNameId.Get(plat.Key).FullName()</td>
-                                    <td class="number">@Html.Raw(HlidacStatu.Util.RenderData.ShortNicePrice(plat.Value.Sum(m => m.CelkoveRocniNakladyNaPolitika), html: true))</td>
-                                </tr>
-                            }
-                        </tbody>
-                    </table>
-                </div>
-                <div class="col-12 col-lg-4">
-                    <h5>Top kumulace</h5>
-                    <table class="table table-striped table-hover">
-                        <thead>
-                            <tr>
-                                <th>Jméno</th>
-                                <th colspan="2">Počet funkc9</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach (var plat in vsichni.OrderByDescending(p => p.Value.Where(m => m.CelkovyRocniPlatVcetneOdmen > 0).Count()).Take(5))
-                            {
-                                <tr>
-                                    <td>@Osoby.GetByNameId.Get(plat.Key).FullName()</td>
-                                    <td class="number">@(plat.Value.Count())</td>
-                                    <td class="number">@Html.Raw(HlidacStatu.Util.RenderData.ShortNicePrice(plat.Value.Sum(m => m.CelkovyRocniPlatVcetneOdmen), html: true))</td>
-                                </tr>
-                            }
-                        </tbody>
-                    </table>
-                </div>
-                <div class="col-12 text-center">
-                    <a class="btn btn-primary btn-sm" href="/politici/reporty">Další reporty, statistiky a analýzy platů politiků</a>
-
-                </div>
-            </div>
-        </div>
-    </section>
-
-
-    <section class="d-flex align-items-center justify-content-center  @(GetBgClass())  pageblock">
-        <div class="container">
-            <div class="row">
-
-                <div class="col-6 col-lg-3 justify-content-center text-center align-text-bottom">
-                    <a href="/politici/reporty">
-
-                        <i class="fa-light fa-money-bill-wheat fa-3x mb-2"
-                           style="--fa-primary-color: #2668d9;"></i>
-                        <div class="fs-5 fw-bold text-center">Průměrný počet placených pozic</div>
-                        <div class="fs-4 fw-bold text-center badge rounded-pill text-bg-warning">
-                            @RenderData.NiceNumber(pocetFunkci, showDecimal: RenderData.ShowDecimalVal.Show)
-                        </div>
-                    </a>
-                </div>
-                <div class="col-6 col-lg-3 justify-content-center text-center align-text-bottom">
-                    <a href="/politici/reporty">
-
-                        <i class="fa-light fa-chart-area fa-3x mb-2 text-warning"></i>
-                        <div class="fs-5 fw-bold text-center">Žebříčky, analýzy, přehledy</div>
-                        <div class="fs-4 fw-bold text-center badge rounded-pill text-bg-warning">
-                            Další reporty a statistiky
-                        </div>
-                    </a>
-                </div>
-            </div>
-        </div>
-    </section>
-
-}
-<section class="d-flex align-items-center justify-content-center  @(GetBgClass())  pageblock">
-    <div class="container">
-        <div class="row">
-            <div class="col h-100 d-flex flex-column justify-content-center text-center">
-                <i class="fa-duotone fa-solid fa-question fa-beat fa-4x mb-2" style=""></i>
-                <div class="fs-3 fw-bold text-center">Jak se určují platy politiků?</div>
-            </div>
-            <div class="col h-100 d-flex flex-column justify-content-center text-center">
-                <i class="fa-regular fa-building-columns fa-beat fa-4x mb-2" style=""></i>
-                <div class="fs-3 fw-bold text-center">Co všechno dělá poslanec/senátor/krajský zastupitel?</div>
-            </div>
-            <div class="col h-100 d-flex flex-column justify-content-center text-center">
-                <div class="position-relative fa-beat fa-4x mb-2" style="">
-                    <i class="fa-duotone fa-solid fa-box-ballot"></i>
-                    <div class="position-absolute translate-middle"
-                         style="left: 50%;top: 70%;font-weight: 700;font-size: 0.25em;color: #a7a8a9;">
-                        Volby
-                    </div>
-                </div>
-                <div class="fs-3 fw-bold text-center">Jak jsou voleni?</div>
-            </div>
-        </div>
+<div class="row row-cols-3 row-cols-lg-3 row-cols-md-2 row-cols-sm-1 g-4">
+    <div class="col">
+        <a href="https://texty.hlidacstatu.cz/vypocet-platu-politiku/" class="btn btn-info btn-sm">
+        <i class="fa-duotone fa-solid fa-question my-2" style=""></i>
+        Jak se určují platy politiků?
+        </a>
     </div>
-</section>
-<hr />
+    <div class="col">
+        <a href="" class="btn btn-info btn-sm disabled">
+        <i class="fa-regular fa-building-columns my-2" style=""></i>
+        Co všechno dělá poslanec/senátor/krajský zastupitel?
+        </a>
+    </div>
+    <div class="col">
+        <a href="https://texty.hlidacstatu.cz/kumulace-funkci/" class="btn btn-info btn-sm">
+            <i class="fa-duotone fa-solid fa-users-gear"></i>
+        Kumulace funkcí
+        </a>
+    </div>
+</div>
 
 @* <section class="d-flex align-items-center justify-content-center"> *@
 @*     <div class="container"> *@
