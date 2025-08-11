@@ -104,22 +104,22 @@
 <section class="container py-5 pageblock">
     <h2 class="visually-hidden">Vybrané statistiky</h2>
     <ul class="list-unstyled row row-cols-1 row-cols-sm-2 row-cols-md-3 g-5 mb-0">
-        <li class="col-6 col-md-4">
+        <li class="col-6 col-md-4 h-100">
             <a href="/politici/seznam/poslanci">
                 <div class="icon icon-primary mb-3">
                     <i class="fa-duotone fa-solid fa-people-group fa-3x mb-2" aria-hidden="true"></i>
                 </div>
                 <h3>Poslankyně a poslanci</h3>
                 <p class="text-body-secondary mb-0">
-                    Poslanci vydělají od <b>@(HlidacStatu.Util.RenderData.NicePriceHtml(rocniPlatMinistru.Min()))</b>
-                    do <b>@(HlidacStatu.Util.RenderData.NicePriceHtml(rocniPlatMinistru.Max()))</b> ročně.
+                    Poslanci vydělají od <b>@(HlidacStatu.Util.RenderData.NicePriceHtml(rocniPlatPoslancu.Min()))</b>
+                    do <b>@(HlidacStatu.Util.RenderData.NicePriceHtml(rocniPlatPoslancu.Max()))</b> ročně.
                     <br /><br />
-                    Najdete u nás celkem <b>@(HlidacStatu.Util.RenderData.NiceNumber(vlada.Count))</b> poslanců a poslankyň.
+                    Najdete u nás celkem <b>@(HlidacStatu.Util.RenderData.NiceNumber(poslanci.Count))</b> poslanců a poslankyň.
                 </p>
             </a>
-            <p><a href="/politici/seznam/poslanci" class="btn btn-outline-primary">Senátorky a senátoři</a></p>
+            <p><a href="/politici/seznam/poslanci" class="btn btn-outline-primary">Poslankyně a poslanci</a></p>
         </li>
-        <li class="col-6 col-md-4">
+        <li class="col-6 col-md-4 h-100">
             <a href="/politici/seznam/vlada">
                 <div class="icon icon-primary mb-3">
                     <i class="fa-duotone fa-solid fa-people-group fa-3x mb-2" aria-hidden="true"></i>
@@ -134,7 +134,7 @@
             </a>
             <p><a href="/politici/seznam/vlada" class="btn btn-outline-primary">Členové vlády</a></p>
         </li>
-        <li class="col-6 col-md-4">
+        <li class="col-6 col-md-4 h-100">
             <a href="/politici/seznam/senatori">
                 <div class="icon icon-primary mb-3">
                     <i class="fa-duotone fa-solid fa-people-group fa-3x mb-2" aria-hidden="true"></i>
@@ -150,23 +150,23 @@
             </a>
             <p><a href="/politici/seznam/senatori" class="btn btn-outline-primary">Senátorky a senátoři</a></p>
         </li>
-        <li class="col-6 col-md-4">
+        <li class="col-6 col-md-4 h-100">
             <a href="/politici/seznam/KrajstiZastupitele">
                 <div class="icon icon-primary mb-3">
                     <i class="fa-duotone fa-solid fa-people-group fa-3x mb-2" aria-hidden="true"></i>
                 </div>
                 <h3>Krajští zastupitelé</h3>
                 <p class="text-body-secondary mb-0">
-                    Zastupitelé vydělají od <b>@(HlidacStatu.Util.RenderData.NicePriceHtml(rocniPlatMinistru.Min()))</b>
-                    do <b>@(HlidacStatu.Util.RenderData.NicePriceHtml(rocniPlatMinistru.Max()))</b> ročně.
+                    Zastupitelé vydělají od <b>@(HlidacStatu.Util.RenderData.NicePriceHtml(rocniPlatKraju.Min()))</b>
+                    do <b>@(HlidacStatu.Util.RenderData.NicePriceHtml(rocniPlatKraju.Max()))</b> ročně.
                     <br /><br />
-                    Najdete u nás celkem <b>@(HlidacStatu.Util.RenderData.NiceNumber(vlada.Count))</b> zastupitelů.
+                    Najdete u nás celkem <b>@(HlidacStatu.Util.RenderData.NiceNumber(kraj.Count))</b> zastupitelů.
                 </p>
             </a>
-            <p><a href="/politici/seznam/KrajstiZastupitele" class="btn btn-outline-primary">Senátorky a senátoři</a></p>
+            <p><a href="/politici/seznam/KrajstiZastupitele" class="btn btn-outline-primary">Krajští zastupitelé</a></p>
 
         </li>
-        <li class="col-6 col-md-4">
+        <li class="col-6 col-md-4 h-100">
             <a href="/politici/seznam?report=zeny">
                 <div class="icon icon-primary mb-3">
                     <i class="fa-duotone fa-solid fa-users-gear fa-3x mb-2" aria-hidden="true"></i>
@@ -187,10 +187,10 @@
                     <b>@Html.Raw(HlidacStatu.Util.RenderData.ShortNicePrice(topJob.Value.Sum(m => m.CelkoveRocniNakladyNaPolitika), html: true))</b>.
                 </p>
             </a>
-            <p><a href="/politici/seznam/KrajstiZastupitele" class="btn btn-outline-primary">Senátorky a senátoři</a></p>
+            <p><a href="/politici/seznam?report=funkce" class="btn btn-outline-primary">Kumulace funkcí</a></p>
 
         </li>
-        <li class="col-6 col-md-4 "> @* bg-secondary-subtle p-4 *@
+        <li class="col-6 col-md-4 h-100"> @* bg-secondary-subtle p-4 *@
             <a href="https://platy.hlidacstatu.cz/Texty/OProjektu">
 
                 <div class="icon icon-primary mb-3">

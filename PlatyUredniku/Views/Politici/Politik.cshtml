@@ -120,30 +120,42 @@
                         <div class="mt-1">
                             <p class="lead">@politik.MainRolesToString(PpRepo.DefaultYear)</p>
 
-                            <h3>Celkové příjmy z veřejných funkcí</h3>
+                            <h3>Celkové příjmy z veřejných funkcí za @rok</h3>
                             <div>
-                                <dl class="row">
-                                    <dt class="col-12 col-sm-12 text-nowrap fs-3">@(rok)</dt>
-                                    <dt class="col-6 col-sm-6 col-md-3 text-nowrap fs-5">
-                                        Roční osobní příjem
-                                        <i class="fa-solid fa-circle-info" style="color:@(SankeyDiagram.Color_primary_light);cursor:pointer" data-bs-toggle="tooltip"
-                                           data-bs-title="Plat, odměny, bonusy, osobní příspěvky a náhrady (např. ubytování, cestovní náhrady, reprezentace)"></i>
-                                    </dt>
-                                    <dd class="col-6 col-sm-6 col-md-9 text-nowrap fs-5">@HlidacStatu.Util.RenderData.NicePriceHtml(platyZaRok.Sum(m => m.CelkovyRocniPlatVcetneOdmen))</dd>
+                                <table class="table">
+                                    <tr>
+                                        <td class="fs-5">
+                                            Roční osobní příjem
+                                            <i class="fa-solid fa-circle-info" style="color:@(SankeyDiagram.Color_primary_light);cursor:pointer" data-bs-toggle="tooltip"
+                                               data-bs-title="Plat, odměny, bonusy, osobní příspěvky a náhrady (např. ubytování, cestovní náhrady, reprezentace)"></i>
+                                        </td>
+                                        <td class="fs-5 number">@HlidacStatu.Util.RenderData.NicePriceHtml(platyZaRok.Sum(m => m.CelkovyRocniPlatVcetneOdmen))</td>
+                                    </tr>
                                     @if (platyZaRok.Sum(m => m.CelkoveRocniNahrady) > 0)
                                     {
-                                        <dt class="col-6 col-sm-6 col-md-3 text-nowrap fs-5">
-                                            Ostatní náhrady
-                                            <i class="fa-solid fa-circle-info" style="color:@(SankeyDiagram.Color_secondary_light);cursor:pointer" data-bs-toggle="tooltip"
-                                               data-bs-title="peněžní a nepeněžní, účelově vázané náhrady (např. kancelář, administrativa, asistenti)"></i>
+
+                                        <tr>
+                                            <td class="fs-5">
+                                                Ostatní náhrady
+                                                <i class="fa-solid fa-circle-info" style="color:@(SankeyDiagram.Color_secondary_light);cursor:pointer" data-bs-toggle="tooltip"
+                                                   data-bs-title="peněžní a nepeněžní, účelově vázané náhrady (např. kancelář, administrativa, asistenti)"></i>
 
 
-                                        </dt>
-                                        <dd class="col-6 col-sm-6 col-md-9 text-nowrap fs-5">@HlidacStatu.Util.RenderData.NicePriceHtml(platyZaRok.Sum(m => m.CelkoveRocniNahrady))</dd>
+                                            </td>
+                                            <td class="fs-5 number">
+                                                @HlidacStatu.Util.RenderData.NicePriceHtml(platyZaRok.Sum(m => m.CelkoveRocniNahrady))
+                                            </td>
+                                        </tr>
                                     }
-                                    <dt class="col-6 col-sm-6 col-md-3 text-nowrap fs-5">Evidujeme příjmy od </dt>
-                                    <dd class="col-6 col-sm-6 col-md-9">@(string.Join(", ", platyZaRok.Select(m => m.Organizace.FirmaDs.DsSubjName)))</dd>
-                                </dl>
+                                    <tr>
+                                        <td class="fs-5">
+                                            Evidujeme příjmy od
+                                        </td>
+                                        <td class="fs-5 text-end">
+                                            @(string.Join(", ", platyZaRok.Select(m => m.Organizace.FirmaDs.DsSubjName)))
+                                        </td>
+                                    </tr>
+                                </table>
 
                             </div>
                             <div>
@@ -366,27 +378,29 @@
                         || pprijem.Status == PpPrijem.StatusPlatu.PotvrzenyPlat_od_organizace
                         )
                 {
-                    <lowbox width="@((pprijem.Status == 0 ? 300 : 130 ))">
-                        <h4>Průběh komunikace s organizací</h4>
-                        <p>
-                            <ol class="list-group" style="max-width:800px;">
+                    @* <lowbox width="@((pprijem.Status == 0 ? 300 : 130 ))"> 
+                        </lowbox>
+                        *@
+                    <h4>Průběh komunikace s organizací</h4>
+                    <p>
+                        <ol class="list-group" style="max-width:800px;">
 
-                                @foreach (var evd in (await PpRepo.GetEventsForPolitikAndOrganizace(politik.NameId, pprijem.IdOrganizace)).OrderBy(o => o.Datum).Select(m => m.GetEventDescription()))
-                                {
-                                    <li class="list-group-item list-group-item-@(evd.BootStrapColor())">
-                                        <div class="d-flex w-100 justify-content-between">
-                                            <h5 class="mb-1">@evd.Title</h5>
-                                            <small>@(evd.Date.ToString("d.M.yyyy"))</small>
-                                        </div>
-                                        @if (!string.IsNullOrWhiteSpace(evd.Note))
-                                        {
-                                            <small>@evd.Note</small>
-                                        }
-                                    </li>
-                                }
-                            </ol>
-                        </p>
-                    </lowbox>
+                            @foreach (var evd in (await PpRepo.GetEventsForPolitikAndOrganizace(politik.NameId, pprijem.IdOrganizace)).OrderBy(o => o.Datum).Select(m => m.GetEventDescription()))
+                            {
+                                <li class="list-group-item list-group-item-@(evd.BootStrapColor())">
+                                    <div class="d-flex w-100 justify-content-between">
+                                        <h5 class="mb-1">@evd.Title</h5>
+                                        <small>@(evd.Date.ToString("d.M.yyyy"))</small>
+                                    </div>
+                                    @if (!string.IsNullOrWhiteSpace(evd.Note))
+                                    {
+                                        <small>@evd.Note</small>
+                                    }
+                                </li>
+                            }
+                        </ol>
+                    </p>
+
 
                 }
             }

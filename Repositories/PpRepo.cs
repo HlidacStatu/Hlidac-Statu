@@ -474,7 +474,7 @@ public static class PpRepo
         await using var db = new DbEntities();
         var q = pouzePotvrzene ? BasePotvrzenePlaty(db, rok) : BaseAllPlaty(db, rok)
             .AsNoTracking();
-        if (withDetails || string.IsNullOrEmpty(ico) == false)
+        if (withDetails || string.IsNullOrEmpty(ico) == false || group.HasValue)
             q = q.Include(i => i.Organizace).ThenInclude(o => o.FirmaDs);
         if (!string.IsNullOrEmpty(ico))
             q = q.Where(m => m.Organizace.FirmaDs.Ico == ico);
@@ -837,8 +837,9 @@ public static class PpRepo
                 var ica = GetIcaForGroup(group);
                 query = pouzePotvrzene ? BasePotvrzenePlaty(db, rok) : BaseAllPlaty(db, rok)
                     .AsNoTracking()
-                    .Where(p => p.Organizace.FirmaDs != null &&
-                                ica.Contains(p.Organizace.FirmaDs.Ico));
+                    .Include(i => i.Organizace).ThenInclude(o => o.FirmaDs);
+                query = query
+                    .Where(p => ica.Contains(p.Organizace.FirmaDs.Ico));
                 break;
 
             case PoliticianGroup.Vlada:
@@ -856,8 +857,11 @@ public static class PpRepo
         {
             return nameIds;
         }
+        var queryRes = query
+            .Select(p => p.Nameid)
+            .Distinct();
 
-        return await query.Select(p => p.Nameid).Distinct()
+        return await queryRes
             .ToListAsync();
     }
 
