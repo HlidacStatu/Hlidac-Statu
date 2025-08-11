@@ -39,6 +39,20 @@ namespace HlidacStatu.Repositories
             }
         }
 
+        public static string ZkratkaForIco(string ico)
+        {
+            var normalizedIco = ParseTools.NormalizeIco(ico);
+            
+            using (DbEntities db = new DbEntities())
+            {
+                return db.ZkratkaStrany
+                    .AsNoTracking()
+                    .Where(zs => zs.Ico == normalizedIco)
+                    .Select(zs => zs.KratkyNazev)
+                    .FirstOrDefault();
+            }
+        }
+
         public static string[,] NazvyStranZkratky = {
             {"strana zelených","SZ"},
             {"česká pirátská strana","Piráti" },

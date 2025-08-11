@@ -6,34 +6,42 @@ using HlidacStatu.Entities;
 using HlidacStatu.Entities.Facts;
 using HlidacStatu.Lib.Analytics;
 using HlidacStatu.Repositories;
-using HlidacStatu.Repositories.Searching;
 using HlidacStatu.Repositories.Statistics;
 using HlidacStatu.Util;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
-using System.Threading;
 using System.Threading.Tasks;
 
 namespace HlidacStatu.Extensions
 {
     public static class OsobaExtension
     {
-
-
-
+        
         public static string CurrentPoliticalParty(this Osoba osoba)
         {
-            return osoba.Events(ev =>
+            var (organizace, ico) = osoba.Events(ev =>
                     ev.Type == (int)OsobaEvent.Types.PolitickaStrana
                     && (!ev.DatumDo.HasValue
                         || ev.DatumDo >= DateTime.Now)
                 )
                 .OrderByDescending(ev => ev.DatumOd)
-                .Select(ev => ev.Organizace)
+                .Select(ev => (ev.Organizace, ev.Ico))
                 .FirstOrDefault();
+
+            if (string.IsNullOrWhiteSpace(ico))
+                return organizace;
+
+            var zkratka = ZkratkaStranyRepo.ZkratkaForIco(ico);
+            
+            if(!string.IsNullOrWhiteSpace(zkratka))
+                return zkratka;
+
+            return FirmaRepo.NameFromIco(ico);
         }
+        
+        
         public static HlidacStatu.DS.Api.Osoba.ListItem ToApiOsobaListItem(this Osoba osoba)
         {
             if (osoba == null)
