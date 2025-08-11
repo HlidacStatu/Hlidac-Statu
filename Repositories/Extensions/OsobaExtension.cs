@@ -33,7 +33,7 @@ namespace HlidacStatu.Extensions
             if (string.IsNullOrWhiteSpace(ico))
                 return organizace;
 
-            var zkratka = ZkratkaStranyRepo.ZkratkaForIco(ico);
+            var zkratka = ZkratkaStranyRepo.NazevStranyForIco(ico);
             
             if(!string.IsNullOrWhiteSpace(zkratka))
                 return zkratka;

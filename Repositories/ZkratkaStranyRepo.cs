@@ -39,18 +39,22 @@ namespace HlidacStatu.Repositories
             }
         }
 
-        public static string ZkratkaForIco(string ico)
+        public static string NazevStranyForIco(string ico)
         {
             var normalizedIco = ParseTools.NormalizeIco(ico);
             
-            using (DbEntities db = new DbEntities())
-            {
-                return db.ZkratkaStrany
-                    .AsNoTracking()
-                    .Where(zs => zs.Ico == normalizedIco)
-                    .Select(zs => zs.KratkyNazev)
-                    .FirstOrDefault();
-            }
+            using DbEntities db = new DbEntities();
+            
+            var zkratkaStrany = db.ZkratkaStrany
+                .AsNoTracking()
+                .Where(zs => zs.Ico == normalizedIco)
+                .Select(zs => zs.KratkyNazev)
+                .FirstOrDefault();
+            
+            if(!string.IsNullOrWhiteSpace(zkratkaStrany))
+                return zkratkaStrany;
+            
+            return FirmaRepo.NameFromIco(normalizedIco);
         }
 
         public static string[,] NazvyStranZkratky = {
