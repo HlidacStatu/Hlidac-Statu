@@ -9,7 +9,7 @@ using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
 using HlidacStatu.Extensions;
-using Microsoft.EntityFrameworkCore;
+using PlatyUredniku.DataTable;
 using ZiggyCreatures.Caching.Fusion;
 
 namespace PlatyUredniku.Controllers;
@@ -43,7 +43,6 @@ public partial class PoliticiController : Controller
         return View();
     }
 
-    
 
     [HlidacCache(60 * 60, "id;rok")]
     public async Task<IActionResult> Politik(string id, int rok = PpRepo.DefaultYear)
@@ -86,11 +85,10 @@ public partial class PoliticiController : Controller
         else
             return View(detail);
     }
-    
+
     [HlidacCache(60 * 60, "*")]
     public async Task<IActionResult> Seznam()
     {
-        // záměrně ignoruju vstupy a to doladíme později
         var fullPoliticiViewDataTask = _cache.GetOrSetAsync<List<PoliticiViewData>>(
             "fullPoliticiViewData",
             _ => GetFullPoliticiViewData()
@@ -99,38 +97,89 @@ public partial class PoliticiController : Controller
             "politickeStranyFilter",
             _ => GetPolitickeStranyForFilter()
         );
-        
+
         var fullPoliticiViewData = await fullPoliticiViewDataTask;
-        int maxJobCount = (int)fullPoliticiViewData.Select(x => x.PocetJobu).Max() + 1;
-        int maxTotalIncome = (int)fullPoliticiViewData.Select(x => x.CelkovyRocniPrijem).Max() + 1;
-        
-        politickeStranyFilter.Add("Ostatní");
-        
-        var politiciFilter = new PoliticiFilter()
+
+        var maxJobCount = (int)fullPoliticiViewData.Max(x => x.PocetJobu) + 1;
+        var maxTotalIncome = (int)fullPoliticiViewData.Max(x => x.CelkovyRocniPrijem) + 1;
+
+        // parties + "Ostatní"
+        var parties = politickeStranyFilter.ToList();
+        if (!parties.Contains("Ostatní", StringComparer.InvariantCultureIgnoreCase))
+            parties.Add("Ostatní");
+
+        var model = new SeznamFilterModel
         {
-            Gender = ["muž", "žena"],
-            Party = politickeStranyFilter.ToArray(),
-            JobCount = [0,  maxJobCount],
-            TotalIncome = [0, maxTotalIncome],
-            PoliticianGroups = [
-                "všichni",
-                "předseda vlády",
-                "ministr",
-                "poslanec",
-                "senátor",
-                "europoslanec",
-                "hejtman",
-                "krajský zastupitel"
-            ],
+            DataEndpointUrl = Url.Action(nameof(SeznamData), "Politici")!,
+            InitialData = fullPoliticiViewData,
+            Filters = new List<FilterField>
+            {
+                new ChoiceFilterField
+                {
+                    Key = "politicianGroups",
+                    Label = "Politická role",
+                    Multiple = false,
+                    Options = new List<FilterOption>
+                    {
+                        new() { Value = "všichni", Label = "Všichni" },
+                        new() { Value = "předseda vlády" },
+                        new() { Value = "ministr" },
+                        new() { Value = "poslanec" },
+                        new() { Value = "senátor" },
+                        new() { Value = "europoslanec" },
+                        new() { Value = "hejtman" },
+                        new() { Value = "krajský zastupitel" }
+                    },
+                    Initial = new[] { "všichni" }
+                },
+                new RangeFilterField
+                {
+                    Key = "totalIncome",
+                    Label = "Celkový roční příjem",
+                    Min = 0,
+                    Max = maxTotalIncome,
+                    Step = 10_000,
+                    Initial = (0, maxTotalIncome),
+                    Unit = "Kč"
+                },
+                new RangeFilterField
+                {
+                    Key = "jobCount",
+                    Label = "Počet jobů",
+                    Min = 0,
+                    Max = maxJobCount,
+                    Step = 1,
+                    Initial = (0, maxJobCount)
+                },
+                new ChoiceFilterField
+                {
+                    Key = "party",
+                    Label = "Politická strana",
+                    Multiple = true,
+                    Options = parties.Select(p => new FilterOption { Value = p, Label = p }).ToList(),
+                    Initial = parties.ToArray() // start with all selected incl. "Ostatní"
+                },
+                new ChoiceFilterField
+                {
+                    Key = "gender",
+                    Label = "Pohlaví",
+                    Multiple = true,
+                    Options =
+                    [
+                        new() { Value = "m", Label = "muž" },
+                        new() { Value = "f", Label = "žena" }
+                    ],
+                    Initial = ["m", "f"]
+                }
+            }
         };
 
-        return View((fullPoliticiViewData, politiciFilter));
+        return View(model);
     }
 
     //todo: Prasečina odsud až úplně dolů - to bude potřeba refaktorovat
-    public async Task<IActionResult> SeznamData([FromQuery]PoliticiFilter filter)
+    public async Task<IActionResult> SeznamData()
     {
-        //todo: přidat ještě namísto pprepo.defaultYear rok, ke kterému se data vážou (input param?/filter)
         var fullPoliticiViewDataTask = _cache.GetOrSetAsync<List<PoliticiViewData>>(
             "fullPoliticiViewData",
             _ => GetFullPoliticiViewData()
@@ -139,62 +188,78 @@ public partial class PoliticiController : Controller
             "politickeStranyFilter",
             _ => GetPolitickeStranyForFilter()
         );
+
         var resultData = await fullPoliticiViewDataTask;
+        var q = HttpContext.Request.Query;
 
-        if (filter is not null)
+        // Read generic filters (names come from your FilterField.Key values)
+        var genders = q.Choices("gender"); // ["m","f"] or ["muž","žena"] depending on your UI
+        var (incomeFrom, incomeTo) = q.RangeDecimal("totalIncome");
+        var (jobsFrom, jobsTo) = q.RangeInt("jobCount");
+        var parties = q.Choices("party");
+        var groups = q.Choices("politicianGroups");
+
+        IEnumerable<PoliticiViewData> filtered = resultData;
+
+        // Gender
+        if (genders.Length > 0)
         {
-            var filteredPoliticiViewData = resultData
-                .Where(d => filter.Gender.Any(g => g.Equals("muž", StringComparison.InvariantCultureIgnoreCase)? 
-                    d.Pohlavi.Equals("m", StringComparison.InvariantCultureIgnoreCase) : 
-                    d.Pohlavi.Equals("f", StringComparison.InvariantCultureIgnoreCase)))
-                .Where(d => d.CelkovyRocniPrijem >= filter.TotalIncome[0])
-                .Where(d => d.CelkovyRocniPrijem <= filter.TotalIncome[1])
-                .Where(d => d.PocetJobu >= filter.JobCount[0])
-                .Where(d => d.PocetJobu <= filter.JobCount[1]);
-
-            filteredPoliticiViewData = filteredPoliticiViewData.Where(d =>
+            // Accept either UI sending "m"/"f" or "muž"/"žena"
+            var norm = new HashSet<string>(StringComparer.InvariantCultureIgnoreCase);
+            foreach (var g in genders)
             {
-                if (filter.Party is null)
-                    return false;
-                
-                // je aktuální pol. strana == straně která je ve filtru
-                if(filter.Party.Any(fp => fp.Equals(d.PolitickaStrana, StringComparison.InvariantCultureIgnoreCase)))
-                    return true;
-
-                // patří aktuální pol. strana mezi strany, které jsou ve filtrech
-                if (politickeStranyFilter.Any(fp =>
-                        fp.Equals(d.PolitickaStrana, StringComparison.InvariantCultureIgnoreCase)))
-                    return false;
-                
-                // politická strana patří mezi ostatní
-                return filter.Party.Contains("Ostatní");
-
-            });
-            
-
-            if (!filter.PoliticianGroups.Contains("všichni"))
-            {
-                filteredPoliticiViewData = filteredPoliticiViewData.Where(d =>
-                    filter.PoliticianGroups.Any(g =>
-                        d.PolitickaRole.Contains(g, StringComparison.InvariantCultureIgnoreCase)));
+                if (string.Equals(g, "muž", StringComparison.InvariantCultureIgnoreCase)) norm.Add("m");
+                else if (string.Equals(g, "žena", StringComparison.InvariantCultureIgnoreCase)) norm.Add("f");
+                else norm.Add(g); // assume already "m"/"f"
             }
 
-            resultData = filteredPoliticiViewData.ToList();
+            filtered = filtered.Where(d => norm.Contains(d.Pohlavi));
         }
-        
-        
-        return new JsonResult(resultData, new JsonSerializerOptions(JsonSerializerDefaults.Web));
+
+        // Ranges
+        if (incomeFrom.HasValue) filtered = filtered.Where(d => d.CelkovyRocniPrijem >= incomeFrom.Value);
+        if (incomeTo.HasValue) filtered = filtered.Where(d => d.CelkovyRocniPrijem <= incomeTo.Value);
+        if (jobsFrom.HasValue) filtered = filtered.Where(d => d.PocetJobu >= jobsFrom.Value);
+        if (jobsTo.HasValue) filtered = filtered.Where(d => d.PocetJobu <= jobsTo.Value);
+
+        // Party including "Ostatní" handling
+        if (parties.Length > 0)
+        {
+            var partiesSet = new HashSet<string>(parties, StringComparer.InvariantCultureIgnoreCase);
+            filtered = filtered.Where(d =>
+            {
+                if (partiesSet.Contains(d.PolitickaStrana)) return true;
+
+                // Known party but not selected
+                if (politickeStranyFilter.Contains(d.PolitickaStrana, StringComparer.InvariantCultureIgnoreCase))
+                    return false;
+
+                // Unknown party falls into "Ostatní"
+                return partiesSet.Contains("Ostatní");
+            });
+        }
+
+        // Groups
+        if (groups.Length > 0 && !groups.Contains("všichni", StringComparer.InvariantCultureIgnoreCase))
+        {
+            filtered = filtered.Where(d =>
+                groups.Any(g => d.PolitickaRole.Contains(g, StringComparison.InvariantCultureIgnoreCase)));
+        }
+
+        return new JsonResult(filtered.ToList(), new JsonSerializerOptions(JsonSerializerDefaults.Web));
     }
+
     private async Task<List<PoliticiViewData>> GetFullPoliticiViewData()
     {
-        var politiciPlatyGroup = await PpRepo.GetPrijmyGroupedByNameIdAsync(PpRepo.DefaultYear, pouzePotvrzene: true, withDetails: true);
+        var politiciPlatyGroup =
+            await PpRepo.GetPrijmyGroupedByNameIdAsync(PpRepo.DefaultYear, pouzePotvrzene: true, withDetails: true);
 
         List<PoliticiViewData> politiciViewData = new List<PoliticiViewData>();
-        
+
         foreach (var politikPlatyKvp in politiciPlatyGroup)
         {
             var osoba = OsobaRepo.GetByNameId(politikPlatyKvp.Key);
-            
+
             politiciViewData.Add(new PoliticiViewData()
             {
                 CelkovyRocniPrijem = politikPlatyKvp.Value.Sum(p => p.CelkovyRocniPlatVcetneOdmen),
@@ -203,18 +268,19 @@ public partial class PoliticiController : Controller
                 PocetJobu = politikPlatyKvp.Value.Length,
                 Pohlavi = osoba.Pohlavi,
                 PolitickaRole = osoba.MainRolesToString(PpRepo.DefaultYear),
-                PolitickaStrana = osoba.CurrentPoliticalParty(), //todo: změnit na politickou stranu v konkrétním roce (přidat funkčnost)
+                PolitickaStrana =
+                    osoba.CurrentPoliticalParty(), //todo: změnit na politickou stranu v konkrétním roce (přidat funkčnost)
                 Organizace = "<ol>" + string.Join("", politikPlatyKvp.Value
                     .Select(n => n.Organizace)
                     .Distinct()
                     .Select(o => $"<li><a href='/politici/organizace/{o?.DS}'>{o?.Nazev}</a></li>")
                 ) + "</ol>",
-                
             });
         }
+
         return politiciViewData;
     }
-    
+
     private List<string> GetPolitickeStranyForFilter()
     {
         List<string> politickeStranyIca =
@@ -237,87 +303,28 @@ public partial class PoliticiController : Controller
         return politickeStranyIca.Select(ZkratkaStranyRepo.NazevStranyForIco).ToList();
     }
 
-    public class PoliticiFilter
-    {
-        [FilterType(FilterTypes.RadioButton, "Politická role")]
-        public string[] PoliticianGroups { get; set; }
-
-        [FilterType(FilterTypes.Range, "Celkový roční příjem")]
-        public int[] TotalIncome { get; set; }
-
-        [FilterType(FilterTypes.Range, "Počet jobů")]
-        public int[] JobCount { get; set; }
-
-        [FilterType(FilterTypes.CheckBox, "Politická strana")]
-        public string[] Party { get; set; }
-
-        [FilterType(FilterTypes.CheckBox, "Pohlaví")]
-        public string[] Gender { get; set; }
-    }
-    
     public class PoliticiViewData
     {
         public string Politik { get; set; }
+
         [HtmlTableDefinition.Column(HtmlTableDefinition.ColumnType.Hidden, "PolitikSort")]
         public string Politik_Sort { get; set; }
-        
+
         [HtmlTableDefinition.Column(HtmlTableDefinition.ColumnType.Text, "Politická role")]
         public string PolitickaRole { get; set; }
-        
+
         [HtmlTableDefinition.Column(HtmlTableDefinition.ColumnType.Price, "Celkový roční příjem")]
         public Decimal CelkovyRocniPrijem { get; set; }
-        
+
         [HtmlTableDefinition.Column(HtmlTableDefinition.ColumnType.Number, "Počet jobů")]
         public Decimal PocetJobu { get; set; }
-        
+
         public string Organizace { get; set; }
-        
+
         [HtmlTableDefinition.Column(HtmlTableDefinition.ColumnType.Hidden, "Pohlaví")]
         public string Pohlavi { get; set; }
-        
+
         [HtmlTableDefinition.Column(HtmlTableDefinition.ColumnType.Text, "Politická strana")]
         public string PolitickaStrana { get; set; }
-    }
-}
-
-internal class FilterTypeAttribute : Attribute
-{
-    public FilterTypes Type { get; }
-    public string Name { get; }
-
-    public FilterTypeAttribute(FilterTypes type, string name)
-    {
-        Type = type;
-        Name = name;
-    }
-}
-
-internal enum FilterTypes
-{
-    RadioButton,
-    Range,
-    CheckBox
-}
-
-public class HtmlTableDefinition
-{
-    public class ColumnAttribute : Attribute
-    {
-        public ColumnType Type { get; }
-        public string Name { get; }
-
-        public ColumnAttribute(ColumnType type, string name)
-        {
-            Type = type;
-            Name = name;
-        }
-    }
-
-    public enum ColumnType
-    {
-        Text,
-        Number,
-        Price,
-        Hidden
     }
 }

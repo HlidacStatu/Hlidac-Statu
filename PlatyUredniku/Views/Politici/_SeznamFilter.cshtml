@@ -1,100 +1,171 @@
 @using System.Reflection
 @using System.Text.Json
-@using PlatyUredniku.Controllers
-@model (PlatyUredniku.Controllers.PoliticiController.PoliticiFilter Filter, List<PlatyUredniku.Controllers.PoliticiController.PoliticiViewData> Data, string DataEndpointUrl)
+@using System.Globalization
+@using PlatyUredniku.DataTable
+@model PlatyUredniku.DataTable.SeznamFilterModel
+
+@{
+// ===== Columns & sorting meta (place at the top of the file) =====
+  var items = (Model.InitialData as System.Collections.IEnumerable)?.Cast<object>().ToList() ?? new List<object>();
+  var rowType = items.FirstOrDefault()?.GetType();
+
+  var visibleProps = new List<(PropertyInfo Prop, HtmlTableDefinition.ColumnAttribute? Attr)>();
+  if (rowType != null)
+  {
+    foreach (var p in rowType.GetProperties(BindingFlags.Instance | BindingFlags.Public))
+    {
+      var attr = p.GetCustomAttribute<HtmlTableDefinition.ColumnAttribute>();
+      var isHiddenAttr = attr?.Type == HtmlTableDefinition.ColumnType.Hidden || attr?.Type == HtmlTableDefinition.ColumnType.Sort;
+      var isHiddenByName = p.Name.EndsWith("_Sort", StringComparison.Ordinal);
+      if (!isHiddenAttr && !isHiddenByName)
+        visibleProps.Add((p, attr));
+    }
+  }
+
+// Build hidden sort siblings ONCE and map visibleIndex -> hiddenDtIndex
+  var hiddenSortProps = new List<PropertyInfo>();
+  var sortIndexMap = new Dictionary<int, int>(); // visible idx -> DT absolute idx of hidden column
+
+  if (rowType != null)
+  {
+    for (int i = 0; i < visibleProps.Count; i++)
+    {
+      var sortName = visibleProps[i].Prop.Name + "_Sort";
+      var sortProp = rowType.GetProperty(sortName, BindingFlags.Instance | BindingFlags.Public);
+      if (sortProp != null)
+      {
+        var existing = hiddenSortProps.FindIndex(p => p.Name == sortProp.Name);
+        if (existing < 0)
+        {
+          hiddenSortProps.Add(sortProp);
+          existing = hiddenSortProps.Count - 1;
+        }
+
+        sortIndexMap[i] = visibleProps.Count + existing; // hidden columns are appended after visible ones
+      }
+    }
+  }
+
+// Targets by type (only visible columns)
+  var numberIdxTargets = visibleProps
+    .Select((x, i) => new { x, i })
+    .Where(t => t.x.Attr?.Type == HtmlTableDefinition.ColumnType.Number)
+    .Select(t => t.i)
+    .ToArray();
+
+  var priceIdxTargets = visibleProps
+    .Select((x, i) => new { x, i })
+    .Where(t => t.x.Attr?.Type == HtmlTableDefinition.ColumnType.Price)
+    .Select(t => t.i)
+    .ToArray();
+
+  string Camel(string n) => JsonNamingPolicy.CamelCase.ConvertName(n);
+
+// Build DataTables columns:
+// - First, all visible columns with orderData pointing to their hidden sort sibling (if any), then fallback to self
+  var dtColumnsVisible = visibleProps.Select((vp, i) => new
+  {
+    data = Camel(vp.Prop.Name),
+    name = Camel(vp.Prop.Name),
+    orderData = sortIndexMap.TryGetValue(i, out var hidIdx)
+      ? new[] { hidIdx, i } // primary: hidden sorter, secondary: itself
+      : new[] { i }
+  });
+
+// - Then append hidden sort columns (these must exist in DT columns to be addressable by orderData)
+  var dtColumnsHidden = hiddenSortProps.Select(p => new
+  {
+    data = Camel(p.Name),
+    name = Camel(p.Name),
+    visible = false,
+    searchable = false
+  });
+
+  var dtColumns = dtColumnsVisible.Concat<object>(dtColumnsHidden).ToList();
+
+// Header titles for visible columns
+  string HeaderTitle((PropertyInfo Prop, HtmlTableDefinition.ColumnAttribute? Attr) c)
+    => c.Attr?.Name ?? c.Prop.Name;
+}
 
 <div class="row">
   <div class="col-2">
-    <form id="filterForm" class="my-4">
+    <form id="@Model.FormId" class="my-4">
       <div class="accordion" id="filterAccordion">
         @{
-          var filterProperties = Model.Filter.GetType().GetProperties();
-          int idx = 0;
-          foreach (var filterProperty in filterProperties)
+          var idx = 0;
+          foreach (var f in Model.Filters)
           {
-            var filterAttribute = filterProperty.GetCustomAttribute<FilterTypeAttribute>();
-            var filterType = filterAttribute?.Type;
-            if (filterType == null) continue;
-            string paneId = $"filterPane{idx++}";
-            string filterPropertyName = filterProperty.Name;
+            var paneId = $"filterPane{idx++}";
             <div class="accordion-item">
               <h2 class="accordion-header" id="heading-@paneId">
-                <button
-                  class="accordion-button collapsed"
-                  type="button"
-                  data-bs-toggle="collapse"
-                  data-bs-target="#collapse-@paneId"
-                  aria-expanded="false"
-                  aria-controls="collapse-@paneId">
-                  @(filterAttribute?.Name ?? filterProperty.Name)
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                        data-bs-target="#collapse-@paneId" aria-expanded="false" aria-controls="collapse-@paneId">
+                  @f.Label
                 </button>
               </h2>
-              <div
-                id="collapse-@paneId"
-                class="accordion-collapse collapse"
-                aria-labelledby="heading-@paneId"
-              >
+              <div id="collapse-@paneId" class="accordion-collapse collapse" aria-labelledby="heading-@paneId">
                 <div class="accordion-body">
-                  @* Radio buttons *@
-                  @if (filterType == FilterTypes.RadioButton)
+                  @switch (f)
                   {
-                    var options = (string[])filterProperty.GetValue(Model.Filter);
-                    foreach (var opt in options)
+                    case ChoiceFilterField cf:
                     {
-                      string id = $"{filterPropertyName}_{opt}";
-                      <div class="form-check">
-                        <input
-                          class="form-check-input"
-                          type="radio"
-                          name="@filterPropertyName"
-                          id="@id"
-                          value="@opt"
-                          @(opt == options.First() ? "checked" : "")/>
-                        <label class="form-check-label" for="@id">@opt</label>
-                      </div>
+                      var initial = new HashSet<string>(cf.Initial ?? Array.Empty<string>(), StringComparer.InvariantCultureIgnoreCase);
+                      var groupName = cf.Key;
+                      foreach (var opt in cf.Options)
+                      {
+                        var value = opt.Value;
+                        var label = opt.Label ?? opt.Value;
+                        var id = $"{groupName}_{value}";
+                        if (cf.Multiple)
+                        {
+                          <div class="form-check">
+                            <input class="form-check-input" type="checkbox" name="@groupName" id="@id" value="@value"
+                                   @(initial.Contains(value) ? "checked" : "")/>
+                            <label class="form-check-label" for="@id">@label</label>
+                          </div>
+                        }
+                        else
+                        {
+                          <div class="form-check">
+                            <input class="form-check-input" type="radio" name="@groupName" id="@id" value="@value"
+                                   @(initial.Count == 0 ? (opt == cf.Options.First() ? "checked" : "") : (initial.Contains(value) ? "checked" : ""))/>
+                            <label class="form-check-label" for="@id">@label</label>
+                          </div>
+                        }
+                      }
+
+                      break;
                     }
-                  }
-                  @* Checkboxes *@
-                  else if (filterType == FilterTypes.CheckBox)
-                  {
-                    var options = (string[])filterProperty.GetValue(Model.Filter);
-                    foreach (var opt in options)
+                    case RangeFilterField rf:
                     {
-                      string id = $"{filterPropertyName}_{opt}";
-                      <div class="form-check">
-                        <input
-                          class="form-check-input"
-                          type="checkbox"
-                          name="@filterPropertyName"
-                          id="@id"
-                          value="@opt"
-                          checked/>
-                        <label class="form-check-label" for="@id">@opt</label>
+                      var stepAttr = rf.Step.HasValue ? $"step=\"{rf.Step.Value.ToString(CultureInfo.InvariantCulture)}\"" : "";
+                      <div class="row g-2 align-items-center">
+                        <div class="col">
+                          <label class="form-label mb-1" for="@($"{rf.Key}From")">od @rf.Unit</label>
+                          <input type="number" class="form-control form-control-sm" id="@($"{rf.Key}From")"
+                                 name="@($"{rf.Key}From")"
+                                 min="@rf.Min.ToString(CultureInfo.InvariantCulture)"
+                                 max="@rf.Max.ToString(CultureInfo.InvariantCulture)" @Html.Raw(stepAttr)
+                                 value="@(rf.Initial?.From.ToString(CultureInfo.InvariantCulture) ?? "")"/>
+                        </div>
+                        <div class="col">
+                          <label class="form-label mb-1" for="@($"{rf.Key}To")">do @rf.Unit</label>
+                          <input type="number" class="form-control form-control-sm" id="@($"{rf.Key}To")"
+                                 name="@($"{rf.Key}To")"
+                                 min="@rf.Min.ToString(CultureInfo.InvariantCulture)"
+                                 max="@rf.Max.ToString(CultureInfo.InvariantCulture)" @Html.Raw(stepAttr)
+                                 value="@(rf.Initial?.To.ToString(CultureInfo.InvariantCulture) ?? "")"/>
+                        </div>
                       </div>
+                      break;
                     }
-                  }
-                  @* Range *@
-                  else if (filterType == FilterTypes.Range)
-                  {
-                    var range = (int[])filterProperty.GetValue(Model.Filter);
-                    <div class="range-inputs">
-                      <input
-                        type="number"
-                        class="form-control form-control--small"
-                        id="@($"{filterPropertyName}Min")"
-                        name="@filterPropertyName"
-                        placeholder="Min"
-                        value="@range[0]"/>
-                      <label class="form-check-label" for="@($"{filterPropertyName}Min")">od</label>
-                      <input
-                        type="number"
-                        class="form-control form-control--small"
-                        id="@($"{filterPropertyName}Max")"
-                        name="@filterPropertyName"
-                        placeholder="Max"
-                        value="@range[1]"/>
-                      <label class="form-check-label" for="@($"{filterPropertyName}Max")">do</label>
-                    </div>
+                    case TextFilterField tf:
+                    {
+                      <input type="search" class="form-control form-control-sm" name="@tf.Key"
+                             placeholder="@tf.Placeholder" value="@(tf.Initial ?? "")"/>
+                      break;
+                    }
                   }
                 </div>
               </div>
@@ -106,37 +177,17 @@
   </div>
 
   <div class="col-10">
-    @{
-      var dataProps = typeof(PoliticiController.PoliticiViewData)
-        .GetProperties()
-        .Select(p => (Prop: p, Attr: p.GetCustomAttribute<HtmlTableDefinition.ColumnAttribute>()))
-        .Where(x => x.Attr is null ||
-                    x.Attr.Type != HtmlTableDefinition.ColumnType.Hidden)
-        .ToList();
-      
-      var allProps = typeof(PoliticiController.PoliticiViewData)
-        .GetProperties()
-        .ToDictionary(p => p.Name, p => p);
-
-      var sortTargetsMeta = dataProps
-        .Select((x, i) => new
-        {
-          index = i,
-          isPrice = x.Attr?.Type == HtmlTableDefinition.ColumnType.Price,
-          isNumber = x.Attr?.Type == HtmlTableDefinition.ColumnType.Number,
-          sortProp = allProps.ContainsKey(x.Prop.Name + "_Sort")
-            ? JsonNamingPolicy.CamelCase.ConvertName(x.Prop.Name + "_Sort")
-            : null
-        })
-        .Where(t => t.sortProp != null && !t.isPrice && !t.isNumber) // don’t override numeric/price renderer
-        .ToList();
-    }
-    <table id="myFilteredTable" class="table table-striped table-bordered">
+    <table id="@Model.TableId" class="table table-striped table-bordered">
       <thead>
       <tr>
-        @foreach (var col in dataProps)
+        @foreach (var col in visibleProps)
         {
-          <th>@(col.Attr?.Name ?? col.Prop.Name)</th>
+          <th>@HeaderTitle(col)</th>
+        }
+        @* add header cells for hidden sort columns so DT column count matches; DT will hide them *@
+        @for (int i = 0; i < hiddenSortProps.Count; i++)
+        {
+          <th class="d-none"></th>
         }
       </tr>
       </thead>
@@ -147,51 +198,19 @@
 
 <script>
   $(function () {
-    // build columns config for DataTables
-    const dtColumns = @Html.Raw(JsonSerializer.Serialize(
-                        dataProps.Select(col => new
-                        {
-                          data = JsonNamingPolicy.CamelCase.ConvertName(col.Prop.Name),
-                          name = JsonNamingPolicy.CamelCase.ConvertName(col.Prop.Name)
-                        }), JsonSerializerOptions.Web));
-
-    const numberIdxTargets = @Html.Raw(JsonSerializer.Serialize(
-                               dataProps.Select((x, i) => new { x, i })
-                                 .Where(t => t.x.Attr?.Type == HtmlTableDefinition.ColumnType.Number)
-                                 .Select(t => t.i),
-                               JsonSerializerOptions.Web));
-
-    const priceIdxTargets = @Html.Raw(JsonSerializer.Serialize(
-                              dataProps.Select((x, i) => new { x, i })
-                                .Where(t => t.x.Attr?.Type == HtmlTableDefinition.ColumnType.Price)
-                                .Select(t => t.i),
-                              JsonSerializerOptions.Web));
-
-    // sorting
-    const sortTargetsMeta = @Html.Raw(JsonSerializer.Serialize(sortTargetsMeta, JsonSerializerOptions.Web));
-
-    const sortColumnDefs = sortTargetsMeta.map(st => ({
-      targets: st.index,
-      render: function (data, type, row) {
-        if (type === 'sort') return row[st.sortProp] ?? data;
-        return data;
-      }
-    }));
+    const dtColumns = @Html.Raw(JsonSerializer.Serialize(dtColumns, JsonSerializerOptions.Web));
+    const numberIdxTargets = @Html.Raw(JsonSerializer.Serialize(numberIdxTargets, JsonSerializerOptions.Web));
+    const priceIdxTargets = @Html.Raw(JsonSerializer.Serialize(priceIdxTargets, JsonSerializerOptions.Web));
+    const initialData = @Html.Raw(JsonSerializer.Serialize(Model.InitialData, JsonSerializerOptions.Web));
 
     const baseColumnDefs = [
-      {
-        targets: numberIdxTargets,
-        className: 'number',
-        type: 'num'
-      },
+      {targets: numberIdxTargets, className: 'number', type: 'num'},
       {
         targets: priceIdxTargets,
         className: 'number',
         type: 'num',
         render: function (data, type) {
-          const n = (typeof data === 'number')
-            ? data
-            : parseFloat(String(data ?? '').replace(/\s|[^\d.-]/g, ''));
+          const n = (typeof data === 'number') ? data : parseFloat(String(data ?? '').replace(/\s|[^\d.-]/g, ''));
           if (type === 'sort' || type === 'type' || type === 'filter') return isNaN(n) ? null : n;
           if (isNaN(n)) return '';
           return new Intl.NumberFormat('cs-CZ', {
@@ -204,20 +223,17 @@
       }
     ];
 
-    const allColumnDefs = baseColumnDefs.concat(sortColumnDefs);
-
-    const table = $('#myFilteredTable').DataTable({
-      data: @Html.Raw(JsonSerializer.Serialize(Model.Data, JsonSerializerOptions.Web)),
-      columns: dtColumns,
-      columnDefs: allColumnDefs,
+    const table = $('#@Model.TableId').DataTable({
+      data: initialData ?? [],
+      columns: dtColumns,             // includes hidden sort columns
+      columnDefs: baseColumnDefs,     // no more sortColumnDefs needed
       language: {'url': '//cdn.datatables.net/plug-ins/1.13.4/i18n/cs.json'},
       lengthChange: false,
       info: false,
-      pageLength: 25,
+      pageLength: 25
     });
 
-    // ajax
-    const form = $('#filterForm');
+    const form = $('#@Model.FormId');
 
     function debounce(fn, delay) {
       let t;
@@ -241,16 +257,12 @@
       });
     }, 200);
 
-    form.off('.filters'); // avoid duplicate bindings if partial is re-rendered
+    form.off('.filters');
     form.on('submit.filters', e => e.preventDefault());
-
-    // radios/checkboxes/selects: use change (ignore the radio that got unchecked)
     form.on('change.filters', 'input[type=radio], input[type=checkbox], select', function () {
       if (this.type === 'radio' && !this.checked) return;
       fetchAndRender();
     });
-
-    // numeric/text/range: use input so typing doesn’t spam requests (debounced)
     form.on('input.filters', 'input[type=number], input[type=range], input[type=text], input[type=search]', fetchAndRender);
   });
 </script>
