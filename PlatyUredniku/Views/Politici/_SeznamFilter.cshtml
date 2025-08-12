@@ -1,8 +1,6 @@
 @using System.Reflection
 @using System.Text.Json
-@using System.Globalization
 @using PlatyUredniku.DataTable
-@model PlatyUredniku.DataTable.SeznamFilterModel
 
 @{
 // ===== Columns & sorting meta (place at the top of the file) =====
@@ -94,79 +92,20 @@
       <div class="accordion" id="filterAccordion">
         @{
           var idx = 0;
-          foreach (var f in Model.Filters)
+          foreach (var filter in Model.Filters)
           {
             var paneId = $"filterPane{idx++}";
             <div class="accordion-item">
               <h2 class="accordion-header" id="heading-@paneId">
-                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
-                        data-bs-target="#collapse-@paneId" aria-expanded="false" aria-controls="collapse-@paneId">
-                  @f.Label
+                <button class="accordion-button collapsed" type="button"
+                        data-bs-toggle="collapse" data-bs-target="#collapse-@paneId"
+                        aria-expanded="false" aria-controls="collapse-@paneId">
+                  @filter.Label
                 </button>
               </h2>
               <div id="collapse-@paneId" class="accordion-collapse collapse" aria-labelledby="heading-@paneId">
                 <div class="accordion-body">
-                  @switch (f)
-                  {
-                    case ChoiceFilterField cf:
-                    {
-                      var initial = new HashSet<string>(cf.Initial ?? Array.Empty<string>(), StringComparer.InvariantCultureIgnoreCase);
-                      var groupName = cf.Key;
-                      foreach (var opt in cf.Options)
-                      {
-                        var value = opt.Value;
-                        var label = opt.Label ?? opt.Value;
-                        var id = $"{groupName}_{value}";
-                        if (cf.Multiple)
-                        {
-                          <div class="form-check">
-                            <input class="form-check-input" type="checkbox" name="@groupName" id="@id" value="@value"
-                                   @(initial.Contains(value) ? "checked" : "")/>
-                            <label class="form-check-label" for="@id">@label</label>
-                          </div>
-                        }
-                        else
-                        {
-                          <div class="form-check">
-                            <input class="form-check-input" type="radio" name="@groupName" id="@id" value="@value"
-                                   @(initial.Count == 0 ? (opt == cf.Options.First() ? "checked" : "") : (initial.Contains(value) ? "checked" : ""))/>
-                            <label class="form-check-label" for="@id">@label</label>
-                          </div>
-                        }
-                      }
-
-                      break;
-                    }
-                    case RangeFilterField rf:
-                    {
-                      var stepAttr = rf.Step.HasValue ? $"step=\"{rf.Step.Value.ToString(CultureInfo.InvariantCulture)}\"" : "";
-                      <div class="row g-2 align-items-center">
-                        <div class="col">
-                          <label class="form-label mb-1" for="@($"{rf.Key}From")">od @rf.Unit</label>
-                          <input type="number" class="form-control form-control-sm" id="@($"{rf.Key}From")"
-                                 name="@($"{rf.Key}From")"
-                                 min="@rf.Min.ToString(CultureInfo.InvariantCulture)"
-                                 max="@rf.Max.ToString(CultureInfo.InvariantCulture)" @Html.Raw(stepAttr)
-                                 value="@(rf.Initial?.From.ToString(CultureInfo.InvariantCulture) ?? "")"/>
-                        </div>
-                        <div class="col">
-                          <label class="form-label mb-1" for="@($"{rf.Key}To")">do @rf.Unit</label>
-                          <input type="number" class="form-control form-control-sm" id="@($"{rf.Key}To")"
-                                 name="@($"{rf.Key}To")"
-                                 min="@rf.Min.ToString(CultureInfo.InvariantCulture)"
-                                 max="@rf.Max.ToString(CultureInfo.InvariantCulture)" @Html.Raw(stepAttr)
-                                 value="@(rf.Initial?.To.ToString(CultureInfo.InvariantCulture) ?? "")"/>
-                        </div>
-                      </div>
-                      break;
-                    }
-                    case TextFilterField tf:
-                    {
-                      <input type="search" class="form-control form-control-sm" name="@tf.Key"
-                             placeholder="@tf.Placeholder" value="@(tf.Initial ?? "")"/>
-                      break;
-                    }
-                  }
+                  @filter.Draw()
                 </div>
               </div>
             </div>
