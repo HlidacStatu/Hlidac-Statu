@@ -107,11 +107,28 @@
 
   <div class="col-10">
     @{
-      // reflect view-data columns
       var dataProps = typeof(PoliticiController.PoliticiViewData)
         .GetProperties()
         .Select(p => (Prop: p, Attr: p.GetCustomAttribute<HtmlTableDefinition.ColumnAttribute>()))
-        .Where(x => x.Attr is null || x.Attr.Type != HtmlTableDefinition.ColumnType.Hidden)
+        .Where(x => x.Attr is null ||
+                    x.Attr.Type != HtmlTableDefinition.ColumnType.Hidden)
+        .ToList();
+      
+      var allProps = typeof(PoliticiController.PoliticiViewData)
+        .GetProperties()
+        .ToDictionary(p => p.Name, p => p);
+
+      var sortTargetsMeta = dataProps
+        .Select((x, i) => new
+        {
+          index = i,
+          isPrice = x.Attr?.Type == HtmlTableDefinition.ColumnType.Price,
+          isNumber = x.Attr?.Type == HtmlTableDefinition.ColumnType.Number,
+          sortProp = allProps.ContainsKey(x.Prop.Name + "_Sort")
+            ? JsonNamingPolicy.CamelCase.ConvertName(x.Prop.Name + "_Sort")
+            : null
+        })
+        .Where(t => t.sortProp != null && !t.isPrice && !t.isNumber) // don’t override numeric/price renderer
         .ToList();
     }
     <table id="myFilteredTable" class="table table-striped table-bordered">
@@ -150,37 +167,49 @@
                                 .Select(t => t.i),
                               JsonSerializerOptions.Web));
 
+    // sorting
+    const sortTargetsMeta = @Html.Raw(JsonSerializer.Serialize(sortTargetsMeta, JsonSerializerOptions.Web));
+
+    const sortColumnDefs = sortTargetsMeta.map(st => ({
+      targets: st.index,
+      render: function (data, type, row) {
+        if (type === 'sort') return row[st.sortProp] ?? data;
+        return data;
+      }
+    }));
+
+    const baseColumnDefs = [
+      {
+        targets: numberIdxTargets,
+        className: 'number',
+        type: 'num'
+      },
+      {
+        targets: priceIdxTargets,
+        className: 'number',
+        type: 'num',
+        render: function (data, type) {
+          const n = (typeof data === 'number')
+            ? data
+            : parseFloat(String(data ?? '').replace(/\s|[^\d.-]/g, ''));
+          if (type === 'sort' || type === 'type' || type === 'filter') return isNaN(n) ? null : n;
+          if (isNaN(n)) return '';
+          return new Intl.NumberFormat('cs-CZ', {
+            style: 'currency',
+            currency: 'CZK',
+            minimumFractionDigits: 0,
+            maximumFractionDigits: 0
+          }).format(n);
+        }
+      }
+    ];
+
+    const allColumnDefs = baseColumnDefs.concat(sortColumnDefs);
+
     const table = $('#myFilteredTable').DataTable({
       data: @Html.Raw(JsonSerializer.Serialize(Model.Data, JsonSerializerOptions.Web)),
       columns: dtColumns,
-      columnDefs: [
-        {
-          targets: numberIdxTargets,
-          className: 'number',
-          type: 'num'
-        },
-        {
-          targets: priceIdxTargets,
-          className: 'number',       // right-align if your CSS does that for .number
-          type: 'num',               // keep numeric sorting
-          render: function (data, type) {
-            // use raw number for sorting/searching
-            const n = (typeof data === 'number')
-              ? data
-              : parseFloat(String(data ?? '').replace(/\s|[^\d.-]/g, ''));
-            if (type === 'sort' || type === 'type' || type === 'filter') return isNaN(n) ? null : n;
-
-            // pretty display (no decimals, CZK)
-            if (isNaN(n)) return '';
-            return new Intl.NumberFormat('cs-CZ', {
-              style: 'currency',
-              currency: 'CZK',
-              minimumFractionDigits: 0,
-              maximumFractionDigits: 0
-            }).format(n);
-          }
-        }
-      ],
+      columnDefs: allColumnDefs,
       language: {'url': '//cdn.datatables.net/plug-ins/1.13.4/i18n/cs.json'},
       lengthChange: false,
       info: false,
