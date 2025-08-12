@@ -30,7 +30,7 @@ public partial class PoliticiController : Controller
 
 
     [HlidacCache(60 * 60, "*")]
-    [Route("Politici/Report/{id}")]
+    [Route("Politici/Reporty/{id}")]
     public async Task<IActionResult> Report(string id)
     {
 

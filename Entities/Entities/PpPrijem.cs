@@ -22,11 +22,11 @@ public class PpPrijem
         Prijem_od_politika_neodsouhlaseny = -2,
         [Devmasters.Enums.NiceDisplayName("Příjem od politika, který jsme zatím nezkontrolovali")]
         Prijem_od_politika_nezkontrolovan = -1,
-        [Devmasters.Enums.NiceDisplayName("Žádáme organizaci o příjem")]
+        [Devmasters.Enums.NiceDisplayName("Žádáme organizaci o příjem politika, informaci dosud neposkytla")]
         Zjistujeme_zadost_106 = 0,
-        [Devmasters.Enums.NiceDisplayName("Příjem zaslaný organizací")]
+        [Devmasters.Enums.NiceDisplayName("Příjem nám poskytla organizace.")]
         PotvrzenyPlat_od_organizace = 1,
-        [Devmasters.Enums.NiceDisplayName("Příjem zaslaný politikem")]
+        [Devmasters.Enums.NiceDisplayName("Příjem nám zaslal politik.")]
         PotvrzenyPlat_od_politika = 2,
 
     }

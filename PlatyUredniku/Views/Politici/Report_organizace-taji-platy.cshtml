@@ -1,0 +1,127 @@
+﻿@using HlidacStatu.Entities
+@using HlidacStatu.Repositories
+@using HlidacStatu.XLib.Render
+@using Microsoft.EntityFrameworkCore
+@using PlatyUredniku.Cache
+
+@{
+    ViewBag.Title = "Organizace nejvíce odmítající poskytnout příjem politiků";
+}
+@section breadcrumbs
+{
+    <ol class="breadcrumb">
+        <li>
+            <a asp-action="Index" asp-controller="Home">Platy</a>
+        </li>
+        <li>
+            <a asp-action="Index" asp-controller="Politici">Platy politiků</a>
+        </li>
+        <li>
+            <a asp-action="Reporty" asp-controller="Politici">Reporty a statistiky</a>
+        </li>
+        <li class="active">@ViewBag.Title</li>
+    </ol>
+}
+
+
+@functions {
+    private bool _sectionBgSwitch = true;
+
+    public string GetBgClass(bool toggle = true)
+    {
+        if (toggle)
+            _sectionBgSwitch = !_sectionBgSwitch;
+
+        return _sectionBgSwitch ? "alter-bg-color" : "";
+    }
+}
+
+<section class="d-flex align-items-center justify-content-center  @(GetBgClass()) pageblock-small">
+    <div class="container">
+        <h2>@ViewData["title"]</h2>
+        <p>
+            Oslovili jsme s žádostí o informace dle zákona o právu na informace všechny zde uvedené organizace.
+            Ty nám odmítli informace o platech daných politiků sdělit.
+        </p>
+        <p>
+            Vzápětí jsme oslovili většinu politiků (na více než 80 % politiků jsme dohledali email či jiné spojení) a požádali je o doplnění chybějících informací
+            o platech.
+        </p>
+        <p>
+            Na tomto seznamu je top 100 organizací, které tají příjem největšího množství politiků.
+        </p>
+    </div>
+</section>
+
+@{
+
+    using var db = new DbEntities();
+    var vsechnyPlaty = await PpRepo.BasePotvrzenePlaty(db, PpRepo.DefaultYear)
+    .Include(i => i.Organizace).ThenInclude(o => o.FirmaDs)
+    .Where(m => m.Status == PpPrijem.StatusPlatu.Zjistujeme_zadost_106)
+    .ToArrayAsync();
+    var orgs = vsechnyPlaty
+    .GroupBy(k => k.Organizace.Ico, v => v, (k, v) => new { ico = k, platy = v.Where(p => p.Status >= 0).ToArray() })
+    .ToDictionary(k => k.ico, v => v.platy)
+    .OrderByDescending(kv => kv.Value.Count())
+    .Take(100)
+    .ToDictionary(kv => kv.Key, kv => kv.Value);
+
+
+    ReportDataSource<KeyValuePair<string, PpPrijem[]>> rds = new(
+    new ReportDataSource<KeyValuePair<string, PpPrijem[]>>.Column()
+    {
+        Name = "Organizace",
+        HtmlRender = (m) =>
+        {
+            return $"<a href='/organizace/{m.Key}'>{Firmy.GetJmeno(m.Key)}</a>";
+        },
+        OrderValueRender = (m) =>
+        {
+            return $"{Firmy.GetJmeno(m.Key)}";
+        },
+    },
+    new ReportDataSource<KeyValuePair<string, PpPrijem[]>>.Column()
+    {
+        Name = "Neposkytl plat pro tyto politiky",
+        HtmlRender = (m) =>
+        {
+            return "<ol>" + string.Join("", m.Value
+        .Select(n => n.Nameid)
+        .Distinct()
+        .Select(o => $"<li><a href='/politici/politik/{o}'>{OsobyRolesCache.Get(o).Jmeno} {OsobyRolesCache.Get(o).Prijmeni}</a></li>")
+        ) + "</ul>";
+
+        },
+        OrderValueRender = (m) => HlidacStatu.Util.RenderData.OrderValueFormat(m.Value.Count()),
+        //CssClass = "text-nowrap overflow-x-hidden "
+    }
+    );
+
+
+    foreach (var kv in orgs)
+    {
+        //var platyPerPolitik = vsechnyPlaty.Where(m => m.Nameid == pol).ToArray();
+        if (kv.Value.Any())
+        {
+            rds.AddRow(kv);
+
+        }
+    }
+}
+
+<section class="d-flex align-items-center justify-content-center  @(GetBgClass()) pageblock-small">
+    <div class="container">
+        <p>
+            @Html.DataToHTMLTable(rds,
+            dataTableOptions: HtmlExtensions.DatatableOptions(orderColumnIdx: 2, orderDirection: "desc", dom: "<\"top\"Bfp>rt<\"bottom\"ip><\"clear\">"))
+        </p>
+    </div>
+</section>
+
+<section class="d-flex align-items-center justify-content-center  @(GetBgClass()) pageblock">
+    <div class="container">
+        <p class="lead">@Html.Raw(ViewData["noteHtml"])</p>
+
+    </div>
+</section>

@@ -238,7 +238,7 @@ public static class PpRepo
     public static IQueryable<PpPrijem> BasePotvrzenePlaty(DbEntities db, int rok = DefaultYear)
     {
         return BaseAllPlaty(db, rok)
-            .Where(m => m.Status > 0);
+            .Where(m => m.Status >= 0);
     }
 
     public static string[] AllNameId(bool? zeny, int rok = DefaultYear)

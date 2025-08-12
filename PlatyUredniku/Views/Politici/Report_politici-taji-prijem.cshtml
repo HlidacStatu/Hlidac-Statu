@@ -35,10 +35,21 @@
     }
 }
 
-<section class="d-flex align-items-center justify-content-center  @(GetBgClass()) pt-5 pageblock-small">
+<section class="d-flex align-items-center justify-content-center  @(GetBgClass()) pageblock-small">
     <div class="container">
         <h2>@ViewData["title"]</h2>
-        <p></p>
+        <p>
+            Oslovili jsme s žádostí o informace dle zákona o právu na informace všechny zde uvedené organizace. 
+            Ty nám odmítli informace o platech daných politiků sdělit.
+            
+        </p>
+        <p>
+            Vzápětí jsme oslovili většinu politiků (na více než 80 % politiků jsme dohledali email či jiné spojení) a požádali je o doplnění chybějících informací
+            o platech.
+        </p>
+        <p>
+            Na tomto seznamu je 100 politiků s nejvyššími příjmy či největším počtem organizací, u kterých se nám příjem nepodařilo získat.
+        </p>
     </div>
 </section>
 
@@ -46,6 +57,7 @@
 
     var vsechnyPlaty = await PpRepo.GetPrijmyGroupedByNameIdAsync(PpRepo.DefaultYear, true);
     vsechnyPlaty = vsechnyPlaty
+        .Where(kv => kv.Value.Any(m => m.Status == PpPrijem.StatusPlatu.Zjistujeme_zadost_106))
         .OrderByDescending(kv => kv.Value.Count(m => m.Status == PpPrijem.StatusPlatu.Zjistujeme_zadost_106))
         .ThenByDescending(kv=> kv.Value.Sum(m=>m.CelkoveRocniNakladyNaPolitika))
         .Take(100)
@@ -91,7 +103,7 @@
                                             .Select(n => n.Organizace)
                                             .Distinct()
                                             .Select(o => $"<li><a href='/politici/organizace/{o?.DS}'>{o?.Nazev}</a></li>")
-                                            ) + "</ul>";
+                                            ) + "</ol>";
 
             },
             OrderValueRender = (m) => HlidacStatu.Util.RenderData.OrderValueFormat(m.Value.Count()),

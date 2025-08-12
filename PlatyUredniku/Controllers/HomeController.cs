@@ -75,7 +75,7 @@ public class HomeController : Controller
         if (detail.Platy?.Count > 0)
             return RedirectToAction("Detail", "Urednici", new { ds = detail.DS });
         if (detail.Platy?.Count > 0)
-            return RedirectToAction("organizace", "Politici", new { ds = detail.DS });
+            return RedirectToAction("organizace", "Politici", new { id = detail.DS });
 
         else
             return View(detail);

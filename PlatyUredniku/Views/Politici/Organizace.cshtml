@@ -1,5 +1,5 @@
-
 @using Devmasters
+@using Devmasters.Enums
 @using HlidacStatu.Entities
 @using HlidacStatu.Lib.Web.UI
 @using HlidacStatu.Repositories
@@ -16,7 +16,7 @@
 
     string ico = Model.Ico;
     Firma f = Firmy.Get(ico);
-    ViewBag.Title = $"Politici v {f.Jmeno} ({rok})" ;
+    ViewBag.Title = $"Politici v {f.Jmeno} ({rok})";
 
     var platy = await PpRepo.GetJednotlivePlatyAsync(rok, true, ico);
 
@@ -129,70 +129,91 @@
 
                         @if (prijemGroup.Platy.Count > 0)
                         {
-                            <table class="table table-borderless table-hover" id="tblSum_politik_@prijemGroup.Key">
-                                <thead>
-                                <tr>
-                                        <th colspan="5">
-                                            <div class="p-3 mb-2 bg-warning text-dark">Jde o příjmy politiků pouze od @f.Jmeno. Celkové příjmy politiků najdete u každého politika zvlášť.
-                                            </div>
-                                        </th>
-                                </tr>
-                                    <tr>
-                                        <th>Jméno politika</th>
-                                        <th class="text-end">Celkový roční osobní příjem</th>
-                                        <th class="text-end">Ostatní náhrady za rok</th>
-                                        <th class="text-end">Přepočtený hrubý měsíční příjem včetně odměn</th>
-                                        <th style="max-width:20rem">Nefinanční benefity</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @foreach (var prijemPolitika in prijemGroup.Platy)
-                                    {
-                                        var politik = OsobaRepo.GetByNameId(prijemPolitika.Nameid);
+                            @if (prijemGroup.Platy.Any(m => m.Status == PpPrijem.StatusPlatu.Zjistujeme_zadost_106))
+                            {
+                                <h4 class="text-danger">V roce @prijemGroup.Key nám organizace neposkytla platy těchto osob:</h4>
+                                <p>
+                                    <ol>
+                                        @foreach (var prijemPolitika in prijemGroup.Platy.Where(m => m.Status == PpPrijem.StatusPlatu.Zjistujeme_zadost_106))
+                                        {
+                                            <li>
+                                                <a href="/politici/@prijemPolitika.Nameid">@Osoby.GetByNameId.Get(prijemPolitika.Nameid).FullName()</a>
+                                            </li>
+                                        }
+                                    </ol>
+                                </p>
+                            }
+                            @if (prijemGroup.Platy.Any(m => m.Status > 0))
+                            {
+                                <table class="table table-borderless table-hover" id="tblSum_politik_@prijemGroup.Key">
+                                    <thead>
                                         <tr>
-                                            <td>
-                                                <a href="/politici/@prijemPolitika.Nameid">@politik.FullName()</a>
-                                            </td>
-                                            <td data-order="@(HlidacStatu.Util.RenderData.OrderValueFormat(prijemPolitika.CelkoveRocniNakladyNaPolitika))"
-                                                class="number text-nowrap">
-                                                @if (prijemPolitika.PocetMesicu < 12)
-                                                {
-                                                    <a href="#" class="link-danger me-2" data-bs-toggle="tooltip"
-                                                       data-bs-title="Příjem je pouze za @Devmasters.Lang.CS.Plural.Get((long)prijemPolitika.PocetMesicu.Value, "jeden měsíc", "{0} měsíce", "{0} měsíců") a může obsahovat odstupné či jinou smluvní odměnu">
-                                                        <i class="fa-solid fa-circle-info"></i>
-                                                    </a>
-                                                }
-
-                                                @HlidacStatu.Util.RenderData.NicePriceHtml(prijemPolitika.CelkoveRocniNakladyNaPolitika)
-                                            </td>
-                                            <td data-order="@(HlidacStatu.Util.RenderData.OrderValueFormat(prijemPolitika.CelkoveRocniNahrady))"
-                                                class="number text-nowrap">
-                                                @if (prijemPolitika.PocetMesicu < 12)
-                                                {
-                                                    <a href="#" class="link-danger me-2" data-bs-toggle="tooltip"
-                                                       data-bs-title="Ostatní náhrady jsou pouze za @Devmasters.Lang.CS.Plural.Get((long)prijemPolitika.PocetMesicu.Value, "jeden měsíc", "{0} měsíce", "{0} měsíců")">
-                                                        <i class="fa-solid fa-circle-info"></i>
-                                                    </a>
-                                                }
-
-                                                @Html.Raw(HlidacStatu.Util.RenderData.NicePriceHtml(prijemPolitika.CelkoveRocniNahrady))
-                                            </td>
-                                            <td data-order="@(HlidacStatu.Util.RenderData.OrderValueFormat(prijemPolitika.PrumernyMesicniPrijemVcetneOdmen))"
-                                                class="number text-nowrap">
-                                                @if (prijemPolitika.PocetMesicu < 12)
-                                                {
-                                                    <a href="#" class="link-danger me-2" data-bs-toggle="tooltip"
-                                                       data-bs-title="Příjem je pouze za @Devmasters.Lang.CS.Plural.Get((long)prijemPolitika.PocetMesicu.Value, "jeden měsíc", "{0} měsíce", "{0} měsíců") a může obsahovat odstupné či jinou smluvní odměnu">
-                                                        <i class="fa-solid fa-circle-info"></i>
-                                                    </a>
-                                                }
-                                                @HlidacStatu.Util.RenderData.NicePrice(prijemPolitika.PrumernyMesicniPrijemVcetneOdmen)
-                                            </td>
-                                            <td>@prijemPolitika.NefinancniBonus</td>
+                                            <th colspan="5">
+                                                <div class="p-3 mb-2 bg-warning text-dark">
+                                                    Jde o příjmy politiků pouze od @f.Jmeno. Celkové příjmy politiků najdete u každého politika zvlášť.
+                                                </div>
+                                            </th>
                                         </tr>
-                                    }
-                                </tbody>
-                            </table>
+                                        <tr>
+                                            <th>Jméno politika</th>
+                                            <th class="text-end">Celkový roční osobní příjem</th>
+                                            <th class="text-end">Ostatní náhrady za rok</th>
+                                            <th class="text-end">Přepočtený hrubý měsíční příjem včetně odměn</th>
+                                            <th style="max-width:20rem">Nefinanční benefity</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach (var prijemPolitika in prijemGroup.Platy.Where(m => m.Status > 0))
+                                        {
+                                            var politik = Osoby.GetByNameId.Get(prijemPolitika.Nameid);
+                                            <tr>
+                                                <td>
+                                                    <a href="/politici/@prijemPolitika.Nameid">@politik.FullName()</a>
+                                                </td>
+                                                <td data-order="@(HlidacStatu.Util.RenderData.OrderValueFormat(prijemPolitika.CelkoveRocniNakladyNaPolitika))"
+                                                    class="number text-nowrap">
+                                                    @if (prijemPolitika.PocetMesicu < 12)
+                                                    {
+                                                        <a href="#" class="link-danger me-2" data-bs-toggle="tooltip"
+                                                           data-bs-title="Příjem je pouze za @Devmasters.Lang.CS.Plural.Get((long)prijemPolitika.PocetMesicu.Value, "jeden měsíc", "{0} měsíce", "{0} měsíců") a může obsahovat odstupné či jinou smluvní odměnu">
+                                                            <i class="fa-solid fa-circle-info"></i>
+                                                        </a>
+                                                    }
+
+                                                    @HlidacStatu.Util.RenderData.NicePriceHtml(prijemPolitika.CelkoveRocniNakladyNaPolitika)
+                                                </td>
+
+
+                                                <td data-order="@(HlidacStatu.Util.RenderData.OrderValueFormat(prijemPolitika.CelkoveRocniNahrady))"
+                                                    class="number text-nowrap">
+                                                    @if (prijemPolitika.PocetMesicu < 12)
+                                                    {
+                                                        <a href="#" class="link-danger me-2" data-bs-toggle="tooltip"
+                                                           data-bs-title="Ostatní náhrady jsou pouze za @Devmasters.Lang.CS.Plural.Get((long)prijemPolitika.PocetMesicu.Value, "jeden měsíc", "{0} měsíce", "{0} měsíců")">
+                                                            <i class="fa-solid fa-circle-info"></i>
+                                                        </a>
+                                                    }
+
+                                                    @Html.Raw(HlidacStatu.Util.RenderData.NicePriceHtml(prijemPolitika.CelkoveRocniNahrady))
+                                                </td>
+                                                <td data-order="@(HlidacStatu.Util.RenderData.OrderValueFormat(prijemPolitika.PrumernyMesicniPrijemVcetneOdmen))"
+                                                    class="number text-nowrap">
+                                                    @if (prijemPolitika.PocetMesicu < 12)
+                                                    {
+                                                        <a href="#" class="link-danger me-2" data-bs-toggle="tooltip"
+                                                           data-bs-title="Příjem je pouze za @Devmasters.Lang.CS.Plural.Get((long)prijemPolitika.PocetMesicu.Value, "jeden měsíc", "{0} měsíce", "{0} měsíců") a může obsahovat odstupné či jinou smluvní odměnu">
+                                                            <i class="fa-solid fa-circle-info"></i>
+                                                        </a>
+                                                    }
+                                                    @HlidacStatu.Util.RenderData.NicePrice(prijemPolitika.PrumernyMesicniPrijemVcetneOdmen)
+                                                </td>
+                                                <td>@prijemPolitika.NefinancniBonus</td>
+
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            }
                         }
                         else if (neaktivniOrg.Any(m => m.Item1 == Model.DS))
                         {
@@ -210,22 +231,10 @@
                         }
                         else
                         {
-                            <div class="alert alert-danger" role="alert">
-                                <h4 class="alert-heading">Platy pro rok @prijemGroup.Key jsme nedostali</h4>
-                                <p>
-                                    Požadované informace o platech a odměnách za rok 2023 jsme
-                                    od @Model.Nazev nedostali.
-                                </p>
-                                <hr>
-                                <p class="mb-0">
-                                    V souladu se zákonem o právu na informace se ptáme na platy nejvyššího představitele
-                                    organizace a nejvyššího managementu pod ním.
-                                </p>
-                            </div>
                         }
 
                     </div>
-                    classAttributesPrijemPolitika = "tab-pane width-75vp";
+
                 }
             }
         </div>

@@ -301,10 +301,20 @@
                             <li>
                                 <a href="https://platy.hlidacstatu.cz/politici/politik/@(pr.Nameid)">@pr.GetOsoba().FullName()</a>
                                 @HlidacStatu.Util.RenderData.NicePriceHtml(pr.CelkovyRocniPlatVcetneOdmen)
-                                @if (pr.CelkoveRocniNahrady > 0)
+                                @if (pr.Status > 0)
                                 {
-                                    <span class="text-muted"> + @HlidacStatu.Util.RenderData.NicePriceHtml(pr.CelkoveRocniNahrady) náhrady</span>
+                                    @HlidacStatu.Util.RenderData.NicePriceHtml(pr.CelkovyRocniPlatVcetneOdmen)
+
+                                    if (pr.CelkoveRocniNahrady > 0)
+                                    {
+                                        <span class="text-muted"> + @HlidacStatu.Util.RenderData.NicePriceHtml(pr.CelkoveRocniNahrady) náhrady</span>
+                                    }
                                 }
+                                else
+                                {
+                                    <span class="text-danger">@(pr.Status.ToNiceDisplayName())</span>
+                                }
+
                             </li>
                         }
                     </ul>
@@ -317,9 +327,18 @@
                             <li>
                                 <a href="https://platy.hlidacstatu.cz/politici/politik/@(pr.Nameid)">@pr.GetOsoba().FullName()</a>
                                 @HlidacStatu.Util.RenderData.NicePriceHtml(pr.CelkovyRocniPlatVcetneOdmen)
-                                @if (pr.CelkoveRocniNahrady > 0)
+                                @if (pr.Status > 0)
                                 {
-                                    <span class="text-muted"> + @HlidacStatu.Util.RenderData.NicePriceHtml(pr.CelkoveRocniNahrady) náhrady</span>
+                                    @HlidacStatu.Util.RenderData.NicePriceHtml(pr.CelkovyRocniPlatVcetneOdmen)
+
+                                    if (pr.CelkoveRocniNahrady > 0)
+                                    {
+                                        <span class="text-muted"> + @HlidacStatu.Util.RenderData.NicePriceHtml(pr.CelkoveRocniNahrady) náhrady</span>
+                                    }
+                                }
+                                else
+                                {
+                                    <span class="text-danger">@(pr.Status.ToNiceDisplayName())</span>
                                 }
                             </li>
                         }
