@@ -15,13 +15,24 @@ using ZiggyCreatures.Caching.Fusion;
 namespace PlatyUredniku.Controllers;
 
 [Authorize(Roles = "Admin")]
-public class PoliticiController : Controller
+public partial class PoliticiController : Controller
 {
     private readonly IFusionCache _cache;
 
     public PoliticiController(IFusionCache cache)
     {
         _cache = cache;
+    }
+
+    [HlidacCache(60 * 60, "*")]
+    public async Task<IActionResult> List(string id, int? year, int? top = null, string sort = null, string report = null)
+    {
+        if (!Enum.TryParse<PpRepo.PoliticianGroup>(id, true, out var politicianGroup))
+        {
+            politicianGroup = PpRepo.PoliticianGroup.Vse;
+        }
+
+        return View((Group: politicianGroup, Year: year ?? PpRepo.DefaultYear, top: top ?? int.MaxValue - 1, sort: sort, report: report));
     }
 
     [HlidacCache(60 * 60, "rok")]
@@ -52,21 +63,6 @@ public class PoliticiController : Controller
         ViewData["osoba"] = osoba;
 
         return View(detail);
-    }
-
-
-    [HlidacCache(60 * 60, "rok")]
-    public async Task<IActionResult> Reporty()
-    {
-        return View();
-    }
-
-
-    [HlidacCache(60 * 60, "*")]
-    [Route("Politici/Report/{id}")]
-    public async Task<IActionResult> Report(string id)
-    {
-        return View("reporty/report" + id);
     }
 
     [HlidacCache(48 * 60 * 60, "*")]

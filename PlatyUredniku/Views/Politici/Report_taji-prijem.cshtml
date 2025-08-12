@@ -1,0 +1,128 @@
+﻿@using HlidacStatu.Entities
+@using HlidacStatu.Repositories
+@using HlidacStatu.XLib.Render
+@using PlatyUredniku.Cache
+
+@{
+    ViewBag.Title = "Politici nejvíce tající svůj příjem";
+}
+@section breadcrumbs
+{
+    <ol class="breadcrumb">
+        <li>
+            <a asp-action="Index" asp-controller="Home">Platy</a>
+        </li>
+        <li>
+            <a asp-action="Index" asp-controller="Politici">Platy politiků</a>
+        </li>
+        <li>
+            <a asp-action="Reporty" asp-controller="Politici">Reporty a statistiky</a>
+        </li>
+        <li class="active">@ViewBag.Title</li>
+    </ol>
+}
+
+
+@functions {
+    private bool _sectionBgSwitch = true;
+
+    public string GetBgClass(bool toggle = true)
+    {
+        if (toggle)
+            _sectionBgSwitch = !_sectionBgSwitch;
+
+        return _sectionBgSwitch ? "alter-bg-color" : "";
+    }
+}
+
+<section class="d-flex align-items-center justify-content-center  @(GetBgClass()) pt-5 pageblock-small">
+    <div class="container">
+        <h2>@ViewData["title"]</h2>
+        <p></p>
+    </div>
+</section>
+
+@{
+
+    var vsechnyPlaty = await PpRepo.GetPrijmyGroupedByNameIdAsync(PpRepo.DefaultYear, true);
+    vsechnyPlaty = vsechnyPlaty
+        .OrderByDescending(kv => kv.Value.Count(m => m.Status == PpPrijem.StatusPlatu.Zjistujeme_zadost_106))
+        .ThenByDescending(kv=> kv.Value.Sum(m=>m.CelkoveRocniNakladyNaPolitika))
+        .Take(100)
+        .ToDictionary(kv => kv.Key, kv => kv.Value);
+
+
+    ReportDataSource<KeyValuePair<string, PpPrijem[]>> rds = new(
+        new ReportDataSource<KeyValuePair<string, PpPrijem[]>>.Column()
+        {
+            Name = "Politik",
+            HtmlRender = (m) =>
+            {
+                return $"<a href='/politici/politik/{m.Key}'>{OsobyRolesCache.Get(m.Key).FullName}</a>";
+            },
+            OrderValueRender = (m) =>
+            {
+                return $"{OsobyRolesCache.Get(m.Key).Prijmeni} {OsobyRolesCache.Get(m.Key).Jmeno}";
+            },
+        },
+        new ReportDataSource<KeyValuePair<string, PpPrijem[]>>.Column()
+        {
+            Name = "Politické role",
+            HtmlRender = (m) => OsobyRolesCache.Get(m.Key).Role,
+            OrderValueRender = (m) => OsobyRolesCache.Get(m.Key).Role,
+        },
+        new ReportDataSource<KeyValuePair<string, PpPrijem[]>>.Column()
+        {
+            Name = "Celkový roční příjem",
+            HtmlRender = (m) =>
+            {
+                return $"<a href='/politici/politik/{m.Key}'>{HlidacStatu.Util.RenderData.NicePrice(m.Value.Sum(v => v.CelkoveRocniNakladyNaPolitika), html: true)}</a>";
+            },
+            OrderValueRender = (m) => HlidacStatu.Util.RenderData.OrderValueFormat(m.Value.Sum(v => v.CelkoveRocniNakladyNaPolitika)),
+            CssClass = "number"
+        },
+        new ReportDataSource<KeyValuePair<string, PpPrijem[]>>.Column()
+        {
+            Name = "Neposkytl plat z organizací",
+            HtmlRender = (m) =>
+            {
+                return "<ol>" + string.Join("", m.Value
+                                            .Where(m => m.Status == PpPrijem.StatusPlatu.Zjistujeme_zadost_106)
+                                            .Select(n => n.Organizace)
+                                            .Distinct()
+                                            .Select(o => $"<li><a href='/politici/organizace/{o?.DS}'>{o?.Nazev}</a></li>")
+                                            ) + "</ul>";
+
+            },
+            OrderValueRender = (m) => HlidacStatu.Util.RenderData.OrderValueFormat(m.Value.Count()),
+            //CssClass = "text-nowrap overflow-x-hidden "
+        }
+    );
+
+
+    foreach (var kv in vsechnyPlaty)
+    {
+        //var platyPerPolitik = vsechnyPlaty.Where(m => m.Nameid == pol).ToArray();
+        if (kv.Value.Any())
+        {
+            rds.AddRow(kv);
+
+        }
+    }
+}
+
+<section class="d-flex align-items-center justify-content-center  @(GetBgClass()) pageblock-small">
+    <div class="container">
+        <p>
+        @Html.DataToHTMLTable(rds,
+        dataTableOptions: HtmlExtensions.DatatableOptions(orderColumnIdx: 2, orderDirection: "desc", dom: "<\"top\"Bfp>rt<\"bottom\"ip><\"clear\">"))
+    </p>
+    </div>
+</section>
+
+<section class="d-flex align-items-center justify-content-center  @(GetBgClass()) pageblock">
+    <div class="container">
+        <p class="lead">@Html.Raw(ViewData["noteHtml"])</p>
+
+    </div>
+</section>

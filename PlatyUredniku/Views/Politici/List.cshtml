@@ -1,0 +1,209 @@
+﻿@model (PpRepo.PoliticianGroup Group, int Year, int top, string sort, string report)
+
+@using Devmasters.Enums
+@using HlidacStatu.Entities
+@using HlidacStatu.Extensions
+@using HlidacStatu.Repositories
+@using HlidacStatu.XLib.Render
+@using HlidacStatu.Util
+@using PlatyUredniku.Cache
+
+@{
+    //reporty parameters templates
+    var group = Model.Group;
+    var year = Model.Year;
+    var top = Model.top;
+    var sort = Model.sort;
+    var report = Model.report;
+
+    bool showGroupsButtons = (top > (int.MaxValue - 10)) && string.IsNullOrEmpty(sort) && string.IsNullOrEmpty(report);
+
+    string grouName = group.ToNiceDisplayName();
+
+    List<string> nameIdFilter = [];
+    if (group == PpRepo.PoliticianGroup.Vse)
+    {
+
+        ViewBag.Title = $"Seznam platů politiků";
+
+    }
+    else
+    {
+        nameIdFilter = await PpRepo.GetNameIdsForGroupAsync(group, year);
+        ViewBag.Title = $"Seznam platů politiků - " + group.ToNiceDisplayName();
+    }
+    Dictionary<string, PpPrijem[]> vsechnyPlaty = null;
+
+    switch (report)
+    {
+        case "zeny":
+            ViewBag.Title = "Pouze političky";
+            vsechnyPlaty = await PpRepo.GetPrijmyBySexAsync(true, true, year);
+            break;
+        case "muzi":
+            ViewBag.Title = "Pouze politici";
+            vsechnyPlaty = await PpRepo.GetPrijmyBySexAsync(false, true, year);
+            break;
+        case "transparentnost":
+            top = 100;
+            ViewBag.Title = "Politici nejvíce tající své příjmy";
+            vsechnyPlaty = await PpRepo.GetPrijmyGroupedByNameIdAsync(year, true);
+            vsechnyPlaty = vsechnyPlaty
+                .OrderByDescending(kv => kv.Value.Count(m => m.Status == PpPrijem.StatusPlatu.Zjistujeme_zadost_106))
+                .Take(top)
+                .ToDictionary(kv => kv.Key, kv => kv.Value);
+            break;
+        case "top-prijem":
+            top = 100;
+            sort = "celkem";
+            break;
+        case "top-funkce":
+            top = 100;
+            sort = "funkce";
+            break;
+    }
+
+    if (vsechnyPlaty == null)
+    {
+        vsechnyPlaty = await PpRepo.GetPrijmyGroupedByNameIdAsync(year, true, onlyNameIds: nameIdFilter.ToArray());
+    }
+
+    var dataToRender = vsechnyPlaty.AsQueryable();
+
+    dataToRender = sort switch
+    {
+        "name" => dataToRender.OrderBy(o => OsobyRolesCache.Get(o.Key,year).Prijmeni),
+        "role" => dataToRender.OrderBy(o => OsobyRolesCache.Get(o.Key,year).Role),
+        "funkce" => dataToRender.OrderByDescending(o => o.Value.Count()),
+        "celkem" => dataToRender.OrderByDescending(o => o.Value.Sum(m => m.CelkoveRocniNakladyNaPolitika)),
+        _ => dataToRender.OrderByDescending(o => o.Value.Sum(m => m.CelkoveRocniNakladyNaPolitika))
+    };
+
+
+    ReportDataSource<KeyValuePair<string, PpPrijem[]>> rds = new(
+        new ReportDataSource<KeyValuePair<string, PpPrijem[]>>.Column()
+        {
+            Name = "Politik",
+            HtmlRender = (m) =>
+            {
+                return $"<a href='/politici/politik/{m.Key}'>{OsobyRolesCache.Get(m.Key).FullName}</a>";
+            },
+            OrderValueRender = (m) =>
+            {
+                return $"{OsobyRolesCache.Get(m.Key).Prijmeni} {OsobyRolesCache.Get(m.Key).Jmeno}";
+            },
+        },
+        new ReportDataSource<KeyValuePair<string, PpPrijem[]>>.Column()
+        {
+            Name = "Politické role",
+            HtmlRender = (m) => OsobyRolesCache.Get(m.Key).Role,
+            OrderValueRender = (m) => OsobyRolesCache.Get(m.Key).Role,
+        },
+        new ReportDataSource<KeyValuePair<string, PpPrijem[]>>.Column()
+        {
+            Name = "Celkový roční příjem",
+            HtmlRender = (m) =>
+            {
+                return $"<a href='/politici/politik/{m.Key}'>{HlidacStatu.Util.RenderData.NicePrice(m.Value.Sum(v => v.CelkoveRocniNakladyNaPolitika), html: true)}</a>";
+            },
+            OrderValueRender = (m) => HlidacStatu.Util.RenderData.OrderValueFormat(m.Value.Sum(v => v.CelkoveRocniNakladyNaPolitika)),
+            CssClass = "number"
+        },
+        new ReportDataSource<KeyValuePair<string, PpPrijem[]>>.Column()
+        {
+            Name = "Působí v organizacích (řazeno podle počtu)",
+            HtmlRender = (m) =>
+            {
+                return "<ol>" + string.Join("", m.Value
+                                            .Select(n => n.Organizace)
+                                            .Distinct()
+                                            .Select(o => $"<li><a href='/politici/organizace/{o?.DS}'>{o?.Nazev}</a></li>")
+                                            ) + "</ul>";
+
+            },
+            OrderValueRender = (m) => HlidacStatu.Util.RenderData.OrderValueFormat(m.Value.Count()),
+            //CssClass = "text-nowrap overflow-x-hidden "
+        }
+    );
+
+
+    if (top < int.MaxValue - 3)
+        dataToRender = dataToRender.Take(top);
+
+    var data = dataToRender.ToArray();
+    foreach (var kv in data)
+    {
+        //var platyPerPolitik = vsechnyPlaty.Where(m => m.Nameid == pol).ToArray();
+        if (kv.Value.Any())
+        {
+            rds.AddRow(kv);
+
+        }
+    }
+}
+
+
+@section breadcrumbs
+{
+    <ol class="breadcrumb">
+        <li>
+            <a asp-action="Index" asp-controller="Home">Platy</a>
+        </li>
+        <li>
+            <a asp-action="Index" asp-controller="Politici">Platy politiků</a>
+        </li>
+        @if (showGroupsButtons)
+        {
+            <li>Seznam politiků</li>
+        }
+        else
+        {
+            <li>
+                <a asp-action="Reporty" asp-controller="Politici">Reporty a statistiky</a>
+            </li>
+        }
+        <li class="active">
+            @ViewBag.Title
+        </li>
+    </ol>
+}
+
+@section Scripts
+{
+    <link rel="stylesheet" type="text/css" href="//cdn.datatables.net/1.13.4/css/jquery.dataTables.css" />
+    <script type="text/javascript" charset="utf8" src="//cdn.datatables.net/1.13.4/js/jquery.dataTables.js"></script>
+}
+
+<section class="d-flex align-items-center justify-content-center pageblock">
+    <div class="container">
+        <h2>@ViewBag.Title </h2>
+
+        @if (showGroupsButtons)
+        {
+            <div class="row mb-3">
+                @{
+                    var groupList = new PpRepo.PoliticianGroup[]
+                    {
+                        PpRepo.PoliticianGroup.Vse,
+                        PpRepo.PoliticianGroup.Vlada,
+                        PpRepo.PoliticianGroup.Poslanci,
+                        PpRepo.PoliticianGroup.Senatori,
+                        PpRepo.PoliticianGroup.KrajstiZastupitele,
+                    };
+                }
+                @foreach (var item in groupList)
+                {
+                    <a class="btn btn@(group == item ? "" : "-outline")-primary btn-sm col @(group == item ? "disabled" : "")" href="/politici/seznam/@(item.ToString())?year=@(PpRepo.DefaultYear)" role="button">
+                        @(item.ToNiceDisplayName())
+                    </a>
+                }
+            </div>
+        }
+        <div>
+            <p>
+                @Html.DataToHTMLTable(rds,
+                dataTableOptions: HtmlExtensions.DatatableOptions(orderColumnIdx: 2, orderDirection: "desc", dom: "<\"top\"Bfp>rt<\"bottom\"ip><\"clear\">"))
+            </p>
+        </div>
+    </div>
+</section>

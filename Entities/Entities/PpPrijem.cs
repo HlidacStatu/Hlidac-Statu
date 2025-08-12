@@ -16,6 +16,8 @@ public class PpPrijem
     [Devmasters.Enums.ShowNiceDisplayName]
     public enum StatusPlatu
     {
+        [Devmasters.Enums.NiceDisplayName("Na tento příjem jsme se organizace neptali")]
+        Prijem_nezjistovali_jsme = -3,
         [Devmasters.Enums.NiceDisplayName("Příjem od politika, který jsme nepřijali jako správný")]
         Prijem_od_politika_neodsouhlaseny = -2,
         [Devmasters.Enums.NiceDisplayName("Příjem od politika, který jsme zatím nezkontrolovali")]
