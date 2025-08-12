@@ -203,6 +203,7 @@ public class PoliticiController : Controller
             {
                 CelkovyRocniPrijem = politikPlatyKvp.Value.Sum(p => p.CelkovyRocniPlatVcetneOdmen),
                 Politik = $"<a href='/politici/politik/{osoba.NameId}'>{osoba.FullName()}</a>",
+                Politik_Sort = $"{osoba.Prijmeni}-{osoba.Jmeno}",
                 PocetJobu = politikPlatyKvp.Value.Length,
                 Pohlavi = osoba.Pohlavi,
                 PolitickaRole = osoba.MainRolesToString(PpRepo.DefaultYear),
@@ -261,6 +262,8 @@ public class PoliticiController : Controller
     public class PoliticiViewData
     {
         public string Politik { get; set; }
+        [HtmlTableDefinition.Column(HtmlTableDefinition.ColumnType.Hidden, "PolitikSort")]
+        public string Politik_Sort { get; set; }
         
         [HtmlTableDefinition.Column(HtmlTableDefinition.ColumnType.Text, "Politická role")]
         public string PolitickaRole { get; set; }
