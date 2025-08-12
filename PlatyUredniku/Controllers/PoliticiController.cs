@@ -99,8 +99,8 @@ public partial class PoliticiController : Controller
         
         // parties + "Ostatní"
         var parties = politickeStranyFilterData;
-        parties.Insert(0, "Všechny");
-        parties.Add("Ostatní");
+        if(!parties.Contains("Všechny")) parties.Insert(0, "Všechny");
+        if(!parties.Contains("Ostatní")) parties.Add("Ostatní");
 
         // Initialize filter
         var model = new DataTableFilter
