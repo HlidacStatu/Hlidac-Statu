@@ -98,9 +98,9 @@ public partial class PoliticiController : Controller
         var filteredPoliticiViewData = FilterPoliticiViewData(fullPoliticiViewData, politickeStranyFilterData);
         
         // parties + "Ostatní"
-        var parties = politickeStranyFilterData.ToList();
-        if (!parties.Contains("Ostatní", StringComparer.InvariantCultureIgnoreCase))
-            parties.Add("Ostatní");
+        var parties = politickeStranyFilterData;
+        parties.Insert(0, "Všechny");
+        parties.Add("Ostatní");
 
         // Initialize filter
         var model = new DataTableFilter
@@ -114,8 +114,8 @@ public partial class PoliticiController : Controller
                     Key = "politicianGroups",
                     Label = "Politická role",
                     Multiple = false,
-                    Options = new List<DataTableFilters.FilterOption>
-                    {
+                    Options =
+                    [
                         new() { Value = "všichni", Label = "Všichni" },
                         new() { Value = "předseda vlády" },
                         new() { Value = "ministr" },
@@ -124,8 +124,8 @@ public partial class PoliticiController : Controller
                         new() { Value = "europoslanec" },
                         new() { Value = "hejtman" },
                         new() { Value = "krajský zastupitel" }
-                    },
-                    Initial = new[] { "všichni" }
+                    ],
+                    Initial = ["všichni"]
                 },
                 new DataTableFilters.RangeFilterField
                 {
@@ -150,9 +150,9 @@ public partial class PoliticiController : Controller
                 {
                     Key = "party",
                     Label = "Politická strana",
-                    Multiple = true,
+                    Multiple = false,
                     Options = parties.Select(p => new DataTableFilters.FilterOption { Value = p, Label = p }).ToList(),
-                    Initial = parties.ToArray() // start with all selected incl. "Ostatní"
+                    Initial = ["Všechny"]
                 },
                 new DataTableFilters.ChoiceFilterField
                 {
@@ -197,7 +197,7 @@ public partial class PoliticiController : Controller
         var parties = q.Choices("party");
         var groups = q.Choices("politicianGroups");
 
-        IEnumerable<PoliticiViewData> filtered = resultData;
+        IEnumerable<PoliticiViewData> filteredData = resultData;
 
         // Gender
         if (genders.Length > 0)
@@ -211,20 +211,20 @@ public partial class PoliticiController : Controller
                 else norm.Add(g); // assume already "m"/"f"
             }
 
-            filtered = filtered.Where(d => norm.Contains(d.Pohlavi));
+            filteredData = filteredData.Where(d => norm.Contains(d.Pohlavi));
         }
 
         // Ranges
-        if (incomeFrom.HasValue) filtered = filtered.Where(d => d.CelkovyRocniPrijem >= incomeFrom.Value);
-        if (incomeTo.HasValue) filtered = filtered.Where(d => d.CelkovyRocniPrijem <= incomeTo.Value);
-        if (jobsFrom.HasValue) filtered = filtered.Where(d => d.PocetJobu >= jobsFrom.Value);
-        if (jobsTo.HasValue) filtered = filtered.Where(d => d.PocetJobu <= jobsTo.Value);
+        if (incomeFrom.HasValue) filteredData = filteredData.Where(d => d.CelkovyRocniPrijem >= incomeFrom.Value);
+        if (incomeTo.HasValue) filteredData = filteredData.Where(d => d.CelkovyRocniPrijem <= incomeTo.Value);
+        if (jobsFrom.HasValue) filteredData = filteredData.Where(d => d.PocetJobu >= jobsFrom.Value);
+        if (jobsTo.HasValue) filteredData = filteredData.Where(d => d.PocetJobu <= jobsTo.Value);
 
         // Party including "Ostatní" handling
-        if (parties.Length > 0)
+        if (parties.Length > 0 && !parties.Contains("Všechny", StringComparer.InvariantCultureIgnoreCase))
         {
             var partiesSet = new HashSet<string>(parties, StringComparer.InvariantCultureIgnoreCase);
-            filtered = filtered.Where(d =>
+            filteredData = filteredData.Where(d =>
             {
                 if (partiesSet.Contains(d.PolitickaStrana)) return true;
 
@@ -240,11 +240,11 @@ public partial class PoliticiController : Controller
         // Groups
         if (groups.Length > 0 && !groups.Contains("všichni", StringComparer.InvariantCultureIgnoreCase))
         {
-            filtered = filtered.Where(d =>
+            filteredData = filteredData.Where(d =>
                 groups.Any(g => d.PolitickaRole.Contains(g, StringComparison.InvariantCultureIgnoreCase)));
         }
 
-        return filtered.ToList();
+        return filteredData.ToList();
     }
 
     private async Task<List<PoliticiViewData>> GetFullPoliticiViewData()
