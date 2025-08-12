@@ -21,7 +21,6 @@ public class HtmlTableDefinition
         Text,
         Number,
         Price,
-        Hidden,
-        Sort
+        Hidden
     }
 }

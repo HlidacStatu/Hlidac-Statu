@@ -2,8 +2,11 @@
 @using System.Text.Json
 @using PlatyUredniku.DataTable
 
+@model DataTableFilter
+
+
 @{
-// ===== Columns & sorting meta (place at the top of the file) =====
+  // ===== Columns & sorting meta =====
   var items = (Model.InitialData as System.Collections.IEnumerable)?.Cast<object>().ToList() ?? new List<object>();
   var rowType = items.FirstOrDefault()?.GetType();
 
@@ -13,14 +16,14 @@
     foreach (var p in rowType.GetProperties(BindingFlags.Instance | BindingFlags.Public))
     {
       var attr = p.GetCustomAttribute<HtmlTableDefinition.ColumnAttribute>();
-      var isHiddenAttr = attr?.Type == HtmlTableDefinition.ColumnType.Hidden || attr?.Type == HtmlTableDefinition.ColumnType.Sort;
+      var isHiddenAttr = attr?.Type == HtmlTableDefinition.ColumnType.Hidden;
       var isHiddenByName = p.Name.EndsWith("_Sort", StringComparison.Ordinal);
       if (!isHiddenAttr && !isHiddenByName)
         visibleProps.Add((p, attr));
     }
   }
 
-// Build hidden sort siblings ONCE and map visibleIndex -> hiddenDtIndex
+  // Build hidden sort siblings ONCE and map visibleIndex -> hiddenDtIndex
   var hiddenSortProps = new List<PropertyInfo>();
   var sortIndexMap = new Dictionary<int, int>(); // visible idx -> DT absolute idx of hidden column
 
@@ -85,8 +88,16 @@
   string HeaderTitle((PropertyInfo Prop, HtmlTableDefinition.ColumnAttribute? Attr) c)
     => c.Attr?.Name ?? c.Prop.Name;
 }
+<style>
+  #filterAccordion .accordion-button:not(.collapsed) {
+    background-color: transparent !important;
+    color: inherit;
+    box-shadow: none;
+  }
+</style>
 
 <div class="row">
+  @* Filter *@
   <div class="col-2">
     <form id="@Model.FormId" class="my-4">
       <div class="accordion" id="filterAccordion">
@@ -105,7 +116,7 @@
               </h2>
               <div id="collapse-@paneId" class="accordion-collapse collapse" aria-labelledby="heading-@paneId">
                 <div class="accordion-body">
-                  @filter.Draw()
+                  @filter.Render()
                 </div>
               </div>
             </div>
@@ -114,7 +125,8 @@
       </div>
     </form>
   </div>
-
+  
+  @* DataTable *@
   <div class="col-10">
     <table id="@Model.TableId" class="table table-striped table-bordered">
       <thead>

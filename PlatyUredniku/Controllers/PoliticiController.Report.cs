@@ -1,24 +1,13 @@
-using HlidacStatu.Entities;
-using HlidacStatu.ExportData;
-using HlidacStatu.Extensions;
 using HlidacStatu.Lib.Web.UI.Attributes;
 using HlidacStatu.Repositories;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using Schema.NET;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text.Json;
 using System.Threading.Tasks;
-using ZiggyCreatures.Caching.Fusion;
-using static HlidacStatu.Repositories.PpRepo;
 
 namespace PlatyUredniku.Controllers;
 
 [Authorize(Roles = "Admin")]
-public partial class PoliticiController : Controller
+public partial class PoliticiController
 {
 
 
