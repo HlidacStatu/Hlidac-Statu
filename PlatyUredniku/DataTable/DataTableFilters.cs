@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Text.Encodings.Web;
+using System.Text.Json;
 using Microsoft.AspNetCore.Html;
 
 namespace PlatyUredniku.DataTable;
@@ -143,4 +144,48 @@ public sealed class DataTableFilter
     public object? InitialData { get; init; }
     public string FormId { get; init; } = "filterForm";
     public string TableId { get; init; } = "myFilteredTable";
+    
+    public IHtmlContent RenderResetButton()
+    {
+        var initialValues = new Dictionary<string, object?>();
+
+        foreach (var filter in Filters)
+        {
+            switch (filter)
+            {
+                case DataTableFilters.ChoiceFilterField choiceFilter:
+                    if (choiceFilter.Initial is not null)
+                    {
+                        initialValues[choiceFilter.Key] = choiceFilter.Initial;
+                    }
+                    break;
+                case DataTableFilters.RangeFilterField rangeFilter:
+                    if (rangeFilter.Initial.HasValue)
+                    {
+                        initialValues[rangeFilter.Key + "From"] = rangeFilter.Initial.Value.From;
+                        initialValues[rangeFilter.Key + "To"] = rangeFilter.Initial.Value.To;
+                    }
+                    break;
+                case DataTableFilters.TextFilterField textFilter:
+                    if (textFilter.Initial is not null)
+                    {
+                        initialValues[textFilter.Key] = textFilter.Initial;
+                    }
+                    break;
+            }
+        }
+        
+        var jsonOptions = new JsonSerializerOptions(JsonSerializerDefaults.Web);
+        var json = JsonSerializer.Serialize(initialValues, jsonOptions);
+
+        var buttonHtml = $"""
+                          <div class="d-grid gap-2">
+                            <button type="button" class="btn btn-sm btn-secondary mt-3" id="resetFiltersButton" data-init='{HtmlEncoder.Default.Encode(json)}'>
+                              Resetovat filtry
+                            </button>
+                          </div>
+                          """;
+
+        return new HtmlString(buttonHtml);
+    }
 }

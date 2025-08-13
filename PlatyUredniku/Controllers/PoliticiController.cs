@@ -130,7 +130,7 @@ public partial class PoliticiController : Controller
                 new DataTableFilters.RangeFilterField
                 {
                     Key = "totalIncome",
-                    Label = "Celkový roční příjem",
+                    Label = "Roční příjem + náhrady",
                     Min = 0,
                     Max = maxTotalIncome,
                     Step = 10_000,

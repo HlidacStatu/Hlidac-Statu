@@ -123,6 +123,7 @@
           }
         }
       </div>
+      @Model.RenderResetButton()
     </form>
   </div>
   
@@ -215,5 +216,35 @@
       fetchAndRender();
     });
     form.on('input.filters', 'input[type=number], input[type=range], input[type=text], input[type=search]', fetchAndRender);
+
+    $('#resetFiltersButton').on('click', function() {
+      const initialValues = JSON.parse($(this).attr('data-init'));
+
+      for (const key in initialValues) {
+        const value = initialValues[key];
+
+        // Resetování ChoiceFilterField (radio, checkbox)
+        if (Array.isArray(value)) {
+          // Checkboxy
+          if ($(`input[name="${key}"][type="checkbox"]`).length > 0) {
+            $(`input[name="${key}"][type="checkbox"]`).prop('checked', false);
+            value.forEach(v => {
+              $(`input[name="${key}"][value="${v}"]`).prop('checked', true);
+            });
+          }
+          // Radio buttony
+          else if ($(`input[name="${key}"][type="radio"]`).length > 0) {
+            $(`input[name="${key}"][value="${value[0]}"]`).prop('checked', true);
+          }
+        }
+        // Resetování TextFilterField a RangeFilterField
+        else {
+          $(`input[name="${key}"]`).val(value);
+        }
+      }
+
+      // Aktualizace tabulky po resetování
+      fetchAndRender();
+    });
   });
 </script>
