@@ -111,7 +111,7 @@ public partial class PoliticiController : Controller
             {
                 new DataTableFilters.ChoiceFilterField
                 {
-                    Key = "politicianGroups",
+                    Key = FilterKeys.PoliticianGroups,
                     Label = "Politická role",
                     Multiple = false,
                     Options =
@@ -129,7 +129,7 @@ public partial class PoliticiController : Controller
                 },
                 new DataTableFilters.RangeFilterField
                 {
-                    Key = "totalIncome",
+                    Key = FilterKeys.TotalIncome,
                     Label = "Roční příjem + náhrady",
                     Min = 0,
                     Max = maxTotalIncome,
@@ -139,7 +139,7 @@ public partial class PoliticiController : Controller
                 },
                 new DataTableFilters.RangeFilterField
                 {
-                    Key = "jobCount",
+                    Key = FilterKeys.JobCount,
                     Label = "Počet jobů",
                     Min = 0,
                     Max = maxJobCount,
@@ -148,7 +148,7 @@ public partial class PoliticiController : Controller
                 },
                 new DataTableFilters.ChoiceFilterField
                 {
-                    Key = "party",
+                    Key = FilterKeys.Party,
                     Label = "Politická strana",
                     Multiple = false,
                     Options = parties.Select(p => new DataTableFilters.FilterOption { Value = p, Label = p }).ToList(),
@@ -156,7 +156,7 @@ public partial class PoliticiController : Controller
                 },
                 new DataTableFilters.ChoiceFilterField
                 {
-                    Key = "gender",
+                    Key = FilterKeys.Gender,
                     Label = "Pohlaví",
                     Multiple = true,
                     Options =
@@ -191,11 +191,11 @@ public partial class PoliticiController : Controller
         var q = HttpContext.Request.Query;
 
         // Read generic filters (names come from your FilterField.Key values)
-        var genders = q.Choices("gender"); // ["m","f"] or ["muž","žena"] depending on your UI
-        var (incomeFrom, incomeTo) = q.RangeDecimal("totalIncome");
-        var (jobsFrom, jobsTo) = q.RangeInt("jobCount");
-        var parties = q.Choices("party");
-        var groups = q.Choices("politicianGroups");
+        var genders = q.Choices(FilterKeys.Gender); // ["m","f"] or ["muž","žena"] depending on your UI
+        var (incomeFrom, incomeTo) = q.RangeDecimal(FilterKeys.TotalIncome);
+        var (jobsFrom, jobsTo) = q.RangeInt(FilterKeys.JobCount);
+        var parties = q.Choices(FilterKeys.Party);
+        var groups = q.Choices(FilterKeys.PoliticianGroups);
 
         IEnumerable<PoliticiViewData> filteredData = resultData;
 
@@ -338,5 +338,14 @@ public partial class PoliticiController : Controller
 
         [HtmlTableDefinition.Column(HtmlTableDefinition.ColumnType.Text, "Politická strana")]
         public string PolitickaStrana { get; set; }
+    }
+    
+    public static class FilterKeys
+    {
+        public const string PoliticianGroups = "politicianGroups";
+        public const string TotalIncome = "totalIncome";
+        public const string JobCount = "jobCount";
+        public const string Party = "party";
+        public const string Gender = "gender";
     }
 }
