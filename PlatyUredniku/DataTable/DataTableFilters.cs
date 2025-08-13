@@ -84,8 +84,8 @@ public sealed class DataTableFilters
             var toValAttr = to.HasValue ? $@" value=""{RenderDecimal(to.Value)}""" : string.Empty;
 
             var html = $$"""
-                         <div class="row g-2 align-items-center">
-                           <div class="col">
+                         <div class="g-2 align-items-center">
+                           <div>
                              <label class="form-label mb-1" for="{{htmlEncoder.Encode($"{Key}From")}}">od {{htmlEncoder.Encode(Unit ?? "")}}</label>
                              <input class="form-control form-control-sm" type="number"
                                     id="{{htmlEncoder.Encode($"{Key}From")}}"
@@ -93,7 +93,7 @@ public sealed class DataTableFilters
                                     min="{{RenderDecimal(Min)}}"
                                     max="{{RenderDecimal(Max)}}"{{stepAttr}}{{fromValAttr}}>
                            </div>
-                           <div class="col">
+                           <div>
                              <label class="form-label mb-1" for="{{htmlEncoder.Encode($"{Key}To")}}">do {{htmlEncoder.Encode(Unit ?? "")}}</label>
                              <input class="form-control form-control-sm" type="number"
                                     id="{{htmlEncoder.Encode($"{Key}To")}}"

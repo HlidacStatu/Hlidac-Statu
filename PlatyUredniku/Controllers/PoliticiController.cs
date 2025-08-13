@@ -93,7 +93,7 @@ public partial class PoliticiController : Controller
         var politickeStranyFilterData = GetPolitickeStranyForFilter();
 
         var maxJobCount = (int)fullPoliticiViewData.Max(x => x.PocetJobu) + 1;
-        var maxTotalIncome = (int)fullPoliticiViewData.Max(x => x.CelkoveRocniNaklady) + 1;
+        var maxTotalIncomeInMilions = Math.Ceiling((fullPoliticiViewData.Max(x => x.CelkoveRocniNaklady) + 1) / 1_000_000);
 
         var filteredPoliticiViewData = FilterPoliticiViewData(fullPoliticiViewData, politickeStranyFilterData);
         
@@ -132,10 +132,10 @@ public partial class PoliticiController : Controller
                     Key = FilterKeys.TotalIncome,
                     Label = "Roční příjem + náhrady",
                     Min = 0,
-                    Max = maxTotalIncome,
-                    Step = 10_000,
-                    Initial = (0, maxTotalIncome),
-                    Unit = "Kč"
+                    Max = maxTotalIncomeInMilions,
+                    Step = 0.5m,
+                    Initial = (0, maxTotalIncomeInMilions),
+                    Unit = "mil. Kč"
                 },
                 new DataTableFilters.RangeFilterField
                 {
@@ -215,8 +215,8 @@ public partial class PoliticiController : Controller
         }
 
         // Ranges
-        if (incomeFrom.HasValue) filteredData = filteredData.Where(d => d.CelkoveRocniNaklady >= incomeFrom.Value);
-        if (incomeTo.HasValue) filteredData = filteredData.Where(d => d.CelkoveRocniNaklady <= incomeTo.Value);
+        if (incomeFrom.HasValue) filteredData = filteredData.Where(d => d.CelkoveRocniNaklady >= incomeFrom.Value * 1_000_000m);
+        if (incomeTo.HasValue) filteredData = filteredData.Where(d => d.CelkoveRocniNaklady <= incomeTo.Value * 1_000_000m);
         if (jobsFrom.HasValue) filteredData = filteredData.Where(d => d.PocetJobu >= jobsFrom.Value);
         if (jobsTo.HasValue) filteredData = filteredData.Where(d => d.PocetJobu <= jobsTo.Value);
 

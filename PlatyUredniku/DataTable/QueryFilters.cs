@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Primitives;
@@ -23,7 +24,7 @@ static class QueryFilters
         => q.TryGetValue(key, out var v) && int.TryParse(v, out var n) ? n : null;
 
     private static decimal? TryParseDecimal(IQueryCollection q, string key)
-        => q.TryGetValue(key, out var v) && decimal.TryParse(v, out var n) ? n : null;
+        => q.TryGetValue(key, out var v) && decimal.TryParse(v, NumberStyles.Number, CultureInfo.InvariantCulture, out var n) ? n : null;
 
     public static bool ContainsCI(this IEnumerable<string> src, string value)
         => src is ISet<string> set ? set.Contains(value) : src.Contains(value, CI);
