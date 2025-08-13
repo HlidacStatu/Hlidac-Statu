@@ -121,7 +121,7 @@ public partial class PoliticiController : Controller
                         new() { Value = "ministr" },
                         new() { Value = "poslanec" },
                         new() { Value = "senátor" },
-                        new() { Value = "europoslanec" },
+                        // new() { Value = "europoslanec" },
                         new() { Value = "hejtman" },
                         new() { Value = "krajský zastupitel" }
                     ],
