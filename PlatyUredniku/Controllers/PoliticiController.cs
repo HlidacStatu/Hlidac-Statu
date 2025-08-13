@@ -93,7 +93,7 @@ public partial class PoliticiController : Controller
         var politickeStranyFilterData = GetPolitickeStranyForFilter();
 
         var maxJobCount = (int)fullPoliticiViewData.Max(x => x.PocetJobu) + 1;
-        var maxTotalIncome = (int)fullPoliticiViewData.Max(x => x.CelkovyRocniPrijem) + 1;
+        var maxTotalIncome = (int)fullPoliticiViewData.Max(x => x.CelkoveRocniNaklady) + 1;
 
         var filteredPoliticiViewData = FilterPoliticiViewData(fullPoliticiViewData, politickeStranyFilterData);
         
@@ -215,8 +215,8 @@ public partial class PoliticiController : Controller
         }
 
         // Ranges
-        if (incomeFrom.HasValue) filteredData = filteredData.Where(d => d.CelkovyRocniPrijem >= incomeFrom.Value);
-        if (incomeTo.HasValue) filteredData = filteredData.Where(d => d.CelkovyRocniPrijem <= incomeTo.Value);
+        if (incomeFrom.HasValue) filteredData = filteredData.Where(d => d.CelkoveRocniNaklady >= incomeFrom.Value);
+        if (incomeTo.HasValue) filteredData = filteredData.Where(d => d.CelkoveRocniNaklady <= incomeTo.Value);
         if (jobsFrom.HasValue) filteredData = filteredData.Where(d => d.PocetJobu >= jobsFrom.Value);
         if (jobsTo.HasValue) filteredData = filteredData.Where(d => d.PocetJobu <= jobsTo.Value);
 
@@ -264,7 +264,7 @@ public partial class PoliticiController : Controller
 
                     politiciViewData.Add(new PoliticiViewData()
                     {
-                        CelkovyRocniPrijem = politikPlatyKvp.Value.Sum(p => p.CelkovyRocniPlatVcetneOdmen),
+                        CelkoveRocniNaklady = politikPlatyKvp.Value.Sum(p => p.CelkoveRocniNakladyNaPolitika),
                         Politik = $"<a href='/politici/politik/{osoba.NameId}'>{osoba.FullName()}</a>",
                         Politik_Sort = $"{osoba.Prijmeni}-{osoba.Jmeno}",
                         PocetJobu = politikPlatyKvp.Value.Length,
@@ -325,8 +325,8 @@ public partial class PoliticiController : Controller
         [HtmlTableDefinition.Column(HtmlTableDefinition.ColumnType.Text, "Politická role")]
         public string PolitickaRole { get; set; }
 
-        [HtmlTableDefinition.Column(HtmlTableDefinition.ColumnType.Price, "Celkový roční příjem")]
-        public Decimal CelkovyRocniPrijem { get; set; }
+        [HtmlTableDefinition.Column(HtmlTableDefinition.ColumnType.Price, "Roční příjem + náhrady")]
+        public Decimal CelkoveRocniNaklady { get; set; }
 
         [HtmlTableDefinition.Column(HtmlTableDefinition.ColumnType.Number, "Počet jobů")]
         public Decimal PocetJobu { get; set; }
