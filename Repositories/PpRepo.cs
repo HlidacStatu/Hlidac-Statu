@@ -446,7 +446,7 @@ public static class PpRepo
                 .AsNoTracking()
                 .Where(m => orgsInEvents.Contains(m.Id))
                 .Include(t => t.FirmaDs)
-                .Include(t => t.PrijmyPolitiku.Where(p => p.Rok == rok && p.Status > 0))
+                .Include(t => t.PrijmyPolitiku.Where(p => p.Rok == rok && p.Status >= 0))
                 .Include(t => t.Tags)
                 .Where(m => tag == null || m.Tags.Any(t => t.Tag == tag))
                 .Where(m => ico == null || m.FirmaDs.Ico == ico)
@@ -911,7 +911,7 @@ public static class PpRepo
 
 
         res.PocetOsobMaPlat = await data
-            .Where(m => m.Status > 0)
+            .Where(m => m.Status >= 0)
             .Select(m => m.Nameid)
             .Distinct()
             .CountAsync();
