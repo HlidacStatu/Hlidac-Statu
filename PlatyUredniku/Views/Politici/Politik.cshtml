@@ -354,6 +354,13 @@
                                 <td>@HlidacStatu.Util.RenderData.NicePriceHtml(pprijem.NahradaKancelar ?? 0)</td>
                             </tr>
                         }
+                        @if (pprijem.Prispevky.HasValue)
+                        {
+                            <tr>
+                                <th>Další příspěvky</th>
+                                <td>@HlidacStatu.Util.RenderData.NicePriceHtml(pprijem.Prispevky ?? 0)</td>
+                            </tr>
+                        }
 
                         <tr>
                             <th>
