@@ -137,7 +137,7 @@
                                         @foreach (var prijemPolitika in prijemGroup.Platy.Where(m => m.Status == PpPrijem.StatusPlatu.Zjistujeme_zadost_106))
                                         {
                                             <li>
-                                                <a href="/politici/@prijemPolitika.Nameid">@Osoby.GetByNameId.Get(prijemPolitika.Nameid).FullName()</a>
+                                                <a href="/politici/politik/@prijemPolitika.Nameid">@Osoby.GetByNameId.Get(prijemPolitika.Nameid).FullName()</a>
                                             </li>
                                         }
                                     </ol>
@@ -168,7 +168,7 @@
                                             var politik = Osoby.GetByNameId.Get(prijemPolitika.Nameid);
                                             <tr>
                                                 <td>
-                                                    <a href="/politici/@prijemPolitika.Nameid">@politik.FullName()</a>
+                                                    <a href="/politici/politik/@prijemPolitika.Nameid">@politik.FullName()</a>
                                                 </td>
                                                 <td data-order="@(HlidacStatu.Util.RenderData.OrderValueFormat(prijemPolitika.CelkoveRocniNakladyNaPolitika))"
                                                     class="number text-nowrap">
