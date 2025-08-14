@@ -72,7 +72,7 @@ public class AutocompleteCacheService
 
         var organizaceTask = LoadOrganizace(cancellationToken);
         var oblastTask = LoadOblasti(cancellationToken);
-        var ceoTask = LoadCeos(cancellationToken);
+        //var ceoTask = LoadCeos(cancellationToken);
         var synonymsTask = LoadSynonyms(cancellationToken);
         var politiciTask = LoadPolitici(cancellationToken);
 
@@ -138,7 +138,8 @@ public class AutocompleteCacheService
             .ToListAsync(cancellationToken: cancellationToken);
     }
     
-    private async Task<List<Autocomplete>> LoadCeos(CancellationToken cancellationToken)
+    [Obsolete("CEOs z uredniku v autocomplete uz nechceme")]        
+    private async Task<List<Autocomplete>> obsolete_LoadCeos(CancellationToken cancellationToken)
     {
         await using var db = new DbEntities();
 

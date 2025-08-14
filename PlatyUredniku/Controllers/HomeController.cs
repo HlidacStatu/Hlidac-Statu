@@ -37,18 +37,7 @@ public class HomeController : Controller
     }
 
 
-    [HlidacCache(48 * 60 * 60, "*")]
-    public async Task<IActionResult> Osoba(string id)
-    { 
-        if (string.IsNullOrEmpty(id))
-            return RedirectToAction("Index");
-        Osoba osoba = Osoby.GetByNameId.Get(id);
-        if (osoba == null)
-        {
-            return NotFound();
-        }
-        return View(osoba);
-    }
+
 
         [HlidacCache(48 * 60 * 60, "*")]
     public async Task<IActionResult> Organizace(string id)

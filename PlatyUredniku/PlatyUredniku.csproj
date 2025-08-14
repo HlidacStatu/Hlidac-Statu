@@ -80,4 +80,7 @@
     <Content Remove="AutocompleteCategoryCache_False\**" />
     <Content Remove="AutocompleteCategoryCache_True\**" />
   </ItemGroup>
+  <ItemGroup>
+    <Content Remove="Views\Home\Osoba.cshtml" />
+  </ItemGroup>
 </Project>
