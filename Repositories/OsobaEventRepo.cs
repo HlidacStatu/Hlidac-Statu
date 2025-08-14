@@ -72,7 +72,32 @@ namespace HlidacStatu.Repositories
             
             return query.ToList();
         }
-        
+        public static (Firma Firma, DateTime? From, DateTime? To, string Role)[] GetCeos(Osoba osoba, DateTime? from = null, DateTime? to = null)
+        {
+            using (DbEntities db = new DbEntities())
+            {
+                var ceoQuery = db.OsobaEvent.AsQueryable()
+                    .Where(oe => oe.Ceo == 1 && oe.OsobaId == osoba.InternalId);
+
+                if (from is not null)
+                    ceoQuery = ceoQuery.Where(oe => oe.DatumDo == null || oe.DatumDo >= from);
+
+                if (to is not null)
+                    ceoQuery = ceoQuery.Where(oe => oe.DatumOd == null || oe.DatumOd <= to);
+
+                var ceoEvent = ceoQuery
+                    .OrderByDescending(oe => oe.DatumOd)
+                    .ToArray()
+                    .Select(m => (Firmy.Get(m.Ico), m.DatumOd, m.DatumDo, m.AddInfo))
+                    .ToArray();
+
+                if (ceoEvent is null)
+                    return Array.Empty<(Firma Firma, DateTime? From, DateTime? To, string Role)>();
+
+                return ceoEvent;
+            }
+        }
+
         public static (Osoba Osoba, DateTime? From, DateTime? To, string Role)[] GetCeos(string ico, DateTime? from = null, DateTime? to = null)
         {
             using (DbEntities db = new DbEntities())

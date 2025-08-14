@@ -1,0 +1,193 @@
+@using Devmasters
+@using Devmasters.Enums
+@using HlidacStatu.Entities
+@using HlidacStatu.Lib.Web.UI
+@using HlidacStatu.Repositories
+@using HlidacStatu.Repositories.SharedModels
+@using HlidacStatu.XLib.Render
+@using Microsoft.EntityFrameworkCore
+@using PlatyUredniku.Models
+@using HlidacStatu.Extensions
+
+@model HlidacStatu.Entities.Osoba
+
+@{
+    //mam osobu, musim zjistit, zda byla CEO a pokud ano, tak v jakych firmach a kdy
+    //a pak najit zda k nim mame platy
+
+    var ceos = OsobaEventRepo.GetCeos(Model, null, null);
+
+    await using var db = new DbEntities();
+    
+    //platy uredniku
+    List<PuPlat> platy = new();
+    foreach (var c in ceos.Where(m => HlidacStatu.Util.DataValidators.CheckCZICO(m.Firma?.ICO)))
+    {
+        var fromY = (c.From?.Year ?? PuRepo.MinYear);
+        var toY = (c.To?.Year ?? PuRepo.DefaultYear);
+        for (int y = fromY; y <= toY; y++)
+        {
+            var found = db.PuPlaty
+                .AsNoTracking()
+                .Include(i => i.Organizace).ThenInclude(i=>i.FirmaDs)
+                .Where(p => p.Rok == y && p.Organizace.FirmaDs.Ico == c.Firma.ICO)
+                .Where(m=>m.JeHlavoun == true);
+            if (found.Any())
+            {
+                platy.AddRange(found);
+            }
+        }
+    }
+
+    //prijmy politiku
+
+    var prijmyPolitika = await PpRepo.GetPrijmyPolitika(Model.NameId, PpRepo.DefaultYear);
+
+
+}
+
+@section breadcrumbs
+{
+    <ol class="breadcrumb">
+        <li>
+            <a asp-action="Index" asp-controller="Home">Platy</a>
+        </li>
+        <li class="active">@ViewBag.Title</li>
+    </ol>
+}
+@section Scripts
+{
+    <link rel="stylesheet" type="text/css" href="//cdn.datatables.net/1.13.4/css/jquery.dataTables.min.css" />
+    <script type="text/javascript" charset="utf8"
+            src="//cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
+    <script>
+        function adjustDataTablesWidth() {
+            $.fn.dataTable.tables({visible: true, api: true}).columns.adjust();
+        }
+    </script>
+}
+
+@functions {
+    private bool _sectionBgSwitch = true;
+
+    public string GetBgClass(bool toggle = true)
+    {
+        if (toggle)
+            _sectionBgSwitch = !_sectionBgSwitch;
+
+        return _sectionBgSwitch ? "alter-bg-color" : "";
+    }
+}
+
+<section class="d-flex align-items-center justify-content-center @(GetBgClass()) pageblock-small">
+    <div class="container">
+        <h2 class="pb-2 border-bottom">@Model.FullNameWithYear()</h2>
+
+        <div class="row">
+            <div class="col">
+                <div class="row">
+                </div> @* CEO *@
+            </div>
+            <div class="col">
+            </div>
+        </div>
+    </div>
+</section>
+<section class="d-flex align-items-center justify-content-center @(GetBgClass()) pageblock">
+    <div class="container">
+        <div class="row row-cols-1 row-cols-lg-2 g-2">
+            @if (prijmyPolitika.Any())
+            {
+                <div class="col">
+                    <h4>Příjmy z politických pozic</h4>
+                    <p>
+                        U tohoto politika evidujeme celkové příjmy
+                        <b>@(HlidacStatu.Util.RenderData.NicePrice(prijmyPolitika.Sum(m => m.CelkoveRocniNakladyNaPolitika)))</b>
+                        za rok @(PpRepo.DefaultYear).
+
+                    </p>
+                    <p>
+
+                        <ul>
+                            @foreach (var pr in prijmyPolitika.OrderByDescending(o => o.CelkoveRocniNakladyNaPolitika))
+                            {
+                                <li>
+                                    <a href="/organizace/@(pr.Organizace.Ico)">@(Firmy.GetJmeno(pr.Organizace.Ico))</a>
+
+                                    @if (pr.Status > 0)
+                                    {
+                                        @HlidacStatu.Util.RenderData.NicePriceHtml(pr.CelkovyRocniPlatVcetneOdmen)
+
+                                        if (pr.CelkoveRocniNahrady > 0)
+                                        {
+                                            <span class="text-muted"> + @HlidacStatu.Util.RenderData.NicePriceHtml(pr.CelkoveRocniNahrady) náhrady</span>
+                                        }
+                                    }
+                                    else
+                                    {
+                                        <span class="text-danger">@(pr.Status.ToNiceDisplayName())</span>
+                                    }
+                                </li>
+                            }
+                        </ul>
+
+                    </p>
+                    <p class="text-center">
+                        <a href="/politici/politik/@Model.NameId" class="btn btn-primary my-3">Všechny příjmy politika z politických funkcí detailně</a>
+                    </p>
+                </div>
+            }
+
+            @if (platy?.Count > 0)
+            {
+                int pocetPlatu = platy.Count();
+                <div class="col">
+                    <h4>Platy politika z úřednických pozic</h4>
+                    <p>
+                        U tohoto politika evidujeme
+                        @(Devmasters.Lang.CS.Plural.Get(pocetPlatu, "jeden plat", "{0} platy", "{0} platů"))
+                        za roky @(string.Join(", ", platy.Select(m => m.Rok).Distinct())).
+                    </p>
+                    <p>
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <td>Rok</td>
+                                    <td>Organizace</td>
+                                    <td>Pozice</td>
+                                    <td>Plat</td>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var pl in platy.OrderByDescending(m => m.Rok)
+                                                            .ThenByDescending(o => o.CelkovyRocniPlatVcetneOdmen))
+                                {
+                                    <tr>
+                                        <td>
+                                            @pl.Rok
+                                        </td>
+                                        <td>
+                                            <a href="/urednici/detail/@pl.Organizace.DS">@(Firmy.GetJmeno(pl.Organizace.Ico))</a>
+                                        </td>
+                                        <td>
+                                            <a href="/urednici/plat/@(pl.Id)">@pl.NazevPozice</a>
+                                        </td>
+                                        <td>
+                                            @HlidacStatu.Util.RenderData.NicePriceHtml(pl.CelkovyRocniPlatVcetneOdmen)
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </p>
+                    @* <p class="text-center">
+                        <a href="/urednici/detail/@Model.DS" class="btn btn-info my-3">Všechny platy  @(f.JsemOVM() ? "úředníků" : "manažerů") v této organizaci</a>
+                    </p> *@
+                </div>
+            }
+        </div>
+
+    </div>
+</section>
+
+<div class="pb-3"></div>
