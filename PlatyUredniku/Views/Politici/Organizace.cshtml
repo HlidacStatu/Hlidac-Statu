@@ -1,25 +1,16 @@
-@using Devmasters
-@using Devmasters.Enums
 @using HlidacStatu.Entities
-@using HlidacStatu.Lib.Web.UI
 @using HlidacStatu.Repositories
-@using HlidacStatu.Repositories.SharedModels
-@using HlidacStatu.XLib.Render
 @using PlatyUredniku.Models
 
 @model HlidacStatu.Entities.PuOrganizace
 
 @{
 
-    string mainTag = Model.Tags.FirstOrDefault(t => PpRepo.MainTags.Contains(t.Tag))?.Tag;
     int rok = (int)ViewBag.rok;
 
     string ico = Model.Ico;
     Firma f = Firmy.Get(ico);
     ViewBag.Title = $"Politici v {f.Jmeno} ({rok})";
-
-    var platy = await PpRepo.GetJednotlivePlatyAsync(rok, true, ico);
-
 }
 @section breadcrumbs
 {
