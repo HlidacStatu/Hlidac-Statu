@@ -134,7 +134,8 @@ namespace HlidacStatu.Util
             //    (baseValue, anotherValue) = (anotherValue, baseValue);
             //}
 
-
+            if (baseValue == 0)
+                return 0m;
             decimal percentage = ( anotherValue - baseValue) / baseValue;
             return percentage;
         }

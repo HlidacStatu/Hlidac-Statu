@@ -1,0 +1,132 @@
+﻿@using HlidacStatu.Entities
+@using HlidacStatu.Repositories
+@using HlidacStatu.Util
+@using HlidacStatu.XLib.Render
+@using PlatyUredniku.Cache
+@using MathNet.Numerics.Statistics;
+@{
+    ViewBag.Title = "Politici nejvíce tající svůj příjem";
+}
+@section breadcrumbs
+{
+    <ol class="breadcrumb">
+        <li>
+            <a asp-action="Index" asp-controller="Home">Platy</a>
+        </li>
+        <li>
+            <a asp-action="Index" asp-controller="Politici">Platy politiků</a>
+        </li>
+        <li>
+            <a asp-action="Reporty" asp-controller="Politici">Reporty a statistiky</a>
+        </li>
+        <li class="active">@ViewBag.Title</li>
+    </ol>
+}
+
+
+@functions {
+    private bool _sectionBgSwitch = true;
+
+    public string GetBgClass(bool toggle = true)
+    {
+        if (toggle)
+            _sectionBgSwitch = !_sectionBgSwitch;
+
+        return _sectionBgSwitch ? "alter-bg-color" : "";
+    }
+}
+
+@{
+    var rocniPlatMuzi = (await PpRepo.GetPrijmyBySexAsync(false))
+    .Select(m => m.Value.Where(m => m.Status > 0).Sum(m => m.CelkoveRocniNakladyNaPolitika));
+
+    var rocniPlatZeny = (await PpRepo.GetPrijmyBySexAsync(true))
+        .Select(m => m.Value.Where(m => m.Status > 0).Sum(m => m.CelkoveRocniNakladyNaPolitika));
+
+    var rocniPlatMuziorgs = (await PpRepo.GetPrijmyBySexAsync(false))
+            .Select(m => m.Value.Count());
+
+    var rocniPlatZenyorgs = (await PpRepo.GetPrijmyBySexAsync(true))
+        .Select(m => m.Value.Count());
+
+
+}
+
+
+<section class="d-flex align-items-center justify-content-center  @(GetBgClass()) pageblock-small">
+    <div class="container">
+        <h2>Rozdíly v platech podle pohlaví</h2>
+        <table class="table table-bordered table-striped table-hover">
+            <thead>
+                <tr>
+                    <th></th>
+                    <th>Ženy</th>
+                    <th>Muži</th>
+                    <th>Rozdíl v %</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td class="text-nowrap">Počet</td>
+                    <td class="number">@(RenderData.NiceNumber(rocniPlatZeny.Count()))</td>
+                    <td class="number">@(RenderData.NiceNumber(rocniPlatMuzi.Count()))</td>
+                    <td class="number">
+                        Žen je @MathTools.DifferenceInPercentText(rocniPlatMuzi.Count(), rocniPlatZeny.Count(), lower:"méně",bigger:"více")
+                    </td>
+                </tr>
+                <tr>
+                    <td class="text-nowrap">Průměrný počet přijmů</td>
+                    <td class="number">@(RenderData.NiceNumber((decimal)rocniPlatZenyorgs.Average()))</td>
+                    <td class="number">@(RenderData.NiceNumber((decimal)rocniPlatMuziorgs.Average()))</td>
+                    <td class="number">
+                        Ženy jich mají @MathTools.DifferenceInPercentText((decimal)rocniPlatMuziorgs.Average(), (decimal)rocniPlatZenyorgs.Average(), lower: "méně", bigger: "více")
+                    </td>
+                </tr>
+                <tr>
+                    <td class="text-nowrap">Průměrný roční příjem</td>
+                    <td class="number">@(RenderData.NicePriceHtml(rocniPlatZeny.Average(), shortFormat: true, showDecimal: RenderData.ShowDecimalVal.Show))</td>
+                    <td class="number">@(RenderData.NicePriceHtml(rocniPlatMuzi.Average(), shortFormat: true, showDecimal: RenderData.ShowDecimalVal.Show))</td>
+                    <td class="number">
+                        Ženy @MathTools.DifferenceInPercentText(rocniPlatMuzi.Average(), rocniPlatZeny.Average())
+                    </td>
+                </tr>
+
+                <tr>
+                    <td class="text-nowrap">Nejvyšší příjem</td>
+                    <td class="number">@(RenderData.NicePriceHtml(rocniPlatZeny.Max(), shortFormat: true, showDecimal: RenderData.ShowDecimalVal.Show))</td>
+                    <td class="number">@(RenderData.NicePriceHtml(rocniPlatMuzi.Max(), shortFormat: true, showDecimal: RenderData.ShowDecimalVal.Show))</td>
+                    <td class="number">
+                        Ženy @MathTools.DifferenceInPercentText(rocniPlatMuzi.Max(), rocniPlatZeny.Max())
+                    </td>
+                </tr>
+                <tr>
+                    <td class="text-nowrap">Příjem poloviny osob je vyšší než </td>
+                    <td class="number">@(RenderData.NicePriceHtml(MathTools.PercentileCont(0.50m, rocniPlatZeny), shortFormat:true, showDecimal: RenderData.ShowDecimalVal.Show ))</td>
+                    <td class="number">@(RenderData.NicePriceHtml(MathTools.PercentileCont(0.50m, rocniPlatMuzi), shortFormat: true, showDecimal: RenderData.ShowDecimalVal.Show))</td>
+                    <td class="number">
+                        Ženy @MathTools.DifferenceInPercentText(MathTools.PercentileCont(0.50m, rocniPlatMuzi), MathTools.PercentileCont(0.50m, rocniPlatZeny))
+                    </td>
+                </tr>
+
+                <tr>
+                    <td class="text-nowrap">Příjem 20% nejlépe placených je vyšší než </td>
+                    <td class="number">@(RenderData.NicePriceHtml(MathTools.PercentileCont(0.80m, rocniPlatZeny), shortFormat: true, showDecimal: RenderData.ShowDecimalVal.Show))</td>
+                    <td class="number">@(RenderData.NicePriceHtml(MathTools.PercentileCont(0.80m, rocniPlatMuzi), shortFormat: true, showDecimal: RenderData.ShowDecimalVal.Show))</td>
+                    <td class="number">
+                        Ženy @MathTools.DifferenceInPercentText(MathTools.PercentileCont(0.80m, rocniPlatMuzi), MathTools.PercentileCont(0.80m, rocniPlatZeny))
+                    </td>
+                </tr>
+                <tr>
+                    <td class="text-nowrap">Příjem 10% nejlépe placených je vyšší než </td>
+                    <td class="number">@(RenderData.NicePriceHtml(MathTools.PercentileCont(0.90m, rocniPlatZeny), shortFormat: true, showDecimal: RenderData.ShowDecimalVal.Show))</td>
+                    <td class="number">@(RenderData.NicePriceHtml(MathTools.PercentileCont(0.90m, rocniPlatMuzi), shortFormat: true, showDecimal: RenderData.ShowDecimalVal.Show))</td>
+                    <td class="number">
+                        Ženy @MathTools.DifferenceInPercentText(MathTools.PercentileCont(0.90m, rocniPlatMuzi), MathTools.PercentileCont(0.80m, rocniPlatZeny))
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+
+    </div>
+</section>
+

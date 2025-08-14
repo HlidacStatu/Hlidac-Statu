@@ -754,6 +754,41 @@ public static class PpRepo
         Vlada
     }
 
+    public async static Task<Dictionary<string, PpPrijem[]>> GetPrijmyByAgeAsync(int minAge, int maxAge, bool withDetails = false, int year = DefaultYear)
+    { 
+        var currY = DateTime.Now.Year;
+        var minBirthDate = new DateTime(currY - maxAge, 1, 1);
+        var maxBirthDate = new DateTime(currY - minAge, 12, 31);
+        return await GetPrijmyByAgeAsync(minBirthDate, maxBirthDate, withDetails, year);
+    }
+    public async static Task<Dictionary<string, PpPrijem[]>> GetPrijmyByAgeAsync(DateTime minBirthDate, DateTime maxBirthDate, bool withDetails = false, int year = DefaultYear)
+    {
+
+        await using var db = new DbEntities();
+
+        var filterosoby = db.Osoba.AsQueryable();
+        filterosoby = filterosoby
+            .Where(o => o.Narozeni != null)
+            .Where(o => o.Narozeni >= minBirthDate && o.Narozeni<=maxBirthDate)
+            ;
+            
+        
+        var nameIds = await BasePotvrzenePlaty(db, DefaultYear)
+            .AsNoTracking()
+            .Join(filterosoby,
+                p => p.Nameid,
+                o => o.NameId,
+                (p, o) => p.Nameid)
+            .ToArrayAsync();
+
+        Dictionary<string, PpPrijem[]> res = (await GetPrijmyGroupedByNameIdAsync(year, withDetails, onlyNameIds: nameIds))
+            .ToDictionary();
+
+        return res;
+    }
+
+
+
     public async static Task<Dictionary<string, PpPrijem[]>> GetPrijmyBySexAsync(bool? woman, bool withDetails = false, int year = DefaultYear)
     {
         await using var db = new DbEntities();

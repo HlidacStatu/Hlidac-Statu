@@ -1,0 +1,131 @@
+﻿@using HlidacStatu.Entities
+@using HlidacStatu.Repositories
+@using HlidacStatu.Util
+@using HlidacStatu.XLib.Render
+@using PlatyUredniku.Cache
+@using MathNet.Numerics.Statistics;
+@{
+    ViewBag.Title = "Politici nejvíce tající svůj příjem";
+}
+@section breadcrumbs
+{
+    <ol class="breadcrumb">
+        <li>
+            <a asp-action="Index" asp-controller="Home">Platy</a>
+        </li>
+        <li>
+            <a asp-action="Index" asp-controller="Politici">Platy politiků</a>
+        </li>
+        <li>
+            <a asp-action="Reporty" asp-controller="Politici">Reporty a statistiky</a>
+        </li>
+        <li class="active">@ViewBag.Title</li>
+    </ol>
+}
+
+
+@functions {
+    private bool _sectionBgSwitch = true;
+
+    public string GetBgClass(bool toggle = true)
+    {
+        if (toggle)
+            _sectionBgSwitch = !_sectionBgSwitch;
+
+        return _sectionBgSwitch ? "alter-bg-color" : "";
+    }
+}
+
+@{
+    var rocniPlatdo30 = (await PpRepo.GetPrijmyByAgeAsync(0,29))
+        .Select(m => m.Value.Where(m=>m.Status>0).Sum(m => m.CelkoveRocniNakladyNaPolitika));
+    var rocniPlat30_50 = (await PpRepo.GetPrijmyByAgeAsync(30,49))
+        .Select(m => m.Value.Where(m => m.Status > 0).Sum(m => m.CelkoveRocniNakladyNaPolitika));
+    var rocniPlat50_70 = (await PpRepo.GetPrijmyByAgeAsync(50, 69))
+        .Select(m => m.Value.Where(m => m.Status > 0).Sum(m => m.CelkoveRocniNakladyNaPolitika));
+    var rocniPlatnad70 = (await PpRepo.GetPrijmyByAgeAsync(70,200))
+        .Select(m => m.Value.Where(m => m.Status > 0).Sum(m => m.CelkoveRocniNakladyNaPolitika));
+
+    var rocniPlatdo30orgs = (await PpRepo.GetPrijmyByAgeAsync(0, 29))
+        .Select(m => m.Value.Count());
+    var rocniPlat30_50orgs = (await PpRepo.GetPrijmyByAgeAsync(30, 49))
+        .Select(m => m.Value.Count());
+    var rocniPlat50_70orgs = (await PpRepo.GetPrijmyByAgeAsync(50, 69))
+        .Select(m => m.Value.Count());
+    var rocniPlatnad70orgs = (await PpRepo.GetPrijmyByAgeAsync(70, 200))
+        .Select(m => m.Value.Count());
+
+}
+
+
+<section class="d-flex align-items-center justify-content-center  @(GetBgClass()) pageblock-small">
+    <div class="container">
+        <h2>Rozdíly v platech podle pohlaví</h2>
+        <table class="table table-bordered table-striped table-hover">
+            <thead>
+                <tr>
+                    <th></th>
+                    <th>do 30 let</th>
+                    <th>30 až 50</th>
+                    <th>50 až 70</th>
+                    <th>nad 70</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td class="text-nowrap">Počet</td>
+                    <td class="number">@(RenderData.NiceNumber(rocniPlatdo30.Count()))</td>
+                    <td class="number">@(RenderData.NiceNumber(rocniPlat30_50.Count()))</td>
+                    <td class="number">@(RenderData.NiceNumber(rocniPlat50_70.Count()))</td>
+                    <td class="number">@(RenderData.NiceNumber(rocniPlatnad70.Count()))</td>
+                </tr>
+                <tr>
+                    <td class="text-nowrap">Průměrný počet přijmů</td>
+                    <td class="number">@(RenderData.NiceNumber((decimal)rocniPlatdo30orgs.Average()))</td>
+                    <td class="number">@(RenderData.NiceNumber((decimal)rocniPlat30_50orgs.Average()))</td>
+                    <td class="number">@(RenderData.NiceNumber((decimal)rocniPlat50_70orgs.Average()))</td>
+                    <td class="number">@(RenderData.NiceNumber((decimal)rocniPlatnad70orgs.Average()))</td>
+                </tr>
+                <tr>
+                    <td class="text-nowrap">Průměrný roční příjem</td>
+                    <td class="number">@(RenderData.NicePriceHtml(rocniPlatdo30.Average(), shortFormat: true, showDecimal: HlidacStatu.Util.RenderData.ShowDecimalVal.Show))</td>
+                    <td class="number">@(RenderData.NicePriceHtml(rocniPlat30_50.Average(), shortFormat: true, showDecimal: HlidacStatu.Util.RenderData.ShowDecimalVal.Show))</td>
+                    <td class="number">@(RenderData.NicePriceHtml(rocniPlat50_70.Average(), shortFormat: true, showDecimal: HlidacStatu.Util.RenderData.ShowDecimalVal.Show))</td>
+                    <td class="number">@(RenderData.NicePriceHtml(rocniPlatnad70.Average(), shortFormat: true, showDecimal: HlidacStatu.Util.RenderData.ShowDecimalVal.Show))</td>
+                </tr>
+
+                <tr>
+                    <td class="text-nowrap">Nejvyšší příjem</td>
+                    <td class="number">@(RenderData.NicePriceHtml(rocniPlatdo30.Max(), shortFormat: true, showDecimal: HlidacStatu.Util.RenderData.ShowDecimalVal.Show))</td>
+                    <td class="number">@(RenderData.NicePriceHtml(rocniPlat30_50.Max(), shortFormat: true, showDecimal: HlidacStatu.Util.RenderData.ShowDecimalVal.Show))</td>
+                    <td class="number">@(RenderData.NicePriceHtml(rocniPlat50_70.Max(), shortFormat: true, showDecimal: HlidacStatu.Util.RenderData.ShowDecimalVal.Show))</td>
+                    <td class="number">@(RenderData.NicePriceHtml(rocniPlatnad70.Max(), shortFormat: true, showDecimal: HlidacStatu.Util.RenderData.ShowDecimalVal.Show))</td>
+                </tr>
+                <tr>
+                    <td class="text-nowrap">Příjem poloviny vzorku osob je vyšší než </td>
+                    <td class="number">@(RenderData.NicePriceHtml(HlidacStatu.Util.MathTools.PercentileCont(0.50m, rocniPlatdo30), shortFormat: true, showDecimal: HlidacStatu.Util.RenderData.ShowDecimalVal.Show))</td>
+                    <td class="number">@(RenderData.NicePriceHtml(HlidacStatu.Util.MathTools.PercentileCont(0.50m, rocniPlat30_50), shortFormat: true, showDecimal: HlidacStatu.Util.RenderData.ShowDecimalVal.Show))</td>
+                    <td class="number">@(RenderData.NicePriceHtml(HlidacStatu.Util.MathTools.PercentileCont(0.50m, rocniPlat50_70), shortFormat: true, showDecimal: HlidacStatu.Util.RenderData.ShowDecimalVal.Show))</td>
+                    <td class="number">@(RenderData.NicePriceHtml(HlidacStatu.Util.MathTools.PercentileCont(0.50m, rocniPlatnad70), shortFormat: true, showDecimal: HlidacStatu.Util.RenderData.ShowDecimalVal.Show))</td>
+                </tr>
+
+                <tr>
+                    <td class="text-nowrap">Příjem 20% nejlépe placených je vyšší než </td>
+                    <td class="number">@(RenderData.NicePriceHtml(HlidacStatu.Util.MathTools.PercentileCont(0.80m, rocniPlatdo30), shortFormat: true, showDecimal: HlidacStatu.Util.RenderData.ShowDecimalVal.Show))</td>
+                    <td class="number">@(RenderData.NicePriceHtml(HlidacStatu.Util.MathTools.PercentileCont(0.80m, rocniPlat30_50), shortFormat: true, showDecimal: HlidacStatu.Util.RenderData.ShowDecimalVal.Show))</td>
+                    <td class="number">@(RenderData.NicePriceHtml(HlidacStatu.Util.MathTools.PercentileCont(0.80m, rocniPlat50_70), shortFormat: true, showDecimal: HlidacStatu.Util.RenderData.ShowDecimalVal.Show))</td>
+                    <td class="number">@(RenderData.NicePriceHtml(HlidacStatu.Util.MathTools.PercentileCont(0.80m, rocniPlatnad70), shortFormat: true, showDecimal: HlidacStatu.Util.RenderData.ShowDecimalVal.Show))</td>
+                </tr>
+                <tr>
+                    <td class="text-nowrap">Příjem 10% nejlépe placených je vyšší než </td>
+                    <td class="number">@(RenderData.NicePriceHtml(HlidacStatu.Util.MathTools.PercentileCont(0.90m, rocniPlatdo30), shortFormat: true, showDecimal: HlidacStatu.Util.RenderData.ShowDecimalVal.Show))</td>
+                    <td class="number">@(RenderData.NicePriceHtml(HlidacStatu.Util.MathTools.PercentileCont(0.90m, rocniPlat30_50), shortFormat: true, showDecimal: HlidacStatu.Util.RenderData.ShowDecimalVal.Show))</td>
+                    <td class="number">@(RenderData.NicePriceHtml(HlidacStatu.Util.MathTools.PercentileCont(0.90m, rocniPlat50_70), shortFormat: true, showDecimal: HlidacStatu.Util.RenderData.ShowDecimalVal.Show))</td>
+                    <td class="number">@(RenderData.NicePriceHtml(HlidacStatu.Util.MathTools.PercentileCont(0.90m, rocniPlatnad70), shortFormat: true, showDecimal: HlidacStatu.Util.RenderData.ShowDecimalVal.Show))</td>
+                </tr>
+            </tbody>
+        </table>
+
+    </div>
+</section>
+
