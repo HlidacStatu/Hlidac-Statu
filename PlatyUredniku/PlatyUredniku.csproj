@@ -32,9 +32,6 @@
     <ProjectReference Include="..\Whisperer\Whisperer.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <AdditionalFiles Include="Views\Shared\Components\AutocompleteWrap.razor" />
-    <AdditionalFiles Include="Views\Shared\Components\HlidacAutocompleteMultitag.razor" />
-    <AdditionalFiles Include="Views\Shared\Components\_Imports.razor" />
     <AdditionalFiles Include="Views\Urednici\analyza_kategorie.cshtml" />
     <AdditionalFiles Include="Views\Urednici\analyza_NamestciMinisterstev.cshtml" />
     <AdditionalFiles Include="Views\Urednici\analyza_NejvyssiOdmeny.cshtml" />
@@ -51,7 +48,6 @@
     <AdditionalFiles Include="Views\Urednici\Statistika_Rusty.cshtml" />
     <AdditionalFiles Include="Views\Urednici\Statistika_Rusty1.cshtml" />
     <AdditionalFiles Include="Views\Urednici\Statistika_Rusty2.cshtml" />
-    <AdditionalFiles Include="Views\Urednici\_platDetail.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <None Include="logger.serilog.json">

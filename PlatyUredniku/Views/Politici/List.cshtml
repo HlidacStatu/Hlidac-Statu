@@ -2,10 +2,8 @@
 
 @using Devmasters.Enums
 @using HlidacStatu.Entities
-@using HlidacStatu.Extensions
 @using HlidacStatu.Repositories
 @using HlidacStatu.XLib.Render
-@using HlidacStatu.Util
 @using PlatyUredniku.Cache
 
 @{
@@ -17,9 +15,7 @@
     var report = Model.report;
 
     bool showGroupsButtons = (top > (int.MaxValue - 10)) && string.IsNullOrEmpty(sort) && string.IsNullOrEmpty(report);
-
-    string grouName = group.ToNiceDisplayName();
-
+    
     List<string> nameIdFilter = [];
     if (group == PpRepo.PoliticianGroup.Vse)
     {

@@ -1,14 +1,10 @@
-﻿@using HlidacStatu.Entities
-@using HlidacStatu.Repositories
+﻿@using HlidacStatu.Repositories
 @using HlidacStatu.Util
-@using MathNet.Numerics.Statistics;
 
 @{
     ViewBag.Title = "Reporty a statistiky";
 
     int rok = PpRepo.DefaultYear;
-    var stats = await PpRepo.GetGlobalStatAsync(rok);
-
 
     var senatori = await PpRepo.GetPrijmyGroupedByNameIdAsync(rok, group: PpRepo.PoliticianGroup.Senatori);
     var poslanci = await PpRepo.GetPrijmyGroupedByNameIdAsync(rok, group: PpRepo.PoliticianGroup.Poslanci);
@@ -21,7 +17,6 @@
     var rocniPlatMinistru = vlada.Select(x => x.Value.Sum(m => m.CelkoveRocniNakladyNaPolitika));
     var rocniPlatKraju = kraj.Select(x => x.Value.Sum(m => m.CelkoveRocniNakladyNaPolitika));
 
-    var vsichniNameIds = await PpRepo.GetNameIdsForGroupAsync(PpRepo.PoliticianGroup.Vse, rok);
     var rocniPlatMuzi = (await PpRepo.GetPrijmyBySexAsync(false))
         .Select(m => m.Value.Sum(m => m.CelkoveRocniNakladyNaPolitika));
 
@@ -29,15 +24,11 @@
         .Select(m => m.Value.Sum(m => m.CelkoveRocniNakladyNaPolitika));
 
     decimal pocetFunkci = (decimal)vsichni
-            .Average(a => a.Value.Count());
+        .Average(a => a.Value.Count());
 
     int minJobCount = 4;
     decimal pocetLidiXjobs = (decimal)vsichni
-            .Count(a => a.Value.Count() >= minJobCount);
-
-    decimal pocetFunkci50thPercentile = (decimal)vsichni
-            .Select(a => (double)a.Value.Count())
-            .Percentile(50);
+        .Count(a => a.Value.Count() >= minJobCount);
 
     decimal prumernyMzdaCR = 46_165 * 12;
 }
@@ -66,6 +57,7 @@
 
         return _sectionBgSwitch ? "alter-bg-color" : "";
     }
+
 }
 
 <section class="d-flex align-items-center justify-content-center  @(GetBgClass()) pageblock-small">
@@ -86,9 +78,11 @@
                                     @((rocniPlatMuzi.Average() / 1_000_000m).ToString("F2")) mil. Kč
                                 </span>
                             </h5>
-                            Političky mají průměrný příjem <div class="me-2 badge text-bg-warning">
+                            Političky mají průměrný příjem
+                            <div class="me-2 badge text-bg-warning">
                                 @(HlidacStatu.Util.MathTools.DifferenceInPercentText(rocniPlatMuzi.Average(), rocniPlatZeny.Average()))
-                            </div> než muži.
+                            </div>
+                            než muži.
                         </div>
                     </div>
                 </div>
@@ -106,8 +100,11 @@
                             Poslanci mají průměrný příjem
                             <div class="me-2 badge text-bg-warning">
                                 @(HlidacStatu.Util.MathTools.DifferenceInPercentText(prumernyMzdaCR, rocniPlatPoslancu.Average()))
-                            </div> než je
-                            <abbr title="Průměrná měsíční mzda rok @PpRepo.DefaultYear je @HlidacStatu.Util.RenderData.NicePrice(prumernyMzdaCR / 12). Roční je  @HlidacStatu.Util.RenderData.NicePrice(prumernyMzdaCR)">průměrná roční mzda v ČR.</abbr>.
+                            </div>
+                            než je
+                            <abbr
+                                title="Průměrná měsíční mzda rok @PpRepo.DefaultYear je @HlidacStatu.Util.RenderData.NicePrice(prumernyMzdaCR / 12). Roční je  @HlidacStatu.Util.RenderData.NicePrice(prumernyMzdaCR)">průměrná
+                                roční mzda v ČR.</abbr>.
                         </div>
                     </div>
                 </div>
@@ -125,8 +122,11 @@
                             Premiér a ministři mají průměrný příjem
                             <div class="me-2 badge text-bg-warning">
                                 @(HlidacStatu.Util.MathTools.DifferenceText(prumernyMzdaCR, rocniPlatMinistru.Average()))
-                            </div> než je
-                            <abbr title="Průměrná měsíční mzda rok @PpRepo.DefaultYear je @HlidacStatu.Util.RenderData.NicePrice(prumernyMzdaCR / 12). Roční je  @HlidacStatu.Util.RenderData.NicePrice(prumernyMzdaCR)">průměrná roční mzda v ČR.</abbr>.
+                            </div>
+                            než je
+                            <abbr
+                                title="Průměrná měsíční mzda rok @PpRepo.DefaultYear je @HlidacStatu.Util.RenderData.NicePrice(prumernyMzdaCR / 12). Roční je  @HlidacStatu.Util.RenderData.NicePrice(prumernyMzdaCR)">průměrná
+                                roční mzda v ČR.</abbr>.
                         </div>
                     </div>
                 </div>
@@ -145,8 +145,11 @@
                             Senátoři mají průměrný příjem
                             <div class="me-2 badge text-bg-warning">
                                 @(HlidacStatu.Util.MathTools.DifferenceInPercentText(prumernyMzdaCR, rocniPlatSenatoru.Average()))
-                            </div> než je
-                            <abbr title="Průměrná měsíční mzda rok @PpRepo.DefaultYear je @HlidacStatu.Util.RenderData.NicePrice(prumernyMzdaCR / 12). Roční je  @HlidacStatu.Util.RenderData.NicePrice(prumernyMzdaCR)">průměrná roční mzda v ČR.</abbr>.
+                            </div>
+                            než je
+                            <abbr
+                                title="Průměrná měsíční mzda rok @PpRepo.DefaultYear je @HlidacStatu.Util.RenderData.NicePrice(prumernyMzdaCR / 12). Roční je  @HlidacStatu.Util.RenderData.NicePrice(prumernyMzdaCR)">průměrná
+                                roční mzda v ČR.</abbr>.
                         </div>
                     </div>
                 </div>
@@ -163,9 +166,13 @@
                             </h5>
                             Krajští zastupitelé mají průměrný příjem
                             <div class="me-2 badge text-bg-warning">
-                                o @HlidacStatu.Util.RenderData.NicePrice(rocniPlatKraju.Average() - prumernyMzdaCR) Kč vyšší
-                            </div> než je
-                            <abbr title="Průměrná měsíční mzda rok @PpRepo.DefaultYear je @HlidacStatu.Util.RenderData.NicePrice(prumernyMzdaCR / 12). Roční je  @HlidacStatu.Util.RenderData.NicePrice(prumernyMzdaCR)">průměrná roční mzda v ČR.</abbr>.
+                                o @HlidacStatu.Util.RenderData.NicePrice(rocniPlatKraju.Average() - prumernyMzdaCR) Kč
+                                vyšší
+                            </div>
+                            než je
+                            <abbr
+                                title="Průměrná měsíční mzda rok @PpRepo.DefaultYear je @HlidacStatu.Util.RenderData.NicePrice(prumernyMzdaCR / 12). Roční je  @HlidacStatu.Util.RenderData.NicePrice(prumernyMzdaCR)">průměrná
+                                roční mzda v ČR.</abbr>.
                         </div>
                     </div>
                 </div>
@@ -179,69 +186,58 @@
                     <div class="d-flex  card-body">
                         <div>
                             <h5 class="mb-2 text-700 fw-normal lh-1">
-                                Průměrně @RenderData.NiceNumber(pocetFunkci, showDecimal: RenderData.ShowDecimalVal.Show)</b> funkcí
+                                Průměrně
+                                <b>@RenderData.NiceNumber(pocetFunkci, showDecimal: RenderData.ShowDecimalVal.Show)</b>
+                                funkcí
                             </h5>
                             @(pocetLidiXjobs) politiků působí na více než <b>@minJobCount</b> pozicích.
                             @{
                                 var topJob = vsichni
-                                .OrderByDescending(p => p.Value.Count())
-                                .ThenByDescending(o => o.Value.Sum(m => m.CelkoveRocniNakladyNaPolitika))
-                                .First();
+                                    .OrderByDescending(p => p.Value.Count())
+                                    .ThenByDescending(o => o.Value.Sum(m => m.CelkoveRocniNakladyNaPolitika))
+                                    .First();
                             }
                             <p>
                                 Vede <b>@(Osoby.GetByNameId.Get(topJob.Key).FullName())</b> s
                                 <span class="me-2 badge text-bg-warning">
-                                    @topJob.Value.Count()</b> funkcemi
+                                    <b>@topJob.Value.Count()</b> funkcemi
                                 </span> a celkovým ročním příjmem
-                                <span class="me-2 badge text-bg-warning">@Html.Raw(HlidacStatu.Util.RenderData.ShortNicePrice(topJob.Value.Sum(m => m.CelkoveRocniNakladyNaPolitika), html: true))</span>.
+                                <span
+                                    class="me-2 badge text-bg-warning">@Html.Raw(HlidacStatu.Util.RenderData.ShortNicePrice(topJob.Value.Sum(m => m.CelkoveRocniNakladyNaPolitika), html: true))</span>.
                             </p>
                         </div>
                     </div>
                 </div>
             </div>
-            @* <div class="col-4 col-lg-2 justify-content-center text-center align-text-bottom pt-3 mt-3">
-                <a href="/politici/organizace">
 
-                    <i class="fa-light fa-building-magnifying-glass fa-3x mb-2" style="--fa-primary-color: #2668d9;"></i>
-                    <div class="fs-6 fw-bold text-center">Počet organizací<br />v databázi</div>
-                    <div class="fs-5 fw-bold text-center badge rounded-pill text-bg-warning">
-                        @(HlidacStatu.Util.RenderData.NiceNumber(stats.PocetOrganizaciPozadano))
-                    </div>
-
-                </a>
-            </div> *@
         </div>
     </div>
 </section>
 <section class="d-flex align-items-center justify-content-center  @(GetBgClass()) pageblock">
     <div class="container">
         <h2>Reporty</h2>
-        <p>
-            <div class="list-group">
-
-                <a href="/politici/reporty/top-prijem" class="list-group-item list-group-item-action">
-                    Politici s nejvyšším celkovým příjmem z veřejných funkcí
-                </a>
-                <a href="/politici/reporty/top-funkce" class="list-group-item list-group-item-action">
-                    Politici s největším počtem funkcí
-                </a>
-                <a href="/politici/reporty/politici-taji-prijem" class="list-group-item list-group-item-action">
-                    Přehled nejméně transparentních politiků
-                </a>
-                <a href="/politici/reporty/organizace-taji-platy" class="list-group-item list-group-item-action">
-                    Přehled nejméně transparentních organizaci
-                </a>
-                <a href="/politici/reporty/report1" class="list-group-item list-group-item-action">
-                    Političky a politici
-                </a>
-                <a href="/politici/reporty/report2" class="list-group-item list-group-item-action">
-                    Mladí vs. senioři
-                </a>
-                <a href="/politici/reporty/report4" class="list-group-item list-group-item-action">
-                    Rekordmani na krajích
-                </a>
-            </div>
-        </p>
-
+        <div class="list-group">
+            <a href="/politici/reporty/top-prijem" class="list-group-item list-group-item-action">
+                Politici s nejvyšším celkovým příjmem z veřejných funkcí
+            </a>
+            <a href="/politici/reporty/top-funkce" class="list-group-item list-group-item-action">
+                Politici s největším počtem funkcí
+            </a>
+            <a href="/politici/reporty/politici-taji-prijem" class="list-group-item list-group-item-action">
+                Přehled nejméně transparentních politiků
+            </a>
+            <a href="/politici/reporty/organizace-taji-platy" class="list-group-item list-group-item-action">
+                Přehled nejméně transparentních organizaci
+            </a>
+            <a href="/politici/reporty/report1" class="list-group-item list-group-item-action">
+                Političky a politici
+            </a>
+            <a href="/politici/reporty/report2" class="list-group-item list-group-item-action">
+                Mladí vs. senioři
+            </a>
+            <a href="/politici/reporty/report4" class="list-group-item list-group-item-action">
+                Rekordmani na krajích
+            </a>
+        </div>
     </div>
 </section>

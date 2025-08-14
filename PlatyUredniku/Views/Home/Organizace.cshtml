@@ -1,23 +1,16 @@
 @using Devmasters
 @using Devmasters.Enums
 @using HlidacStatu.Entities
-@using HlidacStatu.Lib.Web.UI
 @using HlidacStatu.Repositories
-@using HlidacStatu.Repositories.SharedModels
-@using HlidacStatu.XLib.Render
-@using PlatyUredniku.Models
 @using HlidacStatu.Extensions
 
 @model HlidacStatu.Entities.PuOrganizace
 
 @{
-    string mainTag = Model.Tags.FirstOrDefault(t => PpRepo.MainTags.Contains(t.Tag))?.Tag;
-
     string ico = Model.Ico;
     Firma f = Firmy.Get(ico);
     ViewBag.Title = $"{Model.Nazev}";
     var ceo = f.Ceo();
-
 }
 
 @section breadcrumbs

@@ -2,8 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.AspNetCore.Mvc;
-
-using ZiggyCreatures.Caching.Fusion;
 using PlatyUredniku.Services;
 using HlidacStatu.DS.Api;
 using Microsoft.AspNetCore.Authorization;

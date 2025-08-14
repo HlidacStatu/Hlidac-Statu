@@ -6,10 +6,7 @@ using System.Threading.Tasks;
 using ZiggyCreatures.Caching.Fusion;
 using System.Text;
 using System;
-using Microsoft.AspNetCore.OutputCaching;
 using HlidacStatu.Lib.Web.UI.Attributes;
-using System.Data.Entity;
-using System.Linq;
 
 namespace PlatyUredniku.Controllers;
 

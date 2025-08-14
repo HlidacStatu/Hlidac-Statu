@@ -144,6 +144,12 @@ public sealed class DataTableFilter
     public object? InitialData { get; init; }
     public string FormId { get; init; } = "filterForm";
     public string TableId { get; init; } = "myFilteredTable";
+
+    /// <summary>
+    /// Use format like
+    /// `"[[3, 'desc']]"`
+    /// </summary>
+    public string DefaultOrder { get; init; } = "[]";
     
     public IHtmlContent RenderResetButton()
     {
