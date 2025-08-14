@@ -76,14 +76,16 @@ public class AutocompleteCacheService
         var synonymsTask = LoadSynonyms(cancellationToken);
         var politiciTask = LoadPolitici(cancellationToken);
 
-        await Task.WhenAll(organizaceTask, oblastTask, ceoTask, synonymsTask, politiciTask);
+        await Task.WhenAll(organizaceTask, oblastTask, 
+            //ceoTask, 
+            synonymsTask, politiciTask);
 
         if (cancellationToken.IsCancellationRequested)
             return Enumerable.Empty<Autocomplete>().ToList();
 
         results.AddRange(organizaceTask.Result);
         results.AddRange(oblastTask.Result);
-        results.AddRange(ceoTask.Result);
+        //results.AddRange(ceoTask.Result);
         results.AddRange(synonymsTask.Result);
         results.AddRange(politiciTask.Result);
 
