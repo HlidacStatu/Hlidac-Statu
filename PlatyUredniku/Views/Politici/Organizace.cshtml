@@ -1,6 +1,7 @@
 @using HlidacStatu.Entities
 @using HlidacStatu.Repositories
 @using PlatyUredniku.Models
+@using HlidacStatu.Extensions
 
 @model HlidacStatu.Entities.PuOrganizace
 
@@ -73,7 +74,7 @@
     <div class="container">
 
 
-        <h3>Přehled přijmů politiků</h3>
+        <h3>Přehled ročních příjmů politiků</h3>
         <div class="nav flex-row nav-pills my-5" id="v-pills-tab" role="tablist">
             <button class="nav-link disabled" type="button" disabled="disabled">Rok</button>
             @{
@@ -136,21 +137,18 @@
                             }
                             @if (prijemGroup.Platy.Any(m => m.Status > 0))
                             {
-                                <table class="table table-borderless table-hover" id="tblSum_politik_@prijemGroup.Key">
+                                <div class="p-3 mb-2 bg-warning text-dark">
+                                    Jde o příjmy politiků pouze od @f.Jmeno. Celkové příjmy politiků najdete u každého politika zvlášť.
+                                </div>
+                                <table class="table table-hover" id="tblSum_politik_@prijemGroup.Key">
                                     <thead>
                                         <tr>
-                                            <th colspan="5">
-                                                <div class="p-3 mb-2 bg-warning text-dark">
-                                                    Jde o příjmy politiků pouze od @f.Jmeno. Celkové příjmy politiků najdete u každého politika zvlášť.
-                                                </div>
-                                            </th>
-                                        </tr>
-                                        <tr>
-                                            <th>Jméno politika</th>
-                                            <th class="text-end">Celkový roční osobní příjem</th>
-                                            <th class="text-end">Ostatní náhrady za rok</th>
-                                            <th class="text-end">Přepočtený hrubý měsíční příjem včetně odměn</th>
-                                            <th style="max-width:20rem">Nefinanční benefity</th>
+                                            <th>Politik</th>
+                                            <th class="d-none d-md-table-cell"></th>
+                                            <th class="text-end">Celkový roční příjem</th>
+                                            <th class="text-end">Náhrady</th>
+                                            <th class="d-none d-md-table-cell text-end ">Přepočtený měsíční příjem</th>
+                                            <th style="max-width:20rem">Další<br/>benefity</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -161,44 +159,46 @@
                                                 <td>
                                                     <a href="/politici/politik/@prijemPolitika.Nameid">@politik.FullName()</a>
                                                 </td>
+                                                <td class="d-none d-md-table-cell">@politik.MainRolesToString(PpRepo.DefaultYear)</td>
                                                 <td data-order="@(HlidacStatu.Util.RenderData.OrderValueFormat(prijemPolitika.CelkoveRocniNakladyNaPolitika))"
                                                     class="number text-nowrap">
                                                     @if (prijemPolitika.PocetMesicu < 12)
                                                     {
-                                                        <a href="#" class="link-danger me-2" data-bs-toggle="tooltip"
-                                                           data-bs-title="Příjem je pouze za @Devmasters.Lang.CS.Plural.Get((long)prijemPolitika.PocetMesicu.Value, "jeden měsíc", "{0} měsíce", "{0} měsíců") a může obsahovat odstupné či jinou smluvní odměnu">
-                                                            <i class="fa-solid fa-circle-info"></i>
-                                                        </a>
+                                                        <i class="fa-solid fa-circle-info link-warning me-2" data-bs-toggle="tooltip"
+                                                           data-bs-title="pouze za @Devmasters.Lang.CS.Plural.Get((long)prijemPolitika.PocetMesicu.Value, "jeden měsíc", "{0} měsíce", "{0} měsíců") a může obsahovat odstupné či jinou smluvní odměnu">
+                                                            </i>
+                                                        
                                                     }
 
-                                                    @HlidacStatu.Util.RenderData.NicePriceHtml(prijemPolitika.CelkoveRocniNakladyNaPolitika)
-                                                </td>
-
-
-                                                <td data-order="@(HlidacStatu.Util.RenderData.OrderValueFormat(prijemPolitika.CelkoveRocniNahrady))"
-                                                    class="number text-nowrap">
-                                                    @if (prijemPolitika.PocetMesicu < 12)
-                                                    {
-                                                        <a href="#" class="link-danger me-2" data-bs-toggle="tooltip"
-                                                           data-bs-title="Ostatní náhrady jsou pouze za @Devmasters.Lang.CS.Plural.Get((long)prijemPolitika.PocetMesicu.Value, "jeden měsíc", "{0} měsíce", "{0} měsíců")">
-                                                            <i class="fa-solid fa-circle-info"></i>
-                                                        </a>
-                                                    }
-
-                                                    @Html.Raw(HlidacStatu.Util.RenderData.NicePriceHtml(prijemPolitika.CelkoveRocniNahrady))
+                                                    @HlidacStatu.Util.RenderData.NicePriceHtml(prijemPolitika.CelkovyRocniPlatVcetneOdmen)
                                                 </td>
                                                 <td data-order="@(HlidacStatu.Util.RenderData.OrderValueFormat(prijemPolitika.PrumernyMesicniPrijemVcetneOdmen))"
                                                     class="number text-nowrap">
                                                     @if (prijemPolitika.PocetMesicu < 12)
                                                     {
-                                                        <a href="#" class="link-danger me-2" data-bs-toggle="tooltip"
-                                                           data-bs-title="Příjem je pouze za @Devmasters.Lang.CS.Plural.Get((long)prijemPolitika.PocetMesicu.Value, "jeden měsíc", "{0} měsíce", "{0} měsíců") a může obsahovat odstupné či jinou smluvní odměnu">
+                                                        <a href="#" class="link-warning me-2" data-bs-toggle="tooltip"
+                                                           data-bs-title="pouze za @Devmasters.Lang.CS.Plural.Get((long)prijemPolitika.PocetMesicu.Value, "jeden měsíc", "{0} měsíce", "{0} měsíců") a může obsahovat odstupné či jinou smluvní odměnu">
+                                                            <i class="fa-solid fa-circle-info"></i>
+                                                        </a>
+                                                    }
+                                                    @HlidacStatu.Util.RenderData.NicePrice(prijemPolitika.CelkoveRocniNahrady)
+                                                </td>
+                                                <td data-order="@(HlidacStatu.Util.RenderData.OrderValueFormat(prijemPolitika.PrumernyMesicniPrijemVcetneOdmen))"
+                                                    class="d-none d-md-table-cell number text-nowrap">
+                                                    @if (prijemPolitika.PocetMesicu < 12)
+                                                    {
+                                                        <a href="#" class="link-warning me-2" data-bs-toggle="tooltip"
+                                                           data-bs-title="pouze za @Devmasters.Lang.CS.Plural.Get((long)prijemPolitika.PocetMesicu.Value, "jeden měsíc", "{0} měsíce", "{0} měsíců") a může obsahovat odstupné či jinou smluvní odměnu">
                                                             <i class="fa-solid fa-circle-info"></i>
                                                         </a>
                                                     }
                                                     @HlidacStatu.Util.RenderData.NicePrice(prijemPolitika.PrumernyMesicniPrijemVcetneOdmen)
                                                 </td>
-                                                <td>@prijemPolitika.NefinancniBonus</td>
+                                                <td>@if (!string.IsNullOrEmpty(prijemPolitika.NefinancniBonus))
+                                                    {
+                                                        <i class="fa-solid fa-check" title="@(prijemPolitika.NefinancniBonus)"></i>
+                                                    }
+                                                </td>
 
                                             </tr>
                                         }
