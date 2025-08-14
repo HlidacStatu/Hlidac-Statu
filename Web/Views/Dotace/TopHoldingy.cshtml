@@ -156,6 +156,12 @@
 
 <h2 class="mt-4">Přehled holdingů firem, které jsou největšími příjemci dotací
     @(yearText) </h2>
+@if (rok == 2024 && dtyp.HasValue == false)
+{
+    <div class="alert alert-warning my-3" role="alert">
+        Upozornění: Po zpracování přehledů jsme společně se sdružením CESNET odhalili pochybení ve vstupních datech, kdy stát chybně uváděl jako jediného příjemce dotace ve výši 1,2 miliardy Kč sdružení CESNET. Ve skutečnosti byla dotace rozdělena mezi 10 subjektů. Dle proběhlé analýzy by se tedy sdružení CESNET neumístilo na prvním místě jako soukromý příjemce dotací, ale až na desátém.
+    </div>
+}
 <div>
     <partial name="Charts/_SimpleChart" model="chartData"/>
 </div>
