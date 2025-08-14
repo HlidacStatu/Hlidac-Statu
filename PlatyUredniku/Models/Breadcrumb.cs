@@ -1,5 +1,3 @@
-using Nest;
-
 namespace PlatyUredniku.Models;
 
 public class Breadcrumb

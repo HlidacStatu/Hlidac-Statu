@@ -1,0 +1,56 @@
+@using HlidacStatu.Repositories
+@using PlatyUredniku.Controllers
+
+@model PlatyUredniku.DataTable.DataTableFilter
+
+@{
+    ViewBag.Title = "Seznam organizací platicích politiky";
+}
+@section breadcrumbs
+{
+    <ol class="breadcrumb">
+        <li>
+            <a asp-action="Index" asp-controller="Home">Platy</a>
+        </li>
+        <li><a asp-action="Index" asp-controller="Politici">Politici</a></li>
+        <li class="active">@ViewBag.Title</li>
+    </ol>
+}
+@section Scripts
+{
+    <link rel="stylesheet" type="text/css" href="//cdn.datatables.net/1.13.4/css/jquery.dataTables.css" />
+    <script type="text/javascript" charset="utf8" src="//cdn.datatables.net/1.13.4/js/jquery.dataTables.js"></script>
+}
+
+@{
+    var rok = PpRepo.DefaultYear;
+    var organizaceData = (List<PoliticiController.OrganizaceViewData>?)Model.InitialData;
+}
+
+
+<section class="d-flex align-items-center justify-content-center pageblock">
+    <div class="container">
+        <div>
+            <h3 class="pb-5">
+                @ViewBag.Title
+            </h3>
+            <p>
+                V roce @rok @Html.Raw(Devmasters.Lang.CS.Plural.GetWithZero(organizaceData?.Count ?? 0,
+                                "informace o platech nemáme od žádné instituce",
+                                "poskyla plat jedna instituce",
+                                $"poskytli plat {{0}} instituce",
+                                $"poskytlo plat {{0}} institucí")).
+                @Html.Raw(Devmasters.Lang.CS.Plural.GetWithZero(organizaceData?.Where(o => o.PocetPlatu == 0).Count() ?? 0,
+                    "",
+                    " Informace o platech nemáme od jedné instituce.",
+                    $" Informace o platech nemáme od {{0}} institucí.",
+                    $" Informace o platech nemáme od {{0}} institucí.")
+                )
+            </p>
+        </div>
+        
+        <partial name="_DataTableFiltered" model="Model"/>
+        
+    </div>
+</section>
+}

@@ -2,7 +2,6 @@
 @using HlidacStatu.Entities
 @using HlidacStatu.Extensions
 @using HlidacStatu.Repositories.SharedModels
-@using HlidacStatu.Entities.Facts
 
 @model List<PpPrijem>
 @addTagHelper *, HlidacStatu.Lib.Web.UI.TagHelpers
@@ -385,9 +384,7 @@
                         || pprijem.Status == PpPrijem.StatusPlatu.PotvrzenyPlat_od_organizace
                         )
                 {
-                    @* <lowbox width="@((pprijem.Status == 0 ? 300 : 130 ))"> 
-                        </lowbox>
-                        *@
+                    
                     <h4>Průběh komunikace s organizací</h4>
                     <p>
                         <ol class="list-group" style="max-width:800px;">

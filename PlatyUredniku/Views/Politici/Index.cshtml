@@ -1,6 +1,4 @@
-﻿@using Devmasters.Enums
-@using HlidacStatu.Entities
-@using HlidacStatu.Repositories
+﻿@using HlidacStatu.Repositories
 @using HlidacStatu.Util
 @using MathNet.Numerics.Statistics;
 
@@ -19,7 +17,6 @@
 
 @{
     int rok = PpRepo.DefaultYear;
-    var stats = await PpRepo.GetGlobalStatAsync(rok);
 
     var senatori = await PpRepo.GetPrijmyGroupedByNameIdAsync(rok, group: PpRepo.PoliticianGroup.Senatori);
     var poslanci = await PpRepo.GetPrijmyGroupedByNameIdAsync(rok, group: PpRepo.PoliticianGroup.Poslanci);
@@ -32,25 +29,13 @@
     var rocniPlatMinistru = vlada.Select(x => x.Value.Sum(m => m.CelkoveRocniNakladyNaPolitika));
     var rocniPlatKraju = kraj.Select(x => x.Value.Sum(m => m.CelkoveRocniNakladyNaPolitika));
 
-    var vsichniNameIds = await PpRepo.GetNameIdsForGroupAsync(PpRepo.PoliticianGroup.Vse, rok);
-    var rocniPlatMuzi = (await PpRepo.GetPrijmyBySexAsync(false))
-        .Select(m => m.Value.Sum(m => m.CelkoveRocniNakladyNaPolitika));
-
-    var rocniPlatZeny = (await PpRepo.GetPrijmyBySexAsync(true))
-        .Select(m => m.Value.Sum(m => m.CelkoveRocniNakladyNaPolitika));
-
     decimal pocetFunkci = (decimal)vsichni
             .Average(a => a.Value.Count());
 
     int minJobCount = 4;
-    decimal pocetLidiXjobs = (decimal)vsichni
+    decimal pocetLidiXjobs = vsichni
             .Count(a => a.Value.Count() >= minJobCount);
-
-    decimal pocetFunkci50thPercentile = (decimal)vsichni
-            .Select(a => (double)a.Value.Count())
-            .Percentile(50);
-
-    ;
+    
 }
 
 @section breadcrumbs
@@ -62,24 +47,6 @@
         <li class="active">Platy politiků</li>
     </ol>
 }
-
-@*
-<img src="/Content/Img/Hledani_politika_sipka.svg" id="sch_arrow_background" style="position: absolute;z-index: 1200; pointer-events: none;width: 260px;height: auto;" alt="Pozadí" />
-<script>
-    const bg = document.getElementById('sch_arrow_background');
-    const anchor = document.getElementById('hlidac-autocomplete-base');
-
-    function updatePosition() {
-      const rect = anchor.getBoundingClientRect();
-      bg.style.top = (rect.top + window.scrollY - 43) + 'px';  // posun Y
-      bg.style.left = (rect.left + window.scrollX + 650) + 'px'; // posun X
-    }
-
-    window.addEventListener('scroll', updatePosition);
-    window.addEventListener('resize', updatePosition);
-    window.addEventListener('DOMContentLoaded', updatePosition);
-</script>
-*@
 
 <section class="container pb-5 pageblock-small">
     <div class="row align-items-center">
@@ -255,102 +222,6 @@
         </div>
     </div>
 
-    @* <ul class="list-unstyled row row-cols-1 row-cols-sm-2 row-cols-md-3 g-5 mb-0">
-        <li class="col-6 col-md-4 h-100">
-        </li>
-        <li class="col-6 col-md-4 h-100">
-            <a href="/politici/seznam/vlada">
-                <div class="icon icon-primary mb-3">
-                    <i class="fa-duotone fa-solid fa-people-group fa-3x mb-2" aria-hidden="true"></i>
-                </div>
-                <h3>Ministři a premiér</h3>
-                <p class="text-body-secondary mb-0">
-                    Ministři mají příjem od <b>@(HlidacStatu.Util.RenderData.NicePriceHtml(rocniPlatMinistru.Min()))</b>
-                    do <b>@(HlidacStatu.Util.RenderData.NicePriceHtml(rocniPlatMinistru.Max()))</b> ročně.
-                    <br /><br />
-                    Senátorů a senátorek u nás najdete <b>@(HlidacStatu.Util.RenderData.NiceNumber(vlada.Count))</b>.
-                </p>
-            </a>
-            <p><a href="/politici/seznam/vlada" class="btn btn-primary btn-sm">Členové vlády</a></p>
-        </li>
-        <li class="col-6 col-md-4 h-100">
-            <a href="/politici/seznam/senatori">
-                <div class="icon icon-primary mb-3">
-                    <i class="fa-duotone fa-solid fa-people-group fa-3x mb-2" aria-hidden="true"></i>
-                </div>
-                <h3>Senátoři a senátorky</h3>
-                <p class="text-body-secondary mb-0">
-                    Senátoři mají příjem od <b>@(HlidacStatu.Util.RenderData.NicePriceHtml(@rocniPlatSenatoru.Min()))</b>
-                    do <b>@(HlidacStatu.Util.RenderData.NicePriceHtml(@rocniPlatSenatoru.Max()))</b> ročně.
-                    <br /><br />
-                    Senátorů a senátorek u nás najdete <b>@(HlidacStatu.Util.RenderData.NiceNumber(senatori.Count))</b>.
-                </p>
-
-            </a>
-            <p><a href="/politici/seznam/senatori" class="btn btn-primary btn-sm">Senátorky a senátoři</a></p>
-        </li>
-        <li class="col-6 col-md-4 h-100">
-            <a href="/politici/seznam/KrajstiZastupitele">
-                <div class="icon icon-primary mb-3">
-                    <i class="fa-duotone fa-solid fa-people-group fa-3x mb-2" aria-hidden="true"></i>
-                </div>
-                <h3>Krajští zastupitelé</h3>
-                <p class="text-body-secondary mb-0">
-                    Zastupitelé vydělají od <b>@(HlidacStatu.Util.RenderData.NicePriceHtml(rocniPlatKraju.Min()))</b>
-                    do <b>@(HlidacStatu.Util.RenderData.NicePriceHtml(rocniPlatKraju.Max()))</b> ročně.
-                    <br /><br />
-                    Najdete u nás celkem <b>@(HlidacStatu.Util.RenderData.NiceNumber(kraj.Count))</b> zastupitelů.
-                </p>
-            </a>
-            <p><a href="/politici/seznam/KrajstiZastupitele" class="btn btn-primary btn-sm">Krajští zastupitelé</a></p>
-
-        </li>
-        <li class="col-6 col-md-4 h-100">
-            <a href="/politici/seznam?report=zeny">
-                <div class="icon icon-primary mb-3">
-                    <i class="fa-duotone fa-solid fa-users-gear fa-3x mb-2" aria-hidden="true"></i>
-                </div>
-                <h3>Kumulace funkcí</h3>
-                <p class="text-body-secondary mb-0">
-                    Politici mají v průměru <b>@RenderData.NiceNumber(pocetFunkci, showDecimal: RenderData.ShowDecimalVal.Show)</b> placených a neplacených funkcí.
-                    <br />
-                    @(pocetLidiXjobs) politiků působí na více než <b>@minJobCount</b> pozicích.
-                    @{
-                        var topJob = vsichni
-                        .OrderByDescending(p => p.Value.Count())
-                        .ThenByDescending(o => o.Value.Sum(m => m.CelkoveRocniNakladyNaPolitika))
-                        .First();
-                    }
-                    <br />
-                    Vede @(Osoby.GetByNameId.Get(topJob.Key).FullName()) s <b>@topJob.Value.Count()</b> funkcemi a celkovým ročním příjmem
-                    <b>@Html.Raw(HlidacStatu.Util.RenderData.ShortNicePrice(topJob.Value.Sum(m => m.CelkoveRocniNakladyNaPolitika), html: true))</b>.
-                </p>
-            </a>
-            <p><a href="/politici/seznam?report=funkce" class="btn btn-primary btn-sm">Kumulace funkcí</a></p>
-
-        </li>
-        <li class="col-6 col-md-4 h-100">            
-            <a href="https://platy.hlidacstatu.cz/Texty/OProjektu">
-
-                <div class="icon icon-primary mb-3">
-                    <i class="fa-duotone fa-solid fa-circle-info fa-3x mb-2" aria-hidden="true"></i>
-                </div>
-                <h3>O projektu</h3>
-                <p class="text-body-secondary mb-0">
-                    Projekt "Platy politiků a úředníků" je součástí Hlídače státu. Zjistěte, jaký příjem mají politici a kolik zastávají
-                    funkcí.
-                    Data jsme shromáždili na základě oficiální žádosti podle zákona o svobodném přístupu k informacím.
-                    Jedná se o příjmy z výkonu politické či exekutivní funkce
-                    od státních, polostátních nebo městských organizací,
-                    kde působí.
-
-                </p>
-            </a>
-            <p><a href="https://platy.hlidacstatu.cz/Texty/OProjektu" class="btn btn-primary btn-sm">Více o projektu</a></p>
-
-        </li>
-    </ul> *@
-
 </section>
 
 <section class="container py-5 pageblock"> 
@@ -386,40 +257,5 @@
         </div>
     </div>
 </section>
-
-@* <section class="d-flex align-items-center justify-content-center"> *@
-@*     <div class="container"> *@
-@*         <h1> *@
-@*             Příjmy a benefity politiků v @PpRepo.DefaultYear *@
-@*         </h1> *@
-@*         <p class="lead"> *@
-@*             Platy politiků - detailní přehled politických a z daní placených působnostech politiků a jejich příjmy  *@
-@*             z veřejných prostředků. *@
-@*         </p> *@
-@*         <p> *@
-@*             Snažíme se zjistit, kolik si politici skutečně vydělají z veřejných zdrojů. A to nejen za svou hlavní funkci – např.  *@
-@*             jako poslanec, senátor nebo starosta – ale také za další pozice, které často zastávají navíc.  *@
-@*             Může se jednat např. o místa v dozorčích radách státních nebo polostátních firem, v různých správních radách,  *@
-@*             výborech nebo komisích, kde za svou účast dostávají další odměny. *@
-@*         </p> *@
-@*         <p> *@
-@*             Na jednom místě přehledně ukazujeme, kdo z politiků pracuje na více místech najednou (tzv. kumulace funkcí)  *@
-@*             a kolik peněz si díky tomu měsíčně nebo ročně navíc vydělá. Vše stavíme na ověřených a veřejných datech. *@
-@*         </p> *@
-@*         <strong class="lead">Jak data získáváme</strong> *@
-@*         <p> *@
-@*             Informace o příjmech politiků získáváme primárně prostřednictvím oficiálních žádostí podle zákona o svobodném  *@
-@*             přístupu k informacím, které adresujeme institucím, v nichž politici působí. Zároveň umožňujeme samotným  *@
-@*             politikům údaje doplnit či potvrdit. Politici tak mají možnost zkontrolovat informace, které jsme od organizací  *@
-@*             získali a aktivně se podílet na vyšší transparentnosti české politiky i na zvyšování důvěry veřejnosti v  *@
-@*             činnost samotných politiků. *@
-@*         </p> *@
-@*         <p class=""> *@
-@*             Za @PpRepo.DefaultYear jsme máme informace o @(RenderData.NiceNumber(stats.PocetPrijmu)) příjmech a benefitech @(RenderData.NiceNumber(stats.PocetOsob)) politiků z *@
-@*             @(RenderData.NiceNumber(stats.PocetOrganizaci)) organizací. *@
-@*         </p> *@
-@*     </div> *@
-@* </section> *@
-
 
 

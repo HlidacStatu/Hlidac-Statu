@@ -4,7 +4,6 @@
 
 @model DataTableFilter
 
-
 @{
   // ===== Columns & sorting meta =====
   var items = (Model.InitialData as System.Collections.IEnumerable)?.Cast<object>().ToList() ?? new List<object>();
@@ -177,6 +176,7 @@
       language: {'url': '//cdn.datatables.net/plug-ins/1.13.4/i18n/cs.json'},
       lengthChange: false,
       info: false,
+      order: @Html.Raw(Model.DefaultOrder),
       pageLength: 25
     });
 

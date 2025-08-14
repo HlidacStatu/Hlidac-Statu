@@ -1,5 +1,4 @@
 ﻿using HlidacStatu.Repositories.SharedModels;
-using System.Collections.Generic;
 
 namespace PlatyUredniku.Models;
 

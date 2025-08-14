@@ -1,6 +1,5 @@
 ﻿using HlidacStatu.Entities;
 using HlidacStatu.Repositories;
-using Nest;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using ZiggyCreatures.Caching.Fusion;
