@@ -140,7 +140,7 @@ public partial class PoliticiController : Controller
                 new DataTableFilters.RangeFilterField
                 {
                     Key = FilterKeys.JobCount,
-                    Label = "Počet jobů",
+                    Label = "Počet příjmů",
                     Min = 0,
                     Max = maxJobCount,
                     Step = 1,
