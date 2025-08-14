@@ -93,7 +93,9 @@
                     <a class="btn btn-primary" href="/politici/seznam">Zobrazit všechny politiky</a>
                 </div>
                 <div class="col-sm-auto">
-                    <a class="link-cta" href="/politici/reporty"><i class="fa-solid fa-chart-pie-simple-circle-dollar"></i> Statistiky, reporty a analýzy příjmů politiků</a>
+                    <a class="btn-outline-primary" href="/politici/reporty"><i class="fa-solid fa-chart-pie-simple-circle-dollar"></i> 
+                        Zajímavosti, žebříčky a analýzy příjmů politiků
+                    </a>
                 </div>
             </div>
         </div>
@@ -139,7 +141,7 @@
                     Ministři mají příjem od <b>@(HlidacStatu.Util.RenderData.NicePriceHtml(rocniPlatMinistru.Min()))</b>
                     do <b>@(HlidacStatu.Util.RenderData.NicePriceHtml(rocniPlatMinistru.Max()))</b> ročně.
                     <br /><br />
-                    Senátorů a senátorek u nás najdete <b>@(HlidacStatu.Util.RenderData.NiceNumber(vlada.Count))</b>.
+                    Členů vlády u nás najdete <b>@(HlidacStatu.Util.RenderData.NiceNumber(vlada.Count))</b>.
 
                 </div>
                 <div class="card-footer">
@@ -183,7 +185,7 @@
                     </h4>
                 </div>
                 <div class="card-body">
-                    Zastupitelé vydělají od <b>@(HlidacStatu.Util.RenderData.NicePriceHtml(rocniPlatKraju.Min()))</b>
+                    Zastupitelé vydělají od <b>@(HlidacStatu.Util.RenderData.NicePriceHtml(rocniPlatKraju.Where(m=>m>0).Min()))</b>
                     do <b>@(HlidacStatu.Util.RenderData.NicePriceHtml(rocniPlatKraju.Max()))</b> ročně.
                     <br /><br />
                     Najdete u nás celkem <b>@(HlidacStatu.Util.RenderData.NiceNumber(kraj.Count))</b> zastupitelů.
@@ -206,9 +208,11 @@
                     </h4>
                 </div>
                 <div class="card-body">
-                    Politici mají v průměru <b>@RenderData.NiceNumber(pocetFunkci, showDecimal: RenderData.ShowDecimalVal.Show)</b> placených a neplacených funkcí.
-                    <br />
-                    @(pocetLidiXjobs) politiků působí na více než <b>@minJobCount</b> pozicích.
+                    Politici mají v průměru souběh <b>@RenderData.NiceNumber(pocetFunkci, showDecimal: RenderData.ShowDecimalVal.Show)</b> placených a neplacených funkcí.
+                    @*
+                        <br />
+                        @(pocetLidiXjobs) politiků působí na více než <b>@minJobCount</b> pozicích. 
+                    *@
                     @{
                         var topJob = vsichni
                         .OrderByDescending(p => p.Value.Count())
@@ -236,12 +240,10 @@
                     </h4>
                 </div>
                 <div class="card-body">
-                    Projekt "Platy politiků a úředníků" je součástí Hlídače státu. Zjistěte, jaký příjem mají politici a kolik zastávají
-                    funkcí.
-                    Data jsme shromáždili na základě oficiální žádosti podle zákona o svobodném přístupu k informacím.
-                    Jedná se o příjmy z výkonu politické či exekutivní funkce
-                    od státních, polostátních nebo městských organizací,
-                    kde působí.
+                    Unikátní projekt <i>Platy politiků a úředníků</i>je součástí Hlídače státu.
+                    <br />
+                    Zjistěte víc o pozadí projektu i zpracování dat o platech.
+
                 </div>
                 <div class="card-footer">
                     <p class="text-center">
@@ -358,7 +360,7 @@
                 <i class="fas fa-info-circle mx-2"></i>
                 Další informace
             </h3>
-            <ul>
+            <ul class="list-unstyled lh-lg">
                 <li>
                     <a href="https://texty.hlidacstatu.cz/vypocet-platu-politiku/" class="">
                         <i class="fa-duotone fa-solid fa-question mx-2" style=""></i>
