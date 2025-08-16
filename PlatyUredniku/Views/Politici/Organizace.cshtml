@@ -148,7 +148,7 @@
                                             <th class="text-end">Celkový roční příjem</th>
                                             <th class="text-end">Náhrady</th>
                                             <th class="d-none d-md-table-cell text-end ">Přepočtený měsíční příjem</th>
-                                            <th style="max-width:20rem">Další<br/>benefity</th>
+                                            <th style="max-width:20rem">Další<br />benefity</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -166,8 +166,8 @@
                                                     {
                                                         <i class="fa-solid fa-circle-info link-warning me-2" data-bs-toggle="tooltip"
                                                            data-bs-title="pouze za @Devmasters.Lang.CS.Plural.Get((long)prijemPolitika.PocetMesicu.Value, "jeden měsíc", "{0} měsíce", "{0} měsíců") a může obsahovat odstupné či jinou smluvní odměnu">
-                                                            </i>
-                                                        
+                                                        </i>
+
                                                     }
 
                                                     @HlidacStatu.Util.RenderData.NicePriceHtml(prijemPolitika.CelkovyRocniPlatVcetneOdmen)
@@ -194,7 +194,8 @@
                                                     }
                                                     @HlidacStatu.Util.RenderData.NicePrice(prijemPolitika.PrumernyMesicniPrijemVcetneOdmen)
                                                 </td>
-                                                <td>@if (!string.IsNullOrEmpty(prijemPolitika.NefinancniBonus))
+                                                <td>
+                                                    @if (!string.IsNullOrEmpty(prijemPolitika.NefinancniBonus))
                                                     {
                                                         <i class="fa-solid fa-check" title="@(prijemPolitika.NefinancniBonus)"></i>
                                                     }

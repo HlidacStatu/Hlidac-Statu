@@ -60,7 +60,7 @@
                     <a class="btn btn-primary" href="/politici/seznam">Zobrazit všechny politiky</a>
                 </div>
                 <div class="col-sm-auto">
-                    <a class="btn-outline-primary" href="/politici/reporty"><i class="fa-solid fa-chart-pie-simple-circle-dollar"></i> 
+                    <a class="btn btn-outline-primary" href="/politici/reporty"><i class="fa-solid fa-chart-pie-simple-circle-dollar"></i> 
                         Zajímavosti, žebříčky a analýzy příjmů politiků
                     </a>
                 </div>
@@ -82,7 +82,7 @@
                     </h4>
                 </div>
                 <div class="card-body">
-                    Poslanci vydělají od <b>@(HlidacStatu.Util.RenderData.NicePriceHtml(rocniPlatPoslancu.Min()))</b>
+                    Poslanci vydělali v 2024 od <b>@(HlidacStatu.Util.RenderData.NicePriceHtml(rocniPlatPoslancu.Min()))</b>
                     do <b>@(HlidacStatu.Util.RenderData.NicePriceHtml(rocniPlatPoslancu.Max()))</b> ročně.
                     <br /><br />
                     Najdete u nás celkem <b>@(HlidacStatu.Util.RenderData.NiceNumber(poslanci.Count))</b> poslanců a poslankyň.
@@ -105,7 +105,7 @@
 
                 </div>
                 <div class="card-body">
-                    Ministři mají příjem od <b>@(HlidacStatu.Util.RenderData.NicePriceHtml(rocniPlatMinistru.Min()))</b>
+                    Ministři měli v 2024 příjem od <b>@(HlidacStatu.Util.RenderData.NicePriceHtml(rocniPlatMinistru.Min()))</b>
                     do <b>@(HlidacStatu.Util.RenderData.NicePriceHtml(rocniPlatMinistru.Max()))</b> ročně.
                     <br /><br />
                     Členů vlády u nás najdete <b>@(HlidacStatu.Util.RenderData.NiceNumber(vlada.Count))</b>.
@@ -130,7 +130,7 @@
                     </h4>
                 </div>
                 <div class="card-body">
-                    Senátoři mají příjem od <b>@(HlidacStatu.Util.RenderData.NicePriceHtml(@rocniPlatSenatoru.Min()))</b>
+                    Senátoři inkasovali v roce 2024 příjem od <b>@(HlidacStatu.Util.RenderData.NicePriceHtml(@rocniPlatSenatoru.Min()))</b>
                     do <b>@(HlidacStatu.Util.RenderData.NicePriceHtml(@rocniPlatSenatoru.Max()))</b> ročně.
                     <br /><br />
                     Senátorů a senátorek u nás najdete <b>@(HlidacStatu.Util.RenderData.NiceNumber(senatori.Count))</b>.
@@ -152,7 +152,7 @@
                     </h4>
                 </div>
                 <div class="card-body">
-                    Zastupitelé vydělají od <b>@(HlidacStatu.Util.RenderData.NicePriceHtml(rocniPlatKraju.Where(m=>m>0).Min()))</b>
+                    Zastupitelé dostali v roce 2024 od <b>@(HlidacStatu.Util.RenderData.NicePriceHtml(rocniPlatKraju.Where(m=>m>0).Min()))</b>
                     do <b>@(HlidacStatu.Util.RenderData.NicePriceHtml(rocniPlatKraju.Max()))</b> ročně.
                     <br /><br />
                     Najdete u nás celkem <b>@(HlidacStatu.Util.RenderData.NiceNumber(kraj.Count))</b> zastupitelů.
@@ -187,8 +187,7 @@
                         .First();
                     }
                     <br />
-                    Vede @(Osoby.GetByNameId.Get(topJob.Key).FullName()) s <b>@topJob.Value.Count()</b> funkcemi a celkovým ročním příjmem
-                    <b>@Html.Raw(HlidacStatu.Util.RenderData.ShortNicePrice(topJob.Value.Sum(m => m.CelkoveRocniNakladyNaPolitika), html: true))</b>.
+                    Vede <a href="/politici/politik/@topJob.Key">@(Osoby.GetByNameId.Get(topJob.Key).FullName())</a> s <b>@topJob.Value.Count()</b> pozicemi.
                 </div>
                 <div class="card-footer">
                     <p class="text-center">

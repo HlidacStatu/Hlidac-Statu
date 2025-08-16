@@ -1,6 +1,6 @@
 using System.Linq;
 
-namespace HlidacStatu.Entities.Entities;
+namespace HlidacStatu.Entities;
 
 public static class Constants
 {

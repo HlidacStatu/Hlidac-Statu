@@ -55,13 +55,17 @@ public partial class PoliticiController : Controller
         ViewBag.Title = $"Platy politika {id}";
         var osoba = Osoby.GetByNameId.Get(id);
         if (osoba is null)
-            return View();
+            return NotFound();
 
         var detail = await _cache.GetOrSetAsync<List<PpPrijem>>(
             $"{nameof(PpRepo.GetPrijmyPolitika)}_{id}-politici",
             _ => PpRepo.GetPrijmyPolitika(id)
         );
-
+        if (detail == null || detail.Count == 0)
+        {
+            //no data
+            return Redirect(osoba.GetUrl(false));
+        }
         ViewData["osoba"] = osoba;
 
         return View(detail);
