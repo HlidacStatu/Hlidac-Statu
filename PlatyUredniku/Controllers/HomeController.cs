@@ -7,6 +7,8 @@ using ZiggyCreatures.Caching.Fusion;
 using System.Text;
 using System;
 using HlidacStatu.Lib.Web.UI.Attributes;
+using System.Linq;
+using System.Data.Entity;
 
 namespace PlatyUredniku.Controllers;
 
@@ -18,7 +20,7 @@ public class HomeController : Controller
     {
         _cache = cache;
     }
-    
+
     public async Task<IActionResult> Index()
     {
         var platyTask = _cache.GetOrSetAsync<List<PuPlat>>(
@@ -36,7 +38,7 @@ public class HomeController : Controller
 
 
 
-        [HlidacCache(48 * 60 * 60, "*")]
+    [HlidacCache(48 * 60 * 60, "*")]
     public async Task<IActionResult> Organizace(string id)
     {
         string[] ds = null;
@@ -49,9 +51,9 @@ public class HomeController : Controller
                 ds = f.DatovaSchranka;
 
         }
-        else 
+        else
             ds = new[] { id };
-        if (ds?.Length>0)
+        if (ds?.Length > 0)
         {
             await using var db = new DbEntities();
 
@@ -67,7 +69,7 @@ public class HomeController : Controller
 
         if (detail == null)
             return Redirect("/");
-        if (detail.Platy?.Count> 0 && detail.PrijmyPolitiku?.Count>0)
+        if (detail.Platy?.Count > 0 && detail.PrijmyPolitiku?.Count > 0)
         {
             return View(detail);
         }
@@ -87,13 +89,19 @@ public class HomeController : Controller
 
         return View();
     }
-    
 
-    [HlidacCache(3600*24*7)]
+
+    [HlidacCache(3600 * 24 * 7)]
     public async Task<IActionResult> SiteMap()
     {
-        string modif = DateTime.Now.Date.ToString("yyyy-MM-dd") + "T09:00:00+00:00";
-        StringBuilder sb = new StringBuilder(1024*20);
+        var db = new DbEntities();
+
+        DateTime modifDatePu = db.PuPlaty.Where(m => m.DateModified != null).Max(m => m.DateModified) ?? DateTime.Now;
+        DateTime modifDatePP = db.PpPrijmy.Where(m => m.DateModified != null).Max(m => m.DateModified) ?? DateTime.Now;
+        DateTime modifDate = new DateTime(Math.Max(modifDatePu.Ticks, modifDatePP.Ticks));
+        string modif = $"{modifDate:yyyy-MM-dd}";
+        //DateTime.Now.Date.ToString("yyyy-MM-dd") + "T09:00:00+00:00";
+        StringBuilder sb = new StringBuilder(1024 * 20);
         sb.AppendLine(@$"<urlset xmlns=""http://www.sitemaps.org/schemas/sitemap/0.9"" xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"" xsi:schemaLocation=""http://www.sitemaps.org/schemas/sitemap/0.9
             http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd"">
     <url>
@@ -149,7 +157,7 @@ public class HomeController : Controller
     </url>
 
 ");
-        foreach (var item in new string[]{ 
+        foreach (var item in new string[]{
             "ZmenaPlatuCeos","ZmenaPlatuCeos?max=false","ZmenaNejvyssihoPlatu","ZmenaNejvyssihoPlatu?max=false",
                 "NejvyssiOdmeny","kategorie","kategorie?k1=23" }
         )
@@ -169,29 +177,55 @@ public class HomeController : Controller
             sb.AppendLine($"<priority>0.80</priority>");
             sb.AppendLine($"</url>");
         }
-        foreach (var org in (await PuRepo.GetPlatyForYearsAsync(PuRepo.MinYear,PuRepo.DefaultYear)))
+        foreach (PuOrganizace? org in (await PuRepo.GetPlatyForYearsAsync(PuRepo.MinYear, PuRepo.DefaultYear)))
         {
             sb.AppendLine("<url>");
             sb.AppendLine($"<loc>https://platy.hlidacstatu.cz/Urednici/detail/{System.Security.SecurityElement.Escape(org.DS)}</loc>");
-            sb.AppendLine($"<lastmod>{modif}</lastmod>");
+            sb.AppendLine($"<lastmod>{(org.Platy.Max(m => m.DateModified) ?? modifDate):yyyy-MM-dd}</lastmod>");
             sb.AppendLine($"<priority>0.80</priority>");
             sb.AppendLine($"</url>");
             foreach (var item in org.Platy)
             {
                 sb.AppendLine("<url>");
                 sb.AppendLine($"<loc>https://platy.hlidacstatu.cz/Urednici/Plat/{System.Security.SecurityElement.Escape(item.Id.ToString())}</loc>");
-                sb.AppendLine($"<lastmod>{modif}</lastmod>");
+                sb.AppendLine($"<lastmod>{(item.DateModified ?? modifDate):yyyy-MM-dd}</lastmod>");
                 sb.AppendLine($"<priority>0.60</priority>");
                 sb.AppendLine($"</url>");
             }
         }
+        if (Devmasters.Config.GetWebConfigValue("ShowPrijmyPolitiku") == "true")
+        {
+            foreach (var item in new string[]{
+            "politici/","politici/reporty","politici/vsechnyorganizace" }
+)
+            {
+                sb.AppendLine("<url>");
+                sb.AppendLine($"<loc>https://platy.hlidacstatu.cz/{System.Security.SecurityElement.Escape(item)}</loc>");
+                sb.AppendLine($"<lastmod>{modif}</lastmod>");
+                sb.AppendLine($"<priority>0.80</priority>");
+                sb.AppendLine($"</url>");
+            }
+            var roky = await PpRepo.GetRokyPotvrzenePlatyAsync(db);
+            foreach (var rok in roky)
+            {
+                Dictionary<string, PpPrijem[]> platy = await PpRepo.GetPrijmyGroupedByNameIdAsync(rok);
 
+                foreach (var kv in platy)
+                {
+                    sb.AppendLine("<url>");
+                    sb.AppendLine($"<loc>https://platy.hlidacstatu.cz/Politici/politik/{kv.Key}</loc>");
+                    sb.AppendLine($"<lastmod>{(kv.Value.Max(m => m.DateModified) ?? modifDate):yyyy-MM-dd}</lastmod>");
+                    sb.AppendLine($"<priority>1.00</priority>");
+                    sb.AppendLine($"</url>");
+                }
+            }
+        }
 
         sb.AppendLine("</urlset>");
         return Content(sb.ToString(), "application/xml");
     }
-    
-    public IActionResult 
+
+    public IActionResult
         Error()
     {
         return View();

@@ -662,6 +662,8 @@ select distinct ds.DatovaSchranka, f.ico from firma f
 
         if (origPlat is null)
         {
+            plat.DateCreated = DateTime.Now;
+            plat.DateModified = DateTime.Now;
             dbContext.PuPlaty.Add(plat);
         }
         else
@@ -676,6 +678,7 @@ select distinct ds.DatovaSchranka, f.ico from firma f
             origPlat.PocetMesicu = plat.PocetMesicu;
             origPlat.PoznamkaPlat = plat.PoznamkaPlat;
             origPlat.SkrytaPoznamka = plat.SkrytaPoznamka;
+            origPlat.DateModified = DateTime.Now;
         }
 
         await dbContext.SaveChangesAsync();

@@ -1,3 +1,4 @@
+using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -58,4 +59,7 @@ public class PuPlat
     public decimal? PlatMesicne => (Plat ?? 0) / (PocetMesicu ?? 12);
     public decimal? OdmenyMesicne => (Odmeny ?? 0) / (PocetMesicu ?? 12);
     public decimal? OsobniOhodnoceniPerc => ((Plat + Odmeny) == 0 || Plat ==0) ? null : Odmeny / (Plat + Odmeny);
+    public DateTime? DateCreated { get; set; } = DateTime.Now;
+    public DateTime? DateModified { get; set; } = DateTime.Now;
+
 }

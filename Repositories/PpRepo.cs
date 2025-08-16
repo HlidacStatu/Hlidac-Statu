@@ -123,7 +123,7 @@ public static class PpRepo
             case PuEvent.TypUdalosti.Jine:
                 evd.Note = "";
                 if (ev.Smer == PuEvent.SmerKomunikace.ZpravaProNas)
-                    evd.Title = $"Obdrželi jsme zprávu: {ev.Poznamka}";                
+                    evd.Title = $"Obdrželi jsme zprávu: {ev.Poznamka}";
                 else
                     evd.Title = $"Poslali jsme zprávu: {ev.Poznamka}";
                 break;
@@ -135,20 +135,20 @@ public static class PpRepo
         }
         return evd;
     }
-    public static string GetEventsTextDescription(this IEnumerable<PuEvent> events, 
+    public static string GetEventsTextDescription(this IEnumerable<PuEvent> events,
         string template = "{0}", string itemTemplate = "{0}",
             string itemDelimeter = "<br/>")
     {
         throw new NotImplementedException();
         StringBuilder sb = new StringBuilder();
-        
-        foreach (var ev in events.OrderBy(o => o.Datum).Select(m=> m.GetEventDescription()))
+
+        foreach (var ev in events.OrderBy(o => o.Datum).Select(m => m.GetEventDescription()))
         {
             //sb.AppendFormat(itemTemplate, ev.GetEventTextDescription());
             //evd.Title = itemDelimeter);
         }
 
-        return string.Format(template,sb.ToString());
+        return string.Format(template, sb.ToString());
     }
 
     public static async Task<List<PuEvent>> GetEventsForPolitikAndOrganizace(string nameId, int idOrganizace, int year = PpRepo.DefaultYear)
@@ -228,6 +228,17 @@ public static class PpRepo
             .FirstOrDefaultAsync();
     }
 
+    public static Task<int[]> GetRokyPotvrzenePlatyAsync(DbEntities db)
+    {
+        return db.PpPrijmy
+            .AsNoTracking()
+            .Where(m => m.Status >= 0)
+            .Select(m => m.Rok)
+            .Distinct()
+            .OrderBy(m => m)
+            .ToArrayAsync();
+    }
+
     public static IQueryable<PpPrijem> BaseAllPlaty(DbEntities db, int rok = DefaultYear)
     {
 
@@ -235,26 +246,36 @@ public static class PpRepo
             .Where(m => m.Rok == rok);
     }
 
+
+
     public static IQueryable<PpPrijem> BasePotvrzenePlaty(DbEntities db, int rok = DefaultYear)
     {
         return BaseAllPlaty(db, rok)
             .Where(m => m.Status >= 0);
     }
 
-    public static string[] AllNameId(bool? zeny, int rok = DefaultYear)
+    public async static Task<string[]> AllNameIdAsync(bool? zeny, int rok = DefaultYear)
     {
         using var db = new DbEntities();
-        var q = BasePotvrzenePlaty(db, rok)
-            .AsNoTracking()
-            .Join(db.Osoba,
-                p => p.Nameid,
-                o => o.NameId,
-                (p, o) => o);
-        if (zeny.HasValue)
-            q = q.Where(o => o.Pohlavi == (zeny.Value ? "f" : "m"));
-        var qres = q.Select(o => o.NameId)
-            .Distinct();
-        var res = qres.ToArray();
+        string[] res = null;
+        if (zeny.HasValue == false)
+            res = await BasePotvrzenePlaty(db, rok)
+                .AsNoTracking()
+                .Select(p => p.Nameid)
+                .Distinct()
+                .ToArrayAsync();
+        else
+            res= await BasePotvrzenePlaty(db, rok)
+                .AsNoTracking()
+                .Join(db.Osoba,
+                    p => p.Nameid,
+                    o => o.NameId,
+                    (p, o) => o)
+                .Where(o => o.Pohlavi == (zeny.Value ? "f" : "m"))
+                .Select(o => o.NameId)
+                .Distinct()
+                .ToArrayAsync();
+
         return res;
     }
 
@@ -466,8 +487,8 @@ public static class PpRepo
 
 
     public static async Task<Dictionary<string, PpPrijem[]>> GetPrijmyGroupedByNameIdAsync(
-        int rok, bool withDetails = false, 
-        string ico = null, string[] onlyNameIds = null, PoliticianGroup? group=null, bool pouzePotvrzene = true,
+        int rok, bool withDetails = false,
+        string ico = null, string[] onlyNameIds = null, PoliticianGroup? group = null, bool pouzePotvrzene = true,
         Expression<Func<PpPrijem, bool>> predicate = null)
     {
 
@@ -480,7 +501,7 @@ public static class PpRepo
             q = q.Where(m => m.Organizace.FirmaDs.Ico == ico);
         q = q.Where(p => p.Rok == rok);
 
-        if (onlyNameIds?.Count()>0)
+        if (onlyNameIds?.Count() > 0)
             q = q.Where(p => onlyNameIds.Contains(p.Nameid));
 
         if (predicate != null)
@@ -492,7 +513,7 @@ public static class PpRepo
             q = q.Where(m => nameids.Contains(m.Nameid));
         }
         var qGrouped = (await q.ToArrayAsync())
-            .GroupBy(k => k.Nameid, v => v, (k, v) => new { nameId = k, platy = v.Where(p=>p.Status>=0).ToArray() });
+            .GroupBy(k => k.Nameid, v => v, (k, v) => new { nameId = k, platy = v.Where(p => p.Status >= 0).ToArray() });
 
         return qGrouped.ToDictionary(k => k.nameId, v => v.platy);
     }
@@ -721,11 +742,14 @@ public static class PpRepo
 
         if (origPlat is null)
         {
+            prijemPolitika.DateCreated = DateTime.Now;
+            prijemPolitika.DateModified = DateTime.Now;
             dbContext.PpPrijmy.Add(prijemPolitika);
         }
         else
         {
             prijemPolitika.Id = origPlat.Id;
+            prijemPolitika.DateModified = DateTime.Now;
             dbContext.Entry(origPlat).CurrentValues.SetValues(prijemPolitika);
         }
 
@@ -755,7 +779,7 @@ public static class PpRepo
     }
 
     public async static Task<Dictionary<string, PpPrijem[]>> GetPrijmyByAgeAsync(int minAge, int maxAge, bool withDetails = false, int year = DefaultYear)
-    { 
+    {
         var currY = DateTime.Now.Year;
         var minBirthDate = new DateTime(currY - maxAge, 1, 1);
         var maxBirthDate = new DateTime(currY - minAge, 12, 31);
@@ -769,10 +793,10 @@ public static class PpRepo
         var filterosoby = db.Osoba.AsQueryable();
         filterosoby = filterosoby
             .Where(o => o.Narozeni != null)
-            .Where(o => o.Narozeni >= minBirthDate && o.Narozeni<=maxBirthDate)
+            .Where(o => o.Narozeni >= minBirthDate && o.Narozeni <= maxBirthDate)
             ;
-            
-        
+
+
         var nameIds = await BasePotvrzenePlaty(db, DefaultYear)
             .AsNoTracking()
             .Join(filterosoby,
