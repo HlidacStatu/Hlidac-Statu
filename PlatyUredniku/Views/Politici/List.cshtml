@@ -13,9 +13,10 @@
     var top = Model.top;
     var sort = Model.sort;
     var report = Model.report;
+    int orderColumnIdx = 3;
 
     bool showGroupsButtons = (top > (int.MaxValue - 10)) && string.IsNullOrEmpty(sort) && string.IsNullOrEmpty(report);
-    
+
     List<string> nameIdFilter = [];
     if (group == PpRepo.PoliticianGroup.Vse)
     {
@@ -48,14 +49,18 @@
                 .OrderByDescending(kv => kv.Value.Count(m => m.Status == PpPrijem.StatusPlatu.Zjistujeme_zadost_106))
                 .Take(top)
                 .ToDictionary(kv => kv.Key, kv => kv.Value);
+
             break;
         case "top-prijem":
             top = 100;
             sort = "celkem";
+            ViewBag.Title = $"Politici s nejvyšším celkovým příjmem z veřejných funkcí";
             break;
         case "top-funkce":
             top = 100;
             sort = "funkce";
+            ViewBag.Title = $"Politici s největším počtem příjmů";
+            orderColumnIdx = 4;
             break;
     }
 
@@ -91,6 +96,18 @@
         },
         new ReportDataSource<KeyValuePair<string, PpPrijem[]>>.Column()
         {
+            Name = "Strana",
+            HtmlRender = (m) =>
+            {
+                return OsobyRolesCache.Get(m.Key).Strana;
+            },
+            OrderValueRender = (m) =>
+            {
+                return $"{OsobyRolesCache.Get(m.Key).Strana}";
+            },
+        },
+        new ReportDataSource<KeyValuePair<string, PpPrijem[]>>.Column()
+        {
             Name = "Politické role",
             HtmlRender = (m) => OsobyRolesCache.Get(m.Key).Role,
             OrderValueRender = (m) => OsobyRolesCache.Get(m.Key).Role,
@@ -100,7 +117,18 @@
             Name = "Celkový roční příjem",
             HtmlRender = (m) =>
             {
-                return $"<a href='/politici/politik/{m.Key}'>{HlidacStatu.Util.RenderData.NicePrice(m.Value.Sum(v => v.CelkoveRocniNakladyNaPolitika), html: true)}</a>";
+                if (m.Value.All(m=>m.Status == 0))
+                {
+                    return $"<a href='/politici/politik/{m.Key}'>{HlidacStatu.Util.RenderData.NicePrice(m.Value.Sum(v => v.CelkoveRocniNakladyNaPolitika), html: true)}</a>"
+                    + $"<br /><span class='text-danger-emphasis'>Žádná organizace nám příjem dosud neposkytla</span>";
+                }
+                else if (m.Value.Any(m=>m.Status == 0))
+                {
+                    return $"<a href='/politici/politik/{m.Key}'>{HlidacStatu.Util.RenderData.NicePrice(m.Value.Sum(v => v.CelkoveRocniNakladyNaPolitika), html: true)}</a>"
+                    + $"<br /><span class='text-danger-emphasis'>{Devmasters.Lang.CS.Plural.Get(m.Value.Count(m => m.Status == 0), "jedna organizace nám příjem dosud neposkytla", "{0} organizace nám příjem dosud neposkytlo", "{0} organizací nám příjem dosud neposkytlo")}.</span>";
+                }
+                else
+                    return $"<a href='/politici/politik/{m.Key}'>{HlidacStatu.Util.RenderData.NicePrice(m.Value.Sum(v => v.CelkoveRocniNakladyNaPolitika), html: true)}</a>";
             },
             OrderValueRender = (m) => HlidacStatu.Util.RenderData.OrderValueFormat(m.Value.Sum(v => v.CelkoveRocniNakladyNaPolitika)),
             CssClass = "number"
@@ -111,9 +139,8 @@
             HtmlRender = (m) =>
             {
                 return "<ol>" + string.Join("", m.Value
-                                            .Select(n => n.Organizace)
-                                            .Distinct()
-                                            .Select(o => $"<li><a href='/politici/organizace/{o?.DS}'>{o?.Nazev}</a></li>")
+                                            .DistinctBy(d=>d.IdOrganizace)
+                                            .Select(o => $"<li><a href='/politici/organizace/{o.Organizace?.DS}'>{o.Organizace?.Nazev}</a> {(o.Status == 0 ? "<span class='text-danger-emphasis'>(neposkytla příjem)</span>" : "")}</li>")
                                             ) + "</ul>";
 
             },
@@ -198,7 +225,7 @@
         <div>
             <p>
                 @Html.DataToHTMLTable(rds,
-                dataTableOptions: HtmlExtensions.DatatableOptions(orderColumnIdx: 2, orderDirection: "desc", dom: "<\"top\"Bfp>rt<\"bottom\"ip><\"clear\">"))
+                dataTableOptions: HtmlExtensions.DatatableOptions(orderColumnIdx: orderColumnIdx, orderDirection: "desc", dom: "<\"top\"Bfp>rt<\"bottom\"ip><\"clear\">"))
             </p>
         </div>
     </div>

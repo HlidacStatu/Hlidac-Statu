@@ -23,7 +23,7 @@ namespace PlatyUredniku.Cache
             public string Prijmeni { get; set; }
             public string FullName => $"{Jmeno} {Prijmeni}".Trim();
             public string Role { get; set; }
-            public string strana { get; set; }
+            public string Strana { get; set; }
         }
         private static Devmasters.Cache.LocalMemory.AutoUpdateCacheManager<Dictionary<string, osobaInfo>, int> _cacheRolesManager =
             new Devmasters.Cache.LocalMemory.AutoUpdateCacheManager<Dictionary<string, osobaInfo>, int>(
@@ -45,7 +45,8 @@ namespace PlatyUredniku.Cache
                                 {
                                     Jmeno = o.Jmeno,
                                     Prijmeni = o.Prijmeni,
-                                    Role = o.MainRolesToString(rok)
+                                    Role = o.MainRolesToString(rok),
+                                    Strana = o.CurrentPoliticalParty()
                                 };
                             }
                             return new Devmasters.Batch.ActionOutputData();

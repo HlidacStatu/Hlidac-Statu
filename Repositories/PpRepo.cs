@@ -817,9 +817,9 @@ public static class PpRepo
         group switch
         {
             PoliticianGroup.Vse => [],
-            PoliticianGroup.Poslanci => [Constants.Ica.KancelarPoslaneckeSnemovny],
-            PoliticianGroup.Senatori => [Constants.Ica.Senat],
-            PoliticianGroup.KrajstiZastupitele => Constants.Ica.Kraje,
+            PoliticianGroup.Poslanci => [UradyConstants.Ica.KancelarPoslaneckeSnemovny],
+            PoliticianGroup.Senatori => [UradyConstants.Ica.Senat],
+            PoliticianGroup.KrajstiZastupitele => UradyConstants.Ica.Kraje,
             _ => []
         };
 

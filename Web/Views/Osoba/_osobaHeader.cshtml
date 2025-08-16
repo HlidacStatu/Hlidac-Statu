@@ -45,6 +45,10 @@
                 <p class="py-0 my-0 text-muted">@Model.StatusOsoby().ToNiceDisplayName()</p>
                 <p class="py-0 my-0 lead">
                     <a href="@Model.GetUrl()">@Model.FullName()</a>
+                    @if (!string.IsNullOrEmpty(Model.CurrentPoliticalParty()))
+                    {
+                        <span>@(Model.CurrentPoliticalParty())</span>
+                    }
                 </p>
                 <p class="py-0 my-0">@Html.Raw(Model.NarozeniYear(true))</p>
 

@@ -273,7 +273,7 @@
                                 @HlidacStatu.Util.RenderData.NicePriceHtml(pprijem.Plat ?? 0)
 
                                 @if (   pprijem.Organizace.FirmaDs.Ico == "00006572" //plat pro Snemovnu
-                                        && platyZaRok.Select(m => m.Organizace.FirmaDs.Ico).Any(m => HlidacStatu.Entities.Constants.Ica.Vlada.Contains(m)) //a je ve vlade
+                                        && platyZaRok.Select(m => m.Organizace.FirmaDs.Ico).Any(m => HlidacStatu.Entities.UradyConstants.Ica.Vlada.Contains(m)) //a je ve vlade
                                 )
                                 {
                                     <p>

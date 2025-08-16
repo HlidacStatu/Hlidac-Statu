@@ -2,7 +2,7 @@ using System.Linq;
 
 namespace HlidacStatu.Entities;
 
-public static class Constants
+public static class UradyConstants
 {
     public static class Ica
     {

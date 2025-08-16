@@ -144,7 +144,7 @@ public static class OsobaExtension2
                 && (e.AddInfo.ToLower().StartsWith("předseda vlády")
                     || e.AddInfo.ToLower().StartsWith("předsedkyně vlády"))
                 && (e.Organizace?.ToLower().StartsWith("úřad vlády") == true
-                    || e.Ico?.Trim() == Constants.Ica.UradVlady)))
+                    || e.Ico?.Trim() == UradyConstants.Ica.UradVlady)))
         {
             roles.Add("předseda vlády");
         }
@@ -153,7 +153,7 @@ public static class OsobaExtension2
                 e.Type == (int)OsobaEvent.Types.PolitickaExekutivni
                 && e.AddInfo.ToLower().StartsWith("ministr")
                 && (e.Organizace?.ToLower().StartsWith("ministerstvo") == true
-                    || Constants.Ica.Vlada.Contains(e.Ico?.Trim()))))
+                    || UradyConstants.Ica.Vlada.Contains(e.Ico?.Trim()))))
         {
             roles.Add("ministr");
         }
@@ -163,7 +163,7 @@ public static class OsobaExtension2
                 && (e.AddInfo.ToLower().StartsWith("poslanec") ||
                     e.AddInfo.ToLower().StartsWith("poslankyně"))
                 && (e.Organizace?.ToLower().StartsWith("poslanecká sněmovna pčr") == true
-                    || e.Ico?.Trim() == Constants.Ica.KancelarPoslaneckeSnemovny)))
+                    || e.Ico?.Trim() == UradyConstants.Ica.KancelarPoslaneckeSnemovny)))
         {
             roles.Add("poslanec");
         }
@@ -172,7 +172,7 @@ public static class OsobaExtension2
                 e.Type == (int)OsobaEvent.Types.VolenaFunkce
                 && e.AddInfo.ToLower().StartsWith("senát")
                 && (e.Organizace?.ToLower().StartsWith("senát") == true
-                    || e.Ico?.Trim() == Constants.Ica.Senat)))
+                    || e.Ico?.Trim() == UradyConstants.Ica.Senat)))
         {
             roles.Add("senátor");
         }
@@ -196,7 +196,7 @@ public static class OsobaExtension2
         if (events.Any(e => 
                 e.Type == (int)OsobaEvent.Types.VolenaFunkce
                 && e.AddInfo.ToLower().StartsWith("zastupitel")
-                && Constants.Ica.Kraje.Contains(e.Ico?.Trim())))
+                && UradyConstants.Ica.Kraje.Contains(e.Ico?.Trim())))
         {
             roles.Add("krajský zastupitel");
         }

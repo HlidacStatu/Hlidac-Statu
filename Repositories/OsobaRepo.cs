@@ -794,7 +794,7 @@ namespace HlidacStatu.Repositories
                             e.Type == (int)OsobaEvent.Types.PolitickaExekutivni
                             && e.AddInfo.ToLower().StartsWith("ministr")
                             && (e.Organizace.ToLower().StartsWith("ministerstvo")
-                                || Constants.Ica.Vlada.Contains(e.Ico.Trim()))
+                                || UradyConstants.Ica.Vlada.Contains(e.Ico.Trim()))
                             && (e.DatumDo == null || e.DatumDo >= toDate)
                             && (e.DatumOd == null || e.DatumOd <= toDate))
                         .ToList();
@@ -805,7 +805,7 @@ namespace HlidacStatu.Repositories
                             && (e.AddInfo.ToLower().StartsWith("předseda vlády")
                                 || e.AddInfo.ToLower().StartsWith("předsedkyně vlády"))
                             && (e.Organizace.ToLower().StartsWith("úřad vlády")
-                                || e.Ico.Trim() == Constants.Ica.UradVlady)
+                                || e.Ico.Trim() == UradyConstants.Ica.UradVlady)
                             && (e.DatumDo == null || e.DatumDo >= toDate)
                             && (e.DatumOd == null || e.DatumOd <= toDate))
                         .ToList();
@@ -824,7 +824,7 @@ namespace HlidacStatu.Repositories
                             && (e.AddInfo.ToLower().StartsWith("poslanec") ||
                                 e.AddInfo.ToLower().StartsWith("poslankyně"))
                             && (e.Organizace.ToLower().StartsWith("poslanecká sněmovna pčr")
-                                || e.Ico.Trim() == Constants.Ica.KancelarPoslaneckeSnemovny)
+                                || e.Ico.Trim() == UradyConstants.Ica.KancelarPoslaneckeSnemovny)
                             && (e.DatumDo == null || e.DatumDo >= toDate)
                             && (e.DatumOd == null || e.DatumOd <= toDate))
                         .ToList();
@@ -851,7 +851,7 @@ namespace HlidacStatu.Repositories
                             e.Type == (int)OsobaEvent.Types.VolenaFunkce
                             && e.AddInfo.ToLower().StartsWith("senát")
                             && (e.Organizace.ToLower().StartsWith("senát")
-                                || e.Ico.Trim() == Constants.Ica.Senat)
+                                || e.Ico.Trim() == UradyConstants.Ica.Senat)
                             && (e.DatumDo == null || e.DatumDo >= toDate)
                             && (e.DatumOd == null || e.DatumOd <= toDate))
                         .ToList();
@@ -862,7 +862,7 @@ namespace HlidacStatu.Repositories
                             && (e.AddInfo.ToLower().StartsWith("poradce předsedy vlády") ||
                                 e.AddInfo.ToLower().StartsWith("poradkyně předsedy vlády"))
                             && (e.Organizace.ToLower().StartsWith("úřad vlády")
-                                || e.Ico.Trim() == Constants.Ica.UradVlady)
+                                || e.Ico.Trim() == UradyConstants.Ica.UradVlady)
                             && (e.DatumDo == null || e.DatumDo >= toDate)
                             && (e.DatumOd == null || e.DatumOd <= toDate))
                         .ToList();
@@ -871,7 +871,7 @@ namespace HlidacStatu.Repositories
                     return GetByEvent(e =>
                             e.Type == (int)OsobaEvent.Types.VolenaFunkce
                             && e.AddInfo.ToLower().StartsWith("zastupitel")
-                            && Constants.Ica.Kraje.Contains(e.Ico.Trim())
+                            && UradyConstants.Ica.Kraje.Contains(e.Ico.Trim())
                             && (e.DatumDo == null || e.DatumDo >= toDate)
                             && (e.DatumOd == null || e.DatumOd <= toDate))
                         .ToList();
@@ -907,7 +907,7 @@ namespace HlidacStatu.Repositories
                             e.Type == (int)OsobaEvent.Types.PolitickaExekutivni
                             && e.AddInfo.ToLower().StartsWith("ministr")
                             && (e.Organizace.ToLower().StartsWith("ministerstvo")
-                                || Constants.Ica.Vlada.Contains(e.Ico.Trim()))
+                                || UradyConstants.Ica.Vlada.Contains(e.Ico.Trim()))
                             && (e.DatumDo == null || e.DatumDo.Value.Year >= year)
                             && (e.DatumOd == null || e.DatumOd.Value.Year <= year))
                         .ToList();
@@ -918,7 +918,7 @@ namespace HlidacStatu.Repositories
                             && (e.AddInfo.ToLower().StartsWith("předseda vlády")
                                 || e.AddInfo.ToLower().StartsWith("předsedkyně vlády"))
                             && (e.Organizace.ToLower().StartsWith("úřad vlády")
-                                || e.Ico.Trim() == Constants.Ica.UradVlady)
+                                || e.Ico.Trim() == UradyConstants.Ica.UradVlady)
                             && (e.DatumDo == null || e.DatumDo.Value.Year >= year)
                             && (e.DatumOd == null || e.DatumOd.Value.Year <= year))
                         .ToList();
@@ -937,7 +937,7 @@ namespace HlidacStatu.Repositories
                             && (e.AddInfo.ToLower().StartsWith("poslanec") ||
                                 e.AddInfo.ToLower().StartsWith("poslankyně"))
                             && (e.Organizace.ToLower().StartsWith("poslanecká sněmovna pčr")
-                                || e.Ico.Trim() == Constants.Ica.KancelarPoslaneckeSnemovny)
+                                || e.Ico.Trim() == UradyConstants.Ica.KancelarPoslaneckeSnemovny)
                             && (e.DatumDo == null || e.DatumDo.Value.Year >= year)
                             && (e.DatumOd == null || e.DatumOd.Value.Year <= year))
                         .ToList();
@@ -964,7 +964,7 @@ namespace HlidacStatu.Repositories
                             e.Type == (int)OsobaEvent.Types.VolenaFunkce
                             && e.AddInfo.ToLower().StartsWith("senát")
                             && (e.Organizace.ToLower().StartsWith("senát")
-                                || e.Ico.Trim() == Constants.Ica.Senat)
+                                || e.Ico.Trim() == UradyConstants.Ica.Senat)
                             && (e.DatumDo == null || e.DatumDo.Value.Year >= year)
                             && (e.DatumOd == null || e.DatumOd.Value.Year <= year))
                         .ToList();
@@ -975,7 +975,7 @@ namespace HlidacStatu.Repositories
                             && (e.AddInfo.ToLower().StartsWith("poradce předsedy vlády") ||
                                 e.AddInfo.ToLower().StartsWith("poradkyně předsedy vlády"))
                             && (e.Organizace.ToLower().StartsWith("úřad vlády")
-                                || e.Ico.Trim() == Constants.Ica.UradVlady)
+                                || e.Ico.Trim() == UradyConstants.Ica.UradVlady)
                             && (e.DatumDo == null || e.DatumDo.Value.Year >= year)
                             && (e.DatumOd == null || e.DatumOd.Value.Year <= year))
                         .ToList();
@@ -984,7 +984,7 @@ namespace HlidacStatu.Repositories
                     return GetByEvent(e =>
                             e.Type == (int)OsobaEvent.Types.VolenaFunkce
                             && e.AddInfo.ToLower().StartsWith("zastupitel")
-                            && Constants.Ica.Kraje.Contains(e.Ico.Trim())
+                            && UradyConstants.Ica.Kraje.Contains(e.Ico.Trim())
                             && (e.DatumDo == null || e.DatumDo.Value.Year >= year)
                             && (e.DatumOd == null || e.DatumOd.Value.Year <= year))
                         .ToList();
