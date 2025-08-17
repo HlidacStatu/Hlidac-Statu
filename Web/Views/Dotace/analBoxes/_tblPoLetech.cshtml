@@ -29,7 +29,7 @@
                 TextRender = (x) => HlidacStatu.Util.RenderData.NiceNumber(x.Count),
                 HtmlRender = (x) => "<a href='/dotace/hledat?q="
                     + System.Net.WebUtility.UrlEncode(
-                        HlidacStatu.Searching.Query.ModifyQueryAND(Model.Query, $"program:{x.Year}")
+                        HlidacStatu.Searching.Query.ModifyQueryAND(Model.Query, $"rok:{x.Year}")
                     )
                     + $"'>{HlidacStatu.Util.RenderData.NiceNumber(x.Count,html:true)}</a>",
                 OrderValueRender = (x) => HlidacStatu.Util.RenderData.OrderValueFormat(x.Count),
