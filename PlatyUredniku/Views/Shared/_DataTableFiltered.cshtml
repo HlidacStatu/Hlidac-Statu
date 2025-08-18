@@ -125,7 +125,7 @@
       @Model.RenderResetButton()
     </form>
   </div>
-  
+
   @* DataTable *@
   <div class="col-10">
     <table id="@Model.TableId" class="table table-striped table-bordered">
@@ -150,10 +150,18 @@
     const initialData = @Html.Raw(JsonSerializer.Serialize(Model.InitialData, JsonSerializerOptions.Web));
 
     const baseColumnDefs = [
-      {targets: numberIdxTargets, className: 'number', type: 'num'},
+      {
+        targets: numberIdxTargets,
+        createdCell: function (td, cellData, rowData, row, col) {
+          $(td).addClass('number');
+        },
+        type: 'num'
+      },
       {
         targets: priceIdxTargets,
-        className: 'number',
+        createdCell: function (td, cellData, rowData, row, col) {
+          $(td).addClass('number');
+        },
         type: 'num',
         render: function (data, type) {
           const n = (typeof data === 'number') ? data : parseFloat(String(data ?? '').replace(/\s|[^\d.-]/g, ''));
@@ -212,7 +220,7 @@
     });
     form.on('input.filters', 'input[type=number], input[type=range], input[type=text], input[type=search]', fetchAndRender);
 
-    $('#resetFiltersButton').on('click', function() {
+    $('#resetFiltersButton').on('click', function () {
       const initialValues = JSON.parse($(this).attr('data-init'));
 
       for (const key in initialValues) {
