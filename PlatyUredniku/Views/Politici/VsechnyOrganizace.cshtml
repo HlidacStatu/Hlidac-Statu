@@ -40,7 +40,7 @@
                                 "poskyla plat jedna instituce",
                                 $"poskytli plat {{0}} instituce",
                                 $"poskytlo plat {{0}} institucí")).
-                @Html.Raw(Devmasters.Lang.CS.Plural.GetWithZero(organizaceData?.Where(o => o.PocetPlatu == 0).Count() ?? 0,
+                @Html.Raw(Devmasters.Lang.CS.Plural.GetWithZero(organizaceData?.Where(o => o.PocetOsob == 0).Count() ?? 0,
                     "",
                     " Informace o platech nemáme od jedné instituce.",
                     $" Informace o platech nemáme od {{0}} institucí.",

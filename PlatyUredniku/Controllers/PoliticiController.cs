@@ -99,7 +99,7 @@ public partial class PoliticiController : Controller
         ViewData["rok"] = rok;
 
         var organizaceViewData = await GetFullOrganizaceViewDataCached(rok);
-        var maxPocetPlatu = organizaceViewData.Max(o => o.PocetPlatu);
+        var maxPocetPlatu = organizaceViewData.Max(o => o.PocetOsob);
         var maxPlatInMils = Math.Ceiling((organizaceViewData.Max(x => x.PlatyDo) + 1) / 1_000_000);
         
         var filteredOrganizaceViewData = FilterOrganizaceViewData(organizaceViewData);
@@ -338,8 +338,8 @@ public partial class PoliticiController : Controller
 
         IEnumerable<OrganizaceViewData> filteredData = resultData;
         
-        if (platCountFrom.HasValue) filteredData = filteredData.Where(d => d.PocetPlatu >= platCountFrom.Value);
-        if (platCountTo.HasValue) filteredData = filteredData.Where(d => d.PocetPlatu <= platCountTo.Value);
+        if (platCountFrom.HasValue) filteredData = filteredData.Where(d => d.PocetOsob >= platCountFrom.Value);
+        if (platCountTo.HasValue) filteredData = filteredData.Where(d => d.PocetOsob <= platCountTo.Value);
         if (maxPlatFrom.HasValue) filteredData = filteredData.Where(d => d.PlatyDo >= maxPlatFrom.Value * 1_000_000);
         if (maxPlatTo.HasValue) filteredData = filteredData.Where(d => d.PlatyDo <= maxPlatTo.Value * 1_000_000);
 
@@ -406,48 +406,25 @@ public partial class PoliticiController : Controller
                 //         && m.Typ == PuEvent.TypUdalosti.PoskytnutiInformace || m.Typ == PuEvent.TypUdalosti.PoskytnutiInformace
                 // );
 
-                var platyMin = (await PpRepo.GetJednotlivePlatyAsync(rok)).Min(m => m.CelkoveRocniNakladyNaPolitika);
-                var platyMax = (await PpRepo.GetJednotlivePlatyAsync(rok)).Max(m => m.CelkoveRocniNakladyNaPolitika);
-                var platyLength = platyMax - platyMin;
-                if (platyLength == 0)
-                    platyLength = 0.01m;
-
                 return orgs.Select(o =>
                 {
                     var org = new OrganizaceViewData()
                     {
                         NazevOrganizace = $"<a href='/politici/organizace/{o.Ico}'>{o.Nazev}</a>",
                         EventStatus = o.PlatyForYearPoliticiDescriptionHtml(rok),
-                        PocetPlatu = 0
+                        PocetOsob = 0
                     };
 
                     if (!o.PrijmyPolitiku.Any())
                     {
                         return org;
                     }
-
-                    var minPlat = o.PrijmyPolitiku.Min(p => p.CelkoveRocniNakladyNaPolitika);
-                    var maxPlat = o.PrijmyPolitiku.Max(p => p.CelkoveRocniNakladyNaPolitika);
-                    var startPer = Math.Round((minPlat - platyMin) / platyLength * 100);
-                    var endPer = Math.Round((maxPlat - minPlat) / platyLength * 100);
-                    if (endPer == 0)
-                        endPer = 1;
-
-                    org.PlatyOd = minPlat;
-                    org.PlatyDo = maxPlat;
-                    org.PocetPlatu = o.PrijmyPolitiku.Count();
+                    
+                    org.PlatyOd = o.PrijmyPolitiku.Min(p => p.CelkoveRocniNakladyNaPolitika);
+                    org.PlatyDo = o.PrijmyPolitiku.Max(p => p.CelkoveRocniNakladyNaPolitika);
+                    org.PocetOsob = o.PrijmyPolitiku.Count();
                     org.NazevOrganizace = $"<a href='/politici/organizace/{o.Ico}'>{o.Nazev}</a>";
                     org.EventStatus = o.PlatyForYearPoliticiDescriptionHtml(rok);
-                    org.Graf = $"""
-                                <div class="d-flex"
-                                     style="width: 100%;height: 1rem;background: linear-gradient(90deg, hsl(216deg 100% 87%) 0%, hsl(216deg 100% 26.67%) 100%);">
-                                    <div class="border-start  bg-light" style="width: {startPer}%;height: 1rem"></div>
-                                    <div class="bg-transparent rounded-pill position-relative"
-                                         style="width: {endPer}%;height: 1rem;">
-                                    </div>
-                                    <div class="border-end bg-light" style="width: {100 - endPer - startPer}%;height: 1rem"></div>
-                                </div> 
-                                """;
                     return org;
                 }).ToList();
             }
@@ -527,8 +504,8 @@ public partial class PoliticiController : Controller
         [HtmlTableDefinition.Column(HtmlTableDefinition.ColumnType.Text, "Stav")]
         public string EventStatus { get; set; }
 
-        [HtmlTableDefinition.Column(HtmlTableDefinition.ColumnType.Number, "Počet platů")]
-        public Decimal PocetPlatu { get; set; }
+        [HtmlTableDefinition.Column(HtmlTableDefinition.ColumnType.Number, "Počet osob")]
+        public Decimal PocetOsob { get; set; }
 
         [HtmlTableDefinition.Column(HtmlTableDefinition.ColumnType.Hidden, "PlatyOd")]
         public Decimal PlatyOd { get; set; }
@@ -542,8 +519,6 @@ public partial class PoliticiController : Controller
 
         [HtmlTableDefinition.Column(HtmlTableDefinition.ColumnType.Hidden, "Platy sort")]
         public decimal Platy_Sort => PlatyDo;
-
-        public string Graf { get; set; }
     }
 
     public static class OrganizaceFilterKeys
