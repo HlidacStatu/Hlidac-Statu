@@ -16,6 +16,7 @@ public sealed class DataTableFilters
         
         // method for rendering filter to HTML 
         IHtmlContent Render();
+        Dictionary<string, object?> GetInitialValues();
     }
 
     public abstract class FilterField : IFilterable
@@ -23,6 +24,7 @@ public sealed class DataTableFilters
         public required string Key { get; init; }
         public required string Label { get; init; }
         public abstract IHtmlContent Render();
+        public abstract Dictionary<string, object?> GetInitialValues();
     }
 
     public sealed class FilterOption
@@ -61,6 +63,16 @@ public sealed class DataTableFilters
             }
 
             return htmlContentBuilder;
+        }
+        
+        public override Dictionary<string, object?> GetInitialValues()
+        {
+            var values = new Dictionary<string, object?>();
+            if (Initial is not null)
+            {
+                values[Key] = Initial;
+            }
+            return values;
         }
     }
 
@@ -106,6 +118,17 @@ public sealed class DataTableFilters
 
             return new HtmlString(html);
         }
+        
+        public override Dictionary<string, object?> GetInitialValues()
+        {
+            var values = new Dictionary<string, object?>();
+            if (Initial.HasValue)
+            {
+                values[Key + "From"] = Initial.Value.From;
+                values[Key + "To"] = Initial.Value.To;
+            }
+            return values;
+        }
     }
 
     public sealed class TextFilterField : FilterField
@@ -132,6 +155,16 @@ public sealed class DataTableFilters
 
             return new HtmlString(html);
         }
+        
+        public override Dictionary<string, object?> GetInitialValues()
+        {
+            var values = new Dictionary<string, object?>();
+            if (Initial is not null)
+            {
+                values[Key] = Initial;
+            }
+            return values;
+        }
     }
     
     private static string RenderDecimal(decimal v) => v.ToString(CultureInfo.InvariantCulture);
@@ -151,42 +184,51 @@ public sealed class DataTableFilter
     /// </summary>
     public string DefaultOrder { get; init; } = "[]";
     
-    public IHtmlContent RenderResetButton()
+    public string GetInitialValuesJson()
     {
         var initialValues = new Dictionary<string, object?>();
 
         foreach (var filter in Filters)
         {
-            switch (filter)
+            // Sloučí hodnoty z jednotlivých filtrů
+            foreach (var kvp in filter.GetInitialValues())
             {
-                case DataTableFilters.ChoiceFilterField choiceFilter:
-                    if (choiceFilter.Initial is not null)
-                    {
-                        initialValues[choiceFilter.Key] = choiceFilter.Initial;
-                    }
-                    break;
-                case DataTableFilters.RangeFilterField rangeFilter:
-                    if (rangeFilter.Initial.HasValue)
-                    {
-                        initialValues[rangeFilter.Key + "From"] = rangeFilter.Initial.Value.From;
-                        initialValues[rangeFilter.Key + "To"] = rangeFilter.Initial.Value.To;
-                    }
-                    break;
-                case DataTableFilters.TextFilterField textFilter:
-                    if (textFilter.Initial is not null)
-                    {
-                        initialValues[textFilter.Key] = textFilter.Initial;
-                    }
-                    break;
+                initialValues[kvp.Key] = kvp.Value;
+            }
+        }
+
+        var jsonOptions = new JsonSerializerOptions(JsonSerializerDefaults.Web);
+        return JsonSerializer.Serialize(initialValues, jsonOptions);
+    }
+    
+    public string GetFilterOptionsJson()
+    {
+        var filterOptions = new Dictionary<string, object>();
+        
+        foreach (var filter in Filters)
+        {
+            if (filter is DataTableFilters.ChoiceFilterField choiceFilter)
+            {
+                var optionsMap = new Dictionary<string, string>();
+                foreach (var option in choiceFilter.Options)
+                {
+                    optionsMap[option.Value] = option.Label ?? option.Value;
+                }
+                filterOptions[choiceFilter.Key] = optionsMap;
             }
         }
         
         var jsonOptions = new JsonSerializerOptions(JsonSerializerDefaults.Web);
-        var json = JsonSerializer.Serialize(initialValues, jsonOptions);
+        return JsonSerializer.Serialize(filterOptions, jsonOptions);
+    }
+    
+    public IHtmlContent RenderResetButton()
+    {
+        var initialValuesJson = GetInitialValuesJson();
 
         var buttonHtml = $"""
                           <div class="d-grid gap-2">
-                            <button type="button" class="btn btn-sm btn-secondary mt-3" id="resetFiltersButton" data-init='{HtmlEncoder.Default.Encode(json)}'>
+                            <button type="button" class="btn btn-sm btn-secondary mt-3" id="resetFiltersButton" data-init='{HtmlEncoder.Default.Encode(initialValuesJson)}'>
                               Resetovat filtry
                             </button>
                           </div>

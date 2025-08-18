@@ -128,6 +128,9 @@
 
   @* DataTable *@
   <div class="col-10">
+    <div class="filters">
+      
+    </div>
     <table id="@Model.TableId" class="table table-striped table-bordered">
       <thead>
       <tr>
@@ -144,10 +147,27 @@
 
 <script>
   $(function () {
+    const tableId = '@Model.TableId';
+    const formId = '@Model.FormId';
+    const dataEndpointUrl = '@Model.DataEndpointUrl';
+    
     const dtColumns = @Html.Raw(JsonSerializer.Serialize(dtColumns, JsonSerializerOptions.Web));
     const numberIdxTargets = @Html.Raw(JsonSerializer.Serialize(numberIdxTargets, JsonSerializerOptions.Web));
     const priceIdxTargets = @Html.Raw(JsonSerializer.Serialize(priceIdxTargets, JsonSerializerOptions.Web));
     const initialData = @Html.Raw(JsonSerializer.Serialize(Model.InitialData, JsonSerializerOptions.Web));
+    const initialValues = @Html.Raw(Model.GetInitialValuesJson());
+    const filterOptions = @Html.Raw(Model.GetFilterOptionsJson());
+
+    // Jednorázové načtení a uložení mapování labelů
+    const fieldLabels = {};
+    $('#filterAccordion button.accordion-button').each(function() {
+      const label = $(this).text().trim();
+      const paneId = $(this).attr('aria-controls');
+      const inputName = $(`#${paneId} input, #${paneId} select`).first().attr('name');
+      if (inputName) {
+        fieldLabels[inputName] = label;
+      }
+    });
 
     const baseColumnDefs = [
       {
@@ -177,10 +197,10 @@
       }
     ];
 
-    const table = $('#@Model.TableId').DataTable({
+    const table = $(`#${tableId}`).DataTable({
       data: initialData ?? [],
-      columns: dtColumns,             // includes hidden sort columns
-      columnDefs: baseColumnDefs,     // no more sortColumnDefs needed
+      columns: dtColumns,
+      columnDefs: baseColumnDefs,
       language: {'url': '//cdn.datatables.net/plug-ins/1.13.4/i18n/cs.json'},
       lengthChange: false,
       info: false,
@@ -188,7 +208,9 @@
       pageLength: 25
     });
 
-    const form = $('#@Model.FormId');
+    const form = $(`#${formId}`);
+    const filtersContainer = $('.filters');
+    let inflight = null;
 
     function debounce(fn, delay) {
       let t;
@@ -198,55 +220,223 @@
       };
     }
 
-    let inflight = null;
-    const fetchAndRender = debounce(function () {
-      if (inflight) inflight.abort();
-      inflight = $.ajax({
-        url: '@Model.DataEndpointUrl',
-        method: 'GET',
-        data: form.serialize()
-      }).done(data => {
-        table.clear().rows.add(data).draw();
-      }).always(() => {
-        inflight = null;
-      });
-    }, 200);
-
-    form.off('.filters');
-    form.on('submit.filters', e => e.preventDefault());
-    form.on('change.filters', 'input[type=radio], input[type=checkbox], select', function () {
-      if (this.type === 'radio' && !this.checked) return;
-      fetchAndRender();
-    });
-    form.on('input.filters', 'input[type=number], input[type=range], input[type=text], input[type=search]', fetchAndRender);
-
-    $('#resetFiltersButton').on('click', function () {
-      const initialValues = JSON.parse($(this).attr('data-init'));
-
-      for (const key in initialValues) {
-        const value = initialValues[key];
-
-        // Resetování ChoiceFilterField (radio, checkbox)
-        if (Array.isArray(value)) {
-          // Checkboxy
-          if ($(`input[name="${key}"][type="checkbox"]`).length > 0) {
-            $(`input[name="${key}"][type="checkbox"]`).prop('checked', false);
-            value.forEach(v => {
-              $(`input[name="${key}"][value="${v}"]`).prop('checked', true);
-            });
+    function getNormalizedFormData() {
+      const formData = form.serializeArray();
+      const result = {};
+      formData.forEach(item => {
+        if (result[item.name]) {
+          if (!Array.isArray(result[item.name])) {
+            result[item.name] = [result[item.name]];
           }
-          // Radio buttony
-          else if ($(`input[name="${key}"][type="radio"]`).length > 0) {
-            $(`input[name="${key}"][value="${value[0]}"]`).prop('checked', true);
+          result[item.name].push(item.value);
+        } else {
+          result[item.name] = item.value;
+        }
+      });
+      return result;
+    }
+
+    function isSame(valueA, valueB) {
+      if (Array.isArray(valueA) && Array.isArray(valueB)) {
+        const setA = new Set(valueA.sort());
+        const setB = new Set(valueB.sort());
+        if (setA.size !== setB.size) return false;
+        return [...setA].every(val => setB.has(val));
+      } else {
+        return String(valueA) === String(valueB);
+      }
+    }
+
+    const fetchAndRender = debounce(async function () {
+      if (inflight) inflight.abort();
+
+      const currentValues = getNormalizedFormData();
+      const filteredData = new URLSearchParams();
+      const processedKeys = new Set(); // Sledujeme již zpracované klíče
+
+      for (const key in currentValues) {
+        if (!currentValues.hasOwnProperty(key) || processedKeys.has(key)) continue;
+
+        const initial = initialValues[key];
+        const current = currentValues[key];
+
+        // Zpracování rozsahu (From/To)
+        if (key.endsWith('From')) {
+          const baseKey = key.replace('From', '');
+          const fromKey = key;
+          const toKey = baseKey + 'To';
+
+          processedKeys.add(fromKey);
+          processedKeys.add(toKey);
+
+          const isFromChanged = !isSame(initialValues[fromKey], currentValues[fromKey]);
+          const isToChanged = !isSame(initialValues[toKey], currentValues[toKey]);
+
+          if (isFromChanged || isToChanged) {
+            if (currentValues[fromKey]) filteredData.append(fromKey, currentValues[fromKey]);
+            if (currentValues[toKey]) filteredData.append(toKey, currentValues[toKey]);
           }
         }
-        // Resetování TextFilterField a RangeFilterField
+        // Standardní filtry
         else {
-          $(`input[name="${key}"]`).val(value);
+          if (!isSame(initial, current)) {
+            if (Array.isArray(current)) {
+              current.forEach(v => filteredData.append(key, v));
+            } else {
+              filteredData.append(key, current);
+            }
+          }
         }
       }
 
-      // Aktualizace tabulky po resetování
+      const queryString = filteredData.toString();
+      const url = `${dataEndpointUrl}?${queryString}`;
+
+      const controller = new AbortController();
+      inflight = controller;
+
+      try {
+        const response = await fetch(url, {
+          method: 'GET',
+          signal: controller.signal
+        });
+        const data = await response.json();
+
+        table.clear().rows.add(data).draw();
+        renderActivePills(currentValues);
+
+      } catch (error) {
+        if (error.name !== 'AbortError') {
+          console.error("Fetch failed:", error);
+        }
+      } finally {
+        inflight = null;
+      }
+    }, 200);
+
+
+    function renderActivePills(currentValues) {
+      filtersContainer.empty();
+      const activeFilters = new Map();
+
+      // Použijeme Set pro sledování již zpracovaných klíčů (např. 'početPrijmuFrom')
+      const processedKeys = new Set();
+
+      for (const key in currentValues) {
+        if (!currentValues.hasOwnProperty(key) || processedKeys.has(key)) continue;
+
+        const value = currentValues[key];
+        const initial = initialValues[key];
+
+        if (key.endsWith('From')) {
+          const baseKey = key.replace('From', '');
+          const fromKey = key;
+          const toKey = baseKey + 'To';
+
+          processedKeys.add(fromKey);
+          processedKeys.add(toKey);
+
+          const isFromChanged = !isSame(initialValues[fromKey], currentValues[fromKey]);
+          const isToChanged = !isSame(initialValues[toKey], currentValues[toKey]);
+
+          if (isFromChanged || isToChanged) {
+            const label = fieldLabels[fromKey] || baseKey;
+            const fromValue = currentValues[fromKey] || '';
+            const toValue = currentValues[toKey] || '';
+            const displayValue = `${fromValue} - ${toValue}`;
+            activeFilters.set(label, displayValue);
+          }
+        }
+        else if (key.endsWith('To')) {
+          // Přeskočíme, protože je zpracováno v 'From' bloku
+          continue;
+        }
+        else {
+          // Standardní filtry
+          if (!isSame(initial, value)) {
+            const label = fieldLabels[key] || key;
+            let displayValue = value;
+
+            if (filterOptions.hasOwnProperty(key)) {
+              const optionsMap = filterOptions[key];
+              if (Array.isArray(value)) {
+                displayValue = value.map(v => optionsMap[v] || v).join(', ');
+              } else {
+                displayValue = optionsMap[value] || value;
+              }
+            }
+
+            const existingValue = activeFilters.get(label);
+            if (existingValue) {
+              activeFilters.set(label, `${existingValue}, ${displayValue}`);
+            } else {
+              activeFilters.set(label, displayValue);
+            }
+          }
+        }
+      }
+
+      activeFilters.forEach((value, key) => {
+        const pill = $(`
+          <span class="badge rounded-pill bg-secondary d-inline-flex align-items-center me-2 mb-2" data-name="${key}">
+            ${key}: ${value}
+            <button type="button" class="btn-close btn-close-white ms-2" aria-label="Close"></button>
+          </span>
+        `);
+        filtersContainer.append(pill);
+      });
+    }
+
+    // Event listenery
+    form.off('.filters');
+    form.on('submit.filters', e => e.preventDefault());
+    form.on('change.filters', 'input[type=radio], input[type=checkbox], select', fetchAndRender);
+    form.on('input.filters', 'input[type=number], input[type=range], input[type=text], input[type=search]', fetchAndRender);
+
+    $('#resetFiltersButton').on('click', function () {
+      for (const key in initialValues) {
+        const value = initialValues[key];
+        const input = $(`[name="${key}"]`);
+
+        if (input.is('input[type="radio"], input[type="checkbox"]')) {
+          // Nejprve odškrtneme všechny, pak zaškrtneme ty správné
+          $(`[name="${key}"]`).prop('checked', false);
+          if (Array.isArray(value)) {
+            value.forEach(v => $(`[name="${key}"][value="${v}"]`).prop('checked', true));
+          } else if (value !== null) {
+            $(`[name="${key}"][value="${value}"]`).prop('checked', true);
+          }
+        } else {
+          // Reset pro textová, číselná atd. pole
+          input.val(value);
+        }
+      }
+      fetchAndRender();
+    });
+
+    filtersContainer.on('click', '.btn-close', function() {
+      const pill = $(this).closest('.badge');
+      const pillName = pill.data('name');
+      const accordionButton = $(`#filterAccordion button:contains('${pillName}')`);
+      const paneId = accordionButton.attr('aria-controls');
+      const inputs = $(`#${paneId} input, #${paneId} select`);
+
+      // Obnova hodnot
+      inputs.each(function() {
+        const inputName = $(this).attr('name');
+        const initialValue = initialValues.hasOwnProperty(inputName) ? initialValues[inputName] : null;
+        
+        if ($(this).is('input[type="radio"], input[type="checkbox"]')) {
+           $(this).prop('checked', false);
+           if (Array.isArray(initialValue) && initialValue.includes($(this).val())) {
+             $(this).prop('checked', true);
+           } else if (!Array.isArray(initialValue) && initialValue !== null && $(this).val() === initialValue) {
+             $(this).prop('checked', true);
+           }
+        } else {
+          $(this).val(initialValue);
+        }
+      });
       fetchAndRender();
     });
   });

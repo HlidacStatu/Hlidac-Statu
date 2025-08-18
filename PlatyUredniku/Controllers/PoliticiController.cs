@@ -487,10 +487,12 @@ public partial class PoliticiController : Controller
     public class PoliticiViewData
     {
         public string Politik { get; set; }
-
         [HtmlTableDefinition.Column(HtmlTableDefinition.ColumnType.Hidden, "PolitikSort")]
         public string Politik_Sort { get; set; }
-
+        
+        [HtmlTableDefinition.Column(HtmlTableDefinition.ColumnType.Text, "Politická strana")]
+        public string PolitickaStrana { get; set; }
+        
         [HtmlTableDefinition.Column(HtmlTableDefinition.ColumnType.Text, "Politická role")]
         public string PolitickaRole { get; set; }
 
@@ -505,8 +507,7 @@ public partial class PoliticiController : Controller
         [HtmlTableDefinition.Column(HtmlTableDefinition.ColumnType.Hidden, "Pohlaví")]
         public string Pohlavi { get; set; }
 
-        [HtmlTableDefinition.Column(HtmlTableDefinition.ColumnType.Text, "Politická strana")]
-        public string PolitickaStrana { get; set; }
+        
     }
 
     public static class PoliticiFilterKeys
