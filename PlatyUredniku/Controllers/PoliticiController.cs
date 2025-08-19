@@ -406,12 +406,8 @@ public partial class PoliticiController : Controller
 
         if (rottenOrgs.Any())
         {
-            var rottenOrgsHtml = "<ol>" + string.Join("", rottenOrgs.Select(o => $"<li>{WebUtility.HtmlEncode(o?.Nazev)}</li>")) + "</ol>";
-                
-            var title =
-                $"Platy {Devmasters.Lang.CS.Plural.Get(rottenOrgs.Count, "neposkytla", "neposkytly", "neposkytly")} tyto organizace: <br /> {rottenOrgsHtml}"; 
             var result = $"""
-                          <span class="help-tooltip" data-bs-toggle="tooltip" data-bs-html="true" title='{title}'>
+                          <span class="help-tooltip" data-bs-toggle="tooltip" data-bs-html="true" title="Částka zahrnuje jen příjmy, které se nám podařilo shromáždit a které nám byly poskytnuty.">
                             {nicePrice}
                           </span> 
                           """;
@@ -439,7 +435,7 @@ public partial class PoliticiController : Controller
             .Select(o => $"""
                           <li>
                           <a href="/politici/organizace/{o?.DS}">{WebUtility.HtmlEncode(o?.Nazev)}</a>
-                          <i class="text-danger fas fa-exclamation-circle" data-bs-toggle="tooltip" title="neposkytla plat"></i>
+                          <i class="text-danger fas fa-exclamation-circle" data-bs-toggle="tooltip" title="Plat či odměna nebyla poskytnuta."></i>
                           </li>
                           """));
 

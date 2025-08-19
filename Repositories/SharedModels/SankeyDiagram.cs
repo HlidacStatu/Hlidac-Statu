@@ -1,7 +1,5 @@
-﻿using System;
-using HlidacStatu.Entities;
+﻿using HlidacStatu.Entities;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Linq;
 using System.Text.Json;
 using HlidacStatu.Util;
@@ -24,7 +22,6 @@ public class SankeyDiagram
     public string? Subtitle { get; set; }
     public string? Description { get; set; }
     public ICollection<PpPrijem> PrijmyPolitiku { get; set; }
-    public IEnumerable<string> OrgBezUvedeniPlatu { get; set; }
     
     public string CssWidth { get; set; } = "100%";
     public string CssHeight { get; set; } = "100%"; //$"{9 / 16 * 100}%'"; //16:9
@@ -77,26 +74,6 @@ public class SankeyDiagram
             }
             
         }
-        
-        if (OrgBezUvedeniPlatu?.Count() > 0)
-        {
-            data.AddRange(
-                    OrgBezUvedeniPlatu.Select(f=>
-                        new
-                        {
-                            from = "Celkové roční náklady na politika",
-                            to = Firmy.GetJmeno(f),
-                            weight = DrawNakladyPerYear(1, nakladyMax),
-                            color = "#000000",
-                            custom = new
-                            {
-                                value = 0m,
-                                link = $"#{f}"
-                            }
-                        }
-                        )
-                );
-        }
 
         var options = new JsonSerializerOptions
         {
@@ -143,6 +120,9 @@ public class SankeyDiagram
     
     private double DrawNakladyPerYear(decimal hodnota, decimal nakladyTotal)
     {
+        if (hodnota < 1)
+            return 1;
+        
         double realValue = (double)hodnota;
         double max = (double)nakladyTotal;
 
