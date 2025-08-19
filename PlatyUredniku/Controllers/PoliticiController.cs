@@ -20,6 +20,7 @@ namespace PlatyUredniku.Controllers;
 public partial class PoliticiController : Controller
 {
     private readonly IFusionCache _cache;
+    private const string FilterAll = "Vše";
 
     public PoliticiController(IFusionCache cache)
     {
@@ -136,11 +137,11 @@ public partial class PoliticiController : Controller
                 {
                     Key = OrganizaceFilterKeys.Stav,
                     Label = "Stav žádosti",
-                    Initial = ["vše"],
+                    Initial = [FilterAll],
                     Multiple = false,
                     Options =
                     [
-                        new() { Value = "vše", Label = "vše" },
+                        new() { Value = FilterAll, Label = FilterAll },
                         new() { Value = "success", Label = "Poskytli všechny platy" },
                         new() { Value = "warning", Label = "Poskytli část platů" },
                         new() { Value = "danger", Label = "Neposkytli žádný plat" },
@@ -162,7 +163,7 @@ public partial class PoliticiController : Controller
     }
 
     [HlidacCache(60 * 60, "*")]
-    public async Task<IActionResult> Seznam()
+    public async Task<IActionResult> Seznam(string report = "platy")
     {
         var fullPoliticiViewData = await GetFullPoliticiViewDataCached();
         var politickeStranyFilterData = GetPolitickeStranyForFilterCached();
@@ -175,15 +176,21 @@ public partial class PoliticiController : Controller
 
         // parties + "Ostatní"
         var parties = politickeStranyFilterData;
-        if (!parties.Contains("vše")) parties.Insert(0, "vše");
+        if (!parties.Contains(FilterAll)) parties.Insert(0, FilterAll);
         if (!parties.Contains("Ostatní")) parties.Add("Ostatní");
 
+        string sorting = "[[3, 'desc']]";
+        if (report == "funkce")
+        {
+            sorting = "[[4,'desc']]";
+        }
+        
         // Initialize filter
         var model = new DataTableFilter
         {
             DataEndpointUrl = Url.Action(nameof(SeznamData), "Politici")!,
             InitialData = filteredPoliticiViewData,
-            DefaultOrder = "[[3, 'desc']]",
+            DefaultOrder = sorting,
             Filters = new List<DataTableFilters.FilterField>
             {
                 new DataTableFilters.ChoiceFilterField
@@ -193,7 +200,7 @@ public partial class PoliticiController : Controller
                     Multiple = false,
                     Options =
                     [
-                        new() { Value = "všichni", Label = "Všichni" },
+                        new() { Value = FilterAll, Label = FilterAll },
                         new() { Value = "předseda vlády" },
                         new() { Value = "ministr" },
                         new() { Value = "poslanec" },
@@ -202,7 +209,7 @@ public partial class PoliticiController : Controller
                         new() { Value = "hejtman" },
                         new() { Value = "krajský zastupitel" }
                     ],
-                    Initial = ["všichni"]
+                    Initial = SetInitialGroupsForFilter()
                 },
                 new DataTableFilters.RangeFilterField
                 {
@@ -229,7 +236,7 @@ public partial class PoliticiController : Controller
                     Label = "Politická strana",
                     Multiple = false,
                     Options = parties.Select(p => new DataTableFilters.FilterOption { Value = p, Label = p }).ToList(),
-                    Initial = ["vše"]
+                    Initial = [FilterAll]
                 },
                 new DataTableFilters.ChoiceFilterField
                 {
@@ -247,6 +254,21 @@ public partial class PoliticiController : Controller
         };
 
         return View(model);
+    }
+
+    private string[]? SetInitialGroupsForFilter()
+    {
+        var q = HttpContext.Request.Query;
+        
+        var groups = q.Choices(PoliticiFilterKeys.PoliticianGroups);
+
+        if (groups.Length > 0)
+        {
+            return groups;
+
+        }
+        
+        return [FilterAll];
     }
 
     //todo: Prasečina odsud až úplně dolů - to bude potřeba refaktorovat
@@ -301,7 +323,7 @@ public partial class PoliticiController : Controller
         if (jobsTo.HasValue) filteredData = filteredData.Where(d => d.PocetJobu <= jobsTo.Value);
 
         // Party including "Ostatní" handling
-        if (parties.Length > 0 && !parties.Contains("vše", StringComparer.InvariantCultureIgnoreCase))
+        if (parties.Length > 0 && !parties.Contains(FilterAll, StringComparer.InvariantCultureIgnoreCase))
         {
             var partiesSet = new HashSet<string>(parties, StringComparer.InvariantCultureIgnoreCase);
             filteredData = filteredData.Where(d =>
@@ -318,10 +340,10 @@ public partial class PoliticiController : Controller
         }
 
         // Groups
-        if (groups.Length > 0 && !groups.Contains("všichni", StringComparer.InvariantCultureIgnoreCase))
+        if (groups.Length > 0 && !groups.Contains(FilterAll, StringComparer.InvariantCultureIgnoreCase))
         {
             filteredData = filteredData.Where(d =>
-                groups.Any(g => d.PolitickaRole.Contains(g, StringComparison.InvariantCultureIgnoreCase)));
+                groups.Any(g => d.PolitickaRole.StartsWith(g, StringComparison.InvariantCultureIgnoreCase)));
         }
 
         return filteredData.ToList();
@@ -345,7 +367,7 @@ public partial class PoliticiController : Controller
         if (maxPlatTo.HasValue) filteredData = filteredData.Where(d => d.PlatyDo <= maxPlatTo.Value * 1_000_000);
 
         // Groups
-        if (stavy.Length > 0 && !stavy.Contains("vše", StringComparer.InvariantCultureIgnoreCase))
+        if (stavy.Length > 0 && !stavy.Contains(FilterAll, StringComparer.InvariantCultureIgnoreCase))
         {
             filteredData = filteredData.Where(d =>
                 stavy.Any(s => d.EventStatus.Contains(s, StringComparison.InvariantCultureIgnoreCase)));
