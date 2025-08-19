@@ -158,6 +158,31 @@
     const initialValues = @Html.Raw(Model.GetInitialValuesJson());
     const filterOptions = @Html.Raw(Model.GetFilterOptionsJson());
 
+    // první render filtrů
+    const urlParams = new URLSearchParams(window.location.search);
+    const paramsToApply = {};
+
+    for (const [key, value] of urlParams.entries()) {
+      if (!paramsToApply[key]) {
+        paramsToApply[key] = [];
+      }
+      paramsToApply[key].push(value);
+    }
+
+    for (const key in paramsToApply) {
+      const values = paramsToApply[key];
+      const input = $(`[name="${key}"]`);
+
+      if (input.is('input[type="radio"], input[type="checkbox"]')) {
+        // Nejprve odznačit vše, pak nastavit správné hodnoty
+        input.prop('checked', false);
+        values.forEach(v => $(`[name="${key}"][value="${v}"]`).prop('checked', true));
+      } else if (input.length > 0) {
+        // Textové, číselné a select pole
+        input.val(values[0]);
+      }
+    }
+
     // Jednorázové načtení a uložení mapování labelů
     const fieldLabels = {};
     $('#filterAccordion button.accordion-button').each(function() {
@@ -291,6 +316,12 @@
 
       const queryString = filteredData.toString();
       const url = `${dataEndpointUrl}?${queryString}`;
+      
+      //update address bar
+      const newUrl = window.location.protocol + "//" + window.location.host + window.location.pathname + (queryString ? `?${queryString}` : '');
+      if (newUrl !== window.location.href) {
+        history.pushState(null, '', newUrl);
+      }
 
       const controller = new AbortController();
       inflight = controller;
@@ -452,5 +483,9 @@
     $(`#${tableId}`).on('draw.dt', function () {
       initTooltips();
     });
+
+    // first pill render
+    const initialFormState = getNormalizedFormData();
+    renderActivePills(initialFormState);
   });
 </script>

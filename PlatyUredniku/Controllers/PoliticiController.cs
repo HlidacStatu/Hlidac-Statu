@@ -209,7 +209,7 @@ public partial class PoliticiController : Controller
                         new() { Value = "hejtman" },
                         new() { Value = "krajský zastupitel" }
                     ],
-                    Initial = SetInitialGroupsForFilter()
+                    Initial = [FilterAll]
                 },
                 new DataTableFilters.RangeFilterField
                 {
