@@ -539,10 +539,38 @@ public static class PpRepo
     public static string PlatyForYearPoliticiDescriptionHtml(this PuOrganizace org, int rok = DefaultYear,
         bool withDetail = false)
     {
-        var desc = org.GetMetadataDescriptionPolitici(rok);
+        var desc = org.GetSimpleStatus(rok);
 
         return
-            $"<span class='text-{desc.BootstrapStatus}'><i class='{desc.Icon}'></i> {desc.TextStatus}{(withDetail ? $". {desc.Detail}" : "")}</span>";
+            $"<span class='text-{desc.BootstrapStatus}'><i class='{desc.Icon}'></i> {desc.TextStatus}</span>";
+    }
+    
+    public static PuOrganizaceMetadata.Description GetSimpleStatus(this PuOrganizace org,
+        int rok = DefaultYear)
+    {
+     
+        var res = new PuOrganizaceMetadata.Description();
+        
+        if (org.PrijmyPolitiku.All(p => p.Status == PpPrijem.StatusPlatu.Zjistujeme_zadost_106))
+        {
+            res.TextStatus = "Neposkytli žádný plat";
+            res.BootstrapStatus = "danger";
+            res.Icon = "fa-solid fa-circle-xmark";
+        }
+        else if (org.PrijmyPolitiku.All(p => p.Status > PpPrijem.StatusPlatu.Zjistujeme_zadost_106))
+        {
+            res.TextStatus = $"Platy poskytli v plném rozsahu";
+            res.BootstrapStatus = "success";
+            res.Icon = "fa-solid fa-badge-check";
+        }
+        else
+        {
+            res.TextStatus = "Poslali pouze část platů";
+            res.BootstrapStatus = "warning";
+            res.Icon = "fa-solid fa-question-circle";
+        }
+
+        return res;
     }
 
     public static PuOrganizaceMetadata.Description GetMetadataDescriptionPolitici(this PuOrganizace org,

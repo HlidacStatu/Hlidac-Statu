@@ -141,9 +141,9 @@ public partial class PoliticiController : Controller
                     Options =
                     [
                         new() { Value = "vše", Label = "vše" },
-                        new() { Value = "success", Label = "platy dodaly" },
-                        new() { Value = "primary", Label = "neodpověděli" },
-                        new() { Value = "danger", Label = "žádost zamítli" },
+                        new() { Value = "success", Label = "Poskytli všechny platy" },
+                        new() { Value = "warning", Label = "Poskytli část platů" },
+                        new() { Value = "danger", Label = "Neposkytli žádný plat" },
                     ]
                 },
             }
