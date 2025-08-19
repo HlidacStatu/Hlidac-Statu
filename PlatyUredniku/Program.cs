@@ -208,7 +208,7 @@ public class Program
             {
                     "wwwroot/Content/GlobalSite.v1.15.css",
                     "wwwroot/Content/social-share-kit.css",
-                    "wwwroot/Content/new.v1.21.css",
+                    "wwwroot/Content/new.v1.22.css",
                     "wwwroot/css/site.css",
             };
 

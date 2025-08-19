@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Text.Json;
 using System.Threading.Tasks;
 using HlidacStatu.Extensions;
@@ -168,7 +169,7 @@ public partial class PoliticiController : Controller
 
         var maxJobCount = (int)fullPoliticiViewData.Max(x => x.PocetJobu) + 1;
         var maxTotalIncomeInMilions =
-            Math.Ceiling((fullPoliticiViewData.Max(x => x.CelkoveRocniNaklady) + 1) / 1_000_000);
+            Math.Ceiling((fullPoliticiViewData.Max(x => x.CelkoveRocniNaklady_Sort) + 1) / 1_000_000);
 
         var filteredPoliticiViewData = FilterPoliticiViewData(fullPoliticiViewData, politickeStranyFilterData);
 
@@ -293,9 +294,9 @@ public partial class PoliticiController : Controller
 
         // Ranges
         if (incomeFrom.HasValue)
-            filteredData = filteredData.Where(d => d.CelkoveRocniNaklady >= incomeFrom.Value * 1_000_000m);
+            filteredData = filteredData.Where(d => d.CelkoveRocniNaklady_Sort >= incomeFrom.Value * 1_000_000m);
         if (incomeTo.HasValue)
-            filteredData = filteredData.Where(d => d.CelkoveRocniNaklady <= incomeTo.Value * 1_000_000m);
+            filteredData = filteredData.Where(d => d.CelkoveRocniNaklady_Sort <= incomeTo.Value * 1_000_000m);
         if (jobsFrom.HasValue) filteredData = filteredData.Where(d => d.PocetJobu >= jobsFrom.Value);
         if (jobsTo.HasValue) filteredData = filteredData.Where(d => d.PocetJobu <= jobsTo.Value);
 
@@ -367,23 +368,23 @@ public partial class PoliticiController : Controller
 
                 foreach (var politikPlatyKvp in politiciPlatyGroup)
                 {
-                    var osoba = OsobaRepo.GetByNameId(politikPlatyKvp.Key);
-
+                    var nameid = politikPlatyKvp.Key;
+                    var platy = politikPlatyKvp.Value; 
+                    var osoba = OsobaRepo.GetByNameId(nameid);
+                    var celkoveNaklady = platy.Sum(p => p.CelkoveRocniNakladyNaPolitika);
+                    
                     politiciViewData.Add(new PoliticiViewData()
                     {
-                        CelkoveRocniNaklady = politikPlatyKvp.Value.Sum(p => p.CelkoveRocniNakladyNaPolitika),
-                        Politik = $"<a href='/politici/politik/{osoba.NameId}'>{osoba.FullName()}</a>",
+                        CelkoveRocniNaklady = RenderCelkoveRocniNaklady(platy),
+                        CelkoveRocniNaklady_Sort = celkoveNaklady,
+                        Politik = $"<a href='/politici/politik/{osoba.NameId}'>{WebUtility.HtmlEncode(osoba.FullName())}</a>",
                         Politik_Sort = $"{osoba.Prijmeni}-{osoba.Jmeno}",
-                        PocetJobu = politikPlatyKvp.Value.Length,
+                        PocetJobu = platy.Length,
                         Pohlavi = osoba.Pohlavi,
                         PolitickaRole = osoba.MainRolesToString(PpRepo.DefaultYear),
                         PolitickaStrana =
                             osoba.CurrentPoliticalParty(), //todo: změnit na politickou stranu v konkrétním roce (přidat funkčnost)
-                        Organizace = "<ol>" + string.Join("", politikPlatyKvp.Value
-                            .Select(n => n.Organizace)
-                            .Distinct()
-                            .Select(o => $"<li><a href='/politici/organizace/{o?.DS}'>{o?.Nazev}</a></li>")
-                        ) + "</ol>",
+                        Organizace = RenderOrganizace(platy),
                     });
                 }
 
@@ -392,6 +393,57 @@ public partial class PoliticiController : Controller
         );
 
         return fullPoliticiViewDataTask;
+    }
+
+    private string RenderCelkoveRocniNaklady(PpPrijem[] platy)
+    {
+        var rottenOrgs = platy.Where(p => p.Status == PpPrijem.StatusPlatu.Zjistujeme_zadost_106)
+            .Select(n => n.Organizace)
+            .Distinct()
+            .ToList();
+        var celkoveNaklady = platy.Sum(p => p.CelkoveRocniNakladyNaPolitika);
+        var nicePrice = RenderData.NicePrice(celkoveNaklady, html: true);
+
+        if (rottenOrgs.Any())
+        {
+            var rottenOrgsHtml = "<ol>" + string.Join("", rottenOrgs.Select(o => $"<li>{WebUtility.HtmlEncode(o?.Nazev)}</li>")) + "</ol>";
+                
+            var title =
+                $"Platy {Devmasters.Lang.CS.Plural.Get(rottenOrgs.Count, "neposkytla", "neposkytly", "neposkytly")} tyto organizace: <br /> {rottenOrgsHtml}"; 
+            var result = $"""
+                          <span class="help-tooltip" data-bs-toggle="tooltip" data-bs-html="true" title='{title}'>
+                            {nicePrice}
+                          </span> 
+                          """;
+            return result;
+        }
+
+        return nicePrice;
+    }
+    
+    private string RenderOrganizace(PpPrijem[] platy)
+    {
+        var goodOrgs = platy.Where(p => p.Status > PpPrijem.StatusPlatu.Zjistujeme_zadost_106)
+            .Select(n => n.Organizace)
+            .Distinct()
+            .ToList();
+        var rottenOrgs = platy.Where(p => p.Status == PpPrijem.StatusPlatu.Zjistujeme_zadost_106)
+            .Select(n => n.Organizace)
+            .Distinct()
+            .ToList();
+        
+        var goodOrgsHtmlList = string.Join("", goodOrgs
+            .Select(o => $"<li><a href='/politici/organizace/{o?.DS}'>{WebUtility.HtmlEncode(o?.Nazev)}</a></li>"));
+        
+        var rottenOrgsHtmlList = string.Join("", rottenOrgs
+            .Select(o => $"""
+                          <li>
+                          <a href="/politici/organizace/{o?.DS}">{WebUtility.HtmlEncode(o?.Nazev)}</a>
+                          <i class="text-danger fas fa-exclamation-circle" data-bs-toggle="tooltip" title="neposkytla plat"></i>
+                          </li>
+                          """));
+
+        return "<ol>" + goodOrgsHtmlList + rottenOrgsHtmlList + "</ol>";
     }
 
     private async Task<List<OrganizaceViewData>> GetFullOrganizaceViewDataCached(int rok)
@@ -473,8 +525,10 @@ public partial class PoliticiController : Controller
         [HtmlTableDefinition.Column(HtmlTableDefinition.ColumnType.Text, "Politická role")]
         public string PolitickaRole { get; set; }
 
-        [HtmlTableDefinition.Column(HtmlTableDefinition.ColumnType.Price, "Roční příjem + náhrady")]
-        public Decimal CelkoveRocniNaklady { get; set; }
+        [HtmlTableDefinition.Column(HtmlTableDefinition.ColumnType.Number, "Roční příjem + náhrady")]
+        public string CelkoveRocniNaklady { get; set; }
+        [HtmlTableDefinition.Column(HtmlTableDefinition.ColumnType.Hidden, "Prijem sort")]
+        public Decimal CelkoveRocniNaklady_Sort { get; set; }
 
         [HtmlTableDefinition.Column(HtmlTableDefinition.ColumnType.Number, "Počet jobů")]
         public Decimal PocetJobu { get; set; }

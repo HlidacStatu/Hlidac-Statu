@@ -439,5 +439,18 @@
       });
       fetchAndRender();
     });
+    
+    //bootstrap tooltips (if exist)
+    const initTooltips = () => {
+      document.querySelectorAll('[data-bs-toggle="tooltip"]').forEach(el => {
+        if (!bootstrap.Tooltip.getInstance(el)) {
+          new bootstrap.Tooltip(el);
+        }
+      });
+    };
+
+    $(`#${tableId}`).on('draw.dt', function () {
+      initTooltips();
+    });
   });
 </script>
