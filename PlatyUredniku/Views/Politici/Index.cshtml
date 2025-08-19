@@ -1,4 +1,5 @@
-﻿@using HlidacStatu.Repositories
+﻿@using HlidacStatu.Entities
+@using HlidacStatu.Repositories
 @using HlidacStatu.Util
 @using MathNet.Numerics.Statistics;
 
@@ -24,10 +25,10 @@
     var kraj = await PpRepo.GetPrijmyGroupedByNameIdAsync(rok, group: PpRepo.PoliticianGroup.KrajstiZastupitele);
     var vsichni = await PpRepo.GetPrijmyGroupedByNameIdAsync(rok, group: PpRepo.PoliticianGroup.Vse);
 
-    var rocniPlatPoslancu = poslanci.Select(x => x.Value.Sum(m => m.CelkoveRocniNakladyNaPolitika));
-    var rocniPlatSenatoru = senatori.Select(x => x.Value.Sum(m => m.CelkoveRocniNakladyNaPolitika));
-    var rocniPlatMinistru = vlada.Select(x => x.Value.Sum(m => m.CelkoveRocniNakladyNaPolitika));
-    var rocniPlatKraju = kraj.Select(x => x.Value.Sum(m => m.CelkoveRocniNakladyNaPolitika));
+    var rocniPlatPoslancu = poslanci.Select(x => x.Value.Where(s => s.Status > PpPrijem.StatusPlatu.Zjistujeme_zadost_106).Sum(m => m.CelkoveRocniNakladyNaPolitika));
+    var rocniPlatSenatoru = senatori.Select(x => x.Value.Where(s => s.Status > PpPrijem.StatusPlatu.Zjistujeme_zadost_106).Sum(m => m.CelkoveRocniNakladyNaPolitika));
+    var rocniPlatMinistru = vlada.Select(x => x.Value.Where(s => s.Status > PpPrijem.StatusPlatu.Zjistujeme_zadost_106).Sum(m => m.CelkoveRocniNakladyNaPolitika));
+    var rocniPlatKraju = kraj.Select(x => x.Value.Where(s => s.Status > PpPrijem.StatusPlatu.Zjistujeme_zadost_106).Sum(m => m.CelkoveRocniNakladyNaPolitika));
 
     decimal pocetFunkci = (decimal)vsichni
             .Average(a => a.Value.Count());
@@ -186,7 +187,7 @@
                         .ThenByDescending(o => o.Value.Sum(m => m.CelkoveRocniNakladyNaPolitika))
                         .First();
                     }
-                    <br />
+                    <br /><br />
                     Vede <a href="/politici/politik/@topJob.Key">@(Osoby.GetByNameId.Get(topJob.Key).FullName())</a> s <b>@topJob.Value.Count()</b> pozicemi.
                 </div>
                 <div class="card-footer">
@@ -207,7 +208,7 @@
                 </div>
                 <div class="card-body">
                     Unikátní projekt <i>Platy politiků a úředníků</i>je součástí Hlídače státu.
-                    <br />
+                    <br /><br />
                     Zjistěte víc o pozadí projektu i zpracování dat o platech.
 
                 </div>
