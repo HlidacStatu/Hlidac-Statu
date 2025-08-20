@@ -95,7 +95,6 @@ public partial class PoliticiController : Controller
             return View(detail);
     }
 
-    [HlidacCache(48 * 60 * 60, "*")]
     public async Task<IActionResult> VsechnyOrganizace(int rok = PpRepo.DefaultYear)
     {
         ViewData["rok"] = rok;
@@ -161,8 +160,7 @@ public partial class PoliticiController : Controller
 
         return new JsonResult(filteredOrganizaceViewData.ToList(), new JsonSerializerOptions(JsonSerializerDefaults.Web));
     }
-
-    [HlidacCache(60 * 60, "*")]
+    
     public async Task<IActionResult> Seznam(string report = "platy")
     {
         var fullPoliticiViewData = await GetFullPoliticiViewDataCached();
@@ -201,8 +199,8 @@ public partial class PoliticiController : Controller
                     Options =
                     [
                         new() { Value = FilterAll, Label = FilterAll },
-                        new() { Value = "předseda vlády" },
-                        new() { Value = "ministr" },
+                        new() { Value = "člen vlády" },
+                        // new() { Value = "ministr" },
                         new() { Value = "poslanec" },
                         new() { Value = "senátor" },
                         // new() { Value = "europoslanec" },
@@ -343,7 +341,12 @@ public partial class PoliticiController : Controller
         if (groups.Length > 0 && !groups.Contains(FilterAll, StringComparer.InvariantCultureIgnoreCase))
         {
             filteredData = filteredData.Where(d =>
-                groups.Any(g => d.PolitickaRole.StartsWith(g, StringComparison.InvariantCultureIgnoreCase)));
+                groups.Any(g => 
+                    g.Equals("člen vlády", StringComparison.InvariantCultureIgnoreCase) ?
+                        d.PolitickeRoleFilter.Any(r => r.StartsWith("ministr", StringComparison.InvariantCultureIgnoreCase) 
+                                                       || r.StartsWith("předseda vlády", StringComparison.InvariantCultureIgnoreCase) ) :
+                        d.PolitickeRoleFilter.Any(r => r.StartsWith(g, StringComparison.InvariantCultureIgnoreCase))));
+            
         }
 
         return filteredData.ToList();
@@ -403,7 +406,7 @@ public partial class PoliticiController : Controller
                         Politik_Sort = $"{osoba.Prijmeni}-{osoba.Jmeno}",
                         PocetJobu = platy.Length,
                         Pohlavi = osoba.Pohlavi,
-                        PolitickaRole = osoba.MainRolesToString(PpRepo.DefaultYear),
+                        PolitickeRoleFilter = osoba.MainRoles(PpRepo.DefaultYear),
                         PolitickaStrana =
                             osoba.CurrentPoliticalParty(), //todo: změnit na politickou stranu v konkrétním roce (přidat funkčnost)
                         Organizace = RenderOrganizace(platy),
@@ -539,9 +542,12 @@ public partial class PoliticiController : Controller
         
         [HtmlTableDefinition.Column(HtmlTableDefinition.ColumnType.Text, "Politická strana")]
         public string PolitickaStrana { get; set; }
-        
+
         [HtmlTableDefinition.Column(HtmlTableDefinition.ColumnType.Text, "Politická role")]
-        public string PolitickaRole { get; set; }
+        public string PolitickaRole => string.Join(", ", PolitickeRoleFilter);
+        
+        [HtmlTableDefinition.Column(HtmlTableDefinition.ColumnType.Hidden, "PolitRoleFilter")]
+        public List<string> PolitickeRoleFilter {get; set;}
 
         [HtmlTableDefinition.Column(HtmlTableDefinition.ColumnType.Number, "Roční příjem + náhrady")]
         public string CelkoveRocniNaklady { get; set; }
