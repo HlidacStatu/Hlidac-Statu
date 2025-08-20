@@ -120,12 +120,12 @@
                 if (m.Value.All(m=>m.Status == 0))
                 {
                     return $"<a href='/politici/politik/{m.Key}'>{HlidacStatu.Util.RenderData.NicePrice(m.Value.Sum(v => v.CelkoveRocniNakladyNaPolitika), html: true)}</a>"
-                    + $"<br /><span class='text-danger-emphasis'>Žádná organizace nám příjem dosud neposkytla</span>";
+                    + $"<br /><span class='text-danger-emphasis'>Žádná organizace nám příjem neposkytla</span>";
                 }
                 else if (m.Value.Any(m=>m.Status == 0))
                 {
                     return $"<a href='/politici/politik/{m.Key}'>{HlidacStatu.Util.RenderData.NicePrice(m.Value.Sum(v => v.CelkoveRocniNakladyNaPolitika), html: true)}</a>"
-                    + $"<br /><span class='text-danger-emphasis'>{Devmasters.Lang.CS.Plural.Get(m.Value.Count(m => m.Status == 0), "jedna organizace nám příjem dosud neposkytla", "{0} organizace nám příjem dosud neposkytlo", "{0} organizací nám příjem dosud neposkytlo")}.</span>";
+                    + $"<br /><span class='text-danger-emphasis'>{Devmasters.Lang.CS.Plural.Get(m.Value.Count(m => m.Status == 0), "jedna organizace nám příjem neposkytla", "{0} organizace nám příjem neposkytlo", "{0} organizací nám příjem neposkytlo")}.</span>";
                 }
                 else
                     return $"<a href='/politici/politik/{m.Key}'>{HlidacStatu.Util.RenderData.NicePrice(m.Value.Sum(v => v.CelkoveRocniNakladyNaPolitika), html: true)}</a>";

@@ -2,7 +2,7 @@
 @using HlidacStatu.Util
 
 @{
-    ViewBag.Title = "Reporty a statistiky";
+    ViewBag.Title = "Žebříčky, analýzy a zajímavosti";
 
     int rok = PpRepo.DefaultYear;
 
@@ -215,25 +215,25 @@
 </section>
 <section class="d-flex align-items-center justify-content-center  @(GetBgClass()) pageblock">
     <div class="container">
-        <h2>Reporty</h2>
+        <h2>Žebříčky a analýzy</h2>
         <div class="list-group">
             <a href="/politici/reporty/top-prijem" class="list-group-item list-group-item-action">
                 Politici s nejvyšším celkovým příjmem z veřejných funkcí
             </a>
             <a href="/politici/reporty/top-funkce" class="list-group-item list-group-item-action">
-                Politici s největším počtem příjmů
+                Politici s největším počtem kumulací
             </a>
             <a href="/politici/reporty/politici-taji-prijem" class="list-group-item list-group-item-action">
-                Přehled nejméně transparentních politiků
+                Přehled politiků se skrytými příjmy
             </a>
             <a href="/politici/reporty/organizace-taji-platy" class="list-group-item list-group-item-action">
-                Přehled nejméně transparentních organizaci
+                Přehled nejméně transparentních organizací
             </a>
             <a href="/politici/reporty/dle-pohlavi" class="list-group-item list-group-item-action">
-                Političky a politici
+                Političky vs. politici
             </a>
             <a href="/politici/reporty/dle-veku" class="list-group-item list-group-item-action">
-                Mladí vs. senioři
+                Mladí vs. starší politici
             </a>
             <a href="/politici/reporty/report4" class="list-group-item list-group-item-action disabled">
                 Rekordmani na krajích  (připravujeme)

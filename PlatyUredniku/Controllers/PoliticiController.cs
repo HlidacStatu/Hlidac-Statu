@@ -16,7 +16,7 @@ using ZiggyCreatures.Caching.Fusion;
 
 namespace PlatyUredniku.Controllers;
 
-[Authorize(Roles = "Admin")]
+[Authorize(Roles = "Admin,BetaTester")]
 public partial class PoliticiController : Controller
 {
     private readonly IFusionCache _cache;

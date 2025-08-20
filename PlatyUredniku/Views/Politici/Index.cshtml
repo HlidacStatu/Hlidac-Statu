@@ -36,7 +36,7 @@
     int minJobCount = 4;
     decimal pocetLidiXjobs = vsichni
             .Count(a => a.Value.Count() >= minJobCount);
-    
+
 }
 
 @section breadcrumbs
@@ -54,14 +54,15 @@
         <div class="text-lg-start">
             <h1 class="display-3 mb-4 text-start">Příjmy politiků a kumulace funkcí</h1>
             <p class="lead text-body-secondary mb-5">
-                Zjistěte, jaký příjem mají politici a kolik zastávají funkcí. Zmapovali jsme příjmy <b>@((await PpRepo.GetNameIdsForGroupAsync(PpRepo.PoliticianGroup.Vse, rok)).Count)</b> špičkových politiků v ČR.
+                Zjistěte, jaký příjem mají zvolení a jmenovaní politici i kolik zastávají funkcí. Zmapovali jsme příjmy z veřejných funkcí <b>@((await PpRepo.GetNameIdsForGroupAsync(PpRepo.PoliticianGroup.Vse, rok)).Count)</b> politiků v ČR.
             </p>
             <div class="row align-items-center justify-content-center justify-content-lg-start g-4">
                 <div class="col-sm-auto">
                     <a class="btn btn-primary" href="/politici/seznam">Zobrazit všechny politiky</a>
                 </div>
                 <div class="col-sm-auto">
-                    <a class="btn btn-outline-primary" href="/politici/reporty"><i class="fa-solid fa-chart-pie-simple-circle-dollar"></i> 
+                    <a class="btn btn-outline-primary" href="/politici/reporty">
+                        <i class="fa-solid fa-chart-pie-simple-circle-dollar"></i>
                         Zajímavosti, žebříčky a analýzy příjmů politiků
                     </a>
                 </div>
@@ -153,7 +154,7 @@
                     </h4>
                 </div>
                 <div class="card-body">
-                    Zastupitelé dostali v roce 2024 od <b>@(HlidacStatu.Util.RenderData.NicePriceHtml(rocniPlatKraju.Where(m=>m>0).Min()))</b>
+                    Zastupitelé dostali v roce 2024 od <b>@(HlidacStatu.Util.RenderData.NicePriceHtml(rocniPlatKraju.Where(m => m > 0).Min()))</b>
                     do <b>@(HlidacStatu.Util.RenderData.NicePriceHtml(rocniPlatKraju.Max()))</b> ročně.
                     <br /><br />
                     Najdete u nás celkem <b>@(HlidacStatu.Util.RenderData.NiceNumber(kraj.Count))</b> zastupitelů.
@@ -224,7 +225,7 @@
 
 </section>
 
-<section class="container py-5 pageblock"> 
+<section class="container py-5 pageblock">
     <div class="row ">
         <div class="col-12">
             <h3>
@@ -239,8 +240,10 @@
                     </a>
                 </li>
                 <li>
+                    <a href="https://texty.hlidacstatu.cz/jak-se-voli-a-co-delaji-senatori-poslanci-a-krajsti-zastupitele/">
                         <i class="fa-regular fa-building-columns mx-2" style=""></i>
                         Co všechno dělá poslanec, senátor, krajský zastupitel?
+                    </a>
                 </li>
                 <li>
                     <a href="https://texty.hlidacstatu.cz/kumulace-funkci/" class="">
@@ -248,6 +251,11 @@
                         Kumulace funkcí
                     </a>
 
+                </li>
+                <li>
+                    <a href="https://texty.hlidacstatu.cz/faq-platy-politiku/">
+                        <i class="fa-solid fa-messages-question"></i>
+                        Otázky a odpovědi
                 </li>
             </ul>
         </div>

@@ -20,7 +20,9 @@
         <div class="col-lg-10 col-md-12 mx-auto">
             <h1 class="fw-light">Platy politiků a úředníků</h1>
             <p class="lead text-body-secondary">
-                <b>Sledujte, kolik vydělávají politici, úředníci amanažeři </b>. Všechny jejich příjmy na jednom místě. <b>Vaše peníze - vaše právo vědět</b>.
+                <b>Sledujte, kolik vydělávají zvolení politici, top úředníci a manažeři veřejné správy</b>.
+                Jejich příjmy z veřejných funkcí na jednom místě.
+                <b>Vaše peníze - vaše právo vědět</b>.
             </p>
             <p>
                 <a href="/politici" class="btn btn-primary my-3">Příjmy <span class="badge text-bg-light mx-1">@(HlidacStatu.Util.RenderData.NiceNumber(polStats.PocetOsobPozadano))</span> politiků.</a>
@@ -31,13 +33,13 @@
     <div class="row justify-content-center">
         <div class="col-auto">
             <table class="table table-responsive">
-                    <tr>
-                        <td class="align-middle"><i class="fa-solid fa-circle-heart fa-2x mx-3" style="color:red"></i></td>
-                        <td class="fs-6">
+                <tr>
+                    <td class="align-middle"><i class="fa-solid fa-circle-heart fa-2x mx-3" style="color:red"></i></td>
+                    <td class="fs-6">
                         Shromáždit data o tisících platů vyžaduje enormní úsilí.
                         <br /><a target="_blank" href="https://texty.hlidacstatu.cz/jak-podporit-hlidac-statu-fungovani-ceska/">Podpořte nás, ať můžeme pokračovat i příští rok.</a>
                     </td>
-                    </tr>
+                </tr>
             </table>
         </div>
     </div>
@@ -47,17 +49,24 @@
         <div class="row row-cols-1">
             <div class="col">
                 <p class="lead">
-                    Projekt <b>Platy</b> je součástí Hlídače státu. <br />
-                    <i class="fa-solid fa-circle-1"></i> Zjistěte, jaký roční příjem mají významní politici či kolik zastávají funkcí. Jde o novinku, ptáme se poprvé na rok 2024. A budeme to opakovat každý rok.
+                    Unikátní projekt <b>Platy</b> je součástí Hlídače státu. <br />
+                    <i class="fa-solid fa-circle-1"></i> <b>Politici pod lupou</b>: Zjistěte, kolik berou významní politici
+                    a kolik funkcí zároveň zastávají.
+                    Jde o novinku - letos poprvé přinášíme data za rok 2024
+                    a v dalších letech v tom budeme pokračovat.
                     <br />
-                    <i class="fa-solid fa-circle-2"></i> Informace o platech a odměnách soudců, vedení úřadů, státních podniků či příspěvkových organizací v ČR u nás najdete už spoustu let.
+                    <i class="fa-solid fa-circle-2"></i> <b>Platy ve veřejné správě</b>: Už řadu let u nás najdete
+                    jedinečné informace o platech a odměnách soudců,
+                    vedení úřadů, státních podniků či příspěvkových organizací.
                 </p>
                 <p>
-                    Data shromažďujeme na základě oficiální žádosti podle zákona o svobodném přístupu k informacím.             Platy a odměny jsou stanoveny
-                    <a asp-controller="Texty" asp-action="PlatyStatnichZamestnancu">nařízením vlády</a>
-                    nebo
+                    Data shromažďujeme na základě oficiální žádosti podle zákona o svobodném přístupu k informacím.
+                    Platy a odměny jsou stanoveny
+                    <a asp-controller="Texty" asp-action="PlatyStatnichZamestnancu">nařízením vlády</a> nebo
                     <a asp-controller="Texty" asp-action="Nejvyssi">zákonem</a>.
-
+                    Za správnost a úplnost údajů odpovídají oslovené veřejné instituce.
+                    Víte o něčem, co nám v přehledech chybí?
+                    Napište nám na <a href="mailto:podpora@hlidacstatu.cz">podpora@hlidacstatu.cz</a>.
                 </p>
 
             </div>

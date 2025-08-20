@@ -4,7 +4,7 @@
 @using PlatyUredniku.Cache
 
 @{
-    ViewBag.Title = "Politici nejvíce tající svůj příjem";
+    ViewBag.Title = "Přehled politiků se skrytými příjmy";
 }
 @section breadcrumbs
 {
@@ -40,7 +40,7 @@
         <h2>@ViewData["title"]</h2>
         <p>
             Oslovili jsme s žádostí o informace dle zákona o právu na informace všechny zde uvedené organizace. 
-            Ty nám odmítli informace o platech daných politiků sdělit.
+            Ty nám odmítly informace o platech daných politiků sdělit.
             
         </p>
         <p>
@@ -88,14 +88,16 @@
             Name = "Celkový roční příjem",
             HtmlRender = (m) =>
             {
-                return $"<a href='/politici/politik/{m.Key}'>{HlidacStatu.Util.RenderData.NicePrice(m.Value.Sum(v => v.CelkoveRocniNakladyNaPolitika), html: true)}</a>";
+                return $"<a href='/politici/politik/{m.Key}'>{HlidacStatu.Util.RenderData.NicePrice(m.Value.Sum(v => v.CelkoveRocniNakladyNaPolitika), html: true)}</a>"
+                    + $"<br /><span class='text-danger-emphasis'>{Devmasters.Lang.CS.Plural.Get(m.Value.Count(m => m.Status == 0), "jedna organizace nám příjem neposkytla", "{0} organizace nám příjem neposkytlo", "{0} organizací nám příjem neposkytlo")}.</span>"
+                ;
             },
             OrderValueRender = (m) => HlidacStatu.Util.RenderData.OrderValueFormat(m.Value.Sum(v => v.CelkoveRocniNakladyNaPolitika)),
             CssClass = "number"
         },
         new ReportDataSource<KeyValuePair<string, PpPrijem[]>>.Column()
         {
-            Name = "Neposkytl plat z organizací",
+            Name = "Organizace, které neposkytly plat",
             HtmlRender = (m) =>
             {
                 return "<ol>" + string.Join("", m.Value
