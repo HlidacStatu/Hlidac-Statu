@@ -365,9 +365,11 @@ namespace HlidacStatu.Extensions
                 return (lastCeo, ceoEvent.DatumOd, ceoEvent.AddInfo);
             }
         }
-        public static (Osoba Osoba, DateTime? From, DateTime? To, string Role)[] Ceos(this Firma firma, DateTime? fromDate, DateTime? toDate)
+        public static (Osoba Osoba, DateTime? From, DateTime? To, string Role)[] Ceos(
+            this Firma firma, DateTime? fromDate, DateTime? toDate,
+            Expression<Func<OsobaEvent, bool>> predicate = null)
         {
-            return OsobaEventRepo.GetCeos(firma.ICO, fromDate, toDate);
+            return OsobaEventRepo.GetCeos(firma.ICO, fromDate, toDate, predicate);
         }
 
         public static IEnumerable<string> IcosInHolding(this Firma firma, Relation.AktualnostType aktualnost)

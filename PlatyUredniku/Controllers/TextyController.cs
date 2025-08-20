@@ -22,7 +22,7 @@ public class TextyController : Controller
     
     public async Task<IActionResult> Aktuality()
     {
-        return View();
+        return Redirect("/");
     }
     
     public async Task<IActionResult> VypoctyPlatyUredniku()

@@ -98,7 +98,10 @@ namespace HlidacStatu.Repositories
             }
         }
 
-        public static (Osoba Osoba, DateTime? From, DateTime? To, string Role)[] GetCeos(string ico, DateTime? from = null, DateTime? to = null)
+        public static (Osoba Osoba, DateTime? From, DateTime? To, string Role)[] GetCeos(
+            string ico, DateTime? from = null, DateTime? to = null,
+            Expression<Func<OsobaEvent, bool>> predicate = null
+            )
         {
             using (DbEntities db = new DbEntities())
             {
@@ -111,6 +114,9 @@ namespace HlidacStatu.Repositories
                 if (to is not null)
                     ceoQuery = ceoQuery.Where(oe => oe.DatumOd == null || oe.DatumOd <= to);
                 
+                if (predicate is not null)
+                    ceoQuery = ceoQuery.Where(predicate);
+
                 var ceoEvent = ceoQuery
                     .OrderByDescending(oe => oe.DatumOd)
                     .ToArray()
