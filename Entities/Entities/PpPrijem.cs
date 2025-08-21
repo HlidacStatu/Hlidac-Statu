@@ -28,6 +28,8 @@ public class PpPrijem
         PotvrzenyPlat_od_organizace = 1,
         [Devmasters.Enums.NiceDisplayName("Příjem nám zaslal politik.")]
         PotvrzenyPlat_od_politika = 2,
+        [Devmasters.Enums.NiceDisplayName("Příjem z jiného zdroje.")]
+        PotvrzenyPlat_jiny_zdroj = 5,
 
     }
 
@@ -63,6 +65,7 @@ public class PpPrijem
     public decimal? NahradaTelefon { get; set; }
     public decimal? Prispevky { get; set; }
 
+    public string ZdrojInformace { get; set; }
     public StatusPlatu Status { get; set; } = 0;
     
     public string CreatedBy { get; set; }
