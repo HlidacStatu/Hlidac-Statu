@@ -29,7 +29,7 @@ public class HomeController : Controller
         );
 
         ViewData["platy"] = await platyTask;
-        if (this.User.IsInRole("Admin"))
+        if (this.User.IsInRole("Admin") || this.User.IsInRole("BetaTester"))
             return View("IndexNew");
         else
             return View();
