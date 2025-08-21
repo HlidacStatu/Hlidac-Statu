@@ -250,6 +250,11 @@
 
             <h3 id="@pprijem.Organizace.DS"><a href="/politici/organizace/@pprijem.Organizace.FirmaDs.Ico">@pprijem.Organizace.Nazev</a></h3>
 
+            @if (pprijem.Status == PpPrijem.StatusPlatu.PotvrzenyPlat_jiny_zdroj)
+            {
+                <p class="lead text-warning">Informaci o tomto platu máme z jiného zdroje. Zdroj informace: <small>@pprijem.ZdrojInformace</small></p>                
+            }
+            
             @if (pprijem.Status == PpPrijem.StatusPlatu.Zjistujeme_zadost_106)
             {
                 <p class="lead text-warning">Organizace nám pro @politik.FullName() neposkytla žádné informace o platu.</p>                
