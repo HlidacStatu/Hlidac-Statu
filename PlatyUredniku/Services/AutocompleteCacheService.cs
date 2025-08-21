@@ -72,20 +72,16 @@ public class AutocompleteCacheService
 
         var organizaceTask = LoadOrganizace(cancellationToken);
         var oblastTask = LoadOblasti(cancellationToken);
-        //var ceoTask = LoadCeos(cancellationToken);
         var synonymsTask = LoadSynonyms(cancellationToken);
         var politiciTask = LoadPolitici(cancellationToken);
 
-        await Task.WhenAll(organizaceTask, oblastTask, 
-            //ceoTask, 
-            synonymsTask, politiciTask);
+        await Task.WhenAll(organizaceTask, oblastTask, synonymsTask, politiciTask);
 
         if (cancellationToken.IsCancellationRequested)
             return Enumerable.Empty<Autocomplete>().ToList();
 
         results.AddRange(organizaceTask.Result);
         results.AddRange(oblastTask.Result);
-        //results.AddRange(ceoTask.Result);
         results.AddRange(synonymsTask.Result);
         results.AddRange(politiciTask.Result);
 
@@ -138,49 +134,6 @@ public class AutocompleteCacheService
                 Category = Autocomplete.CategoryEnum.Oblast,
             })
             .ToListAsync(cancellationToken: cancellationToken);
-    }
-    
-    [Obsolete("CEOs z uredniku v autocomplete uz nechceme")]        
-    private async Task<List<Autocomplete>> obsolete_LoadCeos(CancellationToken cancellationToken)
-    {
-        await using var db = new DbEntities();
-
-        var platy = await db.PuPlaty.AsNoTracking()
-            .Where(p => p.JeHlavoun == true)
-            .Where(p => p.Rok == PuRepo.DefaultYear)
-            .Include( p => p.Organizace)
-            .ThenInclude(o => o.FirmaDs)
-            .Where(p => p.Organizace.FirmaDs.Ico != null)
-            .ToListAsync(cancellationToken: cancellationToken);
-
-        DateTime fromDate = new DateTime(PuRepo.DefaultYear, 1, 1);
-        DateTime toDate = new DateTime(PuRepo.DefaultYear, 12, 31);
-
-        var results = new List<Autocomplete>();
-        foreach (var plat in platy)
-        {
-            if(cancellationToken.IsCancellationRequested)
-                break;
-            
-            if(string.IsNullOrWhiteSpace(plat.Organizace.FirmaDs.Ico))
-                continue;
-
-            var autocomplete = OsobaEventRepo.GetCeos(plat.Organizace.FirmaDs.Ico, fromDate, toDate)
-                .Select(o => new Autocomplete()
-                {
-                    Id = $"/plat/{plat.Id}",
-                    Text = $"{o.Osoba.Jmeno} {o.Osoba.Prijmeni}{Osoba.AppendTitle(o.Osoba.TitulPred, o.Osoba.TitulPo)}",
-                    PriorityMultiplier = 1,
-                    Type = "osoba",
-                    ImageElement = $"<img src='{o.Osoba.GetPhotoUrl(false, Osoba.PhotoTypes.NoBackground)}' />",
-                    Description = $"{plat.Organizace.Nazev} - {plat.NazevPozice}",
-                    Category = Autocomplete.CategoryEnum.Person,
-                })
-                .ToList();
-            results.AddRange(autocomplete);
-        }
-
-        return results;
     }
     
     private static async Task<List<Autocomplete>> LoadSynonyms(CancellationToken cancellationToken)
