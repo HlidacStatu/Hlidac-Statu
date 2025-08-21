@@ -79,7 +79,7 @@
                                 </span>
                             </h5>
                             Političky mají průměrný příjem
-                            <div class="me-2 badge text-bg-warning">
+                            <div class="badge text-bg-warning">
                                 @(HlidacStatu.Util.MathTools.DifferenceInPercentText(rocniPlatMuzi.Average(), rocniPlatZeny.Average()))
                             </div>
                             než muži.
@@ -98,13 +98,14 @@
                                 @HlidacStatu.Util.RenderData.NicePriceHtml(rocniPlatPoslancu.Average())
                             </h5>
                             Poslanci mají průměrný příjem
-                            <div class="me-2 badge text-bg-warning">
+                            <div class="badge text-bg-warning">
                                 @(HlidacStatu.Util.MathTools.DifferenceText(prumernyMzdaCR, rocniPlatPoslancu.Average()))
                             </div>
                             <span>než je</span>
-                            <abbr
-                                title="Průměrná měsíční mzda rok @PpRepo.DefaultYear je @HlidacStatu.Util.RenderData.NicePrice(prumernyMzdaCR / 12). Roční je  @HlidacStatu.Util.RenderData.NicePrice(prumernyMzdaCR)">průměrná
-                                roční mzda v ČR</abbr>.
+                            <abbr title="Průměrná měsíční mzda rok @PpRepo.DefaultYear je @HlidacStatu.Util.RenderData.NicePrice(prumernyMzdaCR / 12). Roční je  @HlidacStatu.Util.RenderData.NicePrice(prumernyMzdaCR)">
+                                průměrná
+                                roční mzda v ČR
+                            </abbr>.
                         </div>
                     </div>
                 </div>
@@ -120,13 +121,14 @@
                                 @HlidacStatu.Util.RenderData.NicePriceHtml(rocniPlatMinistru.Average())
                             </h5>
                             Premiér a ministři mají průměrný příjem
-                            <div class="me-2 badge text-bg-warning">
+                            <div class="badge text-bg-warning">
                                 @(HlidacStatu.Util.MathTools.DifferenceText(prumernyMzdaCR, rocniPlatMinistru.Average()))
                             </div>
                             <span>než je</span>
-                            <abbr
-                                title="Průměrná měsíční mzda rok @PpRepo.DefaultYear je @HlidacStatu.Util.RenderData.NicePrice(prumernyMzdaCR / 12). Roční je  @HlidacStatu.Util.RenderData.NicePrice(prumernyMzdaCR)">průměrná
-                                roční mzda v ČR</abbr>.
+                            <abbr title="Průměrná měsíční mzda rok @PpRepo.DefaultYear je @HlidacStatu.Util.RenderData.NicePrice(prumernyMzdaCR / 12). Roční je  @HlidacStatu.Util.RenderData.NicePrice(prumernyMzdaCR)">
+                                průměrná
+                                roční mzda v ČR
+                            </abbr>.
                         </div>
                     </div>
                 </div>
@@ -143,13 +145,14 @@
                                 @HlidacStatu.Util.RenderData.NicePriceHtml(rocniPlatSenatoru.Average())
                             </h5>
                             Senátoři mají průměrný příjem
-                            <div class="me-2 badge text-bg-warning">
+                            <div class="badge text-bg-warning">
                                 @(HlidacStatu.Util.MathTools.DifferenceText(prumernyMzdaCR, rocniPlatSenatoru.Average()))
                             </div>
                             <span>než je</span>
-                            <abbr
-                                title="Průměrná měsíční mzda rok @PpRepo.DefaultYear je @HlidacStatu.Util.RenderData.NicePrice(prumernyMzdaCR / 12). Roční je  @HlidacStatu.Util.RenderData.NicePrice(prumernyMzdaCR)">průměrná
-                                roční mzda v ČR</abbr>.
+                            <abbr title="Průměrná měsíční mzda rok @PpRepo.DefaultYear je @HlidacStatu.Util.RenderData.NicePrice(prumernyMzdaCR / 12). Roční je  @HlidacStatu.Util.RenderData.NicePrice(prumernyMzdaCR)">
+                                průměrná
+                                roční mzda v ČR
+                            </abbr>.
                         </div>
                     </div>
                 </div>
@@ -165,14 +168,15 @@
                                 @HlidacStatu.Util.RenderData.NicePriceHtml(rocniPlatKraju.Average())
                             </h5>
                             Krajští zastupitelé mají průměrný příjem
-                            <div class="me-2 badge text-bg-warning">
+                            <div class="badge text-bg-warning">
                                 @(HlidacStatu.Util.MathTools.DifferenceText(prumernyMzdaCR, rocniPlatKraju.Average()))
                                 vyšší
                             </div>
                             <span>než je</span>
-                            <abbr
-                                title="Průměrná měsíční mzda rok @PpRepo.DefaultYear je @HlidacStatu.Util.RenderData.NicePrice(prumernyMzdaCR / 12). Roční je  @HlidacStatu.Util.RenderData.NicePrice(prumernyMzdaCR)">průměrná
-                                roční mzda v ČR</abbr>.
+                            <abbr title="Průměrná měsíční mzda rok @PpRepo.DefaultYear je @HlidacStatu.Util.RenderData.NicePrice(prumernyMzdaCR / 12). Roční je  @HlidacStatu.Util.RenderData.NicePrice(prumernyMzdaCR)">
+                                průměrná
+                                roční mzda v ČR
+                            </abbr>.
                         </div>
                     </div>
                 </div>
@@ -193,18 +197,70 @@
                             @(pocetLidiXjobs) politiků působí na více než <b>@minJobCount</b> pozicích.
                             @{
                                 var topJob = vsichni
-                                    .OrderByDescending(p => p.Value.Count())
-                                    .ThenByDescending(o => o.Value.Sum(m => m.CelkoveRocniNakladyNaPolitika))
-                                    .First();
+                                .OrderByDescending(p => p.Value.Count())
+                                .ThenByDescending(o => o.Value.Sum(m => m.CelkoveRocniNakladyNaPolitika))
+                                .First();
                             }
                             <p>
-                                Vede <b>@(Osoby.GetByNameId.Get(topJob.Key).FullName())</b> s&nbsp;<span class="me-2 badge text-bg-warning"><b>@topJob.Value.Count()</b></span> funkcemi.
+                                Vede <b>@(Osoby.GetByNameId.Get(topJob.Key).FullName())</b> s&nbsp;<span class="badge text-bg-warning"><b>@topJob.Value.Count()</b></span> funkcemi.
                             </p>
                         </div>
                     </div>
                 </div>
             </div>
 
+            <div class="col-6 col-lg-4">
+                <div class="card h-100">
+                    <div class="pb-0 card-header">
+                        <h4 class="">Oslovené úřady a organizace</h4>
+                    </div>
+                    <div class="d-flex  card-body">
+                        <div>
+                            @{
+                                var allOrgs = vsichni.SelectMany(m => m.Value).Select(m => m.IdOrganizace).Distinct();
+                                var noPlatyOrgs = vsichni.SelectMany(m => m.Value)
+                                    .Where(m => m.Status ==  HlidacStatu.Entities.PpPrijem.StatusPlatu.Zjistujeme_zadost_106)
+                                    .Select(m => m.IdOrganizace)
+                                    .Distinct();
+
+                            }
+                            <h5 class="mb-2 text-700 fw-normal lh-1">
+                                <b>@RenderData.NiceNumber(allOrgs.Count())</b>
+                                organizací.
+                            </h5>
+                            Z @RenderData.NiceNumber(allOrgs.Count()) organizací nám platy neposkytlo
+                            či odmítlo poskytnout <span class="badge text-bg-warning"><b>@RenderData.NiceNumber(noPlatyOrgs.Count())</b></span> z nich.
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-6 col-lg-4">
+                <div class="card h-100">
+                    <div class="pb-0 card-header">
+                        <h4 class="">Neposkytnuté platy</h4>
+                    </div>
+                    <div class="d-flex  card-body">
+                        <div>
+                            @{
+
+                                var anyMissingPlat = vsichni
+                                    .Where(m => m.Value.Any(v=> v.Status == HlidacStatu.Entities.PpPrijem.StatusPlatu.Zjistujeme_zadost_106));
+
+                            }
+                            <h5 class="mb-2 text-700 fw-normal lh-1">
+                                <b>@RenderData.NiceNumber(anyMissingPlat.Count())</b>
+                                politiků nemá komplet příjem.
+                            </h5>
+                            Z @RenderData.NiceNumber(vsichni.Count()) politiků jsme všechny odpověďi na plat dostali 
+                            pro @RenderData.NiceNumber(vsichni.Count-anyMissingPlat.Count()) osob. 
+                            U <span class="badge text-bg-warning"><b>@RenderData.NiceNumber(anyMissingPlat.Count())</b></span>
+                            politiků ná, alespoň jeden příjem chybí - nedostali jsme ho.
+                            
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </section>
