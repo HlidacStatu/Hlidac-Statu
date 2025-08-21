@@ -7,6 +7,87 @@
 @{
     ViewBag.Title = "Rozdíly v platech podle pohlaví";
 }
+
+@section Scripts
+{
+    <style>
+        .stat-card {
+            background-color: #a8c8ec;
+            border-radius: 25px;
+            padding: 25px;
+            border: none;
+            color: #2c3e50;
+        }
+
+        .stat-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin-bottom: 10px;
+            text-align: center;
+            line-height: 1.4;
+        }
+
+        .stat-comparison {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+        }
+
+        .stat-group {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .gender-icon {
+            font-size: 2.5rem;
+            margin-bottom: 5px;
+        }
+
+        .female-icon {
+            color: #e74c3c;
+        }
+
+        .male-icon {
+            color: #3498db;
+        }
+
+        .stat-value {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: #2c3e50;
+        }
+
+        .vs-text {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #34495e;
+            margin: 0 10px;
+        }
+
+        .highlight {
+            color: #2c3e50;
+            font-weight: 700;
+        }
+
+
+        @@media (max-width: 768px) {
+            .stat-title {
+                font-size: 1.1rem;
+            }
+
+            .stat-value {
+                font-size: 1.2rem;
+            }
+
+            .gender-icon {
+                font-size: 2rem;
+            }
+        }
+    </style>
+}
 @section breadcrumbs
 {
     <ol class="breadcrumb">
@@ -53,80 +134,95 @@
 }
 
 
-<section class="d-flex align-items-center justify-content-center  @(GetBgClass()) pageblock-small">
-    <div class="container">
-        <h2>@ViewBag.Title</h2>
-        <table class="table table-bordered table-striped table-hover">
-            <thead>
-                <tr>
-                    <th></th>
-                    <th>Ženy</th>
-                    <th>Muži</th>
-                    <th>Rozdíl v %</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td class="text-nowrap">Počet</td>
-                    <td class="number">@(RenderData.NiceNumber(rocniPlatZeny.Count()))</td>
-                    <td class="number">@(RenderData.NiceNumber(rocniPlatMuzi.Count()))</td>
-                    <td class="number">
-                        Žen je @MathTools.DifferenceInPercentText(rocniPlatMuzi.Count(), rocniPlatZeny.Count(), lower:"méně",bigger:"více")
-                    </td>
-                </tr>
-                <tr>
-                    <td class="text-nowrap">Průměrný počet přijmů</td>
-                    <td class="number">@(RenderData.NiceNumber((decimal)rocniPlatZenyorgs.Average()))</td>
-                    <td class="number">@(RenderData.NiceNumber((decimal)rocniPlatMuziorgs.Average()))</td>
-                    <td class="number">
-                        Ženy jich mají @MathTools.DifferenceInPercentText((decimal)rocniPlatMuziorgs.Average(), (decimal)rocniPlatZenyorgs.Average(), lower: "méně", bigger: "více")
-                    </td>
-                </tr>
-                <tr>
-                    <td class="text-nowrap">Průměrný roční příjem</td>
-                    <td class="number">@(RenderData.NicePriceHtml(rocniPlatZeny.Average(), shortFormat: true, showDecimal: RenderData.ShowDecimalVal.Show))</td>
-                    <td class="number">@(RenderData.NicePriceHtml(rocniPlatMuzi.Average(), shortFormat: true, showDecimal: RenderData.ShowDecimalVal.Show))</td>
-                    <td class="number">
-                        Ženy @MathTools.DifferenceInPercentText(rocniPlatMuzi.Average(), rocniPlatZeny.Average())
-                    </td>
-                </tr>
+<div class="container">
+    <div class="row row-cols-1 row-cols-sm-1 row-cols-md-1 row-cols-lg-2 g-4">
 
-                <tr>
-                    <td class="text-nowrap">Nejvyšší příjem</td>
-                    <td class="number">@(RenderData.NicePriceHtml(rocniPlatZeny.Max(), shortFormat: true, showDecimal: RenderData.ShowDecimalVal.Show))</td>
-                    <td class="number">@(RenderData.NicePriceHtml(rocniPlatMuzi.Max(), shortFormat: true, showDecimal: RenderData.ShowDecimalVal.Show))</td>
-                    <td class="number">
-                        Ženy @MathTools.DifferenceInPercentText(rocniPlatMuzi.Max(), rocniPlatZeny.Max())
-                    </td>
-                </tr>
-                <tr>
-                    <td class="text-nowrap">Příjem poloviny osob je vyšší než </td>
-                    <td class="number">@(RenderData.NicePriceHtml(MathTools.PercentileCont(0.50m, rocniPlatZeny), shortFormat:true, showDecimal: RenderData.ShowDecimalVal.Show ))</td>
-                    <td class="number">@(RenderData.NicePriceHtml(MathTools.PercentileCont(0.50m, rocniPlatMuzi), shortFormat: true, showDecimal: RenderData.ShowDecimalVal.Show))</td>
-                    <td class="number">
-                        Ženy @MathTools.DifferenceInPercentText(MathTools.PercentileCont(0.50m, rocniPlatMuzi), MathTools.PercentileCont(0.50m, rocniPlatZeny))
-                    </td>
-                </tr>
+        <div class="col p-3">
+            <!-- Card 1: Average Income -->
+            <div class="card stat-card">
+                <div class="stat-title">
+                    Političky mají průměrný roční příjem <span class="highlight">
+                        @MathTools.DifferenceInPercentText(rocniPlatMuzi.Average(), rocniPlatZeny.Average())
+                        než politici
+                    </span>
+                </div>
+                <div class="stat-comparison">
+                    <div class="stat-group">
+                        <i class="fas fa-female gender-icon female-icon"></i>
+                        <div class="stat-value">@(RenderData.NicePriceHtml(rocniPlatZeny.Average(), shortFormat: true, showDecimal: RenderData.ShowDecimalVal.Show))</div>
+                    </div>
+                    <div class="vs-text">vs.</div>
+                    <div class="stat-group">
+                        <i class="fas fa-male gender-icon male-icon"></i>
+                        <div class="stat-value">@(RenderData.NicePriceHtml(rocniPlatMuzi.Average(), shortFormat: true, showDecimal: RenderData.ShowDecimalVal.Show))</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Card 2: Parliament Representation -->
+        <div class="col p-3">
+            <div class="card stat-card">
+                <div class="stat-title">
+                    Političek je v Parlamentu, vládě a na krajích <span class="highlight">
+                        @MathTools.DifferenceInPercentText(rocniPlatMuzi.Count(), rocniPlatZeny.Count(), lower: "méně", bigger: "více") než politiků
+                    </span>
+                </div>
+                <div class="stat-comparison">
+                    <div class="stat-group">
+                        <i class="fas fa-female gender-icon female-icon"></i>
+                        <div class="stat-value">@(RenderData.NiceNumber(rocniPlatZeny.Count()))</div>
+                    </div>
+                    <div class="vs-text">vs.</div>
+                    <div class="stat-group">
+                        <i class="fas fa-male gender-icon male-icon"></i>
+                        <div class="stat-value">@(RenderData.NiceNumber(rocniPlatMuzi.Count()))</div>
+                    </div>
+                </div>
+            </div>
+        </div>
 
-                <tr>
-                    <td class="text-nowrap">Příjem 20% nejlépe placených je vyšší než </td>
-                    <td class="number">@(RenderData.NicePriceHtml(MathTools.PercentileCont(0.80m, rocniPlatZeny), shortFormat: true, showDecimal: RenderData.ShowDecimalVal.Show))</td>
-                    <td class="number">@(RenderData.NicePriceHtml(MathTools.PercentileCont(0.80m, rocniPlatMuzi), shortFormat: true, showDecimal: RenderData.ShowDecimalVal.Show))</td>
-                    <td class="number">
-                        Ženy @MathTools.DifferenceInPercentText(MathTools.PercentileCont(0.80m, rocniPlatMuzi), MathTools.PercentileCont(0.80m, rocniPlatZeny))
-                    </td>
-                </tr>
-                <tr>
-                    <td class="text-nowrap">Příjem 10% nejlépe placených je vyšší než </td>
-                    <td class="number">@(RenderData.NicePriceHtml(MathTools.PercentileCont(0.90m, rocniPlatZeny), shortFormat: true, showDecimal: RenderData.ShowDecimalVal.Show))</td>
-                    <td class="number">@(RenderData.NicePriceHtml(MathTools.PercentileCont(0.90m, rocniPlatMuzi), shortFormat: true, showDecimal: RenderData.ShowDecimalVal.Show))</td>
-                    <td class="number">
-                        Ženy @MathTools.DifferenceInPercentText(MathTools.PercentileCont(0.90m, rocniPlatMuzi), MathTools.PercentileCont(0.80m, rocniPlatZeny))
-                    </td>
-                </tr>
-            </tbody>
-        </table>
+        <!-- Card 3: Position Accumulation -->
+        <div class="col p-3">
+            <div class="card stat-card">
+                <div class="stat-title">
+                    Ženy mají průměrný počet funkcí <span class="highlight">
+                        @MathTools.DifferenceInPercentText((decimal)rocniPlatMuziorgs.Average(), (decimal)rocniPlatZenyorgs.Average(), lower: "nižší", bigger: "vyšší") než muži
+                    </span>
+                </div>
+                <div class="stat-comparison">
+                    <div class="stat-group">
+                        <i class="fas fa-female gender-icon female-icon"></i>
+                        <div class="stat-value">@(RenderData.NiceNumber((decimal)rocniPlatZenyorgs.Average())) pozic</div>
+                    </div>
+                    <div class="vs-text">vs.</div>
+                    <div class="stat-group">
+                        <i class="fas fa-male gender-icon male-icon"></i>
+                        <div class="stat-value">@(RenderData.NiceNumber((decimal)rocniPlatMuziorgs.Average())) pozic</div>
+                    </div>
+                </div>
+            </div>
+        </div>
 
+        <!-- Card 4: Highest Paid -->
+        <div class="col p-3">
+            <div class="card stat-card">
+                <div class="stat-title">
+                    Nejlépe placená politička bere ročně <span class="highlight">@MathTools.DifferenceInPercentText(rocniPlatMuzi.Max(), rocniPlatZeny.Max()) než nejlépe placený politik</span>
+                </div>
+                <div class="stat-comparison">
+                    <div class="stat-group">
+                        <i class="fas fa-female gender-icon female-icon"></i>
+                        <div class="stat-value">@(RenderData.NicePriceHtml(rocniPlatZeny.Max(), shortFormat: true, showDecimal: RenderData.ShowDecimalVal.Show))</div>
+                    </div>
+                    <div class="vs-text">vs.</div>
+                    <div class="stat-group">
+                        <i class="fas fa-male gender-icon male-icon"></i>
+                        <div class="stat-value">@(RenderData.NicePriceHtml(rocniPlatMuzi.Max(), shortFormat: true, showDecimal: RenderData.ShowDecimalVal.Show))</div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
-</section>
+
+</div>
 
