@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace PlatyUredniku.Controllers;
 
-[Authorize(Roles = "Admin")]
+[Authorize(Roles = "Admin,BetaTester")]
 public partial class PoliticiController
 {
 

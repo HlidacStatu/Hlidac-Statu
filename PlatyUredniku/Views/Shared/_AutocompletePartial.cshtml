@@ -64,7 +64,7 @@
 </div>
 
 @{
-    var link = User.IsInRole("Admin") ? "/autocomplete/admin" : "/autocomplete/main"; 
+    var link = (User.IsInRole("Admin") || User.IsInRole("BetaTester")) ? "/autocomplete/admin" : "/autocomplete/main";
 }
 
 <script>

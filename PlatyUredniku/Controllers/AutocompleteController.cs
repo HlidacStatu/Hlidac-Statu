@@ -54,7 +54,7 @@ public class AutocompleteController : ControllerBase
     }
     
     [Authorize]
-    [HttpGet("admin")]
+    [HttpGet("Admin,BetaTester")]
     public ActionResult<List<Autocomplete>> Admin([FromQuery] string q)
     {
         try

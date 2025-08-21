@@ -31,7 +31,7 @@
         </p>
         <p class="lead">
         </p>
-        @if (User.IsInRole("Admin"))
+        @if (User.IsInRole("Admin") || User.IsInRole("BetaTester"))
         {
             <p class="">
                 Nově jsme přidali také <strong><a asp-controller="Politici" asp-action="Index">Platy politiků</a></strong>.
