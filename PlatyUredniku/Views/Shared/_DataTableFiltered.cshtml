@@ -136,7 +136,7 @@
       <tr>
         @foreach (var col in visibleProps)
         {
-          <th>@HeaderTitle(col)</th>
+          <th>@Html.Raw(HeaderTitle(col))</th>
         }
       </tr>
       </thead>

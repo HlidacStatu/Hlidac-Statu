@@ -111,7 +111,7 @@
                         {
                             <tr>
                                 <th class="text-nowrap">
-                                    Celkový roční příjem
+                                    <celkovy-rocni-prijem/>
                                 </th>
                                 <td class="fw-bold number">@HlidacStatu.Util.RenderData.NicePriceHtml(platyZaRok.Sum(m => m.CelkoveRocniNakladyNaPolitika))</td>
                             </tr>
@@ -180,7 +180,7 @@
                 <thead>
                     <tr>
                         <td class="text-nowrap">Organizace</td>
-                        <td class="text-nowrap">Celkový roční příjem včetně odměn</td>
+                        <td class="text-nowrap"><celkovy-rocni-prijem/></td>
                     </tr>
                 </thead>
                 <tbody>
@@ -260,7 +260,7 @@
                     <caption>Všechny odměny jsou uvedeny v hrubém za kalendářní rok @rok</caption>
                     <tbody>
                         <tr>
-                            <th class="text-nowrap">Celkový roční příjem od této organizace</th>
+                            <th class="text-nowrap"><celkovy-rocni-prijem/> od této organizace</th>
                             <td width="100%">@HlidacStatu.Util.RenderData.NicePriceHtml(pprijem.CelkoveRocniNakladyNaPolitika)</td>
                         </tr>
                         <tr>

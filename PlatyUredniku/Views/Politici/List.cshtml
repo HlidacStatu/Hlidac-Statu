@@ -2,6 +2,7 @@
 
 @using Devmasters.Enums
 @using HlidacStatu.Entities
+@using HlidacStatu.Lib.Web.UI.TagHelpers
 @using HlidacStatu.Repositories
 @using HlidacStatu.XLib.Render
 @using PlatyUredniku.Cache
@@ -114,7 +115,7 @@
         },
         new ReportDataSource<KeyValuePair<string, PpPrijem[]>>.Column()
         {
-            Name = "Celkový roční příjem",
+            Name = CelkovyRocniPrijemTagHelper.Content,
             HtmlRender = (m) =>
             {
                 if (m.Value.All(m=>m.Status == 0))

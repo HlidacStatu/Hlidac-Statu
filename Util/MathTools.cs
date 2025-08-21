@@ -157,7 +157,7 @@ namespace HlidacStatu.Util
                 return $"{same}";
         }
         public static string DifferenceText(decimal baseValue, decimal anotherValue,
-            string prefix = "", string postfix="-krát", string bigger = "vyšší", string lower = "nižší", string same = "stejný",
+            string prefix = "", string postfix="x", string bigger = "vyšší", string lower = "nižší", string same = "stejný",
             string numberFormat = "F1")
         {
             decimal change = anotherValue / baseValue;

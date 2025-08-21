@@ -36,7 +36,7 @@ public class SankeyDiagram
         {
             // prijem
             data.Add(new {
-                from = "Celkové roční náklady na politika",
+                from = "Celkový roční příjem",
                 to = prijemPolitika.Organizace.Nazev,
                 weight = DrawNakladyPerYear(prijemPolitika.CelkovyRocniPlatVcetneOdmen, nakladyMax),
                 color = prijemPolitika.Status == PpPrijem.StatusPlatu.Zjistujeme_zadost_106 ? Color_zjistujeme : Color_prijem,
@@ -57,7 +57,7 @@ public class SankeyDiagram
             if (prijemPolitika.CelkoveRocniNahrady > 1)
             {
                 data.Add(new {
-                    from = "Celkové roční náklady na politika",
+                    from = "Celkový roční příjem",
                     to = prijemPolitika.Organizace.Nazev,
                     weight = DrawNakladyPerYear(prijemPolitika.CelkoveRocniNahrady, nakladyMax),
                     color = Color_nahrady,

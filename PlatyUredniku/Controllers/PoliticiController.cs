@@ -10,6 +10,7 @@ using System.Net;
 using System.Text.Json;
 using System.Threading.Tasks;
 using HlidacStatu.Extensions;
+using HlidacStatu.Lib.Web.UI.TagHelpers;
 using HlidacStatu.Util;
 using PlatyUredniku.DataTable;
 using ZiggyCreatures.Caching.Fusion;
@@ -212,7 +213,7 @@ public partial class PoliticiController : Controller
                 new DataTableFilters.RangeFilterField
                 {
                     Key = PoliticiFilterKeys.TotalIncome,
-                    Label = "Roční příjem + náhrady",
+                    Label = "Celkový roční příjem",
                     Min = 0,
                     Max = maxTotalIncomeInMilions,
                     Step = 0.5m,
@@ -549,7 +550,7 @@ public partial class PoliticiController : Controller
         [HtmlTableDefinition.Column(HtmlTableDefinition.ColumnType.Hidden, "PolitRoleFilter")]
         public List<string> PolitickeRoleFilter {get; set;}
 
-        [HtmlTableDefinition.Column(HtmlTableDefinition.ColumnType.Number, "Roční příjem + náhrady")]
+        [HtmlTableDefinition.Column(HtmlTableDefinition.ColumnType.Number, CelkovyRocniPrijemTagHelper.Content)]
         public string CelkoveRocniNaklady { get; set; }
         [HtmlTableDefinition.Column(HtmlTableDefinition.ColumnType.Hidden, "Prijem sort")]
         public Decimal CelkoveRocniNaklady_Sort { get; set; }
