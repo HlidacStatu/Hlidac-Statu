@@ -53,8 +53,8 @@ public class AutocompleteController : ControllerBase
         return Enumerable.Empty<Autocomplete>().ToList();
     }
     
-    [Authorize]
-    [HttpGet("Admin,BetaTester")]
+    [Authorize()]
+    [HttpGet("admin")]
     public ActionResult<List<Autocomplete>> Admin([FromQuery] string q)
     {
         try
