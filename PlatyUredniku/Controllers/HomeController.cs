@@ -21,6 +21,7 @@ public class HomeController : Controller
         _cache = cache;
     }
 
+    [HlidacCache(48 * 60 * 60)]
     public async Task<IActionResult> Index()
     {
         var platyTask = _cache.GetOrSetAsync<List<PuPlat>>(
@@ -29,10 +30,13 @@ public class HomeController : Controller
         );
 
         ViewData["platy"] = await platyTask;
-        if (this.User.IsInRole("Admin") || this.User.IsInRole("BetaTester"))
-            return View("IndexNew");
+        if (Devmasters.Config.GetWebConfigValue("ShowPrijmyPolitiku") == "true"
+            || this.User.IsInRole("Admin")
+            || this.User.IsInRole("BetaTester")
+                )
+            return View("Index");
         else
-            return View();
+            return View("IndexOld");
     }
 
 
@@ -64,7 +68,8 @@ public class HomeController : Controller
             {
                 detail = f2;
             }
-            detail.PrijmyPolitiku = f2.PrijmyPolitiku;
+            if (detail != null)
+                detail.PrijmyPolitiku = f2?.PrijmyPolitiku;
         }
 
         if (detail == null)

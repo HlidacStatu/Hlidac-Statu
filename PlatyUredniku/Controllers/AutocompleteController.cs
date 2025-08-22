@@ -22,21 +22,31 @@ public class AutocompleteController : ControllerBase
     }
 
     [HttpGet("main")]
-    public ActionResult<List<Autocomplete>> Main([FromQuery] string q)
+    public ActionResult<Autocomplete[]> Main([FromQuery] string q)
     {
+        Autocomplete[] results = Array.Empty<Autocomplete>();
         try
         {
-            var results = AutocompleteService.Search(q, "instituce oblast osoba").ToList();
+            if (Devmasters.Config.GetWebConfigValue("ShowPrijmyPolitiku") == "true" || User.IsInRole("Admin") || User.IsInRole("BetaTester"))
+            {
+                results = AutocompleteService.Search(q).ToArray();
+            }
+            else
+            {
+                results = AutocompleteService.Search(q, "instituce oblast osoba").ToArray();
+
+            }
+
+
             return results;
         }
         catch (Exception e)
         {
-            //todo: add logging
+            //TODO: add logging
         }
-        
-        return Enumerable.Empty<Autocomplete>().ToList();
+        return results;
     }
-    
+
     [HttpGet("category")]
     public ActionResult<List<Autocomplete>> Category([FromQuery] string q)
     {
@@ -49,10 +59,10 @@ public class AutocompleteController : ControllerBase
         {
             //todo: add logging
         }
-        
+
         return Enumerable.Empty<Autocomplete>().ToList();
     }
-    
+
     [Authorize()]
     [HttpGet("admin")]
     public ActionResult<List<Autocomplete>> Admin([FromQuery] string q)
@@ -66,7 +76,7 @@ public class AutocompleteController : ControllerBase
         {
             //todo: add logging
         }
-        
+
         return Enumerable.Empty<Autocomplete>().ToList();
     }
 }
