@@ -3125,14 +3125,15 @@ a.form-search__hint:active:focus {
 }
 
 .exclusive {
-    color: #FFDF00;
-    font-weight: 200;
-    border-radius: 4px;
-    border: 1px solid #101010;
-    background: #101010;
-    padding: 3px 4px;
-    display: inline-block;
-    line-height: 1em;
+    color: #FFDF00 !important;
+    font-weight: 200 !important;
+    border-radius: 4px !important;
+    border: 1px solid #101010 !important;
+    background: #101010 !important;
+    padding: 3px 4px !important;
+    margin: 1px !important;
+    display: inline-block !important;
+    line-height: 1em !important;
     white-space: nowrap;
 }
 

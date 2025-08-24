@@ -1,10 +1,13 @@
-﻿@using HlidacStatu.Repositories
-@using HlidacStatu.Repositories.SharedModels
-
-
+﻿@using HlidacStatu.Entities
+@using HlidacStatu.Repositories
 @{
+    ViewBag.Title = "Platy politiků, úředníků a zaměstnanců státu";
 
-    var stats = await PuRepo.GetGlobalStatOrganizaceAsync();
+    var puPlatyStats = await PuRepo.GetPlatyPerYearStatCache.GetAsync(PuRepo.DefaultYear);
+    var puOrgStats = await PuRepo.GetGlobalStatOrganizaceAsync();
+    PpGlobalStat polStats = await PpRepo.GetGlobalStatAsync(PpRepo.DefaultYear);
+
+    DateTime stopNovinkaPolitici = new DateTime(2025, 10, 15);
 
     var organizationOfTheDay = await PuRepo.GetOrganizationOfTheDayAsync();
     var ceoOfTheDay = organizationOfTheDay.Platy.FirstOrDefault(p => p.JeHlavoun == true && p.Rok == PuRepo.DefaultYear);
@@ -12,135 +15,128 @@
 }
 
 
-
-<section class="d-flex align-items-center justify-content-center block pageblock">
-    <div class="container">
-        <h2>
-            Platy úředníků v @PuRepo.DefaultYear
-        </h2>
-        <p class="">
-            V mnoha demokratických zemích je běžné, že veřejnost může kontrolovat odměňování těch, kteří hospodaří s penězi daňových poplatníků.
-            <b>Informace o platech a odměnách</b> vedoucích úřadů, státních podniků či příspěvkových organizací v ČR ale veřejně <b>dostupné či dohledatelné nejsou</b>.
-            Proto jsme tu my! Využíváme zákona o svobodném přístupu k informacím a na platy a odměny se ptáme už mnoho let.
-        </p>
-        <p>
-            Platy a odměny jsou stanoveny
-            <a asp-controller="Texty" asp-action="PlatyStatnichZamestnancu">nařízením vlády</a>
-            nebo
-            <a asp-controller="Texty" asp-action="Nejvyssi">zákonem</a>.
-        </p>
-        <p class="lead">
-        </p>
-        @if (User.IsInRole("Admin") || User.IsInRole("BetaTester"))
-        {
-            <p class="">
-                Nově jsme přidali také <strong><a asp-controller="Politici" asp-action="Index">Platy politiků</a></strong>.
-                Nebo se můžete podívat na staré dobré <strong><a asp-controller="Urednici" asp-action="Index">Platy úředníků</a></strong>.
+<section class="py-5 text-center container pageblock-small">
+    <div class="row py-lg-5">
+        <div class="col-lg-10 col-md-12 mx-auto">
+            <h1 class="fw-light">Platy politiků a úředníků</h1>
+            <p class="lead text-body-secondary">
+                <b>Sledujte, kolik vydělávají zvolení politici, top úředníci a manažeři veřejné správy</b>.
+                Jejich příjmy z veřejných funkcí na jednom místě.
+                <b>Vaše peníze - vaše právo vědět</b>.
             </p>
-            
-        }
-    </div>
-</section>
-
-<section class="d-flex align-items-center justify-content-center alter-bg-color pageblock">
-    <div class="container">
-        <h5>
-            Za @PuRepo.DefaultYear jsme žádali o platy @(HlidacStatu.Util.RenderData.NiceNumber(stats.PocetOslovenych)) organizací
-            a plat nám @(DateTime.Now<new DateTime(2025,04,1)? "zatím":"") poskytlo @(HlidacStatu.Util.RenderData.NiceNumber(stats.PocetCoPoslaliPlat)) z nich.
-
-        </h5>
-        <p>
-            <a asp-controller="Urednici" asp-action="Oblasti" class="btn btn-primary btn-sm">Seznam všech organizací <span class="badge text-bg-danger">@(HlidacStatu.Util.RenderData.NiceNumber(stats.PocetOslovenych))</span></a>
-        </p>
-        <p class="mb-2 mt-4 text-body-secondary">
-        <p>Platy organizací v jednotlivých oblastech</p>
-        <div class="row">
-                @{
-                    int count = 0;
-                }
-                @foreach (var group in PuRepo.MainTags.Chunk(PuRepo.MainTags.Length / 4 + 1))
-                {
-                    count = count + 1;
-                <div class="col-md-3 col-sm-6 col-6">
-
-                        @foreach (var item in group)
-                        {
-                        <hashtag tag="@item" typ="PlatyUredniku" additional-class="badge rounded-pill border me-3 mb-2 order-{@count}" style="font-size:0.9em"></hashtag>
-                        <br />
-                        }
-
-                </div>
-                }
+            <p>
+                <a href="/politici" class="btn btn-primary my-3">Příjmy <span class="badge text-bg-light mx-1">@(HlidacStatu.Util.RenderData.NiceNumber(polStats.PocetOsobPozadano))</span> politiků.</a>
+                <a href="/urednici" class="btn btn-info my-3" style="margin-left:30px">Platy <span class="badge text-bg-light mx-1">@(HlidacStatu.Util.RenderData.NiceNumber(puPlatyStats.Pocet))</span> úředníků.</a>
+            </p>
         </div>
-
+    </div>
+    <div class="row justify-content-center">
+        <div class="col-auto">
+            <table class="table table-responsive">
+                <tr>
+                    <td class="align-middle"><i class="fa-solid fa-circle-heart fa-2x mx-3" style="color:red"></i></td>
+                    <td class="fs-6">
+                        Shromáždit data o tisících platů vyžaduje enormní úsilí.
+                        <br /><a target="_blank" href="https://texty.hlidacstatu.cz/jak-podporit-hlidac-statu-fungovani-ceska/">Podpořte nás, ať můžeme pokračovat i příští rok.</a>
+                    </td>
+                </tr>
+            </table>
+        </div>
     </div>
 </section>
-
-<section class="d-flex align-items-center justify-content-center pageblock">
+<div class="album py-5 bg-body-tertiary">
     <div class="container">
-        <div class="row">
-            <div class="col-12 col-md-6">
-                <h3>
-                    @organizationOfTheDay.Nazev
-                    <small class="text-body-secondary" style="font-size:75%">Organizace dne</small>
-                </h3>
-                <div>
-                    Najdete ji v kategoriích:
-                    @foreach (var tag in organizationOfTheDay.Tags)
-                    {
-                        <hashtag tag="@tag.Tag" typ="PlatyUredniku"></hashtag>
-                    }
-                </div>
-                <br />
-
-                @if (ceoOfTheDay is not null)
-                {
-                    <p>
-                        Nejvyšším představitelem organizace je <strong>@ceoOfTheDay.NazevPozice</strong>.
-                        Jeho hrubý měsíční plat (přepočtený na plný úvazek) je @HlidacStatu.Util.RenderData.NicePrice(ceoOfTheDay.HrubyMesicniPlatVcetneOdmen).
-                    </p>
-
-                }
-                <p>  
-                    @Html.Raw(Devmasters.Lang.CS.Plural.GetWithZero(dataForOrganizationOfTheDay.Platy.AktualniRok().Count,
-                             "<span class='text-danger'><i class='fa-solid fa-circle-xmark'></i> Odmítli nám poskytnout jakékoliv platy</span>",
-                             "<span class='text-warning'><i class='fa-solid fa-circle-exclamation'></i></span> Evidujeme od organizace jeden plat jedné pozice",
-                             $"<span class='text-success'><i class='fa-solid fa-badge-check'></span></i>Dostali jsme celkem {{0}} platy vedení organizace",
-                             $"<span class='text-success'><i class='fa-solid fa-badge-check'></span></i>Dostali jsme celkem {{0}} manažerských platů")
-                             )
-                    za rok @(PuRepo.DefaultYear).
+        <div class="row row-cols-1">
+            <div class="col">
+                <p class="lead">
+                    Unikátní projekt <b>Platy</b> je součástí Hlídače státu. <br />
+                    <i class="fa-solid fa-circle-1"></i> <b>Politici pod lupou</b>: Zjistěte, kolik berou významní politici
+                    a kolik funkcí zároveň zastávají.
+                    Jde o novinku - letos poprvé přinášíme data za rok 2024
+                    a v dalších letech v tom budeme pokračovat.
+                    <br />
+                    <i class="fa-solid fa-circle-2"></i> <b>Platy ve veřejné správě</b>: Už řadu let u nás najdete
+                    jedinečné informace o platech a odměnách soudců,
+                    vedení úřadů, státních podniků či příspěvkových organizací.
                 </p>
                 <p>
-                    <a asp-controller="Urednici"
-                       asp-action="Detail"
-                       asp-route-id="@organizationOfTheDay.DS"
-                       asp-route-rok="@PuRepo.DefaultYear"
-                       class="btn btn-primary btn-sm">Detail o platech</a>
+                    Data shromažďujeme na základě oficiální žádosti podle zákona o svobodném přístupu k informacím.
+                    Platy a odměny jsou stanoveny
+                    <a asp-controller="Texty" asp-action="PlatyStatnichZamestnancu">nařízením vlády</a> nebo
+                    <a asp-controller="Texty" asp-action="Nejvyssi">zákonem</a>.
+                    Za správnost a úplnost údajů odpovídají oslovené veřejné instituce.
+                    Víte o něčem, co nám v přehledech chybí?
+                    Napište nám na <a href="mailto:podpora@hlidacstatu.cz">podpora@hlidacstatu.cz</a>.
                 </p>
 
             </div>
-            <div class="col-12 col-lg-6">
-
-                <div>
-                    <partial name="Graphs/_AreaRangePlot" model="@(new AreaRangeRenderOptions(){ Platy= dataForOrganizationOfTheDay.Platy, CssHeight="250"})" />
-                </div>
-            </div>
         </div>
     </div>
-</section>
+</div>
 
-<section class="d-flex align-items-center justify-content-center alter-bg-color pageblock">
-    <div class="container">
+<div class="container" style="display:none">
+    <h1>@ViewBag.Title</h1>
+    <div class="row">
+        <div class="col-sm-12 col-md-6 border-end">
+            <h3>
+                Příjmy politiků a kumulace funkcí
+                @if (DateTime.Now < stopNovinkaPolitici)
+                {
+                    <small class="ps-1 text-danger-emphasis">Novinka!</small>
+                }
+            </h3>
+            <div>
+                <img src="/Content//politik.png" class="float-start w-25 p-3" alt="Politik">
+                <p>
+                    Za rok @PuRepo.DefaultYear jsme získali <b>@(HlidacStatu.Util.RenderData.NiceNumber(polStats.PocetPrijmu))</b> příjmů od celkem
+                    <b>@(HlidacStatu.Util.RenderData.NiceNumber(polStats.PocetOsobPozadano))</b> politiků.
 
-        <h2>
-            Analýzy a porovnání
-        </h2>
+                    Alespoň jeden plat nám poskytlo <b>@(HlidacStatu.Util.RenderData.NiceNumber(polStats.PocetOrganizaciDaliPlat))</b> organizací.
+                </p>
+                <p>Ohledně platů jsme oslovili jak  organizace, kde politici působí, tak 911 samotných politiků <small>(na které jsme našli platný email)</small>.</p>
+                <p class="clearfix"></p>
+                <p>
+                    <a asp-controller="Politici" asp-action="Index" class="btn btn-primary">Příjmy a placené funkce všech politiků</a>
+                </p>
+            </div>
 
-        <partial name="_Analyzy_List" />
+        </div>
+        <div class="col-sm-12 col-md-6">
+            <h3>Platy úředníků a manažerů</h3>
+            <div>
+                <img src="/Content//manazer.png" class="float-start w-25 p-3" alt="Politik">
+                <p>
+                    Za @PuRepo.DefaultYear jsme žádali o platy @(HlidacStatu.Util.RenderData.NiceNumber(puOrgStats.PocetOslovenych)) organizací
+                    a plat nám @(DateTime.Now < new DateTime(2025, 04, 1) ? "zatím" : "") poskytlo @(HlidacStatu.Util.RenderData.NiceNumber(puOrgStats.PocetCoPoslaliPlat)) z nich.
+                    Najdete u nás platy @(HlidacStatu.Util.RenderData.NiceNumber(puPlatyStats.Pocet)) lidí a pozic.
+                </p>
+                <div class="clearfix"></div>
+                <p>
+                    <a asp-controller="Urednici" asp-action="Index" class="btn btn-primary">Vše o platech úředníků a manažerů</a>
+                </p>
+            </div>
+        </div>
 
-        
     </div>
-</section>
+
+    <hr class="mt-4" />
+    <p class="lead">
+        Projekt <b>Platy</b> je součástí Hlídače státu. <br />
+        <i class="fa-solid fa-circle-1"></i> Zjistěte, jaký roční příjem mají významní politici či kolik zastávají funkcí. Jde o novinku, ptáme se poprvé na rok 2024. A budeme to opakovat každý rok.
+        <br />
+        <i class="fa-solid fa-circle-2"></i> Informace o platech a odměnách soudců, vedení úřadů, státních podniků či příspěvkových organizací v ČR u nás najdete už spoustu let.
+    </p>
+    <p>
+        Data shromažďujeme na základě oficiální žádosti podle zákona o svobodném přístupu k informacím.             Platy a odměny jsou stanoveny
+        <a asp-controller="Texty" asp-action="PlatyStatnichZamestnancu">nařízením vlády</a>
+        nebo
+        <a asp-controller="Texty" asp-action="Nejvyssi">zákonem</a>.
+        <br />
+        <i class="fa-solid fa-circle-heart" style="color:red"></i> Sesbírat platy tisíců manažerů a dalších tisiců politiků je obrovské množství práce. <a target="_blank" href="https://texty.hlidacstatu.cz/jak-podporit-hlidac-statu-fungovani-ceska/">Podpořte nás v tom, abychom mohli získat platy i příští rok! Díky!!</a>
+    </p>
+
+</div>
+
 
 <p class="m-5">
 

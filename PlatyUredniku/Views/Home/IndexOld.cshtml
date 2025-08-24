@@ -1,0 +1,148 @@
+﻿@using HlidacStatu.Repositories
+@using HlidacStatu.Repositories.SharedModels
+
+
+@{
+
+    var stats = await PuRepo.GetGlobalStatOrganizaceAsync();
+
+    var organizationOfTheDay = await PuRepo.GetOrganizationOfTheDayAsync();
+    var ceoOfTheDay = organizationOfTheDay.Platy.FirstOrDefault(p => p.JeHlavoun == true && p.Rok == PuRepo.DefaultYear);
+    var dataForOrganizationOfTheDay = await UredniciStaticCache.GetFullDetailAsync(organizationOfTheDay.DS);
+}
+
+
+
+<section class="d-flex align-items-center justify-content-center block pageblock">
+    <div class="container">
+        <h2>
+            Platy úředníků v @PuRepo.DefaultYear
+        </h2>
+        <p class="">
+            V mnoha demokratických zemích je běžné, že veřejnost může kontrolovat odměňování těch, kteří hospodaří s penězi daňových poplatníků.
+            <b>Informace o platech a odměnách</b> vedoucích úřadů, státních podniků či příspěvkových organizací v ČR ale veřejně <b>dostupné či dohledatelné nejsou</b>.
+            Proto jsme tu my! Využíváme zákona o svobodném přístupu k informacím a na platy a odměny se ptáme už mnoho let.
+        </p>
+        <p>
+            Platy a odměny jsou stanoveny
+            <a asp-controller="Texty" asp-action="PlatyStatnichZamestnancu">nařízením vlády</a>
+            nebo
+            <a asp-controller="Texty" asp-action="Nejvyssi">zákonem</a>.
+        </p>
+        <p class="lead">
+        </p>
+        @if (User.IsInRole("Admin") || User.IsInRole("BetaTester"))
+        {
+            <p class="">
+                Nově jsme přidali také <strong><a asp-controller="Politici" asp-action="Index">Platy politiků</a></strong>.
+                Nebo se můžete podívat na staré dobré <strong><a asp-controller="Urednici" asp-action="Index">Platy úředníků</a></strong>.
+            </p>
+            
+        }
+    </div>
+</section>
+
+<section class="d-flex align-items-center justify-content-center alter-bg-color pageblock">
+    <div class="container">
+        <h5>
+            Za @PuRepo.DefaultYear jsme žádali o platy @(HlidacStatu.Util.RenderData.NiceNumber(stats.PocetOslovenych)) organizací
+            a plat nám @(DateTime.Now<new DateTime(2025,04,1)? "zatím":"") poskytlo @(HlidacStatu.Util.RenderData.NiceNumber(stats.PocetCoPoslaliPlat)) z nich.
+
+        </h5>
+        <p>
+            <a asp-controller="Urednici" asp-action="Oblasti" class="btn btn-primary btn-sm">Seznam všech organizací <span class="badge text-bg-danger">@(HlidacStatu.Util.RenderData.NiceNumber(stats.PocetOslovenych))</span></a>
+        </p>
+        <p class="mb-2 mt-4 text-body-secondary">
+        <p>Platy organizací v jednotlivých oblastech</p>
+        <div class="row">
+                @{
+                    int count = 0;
+                }
+                @foreach (var group in PuRepo.MainTags.Chunk(PuRepo.MainTags.Length / 4 + 1))
+                {
+                    count = count + 1;
+                <div class="col-md-3 col-sm-6 col-6">
+
+                        @foreach (var item in group)
+                        {
+                        <hashtag tag="@item" typ="PlatyUredniku" additional-class="badge rounded-pill border me-3 mb-2 order-{@count}" style="font-size:0.9em"></hashtag>
+                        <br />
+                        }
+
+                </div>
+                }
+        </div>
+
+    </div>
+</section>
+
+<section class="d-flex align-items-center justify-content-center pageblock">
+    <div class="container">
+        <div class="row">
+            <div class="col-12 col-md-6">
+                <h3>
+                    @organizationOfTheDay.Nazev
+                    <small class="text-body-secondary" style="font-size:75%">Organizace dne</small>
+                </h3>
+                <div>
+                    Najdete ji v kategoriích:
+                    @foreach (var tag in organizationOfTheDay.Tags)
+                    {
+                        <hashtag tag="@tag.Tag" typ="PlatyUredniku"></hashtag>
+                    }
+                </div>
+                <br />
+
+                @if (ceoOfTheDay is not null)
+                {
+                    <p>
+                        Nejvyšším představitelem organizace je <strong>@ceoOfTheDay.NazevPozice</strong>.
+                        Jeho hrubý měsíční plat (přepočtený na plný úvazek) je @HlidacStatu.Util.RenderData.NicePrice(ceoOfTheDay.HrubyMesicniPlatVcetneOdmen).
+                    </p>
+
+                }
+                <p>  
+                    @Html.Raw(Devmasters.Lang.CS.Plural.GetWithZero(dataForOrganizationOfTheDay.Platy.AktualniRok().Count,
+                             "<span class='text-danger'><i class='fa-solid fa-circle-xmark'></i> Odmítli nám poskytnout jakékoliv platy</span>",
+                             "<span class='text-warning'><i class='fa-solid fa-circle-exclamation'></i></span> Evidujeme od organizace jeden plat jedné pozice",
+                             $"<span class='text-success'><i class='fa-solid fa-badge-check'></span></i>Dostali jsme celkem {{0}} platy vedení organizace",
+                             $"<span class='text-success'><i class='fa-solid fa-badge-check'></span></i>Dostali jsme celkem {{0}} manažerských platů")
+                             )
+                    za rok @(PuRepo.DefaultYear).
+                </p>
+                <p>
+                    <a asp-controller="Urednici"
+                       asp-action="Detail"
+                       asp-route-id="@organizationOfTheDay.DS"
+                       asp-route-rok="@PuRepo.DefaultYear"
+                       class="btn btn-primary btn-sm">Detail o platech</a>
+                </p>
+
+            </div>
+            <div class="col-12 col-lg-6">
+
+                <div>
+                    <partial name="Graphs/_AreaRangePlot" model="@(new AreaRangeRenderOptions(){ Platy= dataForOrganizationOfTheDay.Platy, CssHeight="250"})" />
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="d-flex align-items-center justify-content-center alter-bg-color pageblock">
+    <div class="container">
+
+        <h2>
+            Analýzy a porovnání
+        </h2>
+
+        <partial name="_Analyzy_List" />
+
+        
+    </div>
+</section>
+
+<p class="m-5">
+
+</p>
+

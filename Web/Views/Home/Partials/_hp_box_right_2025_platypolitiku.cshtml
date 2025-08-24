@@ -1,0 +1,80 @@
+﻿@using HlidacStatu.Entities
+@using HlidacStatu.Repositories
+
+<div class="watcher-block">
+
+    <div class="watcher__title">
+        <h3 class="new-title">
+            Platy politiků, kumulace funkcí 
+            <span style="vertical-align:middle"><img style="height:42px;color:yellow;margin-right:1px" src="/Content/exkluzivne.svg"></span>
+            <span style="vertical-align:middle"><img style="height:42px;color:yellow;margin-right:1px" src="/Content/novinka.svg"></span>
+        </h3>
+    </div>
+    @{
+        PpGlobalStat polStats = await PpRepo.GetGlobalStatAsync(PpRepo.DefaultYear);
+        var uredniciPlatyStats = await PuRepo.GetPlatyPerYearStatCache.GetAsync(PuRepo.DefaultYear);
+    }
+    <div class="block-col ">
+        <p>
+
+            Věříme, že občané mají právo znát platy nejvyšších představitelů státních úřadů, institucí a dalších organizačních složek státu.
+            Proto jsme se @HlidacStatu.Util.RenderData.NiceNumber(polStats.PocetOrganizaciPozadano) úřadů a organizací zeptali a výsledky zanalyzovali.
+        </p>
+        <p>
+            <a class="btn btn-primary my-3" href="https://platy.hlidacstatu.cz/politici?utm_source=HP&utm_medium=referral&utm_campaign=permanent&utm_content=box1a">
+                Příjmy <span class="badge text-bg-light mx-1">@HlidacStatu.Util.RenderData.NiceNumber(polStats.PocetOsobPozadano)</span> politiků </b>
+                </a>
+        </p>
+    </div>
+
+    <div class="watcher__title">
+        <h3 class="new-title">
+            Platy nejvyšších úředníků a zaměstnanců státu
+            <span style="vertical-align:middle"><img style="height:42px;color:yellow;margin-right:1px" src="/Content/exkluzivne.svg"></span>
+
+        </h3>
+    </div>
+    <div class="block-col ">
+        <p>
+            Věříme, že občané mají právo znát platy nejvyšších představitelů státních úřadů, institucí a dalších organizačních složek státu.
+            Proto jsme se @HlidacStatu.Util.RenderData.NiceNumber(uredniciPlatyStats.Platy.Select(m=>m.IdOrganizace).Distinct().Count())
+            úřadů a organizací zeptali a výsledky zanalyzovali.
+        </p>
+        <p>
+            <a class="btn btn-info my-3" href="https://platy.hlidacstatu.cz/urednici?utm_source=HP&utm_medium=referral&utm_campaign=permanent&utm_content=box1a">Platy 
+                <span class="badge text-bg-light mx-1">@(HlidacStatu.Util.RenderData.NiceNumber(uredniciPlatyStats.Pocet))</span> 
+                úředníků 2016-@(PuRepo.DefaultYear)</a>
+        </p>
+    </div>
+
+    <hr />
+
+    <!-- MailerLite Universal -->
+    <script>
+        (function(m,a,i,l,e,r){ m['MailerLiteObject']=e;function f(){
+        var c={ a:arguments,q:[]};var r=this.push(c);return "number"!=typeof r?r:f.bind(c.q);}
+        f.q=f.q||[];m[e]=m[e]||f.bind(f.q);m[e].q=m[e].q||f.q;r=a.createElement(i);
+        var _=a.getElementsByTagName(i)[0];r.async=1;r.src=l+'?v'+(~~(new Date().getTime()/1000000));
+        _.parentNode.insertBefore(r,_);})(window, document, 'script', 'https://static.mailerlite.com/js/universal.js', 'ml');
+
+        var ml_account = ml('accounts', '1727018', 'u8a0r9v8n8', 'load');
+    </script>
+    <!-- End MailerLite Universal -->
+    <div class="watcher__title">
+        <h3 class="new-title">
+            Novinky a zajímavé články mailem
+        </h3>
+    </div>
+    <div class="block-col ">
+        <p>
+            Přihlaste se k odběru pátečního newsletteru a mějte přehled o všem důležitém!
+        </p>
+        <p>
+            <script>
+                var ml_webform_6077068 = ml_account('webforms', '6077068', 'u5g9s7', 'load');
+                ml_webform_6077068('animation', 'fadeIn');
+            </script>
+            <a class="btn btn-primary btn-sm" href="javascript:;" onclick="ml_webform_6077068('show')">Přihlásit k odběru</a>
+        </p>
+    </div>
+</div>
