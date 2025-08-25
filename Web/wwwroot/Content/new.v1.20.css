@@ -179,7 +179,7 @@ h1 {
     color: #818C99 !important;
 }
 
-.new-p, .small-darkgray-text, .table-new table th, .table-new table td, .table-new th, .table-new td, .watcher__title span, .search-result-label, .funding .funding-box .funding-secured-by, .searching__intro, .searching__questions {
+.new-p, .small-darkgray-text, .table-new table th, .table-new table td, .table-new th, .table-new td,  .search-result-label, .funding .funding-box .funding-secured-by, .searching__intro, .searching__questions {
     color: #28313B;
     font-size: 14px;
     font-weight: 400;
@@ -193,11 +193,11 @@ h1 {
     font-weight: 600;
 }
 
-.new-p--gray, .small-darkgray-text, .table-new table td, .table-new td, .watcher__title span, .search-result-label, .detail-note {
+.new-p--gray, .small-darkgray-text, .table-new table td, .table-new td,  .search-result-label, .detail-note {
     color: #818C99;
 }
 
-.new-p--small, .small-darkgray-text, .table-new table td, .table-new td, .watcher__title span, .search-result-label, .detail-note {
+.new-p--small, .small-darkgray-text, .table-new table td, .table-new td,  .search-result-label, .detail-note {
     font-size: 14px;
     font-weight: 400;
     line-height: 24px;
@@ -1691,7 +1691,6 @@ select {
 .watcher-block p {
     color: #818C99;
     font-size: 16px;
-    font-weight: 400;
     line-height: 24px;
     letter-spacing: 0.3px;
 }
@@ -1750,7 +1749,7 @@ select {
     padding: 56px 16px 0;
 }
 
-    .funding .new-p, .funding .small-darkgray-text, .funding .table-new th, .table-new .funding th, .funding .table-new td, .table-new .funding td, .funding .watcher__title span, .watcher__title .funding span, .funding .search-result-label, .funding .funding-box .funding-secured-by, .funding .searching__intro, .funding .searching__questions {
+    .funding .new-p, .funding .small-darkgray-text, .funding .table-new th, .table-new .funding th, .funding .table-new td, .table-new .funding td, .funding  .watcher__title .funding span, .funding .search-result-label, .funding .funding-box .funding-secured-by, .funding .searching__intro, .funding .searching__questions {
         margin-bottom: 24px;
     }
 

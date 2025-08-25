@@ -5,9 +5,10 @@
 
     <div class="watcher__title">
         <h3 class="new-title">
-            Platy politiků, kumulace funkcí 
-            <span style="vertical-align:middle"><img style="height:42px;color:yellow;margin-right:1px" src="/Content/exkluzivne.svg"></span>
-            <span style="vertical-align:middle"><img style="height:42px;color:yellow;margin-right:1px" src="/Content/novinka.svg"></span>
+            <span class="text-bg-warning px-2 py-0 rounded">Platy</span> politiků, kumulace funkcí
+
+            @* <span style="vertical-align:middle"><img style="height:42px;margin-right:1px" src="/Content/novinka.svg"></span>
+            <span style="vertical-align:middle"><img style="height:42px;margin-right:1px" src="/Content/exkluzivne.svg"></span> *@
         </h3>
     </div>
     @{
@@ -28,9 +29,9 @@
     </div>
 
     <div class="watcher__title">
-        <h3 class="new-title">
-            Platy nejvyšších úředníků a zaměstnanců státu
-            <span style="vertical-align:middle"><img style="height:42px;color:yellow;margin-right:1px" src="/Content/exkluzivne.svg"></span>
+        <h3 class="new-title mt-4">
+            <span class="text-bg-warning px-2 py-0 rounded">Platy</span> nejvyšších úředníků a zaměstnanců státu
+            @* <span style="vertical-align:middle"><img style="height:42px;margin-right:1px" src="/Content/exkluzivne.svg"></span> *@
 
         </h3>
     </div>
@@ -42,8 +43,9 @@
         </p>
         <p>
             <a class="btn btn-info my-3" href="https://platy.hlidacstatu.cz/urednici?utm_source=HP&utm_medium=referral&utm_campaign=permanent&utm_content=box1a">Platy 
-                <span class="badge text-bg-light mx-1">@(HlidacStatu.Util.RenderData.NiceNumber(uredniciPlatyStats.Pocet))</span> 
-                úředníků 2016-@(PuRepo.DefaultYear)</a>
+                <span class="badge text-bg-light mx-1 fw-bold">@(HlidacStatu.Util.RenderData.NiceNumber(uredniciPlatyStats.Pocet))</span> 
+                úředníků 2016-<span style="color:black">@(PuRepo.DefaultYear)</span>
+            </a>
         </p>
     </div>
 
@@ -74,7 +76,7 @@
                 var ml_webform_6077068 = ml_account('webforms', '6077068', 'u5g9s7', 'load');
                 ml_webform_6077068('animation', 'fadeIn');
             </script>
-            <a class="btn btn-primary btn-sm" href="javascript:;" onclick="ml_webform_6077068('show')">Přihlásit k odběru</a>
+            <a class="btn btn-success " href="javascript:;" onclick="ml_webform_6077068('show')">Přihlásit k odběru</a>
         </p>
     </div>
 </div>
