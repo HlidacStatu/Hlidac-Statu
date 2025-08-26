@@ -57,6 +57,7 @@ public class HomeController : Controller
         }
         else
             ds = new[] { id };
+
         if (ds?.Length > 0)
         {
             await using var db = new DbEntities();
@@ -74,18 +75,32 @@ public class HomeController : Controller
 
         if (detail == null)
             return Redirect("/");
-        if (detail.Platy?.Count > 0 && detail.PrijmyPolitiku?.Count > 0)
+
+
+        if (Devmasters.Config.GetWebConfigValue("ShowPrijmyPolitiku") == "true"
+            || this.User.IsInRole("Admin")
+            || this.User.IsInRole("BetaTester")
+                )
         {
-            return View(detail);
+
+            if (detail.Platy?.Count > 0 && detail.PrijmyPolitiku?.Count > 0)
+            {
+                return View(detail);
+            }
+
+            if (detail.Platy?.Count > 0)
+                
+            if (detail.Platy?.Count > 0)
+                return RedirectToAction("organizace", "Politici", new { id = detail.DS });
+
+            else
+                return View(detail);
+        }
+        else
+        {
+            return RedirectToAction("Detail", "Urednici", new { ds = detail.DS });
         }
 
-        if (detail.Platy?.Count > 0)
-            return RedirectToAction("Detail", "Urednici", new { ds = detail.DS });
-        if (detail.Platy?.Count > 0)
-            return RedirectToAction("organizace", "Politici", new { id = detail.DS });
-
-        else
-            return View(detail);
     }
 
     public IActionResult OpenData()
