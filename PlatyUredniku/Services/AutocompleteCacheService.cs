@@ -95,13 +95,14 @@ public class AutocompleteCacheService
         var data = await db.PuOrganizace.AsNoTracking()
             .Include(o => o.FirmaDs)
             .Include(o => o.Tags)
+            .Where(o => o.Platy.Any() || o.PrijmyPolitiku.Any())
             .ToListAsync(cancellationToken: cancellationToken);
 
         data = data.Where(m => m.Tags.Any()).ToList();
         var res = data
             .Select(o => new Autocomplete()
             {
-                Id = $"/detail/{o.DS}",
+                Id = $"/organizace/{o.DS}",
                 Text = $"{o.Nazev}",
                 AdditionalHiddenSearchText = $"{o.Ico} {o.DS}",
                 PriorityMultiplier = 1,
@@ -147,7 +148,7 @@ public class AutocompleteCacheService
 
         var results = synonyma.Select(s => new Autocomplete()
         {
-            Id = $"/detail/{s.QueryPlaty}",
+            Id = $"/organizace/{s.QueryPlaty}",
             Text = s.Text,
             Type = "instituce",
             PriorityMultiplier = 1,
