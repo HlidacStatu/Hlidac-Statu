@@ -56,7 +56,9 @@ public class HomeController : Controller
 
         }
         else
+        {
             ds = new[] { id };
+        }
 
         if (ds?.Length > 0)
         {
@@ -87,8 +89,6 @@ public class HomeController : Controller
             {
                 return View(detail);
             }
-
-            if (detail.Platy?.Count > 0)
                 
             if (detail.Platy?.Count > 0)
                 return RedirectToAction("organizace", "Politici", new { id = detail.DS });

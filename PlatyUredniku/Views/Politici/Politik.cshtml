@@ -49,12 +49,13 @@
         rok = roky.Max();
     }
 
-    var platyZaRok = Model.Where(m => m.Rok == rok);
+    var platyZaRokPotvrzene = Model.Where(m => m.Status>=0);
+
 
     ViewBag.SocialShareTitle = $"{politik.FullNameWithYear()}";
     //ViewBag.SocialShareText = politik.InfoFactsCached().RenderFacts(4, true, true, ", ");
-    ViewBag.SocialShareText = $"{politik.FullNameWithYear()} měl v {PpRepo.DefaultYear} roční příjem {HlidacStatu.Util.RenderData.NicePrice(platyZaRok.Sum(m => m.CelkoveRocniNakladyNaPolitika))}"
-    + $" {Devmasters.Lang.CS.Plural.Get(platyZaRok.Count(), "z jedné pozice", "ze {0} pozic", "z {0} pozic")}.";
+    ViewBag.SocialShareText = $"{politik.FullNameWithYear()} měl v {PpRepo.DefaultYear} roční příjem {HlidacStatu.Util.RenderData.NicePrice(platyZaRokPotvrzene.Sum(m => m.CelkoveRocniNakladyNaPolitika))}"
+    + $" {Devmasters.Lang.CS.Plural.Get(platyZaRokPotvrzene.Count(), "z jedné pozice", "ze {0} pozic", "z {0} pozic")}.";
 
     ViewBag.SocialShareType = "article";
     ViewBag.SocialImage = $"https://www.hlidacstatu.cz/socialbanner/osoba?d={DateTime.Now.ToString("yyMMdd")}&v=" + politik.NameId;
@@ -96,7 +97,7 @@
                 <p class="lead">@politik.MainRolesToString(PpRepo.DefaultYear)</p>
 
                 <p>
-                    <a href="@politik.GetUrl(false)" class="btn btn-outline-primary btn-sm " style="max-width:115px;">
+                    <a href="@politik.GetUrl(false)" class="btn btn-outline-primary btn-sm ">
                         <i class="fa-solid fa-arrow-up-right-from-square"></i> Plný profil politika na Hlídači státu
                     </a>
                 </p>
@@ -107,13 +108,13 @@
                 <h4>Celkové příjmy z veřejných funkcí za @rok</h4>
                 <div>
                     <table class="table" style="width:auto">
-                        @if (platyZaRok.Sum(m => m.CelkoveRocniNahrady) > 0)
+                        @if (platyZaRokPotvrzene.Sum(m => m.CelkoveRocniNahrady) > 0)
                         {
                             <tr>
                                 <th class="text-nowrap">
-                                    <celkovy-rocni-prijem/>
+                                    <celkovy-rocni-prijem />
                                 </th>
-                                <td class="fw-bold number">@HlidacStatu.Util.RenderData.NicePriceHtml(platyZaRok.Sum(m => m.CelkoveRocniNakladyNaPolitika))</td>
+                                <td class="fw-bold number">@HlidacStatu.Util.RenderData.NicePriceHtml(platyZaRokPotvrzene.Sum(m => m.CelkoveRocniNakladyNaPolitika))</td>
                             </tr>
                         }
                         <tr>
@@ -124,9 +125,11 @@
                                    data-bs-title="Plat, odměny, bonusy, osobní příspěvky a náhrady (např. ubytování, cestovní náhrady, reprezentace)"></i>
                             </th>
                             <td class="fw-bold number"
-                                style="background-color:@(new Devmasters.Imaging.RGBA(SankeyDiagram.Color_primary_light).ToRGBA(0.4m))">@HlidacStatu.Util.RenderData.NicePriceHtml(platyZaRok.Sum(m => m.CelkovyRocniPlatVcetneOdmen))</td>
+                                style="background-color:@(new Devmasters.Imaging.RGBA(SankeyDiagram.Color_primary_light).ToRGBA(0.4m))">
+                                @HlidacStatu.Util.RenderData.NicePriceHtml(platyZaRokPotvrzene.Sum(m => m.CelkovyRocniPlatVcetneOdmen))
+                            </td>
                         </tr>
-                        @if (platyZaRok.Sum(m => m.CelkoveRocniNahrady) > 0)
+                        @if (platyZaRokPotvrzene.Sum(m => m.CelkoveRocniNahrady) > 0)
                         {
 
                             <tr>
@@ -138,7 +141,7 @@
                                 </th>
                                 <td class="fw-bold number"
                                     style="background-color:@(new Devmasters.Imaging.RGBA(SankeyDiagram.Color_secondary_light).ToRGBA(0.4m))">
-                                    @HlidacStatu.Util.RenderData.NicePriceHtml(platyZaRok.Sum(m => m.CelkoveRocniNahrady))
+                                    @HlidacStatu.Util.RenderData.NicePriceHtml(platyZaRokPotvrzene.Sum(m => m.CelkoveRocniNahrady))
                                 </td>
                             </tr>
                         }
@@ -149,7 +152,7 @@
                             </th>
                             <td class="fw-bold">
                                 <ol>
-                                    @Html.Raw(string.Join("", platyZaRok.Select(m => "<li>" + m.Organizace.FirmaDs.DsSubjName + "</li>")))
+                                    @Html.Raw(string.Join("", platyZaRokPotvrzene.Select(m => "<li>" + m.Organizace.FirmaDs.DsSubjName + "</li>")))
                                 </ol>
                             </td>
                         </tr>
@@ -170,7 +173,7 @@
         </div>
     </div>
 </section>
-@if (platyZaRok.Count() > 1)
+@if (platyZaRokPotvrzene.Count() > 1)
 {
     <section class="d-flex @(GetBgClass()) pageblock">
         <div class="container">
@@ -180,19 +183,27 @@
                 <thead>
                     <tr>
                         <td class="text-nowrap">Organizace</td>
-                        <td class="text-nowrap"><celkovy-rocni-prijem/></td>
+                        <td class="text-nowrap"><celkovy-rocni-prijem /></td>
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach (var pprijem in platyZaRok)
+                    @foreach (var pprijem in platyZaRokPotvrzene)
                     {
                         @if (pprijem.Status == PpPrijem.StatusPlatu.Zjistujeme_zadost_106)
                         {
                             <tr>
                                 <td><a href="/politici/organizace/@pprijem.Organizace.FirmaDs.Ico">@pprijem.Organizace.Nazev</a></td>
-                                <td class="number"><span class="text-warning">Neposkytla nám informace o platu politika</span></td>
+                                <td ><span class="text-warning">Neposkytla nám informace o platu politika</span></td>
                             </tr>
                         }
+                        else if (pprijem.Status == PpPrijem.StatusPlatu.Prijem_nezjistovali_jsme)
+                        {
+                            <tr>
+                                <td><a href="/politici/organizace/@pprijem.Organizace.FirmaDs.Ico">@pprijem.Organizace.Nazev</a></td>
+                                <td>Na tento příjem jsme se organizace ani politika neptali.</td>
+                            </tr>
+                        }
+
                         else
                         {
                             <tr>
@@ -232,7 +243,7 @@
                 <tfoot>
                     <tr class="table-secondary">
                         <td class="fa-bold">Celkem</td>
-                        <td class="number fa-bold">@HlidacStatu.Util.RenderData.NicePriceHtml(platyZaRok.Sum(m => m.CelkoveRocniNakladyNaPolitika))</td>
+                        <td class="number fa-bold">@HlidacStatu.Util.RenderData.NicePriceHtml(platyZaRokPotvrzene.Sum(m => m.CelkoveRocniNakladyNaPolitika))</td>
                     </tr>
                 </tfoot>
             </table>
@@ -243,7 +254,7 @@
 <div class="container mt-5 mb-0">
     <h2>Detailní informace o příjmech po organizacích v @rok</h2>
 </div>
-@foreach (var pprijem in platyZaRok)
+@foreach (var pprijem in platyZaRokPotvrzene)
 {
     <section class="d-flex block @(GetBgClass()) pageblock">
         <div class="container">
@@ -252,20 +263,39 @@
 
             @if (pprijem.Status == PpPrijem.StatusPlatu.PotvrzenyPlat_jiny_zdroj)
             {
-                <p class="lead text-warning">Informaci o tomto platu máme z jiného zdroje. Zdroj informace: <small>@pprijem.ZdrojInformace</small></p>                
+                <p class="lead text-warning">Informaci o tomto platu máme z jiného zdroje. Zdroj informace: <small>@pprijem.ZdrojInformace</small></p>
             }
-            
+
             @if (pprijem.Status == PpPrijem.StatusPlatu.Zjistujeme_zadost_106)
             {
-                <p class="lead text-warning">Organizace nám pro @politik.FullName() neposkytla žádné informace o platu.</p>                
+                <p class="lead text-warning">Organizace nám pro @politik.FullName() neposkytla žádné informace o platu.</p>
             }
+            else if (pprijem.Status == PpPrijem.StatusPlatu.Prijem_nezjistovali_jsme)
+            {
+                <p class="lead text-body">
+                    Na tento příjem jsme se organizace ani politika neptali.
+                </p>
+                @if (!string.IsNullOrWhiteSpace(pprijem.ZdrojInformace))
+                {
+                    <p>
+                        Zdroj: <cite title="Zdroj">@pprijem.ZdrojInformace</cite>
+                    </p>
+                }
+                @if (!string.IsNullOrWhiteSpace(pprijem.PoznamkaPlat))
+                {
+                    <p>
+                        Poznámka: <cite title="Zdroj">@pprijem.PoznamkaPlat</cite>
+                    </p>
+                }
+            }
+
             else
             {
                 <table class="table table-hover caption-top">
                     <caption>Všechny odměny jsou uvedeny v hrubém za kalendářní rok @rok</caption>
                     <tbody>
                         <tr>
-                            <th class="text-nowrap"><celkovy-rocni-prijem/> od této organizace</th>
+                            <th class="text-nowrap"><celkovy-rocni-prijem /> od této organizace</th>
                             <td width="100%">@HlidacStatu.Util.RenderData.NicePriceHtml(pprijem.CelkoveRocniNakladyNaPolitika)</td>
                         </tr>
                         <tr>
@@ -277,14 +307,14 @@
                             <td style="background-color:@(new Devmasters.Imaging.RGBA(SankeyDiagram.Color_primary_light).ToRGBA(0.4m))">
                                 @HlidacStatu.Util.RenderData.NicePriceHtml(pprijem.Plat ?? 0)
 
-                                @if (   pprijem.Organizace.FirmaDs.Ico == "00006572" //plat pro Snemovnu
-                                        && platyZaRok.Select(m => m.Organizace.FirmaDs.Ico).Any(m => HlidacStatu.Entities.UradyConstants.Ica.Vlada.Contains(m)) //a je ve vlade
-                                )
+                                @if (pprijem.Organizace.FirmaDs.Ico == "00006572" //plat pro Snemovnu
+                                                        && platyZaRokPotvrzene.Select(m => m.Organizace.FirmaDs.Ico).Any(m => HlidacStatu.Entities.UradyConstants.Ica.Vlada.Contains(m)) //a je ve vlade
+                                                        )
                                 {
                                     <p>
                                         <span class="text-warning fas fa-exclamation-circle" aria-hidden="true" title="Upozornění"></span><span class="sr-only">Upozornění</span>
                                         <b>Upozornění: </b>
-                                            Pokud je osoba poslancem a současně ministrem, dostává plat pouze z funkce, kde je plat vyšší.
+                                        Pokud je osoba poslancem a současně ministrem, dostává plat pouze z funkce, kde je plat vyšší.
                                     </p>
                                 }
                             </td>
@@ -368,6 +398,33 @@
                             </th>
                             <td>@pprijem.NefinancniBonus</td>
                         </tr>
+                        @if (!string.IsNullOrWhiteSpace(pprijem.PoznamkaPlat))
+                        {
+                            <tr>
+                                <th>
+                                    Poznámka k platu:
+                                    <i class="fa-solid fa-circle-info link-default me-2" data-bs-toggle="tooltip"
+                                       data-bs-title="někdy uvedená úřadem či politikem, nebo související se zdrojem informace">
+                                    </i>
+
+                                </th>
+                                <td>
+                                    <figure>
+                                        <blockquote class="blockquote">
+                                            <p>@pprijem.PoznamkaPlat</p>
+                                        </blockquote>
+                                        @if (!string.IsNullOrWhiteSpace(pprijem.ZdrojInformace))
+                                        {
+                                            <figcaption class="blockquote-footer">
+                                                Zdroj: <cite title="Zdroj">@pprijem.ZdrojInformace</cite>
+                                            </figcaption>
+                                        }
+                                    </figure>
+
+                                </td>
+                            </tr>
+                        }
+
                     </tbody>
                 </table>
                 @if (pprijem.Status == PpPrijem.StatusPlatu.PotvrzenyPlat_od_politika)

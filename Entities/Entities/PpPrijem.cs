@@ -16,18 +16,18 @@ public class PpPrijem
     [Devmasters.Enums.ShowNiceDisplayName]
     public enum StatusPlatu
     {
-        [Devmasters.Enums.NiceDisplayName("Na tento příjem jsme se organizace neptali")]
-        Prijem_nezjistovali_jsme = -3,
         [Devmasters.Enums.NiceDisplayName("Příjem od politika, který jsme nepřijali jako správný")]
         Prijem_od_politika_neodsouhlaseny = -2,
         [Devmasters.Enums.NiceDisplayName("Příjem od politika, který jsme zatím nezkontrolovali")]
         Prijem_od_politika_nezkontrolovan = -1,
-        [Devmasters.Enums.NiceDisplayName("Žádáme organizaci o příjem politika, informaci neposkytla")]
+        [Devmasters.Enums.NiceDisplayName("Požádali jsme organizaci o příjem politika, informaci neposkytla")]
         Zjistujeme_zadost_106 = 0,
         [Devmasters.Enums.NiceDisplayName("Příjem nám poskytla organizace.")]
         PotvrzenyPlat_od_organizace = 1,
         [Devmasters.Enums.NiceDisplayName("Příjem nám zaslal politik.")]
         PotvrzenyPlat_od_politika = 2,
+        [Devmasters.Enums.NiceDisplayName("Na tento příjem jsme se organizace ani politika neptali")]
+        Prijem_nezjistovali_jsme = 3,
         [Devmasters.Enums.NiceDisplayName("Příjem z jiného zdroje.")]
         PotvrzenyPlat_jiny_zdroj = 5,
 

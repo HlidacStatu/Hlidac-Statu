@@ -75,7 +75,7 @@
     <div class="container">
 
 
-        <h3>Přehled ročních příjmů politiků</h3>
+        <h3>Přehled ročních příjmů politiků pouze od @Model.Nazev</h3>
         <div class="nav flex-row nav-pills my-5" id="v-pills-tab" role="tablist">
             <button class="nav-link disabled" type="button" disabled="disabled">Rok</button>
             @{
@@ -136,7 +136,25 @@
                                     </ol>
                                 </p>
                             }
-                            @if (prijemGroup.Platy.Any(m => m.Status > 0))
+                            @if (prijemGroup.Platy.Any(m => m.Status == PpPrijem.StatusPlatu.Prijem_nezjistovali_jsme))
+                            {
+                                <p>
+                                    Z veřejných zdrojů víme o vztahu @Model.Nazev a
+                                    @Devmasters.Lang.CS.Plural.Get(prijemGroup.Platy.Count(m => m.Status == PpPrijem.StatusPlatu.Prijem_nezjistovali_jsme), "tohoto politika", "těchto politiků", "těchto politiků"),
+                                    ale ani organizace ani @Devmasters.Lang.CS.Plural.Get(prijemGroup.Platy.Count(m => m.Status == PpPrijem.StatusPlatu.Prijem_nezjistovali_jsme), "politika", "politiků", "politiků")
+                                    jsme se na příjem neptali.
+                                    <ol>
+                                        @foreach (var prijemPolitika in prijemGroup.Platy.Where(m => m.Status == PpPrijem.StatusPlatu.Prijem_nezjistovali_jsme))
+                                        {
+                                            <li>
+                                                <a href="/politici/politik/@prijemPolitika.Nameid">@Osoby.GetByNameId.Get(prijemPolitika.Nameid).FullName()</a>
+                                            </li>
+                                        }
+                                    </ol>
+                                </p>
+                                <hr />
+                            }
+                            @if (prijemGroup.Platy.Any(m => m.Status > 0 && m.Status != PpPrijem.StatusPlatu.Prijem_nezjistovali_jsme))
                             {
                                 <div class="p-3 mb-2 bg-warning text-dark">
                                     Jde o příjmy politiků pouze od @f.Jmeno. Celkové příjmy politiků najdete u každého politika zvlášť.
@@ -146,14 +164,14 @@
                                         <tr>
                                             <th>Politik</th>
                                             <th class="d-none d-md-table-cell"></th>
-                                            <th class="text-end"><celkovy-rocni-prijem/></th>
+                                            <th class="text-end"><celkovy-rocni-prijem /></th>
                                             <th class="text-end">Náhrady</th>
                                             <th class="d-none d-md-table-cell text-end ">Přepočtený měsíční příjem</th>
                                             <th style="max-width:20rem">Další<br />benefity</th>
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        @foreach (var prijemPolitika in prijemGroup.Platy.Where(m => m.Status > 0))
+                                        @foreach (var prijemPolitika in prijemGroup.Platy.Where(m => m.Status > 0 & m.Status != PpPrijem.StatusPlatu.Prijem_nezjistovali_jsme))
                                         {
                                             var politik = Osoby.GetByNameId.Get(prijemPolitika.Nameid);
                                             <tr>
@@ -235,19 +253,6 @@
 
 </section>
 
-
-@{
-    sectionBgSwitch = !sectionBgSwitch;
-}
-<section class="d-flex justify-content-center  @(sectionBgSwitch ? "alter-bg-color" : "") pageblock">
-    <div class="container">
-        <h3>Open data</h3>
-        <p>Open data s kompletními platy pro <b>@(Model.Nazev)</b> za všechny dostupné roky</p>
-        <partial name="ExportModal"
-                 model="@(new ExportModalViewModel() { DatovaSchranka = Model.DS, Titulek = $"Export dat pro {Model.Nazev}", NazevTlacitka = $"Open data pro {Model.Nazev}" })" />
-
-    </div>
-</section>
 
 
 <div class="pb-3"></div>

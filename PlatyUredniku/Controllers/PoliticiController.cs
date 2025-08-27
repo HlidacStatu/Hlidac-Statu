@@ -61,8 +61,8 @@ public partial class PoliticiController : Controller
             return NotFound();
 
         var detail = await _cache.GetOrSetAsync<List<PpPrijem>>(
-            $"{nameof(PpRepo.GetPrijmyPolitika)}_{id}-politici",
-            _ => PpRepo.GetPrijmyPolitika(id)
+            $"{nameof(PpRepo.GetPrijmyPolitika)}_{id}_{rok}-politici",
+            _ => PpRepo.GetPrijmyPolitika(id, rok)
         );
         if (detail == null || detail.Count == 0)
         {
