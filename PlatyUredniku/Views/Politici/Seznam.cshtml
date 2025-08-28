@@ -1,7 +1,13 @@
 @model PlatyUredniku.DataTable.DataTableFilter
 
 @{
-    ViewBag.Title = "Seznam platů politiků";
+    string[] ssrok = Model.Filters
+            .FirstOrDefault(m => m.Key == PlatyUredniku.Controllers.PoliticiController.PoliticiFilterKeys.Year)
+            ?.GetInitialValues()?.FirstOrDefault().Value as string[];
+    int rok = Devmasters.ParseText.ToInt( ssrok.FirstOrDefault()) ?? HlidacStatu.Repositories.PuRepo.DefaultYear;
+
+
+    ViewBag.Title = "Seznam platů politiků " + rok;
 }
 
 @section breadcrumbs
@@ -21,13 +27,13 @@
 
 @section Scripts
 {
-    <link rel="stylesheet" type="text/css" href="//cdn.datatables.net/1.13.4/css/jquery.dataTables.css"/>
+    <link rel="stylesheet" type="text/css" href="//cdn.datatables.net/1.13.4/css/jquery.dataTables.css" />
     <script type="text/javascript" charset="utf8" src="//cdn.datatables.net/1.13.4/js/jquery.dataTables.js"></script>
 }
 
 <section class="d-flex align-items-center justify-content-center pageblock">
     <div class="container">
         <h2>@ViewBag.Title </h2>
-        <partial name="_DataTableFiltered" model="Model"/>
+        <partial name="_DataTableFiltered" model="Model" />
     </div>
 </section>

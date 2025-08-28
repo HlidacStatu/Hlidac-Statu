@@ -28,23 +28,23 @@
     else
     {
         nameIdFilter = await PpRepo.GetNameIdsForGroupAsync(group, year);
-        ViewBag.Title = $"Seznam platů politiků - " + group.ToNiceDisplayName();
+        ViewBag.Title = $"Seznam platů politiků - " + group.ToNiceDisplayName() + " " + Model.Year;
     }
     Dictionary<string, PpPrijem[]> vsechnyPlaty = null;
 
     switch (report)
     {
         case "zeny":
-            ViewBag.Title = "Pouze političky";
+            ViewBag.Title = "Pouze političky " + Model.Year;
             vsechnyPlaty = await PpRepo.GetPrijmyBySexAsync(true, true, year);
             break;
         case "muzi":
-            ViewBag.Title = "Pouze politici";
+            ViewBag.Title = "Pouze politici " + Model.Year;
             vsechnyPlaty = await PpRepo.GetPrijmyBySexAsync(false, true, year);
             break;
         case "transparentnost":
             top = 100;
-            ViewBag.Title = "Politici nejvíce tající své příjmy";
+            ViewBag.Title = "Politici nejvíce tající své příjmy " + Model.Year;
             vsechnyPlaty = await PpRepo.GetPrijmyGroupedByNameIdAsync(year, true);
             vsechnyPlaty = vsechnyPlaty
                 .OrderByDescending(kv => kv.Value.Count(m => m.Status == PpPrijem.StatusPlatu.Zjistujeme_zadost_106))
@@ -55,12 +55,12 @@
         case "top-prijem":
             top = 100;
             sort = "celkem";
-            ViewBag.Title = $"Politici s nejvyšším celkovým příjmem z veřejných funkcí";
+            ViewBag.Title = $"Politici s nejvyšším celkovým příjmem z veřejných funkcí " + Model.Year;
             break;
         case "top-funkce":
             top = 100;
             sort = "funkce";
-            ViewBag.Title = $"Politici s největším počtem příjmů";
+            ViewBag.Title = $"Politici s největším počtem příjmů " + Model.Year;
             orderColumnIdx = 4;
             break;
     }

@@ -13,16 +13,29 @@ public sealed class DataTableFilters
     {
         string Key { get; }
         string Label { get; }
-        
+
+        bool Hidden { get; } 
+        OpenStatus Open { get; }
+
         // method for rendering filter to HTML 
         IHtmlContent Render();
         Dictionary<string, object?> GetInitialValues();
+
+    }
+    public enum OpenStatus
+    {
+        Auto,
+        Open,
+        Closed
     }
 
     public abstract class FilterField : IFilterable
     {
         public required string Key { get; init; }
         public required string Label { get; init; }
+        public bool Hidden { get; init; } = false;
+        public OpenStatus Open { get; init; } = OpenStatus.Auto;
+
         public abstract IHtmlContent Render();
         public abstract Dictionary<string, object?> GetInitialValues();
     }

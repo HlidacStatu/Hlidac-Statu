@@ -162,16 +162,16 @@ public partial class PoliticiController : Controller
         return new JsonResult(filteredOrganizaceViewData.ToList(), new JsonSerializerOptions(JsonSerializerDefaults.Web));
     }
     
-    public async Task<IActionResult> Seznam(string report = "platy")
+    public async Task<IActionResult> Seznam(string report = "platy", int rok = PuRepo.DefaultYear)
     {
-        var fullPoliticiViewData = await GetFullPoliticiViewDataCached();
+        var fullPoliticiViewData = await GetFullPoliticiViewDataCached(rok);
         var politickeStranyFilterData = GetPolitickeStranyForFilterCached();
 
         var maxJobCount = (int)fullPoliticiViewData.Max(x => x.PocetJobu) + 1;
         var maxTotalIncomeInMilions =
             Math.Ceiling((fullPoliticiViewData.Max(x => x.CelkoveRocniNaklady_Sort) + 1) / 1_000_000);
 
-        var filteredPoliticiViewData = FilterPoliticiViewData(fullPoliticiViewData, politickeStranyFilterData);
+        var filteredPoliticiViewData = FilterPoliticiViewData(rok, HttpContext.Request.Query, politickeStranyFilterData);
 
         // parties + "Ostatní"
         var parties = politickeStranyFilterData;
@@ -192,6 +192,18 @@ public partial class PoliticiController : Controller
             DefaultOrder = sorting,
             Filters = new List<DataTableFilters.FilterField>
             {
+                new DataTableFilters.ChoiceFilterField
+                {
+                    Key = PoliticiFilterKeys.Year,
+                    Label = "Rok",
+                    Multiple = false,
+                    Hidden = true,
+                    Options =
+                    [
+                        new() { Value = PuRepo.DefaultYear.ToString(), Label = PuRepo.DefaultYear.ToString() },
+                    ],
+                    Initial = [PuRepo.DefaultYear.ToString()]
+                },
                 new DataTableFilters.ChoiceFilterField
                 {
                     Key = PoliticiFilterKeys.PoliticianGroups,
@@ -249,6 +261,7 @@ public partial class PoliticiController : Controller
                     ],
                     Initial = ["m", "f"]
                 }
+
             }
         };
 
@@ -273,21 +286,30 @@ public partial class PoliticiController : Controller
     //todo: Prasečina odsud až úplně dolů - to bude potřeba refaktorovat
     public async Task<IActionResult> SeznamData()
     {
-        var fullPoliticiViewData = await GetFullPoliticiViewDataCached();
 
         var politickeStranyFilterData = GetPolitickeStranyForFilterCached();
 
-        var filtered = FilterPoliticiViewData(fullPoliticiViewData, politickeStranyFilterData);
+        var filtered = FilterPoliticiViewData(HttpContext.Request.Query, politickeStranyFilterData);
 
         return new JsonResult(filtered.ToList(), new JsonSerializerOptions(JsonSerializerDefaults.Web));
     }
 
     // Filtruje data podle query stringu
-    private List<PoliticiViewData> FilterPoliticiViewData(List<PoliticiViewData> fullPoliticiViewDataTask,
+    private List<PoliticiViewData> FilterPoliticiViewData(Microsoft.AspNetCore.Http.IQueryCollection query,
         List<string> politickeStranyFilter)
     {
-        var resultData = fullPoliticiViewDataTask;
-        var q = HttpContext.Request.Query;
+        Microsoft.AspNetCore.Http.IQueryCollection q = query;
+        string? year = q.Choices(PoliticiFilterKeys.Year)?.FirstOrDefault();
+
+        var rok = Devmasters.ParseText.ToInt(year) ?? PuRepo.DefaultYear;   
+        return FilterPoliticiViewData(rok, query, politickeStranyFilter);
+    }
+
+    private List<PoliticiViewData> FilterPoliticiViewData(int rok,
+        Microsoft.AspNetCore.Http.IQueryCollection query,
+        List<string> politickeStranyFilter)
+    {
+        Microsoft.AspNetCore.Http.IQueryCollection q = query;
 
         // Read generic filters (names come from your FilterField.Key values)
         var genders = q.Choices(PoliticiFilterKeys.Gender); // ["m","f"] or ["muž","žena"] depending on your UI
@@ -296,7 +318,10 @@ public partial class PoliticiController : Controller
         var parties = q.Choices(PoliticiFilterKeys.Party);
         var groups = q.Choices(PoliticiFilterKeys.PoliticianGroups);
 
-        IEnumerable<PoliticiViewData> filteredData = resultData;
+
+
+        IEnumerable<PoliticiViewData> filteredData = GetFullPoliticiViewDataCached(rok)
+                .ConfigureAwait(false).GetAwaiter().GetResult();
 
         // Gender
         if (genders.Length > 0)
@@ -380,14 +405,14 @@ public partial class PoliticiController : Controller
         return filteredData.ToList();
     }
 
-    private async Task<List<PoliticiViewData>> GetFullPoliticiViewDataCached()
+    private async Task<List<PoliticiViewData>> GetFullPoliticiViewDataCached(int rok)
     {
         var fullPoliticiViewDataTask = await _cache.GetOrSetAsync<List<PoliticiViewData>>(
-            "fullPoliticiViewData",
+            "fullPoliticiViewData_" + rok.ToString(),
             factory: async _ =>
             {
                 var politiciPlatyGroup =
-                    await PpRepo.GetPrijmyGroupedByNameIdAsync(PpRepo.DefaultYear, pouzePotvrzene: true,
+                    await PpRepo.GetPrijmyGroupedByNameIdAsync(rok, pouzePotvrzene: true,
                         withDetails: true);
 
                 List<PoliticiViewData> politiciViewData = new List<PoliticiViewData>();
@@ -573,6 +598,7 @@ public partial class PoliticiController : Controller
         public const string JobCount = "jobCount";
         public const string Party = "party";
         public const string Gender = "gender";
+        public const string Year = "year";
     }
 
     public class OrganizaceViewData
