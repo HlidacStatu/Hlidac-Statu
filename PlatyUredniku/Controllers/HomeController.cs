@@ -21,7 +21,6 @@ public class HomeController : Controller
         _cache = cache;
     }
 
-    [HlidacCache(48 * 60 * 60)]
     public async Task<IActionResult> Index()
     {
         var platyTask = _cache.GetOrSetAsync<List<PuPlat>>(
