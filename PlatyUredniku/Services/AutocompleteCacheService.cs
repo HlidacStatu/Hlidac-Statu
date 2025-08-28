@@ -46,6 +46,13 @@ public class AutocompleteCacheService
             .Take(8)
             .Select(s => s.Document);
     }
+    public string[] DumpAllDocuments()
+    {
+        if (AutocompleteCache is null)
+            return [];
+
+        return AutocompleteCache.DumpAllDocuments();
+    }
 
     public async Task RefreshAutocompleteDataAsync(CancellationToken cancellationToken)
     {

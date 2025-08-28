@@ -45,6 +45,14 @@ public class AutocompleteCategoryCacheService
             .Select(s => s.Document);
     }
 
+    public string[] DumpAllDocuments()
+    {
+        if (AutocompleteCategoryCache is null)
+            return [];
+
+        return AutocompleteCategoryCache.DumpAllDocuments();
+    }
+
     public async Task RefreshAutocompleteDataAsync(CancellationToken cancellationToken)
     {
         _alternateDirectory = !_alternateDirectory; //switch dir

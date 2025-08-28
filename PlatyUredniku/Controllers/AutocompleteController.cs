@@ -47,6 +47,21 @@ public class AutocompleteController : ControllerBase
         return results;
     }
 
+    [HttpGet("dump")]
+    public ActionResult<string[]> Dump(string id = "")
+    {
+        if (this.User.IsInRole("Admin"))
+        {
+            if (id == "category")
+                return AutocompleteCategoryService.DumpAllDocuments();
+            else
+                return AutocompleteService.DumpAllDocuments();
+        }
+
+        return Array.Empty<string>();
+
+    }
+
     [HttpGet("category")]
     public ActionResult<List<Autocomplete>> Category([FromQuery] string q)
     {

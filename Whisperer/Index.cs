@@ -94,6 +94,26 @@ public sealed class Index<T> : IDisposable where T : IEquatable<T>
             _directory.DeleteFile(file);
         }
     }
+    public string[] DumpAllDocuments()
+    {
+        //_indexAnalyzer.
+        //_queryAnalyzer.
+        using var reader = DirectoryReader.Open(_directory);
+        List<string> res = new();
+
+        // MaxDoc includes deleted docs; NumDocs excludes them.
+        for (int id = 0; id < reader.MaxDoc; id++)
+        {
+            // skip any documents that have been deleted but not yet merged away
+            //if (reader.HasDeletions && reader.HasDeletions)
+            //    continue;
+
+            Document d = reader.Document(id);   // retrieve stored fields
+            res.Add(d.Get(SearchFieldName));
+            //Console.WriteLine($"doc #{id}: {d.Get("id")}  |  {d.Get("title")}");
+        }
+        return res.ToArray();
+    }
 
     public IEnumerable<ScoredResult<T>> Search(string query, int numResults = 10, string? filter = null)
     {
