@@ -112,7 +112,9 @@ public sealed class Index<T> : IDisposable where T : IEquatable<T>
             res.Add(d.Get(SearchFieldName));
             //Console.WriteLine($"doc #{id}: {d.Get("id")}  |  {d.Get("title")}");
         }
-        return res.ToArray();
+        return res
+            .OrderBy(m=>m)
+            .ToArray();
     }
 
     public IEnumerable<ScoredResult<T>> Search(string query, int numResults = 10, string? filter = null)

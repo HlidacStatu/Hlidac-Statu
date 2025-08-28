@@ -96,6 +96,7 @@ a.nav-link.dropdown-toggle.mainmenu {
         font-size: 1.25rem;
         font-weight: 500;
         line-height: 1.1;
+        margin-bottom: 5px;
     }
 
 .back-to-top {

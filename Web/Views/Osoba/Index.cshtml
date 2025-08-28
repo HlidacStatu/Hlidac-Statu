@@ -70,6 +70,10 @@
 
                             </dt>
                             <dd class="col-6 col-sm-6 col-md-9 text-nowrap">@HlidacStatu.Util.RenderData.NicePriceHtml(prijmyPolitika.Sum(m => m.CelkoveRocniNahrady))</dd>
+                            <dt class="col-6 col-sm-6 col-md-3 text-nowrap">
+                                Celkem
+                            </dt>
+                            <dd class="col-6 col-sm-6 col-md-9 text-nowrap">@HlidacStatu.Util.RenderData.NicePriceHtml(prijmyPolitika.Sum(m => m.CelkoveRocniNakladyNaPolitika))</dd>
                         }
                         <dt class="col-6 col-sm-6 col-md-3 text-nowrap">Evidujeme příjmy od </dt>
                         <dd class="col-6 col-sm-6 col-md-9">@(string.Join(", ", prijmyPolitika.Select(m => m.Organizace.FirmaDs.DsSubjName)))</dd>
@@ -125,9 +129,9 @@
             @if (funkceOsobaNum > listingNum + 1)
             {
                 <p class="text-center">
-                    <a href="https://platy.hlidacstatu.cz/politici/politik/@Model.NameId" class="btn btn-primary btn-sm my-3 position-relative">
+                    <a href="/osoba/funkce/@Model.NameId" class="btn btn-primary btn-sm my-3 position-relative">
                         Zobrazit všechny politické a veřejné funkce
-                        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">@(HlidacStatu.Util.RenderData.NicePrice(funkceOsobaNum))</span>
+                        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">@(HlidacStatu.Util.RenderData.NiceNumber(funkceOsobaNum))</span>
                     </a>
                 </p>
             }
