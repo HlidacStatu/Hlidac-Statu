@@ -16,7 +16,7 @@ namespace HlidacStatu.MCPServer.Code
         public static async Task ConfigureSessionCheckCookieAsync(HttpContext ctx, McpServerOptions mcpsOpt, CancellationToken cancellationToken)
         {
             var authUser = ctx.GetAuthPrincipal();
-            if (authUser?.IsInRole("BetaTester") == true)
+            if (authUser?.Identity?.IsAuthenticated == true)
             {
                 if (mcpsOpt.KnownClientInfo == null)
                     mcpsOpt.KnownClientInfo = new ModelContextProtocol.Protocol.Implementation()

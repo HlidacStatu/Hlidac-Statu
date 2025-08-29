@@ -152,7 +152,11 @@
 
         var defaultStart = new DateTime(2000, 1, 1);
         var defaultEnd = new DateTime(DateTime.Now.Year + 2, 12, 31);
-        foreach (var item in dotaceStat.SoukromeFirmy.Concat(dotaceStat.Neziskovky).Concat(dotaceStat.StatniFirmy))
+        foreach (var item in dotaceStat
+            .SoukromeFirmy
+            .Concat(dotaceStat.Neziskovky)
+            .Concat(dotaceStat.StatniFirmy)
+        )
         {
             var ico = item.Key;
             var dotaceCelkemProIco = item.Value.Summary().CelkemPrideleno;
