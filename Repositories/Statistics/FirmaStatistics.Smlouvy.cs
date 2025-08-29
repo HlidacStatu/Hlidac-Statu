@@ -71,7 +71,7 @@ namespace HlidacStatu.Repositories.Statistics
             _holdingSmlouvaCache.Delete((firma, HlidacStatu.DS.Graphs.Relation.AktualnostType.Libovolny, obor));
         }
 
-        public static StatisticsSubjectPerYear<Smlouva.Statistics.Data> GetStatistics(Firma firma, int? obor, bool forceUpdateCache = false)
+        public static StatisticsSubjectPerYear<Smlouva.Statistics.Data> CachedStatisticsSmlouvy(Firma firma, int? obor, bool forceUpdateCache = false)
         {
             StatisticsSubjectPerYear<Smlouva.Statistics.Data> ret = new StatisticsSubjectPerYear<Smlouva.Statistics.Data>();
             //STAT FIX

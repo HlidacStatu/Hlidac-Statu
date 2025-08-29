@@ -163,7 +163,7 @@ namespace HlidacStatu.Extensions
             this Firma firma, int? iclassif = null, bool forceUpdateCache = false)
         {
             Lib.Analytics.StatisticsSubjectPerYear<Smlouva.Statistics.Data> ret = null;
-            ret = FirmaStatistics.GetStatistics(firma, iclassif, forceUpdateCache);
+            ret = FirmaStatistics.CachedStatisticsSmlouvy(firma, iclassif, forceUpdateCache);
             return ret ?? new Lib.Analytics.StatisticsSubjectPerYear<Smlouva.Statistics.Data>();
         }
 

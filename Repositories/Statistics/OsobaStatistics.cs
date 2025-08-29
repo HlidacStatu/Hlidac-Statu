@@ -125,24 +125,30 @@ namespace HlidacStatu.Repositories.Statistics
             Dictionary<string, StatisticsSubjectPerYear<Firma.Statistics.Dotace>> nezisk =
                 new Dictionary<string, StatisticsSubjectPerYear<Firma.Statistics.Dotace>>();
 
-            var perIcoStat = o.AktualniVazby(aktualnost)
+            var icos = o.AktualniVazby(aktualnost)
                 .Where(v => !string.IsNullOrEmpty(v.To?.UniqId)
                             && v.To.Type == HlidacStatu.DS.Graphs.Graph.Node.NodeType.Company)
                 .Select(v => v.To)
                 .Distinct(new HlidacStatu.DS.Graphs.Graph.NodeComparer())
-                .Select(f => Firmy.Get(f.Id))
+                .Select(f => f?.Id);
+                ;
+            var perIcoStat = icos.Select(ico => Firmy.Get(ico))
                 .Where(f => f.Valid == true)
                 .Select(f => new { f = f, ss = f.StatistikaDotaci() });
 
 
-            foreach (var it in perIcoStat)
+            foreach (var fStat in perIcoStat)
             {
-                if (it.f.PatrimStatu() && statni.ContainsKey(it.f.ICO) == false)
-                    statni.Add(it.f.ICO, it.ss);
-                else if (it.f.JsemNeziskovka() && nezisk.ContainsKey(it.f.ICO) == false)
-                    nezisk.Add(it.f.ICO, it.ss);
-                else if (soukr.ContainsKey(it.f.ICO) == false)
-                    soukr.Add(it.f.ICO, it.ss);
+                if (System.Diagnostics.Debugger.IsAttached)
+                {
+                    Console.WriteLine($"Dotace stat for {o.NameId} - {fStat.f.ICO}");
+                }
+                if (fStat.f.PatrimStatu() && statni.ContainsKey(fStat.f.ICO) == false)
+                    statni.Add(fStat.f.ICO, fStat.ss);
+                else if (fStat.f.JsemNeziskovka() && nezisk.ContainsKey(fStat.f.ICO) == false)
+                    nezisk.Add(fStat.f.ICO, fStat.ss);
+                else if (soukr.ContainsKey(fStat.f.ICO) == false)
+                    soukr.Add(fStat.f.ICO, fStat.ss);
             }
 
             res.StatniFirmy = statni;

@@ -361,7 +361,9 @@ namespace HlidacStatu.Entities
             {
                 if (_valid == null)
                     _valid = !(Jmeno == NotFound.Jmeno
-                               || Jmeno == LoadError.Jmeno);
+                               || Jmeno == LoadError.Jmeno
+                               || string.IsNullOrWhiteSpace(this.ICO)
+                               );
 
                 return _valid.Value;
             }
