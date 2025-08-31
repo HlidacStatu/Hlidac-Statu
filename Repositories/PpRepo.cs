@@ -338,7 +338,7 @@ public static class PpRepo
     }
 
 
-    public static async Task<List<PpPrijem>> GetPrijmyPolitika(string nameid, int rok = DefaultYear, bool pouzePotvrzene = true)
+    public static async Task<List<PpPrijem>> GetPrijmyPolitikaAsync(string nameid, int rok = DefaultYear, bool pouzePotvrzene = true)
     {
         await using var db = new DbEntities();
         var baseData = pouzePotvrzene ? BasePotvrzenePlaty(db, rok) : BaseAllPlaty(db, rok);

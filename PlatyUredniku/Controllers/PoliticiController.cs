@@ -17,7 +17,6 @@ using ZiggyCreatures.Caching.Fusion;
 
 namespace PlatyUredniku.Controllers;
 
-[Authorize(Roles = "Admin,BetaTester")]
 public partial class PoliticiController : Controller
 {
     private readonly IFusionCache _cache;
@@ -61,8 +60,8 @@ public partial class PoliticiController : Controller
             return NotFound();
 
         var detail = await _cache.GetOrSetAsync<List<PpPrijem>>(
-            $"{nameof(PpRepo.GetPrijmyPolitika)}_{id}_{rok}-politici",
-            _ => PpRepo.GetPrijmyPolitika(id, rok)
+            $"{nameof(PpRepo.GetPrijmyPolitikaAsync)}_{id}_{rok}-politici",
+            _ => PpRepo.GetPrijmyPolitikaAsync(id, rok)
         );
         if (detail == null || detail.Count == 0)
         {

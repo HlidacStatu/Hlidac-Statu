@@ -42,16 +42,8 @@
 <div class="watcher-blocks">
 
     <div class="watcher-blocks__wrapper">
-        @if (Devmasters.Config.GetWebConfigValue("ShowPrijmyPolitiku") == "true" || User.IsInRole("Admin") || User.IsInRole("BetaTester"))
-        {
             <partial name="Partials/_hp_box_left_2025_platypolitiku" />
             <partial name="Partials/_hp_box_right_2025_platypolitiku" />
-        }
-        else
-        {
-            <partial name="Partials/_hp_box_left_2024" />
-            <partial name="Partials/_hp_box_right_2024" />
-        }
 
 
         @if (false)
@@ -544,45 +536,3 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#fde54c', end
 </div>
 
 
-
-@*
-    <div class="reviews">
-    <h2 class="new-title">Psali o nás</h2>
-    <div class="reviews__carousel">
-    <!-- control arrows -->
-    <!-- TODO: doimplementovat JS - staci posouvat oveflow scroll -->
-    <div class="carousel__arrow">
-    <img class="" src="/Content/img/chevron-reviews.svg">
-    </div>
-    <div class="carousel__arrow carousel__arrow--right">
-    <img class="" src="/Content/img/chevron-reviews.svg">
-    </div>
-
-    <!-- logos with links below -->
-    <a href="/">
-    <img class="reviews__logo" src="/Content/img/reviews/1.png">
-    </a>
-    <a href="/">
-    <img class="reviews__logo" src="/Content/img/reviews/2.png">
-    </a>
-    <a href="/">
-    <img class="reviews__logo" src="/Content/img/reviews/3.png">
-    </a>
-    <a href="/">
-    <img class="reviews__logo" src="/Content/img/reviews/4.png">
-    </a>
-    <a href="/">
-    <img class="reviews__logo" src="/Content/img/reviews/5.png">
-    </a>
-    <a href="/">
-    <img class="reviews__logo" src="/Content/img/reviews/3.png">
-    </a>
-    <a href="/">
-    <img class="reviews__logo" src="/Content/img/reviews/2.png">
-    </a>
-    <a href="/">
-    <img class="reviews__logo" src="/Content/img/reviews/1.png">
-    </a>
-    </div>
-    </div>
-*@

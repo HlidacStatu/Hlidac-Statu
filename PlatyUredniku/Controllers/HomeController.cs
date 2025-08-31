@@ -29,13 +29,8 @@ public class HomeController : Controller
         );
 
         ViewData["platy"] = await platyTask;
-        if (Devmasters.Config.GetWebConfigValue("ShowPrijmyPolitiku") == "true"
-            || this.User.IsInRole("Admin")
-            || this.User.IsInRole("BetaTester")
-                )
-            return View("Index");
-        else
-            return View("IndexOld");
+
+        return View("Index");
     }
 
 
@@ -78,28 +73,17 @@ public class HomeController : Controller
             return Redirect("/");
 
 
-        if (Devmasters.Config.GetWebConfigValue("ShowPrijmyPolitiku") == "true"
-            || this.User.IsInRole("Admin")
-            || this.User.IsInRole("BetaTester")
-                )
+
+        if (detail.Platy?.Count > 0 && detail.PrijmyPolitiku?.Count > 0)
         {
-
-            if (detail.Platy?.Count > 0 && detail.PrijmyPolitiku?.Count > 0)
-            {
-                return View(detail);
-            }
-                
-            if (detail.Platy?.Count > 0)
-                return RedirectToAction("organizace", "Politici", new { id = detail.DS });
-
-            else
-                return View(detail);
+            return View(detail);
         }
+
+        if (detail.Platy?.Count > 0)
+            return RedirectToAction("organizace", "Politici", new { id = detail.DS });
+
         else
-        {
-            return RedirectToAction("Detail", "Urednici", new { ds = detail.DS });
-        }
-
+            return View(detail);
     }
 
     public IActionResult OpenData()

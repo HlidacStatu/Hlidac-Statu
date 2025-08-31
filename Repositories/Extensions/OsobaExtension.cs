@@ -18,7 +18,7 @@ namespace HlidacStatu.Extensions
 {
     public static class OsobaExtension
     {
-        
+
         public static string CurrentPoliticalParty(this Osoba osoba)
         {
             var (organizace, ico) = osoba.Events(ev =>
@@ -34,14 +34,14 @@ namespace HlidacStatu.Extensions
                 return organizace;
 
             var zkratka = ZkratkaStranyRepo.NazevStranyForIco(ico);
-            
-            if(!string.IsNullOrWhiteSpace(zkratka))
+
+            if (!string.IsNullOrWhiteSpace(zkratka))
                 return zkratka;
 
             return FirmaRepo.NameFromIco(ico);
         }
-        
-        
+
+
         public static HlidacStatu.DS.Api.Osoba.ListItem ToApiOsobaListItem(this Osoba osoba)
         {
             if (osoba == null)
@@ -71,7 +71,7 @@ namespace HlidacStatu.Extensions
         public static HlidacStatu.DS.Api.Osoba.Detail ToApiOsobaDetail(this Osoba osoba, DateTime? historyLimit = null)
         {
             historyLimit ??= DateTime.Now.AddYears(-100);
-            if (osoba == null )
+            if (osoba == null)
                 return null;
 
             var res = new HlidacStatu.DS.Api.Osoba.Detail
@@ -112,7 +112,7 @@ namespace HlidacStatu.Extensions
             return res;
         }
 
-        
+
 
         public static bool IsSponzor(this Osoba osoba)
         {
@@ -315,9 +315,9 @@ namespace HlidacStatu.Extensions
         }
         static Devmasters.Cache.Redis.Manager<InfoFact[], Osoba> _cacheInfoFacts =
             Devmasters.Cache.Redis.Manager<InfoFact[], Osoba>
-                .GetSafeInstance("Osoba_InfoFacts_v1_",
+                .GetSafeInstance("Osoba_InfoFacts_v2_",
                     (obj) => InfoFactsAsync(obj).GetAwaiter().GetResult(),
-                    TimeSpan.Zero,
+                    TimeSpan.FromHours(12),
                     Devmasters.Config.GetWebConfigValue("RedisServerUrls").Split(';'),
                     Devmasters.Config.GetWebConfigValue("RedisBucketName"),
                     Devmasters.Config.GetWebConfigValue("RedisUsername"),
@@ -424,7 +424,19 @@ namespace HlidacStatu.Extensions
             }
 
             if (excludedImportanceLevels is null ||
-                !excludedImportanceLevels.Contains(InfoFact.ImportanceLevel.Medium))
+                !excludedImportanceLevels.Contains(InfoFact.ImportanceLevel.Salary))
+            {
+                var year = PpRepo.DefaultYear;
+                var prijmy = await PpRepo.GetPrijmyPolitikaAsync(osoba.NameId, year);
+                if (prijmy.Any())
+                    f.Add(new InfoFact(
+                        $"Příjem od státu v {year} celkem <b>{HlidacStatu.Util.RenderData.ShortNicePrice(prijmy.Sum(m=>m.CelkoveRocniNakladyNaPolitika), showDecimal: RenderData.ShowDecimalVal.Show)}</b> od <b> {Devmasters.Lang.CS.Plural.Get(prijmy.Select(m => m.IdOrganizace).Distinct().Count(),"jedné</b> organizace", "{0}</b> organizací", "{0}</b> organizací")}.",
+                         Fact.ImportanceLevel.Salary
+                        )); 
+            }
+
+            if (excludedImportanceLevels is null ||
+            !excludedImportanceLevels.Contains(InfoFact.ImportanceLevel.Medium))
             {
                 DateTime datumOd = new DateTime(DateTime.Now.Year - 10, 1, 1);
                 var sponzoringPrimy = osoba.Sponzoring(s => s.IcoPrijemce != null
@@ -545,7 +557,7 @@ namespace HlidacStatu.Extensions
             }
 
             var infoFacts = f.OrderByDescending(o => o.Level).ToArray();
-            
+
             return infoFacts;
         }
 

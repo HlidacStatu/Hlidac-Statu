@@ -211,13 +211,8 @@ namespace HlidacStatu.Lib.Web.UI
         {
             int lastY = Devmasters.ParseText.ToInt(Devmasters.Config.GetWebConfigValue("KIndexMaxYear"))
                 ?? KIndexRepo.GetAvailableCalculationYears().Max();
-            if (
-                IfInRoles(user, "TK-KIndex-2021")
-                || IfInRoles(user, "Admin")
-                )
-                return KIndexRepo.GetAvailableCalculationYears().Max();
-            else
-                return lastY;
+
+            return lastY;
         }
 
         public static bool ShowFutureKIndex(System.Security.Principal.IPrincipal user)

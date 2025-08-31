@@ -20,6 +20,7 @@ namespace HlidacStatu.Entities.Facts
         public enum ImportanceLevel
         {
             Summary = 100,
+            Salary = 75,
             Stat = 70,
             High = 50,
             Medium = 25,
