@@ -1,4 +1,5 @@
 using HlidacStatu.Entities;
+using HlidacStatu.Lib.Web.UI.TagHelpers;
 using HlidacStatu.LibCore.Extensions;
 using HlidacStatu.LibCore.MiddleWares;
 using HlidacStatu.LibCore.Services;
@@ -6,23 +7,25 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc.ApplicationParts;
+using Microsoft.AspNetCore.Mvc.Controllers;
+using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using OpenTelemetry.Exporter;
+using OpenTelemetry.Resources;
+using OpenTelemetry.Trace;
 using PlatyUredniku.Cache;
 using PlatyUredniku.Services;
 using Serilog;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
-using Microsoft.AspNetCore.Mvc.Controllers;
-using Microsoft.AspNetCore.Mvc.Infrastructure;
 using ZiggyCreatures.Caching.Fusion;
-using OpenTelemetry.Resources;
-using OpenTelemetry.Trace;
-using OpenTelemetry.Exporter;
 
 
 namespace PlatyUredniku;
@@ -77,7 +80,13 @@ public class Program
             AddBundling(builder.Services);
 
             builder.Services.AddDatabaseDeveloperPageExceptionFilter();
+
             builder.Services.AddControllersWithViews();
+
+
+            //builder.Services.AddControllersWithViews()
+            //    .PartManager.ApplicationParts.Add(new AssemblyPart(typeof(FeedbackModalTagHelper.EmbeededController).Assembly));
+
             builder.Services.AddResponseCaching();
 
             builder.Services.AddSingleton<AttackerDictionaryService>();
@@ -93,8 +102,7 @@ public class Program
             // builder.Services.AddScoped<IErrorBoundaryLogger, AutocompleteErrorLogger>();
 
             var app = builder.Build();
-
-
+            
             UredniciStaticCache.Init(app.Services.GetService<IFusionCache>());
 
             var whitelistIps = Devmasters.Config.GetWebConfigValue("BanWhitelist")?.Split(',',
@@ -191,6 +199,10 @@ public class Program
 
             app.MapRazorPages();
             app.Logger.LogInformation("PlatyUredniku Web starting");
+
+            // --- Minimal API endpoint pro FeedbackModalTagHelper ---
+            _ = app.MapPost(FeedbackModalTagHelper.AcceptDataUrl, FeedbackModalTagHelper.AcceptDataDelegate );
+
             app.Run();
         }
         catch (Exception e)

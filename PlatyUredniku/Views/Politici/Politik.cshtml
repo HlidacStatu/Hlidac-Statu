@@ -49,7 +49,7 @@
         rok = roky.Max();
     }
 
-    var platyZaRokPotvrzene = Model.Where(m => m.Status>=0);
+    var platyZaRokPotvrzene = Model.Where(m => m.Status >= 0);
 
 
     ViewBag.SocialShareTitle = $"{politik.FullNameWithYear()}";
@@ -193,7 +193,7 @@
                         {
                             <tr>
                                 <td><a href="/politici/organizace/@pprijem.Organizace.FirmaDs.Ico">@pprijem.Organizace.Nazev</a></td>
-                                <td ><span class="text-warning">Neposkytla nám informace o platu politika</span></td>
+                                <td><span class="text-warning">Neposkytla nám informace o platu politika</span></td>
                             </tr>
                         }
                         else if (pprijem.Status == PpPrijem.StatusPlatu.Prijem_nezjistovali_jsme)
@@ -491,3 +491,15 @@
         </div>
     </div>
 </section>
+
+
+<section class="d-flex @GetBgClass(false) pageblock">
+    <div class="container">
+        <feedback-modal asp-route-addData="osoba:@politik.NameId"
+                        must-auth="true"
+                        button-style="btn btn-warning"
+                        show-default-alert="false" />
+    </div>
+</section>
+
+<div class="pb-3"></div>

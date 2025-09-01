@@ -1,18 +1,19 @@
 using HlidacStatu.Entities;
+using HlidacStatu.Extensions;
 using HlidacStatu.Lib.Web.UI.Attributes;
+using HlidacStatu.Lib.Web.UI.TagHelpers;
 using HlidacStatu.Repositories;
+using HlidacStatu.Util;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Infrastructure;
+using PlatyUredniku.DataTable;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Text.Json;
 using System.Threading.Tasks;
-using HlidacStatu.Extensions;
-using HlidacStatu.Lib.Web.UI.TagHelpers;
-using HlidacStatu.Util;
-using PlatyUredniku.DataTable;
 using ZiggyCreatures.Caching.Fusion;
 
 namespace PlatyUredniku.Controllers;
@@ -22,9 +23,35 @@ public partial class PoliticiController : Controller
     private readonly IFusionCache _cache;
     private const string FilterAll = "Vše";
 
-    public PoliticiController(IFusionCache cache)
+    public readonly IActionDescriptorCollectionProvider _actionDescriptorCollectionProvider;
+
+    public object RegisteredControllers()
+    {
+        var controllers = _actionDescriptorCollectionProvider.ActionDescriptors.Items
+       .Where(x => x is Microsoft.AspNetCore.Mvc.Controllers.ControllerActionDescriptor)
+       .Cast<Microsoft.AspNetCore.Mvc.Controllers.ControllerActionDescriptor>()
+       .Select(x => new
+       {
+           ControllerName = x.ControllerName,
+           ActionName = x.ActionName,
+           ControllerTypeInfo = x.ControllerTypeInfo.FullName,
+           AttributeRouteInfo = x.AttributeRouteInfo?.Template
+       })
+       .GroupBy(x => x.ControllerName)
+       .Select(g => new
+       {
+           ControllerName = g.Key,
+           ControllerType = g.First().ControllerTypeInfo,
+           Actions = g.Select(a => new { a.ActionName, a.AttributeRouteInfo }).ToList()
+       })
+       .OrderBy(x => x.ControllerName)
+       .ToList();
+        return controllers;
+    }
+    public PoliticiController(IFusionCache cache, IActionDescriptorCollectionProvider actionDescriptorCollectionProvider)
     {
         _cache = cache;
+        _actionDescriptorCollectionProvider = actionDescriptorCollectionProvider;
     }
 
     [HlidacCache(60 * 60, "*")]
