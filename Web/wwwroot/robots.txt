@@ -5,6 +5,7 @@ Disallow: /Api/*
 Disallow: /beta/*
 
 Disallow: /osoba/radek-jonke
+Disallow: /osoba/martha-akritidu
 Disallow: /osoba/rene-fischer-bernard
 
 Sitemap: https://www.HlidacStatu.cz/sitemap.xml
