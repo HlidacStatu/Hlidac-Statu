@@ -8,10 +8,6 @@
     PpGlobalStat polStats = await PpRepo.GetGlobalStatAsync(PpRepo.DefaultYear);
 
     DateTime stopNovinkaPolitici = new DateTime(2025, 10, 15);
-
-    var organizationOfTheDay = await PuRepo.GetOrganizationOfTheDayAsync();
-    var ceoOfTheDay = organizationOfTheDay.Platy.FirstOrDefault(p => p.JeHlavoun == true && p.Rok == PuRepo.DefaultYear);
-    var dataForOrganizationOfTheDay = await UredniciStaticCache.GetFullDetailAsync(organizationOfTheDay.DS);
 }
 
 

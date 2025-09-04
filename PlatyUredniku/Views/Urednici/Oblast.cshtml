@@ -4,15 +4,9 @@
 @model List<HlidacStatu.Entities.PuOrganizace>
 
 @{
-    var platyHlavounu = Model.SelectMany(o => o.Platy).Where(p => p.Rok == PuRepo.DefaultYear && p.JeHlavoun == true)
-        .ToList();
-
-    string? prumerHlavounu = platyHlavounu.Any() ? platyHlavounu.Average(p => p.HrubyMesicniPlatVcetneOdmen).ToString("N0") : null;
-
     List<PuOrganizace> goodOrgs = new();
     List<PuOrganizace> badOrgs = new();
     List<PuOrganizace> notAskedOrgs = new();
-    var neaktivniOrg = PuRepo.GetNeaktivniOrganizace().ToArray();
     if (Model is not null && Model.Any())
     {
         goodOrgs = Model.Where(o => o.Platy.AktualniRok().Any()).OrderBy(o => o.Nazev).ToList();
@@ -75,7 +69,6 @@
                             }
                             @foreach (var org in sorted)
                             {
-                                var metadata = org.Metadata.AktualniRok().FirstOrDefault();
                                 <tr>
                                     <td class="col" style="overflow: hidden;white-space: nowrap;text-overflow: ellipsis;max-width: 20rem;">
                                         <a asp-action="Detail" asp-route-id="@org.DS">@org.Nazev</a>

@@ -16,6 +16,7 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Datasets\Datasets.csproj" />
+    <ProjectReference Include="..\Lib.Web.UI\Lib.Web.UI.csproj" />
     <ProjectReference Include="..\Repositories\Repositories.csproj" />
   </ItemGroup>
 </Project>

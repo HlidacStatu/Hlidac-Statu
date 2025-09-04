@@ -1,7 +1,7 @@
+@using HlidacStatu.Extensions.Cache
 @using HlidacStatu.Repositories
-@using PlatyUredniku.Controllers
 
-@model PlatyUredniku.DataTable.DataTableFilter
+@model HlidacStatu.Extensions.DataTables.DataTableFilter
 
 @{
     ViewBag.Title = "Seznam organizací platicích politiky";
@@ -24,7 +24,7 @@
 
 @{
     var rok = PpRepo.DefaultYear;
-    var organizaceData = (List<PoliticiController.OrganizaceViewData>?)Model.InitialData;
+    var organizaceData = (List<Views.OrganizaceViewData>?)Model.InitialData;
 }
 
 

@@ -1,6 +1,4 @@
-using System;
-
-namespace PlatyUredniku.DataTable;
+namespace HlidacStatu.Extensions.DataTables;
 
 public class HtmlTableDefinition
 {
