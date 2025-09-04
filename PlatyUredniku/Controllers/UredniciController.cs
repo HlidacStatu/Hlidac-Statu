@@ -13,7 +13,6 @@ namespace PlatyUredniku.Controllers;
 
 public class UredniciController : Controller
 {
-
     public async Task<IActionResult> Analyza(string id)
     {
         if (string.IsNullOrWhiteSpace(id))

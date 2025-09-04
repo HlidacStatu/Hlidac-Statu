@@ -23,8 +23,6 @@ using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using ZiggyCreatures.Caching.Fusion;
-
 
 namespace PlatyUredniku;
 
@@ -94,15 +92,10 @@ public class Program
             builder.Services.AddSingleton<AutocompleteCategoryCacheService>();
             builder.Services.AddHostedService<AutocompleteTimer>();
 
-            builder.Services.AddFusionCache()
-                .WithDefaultEntryOptions(CachingOptions.Default);
-
             // builder.Services.AddScoped<IErrorBoundaryLogger, AutocompleteErrorLogger>();
 
             var app = builder.Build();
             
-            UredniciStaticCache.Init(app.Services.GetService<IFusionCache>());
-
             var whitelistIps = Devmasters.Config.GetWebConfigValue("BanWhitelist")?.Split(',',
                 StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
             BannedIpsMiddleware.Whitelist whitelist = new BannedIpsMiddleware.Whitelist();
