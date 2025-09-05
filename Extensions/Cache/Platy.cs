@@ -3,32 +3,21 @@ using HlidacStatu.Entities;
 using HlidacStatu.Extensions.DataTables;
 using HlidacStatu.Repositories;
 using HlidacStatu.Util;
+using HlidacStatu.Repositories.Cache;
 using ZiggyCreatures.Caching.Fusion;
 
 namespace HlidacStatu.Extensions.Cache;
 
 public static class Platy
 {
-    private static readonly IFusionCache _cache = new FusionCache(new FusionCacheOptions()
-    {
-        DefaultEntryOptions = PredefinedCachingOptions.Default,
-        CacheName = FusionCacheOptions.DefaultCacheName
-    });
-
+    
     public static class Politici
     {
-        public static async Task<List<PpPrijem>?> GetPrijmyPolitikaCached(string id, int rok)
-        {
-            var detail = await _cache.GetOrSetAsync<List<PpPrijem>>(
-                $"{nameof(PpRepo.GetPrijmyPolitikaAsync)}_{id}_{rok}-politici",
-                _ => PpRepo.GetPrijmyPolitikaAsync(id, rok)
-            );
-            return detail;
-        }
+        
 
         public static async Task<List<Views.PoliticiViewData>> GetFullPoliticiViewDataCached(int rok)
         {
-            var fullPoliticiViewData = await _cache.GetOrSetAsync<List<Views.PoliticiViewData>>(
+            var fullPoliticiViewData = await CacheService.Cache.GetOrSetAsync<List<Views.PoliticiViewData>>(
                 "fullPoliticiViewData_" + rok.ToString(),
                 factory: async _ =>
                 {
@@ -71,16 +60,12 @@ public static class Platy
 
         public static async Task<List<Views.OrganizaceViewData>> GetFullOrganizaceViewDataCached(int rok)
         {
-            var fullOrganizaceViewData = await _cache.GetOrSetAsync<List<Views.OrganizaceViewData>>(
+            var fullOrganizaceViewData = await CacheService.Cache.GetOrSetAsync<List<Views.OrganizaceViewData>>(
                 $"fullOrganizaceViewData_{rok}",
                 factory: async _ =>
                 {
                     var orgs = await PpRepo.GetActiveOrganizaceAsync(rok);
-                    // var allEventsPoskytnuto = await PpRepo.GetAllEventsAsync(rok,
-                    //     m =>m.DotazovanaInformace == PuEvent.DruhDotazovaneInformace.Politik 
-                    //         && m.Typ == PuEvent.TypUdalosti.PoskytnutiInformace || m.Typ == PuEvent.TypUdalosti.PoskytnutiInformace
-                    // );
-
+                
                     return orgs.Select(o =>
                     {
                         var org = new Views.OrganizaceViewData()
@@ -107,35 +92,7 @@ public static class Platy
 
             return fullOrganizaceViewData;
         }
-
-        public static List<string> GetPolitickeStranyForFilterCached()
-        {
-            return _cache.GetOrSet<List<string>>(
-                "politickeStranyFilterData",
-                _ =>
-                {
-                    List<string> politickeStranyIca =
-                    [
-                        "71443339",
-                        "00442704",
-                        "00496936",
-                        "16192656",
-                        "71339698",
-                        "10742409",
-                        "17085438",
-                        "00409171",
-                        "04134940",
-                        "26673908",
-                        "00409740",
-                        "71339728",
-                        "08288909"
-                    ];
-
-                    return politickeStranyIca.Select(ZkratkaStranyRepo.NazevStranyForIco).ToList();
-                }
-            );
-        }
-
+        
 
         private static string RenderCelkoveRocniNaklady(PpPrijem[] platy)
         {
@@ -184,67 +141,7 @@ public static class Platy
             return "<ol>" + goodOrgsHtmlList + rottenOrgsHtmlList + "</ol>";
         }
     }
-
-    public static class Urednici
-    {
-        public static async Task<int> GetPlatyCountPerYearCached(int year)
-        {
-            return await _cache.GetOrSetAsync<int>(
-                $"platyCount_{year}",
-                async _ => (await PuRepo.GetPlatyAsync(PuRepo.DefaultYear)).Count
-            );
-        }
-
-        public static async Task<List<PuPlat>> GetPoziceDlePlatuCached(int min, int max, int year)
-        {
-            return await _cache.GetOrSetAsync<List<PuPlat>>(
-                $"{nameof(PuRepo.GetPoziceDlePlatuAsync)}_{min}_{max}_{year}",
-                async _ => await PuRepo.GetPoziceDlePlatuAsync(min, max, year)
-            );
-        }
-
-        public static async Task<PuOrganizace> GetFullDetailOrganizaceCached(string datovaSchranka)
-        {
-            return await _cache.GetOrSetAsync<PuOrganizace>(
-                $"{nameof(PuRepo.GetFullDetailAsync)}_{datovaSchranka}",
-                async _ => await PuRepo.GetFullDetailAsync(datovaSchranka)
-            );
-        }
-        public static async Task<List<PuOrganizace>> GetOrganizaceForTagCached(string tag)
-        {
-            return await _cache.GetOrSetAsync<List<PuOrganizace>>(
-                $"{nameof(PuRepo.GetActiveOrganizaceForTagAsync)}_{tag}-urednici",
-                _ => PuRepo.GetActiveOrganizaceForTagAsync(tag)
-            );
-        }
-        public static async Task<PuPlat> GetPlatCached(int id)
-        {
-            return await _cache.GetOrSetAsync<PuPlat>(
-                $"{nameof(PuRepo.GetPlatAsync)}_{id}-urednici",
-                _ => PuRepo.GetPlatAsync(id)
-            );
-        }
-    }
-
-    public static class PredefinedCachingOptions
-    {
-        // Čerstvá data má v paměti po dobu 10 minut => stará
-        // Stará data má v paměti max. 4 hodiny a pokud dojde k výpadku zdroje, použije starou hodnotu a prodlouží dočasnou čerstvost o 1 minutu
-        // Při načítání nových dat do cache dá databázi 100ms čas a v případě, že požadavek trvá déle, použije starou cache, zatímco na pozadí načítá data nová
-        public static readonly FusionCacheEntryOptions Default = new FusionCacheEntryOptions(
-                TimeSpan.FromMinutes(10)
-            )
-            .SetFailSafe(true, TimeSpan.FromHours(4), TimeSpan.FromMinutes(1))
-            .SetFactoryTimeouts(TimeSpan.FromMilliseconds(100)
-            );
-
-        public static readonly FusionCacheEntryOptions Long = new FusionCacheEntryOptions(
-                TimeSpan.FromHours(10)
-            )
-            .SetFailSafe(true, TimeSpan.FromHours(40), TimeSpan.FromMinutes(30))
-            .SetFactoryTimeouts(TimeSpan.FromSeconds(10)
-            );
-    }
+    
 }
 
 public class Views

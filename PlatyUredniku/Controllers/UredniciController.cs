@@ -99,8 +99,8 @@ public class UredniciController : Controller
                 break;
         }
 
-        var platy = await HlidacStatu.Extensions.Cache.Platy.Urednici.GetPoziceDlePlatuCached(range.Min, range.Max, PuRepo.DefaultYear);
-        var platyCount = await HlidacStatu.Extensions.Cache.Platy.Urednici.GetPlatyCountPerYearCached(PuRepo.DefaultYear);
+        var platy = await PuRepo.Cached.GetPoziceDlePlatuAsync(range.Min, range.Max, PuRepo.DefaultYear);
+        var platyCount = await PuRepo.Cached.GetPlatyAsync(PuRepo.DefaultYear);
 
         ViewData["rozsah"] = rozsah;
         ViewData["odkaz"] = odkaz;
@@ -120,7 +120,7 @@ public class UredniciController : Controller
         if (string.IsNullOrWhiteSpace(normalizedTag))
             return NotFound();
         
-        var organizace = await HlidacStatu.Extensions.Cache.Platy.Urednici.GetOrganizaceForTagCached(normalizedTag);
+        var organizace = await PuRepo.Cached.GetActiveOrganizaceForTagAsync(normalizedTag);
 
         var tag = await PuRepo.GetTagAsync(normalizedTag);
         var oblast = tag is null ? id : tag.Tag;
@@ -146,7 +146,7 @@ public class UredniciController : Controller
         var model = new Dictionary<string, List<PuOrganizace>>();
         foreach (var oblast in oblasti)
         {
-            var organizace = await HlidacStatu.Extensions.Cache.Platy.Urednici.GetOrganizaceForTagCached(oblast);
+            var organizace = await PuRepo.Cached.GetActiveOrganizaceForTagAsync(oblast);
 
             model.Add(oblast, organizace);
         }
@@ -171,7 +171,7 @@ public class UredniciController : Controller
 
     public async Task<IActionResult> Detail(string id, int? rok = null)
     {
-        var detail = await HlidacStatu.Extensions.Cache.Platy.Urednici.GetFullDetailOrganizaceCached(id);
+        var detail = await PuRepo.Cached.GetFullDetailAsync(id);
         
         ViewBag.Title = detail.Nazev;
 
@@ -183,7 +183,7 @@ public class UredniciController : Controller
 
     public async Task<IActionResult> Plat(int id)
     {
-        var detail = await HlidacStatu.Extensions.Cache.Platy.Urednici.GetPlatCached(id);
+        var detail = await PuRepo.Cached.GetPlatAsync(id);
 
         ViewData["mainTag"] = detail.Organizace.Tags.FirstOrDefault(t => PuRepo.MainTags.Contains(t.Tag))?.Tag;
 

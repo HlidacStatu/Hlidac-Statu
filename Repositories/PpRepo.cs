@@ -13,7 +13,7 @@ using static HlidacStatu.Entities.PuEvent;
 
 namespace HlidacStatu.Repositories;
 
-public static class PpRepo
+public static partial class PpRepo
 {
     public const int DefaultYear = 2024;
     public const int MinYear = 2024;

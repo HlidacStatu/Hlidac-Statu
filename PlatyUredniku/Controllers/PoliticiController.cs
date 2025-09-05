@@ -47,7 +47,7 @@ public partial class PoliticiController : Controller
         if (osoba is null)
             return NotFound();
 
-        var detail = await HlidacStatu.Extensions.Cache.Platy.Politici.GetPrijmyPolitikaCached(id, rok);
+        var detail = await PpRepo.Cached.GetPrijmyPolitikaAsync(id, rok);
         
         if (detail == null || detail.Count == 0)
         {
@@ -148,7 +148,7 @@ public partial class PoliticiController : Controller
     public async Task<IActionResult> Seznam(string report = "platy", int rok = PuRepo.DefaultYear)
     {
         var fullPoliticiViewData = await HlidacStatu.Extensions.Cache.Platy.Politici.GetFullPoliticiViewDataCached(rok);
-        var politickeStranyFilterData = HlidacStatu.Extensions.Cache.Platy.Politici.GetPolitickeStranyForFilterCached();
+        var politickeStranyFilterData = PpRepo.Cached.GetPolitickeStranyForFilter();
 
         var maxJobCount = (int)fullPoliticiViewData.Max(x => x.PocetJobu) + 1;
         var maxTotalIncomeInMilions =
@@ -270,7 +270,7 @@ public partial class PoliticiController : Controller
     public async Task<IActionResult> SeznamData()
     {
 
-        var politickeStranyFilterData = HlidacStatu.Extensions.Cache.Platy.Politici.GetPolitickeStranyForFilterCached();
+        var politickeStranyFilterData = PpRepo.Cached.GetPolitickeStranyForFilter();
 
         var filtered = FilterPoliticiViewData(HttpContext.Request.Query, politickeStranyFilterData);
 
