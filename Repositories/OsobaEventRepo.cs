@@ -8,6 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 
 namespace HlidacStatu.Repositories
@@ -40,11 +41,11 @@ namespace HlidacStatu.Repositories
         public static List<OsobaEvent> GetByOsobaId(int osobaId, Expression<Func<OsobaEvent, bool>> predicate = null)
         {
             using DbEntities db = new DbEntities();
-            
+
             return GetByOsobaIdTracked(db, osobaId, predicate).AsNoTracking().ToList();
         }
-        
-        
+
+
         public static IQueryable<OsobaEvent> GetByOsobaIdTracked(DbEntities db, int osobaId, Expression<Func<OsobaEvent, bool>> predicate = null)
         {
             var query = db.OsobaEvent
@@ -52,15 +53,15 @@ namespace HlidacStatu.Repositories
 
             if (predicate is not null)
                 query = query.Where(predicate);
-            
+
             return query;
         }
-        
+
         public static List<OsobaEvent> GetByIco(string ico, Expression<Func<OsobaEvent, bool>> predicate = null)
         {
             if (string.IsNullOrWhiteSpace(ico))
                 return Enumerable.Empty<OsobaEvent>().ToList();
-                
+
             using DbEntities db = new DbEntities();
 
             var query = db.OsobaEvent
@@ -69,7 +70,7 @@ namespace HlidacStatu.Repositories
 
             if (predicate is not null)
                 query = query.Where(predicate);
-            
+
             return query.ToList();
         }
         public static (Firma Firma, DateTime? From, DateTime? To, string Role)[] GetCeos(Osoba osoba, DateTime? from = null, DateTime? to = null)
@@ -113,7 +114,7 @@ namespace HlidacStatu.Repositories
 
                 if (to is not null)
                     ceoQuery = ceoQuery.Where(oe => oe.DatumOd == null || oe.DatumOd <= to);
-                
+
                 if (predicate is not null)
                     ceoQuery = ceoQuery.Where(predicate);
 
@@ -166,14 +167,14 @@ namespace HlidacStatu.Repositories
                 return result;
             }
         }
-        
+
         public static IEnumerable<string> GetDistinctOrganisations(OsobaEvent.Types? eventType)
         {
             if (eventType is null)
                 return Enumerable.Empty<string>();
 
             using DbEntities db = new DbEntities();
-            
+
             return db.OsobaEvent.AsQueryable()
                 .Where(m => m.Type == (int)eventType)
                 .Where(m => m.Organizace != null)
@@ -183,14 +184,14 @@ namespace HlidacStatu.Repositories
                 .ToList();
 
         }
-        
+
         public static IEnumerable<string> GetDistinctAddInfo(OsobaEvent.Types? eventType, string organizace)
         {
             if (eventType is null || string.IsNullOrWhiteSpace(organizace))
                 return Enumerable.Empty<string>();
 
             using DbEntities db = new DbEntities();
-            
+
             return db.OsobaEvent.AsQueryable()
                 .Where(m => m.Type == (int)eventType)
                 .Where(m => m.Organizace == organizace)
@@ -200,10 +201,13 @@ namespace HlidacStatu.Repositories
                 .ToList();
 
         }
-        
-        
 
-        public static OsobaEvent CreateOrUpdate(OsobaEvent osobaEvent, string user)
+
+
+        public static OsobaEvent CreateOrUpdate(OsobaEvent osobaEvent, string user,
+            [CallerMemberName] string callingByMethod = null,
+            [System.Runtime.CompilerServices.CallerLineNumber] int sourceLineNumber = 0
+            )
         {
             NormalizeOsobaEvent(osobaEvent);
 
@@ -218,6 +222,9 @@ namespace HlidacStatu.Repositories
                             ev.Pk == osobaEvent.Pk
                         )
                         .FirstOrDefault();
+
+                    user = user + "<null>";
+                    user = user + $"|{callingByMethod}|{sourceLineNumber}";
 
                     if (eventToUpdate != null)
                         return UpdateEvent(eventToUpdate, osobaEvent, user, db);
@@ -243,7 +250,7 @@ namespace HlidacStatu.Repositories
             string pozice = osoba.Pohlavi == "f" ? "Ředitelka" : "Ředitel";
             OsobaEvent.Types type = OsobaEvent.Types.VerejnaSpravaExekutivni;
             var firmaCat = await CeoOf.KategorieOVMAsync();
-            
+
             if (CeoOf.ICO == "48136450") //CNB
             {
                 pozice = osoba.Pohlavi == "f" ? "Guvernérka" : "Guvernér";
