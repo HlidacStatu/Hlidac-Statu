@@ -17,7 +17,6 @@ using Microsoft.Extensions.Logging;
 using OpenTelemetry.Exporter;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
-using PlatyUredniku.Cache;
 using PlatyUredniku.Services;
 using Serilog;
 using System;

@@ -62,6 +62,7 @@ public partial class PoliticiController : Controller
     [HlidacCache(48 * 60 * 60, "*")]
     public async Task<IActionResult> Organizace(string id, int rok = PpRepo.DefaultYear)
     {
+        ViewBag.rok = rok;
         PuOrganizace detail = null;
         if (HlidacStatu.Util.DataValidators.CheckCZICO(id))
         {
