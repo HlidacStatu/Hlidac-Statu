@@ -28,35 +28,41 @@
             <h3 class="fw-bold"><i class="fa-regular fa-user"></i>&nbsp;@Model.NazevPozice</h3>
         </div>
 
-
-        @if (Model.Plat is not null && Model.Plat != 0)
-        {
+        @{
             var platMesicne = Model.PlatMesicne;
             var odmenyMesicne = Model.OdmenyMesicne;
             var osobniOhodnoceni = Model.OsobniOhodnoceniPerc;
+        }
 
-            <div class="row mt-5">
-                <div class="col">
+
+        <div class="row mt-5">
+            <div class="col">
+                <p>
+                    Pozice <b>@Model.NazevPozice</b> měla za rok
+                    @Model.Rok celkový hrubý příjem
+                    <b>@HlidacStatu.Util.RenderData.NicePriceHtml(Model.CelkovyRocniPlatVcetneOdmen)</b>.
+                </p>
+                <p>
+                    Přepočteno na průměrný měsíční základní plat
+                    šlo o <strong>@HlidacStatu.Util.RenderData.NicePriceHtml(platMesicne ?? 0)</strong> měsíčně a
+                    průměrnou měsíční odměnu
+                    <strong>@HlidacStatu.Util.RenderData.NicePriceHtml(odmenyMesicne ?? 0)</strong>.
+                </p>
+
+                @if (Model.Odmeny.HasValue)
+                {
                     <p>
-                        Pozice <b>@Model.NazevPozice</b> měla za rok
-                        @Model.Rok celkový hrubý příjem <b>@HlidacStatu.Util.RenderData.NicePriceHtml(Model.CelkovyRocniPlatVcetneOdmen)</b>.
+                        Odměny a osobní ohodnocení ve výši
+                        <strong>@HlidacStatu.Util.RenderData.NicePriceHtml(Model.Odmeny.Value)</strong>
+                        tvoří <strong>@HlidacStatu.Util.RenderData.NicePercent(osobniOhodnoceni ?? 1, 1)</strong> celkové
+                        výše příjmu.
                     </p>
-                    <p>
-                        Přepočteno na průměrný měsíční základní plat
-                        šlo o <strong>@HlidacStatu.Util.RenderData.NicePriceHtml(platMesicne ?? 0)</strong> měsíčně a průměrnou měsíční odměnu
-                        <strong>@HlidacStatu.Util.RenderData.NicePriceHtml(odmenyMesicne ?? 0)</strong>.
-                    </p>
-
-                    @if (Model.Odmeny.HasValue)
-                    {
-                        <p>
-                            Odměny a osobní ohodnocení ve výši <strong>@HlidacStatu.Util.RenderData.NicePriceHtml(Model.Odmeny.Value)</strong>
-                            tvoří <strong>@HlidacStatu.Util.RenderData.NicePercent(osobniOhodnoceni, 1)%</strong> celkové výše příjmu.
-                        </p>
-                    }
+                }
 
 
-                </div>
+            </div>
+            @if (Model.Plat is not null && Model.Plat != 0)
+            {
                 <div class="col">
                     @ChartUtilExtensions.SemiCircleDonut(new Tuple<string, decimal>[]
                         {
@@ -65,8 +71,8 @@
                         },
                         "Poměr základního platu a odměny", "Kč", 200)
                 </div>
-            </div>
-        }
+            }
+        </div>
 
 
     </div>
@@ -79,7 +85,8 @@
             <tr>
                 <td>
                     Hrubý měsíční plat (přepočtený na plný úvazek) včetně odměn
-                    <sup data-bs-toggle="tooltip" data-bs-title="Průměrná hodnota vypočtená z celkového roční částky vydělené počtem měsíců">
+                    <sup data-bs-toggle="tooltip"
+                         data-bs-title="Průměrná hodnota vypočtená z celkového roční částky vydělené počtem měsíců">
                         <i class="fa-regular fa-circle-info"></i>
                     </sup>
                 </td>

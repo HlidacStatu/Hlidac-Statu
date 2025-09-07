@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace HlidacStatu.Repositories;
 
-public static class PuRepo
+public static partial class PuRepo
 {
     /*
      List PU_organizace s prelozenymi CZISCO

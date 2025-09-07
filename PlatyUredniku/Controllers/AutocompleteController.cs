@@ -4,7 +4,6 @@ using System.Linq;
 using Microsoft.AspNetCore.Mvc;
 using PlatyUredniku.Services;
 using HlidacStatu.DS.Api;
-using Microsoft.AspNetCore.Authorization;
 
 namespace PlatyUredniku.Controllers;
 

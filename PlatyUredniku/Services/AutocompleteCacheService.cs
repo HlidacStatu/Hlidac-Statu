@@ -2,7 +2,6 @@ using HlidacStatu.DS.Api;
 using HlidacStatu.Entities;
 using HlidacStatu.Repositories;
 using Microsoft.EntityFrameworkCore;
-using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -148,10 +147,17 @@ public class AutocompleteCacheService
     {
         await using var db = new DbEntities();
 
-        var synonyma = await db.AutocompleteSynonyms.AsNoTracking()
-            .Where(p => p.QueryPlaty != null)
-            .Where(p => p.Active == 1)
-            .ToListAsync(cancellationToken: cancellationToken);
+        var synonyma = await db.AutocompleteSynonyms
+            .AsNoTracking()
+            .Where(syn => syn.QueryPlaty != null && syn.Active == 1)
+            .Where(syn =>
+                db.PuOrganizace.Any(org =>
+                    org.DS == syn.QueryPlaty &&
+                    (db.PuPlaty.Any(pl => pl.IdOrganizace == org.Id) ||
+                     db.PpPrijmy.Any(pp => pp.IdOrganizace == org.Id))
+                )
+            )
+            .ToListAsync(cancellationToken);
 
         var results = synonyma.Select(s => new Autocomplete()
         {
@@ -160,7 +166,7 @@ public class AutocompleteCacheService
             Type = "instituce",
             PriorityMultiplier = 1,
             ImageElement = $"<i class='fas fa-university'></i>",
-            Description = "", //puvodne $"{o.Oblast}" //TODO zmenit na tagy?
+            Description = s.Description,
             Category = Autocomplete.CategoryEnum.Synonym
         }).ToList();
         

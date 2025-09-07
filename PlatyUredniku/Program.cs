@@ -7,7 +7,6 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc.ApplicationParts;
 using Microsoft.AspNetCore.Mvc.Controllers;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.EntityFrameworkCore;
@@ -18,15 +17,11 @@ using Microsoft.Extensions.Logging;
 using OpenTelemetry.Exporter;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
-using PlatyUredniku.Cache;
 using PlatyUredniku.Services;
 using Serilog;
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using ZiggyCreatures.Caching.Fusion;
-
 
 namespace PlatyUredniku;
 
@@ -96,15 +91,10 @@ public class Program
             builder.Services.AddSingleton<AutocompleteCategoryCacheService>();
             builder.Services.AddHostedService<AutocompleteTimer>();
 
-            builder.Services.AddFusionCache()
-                .WithDefaultEntryOptions(CachingOptions.Default);
-
             // builder.Services.AddScoped<IErrorBoundaryLogger, AutocompleteErrorLogger>();
 
             var app = builder.Build();
             
-            UredniciStaticCache.Init(app.Services.GetService<IFusionCache>());
-
             var whitelistIps = Devmasters.Config.GetWebConfigValue("BanWhitelist")?.Split(',',
                 StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
             BannedIpsMiddleware.Whitelist whitelist = new BannedIpsMiddleware.Whitelist();

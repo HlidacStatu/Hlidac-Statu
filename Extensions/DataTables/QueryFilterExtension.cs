@@ -1,13 +1,10 @@
-using System;
-using System.Collections.Generic;
 using System.Globalization;
-using System.Linq;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Primitives;
 
-namespace PlatyUredniku.DataTable;
+namespace HlidacStatu.Extensions.DataTables;
 
-static class QueryFilters
+public static class QueryFilters
 {
     private static readonly StringComparer CI = StringComparer.InvariantCultureIgnoreCase;
 

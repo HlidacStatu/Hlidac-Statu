@@ -13,7 +13,7 @@ using static HlidacStatu.Entities.PuEvent;
 
 namespace HlidacStatu.Repositories;
 
-public static class PpRepo
+public static partial class PpRepo
 {
     public const int DefaultYear = 2024;
     public const int MinYear = 2024;
@@ -685,7 +685,12 @@ public static class PpRepo
             throw new Exception("Chybí vyplněná datová schránka");
         }
 
-        organizace.DS = organizace.DS.Trim();
+        var correctDs = await GetCorrectDs(organizace.DS);
+
+        if (correctDs is null)
+            throw new Exception("Organizace nebyla nalezena podle datové schránky");
+        
+        organizace.DS = correctDs;
 
         // null navigation properties in organizace, because we will add them manually
         var metadata = organizace.Metadata;
@@ -733,6 +738,27 @@ public static class PpRepo
                 await UpsertPrijemPolitikaAsync(plat);
             }
         }
+    }
+
+    public static async Task<string> GetCorrectDs(string originalDs)
+    {
+        await using var dbContext = new DbEntities();
+        
+        var ds = originalDs.Trim().ToLower();
+        
+        var firmaDs = await dbContext.FirmaDs.AsNoTracking()
+            .Where(o => o.DatovaSchranka == ds)
+            .FirstOrDefaultAsync();
+
+        while (firmaDs is not null && firmaDs.DsParent is not null)
+        {
+            var dsParent = firmaDs.DsParent;
+            firmaDs = await dbContext.FirmaDs.AsNoTracking()
+                .Where(o => o.DatovaSchranka == dsParent)
+                .FirstOrDefaultAsync();
+        }
+        
+        return firmaDs?.DatovaSchranka;
     }
 
     public static async Task UpsertPrijemPolitikaAsync(PpPrijem prijemPolitika)

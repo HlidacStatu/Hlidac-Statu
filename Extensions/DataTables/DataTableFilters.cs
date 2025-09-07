@@ -1,11 +1,9 @@
-using System;
-using System.Collections.Generic;
 using System.Globalization;
 using System.Text.Encodings.Web;
 using System.Text.Json;
 using Microsoft.AspNetCore.Html;
 
-namespace PlatyUredniku.DataTable;
+namespace HlidacStatu.Extensions.DataTables;
 
 public sealed class DataTableFilters
 {

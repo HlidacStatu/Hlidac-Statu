@@ -1,14 +1,11 @@
-﻿@using HlidacStatu.Entities
-@using HlidacStatu.Repositories
+﻿@using HlidacStatu.Repositories
 @using HlidacStatu.Repositories.SharedModels
-@inject ZiggyCreatures.Caching.Fusion.IFusionCache cache;
 @{
     var stats = await PuRepo.GetGlobalStatOrganizaceAsync();
-    List<PuPlat> platy = (List<PuPlat>?)ViewData["platy"];
 
     var organizationOfTheDay = await PuRepo.GetOrganizationOfTheDayAsync();
     var ceoOfTheDay = organizationOfTheDay.Platy.FirstOrDefault(p => p.JeHlavoun == true && p.Rok == PuRepo.DefaultYear);
-    var dataForOrganizationOfTheDay = await UredniciStaticCache.GetFullDetailAsync(organizationOfTheDay.DS);
+    var dataForOrganizationOfTheDay = await PuRepo.Cached.GetFullDetailAsync(organizationOfTheDay.DS);
 }
 
 <section class="d-flex align-items-center justify-content-center pageblock-small pageblock">

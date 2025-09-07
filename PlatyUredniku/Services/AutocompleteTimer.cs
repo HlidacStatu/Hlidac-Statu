@@ -21,7 +21,7 @@ public class AutocompleteTimer : BackgroundService
     {
         await RunAsync(stoppingToken);
 
-        using PeriodicTimer timer = new(TimeSpan.FromMinutes(10));
+        using PeriodicTimer timer = new(TimeSpan.FromHours(2));
 
         try
         {

@@ -8,26 +8,16 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using Devmasters.Enums;
-using ZiggyCreatures.Caching.Fusion;
-
 
 namespace PlatyUredniku.Controllers;
 
 public class UredniciController : Controller
 {
-    private readonly IFusionCache _cache;
-
-    public UredniciController(IFusionCache cache)
-    {
-        _cache = cache;
-    }
     public async Task<IActionResult> Analyza(string id)
     {
-
         if (string.IsNullOrWhiteSpace(id))
             return Redirect("/analyzy");
-
-
+        
         switch (id.ToLower())
         {
             case "kategorie":
@@ -65,13 +55,6 @@ public class UredniciController : Controller
     }
     public async Task<IActionResult> Index()
     {
-        var platyTask = _cache.GetOrSetAsync<List<PuPlat>>(
-            $"{nameof(PuRepo.GetPlatyAsync)}_{PuRepo.DefaultYear}-urednici",
-            _ => PuRepo.GetPlatyAsync(PuRepo.DefaultYear)
-        );
-
-        ViewData["platy"] = await platyTask;
-
         return View();
     }
     
@@ -116,10 +99,9 @@ public class UredniciController : Controller
                 break;
         }
 
-        var platy = await UredniciStaticCache.GetPoziceDlePlatuAsync(range.Min, range.Max, PuRepo.DefaultYear);
-        var platyCount = await UredniciStaticCache.GetPlatyCountPerYearAsync(PuRepo.DefaultYear);
+        var platy = await PuRepo.Cached.GetPoziceDlePlatuAsync(range.Min, range.Max, PuRepo.DefaultYear);
+        var platyCount = await PuRepo.Cached.GetPlatyAsync(PuRepo.DefaultYear);
 
-        ViewData["platy"] = platy;
         ViewData["rozsah"] = rozsah;
         ViewData["odkaz"] = odkaz;
         ViewData["platyMaximum"] = range.Max;
@@ -138,19 +120,12 @@ public class UredniciController : Controller
         if (string.IsNullOrWhiteSpace(normalizedTag))
             return NotFound();
         
-        ValueTask<List<PuOrganizace>> organizaceForTagTask = _cache.GetOrSetAsync<List<PuOrganizace>>(
-            $"{nameof(PuRepo.GetActiveOrganizaceForTagAsync)}_{normalizedTag}-urednici",
-            _ => PuRepo.GetActiveOrganizaceForTagAsync(normalizedTag)
-        );
-
-        var organizace = await organizaceForTagTask;
+        var organizace = await PuRepo.Cached.GetActiveOrganizaceForTagAsync(normalizedTag);
 
         var tag = await PuRepo.GetTagAsync(normalizedTag);
         var oblast = tag is null ? id : tag.Tag;
         
-        ViewData["platy"] = organizace.SelectMany(o => o.Platy).ToList();
         ViewData["oblast"] = oblast;
-        ViewData["context"] = $"{id}";
 
         if (tag is not null && 
             tag.TagNormalized.Equals(tag.Tag, StringComparison.InvariantCultureIgnoreCase) == false)
@@ -171,10 +146,7 @@ public class UredniciController : Controller
         var model = new Dictionary<string, List<PuOrganizace>>();
         foreach (var oblast in oblasti)
         {
-            var organizace = await _cache.GetOrSetAsync<List<PuOrganizace>>(
-                $"{nameof(PuRepo.GetActiveOrganizaceForTagAsync)}_{oblast}-urednici",
-                _ => PuRepo.GetActiveOrganizaceForTagAsync(oblast)
-            );
+            var organizace = await PuRepo.Cached.GetActiveOrganizaceForTagAsync(oblast);
 
             model.Add(oblast, organizace);
         }
@@ -199,28 +171,21 @@ public class UredniciController : Controller
 
     public async Task<IActionResult> Detail(string id, int? rok = null)
     {
-        var detail = await UredniciStaticCache.GetFullDetailAsync(id);
+        var detail = await PuRepo.Cached.GetFullDetailAsync(id);
         
         ViewBag.Title = detail.Nazev;
 
         ViewData["mainTag"] = detail.Tags.FirstOrDefault(t => PuRepo.MainTags.Contains(t.Tag))?.Tag;
-        ViewData["platy"] = detail.Platy.ToList();
-        ViewData["rok"] = rok ?? (detail.Platy.Any() ? detail.Platy.Max(m => m.Rok) : PuRepo.DefaultYear);
         ViewData["id"] = id;
-        ViewData["context"] = detail.FirmaDs.DsSubjName;
 
         return View(detail);
     }
 
     public async Task<IActionResult> Plat(int id)
     {
-        var detail = await _cache.GetOrSetAsync<PuPlat>(
-            $"{nameof(PuRepo.GetPlatAsync)}_{id}-urednici",
-            _ => PuRepo.GetPlatAsync(id)
-        );
+        var detail = await PuRepo.Cached.GetPlatAsync(id);
 
         ViewData["mainTag"] = detail.Organizace.Tags.FirstOrDefault(t => PuRepo.MainTags.Contains(t.Tag))?.Tag;
-        ViewData["context"] = $"{detail.NazevPozice} v organizaci {detail.Organizace.FirmaDs.DsSubjName}";
 
         ViewBag.Title = $"Plat {detail.NazevPozice} v {detail.Organizace.Nazev}";
 

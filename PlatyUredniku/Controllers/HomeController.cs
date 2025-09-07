@@ -3,38 +3,20 @@ using HlidacStatu.Repositories;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using ZiggyCreatures.Caching.Fusion;
 using System.Text;
 using System;
 using HlidacStatu.Lib.Web.UI.Attributes;
 using System.Linq;
-using System.Data.Entity;
 
 namespace PlatyUredniku.Controllers;
 
 public class HomeController : Controller
 {
-    private readonly IFusionCache _cache;
-
-    public HomeController(IFusionCache cache)
-    {
-        _cache = cache;
-    }
-
     public async Task<IActionResult> Index()
     {
-        var platyTask = _cache.GetOrSetAsync<List<PuPlat>>(
-            $"{nameof(PuRepo.GetPlatyAsync)}_{PuRepo.DefaultYear}",
-            _ => PuRepo.GetPlatyAsync(PuRepo.DefaultYear)
-        );
-
-        ViewData["platy"] = await platyTask;
-
         return View("Index");
     }
-
-
-
+    
 
     [HlidacCache(48 * 60 * 60, "*")]
     public async Task<IActionResult> Organizace(string id)
@@ -71,7 +53,6 @@ public class HomeController : Controller
 
         if (detail == null)
             return Redirect("/");
-
 
 
         if (detail.Platy?.Count > 0 && detail.PrijmyPolitiku?.Count > 0)
