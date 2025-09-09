@@ -47,7 +47,7 @@ namespace HlidacStatu.Web.HealthChecks
                 {
                     if (swarm.Services.Any(m => m.Name.Equals(svc, StringComparison.InvariantCultureIgnoreCase)) == false)
                     {
-                        bad = true;
+                        degraded = true;
                         _ = sb.AppendLine($"Service '{svc}' doesn't exists");
                     }
                     else
@@ -55,7 +55,7 @@ namespace HlidacStatu.Web.HealthChecks
                         var service = swarm.Services.First(m => m.Name.Equals(svc, StringComparison.InvariantCultureIgnoreCase));
                         if (service.RunningReplicas == 0)
                         {
-                            bad = true;
+                            degraded = true;
                             _ = sb.AppendLine($"Service '{svc}' is stopped");
                         }
                         else if (service.RunningReplicas > 0 && service.RunningReplicas < service.Replicas)

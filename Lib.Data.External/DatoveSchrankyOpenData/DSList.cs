@@ -14,7 +14,7 @@ namespace HlidacStatu.Lib.Data.External.DatoveSchrankyOpenData
     {
 
        
-        public static IEnumerable<(string ico, string ds, string parentDS, string dsName)> UpdateListDS()
+        public static List<(string ico, string ds, string parentDS, string dsName)> UpdateListDS()
         {
             List<listBox> dsL = new List<listBox>();
 
@@ -57,7 +57,8 @@ namespace HlidacStatu.Lib.Data.External.DatoveSchrankyOpenData
                 m => (
                 string.IsNullOrEmpty(m.ico) ? HlidacStatu.Util.ParseTools.NormalizeIco(m.idOVM) : HlidacStatu.Util.ParseTools.NormalizeIco(m.ico), 
                 m.id, m.hierarchy?.masterId, m?.name?.tradeName)
-                );
+                )
+                .ToList();
 
         }
 
