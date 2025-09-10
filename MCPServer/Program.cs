@@ -1,23 +1,20 @@
 using HlidacStatu.Entities;
 using HlidacStatu.LibCore.Extensions;
-using HlidacStatu.LibCore.Filters;
-using HlidacStatu.LibCore.MiddleWares;
-using HlidacStatu.LibCore.Services;
-using HlidacStatu.MCPServer.Resources;
-using HlidacStatu.MCPServer.Tools;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.DataProtection;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Diagnostics.HealthChecks;
-using Microsoft.OpenApi.Models;
-using ModelContextProtocol.Server;
+using Microsoft.IdentityModel.Tokens;
+using ModelContextProtocol.AspNetCore.Authentication;
 using OpenTelemetry;
 using OpenTelemetry.Metrics;
 using OpenTelemetry.Trace;
 using Serilog;
-using static NPOI.SS.Formula.Functions.Countif;
-using ILogger = Serilog.ILogger;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using ModelContextProtocol.AspNetCore.Authentication;
+using System.Net.Http.Headers;
+using System.Security.Claims;
+using OpenIddict.Abstractions;
+using OpenIddict.Server;
 
 string CORSPolicy = "from_hlidacstatu.cz";
 
@@ -31,7 +28,12 @@ Devmasters.Config.Init(builder.Configuration);
 System.Globalization.CultureInfo.DefaultThreadCurrentCulture = HlidacStatu.Util.Consts.czCulture;
 System.Globalization.CultureInfo.DefaultThreadCurrentUICulture = HlidacStatu.Util.Consts.csCulture;
 
-ILogger logger = Log.ForContext<Program>();
+var logger = Log.ForContext<Program>();
+
+//tohle do produkce pak změnit na správný port
+var serverUrl = "https://localhost:5552/";
+builder.WebHost.UseUrls(serverUrl);
+
 
 
 // service registration --------------------------------------------------------------------------------------------
@@ -39,7 +41,10 @@ ILogger logger = Log.ForContext<Program>();
 // for scoped services (mainly for identity)
 string connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 builder.Services.AddDbContext<DbEntities>(options =>
-    options.UseSqlServer(connectionString));
+{
+    options.UseSqlServer(connectionString);
+    options.UseOpenIddict();
+});
 
 // Add a DbContext to store your Database Keys (cookie single sign on)
 builder.Services.AddDbContext<HlidacKeysContext>(options =>
@@ -48,11 +53,108 @@ builder.Services.AddDataProtection()
     .PersistKeysToDbContext<HlidacKeysContext>()
     .SetApplicationName("HlidacStatu");
 
-bool enableAuth = false;
+builder.Services.AddOpenIddict()
+    .AddCore(options =>
+    {
+        options.UseEntityFrameworkCore()
+            .UseDbContext<DbEntities>();
+    })
+    .AddServer(options =>
+    {
+        // Enable the token endpoint.
+        options.SetTokenEndpointUris("connect/token");
+        options.SetAuthorizationEndpointUris("connect/authorize")
+            .AllowAuthorizationCodeFlow();
+        
+        options.RegisterScopes("mcp:tools", "openid");
 
+        
+        // Enable the client credentials flow.
+        options.AllowClientCredentialsFlow();
 
+        // Register the signing and encryption credentials.
+        options.AddDevelopmentEncryptionCertificate()
+            .AddDevelopmentSigningCertificate();
 
+        // Register the ASP.NET Core host and configure the ASP.NET Core options.
+        options.UseAspNetCore()
+            .EnableTokenEndpointPassthrough();
+        
+        options.AddEventHandler<OpenIddictServerEvents.HandleConfigurationRequestContext>(builder =>
+        {
+            builder.UseInlineHandler(context =>
+            {
+                context.Metadata.Add("registration_endpoint", new OpenIddictParameter(context.BaseUri + "connect/register"));
+                return default;
+            });
+        });
+    });
 
+    builder.Services.AddAuthentication(options =>
+    {
+        options.DefaultChallengeScheme = McpAuthenticationDefaults.AuthenticationScheme;
+        options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    })
+    .AddJwtBearer(options =>
+    {
+        // Configure to validate tokens from our in-memory OAuth server
+        options.Authority = serverUrl;
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = true,
+            ValidateAudience = true,
+            ValidateLifetime = true,
+            ValidateIssuerSigningKey = true,
+            ValidAudience = serverUrl, // Validate that the audience matches the resource metadata as suggested in RFC 8707
+            ValidIssuer = serverUrl,
+            NameClaimType = "name",
+            RoleClaimType = "roles"
+        };
+
+        options.Events = new JwtBearerEvents
+        {
+            OnTokenValidated = context =>
+            {
+                var name = context.Principal?.Identity?.Name ?? "unknown";
+                var email = context.Principal?.FindFirstValue("preferred_username") ?? "unknown";
+                Console.WriteLine($"Token validated for: {name} ({email})");
+                return Task.CompletedTask;
+            },
+            OnAuthenticationFailed = context =>
+            {
+                Console.WriteLine($"Authentication failed: {context.Exception.Message}");
+                return Task.CompletedTask;
+            },
+            OnChallenge = context =>
+            {
+                Console.WriteLine($"Challenging client to authenticate with Entra ID");
+                return Task.CompletedTask;
+            }
+        };
+    })
+    .AddMcp(options =>
+    {
+        options.ResourceMetadata = new()
+        {
+            Resource = new Uri(serverUrl),
+            ResourceDocumentation = new Uri("https://docs.example.com/api/weather"),
+            AuthorizationServers = { new Uri(serverUrl) },
+            ScopesSupported = ["mcp:tools"],
+        };
+    });
+
+    builder.Services.AddCors(options =>
+    {
+        options.AddDefaultPolicy(policy =>
+        {
+            policy.AllowAnyOrigin()
+                .AllowAnyHeader()
+                .AllowAnyMethod();
+        });
+    });
+
+builder.Services.AddAuthorization();
+builder.Services.AddControllers();
 
 //McpServerOptions mcp_server_options = new()
 //{
@@ -78,8 +180,7 @@ _ = builder.Services.AddMcpServer(
         //opt.RunSessionHandler = HlidacStatu.MCPServer.Code.Auth.RunSessionCheckCookieAsync;
     })
     .WithToolsFromAssembly()
-    .WithResourcesFromAssembly()
-    ;
+    .WithResourcesFromAssembly();
 
 builder.Services.AddHttpContextAccessor();
 
@@ -95,16 +196,27 @@ _ = builder.Services.AddOpenTelemetry()
 
 // Pipeline below -------------------------------------------------------------------------------------------------
 var app = builder.Build();
-app.MapMcp();
 
-
-
-if (enableAuth)
+app.Use(async (context, next) =>
 {
-    app.UseAuthentication();
-    app.UseApiAuthenticationMiddleware();
-    app.UseAuthorization();
-}
+    await next(context);
+    Console.WriteLine($"===> [{context.Request.Method}] {context.Request.Path} ==> {context.Response.StatusCode}");
+} );
+
+app.MapMcp().RequireAuthorization();
+
+app.UseHttpsRedirection();
+
+app.UseForwardedHeaders();
+
+app.UseRouting();
+app.UseCors();
+
+app.UseAuthentication(); 
+app.UseAuthorization(); 
+
+app.MapControllers();
+
 
 app.Run();
 

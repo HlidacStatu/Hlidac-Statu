@@ -6,7 +6,7 @@
       "Serilog.Sinks.Http"
     ],
     "MinimumLevel": {
-      "Default": "Debug",
+      "Default": "Information",
       "Override": {
         "Microsoft": "Error",
         "Microsoft.Extensions": "Information",
