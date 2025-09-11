@@ -208,7 +208,7 @@ namespace HlidacStatu.Repositories.Analysis.KorupcniRiziko
                                     //jde o smlouvy bez ceny, u souhrnu dodavatelu resetuj ceny na 0
                                     .Select(m => new KoncentraceDodavateluIndexy.Souhrn()
                                     {
-                                        HodnotaSmluv = 0, Ico = m.Ico, PocetSmluv = m.PocetSmluv, Poznamka = m.Poznamka
+                                        HodnotaSmluv = 0, Ico = m.Ico, PocetSmluv = m.PocetSmluv
                                     })
                                     .ToArray();
                         }

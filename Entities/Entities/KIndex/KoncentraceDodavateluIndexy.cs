@@ -11,7 +11,6 @@ namespace HlidacStatu.Entities.KIndex
             public string Ico { get; set; }
             public int PocetSmluv { get; set; }
             public decimal HodnotaSmluv { get; set; }
-            public string Poznamka { get; set; }
         }
 
         [Nest.Date]

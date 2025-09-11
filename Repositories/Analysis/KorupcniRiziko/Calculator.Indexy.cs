@@ -314,10 +314,10 @@ decimal? prumHodnotaSmlouvy = null, int minPocetSmluvToCalculate = 1
                 {
                     Ico = k,
                     PocetSmluv = v.Count(),
-                    HodnotaSmluv = v.Sum(m => m.HodnotaSmlouvy == 0 ? ret.PrumernaHodnotaSmluvProVypocet : m.HodnotaSmlouvy),
-                    Poznamka = v.Any(m => m.HodnotaSmlouvy == 0) & ret.PrumernaHodnotaSmluvProVypocet > 0
-                                ? $"Pro {v.Count(m => m.HodnotaSmlouvy == 0)} smluv bez uvedené ceny použita průměrná hodnota smlouvy {ret.PrumernaHodnotaSmluvProVypocet}"
-                                : ""
+                    HodnotaSmluv = v.Sum(m => m.HodnotaSmlouvy == 0 ? ret.PrumernaHodnotaSmluvProVypocet : m.HodnotaSmlouvy)
+                    // Poznamka = v.Any(m => m.HodnotaSmlouvy == 0) & ret.PrumernaHodnotaSmluvProVypocet > 0
+                    //             ? $"Pro {v.Count(m => m.HodnotaSmlouvy == 0)} smluv bez uvedené ceny použita průměrná hodnota smlouvy {ret.PrumernaHodnotaSmluvProVypocet}"
+                    //             : ""
                 })
                 .OrderByDescending(o => o.HodnotaSmluv)
                 .ThenByDescending(o => o.PocetSmluv)
