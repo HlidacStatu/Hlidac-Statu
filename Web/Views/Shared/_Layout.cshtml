@@ -218,7 +218,7 @@
     {
         <div class="alert alert-danger" role="alert" id="msgConfirmationEmailInfo">
             Nepotvrdil(a) jste nám e-mail použitý při registraci. Bez potvrzení není účet aktivní.
-            <a class="btn btn-default" href="#" role="button" onclick="javascript:ResendConfirmationMail(this)">Odeslat potvrzovací link e-mailem</a>
+            <a class="btn btn-hs btn-default" href="#" role="button" onclick="javascript:ResendConfirmationMail(this)">Odeslat potvrzovací link e-mailem</a>
 
         </div>
     }
@@ -289,7 +289,7 @@
             </button>
             <div class="collapse navbar-collapse" id="navbar-content">
 
-                <ul class="d-none d-lg-block navbar-nav mr-auto mb-2 mb-lg-0 mainmenu">
+                <ul class="d-none d-lg-block navbar-nav mr-auto mb-2 mb-lg-0 mainmenu" style="z-index:2000">
                     <li class="nav-item mainmenu">
                         <a class="nav-link active" aria-current="page" href="" onclick="return false;" style="visibility:hidden;cursor:pointer;">&nbsp;&nbsp;&nbsp;</a>
                     </li>
@@ -372,7 +372,7 @@
                             <a href="/manage/Watchdogs"
                                alt="Všichni uložení hlídači" title="Všichni uložení hlídači"
                                onclick="_my_event('send', 'event', 'btnWatchDog', 'List', 'authenticated');" role="button"
-                               class="btn btn-warning btn-sm"
+                               class="btn btn-hs btn-warning btn-sm"
                                style="margin-right: 0.5em;height: 2.5em;">
                                 <i style="color:black;" class="fas fa-eye"></i>
                             </a>
@@ -421,7 +421,7 @@
                     <a href="/manage/Watchdogs"
                        alt="Všichni uložení hlídači" title="Všichni uložení hlídači"
                        onclick="_my_event('send', 'event', 'btnWatchDog', 'click', 'authenticated');" role="button"
-                       class="btn btn-warning btn-sm"
+                       class="btn btn-hs btn-warning btn-sm"
                        style="margin-right: 0.5em;height: 2.5em;">
                         <i style="color:black;" class="fas fa-eye"></i>
                     </a>
@@ -578,10 +578,10 @@
                             Uložení záložky je snadné, stačí kliknout na ikonu  <a style="font-size:120%" href="#" class="bookmark bookmarkOff" onclick="javascript:return false;"></a>.
                             Pokud už je konkrétní záložka vytvořená, pak je vybarvena červeně <a style="font-size:120%" href="#" class="bookmark bookmarkOn" onclick="javascript:return false;"></a>.
                         </p>
-                        <p>Abychom ale vědeli, komu jaké záložky patří, <a href="/Identity/Account/login" class="btn btn-default">musíte se zalogovat</a>.</p>
+                        <p>Abychom ale vědeli, komu jaké záložky patří, <a href="/Identity/Account/login" class="btn btn-hs btn-default">musíte se zalogovat</a>.</p>
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-default" data-bs-dismiss="modal">Zavřít</button>
+                        <button type="button" class="btn btn-hs btn-default" data-bs-dismiss="modal">Zavřít</button>
                     </div>
                 </div><!-- /.modal-content -->
             </div><!-- /.modal-dialog -->
@@ -608,11 +608,11 @@
                         <p>
                             @Html.Raw(anonbody)
                         </p>
-                        <p>Pokud jste již zaregistrováni, <a id="VZInfoAnonLogin" href="/Identity/Account/login?returnUrl=" class="btn btn-default">zalogujte se</a>. </p>
+                        <p>Pokud jste již zaregistrováni, <a id="VZInfoAnonLogin" href="/Identity/Account/login?returnUrl=" class="btn btn-hs btn-default">zalogujte se</a>. </p>
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-default" data-bs-dismiss="modal">Zavřít</button>
-                        <a id="VZInfoAnonRegister" onclick="_my_event('send', 'event', 'registerBtn', 'click','@Context.Request.Path#VZPristupOmezen'); return true;" href="/Identity/account/Register?returnUrl=" class="btn btn-primary">Zaregistrovat se</a>
+                        <button type="button" class="btn btn-hs btn-default" data-bs-dismiss="modal">Zavřít</button>
+                        <a id="VZInfoAnonRegister" onclick="_my_event('send', 'event', 'registerBtn', 'click','@Context.Request.Path#VZPristupOmezen'); return true;" href="/Identity/account/Register?returnUrl=" class="btn btn-hs btn-primary">Zaregistrovat se</a>
                     </div>
                 </div><!-- /.modal-content -->
             </div><!-- /.modal-dialog -->
@@ -651,7 +651,7 @@
             <div class="fixed-bottom alert alert-@(colors.TipOfTheDay()) adlinemsg " role="alert" style="margin-bottom:0">
                 <div class="text-center center-block adlinemsgtxt " style="">
                     @Html.Raw(tipTxt)
-                    <a class="btn btn-dark btn-sm" href="https://www.WatchdogAnalytics.cz/?utm_source=hp&utm_medium=referral&utm_campaign=start&utm_content=stickyFooter_ad@(tipIndex)" role="button"><b>Více 👉</b></a>
+                    <a class="btn btn-hs btn-dark btn-sm" href="https://www.WatchdogAnalytics.cz/?utm_source=hp&utm_medium=referral&utm_campaign=start&utm_content=stickyFooter_ad@(tipIndex)" role="button"><b>Více 👉</b></a>
                 </div>
             </div>
             <div style="margin-bottom:50px">&nbsp;</div>
