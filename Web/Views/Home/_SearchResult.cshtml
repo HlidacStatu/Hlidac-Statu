@@ -79,7 +79,7 @@
 {
     <div class="row">
         <div class="col-xs-12">
-            <a class="btn btn-info" role="button" data-bs-toggle="collapse" href="#" onclick="javascript:CollapseAll();return false;" aria-expanded="false" aria-controls="collapseExample">
+            <a class="btn btn-hs btn-info" role="button" data-bs-toggle="collapse" href="#" onclick="javascript:CollapseAll();return false;" aria-expanded="false" aria-controls="collapseExample">
                 Ukázat nedostatky u všech smluv
             </a>
         </div>
@@ -130,7 +130,7 @@
                 @*               
                 @if (this.User?.Identity?.IsAuthenticated == true)
                 {
-                    <a class="btn btn-light btn-sm border border-danger" href="/analyza?q=@(System.Net.WebUtility.UrlEncode(Model.OrigQuery))" onclick="return trackOutLink(this,'analyza');"> Hlubší analýza nalezených smluv</a>
+                    <a class="btn btn-hs btn-light btn-sm border border-danger" href="/analyza?q=@(System.Net.WebUtility.UrlEncode(Model.OrigQuery))" onclick="return trackOutLink(this,'analyza');"> Hlubší analýza nalezených smluv</a>
                 }
                 *@
             </h4>
@@ -156,12 +156,12 @@
             @if (Model.OrigQuery?.Contains(chybyQuery, StringComparison.InvariantCultureIgnoreCase)==true)
             {
                 var qs = $"q={System.Net.WebUtility.UrlEncode(Model.OrigQuery.Replace(chybyQuery, ""))}{queryWithoutQSerialized}";
-                <a class="btn btn-danger btn-sm" href="/hledat?@(qs)">Všechny smlouvy</a>
+                <a class="btn btn-hs btn-danger btn-sm" href="/hledat?@(qs)">Všechny smlouvy</a>
             }
             else
             {
                 var qs = $"q={System.Net.WebUtility.UrlEncode(Model.OrigQuery + chybyQuery)}{queryWithoutQSerialized}";
-                <a class="btn btn-outline-danger btn-sm" href="/hledat?@(qs)">Pouze chybové smlouvy</a>
+                <a class="btn btn-hs btn-outline-danger btn-sm" href="/hledat?@(qs)">Pouze chybové smlouvy</a>
             }
         </div>
         <div class="col-12 d-flex justify-content-end">

@@ -239,7 +239,7 @@ public sealed class DataTableFilter
 
         var buttonHtml = $"""
                           <div class="d-grid gap-2">
-                            <button type="button" class="btn btn-sm btn-secondary mt-3" id="resetFiltersButton" data-init='{HtmlEncoder.Default.Encode(initialValuesJson)}'>
+                            <button type="button" class="btn btn-hs btn-sm btn-secondary mt-3" id="resetFiltersButton" data-init='{HtmlEncoder.Default.Encode(initialValuesJson)}'>
                               Resetovat filtry
                             </button>
                           </div>

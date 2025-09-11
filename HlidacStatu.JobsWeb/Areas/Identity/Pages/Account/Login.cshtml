@@ -29,7 +29,7 @@
     @foreach (var provider in Model.ExternalLogins)
     {
     string imgPath = $"/content/img/{provider.Name}Signin.png";
-    <button type="submit" class="btn btn-link"
+    <button type="submit" class="btn btn-hs btn-link"
     name="provider" value="@provider.Name"
     title="Přihlásit pomocí @provider.DisplayName účtu">
     <img src="@imgPath" style="height:50px;width:auto" />
@@ -77,9 +77,9 @@
                 </div>
                 <div class="form-group" style="margin-top:2em;">
                     <div class="col-sm-offset-2 col-sm-8">
-                        <button type="submit" class="btn btn-primary">Přihlásit se do Watchdog Analytics</button>
-                        <a class="btn btn-secondary" id="forgot-password" asp-page="./ForgotPassword">Zapomněli jste heslo?</a>
-                        @*<a class="btn btn-secondary" id="resend-confirmation" asp-page="./ResendEmailConfirmation">Odeslat potvrzení e-mailem</a>*@
+                        <button type="submit" class="btn btn-hs btn-primary">Přihlásit se do Watchdog Analytics</button>
+                        <a class="btn btn-hs btn-secondary" id="forgot-password" asp-page="./ForgotPassword">Zapomněli jste heslo?</a>
+                        @*<a class="btn btn-hs btn-secondary" id="resend-confirmation" asp-page="./ResendEmailConfirmation">Odeslat potvrzení e-mailem</a>*@
                     </div>
                 </div>
             </form>

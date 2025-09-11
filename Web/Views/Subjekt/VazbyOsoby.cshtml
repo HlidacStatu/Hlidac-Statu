@@ -21,15 +21,15 @@
 
     <p>
         <a href="@Url.Action("VazbyOsoby", new { id = Model.ICO, aktualnost = Relation.AktualnostType.Aktualni })"
-        class="btn btn-@(aktualnost == Relation.AktualnostType.Aktualni ? "success" : "primary") btn-sm" role="button">
+        class="btn btn-hs btn-@(aktualnost == Relation.AktualnostType.Aktualni ? "success" : "primary") btn-sm" role="button">
             @(aktualnost == Relation.AktualnostType.Aktualni ? "Zobrazujeme" : "Ukázat") pouze aktuální vazby
         </a>
         <a href="@Url.Action("VazbyOsoby", new { id = Model.ICO, aktualnost = Relation.AktualnostType.Nedavny })"
-        class="btn btn-@(aktualnost == Relation.AktualnostType.Nedavny ? "success" : "primary") btn-sm" role="button">
+        class="btn btn-hs btn-@(aktualnost == Relation.AktualnostType.Nedavny ? "success" : "primary") btn-sm" role="button">
             @(aktualnost == Relation.AktualnostType.Nedavny ? "Zobrazujeme" : "Ukázat") aktuální a nedávno skončené vazby
         </a>
         <a href="@Url.Action("VazbyOsoby", new { id = Model.ICO, aktualnost = Relation.AktualnostType.Libovolny })"
-        class="btn btn-@(aktualnost == Relation.AktualnostType.Libovolny ? "success" : "primary") btn-sm" role="button">
+        class="btn btn-hs btn-@(aktualnost == Relation.AktualnostType.Libovolny ? "success" : "primary") btn-sm" role="button">
             @(aktualnost == Relation.AktualnostType.Libovolny ? "Zobrazujeme" : "Ukázat") všechny vazby včetně historických
         </a>
     </p>

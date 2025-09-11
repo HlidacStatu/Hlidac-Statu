@@ -100,7 +100,7 @@
 
             </p>
             <p class="text-center">
-                <a href="/sponzori/strana/@Model.ICO" class="btn btn-primary btn-sm my-3 position-relative">
+                <a href="/sponzori/strana/@Model.ICO" class="btn btn-hs btn-primary btn-sm my-3 position-relative">
                     Podrobnosti o sponzorech politické strany
                     <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">@(HlidacStatu.Util.RenderData.NiceNumber(stranaInfo?.Item5 ?? 0))</span>
                 </a>
@@ -133,7 +133,7 @@
             <br />
 
             <p class="text-center">
-                <a href="/kindex/detail/@Model.ICO" class="btn btn-primary btn-sm my-3 position-relative">
+                <a href="/kindex/detail/@Model.ICO" class="btn btn-hs btn-primary btn-sm my-3 position-relative">
                     Podrobnosti Indexu klíčových rizik (K-Index)
                     <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">@(await Html.KIndexIconAsync(Model.ICO))</span>
                 </a>
@@ -207,7 +207,7 @@
 
 
         <p class="text-center">
-            <a  href="/subjekt/rizika/@Model.ICO" class="btn btn-primary btn-sm my-3 position-relative">
+            <a  href="/subjekt/rizika/@Model.ICO" class="btn btn-hs btn-primary btn-sm my-3 position-relative">
                 Detailní souhrn rizik a zajímavostí
                 <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">!!</span>
             </a>
@@ -261,7 +261,7 @@
             <h4 class="pt-1">Skuteční majitelé</h4>
             <p>Open data obchodního rejstříku neobsahují data o skutečných majitelích této organizace</p>
             <p class="text-center">
-                <a target="_blank" href="https://esm.justice.cz/ias/issm/rejstrik-$sm?ico=@(Model.ICO)&jenPlatne=PLATNE&polozek=50&typHledani=STARTS_WITH&typHledaniSpolku=ALL" class="btn btn=outline-primary btn-sm my-3 position-relative">
+                <a target="_blank" href="https://esm.justice.cz/ias/issm/rejstrik-$sm?ico=@(Model.ICO)&jenPlatne=PLATNE&polozek=50&typHledani=STARTS_WITH&typHledaniSpolku=ALL" class="btn btn-hs btn=outline-primary btn-sm my-3 position-relative">
                     <i class="fa-regular fa-arrow-up-right-from-square"></i> Hledat v Evidenci skutečných majitelů
                 </a>
             </p>
@@ -350,7 +350,7 @@
                 }
             </p>
             <p class="text-center">
-                <a target="_blank" href="https://platy.hlidacstatu.cz/politici/organizace/@Model.ICO" class="btn btn-primary btn-sm my-3 position-relative">
+                <a target="_blank" href="https://platy.hlidacstatu.cz/politici/organizace/@Model.ICO" class="btn btn-hs btn-primary btn-sm my-3 position-relative">
                     Všechny příjmy politiků v této organizaci
                     <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">@(HlidacStatu.Util.RenderData.NiceNumber(pocetPolitiku))</span>
                 </a>
@@ -379,7 +379,7 @@
         <partial name="Charts/_AreaRangePlot" model="@(new AreaRangeRenderOptions() { Platy = platyUrednikuOrg.Platy, CssHeight = "380" })" />
 
         <p class="text-center">
-            <a target="_blank" href="https://platy.hlidacstatu.cz/politici/organizace/@Model.ICO" class="btn btn-primary btn-sm my-3 position-relative">
+            <a target="_blank" href="https://platy.hlidacstatu.cz/politici/organizace/@Model.ICO" class="btn btn-hs btn-primary btn-sm my-3 position-relative">
                 Všechny platy @(Model.JsemOVM() ? "úředníků" : "manažerů") v této organizaci
                 <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">@(HlidacStatu.Util.RenderData.NiceNumber(pocetPlatuUredniku))</span>
             </a>
@@ -602,7 +602,7 @@
             </div>
         }
         <p class="text-center">
-            <a href="/subjekt/RegistrSmluv/@Model.ICO" class="btn btn-primary btn-sm my-3 position-relative">
+            <a href="/subjekt/RegistrSmluv/@Model.ICO" class="btn btn-hs btn-primary btn-sm my-3 position-relative">
                 Podrobnosti o smlouvách organizace
                 <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">@(HlidacStatu.Util.RenderData.NiceNumber(statisticsRegistr.Summary().PocetSmluv))</span>
             </a>
@@ -884,7 +884,7 @@
         }
 
         <p class="text-center">
-            <a href="/subjekt/Dotace/@Model.ICO" class="btn btn-primary btn-sm my-3 position-relative">
+            <a href="/subjekt/Dotace/@Model.ICO" class="btn btn-hs btn-primary btn-sm my-3 position-relative">
                 Podrobnosti o dotacích organizace
                 <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">@(HlidacStatu.Util.RenderData.NiceNumber(Model.StatistikaDotaci().Summary().PocetDotaci))</span>
             </a>
@@ -991,7 +991,7 @@
             }
         }
         <p class="text-center">
-            <a href="/subjekt/VerejneZakazky/@Model.ICO" class="btn btn-primary btn-sm my-3 position-relative">
+            <a href="/subjekt/VerejneZakazky/@Model.ICO" class="btn btn-hs btn-primary btn-sm my-3 position-relative">
                 Podrobnosti o veřejných zakázkách organizace
                 <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">@(HlidacStatu.Util.RenderData.NiceNumber(Model.StatistikaVerejneZakazky().Summary().PocetJakoDodavatel + Model.StatistikaVerejneZakazky().Summary().PocetJakoZadavatel))</span>
             </a>
@@ -1015,7 +1015,7 @@
             }
 
             <p class="text-center">
-                <a href="/subjekt/sponzoring/@Model.ICO" class="btn btn-primary btn-sm my-3 position-relative">
+                <a href="/subjekt/sponzoring/@Model.ICO" class="btn btn-hs btn-primary btn-sm my-3 position-relative">
                     Podrobnosti o veřejných zakázkách organizace
                     <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
                         @(HlidacStatu.Util.RenderData.NiceNumber(Model.Sponzoring().Sum(m => m.Hodnota) ?? 0))
@@ -1069,7 +1069,7 @@
             </p>
         }
         <p class="text-center">
-            <a href="/subjekt/InsolvencniRejstrik/@Model.ICO" class="btn btn-primary btn-sm my-3 position-relative">
+            <a href="/subjekt/InsolvencniRejstrik/@Model.ICO" class="btn btn-hs btn-primary btn-sm my-3 position-relative">
                 Podrobnosti o insolvencích se vztahem k organizaci
                 <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
                     @(HlidacStatu.Util.RenderData.NiceNumber(insDluznik.Total + insVeritel.Total + insSpravce.Total))
@@ -1118,7 +1118,7 @@
                     </ul>
                 </p>
                 <p class="text-center">
-                    <a href="/subjekt/dodavatele/@Model.ICO" class="btn btn-primary btn-sm my-3 position-relative">
+                    <a href="/subjekt/dodavatele/@Model.ICO" class="btn btn-hs btn-primary btn-sm my-3 position-relative">
                         Podrobnosti o dodavatelých organizace
                         <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
                             @(HlidacStatu.Util.RenderData.NiceNumber(topDodavateleFull.Count))+
@@ -1145,7 +1145,7 @@
                     </ul>
                 </p>
                 <p class="text-center">
-                    <a href="/subjekt/odberatele/@Model.ICO" class="btn btn-primary btn-sm my-3 position-relative">
+                    <a href="/subjekt/odberatele/@Model.ICO" class="btn btn-hs btn-primary btn-sm my-3 position-relative">
                         Podrobnosti o odběratelých organizace
                         <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
                             @(HlidacStatu.Util.RenderData.NiceNumber(topOdberatele.Count()))+
@@ -1192,7 +1192,7 @@
                     smluv (tj. <b>@numPercent</b> všech smluv) s firmami a osobami podporující politické strany.
                 </p>
                 <p class="text-center">
-                    <a href="/subjekt/ObchodySeSponzory/@Model.ICO" class="btn btn-primary btn-sm my-3 position-relative">
+                    <a href="/subjekt/ObchodySeSponzory/@Model.ICO" class="btn btn-hs btn-primary btn-sm my-3 position-relative">
                         Podrobnosti o vazbách se sponzory politických stran
                         <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
                             @(HlidacStatu.Util.RenderData.NiceNumber(stat.Summary().PocetSmluvSponzorujiciFirmy))
@@ -1246,7 +1246,7 @@
         </div>
 
         <p class="text-center">
-            <a href="/subjekt/DalsiDatabaze/@Model.ICO" class="btn btn-primary btn-sm my-3 position-relative">
+            <a href="/subjekt/DalsiDatabaze/@Model.ICO" class="btn btn-hs btn-primary btn-sm my-3 position-relative">
                 Podrobnosti o organizace v dalších databázích
                 <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
                     @(HlidacStatu.Util.RenderData.NiceNumber(dsSearch.Total))
@@ -1276,7 +1276,7 @@
                             )).
         </p>
         <p class="text-center">
-            <a href="/subjekt/NapojeneOsoby/@Model.ICO" class="btn btn-primary btn-sm my-3 position-relative">
+            <a href="/subjekt/NapojeneOsoby/@Model.ICO" class="btn btn-hs btn-primary btn-sm my-3 position-relative">
                 Vypsat všechny osoby a další detaily
                 <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
                     @(HlidacStatu.Util.RenderData.NiceNumber(napojeneOsoby.Count))
@@ -1329,7 +1329,7 @@
 
             </p>
             <p class="text-center">
-                <a href="/subjekt/Vazby/@Model.ICO" class="btn btn-primary btn-sm my-3 position-relative">
+                <a href="/subjekt/Vazby/@Model.ICO" class="btn btn-hs btn-primary btn-sm my-3 position-relative">
                     Vypsat všechny dceřinné společnosti a orgány
                     <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
                         @(HlidacStatu.Util.RenderData.NiceNumber(Model.PocetPodrizenychSubjektu(Relation.AktualnostType.Nedavny) + vazbyOsoby.Count()))
@@ -1369,7 +1369,7 @@
         }
 
         <p class="text-center">
-            <a href="/subjekt/DalsiInformace/@Model.ICO" class="btn btn-primary btn-sm my-3 position-relative">
+            <a href="/subjekt/DalsiInformace/@Model.ICO" class="btn btn-hs btn-primary btn-sm my-3 position-relative">
                 Zobrazit další informace o organizaci
                 <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
                     @(HlidacStatu.Util.RenderData.NiceNumber(ovmCats.Count() + (ossu?.Count ?? 0)))

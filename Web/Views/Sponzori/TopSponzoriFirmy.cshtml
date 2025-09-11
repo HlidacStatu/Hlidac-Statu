@@ -56,21 +56,21 @@
 <div style="margin-top:20px;margin-bottom:40px;">
         @if (rok != 0)
         {
-            <a class="btn btn-outline-primary" asp-action="TopSponzoriFirmy">Souhrnně za 10 let</a>
+            <a class="btn btn-hs btn-outline-primary" asp-action="TopSponzoriFirmy">Souhrnně za 10 let</a>
         }
         else
         {
-        <a class="btn btn-dark" asp-action="TopSponzoriFirmy">Souhrnně za 10 let</a>
+        <a class="btn btn-hs btn-dark" asp-action="TopSponzoriFirmy">Souhrnně za 10 let</a>
     }
         @for (int year = DateTime.Now.Year - 10; year <= SponzoringRepo.DefaultLastSponzoringYear(); year++)
         {
             if (rok == year)
             {
-            <a class="btn btn-dark" asp-action="TopSponzoriFirmy" asp-route-rok="@year">@year</a>
+            <a class="btn btn-hs btn-dark" asp-action="TopSponzoriFirmy" asp-route-rok="@year">@year</a>
         }
             else
             {
-            <a class="btn btn-outline-primary" asp-action="TopSponzoriFirmy" asp-route-rok="@year">@year</a>
+            <a class="btn btn-hs btn-outline-primary" asp-action="TopSponzoriFirmy" asp-route-rok="@year">@year</a>
             }
         }
 </div>
@@ -185,7 +185,7 @@
 
 </div>
 
-<a class="btn btn-primary" asp-controller="Sponzori" asp-action="TopSponzori" asp-route-rok="@(rok == 0 ? null : rok)">Zobrazit sponzorující osoby</a>
+<a class="btn btn-hs btn-primary" asp-controller="Sponzori" asp-action="TopSponzori" asp-route-rok="@(rok == 0 ? null : rok)">Zobrazit sponzorující osoby</a>
 
 <br />
 

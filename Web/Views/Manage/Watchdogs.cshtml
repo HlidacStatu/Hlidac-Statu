@@ -28,7 +28,7 @@
                     </p>
                 </div>
                 <div class="modal-footer">
-                    <a href="/" role="button" class="btn btn-primary">Přejít na hledání a vytvořit prvního hlídače</a>
+                    <a href="/" role="button" class="btn btn-hs btn-primary">Přejít na hledání a vytvořit prvního hlídače</a>
                 </div>
             </div>
         </div>
@@ -54,7 +54,7 @@
                             }
                             <input id="allInOne" name="allInOne" type="checkbox" onchange="$('#allInOneBtn').prop('disabled', false);" @(allInOneWDcheck)/>
                             <label for="allInOne" class="label-success"></label>
-                            <button id="allInOneBtn" type="submit" class="btn btn-default btn-sm" disabled="disabled" style="margin: 0 0 0 10px;">Uložit</button>
+                            <button id="allInOneBtn" type="submit" class="btn btn-hs btn-default btn-sm" disabled="disabled" style="margin: 0 0 0 10px;">Uložit</button>
                         </div>
                     </form>
                 </li>
@@ -115,13 +115,13 @@
             <td>
                 @if (wd.StatusId > 0)
                 {
-                    <a href="@Url.Action("Watchdogs")?wid=@wd.Id&disable=1" class="btn btn-warning btn-xs">Pozastavit</a>
+                    <a href="@Url.Action("Watchdogs")?wid=@wd.Id&disable=1" class="btn btn-hs btn-warning btn-xs">Pozastavit</a>
                 }
                 else
                 {
-                    <a href="@Url.Action("Watchdogs")?wid=@wd.Id&enable=1" class="btn btn-success btn-xs">Znovu spustit</a>
+                    <a href="@Url.Action("Watchdogs")?wid=@wd.Id&enable=1" class="btn btn-hs btn-success btn-xs">Znovu spustit</a>
                 }
-                <a href="@Url.Action("Watchdogs")?wid=@wd.Id&delete=1" class="btn btn-danger btn-xs" onclick="return confirm('Opravdu to chcete smazat?');">Smazat</a>
+                <a href="@Url.Action("Watchdogs")?wid=@wd.Id&delete=1" class="btn btn-hs btn-danger btn-xs" onclick="return confirm('Opravdu to chcete smazat?');">Smazat</a>
             </td>
         </tr>
     }

@@ -10,8 +10,8 @@
         urlDelimiter = "&";
     }
 }
-<a class="btn btn-sm btn-@(Model.selectedYear == null ? "" : "outline-")info" href="@Model.Url">Všechny roky</a>
+<a class="btn btn-hs btn-sm btn-@(Model.selectedYear == null ? "" : "outline-")info" href="@Model.Url">Všechny roky</a>
 @for (int year = rokOd; year <= rokDo; year++)
 {
-    <a class="btn btn-sm btn-@(Model.selectedYear == year ? "" : "outline-")primary" href="@Model.Url@(urlDelimiter)rok=@year">@year</a>
+    <a class="btn btn-hs btn-sm btn-@(Model.selectedYear == year ? "" : "outline-")primary" href="@Model.Url@(urlDelimiter)rok=@year">@year</a>
 }

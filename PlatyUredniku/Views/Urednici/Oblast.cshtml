@@ -26,6 +26,9 @@
 {
     <ol class="breadcrumb">
         <li>
+            <a href="/">Platy</a>
+        </li>
+        <li>
             <a asp-action="Index">Platy úředníků</a>
         </li>
         <li>
@@ -62,7 +65,7 @@
 
             <div>
                 <div>
-                    <table class="table table-sm">
+                    <table class="table">
                         <tbody>
                             @{
                                 var sorted = badOrgs.Concat(goodOrgs).Concat(notAskedOrgs);

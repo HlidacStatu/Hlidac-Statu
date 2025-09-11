@@ -1,6 +1,19 @@
 @using HlidacStatu.Repositories
 @using PlatyUredniku.Models
 
+
+@section breadcrumbs
+{
+    <ol class="breadcrumb">
+        <li>
+            <a href="/">Platy</a>
+        </li>
+        <li>
+            <a asp-action="Index">Platy úředníků</a>
+        </li>
+        <li class="active">Open data</li>
+    </ol>
+}
 <section class="d-flex align-items-center justify-content-center  pageblock-small">
     <div class="container">
 

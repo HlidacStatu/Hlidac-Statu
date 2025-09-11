@@ -48,7 +48,7 @@ else
                                 <img style="width:250px;height:auto; border:solid #d0d0d0 1px; margin:5px;"
                                      src="data:image/jpeg;base64,@Convert.ToBase64String(File.ReadAllBytes(f), Base64FormattingOptions.None)">
                                 <br/>
-                                <button type="submit" class="btn btn-success" @onclick="() => PickPhoto(f)">Toto je
+                                <button type="submit" class="btn btn-hs btn-success" @onclick="() => PickPhoto(f)">Toto je
                                     správná/nejlepší fotka
                                 </button>
                             </div>
@@ -61,11 +61,11 @@ else
         <div class="card-footer text-body-secondary">
             @if (!AnyFacesDetected)
             {
-                <button class="btn btn-success" @onclick="@(Next)">Pokračovat</button>
+                <button class="btn btn-hs btn-success" @onclick="@(Next)">Pokračovat</button>
             }
             else
             {
-                <button cclass="btn btn-secondary" @onclick="@(Cancel)">Žádná fotka není správná</button>
+                <button cclass="btn btn-hs btn-secondary" @onclick="@(Cancel)">Žádná fotka není správná</button>
             }
         </div>
     </div>

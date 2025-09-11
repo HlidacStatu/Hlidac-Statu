@@ -47,7 +47,7 @@
         Stát dotace publikuje na mnoha místech různými způsoby a v těchto datových zdrojích se některé dotace opakují.
         Náš systém identifikoval, že níže uvedené záznamy jsou stejné jako výše zobrazená dotace. Níže uvedené duplikátní dotace uvádíme pro úplnost a transparentnost.
     </div>
-    <a href="/dotace/detailzdroj/@(Uri.EscapeDataString(Model.Id))" type="button" class="btn btn-info btn-sm">Zobrazit záznam této dotace ze všech datových zdrojů</a>
+    <a href="/dotace/detailzdroj/@(Uri.EscapeDataString(Model.Id))" type="button" class="btn btn-hs btn-info btn-sm">Zobrazit záznam této dotace ze všech datových zdrojů</a>
 
 }
 else
@@ -56,7 +56,7 @@ else
     if (origSource != null)
     {
         <p>
-        <button type="button" class="btn btn-info btn-sm" data-bs-toggle="modal" data-bs-target="#originalDM-@(origSource.NormalizedId)">Zobrazit originální záznam z datového zdroje</button>
+        <button type="button" class="btn btn-hs btn-info btn-sm" data-bs-toggle="modal" data-bs-target="#originalDM-@(origSource.NormalizedId)">Zobrazit originální záznam z datového zdroje</button>
         </p>
         <div id="originalDM-@(origSource.NormalizedId)" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="originalDataModal" aria-hidden="true">
             <div class="modal-dialog modal-fullscreen">

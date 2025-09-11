@@ -4,7 +4,7 @@
     
 }
 
-<a href="#" class="btn btn-sm btn-primary" role="button" data-bs-toggle="modal" data-bs-target="#modal@(modalid)">
+<a href="#" class="btn btn-hs btn-sm btn-primary" role="button" data-bs-toggle="modal" data-bs-target="#modal@(modalid)">
     <span class="small">@(string.IsNullOrWhiteSpace(Model.NazevTlacitka)? "Stáhnout open data" : Model.NazevTlacitka)</span>
 </a> <!-- Modal -->
 <div class="modal fade" id="modal@(modalid)" tabindex="-1" role="dialog" aria-labelledby="modal@(modalid)">
@@ -59,7 +59,7 @@
                        asp-route-rok="@Model.Rok"
                        asp-route-datovaSchranka="@Model.DatovaSchranka"
                        role="button"
-                       class="btn btn-primary btn-sm"
+                       class="btn btn-hs btn-primary btn-sm"
                        target="_blank">
                         Export do Excelu
                     </a>
@@ -68,14 +68,14 @@
                        asp-route-rok="@Model.Rok"
                        asp-route-datovaSchranka="@Model.DatovaSchranka"
                        role="button"
-                       class="btn btn-primary btn-sm"
+                       class="btn btn-hs btn-primary btn-sm"
                        target="_blank">
                         Do CSV odděleného tabulátorem
                     </a>
                 </p>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-default" data-bs-dismiss="modal">Zavřít</button>
+                <button type="button" class="btn btn-hs btn-default" data-bs-dismiss="modal">Zavřít</button>
             </div>
         </div>
     </div>

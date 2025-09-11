@@ -10,7 +10,7 @@
 @rendermode InteractiveServer
 
 <!-- Button trigger modal -->
-<button type="button" class="btn btn-primary" @onclick="LoadJobs">
+<button type="button" class="btn btn-hs btn-primary" @onclick="LoadJobs">
     Save ✔
 </button>
 
@@ -146,8 +146,8 @@
                     }
                 </div>
                 <div class="modal-footer justify-content-start">
-                    <button type="button" class="btn btn-secondary" @onclick="Close">Zrušit změny</button>
-                    <button disabled="@(!isSaveEnabled)" type="button" class="btn btn-primary" @onclick="Save">Uložit změny</button>
+                    <button type="button" class="btn btn-hs btn-secondary" @onclick="Close">Zrušit změny</button>
+                    <button disabled="@(!isSaveEnabled)" type="button" class="btn btn-hs btn-primary" @onclick="Save">Uložit změny</button>
                 </div>
             </div>
         </div>

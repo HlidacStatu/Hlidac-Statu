@@ -81,7 +81,7 @@
                 </p>
 
                 <p class="text-center">
-                    <a href="https://platy.hlidacstatu.cz/politici/politik/@Model.NameId" class="btn btn-primary btn-sm my-3 position-relative">
+                    <a href="https://platy.hlidacstatu.cz/politici/politik/@Model.NameId" class="btn btn-hs btn-primary btn-sm my-3 position-relative">
                         Podrobnosti o příjmech politika z veřejných funkcí
                         <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">@(HlidacStatu.Util.RenderData.NicePrice(prijmyPolitika.Sum(m => m.CelkoveRocniNakladyNaPolitika)))</span>
                     </a>
@@ -129,7 +129,7 @@
             @if (funkceOsobaNum > listingNum + 1)
             {
                 <p class="text-center">
-                    <a href="/osoba/funkce/@Model.NameId" class="btn btn-primary btn-sm my-3 position-relative">
+                    <a href="/osoba/funkce/@Model.NameId" class="btn btn-hs btn-primary btn-sm my-3 position-relative">
                         Zobrazit všechny politické a veřejné funkce
                         <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">@(HlidacStatu.Util.RenderData.NiceNumber(funkceOsobaNum))</span>
                     </a>
@@ -202,7 +202,7 @@
                 }
 
             <p class="text-center">
-                <a href="/osoba/sponzoring/@Model.NameId" class="btn btn-primary btn-sm my-3 position-relative">
+                <a href="/osoba/sponzoring/@Model.NameId" class="btn btn-hs btn-primary btn-sm my-3 position-relative">
                     Podrobnosti o sponzorování politických stran
                     <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">@(HlidacStatu.Util.RenderData.NiceNumber(sponzoring.Count))</span>
                 </a>
@@ -229,7 +229,7 @@
                 @Html.Raw((Model.InfoFactsCached()).Where(m => m.Level == HlidacStatu.Entities.Facts.InfoFact.ImportanceLevel.Stat).FirstOrDefault()?.Render(true) ?? (Model.InfoFactsCached()).First().Render(true))
             </p>
             <p class="text-center">
-                <a href="/osoba/registrsmluv/@Model.NameId" class="btn btn-primary btn-sm my-3 position-relative">
+                <a href="/osoba/registrsmluv/@Model.NameId" class="btn btn-hs btn-primary btn-sm my-3 position-relative">
                     Podrobnosti o smlouvách firem, kde se osoba angažuje
                     <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
                         @(HlidacStatu.Util.RenderData.NiceNumber((statistics.SmlouvyStat_SoukromeFirmySummary()?.Summary().PocetSmluv ?? 0) + (statistics.SmlouvyStat_NeziskovkySummary()?.Summary().PocetSmluv ?? 0)))
@@ -396,7 +396,7 @@
             }
 
             <p class="text-center">
-                <a href="/osoba/vazby/@Model.NameId" class="btn btn-primary btn-sm my-3 position-relative">
+                <a href="/osoba/vazby/@Model.NameId" class="btn btn-hs btn-primary btn-sm my-3 position-relative">
                     Podrobnosti o smlouvách firem, kde se osoba angažuje
                     <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
                         @(HlidacStatu.Util.RenderData.NiceNumber((statistics?.StatniFirmy?.Count ?? 0) + (statistics?.SoukromeFirmy?.Count ?? 0) + (statistics?.Neziskovky?.Count ?? 0)))
@@ -446,7 +446,7 @@
         </p>
     </div>
     <p class="text-center">
-        <a href="/osoba/dotace/@Model.NameId" class="btn btn-primary btn-sm my-3 position-relative">
+        <a href="/osoba/dotace/@Model.NameId" class="btn btn-hs btn-primary btn-sm my-3 position-relative">
             Podrobnosti o dotacích firmám, kde se osoba angažuje
             <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
                 @(HlidacStatu.Util.RenderData.NiceNumber(dotaceStatSum.PocetDotaci))
@@ -543,7 +543,7 @@
 
 
             <p class="text-center">
-                <a href="@(WebUtil.GetSearchUrl("/insolvence/hledat", $"osobaid:" + Model.NameId))" class="btn btn-primary btn-sm my-3 position-relative">
+                <a href="@(WebUtil.GetSearchUrl("/insolvence/hledat", $"osobaid:" + Model.NameId))" class="btn btn-hs btn-primary btn-sm my-3 position-relative">
                     Podrobnosti o insolvencích
                     <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
                         @(HlidacStatu.Util.RenderData.NiceNumber(oinsDluznik.Total + oinsVeritel.Total + oinsSpravce.Total + insDluznik.Total + insVeritel.Total + insSpravce.Total))
@@ -599,7 +599,7 @@
             </p>
 
             <p class="text-center">
-                <a href="@(WebUtil.GetSearchUrl("/verejnezakazky/hledat", $"osobaid:" + Model.NameId))" class="btn btn-primary btn-sm my-3 position-relative">
+                <a href="@(WebUtil.GetSearchUrl("/verejnezakazky/hledat", $"osobaid:" + Model.NameId))" class="btn btn-hs btn-primary btn-sm my-3 position-relative">
                     Podrobnosti o veřejných zakázkách
                     <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
                         @(HlidacStatu.Util.RenderData.NiceNumber(resVZdodav.Total + resVZzadav.Total))
@@ -656,7 +656,7 @@
 
 
         <p class="text-center">
-            <a href="/osoba/dalsidatabaze/@(Model.NameId)" class="btn btn-primary btn-sm my-3 position-relative">
+            <a href="/osoba/dalsidatabaze/@(Model.NameId)" class="btn btn-hs btn-primary btn-sm my-3 position-relative">
                 Podrobnosti o osobě a navázaných organizacích v dalších databázích
                 <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
                     @(HlidacStatu.Util.RenderData.NiceNumber(dsSearch.Total))

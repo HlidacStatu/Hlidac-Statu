@@ -29,10 +29,10 @@
                 @* <h6 class="card-subtitle mb-2 text-warning"></h6> *@
             </div>
             <div class="mx-auto">
-                <button class="btn btn-danger collapse show" id="startRecording" onclick="startRecording()"><i class="fa-duotone fa-microphone-lines fa-beat fa-lg"></i> Začít nahrávat</button>
-                <button class="btn btn-warning collapse" id="stopRecording" onclick="stopRecording()"><i class="fa-duotone fa-microphone-lines fa-beat fa-lg" style="color:red"></i> Vypnout nahrávání</button>
+                <button class="btn btn-hs btn-danger collapse show" id="startRecording" onclick="startRecording()"><i class="fa-duotone fa-microphone-lines fa-beat fa-lg"></i> Začít nahrávat</button>
+                <button class="btn btn-hs btn-warning collapse" id="stopRecording" onclick="stopRecording()"><i class="fa-duotone fa-microphone-lines fa-beat fa-lg" style="color:red"></i> Vypnout nahrávání</button>
                 <div class="alert alert-success collapse hide audioInfoTrigger" role="alert">Nahraný soubor ke stažení najdete níže na stránce.</div>
-                @* <button class="btn btn-info collapse" id="downloadAudio" onclick="downloadMP3()">Stáhnout záznam</button> *@
+                @* <button class="btn btn-hs btn-info collapse" id="downloadAudio" onclick="downloadMP3()">Stáhnout záznam</button> *@
                 <p>
                     Volajícího nemusíte upozornit ani žádat o souhlas, že si tento hovor nahráváte.
                 </p>
@@ -124,7 +124,7 @@
                 <p>
                     <h5 class="card-title">Vyplňte informace o Vás jako stěžovateli a vše pro vygenerování stížnosti je hotovo. Pokud jste ještě nevypnuli nahrávání hovoru, zastavte nahrávání tlačítem <code>Vypnout nahrávání</code></h5>
 
-                    <button class="btn btn-warning collapse" id="stopRecording2" onclick="stopRecording()"><i class="fa-duotone fa-microphone-lines fa-beat fa-lg" style="color:red"></i> Vypnout nahrávání</button>
+                    <button class="btn btn-hs btn-warning collapse" id="stopRecording2" onclick="stopRecording()"><i class="fa-duotone fa-microphone-lines fa-beat fa-lg" style="color:red"></i> Vypnout nahrávání</button>
                     <div class="alert alert-success collapse hide audioInfoTrigger" role="alert">Nahraný soubor ke stažení najdete níže na stránce.</div>
 
                 </p>
@@ -164,7 +164,7 @@
                     </div>
                 </div>
 
-                <button type="submit" class="btn btn-success" id="formSubmit" onclick="saveCookies()">Vygenerovat dokument se stížností</button>
+                <button type="submit" class="btn btn-hs btn-success" id="formSubmit" onclick="saveCookies()">Vygenerovat dokument se stížností</button>
             </div>
         </div>
     </div>
@@ -176,9 +176,9 @@
         <div class="card-body">
             <h5 class="card-title">Zde najdete vygenerované soubory ke stažení</h5>
             <div class="mx-auto">
-                <button class="btn btn-info collapse me-3" id="downloadAudio" onclick="downloadMP3()"><i class="fa-kit fa-regular-circle-microphone-circle-arrow-down fa-lg"></i>&nbsp;Stáhnout záznam hovoru</button>
+                <button class="btn btn-hs btn-info collapse me-3" id="downloadAudio" onclick="downloadMP3()"><i class="fa-kit fa-regular-circle-microphone-circle-arrow-down fa-lg"></i>&nbsp;Stáhnout záznam hovoru</button>
 
-                <a class="btn btn-info collapse" id="downloadPdf"><i class="fa-regular fa-file-pdf fa-lg"></i> Stáhnout stížnost jako PDF</a>
+                <a class="btn btn-hs btn-info collapse" id="downloadPdf"><i class="fa-regular fa-file-pdf fa-lg"></i> Stáhnout stížnost jako PDF</a>
             </div>
 
             <p>

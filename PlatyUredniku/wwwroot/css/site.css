@@ -32,70 +32,20 @@ section.pageblock-small {
 
 }
 
-table.table-sm > * > * {
-    padding: .25rem .25rem !important;
-}
-a.navbar-brand {
-    white-space: normal;
-    text-align: center;
-    word-break: break-all;
-}
 
 /* Provide sufficient contrast against white background */
-a {
+/*a {
   color: #0366d6;
 }
+*/
 
-.btn-primary {
-  color: #fff;
-  background-color: #1b6ec2;
-  border-color: #1861ac;
-}
-
-.nav-pills .nav-link.active, .nav-pills .show > .nav-link {
-  color: #fff;
-  background-color: #1b6ec2;
-  border-color: #1861ac;
-}
-
-/* Sticky footer styles
--------------------------------------------------- */
-html {
-  font-size: 14px;
-}
-@media (min-width: 768px) {
-  html {
-    font-size: 16px;
-  }
-}
-
-.border-top {
-  border-top: 1px solid #e5e5e5;
-}
-.border-bottom {
-  border-bottom: 1px solid #e5e5e5;
-}
-
-.box-shadow {
-  box-shadow: 0 .25rem .75rem rgba(0, 0, 0, .05);
-}
 
 button.accept-policy {
   font-size: 1rem;
   line-height: inherit;
 }
 
-/* Sticky footer styles
--------------------------------------------------- */
-html {
-  position: relative;
-  min-height: 100%;
-}
 
-body {
-  /* Margin bottom by footer height */
-  margin-bottom: 60px;
-}
 .footer {
   width: 100%;
   white-space: nowrap;
@@ -103,57 +53,6 @@ body {
 }
 
 
-/* TOC */
-.nav-link {
-    font-size: 16px;
-    letter-spacing: .36px;
-    color: #0074e4;
-    text-decoration: none;
-    text-transform: none;
-    margin: 0;
-}
-
-.navbar-brand {
-    float: none;
-    padding: 0 45px 0 16px;
-    font-weight: 600;
-    line-height: 44px;
-}
-
-    .navbar-brand svg {
-        margin-right: 10px;
-        vertical-align: bottom;
-    }
-
-.navbar-dark .navbar-nav.level2 .nav-link {
-    color: #0a58ca;
-    padding: 2px 12px;
-}
-
-nav[data-toggle="toc"] {
-    top: 42px;
-}
-
-/* small screens */
-@media (max-width: 768px) {
-    /* override stickyness so that the navigation does not follow scrolling */
-    nav[data-toggle="toc"] {
-        margin-bottom: 42px;
-        position: static;
-    }
-
-        /* PICK ONE */
-        /* don't expand nested items, which pushes down the rest of the page when navigating */
-        nav[data-toggle="toc"] .nav .active .nav {
-            display: none;
-        }
-}
-/* alternatively, if you *do* want the second-level navigation to be shown (as seen on this page on mobile), use this */
-/*
-nav[data-toggle='toc'] .nav .nav {
-  display: block;
-}
-*/
 
 a.link-cta {
     font-size: 1rem;

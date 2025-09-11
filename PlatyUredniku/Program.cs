@@ -208,16 +208,13 @@ public class Program
         {
             string[] cssPaths = new[]
             {
-                    "wwwroot/Content/GlobalSite.v1.15.css",
                     "wwwroot/Content/social-share-kit.css",
-                    "wwwroot/Content/new.v1.22.css",
-                    "wwwroot/css/site.css",
             };
 
 
-            pipeline.AddCssBundle("/Content/bundled.css", cssPaths)
-                .UseContentRoot() // tohle je tady potřeba, protože při standardním použití se špatně generují relativní cesty ve stylech (bootstrap.css)
-                .AdjustRelativePaths(); //tohle je tady potřeba, aby výsledné cesty neobsahovaly /wwwroot/
+            //pipeline.AddCssBundle("/Content/bundled.css", cssPaths)
+            //    .UseContentRoot() // tohle je tady potřeba, protože při standardním použití se špatně generují relativní cesty ve stylech (bootstrap.css)
+            //    .AdjustRelativePaths(); //tohle je tady potřeba, aby výsledné cesty neobsahovaly /wwwroot/
 
 
             pipeline.AddJavaScriptBundle("/bundles/jquery", "Scripts/jquery-1.11.3.min.js");

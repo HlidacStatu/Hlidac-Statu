@@ -248,8 +248,8 @@
                         <div class="order-lg-3 d-none d-sm-inline-flex">
                             <partial name="_LoginPartial" />
                         </div>
-                        @*                <a class="btn btn-success btn-sm fs-sm order-lg-3 d-none d-sm-inline-flex me-2" href="https://themes.getbootstrap.com/product/around-multipurpose-template-ui-kit/" target="_blank" rel="noopener"><i class="ai-cart fs-xl me-2 ms-n1"></i>Login</a>
-                        <a class="btn btn-primary btn-sm fs-sm order-lg-3 d-none d-sm-inline-flex" href="https://themes.getbootstrap.com/product/around-multipurpose-template-ui-kit/" target="_blank" rel="noopener"><i class="ai-cart fs-xl me-2 ms-n1"></i>Buy now</a>
+                        @*                <a class="btn btn-hs btn-success btn-sm fs-sm order-lg-3 d-none d-sm-inline-flex me-2" href="https://themes.getbootstrap.com/product/around-multipurpose-template-ui-kit/" target="_blank" rel="noopener"><i class="ai-cart fs-xl me-2 ms-n1"></i>Login</a>
+                        <a class="btn btn-hs btn-primary btn-sm fs-sm order-lg-3 d-none d-sm-inline-flex" href="https://themes.getbootstrap.com/product/around-multipurpose-template-ui-kit/" target="_blank" rel="noopener"><i class="ai-cart fs-xl me-2 ms-n1"></i>Buy now</a>
                         *@
                         <button class="navbar-toggler ms-sm-3" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"><span class="navbar-toggler-icon"></span></button>
                         <nav class="collapse navbar-collapse" id="navbarNav">
@@ -287,22 +287,22 @@
                         <div class="btn-toolbar mb-5 no-print" role="toolbar" style="position:fixed;top:93px;z-index:10000;">
                             <div class="btn-group me-2" role="group" aria-label="Sub menu" style="background-color:white;box-shadow:rgb(0 0 0 / 35%) 0px 5px 15px;">
 
-                                <a class="btn btn-secondary disabled" style="color:black;" asp-page="/Souhrn" asp-route-obor="@obor" asp-route-rok="@rok">Části analýzy&nbsp;<i class="fa-regular fa-angles-right"></i></a>
+                                <a class="btn btn-hs btn-secondary disabled" style="color:black;" asp-page="/Souhrn" asp-route-obor="@obor" asp-route-rok="@rok">Části analýzy&nbsp;<i class="fa-regular fa-angles-right"></i></a>
 
-                                <a class="btn btn-outline-primary" asp-page="/Souhrn" asp-route-obor="@obor" asp-route-rok="@rok">Souhrn</a>
-                                <a class="btn btn-outline-primary" asp-page="/BenchmarkUradu" asp-route-obor="@obor" asp-route-rok="@rok">Analýza zadavatele</a>
-                                <a class="btn btn-outline-primary" asp-page="/BenchmarkDodavatelu" asp-route-obor="@obor" asp-route-rok="@rok">Porovnání dodavatelů</a>
-                                <a class="btn btn-outline-primary" asp-page="/Pdf" asp-route-obor="@obor" asp-route-rok="@rok">Celá zpráva</a>
+                                <a class="btn btn-hs btn-outline-primary" asp-page="/Souhrn" asp-route-obor="@obor" asp-route-rok="@rok">Souhrn</a>
+                                <a class="btn btn-hs btn-outline-primary" asp-page="/BenchmarkUradu" asp-route-obor="@obor" asp-route-rok="@rok">Analýza zadavatele</a>
+                                <a class="btn btn-hs btn-outline-primary" asp-page="/BenchmarkDodavatelu" asp-route-obor="@obor" asp-route-rok="@rok">Porovnání dodavatelů</a>
+                                <a class="btn btn-hs btn-outline-primary" asp-page="/Pdf" asp-route-obor="@obor" asp-route-rok="@rok">Celá zpráva</a>
                                 @if (userAccess.AnalyzeLevel == Entities.CenyCustomer.AccessDetail.AccessDetailLevel.PRO)
                                 {
-                                    <a class="btn btn-outline-primary" asp-page="/advanced" asp-route-obor="@obor" asp-route-rok="@rok">Detailní analýza</a>
+                                    <a class="btn btn-hs btn-outline-primary" asp-page="/advanced" asp-route-obor="@obor" asp-route-rok="@rok">Detailní analýza</a>
                                 }
                             </div>
                             @if (this.User.IsInRole("Admin"))
                             {
                                 <div class="btn-group me-2 no-print adminBlock" role="group" style="background-color:white;box-shadow:rgb(0 0 0 / 35%) 0px 5px 15px;">
-                                    <a class="btn btn-outline-secondary" asp-page="/JedenJob" asp-route-obor="@obor" asp-route-rok="@rok">▸ Experiment</a>
-                                    <a class="btn btn-outline-secondary" asp-page="/Stats" asp-route-obor="@obor" asp-route-rok="@rok">▸ Zebricek</a>
+                                    <a class="btn btn-hs btn-outline-secondary" asp-page="/JedenJob" asp-route-obor="@obor" asp-route-rok="@rok">▸ Experiment</a>
+                                    <a class="btn btn-hs btn-outline-secondary" asp-page="/Stats" asp-route-obor="@obor" asp-route-rok="@rok">▸ Zebricek</a>
                                 </div>
                             }
                         </div>
@@ -343,10 +343,10 @@
                     </a>
                     <p class="mb-4 pb-lg-1 fs-xs text-muted" style="max-width: 306px;">Analýza smluv, registr smluv, veřejné zakázky. Ve spoluprácí s <a href="https://www.hlidacstatu.cz">Hlídač státu</a>.</p>
                     <div class="mt-n3 ms-n3">
-                        <a class="btn btn-secondary btn-icon btn-sm btn-twitter rounded-circle mt-3 ms-3" href="https://www.twitter.com/hlidacstatu/"><i class="ai-twitter"></i></a>
-                        <a class="btn btn-secondary btn-icon btn-sm btn-instagram rounded-circle mt-3 ms-3" href="https://www.instagram.com/hlidacstatu/"><i class="ai-instagram"></i></a>
-                        <a class="btn btn-secondary btn-icon btn-sm btn-facebook rounded-circle mt-3 ms-3" href="https://www.facebook.com/hlidacstatu/"><i class="ai-facebook"></i></a>
-                        <a class="btn btn-secondary btn-icon btn-sm btn-linkedin rounded-circle mt-3 ms-3" href="https://www.linkedin.com/company/80328355/"><i class="ai-linkedin"></i></a>
+                        <a class="btn btn-hs btn-secondary btn-icon btn-sm btn-twitter rounded-circle mt-3 ms-3" href="https://www.twitter.com/hlidacstatu/"><i class="ai-twitter"></i></a>
+                        <a class="btn btn-hs btn-secondary btn-icon btn-sm btn-instagram rounded-circle mt-3 ms-3" href="https://www.instagram.com/hlidacstatu/"><i class="ai-instagram"></i></a>
+                        <a class="btn btn-hs btn-secondary btn-icon btn-sm btn-facebook rounded-circle mt-3 ms-3" href="https://www.facebook.com/hlidacstatu/"><i class="ai-facebook"></i></a>
+                        <a class="btn btn-hs btn-secondary btn-icon btn-sm btn-linkedin rounded-circle mt-3 ms-3" href="https://www.linkedin.com/company/80328355/"><i class="ai-linkedin"></i></a>
                     </div>
                 </div>
                 <div class="col-lg-9">

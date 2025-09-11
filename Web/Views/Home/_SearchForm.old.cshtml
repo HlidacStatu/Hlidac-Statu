@@ -4,17 +4,17 @@
     <p class="col-xs-offset-0 col-xs-12 col-md-offset-0 col-md-12">
         @using (Html.BeginForm("Hledat", "Home", FormMethod.Get, new { @class = "form-inline", role = "form" }))
         {
-            <h2>Hledání v registru smluv <small><button type="button" class="btn btn-info btn-link" style="left:10px;" data-bs-toggle="modal" data-bs-target="#search-query-help">Nápověda</button></small></h2>
+            <h2>Hledání v registru smluv <small><button type="button" class="btn btn-hs btn-info btn-link" style="left:10px;" data-bs-toggle="modal" data-bs-target="#search-query-help">Nápověda</button></small></h2>
             <div id="custom-search-input" class="col-xs-12">
                 <div class="input-group col-xs-12">
 
                     <input class="form-control input-lg" id="Q" name="Q" placeholder="Název úřadu, smluvní strany, IČO, ..." style="max-width: none;" type="text" value="@Model.OrigQuery">
 
                     <span class="input-group-btn text-end" style="padding-right:20px;">
-                        <button class="btn btn-default btn-lg" type="submit">
+                        <button class="btn btn-hs btn-default btn-lg" type="submit">
                             <i class="fad fa-search"></i>
                         </button>
-                        <button type="button" class="btn btn-info btn-lg" style="left:10px;" data-bs-toggle="modal" data-bs-target="#search-query-help">Nápověda</button>
+                        <button type="button" class="btn btn-hs btn-info btn-lg" style="left:10px;" data-bs-toggle="modal" data-bs-target="#search-query-help">Nápověda</button>
                     </span>
                 </div>
             </div>

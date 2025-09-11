@@ -8,6 +8,18 @@
     var dataForOrganizationOfTheDay = await PuRepo.Cached.GetFullDetailAsync(organizationOfTheDay.DS);
 }
 
+
+@section breadcrumbs
+{
+    <ol class="breadcrumb">
+        <li>
+            <a href="/">Platy</a>
+        </li>
+        <li class="active">
+            Platy úředníků
+        </li>
+    </ol>
+}
 <section class="d-flex align-items-center justify-content-center pageblock-small pageblock">
     <div class="container">
         <h2>
@@ -40,7 +52,7 @@
 
         </h5>
         <p>
-            <a class="btn btn-primary btn-sm" href="/oblasti">Seznam všech organizací <span class="badge text-bg-danger">@(HlidacStatu.Util.RenderData.NiceNumber(stats.PocetOslovenych))</span></a>
+            <a class="btn btn-hs btn-primary btn-sm" href="/oblasti">Seznam všech organizací <span class="badge text-bg-danger">@(HlidacStatu.Util.RenderData.NiceNumber(stats.PocetOslovenych))</span></a>
         </p>
         <p class="mb-2 mt-4 text-body-secondary">
         <p>Platy organizací v jednotlivých oblastech</p>
@@ -104,7 +116,7 @@
                     <a asp-action="Detail"
                        asp-route-id="@organizationOfTheDay.DS"
                        asp-route-rok="@PuRepo.DefaultYear"
-                       class="btn btn-primary btn-sm">Detail o platech</a>
+                       class="btn btn-hs btn-primary btn-sm">Detail o platech</a>
                 </p>
 
             </div>

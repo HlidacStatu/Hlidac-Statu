@@ -28,7 +28,7 @@
                 <label for="prijmeni">Hledat i mezi nepolitiky</label>
                 <input type="checkbox" class="form-check-input" id="extendSearch" name="extendSearch" placeholder="extendSearch" @checkedattr value="true">
             </div>
-            <button type="submit" class="btn btn-primary">Hledej</button>
+            <button type="submit" class="btn btn-hs btn-primary">Hledej</button>
 
         </form>
     </div>
@@ -59,14 +59,14 @@ else
                             @if (osoba.HasPhoto())
                             {
                                 var zdroj = osoba.GetSourceOfPhoto();
-                                <a class="btn btn-default btn-sm" href="/manage/changePhoto/@osoba.NameId" role="button">Změnit fotku</a>
+                                <a class="btn btn-hs btn-default btn-sm" href="/manage/changePhoto/@osoba.NameId" role="button">Změnit fotku</a>
                                 <a title="@zdroj" href="@zdroj" style="font-size:75%;text-decoration:none">
                                     <span class="text-muted">@(zdroj != "" ? "zdroj" : "")</span>
                                 </a>
                             }
                             else
                             {
-                                <a class="btn btn-default btn-sm" href="/manage/changePhoto/@osoba.NameId" role="button">Přidat fotku</a>
+                                <a class="btn btn-hs btn-default btn-sm" href="/manage/changePhoto/@osoba.NameId" role="button">Přidat fotku</a>
                             }
 
                         </div>
@@ -99,7 +99,7 @@ else
                     }
                 </div>
                 <div class="col-sm-2 col-md-2">
-                    <a href="https://admin.hlidacstatu.cz/EventEditor/@osoba.InternalId" class="btn btn-primary btn-sm">Editovat</a>
+                    <a href="https://admin.hlidacstatu.cz/EventEditor/@osoba.InternalId" class="btn btn-hs btn-primary btn-sm">Editovat</a>
                 </div>
             </li>
         }

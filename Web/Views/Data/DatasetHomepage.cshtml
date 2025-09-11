@@ -55,7 +55,7 @@
         <li><a href="/data">Další databáze</a></li>
         <li class="active">@reg.name</li>
     </ol>
-    <div class="active float-end"><a href="/data/manage" class="btn btn-primary btn-sm" style="color:whitesmoke;text-decoration:none">Snadné přidání nového datasetu</a></div>
+    <div class="active float-end"><a href="/data/manage" class="btn btn-hs btn-primary btn-sm" style="color:whitesmoke;text-decoration:none">Snadné přidání nového datasetu</a></div>
 }
 <div id="data-detail-content">
     <div class="row">
@@ -152,10 +152,10 @@
                                     "Jiné","Jiné",
                                 }, true, $"dataset|{Model.DatasetId}"))"/>
             
-            <a href="/data/TechnickeInfo/@Model.DatasetId" class="btn btn-default btn-sm">Technické detaily</a>
+            <a href="/data/TechnickeInfo/@Model.DatasetId" class="btn btn-hs btn-default btn-sm">Technické detaily</a>
             @if (showEditBtn)
             {
-                <a href="/data/Manage/@Model.DatasetId" class="btn btn-info btn-sm" style="margin-left:10px"><i class="far fa-edit"></i> Editovat nastavení datasetu</a>
+                <a href="/data/Manage/@Model.DatasetId" class="btn btn-hs btn-info btn-sm" style="margin-left:10px"><i class="far fa-edit"></i> Editovat nastavení datasetu</a>
             }
 
         </div>

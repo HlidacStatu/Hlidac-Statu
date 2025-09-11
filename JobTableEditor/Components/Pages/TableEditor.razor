@@ -27,8 +27,8 @@ else
 {
     <div class="sticky-top pt-2 col-6 row">
         <div class="col-8">
-            <button class="btn btn-secondary btn-sm" @onclick="AddColumn">Přidej sloupec</button>
-            <button class="btn btn-secondary btn-sm" @onclick="AddRow">Přidej řádek</button>
+            <button class="btn btn-hs btn-secondary btn-sm" @onclick="AddColumn">Přidej sloupec</button>
+            <button class="btn btn-hs btn-secondary btn-sm" @onclick="AddRow">Přidej řádek</button>
             <LinkToOriginal InDocTable="@_table.InDocTable"></LinkToOriginal>
         </div>
         <div class="col-4">
@@ -51,8 +51,8 @@ else
             {
                 int column = col;
                 <th>
-                    <button class="btn btn-sm btn-primary bg-opacity-25" @onclick="@(() => SetColumn(column, true))">Označit</button>
-                    <button class="btn btn-sm btn-outline-info" @onclick="@(() => SetColumn(column, false))">Nic</button>
+                    <button class="btn btn-hs btn-sm btn-primary bg-opacity-25" @onclick="@(() => SetColumn(column, true))">Označit</button>
+                    <button class="btn btn-hs btn-sm btn-outline-info" @onclick="@(() => SetColumn(column, false))">Nic</button>
                     <span>&nbsp;&nbsp;| &nbsp;</span>
                 </th>
             }
@@ -63,7 +63,7 @@ else
         {
             <tr>
                 <th>
-                    <button class="btn btn-sm btn-outline-info" @onclick="@(() => SetRow(row, false))">Nic</button>
+                    <button class="btn btn-hs btn-sm btn-outline-info" @onclick="@(() => SetRow(row, false))">Nic</button>
                 </th>
                 @foreach (var cell in row)
                 {
@@ -79,13 +79,13 @@ else
     <div class="fixed-bottom bg-light p-2">
         <h4 class="text-danger float-start">@_errorMessage</h4>
         <div class="float-end">
-            @* <button class="btn btn-outline-success" @onclick="SaveTable">Save changes</button> *@
+            @* <button class="btn btn-hs btn-outline-success" @onclick="SaveTable">Save changes</button> *@
             <Modal Table="_table"></Modal>
-            <button class="btn btn-outline-secondary" @onclick="NotItTable">Není z oblasti IT</button>
-            <button class="btn btn-outline-warning" @onclick="NoPricesTable">Chybí ceny</button>
-            <button class="btn btn-outline-warning" @onclick="SuperviseTable">Nevím co s tím šéfe (supervisor)</button>
-            <button class="btn btn-outline-warning" @onclick="BrokenTable">Obsahuje data, ale je moc rozházená</button>
-            <button class="btn btn-outline-danger" @onclick="NonsenseTable">This table is full of 💩</button>
+            <button class="btn btn-hs btn-outline-secondary" @onclick="NotItTable">Není z oblasti IT</button>
+            <button class="btn btn-hs btn-outline-warning" @onclick="NoPricesTable">Chybí ceny</button>
+            <button class="btn btn-hs btn-outline-warning" @onclick="SuperviseTable">Nevím co s tím šéfe (supervisor)</button>
+            <button class="btn btn-hs btn-outline-warning" @onclick="BrokenTable">Obsahuje data, ale je moc rozházená</button>
+            <button class="btn btn-hs btn-outline-danger" @onclick="NonsenseTable">This table is full of 💩</button>
         </div>
     </div>
 

@@ -217,7 +217,7 @@
                 }
                 @foreach (var item in groupList)
                 {
-                    <a class="btn btn@(group == item ? "" : "-outline")-primary btn-sm col @(group == item ? "disabled" : "")" href="/politici/seznam/@(item.ToString())?year=@(PpRepo.DefaultYear)" role="button">
+                    <a class="btn btn-hs btn@(group == item ? "" : "-outline")-primary btn-sm col @(group == item ? "disabled" : "")" href="/politici/seznam/@(item.ToString())?year=@(PpRepo.DefaultYear)" role="button">
                         @(item.ToNiceDisplayName())
                     </a>
                 }

@@ -95,9 +95,14 @@ namespace HlidacStatu.Web.HealthChecks
                     //check CPU & Memory
                     foreach (var vm in allVMs)
                     {
-                        if (vm.cpu > 0.9)
+                        if (vm.cpu > 0.99)
                         {
                             unhealth = true;
+                            result.AppendLine($"VM '{vm.name}' {vm.cpu:P1} exhausted CPU.");
+                        }
+                        if (vm.cpu > 0.9)
+                        {
+                            warn = true;
                             result.AppendLine($"VM '{vm.name}' {vm.cpu:P1} exhausted CPU." );
                         }
                         if (vm.mem > (vm.maxmem * .93))
@@ -106,7 +111,7 @@ namespace HlidacStatu.Web.HealthChecks
                             result.AppendLine($"VM '{vm.name}' {(vm.mem / 1_000_000_000):N2} / {(vm.mem / 1_000_000_000):N2} exhausted Memory.");
 
                         }
-                        if (vm.mem > (vm.maxmem*.98))
+                        if (vm.mem > (vm.maxmem*.99))
                         {
                             unhealth = true;
                             result.AppendLine($"VM '{vm.name}' {(vm.mem/1_000_000_000):N2} / {(vm.mem / 1_000_000_000):N2} exhausted Memory.");

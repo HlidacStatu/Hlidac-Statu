@@ -91,7 +91,15 @@
 
     @RenderSection("metatags", required: false)
 
-    <link rel="stylesheet" href="~/css/bootstrap.min.css">
+    <link rel="stylesheet" href="~/css/bootstrap.hlidac.min.css">
+    <link rel="stylesheet" href="~/css/bootstrap.hlidac.override.css">
+    <link rel="stylesheet" href="~/css/hlidac.css">
+    <link rel="stylesheet" href="~/css/site.css">
+
+    <link rel="stylesheet" href="~/Content/social-share-kit.css">
+
+    @* <link rel="stylesheet" href="~/content/bundled.css" /> *@
+
     <script src="~/js/bootstrap.bundle.min.js"></script>
 
     <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,600,700&amp;subset=latin-ext" rel="stylesheet" />
@@ -102,7 +110,6 @@
     <script src="~/bundles/jquery"></script>
     <script src="~/bundles/scriptbundle"></script>
     <script src="~/bundles/highcharts11"></script>
-    <link rel="stylesheet" href="~/content/bundled.css" />
     <script src="~/bundles/modernizr"></script>
 
     <!-- Matomo Tag Manager -->
@@ -142,7 +149,7 @@
 </head>
 <body class="new-body">
     <!-- ##head## -->
-    <div>
+    <div class="nav-hs ">
         <nav class="navbar navbar-expand-lg navbar-light shadow hlidac">
             <div class="container-fluid">
                 <a class="navbar-brand" href="/" style="margin-right:1em;">
@@ -177,7 +184,7 @@
                     </div>
                 </button>
                 <div class="collapse navbar-collapse" id="navbar-content">
-                    <ul class="d-none d-lg-block navbar-nav mr-auto mb-2 mb-lg-0 mainmenu">
+                    <ul class="navbar-nav mr-auto mb-2 mb-lg-0 mainmenu" style="z-index:2000">
                         <li class="nav-item mainmenu">
                             <a class="nav-link active" aria-current="page" href="" onclick="return false;" style="visibility:hidden;cursor:pointer;">&nbsp;&nbsp;&nbsp;</a>
                         </li>
@@ -201,6 +208,39 @@
 
                 </div>
                 <div class="d-none d-lg-flex rightmenu">
+
+                    @if (User.Identity?.IsAuthenticated ?? false)
+                    {
+                        <a style="display:block;margin-right: 0.5em;top:10px;position:relative" href="https://www.hlidacstatu.cz/Identity/Account/manage/"
+                           onclick="_my_event('send', 'event', 'manageBtn', 'click','@Context.Request.Path'); return true;"
+                           title="Nastavení účtu" alt="Nastavení účtu"><i class="fa-solid fa-user fa-xl"></i></a>
+
+                        <a style="display:block;top:10px;position:relative;font-weight:bolder"
+                           onclick="_my_event('send', 'event', 'logoutBtn', 'click','@Context.Request.Path'); return true;"
+                           href="https://www.hlidacstatu.cz/Identity/Account/Logout?rnd=@Guid.NewGuid().ToString("N")">Odhlásit</a>
+                    }
+                    else
+                    {
+                        string nextUrl = Context.Request.GetDisplayUrl();
+                        if (nextUrl.ToLower().StartsWith(System.Net.WebUtility.UrlEncode("Identity/account/")))
+                        {
+                            nextUrl = "";
+                        }
+
+                        <a style="display:block;top:10px;position:relative;font-weight:bolder;margin-right:1em;"
+                           onclick="_my_event('send', 'event', 'loginBtn', 'click','@Context.Request.Path'); return true;"
+                           href="https://www.hlidacstatu.cz/Identity/Account/Login?returnUrl=@(nextUrl)"
+                           id="loginLink">
+                            <i class="fa-solid fa-right-to-bracket fa-lg"></i>
+                            Přihlášení
+                        </a>
+                        <a style="display:block;top:10px;position:relative;font-weight:bolder"
+                           onclick="_my_event('send', 'event', 'registerBtn', 'click','@Context.Request.Path'); return true;"
+                           href="https://www.hlidacstatu.cz/Identity/Account/Register?returnUrl=@(nextUrl)" id="regLink">
+                            <i class="fa-solid fa-file-user fa-lg"></i> Registrace
+                        </a>
+                    }
+
                 </div>
             </div>
         </nav>

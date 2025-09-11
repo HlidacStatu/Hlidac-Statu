@@ -22,7 +22,7 @@
                     @foreach (var provider in Model.ExternalLogins)
                     {
                         string imgPath = $"/content/img/{provider.Name}Signin.png"; 
-                        <button type="submit" class="btn btn-link"
+                        <button type="submit" class="btn btn-hs btn-link"
                                 name="provider" value="@provider.Name"
                                 title="Přihlásit pomocí @provider.DisplayName účtu">
                             <img src="@imgPath" style="height:50px;width:auto" />
@@ -60,7 +60,7 @@
                 </div>
             </div>
             <div class="col-md-offset-2 col-sm-8">
-                <button type="submit" class="btn btn-primary">Zaregistrovat</button>
+                <button type="submit" class="btn btn-hs btn-primary">Zaregistrovat</button>
             </div>
         </form>
     </div>

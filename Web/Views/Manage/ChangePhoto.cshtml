@@ -62,8 +62,8 @@
                     <input type="text" class="form-control" id="source" name="source" placeholder="Zdroj obrázku">
                     <p class="help-block">Napište URL, odkud fotka je anebo popis autorství. Nepoužívejte obrázky z neznámých zdrojů.</p>
                 </div>
-                <a href="@o.GetUrl(true)" class="btn btn-default">&lt;&lt; Zpět</a>
-                <button type="submit" class="btn btn-success">Poslat</button>
+                <a href="@o.GetUrl(true)" class="btn btn-hs btn-default">&lt;&lt; Zpět</a>
+                <button type="submit" class="btn btn-hs btn-success">Poslat</button>
             </form>
 
 
@@ -91,7 +91,7 @@
                     <p class="help-block">Napište URL obrázku, ne URL stránky kde je obrázek.</p>
                 </div>
 
-                <button type="submit" class="btn btn-success">Odeslat</button>
+                <button type="submit" class="btn btn-hs btn-success">Odeslat</button>
             </form>
 
         </div>
@@ -105,7 +105,7 @@
                     <input type="hidden" name="id" value="@o.NameId" />
                     <input type="hidden" name="email" value="@User.Identity.Name" />
                     <p>Checte smazat fotku?</p>
-                    <button type="submit" class="btn btn-success">Smazat</button>
+                    <button type="submit" class="btn btn-hs btn-success">Smazat</button>
                 </form>
 
             </div>

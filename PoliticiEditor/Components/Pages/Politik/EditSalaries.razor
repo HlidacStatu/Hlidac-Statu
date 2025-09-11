@@ -60,8 +60,8 @@
                                     <input type="text" id="poznamka" class="form-control" @bind="platyItem.SkrytaPoznamka"/>
                                 </td>
                                 <td>
-                                    <button class="btn btn-sm btn-success" @onclick="@(() => SaveNote(platyItem))">Uložit poznámku</button>
-                                    <button class="btn btn-sm btn-warning" @onclick="@(Cancel)">Zrušit poznámku</button>
+                                    <button class="btn btn-hs btn-sm btn-success" @onclick="@(() => SaveNote(platyItem))">Uložit poznámku</button>
+                                    <button class="btn btn-hs btn-sm btn-warning" @onclick="@(Cancel)">Zrušit poznámku</button>
                                 </td>
                             </tr>
 
@@ -79,7 +79,7 @@
                                 <td>@platyItem.Prispevky?.ToString("F0")</td>
                                 <td>@platyItem.NefinancniBonus</td>
                                 <td>@platyItem.SkrytaPoznamka</td>
-                                <td><button class="btn btn-sm btn-outline-success" @onclick="@(() => _noteForPrijemId = platyItem.Id)">Přidat poznámku</button></td>
+                                <td><button class="btn btn-hs btn-sm btn-outline-success" @onclick="@(() => _noteForPrijemId = platyItem.Id)">Přidat poznámku</button></td>
                             </tr>
                         }
                     }
@@ -180,8 +180,8 @@
 
     <div class="card-footer text-body-secondary d-flex">
         <div class="ms-auto">
-            <button class="btn btn-success" @onclick="@(Save)">Uložit změny</button>
-            <button class="btn btn-warning" @onclick="@(Cancel)">Zrušit změny</button>
+            <button class="btn btn-hs btn-success" @onclick="@(Save)">Uložit změny</button>
+            <button class="btn btn-hs btn-warning" @onclick="@(Cancel)">Zrušit změny</button>
         </div>
     </div>
 

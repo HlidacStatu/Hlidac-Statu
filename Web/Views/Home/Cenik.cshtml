@@ -166,7 +166,7 @@ title='<span style=""font-weight:bold;font-style: italic;font-size:130%;border-b
                             <li class="list-group-item"><i class="fa fa-check"></i> Licence k libovolnému použití dat</li>
                         </ul>
                         <div class="panel-footer">
-                            <a class="btn btn-lg btn-block btn-danger" onclick="return trackInLink(this,'Cenik');" href="/manage/Objednavka/3">Objednat</a>
+                            <a class="btn btn-hs btn-lg btn-block btn-danger" onclick="return trackInLink(this,'Cenik');" href="/manage/Objednavka/3">Objednat</a>
                         </div>
                         <ul class="list-group text-center">
                             <li class="list-group-item"><i class="fa fa-check"></i> Ceny bez DPH, platba fakturou, splatnost 30 dní.</li>
@@ -194,7 +194,7 @@ title='<span style=""font-weight:bold;font-style: italic;font-size:130%;border-b
                             <li class="list-group-item">&nbsp;<br />&nbsp;</li>
                         </ul>
                         <div class="panel-footer">
-                            <a class="btn btn-lg btn-block btn-warning" onclick="return trackInLink(this,'Cenik');" href="/manage/Objednavka/2">Objednat</a>
+                            <a class="btn btn-hs btn-lg btn-block btn-warning" onclick="return trackInLink(this,'Cenik');" href="/manage/Objednavka/2">Objednat</a>
                         </div>
                         <ul class="list-group text-center">
                             <li class="list-group-item"><i class="fa fa-check"></i> Ceny bez DPH, platba fakturou, splatnost 30 dní.</li>
@@ -224,11 +224,11 @@ title='<span style=""font-weight:bold;font-style: italic;font-size:130%;border-b
                         <div class="panel-footer">
                             @if (this.User?.Identity?.IsAuthenticated == true)
                             {
-                                <a class="btn btn-lg btn-block btn-success" href="#" onclick="return trackInLink(this,'Cenik');" data-bs-toggle="modal" data-bs-target="#cenik_fbForm">Napište nám</a>
+                                <a class="btn btn-hs btn-lg btn-block btn-success" href="#" onclick="return trackInLink(this,'Cenik');" data-bs-toggle="modal" data-bs-target="#cenik_fbForm">Napište nám</a>
                             }
                             else
                             {
-                                <a class="btn btn-lg btn-block btn-success" href="/account/Register" onclick="return trackInLink(this,'Register');">První se zdarma zaregistrujte</a>
+                                <a class="btn btn-hs btn-lg btn-block btn-success" href="/account/Register" onclick="return trackInLink(this,'Register');">První se zdarma zaregistrujte</a>
                             }
                         </div>
                         <ul class="list-group text-center">
@@ -317,10 +317,10 @@ title='<span style=""font-weight:bold;font-style: italic;font-size:130%;border-b
 
                 <!-- Modal Footer -->
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-default" data-bs-dismiss="modal">
+                    <button type="button" class="btn btn-hs btn-default" data-bs-dismiss="modal">
                         Zrušit
                     </button>
-                    <button type="button" onclick="sendcenik_();" class="btn btn-primary" data-bs-dismiss="modal">
+                    <button type="button" onclick="sendcenik_();" class="btn btn-hs btn-primary" data-bs-dismiss="modal">
                         Odeslat vzkaz
                     </button>
                 </div>
