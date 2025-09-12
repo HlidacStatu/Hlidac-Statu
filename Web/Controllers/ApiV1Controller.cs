@@ -655,23 +655,6 @@ namespace HlidacStatu.Web.Controllers
                 new { Total = found.Count(), Result = found }
             ), "application/json");
         }
-
-        public async Task<ActionResult> CheckText(string smlouvaid)
-        {
-            Entities.Issues.IIssueAnalyzer textCheck = new Plugin.IssueAnalyzers.Text();
-            Smlouva s = await SmlouvaRepo.LoadAsync(smlouvaid);
-            if (s != null)
-            {
-                if (s.Prilohy != null && s.Prilohy.Count() > 0)
-                {
-                    var newIss = s.Issues.Where(m => m.IssueTypeId != 200).ToList();
-                    newIss.AddRange(await textCheck.FindIssuesAsync(s));
-                    s.Issues = newIss.ToArray();
-                    await SmlouvaRepo.SaveAsync(s, fireOCRDone: false);
-                }
-            }
-
-            return Content("OK");
-        }
+        
     }
 }
