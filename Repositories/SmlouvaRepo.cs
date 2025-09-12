@@ -603,7 +603,7 @@ namespace HlidacStatu.Repositories
 
             //update statistics of subjects
             bool updateStat = false;
-            var preSml = await LoadAsync(smlouva.Id, includePrilohy: false);
+            var preSml = await LoadAsync(smlouva.Id, includePlaintext: false);
             if (preSml == null) //nova smlouva
                 updateStat = true;
             else
@@ -914,9 +914,9 @@ namespace HlidacStatu.Repositories
         }
 
 
-        public static async Task<Smlouva> LoadAsync(string idVerze, ElasticClient client = null, bool includePrilohy = true)
+        public static async Task<Smlouva> LoadAsync(string idVerze, ElasticClient client = null, bool includePlaintext = true)
         {
-            var s = await _loadAsync(idVerze, client, includePrilohy);
+            var s = await _loadAsync(idVerze, client, includePlaintext);
             if (s == null)
                 return s;
             _ = s.GetRelevantClassification();
@@ -929,7 +929,7 @@ namespace HlidacStatu.Repositories
             return s;
         }
 
-        private static async Task<Smlouva> _loadAsync(string idVerze, ElasticClient client = null, bool includePrilohy = true)
+        private static async Task<Smlouva> _loadAsync(string idVerze, ElasticClient client = null, bool includePlaintext = true)
         {
             bool specClient = client != null;
             try
@@ -942,7 +942,7 @@ namespace HlidacStatu.Repositories
 
                 //var res = c.Get<Smlouva>(idVerze);
 
-                var res = includePrilohy
+                var res = includePlaintext
                     ? await c.GetAsync<Smlouva>(idVerze)
                     : await c.GetAsync<Smlouva>(idVerze, s => s.SourceExcludes("prilohy.plainTextContent"));
 
@@ -955,7 +955,7 @@ namespace HlidacStatu.Repositories
                     {
                         var c1 = Manager.GetESClient_Sneplatne();
 
-                        res = includePrilohy
+                        res = includePlaintext
                             ? await c1.GetAsync<Smlouva>(idVerze)
                             : await c1.GetAsync<Smlouva>(idVerze, s => s.SourceExcludes("prilohy.plainTextContent"));
 

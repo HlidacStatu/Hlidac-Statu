@@ -40,7 +40,7 @@ namespace HlidacStatu.MCPServer.Tools
                     if (string.IsNullOrWhiteSpace(contract_id))
                         return null;
 
-                    var res = await HlidacStatu.Repositories.SmlouvaRepo.LoadAsync(contract_id, includePrilohy: include_text_of_contract);
+                    var res = await HlidacStatu.Repositories.SmlouvaRepo.LoadAsync(contract_id, includePlaintext: include_text_of_contract);
 
                     res = Smlouva.Export(res, false, include_text_of_contract);
 

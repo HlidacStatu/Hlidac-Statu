@@ -39,7 +39,7 @@ namespace HlidacStatu.Web.Framework.SignalR
 
 
             string content = "";
-            var s = await HlidacStatu.Repositories.SmlouvaRepo.LoadAsync(smlouvaId, includePrilohy: true);
+            var s = await HlidacStatu.Repositories.SmlouvaRepo.LoadAsync(smlouvaId, includePlaintext: true);
             if (s != null)
             {
                 List<HlidacStatu.AI.LLM.SumarizaceJSON.Item> summ = new List<HlidacStatu.AI.LLM.SumarizaceJSON.Item>();
@@ -94,7 +94,7 @@ namespace HlidacStatu.Web.Framework.SignalR
             Serilog.Log.ForContext<OllamaSignalRHub>().Warning($"Calling {nameof(Summary)} method from {nameof(OllamaSignalRHub)}, should this call be repeated frequently, it might have serious impact on Web performance! The reason is loading PlainTextContent.");
 
             string content = "";
-            var s = await HlidacStatu.Repositories.SmlouvaRepo.LoadAsync(smlouvaId, includePrilohy: true);
+            var s = await HlidacStatu.Repositories.SmlouvaRepo.LoadAsync(smlouvaId, includePlaintext: true);
             if (s != null)
             {
                 var priloha = s.Prilohy.FirstOrDefault();// (m=>m.UniqueHash() == prilohaId);

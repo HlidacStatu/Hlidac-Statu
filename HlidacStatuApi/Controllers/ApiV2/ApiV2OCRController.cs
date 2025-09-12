@@ -253,7 +253,7 @@ namespace HlidacStatuApi.Controllers.ApiV2
 
         private async Task<HlidacStatu.DS.Api.OcrWork.Task> GetSmlouva(ItemToOcrQueue item)
         {
-            var sml = await SmlouvaRepo.LoadAsync(item.ItemId, includePrilohy: false);
+            var sml = await SmlouvaRepo.LoadAsync(item.ItemId, includePlaintext: false);
 
             if (sml == null)
                 return null;

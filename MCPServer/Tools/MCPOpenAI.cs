@@ -215,7 +215,7 @@ url - a URL to the document or search result item. Useful for citing specific re
                     switch (type)
                     {
                         case "smlouva":
-                            var smlouva = await SmlouvaRepo.LoadAsync(value, includePrilohy: true);
+                            var smlouva = await SmlouvaRepo.LoadAsync(value, includePlaintext: true);
                             res = new OpenAiResultItem
                             {
                                 id = smlouva.Id,
