@@ -29,6 +29,8 @@ namespace HlidacStatu.Web.Framework.SignalR
 
         public async Task SummaryJson( string smlouvaId, string prilohaId, string pocetbodu)
         {
+            Serilog.Log.ForContext<OllamaSignalRHub>().Warning($"Calling {nameof(SummaryJson)} method from {nameof(OllamaSignalRHub)}, should this call be repeated frequently, it might have serious impact on Web performance! The reason is loading PlainTextContent.");
+            
             Uri ollamaUri = new Uri("http://10.10.100.113:18080/ollama/api");
             var ollamaCl = new HlidacStatu.AI.LLM.Clients.OllamaServerClient<HlidacStatu.AI.LLM.Clients.Options.SummaryOptions>(ollamaUri.AbsoluteUri);
             HlidacStatu.AI.LLM.Summarization llm = new HlidacStatu.AI.LLM.Summarization(ollamaCl);
@@ -82,16 +84,14 @@ namespace HlidacStatu.Web.Framework.SignalR
             }
             else
                 await Clients.All.SendAsync("ReceiveJsonSummaryMessage", null);
-
-
-
-
+            
         }
 
 
 
         public async Task Summary(string smlouvaId, string prilohaId, string pocetbodu)
         {
+            Serilog.Log.ForContext<OllamaSignalRHub>().Warning($"Calling {nameof(Summary)} method from {nameof(OllamaSignalRHub)}, should this call be repeated frequently, it might have serious impact on Web performance! The reason is loading PlainTextContent.");
 
             string content = "";
             var s = await HlidacStatu.Repositories.SmlouvaRepo.LoadAsync(smlouvaId, includePrilohy: true);
