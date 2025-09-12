@@ -116,7 +116,7 @@ namespace HlidacStatu.Web.Controllers
                 ModelState.AddModelError("Check", "Nastav smluvni strany");
                 return View();
             }
-            Smlouva s = await SmlouvaRepo.LoadAsync(id);
+            Smlouva s = await SmlouvaRepo.LoadAsync(id, includePlaintext:false);
             if (s == null)
             {
                 ModelState.AddModelError("Check", "smlouva neexistuje");

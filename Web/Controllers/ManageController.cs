@@ -238,7 +238,7 @@ namespace HlidacStatu.Web.Controllers
         [Authorize(Roles = "canEditData")]
         public async Task<ActionResult> EditSmlouva(string Id, string type)
         {
-            object item = await SmlouvaRepo.LoadAsync(Id);
+            object item = await SmlouvaRepo.LoadAsync(Id, includePlaintext:false);
             if (item != null)
             {
                 ViewBag.objectType = type;

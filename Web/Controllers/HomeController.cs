@@ -1060,7 +1060,7 @@ text zpravy: {txt}
             }
             else if (id?.ToLower() == "smlouva")
             {
-                Smlouva s = await SmlouvaRepo.LoadAsync(v);
+                Smlouva s = await SmlouvaRepo.LoadAsync(v, includePlaintext:false);
                 if (s != null)
                 {
                     if (!s.NotInterestingToShow())

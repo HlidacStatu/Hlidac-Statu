@@ -256,7 +256,7 @@ else
                 <td>
                    @foreach (var smlouvaForVz in smlouvyForVz.OrderByDescending(x=>x.CosineSimilarity))
                    {
-                       var smlouva = await SmlouvaRepo.LoadAsync(smlouvaForVz.IdSmlouvy);
+                       var smlouva = await SmlouvaRepo.LoadAsync(smlouvaForVz.IdSmlouvy, includePlaintext:false);
                        if (smlouva is not null)
                        {
                            <a asp-controller="Home" asp-action="Detail" asp-route-Id="@smlouvaForVz.IdSmlouvy">@smlouvaForVz.IdSmlouvy - @smlouva.predmet</a>
