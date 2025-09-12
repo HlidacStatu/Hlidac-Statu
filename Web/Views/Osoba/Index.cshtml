@@ -294,7 +294,7 @@
                                 <a asp-controller="Subjekt" asp-action="Index" asp-route-id="@stat.Key">
                                     @Firmy.GetJmeno(stat.Key)
                                 </a>
-                                (@Html.Raw(stat.Value.Summary().ToNiceLinkString(null, true, customUrl: $"hledat?q=ico:{stat.Key}")) od
+                                (@Html.Raw(stat.Value.Summary().ToNiceLinkString(null, true, customUrl: $"/hledat?q=ico:{stat.Key}")) od
                                 2016
                                 @if (stat.Value.CurrentSeasonStatistics().PocetSmluv > 0)
                                 {
@@ -382,7 +382,7 @@
                                 <a asp-controller="Subjekt" asp-action="Index" asp-route-id="@stat.Key">
                                     @Firmy.GetJmeno(stat.Key)
                                 </a>
-                                (@Html.Raw(stat.Value.Summary().ToNiceLinkString(null, true, customUrl: $"hledat?q=ico:{stat.Key}")) od
+                                (@Html.Raw(stat.Value.Summary().ToNiceLinkString(null, true, customUrl: $"/hledat?q=ico:{stat.Key}")) od
                                 2016
                                 @if (stat.Value.CurrentSeasonStatistics().PocetSmluv > 0)
                                 {
