@@ -19,7 +19,6 @@ using Newtonsoft.Json.Linq;
 using Newtonsoft.Json;
 using HlidacStatu.MLUtil.Splitter;
 using System.Text;
-using static HlidacStatu.AI.LLM.ContractParties.Parsed;
 using HlidacStatu.AI.LLM.Clients.Options;
 
 

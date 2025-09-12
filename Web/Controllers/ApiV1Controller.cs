@@ -544,76 +544,7 @@ namespace HlidacStatu.Web.Controllers
 
             return NoContent();
         }
-
-
-
-        [Authorize]
-        public async Task<ActionResult> Search(string query, int? page, int? order)
-        {
-            page = page ?? 1;
-            order = order ?? 0;
-            Repositories.Searching.SmlouvaSearchResult res = null;
-
-            if (string.IsNullOrWhiteSpace(query))
-                return new NotFoundResult();
-
-            bool? platnyzaznam = null; //1 - nic defaultne
-            if (
-                System.Text.RegularExpressions.Regex.IsMatch(query.ToLower(), "(^|\\s)id:")
-                ||
-                query.ToLower().Contains("idverze:")
-                ||
-                query.ToLower().Contains("idsmlouvy:")
-                ||
-                query.ToLower().Contains("platnyzaznam:")
-            )
-                platnyzaznam = null;
-
-            res = await SmlouvaRepo.Searching.SimpleSearchAsync(query, page.Value,
-                SmlouvaRepo.Searching.DefaultPageSize,
-                (SmlouvaRepo.Searching.OrderResult)order.Value,
-                platnyZaznam: platnyzaznam);
-
-            if (res.IsValid == false)
-            {
-                Response.StatusCode = 500;
-                return Json(new { error = "Bad query", reason = res.ElasticResults.ServerError });
-            }
-            else
-            {
-                var filtered = res.Results
-                    .Select(m =>
-                        Smlouva.Export(m, HttpContext.User.IsInRole("Admin"), false))
-                    .ToArray();
-
-                return Content(
-                    Newtonsoft.Json.JsonConvert.SerializeObject(new { total = res.Total, items = filtered },
-                        Newtonsoft.Json.Formatting.None), "application/json");
-            }
-        }
-
-        [Authorize]
-        public async Task<ActionResult> Detail(string _id)
-        {
-            string Id = _id;
-
-            if (string.IsNullOrWhiteSpace(Id))
-                return new NotFoundResult();
-
-            var model = await SmlouvaRepo.LoadAsync(Id);
-            if (model == null)
-            {
-                return new NotFoundResult();
-            }
-
-            var smodel = Smlouva.Export(model,
-                allData: HttpContext.User.IsInRole("Admin"),
-                docsContent: true
-            );
-            var s = System.Text.Json.JsonSerializer.Serialize(smodel);
-
-            return Content(s, "application/json");
-        }
+        
 
         [Authorize]
         public async Task<ActionResult> ClassificationList(int pageSize = 200)
