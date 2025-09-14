@@ -2,12 +2,12 @@
 
 .btn-primary, .btn-primary-new, .btn-success, .btn-info, .btn-warning, .btn-danger, .header__content .header__search__btn {
     color: white;
-    border-color: #0074E4;
+    border-color: #0074E4;  
     background-color: #0074E4;
 }
 
 .btn-success {
-    background-color: #38CAAA;
+    background-color: #198754;
     border-color: #38CAAA;
 }
 

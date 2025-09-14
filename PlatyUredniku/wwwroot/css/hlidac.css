@@ -104,7 +104,7 @@ body.nav-open header {
     letter-spacing: .03px
 }
 
-    .logo, .logo:active, .logo:hover, .logo:visited, a:hover {
+    .logo, .logo:active, .logo:hover, .logo:visited {
         color: #25272d
     }
 
@@ -139,7 +139,7 @@ body.nav-open nav.level2 {
 }
 
 a {
-    color: #3e6deb;
+    color: rgba(var(--bs-link-color-rgb),var(--bs-link-opacity, 1));
     text-decoration: none
 }
 
@@ -164,15 +164,11 @@ h2 .small, h2 small {
     padding-left: 2.5em;
     line-height: 1.7em;
     display: block;
-    font-size: calc(1.3rem + .6vw) !important
+    font-size: calc(1.1rem + .6vw) !important
 }
 
 h3 .small, h3 small {
     font-size: calc(.7rem + .6vw) !important
-}
-
-.h4, h4 {
-    font-size: 1.2rem
 }
 
 code {
@@ -578,7 +574,7 @@ footer {
             font-size: 10px
         }
 
-        .body.embed .breadcrumb, .material-switch > input[type=checkbox], .onlyembed, body.embed .dontembed {
+        .body.embed .breadcrumb, .onlyembed, body.embed .dontembed {
             display: none
         }
 
@@ -1270,40 +1266,44 @@ div.verticaltab-container {
     width: 40px
 }
 
-    .material-switch > label::before {
-        background: #000;
-        box-shadow: inset 0 0 10px rgba(0,0,0,.5);
-        border-radius: 8px;
-        content: "";
-        height: 16px;
-        margin-top: -8px;
-        position: absolute;
-        opacity: .3;
-        transition: all .4s ease-in-out;
-        width: 40px
-    }
+.material-switch > input[type=checkbox] {
+    display: none;
+}
 
-    .material-switch > label::after {
-        background: #fff;
-        border-radius: 16px;
-        box-shadow: 0 0 5px rgba(0,0,0,.3);
-        content: "";
-        height: 24px;
-        left: -4px;
-        margin-top: -8px;
-        position: absolute;
-        top: -4px;
-        transition: all .3s ease-in-out;
-        width: 24px
-    }
+.material-switch > label::before {
+    background: #000;
+    box-shadow: inset 0 0 10px rgba(0,0,0,.5);
+    border-radius: 4px;
+    content: "";
+    height: 16px;
+    margin-top: -8px;
+    position: absolute;
+    opacity: 1.0;
+    transition: all .4s ease-in-out;
+    width: 40px
+}
+
+.material-switch > label::after {
+    background: #fff;
+    border-radius: 16px;
+    box-shadow: 0 0 5px rgba(0,0,0,.8);
+    content: "";
+    height: 24px;
+    left: -4px;
+    margin-top: -8px;
+    position: absolute;
+    top: -4px;
+    transition: all .3s ease-in-out;
+    width: 24px
+}
 
 .material-switch > input[type=checkbox]:checked + label::before {
     background: inherit;
-    opacity: .5
+    opacity: 1.0;
 }
 
 .material-switch > input[type=checkbox]:checked + label::after {
-    background: inherit;
+    background: rgba(var(--bs-success-rgb), 0.8) !important;
     left: 20px
 }
 
@@ -1531,54 +1531,6 @@ body.nav-open nav ul .social {
     background: #f2f5f7
 }
 
-.navbar.hlidac .nav-item.dropdown.dropdown-mega {
-    position: static
-}
-
-    .navbar.hlidac .nav-item.dropdown.dropdown-mega .dropdown-menu {
-        width: 90%;
-        top: auto;
-        left: 5%
-    }
-
-.navbar.hlidac .nav-item {
-    margin-right: 1em
-}
-
-    .navbar.hlidac .nav-item > a {
-        line-height: 1.2em
-    }
-
-a.nav-link.dropdown-toggle.mainmenu.show {
-    border-radius: 10px 10px 0 0;
-    border-top: 1px #d0d0d0 solid;
-    border-right: 1px #d0d0d0 solid;
-    border-left: 1px #d0d0d0 solid
-}
-
-.dropdown-menu .mega-content {
-    font-size: 15px;
-    line-height: 19px;
-    font-weight: 400
-}
-
-    .dropdown-menu .mega-content .mega-content-title {
-        box-sizing: border-box;
-        font-size: 1.75rem;
-        font-weight: 500;
-        line-height: 1.2;
-        list-style: none;
-        margin-bottom: .5rem;
-        margin-top: 0;
-        text-align: left
-    }
-
-    .dropdown-menu .mega-content .mega-content-subtitle {
-        font-size: 1.25rem;
-        font-weight: 500;
-        line-height: 1.1;
-        margin-bottom: 5px
-    }
 
 .back-to-top {
     cursor: pointer;
@@ -1879,6 +1831,12 @@ h2.new-title {
 
 .btn.btn-link {
     text-transform: initial
+}
+
+.btn-xs {
+    padding: 3px 5px;
+    font-size: 12px;
+    margin: 1px;
 }
 
 .btn--with-margin {
@@ -2286,7 +2244,7 @@ select.hs {
 }
 
 .header__content .header__search__btn {
-    line-height: 54px;
+    /*    line-height: 54px;*/
     margin: 0
 }
 
@@ -3576,7 +3534,7 @@ a.form-search__hint:active, a.form-search__hint:active:focus, a.form-search__hin
 }
 
 .small-link {
-    font-size: 12px;
+    font-size: 90%;
     color: #838c98
 }
 
@@ -3896,7 +3854,8 @@ a.form-search__hint:active, a.form-search__hint:active:focus, a.form-search__hin
 .nav-hs .nav-link {
     font-size: 16px;
     letter-spacing: .36px;
-    color: #0074e4;
+    color: rgba(var(--bs-primary-rgb), var(--bs-link-opacity, 1));
+    font-weight: 600;
     text-decoration: none;
     text-transform: none;
     margin: 0
@@ -3933,6 +3892,64 @@ a.form-search__hint:active, a.form-search__hint:active:focus, a.form-search__hin
     .nav-hs nav [data-toggle=toc] {
         top: 42px
     }
+
+
+.navbar.hlidac .nav-item.dropdown.dropdown-mega {
+    position: static
+}
+
+    .navbar.hlidac .nav-item.dropdown.dropdown-mega .dropdown-menu {
+        width: 90%;
+        top: auto;
+        left: 5%
+    }
+
+
+    .navbar.hlidac .nav-item > a {
+        line-height: 1.2em
+    }
+
+a.nav-link.dropdown-toggle.mainmenu.show {
+    border-radius: 10px 10px 0 0;
+    border-top: 1px #d0d0d0 solid;
+    border-right: 1px #d0d0d0 solid;
+    border-left: 1px #d0d0d0 solid
+}
+
+.dropdown-menu .mega-content {
+    font-size: 15px;
+    line-height: 19px;
+    font-weight: 400
+}
+
+    .dropdown-menu .mega-content .mega-content-title {
+        box-sizing: border-box;
+        font-size: 1.75rem;
+        font-weight: 500;
+        line-height: 1.2;
+        list-style: none;
+        margin-bottom: .5rem;
+        margin-top: 0;
+        text-align: left
+    }
+
+    .dropdown-menu .mega-content .mega-content-subtitle {
+        font-size: 1.25rem;
+        font-weight: 500;
+        line-height: 1.1;
+        margin-bottom: 5px
+    }
+
+@media (max-width: 1200px) {
+    .nav-hs .navbar-brand {
+        float: none;
+        padding: 0;
+    }
+
+    .nav-hs ul.navbar-nav.mainmenu li.mainmenu {
+        padding: 0;
+    }
+}
 
 @media (max-width:768px) {
     .nav-hs nav [data-toggle=toc] {
