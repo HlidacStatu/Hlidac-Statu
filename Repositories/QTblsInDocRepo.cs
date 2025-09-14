@@ -17,7 +17,7 @@ namespace HlidacStatu.Repositories
 
         public static async Task<bool> CreateNewTaskAsync(string smlouvaId, bool force, int priority = 10, Func<DocTables, bool> predicate = null)
         {
-            var sml = await SmlouvaRepo.LoadAsync(smlouvaId, includePrilohy: false);
+            var sml = await SmlouvaRepo.LoadAsync(smlouvaId, includePlaintext: false);
             
             if (sml != null)
             {

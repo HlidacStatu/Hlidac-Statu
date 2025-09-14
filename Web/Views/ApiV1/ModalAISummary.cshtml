@@ -14,11 +14,11 @@
     HlidacStatu.Entities.Smlouva smlouva = null;
     if (aiShortDocs?.FirstOrDefault()?.DocumentID != null)
     {
-        smlouva = await SmlouvaRepo.LoadAsync(aiShortDocs.FirstOrDefault().DocumentID, includePrilohy: false);
+        smlouva = await SmlouvaRepo.LoadAsync(aiShortDocs.FirstOrDefault().DocumentID, includePlaintext: false);
     }
     else if (aiFullDocs?.FirstOrDefault()?.DocumentID != null)
     {
-        smlouva = await SmlouvaRepo.LoadAsync(aiFullDocs.FirstOrDefault().DocumentID, includePrilohy: false);
+        smlouva = await SmlouvaRepo.LoadAsync(aiFullDocs.FirstOrDefault().DocumentID, includePlaintext: false);
     }
 
 }

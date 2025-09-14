@@ -17,7 +17,7 @@ namespace HlidacStatu.Web.Controllers
             if (string.IsNullOrWhiteSpace(id))
                 return NotFound();
 
-            var smlouva = await SmlouvaRepo.LoadAsync(id);
+            var smlouva = await SmlouvaRepo.LoadAsync(id, includePlaintext:false);
 
             if (smlouva is null)
                 return NotFound();
@@ -31,7 +31,7 @@ namespace HlidacStatu.Web.Controllers
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> EditClassification(string id, string typ1, string typ2)
         {
-            var smlouva = await SmlouvaRepo.LoadAsync(id);
+            var smlouva = await SmlouvaRepo.LoadAsync(id, includePlaintext:false);
             if (smlouva is null)
                 return NotFound();
 

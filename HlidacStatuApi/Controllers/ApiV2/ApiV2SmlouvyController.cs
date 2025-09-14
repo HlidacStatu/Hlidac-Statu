@@ -159,7 +159,7 @@ namespace HlidacStatuApi.Controllers.ApiV2
                 return BadRequest($"Hodnota id chybí.");
             }
 
-            var smlouva = await SmlouvaRepo.LoadAsync(id);
+            var smlouva = await SmlouvaRepo.LoadAsync(id, includePlaintext:false);
             if (smlouva == null)
             {
                 return NotFound($"Smlouva nenalezena");

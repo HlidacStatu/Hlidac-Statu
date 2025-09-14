@@ -424,7 +424,7 @@ text zpravy: {txt}
                     }
                 }
             }
-            var model = await SmlouvaRepo.LoadAsync(Id, includePrilohy:false) ;
+            var model = await SmlouvaRepo.LoadAsync(Id, includePlaintext:false) ;
             var priloha = model.Prilohy?.FirstOrDefault(m => m.UniqueHash() == hash);
 
             var fn = SmlouvaRepo.GetDownloadedPrilohaPath(priloha,model, 
@@ -665,7 +665,7 @@ text zpravy: {txt}
             if (string.IsNullOrWhiteSpace(Id))
                 return NotFound();
 
-            var model = await SmlouvaRepo.LoadAsync(Id);
+            var model = await SmlouvaRepo.LoadAsync(Id, includePlaintext: false);
             if (model == null)
             {
                 return NotFound();
@@ -1060,7 +1060,7 @@ text zpravy: {txt}
             }
             else if (id?.ToLower() == "smlouva")
             {
-                Smlouva s = await SmlouvaRepo.LoadAsync(v);
+                Smlouva s = await SmlouvaRepo.LoadAsync(v, includePlaintext:false);
                 if (s != null)
                 {
                     if (!s.NotInterestingToShow())

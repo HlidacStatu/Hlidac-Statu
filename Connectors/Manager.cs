@@ -65,7 +65,6 @@ namespace HlidacStatu.Connectors
         public static string defaultIndexName_Sneplatne = "hlidacsmluvneplatne";
         public static string defaultIndexName_SAll = defaultIndexName + "," + defaultIndexName_Sneplatne;
 
-        public static string defaultIndexName_VerejneZakazky = "verejnezakazky";
         public static string defaultIndexName_VerejneZakazkyNew = "verejnezakazky_new";
         public static string defaultIndexName_ProfilZadavatele = "profilzadavatele";
         public static string defaultIndexName_VerejneZakazkyNaProfiluRaw = "verejnezakazkyprofilraw";
@@ -121,10 +120,8 @@ namespace HlidacStatu.Connectors
                 return;
             if (idxType.Value == IndexType.DataSource)
                 return;
-            var ret = client.Indices.Exists(client.ConnectionSettings.DefaultIndex);
-            if (ret.Exists == false) 
-                CreateIndex(client, idxType.Value);
-
+             
+            CreateIndex(client, idxType.Value);
         }
         public static void DeleteIndex()
         {
@@ -139,11 +136,6 @@ namespace HlidacStatu.Connectors
             return GetESClient(defaultIndexName_Sneplatne, timeOut, connectionLimit);
         }
         
-        [Obsolete(message: "Použij GetESClient_VerejneZakazkyAsync")]
-        public static ElasticClient GetESClient_VZ(int timeOut = 60000, int connectionLimit = 80)
-        {
-            return GetESClient(defaultIndexName_VerejneZakazky, timeOut, connectionLimit, IndexType.VerejneZakazky);
-        }
         public static ElasticClient GetESClient_VerejneZakazky(int timeOut = 60000, int connectionLimit = 80)
         {
             // workaround to get to the hidden index
@@ -151,11 +143,6 @@ namespace HlidacStatu.Connectors
             // return HackClientIndex(indexName, timeOut, connectionLimit);
             
             return GetESClient(defaultIndexName_VerejneZakazkyNew, timeOut, connectionLimit, IndexType.VerejneZakazky);
-        }
-        
-        public static ElasticClient GetESClient_VerejneZakazkyOld(int timeOut = 60000, int connectionLimit = 80)
-        {
-            return GetESClient(defaultIndexName_VerejneZakazky, timeOut, connectionLimit, IndexType.VerejneZakazky);
         }
         
         public static ElasticClient GetESClient_ProfilZadavatele(int timeOut = 60000, int connectionLimit = 80)
@@ -494,6 +481,16 @@ namespace HlidacStatu.Connectors
 
         public static void CreateIndex(ElasticClient client, IndexType idxTyp, bool withAlias = true)
         {
+            var aliasName = client.ConnectionSettings.DefaultIndex.ToLower();
+            var indexName = (withAlias ? $"hs-{aliasName}-01" : aliasName).ToLower();
+
+            //check if index already exists
+            var indexExist = client.Indices.Exists(indexName);
+            if (indexExist?.Exists == true)
+            {
+                return;
+            }
+                
             IndexSettings set = new IndexSettings();
             set.NumberOfReplicas = 1;
             set.NumberOfShards = 1;
@@ -513,8 +510,7 @@ namespace HlidacStatu.Connectors
             idxSt.Settings = set;
 
             CreateIndexResponse res = null;
-            var aliasName = client.ConnectionSettings.DefaultIndex.ToLower();
-            var indexName = (withAlias ? $"hs-{aliasName}-01" : aliasName).ToLower();
+            
             switch (idxTyp)
             {
                 case IndexType.VerejneZakazky:
