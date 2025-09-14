@@ -141,16 +141,26 @@
     <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,600,700&amp;subset=latin-ext" rel="stylesheet" />
     <link href="https://fonts.googleapis.com/css?family=Cabin:400,400i,600,700&amp;subset=latin-ext" rel="stylesheet" />
 
-    <link rel="stylesheet" href="~/css/bootstrap.min.css" />
+
+    <link rel="stylesheet" href="~/css/bootstrap.hlidac.min.css">
+    <link rel="stylesheet" href="~/css/bootstrap.hlidac.override.css">
+    <link rel="stylesheet" href="~/css/hlidac.css">
+    <link rel="stylesheet" href="~/css/site.css">
+
+    <link rel="stylesheet" href="~/Content/social-share-kit.css">
+
+    @* <link rel="stylesheet" href="~/content/bundled.css" /> *@
+
+
+
     <script src="~/js/bootstrap.bundle.min.js"></script>
-    <link rel="stylesheet" href="~/css/bootstrap-hs-modif.css" />
+
 
 
     <script src="https://kit.fontawesome.com/a0fc082c81.js" crossorigin="anonymous"></script>
 
     <script src="~/bundles/jquery"></script>
     <script src="~/bundles/scriptbundle"></script>
-    <link rel="stylesheet" href="~/content/bundled.css" />
     <script src="~/bundles/modernizr"></script>
 
     <script src="/scripts/autocomplete.1.0.0.js?upd=1.0.1"></script>
@@ -178,36 +188,11 @@
     <link href="/scripts/selectize/selectize.bootstrap5.css" rel="stylesheet" />
     <script src="/scripts/selectize/selectize.min.js"></script>
 
-    @*
-    <!-- Matomo -->
-    <script>
-        var _paq = window._paq = window._paq || [];
-        _paq.push(['alwaysUseSendBeacon']);
-        /* tracker methods like "setCustomDimension" should be called before "trackPageView" */
-        _paq.push(['trackPageView']);
-        _paq.push(['enableLinkTracking']);
-        (function () {
-            var u = "https://ma.hlidacstatu.cz/";
-            _paq.push(['setTrackerUrl', u + 'matomo.php']);
-            _paq.push(['setSiteId', '1']);
-        @if (this.User?.Identity?.IsAuthenticated == true)
-        {
-            <text>
-                    _paq.push(['setUserId', '@(this.User.Identity.Name)']);
-            </text>
-        }
-            var d = document, g = d.createElement('script'), s = d.getElementsByTagName('script')[0];
-            g.async = true; g.src = u + 'matomo.js'; s.parentNode.insertBefore(g, s);
-        })();
-    </script>
-    <!-- End Matomo Code -->
-    *@
-
     <!-- clarity -->
-    <script type="text/javascript">(function (c, l, a, r, i, t, y) { c[a] = c[a] || function () { (c[a].q = c[a].q || []).push(arguments) }; t = l.createElement(r); t.async = 1; t.src = "https://www.clarity.ms/tag/" + i; y = l.getElementsByTagName(r)[0]; y.parentNode.insertBefore(t, y); })(window, document, "clarity", "script", "nmktz4to6e");</script>
+    @* <script type="text/javascript">(function (c, l, a, r, i, t, y) { c[a] = c[a] || function () { (c[a].q = c[a].q || []).push(arguments) }; t = l.createElement(r); t.async = 1; t.src = "https://www.clarity.ms/tag/" + i; y = l.getElementsByTagName(r)[0]; y.parentNode.insertBefore(t, y); })(window, document, "clarity", "script", "nmktz4to6e");</script> *@
     <!-- /clarity -->
 
-    <link rel="stylesheet" href="/content/site.last.override.css" />
+    <link rel="stylesheet" href="/css/site.last.override.css" />
 
     <base href="@this.Context.Request.GetDisplayUrl()" />
 
@@ -218,7 +203,7 @@
     {
         <div class="alert alert-danger" role="alert" id="msgConfirmationEmailInfo">
             Nepotvrdil(a) jste nám e-mail použitý při registraci. Bez potvrzení není účet aktivní.
-            <a class="btn btn-hs btn-default" href="#" role="button" onclick="javascript:ResendConfirmationMail(this)">Odeslat potvrzovací link e-mailem</a>
+            <a class="btn btn-hs btn-secondary" href="#" role="button" onclick="javascript:ResendConfirmationMail(this)">Odeslat potvrzovací link e-mailem</a>
 
         </div>
     }
@@ -233,11 +218,11 @@
         {
             string[] hlasky = new string[]
             {
-    "Vše podstatné o organizaci prezidentských voleb!",
-    "Pomoc s žádostí o voličský průkaz",
-    "Prezidentské volby 2023",
-    "To nejdůležitější k lednovým volbám",
-    "Voličský průkaz snadno a rychle"
+        "Vše podstatné o organizaci prezidentských voleb!",
+        "Pomoc s žádostí o voličský průkaz",
+        "Prezidentské volby 2023",
+        "To nejdůležitější k lednovým volbám",
+        "Voličský průkaz snadno a rychle"
             };
 
             <div class="alert alert-dark adlinemsg" role="alert">
@@ -277,7 +262,7 @@
                     <div>Hlídač</div><div><strong>státu</strong></div>
                 </div>
             </a>
-            
+
             <button class="navbar-toggler collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#navbar-content">
                 <div class="hamburger-toggle">
                     <div class="hamburger">
@@ -294,64 +279,30 @@
                         <a class="nav-link active" aria-current="page" href="" onclick="return false;" style="visibility:hidden;cursor:pointer;">&nbsp;&nbsp;&nbsp;</a>
                     </li>
                     <li class="nav-item dropdown dropdown-mega position-static mainmenu">
-                        <a class="nav-link dropdown-toggle mainmenu" href="#" data-bs-toggle="dropdown" data-bs-auto-close="outside">Úřady<br />a úředníci</a>
-                        @* Urady a urednici megacontent *@
-                        <div class="dropdown-menu shadow">
-                            <cache expires-after="@Constants.CachedActionLength.Cache12H" enabled="@(!Html.IsDebug())">
-                                <partial name="MegaMenu/_urady" />
-                            </cache>
-                        </div>
+                        <a class="nav-link  mainmenu" href="https://platy.hlidacstatu.cz">Platy úředníků<br />a politiků</a>
                     </li>
                     <li class="nav-item dropdown dropdown-mega position-static mainmenu">
-                        <a class="nav-link dropdown-toggle mainmenu" href="#" data-bs-toggle="dropdown" data-bs-auto-close="outside">Firmy, sponzoři,<br />politické strany</a>
-                        <div class="dropdown-menu shadow">
-                            <cache expires-after="@Constants.CachedActionLength.Cache12H" enabled="@(!Html.IsDebug())">
-                                <partial name="MegaMenu/_firmy" />
-                            </cache>
-                        </div>
+                        <a class="nav-link  mainmenu" href="/menupage/urady">Úřady<br />a firmy</a>
                     </li>
                     <li class="nav-item dropdown dropdown-mega position-static mainmenu">
-                        <a class="nav-link dropdown-toggle mainmenu" href="#" data-bs-toggle="dropdown" data-bs-auto-close="outside">Smlouvy<br />se státem</a>
-                        @* Smlouvy megacontent *@
-                        <div class="dropdown-menu shadow">
-                        <cache expires-after="@Constants.CachedActionLength.Cache12H" enabled="@(!Html.IsDebug())">
-                            <partial name="MegaMenu/_smlouvy" />
-                        </cache>
-                        </div>
+                        <a class="nav-link  mainmenu" href="/menupage/smlouvy">Smlouvy<br />a zakázky</a>
                     </li>
                     <li class="nav-item dropdown dropdown-mega position-static mainmenu">
-                        <a class="nav-link dropdown-toggle mainmenu" href="#" data-bs-toggle="dropdown" data-bs-auto-close="outside">Veřejné<br />zakázky</a>
-                        @* Verejne zakazky megacontent *@
-                        <div class="dropdown-menu shadow">
-                        <cache expires-after="@Constants.CachedActionLength.Cache12H" enabled="@(!Html.IsDebug())">
-                            <partial name="MegaMenu/_verejnezakazky" />
-                        </cache>
-                        </div>
+                        <a class="nav-link  mainmenu" href="/dotace">Dotace</a>
                     </li>
                     <li class="nav-item dropdown dropdown-mega position-static mainmenu">
-                        <a class="nav-link dropdown-toggle mainmenu" href="#" data-bs-toggle="dropdown" data-bs-auto-close="outside"><span class="text-danger">Nové Dotace</span><br />a další</a>
-                        <div class="dropdown-menu shadow">
-                        <cache expires-after="@Constants.CachedActionLength.Cache12H" enabled="@(!Html.IsDebug())">
-                            <partial name="MegaMenu/_dalsi" />
-                        </cache>
-                        </div>
+                        <a class="nav-link  mainmenu" href="/menupage/firmy">Sponzoři<br />a politici</a>
                     </li>
                     <li class="nav-item dropdown dropdown-mega position-static mainmenu">
-                        <a class="nav-link dropdown-toggle mainmenu" href="#" data-bs-toggle="dropdown" data-bs-auto-close="outside">Vše o Hlídači<br /><i class="fas fa-heart" style="color:red" aria-hidden="true"></i> Podpořte nás</a>
-                        <div class="dropdown-menu shadow">
-                            <partial name="MegaMenu/_hlidac" />
-                        </div>
+                        <a class="nav-link  mainmenu" href="/menupage/další">Státní weby<br />a mnohem víc</a>
                     </li>
                 </ul>
                 <ul class="d-lg-none navbar-nav mr-auto mb-2 mb-lg-0 list-group">
                     <li class="nav-item list-group-item mainmenu fw-bold">
-                        <a href="/menupage/urady">Úřady a úředníci</a>
+                        <a class="nav-link  mainmenu" href="https://platy.hlidacstatu.cz">Platy úředníků<br />a politiků</a>
                     </li>
                     <li class="nav-item list-group-item mainmenu fw-bold">
-                        <a href="/menupage/firmy">
-                            Firmy, sponzoři,
-                            politické strany
-                        </a>
+                        <a href="/menupage/urady">Úřady a úředníci</a>
                     </li>
                     <li class="nav-item list-group-item mainmenu fw-bold">
                         <a href="/menupage/smlouvy">Smlouvy státu</a>
@@ -360,10 +311,18 @@
                         <a href="/menupage/verejnezakazky">Veřejné zakázky</a>
                     </li>
                     <li class="nav-item list-group-item mainmenu fw-bold">
-                        <a href="/menupage/dalsi"><span class="text-danger">Nové dotace</span> a další</a>
+                        <a href="/dotace">Dotace</a>
                     </li>
                     <li class="nav-item list-group-item mainmenu fw-bold">
-                        <a href="/menupage/hlidac">Vše o Hlídači</a>
+                        <a href="/menupage/firmy">
+                            Firmy, sponzoři,
+                            politické strany
+                        </a>
+                    </li>
+                    <li class="nav-item list-group-item mainmenu fw-bold">
+                        <a href="/menupage/další">
+                            Státní weby a mnohem víc
+                        </a>
                     </li>
                     <li class="nav-item list-group-item mainmenu bg-body-secondary">
 
@@ -422,22 +381,22 @@
                        alt="Všichni uložení hlídači" title="Všichni uložení hlídači"
                        onclick="_my_event('send', 'event', 'btnWatchDog', 'click', 'authenticated');" role="button"
                        class="btn btn-hs btn-warning btn-sm"
-                       style="margin-right: 0.5em;height: 2.5em;">
+                       style="margin-right: 0.5em;line-height: 1em;">
                         <i style="color:black;" class="fas fa-eye"></i>
                     </a>
 
-                    <a style="display:block;color:#c9302c;margin-right: 0.4em;position:relative;top:-7px;padding: 0;border: none;"
+                    <a style="display:block;color:#c9302c;margin-right: 0.4em;position:relative;top:5px;padding: 0;border: none;"
                        title="Všechny uložené záložky" alt="Všechny uložené záložky"
                        onclick="_my_event('send', 'event', 'bookmarkListBtn', 'click','@Context.Request.Path'); return true;"
                        href="/manage/zalozky" class="bookmark bookmarkOn btn btn-small">
                         <i class="fa-duotone fa-bookmark fa-lg"></i>
 
                     </a>
-                    <a style="display:block;margin-right: 0.5em;top:10px;position:relative" href="/Identity/Account/manage/"
+                    <a style="display:block;margin-right: 0.5em;position:relative" href="/Identity/Account/manage/"
                        onclick="_my_event('send', 'event', 'manageBtn', 'click','@Context.Request.Path'); return true;"
                        title="Nastavení účtu" alt="Nastavení účtu"><i class="fa-solid fa-user fa-xl"></i></a>
 
-                    <a style="display:block;top:10px;position:relative;font-weight:bolder"
+                    <a style="display:block;position:relative;font-weight:bolder"
                        onclick="_my_event('send', 'event', 'logoutBtn', 'click','@Context.Request.Path'); return true;"
                        href="/Identity/Account/Logout?rnd=@Guid.NewGuid().ToString("N")">Odhlásit</a>
                 }
@@ -479,23 +438,23 @@
             <div class="header__search">
                 <form class="header__search__input-wrapper old-search-input" id="old-search-input" method="get" style="visibility:visible">
                     <input value="@ViewBag.Query" id="Q" name="Q" type="text" class="header__search__input" placeholder="Smluvní strana, Název instituce, Jméno osoby, IČO, téma smlouvy …">
-                    <input type="hidden" name="u" value="2"/> 
-                    <button class="header__search__btn" formaction="/hledat">Hledat</button>
+                    <input type="hidden" name="u" value="2" />
+                    <button class="btn btn-hs btn-primary header__search__btn" formaction="/hledat">Hledat</button>
                 </form>
-                
+
                 <div id="new-search-input" class="new-search-input">
-                    <partial name="_AutocompletePartialJs"/>
+                    <partial name="_AutocompletePartialJs" />
                 </div>
 
 
                 <div>
                     <button class="header__search__hint btn btn-link new-search-input" style="margin-right: 5px; text-decoration: none; padding-top: 2px; font-size: 15px;color:#FFBF66">
-                        <i class="fas fa-blind"></i> Přepnout na vyhledávání bez našeptávače
+                        <i class="fa-solid fa-typewriter"></i> Přepnout na vyhledávání bez našeptávače
                     </button>
                     <button class="header__search__hint btn btn-link old-search-input" style="margin-right: 5px; text-decoration: none; padding-top: 2px; font-size: 15px;color:#FFBF66">
-                        <i class="fas fa-baby"></i> Přepnout na vyhledávání s našeptávačem
+                        <i class="fa-solid fa-wand-sparkles"></i> Přepnout na vyhledávání s našeptávačem
                     </button>
-                    <a class="header__search__hint" style="padding-top:2px;font-size:15px;text-decoration:none;" href="/napoveda">
+                    <a target="_blank" class="header__search__hint" style="padding-top:2px;font-size:15px;text-decoration:none;" href="/napoveda">
                         <i class="fa-regular fa-question-square" style=""></i> Nápověda jak vyhledávat
                     </a>
                     <a class="header__search__hint float-end" style="padding-top:2px;font-size:15px;text-decoration:none;" href="/snadnehledani">
@@ -516,10 +475,10 @@
         }
 
         @if (
-        !(ViewBag.HideTitle == true)
-        &&
-        !string.IsNullOrEmpty((string)ViewBag.Title)
-        )
+                !(ViewBag.HideTitle == true)
+                &&
+                !string.IsNullOrEmpty((string)ViewBag.Title)
+                )
         {
             <div class="row">
                 <div class="col-xs-12">
@@ -578,10 +537,10 @@
                             Uložení záložky je snadné, stačí kliknout na ikonu  <a style="font-size:120%" href="#" class="bookmark bookmarkOff" onclick="javascript:return false;"></a>.
                             Pokud už je konkrétní záložka vytvořená, pak je vybarvena červeně <a style="font-size:120%" href="#" class="bookmark bookmarkOn" onclick="javascript:return false;"></a>.
                         </p>
-                        <p>Abychom ale vědeli, komu jaké záložky patří, <a href="/Identity/Account/login" class="btn btn-hs btn-default">musíte se zalogovat</a>.</p>
+                        <p>Abychom ale vědeli, komu jaké záložky patří, <a href="/Identity/Account/login" class="btn btn-hs btn-secondary">musíte se zalogovat</a>.</p>
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-hs btn-default" data-bs-dismiss="modal">Zavřít</button>
+                        <button type="button" class="btn btn-hs btn-secondary" data-bs-dismiss="modal">Zavřít</button>
                     </div>
                 </div><!-- /.modal-content -->
             </div><!-- /.modal-dialog -->
@@ -608,10 +567,10 @@
                         <p>
                             @Html.Raw(anonbody)
                         </p>
-                        <p>Pokud jste již zaregistrováni, <a id="VZInfoAnonLogin" href="/Identity/Account/login?returnUrl=" class="btn btn-hs btn-default">zalogujte se</a>. </p>
+                        <p>Pokud jste již zaregistrováni, <a id="VZInfoAnonLogin" href="/Identity/Account/login?returnUrl=" class="btn btn-hs btn-secondary">zalogujte se</a>. </p>
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-hs btn-default" data-bs-dismiss="modal">Zavřít</button>
+                        <button type="button" class="btn btn-hs btn-secondary" data-bs-dismiss="modal">Zavřít</button>
                         <a id="VZInfoAnonRegister" onclick="_my_event('send', 'event', 'registerBtn', 'click','@Context.Request.Path#VZPristupOmezen'); return true;" href="/Identity/account/Register?returnUrl=" class="btn btn-hs btn-primary">Zaregistrovat se</a>
                     </div>
                 </div><!-- /.modal-content -->
@@ -633,18 +592,18 @@
             string[] colors = new[] { "primary", "success", "danger", "warning", "info", "dark" };
             string[] txts = new[]
             {
-    "Analýza <b>obvyklých cenových relacích za ICT služby</b>. Unikátní analýza opět ke stažení.",
-    "Cenové analýzy Hlídače státu: <b>unikátní nástroj</b> pro státní správu i dodavatele.",
-    "Detailní přehled obvyklých cen za služby v ICT oblasti <b>aktuálně k dispozici</b>.",
-    "Kdo, s kým a za kolik v IT? My to víme a <b>nyní můžete i vy</b>!",
-    "Navazujeme na přehled obvyklých cen ICT prací od Ministerstva vnitra: analýza cen ICT služeb a prací.",
-    "Přehled obvyklých cen IT prací. <b>Chcete znát ceny vašich konkurentů na trhu?</b>",
-    "Nejrozsáhlejší a nejspolehlivější analýza jednotkových cen ICT prací na českém trhu.",
-    "Pomoc úřadům i dodavatelům ve výběrových řízeních - Přehled obvyklých cen ICT prací.",
-    "Přehled a rozptyl jednotkových cen ICT služeb je na českém trhu.",
-    "Přehled obvyklých cen IT prací ve státní správě. <b>Jistota při zadávání veřejných zakázek.</b>",
-    "Přehled obvyklých cen IT prací. <b>Znáte ceny vašich konkurentů?</b> My ano. Můžete i vy!",
-    };
+        "Analýza <b>obvyklých cenových relacích za ICT služby</b>. Unikátní analýza opět ke stažení.",
+        "Cenové analýzy Hlídače státu: <b>unikátní nástroj</b> pro státní správu i dodavatele.",
+        "Detailní přehled obvyklých cen za služby v ICT oblasti <b>aktuálně k dispozici</b>.",
+        "Kdo, s kým a za kolik v IT? My to víme a <b>nyní můžete i vy</b>!",
+        "Navazujeme na přehled obvyklých cen ICT prací od Ministerstva vnitra: analýza cen ICT služeb a prací.",
+        "Přehled obvyklých cen IT prací. <b>Chcete znát ceny vašich konkurentů na trhu?</b>",
+        "Nejrozsáhlejší a nejspolehlivější analýza jednotkových cen ICT prací na českém trhu.",
+        "Pomoc úřadům i dodavatelům ve výběrových řízeních - Přehled obvyklých cen ICT prací.",
+        "Přehled a rozptyl jednotkových cen ICT služeb je na českém trhu.",
+        "Přehled obvyklých cen IT prací ve státní správě. <b>Jistota při zadávání veřejných zakázek.</b>",
+        "Přehled obvyklých cen IT prací. <b>Znáte ceny vašich konkurentů?</b> My ano. Můžete i vy!",
+        };
             int tipIndex = 0;
             string tipTxt = txts.TipOfTheDay(out tipIndex);
 

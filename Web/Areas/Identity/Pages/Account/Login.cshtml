@@ -3,10 +3,19 @@
 @model LoginModel
 
 @{
-    ViewData["Title"] = "Přihlášení";
+    ViewBag.Title = "Přihlášení";
+}
+@section breadcrumb
+{
+    <ol class="breadcrumb">
+        <li>
+            <a href="/">Hlídač Státu</a>
+        </li>
+        <li>@ViewBag.Title</li>
+    </ol>
 }
 
-<h1>@ViewData["Title"]</h1>
+<h1>@ViewBag.Title</h1>
 
 <div class="row">
     <div class="col-sm-12">

@@ -51,7 +51,7 @@ namespace HlidacStatu.Web.Framework
             string? btnCss = null)
         {
             return new HtmlString(
-                $@"<a class=""{btnCss ?? "btn btn-default btn-xs"}"" href=""{GetSearchUrl(url, query)}"">
+                $@"<a class=""{btnCss ?? "btn btn-secondary btn-xs"}"" href=""{GetSearchUrl(url, query)}"">
                 <span class=""fad fa-search dark"" aria-hidden=""true""></span>{btnText}</a>");
         }
 

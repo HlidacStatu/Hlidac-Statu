@@ -9,6 +9,11 @@
     }
 }
 
+@if (IsSectionDefined("breadcrumb"))
+{
+    @RenderSection("breadcrumb", required: false)
+}
+
 <h2>Správa účtu</h2>
 
 <div>

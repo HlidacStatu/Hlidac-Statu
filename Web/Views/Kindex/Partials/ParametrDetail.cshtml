@@ -44,7 +44,7 @@
         }
         @if (pocetSmluv > 0)
         {
-            <a class="btn btn-hs btn-default" href="/hledatsmlouvy?q=@System.Net.WebUtility.UrlEncode(Model.CurrYear.Info(Model.Part).Query())">
+            <a class="btn btn-hs btn-secondary" href="/hledatsmlouvy?q=@System.Net.WebUtility.UrlEncode(Model.CurrYear.Info(Model.Part).Query())">
                 <i class="far fa-file-search"></i> Vyhledat odpovídající smlouvy
             </a>
         }

@@ -78,7 +78,7 @@ overflow: hidden;height: 75px;border: 1px solid #ccd6dd;resize: none;
                 </div>
             </div>
             <div class=""modal-footer"">
-                <button type=""button"" class=""btn btn-default"" data-bs-dismiss=""modal"">Zavřít</button>
+                <button type=""button"" class=""btn btn-secondary"" data-bs-dismiss=""modal"">Zavřít</button>
             </div>
         </div>
     </div>

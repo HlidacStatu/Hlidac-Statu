@@ -36,7 +36,7 @@
     <div class="container-fluid">
         <div class="row">
             <div class="col-12 col-md-4 py-4 bg-body-tertiary">
-                <div class="mega-content-title"><a onclick="return trackOutLink(this,'megamenu');" href="/verejnezakazky">Veřejné zakázky</a></div>
+                <h3><a onclick="return trackOutLink(this,'megamenu');" href="/verejnezakazky">Veřejné zakázky</a></h3>
                 <p>
                     Každý subjekt (úřad, škola, nemocnice atp.), kterého se týká zákon o zadávání veřejných zakázek
                     (<a onclick="return trackOutLink(this,'megamenu');" href="https://www.zakonyprolidi.cz/cs/2016-134" target="_blank">zákon 134/2016</a>)
@@ -50,7 +50,7 @@
                 </p>
             </div>
             <div class="col-12 col-md-4 py-4">
-                <div class="mega-content-title">Zakázky podle oborů</div>
+                <h3>Zakázky podle oborů</h3>
                 <ul class="list-group">
                     @foreach (var obl in vzList.Take(10))
                     {
@@ -67,7 +67,8 @@
                 </ul>
             </div>
             <div class="col-12 col-md-4 py-4 bg-body-tertiary">
-                <div class="mega-content-title">Zakázky podle zadavatelů</div>
+                <h3>Zakázky podle zadavatelů</h3>
+            
                 <ul class="list-group">
                     <li class="list-group-item d-flex justify-content-between align-items-start">
                         <div class="ms-2 me-auto">

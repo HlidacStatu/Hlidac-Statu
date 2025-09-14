@@ -3,7 +3,7 @@
 @using Microsoft.AspNetCore.Mvc.TagHelpers
 @model HlidacStatu.Repositories.Searching.DotaceSearchResult
 
-<table class="table table-hover">
+<table class="table table-hover table-sm">
     <thead>
     <tr>
         <th></th>
@@ -39,12 +39,16 @@
             </td>
             <td>
                 @(await Html.KIndexLabelLinkAsync(dotaceItem.Recipient.Ico))
-                 @if (dotaceItem.Recipient.Ico is not null && dotaceItem.Recipient.Ico != "00000000")
+                 @if (HlidacStatu.Util.DataValidators.CheckCZICO(dotaceItem.Recipient.Ico))
                 {
                     <a href="/subjekt/@dotaceItem.Recipient.Ico" title="Informace o subjektu">
                         @Devmasters.TextUtil.ShortenText(dotaceItem.Recipient.DisplayName, 40)
-                    </a>
-                }
+                        </a>
+                    }
+                    else
+                    {
+                        <span>@Devmasters.TextUtil.ShortenText(dotaceItem.Recipient.DisplayName, 40)</span>
+                    }
             </td>
             <td class="d-none d-sm-table-cell d-md-table-cell d-lg-table-cell d-xl-table-cell d-xxl-table-cell">
                     <a href="/subjekt/@dotaceItem.SubsidyProviderIco" title="Poskytovatel dotace">

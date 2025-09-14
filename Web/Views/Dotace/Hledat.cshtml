@@ -2,7 +2,7 @@
 @{
 
     ViewBag.Title = "Hlídač Dotací: Hledání";
-    ViewBag.SubTitle = Model?.Q;
+    ViewBag.TxtQuery = Model?.Q;
 
     ViewBag.ShowBookmarkUrl = true;
 }
@@ -13,10 +13,12 @@
     <ol class="breadcrumb">
         <li><a href="/">Hlídač Státu</a></li>
         <li><a href="@Url.Action("Index","Dotace")">Hlídač Dotací</a></li>
-        <li>@ViewBag.SubTitle</li>
+        <li>@ViewBag.TxtQuery</li>
     </ol>
 }
 <partial name="_SearchForm" model="@Model" />
+
+<p>Vyhledávaný dotaz: <mark>@ViewBag.TxtQuery</mark></p>
 
 <partial name="_SearchResult" model="@Model" />
 

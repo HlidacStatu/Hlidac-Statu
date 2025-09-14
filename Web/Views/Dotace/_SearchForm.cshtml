@@ -9,13 +9,13 @@
         <form method="get" class="d-flex w-100">
             <input value="@ViewBag.Query" id="Q" name="Q" type="text" class="header__search__input d-flex w-100" placeholder='Napište vyhledávaný výraz nebo stiskněte tlačítko "Hledat"'>
             <input type="hidden" name="u" value="2"/>
-            <button formaction="/dotace/hledat" class="btn btn-hs btn-primary" style="margin-bottom:0;margin-top:0;padding-bottom:0">Hledat</button>
+            <button formaction="/dotace/hledat" class="btn btn-hs btn-primary" >Hledat</button>
         </form>
     </div>
     
     <div class="hlidac-autocomplete d-flex" id="dotace-ac-new">
         <select id="autocomplete-dotace" autocomplete="off" placeholder='Napište vyhledávaný výraz nebo stiskněte tlačítko "Hledat"'></select>
-        <button id="sendDotaceQuery" class="btn btn-hs btn-primary" style="margin-bottom:0;margin-top:0;padding-bottom:0">Hledat
+        <button id="sendDotaceQuery" class="btn btn-hs btn-primary" >Hledat
             <span id="searchSpiner" style="display: none" class="spinner-border spinner-border-sm text-light align-middle mb-1 ms-1" role="status">
                 <span class="visually-hidden">Loading...</span>
             </span>
@@ -24,10 +24,10 @@
 
     <div>
         <button class="header__search__hint btn btn-link dotace-ac-new" style="margin-right: 5px; text-decoration: none; padding-top: 0px; font-size: 15px; border: none !important">
-            <i class="fas fa-blind"></i> Přepnout na vyhledávání bez našeptávače
+            <i class="fa-solid fa-typewriter"></i> Přepnout na vyhledávání bez našeptávače
         </button>
         <button class="header__search__hint btn btn-link dotace-ac-old" style="margin-right: 5px; text-decoration: none; padding-top: 0px; font-size: 15px; border: none !important">
-            <i class="fas fa-baby"></i> Přepnout na vyhledávání s našeptávačem
+            <i class="fa-solid fa-wand-sparkles"></i> Přepnout na vyhledávání s našeptávačem
         </button>
     </div>
     

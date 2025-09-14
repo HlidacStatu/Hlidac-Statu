@@ -1,9 +1,20 @@
 @page
 @model IndexModel
 @{
-    ViewData["Title"] = "Profil";
+    ViewData["Title"] = "Profil uživatele";
     ViewData["ActivePage"] = ManageNavPages.Index;
 }
+@section breadcrumb
+{
+    <ol class="breadcrumb">
+        <li>
+            <a href="/">Hlídač Státu</a>
+        </li>
+
+        <li>@ViewBag.Title</li>
+    </ol>
+}
+
 
 <h4>@ViewData["Title"]</h4>
 <partial name="_StatusMessage" model="Model.StatusMessage" />

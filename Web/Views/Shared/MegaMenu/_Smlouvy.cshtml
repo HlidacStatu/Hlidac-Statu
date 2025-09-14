@@ -1,27 +1,9 @@
-﻿<div class="mega-content px-4">
+﻿@using HlidacStatu.Repositories
+<div class="mega-content px-4">
     <div class="container-fluid">
         <div class="row">
-            <div class="col-12 col-md-4 py-4 bg-body-tertiary">
-                <div class="mega-content-title"><a onclick="return trackOutLink(this,'megamenu');" href="/smlouvy">Registr smluv</a></div>
-                <p>
-                    Smlouvy státu se evidují v registru smluv. Do registru smluv mají za povinnost dle zákona <a onclick="return trackOutLink(this,'megamenu');" href="https://www.zakonyprolidi.cz/cs/2015-340" target="_blank">č. 340/2015 Sb</a>
-                    všechny úřady, státní organizace, samospráva, státní podniky a školy vkládat smlouvy s hodnotou vyšší než 50 000 Kč.
-                </p>
-                <p>
-                    Všechny smlouvy z registru smluv evidujeme, analyzujeme, kontrolujeme, doplňujeme o důležité poznatky a statistické informace.
-                </p>
-                <div class="mega-content-subtitle">Rady pro uživatele Registru smluv</div>
-                <p>
-                    <ul>
-                        <li><a onclick="return trackOutLink(this,'megamenu');" href="https://texty.hlidacstatu.cz/faq-registr-smluv/" target="_blank">Otázky a odpovědi k Registru smluv</a></li>
-                        <li><a onclick="return trackOutLink(this,'megamenu');" href="https://texty.hlidacstatu.cz/strojove-citelny-format/" target="_blank">Strojově čitelný formát</a></li>
-                        <li><a onclick="return trackOutLink(this,'megamenu');" href="https://texty.hlidacstatu.cz/k-index-manual-dobre-praxe/" target="_blank">Manuál dobré praxe</a></li>
-                        <li><a onclick="return trackOutLink(this,'megamenu');" href="https://texty.hlidacstatu.cz/k-index-otazky-a-odpovedi/" target="_blank">Otázky a odpovědi ke K-indexu</a></li>
-                    </ul>
-                </p>
-            </div>
-            <div class="col-12 col-md-4 py-4">
-                <div class="mega-content-title">Statistiky smluv</div>
+            <div class="col-12 col-md-4 py-4  bg-body-tertiary">
+                <h3>Statistiky smluv</h3>
                 <ul class="list-group">
                     <li class="list-group-item d-flex justify-content-between align-items-start">
                         <div class="ms-2 me-auto">
@@ -81,8 +63,9 @@
 
                 </ul>
             </div>
-            <div class="col-12 col-md-4 py-4 bg-body-tertiary">
-                <div class="mega-content-title">Speciální reporty</div>
+            <div class="col-12 col-md-4 py-4">
+                <h3>Registr smluv</h3>
+                <h4>Speciální reporty</h4>
                 <div class="mega-content-subtitle">Smlouvy uveřejněné konkrétní den</div>
                 <p>
                     <link href="/scripts/zabuto_calendar.min.css" rel="stylesheet" />
@@ -133,6 +116,50 @@
                 </p>
                 -->
             </div>
-        </div>
+            <div class="col-12 col-md-4 py-4 bg-body-tertiary">
+                @{
+                    var vzList = Devmasters.Enums.EnumTools.EnumToEnumerable(typeof(VerejnaZakazkaRepo.Searching.CPVSkupiny))
+                    .Select(m => new
+                    {
+                        id = m.Id,
+                        name = m.Name,
+                        count = VerejnaZakazkaRepo.Searching.CachedSimpleSearch(TimeSpan.FromHours(6),
+                    new HlidacStatu.Repositories.Searching.VerejnaZakazkaSearchData()
+                    {
+                        Q = "zverejneno:[" + DateTime.Now.Date.AddMonths(-12).ToString("yyyy-MM-dd") + " TO *]",
+                        //Q = "*",
+                        Oblast = m.Id.ToString(),
+                        Page = 0,
+                        PageSize = 0,
+                        ExactNumOfResults = true
+                    }
+                    ).Total
+                    })
+                    .Where(m => m.count > 0)
+                    .OrderByDescending(o => o.count)
+                    .ThenBy(o => o.name)
+                    .ToArray()
+                    ;
+                    int vzOblCount = Devmasters.Enums.EnumTools.EnumToEnumerable(typeof(VerejnaZakazkaRepo.Searching.CPVSkupiny)).Count;
+                    long vzCountSum = vzList.Sum(m => m.count);
+                    long vzCount = 0;
+                }
+                <h3>Veřejné Zakázky</h3>
+                <h4>Hlavní oblasti</h4>
+                <ul class="list-group">
+                    @foreach (var obl in vzList.Take(10))
+                    {
+                        vzCount = vzCount + obl.count;
+
+                        <li class="list-group-item">
+                            <a onclick="return trackOutLink(this,'megamenu');" href="/verejnezakazky/hledat?q=&oblast=@VerejnaZakazkaRepo.Searching.NormalizeOblastValue(obl.id.ToString())&order=1">@obl.name</a>
+                        </li>
+                    }
+                    <li class="list-group-item">
+                        <b><a onclick="return trackOutLink(this,'megamenu');" href="/verejnezakazky/">Všechny obory veřejných zakázek</a></b>
+                    </li>
+
+                </ul>
+            </div>
     </div>
 </div>

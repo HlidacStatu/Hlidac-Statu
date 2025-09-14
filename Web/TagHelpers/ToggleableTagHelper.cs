@@ -54,7 +54,7 @@ namespace HlidacStatu.Web.TagHelpers
             sb.AppendLine(@"<div class='tab-buttons'>");
             foreach (var item in toggleableContent)
             {
-                sb.AppendLine($"<div class='btn btn-default {(item.Num == 0 ? "btn-primary" : "" )}' data-tab='tab{item.Num}' ");
+                sb.AppendLine($"<div class='btn btn-secondary {(item.Num == 0 ? "btn-primary" : "" )}' data-tab='tab{item.Num}' ");
                 sb.AppendLine($" style='border-top-right-radius: 0px; border-bottom-right-radius: 0px;'>");
                 sb.AppendLine(item.ButtonText);
                 sb.AppendLine($"</div>");

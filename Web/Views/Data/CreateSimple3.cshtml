@@ -50,7 +50,7 @@
             <p>
                 <a class="btn btn-hs btn-success" href="@Url.Action("importdata",new { id = Model.DatasetId })">Nahrát nová data do datasetu</a>
                 <a class="btn btn-hs btn-primary" href="@Url.Action("manage",new { id = Model.DatasetId })">Spravovat dataset</a>
-                <a class="btn btn-hs btn-default" href="/">Zpět na titulku</a>
+                <a class="btn btn-hs btn-secondary" href="/">Zpět na titulku</a>
             </p>
 
         }
@@ -64,7 +64,7 @@
             <p>
                 <a class="btn btn-hs btn-success" href="@Url.Action("importdata",new { id = Model.DatasetId, fileid= Model.FileId, delimiter=Model.Delimiter })">Nahrát @Devmasters.Lang.CS.Plural.Get(Model.NumOfRows, "jeden záznam", "{0} záznamy", "{0} záznamů") nyní</a>
                 <a class="btn btn-hs btn-primary" href="@Url.Action("manage",new { id = Model.DatasetId })">Spravovat dataset</a>
-                <a class="btn btn-hs btn-default" href="/">Zpět na titulku</a>
+                <a class="btn btn-hs btn-secondary" href="/">Zpět na titulku</a>
             </p>
         }
     </div>

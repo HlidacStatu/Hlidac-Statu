@@ -536,9 +536,9 @@ namespace HlidacStatu.Lib.Web.UI
                         'lengthChange': false,
                         'info': false,
                         }",
-            string customTableHeader = null)
+            string customTableHeader = null, bool smallTable = false)
         {
-            var tblHtml = renderDataToHTMLTable(rds, tableId, dataTableOptions, customTableHeader);
+            var tblHtml = renderDataToHTMLTable(rds, tableId, dataTableOptions, customTableHeader, smallTable);
             return htmlHelper.Raw(tblHtml);
         }
         public static IHtmlContent DataToHTMLTable<T>(
@@ -552,9 +552,9 @@ namespace HlidacStatu.Lib.Web.UI
                         'lengthChange': false,
                         'info': false,
                         }",
-         string customTableHeader = null)
+         string customTableHeader = null, bool smallTable = false)
         {
-            var tblHtml = renderDataToHTMLTable(rds, tableId, dataTableOptions, customTableHeader);
+            var tblHtml = renderDataToHTMLTable(rds, tableId, dataTableOptions, customTableHeader, smallTable);
             return new HtmlString(tblHtml);
         }
 
@@ -569,7 +569,7 @@ namespace HlidacStatu.Lib.Web.UI
                         'lengthChange': false,
                         'info': false,
                         }",
-          string customTableHeader = null)
+          string customTableHeader = null, bool smallTable = false)
         {
             string _tableId = tableId;
             if (string.IsNullOrEmpty(tableId))
@@ -596,7 +596,7 @@ $(document).ready(function () {
             {
                 sb.AppendFormat("<h3>{0}</h3>", rds?.Title ?? "");
             }
-            sb.AppendFormat("<table id=\"{0}\" class=\"table-sorted table table-bordered table-striped\">", _tableId);
+            sb.AppendFormat($"<table id=\"{0}\" class=\"table-sorted table {(smallTable ? "table-sm" : "")} table-bordered table-striped\">", _tableId);
             if (customTableHeader == null)
             {
                 sb.Append("<thead><tr>");

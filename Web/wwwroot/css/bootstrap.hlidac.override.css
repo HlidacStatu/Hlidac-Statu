@@ -1,0 +1,86 @@
+/* ------------ BOOTSTRAP OVERRIDE ==================== */
+
+
+/*    TODO CHECK */
+.card.card-body {
+    display: inline-block;
+}
+
+.btn {
+    border-radius: 4px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    white-space: normal;
+}
+
+.text-bg-danger {
+    color: #fff !important;
+    background-color: var(--bs-danger) !important;
+}
+
+@media (min-width: 992px) {
+    .btn {
+        white-space: nowrap;
+    }
+}
+
+.table {
+    font-size: 90%;
+}
+
+
+
+
+.nav-tabs > li.active > a, .nav-tabs > li.active > a:hover, .nav-tabs > li.active > a:focus {
+    font-weight: 600;
+}
+
+/* horizontal tabs with border */
+.nav-tabs.border > li > a {
+    color: #555;
+    background-color: #fbfbfb;
+    border: 1px solid #ddd;
+    border-bottom-color: transparent;
+    font-size: 16px;
+    font-weight: bold;
+}
+
+.nav-tabs.border > li.active > a, .nav-tabs.border > li.active > a:hover, .nav-tabs.border > li.active > a:focus {
+    color: #000;
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-bottom-color: transparent;
+}
+
+kbd {
+    padding: 0.1rem .3rem;
+}
+
+pre {
+    display: block;
+    padding: 9.5px;
+    margin: 0 0 10px;
+    line-height: 1.42857143;
+    color: #333;
+    word-break: break-all;
+    word-wrap: break-word;
+    background-color: #f5f5f5;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+blockquote {
+    padding: 10px 20px;
+    border-left: 5px solid #eee;
+}
+
+hr {
+    background-color: unset;
+    opacity: 1;
+}
+/* TODO */
+a.badge:hover {
+    color: #0d6efd !important;
+}
+/* ------------ BOOTSTRAP OVERRIDE ==================== */
