@@ -588,3 +588,129 @@ $(document).ready(function () {
 
 });
 // end of search functions
+
+
+
+/*!
+* Color mode toggler for Bootstrap's docs (https://getbootstrap.com/)
+* Copyright 2011-2025 The Bootstrap Authors
+* Licensed under the Creative Commons Attribution 3.0 Unported License.
+*/
+// → Hlavička souboru s informací o autorovi a licenci
+
+(() => {
+    'use strict'
+    // → Okamžitě volaná funkce (IIFE), aby kód neunikl do globálního scope.
+    // → 'use strict' zapíná striktní režim – lepší kontrola chyb a bezpečnější kód.
+
+    const getStoredTheme = () => localStorage.getItem('theme')
+    // → Funkce vrací uloženou hodnotu motivu (light/dark/auto) z localStorage.
+
+    const setStoredTheme = theme => localStorage.setItem('theme', theme)
+    // → Funkce uloží vybraný motiv do localStorage pod klíčem "theme".
+
+    const getPreferredTheme = () => {
+        const storedTheme = getStoredTheme()
+        if (storedTheme) {
+            return storedTheme
+        }
+        // → Pokud je v localStorage uložen motiv, vrátí se ten.
+
+        return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
+        // → Jinak se použije systémové nastavení: pokud má uživatel rád dark mode, vrátí 'dark', jinak 'light'.
+    }
+
+    const setTheme = theme => {
+        if (theme === 'auto') {
+            // → Pokud uživatel zvolí "auto", nastavíme motiv podle aktuálního systémového nastavení.
+            document.documentElement.setAttribute(
+                'data-bs-theme',
+                (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light')
+            )
+        } else {
+            // → Jinak nastavíme explicitně motiv (light/dark).
+            document.documentElement.setAttribute('data-bs-theme', theme)
+        }
+    }
+
+    //setTheme(getPreferredTheme())
+    // → Při načtení stránky se nastaví aktuální motiv (buď uložený, nebo podle systému).
+
+    const showActiveTheme = (theme, focus = false) => {
+        const themeSwitcher = document.querySelector('#bd-theme')
+        // → Najde hlavní přepínač motivu podle ID.
+
+        if (!themeSwitcher) {
+            return
+        }
+        // → Pokud přepínač neexistuje, ukončí funkci.
+
+        const themeSwitcherText = document.querySelector('#bd-theme-text')
+        // → Element s textem tlačítka přepínače.
+
+        const activeThemeIcon = document.querySelector('.theme-icon-active use')
+        // → SVG ikona, která zobrazuje aktuální motiv.
+
+        const btnToActive = document.querySelector(`[data-bs-theme-value="${theme}"]`)
+        // → Najde tlačítko odpovídající zvolenému motivu.
+
+        const svgOfActiveBtn = btnToActive.querySelector('svg use').getAttribute('href')
+        // → Najde ikonu (SVG <use>) patřící k tomuto tlačítku.
+
+        document.querySelectorAll('[data-bs-theme-value]').forEach(element => {
+            element.classList.remove('active')
+            element.setAttribute('aria-pressed', 'false')
+        })
+        // → Všem tlačítkům motivů odebere aktivní stav.
+
+        btnToActive.classList.add('active')
+        btnToActive.setAttribute('aria-pressed', 'true')
+        // → Aktivovanému tlačítku přidá třídu "active" a nastaví ARIA stav na "true".
+
+        activeThemeIcon.setAttribute('href', svgOfActiveBtn)
+        // → Nastaví hlavní ikonu podle zvoleného tlačítka.
+
+        const themeSwitcherLabel = `${themeSwitcherText.textContent} (${btnToActive.dataset.bsThemeValue})`
+        themeSwitcher.setAttribute('aria-label', themeSwitcherLabel)
+        // → Aktualizuje ARIA popis přepínače, aby byl přístupnější (screenreadery).
+
+        if (focus) {
+            themeSwitcher.focus()
+        }
+        // → Pokud parametr focus = true, přepínač dostane focus.
+    }
+
+    //window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
+    //    const storedTheme = getStoredTheme()
+    //    if (storedTheme !== 'light' && storedTheme !== 'dark') {
+    //        setTheme(getPreferredTheme())
+    //    }
+    //})
+    // → Sleduje změnu systémového nastavení dark/light.
+    // → Pokud uživatel nemá ručně nastavený motiv, změní motiv podle systému.
+
+    if (false) {
+        window.addEventListener('DOMContentLoaded', () => {
+            showActiveTheme(getPreferredTheme())
+            // → Po načtení DOM se zobrazí správný motiv na přepínači.
+
+            document.querySelectorAll('[data-bs-theme-value]')
+                .forEach(toggle => {
+                    toggle.addEventListener('click', () => {
+                        const theme = toggle.getAttribute('data-bs-theme-value')
+                        // → Zjistí, jaký motiv bylo vybráno kliknutím.
+
+                        setStoredTheme(theme)
+                        // → Uloží ho do localStorage.
+
+                        setTheme(theme)
+                        // → Nastaví ho na dokumentu.
+
+                        showActiveTheme(theme, true)
+                        // → Zobrazí ho jako aktivní a dá focus na přepínač.
+                    })
+                })
+        });
+    }
+})()
+// → Okamžitě se spustí definovaná funkce (IIFE).
