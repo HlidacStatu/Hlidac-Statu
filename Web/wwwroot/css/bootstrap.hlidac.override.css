@@ -1,6 +1,11 @@
 /* ------------ BOOTSTRAP OVERRIDE ==================== */
 
 
+.btn.btn-sm .badge {
+    font-size: calc(var(--bs-body-font-size) * 0.75, 1em);
+}
+
+
 /*    TODO CHECK */
 .card.card-body {
     display: inline-block;
@@ -15,7 +20,7 @@
 }
 
 .text-bg-danger {
-    color: #fff !important;
+    color: var(--bs-white) !important;
     background-color: var(--bs-danger) !important;
 }
 
@@ -38,18 +43,18 @@
 
 /* horizontal tabs with border */
 .nav-tabs.border > li > a {
-    color: #555;
-    background-color: #fbfbfb;
-    border: 1px solid #ddd;
+    color: var(--bs-link-color);
+    background-color: var(--bs-tertiary-bg);
+    border: 1px solid var(--bs-border-color);
     border-bottom-color: transparent;
     font-size: 16px;
     font-weight: bold;
 }
 
 .nav-tabs.border > li.active > a, .nav-tabs.border > li.active > a:hover, .nav-tabs.border > li.active > a:focus {
-    color: #000;
-    background-color: #fff;
-    border: 1px solid #ddd;
+    color: var(--bs-black);
+    background-color: var(--bs-white);
+    border: 1px solid var(--bs-border-color);
     border-bottom-color: transparent;
 }
 
@@ -62,17 +67,17 @@ pre {
     padding: 9.5px;
     margin: 0 0 10px;
     line-height: 1.42857143;
-    color: #333;
+    color: var(--bs-gray-dark);
     word-break: break-all;
     word-wrap: break-word;
-    background-color: #f5f5f5;
-    border: 1px solid #ccc;
+    background-color: var(--bs-tertiary-bg);
+    border: 1px solid var(--bs-border-color);
     border-radius: 4px;
 }
 
 blockquote {
     padding: 10px 20px;
-    border-left: 5px solid #eee;
+    border-left: 5px solid var(--bs-border-color);
 }
 
 hr {
@@ -81,6 +86,6 @@ hr {
 }
 /* TODO */
 a.badge:hover {
-    color: #0d6efd !important;
+    opacity: 0.8;
 }
 /* ------------ BOOTSTRAP OVERRIDE ==================== */
