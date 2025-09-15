@@ -2,7 +2,6 @@
 @using HlidacStatu.Entities
 @using HlidacStatu.Lib.Analytics
 @using HlidacStatu.Repositories
-@using HlidacStatu.XLib.Render
 @model HlidacStatu.Repositories.DotaceRepo.Statistics.TypeStatsPerYear[]
 
 @{
@@ -37,11 +36,13 @@
     {
         TblOrderColumnIdx = 0,
         TblOrderDirection = "desc",
+        Title = "Státní a evropské dotace"
     };
     var krajData = new HlidacStatu.Web.Models.DotaceAnalBoxes.GeneraModel<StatisticsPerYear<SimpleStat>>()
     {
         TblOrderColumnIdx = 0,
         TblOrderDirection = "desc",
+        Title = "Krajské dotace"
     };
 
 

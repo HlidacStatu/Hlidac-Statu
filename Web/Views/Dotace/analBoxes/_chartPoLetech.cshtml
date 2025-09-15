@@ -1,6 +1,4 @@
-﻿@using Devmasters.Enums
-@using HlidacStatu.Entities
-@using HlidacStatu.Lib.Analytics
+﻿@using HlidacStatu.Lib.Analytics
 @using HlidacStatu.Repositories
 @using HlidacStatu.XLib.Render
 @model HlidacStatu.Web.Models.DotaceAnalBoxes.GeneraModel<StatisticsPerYear<SimpleStat>>
@@ -21,7 +19,8 @@
                 Data = perYearData.OrderBy(s => s.Year)
                     .Select(s => new SeriesData(s.Year, s.Value.CelkemCena))
                     .ToArray(),
+                Name = $"{Model.Title} v jednotlivých letech"
             },
         };
 }
-@Html.ColumnGraph(Model.Title, perYearChartData, yTitleLeft: "Objem dotací v Kč", height: Model.Height)
+@Html.ColumnGraph(Model.Title, perYearChartData, yTitleLeft: "Dotace v miliardách Kč", height: Model.Height)
