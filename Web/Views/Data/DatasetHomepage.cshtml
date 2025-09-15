@@ -12,7 +12,7 @@
     var reg = await Model.RegistrationAsync();
 
     ViewBag.Title = "Databáze " + reg.name;
-    ViewBag.SubTitle = "Podrobné informace";
+    //ViewBag.SubTitle = "Podrobné informace";
 
     ViewBag.SocialShareTitle = "Databáze " + reg.name + " na hlidacstatu.cz";
     ViewBag.SocialShareText = (await Model.InfoFactsAsync()).RenderFacts(2, true, true);
