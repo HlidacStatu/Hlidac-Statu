@@ -33,14 +33,9 @@
                         <h3 class="pt-2 text-body-emphasis">Finanční zdroje dotací</h3>
                         <p>
                             Objemy poskytnutých dotací podle zdroje financování.
-                            (státní, krajské, evropské a další), souhrnně od roku @(HlidacStatu.Repositories.DotaceRepo.DefaultLimitedYears.First()) i po jednotlivých letech.
+                            (státní, krajské, evropské a další), souhrnně od roku @(HlidacStatu.Repositories.DotaceRepo.DefaultLimitedYears.First()) po jednotlivých letech.
                         </p>
-                        <a href="/Dotace/PoLetech" class="btn btn-hs btn-primary btn-sm m-1">Celkem</a>
-                        @foreach (var rok in HlidacStatu.Repositories.DotaceRepo.DefaultLimitedYears.Reverse().Take(3))
-                        {
-                            <a href="/Dotace/PoLetech?rok=@(rok)" class="btn btn-hs btn-primary btn-sm m-1">@rok</a>
-                        }
-                        <a href="/Dotace/PoLetech" class="btn btn-hs btn-primary btn-sm m-1">Další</a>
+                        <a href="/Dotace/PoLetech" class="btn btn-hs btn-primary btn-sm m-1">Přehled</a>
                     </div>
                 </div>
                 <div class="col d-flex align-items-start">
