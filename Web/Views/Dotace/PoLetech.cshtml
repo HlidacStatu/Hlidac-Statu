@@ -61,10 +61,12 @@
 
 }
 
-<div class="alert alert-warning" role="alert">
-    @DotaceTexts.NekompletniDataAlert
-</div>
-
+@if (DateTime.Now.Year-1 > DotaceRepo.LastCompleteYear)
+{
+    <div class="alert alert-warning" role="alert">
+        @DotaceTexts.NekompletniDataAlert
+    </div>
+}
 <h4>Přehled státních a evropských dotací</h4>
 <div>
     <partial name="analBoxes/_chartPoLetech" model="statniData" />
