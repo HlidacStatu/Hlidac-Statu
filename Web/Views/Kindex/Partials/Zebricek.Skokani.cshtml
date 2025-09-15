@@ -60,7 +60,7 @@
     <div class="row">
         <div class="col-sm-12">
             <h4 class="">
-                Skupiny podle kterých lze filtrovat:
+                Skupiny, podle kterých lze filtrovat:
             </h4>
             <div>
                 @if (string.IsNullOrEmpty(selectedGroup))
@@ -69,7 +69,7 @@
                 }
                 else
                 {
-                    <a style="padding-right:20px;" href="/kindex/zebricek/@(ViewBag.SelectedLadder)?rok=@selectedYear"><i class="fas fa-arrow-square-right"></i>Zrušit filter, zobrazit vše</a>
+                    <a style="padding-right:20px;" href="/kindex/zebricek/@(ViewBag.SelectedLadder)?rok=@selectedYear"><i class="fas fa-arrow-square-right"></i>Zrušit filtr, zobrazit vše</a>
                 }
                 @foreach (var group in filterGroups)
                 {
