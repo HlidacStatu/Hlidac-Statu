@@ -39,7 +39,7 @@
                     <div>
                         @foreach (var item in Devmasters.Enums.EnumTools.InGroup(typeof(Firma.Zatrideni.SubjektyObory), g))
                         {
-                            <a href="/kindex/zebricek/@item.ToString()" class="btn btn-hs btn-secondary"><span class="text-gray">Porovnat</span> @(item.ToNiceDisplayName())</a>
+                            <a href="/kindex/zebricek/@item.ToString()" class="btn btn-hs btn-secondary m-1"><span class="text-warning">Porovnat</span> @(item.ToNiceDisplayName())</a>
 
                         }
                         @if (g == "Samospráva")
@@ -50,7 +50,7 @@
                                         <option value="">(vyberte kraj)</option>
                                         @Html.Raw(HlidacStatu.Util.CZ_Nuts.Kraje.OrderBy(k => k.Value).Select(k => $"<option value='{k.Value}'>{k.Value}</option>").Aggregate((f, s) => f + s))
                                     </select>
-                                    <button type="submit" name="specialtype" value="mestavkraji" class="btn btn-hs btn-secondary">Porovnat města v kraji</button>
+                                    <button type="submit" name="specialtype" value="mestavkraji" class="btn btn-hs btn-secondary m-1">Porovnat města v kraji</button>
                                 </form>
                             </div>
 
@@ -61,9 +61,9 @@
                 }
                 <h3>Souhrnné</h3>
                 <div>
-                    <a href="/kindex/zebricek/skokani" class="btn btn-hs btn-secondary"><span class="text-gray">Porovnat</span> největší skokany</a>
-                    <a href="/kindex/zebricek/nejlepsi" class="btn btn-hs btn-secondary"><span class="text-gray">Porovnat</span> 100 nejlepších</a>
-                    <a href="/kindex/zebricek/nejhorsi" class="btn btn-hs btn-secondary"><span class="text-gray">Porovnat</span> 100 nejhorších</a>
+                    <a href="/kindex/zebricek/skokani" class="btn btn-hs btn-secondary m-1"><span class="text-warning">Porovnat</span> největší skokany</a>
+                    <a href="/kindex/zebricek/nejlepsi" class="btn btn-hs btn-secondary m-1"><span class="text-warning">Porovnat</span> 100 nejlepších</a>
+                    <a href="/kindex/zebricek/nejhorsi" class="btn btn-hs btn-secondary m-1"><span class="text-warning">Porovnat</span> 100 nejhorších</a>
 
                 </div>
                 @if (true)
@@ -75,7 +75,7 @@
                                 <option value="">(vyberte parametr)</option>
                                 @Html.Raw(Devmasters.Enums.EnumTools.EnumToEnumerable<KIndexData.KIndexParts>().OrderBy(k => k.Value).Select(k => $"<option value='{k.Value}'>{k.Value.ToNiceDisplayName()}</option>").Aggregate((f, s) => f + s))
                             </select>
-                            <button type="submit" name="partBtn" value="partBtn" class="btn btn-hs btn-secondary">Porovnat podle jednoho parametry K-Indexu</button>
+                            <button type="submit" name="partBtn" value="partBtn" class="btn btn-hs btn-secondary m-1">Porovnat podle jednoho parametry K-Indexu</button>
                         </form>
                     </div>
                 }

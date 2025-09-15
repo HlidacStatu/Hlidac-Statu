@@ -75,7 +75,7 @@
             {
                 if (year != selectedYear)
                 {
-                    <a style="padding-right:20px;" href="/kindex/zebricek/@(ViewBag.SelectedLadder)?rok=@year&kraj=@System.Net.WebUtility.UrlEncode(selectedKraj)&group=@System.Net.WebUtility.UrlEncode(selectedGroup)"><i class="fas fa-arrow-square-right"></i> @year</a>
+                    <a style="padding-right:20px;" href="/kindex/zebricek/@(ViewBag.SelectedLadder)?rok=@year&kraj=@System.Net.WebUtility.UrlEncode(selectedKraj)&group=@System.Net.WebUtility.UrlEncode(selectedGroup)"> @year</a>
                 }
                 else
                 {
@@ -101,7 +101,7 @@
                 }
                 else
                 {
-                    <a style="padding-right:20px; white-space:nowrap;" href="/kindex/zebricek/@(ViewBag.SelectedLadder)?rok=@selectedYear"><i class="fas fa-arrow-square-right"></i>Zrušit filtr, zobrazit vše</a>
+                    <a style="padding-right:20px; white-space:nowrap;" href="/kindex/zebricek/@(ViewBag.SelectedLadder)?rok=@selectedYear">Zrušit filtr, zobrazit vše</a>
                 }
                 @foreach (var group in filterGroups)
                 {
