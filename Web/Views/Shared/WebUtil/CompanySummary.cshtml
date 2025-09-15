@@ -9,11 +9,23 @@
 <p>
     @if (Model.JsemOVM())
     {
-        <span>Úřad - orgán veřejné moci. @Model.Kod_PF_Popis().</span>
+        <span>Úřad - orgán veřejné moci.
+            @if (!string.IsNullOrWhiteSpace(Model.Kod_PF_Popis()))
+            {
+                <span>@Model.Kod_PF_Popis().</span>
+            }
+
+        </span>
     }
     else if (Model.JsemStatniFirma())
     {
-        <span>Firma (spolu)vlastněná státem či samosprávou. @Model.Kod_PF_Popis().</span>
+        <span>
+            Firma (spolu)vlastněná státem či samosprávou.             
+            @if (!string.IsNullOrWhiteSpace(Model.Kod_PF_Popis()))
+            {
+                <span>@Model.Kod_PF_Popis().</span>
+            }
+        </span>
     }
     else if (Model.JsemPolitickaStrana())
     {
@@ -21,7 +33,13 @@
     }
     else
     {
-        <span>Soukromá firma. @Model.Kod_PF_Popis().</span>
+        <span>
+            Soukromá firma.
+            @if (!string.IsNullOrWhiteSpace(Model.Kod_PF_Popis()))
+            {
+                <span>@Model.Kod_PF_Popis().</span>
+            }
+        </span>
     }
     @if (!string.IsNullOrWhiteSpace(Model.StatusFull()))
     {
