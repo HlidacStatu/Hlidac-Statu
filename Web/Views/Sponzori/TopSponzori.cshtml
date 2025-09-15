@@ -58,27 +58,25 @@
 <a asp-controller="Sponzori" asp-action="TopSponzoriFirmy" asp-route-rok="@(rok == 0 ? null : rok)">Zobrazit sponzorující firmy</a>
 
 <div style="margin-top:20px;margin-bottom:40px;">
-    <ul class="list-inline">
-        @if (rok != 0)
+    @if (rok != 0)
+    {
+        <a class="btn btn-hs btn-outline-primary" asp-action="TopSponzori">Souhrnně za 10 let</a>
+    }
+    else
+    {
+        <a class="btn btn-hs btn-dark" asp-action="TopSponzori">Souhrnně za 10 let</a>
+    }
+    @for (int year = DateTime.Now.Year - 10; year <= SponzoringRepo.DefaultLastSponzoringYear(); year++)
+    {
+        if (rok == year)
         {
-            <li><a asp-action="TopSponzori">Souhrnně za 10 let</a></li>
+            <a class="btn btn-hs btn-dark" asp-action="TopSponzori" asp-route-rok="@year">@year</a>
         }
         else
         {
-            <li><b>Souhrnně za 10 let</b></li>
+            <a class="btn btn-hs btn-outline-primary" asp-action="TopSponzori" asp-route-rok="@year">@year</a>
         }
-        @for (int year = DateTime.Now.Year - 10; year <= SponzoringRepo.DefaultLastSponzoringYear(); year++)
-        {
-            if (rok == year)
-            {
-                <li><b>@year</b></li>
-            }
-            else
-            {
-                <li><a asp-action="TopSponzori" asp-route-rok="@year">@year</a></li>
-            }
-        }
-    </ul>
+    }
 </div>
 
 
