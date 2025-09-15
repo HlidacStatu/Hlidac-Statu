@@ -8,7 +8,8 @@
                     <li class="list-group-item d-flex justify-content-between align-items-start">
                         <div class="ms-2 me-auto">
                             <div class="fw-bold">Souhrny</div>
-                            <a onclick="return trackOutLink(this,'megamenu');" href="/report/7">Souhrnné informace o všech smlouvách</a>
+                            <a onclick="return trackOutLink(this,'megamenu');" href="/report/7">Souhrnné informace o
+                                všech smlouvách</a>
                         </div>
                     </li>
                     <li class="list-group-item d-flex justify-content-between align-items-start">
@@ -23,13 +24,16 @@
 
                                 </li>
                                 <li>
-                                    <a onclick="return trackOutLink(this,'megamenu');" href="/adresar/Statni_podniky">Státní podniky</a>
+                                    <a onclick="return trackOutLink(this,'megamenu');" href="/adresar/Statni_podniky">Státní
+                                        podniky</a>
                                 </li>
                                 <li>
-                                    <a onclick="return trackOutLink(this,'megamenu');" href="/adresar/vyjimky_rs">Výjimky z RS</a>
+                                    <a onclick="return trackOutLink(this,'megamenu');" href="/adresar/vyjimky_rs">Výjimky
+                                        z RS</a>
 
                                 </li>
-                                <li><a onclick="return trackOutLink(this,'megamenu');" href="/adresar">... a další</a></li>
+                                <li><a onclick="return trackOutLink(this,'megamenu');" href="/adresar">... a další</a>
+                                </li>
                             </ul>
                         </div>
 
@@ -43,19 +47,23 @@
 
                                 </li>
                                 <li>
-                                    <a onclick="return trackOutLink(this,'megamenu');" href="/adresar/Kraje_Praha">Kraje</a>
+                                    <a onclick="return trackOutLink(this,'megamenu');"
+                                       href="/adresar/Kraje_Praha">Kraje</a>
 
 
                                 </li>
                                 <li>
-                                    <a onclick="return trackOutLink(this,'megamenu');" href="/adresar/Statutarni_mesta">Statutární města</a>
+                                    <a onclick="return trackOutLink(this,'megamenu');" href="/adresar/Statutarni_mesta">Statutární
+                                        města</a>
 
                                 </li>
                                 <li>
-                                    <a onclick="return trackOutLink(this,'megamenu');" href="/adresar/Mestske_casti_Prahy">Městské části Prahy</a>
+                                    <a onclick="return trackOutLink(this,'megamenu');"
+                                       href="/adresar/Mestske_casti_Prahy">Městské části Prahy</a>
 
                                 </li>
-                                <li><a onclick="return trackOutLink(this,'megamenu');" href="/adresar">... a další</a></li>
+                                <li><a onclick="return trackOutLink(this,'megamenu');" href="/adresar">... a další</a>
+                                </li>
                             </ul>
                         </div>
 
@@ -67,8 +75,8 @@
                 <h3>Registr smluv</h3>
                 <h4>Speciální reporty</h4>
                 <div class="mega-content-subtitle">Smlouvy uveřejněné konkrétní den</div>
-                <p>
-                    <link href="/scripts/zabuto_calendar.min.css" rel="stylesheet" />
+                <div>
+                    <link href="/scripts/zabuto_calendar.min.css" rel="stylesheet"/>
                     <script src="/scripts/zabuto_calendar.min.js"></script>
                     <style>
                         table.lightgrey-weekends tbody td:nth-child(n+6) {
@@ -76,8 +84,8 @@
                         }
 
                         .zabuto-calendar.table.table-bordered > tbody > tr > td {
-                            line-height:0;
-                             padding: 9px 9px;
+                            line-height: 0;
+                            padding: 9px 9px;
                         }
                     </style>
                     <!-- define an element -->
@@ -97,7 +105,7 @@
 
                             });
                             $megamenu_sml_cal.on('zabuto:calendar:day', function (e) {
-                                var url = 'https://www.hlidacstatu.cz/HledatSmlouvy?Q=zverejneno:' + e.date.getFullYear() + '-' + (e.date.getMonth()+1).toString().padStart(2, '0') + '-' + e.date.getDate().toString().padStart(2, '0');
+                                var url = 'https://www.hlidacstatu.cz/HledatSmlouvy?Q=zverejneno:' + e.date.getFullYear() + '-' + (e.date.getMonth() + 1).toString().padStart(2, '0') + '-' + e.date.getDate().toString().padStart(2, '0');
                                 console.log(url);
                                 window.location = url;
                             });
@@ -106,10 +114,12 @@
                     </script>
 
 
-                    <hr />
-                </p>
-                <p><a onclick="return trackOutLink(this,'megamenu');" href="/Report/9">Firmy založené těsně před uzavřením smlouvy</a></p>
-                <p><a onclick="return trackOutLink(this,'megamenu');" href="/Report/5">Smlouvy s firmami, co přímo či nepřímo sponzorují politické strany</a></p>
+                    <hr/>
+                </div>
+                <p><a onclick="return trackOutLink(this,'megamenu');" href="/Report/9">Firmy založené těsně před
+                        uzavřením smlouvy</a></p>
+                <p><a onclick="return trackOutLink(this,'megamenu');" href="/Report/5">Smlouvy s firmami, co přímo či
+                        nepřímo sponzorují politické strany</a></p>
                 <!-- <h5>Podle krajů</h5>
                 <p class="text-center">
                     <img src="/content/img/Czech_Republic_location_map_nazvy.svg" style="width:90%;height:auto;" />
@@ -119,27 +129,27 @@
             <div class="col-12 col-md-4 py-4 bg-body-tertiary">
                 @{
                     var vzList = Devmasters.Enums.EnumTools.EnumToEnumerable(typeof(VerejnaZakazkaRepo.Searching.CPVSkupiny))
-                    .Select(m => new
-                    {
-                        id = m.Id,
-                        name = m.Name,
-                        count = VerejnaZakazkaRepo.Searching.CachedSimpleSearch(TimeSpan.FromHours(6),
-                    new HlidacStatu.Repositories.Searching.VerejnaZakazkaSearchData()
-                    {
-                        Q = "zverejneno:[" + DateTime.Now.Date.AddMonths(-12).ToString("yyyy-MM-dd") + " TO *]",
-                        //Q = "*",
-                        Oblast = m.Id.ToString(),
-                        Page = 0,
-                        PageSize = 0,
-                        ExactNumOfResults = true
-                    }
-                    ).Total
-                    })
-                    .Where(m => m.count > 0)
-                    .OrderByDescending(o => o.count)
-                    .ThenBy(o => o.name)
-                    .ToArray()
-                    ;
+                            .Select(m => new
+                            {
+                                id = m.Id,
+                                name = m.Name,
+                                count = VerejnaZakazkaRepo.Searching.CachedSimpleSearch(TimeSpan.FromHours(6),
+                                    new HlidacStatu.Repositories.Searching.VerejnaZakazkaSearchData()
+                                    {
+                                        Q = "zverejneno:[" + DateTime.Now.Date.AddMonths(-12).ToString("yyyy-MM-dd") + " TO *]",
+                                        //Q = "*",
+                                        Oblast = m.Id.ToString(),
+                                        Page = 0,
+                                        PageSize = 0,
+                                        ExactNumOfResults = true
+                                    }
+                                ).Total
+                            })
+                            .Where(m => m.count > 0)
+                            .OrderByDescending(o => o.count)
+                            .ThenBy(o => o.name)
+                            .ToArray()
+                        ;
                     int vzOblCount = Devmasters.Enums.EnumTools.EnumToEnumerable(typeof(VerejnaZakazkaRepo.Searching.CPVSkupiny)).Count;
                     long vzCountSum = vzList.Sum(m => m.count);
                     long vzCount = 0;
@@ -152,14 +162,17 @@
                         vzCount = vzCount + obl.count;
 
                         <li class="list-group-item">
-                            <a onclick="return trackOutLink(this,'megamenu');" href="/verejnezakazky/hledat?q=&oblast=@VerejnaZakazkaRepo.Searching.NormalizeOblastValue(obl.id.ToString())&order=1">@obl.name</a>
+                            <a onclick="return trackOutLink(this,'megamenu');"
+                               href="/verejnezakazky/hledat?q=&oblast=@VerejnaZakazkaRepo.Searching.NormalizeOblastValue(obl.id.ToString())&order=1">@obl.name</a>
                         </li>
                     }
                     <li class="list-group-item">
-                        <b><a onclick="return trackOutLink(this,'megamenu');" href="/verejnezakazky/">Všechny obory veřejných zakázek</a></b>
+                        <b><a onclick="return trackOutLink(this,'megamenu');" href="/verejnezakazky/">Všechny obory
+                                veřejných zakázek</a></b>
                     </li>
 
                 </ul>
             </div>
+        </div>
     </div>
 </div>

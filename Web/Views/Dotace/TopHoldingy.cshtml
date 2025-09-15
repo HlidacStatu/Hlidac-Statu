@@ -30,7 +30,7 @@
     string yearText = rok > 0 ? $" pro rok {rok}" :"";
 
     ViewBag.Title = "Hlídač dotací";
-    ViewBag.SubTitle = $"Holdingy firem kteří jsou největšími příjemci " 
+    ViewBag.SubTitle = $"Holdingy firem, které jsou největšími příjemci " 
         + (dtyp != null ? " " + HlidacStatu.Entities.Dotace.Hint.TypeDescription(dtyp, 4, false) : "")
         + $" dotací{yearText}"
         + (ftyp != null ? " pro " + HlidacStatu.Entities.Firma.TypSubjektuDescription(ftyp, 4, false) : "")
