@@ -3,7 +3,7 @@
 @model LoginModel
 
 @{
-    ViewBag.Title = "Přihlášení";
+    ViewBag.Title = "Přihlášení do Hlídače státu";
 }
 @section breadcrumb
 {
@@ -18,7 +18,7 @@
 
 <div class="row">
     <div class="col-sm-12">
-        <h2>Přihlášení do Hlídače státu.</h2>
+
         @if (!StringValues.IsNullOrEmpty(Request.Query["ReturnUrl"]))
         {
             <div class="alert alert-warning">
