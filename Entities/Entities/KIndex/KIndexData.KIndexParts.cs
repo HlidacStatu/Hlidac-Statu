@@ -30,6 +30,7 @@ namespace HlidacStatu.Entities.KIndex
             [NiceDisplayName("Podíl smluv s cenou u limitu veřejných zakázek")]
             PercSmluvUlimitu = 4,
 
+            [Disabled()]
             [SortValue(6)]
             [GroupValue("Doplnkove")]
             [NiceDisplayName("Podíl smluv uzavřených o víkendu či svátku")]
