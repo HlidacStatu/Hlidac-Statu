@@ -36,10 +36,12 @@
     <PackageReference Include="SixLabors.ImageSharp" Version="3.1.11" />
     <PackageReference Include="SmartAnalyzers.CSharpExtensions.Annotations" Version="4.2.11" />
     <PackageReference Include="System.Security.Cryptography.Pkcs" Version="9.0.7" />
+      <PackageReference Include="JsonSchema.Net" Version="7.3.4" />
+      <PackageReference Include="JsonSchema.Net.Generation" Version="5.0.4" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\Hlidac-Statu-Private\AI\AI.csproj" />
-    <ProjectReference Include="..\Datastructures\Datastructures.csproj" />
+      <ProjectReference Include="..\3rd\JsonRepairSharp\jsonrepairsharp\jsonrepairsharp.csproj" PrivateAssets="All" />
+      <ProjectReference Include="..\Datastructures\Datastructures.csproj" />
     <ProjectReference Include="..\Lib.Analytics\Lib.Analytics.csproj" />
   </ItemGroup>
 </Project>

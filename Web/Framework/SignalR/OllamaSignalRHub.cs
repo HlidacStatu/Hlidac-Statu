@@ -42,7 +42,7 @@ namespace HlidacStatu.Web.Framework.SignalR
             var s = await HlidacStatu.Repositories.SmlouvaRepo.LoadAsync(smlouvaId, includePlaintext: true);
             if (s != null)
             {
-                List<HlidacStatu.AI.LLM.SumarizaceJSON.Item> summ = new List<HlidacStatu.AI.LLM.SumarizaceJSON.Item>();
+                List<HlidacStatu.Entities.AI.SumarizaceJSON.Item> summ = new List<HlidacStatu.Entities.AI.SumarizaceJSON.Item>();
                 var priloha = s.Prilohy.FirstOrDefault();// (m=>m.UniqueHash() == prilohaId);
                 if (priloha != null)
                 {

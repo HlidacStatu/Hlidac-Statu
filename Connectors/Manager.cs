@@ -5,8 +5,6 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 using HlidacStatu.Entities;
 using HlidacStatu.Entities.KIndex;
 using HlidacStatu.Lib.Data.External.RPP;
@@ -576,7 +574,7 @@ namespace HlidacStatu.Connectors
                     res = client.Indices
                        .Create(indexName, i => i
                            .InitializeUsing(idxSt)
-                           .Map<HlidacStatu.AI.LLM.Entities.FullSummary>(map => map.AutoMap().DateDetection(false))  //TODO Summary to T or Object
+                           .Map<HlidacStatu.Entities.AI.FullSummary>(map => map.AutoMap().DateDetection(false))  //TODO Summary to T or Object
                        );
                     break;
                 case IndexType.Subsidy:
