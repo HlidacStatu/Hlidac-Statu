@@ -58,7 +58,7 @@
     <div>
         @{
             var wdModel = new WatchdogViewModel(null, $"OsobaId:{Model.NameId}", $"Vše o <b>{Model.FullName()}</b>",
-                buttonCss: "btn btn-warning btn-xs", prefillWDname: $"Novinky pro {Model.FullName()}",
+                buttonCss: "btn btn-warning btn-sm", prefillWDname: $"Novinky pro {Model.FullName()}",
                 showWdList: false, preButtonText: "");
 
             <partial name="WebUtil/AddWatchdog" model="wdModel"/>

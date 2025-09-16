@@ -13,6 +13,7 @@ namespace HlidacStatu.Lib.Web.UI.TagHelpers
     /// Přidání ikonky k zabookmarkování stránky. Je potřeba buď vyplnit atribut item="".
     /// Nebo můžeme vyplnit atributy name="" a url="".
     /// </summary>
+    [HtmlTargetElement("add-bookmark")]
     public class AddBookmarkTagHelper : TagHelper
     {
         [HtmlAttributeNotBound]

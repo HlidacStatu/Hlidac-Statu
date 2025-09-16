@@ -97,7 +97,7 @@
                         var wdModel = new WatchdogViewModel(null, $"ico:{Model.ICO}",
                             $"Všechny změny o {Devmasters.TextUtil.ShortenText(Model.Jmeno, 30)}",
                             prefillWDname: $"Novinky pro {Model.Jmeno}",
-                            buttonCss: "btn btn-warning btn-xs",
+                            buttonCss: "btn btn-warning btn-sm",
                             showWdList: false,
                             preButtonText: ""
                             );
@@ -113,7 +113,7 @@
                         var wdModel = new WatchdogViewModel(null, $"holding:{Model.ICO}",
                             $"Změny i {Devmasters.Lang.CS.Plural.Get(Model.PocetPodrizenychSubjektu(Relation.AktualnostType.Nedavny), "v jedné dceřiné společnosti", "ve {0} dceřiných společnostech", "v {0} dceřiných společnostech")}",
                             prefillWDname: $"Novinky pro {Model.Jmeno}",
-                            buttonCss: "btn btn-warning btn-xs",
+                            buttonCss: "btn btn-warning btn-sm",
                             showWdList: false,
                             preButtonText: ""
                             );

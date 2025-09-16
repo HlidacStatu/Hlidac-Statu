@@ -148,7 +148,7 @@
                 $"ico:{Model.ICO}",
                 $"Upozornit u {TextUtil.ShortenText(Model.Jmeno, 30)}",
                 prefillWDname: $"Novinky pro {Model.Jmeno}",
-                buttonCss: "btn btn-warning btn-xs",
+                buttonCss: "btn btn-warning btn-sm m-1",
                 showWdList: false, preButtonText: "");
 
                 <partial name="WebUtil/AddWatchdog" model="wdModel" />
@@ -163,10 +163,12 @@
                     $"holding:{Model.ICO}",
                     $"Upozornit u subjektu + {Devmasters.Lang.CS.Plural.Get(Model.PocetPodrizenychSubjektu(Relation.AktualnostType.Nedavny), "v jedné podřízené organizaci", "ve {0} podřízených organizacích", "v {0} podřízených organizacích")}",
                     prefillWDname: $"Novinky pro holding {Model.Jmeno}",
-                    buttonCss: "btn btn-warning btn-xs",
+                    buttonCss: "btn btn-warning btn-sm m-1",
                     showWdList: false, preButtonText: "");
 
+                    <div>
                     <partial name="WebUtil/AddWatchdog" model="wdModel" />
+                    </div>
                 }
             }
             else
@@ -176,7 +178,7 @@
                     $"holding:{Model.ICO}",
                     $"Upozornit u subjektu + {Devmasters.Lang.CS.Plural.Get(Model.PocetPodrizenychSubjektu(Relation.AktualnostType.Nedavny), "v jedné dceřiné společnosti", "ve {0} dceřiných společnostech", "v {0} dceřiných společnostech")}",
                     prefillWDname: $"Novinky pro holding {Model.Jmeno}",
-                    buttonCss: "btn btn-warning btn-xs",
+                    buttonCss: "btn btn-warning btn-sm",
                     showWdList: false, preButtonText: "");
 
                     <partial name="WebUtil/AddWatchdog" model="wdModel" />
