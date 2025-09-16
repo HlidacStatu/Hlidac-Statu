@@ -20,6 +20,7 @@ using Newtonsoft.Json;
 using HlidacStatu.MLUtil.Splitter;
 using System.Text;
 using HlidacStatu.AI.LLM.Clients.Options;
+using HlidacStatu.Entities.AI;
 
 
 namespace HlidacStatu.Repositories

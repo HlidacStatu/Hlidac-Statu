@@ -1,4 +1,4 @@
-﻿using HlidacStatu.AI.LLM.Entities;
+﻿using HlidacStatu.Entities.AI;
 using Nest;
 using System;
 using System.Linq;
@@ -7,7 +7,6 @@ using System.Threading.Tasks;
 namespace HlidacStatu.Repositories
 {
     public class PermanentLLMRepo
-
     {
 
         public static async Task SaveAsync<T>(T item)
@@ -22,7 +21,6 @@ namespace HlidacStatu.Repositories
             }
 
         }
-
 
         public static async Task<T[]> SearchAsync<T>(
             string queryString, int count)
@@ -75,7 +73,7 @@ namespace HlidacStatu.Repositories
         {
             var dbSP = HlidacStatu.Connectors.Manager.GetESClient_PermanentLLM();
 
-            var res = await dbSP.GetAsync<T>(HlidacStatu.AI.LLM.Entities.BaseItem<T>
+            var res = await dbSP.GetAsync<T>(BaseItem
                 .GetId(documentType, documentId, partType, fileId));
             if (!res.Found && res.ServerError != null)
                 throw new ApplicationException(res.ServerError?.ToString());
@@ -89,7 +87,7 @@ namespace HlidacStatu.Repositories
         {
             var dbSP = HlidacStatu.Connectors.Manager.GetESClient_PermanentLLM();
 
-            var res = await dbSP.DocumentExistsAsync<object>(HlidacStatu.AI.LLM.Entities.BaseItem
+            var res = await dbSP.DocumentExistsAsync<object>(BaseItem
                 .GetId(documentType, documentId, partType, fileId));
             if (!res.IsValid && res.ServerError != null)
                 throw new ApplicationException(res.ServerError?.ToString());
@@ -130,7 +128,7 @@ namespace HlidacStatu.Repositories
         public static async Task<bool> ExistsAsync(string documentType, string documentId, string partType, string fileId = null)
         {
             if (
-                documentType == HlidacStatu.AI.LLM.Entities.FullSummary.DOCUMENTTYPE
+                documentType == FullSummary.DOCUMENTTYPE
                 && !string.IsNullOrEmpty(fileId)
                 )
                 return await _existsAsync(documentType, documentId, partType, fileId);
