@@ -61,50 +61,50 @@
 @* První sloupec *@
 <div id="subjcontent_toc">
 
- 
+
     @* ----- Sponzoring politických stran ----- *@
     @if (Model.JsemPolitickaStrana())
     {
-            var sql = @"
-                select ICO, Jmeno,
-                (select SUM(Sponzoring.Hodnota) from Sponzoring where Sponzoring.IcoPrijemce=f.ICO and DATEPART(yy, Sponzoring.DarovanoDne)>=" + (SponzoringRepo.DefaultLastSponzoringYear() - 10).ToString() + @") as suma,
-                (select SUM(Sponzoring.Hodnota) from Sponzoring where Sponzoring.IcoPrijemce=f.ICO and DATEPART(yy, Sponzoring.DarovanoDne)=" + SponzoringRepo.DefaultLastSponzoringYear().ToString() + @") as sumaLastY,
-                (select count(distinct(CONCAT( Sponzoring.OsobaIdDarce , Sponzoring.IcoDarce))) from Sponzoring where Sponzoring.IcoPrijemce=f.ICO and DATEPART(yy, Sponzoring.DarovanoDne)>=" + (SponzoringRepo.DefaultLastSponzoringYear() - 10).ToString() + @") as count
-                from Firma f
-                where KOD_PF = 711
-                and f.ico = '" + Model.ICO + @"'
-                order by sumaLastY desc, suma desc
-                ";
+        var sql = @"
+        select ICO, Jmeno,
+        (select SUM(Sponzoring.Hodnota) from Sponzoring where Sponzoring.IcoPrijemce=f.ICO and DATEPART(yy, Sponzoring.DarovanoDne)>=" + (SponzoringRepo.DefaultLastSponzoringYear() - 10).ToString() + @") as suma,
+        (select SUM(Sponzoring.Hodnota) from Sponzoring where Sponzoring.IcoPrijemce=f.ICO and DATEPART(yy, Sponzoring.DarovanoDne)=" + SponzoringRepo.DefaultLastSponzoringYear().ToString() + @") as sumaLastY,
+        (select count(distinct(CONCAT( Sponzoring.OsobaIdDarce , Sponzoring.IcoDarce))) from Sponzoring where Sponzoring.IcoPrijemce=f.ICO and DATEPART(yy, Sponzoring.DarovanoDne)>=" + (SponzoringRepo.DefaultLastSponzoringYear() - 10).ToString() + @") as count
+        from Firma f
+        where KOD_PF = 711
+        and f.ico = '" + Model.ICO + @"'
+        order by sumaLastY desc, suma desc
+        ";
 
-            var stranaInfo = HlidacStatu.Connectors.DirectDB.GetList<string, string, decimal?, decimal?, int>(sql).FirstOrDefault();
-        
-            <h4>
-                Dary politické straně od sponzorů
-            </h4>
-            <p>
-                Strana v roce @(SponzoringRepo.DefaultLastSponzoringYear()) dostala strana dary
-                ve výši <b>@HlidacStatu.Util.RenderData.NicePriceHtml(stranaInfo?.Item4 ?? 0)</b>.
+        var stranaInfo = HlidacStatu.Connectors.DirectDB.GetList<string, string, decimal?, decimal?, int>(sql).FirstOrDefault();
 
-                @if (stranaInfo?.Item5 == 0)
-                {
-                    <span>Za posledních 10 let nedostala žádné dary.</span>
-                }
-                else
-                {
-                    <span>
-                        Za posledních 10 let celkem <b>@HlidacStatu.Util.RenderData.NicePriceHtml(stranaInfo?.Item3 ?? 0, shortFormat: true)</b>
-                        od <b>@(Devmasters.Lang.CS.Plural.Get(stranaInfo?.Item5 ?? 0, "jednoho sponzora", "{0} sponzorů", "{0} sponzorů"))</b>.
+        <h4>
+            Dary politické straně od sponzorů
+        </h4>
+        <p>
+            Strana v roce @(SponzoringRepo.DefaultLastSponzoringYear()) dostala strana dary
+            ve výši <b>@HlidacStatu.Util.RenderData.NicePriceHtml(stranaInfo?.Item4 ?? 0)</b>.
 
-                    </span>
-                }
+            @if (stranaInfo?.Item5 == 0)
+            {
+                <span>Za posledních 10 let nedostala žádné dary.</span>
+            }
+            else
+            {
+                <span>
+                    Za posledních 10 let celkem <b>@HlidacStatu.Util.RenderData.NicePriceHtml(stranaInfo?.Item3 ?? 0, shortFormat: true)</b>
+                    od <b>@(Devmasters.Lang.CS.Plural.Get(stranaInfo?.Item5 ?? 0, "jednoho sponzora", "{0} sponzorů", "{0} sponzorů"))</b>.
 
-            </p>
-            <p class="text-center">
-                <a href="/sponzori/strana/@Model.ICO" class="btn btn-hs btn-primary btn-sm my-3 position-relative">
-                    Podrobnosti o sponzorech politické strany
-                    <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">@(HlidacStatu.Util.RenderData.NiceNumber(stranaInfo?.Item5 ?? 0))</span>
-                </a>
-            </p>
+                </span>
+            }
+
+        </p>
+        <p class="text-center">
+            <a href="/sponzori/strana/@Model.ICO" class="btn btn-hs btn-primary btn-sm my-3 position-relative">
+                Podrobnosti o sponzorech politické strany
+                <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">@(HlidacStatu.Util.RenderData.NiceNumber(stranaInfo?.Item5 ?? 0))</span>
+            </a>
+        </p>
 
         <hr />
     }
@@ -207,7 +207,7 @@
 
 
         <p class="text-center">
-            <a  href="/subjekt/rizika/@Model.ICO" class="btn btn-hs btn-primary btn-sm my-3 position-relative">
+            <a href="/subjekt/rizika/@Model.ICO" class="btn btn-hs btn-primary btn-sm my-3 position-relative">
                 Detailní souhrn rizik a zajímavostí
                 <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">!!</span>
             </a>
@@ -227,47 +227,47 @@
 
     @* -------- skutecni majitele -------- *@
 
-        @{
-            HlidacStatu.Datasets.DataSet skutMajitDS = HlidacStatu.Datasets.DataSet.CachedDatasets.Get("skutecni-majitele");
-            var skutMajitRes = (await skutMajitDS.SearchDataRawAsync("ico:" + Model.ICO, 1, 1)).Result.ToList();
-        }
-        @if (skutMajitRes.Any()
-                && Devmasters.Config.GetWebConfigValue("HiddenSkutecniMajiteleICO")?.Split(",")?.Contains(Model.ICO) == false
-                )
+    @{
+        HlidacStatu.Datasets.DataSet skutMajitDS = HlidacStatu.Datasets.DataSet.CachedDatasets.Get("skutecni-majitele");
+        var skutMajitRes = (await skutMajitDS.SearchDataRawAsync("ico:" + Model.ICO, 1, 1)).Result.ToList();
+    }
+    @if (skutMajitRes.Any()
+        && Devmasters.Config.GetWebConfigValue("HiddenSkutecniMajiteleICO")?.Split(",")?.Contains(Model.ICO) == false
+        )
+    {
+        Newtonsoft.Json.Linq.JObject obj = Newtonsoft.Json.Linq.JObject.Parse(skutMajitRes.First().Item2);
+        if (obj["skutecni_majitele"]?.Count() > 0)
         {
-            Newtonsoft.Json.Linq.JObject obj = Newtonsoft.Json.Linq.JObject.Parse(skutMajitRes.First().Item2);
-            if (obj["skutecni_majitele"]?.Count() > 0)
+            var aktualniMajitele = obj["skutecni_majitele"].Where(m => ((JValue)m["datum_vymaz"]).Value == null);
+            var vymazaniMajitele = obj["skutecni_majitele"].Where(m => ((JValue)m["datum_vymaz"]).Value != null);
+            if (aktualniMajitele.Count() > 0)
             {
-                var aktualniMajitele = obj["skutecni_majitele"].Where(m => ((JValue)m["datum_vymaz"]).Value == null);
-                var vymazaniMajitele = obj["skutecni_majitele"].Where(m => ((JValue)m["datum_vymaz"]).Value != null);
-                if (aktualniMajitele.Count() > 0)
-                {
-                    <h4 class="pt-1">@(aktualniMajitele.Count() > 1 ? "Skuteční majitelé" : "Skutečný majitel")</h4>
-                    <partial name="_renderSkutecniMajitele" model="@aktualniMajitele" />
-                    <div style="padding-bottom:10px;">&nbsp;</div>
-                }
-
-
-                if (vymazaniMajitele.Count() > 0)
-                {
-                    <h4 class="pt-1">@(vymazaniMajitele.Count() > 1 ? "Vymazaní majitelé" : "Vymazaný majitel")</h4>
-                    <partial name="_renderSkutecniMajitele" model="@vymazaniMajitele" />
-                }
+                <h4 class="pt-1">@(aktualniMajitele.Count() > 1 ? "Skuteční majitelé" : "Skutečný majitel")</h4>
+                <partial name="_renderSkutecniMajitele" model="@aktualniMajitele" />
+                <div style="padding-bottom:10px;">&nbsp;</div>
             }
-            <hr />
-        }
-        else if (Model.Registrovana_v_zahranici == false)
-        {
-            <h4 class="pt-1">Skuteční majitelé</h4>
-            <p>Open data obchodního rejstříku neobsahují data o skutečných majitelích této organizace</p>
-            <p class="text-center">
-                <a target="_blank" href="https://esm.justice.cz/ias/issm/rejstrik-$sm?ico=@(Model.ICO)&jenPlatne=PLATNE&polozek=50&typHledani=STARTS_WITH&typHledaniSpolku=ALL" class="btn btn-hs btn=outline-primary btn-sm my-3 position-relative">
-                    <i class="fa-regular fa-arrow-up-right-from-square"></i> Hledat v Evidenci skutečných majitelů
-                </a>
-            </p>
 
-            <hr />
+
+            if (vymazaniMajitele.Count() > 0)
+            {
+                <h4 class="pt-1">@(vymazaniMajitele.Count() > 1 ? "Vymazaní majitelé" : "Vymazaný majitel")</h4>
+                <partial name="_renderSkutecniMajitele" model="@vymazaniMajitele" />
+            }
         }
+        <hr />
+    }
+    else if (Model.Registrovana_v_zahranici == false)
+    {
+        <h4 class="pt-1">Skuteční majitelé</h4>
+        <p>Open data obchodního rejstříku neobsahují data o skutečných majitelích této organizace</p>
+        <p class="text-center">
+            <a target="_blank" href="https://esm.justice.cz/ias/issm/rejstrik-$sm?ico=@(Model.ICO)&jenPlatne=PLATNE&polozek=50&typHledani=STARTS_WITH&typHledaniSpolku=ALL" class="btn btn-hs btn=outline-primary btn-sm my-3 position-relative">
+                <i class="fa-regular fa-arrow-up-right-from-square"></i> Hledat v Evidenci skutečných majitelů
+            </a>
+        </p>
+
+        <hr />
+    }
 
 
     @* ------- Příjmy politiku ---------- *@
@@ -1001,7 +1001,13 @@
 
 
     @* ----- Sponzoring -----*@
-    @if (Model.IsSponzor() || HlidacStatu.Repositories.StaticData.FirmySVazbamiNaPolitiky_nedavne_Cache.Get().SoukromeFirmy.ContainsKey(Model.ICO))
+    @if (
+        Model.JsemPolitickaStrana() == false
+        &&
+        (
+        Model.IsSponzor() || HlidacStatu.Repositories.StaticData.FirmySVazbamiNaPolitiky_nedavne_Cache.Get().SoukromeFirmy.ContainsKey(Model.ICO)
+        )
+        )
     {
         <div>
             <h4>Sponzoring politických stran</h4>
@@ -1315,7 +1321,7 @@
                     <span>
                         Má vazbu na <a href="/subjekt/Vazby/@Model.ICO">@Devmasters.Lang.CS.Plural.Get(Model.PocetPodrizenychSubjektu(Relation.AktualnostType.Nedavny), "jeden podřízený subjekt", "{0} podřízené subjekty", "{0} podřízených subjektů").</a>
                     </span>
-                }                
+                }
             </p>
             <p>
                 @if (vazbyOsoby.Any())
