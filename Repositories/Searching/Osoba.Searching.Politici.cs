@@ -1,4 +1,5 @@
 ﻿using Devmasters.Collections;
+using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,6 +15,8 @@ namespace HlidacStatu.Repositories.Searching
         public static List<Tuple<string, string[]>> PoliticiStems = null;
 
         static object initLock = new object();
+        private static readonly ILogger _logger = Log.ForContext(typeof(Politici));
+
 
         static Politici()
         {
@@ -23,7 +26,9 @@ namespace HlidacStatu.Repositories.Searching
                 {
                     if (PoliticiStems == null)
                     {
+                        _logger.Warning("InitPoliticiStems start  ");
                         PoliticiStems = InitPoliticiStems();
+                        _logger.Warning("InitPoliticiStems end ");
                         // Newtonsoft.Json.JsonConvert.DeserializeObject<List<Tuple<string, string[]>>>(
                         //System.IO.File.ReadAllText(@"politiciStem.json")
                         //);

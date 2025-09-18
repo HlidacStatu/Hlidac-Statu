@@ -31,7 +31,7 @@ namespace HlidacStatu.Web.Controllers
             var errObj = HttpContext.Items[HlidacStatu.LibCore.MiddleWares.OnHTTPErrorMiddleware.ItemKeyNameObj] as Dictionary<string, string>;
 
             if (errObj != null)
-                _logger.Error("HTTP 404 - page not found, context {context}",errObj);
+                _logger.Warning("HTTP 404 - page not found, context {context}",errObj);
 
             return View();
         }

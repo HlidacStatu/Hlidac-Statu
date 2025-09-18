@@ -19,9 +19,9 @@
     <ProjectReference Include="..\Util\Util.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Devmasters.Cache.AWS_S3" Version="8.0.2" />
-    <PackageReference Include="Devmasters.Cache.Memcached" Version="8.0.4" />
-    <PackageReference Include="Devmasters.Cache.Redis" Version="8.0.4" />
+    <PackageReference Include="Devmasters.Cache.AWS_S3" Version="8.1.0" />
+    <PackageReference Include="Devmasters.Cache.Memcached" Version="8.1.0" />
+    <PackageReference Include="Devmasters.Cache.Redis" Version="8.1.0" />
     <PackageReference Include="MathNet.Numerics" Version="5.0.0" />
     <PackageReference Include="Microsoft.AspNetCore.Components" Version="8.0.18" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc.TagHelpers" Version="2.2.0" />

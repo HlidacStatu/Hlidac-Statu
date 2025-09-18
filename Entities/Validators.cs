@@ -12,6 +12,7 @@ using System.Reflection;
 using System.Text.RegularExpressions;
 using Serilog;
 using Amazon.Runtime.Internal.Util;
+using Microsoft.EntityFrameworkCore.Query;
 
 namespace HlidacStatu.Entities
 {
@@ -59,21 +60,29 @@ namespace HlidacStatu.Entities
 
         static Validators()
         {
+            Devmasters.DT.StopWatchLaps swl = new Devmasters.DT.StopWatchLaps();
+
+            swl.StopPreviousAndStartNextLap(Util.DebugUtil.GetClassAndMethodName(MethodBase.GetCurrentMethod())+" var jmeno");
+
             Jmena = new HashSet<string>(jmenaCache.Get().Split("\n", StringSplitOptions.RemoveEmptyEntries)
                 .Select(m => TextUtil.RemoveDiacritics(m.ToLower().Trim()))
                 .Distinct());
 
+            swl.StopPreviousAndStartNextLap(Util.DebugUtil.GetClassAndMethodName(MethodBase.GetCurrentMethod()) + " var prijmeni");
             Prijmeni = new HashSet<string>(prijmeniCache.Get().Split("\n", StringSplitOptions.RemoveEmptyEntries)
                 .Select(m => TextUtil.RemoveDiacritics(m.ToLower().Trim()))
                 .Distinct());
 
+            swl.StopPreviousAndStartNextLap(Util.DebugUtil.GetClassAndMethodName(MethodBase.GetCurrentMethod()) + " var topjmena");
             TopJmena = new HashSet<string>(topjmenaCache.Get().Split("\n", StringSplitOptions.RemoveEmptyEntries)
                 .Select(m => TextUtil.RemoveDiacritics(m.ToLower().Trim()))
                 .Distinct());
+            swl.StopPreviousAndStartNextLap(Util.DebugUtil.GetClassAndMethodName(MethodBase.GetCurrentMethod()) + " var toprijmeni");
             TopPrijmeni = new HashSet<string>(topprijmeniCache.Get().Split("\n", StringSplitOptions.RemoveEmptyEntries)
                 .Select(m => TextUtil.RemoveDiacritics(m.ToLower().Trim()))
                 .Distinct());
 
+            swl.StopPreviousAndStartNextLap(Util.DebugUtil.GetClassAndMethodName(MethodBase.GetCurrentMethod()) + " loading cpv_cs");
             Log.ForContext(typeof(Validators)).Information("Static data - loading cpv_cs");
 
             using (StringReader r = new StringReader(cpvCache.Get()))
@@ -92,6 +101,8 @@ namespace HlidacStatu.Entities
                         CPVKody.Add(kod, text);
                 }
             }
+            swl.StopAll();
+            Log.ForContext(typeof(Validators)).Warning("Static data times:" + swl.FormatSummary());
         }
 
         public static bool IsOsoba(string text)

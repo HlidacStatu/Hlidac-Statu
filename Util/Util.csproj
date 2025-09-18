@@ -15,7 +15,7 @@
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Devmasters.Batch" Version="8.0.2" />
-    <PackageReference Include="Devmasters.Cache.AWS_S3" Version="8.0.2" />
+    <PackageReference Include="Devmasters.Cache.AWS_S3" Version="8.1.0" />
     <PackageReference Include="Devmasters.Collections" Version="8.0.0" />
     <PackageReference Include="Devmasters.Core" Version="8.0.11" />
     <PackageReference Include="Devmasters.DT" Version="8.1.3" />
