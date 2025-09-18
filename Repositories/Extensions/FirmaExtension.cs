@@ -496,6 +496,12 @@ namespace HlidacStatu.Extensions
         /// <returns></returns>
         public static bool JsemOVM(this Firma firma) => firma.TypSubjektu == Firma.TypSubjektuEnum.Ovm || firma.TypSubjektu == Firma.TypSubjektuEnum.Obec;
         public const int PolitickaStrana_kodPF = 711;
+
+        public static bool JsemZivnostnik(this Firma firma)
+        {
+            return firma.Kod_PF <= 110;
+        }
+        
         public static bool JsemPolitickaStrana(this Firma firma) => firma.Kod_PF == PolitickaStrana_kodPF;
 
         internal static bool _jsemOVM(this Firma firma)

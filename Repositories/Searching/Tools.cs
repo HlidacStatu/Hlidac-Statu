@@ -105,7 +105,7 @@ namespace HlidacStatu.Repositories.Searching
                     {
                         kategorie = Autocomplete.CategoryEnum.City;
                     }
-                    else if (firma.Kod_PF > 110 && firma.JsemOVM() && firma.IsInRS == 1)
+                    else if (!firma.JsemZivnostnik() && firma.JsemOVM() && firma.IsInRS == 1)
                     {
                         kategorie = Autocomplete.CategoryEnum.Authority;
                     }
@@ -131,7 +131,7 @@ namespace HlidacStatu.Repositories.Searching
                     {
                         kategorie = Autocomplete.CategoryEnum.City;
                     }
-                    else if (firma.Kod_PF > 110 && firma.JsemOVM() && firma.IsInRS == 1)
+                    else if (!firma.JsemZivnostnik() && firma.JsemOVM() && firma.IsInRS == 1)
                     {
                         kategorie = Autocomplete.CategoryEnum.Authority;
                     }

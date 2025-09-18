@@ -52,7 +52,7 @@
                 <p class="text-muted sub-header-info">
                     Přehled politických a veřejných funkcí
                 </p>
-                <p>
+                <div>
                     <dl class="row">
                         <dt class="col-6 col-sm-6 col-md-3 text-nowrap">
                             Roční osobní příjem
@@ -78,7 +78,7 @@
                         <dt class="col-6 col-sm-6 col-md-3 text-nowrap">Evidujeme příjmy od </dt>
                         <dd class="col-6 col-sm-6 col-md-9">@(string.Join(", ", prijmyPolitika.Select(m => m.Organizace.FirmaDs.DsSubjName)))</dd>
                     </dl>
-                </p>
+                </div>
 
                 <p class="text-center">
                     <a href="https://platy.hlidacstatu.cz/politici/politik/@Model.NameId" class="btn btn-hs btn-primary btn-sm my-3 position-relative">
@@ -459,11 +459,12 @@
 
 
     @* ----- Insolvence -----*@
-    @*dotace*@
-    @{
+    @if (this.User.IsInRole("Admin") ||
+         (Model.StatusOsoby() != Osoba.StatusOsobyEnum.NeniPolitik && 
+         Model.StatusOsoby() != Osoba.StatusOsobyEnum.Duplicita))
+    {
         laps.StopPreviousAndStartNextLap("insolvence");
-    }
-    @{
+
         var oinsDluznik = await InsolvenceRepo.Searching.SimpleSearchAsync("dluznici.osobaId:" + Model.NameId, 1, 1, (int)HlidacStatu.Repositories.Searching.InsolvenceSearchResult.InsolvenceOrderResult.FastestForScroll, false, HlidacStatu.Web.Framework.InsolvenceLimitedView.IsLimited(this.User));
         var oinsVeritel = await InsolvenceRepo.Searching.SimpleSearchAsync("veritele.osobaId:" + Model.NameId, 1, 1, (int)HlidacStatu.Repositories.Searching.InsolvenceSearchResult.InsolvenceOrderResult.FastestForScroll, false, HlidacStatu.Web.Framework.InsolvenceLimitedView.IsLimited(this.User));
         var oinsSpravce = await InsolvenceRepo.Searching.SimpleSearchAsync("spravci.osobaId:" + Model.NameId, 1, 1, (int)HlidacStatu.Repositories.Searching.InsolvenceSearchResult.InsolvenceOrderResult.FastestForScroll, false, HlidacStatu.Web.Framework.InsolvenceLimitedView.IsLimited(this.User));
@@ -481,81 +482,81 @@
         insolv.Add("dluznik|dlužník|dlužníka|dlužníkem", insDluznik.Total);
         insolv.Add("veritel|věřitel|věřitele|veřitelem", insVeritel.Total);
         insolv.Add("spravce|insolvenční správce|insolvenčního správce|insolvenčním správcem", insSpravce.Total);
-    }
-    @if (oinsolv.Sum(m => m.Value) + insolv.Sum(m => m.Value) > 0)
-    {
-        <div>
-            <h4>Insolvenční rejstřík</h4>
-            <p class="text-muted sub-header-info">
-                Informace o insolvenčních řízeních, kterých se @Model.FullName() nebo firmy, ve kterých se angažuje,
-                účastní jako dlužník, věřitel či správce.
-            </p>
-            @if (oinsolv.Sum(m => m.Value) > 0)
-            {
-                <p>
-                    @Model.FullName() se osobně
-                    <ul>
-                        @foreach (var kv in oinsolv.OrderByDescending(m => m.Value))
-                        {
-                            var text = kv.Key.Split('|');
-                            string surl = WebUtil.GetSearchUrl("/insolvence/hledat", $"{text[0]}.osobaId:" + Model.NameId);
+        if (oinsolv.Sum(m => m.Value) + insolv.Sum(m => m.Value) > 0)
+        {
+            <div>
+                <h4>Insolvenční rejstřík</h4>
+                <p class="text-muted sub-header-info">
+                    Informace o insolvenčních řízeních, kterých se @Model.FullName() nebo firmy, ve kterých se angažuje,
+                    účastní jako dlužník, věřitel či správce.
+                </p>
+                @if (oinsolv.Sum(m => m.Value) > 0)
+                {
+                    <p>
+                        @Model.FullName() se osobně
+                        <ul>
+                            @foreach (var kv in oinsolv.OrderByDescending(m => m.Value))
+                            {
+                                var text = kv.Key.Split('|');
+                                string surl = WebUtil.GetSearchUrl("/insolvence/hledat", $"{text[0]}.osobaId:" + Model.NameId);
 
-                            <li>
-                                @Html.Raw(Devmasters.Lang.CS.Plural.GetWithZero((int)kv.Value,
-                                "<b>nevyskytuje</b> v insolvenčním rejstříku ",
+                                <li>
+                                    @Html.Raw(Devmasters.Lang.CS.Plural.GetWithZero((int)kv.Value,
+                                        "<b>nevyskytuje</b> v insolvenčním rejstříku ",
                                         " vyskytuje v <a href='" + surl + "'><b>jedné insolvenci</b></a>",
                                         " vyskytuje v <a href='" + surl + "'><b>{0} insolvencích</b></a>",
                                         " vyskytuje v <a href='" + surl + "'><b>{0} insolvencích</b></a>"))
-                    jako @(text[1]).
-                </li>
-                                }
-                    </ul>
-                </p>
-            }
-            else
-            {
-                <p>
-                    @Model.FullName() se osobně nevyskytuje v insolvenčním rejstříku.
-                </p>
-            }
+                                    jako @(text[1]).
+                                </li>
+                            }
+                        </ul>
+                    </p>
+                }
+                else
+                {
+                    <p>
+                        @Model.FullName() se osobně nevyskytuje v insolvenčním rejstříku.
+                    </p>
+                }
 
-            @if (insolv.Sum(m => m.Value) > 0)
-            {
-                <p>
-                    Společnosti, ve který se @Model.FullName() angažuje, se
-                    <ul>
-                        @foreach (var kv in insolv.OrderByDescending(m => m.Value))
-                        {
-                            var text = kv.Key.Split('|');
-                            string surl = WebUtil.GetSearchUrl("/insolvence/hledat", $"osobaid{text[0]}:" + Model.NameId);
+                @if (insolv.Sum(m => m.Value) > 0)
+                {
+                    <p>
+                        Společnosti, ve který se @Model.FullName() angažuje, se
+                        <ul>
+                            @foreach (var kv in insolv.OrderByDescending(m => m.Value))
+                            {
+                                var text = kv.Key.Split('|');
+                                string surl = WebUtil.GetSearchUrl("/insolvence/hledat", $"osobaid{text[0]}:" + Model.NameId);
 
-                            <li>
-                                @Html.Raw(Devmasters.Lang.CS.Plural.GetWithZero((int)kv.Value,
-                                "<b>nevyskytují</b> v insolvenčním rejstříku ",
+                                <li>
+                                    @Html.Raw(Devmasters.Lang.CS.Plural.GetWithZero((int)kv.Value,
+                                        "<b>nevyskytují</b> v insolvenčním rejstříku ",
                                         "vyskytují v <a href='" + surl + "'><b>jedné insolvenci</b></a>",
                                         "vyskytují v <a href='" + surl + "'><b>{0} insolvencích</b></a>",
                                         "vyskytují v <a href='" + surl + "'><b>{0} insolvencích</b></a>")) jako @text[1].
-                </li>
-                                }
-                    </ul>
+                                </li>
+                            }
+                        </ul>
+                    </p>
+                }
+
+
+                <p class="text-center">
+                    <a href="@(WebUtil.GetSearchUrl("/insolvence/hledat", $"osobaid:" + Model.NameId))" class="btn btn-hs btn-primary btn-sm my-3 position-relative">
+                        Podrobnosti o insolvencích
+                        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                            @(HlidacStatu.Util.RenderData.NiceNumber(oinsDluznik.Total + oinsVeritel.Total + oinsSpravce.Total + insDluznik.Total + insVeritel.Total + insSpravce.Total))
+                        </span>
+                    </a>
                 </p>
-            }
 
 
-            <p class="text-center">
-                <a href="@(WebUtil.GetSearchUrl("/insolvence/hledat", $"osobaid:" + Model.NameId))" class="btn btn-hs btn-primary btn-sm my-3 position-relative">
-                    Podrobnosti o insolvencích
-                    <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
-                        @(HlidacStatu.Util.RenderData.NiceNumber(oinsDluznik.Total + oinsVeritel.Total + oinsSpravce.Total + insDluznik.Total + insVeritel.Total + insSpravce.Total))
-                    </span>
-                </a>
-            </p>
+            </div>
 
 
-        </div>
-
-
-        <hr />
+            <hr/>
+        }
     }
 
     @* ----- Veřejné zakázky -----*@
@@ -578,7 +579,7 @@
                 Zakázky analyzujeme jak z věstníku veřejných zakázek, tak z profilů zadavatelů.
             </p>
 
-            <p>
+            <div>
                 Firmy navázané na @Model.FullName() jsme našli
                 <ul>
                     @foreach (var kv in vzakaz.OrderByDescending(m => m.Value).Where(m => m.Value > 0))
@@ -596,7 +597,7 @@
                                 }
                     }
                 </ul>
-            </p>
+            </div>
 
             <p class="text-center">
                 <a href="@(WebUtil.GetSearchUrl("/verejnezakazky/hledat", $"osobaid:" + Model.NameId))" class="btn btn-hs btn-primary btn-sm my-3 position-relative">
