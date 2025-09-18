@@ -11,6 +11,8 @@ namespace HlidacStatu.LibCore.MiddleWares
     {
         public const string ItemKeyName = "errorPageCtx";
         public const string ItemKeyNameObj = "errorPageCtxObj";
+        public const string ItemKeyRefererName = "referrerUrl";
+
         private readonly RequestDelegate _next;
         
         private readonly ILogger _logger = Log.ForContext<OnHTTPErrorMiddleware>();
@@ -38,6 +40,10 @@ namespace HlidacStatu.LibCore.MiddleWares
                 else
                     httpContext.Items.Add(ItemKeyName, str);
 
+                httpContext.Items[ItemKeyRefererName] = httpContext?.Request?.Headers?.ContainsKey("Referer") == true
+                    ? httpContext.Request.Headers["Referer"].ToString()
+                    : null;
+
                 _logger.Error(e, "Unhadled exception {middleware} {path}?{query}\n" + str, "OnHTTPErrorMidddleware",
                     httpContext.Request.Path, httpContext.Request.QueryString);
 
@@ -58,6 +64,10 @@ namespace HlidacStatu.LibCore.MiddleWares
                     }
                     else
                         httpContext.Items.Add(ItemKeyName, str);
+
+                    httpContext.Items[ItemKeyRefererName] = httpContext?.Request?.Headers?.ContainsKey("Referer") == true
+                        ? httpContext.Request.Headers["Referer"].ToString()
+                        : null;
 
                     _logger.Error(
                         "Unhadled exception > 500 {middleware} {path}?{query}\n" + httpContext.Items[ItemKeyName],
@@ -81,6 +91,10 @@ namespace HlidacStatu.LibCore.MiddleWares
                     }
                     else
                         httpContext.Items.Add(ItemKeyName, str);
+
+                    httpContext.Items[ItemKeyRefererName] = httpContext?.Request?.Headers?.ContainsKey("Referer") == true
+                        ? httpContext.Request.Headers["Referer"].ToString()
+                        : null;
 
                     httpContext.Items[ItemKeyNameObj] =
                         Devmasters.Net.WebContextLogger.Get404ErrorContextInfo(httpContext);

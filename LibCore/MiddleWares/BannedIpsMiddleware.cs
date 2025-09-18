@@ -24,6 +24,7 @@ namespace HlidacStatu.LibCore.MiddleWares
         private readonly string[] _badWords = new[]
         {
             "wp-login.php"
+            
         };
 
         public BannedIpsMiddleware(RequestDelegate next, Whitelist whitelist)
