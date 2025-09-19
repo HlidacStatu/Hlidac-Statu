@@ -1,7 +1,4 @@
 ﻿@model object
-@using System.Net.Http
-
-@inject IHttpClientFactory HttpClientFactory
 
 @{
     if (Enum.TryParse<HlidacStatu.Web.Framework.Megamenu.Items>(Model as string,true, out var page) == false)
