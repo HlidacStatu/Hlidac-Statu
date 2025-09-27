@@ -7,6 +7,21 @@
     <UserSecretsId>aspnet-PlatyUredniku-CDBD91C6-CE60-4F51-93CF-128B527169E1</UserSecretsId>
     <AssemblyName>HlidacStatu.PlatyUredniku</AssemblyName>
   </PropertyGroup>
+		<!-- 
+	Kvuli exception po nasazeni Microsoft.Data.SqlClient namisto System.Data.SqlClient
+
+Description: The process was terminated due to an unhandled exception.
+Exception Info: Microsoft.Data.SqlClient.SqlException (0x80131904): A connection was successfully established with the server, but then an error occurred during the pre-login handshake. (provider: SSL Provider, error: 0 - The wait operation timed out.)
+ - - - > System.ComponentModel.Win32Exception (258): The wait operation timed out.
+at Microsoft.Data.SqlClient.SqlInternalConnection.OnError(SqlException exception, Boolean breakConnection, Action`1 wrapCloseInAction)
+
+-->
+    <ItemGroup>
+		<RuntimeHostConfigurationOption
+		  Include="Switch.Microsoft.Data.SqlClient.UseManagedNetworkingOnWindows"
+		  Value="true" />
+	</ItemGroup>
+
   <ItemGroup>
     <PackageReference Include="Devmasters.Imaging" Version="8.1.3" />
     <PackageReference Include="MathNet.Numerics" Version="5.0.0" />

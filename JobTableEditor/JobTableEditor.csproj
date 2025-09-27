@@ -11,7 +11,22 @@
     <PackageReference Include="Ollama" Version="1.15.0" />
     <PackageReference Include="System.Security.Cryptography.Pkcs" Version="9.0.7" />
   </ItemGroup>
-  <ItemGroup>
+	<!-- 
+	Kvuli exception po nasazeni Microsoft.Data.SqlClient namisto System.Data.SqlClient
+
+Description: The process was terminated due to an unhandled exception.
+Exception Info: Microsoft.Data.SqlClient.SqlException (0x80131904): A connection was successfully established with the server, but then an error occurred during the pre-login handshake. (provider: SSL Provider, error: 0 - The wait operation timed out.)
+ - - - > System.ComponentModel.Win32Exception (258): The wait operation timed out.
+at Microsoft.Data.SqlClient.SqlInternalConnection.OnError(SqlException exception, Boolean breakConnection, Action`1 wrapCloseInAction)
+
+-->
+	<ItemGroup>
+		<RuntimeHostConfigurationOption
+		  Include="Switch.Microsoft.Data.SqlClient.UseManagedNetworkingOnWindows"
+		  Value="true" />
+	</ItemGroup>
+
+	<ItemGroup>
     <ProjectReference Include="..\..\Hlidac-Statu-Private\HlidacStatu.DetectJobs\HlidacStatu.DetectJobs.csproj" />
     <ProjectReference Include="..\LibCore\LibCore.csproj" />
     <ProjectReference Include="..\Repositories\Repositories.csproj" />
