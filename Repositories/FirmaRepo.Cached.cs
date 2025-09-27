@@ -157,7 +157,7 @@ namespace HlidacStatu.Repositories
                             System.Collections.Concurrent.ConcurrentDictionary<string, string[]> res
                                 = new System.Collections.Concurrent.ConcurrentDictionary<string, string[]>();
                             string cnnStr = Devmasters.Config.GetWebConfigValue("OldEFSqlConnection");
-                            using (Devmasters.PersistLib p = new Devmasters.PersistLib())
+                            using (Devmasters.DbConnect p = new Devmasters.DbConnect())
                             {
                                 var reader = p.ExecuteReader(cnnStr, CommandType.Text, "select ico, jmeno from firma",
                                     null);

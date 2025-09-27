@@ -339,7 +339,7 @@ inner join Firma_DS fds
         = new Devmasters.Cache.LocalMemory.AutoUpdatedCache<IEnumerable<Tuple<string, string>>>(TimeSpan.FromHours(1), "NeaktivniOrganizace",
             (o) =>
             {
-                return DirectDB.GetList<string, string>(@"
+                return DirectDB.Instance.GetList<string, string>(@"
 select distinct ds.DatovaSchranka, f.ico from firma f 
 	inner join Firma_DS ds on f.ICO=ds.ICO
 	inner join PU_Organizace puo on ds.DatovaSchranka = puo.DS

@@ -39,7 +39,7 @@ namespace HlidacStatu.Repositories
 
         public static int DefaultLastSponzoringYear()
         {
-            _defaultLastSponzoringYear ??= (HlidacStatu.Connectors.DirectDB
+            _defaultLastSponzoringYear ??= (HlidacStatu.Connectors.DirectDB.Instance
                                                .GetList<int?>("select max(DATEPART(yy, Sponzoring.DarovanoDne)) from sponzoring where sponzoring.darovanoDne < GetDate()")
                                                .FirstOrDefault()
                                            ?? (DateTime.Now.Year - 1));
@@ -230,7 +230,7 @@ namespace HlidacStatu.Repositories
                 TimeSpan.FromHours(1), "stranyIcoCache",
                 (o) =>
                 {
-                    var res = DirectDB.GetList<string, string>(@"SELECT  IcoPrijemce as IcoStrany, zs.KratkyNazev
+                    var res = DirectDB.Instance.GetList<string, string>(@"SELECT  IcoPrijemce as IcoStrany, zs.KratkyNazev
                       FROM Sponzoring sp
                       Left Join ZkratkaStrany zs on sp.IcoPrijemce = zs.ICO
                       group by zs.KratkyNazev, IcoPrijemce");

@@ -21,12 +21,12 @@ namespace HlidacStatu.Entities
 
             string cnnStr = Devmasters.Config.GetWebConfigValue("OldEFSqlConnection");
             string sql = @"select top 1 * from [DumpData] where mesic = @mesic and rok = @rok and den = @den order by created desc";
-            using (var p = new Devmasters.PersistLib())
+            using (var p = new Devmasters.DbConnect())
             {
                 var ds = p.ExecuteDataset(cnnStr, CommandType.Text, sql, new IDataParameter[] {
-                            new System.Data.SqlClient.SqlParameter("den", (int)dump.den),
-                            new System.Data.SqlClient.SqlParameter("mesic", (int)dump.mesic),
-                            new System.Data.SqlClient.SqlParameter("rok", (int)dump.rok),
+                            new Microsoft.Data.SqlClient.SqlParameter("den", (int)dump.den),
+                            new Microsoft.Data.SqlClient.SqlParameter("mesic", (int)dump.mesic),
+                            new Microsoft.Data.SqlClient.SqlParameter("rok", (int)dump.rok),
                 });
                 if (ds.Tables[0].Rows.Count == 0)
                     return ShouldDownloadStatus.Yes;
@@ -75,18 +75,18 @@ namespace HlidacStatu.Entities
             try
             {
 
-                using (var p = new Devmasters.PersistLib())
+                using (var p = new Devmasters.DbConnect())
                 {
                     p.ExecuteNonQuery(cnnStr, CommandType.Text, sql, new IDataParameter[] {
-                        new System.Data.SqlClient.SqlParameter("created", DateTime.Now),
-                        new System.Data.SqlClient.SqlParameter("processed", processed),
-                        new System.Data.SqlClient.SqlParameter("den", (int)dump.den),
-                        new System.Data.SqlClient.SqlParameter("mesic", (int)dump.mesic),
-                        new System.Data.SqlClient.SqlParameter("rok", (int)dump.rok),
-                        new System.Data.SqlClient.SqlParameter("hash", dump.hashDumpu.Value),
-                        new System.Data.SqlClient.SqlParameter("velikost", (long)dump.velikostDumpu),
-                        new System.Data.SqlClient.SqlParameter("casGenerovani", dump.casGenerovani),
-                        new System.Data.SqlClient.SqlParameter("exception", ex==null ? (string)null : ex.ToString()),
+                        new Microsoft.Data.SqlClient.SqlParameter("created", DateTime.Now),
+                        new Microsoft.Data.SqlClient.SqlParameter("processed", processed),
+                        new Microsoft.Data.SqlClient.SqlParameter("den", (int)dump.den),
+                        new Microsoft.Data.SqlClient.SqlParameter("mesic", (int)dump.mesic),
+                        new Microsoft.Data.SqlClient.SqlParameter("rok", (int)dump.rok),
+                        new Microsoft.Data.SqlClient.SqlParameter("hash", dump.hashDumpu.Value),
+                        new Microsoft.Data.SqlClient.SqlParameter("velikost", (long)dump.velikostDumpu),
+                        new Microsoft.Data.SqlClient.SqlParameter("casGenerovani", dump.casGenerovani),
+                        new Microsoft.Data.SqlClient.SqlParameter("exception", ex==null ? (string)null : ex.ToString()),
                         });
 
                 }

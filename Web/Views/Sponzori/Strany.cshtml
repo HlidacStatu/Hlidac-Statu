@@ -29,7 +29,7 @@ where KOD_PF = 711
 order by sumaLastY desc, suma desc
 ";
 
-    var strany = HlidacStatu.Connectors.DirectDB.GetList<string, string, decimal?, decimal?,int>(sql);
+    var strany = HlidacStatu.Connectors.DirectDB.Instance.GetList<string, string, decimal?, decimal?,int>(sql);
 
     ViewBag.Title = "Všechny politické strany";
 

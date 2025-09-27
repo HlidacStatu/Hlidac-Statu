@@ -51,11 +51,11 @@ namespace HlidacStatu.Web.Framework
         {
             if (string.IsNullOrEmpty(page))
                 return;
-            DirectDB.NoResult("AddVisit", System.Data.CommandType.StoredProcedure,
+            DirectDB.Instance.NoResult("AddVisit", System.Data.CommandType.StoredProcedure,
                 new System.Data.IDataParameter[] {
-                    new System.Data.SqlClient.SqlParameter("@page", page.ToLower()),
-                    new System.Data.SqlClient.SqlParameter("@date", DateTime.Now.Date),
-                    new System.Data.SqlClient.SqlParameter("@channel", (int)channel)
+                    new Microsoft.Data.SqlClient.SqlParameter("@page", page.ToLower()),
+                    new Microsoft.Data.SqlClient.SqlParameter("@date", DateTime.Now.Date),
+                    new Microsoft.Data.SqlClient.SqlParameter("@channel", (int)channel)
                 }
             );
         }

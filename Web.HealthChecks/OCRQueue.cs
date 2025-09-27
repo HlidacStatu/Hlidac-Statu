@@ -33,7 +33,7 @@ namespace HlidacStatu.Web.HealthChecks
 		            from ItemToOcrQueue t with (nolock)
 		            order by type"; ;
 
-                var ocrQueue = HlidacStatu.Connectors.DirectDB.GetList<string, int, int, int, int>(ocrQueueSQL);
+                var ocrQueue = HlidacStatu.Connectors.DirectDB.Instance.GetList<string, int, int, int, int>(ocrQueueSQL);
 
                 var report = $"Velikost fronty:\n {string.Join("\n", ocrQueue.Select(m => $"{m.Item1}:čeká {m.Item2}"))}\n";
 

@@ -11,7 +11,7 @@ using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Data;
-using System.Data.SqlClient;
+using Microsoft.Data.SqlClient;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -72,14 +72,14 @@ namespace HlidacStatu.Repositories
 
                     /*                    if (firma.DatovaSchranka != null)
                                         {
-                                            HlidacStatu.Connectors.DirectDB.NoResult("delete from firma_DS where ico=@ico",
+                                            HlidacStatu.Connectors.DirectDB.Instance.NoResult("delete from firma_DS where ico=@ico",
                                                 new IDataParameter[]
                                                 {
                                                     new SqlParameter("ico", firma.ICO)
                                                 });
                                             foreach (var ds in firma.DatovaSchranka.Distinct())
                                             {
-                                                HlidacStatu.Connectors.DirectDB.NoResult(sqlDS, new IDataParameter[]
+                                                HlidacStatu.Connectors.DirectDB.Instance.NoResult(sqlDS, new IDataParameter[]
                                                 {
                                                     new SqlParameter("ico", firma.ICO),
                                                     new SqlParameter("DatovaSchranka", ds),
@@ -89,14 +89,14 @@ namespace HlidacStatu.Repositories
 
                     if (firma.NACE != null)
                     {
-                        HlidacStatu.Connectors.DirectDB.NoResult("delete from firma_NACE where ico=@ico",
+                        HlidacStatu.Connectors.DirectDB.Instance.NoResult("delete from firma_NACE where ico=@ico",
                             new IDataParameter[]
                             {
                                 new SqlParameter("ico", firma.ICO)
                             });
                         foreach (var nace in firma.NACE.Distinct())
                         {
-                            HlidacStatu.Connectors.DirectDB.NoResult(sqlNACE, new IDataParameter[]
+                            HlidacStatu.Connectors.DirectDB.Instance.NoResult(sqlNACE, new IDataParameter[]
                             {
                                 new SqlParameter("ico", firma.ICO),
                                 new SqlParameter("nace", nace),
@@ -194,12 +194,10 @@ namespace HlidacStatu.Repositories
 
         public static void AddZahranicniFirma(string ico, string jmeno, string adresa)
         {
-            using (PersistLib p = new PersistLib())
-            {
-                string sql = @"insert into firma(ico,dic,stav_subjektu, jmeno, jmenoascii, versionupdate, popis)
+            string sql = @"insert into firma(ico,dic,stav_subjektu, jmeno, jmenoascii, versionupdate, popis)
                                 values(@ico,@dic,@stav,@jmeno,@jmenoascii,0,@adresa)";
 
-                p.ExecuteNonQuery(DirectDB.DefaultCnnStr, CommandType.Text, sql, new IDataParameter[] {
+            DirectDB.Instance.NoResult(sql, CommandType.Text, new IDataParameter[] {
                     new SqlParameter("ico", ico),
                     new SqlParameter("dic", ico),
                     new SqlParameter("stav", (int)1),
@@ -208,7 +206,7 @@ namespace HlidacStatu.Repositories
                     new SqlParameter("versionupdate", (long)0),
                     new SqlParameter("adresa", TextUtil.ShortenText(adresa,100)),
                     });
-            }
+
         }
 
         public static Firma FromIco(string ico, bool loadInvalidIco = false)
@@ -228,12 +226,12 @@ namespace HlidacStatu.Repositories
 
                 if (f != null)
                 {
-                    f.DatovaSchranka = Connectors.DirectDB.GetList<string>("select DatovaSchranka from firma_DS where ico=@ico", param: new IDataParameter[] {
+                    f.DatovaSchranka = Connectors.DirectDB.Instance.GetList<string>("select DatovaSchranka from firma_DS where ico=@ico", param: new IDataParameter[] {
                         new SqlParameter("ico", f.ICO)
                         })
                         .ToArray();
 
-                    f.NACE = Connectors.DirectDB.GetList<string>("select NACE from firma_Nace where ico=@ico", param: new IDataParameter[] {
+                    f.NACE = Connectors.DirectDB.Instance.GetList<string>("select NACE from firma_Nace where ico=@ico", param: new IDataParameter[] {
                         new SqlParameter("ico", f.ICO)
                         })
                         .ToArray();
@@ -261,7 +259,7 @@ namespace HlidacStatu.Repositories
         {
             string sql = @"select ico from Firma where jmeno = @jmeno";
 
-            var res = Connectors.DirectDB.GetList<string>(sql, param: new IDataParameter[] {
+            var res = Connectors.DirectDB.Instance.GetList<string>(sql, param: new IDataParameter[] {
                         new SqlParameter("jmeno", jmeno)
                         });
 
@@ -276,33 +274,15 @@ namespace HlidacStatu.Repositories
 
         public static IEnumerable<(string ico, string jmeno, bool isFop)> GetJmenoIcoAndFopTuples()
         {
-            using (PersistLib p = new PersistLib())
-            {
-                var reader = p.ExecuteReader(DirectDB.DefaultCnnStr, CommandType.Text, "select ico, jmeno, CASE WHEN Kod_PF <= 110 OR Kod_PF IS NULL THEN CAST(1 AS BIT) ELSE CAST(0 AS BIT) END AS isFOP from firma where ISNUMERIC(ico) = 1", null);
-                while (reader.Read())
-                {
-                    string ico = reader.GetString(0).Trim();
-                    string name = reader.GetString(1).Trim();
-                    bool isFop = reader.GetBoolean(2);
-                    if (Devmasters.TextUtil.IsNumeric(ico))
-                    {
-                        ico = Util.ParseTools.NormalizeIco(ico);
-                        yield return (ico, name, isFop);
-                    }
-                }
-            }
+            var data = DirectDB.Instance.GetList<string, string, bool>("select ico, jmeno, CASE WHEN Kod_PF <= 110 OR Kod_PF IS NULL THEN CAST(1 AS BIT) ELSE CAST(0 AS BIT) END AS isFOP from firma where ISNUMERIC(ico) = 1", CommandType.Text, null);
+            return data.Select(m => (Util.ParseTools.NormalizeIco(m.Item1.Trim()), m.Item2.Trim(), m.Item3));
+
         }
 
         public static IEnumerable<string> GetEntrepreneurIcos()
         {
-            using (PersistLib p = new PersistLib())
-            {
-                var reader = p.ExecuteReader(DirectDB.DefaultCnnStr, CommandType.Text, "select ico from firma where ISNUMERIC(ICO) = 1 AND Kod_PF <=110", null);
-                while (reader.Read())
-                {
-                    yield return reader.GetString(0).Trim();
-                }
-            }
+            var data = DirectDB.Instance.GetList<string>("select ico from firma where ISNUMERIC(ICO) = 1 AND Kod_PF <=110", CommandType.Text, null);
+            return data;
         }
 
         public static IEnumerable<Firma> AllFromNameWildcards(string jmeno)
@@ -311,7 +291,7 @@ namespace HlidacStatu.Repositories
 
             var sql = @"select ico from Firma where jmeno like @jmeno";
 
-            var res = Connectors.DirectDB.GetList<string>(sql, param: new IDataParameter[] {
+            var res = Connectors.DirectDB.Instance.GetList<string>(sql, param: new IDataParameter[] {
                         new SqlParameter("jmeno", jmeno)
                         });
 
@@ -328,7 +308,7 @@ namespace HlidacStatu.Repositories
         {
             string sql = @"select firma.ico from Firma_ds fds inner join firma on firma.ico = fds.ico where DatovaSchranka = @ds";
 
-            var res = Connectors.DirectDB.GetList<string>(sql, param: new IDataParameter[] {
+            var res = Connectors.DirectDB.Instance.GetList<string>(sql, param: new IDataParameter[] {
                         new SqlParameter("ds", ds)
                         });
 
@@ -346,25 +326,21 @@ namespace HlidacStatu.Repositories
 
         public static IEnumerable<string> AllIcoInRS()
         {
-            using (PersistLib p = new PersistLib())
+            string sql = @"select ico from Firma where IsInRS = 1";
+
+            var res = DirectDB.Instance.GetList<string>(sql, CommandType.Text, null);
+
+            if (res.Count() > 0)
             {
-                string sql = @"select ico from Firma where IsInRS = 1";
+                var allIcos = res
+                    .Where(r => TextUtil.IsNumeric(r))
+                    .ToArray();
 
-                var res = p.ExecuteDataset(DirectDB.DefaultCnnStr, CommandType.Text, sql, null);
-
-                if (res.Tables.Count > 0 && res.Tables[0].Rows.Count > 0)
-                {
-                    var allIcos = res.Tables[0]
-                        .AsEnumerable()
-                        .Where(r => TextUtil.IsNumeric((string)r["ICO"]))
-                        .Select(r => (string)r["ICO"])
-                        .ToArray();
-
-                    return allIcos;
-                }
-                else
-                    return new string[] { };
+                return allIcos;
             }
+            else
+                return new string[] { };
+
         }
 
         //don;t use it, 
@@ -381,39 +357,34 @@ namespace HlidacStatu.Repositories
         {
             Firma f = new Firma();
             f.ICO = (string)dr["ico"];
-            f.DIC = (string)PersistLib.IsNull(dr["dic"], string.Empty);
-            f.Datum_Zapisu_OR = (DateTime?)PersistLib.IsNull(dr["datum_zapisu_or"], null);
-            f.Stav_subjektu = (byte)Convert.ToInt32(PersistLib.IsNull(dr["Stav_subjektu"], 1));
-            f.Status = Convert.ToInt32(PersistLib.IsNull(dr["Status"], 1));
-            f.Jmeno = (string)PersistLib.IsNull(dr["jmeno"], string.Empty);
-            f.JmenoAscii = (string)PersistLib.IsNull(dr["jmenoascii"], string.Empty);
-            f.Kod_PF = (int?)PersistLib.IsNull(dr["Kod_PF"], null);
+            f.DIC = (string)Devmasters.DirectSql.IsNull(dr["dic"], string.Empty);
+            f.Datum_Zapisu_OR = (DateTime?)Devmasters.DirectSql.IsNull(dr["datum_zapisu_or"], null);
+            f.Stav_subjektu = (byte)Convert.ToInt32(Devmasters.DirectSql.IsNull(dr["Stav_subjektu"], 1));
+            f.Status = Convert.ToInt32(Devmasters.DirectSql.IsNull(dr["Status"], 1));
+            f.Jmeno = (string)Devmasters.DirectSql.IsNull(dr["jmeno"], string.Empty);
+            f.JmenoAscii = (string)Devmasters.DirectSql.IsNull(dr["jmenoascii"], string.Empty);
+            f.Kod_PF = (int?)Devmasters.DirectSql.IsNull(dr["Kod_PF"], null);
             f.VersionUpdate = (int)dr["VersionUpdate"];
-            f.IsInRS = (short?)PersistLib.IsNull(dr["IsInRS"], null);
-            f.KrajId = (string)PersistLib.IsNull(dr["krajid"], string.Empty);
-            f.OkresId = (string)PersistLib.IsNull(dr["okresid"], string.Empty);
-            f.Typ = (int?)PersistLib.IsNull(dr["typ"], null);
-            f.ESA2010 = (string)PersistLib.IsNull(dr["Esa2010"], string.Empty);
+            f.IsInRS = (short?)Devmasters.DirectSql.IsNull(dr["IsInRS"], null);
+            f.KrajId = (string)Devmasters.DirectSql.IsNull(dr["krajid"], string.Empty);
+            f.OkresId = (string)Devmasters.DirectSql.IsNull(dr["okresid"], string.Empty);
+            f.Typ = (int?)Devmasters.DirectSql.IsNull(dr["typ"], null);
+            f.ESA2010 = (string)Devmasters.DirectSql.IsNull(dr["Esa2010"], string.Empty);
 
             if (skipDS_Nace == false)
             {
-                using (PersistLib p = new PersistLib())
-                {
-                    f.DatovaSchranka = p.ExecuteDataset(DirectDB.DefaultCnnStr, CommandType.Text, "select DatovaSchranka from firma_DS where ico=@ico", new IDataParameter[] {
-                        new SqlParameter("ico", f.ICO)
-                        }).Tables[0]
-                        .AsEnumerable()
-                        .Select(m => m[0].ToString())
-                        .ToArray();
 
-                    f.NACE = p.ExecuteDataset(DirectDB.DefaultCnnStr, CommandType.Text, "select NACE from firma_Nace where ico=@ico", new IDataParameter[] {
+                f.DatovaSchranka = DirectDB.Instance.GetList<string>("select DatovaSchranka from firma_DS where ico=@ico", CommandType.Text, new IDataParameter[] {
                         new SqlParameter("ico", f.ICO)
-                        }).Tables[0]
-                        .AsEnumerable()
-                        .Select(m => m[0].ToString())
-                        .ToArray();
-                }
+                        })
+                    .ToArray();
+
+                f.NACE = DirectDB.Instance.GetList<string>("select NACE from firma_Nace where ico=@ico", CommandType.Text, new IDataParameter[] {
+                        new SqlParameter("ico", f.ICO)
+                        })
+                    .ToArray();
             }
+
             return f;
 
         }
@@ -424,25 +395,23 @@ namespace HlidacStatu.Repositories
                 return string.Empty;
 
 
-            using (PersistLib p = new PersistLib())
-            {
-                string sql = @"select jmeno from Firma where ico = @ico";
+            string sql = @"select jmeno from Firma where ico = @ico";
 
-                var res = p.ExecuteScalar(DirectDB.DefaultCnnStr, CommandType.Text, sql, new IDataParameter[] {
+            var res = DirectDB.Instance.GetValue<string>(sql, CommandType.Text, new IDataParameter[] {
                         new SqlParameter("ico", ico)
                         });
 
-                if (PersistLib.IsNull(res) || string.IsNullOrEmpty(res as string))
-                {
-                    if (IcoIfNotFound)
-                        return "IČO:" + ico;
-                    else
-                        return string.Empty;
-                }
+            if (Devmasters.DirectSql.IsNull(res) || string.IsNullOrEmpty(res as string))
+            {
+                if (IcoIfNotFound)
+                    return "IČO:" + ico;
                 else
-                    return (string)res;
-
+                    return string.Empty;
             }
+            else
+                return res;
+
+
         }
 
         public static void RefreshDS(this Firma firma)

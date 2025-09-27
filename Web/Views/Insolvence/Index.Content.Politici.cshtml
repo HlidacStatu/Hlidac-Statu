@@ -33,7 +33,7 @@
                                                                         where osobaid is not null and OsobaId != ''
                                                                         and d.Typ='F'";
 
-                                    var politici = DirectDB
+                                    var politici = DirectDB.Instance
                                         .GetList<string, string, DateTime, DateTime, string>(sql)
                                         .GroupBy(k => k.Item5, v => new Tuple<string, string, DateTime, DateTime>
                                                        (v.Item1, v.Item2, v.Item3, v.Item4))

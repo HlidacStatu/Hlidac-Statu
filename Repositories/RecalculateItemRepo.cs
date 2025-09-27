@@ -23,7 +23,7 @@ namespace HlidacStatu.Repositories
 
         public static int RecalculateQueueLength()
         {
-            return DirectDB.GetValue<int>("select count(*) from RecalculateItemQueue with (nolock)");
+            return DirectDB.Instance.GetValue<int>("select count(*) from RecalculateItemQueue with (nolock)");
         }
 
         public static void RecalculateTasks(int? threads = null, bool debug = false, string[] ids = null,

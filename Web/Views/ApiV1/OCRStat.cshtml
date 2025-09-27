@@ -58,7 +58,7 @@ order by type";
 
     List<string> sdatalist = new List<string>();
 
-    using (var p = new Devmasters.PersistLib())
+    using (var p = new Devmasters.DbConnect())
     {
         var ds = p.ExecuteDataset(cnnStr, System.Data.CommandType.Text, sql, null);
         foreach (System.Data.DataRow dr in ds.Tables[0].Rows)

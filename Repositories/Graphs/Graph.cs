@@ -12,7 +12,7 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.Entity;
-using System.Data.SqlClient;
+using Microsoft.Data.SqlClient;
 using System.Linq;
 using System.Text;
 
@@ -68,7 +68,7 @@ namespace HlidacStatu.Repositories
         }
         public static void SmazVsechnyDcerineVazbyOsoby(long internalId)
         {
-            var nameId = DirectDB.GetValue<string>("select nameid from Osoba where internalId=@internalId",
+            var nameId = DirectDB.Instance.GetValue<string>("select nameid from Osoba where internalId=@internalId",
                 param: new IDataParameter[] { new SqlParameter("internalId", internalId) });
             if (!string.IsNullOrEmpty(nameId))
                 vazbyOsobaNameIdCache.Delete(nameId);
@@ -243,8 +243,8 @@ namespace HlidacStatu.Repositories
             //get zakladni informace o subj.
 
             //find politician in the DB
-            var db = new PersistLib();
-            var sqlCall = DirectDB.GetRawSql(CommandType.Text, sql, parameters);
+            var db = new Devmasters.DbConnect();
+            var sqlCall = DirectDB.Instance.GetRawSql(sql, parameters);
             //string sqlFirma = "select top 1 stav_subjektu from firma where ico = @ico";
 
             var ds = db.ExecuteDataset(cnnStr, CommandType.Text, sqlCall, null);
@@ -260,7 +260,7 @@ namespace HlidacStatu.Repositories
                     {
                         if (dr.Table.Columns.Contains("vazbakOsobaId"))
                         {
-                            var vazbakOsobaId = (int?)PersistLib.IsNull(dr["vazbakOsobaId"], null);
+                            var vazbakOsobaId = (int?)DirectSql.IsNull(dr["vazbakOsobaId"], null);
                             if (vazbakOsobaId != null)
                             {
                                 Osoba o = Osoby.GetById.Get(vazbakOsobaId.Value);
@@ -268,11 +268,11 @@ namespace HlidacStatu.Repositories
                                 {
                                     subjId = vazbakOsobaId.Value.ToString(),
                                     NodeType = HlidacStatu.DS.Graphs.Graph.Node.NodeType.Person,
-                                    fromDate = (DateTime?)PersistLib.IsNull(dr["datumOd"], null),
-                                    toDate = (DateTime?)PersistLib.IsNull(dr["datumDo"], null),
+                                    fromDate = (DateTime?)DirectSql.IsNull(dr["datumOd"], null),
+                                    toDate = (DateTime?)DirectSql.IsNull(dr["datumDo"], null),
                                     kod_ang = Convert.ToInt32(dr["typVazby"]),
-                                    descr = (string)PersistLib.IsNull(dr["PojmenovaniVazby"], ""),
-                                    podil = (decimal?)PersistLib.IsNull(dr["podil"], null)
+                                    descr = (string)DirectSql.IsNull(dr["PojmenovaniVazby"], ""),
+                                    podil = (decimal?)DirectSql.IsNull(dr["podil"], null)
                                 };
                             }
                         }
@@ -284,11 +284,11 @@ namespace HlidacStatu.Repositories
                             subjId = ico,
                             subjname = "",
                             NodeType = HlidacStatu.DS.Graphs.Graph.Node.NodeType.Company,
-                            fromDate = (DateTime?)PersistLib.IsNull(dr["datumOd"], null),
-                            toDate = (DateTime?)PersistLib.IsNull(dr["datumDo"], null),
+                            fromDate = (DateTime?)DirectSql.IsNull(dr["datumOd"], null),
+                            toDate = (DateTime?)DirectSql.IsNull(dr["datumDo"], null),
                             kod_ang = Convert.ToInt32(dr["typVazby"]),
-                            descr = (string)PersistLib.IsNull(dr["PojmenovaniVazby"], ""),
-                            podil = (decimal?)PersistLib.IsNull(dr["podil"], null)
+                            descr = (string)DirectSql.IsNull(dr["PojmenovaniVazby"], ""),
+                            podil = (decimal?)DirectSql.IsNull(dr["podil"], null)
                         };
                     }
 
@@ -416,11 +416,11 @@ namespace HlidacStatu.Repositories
             rel.To = toNode;
             rel.Distance = distance;
             rel.VazbaType = ang.kod_ang;
-            rel.RelFrom = (DateTime?)PersistLib.IsNull(ang.fromDate, null);
+            rel.RelFrom = (DateTime?)DirectSql.IsNull(ang.fromDate, null);
             if (rel.RelFrom < minDate)
                 rel.RelFrom = null;
 
-            rel.RelTo = (DateTime?)PersistLib.IsNull(ang.toDate, null);
+            rel.RelTo = (DateTime?)DirectSql.IsNull(ang.toDate, null);
             if (rel.RelTo < minDate)
                 rel.RelTo = null;
 
@@ -538,8 +538,8 @@ namespace HlidacStatu.Repositories
             //get zakladni informace o subj.
 
             //find politician in the DB
-            var db = new PersistLib();
-            var sqlCall = DirectDB.GetRawSql(CommandType.Text, sql, new IDataParameter[]
+            var db = new DbConnect();
+            var sqlCall = DirectDB.Instance.GetRawSql(sql, new IDataParameter[]
             {
                 new SqlParameter("ico", ico)
             });
@@ -556,11 +556,11 @@ namespace HlidacStatu.Repositories
                         subjId = (string)dr["ico"],
                         subjname = "",
                         NodeType = HlidacStatu.DS.Graphs.Graph.Node.NodeType.Company,
-                        fromDate = (DateTime?)PersistLib.IsNull(dr["datumOd"], null),
-                        toDate = (DateTime?)PersistLib.IsNull(dr["datumDo"], null),
+                        fromDate = (DateTime?)DirectSql.IsNull(dr["datumOd"], null),
+                        toDate = (DateTime?)DirectSql.IsNull(dr["datumDo"], null),
                         kod_ang = Convert.ToInt32(dr["typVazby"]),
-                        descr = (string)PersistLib.IsNull(dr["PojmenovaniVazby"], ""),
-                        podil = (decimal?)PersistLib.IsNull(dr["podil"], null)
+                        descr = (string)DirectSql.IsNull(dr["PojmenovaniVazby"], ""),
+                        podil = (decimal?)DirectSql.IsNull(dr["podil"], null)
                     })
                     .ToArray();
                 var ret = new List<HlidacStatu.DS.Graphs.Graph.Edge>();
@@ -593,8 +593,8 @@ namespace HlidacStatu.Repositories
             //get zakladni informace o subj.
 
             //find politician in the DB
-            var db = new PersistLib();
-            var sqlCall = DirectDB.GetRawSql(CommandType.Text, sql, new IDataParameter[]
+            var db = new DbConnect();
+            var sqlCall = DirectDB.Instance.GetRawSql(sql, new IDataParameter[]
             {
                 new SqlParameter("internalId", osobaInternalId)
             });
@@ -610,11 +610,11 @@ namespace HlidacStatu.Repositories
                         subjId = ((int)dr["osobaId"]).ToString(),
                         subjname = "",
                         NodeType = HlidacStatu.DS.Graphs.Graph.Node.NodeType.Person,
-                        fromDate = (DateTime?)PersistLib.IsNull(dr["datumOd"], null),
-                        toDate = (DateTime?)PersistLib.IsNull(dr["datumDo"], null),
+                        fromDate = (DateTime?)DirectSql.IsNull(dr["datumOd"], null),
+                        toDate = (DateTime?)DirectSql.IsNull(dr["datumDo"], null),
                         kod_ang = Convert.ToInt32(dr["typVazby"]),
-                        descr = (string)PersistLib.IsNull(dr["PojmenovaniVazby"], ""),
-                        podil = (decimal?)PersistLib.IsNull(dr["podil"], null)
+                        descr = (string)DirectSql.IsNull(dr["PojmenovaniVazby"], ""),
+                        podil = (decimal?)DirectSql.IsNull(dr["podil"], null)
                     })
                     .ToArray();
                 var ret = new List<HlidacStatu.DS.Graphs.Graph.Edge>();
@@ -648,8 +648,8 @@ namespace HlidacStatu.Repositories
             //get zakladni informace o subj.
 
             //find politician in the DB
-            var db = new PersistLib();
-            var sqlCall = DirectDB.GetRawSql(CommandType.Text, sql, new IDataParameter[]
+            var db = new DbConnect();
+            var sqlCall = DirectDB.Instance.GetRawSql(sql, new IDataParameter[]
             {
                 new SqlParameter("ico", ico)
             });
@@ -665,11 +665,11 @@ namespace HlidacStatu.Repositories
                         subjId = ((int)dr["osobaId"]).ToString(),
                         subjname = "",
                         NodeType = HlidacStatu.DS.Graphs.Graph.Node.NodeType.Company,
-                        fromDate = (DateTime?)PersistLib.IsNull(dr["datumOd"], null),
-                        toDate = (DateTime?)PersistLib.IsNull(dr["datumDo"], null),
+                        fromDate = (DateTime?)DirectSql.IsNull(dr["datumOd"], null),
+                        toDate = (DateTime?)DirectSql.IsNull(dr["datumDo"], null),
                         kod_ang = Convert.ToInt32(dr["typVazby"]),
-                        descr = (string)PersistLib.IsNull(dr["PojmenovaniVazby"], ""),
-                        podil = (decimal?)PersistLib.IsNull(dr["podil"], null)
+                        descr = (string)DirectSql.IsNull(dr["PojmenovaniVazby"], ""),
+                        podil = (decimal?)DirectSql.IsNull(dr["podil"], null)
                     })
                     .ToArray();
                 var ret = new List<HlidacStatu.DS.Graphs.Graph.Edge>();
@@ -706,8 +706,8 @@ namespace HlidacStatu.Repositories
             //get zakladni informace o subj.
 
             //find politician in the DB
-            var db = new PersistLib();
-            var sqlCall = DirectDB.GetRawSql(CommandType.Text, sql, new IDataParameter[]
+            var db = new DbConnect();
+            var sqlCall = DirectDB.Instance.GetRawSql(sql, new IDataParameter[]
             {
                 new SqlParameter("ico", ico),
                 new SqlParameter("datumOd", datumOd),

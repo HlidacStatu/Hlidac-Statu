@@ -188,7 +188,7 @@ namespace HlidacStatu.Repositories
         public static IEnumerable<Autocomplete> GenerateAutocompleteFirmyOnly()
         {
             string sql = $"select distinct Jmeno, ICO from Firma where LEN(ico) = 8 AND Kod_PF > 110;";
-            var results = DirectDB.GetList<string, string>(sql)
+            var results = DirectDB.Instance.GetList<string, string>(sql)
                 .Select(f => new Autocomplete()
                 {
                     Id = f.Item2,
@@ -218,7 +218,7 @@ namespace HlidacStatu.Repositories
             var lockObj = new object();
             List<Autocomplete> results = new List<Autocomplete>();
 
-            Devmasters.Batch.Manager.DoActionForAll<Tuple<string, string, string, int?, int?>>(DirectDB.GetList<string, string, string, int?, int?>(sql).ToArray(),
+            Devmasters.Batch.Manager.DoActionForAll<Tuple<string, string, string, int?, int?>>(DirectDB.Instance.GetList<string, string, string, int?, int?>(sql).ToArray(),
                 (f) =>
                 {
                     Autocomplete res = null;
@@ -257,7 +257,7 @@ namespace HlidacStatu.Repositories
                               AND Kod_PF > 110
                               AND Typ in ({(int)Firma.TypSubjektuEnum.PatrimStatu}
                                 ,{(int)Firma.TypSubjektuEnum.PatrimStatuAlespon25perc});";
-            var results = DirectDB.GetList<string, string, string, int?>(sql)
+            var results = DirectDB.Instance.GetList<string, string, string, int?>(sql)
                 .AsParallel()
                 .Select(f => new Autocomplete()
                 {
@@ -289,7 +289,7 @@ namespace HlidacStatu.Repositories
             List<Autocomplete> results = new List<Autocomplete>();
 
             await Devmasters.Batch.Manager.DoActionForAllAsync<Tuple<string, string, string, int?>>(
-                DirectDB.GetList<string, string, string, int?>(sql).ToArray(),
+                DirectDB.Instance.GetList<string, string, string, int?>(sql).ToArray(),
                 async f =>
                 {
                     string img = "<i class='fas fa-university'></i>";
@@ -329,7 +329,7 @@ namespace HlidacStatu.Repositories
         private static List<Autocomplete> LoadSynonyms()
         {
             string sql = $@"select text, query, type, priority, imageElement, description from AutocompleteSynonyms where active=1;";
-            var results = DirectDB.GetList<string, string, string, int, string, string>(sql)
+            var results = DirectDB.Instance.GetList<string, string, string, int, string, string>(sql)
                 .AsParallel()
                 .Select(f => new Autocomplete()
                 {

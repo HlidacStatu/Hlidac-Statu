@@ -124,7 +124,7 @@ namespace HlidacStatu.Repositories
                             + " " + string.Join(" ", org.Tags?.Select(m => m.Tag) ?? Array.Empty<string>());
                     if (Util.DataValidators.CheckCZICO(sp.Ico))
                     {
-                        var zkratky = DirectDB.GetList<string>($"select text from AutocompleteSynonyms where query like 'ico:{sp.Ico}%'");
+                        var zkratky = DirectDB.Instance.GetList<string>($"select text from AutocompleteSynonyms where query like 'ico:{sp.Ico}%'");
                         sp.Fulltext = (string.Join(" ", zkratky) + " " + sp.Fulltext).Trim();
                     }
                     count++;
@@ -171,7 +171,7 @@ namespace HlidacStatu.Repositories
                             + " " + "kindex korupce 2020 2021 2022 2023 2024";
                     if (Util.DataValidators.CheckCZICO(sp.Ico))
                     {
-                        var zkratky = DirectDB.GetList<string>($"select text from AutocompleteSynonyms where query like 'ico:{sp.Ico}%'");
+                        var zkratky = DirectDB.Instance.GetList<string>($"select text from AutocompleteSynonyms where query like 'ico:{sp.Ico}%'");
                         sp.Fulltext = (string.Join(" ", zkratky) + " " + sp.Fulltext).Trim();
                     }
                     count++;

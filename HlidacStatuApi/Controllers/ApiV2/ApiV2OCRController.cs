@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json.Linq;
 using Swashbuckle.AspNetCore.Annotations;
-using System.Data.SqlClient;
+using Microsoft.Data.SqlClient;
 using HlidacStatu.Extensions;
 using ILogger = Serilog.ILogger;
 
@@ -606,7 +606,7 @@ namespace HlidacStatuApi.Controllers.ApiV2
             //check if user is in blurredAPIAccess roles
             try
             {
-                var found = HlidacStatu.Connectors.DirectDB.GetList<string, string>(
+                var found = HlidacStatu.Connectors.DirectDB.Instance.GetList<string, string>(
                     "select u.Id, ur.UserId from AspNetUsers u left join AspNetUserRoles ur on u.id = ur.UserId and ur.RoleId='e9a30ca6-8aa7-423c-88f2-b7dd24eda7f8' where u.UserName = @username",
                     System.Data.CommandType.Text, new System.Data.IDataParameter[] { new SqlParameter("username", username) }
                     );
@@ -614,7 +614,7 @@ namespace HlidacStatuApi.Controllers.ApiV2
                     return;
                 if (found.Count() == 1 && found.First().Item2 == null)
                 {
-                    HlidacStatu.Connectors.DirectDB.NoResult(
+                    HlidacStatu.Connectors.DirectDB.Instance.NoResult(
                         @"insert into AspNetUserRoles select  (select id from AspNetUsers where Email like @username) as userId,'e9a30ca6-8aa7-423c-88f2-b7dd24eda7f8' as roleId",
                         System.Data.CommandType.Text, new System.Data.IDataParameter[] { new SqlParameter("username", username) }
                         );
@@ -645,9 +645,9 @@ namespace HlidacStatuApi.Controllers.ApiV2
         [HttpGet("Stats")]
         public async Task<ActionResult<OCRStatistics>> Stats()
         {
-            long OCRQueueWaiting = HlidacStatu.Connectors.DirectDB.GetValue<int>("select count(*) from ItemToOcrQueue with (nolock) where started is null");
-            long OCRQueueRunning = HlidacStatu.Connectors.DirectDB.GetValue<int>("select count(*) from ItemToOcrQueue with (nolock) where started is not null and done is null"); ;
-            long OCRProcessing = HlidacStatu.Connectors.DirectDB.GetValue<int>("select count(*) from ItemToOcrQueue with (nolock) where started is not null and done is not null");
+            long OCRQueueWaiting = HlidacStatu.Connectors.DirectDB.Instance.GetValue<int>("select count(*) from ItemToOcrQueue with (nolock) where started is null");
+            long OCRQueueRunning = HlidacStatu.Connectors.DirectDB.Instance.GetValue<int>("select count(*) from ItemToOcrQueue with (nolock) where started is not null and done is null"); ;
+            long OCRProcessing = HlidacStatu.Connectors.DirectDB.Instance.GetValue<int>("select count(*) from ItemToOcrQueue with (nolock) where started is not null and done is not null");
 
 
             DateTime now = DateTime.Now;

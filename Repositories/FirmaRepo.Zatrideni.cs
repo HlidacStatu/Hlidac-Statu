@@ -220,7 +220,7 @@ namespace HlidacStatu.Repositories
             }
             private static string[] GetSubjektyFromSql(string sql)
             {
-                return DirectDB
+                return DirectDB.Instance
                     .GetList<string>(sql)
                     .ToArray();
             }

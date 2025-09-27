@@ -104,7 +104,7 @@ namespace HlidacStatuApi.Controllers.ApiV2
         {
             System.Text.StringBuilder sb = new System.Text.StringBuilder(1024 * 500);
             string cnnStr = Devmasters.Config.GetWebConfigValue("OldEFSqlConnection");
-            using (Devmasters.PersistLib p = new Devmasters.PersistLib())
+            using (Devmasters.DbConnect p = new Devmasters.DbConnect())
             {
 
                 var reader = p.ExecuteReader(cnnStr, CommandType.Text, "select ico, jmeno from firma where ISNUMERIC(ico) = 1", null);

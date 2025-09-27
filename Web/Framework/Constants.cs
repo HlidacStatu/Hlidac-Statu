@@ -43,7 +43,7 @@ namespace HlidacStatu.Web.Framework
 
                         ApiURL = Devmasters.Config.GetWebConfigValue("APIUrl");
                         
-                        ApiToken = Connectors.DirectDB.GetList<string>($"select top 1 cast(token as nvarchar(40)) from AspNetUserApiTokens where id='{Devmasters.Config.GetWebConfigValue("APIKeyFromUser")}'")
+                        ApiToken = Connectors.DirectDB.Instance.GetList<string>($"select top 1 cast(token as nvarchar(40)) from AspNetUserApiTokens where id='{Devmasters.Config.GetWebConfigValue("APIKeyFromUser")}'")
                             .FirstOrDefault();
 
                     }

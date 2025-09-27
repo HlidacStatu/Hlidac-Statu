@@ -3,7 +3,7 @@ using HlidacStatu.Repositories;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
 using System.Data;
-using System.Data.SqlClient;
+using Microsoft.Data.SqlClient;
 using static HlidacStatu.DS.Api.BlurredPage;
 using ILogger = Serilog.ILogger;
 

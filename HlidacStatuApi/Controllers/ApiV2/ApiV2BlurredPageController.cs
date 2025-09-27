@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
 using System.Data;
-using System.Data.SqlClient;
+using Microsoft.Data.SqlClient;
 using static HlidacStatu.DS.Api.BlurredPage;
 using ILogger = Serilog.ILogger;
 
@@ -136,7 +136,7 @@ namespace HlidacStatuApi.Controllers.ApiV2
             //check if user is in blurredAPIAccess roles
             try
             {
-                var found = HlidacStatu.Connectors.DirectDB.GetList<string, string>(
+                var found = HlidacStatu.Connectors.DirectDB.Instance.GetList<string, string>(
                     "select u.Id, ur.UserId from AspNetUsers u left join AspNetUserRoles ur on u.id = ur.UserId and ur.RoleId='e9a30ca6-8aa7-423c-88f2-b7dd24eda7f8' where u.UserName = @username",
                     System.Data.CommandType.Text, new IDataParameter[] { new SqlParameter("username", username) }
                     );
@@ -144,7 +144,7 @@ namespace HlidacStatuApi.Controllers.ApiV2
                     return;
                 if (found.Count() == 1 && found.First().Item2 == null)
                 {
-                    HlidacStatu.Connectors.DirectDB.NoResult(
+                    HlidacStatu.Connectors.DirectDB.Instance.NoResult(
                         @"insert into AspNetUserRoles select  (select id from AspNetUsers where Email like @username) as userId,'e9a30ca6-8aa7-423c-88f2-b7dd24eda7f8' as roleId",
                         System.Data.CommandType.Text, new IDataParameter[] { new SqlParameter("username", username) }
                         );

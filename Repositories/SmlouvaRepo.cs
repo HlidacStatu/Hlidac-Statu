@@ -10,7 +10,7 @@ using Nest;
 
 using System;
 using System.Collections.Generic;
-using System.Data.SqlClient;
+using Microsoft.Data.SqlClient;
 using System.Linq;
 using System.Threading.Tasks;
 using HlidacStatu.Entities.KIndex;
@@ -667,7 +667,7 @@ namespace HlidacStatu.Repositories
         {
             try
             {
-                DirectDB.NoResult("exec smlouvaId_save @id,@active, @created, @updated, @icoOdberatele",
+                DirectDB.Instance.NoResult("exec smlouvaId_save @id,@active, @created, @updated, @icoOdberatele",
                     new SqlParameter("id", smlouva.Id),
                     new SqlParameter("created", smlouva.casZverejneni),
                     new SqlParameter("updated", smlouva.LastUpdate),
@@ -675,7 +675,7 @@ namespace HlidacStatu.Repositories
                     new SqlParameter("icoOdberatele", smlouva.Platce.ico)
                 );
 
-                DirectDB.NoResult("delete from SmlouvyDodavatele where smlouvaId= @smlouvaId",
+                DirectDB.Instance.NoResult("delete from SmlouvyDodavatele where smlouvaId= @smlouvaId",
                     new SqlParameter("smlouvaId", smlouva.Id)
                 );
                 if (smlouva.Prijemce != null)
@@ -683,7 +683,7 @@ namespace HlidacStatu.Repositories
                     foreach (var ico in smlouva.Prijemce.Select(m => m.ico).Distinct())
                     {
                         if (!string.IsNullOrEmpty(ico))
-                            DirectDB.NoResult("insert into SmlouvyDodavatele(smlouvaid,ico) values(@smlouvaid, @ico)",
+                            DirectDB.Instance.NoResult("insert into SmlouvyDodavatele(smlouvaid,ico) values(@smlouvaid, @ico)",
                                 new SqlParameter("smlouvaId", smlouva.Id),
                                 new SqlParameter("ico", ico)
                         );
@@ -699,14 +699,14 @@ namespace HlidacStatu.Repositories
 
             if (!string.IsNullOrEmpty(smlouva.Platce?.ico))
             {
-                DirectDB.NoResult("exec Firma_IsInRS_Save @ico",
+                DirectDB.Instance.NoResult("exec Firma_IsInRS_Save @ico",
                     new SqlParameter("ico", smlouva.Platce?.ico)
                 );
             }
 
             if (!string.IsNullOrEmpty(smlouva.VkladatelDoRejstriku?.ico))
             {
-                DirectDB.NoResult("exec Firma_IsInRS_Save @ico",
+                DirectDB.Instance.NoResult("exec Firma_IsInRS_Save @ico",
                     new SqlParameter("ico", smlouva.VkladatelDoRejstriku?.ico)
                 );
             }
@@ -715,7 +715,7 @@ namespace HlidacStatu.Repositories
             {
                 if (!string.IsNullOrEmpty(s.ico))
                 {
-                    DirectDB.NoResult("exec Firma_IsInRS_Save @ico",
+                    DirectDB.Instance.NoResult("exec Firma_IsInRS_Save @ico",
                         new SqlParameter("ico", s.ico)
                     );
                 }
@@ -885,7 +885,7 @@ namespace HlidacStatu.Repositories
                         {
                             /*_logger.Warning("Valid Req: Cannot load Smlouva Id " + idVerze +
                                                      "\nDebug:" + res.DebugInformation);*/
-                            //DirectDB.NoResult("delete from SmlouvyIds where id = @id", new System.Data.SqlClient.SqlParameter("id", idVerze));
+                            //DirectDB.Instance.NoResult("delete from SmlouvyIds where id = @id", new Microsoft.Data.SqlClient.SqlParameter("id", idVerze));
                         }
                         else if (res.Found == false)
                             return null;
@@ -966,7 +966,7 @@ namespace HlidacStatu.Repositories
                         {
                             _logger.Warning("Valid Req: Cannot load Smlouva Id " + idVerze +
                                                      "\nDebug:" + res.DebugInformation);
-                            //DirectDB.NoResult("delete from SmlouvyIds where id = @id", new System.Data.SqlClient.SqlParameter("id", idVerze));
+                            //DirectDB.Instance.NoResult("delete from SmlouvyIds where id = @id", new Microsoft.Data.SqlClient.SqlParameter("id", idVerze));
                         }
                         else if (res.Found == false)
                             return null;

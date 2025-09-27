@@ -185,7 +185,7 @@ namespace HlidacStatu.Web.Controllers
 		            from ItemToOcrQueue t with (nolock)
 		            order by type";
 
-            using (var p = new Devmasters.PersistLib())
+            using (var p = new Devmasters.DbConnect())
             {
                 var ds = p.ExecuteDataset(cnnStr, System.Data.CommandType.Text, sql, null);
                 System.Text.StringBuilder sb = new(1024);
