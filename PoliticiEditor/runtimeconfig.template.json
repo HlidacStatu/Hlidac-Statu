@@ -1,7 +1,0 @@
-﻿{
-  "runtimeOptions": {
-    "configProperties": {
-      "Switch.Microsoft.Data.SqlClient.UseManagedNetworkingOnWindows": true
-    }
-  }
-}
