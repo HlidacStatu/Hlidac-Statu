@@ -5,6 +5,7 @@
 @using HlidacStatu.Entities
 @using HlidacStatu.Extensions
 @using HlidacStatu.Lib.Analytics
+@using HlidacStatu.Web.Models
 @using HlidacStatu.XLib.Render
 @using HlidacStatu.Repositories
 @using HlidacStatu.Lib.Web.UI
@@ -142,18 +143,22 @@
 <h2 id="tblHead">
     Jednání a proslovy poslanců v Poslanecké sněmovně Parlamentu ČR
 </h2>
-<p class="lead">Zanalyzovali jsme všechny proslovy poslanců a poslankyň v Poslanecké sněmovně Parlamentu ČR od roku 1998</p>
+<p class="lead">
+    Zanalyzovali jsme všechny projevy poslanců a poslankyň od roku 1998
+</p>
 
 
 
-<h2>Ukecanost jednotlivých Sněmoven</h2>
+<h2>Výřečnost jednotlivých Sněmoven</h2>
 
 <table class="table table-striped">
     <thead>
         <tr>
             <th>Počátek volebního období</th>
-            <th class="d-none d-md-table-cell">Délka všech poslovů</th>
-            <th>rozdíl oproti předchozímu období</th>
+            <th class="d-none d-md-table-cell">
+                Součet délky všech proslovů
+            </th>
+            <th>Rozdíl oproti předchozímu období</th>
         </tr>
     </thead>
     <tbody>
@@ -186,7 +191,7 @@
 <p>
 
     <div class="btn-group btn-group-sm" role="group">
-        <span class="input-group-text">Sstatistika pro </span>
+        <span class="input-group-text">Statistika pro </span>
         @for (int i = 0; i < obdobiList.Length - 1; i++)
         {
             var o = obdobiList[i];

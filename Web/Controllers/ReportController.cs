@@ -98,7 +98,7 @@ namespace HlidacStatu.Web.Controllers
         [HlidacCache(1 * 60, "obdobi", true)]
         public IActionResult ProslovyPSP(int? obdobi)
         {
-            ViewBag.Title = "Žvanírna ve Sněmovně parlamentu";
+            ViewBag.Title = "Délka řečnění v Poslanecké sněmovně";
             return View("34_ProslovyPSP",obdobi);
         }
 
