@@ -2,11 +2,6 @@
 @using HlidacStatu.Extensions;
 @using HlidacStatu.Entities.Facts;
 @using System.Linq;
-@using Devmasters;
-@using HlidacStatu.Entities
-@using HlidacStatu.Repositories
-@using HlidacStatu.Repositories.SharedModels
-@using Newtonsoft.Json.Linq;
 
 @model (HlidacStatu.Entities.Firma firma, string viewName, string title)
 
@@ -217,7 +212,7 @@
             </a>
         }
     </h3>
-    <cache enabled="@(!System.Diagnostics.Debugger.IsAttached)" expires-after="@Constants.CachedActionLength.Cache12H" vary-by="@($"{Model.firma.ICO}")">
+    <cache enabled="@(!System.Diagnostics.Debugger.IsAttached)" expires-after="@Constants.CachedActionLength.Cache12H" vary-by="@($"{Model.firma.ICO}_{User.Identity.IsAuthenticated}")">
         <partial name="_companyHeader" model="@Model.firma" />
     </cache>
 
