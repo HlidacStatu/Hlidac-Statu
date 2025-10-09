@@ -131,6 +131,13 @@ namespace HlidacStatu.Repositories
                new HlidacStatu.Searching.Smlouva_Oblast(1),
                new HlidacStatu.Searching.Smlouva_Oblast(2),
                new HlidacStatu.Searching.Smlouva_Oblasti(),
+               
+               new HlidacStatu.Searching.TransformPrefix("ico_platce:", "platce.ico:",null),
+               new HlidacStatu.Searching.TransformPrefix("ico_prijemce:", "prijemce.ico:",null),
+               new HlidacStatu.Searching.TransformPrefixWithValue("datum_od:","(casZverejneni:>=${q} OR datumUzavreni:>=${q})", "\\d+" ),
+               new HlidacStatu.Searching.TransformPrefixWithValue("datum_do:","(casZverejneni:>=${q} OR datumUzavreni:>=${q})", "\\d+" ),
+               new HlidacStatu.Searching.TransformPrefixWithValue("castka_od:","calculatedPriceWithVATinCZK:>=${q}", "\\d+" ),
+               new HlidacStatu.Searching.TransformPrefixWithValue("castka_do:","calculatedPriceWithVATinCZK:<=${q}", "\\d+" ),
 
             };
 

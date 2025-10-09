@@ -1,0 +1,122 @@
+﻿@{
+    ViewData["Title"] = "Rozšířené vyhledávání";
+}
+
+@section breadcrumb
+{
+    <ol class="breadcrumb">
+        <li>
+            <a href="/">Hlídač Státu</a>
+        </li>
+        <li>
+            <a href="@Url.Action("Smlouvy", "Home")">Hlídač Smluv</a>
+        </li>
+        <li class="active">@ViewBag.Title</li>
+    </ol>
+}
+
+<div class="container mt-4">
+    <h2 class="mb-4">Vyhledávání</h2>
+    <form method="get" asp-action="SimpleSearch" class="row g-3">
+
+        <div class="row">
+            <div class="col-md-3">
+                <label for="DatumOd" class="form-label">Datum od</label>
+                <input type="date" class="form-control" id="DatumOd" name="datumOd" />
+            </div>
+
+            <div class="col-md-3">
+                <label for="DatumDo" class="form-label">Datum do</label>
+                <input type="date" class="form-control" id="DatumDo" name="datumDo" />
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-3">
+                <label for="CastkaOd" class="form-label">Částka od</label>
+                <input type="number" class="form-control" id="CastkaOd" name="castkaOd" step="0.01" />
+            </div>
+
+            <div class="col-md-3">
+                <label for="CastkaDo" class="form-label">Částka do</label>
+                <input type="number" class="form-control" id="CastkaDo" name="castkaDo" step="0.01" />
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-6">
+                <label class="form-label d-block">IČO</label>
+                <ul class="nav nav-tabs" id="icoTab" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link active" id="ico-all-tab" data-bs-toggle="tab" data-bs-target="#ico-all" type="button" role="tab">Jednotné IČO</button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="ico-split-tab" data-bs-toggle="tab" data-bs-target="#ico-split" type="button" role="tab">Rozdělené IČO</button>
+                    </li>
+                </ul>
+                <div class="tab-content border border-top-0 p-3 rounded-bottom" id="icoTabContent">
+                    <div class="tab-pane fade show active" id="ico-all" role="tabpanel">
+                        <input type="text" class="form-control" id="ICO" name="ico" maxlength="8" placeholder="IČO – hledat mezi plátci i příjemci" />
+                    </div>
+                    <div class="tab-pane fade" id="ico-split" role="tabpanel">
+                        <div class="row g-2">
+                            <div class="col-md-6">
+                                <input type="text" class="form-control" id="ICOPlatce" name="icoPlatce" maxlength="8" placeholder="IČO plátce" />
+                            </div>
+                            <div class="col-md-6">
+                                <input type="text" class="form-control" id="ICOPrijemce" name="icoPrijemce" maxlength="8" placeholder="IČO příjemce" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-6">
+                <label for="Osoba" class="form-label">Osoba</label>
+                @await Html.PartialAsync("Partials/_AutocompletePeoplePartial")
+                <input type="hidden" id="Osoba" name="osoba" />
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-6">
+                <label for="ObsahujeSlova" class="form-label">Obsahuje slovo nebo slova</label>
+                <input type="text" class="form-control" id="ObsahujeSlova" name="obsahujeSlova" />
+            </div>
+        </div>
+      
+        <div class="row">
+            <div class="col-md-6">
+                <label for="PresnyTermin" class="form-label">Obsahuje přesný termín</label>
+                <input type="text" class="form-control" id="PresnyTermin" name="presnyTermin" />
+            </div>
+        </div>
+        
+        <div class="col-12 mt-3">
+            <label class="form-label d-block">Rozsah hledání</label>
+            <div class="form-check form-check-inline">
+                <input class="form-check-input" type="radio" name="typ" id="Smlouvy" value="smlouvy">
+                <label class="form-check-label" for="Smlouvy">Hledat pouze smlouvy</label>
+            </div>
+            <div class="form-check form-check-inline">
+                <input class="form-check-input" type="radio" name="typ" id="Dotace" value="dotace">
+                <label class="form-check-label" for="Dotace">Hledat pouze dotace</label>
+            </div>
+            <div class="form-check form-check-inline">
+                <input class="form-check-input" type="radio" name="typ" id="Zakazky" value="zakazky">
+                <label class="form-check-label" for="Zakazky">Hledat pouze veřejné zakázky</label>
+            </div>
+            <div class="form-check form-check-inline">
+                <input class="form-check-input" type="radio" name="typ" id="Vse" value="vse" checked>
+                <label class="form-check-label" for="Vse">Hledat všude</label>
+            </div>
+        </div>
+
+        <div class="col-12 mt-4">
+            <button type="submit" class="btn btn-primary px-4">Vyhledat</button>
+        </div>
+
+    </form>
+</div>
