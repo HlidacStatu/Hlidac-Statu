@@ -1,60 +1,8 @@
-﻿<style>
-    .selectize-dropdown-content {
-        max-height: none !important; /* Disable max-height */
-        overflow: visible !important; /* Ensure overflow is visible */
-    }
-
-    .hlidac-autocomplete {
-        /*border: 2px solid yellow;   */
-        position: relative;
-        padding: 0;
-        margin: 0;
-        z-index: 100;
-    }
-
-    .hs-avatar {
-        margin-left: 15px;
-        min-width: 50px;
-        height: auto;
-        color: #ccc;
-        font-size: 45px;
-    }
-
-    .hs-avatar.small {
-        font-size: 25px;
-    }
-
-    .hs-avatar img {
-        width: 50px;
-    }
-
-    .hs-autocomplete-description {
-        margin-left: 15px;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-    }
-
-    .hs-autocomplete-description.small {
-        margin-top: 10px;
-    }
-
-    .selectize-control .selectize-input {
-        height: 100% !important;
-    }
-
-    .selectize-control {
-        width: 100% !important;
-    }
-
-    .selectize-control.multi .selectize-input > div {
-        background-color: var(--bs-primary-bg-subtle) !important;
-    }
-</style>
+﻿@model (string InputName, bool IsPerson) 
 
 <div>
-    <div class="hlidac-autocomplete d-flex" id="hlidac-autocomplete-people">
-        <select id="autocompletePeople" autocomplete="off" placeholder='Jméno osoby'></select>
+    <div class="hlidac-autocomplete d-flex" id="hlidac-autocomplete-@Model.InputName">
+        <select id="autocomplete@(Model.InputName)" autocomplete="off" placeholder='@(Model.IsPerson? "Jméno osoby":"Název firmy")'></select>
 
         <span id="searchSpiner" style="display: none"
               class="spinner-border spinner-border-sm text-light align-middle mb-1 ms-1" role="status">
@@ -74,7 +22,7 @@
 
 
     $(document).ready(function () {
-        $('#autocompletePeople').selectize({
+        $('#autocomplete@(Model.InputName)').selectize({
             maxItems: 1,
             valueField: 'id',
             labelField: 'text',
@@ -119,7 +67,7 @@
                     dataType: 'json',
                     data: {
                         q: query,
-                        category: "person"
+                        category: "@(Model.IsPerson? "person":"company stateCompany authority city")"
                     },
                     error: function () {
                         callback();
@@ -154,7 +102,7 @@
                 this.clearOptions();
                 this.close();
                 $('#searchSpiner').css('display', 'inline-block;');
-                $('#Osoba').val(value.split('÷')[0].replace('osobaid:', ''));
+                $('#@(Model.InputName)').val(value.split('÷')[0].replace('@(Model.IsPerson? "osobaid:":"ico:")', ''));
             },
             onBlur: function () {
                 this.clearOptions();

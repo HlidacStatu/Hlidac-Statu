@@ -15,6 +15,83 @@
     </ol>
 }
 
+@section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const tabs = document.querySelectorAll('#icoTab button[data-bs-toggle="tab"]');
+
+            function updateInputs(activeId) {
+                const isSplit = activeId === 'ico-split-tab';
+                document.querySelectorAll('#ico-all input, #ico-split input').forEach(i => i.disabled = true);
+                document.querySelectorAll(isSplit ? '#ico-split input' : '#ico-all input')
+                    .forEach(i => i.disabled = false);
+            }
+
+            // Initial setup (ensure correct tab state on page load)
+            const active = document.querySelector('#icoTab .nav-link.active');
+            if (active) updateInputs(active.id);
+
+            tabs.forEach(tab => {
+                tab.addEventListener('shown.bs.tab', e => updateInputs(e.target.id));
+            });
+        });
+    </script>
+}
+
+@* styles for autocomplete *@
+<style>
+    .selectize-dropdown-content {
+        max-height: none !important; /* Disable max-height */
+        overflow: visible !important; /* Ensure overflow is visible */
+    }
+    
+    .hlidac-autocomplete {
+        /*border: 2px solid yellow;   */
+        position: relative;
+        padding: 0;
+        margin: 0;
+    }
+
+    .hs-avatar {
+        margin-left: 15px;
+        min-width: 50px;
+        height: auto;
+        color: #ccc;
+        font-size: 45px;
+    }
+
+    .hs-avatar.small {
+        font-size: 25px;
+    }
+
+    .hs-avatar img {
+        width: 50px;
+    }
+
+    .hs-autocomplete-description {
+        margin-left: 15px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .hs-autocomplete-description.small {
+        margin-top: 10px;
+    }
+
+    .selectize-control .selectize-input {
+        height: 100% !important;
+    }
+
+    .selectize-control {
+        width: 100% !important;
+    }
+
+    .selectize-control.multi .selectize-input > div {
+        background-color: var(--bs-primary-bg-subtle) !important;
+    }
+</style>
+
 <div class="container mt-4">
     <h2 class="mb-4">Vyhledávání</h2>
     <form method="get" asp-action="SimpleSearch" class="row g-3">
@@ -22,24 +99,24 @@
         <div class="row">
             <div class="col-md-3">
                 <label for="DatumOd" class="form-label">Datum od</label>
-                <input type="date" class="form-control" id="DatumOd" name="datumOd" />
+                <input type="date" class="form-control" id="DatumOd" name="datumOd"/>
             </div>
 
             <div class="col-md-3">
                 <label for="DatumDo" class="form-label">Datum do</label>
-                <input type="date" class="form-control" id="DatumDo" name="datumDo" />
+                <input type="date" class="form-control" id="DatumDo" name="datumDo"/>
             </div>
         </div>
 
         <div class="row">
             <div class="col-md-3">
                 <label for="CastkaOd" class="form-label">Částka od</label>
-                <input type="number" class="form-control" id="CastkaOd" name="castkaOd" step="0.01" />
+                <input type="number" class="form-control" id="CastkaOd" name="castkaOd" step="0.01"/>
             </div>
 
             <div class="col-md-3">
                 <label for="CastkaDo" class="form-label">Částka do</label>
-                <input type="number" class="form-control" id="CastkaDo" name="castkaDo" step="0.01" />
+                <input type="number" class="form-control" id="CastkaDo" name="castkaDo" step="0.01"/>
             </div>
         </div>
 
@@ -48,23 +125,32 @@
                 <label class="form-label d-block">IČO</label>
                 <ul class="nav nav-tabs" id="icoTab" role="tablist">
                     <li class="nav-item" role="presentation">
-                        <button class="nav-link active" id="ico-all-tab" data-bs-toggle="tab" data-bs-target="#ico-all" type="button" role="tab">Jednotné IČO</button>
+                        <button class="nav-link active" id="ico-all-tab" data-bs-toggle="tab" data-bs-target="#ico-all"
+                                type="button" role="tab">Jednotné IČO
+                        </button>
                     </li>
                     <li class="nav-item" role="presentation">
-                        <button class="nav-link" id="ico-split-tab" data-bs-toggle="tab" data-bs-target="#ico-split" type="button" role="tab">Rozdělené IČO</button>
+                        <button class="nav-link" id="ico-split-tab" data-bs-toggle="tab" data-bs-target="#ico-split"
+                                type="button" role="tab">Rozdělené IČO
+                        </button>
                     </li>
                 </ul>
                 <div class="tab-content border border-top-0 p-3 rounded-bottom" id="icoTabContent">
                     <div class="tab-pane fade show active" id="ico-all" role="tabpanel">
-                        <input type="text" class="form-control" id="ICO" name="ico" maxlength="8" placeholder="IČO – hledat mezi plátci i příjemci" />
+                        <label for="ICO" class="form-label">Firma – hledat mezi plátci i příjemci</label>
+                        @await Html.PartialAsync("Partials/_AutocompletePeoplePartial", (InputName: "ico", IsPerson: false ))
+                        <input type="hidden" class="form-control" id="ico" name="ico" maxlength="8"
+                               placeholder="IČO – hledat mezi plátci i příjemci"/>
                     </div>
                     <div class="tab-pane fade" id="ico-split" role="tabpanel">
                         <div class="row g-2">
                             <div class="col-md-6">
-                                <input type="text" class="form-control" id="ICOPlatce" name="icoPlatce" maxlength="8" placeholder="IČO plátce" />
+                                <input type="text" class="form-control" id="ICOPlatce" name="icoPlatce" maxlength="8"
+                                       placeholder="IČO plátce"/>
                             </div>
                             <div class="col-md-6">
-                                <input type="text" class="form-control" id="ICOPrijemce" name="icoPrijemce" maxlength="8" placeholder="IČO příjemce" />
+                                <input type="text" class="form-control" id="ICOPrijemce" name="icoPrijemce"
+                                       maxlength="8" placeholder="IČO příjemce"/>
                             </div>
                         </div>
                     </div>
@@ -74,26 +160,26 @@
 
         <div class="row">
             <div class="col-md-6">
-                <label for="Osoba" class="form-label">Osoba</label>
-                @await Html.PartialAsync("Partials/_AutocompletePeoplePartial")
-                <input type="hidden" id="Osoba" name="osoba" />
+                <label for="osoba" class="form-label">Osoba</label>
+                @await Html.PartialAsync("Partials/_AutocompletePeoplePartial", (InputName: "osoba", IsPerson: true ))
+                <input type="hidden" id="osoba" name="osoba"/>
             </div>
         </div>
 
         <div class="row">
             <div class="col-md-6">
                 <label for="ObsahujeSlova" class="form-label">Obsahuje slovo nebo slova</label>
-                <input type="text" class="form-control" id="ObsahujeSlova" name="obsahujeSlova" />
+                <input type="text" class="form-control" id="ObsahujeSlova" name="obsahujeSlova"/>
             </div>
         </div>
-      
+
         <div class="row">
             <div class="col-md-6">
                 <label for="PresnyTermin" class="form-label">Obsahuje přesný termín</label>
-                <input type="text" class="form-control" id="PresnyTermin" name="presnyTermin" />
+                <input type="text" class="form-control" id="PresnyTermin" name="presnyTermin"/>
             </div>
         </div>
-        
+
         <div class="col-12 mt-3">
             <label class="form-label d-block">Rozsah hledání</label>
             <div class="form-check form-check-inline">
