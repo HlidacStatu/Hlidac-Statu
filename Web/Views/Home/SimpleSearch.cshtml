@@ -34,6 +34,20 @@
             tabs.forEach(tab => {
                 tab.addEventListener('shown.bs.tab', e => updateInputs(e.target.id));
             });
+
+            // add next ico button
+            const btn = document.getElementById('add-ico-btn');
+            const items = document.querySelectorAll('#ico-all-container .ico-all-item');
+
+            btn.addEventListener('click', function () {
+                const next = Array.from(items).find(i => i.classList.contains('d-none'));
+                if (next) {
+                    next.classList.remove('d-none');
+                    if (!Array.from(items).some(i => i.classList.contains('d-none'))) {
+                        btn.classList.add('d-none');
+                    }
+                }
+            });
         });
     </script>
 }
@@ -126,31 +140,68 @@
                 <ul class="nav nav-tabs" id="icoTab" role="tablist">
                     <li class="nav-item" role="presentation">
                         <button class="nav-link active" id="ico-all-tab" data-bs-toggle="tab" data-bs-target="#ico-all"
-                                type="button" role="tab">Jednotné IČO
+                                type="button" role="tab">Organizace (nebo firma/úřad/obec)
                         </button>
                     </li>
                     <li class="nav-item" role="presentation">
                         <button class="nav-link" id="ico-split-tab" data-bs-toggle="tab" data-bs-target="#ico-split"
-                                type="button" role="tab">Rozdělené IČO
+                                type="button" role="tab">Rozdělení na plátce a příjemce
                         </button>
                     </li>
                 </ul>
                 <div class="tab-content border border-top-0 p-3 rounded-bottom" id="icoTabContent">
                     <div class="tab-pane fade show active" id="ico-all" role="tabpanel">
                         <label for="ICO" class="form-label">Firma – hledat mezi plátci i příjemci</label>
-                        @await Html.PartialAsync("Partials/_AutocompletePeoplePartial", (InputName: "ico", IsPerson: false ))
-                        <input type="hidden" class="form-control" id="ico" name="ico" maxlength="8"
-                               placeholder="IČO – hledat mezi plátci i příjemci"/>
+                        <div id="ico-all-container">
+                         
+                            <div class="ico-all-item mb-2" id="ico-item-0">
+                                @await Html.PartialAsync("Partials/_AutocompletePeoplePartial", (InputName: "ico0", IsPerson: false))
+                                <input type="hidden" class="form-control" id="ico0" name="ico" maxlength="8"
+                                       placeholder="IČO – hledat mezi plátci i příjemci"/>
+                            </div>
+
+                            <div class="ico-all-item mb-2 d-none" id="ico-item-1">
+                                @await Html.PartialAsync("Partials/_AutocompletePeoplePartial", (InputName: "ico1", IsPerson: false))
+                                <input type="hidden" class="form-control" id="ico1" name="ico" maxlength="8"
+                                       placeholder="IČO – hledat mezi plátci i příjemci"/>
+                            </div>
+
+                            <div class="ico-all-item mb-2 d-none" id="ico-item-2">
+                                @await Html.PartialAsync("Partials/_AutocompletePeoplePartial", (InputName: "ico2", IsPerson: false))
+                                <input type="hidden" class="form-control" id="ico2" name="ico" maxlength="8"
+                                       placeholder="IČO – hledat mezi plátci i příjemci"/>
+                            </div>
+
+                            <div class="ico-all-item mb-2 d-none" id="ico-item-3">
+                                @await Html.PartialAsync("Partials/_AutocompletePeoplePartial", (InputName: "ico3", IsPerson: false))
+                                <input type="hidden" class="form-control" id="ico3" name="ico" maxlength="8"
+                                       placeholder="IČO – hledat mezi plátci i příjemci"/>
+                            </div>
+
+                            <div class="ico-all-item mb-2 d-none" id="ico-item-4">
+                                @await Html.PartialAsync("Partials/_AutocompletePeoplePartial", (InputName: "ico4", IsPerson: false))
+                                <input type="hidden" class="form-control" id="ico4" name="ico" maxlength="8"
+                                       placeholder="IČO – hledat mezi plátci i příjemci"/>
+                            </div>
+                        </div>
+
+                        <button type="button" id="add-ico-btn" class="btn btn-outline-primary btn-sm mt-2">
+                            <i class="fa fa-plus"></i> Přidat další organizaci
+                        </button>
                     </div>
                     <div class="tab-pane fade" id="ico-split" role="tabpanel">
-                        <div class="row g-2">
-                            <div class="col-md-6">
-                                <input type="text" class="form-control" id="ICOPlatce" name="icoPlatce" maxlength="8"
-                                       placeholder="IČO plátce"/>
+                        <div class="g-2">
+                            <div class="mt-1 mb-1">
+                                <label for="ICOPlatce" class="form-label">Hledejte plátce/objednatele</label>
+                                @await Html.PartialAsync("Partials/_AutocompletePeoplePartial", (InputName: "ICOPlatce", IsPerson: false))
+                                <input type="hidden" class="form-control" id="ICOPlatce" name="icoPlatce" maxlength="8"
+                                       placeholder="Plátce"/>
                             </div>
-                            <div class="col-md-6">
-                                <input type="text" class="form-control" id="ICOPrijemce" name="icoPrijemce"
-                                       maxlength="8" placeholder="IČO příjemce"/>
+                            <div class="mt-1 mb-1">
+                                <label for="ICOPlatce" class="form-label">Hledejte příjemce/dodavatele</label>
+                                @await Html.PartialAsync("Partials/_AutocompletePeoplePartial", (InputName: "ICOPrijemce", IsPerson: false))
+                                <input type="hidden" class="form-control" id="ICOPrijemce" name="icoPrijemce"
+                                       maxlength="8" placeholder="Příjemce"/>
                             </div>
                         </div>
                     </div>

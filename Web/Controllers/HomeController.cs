@@ -675,7 +675,7 @@ text zpravy: {txt}
         }
 
         public async Task<IActionResult> SimpleSearch(DateTime? datumOd, DateTime? datumDo, decimal? castkaOd, decimal? castkaDo,
-            string? ico, string? icoPlatce, string? icoPrijemce, string? osoba,
+            List<string>? ico, string? icoPlatce, string? icoPrijemce, string? osoba,
             string? obsahujeSlova, string? presnyTermin, string? typ)
         {
             bool hasAny =
@@ -683,7 +683,7 @@ text zpravy: {txt}
                 datumDo.HasValue ||
                 castkaOd.HasValue ||
                 castkaDo.HasValue ||
-                !string.IsNullOrWhiteSpace(ico) ||
+                (ico != null && ico.Any(s => !string.IsNullOrWhiteSpace(s))) ||
                 !string.IsNullOrWhiteSpace(icoPlatce) ||
                 !string.IsNullOrWhiteSpace(icoPrijemce) ||
                 !string.IsNullOrWhiteSpace(osoba) ||
@@ -696,8 +696,16 @@ text zpravy: {txt}
             if (hasAny)
             {
                 // TODO: add your logic
-                if (!string.IsNullOrWhiteSpace(ico))
-                    parts.Add($"ico:{ico}");
+                if (ico is not null)
+                {
+                    foreach (var icoPart in ico)
+                    {
+                        if (!string.IsNullOrWhiteSpace(icoPart))
+                        {
+                            parts.Add($"ico:{icoPart}");
+                        }
+                    }
+                }
                 if (!string.IsNullOrWhiteSpace(icoPlatce))
                     parts.Add($"ico_platce:{icoPlatce}");
                 if (!string.IsNullOrWhiteSpace(icoPrijemce))
