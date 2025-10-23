@@ -1,6 +1,7 @@
 using HlidacStatu.LibCore.Extensions;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using System;
 
 namespace HlidacStatu.Web
 {
@@ -8,6 +9,8 @@ namespace HlidacStatu.Web
     {
         public static void Main(string[] args)
         {
+            AppContext.SetSwitch("Switch.Microsoft.Data.SqlClient.UseManagedNetworkingOnWindows", true);
+
             var builder = WebApplication.CreateBuilder(args);
             builder.ConfigureHostForWeb(args);
             builder.WebHost.UseStaticWebAssets();
