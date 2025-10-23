@@ -68,6 +68,13 @@ namespace HlidacStatu.Repositories
                 new TransformPrefixWithValue("podepsano:", "datumUzavreniSmlouvy:[${q} TO ${q}||+1d}", "\\d+"),
 
                 new TransformPrefix("text:", "prilohy.plainTextContent:", null),
+                
+                new HlidacStatu.Searching.TransformPrefix("ico_platce:", "zadavatel.iCO:",null),
+                new HlidacStatu.Searching.TransformPrefix("ico_prijemce:", "dodavatele.iCO:",null),
+                new HlidacStatu.Searching.TransformPrefixWithValue("datum_od:","(datumUverejneni:>=${q} OR datumUzavreniSmlouvy:>=${q})", "\\d+" ),
+                new HlidacStatu.Searching.TransformPrefixWithValue("datum_do:","(datumUverejneni:>=${q} OR datumUzavreniSmlouvy:>=${q})", "\\d+" ),
+                new HlidacStatu.Searching.TransformPrefixWithValue("castka_od:","(konecnaHodnotaBezDPH:>=${q} OR odhadovanaHodnotaBezDPH:>=${q})", "\\d+" ),
+                new HlidacStatu.Searching.TransformPrefixWithValue("castka_do:","(konecnaHodnotaBezDPH:<=${q} OR odhadovanaHodnotaBezDPH:<=${q})", "\\d+" ),
             };
 
             [Devmasters.Enums.ShowNiceDisplayName]

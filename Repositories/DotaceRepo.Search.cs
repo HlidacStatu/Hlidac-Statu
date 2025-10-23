@@ -39,6 +39,13 @@ namespace HlidacStatu.Repositories
                 new TransformPrefixWithValue("cena:", "assumedAmount:${q} ", null),
                 new HlidacStatu.Searching.Dotace_Oblast(),
                 new HlidacStatu.Searching.Dotace_Typ(),
+                
+                new TransformPrefix("ico_platce:", "subsidyProviderIco:",null),
+                new TransformPrefix("ico_prijemce:", "recipient.ico:",null),
+                new TransformPrefixRegex("datum_od:","approvedYear:>=${q}", "\\d{4}" ),
+                new TransformPrefixRegex("datum_do:","approvedYear:<=${q}", "\\d{4}" ),
+                new TransformPrefixWithValue("castka_od:","assumedAmount:>=${q}", "\\d+" ),
+                new TransformPrefixWithValue("castka_do:","assumedAmount:<=${q}", "\\d+" ),
             };
 
             public static string[] QueryShorcuts()

@@ -4,6 +4,7 @@ using HlidacStatu.Entities.Views;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using System.Linq;
+using HlidacStatu.Entities.Entities;
 using HlidacStatu.Entities.Entities.PoliticiSelfAdmin;
 
 namespace HlidacStatu.Entities
@@ -41,6 +42,12 @@ namespace HlidacStatu.Entities
                 u.Username,
                 u.Analyza,
                 u.Rok
+            });
+            
+            _ = modelBuilder.Entity<FirmaObor>().HasKey(u => new
+            {
+                u.ICO,
+                u.OborId,
             });
 
             _ = modelBuilder.Entity<MonitoredTask>().HasKey(u => new
@@ -285,6 +292,8 @@ namespace HlidacStatu.Entities
         public virtual DbSet<PpPrijem> PpPrijmy { get; set; }
 
         public virtual DbSet<PuEvent> PuEvents{ get; set; }
+        public virtual DbSet<FirmaObor> FirmaObory{ get; set; }
+        public virtual DbSet<Obor> Obory{ get; set; }
 
         public virtual DbSet<PuVydelek> PuVydelky { get; set; }
         public virtual DbSet<PuCZISCO> PuCZISCO { get; set; }

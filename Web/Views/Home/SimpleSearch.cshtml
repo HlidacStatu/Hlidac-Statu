@@ -1,0 +1,259 @@
+﻿@{
+    ViewData["Title"] = "Rozšířené vyhledávání";
+}
+
+@section breadcrumb
+{
+    <ol class="breadcrumb">
+        <li>
+            <a href="/">Hlídač Státu</a>
+        </li>
+        <li>
+            <a href="@Url.Action("Smlouvy", "Home")">Hlídač Smluv</a>
+        </li>
+        <li class="active">@ViewBag.Title</li>
+    </ol>
+}
+
+@section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const tabs = document.querySelectorAll('#icoTab button[data-bs-toggle="tab"]');
+
+            function updateInputs(activeId) {
+                const isSplit = activeId === 'ico-split-tab';
+                document.querySelectorAll('#ico-all input, #ico-split input').forEach(i => i.disabled = true);
+                document.querySelectorAll(isSplit ? '#ico-split input' : '#ico-all input')
+                    .forEach(i => i.disabled = false);
+            }
+
+            // Initial setup (ensure correct tab state on page load)
+            const active = document.querySelector('#icoTab .nav-link.active');
+            if (active) updateInputs(active.id);
+
+            tabs.forEach(tab => {
+                tab.addEventListener('shown.bs.tab', e => updateInputs(e.target.id));
+            });
+
+            // add next ico button
+            const btn = document.getElementById('add-ico-btn');
+            const items = document.querySelectorAll('#ico-all-container .ico-all-item');
+
+            btn.addEventListener('click', function () {
+                const next = Array.from(items).find(i => i.classList.contains('d-none'));
+                if (next) {
+                    next.classList.remove('d-none');
+                    if (!Array.from(items).some(i => i.classList.contains('d-none'))) {
+                        btn.classList.add('d-none');
+                    }
+                }
+            });
+        });
+    </script>
+}
+
+@* styles for autocomplete *@
+<style>
+    .selectize-dropdown-content {
+        max-height: none !important; /* Disable max-height */
+        overflow: visible !important; /* Ensure overflow is visible */
+    }
+    
+    .hlidac-autocomplete {
+        /*border: 2px solid yellow;   */
+        position: relative;
+        padding: 0;
+        margin: 0;
+    }
+
+    .hs-avatar {
+        margin-left: 15px;
+        min-width: 50px;
+        height: auto;
+        color: #ccc;
+        font-size: 45px;
+    }
+
+    .hs-avatar.small {
+        font-size: 25px;
+    }
+
+    .hs-avatar img {
+        width: 50px;
+    }
+
+    .hs-autocomplete-description {
+        margin-left: 15px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .hs-autocomplete-description.small {
+        margin-top: 10px;
+    }
+
+    .selectize-control .selectize-input {
+        height: 100% !important;
+    }
+
+    .selectize-control {
+        width: 100% !important;
+    }
+
+    .selectize-control.multi .selectize-input > div {
+        background-color: var(--bs-primary-bg-subtle) !important;
+    }
+</style>
+
+<div class="container mt-4">
+    <h2 class="mb-4">Vyhledávání</h2>
+    <form method="get" asp-action="SimpleSearch" class="row g-3">
+
+        <div class="row">
+            <div class="col-md-3">
+                <label for="DatumOd" class="form-label">Datum od</label>
+                <input type="date" class="form-control" id="DatumOd" name="datumOd"/>
+            </div>
+
+            <div class="col-md-3">
+                <label for="DatumDo" class="form-label">Datum do</label>
+                <input type="date" class="form-control" id="DatumDo" name="datumDo"/>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-3">
+                <label for="CastkaOd" class="form-label">Částka od</label>
+                <input type="number" class="form-control" id="CastkaOd" name="castkaOd" step="0.01"/>
+            </div>
+
+            <div class="col-md-3">
+                <label for="CastkaDo" class="form-label">Částka do</label>
+                <input type="number" class="form-control" id="CastkaDo" name="castkaDo" step="0.01"/>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-6">
+                <label class="form-label d-block">IČO</label>
+                <ul class="nav nav-tabs" id="icoTab" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link active" id="ico-all-tab" data-bs-toggle="tab" data-bs-target="#ico-all"
+                                type="button" role="tab">Organizace (nebo firma/úřad/obec)
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="ico-split-tab" data-bs-toggle="tab" data-bs-target="#ico-split"
+                                type="button" role="tab">Rozdělení na plátce a příjemce
+                        </button>
+                    </li>
+                </ul>
+                <div class="tab-content border border-top-0 p-3 rounded-bottom" id="icoTabContent">
+                    <div class="tab-pane fade show active" id="ico-all" role="tabpanel">
+                        <label for="ICO" class="form-label">Firma – hledat mezi plátci i příjemci</label>
+                        <div id="ico-all-container">
+                         
+                            <div class="ico-all-item mb-2" id="ico-item-0">
+                                @await Html.PartialAsync("Partials/_AutocompletePeoplePartial", (InputName: "ico0", IsPerson: false))
+                                <input type="hidden" class="form-control" id="ico0" name="ico" maxlength="8"
+                                       placeholder="IČO – hledat mezi plátci i příjemci"/>
+                            </div>
+
+                            <div class="ico-all-item mb-2 d-none" id="ico-item-1">
+                                @await Html.PartialAsync("Partials/_AutocompletePeoplePartial", (InputName: "ico1", IsPerson: false))
+                                <input type="hidden" class="form-control" id="ico1" name="ico" maxlength="8"
+                                       placeholder="IČO – hledat mezi plátci i příjemci"/>
+                            </div>
+
+                            <div class="ico-all-item mb-2 d-none" id="ico-item-2">
+                                @await Html.PartialAsync("Partials/_AutocompletePeoplePartial", (InputName: "ico2", IsPerson: false))
+                                <input type="hidden" class="form-control" id="ico2" name="ico" maxlength="8"
+                                       placeholder="IČO – hledat mezi plátci i příjemci"/>
+                            </div>
+
+                            <div class="ico-all-item mb-2 d-none" id="ico-item-3">
+                                @await Html.PartialAsync("Partials/_AutocompletePeoplePartial", (InputName: "ico3", IsPerson: false))
+                                <input type="hidden" class="form-control" id="ico3" name="ico" maxlength="8"
+                                       placeholder="IČO – hledat mezi plátci i příjemci"/>
+                            </div>
+
+                            <div class="ico-all-item mb-2 d-none" id="ico-item-4">
+                                @await Html.PartialAsync("Partials/_AutocompletePeoplePartial", (InputName: "ico4", IsPerson: false))
+                                <input type="hidden" class="form-control" id="ico4" name="ico" maxlength="8"
+                                       placeholder="IČO – hledat mezi plátci i příjemci"/>
+                            </div>
+                        </div>
+
+                        <button type="button" id="add-ico-btn" class="btn btn-outline-primary btn-sm mt-2">
+                            <i class="fa fa-plus"></i> Přidat další organizaci
+                        </button>
+                    </div>
+                    <div class="tab-pane fade" id="ico-split" role="tabpanel">
+                        <div class="g-2">
+                            <div class="mt-1 mb-1">
+                                <label for="ICOPlatce" class="form-label">Hledejte plátce/objednatele</label>
+                                @await Html.PartialAsync("Partials/_AutocompletePeoplePartial", (InputName: "ICOPlatce", IsPerson: false))
+                                <input type="hidden" class="form-control" id="ICOPlatce" name="icoPlatce" maxlength="8"
+                                       placeholder="Plátce"/>
+                            </div>
+                            <div class="mt-1 mb-1">
+                                <label for="ICOPlatce" class="form-label">Hledejte příjemce/dodavatele</label>
+                                @await Html.PartialAsync("Partials/_AutocompletePeoplePartial", (InputName: "ICOPrijemce", IsPerson: false))
+                                <input type="hidden" class="form-control" id="ICOPrijemce" name="icoPrijemce"
+                                       maxlength="8" placeholder="Příjemce"/>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-6">
+                <label for="osoba" class="form-label">Osoba</label>
+                @await Html.PartialAsync("Partials/_AutocompletePeoplePartial", (InputName: "osoba", IsPerson: true ))
+                <input type="hidden" id="osoba" name="osoba"/>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-6">
+                <label for="ObsahujeSlova" class="form-label">Obsahuje slovo nebo slova</label>
+                <input type="text" class="form-control" id="ObsahujeSlova" name="obsahujeSlova"/>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-6">
+                <label for="PresnyTermin" class="form-label">Obsahuje přesný termín</label>
+                <input type="text" class="form-control" id="PresnyTermin" name="presnyTermin"/>
+            </div>
+        </div>
+
+        <div class="col-12 mt-3">
+            <label class="form-label d-block">Rozsah hledání</label>
+            <div class="form-check form-check-inline">
+                <input class="form-check-input" type="radio" name="typ" id="Smlouvy" value="smlouvy">
+                <label class="form-check-label" for="Smlouvy">Hledat pouze smlouvy</label>
+            </div>
+            <div class="form-check form-check-inline">
+                <input class="form-check-input" type="radio" name="typ" id="Dotace" value="dotace">
+                <label class="form-check-label" for="Dotace">Hledat pouze dotace</label>
+            </div>
+            <div class="form-check form-check-inline">
+                <input class="form-check-input" type="radio" name="typ" id="Zakazky" value="zakazky">
+                <label class="form-check-label" for="Zakazky">Hledat pouze veřejné zakázky</label>
+            </div>
+            <div class="form-check form-check-inline">
+                <input class="form-check-input" type="radio" name="typ" id="Vse" value="vse" checked>
+                <label class="form-check-label" for="Vse">Hledat všude</label>
+            </div>
+        </div>
+
+        <div class="col-12 mt-4">
+            <button type="submit" class="btn btn-primary px-4">Vyhledat</button>
+        </div>
+
+    </form>
+</div>

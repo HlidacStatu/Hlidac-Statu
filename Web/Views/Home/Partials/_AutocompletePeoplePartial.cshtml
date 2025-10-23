@@ -1,0 +1,131 @@
+﻿@model (string InputName, bool IsPerson) 
+
+<div>
+    <div class="hlidac-autocomplete d-flex" id="hlidac-autocomplete-@Model.InputName">
+        <select id="autocomplete@(Model.InputName)" autocomplete="off" placeholder='@(Model.IsPerson? "Jméno osoby":"Název firmy/úřadu/obce")'></select>
+
+        <span id="searchSpiner" style="display: none"
+              class="spinner-border spinner-border-sm text-light align-middle mb-1 ms-1" role="status">
+            <span class="visually-hidden">Načítám...</span>
+        </span>
+
+    </div>
+</div>
+
+@{
+    var link = "https://ac.hlidacstatu.cz/autocomplete/autocomplete";
+}
+
+<script>
+
+    var autocompleteLastQuery = '';
+
+
+    $(document).ready(function () {
+        $('#autocomplete@(Model.InputName)').selectize({
+            maxItems: 1,
+            valueField: 'id',
+            labelField: 'text',
+            searchField: null,
+            create: false,
+            highlight: false,
+            maxOptions: 10,
+            loadingClass: null,
+            loadThrottle: 250, //cant put smaller number or else it will start bugging
+            delimiter: '░',
+            render: {
+                option: function (item, escape) {
+                    var html = '<div class="d-flex align-items-center justify-content-start">' +
+                        '<div class="hs-avatar">' + item.imageElement + '</div>' +
+                        '<div class="hs-autocomplete-description flex-grow-1 me-2">';
+
+                    
+                    html += '<h6 class="fw-bold mb-0">' + escape(item.text) + '</h6>' +
+                            '<small>' + escape(item.description) + '</small>' +
+                            '<p class="small text-muted mb-0"><i>' + escape(item.type) + '</i></p>';
+                    
+                    html += '</div><div>';
+
+                    if (item.id.startsWith('osobaid:')) {
+                        html += '<div data-href="/osoba/' + escape(item.id.replace('osobaid:', '')) + '" class="text-muted">' +
+                            '<i class="fa-regular fa-arrow-up-right-from-square fa-lg"></i></div>';
+                    } else if (item.id.startsWith('ico:')) {
+                        html += '<div data-href="/subjekt/' + escape(item.id.replace('ico:', '')) + '" class="text-muted">' +
+                            '<i class="fa-regular fa-arrow-up-right-from-square fa-lg"></i></div>';
+                    }
+
+                    html += '</div></div>';
+
+                    return html;
+                }
+            },
+            load: function (query, callback) {
+                if (!query.length) return callback();
+                $.ajax({
+                    url: '@link',
+                    type: 'GET',
+                    dataType: 'json',
+                    data: {
+                        q: query,
+                        category: "@(Model.IsPerson? "person":"company stateCompany authority city")"
+                    },
+                    error: function () {
+                        callback();
+                    },
+                    success: function (res) {
+                        res.forEach(function (item) {
+                            item.id = item.id + '÷' + new Date().getTime();
+                        });
+                        callback(res);
+                    }
+                });
+            },
+            score: function () {
+                return function (item) {
+                    return 1; // All items have the same score, disable built-in filtering
+                };
+            },
+            onType: function (str) {
+                // Prevent local filtering, forcing server-side filtering
+                if (str === '') {
+                    this.clearOptions();
+                    this.close();
+                }
+                autocompleteLastQuery = str;
+                this.clearOptions();
+
+                //this.load(this.settings.load.bind(this, str));
+            },
+            onItemAdd: function (value, $item) {
+                // Clear all options when an item is added
+
+                this.clearOptions();
+                this.close();
+                $('#searchSpiner').css('display', 'inline-block;');
+                $('#@(Model.InputName)').val(value.split('÷')[0].replace('@(Model.IsPerson? "osobaid:":"ico:")', ''));
+            },
+            onBlur: function () {
+                this.clearOptions();
+                this.close();
+            },
+            onDelete: function (values) {
+                // Check if input is empty before clearing options
+                this.clearOptions();
+                this.close();
+            },
+            onOptionRemove: function (value) {
+                // Check if input is empty before clearing options
+                this.clearOptions();
+                this.close();
+            },
+            onItemRemove: function (value) {
+                // Check if input is empty before clearing options
+                this.clearOptions();
+                this.close();
+            },
+
+        });
+
+    });
+
+</script>

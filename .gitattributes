@@ -45,6 +45,11 @@
 *.gif   binary
 *.png   binary
 *.ttf   binary
+*.mp4   binary
+*.avi   binary
+*.mpg   binary
+*.mpeg  binary
+*.mov   binary
 
 ###### DLL
 *.dll   binary
