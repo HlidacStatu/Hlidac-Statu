@@ -7,7 +7,7 @@
 @using HlidacStatu.Repositories
 
 @{
-        Layout = "_ReportLayout";
+    Layout = "_ReportLayout";
 
     var showList = OsobaRepo.GetByZatrideni(OsobaRepo.Zatrideni.Poslanec, DateTime.Now)
         .OrderBy(o => o.Prijmeni)
