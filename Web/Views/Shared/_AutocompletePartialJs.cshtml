@@ -50,10 +50,10 @@
     .selectize-control .selectize-input {
         height: 100% !important;
     }
-
-    .selectize-control {
-        width: 100% !important;
-    }
+    
+    /*.selectize-control {*/
+    /*    width: 100% !important;*/
+    /*}*/
 
         .selectize-control.multi .selectize-input > div {
             background-color: var(--bs-primary-bg-subtle) !important;
@@ -62,13 +62,26 @@
 </style>
 
 <div>
-    <div class="hlidac-autocomplete d-flex">
-        <select id="autocomplete" autocomplete="off" placeholder='Napište vyhledávaný výraz nebo stiskněte tlačítko "Hledat"'></select>
-        <button id="getValuesBtn" class="btn btn-hs btn-primary">Hledat
-            <span id="searchSpiner" style="display: none" class="spinner-border spinner-border-sm text-light align-middle mb-1 ms-1" role="status">
-                <span class="visually-hidden">Loading...</span>
-            </span>
-        </button>
+    <div class="hlidac-autocomplete row g-2 flex-wrap">
+        <div class="col-12 col-sm-9">
+            <select id="autocomplete"
+                    class="form-select w-100 h-100"
+                    autocomplete="off"
+                    placeholder='Napište vyhledávaný výraz nebo stiskněte tlačítko "Hledat"'>
+            </select>
+        </div>
+        <div class="col-12 col-sm-3">
+            <button id="getValuesBtn"
+                    class="btn btn-hs btn-primary">
+                Hledat
+                <span id="searchSpiner"
+                      style="display: none"
+                      class="spinner-border spinner-border-sm text-light align-middle mb-1 ms-1"
+                      role="status">
+                    <span class="visually-hidden">Loading...</span>
+                </span>
+            </button>
+        </div>
     </div>
 </div>
 
