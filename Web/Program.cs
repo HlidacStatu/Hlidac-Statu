@@ -9,7 +9,7 @@ namespace HlidacStatu.Web
     {
         public static void Main(string[] args)
         {
-            AppContext.SetSwitch("Switch.Microsoft.Data.SqlClient.UseManagedNetworkingOnWindows", true);
+            AppContext.SetSwitch("Switch.Microsoft.Data.SqlClient.UseManagedNetworkingOnWindows", false);
 
             var builder = WebApplication.CreateBuilder(args);
             builder.ConfigureHostForWeb(args);
