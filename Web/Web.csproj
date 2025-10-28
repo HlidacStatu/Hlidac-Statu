@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk.Web">
   <PropertyGroup>
-    <Version>1.2.0.0</Version>
+    <Version>1.2.0.1</Version>
     <TargetFramework>net8.0</TargetFramework>
     <UserSecretsId>aspnet-Web-D6658176-CBA9-44EA-823F-F6C01A8F3EE9</UserSecretsId>
     <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
@@ -27,7 +27,7 @@ at Microsoft.Data.SqlClient.SqlInternalConnection.OnError(SqlException exception
     <ItemGroup>
 		<RuntimeHostConfigurationOption
 		  Include="Switch.Microsoft.Data.SqlClient.UseManagedNetworkingOnWindows"
-		  Value="false" />
+		  Value="true" />
 	</ItemGroup>
 	
   <!--    Některé soubory (automaticky kopírované) je potřeba nejprve odstranit ze seznamu, 
