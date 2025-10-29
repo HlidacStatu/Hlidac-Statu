@@ -13,13 +13,21 @@
         </form>
     </div>
     
-    <div class="hlidac-autocomplete d-flex" id="dotace-ac-new">
-        <select id="autocomplete-dotace" autocomplete="off" placeholder='Napište vyhledávaný výraz nebo stiskněte tlačítko "Hledat"'></select>
-        <button id="sendDotaceQuery" class="btn btn-hs btn-primary" >Hledat
-            <span id="searchSpiner" style="display: none" class="spinner-border spinner-border-sm text-light align-middle mb-1 ms-1" role="status">
-                <span class="visually-hidden">Loading...</span>
-            </span>
-        </button>
+    <div class="hlidac-autocomplete row g-0 flex-wrap" id="dotace-ac-new">
+        <div class="col-12 col-sm-10">
+            <select id="autocomplete-dotace"
+                    class="form-select w-100 h-100"
+                    autocomplete="off"
+                    placeholder='Napište vyhledávaný výraz nebo stiskněte tlačítko "Hledat"'>
+            </select>
+        </div>
+        <div class="col-12 col-sm-2">
+            <button id="sendDotaceQuery" class="btn btn-hs btn-primary">Hledat
+                <span id="searchSpiner" style="display: none" class="spinner-border spinner-border-sm text-light align-middle mb-1 ms-1" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                </span>
+            </button>
+        </div>
     </div>
 
     <div>
