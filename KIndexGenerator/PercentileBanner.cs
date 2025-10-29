@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 
 
@@ -54,12 +55,42 @@ namespace HlidacStatu.KIndexGenerator
         { }
 
 
+        public static string GetPercentileBannerSvg()
+{
+
+            var name = "HlidacStatu.KIndexGenerator.PercentileBanner.svg";
+            var sourceAssembly = typeof(PercentileBanner).Assembly;
+            if (sourceAssembly.GetManifestResourceNames().Contains(name))
+            {
+                using (var stream = sourceAssembly.GetManifestResourceStream(name))
+                {
+                    using (var reader = new System.IO.StreamReader(stream))
+                    {
+                        var content = reader.ReadToEnd();
+                            return content;
+                    }
+                }
+            }
+            else
+                return string.Empty;
+        
+        }
+        private static Stream GenerateStreamFromString(string s)
+        {
+            var stream = new MemoryStream();
+            var writer = new StreamWriter(stream);
+            writer.Write(s);
+            writer.Flush();
+            stream.Position = 0;
+            return stream;
+        }
         public PercentileBanner(decimal currValue, Dictionary<int, decimal> percentilesValues, string dataFolder)
         {
             this.CurrValue = currValue;
 
             this.vals = percentilesValues;
-            sdoc = SvgDocument.Open<SvgDocument>(System.IO.Path.Combine(dataFolder, "PercentileBanner.svg"));
+            using var strStream = GenerateStreamFromString(GetPercentileBannerSvg());
+            sdoc = SvgDocument.Open<SvgDocument>(strStream);
 
             decimal perc80range = vals[90] - vals[10];
             decimal near = 0.125m * perc80range;
