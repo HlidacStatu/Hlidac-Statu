@@ -11,6 +11,7 @@ namespace HlidacStatu.Web
         {
             AppContext.SetSwitch("Switch.Microsoft.Data.SqlClient.UseManagedNetworkingOnWindows", true);
 
+
             var builder = WebApplication.CreateBuilder(args);
             builder.ConfigureHostForWeb(args);
             builder.WebHost.UseStaticWebAssets();
@@ -28,8 +29,9 @@ namespace HlidacStatu.Web
             System.Globalization.CultureInfo.DefaultThreadCurrentCulture = Util.Consts.czCulture;
             System.Globalization.CultureInfo.DefaultThreadCurrentUICulture = Util.Consts.csCulture;
             DBUpgrades.DBUpgrader.UpgradeDatabases(Connectors.DirectDB.Instance.DefaultCnnStr);
-            
             builder.Services.ConfigureServices(configuration);
+
+            Devmasters.StartupSequenceRunner.Main.CallStartupSequenceMethodsAsync(true).GetAwaiter().GetResult();
 
             WebApplication app = builder.Build();
             app.ConfigurePipeline();

@@ -7,7 +7,7 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Devmasters.Core" Version="8.2.0" />
+    <PackageReference Include="Devmasters.Core" Version="8.2.4" />
     <PackageReference Include="Microsoft.AspNetCore.Components" Version="8.0.18" />
     <PackageReference Include="Newtonsoft.Json.Schema" Version="3.0.16" />
     <PackageReference Include="Ollama" Version="1.15.0" />

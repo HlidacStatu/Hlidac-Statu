@@ -10,56 +10,65 @@ using Serilog;
 
 namespace HlidacStatu.Datasets
 {
+    [Devmasters.StartupSequenceRunner.InitStartupSequence()]
     public class DataSetDB : DataSet
     {
         public static string DataSourcesDbName = "datasourcesdb";
 
         public static DataSetDB Instance = new DataSetDB();
-        
+
         private readonly ILogger _logger = Log.ForContext<DataSetDB>();
 
 
-        public static Devmasters.Cache.LocalMemory.AutoUpdatedCache<DataSet[]> AllDataSets =
-            new Devmasters.Cache.LocalMemory.AutoUpdatedCache<DataSet[]>(
-                        TimeSpan.FromMinutes(5), (obj) =>
-                        {
-                            var datasets = Instance.SearchDataRawAsync("*", 1, 500)
-                                .ConfigureAwait(false).GetAwaiter().GetResult()
-                            .Result
-                            .Select(s => CachedDatasets.Get(s.Item1))
-                            .Where(d => d != null)
-                            .ToArray();
+        public static Devmasters.Cache.LocalMemory.AutoUpdatedCache<DataSet[]> AllDataSets;
 
-                            return datasets;
-                        }
-                    );
+        public static Devmasters.Cache.LocalMemory.AutoUpdatedCache<DataSet[]> ProductionDataSets;
 
-        public static Devmasters.Cache.LocalMemory.AutoUpdatedCache<DataSet[]> ProductionDataSets =
-            new Devmasters.Cache.LocalMemory.AutoUpdatedCache<DataSet[]>(
-                        TimeSpan.FromMinutes(5), (obj) =>
-                        {
 
-                            var datasets = Instance.SearchDataRawAsync("*", 1, 500)
-                                .ConfigureAwait(false).GetAwaiter().GetResult()
-                            .Result
-                            .Select(s => CachedDatasets.Get(s.Item1))
-                            .Where(d => d != null)
-                            .Where(d => d.RegistrationAsync().ConfigureAwait(false).GetAwaiter().GetResult().betaversion == false 
-                                        && d.RegistrationAsync().ConfigureAwait(false).GetAwaiter().GetResult().hidden == false)
-                            .ToArray();
+        [Devmasters.StartupSequenceRunner.StartupSequence]
+        static void Init()
+        {
+            AllDataSets = new Devmasters.Cache.LocalMemory.AutoUpdatedCache<DataSet[]>(
+                            TimeSpan.FromMinutes(5), (obj) =>
+                            {
+                                var datasets = Instance.SearchDataRawAsync("*", 1, 500)
+                                    .ConfigureAwait(false).GetAwaiter().GetResult()
+                                .Result
+                                .Select(s => CachedDatasets.Get(s.Item1))
+                                .Where(d => d != null)
+                                .ToArray();
 
-                            return datasets;
-                        }
-                    );
+                                return datasets;
+                            }
+                        );
+            _ = AllDataSets.Get();
+            ProductionDataSets =
+                new Devmasters.Cache.LocalMemory.AutoUpdatedCache<DataSet[]>(
+                            TimeSpan.FromMinutes(5), (obj) =>
+                            {
 
-        
+                                var datasets = Instance.SearchDataRawAsync("*", 1, 500)
+                                    .ConfigureAwait(false).GetAwaiter().GetResult()
+                                .Result
+                                .Select(s => CachedDatasets.Get(s.Item1))
+                                .Where(d => d != null)
+                                .Where(d => d.RegistrationAsync().ConfigureAwait(false).GetAwaiter().GetResult().betaversion == false
+                                            && d.RegistrationAsync().ConfigureAwait(false).GetAwaiter().GetResult().hidden == false)
+                                .ToArray();
+
+                                return datasets;
+                            }
+                        );
+            _= ProductionDataSets.Get();
+        }
+
         private DataSetDB() : base(DataSourcesDbName, false)
         {
 
             if (client == null)
             {
                 client = Manager.GetESClient(DataSourcesDbName, idxType: Manager.IndexType.DataSource);
-                    
+
                 var ret = client.Indices.ExistsAsync(client.ConnectionSettings.DefaultIndex)
                     .ConfigureAwait(false).GetAwaiter().GetResult();
                 if (!ret.Exists)
@@ -115,7 +124,7 @@ namespace HlidacStatu.Datasets
 
                 //get mapping
                 var ds = CachedDatasets.Get(addDataResult);
-                
+
                 var txtPropsTask = ds.GetTextMappingListAsync();
                 var allPropsTask = ds.GetMappingListAsync();
                 var txtProps = await txtPropsTask;
@@ -219,7 +228,7 @@ namespace HlidacStatu.Datasets
             return resData;
 
         }
-        
+
         public override async Task<DataSearchRawResult> SearchDataRawAsync(string queryString, int page, int pageSize,
             string sort = null,
             bool excludeBigProperties = true, bool withHighlighting = false, bool exactNumOfResults = false)
@@ -240,7 +249,7 @@ namespace HlidacStatu.Datasets
                 return null;
 
             var results = new List<Registration>();
-            
+
             foreach (var res in resData.Result)
             {
                 try

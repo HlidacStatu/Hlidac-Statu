@@ -16,6 +16,8 @@ using Microsoft.EntityFrameworkCore.Query;
 
 namespace HlidacStatu.Entities
 {
+
+    [Devmasters.StartupSequenceRunner.InitStartupSequence()]
     public static class Validators
     {
         public static HashSet<string> Jmena = new HashSet<string>();
@@ -60,6 +62,15 @@ namespace HlidacStatu.Entities
 
         static Validators()
         {
+            //Init();
+        }
+        static bool initialized = false;
+        [Devmasters.StartupSequenceRunner.StartupSequence(50)]
+        static void Init()
+        {
+            if (initialized) 
+                return;
+
             Devmasters.DT.StopWatchLaps swl = new Devmasters.DT.StopWatchLaps();
 
             swl.StopPreviousAndStartNextLap(Util.DebugUtil.GetClassAndMethodName(MethodBase.GetCurrentMethod())+" var jmeno");
@@ -103,6 +114,7 @@ namespace HlidacStatu.Entities
             }
             swl.StopAll();
             Log.ForContext(typeof(Validators)).Warning("Static data times:" + swl.FormatSummary());
+            initialized = true;
         }
 
         public static bool IsOsoba(string text)

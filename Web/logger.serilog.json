@@ -11,7 +11,8 @@
         "Microsoft": "Error",
         "Microsoft.Extensions": "Information",
         "System": "Error",
-        "Devmasters": "Information"
+        "Devmasters": "Debug",
+        "Devmasters.StartupSequenceRunner": "Debug"
       }
     },
     "WriteTo": [

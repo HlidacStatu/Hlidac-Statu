@@ -3,9 +3,11 @@
 using System;
 using System.Net;
 using Serilog;
+using HlidacStatu.Connectors;
 
 namespace HlidacStatu.XLib
 {
+    [Devmasters.StartupSequenceRunner.InitStartupSequence()]
     public static class StaticData
     {
         public static Devmasters.Cache.LocalMemory.AutoUpdatedCache<WpPost[]> LastBlogPosts = null;
@@ -13,6 +15,15 @@ namespace HlidacStatu.XLib
         static StaticData()
         {
             Log.ForContext(typeof(StaticData)).Information("Static data - LastBlogPosts");
+            //Init();
+        }
+
+        static bool initialized = false;
+        [Devmasters.StartupSequenceRunner.StartupSequence()]
+        static void Init()
+        {
+            if (initialized) 
+                return;
             LastBlogPosts = new Devmasters.Cache.LocalMemory.AutoUpdatedCache<WpPost[]>(
                 TimeSpan.FromHours(3), (obj) =>
                 {
@@ -34,6 +45,7 @@ namespace HlidacStatu.XLib
                     }
                 }
             );
+            initialized = true;
         }
     }
 }
