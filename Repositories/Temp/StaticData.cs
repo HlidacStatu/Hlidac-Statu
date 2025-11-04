@@ -452,7 +452,7 @@ namespace HlidacStatu.Repositories
                  "FirmySVazbamiNaPolitiky_Aktualni",
                (o) =>
                    {
-                       return AnalysisCalculation.LoadFirmySVazbamiNaPolitiky(Relation.AktualnostType.Aktualni, true);
+                       return new AnalysisCalculation.VazbyFiremNaPolitiky();
                    });
 
             FirmySVazbamiNaPolitiky_nedavne_Cache = new Devmasters.Cache.AWS_S3.Cache<AnalysisCalculation.VazbyFiremNaPolitiky>
@@ -477,7 +477,7 @@ namespace HlidacStatu.Repositories
                 "FirmySVazbamiNaPolitiky_Vsechny",
                (o) =>
                {
-                   return AnalysisCalculation.LoadFirmySVazbamiNaPolitiky(Relation.AktualnostType.Libovolny, true);
+                   return new AnalysisCalculation.VazbyFiremNaPolitiky();
                });
 
 

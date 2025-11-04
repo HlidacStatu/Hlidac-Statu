@@ -252,6 +252,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MCPServer", "MCPServer\MCPS
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HlidacStatu.Api.AITask", "HlidacStatu.Api.AITask\HlidacStatu.Api.AITask.csproj", "{0547C2C5-5199-E547-3B70-05333E915C87}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RegistrVozidel", "RegistrVozidel\RegistrVozidel.csproj", "{D6091C5D-273B-4D48-8E20-E73B41B3DBE1}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -634,6 +636,10 @@ Global
 		{0547C2C5-5199-E547-3B70-05333E915C87}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0547C2C5-5199-E547-3B70-05333E915C87}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0547C2C5-5199-E547-3B70-05333E915C87}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D6091C5D-273B-4D48-8E20-E73B41B3DBE1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D6091C5D-273B-4D48-8E20-E73B41B3DBE1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D6091C5D-273B-4D48-8E20-E73B41B3DBE1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D6091C5D-273B-4D48-8E20-E73B41B3DBE1}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -747,6 +753,7 @@ Global
 		{03494D50-791D-151D-C7A1-9935EA74592D} = {ACC852FC-5016-48E7-80DF-ABD60A162FB8}
 		{8B3A187B-DF59-EFF4-34F3-CA37CC868C80} = {034892EA-BACB-4BDE-8161-6F8DB0166FB5}
 		{0547C2C5-5199-E547-3B70-05333E915C87} = {44E67082-D88E-41AE-AF07-4739BDC44B2D}
+		{D6091C5D-273B-4D48-8E20-E73B41B3DBE1} = {44E67082-D88E-41AE-AF07-4739BDC44B2D}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {17143448-F5EA-41D1-886F-00E63AE50798}
