@@ -51,7 +51,7 @@ namespace HlidacStatu.Datasets
                 : base(null)
         {
             orderFill = getDatasetOrderList;
-            InitOrderList();
+            //InitOrderList();
             Page = 1;
         }
 
@@ -65,7 +65,7 @@ namespace HlidacStatu.Datasets
             set
             {
                 _dataset = value;
-                InitOrderList();
+                //InitOrderList();
 
             }
         }
