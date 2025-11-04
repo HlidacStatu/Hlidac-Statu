@@ -18,7 +18,6 @@ using static HlidacStatu.Entities.Osoba.Statistics;
 namespace HlidacStatu.Repositories
 {
 
-    [Devmasters.StartupSequenceRunner.InitStartupSequence()]
     public static class StaticData
     {
         private static readonly ILogger _logger = Log.ForContext(typeof(StaticData));
@@ -311,11 +310,10 @@ namespace HlidacStatu.Repositories
 
         static StaticData()
         {
-            //Init();
+            Init();
         }
 
 
-        [Devmasters.StartupSequenceRunner.StartupSequence(50)]
         public static void Init()
         {
             if (initialized)

@@ -10,7 +10,6 @@ using Serilog;
 
 namespace HlidacStatu.Datasets
 {
-    [Devmasters.StartupSequenceRunner.InitStartupSequence()]
     public class DataSetDB : DataSet
     {
         public static string DataSourcesDbName = "datasourcesdb";
@@ -24,8 +23,10 @@ namespace HlidacStatu.Datasets
 
         public static Devmasters.Cache.LocalMemory.AutoUpdatedCache<DataSet[]> ProductionDataSets;
 
-
-        [Devmasters.StartupSequenceRunner.StartupSequence]
+        static DataSetDB()
+        {
+            Init();
+        }
         static void Init()
         {
             AllDataSets = new Devmasters.Cache.LocalMemory.AutoUpdatedCache<DataSet[]>(
@@ -59,7 +60,7 @@ namespace HlidacStatu.Datasets
                                 return datasets;
                             }
                         );
-            _= ProductionDataSets.Get();
+            _ = ProductionDataSets.Get();
         }
 
         private DataSetDB() : base(DataSourcesDbName, false)

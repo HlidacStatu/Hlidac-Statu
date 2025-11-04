@@ -7,7 +7,6 @@ using HlidacStatu.Connectors;
 
 namespace HlidacStatu.XLib
 {
-    [Devmasters.StartupSequenceRunner.InitStartupSequence()]
     public static class StaticData
     {
         public static Devmasters.Cache.LocalMemory.AutoUpdatedCache<WpPost[]> LastBlogPosts = null;
@@ -15,11 +14,10 @@ namespace HlidacStatu.XLib
         static StaticData()
         {
             Log.ForContext(typeof(StaticData)).Information("Static data - LastBlogPosts");
-            //Init();
+            Init();
         }
 
         static bool initialized = false;
-        [Devmasters.StartupSequenceRunner.StartupSequence()]
         static void Init()
         {
             if (initialized) 

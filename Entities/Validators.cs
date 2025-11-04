@@ -17,7 +17,6 @@ using Microsoft.EntityFrameworkCore.Query;
 namespace HlidacStatu.Entities
 {
 
-    [Devmasters.StartupSequenceRunner.InitStartupSequence()]
     public static class Validators
     {
         public static HashSet<string> Jmena = new HashSet<string>();
@@ -62,10 +61,10 @@ namespace HlidacStatu.Entities
 
         static Validators()
         {
-            //Init();
+            Init();
         }
         static bool initialized = false;
-        [Devmasters.StartupSequenceRunner.StartupSequence(50)]
+
         static void Init()
         {
             if (initialized) 

@@ -31,7 +31,6 @@ namespace HlidacStatu.Web
             DBUpgrades.DBUpgrader.UpgradeDatabases(Connectors.DirectDB.Instance.DefaultCnnStr);
             builder.Services.ConfigureServices(configuration);
 
-            Devmasters.StartupSequenceRunner.Main.CallStartupSequenceMethodsAsync(true).GetAwaiter().GetResult();
 
             WebApplication app = builder.Build();
             app.ConfigurePipeline();
