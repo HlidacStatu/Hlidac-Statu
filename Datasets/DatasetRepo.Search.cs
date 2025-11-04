@@ -170,7 +170,7 @@ namespace HlidacStatu.Datasets
                 {
                     var expConverter = new Newtonsoft.Json.Converters.ExpandoObjectConverter();
 
-                    return new DataSearchResult()
+                    return new DataSearchResult(ds)
                     {
                         ElapsedTime = sw.Elapsed,
                         Q = queryString,
@@ -183,13 +183,12 @@ namespace HlidacStatu.Datasets
                                     expConverter)),
 
                         Page = page,
-                        PageSize = pageSize,
-                        DataSet = ds,
+                        PageSize = pageSize,                        
                         ElasticResultsRaw = res,
                     };
                 }
                 else
-                    return new DataSearchResult()
+                    return new DataSearchResult(ds)
                     {
                         ElapsedTime = sw.Elapsed,
                         Q = queryString,
@@ -198,7 +197,6 @@ namespace HlidacStatu.Datasets
                         Result = new dynamic[] { },
                         Page = page,
                         PageSize = pageSize,
-                        DataSet = ds,
                         ElasticResultsRaw = res,
                     };
             }
@@ -220,7 +218,7 @@ namespace HlidacStatu.Datasets
                 }
 
                 if (res.Total > 0)
-                    return new DataSearchRawResult()
+                    return new DataSearchRawResult(ds)
                     {
                         Q = queryString,
                         IsValid = true,
@@ -229,12 +227,11 @@ namespace HlidacStatu.Datasets
                             new Tuple<string, string>(m.Id, Newtonsoft.Json.JsonConvert.SerializeObject(m.Source))),
                         Page = page,
                         PageSize = pageSize,
-                        DataSet = ds,
                         ElasticResultsRaw = res,
                         Order = sort ?? "0"
                     };
                 else
-                    return new DataSearchRawResult()
+                    return new DataSearchRawResult(ds)
                     {
                         Q = queryString,
                         IsValid = true,
@@ -243,7 +240,6 @@ namespace HlidacStatu.Datasets
                         ElasticResultsRaw = res,
                         Page = page,
                         PageSize = pageSize,
-                        DataSet = ds,
                         Order = sort ?? "0"
                     };
             }

@@ -49,11 +49,11 @@ namespace HlidacStatu.Repositories.Searching
             {
                 _order = string.IsNullOrWhiteSpace(value) ? "0" : value;
 
-                if (OrderList == null)
-                    InitOrderList();
-                if (OrderList != null && OrderList.Count > 0)
+                //if (OrderList == null)
+                //    InitOrderList();
+                if (_orderList != null && _orderList.Count > 0)
                 {
-                    foreach (var item in OrderList)
+                    foreach (var item in _orderList)
                     {
                         if (item.Value == _order.ToString())
                             item.Selected = true;
@@ -68,7 +68,30 @@ namespace HlidacStatu.Repositories.Searching
 
         public bool ExactNumOfResults { get; set; } = false;
 
-        public List<Microsoft.AspNetCore.Mvc.Rendering.SelectListItem> OrderList { get; set; } = null;
+
+        List<Microsoft.AspNetCore.Mvc.Rendering.SelectListItem> _orderList = null;
+        public List<Microsoft.AspNetCore.Mvc.Rendering.SelectListItem> OrderList
+        {
+            get
+            {
+                if (_orderList == null)
+                {
+                    if (orderFill == null)
+                        _orderList = new List<Microsoft.AspNetCore.Mvc.Rendering.SelectListItem>();
+                    else
+                    {
+                        _orderList = orderFill();
+                        _orderList = _orderList ?? new List<Microsoft.AspNetCore.Mvc.Rendering.SelectListItem>();
+                    }
+                }
+                return _orderList;
+            }
+            set { 
+                _orderList = value;
+            }
+        } 
+
+
         public Func<T, string> AdditionalRender = null;
 
         public Nest.ISearchResponse<T> ElasticResults { get; set; }
@@ -106,7 +129,7 @@ namespace HlidacStatu.Repositories.Searching
             if (createdOrderList == null)
                 createdOrderList = emptyOrderList;
             orderFill = createdOrderList;
-            InitOrderList();
+            //InitOrderList();
             PageSize = DefaultPageSize();
 
         }

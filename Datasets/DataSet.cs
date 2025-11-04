@@ -183,7 +183,7 @@ namespace HlidacStatu.Datasets
 
         protected string datasetId = null;
 
-        protected DataSet(string datasourceName, bool fireException)
+        internal DataSet(string datasourceName, bool fireException)
         {
             datasetId = datasourceName.ToLower();
             client = Manager.GetESClient(datasetId, idxType: Manager.IndexType.DataSource);
@@ -519,6 +519,14 @@ namespace HlidacStatu.Datasets
         {
             if (_registration == null)
                 _registration = await DataSetDB.Instance.GetRegistrationAsync(datasetId);
+
+            return _registration;
+        }
+
+        public Registration Registration()
+        {
+            if (_registration == null)
+                _registration = DataSetDB.Instance.GetRegistration(datasetId);
 
             return _registration;
         }
@@ -1128,6 +1136,24 @@ namespace HlidacStatu.Datasets
             return data;
         }
 
+        public string GetData(string Id)
+        {
+            IGetRequest req = new GetRequest(client.ConnectionSettings.DefaultIndex, Id);
+            var res = client.Get<object>(req);
+            if (res.Found)
+                return JsonConvert.SerializeObject(res.Source);
+            else
+            {
+                req = new GetRequest(client.ConnectionSettings.DefaultIndex, Id);
+                res = client.Get<object>(req);
+                if (res.Found)
+                    return JsonConvert.SerializeObject(res.Source);
+                else
+                    return (string)null;
+            }
+        }
+
+
         public async Task<string> GetDataAsync(string Id)
         {
             IGetRequest req = new GetRequest(client.ConnectionSettings.DefaultIndex, Id);
@@ -1186,7 +1212,7 @@ namespace HlidacStatu.Datasets
 
         public string BookmarkName()
         {
-            return RegistrationAsync().ConfigureAwait(false).GetAwaiter().GetResult().name;
+            return Registration().name;
         }
 
         public string ToAuditJson()

@@ -79,7 +79,7 @@
             }
             <hr />
             <partial name="Partials/_SearchForm" 
-                     model="@(new DataSearchRawResult() { DataSet = Model, Q = Context.Request.Query["qs"] })"/>
+                     model="@(new DataSearchRawResult(Model) {  Q = Context.Request.Query["qs"] })"/>
 
 
             @{

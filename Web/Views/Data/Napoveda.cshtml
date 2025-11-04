@@ -17,7 +17,7 @@
     <div class="active float-end"><a href="/data/manage" class="btn btn-hs btn-primary btn-sm" style="color:whitesmoke;text-decoration:none">Snadné přidání nového datasetu</a></div>
 }
 
-<partial name="Partials/_SearchForm" model="@(new DataSearchRawResult() { DataSet = Model, Q = Context.Request.Query["qs"] })"/>
+<partial name="Partials/_SearchForm" model="@(new DataSearchRawResult(Model) { Q = Context.Request.Query["qs"] })"/>
 
 <p>
     <h2>Textové hledání</h2>

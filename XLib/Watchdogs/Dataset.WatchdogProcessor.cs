@@ -116,7 +116,7 @@ namespace HlidacStatu.XLib.Watchdogs
             else
                 dataToRender = data.Items.ToArray();
 
-            DataSearchResult resultToRender = new DataSearchResult();
+            DataSearchResult resultToRender = new DataSearchResult(this.DataSet);
             resultToRender.Result = dataToRender;
 
             //var renderH = new Lib.Render.ScribanT(HtmlTemplate.Replace("#LIMIT#", numOfListed.ToString()));

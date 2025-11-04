@@ -14,7 +14,7 @@ namespace HlidacStatu.Datasets
     {
         public static string DataSourcesDbName = "datasourcesdb";
 
-        public static DataSetDB Instance = new DataSetDB();
+        public static DataSetDB Instance = null;
 
         private readonly ILogger _logger = Log.ForContext<DataSetDB>();
 
@@ -25,6 +25,7 @@ namespace HlidacStatu.Datasets
 
         static DataSetDB()
         {
+            Instance = new DataSetDB();
             Init();
         }
         static void Init()
@@ -32,7 +33,8 @@ namespace HlidacStatu.Datasets
             AllDataSets = new Devmasters.Cache.LocalMemory.AutoUpdatedCache<DataSet[]>(
                             TimeSpan.FromMinutes(5), (obj) =>
                             {
-                                var datasets = Instance.SearchDataRawAsync("*", 1, 500)
+                                var ds = new HlidacStatu.Datasets.DataSet(DataSourcesDbName,false);
+                                var datasets = ds.SearchDataRawAsync("*", 1, 500)
                                     .ConfigureAwait(false).GetAwaiter().GetResult()
                                 .Result
                                 .Select(s => CachedDatasets.Get(s.Item1))
@@ -47,14 +49,10 @@ namespace HlidacStatu.Datasets
                 new Devmasters.Cache.LocalMemory.AutoUpdatedCache<DataSet[]>(
                             TimeSpan.FromMinutes(5), (obj) =>
                             {
-
-                                var datasets = Instance.SearchDataRawAsync("*", 1, 500)
-                                    .ConfigureAwait(false).GetAwaiter().GetResult()
-                                .Result
-                                .Select(s => CachedDatasets.Get(s.Item1))
+                                var datasets = AllDataSets.Get()
                                 .Where(d => d != null)
-                                .Where(d => d.RegistrationAsync().ConfigureAwait(false).GetAwaiter().GetResult().betaversion == false
-                                            && d.RegistrationAsync().ConfigureAwait(false).GetAwaiter().GetResult().hidden == false)
+                                .Where(d => d.Registration().betaversion == false
+                                            && d.Registration().hidden == false)
                                 .ToArray();
 
                                 return datasets;
@@ -93,7 +91,14 @@ namespace HlidacStatu.Datasets
                 }
             }
         }
-
+        public Registration GetRegistration(string datasetId)
+        {
+            datasetId = datasetId.ToLower();
+            var s = GetData(datasetId);
+            if (string.IsNullOrEmpty(s))
+                return null;
+            return Newtonsoft.Json.JsonConvert.DeserializeObject<Registration>(s, DefaultDeserializationSettings);
+        }
         public async Task<Registration> GetRegistrationAsync(string datasetId)
         {
             datasetId = datasetId.ToLower();

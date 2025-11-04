@@ -13,6 +13,9 @@ namespace HlidacStatu.Datasets
         public DataSearchResult() : base()
         {
         }
+        public DataSearchResult(DataSet dataset) : base(dataset)
+        {
+        }
 
         public DataSearchResult(NameValueCollection queryString, SmlouvaRepo.Searching.OrderResult defaultOrder = SmlouvaRepo.Searching.OrderResult.Relevance)
             : base(queryString, defaultOrder)
@@ -24,9 +27,14 @@ namespace HlidacStatu.Datasets
     public class DataSearchRawResult
     : DataSearchResultBase<Tuple<string, string>>
     {
-
         public DataSearchRawResult() : base()
         {
+
+        }
+
+        public DataSearchRawResult(DataSet dataset) : base(dataset)
+        {
+
         }
 
         public DataSearchRawResult(NameValueCollection queryString, SmlouvaRepo.Searching.OrderResult defaultOrder = SmlouvaRepo.Searching.OrderResult.Relevance)
@@ -46,29 +54,22 @@ namespace HlidacStatu.Datasets
         public bool ShowWatchdog { get; set; } = true;
 
         public IEnumerable<T> Result { get; set; }
-
         public DataSearchResultBase()
+                : this(null)
+        {
+        }
+
+        public DataSearchResultBase(DataSet dataset)
                 : base(null)
         {
+            DataSet = dataset;
             orderFill = getDatasetOrderList;
             //InitOrderList();
             Page = 1;
         }
 
         private DataSet _dataset = null;
-        public DataSet DataSet
-        {
-            get
-            {
-                return _dataset;
-            }
-            set
-            {
-                _dataset = value;
-                //InitOrderList();
-
-            }
-        }
+        public DataSet DataSet { get; private set; }
 
 
         public const string OrderAsc = " vzestupně";
@@ -78,7 +79,7 @@ namespace HlidacStatu.Datasets
         protected List<SelectListItem> getDatasetOrderList()
         {
             if (DataSet == null)
-                return new List<SelectListItem>();
+                return null; //new List<SelectListItem>();
 
             List<SelectListItem> list = new List<SelectListItem>();
             list.Add(new SelectListItem()
@@ -87,7 +88,7 @@ namespace HlidacStatu.Datasets
                 Value = "0"
             });
 
-            var registration = DataSet.RegistrationAsync().ConfigureAwait(false).GetAwaiter().GetResult();
+            var registration = DataSet.Registration();
 
             for (int i = 0; i < registration.orderList.GetLength(0); i++)
             {

@@ -304,7 +304,7 @@ namespace HlidacStatu.Web.Controllers
             {
                 if (e.APIResponse.error.number == ApiResponseStatus.InvalidSearchQuery.error.number)
                 {
-                    model.DataSet = ds;
+                    //model.DataSet = ds;
                     model.IsValid = false;
                     return View(model);
                 }
