@@ -148,98 +148,6 @@ namespace HlidacStatu.Repositories
 
         public static Devmasters.Cache.LocalMemory.Cache<Dictionary<string, string>> ZkratkyStran_cache = null;
 
-
-        public static string[] HejtmaniOd2016 = new string[] {
-            "jaroslava-jermanova",
-            "ivana-straska",
-            "josef-bernard",
-            "jana-vildumetzova",
-            "oldrich-bubenicek",
-            "martin-puta",
-            "jiri-stepan",
-            "martin-netolicky",
-            "jiri-behounek",
-            "bohumil-simek",
-            "ladislav-oklestek",
-            "jiri-cunek",
-            "ivo-vondrak",
-            "adriana-krnacova",
-            };
-        public static string[] HejtmaniOd2020 = new string[] {
-            "jiri-behounek","josef-bernard","oldrich-bubenicek","jiri-cunek","zdenek-hrib","jaroslava-pokorna-jermanova","petr-kubis","martin-netolicky","ladislav-oklestek","martin-puta","bohumil-simek","jiri-stepan","ivana-straska","ivo-vondrak"
-        };
-        public static string[] Poslanci2017Novacci = new string[] {
-"adam-vojtech-1","alena-gajduskova","antonin-stanek","dan-tok","dana-balcarova-3","daniel-pawlas","dominik-feri","frantisek-elfmark-1",
-"frantisek-kopriva-20","ilona-mauritzova","ivan-bartos","ivan-jac-4","ivana-nevludova","ivo-vondrak-2","jakub-michalek","jan-bauer",
-"jan-cizinsky","jan-hrncir","jan-kobza-1","jan-kubik-9","jan-lipavsky","jan-posvar-3","jan-rehounek","jana-krutakova","jana-levova-7",
-"jana-vildumetzova","jaroslav-dvorak-110","jaroslav-martinu","jiri-blaha-82","jiri-hlavaty","jiri-masek-50","jiri-strycek",
-"jiri-ventruba","josef-belica-2","julius-spicak","karel-krejza","karla-marikova","karla-slechtova","katerina-valachova",
-"klara-dostalova","lenka-kozlova-4","lubomir-volny-1","lucie--safrankova","lukas-barton","lukas-cernohorsky","lukas-kolarik-1",
-"marek-vyborny","marian-bojko","martin-baxa","martin-jiranek-1","mikulas-ferjencik-1","mikulas-peksa","milan-hnilicka-4",
-"miloslav-rozner","monika-jarosova-6","monika-oborna","milan-pour","olga-richterova","ondrej-profant","ondrej-vesely","patrik-nacher",
-"pavel-juricek-4","pavel-ruzicka-19","pavel-stanek-1","pavel-zacek-18","petr-beitl-1","petr-dolinek","petr-sadovsky-4",
-"petr-tresnak-12","radek-holomcik","radek-koten","radek-rozvoral","radek-zlesak","radovan-vich-1","robert-pelikan",
-"stanislav-blaha","stanislav-fridrich-2","stanislav-juranek","tatana-mala-2","tereza-hythova","tomas-hanzel","tomas-martinek-10",
-"tomas-vymazal-7","vaclav-klaus-2","veronika-vrecionova","vit-rakusan","vlastimil-valek","vojtech-pikal","zdenek-podal"
-};
-
-        public static string[] Poslanci2017Vsichni = new string[] {
-"adam-kalous-1","adam-vojtech-1","alena-gajduskova","ales-juchelka", "alexander-cerny","andrea-babisova","andrea-brzobohata","andrej-babis",
-"antonin-stanek","barbora-koranova-1","bohuslav-svoboda","dana-balcarova-3","daniel-pawlas","david-kasal",
-"david-prazak-5","david-stolpa","dominik-feri","eva-fialova-8","frantisek-elfmark-1","frantisek-kopriva-20","frantisek-petrtyl","frantisek-vacha",
-"hana-aulicka-jirovcova","helena-langsadlova","helena-valkova","ilona-mauritzova","ivan-adamec","ivan-bartos","ivan-jac-4","ivana-nevludova",
-"ivo-pojezny","ivo-vondrak-2","jakub-janda","jakub-michalek","jan-bartosek","jan-bauer","jan-birke","jan-chvojka","jan-cizinsky","jan-farsky",
-"jan-hamacek","jan-hrncir","jan-kobza-1","jan-kubik-9","jan-posvar-3","jan-rehounek","jan-richter","jan-schiller","jan-skopecek",
-"jan-volny","jan-zahradnik","jana-cernochova","jana-krutakova","jana-levova-7","jana-pastuchova","jana-vildumetzova","jaroslav-bzoch-1",
-"jaroslav-dvorak-110","jaroslav-faltynek","jaroslav-foldyna","jaroslav-holik","jaroslav-kytyr","jaroslav-martinu","jiri-behounek",
-"jiri-blaha-82","jiri-dolejs","jiri-kohoutek-9","jiri-masek-50","jiri-mihola","jiri-strycek","jiri-valenta",
-"jiri-ventruba","josef-belica-2","josef-hajek","josef-kott","julius-spicak","kamal-farhan","karel-krejza","karel-rais","karel-schwarzenberg",
-"karel-turecek","karla-marikova","karla-slechtova","katerina-valachova","klara-dostalova","kveta-matusovska","ladislav-oklestek",
-"lenka-drazilova-1","lenka-kozlova-4","leo-luzar","lubomir-spanel-1","lubomir-volny-1","lubomir-zaoralek","lucie--safrankova","lukas-barton",
-"lukas-cernohorsky","lukas-kolarik-1","marcela-melkova","marek-benda","marek-novak-12","marek-vyborny","margita-balastikova","marian-bojko",
-"marian-jurecka","marketa-adamova","martin-baxa","martin-jiranek-1","martin-kolovratnik","michal-ratiborsky",
-"mikulas-ferjencik-1","milan-brazdil","milan-feranec","milan-hnilicka-4","miloslav-janulik","miloslav-rozner",
-"miloslava-rutova","miloslava-vostra","miroslav-grebenicek","miroslav-kalousek","miroslava-nemcova","monika-jarosova-6","monika-oborna",
-"olga-richterova","ondrej-benesik","ondrej-polansky","ondrej-profant","ondrej-vesely","patrik-nacher","pavel-belobradek","pavel-blazek",
-"pavel-jelinek","pavel-juricek-4","pavel-kovacik","pavel-plzak","pavel-pustejovsky","pavel-ruzicka-19","pavel-stanek-1","pavel-zacek-18",
-"pavla-golasowska","petr-beitl-1","petr-bendl","petr-dolinek","petr-fiala","petr-gazdik","petr-sadovsky-4","petr-tresnak-12","petr-vrana-2",
-"milan-pour","premysl-malis-1","radek-holomcik","radek-koten","radek-rozvoral","radek-vondracek","radek-zlesak","radim-fiala",
-"radovan-vich-1","richard-brabec","robert-kralicek","roman-kubicek","roman-onderka","rostislav-vyzula",
-"stanislav-berkovec","stanislav-blaha","stanislav-fridrich-2","stanislav-grospic","stanislav-juranek","tatana-mala-2","tereza-hythova",
-"tomas-hanzel","tomas-kohoutek-7","tomas-martinek-10","tomas-vymazal-7","tomio-okamura","vaclav-klaus-2","vera-adamkova-1","vera-kovarova",
-"vera-prochazkova-19","vit-kankovsky","vit-rakusan","vlastimil-valek","vojtech-filip","vojtech-munzar",
-"vojtech-pikal","zbynek-stanjura","zdenek-ondracek","zdenek-podal","zuzana-majerova-zahradnikova","zuzana-ozanova", "ondrej-babka", "petr-beitl",
-"josef-belica", "jiri-blaha-82", "monika-cervickova", "lenka-drazilova", "dvorak-jaroslav-1", "mikulas-ferjencik", "milan-hnilicka-1",
-"pavel-jelinek,-phd.", "iva-kalatova", "jiri-kobza-2", "martin-kupka", "jan-lipavsky-2", "eva-matyasova", "jana-mrackova-vildumetzova",
-"frantisek-navrkal-2", "petr-pavek-8", "marketa-pekarova-adamova", "marie-pencikova", "roman-sklenak", "petr-venhoda", "ivo-vondrak", "vaclav-votava",
-"pavel-zacek"
-};
-
-        public static string[] Vlada2017 = new string[] {
-"andrej-babis","richard-brabec","dan-tok","","marta-novakova-29",
-"jan-hamacek","jana-malacova","tomas-petricek","alena-schillerova","lubomir-metnar","adam-vojtech-1","petr-krcal",
-"tatana-mala-2","robert-plaga","klara-dostalova","miroslav-toman","antonin-stanek"
-    }; //Pridat Jan Kněžínek	
-
-
-        public static string[] Poslanci2021Novacci = new string[] {
-            "jana-bacikova","vladimir-balas","romana-belohlavkova","roman-belor","jan-berki","jana-berkovcova",
-            "josef-bernard","lubomir-broz-3","eva-decroix","tomas-dubsky-10","ales-dufek","martin-exner-1","petr-fifka",
-            "romana-fischerova-1","josef-flek6","karel-haas","jiri-hajek-62","martin-hajek-2","jana-hanzlikova",
-            "matej-ondrej-havel","jiri-havranek-25","tomas-helebrant-3","simon-heller","igor-hendrych-3","jan-hofmann",
-            "jiri-horak","marie-jilkova","pavel-kasnik","zdenek-kettner-3","pavel-klima-31","lenka-knechtova",
-            "klara-kocmanova","michael-kohajda","ondrej-kolar","vaclav-kral","jan-kuchar-13","martin-kukla-1",
-            "jan-lacina-1","hubert-lang","petr-letocha","martina-lisova","petr-liska","ondrej-lochman","ivana-madlova",
-            "martin-major","lubomir-metnar","tomas-muller-39","hana-naiclerova","jiri-navratil",
-            "zdenka-nemeckova-crkvenjas","milos-novy","hayato-okamura","eliska-olsakova","michaela-opltova",
-            "renata-oulehlova-1","berenika-pestova-1","tom-philipp","pavla-vankova-4","marie-posarova",
-            "lucie-potuckova","petra-quittova","michael-rataj","drahoslav-ryba","rudolf-salvetr","jan-sila-10",
-            "karel-sladecek-1","jiri-slavik-28","karel-smetana-16","robert-strzinek","pavel-svoboda-199",
-            "michaela-sebelova-1","david-simek-15","iveta-stefanova-1","robert-teleky-1","antonin-tesarik",
-            "libor-turek","barbora-urbanova-5","lukas-vlcek","milada-voborska","viktor-vojtko","vit-vomacka",
-            "lubomir-wenzl","milan-wenzl","renata-zajickova","miroslav-zborovsky-2","vladimir-zlinsky","michal-zuna"
-        };
-
         public static string[] Poslanci2021Vsichni = new string[] {
             "alena-schillerova","ales-dufek","ales-juchelka","andrea-babisova","andrej-babis","antonin-tesarik",
             "barbora-urbanova-5","berenika-pestova-1","bohuslav-svoboda","cerny-oldrich","david-kasal","david-prazak-5",
@@ -279,34 +187,7 @@ namespace HlidacStatu.Repositories
         public static Osoba[] Poslanci2021VsichniOsoby = Poslanci2021Vsichni
             .Select(m => Osoby.GetByNameId.Get(m))
             .ToArray();
-
-        public static string[] Poslanci2021OdesliDrive = new string[] {
-            "jan-farsky",
-            "david-simek-15",
-            "jana-mrackova-vildumetzova",
-            "jaroslav-basta",
-            "jaroslav-bzoch-1",
-            "jaroslava-pokorna-jermanova",
-            "klara-dostalova",
-            "milan-feranec",
-            "ondrej-kolar",
-            "ondrej-lochman",
-            "radim-holis"
-        };
-
-        public static string[] Poslanci2021NastoupiliPozdeji = new string[] {
-            "jaromir-dedecek-1",
-            "kamila-blahova-3",
-            "marcel-dlask",
-            "martin-dlouhy",
-            "silvia-dousova",
-            "josef-vana-25",
-            "jarmila-levko",
-            "margita-balastikova",
-            "bohuslav-hudec",
-            "radim-jirout",
-            "miroslav-samas"
-        };
+        
 
         static StaticData()
         {

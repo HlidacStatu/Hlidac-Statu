@@ -14,49 +14,43 @@
         .ThenBy(o => o.Jmeno)
         .ToList();
 
-    var newNames = HlidacStatu.Repositories.StaticData.Poslanci2021Novacci;
-
     ReportDataSource poslanciTable = new(new ReportDataSource.Column[]
     {
-        new() { Name="novacek",
+        new()
+        {
+            Name = "Poslanec (nováčci s <span style='padding-left:5px;' class='fad fa-star text-success' aria-hidden='true'></span> )",
             HtmlRender = (s) =>
             {
                 Osoba o = (Osoba)s;
-                bool novacek = newNames.Contains(o.NameId);
-                return novacek ? "1" : "0";
-            },
-            OrderValueRender = (s) => {
-                Osoba o = (Osoba)s;
-                return o.FullName(false);
-            }
-        },
-        new() { Name="Poslanec (nováčci s <span style='padding-left:5px;' class='fad fa-star text-success' aria-hidden='true'></span> )",
-            HtmlRender = (s) => {
-                Osoba o = (Osoba)s;
-                bool novacek = newNames.Contains(o.NameId);
                 return string.Format("<a href='{0}'>{1}</a>", o.GetUrl(), o.FullNameWithYear(true))
-                + (novacek ? "<span style='padding-left:5px;' title='Nováček ve sněmovně' class='fad fa-star text-success' aria-hidden='true'></span>" :  "")
-                + "<br />"
-                + Devmasters.TextUtil.ShortenText(o.Description(false,m=> true, numOfRecords: 3), 250).Replace("\n", "<br />");
+                       + "<br />"
+                       + Devmasters.TextUtil.ShortenText(o.Description(false, m => true, numOfRecords: 3), 250).Replace("\n", "<br />");
             },
-            OrderValueRender = (s) => {
+            OrderValueRender = (s) =>
+            {
                 Osoba o = (Osoba)s;
                 return o.FullName(false);
             }
         },
-        new() {
-            Name ="Strana/Hnutí",
-            HtmlRender = (s) => {
+        new()
+        {
+            Name = "Strana/Hnutí",
+            HtmlRender = (s) =>
+            {
                 Osoba o = (Osoba)s;
                 return o.CurrentPoliticalParty();
             },
-            OrderValueRender = (s) => {
+            OrderValueRender = (s) =>
+            {
                 Osoba o = (Osoba)s;
                 return o.CurrentPoliticalParty();
             }
         },
-        new() { Name="Angažovanost",
-            HtmlRender = (s) => {
+        new()
+        {
+            Name = "Angažovanost",
+            HtmlRender = (s) =>
+            {
                 Osoba o = (Osoba)s;
                 string sout = "";
 
@@ -65,44 +59,51 @@
                     string customUrl = $"/hledat?Q=osobaid:{o.NameId}";
                     foreach (var v in o.StatistikaRegistrSmluv(Relation.AktualnostType.Nedavny).SoukromeFirmy.Take(2))
                     {
-                        if(v.Value is null)
+                        if (v.Value is null)
                             continue;
-                        sout = sout + v.Value.Summary(HlidacStatu.Lib.Analytics.CoreStat.UsualYearsInterval.FromUsualFirstYearUntilNow).ToNiceLinkString(null,true, customUrl: customUrl) + "<br/>";
+                        sout = sout + v.Value.Summary(HlidacStatu.Lib.Analytics.CoreStat.UsualYearsInterval.FromUsualFirstYearUntilNow).ToNiceLinkString(null, true, customUrl: customUrl) + "<br/>";
                     }
+
                     if (o.StatistikaRegistrSmluv(Relation.AktualnostType.Nedavny).SoukromeFirmy.Count() == 3)
                     {
                         sout = sout + o.StatistikaRegistrSmluv(Relation.AktualnostType.Nedavny).SoukromeFirmy
-                        .Skip(2).First()
-                        .Value.Summary(HlidacStatu.Lib.Analytics.CoreStat.UsualYearsInterval.FromUsualFirstYearUntilNow).ToNiceLinkString(null,true, customUrl: customUrl);
+                            .Skip(2).First()
+                            .Value.Summary(HlidacStatu.Lib.Analytics.CoreStat.UsualYearsInterval.FromUsualFirstYearUntilNow).ToNiceLinkString(null, true, customUrl: customUrl);
                     }
                     else if (o.StatistikaRegistrSmluv(Relation.AktualnostType.Nedavny).SoukromeFirmy.Count() > 2)
                     {
                         sout = sout + "<a href='" + o.GetUrl() + "'>" + Devmasters.Lang.CS.Plural.Get(o.Vazby().Length - 2, "+další vazba;+ další {0} vazby;+ dalších {0} vazeb") + "</a>";
                     }
                 }
+
                 return sout;
             },
-            OrderValueRender = (s) => {
+            OrderValueRender = (s) =>
+            {
                 Osoba o = (Osoba)s;
                 return o.FullName(false);
             }
         },
-        new() { Name="Sponzor",
-            HtmlRender = (s) => {
+        new()
+        {
+            Name = "Sponzor",
+            HtmlRender = (s) =>
+            {
                 Osoba o = (Osoba)s;
-                var sum = o.Sponzoring().Sum(m=>m.Hodnota);
-                if (sum==0)
+                var sum = o.Sponzoring().Sum(m => m.Hodnota);
+                if (sum == 0)
                     return "Ne";
                 else
-                    return "Celkem&nbsp;" + HlidacStatu.Util.RenderData.NicePriceHtml(sum.Value) + string.Format("<br /><a href='{0}'>podrobnosti</a>", o.GetUrl()) ;
+                    return "Celkem&nbsp;" + HlidacStatu.Util.RenderData.NicePriceHtml(sum.Value) + string.Format("<br /><a href='{0}'>podrobnosti</a>", o.GetUrl());
             },
-            OrderValueRender = (s) => {
+            OrderValueRender = (s) =>
+            {
                 Osoba o = (Osoba)s;
-                var val= o.Sponzoring().Sum(m=>m.Hodnota) ;
+                var val = o.Sponzoring().Sum(m => m.Hodnota);
                 return HlidacStatu.Util.RenderData.OrderValueFormat(val);
             }
         },
-});
+    });
 
 
     foreach (var p in showList)
@@ -111,12 +112,8 @@
     }
 }
 
-
-<button id="btnNovacci" class="btn btn-hs btn-secondary">Ukázat pouze poslance - nováčky</button>
-
-
 <h3 id="tblHead">Aktuální složení PSP ČR</h3>
-@ChartUtilExtensions.RenderReport("",ReportModel.QueueItem.types.table, poslanciTable, @"{
+@ChartUtilExtensions.RenderReport("", ReportModel.QueueItem.types.table, poslanciTable, @"{
                  'language': {
                     'url': '//cdn.datatables.net/plug-ins/1.13.4/i18n/cs.json'
                 },
@@ -127,40 +124,3 @@
                 'pageLength': 50,
                 'columnDefs': [{ 'visible': false, 'targets': 0 }]
                 }", "tbPoslanci")
-<script>
-    var filtered = false;
-    $(function () {
-        $("#btnNovacci").click(function () {
-            if (filtered) {
-                filtered = false;
-                showAll();
-                $("#btnNovacci").text("Ukázat pouze poslance - nováčky");
-                $("#tblHead").text("Všichni poslanci zvolení ve volbách 2021");
-
-            }
-            else {
-                filtered = true;
-                showFiltered();
-                $("#btnNovacci").text("Ukázat všechny pouze poslance");
-                $("#tblHead").text("Poslanci - nováčci zvolení ve volbách 2021");
-            }
-        });
-    });
-    function showAll() {
-        $.fn.dataTable.ext.search.pop();
-        tbl_tbPoslanci.draw();
-
-    }
-    function showFiltered() {
-        $.fn.dataTable.ext.search.push(
-            function (settings, data, dataIndex) {
-                var res = parseFloat(data[0]);
-                if (res == 1)
-                    return true;
-                else
-                    return false;
-            }
-        );
-        tbl_tbPoslanci.draw();
-    }
-</script>

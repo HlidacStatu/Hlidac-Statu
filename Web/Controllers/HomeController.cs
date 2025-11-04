@@ -15,7 +15,6 @@ using HlidacStatu.Lib.Web.UI.Attributes;
 using HlidacStatu.LibCore.Extensions;
 using HlidacStatu.Repositories;
 using HlidacStatu.Repositories.Analysis;
-using HlidacStatu.Web.Filters;
 using HlidacStatu.Web.Framework;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Hosting;
@@ -229,7 +228,7 @@ namespace HlidacStatu.Web.Controllers
                 _logger.Information(e, "VisitImg base64 encoding error");
             }
 
-            return File(@"Content\Img\1x1.png", "image/png");
+            return File(@"Content/Img/1x1.png", "image/png");
         }
 
         public ActionResult Kontakt()

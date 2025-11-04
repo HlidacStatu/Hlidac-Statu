@@ -101,5 +101,10 @@ namespace HlidacStatu.Web.Controllers
 
             return Ok($"V pořádku {result}");
         }
+        
+        public ActionResult VisitImg()
+        {
+            return File(@"Content/Img/1x1.png", "image/png");
+        }
     }
 }
