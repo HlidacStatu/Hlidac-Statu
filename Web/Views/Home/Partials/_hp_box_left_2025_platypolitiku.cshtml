@@ -1,41 +1,44 @@
-﻿<div class="watcher-block">
+﻿<div class="watcher-block" style="padding: 32px 0 0 0">
 
-    <div class="watcher__title">
+    <div class="watcher__title" style="padding-top:32px;padding-left:32px;padding-right:32px;background-color:var(--pv-bg-dark)">
         <h3 class="new-title  position-relative d-inline-block">
-            <span class="position-absolute top-0 start-0 translate-middle badge rounded-pill bg-danger" style="font-size:11px">Připravujeme</span>
-            <span class="text-bg-warning px-2 py-0 rounded">Nový</span>
-            projekt            
+            <span class="position-absolute top-0 start-0 translate-middle badge rounded-pill bg-danger" style="font-size:11px">Spuštěno</span>
+            <span class="text-bg-pastvina px-2 py-0 rounded">PastVina</span>
+
         </h3>
     </div>
-    <div class="block-col ">
+    <div class="block-col " style="padding-bottom:32px;padding-left:32px;padding-right:32px;background-color:var(--pv-bg-dark)">
+        <p style="color:white">Nový investigativní projekt Hlídače státu a exreportérů České televize.</p>
+        <p>
+            <div class="text-center">
+                <div class="row">
+                    <div class="col"><i class="fa-solid fa-hand-back-point-right text-pastvina"></i></div>
+                    <div class="col text-start">
+                        <a href="https://www.past-vina.cz" target="_blank" class="text-pastvina">Články,&nbsp;reportáže</a>
+                    </div>
+                    <div class="col text-center">
+                        <a href="https://donio.cz/nas-neumlci-podporte-investigativu-pastvina" target="_blank" class="text-pastvina">Podpora&nbsp;Donio</a>
+                    </div>
+                    <div class="col text-end">
+                    <a href="https://herohero.co/pastvina" target="_blank" class="text-pastvina">Předplatné&nbsp;bonusy</a>
+                    </div>
+                </div>
+            </div>
+            
+
+        </p>
         @* <b>PastVina - investigativní projekt Hlídače státu</b> *@
-        <main class="viewer" role="main" aria-label="Video přehrávač">
-            <video @* title='PastVina - investigativní projekt Hlídače státu' *@
-                   id="hero-video"
-                   autoplay
-                   loop
-                   muted
-                   playsinline
-                   webkit-playsinline
-                   preload="auto"
-                   style="display: block;width: 100%;height: 100%;object-fit: contain;background: #000;">
-                <source src="/Content/promo/pastvina2.mp4" type="video/mp4">
-                Váš prohlížeč nepodporuje HTML5 video.
-            </video>
-            <script>
-                window.addEventListener('DOMContentLoaded', () => {
-                  const v = document.getElementById('hero-video');
-                  if (!v) return;
-                  if (v.paused) {
-                    v.play().catch(() => {  });
-                  }
-                });
-            </script>
-        </main>
+
+        <div style="width: 100%; min-width: 400px; max-width: 800px;">
+            <div style="position: relative; width: 100%; overflow: hidden; padding-top: 56.25%;">
+                <p><iframe style="position: absolute; top: 0; left: 0; right: 0; width: 100%; height: 100%; border: none;" src="https://www.youtube.com/embed/UVbnDtrMywU?si=OxHLutXuXANXq0Cg" width="560" height="315" allowfullscreen="allowfullscreen" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"></iframe></p>
+            </div>
+        </div>
+
+
     </div>
 
-    <hr />
-
+    <div style="background-color:#FFF">
     <div class="watcher__title">
         <h2 class="new-title">
             Podpořte nás <i class="fa-solid fa-circle-heart fa-2x mx-3" style="color:red;font-size:2rem"></i>
@@ -58,4 +61,5 @@
 
 
 
+</div>
 </div>

@@ -1,4 +1,16 @@
-﻿@keyframes height-change {
+﻿:root {
+    --pv-bg: #0f1422;
+    --pv-cyan: #00ffd1;
+    --pv-purple: #4c2cff;
+    --pv-accent: #e3ff00;
+    --pv-dark: #121628;
+    --pv-muted: #C7C7CA; /* A8AEC4 */
+    --pv-text: #EFEFF0; /* E6E1D9 */
+    --pv-bg-dark: #15172E;
+    --pv-title: #381089;
+}
+
+@keyframes height-change {
     0% {
         height: 22px;
         background: #43709f
@@ -3960,4 +3972,12 @@ a.nav-link.dropdown-toggle.mainmenu.show {
         .nav-hs nav[data-toggle=toc] .nav .active .nav {
             display: none
         }
+}
+
+.text-bg-pastvina, .text-bg-pastvina-primary {
+    background: var(--pv-cyan);
+    color: var(--pv-title);
+}
+.text-pastvina, .text-pastvina-primary {
+    color: var(--pv-cyan);
 }
