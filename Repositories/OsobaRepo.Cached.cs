@@ -1,9 +1,7 @@
 using Devmasters.Cache.LocalMemory;
-
 using HlidacStatu.Connectors;
 using HlidacStatu.Entities;
 using Microsoft.EntityFrameworkCore;
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -45,7 +43,7 @@ namespace HlidacStatu.Repositories
                                 return index == -1 ? int.MaxValue : index;
                             })
                             .ToList();
-                        ;
+                        
                         //return osoby;
                         return osoby;
                     }
@@ -60,9 +58,9 @@ namespace HlidacStatu.Repositories
                     {
                         osoby.AddRange(Politici.Get());
                         var osobyQ = db.Osoba.AsQueryable()
-                            .Where(m => db.Sponzoring.Any(SponzoringRepo.SponzoringLimitsPredicate))
                             .Where(m => m.Status == (int)Osoba.StatusOsobyEnum.VazbyNaPolitiky ||
-                                        m.Status == (int)Osoba.StatusOsobyEnum.Sponzor)
+                                        (m.Status == (int)Osoba.StatusOsobyEnum.Sponzor) 
+                                        && db.Sponzoring.Any(SponzoringRepo.SponzoringLimitsPredicate))
                             .AsNoTracking()
                             .ToArray()
                             .OrderBy(o =>

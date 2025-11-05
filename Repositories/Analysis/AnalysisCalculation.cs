@@ -347,7 +347,9 @@ namespace HlidacStatu.Repositories.Analysis
 
         public static VazbyFiremNaPolitiky LoadFirmySVazbamiNaPolitiky(Relation.AktualnostType aktualnostVztahu, bool showProgress = false)
         {
+            object psvLock = new();
             Dictionary<string, List<int>> pol_SVazbami = new Dictionary<string, List<int>>();
+            object psvSfLock = new();
             Dictionary<string, List<int>> pol_SVazbami_StatniFirmy = new Dictionary<string, List<int>>();
 
             Devmasters.Batch.Manager.DoActionForAll<Osoba>(OsobaRepo.PolitickyAktivni.Get(),
@@ -355,9 +357,8 @@ namespace HlidacStatu.Repositories.Analysis
             {
                 try
                 {
-
                     var vazby = p.AktualniVazby(aktualnostVztahu);
-                    if (vazby != null && vazby.Count() > 0)
+                    if (vazby != null && vazby.Any())
                     {
 
                         foreach (var v in vazby)
@@ -366,52 +367,45 @@ namespace HlidacStatu.Repositories.Analysis
                             {
                                 //check if it's GovType company
                                 Firma f = Firmy.Get(v.To.Id);
-                                //if (f == null)
-                                //{
-                                //    f = External.GovData.FromIco(v.To.Id);
-                                //    if (f == null)
-                                //        continue; //unknown company, skip
-                                //}
+          
                                 if (!Firma.IsValid(f))
                                     continue; //unknown company, skip
                                 if (f.PatrimStatu())
                                 {
-                                    //Gov Company
-                                    if (pol_SVazbami_StatniFirmy.ContainsKey(v.To.Id))
+                                    lock (psvSfLock)
                                     {
-                                        var pol = pol_SVazbami_StatniFirmy[v.To.Id];
-                                        if (!pol.Any(m => m == p.InternalId))
-                                            pol.Add(p.InternalId);
+                                        //Gov Company
+                                        if (pol_SVazbami_StatniFirmy.TryGetValue(v.To.Id, out var pol))
+                                        {
+                                            if (pol.All(m => m != p.InternalId))
+                                                pol.Add(p.InternalId);
+                                        }
+                                        else
+                                        {
+                                            pol_SVazbami_StatniFirmy.Add(v.To.Id, new List<int>());
+                                            pol_SVazbami_StatniFirmy[v.To.Id].Add(p.InternalId);
+                                        }
                                     }
-                                    else
-                                    {
-                                        pol_SVazbami_StatniFirmy.Add(v.To.Id, new List<int>());
-                                        pol_SVazbami_StatniFirmy[v.To.Id].Add(p.InternalId);
-                                    }
-
-
                                 }
                                 else
                                 {
-                                    //private company
-                                    if (pol_SVazbami.ContainsKey(v.To.Id))
+                                    lock (psvLock)
                                     {
-                                        var pol = pol_SVazbami[v.To.Id];
-                                        if (!pol.Any(m => m == p.InternalId))
-                                            pol.Add(p.InternalId);
+                                        //private company
+                                        if (pol_SVazbami.TryGetValue(v.To.Id, out var pol))
+                                        {
+                                            if (pol.All(m => m != p.InternalId))
+                                                pol.Add(p.InternalId);
+                                        }
+                                        else
+                                        {
+                                            pol_SVazbami.Add(v.To.Id, new List<int>());
+                                            pol_SVazbami[v.To.Id].Add(p.InternalId);
+                                        }
                                     }
-                                    else
-                                    {
-                                        pol_SVazbami.Add(v.To.Id, new List<int>());
-                                        pol_SVazbami[v.To.Id].Add(p.InternalId);
-                                    }
-
                                 }
-
                             }
-
                         }
-
                     }
                 }
                 catch (Exception e)
@@ -423,9 +417,10 @@ namespace HlidacStatu.Repositories.Analysis
             },
             showProgress ? Devmasters.Batch.Manager.DefaultOutputWriter : (Action<string>)null,
             showProgress ? new ActionProgressWriter().Writer : (Action<ActionProgressData>)null,
-            false
+            parallel: true
             , prefix: "LoadFirmySVazbamiNaPolitiky " + aktualnostVztahu.ToNiceDisplayName()
-            , monitor: showProgress ? new MonitoredTaskRepo.ForBatch() : null
+            , monitor: showProgress ? new MonitoredTaskRepo.ForBatch() : null,
+            maxDegreeOfParallelism:5
             );
 
             return new VazbyFiremNaPolitiky() { SoukromeFirmy = pol_SVazbami, StatniFirmy = pol_SVazbami_StatniFirmy };
