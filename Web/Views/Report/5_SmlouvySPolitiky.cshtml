@@ -15,22 +15,22 @@
         aktualnost = Relation.AktualnostType.Nedavny;
     }
 
-    AnalysisCalculation.VazbyFiremNaPolitiky vazbyNaPolitiky = null;
+    AnalysisCalculation.VazbyFiremNaPolitiky vazbyNaPolitiky = StaticData.FirmySVazbamiNaPolitiky_vsechny_Cache.Get();
     QueryContainer qc = null;
 
     switch (aktualnost)
     {
         case Relation.AktualnostType.Aktualni:
-            vazbyNaPolitiky = StaticData.FirmySVazbamiNaPolitiky_aktualni_Cache.Get();
+            // vazbyNaPolitiky = StaticData.FirmySVazbamiNaPolitiky_aktualni_Cache.Get();
             qc = new QueryContainerDescriptor<Smlouva>().Term(t => t.Field(f => f.SVazbouNaPolitikyAktualni).Value(true));
             break;
         case Relation.AktualnostType.Nedavny:
-            vazbyNaPolitiky = StaticData.FirmySVazbamiNaPolitiky_nedavne_Cache.Get();
+            // vazbyNaPolitiky = StaticData.FirmySVazbamiNaPolitiky_nedavne_Cache.Get();
             qc = new QueryContainerDescriptor<Smlouva>().Term(t => t.Field(f => f.SVazbouNaPolitikyNedavne).Value(true));
             break;
         case Relation.AktualnostType.Neaktualni:
         case Relation.AktualnostType.Libovolny:
-            vazbyNaPolitiky = StaticData.FirmySVazbamiNaPolitiky_vsechny_Cache.Get();
+            // vazbyNaPolitiky = StaticData.FirmySVazbamiNaPolitiky_vsechny_Cache.Get();
             qc = new QueryContainerDescriptor<Smlouva>().Term(t => t.Field(f => f.SVazbouNaPolitiky).Value(true));
             break;
     }
