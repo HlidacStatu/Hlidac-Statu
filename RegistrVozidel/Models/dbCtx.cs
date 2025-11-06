@@ -131,6 +131,9 @@ public partial class dbCtx : DbContext
             entity.Property(e => e.Pcv)
                 .HasMaxLength(30)
                 .HasColumnName("PCV");
+            entity.Property(e => e.CheckSum)
+                .HasMaxLength(50)
+                .HasColumnName("CheckSum");
             entity.Property(e => e.Abs).HasColumnName("ABS");
             entity.Property(e => e.AlternativniProvedeni).HasColumnName("Alternativni_provedeni");
             entity.Property(e => e.Asr).HasColumnName("ASR");
@@ -141,9 +144,6 @@ public partial class dbCtx : DbContext
             entity.Property(e => e.CisloMotoru).HasColumnName("Cislo_motoru");
             entity.Property(e => e.CisloOrv).HasColumnName("Cislo_ORV");
             entity.Property(e => e.CisloTp).HasColumnName("Cislo_TP");
-            entity.Property(e => e.Co2)
-                .HasColumnType("money")
-                .HasColumnName("CO2");
             entity.Property(e => e.Co2Mesto)
                 .HasColumnType("money")
                 .HasColumnName("CO2_mesto");
@@ -155,7 +155,7 @@ public partial class dbCtx : DbContext
             entity.Property(e => e.Datum1RegistraceVCr).HasColumnName("Datum_1_registrace_v_CR");
             entity.Property(e => e.Delka).HasColumnType("money");
             entity.Property(e => e.DelkaDo)
-                .HasColumnType("money")
+                //.HasColumnType("money")
                 .HasColumnName("Delka_do");
             entity.Property(e => e.DojezdZr)
                 .HasColumnType("money")
@@ -166,7 +166,6 @@ public partial class dbCtx : DbContext
             entity.Property(e => e.DruhVozidla).HasColumnName("Druh_vozidla");
             entity.Property(e => e.DruhVozidla2Radek).HasColumnName("Druh_vozidla_2_radek");
             entity.Property(e => e.EsEu).HasColumnName("ES_EU");
-            entity.Property(e => e.EvidencniProhlidkaDne).HasColumnName("Evidencni_prohlidka_dne");
             entity.Property(e => e.FaktorOdchylkyDe)
                 .HasColumnType("money")
                 .HasColumnName("Faktor_odchylky_DE");
@@ -174,7 +173,6 @@ public partial class dbCtx : DbContext
                 .HasColumnType("money")
                 .HasColumnName("Faktor_verifikace_Vf");
             entity.Property(e => e.HmotnostiProvozniDo)
-                .HasColumnType("money")
                 .HasColumnName("Hmotnosti_provozni_Do");
             entity.Property(e => e.HmotnostiVozidlaPriTestuWltp).HasColumnName("Hmotnosti_vozidla_pri_testu_WLTP");
             entity.Property(e => e.HmotnostiZatizeniSz)
@@ -242,7 +240,7 @@ public partial class dbCtx : DbContext
                 .HasColumnName("Nejvyssi_rychlost_omezeni");
             entity.Property(e => e.ObchodniOznaceni).HasColumnName("Obchodni_oznaceni");
             entity.Property(e => e.ObjemCisterny)
-                .HasColumnType("money")
+                //.HasColumnType("money")
                 .HasColumnName("Objem_cisterny");
             entity.Property(e => e.Otacky).HasColumnType("money");
             entity.Property(e => e.OvladaniBrzdSz).HasColumnName("Ovladani_brzd_SZ");
@@ -267,19 +265,36 @@ public partial class dbCtx : DbContext
             entity.Property(e => e.PomerVykonHmotnost)
                 .HasColumnType("money")
                 .HasColumnName("Pomer_vykon_hmotnost");
-            entity.Property(e => e.PravidelnaTechnickaProhlidkaDo).HasColumnName("Pravidelna_technicka_prohlidka_do");
+
+            entity.Property(e => e.NejvetsiTechnickyPripustnaPovolenaHmotnostRaw).HasColumnName("NejvetsiTechnickyPripustnaPovolenaHmotnostRaw");
+            entity.Property(e => e.SpotrebaRaw).HasColumnName("SpotrebaRaw");
+            entity.Property(e => e.EmisniLimitRaw).HasColumnName("EmisniLimitRaw");
+            entity.Property(e => e.PocetMistRaw).HasColumnName("PocetMistRaw");
+            entity.Property(e => e.CelkovaDelkaSirkaVyskaRaw).HasColumnName("CelkovaDelkaSirkaVyskaRaw");
+            entity.Property(e => e.RozchodRaw).HasColumnName("RozchodRaw");
+            entity.Property(e => e.NejvetsiTechnickyPripustnaPovolenaHmotnostNaNapravuRaw).HasColumnName("NejvetsiTechnickyPripustnaPovolenaHmotnostNaNapravuRaw");
+            entity.Property(e => e.NejvetsiPovolenaHmotnostNaNapravuRaw).HasColumnName("NejvetsiPovolenaHmotnostNaNapravuRaw");
+            entity.Property(e => e.NejvetsiTechnickyPripustnaPovolenaHmotnostPripojnehoVozidlaBrzdeneRaw).HasColumnName("NejvetsiTechnickyPripustnaPovolenaHmotnostPripojnehoVozidlaBrzdeneRaw");
+            entity.Property(e => e.NejvetsiTechnickyPripustnaPovolenaHmotnostPripojnehoVozidlaNebrzdeneRaw).HasColumnName("NejvetsiTechnickyPripustnaPovolenaHmotnostPripojnehoVozidlaNebrzdeneRaw");
+            entity.Property(e => e.PocetNapravRaw).HasColumnName("PocetNapravRaw");
+            entity.Property(e => e.KolaPneumatikyNapravyRaw).HasColumnName("KolaPneumatikyNapravyRaw");
+            entity.Property(e => e.VnejsiHlukVozidlaStojiciRaw).HasColumnName("VnejsiHlukVozidlaStojiciRaw");
+            entity.Property(e => e.VnejsiHlukVozidlaZaJizdyRaw).HasColumnName("VnejsiHlukVozidlaZaJizdyRaw");
+            entity.Property(e => e.Co2Raw).HasColumnName("Co2Raw");
+
+
             entity.Property(e => e.PredpisEhkOsn).HasColumnName("Predpis_EHK_OSN");
             entity.Property(e => e.PredpisEhsEsEu).HasColumnName("Predpis_EHS_ES_EU");
             entity.Property(e => e.PredpisSpotrebaPaliva).HasColumnName("Predpis_spotreba_paliva");
             entity.Property(e => e.ProvozniHmotnost)
-                .HasColumnType("money")
+                //.HasColumnType("money")
                 .HasColumnName("Provozni_hmotnost");
             entity.Property(e => e.PrumernaHodnotaUzitecnehoZatizeni)
                 .HasColumnType("money")
                 .HasColumnName("Prumerna_hodnota_uzitecneho_zatizeni");
             entity.Property(e => e.RmZaniku).HasColumnName("RM_zaniku");
             entity.Property(e => e.RokVyroby)
-                .HasColumnType("money")
+                //.HasColumnType("money")
                 .HasColumnName("Rok_vyroby");
             entity.Property(e => e.Rozchod1)
                 .HasColumnType("money")
@@ -293,7 +308,9 @@ public partial class dbCtx : DbContext
             entity.Property(e => e.Rozchod4)
                 .HasColumnType("money")
                 .HasColumnName("Rozchod_4");
-            entity.Property(e => e.Rozvor).HasColumnType("money");
+            entity.Property(e => e.RozvorRaw)
+                //.HasColumnType("money")
+                .HasColumnName("RozvorRaw");
             entity.Property(e => e.Sirka).HasColumnType("money");
             entity.Property(e => e.SnizeniEmisiNedc)
                 .HasColumnType("money")
@@ -301,9 +318,9 @@ public partial class dbCtx : DbContext
             entity.Property(e => e.SnizeniEmisiWltp)
                 .HasColumnType("money")
                 .HasColumnName("Snizeni_emisi_WLTP");
-            entity.Property(e => e.SpecifickeCo2)
-                .HasColumnType("money")
-                .HasColumnName("Specificke_CO2");
+            entity.Property(e => e.SpecifickeCo2Raw)
+                //.HasColumnType("money")
+                .HasColumnName("SpecifickeCo2Raw");
             entity.Property(e => e.SpojovaciZarizeni).HasColumnName("Spojovaci_zarizeni");
             entity.Property(e => e.SpotrebaElMobil)
                 .HasColumnType("money")
@@ -341,14 +358,14 @@ public partial class dbCtx : DbContext
             entity.Property(e => e.VyrobniCisloKaroserie).HasColumnName("Vyrobni_cislo_karoserie");
             entity.Property(e => e.Vyska).HasColumnType("money");
             entity.Property(e => e.VyskaDo)
-                .HasColumnType("money")
+                //.HasColumnType("money")
                 .HasColumnName("Vyska_do");
             entity.Property(e => e.ZadrzenaRzPosledni).HasColumnName("Zadrzena_RZ_posledni");
             entity.Property(e => e.ZadrzenoOrv).HasColumnName("Zadrzeno_ORV");
             entity.Property(e => e.ZarazeniVozidla).HasColumnName("Zarazeni_vozidla");
             entity.Property(e => e.ZatizeniStrechy).HasColumnName("Zatizeni_strechy");
             entity.Property(e => e.ZdvihovyObjem)
-                .HasColumnType("money")
+                //.HasColumnType("money")
                 .HasColumnName("Zdvihovy_objem");
             entity.Property(e => e.Ztp).HasColumnName("ZTP");
         });

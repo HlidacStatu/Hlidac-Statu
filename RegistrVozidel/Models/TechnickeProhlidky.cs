@@ -2,30 +2,43 @@
 #nullable disable
 using System;
 using System.Collections.Generic;
+using CsvHelper.Configuration.Attributes;
 
 namespace HlidacStatu.RegistrVozidel.Models;
 
+//CSV Header:
+//PČV,Typ,Stav,Kód STK,Název STK,Platnost od,Platnost do,Číslo protokolu,Aktuální
 public partial class TechnickeProhlidky
 {
+    [Name("PČV")]
     public string Pcv { get; set; }
-
+    [Name("Typ")]
     public string Typ { get; set; }
 
+    [Name("Stav")]
     public string Stav { get; set; }
 
+    [Name("Kód STK")]
     public decimal? KodStk { get; set; }
 
+    [Name("Název STK")]
     public string NazevStk { get; set; }
 
+    [Name("Platnost od")]
     public DateOnly? PlatnostOd { get; set; }
 
+    [Name("Platnost do")]
     public DateOnly? PlatnostDo { get; set; }
 
+    [Name("Číslo protokolu")]
     public string CisloProtokolu { get; set; }
 
+    [Name("Aktuální")]
     public bool? Aktualni { get; set; }
 
+    [Ignore]
     public DateOnly LastUpdated { get; set; }
 
+    [Ignore]
     public long Pk { get; set; }
 }
