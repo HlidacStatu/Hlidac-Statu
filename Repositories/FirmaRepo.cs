@@ -48,10 +48,16 @@ namespace HlidacStatu.Repositories
             {
                 using (DbEntities db = new DbEntities())
                 {
+                    if (firma.Jmeno.Length > 500)
+                    {
+                        firma.Jmeno = firma.Jmeno.Substring(0, 500);
+                    }
+                    if (firma.JmenoAscii.Length > 500)
+                    {
+                        firma.JmenoAscii = firma.JmenoAscii.Substring(0, 500);
+                    }
 
                     bool existsInDb = db.Firma.AsQueryable().Where(m => m.ICO == firma.ICO).Select(m => m.ICO).FirstOrDefault() != null;
-
-
                     db.Firma.Attach(firma);
                     if (existsInDb)
                     {
