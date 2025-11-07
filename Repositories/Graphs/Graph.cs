@@ -38,14 +38,15 @@ namespace HlidacStatu.Repositories
             return uids;
         }
 
+        const string vazbyCacheVersion="V3";
         private static Devmasters.Cache.Memcached.Manager<List<HlidacStatu.DS.Graphs.Graph.Edge>, string> vazbyIcoCache
-            = Devmasters.Cache.Memcached.Manager<List<HlidacStatu.DS.Graphs.Graph.Edge>, string>.GetSafeInstance("VsechnyDcerineVazby_V2",
+            = Devmasters.Cache.Memcached.Manager<List<HlidacStatu.DS.Graphs.Graph.Edge>, string>.GetSafeInstance("VsechnyDcerineVazby_" + vazbyCacheVersion,
                 ico => vsechnyDcerineVazbyInternal(ico, 0, true, null),
                 TimeSpan.FromDays(3),
                     Devmasters.Config.GetWebConfigValue("HazelcastServers").Split(','));
 
         private static Devmasters.Cache.Memcached.Manager<List<HlidacStatu.DS.Graphs.Graph.Edge>, string> vazbyOsobaNameIdCache
-            = Devmasters.Cache.Memcached.Manager<List<HlidacStatu.DS.Graphs.Graph.Edge>, string>.GetSafeInstance("VsechnyDcerineVazbyOsoba_V2",
+            = Devmasters.Cache.Memcached.Manager<List<HlidacStatu.DS.Graphs.Graph.Edge>, string>.GetSafeInstance("VsechnyDcerineVazbyOsoba_" + vazbyCacheVersion,
                 osobaNameId =>
                 {
                     if (string.IsNullOrEmpty(osobaNameId))
