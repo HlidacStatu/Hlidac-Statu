@@ -38,7 +38,7 @@ namespace HlidacStatu.Repositories
             return uids;
         }
 
-        const string vazbyCacheVersion="V3";
+        const string vazbyCacheVersion="V2";
         private static Devmasters.Cache.Memcached.Manager<List<HlidacStatu.DS.Graphs.Graph.Edge>, string> vazbyIcoCache
             = Devmasters.Cache.Memcached.Manager<List<HlidacStatu.DS.Graphs.Graph.Edge>, string>.GetSafeInstance("VsechnyDcerineVazby_" + vazbyCacheVersion,
                 ico => vsechnyDcerineVazbyInternal(ico, 0, true, null),
