@@ -111,7 +111,7 @@
         exactNumOfResults: true);
 
 
-        var dotaceStat = Model.StatistikaDotace(aktualnost);
+        var dotaceStat = Model.StatistikaDotace();
         var dotaceStatSum = dotaceStat.AllDotaceSummary().Summary();
         int pocetFiremSdotaci = dotaceStat.SoukromeFirmy.Count(m => m.Value.Summary().PocetDotaci > 0)
         + dotaceStat.StatniFirmy.Count(m => m.Value.Summary().PocetDotaci > 0)
