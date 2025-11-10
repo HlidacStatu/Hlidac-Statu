@@ -1,4 +1,5 @@
 ﻿using Devmasters.DT;
+using HlidacStatu.DS.Graphs;
 using HlidacStatu.Entities;
 using HlidacStatu.Extensions;
 using HlidacStatu.Lib.Analytics;
@@ -124,7 +125,8 @@ namespace HlidacStatu.Repositories.Statistics
 
             var firmy_maxrok = new Dictionary<string, DateInterval>();
             firmy_maxrok.Add(firma.ICO, new DateInterval(DateTime.MinValue, DateTime.MaxValue));
-            foreach (var v in firma.AktualniVazby_SkutecnaDobaVazby(DS.Graphs.Relation.AktualnostType.Libovolny))
+            var skutecneVazby = Relation.SkutecnaDobaVazby(firma.AktualniVazby(DS.Graphs.Relation.AktualnostType.Libovolny));
+            foreach (var v in skutecneVazby)
             {
                 if (!string.IsNullOrEmpty(v.To?.UniqId)
                             && v.To.Type == HlidacStatu.DS.Graphs.Graph.Node.NodeType.Company)

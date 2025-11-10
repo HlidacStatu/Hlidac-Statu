@@ -306,10 +306,10 @@ namespace HlidacStatu.Extensions
             return ret;
         }
         public static Osoba.Statistics.Dotace StatistikaDotace(this Osoba osoba,
-            Relation.AktualnostType minAktualnost, bool forceUpdateCache = false)
+            bool forceUpdateCache = false)
         {
 
-            Osoba.Statistics.Dotace ret = OsobaStatistics.CachedStatistics_Dotace(osoba, minAktualnost, forceUpdateCache);
+            Osoba.Statistics.Dotace ret = OsobaStatistics.CachedStatistics_Dotace(osoba, forceUpdateCache);
 
             return ret;
         }

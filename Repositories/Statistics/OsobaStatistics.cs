@@ -1,3 +1,4 @@
+using Devmasters.DT;
 using HlidacStatu.DS.Graphs;
 using HlidacStatu.Entities;
 using HlidacStatu.Extensions;
@@ -23,17 +24,17 @@ namespace HlidacStatu.Repositories.Statistics
                     Devmasters.Config.GetWebConfigValue("RedisCachePassword"),
                         keyValueSelector: obj => $"{obj.os.NameId}/{obj.aktualnost}/{(obj.obor ?? 0)}");
 
-        static Devmasters.Cache.Redis.Manager<Osoba.Statistics.Dotace, (Osoba os, int aktualnost)>
+        static Devmasters.Cache.Redis.Manager<Osoba.Statistics.Dotace, Osoba>
       _cacheDotace
-          = Devmasters.Cache.Redis.Manager<Osoba.Statistics.Dotace, (Osoba os, int aktualnost)>
+          = Devmasters.Cache.Redis.Manager<Osoba.Statistics.Dotace, Osoba>
               .GetSafeInstance("Osoba_DotaceStatistics_v1_",
-                  (obj) => CalculateDotaceStat(obj.os, (Relation.AktualnostType)obj.aktualnost),
+                  (os) => CalculateDotaceStat(os),
                   TimeSpan.Zero,
                     Devmasters.Config.GetWebConfigValue("RedisServerUrls").Split(';'),
                     Devmasters.Config.GetWebConfigValue("RedisBucketName"),
                     Devmasters.Config.GetWebConfigValue("RedisUsername"),
                     Devmasters.Config.GetWebConfigValue("RedisCachePassword"),
-                  keyValueSelector: obj => $"{obj.os.NameId}/{obj.aktualnost}");
+                  keyValueSelector: os => $"obj.NameId");
 
 
         public static void RemoveCachedStatistics_Smlouvy(Osoba os, int? obor)
@@ -47,7 +48,7 @@ namespace HlidacStatu.Repositories.Statistics
 
         public static void RemoveCachedStatistics_Dotace(Osoba os)
         {
-            _cacheDotace.Delete((os, (int)Relation.AktualnostType.Aktualni));
+            _cacheDotace.Delete(os);
 
         }
 
@@ -61,13 +62,13 @@ namespace HlidacStatu.Repositories.Statistics
             return _cacheSmlouvy.Get((os, (int)aktualnost, obor));
         }
 
-        public static Osoba.Statistics.Dotace CachedStatistics_Dotace(Osoba os, Relation.AktualnostType aktualnost,
+        public static Osoba.Statistics.Dotace CachedStatistics_Dotace(Osoba os,
             bool forceUpdateCache = false)
         {
             if (forceUpdateCache)
-                _cacheDotace.Delete((os, (int)aktualnost));
+                _cacheDotace.Delete(os);
 
-            return _cacheDotace.Get((os, (int)aktualnost));
+            return _cacheDotace.Get(os);
         }
 
         public static Osoba.Statistics.RegistrSmluv CalculateSmlouvyStat(Osoba o, Relation.AktualnostType aktualnost, int? obor)
@@ -112,11 +113,10 @@ namespace HlidacStatu.Repositories.Statistics
         }
 
 
-        public static Osoba.Statistics.Dotace CalculateDotaceStat(Osoba o, Relation.AktualnostType aktualnost)
+        public static Osoba.Statistics.Dotace CalculateDotaceStat(Osoba o)
         {
             Osoba.Statistics.Dotace res = new Osoba.Statistics.Dotace();
             res.OsobaNameId = o.NameId;
-            res.Aktualnost = aktualnost;
 
             Dictionary<string, StatisticsSubjectPerYear<Firma.Statistics.Dotace>> statni =
                 new Dictionary<string, StatisticsSubjectPerYear<Firma.Statistics.Dotace>>();
@@ -125,16 +125,36 @@ namespace HlidacStatu.Repositories.Statistics
             Dictionary<string, StatisticsSubjectPerYear<Firma.Statistics.Dotace>> nezisk =
                 new Dictionary<string, StatisticsSubjectPerYear<Firma.Statistics.Dotace>>();
 
-            var icos = o.AktualniVazby(aktualnost)
-                .Where(v => !string.IsNullOrEmpty(v.To?.UniqId)
+            var skutecneVazby = Relation.SkutecnaDobaVazby(o.AktualniVazby(Relation.AktualnostType.Libovolny));
+
+            //var icos = skutecneVazby
+            //    .Where(v => !string.IsNullOrEmpty(v.To?.UniqId)
+            //                && v.To.Type == HlidacStatu.DS.Graphs.Graph.Node.NodeType.Company)
+            //    .Select(v => v.To)
+            //    .Distinct(new HlidacStatu.DS.Graphs.Graph.NodeComparer())
+            //    .Select(f => f?.Id);
+            //;
+            var firmy_maxrok = new Dictionary<string, DateInterval>();
+            foreach (var v in skutecneVazby.Where(v => !string.IsNullOrEmpty(v.To?.UniqId)
                             && v.To.Type == HlidacStatu.DS.Graphs.Graph.Node.NodeType.Company)
-                .Select(v => v.To)
-                .Distinct(new HlidacStatu.DS.Graphs.Graph.NodeComparer())
-                .Select(f => f?.Id);
-                ;
-            var perIcoStat = icos.Select(ico => Firmy.Get(ico))
-                .Where(f => f.Valid == true)
-                .Select(f => new { f = f, ss = f.StatistikaDotaci() });
+)
+            {
+                    firmy_maxrok.TryAdd(v.To.Id, new DateInterval(v.RelFrom ?? DateTime.MinValue, v.RelTo ?? DateTime.MaxValue));
+            }
+
+
+            var perIcoStat = firmy_maxrok
+                .Select(m => new { firma = Firmy.Get(m.Key), interval = m.Value })
+                .Where(m => m.firma.Valid == true)
+                .Select(m => new
+                {
+                    f = m.firma,
+                    ss = new StatisticsSubjectPerYear<Firma.Statistics.Dotace>(
+                        m.firma.ICO,
+                        m.firma.StatistikaDotaci().Filter(fi => fi.Key >= m.interval.From?.Year && fi.Key <= m.interval.To?.Year)
+                        )
+                });
+
 
 
             foreach (var fStat in perIcoStat)

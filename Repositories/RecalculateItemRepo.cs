@@ -98,7 +98,7 @@ namespace HlidacStatu.Repositories
                         else
                         {
 
-                            _ = o.StatistikaDotace(DS.Graphs.Relation.AktualnostType.Nedavny, forceUpdateCache: noRebuild ? false : true);
+                            _ = o.StatistikaDotace(forceUpdateCache: noRebuild ? false : true);
                             _ = o.InfoFactsCached(forceUpdateCache: noRebuild ? false : true);
                         }
                         RecalculateItemRepo.Finish(item);
