@@ -121,43 +121,66 @@ namespace HlidacStatu.RegistrVozidel
             return downloads;
         }
 
+        public class BadRow
+        {
+            public int RowNumber { get; set; }
+            public int FieldCount { get; set; }
+            public string ErrorMessage { get; set; }
+        }
         static int badCount = 0;
         public static void ReadCSV<T>(OpenDataDownload.OpenDataFile file)
         {
-
+            List<BadRow> bads = new List<BadRow>();
             var csvConfiguration = new CsvConfiguration(HlidacStatu.Util.Consts.czCulture)
             {
                 HasHeaderRecord = true,
                 Delimiter = ",",
                 MissingFieldFound = null,
-                BadDataFound = (BadDataFoundArgs args) => { Console.WriteLine("b"); badCount++; },
+                BadDataFound = (BadDataFoundArgs args) =>
+                {
+                    FileLog(args.Context.Parser);
+                    badCount++;
+                }
             };
 
-            try
+            int rows = 0;
+            using (var reader = new StreamReader(file.Directory + file.NormalizedNazev, System.Text.Encoding.UTF8))
+            using (var csv = new CsvReader(reader, csvConfiguration))
             {
 
-                using (var reader = new StreamReader(file.Directory + file.NormalizedNazev, System.Text.Encoding.UTF8))
-                using (var csv = new CsvReader(reader, csvConfiguration))
+                csv.Read();
+                csv.ReadHeader();
+                while (csv.Read())
                 {
-
-                    csv.Read();
-                    csv.ReadHeader();
-                    while (csv.Read())
+                    rows++; 
+                    if (rows % 1000 == 0)
+                        Console.WriteLine($"row {rows}, bads so far: {badCount}");
+                    try
                     {
-                        Console.Write(".");
                         var record = csv.GetRecord<T>();
                         // Do something with the record.
 
                     }
+                    catch (Exception e)
+                    {
+                        //Console.WriteLine($"{e.Message}");
+                        //throw;
+                        FileLog(csv.Parser);
+                        badCount++;
+                    }
                 }
             }
-            catch (Exception e)
-            {
-                Console.WriteLine($"{e.Message}");
-                throw;
-            }
-
+            //System.IO.File.WriteAllText(@"c:\!\badrows.json", Newtonsoft.Json.JsonConvert.SerializeObject(bads, Newtonsoft.Json.Formatting.Indented), System.Text.Encoding.UTF8);
             Console.WriteLine($"BadCount:{badCount}");
+        }
+        static int prevRow = -1;
+        static void FileLog(IParser parser)
+        {
+            if (prevRow != parser.Row)
+            {
+                prevRow = parser.Row;
+                System.IO.File.AppendAllText(@"c:\!\badrows.log", $"Row:{parser.Row}, Fields:{parser.Count}\n");
+            }
         }
     }
 }
