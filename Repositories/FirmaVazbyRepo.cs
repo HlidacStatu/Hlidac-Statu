@@ -252,6 +252,51 @@ namespace HlidacStatu.Repositories
             return Relation.AktualniVazby(vsechnyVazby, minAktualnost, firma.VazbyRootEdge());
         }
 
+        public static HlidacStatu.DS.Graphs.Graph.Edge[] AktualniVazby_SkutecnaDobaVazby(this Firma firma, Relation.AktualnostType minAktualnost, bool refresh = false)
+        {
+            var vsechnyVazby = firma.Vazby(refresh);
+            var vazby = Relation.AktualniVazby(vsechnyVazby, minAktualnost, firma.VazbyRootEdge());
+
+            //najdi konec vazby podle nadrizenych nodu
+            for (int i = 0; i < vazby.Length; i++)
+            {
+                var v = vazby[i];
+                if (v.Distance==0)
+                    continue; //root
+                //najdi nadrizene vazby
+                DateTime? maxDate =
+                    vazby.Any(m => m.To.UniqId == v.From.UniqId && m.Distance == v.Distance-1) ?
+                        vazby.Where(m => m.To.UniqId == v.From.UniqId)
+                            .Max(m => m.RelTo ?? DateTime.MaxValue)
+                        : (DateTime?)null;
+                //najdi nadrizene vazby
+                DateTime? minDate =
+                    vazby.Any(m => m.To.UniqId == v.From.UniqId && m.Distance == v.Distance - 1) ?
+                        vazby.Where(m => m.To.UniqId == v.From.UniqId)
+                            .Max(m => m.RelFrom ?? DateTime.MinValue)
+                        : (DateTime?)null;
+
+                if (maxDate.HasValue)
+                {
+                    if ( v.RelTo.HasValue && v.RelTo > maxDate
+                        || v.RelTo.HasValue == false
+                        )
+                    {
+                        v.RelTo = (maxDate == DateTime.MaxValue ? null : maxDate);
+                    }
+                }
+                if (minDate.HasValue)
+                {
+                    if (v.RelFrom.HasValue && v.RelFrom < minDate
+                        || v.RelTo.HasValue == false
+                        )
+                    {
+                        v.RelFrom = (minDate == DateTime.MinValue? null : minDate);
+                    }
+                }
+            }
+            return vazby;
+        }
 
         public static HlidacStatu.DS.Graphs.Graph.Edge[] VazbyProICO(this Firma firma, string ico)
         {

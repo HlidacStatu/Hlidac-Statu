@@ -155,8 +155,7 @@ namespace HlidacStatu.Repositories
                             if (!holdingOnly || firmaOnly)
                                 _ = f.StatistikaDotaci(forceUpdateCache: true);
                             if (holdingOnly || !firmaOnly)
-                                _ = f.HoldingStatistikaDotaci(DS.Graphs.Relation.AktualnostType.Nedavny,
-                                forceUpdateCache: noRebuild ? false : true);
+                                _ = f.HoldingStatistikaDotaci(forceUpdateCache: noRebuild ? false : true);
                         }
                         break;
                     default:

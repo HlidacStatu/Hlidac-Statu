@@ -673,7 +673,7 @@ namespace HlidacStatu.Repositories
                         .ToList();
                 }
 
-                var dotaceStatHolding = f.HoldingStatistikaDotaci(aktualnost);
+                var dotaceStatHolding = f.HoldingStatistikaDotaci();
                 maxY = HlidacStatu.Util.Consts.CalculatedCurrentYearDotace;
                 if (dotaceStatHolding != null)
                 {

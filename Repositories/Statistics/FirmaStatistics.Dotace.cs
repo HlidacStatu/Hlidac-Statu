@@ -1,4 +1,5 @@
-﻿using HlidacStatu.Entities;
+﻿using Devmasters.DT;
+using HlidacStatu.Entities;
 using HlidacStatu.Extensions;
 using HlidacStatu.Lib.Analytics;
 using Microsoft.IdentityModel.Tokens;
@@ -21,27 +22,24 @@ namespace HlidacStatu.Repositories.Statistics
                     keyValueSelector: f => f.ICO);
 
 
-        static Devmasters.Cache.Memcached.Manager<StatisticsSubjectPerYear<Firma.Statistics.Dotace>, (Firma firma,
-                HlidacStatu.DS.Graphs.Relation.AktualnostType aktualnost)>
-            _holdingDotaceCache = Devmasters.Cache.Memcached.Manager<StatisticsSubjectPerYear<Firma.Statistics.Dotace>, (Firma firma,
-                    HlidacStatu.DS.Graphs.Relation.AktualnostType aktualnost)>
+        static Devmasters.Cache.Memcached.Manager<StatisticsSubjectPerYear<Firma.Statistics.Dotace>, Firma>
+            _holdingDotaceCache = Devmasters.Cache.Memcached.Manager<StatisticsSubjectPerYear<Firma.Statistics.Dotace>, Firma>
                 .GetSafeInstance("Holding_DotaceStatistics_v3",
-                    (obj) => _calculateHoldingDotaceStat(obj.firma, obj.aktualnost),
+                    (f) => _calculateHoldingDotaceStat(f),
                     TimeSpan.Zero,
                     Devmasters.Config.GetWebConfigValue("HazelcastServers").Split(','),
-                    keyValueSelector: obj => obj.firma.ICO + "-" + obj.aktualnost.ToString());
+                    keyValueSelector: f => f.ICO);
 
         public static StatisticsSubjectPerYear<Firma.Statistics.Dotace> CachedHoldingStatisticsDotace(
-            Firma firma, HlidacStatu.DS.Graphs.Relation.AktualnostType aktualnost,
-            bool forceUpdateCache = false, bool invalidateOnly = false)
+            Firma firma, bool forceUpdateCache = false, bool invalidateOnly = false)
         {
             if (forceUpdateCache || invalidateOnly)
-                _holdingDotaceCache.Delete((firma, aktualnost));
+                _holdingDotaceCache.Delete(firma);
 
             if (invalidateOnly)
                 return new();
             else
-                return _holdingDotaceCache.Get((firma, aktualnost));
+                return _holdingDotaceCache.Get(firma);
         }
 
         public static StatisticsSubjectPerYear<Firma.Statistics.Dotace> CachedStatisticsDotace(
@@ -61,9 +59,7 @@ namespace HlidacStatu.Repositories.Statistics
         public static void RemoveStatisticsDotace(Firma firma)
         {
             _dotaceCache.Delete(firma);
-            _holdingDotaceCache.Delete((firma, DS.Graphs.Relation.AktualnostType.Aktualni));
-            _holdingDotaceCache.Delete((firma, DS.Graphs.Relation.AktualnostType.Nedavny));
-            _holdingDotaceCache.Delete((firma, DS.Graphs.Relation.AktualnostType.Libovolny));
+            _holdingDotaceCache.Delete(firma);
 
         }
 
@@ -81,7 +77,7 @@ namespace HlidacStatu.Repositories.Statistics
         }
 
         static FirmaByIcoComparer byIcoOnly = new FirmaByIcoComparer();
-        private static StatisticsSubjectPerYear<Firma.Statistics.Dotace> _calculateHoldingDotaceStat(Firma firma,
+        private static StatisticsSubjectPerYear<Firma.Statistics.Dotace> _calculateHoldingDotaceStat_old(Firma firma,
             HlidacStatu.DS.Graphs.Relation.AktualnostType aktualnost)
         {
 
@@ -94,11 +90,11 @@ namespace HlidacStatu.Repositories.Statistics
                 .ToArray();
 
             if (statistiky.Length == 0)
-                return new StatisticsSubjectPerYear<Firma.Statistics.Dotace>(firma.ICO);    
+                return new StatisticsSubjectPerYear<Firma.Statistics.Dotace>(firma.ICO);
             if (statistiky.Length == 1)
                 return statistiky[0].dotaceStats;
 
-            Dictionary<string, StatisticsSubjectPerYear<Firma.Statistics.Dotace>> statistikyPerIco = 
+            Dictionary<string, StatisticsSubjectPerYear<Firma.Statistics.Dotace>> statistikyPerIco =
                 new Dictionary<string, StatisticsSubjectPerYear<Firma.Statistics.Dotace>>();
 
             foreach (var ico in statistiky.Select(m => m.ICO).Where(m => !string.IsNullOrEmpty(m)))
@@ -110,7 +106,7 @@ namespace HlidacStatu.Repositories.Statistics
                     ) ?? new StatisticsSubjectPerYear<Firma.Statistics.Dotace>();
             }
 
-            StatisticsSubjectPerYear<Firma.Statistics.Dotace> aggregate = 
+            StatisticsSubjectPerYear<Firma.Statistics.Dotace> aggregate =
                 Lib.Analytics.StatisticsSubjectPerYear<Firma.Statistics.Dotace>.Aggregate(firma.ICO, statistikyPerIco.Values);
 
             foreach (var year in aggregate)
@@ -122,6 +118,67 @@ namespace HlidacStatu.Repositories.Statistics
 
             return aggregate;
         }
+
+        private static StatisticsSubjectPerYear<Firma.Statistics.Dotace> _calculateHoldingDotaceStat(Firma firma)
+        {
+
+            var firmy_maxrok = new Dictionary<string, DateInterval>();
+            firmy_maxrok.Add(firma.ICO, new DateInterval(DateTime.MinValue, DateTime.MaxValue));
+            foreach (var v in firma.AktualniVazby_SkutecnaDobaVazby(DS.Graphs.Relation.AktualnostType.Libovolny))
+            {
+                if (!string.IsNullOrEmpty(v.To?.UniqId)
+                            && v.To.Type == HlidacStatu.DS.Graphs.Graph.Node.NodeType.Company)
+                {
+                    firmy_maxrok.TryAdd(v.To.Id, new DateInterval(v.RelFrom ?? DateTime.MinValue, v.RelTo ?? DateTime.MaxValue));
+                }
+
+            }
+            var statistiky = firmy_maxrok
+                .Select(f => new
+                {
+                    ICO = f.Key,
+                    dotaceStats = new StatisticsSubjectPerYear<Firma.Statistics.Dotace>(
+                            f.Key,
+                            Firmy.Get(f.Key).StatistikaDotaci().Filter(m => m.Key >= f.Value.From?.Year && m.Key <= f.Value.To?.Year)
+                            )
+                }
+                )
+                .ToArray();
+
+            if (statistiky.Length == 0)
+                return new StatisticsSubjectPerYear<Firma.Statistics.Dotace>(firma.ICO);
+            if (statistiky.Length == 1)
+                return statistiky[0].dotaceStats;
+
+            Dictionary<string, StatisticsSubjectPerYear<Firma.Statistics.Dotace>> statistikyPerIco =
+                new Dictionary<string, StatisticsSubjectPerYear<Firma.Statistics.Dotace>>();
+
+            foreach (var ico in statistiky.Select(m => m.ICO).Where(m => !string.IsNullOrEmpty(m)))
+            {
+                statistikyPerIco[ico] = new StatisticsSubjectPerYear<Firma.Statistics.Dotace>();
+                statistikyPerIco[ico] = (StatisticsSubjectPerYear<Firma.Statistics.Dotace>.Aggregate(firma.ICO,
+                        statistiky
+                            .Where(w => w.ICO == ico)
+                            .Select(m => m.dotaceStats)
+                            .ToArray()
+                        )
+                    ) ?? new StatisticsSubjectPerYear<Firma.Statistics.Dotace>();
+            }
+
+            StatisticsSubjectPerYear<Firma.Statistics.Dotace> aggregate =
+                Lib.Analytics.StatisticsSubjectPerYear<Firma.Statistics.Dotace>.Aggregate(firma.ICO, statistikyPerIco.Values);
+
+            foreach (var year in aggregate)
+            {
+                year.Value.JednotliveFirmy = statistikyPerIco
+                    .Where(s => s.Value.StatisticsForYear(year.Year).CelkemPrideleno != 0)
+                    .ToDictionary(s => s.Key, s => s.Value.StatisticsForYear(year.Year).CelkemPrideleno);
+            }
+
+            return aggregate;
+        }
+
+
 
         private static async Task<StatisticsSubjectPerYear<Firma.Statistics.Dotace>> CalculateDotaceStatAsync(Firma f)
         {

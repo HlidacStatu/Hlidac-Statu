@@ -59,6 +59,7 @@ namespace HlidacStatu.Lib.Analytics
             ICO = ico;
         }
 
+
         public static StatisticsSubjectPerYear<T> Aggregate(string ico, IEnumerable<StatisticsSubjectPerYear<T>> statistics)
         {
             if (statistics is null)

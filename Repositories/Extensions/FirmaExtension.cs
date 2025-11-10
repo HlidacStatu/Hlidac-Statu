@@ -175,13 +175,12 @@ namespace HlidacStatu.Extensions
 
         }
         public static Lib.Analytics.StatisticsSubjectPerYear<Firma.Statistics.Dotace> HoldingStatistikaDotaci(
-            this Firma firma,
-            Relation.AktualnostType aktualnost, bool forceUpdateCache = false)
+            this Firma firma, bool forceUpdateCache = false)
         {
             //STAT FIX
             //return new();
 
-            return FirmaStatistics.CachedHoldingStatisticsDotace(firma, aktualnost, forceUpdateCache) ??
+            return FirmaStatistics.CachedHoldingStatisticsDotace(firma, forceUpdateCache) ??
                 new Lib.Analytics.StatisticsSubjectPerYear<Firma.Statistics.Dotace>() { ICO = firma.ICO }; ;
         }
 

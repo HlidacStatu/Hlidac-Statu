@@ -654,7 +654,7 @@
         @{
             //var dotaceService = new DotaceService();
             var dotaceSummary = Model.StatistikaDotaci().Summary();
-            var dotaceHoldingStat = Model.HoldingStatistikaDotaci(Relation.AktualnostType.Nedavny);
+            var dotaceHoldingStat = Model.HoldingStatistikaDotaci();
             var dotaceHoldingSummary = dotaceHoldingStat.Summary();
             string durl = "/dotace/hledat?Q=ico%3A+" + Model.ICO;
             //var dotaceStat = dotaceSummary.PocetDotaci;
@@ -825,7 +825,7 @@
             }
 
 
-            var holdingStats = Model.HoldingStatistikaDotaci(Relation.AktualnostType.Nedavny);
+            var holdingStats = Model.HoldingStatistikaDotaci();
 
             var holdingGraphData = new Series[]
             {
