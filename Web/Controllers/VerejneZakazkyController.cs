@@ -48,7 +48,7 @@ namespace HlidacStatu.Web.Controllers
         public async Task<ActionResult> TextDokumentu(string id, string sha)
         {
             var vz = await VerejnaZakazkaRepo.LoadFromESAsync(id);
-            if (vz is null || vz.Dokumenty?.Any(d => d.Sha256Checksum == sha) == false)
+            if (vz is null || string.IsNullOrWhiteSpace(sha) || vz.Dokumenty?.Any(d => d.Sha256Checksum == sha) == false)
                 return new NotFoundResult();
             
             return View(vz);
