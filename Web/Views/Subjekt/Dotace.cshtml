@@ -525,12 +525,16 @@
                             <td>@Html.Raw(HlidacStatu.Util.RenderData.ShortNicePrice( kv.Value.CelkemPrideleno, html:true))</td>
                             <td>
                                 <table class="table table-sm table-borderless table-responsive m-0">
-                                @foreach(var item in kv.Value.JednotliveFirmy.OrderByDescending(o=>o.Value))
-                                {
-                                    <tr>
-                                            <td><a href="/subjekt/@item.Key">@Devmasters.TextUtil.ShortenText(Firmy.GetJmeno(item.Key), 30)</a></td>
-                                            <td class="number">@HlidacStatu.Util.RenderData.NicePrice(item.Value)</td>
-                                        </tr>
+                                    @if (kv.Value.JednotliveFirmy is not null && kv.Value.JednotliveFirmy.Any())
+                                    {
+                                        foreach (var item in kv.Value.JednotliveFirmy.OrderByDescending(o => o.Value))
+                                        {
+                                            <tr>
+                                                <td><a href="/subjekt/@item.Key">@Devmasters.TextUtil.ShortenText(Firmy.GetJmeno(item.Key), 30)</a></td>
+                                                <td class="number">@HlidacStatu.Util.RenderData.NicePrice(item.Value)</td>
+                                            </tr>
+                                        }
+                                        
                                     }
                                 </table>
                             </td>
