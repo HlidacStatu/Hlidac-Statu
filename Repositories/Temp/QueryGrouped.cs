@@ -211,6 +211,8 @@ namespace HlidacStatu.Repositories.ES
             var res = await SmlouvaRepo.Searching.SimpleSearchAsync(query, 1, 0,
                 SmlouvaRepo.Searching.OrderResult.FastestForScroll, aggYSum, exactNumOfResults: true);
 
+            if (!res.IsValid)
+                return null;
 
             Dictionary<int, (List<(string ico, SimpleStat stat)> topPodlePoctu, List<(string ico, SimpleStat stat)>
                 topPodleKc)> result =
@@ -287,6 +289,10 @@ namespace HlidacStatu.Repositories.ES
             var res = new ResultCombined();
 
             var r1 = await _topSmluvniStranyPerYearAsync(property, query, interestedInYearsOnly, maxList);
+            
+            if(r1 == null)
+                return new ResultCombined();
+            
             res.PerYear.TopPodlePoctu = r1.Select(m => new { y = m.Key, v = m.Value.topPodlePoctu })
                 .ToDictionary(k => k.y, v => v.v);
             res.PerYear.TopPodleKc = r1.Select(m => new { y = m.Key, v = m.Value.topPodleKc })

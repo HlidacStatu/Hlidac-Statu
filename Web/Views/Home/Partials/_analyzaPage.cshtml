@@ -33,8 +33,7 @@
 
     List<StatisticsSubjectPerYear<SimpleStat>> topZadavatele = fullAnalysis.TopZadavatele;
     var topZadavateleCurrSeason = fullAnalysis.TopZadavateleCurrSeason;
-    viewRenderTimes.StopPreviousAndStartNextLap("render"); 
-
+    viewRenderTimes.StopPreviousAndStartNextLap("render");
 }
 <h1>
     Analýza dotazu v registru smluv
@@ -42,15 +41,17 @@
 </h1>
 @{
     var resSmlouvy = await HlidacStatu.XLib.Search
-        .GeneralSearchAsync(Model.Query, 1, HlidacStatu.XLib.Search.PartsToSearch.Smlouvy, false, "", this.User, smlouvySize:1);
+        .GeneralSearchAsync(Model.Query, 1, HlidacStatu.XLib.Search.PartsToSearch.Smlouvy, false, "", this.User, smlouvySize: 1);
 }
 <p>
-    <a href="/hledatSmlouvy?q=@(System.Net.WebUtility.UrlEncode(Model.Query))" class="btn btn-hs btn-primary btn-sm">Zobrazit výsledky tohoto dotazu</a>
-    (v registru smluv @Devmasters.Lang.CS.Plural.GetWithZero(resSmlouvy.Smlouvy.Total,"nic nenalezeno","nalezen 1 výsledek","nalezeny {0} výsledky","nalezeno {0} výsledků")).
+    <a href="/hledatSmlouvy?q=@(System.Net.WebUtility.UrlEncode(Model.Query))" class="btn btn-hs btn-primary btn-sm">Zobrazit
+        výsledky tohoto dotazu</a>
+    (v registru
+    smluv @Devmasters.Lang.CS.Plural.GetWithZero(resSmlouvy.Smlouvy.Total, "nic nenalezeno", "nalezen 1 výsledek", "nalezeny {0} výsledky", "nalezeno {0} výsledků")).
 </p>
 
 
-<hr class="double" />
+<hr class="double"/>
 
 @{
     //Graf hodnota smluv
@@ -84,7 +85,6 @@
             Data = statisticsAfter2016
                 .Select(x => new SeriesData(x.Year, x.Value.PocetSmluvBezCeny)).ToArray(),
             Type = Series.SeriesType.line,
-
         }
     };
     var procentaSmluvGraphData = new Series[]
@@ -118,43 +118,41 @@
         .ThenByDescending(o => o.Value.Pocet)
         .ToList();
     var pieOboryData = new SeriesTextValue()
+    {
+        ColorByPoint = true,
+        Name = "Obor",
+        Data = sortedData
+            .Take(9)
+            .Select(m => new SeriesDataTextValue()
             {
-                ColorByPoint = true,
-                Name = "Obor",
-                Data = sortedData
-                                                .Take(9)
-                                                .Select(m => new SeriesDataTextValue()
-                                                {
-                                                    Y = m.Value.CelkemCena,
-                                                    Name = ((Smlouva.SClassification.ClassificationsTypes)m.Key).ToNiceDisplayName()
-                                                })
-                                                .ToArray()
-            };
+                Y = m.Value.CelkemCena,
+                Name = ((Smlouva.SClassification.ClassificationsTypes)m.Key).ToNiceDisplayName()
+            })
+            .ToArray()
+    };
 
     var pieHodnotySmluv = new SeriesTextValue()
+    {
+        ColorByPoint = true,
+        Name = "Hodnoty smluv",
+        Data = HlidacStatu.Web.Framework.Report.GlobalStatistics.SmlouvyPodleCenyAsync(Model.Query)
+            .ConfigureAwait(false).GetAwaiter().GetResult()
+            .Data
+            .Select(m => new SeriesDataTextValue()
             {
-                ColorByPoint = true,
-                Name = "Hodnoty smluv",
-                Data = HlidacStatu.Web.Framework.Report.GlobalStatistics.SmlouvyPodleCenyAsync(Model.Query)
-                                    .ConfigureAwait(false).GetAwaiter().GetResult()
-                                    .Data
-                                    .Select(m => new SeriesDataTextValue()
-                                    {
-                                        Name = m[0].Value.ToString(),
-                                        Y = Convert.ToDecimal(m[1].Value)
-                                    })
-                                    .ToArray()
-            };
-
+                Name = m[0].Value.ToString(),
+                Y = Convert.ToDecimal(m[1].Value)
+            })
+            .ToArray()
+    };
 }
 @if (statistics.Summary(statistics.YearsAfter2016()).PocetSmluv > 0)
 {
-
     <div class="row">
         <div class="col  col-xs-12 border border-secondary-subtle rounded m-2 p-2">
             <h5>Rizika</h5>
             <div>
-                <partial name="Partials/_analyzaRizikoPart" model="@((statistics: statistics, query: Model))" />
+                <partial name="Partials/_analyzaRizikoPart" model="@((statistics: statistics, query: Model))"/>
             </div>
         </div>
     </div>
@@ -168,116 +166,119 @@
     </div>
     <div class="row">
         <div class="col col-xs-12 border border-secondary-subtle rounded m-2 p-2">
-            @Html.PieChart("Obory nalezených smluv",pieOboryData, yTitleLeft: "% smluv", tooltipFormat:"{series.name}: <b>{point.y:,.0f} Kč</b>")
+            @Html.PieChart("Obory nalezených smluv", pieOboryData, yTitleLeft: "% smluv", tooltipFormat: "{series.name}: <b>{point.y:,.0f} Kč</b>")
         </div>
         <div class="col-lg-6 col-xs-12 border border-secondary-subtle rounded m-2 p-2">
-            @Html.PieChart("Smlouvy podle hodnoty", pieHodnotySmluv, tooltipFormat:"{series.name}: <b>{point.y:.1f} %</b>")
+            @Html.PieChart("Smlouvy podle hodnoty", pieHodnotySmluv, tooltipFormat: "{series.name}: <b>{point.y:.1f} %</b>")
         </div>
     </div>
 }
 
-<hr class="double" />
+<hr class="double"/>
 
 <div>
     <h2>Statistika dodavatelů (smluvních partnerů) pro analyzovaný dotaz</h2>
-    <p class="text-muted sub-header-info">
-        Přehledná statistika největších dodavatelů podle smluv v registru smluv.
-    </p>
+    @if (topDodavatele is not null & topDodavatele.Any())
+    {
+        <p class="text-muted sub-header-info">
+            Přehledná statistika největších dodavatelů podle smluv v registru smluv.
+        </p>
 
-    <p>
-        Od roku @(HlidacStatu.Lib.Analytics.Consts.RegistrSmluvYearsList.Min()) byly největšími smluvními dodavateli:
-    <p>
+        <p>
+            Od roku @(HlidacStatu.Lib.Analytics.Consts.RegistrSmluvYearsList.Min()) byly největšími smluvními
+            dodavateli:
+        </p>
+        <div>
             @{
-
                 ReportDataSource<KeyValuePair<string, SimpleStat>> rdsDodav = new(
-                new ReportDataSource<KeyValuePair<string, SimpleStat>>.Column()
-            {
-                Name = "Dodavatel",
-                HtmlRender = (m) =>
-            {
-                var f = Firmy.Get(m.Key);
-                return $"<a href='{f.GetUrl()}'>{f.Jmeno}</a>";
-            }
-            },
-                new ReportDataSource<KeyValuePair<string, SimpleStat>>.Column()
-            {
-                Name = "Počet smluv",
-                HtmlRender = (m) =>
-            {
-                return $"<a style='float:left' href='/hledatSmlouvy?q={System.Net.WebUtility.UrlEncode(Model.Query + " AND ico:" + m.Key)}'><i class='fas fa-link' aria-hidden='true'></i></a> {HlidacStatu.Util.RenderData.NiceNumber(m.Value.Pocet)}";
-            },
-                OrderValueRender = (m) => HlidacStatu.Util.RenderData.OrderValueFormat(m.Value.Pocet),
-                CssClass = "number"
-            },
-                new ReportDataSource<KeyValuePair<string, SimpleStat>>.Column()
-            {
-                Name = "Hodnota smluv",
-                HtmlRender = (m) =>
-            {
-                return HlidacStatu.Util.RenderData.NicePrice(m.Value.CelkemCena);
-            },
-                OrderValueRender = (m) => HlidacStatu.Util.RenderData.OrderValueFormat(m.Value.CelkemCena),
-                CssClass = "number"
-            }
+                    new ReportDataSource<KeyValuePair<string, SimpleStat>>.Column()
+                    {
+                        Name = "Dodavatel",
+                        HtmlRender = (m) =>
+                        {
+                            var f = Firmy.Get(m.Key);
+                            return $"<a href='{f.GetUrl()}'>{f.Jmeno}</a>";
+                        }
+                    },
+                    new ReportDataSource<KeyValuePair<string, SimpleStat>>.Column()
+                    {
+                        Name = "Počet smluv",
+                        HtmlRender = (m) => { return $"<a style='float:left' href='/hledatSmlouvy?q={System.Net.WebUtility.UrlEncode(Model.Query + " AND ico:" + m.Key)}'><i class='fas fa-link' aria-hidden='true'></i></a> {HlidacStatu.Util.RenderData.NiceNumber(m.Value.Pocet)}"; },
+                        OrderValueRender = (m) => HlidacStatu.Util.RenderData.OrderValueFormat(m.Value.Pocet),
+                        CssClass = "number"
+                    },
+                    new ReportDataSource<KeyValuePair<string, SimpleStat>>.Column()
+                    {
+                        Name = "Hodnota smluv",
+                        HtmlRender = (m) => { return HlidacStatu.Util.RenderData.NicePrice(m.Value.CelkemCena); },
+                        OrderValueRender = (m) => HlidacStatu.Util.RenderData.OrderValueFormat(m.Value.CelkemCena),
+                        CssClass = "number"
+                    }
                 );
 
 
                 rdsDodav.AddRows(topDodavatele.Select(m => new KeyValuePair<string, SimpleStat>(m.ICO, m.Summary())));
             }
-            @Html.DataToHTMLTable(rdsDodav, dataTableOptions: HtmlExtensions.DatatableOptions(orderColumnIdx:2, orderDirection:"desc"))
-    </p>
+            @Html.DataToHTMLTable(rdsDodav, dataTableOptions: HtmlExtensions.DatatableOptions(orderColumnIdx: 2, orderDirection: "desc"))
+        </div>
 
-    <p>
-        V roce @currentSeasonYear byly největšími smluvními dodavateli:
-    <p>
-                @if (topDodavateleCurrSeason.Count() > 7)
-                {
-                    @Html.Raw(string.Join(", ", topDodavateleCurrSeason.Take(7).Select(m => $"<a href='/subjekt/{m.ico}'>{Firmy.GetJmeno(m.ico)}</a>")))
-            <span class="collapse" id="topDcurr">
-                        @Html.Raw(string.Join(", ", topDodavateleCurrSeason.Skip(7).Take(13).Select(m => $"<a href='/subjekt/{m.ico}'>{Firmy.GetJmeno(m.ico)}</a>")))
-            </span>
-            <a data-bs-toggle="collapse" href="#topDcurr" style="font-weight:bold">Více... &raquo;</a>
-                }
-                else
-                {
-                    @Html.Raw(string.Join(", ", topDodavateleCurrSeason.Take(20).Select(m => $"<a href='/subjekt/{m.ico}'>{Firmy.GetJmeno(m.ico)}</a>")))
-                }
-    </p>
-    </p>
+        <p>
+            V roce @currentSeasonYear byly největšími smluvními dodavateli:
+        </p>
+        <div>
+            @if (topDodavateleCurrSeason.Count() > 7)
+            {
+                @Html.Raw(string.Join(", ", topDodavateleCurrSeason.Take(7).Select(m => $"<a href='/subjekt/{m.ico}'>{Firmy.GetJmeno(m.ico)}</a>")))
+                <span class="collapse" id="topDcurr">
+                    @Html.Raw(string.Join(", ", topDodavateleCurrSeason.Skip(7).Take(13).Select(m => $"<a href='/subjekt/{m.ico}'>{Firmy.GetJmeno(m.ico)}</a>")))
+                </span>
+                <a data-bs-toggle="collapse" href="#topDcurr" style="font-weight:bold">Více... &raquo;</a>
+            }
+            else
+            {
+                @Html.Raw(string.Join(", ", topDodavateleCurrSeason.Take(20).Select(m => $"<a href='/subjekt/{m.ico}'>{Firmy.GetJmeno(m.ico)}</a>")))
+            }
+        </div>
 
-    <h4>Dodavatelé detailně</h4>
-    <table class="table table-condensed table-striped table-hover">
-        <thead>
-        <td>Subjekt</td>
-                @foreach (var y in Years)
-                {
-            <td>@(y)</td>
-                }
-        </thead>
-        <tbody>
-                @{
-                }
-                @foreach (var ico in topDodavatele.Select(m => m.ICO))
-                {
-                    StatisticsSubjectPerYear<SimpleStat> fStat = topDodavatele.First(m => m.ICO == ico);
+        <h4>Dodavatelé detailně</h4>
+        <table class="table table-condensed table-striped table-hover">
+            <thead>
+            <td>Subjekt</td>
+            @foreach (var y in Years)
+            {
+                <td>@(y)</td>
+            }
+            </thead>
+            <tbody>
+            @{
+            }
+            @foreach (var ico in topDodavatele.Select(m => m.ICO))
+            {
+                StatisticsSubjectPerYear<SimpleStat> fStat = topDodavatele.First(m => m.ICO == ico);
 
                 <tr>
                     <td>@(Firmy.GetJmeno(ico))</td>
-                        @foreach (var y in Years)
-                        {
-                            var query = HlidacStatu.Searching.Query.ModifyQueryAND(Model.Query, $"ico:{ico}", $"datumUzavreni:[{y}-01-01 TO {(y + 1)}-01-01}}");
-                            var urlQ = "/hledat?q=" + System.Net.WebUtility.UrlEncode(query);
+                    @foreach (var y in Years)
+                    {
+                        var query = HlidacStatu.Searching.Query.ModifyQueryAND(Model.Query, $"ico:{ico}", $"datumUzavreni:[{y}-01-01 TO {(y + 1)}-01-01}}");
+                        var urlQ = "/hledat?q=" + System.Net.WebUtility.UrlEncode(query);
 
-                        <td>@Html.Raw(fStat[y].Formatted(true, urlQ, textIfZero:""))</td>
-                        }
+                        <td>@Html.Raw(fStat[y].Formatted(true, urlQ, textIfZero: ""))</td>
+                    }
                 </tr>
-                }
-        </tbody>
-    </table>
-
+            }
+            </tbody>
+        </table>
+    }
+    else
+    {
+        <p class="text-warning sub-header-info">
+            Kvůli velmi obecnému dotazu není možné spočítat přehled pro dodavatele. Zkuste dotaz více specifikovat.
+        </p>
+    }
 </div>
 
-<hr class="double" />
+<hr class="double"/>
 
 <div>
     <h2>Statistika zadavatelů (obvykle úřadů a státních organizací) pro analyzovaný dotaz</h2>
@@ -288,92 +289,84 @@
     <p>
         Od roku @(HlidacStatu.Lib.Analytics.Consts.RegistrSmluvYearsList.Min()) byly největšími smluvními zadavateli:
     <p>
-            @{
-
-                ReportDataSource<KeyValuePair<string, SimpleStat>> rdsZadav = new(
+        @{
+            ReportDataSource<KeyValuePair<string, SimpleStat>> rdsZadav = new(
                 new ReportDataSource<KeyValuePair<string, SimpleStat>>.Column()
-            {
-                Name = "Zadavatel",
-                HtmlRender = (m) =>
-            {
-                var f = Firmy.Get(m.Key);
-                return $"<a href='{f.GetUrl()}'>{f.Jmeno}</a>";
-            }
-            },
+                {
+                    Name = "Zadavatel",
+                    HtmlRender = (m) =>
+                    {
+                        var f = Firmy.Get(m.Key);
+                        return $"<a href='{f.GetUrl()}'>{f.Jmeno}</a>";
+                    }
+                },
                 new ReportDataSource<KeyValuePair<string, SimpleStat>>.Column()
-            {
-                Name = "Počet smluv",
-                HtmlRender = (m) =>
-            {
-
-                return $"<a style='float:left' href='/hledatSmlouvy?q={System.Net.WebUtility.UrlEncode(Model.Query + " AND ico:" + m.Key)}'><i class='fas fa-link' aria-hidden='true'></i></a> {HlidacStatu.Util.RenderData.NiceNumber(m.Value.Pocet)}";
-            },
-                OrderValueRender = (m) => HlidacStatu.Util.RenderData.OrderValueFormat(m.Value.Pocet),
-                CssClass = "number"
-            },
+                {
+                    Name = "Počet smluv",
+                    HtmlRender = (m) => { return $"<a style='float:left' href='/hledatSmlouvy?q={System.Net.WebUtility.UrlEncode(Model.Query + " AND ico:" + m.Key)}'><i class='fas fa-link' aria-hidden='true'></i></a> {HlidacStatu.Util.RenderData.NiceNumber(m.Value.Pocet)}"; },
+                    OrderValueRender = (m) => HlidacStatu.Util.RenderData.OrderValueFormat(m.Value.Pocet),
+                    CssClass = "number"
+                },
                 new ReportDataSource<KeyValuePair<string, SimpleStat>>.Column()
-            {
-                Name = "Hodnota smluv",
-                HtmlRender = (m) =>
-            {
-                return HlidacStatu.Util.RenderData.NicePrice(m.Value.CelkemCena);
-            },
-                OrderValueRender = (m) => HlidacStatu.Util.RenderData.OrderValueFormat(m.Value.CelkemCena),
-                CssClass = "number"
-            }
-                );
+                {
+                    Name = "Hodnota smluv",
+                    HtmlRender = (m) => { return HlidacStatu.Util.RenderData.NicePrice(m.Value.CelkemCena); },
+                    OrderValueRender = (m) => HlidacStatu.Util.RenderData.OrderValueFormat(m.Value.CelkemCena),
+                    CssClass = "number"
+                }
+            );
 
 
-                rdsZadav.AddRows(topZadavatele.Select(m => new KeyValuePair<string, SimpleStat>(m.ICO, m.Summary())));
-            }
-            @Html.DataToHTMLTable(rdsZadav, dataTableOptions: HtmlExtensions.DatatableOptions(orderColumnIdx:2, orderDirection:"desc"))
+            rdsZadav.AddRows(topZadavatele.Select(m => new KeyValuePair<string, SimpleStat>(m.ICO, m.Summary())));
+        }
+        @Html.DataToHTMLTable(rdsZadav, dataTableOptions: HtmlExtensions.DatatableOptions(orderColumnIdx: 2, orderDirection: "desc"))
     </p>
 
     <p>
         V roce @currentSeasonYear byly největšími smluvními dodavateli:
+    </p>
     <p>
-                @if (topZadavateleCurrSeason.Count() > 7)
-                {
-                    @Html.Raw(string.Join(", ", topZadavateleCurrSeason.Take(7).Select(m => $"<a href='/subjekt/{m.ico}'>{Firmy.GetJmeno(m.ico)}</a>")))
+        @if (topZadavateleCurrSeason.Count() > 7)
+        {
+            @Html.Raw(string.Join(", ", topZadavateleCurrSeason.Take(7).Select(m => $"<a href='/subjekt/{m.ico}'>{Firmy.GetJmeno(m.ico)}</a>")))
             <span class="collapse" id="topZcurr">
                         @Html.Raw(string.Join(", ", topZadavateleCurrSeason.Skip(7).Take(13).Select(m => $"<a href='/subjekt/{m.ico}'>{Firmy.GetJmeno(m.ico)}</a>")))
             </span>
             <a data-bs-toggle="collapse" href="#topZcurr" style="font-weight:bold">Více... &raquo;</a>
-                }
-                else
-                {
-                    @Html.Raw(string.Join(", ", topZadavateleCurrSeason.Take(20).Select(m => $"<a href='/subjekt/{m.ico}'>{Firmy.GetJmeno(m.ico)}</a>")))
-                }
-    </p>
+        }
+        else
+        {
+            @Html.Raw(string.Join(", ", topZadavateleCurrSeason.Take(20).Select(m => $"<a href='/subjekt/{m.ico}'>{Firmy.GetJmeno(m.ico)}</a>")))
+        }
     </p>
 
     <h4>Zadavatelé detailně</h4>
     <table class="table table-condensed table-striped table-hover">
         <thead>
         <td>Subjekt</td>
-                @foreach (var y in Years)
-                {
+        @foreach (var y in Years)
+        {
             <td>@(y)</td>
-                }
+        }
         </thead>
         <tbody>
-                @{
-                }
-                @foreach (var ico in topZadavatele.Select(m => m.ICO))
+        @{
+        }
+        @foreach (var ico in topZadavatele.Select(m => m.ICO))
+        {
+            StatisticsSubjectPerYear<SimpleStat> fStat = topZadavatele.First(m => m.ICO == ico);
+
+            <tr>
+                <td>@(Firmy.GetJmeno(ico))</td>
+                @foreach (var y in Years)
                 {
-                    StatisticsSubjectPerYear<SimpleStat> fStat = topZadavatele.First(m => m.ICO == ico);
+                    var query = HlidacStatu.Searching.Query.ModifyQueryAND(Model.Query, $"ico:{ico}", $"datumUzavreni:[{y}-01-01 TO {(y + 1)}-01-01}}");
+                    var urlQ = "/hledat?q=" + System.Net.WebUtility.UrlEncode(query);
 
-                <tr>
-                    <td>@(Firmy.GetJmeno(ico))</td>
-                        @foreach (var y in Years)
-                        {
-                            var query = HlidacStatu.Searching.Query.ModifyQueryAND(Model.Query, $"ico:{ico}", $"datumUzavreni:[{y}-01-01 TO {(y + 1)}-01-01}}");
-                            var urlQ = "/hledat?q=" + System.Net.WebUtility.UrlEncode(query);
-
-                        <td>@Html.Raw(fStat[y].Formatted(true, urlQ, textIfZero:""))</td>
-                        }
-                </tr>
+                    <td>@Html.Raw(fStat[y].Formatted(true, urlQ, textIfZero: ""))</td>
                 }
+            </tr>
+        }
         </tbody>
     </table>
 
