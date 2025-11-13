@@ -82,6 +82,9 @@ public class RejstrikTrestu
 
         public string VymeraCitelne()
         {
+            if(vymery is null || vymery.Length == 0)
+                return "";
+            
             // zatím parsujeme jen měsíce a roky - u ostatních je to složitější
             // zdroj https://eservice-po.rejtr.justice.cz/public/odsouzeni_xml
             foreach (var vymera in vymery)
