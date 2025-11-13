@@ -59,7 +59,7 @@
 
 <h4>@(subTitle)</h4>
 @{
-    if (Model.Query.Contains("\"") == false)
+    if (Model?.Query?.Contains("\"") == false)
     {
         Osoba jmeno = Validators.JmenoInText(Model.Query, false);
         if (jmeno != null)
