@@ -6,7 +6,6 @@ using HlidacStatu.Web.Framework;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
@@ -59,9 +58,8 @@ namespace HlidacStatu.Web
                     });
             });
 
-
+            
             AddIdentity(services, configuration);
-            AddBundling(services);
 
             if (Constants.IsDevelopment())
             {
@@ -249,49 +247,6 @@ namespace HlidacStatu.Web
                 endpoints.MapRazorPages();
             });
         }
-
-        private static void AddBundling(IServiceCollection services)
-        {
-            services.AddWebOptimizer(pipeline =>
-            {
-                //pipeline.EnableDiskCache = false;
-                
-                string[] cssPaths = new[]
-                {
-                    "wwwroot/Content/social-share-kit.css",
-                };
-
-                pipeline.AddJavaScriptBundle("/bundles/jquery", "Scripts/jquery-1.11.3.min.js");
-                pipeline.AddJavaScriptBundle("/bundles/jqueryval", "Scripts/jquery.validate*");
-
-                pipeline.AddJavaScriptBundle("/bundles/modernizr", "Scripts/modernizr-2.8.3.js");
-
-                string[] scriptBundle = new[]
-                {
-                    "Scripts/respond.js",
-                    "Scripts/hlidac.v1.14.js",
-                    "Scripts/fuckadblock.min.js",
-                    "Scripts/social-share-kit.min.js"
-                };
-                pipeline.AddJavaScriptBundle("/bundles/scriptbundle", scriptBundle);
-
-                pipeline.AddJavaScriptBundle("/bundles/highcharts",
-                    "Scripts/Highcharts-7/highcharts.js",
-                    "Scripts/highcharts.global.options.js");
-
-                pipeline.AddJavaScriptBundle("/bundles/highcharts8",
-                    "Scripts/Highcharts-8/js/highcharts.js",
-                    "Scripts/highcharts.global.options.js");
-                
-                
-
-            }, options =>
-            {
-                options.EnableDiskCache = false;
-
-            });
-        }
-
 
         private static void AddIdentity(IServiceCollection services, IConfiguration configuration)
         {
