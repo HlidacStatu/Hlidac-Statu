@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Http;
 using System;
 using System.Threading.Tasks;
 using Serilog;
+using Microsoft.Extensions.Primitives;
 
 namespace HlidacStatu.LibCore.MiddleWares
 {
@@ -55,7 +56,14 @@ namespace HlidacStatu.LibCore.MiddleWares
             }
             else if (httpContext.Response.StatusCode >= 400)
             {
-                _logger.Warning($"OnHTTPErrorMiddleware Invoke exc: {httpContext.Response.StatusCode} {httpContext.Request.Path.ToString()}?{httpContext.Request.QueryString.ToString()}");
+                StringValues referer = default;
+                _ = httpContext?.Request?.Headers?.TryGetValue("Referer", out referer);
+                _logger.Warning("OnHTTPErrorMiddleware 400 HTTP error: {StatusCode} {Path} {QueryString} {Referer}", 
+                    httpContext?.Response?.StatusCode,
+                    httpContext?.Request?.Path.ToString(),
+                    httpContext?.Request?.QueryString.ToString(),
+                    referer.ToString()
+                    );
             }
         }
     }
