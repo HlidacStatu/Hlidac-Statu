@@ -198,7 +198,7 @@ namespace HlidacStatu.Web
                 await next(context);
             });
             app.UseRouting();
-            app.MapHub<HlidacStatu.Web.Framework.SignalR.OllamaSignalRHub>("/ollamaHub");
+            //app.MapHub<HlidacStatu.Web.Framework.SignalR.OllamaSignalRHub>("/ollamaHub");
 
 
             app.UseResponseCaching();

@@ -332,7 +332,8 @@ namespace HlidacStatu.Connectors
                 .DefaultIndex(indexName)
                 .DisableAutomaticProxyDetection(false)
                 .RequestTimeout(TimeSpan.FromMilliseconds(timeOut))
-                .SniffLifeSpan(null)
+                //.SniffLifeSpan(null)
+                .SniffOnStartup(true)
                 .OnRequestCompleted(call =>
                 {
                     // log out the request and the request body, if one exists for the type of request

@@ -24,23 +24,25 @@ namespace HlidacStatu.LibCore.MiddleWares
 
         public async Task Invoke(HttpContext context)
         {
-            var userName = context.User.Identity.Name;
-            if (string.IsNullOrEmpty(userName)
-                &&
-                (context.Request.Path.StartsWithSegments("/api") || context.Request.Path.StartsWithSegments("/health"))
-                )
+            if (context != null)
             {
-                //var authToken = context.GetAuthTokenValue();
-                //authToken = authToken.Replace("Token ", "").Trim();
-
-                var authUser = context.GetAuthPrincipal();
-                if (authUser != null && authUser.Identity.IsAuthenticated)
+                var userName = context?.User?.Identity?.Name;
+                if (string.IsNullOrEmpty(userName)
+                    &&
+                    (context.Request.Path.StartsWithSegments("/api") || context.Request.Path.StartsWithSegments("/health"))
+                    )
                 {
-                    context.User = authUser;
+                    //var authToken = context.GetAuthTokenValue();
+                    //authToken = authToken.Replace("Token ", "").Trim();
 
+                    var authUser = context.GetAuthPrincipal();
+                    if (authUser != null && authUser.Identity.IsAuthenticated)
+                    {
+                        context.User = authUser;
+
+                    }
                 }
             }
-
             await _next(context);
         }
 
