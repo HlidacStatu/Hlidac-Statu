@@ -2,7 +2,6 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Net;
-using System.Threading.Tasks;
 
 namespace HlidacStatu.LibCore.Services
 {
@@ -40,6 +39,7 @@ namespace HlidacStatu.LibCore.Services
             public DateTime Last { get; set; }
 
             public List<string?> Paths { get; set; } = new List<string?>();
+            public readonly object SyncLock = new object();
 
             public Attacker(DateTime last, int num)
             {
@@ -90,19 +90,23 @@ namespace HlidacStatu.LibCore.Services
             else
                 penalty = 10; // not found, forbidden, ...
 
-
-            if (diff >= SaveTimeBetweentAttacksInSec && penalty > 0)
+            bool isAttacker;
+            lock (attacker.SyncLock)
             {
-                attacker.Num = penalty;
-                attacker.Paths.Clear();
+                if (diff >= SaveTimeBetweentAttacksInSec && penalty > 0)
+                {
+                    attacker.Num = penalty;
+                    attacker.Paths.Clear();
+                }
+                else if (penalty > 0)
+                {
+                    attacker.Num += penalty;
+                }
+                attacker.Paths.Add(path);
+                isAttacker = attacker.Num > PenaltyLimit;
             }
-            else if (penalty > 0)
-            {
-                attacker.Num += penalty;
-            }
-            attacker.Paths.Add(path);
-
-            return attacker.Num > PenaltyLimit;
+            
+            return isAttacker;
         }
 
         public string PathsForIp(IPAddress? ipAddress)
