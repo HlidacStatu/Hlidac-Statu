@@ -164,7 +164,6 @@ namespace HlidacStatu.Web
                 app.UseHsts();
             }
 
-            app.UseWebOptimizer();
             app.UseStatusCodePagesWithReExecute("/error/{0}");
             app.UseHttpsRedirection();
 
