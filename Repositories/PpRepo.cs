@@ -4,6 +4,7 @@ using HlidacStatu.Entities.Entities;
 using HlidacStatu.Extensions;
 using Microsoft.EntityFrameworkCore;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
@@ -1004,14 +1005,17 @@ public static partial class PpRepo
         return org.Nazev;
     }
 
-    public static async Task<PpGlobalStat> GetGlobalStatAsync(int rok, Expression<Func<PpPrijem, bool>> predicate = null)
+    private static ConcurrentDictionary<int, PpGlobalStat> _globalStat = new ();
+
+    public static async Task<PpGlobalStat> GetGlobalStatAsync(int rok)
     {
+        if(_globalStat.TryGetValue(rok, out var globalStat))
+            return globalStat;
+            
         var res = new PpGlobalStat() { Rok = rok };
         await using var db = new DbEntities();
         var dataQueryable = BasePotvrzenePlaty(db, rok)
             .AsNoTracking();
-        if (predicate != null)
-            dataQueryable = dataQueryable.Where(predicate);
 
         var data = await dataQueryable.ToListAsync();
         //calculate statistics
@@ -1055,6 +1059,7 @@ public static partial class PpRepo
             { 90, HlidacStatu.Util.MathTools.PercentileCont(0.90m, data.Select(m => m.PrumernyMesicniPrijemVcetneOdmen)) }
         };
 
+        _globalStat.TryAdd(rok, res);
 
         return res;
     }

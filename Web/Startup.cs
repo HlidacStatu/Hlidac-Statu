@@ -254,16 +254,12 @@ namespace HlidacStatu.Web
         {
             services.AddWebOptimizer(pipeline =>
             {
+                //pipeline.EnableDiskCache = false;
+                
                 string[] cssPaths = new[]
                 {
                     "wwwroot/Content/social-share-kit.css",
                 };
-
-
-                //pipeline.AddCssBundle("/Content/bundled.css", cssPaths)
-                //    .UseContentRoot() // tohle je tady potřeba, protože při standardním použití se špatně generují relativní cesty ve stylech (bootstrap.css)
-                //    .AdjustRelativePaths(); //tohle je tady potřeba, aby výsledné cesty neobsahovaly /wwwroot/
-
 
                 pipeline.AddJavaScriptBundle("/bundles/jquery", "Scripts/jquery-1.11.3.min.js");
                 pipeline.AddJavaScriptBundle("/bundles/jqueryval", "Scripts/jquery.validate*");
@@ -286,10 +282,12 @@ namespace HlidacStatu.Web
                 pipeline.AddJavaScriptBundle("/bundles/highcharts8",
                     "Scripts/Highcharts-8/js/highcharts.js",
                     "Scripts/highcharts.global.options.js");
+                
+                
 
-                //pipeline.AddJavaScriptBundle("/bundles/typeahead",
-                //    "Scripts/typeahead.bundle.min.js",
-                //    "Scripts/bloodhound.min.js");
+            }, options =>
+            {
+                options.EnableDiskCache = false;
             });
         }
 
