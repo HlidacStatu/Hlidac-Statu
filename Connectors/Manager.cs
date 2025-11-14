@@ -322,7 +322,7 @@ namespace HlidacStatu.Connectors
 
             string esUrl = Devmasters.Config.GetWebConfigValue("ESConnection");
 
-            var pool = new Elasticsearch.Net.StaticConnectionPool(esUrl
+            var pool = new Elasticsearch.Net.StickyConnectionPool(esUrl
                 .Split(';')
                 .Where(m => !string.IsNullOrWhiteSpace(m))
                 .Select(u => new Uri(u))

@@ -288,6 +288,7 @@ namespace HlidacStatu.Web
             }, options =>
             {
                 options.EnableDiskCache = false;
+
             });
         }
 
