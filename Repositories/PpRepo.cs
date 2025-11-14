@@ -1004,38 +1004,38 @@ public static partial class PpRepo
         return org.Nazev;
     }
 
-    public async static Task<PpGlobalStat> GetGlobalStatAsync(int rok, Expression<Func<PpPrijem, bool>> predicate = null)
+    public static async Task<PpGlobalStat> GetGlobalStatAsync(int rok, Expression<Func<PpPrijem, bool>> predicate = null)
     {
         var res = new PpGlobalStat() { Rok = rok };
-        using var db = new DbEntities();
-        var data = BasePotvrzenePlaty(db, rok)
+        await using var db = new DbEntities();
+        var dataQueryable = BasePotvrzenePlaty(db, rok)
             .AsNoTracking();
         if (predicate != null)
-            data = data.Where(predicate);
+            dataQueryable = dataQueryable.Where(predicate);
 
+        var data = await dataQueryable.ToListAsync();
         //calculate statistics
-        res.PocetPrijmu = await data.CountAsync();
+        res.PocetPrijmu = data.Count();
         res.PocetPrijmuPozadano = await db.PuEvents
             .AsNoTracking()
             .Where(m => m.ProRok == rok && m.DotazovanaInformace == PuEvent.DruhDotazovaneInformace.Politik)
             .Where(m => m.Typ == PuEvent.TypUdalosti.ZaslaniZadosti)
             .Distinct()
             .CountAsync();
-
-
-        res.PocetOsobMaPlat = await data
+        
+        res.PocetOsobMaPlat = data
             .Where(m => m.Status >= 0)
             .Select(m => m.Nameid)
             .Distinct()
-            .CountAsync();
+            .Count();
 
-        res.PocetOsobPozadano = await data
+        res.PocetOsobPozadano = data
             .Select(m => m.Nameid)
             .Distinct()
-            .CountAsync();
+            .Count();
 
 
-        res.PocetOrganizaciDaliPlat = await data.Select(m => m.IdOrganizace).Distinct().CountAsync();
+        res.PocetOrganizaciDaliPlat = data.Select(m => m.IdOrganizace).Distinct().Count();
         res.PocetOrganizaciPozadano = await db.PuEvents
             .AsNoTracking()
             .Where(m => m.ProRok == rok && m.DotazovanaInformace == PuEvent.DruhDotazovaneInformace.Politik)
