@@ -218,10 +218,7 @@ namespace HlidacStatu.Web
 
                         }
                     ).WithMetadata(new AuthorizeAttribute() { Roles = "PrivateApi" });
-            });
-
-            app.UseEndpoints(endpoints =>
-            {
+                
                 endpoints.MapControllerRoute(
                     name: "default",
                     pattern: "{controller=Home}/{action=Index}/{id?}");
