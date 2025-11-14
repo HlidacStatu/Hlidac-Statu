@@ -14,7 +14,7 @@ namespace HlidacStatu.LibCore.MiddleWares
         public const string ItemKeyRefererName = "referrerUrl";
 
         private readonly RequestDelegate _next;
-        
+
         private readonly ILogger _logger = Log.ForContext<OnHTTPErrorMiddleware>();
 
         public OnHTTPErrorMiddleware(RequestDelegate next)
@@ -30,21 +30,7 @@ namespace HlidacStatu.LibCore.MiddleWares
             }
             catch (Exception e)
             {
-                var str = Devmasters.Net.WebContextLogger.LogFatalWebError(e, httpContext, true, "");
-
-                if (httpContext.Items.ContainsKey(ItemKeyName))
-                {
-                    var prevStr = httpContext.Items[ItemKeyName] as string;
-                    httpContext.Items[ItemKeyName] = prevStr + "\n\n====== NextException =======" + str;
-                }
-                else
-                    httpContext.Items.Add(ItemKeyName, str);
-
-                httpContext.Items[ItemKeyRefererName] = httpContext?.Request?.Headers?.ContainsKey("Referer") == true
-                    ? httpContext.Request.Headers["Referer"].ToString()
-                    : null;
-
-                _logger.Error(e, "Unhadled exception {middleware} {path}?{query}\n" + str, "OnHTTPErrorMidddleware",
+                _logger.Error(e, "Unhadled exception {middleware} {path}?{query}\n", "OnHTTPErrorMidddleware",
                     httpContext.Request.Path, httpContext.Request.QueryString);
 
                 throw;
@@ -54,23 +40,11 @@ namespace HlidacStatu.LibCore.MiddleWares
             {
                 try
                 {
-                    var exceptionHandlerPathFeature = httpContext.Features.Get<IExceptionHandlerPathFeature>();
-                    var str = Devmasters.Net.WebContextLogger.LogFatalWebError(exceptionHandlerPathFeature?.Error,
-                        httpContext, true, "");
-                    if (httpContext.Items.ContainsKey(ItemKeyName))
-                    {
-                        var prevStr = httpContext.Items[ItemKeyName] as string;
-                        httpContext.Items[ItemKeyName] = prevStr + "\n\n====== NextException =======" + str;
-                    }
-                    else
-                        httpContext.Items.Add(ItemKeyName, str);
-
-                    httpContext.Items[ItemKeyRefererName] = httpContext?.Request?.Headers?.ContainsKey("Referer") == true
-                        ? httpContext.Request.Headers["Referer"].ToString()
-                        : null;
-
-                    _logger.Error(
-                        "Unhadled exception > 500 {middleware} {path}?{query}\n" + httpContext.Items[ItemKeyName],
+                    var feature = httpContext.Features.Get<IExceptionHandlerFeature>();
+                    var ex = feature?.Error;
+                    
+                    _logger.Error(ex,
+                        "Unhadled exception > 500 {middleware} {path}?{query}\n",
                         "OnHTTPErrorMidddleware", httpContext.Request.Path, httpContext.Request.QueryString);
                 }
                 catch (Exception e)
@@ -81,29 +55,7 @@ namespace HlidacStatu.LibCore.MiddleWares
             }
             else if (httpContext.Response.StatusCode >= 400)
             {
-                try
-                {
-                    var str = Devmasters.Net.WebContextLogger.Log404WebError(httpContext?.Request);
-                    if (httpContext.Items.ContainsKey(ItemKeyName))
-                    {
-                        var prevStr = httpContext.Items[ItemKeyName] as string;
-                        httpContext.Items[ItemKeyName] = prevStr + "\n\n====== Next404 =======" + str;
-                    }
-                    else
-                        httpContext.Items.Add(ItemKeyName, str);
-
-                    httpContext.Items[ItemKeyRefererName] = httpContext?.Request?.Headers?.ContainsKey("Referer") == true
-                        ? httpContext.Request.Headers["Referer"].ToString()
-                        : null;
-
-                    httpContext.Items[ItemKeyNameObj] =
-                        Devmasters.Net.WebContextLogger.Get404ErrorContextInfo(httpContext);
-                }
-                catch (Exception e)
-                {
-                    _logger.Error(e,
-                        $"OnHTTPErrorMiddleware Invoke exc: {httpContext.Response.StatusCode} {httpContext.Request.Path.ToString()}?{httpContext.Request.QueryString.ToString()}");
-                }
+                _logger.Warning($"OnHTTPErrorMiddleware Invoke exc: {httpContext.Response.StatusCode} {httpContext.Request.Path.ToString()}?{httpContext.Request.QueryString.ToString()}");
             }
         }
     }

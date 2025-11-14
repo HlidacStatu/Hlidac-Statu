@@ -1,6 +1,4 @@
-using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
-using System.Collections.Generic;
 using Serilog;
 
 namespace HlidacStatu.Web.Controllers
@@ -13,44 +11,18 @@ namespace HlidacStatu.Web.Controllers
         [Route("500")]
         public IActionResult ApplicationError()
         {
-            var exceptionHandlerPathFeature = HttpContext.Features.Get<IExceptionHandlerPathFeature>();
-
-            string err = HttpContext.Items[HlidacStatu.LibCore.MiddleWares.OnHTTPErrorMiddleware.ItemKeyName] as string;
-            string? referer = HttpContext.Items[HlidacStatu.LibCore.MiddleWares.OnHTTPErrorMiddleware.ItemKeyRefererName] as string;
-
-            _logger.Error($"500 - Server error on {exceptionHandlerPathFeature.Path}\nReferer:{referer}\n\n" + err);
-
             return View();
         }
 
         [Route("404")]
         public IActionResult PageNotFound()
         {
-            string err = HttpContext.Items[HlidacStatu.LibCore.MiddleWares.OnHTTPErrorMiddleware.ItemKeyName] as string;
-            string? referer = HttpContext.Items[HlidacStatu.LibCore.MiddleWares.OnHTTPErrorMiddleware.ItemKeyRefererName] as string;
-
-            _logger.Warning($"HTTP 404 - Page not found.\nReferer:{referer}\n\n" + err);
-            var errObj = HttpContext.Items[HlidacStatu.LibCore.MiddleWares.OnHTTPErrorMiddleware.ItemKeyNameObj] as Dictionary<string, string>;
-
-            if (errObj != null)
-                _logger.Warning("HTTP 404 - page not found\nReferer:{referer}\ncontext: {context}", errObj);
-
             return View();
         }
 
         [Route("{code:int}")]
         public IActionResult GeneralError(int code)
         {
-            string err = HttpContext.Items[HlidacStatu.LibCore.MiddleWares.OnHTTPErrorMiddleware.ItemKeyName] as string;
-            string? referer = HttpContext.Items[HlidacStatu.LibCore.MiddleWares.OnHTTPErrorMiddleware.ItemKeyRefererName] as string;
-
-            string? originalPath = "unknown";
-            if (HttpContext.Items.ContainsKey("originalPath"))
-            {
-                originalPath = HttpContext.Items["originalPath"] as string;
-            }
-            _logger.Warning($"{code} error - [{originalPath}].\nReferer:{referer}\n\n" + err);
-
             return View(code);
         }
 
