@@ -631,7 +631,7 @@ namespace HlidacStatu.Repositories
             }
             if (f.Holding(aktualnost)?.Any() == true)
             {
-                var smlouvyStatHolding = f.HoldingStatisticsRegistrSmluv(aktualnost);
+                var smlouvyStatHolding = f.HoldingStatisticsRegistrSmluv();
                 var maxY = HlidacStatu.Util.Consts.CalculatedCurrentYearSmlouvy;
                 if (smlouvyStatHolding != null)
                 {

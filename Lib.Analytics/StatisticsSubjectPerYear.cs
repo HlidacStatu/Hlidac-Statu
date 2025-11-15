@@ -66,7 +66,7 @@ namespace HlidacStatu.Lib.Analytics
                 return new StatisticsSubjectPerYear<T>() { ICO=ico };
 
             var aggregatedStatistics = new StatisticsSubjectPerYear<T>(
-                $"{ico}",
+                ico,
                 AggregateStats(statistics));
 
             return aggregatedStatistics;

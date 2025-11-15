@@ -200,7 +200,7 @@ namespace HlidacStatu.Extensions
             //STAT FIX
             //return new();
 
-            return FirmaStatistics.CachedHoldingStatisticsVZ(firma, aktualnost, forceUpdateCache) ??
+            return FirmaStatistics.CachedHoldingStatisticsVZ(firma, forceUpdateCache) ??
                 new Lib.Analytics.StatisticsSubjectPerYear<Firma.Statistics.VZ>() { ICO = firma.ICO };
         }
 
@@ -396,10 +396,10 @@ namespace HlidacStatu.Extensions
 
         public static Lib.Analytics.StatisticsSubjectPerYear<Smlouva.Statistics.Data> HoldingStatisticsRegistrSmluv(
             this Firma firma,
-            Relation.AktualnostType aktualnost, int? obor = null, bool forceUpdateCache = false)
+            int? obor = null, bool forceUpdateCache = false)
         {
 
-            var ret = FirmaStatistics.CachedHoldingStatisticsSmlouvy(firma, aktualnost, obor, forceUpdateCache) ??
+            var ret = FirmaStatistics.CachedHoldingStatisticsSmlouvy(firma, obor, forceUpdateCache) ??
                 new Lib.Analytics.StatisticsSubjectPerYear<Smlouva.Statistics.Data>() { ICO = firma.ICO };
 
             return ret;
@@ -837,7 +837,7 @@ namespace HlidacStatu.Extensions
             List<InfoFact> f = new List<InfoFact>();
             //var stat = new HlidacStatu.Lib.Analysis.SubjectStatistic(this);
             var stat = firma.StatistikaRegistruSmluv();
-            var statHolding = firma.HoldingStatisticsRegistrSmluv(Relation.AktualnostType.Aktualni);
+            var statHolding = firma.HoldingStatisticsRegistrSmluv();
             int rok = DateTime.Now.Year;
             if (DateTime.Now.Month < 3)
                 rok = rok - 1;

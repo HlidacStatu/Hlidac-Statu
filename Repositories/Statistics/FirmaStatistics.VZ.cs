@@ -1,4 +1,6 @@
-﻿using HlidacStatu.Entities;
+﻿using HlidacStatu.DS.Graphs;
+using HlidacStatu.Entities;
+using HlidacStatu.Entities.Entities;
 using HlidacStatu.Entities.VZ;
 using HlidacStatu.Extensions;
 using HlidacStatu.Lib.Analytics;
@@ -24,33 +26,31 @@ namespace HlidacStatu.Repositories.Statistics
                     keyValueSelector: f => f.ICO);
 
 
-        static Devmasters.Cache.Redis.Manager<StatisticsSubjectPerYear<Firma.Statistics.VZ>, (Firma firma, HlidacStatu.DS.Graphs.Relation.AktualnostType aktualnost)>
-           _holdingVZCache = Devmasters.Cache.Redis.Manager<StatisticsSubjectPerYear<Firma.Statistics.VZ>, (Firma firma, HlidacStatu.DS.Graphs.Relation.AktualnostType aktualnost)>
+        static Devmasters.Cache.Redis.Manager<StatisticsSubjectPerYear<Firma.Statistics.VZ>, Firma>
+           _holdingVZCache = Devmasters.Cache.Redis.Manager<StatisticsSubjectPerYear<Firma.Statistics.VZ>, Firma>
                .GetSafeInstance("Holding_VZStatistics_",
-                   (obj) => CalculateHoldingVZStat(obj.firma, obj.aktualnost),
-                   TimeSpan.Zero,
+                   (f) => CalculateHoldingVZStat(f),
+                    TimeSpan.Zero,
                     Devmasters.Config.GetWebConfigValue("RedisServerUrls").Split(';'),
                     Devmasters.Config.GetWebConfigValue("RedisBucketName"),
                     Devmasters.Config.GetWebConfigValue("RedisUsername"),
                     Devmasters.Config.GetWebConfigValue("RedisCachePassword"),
-keyValueSelector: obj => obj.firma.ICO + "-" + obj.aktualnost.ToString());
+                    keyValueSelector: f => f.ICO );
 
         public static StatisticsSubjectPerYear<Firma.Statistics.VZ> CachedHoldingStatisticsVZ(
-    Firma firma, HlidacStatu.DS.Graphs.Relation.AktualnostType aktualnost,
-    bool forceUpdateCache = false)
+            Firma firma, 
+            bool forceUpdateCache = false)
         {
             if (forceUpdateCache )
-                _holdingVZCache.Delete((firma, aktualnost));
+                _holdingVZCache.Delete(firma);
 
-                return _holdingVZCache.Get((firma, aktualnost));
+                return _holdingVZCache.Get(firma);
         }
 
         public static void RemoveStatisticsVZ(Firma firma)
         {
             _VZCache.Delete(firma);
-            _holdingVZCache.Delete((firma, HlidacStatu.DS.Graphs.Relation.AktualnostType.Aktualni));
-            _holdingVZCache.Delete((firma, HlidacStatu.DS.Graphs.Relation.AktualnostType.Nedavny));
-            _holdingVZCache.Delete((firma, HlidacStatu.DS.Graphs.Relation.AktualnostType.Libovolny));
+            _holdingVZCache.Delete(firma);
         }
         public static StatisticsSubjectPerYear<Firma.Statistics.VZ> CachedStatisticsVZ(
         Firma firma,
@@ -63,16 +63,37 @@ keyValueSelector: obj => obj.firma.ICO + "-" + obj.aktualnost.ToString());
                 return _VZCache.Get(firma);
         }
 
-        private static StatisticsSubjectPerYear<Firma.Statistics.VZ> CalculateHoldingVZStat(Firma firma, HlidacStatu.DS.Graphs.Relation.AktualnostType aktualnost)
+        private static StatisticsSubjectPerYear<Firma.Statistics.VZ> CalculateHoldingVZStat(Firma f)
         {
-            var firmy = firma.Holding(aktualnost).ToArray();
 
-            var statistiky = firmy.Select(f => f.StatistikaVerejneZakazky()).Append(firma.StatistikaVerejneZakazky()).ToArray();
+            var firmy_maxrok = new Dictionary<string, Devmasters.DT.DateInterval>();
+            firmy_maxrok.Add(f.ICO, new Devmasters.DT.DateInterval(DateTime.MinValue, DateTime.MaxValue));
+            var skutecneVazby = Relation.SkutecnaDobaVazby(f.AktualniVazby(DS.Graphs.Relation.AktualnostType.Libovolny));
+            foreach (var v in skutecneVazby)
+            {
+                if (!string.IsNullOrEmpty(v.To?.UniqId)
+                            && v.To.Type == HlidacStatu.DS.Graphs.Graph.Node.NodeType.Company)
+                {
+                    firmy_maxrok.TryAdd(v.To.Id, new Devmasters.DT.DateInterval(v.RelFrom ?? DateTime.MinValue, v.RelTo ?? DateTime.MaxValue));
+                }
 
-            var aggregate = Lib.Analytics.StatisticsSubjectPerYear<Firma.Statistics.VZ>.Aggregate(firma.ICO,statistiky);
+            }
+            var statistiky = firmy_maxrok
+                .Select(f => new StatisticsSubjectPerYear<Firma.Statistics.VZ>(
+                                f.Key,
+                                Firmy.Get(f.Key).StatistikaVerejneZakazky().Filter(m => m.Key >= f.Value.From?.Year && m.Key <= f.Value.To?.Year)
+                           )
+                )
+                .ToArray();
+            if (statistiky.Length == 0)
+                return new StatisticsSubjectPerYear<Firma.Statistics.VZ>(f.ICO);
+            if (statistiky.Length == 1)
+                return statistiky[0];
+
+            StatisticsSubjectPerYear<Firma.Statistics.VZ> aggregate =
+                Lib.Analytics.StatisticsSubjectPerYear<Firma.Statistics.VZ>.Aggregate(f.ICO, statistiky);
 
             return aggregate;
-
         }
         public static async Task<StatisticsPerYear<SimpleStat>> VZPerYearAsync(string query, int[] interestedInYearsOnly)
         {

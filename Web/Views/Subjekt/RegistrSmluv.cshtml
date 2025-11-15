@@ -41,7 +41,7 @@
         .OrderBy(s => s.Year).ToList();
 
     var summaryAfter2016 = statistics.Summary(statistics.YearsAfter2016());
-    var statHoldingAktual = Model.HoldingStatisticsRegistrSmluv(Relation.AktualnostType.Aktualni);
+    var statHoldingAktual = Model.HoldingStatisticsRegistrSmluv();
     var holdingSummaryAfter2016 = statHoldingAktual.Summary(statHoldingAktual.YearsAfter2016());
 
     var seasonStat = statistics.CurrentSeasonStatistics();

@@ -293,7 +293,7 @@ namespace HlidacStatu.Extensions
             //STAT FIX
             //return new();
 
-            var ret = OsobaStatistics.CachedStatistics_Smlouvy(osoba, minAktualnost, obor, forceUpdateCache);
+            var ret = OsobaStatistics.CachedStatistics_Smlouvy(osoba, obor, forceUpdateCache);
             if (ret == null)
                 return null;
             foreach (var k in ret.SoukromeFirmy.Keys)

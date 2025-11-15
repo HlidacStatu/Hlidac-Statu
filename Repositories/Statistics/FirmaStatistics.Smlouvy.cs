@@ -1,9 +1,12 @@
+using Devmasters.DT;
 using HlidacStatu.Connectors;
+using HlidacStatu.DS.Graphs;
 using HlidacStatu.Entities;
 using HlidacStatu.Extensions;
 using HlidacStatu.Lib.Analytics;
 using Serilog;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -14,31 +17,62 @@ namespace HlidacStatu.Repositories.Statistics
         private static readonly ILogger _logger = Log.ForContext(typeof(FirmaStatistics));
         private static readonly string _version = "v4a";
 
-        static Devmasters.Cache.Redis.Manager<StatisticsSubjectPerYear<Smlouva.Statistics.Data>, (Firma firma, HlidacStatu.DS.Graphs.Relation.AktualnostType aktualnost, int? obor)>
+        static Devmasters.Cache.Redis.Manager<StatisticsSubjectPerYear<Smlouva.Statistics.Data>, (Firma firma,  int? obor)>
             _holdingSmlouvaCache
-            = Devmasters.Cache.Redis.Manager<StatisticsSubjectPerYear<Smlouva.Statistics.Data>, (Firma firma, HlidacStatu.DS.Graphs.Relation.AktualnostType aktualnost, int? obor)>
+            = Devmasters.Cache.Redis.Manager<StatisticsSubjectPerYear<Smlouva.Statistics.Data>, (Firma firma, int? obor)>
                 .GetSafeInstance($"Holding_SmlouvyStatistics_{_version}_",
-                    (obj) => _holdingCalculateStats(obj.firma, obj.aktualnost, obj.obor),
+                    (obj) => _holdingCalculateStats(obj.firma, obj.obor),
                     TimeSpan.Zero,
                     Devmasters.Config.GetWebConfigValue("RedisServerUrls").Split(';'),
                     Devmasters.Config.GetWebConfigValue("RedisBucketName"),
                     Devmasters.Config.GetWebConfigValue("RedisUsername"),
                     Devmasters.Config.GetWebConfigValue("RedisCachePassword"),
-                    keyValueSelector: obj => obj.firma.ICO + "-" + obj.aktualnost.ToString() + "-" + (obj.obor ?? 0));
+                    keyValueSelector: obj => obj.firma.ICO + "-" + (obj.obor ?? 0));
 
         public static StatisticsSubjectPerYear<Smlouva.Statistics.Data> CachedHoldingStatisticsSmlouvy(
-            Firma firma, HlidacStatu.DS.Graphs.Relation.AktualnostType aktualnost, int? obor = null,
+            Firma firma, int? obor = null,
             bool forceUpdateCache = false)
         {
             if (forceUpdateCache)
-                _holdingSmlouvaCache.Delete((firma, aktualnost, obor));
+                _holdingSmlouvaCache.Delete((firma, obor));
 
-                return _holdingSmlouvaCache.Get((firma, aktualnost, obor));
+                return _holdingSmlouvaCache.Get((firma, obor));
         }
 
         private static StatisticsSubjectPerYear<Smlouva.Statistics.Data> _holdingCalculateStats(
-            Firma f, HlidacStatu.DS.Graphs.Relation.AktualnostType aktualnost, int? obor)
+            Firma f, int? obor)
         {
+
+            var firmy_maxrok = new Dictionary<string, DateInterval>();
+            firmy_maxrok.Add(f.ICO, new DateInterval(DateTime.MinValue, DateTime.MaxValue));
+            var skutecneVazby = Relation.SkutecnaDobaVazby(f.AktualniVazby(DS.Graphs.Relation.AktualnostType.Libovolny));
+            foreach (var v in skutecneVazby)
+            {
+                if (!string.IsNullOrEmpty(v.To?.UniqId)
+                            && v.To.Type == HlidacStatu.DS.Graphs.Graph.Node.NodeType.Company)
+                {
+                    firmy_maxrok.TryAdd(v.To.Id, new DateInterval(v.RelFrom ?? DateTime.MinValue, v.RelTo ?? DateTime.MaxValue));
+                }
+
+            }
+            var statistiky = firmy_maxrok
+                .Select(f => new StatisticsSubjectPerYear<Smlouva.Statistics.Data>(
+                                f.Key,
+                                Firmy.Get(f.Key).StatistikaRegistruSmluv(obor).Filter(m => m.Key >= f.Value.From?.Year && m.Key <= f.Value.To?.Year)
+                           )
+                )
+                .ToArray();
+            if (statistiky.Length == 0)
+                return new StatisticsSubjectPerYear<Smlouva.Statistics.Data>(f.ICO);
+            if (statistiky.Length == 1)
+                return statistiky[0];
+
+            StatisticsSubjectPerYear<Smlouva.Statistics.Data> aggregate =
+                Lib.Analytics.StatisticsSubjectPerYear<Smlouva.Statistics.Data>.Aggregate(f.ICO, statistiky);
+
+            return aggregate;
+
+            /* old 
             var firmy = f.Holding(aktualnost).ToArray();
 
             var statistiky = firmy.Select(f => f.StatistikaRegistruSmluv(obor)).Append(f.StatistikaRegistruSmluv(obor))
@@ -47,7 +81,7 @@ namespace HlidacStatu.Repositories.Statistics
             var aggregate = Lib.Analytics.StatisticsSubjectPerYear<Smlouva.Statistics.Data>.Aggregate(f.ICO,statistiky);
 
             return aggregate;
-
+            */
         }
 
         static Devmasters.Cache.Redis.ManagerAsync<StatisticsSubjectPerYear<Smlouva.Statistics.Data>, (Firma firma, int? obor)>
@@ -66,9 +100,7 @@ namespace HlidacStatu.Repositories.Statistics
         {
             _smlouvaCache.DeleteAsync((firma, obor)).ConfigureAwait(false).GetAwaiter().GetResult();
 
-            _holdingSmlouvaCache.Delete((firma, HlidacStatu.DS.Graphs.Relation.AktualnostType.Aktualni, obor));
-            _holdingSmlouvaCache.Delete((firma, HlidacStatu.DS.Graphs.Relation.AktualnostType.Nedavny, obor));
-            _holdingSmlouvaCache.Delete((firma, HlidacStatu.DS.Graphs.Relation.AktualnostType.Libovolny, obor));
+            _holdingSmlouvaCache.Delete((firma, obor));
         }
 
         public static StatisticsSubjectPerYear<Smlouva.Statistics.Data> CachedStatisticsSmlouvy(Firma firma, int? obor, bool forceUpdateCache = false)

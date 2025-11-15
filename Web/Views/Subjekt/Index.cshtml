@@ -24,7 +24,7 @@
 
     var intv = laps.StopPreviousAndStartNextLap("StatistikaRegistruSmluv");
     HlidacStatu.Lib.Analytics.StatisticsSubjectPerYear<Smlouva.Statistics.Data> statisticsRegistr = Model.StatistikaRegistruSmluv();
-    var statisticsHoldingRegistr = Model.HoldingStatisticsRegistrSmluv(Relation.AktualnostType.Nedavny);
+    var statisticsHoldingRegistr = Model.HoldingStatisticsRegistrSmluv();
     intv.Stop();
 
     intv = laps.StopPreviousAndStartNextLap("CurrentSeasonStatistics");

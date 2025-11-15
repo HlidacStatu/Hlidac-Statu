@@ -127,8 +127,7 @@ namespace HlidacStatu.Repositories
                             if (!holdingOnly || firmaOnly)
                                 _ = f.StatistikaRegistruSmluv(forceUpdateCache: true);
                             if (holdingOnly || !firmaOnly)
-                                _ = f.HoldingStatisticsRegistrSmluv(DS.Graphs.Relation.AktualnostType.Nedavny,
-                                forceUpdateCache: noRebuild ? false : true);
+                                _ = f.HoldingStatisticsRegistrSmluv(forceUpdateCache: noRebuild ? false : true);
                         }
                         break;
                     case RecalculateItem.StatisticsTypeEnum.VZ:
