@@ -32,8 +32,9 @@ namespace HlidacStatu.LibCore.MiddleWares
             }
             catch (Exception e)
             {
-                _logger.Error(e, "Unhadled exception {middleware} {path}?{query}\n", "OnHTTPErrorMidddleware",
-                    httpContext.Request.Path, httpContext.Request.QueryString);
+                _logger.Error(e, "Total unhadled exception: {path}?{query}\tmiddleware:{middleware}\nException:{exception}", 
+                    httpContext.Request.Path, httpContext.Request.QueryString,
+                    "OnHTTPErrorMiddleware", e.ToString());
 
                 throw;
             }
@@ -43,11 +44,12 @@ namespace HlidacStatu.LibCore.MiddleWares
                 try
                 {
                     var feature = httpContext.Features.Get<IExceptionHandlerFeature>();
-                    var ex = feature?.Error;
+                    Exception? ex = feature?.Error;
                     
                     _logger.Error(ex,
-                        "Unhadled exception > 500 {middleware} {path}?{query}\n",
-                        "OnHTTPErrorMidddleware", httpContext.Request.Path, httpContext.Request.QueryString);
+                        "Unhadled exception: {path}?{query}\tmiddleware:{middleware}\nException:{exception}",
+                        httpContext.Request.Path, httpContext.Request.QueryString, 
+                        "OnHTTPErrorMidddleware",ex?.ToString());
                 }
                 catch (Exception e)
                 {
@@ -63,13 +65,14 @@ namespace HlidacStatu.LibCore.MiddleWares
                 _ = httpContext?.Request?.Headers?.TryGetValue("User-Agent", out userAgent);
 
 
-                _logger.Warning("OnHTTPErrorMiddleware 400 HTTP error: {IP}\t{StatusCode}\t{Path}{QueryString}\tref:{Referer} useragent:{UserAgent}", 
+                _logger.Warning("HTTP {StatusCode}: ip:{IP}\t{Path}{QueryString}\tref:{Referer} useragent:{UserAgent} {middleware}", 
                     RealIpAddress.GetIp(httpContext),
                     httpContext?.Response?.StatusCode,
                     httpContext?.Request?.Path.ToString(),
                     httpContext?.Request?.QueryString.ToString(),
                     referer.ToString(),
-                    userAgent.ToString()
+                    userAgent.ToString(),
+                    "OnHTTPErrorMidddleware"
                     );
             }
         }

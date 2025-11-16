@@ -134,7 +134,7 @@ namespace HlidacStatu.Web
                 ApplicationName = "WEB"
             });
 
-            app.UseTimeMeasureMiddleware(exceptions: new List<string>() { "/_blazor" });
+            app.UseTimeMeasureMiddleware(ignorePaths: new List<string>() { "/_blazor" });
             
             if (Constants.IsDevelopment())
             {
