@@ -34,7 +34,7 @@ namespace HlidacStatu.LibCore.MiddleWares
             {
                 _logger.Error(e, "Total unhadled exception: {path}?{query}\tmiddleware:{middleware}\nException:{exception}", 
                     httpContext.Request.Path, httpContext.Request.QueryString,
-                    "OnHTTPErrorMiddleware", e.ToString());
+                    typeof(OnHTTPErrorMiddleware).Name, e.ToString());
 
                 throw;
             }
@@ -48,8 +48,10 @@ namespace HlidacStatu.LibCore.MiddleWares
                     
                     _logger.Error(ex,
                         "Unhadled exception: {path}?{query}\tmiddleware:{middleware}\nException:{exception}",
-                        httpContext.Request.Path, httpContext.Request.QueryString, 
-                        "OnHTTPErrorMidddleware",ex?.ToString());
+                        httpContext.Request.Path, 
+                        httpContext.Request.QueryString, 
+                        typeof(OnHTTPErrorMiddleware).Name,
+                        ex?.ToString());
                 }
                 catch (Exception e)
                 {
@@ -72,7 +74,7 @@ namespace HlidacStatu.LibCore.MiddleWares
                     httpContext?.Request?.QueryString.ToString(),
                     referer.ToString(),
                     userAgent.ToString(),
-                    "OnHTTPErrorMidddleware"
+                    typeof(OnHTTPErrorMiddleware).Name
                     );
             }
         }
