@@ -1,9 +1,11 @@
 ﻿using HlidacStatu.Connectors;
 using HlidacStatu.Entities;
 using HlidacStatu.Entities.VZ;
+using HlidacStatu.Lib.Web.UI.Attributes;
 using HlidacStatu.LibCore;
 using HlidacStatu.Repositories;
 using HlidacStatu.Repositories.ProfilZadavatelu;
+using HlidacStatu.Util;
 using HlidacStatu.Web.Framework;
 using HlidacStatu.Web.Models;
 using Microsoft.AspNetCore.Authorization;
@@ -13,6 +15,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Nest;
+using Serilog;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -20,8 +23,6 @@ using System.Linq;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
-using Serilog;
-using HlidacStatu.Lib.Web.UI.Attributes;
 
 namespace HlidacStatu.Web.Controllers
 {
@@ -369,6 +370,20 @@ namespace HlidacStatu.Web.Controllers
             }
 
             return ret;
+        }
+
+        public async Task<ActionResult> RequestInfo()
+        {
+            var s = $"client ip:" + HlidacStatu.Util.RealIpAddress.GetIp(HttpContext)?.ToString();
+            s += "\ndirect ip:" + HttpContext.Connection?.RemoteIpAddress?.ToString();
+            s += "\nfrom cdn:" + RealIpAddress.IpFromVedos(HttpContext);
+            s += "\nuser agent:" + HttpContext.Request.Headers["User-Agent"].ToString();
+            s += "\nall headers:\n" + string.Join("\n",
+                HttpContext.Request.Headers.Select(s =>
+                    s.Key + ": " + s.Value.ToString()
+                )
+                );
+             return Content(s, "text/plain");
         }
 
         public async Task<ActionResult> Status()

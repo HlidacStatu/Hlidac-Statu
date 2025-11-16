@@ -2,35 +2,12 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Net;
+using System.Threading.Tasks;
 
 namespace HlidacStatu.LibCore.Services
 {
     public class AttackerDictionaryService
     {
-
-        // private class RadwareNetwork : Devmasters.Net.Crawlers.CrawlerBase
-        // {
-        //     public override string Name => "RadwareNetwork";
-        //
-        //     public override string[] IP => new string[] {
-        //         "141.226.101.0/24",
-        //         "66.22.0.0/17",
-        //         "159.122.76.110",
-        //         "141.226.97.0/24"
-        //     };
-        //
-        //     public override string[] HostNameRegex => null;
-        //
-        //     public override string[] UserAgent => null;
-        //
-        //     public override async Task<bool> ReloadDefinitionsFromInternetAsync()
-        //     {
-        //         return true;
-        //     }
-        // }
-        //
-        // static Devmasters.Net.Crawlers.ICrawler radware = new RadwareNetwork();
-        // private Devmasters.Net.Crawlers.ICrawler _radware = new RadwareNetwork();
 
 
         private class Attacker

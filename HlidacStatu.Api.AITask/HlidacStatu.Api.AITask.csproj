@@ -13,7 +13,7 @@
 
 	<ItemGroup>
 
-		<PackageReference Include="Devmasters.Net" Version="8.0.6" />
+		<PackageReference Include="Devmasters.Net" Version="8.1.1" />
 
 		<PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
 

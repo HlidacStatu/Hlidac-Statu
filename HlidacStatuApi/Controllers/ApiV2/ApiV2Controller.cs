@@ -1,8 +1,10 @@
 ﻿using Amazon.Runtime.Internal.Endpoints.StandardLibrary;
 using HlidacStatu.Entities;
 using HlidacStatu.Repositories;
+using HlidacStatu.Util;
 using HlidacStatuApi.Models;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Nest;
 using Swashbuckle.AspNetCore.Annotations;
@@ -178,6 +180,23 @@ namespace HlidacStatuApi.Controllers.ApiV2
         public ActionResult<string> GetIp()
         {
             return HlidacStatu.Util.RealIpAddress.GetIp(HttpContext)?.ToString();
+        }
+
+        [ApiExplorerSettings(IgnoreApi = true)]
+        [Authorize]
+        [HttpGet("requestinfo")]
+        public ActionResult<string> RequestInfo()
+        {
+            var s = $"client ip:"+ HlidacStatu.Util.RealIpAddress.GetIp(HttpContext)?.ToString();
+            s += "\ndirect ip:" + HttpContext.Connection?.RemoteIpAddress?.ToString();
+            s += "\nfrom cdn:" + RealIpAddress.IpFromVedos(HttpContext);
+            s += "\nuser agent:" + HttpContext.Request.Headers["User-Agent"].ToString();
+            s += "\nall headers:\n" + string.Join("\n",
+                HttpContext.Request.Headers.Select(s =>
+                    s.Key + ": " + s.Value.ToString()
+                )
+                );
+            return s;
         }
 
         [HttpGet("Check")]
