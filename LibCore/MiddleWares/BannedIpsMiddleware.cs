@@ -23,8 +23,8 @@ namespace HlidacStatu.LibCore.MiddleWares
 
         private readonly string[] _badWords = new[]
         {
-            "wp-login.php"
-            
+            "wp-login.php",
+
         };
 
         public BannedIpsMiddleware(RequestDelegate next, Whitelist whitelist)
@@ -39,14 +39,14 @@ namespace HlidacStatu.LibCore.MiddleWares
         {
             //if on Radware, it uses header X-Forwarded-For
             IPAddress? remoteIp = HlidacStatu.Util.RealIpAddress.GetIp(httpContext);
-
+            bool isCdn = HlidacStatu.Util.RealIpAddress.IpFromVedos(httpContext);
             //short circuit for whitelisted ips
-            if (_whitelist.IsOnWhitelist(remoteIp))
+            if (_whitelist.IsOnWhitelist(remoteIp) || isCdn)
             {
                 await _next(httpContext);
                 return;
             }
-            
+
             var requestedUrl = httpContext.Request.GetDisplayUrl();
 
             // autoban for robots
@@ -102,7 +102,7 @@ namespace HlidacStatu.LibCore.MiddleWares
         {
             var ipString = ipAddress?.ToString() ?? "_empty";
             _logger.Information($"Adding IP [{ipString}] to ban list.");
-            
+
             await BannedIpRepoCached.BanIpAsync(ipString, expiration, lastStatusCode, pathList);
         }
 
@@ -163,21 +163,21 @@ namespace HlidacStatu.LibCore.MiddleWares
 </body>
 </html>";
         }
-        
+
         public class Whitelist
         {
             public HashSet<string> IpAddresses { get; set; } = new();
 
             public bool IsOnWhitelist(IPAddress ipAddress)
             {
-                var ipString = ipAddress?.ToString() ?? "_empty";   
+                var ipString = ipAddress?.ToString() ?? "_empty";
                 return IpAddresses.Contains(ipString);
             }
 
         }
-        
+
     }
-    
+
     public static class BannedIpsMiddlewareExtension
     {
         public static IApplicationBuilder UseBannedIpsMiddleware(this IApplicationBuilder builder,

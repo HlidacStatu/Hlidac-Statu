@@ -32,9 +32,8 @@ namespace HlidacStatu.LibCore.MiddleWares
             }
             catch (Exception e)
             {
-                _logger.Error(e, "Total unhadled exception: {path}?{query}\tmiddleware:{middleware}\nException:{exception}", 
-                    httpContext.Request.Path, httpContext.Request.QueryString,
-                    typeof(OnHTTPErrorMiddleware).Name, e.ToString());
+                Helpers.LogHttpRequestDetail(_logger, Serilog.Events.LogEventLevel.Fatal, httpContext, e, 
+                    "Total unhadled exception", typeof(OnHTTPErrorMiddleware).Name);
 
                 throw;
             }
@@ -45,37 +44,17 @@ namespace HlidacStatu.LibCore.MiddleWares
                 {
                     var feature = httpContext.Features.Get<IExceptionHandlerFeature>();
                     Exception? ex = feature?.Error;
-                    
-                    _logger.Error(ex,
-                        "Unhadled exception: {path}?{query}\tmiddleware:{middleware}\nException:{exception}",
-                        httpContext.Request.Path, 
-                        httpContext.Request.QueryString, 
-                        typeof(OnHTTPErrorMiddleware).Name,
-                        ex?.ToString());
+
+                    Helpers.LogHttpRequestDetail(_logger, Serilog.Events.LogEventLevel.Fatal, httpContext, ex, "Unhadled exception", typeof(OnHTTPErrorMiddleware).Name);
                 }
                 catch (Exception e)
                 {
-                    _logger.Fatal(e,
-                        $"OnHTTPErrorMiddleware Invoke exc: {httpContext.Response.StatusCode} {httpContext.Request.Path}?{httpContext.Request.QueryString.ToString()}");
+                    Helpers.LogHttpRequestDetail(_logger, Serilog.Events.LogEventLevel.Fatal, httpContext, e, "OnHTTPErrorMiddleware Invoke exc", typeof(OnHTTPErrorMiddleware).Name);
                 }
             }
             else if (httpContext.Response.StatusCode >= 400)
             {
-                StringValues referer = default;
-                StringValues userAgent = default;
-                _ = httpContext?.Request?.Headers?.TryGetValue("Referer", out referer);
-                _ = httpContext?.Request?.Headers?.TryGetValue("User-Agent", out userAgent);
-
-
-                _logger.Warning("HTTP {StatusCode}: ip:{IP}\t{Path}{QueryString}\tref:{Referer} useragent:{UserAgent} {middleware}", 
-                    RealIpAddress.GetIp(httpContext),
-                    httpContext?.Response?.StatusCode,
-                    httpContext?.Request?.Path.ToString(),
-                    httpContext?.Request?.QueryString.ToString(),
-                    referer.ToString(),
-                    userAgent.ToString(),
-                    typeof(OnHTTPErrorMiddleware).Name
-                    );
+                Helpers.LogHttpRequestDetail(_logger, Serilog.Events.LogEventLevel.Warning, httpContext, null, null, typeof(OnHTTPErrorMiddleware).Name);
             }
         }
     }
