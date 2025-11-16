@@ -32,7 +32,8 @@ namespace HlidacStatu.LibCore.MiddleWares
             _ = httpContext?.Request?.Headers?.TryGetValue("User-Agent", out userAgent);
 
             if (ex != null)
-                _logger.Write(level, ex, prefix + " {StatusCode}: ip:{IP}\tcdn:{fromCDN}\t{Path}{QueryString}\tref:{Referer} useragent:{UserAgent} {middleware}",
+                _logger.Write(level, ex,
+                    prefix + " {StatusCode}: ip:{IP}\tcdn:{fromCDN}\t{Path}{QueryString}\tref:{Referer} useragent:{UserAgent} {middleware}",
                      httpContext?.Response?.StatusCode,
                      RealIpAddress.GetIp(httpContext),
                      RealIpAddress.IpFromVedos(httpContext),
@@ -43,10 +44,10 @@ namespace HlidacStatu.LibCore.MiddleWares
                      middleware
                      );
             else
-                _logger.Write(level, prefix + " {StatusCode}: ip:{IP}\t{Path}{QueryString}\tref:{Referer} useragent:{UserAgent} {middleware}",
+                _logger.Write(level, prefix + " {StatusCode}: ip:{IP}\tcdn:{fromCDN}\t{Path}{QueryString}\tref:{Referer} useragent:{UserAgent} {middleware}",
                     httpContext?.Response?.StatusCode,
                     RealIpAddress.GetIp(httpContext),
-                     RealIpAddress.IpFromVedos(httpContext),
+                    RealIpAddress.IpFromVedos(httpContext),
                     httpContext?.Request?.Path.ToString(),
                     httpContext?.Request?.QueryString.ToString(),
                     referer.ToString(),

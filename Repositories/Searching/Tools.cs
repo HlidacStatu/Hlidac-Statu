@@ -48,7 +48,10 @@ namespace HlidacStatu.Repositories.Searching
         {
             if (parsedQueries is null)
                 return Enumerable.Empty<Autocomplete>().ToList();
-            return parsedQueries.AsParallel().Select(CreateAutocompleteItemFromQueryFor).ToList();
+            return parsedQueries
+                .AsParallel()
+                .Select(CreateAutocompleteItemFromQueryFor)
+                .ToList();
         }
 
 
