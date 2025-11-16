@@ -5,6 +5,7 @@ using System;
 using System.Threading.Tasks;
 using Serilog;
 using Microsoft.Extensions.Primitives;
+using HlidacStatu.Util;
 
 namespace HlidacStatu.LibCore.MiddleWares
 {
@@ -57,12 +58,18 @@ namespace HlidacStatu.LibCore.MiddleWares
             else if (httpContext.Response.StatusCode >= 400)
             {
                 StringValues referer = default;
+                StringValues userAgent = default;
                 _ = httpContext?.Request?.Headers?.TryGetValue("Referer", out referer);
-                _logger.Warning("OnHTTPErrorMiddleware 400 HTTP error: {StatusCode} {Path} {QueryString} {Referer}", 
+                _ = httpContext?.Request?.Headers?.TryGetValue("User-Agent", out userAgent);
+
+
+                _logger.Warning("OnHTTPErrorMiddleware 400 HTTP error: {IP}\t{StatusCode}\t{Path}{QueryString}\tref:{Referer} useragent:{UserAgent}", 
+                    RealIpAddress.GetIp(httpContext),
                     httpContext?.Response?.StatusCode,
                     httpContext?.Request?.Path.ToString(),
                     httpContext?.Request?.QueryString.ToString(),
-                    referer.ToString()
+                    referer.ToString(),
+                    userAgent.ToString()
                     );
             }
         }
