@@ -1,59 +1,73 @@
-﻿using Elastic.CommonSchema;
-using HlidacStatu.Util;
-using Microsoft.AspNetCore.Components.RenderTree;
+﻿using HlidacStatu.Util;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Primitives;
 using Serilog;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Security.Permissions;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace HlidacStatu.LibCore.MiddleWares
 {
     public static class Helpers
     {
-        public static void LogHttpRequestDetail(ILogger _logger, Serilog.Events.LogEventLevel level,
-            HttpContext httpContext, Exception ex,
+        public static void LogHttpRequestDetail(ILogger? logger, Serilog.Events.LogEventLevel level,
+            HttpContext? httpContext, Exception? exeption,
             string prefix, string middleware)
         {
-            if (_logger == null)
+            if (logger == null)
                 return;
-            if (httpContext == null)
-                throw new NullReferenceException(nameof(httpContext));
 
-            prefix = prefix ?? "HTTP";
+            if (httpContext == null)
+                return;
 
             StringValues referer = default;
             StringValues userAgent = default;
             _ = httpContext?.Request?.Headers?.TryGetValue("Referer", out referer);
             _ = httpContext?.Request?.Headers?.TryGetValue("User-Agent", out userAgent);
+            string ipAddress = string.Empty;
+            string wedosIpAddress = string.Empty;
+            string? path = string.Empty;
+            string? queryString = string.Empty;
+            int? statusCode = null;
+            try
+            {
+                path = httpContext?.Request?.Path.ToString();
+                statusCode = httpContext?.Response?.StatusCode;
+                ipAddress = RealIpAddress.GetIp(httpContext).ToString();
+                wedosIpAddress = RealIpAddress.IpFromVedos(httpContext).ToString();
+                queryString = httpContext?.Request?.QueryString.ToString();
+            }
+            catch
+            {
+                //sanitizing inputs
+            }
 
-            if (ex != null)
-                _logger.Write(level, ex,
-                    prefix + " {StatusCode}: ip:{IP}\tcdn:{fromCDN}\t{Path}{QueryString}\tref:{Referer} useragent:{UserAgent} {middleware}",
-                     httpContext?.Response?.StatusCode,
-                     RealIpAddress.GetIp(httpContext),
-                     RealIpAddress.IpFromVedos(httpContext),
-                     httpContext?.Request?.Path.ToString(),
-                     httpContext?.Request?.QueryString.ToString(),
-                     referer.ToString(),
-                     userAgent.ToString(),
-                     middleware
-                     );
-            else
-                _logger.Write(level, prefix + " {StatusCode}: ip:{IP}\tcdn:{fromCDN}\t{Path}{QueryString}\tref:{Referer} useragent:{UserAgent} {middleware}",
-                    httpContext?.Response?.StatusCode,
-                    RealIpAddress.GetIp(httpContext),
-                    RealIpAddress.IpFromVedos(httpContext),
-                    httpContext?.Request?.Path.ToString(),
-                    httpContext?.Request?.QueryString.ToString(),
+
+            if (exeption != null)
+                logger.Write(level,
+                    exeption,
+                    "{messagePrefix} {StatusCode}: ip:{IP}\tcdn:{fromCDN}\t{Path}{QueryString}\tref:{Referer} useragent:{UserAgent} {logSource}",
+                    prefix,
+                    statusCode,
+                    ipAddress,
+                    wedosIpAddress,
+                    path,
+                    queryString,
                     referer.ToString(),
                     userAgent.ToString(),
                     middleware
-                    );
+                );
+            else
+                logger.Write(level,
+                    "{messagePrefix} {StatusCode}: ip:{IP}\tcdn:{fromCDN}\t{Path}{QueryString}\tref:{Referer} useragent:{UserAgent} {logSource}",
+                    prefix,
+                    statusCode,
+                    ipAddress,
+                    wedosIpAddress,
+                    path,
+                    queryString,
+                    referer.ToString(),
+                    userAgent.ToString(),
+                    middleware
+                );
         }
     }
 }

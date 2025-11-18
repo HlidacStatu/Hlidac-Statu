@@ -89,7 +89,7 @@
         }
         else if (wd.DataType.ToLower().StartsWith("dataset"))
         {
-            stype = wd.DataType.Replace(typeof(DataSet).Name + ".", "");
+            stype = wd.DataType.Replace(nameof(DataSet) + ".", "");
             idType = "dataset";
         }
         else if (wd.DataType == WatchDog.AllDbDataType)

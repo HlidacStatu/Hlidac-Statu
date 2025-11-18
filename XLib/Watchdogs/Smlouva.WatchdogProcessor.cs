@@ -45,7 +45,7 @@ namespace HlidacStatu.XLib.Watchdogs
                 (SmlouvaRepo.Searching.OrderResult)Convert.ToInt32(order ?? "4")
             );
             return new Results(res.ElasticResults.Hits.Select(m => (dynamic)m.Source), res.Total,
-                query, fromDate, toDate, res.IsValid, typeof(Smlouva).Name);
+                query, fromDate, toDate, res.IsValid, nameof(Smlouva));
         }
 
         public Task<RenderedContent> RenderResultsAsync(Results data, long numOfListed = 5)

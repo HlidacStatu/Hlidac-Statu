@@ -4,17 +4,11 @@ using Microsoft.AspNetCore.Http;
 using System;
 using System.Threading.Tasks;
 using Serilog;
-using Microsoft.Extensions.Primitives;
-using HlidacStatu.Util;
 
 namespace HlidacStatu.LibCore.MiddleWares
 {
     public class OnHTTPErrorMiddleware
     {
-        public const string ItemKeyName = "errorPageCtx";
-        public const string ItemKeyNameObj = "errorPageCtxObj";
-        public const string ItemKeyRefererName = "referrerUrl";
-
         private readonly RequestDelegate _next;
 
         private readonly ILogger _logger = Log.ForContext<OnHTTPErrorMiddleware>();
@@ -32,8 +26,8 @@ namespace HlidacStatu.LibCore.MiddleWares
             }
             catch (Exception e)
             {
-                Helpers.LogHttpRequestDetail(_logger, Serilog.Events.LogEventLevel.Fatal, httpContext, e, 
-                    "Total unhadled exception", typeof(OnHTTPErrorMiddleware).Name);
+                Helpers.LogHttpRequestDetail(_logger, Serilog.Events.LogEventLevel.Error, httpContext, e, 
+                    "Untreated exception", nameof(OnHTTPErrorMiddleware));
 
                 throw;
             }
@@ -45,16 +39,16 @@ namespace HlidacStatu.LibCore.MiddleWares
                     var feature = httpContext.Features.Get<IExceptionHandlerFeature>();
                     Exception? ex = feature?.Error;
 
-                    Helpers.LogHttpRequestDetail(_logger, Serilog.Events.LogEventLevel.Fatal, httpContext, ex, "Unhadled exception", typeof(OnHTTPErrorMiddleware).Name);
+                    Helpers.LogHttpRequestDetail(_logger, Serilog.Events.LogEventLevel.Error, httpContext, ex, "Strange server error exception", nameof(OnHTTPErrorMiddleware));
                 }
                 catch (Exception e)
                 {
-                    Helpers.LogHttpRequestDetail(_logger, Serilog.Events.LogEventLevel.Fatal, httpContext, e, "OnHTTPErrorMiddleware Invoke exc", typeof(OnHTTPErrorMiddleware).Name);
+                    Helpers.LogHttpRequestDetail(_logger, Serilog.Events.LogEventLevel.Error, httpContext, e, "OnHTTPErrorMiddleware Invoke exc", nameof(OnHTTPErrorMiddleware));
                 }
             }
             else if (httpContext.Response.StatusCode >= 400)
             {
-                Helpers.LogHttpRequestDetail(_logger, Serilog.Events.LogEventLevel.Warning, httpContext, null, null, typeof(OnHTTPErrorMiddleware).Name);
+                Helpers.LogHttpRequestDetail(_logger, Serilog.Events.LogEventLevel.Warning, httpContext, null, "Not found", nameof(OnHTTPErrorMiddleware));
             }
         }
     }

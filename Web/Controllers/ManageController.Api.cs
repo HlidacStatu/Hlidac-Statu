@@ -425,13 +425,13 @@ namespace HlidacStatu.Web.Controllers
                 wd.PeriodId = period;
                 wd.FocusId = focus;
                 wd.Name = Devmasters.TextUtil.ShortenText(name, 50);
-                if (dt.ToLower() == typeof(Smlouva).Name.ToLower())
-                    wd.DataType = typeof(Smlouva).Name;
-                else if (dt.ToLower() == typeof(VerejnaZakazka).Name.ToLower())
-                    wd.DataType = typeof(VerejnaZakazka).Name;
-                else if (dt.ToLower() == typeof(Rizeni).Name.ToLower())
-                    wd.DataType = typeof(Rizeni).Name;
-                else if (dt.ToLower().StartsWith(typeof(DataSet).Name.ToLower()))
+                if (dt.ToLower() == nameof(Smlouva).ToLower())
+                    wd.DataType = nameof(Smlouva);
+                else if (dt.ToLower() == nameof(VerejnaZakazka).ToLower())
+                    wd.DataType = nameof(VerejnaZakazka);
+                else if (dt.ToLower() == nameof(Rizeni).ToLower())
+                    wd.DataType = nameof(Rizeni);
+                else if (dt.ToLower().StartsWith(nameof(DataSet).ToLower()))
                 {
                     var dataSetId = dt.Replace("DataSet.", "");
                     if (DataSet.ExistsDataset(dataSetId) == false)
