@@ -20,6 +20,7 @@ using System;
 using System.Collections.Generic;
 using System.Security.Cryptography;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc;
 
 namespace HlidacStatu.Web
 {
@@ -65,13 +66,21 @@ namespace HlidacStatu.Web
             {
                 services.AddControllersWithViews()
                     .AddNewtonsoftJson()
-                    .AddRazorRuntimeCompilation();
+                    .AddCookieTempDataProvider();
             }
             else
             {
                 services.AddControllersWithViews()
-                    .AddNewtonsoftJson();
+                    .AddNewtonsoftJson()
+                    .AddCookieTempDataProvider();;
             }
+            
+            services.Configure<CookieTempDataProviderOptions>(options =>
+            {
+                options.Cookie.Name = ".AspNetCore.TempData";
+                options.Cookie.HttpOnly = true;
+                options.Cookie.SameSite = SameSiteMode.Strict;
+            });
 
             services.AddRazorPages()
                 .AddMvcOptions(options =>
