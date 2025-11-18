@@ -31,9 +31,9 @@ namespace HlidacStatu.LibCore.MiddleWares
             {
                 path = httpContext?.Request?.Path.ToString();
                 statusCode = httpContext?.Response?.StatusCode;
-                ipAddress = RealIpAddress.GetIp(httpContext).ToString();
-                wedosIpAddress = RealIpAddress.IpFromVedos(httpContext).ToString();
                 queryString = httpContext?.Request?.QueryString.ToString();
+                ipAddress = RealIpAddress.GetIp(httpContext).MapToIPv4().ToString();
+                wedosIpAddress = RealIpAddress.IpFromVedos(httpContext).ToString();
             }
             catch
             {
