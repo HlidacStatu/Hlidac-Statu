@@ -52,7 +52,7 @@ namespace HlidacStatu.LibCore.MiddleWares
 
                 if (sw.ElapsedMilliseconds >= _errorTimeThresholdMs)
                 {
-                    _logger.Error("page processing: {elapsed} ms\t{webpage}{query_params}\tuser:{user}\tuserAgent:{userAgent}\tReferer:{referer}",
+                    _logger.Warning("page processing: {elapsed} ms\t{webpage}{query_params}\tuser:{user}\tuserAgent:{userAgent}\tReferer:{referer}",
                         sw.ElapsedMilliseconds,
                         url,
                         query,
@@ -62,7 +62,7 @@ namespace HlidacStatu.LibCore.MiddleWares
                 }
                 else if (sw.ElapsedMilliseconds >= _warningTimeThresholdMs)
                 {
-                    _logger.Warning("page processing: {elapsed} ms\t{webpage}{query_params}\tuser:{user}\tuserAgent:{userAgent}\tReferer:{referer}",
+                    _logger.Information("page processing: {elapsed} ms\t{webpage}{query_params}\tuser:{user}\tuserAgent:{userAgent}\tReferer:{referer}",
                         sw.ElapsedMilliseconds,
                         url,
                         query,
@@ -72,7 +72,7 @@ namespace HlidacStatu.LibCore.MiddleWares
                 }
                 else if (sw.ElapsedMilliseconds >= _infoTimeThresholdMs)
                 {
-                    _logger.Information("page processing: {elapsed} ms\t{webpage}{query_params}\tuser:{user}\tuserAgent:{userAgent}\tReferer:{referer}",
+                    _logger.Debug("page processing: {elapsed} ms\t{webpage}{query_params}\tuser:{user}\tuserAgent:{userAgent}\tReferer:{referer}",
                         sw.ElapsedMilliseconds,
                         url,
                         query,
