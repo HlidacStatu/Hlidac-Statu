@@ -282,9 +282,16 @@ namespace HlidacStatu.Web
                     {
                         if (ctx.Request.Path.StartsWithSegments("/api") && ctx.Response.StatusCode == 200)
                         {
-                            ctx.Response.StatusCode = 401;
+                            // Never redirect, just send a 401 if nothing was written yet
+                            if (!ctx.Response.HasStarted)
+                            {
+                                ctx.Response.Clear();
+                                ctx.Response.StatusCode = StatusCodes.Status401Unauthorized;
+                            }
+                            return Task.CompletedTask;
                         }
-                        else
+                        
+                        if (!ctx.Response.HasStarted)
                         {
                             ctx.Response.Redirect($"/Identity/Account/Login?returnUrl={ctx.Request.Path}{ctx.Request.QueryString.Value}");
                         }
@@ -295,10 +302,18 @@ namespace HlidacStatu.Web
                     {
                         if (ctx.Request.Path.StartsWithSegments("/api") && ctx.Response.StatusCode == 200)
                         {
-                            ctx.Response.StatusCode = 403;
+                            if (!ctx.Response.HasStarted)
+                            {
+                                ctx.Response.Clear();
+                                ctx.Response.StatusCode = StatusCodes.Status403Forbidden;
+                            }
+                            return Task.CompletedTask;
                         }
 
-                        ctx.Response.StatusCode = 403;
+                        if (!ctx.Response.HasStarted)
+                        {
+                            ctx.Response.StatusCode = StatusCodes.Status403Forbidden;
+                        }
 
                         return Task.CompletedTask;
                     }
