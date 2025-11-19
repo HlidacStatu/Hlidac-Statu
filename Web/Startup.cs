@@ -18,6 +18,7 @@ using Microsoft.IdentityModel.Tokens;
 using Polly;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Security.Cryptography;
 using System.Threading.Tasks;
 
@@ -398,9 +399,17 @@ namespace HlidacStatu.Web
                 const string aud = "https://appleid.apple.com";
 
                 var now = DateTime.UtcNow;
+                
+                // Extract raw base64 from PEM
+                var lines = secret.Split('\n')
+                    .Select(l => l.Trim())
+                    .Where(l => !l.StartsWith("-----"))
+                    .ToArray();
+
+                var der = Convert.FromBase64String(string.Join("", lines));
 
                 var ecdsa = ECDsa.Create();
-                ecdsa?.ImportPkcs8PrivateKey(Convert.FromBase64String(secret), out _);
+                ecdsa?.ImportPkcs8PrivateKey(der, out _);
 
                 var handler = new JsonWebTokenHandler();
                 return handler.CreateToken(new SecurityTokenDescriptor
