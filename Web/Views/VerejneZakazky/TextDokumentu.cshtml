@@ -10,7 +10,7 @@
     string hash = Context.Request.Query["sha"];
     string plainText = string.Empty;
 
-    VerejnaZakazka.Document doc = Model.Dokumenty.FirstOrDefault(m => m.Sha256Checksum.Contains(hash));
+    VerejnaZakazka.Document doc = Model?.Dokumenty?.FirstOrDefault(m => m.Sha256Checksum.Contains(hash));
     plainText = doc?.PlainText ?? "";
 
 
@@ -29,10 +29,6 @@
     </script>
 }
 
-
-@section footerscripts
-{
-}
 
 @section breadcrumb
 {
@@ -88,8 +84,4 @@ else
             <a href="@doc.GetDocumentUrlToDownload()" target="_blank">Stáhněte si originál</a>.
         </span>
     }
-
-
-
-
 }
