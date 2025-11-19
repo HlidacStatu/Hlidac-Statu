@@ -28,25 +28,9 @@ namespace HlidacStatu.LibCore.MiddleWares
             {
                 Helpers.LogHttpRequestDetail(_logger, Serilog.Events.LogEventLevel.Error, httpContext, e, 
                     "Untreated exception", nameof(OnHTTPErrorMiddleware));
-
-                throw;
             }
 
-            if (httpContext.Response.StatusCode >= 500)
-            {
-                try
-                {
-                    var feature = httpContext.Features.Get<IExceptionHandlerFeature>();
-                    Exception? ex = feature?.Error;
-
-                    Helpers.LogHttpRequestDetail(_logger, Serilog.Events.LogEventLevel.Error, httpContext, ex, "Strange server error exception", nameof(OnHTTPErrorMiddleware));
-                }
-                catch (Exception e)
-                {
-                    Helpers.LogHttpRequestDetail(_logger, Serilog.Events.LogEventLevel.Error, httpContext, e, "OnHTTPErrorMiddleware Invoke exc", nameof(OnHTTPErrorMiddleware));
-                }
-            }
-            else if (httpContext.Response.StatusCode >= 400)
+            if (httpContext.Response.StatusCode >= 400)
             {
                 Helpers.LogHttpRequestDetail(_logger, Serilog.Events.LogEventLevel.Warning, httpContext, null, "Not found", nameof(OnHTTPErrorMiddleware));
             }
