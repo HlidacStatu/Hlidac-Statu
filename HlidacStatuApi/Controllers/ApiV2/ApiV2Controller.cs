@@ -198,7 +198,43 @@ namespace HlidacStatuApi.Controllers.ApiV2
                 );
             return s;
         }
+        [ApiExplorerSettings(IgnoreApi = true)]
+        [Authorize]
+        [HttpGet("elasticstatus")]
+        public ActionResult<string> ElasticStatus()
+        {
+            ClusterHealthResponse res = null;
+            int num = 0;
+            string status = "unknown";
+            string nodes = "-------------------------\n";
+            try
+            {
+                var client = HlidacStatu.Connectors.Manager.GetESClient();
+                res = client.Cluster.Health();
+                num = res?.NumberOfNodes ?? 0;
+                status = res?.Status.ToString() ?? "unknown";
 
+                //GET /_cat/nodes?v&h=m,name,ip,u&s=name
+                var catr = client.LowLevel.Cat.Nodes<Elasticsearch.Net.StringResponse>(
+                        new Elasticsearch.Net.Specification.CatApi.CatNodesRequestParameters()
+                        {
+                            Headers = new[] { "m", "name", "ip", "u" },
+                            SortByColumns = new[] { "name" },
+                            Verbose = true
+                        }
+                    ).Body
+                    ?.Replace("10.10.", "");
+
+                nodes = nodes + catr;
+            }
+            catch (Exception e)
+            {
+                _logger.Error(e, "Status page error");
+            }
+
+            var s = string.Format("{0}-{1}\n\n" + nodes, num, status);
+            return s;
+        }
         [HttpGet("Check")]
         public async Task<ActionResult> Check(int returnStatus = 200)
         {
