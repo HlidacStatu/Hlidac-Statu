@@ -1,17 +1,19 @@
 using Devmasters;
 using Devmasters.Enums;
+using Google.Protobuf.WellKnownTypes;
 using HlidacStatu.Connectors;
 using HlidacStatu.DS.Api.Firmy;
 using HlidacStatu.Entities;
 using HlidacStatu.Entities.Facts;
 using HlidacStatu.Extensions;
 using HlidacStatu.Lib.Data.External.DatoveSchrankyOpenData;
+using Microsoft.Data.SqlClient;
+using Microsoft.EntityFrameworkCore;
 using Nest;
 using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Data;
-using Microsoft.Data.SqlClient;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -95,18 +97,20 @@ namespace HlidacStatu.Repositories
 
                     if (firma.NACE != null)
                     {
-                        HlidacStatu.Connectors.DirectDB.Instance.NoResult("delete from firma_NACE where ico=@ico",
-                            new IDataParameter[]
-                            {
-                                new SqlParameter("ico", firma.ICO)
-                            });
+                        _= db.Database.ExecuteSqlInterpolated($"delete from firma_NACE where ico={firma.ICO}");
+                        //HlidacStatu.Connectors.DirectDB.Instance.NoResult("delete from firma_NACE where ico=@ico",
+                        //    new IDataParameter[]
+                        //    {
+                        //        new SqlParameter("ico", firma.ICO)
+                        //    });
                         foreach (var nace in firma.NACE.Distinct())
                         {
-                            HlidacStatu.Connectors.DirectDB.Instance.NoResult(sqlNACE, new IDataParameter[]
-                            {
-                                new SqlParameter("ico", firma.ICO),
-                                new SqlParameter("nace", nace),
-                            });
+                            _= db.Database.ExecuteSqlInterpolated($"insert into firma_NACE (ico, nace) values ({firma.ICO}, {nace})");
+                            //HlidacStatu.Connectors.DirectDB.Instance.NoResult(sqlNACE, new IDataParameter[]
+                            //{
+                            //    new SqlParameter("ico", firma.ICO),
+                            //    new SqlParameter("nace", nace),
+                            //});
                         }
                     }
                 }
@@ -232,15 +236,20 @@ namespace HlidacStatu.Repositories
 
                 if (f != null)
                 {
-                    f.DatovaSchranka = Connectors.DirectDB.Instance.GetList<string>("select DatovaSchranka from firma_DS where ico=@ico", param: new IDataParameter[] {
-                        new SqlParameter("ico", f.ICO)
-                        })
+                    f.DatovaSchranka = db.Database.SqlQuery<string>($"select DatovaSchranka from firma_DS where ico={ico}")
                         .ToArray();
 
-                    f.NACE = Connectors.DirectDB.Instance.GetList<string>("select NACE from firma_Nace where ico=@ico", param: new IDataParameter[] {
-                        new SqlParameter("ico", f.ICO)
-                        })
+                        //Connectors.DirectDB.Instance.GetList<string>("select DatovaSchranka from firma_DS where ico=@ico", param: new IDataParameter[] {
+                        //new SqlParameter("ico", f.ICO)
+                        //})
+                        //.ToArray();
+
+                    f.NACE = db.Database.SqlQuery<string>($"select NACE from firma_Nace where ico={ico}")
                         .ToArray();
+                    //Connectors.DirectDB.Instance.GetList<string>("select NACE from firma_Nace where ico=@ico", param: new IDataParameter[] {
+                    //new SqlParameter("ico", f.ICO)
+                    //})
+                    //.ToArray();
 
                     return f;
                 }
@@ -278,7 +287,7 @@ namespace HlidacStatu.Repositories
 
         }
 
-        public static IEnumerable<(string ico, string jmeno, bool isFop)> GetJmenoIcoAndFopTuples()
+        public static IEnumerable<(string ico, string jmeno, bool isFop)> GetJmenoIcoAndTopTuples()
         {
             var data = DirectDB.Instance.GetList<string, string, bool>("select ico, jmeno, CASE WHEN Kod_PF <= 110 OR Kod_PF IS NULL THEN CAST(1 AS BIT) ELSE CAST(0 AS BIT) END AS isFOP from firma where ISNUMERIC(ico) = 1", CommandType.Text, null);
             return data.Select(m => (Util.ParseTools.NormalizeIco(m.Item1.Trim()), m.Item2.Trim(), m.Item3));
