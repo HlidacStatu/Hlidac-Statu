@@ -199,7 +199,6 @@ namespace HlidacStatuApi.Controllers.ApiV2
             return s;
         }
         [ApiExplorerSettings(IgnoreApi = true)]
-        [Authorize]
         [HttpGet("elasticstatus")]
         public ActionResult<string> ElasticStatus()
         {
