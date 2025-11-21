@@ -25,21 +25,21 @@ namespace HlidacStatu.Web.HealthChecks
         public class VM
         {
             public string vmid { get; set; }
-            public int cpus { get; set; }
-            public int disk { get; set; }
-            public int diskwrite { get; set; }
-            public long mem { get; set; }
+            public int? cpus { get; set; }
+            public int? disk { get; set; }
+            public int? diskwrite { get; set; }
+            public long? mem { get; set; }
             public float cpu { get; set; }
             public string status { get; set; }
-            public long maxdisk { get; set; }
+            public long? maxdisk { get; set; }
             public string name { get; set; }
-            public long maxmem { get; set; }
+            public long? maxmem { get; set; }
             public string template { get; set; }
-            public int uptime { get; set; }
+            public int? uptime { get; set; }
             public string pid { get; set; }
-            public long netin { get; set; }
-            public int diskread { get; set; }
-            public long netout { get; set; }
+            public long? netin { get; set; }
+            public int? diskread { get; set; }
+            public long? netout { get; set; }
         }
 
         public ProxmoxVMs(Options options)
