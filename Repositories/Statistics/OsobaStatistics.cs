@@ -34,7 +34,7 @@ namespace HlidacStatu.Repositories.Statistics
                     Devmasters.Config.GetWebConfigValue("RedisBucketName"),
                     Devmasters.Config.GetWebConfigValue("RedisUsername"),
                     Devmasters.Config.GetWebConfigValue("RedisCachePassword"),
-                  keyValueSelector: os => $"obj.NameId");
+                  keyValueSelector: os => $"{os.NameId}");
 
 
         public static void RemoveCachedStatistics_Smlouvy(Osoba os, int? obor)
