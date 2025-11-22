@@ -25,7 +25,7 @@ public static class OsobaExtension2
                      || osoba.StatusOsoby() == Osoba.StatusOsobyEnum.VazbyNaPolitiky
                      || osoba.IsSponzor()
                      || await osoba.MaVztahySeStatemAsync()
-                     || osoba.StatistikaRegistrSmluv(Relation.AktualnostType.Nedavny).SmlouvyStat_SoukromeFirmySummary()
+                     || osoba.StatistikaRegistrSmluv().SmlouvyStat_SoukromeFirmySummary()
                          .Summary().PocetSmluv > 0;
 
         if (showIt)

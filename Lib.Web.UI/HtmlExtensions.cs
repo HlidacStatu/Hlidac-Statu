@@ -353,7 +353,7 @@ namespace HlidacStatu.Lib.Web.UI
             {
                 fontFamily = "Cabin",
                 fontSize = 14,
-                color = "#AEBCCB"
+                color = "#565e66"
             };
 
             var options = new
@@ -364,7 +364,7 @@ namespace HlidacStatu.Lib.Web.UI
                 },
                 colors = new[]
                 {
-                    "#DDE3E9", "#AFB9C5", "#2975DC", "#E76605"
+                    "#8a96a6",  "#bfc4c9","#2368c4", "#E76605"
                 },
                 tooltip = new
                 {

@@ -99,7 +99,7 @@ namespace HlidacStatu.Extensions
                         Name = m.FirmaName
                     }).ToArray(),
 
-                Business_Contracts_With_Government = osoba.StatistikaRegistrSmluv(DS.Graphs.Relation.AktualnostType.Nedavny)
+                Business_Contracts_With_Government = osoba.StatistikaRegistrSmluv()
                 .SmlouvyStat_SoukromeFirmySummary()
                     .Select(m => new HlidacStatu.DS.Api.Osoba.Detail.Stats
                     {
@@ -287,7 +287,7 @@ namespace HlidacStatu.Extensions
         }
         //tohle do repositories
         public static Osoba.Statistics.RegistrSmluv StatistikaRegistrSmluv(this Osoba osoba,
-            Relation.AktualnostType minAktualnost, int? obor = null, bool forceUpdateCache = false)
+            int? obor = null, bool forceUpdateCache = false)
         {
             //temporary fix for null values
             //STAT FIX
@@ -356,7 +356,7 @@ namespace HlidacStatu.Extensions
             };
 
             List<InfoFact> f = new List<InfoFact>();
-            var stat = osoba.StatistikaRegistrSmluv(Relation.AktualnostType.Nedavny);
+            var stat = osoba.StatistikaRegistrSmluv();
             StatisticsPerYear<Smlouva.Statistics.Data> soukrStat = stat.SoukromeFirmy.Values
                 .AggregateStats(); //StatisticsSubjectPerYear<Smlouva.Statistics.Data>.
 

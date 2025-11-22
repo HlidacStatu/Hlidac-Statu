@@ -86,7 +86,7 @@
             Type = Series.SeriesType.line,
 
         }
-                                    };
+    };
 
     //Graf počet smluv/počet smluv s utajenou cenou
     var pocetSmluvGraphData = new Series[]
@@ -163,7 +163,7 @@
         @* GRAFY *@
         <h4>Souhrnné statistiky pro @Model.Jmeno</h4>
         <p>
-            Zobrazit všechny smlouvy:  @Html.Raw(NiceString($"/hledatSmlouvy", $"ico:{Model.ICO}", (int)statistics.Summary().PocetSmluv, statistics.Summary().CelkovaHodnotaSmluv));
+            Všechny smlouvy:  @Html.Raw(NiceString($"/hledatSmlouvy", $"ico:{Model.ICO}", (int)statistics.Summary().PocetSmluv, statistics.Summary().CelkovaHodnotaSmluv));
 
             @if (statistics.Summary().PocetSmluvSeZasadnimNedostatkem > 0)
             {

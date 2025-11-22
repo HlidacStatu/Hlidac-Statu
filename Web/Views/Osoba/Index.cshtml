@@ -20,7 +20,7 @@
     var aktualnost = Relation.AktualnostType.Nedavny;
 
     var intv = laps.StopPreviousAndStartNextLap("StatistikaRegistruSmluv");
-    var statistics = Model.StatistikaRegistrSmluv(aktualnost);
+    var statistics = Model.StatistikaRegistrSmluv();
 
     //unused stuff
     //var seasonStat = statistics.SoukromeFirmySummary().CurrentSeasonStatistics();

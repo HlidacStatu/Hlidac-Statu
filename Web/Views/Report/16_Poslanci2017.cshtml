@@ -57,20 +57,20 @@
                 if (o.Vazby() != null)
                 {
                     string customUrl = $"/hledat?Q=osobaid:{o.NameId}";
-                    foreach (var v in o.StatistikaRegistrSmluv(Relation.AktualnostType.Nedavny).SoukromeFirmy.Take(2))
+                    foreach (var v in o.StatistikaRegistrSmluv().SoukromeFirmy.Take(2))
                     {
                         if (v.Value is null)
                             continue;
                         sout = sout + v.Value.Summary(HlidacStatu.Lib.Analytics.CoreStat.UsualYearsInterval.FromUsualFirstYearUntilNow).ToNiceLinkString(null, true, customUrl: customUrl) + "<br/>";
                     }
 
-                    if (o.StatistikaRegistrSmluv(Relation.AktualnostType.Nedavny).SoukromeFirmy.Count() == 3)
+                    if (o.StatistikaRegistrSmluv().SoukromeFirmy.Count() == 3)
                     {
-                        sout = sout + o.StatistikaRegistrSmluv(Relation.AktualnostType.Nedavny).SoukromeFirmy
+                        sout = sout + o.StatistikaRegistrSmluv().SoukromeFirmy
                             .Skip(2).First()
                             .Value.Summary(HlidacStatu.Lib.Analytics.CoreStat.UsualYearsInterval.FromUsualFirstYearUntilNow).ToNiceLinkString(null, true, customUrl: customUrl);
                     }
-                    else if (o.StatistikaRegistrSmluv(Relation.AktualnostType.Nedavny).SoukromeFirmy.Count() > 2)
+                    else if (o.StatistikaRegistrSmluv().SoukromeFirmy.Count() > 2)
                     {
                         sout = sout + "<a href='" + o.GetUrl() + "'>" + Devmasters.Lang.CS.Plural.Get(o.Vazby().Length - 2, "+další vazba;+ další {0} vazby;+ dalších {0} vazeb") + "</a>";
                     }

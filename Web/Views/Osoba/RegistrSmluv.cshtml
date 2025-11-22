@@ -5,6 +5,7 @@
 @using HlidacStatu.Extensions
 @using HlidacStatu.Lib.Analytics
 @using HlidacStatu.Repositories
+@using HlidacStatu.XLib.Render
 
 
 @{
@@ -17,13 +18,88 @@
         aktualnost = xen;
     }
 
-    var ostatAll = Model.StatistikaRegistrSmluv(aktualnost);
-    
+    Osoba.Statistics.RegistrSmluv ostatAll = Model.StatistikaRegistrSmluv();
+    var statniStat = StatisticsSubjectPerYear<Smlouva.Statistics.Data>.AggregateStats(ostatAll.StatniFirmy.Values);
+    var ngoStat = StatisticsSubjectPerYear<Smlouva.Statistics.Data>.AggregateStats(ostatAll.Neziskovky.Values);
+    var soukrStat = StatisticsSubjectPerYear<Smlouva.Statistics.Data>.AggregateStats(ostatAll.SoukromeFirmy.Values);
+    var allStats = StatisticsSubjectPerYear<Smlouva.Statistics.Data>.AggregateStats(new[] { statniStat,ngoStat,soukrStat });
+
+
+    //Graf hodnota smluv
+    var statChart = new Series[]
+    {
+        new()
+        {
+            Name = "Hodnota smluv",
+            Type = Series.SeriesType.column,
+            Data = allStats
+                .Select(x => new SeriesData(x.Year, x.Value.CelkovaHodnotaSmluv)).ToArray(),
+            SeriesTooltip = new SeriesTooltip()
+            {
+                ValueSuffix = " Kč"
+            }
+        },
+        new()
+        {
+            Name = "Počet smluv bez ceny",
+            Data = allStats
+                .Select(x => new SeriesData(x.Year, x.Value.PocetSmluvBezCeny)).ToArray(),
+            Type = Series.SeriesType.line,
+
+        }
+    };
+
+    string NiceString(string url, string query, int pocetSmluv, decimal cenaCelkem, int? year = null)
+    {
+        return $"<a href='{ValidUrl(url, query, year)}'>" +
+            Devmasters.Lang.CS.Plural.Get(pocetSmluv, "{0} smlouva;{0} smlouvy;{0} smluv") +
+            "</a> za celkem " +
+            Smlouva.NicePrice(cenaCelkem, html: true, shortFormat: true);
+    }
+    string ValidUrl(string url, string query, int? year = null)
+    {
+        if (year.HasValue)
+        {
+            query = HlidacStatu.Searching.Query.ModifyQueryAND(query, $"datumUzavreni:[{year}-01-01 TO {year + 1}-01-01}}");
+        }
+        return $"{url}?q={System.Net.WebUtility.UrlEncode(query)}";
+    }
+
 }
 
 @* První sloupec *@
 <div id="subjcontent_toc">
 
+    <h4>Souhrnné statistiky smluv pro @Model.FullName()</h4>
+    <p>
+        
+        <div class="bs-callout info">
+            <h5>Statistiky smluv, které uzavřely firmy s vazbou na @Model.FullName()</h5>
+            <p>
+                <b>@Html.Raw(NiceString($"/hledatSmlouvy", $"osobaid:{Model.NameId}", (int)allStats.Summary().PocetSmluv, allStats.Summary().CelkovaHodnotaSmluv))</b>
+            </p>
+            @if (allStats.Summary().PocetSmluvSeZasadnimNedostatkem > 0)
+            {
+                <p>
+                    @Html.Raw($"<a href='{ValidUrl("/hledatSmlouvy", $"( osobaid:{Model.NameId} AND chyby:zasadni )")}'>{Devmasters.Lang.CS.Plural.Get(allStats.Summary().PocetSmluvSeZasadnimNedostatkem, "Jedna smlouvu má", "{0} smlouvy mají", "{0} smluv má")}</a> zásadní nedostatek");
+                </p>
+            }
+            @if (allStats.Summary().PocetSmluvULimitu > 0)
+            {
+                <p>
+                    @Html.Raw($"<a href='{ValidUrl("/hledatSmlouvy", $"( osobaid:{Model.NameId} AND hint.smlouvaULimitu:>0 )")}'>{Devmasters.Lang.CS.Plural.Get(allStats.Summary().PocetSmluvULimitu, "Jednu smlouva je", "{0} smlouvy jsou", "{0} smluv je")}</a> s hodnotou těsně pod limitem veřejných zakázek");
+                </p>
+            }
+        </div>
+
+        
+
+
+    </p>
+    @Html.ColumnGraph("Hodnota smluv  po letech", statChart, yTitleRight: "Počet smluv")
+
+    <hr />
+    <h4>Detailní statistiky smluv po firmách s vazbou na @Model.FullName()</h4>
 
     <table class="table table-hover table-new table-new--dotted table-striped table-bordered">
             <thead>

@@ -115,7 +115,7 @@ namespace HlidacStatu.XLib.Render
                     Osoba o = Osoby.GetByNameId.Get(osobaId);
                     if (o != null)
                     {
-                        var stat = o.StatistikaRegistrSmluv(Relation.AktualnostType.Nedavny);
+                        var stat = o.StatistikaRegistrSmluv();
                         //return $"<span>{prefix}{stat.BasicStatPerYear.SummaryAfter2016().ToNiceString(o, true, customUrl: "/hledatSmlouvy?q=osobaId:" + o.NameId, twoLines: twoLines)}{postfix}</span>";
                         var s = stat.SoukromeFirmy.Values
                                         .AggregateStats()

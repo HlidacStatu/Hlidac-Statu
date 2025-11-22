@@ -87,7 +87,7 @@ namespace HlidacStatu.Repositories
             {
                 if (o != null)
                 {
-                    var stat = o.StatistikaRegistrSmluv(Relation.AktualnostType.Nedavny);
+                    var stat = o.StatistikaRegistrSmluv();
                     if (stat.SmlouvyStat_SoukromeFirmySummary().HasStatistics && stat.SmlouvyStat_SoukromeFirmySummary().Summary().PocetSmluv > 0)
                     {
                         allStats.Add(stat);
@@ -290,7 +290,7 @@ namespace HlidacStatu.Repositories
                                      {
                                          lock (lockObj)
                                          {
-                                             Osoba.Statistics.RegistrSmluv stat = o.StatistikaRegistrSmluv(Relation.AktualnostType.Nedavny);
+                                             Osoba.Statistics.RegistrSmluv stat = o.StatistikaRegistrSmluv();
 
                                              ret.Add(new Tuple<Osoba.Statistics.RegistrSmluv, Entities.Insolvence.RizeniStatistic[]>(
                                                                  stat, insolvenceIntoList

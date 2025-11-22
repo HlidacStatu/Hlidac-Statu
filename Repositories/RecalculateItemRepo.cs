@@ -84,7 +84,7 @@ namespace HlidacStatu.Repositories
                         else
                         {
 
-                            _ = o.StatistikaRegistrSmluv(DS.Graphs.Relation.AktualnostType.Nedavny, forceUpdateCache: noRebuild ? false : true);
+                            _ = o.StatistikaRegistrSmluv(forceUpdateCache: noRebuild ? false : true);
                             _ = o.InfoFactsCached(forceUpdateCache: noRebuild ? false : true);
                         }
                         RecalculateItemRepo.Finish(item);
