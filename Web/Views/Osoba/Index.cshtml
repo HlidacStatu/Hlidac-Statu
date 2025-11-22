@@ -1,16 +1,17 @@
 ﻿@model HlidacStatu.Entities.Osoba
 
+@using HlidacStatu.XLib.Render
 @using Nest;
 @using System.Linq;
 @using Devmasters.Enums;
 @using HlidacStatu.Datasets
 @using HlidacStatu.DS.Graphs
 @using HlidacStatu.Entities
-@using HlidacStatu.Entities
 @using HlidacStatu.Extensions
 @using HlidacStatu.Repositories
 @using HlidacStatu.Repositories.Statistics
 @using HlidacStatu.XLib
+@using HlidacStatu.Lib.Analytics
 
 @{
     Layout = null;
@@ -415,13 +416,34 @@
     }
 
     @{
-        var dotaceStat = Model.StatistikaDotace();
-        var dotaceStatSum = dotaceStat.AllDotaceSummary().Summary();
-        int pocetFiremSdotaci = dotaceStat.SoukromeFirmy.Count(m => m.Value.Summary().PocetDotaci > 0)
-        + dotaceStat.StatniFirmy.Count(m => m.Value.Summary().PocetDotaci > 0)
-        + dotaceStat.Neziskovky.Count(m => m.Value.Summary().PocetDotaci > 0);
+        var dotaceStat = Model.StatistikaDotace().AllDotaceSummary();
+        var dotaceStatSum = dotaceStat.Summary();
         var sdotaceHKc = " v celkové hodnotě <b>" + HlidacStatu.Util.RenderData.NicePriceHtml(dotaceStatSum.CelkemPrideleno) + "</b>.";
         string durlH = "/dotace/hledat?Q=osobaid%3A" + Model.NameId;
+
+        int pocetFiremSdotaci = Model.StatistikaDotace().SoukromeFirmy.Count(m => m.Value.Summary().PocetDotaci > 0)
+        + Model.StatistikaDotace().StatniFirmy.Count(m => m.Value.Summary().PocetDotaci > 0)
+        + Model.StatistikaDotace().Neziskovky.Count(m => m.Value.Summary().PocetDotaci > 0);
+
+
+        var dotaceChartData = new Series[]
+        {
+        new()
+        {
+            Name = "Celkem Kč",
+            Type = Series.SeriesType.column,
+        Data = dotaceStat
+                .Where(x => x.Year > 0)
+                .OrderBy(x => x.Year)
+                .Select(x => new SeriesData(x.Year, x.Value.CelkemPrideleno)).ToArray(),
+            SeriesTooltip = new SeriesTooltip()
+            {
+                ValueSuffix = " Kč"
+            }
+        },
+
+    };
+
     }
     @if (dotaceStatSum.PocetDotaci > 0)
     {
@@ -445,6 +467,9 @@
 
         </p>
     </div>
+    <p>
+        @Html.ColumnGraph("Hodnota získaných dotací  po letech", dotaceChartData, yTitleRight: "Kč",height:250)
+    </p>
     <p class="text-center">
         <a href="/osoba/dotace/@Model.NameId" class="btn btn-hs btn-primary btn-sm my-3 position-relative">
             Podrobnosti o dotacích firmám, kde se osoba angažuje

@@ -19,10 +19,7 @@
     }
 
     Osoba.Statistics.RegistrSmluv ostatAll = Model.StatistikaRegistrSmluv();
-    var statniStat = StatisticsSubjectPerYear<Smlouva.Statistics.Data>.AggregateStats(ostatAll.StatniFirmy.Values);
-    var ngoStat = StatisticsSubjectPerYear<Smlouva.Statistics.Data>.AggregateStats(ostatAll.Neziskovky.Values);
-    var soukrStat = StatisticsSubjectPerYear<Smlouva.Statistics.Data>.AggregateStats(ostatAll.SoukromeFirmy.Values);
-    var allStats = StatisticsSubjectPerYear<Smlouva.Statistics.Data>.AggregateStats(new[] { statniStat,ngoStat,soukrStat });
+    var allStats = ostatAll.AllSmlouvySummary();
 
 
     //Graf hodnota smluv
@@ -127,7 +124,7 @@
                     <td>
                         @if (vPerIco.Value.Summary().PocetSmluv > 0)
                         {
-                            <span>
+                        <span style="white-space:nowrap">
                                 <a href="@Url.Action("Hledat", "Home", new { Q = "ico:" + ico })">
                                     @Devmasters.Lang.CS.Plural.Get(vPerIco.Value.Summary(CoreStat.UsualYearsInterval.FromUsualFirstYearUntilNow ).PocetSmluv, "{0} smlouva;{0} smlouvy;{0} smluv")
                                 </a>

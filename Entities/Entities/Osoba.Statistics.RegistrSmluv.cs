@@ -22,7 +22,6 @@ namespace HlidacStatu.Entities
             {
 
                 public string OsobaNameId { get; set; }
-                public Relation.AktualnostType Aktualnost { get; set; }
                 public Smlouva.SClassification.ClassificationsTypes? Obor { get; set; } = null;
 
                 public Dictionary<string, StatisticsSubjectPerYear<Smlouva.Statistics.Data>> StatniFirmy { get; set; }
@@ -36,14 +35,24 @@ namespace HlidacStatu.Entities
                 public StatisticsPerYear<Smlouva.Statistics.Data> _statniFirmySummary { get; set; } = null;
                 public StatisticsPerYear<Smlouva.Statistics.Data> _neziskovkySummary { get; set; } = null;
 
+                public StatisticsPerYear<Smlouva.Statistics.Data> AllSmlouvySummary()
+                {
+                    var all = StatniFirmy.Values
+                        .Concat(SoukromeFirmy.Values)
+                        .Concat(Neziskovky.Values);
+
+                    StatisticsPerYear<Smlouva.Statistics.Data> summ = StatisticsSubjectPerYear<Smlouva.Statistics.Data>
+                        .AggregateStats(all);
+
+                    return summ;
+                }
 
             }
             public class Dotace
             {
 
                 public string OsobaNameId { get; set; }
-                public Relation.AktualnostType Aktualnost { get; set; }
-
+                
                 public Dictionary<string, StatisticsSubjectPerYear<Firma.Statistics.Dotace>> StatniFirmy { get; set; } = new();
                 public Dictionary<string, StatisticsSubjectPerYear<Firma.Statistics.Dotace>> SoukromeFirmy { get; set; } = new();
                 public Dictionary<string, StatisticsSubjectPerYear<Firma.Statistics.Dotace>> Neziskovky { get; set; } = new();
