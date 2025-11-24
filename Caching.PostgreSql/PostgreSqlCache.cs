@@ -6,7 +6,7 @@ using Microsoft.Extensions.Options;
 
 namespace HlidacStatu.CachingClients.PostgreSql
 {
-    internal sealed class PostgreSqlCache : IDistributedCache
+    public sealed class PostgreSqlCache : IDistributedCache
     {
         private readonly IDatabaseOperations _dbOperations;
         private readonly TimeSpan _defaultSlidingExpiration;

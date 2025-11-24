@@ -2,7 +2,7 @@
 
 namespace HlidacStatu.CachingClients.PostgreSql
 {
-    internal interface IDatabaseExpiredItemsRemoverLoop : IDisposable
+    public interface IDatabaseExpiredItemsRemoverLoop : IDisposable
     {
         void Start();
     }
