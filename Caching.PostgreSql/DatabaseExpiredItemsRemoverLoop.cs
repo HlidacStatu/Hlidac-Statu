@@ -6,7 +6,7 @@ using Microsoft.Extensions.Internal;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
-namespace HlidacStatu.Caching.PostgreSql
+namespace HlidacStatu.CachingClients.PostgreSql
 {
     internal sealed class DatabaseExpiredItemsRemoverLoop : IDatabaseExpiredItemsRemoverLoop
     {

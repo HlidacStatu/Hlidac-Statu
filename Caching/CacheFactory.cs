@@ -1,6 +1,6 @@
 ﻿using Enyim.Caching;
 using Enyim.Caching.Memcached;
-using HlidacStatu.Caching.PostgreSql;
+using HlidacStatu.CachingClients.PostgreSql;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -243,4 +243,23 @@ public static class CacheFactory
 
         return _postgreSqlClient;
     }
+
+    // private static IDistributedCache GetCache()
+    // {
+    //     IServiceCollection services = new ServiceCollection();
+    //     services.AddLogging(builder => builder.AddSerilog(logger: Log.Logger, dispose: false));
+    //     services.AddDistributedPostgreSqlCache(options =>
+    //     {
+    //         options.ConnectionString = Devmasters.Config.GetWebConfigValue("PostgreSqlCacheConnectionString");
+    //         options.SchemaName = "public";
+    //         options.TableName = "fusion_cache";
+    //         options.CreateInfrastructure = true;
+    //         options.ExpiredItemsDeletionInterval = TimeSpan.FromMinutes(30);
+    //         options.DisableRemoveExpired = false;
+    //         options.UpdateOnGetCacheItem = false;
+    //         options.ReadOnlyMode = false;
+    //     });
+    //     
+    //     
+    // }
 }

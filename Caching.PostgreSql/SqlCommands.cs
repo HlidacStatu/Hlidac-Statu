@@ -1,4 +1,4 @@
-﻿namespace HlidacStatu.Caching.PostgreSql;
+﻿namespace HlidacStatu.CachingClients.PostgreSql;
 
 public class SqlCommands
 {

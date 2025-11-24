@@ -13,7 +13,7 @@
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <LangVersion>11</LangVersion>
-    <PackageId>HlidacStatu.Caching.PostgreSql</PackageId>
+    <PackageId>HlidacStatu.CachingClients.PostgreSql</PackageId>
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
