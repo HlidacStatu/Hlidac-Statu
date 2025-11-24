@@ -14,6 +14,7 @@ using Scriban.Runtime;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace HlidacStatu.XLib.Render
 {
@@ -211,7 +212,7 @@ namespace HlidacStatu.XLib.Render
                 }
                 return string.Empty;
             }
-            public static string fn_RenderCompanyInformations(string ico, int numberOfInfos = 3, string prefix = "", string postfix = "",
+            public static async Task<string> fn_RenderCompanyInformations(string ico, int numberOfInfos = 3, string prefix = "", string postfix = "",
                 string delimiterBetweenInfos = "")
             {
                 if (ico == null)
@@ -223,7 +224,7 @@ namespace HlidacStatu.XLib.Render
                     var o = Firmy.instanceByIco.Get(ico);
                     if (o?.Valid == true)
                     {
-                        string niceString = o.InfoFacts().RenderFacts(numberOfInfos, true, false, delimiterBetweenInfos);
+                        string niceString = (await o.InfoFactsAsync()).RenderFacts(numberOfInfos, true, false, delimiterBetweenInfos);
 
                         return $"<span>{prefix}{niceString}{postfix}</span>";
                     }

@@ -499,7 +499,9 @@ namespace HlidacStatu.Repositories
 
             return res;
         }
-        public static HlidacStatu.DS.Api.Firmy.SubjektDetailInfo GetDetailInfo(string ico, string name)
+        
+        //todo: co tohle dělá a proč je to tady
+        public static async Task<SubjektDetailInfo> GetDetailInfoAsync(string ico, string name)
         {
             DS.Graphs.Relation.AktualnostType aktualnost = DS.Graphs.Relation.AktualnostType.Nedavny;
 
@@ -525,7 +527,7 @@ namespace HlidacStatu.Repositories
             res.Source_Url = f.GetUrl(false);
             res.Ico = f.ICO;
             res.Jmeno_Firmy = f.Jmeno;
-            res.Rizika = f.InfoFacts().RenderFacts(4, true, false);
+            res.Rizika = (await f.InfoFactsAsync()).RenderFacts(4, true, false);
 
 
             res.Kategorie_Organu_Verejne_Moci = f.KategorieOVMAsync().ConfigureAwait(false).GetAwaiter().GetResult()

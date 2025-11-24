@@ -17,6 +17,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
+using HlidacStatu.Repositories.Cache;
 
 namespace HlidacStatu.Extensions
 {
@@ -270,10 +271,11 @@ namespace HlidacStatu.Extensions
                 : (firma.JsemStatniFirma() ? "Firma (spolu)vlastněná státem" : "Soukromá firma");
         }
 
-        public static string SocialInfoBody(this Firma firma)
+        public static async Task<string> SocialInfoBodyAsync(this Firma firma)
         {
+            var infoFacts = await firma.InfoFactsAsync();
             return "<ul>" +
-                   firma.InfoFacts().RenderFacts(4, true, true, "", "<li>{0}</li>", true)
+                   infoFacts.RenderFacts(4, true, true, "", "<li>{0}</li>", true)
                    + "</ul>";
         }
 
@@ -440,8 +442,7 @@ namespace HlidacStatu.Extensions
             {
                 return db.PravniFormaOvm
                     .AsNoTracking()
-                    .Where(zs => zs.Id == kod_pf)
-                    .FirstOrDefault()?
+                    .FirstOrDefault(zs => zs.Id == kod_pf)?
                     .Text;
             }
 
@@ -635,42 +636,11 @@ namespace HlidacStatu.Extensions
                 .Any();
         }
 
-        static Devmasters.Cache.Redis.Manager<InfoFact[], Firma> _infoFactsCache()
-        {
-            var cache = Devmasters.Cache.Redis.Manager<InfoFact[], Firma>
-                .GetSafeInstance("Firma_InfoFacts",
-                    (firma) => GetDirectInfoFactsAsync(firma).ConfigureAwait(false).GetAwaiter().GetResult(),
-                    TimeSpan.FromDays(2),
-                    Devmasters.Config.GetWebConfigValue("RedisServerUrls").Split(';'),
-                    Devmasters.Config.GetWebConfigValue("RedisBucketName"),
-                    Devmasters.Config.GetWebConfigValue("RedisUsername"),
-                    Devmasters.Config.GetWebConfigValue("RedisCachePassword"),
-                    keyValueSelector: f => f.ICO);
-
-            return cache;
-        }
-
-
-        static Devmasters.Cache.Redis.Manager<Riziko[], (Firma f, int rok)> _rizikoCache()
-        {
-            var cache = Devmasters.Cache.Redis.Manager<Riziko[], (Firma f, int rok)>
-                .GetSafeInstance("Firma_Rizika",
-                    (o) => getDirectRiziko(o.f, o.rok),
-                    TimeSpan.FromDays(2),
-                    Devmasters.Config.GetWebConfigValue("RedisServerUrls").Split(';'),
-                    Devmasters.Config.GetWebConfigValue("RedisBucketName"),
-                    Devmasters.Config.GetWebConfigValue("RedisUsername"),
-                    Devmasters.Config.GetWebConfigValue("RedisCachePassword"),
-                    keyValueSelector: o => $"{o.rok}-{o.f.ICO}");
-
-            return cache;
-        }
-
-        private static Riziko[] getDirectRiziko(Firma firma, int rok)
+        public static async Task<Riziko[]> GetDirectRizikoAsync(Firma firma, int rok)
         {
             List<Riziko> res = new List<Riziko>();
             var statistics = firma.StatistikaRegistruSmluv().StatisticsForYear(rok);
-            var kindex = firma.KindexAsync().ConfigureAwait(false).GetAwaiter().GetResult()?.ForYear(rok);
+            var kindex = (await firma.KindexAsync())?.ForYear(rok);
 
 
             if (statistics.PercentSmluvBezCeny > 0)
@@ -812,34 +782,21 @@ namespace HlidacStatu.Extensions
             }
             return res.ToArray();
         }
-
-        public static void InfoFactsInvalidate(this Firma firma) //otázka jestli tohle nebrat z cachce
+        
+        public static async Task<Riziko[]> RizikaAsync(this Firma firma, int rok, bool forceUpdateCache = false) //otázka jestli tohle nebrat z cachce
         {
-            _infoFactsCache().Delete(firma);
-
-        }
-
-
-        public static Riziko[] Rizika(this Firma firma, int rok, bool forceUpdateCache = false) //otázka jestli tohle nebrat z cachce
-        {
-            //STAT FIX
-            //return Array.Empty<InfoFact>();
             if (forceUpdateCache)
-                _rizikoCache().Delete((firma,rok));
-            var inf = _rizikoCache().Get((firma, rok));
-            return inf;
+                await FirmaCache.InvalidateRizikoAsync(firma,rok);
+            return await FirmaCache.GetRizikoAsync(firma, rok);
         }
 
-        public static InfoFact[] InfoFacts(this Firma firma, bool forceUpdateCache = false) //otázka jestli tohle nebrat z cachce
+        public static async Task<InfoFact[]> InfoFactsAsync(this Firma firma, bool forceUpdateCache = false)
         {
-            //STAT FIX
-            //return Array.Empty<InfoFact>();
-
             if (forceUpdateCache)
-                firma.InfoFactsInvalidate();
-            var inf = _infoFactsCache().Get(firma);
-            return inf;
+                await FirmaCache.InvalidateInfoFactsAsync(firma);
+            return await FirmaCache.GetInfoFactsAsync(firma);
         }
+        
         public static async Task<InfoFact[]> GetDirectInfoFactsAsync(Firma firma)
         {
             var sName = firma.ObecneJmeno();

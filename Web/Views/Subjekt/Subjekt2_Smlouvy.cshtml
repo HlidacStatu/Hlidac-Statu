@@ -127,7 +127,7 @@
             <span class="text-muted">Chci sdílet s ostatními</span>
             <div>
                 <share-facebook></share-facebook>
-                <share-twitter text="@($"{Model.Jmeno} na @HlidacStatu - {Model.InfoFacts().FirstOrDefault()?.Render(false)}")"></share-twitter>
+                <share-twitter text="@($"{Model.Jmeno} na @HlidacStatu - {(await Model.InfoFactsAsync()).FirstOrDefault()?.Render(false)}")"></share-twitter>
                 <share-widget></share-widget>
             </div>
         </div>

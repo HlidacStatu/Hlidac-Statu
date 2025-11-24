@@ -1,6 +1,7 @@
 ﻿using System.Data;
 using System.Linq.Expressions;
 using HlidacStatu.Datasets;
+using HlidacStatu.DS.Api.Firmy;
 using HlidacStatu.Entities;
 using HlidacStatu.Repositories;
 using HlidacStatuApi.Models;
@@ -156,7 +157,7 @@ namespace HlidacStatuApi.Controllers.ApiV2
         /// <returns></returns>
         [Authorize(Roles = "Admin")]
         [HttpGet("GetDetailInfo")]
-        public ActionResult<List<HlidacStatu.DS.Api.Firmy.SubjektDetailInfo>> GetDetailInfo([FromQuery] string icos, [FromQuery] string names)
+        public async Task<ActionResult<List<SubjektDetailInfo>>> GetDetailInfo([FromQuery] string icos, [FromQuery] string names)
         {
             List<HlidacStatu.DS.Api.Firmy.SubjektDetailInfo> res = new List<HlidacStatu.DS.Api.Firmy.SubjektDetailInfo>();
 
@@ -165,7 +166,7 @@ namespace HlidacStatuApi.Controllers.ApiV2
                 var icosList = icos.Split('|').Select(i => i.Trim()).ToList();
                 foreach (var ico in icosList)
                 {
-                    var inf = HlidacStatu.Repositories.FirmaRepo.GetDetailInfo(ico,"");
+                    var inf = await HlidacStatu.Repositories.FirmaRepo.GetDetailInfoAsync(ico,"");
                     if (inf != null)
                     {
                         res.Add(inf);
@@ -177,7 +178,7 @@ namespace HlidacStatuApi.Controllers.ApiV2
                 var namesList = names.Split('|').Select(i => i.Trim()).ToList();
                 foreach (var nam in namesList)
                 {
-                    var inf = HlidacStatu.Repositories.FirmaRepo.GetDetailInfo("", nam);
+                    var inf = await HlidacStatu.Repositories.FirmaRepo.GetDetailInfoAsync("", nam);
                     if (inf != null)
                     {
                         res.Add(inf);
