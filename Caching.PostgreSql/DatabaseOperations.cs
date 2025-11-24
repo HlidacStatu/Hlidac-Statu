@@ -11,7 +11,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Npgsql;
 
-namespace HlidacStatu.Caching.PostgreSql
+namespace HlidacStatu.CachingClients.PostgreSql
 {
     internal sealed class DatabaseOperations : IDatabaseOperations
     {

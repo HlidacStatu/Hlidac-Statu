@@ -256,7 +256,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RegistrVozidel", "RegistrVo
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WinSystemMonitor", "..\Hlidac-Statu-Private\WinSystemMonitor\WinSystemMonitor.csproj", "{F64495D4-41C4-4F54-9DC7-BF8831428684}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HlidacStatu.Caching.PostgreSql", "Caching.PostgreSql\HlidacStatu.Caching.PostgreSql.csproj", "{D3917F2F-6187-4A3E-A7B0-95BE9E342D99}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HlidacStatu.CachingClients.PostgreSql", "Caching.PostgreSql\HlidacStatu.CachingClients.PostgreSql.csproj", "{D3917F2F-6187-4A3E-A7B0-95BE9E342D99}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Caching", "Caching\Caching.csproj", "{1E0CE4EF-491B-4D3E-9716-B5A071F12C92}"
 EndProject

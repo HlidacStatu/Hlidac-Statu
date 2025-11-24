@@ -3,7 +3,7 @@ using Microsoft.Extensions.Internal;
 using Microsoft.Extensions.Options;
 using Npgsql;
 
-namespace HlidacStatu.Caching.PostgreSql
+namespace HlidacStatu.CachingClients.PostgreSql
 {
     public class PostgreSqlCacheOptions : IOptions<PostgreSqlCacheOptions>
     {

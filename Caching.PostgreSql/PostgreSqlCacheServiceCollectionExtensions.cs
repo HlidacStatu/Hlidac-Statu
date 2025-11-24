@@ -6,7 +6,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Options;
 
-namespace HlidacStatu.Caching.PostgreSql
+namespace HlidacStatu.CachingClients.PostgreSql
 {
 	/// <summary>
 	/// Extension methods for setting up PostgreSql distributed cache services in an <see cref="IServiceCollection" />.

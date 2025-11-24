@@ -126,8 +126,19 @@ namespace HlidacStatu.Extensions
                 var parentOVM = firma.ParentFirmy(Relation.AktualnostType.Aktualni)
                     .ToArray();
 
-                musi = parentOVM
-                    .Any(m => m.JsemOVM() && m.KategorieOVMAsync().ConfigureAwait(false).GetAwaiter().GetResult().Any(k => k.id == 11));
+                musi = false;
+                foreach (var m in parentOVM)
+                {
+                    if (m.JsemOVM())
+                    {
+                        var cat = await m.KategorieOVMAsync();
+                        if (cat.Any(k => k.id == 11))
+                        {
+                            musi = true;
+                            break;
+                        }
+                    }
+                }
             }
             return musi;
         }

@@ -5,7 +5,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Caching.Distributed;
 
-namespace HlidacStatu.Caching.PostgreSql
+namespace HlidacStatu.CachingClients.PostgreSql
 {
     public interface IDatabaseOperations
     {

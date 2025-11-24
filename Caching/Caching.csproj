@@ -16,7 +16,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\Caching.PostgreSql\HlidacStatu.Caching.PostgreSql.csproj" />
+      <ProjectReference Include="..\Caching.PostgreSql\HlidacStatu.CachingClients.PostgreSql.csproj" />
     </ItemGroup>
 
 </Project>

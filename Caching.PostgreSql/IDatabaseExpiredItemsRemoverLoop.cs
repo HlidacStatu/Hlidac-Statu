@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace HlidacStatu.Caching.PostgreSql
+namespace HlidacStatu.CachingClients.PostgreSql
 {
     internal interface IDatabaseExpiredItemsRemoverLoop : IDisposable
     {
