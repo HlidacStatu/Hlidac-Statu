@@ -1,31 +1,41 @@
 using System.Threading.Tasks;
+using Caching;
+using HlidacStatu.Entities;
+using HlidacStatu.Entities.Facts;
+using HlidacStatu.Extensions;
 using ZiggyCreatures.Caching.Fusion;
 
 namespace HlidacStatu.Repositories.Cache;
 
 public static class FirmaCache
 {
-    
-    
     private static readonly IFusionCache Cache =
-        Caching.CacheFactory.CreateDefaultCacheWithL2Support(nameof(FirmaCache), nameof(FirmaCache));
+        Caching.CacheFactory.CreateNew(CacheFactory.CacheType.L2PostgreSql, nameof(FirmaCache));
 
-    
 
-    public static async Task<string> GetProductAsync(int id, int delayInMs)
+    public static async Task<InfoFact[]> GetInfoFactsAsync(Firma firma)
     {
-        var product = await Cache.GetOrSetAsync<string>($"product:{id}",
-            _ => GetProductFromAsync(id, delayInMs)
+        var infoFacts = await Cache.GetOrSetAsync($"_InfoFacts:{firma.ICO}",
+            _ => FirmaExtension.GetDirectInfoFactsAsync(firma)
         );
-        return product;
+        return infoFacts;
     }
-
     
-    //factories
-    private static async Task<string> GetProductFromAsync(int id, int delayInMs)
+    public static async Task InvalidateInfoFactsAsync(Firma firma)
     {
-        return $"produkt {id} je {productCouner++}";
+        await Cache.ExpireAsync($"_InfoFacts:{firma.ICO}");
     }
 
+    public static async Task<Riziko[]> GetRizikoAsync(Firma f, int rok)
+    {
+        var rizika = await Cache.GetOrSetAsync($"_Rizika:{f.ICO}-{rok}",
+            _ => FirmaExtension.GetDirectRizikoAsync(f, rok)
+        );
+        return rizika;
+    }
     
+    public static async Task InvalidateRizikoAsync(Firma f, int rok)
+    {
+        await Cache.ExpireAsync($"_Rizika:{f.ICO}-{rok}");
+    }
 }

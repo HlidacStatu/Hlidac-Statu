@@ -9,6 +9,8 @@ using ZiggyCreatures.Caching.Fusion.Serialization.SystemTextJson;
 
 namespace Caching;
 
+//todo: add jittering...!
+
 public static class CacheFactory
 {
     /// <summary>
@@ -18,7 +20,7 @@ public static class CacheFactory
     /// nepotřeba distributed cache
     /// Je potřeba nastavit cacheName i prefixName
     /// </summary>
-    public static FusionCacheEntryOptions L1DefaultEntryOptions => new FusionCacheEntryOptions
+    private static FusionCacheEntryOptions L1DefaultEntryOptions => new FusionCacheEntryOptions
     {
         IsFailSafeEnabled = true,
         // o kolik se prodlouží validita cache, pokud selže factory
@@ -45,7 +47,9 @@ public static class CacheFactory
         SkipDistributedCacheWrite = true,
         // vypneme backplane, protože nebudeme řešit synchronizace pro více instancí aplikace (zatím)
         AllowBackgroundBackplaneOperations = false,
-        SkipBackplaneNotifications = true
+        SkipBackplaneNotifications = true,
+        
+        JitterMaxDuration = TimeSpan.FromMinutes(1)
     };
 
 
@@ -56,7 +60,7 @@ public static class CacheFactory
     /// distributed failsafe duration - v L2 max 1 den
     /// Je potřeba nastavit cacheName i prefixName
     /// </summary>
-    public static FusionCacheEntryOptions DistributedCacheEntryOptions => new FusionCacheEntryOptions
+    private static FusionCacheEntryOptions DistributedCacheEntryOptions => new FusionCacheEntryOptions
     {
         IsFailSafeEnabled = true,
         // o kolik se prodlouží validita cache, pokud selže factory
@@ -91,10 +95,9 @@ public static class CacheFactory
         AllowBackgroundDistributedCacheOperations = true,
         // vypneme backplane, protože nebudeme řešit synchronizace pro více instancí aplikace (zatím)
         AllowBackgroundBackplaneOperations = false,
-        SkipBackplaneNotifications = true
+        SkipBackplaneNotifications = true,
+        JitterMaxDuration = TimeSpan.FromMinutes(2)
     };
-    // DistributedCacheCircuitBreakerDuration = TimeSpan.FromSeconds(10),
-
 
     /// <summary>
     /// SCÉNÁŘ 3: NEMÁ EXPIRACI! řešíme, kdy jsou data přepočítaná ručně odjinud (nevíme interval)
@@ -104,7 +107,7 @@ public static class CacheFactory
     /// FACTORY metoda je přímo volání do předpočítaných dat, předpočítaná data se updatuje z DOWNLOADERU
     /// Je potřeba nastavit cacheName i prefixName
     /// </summary>
-    public static FusionCacheEntryOptions L1FromPermanentStoreEntryOptions => new FusionCacheEntryOptions
+    private static FusionCacheEntryOptions L1FromPermanentStoreEntryOptions => new FusionCacheEntryOptions
     {
         IsFailSafeEnabled = true,
         // o kolik se prodlouží validita cache, pokud selže factory
@@ -131,7 +134,8 @@ public static class CacheFactory
         SkipDistributedCacheWrite = true,
         // vypneme backplane, protože nebudeme řešit synchronizace pro více instancí aplikace (zatím)
         AllowBackgroundBackplaneOperations = false,
-        SkipBackplaneNotifications = true
+        SkipBackplaneNotifications = true,
+        JitterMaxDuration = TimeSpan.FromMinutes(1)
     };
 
 
@@ -145,18 +149,56 @@ public static class CacheFactory
 
     private static IServiceProvider? _serviceProvider = null;
 
-    private static IFusionCache GetCache(CacheType cacheType)
+    public static IFusionCache CreateNew(CacheType cacheType, string cachePrefix)
     {
-        _serviceProvider ??= BuildServiceProvider();
+        bool isDistributedCache = cacheType == CacheType.L2Memcache || cacheType == CacheType.L2PostgreSql;
 
-        var fusionCacheProvider = _serviceProvider.GetRequiredService<IFusionCacheProvider>();
-        var cache = fusionCacheProvider.GetCache(cacheType.ToString("G"));
+        var logger = _serviceProvider?.GetService<Microsoft.Extensions.Logging.ILogger<FusionCache>?>();
         
-        if(cache == null)
-            throw new MissingMemberException($"No cache found for cache type {cacheType}");
+        var cache = new FusionCache(new FusionCacheOptions()
+        {
+            CacheName = cachePrefix,
+            CacheKeyPrefix = cachePrefix,
+            DistributedCacheCircuitBreakerDuration = isDistributedCache? TimeSpan.FromSeconds(10) : TimeSpan.Zero,
+            DefaultEntryOptions = cacheType switch
+            {
+                CacheType.L1Default => L1DefaultEntryOptions,
+                CacheType.L1FromPermanentStore => L1FromPermanentStoreEntryOptions,
+                CacheType.L2PostgreSql => DistributedCacheEntryOptions,
+                CacheType.L2Memcache => DistributedCacheEntryOptions,
+                _ => throw new ArgumentOutOfRangeException(nameof(cacheType), cacheType, null)
+            }
+        }, logger: logger);
+
+        if (isDistributedCache)
+        {
+            IDistributedCache? distributedCache = ResolveL2CacheProvider(cacheType); 
+            
+            if(distributedCache != null)
+                cache.SetupDistributedCache(distributedCache, new FusionCacheSystemTextJsonSerializer());
+        }
 
         return cache;
 
+    }
+
+    private static IDistributedCache? ResolveL2CacheProvider(CacheType cacheType)
+    {
+        _serviceProvider ??= BuildServiceProvider();
+        
+        return cacheType switch
+        {
+            CacheType.L2PostgreSql => _serviceProvider.GetRequiredService<IEnumerable<IDistributedCache>>()
+                .OfType<PostgreSqlCache>()
+                .First(),
+            CacheType.L2Memcache => _serviceProvider.GetRequiredService<IEnumerable<IDistributedCache>>()
+                .OfType<MemcachedClient>()
+                .First(),
+            _ => null
+            
+        };
+
+        
     }
 
     private static ServiceProvider BuildServiceProvider()
@@ -195,40 +237,7 @@ public static class CacheFactory
             options.Protocol = MemcachedProtocol.Text;
             options.Transcoder = "MessagePackTranscoder";
         }, asDistributedCache: true);
-
-
-        services.AddFusionCache(CacheType.L1Default.ToString("G"))
-            .AsKeyedServiceByCacheName()
-            .WithDefaultEntryOptions(L1DefaultEntryOptions)
-            .WithoutDistributedCache()
-            .WithoutBackplane();
-
-        services.AddFusionCache(CacheType.L1FromPermanentStore.ToString("G"))
-            .AsKeyedServiceByCacheName()
-            .WithDefaultEntryOptions(L1FromPermanentStoreEntryOptions)
-            .WithoutDistributedCache()
-            .WithoutBackplane();
-
-        //how do i add .With ... Distributed... ?
-        services.AddFusionCache(CacheType.L2Memcache.ToString("G"))
-            .AsKeyedServiceByCacheName()
-            .WithDefaultEntryOptions(DistributedCacheEntryOptions)
-            .WithSerializer(new FusionCacheSystemTextJsonSerializer())
-            .WithDistributedCache(sp => sp.GetRequiredService<IEnumerable<IDistributedCache>>()
-                .OfType<MemcachedClient>()
-                .First())
-            .WithoutBackplane();
-
-        //how do i add .With ... Distributed... ?
-        services.AddFusionCache(CacheType.L2PostgreSql.ToString("G"))
-            .AsKeyedServiceByCacheName()
-            .WithDefaultEntryOptions(DistributedCacheEntryOptions)
-            .WithSerializer(new FusionCacheSystemTextJsonSerializer())
-            .WithDistributedCache(sp => sp.GetRequiredService<IEnumerable<IDistributedCache>>()
-                .OfType<PostgreSqlCache>()
-                .First())
-            .WithoutBackplane();
-
+        
         return services.BuildServiceProvider();
     }
 }

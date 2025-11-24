@@ -1,15 +1,12 @@
-﻿using HlidacStatu.Connectors.External.ProfilZadavatelu;
-using HlidacStatu.Entities;
+﻿using HlidacStatu.Entities;
 using HlidacStatu.Entities.Facts;
 using HlidacStatu.Extensions;
-using HlidacStatu.Lib.Data.External.StatniPokladna;
 using HlidacStatu.Repositories;
 using ModelContextProtocol.Server;
 using System.ComponentModel;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Text.Json;
-using static HlidacStatu.Repositories.SmlouvaRepo.Searching;
 using static HlidacStatu.XLib.Search;
 
 namespace HlidacStatu.MCPServer.Tools
@@ -61,8 +58,6 @@ url - a URL to the document or search result item. Useful for citing specific re
                 AuditRepo.GetMethodParametersWithValues(MethodBase.GetCurrentMethod().GetParameters().Skip(1), query),
                 null, async () =>
                 {
-
-
                     int maxResults = 50;
                     int maxPartSize = 5;
                     Dictionary<PartsToSearch, int> parts = new() {
@@ -83,10 +78,8 @@ url - a URL to the document or search result item. Useful for citing specific re
                         dotaceSize: maxResults,
                         withHighlighting: true
                         );
-
-
+                    
                     List<OpenAiResultItem> res = new List<OpenAiResultItem>();
-
 
                     while (res.Count < maxResults)
                     {
@@ -140,18 +133,32 @@ url - a URL to the document or search result item. Useful for citing specific re
                                                 );
                                         break;
                                     case PartsToSearch.Firmy:
-                                        res.AddRange(
-                                            sres.Firmy.Result
-                                                .Skip(parts[p])
-                                                .Take(maxPartSize)
-                                                .Select(x => new OpenAiResultItem
+                                        var semaphoreThrottling = new SemaphoreSlim(8);
+
+                                        var rangeTasks = sres.Firmy.Result
+                                            .Skip(parts[p])
+                                            .Take(maxPartSize)
+                                            .Select(async x =>
+                                            {
+                                                await semaphoreThrottling.WaitAsync();
+                                                try
                                                 {
-                                                    id = "firma-" + x.ICO,
-                                                    title = x.Jmeno,
-                                                    text = x.InfoFacts().RenderFacts(2, true),
-                                                    url = x.GetUrl(false)
-                                                }).ToArray()
-                                            );
+                                                    var facts = await x.InfoFactsAsync();
+                                                    return new OpenAiResultItem
+                                                    {
+                                                        id = "firma-" + x.ICO,
+                                                        title = x.Jmeno,
+                                                        text = facts.RenderFacts(2, true),
+                                                        url = x.GetUrl(false)
+                                                    };
+                                                }
+                                                finally
+                                                {
+                                                    semaphoreThrottling.Release();
+                                                }
+                                            }).ToArray();
+                                        var range = await Task.WhenAll(rangeTasks);
+                                        res.AddRange(range);
                                         break;
                                     case PartsToSearch.Osoby:
                                         res.AddRange(
@@ -242,7 +249,7 @@ url - a URL to the document or search result item. Useful for citing specific re
                             {
                                 id = firma.ICO,
                                 title = firma.Jmeno,
-                                text = firma.InfoFacts().RenderFacts(2, true),
+                                text = (await firma.InfoFactsAsync()).RenderFacts(2, true),
                                 url = firma.GetUrl(false)
                             };
                             break;

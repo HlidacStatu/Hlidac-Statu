@@ -6,8 +6,10 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Threading.Tasks;
 using Serilog;
 using Devmasters.Collections;
+using HlidacStatu.Repositories.Cache;
 using HlidacStatu.Repositories.Statistics;
 
 namespace HlidacStatu.Repositories
@@ -26,46 +28,43 @@ namespace HlidacStatu.Repositories
             return DirectDB.Instance.GetValue<int>("select count(*) from RecalculateItemQueue with (nolock)");
         }
 
-        public static void RecalculateTasks(int? threads = null, bool debug = false, string[] ids = null,
-            Action<string> outputWriter = null,Action<Devmasters.Batch.ActionProgressData> progressWriter = null,
+        public static async Task RecalculateTasksAsync(int? threads = null, bool debug = false, string[] ids = null,
+            Action<string> outputWriter = null, Action<Devmasters.Batch.ActionProgressData> progressWriter = null,
             int? maxItemsInBatch = null, bool allItemsInDb = false,
             bool invalidateOnly = false
-            )
+        )
         {
-                Devmasters.Batch.Manager.DoActionForAll<int>(Enumerable.Range(0, int.MaxValue - 1),
-                    xx =>
-                    {
-                        var items = RecalculateItemRepo.GetFromProcessingQueueWithParents(1, 1, debug: debug);
-                        if (items.Count() == 0)
-                            return new Devmasters.Batch.ActionOutputData() { CancelRunning = true };
+            await Devmasters.Batch.Manager.DoActionForAllAsync<int>(Enumerable.Range(0, int.MaxValue - 1), async xx =>
+                {
+                    var items = RecalculateItemRepo.GetFromProcessingQueueWithParents(1, 1, debug: debug);
+                    if (items.Count() == 0)
+                        return new Devmasters.Batch.ActionOutputData() { CancelRunning = true };
 
-                        Devmasters.Batch.Manager.DoActionForAll<RecalculateItem>(items,
-                            item =>
-                            {
-                                if (debug)
-                                    _logger.Debug($"start statistics {item.ItemType.ToString()} {item.Id}");
-                                if (item.ItemType == RecalculateItem.ItemTypeEnum.Subjekt)
-                                    RecalculateItemRepo.RecalculateFirma(item, false, invalidateOnly);
-                                else if (item.ItemType == RecalculateItem.ItemTypeEnum.Person)
-                                    RecalculateItemRepo.RecalculateOsoba(item, false, invalidateOnly);
-                                if (debug)
-                                    _logger.Debug($"end statistics {item.ItemType.ToString()} {item.Id}");
+                    await Devmasters.Batch.Manager.DoActionForAllAsync<RecalculateItem>(items, async item =>
+                        {
+                            if (debug)
+                                _logger.Debug($"start statistics {item.ItemType.ToString()} {item.Id}");
+                            if (item.ItemType == RecalculateItem.ItemTypeEnum.Subjekt)
+                                await RecalculateItemRepo.RecalculateFirmaAsync(item, false, invalidateOnly);
+                            else if (item.ItemType == RecalculateItem.ItemTypeEnum.Person)
+                                RecalculateItemRepo.RecalculateOsoba(item, false, invalidateOnly);
+                            if (debug)
+                                _logger.Debug($"end statistics {item.ItemType.ToString()} {item.Id}");
 
-                                return new Devmasters.Batch.ActionOutputData();
-                            },
-                            null, null,
-                            !System.Diagnostics.Debugger.IsAttached, maxDegreeOfParallelism: 2,
-                            monitor: null
-                            );
-                        return new Devmasters.Batch.ActionOutputData();
-                    },
-                    null, null,
-                    !System.Diagnostics.Debugger.IsAttached, maxDegreeOfParallelism: threads,
-                    monitor: new MonitoredTaskRepo.ForBatch("Downloader ", "RecalculateTasks from queue ")
+                            return new Devmasters.Batch.ActionOutputData();
+                        },
+                        null, null,
+                        !System.Diagnostics.Debugger.IsAttached, maxDegreeOfParallelism: 2,
+                        monitor: null
                     );
-            
-            _logger.Information("Ends RecalculateTasks with {numOfThreads} threads", threads.Value);
+                    return new Devmasters.Batch.ActionOutputData();
+                },
+                null, null,
+                !System.Diagnostics.Debugger.IsAttached, maxDegreeOfParallelism: threads,
+                monitor: new MonitoredTaskRepo.ForBatch("Downloader ", "RecalculateTasks from queue ")
+            );
 
+            _logger.Information("Ends RecalculateTasks with {numOfThreads} threads", threads.Value);
         }
 
         public static void RecalculateOsoba(RecalculateItem item, bool noRebuild, bool invalidateOnly)
@@ -83,10 +82,10 @@ namespace HlidacStatu.Repositories
                         }
                         else
                         {
-
                             _ = o.StatistikaRegistrSmluv(forceUpdateCache: noRebuild ? false : true);
                             _ = o.InfoFactsCached(forceUpdateCache: noRebuild ? false : true);
                         }
+
                         RecalculateItemRepo.Finish(item);
                         break;
                     case RecalculateItem.StatisticsTypeEnum.Dotace:
@@ -97,20 +96,20 @@ namespace HlidacStatu.Repositories
                         }
                         else
                         {
-
                             _ = o.StatistikaDotace(forceUpdateCache: noRebuild ? false : true);
                             _ = o.InfoFactsCached(forceUpdateCache: noRebuild ? false : true);
                         }
+
                         RecalculateItemRepo.Finish(item);
                         break;
                     default:
                         break;
                 }
-
             }
         }
 
-        public static void RecalculateFirma(RecalculateItem item, bool noRebuild, bool invalidateOnly, bool firmaOnly = false, bool holdingOnly = false)
+        public static async Task RecalculateFirmaAsync(RecalculateItem item, bool noRebuild, bool invalidateOnly,
+            bool firmaOnly = false, bool holdingOnly = false)
         {
             var f = Firmy.Get(item.Id);
             if (f != null)
@@ -129,6 +128,7 @@ namespace HlidacStatu.Repositories
                             if (holdingOnly || !firmaOnly)
                                 _ = f.HoldingStatisticsRegistrSmluv(forceUpdateCache: noRebuild ? false : true);
                         }
+
                         break;
                     case RecalculateItem.StatisticsTypeEnum.VZ:
                         if (invalidateOnly)
@@ -141,8 +141,9 @@ namespace HlidacStatu.Repositories
                                 _ = f.StatistikaVerejneZakazky(forceUpdateCache: true);
                             if (holdingOnly || !firmaOnly)
                                 _ = f.HoldingStatistikaVerejneZakazky(DS.Graphs.Relation.AktualnostType.Nedavny,
-                                forceUpdateCache: noRebuild ? false : true);
+                                    forceUpdateCache: noRebuild ? false : true);
                         }
+
                         break;
                     case RecalculateItem.StatisticsTypeEnum.Dotace:
                         if (invalidateOnly)
@@ -156,14 +157,16 @@ namespace HlidacStatu.Repositories
                             if (holdingOnly || !firmaOnly)
                                 _ = f.HoldingStatistikaDotaci(forceUpdateCache: noRebuild ? false : true);
                         }
+
                         break;
                     default:
                         break;
                 }
+
                 if (invalidateOnly)
-                    f.InfoFactsInvalidate();
+                    await FirmaCache.InvalidateInfoFactsAsync(f);
                 else
-                    _ = f.InfoFacts(forceUpdateCache: noRebuild ? false : true);
+                    await f.InfoFactsAsync(forceUpdateCache: noRebuild ? false : true);
                 RecalculateItemRepo.Finish(item);
             }
         }
@@ -171,20 +174,23 @@ namespace HlidacStatu.Repositories
         public static List<RecalculateItem> CascadeItems(RecalculateItem item,
             ref System.Collections.Concurrent.ConcurrentBag<RecalculateItem> alreadyOnList)
         {
-
             List<RecalculateItem> list = new List<RecalculateItem>(alreadyOnList);
             if (item.ItemType == RecalculateItem.ItemTypeEnum.Subjekt)
             {
                 var f = Firmy.Get(item.Id);
                 if (f?.Valid == true)
-                    list = list.Union(FirmaForQueue(new List<RecalculateItem>(), f, item.StatisticsType, item.ProvokedBy, 0), comparer)
+                    list = list.Union(
+                            FirmaForQueue(new List<RecalculateItem>(), f, item.StatisticsType, item.ProvokedBy, 0),
+                            comparer)
                         .ToList();
             }
             else if (item.ItemType == RecalculateItem.ItemTypeEnum.Person)
             {
                 var o = Osoby.GetById.Get(Convert.ToInt32(item.Id));
                 if (o != null)
-                    list = list.Union(OsobaForQueue(new List<RecalculateItem>(), o, item.StatisticsType, item.ProvokedBy, 0), comparer)
+                    list = list.Union(
+                            OsobaForQueue(new List<RecalculateItem>(), o, item.StatisticsType, item.ProvokedBy, 0),
+                            comparer)
                         .ToList();
             }
             else
@@ -197,39 +203,42 @@ namespace HlidacStatu.Repositories
         }
 
 
-        public static bool AddOsobaToProcessingQueue(string nameId, RecalculateItem.StatisticsTypeEnum statsType, string provokeBy)
+        public static bool AddOsobaToProcessingQueue(string nameId, RecalculateItem.StatisticsTypeEnum statsType,
+            string provokeBy)
         {
             return AddToProcessingQueue(
-               new RecalculateItem()
-               {
-                   Id = nameId,
-                   ItemType = RecalculateItem.ItemTypeEnum.Person,
-                   StatisticsType = statsType,
-                   ProvokedBy = provokeBy
-               });
+                new RecalculateItem()
+                {
+                    Id = nameId,
+                    ItemType = RecalculateItem.ItemTypeEnum.Person,
+                    StatisticsType = statsType,
+                    ProvokedBy = provokeBy
+                });
         }
+
         public static bool AddToProcessingQueue(Osoba o, RecalculateItem.StatisticsTypeEnum statsType, string provokeBy)
         {
             return AddToProcessingQueue(new RecalculateItem(o, statsType, provokeBy));
         }
 
-        public static bool AddFirmaToProcessingQueue(string ico, RecalculateItem.StatisticsTypeEnum statsType, string provokeBy)
+        public static bool AddFirmaToProcessingQueue(string ico, RecalculateItem.StatisticsTypeEnum statsType,
+            string provokeBy)
         {
             if (string.IsNullOrWhiteSpace(ico))
                 return true;
             return AddToProcessingQueue(
-               new RecalculateItem()
-               {
-                   Id = ico,
-                   ItemType = RecalculateItem.ItemTypeEnum.Subjekt,
-                   StatisticsType = statsType,
-                   ProvokedBy = provokeBy
-               });
+                new RecalculateItem()
+                {
+                    Id = ico,
+                    ItemType = RecalculateItem.ItemTypeEnum.Subjekt,
+                    StatisticsType = statsType,
+                    ProvokedBy = provokeBy
+                });
         }
+
         public static bool AddToProcessingQueue(Firma f, RecalculateItem.StatisticsTypeEnum statsType, string provokeBy)
         {
             return AddToProcessingQueue(new RecalculateItem(f, statsType, provokeBy));
-
         }
 
         private static List<RecalculateItem> OsobaForQueue(List<RecalculateItem> list,
@@ -241,11 +250,13 @@ namespace HlidacStatu.Repositories
             else
                 return new List<RecalculateItem>();
         }
+
         private static List<RecalculateItem> OsobaForQueue(List<RecalculateItem> list,
             Osoba o, RecalculateItem.StatisticsTypeEnum statsType, string provokeBy, int deep)
         {
-            _logger?.Verbose("{method} expanding {osoba} {jmeno} vazby, recursive deep {deep}, current list {count} items",
-                    MethodBase.GetCurrentMethod().Name, o.NameId, o.FullName(), deep, list.Count);
+            _logger?.Verbose(
+                "{method} expanding {osoba} {jmeno} vazby, recursive deep {deep}, current list {count} items",
+                MethodBase.GetCurrentMethod().Name, o.NameId, o.FullName(), deep, list.Count);
 
             //StackOverflow defense
             if (list.Count > 10_000)
@@ -273,8 +284,9 @@ namespace HlidacStatu.Repositories
         private static List<RecalculateItem> FirmaForQueue(List<RecalculateItem> list,
             Firma f, RecalculateItem.StatisticsTypeEnum statsType, string provokeBy, int deep)
         {
-            _logger?.Verbose("{method} expanding {ico} {subjekt} vazby, recursive deep {deep}, current list {count} items",
-                    MethodBase.GetCurrentMethod().Name, f.ICO, f.Jmeno, deep, list.Count);
+            _logger?.Verbose(
+                "{method} expanding {ico} {subjekt} vazby, recursive deep {deep}, current list {count} items",
+                MethodBase.GetCurrentMethod().Name, f.ICO, f.Jmeno, deep, list.Count);
 
             //StackOverflow defense
             if (list.Count > 10_000)
@@ -305,6 +317,7 @@ namespace HlidacStatu.Repositories
                     list = list.Union(OsobaForQueue(list, vaz.o, statsType, provokeBy, deep + 1), comparer).ToList();
                 }
             }
+
             return list;
         }
 
@@ -312,6 +325,7 @@ namespace HlidacStatu.Repositories
         {
             return Finish(item.Pk);
         }
+
         public static bool Finish(long pk)
         {
             using (DbEntities db = new DbEntities())
@@ -325,6 +339,7 @@ namespace HlidacStatu.Repositories
                 return true;
             }
         }
+
         public static bool AddToProcessingQueue(RecalculateItem item)
         {
             if (string.IsNullOrWhiteSpace(item.Id))
@@ -338,7 +353,6 @@ namespace HlidacStatu.Repositories
                     {
                         using (var dbTran = db.Database.BeginTransaction(System.Data.IsolationLevel.RepeatableRead))
                         {
-
                             try
                             {
                                 var exists = db.RecalculateItem.Any(m =>
@@ -346,12 +360,13 @@ namespace HlidacStatu.Repositories
                                     && m.ItemType == item.ItemType
                                     && m.StatisticsType == item.StatisticsType
                                     && (m.Finished == null)
-                                    );
+                                );
                                 if (exists)
                                 {
                                     dbTran.Rollback();
                                     return false;
                                 }
+
                                 _ = db.RecalculateItem.Add(item);
                                 _ = db.SaveChanges();
                                 dbTran.Commit();
@@ -373,7 +388,6 @@ namespace HlidacStatu.Repositories
                         );
                 q.Send(item);
                 return true;*/
-
             }
             catch (Exception)
             {
@@ -385,9 +399,9 @@ namespace HlidacStatu.Repositories
         public static void Debug()
         {
             var fakeList = new System.Collections.Concurrent.ConcurrentBag<RecalculateItem>();
-            var item = new RecalculateItem(Firmy.Get("00000205"), RecalculateItem.StatisticsTypeEnum.VZ, "recalculateDebug");
+            var item = new RecalculateItem(Firmy.Get("00000205"), RecalculateItem.StatisticsTypeEnum.VZ,
+                "recalculateDebug");
             List<RecalculateItem> cascade = CascadeItems(item, ref fakeList);
-
         }
 
         public static IEnumerable<RecalculateItem> GetFromProcessingQueueWithParents(int count, int threads,
@@ -407,7 +421,6 @@ namespace HlidacStatu.Repositories
                 {
                     try
                     {
-
                         if (debug)
                             _logger?.Debug($"GetFromProcessingQueueWithParents getting cascade for {item.UniqueKey}");
                         List<RecalculateItem> cascade = CascadeItems(item, ref list);
@@ -430,10 +443,10 @@ namespace HlidacStatu.Repositories
                 },
                 outputWriter, progressWriter,
                 !System.Diagnostics.Debugger.IsAttached, maxDegreeOfParallelism: threads
+            );
 
-                );
-
-            _logger?.Debug("{method} gets {records} records containing parents and owners", MethodBase.GetCurrentMethod().Name, list.Count);
+            _logger?.Debug("{method} gets {records} records containing parents and owners",
+                MethodBase.GetCurrentMethod().Name, list.Count);
 
             return list.OrderBy(o => o.Created)
                 .Distinct(comparer)
@@ -442,10 +455,8 @@ namespace HlidacStatu.Repositories
 
         public static IEnumerable<RecalculateItem> GetItemsFromProcessingQueue(int count)
         {
-
             try
             {
-
                 using (Entities.DbEntities db = new DbEntities())
                 {
                     db.Database.SetCommandTimeout(120); //120 secs
@@ -464,8 +475,8 @@ namespace HlidacStatu.Repositories
                         db.Database.ExecuteSqlRaw(sql);
                         _logger.Debug("Setting recalculateItemQueue status {sql}", sql);
                     }
-                    return res;
 
+                    return res;
                 }
             }
 
@@ -473,11 +484,6 @@ namespace HlidacStatu.Repositories
             {
                 return Array.Empty<RecalculateItem>();
             }
-
-
-
         }
-
-
     }
 }
