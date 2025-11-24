@@ -1,0 +1,22 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net8.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <PackageReference Include="Devmasters.Core" Version="8.2.4" />
+      <PackageReference Include="EnyimMemcachedCore" Version="3.4.5" />
+      <PackageReference Include="Serilog" Version="4.3.0" />
+      <PackageReference Include="Serilog.Extensions.Hosting" Version="9.0.0" />
+      <PackageReference Include="ZiggyCreatures.FusionCache" Version="2.4.0" />
+      <PackageReference Include="ZiggyCreatures.FusionCache.Serialization.SystemTextJson" Version="2.4.0" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\Caching.PostgreSql\HlidacStatu.Caching.PostgreSql.csproj" />
+    </ItemGroup>
+
+</Project>
