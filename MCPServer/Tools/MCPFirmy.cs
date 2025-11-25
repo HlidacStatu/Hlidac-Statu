@@ -5,6 +5,7 @@ using HlidacStatu.Repositories;
 using ModelContextProtocol.Server;
 using System.ComponentModel;
 using System.Reflection;
+using HlidacStatu.Repositories.Cache;
 
 namespace HlidacStatu.MCPServer.Tools
 {
@@ -92,27 +93,27 @@ namespace HlidacStatu.MCPServer.Tools
             Entities.Firma.Zatrideni.SubjektyObory type
             )
         {
-            return await AuditRepo.AddWithElapsedTimeMeasure(
+            return await AuditRepo.AddWithElapsedTimeMeasureAsync(
                 Audit.Operations.Call,
                 server?.ServerOptions?.KnownClientInfo?.Name?.Split('|')?.FirstOrDefault(),
                 server?.ServerOptions?.KnownClientInfo?.Name?.Split('|')?.LastOrDefault(),
                 AuditRepo.GetClassAndMethodName(MethodBase.GetCurrentMethod()), "",
                 AuditRepo.GetMethodParametersWithValues(MethodBase.GetCurrentMethod().GetParameters().Skip(1), type),
-                null, () =>
+                null, async () =>
                 {
 
-                    var res = FirmaRepo.Zatrideni.Subjekty(type)
-                                            .Select(m => new SimpleDetailInfo()
-                                            {
-                                                Ico = m.Ico,
-                                                Jmeno = m.Jmeno,
-                                                Kraj = m.Kraj,
-                                                Source_Url = HlidacStatu.Entities.Firma.GetUrl(m.Ico, false),
-                                            })
-                            .DistinctBy(m => m.Ico)
-                            .ToArray();
+                    var res = (await FirmaCache.GetSubjektyForOborAsync(type))
+                        .Select(m => new SimpleDetailInfo()
+                        {
+                            Ico = m.Ico,
+                            Jmeno = m.Jmeno,
+                            Kraj = m.Kraj,
+                            Source_Url = HlidacStatu.Entities.Firma.GetUrl(m.Ico, false),
+                        })
+                        .DistinctBy(m => m.Ico)
+                        .ToArray();
                     
-                    return Task.FromResult(res);
+                    return res;
                 });
         }
 

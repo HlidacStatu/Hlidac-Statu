@@ -5,6 +5,7 @@
 @using HlidacStatu.Entities
 @using HlidacStatu.Extensions
 @using HlidacStatu.Repositories
+@using HlidacStatu.Repositories.Cache
 
 
 @{
@@ -25,7 +26,7 @@
 }
 
 @{
-    var subjIco = HlidacStatu.Repositories.FirmaRepo.Zatrideni.Subjekty(oborFromId.Value);
+    var subjIco = await FirmaCache.GetSubjektyForOborAsync(oborFromId.Value);
     if (!string.IsNullOrEmpty(Model.kraj))
     {
         subjIco = subjIco

@@ -4,8 +4,7 @@
 @using HlidacStatu.Entities.KIndex
 @using HlidacStatu.Repositories
 @using HlidacStatu.Repositories.Analysis.KorupcniRiziko
-
-@using Microsoft.AspNetCore.Hosting
+@using HlidacStatu.Repositories.Cache
 
 @{
     int? selectedYear = ViewBag.SelectedYear;
@@ -15,7 +14,7 @@
     
     if (!string.IsNullOrWhiteSpace(ViewBag.LadderTitle))
     {
-        ViewBag.Title = ViewBag.LadderTitle + " pro " + ViewBag.SelectedYear;
+        ViewBag.Title = ViewBag.LadderTitle + " pro " + selectedYear;
     }
     if (!string.IsNullOrEmpty(selectedGroup))
     {
@@ -79,10 +78,10 @@
             case "obor":
                 if (selectedPart.HasValue)
                     result = Statistics.GetStatistics(Model.rok)
-                        .SubjektOrderedListPartsCompanyAsc(selectedPart.Value, FirmaRepo.Zatrideni.Subjekty(oborFromId), showNone: true);
+                        .SubjektOrderedListPartsCompanyAsc(selectedPart.Value, await FirmaCache.GetSubjektyForOborAsync(oborFromId), showNone: true);
                 else
                     result = Statistics.GetStatistics(Model.rok)
-                        .SubjektOrderedListKIndexCompanyAsc(FirmaRepo.Zatrideni.Subjekty(oborFromId), showNone: true);
+                        .SubjektOrderedListKIndexCompanyAsc(await FirmaCache.GetSubjektyForOborAsync(oborFromId), showNone: true);
                 ViewBag.LadderTopic = oborFromId.ToNiceDisplayName();
                 ViewBag.LadderTitle = oborFromId.ToNiceDisplayName() + " podle K–Indexu";
                 break;

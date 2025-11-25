@@ -13,6 +13,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using HlidacStatu.Repositories.Cache;
 using Serilog;
 using Manager = Devmasters.Batch.Manager;
 
@@ -79,7 +80,7 @@ namespace HlidacStatu.Repositories
                         icos.AddRange(velkamesta.Split(','));
 
                         icos.AddRange(
-                            FirmaRepo.Zatrideni.Subjekty(Firma.Zatrideni.SubjektyObory.Vse).Select(m => m.Ico));
+                            (await FirmaCache.GetSubjektyForOborAsync(Firma.Zatrideni.SubjektyObory.Vse)).Select(m => m.Ico));
 
                         //nejvice utajujici smluvni strany
                         _logger.Information($"Loading ICOS utajujici smluvni strany");
