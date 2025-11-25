@@ -28,21 +28,21 @@ namespace HlidacStatu.MCPServer.Tools
             string company_Name
           )
         {
-            return await AuditRepo.AddWithElapsedTimeMeasure(
+            return await AuditRepo.AddWithElapsedTimeMeasureAsync(
                 Audit.Operations.Call,
                 server?.ServerOptions?.KnownClientInfo?.Name?.Split('|')?.FirstOrDefault(),
                 server?.ServerOptions?.KnownClientInfo?.Name?.Split('|')?.LastOrDefault(),
                 AuditRepo.GetClassAndMethodName(MethodBase.GetCurrentMethod()), "",
                 AuditRepo.GetMethodParametersWithValues(MethodBase.GetCurrentMethod().GetParameters().Skip(1), ico, company_Name),
-                null, () =>
+                null, async () =>
                 {
 
                     if (string.IsNullOrWhiteSpace(ico) && string.IsNullOrWhiteSpace(company_Name))
                         return null;
 
-                    SubjektFinancialInfo res = FirmaExtensions.GetFinancialInfo(ico, company_Name);
+                    SubjektFinancialInfo res = await FirmaExtensions.GetFinancialInfoAsync(ico, company_Name);
 
-                    return Task.FromResult(res);
+                    return res;
                 });
 
         }
