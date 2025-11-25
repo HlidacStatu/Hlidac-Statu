@@ -3,6 +3,7 @@ using Enyim.Caching.Memcached;
 using HlidacStatu.CachingClients.PostgreSql;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Serilog;
 using ZiggyCreatures.Caching.Fusion;
 using ZiggyCreatures.Caching.Fusion.Serialization.SystemTextJson;
@@ -199,8 +200,6 @@ public static class CacheFactory
             _ => null
             
         };
-
-        
     }
 
     private static ServiceProvider BuildServiceProvider()
@@ -239,6 +238,15 @@ public static class CacheFactory
             options.Protocol = MemcachedProtocol.Text;
             options.Transcoder = "MessagePackTranscoder";
         }, asDistributedCache: true);
+
+        // Hack for memcache, otherwise it is not added as a IDistributed cache
+        services.AddSingleton<IDistributedCache>(sp =>
+        {
+            var service = sp.GetRequiredService<IMemcachedClient>() as MemcachedClient;
+            return (IDistributedCache)service;
+        });
+            
+        
         
         return services.BuildServiceProvider();
     }
