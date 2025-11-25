@@ -15,7 +15,7 @@ public static class FirmaExtensions
     {
         DS.Graphs.Relation.AktualnostType aktualnost = DS.Graphs.Relation.AktualnostType.Nedavny;
 
-        Firma f = NajdiFirmuPodleIcoJmena(ico, name, aktualnost);
+        Firma f = await NajdiFirmuPodleIcoJmenaAsync(ico, name, aktualnost);
 
         if (f == null || f.Valid == false)
         {
@@ -25,7 +25,7 @@ public static class FirmaExtensions
         // do work
         HlidacStatu.DS.Api.Firmy.SubjektDetailInfo res = new();
 
-        res.Business_info = GetFinancialInfo(f.ICO, f.Jmeno);
+        res.Business_info = await GetFinancialInfoAsync(f.ICO, f.Jmeno);
         if (res.Business_info != null)
         {
             //remove here to avoid duplicated data
@@ -40,7 +40,7 @@ public static class FirmaExtensions
         res.Rizika = (await f.InfoFactsAsync()).RenderFacts(4, true, false);
 
 
-        res.Kategorie_Organu_Verejne_Moci = f.KategorieOVMAsync().ConfigureAwait(false).GetAwaiter().GetResult()
+        res.Kategorie_Organu_Verejne_Moci = (await f.KategorieOVMAsync())
             .Select(m => m.nazev)
             .ToArray();
 
@@ -61,7 +61,7 @@ public static class FirmaExtensions
 
 
         //KINDEX
-        Entities.KIndex.KIndexData kindex = f.KindexAsync().ConfigureAwait(false).GetAwaiter().GetResult();
+        Entities.KIndex.KIndexData kindex = await f.KindexAsync();
         if (kindex != null)
         {
             var maxY = HlidacStatu.Util.Consts.CalculatedCurrentYearKIndex;
@@ -223,10 +223,10 @@ public static class FirmaExtensions
         return res;
     }
 
-    public static HlidacStatu.DS.Api.Firmy.SubjektFinancialInfo GetFinancialInfo(string ico, string name)
+    public static async Task<SubjektFinancialInfo> GetFinancialInfoAsync(string ico, string name)
     {
         DS.Graphs.Relation.AktualnostType aktualnost = DS.Graphs.Relation.AktualnostType.Nedavny;
-        Firma f = NajdiFirmuPodleIcoJmena(ico, name, aktualnost);
+        Firma f = await NajdiFirmuPodleIcoJmenaAsync(ico, name, aktualnost);
         if (f == null || f.Valid == false)
         {
             return null;
@@ -239,7 +239,7 @@ public static class FirmaExtensions
         res.Omezeni_Cinnosti = string.IsNullOrWhiteSpace(f.StatusFull()) ? null : f.StatusFull();
 
         res.Kategorie_Organu_Verejne_Moci = null;
-        var _kategorie_Organu_Verejne_Moci = f.KategorieOVMAsync().ConfigureAwait(false).GetAwaiter().GetResult()
+        var _kategorie_Organu_Verejne_Moci = (await f.KategorieOVMAsync())
             .Select(m => m.nazev)
             .ToArray();
         if (_kategorie_Organu_Verejne_Moci?.Length > 0)
@@ -290,7 +290,7 @@ public static class FirmaExtensions
         return res;
     }
 
-    private static Firma NajdiFirmuPodleIcoJmena(string ico, string name,
+    private static async Task<Firma> NajdiFirmuPodleIcoJmenaAsync(string ico, string name,
         DS.Graphs.Relation.AktualnostType aktualnost = DS.Graphs.Relation.AktualnostType.Nedavny)
     {
         Firma f = null;
@@ -299,8 +299,7 @@ public static class FirmaExtensions
             if (!string.IsNullOrEmpty(name))
             {
                 var fname = Firma.JmenoBezKoncovky(name);
-                var found = FirmaRepo.Searching.FindAllAsync(name, 5, true).ConfigureAwait(false).GetAwaiter()
-                    .GetResult();
+                var found = await FirmaRepo.Searching.FindAllAsync(name, 5, true);
 
                 List<(Firma f, int diffs)> diff = found
                     .Select(m => (m, HlidacStatu.Util.TextTools.LevenshteinDistanceCompute(name, m.Jmeno.Trim())))
