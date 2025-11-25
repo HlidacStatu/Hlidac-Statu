@@ -3,7 +3,6 @@ using Enyim.Caching.Memcached;
 using HlidacStatu.CachingClients.PostgreSql;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.DependencyInjection.Extensions;
 using Serilog;
 using ZiggyCreatures.Caching.Fusion;
 using ZiggyCreatures.Caching.Fusion.Serialization.SystemTextJson;
@@ -202,6 +201,12 @@ public static class CacheFactory
         };
     }
 
+    /// <summary>
+    /// Tady builduju services pro přidání logování do Postgres, FusionCache i Enyim cache
+    /// Taky se vytváří singletony pro L2 distributed cache.
+    /// Memcached se musí přidat ještě solo jako IDistributed (pro fusioncache)
+    /// </summary>
+    /// <returns></returns>
     private static ServiceProvider BuildServiceProvider()
     {
         IServiceCollection services = new ServiceCollection();
