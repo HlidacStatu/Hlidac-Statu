@@ -39,7 +39,7 @@ namespace HlidacStatu.MCPServer.Tools
                     if (string.IsNullOrWhiteSpace(ico) && string.IsNullOrWhiteSpace(company_Name))
                         return null;
 
-                    SubjektFinancialInfo res = HlidacStatu.Repositories.FirmaRepo.GetFinancialInfo(ico, company_Name);
+                    SubjektFinancialInfo res = FirmaExtensions.GetFinancialInfo(ico, company_Name);
 
                     return Task.FromResult(res);
                 });
@@ -76,7 +76,7 @@ namespace HlidacStatu.MCPServer.Tools
                     if (Util.DataValidators.CheckCZICO(ico) == false)
                         return null;
 
-                    DS.Api.Firmy.SubjektDetailInfo res = await HlidacStatu.Repositories.FirmaRepo.GetDetailInfoAsync(ico, company_Name);
+                    DS.Api.Firmy.SubjektDetailInfo res = await FirmaExtensions.GetDetailInfoAsync(ico, company_Name);
 
                     return res;
                 });

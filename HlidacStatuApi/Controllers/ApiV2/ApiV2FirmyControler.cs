@@ -3,6 +3,7 @@ using System.Linq.Expressions;
 using HlidacStatu.Datasets;
 using HlidacStatu.DS.Api.Firmy;
 using HlidacStatu.Entities;
+using HlidacStatu.Extensions;
 using HlidacStatu.Repositories;
 using HlidacStatuApi.Models;
 using Microsoft.AspNetCore.Authorization;
@@ -166,7 +167,7 @@ namespace HlidacStatuApi.Controllers.ApiV2
                 var icosList = icos.Split('|').Select(i => i.Trim()).ToList();
                 foreach (var ico in icosList)
                 {
-                    var inf = await HlidacStatu.Repositories.FirmaRepo.GetDetailInfoAsync(ico,"");
+                    var inf = await FirmaExtensions.GetDetailInfoAsync(ico,"");
                     if (inf != null)
                     {
                         res.Add(inf);
@@ -178,7 +179,7 @@ namespace HlidacStatuApi.Controllers.ApiV2
                 var namesList = names.Split('|').Select(i => i.Trim()).ToList();
                 foreach (var nam in namesList)
                 {
-                    var inf = await HlidacStatu.Repositories.FirmaRepo.GetDetailInfoAsync("", nam);
+                    var inf = await FirmaExtensions.GetDetailInfoAsync("", nam);
                     if (inf != null)
                     {
                         res.Add(inf);
