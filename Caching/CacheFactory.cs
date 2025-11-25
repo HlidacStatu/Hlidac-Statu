@@ -9,7 +9,6 @@ using ZiggyCreatures.Caching.Fusion.Serialization.SystemTextJson;
 
 namespace Caching;
 
-//todo: add jittering...!
 
 public static class CacheFactory
 {
@@ -151,6 +150,9 @@ public static class CacheFactory
 
     public static IFusionCache CreateNew(CacheType cacheType, string cachePrefix)
     {
+        //build service provider
+        _serviceProvider ??= BuildServiceProvider();
+        
         bool isDistributedCache = cacheType == CacheType.L2Memcache || cacheType == CacheType.L2PostgreSql;
 
         var logger = _serviceProvider?.GetService<Microsoft.Extensions.Logging.ILogger<FusionCache>?>();
