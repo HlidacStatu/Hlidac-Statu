@@ -18,6 +18,7 @@ using HlidacStatu.Repositories.Analysis.KorupcniRiziko;
 using Serilog;
 using HlidacStatu.DS.Api;
 using HlidacStatu.Entities.Facts;
+using HlidacStatu.Repositories.Cache;
 
 namespace HlidacStatu.Repositories
 {
@@ -49,22 +50,9 @@ namespace HlidacStatu.Repositories
 
             ParallelOptions po = new ParallelOptions();
             po.MaxDegreeOfParallelism = debug ? 1 : 5; // 10 bylo moc - timeoutoval nám elastic na osobách => hlidacsmluv
-
+            
+            //todo: tohle se dá zlikvidovat
             Parallel.Invoke(po,
-                () =>
-                {
-                    try
-                    {
-                        _logger.Information("GenerateAutocomplete Loading cities");
-                        cities = LoadCities(logOutputFunc,progressOutputFunc);
-                        _logger.Information("GenerateAutocomplete Loading cities done");
-                    }
-                    catch (Exception e)
-                    {
-                        _logger.Error(e, "GenerateAutocomplete Cities error ");
-                    }
-                },
-
                 () =>
                 {
                     try
@@ -148,6 +136,17 @@ namespace HlidacStatu.Repositories
                     }
                 }
             );
+            
+            try
+            {
+                _logger.Information("GenerateAutocomplete Loading cities");
+                cities = await LoadCitiesAsync(logOutputFunc,progressOutputFunc);
+                _logger.Information("GenerateAutocomplete Loading cities done");
+            }
+            catch (Exception e)
+            {
+                _logger.Error(e, "GenerateAutocomplete Cities error ");
+            }
             
             try
             {
@@ -345,12 +344,12 @@ namespace HlidacStatu.Repositories
         }
 
         //obce
-        private static List<Autocomplete> LoadCities(Action<string> logOutputFunc = null, Action<ActionProgressData> progressOutputFunc = null)
+        private static async Task<List<Autocomplete>> LoadCitiesAsync(Action<string> logOutputFunc = null, Action<ActionProgressData> progressOutputFunc = null)
         {
 
             var lockObj = new object();
             List<Autocomplete> results = new List<Autocomplete>();
-            var obce = HlidacStatu.Repositories.FirmaRepo.Zatrideni.Subjekty(Firma.Zatrideni.SubjektyObory.Obce);
+            var obce = await FirmaCache.GetSubjektyForOborAsync(Firma.Zatrideni.SubjektyObory.Obce);
             Devmasters.Batch.Manager.DoActionForAll<Firma.Zatrideni.Item>(obce,
                 (f) =>
                 {

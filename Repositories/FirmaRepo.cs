@@ -31,21 +31,10 @@ namespace HlidacStatu.Repositories
 
         private static readonly ILogger _logger = Log.ForContext(typeof(FirmaRepo));
 
-        private static async Task PrepareBeforeSaveAsync(Firma firma, bool updateLastUpdateValue = true)
-        {
-            firma.JmenoAscii = TextUtil.RemoveDiacritics(firma.Jmeno);
-            await firma.SetTypAsync();
-
-        }
-
         public static void Save(Firma firma)
         {
-            //PrepareBeforeSaveAsync(firma).GetAwaiter().GetResult();
-
-
             string sqlNACE = @"INSERT into firma_NACE(ico, nace) values(@ico,@nace)";
-            //string sqlDS = @"INSERT into firma_DS(ico, DatovaSchranka) values(@ico,@DatovaSchranka)";
-
+         
             try
             {
                 using (DbEntities db = new DbEntities())

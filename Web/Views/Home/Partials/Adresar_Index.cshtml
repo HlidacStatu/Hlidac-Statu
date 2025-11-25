@@ -3,6 +3,7 @@
 @using HlidacStatu.Entities
 @using Devmasters.Enums
 @using System.Linq
+@using HlidacStatu.Repositories.Cache
 
 @{
 
@@ -39,7 +40,7 @@
                     {
                         <a href="/adresar/@(item.ToString())@(Model.zakazky ? "?vz=1":"")" class="btn btn-hs btn-secondary">
                             <span class="text-gray">Zobrazit</span> @(item.ToNiceDisplayName())
-                            <span class="text-gray">(@(HlidacStatu.Repositories.FirmaRepo.Zatrideni.Subjekty(item)?.Length ?? 0))</span>
+                            <span class="text-gray">(@((await FirmaCache.GetSubjektyForOborAsync(item))?.Length ?? 0))</span>
                         </a>
                     }
                 }

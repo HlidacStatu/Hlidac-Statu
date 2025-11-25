@@ -21,6 +21,7 @@ using HlidacStatu.MLUtil.Splitter;
 using System.Text;
 using HlidacStatu.AI.LLM.Clients.Options;
 using HlidacStatu.Entities.AI;
+using HlidacStatu.Repositories.Cache;
 
 
 namespace HlidacStatu.Repositories
@@ -206,7 +207,7 @@ namespace HlidacStatu.Repositories
             return _result.Take(numOfResults).ToArray();
         }
 
-        private static void PrepareBeforeSave(Smlouva smlouva, bool updateLastUpdateValue = true)
+        private static async Task PrepareBeforeSaveAsync(Smlouva smlouva, bool updateLastUpdateValue = true)
         {
             smlouva.SVazbouNaPolitiky = smlouva.JeSmlouva_S_VazbouNaPolitiky(Relation.AktualnostType.Libovolny);
             smlouva.SVazbouNaPolitikyNedavne = smlouva.JeSmlouva_S_VazbouNaPolitiky(Relation.AktualnostType.Nedavny);
@@ -298,7 +299,7 @@ namespace HlidacStatu.Repositories
 
 
             bool zadavatelUstredniOrganStatniSpravy = false;
-            var vsechny_ustredni_organy_statni_spravy = HlidacStatu.Repositories.FirmaRepo.Zatrideni.Subjekty(Firma.Zatrideni.SubjektyObory.Vsechny_ustredni_organy_statni_spravy);
+            var vsechny_ustredni_organy_statni_spravy = await FirmaCache.GetSubjektyForOborAsync(Firma.Zatrideni.SubjektyObory.Vsechny_ustredni_organy_statni_spravy);
             zadavatelUstredniOrganStatniSpravy = vsechny_ustredni_organy_statni_spravy.Any(m => m.Ico == smlouva.Platce.ico);
 
             foreach (var limit in limity)
@@ -600,7 +601,7 @@ namespace HlidacStatu.Repositories
 
 
             if (skipPrepareBeforeSave == false)
-                PrepareBeforeSave(smlouva, updateLastUpdateValue);
+                await PrepareBeforeSaveAsync(smlouva, updateLastUpdateValue);
 
             //update statistics of subjects
             bool updateStat = false;

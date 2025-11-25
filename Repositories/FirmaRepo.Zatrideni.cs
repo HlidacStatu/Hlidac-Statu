@@ -2,12 +2,9 @@ using HlidacStatu.Connectors;
 using HlidacStatu.Entities;
 using HlidacStatu.Extensions;
 using HlidacStatu.Util;
-
-
 using System;
 using System.Linq;
 using System.Threading.Tasks;
-
 
 namespace HlidacStatu.Repositories
 {
@@ -15,12 +12,7 @@ namespace HlidacStatu.Repositories
     {
         public static class Zatrideni
         {
-            private static Devmasters.Cache.Memcached.Manager<Firma.Zatrideni.Item[], Firma.Zatrideni.SubjektyObory> instanceByZatrideni
-                = Devmasters.Cache.Memcached.Manager<Firma.Zatrideni.Item[], Firma.Zatrideni.SubjektyObory>.GetSafeInstance("oboryByObor", 
-                    obor => GetSubjektyDirectAsync(obor).ConfigureAwait(false).GetAwaiter().GetResult(),
-                    TimeSpan.FromDays(2),
-                    Devmasters.Config.GetWebConfigValue("HazelcastServers").Split(','));
-            private static async Task<Firma.Zatrideni.Item[]> GetSubjektyDirectAsync(Firma.Zatrideni.SubjektyObory obor)
+            public static async Task<Firma.Zatrideni.Item[]> GetSubjektyDirectAsync(Firma.Zatrideni.SubjektyObory obor)
             {
                 string[] icos = null;
                 string sql = "";
@@ -248,12 +240,6 @@ namespace HlidacStatu.Repositories
 
                 return new string[] { };
             }
-
-            public static Firma.Zatrideni.Item[] Subjekty(Firma.Zatrideni.SubjektyObory obor)
-            {
-                return instanceByZatrideni.Get(obor);
-            }
-
 
             static object _getSubjektyDirectLock = new object();
         }
