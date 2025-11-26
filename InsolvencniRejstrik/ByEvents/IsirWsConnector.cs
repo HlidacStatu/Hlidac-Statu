@@ -43,7 +43,9 @@ namespace InsolvencniRejstrik.ByEvents
 			WsProcessorTask = RunTask(() => WsProcessor(EventsRepository.GetLastEventId()));
 			MessageProcessorTask = RunTask(MessageProcessor);
 			LinkProcessorTask = RunTask(LinkProcessor);
+			#pragma warning disable CSE009
 			var StatsInfo = RunTask(StatsInfoCallback);
+			#pragma warning restore CSE009
 
 			while (MessageProcessorTask.Status == TaskStatus.Running || LinkProcessorTask.Status == TaskStatus.Running)
 			{
@@ -485,7 +487,9 @@ namespace InsolvencniRejstrik.ByEvents
 
 		private Task RunTask(Action action)
 		{
+			#pragma warning disable CSE009
 			var task = TaskFactory.StartNew(action);
+			#pragma warning restore CSE009
 			while (task.Status != TaskStatus.Running) Thread.Sleep(10);
 			return task;
 		}
