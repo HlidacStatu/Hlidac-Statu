@@ -5,7 +5,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Net.Http;
 using System.Text;
+using HlidacStatu.Repositories.Cache;
 using static HlidacStatu.Entities.Osoba;
 
 namespace HlidacStatu.Repositories
@@ -14,51 +16,52 @@ namespace HlidacStatu.Repositories
     {
         public partial class Merk
         {
-
             /*
              How to create this code
             1. curl -X GET -H 'Authorization: Token merk-api-token' 'https://api.merk.cz//enums/?country_code=cz' > merk.enums.json
             2. use this prompt in Claude (split json into smaller parts if needed):
                "Analyze attached JSON.
-                In JSON , first level is list of categories. 
-                Create C# class, which loads this JSON into memory and contains c# convert function for every category. 
+                In JSON , first level is list of categories.
+                Create C# class, which loads this JSON into memory and contains c# convert function for every category.
                 C# functions must convert keys to corresponding values for every category.
                 Keep lookup keys as string, don't convert it to integer or other type."
              */
 
             public class MerkEnumConverters
             {
-                private static readonly ILogger _logger = Log.ForContext(typeof(MerkEnumConverters));
+                private static string LoadMerkEnums()
+                {
+                    //curl -X GET -H 'Authorization: Token merk-api-token' 'https://api.merk.cz//enums/?country_code=cz'
+                    string s = "";
+                    try
+                    {
+                        Dictionary<string, string> headers = new();
+                        headers.Add("Authorization", "Token " + Devmasters.Config.GetWebConfigValue("MerkApiToken"));
+                        s = Devmasters.Net.HttpClient.Simple.Get(
+                            "https://api.merk.cz//enums/?country_code=cz",
+                            headers: headers);
+                    }
+                    catch (Exception e)
+                    {
+                        try
+                        {
+                            _logger.Error(e, "Error loading Merk enums from API");
+                            s = Devmasters.Net.HttpClient.Simple.Get(
+                                "https://somedata.hlidacstatu.cz/appdata/merk.enums.json");
+                        }
+                        catch (Exception ex)
+                        {
+                            _logger.Error(ex, "Error loading Merk enums from somedata.hlidacstatu.cz");
+                        }
+                    }
 
-                private static Devmasters.Cache.AWS_S3.AutoUpdatebleCache<string> _merkEnumsCache =
-                   new Devmasters.Cache.AWS_S3.AutoUpdatebleCache<string>(
-                       new string[] { Devmasters.Config.GetWebConfigValue("Minio.Cache.Endpoint") }, Devmasters.Config.GetWebConfigValue("Minio.Cache.Bucket"), Devmasters.Config.GetWebConfigValue("Minio.Cache.AccessKey"), Devmasters.Config.GetWebConfigValue("Minio.Cache.SecretKey"),
-                   TimeSpan.FromDays(20), "merk.enums.json", (obj) =>
-                   {
-                       //curl -X GET -H 'Authorization: Token merk-api-token' 'https://api.merk.cz//enums/?country_code=cz'
-                       string s = "";
-                       try
-                       {
-                           Dictionary<string, string> headers = new();
-                           headers.Add("Authorization", "Token " + Devmasters.Config.GetWebConfigValue("MerkApiToken"));
+                    return s;
+                }
 
-                           s = Devmasters.Net.HttpClient.Simple.GetAsync("https://api.merk.cz//enums/?country_code=cz", headers: headers)
-                               .ConfigureAwait(false).GetAwaiter().GetResult();
-                       }
-                       catch (Exception e)
-                       {
-                           try
-                           {
-                               _logger.Error(e, "Error loading Merk enums from API");
-                               s = Devmasters.Net.HttpClient.Simple.GetAsync("https://somedata.hlidacstatu.cz/appdata/merk.enums.json").Result;
-                           }
-                           catch (Exception ex)
-                           {
-                               _logger.Error(e, "Error loading Merk enums from somedata.hlidacstatu.cz");
-                           }
-                       }
-                       return s;
-                   }, null);
+                public static CzechEnumsData GetMerkEnums()
+                {
+                    return JsonConvert.DeserializeObject<CzechEnumsData>(LoadMerkEnums());
+                }
 
                 // Main loader class with conversion methods
                 private static CzechEnumsData _data;
@@ -68,11 +71,11 @@ namespace HlidacStatu.Repositories
                     _data = new CzechEnumsData(); //falback to empty data if not loaded
                     try
                     {
-                        _data = JsonConvert.DeserializeObject<CzechEnumsData>(_merkEnumsCache.Get());
-
+                        _data = FirmaCache.GetMerkEnums();
                     }
                     catch (Exception e)
                     {
+                        _logger.Error(e, "Error loading Merk enums from cache");
                     }
                 }
 
@@ -353,7 +356,9 @@ namespace HlidacStatu.Repositories
 
                     return _data.CompanyIndustry?.TryGetValue(key, out var value) == true ? value : null;
                 }
-                public static string ConvertCompanyIndustryToFullName(string key, bool wholePath, bool includedB2B_B2C, string delimiter = " - ")
+
+                public static string ConvertCompanyIndustryToFullName(string key, bool wholePath, bool includedB2B_B2C,
+                    string delimiter = " - ")
                 {
                     if (string.IsNullOrWhiteSpace(key))
                         return null;
@@ -419,30 +424,69 @@ namespace HlidacStatu.Repositories
                 }
 
                 // Utility methods to get all keys for a category
-                public static IEnumerable<string> GetCountryCodeKeys() => _data.CountryCodes?.Keys?.ToArray() ?? Array.Empty<string>();
-                public static IEnumerable<string> GetCompanyFinancialStatementKeys() => _data.CompanyFinancialStatements?.Keys?.ToArray() ?? Array.Empty<string>();
-                public static IEnumerable<string> GetCompanyMagnitudeKeys() => _data.CompanyMagnitude?.Keys?.ToArray() ?? Array.Empty<string>();
-                public static IEnumerable<string> GetCompanyOwningTypeKeys() => _data.CompanyOwningType?.Keys?.ToArray() ?? Array.Empty<string>();
-                public static IEnumerable<string> GetDistrictKeys() => _data.District?.Keys?.ToArray() ?? Array.Empty<string>();
-                public static IEnumerable<string> GetCompanyLicenseTypeKeys() => _data.CompanyLicenseType?.Keys?.ToArray() ?? Array.Empty<string>();
-                public static IEnumerable<string> GetRegionKeys() => _data.Region?.Keys?.ToArray() ?? Array.Empty<string>();
-                public static IEnumerable<string> GetCompanyInsolvencyTypeKeys() => _data.CompanyInsolvencyType?.Keys?.ToArray() ?? Array.Empty<string>();
-                public static IEnumerable<string> GetCompanyEventsKeys() => _data.CompanyEvents?.Keys?.ToArray() ?? Array.Empty<string>();
-                public static IEnumerable<string> GetCompanyInsolvencyStatusKeys() => _data.CompanyInsolvencyStatuses?.Keys?.ToArray() ?? Array.Empty<string>();
-                public static IEnumerable<string> GetCompanyStatusKeys() => _data.CompanyStatus?.Keys?.ToArray() ?? Array.Empty<string>();
-                public static IEnumerable<string> GetCompanyBusinessPremisesTypeKeys() => _data.CompanyBusinessPremisesTypes?.Keys?.ToArray() ?? Array.Empty<string>();
-                public static IEnumerable<string> GetCompanyEsiStatusKeys() => _data.CompanyEsiStatus?.Keys?.ToArray() ?? Array.Empty<string>();
-                public static IEnumerable<string> GetCompanyEventsActionKeys() => _data.CompanyEventsActions?.Keys?.ToArray() ?? Array.Empty<string>();
-                public static IEnumerable<string> GetCompanyLicenseStatusKeys() => _data.CompanyLicenseStatus?.Keys?.ToArray() ?? Array.Empty<string>();
-                public static IEnumerable<string> GetBankKeys() => _data.Banks?.Keys?.ToArray() ?? Array.Empty<string>();
-                public static IEnumerable<string> GetCompanyRoleKeys() => _data.CompanyRole?.Keys?.ToArray() ?? Array.Empty<string>();
-                public static IEnumerable<string> GetCompanyIndustryKeys() => _data.CompanyIndustry?.Keys?.ToArray() ?? Array.Empty<string>();
-                public static IEnumerable<string> GetCompanyCourtKeys() => _data.CompanyCourt?.Keys?.ToArray() ?? Array.Empty<string>();
-                public static IEnumerable<string> GetCompanyLegalFormKeys() => _data.CompanyLegalForm?.Keys?.ToArray() ?? Array.Empty<string>();
-                public static IEnumerable<string> GetCompanyTurnoverKeys() => _data.CompanyTurnover?.Keys?.ToArray() ?? Array.Empty<string>();
+                public static IEnumerable<string> GetCountryCodeKeys() =>
+                    _data.CountryCodes?.Keys?.ToArray() ?? Array.Empty<string>();
+
+                public static IEnumerable<string> GetCompanyFinancialStatementKeys() =>
+                    _data.CompanyFinancialStatements?.Keys?.ToArray() ?? Array.Empty<string>();
+
+                public static IEnumerable<string> GetCompanyMagnitudeKeys() =>
+                    _data.CompanyMagnitude?.Keys?.ToArray() ?? Array.Empty<string>();
+
+                public static IEnumerable<string> GetCompanyOwningTypeKeys() =>
+                    _data.CompanyOwningType?.Keys?.ToArray() ?? Array.Empty<string>();
+
+                public static IEnumerable<string> GetDistrictKeys() =>
+                    _data.District?.Keys?.ToArray() ?? Array.Empty<string>();
+
+                public static IEnumerable<string> GetCompanyLicenseTypeKeys() =>
+                    _data.CompanyLicenseType?.Keys?.ToArray() ?? Array.Empty<string>();
+
+                public static IEnumerable<string> GetRegionKeys() =>
+                    _data.Region?.Keys?.ToArray() ?? Array.Empty<string>();
+
+                public static IEnumerable<string> GetCompanyInsolvencyTypeKeys() =>
+                    _data.CompanyInsolvencyType?.Keys?.ToArray() ?? Array.Empty<string>();
+
+                public static IEnumerable<string> GetCompanyEventsKeys() =>
+                    _data.CompanyEvents?.Keys?.ToArray() ?? Array.Empty<string>();
+
+                public static IEnumerable<string> GetCompanyInsolvencyStatusKeys() =>
+                    _data.CompanyInsolvencyStatuses?.Keys?.ToArray() ?? Array.Empty<string>();
+
+                public static IEnumerable<string> GetCompanyStatusKeys() =>
+                    _data.CompanyStatus?.Keys?.ToArray() ?? Array.Empty<string>();
+
+                public static IEnumerable<string> GetCompanyBusinessPremisesTypeKeys() =>
+                    _data.CompanyBusinessPremisesTypes?.Keys?.ToArray() ?? Array.Empty<string>();
+
+                public static IEnumerable<string> GetCompanyEsiStatusKeys() =>
+                    _data.CompanyEsiStatus?.Keys?.ToArray() ?? Array.Empty<string>();
+
+                public static IEnumerable<string> GetCompanyEventsActionKeys() =>
+                    _data.CompanyEventsActions?.Keys?.ToArray() ?? Array.Empty<string>();
+
+                public static IEnumerable<string> GetCompanyLicenseStatusKeys() =>
+                    _data.CompanyLicenseStatus?.Keys?.ToArray() ?? Array.Empty<string>();
+
+                public static IEnumerable<string> GetBankKeys() =>
+                    _data.Banks?.Keys?.ToArray() ?? Array.Empty<string>();
+
+                public static IEnumerable<string> GetCompanyRoleKeys() =>
+                    _data.CompanyRole?.Keys?.ToArray() ?? Array.Empty<string>();
+
+                public static IEnumerable<string> GetCompanyIndustryKeys() =>
+                    _data.CompanyIndustry?.Keys?.ToArray() ?? Array.Empty<string>();
+
+                public static IEnumerable<string> GetCompanyCourtKeys() =>
+                    _data.CompanyCourt?.Keys?.ToArray() ?? Array.Empty<string>();
+
+                public static IEnumerable<string> GetCompanyLegalFormKeys() =>
+                    _data.CompanyLegalForm?.Keys?.ToArray() ?? Array.Empty<string>();
+
+                public static IEnumerable<string> GetCompanyTurnoverKeys() =>
+                    _data.CompanyTurnover?.Keys?.ToArray() ?? Array.Empty<string>();
             }
         }
-
-
     }
 }

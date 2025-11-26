@@ -7,7 +7,7 @@ using Serilog;
 using ZiggyCreatures.Caching.Fusion;
 using ZiggyCreatures.Caching.Fusion.Serialization.SystemTextJson;
 
-namespace Caching;
+namespace Hlidacstatu.Caching;
 
 
 public static class CacheFactory

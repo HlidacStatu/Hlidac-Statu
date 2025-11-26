@@ -12,7 +12,7 @@
     <PackageReference Include="Devmasters.Core" Version="8.2.4" />
     <PackageReference Include="Devmasters.DT" Version="8.1.3" />
     <PackageReference Include="Devmasters.Lang" Version="8.1.1" />
-    <PackageReference Include="Devmasters.Net" Version="8.1.1" />
+    <PackageReference Include="Devmasters.Net" Version="8.1.7" />
     <PackageReference Include="Microsoft.AspNetCore.Http.Features" Version="5.0.17" />
     <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="9.0.7" />
