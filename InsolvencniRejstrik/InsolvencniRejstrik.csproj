@@ -52,7 +52,7 @@
       <Version>8.2.4</Version>
     </PackageReference>
     <PackageReference Include="Devmasters.Net">
-      <Version>8.1.1</Version>
+      <Version>8.1.7</Version>
     </PackageReference>
     <PackageReference Include="EntityFramework">
       <Version>6.5.1</Version>

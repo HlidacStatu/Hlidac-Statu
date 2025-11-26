@@ -1,7 +1,6 @@
 using Devmasters;
 
 using HlidacStatu.Entities;
-using HlidacStatu.Repositories.Searching;
 using HlidacStatu.Searching;
 using Nest;
 
@@ -10,7 +9,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using HlidacStatu.Connectors;
-using HlidacStatu.Searching;
 
 namespace HlidacStatu.Repositories
 {
@@ -18,12 +16,8 @@ namespace HlidacStatu.Repositories
     {
         public static class Searching
         {
-            static Searching()
-            {
-                AllValues = GetAllValuesAsync().ConfigureAwait(false).GetAwaiter().GetResult();
-            }
-
-            public readonly static Dictionary<int, string[]> AllValues = new();
+            private static readonly Lazy<Task<Dictionary<int, string[]>>> AllValuesLazy = new(GetAllValuesAsync);
+            public static async Task<Dictionary<int, string[]>> AllValuesAsync() => await AllValuesLazy.Value;
 
             private static async Task<Dictionary<int, string[]>> GetAllValuesAsync()
             {
@@ -42,7 +36,7 @@ namespace HlidacStatu.Repositories
 
                 string modifQ = SimpleQueryCreator
                     .GetSimpleQuery(query,
-                        new IRule[] { new Firmy_OVMKategorie(AllValues) })
+                        new IRule[] { new Firmy_OVMKategorie(await AllValuesAsync()) })
                     .FullQuery();
 
                 string[] specifiedIcosInQuery =
