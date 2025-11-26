@@ -9,7 +9,7 @@
     int pocetDomacnosti = 4347840;
 //    int pocetPracujicich = 5731376 + 160474; // https://www.czso.cz/documents/10180/45709978/300002171132.pdf/8fe48ed6-1480-47f4-b340-a9cef22e9715?version=1.0
 
-    var ds = DataSet.CachedDatasets.Get("pomoc-covid");
+    var ds = DataSet.GetCachedDataset("pomoc-covid");
     var data = covid_pomoc.VsechnaPomoc();
 
     string sprima = "Přímá podpora";

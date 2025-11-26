@@ -9,7 +9,7 @@ namespace HlidacStatu.Datasets.TransparentniUcty
     public class BankovniUcet
     {
         private static DataSet _client =
-            DataSet.CachedDatasets.Get("transparentni-ucty");
+            DataSet.GetCachedDataset("transparentni-ucty");
 
         public string Id
         {

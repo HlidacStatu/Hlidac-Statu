@@ -2,12 +2,13 @@ using HlidacStatu.Datasets;
 using HlidacStatu.Entities;
 
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace HlidacStatu.XLib.Watchdogs
 {
     public static class WatchdogsExtension
     {
-        public static List<IWatchdogProcessor> GetWatchDogProcessors(this WatchDog watchDog)
+        public static async Task<List<IWatchdogProcessor>> GetWatchDogProcessorsAsync(this WatchDog watchDog)
         {
 
             var res = new List<IWatchdogProcessor>();
@@ -24,7 +25,7 @@ namespace HlidacStatu.XLib.Watchdogs
 
             if (watchDog.DataType == WatchDog.AllDbDataType)
             {                                                     //add all datasets
-                foreach (var ds in DataSetDB.ProductionDataSets.Get())
+                foreach (var ds in await DataSetCache.GetProductionDatasetsAsync())
                 {
                     res.Add(new DataSetWatchdogProcessor(watchDog, ds));
                 }

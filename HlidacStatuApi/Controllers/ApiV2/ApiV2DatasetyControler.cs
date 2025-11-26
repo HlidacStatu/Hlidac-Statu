@@ -24,9 +24,9 @@ namespace HlidacStatuApi.Controllers.ApiV2
 
             DataSet[] result = null;
             if (HttpContext.User.IsInRole("Admin"))
-                result = DataSetDB.AllDataSets.Get();
+                result = await DataSetCache.GetAllDatasetsAsync();
             else
-                result = DataSetDB.ProductionDataSets.Get();
+                result = await DataSetCache.GetProductionDatasetsAsync();
 
             var dataTasks = result.Select(m => m.RegistrationAsync());
             var data = await Task.WhenAll(dataTasks);
@@ -49,7 +49,7 @@ namespace HlidacStatuApi.Controllers.ApiV2
                 return BadRequest($"Hodnota id chybí.");
             }
 
-            var ds = DataSet.CachedDatasets.Get(datasetId);
+            var ds = DataSet.GetCachedDataset(datasetId);
             if (ds == null)
             {
                 return NotFound($"Dataset {datasetId} nenalezen.");
@@ -83,7 +83,7 @@ namespace HlidacStatuApi.Controllers.ApiV2
             {
                 HttpContext.Items.Add("track_query", dotaz);
                 
-                var ds = DataSet.CachedDatasets.Get(datasetId?.ToLower());
+                var ds = DataSet.GetCachedDataset(datasetId?.ToLower());
                 if (ds == null)
                 {
                     return BadRequest($"Dataset [{datasetId}] nenalezen.");
@@ -258,7 +258,7 @@ namespace HlidacStatuApi.Controllers.ApiV2
         {
             try
             {
-                var ds = DataSet.CachedDatasets.Get(datasetId.ToLower());
+                var ds = DataSet.GetCachedDataset(datasetId.ToLower());
                 var value = await ds.GetDataObjAsync(itemId);
                 //remove from item
                 if (value == null)
@@ -316,7 +316,7 @@ namespace HlidacStatuApi.Controllers.ApiV2
             datasetId = datasetId.ToLower();
             try
             {
-                var ds = DataSet.CachedDatasets.Get(datasetId);
+                var ds = DataSet.GetCachedDataset(datasetId);
                 if (ds is null)
                 {
                     return NotFound($"Dataset nenalezen.");
@@ -415,7 +415,7 @@ namespace HlidacStatuApi.Controllers.ApiV2
                 return BadRequest(message);
             }
 
-            var ds = DataSet.CachedDatasets.Get(datasetId);
+            var ds = DataSet.GetCachedDataset(datasetId);
             if (ds is null)
             {
                 return NotFound($"Dataset nenalezen.");
@@ -452,7 +452,7 @@ namespace HlidacStatuApi.Controllers.ApiV2
         {
             try
             {
-                var ds = DataSet.CachedDatasets.Get(datasetId.ToLower());
+                var ds = DataSet.GetCachedDataset(datasetId.ToLower());
                 if (ds is null)
                 {
                     return NotFound($"Dataset {datasetId} nenalezen.");

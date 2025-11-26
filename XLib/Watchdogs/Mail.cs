@@ -90,7 +90,7 @@ namespace HlidacStatu.XLib.Watchdogs
 
 
                 //specific Watchdog
-                List<IWatchdogProcessor> wdProcessorsForWD1 = wd1.GetWatchDogProcessors();
+                List<IWatchdogProcessor> wdProcessorsForWD1 = await wd1.GetWatchDogProcessorsAsync();
 
                 DateTime? fromDate = fromSpecificDate;
                 DateTime? toDate = toSpecificDate;

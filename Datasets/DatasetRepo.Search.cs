@@ -36,7 +36,7 @@ namespace HlidacStatu.Datasets
                 string query, bool addKeyword)
             {
                 Dictionary<DataSet, string> queries = new Dictionary<DataSet, string>();
-                foreach (var ds in DataSetDB.ProductionDataSets.Get())
+                foreach (var ds in await DataSetCache.GetProductionDatasetsAsync())
                 {
                     var qSearch = await GetSpecificQueriesForDatasetAsync(ds, mappingProperty, query, addKeyword);
                     if (!string.IsNullOrEmpty(qSearch))
@@ -76,7 +76,7 @@ namespace HlidacStatu.Datasets
                 return $"( {q} )";
             }
             
-            public static async Task<bool> CheckIfAnyRecordExistAsync(string query, IEnumerable<DataSet> datasets = null)
+            public static async Task<bool> CheckIfAnyRecordExistAsync(string query, IEnumerable<DataSet>? datasets = null)
             {
                 
                 [UnsafeAccessor(UnsafeAccessorKind.Method, Name = "get_ContainedQuery")]
@@ -99,7 +99,7 @@ namespace HlidacStatu.Datasets
                 if (string.IsNullOrEmpty(query))
                     return false;
 
-                datasets ??= DataSetDB.ProductionDataSets.Get();
+                datasets ??= await DataSetCache.GetProductionDatasetsAsync();
 
                 var esClient = Manager.GetESClient();
 

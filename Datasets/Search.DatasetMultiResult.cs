@@ -1,10 +1,7 @@
-﻿using HlidacStatu.Repositories.Searching;
-
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using HlidacStatu.Connectors;
 
 namespace HlidacStatu.Datasets
 {
@@ -81,7 +78,7 @@ namespace HlidacStatu.Datasets
                 }
 
                 if (datasets == null)
-                    datasets = DataSetDB.ProductionDataSets.Get();
+                    datasets = await DataSetCache.GetProductionDatasetsAsync();
 
                 ParallelOptions po = new ParallelOptions();
                 po.MaxDegreeOfParallelism = System.Diagnostics.Debugger.IsAttached ? 1 : po.MaxDegreeOfParallelism;

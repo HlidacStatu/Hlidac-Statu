@@ -9,7 +9,7 @@
     Layout = null;
 
     DataSet ds =
-        DataSet.CachedDatasets.Get((string)Model);
+        DataSet.GetCachedDataset((string)Model);
     var reg = ds.RegistrationAsync();
 
     var politiciVds = ds.ESClient.Search<object>(s => s

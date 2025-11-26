@@ -643,7 +643,7 @@
     }
 
     @{
-        var datasetsToSearch = DataSetDB.ProductionDataSets.Get();
+        var datasetsToSearch = await DataSetCache.GetProductionDatasetsAsync();
         var dsQuery = $"( OsobaId:{Model.NameId} ) ";
         var dsSearch = await HlidacStatu.Datasets.Search.DatasetMultiResult.GeneralSearchAsync(dsQuery,
         datasets: datasetsToSearch,
@@ -654,7 +654,7 @@
         <div>
             <h4>@(Model.FullName()) v dalších databázích</h4>
             <p class="text-muted sub-header-info">
-                Na hlídači máme kromě hlavních databází @(DataSetDB.AllDataSets.Get()?.Count().ToString() ?? "") dalších
+                Na hlídači máme kromě hlavních databází @((await DataSetCache.GetAllDatasetsAsync())?.Count().ToString() ?? "") dalších
                 menších databází.
                 Zde vám podrobně vypíšeme, co jsme v nich o @Model.FullName() našli.
             </p>

@@ -110,7 +110,7 @@
     Layout = "_ReportLayout";
 
 
-    var ds = DataSet.CachedDatasets.Get("ministri");
+    var ds = DataSet.GetCachedDataset("ministri");
 
     Dictionary<int, Tuple<DateTime, string>> obdobi = new()
     {

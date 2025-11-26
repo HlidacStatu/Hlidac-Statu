@@ -308,7 +308,7 @@ else
 
             <!-- mobile menu items below -->
             <li class="level2">
-                <a href="/data">Další databáze<sup style="top:0;text-decoration:none;color:#777;">@(DataSetDB.AllDataSets.Get()?.Count().ToString() ?? "")</sup></a>
+                <a href="/data">Další databáze<sup style="top:0;text-decoration:none;color:#777;">@((await DataSetCache.GetAllDatasetsAsync())?.Count().ToString() ?? "")</sup></a>
             </li>
             <li class="level2">
                 <a href="/reporty">Analýzy a reporty<sup style="top:0;text-decoration:none;color:#777;">@(PocetReportu)</sup></a>
@@ -355,7 +355,7 @@ else
     <div class="navbar__level2">
         <ul>
             <li class="">
-                <a href="/data">Další databáze<sup style="top:0;text-decoration:none;color:yellow;">@(DataSetDB.AllDataSets.Get()?.Count().ToString() ?? "")</sup></a>
+                <a href="/data">Další databáze<sup style="top:0;text-decoration:none;color:yellow;">@((await DataSetCache.GetAllDatasetsAsync())?.Count().ToString() ?? "")</sup></a>
             </li>
             <li class="">
                 <a href="/reporty">Analýzy a reporty<sup style="top:0;text-decoration:none;color:yellow;">@(PocetReportu)</sup></a>

@@ -30,7 +30,7 @@ namespace HlidacStatu.Web.Controllers
 
         public async Task<ActionResult> KapacitaNemocnic()
         {
-            var ds = DataSet.CachedDatasets.Get("kapacity-nemocnic");
+            var ds = DataSet.GetCachedDataset("kapacity-nemocnic");
 
 
             NemocniceData?[] nAll = (await ds.SearchDataRawAsync("*", 1, 1000)).Result
