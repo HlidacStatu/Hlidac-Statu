@@ -72,6 +72,7 @@ namespace HlidacStatu.Datasets
             var s = await GetDataAsync(datasetId);
             if (string.IsNullOrEmpty(s))
                 return null;
+            
             return Newtonsoft.Json.JsonConvert.DeserializeObject<Registration>(s, DefaultDeserializationSettings);
         }
 
