@@ -256,6 +256,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RegistrVozidel", "RegistrVo
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WinSystemMonitor", "..\Hlidac-Statu-Private\WinSystemMonitor\WinSystemMonitor.csproj", "{F64495D4-41C4-4F54-9DC7-BF8831428684}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebGenerator", "WebGenerator\WebGenerator.csproj", "{9FCF9E30-B44D-477A-A330-4DFBC9DA4EB7}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -646,6 +648,10 @@ Global
 		{F64495D4-41C4-4F54-9DC7-BF8831428684}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F64495D4-41C4-4F54-9DC7-BF8831428684}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F64495D4-41C4-4F54-9DC7-BF8831428684}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9FCF9E30-B44D-477A-A330-4DFBC9DA4EB7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9FCF9E30-B44D-477A-A330-4DFBC9DA4EB7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9FCF9E30-B44D-477A-A330-4DFBC9DA4EB7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9FCF9E30-B44D-477A-A330-4DFBC9DA4EB7}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -761,6 +767,7 @@ Global
 		{0547C2C5-5199-E547-3B70-05333E915C87} = {44E67082-D88E-41AE-AF07-4739BDC44B2D}
 		{D6091C5D-273B-4D48-8E20-E73B41B3DBE1} = {44E67082-D88E-41AE-AF07-4739BDC44B2D}
 		{F64495D4-41C4-4F54-9DC7-BF8831428684} = {87D50816-C7A9-4B83-A5E3-5EEE0265C2F5}
+		{9FCF9E30-B44D-477A-A330-4DFBC9DA4EB7} = {034892EA-BACB-4BDE-8161-6F8DB0166FB5}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {17143448-F5EA-41D1-886F-00E63AE50798}
