@@ -32,12 +32,13 @@ namespace HlidacStatu.Web
         {
             string connectionString = configuration.GetConnectionString("DefaultConnection");
             // for scoped services (mainly for identity)
-            services.AddDbContext<DbEntities>(options =>
+            services.AddDbContextPool<DbEntities>(options =>
                 options.UseSqlServer(connectionString));
+
             services.AddDatabaseDeveloperPageExceptionFilter();
 
             // Add a DbContext to store your Database Keys
-            services.AddDbContext<HlidacKeysContext>(options =>
+            services.AddDbContextPool<HlidacKeysContext>(options =>
                 options.UseSqlServer(connectionString));
 
             // using Microsoft.AspNetCore.DataProtection;
@@ -47,16 +48,22 @@ namespace HlidacStatu.Web
             
             services.AddCors(options =>
             {
-                options.AddPolicy(name: CORSPolicy,
-                    policy =>
-                    {
-                        policy.SetIsOriginAllowedToAllowWildcardSubdomains()
-                            .WithOrigins("https://*.hlidacstatu.cz", "http://*.hlidacstatu.cz")
-                            .AllowAnyMethod()
-                            .AllowCredentials()
-                            .AllowAnyHeader()
-                            .Build();
-                    });
+                options.AddPolicy(name: CORSPolicy, policy =>
+                {
+                    policy
+                        .SetIsOriginAllowed(origin =>
+                        {
+                            if (Uri.TryCreate(origin, UriKind.Absolute, out var uri))
+                            {
+                                return uri.Scheme == "https" &&
+                                       uri.Host.EndsWith(".hlidacstatu.cz", StringComparison.OrdinalIgnoreCase);
+                            }
+                            return false;
+                        })
+                        .AllowAnyMethod()
+                        .AllowAnyHeader()
+                        .AllowCredentials();
+                });
             });
 
             
@@ -80,14 +87,22 @@ namespace HlidacStatu.Web
 
             services.AddSingleton<AttackerDictionaryService>();
 
-            services.AddResponseCaching();
+            services.AddResponseCaching(options =>
+{
+    //options.MaximumBodySize = 64 * 1024; // tune as needed
+    options.UseCaseSensitivePaths = false;
+});
 
             services.AddSignalR();
 
             services.AddHttpClient(Constants.DefaultHttpClient)
-                .AddTransientHttpErrorPolicy(policyBuilder =>
-                    policyBuilder.WaitAndRetryAsync(
-                        3, retryNumber => TimeSpan.FromMilliseconds(10)));
+                .AddTransientHttpErrorPolicy(pb =>
+                    pb.WaitAndRetryAsync(3, retryAttempt =>
+                    {
+                        var jitter = Random.Shared.NextDouble() * 0.2; // up to 20% jitter
+                        var baseDelay = TimeSpan.FromMilliseconds(100 * Math.Pow(2, retryAttempt));
+                        return TimeSpan.FromMilliseconds(baseDelay.TotalMilliseconds * (1 + jitter));
+                    }));
 
             services
                 .AddHealthChecks()
@@ -178,11 +193,11 @@ namespace HlidacStatu.Web
                 var url = context.Request.Path.Value;
 
                 // Redirect to an external URL
-                if (url?.ToLower()?.StartsWith("/account/") == true)
-                {
-                    context.Response.Redirect("/Identity" + url + context.Request.QueryString.Value);
-                    return;   // short circuit
-                }
+                //if (url?.ToLower()?.StartsWith("/account/") == true)
+                //{
+                //    context.Response.Redirect("/Identity" + url + context.Request.QueryString.Value);
+                //    return;   // short circuit
+                //}
 
                 if (url?.ToLower()?.StartsWith("/cenypracehlidac") == true)
                 {
@@ -199,6 +214,9 @@ namespace HlidacStatu.Web
                 await next(context);
             });
             app.UseRouting();
+
+            app.UseCors(CORSPolicy);
+
             //app.MapHub<HlidacStatu.Web.Framework.SignalR.OllamaSignalRHub>("/ollamaHub");
 
 
@@ -208,7 +226,6 @@ namespace HlidacStatu.Web
             app.UseApiAuthenticationMiddleware();
             app.UseAuthorization();
             
-            app.UseCors(CORSPolicy);
 
             app.UseEndpoints(endpoints => {
                 endpoints.MapHealthChecks("/health"
@@ -275,7 +292,7 @@ namespace HlidacStatu.Web
                 o.Cookie.Domain = ".hlidacstatu.cz";
                 o.Cookie.Name = "HlidacLoginCookie"; // Name of cookie     
                 o.LoginPath = "/Identity/Account/Login"; // Path for the redirect to user login page    
-
+                o.Cookie.SecurePolicy = CookieSecurePolicy.Always;
                 o.Cookie.SameSite = SameSiteMode.Lax;
                 o.Events = new CookieAuthenticationEvents()
                 {
