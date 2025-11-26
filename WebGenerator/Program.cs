@@ -1,4 +1,4 @@
-using HlidacStatu.LibCore.Extensions;
+﻿using HlidacStatu.LibCore.Extensions;
 
 namespace Gen
 {
@@ -8,6 +8,9 @@ namespace Gen
         {
             var builder = WebApplication.CreateBuilder(args);
             builder.ConfigureHostForWeb(args);
+
+            //inicializace statických proměnných
+            Devmasters.Config.Init(builder.Configuration);
 
             // Add services to the container.
             builder.Services.AddControllersWithViews();

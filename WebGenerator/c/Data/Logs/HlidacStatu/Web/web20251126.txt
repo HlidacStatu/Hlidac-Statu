@@ -1,0 +1,318 @@
+2025-11-26 11:03:14.922 +00:00 [ERR] Manager Save
+System.TypeInitializationException: The type initializer for 'HlidacStatu.WebGenerator.Code.RemoteUrlFromWebCache' threw an exception.
+ ---> System.IO.DirectoryNotFoundException: Could not find a part of the path '/app/c:\data\Web\hlidacstatu.cz/wwwroot/content/icons/largetile.png'.
+   at Interop.ThrowExceptionForIoErrno(ErrorInfo errorInfo, String path, Boolean isDirError)
+   at Microsoft.Win32.SafeHandles.SafeFileHandle.Open(String fullPath, FileMode mode, FileAccess access, FileShare share, FileOptions options, Int64 preallocationSize, UnixFileMode openPermissions, Int64& fileLength, UnixFileMode& filePermissions, Boolean failForSymlink, Boolean& wasSymlink, Func`4 createOpenException)
+   at System.IO.File.OpenHandle(String path, FileMode mode, FileAccess access, FileShare share, FileOptions options, Int64 preallocationSize)
+   at System.IO.File.ReadAllBytes(String path)
+   at HlidacStatu.WebGenerator.Code.RemoteUrlFromWebCache..cctor() in C:\Projects\HlidacStatu.GitHub\Hlidac-Statu\WebGenerator\Code\RemoteUrlFromWebCache.cs:line 25
+   --- End of inner exception stack trace ---
+   at HlidacStatu.WebGenerator.Code.RemoteUrlFromWebCache.GetWebPageScreenshotAsync(String url, String ratio, String cacheName, Boolean refreshCache)
+   at HlidacStatu.WebGenerator.Controllers.HomeController.SocialBanner(String id, String v, String t, String st, String b, String f, String img, String rat, String res, String col) in C:\Projects\HlidacStatu.GitHub\Hlidac-Statu\WebGenerator\Controllers\HomeController.cs:line 305
+2025-11-26 11:03:15.015 +00:00 [ERR] An unhandled exception has occurred while executing the request.
+System.IO.FileNotFoundException: Could not find file: content/icons/largetile.png.
+File name: 'content/icons/largetile.png'
+   at Microsoft.AspNetCore.Mvc.Infrastructure.VirtualFileResultExecutor.ExecuteAsync(ActionContext context, VirtualFileResult result)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.ResultNext[TFilter,TFilterAsync](State& next, Scope& scope, Object& state, Boolean& isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.InvokeNextResultFilterAsync[TFilter,TFilterAsync]()
+--- End of stack trace from previous location ---
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.Rethrow(ResultExecutedContextSealed context)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.ResultNext[TFilter,TFilterAsync](State& next, Scope& scope, Object& state, Boolean& isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.InvokeResultFilters()
+--- End of stack trace from previous location ---
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeNextResourceFilter>g__Awaited|25_0(ResourceInvoker invoker, Task lastTask, State next, Scope scope, Object state, Boolean isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.Rethrow(ResourceExecutedContextSealed context)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.Next(State& next, Scope& scope, Object& state, Boolean& isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.InvokeFilterPipelineAsync()
+--- End of stack trace from previous location ---
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeAsync>g__Awaited|17_0(ResourceInvoker invoker, Task task, IDisposable scope)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeAsync>g__Awaited|17_0(ResourceInvoker invoker, Task task, IDisposable scope)
+   at Microsoft.AspNetCore.Authorization.AuthorizationMiddleware.Invoke(HttpContext context)
+   at Microsoft.AspNetCore.Authentication.AuthenticationMiddleware.Invoke(HttpContext context)
+   at Microsoft.AspNetCore.Diagnostics.DeveloperExceptionPageMiddlewareImpl.Invoke(HttpContext context)
+2025-11-26 11:21:09.160 +00:00 [ERR] Manager Save
+System.TypeInitializationException: The type initializer for 'HlidacStatu.WebGenerator.Code.RemoteUrlFromWebCache' threw an exception.
+ ---> System.IO.DirectoryNotFoundException: Could not find a part of the path '/app/c:\data\Web\hlidacstatu.cz/wwwroot/content/icons/largetile.png'.
+   at Interop.ThrowExceptionForIoErrno(ErrorInfo errorInfo, String path, Boolean isDirError)
+   at Microsoft.Win32.SafeHandles.SafeFileHandle.Open(String path, OpenFlags flags, Int32 mode, Boolean failForSymlink, Boolean& wasSymlink, Func`4 createOpenException)
+   at Microsoft.Win32.SafeHandles.SafeFileHandle.Open(String fullPath, FileMode mode, FileAccess access, FileShare share, FileOptions options, Int64 preallocationSize, UnixFileMode openPermissions, Int64& fileLength, UnixFileMode& filePermissions, Boolean failForSymlink, Boolean& wasSymlink, Func`4 createOpenException)
+   at System.IO.File.OpenHandle(String path, FileMode mode, FileAccess access, FileShare share, FileOptions options, Int64 preallocationSize)
+   at System.IO.File.ReadAllBytes(String path)
+   at HlidacStatu.WebGenerator.Code.RemoteUrlFromWebCache..cctor() in C:\Projects\HlidacStatu.GitHub\Hlidac-Statu\WebGenerator\Code\RemoteUrlFromWebCache.cs:line 25
+   --- End of inner exception stack trace ---
+   at HlidacStatu.WebGenerator.Code.RemoteUrlFromWebCache.GetWebPageScreenshotAsync(String url, String ratio, String cacheName, Boolean refreshCache)
+   at HlidacStatu.WebGenerator.Controllers.HomeController.SocialBanner(String id, String v, String t, String st, String b, String f, String img, String rat, String res, String col) in C:\Projects\HlidacStatu.GitHub\Hlidac-Statu\WebGenerator\Controllers\HomeController.cs:line 305
+2025-11-26 11:21:09.235 +00:00 [ERR] An unhandled exception has occurred while executing the request.
+System.IO.FileNotFoundException: Could not find file: content/icons/largetile.png.
+File name: 'content/icons/largetile.png'
+   at Microsoft.AspNetCore.Mvc.Infrastructure.VirtualFileResultExecutor.ExecuteAsync(ActionContext context, VirtualFileResult result)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.ResultNext[TFilter,TFilterAsync](State& next, Scope& scope, Object& state, Boolean& isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.InvokeNextResultFilterAsync[TFilter,TFilterAsync]()
+--- End of stack trace from previous location ---
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.Rethrow(ResultExecutedContextSealed context)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.ResultNext[TFilter,TFilterAsync](State& next, Scope& scope, Object& state, Boolean& isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.InvokeResultFilters()
+--- End of stack trace from previous location ---
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeNextResourceFilter>g__Awaited|25_0(ResourceInvoker invoker, Task lastTask, State next, Scope scope, Object state, Boolean isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.Rethrow(ResourceExecutedContextSealed context)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.Next(State& next, Scope& scope, Object& state, Boolean& isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.InvokeFilterPipelineAsync()
+--- End of stack trace from previous location ---
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeAsync>g__Awaited|17_0(ResourceInvoker invoker, Task task, IDisposable scope)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeAsync>g__Awaited|17_0(ResourceInvoker invoker, Task task, IDisposable scope)
+   at Microsoft.AspNetCore.Authorization.AuthorizationMiddleware.Invoke(HttpContext context)
+   at Microsoft.AspNetCore.Authentication.AuthenticationMiddleware.Invoke(HttpContext context)
+   at Microsoft.AspNetCore.Diagnostics.DeveloperExceptionPageMiddlewareImpl.Invoke(HttpContext context)
+2025-11-26 11:46:45.272 +00:00 [WRN] FUSION [N=FirmaCache I=0HNHCS537VUTA] (O=0HNHCS537VUTC K=FirmaCachesocialbanner_osoba-16x9-david-kyncl): an error occurred while calling the factory
+Devmasters.Net.HttpClient.SimpleHttpClientException: Error accessing url http://localhost:32781/imagebannercore/social?title=David+Kyncl&subtitle=%26nbsp%3B(*1974)%2C+Bez+vazby+na+politiku&body=%3Cul%3E%3Cli%3E%3Cb%3EDavid+Kyncl%3C%2Fb%3E%3C%2Fli%3E%3Cli%3EAnga%C5%BEoval+se++v+%3Cb%3E2+soukr.firm%C3%A1ch%3C%2Fb%3E.+Tyto+subjekty+maj%C3%AD+se+st%C3%A1tem+od+2016+celkem+22+smluv+v+celkov%C3%A9+v%C3%BD%C5%A1i+%3Cb%3E%3Cspan+title%3D%22+++1+759+287+K%C4%8D%22%3E2%26nbsp%3Bmil.%26nbsp%3BK%C4%8D%3C%2Fspan%3E%3C%2Fb%3E.+%3C%2Fli%3E%3Cli%3EJeden+subjekt%2C+ve+kter%C3%A9+se+anga%C5%BEoval%2C+v%26nbsp%3Broce+2025+uzav%C5%99el++6+smluv%3C%2Fb%3E.+%3C%2Fli%3E%3C%2Ful%3E&footer=%C3%9Adaje+k+26.+11.+2025&img=https%3A%2F%2Fwww.hlidacstatu.cz%2FPhoto%2Fdavid-kyncl%3Fphototype%3DSmall&ratio=16x9&color=blue-dark
+ ---> System.Net.Http.HttpRequestException: Connection refused (localhost:32781)
+ ---> System.Net.Sockets.SocketException (111): Connection refused
+   at System.Net.Sockets.Socket.AwaitableSocketAsyncEventArgs.ThrowException(SocketError error, CancellationToken cancellationToken)
+   at System.Net.Sockets.Socket.AwaitableSocketAsyncEventArgs.System.Threading.Tasks.Sources.IValueTaskSource.GetResult(Int16 token)
+   at System.Net.Sockets.Socket.<ConnectAsync>g__WaitForConnectWithCancellation|285_0(AwaitableSocketAsyncEventArgs saea, ValueTask connectTask, CancellationToken cancellationToken)
+   at System.Net.Http.HttpConnectionPool.ConnectToTcpHostAsync(String host, Int32 port, HttpRequestMessage initialRequest, Boolean async, CancellationToken cancellationToken)
+   --- End of inner exception stack trace ---
+   at System.Net.Http.HttpConnectionPool.ConnectToTcpHostAsync(String host, Int32 port, HttpRequestMessage initialRequest, Boolean async, CancellationToken cancellationToken)
+   at System.Net.Http.HttpConnectionPool.ConnectAsync(HttpRequestMessage request, Boolean async, CancellationToken cancellationToken)
+   at System.Net.Http.HttpConnectionPool.CreateHttp11ConnectionAsync(HttpRequestMessage request, Boolean async, CancellationToken cancellationToken)
+   at System.Net.Http.HttpConnectionPool.AddHttp11ConnectionAsync(QueueItem queueItem)
+   at System.Threading.Tasks.TaskCompletionSourceWithCancellation`1.WaitWithCancellationAsync(CancellationToken cancellationToken)
+   at System.Net.Http.HttpConnectionPool.SendWithVersionDetectionAndRetryAsync(HttpRequestMessage request, Boolean async, Boolean doRequestAuth, CancellationToken cancellationToken)
+   at System.Net.Http.DiagnosticsHandler.SendAsyncCore(HttpRequestMessage request, Boolean async, CancellationToken cancellationToken)
+   at System.Net.Http.RedirectHandler.SendAsync(HttpRequestMessage request, Boolean async, CancellationToken cancellationToken)
+   at System.Net.Http.DecompressionHandler.SendAsync(HttpRequestMessage request, Boolean async, CancellationToken cancellationToken)
+   at Microsoft.Extensions.Http.Logging.LoggingHttpMessageHandler.<SendCoreAsync>g__Core|4_0(HttpRequestMessage request, Boolean useAsync, CancellationToken cancellationToken)
+   at Microsoft.Extensions.Http.Logging.LoggingScopeHttpMessageHandler.<SendCoreAsync>g__Core|4_0(HttpRequestMessage request, Boolean useAsync, CancellationToken cancellationToken)
+   at System.Net.Http.HttpClient.<SendAsync>g__Core|83_0(HttpRequestMessage request, HttpCompletionOption completionOption, CancellationTokenSource cts, Boolean disposeCts, CancellationTokenSource pendingRequestsCts, CancellationToken originalCancellationToken)
+   at Devmasters.Net.HttpClient.Simple.CallByteAsync(HttpClient client, HttpMethod method, String url, HttpContent content, Boolean continueOnCapturedContext, Dictionary`2 headers)
+   --- End of inner exception stack trace ---
+   at Devmasters.Net.HttpClient.Simple.CallByteAsync(HttpClient client, HttpMethod method, String url, HttpContent content, Boolean continueOnCapturedContext, Dictionary`2 headers)
+   at Devmasters.Net.HttpClient.Simple.GetRawBytesAsync(String uri, Boolean continueOnCapturedContext, Nullable`1 timeout, Dictionary`2 headers)
+   at HlidacStatu.WebGenerator.Code.RemoteUrlFromWebCache._getBinaryDataFromUrlAsync(KeyAndId ki) in C:\Projects\HlidacStatu.GitHub\Hlidac-Statu\WebGenerator\Code\RemoteUrlFromWebCache.cs:line 52
+   at ZiggyCreatures.Caching.Fusion.Internals.RunUtils.RunAsyncFuncWithTimeoutAsync[TResult](Func`2 asyncFunc, TimeSpan timeout, Boolean cancelIfTimeout, Action`1 timedOutTaskProcessor, CancellationToken token) in /_/src/ZiggyCreatures.FusionCache/Internals/RunUtils.cs:line 69
+   at ZiggyCreatures.Caching.Fusion.FusionCache.GetOrSetEntryInternalAsync[TValue](String operationId, String key, String originalKey, String[] tags, Func`3 factory, Boolean isRealFactory, MaybeValue`1 failSafeDefaultValue, FusionCacheEntryOptions options, Activity activity, CancellationToken token) in /_/src/ZiggyCreatures.FusionCache/FusionCache_Async.cs:line 247
+2025-11-26 11:46:45.476 +00:00 [ERR] WebShot GetData error
+Devmasters.Net.HttpClient.SimpleHttpClientException: Error accessing url http://localhost:32781/imagebannercore/social?title=David+Kyncl&subtitle=%26nbsp%3B(*1974)%2C+Bez+vazby+na+politiku&body=%3Cul%3E%3Cli%3E%3Cb%3EDavid+Kyncl%3C%2Fb%3E%3C%2Fli%3E%3Cli%3EAnga%C5%BEoval+se++v+%3Cb%3E2+soukr.firm%C3%A1ch%3C%2Fb%3E.+Tyto+subjekty+maj%C3%AD+se+st%C3%A1tem+od+2016+celkem+22+smluv+v+celkov%C3%A9+v%C3%BD%C5%A1i+%3Cb%3E%3Cspan+title%3D%22+++1+759+287+K%C4%8D%22%3E2%26nbsp%3Bmil.%26nbsp%3BK%C4%8D%3C%2Fspan%3E%3C%2Fb%3E.+%3C%2Fli%3E%3Cli%3EJeden+subjekt%2C+ve+kter%C3%A9+se+anga%C5%BEoval%2C+v%26nbsp%3Broce+2025+uzav%C5%99el++6+smluv%3C%2Fb%3E.+%3C%2Fli%3E%3C%2Ful%3E&footer=%C3%9Adaje+k+26.+11.+2025&img=https%3A%2F%2Fwww.hlidacstatu.cz%2FPhoto%2Fdavid-kyncl%3Fphototype%3DSmall&ratio=16x9&color=blue-dark
+ ---> System.Net.Http.HttpRequestException: Connection refused (localhost:32781)
+ ---> System.Net.Sockets.SocketException (111): Connection refused
+   at System.Net.Sockets.Socket.AwaitableSocketAsyncEventArgs.ThrowException(SocketError error, CancellationToken cancellationToken)
+   at System.Net.Sockets.Socket.AwaitableSocketAsyncEventArgs.System.Threading.Tasks.Sources.IValueTaskSource.GetResult(Int16 token)
+   at System.Net.Sockets.Socket.<ConnectAsync>g__WaitForConnectWithCancellation|285_0(AwaitableSocketAsyncEventArgs saea, ValueTask connectTask, CancellationToken cancellationToken)
+   at System.Net.Http.HttpConnectionPool.ConnectToTcpHostAsync(String host, Int32 port, HttpRequestMessage initialRequest, Boolean async, CancellationToken cancellationToken)
+   --- End of inner exception stack trace ---
+   at System.Net.Http.HttpConnectionPool.ConnectToTcpHostAsync(String host, Int32 port, HttpRequestMessage initialRequest, Boolean async, CancellationToken cancellationToken)
+   at System.Net.Http.HttpConnectionPool.ConnectAsync(HttpRequestMessage request, Boolean async, CancellationToken cancellationToken)
+   at System.Net.Http.HttpConnectionPool.CreateHttp11ConnectionAsync(HttpRequestMessage request, Boolean async, CancellationToken cancellationToken)
+   at System.Net.Http.HttpConnectionPool.AddHttp11ConnectionAsync(QueueItem queueItem)
+   at System.Threading.Tasks.TaskCompletionSourceWithCancellation`1.WaitWithCancellationAsync(CancellationToken cancellationToken)
+   at System.Net.Http.HttpConnectionPool.SendWithVersionDetectionAndRetryAsync(HttpRequestMessage request, Boolean async, Boolean doRequestAuth, CancellationToken cancellationToken)
+   at System.Net.Http.DiagnosticsHandler.SendAsyncCore(HttpRequestMessage request, Boolean async, CancellationToken cancellationToken)
+   at System.Net.Http.RedirectHandler.SendAsync(HttpRequestMessage request, Boolean async, CancellationToken cancellationToken)
+   at System.Net.Http.DecompressionHandler.SendAsync(HttpRequestMessage request, Boolean async, CancellationToken cancellationToken)
+   at Microsoft.Extensions.Http.Logging.LoggingHttpMessageHandler.<SendCoreAsync>g__Core|4_0(HttpRequestMessage request, Boolean useAsync, CancellationToken cancellationToken)
+   at Microsoft.Extensions.Http.Logging.LoggingScopeHttpMessageHandler.<SendCoreAsync>g__Core|4_0(HttpRequestMessage request, Boolean useAsync, CancellationToken cancellationToken)
+   at System.Net.Http.HttpClient.<SendAsync>g__Core|83_0(HttpRequestMessage request, HttpCompletionOption completionOption, CancellationTokenSource cts, Boolean disposeCts, CancellationTokenSource pendingRequestsCts, CancellationToken originalCancellationToken)
+   at Devmasters.Net.HttpClient.Simple.CallByteAsync(HttpClient client, HttpMethod method, String url, HttpContent content, Boolean continueOnCapturedContext, Dictionary`2 headers)
+   --- End of inner exception stack trace ---
+   at Devmasters.Net.HttpClient.Simple.CallByteAsync(HttpClient client, HttpMethod method, String url, HttpContent content, Boolean continueOnCapturedContext, Dictionary`2 headers)
+   at Devmasters.Net.HttpClient.Simple.GetRawBytesAsync(String uri, Boolean continueOnCapturedContext, Nullable`1 timeout, Dictionary`2 headers)
+   at HlidacStatu.WebGenerator.Code.RemoteUrlFromWebCache._getBinaryDataFromUrlAsync(KeyAndId ki) in C:\Projects\HlidacStatu.GitHub\Hlidac-Statu\WebGenerator\Code\RemoteUrlFromWebCache.cs:line 52
+   at ZiggyCreatures.Caching.Fusion.Internals.RunUtils.RunAsyncFuncWithTimeoutAsync[TResult](Func`2 asyncFunc, TimeSpan timeout, Boolean cancelIfTimeout, Action`1 timedOutTaskProcessor, CancellationToken token) in /_/src/ZiggyCreatures.FusionCache/Internals/RunUtils.cs:line 69
+   at ZiggyCreatures.Caching.Fusion.FusionCache.GetOrSetEntryInternalAsync[TValue](String operationId, String key, String originalKey, String[] tags, Func`3 factory, Boolean isRealFactory, MaybeValue`1 failSafeDefaultValue, FusionCacheEntryOptions options, Activity activity, CancellationToken token) in /_/src/ZiggyCreatures.FusionCache/FusionCache_Async.cs:line 247
+   at ZiggyCreatures.Caching.Fusion.FusionCache.GetOrSetAsync[TValue](String key, Func`3 factory, MaybeValue`1 failSafeDefaultValue, FusionCacheEntryOptions options, IEnumerable`1 tags, CancellationToken token) in /_/src/ZiggyCreatures.FusionCache/FusionCache_Async.cs:line 396
+   at HlidacStatu.WebGenerator.Code.RemoteUrlFromWebCache.getAsync(KeyAndId ki) in C:\Projects\HlidacStatu.GitHub\Hlidac-Statu\WebGenerator\Code\RemoteUrlFromWebCache.cs:line 35
+   at HlidacStatu.WebGenerator.Code.RemoteUrlFromWebCache.GetWebPageScreenshotAsync(String url, String ratio, String cacheName, Boolean refreshCache) in C:\Projects\HlidacStatu.GitHub\Hlidac-Statu\WebGenerator\Code\RemoteUrlFromWebCache.cs:line 115
+2025-11-26 11:47:25.716 +00:00 [WRN] FUSION [N=FirmaCache I=0HNHCS537VUTA] (O=0HNHCS537VUTE K=FirmaCachesocialbanner_osoba-16x9-david-kyncl): an error occurred while calling the factory
+Devmasters.Net.HttpClient.SimpleHttpClientException: Error accessing url http://localhost:32781/imagebannercore/social?title=David+Kyncl&subtitle=%26nbsp%3B(*1974)%2C+Bez+vazby+na+politiku&body=%3Cul%3E%3Cli%3E%3Cb%3EDavid+Kyncl%3C%2Fb%3E%3C%2Fli%3E%3Cli%3EAnga%C5%BEoval+se++v+%3Cb%3E2+soukr.firm%C3%A1ch%3C%2Fb%3E.+Tyto+subjekty+maj%C3%AD+se+st%C3%A1tem+od+2016+celkem+22+smluv+v+celkov%C3%A9+v%C3%BD%C5%A1i+%3Cb%3E%3Cspan+title%3D%22+++1+759+287+K%C4%8D%22%3E2%26nbsp%3Bmil.%26nbsp%3BK%C4%8D%3C%2Fspan%3E%3C%2Fb%3E.+%3C%2Fli%3E%3Cli%3EJeden+subjekt%2C+ve+kter%C3%A9+se+anga%C5%BEoval%2C+v%26nbsp%3Broce+2025+uzav%C5%99el++6+smluv%3C%2Fb%3E.+%3C%2Fli%3E%3C%2Ful%3E&footer=%C3%9Adaje+k+26.+11.+2025&img=https%3A%2F%2Fwww.hlidacstatu.cz%2FPhoto%2Fdavid-kyncl%3Fphototype%3DSmall&ratio=16x9&color=blue-dark
+ ---> System.Net.Http.HttpRequestException: Connection refused (localhost:32781)
+ ---> System.Net.Sockets.SocketException (111): Connection refused
+   at System.Net.Sockets.Socket.AwaitableSocketAsyncEventArgs.ThrowException(SocketError error, CancellationToken cancellationToken)
+   at System.Net.Sockets.Socket.AwaitableSocketAsyncEventArgs.System.Threading.Tasks.Sources.IValueTaskSource.GetResult(Int16 token)
+   at System.Net.Sockets.Socket.<ConnectAsync>g__WaitForConnectWithCancellation|285_0(AwaitableSocketAsyncEventArgs saea, ValueTask connectTask, CancellationToken cancellationToken)
+   at System.Net.Http.HttpConnectionPool.ConnectToTcpHostAsync(String host, Int32 port, HttpRequestMessage initialRequest, Boolean async, CancellationToken cancellationToken)
+   --- End of inner exception stack trace ---
+   at System.Net.Http.HttpConnectionPool.ConnectToTcpHostAsync(String host, Int32 port, HttpRequestMessage initialRequest, Boolean async, CancellationToken cancellationToken)
+   at System.Net.Http.HttpConnectionPool.ConnectAsync(HttpRequestMessage request, Boolean async, CancellationToken cancellationToken)
+   at System.Net.Http.HttpConnectionPool.CreateHttp11ConnectionAsync(HttpRequestMessage request, Boolean async, CancellationToken cancellationToken)
+   at System.Net.Http.HttpConnectionPool.AddHttp11ConnectionAsync(QueueItem queueItem)
+   at System.Threading.Tasks.TaskCompletionSourceWithCancellation`1.WaitWithCancellationAsync(CancellationToken cancellationToken)
+   at System.Net.Http.HttpConnectionPool.SendWithVersionDetectionAndRetryAsync(HttpRequestMessage request, Boolean async, Boolean doRequestAuth, CancellationToken cancellationToken)
+   at System.Net.Http.DiagnosticsHandler.SendAsyncCore(HttpRequestMessage request, Boolean async, CancellationToken cancellationToken)
+   at System.Net.Http.RedirectHandler.SendAsync(HttpRequestMessage request, Boolean async, CancellationToken cancellationToken)
+   at System.Net.Http.DecompressionHandler.SendAsync(HttpRequestMessage request, Boolean async, CancellationToken cancellationToken)
+   at Microsoft.Extensions.Http.Logging.LoggingHttpMessageHandler.<SendCoreAsync>g__Core|4_0(HttpRequestMessage request, Boolean useAsync, CancellationToken cancellationToken)
+   at Microsoft.Extensions.Http.Logging.LoggingScopeHttpMessageHandler.<SendCoreAsync>g__Core|4_0(HttpRequestMessage request, Boolean useAsync, CancellationToken cancellationToken)
+   at System.Net.Http.HttpClient.<SendAsync>g__Core|83_0(HttpRequestMessage request, HttpCompletionOption completionOption, CancellationTokenSource cts, Boolean disposeCts, CancellationTokenSource pendingRequestsCts, CancellationToken originalCancellationToken)
+   at Devmasters.Net.HttpClient.Simple.CallByteAsync(HttpClient client, HttpMethod method, String url, HttpContent content, Boolean continueOnCapturedContext, Dictionary`2 headers)
+   --- End of inner exception stack trace ---
+   at Devmasters.Net.HttpClient.Simple.CallByteAsync(HttpClient client, HttpMethod method, String url, HttpContent content, Boolean continueOnCapturedContext, Dictionary`2 headers)
+   at Devmasters.Net.HttpClient.Simple.GetRawBytesAsync(String uri, Boolean continueOnCapturedContext, Nullable`1 timeout, Dictionary`2 headers)
+   at HlidacStatu.WebGenerator.Code.RemoteUrlFromWebCache._getBinaryDataFromUrlAsync(KeyAndId ki) in C:\Projects\HlidacStatu.GitHub\Hlidac-Statu\WebGenerator\Code\RemoteUrlFromWebCache.cs:line 52
+   at ZiggyCreatures.Caching.Fusion.Internals.RunUtils.RunAsyncFuncWithTimeoutAsync[TResult](Func`2 asyncFunc, TimeSpan timeout, Boolean cancelIfTimeout, Action`1 timedOutTaskProcessor, CancellationToken token) in /_/src/ZiggyCreatures.FusionCache/Internals/RunUtils.cs:line 69
+   at ZiggyCreatures.Caching.Fusion.FusionCache.GetOrSetEntryInternalAsync[TValue](String operationId, String key, String originalKey, String[] tags, Func`3 factory, Boolean isRealFactory, MaybeValue`1 failSafeDefaultValue, FusionCacheEntryOptions options, Activity activity, CancellationToken token) in /_/src/ZiggyCreatures.FusionCache/FusionCache_Async.cs:line 247
+2025-11-26 11:47:25.807 +00:00 [ERR] WebShot GetData error
+Devmasters.Net.HttpClient.SimpleHttpClientException: Error accessing url http://localhost:32781/imagebannercore/social?title=David+Kyncl&subtitle=%26nbsp%3B(*1974)%2C+Bez+vazby+na+politiku&body=%3Cul%3E%3Cli%3E%3Cb%3EDavid+Kyncl%3C%2Fb%3E%3C%2Fli%3E%3Cli%3EAnga%C5%BEoval+se++v+%3Cb%3E2+soukr.firm%C3%A1ch%3C%2Fb%3E.+Tyto+subjekty+maj%C3%AD+se+st%C3%A1tem+od+2016+celkem+22+smluv+v+celkov%C3%A9+v%C3%BD%C5%A1i+%3Cb%3E%3Cspan+title%3D%22+++1+759+287+K%C4%8D%22%3E2%26nbsp%3Bmil.%26nbsp%3BK%C4%8D%3C%2Fspan%3E%3C%2Fb%3E.+%3C%2Fli%3E%3Cli%3EJeden+subjekt%2C+ve+kter%C3%A9+se+anga%C5%BEoval%2C+v%26nbsp%3Broce+2025+uzav%C5%99el++6+smluv%3C%2Fb%3E.+%3C%2Fli%3E%3C%2Ful%3E&footer=%C3%9Adaje+k+26.+11.+2025&img=https%3A%2F%2Fwww.hlidacstatu.cz%2FPhoto%2Fdavid-kyncl%3Fphototype%3DSmall&ratio=16x9&color=blue-dark
+ ---> System.Net.Http.HttpRequestException: Connection refused (localhost:32781)
+ ---> System.Net.Sockets.SocketException (111): Connection refused
+   at System.Net.Sockets.Socket.AwaitableSocketAsyncEventArgs.ThrowException(SocketError error, CancellationToken cancellationToken)
+   at System.Net.Sockets.Socket.AwaitableSocketAsyncEventArgs.System.Threading.Tasks.Sources.IValueTaskSource.GetResult(Int16 token)
+   at System.Net.Sockets.Socket.<ConnectAsync>g__WaitForConnectWithCancellation|285_0(AwaitableSocketAsyncEventArgs saea, ValueTask connectTask, CancellationToken cancellationToken)
+   at System.Net.Http.HttpConnectionPool.ConnectToTcpHostAsync(String host, Int32 port, HttpRequestMessage initialRequest, Boolean async, CancellationToken cancellationToken)
+   --- End of inner exception stack trace ---
+   at System.Net.Http.HttpConnectionPool.ConnectToTcpHostAsync(String host, Int32 port, HttpRequestMessage initialRequest, Boolean async, CancellationToken cancellationToken)
+   at System.Net.Http.HttpConnectionPool.ConnectAsync(HttpRequestMessage request, Boolean async, CancellationToken cancellationToken)
+   at System.Net.Http.HttpConnectionPool.CreateHttp11ConnectionAsync(HttpRequestMessage request, Boolean async, CancellationToken cancellationToken)
+   at System.Net.Http.HttpConnectionPool.AddHttp11ConnectionAsync(QueueItem queueItem)
+   at System.Threading.Tasks.TaskCompletionSourceWithCancellation`1.WaitWithCancellationAsync(CancellationToken cancellationToken)
+   at System.Net.Http.HttpConnectionPool.SendWithVersionDetectionAndRetryAsync(HttpRequestMessage request, Boolean async, Boolean doRequestAuth, CancellationToken cancellationToken)
+   at System.Net.Http.DiagnosticsHandler.SendAsyncCore(HttpRequestMessage request, Boolean async, CancellationToken cancellationToken)
+   at System.Net.Http.RedirectHandler.SendAsync(HttpRequestMessage request, Boolean async, CancellationToken cancellationToken)
+   at System.Net.Http.DecompressionHandler.SendAsync(HttpRequestMessage request, Boolean async, CancellationToken cancellationToken)
+   at Microsoft.Extensions.Http.Logging.LoggingHttpMessageHandler.<SendCoreAsync>g__Core|4_0(HttpRequestMessage request, Boolean useAsync, CancellationToken cancellationToken)
+   at Microsoft.Extensions.Http.Logging.LoggingScopeHttpMessageHandler.<SendCoreAsync>g__Core|4_0(HttpRequestMessage request, Boolean useAsync, CancellationToken cancellationToken)
+   at System.Net.Http.HttpClient.<SendAsync>g__Core|83_0(HttpRequestMessage request, HttpCompletionOption completionOption, CancellationTokenSource cts, Boolean disposeCts, CancellationTokenSource pendingRequestsCts, CancellationToken originalCancellationToken)
+   at Devmasters.Net.HttpClient.Simple.CallByteAsync(HttpClient client, HttpMethod method, String url, HttpContent content, Boolean continueOnCapturedContext, Dictionary`2 headers)
+   --- End of inner exception stack trace ---
+   at Devmasters.Net.HttpClient.Simple.CallByteAsync(HttpClient client, HttpMethod method, String url, HttpContent content, Boolean continueOnCapturedContext, Dictionary`2 headers)
+   at Devmasters.Net.HttpClient.Simple.GetRawBytesAsync(String uri, Boolean continueOnCapturedContext, Nullable`1 timeout, Dictionary`2 headers)
+   at HlidacStatu.WebGenerator.Code.RemoteUrlFromWebCache._getBinaryDataFromUrlAsync(KeyAndId ki) in C:\Projects\HlidacStatu.GitHub\Hlidac-Statu\WebGenerator\Code\RemoteUrlFromWebCache.cs:line 52
+   at ZiggyCreatures.Caching.Fusion.Internals.RunUtils.RunAsyncFuncWithTimeoutAsync[TResult](Func`2 asyncFunc, TimeSpan timeout, Boolean cancelIfTimeout, Action`1 timedOutTaskProcessor, CancellationToken token) in /_/src/ZiggyCreatures.FusionCache/Internals/RunUtils.cs:line 69
+   at ZiggyCreatures.Caching.Fusion.FusionCache.GetOrSetEntryInternalAsync[TValue](String operationId, String key, String originalKey, String[] tags, Func`3 factory, Boolean isRealFactory, MaybeValue`1 failSafeDefaultValue, FusionCacheEntryOptions options, Activity activity, CancellationToken token) in /_/src/ZiggyCreatures.FusionCache/FusionCache_Async.cs:line 247
+   at ZiggyCreatures.Caching.Fusion.FusionCache.GetOrSetAsync[TValue](String key, Func`3 factory, MaybeValue`1 failSafeDefaultValue, FusionCacheEntryOptions options, IEnumerable`1 tags, CancellationToken token) in /_/src/ZiggyCreatures.FusionCache/FusionCache_Async.cs:line 396
+   at HlidacStatu.WebGenerator.Code.RemoteUrlFromWebCache.getAsync(KeyAndId ki) in C:\Projects\HlidacStatu.GitHub\Hlidac-Statu\WebGenerator\Code\RemoteUrlFromWebCache.cs:line 35
+   at HlidacStatu.WebGenerator.Code.RemoteUrlFromWebCache.GetWebPageScreenshotAsync(String url, String ratio, String cacheName, Boolean refreshCache) in C:\Projects\HlidacStatu.GitHub\Hlidac-Statu\WebGenerator\Code\RemoteUrlFromWebCache.cs:line 115
+2025-11-26 11:48:45.951 +00:00 [WRN] FUSION [N=FirmaCache I=0HNHCS537VUTA] (O=0HNHCS537VUTG K=FirmaCachesocialbanner_osoba-16x9-david-kyncl): an error occurred while calling the factory
+Devmasters.Net.HttpClient.SimpleHttpClientException: Error accessing url http://10.10.100.145:3000/screenshot?vp_width=1920&vp_height=1080&url=http%3A%2F%2Flocalhost%3A32781%2Fimagebannercore%2Fsocial%3Ftitle%3DDavid%2BKyncl%26subtitle%3D%2526nbsp%253B(*1974)%252C%2BBez%2Bvazby%2Bna%2Bpolitiku%26body%3D%253Cul%253E%253Cli%253E%253Cb%253EDavid%2BKyncl%253C%252Fb%253E%253C%252Fli%253E%253Cli%253EAnga%25C5%25BEoval%2Bse%2B%2Bv%2B%253Cb%253E2%2Bsoukr.firm%25C3%25A1ch%253C%252Fb%253E.%2BTyto%2Bsubjekty%2Bmaj%25C3%25AD%2Bse%2Bst%25C3%25A1tem%2Bod%2B2016%2Bcelkem%2B22%2Bsmluv%2Bv%2Bcelkov%25C3%25A9%2Bv%25C3%25BD%25C5%25A1i%2B%253Cb%253E%253Cspan%2Btitle%253D%2522%2B%2B%2B1%2B759%2B287%2BK%25C4%258D%2522%253E2%2526nbsp%253Bmil.%2526nbsp%253BK%25C4%258D%253C%252Fspan%253E%253C%252Fb%253E.%2B%253C%252Fli%253E%253Cli%253EJeden%2Bsubjekt%252C%2Bve%2Bkter%25C3%25A9%2Bse%2Banga%25C5%25BEoval%252C%2Bv%2526nbsp%253Broce%2B2025%2Buzav%25C5%2599el%2B%2B6%2Bsmluv%253C%252Fb%253E.%2B%253C%252Fli%253E%253C%252Ful%253E%26footer%3D%25C3%259Adaje%2Bk%2B26.%2B11.%2B2025%26img%3Dhttps%253A%252F%252Fwww.hlidacstatu.cz%252FPhoto%252Fdavid-kyncl%253Fphototype%253DSmall%26ratio%3D16x9%26color%3Dblue-dark
+ ---> System.Net.Http.HttpRequestException: An error occurred while sending the request.
+ ---> System.Net.Http.HttpIOException: The response ended prematurely. (ResponseEnded)
+   at System.Net.Http.HttpConnection.SendAsync(HttpRequestMessage request, Boolean async, CancellationToken cancellationToken)
+   --- End of inner exception stack trace ---
+   at System.Net.Http.HttpConnection.SendAsync(HttpRequestMessage request, Boolean async, CancellationToken cancellationToken)
+   at System.Net.Http.HttpConnectionPool.SendWithVersionDetectionAndRetryAsync(HttpRequestMessage request, Boolean async, Boolean doRequestAuth, CancellationToken cancellationToken)
+   at System.Net.Http.DiagnosticsHandler.SendAsyncCore(HttpRequestMessage request, Boolean async, CancellationToken cancellationToken)
+   at System.Net.Http.RedirectHandler.SendAsync(HttpRequestMessage request, Boolean async, CancellationToken cancellationToken)
+   at System.Net.Http.DecompressionHandler.SendAsync(HttpRequestMessage request, Boolean async, CancellationToken cancellationToken)
+   at Microsoft.Extensions.Http.Logging.LoggingHttpMessageHandler.<SendCoreAsync>g__Core|4_0(HttpRequestMessage request, Boolean useAsync, CancellationToken cancellationToken)
+   at Microsoft.Extensions.Http.Logging.LoggingScopeHttpMessageHandler.<SendCoreAsync>g__Core|4_0(HttpRequestMessage request, Boolean useAsync, CancellationToken cancellationToken)
+   at System.Net.Http.HttpClient.<SendAsync>g__Core|83_0(HttpRequestMessage request, HttpCompletionOption completionOption, CancellationTokenSource cts, Boolean disposeCts, CancellationTokenSource pendingRequestsCts, CancellationToken originalCancellationToken)
+   at Devmasters.Net.HttpClient.Simple.CallByteAsync(HttpClient client, HttpMethod method, String url, HttpContent content, Boolean continueOnCapturedContext, Dictionary`2 headers)
+   --- End of inner exception stack trace ---
+   at Devmasters.Net.HttpClient.Simple.CallByteAsync(HttpClient client, HttpMethod method, String url, HttpContent content, Boolean continueOnCapturedContext, Dictionary`2 headers)
+   at Devmasters.Net.HttpClient.Simple.GetRawBytesAsync(String uri, Boolean continueOnCapturedContext, Nullable`1 timeout, Dictionary`2 headers)
+   at HlidacStatu.WebGenerator.Code.RemoteUrlFromWebCache._getBinaryDataFromUrlAsync(KeyAndId ki)
+   at ZiggyCreatures.Caching.Fusion.Internals.RunUtils.RunAsyncFuncWithTimeoutAsync[TResult](Func`2 asyncFunc, TimeSpan timeout, Boolean cancelIfTimeout, Action`1 timedOutTaskProcessor, CancellationToken token) in /_/src/ZiggyCreatures.FusionCache/Internals/RunUtils.cs:line 69
+   at ZiggyCreatures.Caching.Fusion.FusionCache.GetOrSetEntryInternalAsync[TValue](String operationId, String key, String originalKey, String[] tags, Func`3 factory, Boolean isRealFactory, MaybeValue`1 failSafeDefaultValue, FusionCacheEntryOptions options, Activity activity, CancellationToken token) in /_/src/ZiggyCreatures.FusionCache/FusionCache_Async.cs:line 247
+2025-11-26 11:48:46.053 +00:00 [ERR] WebShot GetData error
+Devmasters.Net.HttpClient.SimpleHttpClientException: Error accessing url http://10.10.100.145:3000/screenshot?vp_width=1920&vp_height=1080&url=http%3A%2F%2Flocalhost%3A32781%2Fimagebannercore%2Fsocial%3Ftitle%3DDavid%2BKyncl%26subtitle%3D%2526nbsp%253B(*1974)%252C%2BBez%2Bvazby%2Bna%2Bpolitiku%26body%3D%253Cul%253E%253Cli%253E%253Cb%253EDavid%2BKyncl%253C%252Fb%253E%253C%252Fli%253E%253Cli%253EAnga%25C5%25BEoval%2Bse%2B%2Bv%2B%253Cb%253E2%2Bsoukr.firm%25C3%25A1ch%253C%252Fb%253E.%2BTyto%2Bsubjekty%2Bmaj%25C3%25AD%2Bse%2Bst%25C3%25A1tem%2Bod%2B2016%2Bcelkem%2B22%2Bsmluv%2Bv%2Bcelkov%25C3%25A9%2Bv%25C3%25BD%25C5%25A1i%2B%253Cb%253E%253Cspan%2Btitle%253D%2522%2B%2B%2B1%2B759%2B287%2BK%25C4%258D%2522%253E2%2526nbsp%253Bmil.%2526nbsp%253BK%25C4%258D%253C%252Fspan%253E%253C%252Fb%253E.%2B%253C%252Fli%253E%253Cli%253EJeden%2Bsubjekt%252C%2Bve%2Bkter%25C3%25A9%2Bse%2Banga%25C5%25BEoval%252C%2Bv%2526nbsp%253Broce%2B2025%2Buzav%25C5%2599el%2B%2B6%2Bsmluv%253C%252Fb%253E.%2B%253C%252Fli%253E%253C%252Ful%253E%26footer%3D%25C3%259Adaje%2Bk%2B26.%2B11.%2B2025%26img%3Dhttps%253A%252F%252Fwww.hlidacstatu.cz%252FPhoto%252Fdavid-kyncl%253Fphototype%253DSmall%26ratio%3D16x9%26color%3Dblue-dark
+ ---> System.Net.Http.HttpRequestException: An error occurred while sending the request.
+ ---> System.Net.Http.HttpIOException: The response ended prematurely. (ResponseEnded)
+   at System.Net.Http.HttpConnection.SendAsync(HttpRequestMessage request, Boolean async, CancellationToken cancellationToken)
+   --- End of inner exception stack trace ---
+   at System.Net.Http.HttpConnection.SendAsync(HttpRequestMessage request, Boolean async, CancellationToken cancellationToken)
+   at System.Net.Http.HttpConnectionPool.SendWithVersionDetectionAndRetryAsync(HttpRequestMessage request, Boolean async, Boolean doRequestAuth, CancellationToken cancellationToken)
+   at System.Net.Http.DiagnosticsHandler.SendAsyncCore(HttpRequestMessage request, Boolean async, CancellationToken cancellationToken)
+   at System.Net.Http.RedirectHandler.SendAsync(HttpRequestMessage request, Boolean async, CancellationToken cancellationToken)
+   at System.Net.Http.DecompressionHandler.SendAsync(HttpRequestMessage request, Boolean async, CancellationToken cancellationToken)
+   at Microsoft.Extensions.Http.Logging.LoggingHttpMessageHandler.<SendCoreAsync>g__Core|4_0(HttpRequestMessage request, Boolean useAsync, CancellationToken cancellationToken)
+   at Microsoft.Extensions.Http.Logging.LoggingScopeHttpMessageHandler.<SendCoreAsync>g__Core|4_0(HttpRequestMessage request, Boolean useAsync, CancellationToken cancellationToken)
+   at System.Net.Http.HttpClient.<SendAsync>g__Core|83_0(HttpRequestMessage request, HttpCompletionOption completionOption, CancellationTokenSource cts, Boolean disposeCts, CancellationTokenSource pendingRequestsCts, CancellationToken originalCancellationToken)
+   at Devmasters.Net.HttpClient.Simple.CallByteAsync(HttpClient client, HttpMethod method, String url, HttpContent content, Boolean continueOnCapturedContext, Dictionary`2 headers)
+   --- End of inner exception stack trace ---
+   at Devmasters.Net.HttpClient.Simple.CallByteAsync(HttpClient client, HttpMethod method, String url, HttpContent content, Boolean continueOnCapturedContext, Dictionary`2 headers)
+   at Devmasters.Net.HttpClient.Simple.GetRawBytesAsync(String uri, Boolean continueOnCapturedContext, Nullable`1 timeout, Dictionary`2 headers)
+   at HlidacStatu.WebGenerator.Code.RemoteUrlFromWebCache._getBinaryDataFromUrlAsync(KeyAndId ki)
+   at ZiggyCreatures.Caching.Fusion.Internals.RunUtils.RunAsyncFuncWithTimeoutAsync[TResult](Func`2 asyncFunc, TimeSpan timeout, Boolean cancelIfTimeout, Action`1 timedOutTaskProcessor, CancellationToken token) in /_/src/ZiggyCreatures.FusionCache/Internals/RunUtils.cs:line 69
+   at ZiggyCreatures.Caching.Fusion.FusionCache.GetOrSetEntryInternalAsync[TValue](String operationId, String key, String originalKey, String[] tags, Func`3 factory, Boolean isRealFactory, MaybeValue`1 failSafeDefaultValue, FusionCacheEntryOptions options, Activity activity, CancellationToken token) in /_/src/ZiggyCreatures.FusionCache/FusionCache_Async.cs:line 247
+   at ZiggyCreatures.Caching.Fusion.FusionCache.GetOrSetAsync[TValue](String key, Func`3 factory, MaybeValue`1 failSafeDefaultValue, FusionCacheEntryOptions options, IEnumerable`1 tags, CancellationToken token) in /_/src/ZiggyCreatures.FusionCache/FusionCache_Async.cs:line 396
+   at HlidacStatu.WebGenerator.Code.RemoteUrlFromWebCache.getAsync(KeyAndId ki)
+   at HlidacStatu.WebGenerator.Code.RemoteUrlFromWebCache.GetWebPageScreenshotAsync(String url, String ratio, String cacheName, Boolean refreshCache)
+2025-11-26 11:48:50.471 +00:00 [WRN] FUSION [N=FirmaCache I=0HNHCS537VUTA] (O=0HNHCS537VUTI K=FirmaCachesocialbanner_osoba-16x9-david-kyncl): an error occurred while calling the factory
+Devmasters.Net.HttpClient.SimpleHttpClientException: Error accessing url http://10.10.100.145:3000/screenshot?vp_width=1920&vp_height=1080&url=http%3A%2F%2Flocalhost%3A32781%2Fimagebannercore%2Fsocial%3Ftitle%3DDavid%2BKyncl%26subtitle%3D%2526nbsp%253B(*1974)%252C%2BBez%2Bvazby%2Bna%2Bpolitiku%26body%3D%253Cul%253E%253Cli%253E%253Cb%253EDavid%2BKyncl%253C%252Fb%253E%253C%252Fli%253E%253Cli%253EAnga%25C5%25BEoval%2Bse%2B%2Bv%2B%253Cb%253E2%2Bsoukr.firm%25C3%25A1ch%253C%252Fb%253E.%2BTyto%2Bsubjekty%2Bmaj%25C3%25AD%2Bse%2Bst%25C3%25A1tem%2Bod%2B2016%2Bcelkem%2B22%2Bsmluv%2Bv%2Bcelkov%25C3%25A9%2Bv%25C3%25BD%25C5%25A1i%2B%253Cb%253E%253Cspan%2Btitle%253D%2522%2B%2B%2B1%2B759%2B287%2BK%25C4%258D%2522%253E2%2526nbsp%253Bmil.%2526nbsp%253BK%25C4%258D%253C%252Fspan%253E%253C%252Fb%253E.%2B%253C%252Fli%253E%253Cli%253EJeden%2Bsubjekt%252C%2Bve%2Bkter%25C3%25A9%2Bse%2Banga%25C5%25BEoval%252C%2Bv%2526nbsp%253Broce%2B2025%2Buzav%25C5%2599el%2B%2B6%2Bsmluv%253C%252Fb%253E.%2B%253C%252Fli%253E%253C%252Ful%253E%26footer%3D%25C3%259Adaje%2Bk%2B26.%2B11.%2B2025%26img%3Dhttps%253A%252F%252Fwww.hlidacstatu.cz%252FPhoto%252Fdavid-kyncl%253Fphototype%253DSmall%26ratio%3D16x9%26color%3Dblue-dark
+ ---> System.Net.Http.HttpRequestException: An error occurred while sending the request.
+ ---> System.Net.Http.HttpIOException: The response ended prematurely. (ResponseEnded)
+   at System.Net.Http.HttpConnection.SendAsync(HttpRequestMessage request, Boolean async, CancellationToken cancellationToken)
+   --- End of inner exception stack trace ---
+   at System.Net.Http.HttpConnection.SendAsync(HttpRequestMessage request, Boolean async, CancellationToken cancellationToken)
+   at System.Net.Http.HttpConnectionPool.SendWithVersionDetectionAndRetryAsync(HttpRequestMessage request, Boolean async, Boolean doRequestAuth, CancellationToken cancellationToken)
+   at System.Net.Http.DiagnosticsHandler.SendAsyncCore(HttpRequestMessage request, Boolean async, CancellationToken cancellationToken)
+   at System.Net.Http.RedirectHandler.SendAsync(HttpRequestMessage request, Boolean async, CancellationToken cancellationToken)
+   at System.Net.Http.DecompressionHandler.SendAsync(HttpRequestMessage request, Boolean async, CancellationToken cancellationToken)
+   at Microsoft.Extensions.Http.Logging.LoggingHttpMessageHandler.<SendCoreAsync>g__Core|4_0(HttpRequestMessage request, Boolean useAsync, CancellationToken cancellationToken)
+   at Microsoft.Extensions.Http.Logging.LoggingScopeHttpMessageHandler.<SendCoreAsync>g__Core|4_0(HttpRequestMessage request, Boolean useAsync, CancellationToken cancellationToken)
+   at System.Net.Http.HttpClient.<SendAsync>g__Core|83_0(HttpRequestMessage request, HttpCompletionOption completionOption, CancellationTokenSource cts, Boolean disposeCts, CancellationTokenSource pendingRequestsCts, CancellationToken originalCancellationToken)
+   at Devmasters.Net.HttpClient.Simple.CallByteAsync(HttpClient client, HttpMethod method, String url, HttpContent content, Boolean continueOnCapturedContext, Dictionary`2 headers)
+   --- End of inner exception stack trace ---
+   at Devmasters.Net.HttpClient.Simple.CallByteAsync(HttpClient client, HttpMethod method, String url, HttpContent content, Boolean continueOnCapturedContext, Dictionary`2 headers)
+   at Devmasters.Net.HttpClient.Simple.GetRawBytesAsync(String uri, Boolean continueOnCapturedContext, Nullable`1 timeout, Dictionary`2 headers)
+   at HlidacStatu.WebGenerator.Code.RemoteUrlFromWebCache._getBinaryDataFromUrlAsync(KeyAndId ki)
+   at ZiggyCreatures.Caching.Fusion.Internals.RunUtils.RunAsyncFuncWithTimeoutAsync[TResult](Func`2 asyncFunc, TimeSpan timeout, Boolean cancelIfTimeout, Action`1 timedOutTaskProcessor, CancellationToken token) in /_/src/ZiggyCreatures.FusionCache/Internals/RunUtils.cs:line 69
+   at ZiggyCreatures.Caching.Fusion.FusionCache.GetOrSetEntryInternalAsync[TValue](String operationId, String key, String originalKey, String[] tags, Func`3 factory, Boolean isRealFactory, MaybeValue`1 failSafeDefaultValue, FusionCacheEntryOptions options, Activity activity, CancellationToken token) in /_/src/ZiggyCreatures.FusionCache/FusionCache_Async.cs:line 247
+2025-11-26 11:48:50.571 +00:00 [ERR] WebShot GetData error
+Devmasters.Net.HttpClient.SimpleHttpClientException: Error accessing url http://10.10.100.145:3000/screenshot?vp_width=1920&vp_height=1080&url=http%3A%2F%2Flocalhost%3A32781%2Fimagebannercore%2Fsocial%3Ftitle%3DDavid%2BKyncl%26subtitle%3D%2526nbsp%253B(*1974)%252C%2BBez%2Bvazby%2Bna%2Bpolitiku%26body%3D%253Cul%253E%253Cli%253E%253Cb%253EDavid%2BKyncl%253C%252Fb%253E%253C%252Fli%253E%253Cli%253EAnga%25C5%25BEoval%2Bse%2B%2Bv%2B%253Cb%253E2%2Bsoukr.firm%25C3%25A1ch%253C%252Fb%253E.%2BTyto%2Bsubjekty%2Bmaj%25C3%25AD%2Bse%2Bst%25C3%25A1tem%2Bod%2B2016%2Bcelkem%2B22%2Bsmluv%2Bv%2Bcelkov%25C3%25A9%2Bv%25C3%25BD%25C5%25A1i%2B%253Cb%253E%253Cspan%2Btitle%253D%2522%2B%2B%2B1%2B759%2B287%2BK%25C4%258D%2522%253E2%2526nbsp%253Bmil.%2526nbsp%253BK%25C4%258D%253C%252Fspan%253E%253C%252Fb%253E.%2B%253C%252Fli%253E%253Cli%253EJeden%2Bsubjekt%252C%2Bve%2Bkter%25C3%25A9%2Bse%2Banga%25C5%25BEoval%252C%2Bv%2526nbsp%253Broce%2B2025%2Buzav%25C5%2599el%2B%2B6%2Bsmluv%253C%252Fb%253E.%2B%253C%252Fli%253E%253C%252Ful%253E%26footer%3D%25C3%259Adaje%2Bk%2B26.%2B11.%2B2025%26img%3Dhttps%253A%252F%252Fwww.hlidacstatu.cz%252FPhoto%252Fdavid-kyncl%253Fphototype%253DSmall%26ratio%3D16x9%26color%3Dblue-dark
+ ---> System.Net.Http.HttpRequestException: An error occurred while sending the request.
+ ---> System.Net.Http.HttpIOException: The response ended prematurely. (ResponseEnded)
+   at System.Net.Http.HttpConnection.SendAsync(HttpRequestMessage request, Boolean async, CancellationToken cancellationToken)
+   --- End of inner exception stack trace ---
+   at System.Net.Http.HttpConnection.SendAsync(HttpRequestMessage request, Boolean async, CancellationToken cancellationToken)
+   at System.Net.Http.HttpConnectionPool.SendWithVersionDetectionAndRetryAsync(HttpRequestMessage request, Boolean async, Boolean doRequestAuth, CancellationToken cancellationToken)
+   at System.Net.Http.DiagnosticsHandler.SendAsyncCore(HttpRequestMessage request, Boolean async, CancellationToken cancellationToken)
+   at System.Net.Http.RedirectHandler.SendAsync(HttpRequestMessage request, Boolean async, CancellationToken cancellationToken)
+   at System.Net.Http.DecompressionHandler.SendAsync(HttpRequestMessage request, Boolean async, CancellationToken cancellationToken)
+   at Microsoft.Extensions.Http.Logging.LoggingHttpMessageHandler.<SendCoreAsync>g__Core|4_0(HttpRequestMessage request, Boolean useAsync, CancellationToken cancellationToken)
+   at Microsoft.Extensions.Http.Logging.LoggingScopeHttpMessageHandler.<SendCoreAsync>g__Core|4_0(HttpRequestMessage request, Boolean useAsync, CancellationToken cancellationToken)
+   at System.Net.Http.HttpClient.<SendAsync>g__Core|83_0(HttpRequestMessage request, HttpCompletionOption completionOption, CancellationTokenSource cts, Boolean disposeCts, CancellationTokenSource pendingRequestsCts, CancellationToken originalCancellationToken)
+   at Devmasters.Net.HttpClient.Simple.CallByteAsync(HttpClient client, HttpMethod method, String url, HttpContent content, Boolean continueOnCapturedContext, Dictionary`2 headers)
+   --- End of inner exception stack trace ---
+   at Devmasters.Net.HttpClient.Simple.CallByteAsync(HttpClient client, HttpMethod method, String url, HttpContent content, Boolean continueOnCapturedContext, Dictionary`2 headers)
+   at Devmasters.Net.HttpClient.Simple.GetRawBytesAsync(String uri, Boolean continueOnCapturedContext, Nullable`1 timeout, Dictionary`2 headers)
+   at HlidacStatu.WebGenerator.Code.RemoteUrlFromWebCache._getBinaryDataFromUrlAsync(KeyAndId ki)
+   at ZiggyCreatures.Caching.Fusion.Internals.RunUtils.RunAsyncFuncWithTimeoutAsync[TResult](Func`2 asyncFunc, TimeSpan timeout, Boolean cancelIfTimeout, Action`1 timedOutTaskProcessor, CancellationToken token) in /_/src/ZiggyCreatures.FusionCache/Internals/RunUtils.cs:line 69
+   at ZiggyCreatures.Caching.Fusion.FusionCache.GetOrSetEntryInternalAsync[TValue](String operationId, String key, String originalKey, String[] tags, Func`3 factory, Boolean isRealFactory, MaybeValue`1 failSafeDefaultValue, FusionCacheEntryOptions options, Activity activity, CancellationToken token) in /_/src/ZiggyCreatures.FusionCache/FusionCache_Async.cs:line 247
+   at ZiggyCreatures.Caching.Fusion.FusionCache.GetOrSetAsync[TValue](String key, Func`3 factory, MaybeValue`1 failSafeDefaultValue, FusionCacheEntryOptions options, IEnumerable`1 tags, CancellationToken token) in /_/src/ZiggyCreatures.FusionCache/FusionCache_Async.cs:line 396
+   at HlidacStatu.WebGenerator.Code.RemoteUrlFromWebCache.getAsync(KeyAndId ki)
+   at HlidacStatu.WebGenerator.Code.RemoteUrlFromWebCache.GetWebPageScreenshotAsync(String url, String ratio, String cacheName, Boolean refreshCache)
+2025-11-26 11:49:32.959 +00:00 [WRN] FUSION [N=FirmaCache I=0HNHCS537VUTA] (O=0HNHCS537VUTK K=FirmaCachesocialbanner_osoba-16x9-david-kyncl): an error occurred while calling the factory
+Devmasters.Net.HttpClient.SimpleHttpClientException: Error accessing url http://10.10.100.145:3000/screenshot?vp_width=1920&vp_height=1080&url=http%3A%2F%2Flocalhost%3A32781%2Fimagebannercore%2Fsocial%3Ftitle%3DDavid%2BKyncl%26subtitle%3D%2526nbsp%253B(*1974)%252C%2BBez%2Bvazby%2Bna%2Bpolitiku%26body%3D%253Cul%253E%253Cli%253E%253Cb%253EDavid%2BKyncl%253C%252Fb%253E%253C%252Fli%253E%253Cli%253EAnga%25C5%25BEoval%2Bse%2B%2Bv%2B%253Cb%253E2%2Bsoukr.firm%25C3%25A1ch%253C%252Fb%253E.%2BTyto%2Bsubjekty%2Bmaj%25C3%25AD%2Bse%2Bst%25C3%25A1tem%2Bod%2B2016%2Bcelkem%2B22%2Bsmluv%2Bv%2Bcelkov%25C3%25A9%2Bv%25C3%25BD%25C5%25A1i%2B%253Cb%253E%253Cspan%2Btitle%253D%2522%2B%2B%2B1%2B759%2B287%2BK%25C4%258D%2522%253E2%2526nbsp%253Bmil.%2526nbsp%253BK%25C4%258D%253C%252Fspan%253E%253C%252Fb%253E.%2B%253C%252Fli%253E%253Cli%253EJeden%2Bsubjekt%252C%2Bve%2Bkter%25C3%25A9%2Bse%2Banga%25C5%25BEoval%252C%2Bv%2526nbsp%253Broce%2B2025%2Buzav%25C5%2599el%2B%2B6%2Bsmluv%253C%252Fb%253E.%2B%253C%252Fli%253E%253C%252Ful%253E%26footer%3D%25C3%259Adaje%2Bk%2B26.%2B11.%2B2025%26img%3Dhttps%253A%252F%252Fwww.hlidacstatu.cz%252FPhoto%252Fdavid-kyncl%253Fphototype%253DSmall%26ratio%3D16x9%26color%3Dblue-dark
+ ---> System.Net.Http.HttpRequestException: An error occurred while sending the request.
+ ---> System.Net.Http.HttpIOException: The response ended prematurely. (ResponseEnded)
+   at System.Net.Http.HttpConnection.SendAsync(HttpRequestMessage request, Boolean async, CancellationToken cancellationToken)
+   --- End of inner exception stack trace ---
+   at System.Net.Http.HttpConnection.SendAsync(HttpRequestMessage request, Boolean async, CancellationToken cancellationToken)
+   at System.Net.Http.HttpConnectionPool.SendWithVersionDetectionAndRetryAsync(HttpRequestMessage request, Boolean async, Boolean doRequestAuth, CancellationToken cancellationToken)
+   at System.Net.Http.DiagnosticsHandler.SendAsyncCore(HttpRequestMessage request, Boolean async, CancellationToken cancellationToken)
+   at System.Net.Http.RedirectHandler.SendAsync(HttpRequestMessage request, Boolean async, CancellationToken cancellationToken)
+   at System.Net.Http.DecompressionHandler.SendAsync(HttpRequestMessage request, Boolean async, CancellationToken cancellationToken)
+   at Microsoft.Extensions.Http.Logging.LoggingHttpMessageHandler.<SendCoreAsync>g__Core|4_0(HttpRequestMessage request, Boolean useAsync, CancellationToken cancellationToken)
+   at Microsoft.Extensions.Http.Logging.LoggingScopeHttpMessageHandler.<SendCoreAsync>g__Core|4_0(HttpRequestMessage request, Boolean useAsync, CancellationToken cancellationToken)
+   at System.Net.Http.HttpClient.<SendAsync>g__Core|83_0(HttpRequestMessage request, HttpCompletionOption completionOption, CancellationTokenSource cts, Boolean disposeCts, CancellationTokenSource pendingRequestsCts, CancellationToken originalCancellationToken)
+   at Devmasters.Net.HttpClient.Simple.CallByteAsync(HttpClient client, HttpMethod method, String url, HttpContent content, Boolean continueOnCapturedContext, Dictionary`2 headers)
+   --- End of inner exception stack trace ---
+   at Devmasters.Net.HttpClient.Simple.CallByteAsync(HttpClient client, HttpMethod method, String url, HttpContent content, Boolean continueOnCapturedContext, Dictionary`2 headers)
+   at Devmasters.Net.HttpClient.Simple.GetRawBytesAsync(String uri, Boolean continueOnCapturedContext, Nullable`1 timeout, Dictionary`2 headers)
+   at HlidacStatu.WebGenerator.Code.RemoteUrlFromWebCache._getBinaryDataFromUrlAsync(KeyAndId ki)
+   at ZiggyCreatures.Caching.Fusion.Internals.RunUtils.RunAsyncFuncWithTimeoutAsync[TResult](Func`2 asyncFunc, TimeSpan timeout, Boolean cancelIfTimeout, Action`1 timedOutTaskProcessor, CancellationToken token) in /_/src/ZiggyCreatures.FusionCache/Internals/RunUtils.cs:line 69
+   at ZiggyCreatures.Caching.Fusion.FusionCache.GetOrSetEntryInternalAsync[TValue](String operationId, String key, String originalKey, String[] tags, Func`3 factory, Boolean isRealFactory, MaybeValue`1 failSafeDefaultValue, FusionCacheEntryOptions options, Activity activity, CancellationToken token) in /_/src/ZiggyCreatures.FusionCache/FusionCache_Async.cs:line 247
+2025-11-26 11:49:34.680 +00:00 [ERR] WebShot GetData error
+Devmasters.Net.HttpClient.SimpleHttpClientException: Error accessing url http://10.10.100.145:3000/screenshot?vp_width=1920&vp_height=1080&url=http%3A%2F%2Flocalhost%3A32781%2Fimagebannercore%2Fsocial%3Ftitle%3DDavid%2BKyncl%26subtitle%3D%2526nbsp%253B(*1974)%252C%2BBez%2Bvazby%2Bna%2Bpolitiku%26body%3D%253Cul%253E%253Cli%253E%253Cb%253EDavid%2BKyncl%253C%252Fb%253E%253C%252Fli%253E%253Cli%253EAnga%25C5%25BEoval%2Bse%2B%2Bv%2B%253Cb%253E2%2Bsoukr.firm%25C3%25A1ch%253C%252Fb%253E.%2BTyto%2Bsubjekty%2Bmaj%25C3%25AD%2Bse%2Bst%25C3%25A1tem%2Bod%2B2016%2Bcelkem%2B22%2Bsmluv%2Bv%2Bcelkov%25C3%25A9%2Bv%25C3%25BD%25C5%25A1i%2B%253Cb%253E%253Cspan%2Btitle%253D%2522%2B%2B%2B1%2B759%2B287%2BK%25C4%258D%2522%253E2%2526nbsp%253Bmil.%2526nbsp%253BK%25C4%258D%253C%252Fspan%253E%253C%252Fb%253E.%2B%253C%252Fli%253E%253Cli%253EJeden%2Bsubjekt%252C%2Bve%2Bkter%25C3%25A9%2Bse%2Banga%25C5%25BEoval%252C%2Bv%2526nbsp%253Broce%2B2025%2Buzav%25C5%2599el%2B%2B6%2Bsmluv%253C%252Fb%253E.%2B%253C%252Fli%253E%253C%252Ful%253E%26footer%3D%25C3%259Adaje%2Bk%2B26.%2B11.%2B2025%26img%3Dhttps%253A%252F%252Fwww.hlidacstatu.cz%252FPhoto%252Fdavid-kyncl%253Fphototype%253DSmall%26ratio%3D16x9%26color%3Dblue-dark
+ ---> System.Net.Http.HttpRequestException: An error occurred while sending the request.
+ ---> System.Net.Http.HttpIOException: The response ended prematurely. (ResponseEnded)
+   at System.Net.Http.HttpConnection.SendAsync(HttpRequestMessage request, Boolean async, CancellationToken cancellationToken)
+   --- End of inner exception stack trace ---
+   at System.Net.Http.HttpConnection.SendAsync(HttpRequestMessage request, Boolean async, CancellationToken cancellationToken)
+   at System.Net.Http.HttpConnectionPool.SendWithVersionDetectionAndRetryAsync(HttpRequestMessage request, Boolean async, Boolean doRequestAuth, CancellationToken cancellationToken)
+   at System.Net.Http.DiagnosticsHandler.SendAsyncCore(HttpRequestMessage request, Boolean async, CancellationToken cancellationToken)
+   at System.Net.Http.RedirectHandler.SendAsync(HttpRequestMessage request, Boolean async, CancellationToken cancellationToken)
+   at System.Net.Http.DecompressionHandler.SendAsync(HttpRequestMessage request, Boolean async, CancellationToken cancellationToken)
+   at Microsoft.Extensions.Http.Logging.LoggingHttpMessageHandler.<SendCoreAsync>g__Core|4_0(HttpRequestMessage request, Boolean useAsync, CancellationToken cancellationToken)
+   at Microsoft.Extensions.Http.Logging.LoggingScopeHttpMessageHandler.<SendCoreAsync>g__Core|4_0(HttpRequestMessage request, Boolean useAsync, CancellationToken cancellationToken)
+   at System.Net.Http.HttpClient.<SendAsync>g__Core|83_0(HttpRequestMessage request, HttpCompletionOption completionOption, CancellationTokenSource cts, Boolean disposeCts, CancellationTokenSource pendingRequestsCts, CancellationToken originalCancellationToken)
+   at Devmasters.Net.HttpClient.Simple.CallByteAsync(HttpClient client, HttpMethod method, String url, HttpContent content, Boolean continueOnCapturedContext, Dictionary`2 headers)
+   --- End of inner exception stack trace ---
+   at Devmasters.Net.HttpClient.Simple.CallByteAsync(HttpClient client, HttpMethod method, String url, HttpContent content, Boolean continueOnCapturedContext, Dictionary`2 headers)
+   at Devmasters.Net.HttpClient.Simple.GetRawBytesAsync(String uri, Boolean continueOnCapturedContext, Nullable`1 timeout, Dictionary`2 headers)
+   at HlidacStatu.WebGenerator.Code.RemoteUrlFromWebCache._getBinaryDataFromUrlAsync(KeyAndId ki)
+   at ZiggyCreatures.Caching.Fusion.Internals.RunUtils.RunAsyncFuncWithTimeoutAsync[TResult](Func`2 asyncFunc, TimeSpan timeout, Boolean cancelIfTimeout, Action`1 timedOutTaskProcessor, CancellationToken token) in /_/src/ZiggyCreatures.FusionCache/Internals/RunUtils.cs:line 69
+   at ZiggyCreatures.Caching.Fusion.FusionCache.GetOrSetEntryInternalAsync[TValue](String operationId, String key, String originalKey, String[] tags, Func`3 factory, Boolean isRealFactory, MaybeValue`1 failSafeDefaultValue, FusionCacheEntryOptions options, Activity activity, CancellationToken token) in /_/src/ZiggyCreatures.FusionCache/FusionCache_Async.cs:line 247
+   at ZiggyCreatures.Caching.Fusion.FusionCache.GetOrSetAsync[TValue](String key, Func`3 factory, MaybeValue`1 failSafeDefaultValue, FusionCacheEntryOptions options, IEnumerable`1 tags, CancellationToken token) in /_/src/ZiggyCreatures.FusionCache/FusionCache_Async.cs:line 396
+   at HlidacStatu.WebGenerator.Code.RemoteUrlFromWebCache.getAsync(KeyAndId ki)
+   at HlidacStatu.WebGenerator.Code.RemoteUrlFromWebCache.GetWebPageScreenshotAsync(String url, String ratio, String cacheName, Boolean refreshCache)

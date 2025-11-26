@@ -30,7 +30,10 @@ namespace HlidacStatu.WebGenerator.Controllers
             string img, string ratio = "16x9", string color = "blue-dark")
         {
             id = id ?? "social";
-
+            if (System.Diagnostics.Debugger.IsAttached)
+            {
+                title = $"{DateTime.Now:HH:mm:ss:f} {title}";
+            }
             if (!string.IsNullOrEmpty(img))
             {
                 if (img.ToLower().StartsWith("http%3a") || img.ToLower().StartsWith("https%3a")
@@ -74,9 +77,9 @@ namespace HlidacStatu.WebGenerator.Controllers
         public async Task<ActionResult> SocialBanner(string id, string v, string t, string st, string b, string f,
     string img, string rat = "16x9", string res = "1200x628", string col = "")
         {
-            string mainUrl = HttpContext.Request.Scheme + "://" + HttpContext.Request.Host;
-
-
+            string mainUrl = "https://gen.hlidacstatu.cz";
+                
+                //HttpContext.Request.Scheme + "://" + HttpContext.Request.Host;
             // #if (DEBUG)
             //             if (System.Diagnostics.Debugger.IsAttached)
             //                 mainUrl = "http://local.hlidacstatu.cz";
@@ -229,7 +232,9 @@ namespace HlidacStatu.WebGenerator.Controllers
             }
             else if (id?.ToLower() == "kindex")
             {
-                data = RemoteUrlFromWebCache.GetBinary(mainUrl + "/kindex/banner/" + v, "kindex-banner-" + v,
+                data = await RemoteUrlFromWebCache.GetWebPageScreenshotAsync(
+                    mainUrl + "/kindex/banner/" + v, rat,
+                    "kindex-banner-" + v,
                     HttpContext.Request.Query["refresh"] == "1");
             }
             else if (id?.ToLower() == "page" && string.IsNullOrEmpty(v) == false)
@@ -276,7 +281,7 @@ namespace HlidacStatu.WebGenerator.Controllers
                 }
 
                 if (string.IsNullOrEmpty(socialHtml))
-                    return File(@"content/icons/largetile.png", "image/png");
+                    return File(RemoteUrlFromWebCache.NoDataPicture, "image/png");
                 else
                     url = mainUrl + "/imagebannercore/quote"
                                   + "?title=" +
@@ -297,7 +302,7 @@ namespace HlidacStatu.WebGenerator.Controllers
             {
                 if (data == null && !string.IsNullOrEmpty(url))
                 {
-                    data = RemoteUrlFromWebCache.GetScreenshot(url, rat,
+                    data = await RemoteUrlFromWebCache.GetWebPageScreenshotAsync(url, rat,
                         (id?.ToLower() ?? "null") + "-" + rat + "-" + v, HttpContext.Request.Query["refresh"] == "1");
                 }
             }
@@ -307,7 +312,7 @@ namespace HlidacStatu.WebGenerator.Controllers
             }
 
             if (data == null || data.Length == 0)
-                return File(@"content/icons/largetile.png", "image/png");
+                return File(RemoteUrlFromWebCache.NoDataPicture, "image/png");
             else
                 return File(data, "image/png");
         }
