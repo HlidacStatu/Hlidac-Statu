@@ -9,7 +9,7 @@ namespace HlidacStatu.Datasets
     public partial class Search
     {
 
-        public class DatasetMultiQueryMultiResult : HlidacStatu.Searching.Search.ISearchResult
+        public class DatasetMultiQueryMultiResult : HlidacStatu.Searching.Search.ISearchResult, IDatasetResult
         {
             public System.TimeSpan ElapsedTime { get; set; }
             public long Total { get { return Results.Sum(m => m.Total); } }

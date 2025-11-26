@@ -663,18 +663,13 @@
                 @Html.Raw(Devmasters.Lang.CS.Plural.Get(dsSearch.Results.Count(m => m.Total > 0), "v <b>jedné</b> databázi", "ve <b>{0} databázích</b>", "v <b>{0} databázích</b>")).
                 @if (dsSearch.Results.Count(m => m.Total > 0) > 1)
                 {
-            <text>
-                Nejvíce v
-                <ul>
-                    @Html.Raw(string
-                                        .Join("", dsSearch.Results.Where(m => m.Total > 0)
-                                        .OrderByDescending(o => o.Total)
-                                        .Take(4)
-                                        .Select(m => $"<li><a href='{m.DataSet.DatasetSearchUrl(m.RenderQuery())}'>{m.DataSet.RegistrationAsync().GetAwaiter().GetResult().name}</a> ({HlidacStatu.Util.RenderData.NiceNumber(m.Total)})</li>"))
-                                        )
-                </ul>
-            </text>
-                        }
+                    <text>
+                        Nejvíce v
+                        <ul>
+                            @(await Html.RenderDatasetResultsAsync(dsSearch))
+                        </ul>
+                    </text>
+                }
             </p>
 
 

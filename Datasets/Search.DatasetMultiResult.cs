@@ -21,7 +21,7 @@ namespace HlidacStatu.Datasets
 
         }
 
-        public class DatasetMultiResult : HlidacStatu.Searching.Search.ISearchResult
+        public class DatasetMultiResult : HlidacStatu.Searching.Search.ISearchResult, IDatasetResult
         {
             public string Query { get; set; }
             public long Total { get { return Results.Sum(m => m.Total); } }
