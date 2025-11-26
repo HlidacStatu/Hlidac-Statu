@@ -105,7 +105,7 @@ public static class DotaceExtension
         return DescribeDataSource(subsidy.PrimaryDataSource);
     }
 
-    public static IEnumerable<Dotace.Hint.Category> ToCalculatedCategoryWithAI(this Dotace item)
+    public static async Task<IEnumerable<Dotace.Hint.Category>> ToCalculatedCategoryWithAIAsync(this Dotace item)
     {
         if (item == null)
             return Array.Empty<Dotace.Hint.Category>();
@@ -129,7 +129,7 @@ public static class DotaceExtension
         runs++;
         try
         {
-            resFull = llm.QueryAsync(llmQuery, null).ConfigureAwait(false).GetAwaiter().GetResult();
+            resFull = await llm.QueryAsync(llmQuery, null);
         }
         catch (Exception e)
         {
