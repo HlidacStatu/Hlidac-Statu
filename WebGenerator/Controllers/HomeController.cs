@@ -98,7 +98,7 @@ namespace HlidacStatu.WebGenerator.Controllers
                         var social = new ImageBannerCoreData()
                         {
                             title = fi.SocialInfoTitle(),
-                            body = fi.SocialInfoBody(),
+                            body = (await fi.SocialInfoBodyAsync()),
                             footer = fi.SocialInfoFooter(),
                             subtitle = fi.SocialInfoSubTitle(),
                             img = fi.SocialInfoImageUrl(),
