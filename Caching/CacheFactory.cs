@@ -5,6 +5,7 @@ using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.DependencyInjection;
 using Serilog;
 using ZiggyCreatures.Caching.Fusion;
+using ZiggyCreatures.Caching.Fusion.Serialization.NeueccMessagePack;
 using ZiggyCreatures.Caching.Fusion.Serialization.SystemTextJson;
 
 namespace Hlidacstatu.Caching;
@@ -143,6 +144,7 @@ public static class CacheFactory
         L1Default,
         L1FromPermanentStore,
         L2PostgreSql,
+        L2PostgreSqlBinarySerializer,
         L2Memcache,
     }
 
@@ -168,6 +170,7 @@ public static class CacheFactory
                 CacheType.L1FromPermanentStore => L1FromPermanentStoreEntryOptions,
                 CacheType.L2PostgreSql => DistributedCacheEntryOptions,
                 CacheType.L2Memcache => DistributedCacheEntryOptions,
+                CacheType.L2PostgreSqlBinarySerializer => DistributedCacheEntryOptions,
                 _ => throw new ArgumentOutOfRangeException(nameof(cacheType), cacheType, null)
             }
         }, logger: logger);
@@ -177,7 +180,11 @@ public static class CacheFactory
             IDistributedCache? distributedCache = ResolveL2CacheProvider(cacheType); 
             
             if(distributedCache != null)
-                cache.SetupDistributedCache(distributedCache, new FusionCacheSystemTextJsonSerializer());
+            {
+                if (cacheType == CacheType.L2PostgreSqlBinarySerializer)
+                    cache.SetupDistributedCache(distributedCache, new FusionCacheNeueccMessagePackSerializer());
+                else
+                    cache.SetupDistributedCache(distributedCache, new FusionCacheSystemTextJsonSerializer());
         }
 
         return cache;
