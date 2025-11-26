@@ -29,8 +29,8 @@ namespace HlidacStatu.Datasets
             {
                 client = Manager.GetESClient(DataSourcesDbName, idxType: Manager.IndexType.DataSource);
 
-                var ret = client.Indices.ExistsAsync(client.ConnectionSettings.DefaultIndex)
-                    .ConfigureAwait(false).GetAwaiter().GetResult();
+                var ret = client.Indices.Exists(client.ConnectionSettings.DefaultIndex);
+                    
                 if (!ret.Exists)
                 {
                     Newtonsoft.Json.Schema.Generation.JSchemaGenerator jsonG =
@@ -48,9 +48,9 @@ namespace HlidacStatu.Datasets
                         Elasticsearch.Net.PostData.String(Newtonsoft.Json.JsonConvert.SerializeObject(reg));
 
                     var tres = client.LowLevel
-                        .IndexAsync<Elasticsearch.Net.StringResponse>(client.ConnectionSettings.DefaultIndex,
-                            DataSourcesDbName, pd)
-                        .ConfigureAwait(false).GetAwaiter().GetResult();
+                        .Index<Elasticsearch.Net.StringResponse>(client.ConnectionSettings.DefaultIndex,
+                            DataSourcesDbName, pd);
+                    
                     if (tres.Success == false)
                         throw new ApplicationException(tres.DebugInformation);
                 }
