@@ -10,7 +10,7 @@
 
     List<Exception> errors = ViewBag.Errors;
 
-    DataSet ds = DataSet.CachedDatasets.Get(Model.DatasetId);
+    DataSet ds = DataSet.GetCachedDataset(Model.DatasetId);
 
 }
 @section scripts

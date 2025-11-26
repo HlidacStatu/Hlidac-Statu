@@ -6,7 +6,7 @@
 @{
     Layout = "_ReportLayout";
 
-    DataSet ds = DataSet.CachedDatasets.Get("covid-podpora");
+    DataSet ds = DataSet.GetCachedDataset("covid-podpora");
 
     dynamic[] allData = ds.GetAllDataForQueryAsync("auto")
         .Result

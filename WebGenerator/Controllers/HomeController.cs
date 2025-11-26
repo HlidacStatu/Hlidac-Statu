@@ -200,7 +200,7 @@ namespace HlidacStatu.WebGenerator.Controllers
             }
             else if (id?.ToLower() == "dataset")
             {
-                var s = DataSet.CachedDatasets.Get(v);
+                var s = DataSet.GetCachedDataset(v);
                 if (s != null)
                 {
                     if (!s.NotInterestingToShow())
@@ -208,7 +208,7 @@ namespace HlidacStatu.WebGenerator.Controllers
                         var social = new ImageBannerCoreData()
                         {
                             title = await s.SocialInfoTitleAsync(),
-                            body = s.SocialInfoBody(),
+                            body = await s.SocialInfoBodyAsync(),
                             footer = s.SocialInfoFooter(),
                             subtitle = s.SocialInfoSubTitle(),
                             img = s.SocialInfoImageUrl(),

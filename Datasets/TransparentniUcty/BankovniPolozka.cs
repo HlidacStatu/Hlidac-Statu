@@ -7,7 +7,7 @@ namespace HlidacStatu.Datasets.TransparentniUcty
     public class BankovniPolozka : IEqualityComparer<BankovniPolozka>
     {
         private static DataSet _client =
-            DataSet.CachedDatasets.Get("transparentni-ucty-transakce");
+            DataSet.GetCachedDataset("transparentni-ucty-transakce");
         
         //idu,majitel,nazev,datum,protiucet,popis,valuta,typ,castka,poznamka
         public string Id { get; set; } = null;

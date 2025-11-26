@@ -92,7 +92,7 @@ namespace HlidacStatu.Datasets
             if (string.IsNullOrEmpty(datasetId))
                 return null;
             else
-                return DataSet.CachedDatasets.Get(datasetId);
+                return DataSet.GetCachedDataset(datasetId);
         }
 
         public string ToAuditJson()

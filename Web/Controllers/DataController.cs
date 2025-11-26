@@ -28,7 +28,7 @@ namespace HlidacStatu.Web.Controllers
                     foreach (var ds in datasets)
                     {
                         var rec = new Models.DatasetIndexStat() { Ds = ds };
-                        var dsContent = DataSet.CachedDatasets.Get(ds.id.ToString());
+                        var dsContent = DataSet.GetCachedDataset(ds.id.ToString());
                         var allrec = await dsContent.SearchDataAsync("", 1, 1, sort: "DbCreated desc", exactNumOfResults: true);
                         rec.RecordNum = allrec.Total;
 
@@ -66,7 +66,7 @@ namespace HlidacStatu.Web.Controllers
             if (string.IsNullOrEmpty(id))
                 return View(datasets);
 
-            var ds = DataSet.CachedDatasets.Get(id);
+            var ds = DataSet.GetCachedDataset(id);
             if (ds == null)
                 return RedirectToAction("index", "Data", new { id = "" });
 
@@ -78,7 +78,7 @@ namespace HlidacStatu.Web.Controllers
             if (string.IsNullOrEmpty(id))
                 return RedirectToAction("Index");
 
-            var ds = DataSet.CachedDatasets.Get(id);
+            var ds = DataSet.GetCachedDataset(id);
             if (ds == null)
                 return RedirectToAction("index");
             return View(ds);
@@ -88,7 +88,7 @@ namespace HlidacStatu.Web.Controllers
         {
             if (!string.IsNullOrEmpty(id))
             {
-                var ds = DataSet.CachedDatasets.Get(id);
+                var ds = DataSet.GetCachedDataset(id);
                 if (ds == null)
                     return Redirect("/data");
 
@@ -101,7 +101,7 @@ namespace HlidacStatu.Web.Controllers
         public async Task<ActionResult> Delete(string id, string confirmation)
         {
             string email = Request.HttpContext.User.Identity?.Name ?? "";
-            var ds = DataSet.CachedDatasets.Get(id);
+            var ds = DataSet.GetCachedDataset(id);
             if (ds == null)
                 return Redirect("/data");
             if ((await ds.HasAdminAccessAsync(Request?.HttpContext?.User)) == false)
@@ -126,7 +126,7 @@ namespace HlidacStatu.Web.Controllers
             if (string.IsNullOrEmpty(id))
                 return RedirectToAction("Index");
 
-            var ds = DataSet.CachedDatasets.Get(id);
+            var ds = DataSet.GetCachedDataset(id);
             if (ds == null)
                 return RedirectToAction("index");
 
@@ -147,7 +147,7 @@ namespace HlidacStatu.Web.Controllers
             if (string.IsNullOrEmpty(id))
                 return RedirectToAction("Index");
 
-            var ds = DataSet.CachedDatasets.Get(id);
+            var ds = DataSet.GetCachedDataset(id);
             if (ds == null)
                 return RedirectToAction("index");
 
@@ -168,7 +168,7 @@ namespace HlidacStatu.Web.Controllers
 
             await datasetIndexStatCache.InvalidateAsync();
 
-            var ds = DataSet.CachedDatasets.Get(id);
+            var ds = DataSet.GetCachedDataset(id);
             if (ds == null)
                 return RedirectToAction("index");
 
@@ -252,7 +252,7 @@ namespace HlidacStatu.Web.Controllers
             if (string.IsNullOrEmpty(id))
                 return RedirectToAction("index");
 
-            var ds = DataSet.CachedDatasets.Get(id);
+            var ds = DataSet.GetCachedDataset(id);
             if (ds == null)
                 return RedirectToAction("index");
 
@@ -267,7 +267,7 @@ namespace HlidacStatu.Web.Controllers
 
 
             DataSet datasource = null;
-            datasource = DataSet.CachedDatasets.Get(id);
+            datasource = DataSet.GetCachedDataset(id);
             if (datasource == null)
                 return RedirectToAction("index", new { id = id });
 
@@ -282,7 +282,7 @@ namespace HlidacStatu.Web.Controllers
             DataSet ds = null;
             try
             {
-                ds = DataSet.CachedDatasets.Get(id);
+                ds = DataSet.GetCachedDataset(id);
                 if (ds == null)
                     return RedirectToAction("index");
 
@@ -325,7 +325,7 @@ namespace HlidacStatu.Web.Controllers
 
             try
             {
-                var ds = DataSet.CachedDatasets.Get(id);
+                var ds = DataSet.GetCachedDataset(id);
                 if (ds == null)
                     return RedirectToAction("index");
                 if (string.IsNullOrEmpty(dataid))
@@ -374,7 +374,7 @@ namespace HlidacStatu.Web.Controllers
 
             try
             {
-                var ds = DataSet.CachedDatasets.Get(id);
+                var ds = DataSet.GetCachedDataset(id);
                 if (ds == null)
                     return RedirectToAction("index");
 

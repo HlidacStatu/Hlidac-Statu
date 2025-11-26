@@ -5,7 +5,7 @@
     Layout = null;
 
     DataSet ds =
-        DataSet.CachedDatasets.Get((string)Model);
+        DataSet.GetCachedDataset((string)Model);
     var reg = await ds.RegistrationAsync();
 
 }

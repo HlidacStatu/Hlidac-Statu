@@ -5,8 +5,10 @@
 @using HlidacStatu.Entities.Analysis
 @using Microsoft.AspNetCore.Http.Extensions
 @using HlidacStatu.Extensions
+@using HlidacStatu.Lib.Analytics
 @using HlidacStatu.Repositories
 @using HlidacStatu.XLib.Render
+@using Microsoft.AspNetCore.Html
 
 
 @{
@@ -23,6 +25,7 @@
     //00066001,00090450,70947023,70946078,72053119,00080837,70971641,27502988,00085031,70932581,70960399,00095711,26913453,03447286,25396544,60733098
 
     #region table
+
     int currYear = DateTime.Now.Year;
     int firstYear = 2016;
     if (DateTime.Now.Month < 2) //v lednu ukazuj jeste lonsky rok
@@ -34,12 +37,26 @@
 
     var parts = new ReportModel();
 
-    var nameCol = new tblDataSource.Column()
+    IEnumerable<HlidacStatu.Lib.Analytics.StatisticsSubjectPerYear<Smlouva.Statistics.Data>> stats =
+        Model
+            .Select(ico => Firmy.Get(ico).StatistikaRegistruSmluv())
+            .Where(m => m != null)
+            .ToArray();
+
+    //prepare async kindexes - 
+    var kindexMap = new Dictionary<string, IHtmlContent>();
+    foreach (var s in stats)
+    {
+        kindexMap[s.ICO] = await Html.KIndexLabelLinkAsync(s.ICO);
+    }
+
+    ReportDataSource<StatisticsSubjectPerYear<Smlouva.Statistics.Data>>.Column nameCol = new tblDataSource.Column()
     {
         Name = "Subjekt",
         HtmlRender = (s) =>
         {
-            return string.Format((Html.KIndexLabelLinkAsync(s.ICO).ConfigureAwait(false).GetAwaiter().GetResult()) + @"<a title='{1}' href='/subjekt/{0}'>{2}</a>", s.ICO, Firmy.GetJmeno(s.ICO), Devmasters.TextUtil.ShortenText(Firmy.GetJmeno(s.ICO), 50));
+            kindexMap.TryGetValue(s.ICO, out var kind);
+            return string.Format(kind?.RenderRawHtml() + @"<a title='{1}' href='/subjekt/{0}'>{2}</a>", s.ICO, Firmy.GetJmeno(s.ICO), Devmasters.TextUtil.ShortenText(Firmy.GetJmeno(s.ICO), 50));
         },
         TextRender = (s) => { return Devmasters.TextUtil.ShortenText(Firmy.GetJmeno(s.ICO), 40); },
         ValueRender = (s) => { return Firmy.GetJmeno(s.ICO); },
@@ -50,19 +67,12 @@
     var columnsPoctySmluv = new List<tblDataSource.Column>();
     columnsPoctySmluv.Add(nameCol);
     columnsPoctySmluv.AddRange(
-            years.SelectMany(y => new[] {
-                tblDataSource.PocetSmluv(y),
-                tblDataSource.SumSmluvKc(y)
-            })
-        );
-
-
-
-    IEnumerable<HlidacStatu.Lib.Analytics.StatisticsSubjectPerYear<Smlouva.Statistics.Data>> stats =
-        Model
-            .Select(ico => Firmy.Get(ico).StatistikaRegistruSmluv())
-            .Where(m => m != null)
-            .ToArray();
+        years.SelectMany(y => new[]
+        {
+            tblDataSource.PocetSmluv(y),
+            tblDataSource.SumSmluvKc(y)
+        })
+    );
 
 
     var tblPocty = new tblDataSource(columnsPoctySmluv);
@@ -75,27 +85,30 @@
     var columnsCompare1 = new List<tblDataSource.Column>();
     columnsCompare1.Add(nameCol);
     columnsCompare1.AddRange(
-        years.SelectMany(y => new[] {
-tblDataSource.PocetSmluvBezCeny(y),
-tblDataSource.PercentSmluvBezCeny(y),
-    }
+        years.SelectMany(y => new[]
+            {
+                tblDataSource.PocetSmluvBezCeny(y),
+                tblDataSource.PercentSmluvBezCeny(y),
+            }
         ));
     var columnsCompare2 = new List<tblDataSource.Column>();
     columnsCompare2.Add(nameCol);
     columnsCompare2.AddRange(
-        years.SelectMany(y => new[] {
-tblDataSource.PocetSmluvBezSmlStrany(y),
-tblDataSource.PercentSmluvBezSmlStrany(y),
-    }
+        years.SelectMany(y => new[]
+            {
+                tblDataSource.PocetSmluvBezSmlStrany(y),
+                tblDataSource.PercentSmluvBezSmlStrany(y),
+            }
         ));
     var columnsCompare3 = new List<tblDataSource.Column>();
     columnsCompare3.Add(nameCol);
     columnsCompare3.AddRange(
-        years.SelectMany(y => new[] {
-tblDataSource.PocetSmluvPolitik(y),
-tblDataSource.SumKcSmluvBezPolitik(y),
-tblDataSource.PercentSmluvPolitik(y),
-    }
+        years.SelectMany(y => new[]
+            {
+                tblDataSource.PocetSmluvPolitik(y),
+                tblDataSource.SumKcSmluvBezPolitik(y),
+                tblDataSource.PercentSmluvPolitik(y),
+            }
         ));
 
 
@@ -109,63 +122,56 @@ tblDataSource.PercentSmluvPolitik(y),
         tblCompare3.AddRow(d);
     }
 
-
     #endregion
 
 
-
     parts.Add("pocetsmluv", "Počet uzavřených smluv",
-    Html.SimpleBarChart(
-        false, false, height, "", "Subjekt", "Počet smluv",
-        GenerateChartData(stats, years, nameCol, y => tblDataSource.PocetSmluv(y)),
-        tooltipFormatFull: "<center><small>{point.category}</small><br /><b>{point.y:,.0f}</b></center>"
-    ));
+        Html.SimpleBarChart(
+            false, false, height, "", "Subjekt", "Počet smluv",
+            GenerateChartData(stats, years, nameCol, y => tblDataSource.PocetSmluv(y)),
+            tooltipFormatFull: "<center><small>{point.category}</small><br /><b>{point.y:,.0f}</b></center>"
+        ));
     parts.Add("sumTbl", "", tblPocty);
 
     parts.Add("sumKcsmluv", "Suma uzavřených smluv v Kč",
-Html.SimpleBarChart(
-false, false, height, "", "Subjekt", "Kč",
-GenerateChartData(stats, years, nameCol, y => tblDataSource.SumSmluvKc(y)),
-tooltipFormatFull: "<center><small>{point.category}</small><br /><b>{point.y:,.0f}</b></center>"
-));
+        Html.SimpleBarChart(
+            false, false, height, "", "Subjekt", "Kč",
+            GenerateChartData(stats, years, nameCol, y => tblDataSource.SumSmluvKc(y)),
+            tooltipFormatFull: "<center><small>{point.category}</small><br /><b>{point.y:,.0f}</b></center>"
+        ));
     parts.Add("compareTbl1", "", tblCompare1);
 
 
     parts.Add("PercentSmluvBezCeny", "% smluv se skrytou cenou",
-Html.SimpleBarChart(
-false, false, height, "", "Subjekt", "%",
-GenerateChartData(stats, years, nameCol, y => tblDataSource.PercentSmluvBezCeny(y)),
-tooltipFormatFull: "<center><small>{point.category}</small><br /><b>{point.y:,.0f}</b></center>"
-));
+        Html.SimpleBarChart(
+            false, false, height, "", "Subjekt", "%",
+            GenerateChartData(stats, years, nameCol, y => tblDataSource.PercentSmluvBezCeny(y)),
+            tooltipFormatFull: "<center><small>{point.category}</small><br /><b>{point.y:,.0f}</b></center>"
+        ));
     parts.Add("PercentSmluvBezSmlStrany", "% smluv se skrytou smluvní stranou",
-    Html.SimpleBarChart(
-        false, false, height, "", "Subjekt", "%",
-        GenerateChartData(stats, years, nameCol, y => tblDataSource.PercentSmluvBezCeny(y)),
-        tooltipFormatFull: "<center><small>{point.category}</small><br /><b>{point.y:,.0f}</b></center>"
-    ));
+        Html.SimpleBarChart(
+            false, false, height, "", "Subjekt", "%",
+            GenerateChartData(stats, years, nameCol, y => tblDataSource.PercentSmluvBezCeny(y)),
+            tooltipFormatFull: "<center><small>{point.category}</small><br /><b>{point.y:,.0f}</b></center>"
+        ));
 
     parts.Add("compareTbl2", "", tblCompare2);
 
 
     parts.Add("PercentSmluvPolitici", "% smluv s firmami s vazbou na sponzory a politiky",
-Html.SimpleBarChart(
-false, false, height, "", "Subjekt", "%",
-GenerateChartData(stats, years, nameCol, y => tblDataSource.PercentSmluvPolitik(y)),
-tooltipFormatFull: "<center><small>{point.category}</small><br /><b>{point.y:,.0f}</b></center>"
-));
+        Html.SimpleBarChart(
+            false, false, height, "", "Subjekt", "%",
+            GenerateChartData(stats, years, nameCol, y => tblDataSource.PercentSmluvPolitik(y)),
+            tooltipFormatFull: "<center><small>{point.category}</small><br /><b>{point.y:,.0f}</b></center>"
+        ));
     parts.Add("PocetSmluvPolitici", "Výše smluv uzavřených s firmami s vazbou na sponzory a politiky",
-    Html.SimpleBarChart(
-        false, false, height, "", "Subjekt", "Kč",
-        GenerateChartData(stats, years, nameCol, y => tblDataSource.SumKcSmluvBezPolitik(y)),
-        tooltipFormatFull: "<center><small>{point.category}</small><br /><b>{point.y:,.0f}</b></center>"
-    ));
+        Html.SimpleBarChart(
+            false, false, height, "", "Subjekt", "Kč",
+            GenerateChartData(stats, years, nameCol, y => tblDataSource.SumKcSmluvBezPolitik(y)),
+            tooltipFormatFull: "<center><small>{point.category}</small><br /><b>{point.y:,.0f}</b></center>"
+        ));
 
     parts.Add("compareTbl3", "", tblCompare3);
-
-
-
-
-
 }
 
 
@@ -180,30 +186,35 @@ tooltipFormatFull: "<center><small>{point.category}</small><br /><b>{point.y:,.0
         </div>
         <div class="card-body">
             <div><b>Podle IČ:</b> (pouze platná česká IČ)</div>
-            <div><code>@Context.Request.Scheme://@Context.Request.Host@(Context.Request.Path)?title=název_stránky&amp;ico=seznam_ico_oddělený_čárkami</code></div>
+            <div><code>@Context.Request.Scheme://@Context.Request.Host@(Context.Request.Path)?title=název_stránky&amp;ico=seznam_ico_oddělený_čárkami</code>
+            </div>
             <div><b>Podle datových schránek:</b> (pouze platné ID českých datových schránek)</div>
-            <div><code>@Context.Request.Scheme://@Context.Request.Host@(Context.Request.Path)?title=název_stránky&amp;ds=seznam_ID_datových_schránek_oddělený_čárkami</code></div>
+            <div><code>@Context.Request.Scheme://@Context.Request.Host@(Context.Request.Path)?title=název_stránky&amp;ds=seznam_ID_datových_schránek_oddělený_čárkami</code>
+            </div>
             <div>&nbsp;</div>
             <div>
                 <b>Příklad:</b>
-                <code><a href="/Porovnat/Subjekty?ico=00216208,00216305,70883521">@Context.Request.Scheme://@Context.Request.Host@(Context.Request.Path)?title=@(HttpUtility.UrlEncode("University"))&amp;ico=00216208,00216305,70883521</a></code>
+                <code><a
+                        href="/Porovnat/Subjekty?ico=00216208,00216305,70883521">@Context.Request.Scheme://@Context.Request.Host@(Context.Request.Path)?title=@(HttpUtility.UrlEncode("University"))&amp;ico=00216208,00216305,70883521</a></code>
             </div>
         </div>
     </div>
 }
 else
 {
-
     if (part.HasValue == false)
     {
         <div class="bs-callout primary small">
             <h3>Vzájemné porovnání těchto organizací</h3>
             <p>
-                V tomto přehledu porovnáváme srovnatelné úřady a organizace. Lépe se tím pozná, jestli se některé výrazně nevymykají obvyklému chování.
-                Pokud utajují výrazně víc než ostatní porovnatelné organizace, pak to může svědčit o možném problému a zvýšeném riziku korupce či neefektivní nakládání s veřejnými prostředky.
+                V tomto přehledu porovnáváme srovnatelné úřady a organizace. Lépe se tím pozná, jestli se některé
+                výrazně nevymykají obvyklému chování.
+                Pokud utajují výrazně víc než ostatní porovnatelné organizace, pak to může svědčit o možném problému a
+                zvýšeném riziku korupce či neefektivní nakládání s veřejnými prostředky.
             </p>
         </div>
     }
+
     <div class="row">
         @{
             int currPart = 0;
@@ -215,28 +226,30 @@ else
             {
                 continue;
             }
+
             string css = "col-sm-12 col-md-6";
             if (parts.GetQueue().Count() < 4)
             {
                 css = "col-sm-12";
             }
+
             if (p.Type == ReportModel.QueueItem.types.table)
             {
-
                 <div class="col-sm-12 block-hover" style="margin-top:10px;">
                     <div style="position:relative;top:33px;">
-                        <share-widget url="@($"{Context.Request.GetDisplayUrl()}&part={currPart}")" title="Vložit tuto tabulku do vlastní stránky"></share-widget>
+                        <share-widget url="@($"{Context.Request.GetDisplayUrl()}&part={currPart}")"
+                                      title="Vložit tuto tabulku do vlastní stránky"></share-widget>
                     </div>
-                    @Html.Raw(ChartUtilExtensions.RenderReport(p, HtmlExtensions.DatatableOptions(orderColumnIdx:6, orderDirection:"desc", pageLength:20), p.Key)
-                                  )
+                    @Html.Raw(ChartUtilExtensions.RenderReport(p, HtmlExtensions.DatatableOptions(orderColumnIdx: 6, orderDirection: "desc", pageLength: 20), p.Key)
+                    )
                 </div>
-
             }
             else
             {
                 <div class="@css block-hover" style="padding-top:30px;">
                     <div style="position:relative;left:16px;">
-                        <share-widget url="@($"{Context.Request.GetDisplayUrl()}&part={currPart}")" title="Vložit tento graf do vlastní stránky"></share-widget>
+                        <share-widget url="@($"{Context.Request.GetDisplayUrl()}&part={currPart}")"
+                                      title="Vložit tento graf do vlastní stránky"></share-widget>
                     </div>
                     @Html.Raw(ChartUtilExtensions.RenderReport(p, @"", p.Key))
                 </div>
@@ -257,21 +270,27 @@ else
         List<tblDataSource> chart = new();
         foreach (var year in years.Reverse())
         {
-            var ch = new tblDataSource(new tblDataSource.Column[] {
-                    nameCol,fn(year)
-                });
+            var ch = new tblDataSource(new tblDataSource.Column[]
+            {
+                nameCol, fn(year)
+            });
             ch.Title = year.ToString();
             foreach (var d in stats)
-            { ch.AddRow(d); }
+            {
+                ch.AddRow(d);
+            }
+
             chart.Add(ch);
         }
+
         return chart.ToArray();
     }
 
     public class tblDataSource : ReportDataSource<HlidacStatu.Lib.Analytics.StatisticsSubjectPerYear<Smlouva.Statistics.Data>>
     {
         public tblDataSource(IEnumerable<Column> cols) : base(cols)
-        { }
+        {
+        }
 
         public static Column PocetSmluv(int? year)
         {
@@ -286,6 +305,7 @@ else
                 OrderValueRender = (s) => { return HlidacStatu.Util.RenderData.OrderValueFormat(s[iYear].PocetSmluv); }
             };
         }
+
         public static Column SumSmluvKc(int? year)
         {
             string sYear = year.HasValue ? $" v {year}" : "";
@@ -314,8 +334,8 @@ else
                 ValueRender = (s) => { return s[iYear].PocetSmluvBezCeny.ToString(); },
                 OrderValueRender = (s) => { return HlidacStatu.Util.RenderData.OrderValueFormat(s[iYear].PocetSmluvBezCeny); }
             };
-
         }
+
         public static Column PercentSmluvBezCeny(int? year)
         {
             string sYear = year.HasValue ? $" v {year}" : "";
@@ -329,7 +349,6 @@ else
                 ValueRender = (s) => { return (s[iYear].PercentSmluvBezCeny * 100).ToString("G", HlidacStatu.Util.Consts.enCulture); },
                 OrderValueRender = (s) => { return HlidacStatu.Util.RenderData.OrderValueFormat(s[iYear].PercentSmluvBezCeny); }
             };
-
         }
 
         public static Column PocetSmluvBezSmlStrany(int? year)
@@ -343,17 +362,17 @@ else
                 HtmlRender = (s) =>
                 {
                     return
-                    "<a href='/Hledat?Q=(issues.issueTypeId:18+OR+issues.issueTypeId:12)+ico:" + s.ICO + "'>"
-                    + s[iYear].PocetSmluvBezSmluvniStrany.ToString()
-                    + "</a>"
-                    ;
+                        "<a href='/Hledat?Q=(issues.issueTypeId:18+OR+issues.issueTypeId:12)+ico:" + s.ICO + "'>"
+                        + s[iYear].PocetSmluvBezSmluvniStrany.ToString()
+                        + "</a>"
+                        ;
                 },
                 TextRender = (s) => { return (s[iYear].PocetSmluvBezSmluvniStrany).ToString("G", HlidacStatu.Util.Consts.enCulture); },
                 ValueRender = (s) => { return (s[iYear].PocetSmluvBezSmluvniStrany).ToString("G", HlidacStatu.Util.Consts.enCulture); },
                 OrderValueRender = (s) => { return s[iYear].PocetSmluvBezSmluvniStrany.ToString(); }
             };
-
         }
+
         public static Column PercentSmluvBezSmlStrany(int? year)
         {
             string sYear = year.HasValue ? $" v {year}" : "";
@@ -367,9 +386,8 @@ else
                 TextRender = (s) => { return (s[iYear].PercentSmluvBezSmluvniStrany * 100).ToString("G", HlidacStatu.Util.Consts.enCulture); },
                 ValueRender = (s) => { return (s[iYear].PercentSmluvBezSmluvniStrany * 100).ToString("G", HlidacStatu.Util.Consts.enCulture); },
             };
-
-
         }
+
         public static Column SumKcSmluvBezSmlStrany(int? year)
         {
             string sYear = year.HasValue ? $" v {year}" : "";
@@ -383,7 +401,6 @@ else
                 TextRender = (s) => { return (s[iYear].SumKcSmluvBezSmluvniStrany * 100).ToString("G", HlidacStatu.Util.Consts.enCulture); },
                 ValueRender = (s) => { return (s[iYear].SumKcSmluvBezSmluvniStrany * 100).ToString("G", HlidacStatu.Util.Consts.enCulture); },
             };
-
         }
 
         public static Column PocetSmluvPolitik(int? year)
@@ -399,9 +416,8 @@ else
                 ValueRender = (s) => { return (s[iYear].PocetSmluvSponzorujiciFirmy).ToString("G", HlidacStatu.Util.Consts.enCulture); },
                 OrderValueRender = (s) => { return s[iYear].PocetSmluvSponzorujiciFirmy.ToString(); }
             };
-
-
         }
+
         public static Column PercentSmluvPolitik(int? year)
         {
             string sYear = year.HasValue ? $" v {year}" : "";
@@ -416,6 +432,7 @@ else
                 OrderValueRender = (s) => { return (s[iYear].PercentSmluvPolitiky * 100000).ToString("G", HlidacStatu.Util.Consts.enCulture); }
             };
         }
+
         public static Column SumKcSmluvBezPolitik(int? year)
         {
             string sYear = year.HasValue ? $" v {year}" : "";
@@ -430,8 +447,7 @@ else
                 ValueRender = (s) => { return (s[iYear].SumKcSmluvSponzorujiciFirmy).ToString("G", HlidacStatu.Util.Consts.enCulture); },
                 OrderValueRender = (s) => { return s[iYear].SumKcSmluvSponzorujiciFirmy.ToString("G", HlidacStatu.Util.Consts.enCulture); }
             };
-
         }
-
     }
+
 }

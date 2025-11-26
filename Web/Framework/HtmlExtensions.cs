@@ -5,9 +5,11 @@ using HlidacStatu.XLib.Render;
 using Microsoft.AspNetCore.Html;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using HlidacStatu.Datasets;
 using HlidacStatu.Entities.KIndex;
 using HlidacStatu.Repositories.Analysis.KorupcniRiziko;
 
@@ -51,6 +53,44 @@ namespace HlidacStatu.Web.Framework
                     + "</small>"
                     );
             }
+        }
+        
+        public static async Task<IHtmlContent> RenderDatasetResultsAsync(this IHtmlHelper self, IDatasetResult dsResult)
+        {
+            var items = await Task.WhenAll(
+                dsResult.Results
+                    .Where(m => m.Total > 0)
+                    .OrderByDescending(o => o.Total)
+                    .Take(4)
+                    .Select(async m =>
+                    {
+                        var reg = await m.DataSet.RegistrationAsync();
+                        return $"<li><a href='{m.DataSet.DatasetSearchUrl(m.RenderQuery())}'>{reg.name}</a> ({HlidacStatu.Util.RenderData.NiceNumber(m.Total)})</li>";
+                    })
+            );
+
+            var html = string.Join("", items);
+            return self.Raw(html);
+        }
+
+        
+        public static async Task<(IEnumerable<string> Tabs, IEnumerable<string> Results)> NalezeneVysledkyVDalsichDatabazichAsync(ConcurrentBag<DataSearchResult> datasetResults, string query)
+        {
+            List<string> tabs = new();
+            foreach (var rds in datasetResults.Where(m => m.Total > 0).OrderByDescending(m => m.Total))
+            {
+                tabs.Add($"{(await rds.DataSet.RegistrationAsync()).name}&nbsp;({HlidacStatu.Util.RenderData.Vysledky.PocetVysledku(rds.Total)})");
+            }
+            
+            List<string> results = new();
+            foreach (var rds in datasetResults
+                         .Where(m => m.Total > 0)
+                         .OrderByDescending(m => m.Total))
+            {
+                results.Add(await rds.RenderResultsInHtmlAsync(query));
+            }
+            
+            return (tabs, results);
         }
 
     }

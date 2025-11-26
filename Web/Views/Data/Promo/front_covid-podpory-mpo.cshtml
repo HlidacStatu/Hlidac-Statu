@@ -9,7 +9,7 @@
     Layout = null;
 
     DataSet ds =
-        DataSet.CachedDatasets.Get((string)Model);
+        DataSet.GetCachedDataset((string)Model);
     
     var vyzvy = await ds.ESClient.SearchAsync<object>(s => s
     .MatchAll()

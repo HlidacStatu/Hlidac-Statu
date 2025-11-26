@@ -157,7 +157,7 @@ namespace HlidacStatu.Web.Controllers
                         return File(rawData, contentType, filename);
                     }
 
-                    DataSet datasource = DataSet.CachedDatasets.Get(ds);
+                    DataSet datasource = DataSet.GetCachedDataset(ds);
                     if (datasource == null)
                     {
                         rawData = System.Text.Encoding.UTF8.GetBytes("žádná data nejsou k dispozici");
@@ -274,7 +274,7 @@ namespace HlidacStatu.Web.Controllers
                     return File(rawData, contentType, filename);
                 }
 
-                DataSet datasource = DataSet.CachedDatasets.Get(ds);
+                DataSet datasource = DataSet.GetCachedDataset(ds);
                 if (datasource == null)
                 {
                     rawData = System.Text.Encoding.UTF8.GetBytes("žádná data nejsou k dispozici");

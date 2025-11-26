@@ -1,10 +1,7 @@
-﻿using HlidacStatu.Repositories.Searching;
-
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using HlidacStatu.Connectors;
 
 namespace HlidacStatu.Datasets
 {
@@ -24,7 +21,7 @@ namespace HlidacStatu.Datasets
 
         }
 
-        public class DatasetMultiResult : HlidacStatu.Searching.Search.ISearchResult
+        public class DatasetMultiResult : HlidacStatu.Searching.Search.ISearchResult, IDatasetResult
         {
             public string Query { get; set; }
             public long Total { get { return Results.Sum(m => m.Total); } }
@@ -81,7 +78,7 @@ namespace HlidacStatu.Datasets
                 }
 
                 if (datasets == null)
-                    datasets = DataSetDB.ProductionDataSets.Get();
+                    datasets = await DataSetCache.GetProductionDatasetsAsync();
 
                 ParallelOptions po = new ParallelOptions();
                 po.MaxDegreeOfParallelism = System.Diagnostics.Debugger.IsAttached ? 1 : po.MaxDegreeOfParallelism;

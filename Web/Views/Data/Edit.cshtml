@@ -7,7 +7,7 @@
 
     ApiResponseStatus err = ViewBag.ApiResponseError;
 
-    DataSet dataset = DataSet.CachedDatasets.Get(Model.datasetId);
+    DataSet dataset = DataSet.GetCachedDataset(Model.datasetId);
     var logged = User.Identity?.Name;
 
 

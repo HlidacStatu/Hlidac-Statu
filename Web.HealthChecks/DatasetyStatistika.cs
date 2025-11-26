@@ -5,80 +5,85 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Hlidacstatu.Caching;
+using HlidacStatu.Datasets;
+using ZiggyCreatures.Caching.Fusion;
 
 namespace HlidacStatu.Web.HealthChecks
 {
     public class DatasetyStatistika : IHealthCheck
     {
-        Devmasters.Cache.LocalMemory.AutoUpdatedCache<List<DatasetStat>> statistiky =
-            new Devmasters.Cache.LocalMemory.AutoUpdatedCache<List<DatasetStat>>(
-                TimeSpan.FromMinutes(60), "DatasetStat_all", _ =>
+        private readonly IFusionCache _cache =
+            Hlidacstatu.Caching.CacheFactory.CreateNew(CacheFactory.CacheType.L1Default, nameof(DatasetyStatistika));
+
+        private ValueTask<List<DatasetStat>> GetStatistikyCachedAsync() => _cache.GetOrSetAsync(
+            $"_DatasetStat_all", async _ =>
+            {
+                try
                 {
-                    try
+                    List<DatasetStat> res = new List<DatasetStat>();
+                    foreach (var ds in await DataSetCache.GetProductionDatasetsAsync())
                     {
-                        List<DatasetStat> res = new List<DatasetStat>();
-                        foreach (var ds in Datasets.DataSetDB.ProductionDataSets.Get())
+                        var item = new DatasetStat();
+                        item.Dataset = ds;
+
+                        var allrec =
+                            await ds.SearchDataAsync("*", 1, 1, sort: "DbCreated desc", exactNumOfResults: true);
+                        
+                        item.PocetCelkem = allrec.Total;
+                        if (allrec.Total > 0)
                         {
-                            var item = new DatasetStat();
-                            item.Dataset = ds;
-
-                            var allrec = ds.SearchDataAsync("*", 1, 1, sort: "DbCreated desc", exactNumOfResults: true)
-                                .ConfigureAwait(false).GetAwaiter().GetResult();
-                            item.PocetCelkem = allrec.Total;
-                            if (allrec.Total > 0)
-                            {
-                                item.PosledniZmena = (DateTime?)allrec.Result.First().DbCreated;
-                            }
-
-
-                            foreach (var interval in EnumsNET.Enums.GetMembers<IntervalEnum>())
-                            {
-                                DateTime dateFrom = DateTime.Now.Date;
-                                DateTime dateTo = DateTime.Now.Date;
-                                string dateQ = "";
-                                switch (interval.Value)
-                                {
-                                    case IntervalEnum.Day:
-                                        dateFrom = dateTo.AddDays(-1);
-                                        dateQ = $"{dateFrom:yyyy-MM-dd}";
-                                        break;
-                                    case IntervalEnum.Week:
-                                        dateFrom = dateTo.AddDays(-7);
-                                        dateQ = $"[{dateFrom:yyyy-MM-dd} TO {dateTo:yyyy-MM-dd}]";
-                                        break;
-                                    case IntervalEnum.Month:
-                                        dateFrom = dateTo.AddMonths(-1);
-                                        dateQ = $"[{dateFrom:yyyy-MM-dd} TO {dateTo:yyyy-MM-dd}]";
-                                        break;
-                                    case IntervalEnum.Year:
-                                        dateFrom = dateTo.AddYears(-1);
-                                        dateQ = $"[{dateFrom:yyyy-MM-dd} TO {dateTo:yyyy-MM-dd}]";
-                                        break;
-                                    default:
-                                        break;
-                                }
-
-                                var pocet = ds.SearchDataAsync(
-                                        $"DbCreated:[{DateTime.Now.AddDays(-7).ToString("yyyy-MM-dd")} TO *]", 1, 0,
-                                        exactNumOfResults: true)
-                                    .ConfigureAwait(false).GetAwaiter().GetResult();
-                                if (pocet.IsValid)
-                                    item.PocetZaInterval.Add(interval.Value, pocet.Total);
-                                else
-                                    item.PocetZaInterval.Add(interval.Value, -1);
-                            }
-
-                            res.Add(item);
+                            item.PosledniZmena = (DateTime?)allrec.Result.First().DbCreated;
                         }
 
-                        return res;
+                        foreach (var interval in EnumsNET.Enums.GetMembers<IntervalEnum>())
+                        {
+                            DateTime dateFrom = DateTime.Now.Date;
+                            DateTime dateTo = DateTime.Now.Date;
+                            string dateQ = "";
+                            switch (interval.Value)
+                            {
+                                case IntervalEnum.Day:
+                                    dateFrom = dateTo.AddDays(-1);
+                                    dateQ = $"{dateFrom:yyyy-MM-dd}";
+                                    break;
+                                case IntervalEnum.Week:
+                                    dateFrom = dateTo.AddDays(-7);
+                                    dateQ = $"[{dateFrom:yyyy-MM-dd} TO {dateTo:yyyy-MM-dd}]";
+                                    break;
+                                case IntervalEnum.Month:
+                                    dateFrom = dateTo.AddMonths(-1);
+                                    dateQ = $"[{dateFrom:yyyy-MM-dd} TO {dateTo:yyyy-MM-dd}]";
+                                    break;
+                                case IntervalEnum.Year:
+                                    dateFrom = dateTo.AddYears(-1);
+                                    dateQ = $"[{dateFrom:yyyy-MM-dd} TO {dateTo:yyyy-MM-dd}]";
+                                    break;
+                                default:
+                                    break;
+                            }
+
+                            var pocet = await ds.SearchDataAsync(
+                                $"DbCreated:[{DateTime.Now.AddDays(-7).ToString("yyyy-MM-dd")} TO *]", 1, 0,
+                                exactNumOfResults: true);
+                            
+                            if (pocet.IsValid)
+                                item.PocetZaInterval.Add(interval.Value, pocet.Total);
+                            else
+                                item.PocetZaInterval.Add(interval.Value, -1);
+                        }
+
+                        res.Add(item);
                     }
-                    catch (Exception)
-                    {
-                        return new List<DatasetStat>();
-                    }
+
+                    return res;
                 }
-            );
+                catch (Exception)
+                {
+                    return new List<DatasetStat>();
+                }
+            }
+        );
 
         private class DatasetStat
         {
@@ -118,12 +123,12 @@ namespace HlidacStatu.Web.HealthChecks
         }
 
 
-        public Task<HealthCheckResult> CheckHealthAsync(HealthCheckContext context,
+        public async Task<HealthCheckResult> CheckHealthAsync(HealthCheckContext context,
             CancellationToken cancellationToken = default)
         {
             try
             {
-                var data = statistiky.Get();
+                var data = await GetStatistikyCachedAsync();
                 System.Text.StringBuilder sb = new System.Text.StringBuilder(1024);
                 sb.Append("<table class='table table-sm table-borderless table-hover'>");
                 sb.Append(
@@ -142,12 +147,11 @@ namespace HlidacStatu.Web.HealthChecks
 
                 sb.Append("</tbody></table>");
 
-                return Task.FromResult(HealthCheckResult.Healthy(sb.ToString()));
+                return HealthCheckResult.Healthy(sb.ToString());
             }
             catch (Exception e)
             {
-                return Task.FromResult(HealthCheckResult.Unhealthy("Unknown status, cannot read data from network disk",
-                    e));
+                return HealthCheckResult.Unhealthy("Unknown status, cannot read data from network disk", e);
             }
         }
     }

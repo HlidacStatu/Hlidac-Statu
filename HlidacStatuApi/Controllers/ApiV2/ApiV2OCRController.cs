@@ -178,7 +178,7 @@ namespace HlidacStatuApi.Controllers.ApiV2
             {
                 return null;
             }
-            var ds = DataSet.CachedDatasets.Get(item.ItemSubType.ToLower());
+            var ds = DataSet.GetCachedDataset(item.ItemSubType.ToLower());
 
             var dsitem = await ds.GetDataObjAsync(item.ItemId);
             List<Uri> uris = DataSet.GetFromItems_HsDocumentUrls(dsitem, false, 20);
@@ -535,7 +535,7 @@ namespace HlidacStatuApi.Controllers.ApiV2
                 return false;
             }
 
-            var ds = DataSet.CachedDatasets.Get(task.ItemSubType.ToLower());
+            var ds = DataSet.GetCachedDataset(task.ItemSubType.ToLower());
             if (ds == null)
             {
                 _logger.Error("Cannot get dataset {datasetname} from task {taskId}.", task.ItemSubType.ToLower(), res.taskId);

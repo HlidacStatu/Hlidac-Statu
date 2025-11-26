@@ -29,7 +29,7 @@ namespace HlidacStatu.XLib.Watchdogs
                         var dataSetId = value.DataType.Replace("DataSet.", "");
                         try
                         {
-                            DataSet = DataSet.CachedDatasets.Get(dataSetId);
+                            DataSet = DataSet.GetCachedDataset(dataSetId);
                         }
                         catch
                         {
@@ -52,7 +52,7 @@ namespace HlidacStatu.XLib.Watchdogs
                 if (_dataset == null)
                 {
                     var dataSetId = OrigWD.DataType.Replace("DataSet.", "");
-                    _dataset = DataSet.CachedDatasets.Get(dataSetId);
+                    _dataset = DataSet.GetCachedDataset(dataSetId);
                 }
 
                 return _dataset;

@@ -300,7 +300,7 @@ namespace HlidacStatu.Web.Controllers
                         , "application/json");
                 else
                 {
-                    var ds = DataSet.CachedDatasets.Get(id);
+                    var ds = DataSet.GetCachedDataset(id);
                     if (ds == null)
                         return Json(ApiResponseStatus.DatasetNotFound);
                     else
@@ -372,7 +372,7 @@ namespace HlidacStatu.Web.Controllers
 
             try
             {
-                var ds = DataSet.CachedDatasets.Get(id?.ToLower());
+                var ds = DataSet.GetCachedDataset(id?.ToLower());
                 if (ds == null)
                     return Json(ApiResponseStatus.DatasetNotFound);
 
@@ -411,7 +411,7 @@ namespace HlidacStatu.Web.Controllers
 
             try
             {
-                var ds = DataSet.CachedDatasets.Get(id.ToLower());
+                var ds = DataSet.GetCachedDataset(id.ToLower());
                 var value = await ds.GetDataObjAsync(dataid);
                 //remove from item
                 if (value == null)
@@ -447,7 +447,7 @@ namespace HlidacStatu.Web.Controllers
 
             try
             {
-                var ds = DataSet.CachedDatasets.Get(id.ToLower());
+                var ds = DataSet.GetCachedDataset(id.ToLower());
                 bool value = await ds.ItemExistsAsync(dataid);
                 //remove from item
                 if (value == false)
@@ -487,7 +487,7 @@ namespace HlidacStatu.Web.Controllers
             id = id.ToLower();
             try
             {
-                var ds = DataSet.CachedDatasets.Get(id);
+                var ds = DataSet.GetCachedDataset(id);
                 var newId = dataid;
 
                 if (mode == "rewrite")

@@ -1,11 +1,8 @@
-using System.Text;
 using HlidacStatu.Datasets;
-using HlidacStatu.DS.Graphs;
 using HlidacStatu.Entities;
 using HlidacStatu.Repositories;
 using HlidacStatu.Repositories.Searching;
 using HlidacStatu.Repositories.Statistics;
-using HlidacStatu.Entities.Entities;
 
 namespace HlidacStatu.Extensions;
 
@@ -38,7 +35,7 @@ public static class OsobaExtension2
         if (showIt)
             return showIt;
 
-        var dataSets = DataSetDB.ProductionDataSets.Get()
+        var dataSets = (await DataSetCache.GetProductionDatasetsAsync())
             .Where(m => m.DatasetId != "skutecni-majitele").ToArray();
         var dsQuery = $"( OsobaId:ilja-pospisil) ";
         showIt = await DatasetRepo.Searching.CheckIfAnyRecordExistAsync(dsQuery, dataSets);

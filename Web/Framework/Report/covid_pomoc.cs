@@ -3,6 +3,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace HlidacStatu.Web.Framework.Report
 {
@@ -19,17 +20,11 @@ namespace HlidacStatu.Web.Framework.Report
         public string poznamka { get; set; }
         public string url { get; set; }
 
-        public static List<covid_pomoc> VsechnaPomoc()
+        public static async Task<List<covid_pomoc>> VsechnaPomocAsync()
         {
-            return dataCache.Get();
+            var ds = DataSet.GetCachedDataset("pomoc-covid");
+            return (await ds.GetAllDataAsync<covid_pomoc>())?.ToList();
         }
-
-        static Devmasters.Cache.LocalMemory.Cache<List<covid_pomoc>> dataCache =
-            new(TimeSpan.FromMinutes(10), "covid_pomoc", (o) =>
-            {
-                var ds = DataSet.CachedDatasets.Get("pomoc-covid");
-                return ds.GetAllDataAsync<covid_pomoc>().ConfigureAwait(false).GetAwaiter().GetResult().ToList();
-            });
 
     }
 }

@@ -249,7 +249,7 @@ namespace HlidacStatu.Web.Controllers
                     data = data.Replace("dataset|", "");
                     try
                     {
-                        var ds = DataSet.CachedDatasets.Get(data);
+                        var ds = DataSet.GetCachedDataset(data);
                         to = (await ds.RegistrationAsync()).createdBy;
                         subject = subject + $" ohledně databáze {ds.DatasetId}";
                     }
@@ -971,7 +971,7 @@ text zpravy: {txt}
 
             if (id == "uohs-ed")
             {
-                var ds = DataSet.CachedDatasets.Get("rozhodnuti-uohs");
+                var ds = DataSet.GetCachedDataset("rozhodnuti-uohs");
                 var res = await ds.SearchDataAsync("*", 0, 30, "PravniMoc desc");
                 if (res.Total > 0)
                 {
@@ -1205,7 +1205,7 @@ text zpravy: {txt}
             }
             else if (id?.ToLower() == "dataset")
             {
-                var s = DataSet.CachedDatasets.Get(v);
+                var s = DataSet.GetCachedDataset(v);
                 if (s != null)
                 {
                     if (!s.NotInterestingToShow())
@@ -1213,7 +1213,7 @@ text zpravy: {txt}
                         var social = new ImageBannerCoreData()
                         {
                             title = await s.SocialInfoTitleAsync(),
-                            body = s.SocialInfoBody(),
+                            body = await s.SocialInfoBodyAsync(),
                             footer = s.SocialInfoFooter(),
                             subtitle = s.SocialInfoSubTitle(),
                             img = s.SocialInfoImageUrl(),

@@ -67,7 +67,7 @@ namespace HlidacStatu.Web.HealthChecks
                         break;
                 }
 
-                var ds = Datasets.DataSet.CachedDatasets.Get(options.DatasetId);
+                var ds = Datasets.DataSet.GetCachedDataset(options.DatasetId);
                 if (ds != null)
                 {
                     var res = await Datasets.DatasetRepo.Searching.SearchDataRawAsync(ds, $"DbCreated:{dateQ}", 1, 1,

@@ -8,28 +8,28 @@
 
     List<string> alreadyRendered = new List<string>();
 
-    var veklep = DataSet.CachedDatasets.Get("veklep");
-    var vyjadreniPolitiku = DataSet.CachedDatasets.Get("vyjadreni-politiku");
-    var jednaniVlady = DataSet.CachedDatasets.Get("jednani-vlady");
-    var stenoZaznamy = DataSet.CachedDatasets.Get("stenozaznamy-psp");
-    var tiskoveKonferenceVlady = DataSet.CachedDatasets.Get("tiskove-konference-vlady");
-    var vyboryPsp = DataSet.CachedDatasets.Get("vybory-psp");
-    var fondPokorneJermanove = DataSet.CachedDatasets.Get("fond-hejtmanky-pokorne-jermanove");
-    var zasedaniZastupitelstev = DataSet.CachedDatasets.Get("zasedani-zastupitelstev");
-    var rozhodnutiUohs = DataSet.CachedDatasets.Get("rozhodnuti-uohs");
-    var ministryInvoices = DataSet.CachedDatasets.Get("ministry-invoices");
-    var rejstrikTrestuPravnickychOsob = DataSet.CachedDatasets.Get("rejstrik-trestu-pravnickych-osob");
-    var stavMostu = DataSet.CachedDatasets.Get("stav-mostu");
-    var narodniInvesticniPlan = DataSet.CachedDatasets.Get("narodni-investicni-plan");
-    var covidPodpory = DataSet.CachedDatasets.Get("covid-podpory-mpo");
-    var prijemcyPodporyCovidProgramu = DataSet.CachedDatasets.Get("prijemci-podpory-covid-programu");
-    var pomocCovid = DataSet.CachedDatasets.Get("pomoc-covid");
-    var deMinimis = DataSet.CachedDatasets.Get("de-minimis");
-    var seznamPolitickychStran = DataSet.CachedDatasets.Get("seznam-politickych-stran");
-    var kvalifikovaniDodavatele = DataSet.CachedDatasets.Get("kvalifikovanidodavatele");
-    var sbirka_pravnich_predpisu = DataSet.CachedDatasets.Get("sbirka-pravnich-predpisu");
-    var ministri = DataSet.CachedDatasets.Get("ministri");
-    var prijemcidotaci = DataSet.CachedDatasets.Get("prijemcidotaci");
+    var veklep = DataSet.GetCachedDataset("veklep");
+    var vyjadreniPolitiku = DataSet.GetCachedDataset("vyjadreni-politiku");
+    var jednaniVlady = DataSet.GetCachedDataset("jednani-vlady");
+    var stenoZaznamy = DataSet.GetCachedDataset("stenozaznamy-psp");
+    var tiskoveKonferenceVlady = DataSet.GetCachedDataset("tiskove-konference-vlady");
+    var vyboryPsp = DataSet.GetCachedDataset("vybory-psp");
+    var fondPokorneJermanove = DataSet.GetCachedDataset("fond-hejtmanky-pokorne-jermanove");
+    var zasedaniZastupitelstev = DataSet.GetCachedDataset("zasedani-zastupitelstev");
+    var rozhodnutiUohs = DataSet.GetCachedDataset("rozhodnuti-uohs");
+    var ministryInvoices = DataSet.GetCachedDataset("ministry-invoices");
+    var rejstrikTrestuPravnickychOsob = DataSet.GetCachedDataset("rejstrik-trestu-pravnickych-osob");
+    var stavMostu = DataSet.GetCachedDataset("stav-mostu");
+    var narodniInvesticniPlan = DataSet.GetCachedDataset("narodni-investicni-plan");
+    var covidPodpory = DataSet.GetCachedDataset("covid-podpory-mpo");
+    var prijemcyPodporyCovidProgramu = DataSet.GetCachedDataset("prijemci-podpory-covid-programu");
+    var pomocCovid = DataSet.GetCachedDataset("pomoc-covid");
+    var deMinimis = DataSet.GetCachedDataset("de-minimis");
+    var seznamPolitickychStran = DataSet.GetCachedDataset("seznam-politickych-stran");
+    var kvalifikovaniDodavatele = DataSet.GetCachedDataset("kvalifikovanidodavatele");
+    var sbirka_pravnich_predpisu = DataSet.GetCachedDataset("sbirka-pravnich-predpisu");
+    var ministri = DataSet.GetCachedDataset("ministri");
+    var prijemcidotaci = DataSet.GetCachedDataset("prijemcidotaci");
 }
 
 
@@ -430,7 +430,7 @@
                             <div class="small" style="padding-left:1em;">
                                 @ds.Ds.description
                                 @{
-                                    var specificDataset = DataSet.CachedDatasets.Get(ds.Ds.id);
+                                    var specificDataset = DataSet.GetCachedDataset(ds.Ds.id);
                                 }
 
                                 <br>Obsahuje <b>@HlidacStatu.Util.RenderData.NiceNumber(specificDataset is null? 0 : await specificDataset.NumberOfRecordsAsync()) záznamů</b>.
@@ -472,7 +472,7 @@
                             <div class="small" style="padding-left:1em;">
                                 @ds.Ds.description
                                 @{
-                                    var betaDataset = DataSet.CachedDatasets.Get(ds.Ds.id);
+                                    var betaDataset = DataSet.GetCachedDataset(ds.Ds.id);
                                 }
                                 Obsahuje @HlidacStatu.Util.RenderData.NiceNumber(betaDataset is null? 0 : await betaDataset.NumberOfRecordsAsync()) záznamů.
                             </div>

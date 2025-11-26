@@ -4,6 +4,7 @@ using HlidacStatu.Repositories;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
+using HlidacStatu.DS.Api;
 using Serilog;
 
 namespace HlidacStatu.Lib.Data.External.Tables
@@ -82,35 +83,32 @@ namespace HlidacStatu.Lib.Data.External.Tables
             return null;
         }
 
-        public static bool HasTablesFromPriloha(Smlouva s, Smlouva.Priloha p)
+        public static async Task<bool> HasTablesFromPrilohaAsync(Smlouva s, Smlouva.Priloha p)
         {
             if (s == null || p == null)
                 return false;
 
-            return DocTablesRepo.ExistsAsync(s.Id, p.UniqueHash())
-                    .ConfigureAwait(false).GetAwaiter().GetResult();
+            return await DocTablesRepo.ExistsAsync(s.Id, p.UniqueHash());
 
         }
-        public static HlidacStatu.DS.Api.TablesInDoc.Result[] GetTablesFromPriloha(Smlouva s, Smlouva.Priloha p)
+        public static async Task<TablesInDoc.Result[]> GetTablesFromPrilohaAsync(Smlouva s, Smlouva.Priloha p)
         {
             if (s == null || p == null)
                 return null;
 
-            DocTables data = DocTablesRepo.GetAsync(s.Id,p.UniqueHash())
-                    .ConfigureAwait(false).GetAwaiter().GetResult();
+            DocTables data = await DocTablesRepo.GetAsync(s.Id, p.UniqueHash());
 
             if (data == null)
                 return null;
 
             return data.Tables;
         }
-        public static HlidacStatu.Entities.DocTables GetTablesInDocStructure(Smlouva s, Smlouva.Priloha p)
+        public static async Task<DocTables> GetTablesInDocStructureAsync(Smlouva s, Smlouva.Priloha p)
         {
             if (s == null || p == null)
                 return null;
 
-            DocTables data = DocTablesRepo.GetAsync(s.Id, p.UniqueHash())
-                    .ConfigureAwait(false).GetAwaiter().GetResult();
+            DocTables data = await DocTablesRepo.GetAsync(s.Id, p.UniqueHash());
 
             if (data == null)
                 return null;

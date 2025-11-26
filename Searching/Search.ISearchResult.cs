@@ -20,8 +20,7 @@
 
             TimeSpan ElapsedTime { get; set; }
         }
-
-
+        
     }
 
 }

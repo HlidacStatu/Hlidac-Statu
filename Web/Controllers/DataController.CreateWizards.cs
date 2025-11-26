@@ -85,7 +85,7 @@ namespace HlidacStatu.Web.Controllers
 
             if (reg != null)
             {
-                var ds = DataSet.CachedDatasets.Get(reg.datasetId);
+                var ds = DataSet.GetCachedDataset(reg.datasetId);
                 if (ds != null)
                 {
                     ViewBag.ExistsDS = await ds.RegistrationAsync();
@@ -397,7 +397,7 @@ namespace HlidacStatu.Web.Controllers
             if (string.IsNullOrEmpty(id))
                 return Redirect("/data");
 
-            var ds = DataSet.CachedDatasets.Get(id);
+            var ds = DataSet.GetCachedDataset(id);
             if (ds == null)
                 return Redirect("/data");
 
@@ -449,7 +449,7 @@ namespace HlidacStatu.Web.Controllers
             if (string.IsNullOrEmpty(id))
                 return Redirect("/data");
 
-            var ds = DataSet.CachedDatasets.Get(id);
+            var ds = DataSet.GetCachedDataset(id);
             if (ds == null)
                 return Redirect("/data");
 
@@ -502,7 +502,7 @@ namespace HlidacStatu.Web.Controllers
             if (string.IsNullOrEmpty(id))
                 return Redirect("/data");
 
-            var ds = DataSet.CachedDatasets.Get(id);
+            var ds = DataSet.GetCachedDataset(id);
             if (ds == null)
                 return Redirect("/data");
 
