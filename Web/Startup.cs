@@ -180,7 +180,7 @@ namespace HlidacStatu.Web
                 // Redirect to an external URL
                 if (url?.ToLower()?.StartsWith("/account/") == true)
                 {
-                    context.Response.Redirect("https://www.hlidacstatu.cz/Identity" + url + context.Request.QueryString.Value);
+                    context.Response.Redirect("/Identity" + url + context.Request.QueryString.Value);
                     return;   // short circuit
                 }
 
