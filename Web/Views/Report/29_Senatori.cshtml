@@ -16,7 +16,7 @@
     ReportDataSource poslanciTable = new(new ReportDataSource.Column[]
     {
         new() { Name="Senátor",
-            HtmlRender = (s) => {
+            HtmlRender =(s) => {
                 Osoba o = (Osoba)s;
                 return string.Format("<a href='{0}'>{1}</a>", o.GetUrl(), o.FullNameWithYear(true))
                 + "<br />"
@@ -29,7 +29,7 @@
         },
         new() {
             Name ="Strana/Hnutí",
-            HtmlRender = (s) => {
+            HtmlRender =(s) => {
                 Osoba o = (Osoba)s;
                 return o.CurrentPoliticalParty();
             },

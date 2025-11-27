@@ -20,15 +20,13 @@
 	<tbody>
 		@foreach (var item in Model.Osoby)
 		{
-			var hasIco = !string.IsNullOrEmpty(item.Osoba.ICO);
-
 			<tr>
 				<td>
 					@Html.Raw(item.Osoba.ToHtml(showOsUdaje || !string.IsNullOrEmpty(item.Osoba.OsobaId) ))
 					@if (!string.IsNullOrEmpty(item.Osoba.ICO))
 					{
 						<div class="small text-info">
-							@statisticsForIco(item.Osoba.ICO)
+							@(await statisticsForIcoAsync(item.Osoba.ICO))
 						</div>
 					}
 					@if (item.DisplayLinkToRizeni)
@@ -56,10 +54,10 @@
 
 @functions {
 
-    HtmlString statisticsForIco(string ico)
+	async Task<HtmlString> statisticsForIcoAsync(string ico)
     {
         var f = Firmy.Get(ico);
-        var stat = f.StatistikaRegistruSmluv();
+        var stat = await f.StatistikaRegistruSmluvAsync();
         var pocetSmluv = Devmasters.Lang.CS.Plural.Get(stat.Summary().PocetSmluv, "{0} smlouvu;{0} smlouvy;{0} smluv");
         var smlouvyText = $" - Nalezeli jsme {pocetSmluv} v Registru smluv o celkové hodnotě <strong>{HlidacStatu.Util.RenderData.NicePriceHtml(stat.Summary().CelkovaHodnotaSmluv, mena: "Kč")}</strong>.";
 

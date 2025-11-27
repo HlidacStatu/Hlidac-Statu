@@ -12,7 +12,7 @@
     ReportDataSource poslanciTable = new(new ReportDataSource.Column[]
    {
 new() { Name="Poradci předsedy vlády",
-    HtmlRender = (s) => {
+    HtmlRender =(s) => {
         Osoba o = (Osoba)s;
         return string.Format("<a href='{0}'>{1}</a>", o.GetUrl(), o.FullNameWithYear(true))
         + "<br />"
@@ -24,7 +24,7 @@ new() { Name="Poradci předsedy vlády",
     }
 },
 new() { Name="Angažovanost ve firmách",
-    HtmlRender = (s) => {
+    HtmlRender =(s) => {
         Osoba o = (Osoba)s;
         string sout = "";
 
@@ -52,7 +52,7 @@ new() { Name="Angažovanost ve firmách",
     }
 },
 new() { Name="Sponzor polit.stran",
-    HtmlRender = (s) => {
+    HtmlRender =(s) => {
         Osoba o = (Osoba)s;
         var sum = o.Sponzoring().Sum(m=>m.Hodnota);
         if (sum==0)

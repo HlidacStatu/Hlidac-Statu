@@ -119,14 +119,14 @@ namespace HlidacStatu.Repositories
                     case RecalculateItem.StatisticsTypeEnum.Smlouva:
                         if (invalidateOnly)
                         {
-                            Statistics.FirmaStatistics.RemoveStatistics(f, null);
+                            await Statistics.FirmaStatistics.RemoveStatisticsAsync(f, null);
                         }
                         else
                         {
                             if (!holdingOnly || firmaOnly)
-                                _ = f.StatistikaRegistruSmluv(forceUpdateCache: true);
+                                _ = f.StatistikaRegistruSmluvAsync(forceUpdateCache: true);
                             if (holdingOnly || !firmaOnly)
-                                _ = f.HoldingStatisticsRegistrSmluv(forceUpdateCache: noRebuild ? false : true);
+                                _ = f.HoldingStatisticsRegistrSmluvAsync(forceUpdateCache: noRebuild ? false : true);
                         }
 
                         break;

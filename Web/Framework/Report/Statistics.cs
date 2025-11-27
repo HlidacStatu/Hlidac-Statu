@@ -124,7 +124,7 @@ namespace HlidacStatu.Web.Framework.Report
                 new()
                 {
                     Name = "Součet cen",
-                    HtmlRender = (s) => { return Smlouva.NicePrice((double?)s, html: true, shortFormat: true); },
+                    HtmlRender =(s) => { return Smlouva.NicePrice((double?)s, html: true, shortFormat: true); },
                     ValueRender = (s) => { return ((double?)s).Value.ToString("F0", Util.Consts.enCulture); },
                     OrderValueRender = (s) => { return HlidacStatu.Util.RenderData.OrderValueFormat((double?)s); },
                 },
@@ -182,7 +182,7 @@ namespace HlidacStatu.Web.Framework.Report
                     new()
                     {
                         Name = "IČO",
-                        HtmlRender = (s) =>
+                        HtmlRender =(s) =>
                         {
                             System.Tuple<string, string> data = (System.Tuple<string, string>)s;
                             return string.Format("<a href='/subjekt/{0}'>{1}</a>", data?.Item2,
@@ -198,7 +198,7 @@ namespace HlidacStatu.Web.Framework.Report
                     new()
                     {
                         Name = "Počet smluv",
-                        HtmlRender = (s) =>
+                        HtmlRender =(s) =>
                         {
                             return HlidacStatu.Util.RenderData.NiceNumber(
                                 HlidacStatu.Util.ParseTools.ToDecimal((string)s) ?? 0, html: true);
@@ -259,7 +259,7 @@ namespace HlidacStatu.Web.Framework.Report
                     new()
                     {
                         Name = "IČO",
-                        HtmlRender = (s) =>
+                        HtmlRender =(s) =>
                         {
                             System.Tuple<string, string> data = (System.Tuple<string, string>)s;
                             return string.Format("<a href='/subjekt/{0}'>{1}</a>", data.Item2,
@@ -275,7 +275,7 @@ namespace HlidacStatu.Web.Framework.Report
                     new()
                     {
                         Name = "Součet cen",
-                        HtmlRender = (s) => { return Smlouva.NicePrice((double?)s, html: true, shortFormat: true); },
+                        HtmlRender =(s) => { return Smlouva.NicePrice((double?)s, html: true, shortFormat: true); },
                         ValueRender = (s) => { return ((double?)s)?.ToString("F0", Util.Consts.enCulture) ?? "0"; },
                         OrderValueRender = (s) => { return HlidacStatu.Util.RenderData.OrderValueFormat((double?)s); }
                     },
@@ -332,7 +332,7 @@ namespace HlidacStatu.Web.Framework.Report
                         Name = "% smluv",
                         TextRender = (s) => { return ((double)s).ToString("N2") + "%"; },
                         ValueRender = (s) => { return ((double)s).ToString("F2") + "%"; },
-                        HtmlRender = (s) => { return ((double)s).ToString("N2") + "%"; },
+                        HtmlRender =(s) => { return ((double)s).ToString("N2") + "%"; },
                         OrderValueRender = (s) => { return HlidacStatu.Util.RenderData.OrderValueFormat(((double)s)); }
                     },
                 }

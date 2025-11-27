@@ -55,7 +55,7 @@
             {
                 Name = "Rok",
                 TextRender = (x) => $"{x.Year}",
-                HtmlRender = (x) => $"{x.Year}",
+                HtmlRender =(x) => $"{x.Year}",
                 OrderValueRender = (x) => HlidacStatu.Util.RenderData.OrderValueFormat(x.Year),
                 CssClass = "number"
             },
@@ -63,7 +63,7 @@
             {
                 Name = "Vyplaceno",
                 TextRender = (x) => HlidacStatu.Util.RenderData.NicePrice(x.SumAssumedAmount),
-                HtmlRender = (x) => HlidacStatu.Util.RenderData.NicePrice(x.SumAssumedAmount,html:true),
+                HtmlRender =(x) => HlidacStatu.Util.RenderData.NicePrice(x.SumAssumedAmount,html:true),
                 OrderValueRender = (x) => HlidacStatu.Util.RenderData.OrderValueFormat(x.SumAssumedAmount),
                 CssClass = "number"
             },
@@ -71,7 +71,7 @@
             {
                 Name = "Průměrná dotace",
                 TextRender = (x) => HlidacStatu.Util.RenderData.NicePrice(x.AvgAssumedAmount),
-                HtmlRender = (x) => HlidacStatu.Util.RenderData.NicePrice(x.AvgAssumedAmount,html:true),
+                HtmlRender =(x) => HlidacStatu.Util.RenderData.NicePrice(x.AvgAssumedAmount,html:true),
                 OrderValueRender = (x) => HlidacStatu.Util.RenderData.OrderValueFormat(x.AvgAssumedAmount),
                 CssClass = "number"
             },
@@ -79,7 +79,7 @@
             {
                 Name = "Maximální výše jednotlivé dotace",
                 TextRender = (x) => HlidacStatu.Util.RenderData.NicePrice(x.MaxAssumedAmount),
-                HtmlRender = (x) => HlidacStatu.Util.RenderData.NicePrice(x.MaxAssumedAmount,html:true),
+                HtmlRender =(x) => HlidacStatu.Util.RenderData.NicePrice(x.MaxAssumedAmount,html:true),
                 OrderValueRender = (x) => HlidacStatu.Util.RenderData.OrderValueFormat(x.MaxAssumedAmount),
                 CssClass = "number"
             },
@@ -87,7 +87,7 @@
             {
                 Name = "Dotace pro firmy sponzorující polit.strany",
                 TextRender = (x) => HlidacStatu.Util.RenderData.NiceNumber(x.CountPolitickyAngazovanySubjekt),
-                HtmlRender = (x) => HlidacStatu.Util.RenderData.NiceNumber(x.CountPolitickyAngazovanySubjekt,html:true),
+                HtmlRender =(x) => HlidacStatu.Util.RenderData.NiceNumber(x.CountPolitickyAngazovanySubjekt,html:true),
                 OrderValueRender = (x) => HlidacStatu.Util.RenderData.OrderValueFormat(x.CountPolitickyAngazovanySubjekt),
                 CssClass = "number"
             },
@@ -95,7 +95,7 @@
             {
                 Name = "Dotace pro nově založené firmy",
                 TextRender = (x) => HlidacStatu.Util.RenderData.NiceNumber(x.CountGrantedCompaniesFirstYear),
-                HtmlRender = (x) => HlidacStatu.Util.RenderData.NiceNumber(x.CountGrantedCompaniesFirstYear,html:true),
+                HtmlRender =(x) => HlidacStatu.Util.RenderData.NiceNumber(x.CountGrantedCompaniesFirstYear,html:true),
                 OrderValueRender = (x) => HlidacStatu.Util.RenderData.OrderValueFormat(x.CountGrantedCompaniesFirstYear),
                 CssClass = "number"
             }
@@ -282,14 +282,14 @@
                     {
                     Name = "Příjemce",
                     CssClass = "text",
-                    HtmlRender = (x) => $"<a href=/subjekt/{x.Ico}>{FirmaRepo.NameFromIco(x.Ico)}</a>",
+                    HtmlRender =(x) => $"<a href=/subjekt/{x.Ico}>{FirmaRepo.NameFromIco(x.Ico)}</a>",
                     TextRender = (x) => FirmaRepo.NameFromIco(x.Ico)
                     },
                     new ReportDataSource<(string Ico, long Pocet, decimal Castka)>.Column()
                     {
                     Name = "Počet dotací",
                     TextRender = (x) => HlidacStatu.Util.RenderData.NiceNumber(x.Pocet),
-                    HtmlRender = (x) => $"<a title='Najit dotace subjektu' href='/dotace/hledat?Q=ico:{x.Ico}%20AND%20{searchQuery}'>{HlidacStatu.Util.RenderData.NiceNumber(x.Pocet)}</a>",
+                    HtmlRender =(x) => $"<a title='Najit dotace subjektu' href='/dotace/hledat?Q=ico:{x.Ico}%20AND%20{searchQuery}'>{HlidacStatu.Util.RenderData.NiceNumber(x.Pocet)}</a>",
                     OrderValueRender = (x) => HlidacStatu.Util.RenderData.OrderValueFormat(x.Pocet),
                     CssClass = "number"
                     },
@@ -297,7 +297,7 @@
                     {
                     Name = "Celková částka",
                     TextRender = (x) => HlidacStatu.Util.RenderData.NicePrice(x.Castka, shortFormat:true),
-                    HtmlRender = (x) => HlidacStatu.Util.RenderData.NicePrice(x.Castka,html:true),
+                    HtmlRender =(x) => HlidacStatu.Util.RenderData.NicePrice(x.Castka,html:true),
                     OrderValueRender = (x) => HlidacStatu.Util.RenderData.OrderValueFormat(x.Castka),
                     CssClass = "number"
                     }

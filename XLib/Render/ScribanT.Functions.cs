@@ -186,7 +186,7 @@ namespace HlidacStatu.XLib.Render
                 return string.Empty;
             }
 
-            public static string fn_RenderCompanyStatistic(string ico, bool twoLines = false, string prefix = "", string postfix = "")
+            public static async Task<string> fn_RenderCompanyStatistic(string ico, bool twoLines = false, string prefix = "", string postfix = "")
             {
                 if (ico  == null)
                     return string.Empty;
@@ -196,7 +196,7 @@ namespace HlidacStatu.XLib.Render
                     var firma = Firmy.instanceByIco.Get(ico);
                     if (firma.Valid)
                     {
-                        var stat = firma.StatistikaRegistruSmluv();
+                        var stat = await firma.StatistikaRegistruSmluvAsync();
                         var pocet = stat.Sum(stat.YearsAfter2016(), s => s.PocetSmluv);
                         var celkem = stat.Sum(stat.YearsAfter2016(), s => s.CelkovaHodnotaSmluv);
 

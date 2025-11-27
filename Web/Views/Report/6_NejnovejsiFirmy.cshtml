@@ -74,7 +74,7 @@
     ReportDataSource rdsNewestComp = new(new ReportDataSource.Column[]
    {
 new() { Name="Firma",
-HtmlRender = (s) => {
+HtmlRender =(s) => {
     System.Tuple<string,string> data = (System.Tuple<string,string>)s;
         return string.Format("<a href='/subjekt/{0}'>{1}</a>", data.Item2, data.Item1);
         },
@@ -83,11 +83,11 @@ HtmlRender = (s) => {
     },
     new() {
     Name ="První výskyt v Registru smluv",
-    HtmlRender = (s) => { return ((DateTime)s).ToString("dd.MM.yyyy"); },
+    HtmlRender =(s) => { return ((DateTime)s).ToString("dd.MM.yyyy"); },
     OrderValueRender = (s) => { return HlidacStatu.Util.RenderData.OrderValueFormat((DateTime)s); }
     },
     new() { Name="Hodnota smluv",
-    HtmlRender = (s) => { return Smlouva.NicePrice((double?)s, html:true, shortFormat:true); },
+    HtmlRender =(s) => { return Smlouva.NicePrice((double?)s, html:true, shortFormat:true); },
     OrderValueRender = (s) => { return HlidacStatu.Util.RenderData.OrderValueFormat(((double)s)); }
     },
     }

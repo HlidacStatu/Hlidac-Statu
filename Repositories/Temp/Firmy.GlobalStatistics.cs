@@ -102,7 +102,7 @@ namespace HlidacStatu.Repositories
                             var f = Get(ico);
                             if (f.PatrimStatu())
                             {
-                                if (f.StatistikaRegistruSmluv().Any(m =>
+                                if ((await f.StatistikaRegistruSmluvAsync()).Any(m =>
                                         m.Value.PocetSmluv >= Entities.KIndex.Consts.MinPocetSmluvPerYear)
                                    )
                                     icos.Add(ico);
@@ -131,7 +131,7 @@ namespace HlidacStatu.Repositories
                             var f = Get(ico);
                             if (f.PatrimStatu())
                             {
-                                if (f.StatistikaRegistruSmluv().Any(m =>
+                                if ((await f.StatistikaRegistruSmluvAsync()).Any(m =>
                                         m.Value.PocetSmluv >= Entities.KIndex.Consts.MinPocetSmluvPerYear)
                                    )
                                     icos.Add(ico);
@@ -242,11 +242,10 @@ namespace HlidacStatu.Repositories
                 List<StatisticsSubjectPerYear<Smlouva.Statistics.Data>> data =
                     new List<StatisticsSubjectPerYear<Smlouva.Statistics.Data>>();
 
-                Manager.DoActionForAll<string>(icos,
-                    (Func<string, ActionOutputData>)(
-                    ico =>
+                await Manager.DoActionForAllAsync<string>(icos,
+                    (Func<string, Task<ActionOutputData>>)(async ico =>
                     {
-                        var stat = Get(ico)?.StatistikaRegistruSmluv(obor.Value);
+                        var stat = await Get(ico)?.StatistikaRegistruSmluvAsync(obor.Value);
                         if (stat != null)
                             lock (lockObj)
                             {

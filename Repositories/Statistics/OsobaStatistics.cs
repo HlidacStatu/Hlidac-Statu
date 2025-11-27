@@ -7,6 +7,8 @@ using HlidacStatu.Lib.Analytics;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace HlidacStatu.Repositories.Statistics
 {
@@ -16,7 +18,7 @@ namespace HlidacStatu.Repositories.Statistics
             _cacheSmlouvy
                 = Devmasters.Cache.Redis.Manager<Osoba.Statistics.RegistrSmluv, (Osoba os,int? obor)>
                     .GetSafeInstance("Osoba_SmlouvyStatistics_v1_",
-                        (obj) => CalculateSmlouvyStat(obj.os, obj.obor),
+                        (obj) => CalculateSmlouvyStatAsync(obj.os, obj.obor),
                         TimeSpan.Zero,
                     Devmasters.Config.GetWebConfigValue("RedisServerUrls").Split(';'),
                     Devmasters.Config.GetWebConfigValue("RedisBucketName"),
@@ -68,7 +70,7 @@ namespace HlidacStatu.Repositories.Statistics
             return _cacheDotace.Get(os);
         }
 
-        public static Osoba.Statistics.RegistrSmluv CalculateSmlouvyStat(Osoba o, int? obor)
+        public static async Task<Osoba.Statistics.RegistrSmluv> CalculateSmlouvyStatAsync(Osoba o, int? obor)
         {
             Osoba.Statistics.RegistrSmluv res = new Osoba.Statistics.RegistrSmluv();
             res.OsobaNameId = o.NameId;
@@ -84,26 +86,40 @@ namespace HlidacStatu.Repositories.Statistics
             var skutecneVazby = Relation.SkutecnaDobaVazby(o.AktualniVazby(Relation.AktualnostType.Libovolny));
             var firmy_maxrok = new Dictionary<string, DateInterval>();
             foreach (var v in skutecneVazby.Where(v => !string.IsNullOrEmpty(v.To?.UniqId)
-                            && v.To.Type == HlidacStatu.DS.Graphs.Graph.Node.NodeType.Company)
-)
+                            && v.To.Type == HlidacStatu.DS.Graphs.Graph.Node.NodeType.Company))
             {
                 firmy_maxrok.TryAdd(v.To.Id, new DateInterval(v.RelFrom ?? DateTime.MinValue, v.RelTo ?? DateTime.MaxValue));
             }
+            
+            var maxConcurrentTasks = 10;
+            var semaphore = new SemaphoreSlim(maxConcurrentTasks);
 
-
-            var perIcoStat = firmy_maxrok
+            var perIcoStatTasks = firmy_maxrok
                 .Select(m => new { firma = Firmy.Get(m.Key), interval = m.Value })
                 .Where(m => m.firma.Valid == true)
-                .Select(m => new
+                .Select(async m =>
                 {
-                    f = m.firma,
-                    ss = new StatisticsSubjectPerYear<Smlouva.Statistics.Data>(
-                        m.firma.ICO,
-                        m.firma.StatistikaRegistruSmluv().Filter(fi => fi.Key >= m.interval.From?.Year && fi.Key <= m.interval.To?.Year)
-                        )
-                });
+                    await semaphore.WaitAsync();
+                    try
+                    {
+                        var stats = await m.firma.StatistikaRegistruSmluvAsync();
+                        return new
+                        {
+                            f = m.firma,
+                            ss = new StatisticsSubjectPerYear<Smlouva.Statistics.Data>(
+                                m.firma.ICO,
+                                stats.Filter(fi => fi.Key >= m.interval.From?.Year && fi.Key <= m.interval.To?.Year)
+                            )
+                        };
+                    }
+                    finally
+                    {
+                        semaphore.Release();
+                    }
+                })
+                .ToArray();
 
-
+            var perIcoStat = await Task.WhenAll(perIcoStatTasks);
 
             foreach (var it in perIcoStat)
             {

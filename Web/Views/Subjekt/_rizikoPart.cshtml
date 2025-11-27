@@ -10,7 +10,7 @@
     var firma = Model.firma;
     var rok = Model.rok;
 
-    var statistics = firma.StatistikaRegistruSmluv().StatisticsForYear(rok);
+    var statistics = (await firma.StatistikaRegistruSmluvAsync()).StatisticsForYear(rok);
     var kindex = (await firma.KindexAsync())?.ForYear(rok);
 
     string query = "";

@@ -614,7 +614,7 @@ namespace HlidacStatu.Repositories.Analysis
                             ico =>
                             {
                                 var firma = Firmy.Get(ico);
-                                var stat = firma.StatistikaRegistruSmluv();
+                                var stat = firma.StatistikaRegistruSmluvAsync();
                                 if (stat.Summary().PocetSmluv > 10 || stat.Summary().CelkovaHodnotaSmluv > 999_999)
                                     getData.Add(stat);
 

@@ -907,7 +907,7 @@ namespace HlidacStatu.Repositories
                 var last = i == (rels.Count() - 1);
                 StatisticsSubjectPerYear<Smlouva.Statistics.Data> stat = null;
                 if (withStats && rel.To.Type == HlidacStatu.DS.Graphs.Graph.Node.NodeType.Company)
-                    stat = Firmy.Get(rel.To.Id).StatistikaRegistruSmluv(); //new Analysis.SubjectStatistic(rel.To.Id);
+                    stat = Firmy.Get(rel.To.Id).StatistikaRegistruSmluvAsync(); //new Analysis.SubjectStatistic(rel.To.Id);
 
                 string subjId = rel.To.Type == HlidacStatu.DS.Graphs.Graph.Node.NodeType.Company ? rel.To.Id : "Osoba";
                 string subjName = rel.To.PrintName();

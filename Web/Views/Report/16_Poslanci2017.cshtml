@@ -19,7 +19,7 @@
         new()
         {
             Name = "Poslanec (nováčci s <span style='padding-left:5px;' class='fad fa-star text-success' aria-hidden='true'></span> )",
-            HtmlRender = (s) =>
+            HtmlRender =(s) =>
             {
                 Osoba o = (Osoba)s;
                 return string.Format("<a href='{0}'>{1}</a>", o.GetUrl(), o.FullNameWithYear(true))
@@ -35,7 +35,7 @@
         new()
         {
             Name = "Strana/Hnutí",
-            HtmlRender = (s) =>
+            HtmlRender =(s) =>
             {
                 Osoba o = (Osoba)s;
                 return o.CurrentPoliticalParty();
@@ -49,7 +49,7 @@
         new()
         {
             Name = "Angažovanost",
-            HtmlRender = (s) =>
+            HtmlRender =(s) =>
             {
                 Osoba o = (Osoba)s;
                 string sout = "";
@@ -87,7 +87,7 @@
         new()
         {
             Name = "Sponzor",
-            HtmlRender = (s) =>
+            HtmlRender =(s) =>
             {
                 Osoba o = (Osoba)s;
                 var sum = o.Sponzoring().Sum(m => m.Hodnota);

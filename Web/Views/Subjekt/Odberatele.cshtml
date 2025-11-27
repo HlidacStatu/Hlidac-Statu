@@ -54,7 +54,7 @@
             ReportDataSource rdsPerIco = new(new[]
             {
                 new  ReportDataSource.Column() { Name="IČO",
-                    HtmlRender = (s) => {
+                    HtmlRender =(s) => {
                         Tuple<string,string> data = (Tuple<string,string>)s;
                         return string.Format(@"{1} <a href='/subjekt/{0}'>detail o subj</a>
                                                <br/>{3}", data.Item2, data.Item1, Model.ICO
@@ -69,7 +69,7 @@
             ReportDataSource rdsPerPrice = new(new[]
             {
                 new  ReportDataSource.Column() { Name="IČO",
-                    HtmlRender = (s) => {
+                    HtmlRender =(s) => {
                         Tuple<string,string> data = (Tuple<string,string>)s;
                         return string.Format(@"{1} <a href='/subjekt/{0}'>detail o subj</a>
                                                <br/>{3}", data.Item2, data.Item1, Model.ICO
@@ -79,7 +79,7 @@
                     TextRender = (s) => { return ((Tuple<string,string>)s).Item1.ToString(); }
                 },
                 new  ReportDataSource.Column() { Name="Součet cen",
-                    HtmlRender = (s) => { return Smlouva.NicePrice((double?)s, html:true, shortFormat:true); },
+                    HtmlRender =(s) => { return Smlouva.NicePrice((double?)s, html:true, shortFormat:true); },
                     OrderValueRender = (s) => { return HlidacStatu.Util.RenderData.OrderValueFormat( ((double?)s) ?? 0 ); }
                     ,CssClass ="number" },
             });
