@@ -13,6 +13,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
+using HlidacStatu.Repositories.Cache;
 
 namespace HlidacStatu.Extensions
 {
@@ -313,32 +314,14 @@ namespace HlidacStatu.Extensions
 
             return ret;
         }
-        static Devmasters.Cache.Redis.Manager<InfoFact[], Osoba> _cacheInfoFacts =
-            Devmasters.Cache.Redis.Manager<InfoFact[], Osoba>
-                .GetSafeInstance("Osoba_InfoFacts_v2_",
-                    (obj) => InfoFactsAsync(obj).GetAwaiter().GetResult(),
-                    TimeSpan.FromHours(12),
-                    Devmasters.Config.GetWebConfigValue("RedisServerUrls").Split(';'),
-                    Devmasters.Config.GetWebConfigValue("RedisBucketName"),
-                    Devmasters.Config.GetWebConfigValue("RedisUsername"),
-                    Devmasters.Config.GetWebConfigValue("RedisCachePassword"),
-                    keyValueSelector: obj => $"_infofacts_{obj.NameId}");
-
-        public static void InfoFactsCacheInvalidate(this Osoba osoba)
+        
+        
+        public static async Task<InfoFact[]> InfoFactsCachedAsync(this Osoba osoba, bool forceUpdateCache = false)
         {
-            _cacheInfoFacts.Delete(osoba);
-
-        }
-        public static InfoFact[] InfoFactsCached(this Osoba osoba, bool forceUpdateCache = false)
-        {
-            //STAT FIX
-            //return Array.Empty<InfoFact>();
-
             if (forceUpdateCache)
-                osoba.InfoFactsCacheInvalidate();
-
-            var _infof = _cacheInfoFacts.Get(osoba);
-            return _infof;
+                await OsobaCache.InvalidateInfoFactsAsync(osoba);
+            
+            return await OsobaCache.GetInfoFactsAsync(osoba);
         }
 
         public static async Task<InfoFact[]> InfoFactsAsync(this Osoba osoba,
@@ -572,10 +555,10 @@ namespace HlidacStatu.Extensions
             return osoba.NarozeniYear(true) + ", " + osoba.StatusOsoby().ToNiceDisplayName();
         }
 
-        public static string SocialInfoBody(this Osoba osoba)
+        public static async Task<string> SocialInfoBodyAsync(this Osoba osoba)
         {
             return "<ul>"
-                   + osoba.InfoFactsCached().RenderFacts(
+                   + (await osoba.InfoFactsCachedAsync()).RenderFacts(
                        4, true, true, "", "<li>{0}</li>", true)
                    + "</ul>";
         }
