@@ -1126,5 +1126,17 @@ namespace HlidacStatu.Repositories
             };
             return Newtonsoft.Json.JsonConvert.SerializeObject(ret);
         }
+        
+        public static string PrintName(this HlidacStatu.DS.Graphs.Graph.Node node, bool html = false)
+        {
+            switch (node.Type)
+            {
+                case HlidacStatu.DS.Graphs.Graph.Node.NodeType.Person:
+                    return Osoby.GetById.Get(Convert.ToInt32(node.Id))?.FullNameWithYear(html) ?? "(neznámá osoba)";
+                case HlidacStatu.DS.Graphs.Graph.Node.NodeType.Company:
+                default:
+                    return Firmy.GetJmeno(node.Id);
+            }
+        }
     }
 }
