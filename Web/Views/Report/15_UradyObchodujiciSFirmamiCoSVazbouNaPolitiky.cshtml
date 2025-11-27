@@ -2,113 +2,96 @@
 @using HlidacStatu.Entities
 @using HlidacStatu.Entities.Analysis
 @using HlidacStatu.Extensions
+@using HlidacStatu.Lib.Analytics
 @using HlidacStatu.XLib.Render
 @using HlidacStatu.Repositories
+@using HlidacStatu.XLib
 
 @{
     Layout = "_ReportLayout";
 
-    var tableSloupce = new[]
-    {
-        new ReportDataSource<BasicDataForSubject<List<BasicData<string>>>>.Column()
+    ReportDataSource<(BasicDataForSubject<List<BasicData<string>>> Bdfs, Firma? Firma, StatisticsSubjectPerYear<Smlouva.Statistics.Data>? Stat)>.Column[] tableSloupce =
+    [
+        new()
         {
             Name = "Úřad",
-            HtmlRender =(s) =>
+            HtmlRender = (s) =>
             {
-                var f = Firmy.Get(s.Ico);
-                return string.Format("<a href='/subjekt/{0}'>{1}</a> <br/> {2}", s.Ico,
-                    f.Jmeno,
-                    f.StatistikaRegistruSmluvAsync().Summary().ToNiceLinkString(null, true, "/subjekt/" + s.Ico)
+                return string.Format("<a href='/subjekt/{0}'>{1}</a> <br/> {2}", s.Firma.ICO,
+                    s.Firma.Jmeno,
+                    s.Stat.Summary().ToNiceLinkString(null, true, "/subjekt/" + s.Firma.ICO)
                 );
             },
-            OrderValueRender = (s) => { return Firmy.GetJmeno(s.Ico); }
+            OrderValueRender = (s) => { return Firmy.GetJmeno(s.Firma.ICO); }
         },
-        new ReportDataSource<BasicDataForSubject<List<BasicData<string>>>>.Column()
+        new()
         {
             Name = "Počet smluv",
-            HtmlRender =(s) => { return s.Pocet.ToString(); },
-            OrderValueRender = (s) => { return s.Pocet.ToString(); }
+            HtmlRender = (s) => { return s.Bdfs.Pocet.ToString(); },
+            OrderValueRender = (s) => { return s.Bdfs.Pocet.ToString(); }
         },
-        new ReportDataSource<BasicDataForSubject<List<BasicData<string>>>>.Column()
+        new()
         {
             Name = "% všech smluv",
-            HtmlRender =(s) =>
+            HtmlRender = (s) =>
             {
-                var stat = Firmy.Get(s.Ico).StatistikaRegistruSmluvAsync();
-                if (stat.Summary().PocetSmluv > 0)
+                if (s.Stat.Summary().PocetSmluv > 0)
                 {
-                    return ((double)s.Pocet / (double)stat.Summary().PocetSmluv).ToString("P2");
+                    return ((double)s.Bdfs.Pocet / (double)s.Stat.Summary().PocetSmluv).ToString("P2");
                 }
                 else
                     return "0";
             },
-            OrderValueRender = (s) =>
-            {
-                var stat = Firmy.Get(s.Ico).StatistikaRegistruSmluvAsync();
-                return HlidacStatu.Util.RenderData.OrderValueFormat(stat.Summary().PocetSmluv);
-            }
+            OrderValueRender = (s) => { return HlidacStatu.Util.RenderData.OrderValueFormat(s.Stat.Summary().PocetSmluv); }
         },
-        new ReportDataSource<BasicDataForSubject<List<BasicData<string>>>>.Column()
+        new()
         {
             Name = "Celková hodnota smluv",
-            HtmlRender =(s) => { return Smlouva.NicePrice(s.CelkemCena, html: true, shortFormat: true); },
-            OrderValueRender = (s) => { return HlidacStatu.Util.RenderData.OrderValueFormat(s.CelkemCena); }
+            HtmlRender = (s) => { return Smlouva.NicePrice(s.Bdfs.CelkemCena, html: true, shortFormat: true); },
+            OrderValueRender = (s) => { return HlidacStatu.Util.RenderData.OrderValueFormat(s.Bdfs.CelkemCena); }
         },
-        new ReportDataSource<BasicDataForSubject<List<BasicData<string>>>>.Column()
+        new()
         {
             Name = "% hodnoty všech smluv",
-            HtmlRender =(s) =>
+            HtmlRender = (s) =>
             {
-                var stat = Firmy.Get(s.Ico).StatistikaRegistruSmluvAsync();
-                if (stat.Summary().CelkovaHodnotaSmluv > 0)
+                if (s.Stat.Summary().CelkovaHodnotaSmluv > 0)
                 {
-                    return (s.CelkemCena / stat.Summary().CelkovaHodnotaSmluv).ToString("P1");
+                    return (s.Bdfs.CelkemCena / s.Stat.Summary().CelkovaHodnotaSmluv).ToString("P1");
                 }
                 else
                     return "0";
             },
-            OrderValueRender = (s) =>
-            {
-                var stat = Firmy.Get(s.Ico).StatistikaRegistruSmluvAsync();
-                return HlidacStatu.Util.RenderData.OrderValueFormat((stat.Summary().CelkovaHodnotaSmluv));
-            }
+            OrderValueRender = (s) => { return HlidacStatu.Util.RenderData.OrderValueFormat((s.Stat.Summary().CelkovaHodnotaSmluv)); }
         },
-        new ReportDataSource<BasicDataForSubject<List<BasicData<string>>>>.Column()
+        new()
         {
             Name = "Dodavatelé",
-            HtmlRender =(s) =>
+            HtmlRender = (s) =>
             {
                 System.Text.StringBuilder sb = new();
                 sb.Append("<ul>");
                 int previewCount = 3;
-                foreach (var f in s.Detail.OrderByDescending(m => m.CelkemCena).Take(previewCount))
+                foreach (var f in s.Bdfs.Detail.OrderByDescending(m => m.CelkemCena).Take(previewCount))
                 {
                     sb.AppendFormat("<li><a href='/Subjekt/{1}'>{2}</a> - <a href='/HledatSmlouvy?Q=icoPlatce:{0}%20AND%20icoPrijemce:{1}'>{3}</a></li>",
-                        s.Ico, f.Item, Firmy.GetJmeno(f.Item)
-                        , f.ToNiceString(null, false, string.Format("", s.Ico, f.Item))
+                        s.Firma.ICO, f.Item, Firmy.GetJmeno(f.Item)
+                        , f.ToNiceString(null, false, string.Format("", s.Firma.ICO, f.Item))
                     );
-
-//sb.AppendFormat("<li><a href='/HledatSmlouvy?Q=icoPlatce:{0}%20AND%20icoPrijemce:{1}'>{2}</a> {3}</li>"
-//    ,d.Ico, f.Ico, f.Name, f.StatForIco.ToNiceString("",false)
-//    );
                 }
 
                 sb.Append("</ul>");
-                if (s.Detail.Count > previewCount)
+                if (s.Bdfs.Detail.Count > previewCount)
                 {
                     string rand = Guid.NewGuid().ToString("N");
                     sb.Append("<a class='btn btn-link' role='button' data-bs-toggle='collapse' href='#allData" + rand + "' aria-expanded='false' aria-controls='allData'>Ukázat všechny</a>");
                     sb.Append("<ul class='collapse' id='allData" + rand + "'>");
-                    foreach (var f in s.Detail.OrderByDescending(m => m.CelkemCena).Skip(previewCount))
+                    foreach (var f in s.Bdfs.Detail.OrderByDescending(m => m.CelkemCena).Skip(previewCount))
                     {
                         sb.AppendFormat("<li><a href='/Subjekt/'{1}>{2}</a> - <a href=''>{3}</a></li>"
-                            , s.Ico, f.Item, Firmy.GetJmeno(f.Item)
-                            , f.ToNiceString(null, false, string.Format("/HledatSmlouvy?Q=icoPlatce:{0}%20AND%20icoPrijemce:{1}", s.Ico, f.Item))
+                            , s.Firma.ICO, f.Item, Firmy.GetJmeno(f.Item)
+                            , f.ToNiceString(null, false, string.Format("/HledatSmlouvy?Q=icoPlatce:{0}%20AND%20icoPrijemce:{1}", s.Firma.ICO, f.Item))
                         );
-
-//sb.AppendFormat("<li><a href='/HledatSmlouvy?Q=icoPlatce:{0}%20AND%20icoPrijemce:{1}'>{2}</a> {3}</li>"
-//    ,d.Ico, f.Ico, f.Name, f.StatForIco.ToNiceString("",false)
-//    );
                     }
 
                     sb.Append("</ul>");
@@ -117,17 +100,23 @@
                 return sb.ToString();
             },
         }
-    };
+    ];
 
 
     var data = HlidacStatu.Repositories.StaticData.UradyObchodujiciSFirmami_s_vazbouNaPolitiky_nedavne_Cache.Get();
 
-    ReportDataSource<BasicDataForSubject<List<BasicData<string>>>> rds1 =
-        new(tableSloupce);
-    //foreach (var bf in data.SoukromeFirmy.Where(o => o.StatForIco.CelkemCena > 500000))
+    ReportDataSource<(BasicDataForSubject<List<BasicData<string>>> Bdfs, Firma? Firma, StatisticsSubjectPerYear<Smlouva.Statistics.Data>? Stat)> rds1 = new(tableSloupce);
+
     foreach (var bf in data.SoukromeFirmy.Where(o => o.Pocet > 7).OrderByDescending(o => o.CelkemCena).Take(500))
     {
-        rds1.AddRow(bf);
+        var firma = Firmy.Get(bf.Ico);
+        StatisticsSubjectPerYear<Smlouva.Statistics.Data>? stat = null;
+        if (firma?.Valid == true)
+        {
+            stat = await firma.StatistikaRegistruSmluvAsync();
+        }
+
+        rds1.AddRow((bf, firma, stat));
     }
 
 
