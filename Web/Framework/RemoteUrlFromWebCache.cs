@@ -70,22 +70,23 @@ namespace HlidacStatu.Web.Framework
 
         public static byte[] GetBinary(string url, string cacheName = null, bool refreshCache = false)
         {
+            var ki = new KeyAndId()
+            {
+                ValueForData = url,
+                CacheNameOnDisk = cacheName
+            };
             try
             {
+                if (Manager.Exists(ki) == false)
+                {
+                    return null; //don't rebuild cache quick fix
+                }
                 if (refreshCache)
                 {
-                    Manager.Delete(new KeyAndId()
-                    {
-                        ValueForData = url,
-                        CacheNameOnDisk = cacheName
-                    });
+                    Manager.Delete(ki);
                 }
 
-                byte[] data = Manager.Get(new KeyAndId()
-                {
-                    ValueForData = url,
-                    CacheNameOnDisk = cacheName
-                });
+                byte[] data = Manager.Get(ki);
 
                 return data;
             }
