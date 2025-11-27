@@ -4,6 +4,7 @@
 using System;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Caching.Distributed;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
 namespace HlidacStatu.CachingClients.PostgreSql
@@ -80,6 +81,42 @@ namespace HlidacStatu.CachingClients.PostgreSql
 			services.AddSingleton<IConfigureOptions<PostgreSqlCacheOptions>>(
 				sp => new ConfigureOptions<PostgreSqlCacheOptions>(opt => setupAction(sp, opt)));
 			
+			return services;
+		}
+		
+		public static IServiceCollection AddDistributedPostgreSqlCacheKeyed(this IServiceCollection services, Action<PostgreSqlCacheOptions> setupAction, object? key)
+		{
+			if (services == null)
+			{
+				throw new ArgumentNullException(nameof(services));
+			}
+
+			if (setupAction == null)
+			{
+				throw new ArgumentNullException(nameof(setupAction));
+			}
+
+			services.AddOptions();
+			services.AddKeyedSingleton<IDatabaseOperations, DatabaseOperations>(key);
+			services.AddKeyedSingleton<IDatabaseExpiredItemsRemoverLoop>(key, (sp, k) =>
+			{
+				var dbOps = sp.GetRequiredKeyedService<IDatabaseOperations>(k);
+				var logger = sp.GetRequiredService<ILogger<DatabaseExpiredItemsRemoverLoop>>();
+				var options = sp.GetRequiredService<IOptions<PostgreSqlCacheOptions>>();
+
+				return new DatabaseExpiredItemsRemoverLoop(options, dbOps, logger);
+			});
+			
+			services.AddKeyedSingleton<IDistributedCache>(key, (sp, k) =>
+			{
+				var dbOps = sp.GetRequiredKeyedService<IDatabaseOperations>(k);
+				var remover = sp.GetRequiredKeyedService<IDatabaseExpiredItemsRemoverLoop>(k);
+				var options = sp.GetRequiredService<IOptions<PostgreSqlCacheOptions>>();
+
+				return new PostgreSqlCache(options, dbOps, remover);
+			});
+			services.Configure(setupAction);
+
 			return services;
 		}
 
