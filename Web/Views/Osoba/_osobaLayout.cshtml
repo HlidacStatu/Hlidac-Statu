@@ -14,7 +14,7 @@
         ViewBag.SocialShareTitle = $"{Model.osoba.FullNameWithYear()}";
         ViewBag.SocialShareText = (await Model.osoba.InfoFactsCachedAsync()).RenderFacts( 4, true, true, ", ");
         ViewBag.SocialShareType = "article";
-        ViewBag.SocialImage = $"https://www.hlidacstatu.cz/socialbanner/osoba?d={DateTime.Now.ToString("yyMMdd")}&v=" + Model.osoba.NameId;
+        ViewBag.SocialImage = $"https://gen.hlidacstatu.cz/socialbanner/osoba?d={DateTime.Now.ToString("yyMMdd")}&v=" + Model.osoba.NameId;
         ViewBag.OpenGraphMore = "<meta property=\"og:image:width\" content=\"1920\" />\n"
                                 + "<meta property=\"og:image:height\" content=\"1080\" />"
                                 + "<meta property=\"og:image:type\" content=\"image/png\" />";
@@ -137,7 +137,7 @@
     @if (Model.viewName != "NoInfo")
     {
         <a href="@Model.osoba.GetUrl(false)" target="_top">
-            <img src="@($"https://www.hlidacstatu.cz/socialbanner/osoba?d={DateTime.Now.ToString("yyMMdd")}&v=" + Model.osoba.NameId)" style="width:95%;height:auto;max-width:@(ViewBag.MaxWidth)px"/>
+            <img src="@($"https://gen.hlidacstatu.cz/socialbanner/osoba?d={DateTime.Now.ToString("yyMMdd")}&v=" + Model.osoba.NameId)" style="width:95%;height:auto;max-width:@(ViewBag.MaxWidth)px"/>
         </a>
     }
 }

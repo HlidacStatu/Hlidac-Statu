@@ -17,7 +17,7 @@
         "Více než 2000 osob, které politickým stranám, hnutím a kandidátům darovali za posledních 10 let v souhrnu alespoň 100 000 Kč."
         : $"Osoby, které politickým stranám, hnutím a kandidátům darovali v roce {rok} v souhrnu alespoň 100 000 Kč.";
 
-    ViewBag.SocialImage = $"https://www.hlidacstatu.cz/socialbanner/quote?d={DateTime.Now.ToString("d.M.yy")}"
+    ViewBag.SocialImage = $"https://gen.hlidacstatu.cz/socialbanner/quote?d={DateTime.Now.ToString("d.M.yy")}"
             + "&t=" + System.Net.WebUtility.UrlEncode(ViewBag.SocialShareTitle)
             + "&b=" + System.Net.WebUtility.UrlEncode(ViewBag.SocialShareText)
             + ((topOsoba != null) ? ("&f=" + System.Net.WebUtility.UrlEncode(topOsoba.FullNameWithYear() + " " + HlidacStatu.Util.RenderData.ShortNicePrice(ViewBag.TopOsobaAmount))) : "")

@@ -75,6 +75,7 @@
 
     @{
         string urlfirst = $"{Context.Request.Scheme}://{Context.Request.Host}";
+
         string defaultSocialImg = urlfirst + "/content/icons/largetile.png";
         string url = ViewBag.SocialShareUrl ?? Context.Request.GetDisplayUrl();
         string text = ViewBag.SocialShareText ?? description;
@@ -91,7 +92,7 @@
 
         if (img == defaultSocialImg && string.IsNullOrEmpty(socialhtml) == false)
         {
-            img = urlfirst + "/socialbanner/page?v=" + System.Net.WebUtility.UrlEncode(Context.Request.GetDisplayUrl());
+            img = "https://gen.hlidacstatu.cz/socialbanner/page?v=" + System.Net.WebUtility.UrlEncode(Context.Request.GetDisplayUrl());
         }
     }
 
