@@ -27,14 +27,22 @@ namespace HlidacStatu.WebGenerator.Code
             NoDataPicture = System.IO.File.ReadAllBytes(path + @"wwwroot/content/largetile.png");
         }
 
+        private static string cacheKey(KeyAndId ki) => $"_{ki.CacheNameOnDisk}";
+
         private static readonly IFusionCache PostgreCache =
-            Hlidacstatu.Caching.CacheFactory.CreateNew(CacheFactory.CacheType.L2PostgreSqlBinarySerializer, nameof(FirmaCache));
+            Hlidacstatu.Caching.CacheFactory.CreateNew(CacheFactory.CacheType.L2PostgreSqlBinarySerializer, "socialbanner");
 
         private static async Task<byte[]> getAsync(KeyAndId ki)
         {
             var infoFacts = await PostgreCache.GetOrSetAsync(
-                $"socialbanner_{ki.CacheNameOnDisk}",
-                _ => _getBinaryDataFromUrlAsync(ki)
+                cacheKey(ki),
+                _ => _getBinaryDataFromUrlAsync(ki),
+                  options =>
+                  {
+                      options.Duration = TimeSpan.FromDays(4);
+                      options.FailSafeMaxDuration = TimeSpan.FromHours(14);
+                      options.DistributedCacheFailSafeMaxDuration = TimeSpan.FromDays(30);
+                  }
             );
             return infoFacts;
         }
@@ -42,7 +50,7 @@ namespace HlidacStatu.WebGenerator.Code
         private static async Task invalidateAsync(KeyAndId ki)
         {
             await PostgreCache.ExpireAsync(
-                $"socialbanner_{ki.CacheNameOnDisk}"
+                cacheKey(ki)
                 );
         }
 
@@ -54,32 +62,6 @@ namespace HlidacStatu.WebGenerator.Code
                 timeout: TimeSpan.FromSeconds(10));
             return data; 
         }
-
-        private static byte[] GetBinaryDataFromUrl(KeyAndId ki)
-        {
-            byte[] data = null;
-
-            try
-            {
-                using (Devmasters.Net.HttpClient.URLContent net =
-                    new Devmasters.Net.HttpClient.URLContent(ki.ValueForData))
-                {
-                    net.Timeout = 7000;
-                    net.IgnoreHttpErrors = true;
-                    data = net.GetBinary().Binary;
-                }
-            }
-            catch (Exception e)
-            {
-                _logger.Error(e, $"Manager Save error from URL {ki.ValueForData}");
-            }
-
-            if (data == null || data.Length == 0)
-                return NoDataPicture;
-            else
-                return data;
-        }
-
 
         public async static Task<byte[]> GetWebPageScreenshotAsync(string url, string ratio, string cacheName = null, bool refreshCache = false)
         {
