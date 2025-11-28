@@ -40,11 +40,6 @@ namespace HlidacStatu.Repositories
         public static Devmasters.Cache.AWS_S3.Cache<AnalysisCalculation.VazbyFiremNaPolitiky>
             FirmySVazbamiNaPolitiky_vsechny_Cache = null;
 
-        public static
-            Devmasters.Cache.AWS_S3.Cache<Tuple<Osoba.Statistics.RegistrSmluv, Entities.Insolvence.RizeniStatistic[]>[]>
-            Insolvence_firem_politiku_Cache = null;
-
-
         public static Devmasters.Cache.AWS_S3.Cache<AnalysisCalculation.VazbyFiremNaUradyStat>
             UradyObchodujiciSFirmami_s_vazbouNaPolitiky_aktualni_Cache = null;
 
@@ -92,77 +87,7 @@ namespace HlidacStatu.Repositories
                 }, null);
 
 
-        public static Devmasters.Cache.AWS_S3.Cache<Dictionary<int, Osoba.Statistics.VerySimple[]>>
-            TopPoliticiObchodSeStatem =
-                new Devmasters.Cache.AWS_S3.Cache<Dictionary<int, Osoba.Statistics.VerySimple[]>>(
-                    new string[] { Devmasters.Config.GetWebConfigValue("Minio.Cache.Endpoint") },
-                    Devmasters.Config.GetWebConfigValue("Minio.Cache.Bucket"),
-                    Devmasters.Config.GetWebConfigValue("Minio.Cache.AccessKey"),
-                    Devmasters.Config.GetWebConfigValue("Minio.Cache.SecretKey"),
-                    TimeSpan.Zero, "TopPoliticiObchodSeStatem", (obj) =>
-                    {
-                        List<Osoba.Statistics.RegistrSmluv> allStats = new();
-                        Devmasters.Batch.Manager.DoActionForAll(OsobaRepo.Politici.Get(),
-                            (o) =>
-                            {
-                                if (o != null)
-                                {
-                                    var stat = o.StatistikaRegistrSmluvAsync();
-                                    if (stat.SmlouvyStat_SoukromeFirmySummary().HasStatistics &&
-                                        stat.SmlouvyStat_SoukromeFirmySummary().Summary().PocetSmluv > 0)
-                                    {
-                                        allStats.Add(stat);
-                                    }
-                                }
-
-                                return new Devmasters.Batch.ActionOutputData();
-                            },
-                            Util.Consts.outputWriter.OutputWriter,
-                            Util.Consts.progressWriter.ProgressWriter,
-                            true, //!System.Diagnostics.Debugger.IsAttached,
-                            maxDegreeOfParallelism: 6, prefix: "TopPoliticiObchodSeStatem loading ",
-                            monitor: new MonitoredTaskRepo.ForBatch());
-
-
-                        Dictionary<int, Osoba.Statistics.VerySimple[]> res = new();
-                        res.Add(0,
-                            allStats.OrderByDescending(o =>
-                                    o.SmlouvyStat_SoukromeFirmySummary().Summary().CelkovaHodnotaSmluv).Take(100)
-                                .Union(allStats.OrderByDescending(o =>
-                                    o.SmlouvyStat_SoukromeFirmySummary().Summary().PocetSmluv).Take(100))
-                                .Select(m => new VerySimple()
-                                    {
-                                        OsobaNameId = m.OsobaNameId,
-                                        CelkovaHodnotaSmluv = m.SmlouvyStat_SoukromeFirmySummary().Summary()
-                                            .CelkovaHodnotaSmluv,
-                                        PocetSmluv = m.SmlouvyStat_SoukromeFirmySummary().Summary().PocetSmluv,
-                                        Year = 0,
-                                    }
-                                )
-                                .ToArray()
-                        );
-                        foreach (int year in HlidacStatu.Entities.KIndex.Consts.ToCalculationYears)
-                        {
-                            res.Add(year,
-                                allStats.OrderByDescending(o =>
-                                        o.SmlouvyStat_SoukromeFirmySummary()[year].CelkovaHodnotaSmluv).Take(100)
-                                    .Union(allStats.OrderByDescending(o =>
-                                        o.SmlouvyStat_SoukromeFirmySummary()[year].PocetSmluv).Take(100))
-                                    .Select(m => new VerySimple()
-                                        {
-                                            OsobaNameId = m.OsobaNameId,
-                                            CelkovaHodnotaSmluv = m.SmlouvyStat_SoukromeFirmySummary()[year]
-                                                .CelkovaHodnotaSmluv,
-                                            PocetSmluv = m.SmlouvyStat_SoukromeFirmySummary()[year].PocetSmluv,
-                                            Year = year,
-                                        }
-                                    )
-                                    .ToArray()
-                            );
-                        }
-
-                        return res;
-                    }, null);
+        
 
 
         public static Dictionary<string, TemplatedQuery> Afery = new Dictionary<string, TemplatedQuery>();
@@ -231,98 +156,7 @@ namespace HlidacStatu.Repositories
             _logger.Information("Static data - Insolvence_firem_politiku ");
             swl.StopPreviousAndStartNextLap(Util.DebugUtil.GetClassAndMethodName(MethodBase.GetCurrentMethod()) +
                                             " var Insolvence_firem_politiku");
-            Insolvence_firem_politiku_Cache =
-                new Devmasters.Cache.AWS_S3.Cache<
-                    Tuple<Osoba.Statistics.RegistrSmluv, Entities.Insolvence.RizeniStatistic[]>[]>(
-                    new string[] { Devmasters.Config.GetWebConfigValue("Minio.Cache.Endpoint") },
-                    Devmasters.Config.GetWebConfigValue("Minio.Cache.Bucket"),
-                    Devmasters.Config.GetWebConfigValue("Minio.Cache.AccessKey"),
-                    Devmasters.Config.GetWebConfigValue("Minio.Cache.SecretKey"), TimeSpan.Zero,
-                    "Insolvence_firem_politiku", (obj) =>
-                    {
-                        var ret =
-                            new List<Tuple<Osoba.Statistics.RegistrSmluv, Entities.Insolvence.RizeniStatistic[]>>();
-                        var lockObj = new object();
-                        Devmasters.Batch.Manager.DoActionForAllAsync<Osoba>(
-                                OsobaRepo.PolitickyAktivni.Get()
-                                    .Where(m => m.StatusOsoby() == Osoba.StatusOsobyEnum.Politik).Distinct(),
-                                async (o) =>
-                                {
-                                    var icos = o.AktualniVazby(Relation.AktualnostType.Nedavny)
-                                        .Where(w => !string.IsNullOrEmpty(w.To.Id))
-                                        //.Where(w => Analysis.ACore.GetBasicStatisticForICO(w.To.Id).Summary.Pocet > 0)
-                                        .Select(w => w.To.Id);
-                                    if (icos.Count() > 0)
-                                    {
-                                        var res = await InsolvenceRepo.Searching.SimpleSearchAsync(
-                                            "osobaiddluznik:" + o.NameId, 1, 100,
-                                            (int)Repositories.Searching.InsolvenceSearchResult.InsolvenceOrderResult
-                                                .LatestUpdateDesc,
-                                            limitedView: false);
-                                        if (res.IsValid && res.Total > 0)
-                                        {
-                                            var insolvenceIntoList = new List<Entities.Insolvence.Rizeni>();
-                                            foreach (var i in res.ElasticResults.Hits.Select(m => m.Source))
-                                            {
-                                                bool addToList = false;
-                                                var pdluznici = i.Dluznici.Where(m => icos.Contains(m.ICO));
-                                                if (pdluznici.Count() > 0)
-                                                {
-                                                    foreach (var pd in pdluznici)
-                                                    {
-                                                        Firma f = Firmy.Get(pd.ICO);
-                                                        var vazby = o.VazbyProICO(pd.ICO);
-                                                        foreach (var v in vazby)
-                                                        {
-                                                            if (Devmasters.DT.Util.IsOverlappingIntervals(
-                                                                    i.DatumZalozeni, i.PosledniZmena, v.RelFrom,
-                                                                    v.RelTo))
-                                                            {
-                                                                addToList = true;
-                                                                goto addList;
-                                                            }
-                                                        }
-                                                    }
-                                                }
-
-                                                addList:
-                                                if (addToList)
-                                                    insolvenceIntoList.Add(i);
-                                            }
-
-                                            if (insolvenceIntoList.Count() > 0)
-                                            {
-                                                lock (lockObj)
-                                                {
-                                                    Osoba.Statistics.RegistrSmluv
-                                                        stat = o.StatistikaRegistrSmluvAsync();
-
-                                                    ret.Add(
-                                                        new Tuple<Osoba.Statistics.RegistrSmluv,
-                                                            Entities.Insolvence.RizeniStatistic[]>(
-                                                            stat, insolvenceIntoList
-                                                                .Select(m =>
-                                                                    new Entities.Insolvence.RizeniStatistic(m, icos))
-                                                                .ToArray()
-                                                        )
-                                                    );
-                                                }
-                                            }
-                                        }
-                                    }
-
-                                    return new Devmasters.Batch.ActionOutputData();
-                                },
-                                Util.Consts.outputWriter.OutputWriter,
-                                Util.Consts.progressWriter.ProgressWriter,
-                                true, //!System.Diagnostics.Debugger.IsAttached,
-                                maxDegreeOfParallelism: 6, prefix: "Insolvence politiku ",
-                                monitor: new MonitoredTaskRepo.ForBatch())
-                            .ConfigureAwait(false).GetAwaiter().GetResult();
-
-                        return ret.ToArray();
-                    }
-                );
+            
 
             _logger.Information("Static data - SponzorujiciFirmy_Vsechny ");
 

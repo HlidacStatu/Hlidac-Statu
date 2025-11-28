@@ -3,13 +3,14 @@
 @using HlidacStatu.Extensions
 @using HlidacStatu.XLib.Render
 @using HlidacStatu.Repositories
+@using HlidacStatu.Repositories.Cache
 
 @{
     Layout = "_ReportLayout";
 
     int year = Devmasters.ParseText.ToInt(this.Context.Request.Query["rok"].FirstOrDefault(), 0) ?? 0;
 
-    Osoba.Statistics.VerySimple[] showList = HlidacStatu.Repositories.StaticData.TopPoliticiObchodSeStatem.Get()[year];
+    Osoba.Statistics.VerySimple[] showList = (await OsobaCache.GetTopPoliticiObchodujiciSeStatemAsync())[year];
 
 
     ReportDataSource poslanciTable = new(new ReportDataSource.Column[]
