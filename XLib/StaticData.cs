@@ -3,7 +3,6 @@
 using System;
 using System.Net;
 using Serilog;
-using HlidacStatu.Connectors;
 
 namespace HlidacStatu.XLib
 {

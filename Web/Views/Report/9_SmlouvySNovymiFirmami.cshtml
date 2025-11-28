@@ -1,103 +1,99 @@
 ﻿@using System.Linq
 @using HlidacStatu.Entities
 @using HlidacStatu.Extensions
+@using HlidacStatu.Lib.Analytics
 @using HlidacStatu.XLib.Render
 @using HlidacStatu.Repositories
 @using HlidacStatu.Repositories.Analysis
 
 
 @{
-        Layout = "_ReportLayout";
+    Layout = "_ReportLayout";
 
 
-    var tableSloupce = new ReportDataSource.Column[]
+    ReportDataSource<(AnalysisCalculation.IcoSmlouvaMinMax? MinMax, StatisticsSubjectPerYear<Smlouva.Statistics.Data>? Stat)>.Column[] tableSloupce =
+    [
+        new()
+        {
+            Name = "Firma",
+            HtmlRender = (s) =>
             {
-        new() { Name="Firma",
-            HtmlRender = (s) => {
-                                    AnalysisCalculation.IcoSmlouvaMinMax data = (AnalysisCalculation.IcoSmlouvaMinMax)s;
-                                    return string.Format("<a href='/subjekt/{0}'>{1}</a>", data.ico, data.jmeno);
-                                },
-            TextRender = (s) => { return ((AnalysisCalculation.IcoSmlouvaMinMax)s).jmeno; }
-        },
-        new() {
-            Name ="Firma založena",
-            HtmlRender = (s) => {
-                AnalysisCalculation.IcoSmlouvaMinMax data = (AnalysisCalculation.IcoSmlouvaMinMax)s;
-                return data.vznikIco.Value.ToString("dd.MM.yyyy");
-
+                return $"<a href='/subjekt/{s.MinMax.ico}'>{s.MinMax.jmeno}</a>";
             },
-            OrderValueRender = (s) => { return HlidacStatu.Util.RenderData.OrderValueFormat(((AnalysisCalculation.IcoSmlouvaMinMax)s).vznikIco.Value); }
+            TextRender = (s) => { return s.MinMax.jmeno; }
         },
-        new() {
-            Name ="Rozdíl dnů",
-            HtmlRender = (s) => {
-                AnalysisCalculation.IcoSmlouvaMinMax data = (AnalysisCalculation.IcoSmlouvaMinMax)s;
-                return ((data.days.Value < 0)
-                        ? ("Firma založena " + Devmasters.Lang.CS.Plural.Get((int)Math.Abs(data.days.Value),"{0} den;{0} dny;{0} dnů") + " po podepsání smlouvy")
-                        : ("Firma založena " + Devmasters.Lang.CS.Plural.Get((int)Math.Abs(data.days.Value),"{0} den;{0} dny;{0} dnů") + " před podepsáním smlouvy")
-                       )
-                    ;
-
+        new()
+        {
+            Name = "Firma založena",
+            HtmlRender = (s) =>
+            {
+                return s.MinMax.vznikIco.Value.ToString("dd.MM.yyyy");
             },
-            OrderValueRender = (s) => { return HlidacStatu.Util.RenderData.OrderValueFormat(((AnalysisCalculation.IcoSmlouvaMinMax)s).days.Value); }
+            OrderValueRender = (s) => { return HlidacStatu.Util.RenderData.OrderValueFormat(s.MinMax.vznikIco.Value); }
         },
-        new() {
-            Name ="První smlouva s firmou podepsána dne",
-            HtmlRender = (s) => {
-                AnalysisCalculation.IcoSmlouvaMinMax data = (AnalysisCalculation.IcoSmlouvaMinMax)s;
-                //return data.minUzavreni.Value.ToString("dd.MM.yyyy");
-                return string.Format("{1}<br/><a href='/hledatsmlouvy?q=ico%3A{2}+AND+podepsano%3A%3C%3D{0}'>První smlouva</a>", data.minUzavreni.Value.ToString("yyyy-MM-dd"), data.minUzavreni.Value.ToString("d.M.yyyy"), data.ico);
-                },
-            OrderValueRender = (s) => { return  HlidacStatu.Util.RenderData.OrderValueFormat(((AnalysisCalculation.IcoSmlouvaMinMax)s).minUzavreni.Value.Ticks); }
-        },
-        new() {
-            Name ="Smluvní aktivita",
-            HtmlRender = (s) => {
-                AnalysisCalculation.IcoSmlouvaMinMax data = (AnalysisCalculation.IcoSmlouvaMinMax)s;
-                var stat = Firmy.Get(data.ico).StatistikaRegistruSmluv();
-
-                return "<a href=\"/hledatsmlouvy?Q=ico:" + data.ico + "\">" +
-                    Devmasters.Lang.CS.Plural.Get(stat.Summary().PocetSmluv, "{0} smlouva;{0} smlouvy;{0} smluv") +
-                "</a>" +
-                "<br />celkem " +
-                Smlouva.NicePrice(stat.Summary().CelkovaHodnotaSmluv, html: true, shortFormat: true)
-
-                ;
+        new()
+        {
+            Name = "Rozdíl dnů",
+            HtmlRender = (s) =>
+            {
+                return (s.MinMax.days.Value < 0)
+                        ? ("Firma založena " + Devmasters.Lang.CS.Plural.Get((int)Math.Abs(s.MinMax.days.Value), "{0} den;{0} dny;{0} dnů") + " po podepsání smlouvy")
+                        : ("Firma založena " + Devmasters.Lang.CS.Plural.Get((int)Math.Abs(s.MinMax.days.Value), "{0} den;{0} dny;{0} dnů") + " před podepsáním smlouvy");
             },
-            OrderValueRender = (s) => {
-                var ico = ((AnalysisCalculation.IcoSmlouvaMinMax)s).ico;
-                var stat = Firmy.Get(ico).StatistikaRegistruSmluv();
-
-                return HlidacStatu.Util.RenderData.OrderValueFormat(stat.Summary().CelkovaHodnotaSmluv );
+            OrderValueRender = (s) => { return HlidacStatu.Util.RenderData.OrderValueFormat(s.MinMax.days.Value); }
+        },
+        new()
+        {
+            Name = "První smlouva s firmou podepsána dne",
+            HtmlRender = (s) =>
+            {
+                return $"{s.MinMax.minUzavreni.Value:d.M.yyyy}<br/><a href='/hledatsmlouvy?q=ico%3A{s.MinMax.ico}+AND+podepsano%3A%3C%3D{s.MinMax.minUzavreni.Value:yyyy-MM-dd}'>První smlouva</a>";
+            },
+            OrderValueRender = (s) => { return HlidacStatu.Util.RenderData.OrderValueFormat(s.MinMax.minUzavreni.Value.Ticks); }
+        },
+        new()
+        {
+            Name = "Smluvní aktivita",
+            HtmlRender = (s) =>
+            {
+                return "<a href=\"/hledatsmlouvy?Q=ico:" + s.MinMax.ico + "\">" +
+                       Devmasters.Lang.CS.Plural.Get(s.Stat.Summary().PocetSmluv, "{0} smlouva;{0} smlouvy;{0} smluv") +
+                       "</a>" +
+                       "<br />celkem " +
+                       Smlouva.NicePrice(s.Stat.Summary().CelkovaHodnotaSmluv, html: true, shortFormat: true);
+            },
+            OrderValueRender = (s) =>
+            {
+                return HlidacStatu.Util.RenderData.OrderValueFormat(s.Stat.Summary().CelkovaHodnotaSmluv);
             }
-        },
-            };
-
-
+        }
+    ];
+    
 
 
     var dataStatsCache = StaticData.FirmyCasovePodezreleZalozene.Get().ToList();
 
 
-    ReportDataSource rds1 = new(tableSloupce);
+    ReportDataSource<(AnalysisCalculation.IcoSmlouvaMinMax? MinMax, StatisticsSubjectPerYear<Smlouva.Statistics.Data>? Stat)> rds1 = new(tableSloupce);
     foreach (var bf in dataStatsCache.Where(m => m.days >= -45 && m.days < 0))
     {
-        rds1.AddRow(bf, bf, bf, bf, bf);
+        var stat = await Firmy.Get(bf.ico).StatistikaRegistruSmluvAsync();
+        rds1.AddRow((bf, stat));
     }
 
-    ReportDataSource rds2 = new(tableSloupce);
-    foreach (var bf in dataStatsCache.Where(m => m.days >= 0 && m.days<30))
+    ReportDataSource<(AnalysisCalculation.IcoSmlouvaMinMax? MinMax, StatisticsSubjectPerYear<Smlouva.Statistics.Data>? Stat)> rds2 = new(tableSloupce);
+    foreach (var bf in dataStatsCache.Where(m => m.days >= 0 && m.days < 30))
     {
-        rds2.AddRow(bf, bf, bf, bf, bf);
+        var stat = await Firmy.Get(bf.ico).StatistikaRegistruSmluvAsync();
+        rds1.AddRow((bf, stat));
     }
 
-    ReportDataSource rds3 = new(tableSloupce);
+    ReportDataSource<(AnalysisCalculation.IcoSmlouvaMinMax? MinMax, StatisticsSubjectPerYear<Smlouva.Statistics.Data>? Stat)> rds3 = new(tableSloupce);
     foreach (var bf in dataStatsCache.Where(m => m.days < -45).Take(300))
     {
-        rds3.AddRow(bf, bf, bf, bf, bf);
+        var stat = await Firmy.Get(bf.ico).StatistikaRegistruSmluvAsync();
+        rds1.AddRow((bf, stat));
     }
-
-
 }
 
 
@@ -105,12 +101,16 @@
 <div class="bs-callout info">
     <p>
         Založení firmy chvíli před podepsáním smlouvy není důkaz podvodu, nekalého úmyslu či chyby.
-        Bývá to běžná situace u změny obchodní formy z důvodu účasti ve výběrovém řízení (živnostníka -> s.r.o.), prvního obchodního úspěchu nové firmy,
-        prostě existuje spousta řádných obchodních a právních důvodů pro takový krok. A velké většina situací spadá do této "kolonky"
+        Bývá to běžná situace u změny obchodní formy z důvodu účasti ve výběrovém řízení (živnostníka -> s.r.o.),
+        prvního obchodního úspěchu nové firmy,
+        prostě existuje spousta řádných obchodních a právních důvodů pro takový krok. A velké většina situací spadá do
+        této "kolonky"
     </p>
     <p>
-        Bývá to však také jeden z indikátorů, že může jít o účelově založenou společnost při zmanipulovaném výběrovém řízení,
-        snahu o zakrytí skutečných vlastníků či špatné historie firmy, jeden z indikátorů potenciálně podezřelého chovaní.
+        Bývá to však také jeden z indikátorů, že může jít o účelově založenou společnost při zmanipulovaném výběrovém
+        řízení,
+        snahu o zakrytí skutečných vlastníků či špatné historie firmy, jeden z indikátorů potenciálně podezřelého
+        chovaní.
     </p>
 </div>
 
@@ -121,13 +121,14 @@
 <div class="bs-callout danger">
     <p>
         <b>Podezřelá situace.</b>
-        Pokud byla firma zapsaná do OŘ až po datu podepsání smlouvy, jak ukazují naše údaje z OŘ, je zpochybnitelná platnost smlouvy .
+        Pokud byla firma zapsaná do OŘ až po datu podepsání smlouvy, jak ukazují naše údaje z OŘ, je zpochybnitelná
+        platnost smlouvy .
         Důvody mohou být různé, od chyby, formálních důvodů až po podvodné.
     </p>
     <p>Tyto firmy a jejich smlouvy doporučujeme k hlubšímu prozkoumání.</p>
 </div>
 
-@ChartUtilExtensions.RenderReport("",ReportModel.QueueItem.types.table, rds1, @"{
+@ChartUtilExtensions.RenderReport("", ReportModel.QueueItem.types.table, rds1, @"{
                  'language': {
                     'url': '//cdn.datatables.net/plug-ins/1.13.4/i18n/cs.json'
                 },
@@ -142,12 +143,13 @@
 <div class="bs-callout danger">
     <p>
         Pokud byla firma zapsaná do OŘ chvíly před podepsáním smlouvy, může se jednat o účelově založenou společnost.
-        Někdy se tak stává před vyběrovým řízením a při problematické historii mateřské firmy. Důvody však mohou být i čistě obchodní.
+        Někdy se tak stává před vyběrovým řízením a při problematické historii mateřské firmy. Důvody však mohou být i
+        čistě obchodní.
     </p>
     <p>Tyto firmy a jejich smlouvy doporučujeme k hlubšímu prozkoumání.</p>
 </div>
 
-@ChartUtilExtensions.RenderReport("",ReportModel.QueueItem.types.table, rds2, @"{
+@ChartUtilExtensions.RenderReport("", ReportModel.QueueItem.types.table, rds2, @"{
                  'language': {
                     'url': '//cdn.datatables.net/plug-ins/1.13.4/i18n/cs.json'
                 },
@@ -166,7 +168,7 @@
         U těchto firem je nejpravděpodobnější, že se jedná o právního nástupce jedné ze smluvních stran, anebo o chybu.
     </p>
 </div>
-@ChartUtilExtensions.RenderReport("",ReportModel.QueueItem.types.table, rds3, @"{
+@ChartUtilExtensions.RenderReport("", ReportModel.QueueItem.types.table, rds3, @"{
                  'language': {
                     'url': '//cdn.datatables.net/plug-ins/1.13.4/i18n/cs.json'
                 },

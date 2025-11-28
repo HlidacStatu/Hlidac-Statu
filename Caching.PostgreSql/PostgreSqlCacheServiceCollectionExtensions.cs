@@ -9,123 +9,140 @@ using Microsoft.Extensions.Options;
 
 namespace HlidacStatu.CachingClients.PostgreSql
 {
-    /// <summary>
-    /// Extension methods for setting up PostgreSql distributed cache services in an <see cref="IServiceCollection" />.
-    /// </summary>
-    public static class PostGreSqlCachingServicesExtensions
-    {
-        /// <summary>
-        /// Adds Community Microsoft PostgreSql distributed caching services to the specified <see cref="IServiceCollection" />
-        /// without configuration. Use an implementation of <see cref="IConfigureOptions{PostgreSqlCacheOptions}"/> for configuration.
-        /// </summary>
-        /// <param name="services">The <see cref="IServiceCollection" /> to add services to.</param>
-        /// <returns>The <see cref="IServiceCollection"/> so that additional calls can be chained.</returns>
-        public static IServiceCollection AddDistributedPostgreSqlCache(this IServiceCollection services)
-        {
-            if (services == null)
-            {
-                throw new ArgumentNullException(nameof(services));
-            }
+	/// <summary>
+	/// Extension methods for setting up PostgreSql distributed cache services in an <see cref="IServiceCollection" />.
+	/// </summary>
+	public static class PostGreSqlCachingServicesExtensions
+	{
+		/// <summary>
+		/// Adds Community Microsoft PostgreSql distributed caching services to the specified <see cref="IServiceCollection" />
+		/// without configuration. Use an implementation of <see cref="IConfigureOptions{PostgreSqlCacheOptions}"/> for configuration.
+		/// </summary>
+		/// <param name="services">The <see cref="IServiceCollection" /> to add services to.</param>
+		/// <returns>The <see cref="IServiceCollection"/> so that additional calls can be chained.</returns>
+		public static IServiceCollection AddDistributedPostgreSqlCache(this IServiceCollection services)
+		{
+			if (services == null)
+			{
+				throw new ArgumentNullException(nameof(services));
+			}
 
-            services.AddOptions();
-            AddPostgreSqlCacheServices(services);
+			services.AddOptions();
+			AddPostgreSqlCacheServices(services);
+			
+			return services;
+		}
+		
+		/// <summary>
+		/// Adds Community Microsoft PostgreSql distributed caching services to the specified <see cref="IServiceCollection" />.
+		/// </summary>
+		/// <param name="services">The <see cref="IServiceCollection" /> to add services to.</param>
+		/// <param name="setupAction">An <see cref="Action{PostgreSqlCacheOptions}"/> to configure the provided <see cref="PostgreSqlCacheOptions"/>.</param>
+		/// <returns>The <see cref="IServiceCollection"/> so that additional calls can be chained.</returns>
+		public static IServiceCollection AddDistributedPostgreSqlCache(this IServiceCollection services, Action<PostgreSqlCacheOptions> setupAction)
+		{
+			if (services == null)
+			{
+				throw new ArgumentNullException(nameof(services));
+			}
 
-            return services;
-        }
+			if (setupAction == null)
+			{
+				throw new ArgumentNullException(nameof(setupAction));
+			}
 
-        /// <summary>
-        /// Adds Community Microsoft PostgreSql distributed caching services to the specified <see cref="IServiceCollection" />.
-        /// </summary>
-        /// <param name="services">The <see cref="IServiceCollection" /> to add services to.</param>
-        /// <param name="setupAction">An <see cref="Action{PostgreSqlCacheOptions}"/> to configure the provided <see cref="PostgreSqlCacheOptions"/>.</param>
-        /// <returns>The <see cref="IServiceCollection"/> so that additional calls can be chained.</returns>
-        public static IServiceCollection AddDistributedPostgreSqlCache(this IServiceCollection services, Action<PostgreSqlCacheOptions> setupAction)
-        {
-            if (services == null)
-            {
-                throw new ArgumentNullException(nameof(services));
-            }
+			services.AddOptions();
+			AddPostgreSqlCacheServices(services);
+			services.Configure(setupAction);
 
-            if (setupAction == null)
-            {
-                throw new ArgumentNullException(nameof(setupAction));
-            }
+			return services;
+		}
 
-            services.AddOptions();
-            AddPostgreSqlCacheServices(services);
-            services.Configure(setupAction);
+		/// <summary>
+		/// Adds Community Microsoft PostgreSql distributed caching services to the specified <see cref="IServiceCollection" />.
+		/// </summary>
+		/// <param name="services">The <see cref="IServiceCollection" /> to add services to.</param>
+		/// <param name="setupAction">An <see cref="Action{IServiceProvider, PostgreSqlCacheOptions}"/> to configure the provided <see cref="PostgreSqlCacheOptions"/>.</param>
+		/// <returns>The <see cref="IServiceCollection"/> so that additional calls can be chained.</returns>
+		public static IServiceCollection AddDistributedPostgreSqlCache(this IServiceCollection services, Action<IServiceProvider, PostgreSqlCacheOptions> setupAction)
+		{
+			if (services == null)
+			{
+				throw new ArgumentNullException(nameof(services));
+			}
 
-            return services;
-        }
+			if (setupAction == null)
+			{
+				throw new ArgumentNullException(nameof(setupAction));
+			}
 
-        /// <summary>
-        /// Adds Community Microsoft PostgreSql distributed caching services to the specified <see cref="IServiceCollection" />.
-        /// </summary>
-        /// <param name="services">The <see cref="IServiceCollection" /> to add services to.</param>
-        /// <param name="setupAction">An <see cref="Action{IServiceProvider, PostgreSqlCacheOptions}"/> to configure the provided <see cref="PostgreSqlCacheOptions"/>.</param>
-        /// <returns>The <see cref="IServiceCollection"/> so that additional calls can be chained.</returns>
-        public static IServiceCollection AddDistributedPostgreSqlCache(this IServiceCollection services, Action<IServiceProvider, PostgreSqlCacheOptions> setupAction)
-        {
-            if (services == null)
-            {
-                throw new ArgumentNullException(nameof(services));
-            }
+			services.AddOptions();
+			AddPostgreSqlCacheServices(services);
+			services.AddSingleton<IConfigureOptions<PostgreSqlCacheOptions>>(
+				sp => new ConfigureOptions<PostgreSqlCacheOptions>(opt => setupAction(sp, opt)));
+			
+			return services;
+		}
+		
+		public static IServiceCollection AddDistributedPostgreSqlCacheKeyed(this IServiceCollection services, Action<PostgreSqlCacheOptions> setupAction, object? key)
+		{
+			if (services == null)
+			{
+				throw new ArgumentNullException(nameof(services));
+			}
 
-            if (setupAction == null)
-            {
-                throw new ArgumentNullException(nameof(setupAction));
-            }
+			if (setupAction == null)
+			{
+				throw new ArgumentNullException(nameof(setupAction));
+			}
+			
+			string? optionsName = key?.ToString();
+			services.Configure<PostgreSqlCacheOptions>(optionsName, setupAction);
+			
+			
+			services.AddOptions();
+			services.AddKeyedSingleton<IDatabaseOperations, DatabaseOperations>(key, (sp, k) =>
+			{
+				var logger = sp.GetRequiredService<ILogger<DatabaseOperations>>();
+				var options = GetWrappedOptions(sp, k);
+				return new DatabaseOperations(options, logger);
+			});
+			
+			services.AddKeyedSingleton<IDatabaseExpiredItemsRemoverLoop>(key, (sp, k) =>
+			{
+				var dbOps = sp.GetRequiredKeyedService<IDatabaseOperations>(k);
+				var logger = sp.GetRequiredService<ILogger<DatabaseExpiredItemsRemoverLoop>>();
+				var options = GetWrappedOptions(sp, k);
 
-            services.AddOptions();
-            AddPostgreSqlCacheServices(services);
-            services.AddSingleton<IConfigureOptions<PostgreSqlCacheOptions>>(
-                sp => new ConfigureOptions<PostgreSqlCacheOptions>(opt => setupAction(sp, opt)));
+				return new DatabaseExpiredItemsRemoverLoop(options, dbOps, logger);
+			});
+			
+			services.AddKeyedSingleton<IDistributedCache>(key, (sp, k) =>
+			{
+				var dbOps = sp.GetRequiredKeyedService<IDatabaseOperations>(k);
+				var remover = sp.GetRequiredKeyedService<IDatabaseExpiredItemsRemoverLoop>(k);
+				var options = GetWrappedOptions(sp, k);
 
-            return services;
-        }
+				return new PostgreSqlCache(options, dbOps, remover);
+			});
+			services.Configure(setupAction);
 
-        public static IServiceCollection AddDistributedPostgreSqlCacheKeyed(this IServiceCollection services, Action<PostgreSqlCacheOptions> setupAction, object? key)
-        {
-            if (services == null)
-            {
-                throw new ArgumentNullException(nameof(services));
-            }
+			return services;
+		}
 
-            if (setupAction == null)
-            {
-                throw new ArgumentNullException(nameof(setupAction));
-            }
+		private static IOptions<PostgreSqlCacheOptions> GetWrappedOptions(IServiceProvider sp, object? key)
+		{
+			var optionsMonitor = sp.GetRequiredService<IOptionsMonitor<PostgreSqlCacheOptions>>();
+			var specificOptions = optionsMonitor.Get(key?.ToString());
+			return Options.Create(specificOptions);
+		}
 
-            services.AddOptions();
-            services.AddKeyedSingleton<IDatabaseOperations, DatabaseOperations>(key);
-            services.AddKeyedSingleton<IDatabaseExpiredItemsRemoverLoop>(key, (sp, k) =>
-            {
-                var dbOps = sp.GetRequiredKeyedService<IDatabaseOperations>(k);
-                var logger = sp.GetRequiredService<ILogger<DatabaseExpiredItemsRemoverLoop>>();
-                var options = sp.GetRequiredService<IOptions<PostgreSqlCacheOptions>>();
-
-                return new DatabaseExpiredItemsRemoverLoop(options, dbOps, logger);
-            });
-
-            services.AddKeyedSingleton<IDistributedCache>(key, (sp, k) =>
-            {
-                var dbOps = sp.GetRequiredKeyedService<IDatabaseOperations>(k);
-                var remover = sp.GetRequiredKeyedService<IDatabaseExpiredItemsRemoverLoop>(k);
-                var options = sp.GetRequiredService<IOptions<PostgreSqlCacheOptions>>();
-
-                return new PostgreSqlCache(options, dbOps, remover);
-            });
-            services.Configure(setupAction);
-
-            return services;
-        }
-
-        // to enable unit testing
+		// to enable unit testing
         private static void AddPostgreSqlCacheServices(IServiceCollection services)
-        {
+		{
             services.AddSingleton<IDatabaseOperations, DatabaseOperations>();
-            services.AddSingleton<IDatabaseExpiredItemsRemoverLoop, DatabaseExpiredItemsRemoverLoop>();
-            services.AddSingleton<IDistributedCache, PostgreSqlCache>();
-        }
-    }
+			services.AddSingleton<IDatabaseExpiredItemsRemoverLoop, DatabaseExpiredItemsRemoverLoop>();
+			services.AddSingleton<IDistributedCache, PostgreSqlCache>();
+		}
+	}
 }

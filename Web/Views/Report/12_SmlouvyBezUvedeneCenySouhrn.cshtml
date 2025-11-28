@@ -6,7 +6,7 @@
 
 
 @{
-        Layout = "_ReportLayout";
+    Layout = "_ReportLayout";
 
     int size = 100;
     AggregationContainerDescriptor<Smlouva> aggs = new AggregationContainerDescriptor<Smlouva>()
@@ -21,51 +21,53 @@
         SmlouvaRepo.Searching.OrderResult.FastestForScroll, aggs, platnyZaznam: true);
 
     ReportDataSource rdsPerIco = new(new ReportDataSource.Column[]
-    {
-        new()
         {
-            Name = "IČO",
-            HtmlRender = (s) =>
+            new()
             {
-                Tuple<string, string> data = (Tuple<string, string>) s;
-                return string.Format(@"<a href='/subjekt/{0}'>{1}</a>", data.Item2, data.Item1);
+                Name = "IČO",
+                HtmlRender =(s) =>
+                {
+                    Tuple<string, string> data = (Tuple<string, string>)s;
+                    return string.Format(@"<a href='/subjekt/{0}'>{1}</a>", data.Item2, data.Item1);
+                },
+                TextRender = (s) => { return ((Tuple<string, string>)s).Item1.ToString(); },
+                ValueRender = (s) => { return $"\"{((System.Tuple<string, string>)s).Item1.ToString()}\""; }
             },
-            TextRender = (s) => { return ((Tuple<string, string>) s).Item1.ToString(); },
-            ValueRender = (s) => { return $"\"{((System.Tuple<string, string>) s).Item1.ToString()}\""; }
-        },
-        new()
-        {
-            Name = "Počet smluv bez uvedené ceny",
-            OrderValueRender = (s) => { return HlidacStatu.Util.RenderData.OrderValueFormat(Convert.ToInt64(s)); },
-            ValueRender = (s) => { return Convert.ToInt64(s).ToString("F0",HlidacStatu.Util.Consts.enCulture); }
-        },
-        new()
-        {
-            Name = "Počet všech smluv",
-            OrderValueRender = (s) => { return HlidacStatu.Util.RenderData.OrderValueFormat(Convert.ToInt64(s)); },
-            ValueRender = (s) => { return Convert.ToInt64(s).ToString("F0",HlidacStatu.Util.Consts.enCulture); }
-        },
-        new()
-        {
-            Name = "% smluv bez cen",
-            HtmlRender = (s) => { return ((double) s).ToString("P1"); },
-            ValueRender = (s) => { return Convert.ToInt64(s).ToString("F1",HlidacStatu.Util.Consts.enCulture); },
-            TextRender = (s) => { return ((double) s).ToString("P1"); },
-            OrderValueRender = (s) => { return HlidacStatu.Util.RenderData.OrderValueFormat((double) s); }
-        },
-    }
-        );
+            new()
+            {
+                Name = "Počet smluv bez uvedené ceny",
+                OrderValueRender = (s) => { return HlidacStatu.Util.RenderData.OrderValueFormat(Convert.ToInt64(s)); },
+                ValueRender = (s) => { return Convert.ToInt64(s).ToString("F0", HlidacStatu.Util.Consts.enCulture); }
+            },
+            new()
+            {
+                Name = "Počet všech smluv",
+                OrderValueRender = (s) => { return HlidacStatu.Util.RenderData.OrderValueFormat(Convert.ToInt64(s)); },
+                ValueRender = (s) => { return Convert.ToInt64(s).ToString("F0", HlidacStatu.Util.Consts.enCulture); }
+            },
+            new()
+            {
+                Name = "% smluv bez cen",
+                HtmlRender =(s) => { return ((double)s).ToString("P1"); },
+                ValueRender = (s) => { return Convert.ToInt64(s).ToString("F1", HlidacStatu.Util.Consts.enCulture); },
+                TextRender = (s) => { return ((double)s).ToString("P1"); },
+                OrderValueRender = (s) => { return HlidacStatu.Util.RenderData.OrderValueFormat((double)s); }
+            },
+        }
+    );
 
-    foreach (KeyedBucket<object> val in ((BucketAggregate) res.ElasticResults.Aggregations["perIco"]).Items)
+    foreach (KeyedBucket<object> val in ((BucketAggregate)res.ElasticResults.Aggregations["perIco"]).Items)
     {
-        var ico = (string) val.Key;
+        
+        var ico = (string)val.Key;
         var f = Firmy.Get(ico);
+        var statRs = await f.StatistikaRegistruSmluvAsync();
         rdsPerIco.AddRow(
-            new Tuple<string, string>(f.Jmeno, (string) val.Key),
+            new Tuple<string, string>(f.Jmeno, (string)val.Key),
             val.DocCount.ToString(),
-            f.StatistikaRegistruSmluv().Summary().PocetSmluv,
-            (double) val.DocCount / (double) f.StatistikaRegistruSmluv().Summary().PocetSmluv
-            );
+            statRs.Summary().PocetSmluv,
+            (double)val.DocCount / (double)statRs.Summary().PocetSmluv
+        );
     }
 
 
@@ -77,9 +79,8 @@
             "perIco_d",
             "Úřady", "Počet smluv",
             rdsPerIco.Filter(10))
-        );
+    );
     model.Add("perIcoTable", "", rdsPerIco);
-
 }
 
 <p class="text-muted">Odběratelé skrývající nebo neuvádějící hodnotu smlouvy</p>
@@ -90,7 +91,7 @@
     <div class="col-xs-12">
         @foreach (var q in model.GetQueue("perIcoChart_d"))
         {
-            @ChartUtilExtensions.RenderReport(q, HtmlExtensions.DatatableOptions(orderColumnIdx:3, orderDirection:"desc"), q.Key)
+            @ChartUtilExtensions.RenderReport(q, HtmlExtensions.DatatableOptions(orderColumnIdx: 3, orderDirection: "desc"), q.Key)
         }
 
 
@@ -98,7 +99,7 @@
     <div class="col-xs-12">
         @foreach (var q in model.GetQueue("perIcoTable"))
         {
-            @ChartUtilExtensions.RenderReport(q, HtmlExtensions.DatatableOptions(orderColumnIdx:3, orderDirection:"desc"), q.Key)
+            @ChartUtilExtensions.RenderReport(q, HtmlExtensions.DatatableOptions(orderColumnIdx: 3, orderDirection: "desc"), q.Key)
         }
     </div>
 </div>

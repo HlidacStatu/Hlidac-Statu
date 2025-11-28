@@ -35,8 +35,7 @@ namespace HlidacStatu.Web.Controllers
             }, options =>
             {
                 options.Duration = TimeSpan.FromHours(1);
-                options.FailSafeMaxDuration = TimeSpan.FromHours(6);
-                options.DistributedCacheFailSafeMaxDuration = TimeSpan.FromDays(1);
+                options.FailSafeMaxDuration = TimeSpan.FromHours(8);
             }
         );
 

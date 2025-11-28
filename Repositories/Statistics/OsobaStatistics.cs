@@ -3,60 +3,42 @@ using HlidacStatu.DS.Graphs;
 using HlidacStatu.Entities;
 using HlidacStatu.Extensions;
 using HlidacStatu.Lib.Analytics;
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
+using HlidacStatu.Repositories.Cache;
 
 namespace HlidacStatu.Repositories.Statistics
 {
     public static class OsobaStatistics
     {
-        static Devmasters.Cache.Redis.Manager<Osoba.Statistics.RegistrSmluv, (Osoba os, int? obor)>
-            _cacheSmlouvy
-                = Devmasters.Cache.Redis.Manager<Osoba.Statistics.RegistrSmluv, (Osoba os,int? obor)>
-                    .GetSafeInstance("Osoba_SmlouvyStatistics_v1_",
-                        (obj) => CalculateSmlouvyStat(obj.os, obj.obor),
-                        TimeSpan.Zero,
-                    Devmasters.Config.GetWebConfigValue("RedisServerUrls").Split(';'),
-                    Devmasters.Config.GetWebConfigValue("RedisBucketName"),
-                    Devmasters.Config.GetWebConfigValue("RedisUsername"),
-                    Devmasters.Config.GetWebConfigValue("RedisCachePassword"),
-                        keyValueSelector: obj => $"{obj.os.NameId}/{(obj.obor ?? 0)}");
-
         static Devmasters.Cache.Redis.Manager<Osoba.Statistics.Dotace, Osoba>
-      _cacheDotace
-          = Devmasters.Cache.Redis.Manager<Osoba.Statistics.Dotace, Osoba>
-              .GetSafeInstance("Osoba_DotaceStatistics_v1_",
-                  (os) => CalculateDotaceStat(os),
-                  TimeSpan.Zero,
-                    Devmasters.Config.GetWebConfigValue("RedisServerUrls").Split(';'),
-                    Devmasters.Config.GetWebConfigValue("RedisBucketName"),
-                    Devmasters.Config.GetWebConfigValue("RedisUsername"),
-                    Devmasters.Config.GetWebConfigValue("RedisCachePassword"),
-                  keyValueSelector: os => $"{os.NameId}");
-
-
-        public static void RemoveCachedStatistics_Smlouvy(Osoba os, int? obor)
-        {
-            _cacheSmlouvy.Delete((os, obor));
-
-        }
+            _cacheDotace
+                = Devmasters.Cache.Redis.Manager<Osoba.Statistics.Dotace, Osoba>
+                    .GetSafeInstance("Osoba_DotaceStatistics_v1_",
+                        (os) => CalculateDotaceStat(os),
+                        TimeSpan.Zero,
+                        Devmasters.Config.GetWebConfigValue("RedisServerUrls").Split(';'),
+                        Devmasters.Config.GetWebConfigValue("RedisBucketName"),
+                        Devmasters.Config.GetWebConfigValue("RedisUsername"),
+                        Devmasters.Config.GetWebConfigValue("RedisCachePassword"),
+                        keyValueSelector: os => $"{os.NameId}");
+        
 
         public static void RemoveCachedStatistics_Dotace(Osoba os)
         {
             _cacheDotace.Delete(os);
-
         }
 
 
-        public static Osoba.Statistics.RegistrSmluv CachedStatistics_Smlouvy(Osoba os,
+        public static async Task<Osoba.Statistics.RegistrSmluv> CachedStatistics_SmlouvyAsync(Osoba os,
             int? obor, bool forceUpdateCache = false)
         {
             if (forceUpdateCache)
-                _cacheSmlouvy.Delete((os, obor));
+                await StatisticsCache.InvalidateOsobaSmlouvyStatisticsAsync(os, obor);
 
-            return _cacheSmlouvy.Get((os, obor));
+            return await StatisticsCache.GetOsobaSmlouvyStatisticsAsync(os, obor);
         }
 
         public static Osoba.Statistics.Dotace CachedStatistics_Dotace(Osoba os,
@@ -68,62 +50,8 @@ namespace HlidacStatu.Repositories.Statistics
             return _cacheDotace.Get(os);
         }
 
-        public static Osoba.Statistics.RegistrSmluv CalculateSmlouvyStat(Osoba o, int? obor)
-        {
-            Osoba.Statistics.RegistrSmluv res = new Osoba.Statistics.RegistrSmluv();
-            res.OsobaNameId = o.NameId;
-            res.Obor = (Smlouva.SClassification.ClassificationsTypes?)obor;
 
-            Dictionary<string, StatisticsSubjectPerYear<Smlouva.Statistics.Data>> statni =
-                new Dictionary<string, StatisticsSubjectPerYear<Smlouva.Statistics.Data>>();
-            Dictionary<string, StatisticsSubjectPerYear<Smlouva.Statistics.Data>> soukr =
-                new Dictionary<string, StatisticsSubjectPerYear<Smlouva.Statistics.Data>>();
-            Dictionary<string, StatisticsSubjectPerYear<Smlouva.Statistics.Data>> nezisk =
-                new Dictionary<string, StatisticsSubjectPerYear<Smlouva.Statistics.Data>>();
-
-            var skutecneVazby = Relation.SkutecnaDobaVazby(o.AktualniVazby(Relation.AktualnostType.Libovolny));
-            var firmy_maxrok = new Dictionary<string, DateInterval>();
-            foreach (var v in skutecneVazby.Where(v => !string.IsNullOrEmpty(v.To?.UniqId)
-                            && v.To.Type == HlidacStatu.DS.Graphs.Graph.Node.NodeType.Company)
-)
-            {
-                firmy_maxrok.TryAdd(v.To.Id, new DateInterval(v.RelFrom ?? DateTime.MinValue, v.RelTo ?? DateTime.MaxValue));
-            }
-
-
-            var perIcoStat = firmy_maxrok
-                .Select(m => new { firma = Firmy.Get(m.Key), interval = m.Value })
-                .Where(m => m.firma.Valid == true)
-                .Select(m => new
-                {
-                    f = m.firma,
-                    ss = new StatisticsSubjectPerYear<Smlouva.Statistics.Data>(
-                        m.firma.ICO,
-                        m.firma.StatistikaRegistruSmluv().Filter(fi => fi.Key >= m.interval.From?.Year && fi.Key <= m.interval.To?.Year)
-                        )
-                });
-
-
-
-            foreach (var it in perIcoStat)
-            {
-                if (it.f.PatrimStatu() && statni.ContainsKey(it.f.ICO) == false)
-                    statni.Add(it.f.ICO, it.ss);
-                else if (it.f.JsemNeziskovka() && nezisk.ContainsKey(it.f.ICO) == false)
-                    nezisk.Add(it.f.ICO, it.ss);
-                else if (soukr.ContainsKey(it.f.ICO) == false)
-                    soukr.Add(it.f.ICO, it.ss);
-
-            }
-
-            res.StatniFirmy = statni;
-            res.SoukromeFirmy = soukr;
-            res.Neziskovky = nezisk;
-            return res;
-        }
-
-
-        public static Osoba.Statistics.Dotace CalculateDotaceStat(Osoba o)
+        private static Osoba.Statistics.Dotace CalculateDotaceStat(Osoba o)
         {
             Osoba.Statistics.Dotace res = new Osoba.Statistics.Dotace();
             res.OsobaNameId = o.NameId;
@@ -138,10 +66,12 @@ namespace HlidacStatu.Repositories.Statistics
             var skutecneVazby = Relation.SkutecnaDobaVazby(o.AktualniVazby(Relation.AktualnostType.Libovolny));
             var firmy_maxrok = new Dictionary<string, DateInterval>();
             foreach (var v in skutecneVazby.Where(v => !string.IsNullOrEmpty(v.To?.UniqId)
-                            && v.To.Type == HlidacStatu.DS.Graphs.Graph.Node.NodeType.Company)
-)
+                                                       && v.To.Type == HlidacStatu.DS.Graphs.Graph.Node.NodeType
+                                                           .Company)
+                    )
             {
-                    firmy_maxrok.TryAdd(v.To.Id, new DateInterval(v.RelFrom ?? DateTime.MinValue, v.RelTo ?? DateTime.MaxValue));
+                firmy_maxrok.TryAdd(v.To.Id,
+                    new DateInterval(v.RelFrom ?? DateTime.MinValue, v.RelTo ?? DateTime.MaxValue));
             }
 
 
@@ -153,10 +83,10 @@ namespace HlidacStatu.Repositories.Statistics
                     f = m.firma,
                     ss = new StatisticsSubjectPerYear<Firma.Statistics.Dotace>(
                         m.firma.ICO,
-                        m.firma.StatistikaDotaci().Filter(fi => fi.Key >= m.interval.From?.Year && fi.Key <= m.interval.To?.Year)
-                        )
+                        m.firma.StatistikaDotaci().Filter(fi =>
+                            fi.Key >= m.interval.From?.Year && fi.Key <= m.interval.To?.Year)
+                    )
                 });
-
 
 
             foreach (var fStat in perIcoStat)
@@ -190,14 +120,16 @@ namespace HlidacStatu.Repositories.Statistics
             return registrSmluv._neziskovkyIcos;
         }
 
-        public static int SmlouvyStat_NeziskovkyCount(this Osoba.Statistics.RegistrSmluv registrSmluv) => registrSmluv.SmlouvyStat_Neziskovky().Count();
+        public static int SmlouvyStat_NeziskovkyCount(this Osoba.Statistics.RegistrSmluv registrSmluv) =>
+            registrSmluv.SmlouvyStat_Neziskovky().Count();
 
         public static int SmlouvyStat_KomercniFirmyCount(this Osoba.Statistics.RegistrSmluv registrSmluv)
         {
             return registrSmluv.SoukromeFirmy.Count - registrSmluv.SmlouvyStat_NeziskovkyCount();
         }
 
-        public static StatisticsPerYear<Smlouva.Statistics.Data> SmlouvyStat_SoukromeFirmySummary(this Osoba.Statistics.RegistrSmluv registrSmluv)
+        public static StatisticsPerYear<Smlouva.Statistics.Data> SmlouvyStat_SoukromeFirmySummary(
+            this Osoba.Statistics.RegistrSmluv registrSmluv)
         {
             if (registrSmluv._soukromeFirmySummary == null)
                 registrSmluv._soukromeFirmySummary = registrSmluv.SoukromeFirmy?.Values.AggregateStats();
@@ -205,7 +137,8 @@ namespace HlidacStatu.Repositories.Statistics
             return registrSmluv._soukromeFirmySummary;
         }
 
-        public static StatisticsPerYear<Smlouva.Statistics.Data> SmlouvyStat_StatniFirmySummary(this Osoba.Statistics.RegistrSmluv registrSmluv)
+        public static StatisticsPerYear<Smlouva.Statistics.Data> SmlouvyStat_StatniFirmySummary(
+            this Osoba.Statistics.RegistrSmluv registrSmluv)
         {
             if (registrSmluv._statniFirmySummary == null)
                 registrSmluv._statniFirmySummary = registrSmluv.StatniFirmy?.Values.AggregateStats();
@@ -213,7 +146,8 @@ namespace HlidacStatu.Repositories.Statistics
             return registrSmluv._statniFirmySummary;
         }
 
-        public static StatisticsPerYear<Smlouva.Statistics.Data> SmlouvyStat_NeziskovkySummary(this Osoba.Statistics.RegistrSmluv registrSmluv)
+        public static StatisticsPerYear<Smlouva.Statistics.Data> SmlouvyStat_NeziskovkySummary(
+            this Osoba.Statistics.RegistrSmluv registrSmluv)
         {
             if (registrSmluv._neziskovkySummary == null)
                 registrSmluv._neziskovkySummary = registrSmluv.Neziskovky?.Values.AggregateStats();

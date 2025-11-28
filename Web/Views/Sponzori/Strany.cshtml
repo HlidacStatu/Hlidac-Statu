@@ -58,7 +58,7 @@ order by sumaLastY desc, suma desc
     new ReportDataSource<Tuple<string, string, decimal?, decimal?,int>>.Column()
             {
                 Name = "Politická strana",
-                HtmlRender = (m) =>
+                HtmlRender =(m) =>
         {
                     return $"{m.Item2} <span style='margin-left:10px'><a href='/sponzori/strana/{m.Item1}'><i class='fa-solid fa-circle-dollar'></i> o sponzoringu</a> <a href='/subjekt/{m.Item1}/'><i class='fa-solid fa-circle-info'></i> o straně</a></span> ";
                 }
@@ -66,7 +66,7 @@ order by sumaLastY desc, suma desc
     new ReportDataSource<Tuple<string, string, decimal?, decimal?,int>>.Column()
             {
                 Name = "Počet sponzorů",
-                HtmlRender = (m) =>
+                HtmlRender =(m) =>
 {
             return $"{m.Item5}";
                 },
@@ -76,7 +76,7 @@ order by sumaLastY desc, suma desc
     new ReportDataSource<Tuple<string, string, decimal?, decimal?,int>>.Column()
             {
                 Name = "Obdržené dary za rok " + SponzoringRepo.DefaultLastSponzoringYear(),
-                HtmlRender = (m) =>
+                HtmlRender =(m) =>
             {
                         return HlidacStatu.Util.RenderData.NicePrice(m.Item4 ?? 0, html: true);
                     },
@@ -86,7 +86,7 @@ order by sumaLastY desc, suma desc
     new ReportDataSource<Tuple<string, string, decimal?, decimal?,int>>.Column()
             {
                 Name = "Obdržené dary za posledních 10 let",
-                HtmlRender = (m) =>
+                HtmlRender =(m) =>
     {
                 return HlidacStatu.Util.RenderData.NicePrice(m.Item3 ?? 0, html: true);
             },

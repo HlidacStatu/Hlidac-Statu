@@ -109,14 +109,14 @@ namespace HlidacStatu.XLib.Render
                 return $"<span>{jmeno} {prijmeni} {narozeni}</span>";
             }
 
-            public static string fn_RenderPersonStatistic(string osobaId, bool twoLines = false, string prefix = "", string postfix = "")
+            public static async Task<string> fn_RenderPersonStatistic(string osobaId, bool twoLines = false, string prefix = "", string postfix = "")
             {
                 if (!string.IsNullOrEmpty(osobaId))
                 {
                     Osoba o = Osoby.GetByNameId.Get(osobaId);
                     if (o != null)
                     {
-                        var stat = o.StatistikaRegistrSmluv();
+                        var stat = await o.StatistikaRegistrSmluvAsync();
                         //return $"<span>{prefix}{stat.BasicStatPerYear.SummaryAfter2016().ToNiceString(o, true, customUrl: "/hledatSmlouvy?q=osobaId:" + o.NameId, twoLines: twoLines)}{postfix}</span>";
                         var s = stat.SoukromeFirmy.Values
                                         .AggregateStats()
@@ -186,7 +186,7 @@ namespace HlidacStatu.XLib.Render
                 return string.Empty;
             }
 
-            public static string fn_RenderCompanyStatistic(string ico, bool twoLines = false, string prefix = "", string postfix = "")
+            public static async Task<string> fn_RenderCompanyStatistic(string ico, bool twoLines = false, string prefix = "", string postfix = "")
             {
                 if (ico  == null)
                     return string.Empty;
@@ -196,7 +196,7 @@ namespace HlidacStatu.XLib.Render
                     var firma = Firmy.instanceByIco.Get(ico);
                     if (firma.Valid)
                     {
-                        var stat = firma.StatistikaRegistruSmluv();
+                        var stat = await firma.StatistikaRegistruSmluvAsync();
                         var pocet = stat.Sum(stat.YearsAfter2016(), s => s.PocetSmluv);
                         var celkem = stat.Sum(stat.YearsAfter2016(), s => s.CelkovaHodnotaSmluv);
 

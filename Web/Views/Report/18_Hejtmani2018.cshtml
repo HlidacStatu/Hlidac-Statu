@@ -22,51 +22,46 @@
     //    .ThenBy(m => m.Jmeno)
     //    .ToList();
 
-    ReportDataSource poslanciTable = new(new ReportDataSource.Column[]
+    ReportDataSource<(Osoba Osoba, Osoba.Statistics.RegistrSmluv? Stat)> poslanciTable = new(new ReportDataSource<(Osoba Osoba, Osoba.Statistics.RegistrSmluv? Stat)>.Column[]
    {
                 new() { Name="Hejtman",
-                    HtmlRender = (s) => {
-                        Osoba o = (Osoba)s;
-                        return string.Format("<a href='{0}'>{1}</a>", o.GetUrl(), o.FullNameWithYear(true))
+                    HtmlRender =(s) => {
+                        return string.Format("<a href='{0}'>{1}</a>", s.Osoba.GetUrl(), s.Osoba.FullNameWithYear(true))
                         + "<br />"
-                        + Devmasters.TextUtil.ShortenText(o.Description(false,m=> true, numOfRecords: 3), 250).Replace("\n", "<br />");
+                        + Devmasters.TextUtil.ShortenText(s.Osoba.Description(false,m=> true, numOfRecords: 3), 250).Replace("\n", "<br />");
                     },
                     OrderValueRender = (s) => {
-                        Osoba o = (Osoba)s;
-                        return o.FullName(false);
+                        return s.Osoba.FullName(false);
                     }
                 },
                 new() {
                     Name ="Strana/Hnutí",
-                    HtmlRender = (s) => {
-                        Osoba o = (Osoba)s;
-                        return o.CurrentPoliticalParty();
+                    HtmlRender =(s) => {
+                        return s.Osoba.CurrentPoliticalParty();
                     },
                     OrderValueRender = (s) => {
-                        Osoba o = (Osoba)s;
-                        return o.CurrentPoliticalParty();
+                        return s.Osoba.CurrentPoliticalParty();
 
                     }
                 },
                 new() { Name="Angažovanost",
-                    HtmlRender = (s) => {
-                        Osoba o = (Osoba)s;
+                    HtmlRender =(s) => {
                         string sout = "";
 
-                        if (o.Vazby() != null)
+                        if (s.Osoba.Vazby() != null)
                         {
-                            foreach (var v in o.StatistikaRegistrSmluv().SoukromeFirmy.Take(2))
+                            foreach (var v in s.Stat.SoukromeFirmy.Take(2))
                             {
                                 sout = sout + v.Value.Summary(HlidacStatu.Lib.Analytics.CoreStat.UsualYearsInterval.FromUsualFirstYearUntilNow).ToNiceLinkString(null,true) + "<br/>";
                             }
-                            if (o.StatistikaRegistrSmluv().SoukromeFirmy.Count() == 3)
+                            if (s.Stat.SoukromeFirmy.Count() == 3)
                             {
-                                sout = sout + o.StatistikaRegistrSmluv().SoukromeFirmy
+                                sout = sout + s.Stat.SoukromeFirmy
                                     .Skip(2).First().Value.Summary(HlidacStatu.Lib.Analytics.CoreStat.UsualYearsInterval.FromUsualFirstYearUntilNow).ToNiceLinkString(null,true);
                             }
-                            else if (o.StatistikaRegistrSmluv().SoukromeFirmy.Count() > 2)
+                            else if (s.Stat.SoukromeFirmy.Count() > 2)
                             {
-                                sout = sout + "<a href='" + o.GetUrl() + "'>" + Devmasters.Lang.CS.Plural.Get(o.Vazby().Length - 2, "+další vazba;+ další {0} vazby;+ dalších {0} vazeb") + "</a>";
+                                sout = sout + "<a href='" + s.Osoba.GetUrl() + "'>" + Devmasters.Lang.CS.Plural.Get(s.Osoba.Vazby().Length - 2, "+další vazba;+ další {0} vazby;+ dalších {0} vazeb") + "</a>";
                             }
                         }
                         else
@@ -76,32 +71,29 @@
                         return sout;
                     },
                     OrderValueRender = (s) => {
-                        Osoba o = (Osoba)s;
-                        return o.FullName(false);
+                        return s.Osoba.FullName(false);
                     }
                 },
                 new() { Name="Sponzor",
-                    HtmlRender = (s) => {
-                        Osoba o = (Osoba)s;
-                        var sum = o.Sponzoring().Sum(m=>m.Hodnota);
+                    HtmlRender =(s) => {
+                        var sum = s.Osoba.Sponzoring().Sum(m=>m.Hodnota);
                         if (sum==0)
                             return "Ne";
                         else
-                            return "Celkem&nbsp;" + HlidacStatu.Util.RenderData.NicePriceHtml(sum.Value) + string.Format("<br /><a href='{0}'>podrobnosti</a>", o.GetUrl()) ;
+                            return "Celkem&nbsp;" + HlidacStatu.Util.RenderData.NicePriceHtml(sum.Value) + string.Format("<br /><a href='{0}'>podrobnosti</a>", s.Osoba.GetUrl()) ;
                     },
                     OrderValueRender = (s) => {
-                        Osoba o = (Osoba)s;
-                        var val= o.Sponzoring().Sum(m=>m.Hodnota) ;
+                        var val= s.Osoba.Sponzoring().Sum(m=>m.Hodnota) ;
                         return HlidacStatu.Util.RenderData.OrderValueFormat(val);
                     }
                 },
    });
 
 
-    foreach (var p in showList)
+    foreach (var osoba in showList)
     {
-
-        poslanciTable.AddRow(p);
+        Osoba.Statistics.RegistrSmluv? stat = await osoba.StatistikaRegistrSmluvAsync();
+        poslanciTable.AddRow((osoba, stat));
     }
 }
 

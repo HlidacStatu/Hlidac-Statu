@@ -22,7 +22,7 @@ public static class OsobaExtension2
                      || osoba.StatusOsoby() == Osoba.StatusOsobyEnum.VazbyNaPolitiky
                      || osoba.IsSponzor()
                      || await osoba.MaVztahySeStatemAsync()
-                     || osoba.StatistikaRegistrSmluv().SmlouvyStat_SoukromeFirmySummary()
+                     || (await osoba.StatistikaRegistrSmluvAsync()).SmlouvyStat_SoukromeFirmySummary()
                          .Summary().PocetSmluv > 0;
 
         if (showIt)

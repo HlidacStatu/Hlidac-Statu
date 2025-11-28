@@ -7,7 +7,6 @@
 @using HlidacStatu.Lib.Analytics
 @using HlidacStatu.XLib.Render
 @using HlidacStatu.Repositories
-@using HlidacStatu.Lib.Web.UI
 
 @{
     Layout = "_ReportLayout";
@@ -20,97 +19,105 @@
     switch (obdobiLower)
     {
         case "mezirocne":
-            data = HlidacStatu.Repositories.Analysis.AnalysisCalculation.NarustySmluvTop100_AbsolutPrice_MaxInYear.Get(Model.obor);
+            data = await HlidacStatu.Repositories.Analysis.AnalysisCalculation.GetNarustySmluvTop100_AbsolutPrice_MaxInYearAsync(Model.obor);
             break;
         case "vlada2018":
-            data = HlidacStatu.Repositories.Analysis.AnalysisCalculation.NarustySmluvTop100_AbsolutPrice_Vlada2018.Get(Model.obor);
+            data = await HlidacStatu.Repositories.Analysis.AnalysisCalculation.GetNarustySmluvTop100_AbsolutPrice_Vlada2018Async(Model.obor);
             obdobi = "za vlády A.Babiše";
             break;
         case "vlada2022":
-            data = HlidacStatu.Repositories.Analysis.AnalysisCalculation.NarustySmluvTop100_AbsolutPrice_Vlada2022.Get(Model.obor);
+            data = await HlidacStatu.Repositories.Analysis.AnalysisCalculation.GetNarustySmluvTop100_AbsolutPrice_Vlada2022Async(Model.obor);
             obdobi = "za vlády P.Fialy";
             break;
         case "2020_24":
             obdobi = "od roku 2020";
-            data = HlidacStatu.Repositories.Analysis.AnalysisCalculation.NarustySmluvTop100_AbsolutPrice_2020_24.Get(Model.obor);
+            data = await HlidacStatu.Repositories.Analysis.AnalysisCalculation.GetNarustySmluvTop100_AbsolutPrice_2020_24Async(Model.obor);
             break;
         default:
             obdobi = "od nuly do max (od roku 2020)";
-            data = HlidacStatu.Repositories.Analysis.AnalysisCalculation.NarustySmluvOdNulyTop100_AbsolutPrice_2020_24.Get(Model.obor);
+            data = await HlidacStatu.Repositories.Analysis.AnalysisCalculation.GetNarustySmluvOdNulyTop100_AbsolutPrice_2020_24Async(Model.obor);
             break;
     }
-
-
-
-    ReportDataSource<CalculatedChangeBetweenYears<string>> tbl = new(
-        new ReportDataSource<CalculatedChangeBetweenYears<string>>.Column[]
-    {
-        new() { Name="Firma",
-            HtmlRender = (s) => {
-                Firma f = Firmy.Get(s.data);
-                return string.Format($"<a href='/subjekt/{f.ICO}'>{f.Jmeno?.ShortenMe(30)}</a>");
-            },
-            OrderValueRender = (s) => {
-                Firma f = Firmy.Get(s.data);
-                return string.Format($"{f.Jmeno}");
-            }
-        },
-        new() {
-            Name ="Období",
-            HtmlRender = (s) => {
-                if (string.IsNullOrEmpty(obdobi))
+    
+    ReportDataSource<(CalculatedChangeBetweenYears<string> CalculatedChangeBetweenYears, Firma Firma, StatisticsSubjectPerYear<Smlouva.Statistics.Data>? Stat)> tbl = new(
+        new ReportDataSource<(CalculatedChangeBetweenYears<string> CalculatedChangeBetweenYears, Firma Firma, StatisticsSubjectPerYear<Smlouva.Statistics.Data>? Stat)>.Column[]
+        {
+            new()
+            {
+                Name = "Firma",
+                HtmlRender = (s) =>
                 {
-                    return $"{s.firstYear}-{s.lastYear}";
+                    return string.Format($"<a href='/subjekt/{s.Firma.ICO}'>{s.Firma.Jmeno?.ShortenMe(30)}</a>");
+                },
+                OrderValueRender = (s) =>
+                {
+                    return string.Format($"{s.Firma.Jmeno}");
                 }
-                else return obdobi ;
             },
-            OrderValueRender = (s) => {
-                return "";
-            }
-        },
-        new() {
-            Name ="Nárůst objemu kontraktů v Kč oproti předchozímu období",
-            HtmlRender = (s) => {
-                return HlidacStatu.Util.RenderData.NicePrice( s.change.ValueChange, html:true,shortFormat:true);
-            },
-            OrderValueRender = (s) => {
-                return HlidacStatu.Util.RenderData.OrderValueFormat(s.change.ValueChange);;
-            },
-            CssClass="number"
-        },
-        new() {
-            Name ="",
-            HtmlRender = (s) => {
-                string res = "";
-                Firma f = Firmy.Get(s.data);
-                if (f.Valid)
+            new()
+            {
+                Name = "Období",
+                HtmlRender = (s) =>
                 {
-                    var stat = f.StatistikaRegistruSmluv();
-                    var chartData = new Series[]
+                    if (string.IsNullOrEmpty(obdobi))
                     {
-                        new()
+                        return $"{s.CalculatedChangeBetweenYears.firstYear}-{s.CalculatedChangeBetweenYears.lastYear}";
+                    }
+                    else return obdobi;
+                },
+                OrderValueRender = (s) => { return ""; }
+            },
+            new()
+            {
+                Name = "Nárůst objemu kontraktů v Kč oproti předchozímu období",
+                HtmlRender = (s) => { return HlidacStatu.Util.RenderData.NicePrice(s.CalculatedChangeBetweenYears.change.ValueChange, html: true, shortFormat: true); },
+                OrderValueRender = (s) =>
+                {
+                    return HlidacStatu.Util.RenderData.OrderValueFormat(s.CalculatedChangeBetweenYears.change.ValueChange);
+                    ;
+                },
+                CssClass = "number"
+            },
+            new()
+            {
+                Name = "",
+                HtmlRender = (s) =>
+                {
+                    string res = "";
+                    if (s.Firma.Valid)
+                    {
+                        var chartData = new Series[]
                         {
-                        Name = "objem smluv",
-                        Type = Series.SeriesType.column,
-                        Data = stat
-                            .Where(x => x.Year > 0)
-                            .OrderBy(x => x.Year)
-                            .Select(x => new SeriesData(x.Year, x.Value.CelkovaHodnotaSmluv)).ToArray(),
-                        SeriesTooltip = new SeriesTooltip()
+                            new()
                             {
-                            ValueSuffix = " Kč"
+                                Name = "objem smluv",
+                                Type = Series.SeriesType.column,
+                                Data = s.Stat?
+                                    .Where(x => x.Year > 0)
+                                    .OrderBy(x => x.Year)
+                                    .Select(x => new SeriesData(x.Year, x.Value.CelkovaHodnotaSmluv)).ToArray(),
+                                SeriesTooltip = new SeriesTooltip()
+                                {
+                                    ValueSuffix = " Kč"
+                                }
                             }
-                        }
-                    };
-                    res = Html.ColumnGraph("", chartData, yTitleLeft: "", yTitleRight: "",height:150, showLegend:false).RenderRawHtml();
-            }
-            return res;
+                        };
+                        res = Html.ColumnGraph("", chartData, yTitleLeft: "", yTitleRight: "", height: 150, showLegend: false).RenderRawHtml();
+                    }
 
+                    return res;
+                }
             }
-        } 
-    });
+        });
 
-    tbl.AddRows(data);
+    foreach (var datum in data)
+    {
+        var firma = Firmy.Get(datum.data);
+        StatisticsSubjectPerYear<Smlouva.Statistics.Data>? firmaStat = null;
+        if(firma.Valid)
+            firmaStat = await firma.StatistikaRegistruSmluvAsync();
+        tbl.AddRow((datum, firma, firmaStat));
+    }
 }
 
 <h2 id="tblHead">
@@ -121,36 +128,47 @@
     }
 </h2>
 
-<p>
+<div>
 
     <div class="btn-group btn-group-sm" role="group">
         <span class="input-group-text">Období</span>
 
-        <a href="@Html.GetRequestPath()?obdobi=&typ=@(Model.typ)&obor=@(Model.obor)" type="button" class="btn btn-hs btn-sm btn-@((obdobiLower == "" || obdobiLower=="odnuly"?"":"outline-"))primary">Nárůsty od nuly</a>
-        <a href="@Html.GetRequestPath()?obdobi=mezirocne&typ=@(Model.typ)&obor=@(Model.obor)" type="button" class="btn btn-hs btn-sm btn-@((obdobiLower=="mezirocne"?"":"outline-"))primary">Top meziroční nárusty</a>
-        <a href="@Html.GetRequestPath()?obdobi=2020-24&typ=@(Model.typ)&obor=@(Model.obor)" type="button" class="btn btn-hs btn-sm btn-@((obdobiLower=="2020-24"?"":"outline-"))primary">Od roku 2020</a>
-        <a href="@Html.GetRequestPath()?obdobi=vlada2022&typ=@(Model.typ)&obor=@(Model.obor)" type="button" class="btn btn-hs btn-sm btn-@((obdobiLower=="vlada2022"?"":"outline-"))primary">Za Fialovy vlády (2022-2025)</a>
-        <a href="@Html.GetRequestPath()?obdobi=vlada2018&typ=@(Model.typ)&obor=@(Model.obor)" type="button" class="btn btn-hs btn-sm btn-@((obdobiLower=="vlada2018"?"":"outline-"))primary">Za Babišovy vlády (2018-2021)</a>
+        <a href="@Html.GetRequestPath()?obdobi=&typ=@(Model.typ)&obor=@(Model.obor)" type="button"
+           class="btn btn-hs btn-sm btn-@((obdobiLower == "" || obdobiLower == "odnuly" ? "" : "outline-"))primary">Nárůsty
+            od nuly</a>
+        <a href="@Html.GetRequestPath()?obdobi=mezirocne&typ=@(Model.typ)&obor=@(Model.obor)" type="button"
+           class="btn btn-hs btn-sm btn-@((obdobiLower == "mezirocne" ? "" : "outline-"))primary">Top meziroční
+            nárusty</a>
+        <a href="@Html.GetRequestPath()?obdobi=2020-24&typ=@(Model.typ)&obor=@(Model.obor)" type="button"
+           class="btn btn-hs btn-sm btn-@((obdobiLower == "2020-24" ? "" : "outline-"))primary">Od roku 2020</a>
+        <a href="@Html.GetRequestPath()?obdobi=vlada2022&typ=@(Model.typ)&obor=@(Model.obor)" type="button"
+           class="btn btn-hs btn-sm btn-@((obdobiLower == "vlada2022" ? "" : "outline-"))primary">Za Fialovy vlády
+            (2022-2025)</a>
+        <a href="@Html.GetRequestPath()?obdobi=vlada2018&typ=@(Model.typ)&obor=@(Model.obor)" type="button"
+           class="btn btn-hs btn-sm btn-@((obdobiLower == "vlada2018" ? "" : "outline-"))primary">Za Babišovy vlády
+            (2018-2021)</a>
     </div>
-</p>
-<p>
+</div>
+<div>
     <form class="row">
         <div class="col-auto">
             <label class="input-group-text">Omezení pro oblast:</label>
         </div>
         <div class="col-auto">
-            <select class="form-select" onchange="window.location.href='@Html.GetRequestPath()?obdobi=@(Model.obdobi)&typ=@(Model.typ)&obor='+encodeURIComponent(this.value)">
+            <select class="form-select"
+                    onchange="window.location.href='@Html.GetRequestPath()?obdobi=@(Model.obdobi)&typ=@(Model.typ)&obor='+encodeURIComponent(this.value)">
                 <option value="" selected=@(Model.obor.HasValue == false)>Všechny oblasti</option>
-                @foreach (var item in Smlouva.SClassification.AllTypes.Where(m => m.IsMainType).OrderBy(o=>o.Fullname))
+                @foreach (var item in Smlouva.SClassification.AllTypes.Where(m => m.IsMainType).OrderBy(o => o.Fullname))
                 {
-                    <option value="@item.Value" selected=@(Model.obor==item.Value )>@(item.Fullname)</option>
+                    <option value="@item.Value" selected=@(Model.obor == item.Value)>@(item.Fullname)</option>
                 }
             </select>
         </div>
     </form>
-</p>
+</div>
 
-<p>Zanalyzovali jsme všechny smlouvy a vztahy dodavatelů a zadavatelů a nalezli jsme tyto neobvyklé nárůsty smluvních vztahů</p>
+<p>Zanalyzovali jsme všechny smlouvy a vztahy dodavatelů a zadavatelů a nalezli jsme tyto neobvyklé nárůsty smluvních
+    vztahů</p>
 <p></p>
 
 

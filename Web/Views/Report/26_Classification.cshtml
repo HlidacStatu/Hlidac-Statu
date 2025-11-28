@@ -43,7 +43,7 @@
                     ValueRender = (s) => {
                             return $"\"{Smlouva.SClassification.Classification.ClassifTypeName(Convert.ToInt32(s))}\"";
                     },
-                    HtmlRender = (s) =>
+                    HtmlRender =(s) =>
                     {
                         var obl = Smlouva.SClassification.Classification.ToClassifType(Convert.ToInt32(s));
                         if (obl.HasValue)
@@ -64,7 +64,7 @@
                 },
                 new() { Name="Počet smluv z této oblasti",
                     CssClass="number",
-                    HtmlRender = (s) => {
+                    HtmlRender =(s) => {
                         return $"{HlidacStatu.Util.RenderData.NiceNumber((long)s, html:true)}";
                     },
                     ValueRender = (s) => { return Convert.ToInt64(s).ToString("F0"); },
@@ -72,7 +72,7 @@
                 },
                 new() { Name="% ze všech",
                     CssClass="number",
-                    HtmlRender = (s) => {
+                    HtmlRender =(s) => {
                         return ( Convert.ToDouble(s) / StaticData.BasicStatisticData.Get()[0]).ToString("P2");
                     },
                     ValueRender = (s) => { return ( Convert.ToDouble(s) / StaticData.BasicStatisticData.Get()[0]).ToString("F0"); },
@@ -81,7 +81,7 @@
                 new() {
                     Name="Hodnota smluv v Kč z této oblasti",
                     CssClass="number",
-                    HtmlRender = (s) => {
+                    HtmlRender =(s) => {
                         Tuple<decimal, decimal> v = (Tuple<decimal, decimal>)s;
                         string price = HlidacStatu.Util.RenderData.NicePrice(v.Item1, shortFormat:true);
                         var t =  $"<span alt='{price}' title='{price}'>{HlidacStatu.Util.RenderData.NicePrice(v.Item1, html:false, shortFormat:false)}";
@@ -97,7 +97,7 @@
                 new() {
                     Name="% ze všech",
                     CssClass="number",
-                    HtmlRender = (s) => {
+                    HtmlRender =(s) => {
                     return ( Convert.ToDouble(s) / StaticData.BasicStatisticData.Get()[2]).ToString("P2");
                     },
                     OrderValueRender = (s) => {
@@ -106,7 +106,7 @@
                 new() {
                     Name="% utajených cen",
                     CssClass="number",
-                    HtmlRender = (s) => {
+                    HtmlRender =(s) => {
                         return Convert.ToDecimal(s).ToString("P2");
                     },
                     ValueRender = (s) => { return Convert.ToDecimal(s).ToString("F2", HlidacStatu.Util.Consts.enCulture);},

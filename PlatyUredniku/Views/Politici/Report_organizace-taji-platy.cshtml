@@ -72,7 +72,7 @@
     new ReportDataSource<KeyValuePair<string, PpPrijem[]>>.Column()
     {
         Name = "Organizace",
-        HtmlRender = (m) =>
+        HtmlRender =(m) =>
         {
             return $"<a href='/organizace/{m.Key}'>{Firmy.GetJmeno(m.Key)}</a>";
         },
@@ -84,7 +84,7 @@
     new ReportDataSource<KeyValuePair<string, PpPrijem[]>>.Column()
     {
         Name = "Neposkytl plat pro tyto politiky",
-        HtmlRender = (m) =>
+        HtmlRender =(m) =>
         {
             return "<ol>" + string.Join("", m.Value
         .Select(n => n.Nameid)

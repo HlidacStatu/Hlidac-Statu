@@ -37,12 +37,13 @@ Query ="\"účtenkovka\" AND ico:00006947", UrlTemplate = "/HledatSmlouvy?Q={0}"
 {
     private async Task QueryStatistics(TemplatedQuery item)
     {
-        <div class="bs-callout @(item.Data.Summary().PocetSmluv==0 ? "success" : "danger"))">
+        var statistics = await item.CachedStatisticsAsync();
+        <div class="bs-callout @(statistics.Summary().PocetSmluv==0 ? "success" : "danger"))">
             <h4>
                 <a href="@item.Url()">@Html.Raw(item.Text)</a>
             </h4>
             <p>
-                @if (item.Data.Summary().PocetSmluv == 0)
+                @if (statistics.Summary().PocetSmluv == 0)
                 {
                     <strong>
                         Zatím žádné smlouvy
@@ -51,9 +52,9 @@ Query ="\"účtenkovka\" AND ico:00006947", UrlTemplate = "/HledatSmlouvy?Q={0}"
                 }
                 else
                 {
-                    for (int y = item.Data.FirstYear(); y <= item.Data.LastYear(); y++)
+                    for (int y = statistics.FirstYear(); y <= statistics.LastYear(); y++)
                     {
-                        var iy = item.Data[y];
+                        var iy = statistics[y];
                         if (iy.PocetSmluv > 0)
                         {
                             <div>

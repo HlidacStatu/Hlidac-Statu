@@ -20,7 +20,7 @@
 {
     var numPercent = "0";
     var sumPercent = "0";
-    var stat = Firmy.Get(uradSVazbami.Ico).StatistikaRegistruSmluv();
+    var stat = await Firmy.Get(uradSVazbami.Ico).StatistikaRegistruSmluvAsync();
     if (stat.Summary().PocetSmluv > 0)
     {
         numPercent = ((double)uradSVazbami.Pocet / (double)stat.Summary().PocetSmluv).ToString("P2");

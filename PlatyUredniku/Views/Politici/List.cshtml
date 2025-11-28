@@ -86,7 +86,7 @@
         new ReportDataSource<KeyValuePair<string, PpPrijem[]>>.Column()
         {
             Name = "Politik",
-            HtmlRender = (m) =>
+            HtmlRender =(m) =>
             {
                 return $"<a href='/politici/politik/{m.Key}'>{OsobyRolesCache.Get(m.Key).FullName}</a>";
             },
@@ -98,7 +98,7 @@
         new ReportDataSource<KeyValuePair<string, PpPrijem[]>>.Column()
         {
             Name = "Strana",
-            HtmlRender = (m) =>
+            HtmlRender =(m) =>
             {
                 return OsobyRolesCache.Get(m.Key).Strana;
             },
@@ -110,13 +110,13 @@
         new ReportDataSource<KeyValuePair<string, PpPrijem[]>>.Column()
         {
             Name = "Politické role",
-            HtmlRender = (m) => OsobyRolesCache.Get(m.Key).Role,
+            HtmlRender =(m) => OsobyRolesCache.Get(m.Key).Role,
             OrderValueRender = (m) => OsobyRolesCache.Get(m.Key).Role,
         },
         new ReportDataSource<KeyValuePair<string, PpPrijem[]>>.Column()
         {
             Name = CelkovyRocniPrijemTagHelper.Content,
-            HtmlRender = (m) =>
+            HtmlRender =(m) =>
             {
                 if (m.Value.All(m=>m.Status == 0))
                 {
@@ -137,7 +137,7 @@
         new ReportDataSource<KeyValuePair<string, PpPrijem[]>>.Column()
         {
             Name = "Působí v organizacích (řazeno podle počtu)",
-            HtmlRender = (m) =>
+            HtmlRender =(m) =>
             {
                 return "<ol>" + string.Join("", m.Value
                                             .DistinctBy(d=>d.IdOrganizace)

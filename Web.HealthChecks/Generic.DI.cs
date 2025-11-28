@@ -89,7 +89,7 @@ namespace Microsoft.Extensions.DependencyInjection
             name = name ?? instance.GetType().Name;
             return builder.Add(new HealthCheckRegistration(
                 name,
-                new HlidacStatu.Web.HealthChecks.CachedResult(instance, cacheTime),
+                new HlidacStatu.Web.HealthChecks.CachedResult(instance, cacheTime, name),
                 failureStatus,
                 tags,
                 timeout));
@@ -104,7 +104,7 @@ namespace Microsoft.Extensions.DependencyInjection
             if (instance == null)
                 throw new ArgumentNullException("instance");
 
-            var cachedInstance = new HlidacStatu.Web.HealthChecks.CachedResult(instance, cacheTime);
+            var cachedInstance = new HlidacStatu.Web.HealthChecks.CachedResult(instance, cacheTime, name);
 
             return builder.Add(new HealthCheckRegistration(
                 name,

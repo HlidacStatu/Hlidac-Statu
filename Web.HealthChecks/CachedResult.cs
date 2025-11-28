@@ -3,51 +3,59 @@ using Serilog;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
+using Hlidacstatu.Caching;
+using ZiggyCreatures.Caching.Fusion;
 
 namespace HlidacStatu.Web.HealthChecks
 {
     public class CachedResult : IHealthCheck
     {
+        private readonly IFusionCache _cache =
+            Hlidacstatu.Caching.CacheFactory.CreateNew(CacheFactory.CacheType.L1Default, "HealthChecksCachedResult");
+        
+        private ValueTask<HealthCheckResult> GetPoskytovateleCacheAsync(HealthCheckContext context, CancellationToken cancellationToken) => _cache.GetOrSetAsync(
+            $"_HealthChecksCachedResult:{_healthCheckName}", async ct =>
+            {
+                var ret = await origHC.CheckHealthAsync(context, ct);
+                
+                return ret;
+                
+            }, options =>
+            {
+                options.Duration = TimeSpan.FromHours(4);
+                options.FailSafeMaxDuration = TimeSpan.FromHours(6);
+            },
+            token: cancellationToken
+        );
+        
         IHealthCheck origHC = null;
         private readonly TimeSpan cacheTime;
-        Devmasters.Cache.LocalMemory.Cache<Tuple<HealthCheckResult>> cache = null;
+        private readonly string _healthCheckName;
 
-        public CachedResult(IHealthCheck originalHC, TimeSpan cacheTime)
+        public CachedResult(IHealthCheck originalHC, TimeSpan cacheTime, string healthCheckName)
         {
+            if(string.IsNullOrWhiteSpace(healthCheckName))
+                throw new ArgumentNullException(nameof(healthCheckName));
             if (originalHC == null)
-                throw new ArgumentNullException("originalHC");
+                throw new ArgumentNullException(nameof(originalHC));
             this.origHC = originalHC;
             this.cacheTime = cacheTime;
-            
+            _healthCheckName = healthCheckName;
         }
+
         ILogger logger = Log.ForContext<CachedResult>();
-
-        object lockObj = new object();
-        public async Task<HealthCheckResult> CheckHealthAsync(HealthCheckContext context, CancellationToken cancellationToken = default)
+        
+        public async Task<HealthCheckResult> CheckHealthAsync(HealthCheckContext context,
+            CancellationToken cancellationToken = default)
         {
-            lock (lockObj)
-            {
-                if (this.cache == null)
-                {
-                  this.cache =new Devmasters.Cache.LocalMemory.Cache<Tuple<HealthCheckResult>>(this.cacheTime,
-                                    (_) =>
-                                    {
-                                        Tuple<HealthCheckResult> ret = new Tuple<HealthCheckResult>(
-                                            origHC.CheckHealthAsync(context, cancellationToken).ConfigureAwait(false).GetAwaiter().GetResult()
-                                            );
-                                        return ret;
-                                    }
-                                    );
-                }
-            }
-
+            
             logger.Debug("Starting {healthcheck}", origHC.GetType().FullName);
-            var cacheRes = this.cache.Get();
-            HealthCheckResult hcRes = cacheRes.Item1;
+            var cacheRes = await GetPoskytovateleCacheAsync(context, cancellationToken);
+            HealthCheckResult hcRes = cacheRes;
             var description = hcRes.Description;
             HealthCheckResult newHCres = new HealthCheckResult(
                 hcRes.Status, description, hcRes.Exception, hcRes.Data
-                );
+            );
 
             logger.Debug("Ending {healthcheck} with {@HcStatus}", origHC.GetType().FullName, newHCres);
             return newHCres;

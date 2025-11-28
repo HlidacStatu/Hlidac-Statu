@@ -47,7 +47,7 @@ namespace HlidacStatu.Repositories
                             if (item.ItemType == RecalculateItem.ItemTypeEnum.Subjekt)
                                 await RecalculateItemRepo.RecalculateFirmaAsync(item, false, invalidateOnly);
                             else if (item.ItemType == RecalculateItem.ItemTypeEnum.Person)
-                                RecalculateItemRepo.RecalculateOsoba(item, false, invalidateOnly);
+                                await RecalculateItemRepo.RecalculateOsobaAsync(item, false, invalidateOnly);
                             if (debug)
                                 _logger.Debug($"end statistics {item.ItemType.ToString()} {item.Id}");
 
@@ -67,7 +67,7 @@ namespace HlidacStatu.Repositories
             _logger.Information("Ends RecalculateTasks with {numOfThreads} threads", threads.Value);
         }
 
-        public static void RecalculateOsoba(RecalculateItem item, bool noRebuild, bool invalidateOnly)
+        public static async Task RecalculateOsobaAsync(RecalculateItem item, bool noRebuild, bool invalidateOnly)
         {
             var o = Osoby.GetByNameId.Get(item.Id);
             if (o != null)
@@ -77,13 +77,13 @@ namespace HlidacStatu.Repositories
                     case RecalculateItem.StatisticsTypeEnum.Smlouva:
                         if (invalidateOnly)
                         {
-                            OsobaStatistics.RemoveCachedStatistics_Smlouvy(o, null);
-                            o.InfoFactsCacheInvalidate();
+                            await StatisticsCache.InvalidateOsobaSmlouvyStatisticsAsync(o, null);
+                            await OsobaCache.InvalidateInfoFactsAsync(o);
                         }
                         else
                         {
-                            _ = o.StatistikaRegistrSmluv(forceUpdateCache: noRebuild ? false : true);
-                            _ = o.InfoFactsCached(forceUpdateCache: noRebuild ? false : true);
+                            _ = o.StatistikaRegistrSmluvAsync(forceUpdateCache: noRebuild ? false : true);
+                            _ = await o.InfoFactsCachedAsync(forceUpdateCache: noRebuild ? false : true);
                         }
 
                         RecalculateItemRepo.Finish(item);
@@ -92,12 +92,12 @@ namespace HlidacStatu.Repositories
                         if (invalidateOnly)
                         {
                             OsobaStatistics.RemoveCachedStatistics_Dotace(o);
-                            o.InfoFactsCacheInvalidate();
+                            await OsobaCache.InvalidateInfoFactsAsync(o);
                         }
                         else
                         {
                             _ = o.StatistikaDotace(forceUpdateCache: noRebuild ? false : true);
-                            _ = o.InfoFactsCached(forceUpdateCache: noRebuild ? false : true);
+                            _ = await o.InfoFactsCachedAsync(forceUpdateCache: noRebuild ? false : true);
                         }
 
                         RecalculateItemRepo.Finish(item);
@@ -119,14 +119,14 @@ namespace HlidacStatu.Repositories
                     case RecalculateItem.StatisticsTypeEnum.Smlouva:
                         if (invalidateOnly)
                         {
-                            Statistics.FirmaStatistics.RemoveStatistics(f, null);
+                            await Statistics.FirmaStatistics.RemoveStatisticsAsync(f, null);
                         }
                         else
                         {
                             if (!holdingOnly || firmaOnly)
-                                _ = f.StatistikaRegistruSmluv(forceUpdateCache: true);
+                                _ = f.StatistikaRegistruSmluvAsync(forceUpdateCache: true);
                             if (holdingOnly || !firmaOnly)
-                                _ = f.HoldingStatisticsRegistrSmluv(forceUpdateCache: noRebuild ? false : true);
+                                _ = f.HoldingStatisticsRegistrSmluvAsync(forceUpdateCache: noRebuild ? false : true);
                         }
 
                         break;

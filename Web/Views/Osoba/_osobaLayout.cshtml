@@ -12,7 +12,7 @@
     if (Model.viewName != "NoInfo")
     {
         ViewBag.SocialShareTitle = $"{Model.osoba.FullNameWithYear()}";
-        ViewBag.SocialShareText = Model.osoba.InfoFactsCached().RenderFacts( 4, true, true, ", ");
+        ViewBag.SocialShareText = (await Model.osoba.InfoFactsCachedAsync()).RenderFacts( 4, true, true, ", ");
         ViewBag.SocialShareType = "article";
         ViewBag.SocialImage = $"https://www.hlidacstatu.cz/socialbanner/osoba?d={DateTime.Now.ToString("yyMMdd")}&v=" + Model.osoba.NameId;
         ViewBag.OpenGraphMore = "<meta property=\"og:image:width\" content=\"1920\" />\n"
@@ -62,7 +62,7 @@
                 Item = new Schema.NET.Person()
                 {
                     Name = (Model.viewName != "NoInfo") ? Model.osoba.FullNameWithYear() : Model.osoba.NameId,
-                    Description = Model.osoba.InfoFactsCached().RenderFacts( 4, true, true, ", "),
+                    Description = (await Model.osoba.InfoFactsCachedAsync()).RenderFacts( 4, true, true, ", "),
                     FamilyName = Model.osoba.Prijmeni,
                     GivenName = Model.osoba.Jmeno,
                     Image = Model.osoba.HasPhoto() ? new Uri(Model.osoba.GetPhotoUrl(false, HlidacStatu.Entities.Osoba.PhotoTypes.NoBackground)) : null,

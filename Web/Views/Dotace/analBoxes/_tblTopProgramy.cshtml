@@ -19,21 +19,21 @@
             {
                 Name = "Poskytovatel",
                 CssClass = "text",
-                HtmlRender = (x) => $"<a href=/subjekt/{x.SubsidyProviderIco}>{FirmaRepo.NameFromIco(x.SubsidyProviderIco)}</a>",
+                HtmlRender =(x) => $"<a href=/subjekt/{x.SubsidyProviderIco}>{FirmaRepo.NameFromIco(x.SubsidyProviderIco)}</a>",
                 TextRender = (x) => FirmaRepo.NameFromIco(x.SubsidyProviderIco)
             },
             new ReportDataSource<(string ProgramName, string ProgramCode, string SubsidyProviderIco, long Count, decimal AssumedAmountSummed)>.Column()
             {
                 Name = "Programu (kód)",
                 TextRender = (x) => x.ProgramName+((!string.IsNullOrEmpty(x.ProgramCode)? $" ({x.ProgramCode})" : "")),
-                HtmlRender = (x) => $"<a href='/dotace/program?programName={System.Net.WebUtility.UrlEncode(x.ProgramName)}&programCode={System.Net.WebUtility.UrlEncode(x.ProgramCode)}'>{x.ProgramName+((!string.IsNullOrEmpty(x.ProgramCode) ? $" ({x.ProgramCode})" : ""))}</a>",
+                HtmlRender =(x) => $"<a href='/dotace/program?programName={System.Net.WebUtility.UrlEncode(x.ProgramName)}&programCode={System.Net.WebUtility.UrlEncode(x.ProgramCode)}'>{x.ProgramName+((!string.IsNullOrEmpty(x.ProgramCode) ? $" ({x.ProgramCode})" : ""))}</a>",
                 CssClass = "text"
             },  
             new ReportDataSource<(string ProgramName, string ProgramCode, string SubsidyProviderIco, long Count,decimal AssumedAmountSummed)>.Column()
             {
                 Name = "Počet dotací",
                 TextRender = (x) => HlidacStatu.Util.RenderData.NiceNumber(x.Count),
-                HtmlRender = (x) => "<a href='/dotace/hledat?q=" 
+                HtmlRender =(x) => "<a href='/dotace/hledat?q=" 
                     + System.Net.WebUtility.UrlEncode(
                         HlidacStatu.Searching.Query.ModifyQueryAND(
                             Model.Query,
@@ -51,7 +51,7 @@
             {
                 Name = "Celková částka",
                 TextRender = (x) => HlidacStatu.Util.RenderData.NicePrice(x.AssumedAmountSummed, shortFormat:true),
-                HtmlRender = (x) => HlidacStatu.Util.RenderData.NicePrice(x.AssumedAmountSummed,html:true),
+                HtmlRender =(x) => HlidacStatu.Util.RenderData.NicePrice(x.AssumedAmountSummed,html:true),
                 OrderValueRender = (x) => HlidacStatu.Util.RenderData.OrderValueFormat(x.AssumedAmountSummed),
                 CssClass = "number"
             }

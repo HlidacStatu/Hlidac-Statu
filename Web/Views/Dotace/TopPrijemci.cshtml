@@ -69,14 +69,14 @@
             {
                 Name = "Příjemce",
                 CssClass = "text",
-                HtmlRender = (x) => $"<a href=/subjekt/{x.Ico}>{FirmaRepo.NameFromIco(x.Ico)}</a>",
+                HtmlRender =(x) => $"<a href=/subjekt/{x.Ico}>{FirmaRepo.NameFromIco(x.Ico)}</a>",
                 TextRender = (x) => FirmaRepo.NameFromIco(x.Ico)
             },
             new ReportDataSource<(string Ico, long Pocet, decimal Castka)>.Column()
             {
                 Name = "Počet dotací" + (rok.HasValue ? $" za {rok}" : ""),
                 TextRender = (x) => HlidacStatu.Util.RenderData.NiceNumber(x.Pocet),
-                HtmlRender = (x) => $"<a title='Najit dotace subjektu' href='/dotace/hledat?Q=ico:{x.Ico}{searchQuery}'>{HlidacStatu.Util.RenderData.NiceNumber(x.Pocet)}</a>",
+                HtmlRender =(x) => $"<a title='Najit dotace subjektu' href='/dotace/hledat?Q=ico:{x.Ico}{searchQuery}'>{HlidacStatu.Util.RenderData.NiceNumber(x.Pocet)}</a>",
         OrderValueRender = (x) => HlidacStatu.Util.RenderData.OrderValueFormat(x.Pocet),
                 CssClass = "number"
             },
@@ -84,7 +84,7 @@
             {
                 Name = "Celková částka",
                 TextRender = (x) => HlidacStatu.Util.RenderData.NicePrice(x.Castka, shortFormat:true),
-                HtmlRender = (x) => HlidacStatu.Util.RenderData.NicePrice(x.Castka,html:true),
+                HtmlRender =(x) => HlidacStatu.Util.RenderData.NicePrice(x.Castka,html:true),
                 OrderValueRender = (x) => HlidacStatu.Util.RenderData.OrderValueFormat(x.Castka),
                 CssClass = "number"
             }

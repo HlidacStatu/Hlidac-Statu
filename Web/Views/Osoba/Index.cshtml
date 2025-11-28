@@ -1,7 +1,6 @@
 ﻿@model HlidacStatu.Entities.Osoba
 
 @using HlidacStatu.XLib.Render
-@using Nest;
 @using System.Linq;
 @using Devmasters.Enums;
 @using HlidacStatu.Datasets
@@ -11,7 +10,6 @@
 @using HlidacStatu.Repositories
 @using HlidacStatu.Repositories.Statistics
 @using HlidacStatu.XLib
-@using HlidacStatu.Lib.Analytics
 
 @{
     Layout = null;
@@ -21,13 +19,8 @@
     var aktualnost = Relation.AktualnostType.Nedavny;
 
     var intv = laps.StopPreviousAndStartNextLap("StatistikaRegistruSmluv");
-    var statistics = Model.StatistikaRegistrSmluv();
+    var statistics = await Model.StatistikaRegistrSmluvAsync();
 
-    //unused stuff
-    //var seasonStat = statistics.SoukromeFirmySummary().CurrentSeasonStatistics();
-    //var currentSeasonYear = statistics.SoukromeFirmySummary().CurrentSeasonYear();
-    //var zmenaObjemuSmluv = statistics.SoukromeFirmySummary().ChangeBetweenYears(currentSeasonYear - 1, currentSeasonYear, s => s.CelkovaHodnotaSmluv);
-    //var pocetSoukrFiremVztah = statistics.SoukromeFirmy.Count + statistics.StatniFirmy.Count;
 
     intv.Stop();
 }
@@ -227,7 +220,10 @@
                 angažoval @Model.FullName().
             </p>
             <p>
-                @Html.Raw((Model.InfoFactsCached()).Where(m => m.Level == HlidacStatu.Entities.Facts.InfoFact.ImportanceLevel.Stat).FirstOrDefault()?.Render(true) ?? (Model.InfoFactsCached()).First().Render(true))
+                @{
+                    var infoFacts = await Model.InfoFactsCachedAsync(); 
+                }
+                @Html.Raw(infoFacts.Where(m => m.Level == HlidacStatu.Entities.Facts.InfoFact.ImportanceLevel.Stat).FirstOrDefault()?.Render(true) ?? infoFacts.First().Render(true))
             </p>
             <p class="text-center">
                 <a href="/osoba/registrsmluv/@Model.NameId" class="btn btn-hs btn-primary btn-sm my-3 position-relative">
