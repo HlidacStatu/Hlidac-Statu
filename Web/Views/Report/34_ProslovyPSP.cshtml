@@ -36,11 +36,6 @@
         obdobi = obdobiOdDo.Last().Key;
     }
 
-
-
-    int? minuleObdobi = _context.Proslovy.Where(x => x.obdobi != aktualniObdobi).Max(x => x.obdobi);
-    //int? aktualniRok = _context.Proslovy.Max(x => x.datum.HasValue ? x.datum.Value.Year : 0);
-
     var db = new Devmasters.DirectSql(cnn);
 
     //srovnani obdobi
@@ -62,40 +57,7 @@
         .Take(10)
         .ToList();
 
-    // Nejméně hovořící poslanci v tomto období (kteří mají aspoň 1 záznam)
-    var minHovorici = _context.Proslovy
-        .Where(s => s.obdobi == obdobi)
-        .Where(s => !string.IsNullOrEmpty(s.OsobaId))
-        .GroupBy(s => new { s.OsobaId, s.celeJmeno, s.politickaStrana })
-        .Select(g => new MinHovoriciDto { OsobaId = g.Key.OsobaId, Jmeno = g.Key.celeJmeno, Strana = g.Key.politickaStrana, DobaCelkem = g.Sum(x => x.dobaProslovuSec) ?? 0 })
-        .OrderBy(x => x.DobaCelkem)
-        .ToList();
-    if (obdobi == aktualniObdobi)
-    {
-        // Pro @(obdobiOdDo[obdobi]) bereme jen poslance, kteří mají aspoň 1 záznam
-        var vsichni_poslanci = HlidacStatu.Repositories.StaticData.Poslanci2021VsichniOsoby
-            .Where(m => minHovorici.Any(mh => mh.OsobaId == m.NameId) == false)
-            .Select(m => new MinHovoriciDto { OsobaId = m.NameId, Jmeno = m.FullName(), Strana = m.CurrentPoliticalParty(), DobaCelkem = 0 })
-            .ToList();
-        minHovorici = minHovorici
-            .Concat(vsichni_poslanci)
-            .OrderBy(x => x.DobaCelkem)
-            .ToList();
-    }
-    minHovorici = minHovorici.Take(10).ToList();
-
-    // Politici nejčastěji zmínění v projevech ostatních
-
-    // var zminky = _context.Proslovy
-    //     .Where(s => s.obdobi == obdobi)
-    //     .Where(s => !string.IsNullOrEmpty(s.politiciZminky) && !string.IsNullOrEmpty(s.OsobaId))
-    //     .ToArray()
-    //     .SelectMany(s => s.politiciZminky.Split(',', StringSplitOptions.RemoveEmptyEntries))
-    //     .GroupBy(jmeno => jmeno.Trim())
-    //     .Select(g => new { Jmeno = g.Key, PocetZminek = g.Count() })
-    //     .OrderByDescending(x => x.PocetZminek).Take(5).ToList();
-
-
+    
     // Schůze, na kterých se nejdéle v součtu řečnilo
     var schuzeNejdelsi = _context.Proslovy
         .Where(s => s.obdobi == obdobi)
@@ -130,23 +92,12 @@
 
 }
 
-@functions {
-    public class MinHovoriciDto
-    {
-        public string? OsobaId { get; set; }
-        public string? Jmeno { get; set; }
-        public string? Strana { get; set; }
-        public double DobaCelkem { get; set; }
-    }
-}
-
 <h2 id="tblHead">
     Jednání a proslovy poslanců v Poslanecké sněmovně Parlamentu ČR
 </h2>
 <p class="lead">
     Zanalyzovali jsme všechny projevy poslanců a poslankyň od roku 1998
 </p>
-
 
 
 <h2>Výřečnost jednotlivých Sněmoven</h2>
@@ -228,27 +179,6 @@
                         }
         </tbody>
     </table>
-
-
-
-    @* <h2 class="mt-5">Politici nejčastěji zmínění v projevech ostatních</h2> *@
-    @* <table class="table table-striped"> *@
-    @*     <thead> *@
-    @*         <tr> *@
-    @*             <th>Jméno</th> *@
-    @*             <th>Počet zmínek</th> *@
-    @*         </tr> *@
-    @*     </thead> *@
-    @*     <tbody> *@
-    @*     @foreach (var z in zminky) *@
-    @*     { *@
-    @*         <tr> *@
-    @*             <td>@z.Jmeno</td> *@
-    @*             <td>@z.PocetZminek</td> *@
-    @*         </tr> *@
-    @*     } *@
-    @*     </tbody> *@
-    @* </table>  *@
 
     <h2 class="mt-5">Schůze s nejdelší řečnickou dobou (@(obdobiOdDo[obdobi]))</h2>
     <table class="table table-striped">
