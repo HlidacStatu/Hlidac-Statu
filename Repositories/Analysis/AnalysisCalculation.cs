@@ -643,52 +643,52 @@ namespace HlidacStatu.Repositories.Analysis
 
         public static ValueTask<CalculatedChangeBetweenYears<string>[]>
             GetNarustySmluvOdNulyTop100_AbsolutPrice_2020_24Async(int? obor) =>
-            PermanentCache.GetOrSetAsync($"_NarustySmluvOdNulyTop100_AbsolutPrice_2020_24_",
+            PermanentCache.GetOrSetAsync($"_NarustySmluvOdNulyTop100_AbsolutPrice_2020_24_{obor}",
                 async _ => BetweenYearsCalculatedChanges(await GetAllStatisticsDataAsync(), obor, 2018, 2021));
 
         public static ValueTask<CalculatedChangeBetweenYears<string>[]>
             GetNarustySmluvOdNulyTop100_Percent_2020_24Async(int? obor) =>
-            PermanentCache.GetOrSetAsync($"_NarustySmluvOdNulyTop100_Percent_2020_24_",
+            PermanentCache.GetOrSetAsync($"_NarustySmluvOdNulyTop100_Percent_2020_24_{obor}",
                 async _ => BetweenYearsCalculatedChanges_Percent(await GetAllStatisticsDataAsync(), obor, 2018, 2021));
 
         public static ValueTask<CalculatedChangeBetweenYears<string>[]>
             GetNarustySmluvTop100_AbsolutPrice_Vlada2018Async(int? obor) =>
-            PermanentCache.GetOrSetAsync($"_NarustySmluvTop100_AbsolutPrice_Vlada2018_",
+            PermanentCache.GetOrSetAsync($"_NarustySmluvTop100_AbsolutPrice_Vlada2018_{obor}",
                 async _ => BetweenYearsCalculatedChanges(await GetAllStatisticsDataAsync(), obor, 2018, 2021));
 
         public static ValueTask<CalculatedChangeBetweenYears<string>[]>
             GetNarustySmluvTop100_Percent_Vlada2018Async(int? obor) =>
-            PermanentCache.GetOrSetAsync("_NarustySmluvTop100_Percent_Vlada2018_", async _ =>
+            PermanentCache.GetOrSetAsync($"_NarustySmluvTop100_Percent_Vlada2018_{obor}", async _ =>
                 BetweenYearsCalculatedChanges_Percent(await GetAllStatisticsDataAsync(), obor, 2018, 2021)
             );
      
         public static ValueTask<CalculatedChangeBetweenYears<string>[]>
             GetNarustySmluvTop100_AbsolutPrice_Vlada2022Async(int? obor) =>
-            PermanentCache.GetOrSetAsync("_NarustySmluvTop100_AbsolutPrice_Vlada2022_", async _ =>
+            PermanentCache.GetOrSetAsync($"_NarustySmluvTop100_AbsolutPrice_Vlada2022_{obor}", async _ =>
                 BetweenYearsCalculatedChanges(await GetAllStatisticsDataAsync(), obor, 2021, 2025)
             );
 
         public static ValueTask<CalculatedChangeBetweenYears<string>[]>
             GetNarustySmluvTop100_Percent_Vlada2022Async(int? obor) =>
-            PermanentCache.GetOrSetAsync("_NarustySmluvTop100_Percent_Vlada2022_", async _ =>
+            PermanentCache.GetOrSetAsync($"_NarustySmluvTop100_Percent_Vlada2022_{obor}", async _ =>
                 BetweenYearsCalculatedChanges_Percent(await GetAllStatisticsDataAsync(), obor, 2022, 2025)
             );
         
         public static ValueTask<CalculatedChangeBetweenYears<string>[]>
             GetNarustySmluvTop100_AbsolutPrice_2020_24Async(int? obor) =>
-            PermanentCache.GetOrSetAsync("_NarustySmluvTop100_AbsolutPrice_2020_24_", async _ =>
+            PermanentCache.GetOrSetAsync($"_NarustySmluvTop100_AbsolutPrice_2020_24_{obor}", async _ =>
                 BetweenYearsCalculatedChanges(await GetAllStatisticsDataAsync(), obor, 2020, 2024)
             );
 
         public static ValueTask<CalculatedChangeBetweenYears<string>[]>
             GetNarustySmluvTop100_Percent_2020_24Async(int? obor) =>
-            PermanentCache.GetOrSetAsync("_NarustySmluvTop100_Percent_2020_24_", async _ =>
+            PermanentCache.GetOrSetAsync($"_NarustySmluvTop100_Percent_2020_24_{obor}", async _ =>
                 BetweenYearsCalculatedChanges_Percent(await GetAllStatisticsDataAsync(), obor, 2020, 2024)
             );
 
         public static ValueTask<CalculatedChangeBetweenYears<string>[]>
             GetNarustySmluvTop100_AbsolutPrice_MaxInYearAsync(int? obor) =>
-            PermanentCache.GetOrSetAsync("_NarustySmluvTop100_AbsolutPrice_MaxInYear_", async _ =>
+            PermanentCache.GetOrSetAsync($"_NarustySmluvTop100_AbsolutPrice_MaxInYear_{obor}", async _ =>
             {
                 List<CalculatedChangeBetweenYears<string>> data = new();
                 for (int i = 2018; i <= DateTime.Now.Year - 1; i++)
@@ -701,7 +701,7 @@ namespace HlidacStatu.Repositories.Analysis
 
         public static ValueTask<CalculatedChangeBetweenYears<string>[]>
             GetNarustySmluvTop100_Percent_MaxInYearAsync(int? obor) =>
-            PermanentCache.GetOrSetAsync("_NarustySmluvTop100_Percent_MaxInYear_", async _ =>
+            PermanentCache.GetOrSetAsync($"_NarustySmluvTop100_Percent_MaxInYear_{obor}", async _ =>
             {
                 List<CalculatedChangeBetweenYears<string>> data = new();
                 for (int i = 2018; i <= DateTime.Now.Year - 1; i++)
