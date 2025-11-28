@@ -23,5 +23,5 @@ if (-not $version) {
     exit 1
 }
 
-Write-Host "##teamcity[setParameter name='env.WEBGENERATOR_VERSION' value='$version']"
+Write-Host "##teamcity[setParameter name='WEBGENERATOR_VERSION' value='$version']"
 
