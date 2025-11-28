@@ -3,19 +3,20 @@
 @using HlidacStatu.Extensions
 @using HlidacStatu.XLib.Render
 @using HlidacStatu.Repositories
+@using HlidacStatu.Repositories.Cache
 
 @{
     Layout = "_ReportLayout";
 
     int year = Devmasters.ParseText.ToInt(this.Context.Request.Query["rok"].FirstOrDefault(), 0) ?? 0;
 
-    Osoba.Statistics.VerySimple[] showList = HlidacStatu.Repositories.StaticData.TopPoliticiObchodSeStatem.Get()[year];
+    Osoba.Statistics.VerySimple[] showList = (await OsobaCache.GetTopPoliticiObchodujiciSeStatemAsync())[year];
 
 
     ReportDataSource poslanciTable = new(new ReportDataSource.Column[]
     {
         new() { Name="Politik",
-            HtmlRender = (s) => {
+            HtmlRender =(s) => {
                 Osoba.Statistics.VerySimple stat = (Osoba.Statistics.VerySimple)s;
                 Osoba o = Osoby.GetByNameId.Get(stat.OsobaNameId);
                 return string.Format("<a href='{0}'>{1}</a>", o.GetUrl(), o.FullNameWithYear(true))
@@ -30,7 +31,7 @@
         },
         new() {
             Name ="Strana/Hnutí",
-            HtmlRender = (s) => {
+            HtmlRender =(s) => {
                 Osoba.Statistics.VerySimple stat = (Osoba.Statistics.VerySimple)s;
                 Osoba o = Osoby.GetByNameId.Get(stat.OsobaNameId);
                 return o.CurrentPoliticalParty();
@@ -43,7 +44,7 @@
         },
         new() {
             Name ="Objem uzavřených smluv firem, kde se angažuje",
-            HtmlRender = (s) => {
+            HtmlRender =(s) => {
                 Osoba.Statistics.VerySimple stat = (Osoba.Statistics.VerySimple)s;
                 return HlidacStatu.Util.RenderData.NicePrice( stat.CelkovaHodnotaSmluv, html:true,shortFormat:true);
             },
@@ -54,7 +55,7 @@
         },
         new() {
             Name ="Počet smluv uzavřených firmami, kde se angažuje",
-            HtmlRender = (s) => {
+            HtmlRender =(s) => {
                 Osoba.Statistics.VerySimple stat = (Osoba.Statistics.VerySimple)s;
                 return HlidacStatu.Util.RenderData.NiceNumber( stat.PocetSmluv, html:true);
             },

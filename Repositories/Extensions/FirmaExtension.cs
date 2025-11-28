@@ -17,6 +17,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
+using HlidacStatu.Lib.Analytics;
 using HlidacStatu.Repositories.Cache;
 
 namespace HlidacStatu.Extensions
@@ -59,7 +60,7 @@ namespace HlidacStatu.Extensions
         public static async Task<bool> MaVztahySeStatemAsync(this Firma firma)
         {
             return firma.IsSponzor()
-                   || firma.StatistikaRegistruSmluv().Sum(s => s.PocetSmluv) > 0
+                   || (await firma.StatistikaRegistruSmluvAsync()).Sum(s => s.PocetSmluv) > 0
                    || (await VerejnaZakazkaRepo.Searching.SimpleSearchAsync("ico:" + firma.ICO, null, 1, 1, "0")).Total > 0
                    || (await DotaceRepo.Searching.SimpleSearchAsync("ico:" + firma.ICO, 1, 1, "0")).Total > 0;
         }
@@ -171,11 +172,11 @@ namespace HlidacStatu.Extensions
             return _kategorieOVM;
         }
 
-        public static Lib.Analytics.StatisticsSubjectPerYear<Smlouva.Statistics.Data> StatistikaRegistruSmluv(
+        public static async Task<StatisticsSubjectPerYear<Smlouva.Statistics.Data>> StatistikaRegistruSmluvAsync(
             this Firma firma, int? iclassif = null, bool forceUpdateCache = false)
         {
             Lib.Analytics.StatisticsSubjectPerYear<Smlouva.Statistics.Data> ret = null;
-            ret = FirmaStatistics.CachedStatisticsSmlouvy(firma, iclassif, forceUpdateCache);
+            ret = await FirmaStatistics.CachedFirmaStatisticsSmlouvyAsync(firma, iclassif, forceUpdateCache);
             return ret ?? new Lib.Analytics.StatisticsSubjectPerYear<Smlouva.Statistics.Data>();
         }
 
@@ -407,12 +408,12 @@ namespace HlidacStatu.Extensions
         }
 
 
-        public static Lib.Analytics.StatisticsSubjectPerYear<Smlouva.Statistics.Data> HoldingStatisticsRegistrSmluv(
+        public static async Task<StatisticsSubjectPerYear<Smlouva.Statistics.Data>> HoldingStatisticsRegistrSmluvAsync(
             this Firma firma,
             int? obor = null, bool forceUpdateCache = false)
         {
 
-            var ret = FirmaStatistics.CachedHoldingStatisticsSmlouvy(firma, obor, forceUpdateCache) ??
+            var ret = await FirmaStatistics.CachedHoldingStatisticsSmlouvyAsync(firma, obor, forceUpdateCache) ??
                 new Lib.Analytics.StatisticsSubjectPerYear<Smlouva.Statistics.Data>() { ICO = firma.ICO };
 
             return ret;
@@ -639,7 +640,7 @@ namespace HlidacStatu.Extensions
         public static async Task<Riziko[]> GetDirectRizikoAsync(Firma firma, int rok)
         {
             List<Riziko> res = new List<Riziko>();
-            var statistics = firma.StatistikaRegistruSmluv().StatisticsForYear(rok);
+            var statistics = (await firma.StatistikaRegistruSmluvAsync()).StatisticsForYear(rok);
             var kindex = (await firma.KindexAsync())?.ForYear(rok);
 
 
@@ -804,8 +805,8 @@ namespace HlidacStatu.Extensions
 
             List<InfoFact> f = new List<InfoFact>();
             //var stat = new HlidacStatu.Lib.Analysis.SubjectStatistic(this);
-            var stat = firma.StatistikaRegistruSmluv();
-            var statHolding = firma.HoldingStatisticsRegistrSmluv();
+            var stat = await firma.StatistikaRegistruSmluvAsync();
+            var statHolding = await firma.HoldingStatisticsRegistrSmluvAsync();
             int rok = DateTime.Now.Year;
             if (DateTime.Now.Month < 3)
                 rok = rok - 1;

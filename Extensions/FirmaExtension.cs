@@ -82,7 +82,7 @@ public static class FirmaExtensions
         }
 
         //Smlouvy
-        var smlouvyStat = f.StatistikaRegistruSmluv();
+        var smlouvyStat = await f.StatistikaRegistruSmluvAsync();
         if (smlouvyStat != null)
         {
             var maxY = HlidacStatu.Util.Consts.CalculatedCurrentYearSmlouvy;
@@ -152,7 +152,7 @@ public static class FirmaExtensions
 
         if (f.Holding(aktualnost)?.Any() == true)
         {
-            var smlouvyStatHolding = f.HoldingStatisticsRegistrSmluv();
+            var smlouvyStatHolding = await f.HoldingStatisticsRegistrSmluvAsync();
             var maxY = HlidacStatu.Util.Consts.CalculatedCurrentYearSmlouvy;
             if (smlouvyStatHolding != null)
             {

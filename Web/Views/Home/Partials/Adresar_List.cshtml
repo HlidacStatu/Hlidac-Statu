@@ -129,7 +129,7 @@ else
                 }
                 else
                 { //smlouvy
-                    HlidacStatu.Lib.Analytics.StatisticsSubjectPerYear<Smlouva.Statistics.Data> stat = firma.StatistikaRegistruSmluv();
+                    HlidacStatu.Lib.Analytics.StatisticsSubjectPerYear<Smlouva.Statistics.Data> stat = await firma.StatistikaRegistruSmluvAsync();
                     var ceo = firma.Ceo();
                     var platyStat = await firma.GetPlatyStatAsync();
                     var platyOrgDetailMetadata = (await HlidacStatu.Repositories.PuRepo.GetFullDetailAsync(firma.DatovaSchranka))?

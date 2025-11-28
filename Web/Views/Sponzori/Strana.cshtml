@@ -245,7 +245,7 @@ else
     new ReportDataSource<(SponzoringSummed sponz, int[] roky)>.Column()
             {
                 Name = "Osoba",
-                HtmlRender = (m) =>
+                HtmlRender =(m) =>
                 {
                     string ret = "";
                     var o = Osoby.GetByNameId.Get(m.sponz.Id);
@@ -272,7 +272,7 @@ else
         new ReportDataSource<(SponzoringSummed sponz, int[] roky)>.Column()
                 {
                     Name = "Částka",
-                    HtmlRender = (m) =>
+                    HtmlRender =(m) =>
     {
                         return HlidacStatu.Util.RenderData.NicePrice(m.sponz.DarCelkem, html: true);
                     },
@@ -282,7 +282,7 @@ else
         new ReportDataSource<(SponzoringSummed sponz, int[] roky)>.Column()
                 {
                     Name = "Sponzoring v letech",
-                    HtmlRender = (m) =>
+                    HtmlRender =(m) =>
     {
                         return string.Join(", ", m.roky);
                     },
@@ -297,7 +297,7 @@ else
     new ReportDataSource<(SponzoringSummed sponz, int[] roky)>.Column()
             {
                 Name = "Firma",
-                HtmlRender = (m) =>
+                HtmlRender =(m) =>
 {
                     return $"<a href='/subjekt/{m.sponz.Id}'>{m.sponz.Jmeno}</a>";
                 }
@@ -305,7 +305,7 @@ else
         new ReportDataSource<(SponzoringSummed sponz, int[] roky)>.Column()
                 {
                     Name = "Částka",
-                    HtmlRender = (m) =>
+                    HtmlRender =(m) =>
     {
                         return HlidacStatu.Util.RenderData.NicePrice(m.sponz.DarCelkem, html: true);
                     },
@@ -315,7 +315,7 @@ else
         new ReportDataSource<(SponzoringSummed sponz, int[] roky)>.Column()
                 {
                     Name = "Sponzoring v letech",
-                    HtmlRender = (m) =>
+                    HtmlRender =(m) =>
     {
                         return string.Join(", ", m.roky);
                     },
@@ -329,7 +329,7 @@ else
     new ReportDataSource<(SponzoringSummed sponz, int[] roky)>.Column()
             {
                 Name = "Strana",
-                HtmlRender = (m) =>
+                HtmlRender =(m) =>
 {
             return $"<a href='/subjekt/{m.sponz.Id}'>{m.sponz.Jmeno}</a>";
         }
@@ -337,7 +337,7 @@ else
         new ReportDataSource<(SponzoringSummed sponz, int[] roky)>.Column()
                 {
                     Name = "Částka",
-                    HtmlRender = (m) =>
+                    HtmlRender =(m) =>
 {
                 return HlidacStatu.Util.RenderData.NicePrice(m.sponz.DarCelkem, html: true);
             },
@@ -347,7 +347,7 @@ else
         new ReportDataSource<(SponzoringSummed sponz, int[] roky)>.Column()
                 {
                     Name = "Sponzoring v letech",
-                    HtmlRender = (m) =>
+                    HtmlRender =(m) =>
 {
                 return string.Join(", ", m.roky);
             },

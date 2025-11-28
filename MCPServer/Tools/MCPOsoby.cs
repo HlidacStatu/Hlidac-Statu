@@ -7,6 +7,7 @@ using ModelContextProtocol.Server;
 using NPOI.SS.Formula.Functions;
 using System.ComponentModel;
 using System.Reflection;
+using HlidacStatu.DS.Api.Osoba;
 
 namespace HlidacStatu.MCPServer.Tools
 {
@@ -21,11 +22,11 @@ namespace HlidacStatu.MCPServer.Tools
     Title = "Get detail of specific politician in Czech Republic"),
     Description("Return detail of specific politician in Czech Republic by his ID. Use method 'find_person_by_name' or 'find_politician_by_name' to find person's ID. "
     + " For company detail use tool 'get_legal_entity_full_detail' with parameter 'ico'.")]
-        public static HlidacStatu.DS.Api.Osoba.Detail get_politician_detail(IMcpServer server,
+        public static async Task<Detail> get_politician_detail(IMcpServer server,
     [Description("ID of person.")]
             string person_id)
         {
-            return AuditRepo.AddWithElapsedTimeMeasure(
+            return await AuditRepo.AddWithElapsedTimeMeasureAsync(
                 Audit.Operations.Call,
                 server?.ServerOptions?.KnownClientInfo?.Name?.Split('|')?.FirstOrDefault(),
                 server?.ServerOptions?.KnownClientInfo?.Name?.Split('|')?.LastOrDefault(),
@@ -44,19 +45,18 @@ namespace HlidacStatu.MCPServer.Tools
         Title = "Get detail of specific person in Czech Republic"),
         Description("Return detail of specific person in Czech Republic by his ID. Use method 'find_person_by_name' to find person's ID. "
         + " For company detail use tool 'get_legal_entity_full_detail' with parameter 'ico'.")]
-        public static HlidacStatu.DS.Api.Osoba.Detail get_person_detail(IMcpServer server,
+        public static async Task<Detail> get_person_detail(IMcpServer server,
         [Description("ID of person.")]
             string person_id)
         {
 
-            return AuditRepo.AddWithElapsedTimeMeasure(
+            return await AuditRepo.AddWithElapsedTimeMeasureAsync(
                 Audit.Operations.Call,
                 server?.ServerOptions?.KnownClientInfo?.Name?.Split('|')?.FirstOrDefault(),
                 server?.ServerOptions?.KnownClientInfo?.Name?.Split('|')?.LastOrDefault(),
                 AuditRepo.GetClassAndMethodName(MethodBase.GetCurrentMethod()), "",
                 AuditRepo.GetMethodParametersWithValues(MethodBase.GetCurrentMethod().GetParameters().Skip(1), person_id),
-                null,
-                () =>
+                null, async () =>
                 {
 
                     if (string.IsNullOrWhiteSpace(person_id) || string.IsNullOrWhiteSpace(person_id))
@@ -69,7 +69,7 @@ namespace HlidacStatu.MCPServer.Tools
                         return null;
                     }
 
-                    var res = o.ToApiOsobaDetail(DateTime.Now.AddYears(-10));
+                    var res = await o.ToApiOsobaDetailAsync(DateTime.Now.AddYears(-10));
                     return res;
                 }
         );

@@ -21,36 +21,30 @@
         {
             query = HlidacStatu.Searching.Query.ModifyQueryAND(query, $"datumUzavreni:[{year}-01-01 TO {year + 1}-01-01}}");
         }
+
         return $"{url}?q={System.Net.WebUtility.UrlEncode(query)}";
     }
 
     string NiceString(string url, string query, int pocetSmluv, decimal cenaCelkem, int? year = null)
     {
         return $"<a href='{ValidUrl(url, query, year)}'>" +
-            Devmasters.Lang.CS.Plural.Get(pocetSmluv, "{0} smlouva;{0} smlouvy;{0} smluv") +
-            "</a> za celkem " +
-            Smlouva.NicePrice(cenaCelkem, html: true, shortFormat: true);
+               Devmasters.Lang.CS.Plural.Get(pocetSmluv, "{0} smlouva;{0} smlouvy;{0} smluv") +
+               "</a> za celkem " +
+               Smlouva.NicePrice(cenaCelkem, html: true, shortFormat: true);
     }
 
-
-
-    var statistics = Model.StatistikaRegistruSmluv();
+    var statistics = await Model.StatistikaRegistruSmluvAsync();
 
     var statisticsAfter2016 = statistics
         .Where(s => statistics.YearsAfter2016().Contains(s.Year))
         .OrderBy(s => s.Year).ToList();
 
-    var summaryAfter2016 = statistics.Summary(statistics.YearsAfter2016());
-    var statHoldingAktual = Model.HoldingStatisticsRegistrSmluv();
+    var statHoldingAktual = await Model.HoldingStatisticsRegistrSmluvAsync();
     var holdingSummaryAfter2016 = statHoldingAktual.Summary(statHoldingAktual.YearsAfter2016());
-
-    var seasonStat = statistics.CurrentSeasonStatistics();
-    var currentSeasonYear = statistics.CurrentSeasonYear();
-    var zmenaObjemuSmluv = statistics.ChangeBetweenYears(currentSeasonYear - 1, currentSeasonYear, s => s.CelkovaHodnotaSmluv);
 
     var topDodavateleT = HlidacStatu.Repositories.ES.QueryGrouped.TopDodavatelePerYearAsync($"ico:{Model.ICO}", statistics.YearsAfter2016());
     var topOdberateleT = HlidacStatu.Repositories.ES.QueryGrouped.TopOdberatelePerYearAsync($"ico:{Model.ICO}", statistics.YearsAfter2016());
-    
+
     Task.WaitAll(topDodavateleT, topOdberateleT);
 
     //Graf hodnota smluv
@@ -84,7 +78,6 @@
             Data = statisticsAfter2016
                 .Select(x => new SeriesData(x.Year, x.Value.PocetSmluvBezCeny)).ToArray(),
             Type = Series.SeriesType.line,
-
         }
     };
 
@@ -104,9 +97,8 @@
             Type = Series.SeriesType.column,
             Data = statisticsAfter2016
                 .Select(x => new SeriesData(x.Year, x.Value.PocetSmluvBezCeny)).ToArray(),
-
         },
-                                    };
+    };
 
     //Graf procenta smluv/počet smluv s utajenou cenou
     var procentaSmluvGraphData = new Series[]
@@ -133,8 +125,7 @@
                 ValueSuffix = " %"
             }
         },
-
-            };
+    };
 
     string dataTableOptions = @"{
         'language': {
@@ -146,11 +137,6 @@
         'info': false,
         'filter': true,
     }";
-
-
-
-
-
 }
 
 
@@ -158,12 +144,13 @@
 @* První sloupec *@
 <div id="subjcontent_toc">
     <div>
-   
+
 
         @* GRAFY *@
         <h4>Souhrnné statistiky pro @Model.Jmeno</h4>
         <p>
-            Všechny smlouvy:  @Html.Raw(NiceString($"/hledatSmlouvy", $"ico:{Model.ICO}", (int)statistics.Summary().PocetSmluv, statistics.Summary().CelkovaHodnotaSmluv));
+            Všechny
+            smlouvy: @Html.Raw(NiceString($"/hledatSmlouvy", $"ico:{Model.ICO}", (int)statistics.Summary().PocetSmluv, statistics.Summary().CelkovaHodnotaSmluv));
 
             @if (statistics.Summary().PocetSmluvSeZasadnimNedostatkem > 0)
             {
@@ -171,244 +158,233 @@
                 @Html.Raw($"<a href='{ValidUrl("/hledatSmlouvy", $"( ico:{Model.ICO} AND chyby:zasadni )")}'>{Devmasters.Lang.CS.Plural.Get(statistics.Summary().PocetSmluvSeZasadnimNedostatkem, "Jedna smlouvu má", "{0} smlouvy mají", "{0} smluv má")}</a> zásadní nedostatek");
             </p>
         }
-            @if (statistics.Summary().PocetSmluvULimitu > 0)
-            {
-                <p>
-                    @Html.Raw($"<a href='{ValidUrl("/hledatSmlouvy", $"( ico:{Model.ICO} AND hint.smlouvaULimitu:>0 )")}'>{Devmasters.Lang.CS.Plural.Get(statistics.Summary().PocetSmluvULimitu, "Jednu smlouva je", "{0} smlouvy jsou", "{0} smluv je")}</a> s hodnotou těsně pod limitem veřejných zakázek");
-                </p>
-            }
-            @if (Model.PatrimStatu() && (statistics.Summary().PercentSmluvPolitiky > 0))
-            {
-                <p>
-                    @Html.Raw($"<a href='{ValidUrl("/hledatSmlouvy", $"( ico:{Model.ICO} AND sVazbouNaPolitikyNedavne:true ) ")}'>{(statistics.Summary().PercentSmluvPolitiky.ToString("P1"))}</a> smluv s firmami navázanými na politiky");
-                </p>
-            }
+        @if (statistics.Summary().PocetSmluvULimitu > 0)
+        {
+            <p>
+                @Html.Raw($"<a href='{ValidUrl("/hledatSmlouvy", $"( ico:{Model.ICO} AND hint.smlouvaULimitu:>0 )")}'>{Devmasters.Lang.CS.Plural.Get(statistics.Summary().PocetSmluvULimitu, "Jednu smlouva je", "{0} smlouvy jsou", "{0} smluv je")}</a> s hodnotou těsně pod limitem veřejných zakázek");
             </p>
-            <hr />
-            @Html.ColumnGraph("Hodnota smluv po letech", hodnotaSmluvGraphData, yTitleRight: "Počet smluv")
-            <hr />
-            @Html.ColumnGraph("Počet smluv po letech", pocetSmluvGraphData, yTitleLeft: "Počet smluv")
-            <hr />
-            @if (Model.PatrimStatu())
-            {
-                <p>
-                    @Html.ColumnGraph("Smlouvy s utajenou cenou a vazbou na politiky", procentaSmluvGraphData, yTitleLeft: "% smluv")
-                </p>
-            }
-            <hr />
-            @*PER YEAR*@
-            @for (int y = statistics.CurrentSeasonYear(); y > 2016; y--)
-            {
-                var kindex = await Model.KindexAsync();
-                
-                <div>
-                    <h3>Statistiky registru smluv pro @(Model.JsemOVM() ? "úřad" : "subjekt") v @y</h3>
-                    <ul>
-                        @if (kindex?.ForYear(y)?.KIndexReady == true)
-                        {
-                            <li>
-                                K-Index v @y má hodnotu @Html.KIndexIcon(kindex.ForYear(y).KIndexLabel) (<a href="@kindex.GetUrl(true, y)">více</a>)
-                            </li>
+        }
+        @if (Model.PatrimStatu() && (statistics.Summary().PercentSmluvPolitiky > 0))
+        {
+            <p>
+                @Html.Raw($"<a href='{ValidUrl("/hledatSmlouvy", $"( ico:{Model.ICO} AND sVazbouNaPolitikyNedavne:true ) ")}'>{(statistics.Summary().PercentSmluvPolitiky.ToString("P1"))}</a> smluv s firmami navázanými na politiky");
+            </p>
+        }
+        </p>
+        <hr/>
+        @Html.ColumnGraph("Hodnota smluv po letech", hodnotaSmluvGraphData, yTitleRight: "Počet smluv")
+        <hr/>
+        @Html.ColumnGraph("Počet smluv po letech", pocetSmluvGraphData, yTitleLeft: "Počet smluv")
+        <hr/>
+        @if (Model.PatrimStatu())
+        {
+            <p>
+                @Html.ColumnGraph("Smlouvy s utajenou cenou a vazbou na politiky", procentaSmluvGraphData, yTitleLeft: "% smluv")
+            </p>
+        }
+        <hr/>
+        @*PER YEAR*@
+        @for (int y = statistics.CurrentSeasonYear(); y > 2016; y--)
+        {
+            var kindex = await Model.KindexAsync();
+
+            <div>
+                <h3>Statistiky registru smluv pro @(Model.JsemOVM() ? "úřad" : "subjekt") v @y</h3>
+                <ul>
+                    @if (kindex?.ForYear(y)?.KIndexReady == true)
+                    {
+                        <li>
+                            K-Index v @y má hodnotu @Html.KIndexIcon(kindex.ForYear(y).KIndexLabel) (<a
+                                href="@kindex.GetUrl(true, y)">více</a>)
+                        </li>
+                    }
+                    <li>
+                        @{
+                            sentences.Clear();
+                            sentences.Add(NiceString($"/hledatSmlouvy", $"ico:{Model.ICO}", (int)statistics[y].PocetSmluv, statistics[y].CelkovaHodnotaSmluv, y));
+                            if (Model.PatrimStatu())
+                            {
+                                sentences.Add("z toho "
+                                              + NiceString($"/hledatSmlouvy", $"( hint.vztahSeSoukromymSubjektem:>0+) AND ico:{Model.ICO}", (int)statistics[y].PocetSmluvSeSoukromymSubj, statistics[y].CelkovaHodnotaSmluvSeSoukrSubj, y)
+                                              + " se soukromými subjekty"
+                                );
+                            }
                         }
-                        <li>
-                            @{
-                                sentences.Clear();
-                                sentences.Add(NiceString($"/hledatSmlouvy", $"ico:{Model.ICO}", (int)statistics[y].PocetSmluv, statistics[y].CelkovaHodnotaSmluv, y));
-                                if (Model.PatrimStatu())
-                                {
-                                    sentences.Add("z toho "
-                                                  + NiceString($"/hledatSmlouvy", $"( hint.vztahSeSoukromymSubjektem:>0+) AND ico:{Model.ICO}", (int)statistics[y].PocetSmluvSeSoukromymSubj, statistics[y].CelkovaHodnotaSmluvSeSoukrSubj, y)
-                                                  + " se soukromými subjekty"
-                                        );
-
-                                }
-
-                            }
-                            @Html.Raw(HlidacStatu.Util.RenderData.RenderList(sentences))
-                        </li>
-                        <li>
-                            @{
-                                sentences.Clear();
-                                sentences.Add($"Celkem {statistics[y].PercentSmluvBezCeny.ToString("P1")} smluv má skrytou cenu");
-                                if (statistics[y].PocetSmluvSeZasadnimNedostatkem > 0)
-                                {
-                                    sentences.Add($"<a href='{ValidUrl("/hledatSmlouvy", $"( ico:{Model.ICO} AND chyby:zasadni )", y)}'>{Devmasters.Lang.CS.Plural.Get(statistics[y].PocetSmluvSeZasadnimNedostatkem, "jednu smlouvu", "{0} smlouvy", "{0} smluv")}</a> má zásadní nedostatek");
-                                }
-                                if (statistics[y].PocetSmluvULimitu > 0)
-                                {
-                                    sentences.Add($"<a href='{ValidUrl("/hledatSmlouvy", $"( ico:{Model.ICO} AND hint.smlouvaULimitu:>0 )", y)}'>{Devmasters.Lang.CS.Plural.Get(statistics[y].PocetSmluvULimitu, "jednu smlouvu", "{0} smlouvy", "{0} smluv")}</a> je s hodnotou těsně pod limitem veřejných zakázek");
-                                }
-                                if (Model.PatrimStatu() && (statistics[y].PercentSmluvPolitiky > 0))
-                                {
-                                    sentences.Add($"<a href='{ValidUrl("/hledatSmlouvy", $"( ico:{Model.ICO} AND sVazbouNaPolitikyNedavne:true ) ", y)}'>{(statistics[y].PercentSmluvPolitiky.ToString("P1"))}</a> smluv s firmami navázanými na politiky");
-                                    //@
-                                }
-                            }
-                            @Html.Raw(HlidacStatu.Util.RenderData.RenderList(sentences))
-                        </li>
-                    </ul>
-                </div>
-                if (
-                    Model.AktualniVazby(Relation.AktualnostType.Nedavny).Count() > 0
-                    && holdingSummaryAfter2016.PocetSmluv > 0
-                    )
-                {
-                    <b style="padding-left:30px">Statistiky pro @(Model.JsemOVM()? "úřad a jeho podřízené organizace" : "subjekt a všechny dceřiné společnosti") </b>
-                    <ul>
-                        <li>
-                            @{
-                                sentences.Clear();
-                                sentences.Add(NiceString($"/hledatSmlouvy", $"holding:{Model.ICO}", (int)statHoldingAktual[y].PocetSmluv, statHoldingAktual[y].CelkovaHodnotaSmluv, y));
-                                if (Model.PatrimStatu())
-                                {
-                                    sentences.Add("z toho "
-                                        + NiceString($"/hledatSmlouvy", $"( hint.vztahSeSoukromymSubjektem:>0+) AND holding:{Model.ICO}", (int)statHoldingAktual[y].PocetSmluvSeSoukromymSubj, statHoldingAktual[y].CelkovaHodnotaSmluvSeSoukrSubj, y)
-                                        + " se soukromými subjekty"
-                                        );
-                                }
-                            }
-                            @Html.Raw(HlidacStatu.Util.RenderData.RenderList(sentences))
-                        </li>
-                        <li>
-                            @{
-                                sentences.Clear();
-                                sentences.Add($"Celkem {statHoldingAktual[y].PercentSmluvBezCeny.ToString("P1")} smluv má skrytou cenu");
-                                if (statHoldingAktual[y].PocetSmluvSeZasadnimNedostatkem > 0)
-                                {
-                                    sentences.Add($"<a href='{ValidUrl("/hledatSmlouvy", $"( holding:{Model.ICO} AND chyby:zasadni )", y)}'>{Devmasters.Lang.CS.Plural.Get(statHoldingAktual[y].PocetSmluvSeZasadnimNedostatkem, "jednu smlouvu", "{0} smlouvy", "{0} smluv")}</a> má zásadní nedostatek");
-                                }
-                                if (statHoldingAktual[y].PocetSmluvULimitu > 0)
-                                {
-                                    sentences.Add($"<a href='{ValidUrl("/hledatSmlouvy", $"( holding:{Model.ICO} AND hint.smlouvaULimitu:>0 )", y)}'>{Devmasters.Lang.CS.Plural.Get(statHoldingAktual[y].PocetSmluvULimitu, "jednu smlouvu", "{0} smlouvy", "{0} smluv")}</a> je s hodnotou těsně pod limitem veřejných zakázek");
-                                }
-                                if (Model.PatrimStatu() && (statHoldingAktual[y].PercentSmluvPolitiky > 0))
-                                {
-                                    sentences.Add($"<a href='{ValidUrl("/hledatSmlouvy", $"( holding:{Model.ICO} AND sVazbouNaPolitikyNedavne:true ) ", y)}'>{(statHoldingAktual[y].PercentSmluvPolitiky.ToString("P1"))}</a> smluv s firmami navázanými na politiky");
-                                    //@
-                                }
-                            }
-                            @Html.Raw(HlidacStatu.Util.RenderData.RenderList(sentences))
-                        </li>
-                    </ul>
-                }
-
-
-                <h4>Závažné nedostatky v roce @y</h4>
-                <div>
-                    <partial name="_rizikoPart" model="@((firma:Model, rok:y))"/>
-
-                </div>
-
-
-
-
-                if (statistics[y].PoOblastech?.Count > 0)
-                {
-                    var sortedData = statistics[y].PoOblastech
-                        .OrderByDescending(o => o.Value.CelkemCena)
-                        .ThenByDescending(o => o.Value.Pocet)
-                        .ToList();
-                    IEnumerable<Tuple<string, decimal>> pieData = sortedData
-                                        .Take(9)
-                                        .Select(m => new Tuple<string, decimal>(
-                                            ((Smlouva.SClassification.ClassificationsTypes)m.Key).ToNiceDisplayName(),
-                                            m.Value.CelkemCena)
-                                        );
-
-                    ReportDataSource<KeyValuePair<int, SimpleStat>> rds = new(
-                            new ReportDataSource<KeyValuePair<int, SimpleStat>>.Column()
+                        @Html.Raw(HlidacStatu.Util.RenderData.RenderList(sentences))
+                    </li>
+                    <li>
+                        @{
+                            sentences.Clear();
+                            sentences.Add($"Celkem {statistics[y].PercentSmluvBezCeny.ToString("P1")} smluv má skrytou cenu");
+                            if (statistics[y].PocetSmluvSeZasadnimNedostatkem > 0)
                             {
-                                Name = "Oblast smluv",
-                                HtmlRender = (m) =>
-                                {
-                                    var t = ((Smlouva.SClassification.ClassificationsTypes)m.Key);
-                                    return $"<a href='{Smlouva.SClassification.Classification.GetSearchUrl(t)} AND ico:{Model.ICO} AND {HlidacStatu.Searching.Query.Formatted("podepsano",new DateTime(y,1,1),new DateTime(y,12,31))}'>"
-                                    +$"{((Smlouva.SClassification.ClassificationsTypes)m.Key).ToNiceDisplayName()}"
-                                    +$"</a>";
-                                }
-                            },
-                            new ReportDataSource<KeyValuePair<int, SimpleStat>>.Column()
-                            {
-                                Name = "Počet smluv",
-                                HtmlRender = (m) =>
-                                {
-                                    return HlidacStatu.Util.RenderData.NiceNumber(m.Value.Pocet);
-                                },
-                                OrderValueRender = (m) => HlidacStatu.Util.RenderData.OrderValueFormat(m.Value.Pocet),
-                                CssClass = "number"
-                            },
-                            new ReportDataSource<KeyValuePair<int, SimpleStat>>.Column()
-                            {
-                                Name = "Hodnota smluv",
-                                HtmlRender = (m) =>
-                                {
-                                    return HlidacStatu.Util.RenderData.NicePrice(m.Value.CelkemCena);
-                                },
-                                OrderValueRender = (m) => HlidacStatu.Util.RenderData.OrderValueFormat(m.Value.CelkemCena),
-                                CssClass = "number"
+                                sentences.Add($"<a href='{ValidUrl("/hledatSmlouvy", $"( ico:{Model.ICO} AND chyby:zasadni )", y)}'>{Devmasters.Lang.CS.Plural.Get(statistics[y].PocetSmluvSeZasadnimNedostatkem, "jednu smlouvu", "{0} smlouvy", "{0} smluv")}</a> má zásadní nedostatek");
                             }
-                        );
-                    rds.AddRows(sortedData);                    
-                    <h4>Oblasti uzavřených smluv v @y</h4>
-                <p>@Html.DataToHTMLTable(rds, dataTableOptions: dataTableOptions)</p>
 
+                            if (statistics[y].PocetSmluvULimitu > 0)
+                            {
+                                sentences.Add($"<a href='{ValidUrl("/hledatSmlouvy", $"( ico:{Model.ICO} AND hint.smlouvaULimitu:>0 )", y)}'>{Devmasters.Lang.CS.Plural.Get(statistics[y].PocetSmluvULimitu, "jednu smlouvu", "{0} smlouvy", "{0} smluv")}</a> je s hodnotou těsně pod limitem veřejných zakázek");
+                            }
+
+                            if (Model.PatrimStatu() && (statistics[y].PercentSmluvPolitiky > 0))
+                            {
+                                sentences.Add($"<a href='{ValidUrl("/hledatSmlouvy", $"( ico:{Model.ICO} AND sVazbouNaPolitikyNedavne:true ) ", y)}'>{(statistics[y].PercentSmluvPolitiky.ToString("P1"))}</a> smluv s firmami navázanými na politiky");
+                                //@
+                            }
+                        }
+                        @Html.Raw(HlidacStatu.Util.RenderData.RenderList(sentences))
+                    </li>
+                </ul>
+            </div>
+            if (
+                Model.AktualniVazby(Relation.AktualnostType.Nedavny).Count() > 0
+                && holdingSummaryAfter2016.PocetSmluv > 0
+            )
+            {
+                <b style="padding-left:30px">Statistiky
+                    pro @(Model.JsemOVM() ? "úřad a jeho podřízené organizace" : "subjekt a všechny dceřiné společnosti") </b>
+                <ul>
+                    <li>
+                        @{
+                            sentences.Clear();
+                            sentences.Add(NiceString($"/hledatSmlouvy", $"holding:{Model.ICO}", (int)statHoldingAktual[y].PocetSmluv, statHoldingAktual[y].CelkovaHodnotaSmluv, y));
+                            if (Model.PatrimStatu())
+                            {
+                                sentences.Add("z toho "
+                                              + NiceString($"/hledatSmlouvy", $"( hint.vztahSeSoukromymSubjektem:>0+) AND holding:{Model.ICO}", (int)statHoldingAktual[y].PocetSmluvSeSoukromymSubj, statHoldingAktual[y].CelkovaHodnotaSmluvSeSoukrSubj, y)
+                                              + " se soukromými subjekty"
+                                );
+                            }
+                        }
+                        @Html.Raw(HlidacStatu.Util.RenderData.RenderList(sentences))
+                    </li>
+                    <li>
+                        @{
+                            sentences.Clear();
+                            sentences.Add($"Celkem {statHoldingAktual[y].PercentSmluvBezCeny.ToString("P1")} smluv má skrytou cenu");
+                            if (statHoldingAktual[y].PocetSmluvSeZasadnimNedostatkem > 0)
+                            {
+                                sentences.Add($"<a href='{ValidUrl("/hledatSmlouvy", $"( holding:{Model.ICO} AND chyby:zasadni )", y)}'>{Devmasters.Lang.CS.Plural.Get(statHoldingAktual[y].PocetSmluvSeZasadnimNedostatkem, "jednu smlouvu", "{0} smlouvy", "{0} smluv")}</a> má zásadní nedostatek");
+                            }
+
+                            if (statHoldingAktual[y].PocetSmluvULimitu > 0)
+                            {
+                                sentences.Add($"<a href='{ValidUrl("/hledatSmlouvy", $"( holding:{Model.ICO} AND hint.smlouvaULimitu:>0 )", y)}'>{Devmasters.Lang.CS.Plural.Get(statHoldingAktual[y].PocetSmluvULimitu, "jednu smlouvu", "{0} smlouvy", "{0} smluv")}</a> je s hodnotou těsně pod limitem veřejných zakázek");
+                            }
+
+                            if (Model.PatrimStatu() && (statHoldingAktual[y].PercentSmluvPolitiky > 0))
+                            {
+                                sentences.Add($"<a href='{ValidUrl("/hledatSmlouvy", $"( holding:{Model.ICO} AND sVazbouNaPolitikyNedavne:true ) ", y)}'>{(statHoldingAktual[y].PercentSmluvPolitiky.ToString("P1"))}</a> smluv s firmami navázanými na politiky");
+                                //@
+                            }
+                        }
+                        @Html.Raw(HlidacStatu.Util.RenderData.RenderList(sentences))
+                    </li>
+                </ul>
             }
 
+
+            <h4>Závažné nedostatky v roce @y</h4>
+            <div>
+                <partial name="_rizikoPart" model="@((firma: Model, rok: y))"/>
+
+            </div>
+
+
+            if (statistics[y].PoOblastech?.Count > 0)
+            {
+                var sortedData = statistics[y].PoOblastech
+                    .OrderByDescending(o => o.Value.CelkemCena)
+                    .ThenByDescending(o => o.Value.Pocet)
+                    .ToList();
+                IEnumerable<Tuple<string, decimal>> pieData = sortedData
+                    .Take(9)
+                    .Select(m => new Tuple<string, decimal>(
+                        ((Smlouva.SClassification.ClassificationsTypes)m.Key).ToNiceDisplayName(),
+                        m.Value.CelkemCena)
+                    );
+
+                ReportDataSource<KeyValuePair<int, SimpleStat>> rds = new(
+                    new ReportDataSource<KeyValuePair<int, SimpleStat>>.Column()
+                    {
+                        Name = "Oblast smluv",
+                        HtmlRender =(m) =>
+                        {
+                            var t = ((Smlouva.SClassification.ClassificationsTypes)m.Key);
+                            return $"<a href='{Smlouva.SClassification.Classification.GetSearchUrl(t)} AND ico:{Model.ICO} AND {HlidacStatu.Searching.Query.Formatted("podepsano", new DateTime(y, 1, 1), new DateTime(y, 12, 31))}'>"
+                                   + $"{((Smlouva.SClassification.ClassificationsTypes)m.Key).ToNiceDisplayName()}"
+                                   + $"</a>";
+                        }
+                    },
+                    new ReportDataSource<KeyValuePair<int, SimpleStat>>.Column()
+                    {
+                        Name = "Počet smluv",
+                        HtmlRender =(m) => { return HlidacStatu.Util.RenderData.NiceNumber(m.Value.Pocet); },
+                        OrderValueRender = (m) => HlidacStatu.Util.RenderData.OrderValueFormat(m.Value.Pocet),
+                        CssClass = "number"
+                    },
+                    new ReportDataSource<KeyValuePair<int, SimpleStat>>.Column()
+                    {
+                        Name = "Hodnota smluv",
+                        HtmlRender =(m) => { return HlidacStatu.Util.RenderData.NicePrice(m.Value.CelkemCena); },
+                        OrderValueRender = (m) => HlidacStatu.Util.RenderData.OrderValueFormat(m.Value.CelkemCena),
+                        CssClass = "number"
+                    }
+                );
+                rds.AddRows(sortedData);
+                <h4>Oblasti uzavřených smluv v @y</h4>
+                <p>@Html.DataToHTMLTable(rds, dataTableOptions: dataTableOptions)</p>
+            }
 
 
             ReportDataSource<KeyValuePair<string, SimpleStat>> podleHodnotyTemplate = new(
-                    new ReportDataSource<KeyValuePair<string, SimpleStat>>.Column()
-                            {
-                                Name = "Společnost",
-                                HtmlRender = (m) =>
-                                {
-                                    string t = m.Key;
-                                    return $"<a href='/subjekt/{t}'>"
-                                        +$"{Firmy.GetJmeno(t)}"
-                                        +$"</a>";
-                                }
-                            },
-                            new ReportDataSource<KeyValuePair<string, SimpleStat>>.Column()
-                            {
-                                Name = "Počet smluv",
-                                HtmlRender = (m) =>
-                                {
-                                    var query = $"ico:{Model.ICO} AND ico:{m.Key} AND "
-                               + $"{HlidacStatu.Searching.Query.Formatted("podepsano",new DateTime(y,1,1),new DateTime(y,12,31))}";
-                                   return $"<a href='/HledatSmlouvy?Q={System.Net.WebUtility.UrlEncode(query)}'>"
-                                       +$"{HlidacStatu.Util.RenderData.NiceNumber(m.Value.Pocet)}"
-                                       +$"</a>";
-                                },
-                                OrderValueRender = (m) => HlidacStatu.Util.RenderData.OrderValueFormat(m.Value.Pocet),
-                                CssClass = "number"
-                            },
-                            new ReportDataSource<KeyValuePair<string, SimpleStat>>.Column()
-                            {
-                                Name = "Hodnota smluv",
-                                HtmlRender = (m) =>
-                                {
-                                    return HlidacStatu.Util.RenderData.NicePrice(m.Value.CelkemCena);
-                                },
-                                OrderValueRender = (m) => HlidacStatu.Util.RenderData.OrderValueFormat(m.Value.CelkemCena),
-                                CssClass = "number"
-                            }
-                        );
+                new ReportDataSource<KeyValuePair<string, SimpleStat>>.Column()
+                {
+                    Name = "Společnost",
+                    HtmlRender =(m) =>
+                    {
+                        string t = m.Key;
+                        return $"<a href='/subjekt/{t}'>"
+                               + $"{Firmy.GetJmeno(t)}"
+                               + $"</a>";
+                    }
+                },
+                new ReportDataSource<KeyValuePair<string, SimpleStat>>.Column()
+                {
+                    Name = "Počet smluv",
+                    HtmlRender =(m) =>
+                    {
+                        var query = $"ico:{Model.ICO} AND ico:{m.Key} AND "
+                                    + $"{HlidacStatu.Searching.Query.Formatted("podepsano", new DateTime(y, 1, 1), new DateTime(y, 12, 31))}";
+                        return $"<a href='/HledatSmlouvy?Q={System.Net.WebUtility.UrlEncode(query)}'>"
+                               + $"{HlidacStatu.Util.RenderData.NiceNumber(m.Value.Pocet)}"
+                               + $"</a>";
+                    },
+                    OrderValueRender = (m) => HlidacStatu.Util.RenderData.OrderValueFormat(m.Value.Pocet),
+                    CssClass = "number"
+                },
+                new ReportDataSource<KeyValuePair<string, SimpleStat>>.Column()
+                {
+                    Name = "Hodnota smluv",
+                    HtmlRender =(m) => { return HlidacStatu.Util.RenderData.NicePrice(m.Value.CelkemCena); },
+                    OrderValueRender = (m) => HlidacStatu.Util.RenderData.OrderValueFormat(m.Value.CelkemCena),
+                    CssClass = "number"
+                }
+            );
 
 
-
-
-            Dictionary<int, (List<(string ico, SimpleStat stat)> topPodlePoctu, List<(string ico, SimpleStat stat)> topPodleKc)> 
+            Dictionary<int, (List<(string ico, SimpleStat stat)> topPodlePoctu, List<(string ico, SimpleStat stat)> topPodleKc)>
                 first = Model.JsemOVM() ? topDodavateleT.Result : topOdberateleT.Result;
 
-            Dictionary<int, (List<(string ico, SimpleStat stat)> topPodlePoctu, List<(string ico, SimpleStat stat)> topPodleKc)> 
+            Dictionary<int, (List<(string ico, SimpleStat stat)> topPodlePoctu, List<(string ico, SimpleStat stat)> topPodleKc)>
                 second = Model.JsemOVM() ? topOdberateleT.Result : topDodavateleT.Result;
 
-            if (first.ContainsKey(y) && first[y].topPodleKc.Count>0)
+            if (first.ContainsKey(y) && first[y].topPodleKc.Count > 0)
             {
                 podleHodnotyTemplate.Clear();
                 podleHodnotyTemplate.AddRows(
                     first[y].topPodleKc.Select(m => new KeyValuePair<string, SimpleStat>(m.ico, m.stat))
-                        );
+                );
                 string dleHodnoty = Html.DataToHTMLTable(podleHodnotyTemplate, dataTableOptions: dataTableOptions).RenderRawHtml();
 
                 podleHodnotyTemplate.Clear();
@@ -417,26 +393,27 @@
                 );
                 string dlePoctu = Html.DataToHTMLTable(podleHodnotyTemplate, dataTableOptions: dataTableOptions).RenderRawHtml();
 
-                        <h4>Statistika @(Model.JsemOVM()? "dodavatelů" : "odběratelů" )  @(Model.JsemOVM()? "úřadu" : "subjektu" ) v @y</h4>
-                        <p>
-                            @Html.Toggleable(
-                                dleHodnoty,"Podle hodnoty smluv",
-                                dlePoctu, "Podle počtu smluv"
-                            )
-@*                            <partial name="WebUtil/HorizontalTabs" 
+                <h4>
+                    Statistika @(Model.JsemOVM() ? "dodavatelů" : "odběratelů") @(Model.JsemOVM() ? "úřadu" : "subjektu") v @y</h4>
+                <p>
+                    @Html.Toggleable(
+                        dleHodnoty, "Podle hodnoty smluv",
+                        dlePoctu, "Podle počtu smluv"
+                    )
+                    @*                            <partial name="WebUtil/HorizontalTabs" 
                                 model="@(new TabsViewModel(new string[]{"podle hodnoty smluv","podle počtu smluv"}, new string[]{dleHodnoty,dlePoctu} ))" 
                             />
 *@
-                        </p>
-                    }
+                </p>
+            }
 
 
-            if (second.ContainsKey(y) && second[y].topPodleKc.Count>0)
+            if (second.ContainsKey(y) && second[y].topPodleKc.Count > 0)
             {
                 podleHodnotyTemplate.Clear();
                 podleHodnotyTemplate.AddRows(
                     second[y].topPodleKc.Select(m => new KeyValuePair<string, SimpleStat>(m.ico, m.stat))
-                        );
+                );
                 string dleHodnoty = Html.DataToHTMLTable(podleHodnotyTemplate, dataTableOptions: dataTableOptions).RenderRawHtml();
 
                 podleHodnotyTemplate.Clear();
@@ -445,29 +422,29 @@
                 );
                 string dlePoctu = Html.DataToHTMLTable(podleHodnotyTemplate, dataTableOptions: dataTableOptions).RenderRawHtml();
 
-                        <h4>Statistika @(Model.JsemOVM()? "odběratelů" : "dodavatelů" ) @(Model.JsemOVM()? "úřadu" : "subjektu" ) v @y</h4>
-                        <p>
-                            @Html.Toggleable(
-                                dleHodnoty,"Podle hodnoty smluv",
-                                dlePoctu, "Podle počtu smluv"
-                            )
-@*                            <partial name="WebUtil/HorizontalTabs" 
+                <h4>
+                    Statistika @(Model.JsemOVM() ? "odběratelů" : "dodavatelů") @(Model.JsemOVM() ? "úřadu" : "subjektu") v @y</h4>
+                <p>
+                    @Html.Toggleable(
+                        dleHodnoty, "Podle hodnoty smluv",
+                        dlePoctu, "Podle počtu smluv"
+                    )
+                    @*                            <partial name="WebUtil/HorizontalTabs" 
                                 model="@(new TabsViewModel(new string[]{"podle hodnoty smluv","podle počtu smluv"}, new string[]{dleHodnoty,dlePoctu} ))" 
                             />
 *@
-                        </p>
-                    }
-
-                <hr />
+                </p>
             }
 
-            <hr style="margin-top:50px" />
+            <hr/>
+        }
+
+        <hr style="margin-top:50px"/>
         }
 
         @*for y*@
 
 
-
-        </div>
-
     </div>
+
+</div>

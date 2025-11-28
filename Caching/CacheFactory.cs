@@ -10,7 +10,6 @@ using ZiggyCreatures.Caching.Fusion.Serialization.SystemTextJson;
 
 namespace Hlidacstatu.Caching;
 
-
 public static class CacheFactory
 {
     /// <summary>
@@ -51,7 +50,6 @@ public static class CacheFactory
 
         JitterMaxDuration = TimeSpan.FromMinutes(1)
     };
-
 
     /// <summary>
     /// SCÉNÁŘ 2: řešíme kdy se data mění pomaleji (hodiny)
@@ -107,42 +105,29 @@ public static class CacheFactory
     /// FACTORY metoda je přímo volání do předpočítaných dat, předpočítaná data se updatuje z DOWNLOADERU
     /// Je potřeba nastavit cacheName i prefixName
     /// </summary>
-    private static FusionCacheEntryOptions L1FromPermanentStoreEntryOptions => new FusionCacheEntryOptions
+    private static FusionCacheEntryOptions PermanentCacheEntryOptions => new FusionCacheEntryOptions
     {
         IsFailSafeEnabled = true,
-        // o kolik se prodlouží validita cache, pokud selže factory
-        // až do FailSafeMaxDuration/DistributedCacheFailSafeMaxDuration
-        FailSafeThrottleDuration = TimeSpan.FromMinutes(3),
-
-        // Délka životnosti
-        //L1
-        Duration = TimeSpan.FromMinutes(5),
-        FailSafeMaxDuration = TimeSpan.FromHours(6),
-        // po 80% uběhlého času z Duration se spustí factory, abychom měli čerstvá data
-        EagerRefreshThreshold = 0.8f,
-
-        // TIMEOUTS
-        //jak dlouho se pokouší načítat z factory, pokud nenačte, použije failsafe
-        FactorySoftTimeout = TimeSpan.FromMilliseconds(500),
-        //Kolik je maximální čas pro načítání dat, než to hodí exception
-        FactoryHardTimeout = TimeSpan.FromSeconds(20),
-        //pokud factory trvá dlouho, nevypne se, ale zkouší to dokončit - umí běžet i delší dobu než je factory hard timeout
         AllowTimedOutFactoryBackgroundCompletion = true,
+        FailSafeThrottleDuration = TimeSpan.FromMinutes(5),
+        Duration = TimeSpan.FromMinutes(10),
+        FailSafeMaxDuration = TimeSpan.FromHours(10),
+        DistributedCacheFailSafeMaxDuration = TimeSpan.FromDays(365),
 
-        // DISTRIBUTED CACHE Vypneme
-        SkipDistributedCacheRead = true,
-        SkipDistributedCacheWrite = true,
-        // vypneme backplane, protože nebudeme řešit synchronizace pro více instancí aplikace (zatím)
+        FactorySoftTimeout = TimeSpan.FromMilliseconds(1500),
+        FactoryHardTimeout = TimeSpan.FromMinutes(10),
+        DistributedCacheSoftTimeout = TimeSpan.FromSeconds(2),
+        DistributedCacheHardTimeout = TimeSpan.FromSeconds(20),
+
+        AllowBackgroundDistributedCacheOperations = true,
         AllowBackgroundBackplaneOperations = false,
         SkipBackplaneNotifications = true,
-        JitterMaxDuration = TimeSpan.FromMinutes(1)
     };
-
 
     public enum CacheType
     {
         L1Default,
-        L1FromPermanentStore,
+        PermanentStore,
         L2PostgreSql,
         L2PostgreSqlBinarySerializer,
         L2Memcache,
@@ -152,22 +137,20 @@ public static class CacheFactory
 
     public static IFusionCache CreateNew(CacheType cacheType, string cachePrefix)
     {
-        //build service provider
         _serviceProvider ??= BuildServiceProvider();
-
-        bool isDistributedCache = cacheType == CacheType.L2Memcache || cacheType == CacheType.L2PostgreSql;
-
         var logger = _serviceProvider?.GetService<Microsoft.Extensions.Logging.ILogger<FusionCache>?>();
+
+        IDistributedCache? distributedCache = ResolveL2CacheProvider(cacheType);
 
         var cache = new FusionCache(new FusionCacheOptions()
         {
             CacheName = cachePrefix,
             CacheKeyPrefix = cachePrefix,
-            DistributedCacheCircuitBreakerDuration = isDistributedCache ? TimeSpan.FromSeconds(10) : TimeSpan.Zero,
+            DistributedCacheCircuitBreakerDuration = distributedCache is null ? TimeSpan.FromSeconds(10) : TimeSpan.Zero,
             DefaultEntryOptions = cacheType switch
             {
                 CacheType.L1Default => L1DefaultEntryOptions,
-                CacheType.L1FromPermanentStore => L1FromPermanentStoreEntryOptions,
+                CacheType.PermanentStore => PermanentCacheEntryOptions,
                 CacheType.L2PostgreSql => DistributedCacheEntryOptions,
                 CacheType.L2Memcache => DistributedCacheEntryOptions,
                 CacheType.L2PostgreSqlBinarySerializer => DistributedCacheEntryOptions,
@@ -175,20 +158,15 @@ public static class CacheFactory
             }
         }, logger: logger);
 
-        if (isDistributedCache)
+        if (distributedCache != null)
         {
-            IDistributedCache? distributedCache = ResolveL2CacheProvider(cacheType);
-
-            if (distributedCache != null)
-            {
-                if (cacheType == CacheType.L2PostgreSqlBinarySerializer)
-                    cache.SetupDistributedCache(distributedCache, new FusionCacheNeueccMessagePackSerializer());
-                else
-                    cache.SetupDistributedCache(distributedCache, new FusionCacheSystemTextJsonSerializer());
-            }
+            if (cacheType == CacheType.L2PostgreSqlBinarySerializer)
+                cache.SetupDistributedCache(distributedCache, new FusionCacheNeueccMessagePackSerializer());
+            else
+                cache.SetupDistributedCache(distributedCache, new FusionCacheSystemTextJsonSerializer());
         }
-        return cache;
 
+        return cache;
     }
 
     private static IDistributedCache? ResolveL2CacheProvider(CacheType cacheType)
@@ -197,14 +175,11 @@ public static class CacheFactory
 
         return cacheType switch
         {
-            CacheType.L2PostgreSql => _serviceProvider.GetRequiredService<IEnumerable<IDistributedCache>>()
-                .OfType<PostgreSqlCache>()
-                .First(),
-            CacheType.L2Memcache => _serviceProvider.GetRequiredService<IEnumerable<IDistributedCache>>()
-                .OfType<MemcachedClient>()
-                .First(),
+            CacheType.L2PostgreSqlBinarySerializer or
+                CacheType.L2PostgreSql => _serviceProvider.GetRequiredKeyedService<IDistributedCache>(CacheType.L2PostgreSql),
+            CacheType.PermanentStore => _serviceProvider.GetRequiredKeyedService<IDistributedCache>(CacheType.PermanentStore),
+            CacheType.L2Memcache => _serviceProvider.GetRequiredKeyedService<IDistributedCache>(CacheType.L2Memcache),
             _ => null
-
         };
     }
 
@@ -219,8 +194,8 @@ public static class CacheFactory
         IServiceCollection services = new ServiceCollection();
         services.AddLogging(builder => builder.AddSerilog(logger: Log.Logger, dispose: false));
 
-        //postgre L2
-        services.AddDistributedPostgreSqlCache(options =>
+        //postgre L2 
+        services.AddDistributedPostgreSqlCacheKeyed(options =>
         {
             options.ConnectionString = Devmasters.Config.GetWebConfigValue("PostgreSqlCacheConnectionString");
             options.SchemaName = "public";
@@ -230,7 +205,20 @@ public static class CacheFactory
             options.DisableRemoveExpired = false;
             options.UpdateOnGetCacheItem = false;
             options.ReadOnlyMode = false;
-        });
+        }, CacheType.L2PostgreSql);
+        //postgre L2 for permanent data
+        services.AddDistributedPostgreSqlCacheKeyed(options =>
+        {
+            options.ConnectionString = Devmasters.Config.GetWebConfigValue("PostgreSqlPermanentCacheConnectionString");
+            options.SchemaName = "public";
+            options.TableName = "fusion_cache";
+            options.CreateInfrastructure = true;
+            options.ExpiredItemsDeletionInterval = TimeSpan.FromDays(1);
+            options.DisableRemoveExpired = false;
+            options.UpdateOnGetCacheItem = false;
+            options.ReadOnlyMode = false;
+        }, CacheType.PermanentStore);
+
         //memcached L2
         var nodeIPs = Devmasters.Config.GetWebConfigValue("HazelcastServers").Split(',',
             StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
@@ -252,13 +240,11 @@ public static class CacheFactory
         }, asDistributedCache: true);
 
         // Hack for memcache, otherwise it is not added as a IDistributed cache
-        services.AddSingleton<IDistributedCache>(sp =>
+        services.AddKeyedSingleton<IDistributedCache>(CacheType.L2Memcache, (sp, sk) =>
         {
             var service = sp.GetRequiredService<IMemcachedClient>() as MemcachedClient;
             return (IDistributedCache)service;
         });
-
-
 
         return services.BuildServiceProvider();
     }

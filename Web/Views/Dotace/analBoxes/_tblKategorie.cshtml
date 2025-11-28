@@ -21,7 +21,7 @@
             new()
             {
                 Name = "Kategorie",
-                HtmlRender = (x) => x.Key.ToNiceDisplayName(),
+                HtmlRender =(x) => x.Key.ToNiceDisplayName(),
                 TextRender = (x) => x.Key.ToNiceDisplayName()
 
             },
@@ -29,7 +29,7 @@
             {
                 Name = "Počet dotací",
                 TextRender = (x) => $"{HlidacStatu.Util.RenderData.NiceNumber(x.Value.Pocet)}",
-                HtmlRender = (x) => $"<a href='/dotace/hledat?q={Model.Query}%20AND%20oblast:{x.Key.ToString()}'>{HlidacStatu.Util.RenderData.NiceNumber(x.Value.Pocet,html:true)}</a>",
+                HtmlRender =(x) => $"<a href='/dotace/hledat?q={Model.Query}%20AND%20oblast:{x.Key.ToString()}'>{HlidacStatu.Util.RenderData.NiceNumber(x.Value.Pocet,html:true)}</a>",
                 OrderValueRender = (x) => HlidacStatu.Util.RenderData.OrderValueFormat(x.Value.Pocet),
                 CssClass = "number"
             },
@@ -37,7 +37,7 @@
             {
                 Name = "Výše dotací",
                 TextRender = (x) => $"{HlidacStatu.Util.RenderData.NicePrice(x.Value.CelkemCena)}",
-                HtmlRender = (x) => $"{HlidacStatu.Util.RenderData.NicePrice(x.Value.CelkemCena,html:true)}",
+                HtmlRender =(x) => $"{HlidacStatu.Util.RenderData.NicePrice(x.Value.CelkemCena,html:true)}",
                 OrderValueRender = (x) => HlidacStatu.Util.RenderData.OrderValueFormat(x.Value.CelkemCena),
                 CssClass = "number"
             }

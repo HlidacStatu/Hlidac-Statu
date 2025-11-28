@@ -1,6 +1,7 @@
 ﻿@using System.Linq
 @using Devmasters.Collections
 @using HlidacStatu.Repositories;
+@using HlidacStatu.Repositories.Cache
 
 
 <div class="mega-content px-4">
@@ -30,7 +31,7 @@
                     </div>
                     <ul class="list-group list-group-flush">
 
-                        @foreach (var pol in HlidacStatu.Repositories.StaticData.TopPoliticiObchodSeStatem.Get()[0].Take(20).ShuffleMe().Take(3))
+                        @foreach (var pol in (await OsobaCache.GetTopPoliticiObchodujiciSeStatemAsync())[0].Take(20).ShuffleMe().Take(3))
                         {
                             var o = Osoby.GetByNameId.Get(pol.OsobaNameId);
                             <li class="list-group-item">

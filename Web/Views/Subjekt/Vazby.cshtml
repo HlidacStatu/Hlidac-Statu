@@ -1,4 +1,5 @@
-﻿@using HlidacStatu.Extensions
+﻿@using System.Threading
+@using HlidacStatu.Extensions
 @using HlidacStatu.Repositories
 @using HlidacStatu.DS.Graphs
 @model HlidacStatu.Entities.Firma
@@ -11,26 +12,28 @@
     {
         aktualnost = xen;
     }
-
-
 }
-
 
 @* První sloupec *@
 <div id="subjcontent_toc">
 
     <p>
         <a href="@Url.Action("Vazby", new { id = Model.ICO, aktualnost = Relation.AktualnostType.Aktualni })"
-           class="btn btn-hs btn-@(aktualnost == Relation.AktualnostType.Aktualni ? "success" : "primary") btn-sm" role="button">
+           class="btn btn-hs btn-@(aktualnost == Relation.AktualnostType.Aktualni ? "success" : "primary") btn-sm"
+           role="button">
             @(aktualnost == Relation.AktualnostType.Aktualni ? "Zobrazujeme" : "Ukázat") pouze aktuální vazby
         </a>
         <a href="@Url.Action("Vazby", new { id = Model.ICO, aktualnost = Relation.AktualnostType.Nedavny })"
-           class="btn btn-hs btn-@(aktualnost == Relation.AktualnostType.Nedavny ? "success" : "primary") btn-sm" role="button">
-            @(aktualnost == Relation.AktualnostType.Nedavny ? "Zobrazujeme" : "Ukázat") aktuální a nedávno skončené vazby
+           class="btn btn-hs btn-@(aktualnost == Relation.AktualnostType.Nedavny ? "success" : "primary") btn-sm"
+           role="button">
+            @(aktualnost == Relation.AktualnostType.Nedavny ? "Zobrazujeme" : "Ukázat") aktuální a nedávno skončené
+            vazby
         </a>
         <a href="@Url.Action("Vazby", new { id = Model.ICO, aktualnost = Relation.AktualnostType.Libovolny })"
-           class="btn btn-hs btn-@(aktualnost == Relation.AktualnostType.Libovolny ? "success" : "primary") btn-sm" role="button">
-            @(aktualnost == Relation.AktualnostType.Libovolny ? "Zobrazujeme" : "Ukázat") všechny vazby včetně historických
+           class="btn btn-hs btn-@(aktualnost == Relation.AktualnostType.Libovolny ? "success" : "primary") btn-sm"
+           role="button">
+            @(aktualnost == Relation.AktualnostType.Libovolny ? "Zobrazujeme" : "Ukázat") všechny vazby včetně
+            historických
         </a>
     </p>
 
@@ -38,7 +41,7 @@
     <p style="padding-top:30px;">
         @Html.Raw(
             HlidacStatu.Repositories.Graph.TiskVazeb(
-                Model.Jmeno,Model.VazbyRootEdge(),
+                Model.Jmeno, Model.VazbyRootEdge(),
                 Model.AktualniVazby(aktualnost),
                 Relation.TiskEnum.Html
             )
@@ -49,29 +52,47 @@
     <p style="padding-top:30px;">
     </p>
     @{
-        var data = Model.AktualniVazby(aktualnost)
-                    .Where(v => v.To != null && v.To.Type == HlidacStatu.DS.Graphs.Graph.Node.NodeType.Company)
-                    .GroupBy(f => f.To.Id, v => v, (ico, v) => new
+        var semaphore = new SemaphoreSlim(10);
+
+        var dataTasks = Model.AktualniVazby(aktualnost)
+            .Where(v => v.To != null && v.To.Type == HlidacStatu.DS.Graphs.Graph.Node.NodeType.Company)
+            .GroupBy(f => f.To.Id, v => v, (ico, v) => new { ico, v })
+            .Select(async g =>
+            {
+                await semaphore.WaitAsync();
+                try
+                {
+                    var stat = await Firmy.Get(g.ico).StatistikaRegistruSmluvAsync();
+                    return new
                     {
-                        ICO = ico,
-                        FirmaName = v.First().To.PrintName(),//HlidacStatu.Lib.Data.External.FirmyDB.NameFromIco(ico, true),
-                        VazbyPerIco = Model.VazbyProICO(ico),
-                        stat = Firmy.Get(ico).StatistikaRegistruSmluv()
-                    })
-                    .OrderByDescending(m => m.stat.Summary().CelkovaHodnotaSmluv).ThenBy(m => m.ICO);
+                        ICO = g.ico,
+                        FirmaName = g.v.First().To.PrintName(),
+                        VazbyPerIco = Model.VazbyProICO(g.ico),
+                        stat
+                    };
+                }
+                finally
+                {
+                    semaphore.Release();
+                }
+            })
+            .ToArray();
 
-
+        var data = (await Task.WhenAll(dataTasks))
+            .OrderByDescending(m => m.stat.Summary().CelkovaHodnotaSmluv)
+            .ThenBy(m => m.ICO)
+            .ToList();
     }
     <p style="padding-top:30px;">
         @foreach (var vPerIco in data)
         {
-            <div>
-                <h4>@vPerIco.FirmaName</h4>
-                @Html.RenderVazby(vPerIco.VazbyPerIco)
+        <div>
+            <h4>@vPerIco.FirmaName</h4>
+            @Html.RenderVazby(vPerIco.VazbyPerIco)
 
 
-            </div>
-        }
+        </div>
+    }
     </p>
 </div>
 

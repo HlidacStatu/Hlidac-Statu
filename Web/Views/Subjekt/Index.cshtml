@@ -1,6 +1,4 @@
 ﻿@model Firma
-
-@using Devmasters
 @using Nest;
 @using System.Linq;
 @using Devmasters.Enums;
@@ -12,7 +10,6 @@
 @using HlidacStatu.Repositories
 @using HlidacStatu.XLib
 @using HlidacStatu.XLib.Render;
-@using HlidacStatu.Entities.Analysis;
 @using HlidacStatu.Entities.KIndex
 @using HlidacStatu.Repositories.SharedModels;
 @using Newtonsoft.Json.Linq
@@ -23,8 +20,8 @@
     Devmasters.DT.StopWatchLaps laps = new();
 
     var intv = laps.StopPreviousAndStartNextLap("StatistikaRegistruSmluv");
-    HlidacStatu.Lib.Analytics.StatisticsSubjectPerYear<Smlouva.Statistics.Data> statisticsRegistr = Model.StatistikaRegistruSmluv();
-    var statisticsHoldingRegistr = Model.HoldingStatisticsRegistrSmluv();
+    HlidacStatu.Lib.Analytics.StatisticsSubjectPerYear<Smlouva.Statistics.Data> statisticsRegistr = await Model.StatistikaRegistruSmluvAsync();
+    var statisticsHoldingRegistr = await Model.HoldingStatisticsRegistrSmluvAsync();
     intv.Stop();
 
     intv = laps.StopPreviousAndStartNextLap("CurrentSeasonStatistics");
@@ -39,20 +36,6 @@
 
     bool OnSankcniSeznam = false;
     string?[] sankcniSeznamRes = new string[] { };
-    //TODO old DatLab
-    // HlidacStatu.Datasets.DataSet sankcniSeznam = HlidacStatu.Datasets.DataSet.GetCachedDataset("firmy-na-sankcnim-seznamu");
-    // try
-    // {
-    //     sankcniSeznamRes = (await sankcniSeznam.SearchDataAsync("ico:" + Model.ICO, 1, 1)).Result.ToList()
-    //         .Select(m => (System.Dynamic.ExpandoObject)m)
-    //         .Select(m => m.FirstOrDefault(p => p.Key == "sankcni_seznam").Value as string)
-    //         .Where(m => m != null)
-    //         .ToArray();
-    //     OnSankcniSeznam = sankcniSeznamRes.Count() > 0;
-    // }
-    // catch
-    // {
-    // }
 
     var rejstrikTrestu = await RejstrikTrestuRepo.FindTrestyAsync(Model.ICO);
 }
@@ -1223,7 +1206,7 @@
         {
             var numPercent = "0";
             var sumPercent = "0";
-            var stat = Firmy.Get(Model.ICO).StatistikaRegistruSmluv();
+            var stat = await Firmy.Get(Model.ICO).StatistikaRegistruSmluvAsync();
             if (stat.Summary().PocetSmluv > 0)
             {
                 numPercent = ((double)stat.Summary().PocetSmluvSponzorujiciFirmy / (double)stat.Summary().PocetSmluv).ToString("P2");

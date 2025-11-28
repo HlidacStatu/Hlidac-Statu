@@ -4,6 +4,7 @@
 using System;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Caching.Distributed;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
 namespace HlidacStatu.CachingClients.PostgreSql
@@ -81,6 +82,59 @@ namespace HlidacStatu.CachingClients.PostgreSql
 				sp => new ConfigureOptions<PostgreSqlCacheOptions>(opt => setupAction(sp, opt)));
 			
 			return services;
+		}
+		
+		public static IServiceCollection AddDistributedPostgreSqlCacheKeyed(this IServiceCollection services, Action<PostgreSqlCacheOptions> setupAction, object? key)
+		{
+			if (services == null)
+			{
+				throw new ArgumentNullException(nameof(services));
+			}
+
+			if (setupAction == null)
+			{
+				throw new ArgumentNullException(nameof(setupAction));
+			}
+			
+			string? optionsName = key?.ToString();
+			services.Configure<PostgreSqlCacheOptions>(optionsName, setupAction);
+			
+			
+			services.AddOptions();
+			services.AddKeyedSingleton<IDatabaseOperations, DatabaseOperations>(key, (sp, k) =>
+			{
+				var logger = sp.GetRequiredService<ILogger<DatabaseOperations>>();
+				var options = GetWrappedOptions(sp, k);
+				return new DatabaseOperations(options, logger);
+			});
+			
+			services.AddKeyedSingleton<IDatabaseExpiredItemsRemoverLoop>(key, (sp, k) =>
+			{
+				var dbOps = sp.GetRequiredKeyedService<IDatabaseOperations>(k);
+				var logger = sp.GetRequiredService<ILogger<DatabaseExpiredItemsRemoverLoop>>();
+				var options = GetWrappedOptions(sp, k);
+
+				return new DatabaseExpiredItemsRemoverLoop(options, dbOps, logger);
+			});
+			
+			services.AddKeyedSingleton<IDistributedCache>(key, (sp, k) =>
+			{
+				var dbOps = sp.GetRequiredKeyedService<IDatabaseOperations>(k);
+				var remover = sp.GetRequiredKeyedService<IDatabaseExpiredItemsRemoverLoop>(k);
+				var options = GetWrappedOptions(sp, k);
+
+				return new PostgreSqlCache(options, dbOps, remover);
+			});
+			services.Configure(setupAction);
+
+			return services;
+		}
+
+		private static IOptions<PostgreSqlCacheOptions> GetWrappedOptions(IServiceProvider sp, object? key)
+		{
+			var optionsMonitor = sp.GetRequiredService<IOptionsMonitor<PostgreSqlCacheOptions>>();
+			var specificOptions = optionsMonitor.Get(key?.ToString());
+			return Options.Create(specificOptions);
 		}
 
 		// to enable unit testing

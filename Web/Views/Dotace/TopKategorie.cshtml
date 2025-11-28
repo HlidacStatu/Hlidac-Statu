@@ -73,14 +73,14 @@
         {
             Name = "Příjemce",
             CssClass = "text",
-            HtmlRender = (x) => $"<a href=/subjekt/{x.Ico}>{FirmaRepo.NameFromIco(x.Ico)}</a>",
+            HtmlRender =(x) => $"<a href=/subjekt/{x.Ico}>{FirmaRepo.NameFromIco(x.Ico)}</a>",
             TextRender = (x) => FirmaRepo.NameFromIco(x.Ico) + $" (x.Ico)"
         },
         new()
         {
             Name = "Počet dotací",
             TextRender = (x) => $"{HlidacStatu.Util.RenderData.NicePrice(x.Sum)}",
-            HtmlRender = (x) => $"<a href='/dotace/hledat?Q=Ico:{x.Ico}{searchQuery}'>{HlidacStatu.Util.RenderData.NiceNumber(x.Count)}</a>",
+            HtmlRender =(x) => $"<a href='/dotace/hledat?Q=Ico:{x.Ico}{searchQuery}'>{HlidacStatu.Util.RenderData.NiceNumber(x.Count)}</a>",
             OrderValueRender = (x) => HlidacStatu.Util.RenderData.OrderValueFormat(x.Sum),
             CssClass = "number"
         },
@@ -88,7 +88,7 @@
         {
             Name = "Částka",
             TextRender = (x) => HlidacStatu.Util.RenderData.NicePrice(x.Sum),
-            HtmlRender = (x) => $"{HlidacStatu.Util.RenderData.NicePrice(x.Sum, showDecimal: HlidacStatu.Util.RenderData.ShowDecimalVal.Hide , html:true)}",
+            HtmlRender =(x) => $"{HlidacStatu.Util.RenderData.NicePrice(x.Sum, showDecimal: HlidacStatu.Util.RenderData.ShowDecimalVal.Hide , html:true)}",
             OrderValueRender = (x) => HlidacStatu.Util.RenderData.OrderValueFormat(x.Sum),
             CssClass = "number"
         }

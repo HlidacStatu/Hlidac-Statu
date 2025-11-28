@@ -1,7 +1,6 @@
 using Devmasters;
 using Devmasters.Enums;
 using Devmasters.Lang.CS;
-using HlidacStatu.DS.Graphs;
 using HlidacStatu.Entities;
 using HlidacStatu.Entities.Facts;
 using HlidacStatu.Lib.Analytics;
@@ -13,6 +12,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
+using HlidacStatu.DS.Api.Osoba;
+using HlidacStatu.Repositories.Cache;
 
 namespace HlidacStatu.Extensions
 {
@@ -68,7 +69,7 @@ namespace HlidacStatu.Extensions
             return res;
         }
 
-        public static HlidacStatu.DS.Api.Osoba.Detail ToApiOsobaDetail(this Osoba osoba, DateTime? historyLimit = null)
+        public static async Task<Detail> ToApiOsobaDetailAsync(this Osoba osoba, DateTime? historyLimit = null)
         {
             historyLimit ??= DateTime.Now.AddYears(-100);
             if (osoba == null)
@@ -99,7 +100,7 @@ namespace HlidacStatu.Extensions
                         Name = m.FirmaName
                     }).ToArray(),
 
-                Business_Contracts_With_Government = osoba.StatistikaRegistrSmluv()
+                Business_Contracts_With_Government = (await osoba.StatistikaRegistrSmluvAsync())
                 .SmlouvyStat_SoukromeFirmySummary()
                     .Select(m => new HlidacStatu.DS.Api.Osoba.Detail.Stats
                     {
@@ -280,20 +281,10 @@ namespace HlidacStatu.Extensions
 
 
         //tohle do repositories
-        public static void RemoveStatistikaRegistrSmluv(this Osoba osoba,
-            int? obor = null)
-        {
-
-        }
-        //tohle do repositories
-        public static Osoba.Statistics.RegistrSmluv StatistikaRegistrSmluv(this Osoba osoba,
+        public static async Task<Osoba.Statistics.RegistrSmluv> StatistikaRegistrSmluvAsync(this Osoba osoba,
             int? obor = null, bool forceUpdateCache = false)
         {
-            //temporary fix for null values
-            //STAT FIX
-            //return new();
-
-            var ret = OsobaStatistics.CachedStatistics_Smlouvy(osoba, obor, forceUpdateCache);
+            var ret = await OsobaStatistics.CachedStatistics_SmlouvyAsync(osoba, obor, forceUpdateCache);
             if (ret == null)
                 return null;
             foreach (var k in ret.SoukromeFirmy.Keys)
@@ -313,32 +304,14 @@ namespace HlidacStatu.Extensions
 
             return ret;
         }
-        static Devmasters.Cache.Redis.Manager<InfoFact[], Osoba> _cacheInfoFacts =
-            Devmasters.Cache.Redis.Manager<InfoFact[], Osoba>
-                .GetSafeInstance("Osoba_InfoFacts_v2_",
-                    (obj) => InfoFactsAsync(obj).GetAwaiter().GetResult(),
-                    TimeSpan.FromHours(12),
-                    Devmasters.Config.GetWebConfigValue("RedisServerUrls").Split(';'),
-                    Devmasters.Config.GetWebConfigValue("RedisBucketName"),
-                    Devmasters.Config.GetWebConfigValue("RedisUsername"),
-                    Devmasters.Config.GetWebConfigValue("RedisCachePassword"),
-                    keyValueSelector: obj => $"_infofacts_{obj.NameId}");
-
-        public static void InfoFactsCacheInvalidate(this Osoba osoba)
+        
+        
+        public static async Task<InfoFact[]> InfoFactsCachedAsync(this Osoba osoba, bool forceUpdateCache = false)
         {
-            _cacheInfoFacts.Delete(osoba);
-
-        }
-        public static InfoFact[] InfoFactsCached(this Osoba osoba, bool forceUpdateCache = false)
-        {
-            //STAT FIX
-            //return Array.Empty<InfoFact>();
-
             if (forceUpdateCache)
-                osoba.InfoFactsCacheInvalidate();
-
-            var _infof = _cacheInfoFacts.Get(osoba);
-            return _infof;
+                await OsobaCache.InvalidateInfoFactsAsync(osoba);
+            
+            return await OsobaCache.GetInfoFactsAsync(osoba);
         }
 
         public static async Task<InfoFact[]> InfoFactsAsync(this Osoba osoba,
@@ -356,9 +329,9 @@ namespace HlidacStatu.Extensions
             };
 
             List<InfoFact> f = new List<InfoFact>();
-            var stat = osoba.StatistikaRegistrSmluv();
+            var stat = await osoba.StatistikaRegistrSmluvAsync();
             StatisticsPerYear<Smlouva.Statistics.Data> soukrStat = stat.SoukromeFirmy.Values
-                .AggregateStats(); //StatisticsSubjectPerYear<Smlouva.Statistics.Data>.
+                .AggregateStats();
 
             int rok = DateTime.Now.Year;
             if (DateTime.Now.Month <= 2)
@@ -572,10 +545,10 @@ namespace HlidacStatu.Extensions
             return osoba.NarozeniYear(true) + ", " + osoba.StatusOsoby().ToNiceDisplayName();
         }
 
-        public static string SocialInfoBody(this Osoba osoba)
+        public static async Task<string> SocialInfoBodyAsync(this Osoba osoba)
         {
             return "<ul>"
-                   + osoba.InfoFactsCached().RenderFacts(
+                   + (await osoba.InfoFactsCachedAsync()).RenderFacts(
                        4, true, true, "", "<li>{0}</li>", true)
                    + "</ul>";
         }

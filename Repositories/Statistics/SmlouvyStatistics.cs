@@ -12,22 +12,6 @@ namespace HlidacStatu.Repositories.Statistics
     {
         private static readonly ILogger _logger = Log.ForContext(typeof(SmlouvyStatistics));
 
-        static Devmasters.Cache.Memcached.Manager<StatisticsPerYear<Smlouva.Statistics.Data>, string> _cache
-            = Devmasters.Cache.Memcached.Manager<StatisticsPerYear<Smlouva.Statistics.Data>, string>
-                .GetSafeInstance("SmlouvyStatistics_Query_v3_",
-                    (query) => CalculateAsync(query).ConfigureAwait(false).GetAwaiter().GetResult(),
-                    TimeSpan.FromHours(12),
-                    Devmasters.Config.GetWebConfigValue("HazelcastServers").Split(',')
-                    );
-
-        static object _cachesLock = new object();
-
-
-        public static StatisticsPerYear<Smlouva.Statistics.Data> CachedStatisticsForQuery(string query)
-        {
-            return _cache.Get(query);
-        }
-
 
         public static async Task<StatisticsPerYear<Smlouva.Statistics.Data>> CalculateAsync(string query)
         {

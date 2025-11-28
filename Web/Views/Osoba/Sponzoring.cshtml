@@ -31,27 +31,27 @@
                 {
                     Name = "Rok",
                     CssClass = "number",
-                    HtmlRender = (x) => x.Rok.ToString(),
+                    HtmlRender =(x) => x.Rok.ToString(),
                     TextRender = (x) => x.Rok.ToString()
                 },
                 new ReportDataSource<(int Rok, string Ico, decimal Dar, string Poznamka)>.Column()
                 {
                     Name = "Politická strana",
-                    HtmlRender = (x) =>
+                    HtmlRender =(x) =>
                     $"<a href=\"/subjekt/{x.Ico}\">{Firmy.GetJmeno(x.Ico)}</a>"
                 },
                 new ReportDataSource<(int Rok, string Ico, decimal Dar, string Poznamka)>.Column()
                 {
                     Name = "Celkem darovali",
                     TextRender = (x) => $"{x.Dar.ToString("N0")} Kč",
-                    HtmlRender = (x) => $"{x.Dar.ToString("N0")}&nbsp;Kč",
+                    HtmlRender =(x) => $"{x.Dar.ToString("N0")}&nbsp;Kč",
                     OrderValueRender = (x) => HlidacStatu.Util.RenderData.OrderValueFormat(x.Dar),
                     CssClass = "number"
                 },
                 new ReportDataSource<(int Rok, string Ico, decimal Dar, string Poznamka)>.Column()
                 {
                     Name = "Poznámka",
-                    HtmlRender = (x) => x.Poznamka,
+                    HtmlRender =(x) => x.Poznamka,
                     TextRender = (x) => x.Poznamka
                 }
             });
@@ -83,7 +83,7 @@
                 new ReportDataSource<(int Rok, string Ico, string Darceico, decimal Dar, string Poznamka)>.Column()
                 {
                     Name = "Sponzorující firma",
-                    HtmlRender = (x) => {
+                    HtmlRender =(x) => {
                         return $"<a href='/subjekt/{x.Darceico}'>{Firmy.GetJmeno(x.Darceico)}</a>"
                         + $"<br/>{Html.RenderVazby(Model.VazbyProICO(x.Darceico))}";
                     },
@@ -94,28 +94,28 @@
                 {
                     Name = "Rok",
                     CssClass = "number",
-                    HtmlRender = (x) => x.Rok.ToString(),
+                    HtmlRender =(x) => x.Rok.ToString(),
                     TextRender = (x) => x.Rok.ToString()
 
                 },
                 new ReportDataSource<(int Rok, string Ico, string Darceico, decimal Dar, string Poznamka)>.Column()
                 {
                     Name = "Politická strana",
-                    HtmlRender = (x) =>
+                    HtmlRender =(x) =>
                     $"<a href=\"/subjekt/{x.Ico}\">{Firmy.GetJmeno(x.Ico)}</a>"
                 },
                 new ReportDataSource<(int Rok, string Ico, string Darceico, decimal Dar, string Poznamka)>.Column()
                 {
                     Name = "Celkem darovali",
                     TextRender = (x) => $"{x.Dar.ToString("N0")} Kč",
-                    HtmlRender = (x) => $"{x.Dar.ToString("N0")}&nbsp;Kč",
+                    HtmlRender =(x) => $"{x.Dar.ToString("N0")}&nbsp;Kč",
                     OrderValueRender = (x) => HlidacStatu.Util.RenderData.OrderValueFormat(x.Dar),
                     CssClass = "number"
                 },
                 new ReportDataSource<(int Rok, string Ico, string Darceico, decimal Dar, string Poznamka)>.Column()
                 {
                     Name = "Poznámka",
-                    HtmlRender = (x) => x.Poznamka,
+                    HtmlRender =(x) => x.Poznamka,
                     TextRender = (x) => x.Poznamka
                 }
             });

@@ -1,4 +1,7 @@
-﻿using HlidacStatu.Entities;
+﻿using System.Threading.Tasks;
+using HlidacStatu.Entities;
+using HlidacStatu.Lib.Analytics;
+using HlidacStatu.Repositories.Cache;
 
 namespace HlidacStatu.Repositories.Analysis
 {
@@ -29,16 +32,9 @@ namespace HlidacStatu.Repositories.Analysis
         public string Description { get; set; }
         public string NameOfView { get; set; }
         public int? Year { get; set; }
-        public Lib.Analytics.StatisticsPerYear<Smlouva.Statistics.Data> Data
-        {
-            get
-            {
-                if (Year.HasValue)
-                    return Repositories.Statistics.SmlouvyStatistics.CachedStatisticsForQuery(Query);
-                else
-                    return Repositories.Statistics.SmlouvyStatistics.CachedStatisticsForQuery(Query);
-            }
-        }
+
+        public ValueTask<StatisticsPerYear<Smlouva.Statistics.Data>> CachedStatisticsAsync() =>
+            StatisticsCache.GetSmlouvyStatisticsForQueryAsync(Query);
 
     }
 

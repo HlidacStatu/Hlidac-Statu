@@ -195,7 +195,7 @@
                     new ReportDataSource<KeyValuePair<string, SimpleStat>>.Column()
                     {
                         Name = "Dodavatel",
-                        HtmlRender = (m) =>
+                        HtmlRender =(m) =>
                         {
                             var f = Firmy.Get(m.Key);
                             return $"<a href='{f.GetUrl()}'>{f.Jmeno}</a>";
@@ -204,14 +204,14 @@
                     new ReportDataSource<KeyValuePair<string, SimpleStat>>.Column()
                     {
                         Name = "Počet smluv",
-                        HtmlRender = (m) => { return $"<a style='float:left' href='/hledatSmlouvy?q={System.Net.WebUtility.UrlEncode(Model.Query + " AND ico:" + m.Key)}'><i class='fas fa-link' aria-hidden='true'></i></a> {HlidacStatu.Util.RenderData.NiceNumber(m.Value.Pocet)}"; },
+                        HtmlRender =(m) => { return $"<a style='float:left' href='/hledatSmlouvy?q={System.Net.WebUtility.UrlEncode(Model.Query + " AND ico:" + m.Key)}'><i class='fas fa-link' aria-hidden='true'></i></a> {HlidacStatu.Util.RenderData.NiceNumber(m.Value.Pocet)}"; },
                         OrderValueRender = (m) => HlidacStatu.Util.RenderData.OrderValueFormat(m.Value.Pocet),
                         CssClass = "number"
                     },
                     new ReportDataSource<KeyValuePair<string, SimpleStat>>.Column()
                     {
                         Name = "Hodnota smluv",
-                        HtmlRender = (m) => { return HlidacStatu.Util.RenderData.NicePrice(m.Value.CelkemCena); },
+                        HtmlRender =(m) => { return HlidacStatu.Util.RenderData.NicePrice(m.Value.CelkemCena); },
                         OrderValueRender = (m) => HlidacStatu.Util.RenderData.OrderValueFormat(m.Value.CelkemCena),
                         CssClass = "number"
                     }
@@ -295,7 +295,7 @@
                 new ReportDataSource<KeyValuePair<string, SimpleStat>>.Column()
                 {
                     Name = "Zadavatel",
-                    HtmlRender = (m) =>
+                    HtmlRender =(m) =>
                     {
                         var f = Firmy.Get(m.Key);
                         return $"<a href='{f.GetUrl()}'>{f.Jmeno}</a>";
@@ -304,14 +304,14 @@
                 new ReportDataSource<KeyValuePair<string, SimpleStat>>.Column()
                 {
                     Name = "Počet smluv",
-                    HtmlRender = (m) => { return $"<a style='float:left' href='/hledatSmlouvy?q={System.Net.WebUtility.UrlEncode(Model.Query + " AND ico:" + m.Key)}'><i class='fas fa-link' aria-hidden='true'></i></a> {HlidacStatu.Util.RenderData.NiceNumber(m.Value.Pocet)}"; },
+                    HtmlRender =(m) => { return $"<a style='float:left' href='/hledatSmlouvy?q={System.Net.WebUtility.UrlEncode(Model.Query + " AND ico:" + m.Key)}'><i class='fas fa-link' aria-hidden='true'></i></a> {HlidacStatu.Util.RenderData.NiceNumber(m.Value.Pocet)}"; },
                     OrderValueRender = (m) => HlidacStatu.Util.RenderData.OrderValueFormat(m.Value.Pocet),
                     CssClass = "number"
                 },
                 new ReportDataSource<KeyValuePair<string, SimpleStat>>.Column()
                 {
                     Name = "Hodnota smluv",
-                    HtmlRender = (m) => { return HlidacStatu.Util.RenderData.NicePrice(m.Value.CelkemCena); },
+                    HtmlRender =(m) => { return HlidacStatu.Util.RenderData.NicePrice(m.Value.CelkemCena); },
                     OrderValueRender = (m) => HlidacStatu.Util.RenderData.OrderValueFormat(m.Value.CelkemCena),
                     CssClass = "number"
                 }

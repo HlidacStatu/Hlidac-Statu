@@ -1,4 +1,5 @@
-﻿@using HlidacStatu.Extensions
+﻿@using System.Threading
+@using HlidacStatu.Extensions
 @using HlidacStatu.Repositories
 @using HlidacStatu.DS.Graphs
 @using HlidacStatu.Repositories.Statistics
@@ -14,7 +15,7 @@
         aktualnost = xen;
     }
 
-    var statistics = Model.StatistikaRegistrSmluv();
+    var statistics = await Model.StatistikaRegistrSmluvAsync();
     var vazbyPodleAktualnosti = Model.AktualniVazby(aktualnost);
 
 }
@@ -174,18 +175,37 @@
     </p>
     <h2>Podrobný výpis vazeb</h2>
     @{
-        var data = vazbyPodleAktualnosti
-        .Where(v => v.To != null && v.To.Type == HlidacStatu.DS.Graphs.Graph.Node.NodeType.Company)
-        .GroupBy(f => f.To.Id, v => v, (ico, v) => new
-        {
-            ICO = ico,
-            FirmaName = v.First().To.PrintName(),//HlidacStatu.Lib.Data.External.FirmyDB.NameFromIco(ico, true),
-            VazbyPerIco = Model.VazbyProICO(ico),
-            stat = Firmy.Get(ico).StatistikaRegistruSmluv()
-        })
-        .OrderByDescending(m => m.stat.Summary().CelkovaHodnotaSmluv).ThenBy(m => m.ICO).ToList();
+        var semaphore = new SemaphoreSlim(10);
 
+        var dataTasks = vazbyPodleAktualnosti
+            .Where(v => v.To != null && v.To.Type == HlidacStatu.DS.Graphs.Graph.Node.NodeType.Company)
+            .GroupBy(f => f.To.Id, v => v, (ico, v) => new { ico, v })
+            .Select(async g =>
+            {
+                await semaphore.WaitAsync();
+                try
+                {
+                    var stat = await Firmy.Get(g.ico).StatistikaRegistruSmluvAsync();
+                    return new
+                    {
+                        ICO = g.ico,
+                        FirmaName = g.v.First().To.PrintName(),
+                        VazbyPerIco = Model.VazbyProICO(g.ico),
+                        stat
+                    };
+                }
+                finally
+                {
+                    semaphore.Release();
+                }
+            })
+            .ToArray();
 
+        var data = (await Task.WhenAll(dataTasks))
+            .OrderByDescending(m => m.stat.Summary().CelkovaHodnotaSmluv)
+            .ThenBy(m => m.ICO)
+            .ToList();
+        
     }
     <p style="padding-top:30px;">
         @foreach (var vPerIco in data)

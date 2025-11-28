@@ -20,14 +20,14 @@
             {
                 Name = "Rok",
                 CssClass = "number",
-                HtmlRender = (x) => x.Year.ToString(),
+                HtmlRender =(x) => x.Year.ToString(),
                 TextRender = (x) => x.Year.ToString()
             },
             new ReportDataSource<(int Year,  long Count,decimal Sum)>.Column()
             {
                 Name = "Počet dotací",
                 TextRender = (x) => HlidacStatu.Util.RenderData.NiceNumber(x.Count),
-                HtmlRender = (x) => "<a href='/dotace/hledat?q="
+                HtmlRender =(x) => "<a href='/dotace/hledat?q="
                     + System.Net.WebUtility.UrlEncode(
                         HlidacStatu.Searching.Query.ModifyQueryAND(Model.Query, $"rok:{x.Year}")
                     )
@@ -39,7 +39,7 @@
             {
                 Name = "Celková částka",
                 TextRender = (x) => HlidacStatu.Util.RenderData.NicePrice(x.Sum),
-                HtmlRender = (x) => HlidacStatu.Util.RenderData.NicePrice(x.Sum, html:true),
+                HtmlRender =(x) => HlidacStatu.Util.RenderData.NicePrice(x.Sum, html:true),
                 OrderValueRender = (x) => HlidacStatu.Util.RenderData.OrderValueFormat(x.Sum),
                 CssClass = "number"
             }

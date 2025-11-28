@@ -37,23 +37,30 @@
 
     var parts = new ReportModel();
 
-    IEnumerable<HlidacStatu.Lib.Analytics.StatisticsSubjectPerYear<Smlouva.Statistics.Data>> stats =
-        Model
-            .Select(ico => Firmy.Get(ico).StatistikaRegistruSmluv())
-            .Where(m => m != null)
-            .ToArray();
-
-    //prepare async kindexes - 
+    List<HlidacStatu.Lib.Analytics.StatisticsSubjectPerYear<Smlouva.Statistics.Data>> stats = new();
     var kindexMap = new Dictionary<string, IHtmlContent>();
-    foreach (var s in stats)
+
+    foreach (var firma in Model.Select(ico => Firmy.Get(ico)))
     {
-        kindexMap[s.ICO] = await Html.KIndexLabelLinkAsync(s.ICO);
+        if (firma.Valid)
+        {
+            var srsTask = firma.StatistikaRegistruSmluvAsync();
+            var kindexTask = Html.KIndexLabelLinkAsync(firma.ICO);
+            
+            var srs = await srsTask;
+            var kindex = await kindexTask;
+            if (srs is not null)
+            {
+                stats.Add(srs);
+                kindexMap[srs.ICO] = kindex;
+            }
+        }
     }
 
     ReportDataSource<StatisticsSubjectPerYear<Smlouva.Statistics.Data>>.Column nameCol = new tblDataSource.Column()
     {
         Name = "Subjekt",
-        HtmlRender = (s) =>
+        HtmlRender =(s) =>
         {
             kindexMap.TryGetValue(s.ICO, out var kind);
             return string.Format(kind?.RenderRawHtml() + @"<a title='{1}' href='/subjekt/{0}'>{2}</a>", s.ICO, Firmy.GetJmeno(s.ICO), Devmasters.TextUtil.ShortenText(Firmy.GetJmeno(s.ICO), 50));
@@ -299,7 +306,7 @@ else
             return new Column()
             {
                 Name = $"Počet všech smluv {sYear}",
-                HtmlRender = (s) => { return s[iYear].PocetSmluv.ToString(); },
+                HtmlRender =(s) => { return s[iYear].PocetSmluv.ToString(); },
                 TextRender = (s) => { return s[iYear].PocetSmluv.ToString(); },
                 ValueRender = (s) => { return s[iYear].PocetSmluv.ToString(); },
                 OrderValueRender = (s) => { return HlidacStatu.Util.RenderData.OrderValueFormat(s[iYear].PocetSmluv); }
@@ -313,7 +320,7 @@ else
             return new Column()
             {
                 Name = $"Hodnota smluv {sYear}",
-                HtmlRender = (s) => { return HlidacStatu.Util.RenderData.ShortNicePrice(s[iYear].CelkovaHodnotaSmluv, html: true); },
+                HtmlRender =(s) => { return HlidacStatu.Util.RenderData.ShortNicePrice(s[iYear].CelkovaHodnotaSmluv, html: true); },
                 TextRender = (s) => { return s[iYear].CelkovaHodnotaSmluv.ToString(); },
                 ValueRender = (s) => { return s[iYear].CelkovaHodnotaSmluv.ToString(); },
                 OrderValueRender = (s) => { return HlidacStatu.Util.RenderData.OrderValueFormat(s[iYear].CelkovaHodnotaSmluv); }
@@ -329,7 +336,7 @@ else
             return new Column()
             {
                 Name = $"Počet smluv bez uvedené ceny {sYear}",
-                HtmlRender = (s) => { return s[iYear].PocetSmluvBezCeny.ToString(); },
+                HtmlRender =(s) => { return s[iYear].PocetSmluvBezCeny.ToString(); },
                 TextRender = (s) => { return s[iYear].PocetSmluvBezCeny.ToString(); },
                 ValueRender = (s) => { return s[iYear].PocetSmluvBezCeny.ToString(); },
                 OrderValueRender = (s) => { return HlidacStatu.Util.RenderData.OrderValueFormat(s[iYear].PocetSmluvBezCeny); }
@@ -344,7 +351,7 @@ else
             return new Column()
             {
                 Name = $"% smluv bez cen {sYear}",
-                HtmlRender = (s) => { return s[iYear].PercentSmluvBezCeny.ToString("P1"); },
+                HtmlRender =(s) => { return s[iYear].PercentSmluvBezCeny.ToString("P1"); },
                 TextRender = (s) => { return (s[iYear].PercentSmluvBezCeny * 100).ToString("G", HlidacStatu.Util.Consts.enCulture); },
                 ValueRender = (s) => { return (s[iYear].PercentSmluvBezCeny * 100).ToString("G", HlidacStatu.Util.Consts.enCulture); },
                 OrderValueRender = (s) => { return HlidacStatu.Util.RenderData.OrderValueFormat(s[iYear].PercentSmluvBezCeny); }
@@ -359,7 +366,7 @@ else
             return new Column()
             {
                 Name = $"Počet smluv bez smluvní strany {sYear}",
-                HtmlRender = (s) =>
+                HtmlRender =(s) =>
                 {
                     return
                         "<a href='/Hledat?Q=(issues.issueTypeId:18+OR+issues.issueTypeId:12)+ico:" + s.ICO + "'>"
@@ -381,7 +388,7 @@ else
             return new Column()
             {
                 Name = $"% smluv bez smluvní strany {sYear}",
-                HtmlRender = (s) => { return s[iYear].PercentSmluvBezSmluvniStrany.ToString("P1"); },
+                HtmlRender =(s) => { return s[iYear].PercentSmluvBezSmluvniStrany.ToString("P1"); },
                 OrderValueRender = (s) => { return (s[iYear].PercentSmluvBezSmluvniStrany * 100000).ToString("G", HlidacStatu.Util.Consts.enCulture); },
                 TextRender = (s) => { return (s[iYear].PercentSmluvBezSmluvniStrany * 100).ToString("G", HlidacStatu.Util.Consts.enCulture); },
                 ValueRender = (s) => { return (s[iYear].PercentSmluvBezSmluvniStrany * 100).ToString("G", HlidacStatu.Util.Consts.enCulture); },
@@ -396,7 +403,7 @@ else
             return new Column()
             {
                 Name = $"% smluv bez smluvní strany {sYear}",
-                HtmlRender = (s) => { return s[iYear].SumKcSmluvBezSmluvniStrany.ToString("P1"); },
+                HtmlRender =(s) => { return s[iYear].SumKcSmluvBezSmluvniStrany.ToString("P1"); },
                 OrderValueRender = (s) => { return (s[iYear].SumKcSmluvBezSmluvniStrany * 100000).ToString("G", HlidacStatu.Util.Consts.enCulture); },
                 TextRender = (s) => { return (s[iYear].SumKcSmluvBezSmluvniStrany * 100).ToString("G", HlidacStatu.Util.Consts.enCulture); },
                 ValueRender = (s) => { return (s[iYear].SumKcSmluvBezSmluvniStrany * 100).ToString("G", HlidacStatu.Util.Consts.enCulture); },
@@ -411,7 +418,7 @@ else
             return new Column()
             {
                 Name = $"Počet smluv s firmami s vazbou na politiky {sYear}",
-                HtmlRender = (s) => { return "<a href='/subjekt/" + s.ICO + "#vazbyNaPolitik'>" + s[iYear].PocetSmluvSponzorujiciFirmy.ToString() + "</a>"; },
+                HtmlRender =(s) => { return "<a href='/subjekt/" + s.ICO + "#vazbyNaPolitik'>" + s[iYear].PocetSmluvSponzorujiciFirmy.ToString() + "</a>"; },
                 TextRender = (s) => { return (s[iYear].PocetSmluvSponzorujiciFirmy).ToString("G", HlidacStatu.Util.Consts.enCulture); },
                 ValueRender = (s) => { return (s[iYear].PocetSmluvSponzorujiciFirmy).ToString("G", HlidacStatu.Util.Consts.enCulture); },
                 OrderValueRender = (s) => { return s[iYear].PocetSmluvSponzorujiciFirmy.ToString(); }
@@ -426,7 +433,7 @@ else
             return new Column()
             {
                 Name = $"% smluv s firmami s vazbou na politiky {sYear}",
-                HtmlRender = (s) => { return s[iYear].PercentSmluvPolitiky.ToString("P1"); },
+                HtmlRender =(s) => { return s[iYear].PercentSmluvPolitiky.ToString("P1"); },
                 TextRender = (s) => { return (s[iYear].PercentSmluvPolitiky * 100).ToString("G", HlidacStatu.Util.Consts.enCulture); },
                 ValueRender = (s) => { return (s[iYear].PercentSmluvPolitiky * 100).ToString("G", HlidacStatu.Util.Consts.enCulture); },
                 OrderValueRender = (s) => { return (s[iYear].PercentSmluvPolitiky * 100000).ToString("G", HlidacStatu.Util.Consts.enCulture); }
@@ -442,7 +449,7 @@ else
             return new Column()
             {
                 Name = $"Hodnota smluv s firmami s vazbou na politiky {sYear}",
-                HtmlRender = (s) => { return HlidacStatu.Util.RenderData.ShortNicePrice(s[iYear].SumKcSmluvSponzorujiciFirmy, html: true); },
+                HtmlRender =(s) => { return HlidacStatu.Util.RenderData.ShortNicePrice(s[iYear].SumKcSmluvSponzorujiciFirmy, html: true); },
                 TextRender = (s) => { return (s[iYear].SumKcSmluvSponzorujiciFirmy).ToString("G", HlidacStatu.Util.Consts.enCulture); },
                 ValueRender = (s) => { return (s[iYear].SumKcSmluvSponzorujiciFirmy).ToString("G", HlidacStatu.Util.Consts.enCulture); },
                 OrderValueRender = (s) => { return s[iYear].SumKcSmluvSponzorujiciFirmy.ToString("G", HlidacStatu.Util.Consts.enCulture); }
