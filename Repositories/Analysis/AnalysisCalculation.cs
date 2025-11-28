@@ -639,12 +639,7 @@ namespace HlidacStatu.Repositories.Analysis
                 );
                 return getData.ToArray();
             });
-
-        public static async Task ForceRefreshAllStatisticsDataAsync()
-        {
-            await PermanentCache.ClearAsync(allowFailSafe: true);
-            
-        }
+        
 
         public static ValueTask<CalculatedChangeBetweenYears<string>[]>
             GetNarustySmluvOdNulyTop100_AbsolutPrice_2020_24Async(int? obor) =>
