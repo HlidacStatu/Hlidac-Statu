@@ -77,12 +77,12 @@ namespace HlidacStatu.Repositories
                     case RecalculateItem.StatisticsTypeEnum.Smlouva:
                         if (invalidateOnly)
                         {
-                            OsobaStatistics.RemoveCachedStatistics_Smlouvy(o, null);
+                            await StatisticsCache.InvalidateOsobaSmlouvyStatisticsAsync(o, null);
                             await OsobaCache.InvalidateInfoFactsAsync(o);
                         }
                         else
                         {
-                            _ = o.StatistikaRegistrSmluv(forceUpdateCache: noRebuild ? false : true);
+                            _ = o.StatistikaRegistrSmluvAsync(forceUpdateCache: noRebuild ? false : true);
                             _ = await o.InfoFactsCachedAsync(forceUpdateCache: noRebuild ? false : true);
                         }
 

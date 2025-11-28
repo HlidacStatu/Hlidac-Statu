@@ -38,13 +38,21 @@ public class StatisticsCache
 
     //Firma Smlouvy
     public static ValueTask<StatisticsSubjectPerYear<Smlouva.Statistics.Data>> GetFirmaSmlouvyStatisticsAsync(
-        Firma firma,
-        int? obor) =>
+        Firma firma, int? obor) =>
         PermanentCache.GetOrSetAsync($"_Firma_SmlouvyStatistics_:{firma.ICO}-{obor?.ToString() ?? "null"}",
             _ => CalculateFirmaSmlouvyStatisticsAsync(firma, obor));
 
     public static ValueTask InvalidateFirmaSmlouvyStatisticsAsync(Firma firma, int? obor) =>
         PermanentCache.ExpireAsync($"_Firma_SmlouvyStatistics_:{firma.ICO}-{obor?.ToString() ?? "null"}");
+
+
+    //Osoby cache
+    public static ValueTask<Osoba.Statistics.RegistrSmluv> GetOsobaSmlouvyStatisticsAsync(Osoba osoba, int? obor) =>
+        PermanentCache.GetOrSetAsync($"_Osoba_SmlouvyStatistics_:{osoba.NameId}-{obor?.ToString() ?? "null"}",
+            _ => CalculateSmlouvyStatAsync(osoba, obor));
+
+    public static ValueTask InvalidateOsobaSmlouvyStatisticsAsync(Osoba osoba, int? obor) =>
+        PermanentCache.ExpireAsync($"_Osoba_SmlouvyStatistics_:{osoba.NameId}-{obor?.ToString() ?? "null"}");
 
 
     //Factories
@@ -77,7 +85,7 @@ public class StatisticsCache
                 {
                     return new StatisticsSubjectPerYear<Smlouva.Statistics.Data>(f.Key,
                         (await Firmy.Get(f.Key).StatistikaRegistruSmluvAsync(obor))
-                            .Filter(m => m.Key >= f.Value.From?.Year && m.Key <= f.Value.To?.Year)
+                        .Filter(m => m.Key >= f.Value.From?.Year && m.Key <= f.Value.To?.Year)
                     );
                 }
                 finally
@@ -117,6 +125,75 @@ public class StatisticsCache
             );
 
         res ??= new StatisticsSubjectPerYear<Smlouva.Statistics.Data>();
+        return res;
+    }
+
+    private static async Task<Osoba.Statistics.RegistrSmluv> CalculateSmlouvyStatAsync(Osoba o, int? obor)
+    {
+        Osoba.Statistics.RegistrSmluv res = new Osoba.Statistics.RegistrSmluv();
+        res.OsobaNameId = o.NameId;
+        res.Obor = (Smlouva.SClassification.ClassificationsTypes?)obor;
+
+        Dictionary<string, StatisticsSubjectPerYear<Smlouva.Statistics.Data>> statni =
+            new Dictionary<string, StatisticsSubjectPerYear<Smlouva.Statistics.Data>>();
+        Dictionary<string, StatisticsSubjectPerYear<Smlouva.Statistics.Data>> soukr =
+            new Dictionary<string, StatisticsSubjectPerYear<Smlouva.Statistics.Data>>();
+        Dictionary<string, StatisticsSubjectPerYear<Smlouva.Statistics.Data>> nezisk =
+            new Dictionary<string, StatisticsSubjectPerYear<Smlouva.Statistics.Data>>();
+
+        var skutecneVazby = Relation.SkutecnaDobaVazby(o.AktualniVazby(Relation.AktualnostType.Libovolny));
+        var firmy_maxrok = new Dictionary<string, DateInterval>();
+        foreach (var v in skutecneVazby.Where(v => !string.IsNullOrEmpty(v.To?.UniqId)
+                                                   && v.To.Type == HlidacStatu.DS.Graphs.Graph.Node.NodeType
+                                                       .Company))
+        {
+            firmy_maxrok.TryAdd(v.To.Id,
+                new DateInterval(v.RelFrom ?? DateTime.MinValue, v.RelTo ?? DateTime.MaxValue));
+        }
+
+        var maxConcurrentTasks = 10;
+        var semaphore = new SemaphoreSlim(maxConcurrentTasks);
+
+        var perIcoStatTasks = firmy_maxrok
+            .Select(m => new { firma = Firmy.Get(m.Key), interval = m.Value })
+            .Where(m => m.firma.Valid == true)
+            .Select(async m =>
+            {
+                await semaphore.WaitAsync();
+                try
+                {
+                    var stats = await m.firma.StatistikaRegistruSmluvAsync();
+                    return new
+                    {
+                        f = m.firma,
+                        ss = new StatisticsSubjectPerYear<Smlouva.Statistics.Data>(
+                            m.firma.ICO,
+                            stats.Filter(fi => fi.Key >= m.interval.From?.Year && fi.Key <= m.interval.To?.Year)
+                        )
+                    };
+                }
+                finally
+                {
+                    semaphore.Release();
+                }
+            })
+            .ToArray();
+
+        var perIcoStat = await Task.WhenAll(perIcoStatTasks);
+
+        foreach (var it in perIcoStat)
+        {
+            if (it.f.PatrimStatu() && statni.ContainsKey(it.f.ICO) == false)
+                statni.Add(it.f.ICO, it.ss);
+            else if (it.f.JsemNeziskovka() && nezisk.ContainsKey(it.f.ICO) == false)
+                nezisk.Add(it.f.ICO, it.ss);
+            else if (soukr.ContainsKey(it.f.ICO) == false)
+                soukr.Add(it.f.ICO, it.ss);
+        }
+
+        res.StatniFirmy = statni;
+        res.SoukromeFirmy = soukr;
+        res.Neziskovky = nezisk;
         return res;
     }
 }

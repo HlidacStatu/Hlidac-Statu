@@ -9,71 +9,80 @@
 @{
     Layout = "_ReportLayout";
 
-    ReportDataSource poslanciTable = new(new ReportDataSource.Column[]
-   {
-new() { Name="Poradci předsedy vlády",
-    HtmlRender =(s) => {
-        Osoba o = (Osoba)s;
-        return string.Format("<a href='{0}'>{1}</a>", o.GetUrl(), o.FullNameWithYear(true))
-        + "<br />"
-        + Devmasters.TextUtil.ShortenText(o.Description(false,m=> true, numOfRecords: 3), 250).Replace("\n", "<br />");
-    },
-    OrderValueRender = (s) => {
-        Osoba o = (Osoba)s;
-        return o.FullName(false);
-    }
-},
-new() { Name="Angažovanost ve firmách",
-    HtmlRender =(s) => {
-        Osoba o = (Osoba)s;
-        string sout = "";
-
-        if (o.Vazby() != null)
-        {
-            foreach (var v in o.StatistikaRegistrSmluv().SoukromeFirmy.Take(2))
-            {
-                sout = sout + v.Value.Summary(HlidacStatu.Lib.Analytics.CoreStat.UsualYearsInterval.FromUsualFirstYearUntilNow).ToNiceLinkString(null,true) + "<br/>";
-            }
-            if (o.StatistikaRegistrSmluv().SoukromeFirmy.Count() == 3)
-            {
-                sout = sout + o.StatistikaRegistrSmluv().SoukromeFirmy
-                .Skip(2).First().Value.Summary(HlidacStatu.Lib.Analytics.CoreStat.UsualYearsInterval.FromUsualFirstYearUntilNow).ToNiceLinkString(null,true);
-            }
-            else if (o.StatistikaRegistrSmluv().SoukromeFirmy.Count() > 2)
-            {
-                sout = sout + "<a href='" + o.GetUrl() + "'>" + Devmasters.Lang.CS.Plural.Get(o.Vazby().Length - 2, "+další vazba;+ další {0} vazby;+ dalších {0} vazeb") + "</a>";
-            }
-        }
-        return sout;
-    },
-    OrderValueRender = (s) => {
-        Osoba o = (Osoba)s;
-        return o.FullName(false);
-    }
-},
-new() { Name="Sponzor polit.stran",
-    HtmlRender =(s) => {
-        Osoba o = (Osoba)s;
-        var sum = o.Sponzoring().Sum(m=>m.Hodnota);
-        if (sum==0)
-            return "Ne";
-        else
-            return "Celkem&nbsp;" + HlidacStatu.Util.RenderData.NicePriceHtml(sum.Value) + string.Format("<br /><a href='{0}'>podrobnosti</a>", o.GetUrl()) ;
-    },
-    OrderValueRender = (s) => {
-        Osoba o = (Osoba)s;
-        var val= o.Sponzoring().Sum(m=>m.Hodnota) ;
-        return HlidacStatu.Util.RenderData.OrderValueFormat(val);
-    }
-},
-   });
-
-
-    foreach (var p in OsobaRepo.GetByZatrideni(OsobaRepo.Zatrideni.PoradcePredsedyVlady, DateTime.Now)
-        .OrderBy(m => m.Prijmeni)
-        .ThenBy(m => m.Jmeno))
+    ReportDataSource<(Osoba Osoba, Osoba.Statistics.RegistrSmluv? Stat)> poslanciTable = new(new ReportDataSource<(Osoba Osoba, Osoba.Statistics.RegistrSmluv? Stat)>.Column[]
     {
-        poslanciTable.AddRow(p);
+        new()
+        {
+            Name = "Poradci předsedy vlády",
+            HtmlRender = (s) =>
+            {
+                return string.Format("<a href='{0}'>{1}</a>", s.Osoba.GetUrl(), s.Osoba.FullNameWithYear(true))
+                       + "<br />"
+                       + Devmasters.TextUtil.ShortenText(s.Osoba.Description(false, m => true, numOfRecords: 3), 250).Replace("\n", "<br />");
+            },
+            OrderValueRender = (s) =>
+            {
+                return s.Osoba.FullName(false);
+            }
+        },
+        new()
+        {
+            Name = "Angažovanost ve firmách",
+            HtmlRender = (s) =>
+            {
+                string sout = "";
+
+                if (s.Osoba.Vazby() != null)
+                {
+                    foreach (var v in s.Stat.SoukromeFirmy.Take(2))
+                    {
+                        sout = sout + v.Value.Summary(HlidacStatu.Lib.Analytics.CoreStat.UsualYearsInterval.FromUsualFirstYearUntilNow).ToNiceLinkString(null, true) + "<br/>";
+                    }
+
+                    if (s.Stat.SoukromeFirmy.Count() == 3)
+                    {
+                        sout = sout + s.Stat.SoukromeFirmy
+                            .Skip(2).First().Value.Summary(HlidacStatu.Lib.Analytics.CoreStat.UsualYearsInterval.FromUsualFirstYearUntilNow).ToNiceLinkString(null, true);
+                    }
+                    else if (s.Stat.SoukromeFirmy.Count() > 2)
+                    {
+                        sout = sout + "<a href='" + s.Osoba.GetUrl() + "'>" + Devmasters.Lang.CS.Plural.Get(s.Osoba.Vazby().Length - 2, "+další vazba;+ další {0} vazby;+ dalších {0} vazeb") + "</a>";
+                    }
+                }
+
+                return sout;
+            },
+            OrderValueRender = (s) =>
+            {
+                return s.Osoba.FullName(false);
+            }
+        },
+        new()
+        {
+            Name = "Sponzor polit.stran",
+            HtmlRender = (s) =>
+            {
+                var sum = s.Osoba.Sponzoring().Sum(m => m.Hodnota);
+                if (sum == 0)
+                    return "Ne";
+                else
+                    return "Celkem&nbsp;" + HlidacStatu.Util.RenderData.NicePriceHtml(sum.Value) + string.Format("<br /><a href='{0}'>podrobnosti</a>", s.Osoba.GetUrl());
+            },
+            OrderValueRender = (s) =>
+            {
+                var val = s.Osoba.Sponzoring().Sum(m => m.Hodnota);
+                return HlidacStatu.Util.RenderData.OrderValueFormat(val);
+            }
+        },
+    });
+
+
+    foreach (var osoba in OsobaRepo.GetByZatrideni(OsobaRepo.Zatrideni.PoradcePredsedyVlady, DateTime.Now)
+                 .OrderBy(m => m.Prijmeni)
+                 .ThenBy(m => m.Jmeno))
+    {
+        Osoba.Statistics.RegistrSmluv? stat = await osoba.StatistikaRegistrSmluvAsync();
+        poslanciTable.AddRow((osoba, stat));
     }
 }
 
@@ -81,9 +90,12 @@ new() { Name="Sponzor polit.stran",
 
 <h3 id="tblHead">Poradci na úřadu vlády</h3>
 <p>
-    Hospodářské noviny se <a href="https://domaci.ihned.cz/c1-66100770-kdo-radi-babisovi-polovina-premierovych-poradcu-dela-za-penize-druha-jako-udernici-zdarma-urad-vlady-taji-kolik-komu-dava?utm_source=ihned&utm_medium=otvirak&utm_content=id-66100770">zajímaly o platy poradců na úřadu vlády</a>.
+    Hospodářské noviny se <a
+        href="https://domaci.ihned.cz/c1-66100770-kdo-radi-babisovi-polovina-premierovych-poradcu-dela-za-penize-druha-jako-udernici-zdarma-urad-vlady-taji-kolik-komu-dava?utm_source=ihned&utm_medium=otvirak&utm_content=id-66100770">zajímaly
+        o platy poradců na úřadu vlády</a>.
 </p>
-<p>Zde je náš pohled na premiérovi poradce, na jejich dary politickým stranám a zda jejich firmy obchodují se státem. </p>
+<p>Zde je náš pohled na premiérovi poradce, na jejich dary politickým stranám a zda jejich firmy obchodují se
+    státem. </p>
 @ChartUtilExtensions.RenderReport("", ReportModel.QueueItem.types.table, poslanciTable, @"{
      'language': {
         'url': '//cdn.datatables.net/plug-ins/1.13.4/i18n/cs.json'

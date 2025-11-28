@@ -1,7 +1,6 @@
 ﻿@model HlidacStatu.Entities.Osoba
 
 @using HlidacStatu.XLib.Render
-@using Nest;
 @using System.Linq;
 @using Devmasters.Enums;
 @using HlidacStatu.Datasets
@@ -11,7 +10,6 @@
 @using HlidacStatu.Repositories
 @using HlidacStatu.Repositories.Statistics
 @using HlidacStatu.XLib
-@using HlidacStatu.Lib.Analytics
 
 @{
     Layout = null;
@@ -21,7 +19,7 @@
     var aktualnost = Relation.AktualnostType.Nedavny;
 
     var intv = laps.StopPreviousAndStartNextLap("StatistikaRegistruSmluv");
-    var statistics = Model.StatistikaRegistrSmluv();
+    var statistics = await Model.StatistikaRegistrSmluvAsync();
 
 
     intv.Stop();

@@ -15,7 +15,7 @@
         aktualnost = xen;
     }
 
-    var statistics = Model.StatistikaRegistrSmluv();
+    var statistics = await Model.StatistikaRegistrSmluvAsync();
     var vazbyPodleAktualnosti = Model.AktualniVazby(aktualnost);
 
 }

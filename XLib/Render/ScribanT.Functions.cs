@@ -109,14 +109,14 @@ namespace HlidacStatu.XLib.Render
                 return $"<span>{jmeno} {prijmeni} {narozeni}</span>";
             }
 
-            public static string fn_RenderPersonStatistic(string osobaId, bool twoLines = false, string prefix = "", string postfix = "")
+            public static async Task<string> fn_RenderPersonStatistic(string osobaId, bool twoLines = false, string prefix = "", string postfix = "")
             {
                 if (!string.IsNullOrEmpty(osobaId))
                 {
                     Osoba o = Osoby.GetByNameId.Get(osobaId);
                     if (o != null)
                     {
-                        var stat = o.StatistikaRegistrSmluv();
+                        var stat = await o.StatistikaRegistrSmluvAsync();
                         //return $"<span>{prefix}{stat.BasicStatPerYear.SummaryAfter2016().ToNiceString(o, true, customUrl: "/hledatSmlouvy?q=osobaId:" + o.NameId, twoLines: twoLines)}{postfix}</span>";
                         var s = stat.SoukromeFirmy.Values
                                         .AggregateStats()
