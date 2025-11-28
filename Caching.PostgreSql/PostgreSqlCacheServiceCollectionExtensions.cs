@@ -95,14 +95,24 @@ namespace HlidacStatu.CachingClients.PostgreSql
 			{
 				throw new ArgumentNullException(nameof(setupAction));
 			}
-
+			
+			string? optionsName = key?.ToString();
+			services.Configure<PostgreSqlCacheOptions>(optionsName, setupAction);
+			
+			
 			services.AddOptions();
-			services.AddKeyedSingleton<IDatabaseOperations, DatabaseOperations>(key);
+			services.AddKeyedSingleton<IDatabaseOperations, DatabaseOperations>(key, (sp, k) =>
+			{
+				var logger = sp.GetRequiredService<ILogger<DatabaseOperations>>();
+				var options = GetWrappedOptions(sp, k);
+				return new DatabaseOperations(options, logger);
+			});
+			
 			services.AddKeyedSingleton<IDatabaseExpiredItemsRemoverLoop>(key, (sp, k) =>
 			{
 				var dbOps = sp.GetRequiredKeyedService<IDatabaseOperations>(k);
 				var logger = sp.GetRequiredService<ILogger<DatabaseExpiredItemsRemoverLoop>>();
-				var options = sp.GetRequiredService<IOptions<PostgreSqlCacheOptions>>();
+				var options = GetWrappedOptions(sp, k);
 
 				return new DatabaseExpiredItemsRemoverLoop(options, dbOps, logger);
 			});
@@ -111,13 +121,20 @@ namespace HlidacStatu.CachingClients.PostgreSql
 			{
 				var dbOps = sp.GetRequiredKeyedService<IDatabaseOperations>(k);
 				var remover = sp.GetRequiredKeyedService<IDatabaseExpiredItemsRemoverLoop>(k);
-				var options = sp.GetRequiredService<IOptions<PostgreSqlCacheOptions>>();
+				var options = GetWrappedOptions(sp, k);
 
 				return new PostgreSqlCache(options, dbOps, remover);
 			});
 			services.Configure(setupAction);
 
 			return services;
+		}
+
+		private static IOptions<PostgreSqlCacheOptions> GetWrappedOptions(IServiceProvider sp, object? key)
+		{
+			var optionsMonitor = sp.GetRequiredService<IOptionsMonitor<PostgreSqlCacheOptions>>();
+			var specificOptions = optionsMonitor.Get(key?.ToString());
+			return Options.Create(specificOptions);
 		}
 
 		// to enable unit testing

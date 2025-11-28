@@ -32,9 +32,7 @@ public static class OsobaCache
     public static ValueTask InvalidateInfoFactsAsync(Osoba osoba) =>
         PostgreCache.ExpireAsync($"_InfoFacts:{osoba.NameId}");
 
-
-    // new shiit
-
+    
     //todo: Imho tohle by se mělo rozhodit po osobě a ne dělat všechny
     public static ValueTask<Dictionary<int, Osoba.Statistics.VerySimple[]>> GetTopPoliticiObchodujiciSeStatemAsync() =>
         PostgreCache.GetOrSetAsync($"_TopPoliticiObchodujiciSeStatem", async _ =>
