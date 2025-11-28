@@ -19,23 +19,23 @@
     switch (obdobiLower)
     {
         case "mezirocne":
-            data = HlidacStatu.Repositories.Analysis.AnalysisCalculation.NarustySmluvTop100_AbsolutPrice_MaxInYear.Get(Model.obor);
+            data = await HlidacStatu.Repositories.Analysis.AnalysisCalculation.GetNarustySmluvTop100_AbsolutPrice_MaxInYearAsync(Model.obor);
             break;
         case "vlada2018":
-            data = HlidacStatu.Repositories.Analysis.AnalysisCalculation.NarustySmluvTop100_AbsolutPrice_Vlada2018.Get(Model.obor);
+            data = await HlidacStatu.Repositories.Analysis.AnalysisCalculation.GetNarustySmluvTop100_AbsolutPrice_Vlada2018Async(Model.obor);
             obdobi = "za vlády A.Babiše";
             break;
         case "vlada2022":
-            data = HlidacStatu.Repositories.Analysis.AnalysisCalculation.NarustySmluvTop100_AbsolutPrice_Vlada2022.Get(Model.obor);
+            data = await HlidacStatu.Repositories.Analysis.AnalysisCalculation.GetNarustySmluvTop100_AbsolutPrice_Vlada2022Async(Model.obor);
             obdobi = "za vlády P.Fialy";
             break;
         case "2020_24":
             obdobi = "od roku 2020";
-            data = HlidacStatu.Repositories.Analysis.AnalysisCalculation.NarustySmluvTop100_AbsolutPrice_2020_24.Get(Model.obor);
+            data = await HlidacStatu.Repositories.Analysis.AnalysisCalculation.GetNarustySmluvTop100_AbsolutPrice_2020_24Async(Model.obor);
             break;
         default:
             obdobi = "od nuly do max (od roku 2020)";
-            data = HlidacStatu.Repositories.Analysis.AnalysisCalculation.NarustySmluvOdNulyTop100_AbsolutPrice_2020_24.Get(Model.obor);
+            data = await HlidacStatu.Repositories.Analysis.AnalysisCalculation.GetNarustySmluvOdNulyTop100_AbsolutPrice_2020_24Async(Model.obor);
             break;
     }
     
