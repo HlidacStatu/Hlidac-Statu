@@ -82,7 +82,7 @@ namespace HlidacStatu.Repositories
                         }
                         else
                         {
-                            _ = o.StatistikaRegistrSmluvAsync(forceUpdateCache: noRebuild ? false : true);
+                            _ = await o.StatistikaRegistrSmluvAsync(forceUpdateCache: noRebuild ? false : true);
                             _ = await o.InfoFactsCachedAsync(forceUpdateCache: noRebuild ? false : true);
                         }
 
@@ -124,9 +124,9 @@ namespace HlidacStatu.Repositories
                         else
                         {
                             if (!holdingOnly || firmaOnly)
-                                _ = f.StatistikaRegistruSmluvAsync(forceUpdateCache: true);
+                                _ = await f.StatistikaRegistruSmluvAsync(forceUpdateCache: true);
                             if (holdingOnly || !firmaOnly)
-                                _ = f.HoldingStatisticsRegistrSmluvAsync(forceUpdateCache: noRebuild ? false : true);
+                                _ = await f.HoldingStatisticsRegistrSmluvAsync(forceUpdateCache: noRebuild ? false : true);
                         }
 
                         break;
