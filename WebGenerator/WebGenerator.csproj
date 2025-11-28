@@ -7,7 +7,7 @@
 		<Nullable>enable</Nullable>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
-		<Version>1.0.1</Version>
+		<Version>1.0.2</Version>
 	</PropertyGroup>
 
 	<ItemGroup>
@@ -23,6 +23,10 @@
 	<ItemGroup>
 		<PackageReference Include="Devmasters.Cache" Version="8.2.0" />
 		<PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.22.1" />
+		<PackageReference Include="OpenTelemetry.Exporter.OpenTelemetryProtocol" Version="1.14.0" />
+		<PackageReference Include="OpenTelemetry.Extensions.Hosting" Version="1.14.0" />
+		<PackageReference Include="OpenTelemetry.Instrumentation.AspNetCore" Version="1.14.0" />
+		<PackageReference Include="OpenTelemetry.Instrumentation.Http" Version="1.14.0" />
 		<PackageReference Include="ZiggyCreatures.FusionCache" Version="2.4.0" />
 		<PackageReference Include="ZiggyCreatures.FusionCache.Serialization.NeueccMessagePack" Version="2.4.0" />
 	</ItemGroup>
@@ -33,6 +37,7 @@
 		<ProjectReference Include="..\Extensions\Extensions.csproj" />
 		<ProjectReference Include="..\LibCore\LibCore.csproj" />
 		<ProjectReference Include="..\Repositories\Repositories.csproj" />
+		<ProjectReference Include="..\Util\Util.csproj" />
 	</ItemGroup>
 
 	<ItemGroup>
