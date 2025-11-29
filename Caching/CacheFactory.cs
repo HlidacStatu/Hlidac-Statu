@@ -37,7 +37,7 @@ public static class CacheFactory
         //jak dlouho se pokouší načítat z factory, pokud nenačte, použije failsafe
         FactorySoftTimeout = TimeSpan.FromMilliseconds(500),
         //Kolik je maximální čas pro načítání dat, než to hodí exception
-        FactoryHardTimeout = TimeSpan.FromSeconds(20),
+        FactoryHardTimeout = TimeSpan.FromMinutes(2),
         //pokud factory trvá dlouho, nevypne se, ale zkouší to dokončit - umí běžet i delší dobu než je factory hard timeout
         AllowTimedOutFactoryBackgroundCompletion = true,
 
@@ -80,7 +80,7 @@ public static class CacheFactory
         //jak dlouho se pokouší načítat z factory, pokud nenačte, použije failsafe
         FactorySoftTimeout = TimeSpan.FromMilliseconds(500),
         //Kolik je maximální čas pro načítání dat, než to hodí exception
-        FactoryHardTimeout = TimeSpan.FromSeconds(20),
+        FactoryHardTimeout = TimeSpan.FromMinutes(5),
         //pokud factory trvá dlouho, nevypne se, ale zkouší to dokončit - umí běžet i delší dobu než je factory hard timeout
         AllowTimedOutFactoryBackgroundCompletion = true,
 
@@ -115,7 +115,7 @@ public static class CacheFactory
         DistributedCacheFailSafeMaxDuration = TimeSpan.FromDays(365),
 
         FactorySoftTimeout = TimeSpan.FromMilliseconds(1500),
-        FactoryHardTimeout = TimeSpan.FromMinutes(10),
+        FactoryHardTimeout = TimeSpan.FromMinutes(20),
         DistributedCacheSoftTimeout = TimeSpan.FromSeconds(2),
         DistributedCacheHardTimeout = TimeSpan.FromSeconds(20),
 
