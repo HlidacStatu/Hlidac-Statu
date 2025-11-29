@@ -169,6 +169,18 @@ public static class CacheFactory
         return cache;
     }
 
+    public static FusionCacheEntryOptions ModifyEntryOptionsFactoryTimeouts(this FusionCacheEntryOptions options, 
+        TimeSpan? factoryHardTimeout = null, TimeSpan? factorySoftTimeout = null)
+    {
+        if (factoryHardTimeout.HasValue)
+            options.FactoryHardTimeout = factoryHardTimeout.Value;
+
+        if (factorySoftTimeout.HasValue)
+            options.FactorySoftTimeout = factorySoftTimeout.Value;
+
+        return options;
+    }
+
     public static FusionCacheEntryOptions ModifyEntryOptionsDuration(this FusionCacheEntryOptions options, TimeSpan mainDuration)
     {
         options.Duration = mainDuration;
