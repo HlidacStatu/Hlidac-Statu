@@ -26,13 +26,14 @@ public static class OsobaCache
 
     public static ValueTask<InfoFact[]> GetInfoFactsAsync(Osoba osoba) =>
         PostgreCache.GetOrSetAsync($"_InfoFacts:{osoba.NameId}",
-            _ => OsobaExtension.InfoFactsAsync(osoba)
+            _ => OsobaExtension.InfoFactsAsync(osoba),
+            options => options.ModifyEntryOptionsDuration(TimeSpan.FromHours(6))
         );
 
     public static ValueTask InvalidateInfoFactsAsync(Osoba osoba) =>
         PostgreCache.ExpireAsync($"_InfoFacts:{osoba.NameId}");
 
-    
+
     //todo: Imho tohle by se mělo rozhodit po osobě a ne dělat všechny
     public static ValueTask<Dictionary<int, Osoba.Statistics.VerySimple[]>> GetTopPoliticiObchodujiciSeStatemAsync() =>
         PostgreCache.GetOrSetAsync($"_TopPoliticiObchodujiciSeStatem", async _ =>
@@ -57,7 +58,7 @@ public static class OsobaCache
                     true, //!System.Diagnostics.Debugger.IsAttached,
                     maxDegreeOfParallelism: 6, prefix: "TopPoliticiObchodSeStatem loading ",
                     monitor: new MonitoredTaskRepo.ForBatch());
-                
+
                 Dictionary<int, Osoba.Statistics.VerySimple[]> res = new();
                 res.Add(0,
                     allStats.OrderByDescending(o =>
@@ -65,13 +66,13 @@ public static class OsobaCache
                         .Union(allStats.OrderByDescending(o =>
                             o.SmlouvyStat_SoukromeFirmySummary().Summary().PocetSmluv).Take(100))
                         .Select(m => new Osoba.Statistics.VerySimple()
-                            {
-                                OsobaNameId = m.OsobaNameId,
-                                CelkovaHodnotaSmluv = m.SmlouvyStat_SoukromeFirmySummary().Summary()
+                        {
+                            OsobaNameId = m.OsobaNameId,
+                            CelkovaHodnotaSmluv = m.SmlouvyStat_SoukromeFirmySummary().Summary()
                                     .CelkovaHodnotaSmluv,
-                                PocetSmluv = m.SmlouvyStat_SoukromeFirmySummary().Summary().PocetSmluv,
-                                Year = 0,
-                            }
+                            PocetSmluv = m.SmlouvyStat_SoukromeFirmySummary().Summary().PocetSmluv,
+                            Year = 0,
+                        }
                         )
                         .ToArray()
                 );
@@ -83,27 +84,24 @@ public static class OsobaCache
                             .Union(allStats.OrderByDescending(o =>
                                 o.SmlouvyStat_SoukromeFirmySummary()[year].PocetSmluv).Take(100))
                             .Select(m => new Osoba.Statistics.VerySimple()
-                                {
-                                    OsobaNameId = m.OsobaNameId,
-                                    CelkovaHodnotaSmluv = m.SmlouvyStat_SoukromeFirmySummary()[year]
+                            {
+                                OsobaNameId = m.OsobaNameId,
+                                CelkovaHodnotaSmluv = m.SmlouvyStat_SoukromeFirmySummary()[year]
                                         .CelkovaHodnotaSmluv,
-                                    PocetSmluv = m.SmlouvyStat_SoukromeFirmySummary()[year].PocetSmluv,
-                                    Year = year,
-                                }
+                                PocetSmluv = m.SmlouvyStat_SoukromeFirmySummary()[year].PocetSmluv,
+                                Year = year,
+                            }
                             )
                             .ToArray()
                     );
                 }
 
                 return res;
-            }, options =>
-            {
-                options.Duration = TimeSpan.FromDays(7);
-                options.FailSafeMaxDuration = TimeSpan.FromHours(14);
-                options.DistributedCacheFailSafeMaxDuration = TimeSpan.FromDays(30);
-            }
+            },
+            options => options.ModifyEntryOptionsDuration(TimeSpan.FromDays(7))
+
         );
-    
+
     public static ValueTask InvalidateITopPoliticiObchodujiciSeStatemAsync() =>
         PostgreCache.ExpireAsync($"_TopPoliticiObchodujiciSeStatem");
 
@@ -187,14 +185,11 @@ public static class OsobaCache
                     monitor: new MonitoredTaskRepo.ForBatch());
 
                 return ret.ToArray();
-            }, options =>
-            {
-                options.Duration = TimeSpan.FromDays(7);
-                options.FailSafeMaxDuration = TimeSpan.FromHours(14);
-                options.DistributedCacheFailSafeMaxDuration = TimeSpan.FromDays(30);
-            }
+            },
+            options => options.ModifyEntryOptionsDuration(TimeSpan.FromDays(7))
+
         );
-    
+
     public static ValueTask InvalidatePoliticiSFirmouVInsolvenciAsync() =>
         PostgreCache.ExpireAsync($"_PoliticiSFirmouVInsolvenci");
 }

@@ -169,6 +169,13 @@ public static class CacheFactory
         return cache;
     }
 
+    public static FusionCacheEntryOptions ModifyEntryOptionsDuration(this FusionCacheEntryOptions options, TimeSpan mainDuration)
+    {
+        options.Duration = mainDuration;
+        options.FailSafeMaxDuration = mainDuration *4;
+        options.DistributedCacheFailSafeMaxDuration = mainDuration * 4 * 4;
+        return options;
+    }
     private static IDistributedCache? ResolveL2CacheProvider(CacheType cacheType)
     {
         _serviceProvider ??= BuildServiceProvider();
