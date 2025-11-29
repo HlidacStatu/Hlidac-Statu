@@ -56,7 +56,7 @@
 
         if (img == defaultSocialImg && string.IsNullOrEmpty(socialhtml) == false)
         {
-            img = gen + "/socialbanner/page?v=" + System.Net.WebUtility.UrlEncode(Context.Request.GetDisplayUrl());
+            img = genurl + "/socialbanner/page?v=" + System.Net.WebUtility.UrlEncode(Context.Request.GetDisplayUrl());
         }
     }
 

@@ -32,11 +32,15 @@ namespace HlidacStatu.WebGenerator.Code
         private static readonly IFusionCache PostgreCache =
             Hlidacstatu.Caching.CacheFactory.CreateNew(CacheFactory.CacheType.L2PostgreSqlBinarySerializer, "socialbanner");
 
-        private static async Task<byte[]> getAsync(KeyAndId ki)
+        private static async Task<byte[]> getAsync(
+            Models.SocialbannerInstrumentationSource socialbannerInstrumentation, 
+            KeyAndId ki)
         {
+            socialbannerInstrumentation.Requested.Add(1);
+
             var infoFacts = await PostgreCache.GetOrSetAsync(
                 cacheKey(ki),
-                _ => _getBinaryDataFromUrlAsync(ki),
+                _ => _getBinaryDataFromUrlAsync(socialbannerInstrumentation, ki),
                   options =>
                   {
                       options.Duration = TimeSpan.FromDays(4);
@@ -54,16 +58,22 @@ namespace HlidacStatu.WebGenerator.Code
                 );
         }
 
-        private async static Task<byte[]> _getBinaryDataFromUrlAsync(KeyAndId ki)
+        private async static Task<byte[]> _getBinaryDataFromUrlAsync(
+            Models.SocialbannerInstrumentationSource socialbannerInstrumentation, 
+            KeyAndId ki
+            )
         {
-
+            socialbannerInstrumentation.Generated.Add(1);
             var data = await Devmasters.Net.HttpClient.Simple.GetRawBytesAsync(
                 ki.ValueForData,
                 timeout: TimeSpan.FromSeconds(10));
             return data; 
         }
 
-        public async static Task<byte[]> GetWebPageScreenshotAsync(string url, string ratio, string cacheName = null, bool refreshCache = false)
+        public async static Task<byte[]> GetWebPageScreenshotAsync(
+            Models.SocialbannerInstrumentationSource socialbannerInstrumentation, 
+            string url, string ratio, string cacheName, 
+            bool refreshCache = false)
         {
             string[]? webShotServiceUrls = Devmasters.Config.GetWebConfigValue("WebShot.Service.Url")
                 ?.Split(';')
@@ -94,7 +104,7 @@ namespace HlidacStatu.WebGenerator.Code
                     await invalidateAsync(ki);   
                 }
 
-                byte[] data = await getAsync(ki);
+                byte[] data = await getAsync(socialbannerInstrumentation,ki);
 
                 return data;
             }

@@ -7,8 +7,16 @@
 		<Nullable>enable</Nullable>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
-		<Version>1.0.3</Version>
+		<Version>1.0.5</Version>
+		<UserSecretsId>ecdf5a8b-6634-40d2-bc28-24679b7f7f39</UserSecretsId>
 	</PropertyGroup>
+
+	<ItemGroup>
+	  <Compile Remove="c\**" />
+	  <Content Remove="c\**" />
+	  <EmbeddedResource Remove="c\**" />
+	  <None Remove="c\**" />
+	</ItemGroup>
 
 	<ItemGroup>
 		<Content Remove="logger.serilog.json" />
@@ -27,7 +35,9 @@
 		<PackageReference Include="OpenTelemetry.Extensions.Hosting" Version="1.14.0" />
 		<PackageReference Include="OpenTelemetry.Instrumentation.AspNetCore" Version="1.14.0" />
 		<PackageReference Include="OpenTelemetry.Instrumentation.Http" Version="1.14.0" />
+		<PackageReference Include="OpenTelemetry.Instrumentation.Runtime" Version="1.14.0" />
 		<PackageReference Include="ZiggyCreatures.FusionCache" Version="2.4.0" />
+		<PackageReference Include="ZiggyCreatures.FusionCache.OpenTelemetry" Version="2.4.0" />
 		<PackageReference Include="ZiggyCreatures.FusionCache.Serialization.NeueccMessagePack" Version="2.4.0" />
 	</ItemGroup>
 
