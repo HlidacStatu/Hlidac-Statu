@@ -23,4 +23,5 @@ if (-not $version) {
     exit 1
 }
 
-$version
+Write-Host "##teamcity[setParameter name='PROJECT_VERSION' value='$version']"
+
