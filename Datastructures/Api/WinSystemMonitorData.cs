@@ -17,7 +17,7 @@ namespace HlidacStatu.DS.Api
         public long SystemUpTimeSeconds { get; set; }
         public long SystemDiskFreeBytes { get; set; }
         public long SystemDiskTotalBytes { get; set; }
-
+        public IIS.Request[] IISRequests { get; set; }
         public class IIS
         {
             public Request[] Requests { get; set; }
@@ -65,11 +65,11 @@ namespace HlidacStatu.DS.Api
                 public int SiteId { get; set; }
                 public string ApplicationPoolName { get; set; }
 
-                public int TimeElapsed { get; set; }
+                public int TimeElapsedInMs { get; set; }
 
-                public int TimeInModule { get; set; }
+                public int TimeInModuleInMs { get; set; }
 
-                public int TimeInState { get; set; }
+                public int TimeInStateInMs { get; set; }
 
                 public string Url { get; set; }
 
