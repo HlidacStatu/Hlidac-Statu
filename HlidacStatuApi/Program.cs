@@ -134,35 +134,7 @@ builder.Services.AddSingleton<IAuthorizationMiddlewareResultHandler, HlidacStatu
 
 
 _ = builder.Services
-    .AddHealthChecks()
-    .AddProcessAllocatedMemoryHealthCheck(maximumMegabytesAllocated: 50000,
-        name: "Web server využitá pamět",
-        tags: new[] { "Web server", "process", "memory" })
-    .AddHealthCheckWithOptions<HlidacStatu.Web.HealthChecks.NetworkDiskStorage, HlidacStatu.Web.HealthChecks.NetworkDiskStorage.Options>(
-        new HlidacStatu.Web.HealthChecks.NetworkDiskStorage.Options()
-        {
-            UNCPath = "c:\\",
-            DegradedMinimumFreeMegabytes = 20 * 1024, //20G 
-            UnHealthtMinimumFreeMegabytes = 5 * 1024 //5GB
-        },
-        "System disk", HealthStatus.Unhealthy, tags: new[] { "Web server" }
-    )
-    .AddHealthCheckWithOptions<HlidacStatu.Web.HealthChecks.IISConnections, HlidacStatu.Web.HealthChecks.IISConnections.Options>(
-        new HlidacStatu.Web.HealthChecks.IISConnections.Options() { AppPoolNameFilter = "api.hlidacstatu.cz", CountWarningThreshold = 20, CountErrorThreshold = 50 },
-            "IIS open requests",
-            tags: new[] { "Web server" }
-            )
-    .AddHealthCheckWithOptions<HlidacStatu.Web.HealthChecks.NetworkDiskStorage, HlidacStatu.Web.HealthChecks.NetworkDiskStorage.Options>(
-        new HlidacStatu.Web.HealthChecks.NetworkDiskStorage.Options()
-        {
-            UNCPath = Devmasters.Config.GetWebConfigValue("FileCachePath"),
-            DegradedMinimumFreeMegabytes = 20 * 1024, //20G 
-            UnHealthtMinimumFreeMegabytes = 5 * 1024 //5GB
-        },
-        "Cache disk", HealthStatus.Unhealthy, tags: new[] { "Web server" }
-        )
-    
-    ;
+    .AddHealthChecks();
 
 _ = builder.Services.AddHangfire(configuration => configuration
         .SetDataCompatibilityLevel(CompatibilityLevel.Version_180)
