@@ -1,6 +1,7 @@
 using System;
 using System.Threading.Tasks;
 using Hlidacstatu.Caching;
+using HlidacStatu.Caching;
 using HlidacStatu.Entities;
 using HlidacStatu.Entities.Facts;
 using HlidacStatu.Extensions;
