@@ -159,7 +159,7 @@
                     <input type="checkbox" /> <span><b>@Model.ICO</b> @Model.Jmeno</span>
                     <ul>
                        @Html.Raw(
-                            HlidacStatu.Repositories.Graph.TiskVazeb(
+                            HlidacStatu.Repositories.Graph.TiskVazebAsync(
                                 Model.Jmeno,Model.VazbyRootEdge(),
                                 Model.AktualniVazby(aktualnost),
                                 Relation.TiskEnum.Checkbox

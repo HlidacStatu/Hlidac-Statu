@@ -40,7 +40,7 @@
 
     <p style="padding-top:30px;">
         @Html.Raw(
-            HlidacStatu.Repositories.Graph.TiskVazeb(
+            await HlidacStatu.Repositories.Graph.TiskVazebAsync(
                 Model.Jmeno, Model.VazbyRootEdge(),
                 Model.AktualniVazby(aktualnost),
                 Relation.TiskEnum.Html

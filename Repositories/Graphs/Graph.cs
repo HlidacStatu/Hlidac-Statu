@@ -898,7 +898,7 @@ namespace HlidacStatu.Repositories
         }
 
 
-        public static string TiskVazeb(string rootName, HlidacStatu.DS.Graphs.Graph.Edge origRoot, IEnumerable<HlidacStatu.DS.Graphs.Graph.Edge> vazby, Relation.TiskEnum typ, bool withStats = true)
+        public static async Task<string> TiskVazebAsync(string rootName, HlidacStatu.DS.Graphs.Graph.Edge origRoot, IEnumerable<HlidacStatu.DS.Graphs.Graph.Edge> vazby, Relation.TiskEnum typ, bool withStats = true)
         {
             string htmlTemplate = "<ul id='nestedlist'><li>{0}</li>{1}</ul>";
             string textTemplate = "{0}\n|\n{1}";
@@ -907,13 +907,13 @@ namespace HlidacStatu.Repositories
             switch (typ)
             {
                 case Relation.TiskEnum.Text:
-                    return string.Format(textTemplate, rootName, PrintFlatRelationsAsync(origRoot, (HlidacStatu.DS.Graphs.Graph.Edge)null, 0, vazby, typ, null, withStats));
+                    return string.Format(textTemplate, rootName, await PrintFlatRelationsAsync(origRoot, (HlidacStatu.DS.Graphs.Graph.Edge)null, 0, vazby, typ, null, withStats));
                 case Relation.TiskEnum.Html:
-                    return string.Format(htmlTemplate, rootName, PrintFlatRelationsAsync(origRoot, (HlidacStatu.DS.Graphs.Graph.Edge)null, 0, vazby, typ, null, withStats));
+                    return string.Format(htmlTemplate, rootName, await PrintFlatRelationsAsync(origRoot, (HlidacStatu.DS.Graphs.Graph.Edge)null, 0, vazby, typ, null, withStats));
                 case Relation.TiskEnum.Json:
-                    return string.Format(jsonTemplate, rootName, PrintFlatRelationsAsync(origRoot, (HlidacStatu.DS.Graphs.Graph.Edge)null, 0, vazby, typ, null, withStats));
+                    return string.Format(jsonTemplate, rootName, await PrintFlatRelationsAsync(origRoot, (HlidacStatu.DS.Graphs.Graph.Edge)null, 0, vazby, typ, null, withStats));
                 case Relation.TiskEnum.Checkbox:
-                    return string.Format(checkboxTemplate, rootName, PrintFlatRelationsAsync(origRoot, (HlidacStatu.DS.Graphs.Graph.Edge)null, 0, vazby, typ, null, withStats));
+                    return string.Format(checkboxTemplate, rootName, await PrintFlatRelationsAsync(origRoot, (HlidacStatu.DS.Graphs.Graph.Edge)null, 0, vazby, typ, null, withStats));
                 default:
                     return string.Empty;
             }
