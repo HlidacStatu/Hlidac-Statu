@@ -18,7 +18,7 @@ namespace HlidacStatu.Caching
         }
 
         public static FusionCacheEntryOptions ModifyEntryOptionsDuration(this FusionCacheEntryOptions options, 
-            TimeSpan inMemoryDuration, TimeSpan? distributedDuration)
+            TimeSpan inMemoryDuration, TimeSpan? distributedDuration = null)
         {
             options.Duration = inMemoryDuration;
             options.FailSafeMaxDuration = inMemoryDuration * 4;
