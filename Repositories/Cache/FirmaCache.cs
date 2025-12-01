@@ -24,7 +24,6 @@ public static class FirmaCache
         PostgreCache.GetOrSetAsync($"_InfoFacts:{firma.ICO}",
             _ => FirmaExtension.GetDirectInfoFactsAsync(firma),
             options => options.ModifyEntryOptionsDuration(TimeSpan.FromHours(6))
-
         );
 
     public static ValueTask InvalidateInfoFactsAsync(Firma firma) => PostgreCache.ExpireAsync($"_InfoFacts:{firma.ICO}");
@@ -40,13 +39,13 @@ public static class FirmaCache
     public static ValueTask<Firma.Zatrideni.Item[]> GetSubjektyForOborAsync(Firma.Zatrideni.SubjektyObory obor) =>
         MemcachedCache.GetOrSetAsync($"_SubjektyForObor:{obor:G}",
             _ => FirmaRepo.Zatrideni.GetSubjektyDirectAsync(obor),
-            options => options.ModifyEntryOptionsDuration(TimeSpan.FromHours(6))
+            options => options.ModifyEntryOptionsDuration(TimeSpan.FromDays(1))
         );
 
     public static FirmaRepo.Merk.MerkEnumConverters.CzechEnumsData GetMerkEnums() =>
         MemcachedCache.GetOrSet($"_MerkEnums",
             _ => FirmaRepo.Merk.MerkEnumConverters.GetMerkEnums(),
-                        options => options.ModifyEntryOptionsDuration(TimeSpan.FromHours(6))
+                        options => options.ModifyEntryOptionsDuration(TimeSpan.FromDays(1))
         );
 }
 

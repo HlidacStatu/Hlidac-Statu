@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using ZiggyCreatures.Caching.Fusion;
+﻿using ZiggyCreatures.Caching.Fusion;
 
 namespace HlidacStatu.Caching
 {
@@ -22,12 +17,27 @@ namespace HlidacStatu.Caching
             return options;
         }
 
-        public static FusionCacheEntryOptions ModifyEntryOptionsDuration(this FusionCacheEntryOptions options, TimeSpan mainDuration)
+        public static FusionCacheEntryOptions ModifyEntryOptionsDuration(this FusionCacheEntryOptions options, 
+            TimeSpan inMemoryDuration, TimeSpan? distributedDuration)
         {
-            options.Duration = mainDuration;
-            options.FailSafeMaxDuration = mainDuration * 4;
-            options.DistributedCacheFailSafeMaxDuration = mainDuration * 4 * 4;
+            options.Duration = inMemoryDuration;
+            options.FailSafeMaxDuration = inMemoryDuration * 4;
+
+            if (distributedDuration is not null)
+            {
+                if (options.DistributedCacheDuration is not null)
+                {
+                    options.DistributedCacheDuration = distributedDuration;
+                }
+                options.DistributedCacheFailSafeMaxDuration = distributedDuration * 4;
+            }
+            else
+            {
+                options.DistributedCacheFailSafeMaxDuration = inMemoryDuration * 4 * 4;
+            }
             return options;
         }
+        
+        
     }
 }
