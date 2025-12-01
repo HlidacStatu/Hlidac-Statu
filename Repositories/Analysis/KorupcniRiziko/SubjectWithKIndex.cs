@@ -39,7 +39,7 @@ namespace HlidacStatu.Repositories.Analysis.KorupcniRiziko
             if (string.IsNullOrWhiteSpace(Ico))
                 throw new Exception("Ico is missing");
 
-            year = KIndexRepo.FixKindexYear(year);
+            year = await KIndexRepo.FixKindexYearAsync(year);
             var kindex = await KIndex.GetAsync(Ico);
 
             if (kindex != null)

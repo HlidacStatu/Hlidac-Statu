@@ -104,11 +104,11 @@
             </p>
             <div class="row" style="padding-top:25px;">
                 <div class="col-sm-2" title="@HlidacStatu.Util.RenderData.NiceNumber(kindex.LastReadyKIndex().KIndex)">
-                    <a href="/kindex/detail/@Model.ICO">@Html.KIndexIcon(kindex.LastReadyKIndex(HtmlExtensions.MaxKIndexYearToShow(this.User)).KIndexLabel, "width:66px")</a>
+                    <a href="/kindex/detail/@Model.ICO">@Html.KIndexIcon(kindex.LastReadyKIndex(await HtmlExtensions.MaxKIndexYearToShowAsync(this.User)).KIndexLabel, "width:66px")</a>
                 </div>
                 <div class="col-sm-10">
                     <div>
-                        @Html.Raw(kindex.InfoFacts(kindex.LastReadyKIndex(HtmlExtensions.MaxKIndexYearToShow(this.User)).Rok).RenderFacts(3, true, false, lineFormat: "<p>{0}</p>", html: true))
+                        @Html.Raw(kindex.InfoFacts(kindex.LastReadyKIndex(await HtmlExtensions.MaxKIndexYearToShowAsync(this.User)).Rok).RenderFacts(3, true, false, lineFormat: "<p>{0}</p>", html: true))
                     </div>
                 </div>
             </div>
@@ -135,7 +135,7 @@
 
     @* ----- Rizika ----- *@
     @{
-        int rok = KIndexRepo.GetAvailableCalculationYears().Max();
+        int rok = (await KIndexRepo.GetAvailableCalculationYearsAsync()).Max();
     }
     <div>
         <h4>

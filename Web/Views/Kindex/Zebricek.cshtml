@@ -77,10 +77,10 @@
         {
             case "obor":
                 if (selectedPart.HasValue)
-                    result = Statistics.GetStatistics(Model.rok)
+                    result = (await Statistics.GetStatisticsAsync(Model.rok))
                         .SubjektOrderedListPartsCompanyAsc(selectedPart.Value, await FirmaCache.GetSubjektyForOborAsync(oborFromId), showNone: true);
                 else
-                    result = Statistics.GetStatistics(Model.rok)
+                    result = (await Statistics.GetStatisticsAsync(Model.rok))
                         .SubjektOrderedListKIndexCompanyAsc(await FirmaCache.GetSubjektyForOborAsync(oborFromId), showNone: true);
                 ViewBag.LadderTopic = oborFromId.ToNiceDisplayName();
                 ViewBag.LadderTitle = oborFromId.ToNiceDisplayName() + " podle K–Indexu";
@@ -88,11 +88,11 @@
 
             case "nejlepsi":
                 if (selectedPart.HasValue)
-                    result = Statistics.GetStatistics(Model.rok)
+                    result = (await Statistics.GetStatisticsAsync(Model.rok))
                         .SubjektOrderedListPartsCompanyAsc(selectedPart.Value)
                         .Take(100);
                 else
-                    result = Statistics.GetStatistics(Model.rok).SubjektOrderedListKIndexCompanyAsc()
+                    result = (await Statistics.GetStatisticsAsync(Model.rok)).SubjektOrderedListKIndexCompanyAsc()
                         //.Where(s => s.KIndex > 0)
                         .Take(100);
                 ViewBag.LadderTopic = "Top 100 nejlepších subjektů";
@@ -101,12 +101,12 @@
 
             case "nejhorsi":
                 if (selectedPart.HasValue)
-                    result = Statistics.GetStatistics(Model.rok)
+                    result = (await Statistics.GetStatisticsAsync(Model.rok))
                         .SubjektOrderedListPartsCompanyAsc(selectedPart.Value)
                         .OrderByDescending(k => k.KIndex)
                         .Take(100);
                 else
-                    result = Statistics.GetStatistics(Model.rok).SubjektOrderedListKIndexCompanyAsc()
+                    result = (await Statistics.GetStatisticsAsync(Model.rok)).SubjektOrderedListKIndexCompanyAsc()
                     .OrderByDescending(k => k.KIndex)
                     .Take(100);
                 ViewBag.LadderTopic = "Nejhůře hodnocené úřady a organizace";
@@ -115,11 +115,11 @@
 
             case "celkovy":
                 if (selectedPart.HasValue)
-                    result = Statistics.GetStatistics(Model.rok)
+                    result = (await Statistics.GetStatisticsAsync(Model.rok))
                         .SubjektOrderedListPartsCompanyAsc(selectedPart.Value);
                 else
                 {
-                    result = Statistics.GetStatistics(Model.rok)
+                    result = (await Statistics.GetStatisticsAsync(Model.rok))
                         .SubjektOrderedListKIndexCompanyAsc()
                         .Select(subj => { 
                             subj.Kraj = HlidacStatu.Util.CZ_Nuts.Nace2Kraj(subj.KrajId, "(neznamý)");
@@ -132,7 +132,7 @@
 
             case "skokani":
                 ViewBag.LadderTitle = "Úřady a organizace, kterým se hodnocení K-Indexu meziročně nejvíce změnilo";
-                <partial name="Partials/Zebricek.Skokani" model="@(Statistics.GetJumpersFromBest(Model.rok).Take(200))"/>
+                <partial name="Partials/Zebricek.Skokani" model="@((await Statistics.GetJumpersFromBestAsync(Model.rok)).Take(200))"/>
                 break;
 
             default:

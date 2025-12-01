@@ -200,17 +200,17 @@ namespace HlidacStatu.Lib.Web.UI
         /// <param name="user"></param>
         /// <param name="rok"></param>
         /// <returns></returns>
-        public static int MaxKIndexYearToShow(System.Security.Principal.IPrincipal user, int? rok = null)
+        public static async Task<int> MaxKIndexYearToShowAsync(System.Security.Principal.IPrincipal user, int? rok = null)
         {
             if (rok.HasValue)
-                return Math.Min(rok.Value, MaxKIndexYearToShow(user));
+                return Math.Min(rok.Value, await MaxKIndexYearToShowAsync(user));
             else
-                return MaxKIndexYearToShow(user);
+                return await MaxKIndexYearToShowAsync(user);
         }
-        public static int MaxKIndexYearToShow(System.Security.Principal.IPrincipal user)
+        public static async Task<int> MaxKIndexYearToShowAsync(System.Security.Principal.IPrincipal user)
         {
             int lastY = Devmasters.ParseText.ToInt(Devmasters.Config.GetWebConfigValue("KIndexMaxYear"))
-                ?? KIndexRepo.GetAvailableCalculationYears().Max();
+                ?? (await KIndexRepo.GetAvailableCalculationYearsAsync()).Max();
 
             return lastY;
         }

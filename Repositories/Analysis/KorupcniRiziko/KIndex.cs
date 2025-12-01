@@ -17,7 +17,7 @@ namespace HlidacStatu.Repositories.Analysis.KorupcniRiziko
         private static readonly IFusionCache _memoryCache =
             HlidacStatu.Caching.CacheFactory.CreateNew(CacheFactory.CacheType.L1Default, nameof(KIndex));
         
-        public static ValueTask<KIndexData> GetKindexCachedAsync(string ico, bool useTempDb) =>
+        private static ValueTask<KIndexData> GetKindexCachedAsync(string ico, bool useTempDb) =>
             _memoryCache.GetOrSetAsync($"_KIndexData:{ico}-{useTempDb}", async _ =>
                 {
                     KIndexData f = await KIndexRepo.GetDirectAsync(ico, useTempDb);
@@ -28,7 +28,7 @@ namespace HlidacStatu.Repositories.Analysis.KorupcniRiziko
                 options => options.ModifyEntryOptionsDuration(TimeSpan.FromHours(28))
             );
         
-        public static ValueTask InvalidateKindexCachedAsync(string ico, bool useTempDb) => 
+        private static ValueTask InvalidateKindexCachedAsync(string ico, bool useTempDb) => 
             _memoryCache.ExpireAsync($"_KIndexData:{ico}-{useTempDb}");
 
 
@@ -76,7 +76,7 @@ namespace HlidacStatu.Repositories.Analysis.KorupcniRiziko
             if (refreshCache)
                 await InvalidateKindexCachedAsync(ico, useTemp);
 
-            KIndexData f = await GetKindexCachedAsync(ico,useTemp);
+            KIndexData f = await GetKindexCachedAsync(ico, useTemp);
             if (f == null || f.Ico == "-")
                 return null;
             return f;
@@ -163,17 +163,17 @@ namespace HlidacStatu.Repositories.Analysis.KorupcniRiziko
         }
 
 
-        public static decimal Average(int year)
+        public static async Task<decimal> AverageAsync(int year)
         {
-            var stat = Statistics.KIndexStatTotal.Get().FirstOrDefault(m => m.Rok == year);
+            var stat = (await Statistics.GetKindexStatTotalAsync()).FirstOrDefault(m => m.Rok == year);
             if (stat == null)
                 return 0;
             else
                 return stat.AverageKindex;
         }
-        public static decimal Average(int year, KIndexData.KIndexParts part)
+        public static async Task<decimal> AverageAsync(int year, KIndexData.KIndexParts part)
         {
-            var stat = Statistics.KIndexStatTotal.Get().FirstOrDefault(m => m.Rok == year);
+            var stat = (await Statistics.GetKindexStatTotalAsync()).FirstOrDefault(m => m.Rok == year);
             if (stat == null)
                 return 0;
             else

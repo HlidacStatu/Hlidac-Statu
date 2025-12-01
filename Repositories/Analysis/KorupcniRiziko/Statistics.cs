@@ -2,9 +2,12 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.Json.Serialization;
+using System.Threading.Tasks;
+using HlidacStatu.Caching;
 using HlidacStatu.Entities;
 using HlidacStatu.Entities.KIndex;
 using Serilog;
+using ZiggyCreatures.Caching.Fusion;
 
 namespace HlidacStatu.Repositories.Analysis.KorupcniRiziko
 {
@@ -14,45 +17,63 @@ namespace HlidacStatu.Repositories.Analysis.KorupcniRiziko
 
         static int[] Percentiles = new int[] { 1, 5, 10, 25, 33, 50, 66, 75, 90, 95, 99 };
 
-        //L1 - 6 hodin
-        //L2 - 10 let
-        public static Devmasters.Cache.AWS_S3.Cache<Statistics[]> KIndexStatTotal = new Devmasters.Cache.AWS_S3.Cache<Statistics[]>(
-                new string[] { Devmasters.Config.GetWebConfigValue("Minio.Cache.Endpoint") },
-                    Devmasters.Config.GetWebConfigValue("Minio.Cache.Bucket"),
-                    Devmasters.Config.GetWebConfigValue("Minio.Cache.AccessKey"),
-                    Devmasters.Config.GetWebConfigValue("Minio.Cache.SecretKey"), 
-                    TimeSpan.Zero, "KIndexStat",
-                    (o) =>
-                    {
-                        return CalculateAsync().ConfigureAwait(false).GetAwaiter().GetResult().ToArray();
-                    });
 
+        private static readonly IFusionCache _permanentCache =
+            HlidacStatu.Caching.CacheFactory.CreateNew(CacheFactory.CacheType.PermanentStore, "KindexStatistics");
 
+        public static ValueTask<Statistics[]> GetKindexStatTotalAsync() =>
+            _permanentCache.GetOrSetAsync($"_KIndexStat",
+                async _ => (await CalculateAsync()).ToArray(),
+                options => options.ModifyEntryOptionsDuration(TimeSpan.FromHours(6))
+            );
+
+        public static async Task ForceRefreshKindexStatTotalAsync(Statistics[] newData = null)
+        {
+            await _permanentCache.ExpireAsync($"_KIndexStat");
+            if (newData is not null && newData.Any())
+            {
+                await _permanentCache.SetAsync($"_KIndexStat", newData);
+            }
+            else
+            {
+                await GetKindexStatTotalAsync();
+            }
+        }
+        
+        
 
         public decimal AverageKindex { get; set; }
         public Dictionary<int, decimal> PercentileKIndex { get; set; } = new Dictionary<int, decimal>();
         public List<IcoDetail> SubjektOrderedListKIndexAsc { get; set; }
+
         public class IcoDetail
         {
             public string ico { get; set; }
             public decimal kindex { get; set; }
             public string krajId { get; set; }
         }
-        public Dictionary<KIndexData.KIndexParts, List<IcoDetail>> SubjektOrderedListPartsAsc { get; set; } = new Dictionary<KIndexData.KIndexParts, List<IcoDetail>>();
+
+        public Dictionary<KIndexData.KIndexParts, List<IcoDetail>> SubjektOrderedListPartsAsc { get; set; } =
+            new Dictionary<KIndexData.KIndexParts, List<IcoDetail>>();
 
 
         public KIndexData.VypocetDetail AverageParts { get; set; }
-        public Dictionary<int, KIndexData.VypocetDetail> PercentileParts { get; set; } = new Dictionary<int, KIndexData.VypocetDetail>();
+
+        public Dictionary<int, KIndexData.VypocetDetail> PercentileParts { get; set; } =
+            new Dictionary<int, KIndexData.VypocetDetail>();
+
         public int Rok { get; set; }
 
 
         //private
         [JsonConstructor]
-        protected Statistics() { }
-        
-        public static Statistics GetStatistics(int year)
+        protected Statistics()
         {
-            var stat = KIndexStatTotal.Get().FirstOrDefault(m => m.Rok == year);
+        }
+
+        public static async Task<Statistics> GetStatisticsAsync(int year)
+        {
+            var stat = (await GetKindexStatTotalAsync()).FirstOrDefault(m => m.Rok == year);
             if (stat == null)
                 return null;
             else
@@ -64,32 +85,36 @@ namespace HlidacStatu.Repositories.Analysis.KorupcniRiziko
         /// </summary>
         /// <param name="year">Minimum year = 2018</param>
         /// <returns>Positive number means improvement. Negative number means worsening.</returns>
-        public static IEnumerable<SubjectWithKIndexTrend> GetJumpersFromBest(int year)
+        public static async Task<IEnumerable<SubjectWithKIndexTrend>> GetJumpersFromBestAsync(int year)
         {
-            if (year < KIndexRepo.GetAvailableCalculationYears().Min() + 1)
-                year = KIndexRepo.GetAvailableCalculationYears().Min() + 1;
-            if (year > KIndexRepo.GetAvailableCalculationYears().Max())
-                year = KIndexRepo.GetAvailableCalculationYears().Max();
+            var availableCalculations = await KIndexRepo.GetAvailableCalculationYearsAsync();
+            
+            if (year < availableCalculations.Min() + 1)
+                year = availableCalculations.Min() + 1;
+            if (year > availableCalculations.Max())
+                year = availableCalculations.Max();
 
-            var statChosenYear = KIndexStatTotal.Get().FirstOrDefault(m => m.Rok == year).SubjektOrderedListKIndexAsc;
-            var statYearBefore = KIndexStatTotal.Get().FirstOrDefault(m => m.Rok == year - 1).SubjektOrderedListKIndexAsc;
+            var kindexStatsTotal = await GetKindexStatTotalAsync();
+            
+            var statChosenYear = kindexStatsTotal.FirstOrDefault(m => m.Rok == year).SubjektOrderedListKIndexAsc;
+            var statYearBefore = kindexStatsTotal.FirstOrDefault(m => m.Rok == year - 1).SubjektOrderedListKIndexAsc;
 
             IEnumerable<SubjectWithKIndexTrend> result = statChosenYear.Join(statYearBefore,
-                cy => cy.ico,
-                yb => yb.ico,
-                (cy, yb) =>
-                {
-                    SubjectNameCache.GetCompanies().TryGetValue(cy.ico, out SubjectNameCache comp);
-                    var r = new SubjectWithKIndexTrend()
+                    cy => cy.ico,
+                    yb => yb.ico,
+                    (cy, yb) =>
                     {
-                        Ico = cy.ico,
-                        Jmeno = comp?.Name,
-                        KIndex = Math.Abs(yb.kindex - cy.kindex),
-                        Group = yb.kindex - cy.kindex < 0 ? "Zhoršení ratingu" : "Zlepšení ratingu",
-                        Roky = new Dictionary<int, decimal> { { year - 1, yb.kindex }, { year, cy.kindex } }
-                    };
-                    return r;
-                })
+                        SubjectNameCache.GetCompanies().TryGetValue(cy.ico, out SubjectNameCache comp);
+                        var r = new SubjectWithKIndexTrend()
+                        {
+                            Ico = cy.ico,
+                            Jmeno = comp?.Name,
+                            KIndex = Math.Abs(yb.kindex - cy.kindex),
+                            Group = yb.kindex - cy.kindex < 0 ? "Zhoršení ratingu" : "Zlepšení ratingu",
+                            Roky = new Dictionary<int, decimal> { { year - 1, yb.kindex }, { year, cy.kindex } }
+                        };
+                        return r;
+                    })
                 .Where(m => (m.Roky.First().Value - m.Roky.Last().Value) != 0)
                 .OrderByDescending(c => c.KIndex);
 
@@ -103,12 +128,14 @@ namespace HlidacStatu.Repositories.Analysis.KorupcniRiziko
         {
             return AverageKindex;
         }
+
         public decimal Average(KIndexData.KIndexParts part)
         {
             return AverageParts.Radky.First(m => m.Velicina == (int)part).Hodnota;
         }
 
-        public IEnumerable<SubjectWithKIndex> Filter(IEnumerable<IcoDetail> source, IEnumerable<Firma.Zatrideni.Item> filterIco = null, bool showNone = false)
+        public IEnumerable<SubjectWithKIndex> Filter(IEnumerable<IcoDetail> source,
+            IEnumerable<Firma.Zatrideni.Item> filterIco = null, bool showNone = false)
         {
             IEnumerable<SubjectWithKIndex> data;
             if (filterIco != null && filterIco.Count() > 0)
@@ -127,33 +154,35 @@ namespace HlidacStatu.Repositories.Analysis.KorupcniRiziko
                             KrajId = yb.KrajId,
                             Kraj = yb.Kraj
                         }
-                    );
+                );
             }
             else
             {
-                data = source.
-                    Select(m =>
+                data = source.Select(m =>
+                {
+                    string subjectName = "";
+                    if (SubjectNameCache.CachedCompanies.Get().TryGetValue(m.ico, out var cache))
                     {
-                        string subjectName = "";
-                        if (SubjectNameCache.CachedCompanies.Get().TryGetValue(m.ico, out var cache))
-                        {
-                            subjectName = cache.Name;
-                        }
-                        else
-                        {
-                            _logger.Error($"Record with ico [{m.ico}] is missing in KIndexCompanies cache file. Please reset cache.");
-                            subjectName = FirmaRepo.NameFromIco(m.ico);
-                        }
-                        return new SubjectWithKIndex()
-                        {
-                            Ico = m.ico,
-                            Jmeno = subjectName,
-                            KrajId = m.krajId,
-                            Group = "",
-                            KIndex = m.kindex
-                        };
-                    });
+                        subjectName = cache.Name;
+                    }
+                    else
+                    {
+                        _logger.Error(
+                            $"Record with ico [{m.ico}] is missing in KIndexCompanies cache file. Please reset cache.");
+                        subjectName = FirmaRepo.NameFromIco(m.ico);
+                    }
+
+                    return new SubjectWithKIndex()
+                    {
+                        Ico = m.ico,
+                        Jmeno = subjectName,
+                        KrajId = m.krajId,
+                        Group = "",
+                        KIndex = m.kindex
+                    };
+                });
             }
+
             if (showNone)
             {
                 if (filterIco != null && filterIco.Count() > 0)
@@ -162,28 +191,31 @@ namespace HlidacStatu.Repositories.Analysis.KorupcniRiziko
 
                     IEnumerable<SubjectWithKIndex> missing_data = missing_ico
                         .Join(filterIco, mi => mi, fi => fi.Ico, (mi, fi) =>
-                                 new SubjectWithKIndex()
-                                 {
-                                     Ico = fi.Ico,
-                                     KIndex = Consts.MinSmluvPerYearKIndexValue,
-                                     Jmeno = fi.Jmeno,
-                                     Group = fi.Group,
-                                     KrajId = fi.KrajId,
-                                     Kraj = fi.Kraj
-                                 });
+                            new SubjectWithKIndex()
+                            {
+                                Ico = fi.Ico,
+                                KIndex = Consts.MinSmluvPerYearKIndexValue,
+                                Jmeno = fi.Jmeno,
+                                Group = fi.Group,
+                                KrajId = fi.KrajId,
+                                Kraj = fi.Kraj
+                            });
                     data = data.Concat(missing_data);
                 }
             }
+
             return data;
         }
 
-        public IEnumerable<SubjectWithKIndex> SubjektOrderedListKIndexCompanyAsc(IEnumerable<Firma.Zatrideni.Item> filterIco = null, bool showNone = false)
+        public IEnumerable<SubjectWithKIndex> SubjektOrderedListKIndexCompanyAsc(
+            IEnumerable<Firma.Zatrideni.Item> filterIco = null, bool showNone = false)
         {
             return Filter(SubjektOrderedListKIndexAsc, filterIco, showNone)
                 .OrderBy(m => m.KIndex);
         }
 
-        public IEnumerable<SubjectWithKIndex> SubjektOrderedListPartsCompanyAsc(KIndexData.KIndexParts part, IEnumerable<Firma.Zatrideni.Item> filterIco = null, bool showNone = false)
+        public IEnumerable<SubjectWithKIndex> SubjektOrderedListPartsCompanyAsc(KIndexData.KIndexParts part,
+            IEnumerable<Firma.Zatrideni.Item> filterIco = null, bool showNone = false)
         {
             return Filter(SubjektOrderedListPartsAsc[part], filterIco, showNone)
                 .OrderBy(m => m.KIndex);
@@ -197,6 +229,7 @@ namespace HlidacStatu.Repositories.Analysis.KorupcniRiziko
             else
                 return res + 1;
         }
+
         public int? SubjektRank(string ico, KIndexData.KIndexParts part)
         {
             var res = SubjektOrderedListPartsAsc[part].FindIndex(m => m.ico == ico);
@@ -246,7 +279,6 @@ namespace HlidacStatu.Repositories.Analysis.KorupcniRiziko
             {
                 return $"{rank}. z {count}";
             }
-
         }
 
         public decimal Percentil(int perc, KIndexData.KIndexParts part)
@@ -270,8 +302,10 @@ namespace HlidacStatu.Repositories.Analysis.KorupcniRiziko
 
                 prefValue = perc.Key;
             }
+
             return new PercInterval(prefValue, 100);
         }
+
         public PercInterval GetPartPercentil(KIndexData.KIndexParts part, decimal value)
         {
             int prefValue = 0;
@@ -283,6 +317,7 @@ namespace HlidacStatu.Repositories.Analysis.KorupcniRiziko
 
                 prefValue = perc.Key;
             }
+
             return new PercInterval(prefValue, 100);
         }
 
@@ -290,10 +325,10 @@ namespace HlidacStatu.Repositories.Analysis.KorupcniRiziko
         {
             return PercIntervalShortText(GetPartPercentil(part, value));
         }
+
         public string PercIntervalShortText(decimal value)
         {
             return PercIntervalShortText(GetKIndexPercentile(value));
         }
-
     }
 }

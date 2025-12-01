@@ -6,7 +6,6 @@ using HlidacStatu.Connectors;
 using HlidacStatu.Entities;
 using HlidacStatu.Entities.Facts;
 using HlidacStatu.Entities.KIndex;
-using HlidacStatu.Util;
 using Nest;
 using Serilog;
 using Consts = HlidacStatu.Entities.KIndex.Consts;
@@ -16,150 +15,15 @@ namespace HlidacStatu.Repositories;
 public static class KIndexRepo
 {
     private static readonly ILogger _logger = Log.ForContext(typeof(KIndexRepo));
-    private static string Best(KIndexData.Annual data, int year, string ico, out KIndexData.KIndexParts? usedPart)
-    {
-        usedPart = data.OrderedValuesFromBestForInfofacts(ico).FirstOrDefault();
-        if (usedPart != null)
-        {
-            return KIndexData.KIndexCommentForPart(usedPart.Value, data);
-        }
-        return null;
-    }
-    private static string Worst(KIndexData.Annual data, int year, string ico, out KIndexData.KIndexParts? usedPart)
-    {
-        usedPart = data.OrderedValuesFromBestForInfofacts(ico)?.Reverse()?.FirstOrDefault();
-        if (usedPart != null)
-        {
-            return KIndexData.KIndexCommentForPart(usedPart.Value, data);
-        }
-        return null;
-    }
-
-
-    static Devmasters.Cache.LocalMemory.Manager<KIndexData.KIndexParts[], (KIndexData.Annual, string)> _orderedValuesFromBestForInfofactsCache
-        = Devmasters.Cache.LocalMemory.Manager<KIndexData.KIndexParts[], (KIndexData.Annual, string)>.GetSafeInstance("orderedValuesFromBestForInfofacts",
-            (data) => _orderedValuesFromBestForInfofacts(data.Item1, data.Item2),
-            TimeSpan.FromDays(2), (data) => $"{data.Item1.Ico}_{data.Item1.Rok}-{data.Item2}"
-            );
-
-    public static KIndexData.KIndexParts[] OrderedValuesFromBestForInfofacts(this KIndexData.Annual annual, string ico, bool invalidateCache = false)
-    {
-        if (invalidateCache)
-            _orderedValuesFromBestForInfofactsCache.Delete((annual, ico));
-
-        return _orderedValuesFromBestForInfofactsCache.Get((annual, ico));
-    }
-
-    static KIndexData.KIndexParts[] _orderedValuesFromBestForInfofacts(this KIndexData.Annual annual, string ico)
-    {
-        if (annual._orderedValuesForInfofacts == null)
-        {
-            lock (annual._lockObj)
-            {
-                if (annual._orderedValuesForInfofacts == null)
-                {
-                    var stat = Analysis.KorupcniRiziko.Statistics.GetStatistics(annual.Rok); //todo: může být null, co s tím?
-                    if (annual.KIndexVypocet.Radky != null || annual.KIndexVypocet.Radky.Count() > 0)
-
-                        annual._orderedValuesForInfofacts = annual.KIndexVypocet.Radky
-                            .Select(m => new { r = m, rank = stat.SubjektRank(ico, m.VelicinaPart) })
-                            .Where(m => m.rank.HasValue)
-                            .Where(m =>
-                                    m.r.VelicinaPart != KIndexData.KIndexParts.PercNovaFirmaDodavatel //nezajimava oblast
-                                    && !(m.r.VelicinaPart == KIndexData.KIndexParts.PercSmlouvyPod50kBonus && m.r.Hodnota == 0) //bez bonusu
-                            )
-                            .OrderBy(m => m.rank)
-                            .ThenBy(o => o.r.Hodnota)
-                            .Select(m => m.r.VelicinaPart)
-                            .ToArray(); //better debug
-                    else
-                        annual._orderedValuesForInfofacts = new KIndexData.KIndexParts[] { };
-                }
-            }
-        }
-        return annual._orderedValuesForInfofacts;
-
-    }
     
-    public static InfoFact[] InfoFacts(this KIndexData kIndexData, int year)
-        {
-            var ann = kIndexData.roky.Where(m => m.Rok == year).FirstOrDefault();
-
-            List<InfoFact> facts = new List<InfoFact>();
-            if (ann == null || ann.KIndexReady == false)
-            {
-                facts.Add(new InfoFact($"K-Index nespočítán. Organizace má méně než {Consts.MinPocetSmluvPerYear} smluv za rok nebo malý objem smluv.", InfoFact.ImportanceLevel.Summary));
-                return facts.ToArray();
-            }
-            switch (ann.KIndexLabel)
-            {
-                case KIndexData.KIndexLabelValues.None:
-                    facts.Add(new InfoFact($"K-Index nespočítán. Organizace má méně než {Consts.MinPocetSmluvPerYear} smluv za rok nebo malý objem smluv.", InfoFact.ImportanceLevel.Summary));
-                    return facts.ToArray();
-
-                case KIndexData.KIndexLabelValues.A:
-                    facts.Add(new InfoFact("Nevykazuje téměř žádné rizikové faktory.", InfoFact.ImportanceLevel.Summary));
-                    break;
-                case KIndexData.KIndexLabelValues.B:
-                    facts.Add(new InfoFact("Chování s malou mírou rizikových faktorů.", InfoFact.ImportanceLevel.Summary));
-                    break;
-                case KIndexData.KIndexLabelValues.C:
-                    facts.Add(new InfoFact("Částečně umožňuje rizikové jednání.", InfoFact.ImportanceLevel.Summary));
-                    break;
-                case KIndexData.KIndexLabelValues.D:
-                    facts.Add(new InfoFact("Vyšší míra rizikových faktorů.", InfoFact.ImportanceLevel.Summary));
-                    break;
-                case KIndexData.KIndexLabelValues.E:
-                    facts.Add(new InfoFact("Vysoký výskyt rizikových faktorů.", InfoFact.ImportanceLevel.Summary));
-                    break;
-                case KIndexData.KIndexLabelValues.F:
-                    facts.Add(new InfoFact("Velmi vysoká míra rizikových faktorů.", InfoFact.ImportanceLevel.Summary));
-                    break;
-                default:
-                    break;
-            }
-            KIndexData.KIndexParts? bestPart = null;
-            KIndexData.KIndexParts? worstPart = null;
-            var sBest = Best(ann, year, kIndexData.Ico, out bestPart);
-            var sworst = Worst(ann, year, kIndexData.Ico, out worstPart);
-
-            //A-C dej pozitivni prvni
-            if (ann.KIndexLabel == KIndexData.KIndexLabelValues.A
-                || ann.KIndexLabel == KIndexData.KIndexLabelValues.B
-                || ann.KIndexLabel == KIndexData.KIndexLabelValues.C
-                )
-            {
-                if (!string.IsNullOrEmpty(sBest))
-                    facts.Add(new InfoFact(sBest, InfoFact.ImportanceLevel.Stat));
-                if (!string.IsNullOrEmpty(sworst))
-                    facts.Add(new InfoFact(sworst, InfoFact.ImportanceLevel.Stat));
-            }
-            else
-            {
-                if (!string.IsNullOrEmpty(sworst))
-                    facts.Add(new InfoFact(sworst, InfoFact.ImportanceLevel.Stat));
-                if (!string.IsNullOrEmpty(sBest))
-                    facts.Add(new InfoFact(sBest, InfoFact.ImportanceLevel.Stat));
-            }
-            foreach (var part in ann.OrderedValuesFromBestForInfofacts(kIndexData.Ico).Reverse())
-            {
-                if (part != bestPart && part != worstPart)
-                {
-                    var sFacts = KIndexData.KIndexCommentForPart(part, ann);
-                    if (!string.IsNullOrEmpty(sFacts))
-                        facts.Add(new InfoFact(sFacts, InfoFact.ImportanceLevel.High));
-                }
-            }
-
-            return facts.ToArray();
-        }
-
-    public static int[] GetAvailableCalculationYears()
+    
+    public static async Task<int[]> GetAvailableCalculationYearsAsync()
     {
         if (Consts.XAvailableCalculationYears is null || !Consts.XAvailableCalculationYears.Any())
         {
+            var maxYear = (await Analysis.KorupcniRiziko.Statistics.GetKindexStatTotalAsync()).Max(m => m.Rok);
             Consts.XAvailableCalculationYears = Consts.ToCalculationYears
-                .Where(r => r <= Analysis.KorupcniRiziko.Statistics.KIndexStatTotal.Get().Max(m => m.Rok))
+                .Where(r => r <= maxYear )
                 .ToArray(); 
         }
 
@@ -174,30 +38,25 @@ public static class KIndexRepo
     /// </summary>
     /// <param name="year"></param>
     /// <returns></returns>
-    public static int FixKindexYear(int? year)
+    public static async Task<int> FixKindexYearAsync(int? year)
     {
-        if (year < GetAvailableCalculationYears().Min())
-            return GetAvailableCalculationYears().Min();
-        if (year is null || year >= GetAvailableCalculationYears().Max())
-            return GetAvailableCalculationYears().Max();
+        var availableCalculationYears = await GetAvailableCalculationYearsAsync();
+        if (year < availableCalculationYears.Min())
+            return availableCalculationYears.Min();
+        if (year is null || year >= availableCalculationYears.Max())
+            return availableCalculationYears.Max();
 
         return year.Value;
     }
     
-    //KindexData
-    //todo: infofacts komplet refaktor? 
-    public static InfoFact[] InfoFacts(this KIndexData kIndexData)
-    {
-        var kidx = kIndexData.LastReadyKIndex();
-        return kIndexData.InfoFacts(kidx?.Rok ?? GetAvailableCalculationYears().Max());
-    }
     
-    public static KIndexData Empty(string ico, string jmeno = null)
+    
+    public static async Task<KIndexData> EmptyAsync(string ico, string jmeno = null)
     {
         KIndexData kidx = new KIndexData();
         kidx.Ico = ico;
         kidx.Jmeno = jmeno ?? Firmy.GetJmeno(ico);
-        kidx.roky = KIndexRepo.GetAvailableCalculationYears()
+        kidx.roky = (await KIndexRepo.GetAvailableCalculationYearsAsync())
             .Select(rok => KIndexData.Annual.Empty(rok))
             .ToList();
         return kidx;

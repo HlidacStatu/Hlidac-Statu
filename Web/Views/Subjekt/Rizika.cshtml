@@ -5,7 +5,7 @@
 @{
     Layout = null;
 
-    var roky = KIndexRepo.GetAvailableCalculationYears();
+    var roky = await KIndexRepo.GetAvailableCalculationYearsAsync();
 
 }
 
@@ -64,7 +64,7 @@
             <!-- Modal Body -->
             <form class="form-horizontal" role="form">
                 <div class="modal-body">
-                    <p>
+                    <div>
                         Toto je výstup <i>Automatické kontroly rizik</i> transparentnosti a hospodaření u uzavřených smluv prováděný Hlídačem státu.
                         <ol>
                             <li>Závěry kontroly nedokazují pochybení či porušení zákona na žádné straně smluvních vztahů.</li>
@@ -72,7 +72,7 @@
                             <li>Kontrola jako celek má sloužit jako vstup pro lepší nastavení vnitřních kontrolních postupů či snadnější nalezení vzniklých chyb.</li>
                         </ol>
                         
-                    </p>
+                    </div>
 
                 </div>
 

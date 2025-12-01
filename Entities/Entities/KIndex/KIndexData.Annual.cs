@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 
 namespace HlidacStatu.Entities.KIndex
 {
@@ -139,6 +140,8 @@ namespace HlidacStatu.Entities.KIndex
             }
 
             public KIndexParts[] _orderedValuesForInfofacts = null;
+            
+            public readonly SemaphoreSlim AnnualSemaphoreSlim = new SemaphoreSlim(1, 1);
             public readonly object _lockObj = new object();
             
 

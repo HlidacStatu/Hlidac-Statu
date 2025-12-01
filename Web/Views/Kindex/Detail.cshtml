@@ -3,6 +3,7 @@
 @using HlidacStatu.Entities
 @using HlidacStatu.Entities.Facts
 @using HlidacStatu.Entities.KIndex
+@using HlidacStatu.Extensions
 @using HlidacStatu.Repositories
 @using HlidacStatu.Repositories.Analysis.KorupcniRiziko
 
@@ -10,10 +11,11 @@
 @{
     string ukazatTxt = "ukázat detail";
     string schovatTxt = "schovat detail";
+    var maxYearToShow = await HtmlExtensions.MaxKIndexYearToShowAsync(User);
 
-    ViewBag.SelectedYear = Model.rok.HasValue ?
-                                Math.Min(Model.rok.Value, HtmlExtensions.MaxKIndexYearToShow(User))
-                                : HtmlExtensions.MaxKIndexYearToShow(User);
+    ViewBag.SelectedYear = Model.rok.HasValue
+        ? Math.Min(Model.rok.Value, maxYearToShow)
+        : maxYearToShow;
 
     bool futureData = KIndex.PlannedKIndexHash(Model.id, Model.rok ?? 0) == Model.priv;
     if (!string.IsNullOrEmpty(Model.priv) && User.IsInRole("Admin"))
@@ -25,7 +27,7 @@
     Firma f = Firmy.Get(Model.id);
     KIndexData kidx = await KIndex.GetAsync(HlidacStatu.Util.ParseTools.NormalizeIco(Model.id), futureData);
     kidx.roky = kidx.roky
-        .Where(m => m.Rok <= HtmlExtensions.MaxKIndexYearToShow(User))
+        .Where(m => m.Rok <= maxYearToShow)
         .ToList();
 
     ViewBag.Title = "K-Index";
@@ -35,83 +37,84 @@
     if (f.Valid && kidx != null)
     {
         ViewBag.SocialShareTitle = $"Index klíčových rizik pro " + f.Jmeno;
-        ViewBag.SocialShareText = kidx.InfoFacts().RenderFacts(4, true, true, ", ");
+        ViewBag.SocialShareText = (await kidx.InfoFactsAsync()).RenderFacts(4, true, true, ", ");
         ViewBag.SocialShareType = "article";
         ViewBag.SocialImage = "https://gen.hlidacstatu.cz/socialbanner/kindex?v=" + Model.id;
         ViewBag.OpenGraphMore = "<meta property=\"og:image:width\" content=\"1000\" />\n"
-                    + "<meta property=\"og:image:height\" content=\"1000\" />"
-                    + "<meta property=\"og:image:type\" content=\"image/png\" />";
-
+                                + "<meta property=\"og:image:height\" content=\"1000\" />"
+                                + "<meta property=\"og:image:type\" content=\"image/png\" />";
     }
 }
 
 
 @section scripts
-    {
-    <link rel="stylesheet" type="text/css" href="//cdn.datatables.net/1.13.4/css/jquery.dataTables.css" />
+{
+    <link rel="stylesheet" type="text/css" href="//cdn.datatables.net/1.13.4/css/jquery.dataTables.css"/>
     <script type="text/javascript" charset="utf8" src="//cdn.datatables.net/1.13.4/js/jquery.dataTables.js"></script>
     <script src="/Scripts/Highcharts-7/highcharts.js"></script>
-<script src="/Scripts/highcharts.global.options.js"></script>
+    <script src="/Scripts/highcharts.global.options.js"></script>
     <script src="/scripts/highcharts-6/highcharts-more.js"></script>
     <script src="/scripts/highcharts-6/modules/heatmap.js"></script>
     <script src="/scripts/highcharts-6/modules/treemap.js"></script>
     <script>
         // Radialize the colors
         Highcharts.setOptions({
-        colors: Highcharts.map(Highcharts.getOptions().colors, function (color) {
-        return {
-        radialGradient: {
-        cx: 0.5,
-        cy: 0.3,
-        r: 0.7
-        },
-        stops: [
-        [0, color],
-        [1, Highcharts.color(color).brighten(-0.3).get('rgb')] // darken
-        ]
-        };
-        })
+            colors: Highcharts.map(Highcharts.getOptions().colors, function (color) {
+                return {
+                    radialGradient: {
+                        cx: 0.5,
+                        cy: 0.3,
+                        r: 0.7
+                    },
+                    stops: [
+                        [0, color],
+                        [1, Highcharts.color(color).brighten(-0.3).get('rgb')] // darken
+                    ]
+                };
+            })
         });
 
         $(document).ready(function () {
 
-        $("#sel_obory").change(function () {
-        $(this).find("option:selected").each(function () {
-        var optionValue = $(this).attr("value");
-        if (optionValue) {
-        $(".boxobor").not("." + optionValue).hide();
-        $(".boxobor." + optionValue).show();
-        InitLowBox();
-        } else {
-        $(".boxobor").hide();
-        }
+            $("#sel_obory").change(function () {
+                $(this).find("option:selected").each(function () {
+                    var optionValue = $(this).attr("value");
+                    if (optionValue) {
+                        $(".boxobor").not("." + optionValue).hide();
+                        $(".boxobor." + optionValue).show();
+                        InitLowBox();
+                    } else {
+                        $(".boxobor").hide();
+                    }
+                });
+            }).change();
+
+            var shown = readCookie("kindexDisclaimerNoteShown");
+            if (shown != "yes") {
+                createCookie("kindexDisclaimerNoteShown", "yes", 2);
+                $('#kindexDisclaimerPopupfbForm').modal('show');
+            }
+
+            var urihash = window.location.hash;
+            if (urihash) {
+                $('html,body').animate({scrollTop: $(urihash).offset().top}, 500);
+                $(urihash).click();
+            }
+
+
         });
-        }).change();
 
-        var shown = readCookie("kindexDisclaimerNoteShown");
-        if (shown != "yes") {
-        createCookie("kindexDisclaimerNoteShown", "yes", 2);
-        $('#kindexDisclaimerPopupfbForm').modal('show');
-        }
-
-        var urihash = window.location.hash;
-        if (urihash) {
-        $('html,body').animate({ scrollTop: $(urihash).offset().top }, 500);
-        $(urihash).click();
-        }
-
-
-        });
         function showHelp(btn, id) {
-        var visible = $(btn).text().includes('@Html.Raw(ukazatTxt)');
-        if (visible) {
-        $(id).show(300, function () { InitLowBox(); });
-        $(btn).text('@Html.Raw(schovatTxt)');
-        }
-        else {
-        $(id).hide(300);
-        $(btn).text('@Html.Raw(ukazatTxt)');
-        }
+            var visible = $(btn).text().includes('@Html.Raw(ukazatTxt)');
+            if (visible) {
+                $(id).show(300, function () {
+                    InitLowBox();
+                });
+                $(btn).text('@Html.Raw(schovatTxt)');
+            } else {
+                $(id).hide(300);
+                $(btn).text('@Html.Raw(ukazatTxt)');
+            }
         }
     </script>
 
@@ -119,7 +122,7 @@
 }
 
 @section breadcrumb
-    {
+{
     <ol class="breadcrumb">
         <li><a href="/">Hlídač Státu</a></li>
         <li><a href="/kindex">K–Index</a></li>
@@ -127,13 +130,16 @@
         <li class="active">@(ViewBag.Title + " " + ViewBag.SubTitle)</li>
     </ol>
 }
+
 @section onlyembed
-    {
+{
     @*@Html.Action("CachedAction_Child_12H", new { model = Model, aktualnost = aktualnost, NameOfView = "OsobaProfil_embed", key = Model.NameId, param1 = aktualnost.ToString() })*@
     @*@Html.Action("Osoba_child", new { model = Model, aktualnost = aktualnost, NameOfView = "OsobaProfil_embed" })*@
 
-    <a href="@kidx.GetUrl(false,Model.rok)" target="_top">
-        <img src="@($"https://gen.hlidacstatu.cz/socialbanner/kindex?d={DateTime.Now.ToString("yyMMdd")}&v=" + Model.id)" style="width:95%;height:auto;max-width:@(ViewBag.MaxWidth)px;" />
+    <a href="@kidx.GetUrl(false, Model.rok)" target="_top">
+        <img
+            src="@($"https://gen.hlidacstatu.cz/socialbanner/kindex?d={DateTime.Now.ToString("yyMMdd")}&v=" + Model.id)"
+            style="width:95%;height:auto;max-width:@(ViewBag.MaxWidth)px;"/>
     </a>
 }
 
@@ -149,74 +155,84 @@
         <h3>Info pro adminy</h3>
         <table class="table table-bordered table-condensed table-striped">
             <thead>
-                <tr><th>Rok</th><th>Ready 2020?</th><th>Zverejneny KIndex</th><th>Ready 2021?</th><th>Planovany ke zverejneni</th><th>KIndex 2021 v1</th></tr>
+            <tr>
+                <th>Rok</th>
+                <th>Ready 2020?</th>
+                <th>Zverejneny KIndex</th>
+                <th>Ready 2021?</th>
+                <th>Planovany ke zverejneni</th>
+                <th>KIndex 2021 v1</th>
+            </tr>
             </thead>
             <tbody>
-                @foreach (var rok in KIndexRepo.GetAvailableCalculationYears())
+            @foreach (var rok in await KIndexRepo.GetAvailableCalculationYearsAsync())
+            {
+                var kidxP = kidxPublic?.ForYear(rok);
+                var kidxF = kidxFuture?.ForYear(rok);
+                //var prevP = kidxPublic.GetPreviousVersions()?.Select(m => m?.KIndex?.ForYear(rok)?.KIndex)?.Where(m=>m!=null);
+                IOrderedEnumerable<Backup> prevVersions = null;
+                if (kidxFuture != null)
                 {
-                    var kidxP = kidxPublic?.ForYear(rok);
-                    var kidxF = kidxFuture?.ForYear(rok);
-                    //var prevP = kidxPublic.GetPreviousVersions()?.Select(m => m?.KIndex?.ForYear(rok)?.KIndex)?.Where(m=>m!=null);
-                    IOrderedEnumerable<Backup> prevVersions = null;
-                        if (kidxFuture != null)
-                        { 
-                            prevVersions= await kidxFuture?.GetPreviousVersionsAsync(true);
-                        }
-
-                    List<string> prevF = null;
-                        if (prevVersions != null) {
-                            prevF = prevVersions
-                                .OrderByDescending(o => o.Created)?
-                                .Select(m => m?.KIndex?.ForYear(rok)?.KIndex)?
-                                .Where(m => m != null)?
-                                .Select(m => m.Value.ToString("N2"))?
-                                .ToList();
-                        }
-                    <tr>
-                        <td>@rok</td>
-                        <td>@(kidxP?.KIndexReady)</td>
-                        <td>@($"{kidxP?.KIndex:N2}")</td>
-                        <td>@(kidxF?.KIndexReady)</td>
-                        <td>@($"{kidxF?.KIndex:N2}")</td>
-                        <td>@(prevF?.Count() > 0 ? prevF.Aggregate((ff, s) => ff + " <- " + s) : "")</td>
-                    </tr>
+                    prevVersions = await kidxFuture?.GetPreviousVersionsAsync(true);
                 }
+
+                List<string> prevF = null;
+                if (prevVersions != null)
+                {
+                    prevF = prevVersions
+                        .OrderByDescending(o => o.Created)?
+                        .Select(m => m?.KIndex?.ForYear(rok)?.KIndex)?
+                        .Where(m => m != null)?
+                        .Select(m => m.Value.ToString("N2"))?
+                        .ToList();
+                }
+
+                <tr>
+                    <td>@rok</td>
+                    <td>@(kidxP?.KIndexReady)</td>
+                    <td>@($"{kidxP?.KIndex:N2}")</td>
+                    <td>@(kidxF?.KIndexReady)</td>
+                    <td>@($"{kidxF?.KIndex:N2}")</td>
+                    <td>@(prevF?.Count() > 0 ? prevF.Aggregate((ff, s) => ff + " <- " + s) : "")</td>
+                </tr>
+            }
             </tbody>
         </table>
     </div>
 }
 
 @if (Consts.KIndexExceptions.Contains(Model.id)
-    && futureData == false)
+     && futureData == false)
 {
     <div class="p-5 mb-4 bg-jumbo rounded-3">
         <div>
             <div class="row">
-                <h2 style="padding-top:0;margin-top:0;margin-bottom:30px"><a href="/subjekt/@f.ICO"><b>@f.Jmeno</b></a> za rok <b>@ViewBag.SelectedYear</b></h2>
+                <h2 style="padding-top:0;margin-top:0;margin-bottom:30px"><a href="/subjekt/@f.ICO"><b>@f.Jmeno</b></a>
+                    za rok <b>@ViewBag.SelectedYear</b></h2>
                 <div class="col-sm-1">
                 </div>
                 <div class="col-sm-9">
                     <h4>
-                        Metodika, kterou jsme použili pro spočítání K–Indexu pro @(f.Jmeno), nebyla přesná. Připravujeme upravenou metodiku,
-                        pomocí které K-Index pro tuto organizaci přepočítáme a která bude lépe postihovat specifika smluvních vztahů této organizace.
+                        Metodika, kterou jsme použili pro spočítání K–Indexu pro @(f.Jmeno), nebyla přesná. Připravujeme
+                        upravenou metodiku,
+                        pomocí které K-Index pro tuto organizaci přepočítáme a která bude lépe postihovat specifika
+                        smluvních vztahů této organizace.
                     </h4>
                 </div>
             </div>
 
         </div>
     </div>
-
 }
 else
 {
-
     <cache enabled="@(!this.User.IsInRole("Admin"))" expires-after="@Constants.CachedActionLength.Cache24H"
            vary-by="@($"{Model.id}_{Model.rok}_{Model.priv}_{this.User.IsInRole("Admin")}")">
         @{
             ViewBag.ICO = Model.id;
             ViewBag.FutureData = futureData;
             ViewBag.SelectedYear = ViewBag.SelectedYear;
-            <partial name="Partials/Detail_child" model="@kidx" />
+            <partial name="Partials/Detail_child" model="@kidx"/>
         }
 
     </cache>
@@ -233,8 +249,7 @@ else
                         "Vyjádření k hodnocení K-Index",
                         "/kindex/recalculateFeedback",
                         mustAuth: false,
-                        addData: Model.id))" />
-
+                        addData: Model.id))"/>
 }
 else
 {
@@ -250,7 +265,7 @@ else
                     "Přepočítat K-Index",
                     "/kindex/recalculateFeedback",
                     mustAuth: true,
-                    addData: Model.id))" />
+                    addData: Model.id))"/>
 
 <div class="modal fade" id="kindexDisclaimerPopupfbForm" tabindex="-1" role="dialog"
      aria-labelledby="kindexDisclaimerPopupfbTitle" aria-hidden="true">
@@ -272,11 +287,18 @@ else
             <div class="modal-body">
                 <form class="form-horizontal" role="form">
                     <div>
-                        Toto je výstup <i>Automatické kontroly rizik</i> transparentnosti a hospodaření u uzavřených smluv prováděný Hlídačem státu.
+                        Toto je výstup <i>Automatické kontroly rizik</i> transparentnosti a hospodaření u uzavřených
+                        smluv prováděný Hlídačem státu.
                         <ol>
-                            <li>Závěry kontroly nedokazují pochybení či porušení zákona na žádné straně smluvních vztahů.</li>
-                            <li>Zjištěná rizika znamenají pouze vyšší možnost výskytu námi posuzovaných a identifikovaných situací u analyzovaných smluv.</li>
-                            <li>Kontrola jako celek má sloužit jako vstup pro lepší nastavení vnitřních kontrolních postupů či snadnější nalezení vzniklých chyb.</li>
+                            <li>Závěry kontroly nedokazují pochybení či porušení zákona na žádné straně smluvních
+                                vztahů.
+                            </li>
+                            <li>Zjištěná rizika znamenají pouze vyšší možnost výskytu námi posuzovaných a
+                                identifikovaných situací u analyzovaných smluv.
+                            </li>
+                            <li>Kontrola jako celek má sloužit jako vstup pro lepší nastavení vnitřních kontrolních
+                                postupů či snadnější nalezení vzniklých chyb.
+                            </li>
                         </ol>
 
                     </div>

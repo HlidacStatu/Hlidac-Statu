@@ -71,7 +71,7 @@
     <div class="col-sm-12">
         <h3 class="">
             Žebříček pro další roky:
-            @foreach (int year in KIndexRepo.GetAvailableCalculationYears().Where(m => this.User.IsInRole("Admin") || maxYear == null || m <= maxYear))
+            @foreach (int year in (await KIndexRepo.GetAvailableCalculationYearsAsync()).Where(m => this.User.IsInRole("Admin") || maxYear == null || m <= maxYear))
             {
                 if (year != selectedYear)
                 {

@@ -7,14 +7,7 @@
 @{
     ViewBag.Title = "K–Index dlouhodobý dopad";
 
-    //KIndexData[] allData = KIndex.KIndexActiveIcos()
-    //    .Select(m => KIndex.GetAsync(m, false).Result)
-    //    .ToArray();
-
-
-    var stat = Statistics.KIndexStatTotal.Get();
-    int[] years = stat.Select(m => m.Rok).Distinct().ToArray();
-
+    var stat = await Statistics.GetKindexStatTotalAsync();
 
 }
 

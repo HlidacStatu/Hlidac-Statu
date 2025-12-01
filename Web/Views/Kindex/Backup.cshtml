@@ -5,6 +5,7 @@
 @using HlidacStatu.Entities
 @using HlidacStatu.Entities.Facts
 @using HlidacStatu.Entities.KIndex
+@using HlidacStatu.Extensions
 @using HlidacStatu.Repositories
 @using HlidacStatu.Repositories.Analysis.KorupcniRiziko
 
@@ -31,7 +32,7 @@
 
     //kindexValue = 10.9m;
 
-    Statistics statistics = Statistics.GetStatistics(selectedYear);
+    Statistics statistics = await Statistics.GetStatisticsAsync(selectedYear);
 
     Func<decimal, decimal, decimal, int> sirkaGrafu = (hodnota, koeficient, celek) => { return (int) Math.Round((hodnota * koeficient / celek * 100), 0); };
 
@@ -574,7 +575,7 @@ else
                                     Výpočet celkového počtu bodů je jednoduchý. Sečtou se body u jednotlivých parametrů a
                                     výsledek se poté (pro lepší čitelnost) vynásobí deseti.
                                 </p>
-                                <p>
+                                <div>
                                     <table class="table table-condensed table-no-border" style="width:auto">
                                         <thead>
                                         <tr>
@@ -629,7 +630,7 @@ else
                                         </tr>
                                         </tbody>
                                     </table>
-                                </p>
+                                </div>
                                 <img src="/kindex/PercentileBanner/@Model.Ico" style="width:80%;max-width:800px;height:auto"/>
 
                             </div>

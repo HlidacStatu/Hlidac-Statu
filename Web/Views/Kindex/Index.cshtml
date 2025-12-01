@@ -120,8 +120,7 @@
                     Náhodně vybraný štítek Indexu klíčových rizik pro dnešní den.
                 </p>
                 @{
-                    var todaysOrg = Statistics
-                        .GetStatistics(2019).SubjektOrderedListKIndexAsc.TipOfTheDay();
+                    var todaysOrg = (await Statistics.GetStatisticsAsync(2019)).SubjektOrderedListKIndexAsc.TipOfTheDay();
                 }
                 <div>
 

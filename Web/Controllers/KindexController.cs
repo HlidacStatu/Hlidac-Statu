@@ -1,12 +1,8 @@
 ﻿using Devmasters.Enums;
-
 using HlidacStatu.Entities;
 using HlidacStatu.Entities.Facts;
 using HlidacStatu.Repositories;
-using HlidacStatu.Web.Filters;
-
 using Microsoft.AspNetCore.Mvc;
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,12 +10,12 @@ using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using HlidacStatu.Entities.KIndex;
+using HlidacStatu.Extensions;
 using HlidacStatu.LibCore;
 using HlidacStatu.Repositories.Analysis.KorupcniRiziko;
 using HlidacStatu.Web.Framework;
 using Serilog;
 using HlidacStatu.Lib.Web.UI.Attributes;
-
 
 namespace HlidacStatu.Web.Controllers
 {
@@ -38,7 +34,7 @@ namespace HlidacStatu.Web.Controllers
         }
 
 
-        public ActionResult Detail(string id, int? rok = null, string priv = null)
+        public async Task<ActionResult> Detail(string id, int? rok = null, string priv = null)
         {
             if (string.IsNullOrWhiteSpace(id))
             {
@@ -49,7 +45,7 @@ namespace HlidacStatu.Web.Controllers
             {
                 ViewBag.ICO = id;
 
-                SetViewbagSelectedYear(ref rok);
+                rok = await SetViewbagSelectedYearAsync(rok);
 
                 (string id, int? rok, string priv) model = (id, rok, priv);
                 return View(model);
@@ -67,7 +63,7 @@ namespace HlidacStatu.Web.Controllers
             
             Backup backup = await KIndexRepo.GetPreviousVersionAsync(id);
 
-            SetViewbagSelectedYear(ref rok);
+            rok = await SetViewbagSelectedYearAsync(rok);
             ViewBag.BackupCreated = backup.Created.ToString("dd.MM.yyyy");
             ViewBag.BackupComment = backup.Comment;
 
@@ -75,9 +71,9 @@ namespace HlidacStatu.Web.Controllers
 
         }
 
-        private void SetViewbagSelectedYear(ref int? rok, int? maxYear = null)
+        private async Task<int?> SetViewbagSelectedYearAsync(int? rok, int? maxYear = null)
         {
-            rok = KIndexRepo.FixKindexYear(rok);
+            rok = await KIndexRepo.FixKindexYearAsync(rok);
             if (maxYear == null && !this.User.IsInRole("Admin"))
             {
                 maxYear = Devmasters.ParseText.ToInt(Devmasters.Config.GetWebConfigValue("KIndexMaxYear"));
@@ -85,12 +81,12 @@ namespace HlidacStatu.Web.Controllers
             if (maxYear.HasValue && rok > maxYear.Value)
                 rok = maxYear;
             ViewBag.SelectedYear = rok;
+            return rok;
         }
 
         public async Task<ActionResult> Porovnat(string id, int? rok = null)
         {
-
-            SetViewbagSelectedYear(ref rok);
+            rok = await SetViewbagSelectedYearAsync(rok);
 
             var results = new List<SubjectWithKIndexAnnualData>();
 
@@ -123,11 +119,9 @@ namespace HlidacStatu.Web.Controllers
 
             return View(results);
         }
-        public ActionResult Zebricek(string id, int? rok = null, string group = null, string kraj = null, string part = null)
+        public async Task<ActionResult> Zebricek(string id, int? rok = null, string group = null, string kraj = null, string part = null)
         {
-
-            //SetViewbagSelectedYear(ref rok, Statistics.KIndexStatTotal.Get().Max(m => m.Rok));
-            SetViewbagSelectedYear(ref rok);
+            rok = await SetViewbagSelectedYearAsync(rok);
             ViewBag.SelectedLadder = id;
             ViewBag.SelectedGroup = group;
             ViewBag.SelectedKraj = kraj;
@@ -252,7 +246,7 @@ text zpravy: {txt}";
 
         public async Task<JsonResult> KindexForIco(string id, int? rok = null)
         {
-            rok = KIndexRepo.FixKindexYear(rok);
+            rok = await KIndexRepo.FixKindexYearAsync(rok);
             var f = Firmy.Get(Util.ParseTools.NormalizeIco(id));
             if (f.Valid)
             {
@@ -349,12 +343,12 @@ text zpravy: {txt}";
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public async Task<ActionResult> PercentileBanner(string id, int? part = null, int? rok = null)
         {
-            rok = KIndexRepo.FixKindexYear(rok);
+            rok = await KIndexRepo.FixKindexYearAsync(rok);
             var kidx = await KIndex.GetAsync(id);
             if (kidx != null)
             {
 
-                Statistics stat = Statistics.GetStatistics(rok.Value);
+                Statistics stat = await Statistics.GetStatisticsAsync(rok.Value);
 
                 KIndexData.KIndexParts? kpart = (KIndexData.KIndexParts?)part;
                 if (kpart.HasValue)
@@ -417,7 +411,7 @@ text zpravy: {txt}";
                 }
                 else
                 {
-                    year = KIndexRepo.FixKindexYear(rok);
+                    year = await KIndexRepo.FixKindexYearAsync(rok);
                     label = kidx.ForYear(year)?.KIndexLabel ?? KIndexData.KIndexLabelValues.None;
                     infoFacts = kidx.InfoFacts(year);
                 }
