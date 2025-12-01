@@ -13,6 +13,9 @@ namespace HlidacStatu.Repositories.Statistics
 {
     public static class OsobaStatistics
     {
+        //L1 - 1 h
+        //L2 - 10 let
+
         static Devmasters.Cache.Redis.Manager<Osoba.Statistics.Dotace, Osoba>
             _cacheDotace
                 = Devmasters.Cache.Redis.Manager<Osoba.Statistics.Dotace, Osoba>

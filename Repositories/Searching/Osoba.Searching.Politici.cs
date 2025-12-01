@@ -43,6 +43,9 @@ namespace HlidacStatu.Repositories.Searching
             public string[] Stems { get; set; }
         }
 
+        //L1 - 12 h
+        //L2 - 10 let
+
         public static Devmasters.Cache.AWS_S3.Cache<Dictionary<string, string>> CalculatedStemCache { get; set; } =
             new Devmasters.Cache.AWS_S3.Cache<Dictionary<string, string>>(
             new string[] { Devmasters.Config.GetWebConfigValue("Minio.Cache.Endpoint") },

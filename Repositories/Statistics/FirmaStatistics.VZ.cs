@@ -14,6 +14,9 @@ namespace HlidacStatu.Repositories.Statistics
 {
     public static partial class FirmaStatistics
     {
+        //L1 - 1 h
+        //L2 - 10 let
+
         static Devmasters.Cache.Redis.Manager<StatisticsSubjectPerYear<Firma.Statistics.VZ>, Firma>
            _VZCache = Devmasters.Cache.Redis.Manager<StatisticsSubjectPerYear<Firma.Statistics.VZ>, Firma>
                .GetSafeInstance("Firma_VZStatistics_",
@@ -25,6 +28,8 @@ namespace HlidacStatu.Repositories.Statistics
                     Devmasters.Config.GetWebConfigValue("RedisCachePassword"),
                     keyValueSelector: f => f.ICO);
 
+        //L1 - 1 h
+        //L2 - 10 let
 
         static Devmasters.Cache.Redis.Manager<StatisticsSubjectPerYear<Firma.Statistics.VZ>, Firma>
            _holdingVZCache = Devmasters.Cache.Redis.Manager<StatisticsSubjectPerYear<Firma.Statistics.VZ>, Firma>

@@ -3,6 +3,9 @@ using System;
 
 namespace HlidacStatu.Repositories
 {
+    /// <summary>
+    /// OPATRNE: TOHLE NEMENIT, NECH DEVMASTERS, NUTNO KOMPLET ODSTRANIT
+    /// </summary>
     public class SharedFiles
     {
         private static volatile Devmasters.Cache.AWS_S3.Manager<byte[], string> sharedFileManager =

@@ -143,6 +143,8 @@ namespace HlidacStatu.Repositories
 
                 _logger.Information("Static data - FirmyNazvyOnlyAscii");
 
+                //L1 - 10 let
+                //L2 - 10 let
                 FirmyNazvyOnlyAscii =
                     new Devmasters.Cache.AWS_S3.Cache<
                         System.Collections.Concurrent.ConcurrentDictionary<string, string[]>>

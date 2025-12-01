@@ -14,6 +14,8 @@ namespace HlidacStatu.Repositories.Analysis.KorupcniRiziko
 
         static int[] Percentiles = new int[] { 1, 5, 10, 25, 33, 50, 66, 75, 90, 95, 99 };
 
+        //L1 - 6 hodin
+        //L2 - 10 let
         public static Devmasters.Cache.AWS_S3.Cache<Statistics[]> KIndexStatTotal = new Devmasters.Cache.AWS_S3.Cache<Statistics[]>(
                 new string[] { Devmasters.Config.GetWebConfigValue("Minio.Cache.Endpoint") },
                     Devmasters.Config.GetWebConfigValue("Minio.Cache.Bucket"),

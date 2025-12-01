@@ -12,6 +12,8 @@ namespace HlidacStatu.Repositories.Analysis.KorupcniRiziko
             Ico = ico;
         }
 
+        //L1 - 6 hodin
+        //L2 - 10 let
         public static Devmasters.Cache.AWS_S3.Cache<Dictionary<string, SubjectNameCache>> CachedCompanies =
             new Devmasters.Cache.AWS_S3.Cache<Dictionary<string, SubjectNameCache>>(
                 new string[] { Devmasters.Config.GetWebConfigValue("Minio.Cache.Endpoint") },

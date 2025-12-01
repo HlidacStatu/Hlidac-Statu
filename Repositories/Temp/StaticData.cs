@@ -60,6 +60,8 @@ namespace HlidacStatu.Repositories
 
         public static Devmasters.Cache.LocalMemory.Cache<List<double>> BasicStatisticData = null;
 
+        //L1 - 10 let
+        //L2 - 10 let
         public static Devmasters.Cache.AWS_S3.Cache<string> CzechDictCache =
             new Devmasters.Cache.AWS_S3.Cache<string>(
                 new string[] { Devmasters.Config.GetWebConfigValue("Minio.Cache.Endpoint") },
@@ -73,6 +75,8 @@ namespace HlidacStatu.Repositories
                     return s;
                 }, null);
 
+        //L1 - 10 let
+        //L2 - 10 let
         public static Devmasters.Cache.AWS_S3.Cache<string> CrawlerUserAgentsCache =
             new Devmasters.Cache.AWS_S3.Cache<string>(
                 new string[] { Devmasters.Config.GetWebConfigValue("Minio.Cache.Endpoint") },
@@ -293,6 +297,8 @@ namespace HlidacStatu.Repositories
 
 
             _logger.Information("Static data - FirmySVazbamiNaPolitiky_*");
+            //L1 - 12 h
+            //L2 - 10 let
             FirmySVazbamiNaPolitiky_aktualni_Cache =
                 new Devmasters.Cache.AWS_S3.Cache<AnalysisCalculation.VazbyFiremNaPolitiky>
                 (new string[] { Devmasters.Config.GetWebConfigValue("Minio.Cache.Endpoint") },
@@ -302,6 +308,8 @@ namespace HlidacStatu.Repositories
                     "FirmySVazbamiNaPolitiky_Aktualni",
                     (o) => { return new AnalysisCalculation.VazbyFiremNaPolitiky(); });
 
+            //L1 - 12 h
+            //L2 - 10 let
             FirmySVazbamiNaPolitiky_nedavne_Cache =
                 new Devmasters.Cache.AWS_S3.Cache<AnalysisCalculation.VazbyFiremNaPolitiky>
                 (new string[] { Devmasters.Config.GetWebConfigValue("Minio.Cache.Endpoint") },
@@ -311,6 +319,8 @@ namespace HlidacStatu.Repositories
                     "FirmySVazbamiNaPolitiky_Nedavne",
                     (o) => { return new AnalysisCalculation.VazbyFiremNaPolitiky(); });
 
+            //L1 - 12 h
+            //L2 - 10 let
             FirmySVazbamiNaPolitiky_vsechny_Cache =
                 new Devmasters.Cache.AWS_S3.Cache<AnalysisCalculation.VazbyFiremNaPolitiky>
                 (
@@ -322,6 +332,8 @@ namespace HlidacStatu.Repositories
                     (o) => { return new AnalysisCalculation.VazbyFiremNaPolitiky(); });
 
 
+            //L1 - 12 h
+            //L2 - 10 let
             FirmyCasovePodezreleZalozene =
                 new Devmasters.Cache.AWS_S3.Cache<IEnumerable<AnalysisCalculation.IcoSmlouvaMinMax>>
                 (new string[] { Devmasters.Config.GetWebConfigValue("Minio.Cache.Endpoint") },
@@ -342,6 +354,8 @@ namespace HlidacStatu.Repositories
 
 
             _logger.Information("Static data - UradyObchodujiciSFirmami_s_vazbouNaPolitiky_*");
+            //L1 - 12 h
+            //L2 - 10 let
             UradyObchodujiciSFirmami_s_vazbouNaPolitiky_aktualni_Cache =
                 new Devmasters.Cache.AWS_S3.Cache<AnalysisCalculation.VazbyFiremNaUradyStat>
                 (new string[] { Devmasters.Config.GetWebConfigValue("Minio.Cache.Endpoint") },
@@ -357,6 +371,8 @@ namespace HlidacStatu.Repositories
                     }
                 );
 
+            //L1 - 12 h
+            //L2 - 10 let
             UradyObchodujiciSFirmami_s_vazbouNaPolitiky_nedavne_Cache =
                 new Devmasters.Cache.AWS_S3.Cache<AnalysisCalculation.VazbyFiremNaUradyStat>
                 (new string[] { Devmasters.Config.GetWebConfigValue("Minio.Cache.Endpoint") },
@@ -371,6 +387,9 @@ namespace HlidacStatu.Repositories
                             .ConfigureAwait(false).GetAwaiter().GetResult();
                     }
                 );
+
+            //L1 - 12 h
+            //L2 - 10 let
             UradyObchodujiciSFirmami_s_vazbouNaPolitiky_vsechny_Cache =
                 new Devmasters.Cache.AWS_S3.Cache<AnalysisCalculation.VazbyFiremNaUradyStat>
                 (new string[] { Devmasters.Config.GetWebConfigValue("Minio.Cache.Endpoint") },
@@ -387,6 +406,8 @@ namespace HlidacStatu.Repositories
                 );
 
             _logger.Information("Static data - UradyObchodujiciSNespolehlivymiPlatciDPH_Cache*");
+            //L1 - 12 h
+            //L2 - 10 let
             UradyObchodujiciSNespolehlivymiPlatciDPH_Cache =
                 new Devmasters.Cache.AWS_S3.Cache<AnalysisCalculation.VazbyFiremNaUradyStat>
                 (new string[] { Devmasters.Config.GetWebConfigValue("Minio.Cache.Endpoint") },
@@ -399,6 +420,8 @@ namespace HlidacStatu.Repositories
                         return new AnalysisCalculation.VazbyFiremNaUradyStat(); //refresh from task
                     }
                 );
+            //L1 - 12 h
+            //L2 - 10 let
             NespolehlivyPlatciDPH_obchodySurady_Cache =
                 new Devmasters.Cache.AWS_S3.Cache<AnalysisCalculation.VazbyFiremNaUradyStat>
                 (new string[] { Devmasters.Config.GetWebConfigValue("Minio.Cache.Endpoint") },

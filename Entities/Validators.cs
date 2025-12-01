@@ -28,6 +28,8 @@ namespace HlidacStatu.Entities
 
         static RegexOptions regexOptions = Util.Consts.DefaultRegexQueryOption;
 
+        //L1 - 10 let
+        //L2 - 10 let
         static Devmasters.Cache.AWS_S3.Cache<string> jmenaCache = new Devmasters.Cache.AWS_S3.Cache<string>(
             new string[] { Devmasters.Config.GetWebConfigValue("Minio.Cache.Endpoint") },
             Devmasters.Config.GetWebConfigValue("Minio.Cache.Bucket"),
@@ -38,21 +40,33 @@ namespace HlidacStatu.Entities
                     return Devmasters.Net.HttpClient.Simple.GetAsync("https://somedata.hlidacstatu.cz/appdata/jmena.txt").Result;
 
                 }, null);
+
+        //L1 - 10 let
+        //L2 - 10 let
         static Devmasters.Cache.AWS_S3.Cache<string> prijmeniCache = new Devmasters.Cache.AWS_S3.Cache<string>(new string[] { Devmasters.Config.GetWebConfigValue("Minio.Cache.Endpoint") }, Devmasters.Config.GetWebConfigValue("Minio.Cache.Bucket"), Devmasters.Config.GetWebConfigValue("Minio.Cache.AccessKey"), Devmasters.Config.GetWebConfigValue("Minio.Cache.SecretKey"),
             TimeSpan.Zero, "prijmeni.txt", (obj) =>
             {
                 return Devmasters.Net.HttpClient.Simple.GetAsync("https://somedata.hlidacstatu.cz/appdata/prijmeni.txt").Result;
             }, null);
+
+        //L1 - 10 let
+        //L2 - 10 let
         static Devmasters.Cache.AWS_S3.Cache<string> topjmenaCache = new Devmasters.Cache.AWS_S3.Cache<string>(new string[] { Devmasters.Config.GetWebConfigValue("Minio.Cache.Endpoint") }, Devmasters.Config.GetWebConfigValue("Minio.Cache.Bucket"), Devmasters.Config.GetWebConfigValue("Minio.Cache.AccessKey"), Devmasters.Config.GetWebConfigValue("Minio.Cache.SecretKey"),
             TimeSpan.Zero, "topjmena.txt", (obj) =>
             {
                 return Devmasters.Net.HttpClient.Simple.GetAsync("https://somedata.hlidacstatu.cz/appdata/topjmena.txt").Result;
             }, null);
+
+        //L1 - 10 let
+        //L2 - 10 let
         static Devmasters.Cache.AWS_S3.Cache<string> topprijmeniCache = new Devmasters.Cache.AWS_S3.Cache<string>(new string[] { Devmasters.Config.GetWebConfigValue("Minio.Cache.Endpoint") }, Devmasters.Config.GetWebConfigValue("Minio.Cache.Bucket"), Devmasters.Config.GetWebConfigValue("Minio.Cache.AccessKey"), Devmasters.Config.GetWebConfigValue("Minio.Cache.SecretKey"),
             TimeSpan.Zero, "topprijmeni.txt", (obj) =>
             {
                 return Devmasters.Net.HttpClient.Simple.GetAsync("https://somedata.hlidacstatu.cz/appdata/topprijmeni.txt").Result;
             }, null);
+
+        //L1 - 10 let
+        //L2 - 10 let
         static Devmasters.Cache.AWS_S3.Cache<string> cpvCache = new Devmasters.Cache.AWS_S3.Cache<string>(new string[] { Devmasters.Config.GetWebConfigValue("Minio.Cache.Endpoint") }, Devmasters.Config.GetWebConfigValue("Minio.Cache.Bucket"), Devmasters.Config.GetWebConfigValue("Minio.Cache.AccessKey"), Devmasters.Config.GetWebConfigValue("Minio.Cache.SecretKey"),
             TimeSpan.Zero, "CPV_CS.txt", (obj) =>
             {

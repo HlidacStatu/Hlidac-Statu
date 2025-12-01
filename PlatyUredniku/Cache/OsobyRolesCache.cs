@@ -25,6 +25,8 @@ namespace PlatyUredniku.Cache
             public string Role { get; set; }
             public string Strana { get; set; }
         }
+
+
         private static Devmasters.Cache.LocalMemory.AutoUpdateCacheManager<Dictionary<string, osobaInfo>, int> _cacheRolesManager =
             new Devmasters.Cache.LocalMemory.AutoUpdateCacheManager<Dictionary<string, osobaInfo>, int>(
                 "OsobyRolesCache",

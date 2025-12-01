@@ -9,6 +9,9 @@ using Serilog;
 
 namespace HlidacStatu.Web.Framework
 {
+    /// <summary>
+    /// SMAZAT TODO
+    /// </summary>
     public static class RemoteUrlFromWebCache
     {
         private static readonly ILogger _logger = Log.ForContext(typeof(RemoteUrlFromWebCache));

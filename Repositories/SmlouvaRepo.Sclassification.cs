@@ -15,11 +15,14 @@ namespace HlidacStatu.Repositories
 {
     public static partial class SmlouvaRepo
     {
+        //mozna odstranit
         private static volatile Devmasters.Cache.File.Manager oldStemCacheManager
             = Devmasters.Cache.File.Manager.GetSafeInstance("SmlouvyStems",
                 smlouvaKeyId => GetRawStemsFromServerAsync(smlouvaKeyId).ConfigureAwait(false).GetAwaiter().GetResult(),
                 TimeSpan.FromDays(365 * 10)); //10 years
 
+        //L1 - 12 h
+        //L2 - 10 let
         private static volatile Devmasters.Cache.AWS_S3.Manager<byte[], string> stemCacheManager
             = Devmasters.Cache.AWS_S3.Manager<byte[], string>.GetSafeInstance(
                 "SmlouvyStems/",

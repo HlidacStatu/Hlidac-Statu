@@ -18,18 +18,24 @@ namespace HlidacStatu.Util
         static List<string> skobce = new List<string>();
         static Dictionary<string, string> ciziStaty = new Dictionary<string, string>();
 
+        //L1 - 12 h
+        //L2 - 10 let
         static Devmasters.Cache.AWS_S3.Cache<string> czobceCache = new Devmasters.Cache.AWS_S3.Cache<string>(new string[] { Devmasters.Config.GetWebConfigValue("Minio.Cache.Endpoint") }, Devmasters.Config.GetWebConfigValue("Minio.Cache.Bucket"), Devmasters.Config.GetWebConfigValue("Minio.Cache.AccessKey"), Devmasters.Config.GetWebConfigValue("Minio.Cache.SecretKey"),
     TimeSpan.Zero, "czobce.txt", (obj) =>
     {
         return Devmasters.Net.HttpClient.Simple.GetAsync("https://somedata.hlidacstatu.cz/appdata/czobce.txt").Result;
     }, null);
 
+        //L1 - 12 h
+        //L2 - 10 let
         static Devmasters.Cache.AWS_S3.Cache<string> skobceCache = new Devmasters.Cache.AWS_S3.Cache<string>(new string[] { Devmasters.Config.GetWebConfigValue("Minio.Cache.Endpoint") }, Devmasters.Config.GetWebConfigValue("Minio.Cache.Bucket"), Devmasters.Config.GetWebConfigValue("Minio.Cache.AccessKey"), Devmasters.Config.GetWebConfigValue("Minio.Cache.SecretKey"),
     TimeSpan.Zero, "skobce.txt", (obj) =>
     {
         return Devmasters.Net.HttpClient.Simple.GetAsync("https://somedata.hlidacstatu.cz/appdata/skobce.txt").Result;
     }, null);
 
+        //L1 - 12 h
+        //L2 - 10 let
         static Devmasters.Cache.AWS_S3.Cache<string> statyCache = new Devmasters.Cache.AWS_S3.Cache<string>(new string[] { Devmasters.Config.GetWebConfigValue("Minio.Cache.Endpoint") }, Devmasters.Config.GetWebConfigValue("Minio.Cache.Bucket"), Devmasters.Config.GetWebConfigValue("Minio.Cache.AccessKey"), Devmasters.Config.GetWebConfigValue("Minio.Cache.SecretKey"),
 TimeSpan.Zero, "staty.txt", (obj) =>
 {

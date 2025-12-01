@@ -192,6 +192,8 @@ namespace HlidacStatu.Repositories
                 obor = obor ?? 0;
 
                 if (!_uradySmlouvyGlobal.ContainsKey(obor.Value))
+                    //L1 - 12 h
+                    //L2 - 10 let
                     _uradySmlouvyGlobal[obor.Value] = new Devmasters.Cache.Redis.Cache<GlobalStatisticsPerYear<Smlouva.Statistics.Data>>(
                             TimeSpan.Zero, 
                             $"UradySmlouvyGlobal_{obor.Value}",

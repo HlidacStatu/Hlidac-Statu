@@ -373,7 +373,8 @@ namespace HlidacStatu.Repositories
         }
 
 
-
+        //L1 - 12 h
+        //L2 - 10 let
         public static Devmasters.Cache.AWS_S3.Cache<string[]> AllIcosInDotaceCache 
             = new Devmasters.Cache.AWS_S3.Cache<string[]>
 (
@@ -386,6 +387,8 @@ namespace HlidacStatu.Repositories
             (obj) => { return Array.Empty<string>(); }//don't calculate online, use Tasks.RebuildAllIcosInDotaceAsync()
         );
 
+        //L1 - 12 h
+        //L2 - 10 let
         public static Devmasters.Cache.AWS_S3.Cache<StatisticsSubjectPerYear<Firma.Statistics.Dotace>[]> TopDotaceHoldingCache
             = new Devmasters.Cache.AWS_S3.Cache<StatisticsSubjectPerYear<Firma.Statistics.Dotace>[]>
 (
@@ -401,6 +404,9 @@ namespace HlidacStatu.Repositories
             }
 
         );
+
+        //L1 - 12 h
+        //L2 - 10 let
         public static Devmasters.Cache.AWS_S3.Cache<StatisticsSubjectPerYear<Firma.Statistics.Dotace>[]> TopDotaceHoldingStatniCache
     = new Devmasters.Cache.AWS_S3.Cache<StatisticsSubjectPerYear<Firma.Statistics.Dotace>[]>
 (

@@ -6,6 +6,10 @@ using HlidacStatu.Connectors;
 
 namespace HlidacStatu.Repositories
 {
+
+    /// <summary>
+    /// TOHLE NEMENIT, NECH DEVMASTERS
+    /// </summary>
     public static class DocTablesRepo
     {
         private static ElasticClient _doTablesClient = Manager.GetESClient_DocTables();
@@ -13,6 +17,7 @@ namespace HlidacStatu.Repositories
 
         static DocTablesRepo()
         {
+            /// TOHLE NEMENIT, NECH DEVMASTERS
             awsClient = new Devmasters.Cache.AWS_S3.CacheProvider<HlidacStatu.DS.Api.TablesInDoc.Result[]>(
                 new string[] { Devmasters.Config.GetWebConfigValue("Minio.Cache.Endpoint") },
                 Devmasters.Config.GetWebConfigValue("Minio.Cache.Bucket"),
