@@ -33,7 +33,10 @@ namespace HlidacStatu.Caching
             }
             else
             {
-                options.DistributedCacheFailSafeMaxDuration = inMemoryDuration * 4 * 4;
+                if (options.DistributedCacheFailSafeMaxDuration is not null)
+                {
+                    options.DistributedCacheFailSafeMaxDuration = inMemoryDuration * 4 * 4;
+                }
             }
             return options;
         }

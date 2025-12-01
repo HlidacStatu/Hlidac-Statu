@@ -8,7 +8,7 @@ using ZiggyCreatures.Caching.Fusion;
 using ZiggyCreatures.Caching.Fusion.Serialization.NeueccMessagePack;
 using ZiggyCreatures.Caching.Fusion.Serialization.SystemTextJson;
 
-namespace Hlidacstatu.Caching;
+namespace HlidacStatu.Caching;
 
 public static class CacheFactory
 {

@@ -1,6 +1,5 @@
 using System;
 using System.Threading.Tasks;
-using Hlidacstatu.Caching;
 using HlidacStatu.Caching;
 using HlidacStatu.Entities;
 using HlidacStatu.Entities.Facts;
@@ -15,10 +14,10 @@ public static class FirmaCache
     // private static readonly ILogger _logger = Log.ForContext(typeof(FirmaCache));
 
     private static readonly IFusionCache PostgreCache =
-        Hlidacstatu.Caching.CacheFactory.CreateNew(CacheFactory.CacheType.L2PostgreSql, nameof(FirmaCache));
+        HlidacStatu.Caching.CacheFactory.CreateNew(CacheFactory.CacheType.L2PostgreSql, nameof(FirmaCache));
 
     private static readonly IFusionCache MemcachedCache =
-        Hlidacstatu.Caching.CacheFactory.CreateNew(CacheFactory.CacheType.L2Memcache, nameof(FirmaCache));
+        HlidacStatu.Caching.CacheFactory.CreateNew(CacheFactory.CacheType.L2Memcache, nameof(FirmaCache));
 
     public static ValueTask<InfoFact[]> GetInfoFactsAsync(Firma firma) =>
         PostgreCache.GetOrSetAsync($"_InfoFacts:{firma.ICO}",

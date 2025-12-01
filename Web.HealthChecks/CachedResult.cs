@@ -3,7 +3,7 @@ using Serilog;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Hlidacstatu.Caching;
+using HlidacStatu.Caching;
 using ZiggyCreatures.Caching.Fusion;
 
 namespace HlidacStatu.Web.HealthChecks
@@ -11,7 +11,7 @@ namespace HlidacStatu.Web.HealthChecks
     public class CachedResult : IHealthCheck
     {
         private readonly IFusionCache _cache =
-            Hlidacstatu.Caching.CacheFactory.CreateNew(CacheFactory.CacheType.L1Default, "HealthChecksCachedResult");
+            HlidacStatu.Caching.CacheFactory.CreateNew(CacheFactory.CacheType.L1Default, "HealthChecksCachedResult");
         
         private ValueTask<HealthCheckResult> GetPoskytovateleCacheAsync(HealthCheckContext context, CancellationToken cancellationToken) => _cache.GetOrSetAsync(
             $"_HealthChecksCachedResult:{_healthCheckName}", async ct =>

@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Hlidacstatu.Caching;
+using HlidacStatu.Caching;
 using HlidacStatu.Datasets;
 using ZiggyCreatures.Caching.Fusion;
 
@@ -14,7 +14,7 @@ namespace HlidacStatu.Web.HealthChecks
     public class DatasetyStatistika : IHealthCheck
     {
         private readonly IFusionCache _cache =
-            Hlidacstatu.Caching.CacheFactory.CreateNew(CacheFactory.CacheType.L1Default, nameof(DatasetyStatistika));
+            HlidacStatu.Caching.CacheFactory.CreateNew(CacheFactory.CacheType.L1Default, nameof(DatasetyStatistika));
 
         private ValueTask<List<DatasetStat>> GetStatistikyCachedAsync() => _cache.GetOrSetAsync(
             $"_DatasetStat_all", async _ =>

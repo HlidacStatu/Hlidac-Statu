@@ -4,7 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Devmasters.Batch;
 using Devmasters.Enums;
-using Hlidacstatu.Caching;
+using HlidacStatu.Caching;
 using HlidacStatu.DS.Graphs;
 using HlidacStatu.Entities;
 using HlidacStatu.Entities.Analysis;
@@ -22,7 +22,7 @@ namespace HlidacStatu.Repositories.Analysis
         private static readonly ILogger _logger = Log.ForContext(typeof(AnalysisCalculation));
 
         private static readonly IFusionCache PermanentCache =
-            Hlidacstatu.Caching.CacheFactory.CreateNew(CacheFactory.CacheType.PermanentStore,
+            HlidacStatu.Caching.CacheFactory.CreateNew(CacheFactory.CacheType.PermanentStore,
                 nameof(AnalysisCalculation));
 
         public class VazbyFiremNaPolitiky

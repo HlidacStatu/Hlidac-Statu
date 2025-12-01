@@ -1,6 +1,6 @@
 
 using Devmasters.Cache.File;
-using Hlidacstatu.Caching;
+using HlidacStatu.Caching;
 using HlidacStatu.Connectors;
 using HlidacStatu.Entities;
 using HlidacStatu.Entities.Facts;
@@ -30,7 +30,7 @@ namespace HlidacStatu.WebGenerator.Code
         private static string cacheKey(KeyAndId ki) => $"_{ki.CacheNameOnDisk}";
 
         private static readonly IFusionCache PostgreCache =
-            Hlidacstatu.Caching.CacheFactory.CreateNew(CacheFactory.CacheType.L2PostgreSqlBinarySerializer, "socialbanner");
+            HlidacStatu.Caching.CacheFactory.CreateNew(CacheFactory.CacheType.L2PostgreSqlBinarySerializer, "socialbanner");
 
         private static async Task<byte[]> getAsync(
             Models.SocialbannerInstrumentationSource socialbannerInstrumentation, 

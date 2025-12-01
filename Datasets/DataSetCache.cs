@@ -1,6 +1,6 @@
 using System.Linq;
 using System.Threading.Tasks;
-using Hlidacstatu.Caching;
+using HlidacStatu.Caching;
 using ZiggyCreatures.Caching.Fusion;
 
 namespace HlidacStatu.Datasets;
@@ -8,7 +8,7 @@ namespace HlidacStatu.Datasets;
 public class DataSetCache
 {
     internal static readonly IFusionCache Cache =
-        Hlidacstatu.Caching.CacheFactory.CreateNew(CacheFactory.CacheType.L1Default, nameof(DataSetDB));
+        HlidacStatu.Caching.CacheFactory.CreateNew(CacheFactory.CacheType.L1Default, nameof(DataSetDB));
     
     public static ValueTask<DataSet[]> GetAllDatasetsAsync() => Cache.GetOrSetAsync($"_AllDataSets", async _ =>
         {

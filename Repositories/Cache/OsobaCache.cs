@@ -3,7 +3,6 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Hlidacstatu.Caching;
 using HlidacStatu.Caching;
 using HlidacStatu.DS.Graphs;
 using HlidacStatu.Entities;
@@ -20,7 +19,7 @@ public static class OsobaCache
     // private static readonly ILogger _logger = Log.ForContext(typeof(FirmaCache));
 
     private static readonly IFusionCache PostgreCache =
-        Hlidacstatu.Caching.CacheFactory.CreateNew(CacheFactory.CacheType.L2PostgreSql, nameof(OsobaCache));
+        HlidacStatu.Caching.CacheFactory.CreateNew(CacheFactory.CacheType.L2PostgreSql, nameof(OsobaCache));
 
     // private static readonly IFusionCache MemcachedCache =
     //     Hlidacstatu.Caching.CacheFactory.CreateNew(CacheFactory.CacheType.L2Memcache, nameof(OsobaCache));

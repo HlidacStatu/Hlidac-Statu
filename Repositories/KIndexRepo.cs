@@ -283,17 +283,17 @@ public static class KIndexRepo
             return null;
         }
     
-    public static async Task<KIndexData> GetDirectAsync((string ico, bool useTempDb) param)
+    public static async Task<KIndexData> GetDirectAsync(string ico, bool useTempDb)
     {
-        if (Consts.KIndexExceptions.Contains(param.ico) && param.useTempDb == false)
+        if (Consts.KIndexExceptions.Contains(ico) && useTempDb == false)
             return null;
 
         var client = Manager.GetESClient_KIndex();
-        if (param.useTempDb)
+        if (useTempDb)
             client = Manager.GetESClient_KIndexTemp();
 
 
-        var res = await client.GetAsync<KIndexData>(param.ico);
+        var res = await client.GetAsync<KIndexData>(ico);
         if (res.Found == false)
             return null;
         else if (!res.IsValid)
@@ -307,7 +307,7 @@ public static class KIndexRepo
             foreach (var r in f.roky)
             {
                 if (r != null)
-                    r.Ico = param.ico;
+                    r.Ico = ico;
             }
             return f;
         }
@@ -340,7 +340,7 @@ public static class KIndexRepo
     
     public static async Task CreateBackupAsync(string comment, string ico, bool useTempDb = false)
     {
-        KIndexData kidx = await GetDirectAsync((ico, useTempDb));
+        KIndexData kidx = await GetDirectAsync(ico, useTempDb);
         if (kidx == null)
             return;
         await CreateBackupAsync(comment, kidx, useTempDb);

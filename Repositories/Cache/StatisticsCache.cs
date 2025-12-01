@@ -4,7 +4,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Devmasters.DT;
-using Hlidacstatu.Caching;
+using HlidacStatu.Caching;
 using HlidacStatu.DS.Graphs;
 using HlidacStatu.Entities;
 using HlidacStatu.Extensions;
@@ -17,7 +17,7 @@ namespace HlidacStatu.Repositories.Cache;
 public class StatisticsCache
 {
     private static readonly IFusionCache PermanentCache =
-        Hlidacstatu.Caching.CacheFactory.CreateNew(CacheFactory.CacheType.PermanentStore, nameof(StatisticsCache));
+        HlidacStatu.Caching.CacheFactory.CreateNew(CacheFactory.CacheType.PermanentStore, nameof(StatisticsCache));
 
 
     //smlouvy

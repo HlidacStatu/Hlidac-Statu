@@ -2,27 +2,35 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using HlidacStatu.Caching;
 using HlidacStatu.Connectors;
 using HlidacStatu.Entities.Analysis;
 using HlidacStatu.Entities.KIndex;
 using Nest;
+using ZiggyCreatures.Caching.Fusion;
 
 namespace HlidacStatu.Repositories.Analysis.KorupcniRiziko
 {
     public static class KIndex
     {
-        private static volatile Devmasters.Cache.LocalMemory.Manager<KIndexData, (string ico, bool useTempDb)> _cachedKIndexData
-            = Devmasters.Cache.LocalMemory.Manager<KIndexData, (string ico, bool useTempDb)>
-                .GetSafeInstance("KIndexData",
-                param =>
+        
+        private static readonly IFusionCache _memoryCache =
+            HlidacStatu.Caching.CacheFactory.CreateNew(CacheFactory.CacheType.L1Default, nameof(KIndex));
+        
+        public static ValueTask<KIndexData> GetKindexCachedAsync(string ico, bool useTempDb) =>
+            _memoryCache.GetOrSetAsync($"_KIndexData:{ico}-{useTempDb}", async _ =>
                 {
-                    KIndexData f = KIndexRepo.GetDirectAsync(param).ConfigureAwait(false).GetAwaiter().GetResult();
+                    KIndexData f = await KIndexRepo.GetDirectAsync(ico, useTempDb);
                     if (f == null || f.Ico == "-")
                         return null;
                     return f;
-
                 },
-                TimeSpan.FromHours(28), keyValueSelector: kv=>$"{kv.ico}_{kv.useTempDb}");
+                options => options.ModifyEntryOptionsDuration(TimeSpan.FromHours(28))
+            );
+        
+        public static ValueTask InvalidateKindexCachedAsync(string ico, bool useTempDb) => 
+            _memoryCache.ExpireAsync($"_KIndexData:{ico}-{useTempDb}");
+
 
         static HashSet<string> kindexReadyIcos = null;
         static System.Timers.Timer refreshTimer = new System.Timers.Timer(TimeSpan.FromHours(12).TotalMilliseconds);
@@ -66,9 +74,9 @@ namespace HlidacStatu.Repositories.Analysis.KorupcniRiziko
             if (string.IsNullOrEmpty(ico))
                 return null;
             if (refreshCache)
-                _cachedKIndexData.Delete((ico, useTemp));
+                await InvalidateKindexCachedAsync(ico, useTemp);
 
-            KIndexData f =  _cachedKIndexData.Get((ico,useTemp));
+            KIndexData f = await GetKindexCachedAsync(ico,useTemp);
             if (f == null || f.Ico == "-")
                 return null;
             return f;

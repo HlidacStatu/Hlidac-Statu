@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
 using System.Linq;
 using Devmasters;
-using Hlidacstatu.Caching;
+using HlidacStatu.Caching;
 using HlidacStatu.Lib.Web.UI.Attributes;
 using ZiggyCreatures.Caching.Fusion;
 
@@ -15,7 +15,7 @@ namespace HlidacStatu.Web.Controllers
     public class DotaceController : Controller
     {
         private static readonly IFusionCache Cache =
-            Hlidacstatu.Caching.CacheFactory.CreateNew(CacheFactory.CacheType.L1Default, nameof(DotaceController));
+            HlidacStatu.Caching.CacheFactory.CreateNew(CacheFactory.CacheType.L1Default, nameof(DotaceController));
 
         private ValueTask<poskytovateleCacheModel[]> GetPoskytovateleCacheAsync() => Cache.GetOrSetAsync(
             $"_DotaceController_PoskytovateleCache", async _ =>

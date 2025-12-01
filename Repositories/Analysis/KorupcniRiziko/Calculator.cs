@@ -40,7 +40,7 @@ namespace HlidacStatu.Repositories.Analysis.KorupcniRiziko
         public static async Task<Calculator> CreateCalculatorAsync(string ico, bool useTemp)
         {
             var calculator = new Calculator(ico);
-            calculator.kindex = await KIndexRepo.GetDirectAsync((ico, useTemp));
+            calculator.kindex = await KIndexRepo.GetDirectAsync(ico, useTemp);
             return calculator;
         }
 
