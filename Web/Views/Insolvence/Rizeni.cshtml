@@ -327,7 +327,7 @@ else
             <p>@Html.Raw(Model.Rizeni.InfoFacts().RenderFacts(2, true, true, html: true)) </p>
             <p><a href="@Model.GetUrl(true)" target="_top">Více informací o insolvenčním řízení</a></p>
         </div>
-        <img src="@($"/socialbanner/insolvence?d={DateTime.Now.ToString("yyMMdd")}&v={Model.Rizeni.SpisovaZnacka}")"
+        <img src="@($"https://gen.hlidacstatu.cz/socialbanner/insolvence?d={DateTime.Now.ToString("yyMMdd")}&v={Model.Rizeni.SpisovaZnacka}")"
              style="width:100%;height:auto;padding:1em 0 0 0;min-width:250px;" />
     </div>
 }

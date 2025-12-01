@@ -7,8 +7,16 @@
 		<Nullable>enable</Nullable>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
-		<Version>1.0.1</Version>
+		<Version>1.0.6</Version>
+		<UserSecretsId>ecdf5a8b-6634-40d2-bc28-24679b7f7f39</UserSecretsId>
 	</PropertyGroup>
+
+	<ItemGroup>
+	  <Compile Remove="c\**" />
+	  <Content Remove="c\**" />
+	  <EmbeddedResource Remove="c\**" />
+	  <None Remove="c\**" />
+	</ItemGroup>
 
 	<ItemGroup>
 		<Content Remove="logger.serilog.json" />
@@ -23,7 +31,13 @@
 	<ItemGroup>
 		<PackageReference Include="Devmasters.Cache" Version="8.2.0" />
 		<PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.22.1" />
+		<PackageReference Include="OpenTelemetry.Exporter.OpenTelemetryProtocol" Version="1.14.0" />
+		<PackageReference Include="OpenTelemetry.Extensions.Hosting" Version="1.14.0" />
+		<PackageReference Include="OpenTelemetry.Instrumentation.AspNetCore" Version="1.14.0" />
+		<PackageReference Include="OpenTelemetry.Instrumentation.Http" Version="1.14.0" />
+		<PackageReference Include="OpenTelemetry.Instrumentation.Runtime" Version="1.14.0" />
 		<PackageReference Include="ZiggyCreatures.FusionCache" Version="2.4.0" />
+		<PackageReference Include="ZiggyCreatures.FusionCache.OpenTelemetry" Version="2.4.0" />
 		<PackageReference Include="ZiggyCreatures.FusionCache.Serialization.NeueccMessagePack" Version="2.4.0" />
 	</ItemGroup>
 
@@ -33,6 +47,13 @@
 		<ProjectReference Include="..\Extensions\Extensions.csproj" />
 		<ProjectReference Include="..\LibCore\LibCore.csproj" />
 		<ProjectReference Include="..\Repositories\Repositories.csproj" />
+		<ProjectReference Include="..\Util\Util.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Content Update="appsettings.json">
+	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	  </Content>
 	</ItemGroup>
 
 	<ItemGroup>

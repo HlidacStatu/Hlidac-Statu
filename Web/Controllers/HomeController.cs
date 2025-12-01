@@ -1078,7 +1078,7 @@ text zpravy: {txt}
         public async Task<ActionResult> SocialBanner(string id, string v, string t, string st, string b, string f,
             string img, string rat = "16x9", string res = "1200x628", string col = "")
         {
-            string mainUrl = HttpContext.Request.Scheme + "://" + HttpContext.Request.Host;
+            string mainUrl = "https://gen.hlidacstatu.cz"; //HttpContext.Request.Scheme + "://" + HttpContext.Request.Host;
 
 
             // #if (DEBUG)

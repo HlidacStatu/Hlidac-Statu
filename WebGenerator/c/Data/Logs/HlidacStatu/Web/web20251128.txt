@@ -1,0 +1,74 @@
+2025-11-28 16:05:19.013 +00:00 [WRN] FirmaRepo.Cached times FirmaRepo..cctor var IcaStatnichFirem :  277.62ms
+FirmaRepo..cctor var IcaStatnichFirem25 :  308.28ms
+FirmaRepo..cctor var DatoveSchranky : 12 949.98ms
+Sum : 13535.879599999998ms
+2025-11-28 16:05:21.890 +00:00 [WRN] FUSION [N=OsobaCache I=0HNHEIVH94EDN] (O=0HNHEIVH94EDO K=OsobaCache_InfoFacts:david-kyncl): an error occurred while calling the factory
+Devmasters.Lang.CS.InvalidResourceException: Invalid english resource. The resource string System.String[] doesn't contains 2 options.
+   at Devmasters.Lang.CS.Plural.GetEnglishPlural(Int64 number, String[] val)
+   at Devmasters.Lang.CS.Plural.Get(Int64 number, PluralDef def)
+   at Devmasters.Lang.CS.Plural.Get(Int64 number, Boolean withZero, CultureInfo culture, String[] val)
+   at Devmasters.Lang.CS.Plural.Get(Int64 number, CultureInfo culture, String[] value)
+   at Devmasters.Lang.CS.Plural.Get(Int64 number, String[] value)
+   at HlidacStatu.Extensions.OsobaExtension.InfoFactsAsync(Osoba osoba, HashSet`1 excludedImportanceLevels) in C:\Projects\HlidacStatu.GitHub\Hlidac-Statu\Repositories\Extensions\OsobaExtension.cs:line 382
+   at ZiggyCreatures.Caching.Fusion.Internals.RunUtils.RunAsyncFuncWithTimeoutAsync[TResult](Func`2 asyncFunc, TimeSpan timeout, Boolean cancelIfTimeout, Action`1 timedOutTaskProcessor, CancellationToken token) in /_/src/ZiggyCreatures.FusionCache/Internals/RunUtils.cs:line 69
+   at ZiggyCreatures.Caching.Fusion.FusionCache.GetOrSetEntryInternalAsync[TValue](String operationId, String key, String originalKey, String[] tags, Func`3 factory, Boolean isRealFactory, MaybeValue`1 failSafeDefaultValue, FusionCacheEntryOptions options, Activity activity, CancellationToken token) in /_/src/ZiggyCreatures.FusionCache/FusionCache_Async.cs:line 247
+2025-11-28 16:05:22.095 +00:00 [ERR] An unhandled exception has occurred while executing the request.
+Devmasters.Lang.CS.InvalidResourceException: Invalid english resource. The resource string System.String[] doesn't contains 2 options.
+   at Devmasters.Lang.CS.Plural.GetEnglishPlural(Int64 number, String[] val)
+   at Devmasters.Lang.CS.Plural.Get(Int64 number, PluralDef def)
+   at Devmasters.Lang.CS.Plural.Get(Int64 number, Boolean withZero, CultureInfo culture, String[] val)
+   at Devmasters.Lang.CS.Plural.Get(Int64 number, CultureInfo culture, String[] value)
+   at Devmasters.Lang.CS.Plural.Get(Int64 number, String[] value)
+   at HlidacStatu.Extensions.OsobaExtension.InfoFactsAsync(Osoba osoba, HashSet`1 excludedImportanceLevels) in C:\Projects\HlidacStatu.GitHub\Hlidac-Statu\Repositories\Extensions\OsobaExtension.cs:line 382
+   at ZiggyCreatures.Caching.Fusion.Internals.RunUtils.RunAsyncFuncWithTimeoutAsync[TResult](Func`2 asyncFunc, TimeSpan timeout, Boolean cancelIfTimeout, Action`1 timedOutTaskProcessor, CancellationToken token) in /_/src/ZiggyCreatures.FusionCache/Internals/RunUtils.cs:line 69
+   at ZiggyCreatures.Caching.Fusion.FusionCache.GetOrSetEntryInternalAsync[TValue](String operationId, String key, String originalKey, String[] tags, Func`3 factory, Boolean isRealFactory, MaybeValue`1 failSafeDefaultValue, FusionCacheEntryOptions options, Activity activity, CancellationToken token) in /_/src/ZiggyCreatures.FusionCache/FusionCache_Async.cs:line 247
+   at ZiggyCreatures.Caching.Fusion.FusionCache.GetOrSetAsync[TValue](String key, Func`3 factory, MaybeValue`1 failSafeDefaultValue, FusionCacheEntryOptions options, IEnumerable`1 tags, CancellationToken token) in /_/src/ZiggyCreatures.FusionCache/FusionCache_Async.cs:line 396
+   at HlidacStatu.Extensions.OsobaExtension.InfoFactsCachedAsync(Osoba osoba, Boolean forceUpdateCache) in C:\Projects\HlidacStatu.GitHub\Hlidac-Statu\Repositories\Extensions\OsobaExtension.cs:line 314
+   at HlidacStatu.Extensions.OsobaExtension.SocialInfoBodyAsync(Osoba osoba) in C:\Projects\HlidacStatu.GitHub\Hlidac-Statu\Repositories\Extensions\OsobaExtension.cs:line 550
+   at HlidacStatu.WebGenerator.Controllers.HomeController.SocialBanner(String id, String v, String t, String st, String b, String f, String img, String rat, String res, String col) in C:\Projects\HlidacStatu.GitHub\Hlidac-Statu\WebGenerator\Controllers\HomeController.cs:line 148
+   at lambda_method38(Closure, Object)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ActionMethodExecutor.TaskOfActionResultExecutor.Execute(ActionContext actionContext, IActionResultTypeMapper mapper, ObjectMethodExecutor executor, Object controller, Object[] arguments)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.<InvokeActionMethodAsync>g__Logged|12_1(ControllerActionInvoker invoker)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.<InvokeNextActionFilterAsync>g__Awaited|10_0(ControllerActionInvoker invoker, Task lastTask, State next, Scope scope, Object state, Boolean isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.Rethrow(ActionExecutedContextSealed context)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.Next(State& next, Scope& scope, Object& state, Boolean& isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.<InvokeInnerFilterAsync>g__Awaited|13_0(ControllerActionInvoker invoker, Task lastTask, State next, Scope scope, Object state, Boolean isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeNextResourceFilter>g__Awaited|25_0(ResourceInvoker invoker, Task lastTask, State next, Scope scope, Object state, Boolean isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.Rethrow(ResourceExecutedContextSealed context)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.Next(State& next, Scope& scope, Object& state, Boolean& isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeFilterPipelineAsync>g__Awaited|20_0(ResourceInvoker invoker, Task lastTask, State next, Scope scope, Object state, Boolean isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeAsync>g__Logged|17_1(ResourceInvoker invoker)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeAsync>g__Logged|17_1(ResourceInvoker invoker)
+   at Microsoft.AspNetCore.Authorization.AuthorizationMiddleware.Invoke(HttpContext context)
+   at Microsoft.AspNetCore.Authentication.AuthenticationMiddleware.Invoke(HttpContext context)
+   at Microsoft.AspNetCore.Diagnostics.DeveloperExceptionPageMiddlewareImpl.Invoke(HttpContext context)
+2025-11-28 16:10:16.058 +00:00 [WRN] FUSION [N=socialbanner I=0HNHEJ2DK0A8R] (O=0HNHEJ2DK0A8T K=socialbanner_osoba-16x9-david-kyncl): FailSafeMaxDuration 14:00:00 was lower than the Duration 4.00:00:00 on FEO[DUR=4.00:00:00 LKTO=/ SKMR=N SKMW=N SKDR=N SKDW=N SKDRWS=N DDUR=/ JIT=2m PR=N SZ=/ FS=Y FSMAX=14:00:00 DFSMAX=30.00:00:00 FSTHR=3m FSTO=500ms FHTO=20s TOFC=Y DSTO=1s DHTO=10s ABDO=Y SBN=Y ABBO=N AC=N]. Duration has been used instead.
+2025-11-28 16:13:56.555 +00:00 [WRN] FUSION [N=socialbanner I=0HNHEJ4FQLN67] (O=0HNHEJ4FQLN69 K=socialbanner_osoba-16x9-david-kyncl): FailSafeMaxDuration 14:00:00 was lower than the Duration 4.00:00:00 on FEO[DUR=4.00:00:00 LKTO=/ SKMR=N SKMW=N SKDR=N SKDW=N SKDRWS=N DDUR=/ JIT=2m PR=N SZ=/ FS=Y FSMAX=14:00:00 DFSMAX=30.00:00:00 FSTHR=3m FSTO=500ms FHTO=20s TOFC=Y DSTO=1s DHTO=10s ABDO=Y SBN=Y ABBO=N AC=N]. Duration has been used instead.
+2025-11-28 16:14:16.635 +00:00 [WRN] FUSION [N=socialbanner I=0HNHEJ4FQLN67] (O=0HNHEJ4FQLN6E K=socialbanner_osoba-16x9-david-kyncl): a synthetic timeout occurred while calling the factory
+ZiggyCreatures.Caching.Fusion.SyntheticTimeoutException: The operation has timed out.
+   at ZiggyCreatures.Caching.Fusion.Internals.RunUtils.RunAsyncFuncWithTimeoutAsync[TResult](Func`2 asyncFunc, TimeSpan timeout, Boolean cancelIfTimeout, Action`1 timedOutTaskProcessor, CancellationToken token) in /_/src/ZiggyCreatures.FusionCache/Internals/RunUtils.cs:line 75
+   at ZiggyCreatures.Caching.Fusion.FusionCache.GetOrSetEntryInternalAsync[TValue](String operationId, String key, String originalKey, String[] tags, Func`3 factory, Boolean isRealFactory, MaybeValue`1 failSafeDefaultValue, FusionCacheEntryOptions options, Activity activity, CancellationToken token) in /_/src/ZiggyCreatures.FusionCache/FusionCache_Async.cs:line 247
+2025-11-28 16:14:16.680 +00:00 [WRN] FUSION [N=socialbanner I=0HNHEJ4FQLN67] (O=0HNHEJ4FQLN6E K=socialbanner_osoba-16x9-david-kyncl): FAIL-SAFE activated (from memory)
+2025-11-28 16:14:17.679 +00:00 [WRN] FUSION [N=socialbanner I=0HNHEJ4FQLN67] (O=0HNHEJ4FQLN6E K=socialbanner_osoba-16x9-david-kyncl): FailSafeMaxDuration 14:00:00 was lower than the Duration 4.00:00:00 on FEO[DUR=4.00:00:00 LKTO=/ SKMR=N SKMW=N SKDR=N SKDW=N SKDRWS=N DDUR=/ JIT=2m PR=N SZ=/ FS=Y FSMAX=14:00:00 DFSMAX=30.00:00:00 FSTHR=3m FSTO=500ms FHTO=20s TOFC=Y DSTO=1s DHTO=10s ABDO=N SBN=Y ABBO=N AC=N]. Duration has been used instead.
+2025-11-28 16:14:25.209 +00:00 [WRN] FUSION [N=socialbanner I=0HNHEJ4FQLN67] (O=0HNHEJ4FQLN6N K=socialbanner_osoba-16x9-david-kyncl): a synthetic timeout occurred while calling the factory
+ZiggyCreatures.Caching.Fusion.SyntheticTimeoutException: The operation has timed out.
+   at ZiggyCreatures.Caching.Fusion.Internals.RunUtils.RunAsyncFuncWithTimeoutAsync[TResult](Func`2 asyncFunc, TimeSpan timeout, Boolean cancelIfTimeout, Action`1 timedOutTaskProcessor, CancellationToken token) in /_/src/ZiggyCreatures.FusionCache/Internals/RunUtils.cs:line 75
+   at ZiggyCreatures.Caching.Fusion.FusionCache.GetOrSetEntryInternalAsync[TValue](String operationId, String key, String originalKey, String[] tags, Func`3 factory, Boolean isRealFactory, MaybeValue`1 failSafeDefaultValue, FusionCacheEntryOptions options, Activity activity, CancellationToken token) in /_/src/ZiggyCreatures.FusionCache/FusionCache_Async.cs:line 247
+2025-11-28 16:14:25.212 +00:00 [WRN] FUSION [N=socialbanner I=0HNHEJ4FQLN67] (O=0HNHEJ4FQLN6N K=socialbanner_osoba-16x9-david-kyncl): FAIL-SAFE activated (from memory)
+2025-11-28 16:14:26.296 +00:00 [WRN] FUSION [N=socialbanner I=0HNHEJ4FQLN67] (O=0HNHEJ4FQLN6N K=socialbanner_osoba-16x9-david-kyncl): FailSafeMaxDuration 14:00:00 was lower than the Duration 4.00:00:00 on FEO[DUR=4.00:00:00 LKTO=/ SKMR=N SKMW=N SKDR=N SKDW=N SKDRWS=N DDUR=/ JIT=2m PR=N SZ=/ FS=Y FSMAX=14:00:00 DFSMAX=30.00:00:00 FSTHR=3m FSTO=500ms FHTO=20s TOFC=Y DSTO=1s DHTO=10s ABDO=N SBN=Y ABBO=N AC=N]. Duration has been used instead.
+2025-11-28 18:11:09.830 +00:00 [WRN] FUSION [N=OsobaCache I=0HNHEL60727PQ] (O=0HNHEL60727PR K=OsobaCache_InfoFacts:david-kyncl): a synthetic timeout occurred while calling the factory
+ZiggyCreatures.Caching.Fusion.SyntheticTimeoutException: The operation has timed out.
+   at ZiggyCreatures.Caching.Fusion.Internals.RunUtils.RunAsyncFuncWithTimeoutAsync[TResult](Func`2 asyncFunc, TimeSpan timeout, Boolean cancelIfTimeout, Action`1 timedOutTaskProcessor, CancellationToken token) in /_/src/ZiggyCreatures.FusionCache/Internals/RunUtils.cs:line 75
+   at ZiggyCreatures.Caching.Fusion.FusionCache.GetOrSetEntryInternalAsync[TValue](String operationId, String key, String originalKey, String[] tags, Func`3 factory, Boolean isRealFactory, MaybeValue`1 failSafeDefaultValue, FusionCacheEntryOptions options, Activity activity, CancellationToken token) in /_/src/ZiggyCreatures.FusionCache/FusionCache_Async.cs:line 247
+2025-11-28 18:11:09.915 +00:00 [WRN] FUSION [N=OsobaCache I=0HNHEL60727PQ] (O=0HNHEL60727PR K=OsobaCache_InfoFacts:david-kyncl): FAIL-SAFE activated (from distributed)
+2025-11-28 18:11:12.908 +00:00 [WRN] FUSION [N=socialbanner I=0HNHEL60727Q2] (O=0HNHEL60727Q4 K=socialbanner_osoba-16x9-david-kyncl): FailSafeMaxDuration 14:00:00 was lower than the Duration 4.00:00:00 on FEO[DUR=4.00:00:00 LKTO=/ SKMR=N SKMW=N SKDR=N SKDW=N SKDRWS=N DDUR=/ JIT=2m PR=N SZ=/ FS=Y FSMAX=14:00:00 DFSMAX=30.00:00:00 FSTHR=3m FSTO=500ms FHTO=20s TOFC=Y DSTO=1s DHTO=10s ABDO=Y SBN=Y ABBO=N AC=N]. Duration has been used instead.
+2025-11-28 18:11:23.293 +00:00 [WRN] FUSION [N=socialbanner I=0HNHEL60727Q2] (O=0HNHEL60727QF K=socialbanner_osoba-16x9-david-kyncl): a synthetic timeout occurred while calling the factory
+ZiggyCreatures.Caching.Fusion.SyntheticTimeoutException: The operation has timed out.
+   at ZiggyCreatures.Caching.Fusion.Internals.RunUtils.RunAsyncFuncWithTimeoutAsync[TResult](Func`2 asyncFunc, TimeSpan timeout, Boolean cancelIfTimeout, Action`1 timedOutTaskProcessor, CancellationToken token) in /_/src/ZiggyCreatures.FusionCache/Internals/RunUtils.cs:line 75
+   at ZiggyCreatures.Caching.Fusion.FusionCache.GetOrSetEntryInternalAsync[TValue](String operationId, String key, String originalKey, String[] tags, Func`3 factory, Boolean isRealFactory, MaybeValue`1 failSafeDefaultValue, FusionCacheEntryOptions options, Activity activity, CancellationToken token) in /_/src/ZiggyCreatures.FusionCache/FusionCache_Async.cs:line 247
+2025-11-28 18:11:23.296 +00:00 [WRN] FUSION [N=socialbanner I=0HNHEL60727Q2] (O=0HNHEL60727QF K=socialbanner_osoba-16x9-david-kyncl): FAIL-SAFE activated (from memory)
+2025-11-28 18:11:25.239 +00:00 [WRN] FUSION [N=socialbanner I=0HNHEL60727Q2] (O=0HNHEL60727QF K=socialbanner_osoba-16x9-david-kyncl): FailSafeMaxDuration 14:00:00 was lower than the Duration 4.00:00:00 on FEO[DUR=4.00:00:00 LKTO=/ SKMR=N SKMW=N SKDR=N SKDW=N SKDRWS=N DDUR=/ JIT=2m PR=N SZ=/ FS=Y FSMAX=14:00:00 DFSMAX=30.00:00:00 FSTHR=3m FSTO=500ms FHTO=20s TOFC=Y DSTO=1s DHTO=10s ABDO=N SBN=Y ABBO=N AC=N]. Duration has been used instead.
+2025-11-28 18:11:25.402 +00:00 [WRN] FirmaRepo.Cached times FirmaRepo..cctor var IcaStatnichFirem :  460,30ms
+FirmaRepo..cctor var IcaStatnichFirem25 :  381,60ms
+FirmaRepo..cctor var DatoveSchranky : 13 462,72ms
+Sum : 14304,6256ms

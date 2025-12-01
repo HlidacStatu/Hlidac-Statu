@@ -16,8 +16,11 @@ namespace HlidacStatu.WebGenerator.Controllers
     {
         private readonly Serilog.ILogger _logger = Log.ForContext<HomeController>();
 
-        public HomeController()
+        public SocialbannerInstrumentationSource SocialbannerInstrumentation { get; }
+
+        public HomeController(SocialbannerInstrumentationSource socialbannerInstrumentation)
         {
+            SocialbannerInstrumentation = socialbannerInstrumentation;
         }
 
         public IActionResult Index()
@@ -232,7 +235,7 @@ namespace HlidacStatu.WebGenerator.Controllers
             }
             else if (id?.ToLower() == "kindex")
             {
-                data = await RemoteUrlFromWebCache.GetWebPageScreenshotAsync(
+                data = await RemoteUrlFromWebCache.GetWebPageScreenshotAsync(this.SocialbannerInstrumentation,
                     mainUrl + "/kindex/banner/" + v, rat,
                     "kindex-banner-" + v,
                     HttpContext.Request.Query["refresh"] == "1");
@@ -302,7 +305,7 @@ namespace HlidacStatu.WebGenerator.Controllers
             {
                 if (data == null && !string.IsNullOrEmpty(url))
                 {
-                    data = await RemoteUrlFromWebCache.GetWebPageScreenshotAsync(url, rat,
+                    data = await RemoteUrlFromWebCache.GetWebPageScreenshotAsync(SocialbannerInstrumentation, url, rat,
                         (id?.ToLower() ?? "null") + "-" + rat + "-" + v, HttpContext.Request.Query["refresh"] == "1");
                 }
             }

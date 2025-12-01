@@ -105,38 +105,7 @@ namespace HlidacStatu.Web
                     }));
 
             services
-                .AddHealthChecks()
-                .AddProcessAllocatedMemoryHealthCheck(maximumMegabytesAllocated: 50000,
-                    name: "Web server využitá pamět",
-                    tags: new[] { "Web server", "process", "memory" })
-                .AddHealthCheckWithOptions<HlidacStatu.Web.HealthChecks.NetworkDiskStorage, HlidacStatu.Web.HealthChecks.NetworkDiskStorage.Options>(
-                    new HlidacStatu.Web.HealthChecks.NetworkDiskStorage.Options()
-                    {
-                        UNCPath = "c:\\",
-                        DegradedMinimumFreeMegabytes = 20 * 1024, //20G 
-                        UnHealthtMinimumFreeMegabytes = 5 * 1024 //5GB
-                    },
-                    "System disk", HealthStatus.Unhealthy, tags: new[] { "Web server" }
-                )
-                .AddHealthCheckWithOptions<HlidacStatu.Web.HealthChecks.IISConnections, HlidacStatu.Web.HealthChecks.IISConnections.Options>(
-                    new HealthChecks.IISConnections.Options() {  AppPoolNameFilter= "net6-wwwHS", CountWarningThreshold = 20, CountErrorThreshold = 50  },
-                        "IIS open requests",
-                        tags: new[] { "Web server" }
-                        )
-                .AddHealthCheckWithOptions<HlidacStatu.Web.HealthChecks.IISConnections, HlidacStatu.Web.HealthChecks.IISConnections.Options>(
-                    new HealthChecks.IISConnections.Options() { AppPoolNameFilter = "net6-wwwHS", StartsWithFilter="_blazor" },
-                        "Blazor open requests",
-                        tags: new[] { "Web server" }
-                        )
-                .AddHealthCheckWithOptions<HlidacStatu.Web.HealthChecks.NetworkDiskStorage, HlidacStatu.Web.HealthChecks.NetworkDiskStorage.Options>(
-                    new HlidacStatu.Web.HealthChecks.NetworkDiskStorage.Options()
-                    {
-                        UNCPath = Devmasters.Config.GetWebConfigValue("FileCachePath"),
-                        DegradedMinimumFreeMegabytes = 20 * 1024, //20G 
-                        UnHealthtMinimumFreeMegabytes = 5 * 1024 //5GB
-                    },
-                    "Cache disk", HealthStatus.Unhealthy, tags: new[] { "Web server" }
-                );
+                .AddHealthChecks();
 
         }
 

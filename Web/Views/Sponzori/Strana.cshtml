@@ -143,7 +143,7 @@
     }
 
 
-    ViewBag.SocialImage = $"https://www.hlidacstatu.cz/socialbanner/quote?d={DateTime.Now.ToString("d.M.yy")}"
+    ViewBag.SocialImage = $"https://gen.hlidacstatu.cz/socialbanner/quote?d={DateTime.Now.ToString("d.M.yy")}"
             + "&t=" + System.Net.WebUtility.UrlEncode(ViewBag.SocialShareTitle)
             + "&b=" + System.Net.WebUtility.UrlEncode(ViewBag.SocialShareText)
             + ((topOsoba != null) ? ("&f=" + System.Net.WebUtility.UrlEncode(topOsoba.FullNameWithYear() + " " + HlidacStatu.Util.RenderData.ShortNicePrice(topOsobaAmount.Value))) : "")

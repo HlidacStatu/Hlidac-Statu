@@ -73,7 +73,7 @@ namespace HlidacStatu.Web.HealthChecks
                     var res = await Datasets.DatasetRepo.Searching.SearchDataRawAsync(ds, $"DbCreated:{dateQ}", 1, 1,
                         "0", exactNumOfResults: true);
 
-                    result += $"{res.Total} zaznamů za {options.Interval.ToNiceDisplayName()} \n";
+                    result += $"{res.Total} záznamů za {options.Interval.ToNiceDisplayName()} \n";
                     if (res.Total < options.MinRecordsInInterval)
                         bad = true;
 
@@ -87,7 +87,7 @@ namespace HlidacStatu.Web.HealthChecks
             }
             catch (Exception e)
             {
-                return HealthCheckResult.Unhealthy("Unknown status, cannot read data from network disk", e);
+                return HealthCheckResult.Unhealthy("Unknown status, cannot read data", e);
             }
 
 

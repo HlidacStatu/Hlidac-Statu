@@ -17,13 +17,30 @@ namespace HlidacStatu.DS.Api
         public long SystemUpTimeSeconds { get; set; }
         public long SystemDiskFreeBytes { get; set; }
         public long SystemDiskTotalBytes { get; set; }
-
+        public IIS.Request[] IISRequests { get; set; }
         public class IIS
         {
             public Request[] Requests { get; set; }
 
             public class Request
             {
+                /*
+                 Name	Value	Description
+Unknown	0	IIS 7 is in an unknown state.
+BeginRequest	1	IIS 7 began processing a request.
+AuthenticateRequest	2	IIS 7 authenticated a request.
+AuthorizeRequest	4	IIS 7 authorized a request.
+ResolveRequestCache	8	IIS 7 satisfied a request from the cache.
+MapRequestHandler	16	IIS 7 mapped the request handler.
+AcquireRequestState	32	IIS 7 acquired the state for a request.
+PreExecuteRequestHandler	64	IIS 7 executed a request handler.
+ExecuteRequestHandler	128	IIS 7 executed a request handler.
+ReleaseRequestState	256	IIS 7 released the state for a request.
+UpdateRequestCache	512	IIS 7 updated the cache.
+LogRequest	1024	IIS 7 logged the request.
+EndRequest	2048	IIS 7 ended a request.
+SendResponse	536870912	IIS 7 sent a response. The event that is associated with this pipeline state is nondeterministic.
+                 */
                 public enum PipelineStateEnum
                 {
                     Unknown = 0,
@@ -65,11 +82,11 @@ namespace HlidacStatu.DS.Api
                 public int SiteId { get; set; }
                 public string ApplicationPoolName { get; set; }
 
-                public int TimeElapsed { get; set; }
+                public int TimeElapsedInMs { get; set; }
 
-                public int TimeInModule { get; set; }
+                public int TimeInModuleInMs { get; set; }
 
-                public int TimeInState { get; set; }
+                public int TimeInStateInMs { get; set; }
 
                 public string Url { get; set; }
 

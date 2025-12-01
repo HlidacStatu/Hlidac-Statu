@@ -14,7 +14,7 @@
     ViewBag.SocialShareTitle = ViewBag.Title;
     ViewBag.SocialShareText = $"{Model.Count} firemních sponzorů, kteří darovali straně {ViewBag.Strana} v součtu {HlidacStatu.Util.RenderData.ShortNicePrice(suma)}."; 
 
-    ViewBag.SocialImage = $"https://www.hlidacstatu.cz/socialbanner/quote?d={DateTime.Now.ToString("d.M.yy")}"
+    ViewBag.SocialImage = $"https://gen.hlidacstatu.cz/socialbanner/quote?d={DateTime.Now.ToString("d.M.yy")}"
                           + "&t=" + System.Net.WebUtility.UrlEncode(ViewBag.SocialShareTitle)
                           + "&b=" + System.Net.WebUtility.UrlEncode(ViewBag.SocialShareText)
                           + ((topFirma != null) ? ("&f=" + System.Net.WebUtility.UrlEncode(topFirma.Jmeno + " " + HlidacStatu.Util.RenderData.ShortNicePrice(ViewBag.TopFirmaAmount))) : "")
