@@ -74,7 +74,7 @@ public static class FirmaExtensions
                     {
                         KIndex = kidx.KIndexLabel.ToString(),
                         Obrazek_Url = kidx.KIndexLabelIconUrl(false),
-                        Popis = kindex.InfoFacts(i).RenderFacts(3, true, true, ", "),
+                        Popis = (await kindex.InfoFactsAsync(i)).RenderFacts(3, true, true, ", "),
                         Rok = i
                     });
                 }

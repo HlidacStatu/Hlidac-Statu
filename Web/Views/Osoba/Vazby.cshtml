@@ -17,7 +17,6 @@
 
     var statistics = await Model.StatistikaRegistrSmluvAsync();
     var vazbyPodleAktualnosti = Model.AktualniVazby(aktualnost);
-
 }
 
 
@@ -26,16 +25,21 @@
 
     <p>
         <a href="@Url.Action("Vazby", new { id = Model.NameId, aktualnost = Relation.AktualnostType.Aktualni })"
-           class="btn btn-hs btn-@(aktualnost == Relation.AktualnostType.Aktualni ? "success" : "primary") btn-sm" role="button">
+           class="btn btn-hs btn-@(aktualnost == Relation.AktualnostType.Aktualni ? "success" : "primary") btn-sm"
+           role="button">
             @(aktualnost == Relation.AktualnostType.Aktualni ? "Zobrazujeme" : "Ukázat") pouze aktuální vazby
         </a>
         <a href="@Url.Action("Vazby", new { id = Model.NameId, aktualnost = Relation.AktualnostType.Nedavny })"
-           class="btn btn-hs btn-@(aktualnost == Relation.AktualnostType.Nedavny ? "success" : "primary") btn-sm" role="button">
-            @(aktualnost == Relation.AktualnostType.Nedavny ? "Zobrazujeme" : "Ukázat") vazby za posledních 5 let včetně aktuálních
+           class="btn btn-hs btn-@(aktualnost == Relation.AktualnostType.Nedavny ? "success" : "primary") btn-sm"
+           role="button">
+            @(aktualnost == Relation.AktualnostType.Nedavny ? "Zobrazujeme" : "Ukázat") vazby za posledních 5 let včetně
+            aktuálních
         </a>
         <a href="@Url.Action("Vazby", new { id = Model.NameId, aktualnost = Relation.AktualnostType.Libovolny })"
-           class="btn btn-hs btn-@(aktualnost == Relation.AktualnostType.Libovolny ? "success" : "primary") btn-sm" role="button">
-            @(aktualnost == Relation.AktualnostType.Libovolny ? "Zobrazujeme" : "Ukázat") všechny vazby včetně historických
+           class="btn btn-hs btn-@(aktualnost == Relation.AktualnostType.Libovolny ? "success" : "primary") btn-sm"
+           role="button">
+            @(aktualnost == Relation.AktualnostType.Libovolny ? "Zobrazujeme" : "Ukázat") všechny vazby včetně
+            historických
         </a>
     </p>
 
@@ -47,18 +51,21 @@
             {
                 case Relation.AktualnostType.Libovolny:
                     <text>
-                        @Model.FullName() se angažuje nebo angažoval v @Devmasters.Lang.CS.Plural.Get(statistics.SoukromeFirmy.Count, "jedné soukromé firmě", "{0} soukromých firmách", "{0} soukromých firmách")
+                        @Model.FullName() se angažuje nebo angažoval
+                        v @Devmasters.Lang.CS.Plural.Get(statistics.SoukromeFirmy.Count, "jedné soukromé firmě", "{0} soukromých firmách", "{0} soukromých firmách")
                     </text>
                     break;
                 case Relation.AktualnostType.Aktualni:
                     <text>
-                        @Model.FullName() se angažuje  v @Devmasters.Lang.CS.Plural.Get(statistics.SoukromeFirmy.Count, "jedné soukromé firmě", "{0} soukromých firmách", "{0} soukromých firmách")
+                        @Model.FullName() se
+                        angažuje v @Devmasters.Lang.CS.Plural.Get(statistics.SoukromeFirmy.Count, "jedné soukromé firmě", "{0} soukromých firmách", "{0} soukromých firmách")
                     </text>
 
                     break;
                 default:
                     <text>
-                        @Model.FullName() se angažuje, nebo se v posledních 5 letech angažoval v @Devmasters.Lang.CS.Plural.Get(statistics.SoukromeFirmy.Count, "jedné soukromé firmě", "{0} soukromých firmách", "{0} soukromých firmách")
+                        @Model.FullName() se angažuje, nebo se v posledních 5 letech angažoval
+                        v @Devmasters.Lang.CS.Plural.Get(statistics.SoukromeFirmy.Count, "jedné soukromé firmě", "{0} soukromých firmách", "{0} soukromých firmách")
                     </text>
 
                     break;
@@ -67,46 +74,50 @@
             {
                 <span>(z toho v @Devmasters.Lang.CS.Plural.Get(statistics.SmlouvyStat_NeziskovkyCount(), "jedné neziskovce", "{0} neziskovkách", "{0} neziskovkách")):</span>
             }
-            <ul>
-                @foreach (var stat in statistics.SoukromeFirmy
-               .OrderByDescending(o => o.Value.Summary().CelkovaHodnotaSmluv)               
-               )
-                {
-                    <li>
-                        <a asp-controller="Subjekt" asp-action="Index" asp-route-id="@stat.Key">
-                            @Firmy.GetJmeno(stat.Key)
-                        </a>
-                        (@Html.Raw(stat.Value.Summary().ToNiceLinkString(null,true, customUrl: $"/hledat?q=ico:{stat.Key}")) od 2016
-                        @if (stat.Value.CurrentSeasonStatistics().PocetSmluv > 0)
-                        {
-                            @($", {stat.Value.CurrentSeasonStatistics().ToNiceLinkString(null, false)} v {stat.Value.CurrentSeasonYear()}")
-                        })
-                    </li>
-                }
-            </ul>
+        <ul>
+            @foreach (var stat in statistics.SoukromeFirmy
+                              .OrderByDescending(o => o.Value.Summary().CelkovaHodnotaSmluv)
+                         )
+            {
+                <li>
+                    <a asp-controller="Subjekt" asp-action="Index" asp-route-id="@stat.Key">
+                        @Firmy.GetJmeno(stat.Key)
+                    </a>
+                    (@Html.Raw(stat.Value.Summary().ToNiceLinkString(null, true, customUrl: $"/hledat?q=ico:{stat.Key}")) od
+                    2016
+                    @if (stat.Value.CurrentSeasonStatistics().PocetSmluv > 0)
+                    {
+                        @($", {stat.Value.CurrentSeasonStatistics().ToNiceLinkString(null, false)} v {stat.Value.CurrentSeasonYear()}")
+                    }
+                    )
+                </li>
+            }
+        </ul>
 
         </p>
     }
     else if (statistics.SoukromeFirmy.Count > 0 && statistics.SmlouvyStat_SoukromeFirmySummary().Summary().PocetSmluv == 0)
     {
-
         <p>
             @switch (aktualnost)
             {
                 case Relation.AktualnostType.Libovolny:
                     <text>
-                        @Model.FullName() se angažuje nebo se angažoval v @Devmasters.Lang.CS.Plural.Get(statistics.SoukromeFirmy.Count, "jedné soukromé firmě, která neobchoduje se státem", "{0} soukromých firmách, které neobchodují se státem", "{0} soukromých firmách, které neobchodují se státem").
+                        @Model.FullName() se angažuje nebo se angažoval
+                        v @Devmasters.Lang.CS.Plural.Get(statistics.SoukromeFirmy.Count, "jedné soukromé firmě, která neobchoduje se státem", "{0} soukromých firmách, které neobchodují se státem", "{0} soukromých firmách, které neobchodují se státem").
                     </text>
                     break;
                 case Relation.AktualnostType.Aktualni:
                     <text>
-                        @Model.FullName() se angažuje v @Devmasters.Lang.CS.Plural.Get(statistics.SoukromeFirmy.Count, "jedné soukromé firmě, která neobchoduje se státem", "{0} soukromých firmách, které neobchodují se státem", "{0} soukromých firmách, které neobchodují se státem").
+                        @Model.FullName() se angažuje
+                        v @Devmasters.Lang.CS.Plural.Get(statistics.SoukromeFirmy.Count, "jedné soukromé firmě, která neobchoduje se státem", "{0} soukromých firmách, které neobchodují se státem", "{0} soukromých firmách, které neobchodují se státem").
                     </text>
 
                     break;
                 default:
                     <text>
-                        @Model.FullName() se angažuje nebo se v posledních 5 letech angažoval v @Devmasters.Lang.CS.Plural.Get(statistics.SoukromeFirmy.Count, "jedné soukromé firmě, která neobchoduje se státem", "{0} soukromých firmách, které neobchodují se státem", "{0} soukromých firmách, které neobchodují se státem").
+                        @Model.FullName() se angažuje nebo se v posledních 5 letech angažoval
+                        v @Devmasters.Lang.CS.Plural.Get(statistics.SoukromeFirmy.Count, "jedné soukromé firmě, která neobchoduje se státem", "{0} soukromých firmách, které neobchodují se státem", "{0} soukromých firmách, které neobchodují se státem").
                     </text>
 
                     break;
@@ -121,52 +132,57 @@
             {
                 case Relation.AktualnostType.Libovolny:
                     <text>
-                        @Model.FullName() se angažuje nebo angažoval v @Devmasters.Lang.CS.Plural.Get(statistics.StatniFirmy.Count, "jedné organizaci", "{0} organizacích", "{0} organizacích"):
+                        @Model.FullName() se angažuje nebo angažoval
+                        v @Devmasters.Lang.CS.Plural.Get(statistics.StatniFirmy.Count, "jedné organizaci", "{0} organizacích", "{0} organizacích"):
                     </text>
                     break;
                 case Relation.AktualnostType.Aktualni:
                     <text>
-                        @Model.FullName() se angažuje v @Devmasters.Lang.CS.Plural.Get(statistics.StatniFirmy.Count, "jedné organizaci", "{0} organizacích", "{0} organizacích"):
+                        @Model.FullName() se angažuje
+                        v @Devmasters.Lang.CS.Plural.Get(statistics.StatniFirmy.Count, "jedné organizaci", "{0} organizacích", "{0} organizacích"):
                     </text>
 
                     break;
                 default:
                     <text>
-                        @Model.FullName() se angažuje, nebo se v posledních 5 letech angažoval v @Devmasters.Lang.CS.Plural.Get(statistics.StatniFirmy.Count, "jedné organizaci", "{0} organizacích", "{0} organizacích"):
+                        @Model.FullName() se angažuje, nebo se v posledních 5 letech angažoval
+                        v @Devmasters.Lang.CS.Plural.Get(statistics.StatniFirmy.Count, "jedné organizaci", "{0} organizacích", "{0} organizacích"):
                     </text>
 
                     break;
             }
 
-            <ul>
-                @foreach (var stat in statistics.StatniFirmy
-               .OrderByDescending(o => o.Value.CurrentSeasonStatistics().CelkovaHodnotaSmluv)
-               )
-                {
-                    <li>
-                        <a asp-controller="Subjekt" asp-action="Index" asp-route-id="@stat.Key">
-                            @Firmy.GetJmeno(stat.Key)
-                        </a> (@Html.Raw(stat.Value.Summary().ToNiceLinkString(null,true, customUrl: $"/hledat?q=ico:{stat.Key}")) od 2016
-                        @if (stat.Value.CurrentSeasonStatistics().PocetSmluv > 0)
-                        {
-                            @($", {stat.Value.CurrentSeasonStatistics().ToNiceLinkString(null, false)} v {stat.Value.CurrentSeasonYear()}")
-                        }
-                        )
-                    </li>
-                }
-            </ul>
+        <ul>
+            @foreach (var stat in statistics.StatniFirmy
+                              .OrderByDescending(o => o.Value.CurrentSeasonStatistics().CelkovaHodnotaSmluv)
+                         )
+            {
+                <li>
+                    <a asp-controller="Subjekt" asp-action="Index" asp-route-id="@stat.Key">
+                        @Firmy.GetJmeno(stat.Key)
+                    </a>
+                    (@Html.Raw(stat.Value.Summary().ToNiceLinkString(null, true, customUrl: $"/hledat?q=ico:{stat.Key}")) od
+                    2016
+                    @if (stat.Value.CurrentSeasonStatistics().PocetSmluv > 0)
+                    {
+                        @($", {stat.Value.CurrentSeasonStatistics().ToNiceLinkString(null, false)} v {stat.Value.CurrentSeasonYear()}")
+                    }
+                    )
+                </li>
+            }
+        </ul>
         </p>
     }
 
-    <hr />
+    <hr/>
 
     <p style="padding-top:30px;">
         @Html.Raw(
-        HlidacStatu.Repositories.Graph.TiskVazeb(
-        Model.FullName(),Model.VazbyRootEdge(),
-        vazbyPodleAktualnosti,
-        Relation.TiskEnum.Html
-        )
+            HlidacStatu.Repositories.Graph.TiskVazeb(
+                Model.FullName(), Model.VazbyRootEdge(),
+                vazbyPodleAktualnosti,
+                Relation.TiskEnum.Html
+            )
         )
     </p>
 
@@ -205,20 +221,19 @@
             .OrderByDescending(m => m.stat.Summary().CelkovaHodnotaSmluv)
             .ThenBy(m => m.ICO)
             .ToList();
-        
     }
     <p style="padding-top:30px;">
         @foreach (var vPerIco in data)
         {
-            <div>
-                <h4><a href="/subjekt/@(vPerIco.ICO)">@vPerIco.FirmaName</a></h4>
-                @Html.RenderVazby(vPerIco.VazbyPerIco)
+        <div>
+            <h4><a href="/subjekt/@(vPerIco.ICO)">@vPerIco.FirmaName</a></h4>
+            @Html.RenderVazby(vPerIco.VazbyPerIco)
 
 
-            </div>
-        }
+        </div>
+    }
     </p>
-    <partial name="PolitikDisclaimer" view-data="ViewData" />
+    <partial name="PolitikDisclaimer" view-data="ViewData"/>
 
 </div>
 

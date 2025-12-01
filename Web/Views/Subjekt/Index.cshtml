@@ -108,7 +108,7 @@
                 </div>
                 <div class="col-sm-10">
                     <div>
-                        @Html.Raw(kindex.InfoFacts(kindex.LastReadyKIndex(await HtmlExtensions.MaxKIndexYearToShowAsync(this.User)).Rok).RenderFacts(3, true, false, lineFormat: "<p>{0}</p>", html: true))
+                        @Html.Raw((await kindex.InfoFactsAsync(kindex.LastReadyKIndex(await HtmlExtensions.MaxKIndexYearToShowAsync(this.User)).Rok)).RenderFacts(3, true, false, lineFormat: "<p>{0}</p>", html: true))
                     </div>
                 </div>
             </div>

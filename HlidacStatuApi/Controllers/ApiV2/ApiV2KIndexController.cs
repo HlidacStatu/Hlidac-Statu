@@ -25,7 +25,7 @@ namespace HlidacStatuApi.Controllers.ApiV2
                 return BadRequest($"Hodnota ico chybí.");
             }
 
-            var kindex = await KIndex.GetAsync(ico);
+            var kindex = await KIndex.GetCachedAsync(ico);
 
             if (kindex == null)
             {
@@ -45,7 +45,7 @@ namespace HlidacStatuApi.Controllers.ApiV2
                 return BadRequest($"Hodnota ico chybí.");
             }
 
-            var kindex = await KIndex.GetAsync(ico);
+            var kindex = await KIndex.GetCachedAsync(ico);
 
             if (kindex == null)
             {

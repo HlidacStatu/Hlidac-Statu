@@ -268,7 +268,7 @@ namespace HlidacStatu.Repositories
                     Description = FixKraj(f.Item3),
                     PriorityMultiplier = 1.5f,
                     ImageElement = "<i class='fas fa-industry-alt'></i>",
-                    KIndex = (KIndex.GetAsync(f.Item2).GetAwaiter().GetResult())?.LastKIndexLabel().ToString("G"),
+                    KIndex = (KIndex.GetCachedAsync(f.Item2).GetAwaiter().GetResult())?.LastKIndexLabel().ToString("G"),
                     Category = Autocomplete.CategoryEnum.StateCompany
                 }).ToList();
             return results;
@@ -311,7 +311,7 @@ namespace HlidacStatu.Repositories
                         Description = FixKraj(f.Item3),
                         PriorityMultiplier = 2,
                         ImageElement = img,
-                        KIndex = (await KIndex.GetAsync(f.Item2))?.LastKIndexLabel().ToString("G"),
+                        KIndex = (await KIndex.GetCachedAsync(f.Item2))?.LastKIndexLabel().ToString("G"),
                         Category = Autocomplete.CategoryEnum.Authority
                     };
 

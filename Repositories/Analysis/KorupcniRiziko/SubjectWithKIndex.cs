@@ -40,7 +40,7 @@ namespace HlidacStatu.Repositories.Analysis.KorupcniRiziko
                 throw new Exception("Ico is missing");
 
             year = await KIndexRepo.FixKindexYearAsync(year);
-            var kindex = await KIndex.GetAsync(Ico);
+            var kindex = await KIndex.GetCachedAsync(Ico);
 
             if (kindex != null)
             {

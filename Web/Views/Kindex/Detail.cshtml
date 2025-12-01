@@ -25,7 +25,7 @@
 
 
     Firma f = Firmy.Get(Model.id);
-    KIndexData kidx = await KIndex.GetAsync(HlidacStatu.Util.ParseTools.NormalizeIco(Model.id), futureData);
+    KIndexData kidx = await KIndex.GetCachedAsync(HlidacStatu.Util.ParseTools.NormalizeIco(Model.id), futureData);
     kidx.roky = kidx.roky
         .Where(m => m.Rok <= maxYearToShow)
         .ToList();
@@ -146,8 +146,8 @@
 
 @if (User.IsInRole("Admin"))
 {
-    var kIndexPublicTask = KIndex.GetAsync(HlidacStatu.Util.ParseTools.NormalizeIco(Model.id), false);
-    var kIndexFutureTask = KIndex.GetAsync(HlidacStatu.Util.ParseTools.NormalizeIco(Model.id), true);
+    var kIndexPublicTask = KIndex.GetCachedAsync(HlidacStatu.Util.ParseTools.NormalizeIco(Model.id), false);
+    var kIndexFutureTask = KIndex.GetCachedAsync(HlidacStatu.Util.ParseTools.NormalizeIco(Model.id), true);
 
     KIndexData kidxPublic = await kIndexPublicTask;
     KIndexData kidxFuture = await kIndexFutureTask;

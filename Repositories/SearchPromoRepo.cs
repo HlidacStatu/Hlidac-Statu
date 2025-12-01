@@ -158,8 +158,8 @@ namespace HlidacStatu.Repositories
             await Devmasters.Batch.Manager.DoActionForAllAsync(KIndxOrgs,
                 async rec =>
                 {
-                    KIndexData kidx = await KIndex.GetAsync(HlidacStatu.Util.ParseTools.NormalizeIco(rec.Ico));
-                    var infof = kidx.InfoFacts((await KIndexRepo.GetAvailableCalculationYearsAsync()).Max())
+                    KIndexData kidx = await KIndex.GetCachedAsync(HlidacStatu.Util.ParseTools.NormalizeIco(rec.Ico));
+                    var infof = (await kidx.InfoFactsAsync((await KIndexRepo.GetAvailableCalculationYearsAsync()).Max()))
                         .RenderFacts(2, true, false, lineFormat: "{0}", html: false);
                     var sp = new SearchPromo();
 

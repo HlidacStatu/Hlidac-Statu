@@ -6,6 +6,7 @@ using HlidacStatu.Caching;
 using HlidacStatu.Connectors;
 using HlidacStatu.Entities.Analysis;
 using HlidacStatu.Entities.KIndex;
+using HlidacStatu.Repositories.Cache;
 using Nest;
 using ZiggyCreatures.Caching.Fusion;
 
@@ -14,24 +15,6 @@ namespace HlidacStatu.Repositories.Analysis.KorupcniRiziko
     public static class KIndex
     {
         
-        private static readonly IFusionCache _memoryCache =
-            HlidacStatu.Caching.CacheFactory.CreateNew(CacheFactory.CacheType.L1Default, nameof(KIndex));
-        
-        private static ValueTask<KIndexData> GetKindexCachedAsync(string ico, bool useTempDb) =>
-            _memoryCache.GetOrSetAsync($"_KIndexData:{ico}-{useTempDb}", async _ =>
-                {
-                    KIndexData f = await KIndexRepo.GetDirectAsync(ico, useTempDb);
-                    if (f == null || f.Ico == "-")
-                        return null;
-                    return f;
-                },
-                options => options.ModifyEntryOptionsDuration(TimeSpan.FromHours(28))
-            );
-        
-        private static ValueTask InvalidateKindexCachedAsync(string ico, bool useTempDb) => 
-            _memoryCache.ExpireAsync($"_KIndexData:{ico}-{useTempDb}");
-
-
         static HashSet<string> kindexReadyIcos = null;
         static System.Timers.Timer refreshTimer = new System.Timers.Timer(TimeSpan.FromHours(12).TotalMilliseconds);
         static KIndex()
@@ -55,7 +38,7 @@ namespace HlidacStatu.Repositories.Analysis.KorupcniRiziko
 
             foreach (var ico in kindexReadyIcos)
             {
-                _ = GetAsync(ico, false).Result;
+                _ = GetCachedAsync(ico, false).Result;
             }
         }
 
@@ -64,7 +47,7 @@ namespace HlidacStatu.Repositories.Analysis.KorupcniRiziko
             return kindexReadyIcos; 
         }
 
-        public static async Task<KIndexData> GetAsync(string ico, bool useTemp = false, bool refreshCache = false)
+        public static async Task<KIndexData> GetCachedAsync(string ico, bool useTemp = false, bool refreshCache = false)
         {
             if (kindexReadyIcos != null && kindexReadyIcos.Count > 0)
             {
@@ -74,9 +57,9 @@ namespace HlidacStatu.Repositories.Analysis.KorupcniRiziko
             if (string.IsNullOrEmpty(ico))
                 return null;
             if (refreshCache)
-                await InvalidateKindexCachedAsync(ico, useTemp);
+                await KindexCache.InvalidateKindexCachedAsync(ico, useTemp);
 
-            KIndexData f = await GetKindexCachedAsync(ico, useTemp);
+            KIndexData f = await KindexCache.GetKindexCachedAsync(ico, useTemp);
             if (f == null || f.Ico == "-")
                 return null;
             return f;
@@ -139,7 +122,7 @@ namespace HlidacStatu.Repositories.Analysis.KorupcniRiziko
 
         public static async Task<bool> HasKIndexValueAsync(string ico, bool useTemp)
         {
-            var kidx = await GetAsync(ico, useTemp);
+            var kidx = await GetCachedAsync(ico, useTemp);
             if (kidx == null)
                 return false;
             else
@@ -152,7 +135,7 @@ namespace HlidacStatu.Repositories.Analysis.KorupcniRiziko
         {
             if (Consts.KIndexExceptions.Contains(ico) && useTemp == false)
                 return new Tuple<int?, KIndexData.KIndexLabelValues>(null, KIndexData.KIndexLabelValues.None);
-            var kidx = await GetAsync(ico, useTemp);
+            var kidx = await GetCachedAsync(ico, useTemp);
             if (kidx != null)
             {
                 var lbl = kidx.LastKIndexLabel(out int? rok);

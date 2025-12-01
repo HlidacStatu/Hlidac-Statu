@@ -250,7 +250,7 @@ text zpravy: {txt}";
             var f = Firmy.Get(Util.ParseTools.NormalizeIco(id));
             if (f.Valid)
             {
-                var kidx = await KIndex.GetAsync(Util.ParseTools.NormalizeIco(id));
+                var kidx = await KIndex.GetCachedAsync(Util.ParseTools.NormalizeIco(id));
 
                 if (kidx != null)
                 {
@@ -315,7 +315,7 @@ text zpravy: {txt}";
 
             if (Util.DataValidators.CheckCZICO(Util.ParseTools.NormalizeIco(id)))
             {
-                KIndexData kdata = await KIndex.GetAsync(Util.ParseTools.NormalizeIco(id),refreshCache:true);
+                KIndexData kdata = await KIndex.GetCachedAsync(Util.ParseTools.NormalizeIco(id),refreshCache:true);
                 ViewBag.ICO = id;
                 return View("Debug", kdata);
             }
@@ -328,7 +328,7 @@ text zpravy: {txt}";
                     var f = Firmy.Get(Util.ParseTools.NormalizeIco(i));
                     if (f.Valid)
                     {
-                        var kidx = await KIndex.GetAsync(Util.ParseTools.NormalizeIco(i), refreshCache: true);
+                        var kidx = await KIndex.GetCachedAsync(Util.ParseTools.NormalizeIco(i), refreshCache: true);
                         if (kidx != null)
                             kdata.Add(kidx);
                     }
@@ -344,7 +344,7 @@ text zpravy: {txt}";
         public async Task<ActionResult> PercentileBanner(string id, int? part = null, int? rok = null)
         {
             rok = await KIndexRepo.FixKindexYearAsync(rok);
-            var kidx = await KIndex.GetAsync(id);
+            var kidx = await KIndex.GetCachedAsync(id);
             if (kidx != null)
             {
 
@@ -395,7 +395,7 @@ text zpravy: {txt}";
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public async Task<ActionResult> Banner(string id, int? rok = null)
         {
-            var kidx = await KIndex.GetAsync(id);
+            var kidx = await KIndex.GetCachedAsync(id);
 
             byte[] data = null;
             if (kidx != null)
@@ -407,13 +407,13 @@ text zpravy: {txt}";
                 {
                     label = kidx.LastKIndexLabel(out int? y);
                     year = y.Value;
-                    infoFacts = kidx.InfoFacts(year);
+                    infoFacts = await kidx.InfoFactsAsync(year);
                 }
                 else
                 {
                     year = await KIndexRepo.FixKindexYearAsync(rok);
                     label = kidx.ForYear(year)?.KIndexLabel ?? KIndexData.KIndexLabelValues.None;
-                    infoFacts = kidx.InfoFacts(year);
+                    infoFacts = await kidx.InfoFactsAsync(year);
                 }
 
 

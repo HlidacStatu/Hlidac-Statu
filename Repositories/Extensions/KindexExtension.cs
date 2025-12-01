@@ -5,93 +5,37 @@ using System.Threading.Tasks;
 using HlidacStatu.Entities.Facts;
 using HlidacStatu.Entities.KIndex;
 using HlidacStatu.Repositories;
+using HlidacStatu.Repositories.Cache;
 using Nest;
 
 namespace HlidacStatu.Extensions
 {
     public static class KindexExtension
     {
-        private static string Best(KIndexData.Annual data, int year, string ico, out KIndexData.KIndexParts? usedPart)
+        private static async Task<(string kindComment, KIndexData.KIndexParts? usedPart)> Best(KIndexData.Annual data, int year, string ico)
         {
-            usedPart = data.OrderedValuesFromBestForInfofacts(ico).FirstOrDefault();
+            KIndexData.KIndexParts? usedPart = (await KindexCache.GetKindexOrderedValuesFromBestForInfofactsAsync(data, ico))?.FirstOrDefault();
             if (usedPart != null)
             {
-                return KIndexData.KIndexCommentForPart(usedPart.Value, data);
+                return (KIndexData.KIndexCommentForPart(usedPart.Value, data), usedPart);
             }
 
-            return null;
+            return (null, null);
         }
 
-        private static string Worst(KIndexData.Annual data, int year, string ico, out KIndexData.KIndexParts? usedPart)
+        private static async Task<(string kindComment, KIndexData.KIndexParts? usedPart)> Worst(KIndexData.Annual data, int year, string ico)
         {
-            usedPart = data.OrderedValuesFromBestForInfofacts(ico)?.Reverse()?.FirstOrDefault();
+            KIndexData.KIndexParts? usedPart = (await KindexCache.GetKindexOrderedValuesFromBestForInfofactsAsync(data, ico))?.Reverse()?.FirstOrDefault();
             if (usedPart != null)
             {
-                return KIndexData.KIndexCommentForPart(usedPart.Value, data);
+                return (KIndexData.KIndexCommentForPart(usedPart.Value, data), usedPart);
             }
 
-            return null;
+            return (null, null);
         }
+        
 
-
-        static Devmasters.Cache.LocalMemory.Manager<KIndexData.KIndexParts[], (KIndexData.Annual, string)>
-            _orderedValuesFromBestForInfofactsCache
-                = Devmasters.Cache.LocalMemory.Manager<KIndexData.KIndexParts[], (KIndexData.Annual, string)>
-                    .GetSafeInstance("orderedValuesFromBestForInfofacts",
-                        (data) => await OrderedValuesFromBestForInfofactsAsync(data.Item1, data.Item2),
-                        TimeSpan.FromDays(2), (data) => $"{data.Item1.Ico}_{data.Item1.Rok}-{data.Item2}"
-                    );
-
-        public static KIndexData.KIndexParts[] OrderedValuesFromBestForInfofacts(this KIndexData.Annual annual,
-            string ico, bool invalidateCache = false)
-        {
-            if (invalidateCache)
-                _orderedValuesFromBestForInfofactsCache.Delete((annual, ico));
-
-            return _orderedValuesFromBestForInfofactsCache.Get((annual, ico));
-        }
-
-        private static async Task<KIndexData.KIndexParts[]> OrderedValuesFromBestForInfofactsAsync(
-            this KIndexData.Annual annual, string ico)
-        {
-            if (annual._orderedValuesForInfofacts == null)
-            {
-                await annual.AnnualSemaphoreSlim.WaitAsync();
-                try
-                {
-                    if (annual._orderedValuesForInfofacts == null)
-                    {
-                        var stat = await HlidacStatu.Repositories.Analysis.KorupcniRiziko.Statistics
-                            .GetStatisticsAsync(annual.Rok); //todo: může být null, co s tím?
-                        if (annual.KIndexVypocet.Radky != null || annual.KIndexVypocet.Radky.Count() > 0)
-
-                            annual._orderedValuesForInfofacts = annual.KIndexVypocet.Radky
-                                .Select(m => new { r = m, rank = stat.SubjektRank(ico, m.VelicinaPart) })
-                                .Where(m => m.rank.HasValue)
-                                .Where(m =>
-                                        m.r.VelicinaPart !=
-                                        KIndexData.KIndexParts.PercNovaFirmaDodavatel //nezajimava oblast
-                                        && !(m.r.VelicinaPart == KIndexData.KIndexParts.PercSmlouvyPod50kBonus &&
-                                             m.r.Hodnota == 0) //bez bonusu
-                                )
-                                .OrderBy(m => m.rank)
-                                .ThenBy(o => o.r.Hodnota)
-                                .Select(m => m.r.VelicinaPart)
-                                .ToArray(); //better debug
-                        else
-                            annual._orderedValuesForInfofacts = new KIndexData.KIndexParts[] { };
-                    }
-                }
-                finally
-                {
-                    annual.AnnualSemaphoreSlim.Release();
-                }
-            }
-
-            return annual._orderedValuesForInfofacts;
-        }
-
-        public static InfoFact[] InfoFacts(this KIndexData kIndexData, int year)
+        public static async Task<InfoFact[]> InfoFactsAsync(this KIndexData kIndexData, int year)
         {
             var ann = kIndexData.roky.Where(m => m.Rok == year).FirstOrDefault();
 
@@ -135,11 +79,9 @@ namespace HlidacStatu.Extensions
                 default:
                     break;
             }
-
-            KIndexData.KIndexParts? bestPart = null;
-            KIndexData.KIndexParts? worstPart = null;
-            var sBest = Best(ann, year, kIndexData.Ico, out bestPart);
-            var sworst = Worst(ann, year, kIndexData.Ico, out worstPart);
+            
+            (var sBest, var bestPart) = await Best(ann, year, kIndexData.Ico);
+            (var sworst, var worstPart) = await Worst(ann, year, kIndexData.Ico);
 
             //A-C dej pozitivni prvni
             if (ann.KIndexLabel == KIndexData.KIndexLabelValues.A
@@ -160,7 +102,8 @@ namespace HlidacStatu.Extensions
                     facts.Add(new InfoFact(sBest, InfoFact.ImportanceLevel.Stat));
             }
 
-            foreach (var part in ann.OrderedValuesFromBestForInfofacts(kIndexData.Ico).Reverse())
+            var kindexOrderedValuesFromBest = await KindexCache.GetKindexOrderedValuesFromBestForInfofactsAsync(ann, kIndexData.Ico);
+            foreach (var part in kindexOrderedValuesFromBest.Reverse())
             {
                 if (part != bestPart && part != worstPart)
                 {
@@ -177,7 +120,7 @@ namespace HlidacStatu.Extensions
         public static async Task<InfoFact[]> InfoFactsAsync(this KIndexData kIndexData)
         {
             var kidx = kIndexData.LastReadyKIndex();
-            return kIndexData.InfoFacts(kidx?.Rok ?? (await KIndexRepo.GetAvailableCalculationYearsAsync()).Max());
+            return await kIndexData.InfoFactsAsync(kidx?.Rok ?? (await KIndexRepo.GetAvailableCalculationYearsAsync()).Max());
         }
     }
 }
