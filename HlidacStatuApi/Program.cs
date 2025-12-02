@@ -4,12 +4,12 @@ using HlidacStatu.LibCore.Extensions;
 using HlidacStatu.LibCore.Filters;
 using HlidacStatu.LibCore.MiddleWares;
 using HlidacStatu.LibCore.Services;
+using HlidacStatuApi;
 using HlidacStatuApi.Code;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.OpenApi.Models;
 using Serilog;
 using ILogger = Serilog.ILogger;
@@ -132,6 +132,13 @@ builder.Services.AddSwaggerGen(c =>
 
 builder.Services.AddSingleton<IAuthorizationMiddlewareResultHandler, HlidacStatuApi.Code.SpecificApiAuthorizationMiddlewareResultHandler>();
 
+//Backroud blurredPage processing
+builder.Services.AddSingleton<BlurredPageBackgroundQueue>(sp =>
+{
+    var logger = sp.GetRequiredService<ILogger<BlurredPageBackgroundQueue>>();
+    return new BlurredPageBackgroundQueue(logger, capacity: 300); 
+});
+builder.Services.AddHostedService<BlurredPageProcessor>();
 
 _ = builder.Services
     .AddHealthChecks();
