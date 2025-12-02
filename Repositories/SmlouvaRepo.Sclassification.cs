@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 using Devmasters.Cache.File;
 
 using HlidacStatu.Entities;
-
+using HlidacStatu.Repositories.Cache;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
@@ -15,33 +15,8 @@ namespace HlidacStatu.Repositories
 {
     public static partial class SmlouvaRepo
     {
-        //mozna odstranit
-        private static volatile Devmasters.Cache.File.Manager oldStemCacheManager
-            = Devmasters.Cache.File.Manager.GetSafeInstance("SmlouvyStems",
-                smlouvaKeyId => GetRawStemsFromServerAsync(smlouvaKeyId).ConfigureAwait(false).GetAwaiter().GetResult(),
-                TimeSpan.FromDays(365 * 10)); //10 years
-
-        //L1 - 12 h
-        //L2 - 10 let
-        private static volatile Devmasters.Cache.AWS_S3.Manager<byte[], string> stemCacheManager
-            = Devmasters.Cache.AWS_S3.Manager<byte[], string>.GetSafeInstance(
-                "SmlouvyStems/",
-                key => GetRawStemsFromServerAsync(key).ConfigureAwait(false).GetAwaiter().GetResult(),
-                TimeSpan.Zero,
-                new string[] { Devmasters.Config.GetWebConfigValue("Minio.Cache.Endpoint") },
-                Devmasters.Config.GetWebConfigValue("Minio.Cache.Bucket"),
-                Devmasters.Config.GetWebConfigValue("Minio.Cache.AccessKey"),
-                Devmasters.Config.GetWebConfigValue("Minio.Cache.SecretKey"),
-                key => $"{key.Substring(0,3)}/stem_smlouva_{key}"
-                );
-
-
-        private static async Task<byte[]> GetRawStemsFromServerAsync(KeyAndId smlouvaKeyId)
-        {
-            return await GetRawStemsFromServerAsync(smlouvaKeyId.ValueForData);
-        }
-
-        private static async Task<byte[]> GetRawStemsFromServerAsync(string smlouvaId)
+       
+        public static async Task<byte[]> GetRawStemsFromServerAsync(string smlouvaId)
         {
             Smlouva s = await SmlouvaRepo.LoadAsync(smlouvaId);
 
@@ -63,75 +38,15 @@ namespace HlidacStatu.Repositories
 
             return Encoding.UTF8.GetBytes(stemmerResponse);
         }
-
-        public static bool MigrateRawStems(string sId)
-        {
-            var key = new KeyAndId() { ValueForData = sId, CacheNameOnDisk = $"stem_smlouva_{sId}" };
-
-            if (oldStemCacheManager.Exists(key) == false)
-                return true;
-            
-            var data = oldStemCacheManager.Get(key);
-
-            if (data == null)
-                return true;
-
-            try
-            {
-                stemCacheManager.Set(sId, data);
-                oldStemCacheManager.Delete(key);
-
-            }
-            catch (Exception)
-            {
-                try
-                {
-
-                }
-                catch (Exception e)
-                {
-                    stemCacheManager.Set(sId, data);
-                    oldStemCacheManager.Delete(key);
-                    _logger.Debug("Deleting stems cache for " + sId);
-
-                    return false;
-                }
-            }
-
-
-            return true;
-        }
-        public static string GetRawStems(string smlouvaId, bool rewriteStems = false)
-        {
-            if (string.IsNullOrEmpty(smlouvaId))
-                return null;
-            if (rewriteStems)
-            {
-                InvalidateStemCache(smlouvaId);
-            }
-
-            var data = stemCacheManager.Get(smlouvaId);
-            if (data == null)
-                return null;
-
-            return Encoding.UTF8.GetString(data);
-        }
-
-        public static void InvalidateStemCache(string smlouvaId)
-        {
-            _logger.Debug("Deleting stems cache for " + smlouvaId);
-
-            stemCacheManager.Delete(smlouvaId);
-        }
-
-        public static Dictionary<Smlouva.SClassification.ClassificationsTypes, decimal> GetClassificationFromServer(Smlouva s,
+        
+        public static async Task<Dictionary<Smlouva.SClassification.ClassificationsTypes, decimal>> GetClassificationFromServerAsync(Smlouva s,
             bool rewriteStems = false)
         {
             var data = new Dictionary<Smlouva.SClassification.ClassificationsTypes, decimal>();
             if (s.Prilohy.Any(m => m.EnoughExtractedText) == false)
                 return null;
 
-            var stems = GetRawStems(s.Id, rewriteStems);
+            var stems = await SmlouvaCache.GetRawStemsAsync(s.Id, rewriteStems);
             if (string.IsNullOrEmpty(stems))
             {
                 return data;
@@ -147,7 +62,7 @@ namespace HlidacStatu.Repositories
             catch
             {
                 //retry once with new stems
-                stems = GetRawStems(s.Id, true);
+                stems = await SmlouvaCache.GetRawStemsAsync(s.Id, true);
                 classifierResponse = CallEndpoint("classifier",
                     stems,
                     s.Id, TimeSpan.FromSeconds(600));
@@ -286,7 +201,7 @@ namespace HlidacStatu.Repositories
 
         }
 
-        public static bool SetClassification(this Smlouva smlouva, bool rewrite = false, bool rewriteStems = false) //true if changed
+        public static async Task<bool> SetClassificationAsync(this Smlouva smlouva, bool rewrite = false, bool rewriteStems = false) //true if changed
         {
             if (smlouva.Prilohy == null
                 || !smlouva.Prilohy.Any(m => m.EnoughExtractedText))
@@ -296,7 +211,7 @@ namespace HlidacStatu.Repositories
                 && ((smlouva.Classification?.GetClassif()) == null || smlouva.Classification.GetClassif().Count() != 0))
                 return false;
 
-            var types = GetClassificationFromServer(smlouva, rewriteStems);
+            var types = await GetClassificationFromServerAsync(smlouva, rewriteStems);
             if (types == null)
             {
                 smlouva.Classification = null;
@@ -304,17 +219,17 @@ namespace HlidacStatu.Repositories
             else
             {
                 Smlouva.SClassification.ClassificationsTypes[] vyjimkyClassif =
-                    new Smlouva.SClassification.ClassificationsTypes[]
-                    {
+                [
                     Smlouva.SClassification.ClassificationsTypes.finance_formality,
                     Smlouva.SClassification.ClassificationsTypes.finance_repo,
-                    Smlouva.SClassification.ClassificationsTypes.finance_bankovni,
-                    };
+                    Smlouva.SClassification.ClassificationsTypes.finance_bankovni
+                ];
 
-                var smluvniStrany = smlouva.Prijemce.Concat(new Smlouva.Subjekt[] { smlouva.Platce })
+                var smluvniStrany = smlouva.Prijemce.Concat([smlouva.Platce])
                     .Select(m => Firmy.Get(m.ico))
                     .Where(m => m.Valid == true)
                     .ToArray();
+                
                 if (types.Count(m => vyjimkyClassif.Contains(m.Key)) > 0
                     && smluvniStrany.Any(m => m.ESA2010?.StartsWith("12") == true) == false
                     )
@@ -330,8 +245,7 @@ namespace HlidacStatu.Repositories
                         ClassifProbability = m.Value
                     }
                     ).ToArray();
-
-                //
+                
 
                 var newClassRelevant = smlouva.relevantClassif(newClass);
                 smlouva.Classification = new Smlouva.SClassification(newClassRelevant)
