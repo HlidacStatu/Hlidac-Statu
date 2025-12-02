@@ -50,7 +50,7 @@ namespace HlidacStatu.Entities
                     }
                     else
                     {
-                        return PoOblastech.GetValueOrDefault(oblast);
+                        return (PoOblastech.GetValueOrDefault(oblast) ?? SimpleStat.Zero);
                     }
                 }
 
