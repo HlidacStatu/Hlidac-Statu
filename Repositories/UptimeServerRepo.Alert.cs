@@ -1,6 +1,6 @@
 using System;
 using System.Linq;
-
+using System.Threading.Tasks;
 using HlidacStatu.Entities;
 using Serilog;
 
@@ -32,9 +32,9 @@ namespace HlidacStatu.Repositories
                 public TimeSpan LengthOfFail { get; set; } = TimeSpan.Zero;
             }
 
-            public static CheckAndAlertResult CheckAndAlertServer(int serverId, DateTime? fromD = null, DateTime? toD = null)
+            public static async Task<CheckAndAlertResult> CheckAndAlertServerAsync(int serverId, DateTime? fromD = null, DateTime? toD = null)
             {
-                CheckAndAlertResult alertStatus = CheckAlertStatusForServerFromInflux(serverId, fromD, toD);
+                CheckAndAlertResult alertStatus = await CheckAlertStatusForServerFromInfluxAsync(serverId, fromD, toD);
 
                 var serverLastSavedStatusInDb = UptimeServerRepo.Load(serverId);
                 AlertStatus? lastAlertStatus = (AlertStatus?)serverLastSavedStatusInDb.LastAlertedStatus;
@@ -128,7 +128,7 @@ namespace HlidacStatu.Repositories
             }
 
 
-            public static CheckAndAlertResult CheckAlertStatusForServerFromInflux(int serverId, DateTime? fromD = null, DateTime? toD = null)
+            public static async Task<CheckAndAlertResult> CheckAlertStatusForServerFromInfluxAsync(int serverId, DateTime? fromD = null, DateTime? toD = null)
             {
                 var timeBack = TimeSpan.FromMinutes(30);
                 if (fromD.HasValue)
@@ -136,7 +136,7 @@ namespace HlidacStatu.Repositories
                     timeBack = (DateTime.Now - fromD.Value).Add(TimeSpan.FromMinutes(10));
                 }
 
-                var serverAvail = UptimeServerRepo.DirectShortAvailability(new[] { serverId }, timeBack)
+                var serverAvail = (await UptimeServerRepo.DirectShortAvailabilityAsync(new[] { serverId }, timeBack))
                     .FirstOrDefault();
                 if (fromD.HasValue)
                 {

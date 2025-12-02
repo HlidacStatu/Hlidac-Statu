@@ -38,8 +38,8 @@ new Thread(
             "availability cache");
         Devmasters.DT.StopWatchEx sw = new Devmasters.DT.StopWatchEx();
         sw.Start();
-        _ = HlidacStatuApi.Code.Availability.AllActiveServers24hoursStat();
-        _ = HlidacStatuApi.Code.Availability.AllActiveServersWeekStat();
+        _ = HlidacStatuApi.Code.Availability.AllActiveServers24hoursStatAsync();
+        _ = HlidacStatuApi.Code.Availability.AllActiveServersWeekStatAsync();
         sw.Stop();
         logger.Information(
             "{action} thread for {part} init during start in {duration} sec.",

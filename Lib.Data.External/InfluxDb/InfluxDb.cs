@@ -4,6 +4,7 @@ using InfluxDB.Client.Writes;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using Serilog;
 
 namespace HlidacStatu.Lib.Data.External
@@ -73,7 +74,7 @@ namespace HlidacStatu.Lib.Data.External
             }
         }
         
-        public static IEnumerable<ResponseItem> GetAvailbility(int[] serverIds, TimeSpan timeBack)
+        public static async Task<IEnumerable<ResponseItem>> GetAvailbilityAsync(int[] serverIds, TimeSpan timeBack)
         {
             var sTimeBack = "";
             if (timeBack.TotalHours >= 1)
@@ -118,8 +119,7 @@ namespace HlidacStatu.Lib.Data.External
                     _logger.Debug("Calling InfluxDB query {query} from time {timeBack}", query, timeBack);
 
                     List<InfluxDB.Client.Core.Flux.Domain.FluxTable> res =
-                        influxDbClient.GetQueryApi().QueryAsync(query, "hlidac")
-                        .ConfigureAwait(false).GetAwaiter().GetResult();
+                        await influxDbClient.GetQueryApi().QueryAsync(query, "hlidac");
 
                     fluxTables.AddRange(res);
                 }
