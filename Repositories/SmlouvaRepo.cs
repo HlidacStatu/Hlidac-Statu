@@ -778,7 +778,7 @@ namespace HlidacStatu.Repositories
                 searchFunc, (hit, param) =>
                 {
                     ids.Add(hit.Id);
-                    return new ActionOutputData() { CancelRunning = false, Log = null };
+                    return Task.FromResult(new ActionOutputData() { CancelRunning = false, Log = null });
                 }, null, outputWriter, progressWriter, false, blockSize: 100);
 
             return ids;

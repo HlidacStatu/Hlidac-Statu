@@ -112,7 +112,7 @@ namespace HlidacStatu.Repositories.Analysis
                 (hit, o) =>
                 {
                     smlouvy.Add(hit.Source);
-                    return new ActionOutputData();
+                    return Task.FromResult(new ActionOutputData());
                 }, null,
                 null, null, false);
 
@@ -344,7 +344,7 @@ namespace HlidacStatu.Repositories.Analysis
                     }
 
                     end:
-                    return new ActionOutputData() { CancelRunning = false, Log = null };
+                    return Task.FromResult(new ActionOutputData() { CancelRunning = false, Log = null });
                 }, null,
                 showProgress ? Devmasters.Batch.Manager.DefaultOutputWriter : (Action<string>)null,
                 showProgress ? new ActionProgressWriter().Writer : (Action<ActionProgressData>)null
@@ -488,7 +488,7 @@ namespace HlidacStatu.Repositories.Analysis
                             }
                     }
 
-                    return new ActionOutputData() { CancelRunning = false, Log = null };
+                    return Task.FromResult(new ActionOutputData() { CancelRunning = false, Log = null });
                 }, null,
                 showProgress ? Devmasters.Batch.Manager.DefaultOutputWriter : (Action<string>)null,
                 showProgress ? new ActionProgressWriter().Writer : (Action<ActionProgressData>)null

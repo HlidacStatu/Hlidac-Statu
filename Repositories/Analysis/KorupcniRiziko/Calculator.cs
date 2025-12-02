@@ -694,7 +694,7 @@ namespace HlidacStatu.Repositories.Analysis.KorupcniRiziko
                         }
                     }
 
-                    return new Devmasters.Batch.ActionOutputData();
+                    return Task.FromResult(new Devmasters.Batch.ActionOutputData());
                 }, null,
                 null, null,
                 false, blockSize: 100,

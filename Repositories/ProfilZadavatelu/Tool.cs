@@ -30,7 +30,7 @@ namespace HlidacStatu.Repositories.ProfilZadavatelu
                     {
                         profily2.Add(pz.Source);
 
-                        return new ActionOutputData();
+                        return Task.FromResult(new ActionOutputData());
                     }, null,
                     outputWriter ?? Manager.DefaultOutputWriter, progressWriter ?? Manager.DefaultProgressWriter,
                     false, elasticClient: Connectors.Manager.GetESClient_VerejneZakazky(), prefix: "profil zadavatelu ");
@@ -56,12 +56,12 @@ namespace HlidacStatu.Repositories.ProfilZadavatelu
                                 );
                 };
                 
-                await Searching.Tools.DoActionForQueryAsync<ProfilZadavateleDownload>(Connectors.Manager.GetESClient_Logs(), searchFunc, (pzd, obj) =>
+                await Searching.Tools.DoActionForQueryAsync<ProfilZadavateleDownload>(Connectors.Manager.GetESClient_Logs(), searchFunc, async (pzd, obj) =>
                     {
                         var profileId = pzd.Source.ProfileId;
                         if (!profily2.Any(m => m.Id == profileId))
                         {
-                            var pz = ProfilZadavateleRepo.GetByIdAsync(profileId).ConfigureAwait(false).GetAwaiter().GetResult();
+                            var pz = await ProfilZadavateleRepo.GetByIdAsync(profileId);
                             if (pz != null)
                                 profily2.Add(pz);
                         }

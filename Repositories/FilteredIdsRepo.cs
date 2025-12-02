@@ -124,7 +124,7 @@ namespace HlidacStatu.Repositories
                 searchFunc, (hit, param) =>
                 {
                     ids2Process.Add(hit.Id);
-                    return new Devmasters.Batch.ActionOutputData() { CancelRunning = false, Log = null };
+                    return Task.FromResult(new Devmasters.Batch.ActionOutputData() { CancelRunning = false, Log = null });
                 }, null, query.LogOutputFunc, query.ProgressOutputFunc, false);
 
             return ids2Process.ToArray();
