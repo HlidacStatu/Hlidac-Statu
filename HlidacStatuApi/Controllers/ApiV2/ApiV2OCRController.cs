@@ -286,7 +286,8 @@ namespace HlidacStatuApi.Controllers.ApiV2
             sw.Start();
             try
             {
-                _ = Hangfire.BackgroundJob.Enqueue(() => DoSave(res));
+                //hangfire do not have issues (according to AI with async jobs) ok then...
+                _ = Hangfire.BackgroundJob.Enqueue(() => DoSaveAsync(res));
                 bool done = false;
             }
             catch (Exception e)
@@ -308,27 +309,26 @@ namespace HlidacStatuApi.Controllers.ApiV2
         //musi byt public kvuli                  _ = Hangfire.BackgroundJob.Enqueue(() => DoSave(res));
 
         [ApiExplorerSettings(IgnoreApi = true)]
-        public void DoSave(HlidacStatu.DS.Api.OcrWork.Task res)
+        public async Task DoSaveAsync(HlidacStatu.DS.Api.OcrWork.Task res)
         {
             try
             {
-
                 switch (res.type)
                 {
                     case HlidacStatu.DS.Api.OcrWork.DocTypes.Smlouva:
-                        _ = SaveSmlouva(res).ConfigureAwait(false).GetAwaiter().GetResult();
+                        _ = await SaveSmlouva(res);
                         ItemToOcrQueue.SetDone(int.Parse(res.taskId), true);
                         break;
                     case HlidacStatu.DS.Api.OcrWork.DocTypes.VerejnaZakazka:
-                        _ = SaveVZ(res).ConfigureAwait(false).GetAwaiter().GetResult();
+                        _ = await SaveVZ(res);
                         ItemToOcrQueue.SetDone(int.Parse(res.taskId), true);
                         break;
                     case HlidacStatu.DS.Api.OcrWork.DocTypes.Dataset:
-                        _ = SaveDataset(res).ConfigureAwait(false).GetAwaiter().GetResult();
+                        _ = await SaveDataset(res);
                         ItemToOcrQueue.SetDone(int.Parse(res.taskId), true);
                         break;
                     case HlidacStatu.DS.Api.OcrWork.DocTypes.Insolvence:
-                        _ = SaveInsolvence(res).ConfigureAwait(false).GetAwaiter().GetResult();
+                        _ = await SaveInsolvence(res);
                         ItemToOcrQueue.SetDone(int.Parse(res.taskId), true);
                         break;
                     default:

@@ -37,8 +37,6 @@ namespace WatchdogAnalytics
             System.Globalization.CultureInfo.DefaultThreadCurrentCulture = Consts.czCulture;
             System.Globalization.CultureInfo.DefaultThreadCurrentUICulture = Consts.csCulture;
 
-            Task.Run(async () => await JobService.RecalculateAsync()).GetAwaiter().GetResult();
-
             services.ConfigureApplicationCookie(options =>
             {
                 //options.AccessDeniedPath = "/Identity/Account/AccessDenied";

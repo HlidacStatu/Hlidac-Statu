@@ -2,6 +2,7 @@ using System.Threading.Tasks;
 using HlidacStatu.LibCore.Extensions;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Hosting;
+using WatchdogAnalytics.Services;
 
 namespace WatchdogAnalytics
 {
@@ -9,7 +10,9 @@ namespace WatchdogAnalytics
     {
         public static async Task Main(string[] args)
         {
-            await CreateHostBuilder(args).Build().RunAsync();
+            var hostbuilder = CreateHostBuilder(args).Build();
+            await JobService.RecalculateAsync();
+            await hostbuilder.RunAsync();
         }
 
         private static IHostBuilder CreateHostBuilder(string[] args) =>

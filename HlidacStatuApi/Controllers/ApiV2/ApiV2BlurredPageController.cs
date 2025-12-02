@@ -50,6 +50,7 @@ namespace HlidacStatuApi.Controllers.ApiV2
 
         }
 
+        //todo: refactor to channels
         [ApiExplorerSettings(IgnoreApi = true)]
         //[Authorize(Roles = "blurredAPIAccess")]
         [HttpPost("Save")]
@@ -62,8 +63,7 @@ namespace HlidacStatuApi.Controllers.ApiV2
                 int numOfPages = data.prilohy.Sum(m => m.pages.Count());
                 if (numOfPages > 200)
                 {
-                    new Thread(
-                        () =>
+                    new Thread(async () =>
                         {
                             _ = Interlocked.Increment(ref savedInThread);
                             _ = Interlocked.Increment(ref runningSaveThreads);
@@ -78,9 +78,9 @@ namespace HlidacStatuApi.Controllers.ApiV2
                             Devmasters.DT.StopWatchEx sw = new Devmasters.DT.StopWatchEx();
                             sw.Start();
 
-                            var success = SaveData(data).ConfigureAwait(false).GetAwaiter().GetResult();
+                            var success = await SaveDataAsync(data);
                             if (!success)
-                                _ = SaveData(data).ConfigureAwait(false).GetAwaiter().GetResult();
+                                _ = await SaveDataAsync(data);
 
                             sw.Stop();
                             _logger.Information(
@@ -99,9 +99,9 @@ namespace HlidacStatuApi.Controllers.ApiV2
                 }
                 else
                 {
-                    var success = await SaveData(data);
+                    var success = await SaveDataAsync(data);
                     if (!success)
-                        _ = await SaveData(data);
+                        _ = await SaveDataAsync(data);
                 }
             }
 
@@ -158,7 +158,7 @@ namespace HlidacStatuApi.Controllers.ApiV2
         }
 
 
-        private async Task<bool> SaveData(BpSave data)
+        private async Task<bool> SaveDataAsync(BpSave data)
         {
             List<Task> tasks = new List<Task>();
             List<PageMetadata> pagesMD = new List<PageMetadata>();
