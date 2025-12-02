@@ -434,7 +434,7 @@ text zpravy: {txt}
             var model = await SmlouvaRepo.LoadAsync(Id, includePlaintext: false);
             var priloha = model.Prilohy?.FirstOrDefault(m => m.UniqueHash() == hash);
 
-            var fn = SmlouvaRepo.GetDownloadedPrilohaPath(priloha, model,
+            var fn = await SmlouvaRepo.GetDownloadedPrilohaPathAsync(priloha, model,
                 forcePDF
                     ? Connectors.IO.PrilohaFile.RequestedFileType.PDF
                     : Connectors.IO.PrilohaFile.RequestedFileType.Original);

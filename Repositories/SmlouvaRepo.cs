@@ -343,7 +343,7 @@ namespace HlidacStatu.Repositories
             if (smlouva.Prilohy != null)
             {
                 foreach (var p in smlouva.Prilohy)
-                    p.UpdateStatistics(smlouva);
+                    await p.UpdateStatisticsAsync(smlouva);
             }
 
             if (ClassificationOverrideRepo.TryGetOverridenClassification(smlouva.Id, out var classificationOverride))

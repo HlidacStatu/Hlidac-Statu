@@ -388,7 +388,7 @@ namespace HlidacStatuApi.Controllers.ApiV2
                         att.FileMetadata = doc.result.Documents[0].FileMetadata
                             .Select(m => new Smlouva.Priloha.KeyVal() { Key = m.Key, Value = m.Value }).ToArray();
 
-                    att.UpdateStatistics(sml);
+                    await att.UpdateStatisticsAsync(sml);
 
                     att.LastUpdate = DateTime.Now;
 
@@ -417,7 +417,7 @@ namespace HlidacStatuApi.Controllers.ApiV2
                             att1.FileMetadata = doc.result.Documents[ii].FileMetadata
                                 .Select(m => new Smlouva.Priloha.KeyVal() { Key = m.Key, Value = m.Value }).ToArray();
 
-                        att1.UpdateStatistics(sml);
+                        await att1.UpdateStatisticsAsync(sml);
 
                         att1.LastUpdate = DateTime.Now;
 
@@ -448,7 +448,7 @@ namespace HlidacStatuApi.Controllers.ApiV2
                         att.FileMetadata = doc.result.Documents[0].FileMetadata
                             .Select(m => new Smlouva.Priloha.KeyVal() { Key = m.Key, Value = m.Value }).ToArray();
 
-                    att.UpdateStatistics(sml);
+                    await att.UpdateStatisticsAsync(sml);
 
                     att.LastUpdate = DateTime.Now;
 

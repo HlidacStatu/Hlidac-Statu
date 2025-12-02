@@ -67,7 +67,7 @@ namespace HlidacStatu.Web.Controllers
             if (sml == null || pr == null)
                 return NotFound();
 
-            string fn = SmlouvaRepo.GetDownloadedPrilohaPath(pr,sml, HlidacStatu.Connectors.IO.PrilohaFile.RequestedFileType.PDF);
+            string fn = await SmlouvaRepo.GetDownloadedPrilohaPathAsync(pr,sml, HlidacStatu.Connectors.IO.PrilohaFile.RequestedFileType.PDF);
             bool weHaveCopy = string.IsNullOrEmpty(fn)==false && System.IO.File.Exists(fn);
             byte[] pdfBin = null;
             if (weHaveCopy)
