@@ -15,6 +15,7 @@ using HlidacStatu.Lib.Web.UI.Attributes;
 using HlidacStatu.LibCore.Extensions;
 using HlidacStatu.Repositories;
 using HlidacStatu.Repositories.Analysis;
+using HlidacStatu.Repositories.Cache;
 using HlidacStatu.Web.Framework;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Hosting;
@@ -997,7 +998,7 @@ text zpravy: {txt}
             {
                 string[] icos = FirmaRepo.MinisterstvaCache.Get().Select(s => s.ICO).ToArray();
 
-                var vz = VerejnaZakazkaRepo.Searching.CachedSimpleSearch(TimeSpan.FromHours(6),
+                var vz = await VzCache.CachedSimpleSearchAsync(
                     new Repositories.Searching.VerejnaZakazkaSearchData()
                     {
                         Q = icos.Select(i => "ico:" + i).Aggregate((f, s) => f + " OR " + s),

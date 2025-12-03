@@ -1,4 +1,7 @@
-﻿@using HlidacStatu.Repositories
+﻿@using System.Threading
+@using HlidacStatu.Connectors.External.ProfilZadavatelu
+@using HlidacStatu.Repositories
+@using HlidacStatu.Repositories.Cache
 <div class="mega-content px-4">
     <div class="container-fluid">
         <div class="row">
@@ -128,30 +131,14 @@
             </div>
             <div class="col-12 col-md-4 py-4 bg-body-tertiary">
                 @{
-                    var vzList = Devmasters.Enums.EnumTools.EnumToEnumerable(typeof(VerejnaZakazkaRepo.Searching.CPVSkupiny))
-                            .Select(m => new
-                            {
-                                id = m.Id,
-                                name = m.Name,
-                                count = VerejnaZakazkaRepo.Searching.CachedSimpleSearch(TimeSpan.FromHours(6),
-                                    new HlidacStatu.Repositories.Searching.VerejnaZakazkaSearchData()
-                                    {
-                                        Q = "zverejneno:[" + DateTime.Now.Date.AddMonths(-12).ToString("yyyy-MM-dd") + " TO *]",
-                                        //Q = "*",
-                                        Oblast = m.Id.ToString(),
-                                        Page = 0,
-                                        PageSize = 0,
-                                        ExactNumOfResults = true
-                                    }
-                                ).Total
-                            })
-                            .Where(m => m.count > 0)
-                            .OrderByDescending(o => o.count)
-                            .ThenBy(o => o.name)
-                            .ToArray()
-                        ;
-                    int vzOblCount = Devmasters.Enums.EnumTools.EnumToEnumerable(typeof(VerejnaZakazkaRepo.Searching.CPVSkupiny)).Count;
-                    long vzCountSum = vzList.Sum(m => m.count);
+                    var vzs = await LocalHtmlExtensions.GetVzList();
+
+                    var vzList = vzs
+                        .Where(m => m.Count > 0)
+                        .OrderByDescending(o => o.Count)
+                        .ThenBy(o => o.Name)
+                        .ToArray();
+                    
                     long vzCount = 0;
                 }
                 <h3>Veřejné Zakázky</h3>
@@ -159,11 +146,11 @@
                 <ul class="list-group">
                     @foreach (var obl in vzList.Take(10))
                     {
-                        vzCount = vzCount + obl.count;
+                        vzCount = vzCount + obl.Count;
 
                         <li class="list-group-item">
                             <a onclick="return trackOutLink(this,'megamenu');"
-                               href="/verejnezakazky/hledat?q=&oblast=@VerejnaZakazkaRepo.Searching.NormalizeOblastValue(obl.id.ToString())&order=1">@obl.name</a>
+                               href="/verejnezakazky/hledat?q=&oblast=@VerejnaZakazkaRepo.Searching.NormalizeOblastValue(obl.Id.ToString())&order=1">@obl.Name</a>
                         </li>
                     }
                     <li class="list-group-item">
