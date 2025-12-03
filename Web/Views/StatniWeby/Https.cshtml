@@ -1,13 +1,14 @@
 ﻿@using System.Linq;
 @using Devmasters.Enums;
 @using HlidacStatu.Entities;
+@using HlidacStatu.Repositories.Cache
 @{
     ViewBag.Title = "Hlídač státních webů";
     ViewBag.SubTitle = "Žebříček HTTPS Labs hodnocení";
 
 
     var servers = HlidacStatu.Repositories.UptimeServerRepo.AllActiveServers();
-    var data = HlidacStatu.Repositories.UptimeSSLRepo.AllLatestSSL()
+    var data = (await UptimeSslCache.AllLatestSslAsync())
             .OrderByDescending(m=>m.SSLGrade())
             .ToArray();
 
@@ -171,7 +172,7 @@ else
 
     <hr/>
     
-    @WebyChartUtil.TableNextGroups("https")
+    @await WebyChartUtil.TableNextGroupsAsync("https")
 }
 
 @section footerscripts{

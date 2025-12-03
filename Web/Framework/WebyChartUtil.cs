@@ -4,7 +4,9 @@ using Microsoft.AspNetCore.Html;
 
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 using HlidacStatu.Entities;
+using HlidacStatu.Repositories.Cache;
 
 namespace HlidacStatu.Web.Framework
 {
@@ -52,7 +54,7 @@ namespace HlidacStatu.Web.Framework
         }
 
 
-        public static IHtmlContent TableNextGroups(string groupName)
+        public static async Task<IHtmlContent> TableNextGroupsAsync(string groupName)
         {
 
 
@@ -68,12 +70,12 @@ namespace HlidacStatu.Web.Framework
                 </a>
 
                 <a href='/StatniWeby/Https' class='list-group-item {WebUtil.IfExists(groupName == "https", "active disabled")}'>
-                    <span class='badge float-end rounded-pill bg-secondary'>{HlidacStatu.Repositories.UptimeSSLRepo.AllLatestSSL()?.Count() ?? 0}</span>
+                    <span class='badge float-end rounded-pill bg-secondary'>{(await UptimeSslCache.AllLatestSslAsync())?.Count() ?? 0}</span>
                     Žebříček státních serverů podle HTTPS Labs hodnocení
                 </a>
 
                 <a href='/StatniWeby/ipv6' class='list-group-item {WebUtil.IfExists(groupName == "ipv6", "active disabled")}'>
-                    <span class='badge float-end rounded-pill bg-secondary'>{HlidacStatu.Repositories.UptimeSSLRepo.AllLatestSSL()?.Count() ?? 0}</span>
+                    <span class='badge float-end rounded-pill bg-secondary'>{(await UptimeSslCache.AllLatestSslAsync())?.Count() ?? 0}</span>
                     Servery podporující a ignorující IPv6.
                 </a>
 
