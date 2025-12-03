@@ -89,7 +89,7 @@ namespace InsolvencniRejstrik.Fixes
 										rizeni.PosledniZmena = item.DatumZalozeniUdalosti;
 									}
 
-									Repository.SetInsolvencyProceeding(rizeni);
+									Repository.SetInsolvencyProceedingAsync(rizeni);
 									savedDocuments++;
 								}
 							}

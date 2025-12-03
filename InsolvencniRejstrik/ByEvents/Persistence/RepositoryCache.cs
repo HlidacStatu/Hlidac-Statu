@@ -1,6 +1,7 @@
 ﻿using HlidacStatu.Entities.Insolvence;
 using System;
 using System.Collections.Concurrent;
+using System.Threading.Tasks;
 
 namespace InsolvencniRejstrik.ByEvents
 {
@@ -15,9 +16,10 @@ namespace InsolvencniRejstrik.ByEvents
 			UnderlyingRepository = repository;
 		}
 
-		public Rizeni GetInsolvencyProceeding(string spisovaZnacka, Func<string, Rizeni> createNewInsolvencyProceeding) => 
-			RizeniCache.GetOrAdd(spisovaZnacka, UnderlyingRepository.GetInsolvencyProceeding(spisovaZnacka, createNewInsolvencyProceeding) ?? createNewInsolvencyProceeding(spisovaZnacka));
+		public async Task<Rizeni> GetInsolvencyProceedingAsync(string spisovaZnacka,
+			Func<string, Rizeni> createNewInsolvencyProceeding) => 
+			RizeniCache.GetOrAdd(spisovaZnacka, await UnderlyingRepository.GetInsolvencyProceedingAsync(spisovaZnacka, createNewInsolvencyProceeding) ?? createNewInsolvencyProceeding(spisovaZnacka));
 
-		public void SetInsolvencyProceeding(Rizeni item)  => UnderlyingRepository.SetInsolvencyProceeding(item);
+		public Task SetInsolvencyProceedingAsync(Rizeni item) => UnderlyingRepository.SetInsolvencyProceedingAsync(item);
 	}
 }
