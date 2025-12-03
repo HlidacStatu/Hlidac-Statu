@@ -6,8 +6,6 @@ using HlidacStatu.Entities;
 using HlidacStatu.Entities.Facts;
 using HlidacStatu.Entities.KIndex;
 using HlidacStatu.Repositories.Analysis.KorupcniRiziko;
-using HlidacStatu.Repositories.Searching;
-using HlidacStatu.Searching;
 using HlidacStatu.Searching;
 using Nest;
 using Serilog;
@@ -149,9 +147,10 @@ namespace HlidacStatu.Repositories
             //=========================================================================
 
             _logger.Information($"SearchPromoRepo.FillDbAsync KIndex loading all orgs");
-            IEnumerable<SubjectWithKIndex> KIndxOrgs =
+            IEnumerable<SubjectWithKIndex> KIndxOrgs = await
                 (await HlidacStatu.Repositories.Analysis.KorupcniRiziko.Statistics.GetStatisticsAsync(
-                    (await KIndexRepo.GetAvailableCalculationYearsAsync()).Max())).SubjektOrderedListKIndexCompanyAsc();
+                    (await KIndexRepo.GetAvailableCalculationYearsAsync()).Max()))
+                .SubjektOrderedListKIndexCompanyAscAsync();
             count = 0;
             _logger.Information($"SearchPromoRepo.FillDbAsync KIndex saving searchpromo");
 
@@ -159,7 +158,8 @@ namespace HlidacStatu.Repositories
                 async rec =>
                 {
                     KIndexData kidx = await KIndex.GetCachedAsync(HlidacStatu.Util.ParseTools.NormalizeIco(rec.Ico));
-                    var infof = (await kidx.InfoFactsAsync((await KIndexRepo.GetAvailableCalculationYearsAsync()).Max()))
+                    var infof =
+                        (await kidx.InfoFactsAsync((await KIndexRepo.GetAvailableCalculationYearsAsync()).Max()))
                         .RenderFacts(2, true, false, lineFormat: "{0}", html: false);
                     var sp = new SearchPromo();
 

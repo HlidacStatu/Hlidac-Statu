@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 
 namespace HlidacStatu.Repositories.Analysis.KorupcniRiziko
 {
@@ -10,36 +8,6 @@ namespace HlidacStatu.Repositories.Analysis.KorupcniRiziko
         {
             Name = name;
             Ico = ico;
-        }
-
-        //L1 - 6 hodin
-        //L2 - 10 let
-        public static Devmasters.Cache.AWS_S3.Cache<Dictionary<string, SubjectNameCache>> CachedCompanies =
-            new Devmasters.Cache.AWS_S3.Cache<Dictionary<string, SubjectNameCache>>(
-                new string[] { Devmasters.Config.GetWebConfigValue("Minio.Cache.Endpoint") },
-                    Devmasters.Config.GetWebConfigValue("Minio.Cache.Bucket"),
-                    Devmasters.Config.GetWebConfigValue("Minio.Cache.AccessKey"),
-                    Devmasters.Config.GetWebConfigValue("Minio.Cache.SecretKey"), 
-                    TimeSpan.Zero, "KIndexCompanies",
-                    (o) =>
-                    {
-                        return ListCompaniesAsync().ConfigureAwait(false).GetAwaiter().GetResult();
-                    });
-
-        private static async Task<Dictionary<string, SubjectNameCache>> ListCompaniesAsync()
-        {
-            Dictionary<string, SubjectNameCache> companies = new Dictionary<string, SubjectNameCache>();
-            await foreach (var kindexRecord in KIndex.YieldExistingKindexesAsync())
-            {
-                companies.Add(kindexRecord.Ico, new SubjectNameCache(kindexRecord.Jmeno, kindexRecord.Ico));
-            }
-
-            return companies;
-        }
-
-        public static Dictionary<string, SubjectNameCache> GetCompanies()
-        {
-            return CachedCompanies.Get();
         }
 
         public string Name { get; set; }
