@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 using HlidacStatu.Connectors;
 
 namespace InsolvencniRejstrik.Fixes
@@ -18,7 +19,7 @@ namespace InsolvencniRejstrik.Fixes
 			Repository = repository;
 		}
 
-		public void Execute(string cacheFile)
+		public async Task ExecuteAsync(string cacheFile)
 		{
 			if (!File.Exists("_invalid-document.log"))
 			{
@@ -28,7 +29,7 @@ namespace InsolvencniRejstrik.Fixes
 
 			Console.WriteLine("Nacitani chybejicich dokumentu ...");
 			var missingDocuments = new Dictionary<long, string>();
-			foreach (var item in File.ReadAllLines("_invalid-document.log"))
+			foreach (var item in await File.ReadAllLinesAsync("_invalid-document.log"))
 			{
 				var parts = item.Split(';');
 				missingDocuments.Add(Convert.ToInt64(parts[1]), parts[0]);
@@ -43,7 +44,7 @@ namespace InsolvencniRejstrik.Fixes
 				var lines = 0;
 				var savedDocuments = 0;
 
-				foreach (var line in File.ReadLines(cacheFile))
+				await foreach (var line in File.ReadLinesAsync(cacheFile))
 				{
 					lines++;
 					var item = WsResult.From(line);
@@ -89,7 +90,7 @@ namespace InsolvencniRejstrik.Fixes
 										rizeni.PosledniZmena = item.DatumZalozeniUdalosti;
 									}
 
-									Repository.SetInsolvencyProceedingAsync(rizeni);
+									await Repository.SetInsolvencyProceedingAsync(rizeni);
 									savedDocuments++;
 								}
 							}

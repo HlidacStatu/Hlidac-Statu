@@ -152,11 +152,11 @@ using HlidacStatu.Entities.Insolvence;
 				var stats = new Stats();
 				var repository = new Repository(stats);
 
-				new MissingDocuments(repository).Execute(cacheFile);
+				await new MissingDocuments(repository).ExecuteAsync(cacheFile);
 			}
 			else if (onlyCacheFix)
 			{
-				new FillInCache(new WsClientCache(new Lazy<IWsClient>(() => new WsClient()), cacheFile)).Execute();
+				await new FillInCache(new WsClientCache(new Lazy<IWsClient>(() => new WsClient()), cacheFile)).ExecuteAsync();
 			}
 			else if (personCreatedTimeFix)
 			{

@@ -62,7 +62,7 @@ namespace InsolvencniRejstrik.ByEvents
 			{
 				try
 				{
-					foreach (var item in WsClient.Get(id))
+					await foreach (var item in WsClient.GetAsync(id))
 					{
 						if (ToEventId > 0 && item.Id > ToEventId)
 						{

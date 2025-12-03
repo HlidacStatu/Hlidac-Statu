@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace InsolvencniRejstrik.ByEvents
 {
@@ -8,15 +9,14 @@ namespace InsolvencniRejstrik.ByEvents
 	{
 		private IsirWs.IsirWsPublicPortTypeClient Client = new IsirWs.IsirWsPublicPortTypeClient();
 		
-		public IEnumerable<WsResult> Get(long id)
+		public async IAsyncEnumerable<WsResult> GetAsync(long id)
 		{
 			var latestId = id;
 			IsirWs.getIsirWsPublicPodnetIdResponse response;
 			do
 			{
-				response = Client
-					.getIsirWsPublicPodnetIdAsync(new IsirWs.getIsirWsPublicPodnetIdRequest { idPodnetu = latestId })
-					.ConfigureAwait(false).GetAwaiter().GetResult();
+				response = await Client
+					.getIsirWsPublicPodnetIdAsync(new IsirWs.getIsirWsPublicPodnetIdRequest { idPodnetu = latestId });
 				if (response.status.stav == IsirWs.stavType.OK)
 				{
 					foreach (var item in response.data)

@@ -1,5 +1,6 @@
 ﻿using InsolvencniRejstrik.ByEvents;
 using System;
+using System.Threading.Tasks;
 
 namespace InsolvencniRejstrik.Fixes
 {
@@ -12,13 +13,13 @@ namespace InsolvencniRejstrik.Fixes
 			Cache = cache;
 		}
 
-		public void Execute()
+		public async Task ExecuteAsync()
 		{
 			var loaded = 0;
 			var started = DateTime.Now;
 
 			var lastId = Cache.GetLastIdInCache();
-			foreach (var item in Cache.Get(lastId))
+			await foreach (var item in Cache.GetAsync(lastId))
 			{
 				loaded++;
 
