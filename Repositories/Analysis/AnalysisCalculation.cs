@@ -732,7 +732,7 @@ namespace HlidacStatu.Repositories.Analysis
                 {
                     item = m,
                     change = obor.HasValue
-                        ? m.ChangeBetweenIntervals(yStart, yEnd, m => m.PoOblastechHierarchicky(obor.Value).CelkemCena)
+                        ? m.ChangeBetweenIntervals(yStart, yEnd, m => m.PoOblastechHierarchicky(obor.Value)?.CelkemCena ?? 0m)
                         : m.ChangeBetweenIntervals(yStart, yEnd, m => m.CelkovaHodnotaSmluv)
                 });
             if (minStartValue.HasValue)
