@@ -68,8 +68,8 @@ else
 
                 if (zakazky)
                 {
-                    HlidacStatu.Lib.Analytics.StatisticsSubjectPerYear<Firma.Statistics.VZ> stat = firma.StatistikaVerejneZakazky();
-                    HlidacStatu.Lib.Analytics.StatisticsSubjectPerYear<Firma.Statistics.VZ> statHolding = firma.HoldingStatistikaVerejneZakazky( HlidacStatu.DS.Graphs.Relation.AktualnostType.Nedavny);
+                    HlidacStatu.Lib.Analytics.StatisticsSubjectPerYear<Firma.Statistics.VZ> stat = await firma.StatistikaVerejneZakazkyAsync();
+                    HlidacStatu.Lib.Analytics.StatisticsSubjectPerYear<Firma.Statistics.VZ> statHolding = await firma.HoldingStatistikaVerejneZakazkyAsync();
                     var ceo = firma.Ceo();
 
                     <tr>

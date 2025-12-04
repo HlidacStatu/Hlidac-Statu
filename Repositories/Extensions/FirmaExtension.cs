@@ -194,26 +194,19 @@ namespace HlidacStatu.Extensions
             //return new();
 
             return FirmaStatistics.CachedHoldingStatisticsDotace(firma, forceUpdateCache) ??
-                new Lib.Analytics.StatisticsSubjectPerYear<Firma.Statistics.Dotace>() { ICO = firma.ICO }; ;
+                new Lib.Analytics.StatisticsSubjectPerYear<Firma.Statistics.Dotace>() { ICO = firma.ICO };
         }
 
-        public static Lib.Analytics.StatisticsSubjectPerYear<Firma.Statistics.VZ> StatistikaVerejneZakazky(
+        public static async Task<StatisticsSubjectPerYear<Firma.Statistics.VZ>> StatistikaVerejneZakazkyAsync(
             this Firma firma, bool forceUpdateCache = false)
         {
-            //STAT FIX
-            //return new ();
-
-            return FirmaStatistics.CachedStatisticsVZ(firma, forceUpdateCache) ??
+            return await FirmaStatistics.CachedStatisticsVZ(firma, forceUpdateCache) ??
                 new Lib.Analytics.StatisticsSubjectPerYear<Firma.Statistics.VZ>() { ICO = firma.ICO };
         }
-        public static Lib.Analytics.StatisticsSubjectPerYear<Firma.Statistics.VZ> HoldingStatistikaVerejneZakazky(
-            this Firma firma,
-            Relation.AktualnostType aktualnost, bool forceUpdateCache = false)
+        public static async Task<StatisticsSubjectPerYear<Firma.Statistics.VZ>> HoldingStatistikaVerejneZakazkyAsync(
+            this Firma firma, bool forceUpdateCache = false)
         {
-            //STAT FIX
-            //return new();
-
-            return FirmaStatistics.CachedHoldingStatisticsVZ(firma, forceUpdateCache) ??
+            return await FirmaStatistics.CachedHoldingStatisticsVZAsync(firma, forceUpdateCache) ??
                 new Lib.Analytics.StatisticsSubjectPerYear<Firma.Statistics.VZ>() { ICO = firma.ICO };
         }
 

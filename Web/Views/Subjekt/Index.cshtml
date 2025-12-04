@@ -918,7 +918,7 @@
         @{
             var profilyZadavatele = (await ProfilZadavateleRepo.GetByIcoAsync(Model.ICO))
                 .DistinctBy(pz => pz.Url?.Trim());
-            var vzStat = Model.StatistikaVerejneZakazky();
+            var vzStat = await Model.StatistikaVerejneZakazkyAsync();
             Dictionary<string, long> vzakaz = new();
             vzakaz.Add("dodavatel|dodavatel|dodavatele|dodavatelem", vzStat.Summary().PocetJakoDodavatel);
             vzakaz.Add("zadavatel|zadavatel|zadavatele|zadavatelem", vzStat.Summary().PocetJakoZadavatel);
@@ -1011,8 +1011,12 @@
         <p class="text-center">
             <a href="/subjekt/VerejneZakazky/@Model.ICO" class="btn btn-hs btn-primary btn-sm my-3 position-relative">
                 Podrobnosti o veřejných zakázkách organizace
-                <span
-                    class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">@(HlidacStatu.Util.RenderData.NiceNumber(Model.StatistikaVerejneZakazky().Summary().PocetJakoDodavatel + Model.StatistikaVerejneZakazky().Summary().PocetJakoZadavatel))</span>
+                <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                    @{
+                        var statvz = await Model.StatistikaVerejneZakazkyAsync();
+                    }
+                    @(HlidacStatu.Util.RenderData.NiceNumber(statvz.Summary().PocetJakoDodavatel + statvz.Summary().PocetJakoZadavatel))
+                </span>
             </a>
         </p>
     </div>

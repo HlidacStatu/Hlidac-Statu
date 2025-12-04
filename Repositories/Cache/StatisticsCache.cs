@@ -3,14 +3,16 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Devmasters.DT;
 using HlidacStatu.Caching;
 using HlidacStatu.DS.Graphs;
 using HlidacStatu.Entities;
+using HlidacStatu.Entities.VZ;
 using HlidacStatu.Extensions;
 using HlidacStatu.Lib.Analytics;
 using HlidacStatu.Repositories.Statistics;
 using ZiggyCreatures.Caching.Fusion;
+using Nest;
+
 
 namespace HlidacStatu.Repositories.Cache;
 
@@ -54,14 +56,29 @@ public class StatisticsCache
     public static ValueTask InvalidateOsobaSmlouvyStatisticsAsync(Osoba osoba, int? obor) =>
         PermanentCache.ExpireAsync($"_Osoba_SmlouvyStatistics_:{osoba.NameId}-{obor?.ToString() ?? "null"}");
 
+    //Vz cache
+    public static ValueTask<StatisticsSubjectPerYear<Firma.Statistics.VZ>> GetFirmaVzStatisticsAsync(Firma firma) =>
+        PermanentCache.GetOrSetAsync($"_Firma_VZStatistics_:{firma.ICO}",
+            _ => CalculateVZStatAsync(firma));
+
+    public static ValueTask InvalidateFirmaVzStatisticsAsync(Firma firma) =>
+        PermanentCache.ExpireAsync($"_Firma_VZStatistics_:{firma.ICO}");
+
+    public static ValueTask<StatisticsSubjectPerYear<Firma.Statistics.VZ>> GetHoldingVzStatisticsAsync(Firma firma) =>
+        PermanentCache.GetOrSetAsync($"_Holding_VZStatistics_:{firma.ICO}",
+            _ => CalculateHoldingVZStatAsync(firma));
+
+    public static ValueTask InvalidateHoldingVzStatisticsAsync(Firma firma) =>
+        PermanentCache.ExpireAsync($"_Holding_VZStatistics_:{firma.ICO}");
+
 
     //Factories
     private static async Task<StatisticsSubjectPerYear<Smlouva.Statistics.Data>> CalculateHoldingSmlouvyStatisticsAsync(
         Firma firma,
         int? obor)
     {
-        var firmyMaxrok = new Dictionary<string, DateInterval>
-            { { firma.ICO, new DateInterval(DateTime.MinValue, DateTime.MaxValue) } };
+        var firmyMaxrok = new Dictionary<string, Devmasters.DT.DateInterval>
+            { { firma.ICO, new Devmasters.DT.DateInterval(DateTime.MinValue, DateTime.MaxValue) } };
         var skutecneVazby =
             Relation.SkutecnaDobaVazby(firma.AktualniVazby(DS.Graphs.Relation.AktualnostType.Libovolny));
         foreach (var v in skutecneVazby)
@@ -70,7 +87,7 @@ public class StatisticsCache
                 && v.To.Type == HlidacStatu.DS.Graphs.Graph.Node.NodeType.Company)
             {
                 firmyMaxrok.TryAdd(v.To.Id,
-                    new DateInterval(v.RelFrom ?? DateTime.MinValue, v.RelTo ?? DateTime.MaxValue));
+                    new Devmasters.DT.DateInterval(v.RelFrom ?? DateTime.MinValue, v.RelTo ?? DateTime.MaxValue));
             }
         }
 
@@ -142,13 +159,13 @@ public class StatisticsCache
             new Dictionary<string, StatisticsSubjectPerYear<Smlouva.Statistics.Data>>();
 
         var skutecneVazby = Relation.SkutecnaDobaVazby(o.AktualniVazby(Relation.AktualnostType.Libovolny));
-        var firmy_maxrok = new Dictionary<string, DateInterval>();
+        var firmy_maxrok = new Dictionary<string, Devmasters.DT.DateInterval>();
         foreach (var v in skutecneVazby.Where(v => !string.IsNullOrEmpty(v.To?.UniqId)
                                                    && v.To.Type == HlidacStatu.DS.Graphs.Graph.Node.NodeType
                                                        .Company))
         {
             firmy_maxrok.TryAdd(v.To.Id,
-                new DateInterval(v.RelFrom ?? DateTime.MinValue, v.RelTo ?? DateTime.MaxValue));
+                new Devmasters.DT.DateInterval(v.RelFrom ?? DateTime.MinValue, v.RelTo ?? DateTime.MaxValue));
         }
 
         var maxConcurrentTasks = 10;
@@ -195,5 +212,132 @@ public class StatisticsCache
         res.SoukromeFirmy = soukr;
         res.Neziskovky = nezisk;
         return res;
+    }
+
+    private static async Task<StatisticsSubjectPerYear<Firma.Statistics.VZ>> CalculateHoldingVZStatAsync(Firma firma)
+    {
+        var firmy_maxrok = new Dictionary<string, Devmasters.DT.DateInterval>();
+        firmy_maxrok.Add(firma.ICO, new Devmasters.DT.DateInterval(DateTime.MinValue, DateTime.MaxValue));
+        var skutecneVazby = Relation.SkutecnaDobaVazby(firma.AktualniVazby(DS.Graphs.Relation.AktualnostType.Libovolny));
+        foreach (var v in skutecneVazby)
+        {
+            if (!string.IsNullOrEmpty(v.To?.UniqId)
+                && v.To.Type == HlidacStatu.DS.Graphs.Graph.Node.NodeType.Company)
+            {
+                firmy_maxrok.TryAdd(v.To.Id,
+                    new Devmasters.DT.DateInterval(v.RelFrom ?? DateTime.MinValue, v.RelTo ?? DateTime.MaxValue));
+            }
+        }
+        
+        var semaphore = new SemaphoreSlim(10);
+        var statistiky = await Task.WhenAll(
+            firmy_maxrok.Select(async f =>
+            {
+                await semaphore.WaitAsync();
+                try
+                {
+                    var stat = await Firmy.Get(f.Key).StatistikaVerejneZakazkyAsync();
+                    return new StatisticsSubjectPerYear<Firma.Statistics.VZ>(
+                        f.Key,
+                        stat.Filter(m => m.Key >= f.Value.From?.Year && m.Key <= f.Value.To?.Year)
+                    );
+                }
+                finally
+                {
+                    semaphore.Release();
+                }
+            })
+        );
+        
+        
+        if (statistiky.Length == 0)
+            return new StatisticsSubjectPerYear<Firma.Statistics.VZ>(firma.ICO);
+        if (statistiky.Length == 1)
+            return statistiky[0];
+
+        StatisticsSubjectPerYear<Firma.Statistics.VZ> aggregate =
+            Lib.Analytics.StatisticsSubjectPerYear<Firma.Statistics.VZ>.Aggregate(firma.ICO, statistiky);
+
+        return aggregate;
+    }
+
+    private static async Task<StatisticsSubjectPerYear<Firma.Statistics.VZ>> CalculateVZStatAsync(Firma f)
+    {
+        var resVZdodavTask = VZPerYearAsync("icododavatel:" + f.ICO, HlidacStatu.Lib.Analytics.Consts.VZYearsList);
+        var resVZzadavTask = VZPerYearAsync("icozadavatel:" + f.ICO, HlidacStatu.Lib.Analytics.Consts.VZYearsList);
+        StatisticsPerYear<SimpleStat> resVZdodav = await resVZdodavTask;
+        StatisticsPerYear<SimpleStat> resVZzadav = await resVZzadavTask;
+
+        Dictionary<int, Firma.Statistics.VZ> data = new Dictionary<int, Firma.Statistics.VZ>();
+        foreach (var year in HlidacStatu.Lib.Analytics.Consts.VZYearsList)
+        {
+            var stat = new Firma.Statistics.VZ();
+
+            if (resVZdodav.Any(m => m.Year == year))
+            {
+                stat.PocetJakoDodavatel = resVZdodav.FirstOrDefault(m => m.Year == year).Value.Pocet;
+                stat.CelkovaHodnotaJakoDodavatel = resVZdodav.FirstOrDefault(m => m.Year == year).Value.CelkemCena;
+            }
+
+            if (resVZzadav.Any(m => m.Year == year))
+            {
+                stat.PocetJakoZadavatel = resVZzadav.FirstOrDefault(m => m.Year == year).Value.Pocet;
+                stat.CelkovaHodnotaJakoZadavatel = resVZzadav.FirstOrDefault(m => m.Year == year).Value.CelkemCena;
+            }
+
+            data.Add(year, stat);
+        }
+
+        return new StatisticsSubjectPerYear<Firma.Statistics.VZ>(f.ICO, data);
+    }
+
+    public static async Task<StatisticsPerYear<SimpleStat>> VZPerYearAsync(string query, int[] interestedInYearsOnly)
+    {
+        AggregationContainerDescriptor<VerejnaZakazka> aggYSum =
+            new AggregationContainerDescriptor<VerejnaZakazka>()
+                .DateHistogram("x-agg", h => h
+                    .Field(f => f.PosledniZmena)
+                    .CalendarInterval(Nest.DateInterval.Year)
+                    .Aggregations(agg => agg
+                        .Sum("sumincome", s => s
+                            .Field(ff => ff.KonecnaHodnotaBezDPH)
+                        )
+                    )
+                );
+
+        var res = await VerejnaZakazkaRepo.Searching.SimpleSearchAsync(query, new string[] { }, 1, 0,
+            "0", exactNumOfResults: true, anyAggregation: aggYSum);
+
+
+        Dictionary<int, SimpleStat> result = new Dictionary<int, SimpleStat>();
+        if (interestedInYearsOnly != null)
+        {
+            foreach (int year in interestedInYearsOnly)
+            {
+                result.Add(year, new SimpleStat());
+            }
+
+            foreach (DateHistogramBucket val in ((BucketAggregate)res.ElasticResults.Aggregations["x-agg"]).Items)
+            {
+                if (result.ContainsKey(val.Date.Year))
+                {
+                    result[val.Date.Year].Pocet = val.DocCount ?? 0;
+                    result[val.Date.Year].CelkemCena =
+                        (decimal)(((DateHistogramBucket)val).Sum("sumincome").Value ?? 0);
+                }
+            }
+        }
+        else
+        {
+            foreach (DateHistogramBucket val in ((BucketAggregate)res.ElasticResults.Aggregations["x-agg"]).Items)
+            {
+                result.Add(val.Date.Year, new SimpleStat());
+                result[val.Date.Year].Pocet = val.DocCount ?? 0;
+                result[val.Date.Year].CelkemCena =
+                    (decimal)(((DateHistogramBucket)val).Sum("sumincome").Value ?? 0);
+            }
+        }
+
+        return new StatisticsPerYear<SimpleStat>(result);
     }
 }

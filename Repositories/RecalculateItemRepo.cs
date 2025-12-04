@@ -133,15 +133,15 @@ namespace HlidacStatu.Repositories
                     case RecalculateItem.StatisticsTypeEnum.VZ:
                         if (invalidateOnly)
                         {
-                            Statistics.FirmaStatistics.RemoveStatisticsVZ(f);
+                            await StatisticsCache.InvalidateHoldingVzStatisticsAsync(f);
+                            await StatisticsCache.InvalidateFirmaVzStatisticsAsync(f);
                         }
                         else
                         {
                             if (!holdingOnly || firmaOnly)
-                                _ = f.StatistikaVerejneZakazky(forceUpdateCache: true);
+                                _ = await f.StatistikaVerejneZakazkyAsync(forceUpdateCache: true);
                             if (holdingOnly || !firmaOnly)
-                                _ = f.HoldingStatistikaVerejneZakazky(DS.Graphs.Relation.AktualnostType.Nedavny,
-                                    forceUpdateCache: noRebuild ? false : true);
+                                _ = await f.HoldingStatistikaVerejneZakazkyAsync(forceUpdateCache: noRebuild ? false : true);
                         }
 
                         break;
