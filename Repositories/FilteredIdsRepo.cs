@@ -21,61 +21,6 @@ namespace HlidacStatu.Repositories
             public Action<Devmasters.Batch.ActionProgressData> ProgressOutputFunc { get; set; } = null;
 
         }
-        
-        public static class CachedIds
-        {
-
-            private static volatile Devmasters.Cache.Redis.Manager<string[], QueryBatch> cacheSmlouvy
-                = Devmasters.Cache.Redis.Manager<string[], QueryBatch>.GetSafeInstance(
-                    "cachedIdsSmlouvy",
-                    q => GetSmlouvyIdAsync(q).ConfigureAwait(false).GetAwaiter().GetResult(),
-                    TimeSpan.FromHours(24),
-                    Devmasters.Config.GetWebConfigValue("RedisServerUrls").Split(';'),
-                    Devmasters.Config.GetWebConfigValue("RedisBucketName"),
-                    Devmasters.Config.GetWebConfigValue("RedisUsername"),
-                    Devmasters.Config.GetWebConfigValue("RedisCachePassword"),
-                    keyValueSelector: key => key.TaskPrefix + Devmasters.Crypto.Hash.ComputeHashToHex(key.Query)
-                    );
-
-            public static string[] Smlouvy(QueryBatch query, bool forceUpdate = false)
-            {
-                if (forceUpdate)
-                {
-                    cacheSmlouvy.Delete(query);
-                }
-
-                return cacheSmlouvy.Get(query);
-
-            }
-
-
-            private static volatile Devmasters.Cache.Redis.Manager<string[], QueryBatch> cacheDotace
-                = Devmasters.Cache.Redis.Manager<string[], QueryBatch>.GetSafeInstance(
-                    "cachedIdsDotace",
-                    q => GetDotaceIdsAsync(q).ConfigureAwait(false).GetAwaiter().GetResult(),
-                    TimeSpan.FromHours(24),
-                    Devmasters.Config.GetWebConfigValue("RedisServerUrls").Split(';'),
-                    Devmasters.Config.GetWebConfigValue("RedisBucketName"),
-                    Devmasters.Config.GetWebConfigValue("RedisUsername"),
-                    Devmasters.Config.GetWebConfigValue("RedisCachePassword"),
-                    syncTimeoutInMs: 500*1000,
-                    keyValueSelector: key => key.TaskPrefix + Devmasters.Crypto.Hash.ComputeHashToHex(key.Query)
-                    );
-
-            public static string[] Dotace(QueryBatch query, bool forceUpdate = false)
-            {
-                if (forceUpdate)
-                {
-                    cacheDotace.Delete(query);
-                }
-
-                return cacheDotace.Get(query);
-
-            }
-
-
-        }
-
 
         public static async Task<string[]> GetDotaceIdsAsync(QueryBatch query, int maxDegreeOfParallelism = 10, Devmasters.Batch.IMonitor monitor = null)
         {
