@@ -1,7 +1,6 @@
 using System;
 using System.Threading.Tasks;
 using HlidacStatu.Caching;
-using HlidacStatu.Repositories;
 using HlidacStatu.Repositories.Searching;
 using Nest;
 using ZiggyCreatures.Caching.Fusion;
@@ -10,19 +9,14 @@ namespace HlidacStatu.Repositories.Cache;
 
 public static class VzCache
 {
-    // private static readonly ILogger _logger = Log.ForContext(typeof(FirmaCache));
-
     private static readonly IFusionCache _memoryCache =
-        HlidacStatu.Caching.CacheFactory.CreateNew(CacheFactory.CacheType.L1Default, nameof(KindexCache));
+        HlidacStatu.Caching.CacheFactory.CreateNew(CacheFactory.CacheType.L1Default, nameof(VzCache));
 
     public static ValueTask<VerejnaZakazkaSearchData> GetSearchesAsync(string query) =>
         _memoryCache.GetOrSetAsync($"_VzSearch:{query}",
             _ => CachedFuncSimpleSearchAsync(query),
             options => options.ModifyEntryOptionsDuration(TimeSpan.FromHours(6))
         );
-
-    // public static ValueTask InvalidateInfoFactsAsync(Firma firma) => PostgreCache.ExpireAsync($"_InfoFacts:{firma.ICO}");
-
     
     public static async Task<VerejnaZakazkaSearchData> CachedSimpleSearchAsync(VerejnaZakazkaSearchData search,
         bool logError = true, bool fixQuery = true, ElasticClient client = null)

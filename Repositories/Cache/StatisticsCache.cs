@@ -20,8 +20,7 @@ public class StatisticsCache
 {
     private static readonly IFusionCache PermanentCache =
         HlidacStatu.Caching.CacheFactory.CreateNew(CacheFactory.CacheType.PermanentStore, nameof(StatisticsCache));
-
-
+    
     //smlouvy
     public static ValueTask<StatisticsPerYear<Smlouva.Statistics.Data>>
         GetSmlouvyStatisticsForQueryAsync(string query) =>

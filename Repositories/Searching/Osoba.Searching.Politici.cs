@@ -19,7 +19,6 @@ namespace HlidacStatu.Repositories.Searching
 
         //Tady byly cache původně blbě a nedocházelo ke správným opravám dat, pokud aplikace běžela déle než 5 dní
         
-        
         // 1 hodinu v paměti, 10 let životnost, k naplnění dojde vždy při spuštění GetCachedPoliticiStemsAsync()
         private static Dictionary<string, string> GetOrSetCalculatedStemsCache(Dictionary<string, string> data = null)
         {
@@ -29,7 +28,6 @@ namespace HlidacStatu.Repositories.Searching
                 return _permanentCache.GetOrDefault(cacheKey, new Dictionary<string, string>());
             }
             
-            _permanentCache.Remove(cacheKey);
             _permanentCache.Set(cacheKey, data, options 
                 => options.ModifyEntryOptionsDuration(TimeSpan.FromHours(1), TimeSpan.FromDays(10*365)));
             return data;

@@ -65,11 +65,11 @@ namespace HlidacStatu.Extensions
                    || (await DotaceRepo.Searching.SimpleSearchAsync("ico:" + firma.ICO, 1, 1, "0")).Total > 0;
         }
 
-        public static bool MaVazbyNaPolitikyPred(this Firma firma, DateTime date)
+        public static async Task<bool> MaVazbyNaPolitikyPredAsync(this Firma firma, DateTime date)
         {
-            if (firma.MaVazbyNaPolitiky())
+            if (await firma.MaVazbyNaPolitikyAsync())
             {
-                var osoby = firma.VazbyNaPolitiky();
+                var osoby = await firma.VazbyNaPolitikyAsync();
                 foreach (var o in osoby)
                 {
                     var found = o.Sponzoring().Any(m => m.DarovanoDne < date);
@@ -212,15 +212,14 @@ namespace HlidacStatu.Extensions
             return KIndex.GetCachedAsync(firma.ICO, useTemp);
         }
 
-        public static bool MaVazbyNaPolitiky(this Firma firma)
+        public static async Task<bool> MaVazbyNaPolitikyAsync(this Firma firma)
         {
-            return StaticData.FirmySVazbamiNaPolitiky_nedavne_Cache.Get().SoukromeFirmy.ContainsKey(firma.ICO);
+            return (await MaterializedViewsCache.FirmySVazbamiNaPolitiky_NedavneAsync()).SoukromeFirmy.ContainsKey(firma.ICO);
         }
 
-        public static Osoba[] VazbyNaPolitiky(this Firma firma)
+        public static async Task<Osoba[]> VazbyNaPolitikyAsync(this Firma firma)
         {
-            return
-                StaticData.FirmySVazbamiNaPolitiky_nedavne_Cache.Get()
+            return (await MaterializedViewsCache.FirmySVazbamiNaPolitiky_NedavneAsync())
                     .SoukromeFirmy[firma.ICO]
                     .Select(pid => OsobaRepo.PolitickyAktivni.Get().Where(m => m.InternalId == pid).FirstOrDefault())
                     .Where(p => p != null)
@@ -245,7 +244,7 @@ namespace HlidacStatu.Extensions
         {
             return (await firma.MaVztahySeStatemAsync() == false)
                    && (firma.IsNespolehlivyPlatceDPH() == false)
-                   && (firma.MaVazbyNaPolitiky() == false);
+                   && (await firma.MaVazbyNaPolitikyAsync() == false);
         }
 
 
@@ -934,12 +933,14 @@ namespace HlidacStatu.Extensions
                     }
                 }
 
+                var firmySVazbamiNaPolitiky = await MaterializedViewsCache.FirmySVazbamiNaPolitiky_NedavneAsync();
+
                 if (//TODO rozlisit prime a neprime angazovani
                     firma.PatrimStatu() == false
-                    && StaticData.FirmySVazbamiNaPolitiky_nedavne_Cache.Get().SoukromeFirmy.ContainsKey(firma.ICO)
+                    && firmySVazbamiNaPolitiky.SoukromeFirmy.ContainsKey(firma.ICO)
                 )
                 {
-                    var politici = StaticData.FirmySVazbamiNaPolitiky_nedavne_Cache.Get().SoukromeFirmy[firma.ICO];
+                    var politici = firmySVazbamiNaPolitiky.SoukromeFirmy[firma.ICO];
                     if (politici.Count > 0)
                     {
                         var sPolitici = Osoby.GetById.Get(politici[0]).FullNameWithYear();

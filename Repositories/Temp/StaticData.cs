@@ -1,9 +1,7 @@
 ﻿using HlidacStatu.DS.Graphs;
 using HlidacStatu.Entities;
 using HlidacStatu.Entities.OrgStrukturyStatu;
-using HlidacStatu.Extensions;
 using HlidacStatu.Repositories.Analysis;
-using HlidacStatu.Repositories.Statistics;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
 using System;
@@ -13,7 +11,6 @@ using System.Linq;
 using System.Reflection;
 using System.Xml;
 using System.Xml.Serialization;
-using static HlidacStatu.Entities.Osoba.Statistics;
 
 namespace HlidacStatu.Repositories
 {
@@ -31,15 +28,6 @@ namespace HlidacStatu.Repositories
         public static Devmasters.Cache.AWS_S3.Cache<IEnumerable<AnalysisCalculation.IcoSmlouvaMinMax>>
             FirmyCasovePodezreleZalozene = null;
 
-        public static Devmasters.Cache.AWS_S3.Cache<AnalysisCalculation.VazbyFiremNaPolitiky>
-            FirmySVazbamiNaPolitiky_aktualni_Cache = null;
-
-        public static Devmasters.Cache.AWS_S3.Cache<AnalysisCalculation.VazbyFiremNaPolitiky>
-            FirmySVazbamiNaPolitiky_nedavne_Cache = null;
-
-        public static Devmasters.Cache.AWS_S3.Cache<AnalysisCalculation.VazbyFiremNaPolitiky>
-            FirmySVazbamiNaPolitiky_vsechny_Cache = null;
-
         public static Devmasters.Cache.AWS_S3.Cache<AnalysisCalculation.VazbyFiremNaUradyStat>
             UradyObchodujiciSFirmami_s_vazbouNaPolitiky_aktualni_Cache = null;
 
@@ -48,12 +36,6 @@ namespace HlidacStatu.Repositories
 
         public static Devmasters.Cache.AWS_S3.Cache<AnalysisCalculation.VazbyFiremNaUradyStat>
             UradyObchodujiciSFirmami_s_vazbouNaPolitiky_vsechny_Cache = null;
-
-        public static Devmasters.Cache.AWS_S3.Cache<AnalysisCalculation.VazbyFiremNaUradyStat>
-            UradyObchodujiciSNespolehlivymiPlatciDPH_Cache = null;
-
-        public static Devmasters.Cache.AWS_S3.Cache<AnalysisCalculation.VazbyFiremNaUradyStat>
-            NespolehlivyPlatciDPH_obchodySurady_Cache = null;
 
         public static Devmasters.Cache.LocalMemory.AutoUpdatedCache<List<Sponzoring>> SponzorujiciFirmy_Vsechny = null;
         public static Devmasters.Cache.LocalMemory.AutoUpdatedCache<List<Sponzoring>> SponzorujiciFirmy_Nedavne = null;
@@ -294,43 +276,7 @@ namespace HlidacStatu.Repositories
                     }
                 }
             );
-
-
-            _logger.Information("Static data - FirmySVazbamiNaPolitiky_*");
-            //L1 - 12 h
-            //L2 - 10 let
-            FirmySVazbamiNaPolitiky_aktualni_Cache =
-                new Devmasters.Cache.AWS_S3.Cache<AnalysisCalculation.VazbyFiremNaPolitiky>
-                (new string[] { Devmasters.Config.GetWebConfigValue("Minio.Cache.Endpoint") },
-                    Devmasters.Config.GetWebConfigValue("Minio.Cache.Bucket"),
-                    Devmasters.Config.GetWebConfigValue("Minio.Cache.AccessKey"),
-                    Devmasters.Config.GetWebConfigValue("Minio.Cache.SecretKey"), TimeSpan.Zero,
-                    "FirmySVazbamiNaPolitiky_Aktualni",
-                    (o) => { return new AnalysisCalculation.VazbyFiremNaPolitiky(); });
-
-            //L1 - 12 h
-            //L2 - 10 let
-            FirmySVazbamiNaPolitiky_nedavne_Cache =
-                new Devmasters.Cache.AWS_S3.Cache<AnalysisCalculation.VazbyFiremNaPolitiky>
-                (new string[] { Devmasters.Config.GetWebConfigValue("Minio.Cache.Endpoint") },
-                    Devmasters.Config.GetWebConfigValue("Minio.Cache.Bucket"),
-                    Devmasters.Config.GetWebConfigValue("Minio.Cache.AccessKey"),
-                    Devmasters.Config.GetWebConfigValue("Minio.Cache.SecretKey"), TimeSpan.Zero,
-                    "FirmySVazbamiNaPolitiky_Nedavne",
-                    (o) => { return new AnalysisCalculation.VazbyFiremNaPolitiky(); });
-
-            //L1 - 12 h
-            //L2 - 10 let
-            FirmySVazbamiNaPolitiky_vsechny_Cache =
-                new Devmasters.Cache.AWS_S3.Cache<AnalysisCalculation.VazbyFiremNaPolitiky>
-                (
-                    new string[] { Devmasters.Config.GetWebConfigValue("Minio.Cache.Endpoint") },
-                    Devmasters.Config.GetWebConfigValue("Minio.Cache.Bucket"),
-                    Devmasters.Config.GetWebConfigValue("Minio.Cache.AccessKey"),
-                    Devmasters.Config.GetWebConfigValue("Minio.Cache.SecretKey"), TimeSpan.Zero,
-                    "FirmySVazbamiNaPolitiky_Vsechny",
-                    (o) => { return new AnalysisCalculation.VazbyFiremNaPolitiky(); });
-
+            
 
             //L1 - 12 h
             //L2 - 10 let
@@ -405,35 +351,7 @@ namespace HlidacStatu.Repositories
                     }
                 );
 
-            _logger.Information("Static data - UradyObchodujiciSNespolehlivymiPlatciDPH_Cache*");
-            //L1 - 12 h
-            //L2 - 10 let
-            UradyObchodujiciSNespolehlivymiPlatciDPH_Cache =
-                new Devmasters.Cache.AWS_S3.Cache<AnalysisCalculation.VazbyFiremNaUradyStat>
-                (new string[] { Devmasters.Config.GetWebConfigValue("Minio.Cache.Endpoint") },
-                    Devmasters.Config.GetWebConfigValue("Minio.Cache.Bucket"),
-                    Devmasters.Config.GetWebConfigValue("Minio.Cache.AccessKey"),
-                    Devmasters.Config.GetWebConfigValue("Minio.Cache.SecretKey"), TimeSpan.Zero,
-                    "UradyObchodujiciSNespolehlivymiPlatciDPH",
-                    (o) =>
-                    {
-                        return new AnalysisCalculation.VazbyFiremNaUradyStat(); //refresh from task
-                    }
-                );
-            //L1 - 12 h
-            //L2 - 10 let
-            NespolehlivyPlatciDPH_obchodySurady_Cache =
-                new Devmasters.Cache.AWS_S3.Cache<AnalysisCalculation.VazbyFiremNaUradyStat>
-                (new string[] { Devmasters.Config.GetWebConfigValue("Minio.Cache.Endpoint") },
-                    Devmasters.Config.GetWebConfigValue("Minio.Cache.Bucket"),
-                    Devmasters.Config.GetWebConfigValue("Minio.Cache.AccessKey"),
-                    Devmasters.Config.GetWebConfigValue("Minio.Cache.SecretKey"), TimeSpan.Zero,
-                    "NespolehlivyPlatciDPH_obchodySurady",
-                    (o) =>
-                    {
-                        return new AnalysisCalculation.VazbyFiremNaUradyStat(); //refresh from task
-                    }
-                );
+            
 
 
             //AFERY

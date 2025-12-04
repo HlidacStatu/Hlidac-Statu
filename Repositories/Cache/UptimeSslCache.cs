@@ -11,7 +11,7 @@ namespace HlidacStatu.Repositories.Cache;
 public static class UptimeSslCache
 {
     private static readonly IFusionCache _memoryCache =
-            HlidacStatu.Caching.CacheFactory.CreateNew(CacheFactory.CacheType.L1Default, nameof(UptimeSSLRepo));
+            HlidacStatu.Caching.CacheFactory.CreateNew(CacheFactory.CacheType.L1Default, nameof(UptimeSslCache));
 
         public static ValueTask<UptimeSSL[]> GetUptimeSslCacheAsync() =>
             _memoryCache.GetOrSetAsync($"_UptimeSslCache", async _ => {

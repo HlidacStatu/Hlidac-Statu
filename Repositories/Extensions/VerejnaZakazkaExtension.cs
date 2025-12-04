@@ -4,6 +4,8 @@ using HlidacStatu.Repositories;
 using HlidacStatu.Util;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
+using HlidacStatu.Repositories.Cache;
 
 
 namespace HlidacStatu.Extensions
@@ -41,10 +43,10 @@ namespace HlidacStatu.Extensions
         }
         
 
-        public static string SocialInfoBody(this VerejnaZakazka verejnaZakazka)
+        public static async Task<string> SocialInfoBodyAsync(this VerejnaZakazka verejnaZakazka)
         {
             return "<ul>" +
-                   verejnaZakazka.InfoFacts().RenderFacts(4, true, true, "", "<li>{0}</li>", true)
+                   (await verejnaZakazka.InfoFactsAsync()).RenderFacts(4, true, true, "", "<li>{0}</li>", true)
                    + "</ul>";
         }
 
@@ -64,7 +66,7 @@ namespace HlidacStatu.Extensions
             return string.Empty;
         }
 
-        public static InfoFact[] InfoFacts(this VerejnaZakazka verejnaZakazka)
+        public static async Task<InfoFact[]> InfoFactsAsync(this VerejnaZakazka verejnaZakazka)
         {
             List<InfoFact> f = new List<InfoFact>();
 
@@ -119,10 +121,9 @@ namespace HlidacStatu.Extensions
             //politici
             foreach (var ss in verejnaZakazka.Dodavatele)
             {
-                if (!string.IsNullOrEmpty(ss.ICO) && StaticData.FirmySVazbamiNaPolitiky_nedavne_Cache.Get()
-                    .SoukromeFirmy.ContainsKey(ss.ICO))
+                var firmySVazbamiNaPolitiky = await MaterializedViewsCache.FirmySVazbamiNaPolitiky_NedavneAsync();
+                if (!string.IsNullOrEmpty(ss.ICO) && firmySVazbamiNaPolitiky.SoukromeFirmy.TryGetValue(ss.ICO, out var politici))
                 {
-                    var politici = StaticData.FirmySVazbamiNaPolitiky_nedavne_Cache.Get().SoukromeFirmy[ss.ICO];
                     if (politici.Count > 0)
                     {
                         var sPolitici = Osoby.GetById.Get(politici[0]).FullNameWithYear();

@@ -132,7 +132,7 @@ namespace HlidacStatu.WebGenerator.Controllers
                     var social = new ImageBannerCoreData()
                     {
                         title = vz.SocialInfoTitle(),
-                        body = vz.SocialInfoBody(),
+                        body = await vz.SocialInfoBodyAsync(),
                         footer = vz.SocialInfoFooter(),
                         subtitle = vz.SocialInfoSubTitle(),
                         img = vz.SocialInfoImageUrl(),
@@ -171,7 +171,7 @@ namespace HlidacStatu.WebGenerator.Controllers
                         var social = new ImageBannerCoreData()
                         {
                             title = s.SocialInfoTitle(),
-                            body = s.SocialInfoBody(),
+                            body = await s.SocialInfoBodyAsync(),
                             footer = s.SocialInfoFooter(),
                             subtitle = s.SocialInfoSubTitle(),
                             img = s.SocialInfoImageUrl(),

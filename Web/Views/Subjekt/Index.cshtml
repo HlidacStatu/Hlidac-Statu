@@ -11,6 +11,7 @@
 @using HlidacStatu.XLib
 @using HlidacStatu.XLib.Render;
 @using HlidacStatu.Entities.KIndex
+@using HlidacStatu.Repositories.Cache
 @using HlidacStatu.Repositories.SharedModels;
 @using Newtonsoft.Json.Linq
 
@@ -1030,7 +1031,7 @@
         Model.JsemPolitickaStrana() == false
         &&
         (
-            Model.IsSponzor() || HlidacStatu.Repositories.StaticData.FirmySVazbamiNaPolitiky_nedavne_Cache.Get().SoukromeFirmy.ContainsKey(Model.ICO)
+            Model.IsSponzor() || (await MaterializedViewsCache.FirmySVazbamiNaPolitiky_NedavneAsync()).SoukromeFirmy.ContainsKey(Model.ICO)
         )
     )
     {

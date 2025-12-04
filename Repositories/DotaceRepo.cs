@@ -91,7 +91,7 @@ namespace HlidacStatu.Repositories
                 if (f.IsSponzorBefore(dotaceDate))
                     item.Hints.RecipientPolitickyAngazovanySubjekt =
                         (int)HintSmlouva.PolitickaAngazovanostTyp.PrimoSubjekt;
-                else if (f.MaVazbyNaPolitikyPred(dotaceDate))
+                else if (f.MaVazbyNaPolitikyPredAsync(dotaceDate))
                     item.Hints.RecipientPolitickyAngazovanySubjekt =
                         (int)HintSmlouva.PolitickaAngazovanostTyp.AngazovanyMajitel;
 

@@ -3,11 +3,13 @@
 @using HlidacStatu.Extensions
 @using HlidacStatu.XLib.Render
 @using HlidacStatu.Repositories
+@using HlidacStatu.Repositories.Cache
 
 @{
     Layout = null;
 
     //ViewBag.Title = "Obchody " + Model.Jmeno + " s firmami sponzorující politické strany";
+    var firmySVazbamiNaPolitiky = await MaterializedViewsCache.FirmySVazbamiNaPolitiky_NedavneAsync();
 }
 
 
@@ -72,13 +74,13 @@
         </p>
     }
 
-    @if (StaticData.FirmySVazbamiNaPolitiky_nedavne_Cache.Get().SoukromeFirmy.ContainsKey(Model.ICO))
+    @if (firmySVazbamiNaPolitiky.SoukromeFirmy.ContainsKey(Model.ICO))
     {
         <hr />
         <div>
             <h4>Sponzorování politických stran osobami angažovanými v tomto subjektu</h4>
             <ul>
-                @foreach (var os in StaticData.FirmySVazbamiNaPolitiky_nedavne_Cache.Get().SoukromeFirmy[Model.ICO])
+                @foreach (var os in firmySVazbamiNaPolitiky.SoukromeFirmy[Model.ICO])
                 {
                     var o = Osoby.GetById.Get(os);
                     //var sponz = o.Sponzoring().ToList();
@@ -86,12 +88,6 @@
                     var sponzorOsoba = o.SponzoringToHtml(itemTemplate: $"<li><a href='{o.GetUrl(true)}'>{o.FullName()}</a> {{0}}</li>", itemDelimeter:"", sponzoringFilter: s=>s.OsobaIdDarce == os || s.IcoDarce == Model.ICO, withCompany: false);
 
                     @Html.Raw(sponzorOsoba);
-@*                    <li>
-                        <a href="@o.GetUrl()">@o.FullNameWithYear()</a> sponzoroval 
-                        @HlidacStatu.Util.RenderData.RenderList(sponz.Select(m => m.JmenoPrijemce()).Distinct(), ending: "")
-                        v celkové výši <b>@HlidacStatu.Util.RenderData.NicePriceHtml(sponz.Sum(m => m.Hodnota) ?? 0)</b>.
-                    </li>
-*@
             }
             </ul>
         </div>

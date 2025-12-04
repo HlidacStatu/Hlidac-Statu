@@ -19,7 +19,6 @@ using Newtonsoft.Json.Linq;
 using Newtonsoft.Json;
 using HlidacStatu.MLUtil.Splitter;
 using System.Text;
-using HlidacStatu.AI.LLM.Clients.Options;
 using HlidacStatu.Entities.AI;
 using HlidacStatu.Repositories.Cache;
 
@@ -256,7 +255,7 @@ namespace HlidacStatu.Repositories
             if (firmy.Any(f => f.IsSponzorBefore(smlouva.datumUzavreni)))
                 smlouva.Hint.SmlouvaSPolitickyAngazovanymSubjektem =
                     (int)HintSmlouva.PolitickaAngazovanostTyp.PrimoSubjekt;
-            else if (firmy.Any(f => f.MaVazbyNaPolitikyPred(smlouva.datumUzavreni)))
+            else if (firmy.Any(f => f.MaVazbyNaPolitikyPredAsync(smlouva.datumUzavreni)))
                 smlouva.Hint.SmlouvaSPolitickyAngazovanymSubjektem =
                     (int)HintSmlouva.PolitickaAngazovanostTyp.AngazovanyMajitel;
 
