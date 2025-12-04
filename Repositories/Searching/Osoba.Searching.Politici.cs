@@ -13,11 +13,14 @@ namespace HlidacStatu.Repositories.Searching
         
         private static readonly IFusionCache _memoryCache =
             HlidacStatu.Caching.CacheFactory.CreateNew(CacheFactory.CacheType.L1Default, nameof(Politici));
-
+        
         private static readonly IFusionCache _permanentCache =
             HlidacStatu.Caching.CacheFactory.CreateNew(CacheFactory.CacheType.PermanentStore, nameof(Politici));
 
+        //Tady byly cache původně blbě a nedocházelo ke správným opravám dat, pokud aplikace běžela déle než 5 dní
         
+        
+        // 1 hodinu v paměti, 10 let životnost, k naplnění dojde vždy při spuštění GetCachedPoliticiStemsAsync()
         private static Dictionary<string, string> GetOrSetCalculatedStemsCache(Dictionary<string, string> data = null)
         {
             string cacheKey = $"_CalculatedPoliticiStems_";
@@ -32,12 +35,15 @@ namespace HlidacStatu.Repositories.Searching
             return data;
         }
         
+        // 1 hodinu v paměti, 4 dni živnotnost (aby se spustila rekalkulace při dalším příp. startu), 
+        // 16 dní failsafe
         private static ValueTask<PolitikStem[]> GetCachedPoliticiStemsAsync() =>
             _permanentCache.GetOrSetAsync($"_politiciStems_",
                 _ => RecalculatePoliticiStemsAsync(),
-                options => options.ModifyEntryOptionsDuration(TimeSpan.FromHours(1), TimeSpan.FromDays(10*365))
+                options => options.ModifyEntryOptionsDuration(TimeSpan.FromHours(1), TimeSpan.FromDays(4))
             );
         
+        //5 dní v paměti, pak rekalk => spustí rekalk GetCachedPoliticiStemsAsync()
         private static ValueTask<List<Tuple<string, string[]>>> PoliticiStemsCachedAsync() =>
             _memoryCache.GetOrSetAsync($"_politiciStemsInMem_",
                 _ => InitPoliticiStemsAsync(),
