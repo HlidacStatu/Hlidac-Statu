@@ -5,6 +5,7 @@
 @using HlidacStatu.Lib.Analytics
 @using HlidacStatu.XLib.Render
 @using HlidacStatu.Repositories
+@using HlidacStatu.Repositories.Cache
 @using HlidacStatu.XLib
 
 @{
@@ -103,7 +104,7 @@
     ];
 
 
-    var data = HlidacStatu.Repositories.StaticData.UradyObchodujiciSFirmami_s_vazbouNaPolitiky_nedavne_Cache.Get();
+    var data = await MaterializedViewsCache.GetUradyObchodujiciSFirmami_s_vazbouNaPolitiky_nedavneAsync();
 
     ReportDataSource<(BasicDataForSubject<List<BasicData<string>>> Bdfs, Firma? Firma, StatisticsSubjectPerYear<Smlouva.Statistics.Data>? Stat)> rds1 = new(tableSloupce);
 

@@ -1206,7 +1206,7 @@
         intv.Stop();
         intv = laps.StopPreviousAndStartNextLap("uradSVazbami");
 
-        var uradSVazbami = HlidacStatu.Repositories.StaticData.UradyObchodujiciSFirmami_s_vazbouNaPolitiky_nedavne_Cache.Get()
+        var uradSVazbami = (await MaterializedViewsCache.GetUradyObchodujiciSFirmami_s_vazbouNaPolitiky_nedavneAsync())
             .SoukromeFirmy.Count(m => m.Ico == Model.ICO && m?.Detail?.Count > 0);
 
         if (uradSVazbami > 0)

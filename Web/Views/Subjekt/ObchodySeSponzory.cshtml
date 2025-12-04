@@ -13,7 +13,7 @@
 <div id="subjcontent_toc">
 
 @{
-    var uradSVazbami = StaticData.UradyObchodujiciSFirmami_s_vazbouNaPolitiky_nedavne_Cache.Get()
+    var uradSVazbami = (await MaterializedViewsCache.GetUradyObchodujiciSFirmami_s_vazbouNaPolitiky_nedavneAsync())
         .SoukromeFirmy.Where(m => m.Ico == Model.ICO && m.Detail != null && m.Detail.Count > 0)
         .FirstOrDefault();
     var firmySVazbamiNaPolitiky = await MaterializedViewsCache.FirmySVazbamiNaPolitiky_NedavneAsync();

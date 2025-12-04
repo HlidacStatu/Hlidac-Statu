@@ -17,76 +17,26 @@ namespace HlidacStatu.Repositories
     public static class StaticData
     {
         private static readonly ILogger _logger = Log.ForContext(typeof(StaticData));
-        
+
         static bool initialized = false;
-        
+
         public static string Dumps_Path = null;
 
         public static Devmasters.Cache.AWS_S3.AutoUpdatebleCache<OrganizacniStrukturyUradu>
             OrganizacniStrukturyUraduCache = null;
-        
-        public static Devmasters.Cache.AWS_S3.Cache<IEnumerable<AnalysisCalculation.IcoSmlouvaMinMax>>
-            FirmyCasovePodezreleZalozene = null;
-
-        public static Devmasters.Cache.AWS_S3.Cache<AnalysisCalculation.VazbyFiremNaUradyStat>
-            UradyObchodujiciSFirmami_s_vazbouNaPolitiky_aktualni_Cache = null;
-
-        public static Devmasters.Cache.AWS_S3.Cache<AnalysisCalculation.VazbyFiremNaUradyStat>
-            UradyObchodujiciSFirmami_s_vazbouNaPolitiky_nedavne_Cache = null;
-
-        public static Devmasters.Cache.AWS_S3.Cache<AnalysisCalculation.VazbyFiremNaUradyStat>
-            UradyObchodujiciSFirmami_s_vazbouNaPolitiky_vsechny_Cache = null;
 
         public static Devmasters.Cache.LocalMemory.AutoUpdatedCache<List<Sponzoring>> SponzorujiciFirmy_Vsechny = null;
         public static Devmasters.Cache.LocalMemory.AutoUpdatedCache<List<Sponzoring>> SponzorujiciFirmy_Nedavne = null;
-
         public static Devmasters.Cache.LocalMemory.Cache<List<double>> BasicStatisticData = null;
-
-        //L1 - 10 let
-        //L2 - 10 let
-        public static Devmasters.Cache.AWS_S3.Cache<string> CzechDictCache =
-            new Devmasters.Cache.AWS_S3.Cache<string>(
-                new string[] { Devmasters.Config.GetWebConfigValue("Minio.Cache.Endpoint") },
-                Devmasters.Config.GetWebConfigValue("Minio.Cache.Bucket"),
-                Devmasters.Config.GetWebConfigValue("Minio.Cache.AccessKey"),
-                Devmasters.Config.GetWebConfigValue("Minio.Cache.SecretKey"),
-                TimeSpan.Zero, "Czech.3-2-5.dic.txt", (obj) =>
-                {
-                    string s = Devmasters.Net.HttpClient.Simple
-                        .GetAsync("https://somedata.hlidacstatu.cz/appdata/Czech.3-2-5.dic.txt").Result;
-                    return s;
-                }, null);
-
-        //L1 - 10 let
-        //L2 - 10 let
-        public static Devmasters.Cache.AWS_S3.Cache<string> CrawlerUserAgentsCache =
-            new Devmasters.Cache.AWS_S3.Cache<string>(
-                new string[] { Devmasters.Config.GetWebConfigValue("Minio.Cache.Endpoint") },
-                Devmasters.Config.GetWebConfigValue("Minio.Cache.Bucket"),
-                Devmasters.Config.GetWebConfigValue("Minio.Cache.AccessKey"),
-                Devmasters.Config.GetWebConfigValue("Minio.Cache.SecretKey"),
-                TimeSpan.Zero, "crawler-user-agents.json",
-                (obj) =>
-                {
-                    return Devmasters.Net.HttpClient.Simple
-                        .GetAsync("https://somedata.hlidacstatu.cz/appdata/crawler-user-agents.json").Result;
-                }, null);
-
-
-        
-
-
-        public static Dictionary<string, TemplatedQuery> Afery = new Dictionary<string, TemplatedQuery>();
 
         public static Devmasters.Cache.LocalMemory.Cache<Dictionary<string, NespolehlivyPlatceDPH>>
             NespolehlivyPlatciDPH = null;
 
-        //public static SingletonManagerWithSetup<Data.External.TwitterPublisher, Tweetinvi.Models.TwitterCredentials> TweetingManager = null;
-
         public static Devmasters.Cache.LocalMemory.Cache<Darujme.Stats> DarujmeStats = null;
-
         public static Devmasters.Cache.LocalMemory.Cache<Dictionary<string, string>> ZkratkyStran_cache = null;
-        
+
+        public static Dictionary<string, TemplatedQuery> Afery = new Dictionary<string, TemplatedQuery>();
+
         static StaticData()
         {
             Init();
@@ -142,7 +92,7 @@ namespace HlidacStatu.Repositories
             _logger.Information("Static data - Insolvence_firem_politiku ");
             swl.StopPreviousAndStartNextLap(Util.DebugUtil.GetClassAndMethodName(MethodBase.GetCurrentMethod()) +
                                             " var Insolvence_firem_politiku");
-            
+
 
             _logger.Information("Static data - SponzorujiciFirmy_Vsechny ");
 
@@ -276,82 +226,12 @@ namespace HlidacStatu.Repositories
                     }
                 }
             );
-            
 
-            //L1 - 12 h
-            //L2 - 10 let
-            FirmyCasovePodezreleZalozene =
-                new Devmasters.Cache.AWS_S3.Cache<IEnumerable<AnalysisCalculation.IcoSmlouvaMinMax>>
-                (new string[] { Devmasters.Config.GetWebConfigValue("Minio.Cache.Endpoint") },
-                    Devmasters.Config.GetWebConfigValue("Minio.Cache.Bucket"),
-                    Devmasters.Config.GetWebConfigValue("Minio.Cache.AccessKey"),
-                    Devmasters.Config.GetWebConfigValue("Minio.Cache.SecretKey"), TimeSpan.Zero,
-                    "FirmyCasovePodezreleZalozene",
-                    (o) =>
-                    {
-                        return AnalysisCalculation.GetFirmyCasovePodezreleZalozeneAsync()
-                            .ConfigureAwait(false).GetAwaiter().GetResult();
-                    });
 
             //migrace: tohle by mělo jít odsud do Repo cache
             ZkratkyStran_cache = new Devmasters.Cache.LocalMemory.Cache<Dictionary<string, string>>
             (TimeSpan.FromHours(24), "ZkratkyStran",
                 (o) => { return ZkratkaStranyRepo.ZkratkyVsechStran(); });
-
-
-            _logger.Information("Static data - UradyObchodujiciSFirmami_s_vazbouNaPolitiky_*");
-            //L1 - 12 h
-            //L2 - 10 let
-            UradyObchodujiciSFirmami_s_vazbouNaPolitiky_aktualni_Cache =
-                new Devmasters.Cache.AWS_S3.Cache<AnalysisCalculation.VazbyFiremNaUradyStat>
-                (new string[] { Devmasters.Config.GetWebConfigValue("Minio.Cache.Endpoint") },
-                    Devmasters.Config.GetWebConfigValue("Minio.Cache.Bucket"),
-                    Devmasters.Config.GetWebConfigValue("Minio.Cache.AccessKey"),
-                    Devmasters.Config.GetWebConfigValue("Minio.Cache.SecretKey"), TimeSpan.Zero,
-                    "UradyObchodujiciSFirmami_s_vazbouNaPolitiky_aktualni",
-                    (o) =>
-                    {
-                        return AnalysisCalculation
-                            .UradyObchodujiciSFirmami_s_vazbouNaPolitikyAsync(Relation.AktualnostType.Aktualni, true)
-                            .ConfigureAwait(false).GetAwaiter().GetResult();
-                    }
-                );
-
-            //L1 - 12 h
-            //L2 - 10 let
-            UradyObchodujiciSFirmami_s_vazbouNaPolitiky_nedavne_Cache =
-                new Devmasters.Cache.AWS_S3.Cache<AnalysisCalculation.VazbyFiremNaUradyStat>
-                (new string[] { Devmasters.Config.GetWebConfigValue("Minio.Cache.Endpoint") },
-                    Devmasters.Config.GetWebConfigValue("Minio.Cache.Bucket"),
-                    Devmasters.Config.GetWebConfigValue("Minio.Cache.AccessKey"),
-                    Devmasters.Config.GetWebConfigValue("Minio.Cache.SecretKey"), TimeSpan.Zero,
-                    "UradyObchodujiciSFirmami_s_vazbouNaPolitiky_nedavne",
-                    (o) =>
-                    {
-                        return AnalysisCalculation
-                            .UradyObchodujiciSFirmami_s_vazbouNaPolitikyAsync(Relation.AktualnostType.Nedavny, true)
-                            .ConfigureAwait(false).GetAwaiter().GetResult();
-                    }
-                );
-
-            //L1 - 12 h
-            //L2 - 10 let
-            UradyObchodujiciSFirmami_s_vazbouNaPolitiky_vsechny_Cache =
-                new Devmasters.Cache.AWS_S3.Cache<AnalysisCalculation.VazbyFiremNaUradyStat>
-                (new string[] { Devmasters.Config.GetWebConfigValue("Minio.Cache.Endpoint") },
-                    Devmasters.Config.GetWebConfigValue("Minio.Cache.Bucket"),
-                    Devmasters.Config.GetWebConfigValue("Minio.Cache.AccessKey"),
-                    Devmasters.Config.GetWebConfigValue("Minio.Cache.SecretKey"), TimeSpan.Zero,
-                    "UradyObchodujiciSFirmami_s_vazbouNaPolitiky_vsechny",
-                    (o) =>
-                    {
-                        return AnalysisCalculation
-                            .UradyObchodujiciSFirmami_s_vazbouNaPolitikyAsync(Relation.AktualnostType.Libovolny, true)
-                            .ConfigureAwait(false).GetAwaiter().GetResult();
-                    }
-                );
-
-            
 
 
             //AFERY
