@@ -296,11 +296,11 @@ namespace HlidacStatu.Extensions
 
             return ret;
         }
-        public static Osoba.Statistics.Dotace StatistikaDotace(this Osoba osoba,
+        public static async Task<Osoba.Statistics.Dotace> StatistikaDotaceAsync(this Osoba osoba,
             bool forceUpdateCache = false)
         {
 
-            Osoba.Statistics.Dotace ret = OsobaStatistics.CachedStatistics_Dotace(osoba, forceUpdateCache);
+            Osoba.Statistics.Dotace ret = await OsobaStatistics.CachedStatistics_DotaceAsync(osoba, forceUpdateCache);
 
             return ret;
         }

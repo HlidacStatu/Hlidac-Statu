@@ -640,8 +640,8 @@
         </p>
         @{
             //var dotaceService = new DotaceService();
-            var dotaceSummary = Model.StatistikaDotaci().Summary();
-            var dotaceHoldingStat = Model.HoldingStatistikaDotaci();
+            var dotaceSummary = (await Model.StatistikaDotaciAsync()).Summary();
+            var dotaceHoldingStat = await Model.HoldingStatistikaDotaciAsync();
             var dotaceHoldingSummary = dotaceHoldingStat.Summary();
             string durl = "/dotace/hledat?Q=ico%3A+" + Model.ICO;
             //var dotaceStat = dotaceSummary.PocetDotaci;
@@ -686,7 +686,7 @@
             }
 
 
-            var dotaceStats = Model.StatistikaDotaci();
+            var dotaceStats = await Model.StatistikaDotaciAsync();
 
             var dotaceGraphData = new Series[]
             {
@@ -812,7 +812,7 @@
             }
 
 
-            var holdingStats = Model.HoldingStatistikaDotaci();
+            var holdingStats = await Model.HoldingStatistikaDotaciAsync();
 
             var holdingGraphData = new Series[]
             {
@@ -828,7 +828,7 @@
                     {
                         ValueSuffix = " Kč"
                     }
-                },
+                }
             };
             <div>
                 <hr/>
@@ -899,7 +899,9 @@
             <a href="/subjekt/Dotace/@Model.ICO" class="btn btn-hs btn-primary btn-sm my-3 position-relative">
                 Podrobnosti o dotacích organizace
                 <span
-                    class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">@(HlidacStatu.Util.RenderData.NiceNumber(Model.StatistikaDotaci().Summary().PocetDotaci))</span>
+                    class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                    @(HlidacStatu.Util.RenderData.NiceNumber((await Model.StatistikaDotaciAsync()).Summary().PocetDotaci))
+                </span>
             </a>
         </p>
 

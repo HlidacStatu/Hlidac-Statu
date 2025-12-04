@@ -91,12 +91,12 @@ namespace HlidacStatu.Repositories
                     case RecalculateItem.StatisticsTypeEnum.Dotace:
                         if (invalidateOnly)
                         {
-                            OsobaStatistics.RemoveCachedStatistics_Dotace(o);
+                            await StatisticsCache.InvalidateOsobaDotaceStatisticsAsync(o);
                             await OsobaCache.InvalidateInfoFactsAsync(o);
                         }
                         else
                         {
-                            _ = o.StatistikaDotace(forceUpdateCache: noRebuild ? false : true);
+                            _ = await o.StatistikaDotaceAsync(forceUpdateCache: noRebuild ? false : true);
                             _ = await o.InfoFactsCachedAsync(forceUpdateCache: noRebuild ? false : true);
                         }
 
@@ -148,14 +148,15 @@ namespace HlidacStatu.Repositories
                     case RecalculateItem.StatisticsTypeEnum.Dotace:
                         if (invalidateOnly)
                         {
-                            Statistics.FirmaStatistics.RemoveStatisticsDotace(f);
+                            await StatisticsCache.InvalidateHoldingDotaceStatisticsAsync(f);
+                            await StatisticsCache.InvalidateFirmaDotaceStatisticsAsync(f);
                         }
                         else
                         {
                             if (!holdingOnly || firmaOnly)
-                                _ = f.StatistikaDotaci(forceUpdateCache: true);
+                                _ = await f.StatistikaDotaciAsync(forceUpdateCache: true);
                             if (holdingOnly || !firmaOnly)
-                                _ = f.HoldingStatistikaDotaci(forceUpdateCache: noRebuild ? false : true);
+                                _ = await f.HoldingStatistikaDotaciAsync(forceUpdateCache: noRebuild ? false : true);
                         }
 
                         break;

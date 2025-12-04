@@ -72,6 +72,33 @@ public class StatisticsCache
         PermanentCache.ExpireAsync($"_Holding_VZStatistics_:{firma.ICO}");
 
 
+    //Dotace cache
+    public static ValueTask<StatisticsSubjectPerYear<Firma.Statistics.Dotace>>
+        GetFirmaDotaceStatisticsAsync(Firma firma) =>
+        PermanentCache.GetOrSetAsync($"_Firma_DotaceStatistics_:{firma.ICO}",
+            _ => CalculateFirmaDotaceStatAsync(firma));
+
+    public static ValueTask InvalidateFirmaDotaceStatisticsAsync(Firma firma) =>
+        PermanentCache.ExpireAsync($"_Firma_DotaceStatistics_:{firma.ICO}");
+
+    public static ValueTask<StatisticsSubjectPerYear<Firma.Statistics.Dotace>>
+        GetHoldingDotaceStatisticsAsync(Firma firma) =>
+        PermanentCache.GetOrSetAsync($"_Holding_DotaceStatistics_:{firma.ICO}",
+            _ => CalculateHoldingDotaceStatAsync(firma));
+
+    public static ValueTask InvalidateHoldingDotaceStatisticsAsync(Firma firma) =>
+        PermanentCache.ExpireAsync($"_Holding_DotaceStatistics_:{firma.ICO}");
+    
+
+    public static ValueTask<Osoba.Statistics.Dotace>
+        GetOsobaDotaceStatisticsAsync(Osoba osoba) =>
+        PermanentCache.GetOrSetAsync($"_Osoba_DotaceStatistics_:{osoba.NameId}",
+            _ => CalculateOsobaDotaceStatAsync(osoba));
+
+    public static ValueTask InvalidateOsobaDotaceStatisticsAsync(Osoba osoba) =>
+        PermanentCache.ExpireAsync($"_Osoba_DotaceStatistics_:{osoba.NameId}");
+
+
     //Factories
     private static async Task<StatisticsSubjectPerYear<Smlouva.Statistics.Data>> CalculateHoldingSmlouvyStatisticsAsync(
         Firma firma,
@@ -218,7 +245,8 @@ public class StatisticsCache
     {
         var firmy_maxrok = new Dictionary<string, Devmasters.DT.DateInterval>();
         firmy_maxrok.Add(firma.ICO, new Devmasters.DT.DateInterval(DateTime.MinValue, DateTime.MaxValue));
-        var skutecneVazby = Relation.SkutecnaDobaVazby(firma.AktualniVazby(DS.Graphs.Relation.AktualnostType.Libovolny));
+        var skutecneVazby =
+            Relation.SkutecnaDobaVazby(firma.AktualniVazby(DS.Graphs.Relation.AktualnostType.Libovolny));
         foreach (var v in skutecneVazby)
         {
             if (!string.IsNullOrEmpty(v.To?.UniqId)
@@ -228,7 +256,7 @@ public class StatisticsCache
                     new Devmasters.DT.DateInterval(v.RelFrom ?? DateTime.MinValue, v.RelTo ?? DateTime.MaxValue));
             }
         }
-        
+
         var semaphore = new SemaphoreSlim(10);
         var statistiky = await Task.WhenAll(
             firmy_maxrok.Select(async f =>
@@ -248,8 +276,7 @@ public class StatisticsCache
                 }
             })
         );
-        
-        
+
         if (statistiky.Length == 0)
             return new StatisticsSubjectPerYear<Firma.Statistics.VZ>(firma.ICO);
         if (statistiky.Length == 1)
@@ -339,5 +366,182 @@ public class StatisticsCache
         }
 
         return new StatisticsPerYear<SimpleStat>(result);
+    }
+
+    private static async Task<StatisticsSubjectPerYear<Firma.Statistics.Dotace>>
+        CalculateHoldingDotaceStatAsync(Firma firma)
+    {
+        var firmy_maxrok = new Dictionary<string, Devmasters.DT.DateInterval>();
+        firmy_maxrok.Add(firma.ICO, new Devmasters.DT.DateInterval(DateTime.MinValue, DateTime.MaxValue));
+        var skutecneVazby =
+            Relation.SkutecnaDobaVazby(firma.AktualniVazby(DS.Graphs.Relation.AktualnostType.Libovolny));
+        foreach (var v in skutecneVazby)
+        {
+            if (!string.IsNullOrEmpty(v.To?.UniqId)
+                && v.To.Type == HlidacStatu.DS.Graphs.Graph.Node.NodeType.Company)
+            {
+                firmy_maxrok.TryAdd(v.To.Id,
+                    new Devmasters.DT.DateInterval(v.RelFrom ?? DateTime.MinValue, v.RelTo ?? DateTime.MaxValue));
+            }
+        }
+
+        var semaphore = new SemaphoreSlim(10);
+        var statistiky = await Task.WhenAll(
+            firmy_maxrok.Select(async f =>
+            {
+                await semaphore.WaitAsync();
+                try
+                {
+                    var stat = await Firmy.Get(f.Key).StatistikaDotaciAsync();
+                    return new StatisticsSubjectPerYear<Firma.Statistics.Dotace>(
+                        f.Key,
+                        stat.Filter(m => m.Key >= f.Value.From?.Year && m.Key <= f.Value.To?.Year)
+                    );
+                }
+                finally
+                {
+                    semaphore.Release();
+                }
+            })
+        );
+
+        if (statistiky.Length == 0)
+            return new StatisticsSubjectPerYear<Firma.Statistics.Dotace>(firma.ICO);
+        if (statistiky.Length == 1)
+            return statistiky[0];
+
+        Dictionary<string, StatisticsSubjectPerYear<Firma.Statistics.Dotace>> statistikyPerIco =
+            new Dictionary<string, StatisticsSubjectPerYear<Firma.Statistics.Dotace>>();
+
+        foreach (var ico in statistiky.Select(m => m.ICO).Where(m => !string.IsNullOrEmpty(m)))
+        {
+            statistikyPerIco[ico] = new StatisticsSubjectPerYear<Firma.Statistics.Dotace>();
+            statistikyPerIco[ico] = (StatisticsSubjectPerYear<Firma.Statistics.Dotace>.Aggregate(firma.ICO,
+                        statistiky
+                            .Where(w => w.ICO == ico)
+                            .Select(m => m)
+                            .ToArray()
+                    )
+                ) ?? new StatisticsSubjectPerYear<Firma.Statistics.Dotace>();
+        }
+
+        StatisticsSubjectPerYear<Firma.Statistics.Dotace> aggregate =
+            Lib.Analytics.StatisticsSubjectPerYear<Firma.Statistics.Dotace>.Aggregate(firma.ICO,
+                statistikyPerIco.Values);
+
+        foreach (var year in aggregate)
+        {
+            year.Value.JednotliveFirmy = statistikyPerIco
+                .Where(s => s.Value.StatisticsForYear(year.Year).CelkemPrideleno != 0)
+                .ToDictionary(s => s.Key, s => s.Value.StatisticsForYear(year.Year).CelkemPrideleno);
+        }
+
+        return aggregate;
+    }
+
+    private static async Task<StatisticsSubjectPerYear<Firma.Statistics.Dotace>> CalculateFirmaDotaceStatAsync(Firma f)
+    {
+        var dotaceFirmy = await DotaceRepo.GetDotaceForIcoAsync(f.ICO).ToListAsync();
+
+        // doplnit počty dotací
+        var statistiky = dotaceFirmy.GroupBy(d => d.ApprovedYear)
+            .ToDictionary(g => g.Key ?? 0,
+                g => new Firma.Statistics.Dotace()
+                {
+                    PocetDotaci = g.Count()
+                }
+            );
+
+        var dataYearly = dotaceFirmy
+            .GroupBy(c => c.ApprovedYear)
+            .ToDictionary(g => g.Key ?? 0,
+                g => g.Sum(c => c.AssumedAmount)
+            );
+
+        foreach (var dy in dataYearly)
+        {
+            if (!statistiky.TryGetValue(dy.Key, out var yearstat))
+            {
+                yearstat = new Firma.Statistics.Dotace();
+                statistiky.Add(dy.Key, yearstat);
+            }
+
+            yearstat.CelkemPrideleno = dy.Value;
+        }
+
+
+        return new StatisticsSubjectPerYear<Firma.Statistics.Dotace>(f.ICO, statistiky);
+    }
+
+
+    private static async Task<Osoba.Statistics.Dotace> CalculateOsobaDotaceStatAsync(Osoba o)
+    {
+        Osoba.Statistics.Dotace res = new Osoba.Statistics.Dotace();
+        res.OsobaNameId = o.NameId;
+
+        Dictionary<string, StatisticsSubjectPerYear<Firma.Statistics.Dotace>> statni =
+            new Dictionary<string, StatisticsSubjectPerYear<Firma.Statistics.Dotace>>();
+        Dictionary<string, StatisticsSubjectPerYear<Firma.Statistics.Dotace>> soukr =
+            new Dictionary<string, StatisticsSubjectPerYear<Firma.Statistics.Dotace>>();
+        Dictionary<string, StatisticsSubjectPerYear<Firma.Statistics.Dotace>> nezisk =
+            new Dictionary<string, StatisticsSubjectPerYear<Firma.Statistics.Dotace>>();
+
+        var skutecneVazby = Relation.SkutecnaDobaVazby(o.AktualniVazby(Relation.AktualnostType.Libovolny));
+        var firmy_maxrok = new Dictionary<string, Devmasters.DT.DateInterval>();
+        foreach (var v in skutecneVazby.Where(v => !string.IsNullOrEmpty(v.To?.UniqId)
+                                                   && v.To.Type == HlidacStatu.DS.Graphs.Graph.Node.NodeType
+                                                       .Company)
+                )
+        {
+            firmy_maxrok.TryAdd(v.To.Id,
+                new Devmasters.DT.DateInterval(v.RelFrom ?? DateTime.MinValue, v.RelTo ?? DateTime.MaxValue));
+        }
+
+        var semaphore = new SemaphoreSlim(20);
+
+        var perIcoStat = await Task.WhenAll(
+            firmy_maxrok
+                .Select(m => new { firma = Firmy.Get(m.Key), interval = m.Value })
+                .Where(m => m.firma.Valid == true)
+                .Select(async m =>
+                {
+                    await semaphore.WaitAsync();
+                    try
+                    {
+                        var stat = await m.firma.StatistikaDotaciAsync();
+                        return new
+                        {
+                            f = m.firma,
+                            ss = new StatisticsSubjectPerYear<Firma.Statistics.Dotace>(
+                                m.firma.ICO,
+                                stat.Filter(fi =>
+                                    fi.Key >= m.interval.From?.Year &&
+                                    fi.Key <= m.interval.To?.Year)
+                            )
+                        };
+                    }
+                    finally
+                    {
+                        semaphore.Release();
+                    }
+                })
+        );
+
+
+        foreach (var fStat in perIcoStat)
+        {
+            if (fStat.f.PatrimStatu() && statni.ContainsKey(fStat.f.ICO) == false)
+                statni.Add(fStat.f.ICO, fStat.ss);
+            else if (fStat.f.JsemNeziskovka() && nezisk.ContainsKey(fStat.f.ICO) == false)
+                nezisk.Add(fStat.f.ICO, fStat.ss);
+            else if (soukr.ContainsKey(fStat.f.ICO) == false)
+                soukr.Add(fStat.f.ICO, fStat.ss);
+        }
+
+        res.StatniFirmy = statni;
+        res.SoukromeFirmy = soukr;
+        res.Neziskovky = nezisk;
+
+        return res;
     }
 }

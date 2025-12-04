@@ -180,20 +180,17 @@ namespace HlidacStatu.Extensions
             return ret ?? new Lib.Analytics.StatisticsSubjectPerYear<Smlouva.Statistics.Data>();
         }
 
-        public static Lib.Analytics.StatisticsSubjectPerYear<Firma.Statistics.Dotace> StatistikaDotaci(
+        public static async Task<StatisticsSubjectPerYear<Firma.Statistics.Dotace>> StatistikaDotaciAsync(
             this Firma firma, bool forceUpdateCache = false)
         {
-            return FirmaStatistics.CachedStatisticsDotace(firma, forceUpdateCache) ??
+            return await FirmaStatistics.CachedStatisticsDotaceAsync(firma, forceUpdateCache) ??
                 new Lib.Analytics.StatisticsSubjectPerYear<Firma.Statistics.Dotace>() { ICO = firma.ICO };
 
         }
-        public static Lib.Analytics.StatisticsSubjectPerYear<Firma.Statistics.Dotace> HoldingStatistikaDotaci(
+        public static async Task<StatisticsSubjectPerYear<Firma.Statistics.Dotace>> HoldingStatistikaDotaciAsync(
             this Firma firma, bool forceUpdateCache = false)
         {
-            //STAT FIX
-            //return new();
-
-            return FirmaStatistics.CachedHoldingStatisticsDotace(firma, forceUpdateCache) ??
+            return await FirmaStatistics.CachedHoldingStatisticsDotace(firma, forceUpdateCache) ??
                 new Lib.Analytics.StatisticsSubjectPerYear<Firma.Statistics.Dotace>() { ICO = firma.ICO };
         }
 
