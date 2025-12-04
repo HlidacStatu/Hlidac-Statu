@@ -2,6 +2,7 @@
 @using HlidacStatu.Entities
 @using HlidacStatu.Extensions
 @using HlidacStatu.Repositories
+@using HlidacStatu.Repositories.Cache
 @using Microsoft.AspNetCore.Html
 
 @model PeopleListViewModel
@@ -69,7 +70,8 @@
         var sponzoriText = sponzori.Any() ? $"<br /> - {string.Join(". ", sponzori)}" : "";
 
         var vazby = new List<int>();
-        StaticData.FirmySVazbamiNaPolitiky_vsechny_Cache.Get().SoukromeFirmy.TryGetValue(ico, out vazby);
+        var firmySVazbamiNaPolitiky = await MaterializedViewsCache.FirmySVazbamiNaPolitiky_NedavneAsync();
+        firmySVazbamiNaPolitiky.SoukromeFirmy.TryGetValue(ico, out vazby);
         var politici = vazby == null ? new List<Osoba>() : OsobaRepo.PolitickyAktivni.Get()?.Where(p => vazby.Contains(p.InternalId)).ToList() ?? new List<Osoba>();
         var maji = Devmasters.Lang.CS.Plural.Get(politici.Count(), "má;mají;mají");
 

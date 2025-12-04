@@ -30,7 +30,7 @@ namespace HlidacStatu.Repositories
             //recalc hints
             try
             {
-                UpdateHints(dotace, false);
+                await UpdateHintsAsync(dotace, false);
             }
             catch (Exception e)
             {
@@ -68,7 +68,7 @@ namespace HlidacStatu.Repositories
                 $"Dotace {dotace.Id} from {dotace.PrimaryDataSource} saved");
         }
 
-        public static bool UpdateHints(Dotace item, bool forceRewriteHints)
+        public static async Task<bool> UpdateHintsAsync(Dotace item, bool forceRewriteHints)
         {
             bool changed = false;
             if (item.Hints?.Category1 == null || forceRewriteHints == true)
@@ -91,7 +91,7 @@ namespace HlidacStatu.Repositories
                 if (f.IsSponzorBefore(dotaceDate))
                     item.Hints.RecipientPolitickyAngazovanySubjekt =
                         (int)HintSmlouva.PolitickaAngazovanostTyp.PrimoSubjekt;
-                else if (f.MaVazbyNaPolitikyPredAsync(dotaceDate))
+                else if (await f.MaVazbyNaPolitikyPredAsync(dotaceDate))
                     item.Hints.RecipientPolitickyAngazovanySubjekt =
                         (int)HintSmlouva.PolitickaAngazovanostTyp.AngazovanyMajitel;
 

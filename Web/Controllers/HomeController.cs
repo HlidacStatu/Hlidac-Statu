@@ -1135,7 +1135,7 @@ text zpravy: {txt}
                     var social = new ImageBannerCoreData()
                     {
                         title = vz.SocialInfoTitle(),
-                        body = vz.SocialInfoBodyAsync(),
+                        body = await vz.SocialInfoBodyAsync(),
                         footer = vz.SocialInfoFooter(),
                         subtitle = vz.SocialInfoSubTitle(),
                         img = vz.SocialInfoImageUrl(),
@@ -1174,7 +1174,7 @@ text zpravy: {txt}
                         var social = new ImageBannerCoreData()
                         {
                             title = s.SocialInfoTitle(),
-                            body = s.SocialInfoBodyAsync(),
+                            body = await s.SocialInfoBodyAsync(),
                             footer = s.SocialInfoFooter(),
                             subtitle = s.SocialInfoSubTitle(),
                             img = s.SocialInfoImageUrl(),

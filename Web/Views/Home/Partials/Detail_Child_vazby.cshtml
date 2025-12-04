@@ -2,16 +2,17 @@
 @using HlidacStatu.Extensions
 @using HlidacStatu.Repositories
 @using HlidacStatu.Entities
+@using HlidacStatu.Repositories.Cache
 
 @{
-
     bool angPolitiku = false;
     bool isSponzorStrany = false;
+    var firmySVazbamiNaPolitiky = await MaterializedViewsCache.FirmySVazbamiNaPolitiky_NedavneAsync();
     if (Model.Prijemce != null)
     {
         angPolitiku = Model.Prijemce.Union(new Smlouva.Subjekt[] { Model.Platce })
             .Where(m => !string.IsNullOrEmpty(m.ico))
-            .Any(m => StaticData.FirmySVazbamiNaPolitiky_nedavne_Cache.Get().SoukromeFirmy.ContainsKey(m.ico));
+            .Any(m => firmySVazbamiNaPolitiky.SoukromeFirmy.ContainsKey(m.ico));
         isSponzorStrany = Model.Prijemce.Union(new Smlouva.Subjekt[] { Model.Platce })
             .Where(m => !string.IsNullOrEmpty(m.ico))
             .Any(m => Firmy.Get(m.ico).Valid && Firmy.Get(m.ico).IsSponzor());
@@ -19,128 +20,130 @@
 
     var otherVersion = await Model.OtherVersionsAsync();
     var podobneSmlouvy = await Model.PodobneSmlouvyAsync();
-
-
 }
 
 
-            @if (otherVersion.Length > 0)
+@if (otherVersion.Length > 0)
+{
+    <tr>
+        <td>
+            <h4>Provázané smlouvy</h4>
+        </td>
+        <td>
+            <div>
+                Nalezli
+                jsme @(Devmasters.Lang.CS.Plural.Get(otherVersion.Length, "jednu provázanou smlouvu", "{0} provázané smlouvy", "{0} provázaných smluv")):
+                <ul>
+                    @foreach (var os in otherVersion)
+                    {
+                        <li><a href="/Detail/@os.Id">Verze @os.Id;
+                                zveřejněna @os.casZverejneni.ToString("dd.MM.yyyy HH.mm"); @(os.platnyZaznam ? "platná" : "zneplatněna")</a>
+                        </li>
+                    }
+                </ul>
+            </div>
+            <span class="text-muted small">Toto je seznam smluv, které jsou zneplatněnými verzemi této smlouvy anebo jsou velmi podobné této smlouvě a je vysoká pravděpodobnost, že se jedná zneplatněné verze smlouvy, které nejsou správně označeny jako provázané.</span>
+        </td>
+    </tr>
+}
+
+@if (podobneSmlouvy.Length > 0)
+{
+    <tr>
+        <td>
+            Podobné smlouvy
+        </td>
+        <td>
+            <div>
+                Nalezli
+                jsme @(Devmasters.Lang.CS.Plural.Get(podobneSmlouvy.Length, "jednu podobnou smlouvu", "{0} podobné smlouvy", "{0} podobných smluv")):
+                <ul>
+                    @foreach (var os in podobneSmlouvy)
+                    {
+                        <li><a href="/Detail/@os.Id">Zveřejněna @os.casZverejneni.ToString("dd.MM.yyyy HH.mm");
+                                částka @HlidacStatu.Util.RenderData.NicePriceHtml(os.CalculatedPriceWithVATinCZK) s
+                                DPH; @(os.platnyZaznam ? "platná" : "zneplatněna")</a></li>
+                    }
+                </ul>
+            </div>
+            <span class="text-muted small">Toto je seznam smluv, které jsou velmi podobné této smlouvě, mají stejné smluvní strany a předmět smlouvy.</span>
+        </td>
+    </tr>
+}
+
+
+
+@if (angPolitiku)
+{
+    <tr>
+        <td>
+            Angažovanost politicky aktivních osob v soukromé firmě u této smlouvy
+        </td>
+        <td>
+
+            @foreach (var ss in Model.Prijemce.Union(new Smlouva.Subjekt[] { Model.Platce }))
             {
-                <tr>
-                    <td>
-                        <h4>Provázané smlouvy</h4>
-                    </td>
-                    <td>
-                        <div>
-                            Nalezli jsme @(Devmasters.Lang.CS.Plural.Get(otherVersion.Length, "jednu provázanou smlouvu", "{0} provázané smlouvy", "{0} provázaných smluv")):
-                            <ul>
-                                @foreach (var os in otherVersion)
-                                {
-                                    <li><a href="/Detail/@os.Id">Verze @os.Id; zveřejněna @os.casZverejneni.ToString("dd.MM.yyyy HH.mm"); @(os.platnyZaznam ? "platná" : "zneplatněna")</a></li>
-                                }
-                            </ul>
-                        </div>
-                        <span class="text-muted small">Toto je seznam smluv, které jsou zneplatněnými verzemi této smlouvy anebo jsou velmi podobné této smlouvě a je vysoká pravděpodobnost, že se jedná zneplatněné verze smlouvy, které nejsou správně označeny jako provázané.</span>
-                    </td>
-                </tr>
-            }
+                if (!string.IsNullOrEmpty(ss.ico) && firmySVazbamiNaPolitiky.SoukromeFirmy.ContainsKey(ss.ico))
+                {
+                    bool first = true;
+                    foreach (var pId in firmySVazbamiNaPolitiky.SoukromeFirmy[ss.ico])
+                    {
+                        Osoba p = OsobaRepo.PolitickyAktivni
+                            .Get()
+                            .Where(m => m.InternalId == pId)
+                            .FirstOrDefault();
 
-            @if (podobneSmlouvy.Length > 0)
-            {
-                <tr>
-                    <td>
-                        Podobné smlouvy
-                    </td>
-                    <td>
-                        <div>
-                            Nalezli jsme @(Devmasters.Lang.CS.Plural.Get(podobneSmlouvy.Length, "jednu podobnou smlouvu", "{0} podobné smlouvy", "{0} podobných smluv")):
-                            <ul>
-                                @foreach (var os in podobneSmlouvy)
-                                {
-                                    <li><a href="/Detail/@os.Id">Zveřejněna @os.casZverejneni.ToString("dd.MM.yyyy HH.mm"); částka @HlidacStatu.Util.RenderData.NicePriceHtml(os.CalculatedPriceWithVATinCZK) s DPH; @(os.platnyZaznam ? "platná" : "zneplatněna")</a></li>
-                                }
-                            </ul>
-                        </div>
-                        <span class="text-muted small">Toto je seznam smluv, které jsou velmi podobné této smlouvě, mají stejné smluvní strany a předmět smlouvy.</span>
-                    </td>
-                </tr>
-            }
-
-
-
-            @if (angPolitiku)
-            {
-                <tr>
-                    <td>
-                        Angažovanost politicky aktivních osob v soukromé firmě u této smlouvy
-                    </td>
-                    <td>
-
-                        @foreach (var ss in Model.Prijemce.Union(new Smlouva.Subjekt[] { Model.Platce }))
+                        if (first)
                         {
-                            if (!string.IsNullOrEmpty(ss.ico) && StaticData.FirmySVazbamiNaPolitiky_nedavne_Cache.Get().SoukromeFirmy.ContainsKey(ss.ico))
-                            {
-                                bool first = true;
-                                foreach (var pId in StaticData.FirmySVazbamiNaPolitiky_nedavne_Cache.Get().SoukromeFirmy[ss.ico])
-                                {
-                                    Osoba p = OsobaRepo.PolitickyAktivni
-                                        .Get()
-                                        .Where(m => m.InternalId == pId)
-                                        .FirstOrDefault();
-
-                                    if (first)
-                                    {
-                                        first = false;
-                                        <h3>@ss.nazev </h3>
-                                        <p>
-                                            <a href="/subjekt/@ss.ico">Další smlouvy firmy</a>
-                                        </p>
-                                    }
-                                    if (p != null)
-                                    {
-                                        <p>
-                                            <strong><a href="/politik/@p.NameId">@p.FullName()</a></strong>
-                                            <div style="padding-left:20px;">
-                                                @Html.RenderVazby(p.VazbyProICO(ss.ico))
-                                            </div>
-                                        </p>
-                                    }
-
-                                }
-                            }
-
+                            first = false;
+                            <h3>@ss.nazev </h3>
+                            <p>
+                                <a href="/subjekt/@ss.ico">Další smlouvy firmy</a>
+                            </p>
                         }
 
-                    </td>
-                </tr>
-            }
-            @if (isSponzorStrany)
-            {
-                <tr>
-                    <td>
-                        Sponzoring politických stran
-                    </td>
-                    <td>
-
-                        @foreach (var subj in Model.Prijemce.Union(new Smlouva.Subjekt[] { Model.Platce }))
+                        if (p != null)
                         {
-                            var firma = Firmy.Get(subj.ico);
-                            if (firma.Valid && firma.IsSponzor() && firma.JsemSoukromaFirma())
-                            {
-                                <div class="card bg-default">
-                                    <div class="card-header">
-                                        <h3 class="card-title">@firma.Jmeno</h3>
-                                    </div>
-                                    <div class="card-body">
-                                        @*@Html.Raw(firma.Description(true, m => m.Type == (int)OsobaEvent.Types.Sponzor))*@
-                                        @Html.Raw(firma.SponzoringToHtml())
-                                    </div>
-                                </div>
-                            }
-
+                            <p>
+                                <strong><a href="/politik/@p.NameId">@p.FullName()</a></strong>
+                            <div style="padding-left:20px;">
+                                @Html.RenderVazby(p.VazbyProICO(ss.ico))
+                            </div>
+                            </p>
                         }
-
-                    </td>
-                </tr>
+                    }
+                }
             }
+
+        </td>
+    </tr>
+}
+@if (isSponzorStrany)
+{
+    <tr>
+        <td>
+            Sponzoring politických stran
+        </td>
+        <td>
+
+            @foreach (var subj in Model.Prijemce.Union(new Smlouva.Subjekt[] { Model.Platce }))
+            {
+                var firma = Firmy.Get(subj.ico);
+                if (firma.Valid && firma.IsSponzor() && firma.JsemSoukromaFirma())
+                {
+                    <div class="card bg-default">
+                        <div class="card-header">
+                            <h3 class="card-title">@firma.Jmeno</h3>
+                        </div>
+                        <div class="card-body">
+                            @*@Html.Raw(firma.Description(true, m => m.Type == (int)OsobaEvent.Types.Sponzor))*@
+                            @Html.Raw(firma.SponzoringToHtml())
+                        </div>
+                    </div>
+                }
+            }
+
+        </td>
+    </tr>
+}
             
