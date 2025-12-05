@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 using HlidacStatu.Connectors;
 
 namespace InsolvencniRejstrik.Fixes
@@ -20,7 +21,7 @@ namespace InsolvencniRejstrik.Fixes
 		private DateTime Start;
 
 
-		public void Execute(string cacheFile)
+		public async Task ExecuteAsync(string cacheFile)
 		{
 			var readingThreshold = 100000;
 			var savingThreshold = 1000;
@@ -50,7 +51,7 @@ namespace InsolvencniRejstrik.Fixes
 				}
 
 				Console.WriteLine("Generovani a ukladani vystupniho json souboru ...");
-				File.WriteAllText("result.json", JsonConvert.SerializeObject(Processings));
+				await File.WriteAllTextAsync("result.json", JsonConvert.SerializeObject(Processings));
 
 				Console.WriteLine("Ukladani ...");
 				Start = DateTime.Now;
@@ -68,8 +69,8 @@ namespace InsolvencniRejstrik.Fixes
 					{
 						using (var stream = File.AppendText("_missing-proceeding.log"))
 						{
-							stream.WriteLine(item.Key);
-							stream.Flush();
+							await stream.WriteLineAsync(item.Key);
+							await stream.FlushAsync();
 						}
 
 						Console.WriteLine();
@@ -85,8 +86,8 @@ namespace InsolvencniRejstrik.Fixes
 						{
 							using (var stream = File.AppendText("_invalid-document.log"))
 							{
-								stream.WriteLine($"{item.Key};{doc.Key}");
-								stream.Flush();
+								await stream.WriteLineAsync($"{item.Key};{doc.Key}");
+								await stream.FlushAsync();
 							}
 
 							Console.WriteLine();
@@ -98,7 +99,7 @@ namespace InsolvencniRejstrik.Fixes
 						document.TypUdalosti = doc.Value;
 					}
 
-					Repository.SetInsolvencyProceeding(rizeni);
+					await Repository.SetInsolvencyProceedingAsync(rizeni);
 				}
 
 				Console.WriteLine("Hotovo");

@@ -13,22 +13,7 @@ namespace HlidacStatu.DetectFaces
     public class FromImage
     {
         static string modelFilename = "haarcascade_frontalface_default.xml";
-        static FromImage()
-        {
-            if (!System.IO.File.Exists(modelFilename))
-            {
-                try
-                {
-                    System.IO.File.WriteAllBytes(modelFilename,
-                        new System.Net.Http.HttpClient().GetByteArrayAsync("https://somedata.hlidacstatu.cz/AppData/haarcascade_frontalface_default.xml").Result
-                    );
-                }
-                catch (Exception)
-                {
-
-                }
-            }
-        }
+        
         public static IEnumerable<string> DetectAndParseFacesIntoFiles(byte[] imageData, int minSize, int marginInPercent)
         {
             List<string> files = new List<string>();

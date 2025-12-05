@@ -8,6 +8,7 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Security.Cryptography;
+using System.Threading.Tasks;
 using static HlidacStatu.Connectors.IO.PrilohaFile;
 using static HlidacStatu.Entities.Smlouva;
 
@@ -16,11 +17,10 @@ namespace HlidacStatu.Repositories
 {
     public partial class SmlouvaRepo
     {
-
-
         private static Connectors.IO.PrilohaFile PrilohaLocalCopy = new Connectors.IO.PrilohaFile();
 
-        public static bool ExistLocalCopyOfPriloha(Smlouva obj, Smlouva.Priloha priloha, RequestedFileType filetype = RequestedFileType.Original)
+        public static bool ExistLocalCopyOfPriloha(Smlouva obj, Smlouva.Priloha priloha,
+            RequestedFileType filetype = RequestedFileType.Original)
         {
             bool weHaveCopy = System.IO.File.Exists(PrilohaLocalCopy.GetFullPath(obj, priloha, filetype));
             return weHaveCopy;
@@ -50,7 +50,7 @@ namespace HlidacStatu.Repositories
                         try
                         {
                             using (URLContent url =
-                                new URLContent(attUrl))
+                                   new URLContent(attUrl))
                             {
                                 url.Tries = 5;
                                 url.IgnoreHttpErrors = true;
@@ -88,13 +88,13 @@ namespace HlidacStatu.Repositories
         }
 
 
-
-
         public static string GetPathFromPrilohaRepository(Smlouva smlouva)
         {
             return PrilohaLocalCopy.GetFullDir(smlouva);
         }
-        public static string GetFullFilePathFromPrilohaRepository(Smlouva smlouva, Priloha priloha, RequestedFileType filetype = RequestedFileType.Original)
+
+        public static string GetFullFilePathFromPrilohaRepository(Smlouva smlouva, Priloha priloha,
+            RequestedFileType filetype = RequestedFileType.Original)
         {
             var fn = PrilohaLocalCopy.GetFullPath(smlouva, priloha);
             if (filetype == RequestedFileType.PDF)
@@ -103,11 +103,8 @@ namespace HlidacStatu.Repositories
         }
 
 
-
-
-
-        public static string GetDownloadedPrilohaPath(Smlouva.Priloha att,
-    Smlouva smlouva, RequestedFileType filetype = RequestedFileType.Original)
+        public static async Task<string> GetDownloadedPrilohaPathAsync(Smlouva.Priloha att,
+            Smlouva smlouva, RequestedFileType filetype = RequestedFileType.Original)
         {
             var ext = ".pdf";
             try
@@ -135,11 +132,11 @@ namespace HlidacStatu.Repositories
                         $"Downloading priloha {att.nazevSouboru} for smlouva {smlouva.Id} from URL {att.odkaz}");
                     byte[] data = null;
                     using (Devmasters.Net.HttpClient.URLContent web =
-                        new Devmasters.Net.HttpClient.URLContent(att.odkaz))
+                           new Devmasters.Net.HttpClient.URLContent(att.odkaz))
                     {
                         web.Timeout = web.Timeout * 10;
                         data = web.GetBinary().Binary;
-                        System.IO.File.WriteAllBytes(localFile, data);
+                        await System.IO.File.WriteAllBytesAsync(localFile, data);
                     }
 
                     _logger.Debug(
@@ -155,19 +152,18 @@ namespace HlidacStatu.Repositories
                             _logger.Debug(
                                 $"Second try: Downloading priloha {att.nazevSouboru} for smlouva {smlouva.Id} from URL {att.odkaz}");
                             using (Devmasters.Net.HttpClient.URLContent web =
-                                new Devmasters.Net.HttpClient.URLContent(att.odkaz))
+                                   new Devmasters.Net.HttpClient.URLContent(att.odkaz))
                             {
                                 web.Tries = 5;
                                 web.IgnoreHttpErrors = true;
                                 web.TimeInMsBetweenTries = 1000;
                                 web.Timeout = web.Timeout * 20;
                                 data = web.GetBinary().Binary;
-                                System.IO.File.WriteAllBytes(localFile, data);
+                                await System.IO.File.WriteAllBytesAsync(localFile, data);
                             }
 
                             _logger.Debug(
                                 $"Second try: Downloaded priloha {att.nazevSouboru} for smlouva {smlouva.Id} from URL {att.odkaz}");
-
                         }
                         else
                             return null;
@@ -189,11 +185,12 @@ namespace HlidacStatu.Repositories
                 {
                     try
                     {
-                        var pdfdata = ConvertPrilohaToPDF.PrilohaToPDFfromFile(System.IO.File.ReadAllBytes(localFile));
+                        var pdfdata =
+                            await ConvertPrilohaToPDF.PrilohaToPDFfromFileAsync(await System.IO.File.ReadAllBytesAsync(localFile));
                         if (pdfdata == null)
                             return localFile;
                         else
-                            System.IO.File.WriteAllBytes($"{localFile}.pdf", pdfdata);
+                            await System.IO.File.WriteAllBytesAsync($"{localFile}.pdf", pdfdata);
 
                         return $"{localFile}.pdf";
                     }
@@ -205,23 +202,20 @@ namespace HlidacStatu.Repositories
                 }
                 else //this is PDF
                     return localFile;
-
             }
 
             return localFile;
         }
 
 
-
-        public static string GetCopyOfDownloadedPrilohaPath(Smlouva.Priloha att,
-    Smlouva smlouva, RequestedFileType filetype = RequestedFileType.Original)
+        public static async Task<string> GetCopyOfDownloadedPrilohaPathAsync(Smlouva.Priloha att,
+            Smlouva smlouva, RequestedFileType filetype = RequestedFileType.Original)
         {
             string tmpFnSystem = null;
             string tmpFn = null;
             try
             {
-
-                var origFile = GetDownloadedPrilohaPath(att, smlouva, filetype);
+                var origFile = await GetDownloadedPrilohaPathAsync(att, smlouva, filetype);
 
                 if (string.IsNullOrEmpty(origFile))
                     return null;
@@ -247,7 +241,8 @@ namespace HlidacStatu.Repositories
             }
             catch (Exception e)
             {
-                _logger.Error(e, "Error in GetCopyOfDownloadedPrilohaPath {smlouvaId} {prilohaHash}", smlouva.Id, att.UniqueHash());
+                _logger.Error(e, "Error in GetCopyOfDownloadedPrilohaPath {smlouvaId} {prilohaHash}", smlouva.Id,
+                    att.UniqueHash());
                 throw;
             }
             finally
@@ -260,8 +255,7 @@ namespace HlidacStatu.Repositories
         }
 
 
-
-        public static void UpdateStatistics(this Priloha p, Smlouva s)
+        public static async Task UpdateStatisticsAsync(this Priloha p, Smlouva s)
         {
             p.Lenght = p.PlainTextContent?.Length ?? 0;
             p.WordCount = Devmasters.TextUtil.CountWords(p.PlainTextContent);
@@ -280,8 +274,8 @@ namespace HlidacStatu.Repositories
                 else
                 {
                     var fnType = HlidacStatu.Util.FileMime.GetTopFileType(
-                        GetDownloadedPrilohaPath(p, s, RequestedFileType.Original)
-                        );
+                        await GetDownloadedPrilohaPathAsync(p, s, RequestedFileType.Original)
+                    );
                     if (fnType != null)
                         contentType = fnType.MimeType;
                     else
@@ -292,24 +286,24 @@ namespace HlidacStatu.Repositories
                                 || p.nazevSouboru?.EndsWith(".csv") == true
                                 || p.nazevSouboru?.EndsWith(".tab") == true
                             )
-                            )//probably text file
+                           ) //probably text file
                         {
                             contentType = "text/plain";
                         }
+
                         if (string.IsNullOrEmpty(contentType))
                         {
-                            var tikaRes = AI.Doc.GetText(GetDownloadedPrilohaPath(p, s, RequestedFileType.Original));
+                            var tikaRes =
+                                AI.Doc.GetText(await GetDownloadedPrilohaPathAsync(p, s, RequestedFileType.Original));
 
                             if (tikaRes != null)
                                 contentType = tikaRes.ContentType;
-
                         }
                     }
                 }
+
                 p.ContentType = contentType;
             }
-
-
         }
     }
 }

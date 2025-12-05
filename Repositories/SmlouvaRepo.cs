@@ -19,9 +19,9 @@ using Newtonsoft.Json.Linq;
 using Newtonsoft.Json;
 using HlidacStatu.MLUtil.Splitter;
 using System.Text;
-using HlidacStatu.AI.LLM.Clients.Options;
 using HlidacStatu.Entities.AI;
 using HlidacStatu.Repositories.Cache;
+using NuGet.Common;
 
 
 namespace HlidacStatu.Repositories
@@ -209,9 +209,9 @@ namespace HlidacStatu.Repositories
 
         private static async Task PrepareBeforeSaveAsync(Smlouva smlouva, bool updateLastUpdateValue = true)
         {
-            smlouva.SVazbouNaPolitiky = smlouva.JeSmlouva_S_VazbouNaPolitiky(Relation.AktualnostType.Libovolny);
-            smlouva.SVazbouNaPolitikyNedavne = smlouva.JeSmlouva_S_VazbouNaPolitiky(Relation.AktualnostType.Nedavny);
-            smlouva.SVazbouNaPolitikyAktualni = smlouva.JeSmlouva_S_VazbouNaPolitiky(Relation.AktualnostType.Aktualni);
+            smlouva.SVazbouNaPolitiky = await smlouva.JeSmlouva_S_VazbouNaPolitikyAsync(Relation.AktualnostType.Libovolny);
+            smlouva.SVazbouNaPolitikyNedavne = await smlouva.JeSmlouva_S_VazbouNaPolitikyAsync(Relation.AktualnostType.Nedavny);
+            smlouva.SVazbouNaPolitikyAktualni = await smlouva.JeSmlouva_S_VazbouNaPolitikyAsync(Relation.AktualnostType.Aktualni);
 
             if (updateLastUpdateValue)
                 smlouva.LastUpdate = DateTime.Now;
@@ -256,9 +256,19 @@ namespace HlidacStatu.Repositories
             if (firmy.Any(f => f.IsSponzorBefore(smlouva.datumUzavreni)))
                 smlouva.Hint.SmlouvaSPolitickyAngazovanymSubjektem =
                     (int)HintSmlouva.PolitickaAngazovanostTyp.PrimoSubjekt;
-            else if (firmy.Any(f => f.MaVazbyNaPolitikyPred(smlouva.datumUzavreni)))
-                smlouva.Hint.SmlouvaSPolitickyAngazovanymSubjektem =
-                    (int)HintSmlouva.PolitickaAngazovanostTyp.AngazovanyMajitel;
+            else
+            {
+                foreach (var firma in firmy)
+                {
+                    if (await firma.MaVazbyNaPolitikyPredAsync(smlouva.datumUzavreni))
+                    {
+                        smlouva.Hint.SmlouvaSPolitickyAngazovanymSubjektem =
+                            (int)HintSmlouva.PolitickaAngazovanostTyp.AngazovanyMajitel;
+                        break;
+                    }
+                    
+                }
+            }
 
             if (fPlatce.Valid && fPlatce.PatrimStatu())
             {
@@ -343,7 +353,7 @@ namespace HlidacStatu.Repositories
             if (smlouva.Prilohy != null)
             {
                 foreach (var p in smlouva.Prilohy)
-                    p.UpdateStatistics(smlouva);
+                    await p.UpdateStatisticsAsync(smlouva);
             }
 
             if (ClassificationOverrideRepo.TryGetOverridenClassification(smlouva.Id, out var classificationOverride))
@@ -368,13 +378,13 @@ namespace HlidacStatu.Repositories
 
 
 
-        public static bool JeSmlouva_S_VazbouNaPolitiky(this Smlouva smlouva, Relation.AktualnostType aktualnost)
+        public static async Task<bool> JeSmlouva_S_VazbouNaPolitikyAsync(this Smlouva smlouva, Relation.AktualnostType aktualnost)
         {
-            var icos = ico_s_VazbouPolitik;
+            var icos = await ico_s_VazbouPolitikAsync;
             if (aktualnost == Relation.AktualnostType.Nedavny)
-                icos = ico_s_VazbouPolitikNedavne;
+                icos = await ico_s_VazbouPolitikNedavneAsync;
             if (aktualnost == Relation.AktualnostType.Aktualni)
-                icos = ico_s_VazbouPolitikAktualni;
+                icos = await ico_s_VazbouPolitikAktualniAsync;
 
             Firma f = null;
             if (smlouva.platnyZaznam)
@@ -401,52 +411,51 @@ namespace HlidacStatu.Repositories
             return false;
         }
 
-        static HashSet<string> ico_s_VazbouPolitik = new HashSet<string>(
-            StaticData.FirmySVazbamiNaPolitiky_vsechny_Cache.Get()?
-                .SoukromeFirmy?
-                .Select(m => m.Key)?
-                .Union(
-                    StaticData.SponzorujiciFirmy_Vsechny?
-                        .Get()?
-                        .Select(m => m.IcoDarce)
-                        ?? new string[] { }
-                )?
+        private static readonly AsyncLazy<HashSet<string>> ico_s_VazbouPolitikAsync = 
+            new(LoadIcoSVazbouPolitikVsechnyAsync);
+        
+        private static async Task<HashSet<string>> LoadIcoSVazbouPolitikVsechnyAsync()
+        {
+            var firmy = await MaterializedViewsCache.FirmySVazbamiNaPolitiky_VsechnyAsync();
+            var sponzori = StaticData.SponzorujiciFirmy_Vsechny?.Get();
+
+            return new HashSet<string>(
+                (firmy?.SoukromeFirmy?.Select(m => m.Key) ?? Enumerable.Empty<string>())
+                .Union(sponzori?.Select(m => m.IcoDarce) ?? Enumerable.Empty<string>())
                 .Distinct()
-            ?? new string[] { }
-        );
+            );
+        }
+        
+        private static readonly AsyncLazy<HashSet<string>> ico_s_VazbouPolitikAktualniAsync =
+            new(LoadIcoSVazbouPolitikAktualniAsync);
 
-        static HashSet<string> ico_s_VazbouPolitikAktualni = new HashSet<string>(
-            StaticData.FirmySVazbamiNaPolitiky_aktualni_Cache.Get()
-                .SoukromeFirmy?
-                .Select(m => m.Key)?
-                .Union(
-                    StaticData.SponzorujiciFirmy_Nedavne?
-                        .Get()?
-                        .Select(m => m.IcoDarce)
-                        ?? new string[] { }
-                )?
+        private static async Task<HashSet<string>> LoadIcoSVazbouPolitikAktualniAsync()
+        {
+            var firmy = await MaterializedViewsCache.FirmySVazbamiNaPolitiky_AktualniAsync();
+            var sponzori = StaticData.SponzorujiciFirmy_Nedavne?.Get();
+
+            return new HashSet<string>(
+                (firmy?.SoukromeFirmy?.Select(m => m.Key) ?? Enumerable.Empty<string>())
+                .Union(sponzori?.Select(m => m.IcoDarce) ?? Enumerable.Empty<string>())
                 .Distinct()
-            ?? new string[] { }
+            );
+        }
 
-        );
+        private static readonly AsyncLazy<HashSet<string>> ico_s_VazbouPolitikNedavneAsync =
+            new(LoadIcoSVazbouPolitikNedavneAsync);
 
-        static HashSet<string> ico_s_VazbouPolitikNedavne = new HashSet<string>(
-            StaticData.FirmySVazbamiNaPolitiky_nedavne_Cache.Get()
-                .SoukromeFirmy?
-                .Select(m => m.Key)?
-                .Union(
-                    StaticData.SponzorujiciFirmy_Nedavne?
-                        .Get()?
-                        .Select(m => m.IcoDarce)
-                        ?? new string[] { }
-                )?
+        private static async Task<HashSet<string>> LoadIcoSVazbouPolitikNedavneAsync()
+        {
+            var firmy = await MaterializedViewsCache.FirmySVazbamiNaPolitiky_NedavneAsync();
+            var sponzori = StaticData.SponzorujiciFirmy_Nedavne?.Get();
+
+            return new HashSet<string>(
+                (firmy?.SoukromeFirmy?.Select(m => m.Key) ?? Enumerable.Empty<string>())
+                .Union(sponzori?.Select(m => m.IcoDarce) ?? Enumerable.Empty<string>())
                 .Distinct()
-            ?? new string[] { }
+            );
+        }
 
-        );
-
-        //public static string SmlouvaProcessingQueueName = "smlouvy2Process";
-        //public static string SmlouvaProcessingQueueNameOnDemand = "smlouvy2ProcessOnDemand";
         public static bool AddToProcessingQueue(this Smlouva smlouva,
                 bool forceOCR = false,
                 bool forceClassification = false,
@@ -778,7 +787,7 @@ namespace HlidacStatu.Repositories
                 searchFunc, (hit, param) =>
                 {
                     ids.Add(hit.Id);
-                    return new ActionOutputData() { CancelRunning = false, Log = null };
+                    return Task.FromResult(new ActionOutputData() { CancelRunning = false, Log = null });
                 }, null, outputWriter, progressWriter, false, blockSize: 100);
 
             return ids;

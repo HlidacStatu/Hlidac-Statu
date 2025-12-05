@@ -3,6 +3,7 @@ using HlidacStatu.Connectors;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using HlidacStatu.Repositories.Cache;
 
 namespace HlidacStatu.Web.Framework
 {
@@ -25,7 +26,7 @@ namespace HlidacStatu.Web.Framework
                 if (AllCrawlers == null)
                     AllCrawlers = new HashSet<string>(
                         Newtonsoft.Json.JsonConvert.
-                            DeserializeObject<Crawler[]>(Repositories.StaticData.CrawlerUserAgentsCache.Get())
+                            DeserializeObject<Crawler[]>(MaterializedViewsCache.GetCrawlerUserAgents())
                             .SelectMany(m => m.instances)
                             .Distinct()
                     );

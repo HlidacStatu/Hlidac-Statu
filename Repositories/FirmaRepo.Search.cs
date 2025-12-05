@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using HlidacStatu.Connectors;
+using NuGet.Common;
 
 namespace HlidacStatu.Repositories
 {
@@ -16,8 +17,8 @@ namespace HlidacStatu.Repositories
     {
         public static class Searching
         {
-            private static readonly Lazy<Task<Dictionary<int, string[]>>> AllValuesLazy = new(GetAllValuesAsync);
-            public static async Task<Dictionary<int, string[]>> AllValuesAsync() => await AllValuesLazy.Value;
+            private static readonly AsyncLazy<Dictionary<int, string[]>> AllValuesLazy = new(GetAllValuesAsync);
+            public static async Task<Dictionary<int, string[]>> AllValuesAsync() => await AllValuesLazy;
 
             private static async Task<Dictionary<int, string[]>> GetAllValuesAsync()
             {

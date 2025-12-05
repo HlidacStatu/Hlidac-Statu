@@ -4,10 +4,10 @@
     ViewBag.Title = "Hlídač smluv";
     ViewBag.SubTitle = "Registr smluv přehledně. Větší veřejná kontrola obchodování státu a místní správy, politiků a firem.";
     ViewBag.HideAd = true;
-
-    double platnych = StaticData.BasicStatisticData.Get()[0];
-    double neplatnych = StaticData.BasicStatisticData.Get()[1];
-    double celkemKc = StaticData.BasicStatisticData.Get()[2];
+    var basicStatisticData = await StaticData.GetBasicStatisticDataAsync();
+    double platnych = basicStatisticData[0];
+    double neplatnych = basicStatisticData[1];
+    double celkemKc = basicStatisticData[2];
 
 }
 

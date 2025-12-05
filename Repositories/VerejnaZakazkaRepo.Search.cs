@@ -491,35 +491,9 @@ namespace HlidacStatu.Repositories
 
                 return s;
             }
+            
 
-            public static Devmasters.Cache.LocalMemory.Manager<VerejnaZakazkaSearchData, string>
-                cachedSearches =
-                    new("VZsearch", 
-                        s => CachedFuncSimpleSearchAsync(s).ConfigureAwait(false).GetAwaiter().GetResult(),
-                        TimeSpan.FromHours(24));
-
-            public static VerejnaZakazkaSearchData CachedSimpleSearch(TimeSpan expiration,
-                VerejnaZakazkaSearchData search,
-                bool logError = true, bool fixQuery = true, ElasticClient client = null, bool exactNumOfResults = false)
-            {
-                FullSearchQuery q = new FullSearchQuery()
-                {
-                    search = search,
-                    logError = logError,
-                    fixQuery = fixQuery,
-                    client = client
-                };
-                return cachedSearches.Get(Newtonsoft.Json.JsonConvert.SerializeObject(q), expiration);
-            }
-
-            private static Task<VerejnaZakazkaSearchData> CachedFuncSimpleSearchAsync(string jsonFullSearchQuery)
-            {
-                var query = Newtonsoft.Json.JsonConvert.DeserializeObject<FullSearchQuery>(jsonFullSearchQuery);
-                return SimpleSearchAsync(query.search, query.anyAggregation, query.logError, query.fixQuery,
-                    query.client);
-            }
-
-            private class FullSearchQuery
+            public class FullSearchQuery
             {
                 public VerejnaZakazkaSearchData search;
                 public AggregationContainerDescriptor<VerejnaZakazka> anyAggregation = null;
@@ -562,7 +536,7 @@ namespace HlidacStatu.Repositories
                     searchFunc, (hit, param) =>
                     {
                         ids2Process.Add(hit.Id);
-                        return new Devmasters.Batch.ActionOutputData() { CancelRunning = false, Log = null };
+                        return Task.FromResult(new Devmasters.Batch.ActionOutputData() { CancelRunning = false, Log = null });
                     }, null, null, null, false, blockSize: 100, prefix: "ocr VZ ");
                 
                 return ids2Process;

@@ -12,8 +12,8 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using HlidacStatu.Connectors;
+using HlidacStatu.Repositories.Cache;
 using Serilog;
-using HlidacStatu.Entities.Facts;
 
 namespace HlidacStatu.Extensions
 {
@@ -21,7 +21,7 @@ namespace HlidacStatu.Extensions
     {
         private static readonly ILogger _logger = Log.ForContext(typeof(SmlouvaExtension));
         
-        public static InfoFact[] InfoFacts(this Smlouva smlouva)
+        public static async Task<InfoFact[]> InfoFactsAsync(this Smlouva smlouva)
         {
             List<InfoFact> f = new List<InfoFact>();
 
@@ -119,10 +119,10 @@ namespace HlidacStatu.Extensions
             //politici
             foreach (var ss in smlouva.Prijemce)
             {
-                if (!string.IsNullOrEmpty(ss.ico) && StaticData.FirmySVazbamiNaPolitiky_nedavne_Cache.Get()?
-                    .SoukromeFirmy?.ContainsKey(ss.ico)==true)
+                var firmySVazbamiNaPolitiky = await MaterializedViewsCache.FirmySVazbamiNaPolitiky_NedavneAsync();
+                if (!string.IsNullOrEmpty(ss.ico) && firmySVazbamiNaPolitiky?.SoukromeFirmy?.ContainsKey(ss.ico)==true)
                 {
-                    var politici = StaticData.FirmySVazbamiNaPolitiky_nedavne_Cache.Get().SoukromeFirmy[ss.ico];
+                    var politici = firmySVazbamiNaPolitiky.SoukromeFirmy[ss.ico];
                     if (politici.Count > 0)
                     {
                         var sPolitici = Osoby.GetById.Get(politici[0]).FullNameWithYear();
@@ -230,10 +230,10 @@ namespace HlidacStatu.Extensions
             return podobneSmlouvy;
         }
 
-        public static string SocialInfoBody(this Smlouva smlouva)
+        public static async Task<string> SocialInfoBodyAsync(this Smlouva smlouva)
         {
             return "<ul>" +
-                   smlouva.InfoFacts().RenderFacts(4, true, true, "", "<li>{0}</li>", true)
+                   (await smlouva.InfoFactsAsync()).RenderFacts(4, true, true, "", "<li>{0}</li>", true)
                    + "</ul>";
         }
 

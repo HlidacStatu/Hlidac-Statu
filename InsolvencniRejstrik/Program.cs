@@ -2,6 +2,7 @@
 using NDesk.Options;
 using System;
 using System.IO;
+using System.Threading.Tasks;
 using Newtonsoft.Json;
 using InsolvencniRejstrik.Fixes;
 using HlidacStatu.Entities.Insolvence;
@@ -11,7 +12,7 @@ using HlidacStatu.Entities.Insolvence;
 {
 	class Program
 	{
-		static void Main(string[] args)
+		static async Task Main(string[] args)
 		{
             var cfg = HlidacConfigExtensions.InitializeConsoleConfiguration(args, "downloader");
             Devmasters.Config.Init(cfg);
@@ -105,7 +106,7 @@ using HlidacStatu.Entities.Insolvence;
 				}
 
 				var connector = new IsirWsConnector(noCache, toEventId, stats, repository, eventsRepository, wsClient);
-				connector.Handle();
+				await connector.HandleAsync();
 			}
 			else if (fromFiles)
 			{
@@ -121,7 +122,7 @@ using HlidacStatu.Entities.Insolvence;
 					foreach (var file in Directory.EnumerateFiles(dir))
 					{
 						var rizeni = JsonConvert.DeserializeObject<Rizeni>(File.ReadAllText(file));
-						repository.SetInsolvencyProceeding(rizeni);
+						await repository.SetInsolvencyProceedingAsync(rizeni);
 						if (++count % 100 == 0)
 						{
 							Console.CursorTop = Console.CursorTop - 1;
@@ -144,22 +145,22 @@ using HlidacStatu.Entities.Insolvence;
             }
             else if (onlyEventTypeFix)
 			{
-				new AddMissingEventTypes().Execute(cacheFile);
+				await new AddMissingEventTypes().ExecuteAsync(cacheFile);
 			}
 			else if (onlyMissingDocumentsFix)
 			{
 				var stats = new Stats();
 				var repository = new Repository(stats);
 
-				new MissingDocuments(repository).Execute(cacheFile);
+				await new MissingDocuments(repository).ExecuteAsync(cacheFile);
 			}
 			else if (onlyCacheFix)
 			{
-				new FillInCache(new WsClientCache(new Lazy<IWsClient>(() => new WsClient()), cacheFile)).Execute();
+				await new FillInCache(new WsClientCache(new Lazy<IWsClient>(() => new WsClient()), cacheFile)).ExecuteAsync();
 			}
 			else if (personCreatedTimeFix)
 			{
-				new PersonCreatedTimeFix().Execute(cacheFile);
+				await new PersonCreatedTimeFix().ExecuteAsync(cacheFile);
 			}
 			else if (eventTypeToStatus)
 			{

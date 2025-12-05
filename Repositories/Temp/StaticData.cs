@@ -1,9 +1,7 @@
 ﻿using HlidacStatu.DS.Graphs;
 using HlidacStatu.Entities;
 using HlidacStatu.Entities.OrgStrukturyStatu;
-using HlidacStatu.Extensions;
 using HlidacStatu.Repositories.Analysis;
-using HlidacStatu.Repositories.Statistics;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
 using System;
@@ -11,9 +9,13 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.Serialization;
-using static HlidacStatu.Entities.Osoba.Statistics;
+using HlidacStatu.Caching;
+using HlidacStatu.Entities.Facts;
+using HlidacStatu.Extensions;
+using ZiggyCreatures.Caching.Fusion;
 
 namespace HlidacStatu.Repositories
 {
@@ -21,90 +23,68 @@ namespace HlidacStatu.Repositories
     {
         private static readonly ILogger _logger = Log.ForContext(typeof(StaticData));
         
+        private static readonly IFusionCache _memoryCache =
+            HlidacStatu.Caching.CacheFactory.CreateNew(CacheFactory.CacheType.L1Default, nameof(StaticData));
+
+        public static ValueTask<List<double>> GetBasicStatisticDataAsync() =>
+            _memoryCache.GetOrSetAsync($"_BasicStaticData", async _ =>
+                {
+                    List<double> pol = new List<double>();
+                    try
+                    {
+                        var res = await SmlouvaRepo.Searching.RawSearchAsync("", 1, 0, platnyZaznam: true,
+                            anyAggregation:
+                            new Nest.AggregationContainerDescriptor<Smlouva>()
+                                .Sum("totalPrice", m => m
+                                    .Field(ff => ff.CalculatedPriceWithVATinCZK)
+                                ), exactNumOfResults: true
+                        );
+                        var resNepl = await SmlouvaRepo.Searching.RawSearchAsync("", 1, 0, platnyZaznam: false,
+                            anyAggregation:
+                            new Nest.AggregationContainerDescriptor<Smlouva>()
+                                .Sum("totalPrice", m => m
+                                    .Field(ff => ff.CalculatedPriceWithVATinCZK)
+                                ), exactNumOfResults: true
+                        );
+
+                        long platnych = res.Total;
+                        long neplatnych = resNepl.Total;
+                        double celkemKc = 0;
+                        celkemKc = ((Nest.ValueAggregate)res.Aggregations["totalPrice"]).Value.Value;
+
+                        pol.Add(platnych);
+                        pol.Add(neplatnych);
+                        pol.Add(celkemKc);
+                        return pol;
+                    }
+                    catch (Exception)
+                    {
+                        pol.Add(0);
+                        pol.Add(0);
+                        pol.Add(0);
+                        return pol;
+                    }
+                },
+                options => options.ModifyEntryOptionsDuration(TimeSpan.FromHours(6)));
+
         static bool initialized = false;
-        
+
         public static string Dumps_Path = null;
 
         public static Devmasters.Cache.AWS_S3.AutoUpdatebleCache<OrganizacniStrukturyUradu>
             OrganizacniStrukturyUraduCache = null;
-        
-        public static Devmasters.Cache.AWS_S3.Cache<IEnumerable<AnalysisCalculation.IcoSmlouvaMinMax>>
-            FirmyCasovePodezreleZalozene = null;
-
-        public static Devmasters.Cache.AWS_S3.Cache<AnalysisCalculation.VazbyFiremNaPolitiky>
-            FirmySVazbamiNaPolitiky_aktualni_Cache = null;
-
-        public static Devmasters.Cache.AWS_S3.Cache<AnalysisCalculation.VazbyFiremNaPolitiky>
-            FirmySVazbamiNaPolitiky_nedavne_Cache = null;
-
-        public static Devmasters.Cache.AWS_S3.Cache<AnalysisCalculation.VazbyFiremNaPolitiky>
-            FirmySVazbamiNaPolitiky_vsechny_Cache = null;
-
-        public static Devmasters.Cache.AWS_S3.Cache<AnalysisCalculation.VazbyFiremNaUradyStat>
-            UradyObchodujiciSFirmami_s_vazbouNaPolitiky_aktualni_Cache = null;
-
-        public static Devmasters.Cache.AWS_S3.Cache<AnalysisCalculation.VazbyFiremNaUradyStat>
-            UradyObchodujiciSFirmami_s_vazbouNaPolitiky_nedavne_Cache = null;
-
-        public static Devmasters.Cache.AWS_S3.Cache<AnalysisCalculation.VazbyFiremNaUradyStat>
-            UradyObchodujiciSFirmami_s_vazbouNaPolitiky_vsechny_Cache = null;
-
-        public static Devmasters.Cache.AWS_S3.Cache<AnalysisCalculation.VazbyFiremNaUradyStat>
-            UradyObchodujiciSNespolehlivymiPlatciDPH_Cache = null;
-
-        public static Devmasters.Cache.AWS_S3.Cache<AnalysisCalculation.VazbyFiremNaUradyStat>
-            NespolehlivyPlatciDPH_obchodySurady_Cache = null;
 
         public static Devmasters.Cache.LocalMemory.AutoUpdatedCache<List<Sponzoring>> SponzorujiciFirmy_Vsechny = null;
         public static Devmasters.Cache.LocalMemory.AutoUpdatedCache<List<Sponzoring>> SponzorujiciFirmy_Nedavne = null;
 
-        public static Devmasters.Cache.LocalMemory.Cache<List<double>> BasicStatisticData = null;
-
-        //L1 - 10 let
-        //L2 - 10 let
-        public static Devmasters.Cache.AWS_S3.Cache<string> CzechDictCache =
-            new Devmasters.Cache.AWS_S3.Cache<string>(
-                new string[] { Devmasters.Config.GetWebConfigValue("Minio.Cache.Endpoint") },
-                Devmasters.Config.GetWebConfigValue("Minio.Cache.Bucket"),
-                Devmasters.Config.GetWebConfigValue("Minio.Cache.AccessKey"),
-                Devmasters.Config.GetWebConfigValue("Minio.Cache.SecretKey"),
-                TimeSpan.Zero, "Czech.3-2-5.dic.txt", (obj) =>
-                {
-                    string s = Devmasters.Net.HttpClient.Simple
-                        .GetAsync("https://somedata.hlidacstatu.cz/appdata/Czech.3-2-5.dic.txt").Result;
-                    return s;
-                }, null);
-
-        //L1 - 10 let
-        //L2 - 10 let
-        public static Devmasters.Cache.AWS_S3.Cache<string> CrawlerUserAgentsCache =
-            new Devmasters.Cache.AWS_S3.Cache<string>(
-                new string[] { Devmasters.Config.GetWebConfigValue("Minio.Cache.Endpoint") },
-                Devmasters.Config.GetWebConfigValue("Minio.Cache.Bucket"),
-                Devmasters.Config.GetWebConfigValue("Minio.Cache.AccessKey"),
-                Devmasters.Config.GetWebConfigValue("Minio.Cache.SecretKey"),
-                TimeSpan.Zero, "crawler-user-agents.json",
-                (obj) =>
-                {
-                    return Devmasters.Net.HttpClient.Simple
-                        .GetAsync("https://somedata.hlidacstatu.cz/appdata/crawler-user-agents.json").Result;
-                }, null);
-
-
-        
-
-
-        public static Dictionary<string, TemplatedQuery> Afery = new Dictionary<string, TemplatedQuery>();
-
         public static Devmasters.Cache.LocalMemory.Cache<Dictionary<string, NespolehlivyPlatceDPH>>
             NespolehlivyPlatciDPH = null;
 
-        //public static SingletonManagerWithSetup<Data.External.TwitterPublisher, Tweetinvi.Models.TwitterCredentials> TweetingManager = null;
-
         public static Devmasters.Cache.LocalMemory.Cache<Darujme.Stats> DarujmeStats = null;
-
         public static Devmasters.Cache.LocalMemory.Cache<Dictionary<string, string>> ZkratkyStran_cache = null;
-        
+
+        public static Dictionary<string, TemplatedQuery> Afery = new Dictionary<string, TemplatedQuery>();
+
         static StaticData()
         {
             Init();
@@ -160,7 +140,7 @@ namespace HlidacStatu.Repositories
             _logger.Information("Static data - Insolvence_firem_politiku ");
             swl.StopPreviousAndStartNextLap(Util.DebugUtil.GetClassAndMethodName(MethodBase.GetCurrentMethod()) +
                                             " var Insolvence_firem_politiku");
-            
+
 
             _logger.Information("Static data - SponzorujiciFirmy_Vsechny ");
 
@@ -250,190 +230,10 @@ namespace HlidacStatu.Repositories
                 }
             );
 
-            _logger.Information("Static data - BasicStatisticData ");
-            swl.StopPreviousAndStartNextLap(Util.DebugUtil.GetClassAndMethodName(MethodBase.GetCurrentMethod()) +
-                                            " var BasicStatisticData");
-            BasicStatisticData = new Devmasters.Cache.LocalMemory.Cache<List<double>>(
-                TimeSpan.FromHours(6), (obj) =>
-                {
-                    List<double> pol = new List<double>();
-                    try
-                    {
-                        var res = SmlouvaRepo.Searching.RawSearchAsync("", 1, 0, platnyZaznam: true, anyAggregation:
-                            new Nest.AggregationContainerDescriptor<Smlouva>()
-                                .Sum("totalPrice", m => m
-                                    .Field(ff => ff.CalculatedPriceWithVATinCZK)
-                                ), exactNumOfResults: true
-                        ).ConfigureAwait(false).GetAwaiter().GetResult();
-                        var resNepl = SmlouvaRepo.Searching.RawSearchAsync("", 1, 0, platnyZaznam: false,
-                            anyAggregation:
-                            new Nest.AggregationContainerDescriptor<Smlouva>()
-                                .Sum("totalPrice", m => m
-                                    .Field(ff => ff.CalculatedPriceWithVATinCZK)
-                                ), exactNumOfResults: true
-                        ).ConfigureAwait(false).GetAwaiter().GetResult();
-
-                        long platnych = res.Total;
-                        long neplatnych = resNepl.Total;
-                        ;
-                        double celkemKc = 0;
-
-                        celkemKc = ((Nest.ValueAggregate)res.Aggregations["totalPrice"]).Value.Value;
-
-                        pol.Add(platnych);
-                        pol.Add(neplatnych);
-                        pol.Add(celkemKc);
-                        return pol;
-                    }
-                    catch (Exception)
-                    {
-                        pol.Add(0);
-                        pol.Add(0);
-                        pol.Add(0);
-                        return pol;
-                    }
-                }
-            );
-
-
-            _logger.Information("Static data - FirmySVazbamiNaPolitiky_*");
-            //L1 - 12 h
-            //L2 - 10 let
-            FirmySVazbamiNaPolitiky_aktualni_Cache =
-                new Devmasters.Cache.AWS_S3.Cache<AnalysisCalculation.VazbyFiremNaPolitiky>
-                (new string[] { Devmasters.Config.GetWebConfigValue("Minio.Cache.Endpoint") },
-                    Devmasters.Config.GetWebConfigValue("Minio.Cache.Bucket"),
-                    Devmasters.Config.GetWebConfigValue("Minio.Cache.AccessKey"),
-                    Devmasters.Config.GetWebConfigValue("Minio.Cache.SecretKey"), TimeSpan.Zero,
-                    "FirmySVazbamiNaPolitiky_Aktualni",
-                    (o) => { return new AnalysisCalculation.VazbyFiremNaPolitiky(); });
-
-            //L1 - 12 h
-            //L2 - 10 let
-            FirmySVazbamiNaPolitiky_nedavne_Cache =
-                new Devmasters.Cache.AWS_S3.Cache<AnalysisCalculation.VazbyFiremNaPolitiky>
-                (new string[] { Devmasters.Config.GetWebConfigValue("Minio.Cache.Endpoint") },
-                    Devmasters.Config.GetWebConfigValue("Minio.Cache.Bucket"),
-                    Devmasters.Config.GetWebConfigValue("Minio.Cache.AccessKey"),
-                    Devmasters.Config.GetWebConfigValue("Minio.Cache.SecretKey"), TimeSpan.Zero,
-                    "FirmySVazbamiNaPolitiky_Nedavne",
-                    (o) => { return new AnalysisCalculation.VazbyFiremNaPolitiky(); });
-
-            //L1 - 12 h
-            //L2 - 10 let
-            FirmySVazbamiNaPolitiky_vsechny_Cache =
-                new Devmasters.Cache.AWS_S3.Cache<AnalysisCalculation.VazbyFiremNaPolitiky>
-                (
-                    new string[] { Devmasters.Config.GetWebConfigValue("Minio.Cache.Endpoint") },
-                    Devmasters.Config.GetWebConfigValue("Minio.Cache.Bucket"),
-                    Devmasters.Config.GetWebConfigValue("Minio.Cache.AccessKey"),
-                    Devmasters.Config.GetWebConfigValue("Minio.Cache.SecretKey"), TimeSpan.Zero,
-                    "FirmySVazbamiNaPolitiky_Vsechny",
-                    (o) => { return new AnalysisCalculation.VazbyFiremNaPolitiky(); });
-
-
-            //L1 - 12 h
-            //L2 - 10 let
-            FirmyCasovePodezreleZalozene =
-                new Devmasters.Cache.AWS_S3.Cache<IEnumerable<AnalysisCalculation.IcoSmlouvaMinMax>>
-                (new string[] { Devmasters.Config.GetWebConfigValue("Minio.Cache.Endpoint") },
-                    Devmasters.Config.GetWebConfigValue("Minio.Cache.Bucket"),
-                    Devmasters.Config.GetWebConfigValue("Minio.Cache.AccessKey"),
-                    Devmasters.Config.GetWebConfigValue("Minio.Cache.SecretKey"), TimeSpan.Zero,
-                    "FirmyCasovePodezreleZalozene",
-                    (o) =>
-                    {
-                        return AnalysisCalculation.GetFirmyCasovePodezreleZalozeneAsync()
-                            .ConfigureAwait(false).GetAwaiter().GetResult();
-                    });
-
             //migrace: tohle by mělo jít odsud do Repo cache
             ZkratkyStran_cache = new Devmasters.Cache.LocalMemory.Cache<Dictionary<string, string>>
             (TimeSpan.FromHours(24), "ZkratkyStran",
                 (o) => { return ZkratkaStranyRepo.ZkratkyVsechStran(); });
-
-
-            _logger.Information("Static data - UradyObchodujiciSFirmami_s_vazbouNaPolitiky_*");
-            //L1 - 12 h
-            //L2 - 10 let
-            UradyObchodujiciSFirmami_s_vazbouNaPolitiky_aktualni_Cache =
-                new Devmasters.Cache.AWS_S3.Cache<AnalysisCalculation.VazbyFiremNaUradyStat>
-                (new string[] { Devmasters.Config.GetWebConfigValue("Minio.Cache.Endpoint") },
-                    Devmasters.Config.GetWebConfigValue("Minio.Cache.Bucket"),
-                    Devmasters.Config.GetWebConfigValue("Minio.Cache.AccessKey"),
-                    Devmasters.Config.GetWebConfigValue("Minio.Cache.SecretKey"), TimeSpan.Zero,
-                    "UradyObchodujiciSFirmami_s_vazbouNaPolitiky_aktualni",
-                    (o) =>
-                    {
-                        return AnalysisCalculation
-                            .UradyObchodujiciSFirmami_s_vazbouNaPolitikyAsync(Relation.AktualnostType.Aktualni, true)
-                            .ConfigureAwait(false).GetAwaiter().GetResult();
-                    }
-                );
-
-            //L1 - 12 h
-            //L2 - 10 let
-            UradyObchodujiciSFirmami_s_vazbouNaPolitiky_nedavne_Cache =
-                new Devmasters.Cache.AWS_S3.Cache<AnalysisCalculation.VazbyFiremNaUradyStat>
-                (new string[] { Devmasters.Config.GetWebConfigValue("Minio.Cache.Endpoint") },
-                    Devmasters.Config.GetWebConfigValue("Minio.Cache.Bucket"),
-                    Devmasters.Config.GetWebConfigValue("Minio.Cache.AccessKey"),
-                    Devmasters.Config.GetWebConfigValue("Minio.Cache.SecretKey"), TimeSpan.Zero,
-                    "UradyObchodujiciSFirmami_s_vazbouNaPolitiky_nedavne",
-                    (o) =>
-                    {
-                        return AnalysisCalculation
-                            .UradyObchodujiciSFirmami_s_vazbouNaPolitikyAsync(Relation.AktualnostType.Nedavny, true)
-                            .ConfigureAwait(false).GetAwaiter().GetResult();
-                    }
-                );
-
-            //L1 - 12 h
-            //L2 - 10 let
-            UradyObchodujiciSFirmami_s_vazbouNaPolitiky_vsechny_Cache =
-                new Devmasters.Cache.AWS_S3.Cache<AnalysisCalculation.VazbyFiremNaUradyStat>
-                (new string[] { Devmasters.Config.GetWebConfigValue("Minio.Cache.Endpoint") },
-                    Devmasters.Config.GetWebConfigValue("Minio.Cache.Bucket"),
-                    Devmasters.Config.GetWebConfigValue("Minio.Cache.AccessKey"),
-                    Devmasters.Config.GetWebConfigValue("Minio.Cache.SecretKey"), TimeSpan.Zero,
-                    "UradyObchodujiciSFirmami_s_vazbouNaPolitiky_vsechny",
-                    (o) =>
-                    {
-                        return AnalysisCalculation
-                            .UradyObchodujiciSFirmami_s_vazbouNaPolitikyAsync(Relation.AktualnostType.Libovolny, true)
-                            .ConfigureAwait(false).GetAwaiter().GetResult();
-                    }
-                );
-
-            _logger.Information("Static data - UradyObchodujiciSNespolehlivymiPlatciDPH_Cache*");
-            //L1 - 12 h
-            //L2 - 10 let
-            UradyObchodujiciSNespolehlivymiPlatciDPH_Cache =
-                new Devmasters.Cache.AWS_S3.Cache<AnalysisCalculation.VazbyFiremNaUradyStat>
-                (new string[] { Devmasters.Config.GetWebConfigValue("Minio.Cache.Endpoint") },
-                    Devmasters.Config.GetWebConfigValue("Minio.Cache.Bucket"),
-                    Devmasters.Config.GetWebConfigValue("Minio.Cache.AccessKey"),
-                    Devmasters.Config.GetWebConfigValue("Minio.Cache.SecretKey"), TimeSpan.Zero,
-                    "UradyObchodujiciSNespolehlivymiPlatciDPH",
-                    (o) =>
-                    {
-                        return new AnalysisCalculation.VazbyFiremNaUradyStat(); //refresh from task
-                    }
-                );
-            //L1 - 12 h
-            //L2 - 10 let
-            NespolehlivyPlatciDPH_obchodySurady_Cache =
-                new Devmasters.Cache.AWS_S3.Cache<AnalysisCalculation.VazbyFiremNaUradyStat>
-                (new string[] { Devmasters.Config.GetWebConfigValue("Minio.Cache.Endpoint") },
-                    Devmasters.Config.GetWebConfigValue("Minio.Cache.Bucket"),
-                    Devmasters.Config.GetWebConfigValue("Minio.Cache.AccessKey"),
-                    Devmasters.Config.GetWebConfigValue("Minio.Cache.SecretKey"), TimeSpan.Zero,
-                    "NespolehlivyPlatciDPH_obchodySurady",
-                    (o) =>
-                    {
-                        return new AnalysisCalculation.VazbyFiremNaUradyStat(); //refresh from task
-                    }
-                );
 
 
             //AFERY
@@ -621,7 +421,7 @@ namespace HlidacStatu.Repositories
             try
             {
                 string url = "https://portal.isoss.gov.cz/opendata/ISoSS_Opendata_OSYS_OSSS.xml";
-                string xml = Devmasters.Net.HttpClient.Simple.GetAsync(url).Result;
+                string xml = Devmasters.Net.HttpClient.Simple.Get(url);
 
                 var ser = new XmlSerializer(typeof(organizacni_struktura_sluzebnich_uradu));
 

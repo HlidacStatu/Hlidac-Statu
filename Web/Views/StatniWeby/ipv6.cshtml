@@ -1,11 +1,12 @@
 ﻿@using System.Linq;
+@using HlidacStatu.Repositories.Cache
 @{
     ViewBag.Title = "Hlídač státních webů";
     ViewBag.SubTitle = "Podpora IPv6 ";
 
 
     var servers = HlidacStatu.Repositories.UptimeServerRepo.AllActiveServers();
-    var data = HlidacStatu.Repositories.UptimeSSLRepo.AllLatestSSL()
+    var data = (await UptimeSslCache.AllLatestSslAsync())
             .Where(m=>m.IP6support != null)
             .OrderByDescending(m=>m.IP6support.IPv6Working())
             .ToArray();
@@ -106,7 +107,7 @@ else
          </div>
      }
  </div>
-    @WebyChartUtil.TableNextGroups("ipv6")
+    @await WebyChartUtil.TableNextGroupsAsync("ipv6")
 }
 
 @section footerscripts{

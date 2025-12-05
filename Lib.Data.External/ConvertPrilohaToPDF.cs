@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Net.Http;
+using System.Threading.Tasks;
 using HlidacStatu.DS.Api;
 using Serilog;
 
@@ -11,7 +12,7 @@ namespace HlidacStatu.Lib.Data.External
         private static readonly ILogger _logger = Log.ForContext<ConvertPrilohaToPDF>();
 
 
-        public static byte[] PrilohaToPDFfromFile(byte[] content, int maxTries = 10)
+        public static async Task<byte[]> PrilohaToPDFfromFileAsync(byte[] content, int maxTries = 10)
         {
             int tries = 0;
         call:
@@ -25,11 +26,10 @@ namespace HlidacStatu.Lib.Data.External
             try
             {
                 tries++;
-                var res = Devmasters.Net.HttpClient.Simple.PostAsync<ApiResult<byte[]>>(
+                var res = await Devmasters.Net.HttpClient.Simple.PostAsync<ApiResult<byte[]>>(
                     Devmasters.Config.GetWebConfigValue("LibreOffice.Service.Api") + "/LibreOffice/ConvertFromFile",
                     form,
-                    headers: headers, timeout: TimeSpan.FromMinutes(4))
-                    .ConfigureAwait(false).GetAwaiter().GetResult();
+                    headers: headers, timeout: TimeSpan.FromMinutes(4));
 
                 if (res.Success)
                 {
@@ -41,7 +41,7 @@ namespace HlidacStatu.Lib.Data.External
                     _logger.Error("Code {errorcode}. Cannot convert into PDF. Try {try}", res.ErrorCode, tries);
                     if (tries < maxTries)
                     {
-                        System.Threading.Thread.Sleep(1000 * tries);
+                        await Task.Delay(1000 * tries);
                         goto call;
                     }
                     else
@@ -58,12 +58,12 @@ namespace HlidacStatu.Lib.Data.External
                 if (statusCode >= 500)
                 {
                     _logger.Error(e, "Code {statuscode}. Cannot convert into PDF. Try {try}", statusCode, tries);
-                    System.Threading.Thread.Sleep(1000 * tries);
+                    await Task.Delay(1000 * tries);
                 }
                 else if (statusCode >= 400)
                 {
                     _logger.Error(e, "Code {statuscode}. Cannot convert into PDF. Try {try}", statusCode, tries);
-                    System.Threading.Thread.Sleep(1000 * tries);
+                    await Task.Delay(1000 * tries);
 
                 }
 
@@ -75,7 +75,7 @@ namespace HlidacStatu.Lib.Data.External
             }
             catch (Exception e)
             {
-                System.Threading.Thread.Sleep(1000 * tries);
+                await Task.Delay(1000 * tries);
                 if (tries < maxTries)
                     goto call;
 

@@ -161,18 +161,16 @@ url - a URL to the document or search result item. Useful for citing specific re
                                         res.AddRange(range);
                                         break;
                                     case PartsToSearch.Osoby:
-                                        res.AddRange(
-                                            sres.Osoby.Result
-                                                    .Skip(parts[p])
-                                                    .Take(maxPartSize)
-                                                .Select(x => new OpenAiResultItem
-                                                {
-                                                    id = "osoba-" + x.NameId,
-                                                    title = x.FullNameWithYear(),
-                                                    text = x.InfoFactsAsync().ConfigureAwait(false).GetAwaiter().GetResult().RenderFacts(2, true),
-                                                    url = x.GetUrl(false)
-                                                }).ToArray()
-                                            );
+                                        foreach (var osoba in sres.Osoby.Result.Skip(parts[p]).Take(maxPartSize))
+                                        {
+                                            res.Add(new OpenAiResultItem
+                                            {
+                                                id = "osoba-" + osoba.NameId,
+                                                title = osoba.FullNameWithYear(),
+                                                text = (await osoba.InfoFactsAsync().ConfigureAwait(false)).RenderFacts(2, true),
+                                                url = osoba.GetUrl(false)
+                                            });
+                                        }
                                         break;
                                     default:
                                         break;

@@ -1,10 +1,6 @@
-using Devmasters.DT;
-using HlidacStatu.DS.Graphs;
 using HlidacStatu.Entities;
 using HlidacStatu.Extensions;
 using HlidacStatu.Lib.Analytics;
-using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using HlidacStatu.Repositories.Cache;
@@ -13,28 +9,7 @@ namespace HlidacStatu.Repositories.Statistics
 {
     public static class OsobaStatistics
     {
-        //L1 - 1 h
-        //L2 - 10 let
-
-        static Devmasters.Cache.Redis.Manager<Osoba.Statistics.Dotace, Osoba>
-            _cacheDotace
-                = Devmasters.Cache.Redis.Manager<Osoba.Statistics.Dotace, Osoba>
-                    .GetSafeInstance("Osoba_DotaceStatistics_v1_",
-                        (os) => CalculateDotaceStat(os),
-                        TimeSpan.Zero,
-                        Devmasters.Config.GetWebConfigValue("RedisServerUrls").Split(';'),
-                        Devmasters.Config.GetWebConfigValue("RedisBucketName"),
-                        Devmasters.Config.GetWebConfigValue("RedisUsername"),
-                        Devmasters.Config.GetWebConfigValue("RedisCachePassword"),
-                        keyValueSelector: os => $"{os.NameId}");
-        
-
-        public static void RemoveCachedStatistics_Dotace(Osoba os)
-        {
-            _cacheDotace.Delete(os);
-        }
-
-
+       
         public static async Task<Osoba.Statistics.RegistrSmluv> CachedStatistics_SmlouvyAsync(Osoba os,
             int? obor, bool forceUpdateCache = false)
         {
@@ -44,70 +19,15 @@ namespace HlidacStatu.Repositories.Statistics
             return await StatisticsCache.GetOsobaSmlouvyStatisticsAsync(os, obor);
         }
 
-        public static Osoba.Statistics.Dotace CachedStatistics_Dotace(Osoba os,
+        public static async Task<Osoba.Statistics.Dotace> CachedStatistics_DotaceAsync(Osoba os,
             bool forceUpdateCache = false)
         {
             if (forceUpdateCache)
-                _cacheDotace.Delete(os);
+                await StatisticsCache.InvalidateOsobaDotaceStatisticsAsync(os);
 
-            return _cacheDotace.Get(os);
+            return await StatisticsCache.GetOsobaDotaceStatisticsAsync(os);
         }
-
-
-        private static Osoba.Statistics.Dotace CalculateDotaceStat(Osoba o)
-        {
-            Osoba.Statistics.Dotace res = new Osoba.Statistics.Dotace();
-            res.OsobaNameId = o.NameId;
-
-            Dictionary<string, StatisticsSubjectPerYear<Firma.Statistics.Dotace>> statni =
-                new Dictionary<string, StatisticsSubjectPerYear<Firma.Statistics.Dotace>>();
-            Dictionary<string, StatisticsSubjectPerYear<Firma.Statistics.Dotace>> soukr =
-                new Dictionary<string, StatisticsSubjectPerYear<Firma.Statistics.Dotace>>();
-            Dictionary<string, StatisticsSubjectPerYear<Firma.Statistics.Dotace>> nezisk =
-                new Dictionary<string, StatisticsSubjectPerYear<Firma.Statistics.Dotace>>();
-
-            var skutecneVazby = Relation.SkutecnaDobaVazby(o.AktualniVazby(Relation.AktualnostType.Libovolny));
-            var firmy_maxrok = new Dictionary<string, DateInterval>();
-            foreach (var v in skutecneVazby.Where(v => !string.IsNullOrEmpty(v.To?.UniqId)
-                                                       && v.To.Type == HlidacStatu.DS.Graphs.Graph.Node.NodeType
-                                                           .Company)
-                    )
-            {
-                firmy_maxrok.TryAdd(v.To.Id,
-                    new DateInterval(v.RelFrom ?? DateTime.MinValue, v.RelTo ?? DateTime.MaxValue));
-            }
-
-
-            var perIcoStat = firmy_maxrok
-                .Select(m => new { firma = Firmy.Get(m.Key), interval = m.Value })
-                .Where(m => m.firma.Valid == true)
-                .Select(m => new
-                {
-                    f = m.firma,
-                    ss = new StatisticsSubjectPerYear<Firma.Statistics.Dotace>(
-                        m.firma.ICO,
-                        m.firma.StatistikaDotaci().Filter(fi =>
-                            fi.Key >= m.interval.From?.Year && fi.Key <= m.interval.To?.Year)
-                    )
-                });
-
-
-            foreach (var fStat in perIcoStat)
-            {
-                if (fStat.f.PatrimStatu() && statni.ContainsKey(fStat.f.ICO) == false)
-                    statni.Add(fStat.f.ICO, fStat.ss);
-                else if (fStat.f.JsemNeziskovka() && nezisk.ContainsKey(fStat.f.ICO) == false)
-                    nezisk.Add(fStat.f.ICO, fStat.ss);
-                else if (soukr.ContainsKey(fStat.f.ICO) == false)
-                    soukr.Add(fStat.f.ICO, fStat.ss);
-            }
-
-            res.StatniFirmy = statni;
-            res.SoukromeFirmy = soukr;
-            res.Neziskovky = nezisk;
-
-            return res;
-        }
+        
 
         public static string[] SmlouvyStat_Neziskovky(this Osoba.Statistics.RegistrSmluv registrSmluv)
         {

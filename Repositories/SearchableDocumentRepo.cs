@@ -141,7 +141,7 @@ namespace HlidacStatu.Repositories
                 var res = await client.IndexManyAsync<SearchableDocument>(chunk);
                 if (!res.IsValid)
                 {
-                    System.Threading.Thread.Sleep(100);
+                    await Task.Delay(100);
                     res = await client.IndexManyAsync<SearchableDocument>(chunk);
                     if (!res.IsValid)
                     {
@@ -166,7 +166,7 @@ namespace HlidacStatu.Repositories
                 o => o.Id(sDoc.RecordId)); //druhy parametr musi byt pole, ktere je unikatni
             if (!res.IsValid)
             {
-                System.Threading.Thread.Sleep(100);
+                await Task.Delay(100);
                 res = await client.IndexAsync<SearchableDocument>(sDoc,
                             o => o.Id(sDoc.RecordId)); //druhy parametr musi byt pole, ktere je unikatni
 

@@ -15,6 +15,7 @@ using HlidacStatu.Lib.Web.UI.Attributes;
 using HlidacStatu.LibCore.Extensions;
 using HlidacStatu.Repositories;
 using HlidacStatu.Repositories.Analysis;
+using HlidacStatu.Repositories.Cache;
 using HlidacStatu.Web.Framework;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Hosting;
@@ -434,7 +435,7 @@ text zpravy: {txt}
             var model = await SmlouvaRepo.LoadAsync(Id, includePlaintext: false);
             var priloha = model.Prilohy?.FirstOrDefault(m => m.UniqueHash() == hash);
 
-            var fn = SmlouvaRepo.GetDownloadedPrilohaPath(priloha, model,
+            var fn = await SmlouvaRepo.GetDownloadedPrilohaPathAsync(priloha, model,
                 forcePDF
                     ? Connectors.IO.PrilohaFile.RequestedFileType.PDF
                     : Connectors.IO.PrilohaFile.RequestedFileType.Original);
@@ -997,7 +998,7 @@ text zpravy: {txt}
             {
                 string[] icos = FirmaRepo.MinisterstvaCache.Get().Select(s => s.ICO).ToArray();
 
-                var vz = VerejnaZakazkaRepo.Searching.CachedSimpleSearch(TimeSpan.FromHours(6),
+                var vz = await VzCache.CachedSimpleSearchAsync(
                     new Repositories.Searching.VerejnaZakazkaSearchData()
                     {
                         Q = icos.Select(i => "ico:" + i).Aggregate((f, s) => f + " OR " + s),
@@ -1134,7 +1135,7 @@ text zpravy: {txt}
                     var social = new ImageBannerCoreData()
                     {
                         title = vz.SocialInfoTitle(),
-                        body = vz.SocialInfoBody(),
+                        body = await vz.SocialInfoBodyAsync(),
                         footer = vz.SocialInfoFooter(),
                         subtitle = vz.SocialInfoSubTitle(),
                         img = vz.SocialInfoImageUrl(),
@@ -1173,7 +1174,7 @@ text zpravy: {txt}
                         var social = new ImageBannerCoreData()
                         {
                             title = s.SocialInfoTitle(),
-                            body = s.SocialInfoBody(),
+                            body = await s.SocialInfoBodyAsync(),
                             footer = s.SocialInfoFooter(),
                             subtitle = s.SocialInfoSubTitle(),
                             img = s.SocialInfoImageUrl(),

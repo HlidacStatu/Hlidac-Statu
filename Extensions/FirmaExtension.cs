@@ -126,7 +126,7 @@ public static class FirmaExtensions
 
 
         //dotace
-        var dotaceStat = f.StatistikaDotaci();
+        var dotaceStat = await f.StatistikaDotaciAsync();
         if (dotaceStat != null)
         {
             var maxY = HlidacStatu.Util.Consts.CalculatedCurrentYearDotace;
@@ -194,7 +194,7 @@ public static class FirmaExtensions
                     .ToList();
             }
 
-            var dotaceStatHolding = f.HoldingStatistikaDotaci();
+            var dotaceStatHolding = await f.HoldingStatistikaDotaciAsync();
             maxY = HlidacStatu.Util.Consts.CalculatedCurrentYearDotace;
             if (dotaceStatHolding != null)
             {

@@ -9,14 +9,15 @@ namespace InsolvencniRejstrik.ByEvents
 		public const string OriginFile = "failed_messages.dat";
 		public const string ProcessingFile = "failed_messages_for_read.dat";
 
-		public IEnumerable<WsResult> Get(long id)
+		public async IAsyncEnumerable<WsResult> GetAsync(long id)
 		{
 			if (File.Exists(OriginFile))
 			{
 				File.Move(OriginFile, ProcessingFile);
 
-				foreach (var item in File.ReadLines(ProcessingFile).Select(l => WsResult.From(l)))
+				await foreach (var line in File.ReadLinesAsync(ProcessingFile))
 				{
+					var item = WsResult.From(line);
 					yield return item;
 				}
 

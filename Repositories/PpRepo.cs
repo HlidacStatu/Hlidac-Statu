@@ -573,76 +573,7 @@ public static partial class PpRepo
 
         return res;
     }
-
-    public static PuOrganizaceMetadata.Description GetMetadataDescriptionPolitici(this PuOrganizace org,
-        int rok = DefaultYear)
-    {
-        var res = new PuOrganizaceMetadata.Description();
-
-        var events = org
-            .GetOrganizationEventsAsync(rok, m => m.DotazovanaInformace == PuEvent.DruhDotazovaneInformace.Politik)
-            .ConfigureAwait(false).GetAwaiter().GetResult();
-        // MetadataPlatyUredniku.Where(m => m.Rok == rok && m.Typ == PuOrganizaceMetadata.TypMetadat.PlatyPolitiku).ToList();
-
-        if (
-            events.Any(m => m.Typ == PuEvent.TypUdalosti.ZaslaniZadosti) == false
-            && events.Any(m => m.Typ == PuEvent.TypUdalosti.PoskytnutiInformace) == false
-        )
-        {
-            res.TextStatus = "Této organizace jsme se na platy neptali";
-            res.Detail = "";
-            res.BootstrapStatus = "primary";
-            res.Icon = "fa-solid fa-question-circle";
-        }
-        else if (
-            events.Any(m => m.Typ == PuEvent.TypUdalosti.ZaslaniZadosti)
-            &&
-            events.Any(m => m.Typ == PuEvent.TypUdalosti.PoskytnutiInformace) == false
-        )
-        {
-            res.TextStatus = $"{events.Max(m => m.Datum):d. M. yyyy} Odeslána žádost o platy";
-            res.Detail = "Data jsme zatím nedostali nebo nezpracovali.";
-            res.BootstrapStatus = "primary";
-            res.Icon = "fa-solid fa-question-circle";
-        }
-        else if (
-            events.Any(m => m.Typ == PuEvent.TypUdalosti.ZaslaniZadosti)
-            &&
-            events.Any(m => m.Typ == PuEvent.TypUdalosti.UplneOdmitnutiPoskytnutiInformaci)
-        )
-        {
-            res.TextStatus = "Odmítli poskytnout platy";
-            res.Detail = string.Join(". ", events
-                .Where(m => m.Typ == PuEvent.TypUdalosti.UplneOdmitnutiPoskytnutiInformaci)
-                .Select(m => m.Poznamka));
-            res.BootstrapStatus = "danger";
-            res.Icon = "fa-solid fa-circle-xmark";
-        }
-        else if (
-            events.Any(m => m.Typ == PuEvent.TypUdalosti.ZaslaniZadosti)
-            &&
-            events.Any(m => m.Typ == PuEvent.TypUdalosti.CastecneOdmitnutiPoskytnutiInformaci)
-        )
-        {
-            res.TextStatus = "Poskytli pouze část požadovaných informací";
-            res.Detail = string.Join(". ", events
-                .Where(m => m.Typ == PuEvent.TypUdalosti.CastecneOdmitnutiPoskytnutiInformaci)
-                .Select(m => m.Poznamka));
-            res.BootstrapStatus = "danger";
-            res.Icon = "fa-solid fa-circle-xmark";
-        }
-        else
-        {
-            res.TextStatus = $"Požadované platy nám poskytli v plném rozsahu";
-            res.Detail = string.Join(". ", events
-                .Where(m => m.Typ == PuEvent.TypUdalosti.PoskytnutiInformace)
-                .Select(m => m.Poznamka));
-            res.BootstrapStatus = "success";
-            res.Icon = "fa-solid fa-badge-check";
-        }
-
-        return res;
-    }
+    
 
     public static async Task<List<PpPrijem>> GetPlatyWithOrganizaceForYearAsync(int rok)
     {

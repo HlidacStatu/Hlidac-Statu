@@ -1,9 +1,10 @@
 ﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace InsolvencniRejstrik.ByEvents
 {
 	interface IWsClient
 	{
-		IEnumerable<WsResult> Get(long id);
+		IAsyncEnumerable<WsResult> GetAsync(long id);
 	}
 }

@@ -271,7 +271,7 @@ else
             <td>Sdílení</td>
             <td>
                 <share-facebook></share-facebook>
-                <share-twitter text="@($"Zakázka '{Devmasters.TextUtil.ShortenText(Model.NazevZakazky, 80)}' na @HlidacStatu - {Model.InfoFacts().FirstOrDefault()?.Render(false)}")"></share-twitter>
+                <share-twitter text="@($"Zakázka '{Devmasters.TextUtil.ShortenText(Model.NazevZakazky, 80)}' na @HlidacStatu - {(await Model.InfoFactsAsync()).FirstOrDefault()?.Render(false)}")"></share-twitter>
                 <share-widget></share-widget>
             </td>
         </tr>
@@ -312,7 +312,7 @@ else
     <div class="onlyembed">
         <div class="container text">
             <h3>@Devmasters.TextUtil.ShortenText(Model.NazevZakazky, 60)</h3>
-            <p>@Html.Raw(Model.InfoFacts().RenderFacts( 2, true, true, html: true)) </p>
+            <p>@Html.Raw((await Model.InfoFactsAsync()).RenderFacts( 2, true, true, html: true)) </p>
             <p>
                 <a href="@Model.GetUrl(true)" target="_top">Více informací o zakázce</a>
             </p>

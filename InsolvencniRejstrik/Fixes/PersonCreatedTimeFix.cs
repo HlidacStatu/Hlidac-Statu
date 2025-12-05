@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Xml.Linq;
 using HlidacStatu.Connectors;
 
@@ -57,7 +58,7 @@ namespace InsolvencniRejstrik.Fixes
 			}
 		}
 
-		public void Execute(string cacheFile)
+		public async Task ExecuteAsync(string cacheFile)
 		{
 			var readingThreshold = 100000;
 			var savingThreshold = 1000;
@@ -88,7 +89,7 @@ namespace InsolvencniRejstrik.Fixes
 				}
 
 				Console.WriteLine("Generovani a ukladani vystupniho json souboru ...");
-				File.WriteAllText("result.json", JsonConvert.SerializeObject(Processings));
+				await File.WriteAllTextAsync("result.json", JsonConvert.SerializeObject(Processings));
 
 				Console.WriteLine("Ukladani ...");
 				Start = DateTime.Now;
@@ -127,8 +128,8 @@ namespace InsolvencniRejstrik.Fixes
 						person.Zalozen = doc.Value;
 					}
 
-					Repository.SetInsolvencyProceeding(rizeni);
-                    HlidacStatu.Repositories.RizeniRepo.SaveAsync(rizeni).ConfigureAwait(false).GetAwaiter().GetResult();
+					await Repository.SetInsolvencyProceedingAsync(rizeni);
+                    await HlidacStatu.Repositories.RizeniRepo.SaveAsync(rizeni);
 				}
 
 				Console.WriteLine("Hotovo");

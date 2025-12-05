@@ -66,20 +66,7 @@ namespace HlidacStatu.Repositories
                         _logger.Error(e, "GenerateAutocomplete Companies error ");
                     }
                 },
-                () =>
-                {
-                    try
-                    {
-                        _logger.Information("GenerateAutocomplete Loading state companies");
-                        stateCompanies = LoadStateCompanies();
-                        _logger.Information("GenerateAutocomplete Loading state companies done");
-                    }
-                    catch (Exception e)
-                    {
-                        _logger.Error(e, "GenerateAutocomplete StateCompanies error ");
-                    }
-                },
-
+                
                 () =>
                 {
                     try
@@ -93,21 +80,6 @@ namespace HlidacStatu.Repositories
                         _logger.Error(e, "GenerateAutocomplete Oblasti error ");
                     }
                 },
-                
-                () =>
-                {
-                    try
-                    {
-                        _logger.Information("GenerateAutocomplete Loading dotace programs");
-                        dotacePrograms = LoadDotacePrograms();
-                        _logger.Information("GenerateAutocomplete Loading dotace programs done");
-                    }
-                    catch (Exception e)
-                    {
-                        _logger.Error(e, "GenerateAutocomplete dotace programs error ");
-                    }
-                },
-
                 () =>
                 {
                     try
@@ -139,6 +111,17 @@ namespace HlidacStatu.Repositories
             
             try
             {
+                _logger.Information("GenerateAutocomplete Loading state companies");
+                stateCompanies = await LoadStateCompaniesAsync();
+                _logger.Information("GenerateAutocomplete Loading state companies done");
+            }
+            catch (Exception e)
+            {
+                _logger.Error(e, "GenerateAutocomplete StateCompanies error ");
+            }
+            
+            try
+            {
                 _logger.Information("GenerateAutocomplete Loading cities");
                 cities = await LoadCitiesAsync(logOutputFunc,progressOutputFunc);
                 _logger.Information("GenerateAutocomplete Loading cities done");
@@ -146,6 +129,17 @@ namespace HlidacStatu.Repositories
             catch (Exception e)
             {
                 _logger.Error(e, "GenerateAutocomplete Cities error ");
+            }
+            
+            try
+            {
+                _logger.Information("GenerateAutocomplete Loading dotace programs");
+                dotacePrograms = await LoadDotaceProgramsAsync();
+                _logger.Information("GenerateAutocomplete Loading dotace programs done");
+            }
+            catch (Exception e)
+            {
+                _logger.Error(e, "GenerateAutocomplete dotace programs error ");
             }
             
             try
@@ -247,7 +241,7 @@ namespace HlidacStatu.Repositories
         
 
         //státní firmy
-        private static List<Autocomplete> LoadStateCompanies()
+        private static async Task<List<Autocomplete>> LoadStateCompaniesAsync()
         {
             string sql = $@"select Jmeno, ICO, KrajId, status 
                              from Firma 
@@ -256,22 +250,40 @@ namespace HlidacStatu.Repositories
                               AND Kod_PF > 110
                               AND Typ in ({(int)Firma.TypSubjektuEnum.PatrimStatu}
                                 ,{(int)Firma.TypSubjektuEnum.PatrimStatuAlespon25perc});";
-            var results = DirectDB.Instance.GetList<string, string, string, int?>(sql)
-                .AsParallel()
-                .Select(f => new Autocomplete()
+            
+            var items = DirectDB.Instance.GetList<string, string, string, int?>(sql);
+            int maxConcurrency = 20;
+            var semaphore = new SemaphoreSlim(maxConcurrency);
+            
+            var tasks = items.Select(async f =>
+            {
+                await semaphore.WaitAsync();
+                try
                 {
-                    Id = $"ico:{f.Item2}",
-                    DisplayText = f.Item1,
-                    Text = NormalizeJmenoForSearch(f.Item1),
-                    AdditionalHiddenSearchText = f.Item2,
-                    Type = ("státní firma" + " " + Firma.StatusFull(f.Item4, true)).Trim(),
-                    Description = FixKraj(f.Item3),
-                    PriorityMultiplier = 1.5f,
-                    ImageElement = "<i class='fas fa-industry-alt'></i>",
-                    KIndex = (KIndex.GetCachedAsync(f.Item2).GetAwaiter().GetResult())?.LastKIndexLabel().ToString("G"),
-                    Category = Autocomplete.CategoryEnum.StateCompany
-                }).ToList();
-            return results;
+                    var kIndex = await KIndex.GetCachedAsync(f.Item2);
+                    
+                    return new Autocomplete
+                    {
+                        Id = $"ico:{f.Item2}",
+                        DisplayText = f.Item1,
+                        Text = NormalizeJmenoForSearch(f.Item1),
+                        AdditionalHiddenSearchText = f.Item2,
+                        Type = ("státní firma" + " " + Firma.StatusFull(f.Item4, true)).Trim(),
+                        Description = FixKraj(f.Item3),
+                        PriorityMultiplier = 1.5f,
+                        ImageElement = "<i class='fas fa-industry-alt'></i>",
+                        KIndex = kIndex?.LastKIndexLabel().ToString("G"),
+                        Category = Autocomplete.CategoryEnum.StateCompany
+                    };
+                }
+                finally
+                {
+                    semaphore.Release();
+                }
+            });
+            
+            var results = await Task.WhenAll(tasks);
+            return results.ToList();
         }
 
         //úřady
@@ -485,10 +497,10 @@ namespace HlidacStatu.Repositories
             return oblasti;
         }
         
-        private static IEnumerable<Autocomplete> LoadDotacePrograms()
+        private static async Task<IEnumerable<Autocomplete>> LoadDotaceProgramsAsync()
         {
             
-            var programs = DotaceRepo.GetDistinctProgramsAsync().GetAwaiter().GetResult();
+            var programs = await DotaceRepo.GetDistinctProgramsAsync();
             
             var programy = programs.Select(p =>
             {

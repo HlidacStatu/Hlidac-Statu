@@ -2,33 +2,35 @@
 using Newtonsoft.Json;
 using System;
 using System.IO;
+using System.Threading.Tasks;
 
 namespace InsolvencniRejstrik.ByEvents
 {
 	public class FileRepository : IRepository
 	{
-		public Rizeni GetInsolvencyProceeding(string spisovaZnacka, Func<string, Rizeni> createNewInsolvencyProceeding)
+		public async Task<Rizeni> GetInsolvencyProceedingAsync(string spisovaZnacka,
+			Func<string, Rizeni> createNewInsolvencyProceeding)
 		{
 			var noveRizeni = createNewInsolvencyProceeding(spisovaZnacka);
 			var filePath = GetFilePath(noveRizeni);
 
 			return File.Exists(filePath.FullPath)
-				? JsonConvert.DeserializeObject<Rizeni>(File.ReadAllText(filePath.FullPath))
+				? JsonConvert.DeserializeObject<Rizeni>(await File.ReadAllTextAsync(filePath.FullPath))
 				: noveRizeni;
 		}
 
-		public void SetInsolvencyProceeding(Rizeni item)
+		public async Task SetInsolvencyProceedingAsync(Rizeni item)
 		{
 			var filePath = GetFilePath(item);
 
 			try
 			{
-				File.WriteAllText(filePath.FullPath, JsonConvert.SerializeObject(item, Formatting.Indented));
+				await File.WriteAllTextAsync(filePath.FullPath, JsonConvert.SerializeObject(item, Formatting.Indented));
 			}
 			catch (DirectoryNotFoundException)
 			{
 				Directory.CreateDirectory(filePath.Dir);
-				File.WriteAllText(filePath.FullPath, JsonConvert.SerializeObject(item, Formatting.Indented));
+				await File.WriteAllTextAsync(filePath.FullPath, JsonConvert.SerializeObject(item, Formatting.Indented));
 			}
 		}
 

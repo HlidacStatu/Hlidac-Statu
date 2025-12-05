@@ -462,24 +462,19 @@ bool withHighlighting = false, bool exactNumOfResults = false)
             {
                 return h == QueryHash(typ, q);
             }
-
-            public static Devmasters.Cache.LocalMemory.Manager<SmlouvaSearchResult, (string query, AggregationContainerDescriptor<Smlouva> aggr)> cachedSearches = 
-                new Devmasters.Cache.LocalMemory.Manager<SmlouvaSearchResult, (string query, AggregationContainerDescriptor<Smlouva> aggr)>(
-                    "SMLOUVYsearch", 
-                    tuple => funcSimpleSearchAsync(tuple).ConfigureAwait(false).GetAwaiter().GetResult(), 
-                    TimeSpan.FromHours(24));
             
-            public static SmlouvaSearchResult CachedSimpleSearchWithStat(TimeSpan expiration,
+            
+            public static Task<SmlouvaSearchResult> CachedSimpleSearchWithStat(
                string query, int page, int pageSize, OrderResult order,
                bool? platnyZaznam = null, bool includeNeplatne = false,
                bool logError = true, bool fixQuery = true
                )
             { 
-                return CachedSimpleSearch(expiration, query, page, pageSize, order, platnyZaznam, includeNeplatne, logError, fixQuery,
+                return CachedSimpleSearch(query, page, pageSize, order, platnyZaznam, includeNeplatne, logError, fixQuery,
                     new AggregationContainerDescriptor<Smlouva>().Sum("sumKc", m => m.Field(f => f.CalculatedPriceWithVATinCZK))
                     );
             }
-            public static SmlouvaSearchResult CachedSimpleSearch(TimeSpan expiration,
+            public static async Task<SmlouvaSearchResult> CachedSimpleSearch(
                 string query, int page, int pageSize, OrderResult order,
                 bool? platnyZaznam = null, bool includeNeplatne = false,
                 bool logError = true, bool fixQuery = true,
@@ -499,13 +494,13 @@ bool withHighlighting = false, bool exactNumOfResults = false)
                     exactNumOfResults = true,
                     anyAggregation = aggregation
                 };
-                return cachedSearches.Get((JsonConvert.SerializeObject(q),q.anyAggregation), expiration);
+                return await FuncSimpleSearchAsync(JsonConvert.SerializeObject(q), q.anyAggregation);
             }
-            private static async Task<SmlouvaSearchResult> funcSimpleSearchAsync((string query, AggregationContainerDescriptor<Smlouva> aggr) data)
+            private static async Task<SmlouvaSearchResult> FuncSimpleSearchAsync(string query, AggregationContainerDescriptor<Smlouva> aggr)
             {
-                var q = JsonConvert.DeserializeObject<FullSearchQuery>(data.query);
+                var q = JsonConvert.DeserializeObject<FullSearchQuery>(query);
                 var ret = await SimpleSearchAsync(
-                    q.query, q.page, q.pageSize, q.order, data.aggr, q.platnyZaznam, q.includeNeplatne, 
+                    q.query, q.page, q.pageSize, q.order, aggr, q.platnyZaznam, q.includeNeplatne, 
                     q.logError, q.fixQuery, exactNumOfResults: q.exactNumOfResults
                     );
                 //remove debug & more

@@ -122,7 +122,7 @@ namespace HlidacStatu.Repositories
                 searchFunc, (hit, param) =>
                 {
                     ids.Add(hit.Id);
-                    return new Devmasters.Batch.ActionOutputData() { CancelRunning = false, Log = null };
+                    return Task.FromResult(new Devmasters.Batch.ActionOutputData() { CancelRunning = false, Log = null });
                 }, null, outputWriter, progressWriter, false, prefix: "get_id_Insolvence ", blockSize: 10);
             return ids;
         }

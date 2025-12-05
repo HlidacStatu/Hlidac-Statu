@@ -101,7 +101,7 @@ namespace HlidacStatu.Lib.Data.External
                     _logger.Error("Error during tweet thread creation. all {texts}, error after {text}.",texts, text);
                     return null;
                 }
-                System.Threading.Thread.Sleep(20);
+                await Task.Delay(20);
             }
 
             return tweetId;

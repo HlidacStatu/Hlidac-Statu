@@ -36,9 +36,7 @@ namespace HlidacStatu.XLib
         }
         public static async Task<FullAnalysis> AnalysisAsync(string query)
         {
-
             int[] years = HlidacStatu.Lib.Analytics.Consts.RegistrSmluvYearsList.ToArray(); //.Where(m => m > 2018).ToArray();
-
 
             var t1 = SmlouvyStatistics.CalculateAsync(query);
             var t2 = HlidacStatu.Repositories.ES.QueryGrouped.TopDodavatelePerYearStatsAsync(query, years);
@@ -48,14 +46,10 @@ namespace HlidacStatu.XLib
                                 m => m.Field(f => f.CalculatedPriceWithVATinCZK))
                         );
 
-
-
-            await Task.WhenAll(t1, t2, t3, t4);
-
-            Repositories.Searching.SmlouvaSearchResult smlouvy = t4.Result;
+            Repositories.Searching.SmlouvaSearchResult smlouvy = await t4;
 
             HlidacStatu.Lib.Analytics.StatisticsPerYear<Smlouva.Statistics.Data> statistics =
-                new StatisticsPerYear<Smlouva.Statistics.Data>(t1.Result);
+                new StatisticsPerYear<Smlouva.Statistics.Data>(await t1);
             List<(int Year, Smlouva.Statistics.Data Value)> statisticsAfter2016 = statistics
                 .Where(s => statistics.YearsAfter2016().Contains(s.Year))
                 .OrderBy(s => s.Year).ToList();
@@ -63,12 +57,12 @@ namespace HlidacStatu.XLib
 
             int currentSeasonYear = statistics.CurrentSeasonYear();
 
-            Repositories.ES.QueryGrouped.ResultCombined topDodavateleFull = t2.Result;
+            Repositories.ES.QueryGrouped.ResultCombined topDodavateleFull = await t2;
 
             List<StatisticsSubjectPerYear<SimpleStat>> topDodavatele = topDodavateleFull.PerIco.CombinedTop(50);
             IEnumerable<(string ico, SimpleStat stat)> topDodavateleCurrSeason = topDodavateleFull.PerYear.CombinedTop(currentSeasonYear, 10);
 
-            Repositories.ES.QueryGrouped.ResultCombined topZadavateleFull = t3.Result;
+            Repositories.ES.QueryGrouped.ResultCombined topZadavateleFull = await t3;
 
             List<StatisticsSubjectPerYear<SimpleStat>> topZadavatele = topZadavateleFull.PerIco.CombinedTop(50);
             IEnumerable<(string ico, SimpleStat stat)> topZadavateleCurrSeason = topZadavateleFull.PerYear.CombinedTop(currentSeasonYear, 10);

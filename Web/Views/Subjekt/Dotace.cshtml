@@ -1,18 +1,21 @@
-﻿@model Firma
+﻿@model Firma;
+@using System.Collections.Concurrent;
 @using System.Linq;
+@using System.Threading;
 @using Devmasters.Enums;
-@using HlidacStatu.DS.Graphs
-@using HlidacStatu.Extensions
+@using HlidacStatu.DS.Graphs;
+@using HlidacStatu.Extensions;
 @using HlidacStatu.XLib.Render;
 @using HlidacStatu.Entities;
-@using HlidacStatu.Repositories
+@using HlidacStatu.Repositories;
+@using HlidacStatu.Lib.Analytics;
 
 @{
     Layout = null;
-    var firmaStats = Model.StatistikaDotaci();
-    var holdingStats = Model.HoldingStatistikaDotaci();
+    var firmaStats = await Model.StatistikaDotaciAsync();
+    var holdingStats = await Model.HoldingStatistikaDotaciAsync();
     bool showHolding = holdingStats.Summary().PocetDotaci > 0
-                       && holdingStats.Summary().CelkemPrideleno != Model.StatistikaDotaci().Summary().CelkemPrideleno;
+                       && holdingStats.Summary().CelkemPrideleno != firmaStats.Summary().CelkemPrideleno;
 
 
     //graph
@@ -69,7 +72,7 @@
             }
         }
     );
-    foreach (var dot in Model.StatistikaDotaci().Where(d => d.Value.CelkemPrideleno > 0).OrderBy(d => d.Year))
+    foreach (var dot in firmaStats.Where(d => d.Value.CelkemPrideleno > 0).OrderBy(d => d.Year))
     {
         reportData.AddRow(dot);
     }
@@ -111,7 +114,25 @@
     var holdingFirmy = Model.Holding(Relation.AktualnostType.Nedavny).ToList();
     //holdingFirmy.Add(Model);
 
-    var holdingFirmyWithSubsidies = holdingFirmy.Where(c => c.StatistikaDotaci().HasStatistics).Append(Model).ToList();
+    ConcurrentBag<(Firma Firma, StatisticsSubjectPerYear<Firma.Statistics.Dotace> Stat)> holdingFirmyWithSubsidies = new();
+    var semaphore = new SemaphoreSlim(10);
+    foreach (var firmaFromHolding in holdingFirmy.Append(Model))
+    {
+        await semaphore.WaitAsync();
+        try
+        {
+            var stat = await firmaFromHolding.StatistikaDotaciAsync();
+            if (stat is not null && stat.HasStatistics)
+            {
+                holdingFirmyWithSubsidies.Add((firmaFromHolding, stat));
+            }
+        }
+        finally
+        {
+            semaphore.Release();
+        }
+    }
+    
     int subCompaniesWithSubsidiesCount = holdingFirmyWithSubsidies.Count() - 1;
 
 
@@ -133,29 +154,29 @@
     };
 
     //tabulka
-    var holdingReportData = new ReportDataSource<Firma>(
-        new ReportDataSource<Firma>.Column[]
+    var holdingReportData = new ReportDataSource<(Firma Firma, StatisticsSubjectPerYear<Firma.Statistics.Dotace> Stat)>(
+        new ReportDataSource<(Firma Firma, StatisticsSubjectPerYear<Firma.Statistics.Dotace> Stat)>.Column[]
         {
             new()
             {
                 Name = "Subjekt",
-                TextRender = (x) => x.Jmeno,
-                HtmlRender =(x) => x.Jmeno,
+                TextRender = (x) => x.Firma.Jmeno,
+                HtmlRender =(x) => x.Firma.Jmeno,
             },
             new()
             {
                 Name = "Počet dotací firmě",
-                TextRender = (x) => $"{HlidacStatu.Util.RenderData.NiceNumber(x.StatistikaDotaci().Sum(s => s.PocetDotaci))}",
-                HtmlRender =(x) => $"<a href=\"/dotace/hledat?Q=ico:{x.ICO}\">{HlidacStatu.Util.RenderData.NiceNumber(x.StatistikaDotaci().Sum(s => s.PocetDotaci), html: true)}</a>",
-                OrderValueRender = (x) => HlidacStatu.Util.RenderData.OrderValueFormat(x.StatistikaDotaci().Sum(s => s.CelkemPrideleno)),
+                TextRender = (x) => $"{HlidacStatu.Util.RenderData.NiceNumber(x.Stat.Sum(s => s.PocetDotaci))}",
+                HtmlRender =(x) => $"<a href=\"/dotace/hledat?Q=ico:{x.Firma.ICO}\">{HlidacStatu.Util.RenderData.NiceNumber(x.Stat.Sum(s => s.PocetDotaci), html: true)}</a>",
+                OrderValueRender = (x) => HlidacStatu.Util.RenderData.OrderValueFormat(x.Stat.Sum(s => s.CelkemPrideleno)),
                 CssClass = "number"
             },
             new()
             {
                 Name = "Suma",
-                TextRender = (x) => $"{HlidacStatu.Util.RenderData.NicePrice(x.StatistikaDotaci().Sum(s => s.CelkemPrideleno))}",
-                HtmlRender =(x) => $"{HlidacStatu.Util.RenderData.NicePrice(x.StatistikaDotaci().Sum(s => s.CelkemPrideleno), html: true)}",
-                OrderValueRender = (x) => HlidacStatu.Util.RenderData.OrderValueFormat(x.StatistikaDotaci().Sum(s => s.CelkemPrideleno)),
+                TextRender = (x) => $"{HlidacStatu.Util.RenderData.NicePrice(x.Stat.Sum(s => s.CelkemPrideleno))}",
+                HtmlRender =(x) => $"{HlidacStatu.Util.RenderData.NicePrice(x.Stat.Sum(s => s.CelkemPrideleno), html: true)}",
+                OrderValueRender = (x) => HlidacStatu.Util.RenderData.OrderValueFormat(x.Stat.Sum(s => s.CelkemPrideleno)),
                 CssClass = "number"
             }
         }
@@ -175,8 +196,8 @@
         <h4>Souhrn</h4>
         @{
             string durl = "/dotace/hledat?Q=ico%3A+" + Model.ICO;
-            var dotaceSuma = Model.StatistikaDotaci().Sum(s => s.CelkemPrideleno);
-            var dotacePocet = Model.StatistikaDotaci().Sum(v => v.PocetDotaci);
+            var dotaceSuma = firmaStats.Sum(s => s.CelkemPrideleno);
+            var dotacePocet = firmaStats.Sum(v => v.PocetDotaci);
 
             var sdotaceKc = $" v celkové hodnotě <b>{HlidacStatu.Util.RenderData.NicePriceHtml(dotaceSuma)}</b>.";
         }
@@ -402,7 +423,7 @@
 
         <h4>Přehled subjektu</h4>
 
-        @if (Model.StatistikaDotaci().Summary().PocetDotaci == 0)
+        @if (firmaStats.Summary().PocetDotaci == 0)
         {
             <p>
             <div class="alert alert-light" role="alert">
@@ -510,7 +531,7 @@
                 </tr>
                 </thead>
                 <tbody>
-                @foreach (var kv in Model.HoldingStatistikaDotaci().OrderByDescending(o => o.Year))
+                @foreach (var kv in holdingStats.OrderByDescending(o => o.Year))
                 {
                     <tr>
                         <td>

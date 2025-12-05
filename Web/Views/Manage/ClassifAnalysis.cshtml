@@ -47,7 +47,7 @@
             request.Content.Headers.ContentType = System.Net.Http.Headers.MediaTypeHeaderValue.Parse("application/json"); 
 
             var response = await httpClient.SendAsync(request);
-            words = Newtonsoft.Json.JsonConvert.DeserializeObject<string[]>(response.Content.ReadAsStringAsync().Result);
+            words = Newtonsoft.Json.JsonConvert.DeserializeObject<string[]>(await response.Content.ReadAsStringAsync());
         }
     }
     var explainStr = "";
@@ -61,7 +61,7 @@
         request.Content.Headers.ContentType = System.Net.Http.Headers.MediaTypeHeaderValue.Parse("application/json"); 
 
         var response = await httpClient.SendAsync(request);
-        explainStr = response.Content.ReadAsStringAsync().Result;
+        explainStr = await response.Content.ReadAsStringAsync();
     }
 }
 <hr />

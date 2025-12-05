@@ -1,66 +1,71 @@
-﻿using HlidacStatu.Entities;
+﻿using HlidacStatu.Caching;
+using HlidacStatu.Entities;
 using Serilog;
+using ZiggyCreatures.Caching.Fusion;
 
 namespace HlidacStatuApi.Code
 {
     public class Availability
     {
+        private static readonly IFusionCache MemoryCache =
+            HlidacStatu.Caching.CacheFactory.CreateNew(CacheFactory.CacheType.L1Default, nameof(Availability));
 
-        private static Devmasters.Cache.LocalMemory.AutoUpdatedCache<UptimeServer.HostAvailability[]> uptimeServersCache1Day =
-      new Devmasters.Cache.LocalMemory.AutoUpdatedCache<UptimeServer.HostAvailability[]>(TimeSpan.FromMinutes(3),
-          (obj) =>
-          {
-              Devmasters.DT.StopWatchEx sw = new Devmasters.DT.StopWatchEx();
-              sw.Start();
-              var res = _availability(24);
-              sw.Stop();
-              Log.ForContext<Availability>().Information("{action} updated of {part} in {duration} sec. Last record {date}", "updated", "uptimeServersCache1Day", sw.Elapsed.TotalSeconds, res.FirstOrDefault()?.Data?.Max(m=>m.Time));
-              return res.ToArray();
-          });
+        public static ValueTask<UptimeServer.HostAvailability[]> GetUptimeServer1dayCacheAsync() =>
+            MemoryCache.GetOrSetAsync($"_uptimeServersCache1Day", async _ =>
+                {
+                    Devmasters.DT.StopWatchEx sw = new Devmasters.DT.StopWatchEx();
+                    sw.Start();
+                    var res = await AvailabilityAsync(24);
+                    sw.Stop();
+                    Log.ForContext<Availability>()
+                        .Information("{action} updated of {part} in {duration} sec. Last record {date}", "updated",
+                            "uptimeServersCache1Day", sw.Elapsed.TotalSeconds,
+                            res.FirstOrDefault()?.Data?.Max(m => m.Time));
+                    return res.ToArray();
+                },
+                options => options.ModifyEntryOptionsDuration(TimeSpan.FromMinutes(3))
+            );
 
-        private static Devmasters.Cache.LocalMemory.AutoUpdatedCache<UptimeServer.HostAvailability[]> uptimeServersCache7Days
-       = new Devmasters.Cache.LocalMemory.AutoUpdatedCache<UptimeServer.HostAvailability[]>(TimeSpan.FromMinutes(30),
-           "uptimeServersCache7Days",
-          (id) =>
-          {
-              Devmasters.DT.StopWatchEx sw = new Devmasters.DT.StopWatchEx();
-              sw.Start();
-
-            #if DEBUG
-              var res = uptimeServersCache1Day.Get();
-            #else
-              var res = _availability(7 * 24);
-            #endif
-              sw.Stop();
-              Log.ForContext<Availability>().Information("{action} updated of {part} in {duration} sec. Last record {date}.", "updated", "uptimeServersCache7Days", sw.Elapsed.TotalSeconds, res.FirstOrDefault()?.Data?.Max(m => m.Time));
-              return res.ToArray();
-
-          }
-          );
+        public static ValueTask<UptimeServer.HostAvailability[]> GetUptimeServer7daysCacheAsync() =>
+            MemoryCache.GetOrSetAsync($"_uptimeServersCache7Days", async _ =>
+                {
+                    Devmasters.DT.StopWatchEx sw = new Devmasters.DT.StopWatchEx();
+                    sw.Start();
+                    var res = await AvailabilityAsync(7 * 24);
+                    sw.Stop();
+                    Log.ForContext<Availability>().Information(
+                        "{action} updated of {part} in {duration} sec. Last record {date}.", "updated",
+                        "uptimeServersCache7Days", sw.Elapsed.TotalSeconds,
+                        res.FirstOrDefault()?.Data?.Max(m => m.Time));
+                    return res.ToArray();
+                },
+                options => options.ModifyEntryOptionsDuration(TimeSpan.FromMinutes(30))
+            );
 
 
-
-        private static IEnumerable<UptimeServer.HostAvailability> _availability(int hoursBack)
+        private static Task<IEnumerable<UptimeServer.HostAvailability>> AvailabilityAsync(int hoursBack)
         {
             int[] serverIds = HlidacStatu.Repositories.UptimeServerRepo.AllActiveServers().Select(m => m.Id).ToArray();
-            return _availability(serverIds, hoursBack);
+            return AvailabilityAsync(serverIds, hoursBack);
         }
 
-        private static IEnumerable<UptimeServer.HostAvailability> _availability(int[] serverIds, int hoursBack)
+        private static Task<IEnumerable<UptimeServer.HostAvailability>> AvailabilityAsync(int[] serverIds,
+            int hoursBack)
         {
-            return _availability(serverIds, TimeSpan.FromHours(hoursBack));
+            return AvailabilityAsync(serverIds, TimeSpan.FromHours(hoursBack));
         }
 
-        private static IEnumerable<UptimeServer.HostAvailability> _availability(int[] serverIds, TimeSpan intervalBack)
+        private static async Task<IEnumerable<UptimeServer.HostAvailability>> AvailabilityAsync(int[] serverIds,
+            TimeSpan intervalBack)
         {
             UptimeServer[] allServers = HlidacStatu.Repositories.UptimeServerRepo.AllActiveServers();
 
 
-            IEnumerable<HlidacStatu.Lib.Data.External.InfluxDb.ResponseItem> items = 
+            IEnumerable<HlidacStatu.Lib.Data.External.InfluxDb.ResponseItem> items =
                 new HlidacStatu.Lib.Data.External.InfluxDb.ResponseItem[] { };
             try
             {
-                items = HlidacStatu.Lib.Data.External.InfluxDb.GetAvailbility(serverIds, intervalBack);
+                items = await HlidacStatu.Lib.Data.External.InfluxDb.GetAvailbilityAsync(serverIds, intervalBack);
             }
             catch (Exception e)
             {
@@ -69,55 +74,62 @@ namespace HlidacStatuApi.Code
             }
 
             var zabList = items
-                .GroupBy(k => k.ServerId, v => v)
-                .Select(g => new UptimeServer.HostAvailability(
-                                allServers.First(m => m.Id == g.First().ServerId),
-                                g.OrderBy(m => m.CheckStart)
+                    .GroupBy(k => k.ServerId, v => v)
+                    .Select(g => new UptimeServer.HostAvailability(
+                            allServers.First(m => m.Id == g.First().ServerId),
+                            g.OrderBy(m => m.CheckStart)
                                 .Select(m => new UptimeServer.UptimeMeasure()
-                                {
-                                    clock = m.CheckStart,
-                                    itemId = g.Key,
-                                    value = m.ResponseCode >= 400 ? UptimeServer.Availability.BadHttpCode : (m.ResponseTimeInMs > 15000 ? UptimeServer.Availability.TimeOuted2 : ((decimal)m.ResponseTimeInMs) / 1000m)
-                                }
+                                    {
+                                        clock = m.CheckStart,
+                                        itemId = g.Key,
+                                        value = m.ResponseCode >= 400
+                                            ? UptimeServer.Availability.BadHttpCode
+                                            : (m.ResponseTimeInMs > 15000
+                                                ? UptimeServer.Availability.TimeOuted2
+                                                : ((decimal)m.ResponseTimeInMs) / 1000m)
+                                    }
                                 )
-                            ) //zabhost
+                        ) //zabhost
                     )
-                .OrderBy(o => o.Host.Name)
-                .ToArray()
+                    .OrderBy(o => o.Host.Name)
+                    .ToArray()
                 ;
 
 
             return zabList;
         }
-        public static IEnumerable<UptimeServer.HostAvailability> AvailabilityForDayByIds(IEnumerable<int> serverIds)
+
+        public static async Task<IEnumerable<UptimeServer.HostAvailability>> AvailabilityForDayByIdsAsync(IEnumerable<int> serverIds)
         {
             if (serverIds?.Count() == null)
                 return null;
             if (serverIds.Count() == 0)
                 return null;
 
-            UptimeServer.HostAvailability[] allData = uptimeServersCache1Day.Get();
+            UptimeServer.HostAvailability[] allData = await GetUptimeServer1dayCacheAsync();
 
             List<UptimeServer.HostAvailability> choosen = new List<UptimeServer.HostAvailability>();
             choosen = allData
-                .Where(m=>m?.Host?.Id != null)
+                .Where(m => m?.Host?.Id != null)
                 .Where(m => serverIds.Contains(m.Host.Id))
                 .OrderByDescending(o => o?.Host?.Name)
                 .ToList();
             return choosen;
         }
-        public static UptimeServer.HostAvailability AvailabilityForWeekById(int serverId)
+
+        public static async Task<UptimeServer.HostAvailability> AvailabilityForWeekByIdAsync(int serverId)
         {
-            return AvailabilityForWeekByIds(new int[] { serverId }).FirstOrDefault();
+            return (await AvailabilityForWeekByIdsAsync(new int[] { serverId })).FirstOrDefault();
         }
-        public static IEnumerable<UptimeServer.HostAvailability> AvailabilityForWeekByIds(IEnumerable<int> serverIds)
+
+        public static async Task<IEnumerable<UptimeServer.HostAvailability>> AvailabilityForWeekByIdsAsync(IEnumerable<int> serverIds)
         {
             if (serverIds?.Count() == null)
                 return null;
             if (serverIds.Count() == 0)
                 return null;
 
-            UptimeServer.HostAvailability[] allData = uptimeServersCache7Days.Get();
+            UptimeServer.HostAvailability[] allData = await GetUptimeServer7daysCacheAsync();
 
             List<UptimeServer.HostAvailability> choosen = new List<UptimeServer.HostAvailability>();
             choosen = allData
@@ -128,28 +140,29 @@ namespace HlidacStatuApi.Code
         }
 
 
-        public static IEnumerable<UptimeServer.HostAvailability> AvailabilityForDayByGroup(string group)
+        public static async Task<IEnumerable<UptimeServer.HostAvailability>> AvailabilityForDayByGroupAsync(string group)
         {
             int[] serverIds = HlidacStatu.Repositories.UptimeServerRepo.ServersIn(group).ToArray();
-            return AvailabilityForDayByIds(serverIds);
+            return await AvailabilityForDayByIdsAsync(serverIds);
         }
-        public static UptimeServer.HostAvailability AvailabilityForDayById(int serverId)
+
+        public static async Task<UptimeServer.HostAvailability> AvailabilityForDayById(int serverId)
         {
-            return AvailabilityForDayByIds(new int[] { serverId }).FirstOrDefault();
-
+            return (await AvailabilityForDayByIdsAsync(new int[] { serverId })).FirstOrDefault();
         }
 
-        public static List<UptimeServer.HostAvailability> AllActiveServers24hoursStat()
+        public static async Task<List<UptimeServer.HostAvailability>> AllActiveServers24hoursStatAsync()
         {
-            return AvailabilityForDayByIds(HlidacStatu.Repositories.UptimeServerRepo.AllActiveServers().Select(m => m.Id))
-                                    .ToList();
+            return (await AvailabilityForDayByIdsAsync(HlidacStatu.Repositories.UptimeServerRepo.AllActiveServers()
+                    .Select(m => m.Id)))
+                .ToList();
         }
 
-        public static List<UptimeServer.HostAvailability> AllActiveServersWeekStat()
+        public static async Task<List<UptimeServer.HostAvailability>> AllActiveServersWeekStatAsync()
         {
-            return AvailabilityForWeekByIds(HlidacStatu.Repositories.UptimeServerRepo.AllActiveServers().Select(m => m.Id))
-                                    .ToList();
+            return (await AvailabilityForWeekByIdsAsync(HlidacStatu.Repositories.UptimeServerRepo.AllActiveServers()
+                    .Select(m => m.Id)))
+                .ToList();
         }
-
     }
 }

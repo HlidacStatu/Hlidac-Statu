@@ -1,0 +1,39 @@
+using System;
+using System.Text;
+using System.Threading.Tasks;
+using HlidacStatu.Caching;
+using ZiggyCreatures.Caching.Fusion;
+
+namespace HlidacStatu.Repositories.Cache;
+
+public static class SmlouvaCache
+{
+    private static readonly IFusionCache PermanentCache =
+        HlidacStatu.Caching.CacheFactory.CreateNew(CacheFactory.CacheType.PermanentStore, nameof(SmlouvaCache));
+    
+    private static ValueTask<byte[]> GetRawStemsFromCacheAsync(string smlouvaId) =>
+        PermanentCache.GetOrSetAsync($"_SmlouvyStems:{smlouvaId}",
+            _ => SmlouvaRepo.GetRawStemsFromServerAsync(smlouvaId),
+            options => options.ModifyEntryOptionsDuration(TimeSpan.FromHours(12), TimeSpan.FromDays(10 * 365))
+        );
+
+    private static ValueTask RemoveRawStemsFromCacheAsync(string smlouvaId) =>
+        PermanentCache.RemoveAsync($"_SmlouvyStems:{smlouvaId}");
+
+
+    public static async Task<string> GetRawStemsAsync(string smlouvaId, bool rewriteStems = false)
+    {
+        if (string.IsNullOrEmpty(smlouvaId))
+            return null;
+        if (rewriteStems)
+        {
+            await RemoveRawStemsFromCacheAsync(smlouvaId);
+        }
+
+        var data = await GetRawStemsFromCacheAsync(smlouvaId);
+        if (data == null)
+            return null;
+
+        return Encoding.UTF8.GetString(data);
+    }
+}

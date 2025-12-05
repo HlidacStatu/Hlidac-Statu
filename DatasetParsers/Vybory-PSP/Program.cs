@@ -4,6 +4,7 @@ using HlidacStatu.Api.Dataset.Connector;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
 using Serilog;
 
@@ -16,7 +17,7 @@ namespace Vybory_PSP
 
         public static string apikey = System.Configuration.ConfigurationManager.AppSettings["apikey"];
         public static string mp3path = System.Configuration.ConfigurationManager.AppSettings["mp3path"];
-        static void Main(string[] arguments)
+        static async Task Main(string[] arguments)
         {
             dsc = new HlidacStatu.Api.Dataset.Connector.DatasetConnector(apikey);
             
@@ -157,9 +158,9 @@ namespace Vybory_PSP
                 );
 
             //dsc.DeleteDataset(dsDef).Wait();
-            if (!dsc.DatasetExists(dsDef).Result)
+            if (!await dsc.DatasetExists(dsDef))
             {
-                dsc.CreateDataset(dsDef).Wait();
+                await dsc.CreateDataset(dsDef);
             }
 
             //download vybory
@@ -167,7 +168,7 @@ namespace Vybory_PSP
             //int idVyboru = 500;
             foreach (var idVyboru in Parse.Vybory.Keys)
             {
-                Parse.Vybor(dsc, idVyboru);
+               await Parse.VyborAsync(dsc, idVyboru);
             }
         }
 

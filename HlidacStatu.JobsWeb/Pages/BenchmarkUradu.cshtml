@@ -99,8 +99,7 @@
         @{
             Firma urad = HlidacStatu.Repositories.Firmy.Get(Model.Ico);
 
-            var RSstat = HlidacStatu.Repositories.SmlouvaRepo.Searching.CachedSimpleSearchWithStat(
-                TimeSpan.FromDays(14),
+            var RSstat = await HlidacStatu.Repositories.SmlouvaRepo.Searching.CachedSimpleSearchWithStat(
                 $"icoPlatce:{Model.Ico} AND " + Model.Key?.PerSubjectDesc?.Query,
                 1, 0, Repositories.SmlouvaRepo.Searching.OrderResult.FastestForScroll);
             double sumKc = ((Nest.ValueAggregate)RSstat.ElasticResults?.Aggregations["sumKc"])?.Value ?? 0;

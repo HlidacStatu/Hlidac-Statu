@@ -10,6 +10,7 @@ using HlidacStatu.Entities;
 using HlidacStatu.Entities.Analysis;
 using HlidacStatu.Extensions;
 using HlidacStatu.Lib.Analytics;
+using HlidacStatu.Repositories.Cache;
 using Nest;
 using Serilog;
 using ZiggyCreatures.Caching.Fusion;
@@ -112,7 +113,7 @@ namespace HlidacStatu.Repositories.Analysis
                 (hit, o) =>
                 {
                     smlouvy.Add(hit.Source);
-                    return new ActionOutputData();
+                    return Task.FromResult(new ActionOutputData());
                 }, null,
                 null, null, false);
 
@@ -226,20 +227,20 @@ namespace HlidacStatu.Repositories.Analysis
             switch (aktualnost)
             {
                 case Relation.AktualnostType.Aktualni:
-                    vazbyNaPolitiky = StaticData.FirmySVazbamiNaPolitiky_aktualni_Cache.Get();
+                    vazbyNaPolitiky = await MaterializedViewsCache.FirmySVazbamiNaPolitiky_AktualniAsync();
                     qc = new QueryContainerDescriptor<Smlouva>().Term(t =>
                         t.Field(f => f.SVazbouNaPolitikyAktualni).Value(true));
                     sponzorujiciFirmy = StaticData.SponzorujiciFirmy_Nedavne.Get();
                     break;
                 case Relation.AktualnostType.Nedavny:
-                    vazbyNaPolitiky = StaticData.FirmySVazbamiNaPolitiky_nedavne_Cache.Get();
+                    vazbyNaPolitiky = await MaterializedViewsCache.FirmySVazbamiNaPolitiky_NedavneAsync();
                     qc = new QueryContainerDescriptor<Smlouva>().Term(t =>
                         t.Field(f => f.SVazbouNaPolitikyNedavne).Value(true));
                     sponzorujiciFirmy = StaticData.SponzorujiciFirmy_Nedavne.Get();
                     break;
                 case Relation.AktualnostType.Neaktualni:
                 case Relation.AktualnostType.Libovolny:
-                    vazbyNaPolitiky = StaticData.FirmySVazbamiNaPolitiky_vsechny_Cache.Get();
+                    vazbyNaPolitiky = await MaterializedViewsCache.FirmySVazbamiNaPolitiky_VsechnyAsync();
                     qc = new QueryContainerDescriptor<Smlouva>().Term(t =>
                         t.Field(f => f.SVazbouNaPolitiky).Value(true));
                     sponzorujiciFirmy = StaticData.SponzorujiciFirmy_Vsechny.Get();
@@ -344,7 +345,7 @@ namespace HlidacStatu.Repositories.Analysis
                     }
 
                     end:
-                    return new ActionOutputData() { CancelRunning = false, Log = null };
+                    return Task.FromResult(new ActionOutputData() { CancelRunning = false, Log = null });
                 }, null,
                 showProgress ? Devmasters.Batch.Manager.DefaultOutputWriter : (Action<string>)null,
                 showProgress ? new ActionProgressWriter().Writer : (Action<ActionProgressData>)null
@@ -488,7 +489,7 @@ namespace HlidacStatu.Repositories.Analysis
                             }
                     }
 
-                    return new ActionOutputData() { CancelRunning = false, Log = null };
+                    return Task.FromResult(new ActionOutputData() { CancelRunning = false, Log = null });
                 }, null,
                 showProgress ? Devmasters.Batch.Manager.DefaultOutputWriter : (Action<string>)null,
                 showProgress ? new ActionProgressWriter().Writer : (Action<ActionProgressData>)null

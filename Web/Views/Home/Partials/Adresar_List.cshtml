@@ -68,8 +68,8 @@ else
 
                 if (zakazky)
                 {
-                    HlidacStatu.Lib.Analytics.StatisticsSubjectPerYear<Firma.Statistics.VZ> stat = firma.StatistikaVerejneZakazky();
-                    HlidacStatu.Lib.Analytics.StatisticsSubjectPerYear<Firma.Statistics.VZ> statHolding = firma.HoldingStatistikaVerejneZakazky( HlidacStatu.DS.Graphs.Relation.AktualnostType.Nedavny);
+                    HlidacStatu.Lib.Analytics.StatisticsSubjectPerYear<Firma.Statistics.VZ> stat = await firma.StatistikaVerejneZakazkyAsync();
+                    HlidacStatu.Lib.Analytics.StatisticsSubjectPerYear<Firma.Statistics.VZ> statHolding = await firma.HoldingStatistikaVerejneZakazkyAsync();
                     var ceo = firma.Ceo();
 
                     <tr>
@@ -155,7 +155,7 @@ else
                            )
                             {
                                 <p>Komentář k neposkytnutým platům: 
-                                    <a href="@firma.GetPlatyUrlAsync()">
+                                    <a href="@(await firma.GetPlatyUrlAsync())">
                                         @(platyOrgDetailMetadata.PoznamkaHlidace)
                                     </a>
                                 </p>
@@ -164,7 +164,7 @@ else
                             {
                                 var pustat = platyStat.Stats[PuRepo.DefaultYear];
                                 <p>
-                                    Poskytly <a href="@firma.GetPlatyUrlAsync()">@(Devmasters.Lang.CS.Plural.GetWithZero(pustat.Pocet, "0 platů", "1 plat", "{0} platy", "{0} platů"))</a>, @(HlidacStatu.Util.RenderData.NicePriceHtml(pustat.Min)) 
+                                    Poskytly <a href="@(await firma.GetPlatyUrlAsync())">@(Devmasters.Lang.CS.Plural.GetWithZero(pustat.Pocet, "0 platů", "1 plat", "{0} platy", "{0} platů"))</a>, @(HlidacStatu.Util.RenderData.NicePriceHtml(pustat.Min)) 
                                     @if (pustat.Pocet>1) {
                                         <span>- @(HlidacStatu.Util.RenderData.NicePriceHtml(pustat.Max))</span>
                                     }.

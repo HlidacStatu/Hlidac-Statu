@@ -1,5 +1,4 @@
 using HlidacStatu.Entities;
-using System;
 using System.Linq;
 using System.Threading.Tasks;
 using HlidacStatu.Connectors;
@@ -10,48 +9,7 @@ namespace HlidacStatu.Repositories
     public static class UptimeSSLRepo
     {
         private static readonly ILogger _logger = Log.ForContext(typeof(UptimeSSLRepo));
-
-        private static Devmasters.Cache.LocalMemory.AutoUpdatedCache<UptimeSSL[]> uptimeSSlCache =
-            new Devmasters.Cache.LocalMemory.AutoUpdatedCache<UptimeSSL[]>(TimeSpan.FromHours(2), (obj) =>
-                {
-                    UptimeSSL[] res = new UptimeSSL[] { };
-                    var client = Manager.GetESClient_UptimeSSL();
-                    var resX = client
-                        .SearchAsync<UptimeSSL>(s => s
-                            .Query(q => q.MatchAll())
-                            .Aggregations(agg => agg
-                                .Terms("domains", t => t
-                                    .Field(ff => ff.Domain)
-                                    .Size(5000)
-                                    .Aggregations(a => a
-                                        .TopHits("last", th => th
-                                            .Size(1)
-                                            .Sort(o => o.Descending("created"))
-                                        )
-                                    )
-                                )
-                            )
-                        ).ConfigureAwait(false).GetAwaiter().GetResult();
-
-                    var latest = ((Nest.BucketAggregate)resX.Aggregations["domains"]).Items
-                        .Select(i =>
-                        {
-                            var valX = ((Nest.KeyedBucket<object>)i).Values.First();
-                            UptimeSSL val = ((Nest.TopHitsAggregate)valX).Documents<UptimeSSL>().First();
-                            return val;
-                        }
-                        ).ToArray();
-
-                    return latest;
-                });
-
-        public static UptimeSSL[] AllLatestSSL(bool fromCache = true)
-        {
-            if (fromCache == false)
-                uptimeSSlCache.ForceRefreshCache();
-            return uptimeSSlCache.Get();
-        }
-
+        
         public static async Task SaveAsync(UptimeSSL item)
         {
             try

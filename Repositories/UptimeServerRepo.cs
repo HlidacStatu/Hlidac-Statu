@@ -37,25 +37,25 @@ namespace HlidacStatu.Repositories
         }
 
 
-        public static IEnumerable<UptimeServer.HostAvailability> DirectShortAvailability(int[] serverIds, TimeSpan intervalBack)
+        public static Task<IEnumerable<UptimeServer.HostAvailability>> DirectShortAvailabilityAsync(int[] serverIds, TimeSpan intervalBack)
         {
             if (serverIds?.Length == null)
                 return null;
             if (serverIds.Length == 0)
                 return null;
 
-            return _directAvailabilityFromInFlux(serverIds, intervalBack);
+            return DirectAvailabilityFromInFluxAsync(serverIds, intervalBack);
         }
-        public static IEnumerable<UptimeServer.HostAvailability> GetAvailabilityNoCache(TimeSpan intervalBack, params int[] serverIds)
+        public static Task<IEnumerable<UptimeServer.HostAvailability>> GetAvailabilityNoCacheAsync(TimeSpan intervalBack, params int[] serverIds)
         {
-            return _directAvailabilityFromInFlux(serverIds, intervalBack);
+            return DirectAvailabilityFromInFluxAsync(serverIds, intervalBack);
         }
 
-        private static IEnumerable<UptimeServer.HostAvailability> _directAvailabilityFromInFlux(int[] serverIds, TimeSpan intervalBack)
+        private static async Task<IEnumerable<UptimeServer.HostAvailability>> DirectAvailabilityFromInFluxAsync(int[] serverIds, TimeSpan intervalBack)
         {
             UptimeServer[] allServers = HlidacStatu.Repositories.UptimeServerRepo.AllActiveServers();
 
-            var items = HlidacStatu.Lib.Data.External.InfluxDb.GetAvailbility(serverIds, intervalBack);
+            var items = await HlidacStatu.Lib.Data.External.InfluxDb.GetAvailbilityAsync(serverIds, intervalBack);
 
             var zabList = items
                 .GroupBy(k => k.ServerId, v => v)
@@ -79,7 +79,7 @@ namespace HlidacStatu.Repositories
             return zabList;
         }
 
-        public static void SaveLastCheck(UptimeItem lastCheck)
+        public static async Task SaveLastCheckAsync(UptimeItem lastCheck)
         {
             Devmasters.DT.StopWatchLaps swl = new Devmasters.DT.StopWatchLaps();
 
@@ -122,7 +122,7 @@ namespace HlidacStatu.Repositories
                 lap.Stop();
 
                 lap = swl.StopPreviousAndStartNextLap("CheckAlert ");
-                UptimeServerRepo.Alert.CheckAndAlertServer(lastCheck.ServerId);
+                await UptimeServerRepo.Alert.CheckAndAlertServerAsync(lastCheck.ServerId);
                 lap.Stop();
 
                 Console.WriteLine("Times:\n" + swl.ToString());
@@ -207,24 +207,24 @@ namespace HlidacStatu.Repositories
             }
         }
 
-        public static List<UptimeServer> GetServersToCheck(int numOfServers = 30, bool debug = false)
+        public static async Task<List<UptimeServer>> GetServersToCheckAsync(int numOfServers = 30, bool debug = false)
         {
             try
             {
                 List<UptimeServer> list = null;
-                using (DbEntities db = new DbEntities())
+                await using (DbEntities db = new DbEntities())
                 {
                     if (debug)
                     {
-                        list = db.UptimeServers
+                        list = await db.UptimeServers
                             .AsNoTracking()
                             .Where(m => m.Id == 440)
-                            .ToList();
+                            .ToListAsync();
                     }
                     else
-                        list = db.UptimeServers.FromSqlInterpolated($"exec GetUptimeServers {numOfServers}")
+                        list = await db.UptimeServers.FromSqlInterpolated($"exec GetUptimeServers {numOfServers}")
                         .AsNoTracking()
-                        .ToList();
+                        .ToListAsync();
 
                     return list;
                 }

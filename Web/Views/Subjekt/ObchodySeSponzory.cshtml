@@ -3,6 +3,7 @@
 @using HlidacStatu.Entities
 @using HlidacStatu.Extensions
 @using HlidacStatu.Repositories
+@using HlidacStatu.Repositories.Cache
 
 @{ 
         Layout = null;
@@ -12,9 +13,10 @@
 <div id="subjcontent_toc">
 
 @{
-    var uradSVazbami = StaticData.UradyObchodujiciSFirmami_s_vazbouNaPolitiky_nedavne_Cache.Get()
+    var uradSVazbami = (await MaterializedViewsCache.GetUradyObchodujiciSFirmami_s_vazbouNaPolitiky_nedavneAsync())
         .SoukromeFirmy.Where(m => m.Ico == Model.ICO && m.Detail != null && m.Detail.Count > 0)
         .FirstOrDefault();
+    var firmySVazbamiNaPolitiky = await MaterializedViewsCache.FirmySVazbamiNaPolitiky_NedavneAsync();
 }
 @if (uradSVazbami != null)
 {
@@ -62,14 +64,13 @@
                                 , f.ToNiceString(null, false)
                                 , WebUtil.AddSearchBtn("/HledatSmlouvy", "icoPlatce:" + uradSVazbami.Ico + " AND icoPrijemce:" + f.Item, "Ukázat tyto smlouvy"));
 
-                            if (StaticData.FirmySVazbamiNaPolitiky_nedavne_Cache.Get().SoukromeFirmy.ContainsKey(f.Item))
+                            if (firmySVazbamiNaPolitiky.SoukromeFirmy.ContainsKey(f.Item))
                             {
                                 sb.AppendLine("<br/>Osoby:");
-                                var ip = StaticData.FirmySVazbamiNaPolitiky_nedavne_Cache.Get().SoukromeFirmy[f.Item]
+                                var ip = firmySVazbamiNaPolitiky.SoukromeFirmy[f.Item]
                                             .Select(pid => OsobaRepo.PolitickyAktivni
                                                 .Get()
-                                                .Where(m => m.InternalId == pid)
-                                                .FirstOrDefault())
+                                                .FirstOrDefault(m => m.InternalId == pid))
                                                 .Where(pol => pol != null)
                                                 .Select(pol => string.Format("<a href='{0}'>{1}</a>", pol.GetUrl(), pol.FullNameWithYear()))
                                             .ToList();
@@ -93,9 +94,6 @@
 
                         }
 
-                        //sb.AppendFormat("<li><a href='/Hledat?Q=icoPlatce:{0}%20AND%20icoPrijemce:{1}'>{2}</a> {3}</li>"
-                        //    ,d.Ico, f.Ico, f.Name, f.StatForIco.ToNiceString("",false)
-                        //    );
                         sb.Append("</ol>");
 
 

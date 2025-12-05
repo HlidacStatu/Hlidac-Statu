@@ -99,11 +99,11 @@ namespace HlidacStatu.Repositories
             return sml.Prilohy.Where(m => foundPrilohy.Contains(m.UniqueHash()) == false);
         }
 
-        public static async Task<DataResultset<PageMetadata>> GetDataForDocument(Smlouva smlouva, Smlouva.Priloha priloha)
+        public static async Task<DataResultset<PageMetadata>> GetDataForDocumentAsync(Smlouva smlouva, Smlouva.Priloha priloha)
         {
-            return await GetDataForDocument(smlouva.Id, priloha.UniqueHash());
+            return await GetDataForDocumentAsync(smlouva.Id, priloha.UniqueHash());
         }
-        public static async Task<DataResultset<PageMetadata>> GetDataForDocument(string smlouvaId, string prilohaUniqueId)
+        public static async Task<DataResultset<PageMetadata>> GetDataForDocumentAsync(string smlouvaId, string prilohaUniqueId)
         {
             var cl = Manager.GetESClient_PageMetadata();
             

@@ -1,11 +1,12 @@
 ﻿using HlidacStatu.Entities.Insolvence;
 using System;
+using System.Threading.Tasks;
 
 namespace InsolvencniRejstrik.ByEvents
 {
 	interface IRepository
 	{
-		Rizeni GetInsolvencyProceeding(string spisovaZnacka, Func<string, Rizeni> createNewInsolvencyProceeding);
-		void SetInsolvencyProceeding(Rizeni item);
+		Task<Rizeni> GetInsolvencyProceedingAsync(string spisovaZnacka, Func<string, Rizeni> createNewInsolvencyProceeding);
+		Task SetInsolvencyProceedingAsync(Rizeni item);
 	}
 }

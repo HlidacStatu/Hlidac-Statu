@@ -15,7 +15,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using static HlidacStatu.Connectors.External.RZP;
+using HlidacStatu.Repositories.Cache;
 using static HlidacStatu.Entities.Osoba;
 
 namespace HlidacStatu.Repositories
@@ -610,15 +610,15 @@ namespace HlidacStatu.Repositories
                         if (skipRest)
                             break;
 
-                        if (StaticData.FirmySVazbamiNaPolitiky_nedavne_Cache.Get().SoukromeFirmy.ContainsKey(f.ICO))
+                        var firmySVazbamiNaPolitiky =
+                            await MaterializedViewsCache.FirmySVazbamiNaPolitiky_NedavneAsync();
+                        
+                        if (firmySVazbamiNaPolitiky.SoukromeFirmy.TryGetValue(f.ICO, out var osobyIds))
                         {
-                            foreach (var osobaId in StaticData.FirmySVazbamiNaPolitiky_nedavne_Cache.Get()
-                                .SoukromeFirmy[f.ICO])
+                            foreach (var osobaId in osobyIds)
                             {
-                                if (osoby.ContainsKey(osobaId))
+                                if (!osoby.TryAdd(osobaId, 1))
                                     osoby[osobaId]++;
-                                else
-                                    osoby.Add(osobaId, 1);
 
                                 if (osoby.Count > maxNumOfResults)
                                 {
@@ -648,11 +648,9 @@ namespace HlidacStatu.Repositories
                                     break;
                                 }
 
-                                if (skipRest == false && StaticData.FirmySVazbamiNaPolitiky_nedavne_Cache.Get()
-                                    .SoukromeFirmy.ContainsKey(fv.To.Id))
+                                if (skipRest == false && firmySVazbamiNaPolitiky.SoukromeFirmy.TryGetValue(fv.To.Id, out var osobyIds2))
                                 {
-                                    foreach (var osobaId in StaticData.FirmySVazbamiNaPolitiky_nedavne_Cache.Get()
-                                        .SoukromeFirmy[fv.To.Id])
+                                    foreach (var osobaId in osobyIds2)
                                     {
                                         if (osoby.ContainsKey(osobaId))
                                             osoby[osobaId]++;

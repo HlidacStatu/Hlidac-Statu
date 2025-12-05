@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace InsolvencniRejstrik.ByEvents
 {
@@ -29,7 +30,7 @@ namespace InsolvencniRejstrik.ByEvents
 			return 0;
 		}
 
-		public IEnumerable<WsResult> Get(long id)
+		public async IAsyncEnumerable<WsResult> GetAsync(long id)
 		{
 			var latestId = id;
 			if (File.Exists(CacheFile))
@@ -53,8 +54,8 @@ namespace InsolvencniRejstrik.ByEvents
 
 							fileStream.BaseStream.Seek(currentOffset, SeekOrigin.Begin);
 							fileStream.DiscardBufferedData();
-							fileStream.ReadLine();  // ignored because first read line could be incomplete (sought in the middle of it)
-							var wsResult = WsResult.From(fileStream.ReadLine());
+							await fileStream.ReadLineAsync();  // ignored because first read line could be incomplete (sought in the middle of it)
+							var wsResult = WsResult.From(await fileStream.ReadLineAsync());
 							if (wsResult.Id > latestId)
 							{
 								currentOffset = currentOffset - SeekStepInBytes;
@@ -67,7 +68,7 @@ namespace InsolvencniRejstrik.ByEvents
 
 						while (!fileStream.EndOfStream)
 						{
-							var item = WsResult.From(fileStream.ReadLine());
+							var item = WsResult.From(await fileStream.ReadLineAsync());
 							if (item.Id < latestId)
 							{
 								continue;
@@ -93,9 +94,9 @@ namespace InsolvencniRejstrik.ByEvents
 				}
 			}
 
-			foreach (var item in UnderlyingClient.Value.Get(latestId))
+			await foreach (var item in UnderlyingClient.Value.GetAsync(latestId))
 			{
-				File.AppendAllLines(CacheFile, new[] { item.ToStringLine() });
+				await File.AppendAllLinesAsync(CacheFile, new[] { item.ToStringLine() });
 				yield return item;
 			}
 		}

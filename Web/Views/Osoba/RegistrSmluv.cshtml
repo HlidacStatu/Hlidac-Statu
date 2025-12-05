@@ -5,6 +5,7 @@
 @using HlidacStatu.Extensions
 @using HlidacStatu.Lib.Analytics
 @using HlidacStatu.Repositories
+@using HlidacStatu.Repositories.Cache
 @using HlidacStatu.XLib.Render
 
 
@@ -20,7 +21,7 @@
 
     Osoba.Statistics.RegistrSmluv ostatAll = await Model.StatistikaRegistrSmluvAsync();
     var allStats = ostatAll.AllSmlouvySummary();
-
+    var firmySVazbamiNaPolitiky = await MaterializedViewsCache.FirmySVazbamiNaPolitiky_NedavneAsync();
 
     //Graf hodnota smluv
     var statChart = new Series[]
@@ -42,26 +43,26 @@
             Data = allStats
                 .Select(x => new SeriesData(x.Year, x.Value.PocetSmluvBezCeny)).ToArray(),
             Type = Series.SeriesType.line,
-
         }
     };
 
     string NiceString(string url, string query, int pocetSmluv, decimal cenaCelkem, int? year = null)
     {
         return $"<a href='{ValidUrl(url, query, year)}'>" +
-            Devmasters.Lang.CS.Plural.Get(pocetSmluv, "{0} smlouva;{0} smlouvy;{0} smluv") +
-            "</a> za celkem " +
-            Smlouva.NicePrice(cenaCelkem, html: true, shortFormat: true);
+               Devmasters.Lang.CS.Plural.Get(pocetSmluv, "{0} smlouva;{0} smlouvy;{0} smluv") +
+               "</a> za celkem " +
+               Smlouva.NicePrice(cenaCelkem, html: true, shortFormat: true);
     }
+
     string ValidUrl(string url, string query, int? year = null)
     {
         if (year.HasValue)
         {
             query = HlidacStatu.Searching.Query.ModifyQueryAND(query, $"datumUzavreni:[{year}-01-01 TO {year + 1}-01-01}}");
         }
+
         return $"{url}?q={System.Net.WebUtility.UrlEncode(query)}";
     }
-
 }
 
 @* První sloupec *@
@@ -69,93 +70,92 @@
 
     <h4>Souhrnné statistiky smluv pro @Model.FullName()</h4>
     <p>
-        
-        <div class="bs-callout info">
-            <h5>Statistiky smluv, které uzavřely firmy s vazbou na @Model.FullName()</h5>
-            <p>
-                <b>@Html.Raw(NiceString($"/hledatSmlouvy", $"osobaid:{Model.NameId}", (int)allStats.Summary().PocetSmluv, allStats.Summary().CelkovaHodnotaSmluv))</b>
-            </p>
-            @if (allStats.Summary().PocetSmluvSeZasadnimNedostatkem > 0)
-            {
-                <p>
-                    @Html.Raw($"<a href='{ValidUrl("/hledatSmlouvy", $"( osobaid:{Model.NameId} AND chyby:zasadni )")}'>{Devmasters.Lang.CS.Plural.Get(allStats.Summary().PocetSmluvSeZasadnimNedostatkem, "Jedna smlouvu má", "{0} smlouvy mají", "{0} smluv má")}</a> zásadní nedostatek");
-                </p>
-            }
-            @if (allStats.Summary().PocetSmluvULimitu > 0)
-            {
-                <p>
-                    @Html.Raw($"<a href='{ValidUrl("/hledatSmlouvy", $"( osobaid:{Model.NameId} AND hint.smlouvaULimitu:>0 )")}'>{Devmasters.Lang.CS.Plural.Get(allStats.Summary().PocetSmluvULimitu, "Jednu smlouva je", "{0} smlouvy jsou", "{0} smluv je")}</a> s hodnotou těsně pod limitem veřejných zakázek");
-                </p>
-            }
-        </div>
 
-        
+    <div class="bs-callout info">
+        <h5>Statistiky smluv, které uzavřely firmy s vazbou na @Model.FullName()</h5>
+        <p>
+            <b>@Html.Raw(NiceString($"/hledatSmlouvy", $"osobaid:{Model.NameId}", (int)allStats.Summary().PocetSmluv, allStats.Summary().CelkovaHodnotaSmluv))</b>
+        </p>
+        @if (allStats.Summary().PocetSmluvSeZasadnimNedostatkem > 0)
+        {
+            <p>
+                @Html.Raw($"<a href='{ValidUrl("/hledatSmlouvy", $"( osobaid:{Model.NameId} AND chyby:zasadni )")}'>{Devmasters.Lang.CS.Plural.Get(allStats.Summary().PocetSmluvSeZasadnimNedostatkem, "Jedna smlouvu má", "{0} smlouvy mají", "{0} smluv má")}</a> zásadní nedostatek");
+            </p>
+        }
+        @if (allStats.Summary().PocetSmluvULimitu > 0)
+        {
+            <p>
+                @Html.Raw($"<a href='{ValidUrl("/hledatSmlouvy", $"( osobaid:{Model.NameId} AND hint.smlouvaULimitu:>0 )")}'>{Devmasters.Lang.CS.Plural.Get(allStats.Summary().PocetSmluvULimitu, "Jednu smlouva je", "{0} smlouvy jsou", "{0} smluv je")}</a> s hodnotou těsně pod limitem veřejných zakázek");
+            </p>
+        }
+    </div>
+
+
 
 
     </p>
     @Html.ColumnGraph("Hodnota smluv  po letech", statChart, yTitleRight: "Počet smluv")
 
-    <hr />
+    <hr/>
     <h4>Detailní statistiky smluv po firmách s vazbou na @Model.FullName()</h4>
 
     <table class="table table-hover table-new table-new--dotted table-striped table-bordered">
-            <thead>
-                <tr>
-                    <th>Firma</th>
-                    <th>Obchody firmy se státem od 2016</th>
-                    <th>Vztah @Model.FullName() s firmou</th>
-                </tr>
-            </thead>
+        <thead>
+        <tr>
+            <th>Firma</th>
+            <th>Obchody firmy se státem od 2016</th>
+            <th>Vztah @Model.FullName() s firmou</th>
+        </tr>
+        </thead>
 
-            @foreach (var vPerIco in (ostatAll.SoukromeFirmy.Union(ostatAll.StatniFirmy))
-    .OrderByDescending(o => o.Value.Summary().CelkovaHodnotaSmluv)
-    .ThenByDescending(o => o.Value.Summary().PocetSmluv)
-    .Where(o => o.Value.Summary().PocetSmluv > 0)
-    )
-            {
-                string ico = vPerIco.Value.ICO;
-                Firma f = Firmy.Get(ico);
-                <tr>
-                    <td>
-                        <a href="@(f.GetUrl(true))">@f.Jmeno</a>
-                        @(StaticData.FirmySVazbamiNaPolitiky_nedavne_Cache.Get().SoukromeFirmy.ContainsKey(ico) ? " - soukromá firma" : "")
-                        @(StaticData.FirmySVazbamiNaPolitiky_nedavne_Cache.Get().StatniFirmy.ContainsKey(ico) ? " - firma (spolu)vlastněná státem či samosprávou" : "")
-                    </td>
-                    <td>
-                        @if (vPerIco.Value.Summary().PocetSmluv > 0)
-                        {
+        @foreach (var vPerIco in (ostatAll.SoukromeFirmy.Union(ostatAll.StatniFirmy))
+                      .OrderByDescending(o => o.Value.Summary().CelkovaHodnotaSmluv)
+                      .ThenByDescending(o => o.Value.Summary().PocetSmluv)
+                      .Where(o => o.Value.Summary().PocetSmluv > 0)
+                     )
+        {
+            string ico = vPerIco.Value.ICO;
+            Firma f = Firmy.Get(ico);
+            <tr>
+                <td>
+                    <a href="@(f.GetUrl(true))">@f.Jmeno</a>
+                    @(firmySVazbamiNaPolitiky.SoukromeFirmy.ContainsKey(ico) ? " - soukromá firma" : "")
+                    @(firmySVazbamiNaPolitiky.StatniFirmy.ContainsKey(ico) ? " - firma (spolu)vlastněná státem či samosprávou" : "")
+                </td>
+                <td>
+                    @if (vPerIco.Value.Summary().PocetSmluv > 0)
+                    {
                         <span style="white-space:nowrap">
                                 <a href="@Url.Action("Hledat", "Home", new { Q = "ico:" + ico })">
-                                    @Devmasters.Lang.CS.Plural.Get(vPerIco.Value.Summary(CoreStat.UsualYearsInterval.FromUsualFirstYearUntilNow ).PocetSmluv, "{0} smlouva;{0} smlouvy;{0} smluv")
+                                    @Devmasters.Lang.CS.Plural.Get(vPerIco.Value.Summary(CoreStat.UsualYearsInterval.FromUsualFirstYearUntilNow).PocetSmluv, "{0} smlouva;{0} smlouvy;{0} smluv")
                                 </a>
-                                <br />celkem @Html.Raw(Smlouva.NicePrice(vPerIco.Value.Summary(CoreStat.UsualYearsInterval.FromUsualFirstYearUntilNow ).CelkovaHodnotaSmluv, html: true, shortFormat: true))
+                            <br/>celkem @Html.Raw(Smlouva.NicePrice(vPerIco.Value.Summary(CoreStat.UsualYearsInterval.FromUsualFirstYearUntilNow).CelkovaHodnotaSmluv, html: true, shortFormat: true))
                             </span>
-                        }
-                        else
-                        {
-                            <span>Nenalezli jsme žádné smlouvy</span>
-                        }
+                    }
+                    else
+                    {
+                        <span>Nenalezli jsme žádné smlouvy</span>
+                    }
 
 
-                    </td>
-                    <td>
-                        @Html.RenderVazby(Model.VazbyProICO(ico))
-                    </td>
-                </tr>
-            }
-        </table>
-
-        @{ int numBezSmluv = ostatAll.SoukromeFirmy
-                .Count(o => o.Value.Summary().PocetSmluv == 0);
+                </td>
+                <td>
+                    @Html.RenderVazby(Model.VazbyProICO(ico))
+                </td>
+            </tr>
         }
-        @if (numBezSmluv > 0)
-        {
-            <p>
-                @Model.FullName() se angažuje či angažoval
-                <b>@Devmasters.Lang.CS.Plural.Get(numBezSmluv, "v jedné firmě", "v dalších {0} firmách", "v dalších {0} společnostech")</b>,
-                které nemají žádné obchodní vztahy se státem (uložené v registru smluv).
-            </p>
-        }
+    </table>
+
+    @{ int numBezSmluv = ostatAll.SoukromeFirmy
+               .Count(o => o.Value.Summary().PocetSmluv == 0); }
+    @if (numBezSmluv > 0)
+    {
+        <p>
+            @Model.FullName() se angažuje či angažoval
+            <b>@Devmasters.Lang.CS.Plural.Get(numBezSmluv, "v jedné firmě", "v dalších {0} firmách", "v dalších {0} společnostech")</b>,
+            které nemají žádné obchodní vztahy se státem (uložené v registru smluv).
+        </p>
+    }
 
 
-    </div>
+</div>

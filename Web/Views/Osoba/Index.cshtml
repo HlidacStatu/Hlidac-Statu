@@ -412,14 +412,15 @@
     }
 
     @{
-        var dotaceStat = Model.StatistikaDotace().AllDotaceSummary();
+        var statistikaDotaci = await Model.StatistikaDotaceAsync(); 
+        var dotaceStat = statistikaDotaci.AllDotaceSummary();
         var dotaceStatSum = dotaceStat.Summary();
         var sdotaceHKc = " v celkové hodnotě <b>" + HlidacStatu.Util.RenderData.NicePriceHtml(dotaceStatSum.CelkemPrideleno) + "</b>.";
         string durlH = "/dotace/hledat?Q=osobaid%3A" + Model.NameId;
 
-        int pocetFiremSdotaci = Model.StatistikaDotace().SoukromeFirmy.Count(m => m.Value.Summary().PocetDotaci > 0)
-        + Model.StatistikaDotace().StatniFirmy.Count(m => m.Value.Summary().PocetDotaci > 0)
-        + Model.StatistikaDotace().Neziskovky.Count(m => m.Value.Summary().PocetDotaci > 0);
+        int pocetFiremSdotaci = statistikaDotaci.SoukromeFirmy.Count(m => m.Value.Summary().PocetDotaci > 0)
+        + statistikaDotaci.StatniFirmy.Count(m => m.Value.Summary().PocetDotaci > 0)
+        + statistikaDotaci.Neziskovky.Count(m => m.Value.Summary().PocetDotaci > 0);
 
 
         var dotaceChartData = new Series[]

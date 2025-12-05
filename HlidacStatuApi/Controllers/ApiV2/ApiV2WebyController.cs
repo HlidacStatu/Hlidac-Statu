@@ -50,16 +50,16 @@ namespace HlidacStatuApi.Controllers.ApiV2
 
         [Authorize]
         [HttpGet("nedostupnost")]
-        public ActionResult<NedostupnostModel[]> TopNedostupnost(int days)
+        public async Task<ActionResult<NedostupnostModel[]>> TopNedostupnost(int days)
         {
 
-            UptimeServer.HostAvailability[] topNedostupnosti1D = Code.Availability.AllActiveServers24hoursStat()
+            UptimeServer.HostAvailability[] topNedostupnosti1D = (await Code.Availability.AllActiveServers24hoursStatAsync())
                 //.Where(m=>m.Host.Id == 108)
                 .Where(o => (o.Statistics().DurationTotal.Pomale.TotalSeconds) + o.Statistics().DurationTotal.Nedostupne.TotalSeconds > 0)
                 .OrderByDescending(o => (o.Statistics().DurationTotal.Pomale.TotalSeconds) + (o.Statistics().DurationTotal.Nedostupne.TotalSeconds * 5.0))
                 .Take(60)
                 .ToArray();
-            UptimeServer.HostAvailability[] topNedostupnosti7D = Code.Availability.AllActiveServersWeekStat()
+            UptimeServer.HostAvailability[] topNedostupnosti7D = (await Code.Availability.AllActiveServersWeekStatAsync())
                             .Where(m => m?.Host?.Id != null)
                             .Where(o => (o.Statistics().DurationTotal.Pomale.TotalSeconds) + o.Statistics().DurationTotal.Nedostupne.TotalSeconds > 0)
                             .OrderByDescending(o => (o.Statistics().DurationTotal.Pomale.TotalSeconds) + (o.Statistics().DurationTotal.Nedostupne.TotalSeconds * 5.0))
@@ -95,9 +95,9 @@ namespace HlidacStatuApi.Controllers.ApiV2
             {
                 UptimeServer.HostAvailability data = null;
                 if (days == null || days == 7)
-                    data = Code.Availability.AvailabilityForWeekById(host.Id);
+                    data = await Code.Availability.AvailabilityForWeekByIdAsync(host.Id);
                 else
-                    data = Code.Availability.AvailabilityForDayById(host.Id);
+                    data = await Code.Availability.AvailabilityForDayById(host.Id);
 
 
                 UptimeSSL webssl = await UptimeSSLRepo.LoadLatestAsync(host.HostDomain());
@@ -129,7 +129,7 @@ namespace HlidacStatuApi.Controllers.ApiV2
         [ApiExplorerSettings(IgnoreApi = true)]
         [Authorize]
         [HttpGet("availabilityForDayById")]
-        public ActionResult<UptimeServer.HostAvailability> AvailabilityForDayById(int? id)
+        public async Task<ActionResult<UptimeServer.HostAvailability>> AvailabilityForDayById(int? id)
         {
             if (id == null)
                 return BadRequest($"Web nenalezen");
@@ -138,14 +138,14 @@ namespace HlidacStatuApi.Controllers.ApiV2
             if (host == null)
                 return BadRequest($"Web nenalezen");
 
-            return Availability.AvailabilityForDayById(id.Value);
+            return await Availability.AvailabilityForDayById(id.Value);
         }
 
 
         [ApiExplorerSettings(IgnoreApi = true)]
         [Authorize]
         [HttpGet("availabilityForWeekById")]
-        public ActionResult<UptimeServer.HostAvailability> AvailabilityForWeekById(int? id)
+        public async Task<ActionResult<UptimeServer.HostAvailability>> AvailabilityForWeekById(int? id)
         {
             if (id == null)
                 return BadRequest($"Web nenalezen");
@@ -154,13 +154,13 @@ namespace HlidacStatuApi.Controllers.ApiV2
             if (host == null)
                 return BadRequest($"Web nenalezen");
 
-            return Availability.AvailabilityForWeekById(id.Value);
+            return await Availability.AvailabilityForWeekByIdAsync(id.Value);
         }
 
         [ApiExplorerSettings(IgnoreApi = true)]
         [HttpGet("chartdata/{id}")]
         [HlidacCache(60, "id;f;t;h", false)]
-        public ActionResult ChartData(string id, long? f, long? t, int? h = 24)
+        public async Task<ActionResult> ChartData(string id, long? f, long? t, int? h = 24)
         {
             id = id?.ToLower() ?? "";
             string content = "{}";
@@ -178,11 +178,11 @@ namespace HlidacStatuApi.Controllers.ApiV2
                 var host = UptimeServerRepo.Load(Convert.ToInt32(id));
                 if (host != null)
                 {
-                    data = new UptimeServer.HostAvailability[] { Code.Availability.AvailabilityForWeekById(host.Id) };
+                    data = new UptimeServer.HostAvailability[] { await Code.Availability.AvailabilityForWeekByIdAsync(host.Id) };
                 }
             }
             else
-                data = Code.Availability.AvailabilityForDayByGroup(id);
+                data = await Code.Availability.AvailabilityForDayByGroupAsync(id);
 
             if (data?.Count() > 0)
             {

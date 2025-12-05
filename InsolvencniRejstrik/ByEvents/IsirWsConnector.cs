@@ -6,7 +6,6 @@ using System.IO;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
-using System.Threading;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 using Serilog;
@@ -35,23 +34,19 @@ namespace InsolvencniRejstrik.ByEvents
 			WsClient = wsClient;
 			ToEventId = toEventId;
 		}
-
-		public void Handle()
+		
+		public async Task HandleAsync()
 		{
 			Console.WriteLine("Spousti se zpracovani ...");
 
-			WsProcessorTask = RunTask(() => WsProcessor(EventsRepository.GetLastEventId()));
-			MessageProcessorTask = RunTask(MessageProcessor);
-			LinkProcessorTask = RunTask(LinkProcessor);
-			#pragma warning disable CSE009
-			var StatsInfo = RunTask(StatsInfoCallback);
-			#pragma warning restore CSE009
+			WsProcessorTask = WsProcessorAsync(EventsRepository.GetLastEventId());
+			MessageProcessorTask = MessageProcessorAsync();
+			LinkProcessorTask = LinkProcessorAsync();
+			_ = StatsInfoCallbackAsync();
 
-			while (MessageProcessorTask.Status == TaskStatus.Running || LinkProcessorTask.Status == TaskStatus.Running)
-			{
-				Thread.Sleep(500);
-			}
+			await Task.WhenAll(MessageProcessorTask, LinkProcessorTask);
 		}
+		
 
 		private Stats GlobalStats;
 		private Task WsProcessorTask;
@@ -60,14 +55,14 @@ namespace InsolvencniRejstrik.ByEvents
 		private ConcurrentQueue<WsResult> WsResultsQueue = new ConcurrentQueue<WsResult>();
 		private ConcurrentQueue<Rizeni> LinkRequestsQueue = new ConcurrentQueue<Rizeni>();
 
-		private void WsProcessor(long id)
+		private async Task WsProcessorAsync(long id)
 		{
 			var lastId = id;
 			while (true)
 			{
 				try
 				{
-					foreach (var item in WsClient.Get(id))
+					await foreach (var item in WsClient.GetAsync(id))
 					{
 						if (ToEventId > 0 && item.Id > ToEventId)
 						{
@@ -79,7 +74,7 @@ namespace InsolvencniRejstrik.ByEvents
 
 						while (WsResultsQueue.Count > 5_000)
 						{
-							Thread.Sleep(1_000);
+							await Task.Delay(1_000);
 						}
 					}
 
@@ -93,7 +88,7 @@ namespace InsolvencniRejstrik.ByEvents
 			}
 		}
 
-		private void LinkProcessor()
+		private async Task LinkProcessorAsync()
 		{
 			while (!LinkRequestsQueue.IsEmpty || WsProcessorTask.Status == TaskStatus.Running || MessageProcessorTask.Status == TaskStatus.Running)
 			{
@@ -104,12 +99,12 @@ namespace InsolvencniRejstrik.ByEvents
 				}
 				else
 				{
-					Thread.Sleep(100);
+					await Task.Delay(100);
 				}
 			}
 		}
 
-		private void MessageProcessor()
+		private async Task MessageProcessorAsync()
 		{
 			while (!WsResultsQueue.IsEmpty || WsProcessorTask.Status == TaskStatus.Running)
 			{
@@ -121,7 +116,7 @@ namespace InsolvencniRejstrik.ByEvents
 					GlobalStats.LastEventTime = item.DatumZalozeniUdalosti;
 					try
 					{
-						var rizeni = Repository.GetInsolvencyProceeding(item.SpisovaZnacka, CreateNewInsolvencyProceeding);
+						var rizeni = await Repository.GetInsolvencyProceedingAsync(item.SpisovaZnacka, CreateNewInsolvencyProceeding);
 						var lastChanged = rizeni?.PosledniZmena ?? DateTime.MinValue;
 
 						ProcessDocument(item, rizeni);
@@ -209,7 +204,7 @@ namespace InsolvencniRejstrik.ByEvents
 
 							if (lastChanged != rizeni.PosledniZmena || updated)
 							{
-								Repository.SetInsolvencyProceeding(rizeni);
+								await Repository.SetInsolvencyProceedingAsync(rizeni);
 							}
 						}
 						EventsRepository.SetLastEventId(item.Id);
@@ -217,19 +212,19 @@ namespace InsolvencniRejstrik.ByEvents
 					catch (Exception e)
 					{
 						GlobalStats.WriteError($"Message task - {e.Message}", item.Id);
-						File.AppendAllText("errors.log", $@"""
+						await File.AppendAllTextAsync("errors.log", $@"""
 [{DateTime.Now}]
 {item.Id} - {item.SpisovaZnacka} - {item.PopisUdalosti}
 {e.ToString()}
 {e.StackTrace}
 """);
 						_logger.Error(e, $"Message processor - {e.Message} (eventId: {item.Id})");
-						File.AppendAllLines("failed_messages.dat", new[] { item.ToStringLine() });
+						await File.AppendAllLinesAsync("failed_messages.dat", new[] { item.ToStringLine() });
 					}
 				}
 				else
 				{
-					Thread.Sleep(100);
+					await Task.Delay(100);
 				}
 			}
 		}
@@ -422,7 +417,7 @@ namespace InsolvencniRejstrik.ByEvents
 										}.Where(i => !string.IsNullOrEmpty(i)));
 		}
 
-		private void StatsInfoCallback()
+		private async Task StatsInfoCallbackAsync()
 		{
 			while (true)
 			{
@@ -462,7 +457,7 @@ namespace InsolvencniRejstrik.ByEvents
 					{
 						Console.WriteLine($"    - {error}");
 					}
-					Thread.Sleep(1000);
+					await Task.Delay(1000);
 				}
 				catch (Exception e)
 				{
@@ -470,7 +465,7 @@ namespace InsolvencniRejstrik.ByEvents
 					Console.WriteLine("Vlakno pro vykreslovani UI selhalo");
 					Console.WriteLine(e.Message);
 					Console.WriteLine(e.StackTrace);
-					Thread.Sleep(1000);
+					await Task.Delay(1000);
 				}
 			}
 		}
@@ -485,14 +480,6 @@ namespace InsolvencniRejstrik.ByEvents
 			return xdoc.Descendants(element).FirstOrDefault()?.Value ?? "";
 		}
 
-		private Task RunTask(Action action)
-		{
-			#pragma warning disable CSE009
-			var task = TaskFactory.StartNew(action);
-			#pragma warning restore CSE009
-			while (task.Status != TaskStatus.Running) Thread.Sleep(10);
-			return task;
-		}
 
 		private void PrintHeader()
 		{

@@ -606,9 +606,6 @@ namespace HlidacStatu.Entities
                 Legal_Risk_Level = this.GetLegalRisksLevel() > ImportanceLevel.Minor
                     ? this.GetLegalRisksLevel().ToNiceDisplayName() : null,
             };
-            {
-            }
-            ;
         }
     }
 }

@@ -5,6 +5,7 @@
 @using HlidacStatu.XLib.Render
 @using HlidacStatu.Repositories
 @using HlidacStatu.Repositories.Analysis
+@using HlidacStatu.Repositories.Cache
 
 
 @{
@@ -71,7 +72,7 @@
     
 
 
-    var dataStatsCache = StaticData.FirmyCasovePodezreleZalozene.Get().ToList();
+    var dataStatsCache = (await MaterializedViewsCache.GetFirmyCasovePodezreleZalozeneAsync()).ToList();
 
 
     ReportDataSource<(AnalysisCalculation.IcoSmlouvaMinMax? MinMax, StatisticsSubjectPerYear<Smlouva.Statistics.Data>? Stat)> rds1 = new(tableSloupce);

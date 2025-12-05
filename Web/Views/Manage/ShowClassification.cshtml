@@ -11,7 +11,7 @@
     try
     {
         sml = await SmlouvaRepo.LoadAsync(Model.Item1, includePlaintext:false);
-        classif = SmlouvaRepo.GetClassificationFromServer(sml);
+        classif = await SmlouvaRepo.GetClassificationFromServerAsync(sml);
     }
     catch (Exception e)
     {

@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using HlidacStatu.Caching;
 using HlidacStatu.Entities;
 using HlidacStatu.Entities.KIndex;
+using HlidacStatu.Repositories.Cache;
 using Serilog;
 using ZiggyCreatures.Caching.Fusion;
 
@@ -24,8 +25,11 @@ namespace HlidacStatu.Repositories.Analysis.KorupcniRiziko
         public static ValueTask<Statistics[]> GetKindexStatTotalAsync() =>
             _permanentCache.GetOrSetAsync($"_KIndexStat",
                 async _ => (await CalculateAsync()).ToArray(),
-                options => options.ModifyEntryOptionsDuration(TimeSpan.FromHours(6))
-            );
+                options =>
+                {
+                    options.ModifyEntryOptionsDuration(TimeSpan.FromHours(6), TimeSpan.FromDays(10 * 365));
+                    options.ModifyEntryOptionsFactoryTimeouts(TimeSpan.FromHours(12));
+                });
 
         public static async Task ForceRefreshKindexStatTotalAsync(Statistics[] newData = null)
         {
@@ -39,7 +43,6 @@ namespace HlidacStatu.Repositories.Analysis.KorupcniRiziko
                 await GetKindexStatTotalAsync();
             }
         }
-        
         
 
         public decimal AverageKindex { get; set; }
@@ -99,12 +102,14 @@ namespace HlidacStatu.Repositories.Analysis.KorupcniRiziko
             var statChosenYear = kindexStatsTotal.FirstOrDefault(m => m.Rok == year).SubjektOrderedListKIndexAsc;
             var statYearBefore = kindexStatsTotal.FirstOrDefault(m => m.Rok == year - 1).SubjektOrderedListKIndexAsc;
 
+            var kindexCompanies = await KindexCache.GetKindexCompaniesAsync();
+            
             IEnumerable<SubjectWithKIndexTrend> result = statChosenYear.Join(statYearBefore,
                     cy => cy.ico,
                     yb => yb.ico,
                     (cy, yb) =>
                     {
-                        SubjectNameCache.GetCompanies().TryGetValue(cy.ico, out SubjectNameCache comp);
+                        kindexCompanies.TryGetValue(cy.ico, out SubjectNameCache comp);
                         var r = new SubjectWithKIndexTrend()
                         {
                             Ico = cy.ico,
@@ -134,10 +139,11 @@ namespace HlidacStatu.Repositories.Analysis.KorupcniRiziko
             return AverageParts.Radky.First(m => m.Velicina == (int)part).Hodnota;
         }
 
-        public IEnumerable<SubjectWithKIndex> Filter(IEnumerable<IcoDetail> source,
+        public async Task<IEnumerable<SubjectWithKIndex>> FilterAsync(IEnumerable<IcoDetail> source,
             IEnumerable<Firma.Zatrideni.Item> filterIco = null, bool showNone = false)
         {
             IEnumerable<SubjectWithKIndex> data;
+            
             if (filterIco != null && filterIco.Count() > 0)
             {
                 data = source.Join(
@@ -158,10 +164,11 @@ namespace HlidacStatu.Repositories.Analysis.KorupcniRiziko
             }
             else
             {
+                var kindexCompanies = await KindexCache.GetKindexCompaniesAsync();
                 data = source.Select(m =>
                 {
                     string subjectName = "";
-                    if (SubjectNameCache.CachedCompanies.Get().TryGetValue(m.ico, out var cache))
+                    if (kindexCompanies.TryGetValue(m.ico, out var cache))
                     {
                         subjectName = cache.Name;
                     }
@@ -207,17 +214,17 @@ namespace HlidacStatu.Repositories.Analysis.KorupcniRiziko
             return data;
         }
 
-        public IEnumerable<SubjectWithKIndex> SubjektOrderedListKIndexCompanyAsc(
+        public async Task<IEnumerable<SubjectWithKIndex>> SubjektOrderedListKIndexCompanyAscAsync(
             IEnumerable<Firma.Zatrideni.Item> filterIco = null, bool showNone = false)
         {
-            return Filter(SubjektOrderedListKIndexAsc, filterIco, showNone)
+            return (await FilterAsync(SubjektOrderedListKIndexAsc, filterIco, showNone))
                 .OrderBy(m => m.KIndex);
         }
 
-        public IEnumerable<SubjectWithKIndex> SubjektOrderedListPartsCompanyAsc(KIndexData.KIndexParts part,
+        public async Task<IEnumerable<SubjectWithKIndex>> SubjektOrderedListPartsCompanyAscAsync(KIndexData.KIndexParts part,
             IEnumerable<Firma.Zatrideni.Item> filterIco = null, bool showNone = false)
         {
-            return Filter(SubjektOrderedListPartsAsc[part], filterIco, showNone)
+            return (await FilterAsync(SubjektOrderedListPartsAsc[part], filterIco, showNone))
                 .OrderBy(m => m.KIndex);
         }
 

@@ -154,7 +154,7 @@ public partial class PoliticiController : Controller
         var maxTotalIncomeInMilions =
             Math.Ceiling((fullPoliticiViewData.Max(x => x.CelkoveRocniNaklady_Sort) + 1) / 1_000_000);
 
-        var filteredPoliticiViewData = FilterPoliticiViewData(rok, HttpContext.Request.Query, politickeStranyFilterData);
+        var filteredPoliticiViewData = FilterPoliticiViewDataAsync(rok, HttpContext.Request.Query, politickeStranyFilterData);
 
         // parties + "Ostatní"
         var parties = politickeStranyFilterData;
@@ -272,23 +272,23 @@ public partial class PoliticiController : Controller
 
         var politickeStranyFilterData = PpRepo.Cached.GetPolitickeStranyForFilter();
 
-        var filtered = FilterPoliticiViewData(HttpContext.Request.Query, politickeStranyFilterData);
+        var filtered = await FilterPoliticiViewDataAsync(HttpContext.Request.Query, politickeStranyFilterData);
 
         return new JsonResult(filtered.ToList(), new JsonSerializerOptions(JsonSerializerDefaults.Web));
     }
 
     // Filtruje data podle query stringu
-    private List<HlidacStatu.Extensions.Cache.Views.PoliticiViewData> FilterPoliticiViewData(Microsoft.AspNetCore.Http.IQueryCollection query,
+    private async Task<List<HlidacStatu.Extensions.Cache.Views.PoliticiViewData>> FilterPoliticiViewDataAsync(Microsoft.AspNetCore.Http.IQueryCollection query,
         List<string> politickeStranyFilter)
     {
         Microsoft.AspNetCore.Http.IQueryCollection q = query;
         string? year = q.Choices(PoliticiFilterKeys.Year)?.FirstOrDefault();
 
         var rok = Devmasters.ParseText.ToInt(year) ?? PuRepo.DefaultYear;   
-        return FilterPoliticiViewData(rok, query, politickeStranyFilter);
+        return await FilterPoliticiViewDataAsync(rok, query, politickeStranyFilter);
     }
 
-    private List<HlidacStatu.Extensions.Cache.Views.PoliticiViewData> FilterPoliticiViewData(int rok,
+    private async Task<List<HlidacStatu.Extensions.Cache.Views.PoliticiViewData>> FilterPoliticiViewDataAsync(int rok,
         Microsoft.AspNetCore.Http.IQueryCollection query,
         List<string> politickeStranyFilter)
     {
@@ -303,8 +303,8 @@ public partial class PoliticiController : Controller
 
 
 
-        IEnumerable<HlidacStatu.Extensions.Cache.Views.PoliticiViewData> filteredData = HlidacStatu.Extensions.Cache.Platy.Politici.GetFullPoliticiViewDataCached(rok)
-                .ConfigureAwait(false).GetAwaiter().GetResult();
+        IEnumerable<HlidacStatu.Extensions.Cache.Views.PoliticiViewData> filteredData =
+            await HlidacStatu.Extensions.Cache.Platy.Politici.GetFullPoliticiViewDataCached(rok);
 
         // Gender
         if (genders.Length > 0)

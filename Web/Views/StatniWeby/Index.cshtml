@@ -1,4 +1,5 @@
 ﻿@using HlidacStatu.Entities
+@using HlidacStatu.Repositories.Cache
 
 @{
     ViewBag.Title = "Hlídač státních webů";
@@ -50,7 +51,7 @@
     <partial name="_AutocompletePartial"/>
 
 @{
-    var data = HlidacStatu.Repositories.UptimeSSLRepo.AllLatestSSL()
+    var data = (await UptimeSslCache.AllLatestSslAsync())
             .OrderByDescending(m => m.SSLGrade())
             .ToArray();
 }
@@ -73,7 +74,7 @@
                         Již neplatné (expirované certifikáty)
                     </div>
                     <div class="card-body">
-                        <p class="card-text">
+                        <div class="card-text">
                             <ul class="list-inline">
                                 @foreach (var domain in expired)
                                 {
@@ -87,7 +88,7 @@
                                     }
                                 }
                             </ul>
-                        </p>
+                        </div>
                     </div>
                 </div>
                 <div style="margin-bottom:20px;"></div>
@@ -99,7 +100,7 @@
                         Certifikáty, co budou neplatné do týdne
                     </div>
                     <div class="card-body">
-                        <p class="card-text">
+                        <div class="card-text">
                             <ul class="list-inline">
                                 @foreach (var _dom in closeToExpiration.Where(m => (m.CertExpiration().Value - DateTime.Now).TotalDays < 15)
                                )
@@ -124,7 +125,7 @@
                                     <li class="list-inline-item">@Html.Raw(icon) <a href="@server.pageUrl">@server.Name</a> (@expiresIn).</li>
                                 }
                             </ul>
-                        </p>
+                        </div>
                     </div>
                 </div>
                 <a href="/statniweby/https" class="btn btn-hs btn-warning btn-sm">Více informací o HTTPS všech serverů</a>
@@ -264,7 +265,7 @@
 
 <div class="clearfix"></div>
 
-@WebyChartUtil.TableNextGroups("index")
+@await WebyChartUtil.TableNextGroupsAsync("index")
 
 
 <partial name="_CoVlastneDelamePartial.cshtml" />

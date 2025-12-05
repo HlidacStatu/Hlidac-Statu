@@ -33,7 +33,7 @@ namespace HlidacStatu.Lib.Data.External.Tables.Camelot
             cl = new ClientLow(conn.GetEndpointUrl(), connection.GetApiKey());
         }
 
-        public async Task<ApiResult<HlidacStatu.DS.Api.TablesInDoc.ApiOldCamelotResult>> ParseFromUrl(int numberOfTries = 10)
+        public async Task<ApiResult<HlidacStatu.DS.Api.TablesInDoc.ApiOldCamelotResult>> ParseFromUrlAsync(int numberOfTries = 10)
         {
             try
             {
@@ -47,9 +47,9 @@ namespace HlidacStatu.Lib.Data.External.Tables.Camelot
                     else if (res.ErrorCode == 429)
                     {
                         _logger.Debug($"try {i} Error 429 waiting because of {cl.ApiEndpoint}");
-                        cl.Dispose();
+                        await cl.DisposeAsync();
                         cl = new ClientLow(conn.GetEndpointUrl(), conn.GetApiKey());
-                        System.Threading.Thread.Sleep(200 + 3000 * i);
+                        await Task.Delay(200 + 3000 * i);
                     }
                     else
                     {

@@ -19,10 +19,12 @@ namespace HlidacStatuApi.Controllers.ApiV2
     {
         private readonly ILogger _logger = Serilog.Log.ForContext<ApiV2BlurredPageController>();
         
-        static long runningSaveThreads = 0;
-        static long savingPagesInThreads = 0;
-        static long savedInThread = 0;
-        static long saved = 0;
+        private readonly BlurredPageBackgroundQueue _backgroundQueue;
+
+        public ApiV2BlurredPageController(BlurredPageBackgroundQueue backgroundQueue)
+        {
+            _backgroundQueue = backgroundQueue;
+        }
 
         [ApiExplorerSettings(IgnoreApi = true)]
         //[Authorize(Roles = "blurredAPIAccess")]
@@ -50,6 +52,7 @@ namespace HlidacStatuApi.Controllers.ApiV2
 
         }
 
+        //todo: refactor to channels
         [ApiExplorerSettings(IgnoreApi = true)]
         //[Authorize(Roles = "blurredAPIAccess")]
         [HttpPost("Save")]
@@ -60,54 +63,13 @@ namespace HlidacStatuApi.Controllers.ApiV2
             if (data.prilohy != null)
             {
                 int numOfPages = data.prilohy.Sum(m => m.pages.Count());
-                if (numOfPages > 200)
-                {
-                    new Thread(
-                        () =>
-                        {
-                            _ = Interlocked.Increment(ref savedInThread);
-                            _ = Interlocked.Increment(ref runningSaveThreads);
-                            _ = Interlocked.Add(ref savingPagesInThreads, numOfPages);
-
-                            _logger.Information(
-                                "{action} {code} for {part} for {pages}.",
-                                "starting",
-                                "thread",
-                                "ApiV2BlurredPageController.BpSave",
-                                numOfPages);
-                            Devmasters.DT.StopWatchEx sw = new Devmasters.DT.StopWatchEx();
-                            sw.Start();
-
-                            var success = SaveData(data).ConfigureAwait(false).GetAwaiter().GetResult();
-                            if (!success)
-                                _ = SaveData(data).ConfigureAwait(false).GetAwaiter().GetResult();
-
-                            sw.Stop();
-                            _logger.Information(
-                                "{action} {code} for {part} for {pages} in {duration} sec.",
-                                "ends",
-                                "thread",
-                                "ApiV2BlurredPageController.BpSave",
-                                numOfPages,
-                                sw.Elapsed.TotalSeconds);
-
-                            _ = Interlocked.Decrement(ref runningSaveThreads);
-                            _ = Interlocked.Add(ref savingPagesInThreads, -1 * numOfPages);
-
-                        }
-                    ).Start();
-                }
-                else
-                {
-                    var success = await SaveData(data);
-                    if (!success)
-                        _ = await SaveData(data);
-                }
+                await _backgroundQueue.QueueWorkAsync(data);
+                _logger.Information(
+                    "Queued {pages} pages for background processing for {smlouvaId}",
+                    numOfPages,
+                    data.smlouvaId
+                );
             }
-
-            _ = Interlocked.Increment(ref savedInThread);
-
-            //_ = justInProcess.Remove(data.smlouvaId, out _);
 
             return StatusCode(200);
         }
@@ -158,96 +120,7 @@ namespace HlidacStatuApi.Controllers.ApiV2
         }
 
 
-        private async Task<bool> SaveData(BpSave data)
-        {
-            List<Task> tasks = new List<Task>();
-            List<PageMetadata> pagesMD = new List<PageMetadata>();
-            foreach (var p in data.prilohy)
-            {
-                foreach (var page in p.pages)
-                {
-                    PageMetadata pm = new PageMetadata();
-                    pm.SmlouvaId = data.smlouvaId;
-                    pm.PrilohaId = p.uniqueId;
-                    pm.PageNum = page.page;
-                    pm.Blurred = new PageMetadata.BlurredMetadata()
-                    {
-                        BlackenAreaBoundaries = page.blackenAreaBoundaries
-                            .Select(b => new PageMetadata.BlurredMetadata.Boundary()
-                            {
-                                X = b.x,
-                                Y = b.y,
-                                Width = b.width,
-                                Height = b.height
-                            }
-                            ).ToArray(),
-                        TextAreaBoundaries = page.textAreaBoundaries
-                            .Select(b => new PageMetadata.BlurredMetadata.Boundary()
-                            {
-                                X = b.x,
-                                Y = b.y,
-                                Width = b.width,
-                                Height = b.height
-                            }
-                            ).ToArray(),
-                        AnalyzerVersion = page.analyzerVersion,
-                        Created = DateTime.Now,
-                        ImageWidth = page.imageWidth,
-                        ImageHeight = page.imageHeight,
-                        BlackenArea = page.blackenArea,
-                        TextArea = page.textArea
-                    };
-                    pagesMD.Add(pm);
-                    Task t = PageMetadataRepo.SaveAsync(pm);
-                    tasks.Add(t);
-                    //t.Wait();
-                }
-            }
-
-
-            if (pagesMD.Count > 0)
-            {
-                var sml = await SmlouvaRepo.LoadAsync(data.smlouvaId);
-                foreach (var pril in sml.Prilohy)
-                {
-                    IEnumerable<PageMetadata>? blurredPages = pagesMD.Where(m => m.PrilohaId == pril.UniqueHash());
-
-                    if (blurredPages.Any())
-                    {
-                        var pb = new Smlouva.Priloha.BlurredPagesStats(blurredPages);
-                        pril.BlurredPages = pb;
-                    }
-                    else
-                    {
-                        if (pril.BlurredPages != null)
-                        {
-                            //keep
-                        }
-                        else
-                        {
-                            pril.BlurredPages = null;
-                        }
-                    }
-                }
-                _ = await SmlouvaRepo.SaveAsync(sml, updateLastUpdateValue: false, skipPrepareBeforeSave: true, fireOCRDone:false);
-
-            }
-            try
-            {
-                Task.WaitAll(tasks.ToArray());
-                return true;
-            }
-            catch (Exception e)
-            {
-                _logger.Error(e,
-                    "{action} {code} for {part} exception.",
-                    "saving",
-                    "thread",
-                    "ApiV2BlurredPageController.BpSave"
-                    );
-                return false;
-            }
-        }
+        
 
         [ApiExplorerSettings(IgnoreApi = true)]
         [Authorize(Roles = "PrivateApi")]

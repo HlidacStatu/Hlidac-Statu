@@ -7,6 +7,7 @@
 @{
     ViewBag.Title = "Organizace nejvíce odmítající poskytnout příjem politiků";
 }
+
 @section breadcrumbs
 {
     <ol class="breadcrumb">
@@ -34,6 +35,7 @@
 
         return _sectionBgSwitch ? "alter-bg-color" : "";
     }
+
 }
 
 <section class="d-flex align-items-center justify-content-center  @(GetBgClass()) pageblock-small">
@@ -44,7 +46,8 @@
             Ty nám odmítly informace o platech daných politiků sdělit.
         </p>
         <p>
-            Vzápětí jsme oslovili většinu politiků (na více než 80 % politiků jsme dohledali email či jiné spojení) a požádali je o doplnění chybějících informací
+            Vzápětí jsme oslovili většinu politiků (na více než 80 % politiků jsme dohledali email či jiné spojení) a
+            požádali je o doplnění chybějících informací
             o platech.
         </p>
         <p>
@@ -54,48 +57,40 @@
 </section>
 
 @{
-
     using var db = new DbEntities();
     var vsechnyPlaty = await PpRepo.BasePotvrzenePlaty(db, PpRepo.DefaultYear)
-    .Include(i => i.Organizace).ThenInclude(o => o.FirmaDs)
-    .Where(m => m.Status == PpPrijem.StatusPlatu.Zjistujeme_zadost_106)
-    .ToArrayAsync();
+        .Include(i => i.Organizace).ThenInclude(o => o.FirmaDs)
+        .Where(m => m.Status == PpPrijem.StatusPlatu.Zjistujeme_zadost_106)
+        .ToArrayAsync();
     var orgs = vsechnyPlaty
-    .GroupBy(k => k.Organizace.Ico, v => v, (k, v) => new { ico = k, platy = v.Where(p => p.Status >= 0).ToArray() })
-    .ToDictionary(k => k.ico, v => v.platy)
-    .OrderByDescending(kv => kv.Value.Count())
-    .Take(100)
-    .ToDictionary(kv => kv.Key, kv => kv.Value);
+        .GroupBy(k => k.Organizace.Ico, v => v, (k, v) => new { ico = k, platy = v.Where(p => p.Status >= 0).ToArray() })
+        .ToDictionary(k => k.ico, v => v.platy)
+        .OrderByDescending(kv => kv.Value.Count())
+        .Take(100)
+        .ToDictionary(kv => kv.Key, kv => kv.Value);
 
 
-    ReportDataSource<KeyValuePair<string, PpPrijem[]>> rds = new(
-    new ReportDataSource<KeyValuePair<string, PpPrijem[]>>.Column()
-    {
-        Name = "Organizace",
-        HtmlRender =(m) =>
+    ReportDataSource<(KeyValuePair<string, PpPrijem[]> kv, OsobyRolesCache.osobaInfo roles)> rds = new(
+        new ReportDataSource<(KeyValuePair<string, PpPrijem[]> kv, OsobyRolesCache.osobaInfo roles)>.Column()
         {
-            return $"<a href='/organizace/{m.Key}'>{Firmy.GetJmeno(m.Key)}</a>";
+            Name = "Organizace",
+            HtmlRender = (m) => { return $"<a href='/organizace/{m.kv.Key}'>{Firmy.GetJmeno(m.kv.Key)}</a>"; },
+            OrderValueRender = (m) => { return $"{Firmy.GetJmeno(m.kv.Key)}"; },
         },
-        OrderValueRender = (m) =>
+        new ReportDataSource<(KeyValuePair<string, PpPrijem[]> kv, OsobyRolesCache.osobaInfo roles)>.Column()
         {
-            return $"{Firmy.GetJmeno(m.Key)}";
-        },
-    },
-    new ReportDataSource<KeyValuePair<string, PpPrijem[]>>.Column()
-    {
-        Name = "Neposkytl plat pro tyto politiky",
-        HtmlRender =(m) =>
-        {
-            return "<ol>" + string.Join("", m.Value
-        .Select(n => n.Nameid)
-        .Distinct()
-        .Select(o => $"<li><a href='/politici/politik/{o}'>{OsobyRolesCache.Get(o).Jmeno} {OsobyRolesCache.Get(o).Prijmeni}</a></li>")
-        ) + "</ul>";
-
-        },
-        OrderValueRender = (m) => HlidacStatu.Util.RenderData.OrderValueFormat(m.Value.Count()),
-        //CssClass = "text-nowrap overflow-x-hidden "
-    }
+            Name = "Neposkytl plat pro tyto politiky",
+            HtmlRender = (m) =>
+            {
+                return "<ol>" + string.Join("", m.kv.Value
+                    .Select(n => n.Nameid)
+                    .Distinct()
+                    .Select(o => $"<li><a href='/politici/politik/{o}'>{m.roles.Jmeno} {m.roles.Prijmeni}</a></li>")
+                ) + "</ul>";
+            },
+            OrderValueRender = (m) => HlidacStatu.Util.RenderData.OrderValueFormat(m.kv.Value.Count()),
+            //CssClass = "text-nowrap overflow-x-hidden "
+        }
     );
 
 
@@ -104,8 +99,8 @@
         //var platyPerPolitik = vsechnyPlaty.Where(m => m.Nameid == pol).ToArray();
         if (kv.Value.Any())
         {
-            rds.AddRow(kv);
-
+            var roles = await OsobyRolesCache.GetAsync(kv.Key);
+            rds.AddRow((kv, roles));
         }
     }
 }
@@ -114,7 +109,7 @@
     <div class="container">
         <p>
             @Html.DataToHTMLTable(rds,
-            dataTableOptions: HtmlExtensions.DatatableOptions(orderColumnIdx: 2, orderDirection: "desc", dom: "<\"top\"Bfp>rt<\"bottom\"ip><\"clear\">"))
+                dataTableOptions: HtmlExtensions.DatatableOptions(orderColumnIdx: 2, orderDirection: "desc", dom: "<\"top\"Bfp>rt<\"bottom\"ip><\"clear\">"))
         </p>
     </div>
 </section>

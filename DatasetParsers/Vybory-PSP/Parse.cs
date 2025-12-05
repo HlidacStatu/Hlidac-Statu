@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 using Devmasters.SpeechToText;
 namespace Vybory_PSP
 {
@@ -28,10 +29,8 @@ namespace Vybory_PSP
         static string _vyborJednaniHProot = "https://www.psp.cz/sqw/"; //idVyboru +6, 
         static string _vyborUsneseni = "https://www.psp.cz/sqw/hp.sqw?k={0}&kk=5&td=1&n={1}"; //idVyboru+5 , page
 
-        public static void Vybor(DatasetConnector dsc, int vyborId, bool rewrite = false)
+        public static async Task VyborAsync(DatasetConnector dsc, int vyborId, bool rewrite = false)
         {
-
-
             List<_usneseni> vsechnausneseni = VsechnaUsneseniVyboru(vyborId);
 
             Console.WriteLine($"Vybor {vyborId}");
@@ -69,8 +68,7 @@ namespace Vybory_PSP
             {
                 //parse HP jednani
                 //for (int cisloJednani = lastJednani; cisloJednani > 0; cisloJednani--)
-                Devmasters.Batch.Manager.DoActionForAll<int>(Enumerable.Range(1, lastJednani).Reverse(),
-                    (cisloJednani) =>
+                await Devmasters.Batch.Manager.DoActionForAllAsync<int>(Enumerable.Range(1, lastJednani).Reverse(), async (cisloJednani) =>
                 {
                     var jednani = JednaniKomplexni(vyborId, cisloJednani, string.Format(jednaniUrlTemplate, cisloJednani));
                     if (jednani == null)
@@ -96,7 +94,7 @@ namespace Vybory_PSP
                     jednani exists = null;
                     try
                     {
-                        exists = dsc.GetItemFromDataset<jednani>(datasetname, jednani.Id).Result;
+                        exists = await dsc.GetItemFromDataset<jednani>(datasetname, jednani.Id);
                     }
                     catch (Exception)
                     {
@@ -146,7 +144,7 @@ namespace Vybory_PSP
 
                     string id = "";
                     if (changed)
-                        id = dsc.AddItemToDataset(datasetname, jednani, DatasetConnector.AddItemMode.Rewrite).Result;
+                        id = await dsc.AddItemToDataset(datasetname, jednani, DatasetConnector.AddItemMode.Rewrite);
                     Console.WriteLine($"Saved vybor {jednani.vybor} jednani {jednani.Id} id {id}");
                     return new Devmasters.Batch.ActionOutputData();
 

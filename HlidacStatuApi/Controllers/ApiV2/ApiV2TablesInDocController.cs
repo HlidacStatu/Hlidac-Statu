@@ -58,7 +58,7 @@ namespace HlidacStatuApi.Controllers.ApiV2
                 HlidacStatu.DS.Api.TablesInDoc.Result[] tables = data.results;
                 tasks.Add( DocTablesRepo.SaveAsync(data.task.smlouvaId, data.task.prilohaId, tables));
             }
-            Task.WaitAll(tasks.ToArray());
+            await Task.WhenAll(tasks);
             return StatusCode(200);
         }
 

@@ -7,7 +7,7 @@ namespace HlidacStatu.Lib.Data.External.Tables.Camelot
 {
 
     public class ClientParse
-        : IDisposable
+        : IAsyncDisposable
     {
         public string PdfUrl { get; }
         public ClientLow.Commands Command { get; }
@@ -49,9 +49,9 @@ namespace HlidacStatu.Lib.Data.External.Tables.Camelot
                     {
                         this.SessionId = null;
                         _logger.Debug($"try {i} Error 429 waiting because of {cl.ApiEndpoint}");
-                        cl.Dispose();
+                        await cl.DisposeAsync();
                         cl = new ClientLow(conn.GetEndpointUrl(), conn.GetApiKey());
-                        System.Threading.Thread.Sleep(200 + 3000 * i);
+                        await Task.Delay(200 + 3000 * i);
                     }
                     else
                     {
@@ -130,51 +130,22 @@ namespace HlidacStatu.Lib.Data.External.Tables.Camelot
                 return new ApiResult<CamelotStatistics>(false);
             }
         }
-        protected virtual void Dispose(bool disposing)
-        {
-            if (!disposedValue)
-            {
-                if (disposing)
-                {
-                    if (!string.IsNullOrEmpty(this.SessionId))
-                    {
-                        var res = this.EndSessionAsync().Result;
-                    }
-                    if (cl != null)
-                        cl.Dispose();
 
-                    // TODO: dispose managed state (managed objects)
-                }
-
-                // TODO: free unmanaged resources (unmanaged objects) and override finalizer
-                // TODO: set large fields to null
-                disposedValue = true;
-            }
-        }
-
-        // // TODO: override finalizer only if 'Dispose(bool disposing)' has code to free unmanaged resources
-        // ~ClientLow()
-        // {
-        //     // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
-        //     Dispose(disposing: false);
-        // }
-
-        public void Dispose()
-        {
-            // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
-            Dispose(disposing: true);
-            GC.SuppressFinalize(this);
-        }
+        private bool _disposed;
 
         public async ValueTask DisposeAsync()
         {
-            await this.EndSessionAsync();
-            if (cl != null)
-            {
+            if (_disposed) return;
+
+            if (!string.IsNullOrEmpty(SessionId))
+                await EndSessionAsync();
+
+            if (cl is not null)
                 await cl.DisposeAsync();
-                cl = null;
-            }
-            Dispose(false);
+
+            cl = null;
+            _disposed = true;
+            GC.SuppressFinalize(this);
         }
     }
 }

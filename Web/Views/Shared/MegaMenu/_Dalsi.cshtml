@@ -70,7 +70,7 @@
                                         if (specificDataset != null)
                                         {
                                             <li>
-                                                <a onclick="return trackOutLink(this,'megamenu');" href="https://www.hlidacstatu.cz/data/Index/@ds.Key">@specificDataset.RegistrationAsync().Result.name</a>
+                                                <a onclick="return trackOutLink(this,'megamenu');" href="https://www.hlidacstatu.cz/data/Index/@ds.Key">@(await specificDataset.RegistrationAsync()).name</a>
                                             </li>
                                         }
                                     }

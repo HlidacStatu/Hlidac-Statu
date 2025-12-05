@@ -8,10 +8,12 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using HlidacStatu.Datasets;
 using HlidacStatu.Entities.KIndex;
 using HlidacStatu.Repositories.Analysis.KorupcniRiziko;
+using HlidacStatu.Repositories.Cache;
 
 namespace HlidacStatu.Web.Framework
 {
@@ -91,6 +93,39 @@ namespace HlidacStatu.Web.Framework
             }
             
             return (tabs, results);
+        }
+
+        public static async Task<(int Id, string Name, long Count)[]> GetVzList()
+        {
+            var cpv = Devmasters.Enums.EnumTools.EnumToEnumerable(
+                typeof(VerejnaZakazkaRepo.Searching.CPVSkupiny));
+
+            using var sem = new SemaphoreSlim(10);
+            Task<(int Id, string Name, long Count)>[] tasks = cpv.Select(async m =>
+            {
+                await sem.WaitAsync();
+                try
+                {
+                    var result = await VzCache.CachedSimpleSearchAsync(
+                        new HlidacStatu.Repositories.Searching.VerejnaZakazkaSearchData
+                        {
+                            Q = "zverejneno:[" + DateTime.Now.Date.AddMonths(-12).ToString("yyyy-MM-dd") + " TO *]",
+                            Oblast = m.Id.ToString(),
+                            Page = 0,
+                            PageSize = 0,
+                            ExactNumOfResults = true
+                        });
+
+                    return (m.Id, m.Name, result.Total);
+                    
+                }
+                finally
+                {
+                    sem.Release();
+                }
+            }).ToArray();
+
+            return await Task.WhenAll(tasks);
         }
 
     }

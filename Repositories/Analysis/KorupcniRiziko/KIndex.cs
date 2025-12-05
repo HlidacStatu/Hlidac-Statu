@@ -2,53 +2,20 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using HlidacStatu.Caching;
 using HlidacStatu.Connectors;
 using HlidacStatu.Entities.Analysis;
 using HlidacStatu.Entities.KIndex;
 using HlidacStatu.Repositories.Cache;
 using Nest;
-using ZiggyCreatures.Caching.Fusion;
 
 namespace HlidacStatu.Repositories.Analysis.KorupcniRiziko
 {
     public static class KIndex
     {
-        
-        static HashSet<string> kindexReadyIcos = null;
-        static System.Timers.Timer refreshTimer = new System.Timers.Timer(TimeSpan.FromHours(12).TotalMilliseconds);
-        static KIndex()
-        {
-            refreshTimer.Elapsed += (o, t) => { refreshCache(); } ;
-
-            new System.Threading.Thread(() => {
-                refreshCache();
-            }).Start();
-        }
-
-
-        private static void refreshCache()
-        {
-            kindexReadyIcos = HlidacStatu.Repositories.Searching.Tools.GetAllSmlouvyIdsAsync(
-                Manager.GetESClient_KIndex(),
-                4,
-                "roky.kIndexReady:true"
-                ).Result
-                .Result.ToHashSet();
-
-            foreach (var ico in kindexReadyIcos)
-            {
-                _ = GetCachedAsync(ico, false).Result;
-            }
-        }
-
-        public static IEnumerable<string> KIndexActiveIcos()
-        {
-            return kindexReadyIcos; 
-        }
 
         public static async Task<KIndexData> GetCachedAsync(string ico, bool useTemp = false, bool refreshCache = false)
         {
+            var kindexReadyIcos = await KindexCache.GetKindexReadyIcosAsync();
             if (kindexReadyIcos != null && kindexReadyIcos.Count > 0)
             {
                 if (kindexReadyIcos.Contains(ico) == false)
@@ -118,17 +85,6 @@ namespace HlidacStatu.Repositories.Analysis.KorupcniRiziko
 
             await client.ClearScrollAsync(new ClearScrollRequest(scrollid));
 
-        }
-
-        public static async Task<bool> HasKIndexValueAsync(string ico, bool useTemp)
-        {
-            var kidx = await GetCachedAsync(ico, useTemp);
-            if (kidx == null)
-                return false;
-            else
-            {
-                return kidx.roky.Any(m => m.KIndexReady);
-            }
         }
 
         public static async Task<Tuple<int?, KIndexData.KIndexLabelValues>> GetLastLabelAsync(string ico, bool useTemp=false)

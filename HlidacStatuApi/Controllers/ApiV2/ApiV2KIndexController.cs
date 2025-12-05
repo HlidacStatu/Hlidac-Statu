@@ -1,5 +1,6 @@
 ﻿using HlidacStatu.Entities.KIndex;
 using HlidacStatu.Repositories.Analysis.KorupcniRiziko;
+using HlidacStatu.Repositories.Cache;
 using HlidacStatuApi.Models;
 using Microsoft.AspNetCore.Mvc;
 
@@ -11,9 +12,9 @@ namespace HlidacStatuApi.Controllers.ApiV2
 
         [ApiExplorerSettings(IgnoreApi = true)]
         [HttpGet]
-        public ActionResult<IEnumerable<SubjectNameCache>> AllSubjects()
+        public async Task<ActionResult<IEnumerable<SubjectNameCache>>> AllSubjects()
         {
-            return SubjectNameCache.GetCompanies().Values;
+            return (await KindexCache.GetKindexCompaniesAsync()).Values;
         }
 
         [ApiExplorerSettings(IgnoreApi = true)]

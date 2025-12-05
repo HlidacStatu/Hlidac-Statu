@@ -226,7 +226,7 @@ namespace HlidacStatu.Repositories.Searching
         static string ScrollLifeTime = "2m";
 
         public static async Task DoActionForAllAsync<T>(
-            Func<IHit<T>, object, ActionOutputData> action,
+            Func<IHit<T>, object, Task<ActionOutputData>> action,
             object actionParameters,
             Action<string> logOutputFunc,
             Action<ActionProgressData> progressOutputFunc,
@@ -286,7 +286,7 @@ namespace HlidacStatu.Repositories.Searching
 
         public static async Task DoActionForQueryAsync<T>(ElasticClient client,
             Func<int, int, Task<ISearchResponse<T>>> searchFunc,
-            Func<IHit<T>, object, ActionOutputData> action, object actionParameters,
+            Func<IHit<T>, object, Task<ActionOutputData>> action, object actionParameters,
             Action<string> logOutputFunc,
             Action<ActionProgressData> progressOutputFunc,
             bool parallel,
@@ -373,14 +373,14 @@ namespace HlidacStatu.Repositories.Searching
                         if (maxDegreeOfParallelism.HasValue)
                             pOptions.MaxDegreeOfParallelism = maxDegreeOfParallelism.Value;
                         pOptions.CancellationToken = cts.Token;
-                        _ = Parallel.ForEach(result.Hits, (hit) =>
+                        await Parallel.ForEachAsync(result.Hits, cts.Token, async (hit, token) =>
                         {
                             if (action != null)
                             {
                                 ActionOutputData cancel = null;
                                 try
                                 {
-                                    cancel = action(hit, actionParameters);
+                                    cancel = await action(hit, actionParameters);
                                     Interlocked.Increment(ref processedCount);
 
 
@@ -388,12 +388,12 @@ namespace HlidacStatu.Repositories.Searching
                                         logOutputFunc(cancel.Log);
 
                                     if (cancel.CancelRunning)
-                                        cts.Cancel();
+                                        await cts.CancelAsync();
                                 }
                                 catch (Exception e)
                                 {
                                     _logger.Error(e, "DoActionForAll action error");
-                                    cts.Cancel();
+                                    await cts.CancelAsync();
                                 }
                                 finally
                                 {
@@ -421,7 +421,7 @@ namespace HlidacStatu.Repositories.Searching
                     {
                         if (action != null)
                         {
-                            ActionOutputData cancel = action(hit, actionParameters);
+                            ActionOutputData cancel = await action(hit, actionParameters);
                             try
                             {
 

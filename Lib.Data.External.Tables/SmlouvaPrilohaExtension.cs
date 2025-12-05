@@ -38,14 +38,14 @@ namespace HlidacStatu.Lib.Data.External.Tables
             {
                 HlidacStatu.DS.Api.TablesInDoc.Result[] myRes = null;
                 if (smlouva.znepristupnenaSmlouva()==false)
-                    myRes = PDF.GetMaxTablesFromPDFAsync(
+                    myRes = await PDF.GetMaxTablesFromPDFAsync(
                         priloha.LocalCopyUrl(smlouva.Id, true,null, null), 
-                            HlidacStatu.DS.Api.TablesInDoc.Formats.JSON).Result;
+                            HlidacStatu.DS.Api.TablesInDoc.Formats.JSON);
 
                 if (myRes == null)
-                    myRes = PDF.GetMaxTablesFromPDFAsync(
+                    myRes = await PDF.GetMaxTablesFromPDFAsync(
                         priloha.LocalCopyUrl(smlouva.Id, true, secret: Devmasters.Config.GetWebConfigValue("LocalPrilohaUniversalSecret")),
-                        HlidacStatu.DS.Api.TablesInDoc.Formats.JSON).Result;
+                        HlidacStatu.DS.Api.TablesInDoc.Formats.JSON);
 
                 sw.Stop();
                 _logger.Debug($"smlouva {smlouva.Id} soubor {priloha.UniqueHash()} done in {sw.ElapsedMilliseconds}ms, found {myRes?.Sum(m => m.Tables?.Length ?? 0)} tables");

@@ -1,16 +1,13 @@
 ﻿@model HlidacStatu.Entities.Osoba
-@using HlidacStatu.Lib.Analytics
 @using HlidacStatu.XLib.Render;
 @using HlidacStatu.Repositories
-@using HlidacStatu.Repositories.Statistics
 @using HlidacStatu.Extensions
-@using HlidacStatu.DS.Graphs
 @using HlidacStatu.Entities
 
 @{
     Layout = null;
 
-    Osoba.Statistics.Dotace stats = Model.StatistikaDotace();
+    Osoba.Statistics.Dotace stats = await Model.StatistikaDotaceAsync();
     var allStats = stats.AllDotaceSummary();
 
 
