@@ -111,7 +111,6 @@ namespace HlidacStatu.Entities.Analysis
                     Pocet = Data.Where(k => k.Key > 0 && k.Key < 2016).Sum(m => m.Value.Pocet),
                     CelkemCena = Data.Where(k => k.Key > 0 && k.Key < 2016).Sum(m => m.Value.CelkemCena)
                 };
-                ;
             }
             return _summaryBefore2016;
         }
