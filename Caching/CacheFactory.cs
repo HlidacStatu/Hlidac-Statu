@@ -115,7 +115,7 @@ public static class CacheFactory
         DistributedCacheDuration = TimeSpan.FromDays(10 * 365),
         DistributedCacheFailSafeMaxDuration = TimeSpan.FromDays(10 * 365),
 
-        FactorySoftTimeout = TimeSpan.FromMilliseconds(1500),
+        FactorySoftTimeout = TimeSpan.FromMilliseconds(5000),
         FactoryHardTimeout = TimeSpan.FromHours(4),
         DistributedCacheSoftTimeout = TimeSpan.FromSeconds(2),
         DistributedCacheHardTimeout = TimeSpan.FromMinutes(1),

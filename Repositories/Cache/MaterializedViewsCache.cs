@@ -72,8 +72,6 @@ public class MaterializedViewsCache
             options =>
             {
                 options.ModifyEntryOptionsDuration(TimeSpan.FromHours(12), TimeSpan.FromDays(10 * 365));
-                options.ModifyEntryOptionsFactoryTimeouts(factoryHardTimeout: TimeSpan.FromHours(1),
-                    factorySoftTimeout: TimeSpan.FromSeconds(5));
             });
     }
 
@@ -91,8 +89,6 @@ public class MaterializedViewsCache
             options =>
             {
                 options.ModifyEntryOptionsDuration(TimeSpan.FromHours(12), TimeSpan.FromDays(10 * 365));
-                options.ModifyEntryOptionsFactoryTimeouts(factoryHardTimeout: TimeSpan.FromHours(1),
-                    factorySoftTimeout: TimeSpan.FromSeconds(5));
             });
     }
 
@@ -110,8 +106,6 @@ public class MaterializedViewsCache
             options =>
             {
                 options.ModifyEntryOptionsDuration(TimeSpan.FromHours(12), TimeSpan.FromDays(10 * 365));
-                options.ModifyEntryOptionsFactoryTimeouts(factoryHardTimeout: TimeSpan.FromHours(1),
-                    factorySoftTimeout: TimeSpan.FromSeconds(5));
             });
     }
 
@@ -125,8 +119,6 @@ public class MaterializedViewsCache
             await PermanentCache.SetAsync(key, data, options =>
             {
                 options.ModifyEntryOptionsDuration(TimeSpan.FromHours(12), TimeSpan.FromDays(10 * 365));
-                options.ModifyEntryOptionsFactoryTimeouts(factoryHardTimeout: TimeSpan.FromHours(1),
-                    factorySoftTimeout: TimeSpan.FromSeconds(5));
             });
         }
 
@@ -135,8 +127,6 @@ public class MaterializedViewsCache
             options =>
             {
                 options.ModifyEntryOptionsDuration(TimeSpan.FromHours(12), TimeSpan.FromDays(10 * 365));
-                options.ModifyEntryOptionsFactoryTimeouts(factoryHardTimeout: TimeSpan.FromHours(1),
-                    factorySoftTimeout: TimeSpan.FromSeconds(5));
             });
     }
 
@@ -152,8 +142,6 @@ public class MaterializedViewsCache
             options =>
             {
                 options.ModifyEntryOptionsDuration(TimeSpan.FromDays(10 * 365), TimeSpan.FromDays(10 * 365));
-                options.ModifyEntryOptionsFactoryTimeouts(factoryHardTimeout: TimeSpan.FromMinutes(5),
-                    factorySoftTimeout: TimeSpan.FromSeconds(5));
             });
     }
 
@@ -169,8 +157,6 @@ public class MaterializedViewsCache
             options =>
             {
                 options.ModifyEntryOptionsDuration(TimeSpan.FromDays(10 * 365), TimeSpan.FromDays(10 * 365));
-                options.ModifyEntryOptionsFactoryTimeouts(factoryHardTimeout: TimeSpan.FromMinutes(5),
-                    factorySoftTimeout: TimeSpan.FromSeconds(5));
             });
     }
 }
