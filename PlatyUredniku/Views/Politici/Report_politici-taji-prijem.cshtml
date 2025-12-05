@@ -7,6 +7,7 @@
 @{
     ViewBag.Title = "Přehled politiků se skrytými příjmy";
 }
+
 @section breadcrumbs
 {
     <ol class="breadcrumb">
@@ -34,82 +35,77 @@
 
         return _sectionBgSwitch ? "alter-bg-color" : "";
     }
+
 }
 
 <section class="d-flex align-items-center justify-content-center  @(GetBgClass()) pageblock-small">
     <div class="container">
         <h2>@ViewData["title"]</h2>
         <p>
-            Oslovili jsme s žádostí o informace dle zákona o právu na informace všechny zde uvedené organizace. 
+            Oslovili jsme s žádostí o informace dle zákona o právu na informace všechny zde uvedené organizace.
             Ty nám odmítly informace o platech daných politiků sdělit.
-            
+
         </p>
         <p>
-            Vzápětí jsme oslovili většinu politiků (na více než 80 % politiků jsme dohledali email či jiné spojení) a požádali je o doplnění chybějících informací
+            Vzápětí jsme oslovili většinu politiků (na více než 80 % politiků jsme dohledali email či jiné spojení) a
+            požádali je o doplnění chybějících informací
             o platech.
         </p>
         <p>
-            Na tomto seznamu je 100 politiků s nejvyššími příjmy či největším počtem organizací, u kterých se nám příjem nepodařilo získat.
+            Na tomto seznamu je 100 politiků s nejvyššími příjmy či největším počtem organizací, u kterých se nám příjem
+            nepodařilo získat.
         </p>
     </div>
 </section>
 
 @{
-
     var vsechnyPlaty = await PpRepo.GetPrijmyGroupedByNameIdAsync(PpRepo.DefaultYear, true);
     vsechnyPlaty = vsechnyPlaty
         .Where(kv => kv.Value.Any(m => m.Status == PpPrijem.StatusPlatu.Zjistujeme_zadost_106))
         .OrderByDescending(kv => kv.Value.Count(m => m.Status == PpPrijem.StatusPlatu.Zjistujeme_zadost_106))
-        .ThenByDescending(kv=> kv.Value.Sum(m=>m.CelkoveRocniNakladyNaPolitika))
+        .ThenByDescending(kv => kv.Value.Sum(m => m.CelkoveRocniNakladyNaPolitika))
         .Take(100)
         .ToDictionary(kv => kv.Key, kv => kv.Value);
 
 
-    ReportDataSource<KeyValuePair<string, PpPrijem[]>> rds = new(
-        new ReportDataSource<KeyValuePair<string, PpPrijem[]>>.Column()
+    ReportDataSource<(KeyValuePair<string, PpPrijem[]> kv, OsobyRolesCache.osobaInfo roles)> rds = new(
+        new ReportDataSource<(KeyValuePair<string, PpPrijem[]> kv, OsobyRolesCache.osobaInfo roles)>.Column()
         {
             Name = "Politik",
-            HtmlRender =(m) =>
-            {
-                return $"<a href='/politici/politik/{m.Key}'>{OsobyRolesCache.Get(m.Key).FullName}</a>";
-            },
-            OrderValueRender = (m) =>
-            {
-                return $"{OsobyRolesCache.Get(m.Key).Prijmeni} {OsobyRolesCache.Get(m.Key).Jmeno}";
-            },
+            HtmlRender = (m) => { return $"<a href='/politici/politik/{m.kv.Key}'>{m.roles.FullName}</a>"; },
+            OrderValueRender = (m) => { return $"{m.roles.Prijmeni} {m.roles.Jmeno}"; },
         },
-        new ReportDataSource<KeyValuePair<string, PpPrijem[]>>.Column()
+        new ReportDataSource<(KeyValuePair<string, PpPrijem[]> kv, OsobyRolesCache.osobaInfo roles)>.Column()
         {
             Name = "Politické role",
-            HtmlRender =(m) => OsobyRolesCache.Get(m.Key).Role,
-            OrderValueRender = (m) => OsobyRolesCache.Get(m.Key).Role,
+            HtmlRender = (m) => m.roles.Role,
+            OrderValueRender = (m) => m.roles.Role,
         },
-        new ReportDataSource<KeyValuePair<string, PpPrijem[]>>.Column()
+        new ReportDataSource<(KeyValuePair<string, PpPrijem[]> kv, OsobyRolesCache.osobaInfo roles)>.Column()
         {
             Name = CelkovyRocniPrijemTagHelper.Content,
-            HtmlRender =(m) =>
+            HtmlRender = (m) =>
             {
-                return $"<a href='/politici/politik/{m.Key}'>{HlidacStatu.Util.RenderData.NicePrice(m.Value.Sum(v => v.CelkoveRocniNakladyNaPolitika), html: true)}</a>"
-                    + $"<br /><span class='text-danger-emphasis'>{Devmasters.Lang.CS.Plural.Get(m.Value.Count(m => m.Status == 0), "jedna organizace nám příjem neposkytla", "{0} organizace nám příjem neposkytlo", "{0} organizací nám příjem neposkytlo")}.</span>"
-                ;
+                return $"<a href='/politici/politik/{m.kv.Key}'>{HlidacStatu.Util.RenderData.NicePrice(m.kv.Value.Sum(v => v.CelkoveRocniNakladyNaPolitika), html: true)}</a>"
+                       + $"<br /><span class='text-danger-emphasis'>{Devmasters.Lang.CS.Plural.Get(m.kv.Value.Count(m => m.Status == 0), "jedna organizace nám příjem neposkytla", "{0} organizace nám příjem neposkytlo", "{0} organizací nám příjem neposkytlo")}.</span>"
+                    ;
             },
-            OrderValueRender = (m) => HlidacStatu.Util.RenderData.OrderValueFormat(m.Value.Sum(v => v.CelkoveRocniNakladyNaPolitika)),
+            OrderValueRender = (m) => HlidacStatu.Util.RenderData.OrderValueFormat(m.kv.Value.Sum(v => v.CelkoveRocniNakladyNaPolitika)),
             CssClass = "number"
         },
-        new ReportDataSource<KeyValuePair<string, PpPrijem[]>>.Column()
+        new ReportDataSource<(KeyValuePair<string, PpPrijem[]> kv, OsobyRolesCache.osobaInfo roles)>.Column()
         {
             Name = "Organizace, které neposkytly plat",
-            HtmlRender =(m) =>
+            HtmlRender = (m) =>
             {
-                return "<ol>" + string.Join("", m.Value
-                                            .Where(m => m.Status == PpPrijem.StatusPlatu.Zjistujeme_zadost_106)
-                                            .Select(n => n.Organizace)
-                                            .Distinct()
-                                            .Select(o => $"<li><a href='/politici/organizace/{o?.DS}'>{o?.Nazev}</a></li>")
-                                            ) + "</ol>";
-
+                return "<ol>" + string.Join("", m.kv.Value
+                    .Where(m => m.Status == PpPrijem.StatusPlatu.Zjistujeme_zadost_106)
+                    .Select(n => n.Organizace)
+                    .Distinct()
+                    .Select(o => $"<li><a href='/politici/organizace/{o?.DS}'>{o?.Nazev}</a></li>")
+                ) + "</ol>";
             },
-            OrderValueRender = (m) => HlidacStatu.Util.RenderData.OrderValueFormat(m.Value.Count()),
+            OrderValueRender = (m) => HlidacStatu.Util.RenderData.OrderValueFormat(m.kv.Value.Count()),
             //CssClass = "text-nowrap overflow-x-hidden "
         }
     );
@@ -120,8 +116,8 @@
         //var platyPerPolitik = vsechnyPlaty.Where(m => m.Nameid == pol).ToArray();
         if (kv.Value.Any())
         {
-            rds.AddRow(kv);
-
+            var roles = await OsobyRolesCache.GetAsync(kv.Key);
+            rds.AddRow((kv, roles));
         }
     }
 }
@@ -129,9 +125,9 @@
 <section class="d-flex align-items-center justify-content-center  @(GetBgClass()) pageblock-small">
     <div class="container">
         <p>
-        @Html.DataToHTMLTable(rds,
-        dataTableOptions: HtmlExtensions.DatatableOptions(orderColumnIdx: 2, orderDirection: "desc", dom: "<\"top\"Bfp>rt<\"bottom\"ip><\"clear\">"))
-    </p>
+            @Html.DataToHTMLTable(rds,
+                dataTableOptions: HtmlExtensions.DatatableOptions(orderColumnIdx: 2, orderDirection: "desc", dom: "<\"top\"Bfp>rt<\"bottom\"ip><\"clear\">"))
+        </p>
     </div>
 </section>
 

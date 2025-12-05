@@ -3,19 +3,14 @@ using HlidacStatu.Repositories;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
+using HlidacStatu.Caching;
+using ZiggyCreatures.Caching.Fusion;
 
 namespace PlatyUredniku.Cache
 {
     public static class OsobyRolesCache
     {
-        static OsobyRolesCache()
-        {
-            // Initialize the cache manager
-            for (int rok = PpRepo.DefaultYear; rok >= PpRepo.MinYear; rok--)
-            {
-                _ = _cacheRolesManager.Get(rok);
-            }
-        }
         public class osobaInfo
         {
             public string Jmeno { get; set; }
@@ -26,63 +21,83 @@ namespace PlatyUredniku.Cache
             public string Strana { get; set; }
         }
 
+        private static readonly IFusionCache _postgreSqlCache =
+            HlidacStatu.Caching.CacheFactory.CreateNew(CacheFactory.CacheType.L2PostgreSql, nameof(OsobyRolesCache));
 
-        private static Devmasters.Cache.LocalMemory.AutoUpdateCacheManager<Dictionary<string, osobaInfo>, int> _cacheRolesManager =
-            new Devmasters.Cache.LocalMemory.AutoUpdateCacheManager<Dictionary<string, osobaInfo>, int>(
-                "OsobyRolesCache",
-                (rok) =>
-                {
-                    System.Collections.Concurrent.ConcurrentDictionary<string, osobaInfo> res = new System.Collections.Concurrent.ConcurrentDictionary<string, osobaInfo>();
-                    var nameids = PpRepo.GetNameIdsForGroupAsync(PpRepo.PoliticianGroup.Vse)
-                        .ConfigureAwait(false).GetAwaiter().GetResult()
-                        .Distinct();
-
-                    Devmasters.Batch.Manager.DoActionForAll(nameids,
-                        (nameid) =>
-                        {
-                            var o = Osoby.GetByNameId.Get(nameid);
-                            if (o != null)
-                            {
-                                res[nameid] = new osobaInfo()
-                                {
-                                    Jmeno = o.Jmeno,
-                                    Prijmeni = o.Prijmeni,
-                                    Role = o.MainRolesToString(rok),
-                                    Strana = o.CurrentPoliticalParty()
-                                };
-                            }
-                            return new Devmasters.Batch.ActionOutputData();
-                        },
-                        null, null,
-                        true, 10,
-                        prefix: "OsobyRolesCache ", monitor: new MonitoredTaskRepo.ForBatch()
-                    );
-                    return res.ToDictionary();
-                }, TimeSpan.FromHours(12), rok => rok.ToString());
-
-        public static osobaInfo Get(string nameId, int rok = PpRepo.DefaultYear)
+        private static async Task<Dictionary<string, osobaInfo>> GetOrSetCachedRolesAsync(int rok,
+            Dictionary<string, osobaInfo>? data = null)
         {
-            if (_cacheRolesManager.Get(rok).ContainsKey(nameId))
+            string cacheKey = $"OsobyRolesCache:{rok}";
+            if (data is null)
             {
-                return _cacheRolesManager.Get(rok)[nameId];
+                return await _postgreSqlCache.GetOrSetAsync(cacheKey, async _ =>
+                    {
+                        System.Collections.Concurrent.ConcurrentDictionary<string, osobaInfo> res = new();
+                        var nameids = (await PpRepo.GetNameIdsForGroupAsync(PpRepo.PoliticianGroup.Vse)).Distinct();
+
+                        Devmasters.Batch.Manager.DoActionForAll(nameids,
+                            (nameid) =>
+                            {
+                                var o = Osoby.GetByNameId.Get(nameid);
+                                if (o != null)
+                                {
+                                    res[nameid] = new osobaInfo()
+                                    {
+                                        Jmeno = o.Jmeno,
+                                        Prijmeni = o.Prijmeni,
+                                        Role = o.MainRolesToString(rok),
+                                        Strana = o.CurrentPoliticalParty()
+                                    };
+                                }
+
+                                return new Devmasters.Batch.ActionOutputData();
+                            },
+                            null, null,
+                            true, 10,
+                            prefix: "OsobyRolesCache ", monitor: new MonitoredTaskRepo.ForBatch()
+                        );
+                        return res.ToDictionary();
+                    },
+                    options =>
+                    {
+                        options.ModifyEntryOptionsDuration(TimeSpan.FromHours(12));
+                        options.ModifyEntryOptionsFactoryTimeouts(factoryHardTimeout: TimeSpan.FromMinutes(10));
+                    });
+            }
+
+            await _postgreSqlCache.SetAsync(cacheKey, data, options =>
+            {
+                options.ModifyEntryOptionsDuration(TimeSpan.FromHours(12));
+                options.ModifyEntryOptionsFactoryTimeouts(factoryHardTimeout: TimeSpan.FromMinutes(10));
+            });
+
+            return data;
+        }
+
+        public static async Task<osobaInfo> GetAsync(string nameId, int rok = PpRepo.DefaultYear)
+        {
+            var cachedRoles = await GetOrSetCachedRolesAsync(rok);
+
+            if (cachedRoles.TryGetValue(nameId, out var role))
+            {
+                return role;
             }
             else
             {
                 var o = Osoby.GetByNameId.Get(nameId);
                 if (o != null)
                 {
-                    var allDict = _cacheRolesManager.Get(rok);
+                    var allDict = cachedRoles;
                     allDict[nameId] = new osobaInfo()
                     {
                         Jmeno = o.Jmeno,
                         Prijmeni = o.Prijmeni,
                         Role = o.MainRolesToString(PpRepo.DefaultYear)
                     };
-                    _cacheRolesManager.Set(rok,allDict);
+                    await GetOrSetCachedRolesAsync(rok, allDict);
                     return allDict[nameId];
-
                 }
-                else 
+                else
                     return new osobaInfo()
                     {
                         Jmeno = "",
@@ -91,6 +106,5 @@ namespace PlatyUredniku.Cache
                     };
             }
         }
-
     }
 }
