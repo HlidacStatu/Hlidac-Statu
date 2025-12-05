@@ -181,7 +181,7 @@ namespace HlidacStatu.Repositories.Searching
             {
                 if (tries < 6)
                 {
-                    System.Threading.Thread.Sleep(20 * tries);
+                    await Task.Delay(20 * tries);
                     goto start;
                 }
                 else

@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using Nest;
 using System;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Serilog;
 using Osoba = HlidacStatu.Entities.Insolvence.Osoba;
@@ -121,7 +122,7 @@ namespace HlidacStatu.Repositories
 			}
 		}
 
-		static object saveLockObj = new object();
+		static SemaphoreSlim _saveLock = new (1);
 		public static async Task SaveAsync(Rizeni rizeni, ElasticClient client = null, bool? forceOnRadarValue = null)
 		{
 			if (rizeni.IsFullRecord == false)
@@ -177,11 +178,15 @@ namespace HlidacStatu.Repositories
 			o => o.Id(rizeni.SpisovaZnacka)); //druhy parametr musi byt pole, ktere je unikatni
 			if (!res.IsValid)
 			{
-				lock (saveLockObj)
+				await _saveLock.WaitAsync();
+				try
 				{
-					System.Threading.Thread.Sleep(100);
-					res = client.IndexAsync<Rizeni>(rizeni,
-						o => o.Id(rizeni.SpisovaZnacka)).Result; //druhy parametr musi byt pole, ktere je unikatni
+					await Task.Delay(100);
+					res = await client.IndexAsync<Rizeni>(rizeni, o => o.Id(rizeni.SpisovaZnacka));
+				}
+				finally
+				{
+					_saveLock.Release();
 				}
 				if (!res.IsValid)
 				{

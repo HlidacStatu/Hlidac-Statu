@@ -37,7 +37,7 @@ namespace HlidacStatu.Lib.Data.External.Tables.Camelot
                     }
                     do
                     {
-                        System.Threading.Thread.Sleep(1000);
+                        await Task.Delay(1000);
                         res = await cl.GetSessionAsync();
                         if (res.Success)
                         {
