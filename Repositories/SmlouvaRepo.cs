@@ -21,6 +21,7 @@ using HlidacStatu.MLUtil.Splitter;
 using System.Text;
 using HlidacStatu.Entities.AI;
 using HlidacStatu.Repositories.Cache;
+using NuGet.Common;
 
 
 namespace HlidacStatu.Repositories
@@ -379,11 +380,11 @@ namespace HlidacStatu.Repositories
 
         public static async Task<bool> JeSmlouva_S_VazbouNaPolitikyAsync(this Smlouva smlouva, Relation.AktualnostType aktualnost)
         {
-            var icos = await ico_s_VazbouPolitikAsync.Value;
+            var icos = await ico_s_VazbouPolitikAsync;
             if (aktualnost == Relation.AktualnostType.Nedavny)
-                icos = await ico_s_VazbouPolitikNedavneAsync.Value;
+                icos = await ico_s_VazbouPolitikNedavneAsync;
             if (aktualnost == Relation.AktualnostType.Aktualni)
-                icos = await ico_s_VazbouPolitikAktualniAsync.Value;
+                icos = await ico_s_VazbouPolitikAktualniAsync;
 
             Firma f = null;
             if (smlouva.platnyZaznam)
@@ -410,7 +411,7 @@ namespace HlidacStatu.Repositories
             return false;
         }
 
-        private static readonly Lazy<Task<HashSet<string>>> ico_s_VazbouPolitikAsync = 
+        private static readonly AsyncLazy<HashSet<string>> ico_s_VazbouPolitikAsync = 
             new(LoadIcoSVazbouPolitikVsechnyAsync);
         
         private static async Task<HashSet<string>> LoadIcoSVazbouPolitikVsechnyAsync()
@@ -425,7 +426,7 @@ namespace HlidacStatu.Repositories
             );
         }
         
-        private static readonly Lazy<Task<HashSet<string>>> ico_s_VazbouPolitikAktualniAsync =
+        private static readonly AsyncLazy<HashSet<string>> ico_s_VazbouPolitikAktualniAsync =
             new(LoadIcoSVazbouPolitikAktualniAsync);
 
         private static async Task<HashSet<string>> LoadIcoSVazbouPolitikAktualniAsync()
@@ -440,7 +441,7 @@ namespace HlidacStatu.Repositories
             );
         }
 
-        private static readonly Lazy<Task<HashSet<string>>> ico_s_VazbouPolitikNedavneAsync =
+        private static readonly AsyncLazy<HashSet<string>> ico_s_VazbouPolitikNedavneAsync =
             new(LoadIcoSVazbouPolitikNedavneAsync);
 
         private static async Task<HashSet<string>> LoadIcoSVazbouPolitikNedavneAsync()

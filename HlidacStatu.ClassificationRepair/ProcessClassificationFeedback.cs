@@ -45,13 +45,13 @@ namespace HlidacStatu.ClassificationRepair
                 await Task.WhenAll(explainTask, documentNgramTask, bullshitNgramsTask, allNgramsTask);
                 //await MonitoredTask.WhenAll(documentNgramTask, bullshitNgramsTask, allNgramsTask);
 
-                var missingNgrams = documentNgramTask.Result
-                    .Except(bullshitNgramsTask.Result)
-                    .Except(allNgramsTask.Result);
+                var missingNgrams = (await documentNgramTask)
+                    .Except(await bullshitNgramsTask)
+                    .Except(await allNgramsTask);
 
                 // poslat mail
                 await SendMail(message.FeedbackEmail, message.IdSmlouvy,
-                    message.ProposedCategories, explainTask.Result,
+                    message.ProposedCategories, (await explainTask),
                     missingNgrams);
                 _logger.Information($"Message with idSmlouvy={message.IdSmlouvy} processed.");
             }

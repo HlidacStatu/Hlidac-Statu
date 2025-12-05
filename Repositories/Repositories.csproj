@@ -29,6 +29,7 @@
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="9.0.7" />
     <PackageReference Include="NEST" Version="7.17.5" />
     <PackageReference Include="Newtonsoft.Json.Schema" Version="3.0.16" />
+    <PackageReference Include="NuGet.Common" Version="6.11.0" />
     <PackageReference Include="Ollama" Version="1.15.0" />
     <PackageReference Include="Polly.Core" Version="8.5.0" />
     <PackageReference Include="Polly.RateLimiting" Version="8.5.0" />

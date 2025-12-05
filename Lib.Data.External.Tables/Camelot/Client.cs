@@ -18,7 +18,7 @@ namespace HlidacStatu.Lib.Data.External.Tables.Camelot
             try
             {
 
-                using (var cl = new ClientParse(conn, pdfUrl, command, format, pages))
+                await using (var cl = new ClientParse(conn, pdfUrl, command, format, pages))
                 {
                     ApiResult<HlidacStatu.DS.Api.TablesInDoc.ApiOldCamelotResult> res = null;
                     var session = await cl.StartSessionAsync();

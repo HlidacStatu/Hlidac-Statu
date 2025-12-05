@@ -71,7 +71,7 @@ public static class OsobaExtension2
             HlidacStatu.Searching.Search.ISearchResult result = await completedTask;
             if (result.Total > 0)
             {
-                cts.Cancel();
+                await cts.CancelAsync();
                 return true;
             }
         }

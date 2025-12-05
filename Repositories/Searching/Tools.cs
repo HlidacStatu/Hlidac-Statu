@@ -388,12 +388,12 @@ namespace HlidacStatu.Repositories.Searching
                                         logOutputFunc(cancel.Log);
 
                                     if (cancel.CancelRunning)
-                                        cts.Cancel();
+                                        await cts.CancelAsync();
                                 }
                                 catch (Exception e)
                                 {
                                     _logger.Error(e, "DoActionForAll action error");
-                                    cts.Cancel();
+                                    await cts.CancelAsync();
                                 }
                                 finally
                                 {
