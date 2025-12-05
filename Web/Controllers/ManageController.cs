@@ -543,7 +543,7 @@ namespace HlidacStatu.Web.Controllers
 
         [AllowAnonymous]
         [HttpPost]
-        public ActionResult ChangePhoto(string id, IFormCollection form, IFormFile file1)
+        public async Task<ActionResult> ChangePhoto(string id, IFormCollection form, IFormFile file1)
         {
             try
             {
@@ -625,10 +625,10 @@ namespace HlidacStatu.Web.Controllers
                                         //Devmasters.IO.IOTools.MoveFile(fn, HlidacStatu.Lib.Init.OsobaFotky.GetFullPath(o, "small.jpg"));
                                         imi.Resize(new SixLabors.ImageSharp.Size(300, 300), true, Devmasters.Imaging.InMemoryImage.InterpolationsQuality.High, true);
                                         imi.SaveAsJPEG(o.GetPhotoPath(), 80);
-                                        var noBackGr = HlidacStatu.AI.Photo.RemoveBackgroundAsync(
+                                        var noBackGr = await HlidacStatu.AI.Photo.RemoveBackgroundAsync(
                                                     new Uri(Devmasters.Config.GetWebConfigValue("RemoveBackgroundAPI")),
                                                     System.IO.File.ReadAllBytes(o.GetPhotoPath()),
-                                                    AI.Photo.RemoveBackgroundStyles.Person).Result;
+                                                    AI.Photo.RemoveBackgroundStyles.Person);
                                         if (noBackGr != null)
                                             System.IO.File.WriteAllBytes(o.GetPhotoPath( Osoba.PhotoTypes.NoBackground, true), noBackGr);
 

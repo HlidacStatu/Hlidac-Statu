@@ -28,7 +28,7 @@ public class IdsCache
     public static async Task<string[]> GetDotaceIdsAsync(FilteredIdsRepo.QueryBatch query, bool forceUpdate = false)
     {
         string key = $"_cachedIdsDotace:{query.TaskPrefix + Devmasters.Crypto.Hash.ComputeHashToHex(query.Query)}";
-
+ 
         if (forceUpdate)
         {
             await PostgreCache.ExpireAsync(key);

@@ -1,4 +1,6 @@
-﻿[*.cs]
+﻿root = true
+
+[*.cs]
 
 # CS8625: Cannot convert null literal to non-nullable reference type.
 dotnet_diagnostic.CS8625.severity = suggestion
@@ -9,3 +11,12 @@ dotnet_diagnostic.CS1591.severity = suggestion
 #async await important issues
 dotnet_diagnostic.CA2012.severity = error
 dotnet_diagnostic.CS4014.severity = error
+
+# silent that value should be discarded or returned
+dotnet_diagnostic.CSE005.severity = suggestion
+
+# VSTHRD002: Avoid problematic synchronous waits
+dotnet_diagnostic.VSTHRD002.severity = error
+
+# VSTHRD103: Call async methods when in an async method
+dotnet_diagnostic.VSTHRD103.severity = error
