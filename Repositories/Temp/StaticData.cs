@@ -421,7 +421,7 @@ namespace HlidacStatu.Repositories
             try
             {
                 string url = "https://portal.isoss.gov.cz/opendata/ISoSS_Opendata_OSYS_OSSS.xml";
-                string xml = Devmasters.Net.HttpClient.Simple.GetAsync(url).Result;
+                string xml = Devmasters.Net.HttpClient.Simple.Get(url);
 
                 var ser = new XmlSerializer(typeof(organizacni_struktura_sluzebnich_uradu));
 

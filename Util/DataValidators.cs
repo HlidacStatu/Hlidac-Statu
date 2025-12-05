@@ -20,27 +20,42 @@ namespace HlidacStatu.Util
 
         //L1 - 12 h
         //L2 - 10 let
-        static Devmasters.Cache.AWS_S3.Cache<string> czobceCache = new Devmasters.Cache.AWS_S3.Cache<string>(new string[] { Devmasters.Config.GetWebConfigValue("Minio.Cache.Endpoint") }, Devmasters.Config.GetWebConfigValue("Minio.Cache.Bucket"), Devmasters.Config.GetWebConfigValue("Minio.Cache.AccessKey"), Devmasters.Config.GetWebConfigValue("Minio.Cache.SecretKey"),
-    TimeSpan.Zero, "czobce.txt", (obj) =>
-    {
-        return Devmasters.Net.HttpClient.Simple.GetAsync("https://somedata.hlidacstatu.cz/appdata/czobce.txt").Result;
-    }, null);
+        static Devmasters.Cache.AWS_S3.Cache<string> czobceCache = new Devmasters.Cache.AWS_S3.Cache<string>(
+            new string[] { Devmasters.Config.GetWebConfigValue("Minio.Cache.Endpoint") },
+            Devmasters.Config.GetWebConfigValue("Minio.Cache.Bucket"),
+            Devmasters.Config.GetWebConfigValue("Minio.Cache.AccessKey"),
+            Devmasters.Config.GetWebConfigValue("Minio.Cache.SecretKey"),
+            TimeSpan.Zero, "czobce.txt",
+            (obj) =>
+            {
+                return Devmasters.Net.HttpClient.Simple.Get("https://somedata.hlidacstatu.cz/appdata/czobce.txt");
+            }, null);
 
         //L1 - 12 h
         //L2 - 10 let
-        static Devmasters.Cache.AWS_S3.Cache<string> skobceCache = new Devmasters.Cache.AWS_S3.Cache<string>(new string[] { Devmasters.Config.GetWebConfigValue("Minio.Cache.Endpoint") }, Devmasters.Config.GetWebConfigValue("Minio.Cache.Bucket"), Devmasters.Config.GetWebConfigValue("Minio.Cache.AccessKey"), Devmasters.Config.GetWebConfigValue("Minio.Cache.SecretKey"),
-    TimeSpan.Zero, "skobce.txt", (obj) =>
-    {
-        return Devmasters.Net.HttpClient.Simple.GetAsync("https://somedata.hlidacstatu.cz/appdata/skobce.txt").Result;
-    }, null);
+        static Devmasters.Cache.AWS_S3.Cache<string> skobceCache = new Devmasters.Cache.AWS_S3.Cache<string>(
+            new string[] { Devmasters.Config.GetWebConfigValue("Minio.Cache.Endpoint") },
+            Devmasters.Config.GetWebConfigValue("Minio.Cache.Bucket"),
+            Devmasters.Config.GetWebConfigValue("Minio.Cache.AccessKey"),
+            Devmasters.Config.GetWebConfigValue("Minio.Cache.SecretKey"),
+            TimeSpan.Zero, "skobce.txt",
+            (obj) =>
+            {
+                return Devmasters.Net.HttpClient.Simple.Get("https://somedata.hlidacstatu.cz/appdata/skobce.txt");
+            }, null);
 
         //L1 - 12 h
         //L2 - 10 let
-        static Devmasters.Cache.AWS_S3.Cache<string> statyCache = new Devmasters.Cache.AWS_S3.Cache<string>(new string[] { Devmasters.Config.GetWebConfigValue("Minio.Cache.Endpoint") }, Devmasters.Config.GetWebConfigValue("Minio.Cache.Bucket"), Devmasters.Config.GetWebConfigValue("Minio.Cache.AccessKey"), Devmasters.Config.GetWebConfigValue("Minio.Cache.SecretKey"),
-TimeSpan.Zero, "staty.txt", (obj) =>
-{
-return Devmasters.Net.HttpClient.Simple.GetAsync("https://somedata.hlidacstatu.cz/appdata/staty.txt").Result;
-}, null);
+        static Devmasters.Cache.AWS_S3.Cache<string> statyCache = new Devmasters.Cache.AWS_S3.Cache<string>(
+            new string[] { Devmasters.Config.GetWebConfigValue("Minio.Cache.Endpoint") },
+            Devmasters.Config.GetWebConfigValue("Minio.Cache.Bucket"),
+            Devmasters.Config.GetWebConfigValue("Minio.Cache.AccessKey"),
+            Devmasters.Config.GetWebConfigValue("Minio.Cache.SecretKey"),
+            TimeSpan.Zero, "staty.txt",
+            (obj) =>
+            {
+                return Devmasters.Net.HttpClient.Simple.Get("https://somedata.hlidacstatu.cz/appdata/staty.txt");
+            }, null);
 
         static DataValidators()
         {
@@ -66,9 +81,12 @@ return Devmasters.Net.HttpClient.Simple.GetAsync("https://somedata.hlidacstatu.c
                     .Select(mm =>
                     {
                         if (mm.Length == 1)
-                            return new KeyValuePair<string, string>(Devmasters.TextUtil.RemoveDiacritics(mm[0]).Trim().ToLower(), "xx");
+                            return new KeyValuePair<string, string>(
+                                Devmasters.TextUtil.RemoveDiacritics(mm[0]).Trim().ToLower(), "xx");
                         else
-                            return new KeyValuePair<string, string>(Devmasters.TextUtil.RemoveDiacritics(mm[0]).Trim().ToLower(), mm[1].Length == 0 ? "xx" : mm[1].Trim());
+                            return new KeyValuePair<string, string>(
+                                Devmasters.TextUtil.RemoveDiacritics(mm[0]).Trim().ToLower(),
+                                mm[1].Length == 0 ? "xx" : mm[1].Trim());
                     });
                 foreach (var kv in tmp.Where(m => !string.IsNullOrEmpty(m.Key)))
                 {
@@ -77,19 +95,16 @@ return Devmasters.Net.HttpClient.Simple.GetAsync("https://somedata.hlidacstatu.c
                 }
 
                 czobce = czobceCache.Get().Split("\n", StringSplitOptions.RemoveEmptyEntries)
-                        .Select(m => Devmasters.TextUtil.RemoveDiacritics(m.Trim()).ToLower())
-                        .ToList();
+                    .Select(m => Devmasters.TextUtil.RemoveDiacritics(m.Trim()).ToLower())
+                    .ToList();
                 skobce = skobceCache.Get().Split("\n", StringSplitOptions.RemoveEmptyEntries)
-                        .Select(m => Devmasters.TextUtil.RemoveDiacritics(m.Trim()).ToLower())
-                        .ToList();
-
-
+                    .Select(m => Devmasters.TextUtil.RemoveDiacritics(m.Trim()).ToLower())
+                    .ToList();
             }
             catch (Exception e)
             {
                 logger.Fatal(e, "Cannot initialize DataValidators class");
             }
-
         }
 
         /// <summary>
@@ -114,17 +129,17 @@ return Devmasters.Net.HttpClient.Simple.GetAsync("https://somedata.hlidacstatu.c
             {
                 case 2:
                     return cultures
-                           .Select(c => c.TwoLetterISOLanguageName.ToLowerInvariant())
-                           .Distinct()
-                           .Contains(code);
+                        .Select(c => c.TwoLetterISOLanguageName.ToLowerInvariant())
+                        .Distinct()
+                        .Contains(code);
 
                 case 3:
                     // Some cultures have 3-letter fallback “ivl” etc.; filter to length 3
                     return cultures
-                           .Select(c => c.ThreeLetterISOLanguageName.ToLowerInvariant())
-                           .Where(s => s.Length == 3)
-                           .Distinct()
-                           .Contains(code);
+                        .Select(c => c.ThreeLetterISOLanguageName.ToLowerInvariant())
+                        .Where(s => s.Length == 3)
+                        .Distinct()
+                        .Contains(code);
 
                 default:
                     //throw new ArgumentOutOfRangeException(nameof(alpha), alpha, "alpha must be 2 or 3");
@@ -139,11 +154,12 @@ return Devmasters.Net.HttpClient.Simple.GetAsync("https://somedata.hlidacstatu.c
 
             var pref = Devmasters.RegexUtil.GetRegexGroupValue(ico, @"^(?<pref>\w{2}-).{1,}", "pref");
 
-            return pref;//je-li prefix, je to zahranicni ico
+            return pref; //je-li prefix, je to zahranicni ico
         }
+
         public static bool IsFirmaIcoZahranicni(string ico)
         {
-            return !string.IsNullOrEmpty(FirmaIcoZahranicni(ico));//je-li prefix, je to zahranicni ico
+            return !string.IsNullOrEmpty(FirmaIcoZahranicni(ico)); //je-li prefix, je to zahranicni ico
         }
 
         //zdroj http://devon.blog.zive.cz/2009/09/kontrola-rodneho-cisla/
@@ -152,6 +168,7 @@ return Devmasters.Net.HttpClient.Simple.GetAsync("https://somedata.hlidacstatu.c
             DateTime? ret;
             return IsRcValid(rc, out ret);
         }
+
         public static bool IsRcValid(string rc, out DateTime? birthDate)
         {
             birthDate = null;
@@ -162,7 +179,7 @@ return Devmasters.Net.HttpClient.Simple.GetAsync("https://somedata.hlidacstatu.c
             // RC.Lenght == 9 -> roky 1900 .. 1953
             // RC.Lenght == 10 -> roky 1954 .. 2053
             int year = Convert.ToInt32(rc.Substring(0, 2));
-            if (rc.Length == 9 && year >= 54) return false;  // od 1.1.1954 ma RC 10 znaku
+            if (rc.Length == 9 && year >= 54) return false; // od 1.1.1954 ma RC 10 znaku
             if (rc.Length == 9 || (rc.Length == 10 && year >= 54))
             {
                 year += 1900;
@@ -171,15 +188,16 @@ return Devmasters.Net.HttpClient.Simple.GetAsync("https://somedata.hlidacstatu.c
             {
                 year += 2000;
             }
+
             // muzi: 1 .. 12, 21 .. 32
             // zeny: 51 .. 62, 71 .. 82
             int month = Convert.ToInt32(rc.Substring(2, 2));
-            if (month > 70 && year > 2003) month -= 70;   // 53/2004 Sb.
+            if (month > 70 && year > 2003) month -= 70; // 53/2004 Sb.
             if (month > 50) month -= 50;
-            if (month > 20 && year > 2003) month -= 20;   // 53/2004 Sb.
+            if (month > 20 && year > 2003) month -= 20; // 53/2004 Sb.
             if (month < 1 || month > 12) return false;
             int day = Convert.ToInt32(rc.Substring(4, 2));
-            if (day > 50) day -= 50;                      //den + 50 = cizinec, zijici v CR
+            if (day > 50) day -= 50; //den + 50 = cizinec, zijici v CR
             if (day < 1 || day > 31) return false;
 
             // maji jen 30 dni
@@ -197,20 +215,21 @@ return Devmasters.Net.HttpClient.Simple.GetAsync("https://somedata.hlidacstatu.c
                 birthDate = null;
                 return false;
             }
-            int rcBase = Convert.ToInt32(rc.Substring(0, 9));   // rrmmddccc
+
+            int rcBase = Convert.ToInt32(rc.Substring(0, 9)); // rrmmddccc
             if (rc.Length > 9)
             {
                 string controlstring = rc.Substring(9, 1);
                 int controlnum = 0;
                 if (controlstring == "a" || controlstring == "A")
                 {
-
                     controlnum = 0;
                 }
                 else
                 {
                     controlnum = Convert.ToInt32(controlstring);
                 }
+
                 int mod = rcBase % 11;
                 if (mod != controlnum)
                 {
@@ -220,6 +239,7 @@ return Devmasters.Net.HttpClient.Simple.GetAsync("https://somedata.hlidacstatu.c
                     return false;
                 }
             }
+
             return true;
         }
 
@@ -247,20 +267,16 @@ return Devmasters.Net.HttpClient.Simple.GetAsync("https://somedata.hlidacstatu.c
                     int num = int.Parse(ico[i].ToString());
                     sum = sum + num * (8 - i);
                 }
+
                 int control = ((11 - sum % 11) % 10);
 
                 return (control == int.Parse(ico[7].ToString()));
-
-
             }
             catch (Exception)
             {
                 return false;
             }
-
         }
-
-
 
 
         private static string CeskaAdresaObec(string adresa)
@@ -301,6 +317,5 @@ return Devmasters.Net.HttpClient.Simple.GetAsync("https://somedata.hlidacstatu.c
 
             return null;
         }
-
     }
 }

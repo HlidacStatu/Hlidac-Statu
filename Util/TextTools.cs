@@ -69,9 +69,12 @@ public static class TextTools
         int[,] d = new int[n + 1, m + 1];
 
         // initialize the top and right of the table to 0, 1, 2, ...
-        for (int i = 0; i <= n; d[i, 0] = i++) ;
-        for (int j = 1; j <= m; d[0, j] = j++) ;
-
+        for (int i = 0; i <= n; d[i, 0] = i++)
+        {
+        }
+        for (int j = 1; j <= m; d[0, j] = j++)
+        {
+        }
         for (int i = 1; i <= n; i++)
         {
             for (int j = 1; j <= m; j++)
