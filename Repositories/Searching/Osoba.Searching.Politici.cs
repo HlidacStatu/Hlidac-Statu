@@ -28,8 +28,11 @@ namespace HlidacStatu.Repositories.Searching
                 return _permanentCache.GetOrDefault(cacheKey, new Dictionary<string, string>());
             }
             
-            _permanentCache.Set(cacheKey, data, options 
-                => options.ModifyEntryOptionsDuration(TimeSpan.FromHours(1), TimeSpan.FromDays(10*365)));
+            _permanentCache.Set(cacheKey, data, options =>
+            {
+                options.ModifyEntryOptionsDuration(TimeSpan.FromHours(1), TimeSpan.FromDays(10 * 365));
+                options.FactoryHardTimeout = TimeSpan.FromHours(1);
+            });
             return data;
         }
         
@@ -38,15 +41,21 @@ namespace HlidacStatu.Repositories.Searching
         private static ValueTask<PolitikStem[]> GetCachedPoliticiStemsAsync() =>
             _permanentCache.GetOrSetAsync($"_politiciStems_",
                 _ => RecalculatePoliticiStemsAsync(),
-                options => options.ModifyEntryOptionsDuration(TimeSpan.FromHours(1), TimeSpan.FromDays(4))
-            );
+                options =>
+                {
+                    options.ModifyEntryOptionsDuration(TimeSpan.FromHours(1), TimeSpan.FromDays(4));
+                    options.FactoryHardTimeout = TimeSpan.FromHours(1);
+                });
         
         //5 dní v paměti, pak rekalk => spustí rekalk GetCachedPoliticiStemsAsync()
         private static ValueTask<List<Tuple<string, string[]>>> PoliticiStemsCachedAsync() =>
             _memoryCache.GetOrSetAsync($"_politiciStemsInMem_",
                 _ => InitPoliticiStemsAsync(),
-                options => options.ModifyEntryOptionsDuration(TimeSpan.FromDays(5))
-            );
+                options =>
+                {
+                    options.ModifyEntryOptionsDuration(TimeSpan.FromDays(5));
+                    options.FactoryHardTimeout = TimeSpan.FromHours(1);
+                });
 
 
         internal class PolitikStem
