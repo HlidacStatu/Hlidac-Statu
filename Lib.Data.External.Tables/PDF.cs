@@ -18,35 +18,27 @@ namespace HlidacStatu.Lib.Data.External.Tables
             )
         {
             List<HlidacStatu.DS.Api.TablesInDoc.ApiOldCamelotResult> res = new List<HlidacStatu.DS.Api.TablesInDoc.ApiOldCamelotResult>();
-            HlidacStatu.DS.Api.TablesInDoc.ApiOldCamelotResult resLatt = null;
-            HlidacStatu.DS.Api.TablesInDoc.ApiOldCamelotResult resStre = null;
-            ParallelOptions po = new ParallelOptions();
+            
+            var lattTask = Client.GetTablesFromPDFAsync(pdfUrl, ClientLow.Commands.lattice, format, pages, executionTimeout, conn);
+            var streTask = Client.GetTablesFromPDFAsync(pdfUrl, ClientLow.Commands.stream, format, pages, executionTimeout, conn);
 
-            //if (System.Diagnostics.Debugger.IsAttached)
-            //    po = new ParallelOptions() { MaxDegreeOfParallelism = 1 };
+            var resLatt = await lattTask;
+            var resStre = await streTask;
 
-            Parallel.Invoke(po,
-                 () =>
-                 {
-                     resLatt = Client.GetTablesFromPDFAsync(pdfUrl, ClientLow.Commands.lattice, format, pages,executionTimeout,conn).Result;
-                     if (resLatt.Status != HlidacStatu.DS.Api.TablesInDoc.ApiOldCamelotResult.Statuses.Error.ToString())
-                         res.Add(resLatt);
-                     _logger.Debug($"PDF {pdfUrl} done Latt in {resLatt.ElapsedTimeInMs}ms on {resLatt.CamelotServer}, status {resLatt.Status}");
-                 },
-                () =>
-                {
-                    resStre = Client.GetTablesFromPDFAsync(pdfUrl, ClientLow.Commands.stream, format, pages, executionTimeout, conn).Result;
-                    if (resStre.Status != HlidacStatu.DS.Api.TablesInDoc.ApiOldCamelotResult.Statuses.Error.ToString())
-                        res.Add(resStre);
-                    _logger.Debug($"PDF {pdfUrl} done Stream in {resStre?.ElapsedTimeInMs}ms on {resStre.CamelotServer}, status {resStre.Status}");
-                });
+            if (resLatt.Status != HlidacStatu.DS.Api.TablesInDoc.ApiOldCamelotResult.Statuses.Error.ToString())
+                res.Add(resLatt);
+
+            if (resStre.Status != HlidacStatu.DS.Api.TablesInDoc.ApiOldCamelotResult.Statuses.Error.ToString())
+                res.Add(resStre);
+
+            _logger.Debug($"PDF {pdfUrl} done Latt in {resLatt.ElapsedTimeInMs}ms on {resLatt.CamelotServer}, status {resLatt.Status}");
+            _logger.Debug($"PDF {pdfUrl} done Stream in {resStre.ElapsedTimeInMs}ms on {resStre.CamelotServer}, status {resStre.Status}");
             if (resLatt.ErrorOccured() && resStre.ErrorOccured())
                 return null;
 
             return res
                 .Select(m => (HlidacStatu.DS.Api.TablesInDoc.Result)m)
-                .ToArray()
-                ;
+                .ToArray();
         }
     }
 }

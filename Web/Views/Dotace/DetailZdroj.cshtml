@@ -1,4 +1,5 @@
-﻿@using HlidacStatu.Extensions
+﻿@using System.Threading
+@using HlidacStatu.Extensions
 @model HlidacStatu.Entities.Dotace
 
 @{
@@ -8,9 +9,22 @@
     var allDotace = new List<HlidacStatu.Entities.Subsidy>();
     if (Model.SourceIds.Count>0)
     {
-        allDotace.AddRange(Model.SourceIds
-            .Select(id => HlidacStatu.Repositories.SubsidyRepo.GetAsync(id).Result)
-            .Where(m => m != null));
+        var sem = new SemaphoreSlim(10);
+        var tasks = Model.SourceIds.Select(async id =>
+        {
+            await sem.WaitAsync();
+            try
+            {
+                return await HlidacStatu.Repositories.SubsidyRepo.GetAsync(id);
+            }
+            finally
+            {
+                sem.Release();
+            }
+        });
+
+        var results = await Task.WhenAll(tasks);
+        allDotace.AddRange(results.Where(r => r != null));
     }
     allDotace = allDotace.OrderBy(o => o.Hints.IsOriginal == false).ToList();
 
