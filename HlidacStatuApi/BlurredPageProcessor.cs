@@ -106,95 +106,111 @@ public class BlurredPageProcessor : BackgroundService
     }
 
     private async Task<bool> SaveDataAsync(BlurredPage.BpSave data)
+    {
+        var semaphore = new SemaphoreSlim(20); // limit concurrency (10–20 recommended)
+
+        List<Task> tasks = new List<Task>();
+        List<PageMetadata> pagesMD = new List<PageMetadata>();
+        foreach (var p in data.prilohy)
         {
-            List<Task> tasks = new List<Task>();
-            List<PageMetadata> pagesMD = new List<PageMetadata>();
-            foreach (var p in data.prilohy)
+            foreach (var page in p.pages)
             {
-                foreach (var page in p.pages)
+                PageMetadata pm = new PageMetadata();
+                pm.SmlouvaId = data.smlouvaId;
+                pm.PrilohaId = p.uniqueId;
+                pm.PageNum = page.page;
+                pm.Blurred = new PageMetadata.BlurredMetadata()
                 {
-                    PageMetadata pm = new PageMetadata();
-                    pm.SmlouvaId = data.smlouvaId;
-                    pm.PrilohaId = p.uniqueId;
-                    pm.PageNum = page.page;
-                    pm.Blurred = new PageMetadata.BlurredMetadata()
-                    {
-                        BlackenAreaBoundaries = page.blackenAreaBoundaries
-                            .Select(b => new PageMetadata.BlurredMetadata.Boundary()
+                    BlackenAreaBoundaries = page.blackenAreaBoundaries
+                        .Select(b => new PageMetadata.BlurredMetadata.Boundary()
                             {
                                 X = b.x,
                                 Y = b.y,
                                 Width = b.width,
                                 Height = b.height
                             }
-                            ).ToArray(),
-                        TextAreaBoundaries = page.textAreaBoundaries
-                            .Select(b => new PageMetadata.BlurredMetadata.Boundary()
+                        ).ToArray(),
+                    TextAreaBoundaries = page.textAreaBoundaries
+                        .Select(b => new PageMetadata.BlurredMetadata.Boundary()
                             {
                                 X = b.x,
                                 Y = b.y,
                                 Width = b.width,
                                 Height = b.height
                             }
-                            ).ToArray(),
-                        AnalyzerVersion = page.analyzerVersion,
-                        Created = DateTime.Now,
-                        ImageWidth = page.imageWidth,
-                        ImageHeight = page.imageHeight,
-                        BlackenArea = page.blackenArea,
-                        TextArea = page.textArea
-                    };
-                    pagesMD.Add(pm);
-                    Task t = PageMetadataRepo.SaveAsync(pm);
-                    tasks.Add(t);
-                    //t.Wait();
-                }
+                        ).ToArray(),
+                    AnalyzerVersion = page.analyzerVersion,
+                    Created = DateTime.Now,
+                    ImageWidth = page.imageWidth,
+                    ImageHeight = page.imageHeight,
+                    BlackenArea = page.blackenArea,
+                    TextArea = page.textArea
+                };
+                pagesMD.Add(pm);
+                
+                tasks.Add(SaveWithLimitAsync(pm, semaphore));
             }
+        }
 
 
-            if (pagesMD.Count > 0)
+        if (pagesMD.Count > 0)
+        {
+            var sml = await SmlouvaRepo.LoadAsync(data.smlouvaId);
+            foreach (var pril in sml.Prilohy)
             {
-                var sml = await SmlouvaRepo.LoadAsync(data.smlouvaId);
-                foreach (var pril in sml.Prilohy)
-                {
-                    IEnumerable<PageMetadata>? blurredPages = pagesMD.Where(m => m.PrilohaId == pril.UniqueHash());
+                IEnumerable<PageMetadata>? blurredPages = pagesMD.Where(m => m.PrilohaId == pril.UniqueHash());
 
-                    if (blurredPages.Any())
+                if (blurredPages.Any())
+                {
+                    var pb = new Smlouva.Priloha.BlurredPagesStats(blurredPages);
+                    pril.BlurredPages = pb;
+                }
+                else
+                {
+                    if (pril.BlurredPages != null)
                     {
-                        var pb = new Smlouva.Priloha.BlurredPagesStats(blurredPages);
-                        pril.BlurredPages = pb;
+                        //keep
                     }
                     else
                     {
-                        if (pril.BlurredPages != null)
-                        {
-                            //keep
-                        }
-                        else
-                        {
-                            pril.BlurredPages = null;
-                        }
+                        pril.BlurredPages = null;
                     }
                 }
-                _ = await SmlouvaRepo.SaveAsync(sml, updateLastUpdateValue: false, skipPrepareBeforeSave: true, fireOCRDone:false);
+            }
 
-            }
-            try
-            {
-                Task.WaitAll(tasks.ToArray());
-                return true;
-            }
-            catch (Exception e)
-            {
-                _logger.LogError(e,
-                    "{action} {code} for {part} exception.",
-                    "saving",
-                    "thread",
-                    "ApiV2BlurredPageController.BpSave"
-                    );
-                return false;
-            }
+            _ = await SmlouvaRepo.SaveAsync(sml, updateLastUpdateValue: false, skipPrepareBeforeSave: true,
+                fireOCRDone: false);
         }
+
+        try
+        {
+            await Task.WhenAll(tasks.ToArray());
+            return true;
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e,
+                "{action} {code} for {part} exception.",
+                "saving",
+                "thread",
+                "ApiV2BlurredPageController.BpSave"
+            );
+            return false;
+        }
+    }
+    
+    async Task SaveWithLimitAsync(PageMetadata pm, SemaphoreSlim semaphore)
+    {
+        await semaphore.WaitAsync();
+        try
+        {
+            await PageMetadataRepo.SaveAsync(pm);
+        }
+        finally
+        {
+            semaphore.Release();
+        }
+    }
 
     public override async Task StopAsync(CancellationToken cancellationToken)
     {

@@ -348,7 +348,7 @@ namespace HlidacStatu.Web.Controllers
         }
 
         [Authorize(Roles = "canEditData")]
-        public JsonResult DoPhotoRemoveBackground(string id)
+        public async Task<JsonResult> DoPhotoRemoveBackground(string id)
         {
 
             var o = Osoby.GetByNameId.Get(id);
@@ -362,10 +362,10 @@ namespace HlidacStatu.Web.Controllers
                 if (System.IO.File.Exists(path))
                 {
                     
-                    var noBackGr = HlidacStatu.AI.Photo.RemoveBackgroundAsync(
+                    var noBackGr = await HlidacStatu.AI.Photo.RemoveBackgroundAsync(
                         new Uri(Devmasters.Config.GetWebConfigValue("RemoveBackgroundAPI")),
                         System.IO.File.ReadAllBytes(o.GetPhotoPath()), 
-                        AI.Photo.RemoveBackgroundStyles.Person).Result;
+                        AI.Photo.RemoveBackgroundStyles.Person);
                     if (noBackGr != null)
                     {
                         System.IO.File.WriteAllBytes(o.GetPhotoPath( Entities.Osoba.PhotoTypes.NoBackground,true), noBackGr);

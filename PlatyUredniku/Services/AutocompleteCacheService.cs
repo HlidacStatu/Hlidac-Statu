@@ -76,25 +76,23 @@ public class AutocompleteCacheService
     {
         var results = new List<Autocomplete>();
 
-        var organizaceTask = LoadOrganizace(cancellationToken);
+        var organizaceTask = LoadOrganizaceAsync(cancellationToken);
         var oblastTask = LoadOblasti(cancellationToken);
         var synonymsTask = LoadSynonyms(cancellationToken);
         var politiciTask = LoadPolitici(cancellationToken);
-
-        await Task.WhenAll(organizaceTask, oblastTask, synonymsTask, politiciTask);
-
+        
+        results.AddRange(await organizaceTask);
+        results.AddRange(await oblastTask);
+        results.AddRange(await synonymsTask);
+        results.AddRange(await politiciTask);
+        
         if (cancellationToken.IsCancellationRequested)
             return Enumerable.Empty<Autocomplete>().ToList();
-
-        results.AddRange(organizaceTask.Result);
-        results.AddRange(oblastTask.Result);
-        results.AddRange(synonymsTask.Result);
-        results.AddRange(politiciTask.Result);
 
         return results;
     }
 
-    private async Task<List<Autocomplete>> LoadOrganizace(CancellationToken cancellationToken)
+    private async Task<List<Autocomplete>> LoadOrganizaceAsync(CancellationToken cancellationToken)
     {
         await using var db = new DbEntities();
 

@@ -54,19 +54,17 @@ public class LocallyCachedAutocompleteService
     {
         var results = new List<HlidacStatu.DS.Api.Autocomplete>();
 
-        var politickeStrany = LoadPolitickeStrany(cancellationToken);
-
-        await Task.WhenAll(politickeStrany);
-
+        var politickeStrany = await LoadPolitickeStranyAsync(cancellationToken);
+        
         if (cancellationToken.IsCancellationRequested)
             return Enumerable.Empty<HlidacStatu.DS.Api.Autocomplete>().ToList();
 
-        results.AddRange(politickeStrany.Result);
+        results.AddRange(politickeStrany);
 
         return results;
     }
 
-    private async Task<List<HlidacStatu.DS.Api.Autocomplete>> LoadPolitickeStrany(CancellationToken cancellationToken)
+    private async Task<List<HlidacStatu.DS.Api.Autocomplete>> LoadPolitickeStranyAsync(CancellationToken cancellationToken)
     {
         await using var db = new DbEntities();
 
