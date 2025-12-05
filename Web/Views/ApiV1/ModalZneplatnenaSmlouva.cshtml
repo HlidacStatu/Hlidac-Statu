@@ -17,6 +17,7 @@
         platnyZaznam = smlouva.PlatnostZaznamuVRS();
     }
     
+    var basicStatisticData = await StaticData.GetBasicStatisticDataAsync();
 
 
     if (platnyZaznam.HasValue)
@@ -57,7 +58,7 @@
                 Poznámka ze zákulisí:<br />
                 Kontrolu neplatnosti smluv provádíme pravidelně každý víkend, protože registr smluv
                 informace o zneplatněných smlouvách neuvádí a my musíme zkontrolovat všech
-                @(StaticData.BasicStatisticData.Get()[0] + StaticData.BasicStatisticData.Get()[1]) smluv.
+                @(basicStatisticData[0] + basicStatisticData[1]) smluv.
             </p>
         }
         else if (platnyZaznam == true)
@@ -74,7 +75,7 @@
                 Poznámka ze zákulisí:<br/>
                 Kontrolu neplatnosti smluv provádíme pravidelně každý víkend, protože registr smluv
                 informace o zneplatněných smlouvách neuvádí a my musíme zkontrolovat všech
-                @HlidacStatu.Util.RenderData.ShortNiceNumber((decimal)(StaticData.BasicStatisticData.Get()[0] + StaticData.BasicStatisticData.Get()[1])) smluv.
+                @HlidacStatu.Util.RenderData.ShortNiceNumber((decimal)(basicStatisticData[0] + basicStatisticData[1])) smluv.
             </p>
 
         }
@@ -92,7 +93,7 @@
                 Poznámka ze zákulisí:<br />
                 Kontrolu neplatnosti smluv provádíme pravidelně každý víkend, protože registr smluv
                 informace o zneplatněných smlouvách neuvádí a my musíme zkontrolovat všech
-                @(StaticData.BasicStatisticData.Get()[0] + StaticData.BasicStatisticData.Get()[1]) smluv.
+                @(basicStatisticData[0] + basicStatisticData[1]) smluv.
             </p>
 
         }

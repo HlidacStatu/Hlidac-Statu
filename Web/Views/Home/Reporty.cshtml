@@ -54,9 +54,10 @@
             <h3 style="margin-top:0;">Smlouvy</h3>
             <div class="col-block-shadow">
                 @{
-                    double platnych = StaticData.BasicStatisticData.Get()[0];
-                    double neplatnych = StaticData.BasicStatisticData.Get()[1];
-                    double celkemKc = StaticData.BasicStatisticData.Get()[2];
+                    var basicStatisticData = await StaticData.GetBasicStatisticDataAsync();
+                    double platnych = basicStatisticData[0];
+                    double neplatnych = basicStatisticData[1];
+                    double celkemKc = basicStatisticData[2];
                 }
                 <h3><a href="/Report/7">Základní statistiky Registru smluv</a></h3>
                 <p>Celkem smlouvy za @Html.Raw(Smlouva.ShortNicePrice(Convert.ToDecimal(celkemKc), html: true)) s DPH, @(platnych.ToString("N0")) platných smluv, @(neplatnych.ToString("N0")) neplatných.</p>

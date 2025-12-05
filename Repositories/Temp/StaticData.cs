@@ -9,14 +9,63 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.Serialization;
+using HlidacStatu.Caching;
+using HlidacStatu.Entities.Facts;
+using HlidacStatu.Extensions;
+using ZiggyCreatures.Caching.Fusion;
 
 namespace HlidacStatu.Repositories
 {
     public static class StaticData
     {
         private static readonly ILogger _logger = Log.ForContext(typeof(StaticData));
+        
+        private static readonly IFusionCache _memoryCache =
+            HlidacStatu.Caching.CacheFactory.CreateNew(CacheFactory.CacheType.L1Default, nameof(StaticData));
+
+        public static ValueTask<List<double>> GetBasicStatisticDataAsync() =>
+            _memoryCache.GetOrSetAsync($"_BasicStaticData", async _ =>
+                {
+                    List<double> pol = new List<double>();
+                    try
+                    {
+                        var res = await SmlouvaRepo.Searching.RawSearchAsync("", 1, 0, platnyZaznam: true,
+                            anyAggregation:
+                            new Nest.AggregationContainerDescriptor<Smlouva>()
+                                .Sum("totalPrice", m => m
+                                    .Field(ff => ff.CalculatedPriceWithVATinCZK)
+                                ), exactNumOfResults: true
+                        );
+                        var resNepl = await SmlouvaRepo.Searching.RawSearchAsync("", 1, 0, platnyZaznam: false,
+                            anyAggregation:
+                            new Nest.AggregationContainerDescriptor<Smlouva>()
+                                .Sum("totalPrice", m => m
+                                    .Field(ff => ff.CalculatedPriceWithVATinCZK)
+                                ), exactNumOfResults: true
+                        );
+
+                        long platnych = res.Total;
+                        long neplatnych = resNepl.Total;
+                        double celkemKc = 0;
+                        celkemKc = ((Nest.ValueAggregate)res.Aggregations["totalPrice"]).Value.Value;
+
+                        pol.Add(platnych);
+                        pol.Add(neplatnych);
+                        pol.Add(celkemKc);
+                        return pol;
+                    }
+                    catch (Exception)
+                    {
+                        pol.Add(0);
+                        pol.Add(0);
+                        pol.Add(0);
+                        return pol;
+                    }
+                },
+                options => options.ModifyEntryOptionsDuration(TimeSpan.FromHours(6)));
 
         static bool initialized = false;
 
@@ -27,7 +76,6 @@ namespace HlidacStatu.Repositories
 
         public static Devmasters.Cache.LocalMemory.AutoUpdatedCache<List<Sponzoring>> SponzorujiciFirmy_Vsechny = null;
         public static Devmasters.Cache.LocalMemory.AutoUpdatedCache<List<Sponzoring>> SponzorujiciFirmy_Nedavne = null;
-        public static Devmasters.Cache.LocalMemory.Cache<List<double>> BasicStatisticData = null;
 
         public static Devmasters.Cache.LocalMemory.Cache<Dictionary<string, NespolehlivyPlatceDPH>>
             NespolehlivyPlatciDPH = null;
@@ -181,52 +229,6 @@ namespace HlidacStatu.Repositories
                     }
                 }
             );
-
-            _logger.Information("Static data - BasicStatisticData ");
-            swl.StopPreviousAndStartNextLap(Util.DebugUtil.GetClassAndMethodName(MethodBase.GetCurrentMethod()) +
-                                            " var BasicStatisticData");
-            BasicStatisticData = new Devmasters.Cache.LocalMemory.Cache<List<double>>(
-                TimeSpan.FromHours(6), (obj) =>
-                {
-                    List<double> pol = new List<double>();
-                    try
-                    {
-                        var res = SmlouvaRepo.Searching.RawSearchAsync("", 1, 0, platnyZaznam: true, anyAggregation:
-                            new Nest.AggregationContainerDescriptor<Smlouva>()
-                                .Sum("totalPrice", m => m
-                                    .Field(ff => ff.CalculatedPriceWithVATinCZK)
-                                ), exactNumOfResults: true
-                        ).ConfigureAwait(false).GetAwaiter().GetResult();
-                        var resNepl = SmlouvaRepo.Searching.RawSearchAsync("", 1, 0, platnyZaznam: false,
-                            anyAggregation:
-                            new Nest.AggregationContainerDescriptor<Smlouva>()
-                                .Sum("totalPrice", m => m
-                                    .Field(ff => ff.CalculatedPriceWithVATinCZK)
-                                ), exactNumOfResults: true
-                        ).ConfigureAwait(false).GetAwaiter().GetResult();
-
-                        long platnych = res.Total;
-                        long neplatnych = resNepl.Total;
-                        ;
-                        double celkemKc = 0;
-
-                        celkemKc = ((Nest.ValueAggregate)res.Aggregations["totalPrice"]).Value.Value;
-
-                        pol.Add(platnych);
-                        pol.Add(neplatnych);
-                        pol.Add(celkemKc);
-                        return pol;
-                    }
-                    catch (Exception)
-                    {
-                        pol.Add(0);
-                        pol.Add(0);
-                        pol.Add(0);
-                        return pol;
-                    }
-                }
-            );
-
 
             //migrace: tohle by mělo jít odsud do Repo cache
             ZkratkyStran_cache = new Devmasters.Cache.LocalMemory.Cache<Dictionary<string, string>>

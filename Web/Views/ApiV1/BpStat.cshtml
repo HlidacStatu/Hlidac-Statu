@@ -1,5 +1,6 @@
 ﻿@using HlidacStatu.Util;
 @using HlidacStatu.Connectors
+@using HlidacStatu.Repositories
 @{
     /**/
 
@@ -58,8 +59,9 @@
     }
     catch (Exception) { }
 
+    var basicStatisticData = await StaticData.GetBasicStatisticDataAsync();
 
-    var smluvCelkem = (decimal)(HlidacStatu.Repositories.StaticData.BasicStatisticData.Get()[0] + HlidacStatu.Repositories.StaticData.BasicStatisticData.Get()[1]);
+    var smluvCelkem = (decimal)(basicStatisticData[0] + basicStatisticData[1]);
     ViewBag.Title = "Statistika analýzy začerněných stránek smluv";
     ViewBag.SubTitle = "";
 

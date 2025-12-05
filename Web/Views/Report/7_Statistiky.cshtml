@@ -38,10 +38,11 @@
             await HlidacStatu.Web.Framework.Report.GlobalStatistics.PocetSmluvPerUzavreniAsync(Nest.DateInterval.Week))
         );
 
+    var basicStaticData = await StaticData.GetBasicStatisticDataAsync();
 
-    double platnych = StaticData.BasicStatisticData.Get()[0];
-    double neplatnych = StaticData.BasicStatisticData.Get()[1];
-    double celkemKc = StaticData.BasicStatisticData.Get()[2];
+    double platnych = basicStaticData[0];
+    double neplatnych = basicStaticData[1];
+    double celkemKc = basicStaticData[2];
 
 
     var sumCountZad = await HlidacStatu.Web.Framework.Report.GlobalStatistics.TopListPerCountAsync(true);

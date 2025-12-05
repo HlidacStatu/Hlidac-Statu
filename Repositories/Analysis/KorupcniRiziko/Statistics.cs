@@ -25,8 +25,11 @@ namespace HlidacStatu.Repositories.Analysis.KorupcniRiziko
         public static ValueTask<Statistics[]> GetKindexStatTotalAsync() =>
             _permanentCache.GetOrSetAsync($"_KIndexStat",
                 async _ => (await CalculateAsync()).ToArray(),
-                options => options.ModifyEntryOptionsDuration(TimeSpan.FromHours(6),TimeSpan.FromDays(10*365))
-            );
+                options =>
+                {
+                    options.ModifyEntryOptionsDuration(TimeSpan.FromHours(6), TimeSpan.FromDays(10 * 365));
+                    options.ModifyEntryOptionsFactoryTimeouts(TimeSpan.FromHours(12));
+                });
 
         public static async Task ForceRefreshKindexStatTotalAsync(Statistics[] newData = null)
         {

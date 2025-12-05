@@ -265,7 +265,7 @@ else
     <p>
         Veřejná správa a státní firmy hospodaří s prostředky občanů ČR. Každá organizace se chová jinak,
         dodržuje zákon, metodiky a doporučení v různé míře. Zanalyzovali jsme více než
-        @HlidacStatu.Util.RenderData.NiceNumber((decimal)Math.Round(StaticData.BasicStatisticData.Get()[0] / 10000) * 10000) smluv, dvacet tisíc organizací a
+        @HlidacStatu.Util.RenderData.NiceNumber((decimal)Math.Round((await StaticData.GetBasicStatisticDataAsync())[0] / 10000) * 10000) smluv, dvacet tisíc organizací a
         zanalyzovali jejich transparentnost, dodržování zákona a nakládání s veřejnými penězi.
     </p>
     <p>
