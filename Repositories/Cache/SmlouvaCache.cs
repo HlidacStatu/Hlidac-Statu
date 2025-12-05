@@ -20,6 +20,10 @@ public static class SmlouvaCache
     private static ValueTask RemoveRawStemsFromCacheAsync(string smlouvaId) =>
         PermanentCache.RemoveAsync($"_SmlouvyStems:{smlouvaId}");
 
+    private static ValueTask SetRawStemsFromCacheAsync(string smlouvaId, byte[] data) =>
+        PermanentCache.SetAsync($"_SmlouvyStems:{smlouvaId}", data,
+            options => options.ModifyEntryOptionsDuration(TimeSpan.FromHours(12), TimeSpan.FromDays(10 * 365))
+        );
 
     public static async Task<string> GetRawStemsAsync(string smlouvaId, bool rewriteStems = false)
     {
