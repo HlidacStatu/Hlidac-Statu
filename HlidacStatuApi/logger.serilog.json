@@ -10,7 +10,10 @@
       "Override": {
         "Microsoft": "Error",
         "Microsoft.Extensions": "Information",
-        "System": "Error"
+        "System": "Error",
+        "Devmasters": "Warning",
+        "Devmasters.StartupSequenceRunner": "Information",
+        "ZiggyCreatures.Caching": "Error"
       }
     },
     "WriteTo": [

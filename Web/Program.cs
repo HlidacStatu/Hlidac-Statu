@@ -1,7 +1,14 @@
 using HlidacStatu.LibCore.Extensions;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.DependencyInjection;
 using System;
+using OpenTelemetry;
+using OpenTelemetry.Exporter;
+using OpenTelemetry.Metrics;
+using OpenTelemetry.Resources;
+using OpenTelemetry.Trace;
+using Microsoft.Extensions.Logging;
 
 namespace HlidacStatu.Web
 {
@@ -25,7 +32,60 @@ namespace HlidacStatu.Web
             //dont check ssl for local debugging with local api
             System.Net.ServicePointManager.ServerCertificateValidationCallback += (sender, cert, chain, sslPolicyErrors) => true;
 #endif
-            
+
+            // Setup logging to be exported via OpenTelemetry
+            _ = builder.Logging.AddOpenTelemetry(logging =>
+            {
+                logging.IncludeFormattedMessage = true;
+                logging.IncludeScopes = true;
+            });
+
+            var OtlpEndpoint = builder.Configuration["OTEL_EXPORTER_OTLP_ENDPOINT"];
+
+
+            var otel = builder.Services.AddOpenTelemetry()
+                .ConfigureResource(b => b
+                    .AddService(
+                        serviceName: "Web",
+                        serviceVersion: typeof(Program).Assembly.GetName().Version?.ToString() ?? "unknown"
+                    )
+                )
+                ;
+            _ = otel.WithMetrics(metrics =>
+            {
+                // Metrics provider from OpenTelemetry
+                metrics.AddAspNetCoreInstrumentation();
+                metrics.AddRuntimeInstrumentation();
+                //Our custom metrics
+                //metrics.AddMeter(greeterMeter.Name);
+                // Metrics provides by ASP.NET Core in .NET 8
+                metrics.AddMeter("Microsoft.AspNetCore.Hosting");
+                metrics.AddMeter("Microsoft.AspNetCore.Server.Kestrel");
+                // Metrics provided by System.Net libraries
+                metrics.AddMeter("System.Net.Http");
+                metrics.AddMeter("System.Net.NameResolution");
+                //metrics.AddMeter(SocialbannerInstrumentationSource.MeterName);
+                metrics.AddFusionCacheInstrumentation(o => o.IncludeDistributedLevel = true);
+            }
+                );
+            _ = otel.WithTracing(tracing =>
+            {
+                //tracing.AddSource(SocialbannerInstrumentationSource.ActivitySourceName);
+                tracing.AddAspNetCoreInstrumentation();
+                tracing.AddHttpClientInstrumentation();
+                tracing.AddFusionCacheInstrumentation(o =>
+                {
+                    o.IncludeDistributedLevel = true;
+                });
+
+            });
+
+
+            if (OtlpEndpoint != null)
+            {
+                _ = otel.UseOtlpExporter();
+            }
+
             //get IConfiguration
             var configuration = builder.Configuration;
             StartupLogger.Write("Configuration 2 initialized.");

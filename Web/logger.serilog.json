@@ -11,8 +11,9 @@
         "Microsoft": "Error",
         "Microsoft.Extensions": "Information",
         "System": "Error",
-        "Devmasters": "Debug",
-        "Devmasters.StartupSequenceRunner": "Debug"
+        "Devmasters": "Warning",
+        "Devmasters.StartupSequenceRunner": "Information",
+        "ZiggyCreatures.Caching": "Error"
       }
     },
     "WriteTo": [
