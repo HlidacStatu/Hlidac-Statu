@@ -25,8 +25,12 @@ namespace HlidacStatu.Web
             
             builder.ConfigureHostForWeb(args);
             var configuration = builder.Configuration;
-            Devmasters.Config.Init(configuration);
+            //inicializace statických proměnných
+            System.Globalization.CultureInfo.DefaultThreadCurrentCulture = Util.Consts.czCulture;
+            System.Globalization.CultureInfo.DefaultThreadCurrentUICulture = Util.Consts.csCulture;
             StartupLogger.Write("Configuration loaded and Logger initialized.");
+            Devmasters.Config.Init(configuration);
+            StartupLogger.Write("Devmasters Init inited");
 
             builder.WebHost.UseStaticWebAssets();
             
@@ -87,16 +91,12 @@ namespace HlidacStatu.Web
 
             if (OtlpEndpoint != null)
             {
-                _ = otel.UseOtlpExporter();
+                _ = otel.UseOtlpExporter();                            
             }
 
             //get IConfiguration
             StartupLogger.Write("Configuration 2 initialized.");
             
-            //inicializace statických proměnných
-            StartupLogger.Write("Devmasters Init inited");
-            System.Globalization.CultureInfo.DefaultThreadCurrentCulture = Util.Consts.czCulture;
-            System.Globalization.CultureInfo.DefaultThreadCurrentUICulture = Util.Consts.csCulture;
             
             
             DBUpgrades.DBUpgrader.UpgradeDatabases(Connectors.DirectDB.Instance.DefaultCnnStr);
