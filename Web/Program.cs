@@ -89,7 +89,10 @@ namespace HlidacStatu.Web
 
             if (OtlpEndpoint != null)
             {
-                _ = otel.UseOtlpExporter();                            
+                _ = otel.UseOtlpExporter(
+                        OtlpExportProtocol.Grpc,
+                        new Uri(OtlpEndpoint)
+                    );                            
             }
 
             //get IConfiguration
