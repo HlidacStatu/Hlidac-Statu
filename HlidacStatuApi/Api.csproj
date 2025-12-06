@@ -8,6 +8,7 @@
 		<Version>2.4.3.0</Version>
 		<RootNamespace>HlidacStatuApi</RootNamespace>
 		<AssemblyName>HlidacStatuApi</AssemblyName>
+		<UserSecretsId>ecdf5a8b-6634-40d2-bc28-24679b7f7f39</UserSecretsId>
 	</PropertyGroup>
 	<ItemGroup>
 		<Compile Remove="Controllers\HomeController.cs" />

@@ -1,0 +1,33 @@
+receivers:
+  otlp:
+    protocols:
+      grpc:
+        endpoint: 0.0.0.0:4317
+      http:
+        endpoint: 0.0.0.0:4318
+
+processors:
+  filter/only_my_source:
+    error_mode: ignore
+    traces:
+      span:
+        - 'resource.attributes["service.name"] != "Api"'
+
+exporters:
+  logging:
+    verbosity: detailed
+
+service:
+  pipelines:
+    traces:
+      receivers: [otlp]
+      processors: [filter/only_my_source]
+      exporters: [logging]
+    metrics:
+      receivers: [otlp]
+      processors: []
+      exporters: [logging]
+    logs:
+      receivers: [otlp]
+      processors: []
+      exporters: [logging]

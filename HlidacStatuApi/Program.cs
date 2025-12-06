@@ -10,15 +10,16 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
-using Serilog;
-using ILogger = Serilog.ILogger;
 using OpenTelemetry;
 using OpenTelemetry.Exporter;
 using OpenTelemetry.Metrics;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
-using Microsoft.Extensions.Logging;
+using Serilog;
+using System.Diagnostics;
+using ILogger = Serilog.ILogger;
 
 string CORSPolicy = "from_hlidacstatu.cz";
 
@@ -57,10 +58,10 @@ new Thread(
 
 // Setup logging to be exported via OpenTelemetry
 _ = builder.Logging.AddOpenTelemetry(logging =>
-{
-    logging.IncludeFormattedMessage = true;
-    logging.IncludeScopes = true;
-});
+    {
+        logging.IncludeFormattedMessage = true;
+        logging.IncludeScopes = true;
+    });
 
 
 var OtlpEndpoint = Devmasters.Config.GetWebConfigValue("OTEL_EXPORTER_OTLP_ENDPOINT");
@@ -72,8 +73,8 @@ var otel = builder.Services.AddOpenTelemetry()
             serviceName: "Api",
             serviceVersion: typeof(Program).Assembly.GetName().Version?.ToString() ?? "unknown"
         )
-    )
-    ;
+    );
+
 _ = otel.WithMetrics(metrics =>
 {
     // Metrics provider from OpenTelemetry
@@ -100,13 +101,27 @@ _ = otel.WithTracing(tracing =>
     {
         o.IncludeDistributedLevel = true;
     });
+    tracing.AddSource("ApiProgramStart");
 
 });
 
 
 if (OtlpEndpoint != null)
 {
-    _ = otel.UseOtlpExporter();
+    _ = otel.UseOtlpExporter(
+         OtlpExportProtocol.Grpc,
+         new Uri(OtlpEndpoint)
+        );
+}
+
+var source = new ActivitySource("ApiProgramStart");
+
+using (var activity = source.StartActivity("Starting prg"))
+{
+    activity?.SetTag("test.key", "test-value");
+    activity?.SetTag("env", "production");
+    // simulace práce
+    Thread.Sleep(100);
 }
 
 
