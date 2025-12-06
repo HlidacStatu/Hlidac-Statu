@@ -8,7 +8,7 @@ using System.Reflection.PortableExecutable;
 using System.Diagnostics.Metrics;
 using HlidacStatu.WebGenerator.Models;
 
-namespace Gen
+namespace WebGenerator
 {
     public class Program
     {
@@ -32,7 +32,9 @@ namespace Gen
                 logging.IncludeScopes = true;
             });
 
-            var OtlpEndpoint = builder.Configuration["OTEL_EXPORTER_OTLP_ENDPOINT"];
+            //var OtlpEndpoint = builder.Configuration["OTEL_EXPORTER_OTLP_ENDPOINT"];
+            var OtlpEndpoint = Devmasters.Config.GetWebConfigValue("OTEL_EXPORTER_OTLP_ENDPOINT");
+
 
             //builder.Services.Configure<OtlpExporterOptions>(
             //    o => o.Headers = $"x-otlp-api-key=Groggily-Chuck-Target7-Provable");

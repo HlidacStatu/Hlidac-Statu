@@ -63,9 +63,7 @@ _ = builder.Logging.AddOpenTelemetry(logging =>
 });
 
 
-var OtlpEndpoint = builder.Configuration["OTEL_EXPORTER_OTLP_ENDPOINT"]
-       ?? Devmasters.Config.GetWebConfigValue("OTEL_EXPORTER_OTLP_ENDPOINT")
-    ;
+var OtlpEndpoint = Devmasters.Config.GetWebConfigValue("OTEL_EXPORTER_OTLP_ENDPOINT");
 
 
 var otel = builder.Services.AddOpenTelemetry()
