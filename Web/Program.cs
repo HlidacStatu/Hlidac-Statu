@@ -24,8 +24,10 @@ namespace HlidacStatu.Web
             StartupLogger.Write("Builder created.");
             
             builder.ConfigureHostForWeb(args);
+            var configuration = builder.Configuration;
+            Devmasters.Config.Init(configuration);
             StartupLogger.Write("Configuration loaded and Logger initialized.");
-            
+
             builder.WebHost.UseStaticWebAssets();
             
 #if DEBUG
@@ -40,7 +42,9 @@ namespace HlidacStatu.Web
                 logging.IncludeScopes = true;
             });
 
-            var OtlpEndpoint = builder.Configuration["OTEL_EXPORTER_OTLP_ENDPOINT"];
+            var OtlpEndpoint = builder.Configuration["OTEL_EXPORTER_OTLP_ENDPOINT"] 
+                   ?? Devmasters.Config.GetWebConfigValue("OTEL_EXPORTER_OTLP_ENDPOINT")
+                ;
 
 
             var otel = builder.Services.AddOpenTelemetry()
@@ -87,11 +91,9 @@ namespace HlidacStatu.Web
             }
 
             //get IConfiguration
-            var configuration = builder.Configuration;
             StartupLogger.Write("Configuration 2 initialized.");
             
             //inicializace statických proměnných
-            Devmasters.Config.Init(configuration);
             StartupLogger.Write("Devmasters Init inited");
             System.Globalization.CultureInfo.DefaultThreadCurrentCulture = Util.Consts.czCulture;
             System.Globalization.CultureInfo.DefaultThreadCurrentUICulture = Util.Consts.csCulture;
