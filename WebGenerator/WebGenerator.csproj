@@ -60,6 +60,9 @@
 	  <None Update="BuildPushDocker.bat">
 	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 	  </None>
+	  <None Update="DockerfileFromPublish">
+	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	  </None>
 	  <None Update="Dockerfilepublish">
 	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 	  </None>
