@@ -38,7 +38,7 @@ namespace HlidacStatu.Repositories
                         Dictionary<string, string> headers = new();
                         headers.Add("Authorization", "Token " + Devmasters.Config.GetWebConfigValue("MerkApiToken"));
                         s = Devmasters.Net.HttpClient.Simple.Get(
-                            "https://api.merk.cz//enums/?country_code=cz",
+                            "https://api.merk.cz/enums/?country_code=cz",
                             headers: headers);
                     }
                     catch (Exception e)
@@ -58,25 +58,30 @@ namespace HlidacStatu.Repositories
                     return s;
                 }
 
-                public static CzechEnumsData GetMerkEnums()
-                {
-                    return JsonConvert.DeserializeObject<CzechEnumsData>(LoadMerkEnums());
-                }
-
+                static object lockObj = new object();
+                static CzechEnumsData _czechEnumsData = null;
                 // Main loader class with conversion methods
-                private static CzechEnumsData _data;
+                private static CzechEnumsData czechEnumsData
+                {
+                    get
+                    {
+                        if (_czechEnumsData == null)
+                        {
+                            lock (lockObj)
+                            {
+                                if (_czechEnumsData == null)
+                                {
+                                    _czechEnumsData = JsonConvert.DeserializeObject<CzechEnumsData>(LoadMerkEnums());
+                                }
+                            }
+                        }
+                        return _czechEnumsData;
+                    }
+                }
 
                 static MerkEnumConverters()
                 {
-                    _data = new CzechEnumsData(); //falback to empty data if not loaded
-                    try
-                    {
-                        _data = FirmaCache.GetMerkEnums();
-                    }
-                    catch (Exception e)
-                    {
-                        _logger.Error(e, "Error loading Merk enums from cache");
-                    }
+
                 }
 
                 // Base class for basic enum items
@@ -218,7 +223,7 @@ namespace HlidacStatu.Repositories
                     if (string.IsNullOrWhiteSpace(key))
                         return null;
 
-                    return _data.CountryCodes?.TryGetValue(key, out var value) == true ? value : null;
+                    return czechEnumsData.CountryCodes?.TryGetValue(key, out var value) == true ? value : null;
                 }
 
                 public static FinancialStatementItem ConvertCompanyFinancialStatement(string key)
@@ -226,7 +231,7 @@ namespace HlidacStatu.Repositories
                     if (string.IsNullOrWhiteSpace(key))
                         return null;
 
-                    return _data.CompanyFinancialStatements?.TryGetValue(key, out var value) == true ? value : null;
+                    return czechEnumsData.CompanyFinancialStatements?.TryGetValue(key, out var value) == true ? value : null;
                 }
 
                 public static RangeEnumItem ConvertCompanyMagnitude(string key)
@@ -234,7 +239,7 @@ namespace HlidacStatu.Repositories
                     if (string.IsNullOrWhiteSpace(key))
                         return null;
 
-                    return _data.CompanyMagnitude?.TryGetValue(key, out var value) == true ? value : null;
+                    return czechEnumsData.CompanyMagnitude?.TryGetValue(key, out var value) == true ? value : null;
                 }
 
                 public static BasicEnumItem ConvertCompanyOwningType(string key)
@@ -242,7 +247,7 @@ namespace HlidacStatu.Repositories
                     if (string.IsNullOrWhiteSpace(key))
                         return null;
 
-                    return _data.CompanyOwningType?.TryGetValue(key, out var value) == true ? value : null;
+                    return czechEnumsData.CompanyOwningType?.TryGetValue(key, out var value) == true ? value : null;
                 }
 
                 public static BasicEnumItem ConvertDistrict(string key)
@@ -250,7 +255,7 @@ namespace HlidacStatu.Repositories
                     if (string.IsNullOrWhiteSpace(key))
                         return null;
 
-                    return _data.District?.TryGetValue(key, out var value) == true ? value : null;
+                    return czechEnumsData.District?.TryGetValue(key, out var value) == true ? value : null;
                 }
 
                 public static BasicEnumItem ConvertCompanyLicenseType(string key)
@@ -258,7 +263,7 @@ namespace HlidacStatu.Repositories
                     if (string.IsNullOrWhiteSpace(key))
                         return null;
 
-                    return _data.CompanyLicenseType?.TryGetValue(key, out var value) == true ? value : null;
+                    return czechEnumsData.CompanyLicenseType?.TryGetValue(key, out var value) == true ? value : null;
                 }
 
                 public static RegionItem ConvertRegion(string key)
@@ -266,7 +271,7 @@ namespace HlidacStatu.Repositories
                     if (string.IsNullOrWhiteSpace(key))
                         return null;
 
-                    return _data.Region?.TryGetValue(key, out var value) == true ? value : null;
+                    return czechEnumsData.Region?.TryGetValue(key, out var value) == true ? value : null;
                 }
 
                 public static BasicEnumItem ConvertCompanyInsolvencyType(string key)
@@ -274,7 +279,7 @@ namespace HlidacStatu.Repositories
                     if (string.IsNullOrWhiteSpace(key))
                         return null;
 
-                    return _data.CompanyInsolvencyType?.TryGetValue(key, out var value) == true ? value : null;
+                    return czechEnumsData.CompanyInsolvencyType?.TryGetValue(key, out var value) == true ? value : null;
                 }
 
                 public static BasicEnumItem ConvertCompanyEvents(string key)
@@ -282,7 +287,7 @@ namespace HlidacStatu.Repositories
                     if (string.IsNullOrWhiteSpace(key))
                         return null;
 
-                    return _data.CompanyEvents?.TryGetValue(key, out var value) == true ? value : null;
+                    return czechEnumsData.CompanyEvents?.TryGetValue(key, out var value) == true ? value : null;
                 }
 
                 public static BasicEnumItem ConvertCompanyInsolvencyStatus(string key)
@@ -290,7 +295,7 @@ namespace HlidacStatu.Repositories
                     if (string.IsNullOrWhiteSpace(key))
                         return null;
 
-                    return _data.CompanyInsolvencyStatuses?.TryGetValue(key, out var value) == true ? value : null;
+                    return czechEnumsData.CompanyInsolvencyStatuses?.TryGetValue(key, out var value) == true ? value : null;
                 }
 
                 public static BasicEnumItem ConvertCompanyStatus(string key)
@@ -298,7 +303,7 @@ namespace HlidacStatu.Repositories
                     if (string.IsNullOrWhiteSpace(key))
                         return null;
 
-                    return _data.CompanyStatus?.TryGetValue(key, out var value) == true ? value : null;
+                    return czechEnumsData.CompanyStatus?.TryGetValue(key, out var value) == true ? value : null;
                 }
 
                 public static BasicEnumItem ConvertCompanyBusinessPremisesType(string key)
@@ -306,7 +311,7 @@ namespace HlidacStatu.Repositories
                     if (string.IsNullOrWhiteSpace(key))
                         return null;
 
-                    return _data.CompanyBusinessPremisesTypes?.TryGetValue(key, out var value) == true ? value : null;
+                    return czechEnumsData.CompanyBusinessPremisesTypes?.TryGetValue(key, out var value) == true ? value : null;
                 }
 
                 public static BasicEnumItem ConvertCompanyEsiStatus(string key)
@@ -314,7 +319,7 @@ namespace HlidacStatu.Repositories
                     if (string.IsNullOrWhiteSpace(key))
                         return null;
 
-                    return _data.CompanyEsiStatus?.TryGetValue(key, out var value) == true ? value : null;
+                    return czechEnumsData.CompanyEsiStatus?.TryGetValue(key, out var value) == true ? value : null;
                 }
 
                 public static BasicEnumItem ConvertCompanyEventsAction(string key)
@@ -322,7 +327,7 @@ namespace HlidacStatu.Repositories
                     if (string.IsNullOrWhiteSpace(key))
                         return null;
 
-                    return _data.CompanyEventsActions?.TryGetValue(key, out var value) == true ? value : null;
+                    return czechEnumsData.CompanyEventsActions?.TryGetValue(key, out var value) == true ? value : null;
                 }
 
                 public static BasicEnumItem ConvertCompanyLicenseStatus(string key)
@@ -330,7 +335,7 @@ namespace HlidacStatu.Repositories
                     if (string.IsNullOrWhiteSpace(key))
                         return null;
 
-                    return _data.CompanyLicenseStatus?.TryGetValue(key, out var value) == true ? value : null;
+                    return czechEnumsData.CompanyLicenseStatus?.TryGetValue(key, out var value) == true ? value : null;
                 }
 
                 public static BasicEnumItem ConvertBank(string key)
@@ -338,7 +343,7 @@ namespace HlidacStatu.Repositories
                     if (string.IsNullOrWhiteSpace(key))
                         return null;
 
-                    return _data.Banks?.TryGetValue(key, out var value) == true ? value : null;
+                    return czechEnumsData.Banks?.TryGetValue(key, out var value) == true ? value : null;
                 }
 
                 public static BasicEnumItem ConvertCompanyRole(string key)
@@ -346,7 +351,7 @@ namespace HlidacStatu.Repositories
                     if (string.IsNullOrWhiteSpace(key))
                         return null;
 
-                    return _data.CompanyRole?.TryGetValue(key, out var value) == true ? value : null;
+                    return czechEnumsData.CompanyRole?.TryGetValue(key, out var value) == true ? value : null;
                 }
 
                 public static IndustryItem ConvertCompanyIndustry(string key)
@@ -354,7 +359,7 @@ namespace HlidacStatu.Repositories
                     if (string.IsNullOrWhiteSpace(key))
                         return null;
 
-                    return _data.CompanyIndustry?.TryGetValue(key, out var value) == true ? value : null;
+                    return czechEnumsData.CompanyIndustry?.TryGetValue(key, out var value) == true ? value : null;
                 }
 
                 public static string ConvertCompanyIndustryToFullName(string key, bool wholePath, bool includedB2B_B2C,
@@ -406,86 +411,86 @@ namespace HlidacStatu.Repositories
                     if (string.IsNullOrWhiteSpace(key))
                         return null;
 
-                    return _data.CompanyCourt?.TryGetValue(key, out var value) == true ? value : null;
+                    return czechEnumsData.CompanyCourt?.TryGetValue(key, out var value) == true ? value : null;
                 }
 
                 public static BasicEnumItem ConvertCompanyLegalForm(string key)
                 {
                     if (string.IsNullOrWhiteSpace(key))
                         return null;
-                    return _data.CompanyLegalForm?.TryGetValue(key, out var value) == true ? value : null;
+                    return czechEnumsData.CompanyLegalForm?.TryGetValue(key, out var value) == true ? value : null;
                 }
 
                 public static RangeEnumItem ConvertCompanyTurnover(string key)
                 {
                     if (string.IsNullOrWhiteSpace(key))
                         return null;
-                    return _data.CompanyTurnover?.TryGetValue(key, out var value) == true ? value : null;
+                    return czechEnumsData.CompanyTurnover?.TryGetValue(key, out var value) == true ? value : null;
                 }
 
                 // Utility methods to get all keys for a category
                 public static IEnumerable<string> GetCountryCodeKeys() =>
-                    _data.CountryCodes?.Keys?.ToArray() ?? Array.Empty<string>();
+                    czechEnumsData.CountryCodes?.Keys?.ToArray() ?? Array.Empty<string>();
 
                 public static IEnumerable<string> GetCompanyFinancialStatementKeys() =>
-                    _data.CompanyFinancialStatements?.Keys?.ToArray() ?? Array.Empty<string>();
+                    czechEnumsData.CompanyFinancialStatements?.Keys?.ToArray() ?? Array.Empty<string>();
 
                 public static IEnumerable<string> GetCompanyMagnitudeKeys() =>
-                    _data.CompanyMagnitude?.Keys?.ToArray() ?? Array.Empty<string>();
+                    czechEnumsData.CompanyMagnitude?.Keys?.ToArray() ?? Array.Empty<string>();
 
                 public static IEnumerable<string> GetCompanyOwningTypeKeys() =>
-                    _data.CompanyOwningType?.Keys?.ToArray() ?? Array.Empty<string>();
+                    czechEnumsData.CompanyOwningType?.Keys?.ToArray() ?? Array.Empty<string>();
 
                 public static IEnumerable<string> GetDistrictKeys() =>
-                    _data.District?.Keys?.ToArray() ?? Array.Empty<string>();
+                    czechEnumsData.District?.Keys?.ToArray() ?? Array.Empty<string>();
 
                 public static IEnumerable<string> GetCompanyLicenseTypeKeys() =>
-                    _data.CompanyLicenseType?.Keys?.ToArray() ?? Array.Empty<string>();
+                    czechEnumsData.CompanyLicenseType?.Keys?.ToArray() ?? Array.Empty<string>();
 
                 public static IEnumerable<string> GetRegionKeys() =>
-                    _data.Region?.Keys?.ToArray() ?? Array.Empty<string>();
+                    czechEnumsData.Region?.Keys?.ToArray() ?? Array.Empty<string>();
 
                 public static IEnumerable<string> GetCompanyInsolvencyTypeKeys() =>
-                    _data.CompanyInsolvencyType?.Keys?.ToArray() ?? Array.Empty<string>();
+                    czechEnumsData.CompanyInsolvencyType?.Keys?.ToArray() ?? Array.Empty<string>();
 
                 public static IEnumerable<string> GetCompanyEventsKeys() =>
-                    _data.CompanyEvents?.Keys?.ToArray() ?? Array.Empty<string>();
+                    czechEnumsData.CompanyEvents?.Keys?.ToArray() ?? Array.Empty<string>();
 
                 public static IEnumerable<string> GetCompanyInsolvencyStatusKeys() =>
-                    _data.CompanyInsolvencyStatuses?.Keys?.ToArray() ?? Array.Empty<string>();
+                    czechEnumsData.CompanyInsolvencyStatuses?.Keys?.ToArray() ?? Array.Empty<string>();
 
                 public static IEnumerable<string> GetCompanyStatusKeys() =>
-                    _data.CompanyStatus?.Keys?.ToArray() ?? Array.Empty<string>();
+                    czechEnumsData.CompanyStatus?.Keys?.ToArray() ?? Array.Empty<string>();
 
                 public static IEnumerable<string> GetCompanyBusinessPremisesTypeKeys() =>
-                    _data.CompanyBusinessPremisesTypes?.Keys?.ToArray() ?? Array.Empty<string>();
+                    czechEnumsData.CompanyBusinessPremisesTypes?.Keys?.ToArray() ?? Array.Empty<string>();
 
                 public static IEnumerable<string> GetCompanyEsiStatusKeys() =>
-                    _data.CompanyEsiStatus?.Keys?.ToArray() ?? Array.Empty<string>();
+                    czechEnumsData.CompanyEsiStatus?.Keys?.ToArray() ?? Array.Empty<string>();
 
                 public static IEnumerable<string> GetCompanyEventsActionKeys() =>
-                    _data.CompanyEventsActions?.Keys?.ToArray() ?? Array.Empty<string>();
+                    czechEnumsData.CompanyEventsActions?.Keys?.ToArray() ?? Array.Empty<string>();
 
                 public static IEnumerable<string> GetCompanyLicenseStatusKeys() =>
-                    _data.CompanyLicenseStatus?.Keys?.ToArray() ?? Array.Empty<string>();
+                    czechEnumsData.CompanyLicenseStatus?.Keys?.ToArray() ?? Array.Empty<string>();
 
                 public static IEnumerable<string> GetBankKeys() =>
-                    _data.Banks?.Keys?.ToArray() ?? Array.Empty<string>();
+                    czechEnumsData.Banks?.Keys?.ToArray() ?? Array.Empty<string>();
 
                 public static IEnumerable<string> GetCompanyRoleKeys() =>
-                    _data.CompanyRole?.Keys?.ToArray() ?? Array.Empty<string>();
+                    czechEnumsData.CompanyRole?.Keys?.ToArray() ?? Array.Empty<string>();
 
                 public static IEnumerable<string> GetCompanyIndustryKeys() =>
-                    _data.CompanyIndustry?.Keys?.ToArray() ?? Array.Empty<string>();
+                    czechEnumsData.CompanyIndustry?.Keys?.ToArray() ?? Array.Empty<string>();
 
                 public static IEnumerable<string> GetCompanyCourtKeys() =>
-                    _data.CompanyCourt?.Keys?.ToArray() ?? Array.Empty<string>();
+                    czechEnumsData.CompanyCourt?.Keys?.ToArray() ?? Array.Empty<string>();
 
                 public static IEnumerable<string> GetCompanyLegalFormKeys() =>
-                    _data.CompanyLegalForm?.Keys?.ToArray() ?? Array.Empty<string>();
+                    czechEnumsData.CompanyLegalForm?.Keys?.ToArray() ?? Array.Empty<string>();
 
                 public static IEnumerable<string> GetCompanyTurnoverKeys() =>
-                    _data.CompanyTurnover?.Keys?.ToArray() ?? Array.Empty<string>();
+                    czechEnumsData.CompanyTurnover?.Keys?.ToArray() ?? Array.Empty<string>();
             }
         }
     }

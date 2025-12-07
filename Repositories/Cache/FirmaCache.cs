@@ -41,10 +41,10 @@ public static class FirmaCache
             options => options.ModifyEntryOptionsDuration(TimeSpan.FromDays(1))
         );
 
-    public static FirmaRepo.Merk.MerkEnumConverters.CzechEnumsData GetMerkEnums() =>
-        MemcachedCache.GetOrSet($"_MerkEnums",
-            _ => FirmaRepo.Merk.MerkEnumConverters.GetMerkEnums(),
-                        options => options.ModifyEntryOptionsDuration(TimeSpan.FromDays(1))
-        );
+    //public static FirmaRepo.Merk.MerkEnumConverters.CzechEnumsData GetMerkEnums() =>
+    //    MemcachedCache.GetOrSet($"_MerkEnums",
+    //        _ => FirmaRepo.Merk.MerkEnumConverters.GetMerkEnums(),
+    //                    options => options.ModifyEntryOptionsDuration(TimeSpan.FromDays(1))
+    //    );
 }
 

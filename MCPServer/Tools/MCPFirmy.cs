@@ -16,6 +16,45 @@ namespace HlidacStatu.MCPServer.Tools
 
         [McpServerTool(
           //UseStructuredContent =true,
+          Name = "find_legal_entity_by_name",
+          Title = "Find company or government office by name or part of the name, returns ICO and full name."),
+            Description("Find company or government office, returns ICO and full name")]
+        public static async Task<SubjektInfo> find_legal_entity_by_name(IMcpServer server,
+          [Description("Part or full name of company or government office.")]
+            string name
+  )
+        {
+            return await AuditRepo.AddWithElapsedTimeMeasureAsync(
+                Audit.Operations.Call,
+                server?.ServerOptions?.KnownClientInfo?.Name?.Split('|')?.FirstOrDefault(),
+                server?.ServerOptions?.KnownClientInfo?.Name?.Split('|')?.LastOrDefault(),
+                AuditRepo.GetClassAndMethodName(MethodBase.GetCurrentMethod()), "",
+                AuditRepo.GetMethodParametersWithValues(MethodBase.GetCurrentMethod().GetParameters().Skip(1), name),
+                null, async () =>
+                {
+
+                    if (string.IsNullOrWhiteSpace(name))
+                        return null;
+
+                    Firma f = await FirmaExtensions.NajdiFirmuPodleIcoJmenaAsync(null, name);
+                    if (f == null || f.Valid == false)
+                    {
+                        return null;
+                    }
+
+                    return new SubjektInfo()
+                    {
+                        Charakter = FirmaExtensions.CharakterFirmy(f),
+                        Ico = f.ICO,
+                        Nazev = f.Jmeno
+
+                    };
+                });
+
+        }
+
+        [McpServerTool(
+          //UseStructuredContent =true,
           Name = "get_legal_entity_business_info",
           Title = "Return detail information about Czech company with ICO"),
         Description("Returns basic business info abou the Czech Legal entity (included corporations, government institutions, municipalities, NGO and all other subjects )."
@@ -112,7 +151,7 @@ namespace HlidacStatu.MCPServer.Tools
                         })
                         .DistinctBy(m => m.Ico)
                         .ToArray();
-                    
+
                     return res;
                 });
         }
@@ -158,7 +197,7 @@ namespace HlidacStatu.MCPServer.Tools
                                 Source_Url = HlidacStatu.Entities.Firma.GetUrl(m, false),
                             })
                             .ToArray();
-                    
+
                     return Task.FromResult(res);
                 });
         }

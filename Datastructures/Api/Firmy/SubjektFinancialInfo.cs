@@ -26,7 +26,7 @@ namespace HlidacStatu.DS.Api.Firmy
         /// <summary>
         /// Charakter subjektu
         /// </summary>
-        public CharakterEnum Charakter_Firmy { get; set; }
+        public SubjektInfo.CharakterEnum Charakter_Firmy { get; set; }
 
         /// <summary>
         /// 

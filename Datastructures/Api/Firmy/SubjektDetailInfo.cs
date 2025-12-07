@@ -7,10 +7,8 @@ using System.Threading.Tasks;
 
 namespace HlidacStatu.DS.Api.Firmy
 {
-    /// <summary>
-    /// Detailní informace o firmě
-    /// </summary>
-    public class SubjektDetailInfo : MCPBaseResponse
+
+    public class SubjektInfo : MCPBaseResponse
     {
         /// <summary>
         /// Charakter subjektu
@@ -32,21 +30,25 @@ namespace HlidacStatu.DS.Api.Firmy
         /// </summary>
         public string Ico { get; set; }
 
+        public CharakterEnum Charakter { get; set; }
+
         /// <summary>
         /// Název subjektu
         /// </summary>
-        public string Jmeno_Firmy { get; set; }
+        public string Nazev { get; set; }
+    }
 
-        /// <summary>
-        /// Omezení činnosti. Pokud prázdné, tak normálně fungující firma.
-        /// Typicka omezeni: v likvidaci,v insolvenci,v likvidaci,v nucené správě,zaniklý subjekt,pozastavená činností,nezahájená činnost
-        /// </summary>
+    /// <summary>
+    /// Detailní informace o firmě
+    /// </summary>
+    public class SubjektDetailInfo : SubjektInfo
+    {
+
 
         public SubjektFinancialInfo Business_info { get; set; } = null;
         /// <summary>
         /// Charakter subjektu
         /// </summary>
-        public CharakterEnum Charakter_Firmy { get; set; }
 
         public string Rizika { get; set; } = string.Empty;
 

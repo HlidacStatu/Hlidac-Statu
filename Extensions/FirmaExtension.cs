@@ -36,7 +36,7 @@ public static class FirmaExtensions
 
         res.Source_Url = f.GetUrl(false);
         res.Ico = f.ICO;
-        res.Jmeno_Firmy = f.Jmeno;
+        res.Nazev = f.Jmeno;
         res.Rizika = (await f.InfoFactsAsync()).RenderFacts(4, true, false);
 
 
@@ -44,20 +44,7 @@ public static class FirmaExtensions
             .Select(m => m.nazev)
             .ToArray();
 
-        if (f.JsemNeziskovka())
-            res.Charakter_Firmy = DS.Api.Firmy.SubjektDetailInfo.CharakterEnum.NeziskovaOrganizace;
-        else if (f.JsemOVM())
-            res.Charakter_Firmy = DS.Api.Firmy.SubjektDetailInfo.CharakterEnum.StatniOrgan;
-        else if (f.JsemPolitickaStrana())
-            res.Charakter_Firmy = DS.Api.Firmy.SubjektDetailInfo.CharakterEnum.PolitickaStrana;
-        else if (f.TypSubjektu == Firma.TypSubjektuEnum.PatrimStatu
-                 || f.TypSubjektu == Firma.TypSubjektuEnum.PatrimStatuAlespon25perc
-                 || f.JsemStatniFirma())
-            res.Charakter_Firmy = DS.Api.Firmy.SubjektDetailInfo.CharakterEnum.FirmaPatriStatu;
-        else if (f.Registrovana_v_zahranici)
-            res.Charakter_Firmy = DS.Api.Firmy.SubjektDetailInfo.CharakterEnum.ZahranicniFirma;
-        else if (f.JsemSoukromaFirma())
-            res.Charakter_Firmy = DS.Api.Firmy.SubjektDetailInfo.CharakterEnum.SoukromaFirma;
+        res.Charakter = CharakterFirmy(f);
 
 
         //KINDEX
@@ -223,6 +210,31 @@ public static class FirmaExtensions
         return res;
     }
 
+    public static DS.Api.Firmy.SubjektDetailInfo.CharakterEnum CharakterFirmy(Firma f)
+    {
+        if (f == null)
+            throw new ArgumentNullException(nameof(f));
+        if (f.Valid == false)
+            throw new ArgumentException("Firma is not valid.", nameof(f));
+
+        if (f.JsemNeziskovka())
+            return DS.Api.Firmy.SubjektDetailInfo.CharakterEnum.NeziskovaOrganizace;
+        else if (f.JsemOVM())
+            return DS.Api.Firmy.SubjektDetailInfo.CharakterEnum.StatniOrgan;
+        else if (f.JsemPolitickaStrana())
+            return DS.Api.Firmy.SubjektDetailInfo.CharakterEnum.PolitickaStrana;
+        else if (f.TypSubjektu == Firma.TypSubjektuEnum.PatrimStatu
+                 || f.TypSubjektu == Firma.TypSubjektuEnum.PatrimStatuAlespon25perc
+                 || f.JsemStatniFirma())
+            return DS.Api.Firmy.SubjektDetailInfo.CharakterEnum.FirmaPatriStatu;
+        else if (f.Registrovana_v_zahranici)
+            return DS.Api.Firmy.SubjektDetailInfo.CharakterEnum.ZahranicniFirma;
+        else if (f.JsemSoukromaFirma())
+            return DS.Api.Firmy.SubjektDetailInfo.CharakterEnum.SoukromaFirma;
+
+        return DS.Api.Firmy.SubjektDetailInfo.CharakterEnum.Nezjisteno;
+    }
+
     public static async Task<SubjektFinancialInfo> GetFinancialInfoAsync(string ico, string name)
     {
         DS.Graphs.Relation.AktualnostType aktualnost = DS.Graphs.Relation.AktualnostType.Nedavny;
@@ -290,7 +302,7 @@ public static class FirmaExtensions
         return res;
     }
 
-    private static async Task<Firma> NajdiFirmuPodleIcoJmenaAsync(string ico, string name,
+    public static async Task<Firma> NajdiFirmuPodleIcoJmenaAsync(string ico, string name,
         DS.Graphs.Relation.AktualnostType aktualnost = DS.Graphs.Relation.AktualnostType.Nedavny)
     {
         Firma f = null;
