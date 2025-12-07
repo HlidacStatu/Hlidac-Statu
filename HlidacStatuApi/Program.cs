@@ -75,6 +75,7 @@ var otel = builder.Services.AddOpenTelemetry()
         )
     );
 
+
 _ = otel.WithMetrics(metrics =>
 {
     // Metrics provider from OpenTelemetry
@@ -88,22 +89,27 @@ _ = otel.WithMetrics(metrics =>
     // Metrics provided by System.Net libraries
     metrics.AddMeter("System.Net.Http");
     metrics.AddMeter("System.Net.NameResolution");
+    metrics.AddMeter("Microsoft.EntityFrameworkCore");
+    metrics.AddMeter("System.Data"); //just blind test shot
+    metrics.AddMeter("Microsoft.Data"); //just blind test shot
     //metrics.AddMeter(SocialbannerInstrumentationSource.MeterName);
     metrics.AddFusionCacheInstrumentation(o => o.IncludeDistributedLevel = true);
-}
-    );
+});
 _ = otel.WithTracing(tracing =>
 {
     //tracing.AddSource(SocialbannerInstrumentationSource.ActivitySourceName);
     tracing.AddAspNetCoreInstrumentation();
     tracing.AddHttpClientInstrumentation();
+    tracing.AddSqlClientInstrumentation();
+    tracing.AddEntityFrameworkCoreInstrumentation();
+    tracing.AddElasticsearchClientInstrumentation();
     tracing.AddFusionCacheInstrumentation(o =>
     {
         o.IncludeDistributedLevel = true;
     });
-    tracing.AddSource("ApiProgramStart");
 
 });
+
 
 
 if (OtlpEndpoint != null)

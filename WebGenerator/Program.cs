@@ -39,49 +39,59 @@ namespace WebGenerator
             //builder.Services.Configure<OtlpExporterOptions>(
             //    o => o.Headers = $"x-otlp-api-key=Groggily-Chuck-Target7-Provable");
 
+
+
             var otel = builder.Services.AddOpenTelemetry()
                 .ConfigureResource(b => b
                     .AddService(
-                        serviceName: "WebGenerator",
+                        serviceName: "Web",
                         serviceVersion: typeof(Program).Assembly.GetName().Version?.ToString() ?? "unknown"
                     )
                 )
                 ;
             _ = otel.WithMetrics(metrics =>
-                    {
-                        // Metrics provider from OpenTelemetry
-                        metrics.AddAspNetCoreInstrumentation();
-                        metrics.AddRuntimeInstrumentation();
-                        //Our custom metrics
-                        //metrics.AddMeter(greeterMeter.Name);
-                        // Metrics provides by ASP.NET Core in .NET 8
-                        metrics.AddMeter("Microsoft.AspNetCore.Hosting");
-                        metrics.AddMeter("Microsoft.AspNetCore.Server.Kestrel");
-                        // Metrics provided by System.Net libraries
-                        metrics.AddMeter("System.Net.Http");
-                        metrics.AddMeter("System.Net.NameResolution");
-                        metrics.AddMeter(SocialbannerInstrumentationSource.MeterName);
-                        metrics.AddFusionCacheInstrumentation(o => o.IncludeDistributedLevel = true);
-                    }
+            {
+                // Metrics provider from OpenTelemetry
+                metrics.AddAspNetCoreInstrumentation();
+                metrics.AddRuntimeInstrumentation();
+                //Our custom metrics
+                //metrics.AddMeter(greeterMeter.Name);
+                // Metrics provides by ASP.NET Core in .NET 8
+                metrics.AddMeter("Microsoft.AspNetCore.Hosting");
+                metrics.AddMeter("Microsoft.AspNetCore.Server.Kestrel");
+                // Metrics provided by System.Net libraries
+                metrics.AddMeter("System.Net.Http");
+                metrics.AddMeter("System.Net.NameResolution");
+                metrics.AddMeter("Microsoft.EntityFrameworkCore");
+                metrics.AddMeter("System.Data"); //just blind test shot
+                metrics.AddMeter("Microsoft.Data"); //just blind test shot
+                metrics.AddMeter(SocialbannerInstrumentationSource.MeterName);
+                metrics.AddFusionCacheInstrumentation(o => o.IncludeDistributedLevel = true);
+            }
                 );
             _ = otel.WithTracing(tracing =>
+            {
+                tracing.AddSource(SocialbannerInstrumentationSource.ActivitySourceName);
+                tracing.AddAspNetCoreInstrumentation();
+                tracing.AddHttpClientInstrumentation();
+                tracing.AddSqlClientInstrumentation();
+                tracing.AddEntityFrameworkCoreInstrumentation();
+                tracing.AddElasticsearchClientInstrumentation();
+                tracing.AddFusionCacheInstrumentation(o =>
                 {
-                    tracing.AddSource(SocialbannerInstrumentationSource.ActivitySourceName);
-                    tracing.AddAspNetCoreInstrumentation();
-                    tracing.AddHttpClientInstrumentation();
-                    tracing.AddFusionCacheInstrumentation(o =>
-                    {
-                        o.IncludeDistributedLevel = true;
-                    });
-
+                    o.IncludeDistributedLevel = true;
                 });
+
+            });
 
 
             if (OtlpEndpoint != null)
             {
-                _ = otel.UseOtlpExporter();
+                _ = otel.UseOtlpExporter(
+                        OtlpExportProtocol.Grpc,
+                        new Uri(OtlpEndpoint)
+                    );
             }
-
 
 
             // Add services to the container.

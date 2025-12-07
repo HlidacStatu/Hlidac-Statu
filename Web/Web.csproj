@@ -103,8 +103,11 @@ at Microsoft.Data.SqlClient.SqlInternalConnection.OnError(SqlException exception
 		<PackageReference Include="OpenTelemetry.Instrumentation.AspNet" Version="1.14.0" />
 		<PackageReference Include="OpenTelemetry.Instrumentation.AspNet.TelemetryHttpModule" Version="1.14.0" />
 		<PackageReference Include="OpenTelemetry.Instrumentation.AspNetCore" Version="1.14.0" />
+		<PackageReference Include="OpenTelemetry.Instrumentation.ElasticsearchClient" Version="1.14.0-beta.1" />
 		<PackageReference Include="OpenTelemetry.Instrumentation.Http" Version="1.14.0" />
 		<PackageReference Include="OpenTelemetry.Instrumentation.Runtime" Version="1.14.0" />
+		<PackageReference Include="OpenTelemetry.Instrumentation.EntityFrameworkCore" Version="1.14.0-beta.2" />
+		<PackageReference Include="OpenTelemetry.Instrumentation.SqlClient" Version="1.14.0-beta.1" />
 		<PackageReference Include="PDFtoImage" Version="4.1.1" />
 		<PackageReference Include="QuestPDF" Version="2024.10.4" />
 		<PackageReference Include="Schema.NET" Version="13.0.0" />
