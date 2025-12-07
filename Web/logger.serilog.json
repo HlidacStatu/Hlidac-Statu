@@ -9,9 +9,14 @@
       "Default": "Information",
       "Override": {
         "Microsoft": "Error",
-        "Microsoft.Extensions": "Information",
+        "Microsoft.Extensions": "Error",
         "System": "Error",
-        "Devmasters": "Warning",
+        "Devmasters": "Error",
+        "Devmasters.Batch": "Information",
+        "HlidacStatu.Connectors.Manager": "Error",
+        "HlidacStatu.Lib.ES": "Error",
+        "NEST": "Error",
+        "Elasticsearch.Net": "Error",
         "Devmasters.StartupSequenceRunner": "Information",
         "ZiggyCreatures.Caching": "Error"
       }

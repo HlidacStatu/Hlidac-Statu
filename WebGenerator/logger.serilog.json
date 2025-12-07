@@ -9,24 +9,19 @@
       "Default": "Information",
       "Override": {
         "Microsoft": "Error",
-        "Microsoft.Extensions": "Information",
+        "Microsoft.Extensions": "Error",
         "System": "Error",
-        "Devmasters": "Debug",
-        "Devmasters.StartupSequenceRunner": "Debug"
+        "Devmasters": "Error",
+        "Devmasters.Batch": "Information",
+        "HlidacStatu.Connectors.Manager": "Error",
+        "HlidacStatu.Lib.ES": "Error",
+        "NEST": "Error",
+        "Elasticsearch.Net": "Error",
+        "Devmasters.StartupSequenceRunner": "Information",
+        "ZiggyCreatures.Caching": "Error"
       }
     },
     "WriteTo": [
-      {
-        "Name": "File",
-        "Args": {
-          "restrictedToMinimumLevel": "Warning",
-          "path": "c:/Data/Logs/HlidacStatu/Web/web.txt",
-          "rollingInterval": "Day",
-          "fileSizeLimitBytes": null,
-          "retainedFileCountLimit": 9,
-          "shared": true
-        }
-      },
       {
         "Name": "Http",
         "Args": {
