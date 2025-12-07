@@ -57,14 +57,12 @@ namespace HlidacStatu.MCPServer.Tools
           //UseStructuredContent =true,
           Name = "get_legal_entity_business_info",
           Title = "Return detail information about Czech company with ICO"),
-        Description("Returns basic business info abou the Czech Legal entity (included corporations, government institutions, municipalities, NGO and all other subjects )."
-            + "Specify legal entity by ICO or name. Use primary ICO if it's available."
-            + " For person detail use tool 'get_person_detail' with parameter 'person_id'.")]
+            Description("Returns basic business info abou the Czech Legal entity (included corporations, government institutions, municipalities, NGO and all other subjects )."
+            + "Specify legal entity by ICO. Use 'find_legal_entity_by_name' to find entity  by name and get entity ICO.")
+            ]
         public static async Task<SubjektFinancialInfo> SubjektFinancialInfo(IMcpServer server,
           [Description("IČO of Legal entity to get detail information about.")]
-            string ico,
-          [Description("Name of Legal entity to get detail information about. If ICO is specified, the name is not used for filtering.")]
-            string company_Name
+            string ico
           )
         {
             return await AuditRepo.AddWithElapsedTimeMeasureAsync(
@@ -72,14 +70,14 @@ namespace HlidacStatu.MCPServer.Tools
                 server?.ServerOptions?.KnownClientInfo?.Name?.Split('|')?.FirstOrDefault(),
                 server?.ServerOptions?.KnownClientInfo?.Name?.Split('|')?.LastOrDefault(),
                 AuditRepo.GetClassAndMethodName(MethodBase.GetCurrentMethod()), "",
-                AuditRepo.GetMethodParametersWithValues(MethodBase.GetCurrentMethod().GetParameters().Skip(1), ico, company_Name),
+                AuditRepo.GetMethodParametersWithValues(MethodBase.GetCurrentMethod().GetParameters().Skip(1), ico),
                 null, async () =>
                 {
 
-                    if (string.IsNullOrWhiteSpace(ico) && string.IsNullOrWhiteSpace(company_Name))
+                    if (string.IsNullOrWhiteSpace(ico) )
                         return null;
 
-                    SubjektFinancialInfo res = await FirmaExtensions.GetFinancialInfoAsync(ico, company_Name);
+                    SubjektFinancialInfo res = await FirmaExtensions.GetFinancialInfoAsync(ico, null);
 
                     return res;
                 });
@@ -93,13 +91,10 @@ namespace HlidacStatu.MCPServer.Tools
             Name = "get_business_between_legal_entity_and_government",
             Title = "Return detail information about Czech company with ICO"),
         Description("Returns detail of business contracts, subsidies and statistics between the legal entity and the Czech government. "
-            + "Specify legal entity by ICO or name. Use primary ICO if it's available."
-            + " For person detail use tool 'get_person_detail' with parameter 'person_id'.")]
+            + "Specify legal entity by ICO. Use 'find_legal_entity_by_name' to find entity  by name and get entity ICO.")]
         public static async Task<SubjektDetailInfo> SubjektDetailInfo(IMcpServer server,
             [Description("IČO of Legal entity to get detail information about.")]
-            string ico,
-            [Description("Name of Legal entity to get detail information about. If ICO is specified, the name is not used for filtering.")]
-            string company_Name
+            string ico
             )
         {
             return await AuditRepo.AddWithElapsedTimeMeasure(
@@ -107,7 +102,7 @@ namespace HlidacStatu.MCPServer.Tools
                 server?.ServerOptions?.KnownClientInfo?.Name?.Split('|')?.FirstOrDefault(),
                 server?.ServerOptions?.KnownClientInfo?.Name?.Split('|')?.LastOrDefault(),
                 AuditRepo.GetClassAndMethodName(MethodBase.GetCurrentMethod()), "",
-                AuditRepo.GetMethodParametersWithValues(MethodBase.GetCurrentMethod().GetParameters().Skip(1), ico, company_Name),
+                AuditRepo.GetMethodParametersWithValues(MethodBase.GetCurrentMethod().GetParameters().Skip(1), ico),
                 null, async () =>
                 {
 
@@ -116,7 +111,7 @@ namespace HlidacStatu.MCPServer.Tools
                     if (Util.DataValidators.CheckCZICO(ico) == false)
                         return null;
 
-                    DS.Api.Firmy.SubjektDetailInfo res = await FirmaExtensions.GetDetailInfoAsync(ico, company_Name);
+                    DS.Api.Firmy.SubjektDetailInfo res = await FirmaExtensions.GetDetailInfoAsync(ico, null);
 
                     return res;
                 });
