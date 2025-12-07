@@ -44,7 +44,7 @@ namespace WebGenerator
             var otel = builder.Services.AddOpenTelemetry()
                 .ConfigureResource(b => b
                     .AddService(
-                        serviceName: "Web",
+                        serviceName: "WebGenerator",
                         serviceVersion: typeof(Program).Assembly.GetName().Version?.ToString() ?? "unknown"
                     )
                 )
