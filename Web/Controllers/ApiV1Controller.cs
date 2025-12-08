@@ -21,8 +21,10 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.WebUtilities;
 
 namespace HlidacStatu.Web.Controllers
 {
@@ -136,6 +138,7 @@ namespace HlidacStatu.Web.Controllers
                 foreach (var user in users)
                 {
                     string code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
+                    code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
                     try
                     {
                         var callbackUrl = $"https://www.hlidacstatu.cz/identity/account/ConfirmEmail?userId={user.Id}&code={code}"; 
