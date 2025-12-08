@@ -16,21 +16,16 @@ namespace HlidacStatu.Web
     {
         public static void Main(string[] args)
         {
-            StartupLogger.Write("Application started.");
             AppContext.SetSwitch("Switch.Microsoft.Data.SqlClient.UseManagedNetworkingOnWindows", true);
-
             
             var builder = WebApplication.CreateBuilder(args);
-            StartupLogger.Write("Builder created.");
             
             builder.ConfigureHostForWeb(args);
             var configuration = builder.Configuration;
             //inicializace statických proměnných
             System.Globalization.CultureInfo.DefaultThreadCurrentCulture = Util.Consts.czCulture;
             System.Globalization.CultureInfo.DefaultThreadCurrentUICulture = Util.Consts.csCulture;
-            StartupLogger.Write("Configuration loaded and Logger initialized.");
             Devmasters.Config.Init(configuration);
-            StartupLogger.Write("Devmasters Init inited");
 
             builder.WebHost.UseStaticWebAssets();
             
@@ -102,21 +97,13 @@ namespace HlidacStatu.Web
             }
 
             //get IConfiguration
-            StartupLogger.Write("Configuration 2 initialized.");
-            
-            
-            
             DBUpgrades.DBUpgrader.UpgradeDatabases(Connectors.DirectDB.Instance.DefaultCnnStr);
-            StartupLogger.Write("Db upgrader upgraded.");
             
             builder.Services.ConfigureServices(configuration);
-            StartupLogger.Write("Services configured.");
             
             WebApplication app = builder.Build();
-            StartupLogger.Write("App builded");
             
             app.ConfigurePipeline();
-            StartupLogger.Write("Pipeline configured");
             
             app.Run();
         }
