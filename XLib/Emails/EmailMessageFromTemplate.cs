@@ -3,6 +3,7 @@
 using System;
 using System.Net.Mail;
 using System.Text;
+using System.Threading.Tasks;
 using Serilog;
 
 namespace HlidacStatu.XLib.Emails
@@ -27,12 +28,12 @@ namespace HlidacStatu.XLib.Emails
         public dynamic Model { get; set; } = new System.Dynamic.ExpandoObject();
 
 
-        private string RenderView(string template)
+        private async Task<string> RenderViewAsync(string template)
         {
             try
             {
                 var t = new Render.ScribanT(template);
-                return t.Render(Model);
+                return await t.RenderAsync(Model);
             }
             catch (Exception e)
             {
@@ -41,7 +42,7 @@ namespace HlidacStatu.XLib.Emails
             }
         }
 
-        public void SendEmail()
+        public async Task SendEmailAsync()
         {
             try
             {
@@ -50,7 +51,7 @@ namespace HlidacStatu.XLib.Emails
                     if (!string.IsNullOrEmpty(TextTemplate))
                     {
                         //msg.AlternateViews.Add(AlternateView.CreateAlternateViewFromString(, new System.Net.Mime.ContentType("text/plain")));
-                        var view = AlternateView.CreateAlternateViewFromString(RenderView(TextTemplate), new System.Net.Mime.ContentType("text/plain"));
+                        var view = AlternateView.CreateAlternateViewFromString(await RenderViewAsync(TextTemplate), new System.Net.Mime.ContentType("text/plain"));
                         view.ContentType.CharSet = Encoding.UTF8.WebName;
                         msg.AlternateViews.Add(view);
 
@@ -58,7 +59,7 @@ namespace HlidacStatu.XLib.Emails
                     if (!string.IsNullOrEmpty(HtmlTemplate))
                     {
                         //msg.AlternateViews.Add(AlternateView.CreateAlternateViewFromString(RenderView(this.HtmlTemplate), new System.Net.Mime.ContentType("text/html")));
-                        var view = AlternateView.CreateAlternateViewFromString(RenderView(HtmlTemplate), new System.Net.Mime.ContentType("text/html"));
+                        var view = AlternateView.CreateAlternateViewFromString(await RenderViewAsync(HtmlTemplate), new System.Net.Mime.ContentType("text/html"));
                         view.ContentType.CharSet = Encoding.UTF8.WebName;
                         msg.AlternateViews.Add(view);
                     }
@@ -84,11 +85,11 @@ namespace HlidacStatu.XLib.Emails
 #endif
             }
         }
-        public string RenderText()
+        public async Task<string> RenderTextAsync()
         {
             try
             {
-                return RenderView(TextTemplate);
+                return await RenderViewAsync(TextTemplate);
             }
             catch (Exception e)
             {
@@ -97,11 +98,11 @@ namespace HlidacStatu.XLib.Emails
             }
         }
 
-        public string RenderHtml()
+        public async Task<string> RenderHtmlAsync()
         {
             try
             {
-                return RenderView(HtmlTemplate);
+                return await RenderViewAsync(HtmlTemplate);
             }
             catch (Exception e)
             {
