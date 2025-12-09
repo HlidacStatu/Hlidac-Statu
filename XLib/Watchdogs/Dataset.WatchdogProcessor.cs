@@ -120,8 +120,8 @@ namespace HlidacStatu.XLib.Watchdogs
             resultToRender.Result = dataToRender;
 
             //var renderH = new Lib.Render.ScribanT(HtmlTemplate.Replace("#LIMIT#", numOfListed.ToString()));
-            ret.ContentHtml = (await DataSet.RegistrationAsync()).searchResultTemplate
-                .Render(DataSet, resultToRender, data.SearchQuery);
+            ret.ContentHtml = await (await DataSet.RegistrationAsync()).searchResultTemplate
+                .RenderAsync(DataSet, resultToRender, data.SearchQuery);
             if (data.Total > dataToRender.Count())
             {
                 var s = "<table><tr><td height='30' style='line-height: 50px; min-height: 50px;'></td></tr></table>"

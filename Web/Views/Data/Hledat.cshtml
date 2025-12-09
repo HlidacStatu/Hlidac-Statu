@@ -93,7 +93,7 @@
                 .Select(s => { dynamic d = Newtonsoft.Json.Linq.JObject.Parse(s.Item2); return d; })
                 .ToArray();
 
-            var html = registration.searchResultTemplate.Render(Model.DataSet, model, model.Q);
+            var html = await registration.searchResultTemplate.RenderAsync(Model.DataSet, model, model.Q);
             @Html.Raw(html)
 
         }

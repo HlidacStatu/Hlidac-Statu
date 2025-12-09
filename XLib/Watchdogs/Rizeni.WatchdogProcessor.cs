@@ -66,7 +66,7 @@ namespace HlidacStatu.XLib.Watchdogs
                 query, fromDate, toDate, res.IsValid, nameof(Rizeni));
         }
 
-        public Task<RenderedContent> RenderResultsAsync(Results data, long numOfListed = 5)
+        public async Task<RenderedContent> RenderResultsAsync(Results data, long numOfListed = 5)
         {
             RenderedContent ret = new RenderedContent();
             List<RenderedContent> items = new List<RenderedContent>();
@@ -74,13 +74,13 @@ namespace HlidacStatu.XLib.Watchdogs
                 numOfListed = data.Total;
 
             var renderH = new Render.ScribanT(HtmlTemplate.Replace("#LIMIT#", numOfListed.ToString()));
-            ret.ContentHtml = renderH.Render(data);
+            ret.ContentHtml = await renderH.RenderAsync(data);
             var renderT = new Render.ScribanT(TextTemplate.Replace("#LIMIT#", numOfListed.ToString()));
-            ret.ContentText = renderT.Render(data);
+            ret.ContentText = await renderT.RenderAsync(data);
             ret.ContentTitle = "Insolvenční řízení";
 
 
-            return Task.FromResult(ret);
+            return ret;
         }
 
         public static string HtmlTemplate = @"

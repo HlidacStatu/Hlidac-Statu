@@ -3,6 +3,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using Serilog;
 
 namespace HlidacStatu.XLib.Render
@@ -44,7 +45,7 @@ namespace HlidacStatu.XLib.Render
             return new List<string>();
         }
 
-        public string Render(dynamic dmodel)
+        public async Task<string> RenderAsync(dynamic dmodel)
         {
             try
             {
@@ -65,7 +66,7 @@ namespace HlidacStatu.XLib.Render
 
                 context.PushGlobal(scriptObjGlobalVariables);
 
-                var res = xTemplate.Render(context);
+                var res = await xTemplate.RenderAsync(context);
                 return res;
             }
             catch (Exception e)

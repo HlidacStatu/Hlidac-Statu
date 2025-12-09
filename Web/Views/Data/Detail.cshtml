@@ -52,7 +52,7 @@
         {
             if (registration?.detailTemplate?.IsNewTemplate() == true)
             {
-                var html = DatasetsRenderer.Render(registration.detailTemplate, Model.Dataset, model, highlightingData: highlightingData);
+                var html = await DatasetsRenderer.RenderAsync(registration.detailTemplate, Model.Dataset, model, highlightingData: highlightingData);
                 @Html.Raw(html)
             }
             else

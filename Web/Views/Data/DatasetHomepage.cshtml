@@ -100,7 +100,7 @@
                             .Select(s => { dynamic d = Newtonsoft.Json.Linq.JObject.Parse(s.Item2); return d; })
                             .ToArray();
 
-                        var html = reg.searchResultTemplate.Render(Model, results, data.Q);
+                        var html = await reg.searchResultTemplate.RenderAsync(Model, results, data.Q);
                                 @Html.Raw("<h4>Poslední záznamy v databázi</h4><p>" + html + "</p>")
                             }
                             else

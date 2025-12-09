@@ -9,14 +9,14 @@ namespace HlidacStatu.XLib.Render
 {
     public static class DatasetsRenderer
     {
-        public static string Render(this Registration.Template registrationTemplate, DataSet ds, string sModel, string qs = "",
+        public static async Task<string> RenderAsync(this Registration.Template registrationTemplate, DataSet ds, string sModel, string qs = "",
             IReadOnlyDictionary<string, IReadOnlyCollection<string>> highlightingData = null)
         {
             dynamic model = Newtonsoft.Json.Linq.JObject.Parse(sModel);
-            return Render(registrationTemplate, ds, model, qs, highlightingData);
+            return await RenderAsync(registrationTemplate, ds, model, qs, highlightingData);
         }
 
-        public static string Render(this Registration.Template registrationTemplate, DataSet ds, dynamic dmodel, string qs = "",
+        public static async Task<string> RenderAsync(this Registration.Template registrationTemplate, DataSet ds, dynamic dmodel, string qs = "",
             IReadOnlyDictionary<string, IReadOnlyCollection<string>> highlightingData = null)
         {
             string template = registrationTemplate.GetTemplateHeader(ds.DatasetId, qs) + registrationTemplate.body;
@@ -24,7 +24,7 @@ namespace HlidacStatu.XLib.Render
             globVar.Add("highlightingData", highlightingData);
             var xtemp = new ScribanT(template, globVar);
 
-            var res = xtemp.Render(dmodel);
+            var res = await xtemp.RenderAsync(dmodel);
             return res;
         }
 
@@ -47,9 +47,9 @@ namespace HlidacStatu.XLib.Render
                         .Select(s => itemToDynamicFunc(s))
                         .ToArray();
 
-                    content = registration
+                    content = await registration
                         .searchResultTemplate
-                        .Render(dataSearchResultBase.DataSet, model, qs: query);
+                        .RenderAsync(dataSearchResultBase.DataSet, model, qs: query);
                 }
                 else
                 {

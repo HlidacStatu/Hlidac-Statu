@@ -1015,14 +1015,14 @@ namespace HlidacStatu.Repositories
                                 subjName,
                                 rel.Doba()
                                 );
-                        sb.Append(PrintFlatRelationsAsync(origRoot, rel, level + 1, relations, typ, renderedIds, withStats));
+                        sb.Append(await PrintFlatRelationsAsync(origRoot, rel, level + 1, relations, typ, renderedIds, withStats));
                         break;
                     case Relation.TiskEnum.Html:
                         if (withStats && stat != null)
                             sb.AppendFormat("<li class='{3} {6}'><a href='/subjekt/{0}'>{0}:{1}</a>{7}; {4}, celkem {5}. {2}</li>",
                                 subjId,
                                 subjName,
-                                PrintFlatRelationsAsync(origRoot, rel, level + 1, relations, typ, renderedIds, withStats),
+                                await PrintFlatRelationsAsync(origRoot, rel, level + 1, relations, typ, renderedIds, withStats),
                                 last ? "" : "connect",
                                 Devmasters.Lang.CS.Plural.Get(stat.Summary().PocetSmluv, Util.Consts.csCulture, "{0} smlouva", "{0} smlouvy", "{0} smluv"),
                                 Smlouva.NicePrice(stat.Summary().CelkovaHodnotaSmluv, html: true, shortFormat: true),
@@ -1033,7 +1033,7 @@ namespace HlidacStatu.Repositories
                             sb.AppendFormat("<li class='{3} {4}'><a href='/subjekt/{0}'><span class=''>{0}:{1}</span></a>{5}.  {2}</li>",
                                 subjId,
                                 subjName,
-                                PrintFlatRelationsAsync(origRoot, rel, level + 1, relations, typ, renderedIds, withStats),
+                                await PrintFlatRelationsAsync(origRoot, rel, level + 1, relations, typ, renderedIds, withStats),
                                 last ? "" : "connect",
                                 "aktualnost" + ((int)rel.Aktualnost).ToString(),
                                 (rel.Aktualnost < Relation.AktualnostType.Aktualni) ? rel.Doba(format: "/{0}/") : string.Empty,
@@ -1046,7 +1046,7 @@ namespace HlidacStatu.Repositories
                         , (last ? "" : "connect"),
                         ("aktualnost" + ((int)rel.Aktualnost).ToString()),
                         subjId, subjName,
-                        PrintFlatRelationsAsync(origRoot, rel, level + 1, relations, typ, renderedIds, withStats)
+                        await PrintFlatRelationsAsync(origRoot, rel, level + 1, relations, typ, renderedIds, withStats)
                         );
 
                         break;
