@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using HlidacStatu.Datasets;
 using HlidacStatu.Entities;
 using HlidacStatu.Repositories;
@@ -15,32 +16,34 @@ public static class OsobaExtension2
         if (osoba.NameId == "radek-jonke")
             return false;
 
-        var showIt = osoba.StatusOsoby() == Osoba.StatusOsobyEnum.Politik
-                     || osoba.StatusOsoby() == Osoba.StatusOsobyEnum.ByvalyPolitik
-                     || osoba.StatusOsoby() == Osoba.StatusOsobyEnum.Sponzor
-                     || osoba.StatusOsoby() == Osoba.StatusOsobyEnum.VysokyUrednik
-                     || osoba.StatusOsoby() == Osoba.StatusOsobyEnum.VazbyNaPolitiky
-                     || osoba.IsSponzor()
-                     || await osoba.MaVztahySeStatemAsync()
-                     || (await osoba.StatistikaRegistrSmluvAsync()).SmlouvyStat_SoukromeFirmySummary()
-                         .Summary().PocetSmluv > 0;
+        var isInteresting = osoba.StatusOsoby() == Osoba.StatusOsobyEnum.Politik
+                            || osoba.StatusOsoby() == Osoba.StatusOsobyEnum.ByvalyPolitik
+                            || osoba.StatusOsoby() == Osoba.StatusOsobyEnum.Sponzor
+                            || osoba.StatusOsoby() == Osoba.StatusOsobyEnum.VysokyUrednik
+                            || osoba.StatusOsoby() == Osoba.StatusOsobyEnum.VazbyNaPolitiky;
 
-        if (showIt)
-            return showIt;
+        if (isInteresting)
+            return isInteresting;
 
-        var dotace = await DotaceRepo.Searching.SimpleSearchAsync("osobaid:" + osoba.NameId, 0, 0,
-            ((int)HlidacStatu.Repositories.Searching.DotaceSearchResult.DotaceOrderResult.FastestForScroll).ToString(),
-            exactNumOfResults: true);
-        showIt = dotace.Total > 0;
-        if (showIt)
-            return showIt;
+        if (osoba.IsSponzor())
+            return true;
+
+        bool maVztahySeStatem = await osoba.MaVztahySeStatemAsync();
+        if (maVztahySeStatem)
+            return true;
+
+        bool maSmlouvySeStatem = (await osoba.StatistikaRegistrSmluvAsync()).SmlouvyStat_SoukromeFirmySummary()
+            .Summary().PocetSmluv > 0;
+        if (maSmlouvySeStatem)
+            return true;
 
         var dataSets = (await DataSetCache.GetProductionDatasetsAsync())
             .Where(m => m.DatasetId != "skutecni-majitele").ToArray();
         var dsQuery = $"( OsobaId:ilja-pospisil) ";
-        showIt = await DatasetRepo.Searching.CheckIfAnyRecordExistAsync(dsQuery, dataSets);
+        if (await DatasetRepo.Searching.CheckIfAnyRecordExistAsync(dsQuery, dataSets))
+            return true;
 
-        return showIt;
+        return false;
     }
 
     public static async Task<bool> MaVztahySeStatemAsync(this Osoba osoba)
@@ -49,33 +52,44 @@ public static class OsobaExtension2
             return true;
 
         var cts = new CancellationTokenSource();
-
-        List<Task<HlidacStatu.Searching.Search.ISearchResult>> tasks = new()
-        {
-            Util.Helper.CreateBaseTask<HlidacStatu.Searching.Search.ISearchResult, SmlouvaSearchResult>(
-                SmlouvaRepo.Searching.SimpleSearchAsync("osobaid:" + osoba.NameId, 1, 1, 0,
-                    cancellationToken: cts.Token)),
-            Util.Helper.CreateBaseTask<HlidacStatu.Searching.Search.ISearchResult, VerejnaZakazkaSearchData>(
-                VerejnaZakazkaRepo.Searching.SimpleSearchAsync("osobaid:" + osoba.NameId, null, 1, 1, "0",
-                    cancellationToken: cts.Token)),
-            Util.Helper.CreateBaseTask<HlidacStatu.Searching.Search.ISearchResult, DotaceSearchResult>(
-                DotaceRepo.Searching.SimpleSearchAsync("osobaid:" + osoba.NameId, 1, 1, "0",
-                    cancellationToken: cts.Token)),
-        };
-
-
+        
+        var sw = new Stopwatch();
+        sw.Start();
+        List<Task<bool>> tasks =
+        [
+            Task.Run(async () =>
+            {
+                var search = await SmlouvaRepo.Searching.SimpleSearchAsync("osobaid:" + osoba.NameId, 0, 0, 0,
+                    cancellationToken: cts.Token);
+                return search.Total > 0;
+            }, cts.Token),
+            Task.Run(async () =>
+            {
+                var search = await VerejnaZakazkaRepo.Searching.SimpleSearchAsync("osobaid:" + osoba.NameId, null, 0, 0,
+                    "0", cancellationToken: cts.Token);
+                return search.Total > 0;
+            }, cts.Token),
+            Task.Run(async () =>
+            {
+                var search = await DotaceRepo.Searching.SimpleSearchAsync("osobaid:" + osoba.NameId, 0, 0, "0",
+                    cancellationToken: cts.Token);
+                return search.Total > 0;
+            }, cts.Token)
+        ];
+        
+        
         while (tasks.Any())
         {
             var completedTask = await Task.WhenAny(tasks);
             tasks.Remove(completedTask);
-            HlidacStatu.Searching.Search.ISearchResult result = await completedTask;
-            if (result.Total > 0)
+            if (await completedTask == true)
             {
+                sw.Stop();
                 await cts.CancelAsync();
                 return true;
             }
         }
-
+        
         return false;
     }
 
@@ -104,10 +118,10 @@ public static class OsobaExtension2
                 && (ev.DatumDo == null || ev.DatumDo.Value.Year >= forYear)
                 && (ev.DatumOd == null || ev.DatumOd.Value.Year <= forYear))
             .ToList();
-        
-        return AssembleRoles(events); 
+
+        return AssembleRoles(events);
     }
-    
+
     public static string MainRolesToString(this Osoba osoba, int forYear, string delimiter = ", ")
     {
         var events = osoba.Events(ev =>
@@ -121,14 +135,14 @@ public static class OsobaExtension2
         try
         {
             var roles = AssembleRoles(events);
-                
-            return string.Join(delimiter, roles);
 
+            return string.Join(delimiter, roles);
         }
         catch (Exception e)
         {
             Console.WriteLine(e);
         }
+
         return "";
     }
 
@@ -136,10 +150,10 @@ public static class OsobaExtension2
     {
         if (events is null || !events.Any())
             return [];
-        
+
         List<string> roles = new();
 
-        if (events.Any(e => 
+        if (events.Any(e =>
                 e.Type == (int)OsobaEvent.Types.PolitickaExekutivni
                 && (e.AddInfo.ToLower().StartsWith("předseda vlády")
                     || e.AddInfo.ToLower().StartsWith("předsedkyně vlády"))
@@ -148,8 +162,8 @@ public static class OsobaExtension2
         {
             roles.Add("předseda vlády");
         }
-        
-        if (events.Any(e => 
+
+        if (events.Any(e =>
                 e.Type == (int)OsobaEvent.Types.PolitickaExekutivni
                 && e.AddInfo.ToLower().StartsWith("ministr")
                 && (e.Organizace?.ToLower().StartsWith("ministerstvo") == true
@@ -157,8 +171,8 @@ public static class OsobaExtension2
         {
             roles.Add("ministr");
         }
-        
-        if (events.Any(e => 
+
+        if (events.Any(e =>
                 e.Type == (int)OsobaEvent.Types.VolenaFunkce
                 && (e.AddInfo.ToLower().StartsWith("poslanec") ||
                     e.AddInfo.ToLower().StartsWith("poslankyně"))
@@ -167,8 +181,8 @@ public static class OsobaExtension2
         {
             roles.Add("poslanec");
         }
-        
-        if (events.Any(e => 
+
+        if (events.Any(e =>
                 e.Type == (int)OsobaEvent.Types.VolenaFunkce
                 && e.AddInfo.ToLower().StartsWith("senát")
                 && (e.Organizace?.ToLower().StartsWith("senát") == true
@@ -176,8 +190,8 @@ public static class OsobaExtension2
         {
             roles.Add("senátor");
         }
-        
-        if (events.Any(e => 
+
+        if (events.Any(e =>
                 e.Type == (int)OsobaEvent.Types.VolenaFunkce
                 && (e.AddInfo.ToLower().StartsWith("poslanec ep") ||
                     e.AddInfo.ToLower().StartsWith("poslankyně ep"))
@@ -185,15 +199,15 @@ public static class OsobaExtension2
         {
             roles.Add("europoslanec");
         }
-        
-        if (events.Any(e => 
+
+        if (events.Any(e =>
                 e.Type == (int)OsobaEvent.Types.PolitickaExekutivni
                 && e.AddInfo.ToLower().StartsWith("hejtman")))
         {
             roles.Add("hejtman");
         }
-        
-        if (events.Any(e => 
+
+        if (events.Any(e =>
                 e.Type == (int)OsobaEvent.Types.VolenaFunkce
                 && e.AddInfo.ToLower().StartsWith("zastupitel")
                 && UradyConstants.Ica.Kraje.Contains(e.Ico?.Trim())))
@@ -203,7 +217,7 @@ public static class OsobaExtension2
 
         return roles;
     }
-    
+
 
     /// <summary>
     /// returns true if changed

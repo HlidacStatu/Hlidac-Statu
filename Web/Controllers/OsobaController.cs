@@ -165,6 +165,7 @@ namespace HlidacStatu.Web.Controllers
 
         public async Task<ActionResult> Vazby(string id, Relation.AktualnostType? aktualnost)
         {
+            
             if (string.IsNullOrWhiteSpace(id))
             {
                 return RedirectToAction("Index", "Osoby");
