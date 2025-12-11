@@ -5,6 +5,7 @@
 @using HlidacStatu.XLib
 @using HlidacStatu.XLib.Render
 @using HlidacStatu.Repositories
+@using HlidacStatu.Lib.Analytics
 
 @{
     Layout = "_ReportLayout";
@@ -14,7 +15,7 @@
         .ThenBy(o => o.Jmeno)
         .ToList();
 
-    ReportDataSource<Tuple<Osoba, Osoba.Statistics.RegistrSmluv>> poslanciTable = new(new ReportDataSource<Tuple<Osoba, Osoba.Statistics.RegistrSmluv>>.Column[]
+    ReportDataSource<Tuple<Osoba, Osoba.Statistics.RegistrSmluv, Osoba.Statistics.Dotace>> poslanciTable = new(new ReportDataSource<Tuple<Osoba, Osoba.Statistics.RegistrSmluv, Osoba.Statistics.Dotace>>.Column[]
     {
         new()
         {
@@ -44,31 +45,18 @@
         },
         new()
         {
-            Name = "Angažovanost",
+            Name = "Vazby se státem",
             HtmlRender =(s) =>
             {
                 string sout = "";
+                var s_smlouvyStat = s.Item2.SoukromeFirmy.Values.AggregateStats().Summary();
+                if (s_smlouvyStat.PocetSmluv > 0) {
+                    sout += "Navázané soukromé firmy uzavřely "+ s_smlouvyStat.ToNiceLinkString(s.Item1, customUrl:$"/osoba/registrsmluv/{s.Item1.NameId}") + "<br />";
+                }
 
-                if (s.Item1.Vazby() != null)
-                {
-                    string customUrl = $"/hledat?Q=osobaid:{s.Item1.NameId}";
-                    foreach (var v in s.Item2.SoukromeFirmy.Take(2))
-                    {
-                        if (v.Value is null)
-                            continue;
-                        sout = sout + v.Value.Summary(HlidacStatu.Lib.Analytics.CoreStat.UsualYearsInterval.FromUsualFirstYearUntilNow).ToNiceLinkString(null, true, customUrl: customUrl) + "<br/>";
-                    }
-
-                    if (s.Item2.SoukromeFirmy.Count() == 3)
-                    {
-                        sout = sout + s.Item2.SoukromeFirmy
-                            .Skip(2).First()
-                            .Value.Summary(HlidacStatu.Lib.Analytics.CoreStat.UsualYearsInterval.FromUsualFirstYearUntilNow).ToNiceLinkString(null, true, customUrl: customUrl);
-                    }
-                    else if (s.Item2.SoukromeFirmy.Count() > 2)
-                    {
-                        sout = sout + "<a href='" + s.Item1.GetUrl() + "'>" + Devmasters.Lang.CS.Plural.Get(s.Item1.Vazby().Length - 2, "+další vazba;+ další {0} vazby;+ dalších {0} vazeb") + "</a>";
-                    }
+                var s_dotaceStat = s.Item3.SoukromeFirmy.Values.AggregateStats().Summary();
+                if (s_dotaceStat.PocetDotaci > 0) {
+                    sout += "Navázané soukromé firmy získaly  "+ s_dotaceStat.ToNiceLinkString_4pad(s.Item1, customUrl:$"/osoba/dotace/{s.Item1.NameId}") ;
                 }
 
                 return sout;
@@ -101,7 +89,9 @@
     foreach (var osoba in showList)
     {
         Osoba.Statistics.RegistrSmluv? stat = await osoba.StatistikaRegistrSmluvAsync();
-        var tuple = new Tuple<Osoba, Osoba.Statistics.RegistrSmluv>(osoba, stat);
+        var dotacestat = await osoba.StatistikaDotaceAsync();
+
+        var tuple = new Tuple<Osoba, Osoba.Statistics.RegistrSmluv, Osoba.Statistics.Dotace>(osoba, stat, dotacestat);
         poslanciTable.AddRow(tuple);
     }
 }
@@ -117,5 +107,5 @@
                 'info': false,
                 'paging': true,
                 'pageLength': 50,
-                'columnDefs': [{ 'visible': false, 'targets': 0 }]
+                // 'columnDefs': [{ 'visible': false, 'targets': 0 }]
                 }")
