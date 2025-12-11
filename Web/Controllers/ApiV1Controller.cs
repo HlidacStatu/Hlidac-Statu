@@ -25,6 +25,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.WebUtilities;
+using HlidacStatu.LibCore.Filters;
 
 namespace HlidacStatu.Web.Controllers
 {
@@ -76,7 +77,7 @@ namespace HlidacStatu.Web.Controllers
             return View();
         }
 
-        [HlidacCache(60, "", false)]
+        [HlidacOutputCache(60, "", false)]
         public ActionResult BpStat()
         {
             return View();

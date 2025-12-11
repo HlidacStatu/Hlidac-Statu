@@ -1,6 +1,7 @@
 ﻿using Devmasters.Enums;
 using HlidacStatu.Entities;
 using HlidacStatu.Lib.Web.UI.Attributes;
+using HlidacStatu.LibCore.Filters;
 using HlidacStatu.Repositories;
 
 using HlidacStatuApi.Code;
@@ -159,7 +160,7 @@ namespace HlidacStatuApi.Controllers.ApiV2
 
         [ApiExplorerSettings(IgnoreApi = true)]
         [HttpGet("chartdata/{id}")]
-        [HlidacCache(60, "id;f;t;h", false)]
+        [HlidacOutputCache(60, "id;f;t;h", false)]
         public async Task<ActionResult> ChartData(string id, long? f, long? t, int? h = 24)
         {
             id = id?.ToLower() ?? "";

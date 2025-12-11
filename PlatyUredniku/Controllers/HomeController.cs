@@ -7,6 +7,7 @@ using System.Text;
 using System;
 using HlidacStatu.Lib.Web.UI.Attributes;
 using System.Linq;
+using HlidacStatu.LibCore.Filters;
 
 namespace PlatyUredniku.Controllers;
 
@@ -18,7 +19,7 @@ public class HomeController : Controller
     }
     
 
-    [HlidacCache(48 * 60 * 60, "*")]
+    [HlidacOutputCache(48 * 60 * 60, "*")]
     public async Task<IActionResult> Organizace(string id)
     {
         string[] ds = null;
@@ -74,7 +75,7 @@ public class HomeController : Controller
     }
 
 
-    [HlidacCache(3600 * 24 * 7)]
+    [HlidacOutputCache(3600 * 24 * 7)]
     public async Task<IActionResult> SiteMap()
     {
         var db = new DbEntities();

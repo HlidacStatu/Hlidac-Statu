@@ -8,6 +8,7 @@ using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
 using HlidacStatu.Extensions.DataTables;
+using HlidacStatu.LibCore.Filters;
 
 namespace PlatyUredniku.Controllers;
 
@@ -15,7 +16,7 @@ public partial class PoliticiController : Controller
 {
     private const string FilterAll = "Vše";
     
-    [HlidacCache(60 * 60, "*")]
+    [HlidacOutputCache(60 * 60, "*")]
     public async Task<IActionResult> List(string id, int? year, int? top = null, string sort = null,
         string report = null)
     {
@@ -28,7 +29,7 @@ public partial class PoliticiController : Controller
             report: report));
     }
 
-    [HlidacCache(60 * 60, "rok")]
+    [HlidacOutputCache(60 * 60, "rok")]
     public async Task<IActionResult> Index(int rok = PpRepo.DefaultYear)
     {
         //titulka politiku
@@ -37,7 +38,7 @@ public partial class PoliticiController : Controller
     }
 
 
-    [HlidacCache(60 * 60, "id;rok")]
+    [HlidacOutputCache(60 * 60, "id;rok")]
     public async Task<IActionResult> Politik(string id, int rok = PpRepo.DefaultYear)
     {
         //detail politika
@@ -59,7 +60,7 @@ public partial class PoliticiController : Controller
         return View(detail);
     }
 
-    [HlidacCache(48 * 60 * 60, "*")]
+    [HlidacOutputCache(48 * 60 * 60, "*")]
     public async Task<IActionResult> Organizace(string id, int rok = PpRepo.DefaultYear)
     {
         ViewBag.rok = rok;

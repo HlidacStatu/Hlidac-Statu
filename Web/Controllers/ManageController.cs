@@ -22,6 +22,7 @@ using System.Threading.Tasks;
 using HlidacStatu.Entities.KIndex;
 using Serilog;
 using HlidacStatu.Lib.Web.UI.Attributes;
+using HlidacStatu.LibCore.Filters;
 
 namespace HlidacStatu.Web.Controllers
 {
@@ -704,7 +705,7 @@ namespace HlidacStatu.Web.Controllers
             return View();
         }
 
-        [HlidacCache(60 * 10, null, false)]
+        [HlidacOutputCache(60 * 10, null, false)]
         public ActionResult AllOsobaPhotos()
         {
             return View();

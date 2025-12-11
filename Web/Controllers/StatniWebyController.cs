@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using HlidacStatu.Entities;
 using HlidacStatu.Lib.Web.UI.Attributes;
 using HlidacStatu.LibCore;
+using HlidacStatu.LibCore.Filters;
 using HlidacStatu.Repositories;
 using HlidacStatu.Web.Filters;
 using HlidacStatu.Web.Framework;
@@ -19,13 +20,13 @@ namespace HlidacStatu.Web.Controllers
     {
         private readonly ILogger _logger = Log.ForContext<StatniWebyController>();
 
-        [HlidacCache(60 * 60, "id;embed", false)]
+        [HlidacOutputCache(60 * 60, "id;embed", false)]
         public ActionResult Index()
         {
             return View();
         }
 
-        [HlidacCache(5 * 60, "id;embed", false)]
+        [HlidacOutputCache(5 * 60, "id;embed", false)]
         public ActionResult Dalsi(string id)
         {
             ViewBag.ID = id;
@@ -53,7 +54,7 @@ namespace HlidacStatu.Web.Controllers
 
 
 
-        [HlidacCache(5 * 60, "id;embed", false)]
+        [HlidacOutputCache(5 * 60, "id;embed", false)]
         public ActionResult Info(int id, string h)
         {
             UptimeServer host = Repositories.UptimeServerRepo.AllActiveServers()
@@ -66,7 +67,7 @@ namespace HlidacStatu.Web.Controllers
 
 
         static byte[] EmptyPng = Convert.FromBase64String("iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+P+/HgAFhAJ/wlseKgAAAABJRU5ErkJggg==");
-        [HlidacCache(5 * 60, "id", false)]
+        [HlidacOutputCache(5 * 60, "id", false)]
         public async Task<ActionResult> Banner(int id)
         {
             UptimeServer host = Repositories.UptimeServerRepo.AllActiveServers()
@@ -144,7 +145,7 @@ namespace HlidacStatu.Web.Controllers
         }
 
 
-        [HlidacCache(60 * 60, "id;embed", false)]
+        [HlidacOutputCache(60 * 60, "id;embed", false)]
         public ActionResult InfoHttps(int id)
         {
             UptimeServer host = Repositories.UptimeServerRepo.AllActiveServers()
@@ -196,13 +197,13 @@ namespace HlidacStatu.Web.Controllers
             return NoContent();
         }
 
-        [HlidacCache(60 * 60,"", false)]
+        [HlidacOutputCache(60 * 60,"", false)]
         public ActionResult Https()
         {
             return View();
         }
 
-        [HlidacCache(60 * 60, "", false)]
+        [HlidacOutputCache(60 * 60, "", false)]
         public ActionResult ipv6()
         {
             return View();

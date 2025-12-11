@@ -1,4 +1,5 @@
 using HlidacStatu.Lib.Web.UI.Attributes;
+using HlidacStatu.LibCore.Filters;
 using HlidacStatu.Repositories;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
@@ -9,14 +10,14 @@ public partial class PoliticiController
 {
 
 
-    [HlidacCache(60 * 60, "rok")]
+    [HlidacOutputCache(60 * 60, "rok")]
     public async Task<IActionResult> Reporty()
     {
         return View();
     }
 
 
-    [HlidacCache(60 * 60, "*")]
+    [HlidacOutputCache(60 * 60, "*")]
     [Route("Politici/Reporty/{id}")]
     public async Task<IActionResult> Report(string id)
     {

@@ -16,6 +16,7 @@ using HlidacStatu.Repositories.Analysis.KorupcniRiziko;
 using HlidacStatu.Web.Framework;
 using Serilog;
 using HlidacStatu.Lib.Web.UI.Attributes;
+using HlidacStatu.LibCore.Filters;
 
 namespace HlidacStatu.Web.Controllers
 {
@@ -27,7 +28,7 @@ namespace HlidacStatu.Web.Controllers
             return View();
         }
 
-        [HlidacCache(60*60*12,null,false)]
+        [HlidacOutputCache(60*60*12,null,false)]
         public ActionResult DlouhodobaAnalyza()
         {
             return View();

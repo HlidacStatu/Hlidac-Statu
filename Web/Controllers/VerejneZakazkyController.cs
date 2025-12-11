@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using HlidacStatu.Connectors;
 using HlidacStatu.Extensions;
 using HlidacStatu.Lib.Web.UI.Attributes;
+using HlidacStatu.LibCore.Filters;
 
 namespace HlidacStatu.Web.Controllers
 {
@@ -102,7 +103,7 @@ namespace HlidacStatu.Web.Controllers
             return View(res);
         }
 
-        [HlidacCache(60 * 10, "id;h;embed", false)]
+        [HlidacOutputCache(60 * 10, "id;h;embed", false)]
         public ActionResult CPVs()
         {
             return Content(Newtonsoft.Json.JsonConvert.SerializeObject(

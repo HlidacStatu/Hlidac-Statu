@@ -966,7 +966,7 @@ text zpravy: {txt}
             return Content(widgetjs, "text/javascript");
         }
 
-        [HlidacCache(60 * 60, "id", false)]
+        [HlidacOutputCache(60 * 60, "id", false)]
         public async Task<ActionResult> Export(string id)
         {
             System.Text.StringBuilder sb = new(2048);

@@ -9,6 +9,7 @@ using Devmasters;
 using HlidacStatu.Caching;
 using HlidacStatu.Lib.Web.UI.Attributes;
 using ZiggyCreatures.Caching.Fusion;
+using HlidacStatu.LibCore.Filters;
 
 namespace HlidacStatu.Web.Controllers
 {
@@ -144,14 +145,14 @@ namespace HlidacStatu.Web.Controllers
             return View(dotace);
         }
 
-        [HlidacCache(22 * 60 * 60, "", false)]
+        [HlidacOutputCache(22 * 60 * 60, "", false)]
         public async Task<ActionResult> PoLetech()
         {
             DotaceRepo.Statistics.TypeStatsPerYear[] data = await DotaceRepo.ReportPoLetechPerTypeAsync();
             return View(data);
         }
 
-        [HlidacCache(22 * 60 * 60, "rok;ftyp;dtyp", false)]
+        [HlidacOutputCache(22 * 60 * 60, "rok;ftyp;dtyp", false)]
         public async Task<ActionResult> TopPrijemci(int? rok = null, int? ftyp = null, int? dtyp = null)
         {
             Firma.TypSubjektuEnum? typSubj = null;
@@ -172,7 +173,7 @@ namespace HlidacStatu.Web.Controllers
             return View(data);
         }
 
-        [HlidacCache(22 * 60 * 60, "rok;ftyp;dtyp", false)]
+        [HlidacOutputCache(22 * 60 * 60, "rok;ftyp;dtyp", false)]
         public async Task<ActionResult> TopHoldingy(int? rok = null, int? ftyp = null, int? dtyp = null)
         {
             Firma.TypSubjektuEnum? typSubj = null;
@@ -241,7 +242,7 @@ namespace HlidacStatu.Web.Controllers
             return View();
         }
 
-        [HlidacCache(22 * 60 * 60, "typdotace;rok", false)]
+        [HlidacOutputCache(22 * 60 * 60, "typdotace;rok", false)]
         public async Task<ActionResult> TopPoskytovatele(int typDotace, int? rok = null)
         {
             var data = await DotaceRepo.ReportPoskytovatelePoLetechAsync((Dotace.Hint.Type)typDotace, rok);
@@ -250,7 +251,7 @@ namespace HlidacStatu.Web.Controllers
             return View(data);
         }
 
-        [HlidacCache(22 * 60 * 60, "rok;cat", false)]
+        [HlidacOutputCache(22 * 60 * 60, "rok;cat", false)]
         public async Task<ActionResult> TopKategorie(int? rok = null, int? cat = null)
         {
             ViewData["rok"] = rok;
@@ -270,7 +271,7 @@ namespace HlidacStatu.Web.Controllers
             }
         }
 
-        [HlidacCache(22 * 60 * 60, "programname;programcode;rok", false)]
+        [HlidacOutputCache(22 * 60 * 60, "programname;programcode;rok", false)]
         public async Task<ActionResult> Program(string programName, string programCode)
         {
             var data = await DotaceRepo.ProgramStatisticAsync(programName, programCode);
@@ -279,7 +280,7 @@ namespace HlidacStatu.Web.Controllers
             return View(data);
         }
 
-        [HlidacCache(22 * 60 * 60, "rok", false)]
+        [HlidacOutputCache(22 * 60 * 60, "rok", false)]
         public async Task<ActionResult> DotacniExperti(int? rok = null)
         {
             var data = await DotaceRepo.DotacniExperti(rok);
@@ -287,7 +288,7 @@ namespace HlidacStatu.Web.Controllers
             return View(data);
         }
 
-        [HlidacCache(22 * 60 * 60, "typdotace;rok;icoPoskytovatele;icoPrijemce", false)]
+        [HlidacOutputCache(22 * 60 * 60, "typdotace;rok;icoPoskytovatele;icoPrijemce", false)]
         public async Task<ActionResult> TopDotacniProgramy(int typDotace, int? rok = null,
             string icoPoskytovatele = null, string icoPrijemce = null)
         {
@@ -298,7 +299,7 @@ namespace HlidacStatu.Web.Controllers
             return View();
         }
 
-        [HlidacCache(22 * 60 * 60, "rok", false)]
+        [HlidacOutputCache(22 * 60 * 60, "rok", false)]
         public async Task<ActionResult> DotovaniSponzori(int? rok = null)
         {
             var data = await DotaceRepo.DotovaniSponzori(rok);

@@ -1,4 +1,5 @@
 ﻿using HlidacStatu.Lib.Web.UI.Attributes;
+using HlidacStatu.LibCore.Filters;
 using HlidacStatu.Repositories;
 using HlidacStatu.Web.Filters;
 
@@ -14,7 +15,7 @@ namespace HlidacStatu.Web.Controllers
     public class SponzoriController : Controller
     {
 
-        [HlidacCache(3600, "", false)]
+        [HlidacOutputCache(3600, "", false)]
         public async Task<ActionResult> Index(CancellationToken cancellationToken)
         {
             var model = await SponzoringRepo.PartiesPerYearsOverviewAsync(SponzoringRepo.DefaultLastSponzoringYear(), cancellationToken);
@@ -37,7 +38,7 @@ namespace HlidacStatu.Web.Controllers
             return View(filteredModel);
         }
 
-        [HlidacCache(12*3600, "rok", false)]
+        [HlidacOutputCache(12*3600, "rok", false)]
         public async Task<ActionResult> TopSponzoriFirmy(int? rok, CancellationToken cancellationToken)
         {
             System.Collections.Generic.List<Entities.Views.SponzoringSummed> model = 
@@ -52,7 +53,7 @@ namespace HlidacStatu.Web.Controllers
             return View(filteredModel);
         }
 
-        [HlidacCache(3600, "id;r", false)]
+        [HlidacOutputCache(3600, "id;r", false)]
         public async Task<ActionResult> Strana(string id, CancellationToken cancellationToken)
         {
             if (string.IsNullOrEmpty(id))
@@ -62,7 +63,7 @@ namespace HlidacStatu.Web.Controllers
             return View((object)id);
         }
 
-        [HlidacCache(3600, "id;r", false)]
+        [HlidacOutputCache(3600, "id;r", false)]
         public async Task<ActionResult> Strany(CancellationToken cancellationToken)
         {
             return View();
