@@ -11,7 +11,7 @@ using HlidacStatu.DS.Graphs;
 using HlidacStatu.Entities;
 using HlidacStatu.Entities.VZ;
 using HlidacStatu.Extensions;
-using HlidacStatu.Lib.Web.UI.Attributes;
+using HlidacStatu.LibCore.Filters;
 using HlidacStatu.LibCore.Extensions;
 using HlidacStatu.Repositories;
 using HlidacStatu.Repositories.Analysis;
@@ -25,6 +25,7 @@ using Microsoft.Net.Http.Headers;
 using Serilog;
 using static HlidacStatu.XLib.Search;
 using Visit = HlidacStatu.Web.Framework.Visit;
+using HlidacStatu.Lib.Web.UI.Attributes;
 
 
 namespace HlidacStatu.Web.Controllers

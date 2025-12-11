@@ -1,4 +1,5 @@
 using HlidacStatu.Lib.Web.UI.Attributes;
+using HlidacStatu.LibCore.Filters;
 using HlidacStatu.Web.Filters;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http.Extensions;
@@ -52,7 +53,7 @@ namespace HlidacStatu.Web.Controllers
 
 
         [Route("25")]
-        [HlidacCache(12 * 60 * 60, "id;obdobi", true)]
+        [HlidacOutputCache(12 * 60 * 60, "id;obdobi", true)]
         public IActionResult Report25()
         {
             ViewBag.ReportNum = 25;
@@ -83,7 +84,7 @@ namespace HlidacStatu.Web.Controllers
 
 
         [Route("32")]
-        [HlidacCache(24 * 60 * 60, "id;rok",true)]
+        [HlidacOutputCache(24 * 60 * 60, "id;rok",true)]
 
         public IActionResult TopPoliticiObchod(int? id, int rok = 0)
         {
@@ -95,7 +96,7 @@ namespace HlidacStatu.Web.Controllers
         }
 
         [Route("34")]
-        [HlidacCache(1 * 60, "obdobi", true)]
+        [HlidacOutputCache(1 * 60, "obdobi", true)]
         public IActionResult ProslovyPSP(int? obdobi)
         {
             ViewBag.Title = "Délka řečnění v Poslanecké sněmovně";
@@ -117,7 +118,7 @@ namespace HlidacStatu.Web.Controllers
 
         [Authorize(Roles = "Admin")]
         [Route("33")]
-        [HlidacCache(24 * 60 * 60, "id;obdobi;typ;obor", true)]
+        [HlidacOutputCache(24 * 60 * 60, "id;obdobi;typ;obor", true)]
         public IActionResult TopNarustySmluv(int? id, string obdobi = "", int? obor = null, string typ = "abs")
         {
 
@@ -128,7 +129,7 @@ namespace HlidacStatu.Web.Controllers
         }
 
         [Route("{id:int}")]
-        [HlidacCache(12 * 60 * 60, "id", true)]
+        [HlidacOutputCache(12 * 60 * 60, "id", true)]
         public ActionResult OtherReports(int? id)
         {
             if (id.HasValue == false)

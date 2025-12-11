@@ -32,30 +32,49 @@ namespace HlidacStatu.Lib.Web.UI.Attributes
 
         public void OnResourceExecuting(ResourceExecutingContext context)
         {
-            var key = BuildCacheKey(context.HttpContext);
 
             IMemoryCache? cacheService = (IMemoryCache)context.HttpContext.RequestServices.GetService(typeof(IMemoryCache));
             if (cacheService is null)
-                _logger.Error("IMemoryCache service was not found - HlidacCacheAttribute.cs:29");
-
-            if (cacheService.TryGetValue(key, out IActionResult result))
             {
-                context.Result = result;
+                _logger.Error("IMemoryCache service was not found - HlidacCacheAttribute.cs");
+                return;  // Exit early!
             }
+            var key = BuildCacheKey(context.HttpContext);
+
+            if (cacheService.TryGetValue(key, out IActionResult? cachedResult) && cachedResult is not null)
+            {
+                context.Result = cachedResult;
+                // Mark that we served from cache (so OnResourceExecuted can skip re-saving)
+                context.HttpContext.Items["_HlidacCacheHit"] = true;
+            }
+
         }
 
         public void OnResourceExecuted(ResourceExecutedContext context)
         {
-            var key = BuildCacheKey(context.HttpContext);
+            // Skip if we already served from cache
+            if (context.HttpContext.Items.ContainsKey("_HlidacCacheHit"))
+                return;
+
+            // Skip if result is null (error occurred)
+            if (context.Result is null)
+                return;
+
 
             IMemoryCache? cacheService = (IMemoryCache)context.HttpContext.RequestServices.GetService(typeof(IMemoryCache));
             if (cacheService is null)
+            {
                 _logger.Error("IMemoryCache service was not found - HlidacCacheAttribute.cs:43");
+                return;
+            }
 
-            if (System.Diagnostics.Debugger.IsAttached)
-                cacheService.Set(key, context.Result, TimeSpan.FromSeconds(2));
-            else
-                cacheService.Set(key, context.Result, TimeSpan.FromSeconds(_duration));
+            var key = BuildCacheKey(context.HttpContext);
+            var duration = System.Diagnostics.Debugger.IsAttached
+                ? TimeSpan.FromHours(2)
+                : TimeSpan.FromSeconds(_duration);
+
+            cacheService.Set(key, context.Result, duration);
+
         }
 
         private string BuildCacheKey(HttpContext context)

@@ -98,7 +98,9 @@ namespace HlidacStatu.Web
 
             //get IConfiguration
             DBUpgrades.DBUpgrader.UpgradeDatabases(Connectors.DirectDB.Instance.DefaultCnnStr);
-            
+
+            builder.Services.AddMemoryCache();
+
             builder.Services.ConfigureServices(configuration);
             
             WebApplication app = builder.Build();
