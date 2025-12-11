@@ -89,7 +89,7 @@
 
 
 <h2 id="tblHead">Aktuální složení vlády</h2>
-@ChartUtilExtensions.RenderReport("", ReportModel.QueueItem.types.table, vlada2017tbl, @"{
+@HtmlExtensions.DataToHTMLTable(vlada2017tbl, tableId:"", dataTableOptions: @"{
 'language': {
 'url': '//cdn.datatables.net/plug-ins/1.13.4/i18n/cs.json'
 },
