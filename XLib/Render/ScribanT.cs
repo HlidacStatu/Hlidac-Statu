@@ -25,11 +25,8 @@ namespace HlidacStatu.XLib.Render
             xTemplate = Scriban.Template.Parse(template);
             if (xTemplate.HasErrors)
             {
-                throw new ApplicationException(xTemplate
-                    .Messages
-                    .Select(m => m.ToString())
-                    .Aggregate((f, s) => f + "\n" + s)
-                    );
+                var exc = string.Join("\n", xTemplate.Messages);
+                throw new ApplicationException(exc);
             }
         }
 

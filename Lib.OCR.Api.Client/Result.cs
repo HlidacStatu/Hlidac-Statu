@@ -67,7 +67,7 @@ namespace HlidacStatu.Lib.OCR.Api
                     doc.Pages = Documents.Sum(m => m.Pages);
                     doc.RemainsInSec = Documents.Sum(m => m.RemainsInSec);
                     doc.UsedOCR = Documents.Any(m => m.UsedOCR);
-                    doc.UsedTool = Documents.Select(m => m.UsedTool).Aggregate((f, s) => f + "|" + s);
+                    doc.UsedTool = String.Join("|", Documents.Select(m => m.UsedTool));
                     doc.Confidence = Documents.Average(m => m.Confidence);
                 }
                 _mergedDocument = doc;

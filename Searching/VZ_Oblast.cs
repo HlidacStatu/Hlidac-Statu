@@ -34,8 +34,8 @@ namespace HlidacStatu.Searching
                 var cpvs = cpvOblastToCpvFunc(oblastVal);
                 if (cpvs?.Length > 0)
                 {
-                    //var q_cpv = "cPV:(" + cpvs.Select(s => s + "*").Aggregate((f, s) => f + " OR " + s) + ")";
-                    var q_cpv = " ( " + cpvs.Select(s => "cPV:" + s + "*").Aggregate((f, s) => f + " OR " + s) + " ) ";
+                    string stringCpvs = String.Join(" OR ", cpvs.Select(s => "cPV:" + s + "*"));
+                    var q_cpv = $" ( {stringCpvs} ) ";
                     return new RuleResult(SplittingQuery.SplitQuery($" {q_cpv} "), NextStep);
                 }
             }

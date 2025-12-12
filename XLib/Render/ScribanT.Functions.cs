@@ -454,7 +454,7 @@ namespace HlidacStatu.XLib.Render
                         var vals = jp.Values<JToken>();
                         if (vals != null && vals.Count() > 0)
                         {
-                            return vals.Select(v => xfn_RenderProperty(v, level, maxLevel, maxLength)).Aggregate((f, s) => f + "\n" + s);
+                            return String.Join("\n", vals.Select(v => xfn_RenderProperty(v, level, maxLevel, maxLength)));
                         }
                         break;
                     case JTokenType.Constructor:

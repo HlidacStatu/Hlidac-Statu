@@ -36,9 +36,7 @@ namespace HlidacStatu.Searching
                 {
                     if (katId.Equals(key.ToString(), StringComparison.InvariantCultureIgnoreCase))
                     {
-                        string icosQuery = " ( " + validValues[key]
-                                .Select(t => $"ico:{t}")
-                                .Aggregate((f, s) => f + " OR " + s) + " ) ";
+                        string icosQuery = $" ( {string.Join(" OR ", validValues[key].Select(t => $"ico:{t}"))} ) ";
                         return new RuleResult(SplittingQuery.SplitQuery($"{icosQuery}"), NextStep);
                     }
                 }

@@ -99,10 +99,9 @@ namespace HlidacStatu.Repositories
                     string[] cutWords = words.Skip(firstWord) //preskoc slovo na zacatku
                         .Reverse().Skip(skipWord).Reverse() // a ubirej od konce
                         .ToArray();
-                    string wordCombination = cutWords.Aggregate((f, s) => f + " " + s);
+                    string wordCombination = string.Join(" ", cutWords);
 
-                    string koncovkaFirmy = "";
-                    string firmaBezKoncovky = Firma.JmenoBezKoncovkyAsciiFull(wordCombination, out koncovkaFirmy);
+                    string firmaBezKoncovky = Firma.JmenoBezKoncovkyAsciiFull(wordCombination, out var koncovkaFirmy);
                     string simpleName = TextUtil.RemoveDiacritics(firmaBezKoncovky).ToLower().Trim();
                     //+ "|" + koncovka;
 
