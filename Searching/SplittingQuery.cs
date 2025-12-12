@@ -1,15 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
+﻿using System.Diagnostics;
 using System.Text;
+using System.Text.RegularExpressions;
 
 namespace HlidacStatu.Searching
 {
-    public class SplittingQuery
+    public partial class SplittingQuery
     {
         [DebuggerDisplay("{ToQueryString}")]
-        public class Part
+        public partial class Part
         {
             public string Prefix { get; set; } = "";
             public string Value { get; set; } = "";
@@ -41,6 +39,8 @@ namespace HlidacStatu.Searching
                 }
             }
 
+            [GeneratedRegex(@"(?<w>\w*) ~ (?<n>\d{0,2})", RegexOptions.IgnoreCase | RegexOptions.IgnorePatternWhitespace | RegexOptions.Multiline)]
+            private static partial Regex TildePatternRegex();
 
             static char[] reservedAll = new char[] { '+', '=', '!', '(', ')', '{', '}', '[', ']', '^', '\'', '~', '*', '?', ':', '\\', '/' };
             static char[] skipIfPrefix = new char[] { '-', '*', '?' };
@@ -70,8 +70,7 @@ namespace HlidacStatu.Searching
 
                 //allow ~ or ~5 on the end of word
                 //replace ~ with chr(254)
-                val = System.Text.RegularExpressions.Regex.Replace(val, @"(?<w>\w*) ~ (?<n>\d{0,2})", "${w}" + Devmasters.Core.Chr(254) + "${n}", Util.Consts.DefaultRegexQueryOption);
-
+                val = TildePatternRegex().Replace(val, "${w}\u00FE${n}");
 
                 for (int i = 0; i < val.Length; i++)
                 {
