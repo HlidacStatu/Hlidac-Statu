@@ -51,7 +51,7 @@ namespace HlidacStatu.Web.Framework
                 return self.Raw("Nepřímá vazba přes:<br/><small>"
                     + $"{vazbyToRender.First().From?.PrintName()} {vazbyToRender.First().Descr} v {vazbyToRender.First().To.PrintName()} {vazbyToRender.First().Doba()}"
                     + $" → "
-                    + vazbyToRender.Skip(1).Select(m => m.Descr + " v " + m.To.PrintName()).Aggregate((f, s) => f + " → " + s)
+                    + string.Join(" → ", vazbyToRender.Skip(1).Select(m => m.Descr + " v " + m.To.PrintName()))
                     + "</small>"
                     );
             }

@@ -210,7 +210,7 @@ namespace HlidacStatu.Web.Controllers
                 else if (string.IsNullOrEmpty(form["ico"]))
                     return Redirect("/Subjekt/" + id);
 
-                query = form["ico"].ToString().Split(',').Select(m => "ico:" + m).Aggregate((f, s) => f + " OR " + s);
+                query = string.Join(" OR ", form["ico"].ToString().Split(',').Select(m => "ico:" + m));
 
                 if (wd == null)
                     wd = new WatchDog();
