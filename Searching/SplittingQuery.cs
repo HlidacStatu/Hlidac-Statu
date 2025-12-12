@@ -69,7 +69,10 @@ namespace HlidacStatu.Searching
 
                 //allow ~ or ~5 on the end of word
                 //replace ~ with chr(254)
-                val = TildePatternRegex().Replace(val, "${w}\u00FE${n}");
+                if (val.IndexOf('~') >= 0)
+                {
+                    val = TildePatternRegex().Replace(val, "${w}\u00FE${n}");
+                }
 
                 // Pre-allocate StringBuilder with estimated capacity
                 StringBuilder sb = new StringBuilder(val.Length + 10);

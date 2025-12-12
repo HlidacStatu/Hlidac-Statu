@@ -50,9 +50,9 @@ namespace HlidacStatu.Entities.Facts
             if (taken.Count == 0)
                 return "";
             else
-                return taken
-                    .Select(t => useStringF ? string.Format(lineFormat, t.Render(html)) : t.Render(html))
-                    .Aggregate((f, s) => f + delimiterBetween + s);
+                return String.Join(delimiterBetween, taken
+                        .Select(t => useStringF ? string.Format(lineFormat, t.Render(html)) : t.Render(html)));
+                    
         }
 
     }

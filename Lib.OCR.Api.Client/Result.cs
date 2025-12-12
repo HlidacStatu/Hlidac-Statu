@@ -62,9 +62,8 @@ namespace HlidacStatu.Lib.OCR.Api
                 }
                 else if (Documents.Count > 1)
                 {
-                    doc.Text = Documents
-                        .Select(m => $"--------- soubor : {m.Filename} ---------" + m.Text)
-                        .Aggregate((f, s) => f + "\n\n\n\n\n\n" + s);
+                    doc.Text = String.Join("\n\n\n\n\n\n", Documents
+                            .Select(m => $"--------- soubor : {m.Filename} ---------" + m.Text));
                     doc.Pages = Documents.Sum(m => m.Pages);
                     doc.RemainsInSec = Documents.Sum(m => m.RemainsInSec);
                     doc.UsedOCR = Documents.Any(m => m.UsedOCR);

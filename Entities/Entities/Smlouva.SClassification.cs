@@ -680,8 +680,10 @@ namespace HlidacStatu.Entities
             {
                 if (GetClassif() != null)
                 {
-                    return $"Types:{GetClassif().Select(m => m.ClassifType().ToString() + " (" + m.ClassifProbability.ToString("P2") + ")").Aggregate((f, s) => f + "; " + s)}"
-                        + $" updated:{LastUpdate.ToString()}";
+                    string types = string.Join("; ",
+                        GetClassif().Select(m =>
+                            m.ClassifType().ToString() + " (" + m.ClassifProbability.ToString("P2") + ")"));
+                    return $"Types:{types} updated:{LastUpdate.ToString()}";
                 }
                 else
                 {
