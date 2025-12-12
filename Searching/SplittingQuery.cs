@@ -6,8 +6,16 @@ namespace HlidacStatu.Searching
 {
     public partial class SplittingQuery
     {
+        [GeneratedRegex(@"(?<w>\w*) ~ (?<n>\d{0,2})", RegexOptions.IgnoreCase | RegexOptions.IgnorePatternWhitespace | RegexOptions.Multiline)]
+        private static partial Regex TildePatternRegex();
+            
+        [GeneratedRegex(@"(^|\s|[(]) (?<p>(\w|\.)*:) (?<q>(-|\w)* )\s*",
+            RegexOptions.IgnoreCase | RegexOptions.Multiline | RegexOptions.IgnorePatternWhitespace | RegexOptions.CultureInvariant)]
+        public static partial Regex FindPrefixRegex();
+        
+        
         [DebuggerDisplay("{ToQueryString}")]
-        public partial class Part
+        public class Part
         {
             public string Prefix { get; set; } = "";
             public string Value { get; set; } = "";
@@ -38,9 +46,6 @@ namespace HlidacStatu.Searching
                     }
                 }
             }
-
-            [GeneratedRegex(@"(?<w>\w*) ~ (?<n>\d{0,2})", RegexOptions.IgnoreCase | RegexOptions.IgnorePatternWhitespace | RegexOptions.Multiline)]
-            private static partial Regex TildePatternRegex();
 
             static char[] reservedAll = new char[] { '+', '=', '!', '(', ')', '{', '}', '[', ']', '^', '\'', '~', '*', '?', ':', '\\', '/' };
             static char[] skipIfPrefix = new char[] { '-', '*', '?' };
@@ -242,8 +247,9 @@ namespace HlidacStatu.Searching
 
                     foreach (var mt in mezery)
                     {
-                        string findPrefixReg = @"(^|\s|[(]) (?<p>(\w|\.)*:) (?<q>(-|\w)* )\s*";
-                        var prefix = Devmasters.RegexUtil.GetRegexGroupValue(mt, findPrefixReg, "p");
+                        var match = FindPrefixRegex().Match(mt);
+                        string prefix = match.Success ? match.Groups["p"].Value : string.Empty;
+
                         if (!string.IsNullOrEmpty(prefix))
                             tmpParts.Add(new Part()
                             {
