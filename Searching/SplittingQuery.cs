@@ -31,29 +31,22 @@ namespace HlidacStatu.Searching
 
             public string ExportPartAsQuery(bool encode = true)
             {
-                //force not to encode
-                // encode = false;
                 if (ExactValue)
                     return Value;
-                else
-                {
-                    if (encode)
-                        return (Prefix ?? "") + EncodedValue();
-                    else
-                    {
-                        return (Prefix ?? "") + Value;
-                    }
-                }
+                
+                if (encode)
+                    return (Prefix ?? "") + EncodedValue();
+                
+                return (Prefix ?? "") + Value;
             }
 
-            static readonly HashSet<char> reservedAll = new HashSet<char>
-                { '+', '=', '!', '(', ')', '{', '}', '[', ']', '^', '\'', '~', '*', '?', ':', '\\', '/' };
+            static readonly HashSet<char> reservedAll =
+                ['+', '=', '!', '(', ')', '{', '}', '[', ']', '^', '\'', '~', '*', '?', ':', '\\', '/'];
 
-            static char[] skipIfPrefix = new char[] { '-', '*', '?' };
-
-            static char[] formulaStart = new char[] { '>', '<', '(', '{', '[' };
-            static char[] formulaEnd = new char[] { ')', '}', ']', '*' };
-            static char[] ignored = new char[] { '>', '<' };
+            static readonly char[] skipIfPrefix = new char[] { '-', '*', '?' };
+            static readonly char[] formulaStart = new char[] { '>', '<', '(', '{', '[' };
+            static readonly char[] formulaEnd = new char[] { ')', '}', ']', '*' };
+            static readonly char[] ignored = new char[] { '>', '<' };
 
             public string EncodedValue()
             {
@@ -80,6 +73,7 @@ namespace HlidacStatu.Searching
 
                 // Pre-allocate StringBuilder with estimated capacity
                 StringBuilder sb = new StringBuilder(val.Length + 10);
+                bool isPrefixNull = string.IsNullOrWhiteSpace(Prefix);
 
                 for (int i = 0; i < val.Length; i++)
                 {
@@ -92,19 +86,19 @@ namespace HlidacStatu.Searching
                         continue;
                     }
 
-                    if (!string.IsNullOrEmpty(Prefix) && skipIfPrefix.Contains(currentChar))
+                    if (!isPrefixNull && skipIfPrefix.Contains(currentChar))
                     {
                         sb.Append(currentChar);
                         continue;
                     }
 
-                    if (string.IsNullOrWhiteSpace(Prefix) && i == 0 && formulaStart.Contains(currentChar))
+                    if (isPrefixNull && i == 0 && formulaStart.Contains(currentChar))
                     {
                         sb.Append(currentChar);
                         continue;
                     }
 
-                    if (string.IsNullOrWhiteSpace(Prefix) == false
+                    if (isPrefixNull == false
                         && i == 0 && val.Length > 1
                         && formulaStart.Contains(currentChar) && val[i + 1] == '=')
                     {
@@ -114,7 +108,7 @@ namespace HlidacStatu.Searching
                         continue;
                     }
 
-                    if (string.IsNullOrWhiteSpace(Prefix) && i == val.Length - 1 && formulaEnd.Contains(currentChar))
+                    if (isPrefixNull && i == val.Length - 1 && formulaEnd.Contains(currentChar))
                     {
                         sb.Append(currentChar);
                         continue;
@@ -216,7 +210,7 @@ namespace HlidacStatu.Searching
             if (string.IsNullOrWhiteSpace(query))
                 return [];
 
-            List<Part> tmpParts = new List<Part>();
+            List<Part> tmpParts = [];
             //prvni rozdelit podle ""
             var fixTxts = Devmasters.TextUtil.SplitStringToPartsWithQuotes(query, '\"');
 
@@ -238,7 +232,7 @@ namespace HlidacStatu.Searching
                     }
                     else if (i > 0 && fixTxts[i - 1].Item1.EndsWith(":"))
                     {
-                        tmpParts[tmpParts.Count - 1].Prefix = tmpParts[tmpParts.Count - 1].Prefix;
+                        // tmpParts[tmpParts.Count - 1].Prefix = tmpParts[tmpParts.Count - 1].Prefix;
                         tmpParts[tmpParts.Count - 1].Value = fixTxts[i].Item1;
                     }
                     else
@@ -257,7 +251,7 @@ namespace HlidacStatu.Searching
                     string tPart = fixTxts[i].Item1;
                     tPart = tPart.Replace("(", " ( ").Replace(")", " ) ")
                         .Replace(": (", ":("); //fix mezera za :
-                    string[] mezery = tPart.Split(new char[] { ' ' });
+                    string[] mezery = tPart.Split(' ');
 
                     foreach (var mt in mezery)
                     {
