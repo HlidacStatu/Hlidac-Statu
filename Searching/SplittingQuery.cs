@@ -235,7 +235,7 @@ namespace HlidacStatu.Searching
                     }
                     else if (i > 0 && fixTxts[i - 1].Item1.EndsWith(":"))
                     {
-                        // tmpParts[tmpParts.Count - 1].Prefix = tmpParts[tmpParts.Count - 1].Prefix;
+                        //tmpParts[tmpParts.Count - 1].Prefix = tmpParts[tmpParts.Count - 1].Prefix;
                         tmpParts[tmpParts.Count - 1].Value = fixTxts[i].Item1;
                     }
                     else

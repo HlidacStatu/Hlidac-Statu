@@ -128,7 +128,8 @@ namespace HlidacStatu.RegistrVozidel
             public string ErrorMessage { get; set; }
         }
         static int badCount = 0;
-        public static void ReadCSV<T>(OpenDataDownload.OpenDataFile file)
+        public async static Task ReadCSVAsync<T>(OpenDataDownload.OpenDataFile file)
+            where T : HlidacStatu.RegistrVozidel.Models.ICheckDuplicate, new()
         {
             List<BadRow> bads = new List<BadRow>();
             var csvConfiguration = new CsvConfiguration(HlidacStatu.Util.Consts.czCulture)
@@ -143,22 +144,32 @@ namespace HlidacStatu.RegistrVozidel
                 }
             };
 
+            using var db = new HlidacStatu.RegistrVozidel.Models.dbCtx();
+
             int rows = 0;
             using (var reader = new StreamReader(file.Directory + file.NormalizedNazev, System.Text.Encoding.UTF8))
             using (var csv = new CsvReader(reader, csvConfiguration))
             {
 
-                csv.Read();
+                await csv.ReadAsync();
                 csv.ReadHeader();
-                while (csv.Read())
+                while (await csv.ReadAsync())
                 {
-                    rows++; 
-                    if (rows % 1000 == 0)
-                        Console.WriteLine($"row {rows}, bads so far: {badCount}");
+                    rows++;
                     try
                     {
-                        var record = csv.GetRecord<T>();
+                        T rec = csv.GetRecord<T>();
                         // Do something with the record.
+                        //Console.WriteLine($"{rec}");
+                        Models.ICheckDuplicate.DuplicateCheckResult check = await rec.CheckDuplicateAsync();
+                        if (check == Models.ICheckDuplicate.DuplicateCheckResult.NoDuplicate)
+                            db.Add(rec);
+                        else if (check == Models.ICheckDuplicate.DuplicateCheckResult.SamePrimaryKeyOtherChecksum)
+                        {
+                            //update
+                            db.Update(rec);
+                        }
+
 
                     }
                     catch (Exception e)
@@ -168,6 +179,21 @@ namespace HlidacStatu.RegistrVozidel
                         FileLog(csv.Parser);
                         badCount++;
                     }
+                    if (rows % 20 == 0)
+                    {
+                        Console.WriteLine($"row {rows}, bads so far: {badCount}. Saving changes...");
+                        try
+                        {
+                            _ = await db.SaveChangesAsync();
+
+                        }
+                        catch (Exception e)
+                        {
+
+                            throw;
+                        }
+                    }
+
                 }
             }
             //System.IO.File.WriteAllText(@"c:\!\badrows.json", Newtonsoft.Json.JsonConvert.SerializeObject(bads, Newtonsoft.Json.Formatting.Indented), System.Text.Encoding.UTF8);

@@ -8,24 +8,43 @@ namespace HlidacStatu.RegistrVozidel.Models;
 
 public partial class dbCtx : DbContext
 {
+
+    public dbCtx()
+    : base(GetConnectionString())
+    {
+    }
+
+
     public dbCtx(DbContextOptions<dbCtx> options)
         : base(options)
     {
     }
 
-    public virtual DbSet<TechnickeProhlidky> TechnickeProhlidkies { get; set; }
+    private static DbContextOptions GetConnectionString()
+    {
+        var connectionString = Devmasters.Config.GetWebConfigValue("RegistrVozidelCnnStr");
+        return new DbContextOptionsBuilder()
+            .UseSqlServer(connectionString) //, sql=> sql.CommandTimeout(120).EnableRetryOnFailure(2) )
+                                            //.EnableDetailedErrors()  //ukáže který sloupec je null/nejde deserializovat v chybě
+                                            //.EnableSensitiveDataLogging(true)
 
-    public virtual DbSet<VlastnikProvozovatelVozidla> VlastnikProvozovatelVozidlas { get; set; }
+            .Options;
+    }
 
-    public virtual DbSet<VozidlaDoplnkoveVybaveni> VozidlaDoplnkoveVybavenis { get; set; }
 
-    public virtual DbSet<VozidlaDovoz> VozidlaDovozs { get; set; }
+    public virtual DbSet<TechnickeProhlidky> TechnickeProhlidkie { get; set; }
 
-    public virtual DbSet<VozidlaVyrazenaZProvozu> VozidlaVyrazenaZProvozus { get; set; }
+    public virtual DbSet<VlastnikProvozovatelVozidla> VlastnikProvozovatelVozidla { get; set; }
 
-    public virtual DbSet<VypisVozidel> VypisVozidels { get; set; }
+    public virtual DbSet<VozidlaDoplnkoveVybaveni> VozidlaDoplnkoveVybaveni { get; set; }
 
-    public virtual DbSet<ZpravyVyrobceZastupce> ZpravyVyrobceZastupces { get; set; }
+    public virtual DbSet<VozidlaDovoz> VozidlaDovoz { get; set; }
+
+    public virtual DbSet<VozidlaVyrazenaZProvozu> VozidlaVyrazenaZProvozu { get; set; }
+
+    public virtual DbSet<VypisVozidel> VypisVozidel { get; set; }
+
+    public virtual DbSet<ZpravyVyrobceZastupce> ZpravyVyrobceZastupce { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -132,7 +151,7 @@ public partial class dbCtx : DbContext
                 .HasMaxLength(30)
                 .HasColumnName("PCV");
             entity.Property(e => e.CheckSum)
-                .HasMaxLength(50)
+                .HasMaxLength(64)
                 .HasColumnName("CheckSum");
             entity.Property(e => e.Abs).HasColumnName("ABS");
             entity.Property(e => e.AlternativniProvedeni).HasColumnName("Alternativni_provedeni");
@@ -160,7 +179,7 @@ public partial class dbCtx : DbContext
             entity.Property(e => e.DojezdZr)
                 .HasColumnType("money")
                 .HasColumnName("Dojezd_ZR");
-            entity.Property(e => e.DoplňkovyTextNaTp).HasColumnName("Doplňkovy_text_na_TP");
+            entity.Property(e => e.DoplnkovyTextNaTp).HasColumnName("Doplnkovy_text_na_TP");
             entity.Property(e => e.DruhKaroserie).HasColumnName("Druh_karoserie");
             entity.Property(e => e.DruhRz).HasColumnName("Druh_RZ");
             entity.Property(e => e.DruhVozidla).HasColumnName("Druh_vozidla");
@@ -368,6 +387,11 @@ public partial class dbCtx : DbContext
                 //.HasColumnType("money")
                 .HasColumnName("Zdvihovy_objem");
             entity.Property(e => e.Ztp).HasColumnName("ZTP");
+            entity.Property(e => e.VariantaRz).HasColumnName("VariantaRZ");
+            entity.Property(e => e.SpotrebaPredpis).HasColumnName("SpotrebaPredpis");
+            entity.Property(e => e.BarvaDoplnkova).HasColumnName("BarvaDoplnkova");
+            entity.Property(e => e.NejvetsiTechnickyPripustnaPovolenaHmotnostJizdniSoupravy).HasColumnName("NejvetsiTechnickyPripustnaPovolenaHmotnostJizdniSoupravy");
+            entity.Property(e => e.StupenAutonomityVozidla).HasColumnName("StupenAutonomityVozidla");
         });
 
         modelBuilder.Entity<ZpravyVyrobceZastupce>(entity =>
