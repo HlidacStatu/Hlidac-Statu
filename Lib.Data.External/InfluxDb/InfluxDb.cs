@@ -93,7 +93,7 @@ namespace HlidacStatu.Lib.Data.External
                 query = "from(bucket:\"uptimer\") \n"
                     + $" |> range(start: {sTimeBack}) \n"
                     + "  |> filter(fn: (r) => r[\"_measurement\"] == \"uptime\") \n"
-                    + "  |> filter(fn: (r) => " + serverPart.Select(m => $"r[\"serverid\"] == \"{m}\"").Aggregate((f, s) => f + " or " + s) + " ) \n"
+                    + "  |> filter(fn: (r) => " + string.Join(" or ", serverPart.Select(m => $"r[\"serverid\"] == \"{m}\"")) + " ) \n"
                     + "  |> filter(fn: (r) => r[\"fieldname\"] == \"responseCode\" or r[\"fieldname\"] == \"responseSize\" or r[\"fieldname\"] == \"responseTime\")  \n"
                 ;
 

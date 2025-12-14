@@ -1,5 +1,4 @@
 using HlidacStatu.Util;
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,6 +11,7 @@ namespace HlidacStatu.Extensions
     public static class RizeniExtension
     {
         private static readonly ILogger _logger = Log.ForContext(typeof(RizeniExtension));
+
         public static bool OdstranenoZInsolvencnihoRejstriku(this Rizeni rizeni)
         {
             return OdstranenoZInsolvencnihoRejstriku(rizeni.UrlInIR());
@@ -64,7 +64,7 @@ namespace HlidacStatu.Extensions
         public static string SocialInfoBody(this Rizeni rizeni)
         {
             return "<ul>" +
-                   rizeni.InfoFacts().RenderFacts( 4, true, true, "", "<li>{0}</li>", true)
+                   rizeni.InfoFacts().RenderFacts(4, true, true, "", "<li>{0}</li>", true)
                    + "</ul>";
         }
 
@@ -95,16 +95,16 @@ namespace HlidacStatu.Extensions
                 sumTxt = Devmasters.Lang.CS.Plural.GetWithZero(rizeni.Dluznici.Count,
                     "",
                     "Dlužníkem je " + rizeni.Dluznici.First().FullNameWithYear(),
-                    "Dlužníky jsou " + rizeni.Dluznici.Select(m => m.FullNameWithYear()).Aggregate((f, s) => f + ", " + s),
-                    "Dlužníky jsou" + rizeni.Dluznici.Take(3).Select(m => m.FullNameWithYear())
-                                        .Aggregate((f, s) => f + ", " + s)
-                                    + "a " + Devmasters.Lang.CS.Plural.Get(rizeni.Dluznici.Count - 3, " jeden další", "{0} další",
+                    "Dlužníky jsou " + string.Join(", ", rizeni.Dluznici.Select(m => m.FullNameWithYear())),
+                    "Dlužníky jsou" + string.Join(", ", rizeni.Dluznici.Take(3).Select(m => m.FullNameWithYear()))
+                                    + "a " + Devmasters.Lang.CS.Plural.Get(rizeni.Dluznici.Count - 3, " jeden další",
+                                        "{0} další",
                                         "{0} dalších")
                                     + ". "
                 );
                 data.Add(new InfoFact()
                 {
-                    Level = InfoFact.ImportanceLevel.High,
+                    Level = Fact.ImportanceLevel.High,
                     Text = sumTxt
                 });
             }

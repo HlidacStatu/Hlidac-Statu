@@ -81,9 +81,8 @@ namespace HlidacStatu.XLib
                 if (times == null || times.Count() == 0)
                     return string.Empty;
 
-                return times
-                    .Select(kv => $"{kv.Key}: {kv.Value.TotalMilliseconds.ToString()}")
-                    .Aggregate((f, s) => f + delimiter + s);
+                return string.Join(delimiter, times
+                    .Select(kv => $"{kv.Key}: {kv.Value.TotalMilliseconds.ToString()}"));
             }
 
             public bool IsValid

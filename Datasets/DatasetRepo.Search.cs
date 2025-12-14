@@ -70,9 +70,7 @@ namespace HlidacStatu.Datasets
                 if (properties.Count() == 0)
                     return string.Empty;
                 //create query
-                string q = properties
-                    .Select(p => $"{p}:{value}")
-                    .Aggregate((f, s) => f + " OR " + s);
+                string q = string.Join(" OR ", properties.Select(p => $"{p}:{value}"));
                 return $"( {q} )";
             }
             

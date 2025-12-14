@@ -143,8 +143,7 @@ window.onload = function() {{
                     var vals = jp.Values<JToken>();
                     if (vals != null && vals.Count() > 0)
                     {
-                        return vals.Select(v => RenderProperty(v, level, maxLevel, maxLength))
-                            .Aggregate((f, s) => f + "\n" + s);
+                        return string.Join("\n", vals.Select(v => RenderProperty(v, level, maxLevel, maxLength)));
                     }
 
                     break;

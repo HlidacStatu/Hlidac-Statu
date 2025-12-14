@@ -516,15 +516,16 @@ text zpravy: {txt}
             if (!string.IsNullOrWhiteSpace(qs["anytxt"]))
             {
                 query += " ("
-                         + qs["anytxt"].ToString().Split(splitChars, StringSplitOptions.RemoveEmptyEntries)
-                             .Aggregate((f, s) => f + " OR " + s)
-                         + ")";
+                         + string.Join(" OR ", qs["anytxt"].ToString()
+                             .Split(splitChars, StringSplitOptions.RemoveEmptyEntries))
+                                               + ")";
             }
 
             if (!string.IsNullOrWhiteSpace(qs["nonetxt"]))
             {
-                query += " " + qs["nonetxt"].ToString().Split(splitChars, StringSplitOptions.RemoveEmptyEntries)
-                    .Select(s => s.StartsWith("-") ? s : "-" + s).Aggregate((f, s) => f + " " + s);
+                query += " " + string.Join(" ",qs["nonetxt"].ToString()
+                    .Split(splitChars, StringSplitOptions.RemoveEmptyEntries)
+                    .Select(s => s.StartsWith("-") ? s : "-" + s));
             }
 
             if (!string.IsNullOrWhiteSpace(qs["textsmlouvy"]))
@@ -559,8 +560,8 @@ text zpravy: {txt}
             {
                 // into ()
                 query += " ("
-                         + platce.Where(m => !string.IsNullOrWhiteSpace(m.Value)).Select(m => m.Key + ":" + m.Value)
-                             .Aggregate((f, s) => f + " OR " + s)
+                         + string.Join(" OR ", platce.Where(m => !string.IsNullOrWhiteSpace(m.Value))
+                             .Select(m => m.Key + ":" + m.Value))
                          + ")";
             }
             else if (platce.Count(m => !string.IsNullOrWhiteSpace(m.Value)) == 1)
@@ -596,8 +597,8 @@ text zpravy: {txt}
             {
                 // into ()
                 query += " ("
-                         + prijemce.Where(m => !string.IsNullOrWhiteSpace(m.Value)).Select(m => m.Key + ":" + m.Value)
-                             .Aggregate((f, s) => f + " OR " + s)
+                         + string.Join(" OR ", prijemce.Where(m => !string.IsNullOrWhiteSpace(m.Value))
+                             .Select(m => m.Key + ":" + m.Value))
                          + ")";
             }
             else if (prijemce.Count(m => !string.IsNullOrWhiteSpace(m.Value)) == 1)
@@ -675,7 +676,8 @@ text zpravy: {txt}
             return View();
         }
 
-        public async Task<IActionResult> SimpleSearch(DateTime? datumOd, DateTime? datumDo, decimal? castkaOd, decimal? castkaDo,
+        public async Task<IActionResult> SimpleSearch(DateTime? datumOd, DateTime? datumDo, decimal? castkaOd,
+            decimal? castkaDo,
             List<string>? ico, string? icoPlatce, string? icoPrijemce, string? osoba,
             string? obsahujeSlova, string? presnyTermin, string? typ)
         {
@@ -707,6 +709,7 @@ text zpravy: {txt}
                         }
                     }
                 }
+
                 if (!string.IsNullOrWhiteSpace(icoPlatce))
                     parts.Add($"ico_platce:{icoPlatce}");
                 if (!string.IsNullOrWhiteSpace(icoPrijemce))
@@ -725,15 +728,15 @@ text zpravy: {txt}
                     parts.Add($"\"{presnyTermin}\"");
                 if (!string.IsNullOrWhiteSpace(obsahujeSlova))
                     parts.Add($"{obsahujeSlova}");
-                
+
                 string query = string.Join(" AND ", parts);
-                
+
                 return Redirect("/Hledat?q=" + System.Net.WebUtility.UrlEncode(query));
-                
+
                 // if (!string.IsNullOrWhiteSpace(Typ))
                 //     parts.Add($"typ:{Typ}");
             }
-            
+
             return View();
         }
 
@@ -1002,7 +1005,7 @@ text zpravy: {txt}
                 var vz = await VzCache.CachedSimpleSearchAsync(
                     new Repositories.Searching.VerejnaZakazkaSearchData()
                     {
-                        Q = icos.Select(i => "ico:" + i).Aggregate((f, s) => f + " OR " + s),
+                        Q = string.Join(" OR ", icos.Select(i => "ico:" + i)),
                         Page = 0,
                         PageSize = 30,
                         Order = "1"
@@ -1022,8 +1025,7 @@ text zpravy: {txt}
                                 Cena = h.Source.FormattedCena(false),
                                 CPVkody = h.Source.CPV.Count() == 0
                                     ? ""
-                                    : h.Source.CPV.Select(c => VerejnaZakazka.CPVToText(c))
-                                        .Aggregate((f, s) => f + ", " + s),
+                                    : string.Join(", ", h.Source.CPV.Select(c => VerejnaZakazka.CPVToText(c))),
                                 Stav = h.Source.StavZakazky.ToNiceDisplayName(),
                                 DatumUverejneni = h.Source.DatumUverejneni
                             })
@@ -1080,7 +1082,8 @@ text zpravy: {txt}
         public async Task<ActionResult> SocialBanner(string id, string v, string t, string st, string b, string f,
             string img, string rat = "16x9", string res = "1200x628", string col = "")
         {
-            string mainUrl = "https://gen.hlidacstatu.cz"; //HttpContext.Request.Scheme + "://" + HttpContext.Request.Host;
+            string
+                mainUrl = "https://gen.hlidacstatu.cz"; //HttpContext.Request.Scheme + "://" + HttpContext.Request.Host;
 
 
             // #if (DEBUG)

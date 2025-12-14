@@ -80,13 +80,12 @@ namespace HlidacStatu.DS.Api
                 }
                 else if (docs.Count() > 1)
                 {
-                    doc.Text = docs
-                        .Select(m => $"--------- soubor : {m.Filename} ---------" + m.Text)
-                        .Aggregate((f, s) => f + "\n\n\n\n\n\n" + s);
+                    doc.Text = string.Join("\n\n\n\n\n\n", docs
+                        .Select(m => $"--------- soubor : {m.Filename} ---------" + m.Text));
                     doc.Pages = docs.Sum(m => m.Pages);
                     doc.RemainsInSec = docs.Sum(m => m.RemainsInSec);
                     doc.UsedOCR = docs.Any(m => m.UsedOCR);
-                    doc.UsedTool = docs.Select(m => m.UsedTool).Aggregate((f, s) => f + "|" + s);
+                    doc.UsedTool = string.Join("|", docs.Select(m => m.UsedTool));
                     doc.Confidence = docs.Average(m => m.Confidence);
                     doc.ContentType = docs.First().ContentType;
                     doc.FileMetadata = docs.SelectMany(m=>m.FileMetadata).ToArray();

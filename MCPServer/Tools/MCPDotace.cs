@@ -111,7 +111,7 @@ Description("Search subsidies from Czech government for specified parameters. Yo
                     if (!string.IsNullOrWhiteSpace(negative_keywords))
                     {
                         query += " NOT ( "
-                            + negative_keywords.ToString().Split(splitChars, StringSplitOptions.RemoveEmptyEntries).Select(s => s.StartsWith("-") ? s : "-" + s).Aggregate((f, s) => f + " " + s)
+                            + string.Join(" ", negative_keywords.Split(splitChars, StringSplitOptions.RemoveEmptyEntries).Select(s => s.StartsWith("-") ? s : "-" + s)) 
                             + " ) ";
                     }
 

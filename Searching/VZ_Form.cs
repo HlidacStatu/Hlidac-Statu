@@ -33,7 +33,7 @@ namespace HlidacStatu.Searching
                     string[] forms = form.Split(new char[] { ',', ';', '|' }, StringSplitOptions.RemoveEmptyEntries);
                     string q_form = "";
                     if (forms.Length > 0)
-                        q_form = "formulare.druh:(" + forms.Select(s => s + "*").Aggregate((f, s) => f + " OR " + s) + ")";
+                        q_form = $"formulare.druh:({string.Join(" OR ",forms.Select(s => s + "*"))})";
 
                     return new RuleResult(SplittingQuery.SplitQuery($" ( {q_form} ) "), NextStep);
                 }

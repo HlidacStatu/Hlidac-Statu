@@ -717,7 +717,7 @@ namespace HlidacStatu.Web.Controllers
             if (errors?.Count > 0)
             {
                 _logger.Error("ImportDataProcess exceptions \n"
-                    + errors.Select(m => m.Message).Aggregate((f, s) => f + "\n" + s));
+                    + string.Join("\n", errors.Select(m => m.Message)));
             }
 
             ViewBag.ApiResponseError = ApiResponseStatus.Error(-99, "Chyba při importu dat");

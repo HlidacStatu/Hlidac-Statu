@@ -1,8 +1,6 @@
 ﻿using HlidacStatu.XLib.Render;
-
 using Microsoft.AspNetCore.Html;
 using Microsoft.AspNetCore.Mvc.Rendering;
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,8 +10,6 @@ namespace HlidacStatu.Lib.Web.UI
 {
     public static class ChartUtilExtensions
     {
-
-
         public static IHtmlContent TimelineGraph(this IHtmlHelper htmlHelper,
             string name,
             string rowLabel,
@@ -21,9 +17,9 @@ namespace HlidacStatu.Lib.Web.UI
             IEnumerable<(string row, string bar, DateTime? from, DateTime? to)> data,
             int height)
         {
-
             var stringifiedRows = data
-                .Select(d => $"['{d.row}','{d.bar}',new Date({FormatDate(d.from, false)}),new Date({FormatDate(d.to, true)})]");
+                .Select(d =>
+                    $"['{d.row}','{d.bar}',new Date({FormatDate(d.from, false)}),new Date({FormatDate(d.to, true)})]");
             string timelineDataArr = $"[{string.Join(",", stringifiedRows)}]";
 
             string graph = @"
@@ -65,7 +61,7 @@ namespace HlidacStatu.Lib.Web.UI
             string FormatDate(DateTime? datum, bool isDatumDo)
             {
                 var fixedDate = datum ??
-                    (isDatumDo ? DateTime.Now : new DateTime(2000, 1, 1));
+                                (isDatumDo ? DateTime.Now : new DateTime(2000, 1, 1));
 
                 int rok = fixedDate.Year;
                 int mesic = fixedDate.Month - 1; //protože javascript
@@ -74,9 +70,6 @@ namespace HlidacStatu.Lib.Web.UI
                 return $"new Date({rok},{mesic},{den})";
             }
         }
-
-    
-
 
 
         public static IHtmlContent PieChart(this IHtmlHelper htmlHelper,
@@ -88,7 +81,7 @@ namespace HlidacStatu.Lib.Web.UI
             string yTitleRight = "",
             string tooltipFormat = null,
             bool showZerovalues = false
-            )
+        )
         {
             string random = Guid.NewGuid().ToString("N");
             var sb = new System.Text.StringBuilder();
@@ -134,11 +127,12 @@ namespace HlidacStatu.Lib.Web.UI
                 {
                     pointFormat = tooltipFormat ?? "{series.name}: <b>{point.y}</b>"
                 }
-
             };
 
 
-            var ser = Newtonsoft.Json.JsonConvert.SerializeObject(anon, new Newtonsoft.Json.JsonSerializerSettings() { NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore });
+            var ser = Newtonsoft.Json.JsonConvert.SerializeObject(anon,
+                new Newtonsoft.Json.JsonSerializerSettings()
+                    { NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore });
             sb.Append(ser);
             sb.Append(");});");
             sb.AppendLine("</script>");
@@ -156,7 +150,7 @@ namespace HlidacStatu.Lib.Web.UI
             bool stacked = false,
             string showStackedSummaryFormat = "{total}",
             bool showLegend = true
-            )
+        )
         {
             string random = Guid.NewGuid().ToString("N");
             var sb = new System.Text.StringBuilder();
@@ -197,10 +191,11 @@ namespace HlidacStatu.Lib.Web.UI
                     useHTML = true,
                     shared = true,
                     valueDecimals = 0,
-                    headerFormat = $"<table class=\"chart_tooltip-table\"><tr><td>{xTooltip}:</td><td>{{point.key}}</td>",
-                    pointFormat = "<tr><td><span class=\"chart_small-circle\" style=\" background-color: {series.color};\" ></span> {series.name}: </td><td style=\"text-align: right\"><b>{tooltip.valuePrefix}{point.y}{tooltip.valueSuffix}</b></td></tr>",
+                    headerFormat =
+                        $"<table class=\"chart_tooltip-table\"><tr><td>{xTooltip}:</td><td>{{point.key}}</td>",
+                    pointFormat =
+                        "<tr><td><span class=\"chart_small-circle\" style=\" background-color: {series.color};\" ></span> {series.name}: </td><td style=\"text-align: right\"><b>{tooltip.valuePrefix}{point.y}{tooltip.valueSuffix}</b></td></tr>",
                     footerFormat = "</table>",
-
                 },
                 plotOptions = new
                 {
@@ -264,7 +259,6 @@ namespace HlidacStatu.Lib.Web.UI
                 },
                 navigation = new { buttonOptions = new { enabled = false } },
                 series = series
-
             };
 
 
@@ -277,9 +271,9 @@ namespace HlidacStatu.Lib.Web.UI
 
 
         public static IHtmlContent SimpleStackedChart(
-    IEnumerable<(string name, IEnumerable<ReportDataTimeValue> values)> data,
-    string title, string valueName,
-    int height, string addStyle = "", int? minY = null, bool showMarker = true, string chartType = "column")
+            IEnumerable<(string name, IEnumerable<ReportDataTimeValue> values)> data,
+            string title, string valueName,
+            int height, string addStyle = "", int? minY = null, bool showMarker = true, string chartType = "column")
         {
             string containerId = "chart_" + Guid.NewGuid().ToString("N");
             List<string> sdata = new List<string>();
@@ -287,11 +281,10 @@ namespace HlidacStatu.Lib.Web.UI
             {
                 sdata.Add(
                     $"{{ name : '{d.name}', data :["
-                    + d.values
-                        .Select(m =>
-                            $"[Date.UTC({m.Date.Year},{m.Date.Month - 1},{m.Date.Day},{m.Date.Hour},{m.Date.Minute}),{m.Value.ToString(HlidacStatu.Util.Consts.enCulture)}]")
-                        .Aggregate((f, s) => f + "," + s)
-                    + $"]}}"
+                    + string.Join(",",d.values
+                                          .Select(m =>
+                                              $"[Date.UTC({m.Date.Year},{m.Date.Month - 1},{m.Date.Day},{m.Date.Hour},{m.Date.Minute}),{m.Value.ToString(HlidacStatu.Util.Consts.enCulture)}]"))
+                                      + $"]}}"
                 );
             }
 
@@ -351,7 +344,6 @@ xAxis: {
         }
 
 
-
         public static IHtmlContent SimpleLineChart(
             IEnumerable<(string name, IEnumerable<ReportDataTimeValue> values)> data,
             string title, string valueName,
@@ -363,11 +355,10 @@ xAxis: {
             {
                 sdata.Add(
                     $"{{ name : '{d.name}', data :["
-                    + d.values
-                        .Select(m =>
-                            $"[Date.UTC({m.Date.Year},{m.Date.Month - 1},{m.Date.Day},{m.Date.Hour},{m.Date.Minute}),{m.Value.ToString(HlidacStatu.Util.Consts.enCulture)}]")
-                        .Aggregate((f, s) => f + "," + s)
-                    + $"]}}"
+                    + string.Join(",", d.values
+                                          .Select(m =>
+                                              $"[Date.UTC({m.Date.Year},{m.Date.Month - 1},{m.Date.Day},{m.Date.Hour},{m.Date.Minute}),{m.Value.ToString(HlidacStatu.Util.Consts.enCulture)}]"))
+                                      + $"]}}"
                 );
             }
 
@@ -434,9 +425,8 @@ Highcharts.chart('" + containerId + @"', {
         {
             //https://jsfiddle.net/gh/get/library/pure/highcharts/highcharts/tree/master/samples/highcharts/demo/pie-semi-circle
             string containerId = "chart_" + Guid.NewGuid().ToString("N");
-            string sdata = data
-                .Select(m => $"['{m.Item1.Replace("'", "\'")}',{m.Item2.ToString(HlidacStatu.Util.Consts.enCulture)}]")
-                .Aggregate((f, s) => f + "," + s);
+            string sdata = string.Join(",", data
+                .Select(m => $"['{m.Item1.Replace("'", "\'")}',{m.Item2.ToString(HlidacStatu.Util.Consts.enCulture)}]"));
 
             var sb = @"
     <div id='" + containerId + @"' style='height:" + height + @"px;" + addStyle + @"'></div>
@@ -504,10 +494,9 @@ pie: {
 
             string containerId = "chart_" + Guid.NewGuid().ToString("N");
             string sMaxVal = data.Max(m => m.Value).ToString(HlidacStatu.Util.Consts.enCulture);
-            string sdata = data
+            string sdata = string.Join(",", data
                 .Select(m =>
-                    $"[Date.UTC({m.Date.Year},{m.Date.Month - 1},{m.Date.Day}),{m.Value.ToString(HlidacStatu.Util.Consts.enCulture)}]")
-                .Aggregate((f, s) => f + "," + s);
+                    $"[Date.UTC({m.Date.Year},{m.Date.Month - 1},{m.Date.Day}),{m.Value.ToString(HlidacStatu.Util.Consts.enCulture)}]"));
 
             StringBuilder sb = new StringBuilder();
 
@@ -557,14 +546,14 @@ pie: {
             return new HtmlString(sb.ToString());
         }
 
-        public static IHtmlContent SimpleBarChart<T>(this IHtmlHelper htmlHelper, 
+        public static IHtmlContent SimpleBarChart<T>(this IHtmlHelper htmlHelper,
                 bool columnType, bool timeData, int height,
                 string containerId, string xAxisName, string yAxisName,
                 ReportDataSource<T> rds, string tooltipValueSuffix = "",
                 string xValueFormat = null, string yValueFormat = null, string tooltipFormatFull = null,
                 string loadEvents = null, string backgroundColor = null, string addStyle = null, bool stacking = false
             )
-        //where T : class
+            //where T : class
         {
             return SimpleBarChart(htmlHelper, columnType, timeData, height,
                 containerId, xAxisName, yAxisName,
@@ -626,11 +615,12 @@ pie: {
             if (timeData == false)
             {
                 sb.AppendLine("	\"categories\": [" +
-                 string.Join(",",
-                         rds[0].Data.Select(v => "\"" + v[0].Column.TextRender(v[0].Value) + "\"")
-                         ) + "],"
-                  );
+                              string.Join(",",
+                                  rds[0].Data.Select(v => "\"" + v[0].Column.TextRender(v[0].Value) + "\"")
+                              ) + "],"
+                );
             }
+
             sb.AppendLine("			\"labels\": {");
             sb.AppendLine($"		\"format\": \"{xValueFormat}\",");
             sb.AppendLine("				\"staggerLines\": 1");
@@ -687,10 +677,9 @@ pie: {
             {
                 sdata.Add(
                     $"{{ name : '{d.name}', data :["
-                    + d.values
+                    + string.Join(",", d.values
                         .Select(m =>
-                            $"[Date.UTC({m.Date.Year},{m.Date.Month - 1},{m.Date.Day},{m.Date.Hour},{m.Date.Minute}),{m.Value.ToString(HlidacStatu.Util.Consts.enCulture)}]")
-                        .Aggregate((f, s) => f + "," + s)
+                            $"[Date.UTC({m.Date.Year},{m.Date.Month - 1},{m.Date.Day},{m.Date.Hour},{m.Date.Minute}),{m.Value.ToString(HlidacStatu.Util.Consts.enCulture)}]"))
                     + $"]}}"
                 );
             }
@@ -740,16 +729,16 @@ pie: {
 
         public static IHtmlContent RenderReportTableT<T>(string title, ReportDataSource<T> item,
                 string JsDataTableOptions = null, string JsDataTableId = null)
-        //  where T : class
+            //  where T : class
         {
             if (item == null)
             {
                 return HtmlString.Empty;
             }
+
             item.Title = title;
             return HtmlExtensions.DataToHTMLTable(item, JsDataTableId, JsDataTableOptions);
         }
-
 
 
         public static IHtmlContent RenderReport(ReportModel.QueueItem item,
@@ -773,7 +762,7 @@ pie: {
 
         public static IHtmlContent RenderReportTable<T>(string title, ReportModel.QueueItem item,
                 string JsDataTableOptions, string JsDataTableId = null)
-        //where T : class
+            //where T : class
         {
             if (item.Type == ReportModel.QueueItem.types.table)
             {
@@ -815,8 +804,5 @@ pie: {
                     JsDataTableOptions, JsDataTableId);
             }
         }
-
-
-
     }
 }

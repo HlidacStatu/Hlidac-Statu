@@ -127,7 +127,7 @@ namespace HlidacStatu.MCPServer.Tools
                     if (!string.IsNullOrWhiteSpace(negative_keywords))
                     {
                         query += " NOT ( "
-                            + negative_keywords.ToString().Split(splitChars, StringSplitOptions.RemoveEmptyEntries).Select(s => s.StartsWith("-") ? s : "-" + s).Aggregate((f, s) => f + " " + s)
+                            + string.Join(" ", negative_keywords.ToString().Split(splitChars, StringSplitOptions.RemoveEmptyEntries).Select(s => s.StartsWith("-") ? s : "-" + s))
                             + " ) ";
                     }
 
@@ -151,7 +151,7 @@ namespace HlidacStatu.MCPServer.Tools
                     if (icos.Count(m => !string.IsNullOrWhiteSpace(m.Value)) > 1)
                     { // into ()
                         query += " ("
-                                + icos.Where(m => !string.IsNullOrWhiteSpace(m.Value)).Select(m => m.Key + ":" + m.Value).Aggregate((f, s) => f + " OR " + s)
+                                + string.Join(" OR ", icos.Where(m => !string.IsNullOrWhiteSpace(m.Value)).Select(m => m.Key + ":" + m.Value))
                                 + ")";
                     }
 

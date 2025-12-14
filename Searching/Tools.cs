@@ -105,7 +105,7 @@ namespace HlidacStatu.Searching
                         fixPart = System.Net.WebUtility.UrlDecode(fixPart);
                         fixPart = System.Net.WebUtility.HtmlDecode(fixPart);
                         Regex opReg =
-                            new Regex(string.Format(@"(^|\s)({0})(\s|$)", operators.Aggregate((f, s) => f + "|" + s)),
+                            new Regex($@"(^|\s)({string.Join("|", operators)})(\s|$)",
                                 regexQueryOption);
 
                         //UPPER Operator

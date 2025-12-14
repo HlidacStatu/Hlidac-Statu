@@ -49,7 +49,7 @@ namespace HlidacStatu.Searching
                             q_cpv = " cPV:" + cpvs[0] + "* ";
                     }
                     else if (cpvs.Length > 1)
-                        q_cpv = " ( " + cpvs.Select(s => "cPV:" + s + "*").Aggregate((f, s) => f + " OR " + s) + " ) ";
+                        q_cpv =  $" ( {string.Join(" OR ", cpvs.Select(s => "cPV:" + s + "*"))} ) ";
 
                     return new RuleResult(SplittingQuery.SplitQuery($" {q_cpv} "), NextStep);
                 }
