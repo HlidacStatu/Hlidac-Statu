@@ -1,5 +1,6 @@
 ﻿using HlidacStatu.RegistrVozidel.Models;
 using KellermanSoftware.CompareNetObjects;
+using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,6 +12,7 @@ namespace HlidacStatu.RegistrVozidel
 {
     public static class Util
     {
+
         static string NormalizeValue(object? value)
         {
             if (value is null) return "";
