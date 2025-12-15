@@ -1,14 +1,12 @@
 ﻿using Devmasters.Batch;
-
 using HlidacStatu.Connectors;
 using HlidacStatu.DS.Graphs;
 using HlidacStatu.Entities;
 using HlidacStatu.Extensions;
 using HlidacStatu.Lib.Analytics;
-
 using Nest;
-
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -29,7 +27,7 @@ namespace HlidacStatu.Repositories
 
             static List<string> _vsechnyUrady = null;
             private static SemaphoreSlim _semaphoreSlim = new SemaphoreSlim(1, 1);
-            
+
             public static async Task<List<string>> VsechnyUradyAsync(
                 Action<string> logOutputFunc = null,
                 Action<ActionProgressData> progressOutputFunc = null,
@@ -80,7 +78,8 @@ namespace HlidacStatu.Repositories
                         icos.AddRange(velkamesta.Split(','));
 
                         icos.AddRange(
-                            (await FirmaCache.GetSubjektyForOborAsync(Firma.Zatrideni.SubjektyObory.Vse)).Select(m => m.Ico));
+                            (await FirmaCache.GetSubjektyForOborAsync(Firma.Zatrideni.SubjektyObory.Vse)).Select(m =>
+                                m.Ico));
 
                         //nejvice utajujici smluvni strany
                         _logger.Information($"Loading ICOS utajujici smluvni strany");
@@ -157,7 +156,7 @@ namespace HlidacStatu.Repositories
                                 allIcos.Add(i);
                                 foreach (var pic in fk.IcosInHolding(Relation.AktualnostType.Aktualni))
                                     allIcos.Add(pic);
-                                
+
                                 return new ActionOutputData();
                             },
                             logOutputFunc,
@@ -176,96 +175,60 @@ namespace HlidacStatu.Repositories
                         _semaphoreSlim.Release();
                     }
                 }
+
                 return _vsechnyUrady;
             }
 
-            private static
-                Dictionary<int,
-                Devmasters.Cache.Redis.Cache<GlobalStatisticsPerYear<Smlouva.Statistics.Data>>>
-                _uradySmlouvyGlobal =
-                    new();
-
-
-            public static GlobalStatisticsPerYear<Smlouva.Statistics.Data> UradySmlouvyGlobal(int? obor = null,
-                GlobalStatisticsPerYear<Smlouva.Statistics.Data> newData = null)
-            {
-                obor = obor ?? 0;
-
-                if (!_uradySmlouvyGlobal.ContainsKey(obor.Value))
-                    //L1 - 12 h
-                    //L2 - 10 let
-                    _uradySmlouvyGlobal[obor.Value] = new Devmasters.Cache.Redis.Cache<GlobalStatisticsPerYear<Smlouva.Statistics.Data>>(
-                            TimeSpan.Zero, 
-                            $"UradySmlouvyGlobal_{obor.Value}",
-                            o =>
-                            {
-                                //fill from Lib.Data.AnalysisCalculation.CalculateGlobalRankPerYear_UradySmlouvy && Tasks.UpdateWebCache
-                                return null;
-                            },
-                    Devmasters.Config.GetWebConfigValue("RedisServerUrls").Split(';'),
-                    Devmasters.Config.GetWebConfigValue("RedisBucketName"),
-                    Devmasters.Config.GetWebConfigValue("RedisUsername"),
-                    Devmasters.Config.GetWebConfigValue("RedisCachePassword")
-                            );
-
-                if (newData != null)
-                {
-                    _uradySmlouvyGlobal[obor.Value].ForceRefreshCache(newData);
-                    return newData;
-                }
-                else
-                    return _uradySmlouvyGlobal[obor.Value].Get();
-
-            }
 
             public static async Task CalculateGlobalRangeCaches_UradySmlouvyAsync(int? threads = null,
-         Action<string> logOutputFunc = null, Action<ActionProgressData> progressOutputFunc = null)
+                Action<string> logOutputFunc = null, Action<ActionProgressData> progressOutputFunc = null)
             {
-                UradySmlouvyGlobal(null, await CalculateGlobalRankPerYear_UradySmlouvyAsync(null, threads, logOutputFunc, progressOutputFunc));
+                await StatisticsCache.UradySmlouvyGlobalAsync(null,
+                    await CalculateGlobalRankPerYear_UradySmlouvyAsync(null, threads, logOutputFunc,
+                        progressOutputFunc));
                 foreach (var main in Devmasters.Enums.EnumTools
-                    .EnumToEnumerable(typeof(Smlouva.SClassification.ClassificationsTypes))
-                    .Select(m => new { value = Convert.ToInt32(m.Id), key = m.Name })
-                    .Where(m => m.value % 100 == 0)
-                    )
+                             .EnumToEnumerable(typeof(Smlouva.SClassification.ClassificationsTypes))
+                             .Select(m => new { value = Convert.ToInt32(m.Id), key = m.Name })
+                             .Where(m => m.value % 100 == 0)
+                        )
                 {
-                    UradySmlouvyGlobal(main.value, await CalculateGlobalRankPerYear_UradySmlouvyAsync(null, threads, logOutputFunc, progressOutputFunc));
+                    await StatisticsCache.UradySmlouvyGlobalAsync(main.value,
+                        await CalculateGlobalRankPerYear_UradySmlouvyAsync(null, threads, logOutputFunc,
+                            progressOutputFunc));
                 }
             }
 
-            private static async Task<GlobalStatisticsPerYear<Smlouva.Statistics.Data>> CalculateGlobalRankPerYear_UradySmlouvyAsync(
-                 int? obor = null,
-                 int? threads = null,
-                 Action<string> logOutputFunc = null, Action<ActionProgressData> progressOutputFunc = null
-                 )
+            public static async Task<GlobalStatisticsPerYear<Smlouva.Statistics.Data>>
+                CalculateGlobalRankPerYear_UradySmlouvyAsync(
+                    int? obor = null,
+                    int? threads = null,
+                    Action<string> logOutputFunc = null, Action<ActionProgressData> progressOutputFunc = null
+                )
             {
                 obor = obor ?? 0;
                 var icos = await VsechnyUradyAsync(logOutputFunc, progressOutputFunc);
-                object lockObj = new object();
-                List<StatisticsSubjectPerYear<Smlouva.Statistics.Data>> data =
-                    new List<StatisticsSubjectPerYear<Smlouva.Statistics.Data>>();
+                ConcurrentBag<StatisticsSubjectPerYear<Smlouva.Statistics.Data>> data =
+                    new ConcurrentBag<StatisticsSubjectPerYear<Smlouva.Statistics.Data>>();
 
                 await Manager.DoActionForAllAsync<string>(icos,
                     (Func<string, Task<ActionOutputData>>)(async ico =>
                     {
                         var stat = await Get(ico)?.StatistikaRegistruSmluvAsync(obor.Value);
                         if (stat != null)
-                            lock (lockObj)
-                            {
-                                data.Add(stat);
-                            }
+                            data.Add(stat);
+
                         return new ActionOutputData();
                     }), logOutputFunc, progressOutputFunc, true, maxDegreeOfParallelism: threads
-                    ,prefix: $"CalculateGlobalRankPerYear_UradySmlouvy_{obor.Value} "
+                    , prefix: $"CalculateGlobalRankPerYear_UradySmlouvy_{obor.Value} "
                     , monitor: progressOutputFunc != null ? new MonitoredTaskRepo.ForBatch() : null
-                    );
+                );
 
                 return new GlobalStatisticsPerYear<Smlouva.Statistics.Data>(
                     Consts.RegistrSmluvYearsList,
                     data,
-                     m => m.PocetSmluv >= 10
-                     );
+                    m => m.PocetSmluv >= 10
+                );
             }
-
         }
     }
 }

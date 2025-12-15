@@ -96,6 +96,28 @@ public class StatisticsCache
 
     public static ValueTask InvalidateOsobaDotaceStatisticsAsync(Osoba osoba) =>
         PermanentCache.ExpireAsync($"_Osoba_DotaceStatistics_:{osoba.NameId}");
+    
+    // Firmy global
+    // todo: Krom plnění daty se tato cache vůbec nikde nepoužívá
+    public static async Task<GlobalStatisticsPerYear<Smlouva.Statistics.Data>> UradySmlouvyGlobalAsync(int? obor = null,
+        GlobalStatisticsPerYear<Smlouva.Statistics.Data> newData = null)
+    {
+        
+        string key = $"UradySmlouvyGlobal_{obor?.ToString() ?? "null"}";
+
+        if (newData != null)
+        {
+            await PermanentCache.SetAsync(key, newData);
+            return newData;
+        }
+
+        return await PermanentCache.GetOrSetAsync(key,
+            _ => Firmy.GlobalStatistics.CalculateGlobalRankPerYear_UradySmlouvyAsync(obor),
+            options =>
+            {
+                options.ModifyEntryOptionsDuration(TimeSpan.FromHours(12), TimeSpan.FromDays(10 * 365));
+            });
+    }
 
 
     //Factories
