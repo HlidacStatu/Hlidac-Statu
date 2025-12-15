@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace HlidacStatu.RegistrVozidel
 {
-    public static class Util
+    public static partial class Util
     {
 
         static string NormalizeValue(object? value)
