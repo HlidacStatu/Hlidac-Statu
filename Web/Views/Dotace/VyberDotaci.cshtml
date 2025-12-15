@@ -10,19 +10,6 @@
     Dictionary<string, string> qs = this.Context.Request.Query
         .ToDictionary(q => q.Key, q => q.Value.ToString().Replace(HlidacStatu.Web.Controllers.DotaceController.EMPTY_FORM_VALUE,""));
 
-
-    // var poskytovateleFirmyCache = new Devmasters.Cache.Redis.Cache<string ico, long Count, decimal Sum)[]>(TimeSpan.FromDays(1),
-    // "poskytovateleDotaciFirmyInfoCache", (o)=>{
-    //     var ret = poskytovateleIcos
-    //     .Select(i => ( Firmy.Get(i.IcoPoskytovatele), i.Count, i.Sum))
-    //     .ToArray();
-    //     return ret;
-    // }, Devmasters.Config.GetWebConfigValue("RedisServerUrls").Split(';'),
-    //     Devmasters.Config.GetWebConfigValue("RedisBucketName"),
-    //     Devmasters.Config.GetWebConfigValue("RedisUsername"),
-    //     Devmasters.Config.GetWebConfigValue("RedisCachePassword")
-    // );
-
 }
 
 @section breadcrumb
