@@ -54,20 +54,16 @@ public partial class VypisVozidel : ICheckDuplicate
 
     public async Task<DuplicateCheckResult> CheckDuplicateAsync()
     {
-        var existQ = _uniqueKeys
-            .Where(m => m.Key == this.Pcv)
-            .Where(m => m.Value == this.CheckSum)
-            .Select(m => new { pk = m.Key, checksum = m.Value });
-
-        var exist = existQ
-            .FirstOrDefault();
-
-        if (exist == null)
+        if (_uniqueKeys == null)
+            throw new InvalidOperationException("PreDuplication must be called before CheckDuplicateAsync.");
+        if (_uniqueKeys.ContainsKey(this.Pcv) == false)
             return DuplicateCheckResult.NoDuplicate;
-        else if (exist.checksum != this.CheckSum)
-            return DuplicateCheckResult.SamePrimaryKeyOtherChecksum;
-        else
+
+        var checksum = _uniqueKeys[this.Pcv];
+        if (checksum == this.CheckSum)
             return DuplicateCheckResult.Same;
+        else
+            return DuplicateCheckResult.SamePrimaryKeyOtherChecksum;
     }
 
     [Name("PČV")]

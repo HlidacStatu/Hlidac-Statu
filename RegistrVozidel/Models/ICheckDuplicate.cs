@@ -7,7 +7,7 @@ namespace HlidacStatu.RegistrVozidel.Models
         {
             NoDuplicate = 0,
             SamePrimaryKeyOtherChecksum = 1,
-            Same = 1,
+            Same = 2,
         }
         //string ComputeCheckSum();
         static abstract Task PreDuplication();

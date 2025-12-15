@@ -123,8 +123,8 @@ namespace HlidacStatu.RegistrVozidel
 
             var links = new Dictionary<string, OpenDataDownload.OpenDataFile.Typy>()
                 {
-                    { "https://download.dataovozidlech.cz/vypiszregistru/vypisvozidel", OpenDataDownload.OpenDataFile.Typy.vypis_vozidel },
-                    { "https://download.dataovozidlech.cz/vypiszregistru/vozidlavyrazenazprovozu", OpenDataDownload.OpenDataFile.Typy.vozidla_vyrazena_z_provozu },
+                    //{ "https://download.dataovozidlech.cz/vypiszregistru/vypisvozidel", OpenDataDownload.OpenDataFile.Typy.vypis_vozidel },
+                    //{ "https://download.dataovozidlech.cz/vypiszregistru/vozidlavyrazenazprovozu", OpenDataDownload.OpenDataFile.Typy.vozidla_vyrazena_z_provozu },
                     { "https://download.dataovozidlech.cz/vypiszregistru/technickeprohlidky", OpenDataDownload.OpenDataFile.Typy.technicke_prohlidky },
                     { "https://download.dataovozidlech.cz/vypiszregistru/vozidladovoz", OpenDataDownload.OpenDataFile.Typy.vozidla_dovoz },
                     { "https://download.dataovozidlech.cz/vypiszregistru/vozidladoplnkovevybaveni", OpenDataDownload.OpenDataFile.Typy.vozidla_doplnkove_vybaveni },
@@ -398,7 +398,7 @@ namespace HlidacStatu.RegistrVozidel
                             pending.Add(new PendingChange<T>(rec, EntityState.Modified));
                         }
                     }
-                    catch
+                    catch (Exception e)
                     {
                         FileLog(csv.Parser);
                         badCount++;
@@ -407,20 +407,24 @@ namespace HlidacStatu.RegistrVozidel
                     if (rows % step == 0)
                     {
                         swCsv.Stop();
-                        Console.Write($"in {swCsv.ExactElapsedMiliseconds} | row {rows}, bads so far: {badCount}. Enqueue batch... ");
+                        Console.Write($"{typeof(T).Name} in {swCsv.ElapsedMilliseconds} | row {rows}, bads {badCount} | ");
+                        //_logger.Debug("{type}: Processed int {elapsed} {rows} rows, bads so far: {badCount}", swCsv.ElapsedMilliseconds, typeof(T).Name, rows, badCount);)
+                        if (pending.Any())
+                        {                       // pošleme dávku do background ukládání (hlavní while jen krátce čeká, když je fronta plná)
+                            Console.Write("Enqueue batch... ");
+                            var batch = new SaveBatch<T>(
+                                RowFrom: batchStartRow == 0 ? (rows - step + 1) : batchStartRow,
+                                RowTo: rows,
+                                Changes: pending);
 
-                        // pošleme dávku do background ukládání (hlavní while jen krátce čeká, když je fronta plná)
-                        var batch = new SaveBatch<T>(
-                            RowFrom: batchStartRow == 0 ? (rows - step + 1) : batchStartRow,
-                            RowTo: rows,
-                            Changes: pending);
+                            batchStartRow = rows + 1;
 
-                        batchStartRow = rows + 1;
+                            await channel.Writer.WriteAsync(batch, ct);
 
-                        pending = new List<PendingChange<T>>(capacity: step);
-                        await channel.Writer.WriteAsync(batch, ct);
-
-                        Console.WriteLine("queued.");
+                            pending = new List<PendingChange<T>>(capacity: step);
+                            Console.Write(" queued.");
+                        }
+                        Console.WriteLine();
                         swCsv.Restart();
                     }
                 }

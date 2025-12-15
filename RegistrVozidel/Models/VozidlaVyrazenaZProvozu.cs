@@ -12,33 +12,37 @@ namespace HlidacStatu.RegistrVozidel.Models;
 // PČV,Datum od,Datum do,Důvod,RM kód,RM Název
 public partial class VozidlaVyrazenaZProvozu : ICheckDuplicate
 {
+    static HashSet<string> _uniqueKeys = new();
     public async static Task PreDuplication()
     {
-        await Task.CompletedTask;
+        if (_uniqueKeys.Count > 0)
+            return;
+        using var db = new dbCtx();
+        _uniqueKeys = await db.VozidlaVyrazenaZProvozu
+            .AsNoTracking()
+            .Select(m => m.Pcv + "\t" + m.CheckSum)
+            .ToHashSetAsync();
+
+        //await Task.CompletedTask;
     }
     public async static Task PostDuplication()
     {
-        await Task.CompletedTask;
+        _uniqueKeys.Clear();
+
+        //await Task.CompletedTask;
     }
 
     public async Task<DuplicateCheckResult> CheckDuplicateAsync()
     {
-        using var db = new dbCtx();
-        var existQ = db.VozidlaVyrazenaZProvozu
-            .AsNoTracking()
-            .Where(m => m.Pcv == this.Pcv && m.CheckSum == this.CheckSum)
-            .Select(m => new { pk = m.Pcv, checksum = m.CheckSum });
-
-        var exist = await existQ
-            .FirstOrDefaultAsync();
-
-        if (exist == null)
+        if (_uniqueKeys == null)
+            throw new InvalidOperationException("PreDuplication must be called before CheckDuplicateAsync.");
+        var key = this.Pcv + "\t" + this.CheckSum;
+        if (_uniqueKeys.Contains(this.Pcv) == false)
             return DuplicateCheckResult.NoDuplicate;
-        else if (exist.checksum != this.CheckSum)
-            return DuplicateCheckResult.NoDuplicate; //add new record even if PK is same but checksum differ
         else
             return DuplicateCheckResult.Same;
     }
+
 
     [Name("PČV")]
     public string Pcv { get; set; }
