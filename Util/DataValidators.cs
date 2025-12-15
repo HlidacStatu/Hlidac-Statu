@@ -1,11 +1,12 @@
 ﻿using Serilog;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations.Schema;
 using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
+using HlidacStatu.Caching;
+using ZiggyCreatures.Caching.Fusion;
 
 namespace HlidacStatu.Util
 {
@@ -17,45 +18,28 @@ namespace HlidacStatu.Util
         static List<string> czobce = new List<string>();
         static List<string> skobce = new List<string>();
         static Dictionary<string, string> ciziStaty = new Dictionary<string, string>();
+        
+        private static readonly IFusionCache PermanentCache =
+            HlidacStatu.Caching.CacheFactory.CreateNew(CacheFactory.CacheType.PermanentStore, nameof(DataValidators));
 
-        //L1 - 12 h
-        //L2 - 10 let
-        static Devmasters.Cache.AWS_S3.Cache<string> czobceCache = new Devmasters.Cache.AWS_S3.Cache<string>(
-            new string[] { Devmasters.Config.GetWebConfigValue("Minio.Cache.Endpoint") },
-            Devmasters.Config.GetWebConfigValue("Minio.Cache.Bucket"),
-            Devmasters.Config.GetWebConfigValue("Minio.Cache.AccessKey"),
-            Devmasters.Config.GetWebConfigValue("Minio.Cache.SecretKey"),
-            TimeSpan.Zero, "czobce.txt",
-            (obj) =>
-            {
-                return Devmasters.Net.HttpClient.Simple.Get("https://somedata.hlidacstatu.cz/appdata/czobce.txt");
-            }, null);
+        public static string CzObceCached()
+            => PermanentCache.GetOrSet("czobce.txt",
+                _ => Devmasters.Net.HttpClient.Simple.Get("https://somedata.hlidacstatu.cz/appdata/czobce.txt"),
+                options => options.ModifyEntryOptionsDuration(TimeSpan.FromHours(12), TimeSpan.FromDays(10 * 365))
+            );
 
-        //L1 - 12 h
-        //L2 - 10 let
-        static Devmasters.Cache.AWS_S3.Cache<string> skobceCache = new Devmasters.Cache.AWS_S3.Cache<string>(
-            new string[] { Devmasters.Config.GetWebConfigValue("Minio.Cache.Endpoint") },
-            Devmasters.Config.GetWebConfigValue("Minio.Cache.Bucket"),
-            Devmasters.Config.GetWebConfigValue("Minio.Cache.AccessKey"),
-            Devmasters.Config.GetWebConfigValue("Minio.Cache.SecretKey"),
-            TimeSpan.Zero, "skobce.txt",
-            (obj) =>
-            {
-                return Devmasters.Net.HttpClient.Simple.Get("https://somedata.hlidacstatu.cz/appdata/skobce.txt");
-            }, null);
+        public static string SkObceCached()
+            => PermanentCache.GetOrSet("skobce.txt",
+                _ => Devmasters.Net.HttpClient.Simple.Get("https://somedata.hlidacstatu.cz/appdata/skobce.txt"),
+                options => options.ModifyEntryOptionsDuration(TimeSpan.FromHours(12), TimeSpan.FromDays(10 * 365))
+            );
 
-        //L1 - 12 h
-        //L2 - 10 let
-        static Devmasters.Cache.AWS_S3.Cache<string> statyCache = new Devmasters.Cache.AWS_S3.Cache<string>(
-            new string[] { Devmasters.Config.GetWebConfigValue("Minio.Cache.Endpoint") },
-            Devmasters.Config.GetWebConfigValue("Minio.Cache.Bucket"),
-            Devmasters.Config.GetWebConfigValue("Minio.Cache.AccessKey"),
-            Devmasters.Config.GetWebConfigValue("Minio.Cache.SecretKey"),
-            TimeSpan.Zero, "staty.txt",
-            (obj) =>
-            {
-                return Devmasters.Net.HttpClient.Simple.Get("https://somedata.hlidacstatu.cz/appdata/staty.txt");
-            }, null);
+        public static string StatyCached()
+            => PermanentCache.GetOrSet("staty.txt",
+                _ => Devmasters.Net.HttpClient.Simple.Get("https://somedata.hlidacstatu.cz/appdata/staty.txt"),
+                options => options.ModifyEntryOptionsDuration(TimeSpan.FromHours(12), TimeSpan.FromDays(10 * 365))
+            );
+
 
         static DataValidators()
         {
@@ -65,10 +49,6 @@ namespace HlidacStatu.Util
                 {
                     root = Devmasters.Config.GetWebConfigValue("WebAppDataPath");
                 }
-                //else if (System.Web.HttpContext.Current != null) //inside web app
-                //{
-                //    root = System.Web.HttpContext.Current.Server.MapPath("~/App_Data/");
-                //}
                 else
                     root = Devmasters.IO.IOTools.GetExecutingDirectoryName(true);
 
@@ -76,7 +56,7 @@ namespace HlidacStatu.Util
                     root = root + Path.DirectorySeparatorChar;
 
 
-                var tmp = statyCache.Get().Split("\n", StringSplitOptions.RemoveEmptyEntries)
+                var tmp = StatyCached().Split("\n", StringSplitOptions.RemoveEmptyEntries)
                     .Select(m => m.Split('\t'))
                     .Select(mm =>
                     {
@@ -94,10 +74,10 @@ namespace HlidacStatu.Util
                         ciziStaty.Add(kv.Key, kv.Value);
                 }
 
-                czobce = czobceCache.Get().Split("\n", StringSplitOptions.RemoveEmptyEntries)
+                czobce = CzObceCached().Split("\n", StringSplitOptions.RemoveEmptyEntries)
                     .Select(m => Devmasters.TextUtil.RemoveDiacritics(m.Trim()).ToLower())
                     .ToList();
-                skobce = skobceCache.Get().Split("\n", StringSplitOptions.RemoveEmptyEntries)
+                skobce = SkObceCached().Split("\n", StringSplitOptions.RemoveEmptyEntries)
                     .Select(m => Devmasters.TextUtil.RemoveDiacritics(m.Trim()).ToLower())
                     .ToList();
             }
@@ -309,9 +289,6 @@ namespace HlidacStatu.Util
 
                     if (Regex.IsMatch(dadresa, reg, Consts.DefaultRegexQueryOption))
                         return o;
-
-                    //if (dadresa.Contains(o))
-                    //    return o;
                 }
             }
 
