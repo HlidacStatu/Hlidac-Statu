@@ -13,8 +13,6 @@ using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.Serialization;
 using HlidacStatu.Caching;
-using HlidacStatu.Entities.Facts;
-using HlidacStatu.Extensions;
 using ZiggyCreatures.Caching.Fusion;
 
 namespace HlidacStatu.Repositories
@@ -80,7 +78,6 @@ namespace HlidacStatu.Repositories
         public static Devmasters.Cache.LocalMemory.Cache<Dictionary<string, NespolehlivyPlatceDPH>>
             NespolehlivyPlatciDPH = null;
 
-        public static Devmasters.Cache.LocalMemory.Cache<Darujme.Stats> DarujmeStats = null;
         public static Devmasters.Cache.LocalMemory.Cache<Dictionary<string, string>> ZkratkyStran_cache = null;
 
         public static Dictionary<string, TemplatedQuery> Afery = new Dictionary<string, TemplatedQuery>();
@@ -191,44 +188,7 @@ namespace HlidacStatu.Repositories
             swl.StopPreviousAndStartNextLap(Util.DebugUtil.GetClassAndMethodName(MethodBase.GetCurrentMethod()) +
                                             " var SponzorujiciFirmy_Vsechny force load");
             SponzorujiciFirmy_Vsechny.Get(); //force to load
-
-            _logger.Information("Static data - DarujmeStats");
-
-            swl.StopPreviousAndStartNextLap(Util.DebugUtil.GetClassAndMethodName(MethodBase.GetCurrentMethod()) +
-                                            " var DarujmeStats");
-            DarujmeStats = new Devmasters.Cache.LocalMemory.Cache<Darujme.Stats>(
-                TimeSpan.FromHours(3), (obj) =>
-                {
-                    var defData = new Darujme.Stats()
-                    {
-                        projectStats = new Darujme.Stats.Projectstats()
-                        {
-                            collectedAmountEstimate = new Darujme.Stats.Projectstats.Collectedamountestimate()
-                            {
-                                cents = 70891100,
-                                currency = "CZK"
-                            },
-                            donorsCount = 280,
-                            projectId = 1200384
-                        }
-                    };
-                    try
-                    {
-                        using (Devmasters.Net.HttpClient.URLContent url =
-                               new Devmasters.Net.HttpClient.URLContent(
-                                   "https://www.darujme.cz/api/v1/project/1200384/stats?apiId=74233883&apiSecret=q2vqimypo2ohpa0qi6g9zwn37rb1bpaan12gulqk"))
-                        {
-                            return Newtonsoft.Json.JsonConvert.DeserializeObject<Darujme.Stats>(url.GetContent().Text);
-                        }
-                    }
-                    catch (Exception e)
-                    {
-                        _logger.Error(e, "Static data - DarujmeStats");
-
-                        return defData;
-                    }
-                }
-            );
+            
 
             //migrace: tohle by mělo jít odsud do Repo cache
             ZkratkyStran_cache = new Devmasters.Cache.LocalMemory.Cache<Dictionary<string, string>>

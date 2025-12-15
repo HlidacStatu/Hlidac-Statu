@@ -10,9 +10,9 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text.RegularExpressions;
+using HlidacStatu.Caching;
 using Serilog;
-using Amazon.Runtime.Internal.Util;
-using Microsoft.EntityFrameworkCore.Query;
+using ZiggyCreatures.Caching.Fusion;
 
 namespace HlidacStatu.Entities
 {
@@ -25,53 +25,40 @@ namespace HlidacStatu.Entities
         public static HashSet<string> TopPrijmeni = new HashSet<string>();
 
         public static Dictionary<string, string> CPVKody = new Dictionary<string, string>();
+        
+        private static readonly IFusionCache PermanentCache =
+            HlidacStatu.Caching.CacheFactory.CreateNew(CacheFactory.CacheType.PermanentStore, nameof(Validators));
 
-        static RegexOptions regexOptions = Util.Consts.DefaultRegexQueryOption;
+        public static string JmenaCached()
+            => PermanentCache.GetOrSet("jmena.txt",
+                _ => Devmasters.Net.HttpClient.Simple.Get("https://somedata.hlidacstatu.cz/appdata/jmena.txt"),
+                options => options.ModifyEntryOptionsDuration(TimeSpan.FromDays(10 * 365), TimeSpan.FromDays(10 * 365))
+            );
 
-        //L1 - 10 let
-        //L2 - 10 let
-        static Devmasters.Cache.AWS_S3.Cache<string> jmenaCache = new Devmasters.Cache.AWS_S3.Cache<string>(
-            new string[] { Devmasters.Config.GetWebConfigValue("Minio.Cache.Endpoint") },
-            Devmasters.Config.GetWebConfigValue("Minio.Cache.Bucket"),
-            Devmasters.Config.GetWebConfigValue("Minio.Cache.AccessKey"),
-            Devmasters.Config.GetWebConfigValue("Minio.Cache.SecretKey"),
-            TimeSpan.Zero, "jmena.txt", (obj) =>
-                {
-                    return Devmasters.Net.HttpClient.Simple.Get("https://somedata.hlidacstatu.cz/appdata/jmena.txt");
+        public static string PrijmeniCached()
+            => PermanentCache.GetOrSet("prijmeni.txt",
+                _ => Devmasters.Net.HttpClient.Simple.Get("https://somedata.hlidacstatu.cz/appdata/prijmeni.txt"),
+                options => options.ModifyEntryOptionsDuration(TimeSpan.FromDays(10 * 365), TimeSpan.FromDays(10 * 365))
+            );
 
-                }, null);
+        public static string TopJmenaCached()
+            => PermanentCache.GetOrSet("topjmena.txt",
+                _ => Devmasters.Net.HttpClient.Simple.Get("https://somedata.hlidacstatu.cz/appdata/topjmena.txt"),
+                options => options.ModifyEntryOptionsDuration(TimeSpan.FromDays(10 * 365), TimeSpan.FromDays(10 * 365))
+            );
 
-        //L1 - 10 let
-        //L2 - 10 let
-        static Devmasters.Cache.AWS_S3.Cache<string> prijmeniCache = new Devmasters.Cache.AWS_S3.Cache<string>(new string[] { Devmasters.Config.GetWebConfigValue("Minio.Cache.Endpoint") }, Devmasters.Config.GetWebConfigValue("Minio.Cache.Bucket"), Devmasters.Config.GetWebConfigValue("Minio.Cache.AccessKey"), Devmasters.Config.GetWebConfigValue("Minio.Cache.SecretKey"),
-            TimeSpan.Zero, "prijmeni.txt", (obj) =>
-            {
-                return Devmasters.Net.HttpClient.Simple.Get("https://somedata.hlidacstatu.cz/appdata/prijmeni.txt");
-            }, null);
+        public static string TopPrijmeniCached()
+            => PermanentCache.GetOrSet("topprijmeni.txt",
+                _ => Devmasters.Net.HttpClient.Simple.Get("https://somedata.hlidacstatu.cz/appdata/topprijmeni.txt"),
+                options => options.ModifyEntryOptionsDuration(TimeSpan.FromDays(10 * 365), TimeSpan.FromDays(10 * 365))
+            );
 
-        //L1 - 10 let
-        //L2 - 10 let
-        static Devmasters.Cache.AWS_S3.Cache<string> topjmenaCache = new Devmasters.Cache.AWS_S3.Cache<string>(new string[] { Devmasters.Config.GetWebConfigValue("Minio.Cache.Endpoint") }, Devmasters.Config.GetWebConfigValue("Minio.Cache.Bucket"), Devmasters.Config.GetWebConfigValue("Minio.Cache.AccessKey"), Devmasters.Config.GetWebConfigValue("Minio.Cache.SecretKey"),
-            TimeSpan.Zero, "topjmena.txt", (obj) =>
-            {
-                return Devmasters.Net.HttpClient.Simple.Get("https://somedata.hlidacstatu.cz/appdata/topjmena.txt");
-            }, null);
-
-        //L1 - 10 let
-        //L2 - 10 let
-        static Devmasters.Cache.AWS_S3.Cache<string> topprijmeniCache = new Devmasters.Cache.AWS_S3.Cache<string>(new string[] { Devmasters.Config.GetWebConfigValue("Minio.Cache.Endpoint") }, Devmasters.Config.GetWebConfigValue("Minio.Cache.Bucket"), Devmasters.Config.GetWebConfigValue("Minio.Cache.AccessKey"), Devmasters.Config.GetWebConfigValue("Minio.Cache.SecretKey"),
-            TimeSpan.Zero, "topprijmeni.txt", (obj) =>
-            {
-                return Devmasters.Net.HttpClient.Simple.Get("https://somedata.hlidacstatu.cz/appdata/topprijmeni.txt");
-            }, null);
-
-        //L1 - 10 let
-        //L2 - 10 let
-        static Devmasters.Cache.AWS_S3.Cache<string> cpvCache = new Devmasters.Cache.AWS_S3.Cache<string>(new string[] { Devmasters.Config.GetWebConfigValue("Minio.Cache.Endpoint") }, Devmasters.Config.GetWebConfigValue("Minio.Cache.Bucket"), Devmasters.Config.GetWebConfigValue("Minio.Cache.AccessKey"), Devmasters.Config.GetWebConfigValue("Minio.Cache.SecretKey"),
-            TimeSpan.Zero, "CPV_CS.txt", (obj) =>
-            {
-                return Devmasters.Net.HttpClient.Simple.Get("https://somedata.hlidacstatu.cz/appdata/CPV_CS.txt");
-            }, null);
+        public static string CpvCached()
+            => PermanentCache.GetOrSet("CPV_CS.txt",
+                _ => Devmasters.Net.HttpClient.Simple.Get("https://somedata.hlidacstatu.cz/appdata/CPV_CS.txt"),
+                options => options.ModifyEntryOptionsDuration(TimeSpan.FromDays(10 * 365), TimeSpan.FromDays(10 * 365))
+            );
+        
 
         static Validators()
         {
@@ -88,28 +75,28 @@ namespace HlidacStatu.Entities
 
             swl.StopPreviousAndStartNextLap(Util.DebugUtil.GetClassAndMethodName(MethodBase.GetCurrentMethod())+" var jmeno");
 
-            Jmena = new HashSet<string>(jmenaCache.Get().Split("\n", StringSplitOptions.RemoveEmptyEntries)
+            Jmena = new HashSet<string>(JmenaCached().Split("\n", StringSplitOptions.RemoveEmptyEntries)
                 .Select(m => TextUtil.RemoveDiacritics(m.ToLower().Trim()))
                 .Distinct());
 
             swl.StopPreviousAndStartNextLap(Util.DebugUtil.GetClassAndMethodName(MethodBase.GetCurrentMethod()) + " var prijmeni");
-            Prijmeni = new HashSet<string>(prijmeniCache.Get().Split("\n", StringSplitOptions.RemoveEmptyEntries)
+            Prijmeni = new HashSet<string>(PrijmeniCached().Split("\n", StringSplitOptions.RemoveEmptyEntries)
                 .Select(m => TextUtil.RemoveDiacritics(m.ToLower().Trim()))
                 .Distinct());
 
             swl.StopPreviousAndStartNextLap(Util.DebugUtil.GetClassAndMethodName(MethodBase.GetCurrentMethod()) + " var topjmena");
-            TopJmena = new HashSet<string>(topjmenaCache.Get().Split("\n", StringSplitOptions.RemoveEmptyEntries)
+            TopJmena = new HashSet<string>(TopJmenaCached().Split("\n", StringSplitOptions.RemoveEmptyEntries)
                 .Select(m => TextUtil.RemoveDiacritics(m.ToLower().Trim()))
                 .Distinct());
             swl.StopPreviousAndStartNextLap(Util.DebugUtil.GetClassAndMethodName(MethodBase.GetCurrentMethod()) + " var toprijmeni");
-            TopPrijmeni = new HashSet<string>(topprijmeniCache.Get().Split("\n", StringSplitOptions.RemoveEmptyEntries)
+            TopPrijmeni = new HashSet<string>(TopPrijmeniCached().Split("\n", StringSplitOptions.RemoveEmptyEntries)
                 .Select(m => TextUtil.RemoveDiacritics(m.ToLower().Trim()))
                 .Distinct());
 
             swl.StopPreviousAndStartNextLap(Util.DebugUtil.GetClassAndMethodName(MethodBase.GetCurrentMethod()) + " loading cpv_cs");
             Log.ForContext(typeof(Validators)).Information("Static data - loading cpv_cs");
 
-            using (StringReader r = new StringReader(cpvCache.Get()))
+            using (StringReader r = new StringReader(CpvCached()))
             {
                 var csv = new CsvHelper.CsvReader(r,
                     new CsvHelper.Configuration.CsvConfiguration(Util.Consts.csCulture)

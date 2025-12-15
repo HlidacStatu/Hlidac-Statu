@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using HlidacStatu.Caching;
 using HlidacStatu.DS.Graphs;
+using HlidacStatu.Entities;
+using HlidacStatu.Lib.Analytics;
 using HlidacStatu.Repositories.Analysis;
 using ZiggyCreatures.Caching.Fusion;
 
@@ -54,6 +56,38 @@ public class MaterializedViewsCache
             options => options.ModifyEntryOptionsDuration(TimeSpan.FromHours(12), TimeSpan.FromDays(10 * 365)),
             data
         );
+    
+    // dotace reports
+    // to rebuild use Tasks.RebuildStatisticsDotaceAsync()
+    public static ValueTask<string[]> AllIcosInDotaceCacheAsync(string[] data = null)
+        => PermanentCache.LoadOrSetDataFromPermanentCacheAsync<string[]>(
+            "_allIcosInDotaceCache",
+            options => options.ModifyEntryOptionsDuration(TimeSpan.FromHours(12), TimeSpan.FromDays(10 * 365)),
+            data
+        );
+
+    public static ValueTask<StatisticsSubjectPerYear<Firma.Statistics.Dotace>[]> TopDotaceHoldingCacheAsync(
+        StatisticsSubjectPerYear<Firma.Statistics.Dotace>[] data = null)
+        => PermanentCache.LoadOrSetDataFromPermanentCacheAsync<StatisticsSubjectPerYear<Firma.Statistics.Dotace>[]>(
+            "_topDotaceHoldingCache",
+            options => options.ModifyEntryOptionsDuration(TimeSpan.FromHours(12), TimeSpan.FromDays(10 * 365)),
+            data
+        );
+
+    public static ValueTask<StatisticsSubjectPerYear<Firma.Statistics.Dotace>[]> TopDotaceHoldingStatniCacheAsync(
+        StatisticsSubjectPerYear<Firma.Statistics.Dotace>[] data = null)
+        => PermanentCache.LoadOrSetDataFromPermanentCacheAsync<StatisticsSubjectPerYear<Firma.Statistics.Dotace>[]>(
+            "_topDotaceHoldingStatniCache",
+            options => options.ModifyEntryOptionsDuration(TimeSpan.FromHours(12), TimeSpan.FromDays(10 * 365)),
+            data
+        );
+
+    
+    
+    
+    
+    
+    
 
     //Caches with factory
     public static async Task<AnalysisCalculation.VazbyFiremNaUradyStat>

@@ -10,6 +10,7 @@ using HlidacStatu.Caching;
 using HlidacStatu.Lib.Web.UI.Attributes;
 using ZiggyCreatures.Caching.Fusion;
 using HlidacStatu.LibCore.Filters;
+using HlidacStatu.Repositories.Cache;
 
 namespace HlidacStatu.Web.Controllers
 {
@@ -191,9 +192,9 @@ namespace HlidacStatu.Web.Controllers
 
             List<Lib.Analytics.StatisticsSubjectPerYear<Firma.Statistics.Dotace>> data = null;
             if (ftyp.HasValue && ftyp.Value == (int)Firma.TypSubjektuEnum.PatrimStatu)
-                data = DotaceRepo.TopDotaceHoldingStatniCache.Get().ToList();
+                data = (await MaterializedViewsCache.TopDotaceHoldingStatniCacheAsync()).ToList();
             else
-                data = DotaceRepo.TopDotaceHoldingCache.Get().ToList();
+                data = (await MaterializedViewsCache.TopDotaceHoldingCacheAsync()).ToList();
 
             return View(data);
         }
