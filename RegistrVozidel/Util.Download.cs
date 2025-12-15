@@ -116,8 +116,8 @@ namespace HlidacStatu.RegistrVozidel
 
                 var links = new Dictionary<string, OpenDataDownload.OpenDataFile.Typy>()
                 {
-                    //{ "https://download.dataovozidlech.cz/vypiszregistru/vypisvozidel", OpenDataDownload.OpenDataFile.Typy.vypis_vozidel },
-                    //{ "https://download.dataovozidlech.cz/vypiszregistru/vozidlavyrazenazprovozu", OpenDataDownload.OpenDataFile.Typy.vozidla_vyrazena_z_provozu },
+                    { "https://download.dataovozidlech.cz/vypiszregistru/vypisvozidel", OpenDataDownload.OpenDataFile.Typy.vypis_vozidel },
+                    { "https://download.dataovozidlech.cz/vypiszregistru/vozidlavyrazenazprovozu", OpenDataDownload.OpenDataFile.Typy.vozidla_vyrazena_z_provozu },
                     { "https://download.dataovozidlech.cz/vypiszregistru/technickeprohlidky", OpenDataDownload.OpenDataFile.Typy.technicke_prohlidky },
                     { "https://download.dataovozidlech.cz/vypiszregistru/vozidladovoz", OpenDataDownload.OpenDataFile.Typy.vozidla_dovoz },
                     { "https://download.dataovozidlech.cz/vypiszregistru/vozidladoplnkovevybaveni", OpenDataDownload.OpenDataFile.Typy.vozidla_doplnkove_vybaveni },
