@@ -12,16 +12,34 @@ namespace HlidacStatu.RegistrVozidel.Models;
 // PČV,Typ subjektu,Vztah k vozidlu,Aktuální,IČO,Název,Adresa,Datum od,Datum do
 public partial class VlastnikProvozovatelVozidla : ICheckDuplicate
 {
+    static Dictionary<string, string> _uniqueKeys = new();
+    public async static Task PreDuplication()
+    {
+        if (_uniqueKeys.Count > 0)
+            return;
+        using var db = new dbCtx();
+        _uniqueKeys = await db.VlastnikProvozovatelVozidla
+            .AsNoTracking()
+            .Select(m => new { pk = m.Pcv, checksum = m.CheckSum })
+            .ToDictionaryAsync(k => k.pk, v => v.checksum);
+
+        //await Task.CompletedTask;
+    }
+    public async static Task PostDuplication()
+    {
+        _uniqueKeys.Clear();
+
+        //await Task.CompletedTask;
+    }
     public async Task<DuplicateCheckResult> CheckDuplicateAsync()
     {
-        using var db = new dbCtx();
-        var existQ = db.VypisVozidel
-            .AsNoTracking()
-            .Where(m => m.Pcv == this.Pcv)
-            .Select(m => new { pk = m.Pcv, checksum = m.CheckSum });
+        var existQ = _uniqueKeys
+            .Where(m => m.Key == this.Pcv)
+            .Where(m => m.Value == this.CheckSum)
+            .Select(m => new { pk = m.Key, checksum = m.Value });
 
-        var exist = await existQ
-            .FirstOrDefaultAsync();
+        var exist = existQ
+            .FirstOrDefault();
 
         if (exist == null)
             return DuplicateCheckResult.NoDuplicate;

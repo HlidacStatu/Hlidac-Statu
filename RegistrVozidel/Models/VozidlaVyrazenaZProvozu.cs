@@ -12,12 +12,21 @@ namespace HlidacStatu.RegistrVozidel.Models;
 // PČV,Datum od,Datum do,Důvod,RM kód,RM Název
 public partial class VozidlaVyrazenaZProvozu : ICheckDuplicate
 {
+    public async static Task PreDuplication()
+    {
+        await Task.CompletedTask;
+    }
+    public async static Task PostDuplication()
+    {
+        await Task.CompletedTask;
+    }
+
     public async Task<DuplicateCheckResult> CheckDuplicateAsync()
     {
         using var db = new dbCtx();
-        var existQ = db.VypisVozidel
+        var existQ = db.VozidlaVyrazenaZProvozu
             .AsNoTracking()
-            .Where(m => m.Pcv == this.Pcv)
+            .Where(m => m.Pcv == this.Pcv && m.CheckSum == this.CheckSum)
             .Select(m => new { pk = m.Pcv, checksum = m.CheckSum });
 
         var exist = await existQ

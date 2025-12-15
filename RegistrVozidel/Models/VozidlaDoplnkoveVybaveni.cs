@@ -10,12 +10,21 @@ namespace HlidacStatu.RegistrVozidel.Models;
 
 public partial class VozidlaDoplnkoveVybaveni : ICheckDuplicate
 {
+    public async static Task PreDuplication()
+    {
+        await Task.CompletedTask;
+    }
+    public async static Task PostDuplication()
+    {
+        await Task.CompletedTask;
+    }
+
     public async Task<DuplicateCheckResult> CheckDuplicateAsync()
     {
         using var db = new dbCtx();
-        var existQ = db.VypisVozidel
+        var existQ = db.VozidlaDoplnkoveVybaveni
             .AsNoTracking()
-            .Where(m => m.Pcv == this.Pcv)
+            .Where(m => m.Pcv == this.Pcv && m.CheckSum == this.CheckSum)
             .Select(m => new { pk = m.Pcv, checksum = m.CheckSum });
 
         var exist = await existQ

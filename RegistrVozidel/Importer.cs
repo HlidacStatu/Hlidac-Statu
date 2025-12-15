@@ -12,7 +12,7 @@ using System.Threading.Channels;
 namespace HlidacStatu.RegistrVozidel
 {
 
-    public class Importer
+    public partial class Importer
     {
         private static readonly ILogger _logger = Serilog.Log.ForContext<Importer>();
 
@@ -21,52 +21,6 @@ namespace HlidacStatu.RegistrVozidel
         private record PendingChange<T>(T Entity, EntityState State);
         // dávka změn
         private record SaveBatch<T>(int RowFrom, int RowTo, List<PendingChange<T>> Changes);
-
-
-        public class OpenDataDownload
-        {
-
-
-
-            public List<OpenDataFile> MesicniDavka { get; set; } = new();
-            public DateTime MesicRok { get; set; }
-            public class OpenDataFile
-            {
-                public enum Typy : int
-                {
-                    vypis_vozidel = 3,
-                    technicke_prohlidky = 4,
-                    vozidla_vyrazena_z_provozu = 6,
-                    vozidla_dovoz = 7,
-                    vozidla_doplnkove_vybaveni = 8,
-                    zpravy_vyrobce_zastupce = 9,
-                    vlastnik_provozovatel_vozidla = 10
-                }
-
-                string _directory = "";
-                public string Directory
-                {
-                    get
-                    {
-                        return _directory;
-                    }
-                    set
-                    {
-                        var tmp = value;
-                        if (tmp.EndsWith(System.IO.Path.DirectorySeparatorChar) == false)
-                            tmp += System.IO.Path.DirectorySeparatorChar;
-                        _directory = tmp;
-                    }
-
-                }
-                public string Nazev { get; set; }
-                public string NormalizedNazev { get; set; }
-                public string Guid { get; set; }
-                public Typy Typ { get; set; }
-                public DateTime Vygenerovano { get; set; }
-                public int Skip { get; set; }
-            }
-        }
 
 
         static async Task<string?> GetRemoteFileNameAsync(Uri url, CancellationToken ct = default)
@@ -187,16 +141,15 @@ namespace HlidacStatu.RegistrVozidel
                     _logger.Error("Cannot get remote file name for {url}", link.Key);
                     continue;
                 }
-                    var df = new OpenDataDownload.OpenDataFile
-                        {
-                            Directory = fulldir,
-                            Nazev = fileName,
-                            NormalizedNazev = fileName,
-                            Guid = Guid.NewGuid().ToString(),
-                            Typ = link.Value,
-                            Vygenerovano = DateTime.Now,
-                            Skip = 0
-                        };
+                var df = new OpenDataDownload.OpenDataFile
+                {
+                    Directory = fulldir,
+                    Nazev = fileName,
+                    Guid = Guid.NewGuid().ToString(),
+                    Typ = link.Value,
+                    Vygenerovano = DateTime.Now,
+                    Skip = 0
+                };
                 downloads[0].MesicniDavka.Add(df);
 
                 if (System.IO.File.Exists(df.Directory + df.Nazev))
@@ -205,6 +158,7 @@ namespace HlidacStatu.RegistrVozidel
                 }
                 else
                 {
+                    _logger.Information("Downloading {url}", link.Key);
                     await DownloadToFileWithProgressAsync(httpClient, new Uri(link.Key), df.Directory + df.Nazev, progress);
                 }
             }
@@ -304,7 +258,7 @@ namespace HlidacStatu.RegistrVozidel
           Func<dbCtx> dbFactory,
           Action<string> log,
           CancellationToken ct)
-          where T : class
+          where T : ICheckDuplicate, new()
         {
             await foreach (var batch in reader.ReadAllAsync(ct))
             {
@@ -326,12 +280,45 @@ namespace HlidacStatu.RegistrVozidel
         }
 
 
-        public async Task ImportAsync<T>(
-        OpenDataDownload.OpenDataFile file,
-        int step = 100,
-        Func<dbCtx> dbFactory = null,
-        CancellationToken ct = default)
-        where T : class
+        public async Task ImportAsync(
+                OpenDataDownload.OpenDataFile file,
+                int step = 100,
+                Func<dbCtx> dbFactory = null,
+                CancellationToken ct = default)
+        {
+            switch (file.Typ)
+            {
+                case OpenDataDownload.OpenDataFile.Typy.vypis_vozidel:
+                    await ImportAsync<VypisVozidel>(file, step, dbFactory, ct);
+                    break;
+                case OpenDataDownload.OpenDataFile.Typy.technicke_prohlidky:
+                    await ImportAsync<TechnickeProhlidky>(file, step, dbFactory, ct);
+                    break;
+                case OpenDataDownload.OpenDataFile.Typy.vozidla_vyrazena_z_provozu:
+                    await ImportAsync<VozidlaVyrazenaZProvozu>(file, step, dbFactory, ct);
+                    break;
+                case OpenDataDownload.OpenDataFile.Typy.vozidla_dovoz:
+                    await ImportAsync<VozidlaDovoz>(file, step, dbFactory, ct);
+                    break;
+                case OpenDataDownload.OpenDataFile.Typy.vozidla_doplnkove_vybaveni:
+                    await ImportAsync<VozidlaDoplnkoveVybaveni>(file, step, dbFactory, ct);
+                    break;
+                case OpenDataDownload.OpenDataFile.Typy.zpravy_vyrobce_zastupce:
+                    await ImportAsync<ZpravyVyrobceZastupce>(file, step, dbFactory, ct);
+                    break;
+                case OpenDataDownload.OpenDataFile.Typy.vlastnik_provozovatel_vozidla:
+                    await ImportAsync<VlastnikProvozovatelVozidla>(file, step, dbFactory, ct);
+                    break;
+                default:
+                    throw new NotSupportedException($"File type {file.Typ} is not supported for import.");
+            }
+        }
+        private async Task ImportAsync<T>(
+                OpenDataDownload.OpenDataFile file,
+                int step = 100,
+                Func<dbCtx> dbFactory = null,
+                CancellationToken ct = default)
+        where T : ICheckDuplicate, new()
         {
             int rows = 0;
             int badCount = 0;
@@ -368,10 +355,16 @@ namespace HlidacStatu.RegistrVozidel
                 .ToArray();
 
 
+            
             var swCsv = new Devmasters.DT.StopWatchEx();
 
             var pending = new List<PendingChange<T>>(capacity: step);
             int batchStartRow = 0;
+
+            _logger.Information("Preparing duplication check for {type}", typeof(T).Name);
+            await T.PreDuplication();
+
+            _logger.Information("Parsing CSV {file} for {type}", file.NormalizedNazev, typeof(T).Name);
 
             using (var reader = new StreamReader(file.Directory + file.NormalizedNazev, System.Text.Encoding.UTF8))
             using (var csv = new CsvReader(reader, csvConfiguration))
@@ -394,7 +387,7 @@ namespace HlidacStatu.RegistrVozidel
                         T rec = csv.GetRecord<T>();
 
                         // dup-check (zůstává v hlavním vlákně)
-                        var check = await ((Models.ICheckDuplicate)rec).CheckDuplicateAsync();
+                        var check = await rec.CheckDuplicateAsync();
 
                         if (check == Models.ICheckDuplicate.DuplicateCheckResult.NoDuplicate)
                         {
@@ -443,9 +436,15 @@ namespace HlidacStatu.RegistrVozidel
 
                 await channel.Writer.WriteAsync(batch, ct);
             }
+            _logger.Information("Waiting for {file} to finish processing {type}", file.NormalizedNazev, typeof(T).Name);
 
             channel.Writer.Complete();
             await Task.WhenAll(workers);
+
+            _logger.Information("Post duplication for {type}", typeof(T).Name);
+            await T.PostDuplication();
+            _logger.Information("Done {type}", typeof(T).Name);
+
         }
 
         public async Task __ReadCSV_and_DBSyncAsync<T>(OpenDataDownload.OpenDataFile file)

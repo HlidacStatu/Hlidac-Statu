@@ -10,7 +10,8 @@ namespace HlidacStatu.RegistrVozidel.Models
             Same = 1,
         }
         //string ComputeCheckSum();
-
+        static abstract Task PreDuplication();
+        static abstract Task PostDuplication();
         Task<DuplicateCheckResult> CheckDuplicateAsync();
         
 

@@ -67,6 +67,11 @@ public partial class dbCtx : DbContext
                 .HasColumnName("PCV");
             entity.Property(e => e.PlatnostDo).HasColumnName("Platnost_do");
             entity.Property(e => e.PlatnostOd).HasColumnName("Platnost_od");
+
+            entity.Property(e => e.CheckSum)
+                .HasMaxLength(64)
+                .HasColumnName("CheckSum");
+
         });
 
         modelBuilder.Entity<VlastnikProvozovatelVozidla>(entity =>
@@ -90,6 +95,10 @@ public partial class dbCtx : DbContext
             entity.Property(e => e.VztahKVozidlu)
                 .HasColumnType("money")
                 .HasColumnName("Vztah_k_vozidlu");
+            entity.Property(e => e.CheckSum)
+                .HasMaxLength(64)
+                .HasColumnName("CheckSum");
+
         });
 
         modelBuilder.Entity<VozidlaDoplnkoveVybaveni>(entity =>
@@ -104,6 +113,10 @@ public partial class dbCtx : DbContext
             entity.Property(e => e.Pcv)
                 .HasMaxLength(30)
                 .HasColumnName("PCV");
+            entity.Property(e => e.CheckSum)
+                .HasMaxLength(64)
+                .HasColumnName("CheckSum");
+
         });
 
         modelBuilder.Entity<VozidlaDovoz>(entity =>
@@ -119,6 +132,11 @@ public partial class dbCtx : DbContext
             entity.Property(e => e.Pcv)
                 .HasMaxLength(30)
                 .HasColumnName("PCV");
+
+            entity.Property(e => e.CheckSum)
+                .HasMaxLength(64)
+                .HasColumnName("CheckSum");
+
         });
 
         modelBuilder.Entity<VozidlaVyrazenaZProvozu>(entity =>
@@ -139,6 +157,10 @@ public partial class dbCtx : DbContext
                 .HasColumnType("money")
                 .HasColumnName("RM_kod");
             entity.Property(e => e.RmNazev).HasColumnName("RM_Nazev");
+            entity.Property(e => e.CheckSum)
+                .HasMaxLength(64)
+                .HasColumnName("CheckSum");
+
         });
 
         modelBuilder.Entity<VypisVozidel>(entity =>
@@ -407,6 +429,10 @@ public partial class dbCtx : DbContext
             entity.Property(e => e.Pcv)
                 .HasMaxLength(30)
                 .HasColumnName("PCV");
+            entity.Property(e => e.CheckSum)
+                .HasMaxLength(64)
+                .HasColumnName("CheckSum");
+
         });
 
         OnModelCreatingPartial(modelBuilder);
