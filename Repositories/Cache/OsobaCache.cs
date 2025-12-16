@@ -22,8 +22,12 @@ public static class OsobaCache
     public static ValueTask<InfoFact[]> GetInfoFactsAsync(Osoba osoba) =>
         PostgreCache.GetOrSetAsync($"_InfoFacts:{osoba.NameId}",
             _ => OsobaExtension.InfoFactsAsync(osoba),
-            options => options.ModifyEntryOptionsDuration(TimeSpan.FromHours(6))
-        );
+            options =>
+            {
+                options.ModifyEntryOptionsDuration(TimeSpan.FromHours(6));
+                options.ModifyEntryOptionsFactoryTimeouts(
+                    factoryHardTimeout: TimeSpan.FromMinutes(30));
+            });
 
     public static ValueTask InvalidateInfoFactsAsync(Osoba osoba) =>
         PostgreCache.ExpireAsync($"_InfoFacts:{osoba.NameId}");

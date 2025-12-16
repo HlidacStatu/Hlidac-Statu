@@ -27,8 +27,12 @@ public static class FirmaCache
     public static ValueTask<InfoFact[]> GetInfoFactsAsync(Firma firma) =>
         PostgreCache.GetOrSetAsync($"_InfoFacts:{firma.ICO}",
             _ => FirmaExtension.GetDirectInfoFactsAsync(firma),
-            options => options.ModifyEntryOptionsDuration(TimeSpan.FromHours(6))
-        );
+            options =>
+            {
+                options.ModifyEntryOptionsDuration(TimeSpan.FromHours(6));
+                options.ModifyEntryOptionsFactoryTimeouts(
+                    factoryHardTimeout: TimeSpan.FromMinutes(30));
+            });
 
     public static ValueTask InvalidateInfoFactsAsync(Firma firma) => PostgreCache.ExpireAsync($"_InfoFacts:{firma.ICO}");
 
