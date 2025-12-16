@@ -1,10 +1,9 @@
 using Devmasters;
-
 using HlidacStatu.Entities;
-
 using System;
 using System.Linq;
 using System.Text.RegularExpressions;
+using HlidacStatu.Repositories.Cache;
 
 namespace HlidacStatu.Repositories
 {
@@ -107,11 +106,11 @@ namespace HlidacStatu.Repositories
 
 
                     if (firmaBezKoncovky.Length > 3
-                        && FirmyNazvyOnlyAscii.Get().ContainsKey(simpleName)
+                        && FirmaCache.FirmyNazvyOnlyAscii().ContainsKey(simpleName)
                     )
                     {
                         //nasel jsem ico?
-                        foreach (var ico in FirmyNazvyOnlyAscii.Get()[simpleName])
+                        foreach (var ico in FirmaCache.FirmyNazvyOnlyAscii()[simpleName])
                         {
                             Firma f = Firmy.Get(ico); //TODO StaticData.FirmyNazvyAscii.Get()[simpleName]);
                             if (f.Valid)

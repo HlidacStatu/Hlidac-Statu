@@ -208,6 +208,44 @@ namespace HlidacStatu.Repositories
 
         }
 
+        public static Dictionary<string, string[]> GetNazvyOnlyAscii()
+        {
+            Dictionary<string, string[]> res = new ();
+
+            using (DbEntities db = new DbEntities())
+            {
+                var firmy = db.Firma
+                    .Select(f => new { f.ICO, f.Jmeno })
+                    .AsNoTracking()
+                    .ToList();
+
+                foreach (var firma in firmy)
+                {
+                    string ico = firma.ICO?.Trim();
+                    string name = firma.Jmeno?.Trim();
+
+                    if (string.IsNullOrEmpty(ico) || string.IsNullOrEmpty(name))
+                        continue;
+
+                    if (ico.IsNumeric())
+                    {
+                        ico = Util.ParseTools.NormalizeIco(ico);
+                        var jmenoa = Firma.JmenoBezKoncovky(name).RemoveDiacritics()
+                            .Trim().ToLower();
+
+                        if (!res.ContainsKey(jmenoa))
+                            res[jmenoa] = [ico];
+                        else if (!res[jmenoa].Contains(ico))
+                        {
+                            var v = res[jmenoa];
+                            res[jmenoa] = v.Union([ico]).ToArray();
+                        }
+                    }
+                }
+            }
+            return res;
+        }
+
         public static Firma FromIco(string ico, bool loadInvalidIco = false)
         {
             if (Util.DataValidators.CheckCZICO(ico) == false && loadInvalidIco == false)

@@ -1307,7 +1307,7 @@
         intv = laps.StopPreviousAndStartNextLap("NapojeneOsoby");
         //POUZE MINISTERSTVA
     }
-    @if (FirmaRepo.MinisterstvaCache.Get().Any(f => f.ICO == Model.ICO))
+    @if (FirmaCache.Ministerstva().Any(f => f.ICO == Model.ICO))
     {
         var napojeneOsoby = await Model.NapojeneOsobyMinisterstvaAsync();
 

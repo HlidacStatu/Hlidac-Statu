@@ -5,7 +5,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using HlidacStatu.Entities;
 using HlidacStatu.Lib.Analytics;
-using System.Configuration;
 
 namespace HlidacStatu.Repositories
 {

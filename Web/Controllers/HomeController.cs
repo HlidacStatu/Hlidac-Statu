@@ -1000,7 +1000,7 @@ text zpravy: {txt}
             }
             else if (id == "vz-ed")
             {
-                string[] icos = FirmaRepo.MinisterstvaCache.Get().Select(s => s.ICO).ToArray();
+                string[] icos = FirmaCache.Ministerstva().Select(s => s.ICO).ToArray();
 
                 var vz = await VzCache.CachedSimpleSearchAsync(
                     new Repositories.Searching.VerejnaZakazkaSearchData()
