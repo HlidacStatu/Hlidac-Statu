@@ -50,10 +50,21 @@ namespace HlidacStatu.RegistrVozidel
 
                 var sw = new Devmasters.DT.StopWatchEx();
                 sw.Start();
-                await db.SaveChangesAsync(ct);
+                try
+                {
+                    await db.SaveChangesAsync(ct);
+                    log($"Saved rows {batch.RowFrom}-{batch.RowTo} ( {batch.Changes.Count}/{reader.Count} ) in {sw.ExactElapsedMiliseconds} ms");
+
+                }
+                catch (Exception e)
+                {
+                    _logger.Error(e, "Error saving batch {rowFrom}-{rowTo} of type {type}", batch.RowFrom, batch.RowTo, typeof(T).Name);
+                    log($"ERROR {batch.RowFrom}-{batch.RowTo} {e.Message}");
+
+                    throw;
+                }
                 sw.Stop();
 
-                log($"Saved rows {batch.RowFrom}-{batch.RowTo} ( {batch.Changes.Count}/{reader.Count} ) in {sw.ExactElapsedMiliseconds} ms");
             }
         }
 
