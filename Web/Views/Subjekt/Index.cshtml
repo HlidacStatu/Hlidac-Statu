@@ -215,51 +215,61 @@
 
     @* -------- skutecni majitele -------- *@
 
-    @{
+    @if (false)
+    {
+
         HlidacStatu.Datasets.DataSet skutMajitDS = HlidacStatu.Datasets.DataSet.GetCachedDataset("skutecni-majitele");
         var skutMajitRes = (await skutMajitDS.SearchDataRawAsync("ico:" + Model.ICO, 1, 1)).Result.ToList();
-    }
-    @if (skutMajitRes.Any()
+
+        if (skutMajitRes.Any()
         && Devmasters.Config.GetWebConfigValue("HiddenSkutecniMajiteleICO")?.Split(",")?.Contains(Model.ICO) == false
         )
-    {
-        Newtonsoft.Json.Linq.JObject obj = Newtonsoft.Json.Linq.JObject.Parse(skutMajitRes.First().Item2);
-        if (obj["skutecni_majitele"]?.Count() > 0)
         {
-            var aktualniMajitele = obj["skutecni_majitele"].Where(m => ((JValue)m["datum_vymaz"]).Value == null);
-            var vymazaniMajitele = obj["skutecni_majitele"].Where(m => ((JValue)m["datum_vymaz"]).Value != null);
-            if (aktualniMajitele.Count() > 0)
+            Newtonsoft.Json.Linq.JObject obj = Newtonsoft.Json.Linq.JObject.Parse(skutMajitRes.First().Item2);
+            if (obj["skutecni_majitele"]?.Count() > 0)
             {
-                <h4 class="pt-1">@(aktualniMajitele.Count() > 1 ? "Skuteční majitelé" : "Skutečný majitel")</h4>
-                <partial name="_renderSkutecniMajitele" model="@aktualniMajitele" />
-                <div style="padding-bottom:10px;">&nbsp;</div>
-            }
+                var aktualniMajitele = obj["skutecni_majitele"].Where(m => ((JValue)m["datum_vymaz"]).Value == null);
+                var vymazaniMajitele = obj["skutecni_majitele"].Where(m => ((JValue)m["datum_vymaz"]).Value != null);
+                if (aktualniMajitele.Count() > 0)
+                {
+                    <h4 class="pt-1">@(aktualniMajitele.Count() > 1 ? "Skuteční majitelé" : "Skutečný majitel")</h4>
+                    <partial name="_renderSkutecniMajitele" model="@aktualniMajitele" />
+                    <div style="padding-bottom:10px;">&nbsp;</div>
+                }
 
 
-            if (vymazaniMajitele.Count() > 0)
-            {
-                <h4 class="pt-1">@(vymazaniMajitele.Count() > 1 ? "Vymazaní majitelé" : "Vymazaný majitel")</h4>
-                <partial name="_renderSkutecniMajitele" model="@vymazaniMajitele" />
+                if (vymazaniMajitele.Count() > 0)
+                {
+                    <h4 class="pt-1">@(vymazaniMajitele.Count() > 1 ? "Vymazaní majitelé" : "Vymazaný majitel")</h4>
+                    <partial name="_renderSkutecniMajitele" model="@vymazaniMajitele" />
+                }
             }
+
+            <hr />
         }
+        else if (Model.Registrovana_v_zahranici == false)
+        {
+            <h4 class="pt-1">Skuteční majitelé</h4>
+            <p>Open data obchodního rejstříku neobsahují data o skutečných majitelích této organizace</p>
+            <p class="text-center">
+                <a target="_blank"
+                   href="https://esm.justice.cz/ias/issm/rejstrik-$sm?ico=@(Model.ICO)&jenPlatne=PLATNE&polozek=50&typHledani=STARTS_WITH&typHledaniSpolku=ALL"
+                   class="btn btn-hs btn=outline-primary btn-sm my-3 position-relative">
+                    <i class="fa-regular fa-arrow-up-right-from-square"></i> Hledat v Evidenci skutečných majitelů
+                </a>
+            </p>
 
-        <hr />
+            <hr />
+        }
     }
-    else if (Model.Registrovana_v_zahranici == false)
+    else
     {
-        <h4 class="pt-1">Skuteční majitelé</h4>
-        <p>Open data obchodního rejstříku neobsahují data o skutečných majitelích této organizace</p>
-        <p class="text-center">
-            <a target="_blank"
-               href="https://esm.justice.cz/ias/issm/rejstrik-$sm?ico=@(Model.ICO)&jenPlatne=PLATNE&polozek=50&typHledani=STARTS_WITH&typHledaniSpolku=ALL"
-               class="btn btn-hs btn=outline-primary btn-sm my-3 position-relative">
-                <i class="fa-regular fa-arrow-up-right-from-square"></i> Hledat v Evidenci skutečných majitelů
-            </a>
-        </p>
-
-        <hr />
+        <div>
+            Ministerstvo spravedlnosti od 17.12.2025 zrušilo veřejnosti přístup k evidenci skutečných majitelů.<br />
+            <a href="https://x.com/HlidacStatu/status/2001233337931755946" target="_blank">Zásadním způsobem tím omezilo veřejnou kontrolu</a> subjektů obchodujících se státem, dostávajících dotace
+            a zjednodušila praní špinavých peněz.
+        </div>
     }
-
 
     @* ------- Příjmy politiku ---------- *@
 
@@ -1063,20 +1073,16 @@
     }
 
     <div>
-        <h4>Provozovaná vozidla</h4>
         @{
-            var vozidla
         }
         <role-limited roles="Admin,Supporter">
             <pass>
+                <h4>Provozovaná vozidla</h4>
                 <p class="text-muted sub-header-info">
                     Maji 5 aut
                 </p>
             </pass>
             <else>
-                <p class="text-muted sub-header-info">
-                    Maji i BMW
-                    </p>
             </else>
         </role-limited>
     </div>
