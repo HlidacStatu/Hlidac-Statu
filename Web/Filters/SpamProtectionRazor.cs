@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Serilog;
+using System.Collections.Generic;
 
 namespace HlidacStatu.Web.Filters
 {
@@ -18,6 +19,7 @@ namespace HlidacStatu.Web.Filters
 
             if (IsInFormData(req) || IsInQueryData(req))
             {
+                _ = context.HttpContext.Items.TryAdd(HlidacStatu.LibCore.MiddleWares.BannedIpsMiddleware.ContextKeyNameBotWarning, 50);
                 _logger.Warning($"Detected bot from [{HlidacStatu.Util.RealIpAddress.GetIp(context.HttpContext)}] filling in 'email2' field value.");
                 context.Result = new RedirectToActionResult("Bot", "Error", null);
             }

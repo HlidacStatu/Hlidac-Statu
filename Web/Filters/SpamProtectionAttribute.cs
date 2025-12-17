@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Serilog;
+using System.Collections.Generic;
 
 namespace HlidacStatu.Web.Filters
 {
@@ -35,6 +36,7 @@ namespace HlidacStatu.Web.Filters
                 {
                     //context.HttpContext.Items.Add("honeypotTrapped", true);
                     _logger.Warning($"Detected bot from [{HlidacStatu.Util.RealIpAddress.GetIp(context.HttpContext)}]");
+                    _=context.HttpContext.Items.TryAdd(HlidacStatu.LibCore.MiddleWares.BannedIpsMiddleware.ContextKeyNameBotWarning,50);
                     context.Result = _redirect;
                 }
             }

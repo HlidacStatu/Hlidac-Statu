@@ -126,12 +126,13 @@ namespace HlidacStatu.Web
                 app.UseDeveloperExceptionPage();
                 app.UseMigrationsEndPoint();
             }
-            else if (Devmasters.Config.GetWebConfigValue("DeveloperExceptionPage") == "true")
+            else //production
             {
-                app.UseDeveloperExceptionPage();
-            }
-            else
-            {
+                if (Devmasters.Config.GetWebConfigValue("DeveloperExceptionPage") == "true")
+                {
+                    app.UseDeveloperExceptionPage();
+                }
+
                 var whitelistIps = Devmasters.Config.GetWebConfigValue("BanWhitelist")?.Split(',',
                     StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
                 BannedIpsMiddleware.Whitelist whitelist = new BannedIpsMiddleware.Whitelist();

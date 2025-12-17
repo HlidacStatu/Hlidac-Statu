@@ -4,6 +4,7 @@ using System.Collections.Generic;
 
 namespace HlidacStatu.Web.TagHelpers
 {
+    [HtmlTargetElement("highlight-content")]
     public class HighlightContentTagHelper : TagHelper
     {
         public IReadOnlyDictionary<string, IReadOnlyCollection<string>> Highlights { get; set; }
