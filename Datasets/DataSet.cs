@@ -79,7 +79,7 @@ namespace HlidacStatu.Datasets
             }
             else
             {
-                Manager.CreateIndex(client);
+                await Manager.CreateIndexAsync(client);
                 await DataSetDB.Instance.AddDataAsync(reg, user);
             }
 

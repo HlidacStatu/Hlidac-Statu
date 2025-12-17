@@ -29,7 +29,7 @@ namespace HlidacStatu.Datasets
             {
                 client = Manager.GetESClient(DataSourcesDbName, idxType: Manager.IndexType.DataSource);
 
-                var ret = client.Indices.Exists(client.ConnectionSettings.DefaultIndex);
+                var ret = client.Indices.ExistsAsync(client.ConnectionSettings.DefaultIndex);
                     
                 if (!ret.Exists)
                 {
@@ -41,7 +41,7 @@ namespace HlidacStatu.Datasets
                         datasetId = DataSourcesDbName,
                         jsonSchema = jsonG.Generate(typeof(Registration)).ToString()
                     };
-                    Manager.CreateIndex(client);
+                    Manager.CreateIndexAsync(client);
 
                     //add record
                     Elasticsearch.Net.PostData pd =
