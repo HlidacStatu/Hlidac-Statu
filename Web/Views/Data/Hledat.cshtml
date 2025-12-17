@@ -120,6 +120,6 @@
 }
 
 <partial name="SearchResults/Pagination" 
-         model="@(new PaginationViewModel(Model, $"/Data/Hledat/{Model.DataSet.DatasetId}", exportType: Model.DataSet.IsFlatStructure() ? "dataset" : null, exportMoreParams: $"ds={registration.datasetId}"))"/>
+         model="@(new PaginationViewModel(Model, $"/Data/Hledat/{Model.DataSet.DatasetId}", exportType: await Model.DataSet.IsFlatStructureAsync() ? "dataset" : null, exportMoreParams: $"ds={registration.datasetId}"))"/>
 
 <partial name="Partials/_new"/>

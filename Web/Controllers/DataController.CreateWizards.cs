@@ -331,7 +331,7 @@ namespace HlidacStatu.Web.Controllers
             reg.searchResultTemplate = new Registration.Template() { body = search.Body };
 
 
-            if (DataSet.ExistsDataset(reg.datasetId))
+            if (await DataSet.ExistsDatasetAsync(reg.datasetId))
                 reg.datasetId = reg.datasetId + "-" + Devmasters.TextUtil.GenRandomString(5);
 
             await datasetIndexStatCache.InvalidateAsync();
@@ -340,7 +340,7 @@ namespace HlidacStatu.Web.Controllers
 
             if (status.valid == false)
             {
-                if (DataSet.ExistsDataset((status.value?.ToString() ?? "")))
+                if (await DataSet.ExistsDatasetAsync((status.value?.ToString() ?? "")))
                     await DataSetDB.Instance.DeleteRegistrationAsync(status.value?.ToString(), email);
 
                 ViewBag.ApiResponseError = status;
@@ -407,7 +407,7 @@ namespace HlidacStatu.Web.Controllers
 
             model.DatasetId = ds.DatasetId;
 
-            if (ds.IsFlatStructure() == false)
+            if (await ds.IsFlatStructureAsync() == false)
             {
                 ViewBag.Mode = "notflat";
                 return View("ImportData.noflat", model);
@@ -511,7 +511,7 @@ namespace HlidacStatu.Web.Controllers
 
             await datasetIndexStatCache.InvalidateAsync();
 
-            if (ds.IsFlatStructure() == false)
+            if (await ds.IsFlatStructureAsync() == false)
             {
                 return RedirectToAction("ImportData", new { id = ds.DatasetId, fileId = model.FileId, delimiter = model.GetValidDelimiter() });
             }
@@ -521,7 +521,7 @@ namespace HlidacStatu.Web.Controllers
             if (!System.IO.File.Exists(path))
                 return RedirectToAction("ImportData", new { id = ds.DatasetId });
 
-            RuntimeClassBuilder rcb = new RuntimeClassBuilder(ds.GetPropertyNamesTypesFromSchema().ToDictionary(m => m.Key, v => v.Value.Type));
+            RuntimeClassBuilder rcb = new RuntimeClassBuilder((await ds.GetPropertyNamesTypesFromSchemaAsync()).ToDictionary(m => m.Key, v => v.Value.Type));
 
             string[] formsHeaders = form["sheaders"].ToString().Split('|');
             List<MappingCSV> mappingProps = new List<MappingCSV>();
@@ -571,7 +571,7 @@ namespace HlidacStatu.Web.Controllers
                         var newObj = rcb.CreateObject();
                         for (int m = 0; m < mappingProps.Count; m++)
                         {
-                            Type destType = ds.GetPropertyNameTypeFromSchema(mappingProps[m].TargetJSON).FirstOrDefault().Value.Type;
+                            Type destType = (await ds.GetPropertyNameTypeFromSchemaAsync(mappingProps[m].TargetJSON)).FirstOrDefault().Value.Type;
                             object value = null;
 
                             string[] specialValues = new string[] { "-skip-", "-gen-", "--" };

@@ -165,7 +165,7 @@ namespace HlidacStatu.Web.Controllers
                         filename = "chyba.txt";
                         return File(rawData, contentType, filename);
                     }
-                    if (datasource.IsFlatStructure() == false)
+                    if (await datasource.IsFlatStructureAsync() == false)
                     {
                         rawData = System.Text.Encoding.UTF8.GetBytes("Tato databáze nemá jednoduchou, plochou strukturu. Proto nemůže být exportována. Použijte API z hlidacstatu.cz/api");
                         contentType = "text/plain";
@@ -186,7 +186,7 @@ namespace HlidacStatu.Web.Controllers
                     {
                         foreach (var s in sres.Result)
                         {
-                            data.Add(datasource.ExportFlatObject(s));
+                            data.Add(await datasource.ExportFlatObjectAsync(s));
                         }
                     }
                 }
@@ -282,7 +282,7 @@ namespace HlidacStatu.Web.Controllers
                     filename = "chyba.txt";
                     return File(rawData, contentType, filename);
                 }
-                if (datasource.IsFlatStructure() == false)
+                if (await datasource.IsFlatStructureAsync() == false)
                 {
                     rawData = System.Text.Encoding.UTF8.GetBytes("Tato databáze nemá jednoduchou, plochou strukturu. Proto nemůže být exportována. Použijte API z hlidacstatu.cz/api");
                     contentType = "text/plain";
@@ -304,7 +304,7 @@ namespace HlidacStatu.Web.Controllers
                 {
                     foreach (var s in res)
                     {
-                        data.Add(datasource.ExportFlatObject(s));
+                        data.Add(await datasource.ExportFlatObjectAsync(s));
                     }
                 }
                 
@@ -404,7 +404,7 @@ namespace HlidacStatu.Web.Controllers
             }
         }
 
-        public ActionResult AddWd(string query, string dataType, string name, int period, int focus)
+        public async Task<ActionResult> AddWd(string query, string dataType, string name, int period, int focus)
         {
             using (DbEntities db = new DbEntities())
             {
@@ -434,7 +434,7 @@ namespace HlidacStatu.Web.Controllers
                 else if (dt.ToLower().StartsWith(nameof(DataSet).ToLower()))
                 {
                     var dataSetId = dt.Replace("DataSet.", "");
-                    if (DataSet.ExistsDataset(dataSetId) == false)
+                    if (await DataSet.ExistsDatasetAsync(dataSetId) == false)
                     {
                         _logger.Error("AddWd - try to hack, wrong dataType = " + dataType + "." + dataSetId);
                         throw new ArgumentOutOfRangeException("AddWd - try to hack, wrong dataType = " + dataType + "." + dataSetId);

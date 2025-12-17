@@ -88,7 +88,7 @@ namespace HlidacStatu.Datasets
                 Value = "0"
             });
 
-            var registration = DataSet.Registration();
+            var registration = await DataSet.RegistrationAsync();
 
             for (int i = 0; i < registration.orderList.GetLength(0); i++)
             {

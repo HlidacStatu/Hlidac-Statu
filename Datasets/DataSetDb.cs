@@ -25,8 +25,9 @@ namespace HlidacStatu.Datasets
             _initializationTask = Instance.EnsureIndexExistsAsync();
         }
         
-        private DataSetDB() : base(DataSourcesDbName, false)
+        private DataSetDB() : base()
         {
+            datasetId = DataSourcesDbName.ToLower();
             client ??= Manager.GetESClient(DataSourcesDbName, idxType: Manager.IndexType.DataSource);
         }
         

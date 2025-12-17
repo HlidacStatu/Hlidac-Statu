@@ -174,7 +174,7 @@ namespace HlidacStatuApi.Controllers.ApiV2
             {
                 return null;
             }
-            if (!DataSet.ExistsDataset(item.ItemSubType.ToLower()))
+            if (! await DataSet.ExistsDatasetAsync(item.ItemSubType.ToLower()))
             {
                 return null;
             }

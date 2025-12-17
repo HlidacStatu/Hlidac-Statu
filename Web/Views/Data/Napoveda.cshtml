@@ -80,7 +80,7 @@
             </tr>
         </thead>
         <tbody>
-            @foreach (var prop in Model.GetPropertyNamesTypesFromSchema())
+            @foreach (var prop in await Model.GetPropertyNamesTypesFromSchemaAsync())
             {
                 <tr>
                     <td><code>@prop.Key</code></td>

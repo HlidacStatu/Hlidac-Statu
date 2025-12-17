@@ -38,7 +38,7 @@
 @{
     string delimiter = ViewBag.Delimiter;
 
-    string[] properties = ds.GetPropertyNamesFromSchema();
+    string[] properties = await ds.GetPropertyNamesFromSchemaAsync();
 }
 
 <div class="row">

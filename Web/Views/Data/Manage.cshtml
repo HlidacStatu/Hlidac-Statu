@@ -4,7 +4,7 @@
     ViewBag.Title = "Správa databází";
     var email = User.Identity?.Name;
 
-    bool isFlatDS = (Model?.GetDataset()?.IsFlatStructure()) == true;
+    bool isFlatDS = (await Model?.GetDataset()?.IsFlatStructureAsync()) == true;
 }
 
 

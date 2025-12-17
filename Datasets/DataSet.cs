@@ -84,7 +84,7 @@ namespace HlidacStatu.Datasets
             }
 
 
-            return new DataSet(reg.datasetId);
+            return await CreateDataSetInstanceAsync(reg.datasetId, true);
         }
 
         private async Task<IEnumerable<string>> _getPreviewTopValueFromItemAsync(JObject item,
@@ -179,12 +179,20 @@ namespace HlidacStatu.Datasets
 
         protected string datasetId = null;
 
-        internal DataSet(string datasourceName, bool fireException)
+        private DataSet(string datasourceName)
         {
             datasetId = datasourceName.ToLower();
             client = Manager.GetESClient(datasetId, idxType: Manager.IndexType.DataSource);
+        }
 
-            var ret = client.Indices.Exists(client.ConnectionSettings.DefaultIndex);
+        protected DataSet()
+        {
+            
+        }
+
+        private async Task DataSetAfterInitCheckAsync(bool fireException)
+        {
+            var ret = await client.Indices.ExistsAsync(client.ConnectionSettings.DefaultIndex);
 
             if (ret.Exists == false)
             {
@@ -193,6 +201,13 @@ namespace HlidacStatu.Datasets
                 else
                     client = null;
             }
+        }
+
+        internal static async Task<DataSet> CreateDataSetInstanceAsync(string datasourceName, bool fireException)
+        {
+            var dataset = new DataSet(datasourceName);
+            await dataset.DataSetAfterInitCheckAsync(fireException);
+            return dataset;
         }
 
         public ElasticClient ESClient
@@ -554,10 +569,7 @@ namespace HlidacStatu.Datasets
             else
                 return "https://www.hlidacstatu.cz" + url;
         }
-
-        protected DataSet(string datasourceName) : this(datasourceName, true)
-        {
-        }
+        
 
         public string DatasetId
         {
@@ -1154,9 +1166,9 @@ namespace HlidacStatu.Datasets
             return res.Success;
         }
 
-        public static bool ExistsDataset(string datasetId)
+        public static async Task<bool> ExistsDatasetAsync(string datasetId)
         {
-            DataSet ds = new DataSet(datasetId, false);
+            DataSet ds = await CreateDataSetInstanceAsync(datasetId, false);
             return ds.client != null;
         }
 
@@ -1187,7 +1199,7 @@ namespace HlidacStatu.Datasets
             return url;
         }
 
-        public async Task<string> BookmarkNameAsync()
+        public async string BookmarkName()
         {
             return (await RegistrationAsync()).name;
         }
