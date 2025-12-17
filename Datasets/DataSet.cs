@@ -309,19 +309,19 @@ namespace HlidacStatu.Datasets
             return mappingTypes;
         }
 
-        public ExpandoObject ExportFlatObject(string serializedObj)
+        public Task<ExpandoObject> ExportFlatObjectAsync(string serializedObj)
         {
-            return ExportFlatObject(
+            return ExportFlatObjectAsync(
                 JsonConvert.DeserializeObject<ExpandoObject>(serializedObj, new ExpandoObjectConverter()));
         }
 
-        public ExpandoObject ExportFlatObject(ExpandoObject obj)
+        public async Task<ExpandoObject> ExportFlatObjectAsync(ExpandoObject obj)
         {
-            if (IsFlatStructure() == false)
+            if (await IsFlatStructureAsync() == false)
                 return null;
 
             IDictionary<String, Object> eo = (IDictionary<String, Object>)obj;
-            string[] props = GetPropertyNamesFromSchema();
+            string[] props = await GetPropertyNamesFromSchemaAsync();
             var toremove = eo.Keys.Where(m => props.Contains(m, StringComparer.InvariantCultureIgnoreCase) == false)
                 .ToArray();
             for (int i = 0; i < toremove.Count(); i++)
@@ -332,24 +332,24 @@ namespace HlidacStatu.Datasets
             return obj;
         }
 
-        public bool IsFlatStructure()
+        public async Task<bool> IsFlatStructureAsync()
         {
             //important from import data from CSV
-            var props = GetPropertyNamesFromSchema();
+            var props = await GetPropertyNamesFromSchemaAsync();
             return props.Any(p => p.Contains(".")) == false; //. is delimiter for inner objects
         }
 
-        public string[] GetPropertyNameFromSchema(string name)
+        public async Task<string[]> GetPropertyNameFromSchemaAsync(string name)
         {
             Dictionary<string, Property> names = new Dictionary<string, Property>();
-            var sch = Schema;
+            var sch = await GetSchemaAsync();
             GetPropertyNameTypeFromSchemaInternal(new JSchema[] { sch }, "", name, ref names);
             return names.Keys.ToArray();
         }
 
-        public string[] GetPropertyNamesFromSchema()
+        public async Task<string[]> GetPropertyNamesFromSchemaAsync()
         {
-            return GetPropertyNameFromSchema("");
+            return await GetPropertyNameFromSchemaAsync("");
         }
 
         public static Dictionary<string, Property> DefaultDatasetProperties = new Dictionary<string, Property>()
@@ -366,9 +366,9 @@ namespace HlidacStatu.Datasets
             },
         };
 
-        public Dictionary<string, Property> GetPropertyNamesTypesFromSchema(bool addDefaultDatasetProperties = false)
+        public async Task<Dictionary<string, Property>> GetPropertyNamesTypesFromSchemaAsync(bool addDefaultDatasetProperties = false)
         {
-            var properties = GetPropertyNameTypeFromSchema("");
+            var properties = await GetPropertyNameTypeFromSchemaAsync("");
             if (addDefaultDatasetProperties)
             {
                 foreach (var pp in DefaultDatasetProperties)
@@ -379,10 +379,10 @@ namespace HlidacStatu.Datasets
             return properties;
         }
 
-        public Dictionary<string, Property> GetPropertyNameTypeFromSchema(string name)
+        public async Task<Dictionary<string, Property>> GetPropertyNameTypeFromSchemaAsync(string name)
         {
             Dictionary<string, Property> names = new Dictionary<string, Property>();
-            var sch = Schema;
+            var sch = await GetSchemaAsync();
             GetPropertyNameTypeFromSchemaInternal(new JSchema[] { sch }, "", name, ref names);
             return names;
         }
@@ -525,14 +525,6 @@ namespace HlidacStatu.Datasets
             return _registration;
         }
 
-        public Registration Registration()
-        {
-            if (_registration == null)
-                _registration = DataSetDB.Instance.GetRegistration(datasetId);
-
-            return _registration;
-        }
-
         public string DatasetUrl(bool local = true)
         {
             var url = $"/data/Index/{DatasetId}";
@@ -573,17 +565,15 @@ namespace HlidacStatu.Datasets
         }
 
 
-        protected JSchema Schema
+        protected async Task<JSchema> GetSchemaAsync()
         {
-            get
+            if (schema == null)
             {
-                if (schema == null)
-                {
-                    schema = DataSetDB.Instance.GetRegistration(DatasetId)?.GetSchema();
-                }
-
-                return schema;
+                schema = (await DataSetDB.Instance.GetRegistrationAsync(DatasetId))?.GetSchema();
             }
+
+            return schema;
+        
         }
 
         public virtual Task<string> AddDataAsync(object data, string id, string createdBy, bool validateSchema = true,
@@ -1140,23 +1130,6 @@ namespace HlidacStatu.Datasets
             return data;
         }
 
-        public string GetData(string Id)
-        {
-            IGetRequest req = new GetRequest(client.ConnectionSettings.DefaultIndex, Id);
-            var res = client.Get<object>(req);
-            if (res.Found)
-                return JsonConvert.SerializeObject(res.Source);
-            else
-            {
-                req = new GetRequest(client.ConnectionSettings.DefaultIndex, Id);
-                res = client.Get<object>(req);
-                if (res.Found)
-                    return JsonConvert.SerializeObject(res.Source);
-                else
-                    return (string)null;
-            }
-        }
-
 
         public async Task<string> GetDataAsync(string Id)
         {
@@ -1214,9 +1187,9 @@ namespace HlidacStatu.Datasets
             return url;
         }
 
-        public string BookmarkName()
+        public async Task<string> BookmarkNameAsync()
         {
-            return Registration().name;
+            return (await RegistrationAsync()).name;
         }
 
         public string ToAuditJson()

@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using HlidacStatu.Caching;
@@ -26,13 +27,18 @@ public class DataSetCache
     
     public static ValueTask<DataSet[]> GetProductionDatasetsAsync() => Cache.GetOrSetAsync($"_ProductionDataSets", async _ =>
         {
+            var results = new List<DataSet>();
             var datasets = (await GetAllDatasetsAsync())
-                .Where(d => d != null)
-                .Where(d => d.Registration().betaversion == false
-                            && d.Registration().hidden == false)
-                .ToArray();
+                .Where(d => d != null);
 
-            return datasets;
+            foreach (var dataset in datasets)
+            {
+                var registration = await dataset.RegistrationAsync();
+                if(registration.betaversion == false && registration.hidden == false)
+                    results.Add(dataset);
+            }
+            
+            return results.ToArray();
         }
     );
 }

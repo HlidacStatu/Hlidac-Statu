@@ -17,54 +17,48 @@ namespace HlidacStatu.Datasets
         public static DataSetDB Instance = null;
 
         private readonly ILogger _logger = Log.ForContext<DataSetDB>();
+        private static readonly Task _initializationTask;
 
         static DataSetDB()
         {
             Instance = new DataSetDB();
+            _initializationTask = Instance.EnsureIndexExistsAsync();
         }
         
         private DataSetDB() : base(DataSourcesDbName, false)
         {
-            if (client == null)
+            client ??= Manager.GetESClient(DataSourcesDbName, idxType: Manager.IndexType.DataSource);
+        }
+        
+        private async Task EnsureIndexExistsAsync()
+        {
+            var ret = await client.Indices.ExistsAsync(client.ConnectionSettings.DefaultIndex);
+                    
+            if (!ret.Exists)
             {
-                client = Manager.GetESClient(DataSourcesDbName, idxType: Manager.IndexType.DataSource);
-
-                var ret = client.Indices.ExistsAsync(client.ConnectionSettings.DefaultIndex);
-                    
-                if (!ret.Exists)
+                Newtonsoft.Json.Schema.Generation.JSchemaGenerator jsonG =
+                    new Newtonsoft.Json.Schema.Generation.JSchemaGenerator();
+                jsonG.DefaultRequired = Newtonsoft.Json.Required.Default;
+                Registration reg = new Registration()
                 {
-                    Newtonsoft.Json.Schema.Generation.JSchemaGenerator jsonG =
-                        new Newtonsoft.Json.Schema.Generation.JSchemaGenerator();
-                    jsonG.DefaultRequired = Newtonsoft.Json.Required.Default;
-                    Registration reg = new Registration()
-                    {
-                        datasetId = DataSourcesDbName,
-                        jsonSchema = jsonG.Generate(typeof(Registration)).ToString()
-                    };
-                    Manager.CreateIndexAsync(client);
+                    datasetId = DataSourcesDbName,
+                    jsonSchema = jsonG.Generate(typeof(Registration)).ToString()
+                };
+                await Manager.CreateIndexAsync(client);
 
-                    //add record
-                    Elasticsearch.Net.PostData pd =
-                        Elasticsearch.Net.PostData.String(Newtonsoft.Json.JsonConvert.SerializeObject(reg));
+                //add record
+                Elasticsearch.Net.PostData pd =
+                    Elasticsearch.Net.PostData.String(Newtonsoft.Json.JsonConvert.SerializeObject(reg));
 
-                    var tres = client.LowLevel
-                        .Index<Elasticsearch.Net.StringResponse>(client.ConnectionSettings.DefaultIndex,
-                            DataSourcesDbName, pd);
+                var tres = await client.LowLevel
+                    .IndexAsync<Elasticsearch.Net.StringResponse>(client.ConnectionSettings.DefaultIndex,
+                        DataSourcesDbName, pd);
                     
-                    if (tres.Success == false)
-                        throw new ApplicationException(tres.DebugInformation);
-                }
+                if (tres.Success == false)
+                    throw new ApplicationException(tres.DebugInformation);
             }
         }
-
-        public Registration GetRegistration(string datasetId)
-        {
-            datasetId = datasetId.ToLower();
-            var s = GetData(datasetId);
-            if (string.IsNullOrEmpty(s))
-                return null;
-            return Newtonsoft.Json.JsonConvert.DeserializeObject<Registration>(s, DefaultDeserializationSettings);
-        }
+        
 
         public async Task<Registration> GetRegistrationAsync(string datasetId)
         {
