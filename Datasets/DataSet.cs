@@ -1199,9 +1199,11 @@ namespace HlidacStatu.Datasets
             return url;
         }
 
-        public async string BookmarkName()
+        public string BookmarkName()
         {
-            return (await RegistrationAsync()).name;
+#pragma warning disable VSTHRD002
+            return RegistrationAsync().GetAwaiter().GetResult().name;
+#pragma warning restore VSTHRD002
         }
 
         public string ToAuditJson()

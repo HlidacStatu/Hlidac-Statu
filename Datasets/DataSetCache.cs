@@ -13,7 +13,7 @@ public class DataSetCache
     
     public static ValueTask<DataSet[]> GetAllDatasetsAsync() => Cache.GetOrSetAsync($"_AllDataSets", async _ =>
         {
-            var ds = new HlidacStatu.Datasets.DataSet(DataSetDB.DataSourcesDbName, false);
+            var ds = await HlidacStatu.Datasets.DataSet.CreateDataSetInstanceAsync(DataSetDB.DataSourcesDbName, false);
             var searchData = await ds.SearchDataRawAsync("*", 1, 500);
             var datasets = searchData
                 .Result

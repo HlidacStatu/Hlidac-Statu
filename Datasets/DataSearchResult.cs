@@ -87,8 +87,10 @@ namespace HlidacStatu.Datasets
                 Text = "Relevance",
                 Value = "0"
             });
-
-            var registration = await DataSet.RegistrationAsync();
+            
+#pragma warning disable VSTHRD002
+            var registration = DataSet.RegistrationAsync().GetAwaiter().GetResult();
+#pragma warning restore VSTHRD002
 
             for (int i = 0; i < registration.orderList.GetLength(0); i++)
             {
