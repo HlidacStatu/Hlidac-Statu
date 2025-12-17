@@ -70,26 +70,21 @@ namespace HlidacStatu.CachingClients.PostgreSql
                 return;
             }
 
-            //TODO quick fix 16.12.2025
-            if (false)
+            using (var connection = ConnectionFactory())
             {
-                using (var connection = ConnectionFactory())
+                connection.Open();
+                using (var transaction = connection.BeginTransaction())
                 {
-                    connection.Open();
-                    using (var transaction = connection.BeginTransaction())
-                    {
-                        var createSchemaAndTable = new CommandDefinition(
-                            SqlCommands.CreateSchemaAndTableSql,
-                            transaction: transaction);
-                        connection.Execute(createSchemaAndTable);
+                    var createSchemaAndTable = new CommandDefinition(
+                        SqlCommands.CreateSchemaAndTableSql,
+                        transaction: transaction);
+                    connection.Execute(createSchemaAndTable);
 
-                        transaction.Commit();
-                    }
+                    transaction.Commit();
                 }
-                _logger?.LogDebug("CreateTableIfNotExist executed");
             }
-            else
-             _logger?.LogDebug("CreateTableIfNotExist skipped due to quick fix");
+
+            _logger?.LogDebug("CreateTableIfNotExist executed");
         }
 
         public void DeleteCacheItem(string key)
