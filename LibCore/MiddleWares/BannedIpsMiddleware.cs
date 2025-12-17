@@ -17,6 +17,9 @@ namespace HlidacStatu.LibCore.MiddleWares
 {
     public class BannedIpsMiddleware
     {
+        public const string ContextKeyName = "BannedIpsMiddleware";
+        public const string ContextKeyNameBotWarning = ContextKeyName+"_BotHere";
+
         private readonly RequestDelegate _next;
         private readonly Whitelist _whitelist;
         private readonly ILogger _logger = Log.ForContext<BannedIpsMiddleware>();
@@ -55,6 +58,11 @@ namespace HlidacStatu.LibCore.MiddleWares
                 await BanIp(remoteIp, DateTime.Now.AddHours(6), 555, requestedUrl);
             }
 
+            // autoban for robots detected by honeypot
+            if (httpContext.Items.TryGetValue(ContextKeyNameBotWarning, out _))
+            {
+                await BanIp(remoteIp, DateTime.Now.AddHours(6), 555, requestedUrl);
+            }
 
             // block banned ip
             if (IsBanned(remoteIp))
@@ -78,9 +86,15 @@ namespace HlidacStatu.LibCore.MiddleWares
                 throw;
             }
 
-            // add new ip to blocked ones in case it is attacker
             int statusCode = httpContext.Response.StatusCode;
-            if (attackerDictionary.IsAttacker(remoteIp, statusCode, lastPath))
+
+            // autoban for robots detected by honeypot
+            if (httpContext.Items.TryGetValue(ContextKeyNameBotWarning, out _))
+            {
+                await BanIp(remoteIp, DateTime.Now.AddHours(6), 555, requestedUrl);
+            }
+            // add new ip to blocked ones in case it is attacker
+            else if (attackerDictionary.IsAttacker(remoteIp, statusCode, lastPath))
             {
                 string pathList = attackerDictionary.PathsForIp(remoteIp);
                 await BanIp(remoteIp, DateTime.Now.AddHours(6), statusCode, pathList);
