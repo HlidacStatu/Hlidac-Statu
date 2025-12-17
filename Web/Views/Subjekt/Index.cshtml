@@ -1062,17 +1062,24 @@
         intv = laps.StopPreviousAndStartNextLap("Registr vozidel");
     }
 
-    @if (this.User.IsInRole("Admin") || this.User.IsInRole("Supporters"))
-    {
-        <div>
-            <h4>Provozovaná vozidla</h4>
-            <p class="text-muted sub-header-info">
-                Informace o insolvenčních řízeních, kterých
-                se @Html.SubjektTypTrojice(Model, "úřad ", "organizace ", "firma ")
-                účastní jako dlužník, věřitel či správce.
-            </p>
-        </div>
-    }
+    <div>
+        <h4>Provozovaná vozidla</h4>
+        @{
+            var vozidla
+        }
+        <role-limited roles="Admin,Supporter">
+            <pass>
+                <p class="text-muted sub-header-info">
+                    Maji 5 aut
+                </p>
+            </pass>
+            <else>
+                <p class="text-muted sub-header-info">
+                    Maji i BMW
+                    </p>
+            </else>
+        </role-limited>
+    </div>
 
     @* ----- Insolvence -----*@
     @{
