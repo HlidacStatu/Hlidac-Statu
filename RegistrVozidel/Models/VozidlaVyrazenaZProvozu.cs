@@ -37,7 +37,7 @@ public partial class VozidlaVyrazenaZProvozu : ICheckDuplicate
         if (_uniqueKeys == null)
             throw new InvalidOperationException("PreDuplication must be called before CheckDuplicateAsync.");
         var key = this.Pcv + "\t" + this.CheckSum;
-        if (_uniqueKeys.Contains(this.Pcv) == false)
+        if (_uniqueKeys.Contains(key) == false)
             return DuplicateCheckResult.NoDuplicate;
         else
             return DuplicateCheckResult.Same;
