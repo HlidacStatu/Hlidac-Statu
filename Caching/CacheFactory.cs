@@ -201,7 +201,7 @@ public static class CacheFactory
             options.ConnectionString = Devmasters.Config.GetWebConfigValue("PostgreSqlCacheConnectionString");
             options.SchemaName = "public";
             options.TableName = "fusion_cache";
-            options.CreateInfrastructure = true;
+            options.CreateInfrastructure = false;
             options.ExpiredItemsDeletionInterval = TimeSpan.FromMinutes(30);
             options.DisableRemoveExpired = false;
             options.UpdateOnGetCacheItem = false;
@@ -213,7 +213,7 @@ public static class CacheFactory
             options.ConnectionString = Devmasters.Config.GetWebConfigValue("PostgreSqlPermanentCacheConnectionString");
             options.SchemaName = "public";
             options.TableName = "fusion_cache";
-            options.CreateInfrastructure = true;
+            options.CreateInfrastructure = false;
             options.ExpiredItemsDeletionInterval = TimeSpan.FromDays(1);
             options.DisableRemoveExpired = false;
             options.UpdateOnGetCacheItem = false;

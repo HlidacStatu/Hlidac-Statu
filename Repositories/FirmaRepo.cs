@@ -266,18 +266,9 @@ namespace HlidacStatu.Repositories
                     f.DatovaSchranka = db.Database.SqlQuery<string>($"select DatovaSchranka from firma_DS where ico={ico}")
                         .ToArray();
 
-                        //Connectors.DirectDB.Instance.GetList<string>("select DatovaSchranka from firma_DS where ico=@ico", param: new IDataParameter[] {
-                        //new SqlParameter("ico", f.ICO)
-                        //})
-                        //.ToArray();
-
                     f.NACE = db.Database.SqlQuery<string>($"select NACE from firma_Nace where ico={ico}")
                         .ToArray();
-                    //Connectors.DirectDB.Instance.GetList<string>("select NACE from firma_Nace where ico=@ico", param: new IDataParameter[] {
-                    //new SqlParameter("ico", f.ICO)
-                    //})
-                    //.ToArray();
-
+                    
                     return f;
                 }
                 else
