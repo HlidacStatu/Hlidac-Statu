@@ -135,7 +135,7 @@ public static class HlidacConfigExtensions
                     .Filter.ByIncludingOnly(Matching.FromSource("HlidacStatu.Repositories.AuditRepo"))
                     .AddLogStash(new Uri(context.Configuration.GetValue<string>("AppSettings:LogStashAuditUrl") ?? "http://10.10.100.145:5001"))
                     )
-            .WriteTo.Console());
+            );
     }
     
     /// <summary>
@@ -191,7 +191,7 @@ public static class HlidacConfigExtensions
                 .Filter.ByIncludingOnly(Matching.FromSource("HlidacStatu.Repositories.AuditRepo"))
                 .AddLogStash(new Uri(logStashAuditUrl ?? "http://10.10.100.145:5001"))
                 )
-            .WriteTo.Console());
+            );
     }
 
     /// <summary>
