@@ -15,7 +15,7 @@ namespace HlidacStatu.Repositories
     {
         private static readonly ILogger _logger = Log.ForContext(typeof(OsobyEsRepo));
 
-        private static readonly ElasticClient _esClient = Manager.GetESClient_Osoby();
+        private static ElasticClient _esClient => Manager.GetESClient_Osoby();
 
         public static async Task<bool> DeleteAllAsync()
         {

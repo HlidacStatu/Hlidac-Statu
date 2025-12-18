@@ -2,7 +2,6 @@ using HlidacStatu.Entities;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
 using System.Linq;
-using System.Net.Mail;
 
 namespace HlidacStatu.Repositories
 {

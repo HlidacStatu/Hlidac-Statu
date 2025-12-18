@@ -22,8 +22,6 @@ namespace HlidacStatu.Repositories
 {
     public static partial class OsobaRepo
     {
-
-
         public static class Searching
         {
             public static readonly Regex DateRegex = new(@"(\d{1,2}[-./\\]\d{1,2}[-./\\]\d{2,4})|(\d{2,4}[-./\\]\d{1,2}[-./\\]\d{1,2})");

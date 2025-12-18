@@ -2,8 +2,6 @@ using HlidacStatu.Entities;
 using System;
 using Serilog;
 using System.Reflection;
-using System.Security.AccessControl;
-using LinqToTwitter;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;

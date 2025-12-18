@@ -15,7 +15,6 @@ using System.Linq.Expressions;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
-using HlidacStatu.Entities.Entities;
 using static HlidacStatu.Entities.Osoba;
 
 namespace HlidacStatu.Repositories

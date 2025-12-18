@@ -1,20 +1,16 @@
 using Devmasters.Batch;
 using Devmasters.Enums;
-
 using HlidacStatu.Connectors;
 using HlidacStatu.Entities;
 using HlidacStatu.Extensions;
 using HlidacStatu.Util;
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using HlidacStatu.Repositories.Analysis.KorupcniRiziko;
-
 using Serilog;
 using HlidacStatu.DS.Api;
 using HlidacStatu.Entities.Facts;
@@ -29,12 +25,14 @@ namespace HlidacStatu.Repositories
 
 
         static bool debug = System.Diagnostics.Debugger.IsAttached;
+
         /// <summary>
         /// Generates autocomplete data
         /// ! Slow, long running operation
         /// </summary>
         /// <returns></returns>
-        public static async Task<IEnumerable<Autocomplete>> GenerateAutocomplete(bool debug = false, Action<string> logOutputFunc = null, Action<ActionProgressData> progressOutputFunc = null)
+        public static async Task<IEnumerable<Autocomplete>> GenerateAutocomplete(bool debug = false,
+            Action<string> logOutputFunc = null, Action<ActionProgressData> progressOutputFunc = null)
         {
             AutocompleteRepo.debug = debug;
             IEnumerable<Autocomplete> companies = new List<Autocomplete>();
@@ -49,8 +47,9 @@ namespace HlidacStatu.Repositories
             //IEnumerable<Autocomplete> articles = new List<Autocomplete>();
 
             ParallelOptions po = new ParallelOptions();
-            po.MaxDegreeOfParallelism = debug ? 1 : 5; // 10 bylo moc - timeoutoval nám elastic na osobách => hlidacsmluv
-            
+            po.MaxDegreeOfParallelism =
+                debug ? 1 : 5; // 10 bylo moc - timeoutoval nám elastic na osobách => hlidacsmluv
+
             //todo: tohle se dá zlikvidovat
             Parallel.Invoke(po,
                 () =>
@@ -66,7 +65,6 @@ namespace HlidacStatu.Repositories
                         _logger.Error(e, "GenerateAutocomplete Companies error ");
                     }
                 },
-                
                 () =>
                 {
                     try
@@ -93,7 +91,6 @@ namespace HlidacStatu.Repositories
                         _logger.Error(e, "GenerateAutocomplete Synonyms error ");
                     }
                 },
-
                 () =>
                 {
                     try
@@ -108,7 +105,7 @@ namespace HlidacStatu.Repositories
                     }
                 }
             );
-            
+
             try
             {
                 _logger.Information("GenerateAutocomplete Loading state companies");
@@ -119,18 +116,18 @@ namespace HlidacStatu.Repositories
             {
                 _logger.Error(e, "GenerateAutocomplete StateCompanies error ");
             }
-            
+
             try
             {
                 _logger.Information("GenerateAutocomplete Loading cities");
-                cities = await LoadCitiesAsync(logOutputFunc,progressOutputFunc);
+                cities = await LoadCitiesAsync(logOutputFunc, progressOutputFunc);
                 _logger.Information("GenerateAutocomplete Loading cities done");
             }
             catch (Exception e)
             {
                 _logger.Error(e, "GenerateAutocomplete Cities error ");
             }
-            
+
             try
             {
                 _logger.Information("GenerateAutocomplete Loading dotace programs");
@@ -141,7 +138,7 @@ namespace HlidacStatu.Repositories
             {
                 _logger.Error(e, "GenerateAutocomplete dotace programs error ");
             }
-            
+
             try
             {
                 _logger.Information("GenerateAutocomplete Loading authorities");
@@ -152,7 +149,7 @@ namespace HlidacStatu.Repositories
             {
                 _logger.Error(e, "GenerateAutocomplete Authorities error ");
             }
-            
+
             try
             {
                 _logger.Information("GenerateAutocomplete Loading people");
@@ -163,18 +160,18 @@ namespace HlidacStatu.Repositories
             {
                 _logger.Error(e, "GenerateAutocomplete People error ");
             }
-            
+
             _logger.Information("GenerateAutocomplete done");
 
             return companies
-            .Concat(stateCompanies)
-            .Concat(authorities)
-            .Concat(cities)
-            .Concat(people)
-            .Concat(oblasti)
-            .Concat(synonyms)
-            .Concat(operators)
-            .Concat(dotacePrograms);
+                .Concat(stateCompanies)
+                .Concat(authorities)
+                .Concat(cities)
+                .Concat(people)
+                .Concat(oblasti)
+                .Concat(synonyms)
+                .Concat(operators)
+                .Concat(dotacePrograms);
         }
 
         //používá se v administraci eventů pro naše politiky
@@ -189,7 +186,7 @@ namespace HlidacStatu.Repositories
                 }).ToList();
             return results;
         }
-        
+
         private static string NormalizeJmenoForSearch(string firma)
         {
             string jmenoFirmyBezKoncovky = Firma.JmenoBezKoncovkyFull(firma, out string koncovka);
@@ -198,7 +195,8 @@ namespace HlidacStatu.Repositories
         }
 
         //firmy
-        private static List<Autocomplete> LoadCompanies(Action<string> logOutputFunc = null, Action<ActionProgressData> progressOutputFunc = null)
+        private static List<Autocomplete> LoadCompanies(Action<string> logOutputFunc = null,
+            Action<ActionProgressData> progressOutputFunc = null)
         {
             // Kod_PF < 110  - cokoliv co nejsou fyzické osoby, podnikatelé
             // Podnikatelé nejsou zařazeni, protože je jich poté moc a vznikají tam duplicity
@@ -211,7 +209,8 @@ namespace HlidacStatu.Repositories
             var lockObj = new object();
             List<Autocomplete> results = new List<Autocomplete>();
 
-            Devmasters.Batch.Manager.DoActionForAll<Tuple<string, string, string, int?, int?>>(DirectDB.Instance.GetList<string, string, string, int?, int?>(sql).ToArray(),
+            Devmasters.Batch.Manager.DoActionForAll<Tuple<string, string, string, int?, int?>>(
+                DirectDB.Instance.GetList<string, string, string, int?, int?>(sql).ToArray(),
                 (f) =>
                 {
                     Autocomplete res = null;
@@ -223,7 +222,7 @@ namespace HlidacStatu.Repositories
                         AdditionalHiddenSearchText = f.Item2,
                         Type = ("firma" + " " + Firma.StatusFull(f.Item4, true)).Trim(),
                         Description = FixKraj(f.Item3),
-                        PriorityMultiplier = (f.Item4 == 1 ) ? 1f : 0.3f,
+                        PriorityMultiplier = (f.Item4 == 1) ? 1f : 0.3f,
                         ImageElement = "<i class='fas fa-industry-alt'></i>",
                         Category = Autocomplete.CategoryEnum.Company
                     };
@@ -238,7 +237,6 @@ namespace HlidacStatu.Repositories
             return results;
         }
 
-        
 
         //státní firmy
         private static async Task<List<Autocomplete>> LoadStateCompaniesAsync()
@@ -250,18 +248,18 @@ namespace HlidacStatu.Repositories
                               AND Kod_PF > 110
                               AND Typ in ({(int)Firma.TypSubjektuEnum.PatrimStatu}
                                 ,{(int)Firma.TypSubjektuEnum.PatrimStatuAlespon25perc});";
-            
+
             var items = DirectDB.Instance.GetList<string, string, string, int?>(sql);
             int maxConcurrency = 20;
             var semaphore = new SemaphoreSlim(maxConcurrency);
-            
+
             var tasks = items.Select(async f =>
             {
                 await semaphore.WaitAsync();
                 try
                 {
                     var kIndex = await KIndex.GetCachedAsync(f.Item2);
-                    
+
                     return new Autocomplete
                     {
                         Id = $"ico:{f.Item2}",
@@ -281,13 +279,14 @@ namespace HlidacStatu.Repositories
                     semaphore.Release();
                 }
             });
-            
+
             var results = await Task.WhenAll(tasks);
             return results.ToList();
         }
 
         //úřady
-        private static async Task<List<Autocomplete>> LoadAuthoritiesAsync(Action<string> logOutputFunc = null, Action<ActionProgressData> progressOutputFunc = null)
+        private static async Task<List<Autocomplete>> LoadAuthoritiesAsync(Action<string> logOutputFunc = null,
+            Action<ActionProgressData> progressOutputFunc = null)
         {
             string sql = $@"select Jmeno, ICO, KrajId , status
                              from Firma 
@@ -339,7 +338,8 @@ namespace HlidacStatu.Repositories
 
         private static List<Autocomplete> LoadSynonyms()
         {
-            string sql = $@"select text, query, type, priority, imageElement, description from AutocompleteSynonyms where active=1;";
+            string sql =
+                $@"select text, query, type, priority, imageElement, description from AutocompleteSynonyms where active=1;";
             var results = DirectDB.Instance.GetList<string, string, string, int, string, string>(sql)
                 .AsParallel()
                 .Select(f => new Autocomplete()
@@ -356,16 +356,15 @@ namespace HlidacStatu.Repositories
         }
 
         //obce
-        private static async Task<List<Autocomplete>> LoadCitiesAsync(Action<string> logOutputFunc = null, Action<ActionProgressData> progressOutputFunc = null)
+        private static async Task<List<Autocomplete>> LoadCitiesAsync(Action<string> logOutputFunc = null,
+            Action<ActionProgressData> progressOutputFunc = null)
         {
-
             var lockObj = new object();
             List<Autocomplete> results = new List<Autocomplete>();
             var obce = await FirmaCache.GetSubjektyForOborAsync(Firma.Zatrideni.SubjektyObory.Obce);
             Devmasters.Batch.Manager.DoActionForAll<Firma.Zatrideni.Item>(obce,
                 (f) =>
                 {
-
                     string img = "<i class='fas fa-city'></i>";
 
                     var fi = Firmy.Get(f.Ico);
@@ -400,6 +399,7 @@ namespace HlidacStatu.Repositories
                         results.Add(synonyms[0]);
                         results.Add(synonyms[1]);
                     }
+
                     return new Devmasters.Batch.ActionOutputData();
                 }, logOutputFunc, progressOutputFunc, true, prefix: "LoadObce ");
 
@@ -407,22 +407,22 @@ namespace HlidacStatu.Repositories
         }
 
         //lidi
-        public static async Task<List<Autocomplete>> LoadPeopleAsync(Action<string> logOutputFunc = null, Action<ActionProgressData> progressOutputFunc = null)
+        public static async Task<List<Autocomplete>> LoadPeopleAsync(Action<string> logOutputFunc = null,
+            Action<ActionProgressData> progressOutputFunc = null)
         {
             var excludedInfoFactImportanceLevels = new HashSet<InfoFact.ImportanceLevel>()
             {
                 InfoFact.ImportanceLevel.Stat
             };
-            
+
             List<Autocomplete> results = new List<Autocomplete>();
             using (DbEntities db = new DbEntities())
             {
-
                 SemaphoreSlim semaphoreLock = new SemaphoreSlim(1, 1);
                 await Devmasters.Batch.Manager.DoActionForAllAsync<Osoba>(db.Osoba.AsQueryable()
-                    .Where(o => o.Status == (int)Osoba.StatusOsobyEnum.Politik
-                        || o.Status == (int)Osoba.StatusOsobyEnum.VysokyUrednik
-                        || o.Status == (int)Osoba.StatusOsobyEnum.Sponzor), async o =>
+                        .Where(o => o.Status == (int)Osoba.StatusOsobyEnum.Politik
+                                    || o.Status == (int)Osoba.StatusOsobyEnum.VysokyUrednik
+                                    || o.Status == (int)Osoba.StatusOsobyEnum.Sponzor), async o =>
                     {
                         float priority = o.Status switch
                         {
@@ -430,7 +430,7 @@ namespace HlidacStatu.Repositories
                             (int)Osoba.StatusOsobyEnum.VysokyUrednik => 1.7f,
                             _ => 1f
                         };
-                        
+
                         var synonyms = new Autocomplete[2];
                         synonyms[0] = new Autocomplete()
                         {
@@ -439,12 +439,12 @@ namespace HlidacStatu.Repositories
                             PriorityMultiplier = priority,
                             Type = o.StatusOsoby().ToNiceDisplayName(),
                             ImageElement = $"<img src='{o.GetPhotoUrl(false, Osoba.PhotoTypes.NoBackground)}' />",
-                            Description = (await 
-                                o.InfoFactsAsync(excludedInfoFactImportanceLevels)).ToArray()
+                            Description = (await
+                                    o.InfoFactsAsync(excludedInfoFactImportanceLevels)).ToArray()
                                 .RenderFacts(2, true, false, "", "{0}", false),
                             Category = Autocomplete.CategoryEnum.Person
                         };
- 
+
                         synonyms[1] = synonyms[0].Clone();
                         synonyms[1].Text = $"{o.Prijmeni} {o.Jmeno}{Osoba.AppendTitle(o.TitulPred, o.TitulPo)}";
 
@@ -458,17 +458,17 @@ namespace HlidacStatu.Repositories
                         {
                             semaphoreLock.Release();
                         }
-                        
+
                         return new Devmasters.Batch.ActionOutputData();
                     }
                     // tady nemůže být větší paralelita, protože to pak nezvládá elasticsearch
-                    , logOutputFunc, progressOutputFunc, true, prefix: "LoadPeople ", maxDegreeOfParallelism:5, monitor: new MonitoredTaskRepo.ForBatch()); 
-
+                    , logOutputFunc, progressOutputFunc, true, prefix: "LoadPeople ", maxDegreeOfParallelism: 5,
+                    monitor: new MonitoredTaskRepo.ForBatch());
             }
+
             return results;
         }
 
-        
 
         private static IEnumerable<Autocomplete> LoadOblasti()
         {
@@ -496,15 +496,13 @@ namespace HlidacStatu.Repositories
 
             return oblasti;
         }
-        
+
         private static async Task<IEnumerable<Autocomplete>> LoadDotaceProgramsAsync()
         {
-            
             var programs = await DotaceRepo.GetDistinctProgramsAsync();
-            
+
             var programy = programs.Select(p =>
             {
-                
                 var program = new Autocomplete()
                 {
                     Id = $"program:\"{p}\"",
@@ -515,11 +513,11 @@ namespace HlidacStatu.Repositories
                     ImageElement = $"<i class='fa-duotone fa-light fa-folder-open'></i>",
                     Category = Autocomplete.CategoryEnum.DotaceProgram,
                 };
-            
-                
+
+
                 return program;
             });
-            
+
             return programy;
         }
 
@@ -549,7 +547,7 @@ namespace HlidacStatu.Repositories
                 }
             };
         }
-        
+
         // private static IEnumerable<Autocomplete> LoadArticles()
         // {
         //     

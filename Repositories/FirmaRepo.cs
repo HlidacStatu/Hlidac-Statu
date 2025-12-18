@@ -1,21 +1,14 @@
 using Devmasters;
-using Devmasters.Enums;
-using Google.Protobuf.WellKnownTypes;
 using HlidacStatu.Connectors;
-using HlidacStatu.DS.Api.Firmy;
 using HlidacStatu.Entities;
-using HlidacStatu.Entities.Facts;
-using HlidacStatu.Extensions;
 using HlidacStatu.Lib.Data.External.DatoveSchrankyOpenData;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
-using Nest;
 using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
-using System.Threading.Tasks;
 
 namespace HlidacStatu.Repositories
 {

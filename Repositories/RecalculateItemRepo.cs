@@ -8,9 +8,7 @@ using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 using Serilog;
-using Devmasters.Collections;
 using HlidacStatu.Repositories.Cache;
-using HlidacStatu.Repositories.Statistics;
 
 namespace HlidacStatu.Repositories
 {

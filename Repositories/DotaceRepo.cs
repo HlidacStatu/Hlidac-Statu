@@ -16,7 +16,7 @@ namespace HlidacStatu.Repositories
     {
         private static readonly ILogger Logger = Log.ForContext(typeof(DotaceRepo));
 
-        public static readonly ElasticClient DotaceClient = Manager.GetESClient_Dotace();
+        private static ElasticClient DotaceClient => Manager.GetESClient_Dotace();
 
         public const int LastCompleteYear = 2024;
 

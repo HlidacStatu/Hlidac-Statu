@@ -8,7 +8,7 @@ namespace HlidacStatu.Repositories
 {
     public static partial class MonitoredTaskRepo
     {
-         public static MonitoredTask Create(MonitoredTask monitoredTask)
+        public static MonitoredTask Create(MonitoredTask monitoredTask)
         {
             if (!string.IsNullOrEmpty(monitoredTask?.Exception))
                 if (monitoredTask.Exception.Length > 50000)
@@ -18,8 +18,8 @@ namespace HlidacStatu.Repositories
                 _ = db.MonitoredTasks.Add(monitoredTask);
                 _ = db.SaveChanges();
             }
-            return monitoredTask;
 
+            return monitoredTask;
         }
 
         public static async Task<MonitoredTask> CreateAsync(MonitoredTask monitoredTask)
@@ -33,6 +33,7 @@ namespace HlidacStatu.Repositories
                 _ = db.MonitoredTasks.Add(monitoredTask);
                 _ = await db.SaveChangesAsync();
             }
+
             return monitoredTask;
         }
 
@@ -45,17 +46,18 @@ namespace HlidacStatu.Repositories
             if ((now - task.LastTimeProgressUpdated) > task.MinIntervalBetweenUpdates)
             {
                 //Console.WriteLine($"{now:mm.ss} in db");
-                DirectDB.Instance.NoResult("update MonitoredTasks set ItemUpdated = @now, progress=@progress where pk = @pk",
+                DirectDB.Instance.NoResult(
+                    "update MonitoredTasks set ItemUpdated = @now, progress=@progress where pk = @pk",
                     new Microsoft.Data.SqlClient.SqlParameter("now", task.ItemUpdated),
                     new Microsoft.Data.SqlClient.SqlParameter("progress", task.Progress),
                     new Microsoft.Data.SqlClient.SqlParameter("pk", task.Pk)
-                    );
+                );
                 task.ProgressUpdated();
-
             }
-            return task;
 
+            return task;
         }
+
         public static MonitoredTask Update(this MonitoredTask task)
         {
             using (DbEntities db = new DbEntities())
@@ -63,11 +65,11 @@ namespace HlidacStatu.Repositories
                 _ = db.MonitoredTasks.Attach(task);
                 db.Entry(task).State = Microsoft.EntityFrameworkCore.EntityState.Modified;
                 _ = db.SaveChanges();
-
             }
-            return task;
 
+            return task;
         }
+
         public static MonitoredTask Finish(this MonitoredTask task, bool success = true, Exception exception = null)
         {
             string except = "";
@@ -84,11 +86,12 @@ namespace HlidacStatu.Repositories
                             sb.AppendLine(exNestedInnerException.ToString());
                             sb.AppendLine("\n\n----------\n\n");
                         }
+
                         exNestedInnerException = exNestedInnerException.InnerException;
-                    }
-                    while (exNestedInnerException != null);
+                    } while (exNestedInnerException != null);
                 }
-                except=sb.ToString();
+
+                except = sb.ToString();
             }
             else
                 except = exception?.ToString();
@@ -108,10 +111,9 @@ namespace HlidacStatu.Repositories
                 _ = db.MonitoredTasks.Attach(task);
                 db.Entry(task).State = Microsoft.EntityFrameworkCore.EntityState.Modified;
                 _ = db.SaveChanges();
-
             }
-            return task;
 
+            return task;
         }
 
         private static decimal SetProgress(decimal progressInPercent)
@@ -123,6 +125,5 @@ namespace HlidacStatu.Repositories
 
             return progressInPercent;
         }
-
     }
 }

@@ -1,6 +1,5 @@
 ﻿using HlidacStatu.Lib.Analytics;
 using System.Linq;
-using static HlidacStatu.Repositories.DotaceRepo;
 
 namespace HlidacStatu.Repositories
 {
