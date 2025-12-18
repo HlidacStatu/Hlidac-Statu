@@ -13,7 +13,7 @@ namespace HlidacStatu.Repositories
 
         private static string getNameByIco(string key)
         {
-            var o = FirmaRepo.FromIcoAsync(key);
+            var o = FirmaRepo.FromIco(key);
             if (o == null)
                 return key;
             if (o.Valid == false)
@@ -23,7 +23,7 @@ namespace HlidacStatu.Repositories
 
         private static Firma getByIco(string key)
         {
-            var o = FirmaRepo.FromIcoAsync(key);
+            var o = FirmaRepo.FromIco(key);
             return o ?? nullObj;
         }
         private static Firma getByDS(string key)
