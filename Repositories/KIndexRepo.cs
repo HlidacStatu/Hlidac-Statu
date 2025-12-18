@@ -214,7 +214,7 @@ public static class KIndexRepo
             }
             if (string.IsNullOrWhiteSpace(kindexFeedback.Company))
             {
-                var firma = FirmaRepo.FromIco(kindexFeedback.Ico);
+                var firma = await FirmaRepo.FromIcoAsync(kindexFeedback.Ico);
                 kindexFeedback.Company = firma.Jmeno;
             }
 

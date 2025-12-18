@@ -46,7 +46,7 @@ namespace HlidacStatu.Repositories
         public static async Task<bool> MaSkutecnehoMajiteleAsync(string ico, DateTime datumPocatku)
         {
             if (string.IsNullOrWhiteSpace(ico)) throw new ArgumentNullException(nameof(ico));
-            var firma = FirmaRepo.FromIco(ico);
+            var firma = await FirmaRepo.FromIcoAsync(ico);
 
             if (PodlehaSkm(firma, datumPocatku))
             {

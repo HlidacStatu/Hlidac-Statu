@@ -2,12 +2,10 @@ using System.Dynamic;
 using System.Text.Json;
 using Devmasters;
 using HlidacStatu.AI.LLM;
-using HlidacStatu.AI.LLM.Clients.Options;
 using HlidacStatu.Entities;
 using HlidacStatu.Entities.AI;
 using HlidacStatu.Repositories;
 using Serilog;
-using Serilog.Core;
 
 namespace HlidacStatu.Extensions;
 
@@ -23,7 +21,7 @@ public static class DotaceExtension
             return null;
 
         var datum = new DateTime(dotace.ApprovedYear.Value, 1, 1);
-        var firma = FirmaRepo.FromIco(dotace.Recipient.Ico);
+        var firma = await FirmaRepo.FromIcoAsync(dotace.Recipient.Ico);
 
         if (SkutecniMajiteleRepo.PodlehaSkm(firma, datum))
         {
