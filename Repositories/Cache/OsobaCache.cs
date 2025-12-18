@@ -16,25 +16,8 @@ namespace HlidacStatu.Repositories.Cache;
 public static class OsobaCache
 {
 
-    private static readonly object _postgreCacheLock = new();
-    private static IFusionCache _postgreCache;
-    private static IFusionCache PostgreCache
-    {
-        get
-        {
-            if (_postgreCache == null)
-            {
-                lock (_postgreCacheLock)
-                {
-                    _postgreCache ??= HlidacStatu.Caching.CacheFactory.CreateNew(
-                        CacheFactory.CacheType.L2PostgreSql,
-                        nameof(OsobaCache));
-                }
-            }
-
-            return _postgreCache;
-        }
-    }
+    private static readonly IFusionCache PostgreCache =
+        HlidacStatu.Caching.CacheFactory.CreateNew(CacheFactory.CacheType.L2PostgreSql, nameof(OsobaCache));
 
     public static ValueTask<InfoFact[]> GetInfoFactsAsync(Osoba osoba) =>
         PostgreCache.GetOrSetAsync($"_InfoFacts:{osoba.NameId}",
