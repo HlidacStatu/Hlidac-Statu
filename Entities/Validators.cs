@@ -26,25 +26,8 @@ namespace HlidacStatu.Entities
 
         public static Dictionary<string, string> CPVKody = new Dictionary<string, string>();
         
-        private static readonly object _permanentCacheLock = new();
-        private static IFusionCache _permanentCache;
-        private static IFusionCache PermanentCache
-        {
-            get
-            {
-                if (_permanentCache == null)
-                {
-                    lock (_permanentCacheLock)
-                    {
-                        _permanentCache ??= HlidacStatu.Caching.CacheFactory.CreateNew(
-                            CacheFactory.CacheType.PermanentStore,
-                            nameof(Validators));
-                    }
-                }
-
-                return _permanentCache;
-            }
-        }
+        private static readonly IFusionCache PermanentCache =
+            HlidacStatu.Caching.CacheFactory.CreateNew(CacheFactory.CacheType.PermanentStore, nameof(Validators));
 
         public static string JmenaCached()
             => PermanentCache.GetOrSet("jmena.txt",

@@ -28,9 +28,9 @@ namespace HlidacStatu.Datasets
         private static readonly ILogger _logger = Log.ForContext<DataSet>();
         
         public static DataSet GetCachedDataset(string datasetId) => 
-            DataSetCache.MemoryCache.GetOrSet($"_Datasets:{datasetId}", new DataSet(datasetId));
+            DataSetCache.Cache.GetOrSet($"_Datasets:{datasetId}", new DataSet(datasetId));
         public static void DeleteCachedDataset(string datasetId) => 
-            DataSetCache.MemoryCache.Remove($"_Datasets:{datasetId}");
+            DataSetCache.Cache.Remove($"_Datasets:{datasetId}");
 
 
         public static JsonSerializerSettings DefaultDeserializationSettings = new JsonSerializerSettings()

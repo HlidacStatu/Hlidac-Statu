@@ -8,27 +8,10 @@ namespace HlidacStatu.Datasets;
 
 public class DataSetCache
 {
-    private static readonly object _memoryCachelock = new object();
-    private static IFusionCache _memoryCache;
-    internal static IFusionCache MemoryCache
-    {
-        get
-        {
-            if (_memoryCache == null)
-            {
-                lock (_memoryCachelock)
-                {
-                    _memoryCache ??= HlidacStatu.Caching.CacheFactory.CreateNew(
-                        CacheFactory.CacheType.L1Default,
-                        nameof(DataSetDB));
-                }
-            }
-
-            return _memoryCache;
-        }
-    }
+    internal static readonly IFusionCache Cache =
+        HlidacStatu.Caching.CacheFactory.CreateNew(CacheFactory.CacheType.L1Default, nameof(DataSetDB));
     
-    public static ValueTask<DataSet[]> GetAllDatasetsAsync() => MemoryCache.GetOrSetAsync($"_AllDataSets", async _ =>
+    public static ValueTask<DataSet[]> GetAllDatasetsAsync() => Cache.GetOrSetAsync($"_AllDataSets", async _ =>
         {
             var ds = await HlidacStatu.Datasets.DataSet.CreateDataSetInstanceAsync(DataSetDB.DataSourcesDbName, false);
             var searchData = await ds.SearchDataRawAsync("*", 1, 500);
@@ -42,7 +25,7 @@ public class DataSetCache
         }
     );
     
-    public static ValueTask<DataSet[]> GetProductionDatasetsAsync() => MemoryCache.GetOrSetAsync($"_ProductionDataSets", async _ =>
+    public static ValueTask<DataSet[]> GetProductionDatasetsAsync() => Cache.GetOrSetAsync($"_ProductionDataSets", async _ =>
         {
             var results = new List<DataSet>();
             var datasets = (await GetAllDatasetsAsync())

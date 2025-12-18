@@ -21,25 +21,8 @@ namespace PlatyUredniku.Cache
             public string Strana { get; set; }
         }
 
-        private static readonly object _postgreCacheLock = new();
-        private static IFusionCache _postgreCache;
-        private static IFusionCache PostgreCache
-        {
-            get
-            {
-                if (_postgreCache == null)
-                {
-                    lock (_postgreCacheLock)
-                    {
-                        _postgreCache ??= HlidacStatu.Caching.CacheFactory.CreateNew(
-                            CacheFactory.CacheType.L2PostgreSql,
-                            nameof(OsobyRolesCache));
-                    }
-                }
-
-                return _postgreCache;
-            }
-        }
+        private static readonly IFusionCache _postgreSqlCache =
+            HlidacStatu.Caching.CacheFactory.CreateNew(CacheFactory.CacheType.L2PostgreSql, nameof(OsobyRolesCache));
 
         private static async Task<Dictionary<string, osobaInfo>> GetOrSetCachedRolesAsync(int rok,
             Dictionary<string, osobaInfo>? data = null)
@@ -47,7 +30,7 @@ namespace PlatyUredniku.Cache
             string cacheKey = $"OsobyRolesCache:{rok}";
             if (data is null)
             {
-                return await PostgreCache.GetOrSetAsync(cacheKey, async _ =>
+                return await _postgreSqlCache.GetOrSetAsync(cacheKey, async _ =>
                     {
                         System.Collections.Concurrent.ConcurrentDictionary<string, osobaInfo> res = new();
                         var nameids = (await PpRepo.GetNameIdsForGroupAsync(PpRepo.PoliticianGroup.Vse)).Distinct();
@@ -82,7 +65,7 @@ namespace PlatyUredniku.Cache
                     });
             }
 
-            await PostgreCache.SetAsync(cacheKey, data, options =>
+            await _postgreSqlCache.SetAsync(cacheKey, data, options =>
             {
                 options.ModifyEntryOptionsDuration(TimeSpan.FromHours(12));
                 options.ModifyEntryOptionsFactoryTimeouts(factoryHardTimeout: TimeSpan.FromMinutes(10));

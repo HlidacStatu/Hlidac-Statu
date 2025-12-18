@@ -18,28 +18,12 @@ namespace HlidacStatu.Repositories.Analysis.KorupcniRiziko
 
         static int[] Percentiles = new int[] { 1, 5, 10, 25, 33, 50, 66, 75, 90, 95, 99 };
 
-        private static readonly object _permanentCacheLock = new();
-        private static IFusionCache _permanentCache;
-        private static IFusionCache PermanentCache
-        {
-            get
-            {
-                if (_permanentCache == null)
-                {
-                    lock (_permanentCacheLock)
-                    {
-                        _permanentCache ??= HlidacStatu.Caching.CacheFactory.CreateNew(
-                            CacheFactory.CacheType.PermanentStore,
-                            "KindexStatistics");
-                    }
-                }
 
-                return _permanentCache;
-            }
-        }
+        private static readonly IFusionCache _permanentCache =
+            HlidacStatu.Caching.CacheFactory.CreateNew(CacheFactory.CacheType.PermanentStore, "KindexStatistics");
 
         public static ValueTask<Statistics[]> GetKindexStatTotalAsync() =>
-            PermanentCache.GetOrSetAsync($"_KIndexStat",
+            _permanentCache.GetOrSetAsync($"_KIndexStat",
                 async _ => (await CalculateAsync()).ToArray(),
                 options =>
                 {
@@ -49,10 +33,10 @@ namespace HlidacStatu.Repositories.Analysis.KorupcniRiziko
 
         public static async Task ForceRefreshKindexStatTotalAsync(Statistics[] newData = null)
         {
-            await PermanentCache.ExpireAsync($"_KIndexStat");
+            await _permanentCache.ExpireAsync($"_KIndexStat");
             if (newData is not null && newData.Any())
             {
-                await PermanentCache.SetAsync($"_KIndexStat", newData);
+                await _permanentCache.SetAsync($"_KIndexStat", newData);
             }
             else
             {

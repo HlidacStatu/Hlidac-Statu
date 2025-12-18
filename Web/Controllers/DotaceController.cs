@@ -16,27 +16,10 @@ namespace HlidacStatu.Web.Controllers
 {
     public class DotaceController : Controller
     {
-        private static readonly object _memoryCachelock = new object();
-        private static IFusionCache _memoryCache;
-        private static IFusionCache MemoryCache
-        {
-            get
-            {
-                if (_memoryCache == null)
-                {
-                    lock (_memoryCachelock)
-                    {
-                        _memoryCache ??= HlidacStatu.Caching.CacheFactory.CreateNew(
-                            CacheFactory.CacheType.L1Default,
-                            nameof(DotaceController));
-                    }
-                }
+        private static readonly IFusionCache Cache =
+            HlidacStatu.Caching.CacheFactory.CreateNew(CacheFactory.CacheType.L1Default, nameof(DotaceController));
 
-                return _memoryCache;
-            }
-        }
-        
-        private ValueTask<poskytovateleCacheModel[]> GetPoskytovateleCacheAsync() => MemoryCache.GetOrSetAsync(
+        private ValueTask<poskytovateleCacheModel[]> GetPoskytovateleCacheAsync() => Cache.GetOrSetAsync(
             $"_DotaceController_PoskytovateleCache", async _ =>
             {
                 var poskytovateleIcos =

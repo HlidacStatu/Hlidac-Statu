@@ -11,45 +11,11 @@ namespace HlidacStatu.Repositories.Searching
     {
         private static Random Rnd = new Random();
         
-        private static readonly object _memoryCachelock = new object();
-        private static IFusionCache _memoryCache;
-        private static IFusionCache MemoryCache
-        {
-            get
-            {
-                if (_memoryCache == null)
-                {
-                    lock (_memoryCachelock)
-                    {
-                        _memoryCache ??= HlidacStatu.Caching.CacheFactory.CreateNew(
-                            CacheFactory.CacheType.L1Default,
-                            nameof(Politici));
-                    }
-                }
-
-                return _memoryCache;
-            }
-        }
+        private static readonly IFusionCache _memoryCache =
+            HlidacStatu.Caching.CacheFactory.CreateNew(CacheFactory.CacheType.L1Default, nameof(Politici));
         
-        private static readonly object _permanentCacheLock = new();
-        private static IFusionCache _permanentCache;
-        private static IFusionCache PermanentCache
-        {
-            get
-            {
-                if (_permanentCache == null)
-                {
-                    lock (_permanentCacheLock)
-                    {
-                        _permanentCache ??= HlidacStatu.Caching.CacheFactory.CreateNew(
-                            CacheFactory.CacheType.PermanentStore,
-                            nameof(Politici));
-                    }
-                }
-
-                return _permanentCache;
-            }
-        }
+        private static readonly IFusionCache _permanentCache =
+            HlidacStatu.Caching.CacheFactory.CreateNew(CacheFactory.CacheType.PermanentStore, nameof(Politici));
 
         //Tady byly cache původně blbě a nedocházelo ke správným opravám dat, pokud aplikace běžela déle než 5 dní
         
@@ -59,10 +25,10 @@ namespace HlidacStatu.Repositories.Searching
             string cacheKey = $"_CalculatedPoliticiStems_";
             if (data is null || !data.Any())
             {
-                return PermanentCache.GetOrDefault(cacheKey, new Dictionary<string, string>());
+                return _permanentCache.GetOrDefault(cacheKey, new Dictionary<string, string>());
             }
             
-            PermanentCache.Set(cacheKey, data, options =>
+            _permanentCache.Set(cacheKey, data, options =>
             {
                 options.ModifyEntryOptionsDuration(TimeSpan.FromHours(1), TimeSpan.FromDays(10 * 365));
                 options.FactoryHardTimeout = TimeSpan.FromHours(1);
@@ -73,7 +39,7 @@ namespace HlidacStatu.Repositories.Searching
         // 1 hodinu v paměti, 4 dni živnotnost (aby se spustila rekalkulace při dalším příp. startu), 
         // 16 dní failsafe
         private static ValueTask<PolitikStem[]> GetCachedPoliticiStemsAsync() =>
-            PermanentCache.GetOrSetAsync($"_politiciStems_",
+            _permanentCache.GetOrSetAsync($"_politiciStems_",
                 _ => RecalculatePoliticiStemsAsync(),
                 options =>
                 {
@@ -83,7 +49,7 @@ namespace HlidacStatu.Repositories.Searching
         
         //5 dní v paměti, pak rekalk => spustí rekalk GetCachedPoliticiStemsAsync()
         private static ValueTask<List<Tuple<string, string[]>>> PoliticiStemsCachedAsync() =>
-            MemoryCache.GetOrSetAsync($"_politiciStemsInMem_",
+            _memoryCache.GetOrSetAsync($"_politiciStemsInMem_",
                 _ => InitPoliticiStemsAsync(),
                 options =>
                 {
