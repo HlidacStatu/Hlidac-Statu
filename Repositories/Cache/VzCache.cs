@@ -9,11 +9,28 @@ namespace HlidacStatu.Repositories.Cache;
 
 public static class VzCache
 {
-    private static readonly IFusionCache _memoryCache =
-        HlidacStatu.Caching.CacheFactory.CreateNew(CacheFactory.CacheType.L1Default, nameof(VzCache));
+    private static readonly object _memoryCachelock = new object();
+    private static IFusionCache _memoryCache;
+    private static IFusionCache MemoryCache
+    {
+        get
+        {
+            if (_memoryCache == null)
+            {
+                lock (_memoryCachelock)
+                {
+                    _memoryCache ??= HlidacStatu.Caching.CacheFactory.CreateNew(
+                        CacheFactory.CacheType.L1Default,
+                        nameof(VzCache));
+                }
+            }
+
+            return _memoryCache;
+        }
+    }
 
     public static ValueTask<VerejnaZakazkaSearchData> GetSearchesAsync(string query) =>
-        _memoryCache.GetOrSetAsync($"_VzSearch:{query}",
+        MemoryCache.GetOrSetAsync($"_VzSearch:{query}",
             _ => CachedFuncSimpleSearchAsync(query),
             options => options.ModifyEntryOptionsDuration(TimeSpan.FromHours(6))
         );

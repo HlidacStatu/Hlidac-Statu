@@ -18,8 +18,25 @@ namespace HlidacStatu.Repositories.Cache;
 
 public class StatisticsCache
 {
-    private static readonly IFusionCache PermanentCache =
-        HlidacStatu.Caching.CacheFactory.CreateNew(CacheFactory.CacheType.PermanentStore, nameof(StatisticsCache));
+    private static readonly object _permanentCacheLock = new();
+    private static IFusionCache _permanentCache;
+    private static IFusionCache PermanentCache
+    {
+        get
+        {
+            if (_permanentCache == null)
+            {
+                lock (_permanentCacheLock)
+                {
+                    _permanentCache ??= HlidacStatu.Caching.CacheFactory.CreateNew(
+                        CacheFactory.CacheType.PermanentStore,
+                        nameof(StatisticsCache));
+                }
+            }
+
+            return _permanentCache;
+        }
+    }
     
     //smlouvy
     public static ValueTask<StatisticsPerYear<Smlouva.Statistics.Data>>

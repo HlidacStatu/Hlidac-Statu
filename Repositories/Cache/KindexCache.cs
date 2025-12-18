@@ -13,17 +13,49 @@ namespace HlidacStatu.Repositories.Cache;
 
 public static class KindexCache
 {
-    // private static readonly ILogger _logger = Log.ForContext(typeof(FirmaCache));
+    private static readonly object _permanentCacheLock = new();
+    private static IFusionCache _permanentCache;
+    private static IFusionCache PermanentCache
+    {
+        get
+        {
+            if (_permanentCache == null)
+            {
+                lock (_permanentCacheLock)
+                {
+                    _permanentCache ??= HlidacStatu.Caching.CacheFactory.CreateNew(
+                        CacheFactory.CacheType.PermanentStore,
+                        nameof(KindexCache));
+                }
+            }
 
-    private static readonly IFusionCache _permanentCache =
-        HlidacStatu.Caching.CacheFactory.CreateNew(CacheFactory.CacheType.PermanentStore, nameof(KindexCache));
+            return _permanentCache;
+        }
+    }
 
-    private static readonly IFusionCache _memoryCache =
-        HlidacStatu.Caching.CacheFactory.CreateNew(CacheFactory.CacheType.L1Default, nameof(KindexCache));
+    private static readonly object _memoryCachelock = new object();
+    private static IFusionCache _memoryCache;
+    private static IFusionCache MemoryCache
+    {
+        get
+        {
+            if (_memoryCache == null)
+            {
+                lock (_memoryCachelock)
+                {
+                    _memoryCache ??= HlidacStatu.Caching.CacheFactory.CreateNew(
+                        CacheFactory.CacheType.L1Default,
+                        nameof(KindexCache));
+                }
+            }
+
+            return _memoryCache;
+        }
+    }
 
 
     public static ValueTask<HashSet<string>> GetKindexReadyIcosAsync() =>
-        _memoryCache.GetOrSetAsync($"_KIndexReadyIcos", async _ =>
+        MemoryCache.GetOrSetAsync($"_KIndexReadyIcos", async _ =>
                 (await HlidacStatu.Repositories.Searching.Tools.GetAllSmlouvyIdsAsync(
                     Manager.GetESClient_KIndex(),
                     4,
@@ -34,14 +66,14 @@ public static class KindexCache
 
 
     public static ValueTask<Dictionary<string, SubjectNameCache>> GetKindexCompaniesAsync() =>
-        _permanentCache.GetOrSetAsync($"_KIndexCompanies", _ => ListCompaniesAsync(),
+        PermanentCache.GetOrSetAsync($"_KIndexCompanies", _ => ListCompaniesAsync(),
             options => options.ModifyEntryOptionsDuration(TimeSpan.FromHours(6), TimeSpan.FromDays(10 * 365))
         );
 
-    public static ValueTask InvalidateKindexCompaniesAsync() => _permanentCache.ExpireAsync($"_KIndexCompanies");
+    public static ValueTask InvalidateKindexCompaniesAsync() => PermanentCache.ExpireAsync($"_KIndexCompanies");
 
     public static ValueTask<KIndexData> GetKindexCachedAsync(string ico, bool useTempDb) =>
-        _memoryCache.GetOrSetAsync($"_KIndexData:{ico}-{useTempDb}", async _ =>
+        MemoryCache.GetOrSetAsync($"_KIndexData:{ico}-{useTempDb}", async _ =>
             {
                 KIndexData f = await KIndexRepo.GetDirectAsync(ico, useTempDb);
                 if (f == null || f.Ico == "-")
@@ -52,12 +84,12 @@ public static class KindexCache
         );
 
     public static ValueTask InvalidateKindexCachedAsync(string ico, bool useTempDb) =>
-        _memoryCache.ExpireAsync($"_KIndexData:{ico}-{useTempDb}");
+        MemoryCache.ExpireAsync($"_KIndexData:{ico}-{useTempDb}");
 
 
     public static ValueTask<KIndexData.KIndexParts[]> GetKindexOrderedValuesFromBestForInfofactsAsync(
         KIndexData.Annual annual, string ico) =>
-        _memoryCache.GetOrSetAsync($"_orderedValuesFromBestForInfofacts:{annual.Ico}-{annual.Rok}-{ico}",
+        MemoryCache.GetOrSetAsync($"_orderedValuesFromBestForInfofacts:{annual.Ico}-{annual.Rok}-{ico}",
             async _ => await OrderedValuesFromBestForInfofactsAsync(annual, ico),
             options => options.ModifyEntryOptionsDuration(TimeSpan.FromDays(2))
         );

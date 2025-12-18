@@ -7,8 +7,25 @@ namespace HlidacStatu.Repositories.Cache;
 
 public class IdsCache
 {
-    private static readonly IFusionCache PostgreCache =
-        HlidacStatu.Caching.CacheFactory.CreateNew(CacheFactory.CacheType.L2PostgreSql, nameof(IdsCache));
+    private static readonly object _postgreCacheLock = new();
+    private static IFusionCache _postgreCache;
+    private static IFusionCache PostgreCache
+    {
+        get
+        {
+            if (_postgreCache == null)
+            {
+                lock (_postgreCacheLock)
+                {
+                    _postgreCache ??= HlidacStatu.Caching.CacheFactory.CreateNew(
+                        CacheFactory.CacheType.L2PostgreSql,
+                        nameof(IdsCache));
+                }
+            }
+
+            return _postgreCache;
+        }
+    }
 
     public static async Task<string[]> GetSmlouvyIdsAsync(FilteredIdsRepo.QueryBatch query, bool forceUpdate = false)
     {
