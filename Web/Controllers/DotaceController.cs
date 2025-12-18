@@ -16,7 +16,7 @@ namespace HlidacStatu.Web.Controllers
 {
     public class DotaceController : Controller
     {
-        private static readonly IFusionCache Cache =
+        private static IFusionCache Cache =>
             HlidacStatu.Caching.CacheFactory.CreateNew(CacheFactory.CacheType.L1Default, nameof(DotaceController));
 
         private ValueTask<poskytovateleCacheModel[]> GetPoskytovateleCacheAsync() => Cache.GetOrSetAsync(

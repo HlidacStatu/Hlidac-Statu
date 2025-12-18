@@ -10,7 +10,7 @@ namespace HlidacStatu.Web.HealthChecks
 {
     public class CachedResult : IHealthCheck
     {
-        private readonly IFusionCache _cache =
+        private IFusionCache _cache =>
             HlidacStatu.Caching.CacheFactory.CreateNew(CacheFactory.CacheType.L1Default, "HealthChecksCachedResult");
         
         private ValueTask<HealthCheckResult> GetPoskytovateleCacheAsync(HealthCheckContext context, CancellationToken cancellationToken) => _cache.GetOrSetAsync(

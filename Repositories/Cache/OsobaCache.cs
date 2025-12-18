@@ -16,7 +16,7 @@ namespace HlidacStatu.Repositories.Cache;
 public static class OsobaCache
 {
 
-    private static readonly IFusionCache PostgreCache =
+    private static IFusionCache PostgreCache =>
         HlidacStatu.Caching.CacheFactory.CreateNew(CacheFactory.CacheType.L2PostgreSql, nameof(OsobaCache));
 
     public static ValueTask<InfoFact[]> GetInfoFactsAsync(Osoba osoba) =>

@@ -8,7 +8,7 @@ namespace HlidacStatu.Repositories.Cache;
 
 public static class SmlouvaCache
 {
-    private static readonly IFusionCache PermanentCache =
+    private static IFusionCache PermanentCache =>
         HlidacStatu.Caching.CacheFactory.CreateNew(CacheFactory.CacheType.PermanentStore, nameof(SmlouvaCache));
     
     private static ValueTask<byte[]> GetRawStemsFromCacheAsync(string smlouvaId) =>

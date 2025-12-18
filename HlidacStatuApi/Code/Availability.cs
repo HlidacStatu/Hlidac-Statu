@@ -7,7 +7,7 @@ namespace HlidacStatuApi.Code
 {
     public class Availability
     {
-        private static readonly IFusionCache MemoryCache =
+        private static IFusionCache MemoryCache =>
             HlidacStatu.Caching.CacheFactory.CreateNew(CacheFactory.CacheType.L1Default, nameof(Availability));
 
         public static ValueTask<UptimeServer.HostAvailability[]> GetUptimeServer1dayCacheAsync() =>

@@ -22,7 +22,7 @@ namespace HlidacStatu.Repositories.Analysis
     {
         private static readonly ILogger _logger = Log.ForContext(typeof(AnalysisCalculation));
 
-        private static readonly IFusionCache PermanentCache =
+        private static IFusionCache PermanentCache =>
             HlidacStatu.Caching.CacheFactory.CreateNew(CacheFactory.CacheType.PermanentStore,
                 nameof(AnalysisCalculation));
 

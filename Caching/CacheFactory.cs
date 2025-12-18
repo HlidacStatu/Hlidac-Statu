@@ -1,4 +1,5 @@
-﻿using Enyim.Caching;
+﻿using System.Collections.Concurrent;
+using Enyim.Caching;
 using Enyim.Caching.Memcached;
 using HlidacStatu.CachingClients.PostgreSql;
 using Microsoft.Extensions.Caching.Distributed;
@@ -136,7 +137,14 @@ public static class CacheFactory
 
     private static IServiceProvider? _serviceProvider = null;
 
+    private static readonly ConcurrentDictionary<(CacheType, string), IFusionCache> _cacheInstances = new();
+    
     public static IFusionCache CreateNew(CacheType cacheType, string cachePrefix)
+    {
+        return _cacheInstances.GetOrAdd((cacheType, cachePrefix), key => CreateNewInternal(key.Item1, key.Item2));
+    }
+    
+    private static IFusionCache CreateNewInternal(CacheType cacheType, string cachePrefix)
     {
         _serviceProvider ??= BuildServiceProvider();
         var logger = _serviceProvider?.GetService<Microsoft.Extensions.Logging.ILogger<FusionCache>?>();

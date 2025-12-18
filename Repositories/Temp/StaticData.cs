@@ -21,7 +21,7 @@ namespace HlidacStatu.Repositories
     {
         private static readonly ILogger _logger = Log.ForContext(typeof(StaticData));
         
-        private static readonly IFusionCache _memoryCache =
+        private static IFusionCache _memoryCache =>
             HlidacStatu.Caching.CacheFactory.CreateNew(CacheFactory.CacheType.L1Default, nameof(StaticData));
 
         public static ValueTask<List<double>> GetBasicStatisticDataAsync() =>

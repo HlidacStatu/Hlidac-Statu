@@ -19,7 +19,7 @@ namespace HlidacStatu.Util
         static List<string> skobce = new List<string>();
         static Dictionary<string, string> ciziStaty = new Dictionary<string, string>();
         
-        private static readonly IFusionCache PermanentCache =
+        private static IFusionCache PermanentCache =>
             HlidacStatu.Caching.CacheFactory.CreateNew(CacheFactory.CacheType.PermanentStore, nameof(DataValidators));
 
         public static string CzObceCached()
