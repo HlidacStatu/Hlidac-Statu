@@ -19,8 +19,25 @@ namespace HlidacStatu.Util
         static List<string> skobce = new List<string>();
         static Dictionary<string, string> ciziStaty = new Dictionary<string, string>();
         
-        private static readonly IFusionCache PermanentCache =
-            HlidacStatu.Caching.CacheFactory.CreateNew(CacheFactory.CacheType.PermanentStore, nameof(DataValidators));
+        private static readonly object _permanentCacheLock = new();
+        private static IFusionCache _permanentCache;
+        private static IFusionCache PermanentCache
+        {
+            get
+            {
+                if (_permanentCache == null)
+                {
+                    lock (_permanentCacheLock)
+                    {
+                        _permanentCache ??= HlidacStatu.Caching.CacheFactory.CreateNew(
+                            CacheFactory.CacheType.PermanentStore,
+                            nameof(DataValidators));
+                    }
+                }
+
+                return _permanentCache;
+            }
+        }
 
         public static string CzObceCached()
             => PermanentCache.GetOrSet("czobce.txt",

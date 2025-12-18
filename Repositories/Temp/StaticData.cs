@@ -21,11 +21,28 @@ namespace HlidacStatu.Repositories
     {
         private static readonly ILogger _logger = Log.ForContext(typeof(StaticData));
         
-        private static readonly IFusionCache _memoryCache =
-            HlidacStatu.Caching.CacheFactory.CreateNew(CacheFactory.CacheType.L1Default, nameof(StaticData));
+        private static readonly object _memoryCachelock = new object();
+        private static IFusionCache _memoryCache;
+        private static IFusionCache MemoryCache
+        {
+            get
+            {
+                if (_memoryCache == null)
+                {
+                    lock (_memoryCachelock)
+                    {
+                        _memoryCache ??= HlidacStatu.Caching.CacheFactory.CreateNew(
+                            CacheFactory.CacheType.L1Default,
+                            nameof(StaticData));
+                    }
+                }
+
+                return _memoryCache;
+            }
+        }
 
         public static ValueTask<List<double>> GetBasicStatisticDataAsync() =>
-            _memoryCache.GetOrSetAsync($"_BasicStaticData", async _ =>
+            MemoryCache.GetOrSetAsync($"_BasicStaticData", async _ =>
                 {
                     List<double> pol = new List<double>();
                     try

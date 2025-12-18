@@ -13,10 +13,27 @@ namespace HlidacStatu.Web.HealthChecks
 {
     public class DatasetyStatistika : IHealthCheck
     {
-        private readonly IFusionCache _cache =
-            HlidacStatu.Caching.CacheFactory.CreateNew(CacheFactory.CacheType.L1Default, nameof(DatasetyStatistika));
+        private static readonly object _memoryCachelock = new object();
+        private static IFusionCache _memoryCache;
+        private static IFusionCache MemoryCache
+        {
+            get
+            {
+                if (_memoryCache == null)
+                {
+                    lock (_memoryCachelock)
+                    {
+                        _memoryCache ??= HlidacStatu.Caching.CacheFactory.CreateNew(
+                            CacheFactory.CacheType.L1Default,
+                            nameof(DatasetyStatistika));
+                    }
+                }
 
-        private ValueTask<List<DatasetStat>> GetStatistikyCachedAsync() => _cache.GetOrSetAsync(
+                return _memoryCache;
+            }
+        }
+
+        private ValueTask<List<DatasetStat>> GetStatistikyCachedAsync() => MemoryCache.GetOrSetAsync(
             $"_DatasetStat_all", async _ =>
             {
                 try
