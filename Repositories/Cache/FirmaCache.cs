@@ -12,16 +12,16 @@ namespace HlidacStatu.Repositories.Cache;
 
 public static class FirmaCache
 {
-    private static readonly IFusionCache MemoryCache =
+    private static IFusionCache MemoryCache =>
         HlidacStatu.Caching.CacheFactory.CreateNew(CacheFactory.CacheType.L1Default, nameof(FirmaCache));
 
-    private static readonly IFusionCache PostgreCache =
+    private static IFusionCache PostgreCache =>
         HlidacStatu.Caching.CacheFactory.CreateNew(CacheFactory.CacheType.L2PostgreSql, nameof(FirmaCache));
 
-    private static readonly IFusionCache MemcachedCache =
+    private static IFusionCache MemcachedCache =>
         HlidacStatu.Caching.CacheFactory.CreateNew(CacheFactory.CacheType.L2Memcache, nameof(FirmaCache));
     
-    private static readonly IFusionCache PermanentCache =
+    private static IFusionCache PermanentCache =>
         HlidacStatu.Caching.CacheFactory.CreateNew(CacheFactory.CacheType.PermanentStore, nameof(FirmaCache));
 
     public static ValueTask<InfoFact[]> GetInfoFactsAsync(Firma firma) =>

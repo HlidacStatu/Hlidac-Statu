@@ -8,7 +8,7 @@ namespace HlidacStatu.Datasets;
 
 public class DataSetCache
 {
-    internal static readonly IFusionCache Cache =
+    internal static IFusionCache Cache =>
         HlidacStatu.Caching.CacheFactory.CreateNew(CacheFactory.CacheType.L1Default, nameof(DataSetDB));
     
     public static ValueTask<DataSet[]> GetAllDatasetsAsync() => Cache.GetOrSetAsync($"_AllDataSets", async _ =>

@@ -17,12 +17,11 @@ namespace HlidacStatu.Repositories
     {
         private static readonly ILogger Logger = Log.ForContext(typeof(SubsidyRepo));
 
-        public static readonly ElasticClient SubsidyClient = Manager.GetESClient_Subsidy();
+        public static ElasticClient SubsidyClient => Manager.GetESClient_Subsidy();
 
         public static readonly string[] SubsidyDuplicityOrdering =
             ["IsRed", "Cedr", "Eufondy", "Státní zemědělský intervenční fond"];
 
-        private static readonly ConcurrentDictionary<string, SemaphoreSlim> _subsidyLocks = new();
         private static readonly SemaphoreSlim _deleteLock = new SemaphoreSlim(1, 1);
 
 

@@ -19,7 +19,7 @@ namespace HlidacStatu.Repositories.Analysis.KorupcniRiziko
         static int[] Percentiles = new int[] { 1, 5, 10, 25, 33, 50, 66, 75, 90, 95, 99 };
 
 
-        private static readonly IFusionCache _permanentCache =
+        private static IFusionCache _permanentCache =>
             HlidacStatu.Caching.CacheFactory.CreateNew(CacheFactory.CacheType.PermanentStore, "KindexStatistics");
 
         public static ValueTask<Statistics[]> GetKindexStatTotalAsync() =>

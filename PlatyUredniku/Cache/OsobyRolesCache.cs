@@ -21,7 +21,7 @@ namespace PlatyUredniku.Cache
             public string Strana { get; set; }
         }
 
-        private static readonly IFusionCache _postgreSqlCache =
+        private static IFusionCache _postgreSqlCache =>
             HlidacStatu.Caching.CacheFactory.CreateNew(CacheFactory.CacheType.L2PostgreSql, nameof(OsobyRolesCache));
 
         private static async Task<Dictionary<string, osobaInfo>> GetOrSetCachedRolesAsync(int rok,

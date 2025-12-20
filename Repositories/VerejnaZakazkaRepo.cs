@@ -27,41 +27,11 @@ namespace HlidacStatu.Repositories
 {
     public static partial class VerejnaZakazkaRepo
     {
-        // private static AsyncRetryPolicy<HttpResponseMessage> _retryPolicy = HttpPolicyExtensions
-        //     .HandleTransientHttpError()
-        //     .OrResult(r => r.RequestMessage.RequestUri.Host.Contains("bpapi.datlab.eu") &&
-        //                    r.StatusCode == HttpStatusCode.Forbidden)
-        //     .WaitAndRetryAsync(3, _ => TimeSpan.FromSeconds(1));
-
-        // private static ResiliencePipeline<HttpResponseMessage> _retryPipeline;
-        // private static ResiliencePipeline<HttpResponseMessage> _retryThrottledPipeline;
         private static ConcurrentDictionary<string,ResiliencePipeline<HttpResponseMessage>> _retryThrottledPipelinePerHost = new ();
 
         // Emergency HttpClient for cases where it is not convinient to inject HttpClient.
         private static Lazy<HttpClient> _lazyHttpClient = new();
-
-        // static VerejnaZakazkaRepo()
-        // {
-        //     _retryPipeline = new ResiliencePipelineBuilder<HttpResponseMessage>()
-        //         .AddRetry(new()
-        //         {
-        //             ShouldHandle = static args => args.Outcome switch
-        //             {
-        //                 { Exception: HttpRequestException } or { Exception: SocketException} => PredicateResult.True(),
-        //                 { Result.StatusCode: >= HttpStatusCode.InternalServerError } => PredicateResult.True(),
-        //                 { Result.StatusCode: HttpStatusCode.RequestTimeout } => PredicateResult.True(),
-        //                 var outcome when outcome.Result?.StatusCode == HttpStatusCode.Forbidden 
-        //                                  && outcome.Result?.RequestMessage?.RequestUri?.Host.Contains("bpapi.datlab.eu") == true => PredicateResult.True(),
-        //                 _ => PredicateResult.False()
-        //             },
-        //             MaxRetryAttempts = 3,
-        //             Delay = TimeSpan.FromSeconds(2),
-        //             UseJitter = true
-        //         })
-        //         .Build();
-        //     
-        // }
-
+        
         private static ResiliencePipeline<HttpResponseMessage> CreateNewResiliencePipeline()
         {
             return new ResiliencePipelineBuilder<HttpResponseMessage>()

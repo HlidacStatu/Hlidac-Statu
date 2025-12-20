@@ -13,12 +13,10 @@ namespace HlidacStatu.Repositories.Cache;
 
 public static class KindexCache
 {
-    // private static readonly ILogger _logger = Log.ForContext(typeof(FirmaCache));
-
-    private static readonly IFusionCache _permanentCache =
+    private static IFusionCache _permanentCache =>
         HlidacStatu.Caching.CacheFactory.CreateNew(CacheFactory.CacheType.PermanentStore, nameof(KindexCache));
 
-    private static readonly IFusionCache _memoryCache =
+    private static IFusionCache _memoryCache =>
         HlidacStatu.Caching.CacheFactory.CreateNew(CacheFactory.CacheType.L1Default, nameof(KindexCache));
 
 

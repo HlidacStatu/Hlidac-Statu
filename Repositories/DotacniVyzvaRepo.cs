@@ -1,7 +1,5 @@
 using Nest;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using HlidacStatu.Connectors;
 using HlidacStatu.Entities;
@@ -13,7 +11,7 @@ namespace HlidacStatu.Repositories
     {
         private static readonly ILogger Logger = Log.ForContext(typeof(DotacniVyzvaRepo));
 
-        public static readonly ElasticClient DotacniVyzvaClient = Manager.GetESClient_DotacniVyzva();
+        public static ElasticClient DotacniVyzvaClient => Manager.GetESClient_DotacniVyzva();
 
         public static async Task SaveAsync(DotacniVyzva dotacniVyzva, bool shouldRewrite = true)
         {

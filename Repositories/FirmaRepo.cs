@@ -1,15 +1,9 @@
 using Devmasters;
-using Devmasters.Enums;
-using Google.Protobuf.WellKnownTypes;
 using HlidacStatu.Connectors;
-using HlidacStatu.DS.Api.Firmy;
 using HlidacStatu.Entities;
-using HlidacStatu.Entities.Facts;
-using HlidacStatu.Extensions;
 using HlidacStatu.Lib.Data.External.DatoveSchrankyOpenData;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
-using Nest;
 using Serilog;
 using System;
 using System.Collections.Generic;
@@ -273,8 +267,35 @@ namespace HlidacStatu.Repositories
                 }
                 else
                     return Firma.NotFound;
-
             }
+        }
+        
+        public static async Task<Firma> FromIcoAsync(string ico, bool loadInvalidIco = false)
+        {
+            if (Util.DataValidators.CheckCZICO(ico) == false && loadInvalidIco == false)
+                return Firma.NotFound;
+        
+            Firma f = new Firma();
+            await using DbEntities db = new DbEntities();
+            
+            f = await db.Firma.FirstOrDefaultAsync(m => m.ICO == ico);
+            if (f is null)
+                return Firma.NotFound;
+        
+            f.ICO = HlidacStatu.Util.ParseTools.NormalizeIco(f.ICO);
+        
+            if (f != null)
+            {
+                f.DatovaSchranka = await db.Database.SqlQuery<string>($"select DatovaSchranka from firma_DS where ico={ico}")
+                    .ToArrayAsync();
+        
+                f.NACE = await db.Database.SqlQuery<string>($"select NACE from firma_Nace where ico={ico}")
+                    .ToArrayAsync();
+                    
+                return f;
+            }
+            else
+                return Firma.NotFound;
         }
 
         public static Firma FromNameFirstItem(string jmeno, bool wildcards = false)

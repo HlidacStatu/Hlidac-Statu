@@ -9,7 +9,7 @@ namespace HlidacStatu.Repositories.Cache;
 
 public static class VzCache
 {
-    private static readonly IFusionCache _memoryCache =
+    private static IFusionCache _memoryCache =>
         HlidacStatu.Caching.CacheFactory.CreateNew(CacheFactory.CacheType.L1Default, nameof(VzCache));
 
     public static ValueTask<VerejnaZakazkaSearchData> GetSearchesAsync(string query) =>

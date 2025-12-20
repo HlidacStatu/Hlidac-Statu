@@ -20,7 +20,7 @@ namespace HlidacStatu.WebGenerator.Code
 
         private static string cacheKey(KeyAndId ki) => $"_{ki.CacheNameOnDisk}";
 
-        private static readonly IFusionCache PostgreCache =
+        private static IFusionCache PostgreCache =>
             HlidacStatu.Caching.CacheFactory.CreateNew(CacheFactory.CacheType.L2PostgreSqlBinarySerializer, "socialbanner");
 
         private static async Task<byte[]> getAsync(

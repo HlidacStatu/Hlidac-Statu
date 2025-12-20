@@ -915,9 +915,7 @@ namespace HlidacStatu.Extensions
                             .ToArray();
                         decimal celkem = sponzoring.Sum(m => m.Hodnota) ?? 0;
                         decimal top = sponzoring.Max(m => m.Hodnota) ?? 0;
-                        string prvniStrana =
-                            FirmaRepo.FromIco(strany[0])
-                                .Jmeno; //todo: přidat tabulku politických stran a změnit zde na název strany
+                        string prvniStrana = (await FirmaRepo.FromIcoAsync(strany[0])).Jmeno;
 
                         f.Add(new InfoFact($"{sName} "
                                            + Devmasters.Lang.CS.Plural.Get(roky.Count(), "v roce " + roky[0],

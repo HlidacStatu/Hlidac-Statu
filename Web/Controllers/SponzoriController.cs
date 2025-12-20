@@ -47,7 +47,7 @@ namespace HlidacStatu.Web.Controllers
             var filteredModel = model.Where(s => s.DarCelkem > 100000).ToList();
             ViewBag.Rok = rok ?? 0;
             var firstRow = filteredModel.FirstOrDefault();
-            ViewBag.TopFirma = FirmaRepo.FromIco(firstRow?.Id);
+            ViewBag.TopFirma = FirmaRepo.FromIcoAsync(firstRow?.Id);
             ViewBag.TopFirmaAmount = firstRow?.DarCelkem ?? 0;
 
             return View(filteredModel);
@@ -91,7 +91,7 @@ namespace HlidacStatu.Web.Controllers
             ViewBag.Strana = id;
             var model = await SponzoringRepo.CompanySponsorsAsync(id, cancellationToken);
             var firstRow = model.FirstOrDefault();
-            ViewBag.TopFirma = FirmaRepo.FromIco(firstRow?.Id);
+            ViewBag.TopFirma = FirmaRepo.FromIcoAsync(firstRow?.Id);
             ViewBag.TopFirmaAmount = firstRow?.DarCelkem ?? 0;
 
             return View(model);

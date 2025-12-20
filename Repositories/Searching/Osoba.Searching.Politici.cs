@@ -11,10 +11,10 @@ namespace HlidacStatu.Repositories.Searching
     {
         private static Random Rnd = new Random();
         
-        private static readonly IFusionCache _memoryCache =
+        private static IFusionCache _memoryCache =>
             HlidacStatu.Caching.CacheFactory.CreateNew(CacheFactory.CacheType.L1Default, nameof(Politici));
         
-        private static readonly IFusionCache _permanentCache =
+        private static IFusionCache _permanentCache =>
             HlidacStatu.Caching.CacheFactory.CreateNew(CacheFactory.CacheType.PermanentStore, nameof(Politici));
 
         //Tady byly cache původně blbě a nedocházelo ke správným opravám dat, pokud aplikace běžela déle než 5 dní

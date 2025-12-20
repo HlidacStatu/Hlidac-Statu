@@ -13,7 +13,7 @@ namespace HlidacStatu.Repositories
     public static class DocTablesRepo
     {
         //timout = 1000
-        private static ElasticClient _doTablesClient = Manager.GetESClient_DocTables();
+        private static ElasticClient _doTablesClient => Manager.GetESClient_DocTables();
         static Devmasters.Cache.AWS_S3.CacheProvider<HlidacStatu.DS.Api.TablesInDoc.Result[]> awsClient = null;
 
         static DocTablesRepo()

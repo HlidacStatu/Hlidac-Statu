@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 using HlidacStatu.Entities;
 using HlidacStatu.Extensions;
 using HlidacStatu.Repositories;
@@ -63,7 +64,7 @@ public static class Common
         /// <summary>
         /// Uploads new donations to FirmaEvent table
         /// </summary>
-        public static void UploadCompanyDonations(Donations donations, string user, string zdroj)
+        public static async Task UploadCompanyDonationsAsync(Donations donations, string user, string zdroj)
         {
             foreach (var companyDonations in donations.GetDonations())
             {
@@ -72,7 +73,7 @@ public static class Common
                 Firma firma = null;
                 try
                 {
-                    firma = FirmaRepo.FromIco(donor.CompanyId);
+                    firma = await FirmaRepo.FromIcoAsync(donor.CompanyId);
                 }
                 catch (Exception ex)
                 {

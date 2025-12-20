@@ -11,8 +11,6 @@ namespace HlidacStatu.Repositories
     {
         private static readonly ILogger _logger = Log.ForContext(typeof(OsobaVazbyRepo));
 
-
-
         public static string[] Icos_s_VazbouNaOsobu(string nameId)
         {
             string[] res = Array.Empty<string>();

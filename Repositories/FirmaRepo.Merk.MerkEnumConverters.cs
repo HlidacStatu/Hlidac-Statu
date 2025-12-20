@@ -1,14 +1,8 @@
-﻿using Amazon.Runtime.Internal.Transform;
-using Newtonsoft.Json;
-using Serilog;
+﻿using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Linq.Expressions;
-using System.Net.Http;
 using System.Text;
-using HlidacStatu.Repositories.Cache;
-using static HlidacStatu.Entities.Osoba;
 
 namespace HlidacStatu.Repositories
 {
