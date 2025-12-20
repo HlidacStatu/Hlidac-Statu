@@ -5,18 +5,13 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
+using Serilog;
 
 namespace HlidacStatu.RegistrVozidel
 {
-    public static class Repo
+    public static partial class Repo
     {
-        // Pseudocode:
-        // - Use db context with using var to ensure disposal.
-        // - Compose query with AsNoTracking on both sets for projection without tracking.
-        // - Join owners with vehicles by Pcv.
-        // - Filter by provided ico.
-        // - Select into a new VypisVozidel instance, assigning only the requested columns from p and vv.
-        // - Execute with ToListAsync and ConfigureAwait(false).
+        private static readonly ILogger _logger = Serilog.Log.ForContext(typeof(Repo));
 
         public static async Task<List<Models.VozidloLight>> GetForICOAsync(string ico,
             Enums.Vztah_k_vozidluEnum? vztah = null
@@ -50,10 +45,10 @@ namespace HlidacStatu.RegistrVozidel
                     DatumDo = x.p.DatumDo,
 
                     // from vv (VypisVozidel)
-
+                    Palivo = x.vv.Palivo,
                     Kategorie_vozidla = x.vv.KategorieVozidla,
                     Tovarni_znacka = x.vv.TovarniZnacka,
-                    typ = x.vv.Typ,
+                    Typ = x.vv.Typ,
                     Rok_vyroby = x.vv.RokVyroby,
                     Datum_1_registrace = x.vv.Datum1Registrace,
                     Datum_1_registrace_v_CR = x.vv.Datum1RegistraceVCr,

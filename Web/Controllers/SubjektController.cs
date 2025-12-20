@@ -25,6 +25,16 @@ namespace HlidacStatu.Web.Controllers
 
         }
 
+        public ActionResult VozovyPark(string id)
+        {
+            if (TryGetCompany(id, out var firma, out var result))
+            {
+                (Firma firma, string viewName, string title) model = (firma, "VozovyPark", $"{firma.Jmeno} - Vozový park");
+                return View("_subjektLayout", model);
+            }
+
+            return result;
+        }
         public ActionResult Dotace(string id)
         {
             if (TryGetCompany(id, out var firma, out var result))

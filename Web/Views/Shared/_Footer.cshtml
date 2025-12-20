@@ -41,7 +41,12 @@
                     <i class="fa-brands fa-square-bluesky fa-2x"></i>
                 </a>
             </div>
-            <div style="padding-top:7px;font-size:9px;color:#050505">CORE5 @(System.Reflection.Assembly.GetEntryAssembly().GetName().Version) @(System.IO.File.GetLastWriteTime(System.Reflection.Assembly.GetEntryAssembly().Location).ToString("yyyy-MM-dd HH:mm"))</div>
+            <div style="padding-top:7px;font-size:9px;color:#050505">
+                @(Environment.MachineName)
+                CORE8 
+                @(System.Reflection.Assembly.GetEntryAssembly().GetName().Version) 
+                @(System.IO.File.GetLastWriteTime(System.Reflection.Assembly.GetEntryAssembly().Location).ToString("yyyy-MM-dd HH:mm"))                
+            </div>
         </div>
     </div>
 

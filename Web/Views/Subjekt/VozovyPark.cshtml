@@ -1,0 +1,89 @@
+﻿@model HlidacStatu.Entities.Firma 
+@using System.Linq;
+@using HlidacStatu.RegistrVozidel.Models
+@using HlidacStatu.Repositories
+@using HlidacStatu.XLib.Render
+@using Devmasters;
+
+@{
+    Layout = null;
+
+    List<VozidloLight> vozidlaRaw = 
+        await HlidacStatu.RegistrVozidel.Repo.Cached.GetForICOAsync(this.Model.ICO);
+    List<VozidloLightPerIco> vozidla = vozidlaRaw
+        .GroupBy(g => g.Pcv)
+        .Select(s => new VozidloLightPerIco(s))
+        .ToList();
+
+
+    ReportDataSource<VozidloLightPerIco> rds = new(
+        new[]
+{
+            new  ReportDataSource<VozidloLightPerIco>.Column() { 
+                Name="Značka",
+                HtmlRender =(s) => {
+                    return s.Tovarni_znacka;
+                },
+                ValueRender = (s) => { return s.Tovarni_znacka; },
+                TextRender = (s) => { return s.Tovarni_znacka; },
+            },
+            new  ReportDataSource<VozidloLightPerIco>.Column() {
+                Name="Značka",
+                HtmlRender =(s) => {
+                    return s.Typ;
+                },
+                ValueRender = (s) => { return s.Typ; },
+                TextRender = (s) => { return s.Typ; },
+            },
+            new  ReportDataSource<VozidloLightPerIco>.Column() {
+                Name="Kategorie",
+                HtmlRender =(s) => {
+                    return s.Kategorie.Kod.ShortenMe(2);
+                },
+                ValueRender = (s) => { return s.Kategorie.Kod.ShortenMe(2); },
+                TextRender = (s) => { return s.Kategorie.Kod.ShortenMe(2); }
+            },
+            new  ReportDataSource<VozidloLightPerIco>.Column() {
+                Name="Palivo",
+                HtmlRender =(s) => {
+                    return $"<span title='{s.Palivo}'>{s.Palivo.Trim().ShortenMe(2)}</span>";
+                },
+                ValueRender = (s) => { return s.Palivo; },
+                TextRender = (s) => { return s.Palivo; }
+            },
+            new  ReportDataSource<VozidloLightPerIco>.Column() {
+                Name="1. Reg (v ČR)",
+                HtmlRender =(s) => {
+                    return $"{(s.Datum_1_registrace?.Year == null ? s.Datum_1_registrace.Value.Year.ToString() : "--")}"
+                    + $"{(s.Datum_1_registrace?.Year == null ? "("+s.Datum_1_registrace.Value.Year.ToString()+")" : "")}";
+                },
+                ValueRender = (s) => { return s.Datum_1_registrace?.Year; },
+                TextRender = (s) => { return s.Datum_1_registrace?.Year == null ? s.Datum_1_registrace.Value.Year.ToString() : "" ;}
+            },
+            // new  ReportDataSource<VozidloLightPerIco>.Column() {
+            //     Name="Majitel",
+            //     HtmlRender =(s) => {
+            //         return string.Join("<br />", s.Majitel_v_dobe.Select(m=>$""));
+            //     },
+            //     ValueRender = (s) => { return s.Majitel_v_dobe.l?.Year; },
+            //     TextRender = (s) => { return s.Datum_1_registrace?.Year == null ? s.Datum_1_registrace.Value.Year.ToString() : "" ;}
+            // },
+            // new  ReportDataSource<VozidloLightPerIco>.Column() {
+            //     Name="Palivo",
+            //     HtmlRender =(s) => {
+            //         return $"<span title='{s.Palivo}'>{s.Palivo.Trim().ShortenMe(2)}</span>";
+            //     },
+            //     ValueRender = (s) => { return s.Palivo; },
+            //     TextRender = (s) => { return s.Palivo; }
+            // },
+        });
+
+}
+
+<div id="subjcontent_toc">
+
+   
+
+</div>
+
+

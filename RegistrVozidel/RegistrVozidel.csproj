@@ -26,6 +26,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <ProjectReference Include="..\Caching\Caching.csproj" />
 	  <ProjectReference Include="..\Util\Util.csproj" />
 	</ItemGroup>
 </Project>

@@ -203,9 +203,10 @@ public static class KIndexRepo
             return;
         await CreateBackupAsync(comment, kidx, useTempDb);
     }
-    
-    
+
+
     //KIndexFeedback
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "VSTHRD103:Call async methods when in an async method", Justification = "<Pending>")]
     public static async Task SaveAsync(this KindexFeedback kindexFeedback)
         {
             if (string.IsNullOrWhiteSpace(kindexFeedback.Id))
@@ -214,7 +215,7 @@ public static class KIndexRepo
             }
             if (string.IsNullOrWhiteSpace(kindexFeedback.Company))
             {
-                var firma = await FirmaRepo.FromIcoAsync(kindexFeedback.Ico);
+                var firma = FirmaRepo.FromIco(kindexFeedback.Ico);
                 kindexFeedback.Company = firma.Jmeno;
             }
 

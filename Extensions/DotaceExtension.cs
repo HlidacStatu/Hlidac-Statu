@@ -12,7 +12,8 @@ namespace HlidacStatu.Extensions;
 public static class DotaceExtension
 {
     private static readonly ILogger _logger = Log.ForContext(typeof(DotaceExtension));
-    
+
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "VSTHRD103:Call async methods when in an async method", Justification = "<Pending>")]
     public static async Task<bool?> MaSkutecnehoMajiteleAsync(this Dotace dotace)
     {
         if (dotace.ApprovedYear is null)
@@ -21,7 +22,7 @@ public static class DotaceExtension
             return null;
 
         var datum = new DateTime(dotace.ApprovedYear.Value, 1, 1);
-        var firma = await FirmaRepo.FromIcoAsync(dotace.Recipient.Ico);
+        var firma = FirmaRepo.FromIco(dotace.Recipient.Ico);
 
         if (SkutecniMajiteleRepo.PodlehaSkm(firma, datum))
         {

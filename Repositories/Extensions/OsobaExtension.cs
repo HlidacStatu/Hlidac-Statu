@@ -314,6 +314,7 @@ namespace HlidacStatu.Extensions
             return await OsobaCache.GetInfoFactsAsync(osoba);
         }
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "VSTHRD103:Call async methods when in an async method", Justification = "<Pending>")]
         public static async Task<InfoFact[]> InfoFactsAsync(this Osoba osoba,
             HashSet<InfoFact.ImportanceLevel> excludedImportanceLevels = null)
         {
@@ -424,7 +425,7 @@ namespace HlidacStatu.Extensions
                     decimal celkem = sponzoringPrimy.Sum(m => m.Hodnota) ?? 0;
                     decimal top = sponzoringPrimy.Max(m => m.Hodnota) ?? 0;
                     //todo: přidat tabulku politických stran a změnit zde na název strany
-                    string prvniStrana = (await FirmaRepo.FromIcoAsync(strany[0])).Jmeno; 
+                    string prvniStrana = FirmaRepo.FromIco(strany[0]).Jmeno; 
 
                     f.Add(new InfoFact($"{osoba.FullName()} "
                                        + Plural.Get(roky.Count(), "v roce " + roky[0],
@@ -450,7 +451,7 @@ namespace HlidacStatu.Extensions
                         .ToArray();
                     decimal celkem = sponzoringPresFirmu.Sum(m => m.Hodnota) ?? 0;
                     decimal top = sponzoringPresFirmu.Max(m => m.Hodnota) ?? 0;
-                    string prvniStrana = (await FirmaRepo.FromIcoAsync(strany[0])).Jmeno;
+                    string prvniStrana = (FirmaRepo.FromIco(strany[0])).Jmeno;
 
                     f.Add(new InfoFact($"{osoba.FullName()} byl{(osoba.Muz() ? "" : "a")}"
                                        + $" členem statutárního orgánu společnosti, která "

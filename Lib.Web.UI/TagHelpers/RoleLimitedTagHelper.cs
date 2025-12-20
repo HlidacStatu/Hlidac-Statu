@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Microsoft.AspNetCore.Razor.TagHelpers;
+using Nest;
 using System;
 using System.Linq;
 using static HlidacStatu.Lib.Web.UI.TagHelpers.ToggleableTagHelper;
@@ -9,10 +10,10 @@ namespace HlidacStatu.Lib.Web.UI.TagHelpers
 {
     [HtmlTargetElement("role-limited")]
     [RestrictChildren("pass", "else")]
-
     public partial class RoleLimitedTagHelper : TagHelper
     {
 
+        public bool HideAnyContent { get; set; } = true;
 
         [ViewContext]
         [HtmlAttributeNotBound]
@@ -23,6 +24,11 @@ namespace HlidacStatu.Lib.Web.UI.TagHelpers
 
         public override async Task ProcessAsync(TagHelperContext context, TagHelperOutput output)
         {
+            if (HideAnyContent)
+            {
+                output.SuppressOutput(); 
+                return;
+            }
             var modalContext = new List<SimpleInnerBaseTagRenderHelper.InnerContext>();
             context.Items.Add(typeof(List<SimpleInnerBaseTagRenderHelper.InnerContext>), modalContext);
 

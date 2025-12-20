@@ -43,10 +43,11 @@ namespace HlidacStatu.Repositories
             return true;
         }
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "VSTHRD103:Call async methods when in an async method", Justification = "<Pending>")]
         public static async Task<bool> MaSkutecnehoMajiteleAsync(string ico, DateTime datumPocatku)
         {
             if (string.IsNullOrWhiteSpace(ico)) throw new ArgumentNullException(nameof(ico));
-            var firma = await FirmaRepo.FromIcoAsync(ico);
+            var firma = FirmaRepo.FromIco(ico);
 
             if (PodlehaSkm(firma, datumPocatku))
             {
