@@ -360,8 +360,8 @@ namespace HlidacStatu.Entities
             get
             {
                 if (_valid == null)
-                    _valid = !(Jmeno == NotFound.Jmeno
-                               || Jmeno == LoadError.Jmeno
+                    _valid = !(ICO == NotFound.ICO
+                               || ICO == LoadError.ICO
                                || string.IsNullOrWhiteSpace(this.ICO)
                                );
 
