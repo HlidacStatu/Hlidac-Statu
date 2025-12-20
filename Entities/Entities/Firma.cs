@@ -362,6 +362,7 @@ namespace HlidacStatu.Entities
                 if (_valid == null)
                     _valid = !(ICO == NotFound.ICO
                                || ICO == LoadError.ICO
+                               || string.IsNullOrEmpty(this.Jmeno)
                                || string.IsNullOrWhiteSpace(this.ICO)
                                );
 

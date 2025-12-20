@@ -1,4 +1,5 @@
 ﻿@model Firma
+@using HlidacStatu.RegistrVozidel
 @using Nest;
 @using System.Linq;
 @using Devmasters.Enums;
@@ -1072,20 +1073,47 @@
         intv = laps.StopPreviousAndStartNextLap("Registr vozidel");
     }
 
+    @if (User.IsInRole("Admin"))
+    {
     <div>
         @{
+            List<HlidacStatu.RegistrVozidel.Models.VozidloLight> vozidla = await HlidacStatu.RegistrVozidel.Repo.GetForICOAsync(this.Model.ICO);
         }
-        <role-limited roles="Admin,Supporter">
-            <pass>
-                <h4>Provozovaná vozidla</h4>
-                <p class="text-muted sub-header-info">
-                    Maji 5 aut
-                </p>
-            </pass>
-            <else>
-            </else>
-        </role-limited>
+        @if (vozidla.Any())
+        {
+            <h4>Vozový park</h4>
+
+            <p class="text-muted sub-header-info">Detailní informace o aktuálním i dřívějším vozovém parku organizace.</p>
+            <p>
+                <partial name="_renderVozidlaSouhrn"
+                         model="new Tuple<Firma, IEnumerable<HlidacStatu.RegistrVozidel.Models.VozidloLight>>(Model, vozidla.Where(m => m.Aktualni == true))" />
+
+                <partial name="_renderVozidlaSouhrn"
+                         model="new Tuple<Firma, IEnumerable<HlidacStatu.RegistrVozidel.Models.VozidloLight>>(Model, vozidla.Where(m => m.Aktualni == false))" />
+
+            </p>
+            <role-limited roles="Admin,Supporter">
+                <pass>
+                    <lowbox>
+                        <partial name="WebUtil/DynamicModal"
+                                 model="@(new DynamicModalViewModel($"/api/v1/SupporterOnly"))"  />
+<div>Jednotlivá vozidla:
+    Škoda<br/>
+    Škoda<br/>
+    Škoda<br/>
+    Škoda<br/>
+    Škoda<br/>
+                            Škoda<br />
+                        </div>
+                    </lowbox>
+                </pass>
+                <else>
+                </else>
+            </role-limited>
+        }
     </div>
+
+    }
 
     @* ----- Insolvence -----*@
     @{

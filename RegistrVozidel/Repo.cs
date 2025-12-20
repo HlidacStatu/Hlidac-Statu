@@ -18,27 +18,39 @@ namespace HlidacStatu.RegistrVozidel
         // - Select into a new VypisVozidel instance, assigning only the requested columns from p and vv.
         // - Execute with ToListAsync and ConfigureAwait(false).
 
-        public static async Task<List<Models.Vozidlo>> GetForICOAsync(string ico)
+        public static async Task<List<Models.VozidloLight>> GetForICOAsync(string ico,
+            Enums.Vztah_k_vozidluEnum? vztah = null
+            )
         {
             using var client = new dbCtx();
 
-            return await client.VlastnikProvozovatelVozidla
+            var q1 = client.VlastnikProvozovatelVozidla
                 .AsNoTracking()
                 .Join(
                     client.VypisVozidel.AsNoTracking(),
                     p => p.Pcv,
                     vv => vv.Pcv,
                     (p, vv) => new { p, vv })
-                .Where(x => x.p.Ico == ico)
-                .Select(x => new Vozidlo
+                .Where(x => x.p.Ico == ico);
+            if (vztah != null)
+            {
+                q1 = q1.Where(x => x.p.VztahKVozidlu == (decimal?)vztah);
+            }
+
+            var q2 = await q1
+                .Select(x => new VozidloLight
                 {
                     // from p (VlastnikProvozovatelVozidla)
+                    Pcv = x.p.Pcv,
                     Ico = x.p.Ico,
                     Typ_subjekt = x.p.TypSubjektu,
                     Vztah_k_vozidlu = x.p.VztahKVozidlu,
                     Aktualni = x.p.Aktualni,
+                    DatumOd = x.p.DatumOd,
+                    DatumDo = x.p.DatumDo,
 
                     // from vv (VypisVozidel)
+
                     Kategorie_vozidla = x.vv.KategorieVozidla,
                     Tovarni_znacka = x.vv.TovarniZnacka,
                     typ = x.vv.Typ,
@@ -54,6 +66,7 @@ namespace HlidacStatu.RegistrVozidel
                     ProvozniHmotnost = x.vv.ProvozniHmotnost
                 })
                 .ToListAsync();
+            return q2;
         }
     }
 }

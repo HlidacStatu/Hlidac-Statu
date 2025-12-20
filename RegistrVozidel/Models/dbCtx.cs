@@ -32,7 +32,7 @@ public partial class dbCtx : DbContext
     }
 
 
-    public virtual DbSet<TechnickeProhlidky> TechnickeProhlidkie { get; set; }
+    public virtual DbSet<TechnickeProhlidky> TechnickeProhlidky { get; set; }
 
     public virtual DbSet<VlastnikProvozovatelVozidla> VlastnikProvozovatelVozidla { get; set; }
 

@@ -1,0 +1,66 @@
+﻿@using HlidacStatu.Repositories
+
+@* return View(new Tuple<string,string>(sourceUrl, modalId)); *@
+@model Tuple<string,string>
+
+@{
+    Layout = null;
+
+    var sourceUrl = Model.Item1;
+    var modalId = Model.Item2;
+
+
+}
+
+<!-- Modal Header -->
+<div class="modal-header" style="text-align:left;">
+    <h4 class="modal-title" id="@(modalId)Title">
+        Obsah pouze pro podporovatele
+    </h4>
+    <button type="button" class="btn-close" data-bs-dismiss="modal">
+        <span aria-hidden="true">×</span>
+        <span class="sr-only">Close</span>
+    </button>
+</div>
+
+<!-- Modal Body -->
+<div class="modal-body" style="text-align:left;">
+
+    <p class="fw-bold">
+        Tento obsah je dostupný pouze pro podporovatele projektu HlidacStatu.cz a předplatitele investigativního projektu PastVina.
+    </p>
+    <p>
+        Pokud chcete získat přístup k tého a dalším exkluzivním funkcím,
+        zvažte prosím podporu našeho projektu prostřednictvím daru Hlídači státu nebo předplatného projektu PastVina.
+    </p>
+    <p>
+        <a target="_blank" href="https://www.darujme.cz/darovat/1200384" class="btn btn-primary">Dar Hlídači státu</a> <br />
+        <span class="sub-header-info">Každých 100 Kč daru zpřístupní všechny funkce na 1 měsíc.</span>
+        <span class="text-muted sub-header-info">Tento dar je možné uplatnit pro snížení daňového základu</span>
+    </p>
+    <p>
+        <a target="_blank" href="https://herohero.co/pastvina" class="btn btn-primary">Předplatné investigace PastVina</a> <br />
+        <span class="text-muted sub-header-info">Předplatné je možné dát do přímých nákladů firmy či podnikatele</span>
+
+    </p>
+
+</div>
+
+<!-- Modal Footer -->
+<div class="modal-footer">
+    <button type="button" class="btn btn-hs btn-secondary" onclick="confirm@(modalId)();" data-bs-dismiss="modal">
+        OK
+    </button>
+    <a target="_blank" href="https://www.darujme.cz/darovat/1200384" onclick="confirm@(modalId)();return true;" class="btn btn-primary">Dar Hlídači státu</a> <br />
+
+    <a target="_blank" href="https://herohero.co/pastvina" onclick="confirm@(modalId)();return true;" class="btn btn-primary">Předplatné PastVina</a> <br />
+
+</div>
+
+<script>
+    function confirm@(modalId)() {
+        var prf = '#@(modalId)';
+        var url = $(prf + "Url").val();
+        window.location.reload();
+    }
+</script>

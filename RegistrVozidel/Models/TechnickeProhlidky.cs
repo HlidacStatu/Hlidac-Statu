@@ -18,9 +18,9 @@ public partial class TechnickeProhlidky : ICheckDuplicate
         if (_uniqueKeys.Count > 0)
             return;
         using var db = new dbCtx();
-        _uniqueKeys = await db.TechnickeProhlidkie
+        _uniqueKeys = await db.TechnickeProhlidky
             .AsNoTracking()
-            .Select(m => m.Pcv + "\t" + m.CheckSum)
+            .Select(m => $"{m.Pcv}\t{m.CheckSum}")
             .ToHashSetAsync();
 
         //await Task.CompletedTask;

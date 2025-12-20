@@ -19,7 +19,7 @@ public partial class ZpravyVyrobceZastupce : ICheckDuplicate
         using var db = new dbCtx();
         _uniqueKeys = await db.ZpravyVyrobceZastupce
             .AsNoTracking()
-            .Select(m => m.Pcv + "\t" + m.CheckSum)
+            .Select(m => $"{m.Pcv}\t{m.CheckSum}")
             .ToHashSetAsync();
 
         //await Task.CompletedTask;

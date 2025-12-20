@@ -43,6 +43,11 @@ namespace HlidacStatu.Web.Controllers
                 AIShortdocs, AIFulldocs, modalId));
         }
 
+        public async Task<ActionResult> SupporterOnly(string sourceUrl, string modalId)
+        {
+
+            return View(new Tuple<string,string>(sourceUrl, modalId));
+        }
     }
 }
 

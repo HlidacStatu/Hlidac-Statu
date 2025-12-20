@@ -1,0 +1,62 @@
+@using HlidacStatu.Entities
+@using HlidacStatu.RegistrVozidel
+@model Tuple<Firma,IEnumerable<HlidacStatu.RegistrVozidel.Models.VozidloLight>>
+
+
+@{
+    Layout = null;
+    var firma = Model?.Item1;
+    var vozidla = Model?.Item2;
+    var vlastnikVozidel = vozidla?.Where(m => m.FormaVlastnictvi == Enums.Vztah_k_vozidluEnum.Vlastnik).ToList();
+    if (firma == null || vozidla == null || !vozidla.Any())
+    {
+        return;
+    }
+    bool showVlastnik = vozidla.Any(m => m.FormaVlastnictvi == Enums.Vztah_k_vozidluEnum.Vlastnik);
+    bool showProvoz = vozidla.Any(m => m.FormaVlastnictvi == Enums.Vztah_k_vozidluEnum.Provozovatel);
+
+    string vlastni = "vlastní";
+    string provoz = "provozuje";
+
+
+    if (vozidla.Any(m => m.Aktualni == false) && vozidla.Any(m => m.Aktualni == true))
+    {
+        vlastni = "vlastní a vlastnilo";
+        provoz = "provozuje a provozovalo";
+    }
+    else if (vozidla.Any(m => m.Aktualni == false))
+    {
+        vlastni = "vlastnilo";
+        provoz = "provozovalo";
+    }
+
+}
+
+<div>
+    @firma.Jmeno
+    @Devmasters.Lang.CS.Plural.GetWithZero(vozidla.Count(m => m.FormaVlastnictvi == Enums.Vztah_k_vozidluEnum.Vlastnik), "", vlastni + " 1 vozidlo", vlastni + " {0} vozidla", vlastni + " {0} vozidel")
+    @if (vozidla.Any(m => m.FormaVlastnictvi == Enums.Vztah_k_vozidluEnum.Vlastnik)
+        && vozidla.Any(m => m.FormaVlastnictvi == Enums.Vztah_k_vozidluEnum.Provozovatel)
+        )
+    {
+        <span> a </span>
+    }
+
+    @Devmasters.Lang.CS.Plural.GetWithZero(vozidla.Count(m => m.FormaVlastnictvi == Enums.Vztah_k_vozidluEnum.Provozovatel), "", provoz + " 1 vozidlo", provoz + " {0} vozidla", provoz + " {0} vozidel")
+    .
+</div>
+<div class="row">
+
+    @foreach (var typy in vozidla
+        .GroupBy(k => k.Kategorie.Typ, v => v, (k, v) => new { k, v = v.DistinctBy(d => d.Pcv).Count() })
+        .OrderByDescending(o => o.v)
+        )
+    {
+        <div class="col-auto">
+            <span class="badge text-bg-light p-2 m-1 fs-6" style="white-space:nowrap">
+                <i class="fa-regular @(typy.k.Icon)"></i> @typy.k.Jmeno <span class="badge text-bg-primary">@(typy.v)</span>
+            </span>
+        </div>
+
+    }
+</div>

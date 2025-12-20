@@ -20,7 +20,7 @@ public partial class VozidlaVyrazenaZProvozu : ICheckDuplicate
         using var db = new dbCtx();
         _uniqueKeys = await db.VozidlaVyrazenaZProvozu
             .AsNoTracking()
-            .Select(m => m.Pcv + "\t" + m.CheckSum)
+            .Select(m => $"{m.Pcv}\t{m.CheckSum}")
             .ToHashSetAsync();
 
         //await Task.CompletedTask;
