@@ -596,7 +596,7 @@ $(document).ready(function () {
             {
                 sb.AppendFormat("<h3>{0}</h3>", rds?.Title ?? "");
             }
-            sb.AppendFormat($"<table id=\"{0}\" class=\"table-sorted table {(smallTable ? "table-sm" : "")} table-bordered table-striped\">", _tableId);
+            sb.AppendFormat($"<table id=\"{_tableId}\" class=\"table-sorted table {(smallTable ? "table-sm" : "")} table-bordered table-striped\">");
             if (customTableHeader == null)
             {
                 sb.Append("<thead><tr>");
