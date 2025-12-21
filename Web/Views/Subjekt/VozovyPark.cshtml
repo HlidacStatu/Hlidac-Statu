@@ -4,6 +4,7 @@
 @using HlidacStatu.Repositories
 @using HlidacStatu.XLib.Render
 @using Devmasters;
+@using Devmasters.DT;
 
 @{
     Layout = null;
@@ -28,12 +29,12 @@
                 TextRender = (s) => { return s.Tovarni_znacka; },
             },
             new  ReportDataSource<VozidloLightPerIco>.Column() {
-                Name="Značka",
+                Name="Model",
                 HtmlRender =(s) => {
-                    return s.Typ;
+                    return s.Model;
                 },
-                ValueRender = (s) => { return s.Typ; },
-                TextRender = (s) => { return s.Typ; },
+                ValueRender = (s) => { return s.Model; },
+                TextRender = (s) => { return s.Model; },
             },
             new  ReportDataSource<VozidloLightPerIco>.Column() {
                 Name="Kategorie",
@@ -52,37 +53,58 @@
                 TextRender = (s) => { return s.Palivo; }
             },
             new  ReportDataSource<VozidloLightPerIco>.Column() {
-                Name="1. Reg (v ČR)",
+                Name="Rok výroby",
                 HtmlRender =(s) => {
-                    return $"{(s.Datum_1_registrace?.Year == null ? s.Datum_1_registrace.Value.Year.ToString() : "--")}"
-                    + $"{(s.Datum_1_registrace?.Year == null ? "("+s.Datum_1_registrace.Value.Year.ToString()+")" : "")}";
+                    return s.Rok_vyroby == null ? "&pm;"+s.Datum_1_registrace?.ToString("yyyy") : s.Rok_vyroby.ToString();
+                    
                 },
-                ValueRender = (s) => { return s.Datum_1_registrace?.Year; },
-                TextRender = (s) => { return s.Datum_1_registrace?.Year == null ? s.Datum_1_registrace.Value.Year.ToString() : "" ;}
+                ValueRender = (s) => { return s.Rok_vyroby == null ? s.Datum_1_registrace?.ToString("yyyy") : s.Rok_vyroby.ToString(); },
+                TextRender = (s) => { return s.Rok_vyroby == null ? s.Datum_1_registrace?.ToString("yyyy") : s.Rok_vyroby.ToString();},
+                OrderValueRender = (s) => { return HlidacStatu.Util.RenderData.OrderValueFormat(s.Rok_vyroby == null ? s.Datum_1_registrace?.Year : s.Rok_vyroby); }
             },
-            // new  ReportDataSource<VozidloLightPerIco>.Column() {
-            //     Name="Majitel",
-            //     HtmlRender =(s) => {
-            //         return string.Join("<br />", s.Majitel_v_dobe.Select(m=>$""));
-            //     },
-            //     ValueRender = (s) => { return s.Majitel_v_dobe.l?.Year; },
-            //     TextRender = (s) => { return s.Datum_1_registrace?.Year == null ? s.Datum_1_registrace.Value.Year.ToString() : "" ;}
-            // },
-            // new  ReportDataSource<VozidloLightPerIco>.Column() {
-            //     Name="Palivo",
-            //     HtmlRender =(s) => {
-            //         return $"<span title='{s.Palivo}'>{s.Palivo.Trim().ShortenMe(2)}</span>";
-            //     },
-            //     ValueRender = (s) => { return s.Palivo; },
-            //     TextRender = (s) => { return s.Palivo; }
-            // },
+            new  ReportDataSource<VozidloLightPerIco>.Column() {
+                Name="Majitel",
+                HtmlRender =(s) => {
+                    return string.Join("<br />", s.Majitel_v_dobe.Select(m=> m.ToNiceString(dateFormat:"yyyy")));
+                },
+                ValueRender = (s) => { return s.Majitel_v_dobe.LastOrDefault()?.From?.ToString("yyyy"); },
+                TextRender = (s) => { return s.Majitel_v_dobe.LastOrDefault()?.From?.ToString("yyyy") ;}
+            },
+            new  ReportDataSource<VozidloLightPerIco>.Column() {
+                Name="Provozovatel",
+                HtmlRender =(s) => {
+                    return string.Join("<br />", s.Provozovatel_v_dobe.Select(m=> m.ToNiceString(dateFormat:"yyyy")));
+                },
+                ValueRender = (s) => { return s.Provozovatel_v_dobe.LastOrDefault()?.From?.ToString("yyyy"); },
+                TextRender = (s) => { return s.Provozovatel_v_dobe.LastOrDefault()?.From?.ToString("yyyy") ;}
+            },
+            new  ReportDataSource<VozidloLightPerIco>.Column() {
+                Name="STK do",
+                HtmlRender =(s) => {
+                    return s.PlastnostStk?.ToString("MM.yyyy");
+                },
+                ValueRender = (s) => { return s.PlastnostStk?.ToString("MM.yyyy"); },
+                TextRender = (s) => { return s.PlastnostStk?.ToString("MM.yyyy") ;},
+                OrderValueRender = (s) => { return HlidacStatu.Util.RenderData.OrderValueFormat(s.PlastnostStk?.ToDateTime(default)); }
+            },
         });
 
+    rds.AddRows(vozidla.Where(m=>m.Aktualni==true));
 }
 
 <div id="subjcontent_toc">
 
-   
+   <h3>Aktuální vozový park</h3>
+    @Html.DataToHTMLTable(rds, dataTableOptions: HtmlExtensions.DatatableOptions(pageLength: 20))
+
+    @{
+        rds.Clear();
+        rds.AddRows(vozidla.Where(m=>m.Aktualni==false));
+    }
+    <hr />
+    <h3>Historický vozový park</h3>
+    @Html.DataToHTMLTable(rds, dataTableOptions: HtmlExtensions.DatatableOptions(pageLength: 20, orderColumnIdx:4))
+
 
 </div>
 

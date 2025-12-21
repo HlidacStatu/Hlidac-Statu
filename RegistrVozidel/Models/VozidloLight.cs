@@ -36,7 +36,7 @@ namespace HlidacStatu.RegistrVozidel.Models
             Aktualni = v2.Aktualni;
             Kategorie_vozidla = v2.Kategorie_vozidla;
             Tovarni_znacka = v2.Tovarni_znacka;
-            Typ = v2.Typ;
+            Model = v2.Model;
             Rok_vyroby = v2.Rok_vyroby;
             Palivo = v2.Palivo;
             Datum_1_registrace = v2.Datum_1_registrace;
@@ -104,7 +104,7 @@ namespace HlidacStatu.RegistrVozidel.Models
         public bool? Aktualni { get; set; }
         public string Kategorie_vozidla { get; set; }
         public string Tovarni_znacka { get; set; }
-        public string Typ { get; set; }
+        public string Model { get; set; }
         public int? Rok_vyroby { get; set; }
         public string Palivo { get; set; }
         public DateOnly? Datum_1_registrace { get; set; }
@@ -116,5 +116,9 @@ namespace HlidacStatu.RegistrVozidel.Models
         public bool? HybridniVozidlo { get; set; }
         public string Stupen_plneni_emisni_urovne { get; set; }
         public string ProvozniHmotnost { get; set; }
+
+        public DateOnly? PosledniStk { get; set; }
+        public DateOnly? PlastnostStk { get; set; }
+
     }
 }

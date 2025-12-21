@@ -31,8 +31,21 @@ namespace HlidacStatu.RegistrVozidel
             {
                 q1 = q1.Where(x => x.p.VztahKVozidlu == (decimal?)vztah);
             }
+            var q2 = q1.Join(
+                client.TechnickeProhlidky.AsNoTracking()
+                    .GroupBy(tp => tp.Pcv)
+                    .Select(g => new
+                    {
+                        Pcv = g.Key,
+                        PosledniStk = g.Max(tp => tp.PlatnostOd),
+                        PlatnostStkMax = g.Max(tp => tp.PlatnostDo)
+                    }),
+                x => x.p.Pcv,
+                stk => stk.Pcv,
+                (x, stk) => new { x.p, x.vv, stk.PosledniStk, stk.PlatnostStkMax }
+                );
 
-            var q2 = await q1
+            var q3 =  q2
                 .Select(x => new VozidloLight
                 {
                     // from p (VlastnikProvozovatelVozidla)
@@ -48,7 +61,7 @@ namespace HlidacStatu.RegistrVozidel
                     Palivo = x.vv.Palivo,
                     Kategorie_vozidla = x.vv.KategorieVozidla,
                     Tovarni_znacka = x.vv.TovarniZnacka,
-                    Typ = x.vv.Typ,
+                    Model = x.vv.ObchodniOznaceni,
                     Rok_vyroby = x.vv.RokVyroby,
                     Datum_1_registrace = x.vv.Datum1Registrace,
                     Datum_1_registrace_v_CR = x.vv.Datum1RegistraceVCr,
@@ -58,10 +71,15 @@ namespace HlidacStatu.RegistrVozidel
                     PlneElektrickeVozidlo = x.vv.PlneElektrickeVozidlo,
                     HybridniVozidlo = x.vv.HybridniVozidlo,
                     Stupen_plneni_emisni_urovne = x.vv.StupenPlneniEmisniUrovne,
-                    ProvozniHmotnost = x.vv.ProvozniHmotnost
-                })
+                    ProvozniHmotnost = x.vv.ProvozniHmotnost,
+
+                    // from stk (TechnickeProhlidky)
+                    PosledniStk = x.PosledniStk,
+                    PlastnostStk = x.PlatnostStkMax
+                });
+            var final = await q3
                 .ToListAsync();
-            return q2;
+            return final;
         }
     }
 }

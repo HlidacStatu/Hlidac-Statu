@@ -496,7 +496,7 @@ namespace HlidacStatu.Lib.Web.UI
                     },
                 },
                 ordering = ordering,
-                order = orderColumnIdx.HasValue == false ? null : new[] { new object[] { orderColumnIdx.Value, orderDirection } }
+                order = orderColumnIdx.HasValue == false ? new object[] { }  : new[] { new object[] { orderColumnIdx.Value, orderDirection } }
             };
 
             if (customObjs?.Count > 0)

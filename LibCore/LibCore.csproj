@@ -7,7 +7,7 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Devmasters.Core" Version="8.2.4" />
+    <PackageReference Include="Devmasters.Core" Version="8.2.5" />
     <PackageReference Include="Microsoft.AspNetCore.Components" Version="8.0.18" />
     <PackageReference Include="Microsoft.AspNetCore.Http.Abstractions" Version="2.3.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="8.0.11">
