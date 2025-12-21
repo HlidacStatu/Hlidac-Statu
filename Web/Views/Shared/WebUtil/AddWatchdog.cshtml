@@ -234,8 +234,8 @@ Máme pro vás denné sledovat <b>nové {dataTypeName} odpovídající tomuto do
                         </div>
                         <div class="modal-footer">
                             <button type="button" onclick="_my_event('send', 'event', 'btnWatchDog', 'CloseForm', 'anonym');" class="btn btn-hs btn-secondary" data-bs-dismiss="modal">Zavřít</button>
-                            <a onclick="_my_event('send', 'event', 'registerBtn', 'click','/@this.Path'); return true;" href="/account/register?returnUrl=@(System.Net.WebUtility.UrlEncode(Context.Request.GetEncodedPathAndQuery()))" onclick="_my_event('send', 'event', 'btnWatchDog', 'Register', 'anonym');" role="button" class="btn btn-hs btn-primary">Zdarma zaregistrovat</a>
-                            <a onclick="_my_event('send', 'event', 'registerBtn', 'click','/@this.Path'); return true;" href="/account/login?returnUrl=@(System.Net.WebUtility.UrlEncode(Context.Request.GetEncodedPathAndQuery()))" onclick="_my_event('send', 'event', 'btnWatchDog', 'Login', 'anonym');" role="button" class="btn btn-hs btn-success">Přihlásit se</a>
+                            <a onclick="_my_event('send', 'event', 'registerBtn', 'click','/@this.Path'); return true;" href="/account/register?retUrl_2=@(System.Net.WebUtility.UrlEncode(Context.Request.GetEncodedPathAndQuery()))" onclick="_my_event('send', 'event', 'btnWatchDog', 'Register', 'anonym');" role="button" class="btn btn-hs btn-primary">Zdarma zaregistrovat</a>
+                            <a onclick="_my_event('send', 'event', 'registerBtn', 'click','/@this.Path'); return true;" href="/account/login?retUrl_2=@(System.Net.WebUtility.UrlEncode(Context.Request.GetEncodedPathAndQuery()))" onclick="_my_event('send', 'event', 'btnWatchDog', 'Login', 'anonym');" role="button" class="btn btn-hs btn-success">Přihlásit se</a>
                         </div>
                     </div>
                 </div>

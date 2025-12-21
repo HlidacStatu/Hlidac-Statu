@@ -280,7 +280,7 @@ namespace HlidacStatu.Web
                         
                         if (!ctx.Response.HasStarted)
                         {
-                            ctx.Response.Redirect($"/Identity/Account/Login?returnUrl={ctx.Request.Path}{ctx.Request.QueryString.Value}");
+                            ctx.Response.Redirect($"/Identity/Account/Login?retUrl_2={ctx.Request.Path}{ctx.Request.QueryString.Value}");
                         }
 
                         return Task.CompletedTask;

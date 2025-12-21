@@ -16,8 +16,8 @@ namespace HlidacStatu.Web.TagHelpers
         public override void Process(TagHelperContext context, TagHelperOutput output)
         {
             string returnPage = System.Net.WebUtility.UrlEncode(ViewContext.GetRequestPathAndQuery());
-            string registerUrl = $"/Identity/Account/Register?returnUrl={returnPage}";
-            string loginUrl = $"/Identity/Account/Login?returnUrl={returnPage}";
+            string registerUrl = $"/Identity/Account/Register?retUrl_2={returnPage}";
+            string loginUrl = $"/Identity/Account/Login?retUrl_2={returnPage}";
 
             output.TagName = "div";
             output.Content.SetHtmlContent(

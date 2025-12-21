@@ -25,7 +25,7 @@ namespace HlidacStatu.Web.Areas.Identity.Pages.Account
 
         public string EmailConfirmationUrl { get; set; }
 
-        public async Task<IActionResult> OnGetAsync(string email, string? returnUrl = null)
+        public async Task<IActionResult> OnGetAsync(string email, string? retUrl_2 = null)
         {
             if (email == null)
             {
@@ -49,7 +49,7 @@ namespace HlidacStatu.Web.Areas.Identity.Pages.Account
             //     EmailConfirmationUrl = Url.Page(
             //         "/Account/ConfirmEmail",
             //         pageHandler: null,
-            //         values: new { area = "Identity", userId = userId, code = code, returnUrl = returnUrl },
+            //         values: new { area = "Identity", userId = userId, code = code, retUrl_2 = retUrl_2 },
             //         protocol: Request.Scheme);
             // }
 

@@ -224,7 +224,7 @@ function send{idPrefix}() {{
                 <form class=""form-horizontal"" role=""form"">
                     <p>Pro poslání vzkazu musíte být přihlášeni.</p>
                     <p>
-                        <a href=""https://www.hlidacstatu.cz/Identity/Account/Login?returnUrl={currentUrl}"">Přihlásit se</a>
+                        <a href=""https://www.hlidacstatu.cz/Identity/Account/Login?retUrl_2={currentUrl}"">Přihlásit se</a>
                     </p>
                 </form>
             </div>

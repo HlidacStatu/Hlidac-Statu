@@ -24,7 +24,7 @@ namespace WatchdogAnalytics.Areas.Identity.Pages.Account
         [BindProperty]
         public InputModel Input { get; set; }
 
-        public string ReturnUrl { get; set; }
+        public string retUrl_2 { get; set; }
 
         public class InputModel
         {
@@ -35,7 +35,7 @@ namespace WatchdogAnalytics.Areas.Identity.Pages.Account
             public string RecoveryCode { get; set; }
         }
 
-        public async Task<IActionResult> OnGetAsync(string? returnUrl = null)
+        public async Task<IActionResult> OnGetAsync(string? retUrl_2 = null)
         {
             // Ensure the user has gone through the username & password screen first
             var user = await _signInManager.GetTwoFactorAuthenticationUserAsync();
@@ -44,12 +44,12 @@ namespace WatchdogAnalytics.Areas.Identity.Pages.Account
                 throw new InvalidOperationException($"Unable to load two-factor authentication user.");
             }
 
-            ReturnUrl = returnUrl;
+            retUrl_2 = retUrl_2;
 
             return Page();
         }
 
-        public async Task<IActionResult> OnPostAsync(string? returnUrl = null)
+        public async Task<IActionResult> OnPostAsync(string? retUrl_2 = null)
         {
             if (!ModelState.IsValid)
             {
@@ -69,7 +69,7 @@ namespace WatchdogAnalytics.Areas.Identity.Pages.Account
             if (result.Succeeded)
             {
                 _logger.Information($"User with ID '{user.Id}' logged in with a recovery code.");
-                return LocalRedirect(returnUrl ?? Url.Content("~/"));
+                return LocalRedirect(retUrl_2 ?? Url.Content("~/"));
             }
             if (result.IsLockedOut)
             {

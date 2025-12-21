@@ -60,8 +60,8 @@
                     <hr />
                     <p><b>Export funguje pouze, když jste přihlášeni.</b></p>
                     <p>
-                        <a onclick="_my_event('send', 'event', 'registerBtn', 'click','@Model.GaPageEventId'); return true;" href="/account/Register?returnUrl=@(System.Net.WebUtility.UrlEncode(Context.Request.GetEncodedPathAndQuery()))">Registrace</a>
-                        je jednoduchá a zdarma. Pokud už jste zaregistrováni, stačí se <a href="/account/Login?returnUrl=@(System.Net.WebUtility.UrlEncode(Context.Request.GetEncodedPathAndQuery()))">přihlásit</a>.
+                        <a onclick="_my_event('send', 'event', 'registerBtn', 'click','@Model.GaPageEventId'); return true;" href="/account/Register?retUrl_2=@(System.Net.WebUtility.UrlEncode(Context.Request.GetEncodedPathAndQuery()))">Registrace</a>
+                        je jednoduchá a zdarma. Pokud už jste zaregistrováni, stačí se <a href="/account/Login?retUrl_2=@(System.Net.WebUtility.UrlEncode(Context.Request.GetEncodedPathAndQuery()))">přihlásit</a>.
                     </p>}
             </div>
             <div class="modal-footer">

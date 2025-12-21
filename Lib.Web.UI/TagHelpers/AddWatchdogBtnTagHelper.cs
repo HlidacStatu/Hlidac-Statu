@@ -100,8 +100,8 @@ namespace HlidacStatu.Lib.Web.UI.TagHelpers
             // --- Původně availableWatchdogs = int.MaxValue ---
             var availableWatchdogs = int.MaxValue;
 
-            // --- ReturnUrl pro anonymní modál ---
-            var returnUrl = System.Net.WebUtility.UrlEncode(httpCtx.Request.GetEncodedPathAndQuery());
+            // --- retUrl_2 pro anonymní modál ---
+            var retUrl_2 = System.Net.WebUtility.UrlEncode(httpCtx.Request.GetEncodedPathAndQuery());
 
             // --- Render ---
             var sb = new StringBuilder(4096);
@@ -253,10 +253,10 @@ namespace HlidacStatu.Lib.Web.UI.TagHelpers
         <button type=""button"" onclick=""_my_event('send','event','btnWatchDog','CloseForm','anonym');""
                 class=""btn btn-hs btn-secondary"" data-bs-dismiss=""modal"">Zavřít</button>
         <a onclick=""_my_event('send','event','registerBtn','click','/@this.Path'); return true;""
-           href=""/account/register?returnUrl={returnUrl}""
+           href=""/account/register?retUrl_2={retUrl_2}""
            role=""button"" class=""btn btn-hs btn-primary"">Zdarma zaregistrovat</a>
         <a onclick=""_my_event('send','event','registerBtn','click','/@this.Path'); return true;""
-           href=""/account/login?returnUrl={returnUrl}""
+           href=""/account/login?retUrl_2={retUrl_2}""
            role=""button"" class=""btn btn-hs btn-success"">Přihlásit se</a>
       </div>
     </div>

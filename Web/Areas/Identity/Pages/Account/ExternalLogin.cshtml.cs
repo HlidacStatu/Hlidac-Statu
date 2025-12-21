@@ -35,7 +35,7 @@ namespace HlidacStatu.Web.Areas.Identity.Pages.Account
 
         public string ProviderDisplayName { get; set; }
 
-        public string ReturnUrl { get; set; }
+        public string retUrl_2 { get; set; }
 
         [TempData]
         public string ErrorMessage { get; set; }
@@ -52,27 +52,27 @@ namespace HlidacStatu.Web.Areas.Identity.Pages.Account
             return RedirectToPage("./Login");
         }
 
-        public IActionResult OnPost(string provider, string? returnUrl = null)
+        public IActionResult OnPost(string provider, string? retUrl_2 = null)
         {
             // Request a redirect to the external login provider.
-            var redirectUrl = Url.Page("./ExternalLogin", pageHandler: "Callback", values: new { returnUrl });
+            var redirectUrl = Url.Page("./ExternalLogin", pageHandler: "Callback", values: new { retUrl_2 });
             var properties = _signInManager.ConfigureExternalAuthenticationProperties(provider, redirectUrl);
             return new ChallengeResult(provider, properties);
         }
 
-        public async Task<IActionResult> OnGetCallbackAsync(string? returnUrl = null, string? remoteError = null)
+        public async Task<IActionResult> OnGetCallbackAsync(string? retUrl_2 = null, string? remoteError = null)
         {
-            returnUrl = returnUrl ?? Url.Content("~/");
+            retUrl_2 = retUrl_2 ?? Url.Content("~/");
             if (remoteError != null)
             {
                 ErrorMessage = $"Error from external provider: {remoteError}";
-                return RedirectToPage("./Login", new { ReturnUrl = returnUrl });
+                return RedirectToPage("./Login", new { retUrl_2 = retUrl_2 });
             }
             var info = await _signInManager.GetExternalLoginInfoAsync();
             if (info == null)
             {
                 ErrorMessage = "Error loading external login information.";
-                return RedirectToPage("./Login", new { ReturnUrl = returnUrl });
+                return RedirectToPage("./Login", new { retUrl_2 = retUrl_2 });
             }
 
             // Sign in the user with this external login provider if the user already has a login.
@@ -80,7 +80,7 @@ namespace HlidacStatu.Web.Areas.Identity.Pages.Account
             if (result.Succeeded)
             {
                 _logger.Information($"{info.Principal.Identity.Name} logged in with {info.LoginProvider} provider.");
-                return LocalRedirect(returnUrl);
+                return LocalRedirect(retUrl_2);
             }
             if (result.IsLockedOut)
             {
@@ -93,7 +93,7 @@ namespace HlidacStatu.Web.Areas.Identity.Pages.Account
                 if (string.IsNullOrEmpty(email))
                 {
                     ErrorMessage = "Error loading email value from external login.";
-                    return RedirectToPage("./Login", new { ReturnUrl = returnUrl });
+                    return RedirectToPage("./Login", new { retUrl_2 = retUrl_2 });
                 }
                 
                 var user = await _userManager.FindByEmailAsync(email);
@@ -105,7 +105,7 @@ namespace HlidacStatu.Web.Areas.Identity.Pages.Account
                     if (!userCreateResult.Succeeded)
                     {
                         ErrorMessage = "User couldn't be created.";
-                        return RedirectToPage("./Login", new { ReturnUrl = returnUrl });
+                        return RedirectToPage("./Login", new { retUrl_2 = retUrl_2 });
                     }
                     
                     // send confirmation email
@@ -129,11 +129,11 @@ namespace HlidacStatu.Web.Areas.Identity.Pages.Account
                 var loginres = await _signInManager.UserManager.AddLoginAsync(user, info); // store user token
                 await _signInManager.SignInAsync(user, isPersistent: false, info.LoginProvider);
 
-                return LocalRedirect(returnUrl);
+                return LocalRedirect(retUrl_2);
             }
         }
 
-        public IActionResult OnPostConfirmationAsync(string? returnUrl = null)
+        public IActionResult OnPostConfirmationAsync(string? retUrl_2 = null)
         {
             //no confirmation needed
             return NotFound("this action is disabled");

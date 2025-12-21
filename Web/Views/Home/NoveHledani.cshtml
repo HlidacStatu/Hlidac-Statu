@@ -300,11 +300,11 @@ else
                         nextUrl = "";
                     }
 
-                    <a onclick="_my_event('send', 'event', 'loginBtn', 'click','@Context.Request.Path'); return true;" href="/Identity/Account/Login?returnUrl=@(nextUrl)" id="loginLink">
+                    <a onclick="_my_event('send', 'event', 'loginBtn', 'click','@Context.Request.Path'); return true;" href="/Identity/Account/Login?retUrl_2=@(nextUrl)" id="loginLink">
                         <img src="/Content/img/icon-user.svg" style="padding-right: 8px;">
                         Přihlášení
                     </a>
-                    <a onclick="_my_event('send', 'event', 'registerBtn', 'click','@Context.Request.Path'); return true;" href="/Identity/Account/Register?returnUrl=@(nextUrl)" id="regLink">Registrace</a>
+                    <a onclick="_my_event('send', 'event', 'registerBtn', 'click','@Context.Request.Path'); return true;" href="/Identity/Account/Register?retUrl_2=@(nextUrl)" id="regLink">Registrace</a>
                 }
             </li>
 

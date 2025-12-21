@@ -44,9 +44,9 @@ namespace WatchdogAnalytics
                 options.Cookie.HttpOnly = true;
                 options.ExpireTimeSpan = TimeSpan.FromDays(14);
                 //options.LoginPath = "/Identity/Account/Login";
-                // ReturnUrlParameter requires 
+                // retUrl_2Parameter requires 
                 //using Microsoft.AspNetCore.Authentication.Cookies;
-                options.ReturnUrlParameter = CookieAuthenticationDefaults.ReturnUrlParameter;
+                options.retUrl_2Parameter = CookieAuthenticationDefaults.retUrl_2Parameter;
                 options.SlidingExpiration = true;
             });
 

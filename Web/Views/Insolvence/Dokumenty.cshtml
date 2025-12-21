@@ -35,11 +35,11 @@
 	</p>
 	<p>
 		<a onclick="_my_event('send', 'event', 'registerBtn', 'click','@Context.Request.Path#PristupOmezen'); return true;"
-		   href="/account/Register?returnUrl=@(this.Url.Action())" class="btn btn-hs btn-primary">
+		   href="/account/Register?retUrl_2=@(this.Url.Action())" class="btn btn-hs btn-primary">
 			Zaregistrujte se
 		</a>
 	</p>
-	<p><a onclick="_my_event('send', 'event', 'loginBtn', 'click','@Context.Request.Path#PristupOmezen'); return true;" href="/account/Login?returnUrl=@(this.Url.Action())" class="btn btn-hs btn-secondary">přihlaste se</a>, pokud jste již zaregistrováni. </p>
+	<p><a onclick="_my_event('send', 'event', 'loginBtn', 'click','@Context.Request.Path#PristupOmezen'); return true;" href="/account/Login?retUrl_2=@(this.Url.Action())" class="btn btn-hs btn-secondary">přihlaste se</a>, pokud jste již zaregistrováni. </p>
 	
 }
 else

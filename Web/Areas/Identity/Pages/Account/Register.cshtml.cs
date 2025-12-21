@@ -34,7 +34,7 @@ namespace HlidacStatu.Web.Areas.Identity.Pages.Account
         [BindProperty]
         public InputModel Input { get; set; }
 
-        public string? ReturnUrl { get; set; }
+        public string? retUrl_2 { get; set; }
 
         public IList<AuthenticationScheme> ExternalLogins { get; set; }
 
@@ -57,15 +57,15 @@ namespace HlidacStatu.Web.Areas.Identity.Pages.Account
             public string ConfirmPassword { get; set; }
         }
 
-        public async Task OnGetAsync(string? returnUrl = null)
+        public async Task OnGetAsync(string? retUrl_2 = null)
         {
-            ReturnUrl = returnUrl;
+            retUrl_2 = retUrl_2;
             ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
         }
 
-        public async Task<IActionResult> OnPostAsync(string? returnUrl = null)
+        public async Task<IActionResult> OnPostAsync(string? retUrl_2 = null)
         {
-            returnUrl ??= Url.Content("~/");
+            retUrl_2 ??= Url.Content("~/");
             ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
             if (ModelState.IsValid)
             {
@@ -82,7 +82,7 @@ namespace HlidacStatu.Web.Areas.Identity.Pages.Account
                     var callbackUrl = Url.Page(
                         "/Account/ConfirmEmail",
                         pageHandler: null,
-                        values: new { area = "Identity", userId = user.Id, code = code, returnUrl = returnUrl },
+                        values: new { area = "Identity", userId = user.Id, code = code, retUrl_2 = retUrl_2 },
                         protocol: Request.Scheme);
 
                     var email = XLib.Emails.EmailMsg.CreateEmailMsgFromPostalTemplate("Register");
@@ -92,16 +92,16 @@ namespace HlidacStatu.Web.Areas.Identity.Pages.Account
 
                     if (_userManager.Options.SignIn.RequireConfirmedAccount)
                     {
-                        return RedirectToPage("RegisterConfirmation", new { email = Input.Email, returnUrl = returnUrl });
+                        return RedirectToPage("RegisterConfirmation", new { email = Input.Email, retUrl_2 = retUrl_2 });
                     }
                     else
                     {
                         await _signInManager.SignInAsync(user, isPersistent: false);
-                        if (returnUrl == "/cenypracehlidac")
+                        if (retUrl_2 == "/cenypracehlidac")
                         {
                             return Redirect("cenyprace.hlidacstatu.cz");
                         }
-                        return LocalRedirect(returnUrl);
+                        return LocalRedirect(retUrl_2);
                     }
                 }
                 foreach (var error in result.Errors)

@@ -29,7 +29,7 @@ namespace HlidacStatu.Web.Areas.Identity.Pages.Account
 
         public bool RememberMe { get; set; }
 
-        public string ReturnUrl { get; set; }
+        public string retUrl_2 { get; set; }
 
         public class InputModel
         {
@@ -43,7 +43,7 @@ namespace HlidacStatu.Web.Areas.Identity.Pages.Account
             public bool RememberMachine { get; set; }
         }
 
-        public async Task<IActionResult> OnGetAsync(bool rememberMe, string? returnUrl = null)
+        public async Task<IActionResult> OnGetAsync(bool rememberMe, string? retUrl_2 = null)
         {
             // Ensure the user has gone through the username & password screen first
             var user = await _signInManager.GetTwoFactorAuthenticationUserAsync();
@@ -53,20 +53,20 @@ namespace HlidacStatu.Web.Areas.Identity.Pages.Account
                 throw new InvalidOperationException($"Unable to load two-factor authentication user.");
             }
 
-            ReturnUrl = returnUrl;
+            retUrl_2 = retUrl_2;
             RememberMe = rememberMe;
 
             return Page();
         }
 
-        public async Task<IActionResult> OnPostAsync(bool rememberMe, string? returnUrl = null)
+        public async Task<IActionResult> OnPostAsync(bool rememberMe, string? retUrl_2 = null)
         {
             if (!ModelState.IsValid)
             {
                 return Page();
             }
 
-            returnUrl = returnUrl ?? Url.Content("~/");
+            retUrl_2 = retUrl_2 ?? Url.Content("~/");
 
             var user = await _signInManager.GetTwoFactorAuthenticationUserAsync();
             if (user == null)
@@ -81,7 +81,7 @@ namespace HlidacStatu.Web.Areas.Identity.Pages.Account
             if (result.Succeeded)
             {
                 _logger.Information($"User with ID '{user.Id}' logged in with 2fa.");
-                return LocalRedirect(returnUrl);
+                return LocalRedirect(retUrl_2);
             }
             else if (result.IsLockedOut)
             {

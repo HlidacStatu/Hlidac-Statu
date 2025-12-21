@@ -21,24 +21,24 @@ namespace HlidacStatu.Web.Areas.Identity.Pages.Account
             _signInManager = signInManager;
         }
 
-        public async Task<IActionResult> OnGet(string? returnUrl = null)
+        public async Task<IActionResult> OnGet(string? retUrl_2 = null)
         {
             await _signInManager.SignOutAsync();
             _logger.Information("User logged out.");
-            if(string.IsNullOrEmpty(returnUrl))
+            if(string.IsNullOrEmpty(retUrl_2))
                 return RedirectToAction("Index", "Home");
             else
-                return LocalRedirect(returnUrl);
+                return LocalRedirect(retUrl_2);
         }
 
-        public async Task<IActionResult> OnPost(string? returnUrl = null)
+        public async Task<IActionResult> OnPost(string? retUrl_2 = null)
         {
             await _signInManager.SignOutAsync();
             _logger.Information("User logged out.");
-            if(string.IsNullOrEmpty(returnUrl))
+            if(string.IsNullOrEmpty(retUrl_2))
                 return RedirectToAction("Index", "Home");
             else
-                return LocalRedirect(returnUrl);
+                return LocalRedirect(retUrl_2);
         }
     }
 }

@@ -7,7 +7,7 @@
 
 <div class="row">
     <div class="col-sm-12">
-        <p>Bez účtu si nemůžete nechat kontrolovat smlouvy, ukládat dotazy a spoustu dalších věcí. Pokud už účet máte, <a asp-page="./Login" asp-route-returnUrl="@Model.ReturnUrl">zalogujte se tady</a>.</p>
+        <p>Bez účtu si nemůžete nechat kontrolovat smlouvy, ukládat dotazy a spoustu dalších věcí. Pokud už účet máte, <a asp-page="./Login" asp-route-retUrl_2="@Model.retUrl_2">zalogujte se tady</a>.</p>
         <hr/>
     </div>
     <div class="col-sm-12">
@@ -15,7 +15,7 @@
         <p>Nemusíte se bát, my se váš login a heslo k jiné službě nedozvíme. Jediné, co se dozvíme je váš email. Stejně jako při registraci níže.</p>
         
         <section>
-            <form id="external" method="post" asp-page="./ExternalLogin" asp-route-returnUrl="@Model.ReturnUrl">
+            <form id="external" method="post" asp-page="./ExternalLogin" asp-route-retUrl_2="@Model.retUrl_2">
                 <div>
                     @foreach (var provider in Model.ExternalLogins)
                     {
@@ -33,7 +33,7 @@
     </div>
     <div class="col-sm-12">
         <h4>Vytvoření účtu přímo na Hlídači státu</h4>
-        <form asp-route-returnUrl="@Model.ReturnUrl" method="post" class="form-horizontal" autocomplete="off">
+        <form asp-route-retUrl_2="@Model.retUrl_2" method="post" class="form-horizontal" autocomplete="off">
             <div asp-validation-summary="All" class="text-danger"></div>
             <honeypot></honeypot>
             <div class="form-group">

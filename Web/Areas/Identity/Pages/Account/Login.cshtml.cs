@@ -34,7 +34,7 @@ namespace HlidacStatu.Web.Areas.Identity.Pages.Account
 
         public IList<AuthenticationScheme> ExternalLogins { get; set; }
 
-        public string? ReturnUrl { get; set; }
+        public string? retUrl_2 { get; set; }
 
         [TempData]
         public string ErrorMessage { get; set; }
@@ -53,28 +53,28 @@ namespace HlidacStatu.Web.Areas.Identity.Pages.Account
             public bool RememberMe { get; set; }
         }
 
-        public async Task OnGetAsync(string? returnUrl = null)
+        public async Task OnGetAsync(string? retUrl_2 = null)
         {
             if (!string.IsNullOrEmpty(ErrorMessage))
             {
                 ModelState.AddModelError(string.Empty, ErrorMessage);
             }
 
-            returnUrl ??= Url.Content("~/");
-            returnUrl = returnUrl.Replace("/Identity/Account/Login?returnUrl=/", "");
+            retUrl_2 ??= Url.Content("~/");
+            retUrl_2 = retUrl_2.Replace("/Identity/Account/Login?retUrl_2=/", "");
 
             // Clear the existing external cookie to ensure a clean login process
             await HttpContext.SignOutAsync(IdentityConstants.ExternalScheme);
 
             ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
 
-            ReturnUrl = returnUrl;
+            retUrl_2 = retUrl_2;
         }
 
-        public async Task<IActionResult> OnPostAsync(string? returnUrl = null)
+        public async Task<IActionResult> OnPostAsync(string? retUrl_2 = null)
         {
-            returnUrl ??= Url.Content("~/");
-            returnUrl = returnUrl.Replace("/Identity/Account/Login?returnUrl=/", "");
+            retUrl_2 ??= Url.Content("~/");
+            retUrl_2 = retUrl_2.Replace("/Identity/Account/Login?retUrl_2=/", "");
 
             ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
 
@@ -86,11 +86,11 @@ namespace HlidacStatu.Web.Areas.Identity.Pages.Account
                 if (result.Succeeded)
                 {
                     _logger.Information("User logged in.");
-                    return LocalRedirect(returnUrl);
+                    return LocalRedirect(retUrl_2);
                 }
                 if (result.RequiresTwoFactor)
                 {
-                    return RedirectToPage("./LoginWith2fa", new { ReturnUrl = returnUrl, RememberMe = Input.RememberMe });
+                    return RedirectToPage("./LoginWith2fa", new { retUrl_2 = retUrl_2, RememberMe = Input.RememberMe });
                 }
                 if (result.IsLockedOut)
                 {
