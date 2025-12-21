@@ -416,7 +416,7 @@ namespace HlidacStatu.Extensions
                 return true;
 
             if (
-                (firma.Kod_PF != null && Firma.StatniFirmy_BasedKodPF.Contains(firma.Kod_PF.Value))
+                (firma.Kod_PF != null && FirmaVlastnenaStatemRepo.StatniFirmy_BasedKodPF.Contains(firma.Kod_PF.Value))
                 || (FirmaCache.VsechnyStatniMestskeFirmy25percs().Contains(firma.ICO))
             )
             {
@@ -514,7 +514,7 @@ namespace HlidacStatu.Extensions
         internal static bool _jsemStatniFirma(this Firma firma)
         {
             if (
-                (firma.Kod_PF != null && Firma.StatniFirmy_BasedKodPF.Contains(firma.Kod_PF.Value))
+                (firma.Kod_PF != null && FirmaVlastnenaStatemRepo.StatniFirmy_BasedKodPF.Contains(firma.Kod_PF.Value))
                 || (FirmaCache.VsechnyStatniMestskeFirmy().Contains(firma.ICO))
             )
             {

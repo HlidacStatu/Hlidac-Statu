@@ -64,7 +64,7 @@ namespace HlidacStatu.Repositories
 
                         //CEZ, CPost, CD, 
                         icos.AddRange("45274649,47114983,70994226".Split(','));
-                        icos.AddRange(Firma.StatniFirmyICO);
+                        icos.AddRange(FirmaVlastnenaStatemRepo.StatniFirmyICO);
 
                         icos.AddRange(DirectDB.Instance
                             .GetList<string>(
