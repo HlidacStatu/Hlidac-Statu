@@ -150,9 +150,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "public", "public", "{8DFECE
 		.editorconfig = .editorconfig
 		.gitattributes = .gitattributes
 		.gitignore = .gitignore
+		Directory.Build.props = Directory.Build.props
 		nuget.config = nuget.config
 		README.MD = README.MD
-		Directory.Build.props = Directory.Build.props
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "private", "private", "{131AAA92-76B1-4D68-9410-7B52810BC976}"
@@ -266,6 +266,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CacheStarter", "..\Hlidac-Statu-Private\CacheStarter\CacheStarter.csproj", "{34B8DF45-AD37-4B8A-8BEE-E155D6FBA8ED}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lib.ISVAVAI", "..\Hlidac-Statu-Private\Lib.ISVAVAI\Lib.ISVAVAI.csproj", "{721B9D13-0FB9-4138-9E26-7C03106CB36A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InsolvencyScraper", "..\Hlidac-Statu-Private\InsolvencniSpravciScraper\InsolvencyScraper.csproj", "{1F0660DA-0456-DA91-AF23-6C3C033FA4FB}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -677,6 +679,10 @@ Global
 		{721B9D13-0FB9-4138-9E26-7C03106CB36A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{721B9D13-0FB9-4138-9E26-7C03106CB36A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{721B9D13-0FB9-4138-9E26-7C03106CB36A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1F0660DA-0456-DA91-AF23-6C3C033FA4FB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1F0660DA-0456-DA91-AF23-6C3C033FA4FB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1F0660DA-0456-DA91-AF23-6C3C033FA4FB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1F0660DA-0456-DA91-AF23-6C3C033FA4FB}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -797,6 +803,7 @@ Global
 		{00E5A8FC-4816-4271-A373-2B50F3089C0E} = {44E67082-D88E-41AE-AF07-4739BDC44B2D}
 		{34B8DF45-AD37-4B8A-8BEE-E155D6FBA8ED} = {87D50816-C7A9-4B83-A5E3-5EEE0265C2F5}
 		{721B9D13-0FB9-4138-9E26-7C03106CB36A} = {44E67082-D88E-41AE-AF07-4739BDC44B2D}
+		{1F0660DA-0456-DA91-AF23-6C3C033FA4FB} = {44E67082-D88E-41AE-AF07-4739BDC44B2D}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {17143448-F5EA-41D1-886F-00E63AE50798}

@@ -2,6 +2,12 @@ using System.Xml.Serialization;
 
 namespace HlidacStatu.Entities;
 
+public class OrganVerejneMoci_KategorieOvm
+{
+    public string IdDS { get; set; }
+    public string KategorieOvm { get; set; }
+}
+
 [XmlRoot(ElementName = "Subjekt")]
 public class OrganVerejneMoci
 {

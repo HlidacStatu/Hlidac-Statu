@@ -231,7 +231,17 @@ namespace HlidacStatu.Entities
             _ = modelBuilder.Entity<SmlouvaVerejnaZakazka>()
                 .HasKey(s => new { s.VzId, s.IdSmlouvy });
 
+            _ = modelBuilder.Entity<OrganVerejneMoci_KategorieOvm>(entity =>
+            {
+                _ = entity.Property(e => e.IdDS).HasMaxLength(20);
+                _ = entity.Property(e => e.KategorieOvm).HasMaxLength(10);
+                _ = entity.HasKey(u => new
+                {
+                    u.IdDS,
+                    u.KategorieOvm
+                });
 
+            });
         }
 
         public virtual DbSet<UptimeServer> UptimeServers { get; set; }
@@ -281,6 +291,7 @@ namespace HlidacStatu.Entities
         public virtual DbSet<AdresaOvm> AdresaOvm { get; set; }
         public virtual DbSet<AdresniMisto> AdresniMisto { get; set; }
         public virtual DbSet<OrganVerejneMoci> OrganVerejneMoci { get; set; }
+        public virtual DbSet<OrganVerejneMoci_KategorieOvm> OrganVerejneMoci_KategorieOvm { get; set; }
         public virtual DbSet<PravniFormaOvm> PravniFormaOvm { get; set; }
         public virtual DbSet<TypOvm> TypOvm { get; set; }
         public virtual DbSet<ConfigurationValue> ConfigurationValues { get; set; }
