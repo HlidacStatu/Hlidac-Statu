@@ -11,7 +11,7 @@ namespace HlidacStatu.Repositories
     {
         public static class Zatrideni
         {
-            public static async Task<Firma.Zatrideni.Item[]> GetSubjektyDirectAsync(Firma.Zatrideni.SubjektyObory obor)
+            public static async Task<string[]> GetIcoDirectAsync(Firma.Zatrideni.SubjektyObory obor)
             {
                 string[] icos = null;
                 string sql = "";
@@ -74,13 +74,13 @@ namespace HlidacStatu.Repositories
                             .Split(',');
                         sql = @"select ico from Firma f where f.kod_pf in (302,301) and f.IsInRs = 1";
                         icos = GetSubjektyFromSql(sql).Union(icos).Distinct().ToArray();
-
                         break;
+
                     case Firma.Zatrideni.SubjektyObory.Agentury:
                         icos = "62933591,00001171,71377999,72050365,75123924,06578705,07460121,45249130"
                             .Split(',');
-                        break;
 
+                        break;
                     case Firma.Zatrideni.SubjektyObory.Fakultni_nemocnice:
                         icos = "65269705,00179906,00669806,00098892,00843989,00064165,00064203,00159816,00064173"
                             .Split(',');
@@ -118,7 +118,7 @@ namespace HlidacStatu.Repositories
                     case Firma.Zatrideni.SubjektyObory.Ostatni:
                         icos = new string[] { };
                         break;
-                    case Firma.Zatrideni.SubjektyObory.Media:
+                    case Firma.Zatrideni.SubjektyObory.StatniMedia:
                         sql = @"select ico from Firma f where f.kod_pf in (361,362) and f.IsInRs = 1";
                         icos = GetSubjektyFromSql(sql);
                         break;
@@ -146,10 +146,43 @@ namespace HlidacStatu.Repositories
                         sql = @"select ico from Firma f where f.Esa2010 like ('12%') and f.IsInRs = 1";
                         icos = GetSubjektyFromSql(sql);
                         break;
-                    default:
+                    case Firma.Zatrideni.SubjektyObory.Zdravotni_ustavy:
+                    case Firma.Zatrideni.SubjektyObory.Zdravotni_pojistovny:
+                    case Firma.Zatrideni.SubjektyObory.Vrchni_statni_zastupitelstvi:
+                    case Firma.Zatrideni.SubjektyObory.Krajska_statni_zastupitelstvi:
+                    case Firma.Zatrideni.SubjektyObory.Krajske_soudy:
+                    case Firma.Zatrideni.SubjektyObory.Soudy:
+                    case Firma.Zatrideni.SubjektyObory.Kraje_Praha:
+                    case Firma.Zatrideni.SubjektyObory.Obce_III_stupne:
+                    case Firma.Zatrideni.SubjektyObory.Obce:
+                    case Firma.Zatrideni.SubjektyObory.Statutarni_mesta:
+                    case Firma.Zatrideni.SubjektyObory.Mestske_casti_Prahy:
+                    case Firma.Zatrideni.SubjektyObory.Hasicsky_zachranny_sbor:
+                    case Firma.Zatrideni.SubjektyObory.Krajske_hygienicke_stanice:
+                    case Firma.Zatrideni.SubjektyObory.Krajska_reditelstvi_policie:
+                    case Firma.Zatrideni.SubjektyObory.Statni_fondy:
+                    case Firma.Zatrideni.SubjektyObory.OSSZ:
+                    case Firma.Zatrideni.SubjektyObory.Katastralni_urady:
+                    case Firma.Zatrideni.SubjektyObory.Ministerstva:
+                    case Firma.Zatrideni.SubjektyObory.Organizacni_slozky_statu:
+                    case Firma.Zatrideni.SubjektyObory.Dalsi_ustredni_organy_statni_spravy:
+                    case Firma.Zatrideni.SubjektyObory.Celni_urady:
+                    case Firma.Zatrideni.SubjektyObory.Financni_urady:
+                    case Firma.Zatrideni.SubjektyObory.Verejne_vysoke_skoly:
+                    case Firma.Zatrideni.SubjektyObory.Konzervatore:
+                    case Firma.Zatrideni.SubjektyObory.OVM_pro_evidenci_skutecnych_majitelu:
                         icos = await GetSubjektyFromRppAsync((int)obor);
                         break;
+                    default:
+                        throw new System.Exception("Neznamy obor pro ziskani subjektu: " + obor.ToString());
                 }
+
+                return icos;
+            }
+            public static async Task<Firma.Zatrideni.Item[]> GetSubjektyDirectAsync(Firma.Zatrideni.SubjektyObory obor)
+            { 
+                var icos = await GetIcoDirectAsync(obor);
+
                 bool removeKraj = false;
                 switch (obor)
                 {
@@ -176,7 +209,6 @@ namespace HlidacStatu.Repositories
                     default:
                         break;
                 }
-
                 if (icos.Count() == 0)
                     return new Firma.Zatrideni.Item[] { };
                 else
@@ -204,7 +236,7 @@ namespace HlidacStatu.Repositories
                                 }
                             }
                             return new Devmasters.Batch.ActionOutputData();
-                        },null,null, !System.Diagnostics.Debugger.IsAttached, prefix: "firmy zatrideni ");
+                        }, null, null, !System.Diagnostics.Debugger.IsAttached, prefix: "firmy zatrideni ");
 
                     return ret.ToArray();
                 }
@@ -228,7 +260,7 @@ namespace HlidacStatu.Repositories
 
             private static async Task<string[]> GetAllSubjektyFromRppAsync()
             {
-                var client = Manager.GetESClient_RPP_Kategorie(); 
+                var client = Manager.GetESClient_RPP_Kategorie();
                 var res = await client.SearchAsync<Lib.Data.External.RPP.KategorieOVM>(s => s.Size(9000).Query(q => q.MatchAll()));
                 if (res.IsValid)
                     return res.Hits

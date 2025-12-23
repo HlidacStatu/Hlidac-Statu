@@ -28,31 +28,155 @@ namespace HlidacStatu.Repositories
         //vcetne strategickych podniku z https://www.mfcr.cz/cs/aktualne/tiskove-zpravy/2020/vlada-schvalila-strategii-vlastnicke-pol-37573
         public static string[] StatniFirmyICO = new string[]
         {
-            "00000205", "00000337", "00000345", "00000370", "00000493", "00000515", "00001279", "00001481", "00001490",
-            "00002321", "00002674", "00002691",
-            "00002739", "00003026", "00007536", "00008141", "00008184", "00009181", "00009334", "00009393", "00009563",
-            "00010669", "00011011", "00012033",
-            "00012343", "00013251", "00013455", "00014079", "00014125", "00014818", "00015156", "00015270", "00015296",
-            "00015415", "00015679", "00024007",
-            "00076791", "00086932", "00128201", "00157287", "00157325", "00251976", "00311391", "00514152", "00565253",
-            "00577880", "00659819", "00664073",
-            "03630919", "13695673", "14450216", "14450241", "14867770", "14888025", "15503852", "17047234", "24272523",
-            "24729035", "24821993", "24829871",
-            "25059386", "25085531", "25125877", "25255843", "25291581", "25401726", "25634160", "25674285", "25702556",
-            "25938924", "26051818", "26162539",
-            "26175291", "26206803", "26376547", "26463318", "26470411", "26840065", "26871823", "27145573", "27146235",
-            "27195872", "27232433", "27257258",
-            "27257517", "27309941", "27364976", "27378225", "27772683", "27786331", "27804721", "27892646", "28196678",
-            "28244532", "28255933", "28267141",
-            "28707052", "28786009", "28861736", "29372259", "42196451", "43833560", "44269595", "44848943", "45144419",
-            "45147965", "45193070", "45273375",
-            "45273448", "45274649", "45274827", "45279314", "45534268", "45795908", "46355901", "46504818", "46708707",
-            "47114983", "47115726", "47673354",
-            "47677543", "48204285", "48291749", "48535591", "49241494", "49241672", "49453866", "49454561", "49710371",
-            "49901982", "49973720", "60193468",
-            "60193531", "60196696", "60197901", "60698101", "61459445", "61860336", "62413376", "63078333", "63080249",
-            "70889953", "70889988", "70890005",
-            "70890013", "70890021", "70994226", "70994234"
+            "00014818", // ARMABETON, a.s., v likvidaci
+            "00003026", // Automatizace železniční dopravy Praha, státní podnik "v likvidaci"
+            "25125877", // BALMED Praha, státní podnik
+            "00012033", // BENZINA, státní podnik"v likvidaci
+            "00015296", // Brněnské cihelny, státní podnik - v likvidaci
+            "00012343", // Brněnské papírny, státní podnik - v likvidaci
+            "00514152", // Budějovický Budvar, národní podnik, Budweiser Budvar, National Corporation, Budweiser Budvar, Entreprise Nationale
+            "00311391", // CENDIS, s.p.
+            "00013455", // CENTRUM - F, a.s. v likvidaci
+            "27892646", // Centrum Holešovice a.s.
+            "00015270", // Cihlářské a keramické závody Teplice, státní podnik v likvidaci
+            "25085531", // CSA Services, s.r.o.
+            "25674285", // Czech Airlines Handling, a.s.
+            "27145573", // Czech Airlines Technics, a.s.
+            "24829871", // ČD - Informační Systémy, a.s.
+            "61459445", // ČD - Telematika a.s.
+            "28196678", // ČD Cargo, a.s.
+            "27195872", // ČD Reality a.s.
+            "27364976", // ČD travel, s.r.o.
+            "60193531", // ČEPRO, a.s.
+            "25702556", // ČEPS, a.s.
+            "63078333", // Česká exportní banka, a.s.
+            "27772683", // Česká pošta Security, s.r.o.
+            "47114983", // Česká pošta, s.p.
+            "45795908", // České aerolinie a.s.
+            "70994226", // České dráhy, a.s.
+            "00002691", // České energetické závody, státní podnik, odštěpný závod Elektrárna Tisová Zkratka : ČEZ-ETI - výmaz k 20.10.1992
+            "26162539", // Českomoravská společnost chovatelů, a.s.
+            "14888025", // Československá automobilová doprava, Ústřední autobusové nádraží, st.podnik "v likvidaci"
+            "00086932", // Československá státní automobilová doprava, státní podnik Hradec Králové
+            "24821993", // Český Aeroholding, a.s.
+            "24729035", // ČEZ Distribuce, a. s.
+            "26871823", // ČEZ Distribuční služby, s.r.o.
+            "28255933", // ČEZ Energetické produkty, s.r.o.
+            "60698101", // ČEZ ENERGOSERVIS spol. s r.o.
+            "27804721", // ČEZ ESL, s.r.o.
+            "26470411", // ČEZ ICT Services, a. s.
+            "28861736", // ČEZ Invest Slovensko, a.s.
+            "26206803", // ČEZ Korporátní služby, s.r.o.
+            "26840065", // ČEZ Logistika, s.r.o.
+            "25938924", // ČEZ Obnovitelné zdroje, s.r.o.
+            "27232433", // ČEZ Prodej, a.s.
+            "27309941", // ČEZ Teplárenská, a.s.
+            "26376547", // ČEZ Zákaznické služby, s.r.o.
+            "45274649", // ČEZ, a. s.
+            "00565253", // ČKD DOPRAVNÍ SYSTÉMY,a.s. v likvidaci
+            "00011011", // ČKD DUKLA a.s.
+            "00002674", // ČPPT, s.p.
+            "00002739", // DIAMO, státní podnik
+            "27378225", // Dopravní vzdělávací institut, a.s.
+            "27786331", // DPOV, a.s.
+            "49241672", // Editio Praga a.s. v likvidaci
+            "28786009", // Elektrárna Chvaletice a.s.
+            "00001481", // Elektrotechnický zkušební ústav, s. p.
+            "26051818", // Energetické centrum s.r.o.
+            "47115726", // Energotrans, a.s.
+            "25291581", // Explosia a.s.
+            "45279314", // Exportní garanční a pojišťovací společnost, a.s.
+            "00577880", // Fyzikálně technický zkušební ústav, státní podnik
+            "26175291", // GALILEO REAL, k.s. v likvidaci
+            "44269595", // Harvardský průmyslový holding, a.s.
+            "45274827", // HEXA PLUS, a.s. v likvidaci
+            "45144419", // HOLDING KLADNO a.s."v likvidaci"
+            "61860336", // HOLIDAYS Czech Airlines, a.s.
+            "25634160", // HOLTE MEDICAL, a.s. v likvidaci
+            "25059386", // HOLTE s.r.o. - v likvidaci
+            "14450216", // Horské lázně Karlova Studánka, státní podnik
+            "00251976", // Hotelinvest a.s.
+            "48535591", // IKEM - služby, spol. s r.o., v likvidaci
+            "60197901", // IMOB a.s. v likvidaci
+            "00014079", // Jihomoravské dřevařské závody Brno, v likvidaci
+            "49973720", // Jihomoravské pivovary, a.s. v likvidaci
+            "63080249", // Kongresové centrum Praha, a.s.
+            "25255843", // KORADO, a.s.
+            "42196451", // Lesy České republiky, s.p.
+            "28244532", // Letiště Praha, a. s.
+            "14867770", // LINETA Severočeská dřevařská společnost a.s.
+            "00000515", // LOM PRAHA s.p.
+            "47673354", // MCI HOLDING a.s. - v likvidaci
+            "60193468", // MERO ČR, a.s.
+            "43833560", // Mezinárodní testování drůbeže, státní podnik
+            "15503852", // Moravskoslezské dřevařské závody, Šumperk a.s. "v likvidaci"
+            "00009334", // Mototechna, státní podnik "v likvidaci"
+            "60196696", // MUFIS a.s.
+            "47677543", // NAKIT
+            "44848943", // Národní rozvojová banka, a.s.
+            "00000345", // NAŠE VOJSKO, TISKÁRNA, PRAHA, státní podnik
+            "00009181", // ORLIČAN, a.s., v likvidaci
+            "00009563", // OSAN, obchodní podnik v likvidaci
+            "26463318", // OTE, a.s.
+            "00007536", // Palivový kombinát Ústí, státní podnik
+            "49241494", // Podpůrný a garanční rolnický a lesnický fond, a.s.
+            "45273448", // Poštovní tiskárna cenin Praha s.r.o.
+            "70890005", // Povodí Labe, státní podnik
+            "70890013", // Povodí Moravy, s.p.
+            "70890021", // Povodí Odry, státní podnik
+            "70889988", // Povodí Ohře, státní podnik
+            "70889953", // Povodí Vltavy, státní podnik
+            "46504818", // Prefa Pardubice a.s.
+            "00157287", // PRIOR - Severočeské obchodní domy, státní podnik v "likvidaci"
+            "00157325", // PRIOR - Severomoravské OD Ostrava v likvidaci, státní podnik
+            "46355901", // PRISKO a.s.
+            "17047234", // RAILREKLAM, spol. s r.o.
+            "00664073", // RKT - Rovnací a kotevní technika, státní podnik v likvidaci
+            "49823574", // Robin Oil s.r.o.
+            "49710371", // Řízení letového provozu České republiky, státní podnik (ŘLP ČR, s.p.)
+            "46708707", // SETUZA a.s.
+            "49901982", // Severočeské doly a.s.
+            "00015156", // Severočeské keramické závody Most, státní podnik v likvidaci
+            "48291749", // Severočeské mlékárny, a.s. Teplice
+            "00015415", // Severokámen Liberec, státní podnik v likvidaci
+            "00076791", // Silnice, státní podnik Plzeň - v likvidaci
+            "49453866", // Slovácké vodárny a kanalizace, a. s.
+            "62413376", // Správa Letiště Praha, s.p.
+            "70994234", // Správa železnic, státní organizace
+            "14450241", // Státní léčebné lázně Bludov, státní podnik "v likvidaci"
+            "00024007", // Státní léčebné lázně Janské Lázně, státní podnik
+            "03630919", // Státní pokladna Centrum sdílených služeb, s. p.
+            "00001279", // Státní tiskárna cenin, s. p.
+            "27146235", // Státní zkušebna strojů a.s.
+            "00001490", // Strojírenský zkušební ústav, s.p.
+            "00008141", // Středočeské energetické závody, státní podnik "v likvidaci"
+            "00128201", // ŠKODA PRAHA a.s.
+            "27257517", // ŠKODA PRAHA Invest s.r.o.
+            "00015679", // Technický a zkušební ústav stavební Praha, s.p.
+            "00002321", // TECHNOMAT, státní podnik "v likvidaci"
+            "28707052", // Teplárna Trmice, a.s.
+            "00013251", // Textilní zkušební ústav, s.p.
+            "25401726", // THERMAL-F, a.s.
+            "45534268", // TRANSPORTA a.s.
+            "28267141", // TRANZA Strojírny a.s.
+            "45147965", // Ústav nerostných surovin a. s. v likvidaci
+            "45193070", // VÍTKOVICE, a.s.
+            "49454561", // Vodovody a kanalizace Zlín, a.s.
+            "00000205", // Vojenské lesy a statky ČR, s.p.
+            "00000337", // Vojenské stavby - státní podnik v likvidaci
+            "00659819", // Vojenský opravárenský podnik 081 Přelouč, státní podnik
+            "24272523", // Vojenský technický ústav, s.p.
+            "29372259", // Vojenský výzkumný ústav, s. p.
+            "00000493", // VOP CZ, s.p.
+            "45273375", // VSZP, a.s. v likvidaci
+            "00000370", // Vydavatelství MAGNET-PRESS
+            "00008184", // Východočeské energetické závody, státní podnik v likvidaci
+            "00014125", // Výzkumný a vývojový ústav dřevařský, Praha, s.p.
+            "27257258", // Výzkumný Ústav Železniční, a.s.
+            "00010669", // VZLU AEROSPACE, a.s.
+            "48204285", // Zemský hřebčinec Písek státní podnik v likvidaci
+            "13695673", // Zemský hřebčinec Tlumačov, státní podnik v likvidaci
+            "00009393", // ZPS, a.s. v likvidaci
 
         };
 
@@ -156,6 +280,8 @@ namespace HlidacStatu.Repositories
             HlidacStatu.Caching.CacheFactory.CreateNew(CacheFactory.CacheType.PermanentStore, nameof(FirmaVlastnenaStatemRepo));
 
 
+
+
         [Obsolete("Use SeznamOvmIndex")]
         public static string DatafileSeznamDsOvmCached()
             => PermanentCache.GetOrSet("datafile-seznam_ds_ovm.xml",
@@ -185,6 +311,54 @@ namespace HlidacStatu.Repositories
                 options => options.ModifyEntryOptionsDuration(TimeSpan.FromHours(12), TimeSpan.FromDays(10 * 365))
             );
 
+        
+
+        static HashSet<string> _ovm_Nikdy_nejsou_statni = null;
+        private static async Task<HashSet<string>> OVM_Nikdy_nejsou_statni(bool updateFromPrimarySource = false) 
+        {
+            if (updateFromPrimarySource)
+                await Update_OrganVerejneMoci_in_DBAsync();
+
+            if (_ovm_Nikdy_nejsou_statni == null)
+            {
+                using DbEntities db = new DbEntities();
+
+                //kategorie, ktere nikdy nejsou statni
+                //OVM z OrganVerejneMoci
+                //ale ne ty, co maji kategorii OVM ze seznamu nize (seznam kategorii ovm https://rpp-ais.egon.gov.cz/AISP/verejne/ovm-spuu/katalog-kategorii-ovm)
+                var forbiddenOVMKategories = new HashSet<string>()
+            {
+                "KO118", //Soudní exekutoři
+                "KO155", //Notáři
+                "KO505", //Soukromé vysoké školy
+                "KO520", //Profesní komory v agendě ochrany spotřebitele
+                "KO537", //Insolvenční správci - fyzická osoba
+                "KO538", //Insolvenční správci - v.o.s.
+                "KO542", //Soukromé archivy
+            };
+                var res = await db.OrganVerejneMoci
+                    .AsNoTracking()
+                    .Join(
+                        db.OrganVerejneMoci_KategorieOvm.AsNoTracking(),
+                        o => o.IdDS,
+                        k => k.IdDS,
+                        (o, k) => new { o, k }
+                    )
+                    .Where(m => m.o.ICO != null)
+                    .Where(k => forbiddenOVMKategories.Contains(k.k.KategorieOvm))
+                    .Select(m => m.o.ICO)
+                    .Distinct()
+                    .ToHashSetAsync();
+
+                //rucne pridane ICO, ktere nikdy nemohou byt statni firmou
+                res.Add("25755277"); //Clovek v tisni
+                res.Add("00001350"); //csob
+                _ovm_Nikdy_nejsou_statni = res;
+            }
+            return _ovm_Nikdy_nejsou_statni;
+            ;
+        }
+
         //merge of Firmy.GlobalStatistics.VsechnyUradyAsync
         //Tasks.Merk.UpdateListStatniFirmy_InDB
         public async static Task<IEnumerable<FirmaVlastnenaStatem>> Najdi_Firmy_Vlastnene_Statem_z_Primarnich_ZdrojuAsync(
@@ -193,7 +367,15 @@ namespace HlidacStatu.Repositories
             )
         {
             using DbEntities db = new DbEntities();
+
+            //updatni OVM v DB
+            HashSet<string> ovm_nikdyStatni = await OVM_Nikdy_nejsou_statni(true);
+
+
+            //Find statni firmy 
+
             List<string> bagOfIco = new List<string>();
+
 
             bagOfIco.AddRange(StatniFirmyICO);
 
@@ -292,39 +474,7 @@ namespace HlidacStatu.Repositories
 
             }
 
-            //updatni OVM v DB
-            await Update_OrganVerejneMoci_in_DBAsync();
 
-            //kategorie, ktere nikdy nejsou statni
-            //OVM z OrganVerejneMoci
-            //ale ne ty, co maji kategorii OVM ze seznamu nize (seznam kategorii ovm https://rpp-ais.egon.gov.cz/AISP/verejne/ovm-spuu/katalog-kategorii-ovm)
-            var forbiddenOVMKategories = new HashSet<string>()
-            {
-                "KO118", //Soudní exekutoři
-                "KO155", //Notáři
-                "KO505", //Soukromé vysoké školy
-                "KO520", //Profesní komory v agendě ochrany spotřebitele
-                "KO537", //Insolvenční správci - fyzická osoba
-                "KO538", //Insolvenční správci - v.o.s.
-                "KO542", //Soukromé archivy
-            };
-            var ovmIcoToIgnore_nejsouStatni = db.OrganVerejneMoci
-                .AsNoTracking()
-                .Join(
-                    db.OrganVerejneMoci_KategorieOvm.AsNoTracking(),
-                    o => o.IdDS,
-                    k => k.IdDS,
-                    (o, k) => new { o, k }
-                )
-                .Where(m => m.o.ICO != null)
-                .Where(k => forbiddenOVMKategories.Contains(k.k.KategorieOvm))
-                .Select(m => m.o.ICO)
-                .Distinct()
-                .ToHashSet();
-
-            var allOvm = db.OrganVerejneMoci.AsNoTracking().Select(m => m.ICO).ToList()
-                .Except(ovmIcoToIgnore_nejsouStatni) ;
-            bagOfIco.AddRange(allOvm);
 
 
 
@@ -333,9 +483,32 @@ namespace HlidacStatu.Repositories
                 .Where(m => string.IsNullOrEmpty(m) == false)
                 .Distinct()
                 .ToList();
-            //rucni smazani
-            bagOfIco.Remove("25755277"); //Clovek v tisni
-            bagOfIco.Remove("00001350"); //csob
+
+            //smaz vsechny OVM, kteri maji kategorii, ktera znemožnuje byt statni firmou
+            var allOvm = await db.OrganVerejneMoci.AsNoTracking()
+                .Select(m => m.ICO)
+                .ToListAsync();
+            bagOfIco.AddRange(allOvm);
+
+            bagOfIco.AddRange(await FirmaRepo.Zatrideni.GetIcoDirectAsync(Firma.Zatrideni.SubjektyObory.Fakultni_nemocnice));
+            bagOfIco.AddRange(await FirmaRepo.Zatrideni.GetIcoDirectAsync(Firma.Zatrideni.SubjektyObory.Hasicsky_zachranny_sbor));
+            bagOfIco.AddRange(await FirmaRepo.Zatrideni.GetIcoDirectAsync(Firma.Zatrideni.SubjektyObory.Knihovny));
+            bagOfIco.AddRange(await FirmaRepo.Zatrideni.GetIcoDirectAsync(Firma.Zatrideni.SubjektyObory.StatniMedia));
+            bagOfIco.AddRange(await FirmaRepo.Zatrideni.GetIcoDirectAsync(Firma.Zatrideni.SubjektyObory.Krajske_spravy_silnic));
+            bagOfIco.AddRange(await FirmaRepo.Zatrideni.GetIcoDirectAsync(Firma.Zatrideni.SubjektyObory.Velke_nemocnice));
+            bagOfIco.AddRange(await FirmaRepo.Zatrideni.GetIcoDirectAsync(Firma.Zatrideni.SubjektyObory.Verejne_vysoke_skoly));
+            bagOfIco.AddRange(await FirmaRepo.Zatrideni.GetIcoDirectAsync(Firma.Zatrideni.SubjektyObory.Zdravotni_pojistovny));
+
+
+
+
+            //cleanup a filtruj ico, co nikdy nejsou statni
+            bagOfIco = bagOfIco
+                .Select(m=>m.Trim())
+                .Where(m=> string.IsNullOrEmpty(m) == false)
+                .Distinct()
+                .Where(m => ovm_nikdyStatni.Contains(m) == false)                
+                .ToList();
 
 
             //najdi vsechny firmy a jejich vazby
@@ -369,9 +542,15 @@ namespace HlidacStatu.Repositories
              !System.Diagnostics.Debugger.IsAttached, prefix: "freshList statnifirmy ", monitor: new MonitoredTaskRepo.ForBatch()
              );
 
-            //rucni smazani, kdyz by bylo v podrizenych
-            bagOfIco.Remove("25755277"); //rucni smazani Clovek v tisni
-            bagOfIco.Remove("00001350"); //csob
+
+            //cleanup a filtruj ico, co nikdy nejsou statni
+            bagOfIco = bagOfIco
+                .Select(m => m.Trim())
+                .Where(m => string.IsNullOrEmpty(m) == false)
+                .Distinct()
+                .Where(m => ovm_nikdyStatni.Contains(m) == false)
+                .ToList();
+
 
 
 

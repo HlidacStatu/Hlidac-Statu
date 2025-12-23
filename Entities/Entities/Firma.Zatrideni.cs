@@ -58,6 +58,9 @@ namespace HlidacStatu.Entities
                 [GroupValue("Justice")]
                 [NiceDisplayName("Všechny soudy")]
                 Soudy = 123,
+                //[GroupValue("Justice")]
+                //[NiceDisplayName("Insolvenční správci")]
+                //Insolvencni_spravci = 10002,
 
                 [GroupValue("Samospráva")]
                 [NiceDisplayName("Kraje a hl. m. Praha")]
@@ -116,7 +119,7 @@ namespace HlidacStatu.Entities
 
                 [GroupValue("Státní úřady a organizace")]
                 [NiceDisplayName("Média")]
-                Media = 10105,
+                StatniMedia = 10105,
 
                 [Disabled()]
                 [GroupValue("Státní úřady a organizace")]

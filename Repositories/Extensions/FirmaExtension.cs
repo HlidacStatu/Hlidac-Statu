@@ -408,23 +408,6 @@ namespace HlidacStatu.Extensions
             return ret;
         }
 
-        public static bool PatrimStatuAlespon25procent(this Firma firma) => (firma.TypSubjektu == Firma.TypSubjektuEnum.PatrimStatuAlespon25perc);
-
-        internal static bool _patrimStatuAlespon25procent(this Firma firma)
-        {
-            if (firma.JsemOVM())
-                return true;
-
-            if (
-                (firma.Kod_PF != null && FirmaVlastnenaStatemRepo.StatniFirmy_BasedKodPF.Contains(firma.Kod_PF.Value))
-                || (FirmaCache.VsechnyStatniMestskeFirmy25percs().Contains(firma.ICO))
-            )
-            {
-                return true;
-            }
-            else
-                return false;
-        }
         public static string Kod_PF_Popis(this Firma firma)
         {
             var kod_pf = (firma.Kod_PF?.ToString() ?? "");
@@ -458,34 +441,6 @@ namespace HlidacStatu.Extensions
         }
 
 
-        public static async Task SetTypAsync(this Firma firma)
-        {
-            bool obec = false;
-            if (firma._jsemOVM()) //Obec co neni v kategorii Obce s rozšířenou působností
-            {
-                if ((await firma.KategorieOVMAsync()).Any(m => m.id == 14) == true //je obec
-                   )
-                {
-                    obec = true;
-                }
-            }
-
-            if (obec)
-                firma.TypSubjektu = Firma.TypSubjektuEnum.Obec;
-            else if (firma._jsemOVM())
-                firma.TypSubjektu = Firma.TypSubjektuEnum.Ovm;
-            else if (firma._patrimStatuAlespon25procent())
-            {
-                firma.TypSubjektu = Firma.TypSubjektuEnum.PatrimStatuAlespon25perc;
-                if (firma._jsemStatniFirma())
-                    firma.TypSubjektu = Firma.TypSubjektuEnum.PatrimStatu;
-            }
-            else if (firma._jsemStatniFirma())
-                firma.TypSubjektu = Firma.TypSubjektuEnum.PatrimStatu;
-            else
-                firma.TypSubjektu = Firma.TypSubjektuEnum.Soukromy;
-        }
-
         public static bool PatrimStatu(this Firma firma)
         {
             return firma.JsemOVM() || firma.JsemStatniFirma();
@@ -510,19 +465,7 @@ namespace HlidacStatu.Extensions
             return FirmaCache.UradyOvm().Contains(firma.ICO);
         }
 
-        public static bool JsemStatniFirma(this Firma firma) => firma.TypSubjektu == Firma.TypSubjektuEnum.PatrimStatu || firma.TypSubjektu == Firma.TypSubjektuEnum.PatrimStatuAlespon25perc;
-        internal static bool _jsemStatniFirma(this Firma firma)
-        {
-            if (
-                (firma.Kod_PF != null && FirmaVlastnenaStatemRepo.StatniFirmy_BasedKodPF.Contains(firma.Kod_PF.Value))
-                || (FirmaCache.VsechnyStatniMestskeFirmy().Contains(firma.ICO))
-            )
-            {
-                return true;
-            }
-            else
-                return false;
-        }
+        public static bool JsemStatniFirma(this Firma firma) => Firma.StatniSubjektPredicate(firma);
 
 
         public static bool IsSponzor(this Firma firma)

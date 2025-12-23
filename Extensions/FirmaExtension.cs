@@ -223,8 +223,7 @@ public static class FirmaExtensions
             return DS.Api.Firmy.SubjektDetailInfo.CharakterEnum.StatniOrgan;
         else if (f.JsemPolitickaStrana())
             return DS.Api.Firmy.SubjektDetailInfo.CharakterEnum.PolitickaStrana;
-        else if (f.TypSubjektu == Firma.TypSubjektuEnum.PatrimStatu
-                 || f.TypSubjektu == Firma.TypSubjektuEnum.PatrimStatuAlespon25perc
+        else if (f.TypSubjektu == Firma.TypSubjektuEnum.PatrimStatu                 
                  || f.JsemStatniFirma())
             return DS.Api.Firmy.SubjektDetailInfo.CharakterEnum.FirmaPatriStatu;
         else if (f.Registrovana_v_zahranici)

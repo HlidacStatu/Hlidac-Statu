@@ -246,8 +246,7 @@ namespace HlidacStatu.Repositories
                             where IsInRS = 1 
                               AND LEN(ico) = 8 
                               AND Kod_PF > 110
-                              AND Typ in ({(int)Firma.TypSubjektuEnum.PatrimStatu}
-                                ,{(int)Firma.TypSubjektuEnum.PatrimStatuAlespon25perc});";
+                              AND Typ  = {(int)Firma.TypSubjektuEnum.PatrimStatu};";
 
             var items = DirectDB.Instance.GetList<string, string, string, int?>(sql);
             int maxConcurrency = 20;

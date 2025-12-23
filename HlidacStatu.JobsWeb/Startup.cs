@@ -46,7 +46,7 @@ namespace WatchdogAnalytics
                 //options.LoginPath = "/Identity/Account/Login";
                 // retUrl_2Parameter requires 
                 //using Microsoft.AspNetCore.Authentication.Cookies;
-                options.retUrl_2Parameter = CookieAuthenticationDefaults.retUrl_2Parameter;
+                options.ReturnUrlParameter = CookieAuthenticationDefaults.ReturnUrlParameter;
                 options.SlidingExpiration = true;
             });
 

@@ -1,5 +1,6 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
+using System.Data.Entity;
 using System.Linq;
 using System.Threading.Tasks;
 using HlidacStatu.Caching;
@@ -67,6 +68,7 @@ public static class FirmaCache
             _ => OvmRepo.KrajskeUrady().Select(m => Firmy.GetByDS(m.IdDS)).ToArray(),
             options => options.ModifyEntryOptionsDuration(TimeSpan.FromHours(6))
         );
+
 
     public static Dictionary<string, string[]> MestaPodleKraju() =>
         MemoryCache.GetOrSet("StatData.MestaPodleKraju",

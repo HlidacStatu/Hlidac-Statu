@@ -23,18 +23,23 @@ namespace HlidacStatu.Entities
             Neznamy = -1,
             [NiceDisplayName("Soukromý")]
             Soukromy = 0,
+
             [NiceDisplayName("Státní")]
-            PatrimStatu = 1,
+            InsolvecniSpravce = 1,
 
-            [Devmasters.Enums.Disabled]
-            [NiceDisplayName("Částečně státní (podíl > 25%)")]
-            PatrimStatuAlespon25perc = 2,
-
+            [NiceDisplayName("Státní")]
+            PatrimStatu = 9,
             [NiceDisplayName("Úřad")]
             Ovm = 10,
             [NiceDisplayName("Obec")]
             Obec = 20
         }
+
+        public static Func<Firma,bool> SoukromaSubjektPredicate => (f)=>f.Typ <= (int)TypSubjektuEnum.Soukromy;
+        public static Func<Firma, bool> StatniSubjektPredicate => (f) => (f.Typ >= (int)TypSubjektuEnum.PatrimStatu );
+        public static Func<Firma, bool> UradySubjektPredicate => (f) => (f.Typ >= (int)TypSubjektuEnum.Ovm);
+
+
         public static string TypSubjektuDescription(int? typ, int pad, bool jednotne = true)
         {
             if (typ.HasValue)
@@ -63,11 +68,11 @@ namespace HlidacStatu.Entities
                             return "firmu vlastněnou státem";
                         else
                             return "firma vlastněná státem";
-                    case TypSubjektuEnum.PatrimStatuAlespon25perc:
-                        if (pad == 4)
-                            return "firmu vlastněnou státem (podíl min 25%)";
-                        else
-                            return "firma vlastněná státem (podíl min 25%)";
+                    //case TypSubjektuEnum.PatrimStatuAlespon25perc:
+                    //    if (pad == 4)
+                    //        return "firmu vlastněnou státem (podíl min 25%)";
+                    //    else
+                    //        return "firma vlastněná státem (podíl min 25%)";
                     case TypSubjektuEnum.Ovm:
                         if (pad == 4)
                             return "úřad";
@@ -102,11 +107,11 @@ namespace HlidacStatu.Entities
                             return "firmy vlastněné státem";
                         else
                             return "firma vlastněná státem";
-                    case TypSubjektuEnum.PatrimStatuAlespon25perc:
-                        if (pad == 4)
-                            return "firmy vlastněné státem (podíl min 25%)";
-                        else
-                            return "firmy vlastněné státem (podíl min 25%)";
+                    //case TypSubjektuEnum.PatrimStatuAlespon25perc:
+                    //    if (pad == 4)
+                    //        return "firmy vlastněné státem (podíl min 25%)";
+                    //    else
+                    //        return "firmy vlastněné státem (podíl min 25%)";
                     case TypSubjektuEnum.Ovm:
                         if (pad == 4)
                             return "úřady";

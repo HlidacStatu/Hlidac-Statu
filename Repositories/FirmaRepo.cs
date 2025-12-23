@@ -33,6 +33,7 @@ namespace HlidacStatu.Repositories
             {
                 using (DbEntities db = new DbEntities())
                 {
+
                     if (firma.Jmeno.Length > 500)
                     {
                         firma.Jmeno = firma.Jmeno.Substring(0, 500);
