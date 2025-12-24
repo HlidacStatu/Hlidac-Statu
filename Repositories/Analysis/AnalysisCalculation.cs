@@ -377,7 +377,9 @@ namespace HlidacStatu.Repositories.Analysis
                 {
                     try
                     {
-                        var vazby = p.AktualniVazby(aktualnostVztahu);
+                        var vazby = p.AktualniVazby( Relation.CharakterVazbyEnum.VlastnictviKontrola, aktualnostVztahu)
+                            .Union(p.AktualniVazby(Relation.CharakterVazbyEnum.Uredni, aktualnostVztahu))
+                        ;
                         if (vazby != null && vazby.Any())
                         {
                             foreach (var v in vazby)

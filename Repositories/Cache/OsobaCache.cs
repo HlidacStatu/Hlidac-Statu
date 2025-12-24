@@ -117,7 +117,10 @@ public static class OsobaCache
                         .Distinct(),
                     async (o) =>
                     {
-                        var icos = o.AktualniVazby(Relation.AktualnostType.Nedavny)
+                        var vazby = o.AktualniVazby(Relation.CharakterVazbyEnum.VlastnictviKontrola, Relation.AktualnostType.Nedavny)
+                                .Union(o.AktualniVazby(Relation.CharakterVazbyEnum.Uredni, Relation.AktualnostType.Nedavny));
+
+                        var icos = vazby
                             .Where(w => !string.IsNullOrEmpty(w.To.Id))
                             .Select(w => w.To.Id)
                             .ToList();
@@ -139,8 +142,8 @@ public static class OsobaCache
 
                                     foreach (var pd in pdluznici)
                                     {
-                                        var vazby = o.VazbyProICO(pd.ICO);
-                                        foreach (var v in vazby)
+                                        var _v_ico = o.VazbyProICO(pd.ICO);
+                                        foreach (var v in _v_ico)
                                         {
                                             if (Devmasters.DT.Util.IsOverlappingIntervals(
                                                     i.DatumZalozeni, i.PosledniZmena, v.RelFrom, v.RelTo))

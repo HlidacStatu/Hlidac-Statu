@@ -285,6 +285,7 @@ namespace HlidacStatu.Entities
 
         //External.RPP.KategorieOVM[] _kategorieOVM = null;
 
+        public Graph.Edge[] _vazbyUredni = null;
         public Graph.Edge[] _vazby = null;
         public Graph.Edge[] _parentVazbyFirmy = null;
         public Firma[] _parents = null;

@@ -58,7 +58,8 @@ namespace HlidacStatu.Extensions
                 Photo_Url = osoba.HasPhoto() ? osoba.GetPhotoUrl(false) : null,
                 Current_Political_Party = osoba.CurrentPoliticalParty() ?? "None",
                 Have_More_Details = true,
-                Involved_In_Companies_Count = osoba.AktualniVazby(DS.Graphs.Relation.AktualnostType.Nedavny)
+                //TODO zvazit pridani vazeb urednich
+                Involved_In_Companies_Count = osoba.AktualniVazby( DS.Graphs.Relation.CharakterVazbyEnum.VlastnictviKontrola, DS.Graphs.Relation.AktualnostType.Nedavny)
                         .Where(v => v.To != null && v.To.Type == HlidacStatu.DS.Graphs.Graph.Node.NodeType.Company)
                         .GroupBy(f => f.To.Id, v => v, (ico, v) => new
                         {
@@ -86,8 +87,8 @@ namespace HlidacStatu.Extensions
                 Current_Political_Party = osoba.CurrentPoliticalParty() ?? "None",
 
                 Recent_Public_Activities_Description = osoba.Description(false, m => m.DatumDo == null || m.DatumDo > historyLimit, 5, itemDelimeter: ", "),
-
-                Involved_In_Companies = osoba.AktualniVazby(DS.Graphs.Relation.AktualnostType.Nedavny)
+                //TODO zvazit pridani vazeb urednich
+                Involved_In_Companies = osoba.AktualniVazby( DS.Graphs.Relation.CharakterVazbyEnum.VlastnictviKontrola, DS.Graphs.Relation.AktualnostType.Nedavny)
                     .Where(v => v.To != null && v.To.Type == HlidacStatu.DS.Graphs.Graph.Node.NodeType.Company)
                     .GroupBy(f => f.To.Id, v => v, (ico, v) => new
                     {

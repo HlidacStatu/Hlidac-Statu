@@ -33,7 +33,7 @@
             {
                 string sout = "";
 
-                if (s.Osoba.Vazby() != null)
+                if (s.Osoba.Vazby( Relation.CharakterVazbyEnum.VlastnictviKontrola) != null)
                 {
                     foreach (var v in s.Stat.SoukromeFirmy.Take(2))
                     {
@@ -46,7 +46,7 @@
                     }
                     else if (s.Stat.SoukromeFirmy.Count() > 2)
                     {
-                        sout = sout + "<a href='" + s.Osoba.GetUrl() + "'>" + Devmasters.Lang.CS.Plural.Get(s.Osoba.Vazby().Length - 2, "+další vazba;+ další {0} vazby;+ dalších {0} vazeb") + "</a>";
+                        sout = sout + "<a href='" + s.Osoba.GetUrl() + "'>" + Devmasters.Lang.CS.Plural.Get(s.Osoba.Vazby( Relation.CharakterVazbyEnum.VlastnictviKontrola).Length - 2, "+další vazba;+ další {0} vazby;+ dalších {0} vazeb") + "</a>";
                     }
                 }
                 return sout;

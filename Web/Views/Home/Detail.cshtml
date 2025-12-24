@@ -530,7 +530,7 @@
 
                             var semaphore = new SemaphoreSlim(10);
 
-                            var dataTasks = fo.AktualniVazby(HlidacStatu.DS.Graphs.Relation.AktualnostType.Nedavny)
+                            var dataTasks = fo.AktualniVazby( HlidacStatu.DS.Graphs.Relation.CharakterVazbyEnum.VlastnictviKontrola, HlidacStatu.DS.Graphs.Relation.AktualnostType.Nedavny)
                                 .Where(v => v.To != null && v.To.Type == HlidacStatu.DS.Graphs.Graph.Node.NodeType.Company)
                                 .Where(m => allIcosInSmlouva.Contains(m.To.Id))
                                 .GroupBy(f => f.To.Id, v => v, (ico, v) => new { ico, v })

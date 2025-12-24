@@ -612,7 +612,8 @@ namespace HlidacStatu.Web.Controllers
 
             var no = OsobaRepo.GetOrCreateNew(titulPred, jmeno, prijmeni, titulPo, nar,
                 (Osoba.StatusOsobyEnum)typOsoby, HttpContext.User.Identity.Name);
-            no.Vazby(true);
+            no.Vazby( DS.Graphs.Relation.CharakterVazbyEnum.VlastnictviKontrola, true);
+            no.Vazby(DS.Graphs.Relation.CharakterVazbyEnum.Uredni, true);
 
             return Content(Newtonsoft.Json.JsonConvert.SerializeObject(
                     new { valid = true, nameId = no.NameId })

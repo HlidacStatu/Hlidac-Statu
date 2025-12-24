@@ -16,7 +16,7 @@
     }
 
     var statistics = await Model.StatistikaRegistrSmluvAsync();
-    var vazbyPodleAktualnosti = Model.AktualniVazby(aktualnost);
+    var vazbyPodleAktualnosti = Model.AktualniVazby( Relation.CharakterVazbyEnum.VlastnictviKontrola, aktualnost);
 }
 
 

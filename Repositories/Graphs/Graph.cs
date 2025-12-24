@@ -40,62 +40,92 @@ namespace HlidacStatu.Repositories
         }
 
         const string vazbyCacheVersion="V2";
-        private static Devmasters.Cache.Memcached.Manager<List<HlidacStatu.DS.Graphs.Graph.Edge>, string> vazbyIcoCache
-            = Devmasters.Cache.Memcached.Manager<List<HlidacStatu.DS.Graphs.Graph.Edge>, string>.GetSafeInstance("VsechnyDcerineVazby_" + vazbyCacheVersion,
-                ico => vsechnyDcerineVazbyInternal(ico, 0, true, null),
+        private static Devmasters.Cache.Memcached.Manager<List<HlidacStatu.DS.Graphs.Graph.Edge>, (string, Relation.CharakterVazbyEnum)> vazbyIcoCache
+            = Devmasters.Cache.Memcached.Manager<List<HlidacStatu.DS.Graphs.Graph.Edge>, (string, Relation.CharakterVazbyEnum)>.GetSafeInstance("VsechnyDcerineVazby_" + vazbyCacheVersion,
+                k => vsechnyDcerineVazbyInternal(k.Item1, k.Item2, 0, true, null),
                 TimeSpan.FromDays(3),
-                    Devmasters.Config.GetWebConfigValue("HazelcastServers").Split(','));
+                    Devmasters.Config.GetWebConfigValue("HazelcastServers").Split(','),
+                    keyValueSelector: key => $"{key.Item1}_{key.Item2}");
 
-        private static Devmasters.Cache.Memcached.Manager<List<HlidacStatu.DS.Graphs.Graph.Edge>, string> vazbyOsobaNameIdCache
-            = Devmasters.Cache.Memcached.Manager<List<HlidacStatu.DS.Graphs.Graph.Edge>, string>.GetSafeInstance("VsechnyDcerineVazbyOsoba_" + vazbyCacheVersion,
-                osobaNameId =>
+        private static Devmasters.Cache.Memcached.Manager<List<HlidacStatu.DS.Graphs.Graph.Edge>, (string, Relation.CharakterVazbyEnum)> vazbyOsobaNameIdCache
+            = Devmasters.Cache.Memcached.Manager<List<HlidacStatu.DS.Graphs.Graph.Edge>, (string, Relation.CharakterVazbyEnum)>.GetSafeInstance("VsechnyDcerineVazbyOsoba_" + vazbyCacheVersion,
+                k =>
                 {
-                    if (string.IsNullOrEmpty(osobaNameId))
+                    if (string.IsNullOrEmpty(k.Item1))
                         return new List<HlidacStatu.DS.Graphs.Graph.Edge>();
-                    Osoba o = Osoby.GetByNameId.Get(osobaNameId);
-                    return vsechnyDcerineVazbyInternal(o, 0, true, null);
+                    Osoba o = Osoby.GetByNameId.Get(k.Item1);
+                    return vsechnyDcerineVazbyInternal(o, k.Item2, 0, true, null);
                 },
                 TimeSpan.FromDays(3),
-                Devmasters.Config.GetWebConfigValue("HazelcastServers").Split(','));
+                Devmasters.Config.GetWebConfigValue("HazelcastServers").Split(','),
+                keyValueSelector: key => $"{key.Item1}_{key.Item2}");
 
         public static void SmazVsechnyDcerineVazbyFirmy(string ico)
         {
-            vazbyIcoCache.Delete(ico);
+            foreach (Relation.CharakterVazbyEnum charakter in Enum.GetValues(typeof(Relation.CharakterVazbyEnum)))
+                vazbyIcoCache.Delete((ico, charakter));
         }
-        public static List<HlidacStatu.DS.Graphs.Graph.Edge> VsechnyDcerineVazby(string ico, bool refresh = false)
+        public static List<HlidacStatu.DS.Graphs.Graph.Edge> VsechnyDcerineVazby(string ico,
+            Relation.CharakterVazbyEnum charakterVazby,
+            bool refresh = false)
         {
             if (refresh)
-                vazbyIcoCache.Delete(ico);
-            return vazbyIcoCache.Get(ico);
+                vazbyIcoCache.Delete((ico,charakterVazby));
+            return vazbyIcoCache.Get((ico,charakterVazby));
         }
         public static void SmazVsechnyDcerineVazbyOsoby(long internalId)
         {
             var nameId = DirectDB.Instance.GetValue<string>("select nameid from Osoba where internalId=@internalId",
                 param: new IDataParameter[] { new SqlParameter("internalId", internalId) });
             if (!string.IsNullOrEmpty(nameId))
-                vazbyOsobaNameIdCache.Delete(nameId);
+            {
+                foreach (Relation.CharakterVazbyEnum charakter in Enum.GetValues(typeof(Relation.CharakterVazbyEnum)))
+                    vazbyOsobaNameIdCache.Delete((nameId,charakter));
+            }
         }
         public static void SmazVsechnyDcerineVazbyOsoby(string nameId)
         {
-            vazbyOsobaNameIdCache.Delete(nameId);
+            foreach (Relation.CharakterVazbyEnum charakter in Enum.GetValues(typeof(Relation.CharakterVazbyEnum)))
+                vazbyOsobaNameIdCache.Delete((nameId, charakter));
         }
         public static void SmazVsechnyDcerineVazbyOsoby(Osoba person)
         {
-            vazbyOsobaNameIdCache.Delete(person?.NameId);
+            if (person == null)
+                return;
+            foreach (Relation.CharakterVazbyEnum charakter in Enum.GetValues(typeof(Relation.CharakterVazbyEnum)))
+                vazbyOsobaNameIdCache.Delete((person.NameId, charakter));
         }
 
-        public static List<HlidacStatu.DS.Graphs.Graph.Edge> VsechnyDcerineVazby(Osoba person, bool refresh = false)
+        public static List<HlidacStatu.DS.Graphs.Graph.Edge> VsechnyDcerineVazby(Osoba person,
+            Relation.CharakterVazbyEnum charakterVazby,
+            bool refresh = false)
         {
+            if (person == null)
+                return null;
             if (refresh)
-                vazbyOsobaNameIdCache.Delete(person?.NameId);
-            return vazbyOsobaNameIdCache.Get(person?.NameId);
+                vazbyOsobaNameIdCache.Delete((person.NameId, charakterVazby));
+            return vazbyOsobaNameIdCache.Get((person.NameId, charakterVazby));
         }
 
-        public static List<HlidacStatu.DS.Graphs.Graph.Edge> vsechnyDcerineVazbyInternal(string ico, int level, bool goDeep, HlidacStatu.DS.Graphs.Graph.Edge parent,
+        public static List<HlidacStatu.DS.Graphs.Graph.Edge> vsechnyDcerineVazbyInternal(
+            string ico,
+            Relation.CharakterVazbyEnum charakterVazby,
+            int level, bool goDeep, HlidacStatu.DS.Graphs.Graph.Edge parent,
             ExcludeDataCol excludeICO = null, DateTime? datumOd = null, DateTime? datumDo = null, decimal minPodil = 0)
         {
+            var charakterVazbyQuery = "";
+            if (charakterVazby == Relation.CharakterVazbyEnum.VlastnictviKontrola)
+            {
+                charakterVazbyQuery = $"and typVazby in ({string.Join(",", Relation.CharakterVazby_UredniVazbyIds)})";
+            }
+            else if (charakterVazby == Relation.CharakterVazbyEnum.Uredni)
+            {
+                charakterVazbyQuery = $"and typVazby not in ({string.Join(",", Relation.CharakterVazby_UredniVazbyIds)})";
+            }
+
             string sql = $@"select vazbakIco, datumOd, datumDo, typVazby, pojmenovaniVazby, podil from Firmavazby 
     where ico=@ico 
+    {charakterVazbyQuery}
     and (podil is null or podil >= {minPodil})
 	and dbo.IsSomehowInInterval(@datumOd, @datumDo, datumOd, datumDo) = 1
 ";
@@ -106,22 +136,35 @@ namespace HlidacStatu.Repositories
                 new SqlParameter("datumDo", datumDo),
             };
 
-            var rel = GetChildrenRelations(sql, HlidacStatu.DS.Graphs.Graph.Node.NodeType.Company, ico, datumOd, datumDo,
+            var rel = GetChildrenRelations(sql, charakterVazby,
+                HlidacStatu.DS.Graphs.Graph.Node.NodeType.Company, ico, datumOd, datumDo,
                 p, level, goDeep, parent, excludeICO, minPodil);
             return rel;
         }
 
 
-        public static List<HlidacStatu.DS.Graphs.Graph.Edge> vsechnyDcerineVazbyInternal(Osoba person, int level, bool goDeep, HlidacStatu.DS.Graphs.Graph.Edge parent,
+        public static List<HlidacStatu.DS.Graphs.Graph.Edge> vsechnyDcerineVazbyInternal(Osoba person, 
+            Relation.CharakterVazbyEnum charakterVazby, 
+            int level, bool goDeep, HlidacStatu.DS.Graphs.Graph.Edge parent,
             ExcludeDataCol excludeICO = null, IEnumerable<int> excludeOsobaId = null,
             DateTime? datumOd = null, DateTime? datumDo = null, decimal minPodil = 0)
         {
             if (excludeOsobaId == null)
                 excludeOsobaId = new int[] { };
 
+            var charakterVazbyQuery = "";
+            if (charakterVazby == Relation.CharakterVazbyEnum.VlastnictviKontrola)
+            {
+                charakterVazbyQuery = $"and typVazby in ({string.Join(",", Relation.CharakterVazby_UredniVazbyIds)})";
+            }
+            else if (charakterVazby == Relation.CharakterVazbyEnum.Uredni)
+            {
+                charakterVazbyQuery = $"and typVazby not in ({string.Join(",", Relation.CharakterVazby_UredniVazbyIds)})";
+            }
             string sql =
                 $@"select vazbakIco, vazbakOsobaId, datumOd, datumDo, typVazby, pojmenovaniVazby, podil from OsobaVazby 
                             where osobaId = @osobaId 
+                                {charakterVazbyQuery}
                             and (podil is null or podil >= {minPodil})
                 	        and dbo.IsSomehowInInterval(@datumOd, @datumDo, datumOd, datumDo) = 1
 ";
@@ -132,7 +175,8 @@ namespace HlidacStatu.Repositories
                 new SqlParameter("datumDo", datumDo),
             };
 
-            var relForPerson = GetChildrenRelations(sql, HlidacStatu.DS.Graphs.Graph.Node.NodeType.Person, person.InternalId.ToString(),
+            var relForPerson = GetChildrenRelations(sql, charakterVazby,
+                HlidacStatu.DS.Graphs.Graph.Node.NodeType.Person, person.InternalId.ToString(),
                 datumOd, datumDo,
                 p, level, goDeep, parent, excludeICO, minPodil);
 
@@ -161,7 +205,7 @@ namespace HlidacStatu.Repositories
                         {
                             Osoba o = Osoby.GetById.Get(ov.VazbakOsobaId.Value);
                             excludeOsobaId = excludeOsobaId.Union(new int[] { ov.VazbakOsobaId.Value, ov.OsobaId }); //pridej obe osoby pro zamezeni kruhu pri vzajemnem provazani
-                            var rel = vsechnyDcerineVazbyInternal(o, level + 1, true, parentRelFound,
+                            var rel = vsechnyDcerineVazbyInternal(o, charakterVazby, level + 1, true, parentRelFound,
                                 excludeOsobaId: excludeOsobaId);
                             relForConnectedPersons = HlidacStatu.DS.Graphs.Graph.Edge.Merge(relForConnectedPersons, rel);
                         }
@@ -198,8 +242,8 @@ namespace HlidacStatu.Repositories
         public static List<HlidacStatu.DS.Graphs.Graph.Edge> Holding(string ico, DateTime datumOd, DateTime datumDo,
             Relation.AktualnostType aktualnost)
         {
-            var vazby = vsechnyDcerineVazbyInternal(ico, 9, true, null, datumOd: datumOd, datumDo: datumDo);
-            var parents = GetParentRelations(ico, vazby, 0, datumOd, datumDo);
+            var vazby = vsechnyDcerineVazbyInternal(ico, Relation.CharakterVazbyEnum.VlastnictviKontrola, 9, true, null, datumOd: datumOd, datumDo: datumDo);
+            var parents = GetParentRelations(ico, Relation.CharakterVazbyEnum.VlastnictviKontrola, vazby, 0, datumOd, datumDo);
             var rootNode = new HlidacStatu.DS.Graphs.Graph.Node() { Id = ico, Type = HlidacStatu.DS.Graphs.Graph.Node.NodeType.Company };
             if (parents?.Count() > 0)
             {
@@ -217,6 +261,7 @@ namespace HlidacStatu.Repositories
         }
 
         public static List<HlidacStatu.DS.Graphs.Graph.Edge> GetChildrenRelations(string sql,
+            Relation.CharakterVazbyEnum charakterVazby,
             HlidacStatu.DS.Graphs.Graph.Node.NodeType nodeType, string nodeId, DateTime? datumOd, DateTime? datumDo,
             IDataParameter[] parameters, int level, bool goDeep,
             HlidacStatu.DS.Graphs.Graph.Edge parent, ExcludeDataCol excludeICO, decimal minPodil)
@@ -393,7 +438,7 @@ namespace HlidacStatu.Repositories
                 {
                     //old
                     deeperRels.AddRange(
-                        vsechnyDcerineVazbyInternal(rel.To.Id, level, goDeep, rel,
+                        vsechnyDcerineVazbyInternal(rel.To.Id, charakterVazby, level, goDeep, rel,
                             excludeICO.AddItem(new ExcludeData(rel)),
                             rel.RelFrom, rel.RelTo, minPodil)
                     );
@@ -528,8 +573,17 @@ namespace HlidacStatu.Repositories
             return new Tuple<HlidacStatu.DS.Graphs.Relation.RelationSimpleEnum, string>(relRelationship, descr);
         }
 
-        public static IEnumerable<HlidacStatu.DS.Graphs.Graph.Edge> GetDirectParentRelationsFirmy(string ico)
+        public static IEnumerable<HlidacStatu.DS.Graphs.Graph.Edge> GetDirectParentRelationsFirmy(string ico, Relation.CharakterVazbyEnum charakterVazby)
         {
+            var charakterVazbyQuery = "";
+            if (charakterVazby == Relation.CharakterVazbyEnum.VlastnictviKontrola)
+            {
+                charakterVazbyQuery = $"and typVazby in ({string.Join(",", Relation.CharakterVazby_UredniVazbyIds)})";
+            }
+            else if (charakterVazby == Relation.CharakterVazbyEnum.Uredni)
+            {
+                charakterVazbyQuery = $"and typVazby not in ({string.Join(",", Relation.CharakterVazby_UredniVazbyIds)})";
+            }
             string sql = @"select ICO, vazbakIco, datumOd, datumDo, typVazby, pojmenovaniVazby, podil from FirmaVazby 
             where vazbakico=@ico 
         ";
@@ -694,11 +748,22 @@ namespace HlidacStatu.Repositories
         }
 
         public static IEnumerable<HlidacStatu.DS.Graphs.Graph.Edge> GetParentRelations(string ico,
+            Relation.CharakterVazbyEnum charakterVazby,
             IEnumerable<HlidacStatu.DS.Graphs.Graph.Edge> currRelations, int distance,
             DateTime datumOd, DateTime datumDo)
         {
-            string sql = @"select ico, vazbakIco, datumOd, datumDo, typVazby, pojmenovaniVazby, podil from Firmavazby 
+            var charakterVazbyQuery = "";
+            if (charakterVazby == Relation.CharakterVazbyEnum.VlastnictviKontrola)
+            {
+                charakterVazbyQuery = $"and typVazby in ({string.Join(",", Relation.CharakterVazby_UredniVazbyIds)})";
+            }
+            else if (charakterVazby == Relation.CharakterVazbyEnum.Uredni)
+            {
+                charakterVazbyQuery = $"and typVazby not in ({string.Join(",", Relation.CharakterVazby_UredniVazbyIds)})";
+            }
+            string sql = @$"select ico, vazbakIco, datumOd, datumDo, typVazby, pojmenovaniVazby, podil from Firmavazby 
             where vazbakico=@ico 
+            {charakterVazbyQuery}
         	and dbo.IsSomehowInInterval(@datumOd, @datumDo, datumOd, datumDo) = 1
         ";
 
@@ -728,7 +793,9 @@ namespace HlidacStatu.Repositories
 
                 foreach (var parentIco in parentIcos)
                 {
-                    var parentRels = vsechnyDcerineVazbyInternal(parentIco, 0, true, null,
+                    var parentRels = vsechnyDcerineVazbyInternal(parentIco,
+                        charakterVazby,
+                        0, true, null,
                         new ExcludeDataCol() { items = relations?.Select(m => new ExcludeData(m)).ToList() }
                         , datumOd: datumOd, datumDo: datumDo
                     );
@@ -753,7 +820,7 @@ namespace HlidacStatu.Repositories
 
                 foreach (var parentIco in parentIcos)
                 {
-                    var parents = GetParentRelations(parentIco, relations, distance + 1, datumOd, datumDo);
+                    var parents = GetParentRelations(parentIco, charakterVazby, relations, distance + 1, datumOd, datumDo);
                     relations.AddRange(parents);
                 }
 

@@ -14,6 +14,24 @@ namespace HlidacStatu.DS.Graphs
 
         public static TimeSpan NedavnyVztahDelka = TimeSpan.FromDays((365 * 5) + 2); //5 let
 
+        public enum CharakterVazbyEnum
+        {
+            VlastnictviKontrola = 0,
+            Uredni = 1,
+
+        }
+
+        public static int[] CharakterVazby_UredniVazbyIds = new int[] { 
+            (int)RelationEnum.Likvidator,
+            (int)RelationEnum.Likvidator_v_zastoupeni,
+            (int)RelationEnum.Spravce_konkursu,
+            (int)RelationEnum.Oddeleny_insolvencni_spravce,
+            (int)RelationEnum.Predbezny_insolvencni_spravce,
+            (int)RelationEnum.Predbezny_spravce,
+            (int)RelationEnum.Insolvencni_spravce,
+            (int)RelationEnum.Zvlastni_insolvencni_spravce,
+            (int)RelationEnum.Zvlastni_spravce,
+        };
 
         [ShowNiceDisplayName()]
         public enum RelationEnum
@@ -28,87 +46,127 @@ namespace HlidacStatu.DS.Graphs
             Kontrola = -1,
 
             [NiceDisplayName("Podnikatel z OR")]
-            Podnikatel_z_OR = 00,
+            Podnikatel_z_OR = 0,
             [NiceDisplayName("Člen statutárního orgánu")]
-            Clen_statutarniho_organu = 01,
+            Clen_statutarniho_organu = 1,
             [NiceDisplayName("Likvidátor")]
-            Likvidator = 02,
+            Likvidator = 2,
             [NiceDisplayName("Prokurista")]
-            Prokurista = 03,
+            Prokurista = 3,
             [NiceDisplayName("Člen dozorčí rady")]
-            Clen_dozorci_rady = 04,
+            Clen_dozorci_rady = 4,
             [NiceDisplayName("Jediný akcionář")]
-            Jediny_akcionar = 05,
+            Jediny_akcionar = 5,
             [NiceDisplayName("Člen družstva s vkladem")]
-            Clen_druzstva_s_vkladem = 06,
-            [NiceDisplayName("Člen dozorčí rady v zastoupení")]
-            Clen_dozorci_rady_v_zastoupeni = 07,
-            [NiceDisplayName("Člen kontrolní komise v zastoupení")]
-            Clen_kontrolni_komise_v_zastoupeni = 08,
+            Clen_druzstva_s_vkladem = 6,
+
+            // PATCHED by JSON
+            [NiceDisplayName("Společník bez vkladu")]
+            Clen_dozorci_rady_v_zastoupeni = 7,
+            [NiceDisplayName("Společník s vkladem")]
+            Clen_kontrolni_komise_v_zastoupeni = 8,
+
             [NiceDisplayName("Komplementář")]
-            Komplementar = 09,
+            Komplementar = 9,
             [NiceDisplayName("Komanditista")]
             Komanditista = 10,
             [NiceDisplayName("Správce konkursu")]
             Spravce_konkursu = 11,
-            [NiceDisplayName("Likvidátor v zastoupení")]
+
+            // PATCHED by JSON
+            [NiceDisplayName("Zástupce správce konkursu")]
             Likvidator_v_zastoupeni = 12,
-            [NiceDisplayName("Oddělený insolvenční správce")]
+            [NiceDisplayName("Zakladatel státního podniku")]
             Oddeleny_insolvencni_spravce = 13,
-            [NiceDisplayName("Pobočný spolek")]
+            [NiceDisplayName("Zakladatel o.p.s.")]
             Pobocny_spolek = 14,
-            [NiceDisplayName("Podnikatel")]
+            [NiceDisplayName("Zřizovatel odštěpného závodu")]
             Podnikatel = 15,
+
             [NiceDisplayName("Předběžný insolvenční správce")]
             Predbezny_insolvencni_spravce = 16,
-            [NiceDisplayName("Předběžný správce")]
+
+            // PATCHED by JSON
+            [NiceDisplayName("Předběžný insolvenční správce")]
             Predbezny_spravce = 17,
+
             [NiceDisplayName("Představenstvo")]
             Predstavenstvo = 18,
             [NiceDisplayName("Podílník")]
             Podilnik = 19,
             [NiceDisplayName("Revizor")]
             Revizor = 20,
-            [NiceDisplayName("Revizor v zastoupení")]
+
+            // PATCHED by JSON
+            [NiceDisplayName("Zřizovatel nadace")]
             Revizor_v_zastoupeni = 21,
-            [NiceDisplayName("Člen rozhodčí komise")]
+            [NiceDisplayName("Statutár - vedoucí odštěpného závodu")]
             Clen_rozhodci_komise = 22,
+
             [NiceDisplayName("Vedoucí odštěpného závodu")]
             Vedouci_odstepneho_zavodu = 23,
-            [NiceDisplayName("Společník")]
+
+            // PATCHED by JSON
+            [NiceDisplayName("Společník s vkladem")]
             Spolecnik = 24,
-            [NiceDisplayName("Člen správní rady v zastoupení")]
+            [NiceDisplayName("Předběžný správce konkursní podstaty")]
             Clen_spravni_rady_v_zastoupeni = 25,
-            [NiceDisplayName("Člen statutárního orgánu zřizovatele")]
+            [NiceDisplayName("Prokurista")]
             Clen_statutarniho_organu_zrizovatele = 26,
-            [NiceDisplayName("Člen statutárního orgánu v zastoupení")]
+
+            // ADDED (missing in enum, from JSON)
+            [NiceDisplayName("Člen statutárního orgánu společnosti")]
+            Clen_statutarniho_organu_spolecnosti = 27,
+
+            // PATCHED by JSON
+            [NiceDisplayName("Člen statutárního orgánu komplementářů")]
             Clen_statutarniho_organu_v_zastoupeni = 28,
-            [NiceDisplayName("Insolvenční správce vyrovnávací")]
+            [NiceDisplayName("Člen statutárního orgánu představenstva")]
             Insolvencni_spravce_vyrovnavaci = 29,
+
+            // ADDED (missing in enum, from JSON)
+            [NiceDisplayName("Člen představenstva")]
+            Clen_predstavenstva = 30,
+
             [NiceDisplayName("Člen správní rady")]
             Clen_spravni_rady = 31,
-            [NiceDisplayName("Statutární orgán zřizovatele v zastoupení")]
+
+            // PATCHED by JSON
+            [NiceDisplayName("Oprávněná osoba nadace")]
             Statutarni_organ_zrizovatele_v_zastoupeni = 32,
-            [NiceDisplayName("Zakladatel")]
+            [NiceDisplayName("Oprávněná osoba nadačního fondu")]
             Zakladatel = 33,
+
             [NiceDisplayName("Nástupce zřizovatele")]
             Nastupce_zrizovatele = 34,
-            [NiceDisplayName("Zakladatel s vkladem")]
+
+            // PATCHED by JSON
+            [NiceDisplayName("Zřizovatel příspěvkové organizace")]
             Zakladatel_s_vkladem = 35,
+
             [NiceDisplayName("Člen sdružení")]
             Clen_sdruzeni = 36,
-            [NiceDisplayName("Zástupce insolvenčního správce")]
+
+            // PATCHED by JSON
+            [NiceDisplayName("Člen statutárního orgánu zřizovatele - Z")]
             Zastupce_insolvencniho_spravce = 37,
-            [NiceDisplayName("Člen kontrolní komise")]
+            [NiceDisplayName("Člen kontrolní komise - Z")]
             Clen_kontrolni_komise = 38,
+
             [NiceDisplayName("Insolvenční správce")]
             Insolvencni_spravce = 39,
-            [NiceDisplayName("Zástupce správce")]
+
+            // PATCHED by JSON
+            [NiceDisplayName("Ředitel o.p.s.")]
             Zastupce_spravce = 40,
+
             [NiceDisplayName("Zvláštní insolvenční správce")]
             Zvlastni_insolvencni_spravce = 41,
             [NiceDisplayName("Zvláštní správce")]
             Zvlastni_spravce = 42,
+
+            // NOTE: původní enum měl 400/401/402, ale JSON má 200/201/202.
+            // Nechávám původní kvůli kompatibilitě + přidávám JSON verze.
             [NiceDisplayName("Podnikatel z RŽP")]
             Podnikatel_z_RZP = 400,
             [NiceDisplayName("Statutár")]
@@ -116,8 +174,24 @@ namespace HlidacStatu.DS.Graphs
             [NiceDisplayName("Vedoucí org. složky")]
             Vedouci_org_slozky = 402,
 
-        }
+            // ADDED (missing in enum, from JSON)
+            [NiceDisplayName("Podnikatel z RŽP")]
+            Podnikatel_z_RZP_200 = 200,
+            [NiceDisplayName("Statutár")]
+            Statutar_201 = 201,
+            [NiceDisplayName("Vedoucí org. složky")]
+            Vedouci_org_slozky_202 = 202,
 
+            // ADDED (missing in enum, from JSON)
+            [NiceDisplayName("Podnikatel z ISPOZ")]
+            Podnikatel_z_ISPOZ = 1600,
+            [NiceDisplayName("Člen statutárního orgánu")]
+            Clen_statutarniho_organu_ISPOZ = 1601,
+            [NiceDisplayName("Odpovědný zástupce")]
+            Odpovedny_zastupce = 1602,
+            [NiceDisplayName("Neznámý")]
+            Neznamy = 1699,
+        }
 
         [ShowNiceDisplayName()]
         public enum RelationSimpleEnum

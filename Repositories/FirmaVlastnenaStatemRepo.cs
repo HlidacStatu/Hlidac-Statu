@@ -522,7 +522,7 @@ namespace HlidacStatu.Repositories
 
                      List<string> subjIco = new List<string>();
                      subjIco.Add(Util.ParseTools.NormalizeIco(f.ICO));
-                     var vazby = f.AktualniVazby(Relation.AktualnostType.Aktualni, true);
+                     var vazby = f.AktualniVazby(Relation.AktualnostType.Aktualni, Relation.CharakterVazbyEnum.VlastnictviKontrola, true);
                      subjIco.AddRange(vazby.Select(m => Util.ParseTools.NormalizeIco(m.To.Id)));
                      foreach (var inIc in subjIco)
                      {

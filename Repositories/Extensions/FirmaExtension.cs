@@ -125,7 +125,7 @@ namespace HlidacStatu.Extensions
             }
             else if (firma.JsemStatniFirma())
             {
-                var parentOVM = firma.ParentFirmy(Relation.AktualnostType.Aktualni)
+                var parentOVM = firma.ParentFirmy( Relation.CharakterVazbyEnum.VlastnictviKontrola, Relation.AktualnostType.Aktualni)
                     .ToArray();
 
                 musi = false;

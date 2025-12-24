@@ -1,14 +1,15 @@
-﻿using System.Text.RegularExpressions;
+﻿using HlidacStatu.DS.Graphs;
+using System.Text.RegularExpressions;
 
 namespace HlidacStatu.Searching
 {
     public class OsobaId
         : RuleBase
     {
-        private readonly Func<string, string[]> icosConnectedToPerson;
+        private readonly Func<string, Relation.CharakterVazbyEnum, string[]> icosConnectedToPerson;
         string _specificPrefix = null;
 
-        public OsobaId(Func<string, string[]> icosConnectedToPerson, string specificPrefix, string replaceWith,
+        public OsobaId(Func<string, Relation.CharakterVazbyEnum, string[]> icosConnectedToPerson, string specificPrefix, string replaceWith,
             bool stopFurtherProcessing = false, string addLastCondition = "")
             : base(replaceWith, stopFurtherProcessing, addLastCondition)
         {
@@ -71,7 +72,7 @@ namespace HlidacStatu.Searching
                     var templ = $" ( {ReplaceWith}{{0}} ) ";
                     if (ReplaceWith.Contains("${q}"))
                         templ = $" ( {ReplaceWith.Replace("${q}", "{0}")} )";
-                    var icos = this.icosConnectedToPerson(nameId);
+                    var icos = this.icosConnectedToPerson(nameId, Relation.CharakterVazbyEnum.VlastnictviKontrola);
                     if (icos != null && icos.Length > 0)
                     {
                         icosQuery = $" ( {string.Join(" OR ", icos

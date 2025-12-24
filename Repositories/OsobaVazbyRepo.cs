@@ -11,14 +11,14 @@ namespace HlidacStatu.Repositories
     {
         private static readonly ILogger _logger = Log.ForContext(typeof(OsobaVazbyRepo));
 
-        public static string[] Icos_s_VazbouNaOsobu(string nameId)
+        public static string[] Icos_s_VazbouNaOsobu(string nameId, Relation.CharakterVazbyEnum charakterVazby = Relation.CharakterVazbyEnum.VlastnictviKontrola)
         {
             string[] res = Array.Empty<string>();
             Osoba p = Osoby.GetByNameId.Get(nameId);
 
             if (p != null)
             {
-                var icos = p.AktualniVazby(Relation.AktualnostType.Nedavny)
+                var icos = p.AktualniVazby( charakterVazby, Relation.AktualnostType.Nedavny)
                             .Where(w => !string.IsNullOrEmpty(w.To.Id))
                             //.Where(w => Analysis.ACore.GetBasicStatisticForICO(w.To.Id).Summary.Pocet > 0)
                             .Select(w => w.To.Id)
@@ -209,7 +209,7 @@ namespace HlidacStatu.Repositories
         private static void InitializeGraph(this Osoba osoba)
         {
             osoba._graph = new UnweightedGraph();
-            foreach (var vazba in osoba.Vazby())
+            foreach (var vazba in osoba.Vazby(Relation.CharakterVazbyEnum.VlastnictviKontrola).Concat(osoba.Vazby(Relation.CharakterVazbyEnum.Uredni)))
             {
                 if (vazba.From is null)
                 {
@@ -232,46 +232,52 @@ namespace HlidacStatu.Repositories
             return new Vertex<string>($"{HlidacStatu.DS.Graphs.Graph.Node.Prefix_NodeType_Company}{ico}");
         }
 
-        public static HlidacStatu.DS.Graphs.Graph.Edge[] Vazby(this Osoba osoba, bool refresh = false)
+        public static HlidacStatu.DS.Graphs.Graph.Edge[] Vazby(this Osoba osoba, Relation.CharakterVazbyEnum charakterVazby, bool refresh = false)
         {
             if (osoba == null)
                 return new DS.Graphs.Graph.Edge[0];
 
             if (refresh || osoba._vazby == null)
             {
-                osoba.updateVazby(refresh);
+                osoba.updateVazbyForInstance( charakterVazby, refresh);
             }
 
             return osoba._vazby;
         }
 
-        public static int PocetPodrizenychSubjektu(this Osoba osoba, Relation.AktualnostType minAktualnost, bool refresh = false)
+        public static int PocetPodrizenychSubjektu(this Osoba osoba, 
+            Relation.CharakterVazbyEnum charakterVazby,
+            Relation.AktualnostType minAktualnost, bool refresh = false)
         {
             //firma.UpdateVazbyFromDB(); //nemelo by tu byt.
-            return osoba.AktualniVazby(minAktualnost, refresh)?
+            return osoba.AktualniVazby(charakterVazby, minAktualnost, refresh)?
                 .Select(m => m.To.UniqId)?
                 .Distinct()?
                 .Count() ?? 0;
         }
-        public static HlidacStatu.DS.Graphs.Graph.Edge[] PrimaAngazovanost(this Osoba osoba, Relation.AktualnostType minAktualnost, bool refresh = false)
+        public static HlidacStatu.DS.Graphs.Graph.Edge[] PrimaAngazovanost(this Osoba osoba, 
+            Relation.CharakterVazbyEnum charakterVazby, 
+            Relation.AktualnostType minAktualnost, bool refresh = false)
         {
-            var vazby = Relation.AktualniVazby(osoba.Vazby(refresh), minAktualnost, osoba.VazbyRootEdge());
+            var vazby = Relation.AktualniVazby(osoba.Vazby(charakterVazby, refresh), minAktualnost, osoba.VazbyRootEdge());
 
             var res = vazby.Where(v => v.Distance == 1).ToArray();
             return res;
         }
 
-        public static HlidacStatu.DS.Graphs.Graph.Edge[] AktualniVazby(this Osoba osoba, Relation.AktualnostType minAktualnost, bool refresh = false)
+        public static HlidacStatu.DS.Graphs.Graph.Edge[] AktualniVazby(this Osoba osoba, 
+            Relation.CharakterVazbyEnum charakterVazby,
+            Relation.AktualnostType minAktualnost, bool refresh = false)
         {
-            return Relation.AktualniVazby(osoba.Vazby(refresh), minAktualnost, osoba.VazbyRootEdge());
+            return Relation.AktualniVazby(osoba.Vazby(charakterVazby, refresh), minAktualnost, osoba.VazbyRootEdge());
         }
 
-        private static void updateVazby(this Osoba osoba, bool refresh = false)
+        private static void updateVazbyForInstance(this Osoba osoba, Relation.CharakterVazbyEnum charakterVazby,
+            bool refresh = false)
         {
             try
             {
-                osoba._vazby = Graph.VsechnyDcerineVazby(osoba, refresh)
-                    .ToArray();
+                osoba.updateVazbyForInstance(charakterVazby, refresh);
             }
             catch (Exception)
             {

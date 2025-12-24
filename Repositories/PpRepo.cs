@@ -307,7 +307,7 @@ public static partial class PpRepo
         Osoba o = Osoby.GetByNameId.Get(nameId);
         if (o != null)
         {
-            var vazby = o.PrimaAngazovanost(HlidacStatu.DS.Graphs.Relation.AktualnostType.Nedavny);
+            var vazby = o.PrimaAngazovanost(DS.Graphs.Relation.CharakterVazbyEnum.VlastnictviKontrola, HlidacStatu.DS.Graphs.Relation.AktualnostType.Nedavny);
             var d1 = vazby
                 .Where(v => Devmasters.DT.DateInterval.IsOverlappingIntervals(
                     new Devmasters.DT.DateInterval(v.RelFrom, v.RelTo), obdobi))

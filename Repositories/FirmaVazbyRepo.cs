@@ -12,7 +12,8 @@ namespace HlidacStatu.Repositories
     public static class FirmaVazbyRepo
     {
         private static readonly ILogger _logger = Log.ForContext(typeof(FirmaVazbyRepo));
-        
+
+
         public static void AddOrUpdate(
             string vlastnikIco, string dcerinkaIco,
             int kod_angm, string funkce, decimal? share, DateTime? fromDate, DateTime? toDate
@@ -86,7 +87,7 @@ namespace HlidacStatu.Repositories
                         .Where(o => o.To.Type == HlidacStatu.DS.Graphs.Graph.Node.NodeType.Person)
                         .Select(o => Osoby.GetById.Get(Convert.ToInt32(o.To.Id)))
                         .Where(o => o != null)
-                        .SelectMany(o => o.AktualniVazby(aktualnost))
+                        .SelectMany(o => o.AktualniVazby( Relation.CharakterVazbyEnum.VlastnictviKontrola, aktualnost))
                         .Select(v => v.To.Id)
                         .Distinct();
                 icos = icos.Union(icosPresLidi).Distinct();
@@ -95,43 +96,55 @@ namespace HlidacStatu.Repositories
             }
             return res;
         }
-        private static void UpdateVazby(this Firma firma, bool refresh = false)
+        private static void UpdateVazby(this Firma firma,
+            Relation.CharakterVazbyEnum charakterVazby,
+            bool refresh = false)
         {
             try
             {
-                firma._vazby = Graph.VsechnyDcerineVazby(firma.ICO, refresh)
-                    .ToArray();
+                var _vazby = Graph.VsechnyDcerineVazby(firma.ICO, charakterVazby, refresh);
+                firma.SetVazbyForInstanceOnly(charakterVazby,_vazby);
             }
             catch (Exception)
             {
-                firma._vazby = new HlidacStatu.DS.Graphs.Graph.Edge[] { };
+                firma.SetVazbyForInstanceOnly(charakterVazby, new HlidacStatu.DS.Graphs.Graph.Edge[] { });
             }
         }
 
 
 
-        public static DS.Graphs.Graph.Edge[] Vazby(this Firma firma, bool refresh = false)
+        public static DS.Graphs.Graph.Edge[] Vazby(this Firma firma,
+            Relation.CharakterVazbyEnum charakterVazby = Relation.CharakterVazbyEnum.VlastnictviKontrola,
+            bool refresh = false)
         {
             if (firma._vazby == null || refresh == true)
             {
-                firma.UpdateVazby(refresh);
+                firma.UpdateVazby(charakterVazby, refresh);
             }
 
             return firma._vazby;
         }
 
-        public static void Vazby(this Firma firma, IEnumerable<HlidacStatu.DS.Graphs.Graph.Edge> value)
+        public static void SetVazbyForInstanceOnly(this Firma firma,
+            Relation.CharakterVazbyEnum charakterVazby,
+            IEnumerable<HlidacStatu.DS.Graphs.Graph.Edge> value
+            )
         {
-            firma._vazby = value.ToArray();
+            if (charakterVazby == Relation.CharakterVazbyEnum.VlastnictviKontrola)
+                firma._vazby = value.ToArray();
+            else if (charakterVazby == Relation.CharakterVazbyEnum.Uredni)
+                firma._vazbyUredni = value.ToArray();
         }
 
 
 
-        public static Firma[] ParentFirmy(this Firma firma, Relation.AktualnostType minAktualnost)
+        public static Firma[] ParentFirmy(this Firma firma, 
+            Relation.CharakterVazbyEnum charakterVazby,
+            Relation.AktualnostType minAktualnost)
         {
             if (firma._parents == null)
             {
-                firma._parents = _getAllParents(firma.ICO, minAktualnost)
+                firma._parents = _getAllParents(firma.ICO, charakterVazby, minAktualnost)
                     .Select(m=> Firmy.Get(m))
                     .Where(m=> m!=null || m?.Valid == true)
                     .ToArray();
@@ -140,12 +153,14 @@ namespace HlidacStatu.Repositories
             return firma._parents;
         }
 
-        public static HashSet<string> _getAllParents( string ico, Relation.AktualnostType minAktualnost,
+        public static HashSet<string> _getAllParents( string ico, 
+            Relation.CharakterVazbyEnum charakterVazby,
+            Relation.AktualnostType minAktualnost,
             HashSet<string> currList = null)
         {
             currList = currList ?? new HashSet<string>();
 
-            HlidacStatu.DS.Graphs.Graph.Edge[] _parentF = Graph.GetDirectParentRelationsFirmy(ico).ToArray();
+            HlidacStatu.DS.Graphs.Graph.Edge[] _parentF = Graph.GetDirectParentRelationsFirmy(ico, charakterVazby).ToArray();
             var _parentVazby = _parentF
                 .Where(m => m.Aktualnost >= minAktualnost)
                 //.Where(m => Devmasters.DT.Util.IsOverlappingIntervals(parentF.RelFrom, parent.RelTo, m.RelFrom, m.RelTo))
@@ -177,7 +192,7 @@ namespace HlidacStatu.Repositories
                     else
                     {
                         currList.Add(f);
-                        var newParents = _getAllParents(f, minAktualnost, currList);
+                        var newParents = _getAllParents(f,charakterVazby, minAktualnost, currList);
                         foreach (var np in newParents)
                         {
                             currList.Add(np);
@@ -190,26 +205,23 @@ namespace HlidacStatu.Repositories
                 return currList;
         }
 
-        public static HlidacStatu.DS.Graphs.Graph.Edge[] ParentVazbaFirmy(this Firma firma, Relation.AktualnostType minAktualnost)
+        public static HlidacStatu.DS.Graphs.Graph.Edge[] ParentVazbaFirmy(this Firma firma, 
+            Relation.CharakterVazbyEnum charakterVazby,
+            Relation.AktualnostType minAktualnost)
         {
             if (firma._parentVazbyFirmy == null)
-                firma._parentVazbyFirmy = Graph.GetDirectParentRelationsFirmy(firma.ICO).ToArray();
+                firma._parentVazbyFirmy = Graph.GetDirectParentRelationsFirmy(firma.ICO,charakterVazby).ToArray();
             return firma._parentVazbyFirmy.Where(m => m.Aktualnost >= minAktualnost).ToArray(); 
         }
 
 
 
-        public static HlidacStatu.DS.Graphs.Graph.Edge[] ParentVazbyOsoby(this Firma firma, Relation.AktualnostType minAktualnost)
-        {
-            throw new NotImplementedException(); //funguje blbe, dobre funguje firma.Osoby_v_OR
-            if (firma._parentVazbyOsoby == null)
-                firma._parentVazbyOsoby = Graph.GetDirectParentRelationsOsoby(firma.ICO).ToArray();
-            return Relation.AktualniVazby(firma._parentVazbyOsoby, minAktualnost, firma.VazbyRootEdge());
-        }
 
-        private static Firma[] _vsechnyDcerinnePodrizene(this Firma firma, Relation.AktualnostType minAktualnost, bool refresh = false)
+        private static Firma[] _vsechnyDcerinnePodrizene(this Firma firma,
+            Relation.CharakterVazbyEnum charakterVazby ,
+            Relation.AktualnostType minAktualnost, bool refresh = false)
         {
-            var vazby = firma.AktualniVazby(minAktualnost, refresh);
+            var vazby = firma.AktualniVazby(minAktualnost, charakterVazby, refresh);
 
             var data = vazby
                 .Where(v => v.To != null && v.To.Type == HlidacStatu.DS.Graphs.Graph.Node.NodeType.Company)
@@ -235,19 +247,24 @@ namespace HlidacStatu.Repositories
             };
 
         }
-        public static int PocetPodrizenychSubjektu(this Firma firma, Relation.AktualnostType minAktualnost, bool refresh = false)
+        public static int PocetPodrizenychSubjektu(this Firma firma,
+            Relation.CharakterVazbyEnum charakterVazby,
+            Relation.AktualnostType minAktualnost, bool refresh = false)
         {
             //firma.UpdateVazbyFromDB(); //nemelo by tu byt.
-            return firma.AktualniVazby(minAktualnost,refresh)?
+            return firma.AktualniVazby(minAktualnost, charakterVazby,refresh)?
                 .Select(m=>m.To.UniqId)?
                 .Distinct()?
                 .Count() ?? 0;
         }
 
-        public static HlidacStatu.DS.Graphs.Graph.Edge[] AktualniVazby(this Firma firma, Relation.AktualnostType minAktualnost, bool refresh = false)
+        public static HlidacStatu.DS.Graphs.Graph.Edge[] AktualniVazby(this Firma firma, 
+            Relation.AktualnostType minAktualnost,
+            Relation.CharakterVazbyEnum charakterVazby = Relation.CharakterVazbyEnum.VlastnictviKontrola,
+            bool refresh = false)
         {
             //firma.UpdateVazbyFromDB(); //nemelo by tu byt.
-            var vsechnyVazby = firma.Vazby(refresh);
+            var vsechnyVazby = firma.Vazby(charakterVazby, refresh);
             return Relation.AktualniVazby(vsechnyVazby, minAktualnost, firma.VazbyRootEdge());
         }
 
@@ -316,13 +333,13 @@ namespace HlidacStatu.Repositories
             return new Vertex<string>($"{HlidacStatu.DS.Graphs.Graph.Node.Prefix_NodeType_Company}{ico}");
         }
 
-        public static void UpdateVazbyFromDb(this Firma firma)
+        public static void UpdateVazbyFromDb(this Firma firma, Relation.CharakterVazbyEnum charakterVazby = Relation.CharakterVazbyEnum.VlastnictviKontrola)
         {
             List<HlidacStatu.DS.Graphs.Graph.Edge> oldRel = new List<HlidacStatu.DS.Graphs.Graph.Edge>();
 
-            var firstRel = Graph.VsechnyDcerineVazby(firma.ICO, true);
+            var firstRel = Graph.VsechnyDcerineVazby(firma.ICO, charakterVazby, true);
 
-            firma.Vazby(HlidacStatu.DS.Graphs.Graph.Edge.Merge(oldRel, firstRel).ToArray());
+            firma.SetVazbyForInstanceOnly(charakterVazby, HlidacStatu.DS.Graphs.Graph.Edge.Merge(oldRel, firstRel).ToArray());
         }
 
         public static void FixVazbaDatumDo()

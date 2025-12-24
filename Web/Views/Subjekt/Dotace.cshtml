@@ -246,7 +246,7 @@
                     <p>
                         <b>@Devmasters.Lang.CS.Plural.Get(subCompaniesWithSubsidiesCount, "Jedna podřízená organizace", "{0} podřízená organizace", "{0} podřízených organizací")</b>
                         (z
-                        celkem @HlidacStatu.Util.RenderData.NiceNumber(Model.PocetPodrizenychSubjektu(Relation.AktualnostType.Nedavny)))
+                        celkem @HlidacStatu.Util.RenderData.NiceNumber(Model.PocetPodrizenychSubjektu( Relation.CharakterVazbyEnum.VlastnictviKontrola, Relation.AktualnostType.Nedavny)))
                         úřadu @Devmasters.TextUtil.ShortenText(Model.Jmeno, 35)
 
                         @Devmasters.Lang.CS.Plural.Get(subCompaniesWithSubsidiesCount,
@@ -271,7 +271,7 @@
                     <p>
                         <b>@Devmasters.Lang.CS.Plural.Get(subCompaniesWithSubsidiesCount, "Jedna dceřiná společnost", "{0} dceřiné společnosti", "{0} dceřiných společností")</b>
                         (z
-                        celkem @HlidacStatu.Util.RenderData.NiceNumber(Model.PocetPodrizenychSubjektu(Relation.AktualnostType.Nedavny)))
+                        celkem @HlidacStatu.Util.RenderData.NiceNumber(Model.PocetPodrizenychSubjektu( Relation.CharakterVazbyEnum.VlastnictviKontrola, Relation.AktualnostType.Nedavny)))
                         firmy @Devmasters.TextUtil.ShortenText(Model.Jmeno, 35)
 
                         @Devmasters.Lang.CS.Plural.Get(subCompaniesWithSubsidiesCount,

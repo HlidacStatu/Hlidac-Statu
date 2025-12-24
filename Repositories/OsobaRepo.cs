@@ -724,7 +724,7 @@ namespace HlidacStatu.Repositories
                 .Select(m => m.Name).ToArray();
 
 
-            r.Vazbyfirmy = Graph.VsechnyDcerineVazby(osoba)
+            r.Vazbyfirmy = Repositories.Graph.VsechnyDcerineVazby(osoba, Relation.CharakterVazbyEnum.VlastnictviKontrola)
                 .Where(m => angazovanostDesc.Contains(m.Descr))
                 .Select(m =>
                     new Osoba.JSON.vazba()
