@@ -116,11 +116,11 @@ namespace HlidacStatu.Repositories
             var charakterVazbyQuery = "";
             if (charakterVazby == Relation.CharakterVazbyEnum.VlastnictviKontrola)
             {
-                charakterVazbyQuery = $"and typVazby in ({string.Join(",", Relation.CharakterVazby_UredniVazbyIds)})";
+                charakterVazbyQuery = $"and typVazby not in ({string.Join(",", Relation.CharakterVazby_UredniVazbyIds)})";
             }
             else if (charakterVazby == Relation.CharakterVazbyEnum.Uredni)
             {
-                charakterVazbyQuery = $"and typVazby not in ({string.Join(",", Relation.CharakterVazby_UredniVazbyIds)})";
+                charakterVazbyQuery = $"and typVazby in ({string.Join(",", Relation.CharakterVazby_UredniVazbyIds)})";
             }
 
             string sql = $@"select vazbakIco, datumOd, datumDo, typVazby, pojmenovaniVazby, podil from Firmavazby 
@@ -155,11 +155,11 @@ namespace HlidacStatu.Repositories
             var charakterVazbyQuery = "";
             if (charakterVazby == Relation.CharakterVazbyEnum.VlastnictviKontrola)
             {
-                charakterVazbyQuery = $"and typVazby in ({string.Join(",", Relation.CharakterVazby_UredniVazbyIds)})";
+                charakterVazbyQuery = $"and typVazby not in ({string.Join(",", Relation.CharakterVazby_UredniVazbyIds)})";
             }
             else if (charakterVazby == Relation.CharakterVazbyEnum.Uredni)
             {
-                charakterVazbyQuery = $"and typVazby not in ({string.Join(",", Relation.CharakterVazby_UredniVazbyIds)})";
+                charakterVazbyQuery = $"and typVazby in ({string.Join(",", Relation.CharakterVazby_UredniVazbyIds)})";
             }
             string sql =
                 $@"select vazbakIco, vazbakOsobaId, datumOd, datumDo, typVazby, pojmenovaniVazby, podil from OsobaVazby 
@@ -578,11 +578,11 @@ namespace HlidacStatu.Repositories
             var charakterVazbyQuery = "";
             if (charakterVazby == Relation.CharakterVazbyEnum.VlastnictviKontrola)
             {
-                charakterVazbyQuery = $"and typVazby in ({string.Join(",", Relation.CharakterVazby_UredniVazbyIds)})";
+                charakterVazbyQuery = $"and typVazby not in ({string.Join(",", Relation.CharakterVazby_UredniVazbyIds)})";
             }
             else if (charakterVazby == Relation.CharakterVazbyEnum.Uredni)
             {
-                charakterVazbyQuery = $"and typVazby not in ({string.Join(",", Relation.CharakterVazby_UredniVazbyIds)})";
+                charakterVazbyQuery = $"and typVazby in ({string.Join(",", Relation.CharakterVazby_UredniVazbyIds)})";
             }
             string sql = @"select ICO, vazbakIco, datumOd, datumDo, typVazby, pojmenovaniVazby, podil from FirmaVazby 
             where vazbakico=@ico 
@@ -755,11 +755,11 @@ namespace HlidacStatu.Repositories
             var charakterVazbyQuery = "";
             if (charakterVazby == Relation.CharakterVazbyEnum.VlastnictviKontrola)
             {
-                charakterVazbyQuery = $"and typVazby in ({string.Join(",", Relation.CharakterVazby_UredniVazbyIds)})";
+                charakterVazbyQuery = $"and typVazby not in ({string.Join(",", Relation.CharakterVazby_UredniVazbyIds)})";
             }
             else if (charakterVazby == Relation.CharakterVazbyEnum.Uredni)
             {
-                charakterVazbyQuery = $"and typVazby not in ({string.Join(",", Relation.CharakterVazby_UredniVazbyIds)})";
+                charakterVazbyQuery = $"and typVazby in ({string.Join(",", Relation.CharakterVazby_UredniVazbyIds)})";
             }
             string sql = @$"select ico, vazbakIco, datumOd, datumDo, typVazby, pojmenovaniVazby, podil from Firmavazby 
             where vazbakico=@ico 

@@ -22,15 +22,17 @@ namespace HlidacStatu.DS.Graphs
         }
 
         public static int[] CharakterVazby_UredniVazbyIds = new int[] { 
-            (int)RelationEnum.Likvidator,
-            (int)RelationEnum.Likvidator_v_zastoupeni,
-            (int)RelationEnum.Spravce_konkursu,
-            (int)RelationEnum.Oddeleny_insolvencni_spravce,
-            (int)RelationEnum.Predbezny_insolvencni_spravce,
-            (int)RelationEnum.Predbezny_spravce,
-            (int)RelationEnum.Insolvencni_spravce,
-            (int)RelationEnum.Zvlastni_insolvencni_spravce,
-            (int)RelationEnum.Zvlastni_spravce,
+            (int)RelationEnum.Likvidator, //2
+            (int)RelationEnum.Likvidator_v_zastoupeni, //12
+            (int)RelationEnum.Spravce_konkursu, //11
+            (int)RelationEnum.Oddeleny_insolvencni_spravce, //13
+            (int)RelationEnum.Predbezny_insolvencni_spravce, //16
+            (int)RelationEnum.Predbezny_spravce, //17
+            (int)RelationEnum.Insolvencni_spravce, //39
+            (int)RelationEnum.Insolvencni_spravce_vyrovnavaci, //29
+            (int)RelationEnum.Zastupce_insolvencniho_spravce, //37
+            (int)RelationEnum.Zvlastni_insolvencni_spravce,  //41
+            (int)RelationEnum.Zvlastni_spravce, //42
         };
 
         [ShowNiceDisplayName()]
