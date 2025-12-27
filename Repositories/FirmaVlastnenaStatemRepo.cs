@@ -361,6 +361,7 @@ namespace HlidacStatu.Repositories
         {
             using DbEntities db = new DbEntities();
 
+
             progressWriter = progressWriter ?? new Devmasters.Batch.ActionProgressWriter(0.1f).Writer;
 
             //updatni OVM v DB
@@ -518,17 +519,6 @@ namespace HlidacStatu.Repositories
                 .Distinct()
                 .Where(m => ovm_nikdyStatni.Contains(m) == false)                
                 .ToList();
-
-            System.Collections.Concurrent.ConcurrentDictionary<string, string> so_far_found_subjects = new();
-            Devmasters.Batch.Manager.DoActionForAll<string>(bagOfIco,
-             (ico) =>
-             {
-                 so_far_found_subjects.TryAdd(ico, Firmy.GetJmeno(ico));
-                 return new Devmasters.Batch.ActionOutputData();
-             }, outputWriter, progressWriter,true);
-
-            foreach (var kv in so_far_found_subjects.OrderBy(o=>o.Value))
-                System.IO.File.AppendAllText(@"c:\!\statni_subjekty_prehled.txt", $"{kv.Key}\t{kv.Value}\r\n");
 
             //najdi vsechny subjekty a jejich vazby           
             _logger.Information("Najdi vsechny podrizene subjekty ...");

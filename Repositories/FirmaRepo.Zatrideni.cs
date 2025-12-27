@@ -16,12 +16,12 @@ namespace HlidacStatu.Repositories
                 string[] icos = null;
                 string sql = "";
 
-                if ((int)obor >= 100000)
+                if ((int)obor >= 100_000)
                 {
                     sql = @"select ico from OrganVerejneMoci ovm
 	inner join OrganVerejneMoci_KategorieOvm k on ovm.IdDS=k.IdDS
-	where k.KategorieOvm='KO"+ ((int)obor) + "';";
-                    icos = GetSubjektyFromSql(sql).Union(icos).Distinct().ToArray();
+	where k.KategorieOvm='KO"+ ((int)obor-100_000) + "';";
+                    icos = GetSubjektyFromSql(sql).Distinct().ToArray();
 
                     return icos;
                 }
