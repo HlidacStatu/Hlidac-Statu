@@ -277,7 +277,7 @@ namespace HlidacStatu.Repositories
         {
             try
             {
-                osoba.updateVazbyForInstance(charakterVazby, refresh);
+                osoba._vazby = Graph.VsechnyDcerineVazby(osoba, charakterVazby, refresh).ToArray();
             }
             catch (Exception)
             {
