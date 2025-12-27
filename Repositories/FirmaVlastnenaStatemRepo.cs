@@ -3,8 +3,10 @@ using HlidacStatu.Caching;
 using HlidacStatu.Connectors;
 using HlidacStatu.DS.Graphs;
 using HlidacStatu.Entities;
+using HlidacStatu.Util;
 using InfluxDB.Client.Api.Domain;
 using Microsoft.EntityFrameworkCore;
+using Nest;
 using Polly;
 using Polly.Extensions.Http;
 using Polly.Retry;
@@ -290,12 +292,12 @@ namespace HlidacStatu.Repositories
         }
 
         static HashSet<string> _ovm_Nikdy_nejsou_statni = null;
-        private static async Task<HashSet<string>> OVM_Nikdy_nejsou_statni(bool updateFromPrimarySource = false) 
+        private static async Task<HashSet<string>> OVM_Nikdy_nejsou_statni(bool updateFromPrimarySource = false)
         {
             if (updateFromPrimarySource)
                 await Update_OrganVerejneMoci_in_DBAsync();
 
-            if (_ovm_Nikdy_nejsou_statni == null)
+            if (updateFromPrimarySource ||  _ovm_Nikdy_nejsou_statni == null)
             {
                 using DbEntities db = new DbEntities();
 
@@ -312,7 +314,8 @@ namespace HlidacStatu.Repositories
                 "KO538", //Insolvenční správci - v.o.s.
                 "KO542", //Soukromé archivy
             };
-                var res = await db.OrganVerejneMoci
+                _logger.Information("Loading OVM, kteri nikdy nemohou byt statni firmou...");
+                var res1 = await db.OrganVerejneMoci
                     .AsNoTracking()
                     .Join(
                         db.OrganVerejneMoci_KategorieOvm.AsNoTracking(),
@@ -321,15 +324,29 @@ namespace HlidacStatu.Repositories
                         (o, k) => new { o, k }
                     )
                     .Where(m => m.o.ICO != null)
-                    .Where(k => forbiddenOVMKategories.Contains(k.k.KategorieOvm))
+                    .Where(m => 
+                        forbiddenOVMKategories.Contains(m.k.KategorieOvm)
+                    )
                     .Select(m => m.o.ICO)
                     .Distinct()
                     .ToHashSetAsync();
+                var res2 = await db.OrganVerejneMoci
+                    .AsNoTracking()
+                    .Where(m => m.ICO != null)
+                    .Where(m => m.TypDS.Contains("PFO") //fyzicke osoby nikdy nemohou byt statni firmou
+                        )
+                    .Select(m => m.ICO)
+                    .Distinct()
+                    .ToHashSetAsync();
+
+                _ovm_Nikdy_nejsou_statni = res1.Union(res2).ToHashSet();
 
                 //rucne pridane ICO, ktere nikdy nemohou byt statni firmou
-                res.Add("25755277"); //Clovek v tisni
-                res.Add("00001350"); //csob
-                _ovm_Nikdy_nejsou_statni = res;
+                _ovm_Nikdy_nejsou_statni.Add("25755277"); //Clovek v tisni
+                _ovm_Nikdy_nejsou_statni.Add("00001350"); //csob
+                _ovm_Nikdy_nejsou_statni.Add("24288110"); //Elektrárna Počerady, a.s.
+                _ovm_Nikdy_nejsou_statni.Add("28786009"); //Elektrárna Chvaletice a.s.
+
             }
             return _ovm_Nikdy_nejsou_statni;
             ;
@@ -344,17 +361,21 @@ namespace HlidacStatu.Repositories
         {
             using DbEntities db = new DbEntities();
 
-            //updatni OVM v DB
-            HashSet<string> ovm_nikdyStatni = await OVM_Nikdy_nejsou_statni(true);
+            progressWriter = progressWriter ?? new Devmasters.Batch.ActionProgressWriter(0.1f).Writer;
 
+            //updatni OVM v DB
+            var updateOVM = true;
+            if (System.Diagnostics.Debugger.IsAttached)
+                updateOVM = false; //jen pri ladeni
+            HashSet<string> ovm_nikdyStatni = await OVM_Nikdy_nejsou_statni(updateOVM); 
 
             //Find statni firmy 
 
             List<string> bagOfIco = new List<string>();
 
-
             bagOfIco.AddRange(StatniFirmyICO);
 
+            _logger.Information("Adding statni firmy podle pravni formy...");
             //vsechny firmy z OR podle pravni formy
             bagOfIco.AddRange(
                 db.Firma.Where(m => StatniFirmy_BasedKodPF.Contains(m.Kod_PF ?? -1))
@@ -363,6 +384,7 @@ namespace HlidacStatu.Repositories
                 .ToList()
             );
 
+            _logger.Information("Downloading seznamu verejnych spolecnosti a vladnich instituci z mfcr.cz Part 1...");
             //firmy z MFCR - verejne spolecnosti a vladni instituce
             Console.WriteLine("Downloading from mfcr.cz 1");
             string MFLink = "https://www.mfcr.cz/assets/cs/media/Rozp-ramce-zak-23-2017_2021_Seznam-verejnych-spolecnosti-v-CR-rijen-2021.xlsx";
@@ -385,6 +407,7 @@ namespace HlidacStatu.Repositories
             }
 
 
+            _logger.Information("Downloading seznamu verejnych spolecnosti a vladnich instituci z mfcr.cz Part 2...");
             Console.WriteLine("Downloading from mfcr.cz 2");
             string MFLink2 = "https://www.mfcr.cz/assets/cs/media/Rozp-ramce-zak-23-2017_2021_Seznam-vladnich-instituci-v-CR-rijen-2021.xlsx";
             string fn2 = @"c:\!\Seznam-vladnich-spolecnosti.xlsx";
@@ -409,6 +432,7 @@ namespace HlidacStatu.Repositories
             System.Text.Encoding.RegisterProvider(System.Text.CodePagesEncodingProvider.Instance);
             if (System.IO.File.Exists(fn))
             {
+                _logger.Information("Parsing downloaded excel files Part 1...");
                 Console.WriteLine("parsing excel 1");
                 using (var stream = System.IO.File.Open(fn, System.IO.FileMode.Open, System.IO.FileAccess.Read))
                 {
@@ -430,6 +454,7 @@ namespace HlidacStatu.Repositories
 
             if (System.IO.File.Exists(fn2))
             {
+                _logger.Information("Parsing downloaded excel files Part 1...");
                 Console.WriteLine("parsing excel 2");
                 using (var stream = System.IO.File.Open(fn2, System.IO.FileMode.Open, System.IO.FileAccess.Read))
                 {
@@ -453,43 +478,63 @@ namespace HlidacStatu.Repositories
 
 
 
-
+            _logger.Debug("Cleaning up duplicates ...");
             //delete duplicates and empties
             bagOfIco = bagOfIco
                 .Where(m => string.IsNullOrEmpty(m) == false)
                 .Distinct()
                 .ToList();
 
-            //smaz vsechny OVM, kteri maji kategorii, ktera znemožnuje byt statni firmou
+            _logger.Information("Adding statni firmy...");
             var allOvm = await db.OrganVerejneMoci.AsNoTracking()
                 .Select(m => m.ICO)
                 .ToListAsync();
             bagOfIco.AddRange(allOvm);
 
+            _logger.Information("Adding statni firmy podle oboru cinnosti fakultni nemocnice...");
             bagOfIco.AddRange(await FirmaRepo.Zatrideni.GetIcoDirectAsync(Firma.Zatrideni.SubjektyObory.Fakultni_nemocnice));
+            _logger.Information("Adding statni firmy podle oboru cinnosti hasice...");
             bagOfIco.AddRange(await FirmaRepo.Zatrideni.GetIcoDirectAsync(Firma.Zatrideni.SubjektyObory.Hasicsky_zachranny_sbor));
+            _logger.Information("Adding statni firmy podle oboru cinnosti knihovny...");
             bagOfIco.AddRange(await FirmaRepo.Zatrideni.GetIcoDirectAsync(Firma.Zatrideni.SubjektyObory.Knihovny));
+            _logger.Information("Adding statni firmy podle oboru cinnosti statni media...");
             bagOfIco.AddRange(await FirmaRepo.Zatrideni.GetIcoDirectAsync(Firma.Zatrideni.SubjektyObory.StatniMedia));
+            _logger.Information("Adding statni firmy podle oboru cinnosti krajske spravy silnic...");
             bagOfIco.AddRange(await FirmaRepo.Zatrideni.GetIcoDirectAsync(Firma.Zatrideni.SubjektyObory.Krajske_spravy_silnic));
+            _logger.Information("Adding statni firmy podle oboru cinnosti velke nemocnice...");
             bagOfIco.AddRange(await FirmaRepo.Zatrideni.GetIcoDirectAsync(Firma.Zatrideni.SubjektyObory.Velke_nemocnice));
+            _logger.Information("Adding statni firmy podle oboru cinnosti verejne vysoke skoly...");
             bagOfIco.AddRange(await FirmaRepo.Zatrideni.GetIcoDirectAsync(Firma.Zatrideni.SubjektyObory.Verejne_vysoke_skoly));
+            _logger.Information("Adding statni firmy podle oboru cinnosti zdravotni pojistovny...");
             bagOfIco.AddRange(await FirmaRepo.Zatrideni.GetIcoDirectAsync(Firma.Zatrideni.SubjektyObory.Zdravotni_pojistovny));
 
 
-
-
+            //smaz vsechny OVM, kteri maji kategorii, ktera znemožnuje byt statni firmou
             //cleanup a filtruj ico, co nikdy nejsou statni
+            _logger.Debug("Smaz duplicate a subjekty, co nikdy nejsou statni...");
             bagOfIco = bagOfIco
+                .Where(m => string.IsNullOrEmpty(m) == false)
                 .Select(m=>m.Trim())
-                .Where(m=> string.IsNullOrEmpty(m) == false)
                 .Distinct()
                 .Where(m => ovm_nikdyStatni.Contains(m) == false)                
                 .ToList();
 
+            System.Collections.Concurrent.ConcurrentDictionary<string, string> so_far_found_subjects = new();
+            Devmasters.Batch.Manager.DoActionForAll<string>(bagOfIco,
+             (ico) =>
+             {
+                 so_far_found_subjects.TryAdd(ico, Firmy.GetJmeno(ico));
+                 return new Devmasters.Batch.ActionOutputData();
+             }, outputWriter, progressWriter,true);
 
-            //najdi vsechny firmy a jejich vazby           
+            foreach (var kv in so_far_found_subjects.OrderBy(o=>o.Value))
+                System.IO.File.AppendAllText(@"c:\!\statni_subjekty_prehled.txt", $"{kv.Key}\t{kv.Value}\r\n");
 
+            //najdi vsechny subjekty a jejich vazby           
+            _logger.Information("Najdi vsechny podrizene subjekty ...");
             object lockObj = new object();
+            System.Collections.Concurrent.ConcurrentBag<string> foundIcos = new(); 
+
             Devmasters.Batch.Manager.DoActionForAll<string, object>(bagOfIco,
              (ico, obj) =>
              {
@@ -508,7 +553,7 @@ namespace HlidacStatu.Repositories
                          {
                              lock (lockObj)
                              {
-                                 bagOfIco.Add(inIc);
+                                 foundIcos.Add(inIc);
                              }
                          }
                      }
@@ -519,8 +564,10 @@ namespace HlidacStatu.Repositories
              !System.Diagnostics.Debugger.IsAttached, prefix: "freshList statnifirmy ", monitor: new MonitoredTaskRepo.ForBatch()
              );
 
+            bagOfIco.AddRange(foundIcos);
 
             //cleanup a filtruj ico, co nikdy nejsou statni
+            _logger.Debug("Smaz duplicate a subjekty, co nikdy nejsou statni...");
             bagOfIco = bagOfIco
                 .Select(m => m.Trim())
                 .Where(m => string.IsNullOrEmpty(m) == false)
@@ -531,10 +578,13 @@ namespace HlidacStatu.Repositories
 
             //update DB with bagOfIco as statni firmy
             //reset typ for all
+            _logger.Information("Updating DB ...");
+            _logger.Information("Resetting all firmy to Soukromy ...");
             string sql = $"update firma set typ={((int)(TypSubjektuEnum.Soukromy))} where typ != {((int)(TypSubjektuEnum.Soukromy))}"; // where ico not in ({ica})
             DirectDB.Instance.NoResult(sql);
 
             List<string[]> batch = bagOfIco.Chunk(500).ToList();
+            _logger.Information("Setting statni firmy ...");
             Devmasters.Batch.Manager.DoActionForAll<IEnumerable<string>>(batch,
                 (icob) =>
                 {
@@ -551,22 +601,7 @@ namespace HlidacStatu.Repositories
             batch = allOvm
                 .Where(m => ovm_nikdyStatni.Contains(m) == false)
                 .Chunk(500).ToList();
-            Devmasters.Batch.Manager.DoActionForAll<IEnumerable<string>>(batch,
-                (icob) =>
-                {
-                    string icos = string.Join(",", icob.Select(i => $"'{i}'"));
-                    string sql = $"update firma set typ={((int)(TypSubjektuEnum.Ovm))} where ico in ({icos})";
-                    DirectDB.Instance.NoResult(sql);
-
-                    return new Devmasters.Batch.ActionOutputData();
-                }, outputWriter, progressWriter,
-                !System.Diagnostics.Debugger.IsAttached, prefix: "UpdateFirmyWithTyp OVM", monitor: new MonitoredTaskRepo.ForBatch()
-            );
-
-            batch.Clear();
-            batch = allOvm
-                .Where(m => ovm_nikdyStatni.Contains(m) == false)
-                .Chunk(500).ToList();
+            _logger.Information("Setting OVM typ...");
             Devmasters.Batch.Manager.DoActionForAll<IEnumerable<string>>(batch,
                 (icob) =>
                 {
@@ -586,6 +621,7 @@ namespace HlidacStatu.Repositories
             batch.Clear();
             batch = DirectDB.Instance.GetList<string>(sqlObce)
                 .Chunk(500).ToList();
+            _logger.Information("Setting OBCE typ...");
             Devmasters.Batch.Manager.DoActionForAll<IEnumerable<string>>(batch,
                 (icob) =>
                 {
@@ -603,6 +639,7 @@ namespace HlidacStatu.Repositories
             batch = (await FirmaRepo.Zatrideni.GetIcoDirectAsync(Zatrideni.SubjektyObory.Insolvencni_spravci_fyzicke_osoby))
                     .Union(await FirmaRepo.Zatrideni.GetIcoDirectAsync(Zatrideni.SubjektyObory.Insolvencni_spravci_pravnicke_osoby))
                         .Chunk(500).ToList();
+            _logger.Information("Setting INSOLVENCNI SPRAVCI typ...");
             Devmasters.Batch.Manager.DoActionForAll<IEnumerable<string>>(batch,
                 (icob) =>
                 {
@@ -618,6 +655,7 @@ namespace HlidacStatu.Repositories
             batch.Clear();
             batch = (await FirmaRepo.Zatrideni.GetIcoDirectAsync(Zatrideni.SubjektyObory.Soudni_exekutori))
                         .Chunk(500).ToList();
+            _logger.Information("Setting EXEKUTOR typ...");
             Devmasters.Batch.Manager.DoActionForAll<IEnumerable<string>>(batch,
                 (icob) =>
                 {
@@ -630,6 +668,7 @@ namespace HlidacStatu.Repositories
                 !System.Diagnostics.Debugger.IsAttached, prefix: "UpdateFirmyWithTyp exekutor", monitor: new MonitoredTaskRepo.ForBatch()
             );
 
+            _logger.Information("Done updating statni firmy.");
 
         }
 
@@ -692,14 +731,23 @@ namespace HlidacStatu.Repositories
                 using var transaction = await db.Database.BeginTransactionAsync();
                 try
                 {
+                    _logger.Information("Truncating OVM related tables");
                     await db.Database.ExecuteSqlRawAsync("truncate table AdresaOvm");
+                    _logger.Information("Truncated AdresaOvm");
                     await db.Database.ExecuteSqlRawAsync("truncate table PravniFormaOvm");
+                    _logger.Information("Truncated PravniFormaOvm");
                     await db.Database.ExecuteSqlRawAsync("truncate table TypOvm");
+                    _logger.Information("Truncated TypOvm");
                     await db.Database.ExecuteSqlRawAsync("truncate table OrganVerejneMoci");
+                    _logger.Information("Truncated OrganVerejneMoci");
                     await db.Database.ExecuteSqlRawAsync("truncate table OrganVerejneMoci_KategorieOvm");
+                    _logger.Information("Truncated OrganVerejneMoci_KategorieOvm");
 
+                    _logger.Information("Inserting OVM data into database");
+                    long count = 0;
                     foreach (var ovm in data.Subjekt)
                     {
+                        count++;
                         // replace with correct unique record
                         if (typyOvm.TryAdd(ovm.TypOvm.Id, ovm.TypOvm) == false)
                             ovm.TypOvm = typyOvm[ovm.TypOvm.Id];
@@ -722,7 +770,8 @@ namespace HlidacStatu.Repositories
                                 });
                             }
                         }
-
+                        if (count % 50 == 0)
+                            _logger.Information("Inserting OVM {count}/{total}", count, data.Subjekt.Count);
                         db.OrganVerejneMoci.Add(ovm);
                     }
 
