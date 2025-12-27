@@ -1,5 +1,6 @@
 ﻿using ExcelDataReader;
 using HlidacStatu.Caching;
+using HlidacStatu.Connectors;
 using HlidacStatu.DS.Graphs;
 using HlidacStatu.Entities;
 using InfluxDB.Client.Api.Domain;
@@ -18,6 +19,7 @@ using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.Serialization;
 using ZiggyCreatures.Caching.Fusion;
+using static HlidacStatu.Entities.Firma;
 
 namespace HlidacStatu.Repositories
 {
@@ -214,42 +216,6 @@ namespace HlidacStatu.Repositories
 
 
 
-        public static List<string> IcaStatnichFirem(int statniPodil)
-        {
-            using (DbEntities db = new DbEntities())
-            {
-                return db.FirmyVlastneneStatem
-                    .AsNoTracking()
-                    .Where(m => m.Podil >= statniPodil)
-                    .Select(m => m.Ico)
-                    .ToList();
-            }
-        }
-
-        public static List<string> IcaStatnichFirem()
-        {
-            using (DbEntities db = new DbEntities())
-            {
-                return db.FirmyVlastneneStatem
-                    .AsNoTracking()
-                    .Select(m => m.Ico)
-                    .ToList()
-                    //.Union(
-                    ;
-            }
-        }
-        
-
-        public static void Repopulate(IEnumerable<FirmaVlastnenaStatem> percList)
-        {
-            using (DbEntities db = new DbEntities())
-            {
-                db.Database.ExecuteSqlRaw("TRUNCATE TABLE [FirmyVlastneneStatem]");
-                db.FirmyVlastneneStatem.AddRange(percList);
-                db.SaveChanges();
-            }
-            
-        }
 
 
 
@@ -281,37 +247,47 @@ namespace HlidacStatu.Repositories
 
 
 
+        public async static Task<HashSet<string>> IcaStatnichFiremAsync()
+        {
+            using (DbEntities db = new DbEntities())
+            {
+                var q = db.Firma
+                    .AsNoTracking()
+                    .Where(Firma.StatniFirmaPredicate)
+                    .Select(m => m.ICO)
+                    .AsQueryable();
+                var r = await q.ToHashSetAsync();
+                return r;
+            }
+        }
 
-        [Obsolete("Use SeznamOvmIndex")]
-        public static string DatafileSeznamDsOvmCached()
-            => PermanentCache.GetOrSet("datafile-seznam_ds_ovm.xml",
-                _ =>
-                {
-                    try
-                    {
-                        return Devmasters.Net.HttpClient.Simple.Get("https://www.mojedatovaschranka.cz/sds/datafile?format=xml&service=seznam_ds_ovm");
+        public async static Task<HashSet<string>> IcaUraduStatnichFiremAsync()
+        {
+            using (DbEntities db = new DbEntities())
+            {
+                var q = db.Firma
+                    .AsNoTracking()
+                    .Where(Firma.PatrimStatuPredicate)
+                    .Select(m => m.ICO)
+                    .AsQueryable();
+                var r = await q.ToHashSetAsync();
+                return r;
+            }
+        }
 
-                    }
-                    catch (Exception e)
-                    {
-                        _logger.Fatal(e, "cannot download datafile-seznam_ds_ovm.xml from https://www.mojedatovaschranka.cz");
-                        try
-                        {
-                            return Devmasters.Net.HttpClient.Simple.Get("https://somedata.hlidacstatu.cz/appdata/datafile-seznam_ds_ovm.xml");
-
-
-                        }
-                        catch (Exception e2)
-                        {
-                            _logger.Fatal(e2, "cannot download datafile-seznam_ds_ovm.xml from both sources");
-                            return "";
-                        }
-                    }
-                },
-                options => options.ModifyEntryOptionsDuration(TimeSpan.FromHours(12), TimeSpan.FromDays(10 * 365))
-            );
-
-        
+        public async static Task<HashSet<string>> IcaOVMAsync()
+        {
+            using (DbEntities db = new DbEntities())
+            {
+                var q = db.Firma
+                    .AsNoTracking()
+                    .Where(Firma.OVMSubjektPredicate)
+                    .Select(m => m.ICO)
+                    .AsQueryable();
+                var r = await q.ToHashSetAsync();
+                return r;
+            }
+        }
 
         static HashSet<string> _ovm_Nikdy_nejsou_statni = null;
         private static async Task<HashSet<string>> OVM_Nikdy_nejsou_statni(bool updateFromPrimarySource = false) 
@@ -361,7 +337,7 @@ namespace HlidacStatu.Repositories
 
         //merge of Firmy.GlobalStatistics.VsechnyUradyAsync
         //Tasks.Merk.UpdateListStatniFirmy_InDB
-        public async static Task<IEnumerable<FirmaVlastnenaStatem>> Najdi_Firmy_Vlastnene_Statem_z_Primarnich_ZdrojuAsync(
+        public async static Task Najdi_Firmy_Vlastnene_Statem_z_Primarnich_ZdrojuAsync(
             Action<string> outputWriter = null,
             Action<Devmasters.Batch.ActionProgressData> progressWriter = null
             )
@@ -511,7 +487,8 @@ namespace HlidacStatu.Repositories
                 .ToList();
 
 
-            //najdi vsechny firmy a jejich vazby
+            //najdi vsechny firmy a jejich vazby           
+
             object lockObj = new object();
             Devmasters.Batch.Manager.DoActionForAll<string, object>(bagOfIco,
              (ico, obj) =>
@@ -552,9 +529,108 @@ namespace HlidacStatu.Repositories
                 .ToList();
 
 
+            //update DB with bagOfIco as statni firmy
+            //reset typ for all
+            string sql = $"update firma set typ={((int)(TypSubjektuEnum.Soukromy))} where typ != {((int)(TypSubjektuEnum.Soukromy))}"; // where ico not in ({ica})
+            DirectDB.Instance.NoResult(sql);
+
+            List<string[]> batch = bagOfIco.Chunk(500).ToList();
+            Devmasters.Batch.Manager.DoActionForAll<IEnumerable<string>>(batch,
+                (icob) =>
+                {
+                    string icos = string.Join(",", icob.Select(i => $"'{i}'"));
+                    string sql = $"update firma set typ={((int)(TypSubjektuEnum.PatrimStatu))} where ico in ({icos})";
+                    DirectDB.Instance.NoResult(sql);
+
+                    return new Devmasters.Batch.ActionOutputData();
+                }, outputWriter, progressWriter,
+                !System.Diagnostics.Debugger.IsAttached, prefix: "UpdateFirmyWithTyp STATNI", monitor: new MonitoredTaskRepo.ForBatch()
+            );
+
+            batch.Clear();
+            batch = allOvm
+                .Where(m => ovm_nikdyStatni.Contains(m) == false)
+                .Chunk(500).ToList();
+            Devmasters.Batch.Manager.DoActionForAll<IEnumerable<string>>(batch,
+                (icob) =>
+                {
+                    string icos = string.Join(",", icob.Select(i => $"'{i}'"));
+                    string sql = $"update firma set typ={((int)(TypSubjektuEnum.Ovm))} where ico in ({icos})";
+                    DirectDB.Instance.NoResult(sql);
+
+                    return new Devmasters.Batch.ActionOutputData();
+                }, outputWriter, progressWriter,
+                !System.Diagnostics.Debugger.IsAttached, prefix: "UpdateFirmyWithTyp OVM", monitor: new MonitoredTaskRepo.ForBatch()
+            );
+
+            batch.Clear();
+            batch = allOvm
+                .Where(m => ovm_nikdyStatni.Contains(m) == false)
+                .Chunk(500).ToList();
+            Devmasters.Batch.Manager.DoActionForAll<IEnumerable<string>>(batch,
+                (icob) =>
+                {
+                    string icos = string.Join(",", icob.Select(i => $"'{i}'"));
+                    string sql = $"update firma set typ={((int)(TypSubjektuEnum.Ovm))} where ico in ({icos})";
+                    DirectDB.Instance.NoResult(sql);
+
+                    return new Devmasters.Batch.ActionOutputData();
+                }, outputWriter, progressWriter,
+                !System.Diagnostics.Debugger.IsAttached, prefix: "UpdateFirmyWithTyp OVM", monitor: new MonitoredTaskRepo.ForBatch()
+            );
+
+            //obce
+            var sqlObce = @"select distinct ico from OrganVerejneMoci ovm
+	inner join OrganVerejneMoci_KategorieOvm k on ovm.IdDS=k.IdDS
+	where k.KategorieOvm='KO14' or k.KategorieOvm='KO12' or k.KategorieOvm='KO137'";
+            batch.Clear();
+            batch = DirectDB.Instance.GetList<string>(sqlObce)
+                .Chunk(500).ToList();
+            Devmasters.Batch.Manager.DoActionForAll<IEnumerable<string>>(batch,
+                (icob) =>
+                {
+                    string icos = string.Join(",", icob.Select(i => $"'{i}'"));
+                    string sql = $"update firma set typ={((int)(TypSubjektuEnum.Obec))} where ico in ({icos})";
+                    DirectDB.Instance.NoResult(sql);
+
+                    return new Devmasters.Batch.ActionOutputData();
+                }, outputWriter, progressWriter,
+                !System.Diagnostics.Debugger.IsAttached, prefix: "UpdateFirmyWithTyp OBCE", monitor: new MonitoredTaskRepo.ForBatch()
+            );
+
+            //insolvencni spravci
+            batch.Clear();
+            batch = (await FirmaRepo.Zatrideni.GetIcoDirectAsync(Zatrideni.SubjektyObory.Insolvencni_spravci_fyzicke_osoby))
+                    .Union(await FirmaRepo.Zatrideni.GetIcoDirectAsync(Zatrideni.SubjektyObory.Insolvencni_spravci_pravnicke_osoby))
+                        .Chunk(500).ToList();
+            Devmasters.Batch.Manager.DoActionForAll<IEnumerable<string>>(batch,
+                (icob) =>
+                {
+                    string icos = string.Join(",", icob.Select(i => $"'{i}'"));
+                    string sql = $"update firma set typ={((int)(TypSubjektuEnum.InsolvecniSpravce))} where ico in ({icos})";
+                    DirectDB.Instance.NoResult(sql);
+
+                    return new Devmasters.Batch.ActionOutputData();
+                }, outputWriter, progressWriter,
+                !System.Diagnostics.Debugger.IsAttached, prefix: "UpdateFirmyWithTyp insolvecni spravci", monitor: new MonitoredTaskRepo.ForBatch()
+            );
+            //exekutori
+            batch.Clear();
+            batch = (await FirmaRepo.Zatrideni.GetIcoDirectAsync(Zatrideni.SubjektyObory.Soudni_exekutori))
+                        .Chunk(500).ToList();
+            Devmasters.Batch.Manager.DoActionForAll<IEnumerable<string>>(batch,
+                (icob) =>
+                {
+                    string icos = string.Join(",", icob.Select(i => $"'{i}'"));
+                    string sql = $"update firma set typ={((int)(TypSubjektuEnum.Exekutor))} where ico in ({icos})";
+                    DirectDB.Instance.NoResult(sql);
+
+                    return new Devmasters.Batch.ActionOutputData();
+                }, outputWriter, progressWriter,
+                !System.Diagnostics.Debugger.IsAttached, prefix: "UpdateFirmyWithTyp exekutor", monitor: new MonitoredTaskRepo.ForBatch()
+            );
 
 
-            return null;
         }
 
 

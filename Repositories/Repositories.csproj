@@ -34,6 +34,7 @@
     <PackageReference Include="Polly.Core" Version="8.5.0" />
     <PackageReference Include="Polly.RateLimiting" Version="8.5.0" />
     <PackageReference Include="Polly.Extensions.Http" Version="3.0.0" />
+    <PackageReference Include="System.Linq.Async" Version="7.0.0" />
     <PackageReference Include="System.Security.Cryptography.Pkcs" Version="9.0.7" />
     <PackageReference Include="System.Text.Encoding.CodePages" Version="8.0.0" />
     <PackageReference Include="ZiggyCreatures.FusionCache" Version="2.4.0" />

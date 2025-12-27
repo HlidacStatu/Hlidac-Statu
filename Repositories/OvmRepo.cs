@@ -7,13 +7,6 @@ namespace HlidacStatu.Repositories
 {
     public class OvmRepo
     {
-        public static List<OrganVerejneMoci> UradyOvm()
-        {
-            using var dbContext = new DbEntities();
-            return dbContext.OrganVerejneMoci.AsNoTracking()
-                .Where(o => o.TypDS.StartsWith("OVM") && o.ICO != null)
-                .ToList();
-        }
 
         public static List<OrganVerejneMoci> Ministerstva()
         {

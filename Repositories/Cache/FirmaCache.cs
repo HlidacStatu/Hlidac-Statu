@@ -83,23 +83,17 @@ public static class FirmaCache
         );
     
     
-    public static HashSet<string> VsechnyStatniMestskeFirmy() =>
-        MemoryCache.GetOrSet("StatData.VsechnyStatniMestskeFirmy",
-            _ => FirmaVlastnenaStatemRepo.IcaStatnichFirem().ToHashSet(),
+    public static ValueTask<HashSet<string>> VsechnyStatniMestskeFirmyAsync() =>
+        MemoryCache.GetOrSetAsync("StatData.VsechnyStatniMestskeFirmy",
+            async _ =>  await FirmaVlastnenaStatemRepo.IcaUraduStatnichFiremAsync(),
             options => options.ModifyEntryOptionsDuration(TimeSpan.FromHours(6))
         );
 
-    public static HashSet<string> VsechnyStatniMestskeFirmy25percs() =>
-        MemoryCache.GetOrSet("StatData.VsechnyStatniMestskeFirmy25percs",
-            _ => FirmaVlastnenaStatemRepo.IcaStatnichFirem(25).ToHashSet(),
-            options => options.ModifyEntryOptionsDuration(TimeSpan.FromHours(6))
-        );
-
-    public static HashSet<string> UradyOvm() =>
-        MemoryCache.GetOrSet("StatData.UradyOvm",
-            _ =>
+    public static ValueTask<HashSet<string>> UradyOvmAsync() =>
+        MemoryCache.GetOrSetAsync("StatData.UradyOvm",
+            async _ =>
             {
-                var urady = OvmRepo.UradyOvm().Select(u => u.ICO).ToHashSet();
+                var urady = await FirmaVlastnenaStatemRepo.IcaOVMAsync();
                 urady.Add("00832227"); //Euroregion Neisse - Nisa - Nysa
                 return urady;
             },

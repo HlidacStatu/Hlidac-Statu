@@ -98,7 +98,7 @@ public class StatisticsCache
         PermanentCache.ExpireAsync($"_Osoba_DotaceStatistics_:{osoba.NameId}");
     
     // Firmy global
-    // todo: Krom plnění daty se tato cache vůbec nikde nepoužívá
+    // TODO: Krom plnění daty se tato cache vůbec nikde nepoužívá
     public static async Task<GlobalStatisticsPerYear<Smlouva.Statistics.Data>> UradySmlouvyGlobalAsync(int? obor = null,
         GlobalStatisticsPerYear<Smlouva.Statistics.Data> newData = null)
     {

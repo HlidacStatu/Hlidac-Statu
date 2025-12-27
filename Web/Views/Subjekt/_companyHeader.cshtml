@@ -20,7 +20,7 @@
 
 
 <cache enabled="@(!System.Diagnostics.Debugger.IsAttached)" expires-after="@Constants.CachedActionLength.Cache12H" vary-by="@($"{Model.ICO}")">
-    <partial name="WebUtil/CompanySummary" model="@Model" />
+    <partial name="_companySummary" model="@Model" />
 </cache>
 
 <div class="row row-cols-2 row-cols-md-1 g-4">

@@ -23,7 +23,9 @@ namespace HlidacStatu.Repositories
         
         public static HashSet<int> StatniFirmyKdeNeniPotrebaSkutecnyMajitel = new()
         {
-            1, 2, 10, 20
+            (int)Entities.Firma.TypSubjektuEnum.PatrimStatu,
+            (int)Entities.Firma.TypSubjektuEnum.Ovm,
+            (int)Entities.Firma.TypSubjektuEnum.Obec,
         };
 
         private static ElasticClient _skmClient =>

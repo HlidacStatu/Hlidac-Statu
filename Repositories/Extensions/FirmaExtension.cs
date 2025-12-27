@@ -423,7 +423,7 @@ namespace HlidacStatu.Extensions
 
         public static bool JsemSoukromaFirma(this Firma firma)
         {
-            return firma.JsemOVM() == false && firma.JsemStatniFirma() == false;
+            return firma.TypSubjektu <= Firma.TypSubjektuEnum.Exekutor;
         }
 
         static int[] Neziskovky_KOD_PF = new int[] { 116, 117, 118, 141, 161, 422, 423, 671, 701, 706, 736 };
@@ -441,16 +441,15 @@ namespace HlidacStatu.Extensions
         }
 
 
-        public static bool PatrimStatu(this Firma firma)
-        {
-            return firma.JsemOVM() || firma.JsemStatniFirma();
-        }
+        public static bool PatrimStatu(this Firma firma) => Firma.PatrimStatuPredicate(firma);
 
         /// <summary>
         /// Orgán veřejné moci
         /// </summary>
         /// <returns></returns>
-        public static bool JsemOVM(this Firma firma) => firma.TypSubjektu == Firma.TypSubjektuEnum.Ovm || firma.TypSubjektu == Firma.TypSubjektuEnum.Obec;
+        public static bool JsemInsolvencniSpravce(this Firma firma) => firma.TypSubjektu == Firma.TypSubjektuEnum.InsolvecniSpravce;
+        public static bool JsemExekutor(this Firma firma) => firma.TypSubjektu == Firma.TypSubjektuEnum.Exekutor;
+        public static bool JsemOVM(this Firma firma) => Firma.OVMSubjektPredicate(firma);
         public const int PolitickaStrana_kodPF = 711;
 
         public static bool JsemZivnostnik(this Firma firma)
@@ -460,13 +459,7 @@ namespace HlidacStatu.Extensions
         
         public static bool JsemPolitickaStrana(this Firma firma) => firma.Kod_PF == PolitickaStrana_kodPF;
 
-        internal static bool _jsemOVM(this Firma firma)
-        {
-            return FirmaCache.UradyOvm().Contains(firma.ICO);
-        }
-
-        public static bool JsemStatniFirma(this Firma firma) => Firma.StatniSubjektPredicate(firma);
-
+        public static bool JsemStatniFirma(this Firma firma) => firma.TypSubjektu == Firma.TypSubjektuEnum.PatrimStatu;
 
         public static bool IsSponzor(this Firma firma)
         {

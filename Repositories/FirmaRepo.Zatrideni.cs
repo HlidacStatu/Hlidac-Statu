@@ -15,6 +15,18 @@ namespace HlidacStatu.Repositories
             {
                 string[] icos = null;
                 string sql = "";
+
+                if ((int)obor >= 100000)
+                {
+                    sql = @"select ico from OrganVerejneMoci ovm
+	inner join OrganVerejneMoci_KategorieOvm k on ovm.IdDS=k.IdDS
+	where k.KategorieOvm='KO"+ ((int)obor) + "';";
+                    icos = GetSubjektyFromSql(sql).Union(icos).Distinct().ToArray();
+
+                    return icos;
+                }
+
+
                 switch (obor)
                 {
                     case Firma.Zatrideni.SubjektyObory.Vse:
@@ -146,6 +158,7 @@ namespace HlidacStatu.Repositories
                         sql = @"select ico from Firma f where f.Esa2010 like ('12%') and f.IsInRs = 1";
                         icos = GetSubjektyFromSql(sql);
                         break;
+
                     case Firma.Zatrideni.SubjektyObory.Zdravotni_ustavy:
                     case Firma.Zatrideni.SubjektyObory.Zdravotni_pojistovny:
                     case Firma.Zatrideni.SubjektyObory.Vrchni_statni_zastupitelstvi:

@@ -58,9 +58,6 @@ namespace HlidacStatu.Entities
                 [GroupValue("Justice")]
                 [NiceDisplayName("Všechny soudy")]
                 Soudy = 123,
-                //[GroupValue("Justice")]
-                //[NiceDisplayName("Insolvenční správci")]
-                //Insolvencni_spravci = 10002,
 
                 [GroupValue("Samospráva")]
                 [NiceDisplayName("Kraje a hl. m. Praha")]
@@ -192,10 +189,34 @@ namespace HlidacStatu.Entities
                 [GroupValue("Kultura")]
                 [NiceDisplayName("Divadla")]
                 Divadla = 12004,
+
                 [GroupValue("Kultura")]
                 [NiceDisplayName("ZOO")]
                 ZOO = 12005,
 
+
+                //pokud je ID > 100_000, pak hodnota ve stovkach odpovida hodnote KOXXX z OrganVerejneMoci_KategorieList
+                [GroupValue("OVM_Soukromé")]
+                [NiceDisplayName("Soudní exekutoři")]
+                Soudni_exekutori = 100118,
+                [GroupValue("OVM_Soukromé")]
+                [NiceDisplayName("Notáři")]
+                Notari = 100155,
+                [GroupValue("OVM_Soukromé")]
+                [NiceDisplayName("Soukromé vysoké školy")]
+                Soukrome_vysoke_skoly = 100505,
+                [GroupValue("OVM_Soukromé")]
+                [NiceDisplayName("Profesní komory")]
+                Profesni_komory = 100520,
+                [GroupValue("OVM_Soukromé")]
+                [NiceDisplayName("Insolvenční správci fyz.osoby")]
+                Insolvencni_spravci_fyzicke_osoby = 100537,
+                [GroupValue("OVM_Soukromé")]
+                [NiceDisplayName("Insolvenční správci právnické osoby")]
+                Insolvencni_spravci_pravnicke_osoby = 100538,
+                [GroupValue("OVM_Soukromé")]
+                [NiceDisplayName("Soukromé archivy")]
+                Soukrome_archivy = 100542,
 
 
                 //Veznice = 10009,
