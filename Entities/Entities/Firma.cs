@@ -296,8 +296,32 @@ namespace HlidacStatu.Entities
         public Graph.Edge[] _parentVazbyOsoby = null;
 
         //Napojení na graf
-        public UnweightedGraph _graph = null;
-        public Vertex<string> _startingVertex = null; //not for other use except as a search starting point
+        public Dictionary<Relation.CharakterVazbyEnum, UnweightedGraph> _graphs = new ();
+        public Dictionary<Relation.CharakterVazbyEnum, Vertex<string>> _graphStartingVertexs = new ();
+
+        public UnweightedGraph _getGraph(Relation.CharakterVazbyEnum charakter)
+        {
+            if (_graphs.ContainsKey(charakter))
+                return _graphs[charakter];
+            else
+                return null;
+        }
+        public void _setGraph(Relation.CharakterVazbyEnum charakter, UnweightedGraph graph)
+        {
+               _graphs[charakter] = graph;
+        }
+
+        public Vertex<string> _getStartingVertext(Relation.CharakterVazbyEnum charakter)
+        {
+            if (_graphStartingVertexs.ContainsKey(charakter))
+                return _graphStartingVertexs[charakter];
+            else
+                return null;
+        }
+        public void _setStartingVertext(Relation.CharakterVazbyEnum charakter, Vertex<string> vertex)
+        {
+            _graphStartingVertexs[charakter] = vertex;
+        }
 
         bool? _valid = null;
 

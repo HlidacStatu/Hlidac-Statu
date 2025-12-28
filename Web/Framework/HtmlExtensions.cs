@@ -45,13 +45,14 @@ namespace HlidacStatu.Web.Framework
             }
 
             if (vazbyToRender.Count() == 1)
-                return self.Raw($"{vazbyToRender.First().Descr} v {vazbyToRender.First().To.PrintName()} {vazbyToRender.First().Doba()}");
+                return self.Raw($"{vazbyToRender.First().From?.PrintName()} <i>/{vazbyToRender.First().Descr}/</i> v {vazbyToRender.First().To.PrintName()} {vazbyToRender.First().Doba()}");
             else
             {
-                return self.Raw("Nepřímá vazba přes:<br/><small>"
-                    + $"{vazbyToRender.First().From?.PrintName()} {vazbyToRender.First().Descr} v {vazbyToRender.First().To.PrintName()} {vazbyToRender.First().Doba()}"
+                return self.Raw("Nepřímá vazba přes:<br/>" 
+                    + "<small>"
+                    + $"{vazbyToRender.First().From?.PrintName()} <i>/{vazbyToRender.First().Descr}/</i> v {vazbyToRender.First().To.PrintName()} {vazbyToRender.First().Doba()}"
                     + $" → "
-                    + string.Join(" → ", vazbyToRender.Skip(1).Select(m => m.Descr + " v " + m.To.PrintName()))
+                    + string.Join(" → ", vazbyToRender.Skip(1).Select(m => $"<i>{m.Descr}</i> v {m.To.PrintName()}"))
                     + "</small>"
                     );
             }

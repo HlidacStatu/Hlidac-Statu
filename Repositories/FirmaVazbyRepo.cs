@@ -117,12 +117,23 @@ namespace HlidacStatu.Repositories
             Relation.CharakterVazbyEnum charakterVazby = Relation.CharakterVazbyEnum.VlastnictviKontrola,
             bool refresh = false)
         {
-            if (firma._vazby == null || refresh == true)
+            if (charakterVazby == Relation.CharakterVazbyEnum.VlastnictviKontrola)
             {
-                firma.UpdateVazby(charakterVazby, refresh);
+                if (firma._vazby == null || refresh == true)
+                {
+                    firma.UpdateVazby(charakterVazby, refresh);
+                }
+                return firma._vazby;
             }
+            else
+            {
+                if (firma._vazbyUredni == null || refresh == true)
+                {
+                    firma.UpdateVazby(charakterVazby, refresh);
+                }
 
-            return firma._vazby;
+                return firma._vazbyUredni;
+            }
         }
 
         public static void SetVazbyForInstanceOnly(this Firma firma,
@@ -270,28 +281,29 @@ namespace HlidacStatu.Repositories
 
 
 
-        public static HlidacStatu.DS.Graphs.Graph.Edge[] VazbyProICO(this Firma firma, string ico)
+        public static HlidacStatu.DS.Graphs.Graph.Edge[] VazbyProICO(this Firma firma, Relation.CharakterVazbyEnum charakterVazby, string ico)
         {
-            return _vazbyProIcoCache.Get((firma, ico));
+            return _vazbyProIcoCache.Get((firma, charakterVazby, ico));
         }
 
-        static private Devmasters.Cache.LocalMemory.Manager<HlidacStatu.DS.Graphs.Graph.Edge[], (Firma f, string ico)> _vazbyProIcoCache
-            = Devmasters.Cache.LocalMemory.Manager<HlidacStatu.DS.Graphs.Graph.Edge[], (Firma f, string ico)>
-                .GetSafeInstance("_vazbyFirmaProIcoCache", f => { return f.f._vazbyProICO(f.ico); },
-                    TimeSpan.FromHours(2), k => (k.f.ICO + "-" + k.ico)
+        static private Devmasters.Cache.LocalMemory.Manager<HlidacStatu.DS.Graphs.Graph.Edge[], (Firma f, Relation.CharakterVazbyEnum charakterVazby, string ico)> _vazbyProIcoCache
+            = Devmasters.Cache.LocalMemory.Manager<HlidacStatu.DS.Graphs.Graph.Edge[], (Firma f, Relation.CharakterVazbyEnum charakterVazby, string ico)>
+                .GetSafeInstance("_vazbyFirmaProIcoCache", f => { return f.f._vazbyProICO(f.charakterVazby, f.ico); },
+                    TimeSpan.FromHours(2), k => (k.f.ICO + "-"+ k.charakterVazby + "->" + k.ico)
                 );
 
 
 
 
-        private static void InitializeGraph(this Firma firma)
+        private static void InitializeGraph(this Firma firma, Relation.CharakterVazbyEnum charakterVazby)
         {
-            firma._graph = new UnweightedGraph();
-            foreach (var vazba in firma.Vazby())
+            var uGraph = new UnweightedGraph();
+            Vertex<string> _startingVertex = null;
+            foreach (var vazba in firma.Vazby(charakterVazby))
             {
                 if (vazba.From is null)
                 {
-                    firma._startingVertex = new Vertex<string>(vazba.To.UniqId);
+                    _startingVertex = new Vertex<string>(vazba.To.UniqId);
                     continue;
                 }
 
@@ -301,21 +313,23 @@ namespace HlidacStatu.Repositories
                 var fromVertex = new Vertex<string>(vazba.From.UniqId);
                 var toVertex = new Vertex<string>(vazba.To.UniqId);
 
-                firma._graph.AddEdge(fromVertex, toVertex, vazba);
+                uGraph.AddEdge(fromVertex, toVertex, vazba);
             }
+            firma._setGraph(charakterVazby, uGraph);
+            firma._setStartingVertext(charakterVazby, _startingVertex);
         }
 
-        private static HlidacStatu.DS.Graphs.Graph.Edge[] _vazbyProICO(this Firma firma, string ico)
+        private static HlidacStatu.DS.Graphs.Graph.Edge[] _vazbyProICO(this Firma firma, Relation.CharakterVazbyEnum charakterVazby, string ico)
         {
-            if (firma._graph is null || firma._graph.Vertices.Count == 0)
-                firma.InitializeGraph();
+            if (firma._getGraph(charakterVazby) is null || firma._getGraph(charakterVazby).Vertices.Count == 0)
+                firma.InitializeGraph(charakterVazby);
 
-            if (firma._startingVertex is null)
-                firma._startingVertex = new Vertex<string>(HlidacStatu.DS.Graphs.Graph.Node.Prefix_NodeType_Company + firma.ICO);
-
+            if (firma._getStartingVertext(charakterVazby) is null)
+                firma._setStartingVertext(charakterVazby, new Vertex<string>(HlidacStatu.DS.Graphs.Graph.Node.Prefix_NodeType_Company + firma.ICO));
             try
             {
-                var shortestPath = firma._graph.ShortestPath(firma._startingVertex, CreateVertexFromIco(ico));
+
+                var shortestPath = firma._getGraph(charakterVazby).ShortestPath(firma._getStartingVertext(charakterVazby), CreateVertexFromIco(ico));
                 if (shortestPath == null)
                     return Array.Empty<HlidacStatu.DS.Graphs.Graph.Edge>();
                 var result = shortestPath.Select(x => ((Edge<HlidacStatu.DS.Graphs.Graph.Edge>)x).BindingPayload).ToArray();

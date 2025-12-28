@@ -1444,6 +1444,38 @@
         <hr />
     }
 
+
+
+    @if (Model.AktualniVazby(Relation.AktualnostType.Nedavny, Relation.CharakterVazbyEnum.Uredni).Count() > 0)
+    {
+        <div>
+            <h4>Úřední vazby na další subjekty</h4>
+            <p class="text-muted sub-header-info">
+                Typicky společnosti spravované v rámci insolvence, exekuce a dalších obdobných řízení. Nejde o majetkové vazby.
+            </p>
+            <p>
+                    <span>
+                        Spravuje či řeší <a href="/subjekt/Vazby/@Model.ICO">
+                            @Devmasters.Lang.CS.Plural.Get(Model.PocetPodrizenychSubjektu(Relation.CharakterVazbyEnum.Uredni, Relation.AktualnostType.Nedavny), "jeden subjekt", "{0} subjekty", "{0} subjektů").
+                            </a>
+                    </span>
+            </p>
+            <p class="text-center">
+                <a href="/subjekt/VazbyUredni/@Model.ICO" class="btn btn-hs btn-primary btn-sm my-3 position-relative">
+                    Vypsat všechny úřední vazby na další subjekty
+                    <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                        @(HlidacStatu.Util.RenderData.NiceNumber(Model.PocetPodrizenychSubjektu(Relation.CharakterVazbyEnum.Uredni, Relation.AktualnostType.Nedavny)))
+                    </span>
+                </a>
+            </p>
+
+        </div>
+        <hr />
+    }
+
+
+
+
     @{
         var ovmCats = await Model.KategorieOVMAsync();
         HlidacStatu.Repositories.StaticData.OrganizacniStrukturyUraduCache.Get().Urady.TryGetValue(Model.ICO, out var ossu);

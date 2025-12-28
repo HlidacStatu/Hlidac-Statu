@@ -101,6 +101,7 @@ public partial class VypisVozidel : ICheckDuplicate
     [Name("Druh vozidla 2. ř.")]
     public string DruhVozidla2Radek { get; set; }
 
+    //
     [Name("Kategorie vozidla")]
     public string KategorieVozidla { get; set; }
 
