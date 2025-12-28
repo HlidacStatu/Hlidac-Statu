@@ -29,6 +29,19 @@ namespace HlidacStatu.Repositories
     {
         private static ILogger _logger = Serilog.Log.Logger.ForContext(typeof(FirmaVlastnenaStatemRepo));
 
+        static string[] DebugCheckList = new string[] {
+"61467863",
+"26978636",
+"61061344",
+"60751606",
+"27089444",
+"60112743",
+"15886492",
+"26764652",
+"62582836",
+"64948242",
+"26080222"        };
+
         //vcetne strategickych podniku z https://www.mfcr.cz/cs/aktualne/tiskove-zpravy/2020/vlada-schvalila-strategii-vlastnicke-pol-37573
         public static string[] StatniFirmyICO = new string[]
         {
@@ -290,21 +303,31 @@ namespace HlidacStatu.Repositories
                 return r;
             }
         }
-
-        static HashSet<string> _ovm_Nikdy_nejsou_statni = null;
-        private static async Task<HashSet<string>> OVM_Nikdy_nejsou_statni(bool updateFromPrimarySource = false)
-        {
-            if (updateFromPrimarySource)
-                await Update_OrganVerejneMoci_in_DBAsync();
-
-            if (updateFromPrimarySource ||  _ovm_Nikdy_nejsou_statni == null)
+        static HashSet<string> vzdySoukr_ESA2010 = new HashSet<string>()
             {
-                using DbEntities db = new DbEntities();
+        "12202","12203", //banky
+        "12302", "12303", //fondy penezniho trhu
+        "11002", "11003", //Nefinanční podniky
+        "12402", "12403", //Investiční fondy jiné než fondy peněžního trhu
+        "12502", "12503", // Ostatní finanční zprostředkovatelé kromě pojišťovacích společností a penzijních fondů
+        "12602", "12603", // Pomocné finanční instituce
+        "12702", "12703", // Kaptivní finanční instituce a půjčovatelé peněz
+        "12802", "12803", // Pojišťovací společnosti
+        "12902", "12903", // Penzijní fondy
+        "15002", "15003" // Neziskové instituce sloužící domácnostem,
+            };
+        public static bool OVM_Nikdy_nejsou_statni_Filter_ESA2010_JeSoukrome(string esa2010)
+        {
+            if (string.IsNullOrEmpty(esa2010))
+                return false;
+            if (esa2010.StartsWith("2"))
+                return true; //nerezidenti vzdy soukrome
+            if (vzdySoukr_ESA2010.Contains(esa2010))
+                return true;
+            return false;
+        }
 
-                //kategorie, ktere nikdy nejsou statni
-                //OVM z OrganVerejneMoci
-                //ale ne ty, co maji kategorii OVM ze seznamu nize (seznam kategorii ovm https://rpp-ais.egon.gov.cz/AISP/verejne/ovm-spuu/katalog-kategorii-ovm)
-                var forbiddenOVMKategories = new HashSet<string>()
+        static HashSet<string> vzdySoukr_OVMKategorie = new HashSet<string>()
             {
                 "KO118", //Soudní exekutoři
                 "KO155", //Notáři
@@ -314,6 +337,28 @@ namespace HlidacStatu.Repositories
                 "KO538", //Insolvenční správci - v.o.s.
                 "KO542", //Soukromé archivy
             };
+        private static bool OVM_Nikdy_nejsou_statni_Filter_OVM_Kategorie_JeSoukrome(string kategorieOvm)
+        {
+            if (string.IsNullOrEmpty(kategorieOvm))
+                return false;   
+            if (vzdySoukr_OVMKategorie.Contains(kategorieOvm))
+                return true;
+            return false;
+        }
+
+        static HashSet<string> _ovm_Nikdy_nejsou_statni = null;
+        private static async Task<HashSet<string>> OVM_Nikdy_nejsou_statni(bool updateFromPrimarySource = false)
+        {
+            if (updateFromPrimarySource)
+                await Update_OrganVerejneMoci_in_DBAsync();
+
+            if (updateFromPrimarySource || _ovm_Nikdy_nejsou_statni == null)
+            {
+                using DbEntities db = new DbEntities();
+
+                //kategorie, ktere nikdy nejsou statni
+                //OVM z OrganVerejneMoci
+                //ale ne ty, co maji kategorii OVM ze seznamu nize (seznam kategorii ovm https://rpp-ais.egon.gov.cz/AISP/verejne/ovm-spuu/katalog-kategorii-ovm)
                 _logger.Information("Loading OVM, kteri nikdy nemohou byt statni firmou...");
                 var res1 = await db.OrganVerejneMoci
                     .AsNoTracking()
@@ -324,8 +369,8 @@ namespace HlidacStatu.Repositories
                         (o, k) => new { o, k }
                     )
                     .Where(m => m.o.ICO != null)
-                    .Where(m => 
-                        forbiddenOVMKategories.Contains(m.k.KategorieOvm)
+                    .Where(m =>
+                        vzdySoukr_OVMKategorie.Contains(m.k.KategorieOvm)
                     )
                     .Select(m => m.o.ICO)
                     .Distinct()
@@ -339,7 +384,20 @@ namespace HlidacStatu.Repositories
                     .Distinct()
                     .ToHashSetAsync();
 
-                _ovm_Nikdy_nejsou_statni = res1.Union(res2).ToHashSet();
+                var res3 = DirectDB.Instance.GetList<string>(@"
+select distinct o.ICO  from OrganVerejneMoci o	
+	left join Firma f on o.ICO = f.ICO
+	left join OrganVerejneMoci_KategorieOvm k on o.IdDS = k.IdDS
+	left join OrganVerejneMoci_KategorieList kl on k.KategorieOvm = kl.KategorieOvmID
+where 
+1 = 1
+--Zkratka like 'spuu_%' 
+and (esa2010 in (" + string.Join(",",vzdySoukr_ESA2010.Select(m=>$"'{m}'")) + @")
+    or str(esa2010,5,0) like '2%' -- Nerezidenti
+    )
+");
+
+                _ovm_Nikdy_nejsou_statni = res1.Union(res2).Union(res3).ToHashSet();
 
                 //rucne pridane ICO, ktere nikdy nemohou byt statni firmou
                 _ovm_Nikdy_nejsou_statni.Add("25755277"); //Clovek v tisni
@@ -359,6 +417,8 @@ namespace HlidacStatu.Repositories
             Action<Devmasters.Batch.ActionProgressData> progressWriter = null
             )
         {
+
+            List<string> debugCheck = new();
             using DbEntities db = new DbEntities();
 
 
@@ -368,7 +428,7 @@ namespace HlidacStatu.Repositories
             var updateOVM = true;
             if (System.Diagnostics.Debugger.IsAttached)
                 updateOVM = false; //jen pri ladeni
-            HashSet<string> ovm_nikdyStatni = await OVM_Nikdy_nejsou_statni(updateOVM); 
+            HashSet<string> ovm_nikdyStatni = await OVM_Nikdy_nejsou_statni(updateOVM);
 
             //Find statni firmy 
 
@@ -515,16 +575,22 @@ namespace HlidacStatu.Repositories
             _logger.Debug("Smaz duplicate a subjekty, co nikdy nejsou statni...");
             bagOfIco = bagOfIco
                 .Where(m => string.IsNullOrEmpty(m) == false)
-                .Select(m=>m.Trim())
+                .Select(m => m.Trim())
                 .Distinct()
-                .Where(m => ovm_nikdyStatni.Contains(m) == false)                
+                .Where(m => ovm_nikdyStatni.Contains(m) == false)
                 .ToList();
+
+            debugCheck = bagOfIco.Intersect(DebugCheckList).ToList();
+            if (debugCheck.Any())
+            {
+                _logger.Warning("DebugCheck ICO nalezeno v bagOfIco :" + string.Join(",", debugCheck));
+            }
 
             //najdi vsechny subjekty a jejich vazby           
             _logger.Information("Najdi vsechny podrizene subjekty ...");
             object lockObj = new object();
-            System.Collections.Concurrent.ConcurrentBag<string> foundIcos = new(); 
-
+            System.Collections.Concurrent.ConcurrentBag<string> foundIcos = new();
+            System.Collections.Concurrent.ConcurrentBag<(string, string)> foundDebugCheckIco = new();
             Devmasters.Batch.Manager.DoActionForAll<string, object>(bagOfIco,
              (ico, obj) =>
              {
@@ -539,19 +605,21 @@ namespace HlidacStatu.Repositories
                      foreach (var inIc in subjIco)
                      {
                          var ff = Firmy.Get(inIc);
-                         if (ff.Valid && FirmaVlastnenaStatemRepo.MuzeBytStatni_PodlePravniFormaKod(ff.Kod_PF))
+                         if (ff.Valid 
+                            && FirmaVlastnenaStatemRepo.MuzeBytStatni_PodlePravniFormaKod(ff.Kod_PF)
+                            && OVM_Nikdy_nejsou_statni_Filter_ESA2010_JeSoukrome(ff.ESA2010) == false
+                            )
                          {
-                             lock (lockObj)
-                             {
-                                 foundIcos.Add(inIc);
-                             }
+                             foundIcos.Add(inIc);
+                             if (DebugCheckList.Contains(inIc))
+                                 foundDebugCheckIco.Add((inIc, f.ICO));
                          }
                      }
                  }
 
                  return new Devmasters.Batch.ActionOutputData();
              }, null, outputWriter, progressWriter,
-             !System.Diagnostics.Debugger.IsAttached, prefix: "freshList statnifirmy ", monitor: new MonitoredTaskRepo.ForBatch()
+             true, prefix: "freshList statnifirmy ", monitor: new MonitoredTaskRepo.ForBatch()
              );
 
             bagOfIco.AddRange(foundIcos);
@@ -564,6 +632,12 @@ namespace HlidacStatu.Repositories
                 .Distinct()
                 .Where(m => ovm_nikdyStatni.Contains(m) == false)
                 .ToList();
+
+            debugCheck = bagOfIco.Intersect(DebugCheckList).ToList();
+            if (debugCheck.Any() || foundDebugCheckIco.Any())
+            {
+                _logger.Warning("DebugCheck ICO nalezeno v bagOfIco :" + string.Join(",", debugCheck));
+            }
 
 
             //update DB with bagOfIco as statni firmy
@@ -677,7 +751,7 @@ namespace HlidacStatu.Repositories
                 .HandleTransientHttpError()
                 .WaitAndRetryAsync(5, _ => TimeSpan.FromSeconds(1));
 
-        _logger.Information("Running OVM download");
+            _logger.Information("Running OVM download");
             string ovmUrl = "https://www.czechpoint.cz/spravadat/ovm/datafile.do?format=xml&service=seznamovm";
             var httpClient = new HttpClient();
 
