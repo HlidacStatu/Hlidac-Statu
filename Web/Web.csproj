@@ -134,7 +134,6 @@ at Microsoft.Data.SqlClient.SqlInternalConnection.OnError(SqlException exception
 		<ProjectReference Include="..\LibCore\LibCore.csproj" />
 		<ProjectReference Include="..\Plugin.Enhancers\Plugin.Enhancers.csproj" />
 		<ProjectReference Include="..\Plugin.IssueAnalyzers\Plugin.IssueAnalyzers.csproj" />
-		<ProjectReference Include="..\RegistrVozidel\RegistrVozidel.csproj" />
 		<ProjectReference Include="..\Util\Util.csproj" />
 		<ProjectReference Include="..\Web.HealthChecks\Web.HealthChecks.csproj" />
 		<ProjectReference Include="..\XLib\XLib.csproj" />

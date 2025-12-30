@@ -78,25 +78,7 @@ namespace HlidacStatu.Lib.Web.UI.TagHelpers
         }
     }
 
-    //[HtmlTargetElement("content", ParentTag = "toggleable")]
-    //public class ToggleableInner1TagHelp : ToggleableInnerBaseTagHelper
-    //{
-    //    public override void AssignValues(string buttonName, string content)
-    //    {
-    //        this.toggleableContent.ButtonText1 = buttonName;
-    //        this.toggleableContent.Content1 = content;
-    //    }
-    //}
 
-    //[HtmlTargetElement("content-two", ParentTag = "toggleable")]
-    //public class ToggleableInner2TagHelp : ToggleableInnerBaseTagHelper
-    //{
-    //    public override void AssignValues(string buttonName, string content)
-    //    {
-    //        this.toggleableContent.ButtonText2 = buttonName;
-    //        this.toggleableContent.Content2 = content;
-    //    }
-    //}
 
 
     [HtmlTargetElement("content", ParentTag = "toggleable")]
