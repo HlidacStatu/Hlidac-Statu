@@ -27,7 +27,7 @@ namespace HlidacStatu.Repositories
         }
 
         public static async Task RecalculateTasksAsync(int? threads = null, bool debug = false, string[] ids = null,
-            Action<string> outputWriter = null, Action<Devmasters.Batch.ActionProgressData> progressWriter = null,
+            Action<string> outputWriter = null, Devmasters.Batch.IProgressWriter  progressWriter = null,
             int? maxItemsInBatch = null, bool allItemsInDb = false,
             bool invalidateOnly = false
         )
@@ -406,7 +406,7 @@ namespace HlidacStatu.Repositories
         }
 
         public static IEnumerable<RecalculateItem> GetFromProcessingQueueWithParents(int count, int threads,
-            Action<string> outputWriter = null, Action<Devmasters.Batch.ActionProgressData> progressWriter = null,
+            Action<string> outputWriter = null, Devmasters.Batch.IProgressWriter  progressWriter = null,
             bool debug = false)
         {
             if (debug)

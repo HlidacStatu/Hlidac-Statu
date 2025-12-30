@@ -414,7 +414,7 @@ and (esa2010 in (" + string.Join(",",vzdySoukr_ESA2010.Select(m=>$"'{m}'")) + @"
         //Tasks.Merk.UpdateListStatniFirmy_InDB
         public async static Task Najdi_Firmy_Vlastnene_Statem_z_Primarnich_ZdrojuAsync(
             Action<string> outputWriter = null,
-            Action<Devmasters.Batch.ActionProgressData> progressWriter = null
+            Devmasters.Batch.IProgressWriter  progressWriter = null
             )
         {
 
@@ -422,7 +422,7 @@ and (esa2010 in (" + string.Join(",",vzdySoukr_ESA2010.Select(m=>$"'{m}'")) + @"
             using DbEntities db = new DbEntities();
 
 
-            progressWriter = progressWriter ?? new Devmasters.Batch.ActionProgressWriter(0.1f).Writer;
+            progressWriter = progressWriter ?? new Devmasters.Batch.ActionProgressWriter(0.1f);
 
             //updatni OVM v DB
             var updateOVM = true;

@@ -1,0 +1,37 @@
+﻿@using HlidacStatu.Repositories
+@using HlidacStatu.Repositories.Cache
+@{
+    ViewBag.Title = "Hlídač veřejných zakázek";
+    ViewBag.SubTitle = "";
+}
+
+
+@section breadcrumb
+{
+    <ol class="breadcrumb">
+        <li><a href="/">Hlídač Státu</a></li>
+        <li class="active">Registr vozidel</li>
+    </ol>
+}
+
+<form method="get" action="/vozidla/VIN" class="form-inline" role="form">
+    <div  class="input-group col-xs-12 custom-search-input">
+        <div class="input-group col-xs-12">
+
+            <input class="form-control input" id="ID" name="ID" placeholder="Celé VIN číslo vozidla ..." style="max-width: none;" type="text" value="@Model.Q">
+
+            <span class="input-group-btn text-end" style="padding-right:20px;">
+                <button class="btn btn-hs btn-secondary" type="submit">
+                    <i class="fad fa-search"></i>
+                </button>
+            </span>
+        </div>
+    </div>
+</form>
+
+
+
+
+
+
+

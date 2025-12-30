@@ -32,7 +32,7 @@ namespace HlidacStatu.Repositories
         /// </summary>
         /// <returns></returns>
         public static async Task<IEnumerable<Autocomplete>> GenerateAutocomplete(bool debug = false,
-            Action<string> logOutputFunc = null, Action<ActionProgressData> progressOutputFunc = null)
+            Action<string> logOutputFunc = null, IProgressWriter progressOutputFunc = null)
         {
             AutocompleteRepo.debug = debug;
             IEnumerable<Autocomplete> companies = new List<Autocomplete>();
@@ -196,7 +196,7 @@ namespace HlidacStatu.Repositories
 
         //firmy
         private static List<Autocomplete> LoadCompanies(Action<string> logOutputFunc = null,
-            Action<ActionProgressData> progressOutputFunc = null)
+            IProgressWriter progressOutputFunc = null)
         {
             // Kod_PF < 110  - cokoliv co nejsou fyzické osoby, podnikatelé
             // Podnikatelé nejsou zařazeni, protože je jich poté moc a vznikají tam duplicity
@@ -285,7 +285,7 @@ namespace HlidacStatu.Repositories
 
         //úřady
         private static async Task<List<Autocomplete>> LoadAuthoritiesAsync(Action<string> logOutputFunc = null,
-            Action<ActionProgressData> progressOutputFunc = null)
+            IProgressWriter progressOutputFunc = null)
         {
             string sql = $@"select Jmeno, ICO, KrajId , status
                              from Firma 
@@ -356,7 +356,7 @@ namespace HlidacStatu.Repositories
 
         //obce
         private static async Task<List<Autocomplete>> LoadCitiesAsync(Action<string> logOutputFunc = null,
-            Action<ActionProgressData> progressOutputFunc = null)
+            IProgressWriter progressOutputFunc = null)
         {
             var lockObj = new object();
             List<Autocomplete> results = new List<Autocomplete>();
@@ -407,7 +407,7 @@ namespace HlidacStatu.Repositories
 
         //lidi
         public static async Task<List<Autocomplete>> LoadPeopleAsync(Action<string> logOutputFunc = null,
-            Action<ActionProgressData> progressOutputFunc = null)
+            IProgressWriter progressOutputFunc = null)
         {
             var excludedInfoFactImportanceLevels = new HashSet<InfoFact.ImportanceLevel>()
             {

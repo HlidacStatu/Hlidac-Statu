@@ -53,7 +53,7 @@ public static class OsobaCache
                         return new Devmasters.Batch.ActionOutputData();
                     },
                     Util.Consts.outputWriter.OutputWriter,
-                    Util.Consts.progressWriter.ProgressWriter,
+                    Util.Consts.progressWriter,
                     true, //!System.Diagnostics.Debugger.IsAttached,
                     maxDegreeOfParallelism: 6, prefix: "TopPoliticiObchodSeStatem loading ",
                     monitor: new MonitoredTaskRepo.ForBatch());
@@ -181,7 +181,7 @@ public static class OsobaCache
                         return new Devmasters.Batch.ActionOutputData();
                     },
                     Util.Consts.outputWriter.OutputWriter,
-                    Util.Consts.progressWriter.ProgressWriter,
+                    Util.Consts.progressWriter,
                     true, //!System.Diagnostics.Debugger.IsAttached,
                     maxDegreeOfParallelism: 6, prefix: "Insolvence politiku ",
                     monitor: new MonitoredTaskRepo.ForBatch());

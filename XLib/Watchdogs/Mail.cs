@@ -27,7 +27,7 @@ namespace HlidacStatu.XLib.Watchdogs
             string openingText = null,
             int maxDegreeOfParallelism = 20,
             Action<string> logOutputFunc = null,
-            Action<Devmasters.Batch.ActionProgressData> progressOutputFunc = null)
+            Devmasters.Batch.IProgressWriter  progressOutputFunc = null)
             => SendWatchdogsInOneEmailAsync(new WatchDog[] { watchdog },
                 aspnetUser,
                 force, specificContacts,

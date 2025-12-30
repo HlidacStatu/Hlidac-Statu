@@ -34,7 +34,7 @@ namespace HlidacStatu.Repositories
         };
 
         public static async Task FillDbAsync(bool fullRebuild = false, Action<string> outputWriter = null,
-            Action<ActionProgressData> progressWriter = null)
+            Devmasters.Batch.IProgressWriter  progressWriter = null)
         {
             //pravidla
             //titulek max 19 znaků
@@ -136,7 +136,7 @@ namespace HlidacStatu.Repositories
                     return new Devmasters.Batch.ActionOutputData();
                 }
                 , outputWriter ?? Devmasters.Batch.Manager.DefaultOutputWriter,
-                progressWriter ?? Devmasters.Batch.Manager.DefaultProgressWriter, true,
+                progressWriter ?? new Devmasters.Batch.ActionProgressWriter(), true,
                 prefix: "FillDbAsync platy uredniku ", monitor: new MonitoredTaskRepo.ForBatch());
 
 
@@ -191,7 +191,7 @@ namespace HlidacStatu.Repositories
                     return new Devmasters.Batch.ActionOutputData();
                 }
                 , outputWriter ?? Devmasters.Batch.Manager.DefaultOutputWriter,
-                progressWriter ?? Devmasters.Batch.Manager.DefaultProgressWriter, true,
+                progressWriter ?? new Devmasters.Batch.ActionProgressWriter(), true,
                 prefix: "FillDbAsync KIndex ", monitor: new MonitoredTaskRepo.ForBatch());
 
 

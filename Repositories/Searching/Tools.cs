@@ -229,7 +229,7 @@ namespace HlidacStatu.Repositories.Searching
             Func<IHit<T>, object, Task<ActionOutputData>> action,
             object actionParameters,
             Action<string> logOutputFunc,
-            Action<ActionProgressData> progressOutputFunc,
+            IProgressWriter progressOutputFunc,
             bool parallel,
             int blockSize = 500, int? maxDegreeOfParallelism = null,
             bool IdOnly = false,
@@ -288,7 +288,7 @@ namespace HlidacStatu.Repositories.Searching
             Func<int, int, Task<ISearchResponse<T>>> searchFunc,
             Func<IHit<T>, object, Task<ActionOutputData>> action, object actionParameters,
             Action<string> logOutputFunc,
-            Action<ActionProgressData> progressOutputFunc,
+            IProgressWriter progressOutputFunc,
             bool parallel,
             int blockSize = 500, int? maxDegreeOfParallelism = null, string prefix = null,
             IMonitor monitor = null
@@ -405,8 +405,7 @@ namespace HlidacStatu.Repositories.Searching
 
                             if (progressOutputFunc != null)
                             {
-                                ActionProgressData apd = new ActionProgressData(total, processedCount, started, prefix);
-                                progressOutputFunc(apd);
+                                progressOutputFunc.Writer(total, processedCount, started, prefix);
                             }
                         });
                     }
@@ -449,8 +448,7 @@ namespace HlidacStatu.Repositories.Searching
 
                                 if (progressOutputFunc != null)
                                 {
-                                    ActionProgressData apd = new ActionProgressData(total, processedCount, started, prefix);
-                                    progressOutputFunc(apd);
+                                    progressOutputFunc.Writer(total, processedCount, started, prefix);
                                 }
 
                             }
@@ -481,7 +479,7 @@ namespace HlidacStatu.Repositories.Searching
 
         public static async Task<DataResultset<T>> GetAllRecordsAsync<T>(ElasticClient sourceESClient, int maxDegreeOfParallelism,
             string query = null, int batchSize = 10,
-            Action<string> logOutputFunc = null, Action<Devmasters.Batch.ActionProgressData> progressOutputFunc = null,
+            Action<string> logOutputFunc = null, Devmasters.Batch.IProgressWriter  progressOutputFunc = null,
             IMonitor monitor = null)
 
             where T : class
@@ -544,7 +542,8 @@ namespace HlidacStatu.Repositories.Searching
                     }
                     if (progressOutputFunc != null)
                     {
-                        progressOutputFunc(new ActionProgressData(total, allRecs.Count, started));
+                        progressOutputFunc.Writer(total, allRecs.Count, started);
+
                     }
                     if (monitor != null)
                         monitor.SetProgress((decimal)ActionProgressData.SimplePercentDone(total, allRecs.Count));
@@ -578,7 +577,7 @@ namespace HlidacStatu.Repositories.Searching
 
         public static async Task<DataResultset<string>> GetAllSmlouvyIdsAsync(this ElasticClient sourceESClient, int maxDegreeOfParallelism,
             string query = null, int batchSize = 100,
-            Action<string> logOutputFunc = null, Action<Devmasters.Batch.ActionProgressData> progressOutputFunc = null,
+            Action<string> logOutputFunc = null, Devmasters.Batch.IProgressWriter  progressOutputFunc = null,
             IMonitor monitor = null)
         {
             var qs = new QueryContainerDescriptor<object>().MatchAll();
@@ -596,7 +595,7 @@ namespace HlidacStatu.Repositories.Searching
         }
         public static async Task<DataResultset<string>> GetAllIdsAsync(this ElasticClient sourceESClient, int maxDegreeOfParallelism,
             QueryContainer queryContainer, int batchSize = 100,
-            Action<string> logOutputFunc = null, Action<Devmasters.Batch.ActionProgressData> progressOutputFunc = null,
+            Action<string> logOutputFunc = null, Devmasters.Batch.IProgressWriter  progressOutputFunc = null,
             IMonitor monitor = null)
         {
             if (maxDegreeOfParallelism < 2)
@@ -647,7 +646,7 @@ namespace HlidacStatu.Repositories.Searching
                     }
                     if (progressOutputFunc != null)
                     {
-                        progressOutputFunc(new ActionProgressData(total, allIds.Count, started));
+                        progressOutputFunc.Writer(total, allIds.Count, started);
                     }
                     if (monitor != null)
                         monitor.SetProgress((decimal)ActionProgressData.SimplePercentDone(total, allIds.Count));

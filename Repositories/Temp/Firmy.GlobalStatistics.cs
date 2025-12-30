@@ -34,7 +34,7 @@ namespace HlidacStatu.Repositories
 
             public static async Task<List<string>> VsechnyUradyAsync(
                 Action<string> logOutputFunc = null,
-                Action<ActionProgressData> progressOutputFunc = null,
+                IProgressWriter progressOutputFunc = null,
                 int? threads = null)
             {
                 if (_vsechnyUrady != null)
@@ -183,7 +183,7 @@ namespace HlidacStatu.Repositories
 
 
             public static async Task CalculateGlobalRangeCaches_UradySmlouvyAsync(int? threads = null,
-                Action<string> logOutputFunc = null, Action<ActionProgressData> progressOutputFunc = null)
+                Action<string> logOutputFunc = null, IProgressWriter progressOutputFunc = null)
             {
                 await StatisticsCache.UradySmlouvyGlobalAsync(null,
                     await CalculateGlobalRankPerYear_UradySmlouvyAsync(null, threads, logOutputFunc,
@@ -204,7 +204,7 @@ namespace HlidacStatu.Repositories
                 CalculateGlobalRankPerYear_UradySmlouvyAsync(
                     int? obor = null,
                     int? threads = null,
-                    Action<string> logOutputFunc = null, Action<ActionProgressData> progressOutputFunc = null
+                    Action<string> logOutputFunc = null, IProgressWriter progressOutputFunc = null
                 )
             {
                 obor = obor ?? 0;

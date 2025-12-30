@@ -16,6 +16,7 @@ public partial class VozidlaDoplnkoveVybaveni : ICheckDuplicate
         if (_uniqueKeys.Count > 0)
             return;
         using var db = new dbCtx();
+        db.Database.SetCommandTimeout(TimeSpan.FromSeconds(180));
         _uniqueKeys = await db.VozidlaDoplnkoveVybaveni
             .AsNoTracking()
             .Select(m => $"{m.Pcv}\t{m.CheckSum}")

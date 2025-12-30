@@ -17,8 +17,8 @@ namespace HlidacStatu.Util
 
         public static Devmasters.Batch.MultiProgressWriter progressWriter =
             new Devmasters.Batch.MultiProgressWriter(
-                new Devmasters.Batch.ActionProgressWriter(0.1f).Writer,
-                new Devmasters.Batch.ActionProgressWriter(10, new Devmasters.Batch.LoggerWriter(LW).ProgressWriter).Writer
+                new Devmasters.Batch.ActionProgressWriter(0.1f),
+                new Devmasters.Batch.ActionProgressWriter(10, new Devmasters.Batch.LoggerWriter(LW).ProgressWriter)
             );
 
         public static RegexOptions DefaultRegexQueryOption = RegexOptions.IgnoreCase

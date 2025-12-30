@@ -765,7 +765,7 @@ namespace HlidacStatu.Repositories
         }
 
         public static async Task<IEnumerable<string>> _allIdsFromESAsync(bool deleted, Action<string> outputWriter = null,
-            Action<ActionProgressData> progressWriter = null)
+            Devmasters.Batch.IProgressWriter  progressWriter = null)
         {
             List<string> ids = new List<string>();
             var client = deleted ? Manager.GetESClient_Sneplatne() : Manager.GetESClient();
@@ -822,7 +822,7 @@ namespace HlidacStatu.Repositories
         }
 
         public static async Task<IEnumerable<string>> AllIdsFromESAsync(bool? deleted, Action<string> outputWriter = null,
-            Action<ActionProgressData> progressWriter = null)
+            Devmasters.Batch.IProgressWriter  progressWriter = null)
         {
             if (deleted.HasValue)
                 return await _allIdsFromESAsync(deleted.Value, outputWriter, progressWriter);

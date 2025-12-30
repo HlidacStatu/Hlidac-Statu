@@ -38,10 +38,34 @@ public partial class VypisVozidel : ICheckDuplicate
         if (_uniqueKeys.Count > 0)
             return;
         using var db = new dbCtx();
-        _uniqueKeys = await db.VypisVozidel
+        db.Database.SetCommandTimeout(TimeSpan.FromSeconds(180));
+        //_uniqueKeys = await db.VypisVozidel
+        //    .AsNoTracking()
+        //    .Select(m => new { pk = m.Pcv, checksum = m.CheckSum })
+        //    .ToDictionaryAsync(k => k.pk, v => v.checksum);
+
+
+        var totalCount = await db.VypisVozidel.CountAsync();
+        var result = new Dictionary<string, string>(totalCount);
+
+        var count = 0;
+        var progressWriter = new Devmasters.Batch.ActionProgressWriter(1f);
+        var started = DateTime.Now;
+
+        await foreach (var item in db.VypisVozidel
             .AsNoTracking()
             .Select(m => new { pk = m.Pcv, checksum = m.CheckSum })
-            .ToDictionaryAsync(k => k.pk, v => v.checksum);
+            .AsAsyncEnumerable())
+        {
+            result[item.pk] = item.checksum;
+            count++;
+            if (count % 1000 == 0)
+                progressWriter.Writer(totalCount, count, started);
+        }
+
+        progressWriter.Writer(totalCount, totalCount, started);
+
+        _uniqueKeys = result;
 
         //await Task.CompletedTask;
     }

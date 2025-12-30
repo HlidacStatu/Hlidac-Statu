@@ -155,11 +155,24 @@ namespace HlidacStatu.RegistrVozidel
 
             _logger.Information("Parsing CSV {file} for {type}", file.NormalizedNazev, typeof(T).Name);
 
-            using (var reader = new StreamReader(file.Directory + file.NormalizedNazev, System.Text.Encoding.UTF8))
+
+            var progressWriter = new Devmasters.Batch.ActionProgressWriter(10_000);
+
+            await using var fs = new FileStream(
+                file.Directory + file.NormalizedNazev,
+                FileMode.Open,
+                FileAccess.Read,
+                FileShare.Read,
+                bufferSize: 1 << 20, // 1 MB
+                options: FileOptions.SequentialScan);
+            using (var reader = new StreamReader(fs, System.Text.Encoding.UTF8, bufferSize: 1 << 16))
             using (var csv = new CsvReader(reader, csvConfiguration))
             {
                 await csv.ReadAsync();
                 csv.ReadHeader();
+
+                var total = fs.Length;
+                var started = DateTime.Now;
 
                 swCsv.Start();
 
@@ -168,8 +181,22 @@ namespace HlidacStatu.RegistrVozidel
                     ct.ThrowIfCancellationRequested();
 
                     rows++;
+
+
                     if (rows < file.Skip)
+                    {
+                        if (rows % 10000 == 0)
+                        {
+                            progressWriter.Writer(total, fs.Position, started);
+
+                        }
                         continue;
+                    }
+
+                    if (rows % 10000 == 0)
+                    {
+                        progressWriter.Writer(total, fs.Position, started);
+                    }
 
                     try
                     {

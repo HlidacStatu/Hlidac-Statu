@@ -70,7 +70,7 @@ namespace HlidacStatu.Repositories.Analysis.KorupcniRiziko
 
 
                     return Task.FromResult(new Devmasters.Batch.ActionOutputData() { CancelRunning = false, Log = null });
-                }, null, Devmasters.Batch.Manager.DefaultOutputWriter, Devmasters.Batch.Manager.DefaultProgressWriter,
+                }, null, Devmasters.Batch.Manager.DefaultOutputWriter, new Devmasters.Batch.ActionProgressWriter(),
                 false, prefix: "GET data ");
 
 

@@ -16,7 +16,7 @@ namespace HlidacStatu.Repositories.ProfilZadavatelu
     {
         private static readonly ILogger _logger = Log.ForContext(typeof(Tool));
         
-        public static async Task ProcessProfilyZadavateluAsync(bool onlyWithErr, DateTime from, Action<string> outputWriter = null, Action<ActionProgressData> progressWriter = null)
+        public static async Task ProcessProfilyZadavateluAsync(bool onlyWithErr, DateTime from, Action<string> outputWriter = null, Devmasters.Batch.IProgressWriter  progressWriter = null)
         {
             var profily2 = new List<ProfilZadavatele>();
 
@@ -32,7 +32,7 @@ namespace HlidacStatu.Repositories.ProfilZadavatelu
 
                         return Task.FromResult(new ActionOutputData());
                     }, null,
-                    outputWriter ?? Manager.DefaultOutputWriter, progressWriter ?? Manager.DefaultProgressWriter,
+                    outputWriter ?? Manager.DefaultOutputWriter, progressWriter ?? new Devmasters.Batch.ActionProgressWriter(),
                     false, elasticClient: Connectors.Manager.GetESClient_VerejneZakazky(), prefix: "profil zadavatelu ");
 
                 Console.WriteLine("Let's go mining");
@@ -67,7 +67,7 @@ namespace HlidacStatu.Repositories.ProfilZadavatelu
                         }
                         return new ActionOutputData();
                     }, null,
-                    outputWriter ?? Manager.DefaultOutputWriter, progressWriter ?? Manager.DefaultProgressWriter
+                    outputWriter ?? Manager.DefaultOutputWriter, progressWriter ?? new Devmasters.Batch.ActionProgressWriter()
                     , false, prefix: "profil zadav 2 ", monitor: new MonitoredTaskRepo.ForBatch());
 
 
@@ -79,7 +79,7 @@ namespace HlidacStatu.Repositories.ProfilZadavatelu
                 {
                     await parser.ProcessProfileZadavateluAsync(p, from);
                     return new ActionOutputData();
-                }, outputWriter ?? Manager.DefaultOutputWriter, progressWriter ?? Manager.DefaultProgressWriter, true, 
+                }, outputWriter ?? Manager.DefaultOutputWriter, progressWriter ?? new Devmasters.Batch.ActionProgressWriter(), true, 
                 prefix: "profil zadav 3 ", monitor: new MonitoredTaskRepo.ForBatch());
 
 

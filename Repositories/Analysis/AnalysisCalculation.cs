@@ -194,7 +194,7 @@ namespace HlidacStatu.Repositories.Analysis
                     return new ActionOutputData();
                 },
                 showProgress ? Devmasters.Batch.Manager.DefaultOutputWriter : (Action<string>)null,
-                showProgress ? new ActionProgressWriter().Writer : (Action<ActionProgressData>)null,
+                showProgress ? new ActionProgressWriter() : (Devmasters.Batch.IProgressWriter )null,
                 !System.Diagnostics.Debugger.IsAttached, maxDegreeOfParallelism: 5,
                 prefix: "UradyObchodujiciSFirmami_NespolehlivymiPlatciDPH ", monitor: new MonitoredTaskRepo.ForBatch());
 
@@ -348,7 +348,7 @@ namespace HlidacStatu.Repositories.Analysis
                     return Task.FromResult(new ActionOutputData() { CancelRunning = false, Log = null });
                 }, null,
                 showProgress ? Devmasters.Batch.Manager.DefaultOutputWriter : (Action<string>)null,
-                showProgress ? new ActionProgressWriter().Writer : (Action<ActionProgressData>)null
+                showProgress ? new ActionProgressWriter() : (Devmasters.Batch.IProgressWriter )null
                 , true
                 , prefix: "UradyObchodujiciSFirmami_s_vazbouNaPolitiky " + aktualnost.ToNiceDisplayName()
                 , monitor: new MonitoredTaskRepo.ForBatch()
@@ -437,7 +437,7 @@ namespace HlidacStatu.Repositories.Analysis
                     return new ActionOutputData() { CancelRunning = false, Log = null };
                 },
                 showProgress ? Devmasters.Batch.Manager.DefaultOutputWriter : (Action<string>)null,
-                showProgress ? new ActionProgressWriter().Writer : (Action<ActionProgressData>)null,
+                showProgress ? new ActionProgressWriter() : (Devmasters.Batch.IProgressWriter )null,
                 parallel: true
                 , prefix: "LoadFirmySVazbamiNaPolitiky " + aktualnostVztahu.ToNiceDisplayName()
                 , monitor: showProgress ? new MonitoredTaskRepo.ForBatch() : null,
@@ -494,7 +494,7 @@ namespace HlidacStatu.Repositories.Analysis
                     return Task.FromResult(new ActionOutputData() { CancelRunning = false, Log = null });
                 }, null,
                 showProgress ? Devmasters.Batch.Manager.DefaultOutputWriter : (Action<string>)null,
-                showProgress ? new ActionProgressWriter().Writer : (Action<ActionProgressData>)null
+                showProgress ? new ActionProgressWriter() : (Devmasters.Batch.IProgressWriter )null
                 , false
                 , prefix: "SmlouvyIdSPolitiky "
                 , monitor: new MonitoredTaskRepo.ForBatch()
@@ -504,7 +504,7 @@ namespace HlidacStatu.Repositories.Analysis
         }
 
         public static async Task<IEnumerable<IcoSmlouvaMinMax>> GetFirmyCasovePodezreleZalozeneAsync(
-            Action<string> logOutputFunc = null, Action<ActionProgressData> progressOutputFunc = null)
+            Action<string> logOutputFunc = null, IProgressWriter progressOutputFunc = null)
         {
             _logger.Debug("GetFirmyCasovePodezreleZalozene - getting all ico");
             var allIcos = FirmaRepo.AllIcoInRS();
@@ -571,7 +571,7 @@ namespace HlidacStatu.Repositories.Analysis
                 },
                 null,
                 logOutputFunc ?? Devmasters.Batch.Manager.DefaultOutputWriter,
-                progressOutputFunc ?? new ActionProgressWriter(0.1f).Writer,
+                progressOutputFunc ?? new ActionProgressWriter(0.1f),
                 true, prefix: "GetFirmyCasovePodezreleZalozene ", monitor: new MonitoredTaskRepo.ForBatch()
             );
 
@@ -635,7 +635,7 @@ namespace HlidacStatu.Repositories.Analysis
                         return new ActionOutputData();
                     },
                     Devmasters.Batch.Manager.DefaultOutputWriter,
-                    new ActionProgressWriter().Writer,
+                    new ActionProgressWriter(),
                     true, maxDegreeOfParallelism: 10,
                     prefix: "NarustySmluv getAll stats ",
                     monitor: new MonitoredTaskRepo.ForBatch()
