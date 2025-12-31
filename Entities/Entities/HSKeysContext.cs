@@ -3,11 +3,11 @@ using Microsoft.EntityFrameworkCore;
 
 namespace HlidacStatu.Entities
 {
-    public class HlidacKeysContext : DbContext, IDataProtectionKeyContext
+    public class HSKeysContext : DbContext, IDataProtectionKeyContext
     {
         // A recommended constructor overload when using EF Core 
         // with dependency injection.
-        public HlidacKeysContext(DbContextOptions<HlidacKeysContext> options) 
+        public HSKeysContext(DbContextOptions<HSKeysContext> options) 
             : base(options) { }
 
         // This maps to the table that stores keys.

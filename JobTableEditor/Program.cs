@@ -31,12 +31,12 @@ builder.Services.AddDbContext<DbEntities>(options =>
     options.UseSqlServer(connectionString));
             
 // Add a DbContext to store your Database Keys
-builder.Services.AddDbContext<HlidacKeysContext>(options =>
+builder.Services.AddDbContext<HSKeysContext>(options =>
     options.UseSqlServer(connectionString));
             
 // using Microsoft.AspNetCore.DataProtection;
 builder.Services.AddDataProtection()
-    .PersistKeysToDbContext<HlidacKeysContext>()
+    .PersistKeysToDbContext<HSKeysContext>()
     .SetApplicationName("HlidacStatu");
             
 IdentityStartup.AddIdentity(builder.Services);

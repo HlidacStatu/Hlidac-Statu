@@ -119,6 +119,7 @@ at Microsoft.Data.SqlClient.SqlInternalConnection.OnError(SqlException exception
 	<ItemGroup>
 		<ProjectReference Include="..\..\Hlidac-Statu-Private\AI\AI.csproj" />
 		<ProjectReference Include="..\..\Hlidac-Statu-Private\HlidacStatu.DetectJobs\HlidacStatu.DetectJobs.csproj" />
+		<ProjectReference Include="..\..\Hlidac-Statu-Private\RegistrVozidel\RegistrVozidel.csproj" />
 		<ProjectReference Include="..\Datasets\Datasets.csproj" />
 		<ProjectReference Include="..\DBUpgrader\DBUpgrader.csproj" />
 		<ProjectReference Include="..\DetectFaces\DetectFaces.csproj" />

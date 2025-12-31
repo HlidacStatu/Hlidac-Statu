@@ -65,10 +65,10 @@ public class Program
             string connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
             builder.Services.AddDbContext<DbEntities>(options =>
                 options.UseSqlServer(connectionString));
-            builder.Services.AddDbContext<HlidacKeysContext>(options =>
+            builder.Services.AddDbContext<HSKeysContext>(options =>
                 options.UseSqlServer(connectionString));
             builder.Services.AddDataProtection()
-                .PersistKeysToDbContext<HlidacKeysContext>()
+                .PersistKeysToDbContext<HSKeysContext>()
                 .SetApplicationName("HlidacStatu");
 
             AddIdentity(builder.Services);

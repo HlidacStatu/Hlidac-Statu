@@ -37,12 +37,12 @@ namespace HlidacStatu.Web
             services.AddDatabaseDeveloperPageExceptionFilter();
 
             // Add a DbContext to store your Database Keys
-            services.AddDbContextPool<HlidacKeysContext>(options =>
+            services.AddDbContextPool<HSKeysContext>(options =>
                 options.UseSqlServer(connectionString));
 
             // using Microsoft.AspNetCore.DataProtection;
             services.AddDataProtection()
-                .PersistKeysToDbContext<HlidacKeysContext>()
+                .PersistKeysToDbContext<HSKeysContext>()
                 .SetApplicationName("HlidacStatu");
             
             services.AddCors(options =>

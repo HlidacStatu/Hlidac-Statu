@@ -139,10 +139,10 @@ builder.Services.AddDbContext<DbEntities>(options =>
     options.UseSqlServer(connectionString));
 
 // Add a DbContext to store your Database Keys (cookie single sign on)
-builder.Services.AddDbContext<HlidacKeysContext>(options =>
+builder.Services.AddDbContext<HSKeysContext>(options =>
     options.UseSqlServer(connectionString));
 builder.Services.AddDataProtection()
-    .PersistKeysToDbContext<HlidacKeysContext>()
+    .PersistKeysToDbContext<HSKeysContext>()
     .SetApplicationName("HlidacStatu");
 
 builder.Services.AddCors(options =>

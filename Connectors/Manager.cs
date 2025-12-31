@@ -55,7 +55,8 @@ namespace HlidacStatu.Connectors
             SearchPromo,
             PermanentLLM,
             Dotace,
-            AuditLog
+            AuditLog,
+            STK
         }
 
         public static string defaultIndexName = "hlidacsmluv";
@@ -88,6 +89,7 @@ namespace HlidacStatu.Connectors
         public static string defaultIndexName_RPP_Kategorie = "rpp_kategorie";
         public static string defaultIndexName_RPP_OVM = "rpp_ovm";
         public static string defaultIndexName_RPP_ISVS = "rpp_isvs";
+        public static string defaultIndexName_STK = "stk";
         public static string defaultIndexName_SplitSmlouvy = "splitsmlouvy";
         public static string defaultIndexName_SearchPromo = "searchpromo";
         public static string defaultIndexName_PermanentLLM = "permanentllm";
@@ -108,6 +110,7 @@ namespace HlidacStatu.Connectors
                 try
                 {
                     await InitializeAllIndicesAsync();
+                    _logger.Information("Elasticsearch indices initialized successfully during startup");
                 }
                 catch (Exception ex)
                 {
@@ -161,6 +164,10 @@ namespace HlidacStatu.Connectors
         public static ElasticClient GetESClient_RPP_OVM(int timeOut = 60000, int connectionLimit = 80)
         {
             return GetESClient(defaultIndexName_RPP_OVM, timeOut, connectionLimit, IndexType.RPP_OVM);
+        }
+        public static ElasticClient GetESClient_STK(int timeOut = 60000, int connectionLimit = 80)
+        {
+            return GetESClient(defaultIndexName_STK, timeOut, connectionLimit, IndexType.STK);
         }
 
         public static ElasticClient GetESClient_RPP_ISVS(int timeOut = 60000, int connectionLimit = 80)
@@ -324,6 +331,7 @@ namespace HlidacStatu.Connectors
                 InitializeIndexAsync(IndexType.RPP_Kategorie, defaultIndexName_RPP_Kategorie),
                 InitializeIndexAsync(IndexType.RPP_OVM, defaultIndexName_RPP_OVM),
                 InitializeIndexAsync(IndexType.RPP_ISVS, defaultIndexName_RPP_ISVS),
+                InitializeIndexAsync(IndexType.STK, defaultIndexName_STK),
                 InitializeIndexAsync(IndexType.SplitSmlouvy, defaultIndexName_SplitSmlouvy),
                 InitializeIndexAsync(IndexType.SearchPromo, defaultIndexName_SearchPromo),
                 InitializeIndexAsync(IndexType.PermanentLLM, defaultIndexName_PermanentLLM),
@@ -348,7 +356,55 @@ namespace HlidacStatu.Connectors
                 throw;
             }
         }
-        
+
+        public async static Task<(bool success, CreateIndexResponse response)> CheckAndCreateIndexAsync<T>(
+            ElasticClient client,
+            bool withAlias = true,
+            IndexSettings indexSetting = null,
+            Nest.Analysis indexAnalysis = null
+            ) where T : class
+        {
+            var aliasName = client.ConnectionSettings.DefaultIndex.ToLower();
+            var indexName = (withAlias ? $"hs-{aliasName}-01" : aliasName).ToLower();
+
+
+            //check if index already exists
+            var indexExist = await client.Indices.ExistsAsync(indexName);
+            if (indexExist?.Exists == true)
+            {
+                return (true,null);
+            }
+
+            indexSetting = indexSetting ?? new IndexSettings()
+            {
+                NumberOfReplicas = 1,
+                NumberOfShards = 1,
+                RefreshInterval = new Time(TimeSpan.FromSeconds(5))
+            };
+            indexAnalysis ??= new Nest.Analysis()
+            {
+                Analyzers = new Analyzers(),
+                TokenFilters = BasicTokenFilters(),
+            };
+
+            indexSetting.Analysis = indexAnalysis;
+            indexSetting.Analysis.Analyzers.Add("default", DefaultAnalyzer());
+
+            IndexState idxSt = new IndexState();
+            idxSt.Settings = indexSetting;
+
+            CreateIndexResponse res = null;
+            res = await client.Indices
+                        .CreateAsync(indexName, i => i
+                            .InitializeUsing(idxSt)
+                            .Map<T>(map => map.AutoMap().DateDetection(false))
+                        );
+            if (res.IsValid && withAlias)
+                await client.Indices.PutAliasAsync(indexName, aliasName);
+
+            return (res?.IsValid ?? false, res);
+        }
+
         public static ConnectionSettings GetElasticSearchConnectionSettings(string indexName, int timeOut = 60000,
             int? connectionLimit = null)
         {
@@ -731,6 +787,9 @@ namespace HlidacStatu.Connectors
                             )
                             .Map<OVMFull>(map => map.AutoMap(maxRecursion: 1))
                         );
+                    break;
+                case IndexType.STK:
+                    //use
                     break;
                 case IndexType.RPP_ISVS:
                     res = await client.Indices
