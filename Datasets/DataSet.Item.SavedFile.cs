@@ -119,7 +119,7 @@ namespace HlidacStatu.Datasets
                         int nextVersion = FindNextVersion(fullname);
                         int lastVersion = nextVersion - 1;
                         System.IO.FileInfo fiLast = new System.IO.FileInfo(VersionedFilename(fullname, lastVersion));
-                        if (Devmasters.IO.BinaryCompare.FilesContentsAreEqual(fiLast, data))
+                        if (Devmasters.IO.BinaryComparer.AreEqual(fiLast.FullName, data))
                         {
                             data = null;
                             return true;

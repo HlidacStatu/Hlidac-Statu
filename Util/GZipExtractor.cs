@@ -21,7 +21,7 @@ public static class GzipArchiveExtractor
     public static async Task<IReadOnlyList<string>> DownloadAndExtractAsync(
         string url,
         string destinationDirectory,
-        bool overwriteExisting = false,
+        bool overwriteIfDifferent = false,
             TimeSpan? timeout = null,
         CancellationToken cancellationToken = default)
     {
@@ -50,7 +50,7 @@ public static class GzipArchiveExtractor
             return await ExtractTarAsync(
                 decompressedData,
                 destinationDirectory,
-                overwriteExisting,
+                overwriteIfDifferent,
                 cancellationToken);
         }
         else
@@ -60,7 +60,7 @@ public static class GzipArchiveExtractor
                 decompressedData,
                 url,
                 destinationDirectory,
-                overwriteExisting,
+                overwriteIfDifferent,
                 cancellationToken);
         }
     }
@@ -74,7 +74,7 @@ public static class GzipArchiveExtractor
         IProgress<DownloadProgress>? downloadProgress = null,
         IProgress<ExtractionProgress>? extractionProgress = null,
         TimeSpan? timeout = null,
-        bool overwriteExisting = false,
+        bool overwriteIfDifferent = false,
         CancellationToken cancellationToken = default)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(url);
@@ -125,7 +125,7 @@ public static class GzipArchiveExtractor
             return await ExtractTarAsync(
                 decompressedData,
                 destinationDirectory,
-                overwriteExisting,
+                overwriteIfDifferent,
                 cancellationToken,
                 extractionProgress);
         }
@@ -135,7 +135,7 @@ public static class GzipArchiveExtractor
                 decompressedData,
                 url,
                 destinationDirectory,
-                overwriteExisting,
+                overwriteIfDifferent,
                 cancellationToken);
         }
     }
@@ -173,7 +173,7 @@ public static class GzipArchiveExtractor
     private static async Task<IReadOnlyList<string>> ExtractTarAsync(
         byte[] tarData,
         string destinationDirectory,
-        bool overwriteExisting,
+        bool overwriteIfDifferent,
         CancellationToken cancellationToken,
         IProgress<ExtractionProgress>? progress = null)
     {
@@ -224,18 +224,24 @@ public static class GzipArchiveExtractor
 
             // Kontrola existence souboru
             // Pokud nepřepisujeme, najdeme unikátní název
-            if (File.Exists(fullPath) && !overwriteExisting)
+            if (File.Exists(fullPath))
             {
-                for (int i = 0; i < 20_000; i++)
+                if (overwriteIfDifferent)
                 {
-                    fullPath = Path.GetFullPath(Path.Combine(destinationDirectory, $"v{i}_" + entryPath));
-                    if (File.Exists(fullPath) == false)
-                        break;
+
+                    var isDiff = Devmasters.IO.BinaryComparer.AreEqual(fullPath, entry.DataStream);
+                    if (isDiff)
+                    {
+                        await entry.ExtractToFileAsync(fullPath, overwriteIfDifferent, cancellationToken);
+                        extractedFiles.Add(fullPath);
+                    }
                 }
             }
-            await entry.ExtractToFileAsync(fullPath, overwriteExisting, cancellationToken);
-            extractedFiles.Add(fullPath);
-
+            else
+            {
+                await entry.ExtractToFileAsync(fullPath, overwriteIfDifferent, cancellationToken);
+                extractedFiles.Add(fullPath);
+            }
             progress?.Report(new ExtractionProgress(entryIndex, entry.Name, fullPath));
         }
 
@@ -246,26 +252,32 @@ public static class GzipArchiveExtractor
         byte[] decompressedData,
         string originalUrl,
         string destinationDirectory,
-        bool overwriteExisting,
+        bool overwriteIfDifferent,
         CancellationToken cancellationToken)
     {
         // Odvodíme název souboru z URL (odstraníme .gz příponu)
         var fileName = GetFileNameFromUrl(originalUrl);
         var fullPath = Path.Combine(destinationDirectory, fileName);
 
-        if (File.Exists(fullPath) && !overwriteExisting)
+        if (File.Exists(fullPath))
         {
-            for (int i = 0; i < 20_000; i++)
+            if (overwriteIfDifferent)
             {
-                fullPath = Path.GetFullPath(Path.Combine(destinationDirectory, $"v{i}_" + fileName));
-                if (File.Exists(fullPath) == false)
-                    break;
+                var isDiff = Devmasters.IO.BinaryComparer.AreEqual(fullPath, decompressedData);
+                if (isDiff)
+                {
+                    await File.WriteAllBytesAsync(fullPath, decompressedData, cancellationToken);
+                    return [fullPath];
+                }
             }
+
         }
-
-        await File.WriteAllBytesAsync(fullPath, decompressedData, cancellationToken);
-
-        return [fullPath];
+        else
+        {
+            await File.WriteAllBytesAsync(fullPath, decompressedData, cancellationToken);
+            return [fullPath];
+        }
+        return Array.Empty<string>();
     }
 
     private static string GetFileNameFromUrl(string url)
