@@ -56,10 +56,10 @@
     <div class="row">
         <div class="col-12">
             <div class="alert alert-warning" role="alert">
-                <h4 class="alert-heading"><i class="fa-solid fa-triangle-exclamation"></i> Žádný vůz nenalezen</h4>
-                <p>Aww yeah, you successfully read this important alert message. This example text is going to run a bit longer so that you can see how spacing within an alert works with this kind of content.</p>
+                <h4 class="alert-heading"><i class="fa-solid fa-triangle-exclamation"></i> Vůz nenalezen</h4>
+                <p>Je potřeba hledat celý VIN automobilu a musí se přesně schodovat. Není možné hledat podle části VIN nebo podle SPZ.</p>
                 <hr>
-                <p class="mb-0">Whenever you need to, be sure to use margin utilities to keep things nice and tidy.</p>
+                <p class="mb-0">Jaká auta mají jednotlivé úřady? Najdi úřad v hledání v hlavičce a tam je najdeš.</p>
             </div>
         </div>
     </div>
@@ -73,288 +73,342 @@
                             .AsNoTracking()
                             .Select(m => m)
                             .Where(v => v.Pcv == vozidlo.Pcv)
-                            .OrderBy(o => o.PlatnostOd);
+                            .OrderBy(o => o.PlatnostOd)
+                            .ToArray();
     ;
     var ownersHistory = db.VlastnikProvozovatelVozidla
                             .AsNoTracking()
                             .Select(m => m)
                             .Where(v => v.Pcv == vozidlo.Pcv)
-                            .OrderBy(o => o.DatumOd);
+                            .OrderBy(o => o.DatumOd)
+                            .ToArray();
+    var stkHistory = db.STKMereni
+                            .AsNoTracking()
+                            .Select(m => m)
+                            .Where(v => v.Pcv == vozidlo.Pcv)
+                            .OrderBy(o => o.DatumProhlidky)
+                            .ToArray();
 
+    var lastKmObj = stkHistory.OrderByDescending(o => o.DatumProhlidky).FirstOrDefault(m => m.StavTachometru.HasValue);
+    long? lastKm = lastKmObj?.StavTachometru;
+    DateTime? lastKmDate = lastKmObj?.DatumProhlidky;
+    DateTime? nextStk = stkHistory.OrderByDescending(o => o.DatumProhlidky).FirstOrDefault(m => m.PristiProhlidka.HasValue)?.PristiProhlidka;
+    if (nextStk.HasValue == false)
+    {
+        if (stkHistory.Count() > 2) //je min druha STK, tzn. pridam 2 roky
+        {
+            nextStk = stkHistory.Reverse().Where(m => m.DatumProhlidky.HasValue).FirstOrDefault()?.DatumProhlidky?.AddYears(2);
+        }
+        if (technickeProhlidky.Any(m => m.PlatnostDo.HasValue)) //EK
+        {
+            var dt = technickeProhlidky.Where(m => m.PlatnostDo.HasValue).Max(m => m.PlatnostDo);
+            if (dt.HasValue)
+            {
+                nextStk = dt.Value.ToDateTime(TimeOnly.MinValue);
+            }
+        }
+    }
 }
-<section id="check">
-    <div class="container mt-5">
-        <div class="title-card">
-            <div class="row align-items-center">
-                <div class="col-md-3 col-sm-4 col-12 text-center text-md-start mb-3 mb-md-0">
-                    <div class="brand-badge">@Display(vozidlo?.TovarniZnacka)</div>
-                </div>
-                <div class="col-md-9 col-sm-8 col-12">
-                    <div class="row">
-                        <div class="col-12 mb-3">
-                            <span class="label">VIN</span>
-                            <h4 id="vin" class="mb-0">@Display(vozidlo?.Vin)</h4>
-                        </div>
-                        <div class="col-6 mb-3">
-                            <span class="label">Tovární značka</span>
-                            <h4 class="mb-0">@Display(vozidlo?.TovarniZnacka)</h4>
-                        </div>
-                        <div class="col-6 mb-3">
-                            <span class="label">Obchodní označení</span>
-                            <h4 class="mb-0">@Display(vozidlo?.ObchodniOznaceni)</h4>
-                        </div>
-                        <div class="col-6 mb-3">
-                            <span class="label">Barva</span>
-                            <h4 class="mb-0">@Display(vozidlo?.Barva)</h4>
-                        </div>
-                        <div class="col-6 mb-3">
-                            <span class="label">Palivo</span>
-                            <h4 class="mb-0">@Display(vozidlo?.Palivo)</h4>
+    <section id="check">
+        <div class="container mt-5">
+            <div class="title-card">
+                <div class="row align-items-center">
+                    <div class="col-md-3 col-sm-4 col-12 text-center text-md-start mb-3 mb-md-0">
+                        <div class="brand-badge">@Display(vozidlo?.TovarniZnacka)</div>
+                    </div>
+                    <div class="col-md-9 col-sm-8 col-12">
+                        <div class="row">
+                            <div class="col-12 mb-3">
+                                <span class="label">VIN</span>
+                                <h4 id="vin" class="mb-0">@Display(vozidlo?.Vin)</h4>
+                            </div>
+                            <div class="col-6 mb-3">
+                                <span class="label">Tovární značka</span>
+                                <h4 class="mb-0">@Display(vozidlo?.TovarniZnacka)</h4>
+                            </div>
+                            <div class="col-6 mb-3">
+                                <span class="label">Obchodní označení</span>
+                                <h4 class="mb-0">@Display(vozidlo?.ObchodniOznaceni)</h4>
+                            </div>
+                            <div class="col-6 mb-3">
+                                <span class="label">Barva</span>
+                                <h4 class="mb-0">@Display(vozidlo?.Barva)</h4>
+                            </div>
+                            <div class="col-6 mb-3">
+                                <span class="label">Palivo</span>
+                                <h4 class="mb-0">@Display(vozidlo?.Palivo)</h4>
+                            </div>
+                            <div class="col-6 mb-3">
+                                <span class="label">
+                                    Stav km
+                                    <i class="fa-solid fa-circle-info" data-bs-toggle="tooltip" data-bs-title="poslední známý stav z STK z @Display(lastKmDate)"></i>
+                                </span>
+                                <h4 class="mb-0">@Display(lastKm)</h4>
+                            </div>
+                            <div class="col-6 mb-3">
+                                <span class="label">Platnost STK do</span>
+                                <h4 class="mb-0">@Display(nextStk)</h4>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
+
+
+            <accordion theme="warning">
+                <content collapsed="false" title="<i class='fa-solid fa-car me-2'></i> Identifikace vozidla" css-title="fs-5">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="kv-row d-flex justify-content-between">
+                                <span class="kv-key">Kategorie</span>
+                                <span class="kv-value">@Display(vozidlo?.KategorieVozidla)</span>
+                            </div>
+                            <div class="kv-row d-flex justify-content-between">
+                                <span class="kv-key">Druh vozidla</span>
+                                <span class="kv-value">@Display(vozidlo?.DruhVozidla)</span>
+                            </div>
+                            <div class="kv-row d-flex justify-content-between">
+                                <span class="kv-key">Typ / varianta / verze</span>
+                                <span class="kv-value">@DisplayRawOrDash($"{vozidlo?.Typ} {vozidlo?.Varianta} {vozidlo?.Verze}".Trim())</span>
+                            </div>
+                            <div class="kv-row d-flex justify-content-between">
+                                <span class="kv-key">Výrobce vozidla</span>
+                                <span class="kv-value">@Display(vozidlo?.VyrobceVozidla)</span>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="kv-row d-flex justify-content-between">
+                                <span class="kv-key">Výrobce motoru</span>
+                                <span class="kv-value">@Display(vozidlo?.VyrobceMotoru)</span>
+                            </div>
+                            <div class="kv-row d-flex justify-content-between">
+                                <span class="kv-key">Typ motoru</span>
+                                <span class="kv-value">@Display(vozidlo?.TypMotoru)</span>
+                            </div>
+                            <div class="kv-row d-flex justify-content-between">
+                                <span class="kv-key">Číslo motoru</span>
+                                <span class="kv-value">@Display(vozidlo?.CisloMotoru)</span>
+                            </div>
+                            <div class="kv-row d-flex justify-content-between">
+                                <span class="kv-key">Rok výroby</span>
+                                <span class="kv-value">@Display(vozidlo?.RokVyroby)</span>
+                            </div>
+                        </div>
+                    </div>
+                </content>
+
+                <content collapsed="false" title="<i class='fa-solid fa-file-lines me-2'></i> Registrace" css-title="fs-5">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="kv-row d-flex justify-content-between">
+                                <span class="kv-key">1. registrace</span>
+                                <span class="kv-value">@Display(vozidlo?.Datum1Registrace)</span>
+                            </div>
+                            <div class="kv-row d-flex justify-content-between">
+                                <span class="kv-key">1. registrace v ČR</span>
+                                <span class="kv-value">@Display(vozidlo?.Datum1RegistraceVCr)</span>
+                            </div>
+                            <div class="kv-row d-flex justify-content-between">
+                                <span class="kv-key">Status</span>
+                                <span class="kv-value">@Display(vozidlo?.Status)</span>
+                            </div>
+                            <div class="kv-row d-flex justify-content-between">
+                                <span class="kv-key">Zařazení vozidla</span>
+                                <span class="kv-value">@Display(vozidlo?.ZarazeniVozidla)</span>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="kv-row d-flex justify-content-between">
+                                <span class="kv-key">Účel vozidla</span>
+                                <span class="kv-value">@Display(vozidlo?.UcelVozidla)</span>
+                            </div>
+                            <div class="kv-row d-flex justify-content-between">
+                                <span class="kv-key">Druh RZ</span>
+                                <span class="kv-value">@Display(vozidlo?.DruhRz)</span>
+                            </div>
+                            <div class="kv-row d-flex justify-content-between">
+                                <span class="kv-key">Číslo TP / ORV</span>
+                                <span class="kv-value">@DisplayRawOrDash($"{vozidlo?.CisloTp} {vozidlo?.CisloOrv}".Trim())</span>
+                            </div>
+                        </div>
+                    </div>
+                </content>
+                <content collapsed="false" title="<i class='fa-solid fa-gas-pump me-2'></i> Pohon a emise" css-title="fs-5">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="kv-row d-flex justify-content-between">
+                                <span class="kv-key">Palivo</span>
+                                <span class="kv-value">@Display(vozidlo?.Palivo)</span>
+                            </div>
+                            <div class="kv-row d-flex justify-content-between">
+                                <span class="kv-key">Zdvihový objem</span>
+                                <span class="kv-value">@Display(vozidlo?.ZdvihovyObjem)</span>
+                            </div>
+                            <div class="kv-row d-flex justify-content-between">
+                                <span class="kv-key">Max. výkon</span>
+                                <span class="kv-value">@Display(vozidlo?.MaxVykon, " kW")</span>
+                            </div>
+                            <div class="kv-row d-flex justify-content-between">
+                                <span class="kv-key">Otáčky</span>
+                                <span class="kv-value">@Display(vozidlo?.Otacky, " min-1")</span>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="kv-row d-flex justify-content-between">
+                                <span class="kv-key">Plně elektrické vozidlo</span>
+                                <span class="kv-value">@Display(vozidlo?.PlneElektrickeVozidlo)</span>
+                            </div>
+                            <div class="kv-row d-flex justify-content-between">
+                                <span class="kv-key">Hybridní vozidlo</span>
+                                <span class="kv-value">@Display(vozidlo?.HybridniVozidlo)</span>
+                            </div>
+                            <div class="kv-row d-flex justify-content-between">
+                                <span class="kv-key">Emisní stupeň</span>
+                                <span class="kv-value">@Display(vozidlo?.StupenPlneniEmisniUrovne)</span>
+                            </div>
+                            <div class="kv-row d-flex justify-content-between">
+                                <span class="kv-key">CO2</span>
+                                <span class="kv-value">@DisplayRawOrDash(vozidlo?.Co2Raw)</span>
+                            </div>
+                        </div>
+                    </div>
+                </content>
+                <content collapsed="true" title="<i class='fa-solid fa-ruler-combined me-2'></i> Rozměry a hmotnost" css-title="fs-5">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="kv-row d-flex justify-content-between">
+                                <span class="kv-key">Délka / šířka / výška</span>
+                                <span class="kv-value">@DisplayRawOrDash(vozidlo?.CelkovaDelkaSirkaVyskaRaw)</span>
+                            </div>
+                            <div class="kv-row d-flex justify-content-between">
+                                <span class="kv-key">Rozvor</span>
+                                <span class="kv-value">@DisplayRawOrDash(vozidlo?.RozvorRaw)</span>
+                            </div>
+                            <div class="kv-row d-flex justify-content-between">
+                                <span class="kv-key">Rozchod</span>
+                                <span class="kv-value">@DisplayRawOrDash(vozidlo?.RozchodRaw)</span>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="kv-row d-flex justify-content-between">
+                                <span class="kv-key">Provozní hmotnost</span>
+                                <span class="kv-value">@DisplayRawOrDash(vozidlo?.ProvozniHmotnost)</span>
+                            </div>
+                            <div class="kv-row d-flex justify-content-between">
+                                <span class="kv-key">Největší technicky přípustná</span>
+                                <span class="kv-value">@DisplayRawOrDash(vozidlo?.NejvetsiTechnickyPripustnaPovolenaHmotnostRaw)</span>
+                            </div>
+                            <div class="kv-row d-flex justify-content-between">
+                                <span class="kv-key">Počet míst</span>
+                                <span class="kv-value">@DisplayRawOrDash(vozidlo?.PocetMistRaw)</span>
+                            </div>
+                        </div>
+                    </div>
+                </content>
+                <content collapsed="true" title="<i class='fa-solid fa-calendar-check me-2'></i> STK - technické prohlídky" css-title="fs-5">
+                    <div class="row">
+                        <div class="col-12">
+                            @if (technickeProhlidky.Any())
+                            {
+                                <div class="table-responsive">
+                                    <table class="table history-table align-middle mb-0">
+                                        <thead>
+                                            <tr>
+                                                <th>Typ</th>
+                                                <th>Stav</th>
+                                                <th>Stanice</th>
+                                                <th>Platnost</th>
+                                                <th>Protokol</th>
+                                                <th>Stav km</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @foreach (var prohlidka in technickeProhlidky.OrderByDescending(item => item.PlatnostOd))
+                                            {
+                                                <tr>
+                                                    <td>@Display(prohlidka?.Typ)</td>
+                                                    <td>@Display(prohlidka?.Stav)</td>
+                                                    <td>@DisplayRawOrDash(prohlidka?.NazevStk)</td>
+                                                    <td>@Display(prohlidka?.PlatnostOd) - @Display(prohlidka?.PlatnostDo)</td>
+                                                    <td>@DisplayRawOrDash(prohlidka?.CisloProtokolu)</td>
+                                                    <td>
+                                                        @{
+                                                            //najdi stk prohlidku
+                                                            var stk = stkHistory
+                                                                .Where(m => m.CisloProtokolu == prohlidka.CisloProtokolu)
+                                                            ;
+                                                            if (stk.Any() == false)
+                                                            {
+                                                                stk = stkHistory
+                                                                   .Where(m => m.DatumProhlidky.HasValue)
+                                                                   .Where(m => (new DateOnly(m.DatumProhlidky.Value.Year, m.DatumProhlidky.Value.Month, m.DatumProhlidky.Value.Day) == prohlidka.PlatnostOd));
+                                                            }
+                                                            long? km = stk.Max(m => m.StavTachometru);
+                                                            //long km = 0;
+                                                        }
+                                                        @Display(km)
+                                                    </td>
+                                                </tr>
+                                            }
+                                        </tbody>
+                                    </table>
+                                </div>
+                            }
+                            else
+                            {
+                                <div class="history-muted">Bez záznamů.</div>
+                            }
+                        </div>
+                    </div>
+                </content>
+                <content collapsed="true" title="<i class='fa-solid fa-user me-2'></i> Majitelé a provozovatelé" css-title="fs-5">
+                    <div class="row">
+                        <div class="col-12">
+                            @if (ownersHistory.Any())
+                            {
+                                <div class="table-responsive">
+                                    <table class="table history-table align-middle mb-0">
+                                        <thead>
+                                            <tr>
+                                                <th>Vztah</th>
+                                                <th>Subjekt</th>
+                                                <th>IČO</th>
+                                                <th>Adresa</th>
+                                                <th>Období</th>
+                                                <th>Aktuální</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @foreach (var owner in ownersHistory.OrderByDescending(item => item.DatumOd))
+                                            {
+                                                <tr>
+                                                    <td>@DisplayPerson(owner?.FormaVlastnictvi.ToString())</td>
+                                                    <td>@Display(owner?.Nazev)</td>
+                                                    <td>@Display(owner?.Ico)</td>
+                                                    <td>@Display(owner?.Adresa)</td>
+                                                    <td>@Display(owner?.DatumOd) - @Display(owner?.DatumDo)</td>
+                                                    <td>@Display(owner?.Aktualni)</td>
+                                                </tr>
+                                            }
+                                        </tbody>
+                                    </table>
+                                </div>
+                            }
+                            else
+                            {
+                                <div class="history-muted">Bez záznamů.</div>
+                            }
+                    </div>
+
+                    </div>
+                </content>
+            </accordion>
+
+
+
+
         </div>
-
-
-        <accordion theme="warning">
-            <content collapsed="false" title="<i class='fa-solid fa-car me-2'></i> Identifikace vozidla" css-title="fs-5">
-                <div class="row">
-                    <div class="col-md-6">
-                        <div class="kv-row d-flex justify-content-between">
-                            <span class="kv-key">Kategorie</span>
-                            <span class="kv-value">@Display(vozidlo?.KategorieVozidla)</span>
-                        </div>
-                        <div class="kv-row d-flex justify-content-between">
-                            <span class="kv-key">Druh vozidla</span>
-                            <span class="kv-value">@Display(vozidlo?.DruhVozidla)</span>
-                        </div>
-                        <div class="kv-row d-flex justify-content-between">
-                            <span class="kv-key">Typ / varianta / verze</span>
-                            <span class="kv-value">@DisplayRawOrDash($"{vozidlo?.Typ} {vozidlo?.Varianta} {vozidlo?.Verze}".Trim())</span>
-                        </div>
-                        <div class="kv-row d-flex justify-content-between">
-                            <span class="kv-key">Výrobce vozidla</span>
-                            <span class="kv-value">@Display(vozidlo?.VyrobceVozidla)</span>
-                        </div>
-                    </div>
-                    <div class="col-md-6">
-                        <div class="kv-row d-flex justify-content-between">
-                            <span class="kv-key">Výrobce motoru</span>
-                            <span class="kv-value">@Display(vozidlo?.VyrobceMotoru)</span>
-                        </div>
-                        <div class="kv-row d-flex justify-content-between">
-                            <span class="kv-key">Typ motoru</span>
-                            <span class="kv-value">@Display(vozidlo?.TypMotoru)</span>
-                        </div>
-                        <div class="kv-row d-flex justify-content-between">
-                            <span class="kv-key">Číslo motoru</span>
-                            <span class="kv-value">@Display(vozidlo?.CisloMotoru)</span>
-                        </div>
-                        <div class="kv-row d-flex justify-content-between">
-                            <span class="kv-key">Rok výroby</span>
-                            <span class="kv-value">@Display(vozidlo?.RokVyroby)</span>
-                        </div>
-                    </div>
-                </div>
-            </content>
-
-            <content collapsed="false" title="<i class='fa-solid fa-file-lines me-2'></i> Registrace" css-title="fs-5">
-                <div class="row">
-                    <div class="col-md-6">
-                        <div class="kv-row d-flex justify-content-between">
-                            <span class="kv-key">1. registrace</span>
-                            <span class="kv-value">@Display(vozidlo?.Datum1Registrace)</span>
-                        </div>
-                        <div class="kv-row d-flex justify-content-between">
-                            <span class="kv-key">1. registrace v ČR</span>
-                            <span class="kv-value">@Display(vozidlo?.Datum1RegistraceVCr)</span>
-                        </div>
-                        <div class="kv-row d-flex justify-content-between">
-                            <span class="kv-key">Status</span>
-                            <span class="kv-value">@Display(vozidlo?.Status)</span>
-                        </div>
-                        <div class="kv-row d-flex justify-content-between">
-                            <span class="kv-key">Zařazení vozidla</span>
-                            <span class="kv-value">@Display(vozidlo?.ZarazeniVozidla)</span>
-                        </div>
-                    </div>
-                    <div class="col-md-6">
-                        <div class="kv-row d-flex justify-content-between">
-                            <span class="kv-key">Účel vozidla</span>
-                            <span class="kv-value">@Display(vozidlo?.UcelVozidla)</span>
-                        </div>
-                        <div class="kv-row d-flex justify-content-between">
-                            <span class="kv-key">Druh RZ</span>
-                            <span class="kv-value">@Display(vozidlo?.DruhRz)</span>
-                        </div>
-                        <div class="kv-row d-flex justify-content-between">
-                            <span class="kv-key">Číslo TP / ORV</span>
-                            <span class="kv-value">@DisplayRawOrDash($"{vozidlo?.CisloTp} {vozidlo?.CisloOrv}".Trim())</span>
-                        </div>
-                    </div>
-                </div>
-            </content>
-            <content collapsed="false" title="<i class='fa-solid fa-gas-pump me-2'></i> Pohon a emise" css-title="fs-5">
-                <div class="row">
-                    <div class="col-md-6">
-                        <div class="kv-row d-flex justify-content-between">
-                            <span class="kv-key">Palivo</span>
-                            <span class="kv-value">@Display(vozidlo?.Palivo)</span>
-                        </div>
-                        <div class="kv-row d-flex justify-content-between">
-                            <span class="kv-key">Zdvihový objem</span>
-                            <span class="kv-value">@Display(vozidlo?.ZdvihovyObjem)</span>
-                        </div>
-                        <div class="kv-row d-flex justify-content-between">
-                            <span class="kv-key">Max. výkon</span>
-                            <span class="kv-value">@Display(vozidlo?.MaxVykon, " kW")</span>
-                        </div>
-                        <div class="kv-row d-flex justify-content-between">
-                            <span class="kv-key">Otáčky</span>
-                            <span class="kv-value">@Display(vozidlo?.Otacky, " min-1")</span>
-                        </div>
-                    </div>
-                    <div class="col-md-6">
-                        <div class="kv-row d-flex justify-content-between">
-                            <span class="kv-key">Plně elektrické vozidlo</span>
-                            <span class="kv-value">@Display(vozidlo?.PlneElektrickeVozidlo)</span>
-                        </div>
-                        <div class="kv-row d-flex justify-content-between">
-                            <span class="kv-key">Hybridní vozidlo</span>
-                            <span class="kv-value">@Display(vozidlo?.HybridniVozidlo)</span>
-                        </div>
-                        <div class="kv-row d-flex justify-content-between">
-                            <span class="kv-key">Emisní stupeň</span>
-                            <span class="kv-value">@Display(vozidlo?.StupenPlneniEmisniUrovne)</span>
-                        </div>
-                        <div class="kv-row d-flex justify-content-between">
-                            <span class="kv-key">CO2</span>
-                            <span class="kv-value">@DisplayRawOrDash(vozidlo?.Co2Raw)</span>
-                        </div>
-                    </div>
-                </div>
-            </content>
-            <content collapsed="true" title="<i class='fa-solid fa-ruler-combined me-2'></i> Rozměry a hmotnost" css-title="fs-5">
-                <div class="row">
-                    <div class="col-md-6">
-                        <div class="kv-row d-flex justify-content-between">
-                            <span class="kv-key">Délka / šířka / výška</span>
-                            <span class="kv-value">@DisplayRawOrDash(vozidlo?.CelkovaDelkaSirkaVyskaRaw)</span>
-                        </div>
-                        <div class="kv-row d-flex justify-content-between">
-                            <span class="kv-key">Rozvor</span>
-                            <span class="kv-value">@DisplayRawOrDash(vozidlo?.RozvorRaw)</span>
-                        </div>
-                        <div class="kv-row d-flex justify-content-between">
-                            <span class="kv-key">Rozchod</span>
-                            <span class="kv-value">@DisplayRawOrDash(vozidlo?.RozchodRaw)</span>
-                        </div>
-                    </div>
-                    <div class="col-md-6">
-                        <div class="kv-row d-flex justify-content-between">
-                            <span class="kv-key">Provozní hmotnost</span>
-                            <span class="kv-value">@DisplayRawOrDash(vozidlo?.ProvozniHmotnost)</span>
-                        </div>
-                        <div class="kv-row d-flex justify-content-between">
-                            <span class="kv-key">Největší technicky přípustná</span>
-                            <span class="kv-value">@DisplayRawOrDash(vozidlo?.NejvetsiTechnickyPripustnaPovolenaHmotnostRaw)</span>
-                        </div>
-                        <div class="kv-row d-flex justify-content-between">
-                            <span class="kv-key">Počet míst</span>
-                            <span class="kv-value">@DisplayRawOrDash(vozidlo?.PocetMistRaw)</span>
-                        </div>
-                    </div>
-                </div>
-            </content>
-            <content collapsed="true" title="<i class='fa-solid fa-calendar-check me-2'></i> STK - technické prohlídky" css-title="fs-5">
-                <div class="row">
-                    <div class="col-12">
-                        @if (technickeProhlidky.Any())
-                        {
-                            <div class="table-responsive">
-                                <table class="table history-table align-middle mb-0">
-                                    <thead>
-                                        <tr>
-                                            <th>Typ</th>
-                                            <th>Stav</th>
-                                            <th>Stanice</th>
-                                            <th>Platnost</th>
-                                            <th>Protokol</th>
-                                            <th>Aktuální</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        @foreach (var prohlidka in technickeProhlidky.OrderByDescending(item => item.PlatnostOd))
-                                        {
-                                            <tr>
-                                                <td>@Display(prohlidka?.Typ)</td>
-                                                <td>@Display(prohlidka?.Stav)</td>
-                                                <td>@DisplayRawOrDash(prohlidka?.NazevStk)</td>
-                                                <td>@Display(prohlidka?.PlatnostOd) - @Display(prohlidka?.PlatnostDo)</td>
-                                                <td>@DisplayRawOrDash(prohlidka?.CisloProtokolu)</td>
-                                                <td>@Display(prohlidka?.Aktualni)</td>
-                                            </tr>
-                                        }
-                                    </tbody>
-                                </table>
-                            </div>
-                        }
-                        else
-                        {
-                            <div class="history-muted">Bez záznamů.</div>
-                        }
-                    </div>
-                </div>
-            </content>
-            <content collapsed="true" title="<i class='fa-solid fa-user me-2'></i> Majitelé a provozovatelé" css-title="fs-5">
-                <div class="row">
-                    <div class="col-12">
-                        @if (ownersHistory.Any())
-                        {
-                            <div class="table-responsive">
-                                <table class="table history-table align-middle mb-0">
-                                    <thead>
-                                        <tr>
-                                            <th>Vztah</th>
-                                            <th>Subjekt</th>
-                                            <th>IČO</th>
-                                            <th>Adresa</th>
-                                            <th>Období</th>
-                                            <th>Aktuální</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        @foreach (var owner in ownersHistory.OrderByDescending(item => item.DatumOd))
-                                        {
-                                            <tr>
-                                                <td>@DisplayRawOrDash(owner?.FormaVlastnictvi.ToString())</td>
-                                                <td>@Display(owner?.Nazev)</td>
-                                                <td>@Display(owner?.Ico)</td>
-                                                <td>@Display(owner?.Adresa)</td>
-                                                <td>@Display(owner?.DatumOd) - @Display(owner?.DatumDo)</td>
-                                                <td>@Display(owner?.Aktualni)</td>
-                                            </tr>
-                                        }
-                                    </tbody>
-                                </table>
-                            </div>
-                        }
-                        else
-                        {
-                            <div class="history-muted">Bez záznamů.</div>
-                        }
-                    </div>
-
-                </div>
-            </content>
-        </accordion>
-
-
-
-
-    </div>
-</section>
+    </section>
 
 
 
@@ -374,8 +428,13 @@
     private static string Display(int? value)
         => value.HasValue ? $"{HlidacStatu.Util.RenderData.NiceNumber(value.Value)}" : "-";
 
+    private static string Display(DateTime? value)
+        => value.HasValue ? value.Value.ToString("d.M.yyyy", CultureInfo.InvariantCulture) : "-";
     private static string Display(DateOnly? value)
         => value.HasValue ? value.Value.ToString("d.M.yyyy", CultureInfo.InvariantCulture) : "-";
+
+    private static string DisplayPerson(string value)
+        => string.IsNullOrWhiteSpace(value) ? "fyzická osoba" : value;
 
     private static string DisplayRawOrDash(string value)
         => string.IsNullOrWhiteSpace(value) ? "-" : value;
