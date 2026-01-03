@@ -42,7 +42,8 @@
                     return s.Kategorie.Kod.ShortenMe(2);
                 },
                 ValueRender = (s) => { return s.Kategorie.Kod.ShortenMe(2); },
-                TextRender = (s) => { return s.Kategorie.Kod.ShortenMe(2); }
+                TextRender = (s) => { return s.Kategorie.Kod.ShortenMe(2); },
+                CssClass = "d-none d-lg-table-cell"
             },
             new  ReportDataSource<VozidloLightPerIco>.Column() {
                 Name="Palivo",
@@ -50,7 +51,8 @@
                     return $"<span title='{s.Palivo}'>{s.Palivo.Trim().ShortenMe(2)}</span>";
                 },
                 ValueRender = (s) => { return s.Palivo; },
-                TextRender = (s) => { return s.Palivo; }
+                TextRender = (s) => { return s.Palivo; },
+                CssClass = "d-none d-lg-table-cell"
             },
             new  ReportDataSource<VozidloLightPerIco>.Column() {
                 Name="Rok výroby",
@@ -65,7 +67,8 @@
             new  ReportDataSource<VozidloLightPerIco>.Column() {
                 Name="Majitel",
                 HtmlRender =(s) => {
-                    return string.Join("<br />", s.Majitel_v_dobe.Select(m=> m.ToNiceString(dateFormat:"yyyy")));
+                    return string.Join("<br />", s.Majitel_v_dobe.Select(m=> m.ToNiceString(dateFormat:"yyyy")))
+                    + "&nbsp;";
                 },
                 ValueRender = (s) => { return s.Majitel_v_dobe.LastOrDefault()?.From?.ToString("yyyy"); },
                 TextRender = (s) => { return s.Majitel_v_dobe.LastOrDefault()?.From?.ToString("yyyy") ;}
@@ -73,19 +76,19 @@
             new  ReportDataSource<VozidloLightPerIco>.Column() {
                 Name="Provozovatel",
                 HtmlRender =(s) => {
-                    return string.Join("<br />", s.Provozovatel_v_dobe.Select(m=> m.ToNiceString(dateFormat:"yyyy")));
+                    return string.Join("<br />", s.Provozovatel_v_dobe.Select(m=> m.ToNiceString(dateFormat:"yyyy")))
+                        + "&nbsp;";
                 },
                 ValueRender = (s) => { return s.Provozovatel_v_dobe.LastOrDefault()?.From?.ToString("yyyy"); },
                 TextRender = (s) => { return s.Provozovatel_v_dobe.LastOrDefault()?.From?.ToString("yyyy") ;}
             },
             new  ReportDataSource<VozidloLightPerIco>.Column() {
-                Name="STK do",
+                Name="Detail",
                 HtmlRender =(s) => {
-                    return s.PlastnostStk?.ToString("MM.yyyy");
+                    return $"<a href='/vozidla/vin/{s.VIN}'>Detail</a>";
                 },
-                ValueRender = (s) => { return s.PlastnostStk?.ToString("MM.yyyy"); },
-                TextRender = (s) => { return s.PlastnostStk?.ToString("MM.yyyy") ;},
-                OrderValueRender = (s) => { return HlidacStatu.Util.RenderData.OrderValueFormat(s.PlastnostStk?.ToDateTime(default)); }
+                ValueRender = (s) => { return s.VIN; },
+                TextRender = (s) => { return s.VIN ;},
             },
         });
 
@@ -94,7 +97,38 @@
 
 <div id="subjcontent_toc">
 
+    @if (User.IsInRole("Admin") == false)
+    {
+        <p>Tato stránka bude dostupná až za několik dní</p>
+        return;
+    }
+    <div class="p-5 border border-3">
+    <h2>Test pristupu pro supporters</h2>
+
+    <role-limited roles="Admin,Supporter" hide-any-content="false">
+        <pass>
+            Jsi admin, zde bys viděl všechna vozidla
+            <hr />
+            <hidecontent height="70">
+                <span>@Html.Raw(string.Join("<br />", vozidla.Select(m=>$"Detail o vozidle {Html.Encode(m.Tovarni_znacka)} {Html.Encode(m.Model)}").Take(2)))
+                </span>
+            </hidecontent>
+            <p class="text-center">
+                <partial name="WebUtil/DynamicModal"
+                         model="@(new DynamicModalViewModel(
+                        $"/api/v1/SupporterOnly",
+                        nazevOdkazu: $"<span class='btn btn-hs btn-primary btn-sm my-3 position-relative'>Celý vozový park podrobně <span class='position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger'>" + HlidacStatu.Util.RenderData.NiceNumber(vozidla.Count) + "</span></span>",
+                        width: DynamicModalViewModel.WidthSizeEnum.Large
+                    ))" />
+            </p>
+        </pass>
+        <else>
+        </else>
+    </role-limited>
+    </div>
+    <hr / >
    <h3>Aktuální vozový park</h3>
+
     @Html.DataToHTMLTable(rds, dataTableOptions: HtmlExtensions.DatatableOptions(pageLength: 20))
 
     @{

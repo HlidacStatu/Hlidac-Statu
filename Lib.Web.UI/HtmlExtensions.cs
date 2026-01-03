@@ -602,7 +602,7 @@ $(document).ready(function () {
                 sb.Append("<thead><tr>");
                 foreach (var column in rds.Columns)
                 {
-                    sb.AppendFormat("<th>{0}</th>", column.Name);
+                    sb.AppendFormat($"<th{(string.IsNullOrEmpty(column.CssClass) ? "" : $" class='{column.CssClass}'" )}>{column.Name}</th>");
                 }
                 sb.Append("</tr></thead>");
             }

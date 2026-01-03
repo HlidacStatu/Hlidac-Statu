@@ -745,7 +745,7 @@
                     <p>
                         <b>@Devmasters.Lang.CS.Plural.Get(subjectsWithSubsidiesCount, "Jedna podřízená organizace", "{0} podřízená organizace", "{0} podřízených organizací")</b>
                         (z
-                        celkem @HlidacStatu.Util.RenderData.NiceNumber(Model.PocetPodrizenychSubjektu( Relation.CharakterVazbyEnum.VlastnictviKontrola, Relation.AktualnostType.Nedavny)))
+                        celkem @HlidacStatu.Util.RenderData.NiceNumber(Model.PocetPodrizenychSubjektu(Relation.CharakterVazbyEnum.VlastnictviKontrola, Relation.AktualnostType.Nedavny)))
                         úřadu @Devmasters.TextUtil.ShortenText(Model.Jmeno, 35)
 
                         @Devmasters.Lang.CS.Plural.Get(subjectsWithSubsidiesCount,
@@ -770,7 +770,7 @@
                     <p>
                         <b>@Devmasters.Lang.CS.Plural.Get(subjectsWithSubsidiesCount, "Jedna dceřiná společnost", "{0} dceřiné společnosti", "{0} dceřiných společností")</b>
                         (z
-                        celkem @HlidacStatu.Util.RenderData.NiceNumber(Model.PocetPodrizenychSubjektu( Relation.CharakterVazbyEnum.VlastnictviKontrola, Relation.AktualnostType.Nedavny)))
+                        celkem @HlidacStatu.Util.RenderData.NiceNumber(Model.PocetPodrizenychSubjektu(Relation.CharakterVazbyEnum.VlastnictviKontrola, Relation.AktualnostType.Nedavny)))
                         firmy @Devmasters.TextUtil.ShortenText(Model.Jmeno, 35)
 
                         @Devmasters.Lang.CS.Plural.Get(subjectsWithSubsidiesCount,
@@ -1076,7 +1076,7 @@
         intv = laps.StopPreviousAndStartNextLap("Registr vozidel");
     }
 
-    @if (User.IsInRole("Admin"))
+    @if (Model.PatrimStatu())
     {
         <div>
             @{
@@ -1095,27 +1095,23 @@
                              model="new Tuple<Firma, IEnumerable<HlidacStatu.RegistrVozidel.Models.VozidloLight>>(Model, vozidla.Where(m => m.Aktualni == false))" />
 
                 </div>
-
-                <p class="text-center">
-                    <a href="/subjekt/vozovypark/@Model.ICO" class='btn btn-hs btn-primary btn-sm my-3 position-relative'>Celý vozový park podrobně <span class='position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger'>@(HlidacStatu.Util.RenderData.NiceNumber(vozidla.Count))</span></a>
-                </p>
-                <role-limited roles="Admin,Supporter" hide-any-content="true">
-                    <pass>
-                        <hidecontent height="70">
-                        </hidecontent>
-                        <p class="text-center">
-                            <partial name="WebUtil/DynamicModal"
-                                     model="@(new DynamicModalViewModel(
-                                                                             $"/api/v1/SupporterOnly",
-                                                                             nazevOdkazu: $"<span class='btn btn-hs btn-primary btn-sm my-3 position-relative'>Celý vozový park podrobně <span class='position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger'>" + HlidacStatu.Util.RenderData.NiceNumber(vozidla.Count) + "</span></span>",
-                                                                             width: DynamicModalViewModel.WidthSizeEnum.Large
-                                                                         ))" />
-                </p>
-            </pass>
-            <else>
-            </else>
-        </role-limited>
+                @if (User.IsInRole("Admin"))
+                {
+                    <p class="text-center">
+                        <a href="/subjekt/vozovypark/@Model.ICO" class='btn btn-hs btn-primary btn-sm my-3 position-relative'>Celý vozový park podrobně <span class='position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger'>@(HlidacStatu.Util.RenderData.NiceNumber(vozidla.Count))</span></a>
+                    </p>
                 }
+                else
+                {
+
+                    <p>
+                        Detailní informace o vozovém parku státních organizací ukážeme už za několik dní.
+                    </p>
+
+                }
+                <hr />
+
+            }
         </div>
 
     }
@@ -1413,13 +1409,13 @@
                 @if (Model.PatrimStatu())
                 {
                     <span>
-                        Řídí <a href="/subjekt/Vazby/@Model.ICO">@Devmasters.Lang.CS.Plural.Get(Model.PocetPodrizenychSubjektu( Relation.CharakterVazbyEnum.VlastnictviKontrola, Relation.AktualnostType.Nedavny), "jednu podřízenou organizaci", "{0} podřízené organizace", "{0} podřízených organizací").</a>
+                        Řídí <a href="/subjekt/Vazby/@Model.ICO">@Devmasters.Lang.CS.Plural.Get(Model.PocetPodrizenychSubjektu(Relation.CharakterVazbyEnum.VlastnictviKontrola, Relation.AktualnostType.Nedavny), "jednu podřízenou organizaci", "{0} podřízené organizace", "{0} podřízených organizací").</a>
                     </span>
                 }
                 else
                 {
                     <span>
-                        Má vazbu na <a href="/subjekt/Vazby/@Model.ICO">@Devmasters.Lang.CS.Plural.Get(Model.PocetPodrizenychSubjektu( Relation.CharakterVazbyEnum.VlastnictviKontrola, Relation.AktualnostType.Nedavny), "jeden podřízený subjekt", "{0} podřízené subjekty", "{0} podřízených subjektů").</a>
+                        Má vazbu na <a href="/subjekt/Vazby/@Model.ICO">@Devmasters.Lang.CS.Plural.Get(Model.PocetPodrizenychSubjektu(Relation.CharakterVazbyEnum.VlastnictviKontrola, Relation.AktualnostType.Nedavny), "jeden podřízený subjekt", "{0} podřízené subjekty", "{0} podřízených subjektů").</a>
                     </span>
                 }
             </p>
@@ -1438,7 +1434,7 @@
                 <a href="/subjekt/Vazby/@Model.ICO" class="btn btn-hs btn-primary btn-sm my-3 position-relative">
                     Vypsat všechny dceřinné společnosti a orgány
                     <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
-                        @(HlidacStatu.Util.RenderData.NiceNumber(Model.PocetPodrizenychSubjektu( Relation.CharakterVazbyEnum.VlastnictviKontrola, Relation.AktualnostType.Nedavny) + vazbyOsoby.Count()))
+                        @(HlidacStatu.Util.RenderData.NiceNumber(Model.PocetPodrizenychSubjektu(Relation.CharakterVazbyEnum.VlastnictviKontrola, Relation.AktualnostType.Nedavny) + vazbyOsoby.Count()))
                     </span>
                 </a>
             </p>
@@ -1457,11 +1453,11 @@
                 Typicky společnosti spravované v rámci insolvence, exekuce a dalších obdobných řízení. Nejde o majetkové vazby.
             </p>
             <p>
-                    <span>
-                        Spravuje či řeší <a href="/subjekt/Vazby/@Model.ICO">
-                            @Devmasters.Lang.CS.Plural.Get(Model.PocetPodrizenychSubjektu(Relation.CharakterVazbyEnum.Uredni, Relation.AktualnostType.Nedavny), "jeden subjekt", "{0} subjekty", "{0} subjektů").
-                            </a>
-                    </span>
+                <span>
+                    Spravuje či řeší <a href="/subjekt/Vazby/@Model.ICO">
+                        @Devmasters.Lang.CS.Plural.Get(Model.PocetPodrizenychSubjektu(Relation.CharakterVazbyEnum.Uredni, Relation.AktualnostType.Nedavny), "jeden subjekt", "{0} subjekty", "{0} subjektů").
+                    </a>
+                </span>
             </p>
             <p class="text-center">
                 <a href="/subjekt/VazbyUredni/@Model.ICO" class="btn btn-hs btn-primary btn-sm my-3 position-relative">
