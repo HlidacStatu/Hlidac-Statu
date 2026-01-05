@@ -73,7 +73,7 @@ public static class Common
                 Firma firma = null;
                 try
                 {
-                    firma = FirmaRepo.FromIco(donor.CompanyId);
+                    firma = await FirmaRepo.FromIcoAsync(donor.CompanyId);
                 }
                 catch (Exception ex)
                 {

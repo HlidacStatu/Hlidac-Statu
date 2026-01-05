@@ -19,4 +19,4 @@ dotnet_diagnostic.CSE005.severity = suggestion
 dotnet_diagnostic.VSTHRD002.severity = error
 
 # VSTHRD103: Call async methods when in an async method
-dotnet_diagnostic.VSTHRD103.severity = suggestion
+dotnet_diagnostic.VSTHRD103.severity = error
