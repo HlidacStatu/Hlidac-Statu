@@ -34,6 +34,17 @@
             --bs-accordion-active-color: var(--bs-warning-text-emphasis);
             --bs-accordion-active-bg: var(--bs-warning-bg-subtle);
         }
+        .brand-badge {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--bs-secondary-text-emphasis);
+            /* background-color: var(--bs-secondary-bg-subtle);
+            display: inline-block; */
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            margin-bottom: 1rem;
+            text-align:center;
+        }
     </style>
 }
 
@@ -130,7 +141,13 @@
         <div class="title-card">
             <div class="row align-items-center">
                 <div class="col-md-3 col-sm-4 col-12 text-center text-md-start mb-3 mb-md-0">
-                    <div class="brand-badge">@Display(vozidlo?.TovarniZnacka)</div>
+                    @if( !string.IsNullOrWhiteSpace(vozidlo?.Logoslug))
+                    {
+                    <div  class="text-center">
+                        <img src="https://somedata.hlidacstatu.cz/v/optimized/@(vozidlo.Logoslug).png" style="max-width:80%;max-height:9rem" />
+                    </div>
+                    }
+                    <div class="brand-badge align-content-center">@Display(vozidlo?.TovarniZnacka)</div>
                 </div>
                 <div class="col-md-9 col-sm-8 col-12">
                     <div class="row">
