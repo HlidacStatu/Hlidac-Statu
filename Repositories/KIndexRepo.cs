@@ -206,7 +206,6 @@ public static class KIndexRepo
 
 
     //KIndexFeedback
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "VSTHRD103:Call async methods when in an async method", Justification = "<Pending>")]
     public static async Task SaveAsync(this KindexFeedback kindexFeedback)
         {
             if (string.IsNullOrWhiteSpace(kindexFeedback.Id))
@@ -215,7 +214,7 @@ public static class KIndexRepo
             }
             if (string.IsNullOrWhiteSpace(kindexFeedback.Company))
             {
-                var firma = FirmaRepo.FromIco(kindexFeedback.Ico);
+                var firma = await FirmaRepo.FromIcoAsync(kindexFeedback.Ico);
                 kindexFeedback.Company = firma.Jmeno;
             }
 

@@ -722,8 +722,7 @@ namespace HlidacStatu.Extensions
                 await FirmaCache.InvalidateInfoFactsAsync(firma);
             return await FirmaCache.GetInfoFactsAsync(firma);
         }
-
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "VSTHRD103:Call async methods when in an async method", Justification = "<Pending>")]
+        
         public static async Task<InfoFact[]> GetDirectInfoFactsAsync(Firma firma)
         {
             var sName = firma.ObecneJmeno();
@@ -852,7 +851,7 @@ namespace HlidacStatu.Extensions
                             .ToArray();
                         decimal celkem = sponzoring.Sum(m => m.Hodnota) ?? 0;
                         decimal top = sponzoring.Max(m => m.Hodnota) ?? 0;
-                        string prvniStrana = FirmaRepo.FromIco(strany[0]).Jmeno;
+                        string prvniStrana = (await FirmaRepo.FromIcoAsync(strany[0])).Jmeno;
 
                         f.Add(new InfoFact($"{sName} "
                                            + Devmasters.Lang.CS.Plural.Get(roky.Count(), "v roce " + roky[0],
