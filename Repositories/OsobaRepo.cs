@@ -22,13 +22,7 @@ namespace HlidacStatu.Repositories
     public static partial class OsobaRepo
     {
         private static readonly ILogger _logger = Log.ForContext(typeof(OsobaRepo));
-        public static Osoba GetOrCreateNew(string titulPred, string jmeno, string prijmeni, string titulPo,
-            string narozeni, Osoba.StatusOsobyEnum status, string user
-        )
-        {
-            return GetOrCreateNew(titulPred, jmeno, prijmeni, titulPo, Devmasters.DT.Util.ToDate(narozeni), status,
-                user);
-        }
+        
 
         public static Osoba GetOrCreateNew(string titulPred, string jmeno, string prijmeni, string titulPo,
             DateTime? narozeni, Osoba.StatusOsobyEnum status, string user, DateTime? umrti = null)
@@ -97,14 +91,15 @@ namespace HlidacStatu.Repositories
 
         public static Osoba[] ParentOsoby(this Osoba osoba, Relation.AktualnostType minAktualnost)
         {
-            var _parents = _getAllParents(osoba.InternalId, minAktualnost)
+            var _parents = GetAllParents(osoba.InternalId, minAktualnost)
                     .Select(m => Osoby.GetById.Get(m))
                     .Where(m => m != null)
                     .ToArray();
 
             return _parents;
         }
-        public static HashSet<int> _getAllParents(int osobaInternalId, Relation.AktualnostType minAktualnost,
+
+        private static HashSet<int> GetAllParents(int osobaInternalId, Relation.AktualnostType minAktualnost,
     HashSet<int> currList = null)
         {
             currList = currList ?? new HashSet<int>();
@@ -122,7 +117,7 @@ namespace HlidacStatu.Repositories
                 else
                 {
                     currList.Add(Convert.ToInt32(f.From.Id));
-                    var newParents = _getAllParents(Convert.ToInt32(f.From.Id), minAktualnost, currList);
+                    var newParents = GetAllParents(Convert.ToInt32(f.From.Id), minAktualnost, currList);
                     foreach (var np in newParents)
                     {
                         currList.Add(np);
@@ -395,7 +390,7 @@ namespace HlidacStatu.Repositories
         }
 
 
-        public static Osoba MergeWith(this Osoba original, Osoba duplicated, string user)
+        public static async Task<Osoba> MergeWithAsync(this Osoba original, Osoba duplicated, string user)
         {
             if (original.InternalId == duplicated.InternalId)
                 return original;
@@ -403,8 +398,8 @@ namespace HlidacStatu.Repositories
             //todo: předělat do transakce tak, aby se neukládaly samostatné části ?!
             SponzoringRepo.MergeDonatingOsoba(original.InternalId, duplicated.InternalId, user);
 
-            List<OsobaEvent> duplicateEvents = OsobaEventRepo.GetByOsobaId(duplicated.InternalId);
-            List<OsobaEvent> originalEvents = OsobaEventRepo.GetByOsobaId(original.InternalId);
+            List<OsobaEvent> duplicateEvents = await OsobaEventRepo.GetByOsobaIdAsync(duplicated.InternalId);
+            List<OsobaEvent> originalEvents = await OsobaEventRepo.GetByOsobaIdAsync(original.InternalId);
             foreach (var dEv in duplicateEvents)
             {
                 //check duplicates
@@ -421,7 +416,7 @@ namespace HlidacStatu.Repositories
                     );
                 if (exists == false)
                 {
-                    original.AddOrUpdateEvent(dEv, user);
+                    await original.AddOrUpdateEventAsync(dEv, user);
                 }
             }
 

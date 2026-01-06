@@ -10,7 +10,7 @@
     string ico = Model.Ico;
     Firma f = Firmy.Get(ico);
     ViewBag.Title = $"{Model.Nazev}";
-    var ceo = f.Ceo();
+    var ceo = await f.CurrentCeoAsync();
 }
 
 @section breadcrumbs

@@ -343,35 +343,18 @@ namespace HlidacStatu.Extensions
             return new HlidacStatu.Lib.Data.External.RPP.OVMFull.Osoba[] { };
 
         }
-
-
-        [Obsolete("Use OsobaEventRepo.GetCeos or FirmaExtension.Ceos and work it from there. This one might be faulty")]
-        public static (Osoba Osoba, DateTime? From, string Role) Ceo(this Firma firma)
+        
+        public static async Task<(Osoba Osoba, DateTime? From, string Role)> CurrentCeoAsync(this Firma firma)
         {
-            using (DbEntities db = new DbEntities())
-            {
-                var ceoEvent = db.OsobaEvent.AsQueryable()
-                    .Where(oe => oe.Ceo == 1 && oe.Ico == firma.ICO)
-                    .Where(oe => oe.DatumDo == null || oe.DatumDo >= DateTime.Now)
-                    .Where(oe => oe.DatumOd != null && oe.DatumOd <= DateTime.Now)
-                    .OrderByDescending(oe => oe.DatumOd)
-                    .FirstOrDefault();
-
-                if (ceoEvent is null)
-                    return (null, null, null);
-
-                var lastCeo = OsobaRepo.GetByInternalId(ceoEvent.OsobaId);
-                if (lastCeo is null || !lastCeo.IsValid())
-                    return (null, null, null);
-
-                return (lastCeo, ceoEvent.DatumOd, ceoEvent.AddInfo);
-            }
+            var ceos = await OsobaEventRepo.GetCeosAsync(firma.ICO);
+            var lastCeo = ceos.MaxBy(c => c.From); 
+            return (lastCeo.Osoba, lastCeo.From, lastCeo.Role);
         }
-        public static (Osoba Osoba, DateTime? From, DateTime? To, string Role)[] Ceos(
+        public static async Task<(Osoba Osoba, DateTime? From, DateTime? To, string Role)[]> CeosAsync(
             this Firma firma, DateTime? fromDate, DateTime? toDate,
             Expression<Func<OsobaEvent, bool>> predicate = null)
         {
-            return OsobaEventRepo.GetCeos(firma.ICO, fromDate, toDate, predicate);
+            return await OsobaEventRepo.GetCeosAsync(firma.ICO, fromDate, toDate, predicate);
         }
 
         public static IEnumerable<string> IcosInHolding(this Firma firma, Relation.AktualnostType aktualnost)

@@ -306,7 +306,7 @@ namespace HlidacStatu.Repositories
                     var fi = Firmy.Get(f.Item2);
                     if (fi.Valid)
                     {
-                        var o = fi.Ceo().Osoba;
+                        var o = (await fi.CurrentCeoAsync()).Osoba;
                         if (o != null)
                             img = $"<img src='{o.GetPhotoUrl(false, Osoba.PhotoTypes.NoBackground)}' />";
                     }
@@ -361,15 +361,14 @@ namespace HlidacStatu.Repositories
             var lockObj = new object();
             List<Autocomplete> results = new List<Autocomplete>();
             var obce = await FirmaCache.GetSubjektyForOborAsync(Firma.Zatrideni.SubjektyObory.Obce);
-            Devmasters.Batch.Manager.DoActionForAll<Firma.Zatrideni.Item>(obce,
-                (f) =>
+            await Devmasters.Batch.Manager.DoActionForAllAsync<Firma.Zatrideni.Item>(obce, async (f) =>
                 {
                     string img = "<i class='fas fa-city'></i>";
 
                     var fi = Firmy.Get(f.Ico);
                     if (fi.Valid)
                     {
-                        var o = fi.Ceo().Osoba;
+                        var o = (await fi.CurrentCeoAsync()).Osoba;
                         if (o != null)
                             img = $"<img src='{o.GetPhotoUrl(false, Osoba.PhotoTypes.NoBackground)}' />";
                     }

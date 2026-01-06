@@ -1,9 +1,7 @@
 using HlidacStatu.Entities;
 using HlidacStatu.Extensions;
 using HlidacStatu.Util;
-
 using Microsoft.EntityFrameworkCore;
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,34 +13,32 @@ namespace HlidacStatu.Repositories
 {
     public static class OsobaEventRepo
     {
-        public static OsobaEvent GetById(int id)
+        public static async Task<OsobaEvent> GetByIdAsync(int id)
         {
-            using (DbEntities db = new DbEntities())
-            {
-                return db.OsobaEvent.AsQueryable()
-                    .Where(m =>
-                        m.Pk == id
-                    )
-                    .FirstOrDefault();
-            }
+            await using DbEntities db = new DbEntities();
+            
+            return await db.OsobaEvent
+                .Where(m =>
+                    m.Pk == id
+                )
+                .FirstOrDefaultAsync();
         }
 
-        public static IEnumerable<OsobaEvent> GetByEvent(Expression<Func<OsobaEvent, bool>> predicate)
+        public static async Task<IEnumerable<OsobaEvent>> GetByEventAsync(Expression<Func<OsobaEvent, bool>> predicate)
         {
-            using (DbEntities db = new DbEntities())
-            {
-                var events = db.OsobaEvent
-                    .Where(predicate);
+            await using DbEntities db = new DbEntities();
+            var events = await db.OsobaEvent
+                .Where(predicate)
+                .ToListAsync();
 
-                return events.ToList();
-            }
+            return events.ToList();
         }
 
-        public static List<OsobaEvent> GetByOsobaId(int osobaId, Expression<Func<OsobaEvent, bool>> predicate = null)
+        public static async Task<List<OsobaEvent>> GetByOsobaIdAsync(int osobaId, Expression<Func<OsobaEvent, bool>> predicate = null)
         {
-            using DbEntities db = new DbEntities();
+            await using DbEntities db = new DbEntities();
 
-            return GetByOsobaIdTracked(db, osobaId, predicate).AsNoTracking().ToList();
+            return await GetByOsobaIdTracked(db, osobaId, predicate).AsNoTracking().ToListAsync();
         }
 
 
@@ -57,12 +53,12 @@ namespace HlidacStatu.Repositories
             return query;
         }
 
-        public static List<OsobaEvent> GetByIco(string ico, Expression<Func<OsobaEvent, bool>> predicate = null)
+        public static async Task<List<OsobaEvent>> GetByIcoAsync(string ico, Expression<Func<OsobaEvent, bool>> predicate = null)
         {
             if (string.IsNullOrWhiteSpace(ico))
                 return Enumerable.Empty<OsobaEvent>().ToList();
 
-            using DbEntities db = new DbEntities();
+            await using DbEntities db = new DbEntities();
 
             var query = db.OsobaEvent
                 .AsNoTracking()
@@ -71,174 +67,111 @@ namespace HlidacStatu.Repositories
             if (predicate is not null)
                 query = query.Where(predicate);
 
-            return query.ToList();
+            return await query.ToListAsync();
         }
-        public static (Firma Firma, DateTime? From, DateTime? To, string Role)[] GetCeos(Osoba osoba, DateTime? from = null, DateTime? to = null)
-        {
-            using (DbEntities db = new DbEntities())
-            {
-                var ceoQuery = db.OsobaEvent.AsQueryable()
-                    .Where(oe => oe.Ceo == 1 && oe.OsobaId == osoba.InternalId);
+        
 
-                if (from is not null)
-                    ceoQuery = ceoQuery.Where(oe => oe.DatumDo == null || oe.DatumDo >= from);
-
-                if (to is not null)
-                    ceoQuery = ceoQuery.Where(oe => oe.DatumOd == null || oe.DatumOd <= to);
-
-                var ceoEvent = ceoQuery
-                    .OrderByDescending(oe => oe.DatumOd)
-                    .ToArray()
-                    .Select(m => (Firmy.Get(m.Ico), m.DatumOd, m.DatumDo, m.AddInfo))
-                    .ToArray();
-
-                if (ceoEvent is null)
-                    return Array.Empty<(Firma Firma, DateTime? From, DateTime? To, string Role)>();
-
-                return ceoEvent;
-            }
-        }
-
-        public static (Osoba Osoba, DateTime? From, DateTime? To, string Role)[] GetCeos(
+        public static async Task<(Osoba Osoba, DateTime? From, DateTime? To, string Role)[]> GetCeosAsync(
             string ico, DateTime? from = null, DateTime? to = null,
-            Expression<Func<OsobaEvent, bool>> predicate = null
-            )
+            Expression<Func<OsobaEvent, bool>> predicate = null)
         {
-            using (DbEntities db = new DbEntities())
-            {
-                var ceoQuery = db.OsobaEvent.AsQueryable()
-                    .Where(oe => oe.Ceo == 1 && oe.Ico == ico);
+            await using DbEntities db = new DbEntities();
+            
+            var ceoQuery = db.OsobaEvent.AsNoTracking()
+                .Where(oe => oe.Ceo == 1 && oe.Ico == ico);
 
-                if (from is not null)
-                    ceoQuery = ceoQuery.Where(oe => oe.DatumDo == null || oe.DatumDo >= from);
+            if (from is not null)
+                ceoQuery = ceoQuery.Where(oe => oe.DatumDo == null || oe.DatumDo >= from);
 
-                if (to is not null)
-                    ceoQuery = ceoQuery.Where(oe => oe.DatumOd == null || oe.DatumOd <= to);
+            if (to is not null)
+                ceoQuery = ceoQuery.Where(oe => oe.DatumOd == null || oe.DatumOd <= to);
 
-                if (predicate is not null)
-                    ceoQuery = ceoQuery.Where(predicate);
+            if (predicate is not null)
+                ceoQuery = ceoQuery.Where(predicate);
 
-                var ceoEvent = ceoQuery
-                    .OrderByDescending(oe => oe.DatumOd)
-                    .ToArray()
-                    .Select(m => (OsobaRepo.GetByInternalId(m.OsobaId), m.DatumOd, m.DatumDo, m.AddInfo))
-                    .ToArray();
+            var ceoEvents = await ceoQuery
+                .OrderByDescending(oe => oe.DatumOd)
+                .ToArrayAsync();
+                
+            var ceoEventsWithOsoba = ceoEvents
+                .Select(m => (OsobaRepo.GetByInternalId(m.OsobaId), m.DatumOd, m.DatumDo, m.AddInfo))
+                .ToArray();
 
-                if (ceoEvent is null)
-                    return Array.Empty<(Osoba Osoba, DateTime? From, DateTime? To, string Role)>();
+            if (ceoEventsWithOsoba is null)
+                return Array.Empty<(Osoba Osoba, DateTime? From, DateTime? To, string Role)>();
 
-                return ceoEvent;
-            }
+            return ceoEventsWithOsoba;
         }
+        
 
-        // tohle by ještě sneslo optimalizaci - ale až budou k dispozici data
-        public static IEnumerable<string> GetAddInfos(string jmeno, int? eventTypeId, int maxNumOfResults = 1500)
-        {
-            using (DbEntities db = new DbEntities())
-            {
-                var result = db.OsobaEvent.AsQueryable()
-                    .Where(m => m.Type == eventTypeId)
-                    .Where(m => m != null)
-                    .Where(m => m.AddInfo.Contains(jmeno))
-                    //.OrderBy(m => m.AddInfo)
-                    .Select(m => m.AddInfo)
-                    .Distinct()
-                    .Take(maxNumOfResults)
-                    .ToList();
-
-                return result;
-            }
-        }
-
-        public static IEnumerable<string> GetOrganisations(string jmeno, int? eventTypeId, int maxNumOfResults = 1500)
-        {
-            using (DbEntities db = new DbEntities())
-            {
-                var result = db.OsobaEvent.AsQueryable()
-                    .Where(m => m.Type == eventTypeId)
-                    .Where(m => m != null)
-                    .Where(m => m.Organizace.Contains(jmeno))
-                    //.OrderBy(m => m.AddInfo)
-                    .Select(m => m.Organizace)
-                    .Distinct()
-                    .Take(maxNumOfResults)
-                    .ToList();
-
-                return result;
-            }
-        }
-
-        public static IEnumerable<string> GetDistinctOrganisations(OsobaEvent.Types? eventType)
+        public static async Task<IEnumerable<string>> GetDistinctOrganisationsAsync(OsobaEvent.Types? eventType)
         {
             if (eventType is null)
                 return Enumerable.Empty<string>();
 
-            using DbEntities db = new DbEntities();
+            await using DbEntities db = new DbEntities();
 
-            return db.OsobaEvent.AsQueryable()
+            return await db.OsobaEvent.AsNoTracking()
                 .Where(m => m.Type == (int)eventType)
                 .Where(m => m.Organizace != null)
                 .Select(m => m.Organizace)
                 .Distinct()
                 .Take(100)
-                .ToList();
+                .ToListAsync();
 
         }
 
-        public static IEnumerable<string> GetDistinctAddInfo(OsobaEvent.Types? eventType, string organizace)
+        public static async Task<IEnumerable<string>> GetDistinctAddInfoAsync(OsobaEvent.Types? eventType, string organizace)
         {
             if (eventType is null || string.IsNullOrWhiteSpace(organizace))
                 return Enumerable.Empty<string>();
 
-            using DbEntities db = new DbEntities();
+            await using DbEntities db = new DbEntities();
 
-            return db.OsobaEvent.AsQueryable()
+            return await db.OsobaEvent.AsNoTracking()
                 .Where(m => m.Type == (int)eventType)
                 .Where(m => m.Organizace == organizace)
                 .Select(m => m.AddInfo)
                 .Distinct()
                 .Take(100)
-                .ToList();
+                .ToListAsync();
 
         }
+         
 
-
-
-        public static OsobaEvent CreateOrUpdate(OsobaEvent osobaEvent, string user,
+        public static async Task<OsobaEvent> CreateOrUpdateAsync(OsobaEvent osobaEvent, string user,
             [CallerMemberName] string callingByMethod = null,
-            [System.Runtime.CompilerServices.CallerLineNumber] int sourceLineNumber = 0
-            )
+            [System.Runtime.CompilerServices.CallerLineNumber] int sourceLineNumber = 0)
         {
             NormalizeOsobaEvent(osobaEvent);
 
-            using (DbEntities db = new DbEntities())
+            await using DbEntities db = new DbEntities();
+            
+            OsobaEvent eventToUpdate = null;
+            // známe PK
+            if (osobaEvent.Pk > 0)
             {
-                OsobaEvent eventToUpdate = null;
-                // známe PK
-                if (osobaEvent.Pk > 0)
-                {
-                    eventToUpdate = db.OsobaEvent.AsQueryable()
-                        .Where(ev =>
-                            ev.Pk == osobaEvent.Pk
-                        )
-                        .FirstOrDefault();
+                eventToUpdate = await db.OsobaEvent
+                    .Where(ev =>
+                        ev.Pk == osobaEvent.Pk
+                    )
+                    .FirstOrDefaultAsync();
 
-                    user = user + "<null>";
-                    user = user + $"|{callingByMethod}|{sourceLineNumber}";
-
-                    if (eventToUpdate != null)
-                        return UpdateEvent(eventToUpdate, osobaEvent, user, db);
-                }
-
-                eventToUpdate = GetDuplicate(osobaEvent, db);
+                user = user + "<null>";
+                user = user + $"|{callingByMethod}|{sourceLineNumber}";
 
                 if (eventToUpdate != null)
-                {
-                    return UpdateEvent(eventToUpdate, osobaEvent, user, db);
-                }
-
-                return CreateEvent(osobaEvent, user, db);
+                    return await UpdateEventAsync(eventToUpdate, osobaEvent, user, db);
             }
+
+            eventToUpdate = await GetDuplicateAsync(osobaEvent, db);
+
+            if (eventToUpdate != null)
+            {
+                return await UpdateEventAsync(eventToUpdate, osobaEvent, user, db);
+            }
+
+            return await CreateEventAsync(osobaEvent, user, db);
         }
 
         public static async Task<OsobaEvent> AddCleverCEOIntoOsobaEventAsync(
@@ -328,16 +261,17 @@ namespace HlidacStatu.Repositories
             }
 
             //find duplicate
-            using (var db = new DbEntities())
+            await using (var db = new DbEntities())
             {
-                var exists = db.OsobaEvent.AsNoTracking().AsQueryable()
+                var exists = await db.OsobaEvent.AsNoTracking()
                     .Where(ev =>
                         ev.OsobaId == osoba.InternalId
                         && ev.Ico == CeoOf.ICO
                         && ev.Ceo == 1
                         && ev.DatumOd == dateFrom
                         && ev.DatumDo == dateTo)
-                    .FirstOrDefault();
+                    .FirstOrDefaultAsync();
+                
                 if (exists != null)
                 {
                     if (overrideExisting)
@@ -355,23 +289,23 @@ namespace HlidacStatu.Repositories
             newOE.Ico = CeoOf.ICO;
             newOE.Organizace = CeoOf.Jmeno;
             newOE.Zdroj = zdroj;
-            return AddOrUpdateEvent(osoba, newOE, changingUser);
+            return await AddOrUpdateEventAsync(osoba, newOE, changingUser);
 
         }
 
-        public static OsobaEvent AddOrUpdateEvent(this Osoba osoba, OsobaEvent ev, string user)
+        public static async Task<OsobaEvent> AddOrUpdateEventAsync(this Osoba osoba, OsobaEvent ev, string user)
         {
             if (ev == null || osoba == null)
                 return null;
 
             ev.OsobaId = osoba.InternalId;
 
-            return CreateOrUpdate(ev, user);
+            return await CreateOrUpdateAsync(ev, user);
         }
 
-        private static OsobaEvent GetDuplicate(OsobaEvent osobaEvent, DbEntities db)
+        private static async Task<OsobaEvent> GetDuplicateAsync(OsobaEvent osobaEvent, DbEntities db)
         {
-            return db.OsobaEvent.AsQueryable()
+            return await db.OsobaEvent
                 .Where(ev =>
                     ev.OsobaId == osobaEvent.OsobaId
                     && ev.Ico == osobaEvent.Ico
@@ -380,10 +314,10 @@ namespace HlidacStatu.Repositories
                     && ev.DatumOd == osobaEvent.DatumOd
                     && ev.Type == osobaEvent.Type
                     && ev.Organizace == osobaEvent.Organizace)
-                .FirstOrDefault();
+                .FirstOrDefaultAsync();
         }
 
-        private static OsobaEvent CreateEvent(OsobaEvent osobaEvent, string user, DbEntities db)
+        private static async Task<OsobaEvent> CreateEventAsync(OsobaEvent osobaEvent, string user, DbEntities db)
         {
             if (osobaEvent.OsobaId == 0 && string.IsNullOrWhiteSpace(osobaEvent.Ico))
                 throw new Exception("Cant attach event to a person or to a company since their reference is empty");
@@ -393,7 +327,7 @@ namespace HlidacStatu.Repositories
             osobaEvent.ModifiedBy = user;
             osobaEvent.Modified = DateTime.Now;
             db.OsobaEvent.Add(osobaEvent);
-            db.SaveChanges();
+            await db.SaveChangesAsync();
             if (osobaEvent.OsobaId > 0)
             {
                 OsobaRepo.FlushCache(osobaEvent.OsobaId);
@@ -403,7 +337,7 @@ namespace HlidacStatu.Repositories
             return osobaEvent;
         }
 
-        private static OsobaEvent UpdateEvent(OsobaEvent eventToUpdate, OsobaEvent osobaEvent, string user,
+        private static async Task<OsobaEvent> UpdateEventAsync(OsobaEvent eventToUpdate, OsobaEvent osobaEvent, string user,
             DbEntities db)
         {
             if (eventToUpdate is null)
@@ -436,7 +370,7 @@ namespace HlidacStatu.Repositories
             eventToUpdate.ModifiedBy = user;
             eventToUpdate.Modified = DateTime.Now;
 
-            db.SaveChanges();
+            await db.SaveChangesAsync();
             if (osobaEvent.OsobaId > 0)
             {
                 OsobaRepo.FlushCache(osobaEvent.OsobaId);
@@ -446,18 +380,16 @@ namespace HlidacStatu.Repositories
             return eventToUpdate;
         }
 
-        public static void Delete(OsobaEvent osobaEvent, string user)
+        public static async Task DeleteAsync(OsobaEvent osobaEvent, string user)
         {
             if (osobaEvent.Pk > 0)
             {
-                using (DbEntities db = new DbEntities())
-                {
-                    db.OsobaEvent.Attach(osobaEvent);
-                    db.Entry(osobaEvent).State = EntityState.Deleted;
-                    AuditRepo.Add<OsobaEvent>(Audit.Operations.Delete, user, osobaEvent, null);
-                    Osoby.CachedEvents.Delete(osobaEvent.OsobaId);
-                    db.SaveChanges();
-                }
+                await using DbEntities db = new DbEntities();
+                db.OsobaEvent.Attach(osobaEvent);
+                db.Entry(osobaEvent).State = EntityState.Deleted;
+                AuditRepo.Add<OsobaEvent>(Audit.Operations.Delete, user, osobaEvent, null);
+                Osoby.CachedEvents.Delete(osobaEvent.OsobaId);
+                await db.SaveChangesAsync();
             }
         }
 

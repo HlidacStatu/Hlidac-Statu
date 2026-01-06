@@ -28,7 +28,7 @@
 
     Relation.AktualnostType? aktualnost = ViewBag.Aktualnost;
 
-    var ceo = Model.firma.Ceo();
+    var ceo = Model.firma.CurrentCeoAsync();
 
 }
 @section metatags

@@ -70,7 +70,7 @@ else
                 {
                     HlidacStatu.Lib.Analytics.StatisticsSubjectPerYear<Firma.Statistics.VZ> stat = await firma.StatistikaVerejneZakazkyAsync();
                     HlidacStatu.Lib.Analytics.StatisticsSubjectPerYear<Firma.Statistics.VZ> statHolding = await firma.HoldingStatistikaVerejneZakazkyAsync();
-                    var ceo = firma.Ceo();
+                    var ceo = await firma.CurrentCeoAsync();
 
                     <tr>
                         <td>
@@ -130,7 +130,7 @@ else
                 else
                 { //smlouvy
                     HlidacStatu.Lib.Analytics.StatisticsSubjectPerYear<Smlouva.Statistics.Data> stat = await firma.StatistikaRegistruSmluvAsync();
-                    var ceo = firma.Ceo();
+                    var ceo = await firma.CurrentCeoAsync();
                     var platyStat = await firma.GetPlatyStatAsync();
                     var platyOrgDetailMetadata = (await HlidacStatu.Repositories.PuRepo.GetFullDetailAsync(firma.DatovaSchranka))?
                                                     .MetadataPlatyUredniku.FirstOrDefault(m=>m.Rok == PuRepo.DefaultYear);

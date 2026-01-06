@@ -10,14 +10,10 @@
 @{
     Layout = null;
 
-    var ceo = Model.Ceo();
-
-
+    var ceo = await Model.CurrentCeoAsync();
 }
 
-
 @* company header *@
-
 
 <cache enabled="@(!System.Diagnostics.Debugger.IsAttached)" expires-after="@Constants.CachedActionLength.Cache12H" vary-by="@($"{Model.ICO}")">
     <partial name="_companySummary" model="@Model" />

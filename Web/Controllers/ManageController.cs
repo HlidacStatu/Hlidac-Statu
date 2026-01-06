@@ -5,15 +5,12 @@ using HlidacStatu.Entities.VZ;
 using HlidacStatu.Extensions;
 using HlidacStatu.Repositories;
 using HlidacStatu.Util;
-using HlidacStatu.Web.Filters;
 using HlidacStatu.Web.Models;
-
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -21,7 +18,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using HlidacStatu.Entities.KIndex;
 using Serilog;
-using HlidacStatu.Lib.Web.UI.Attributes;
 using HlidacStatu.LibCore.Filters;
 
 namespace HlidacStatu.Web.Controllers
@@ -36,26 +32,7 @@ namespace HlidacStatu.Web.Controllers
         {
             _userManager = userManager;
         }
-
-        // public async Task<ActionResult> LockUser()
-        // {
-        //     
-        //     var emailsToLock = new[] { "kwebeb@email.cz", "sample@email.tst" };
-        //
-        //     foreach (var email in emailsToLock)
-        //     {
-        //         var user = await _userManager.FindByEmailAsync(email);
-        //         if (user != null)
-        //         {
-        //             await _userManager.UpdateSecurityStampAsync(user); // invalidate cookies
-        //             await _userManager.UpdateAsync(user);
-        //         }
-        //     }
-        //
-        //     return Ok();
-        // }
-
-        //
+        
         // GET: /Manage/Index
         public async Task<ActionResult> Index(ManageMessageId? message)
         {
@@ -255,7 +232,6 @@ namespace HlidacStatu.Web.Controllers
         [HttpPost]
         public async Task<ActionResult> EditSmlouva(string Id, IFormCollection form)
         {
-            string oldJson = form["oldJson"];
             string newJson = form["jsonRaw"];
             Smlouva s = Newtonsoft.Json.JsonConvert.DeserializeObject<Smlouva>(newJson);
             await SmlouvaRepo.SaveAsync(s, fireOCRDone:true);
@@ -271,7 +247,7 @@ namespace HlidacStatu.Web.Controllers
 
         [Authorize(Roles = "canEditData")]
         [HttpPost]
-        public ActionResult AddPersons(IFormCollection form)
+        public async Task<ActionResult> AddPersons(IFormCollection form)
         {
             List<string> newIds = new List<string>();
             string tabdelimited = form["data"];
@@ -341,7 +317,7 @@ namespace HlidacStatu.Web.Controllers
                         Title = $"člen v {clenstviStrana}"
                     };
 
-                    OsobaEventRepo.CreateOrUpdate(clenStrany, User.Identity?.Name);
+                    await OsobaEventRepo.CreateOrUpdateAsync(clenStrany, User.Identity?.Name);
                 }
 
 
@@ -359,7 +335,7 @@ namespace HlidacStatu.Web.Controllers
                         Title = $"{eventRole} v {eventOrganizace}"
                     };
 
-                    OsobaEventRepo.CreateOrUpdate(dalsiEvent, User.Identity?.Name);
+                    await OsobaEventRepo.CreateOrUpdateAsync(dalsiEvent, User.Identity?.Name);
                 }
 
 

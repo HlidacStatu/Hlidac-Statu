@@ -130,7 +130,7 @@ namespace HlidacStatuApi.Controllers.ApiV2
         // /api/v2/firmy/social?typ=WWW&typ=Youtube
         [Authorize]
         [HttpGet("social")]
-        public ActionResult<List<FirmaSocialDTO>> Social([FromQuery] OsobaEvent.SocialNetwork typ)
+        public async Task<ActionResult<List<FirmaSocialDTO>>> Social([FromQuery] OsobaEvent.SocialNetwork typ)
         {
 
             var social = typ.ToString("G");
@@ -139,7 +139,7 @@ namespace HlidacStatuApi.Controllers.ApiV2
                 e.Type == (int)OsobaEvent.Types.SocialniSite
                 && e.Organizace == social;
 
-            var events = OsobaEventRepo.GetByEvent(socialNetworkFilter)
+            var events = (await OsobaEventRepo.GetByEventAsync(socialNetworkFilter))
                 .GroupBy(e => e.Ico)
                 .Select(g => TransformEventsToFirmaSocial(g))
                 .Where(r => r != null)
