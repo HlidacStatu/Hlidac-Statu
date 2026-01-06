@@ -2,7 +2,6 @@ using System.Diagnostics;
 using HlidacStatu.Datasets;
 using HlidacStatu.Entities;
 using HlidacStatu.Repositories;
-using HlidacStatu.Repositories.Searching;
 using HlidacStatu.Repositories.Statistics;
 
 namespace HlidacStatu.Extensions;
@@ -25,7 +24,7 @@ public static class OsobaExtension2
         if (isInteresting)
             return isInteresting;
 
-        if (osoba.IsSponzor())
+        if (await osoba.IsSponzorAsync())
             return true;
 
         bool maVztahySeStatem = await osoba.MaVztahySeStatemAsync();
@@ -48,7 +47,7 @@ public static class OsobaExtension2
 
     public static async Task<bool> MaVztahySeStatemAsync(this Osoba osoba)
     {
-        if (osoba.IsSponzor())
+        if (await osoba.IsSponzorAsync())
             return true;
 
         var cts = new CancellationTokenSource();
@@ -245,7 +244,7 @@ public static class OsobaExtension2
                     return true;
                 }
 
-                if (osoba.IsSponzor() == false && await osoba.MaVztahySeStatemAsync() == false)
+                if (await osoba.IsSponzorAsync() == false && await osoba.MaVztahySeStatemAsync() == false)
                 {
                     osoba.Status = (int)Osoba.StatusOsobyEnum.NeniPolitik;
                     return true;
@@ -260,7 +259,7 @@ public static class OsobaExtension2
                     chgnd = true;
                 }
 
-                if (chgnd && osoba.IsSponzor() == false && await osoba.MaVztahySeStatemAsync() == false)
+                if (chgnd && await osoba.IsSponzorAsync() == false && await osoba.MaVztahySeStatemAsync() == false)
                 {
                     osoba.Status = (int)Osoba.StatusOsobyEnum.NeniPolitik;
                     chgnd = true;

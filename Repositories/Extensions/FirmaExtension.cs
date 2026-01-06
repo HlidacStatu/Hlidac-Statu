@@ -44,9 +44,9 @@ namespace HlidacStatu.Extensions
         }
 
 
-        public static IEnumerable<SocialContact> GetSocialContacts(this Firma firma)
+        public static async Task<IEnumerable<SocialContact>> GetSocialContactsAsync(this Firma firma)
         {
-            return firma.Events(oe => oe.Type == (int)OsobaEvent.Types.SocialniSite)
+            return (await firma.EventsAsync(oe => oe.Type == (int)OsobaEvent.Types.SocialniSite))
                 .Select(oe => new SocialContact
                 {
                     Network = Enum.TryParse<OsobaEvent.SocialNetwork>(oe.Organizace, true, out var socialNetwork)
@@ -57,9 +57,9 @@ namespace HlidacStatu.Extensions
                 });
         }
 
-        public static async Task<bool> MaVztahySeStatemAsync(this Firma firma)
+        private static async Task<bool> MaVztahySeStatemAsync(this Firma firma)
         {
-            return firma.IsSponzor()
+            return await firma.IsSponzorAsync()
                    || (await firma.StatistikaRegistruSmluvAsync()).Sum(s => s.PocetSmluv) > 0
                    || (await VerejnaZakazkaRepo.Searching.SimpleSearchAsync("ico:" + firma.ICO, null, 1, 1, "0")).Total > 0
                    || (await DotaceRepo.Searching.SimpleSearchAsync("ico:" + firma.ICO, 1, 1, "0")).Total > 0;
@@ -72,7 +72,7 @@ namespace HlidacStatu.Extensions
                 var osoby = await firma.VazbyNaPolitikyAsync();
                 foreach (var o in osoby)
                 {
-                    var found = o.Sponzoring().Any(m => m.DarovanoDne < date);
+                    var found = (await o.SponzoringAsync()).Any(m => m.DarovanoDne < date);
                     if (found)
                         return true;
                 }
@@ -444,60 +444,58 @@ namespace HlidacStatu.Extensions
 
         public static bool JsemStatniFirma(this Firma firma) => firma.TypSubjektu == Firma.TypSubjektuEnum.PatrimStatu;
 
-        public static bool IsSponzor(this Firma firma)
+        public static async Task<bool> IsSponzorAsync(this Firma firma)
         {
-            return firma.Sponzoring().Any();
+            return (await firma.SponzoringAsync()).Any();
         }
 
-        public static IEnumerable<OsobaEvent> Events(this Firma firma)
+        public static async Task<OsobaEvent[]> EventsAsync(this Firma firma)
         {
-            return firma.Events(m => true);
+            return await firma.EventsAsync(m => true);
         }
 
-        public static IEnumerable<Sponzoring> Sponzoring(this Firma firma)
+        public static async Task<List<Sponzoring>> SponzoringAsync(this Firma firma)
         {
-            return firma.Sponzoring(m => true);
+            return await firma.SponzoringAsync(m => true);
         }
 
-        public static string SponzoringToHtml(this Firma firma, int take = int.MaxValue)
+        public static async Task<string> SponzoringToHtmlAsync(this Firma firma, int take = int.MaxValue)
         {
             return string.Join("<br />",
-                firma.Sponzoring()
+                (await firma.SponzoringAsync())
                     .OrderByDescending(s => s.DarovanoDne)
                     .Select(s => s.ToHtml())
                     .Take(take));
         }
 
-        public static IEnumerable<OsobaEvent> Events(this Firma firma, Expression<Func<OsobaEvent, bool>> predicate)
+        private static async Task<OsobaEvent[]> EventsAsync(this Firma firma, Expression<Func<OsobaEvent, bool>> predicate)
         {
-            using (DbEntities db = new DbEntities())
-            {
-                return db.OsobaEvent
-                    .AsNoTracking()
-                    .Where(predicate)
-                    .Where(m => m.Ico == firma.ICO)
-                    .ToArray();
-            }
+            await using DbEntities db = new DbEntities();
+            return await db.OsobaEvent
+                .AsNoTracking()
+                .Where(predicate)
+                .Where(m => m.Ico == firma.ICO)
+                .ToArrayAsync();
         }
 
-        public static IEnumerable<Sponzoring> Sponzoring(this Firma firma, Expression<Func<Sponzoring, bool>> predicate)
+        private static async Task<List<Sponzoring>> SponzoringAsync(this Firma firma, Expression<Func<Sponzoring, bool>> predicate)
         {
-            return SponzoringRepo.GetByDarce(firma.ICO, predicate);
+            return await SponzoringRepo.GetByDarceAsync(firma.ICO, predicate);
         }
 
-        public static Sponzoring AddSponsoring(this Firma firma, Sponzoring sponzoring, string user)
+        public static async Task<Sponzoring> AddSponsoringAsync(this Firma firma, Sponzoring sponzoring, string user)
         {
             sponzoring.IcoDarce = firma.ICO;
-            var result = SponzoringRepo.Create(sponzoring, user);
+            var result = await SponzoringRepo.CreateAsync(sponzoring, user);
             return result;
         }
 
-        public static string Description(this Firma firma, bool html, Expression<Func<OsobaEvent, bool>> predicate,
+        public static async Task<string> DescriptionAsync(this Firma firma, bool html, Expression<Func<OsobaEvent, bool>> predicate,
             string template = "{0}", string itemTemplate = "{0}",
             string itemDelimeter = "<br/>", int numOfRecords = int.MaxValue)
         {
-            var events = firma.Events(predicate);
-            if (events.Count() == 0)
+            var events = await firma.EventsAsync(predicate);
+            if (!events.Any())
                 return string.Empty;
             else
             {
@@ -528,7 +526,7 @@ namespace HlidacStatu.Extensions
         const string statniName = "Státní firma";
         const string firmaName = "Firma";
 
-        public static string ObecneJmeno(this Firma firma)
+        private static string ObecneJmeno(this Firma firma)
         {
             return firma.JsemOVM() ? uradName : (firma.JsemStatniFirma() ? statniName : firmaName);
         }
@@ -722,10 +720,10 @@ namespace HlidacStatu.Extensions
             if (stat.Sum(stat.YearsAfter2016(), s => s.PocetSmluv) == 0)
             {
                 f.Add(new InfoFact($"{sName} nemá žádné smluvní vztahy evidované s&nbsp;veřejnou správou. ",
-                    InfoFact.ImportanceLevel.Medium));
+                    Fact.ImportanceLevel.Medium));
                 f.Add(new InfoFact(
                     $"{(sMuzsky ? "Byl založen" : "Byla založena")} <b>{firma.Datum_Zapisu_OR?.ToString("d. M. yyyy")}</b>. ",
-                    InfoFact.ImportanceLevel.Medium));
+                    Fact.ImportanceLevel.Medium));
             }
             else
             {
@@ -744,7 +742,7 @@ namespace HlidacStatu.Extensions
                                            "celkem {0} smluv")
                                        + $" za <b>{RenderData.ShortNicePrice(statHolding[rok].CelkovaHodnotaSmluv, html: true)}</b>, "
 
-                        , InfoFact.ImportanceLevel.Summary)
+                        , Fact.ImportanceLevel.Summary)
                     );
                 }
                 else
@@ -754,7 +752,7 @@ namespace HlidacStatu.Extensions
                                            "{0} smlouvy s&nbsp;veřejnou správou",
                                            "celkem {0} smluv s&nbsp;veřejnou správou")
                                        + $" za <b>{RenderData.ShortNicePrice(stat[rok].CelkovaHodnotaSmluv, html: true)}</b>. "
-                        , InfoFact.ImportanceLevel.Summary)
+                        , Fact.ImportanceLevel.Summary)
                     );
 
                 (decimal zmena, decimal? procentniZmena) =
@@ -775,7 +773,7 @@ namespace HlidacStatu.Extensions
                             break;
                     }
 
-                    f.Add(new InfoFact(text, InfoFact.ImportanceLevel.Medium));
+                    f.Add(new InfoFact(text, Fact.ImportanceLevel.Medium));
                 }
 
                 if (stat[rok].PocetSmluvBezCeny > 0)
@@ -785,7 +783,7 @@ namespace HlidacStatu.Extensions
                         Devmasters.Lang.CS.Plural.Get(stat[rok].PocetSmluvBezCeny, "u&nbsp;jedné smlouvy",
                             "u&nbsp;{0} smluv", "u&nbsp;{0} smluv")
                         + $", což je celkem <b>{stat[rok].PercentSmluvBezCeny.ToString("P2")}</b> ze všech. ",
-                        InfoFact.ImportanceLevel.Medium)
+                        Fact.ImportanceLevel.Medium)
                     );
                 }
                 else if (stat[rok - 1].PocetSmluvBezCeny > 0)
@@ -795,7 +793,7 @@ namespace HlidacStatu.Extensions
                         Devmasters.Lang.CS.Plural.Get(stat[rok - 1].PocetSmluvBezCeny, "u&nbsp;jedné smlouvy",
                             "u&nbsp;{0} smluv", "u&nbsp;{0} smluv")
                         + $", což je celkem <b>{stat[rok - 1].PercentSmluvBezCeny.ToString("P2")}</b> ze všech. "
-                        , InfoFact.ImportanceLevel.Medium)
+                        , Fact.ImportanceLevel.Medium)
                     );
                 }
 
@@ -809,7 +807,7 @@ namespace HlidacStatu.Extensions
                     f.Add(new InfoFact($@"Má v registru smluv
                                     <b>{Devmasters.Lang.CS.Plural.GetWithZero((int)numFatalIssue, "0 smluv", "jednu smlouvu obsahující", "{0} smlouvy obsahující", "{0:### ### ##0} smluv obsahujících ")}
                                         tak závažné nedostatky v rozporu se zákonem,
-                                    </b>že jsou velmi pravděpodobně neplatné. ", InfoFact.ImportanceLevel.High));
+                                    </b>že jsou velmi pravděpodobně neplatné. ", Fact.ImportanceLevel.High));
                 }
 
                 if (numVazneIssue > 0)
@@ -817,7 +815,7 @@ namespace HlidacStatu.Extensions
                     f.Add(new InfoFact($@"Má v registru smluv
                                     <b>{Devmasters.Lang.CS.Plural.GetWithZero((int)numFatalIssue, "0 smluv", "jednu smlouvu obsahující", "{0} smlouvy obsahující", "{0:### ### ##0} smluv obsahujících ")}</b>
                                         vážné nedostatky. "
-                        , InfoFact.ImportanceLevel.Medium)
+                        , Fact.ImportanceLevel.Medium)
                     );
                 }
 
@@ -825,9 +823,9 @@ namespace HlidacStatu.Extensions
                 {
                     DateTime datumOd = new DateTime(DateTime.Now.Year - 10, 1, 1);
                     var sponzoring =
-                        firma.Sponzoring(s =>
-                            s.IcoPrijemce != null && s.DarovanoDne >= datumOd); // sponzoring pol. stran
-                    if (sponzoring != null && sponzoring.Count() > 0)
+                        await firma.SponzoringAsync(s => s.IcoPrijemce != null && s.DarovanoDne >= datumOd);
+                    
+                    if (sponzoring != null && sponzoring.Any())
                     {
                         string[] strany = sponzoring.Select(m => m.IcoPrijemce).Distinct().ToArray();
                         int[] roky = sponzoring.Select(m => m.DarovanoDne.Value.Year).Distinct().OrderBy(y => y)
@@ -845,7 +843,7 @@ namespace HlidacStatu.Extensions
                                                "{0} polit.strany", "{0} polit.stran")
                                            + $" v&nbsp;celkové výši <b>{RenderData.ShortNicePrice(celkem, html: true)}</b>. "
                                            + $"Nejvyšší sponzorský dar byl ve výši {RenderData.ShortNicePrice(top, html: true)}. "
-                            , InfoFact.ImportanceLevel.Medium)
+                            , Fact.ImportanceLevel.Medium)
                         );
                     }
                 }
@@ -890,7 +888,7 @@ namespace HlidacStatu.Extensions
                                 , " angažují {0} politicky angažované osoby - "
                                 , " angažuje {0} politicky angažovaných osob - ")
                             + sPolitici + ". "
-                            , InfoFact.ImportanceLevel.Medium)
+                            , Fact.ImportanceLevel.Medium)
                         );
                     }
                 }
@@ -902,7 +900,7 @@ namespace HlidacStatu.Extensions
                                            "jednu smlouvu; {0} smlouvy;{0} smluv")
                                        + $" s firmama s vazbou na politiky za celkem <b>{RenderData.ShortNicePrice(stat[rok].SumKcSmluvSponzorujiciFirmy, html: true)}</b> "
                                        + $" (tj. {stat[rok].PercentKcSmluvPolitiky.ToString("P2")}). "
-                        , InfoFact.ImportanceLevel.Medium)
+                        , Fact.ImportanceLevel.Medium)
                     );
                 }
                 else if (firma.PatrimStatu() && stat[rok - 1].PocetSmluvSponzorujiciFirmy > 0)
@@ -912,7 +910,7 @@ namespace HlidacStatu.Extensions
                                            "jednu smlouvu; {0} smlouvy;{0} smluv")
                                        + $" s firmama s vazbou na politiky za celkem <b>{RenderData.ShortNicePrice(stat[rok - 1].SumKcSmluvSponzorujiciFirmy, html: true)}</b> "
                                        + $" (tj. {stat[rok].PercentKcSmluvPolitiky.ToString("P2")}). "
-                        , InfoFact.ImportanceLevel.Medium)
+                        , Fact.ImportanceLevel.Medium)
                     );
                 }
 
@@ -923,7 +921,7 @@ namespace HlidacStatu.Extensions
                                        "{0} smlouvy v&nbsp;registru smluv",
                                        "celkem {0} smluv v&nbsp;registru smluv")
                                    + $" za <b>{RenderData.ShortNicePrice(stat.Sum(stat.YearsAfter2016(), s => s.CelkovaHodnotaSmluv), html: true)}</b>. "
-                    , InfoFact.ImportanceLevel.Low)
+                    , Fact.ImportanceLevel.Low)
                 );
             }
 
@@ -937,7 +935,7 @@ namespace HlidacStatu.Extensions
                                            "{0} smlouvy v&nbsp;registru smluv",
                                            "celkem {0} smluv v&nbspregistru smluv")
                                        + $" za <b>{RenderData.ShortNicePrice(statHolding[rok].CelkovaHodnotaSmluv, html: true)}</b>. "
-                        , InfoFact.ImportanceLevel.Low)
+                        , Fact.ImportanceLevel.Low)
                     );
 
                     string text = $"Mezi lety <b>{rok - 1}-{rok - 2000}</b> ";
@@ -961,7 +959,7 @@ namespace HlidacStatu.Extensions
                                 break;
                         }
 
-                        f.Add(new InfoFact(text, InfoFact.ImportanceLevel.Low));
+                        f.Add(new InfoFact(text, Fact.ImportanceLevel.Low));
                     }
                 }
             }

@@ -121,11 +121,10 @@
                                     </td>
                                     <td>
                                         @{
-                                            var strany = SponzoringRepo.GetByDarce(row.Id, m => true).Select(m => SponzoringRepo.IcoToKratkyNazev(m.IcoPrijemce))
+                                            var strany = (await SponzoringRepo.GetByDarceAsync(row.Id, m => true)).Select(m => SponzoringRepo.IcoToKratkyNazev(m.IcoPrijemce))
                                             .Where(m => m != null)
                                             .Distinct().OrderBy(m => m)
-                                            .Select(s => $"<a href='/Sponzori/Strana/{System.Net.WebUtility.UrlEncode(s)}'>{s}</a>")
-                                            ;
+                                            .Select(s => $"<a href='/Sponzori/Strana/{System.Net.WebUtility.UrlEncode(s)}'>{s}</a>");
                                         }
                                         @Html.Raw(string.Join(", ", strany))
                                     </td>
@@ -158,11 +157,10 @@
                                         </td>
                                         <td>
                                             @{
-                                                var strany = SponzoringRepo.GetByDarce(row.Id, m => true).Select(m => SponzoringRepo.IcoToKratkyNazev(m.IcoPrijemce))
+                                                var strany = (await SponzoringRepo.GetByDarceAsync(row.Id, m => true)).Select(m => SponzoringRepo.IcoToKratkyNazev(m.IcoPrijemce))
                                                 .Where(m => m != null)
                                                 .Distinct().OrderBy(m => m)
-                                                .Select(s => $"<a href='/Sponzori/Strana/{System.Net.WebUtility.UrlEncode(s)}'>{s}</a>")
-                                                ;
+                                                .Select(s => $"<a href='/Sponzori/Strana/{System.Net.WebUtility.UrlEncode(s)}'>{s}</a>");
                                             }
                                             @Html.Raw(string.Join(", ", strany))
                                         </td>

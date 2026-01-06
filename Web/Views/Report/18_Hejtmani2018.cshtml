@@ -7,93 +7,92 @@
 @using HlidacStatu.Repositories
 
 @{
-        Layout = "_ReportLayout";
+    Layout = "_ReportLayout";
 
     var showList = OsobaRepo.GetByZatrideni(OsobaRepo.Zatrideni.Hejtman, DateTime.Now)
         .OrderBy(o => o.Prijmeni)
         .ThenBy(o => o.Jmeno)
         .ToList();
-    //var allNames = StaticData.HejtmaniOd2020;
 
-    //List<Osoba> showList = null;
-    //showList = OsobaRepo.PolitickyAktivni.Get()
-    //    .Where(p => allNames.Contains(p.NameId))
-    //    .OrderBy(m => m.Prijmeni)
-    //    .ThenBy(m => m.Jmeno)
-    //    .ToList();
 
-    ReportDataSource<(Osoba Osoba, Osoba.Statistics.RegistrSmluv? Stat)> poslanciTable = new(new ReportDataSource<(Osoba Osoba, Osoba.Statistics.RegistrSmluv? Stat)>.Column[]
-   {
-                new() { Name="Hejtman",
-                    HtmlRender =(s) => {
-                        return string.Format("<a href='{0}'>{1}</a>", s.Osoba.GetUrl(), s.Osoba.FullNameWithYear(true))
-                        + "<br />"
-                        + Devmasters.TextUtil.ShortenText(s.Osoba.Description(false,m=> true, numOfRecords: 3), 250).Replace("\n", "<br />");
-                    },
-                    OrderValueRender = (s) => {
-                        return s.Osoba.FullName(false);
-                    }
-                },
-                new() {
-                    Name ="Strana/Hnutí",
-                    HtmlRender =(s) => {
-                        return s.Osoba.CurrentPoliticalParty();
-                    },
-                    OrderValueRender = (s) => {
-                        return s.Osoba.CurrentPoliticalParty();
+    ReportDataSource<(Osoba Osoba, Osoba.Statistics.RegistrSmluv? Stat, decimal? Sponzoring, string Description)> poslanciTable = new(new ReportDataSource<(Osoba Osoba, Osoba.Statistics.RegistrSmluv? Stat, decimal? Sponzoring, string Description)>.Column[]
+    {
+        new()
+        {
+            Name = "Hejtman",
+            HtmlRender = (s) =>
+            {
+                return $"<a href='{s.Osoba.GetUrl()}'>{s.Osoba.FullNameWithYear(true)}</a>"
+                       + "<br />"
+                       + Devmasters.TextUtil.ShortenText(s.Description, 250).Replace("\n", "<br />");
+            },
+            OrderValueRender = (s) => { return s.Osoba.FullName(false); }
+        },
+        new()
+        {
+            Name = "Strana/Hnutí",
+            HtmlRender = (s) => { return s.Osoba.CurrentPoliticalParty(); },
+            OrderValueRender = (s) => { return s.Osoba.CurrentPoliticalParty(); }
+        },
+        new()
+        {
+            Name = "Angažovanost",
+            HtmlRender = (s) =>
+            {
+                string sout = "";
 
+                if (s.Osoba.Vazby(Relation.CharakterVazbyEnum.VlastnictviKontrola) != null)
+                {
+                    foreach (var v in s.Stat.SoukromeFirmy.Take(2))
+                    {
+                        sout = sout + v.Value.Summary(HlidacStatu.Lib.Analytics.CoreStat.UsualYearsInterval.FromUsualFirstYearUntilNow).ToNiceLinkString(null, true) + "<br/>";
                     }
-                },
-                new() { Name="Angažovanost",
-                    HtmlRender =(s) => {
-                        string sout = "";
 
-                        if (s.Osoba.Vazby( Relation.CharakterVazbyEnum.VlastnictviKontrola) != null)
-                        {
-                            foreach (var v in s.Stat.SoukromeFirmy.Take(2))
-                            {
-                                sout = sout + v.Value.Summary(HlidacStatu.Lib.Analytics.CoreStat.UsualYearsInterval.FromUsualFirstYearUntilNow).ToNiceLinkString(null,true) + "<br/>";
-                            }
-                            if (s.Stat.SoukromeFirmy.Count() == 3)
-                            {
-                                sout = sout + s.Stat.SoukromeFirmy
-                                    .Skip(2).First().Value.Summary(HlidacStatu.Lib.Analytics.CoreStat.UsualYearsInterval.FromUsualFirstYearUntilNow).ToNiceLinkString(null,true);
-                            }
-                            else if (s.Stat.SoukromeFirmy.Count() > 2)
-                            {
-                                sout = sout + "<a href='" + s.Osoba.GetUrl() + "'>" + Devmasters.Lang.CS.Plural.Get(s.Osoba.Vazby( Relation.CharakterVazbyEnum.VlastnictviKontrola).Length - 2, "+další vazba;+ další {0} vazby;+ dalších {0} vazeb") + "</a>";
-                            }
-                        }
-                        else
-                        {
-                            sout="&nbsp;";
-                        }
-                        return sout;
-                    },
-                    OrderValueRender = (s) => {
-                        return s.Osoba.FullName(false);
+                    if (s.Stat.SoukromeFirmy.Count() == 3)
+                    {
+                        sout = sout + s.Stat.SoukromeFirmy
+                            .Skip(2).First().Value.Summary(HlidacStatu.Lib.Analytics.CoreStat.UsualYearsInterval.FromUsualFirstYearUntilNow).ToNiceLinkString(null, true);
                     }
-                },
-                new() { Name="Sponzor",
-                    HtmlRender =(s) => {
-                        var sum = s.Osoba.Sponzoring().Sum(m=>m.Hodnota);
-                        if (sum==0)
-                            return "Ne";
-                        else
-                            return "Celkem&nbsp;" + HlidacStatu.Util.RenderData.NicePriceHtml(sum.Value) + string.Format("<br /><a href='{0}'>podrobnosti</a>", s.Osoba.GetUrl()) ;
-                    },
-                    OrderValueRender = (s) => {
-                        var val= s.Osoba.Sponzoring().Sum(m=>m.Hodnota) ;
-                        return HlidacStatu.Util.RenderData.OrderValueFormat(val);
+                    else if (s.Stat.SoukromeFirmy.Count() > 2)
+                    {
+                        sout = sout + "<a href='" + s.Osoba.GetUrl() + "'>" + Devmasters.Lang.CS.Plural.Get(s.Osoba.Vazby(Relation.CharakterVazbyEnum.VlastnictviKontrola).Length - 2, "+další vazba;+ další {0} vazby;+ dalších {0} vazeb") + "</a>";
                     }
-                },
-   });
+                }
+                else
+                {
+                    sout = "&nbsp;";
+                }
+
+                return sout;
+            },
+            OrderValueRender = (s) => { return s.Osoba.FullName(false); }
+        },
+        new()
+        {
+            Name = "Sponzor",
+            HtmlRender = (s) =>
+            {
+                var sum = s.Sponzoring;
+                if (sum == 0)
+                    return "Ne";
+                else
+                    return $"Celkem&nbsp;{HlidacStatu.Util.RenderData.NicePriceHtml(sum.Value)}<br /><a href='{s.Osoba.GetUrl()}'>podrobnosti</a>";
+            },
+            OrderValueRender = (s) =>
+            {
+                var val = s.Sponzoring;
+                return HlidacStatu.Util.RenderData.OrderValueFormat(val);
+            }
+        },
+    });
 
 
     foreach (var osoba in showList)
     {
         Osoba.Statistics.RegistrSmluv? stat = await osoba.StatistikaRegistrSmluvAsync();
-        poslanciTable.AddRow((osoba, stat));
+        var sponzoring = (await osoba.SponzoringAsync()).Sum(m => m.Hodnota);
+        var description = await osoba.DescriptionAsync(false, m => true, numOfRecords: 3);
+        poslanciTable.AddRow((osoba, stat, sponzoring, description));
     }
 }
 

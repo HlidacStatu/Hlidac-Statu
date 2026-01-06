@@ -1041,20 +1041,22 @@
         Model.JsemPolitickaStrana() == false
         &&
         (
-        Model.IsSponzor() || (await MaterializedViewsCache.FirmySVazbamiNaPolitiky_NedavneAsync()).SoukromeFirmy.ContainsKey(Model.ICO)
+        await Model.IsSponzorAsync() || (await MaterializedViewsCache.FirmySVazbamiNaPolitiky_NedavneAsync()).SoukromeFirmy.ContainsKey(Model.ICO)
         )
         )
     {
+        var sponzoring = await Model.SponzoringAsync();
+        
         <div>
             <h4>Sponzoring politických stran</h4>
-            @if (Model.IsSponzor())
+            @if (await Model.IsSponzorAsync())
             {
                 <p>
                     @Html.SubjektTypTrojice(Model, "Úřad sponzoroval", "Organizace sponzorovala", "Firma sponzorovala")
                     politické
-                    strany @HlidacStatu.Util.RenderData.RenderList(Model.Sponzoring().Select(m => m.JmenoPrijemce()).Distinct(), ending: "")
+                    strany @HlidacStatu.Util.RenderData.RenderList(sponzoring.Select(m => m.JmenoPrijemce()).Distinct(), ending: "")
                     v celkové
-                    výši @HlidacStatu.Util.RenderData.NicePriceHtml(Model.Sponzoring().Sum(m => m.Hodnota) ?? 0).
+                    výši @HlidacStatu.Util.RenderData.NicePriceHtml(sponzoring.Sum(m => m.Hodnota) ?? 0).
                 </p>
             }
 
@@ -1062,7 +1064,7 @@
                 <a href="/subjekt/sponzoring/@Model.ICO" class="btn btn-hs btn-primary btn-sm my-3 position-relative">
                     Podrobnosti o veřejných zakázkách organizace
                     <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
-                        @(HlidacStatu.Util.RenderData.NiceNumber(Model.Sponzoring().Sum(m => m.Hodnota) ?? 0))
+                        @(HlidacStatu.Util.RenderData.NiceNumber(sponzoring.Sum(m => m.Hodnota) ?? 0))
                     </span>
                 </a>
             </p>

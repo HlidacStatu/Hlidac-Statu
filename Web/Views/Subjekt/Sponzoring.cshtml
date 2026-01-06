@@ -20,8 +20,7 @@
     </p>
     
     @{
-        var sponzoring = Model.Sponzoring()
-            .ToList();
+        var sponzoring = await Model.SponzoringAsync();
         
         var sponzoringData = new ReportDataSource<(int Rok, string Ico, decimal Dar, string Poznamka)>(
             new[]
@@ -85,7 +84,7 @@
                     var o = Osoby.GetById.Get(os);
                     //var sponz = o.Sponzoring().ToList();
 
-                    var sponzorOsoba = o.SponzoringToHtml(itemTemplate: $"<li><a href='{o.GetUrl(true)}'>{o.FullName()}</a> {{0}}</li>", itemDelimeter:"", sponzoringFilter: s=>s.OsobaIdDarce == os || s.IcoDarce == Model.ICO, withCompany: false);
+                    var sponzorOsoba = o.SponzoringToHtmlAsync(itemTemplate: $"<li><a href='{o.GetUrl(true)}'>{o.FullName()}</a> {{0}}</li>", itemDelimeter:"", sponzoringFilter: s=>s.OsobaIdDarce == os || s.IcoDarce == Model.ICO, withCompany: false);
 
                     @Html.Raw(sponzorOsoba);
             }

@@ -1,5 +1,4 @@
 ﻿@model HlidacStatu.Entities.Osoba
-@using System.Linq
 @using HlidacStatu.Extensions
 @using HlidacStatu.XLib.Render
 @using HlidacStatu.Repositories
@@ -16,13 +15,9 @@
     </p>
     
     @{
-        var sponzoring = Model.Sponzoring()
-            .Where(m => m.Typ != (int)Sponzoring.TypDaru.DarFirmy)
-            .ToList();
+        var sponzoring = await Model.SponzoringAsync(m => m.Typ != (int)Sponzoring.TypDaru.DarFirmy);
 
-        var sponzoringFirma = Model.Sponzoring()
-            .Where(m => m.Typ == (int)Sponzoring.TypDaru.DarFirmy)
-            .ToList();
+        var sponzoringFirma = await Model.SponzoringAsync(m => m.Typ == (int)Sponzoring.TypDaru.DarFirmy);
         
         var sponzoringData = new ReportDataSource<(int Rok, string Ico, decimal Dar, string Poznamka)>(
             new[]

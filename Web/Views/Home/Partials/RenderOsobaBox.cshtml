@@ -53,7 +53,7 @@ else
             , ";, <b>{0} smlouvy</b> v registru smluv za <b>" + osobaStatDescTotalKc + "</b>"
             , ";, <b>{0} smluv</b> v registru smluv za <b>" + osobaStatDescTotalKc) + "</b>"
         );
-    var funkceOsoba = Model.Osoba.Description(true, e => true, numOfRecords: 2);
+    var funkceOsoba = await Model.Osoba.DescriptionAsync(true, e => true, numOfRecords: 2);
     string box1Css = "col-sm-4 col-md-3";
     string box2Css = "col-sm-4 col-md-3";
 
@@ -74,7 +74,7 @@ else
                     @Model.Osoba.StatusOsoby().ToNiceDisplayName()
                     @if (Model.Smaller)
                     {
-                        @Html.Raw(", " +Devmasters.TextUtil.ShortenText(funkceOsoba,80))
+                        @Html.Raw(", " + Devmasters.TextUtil.ShortenText(funkceOsoba,80))
                     }
                 </div>
             </div>

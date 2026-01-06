@@ -9,16 +9,17 @@
 @{
     Layout = "_ReportLayout";
 
-    ReportDataSource<(Osoba Osoba, Osoba.Statistics.RegistrSmluv? Stat)> poslanciTable = new(new ReportDataSource<(Osoba Osoba, Osoba.Statistics.RegistrSmluv? Stat)>.Column[]
+    ReportDataSource<(Osoba Osoba, Osoba.Statistics.RegistrSmluv? Stat, decimal? Sponzoring, string Description)> poslanciTable = 
+        new(new ReportDataSource<(Osoba Osoba, Osoba.Statistics.RegistrSmluv? Stat, decimal? Sponzoring, string Description)>.Column[]
     {
         new()
         {
             Name = "Poradci předsedy vlády",
             HtmlRender = (s) =>
             {
-                return string.Format("<a href='{0}'>{1}</a>", s.Osoba.GetUrl(), s.Osoba.FullNameWithYear(true))
+                return $"<a href='{s.Osoba.GetUrl()}'>{s.Osoba.FullNameWithYear(true)}</a>"
                        + "<br />"
-                       + Devmasters.TextUtil.ShortenText(s.Osoba.Description(false, m => true, numOfRecords: 3), 250).Replace("\n", "<br />");
+                       + Devmasters.TextUtil.ShortenText(s.Description, 250).Replace("\n", "<br />");
             },
             OrderValueRender = (s) =>
             {
@@ -62,7 +63,7 @@
             Name = "Sponzor polit.stran",
             HtmlRender = (s) =>
             {
-                var sum = s.Osoba.Sponzoring().Sum(m => m.Hodnota);
+                var sum = s.Sponzoring;
                 if (sum == 0)
                     return "Ne";
                 else
@@ -70,10 +71,10 @@
             },
             OrderValueRender = (s) =>
             {
-                var val = s.Osoba.Sponzoring().Sum(m => m.Hodnota);
+                var val = s.Sponzoring;
                 return HlidacStatu.Util.RenderData.OrderValueFormat(val);
             }
-        },
+        }
     });
 
 
@@ -82,7 +83,9 @@
                  .ThenBy(m => m.Jmeno))
     {
         Osoba.Statistics.RegistrSmluv? stat = await osoba.StatistikaRegistrSmluvAsync();
-        poslanciTable.AddRow((osoba, stat));
+        var sponzoring = (await osoba.SponzoringAsync()).Sum(m => m.Hodnota);
+        var description = await osoba.DescriptionAsync(false, m => true, numOfRecords: 3);
+        poslanciTable.AddRow((osoba, stat, sponzoring, description));
     }
 }
 

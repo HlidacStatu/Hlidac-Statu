@@ -86,7 +86,7 @@ namespace HlidacStatu.Extensions
 
             data.Add(new InfoFact()
             {
-                Level = InfoFact.ImportanceLevel.Summary,
+                Level = Fact.ImportanceLevel.Summary,
                 Text = sumTxt
             });
 
@@ -119,7 +119,7 @@ namespace HlidacStatu.Extensions
                 );
                 data.Add(new InfoFact()
                 {
-                    Level = InfoFact.ImportanceLevel.High,
+                    Level = Fact.ImportanceLevel.High,
                     Text = sumTxt
                 });
             }

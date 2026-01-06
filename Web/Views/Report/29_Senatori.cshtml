@@ -13,29 +13,25 @@
         .ToList();
 
 
-    ReportDataSource poslanciTable = new(new ReportDataSource.Column[]
+    var poslanciTable = new ReportDataSource<(Osoba Osoba, string Description)>(new ReportDataSource<(Osoba Osoba, string Description)>.Column[]
     {
         new() { Name="Senátor",
             HtmlRender =(s) => {
-                Osoba o = (Osoba)s;
-                return string.Format("<a href='{0}'>{1}</a>", o.GetUrl(), o.FullNameWithYear(true))
+                return string.Format("<a href='{0}'>{1}</a>", s.Osoba.GetUrl(), s.Osoba.FullNameWithYear(true))
                 + "<br />"
-                + Devmasters.TextUtil.ShortenText(o.Description(false,m=> true, numOfRecords: 3), 250).Replace("\n", "<br />");
+                + Devmasters.TextUtil.ShortenText(s.Description, 250).Replace("\n", "<br />");
             },
             OrderValueRender = (s) => {
-                Osoba o = (Osoba)s;
-                return o.FullName(false);
+                return s.Osoba.FullName(false);
             }
         },
         new() {
             Name ="Strana/Hnutí",
             HtmlRender =(s) => {
-                Osoba o = (Osoba)s;
-                return o.CurrentPoliticalParty();
+                return s.Osoba.CurrentPoliticalParty();
             },
             OrderValueRender = (s) => {
-                Osoba o = (Osoba)s;
-                return o.CurrentPoliticalParty();
+                return s.Osoba.CurrentPoliticalParty();
             }
         }
     });
@@ -43,7 +39,8 @@
 
     foreach (var p in showList)
     {
-        poslanciTable.AddRow(p);
+        var description = await p.DescriptionAsync(false, m => true, numOfRecords: 3);
+        poslanciTable.AddRow((p, description));
     }
 }
 

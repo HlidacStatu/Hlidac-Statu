@@ -7,26 +7,8 @@ namespace HlidacStatuApi.Models
 {
     public class OsobaDetailDTO
     {
-        public OsobaDetailDTO(Osoba o)
+        public static async Task<OsobaDetailDTO> CreateOsobaDetailDTOAsync(Osoba o)
         {
-            this.TitulPred = o.TitulPred;
-            this.Jmeno = o.Jmeno;
-            this.Prijmeni = o.Prijmeni;
-            this.TitulPo = o.TitulPo;
-            this.Narozeni = o.Narozeni;
-            this.NameId = o.NameId;
-            this.PolitickaStrana = o.CurrentPoliticalParty();
-            this.Profile = o.GetUrl();
-            this.Sponzoring = o.Sponzoring()
-                .Select(ev => new OsobaEventDTO()
-                {
-                    Castka = ev.Hodnota,
-                    DatumOd = ev.DarovanoDne,
-                    DatumDo = ev.DarovanoDne,
-                    Typ = "sponzor",
-                    Organizace = ev.JmenoPrijemce()
-                }).ToList();
-
             var unwantedEvents = new int[]
             {
                 (int)OsobaEvent.Types.Osobni,
@@ -34,21 +16,46 @@ namespace HlidacStatuApi.Models
                 (int)OsobaEvent.Types.SocialniSite,
             };
 
-            this.Udalosti = o.NoFilteredEvents(ev => !unwantedEvents.Contains(ev.Type))
-                .Select(ev => new OsobaEventDTO()
-                {
-                    Castka = ev.AddInfoNum,
-                    DatumOd = ev.DatumOd,
-                    DatumDo = ev.DatumDo,
-                    Role = ev.AddInfo,
-                    Typ = ((OsobaEvent.Types)ev.Type).ToNiceDisplayName(),
-                    Organizace = ev.Organizace
-                }).ToList();
+            var dto = new OsobaDetailDTO()
+            {
+                TitulPred = o.TitulPred,
+                Jmeno = o.Jmeno,
+                Prijmeni = o.Prijmeni,
+                TitulPo = o.TitulPo,
+                Narozeni = o.Narozeni,
+                NameId = o.NameId,
+                PolitickaStrana = o.CurrentPoliticalParty(),
+                Profile = o.GetUrl(),
+                Sponzoring = (await o.SponzoringAsync())
+                    .Select(ev => new OsobaEventDTO()
+                    {
+                        Castka = ev.Hodnota,
+                        DatumOd = ev.DarovanoDne,
+                        DatumDo = ev.DarovanoDne,
+                        Typ = "sponzor",
+                        Organizace = ev.JmenoPrijemce()
+                    }).ToList(),
 
-            this.SocialniSite = o.NoFilteredEvents(ev => ev.Type == (int)OsobaEvent.Types.SocialniSite)
-                .Select(ev => new SocialNetworkDTO(ev))
-                .ToList();
+                Udalosti = o.NoFilteredEvents(ev => !unwantedEvents.Contains(ev.Type))
+                    .Select(ev => new OsobaEventDTO()
+                    {
+                        Castka = ev.AddInfoNum,
+                        DatumOd = ev.DatumOd,
+                        DatumDo = ev.DatumDo,
+                        Role = ev.AddInfo,
+                        Typ = ((OsobaEvent.Types)ev.Type).ToNiceDisplayName(),
+                        Organizace = ev.Organizace
+                    }).ToList(),
+
+                SocialniSite = o.NoFilteredEvents(ev => ev.Type == (int)OsobaEvent.Types.SocialniSite)
+                    .Select(ev => new SocialNetworkDTO(ev))
+                    .ToList()
+            };
+
+
+            return dto;
         }
+
         public string TitulPred { get; set; }
         public string Jmeno { get; set; }
         public string Prijmeni { get; set; }

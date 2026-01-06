@@ -93,7 +93,7 @@ namespace HlidacStatu.Extensions
                     $"Odhadovaná hodnota zakázky je <b>{RenderData.NicePrice(verejnaZakazka.OdhadovanaHodnotaBezDPH.Value, mena: verejnaZakazka.OdhadovanaHodnotaMena ?? "Kč")}</b>.";
             }
 
-            f.Add(new InfoFact(hlavni, InfoFact.ImportanceLevel.Summary));
+            f.Add(new InfoFact(hlavni, Fact.ImportanceLevel.Summary));
 
             //sponzori
             foreach (var subj in verejnaZakazka.Dodavatele.Union(
@@ -102,16 +102,16 @@ namespace HlidacStatu.Extensions
                 if (subj != null)
                 {
                     var firma = Firmy.Get(subj.ICO);
-                    if (firma.Valid && firma.IsSponzor() && firma.JsemSoukromaFirma())
+                    if (firma.Valid && await firma.IsSponzorAsync() && firma.JsemSoukromaFirma())
                     {
                         f.Add(new InfoFact(
                             $"{firma.Jmeno}: " +
                             string.Join("<br />",
-                                firma.Sponzoring()
+                                (await firma.SponzoringAsync())
                                     .OrderByDescending(s => s.DarovanoDne)
                                     .Select(s => s.ToHtml())
                                     .Take(2)),
-                            InfoFact.ImportanceLevel.Medium)
+                            Fact.ImportanceLevel.Medium)
                         );
                     }
                 }
@@ -155,7 +155,7 @@ namespace HlidacStatu.Extensions
                                                , " angažují {0} politicky angažované osoby - "
                                                , " angažuje {0} politicky angažovaných osob - ")
                                            + sPolitici + "."
-                            , InfoFact.ImportanceLevel.Medium)
+                            , Fact.ImportanceLevel.Medium)
                         );
                     }
                 }

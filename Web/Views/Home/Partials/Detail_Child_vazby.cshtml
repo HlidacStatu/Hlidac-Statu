@@ -10,12 +10,19 @@
     var firmySVazbamiNaPolitiky = await MaterializedViewsCache.FirmySVazbamiNaPolitiky_NedavneAsync();
     if (Model.Prijemce != null)
     {
-        angPolitiku = Model.Prijemce.Union(new Smlouva.Subjekt[] { Model.Platce })
-            .Where(m => !string.IsNullOrEmpty(m.ico))
-            .Any(m => firmySVazbamiNaPolitiky.SoukromeFirmy.ContainsKey(m.ico));
-        isSponzorStrany = Model.Prijemce.Union(new Smlouva.Subjekt[] { Model.Platce })
-            .Where(m => !string.IsNullOrEmpty(m.ico))
-            .Any(m => Firmy.Get(m.ico).Valid && Firmy.Get(m.ico).IsSponzor());
+        var platciPrijemci = Model.Prijemce.Union(new Smlouva.Subjekt[] { Model.Platce })
+            .Where(m => !string.IsNullOrEmpty(m.ico)).ToArray(); 
+        
+        angPolitiku = platciPrijemci.Any(m => firmySVazbamiNaPolitiky.SoukromeFirmy.ContainsKey(m.ico));
+        
+        foreach (var platcePrijemce in platciPrijemci)
+        {
+            if (Firmy.Get(platcePrijemce.ico).Valid && await Firmy.Get(platcePrijemce.ico).IsSponzorAsync())
+            {
+                isSponzorStrany = true;
+                break;
+            }
+        }
     }
 
     var otherVersion = await Model.OtherVersionsAsync();
@@ -71,8 +78,6 @@
     </tr>
 }
 
-
-
 @if (angPolitiku)
 {
     <tr>
@@ -90,8 +95,7 @@
                     {
                         Osoba p = OsobaRepo.PolitickyAktivni
                             .Get()
-                            .Where(m => m.InternalId == pId)
-                            .FirstOrDefault();
+                            .FirstOrDefault(m => m.InternalId == pId);
 
                         if (first)
                         {
@@ -129,7 +133,7 @@
             @foreach (var subj in Model.Prijemce.Union(new Smlouva.Subjekt[] { Model.Platce }))
             {
                 var firma = Firmy.Get(subj.ico);
-                if (firma.Valid && firma.IsSponzor() && firma.JsemSoukromaFirma())
+                if (firma.Valid && await firma.IsSponzorAsync() && firma.JsemSoukromaFirma())
                 {
                     <div class="card bg-default">
                         <div class="card-header">
@@ -137,7 +141,7 @@
                         </div>
                         <div class="card-body">
                             @*@Html.Raw(firma.Description(true, m => m.Type == (int)OsobaEvent.Types.Sponzor))*@
-                            @Html.Raw(firma.SponzoringToHtml())
+                            @Html.Raw(firma.SponzoringToHtmlAsync())
                         </div>
                     </div>
                 }

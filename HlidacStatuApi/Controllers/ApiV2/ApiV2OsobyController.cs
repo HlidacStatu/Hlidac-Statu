@@ -23,7 +23,7 @@ namespace HlidacStatuApi.Controllers.ApiV2
         /// <returns></returns>
         [Authorize]
         [HttpGet("{osobaId}")]
-        public ActionResult<OsobaDetailDTO> Detail([FromRoute] string osobaId)
+        public async Task<ActionResult<OsobaDetailDTO>> Detail([FromRoute] string osobaId)
         {
             if (string.IsNullOrEmpty(osobaId))
             {
@@ -37,9 +37,7 @@ namespace HlidacStatuApi.Controllers.ApiV2
                 return NotFound($"Osoba s id [{osobaId}] nenalezena");
             }
 
-            OsobaDetailDTO OsobaDetail = new OsobaDetailDTO(osoba);
-
-            return OsobaDetail;
+            return await OsobaDetailDTO.CreateOsobaDetailDTOAsync(osoba);
         }
 
         /// <summary>

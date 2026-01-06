@@ -3,9 +3,7 @@ using HlidacStatu.Entities.XSD;
 using HlidacStatu.Repositories;
 using HlidacStatu.Util;
 using HlidacStatu.Entities.Facts;
-
 using Nest;
-
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -39,22 +37,22 @@ namespace HlidacStatu.Extensions
                     .ShortNicePrice(smlouva.CalculatedPriceWithVATinCZK, html: true,
                         showDecimal: RenderData.ShowDecimalVal.Show));
 
-            f.Add(new InfoFact(hlavni, InfoFact.ImportanceLevel.Summary));
+            f.Add(new InfoFact(hlavni, Fact.ImportanceLevel.Summary));
 
             //sponzori
             foreach (var subj in smlouva.Prijemce.Union(new Smlouva.Subjekt[] { smlouva.Platce }))
             {
                 var firma = Firmy.Get(subj.ico);
-                if (firma.Valid && firma.IsSponzor() && firma.JsemSoukromaFirma())
+                if (firma.Valid && await firma.IsSponzorAsync() && firma.JsemSoukromaFirma())
                 {
                     f.Add(new InfoFact(
                         $"{firma.Jmeno}: " +
                         string.Join("<br />",
-                            firma.Sponzoring()
+                            (await firma.SponzoringAsync())
                                 .OrderByDescending(s => s.DarovanoDne)
                                 .Select(s => s.ToHtml())
                                 .Take(2)),
-                        InfoFact.ImportanceLevel.Medium)
+                        Fact.ImportanceLevel.Medium)
                     );
                 }
             }
@@ -75,7 +73,7 @@ namespace HlidacStatu.Extensions
                         count++;
                         f.Add(new InfoFact(
                             $"<b>{iss.Title}</b><br/><small>{iss.TextDescription}</small>"
-                            , InfoFact.ImportanceLevel.High)
+                            , Fact.ImportanceLevel.High)
                         );
                     }
                     else if (iss.Public &&
@@ -104,7 +102,7 @@ namespace HlidacStatu.Extensions
                         f.Add(
                             new InfoFact(
                                 $"<b>{importance}{(string.IsNullOrEmpty(importance) ? iss.Title : iss.Title.ToLower())}</b><br/><small>{iss.TextDescription}</small>"
-                                , InfoFact.ImportanceLevel.Medium)
+                                , Fact.ImportanceLevel.Medium)
                         );
                     }
 
@@ -113,7 +111,7 @@ namespace HlidacStatu.Extensions
                 }
             }
             else
-                f.Add(new InfoFact("Žádné nedostatky u smlouvy jsme nenalezli.", InfoFact.ImportanceLevel.Low));
+                f.Add(new InfoFact("Žádné nedostatky u smlouvy jsme nenalezli.", Fact.ImportanceLevel.Low));
 
 
             //politici
@@ -154,7 +152,7 @@ namespace HlidacStatu.Extensions
                                                , " angažují {0} politicky angažované osoby - "
                                                , " angažuje {0} politicky angažovaných osob - ")
                                            + sPolitici + "."
-                            , InfoFact.ImportanceLevel.Medium)
+                            ,Fact.ImportanceLevel.Medium)
                         );
                     }
                 }

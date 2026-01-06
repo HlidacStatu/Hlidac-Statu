@@ -44,7 +44,7 @@ namespace HlidacStatu.Extensions
             {
                 facts.Add(new InfoFact(
                     $"K-Index nespočítán. Organizace má méně než {Consts.MinPocetSmluvPerYear} smluv za rok nebo malý objem smluv.",
-                    InfoFact.ImportanceLevel.Summary));
+                    Fact.ImportanceLevel.Summary));
                 return facts.ToArray();
             }
 
@@ -53,28 +53,28 @@ namespace HlidacStatu.Extensions
                 case KIndexData.KIndexLabelValues.None:
                     facts.Add(new InfoFact(
                         $"K-Index nespočítán. Organizace má méně než {Consts.MinPocetSmluvPerYear} smluv za rok nebo malý objem smluv.",
-                        InfoFact.ImportanceLevel.Summary));
+                        Fact.ImportanceLevel.Summary));
                     return facts.ToArray();
 
                 case KIndexData.KIndexLabelValues.A:
                     facts.Add(
-                        new InfoFact("Nevykazuje téměř žádné rizikové faktory.", InfoFact.ImportanceLevel.Summary));
+                        new InfoFact("Nevykazuje téměř žádné rizikové faktory.", Fact.ImportanceLevel.Summary));
                     break;
                 case KIndexData.KIndexLabelValues.B:
                     facts.Add(new InfoFact("Chování s malou mírou rizikových faktorů.",
-                        InfoFact.ImportanceLevel.Summary));
+                        Fact.ImportanceLevel.Summary));
                     break;
                 case KIndexData.KIndexLabelValues.C:
-                    facts.Add(new InfoFact("Částečně umožňuje rizikové jednání.", InfoFact.ImportanceLevel.Summary));
+                    facts.Add(new InfoFact("Částečně umožňuje rizikové jednání.", Fact.ImportanceLevel.Summary));
                     break;
                 case KIndexData.KIndexLabelValues.D:
-                    facts.Add(new InfoFact("Vyšší míra rizikových faktorů.", InfoFact.ImportanceLevel.Summary));
+                    facts.Add(new InfoFact("Vyšší míra rizikových faktorů.", Fact.ImportanceLevel.Summary));
                     break;
                 case KIndexData.KIndexLabelValues.E:
-                    facts.Add(new InfoFact("Vysoký výskyt rizikových faktorů.", InfoFact.ImportanceLevel.Summary));
+                    facts.Add(new InfoFact("Vysoký výskyt rizikových faktorů.", Fact.ImportanceLevel.Summary));
                     break;
                 case KIndexData.KIndexLabelValues.F:
-                    facts.Add(new InfoFact("Velmi vysoká míra rizikových faktorů.", InfoFact.ImportanceLevel.Summary));
+                    facts.Add(new InfoFact("Velmi vysoká míra rizikových faktorů.", Fact.ImportanceLevel.Summary));
                     break;
                 default:
                     break;
@@ -90,16 +90,16 @@ namespace HlidacStatu.Extensions
                )
             {
                 if (!string.IsNullOrEmpty(sBest))
-                    facts.Add(new InfoFact(sBest, InfoFact.ImportanceLevel.Stat));
+                    facts.Add(new InfoFact(sBest, Fact.ImportanceLevel.Stat));
                 if (!string.IsNullOrEmpty(sworst))
-                    facts.Add(new InfoFact(sworst, InfoFact.ImportanceLevel.Stat));
+                    facts.Add(new InfoFact(sworst, Fact.ImportanceLevel.Stat));
             }
             else
             {
                 if (!string.IsNullOrEmpty(sworst))
-                    facts.Add(new InfoFact(sworst, InfoFact.ImportanceLevel.Stat));
+                    facts.Add(new InfoFact(sworst, Fact.ImportanceLevel.Stat));
                 if (!string.IsNullOrEmpty(sBest))
-                    facts.Add(new InfoFact(sBest, InfoFact.ImportanceLevel.Stat));
+                    facts.Add(new InfoFact(sBest, Fact.ImportanceLevel.Stat));
             }
 
             var kindexOrderedValuesFromBest = await KindexCache.GetKindexOrderedValuesFromBestForInfofactsAsync(ann, kIndexData.Ico);
@@ -109,7 +109,7 @@ namespace HlidacStatu.Extensions
                 {
                     var sFacts = KIndexData.KIndexCommentForPart(part, ann);
                     if (!string.IsNullOrEmpty(sFacts))
-                        facts.Add(new InfoFact(sFacts, InfoFact.ImportanceLevel.High));
+                        facts.Add(new InfoFact(sFacts, Fact.ImportanceLevel.High));
                 }
             }
 

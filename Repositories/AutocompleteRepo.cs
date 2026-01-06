@@ -408,9 +408,9 @@ namespace HlidacStatu.Repositories
         public static async Task<List<Autocomplete>> LoadPeopleAsync(Action<string> logOutputFunc = null,
             IProgressWriter progressOutputFunc = null)
         {
-            var excludedInfoFactImportanceLevels = new HashSet<InfoFact.ImportanceLevel>()
+            var excludedInfoFactImportanceLevels = new HashSet<Fact.ImportanceLevel>()
             {
-                InfoFact.ImportanceLevel.Stat
+                Fact.ImportanceLevel.Stat
             };
 
             List<Autocomplete> results = new List<Autocomplete>();

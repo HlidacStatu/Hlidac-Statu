@@ -5,7 +5,7 @@
 @using HlidacStatu.Repositories
 
 @{
-        Layout = "_ReportLayout";
+    Layout = "_ReportLayout";
 
     var showList = OsobaRepo.GetByZatrideni(OsobaRepo.Zatrideni.Europoslanec, DateTime.Now)
         .OrderBy(o => o.Prijmeni)
@@ -13,42 +13,37 @@
         .ToList();
 
 
-    ReportDataSource poslanciTable = new(new ReportDataSource.Column[]
+    var poslanciTable = new ReportDataSource<(Osoba Osoba, string Description)>(new ReportDataSource<(Osoba Osoba, string Description)>.Column[]
     {
-        new() { Name="Europoslanec",
-            HtmlRender =(s) => {
-                Osoba o = (Osoba)s;
-                return string.Format("<a href='{0}'>{1}</a>", o.GetUrl(), o.FullNameWithYear(true))
-                + "<br />"
-                + Devmasters.TextUtil.ShortenText(o.Description(false,m=> true, numOfRecords: 3), 250).Replace("\n", "<br />");
+        new()
+        {
+            Name = "Europoslanec",
+            HtmlRender = (s) =>
+            {
+                return string.Format("<a href='{0}'>{1}</a>", s.Osoba.GetUrl(), s.Osoba.FullNameWithYear(true))
+                       + "<br />"
+                       + Devmasters.TextUtil.ShortenText(s.Description, 250).Replace("\n", "<br />");
             },
-            OrderValueRender = (s) => {
-                Osoba o = (Osoba)s;
-                return o.FullName(false);
-            }
+            OrderValueRender = (s) => { return s.Osoba.FullName(false); }
         },
-        new() {
-            Name ="Strana/Hnutí",
-            HtmlRender =(s) => {
-                Osoba o = (Osoba)s;
-                return o.CurrentPoliticalParty();
-            },
-            OrderValueRender = (s) => {
-                Osoba o = (Osoba)s;
-                return o.CurrentPoliticalParty();
-            }
+        new()
+        {
+            Name = "Strana/Hnutí",
+            HtmlRender = (s) => { return s.Osoba.CurrentPoliticalParty(); },
+            OrderValueRender = (s) => { return s.Osoba.CurrentPoliticalParty(); }
         }
     });
 
 
     foreach (var p in showList)
     {
-        poslanciTable.AddRow(p);
+        var description = await p.DescriptionAsync(false, m => true, numOfRecords: 3);
+        poslanciTable.AddRow((p, description));
     }
 }
 
 <h3 id="tblHead">Europoslanci</h3>
-@ChartUtilExtensions.RenderReport("",ReportModel.QueueItem.types.table, poslanciTable, @"{
+@ChartUtilExtensions.RenderReport("", ReportModel.QueueItem.types.table, poslanciTable, @"{
                  'language': {
                     'url': '//cdn.datatables.net/plug-ins/1.13.4/i18n/cs.json'
                 },

@@ -72,7 +72,7 @@ namespace SponzoriLoader
             }
 
             //Save to DB
-            Common.UploadPeopleDonations(peopleDonations, _user, _zdroj);
+            await Common.UploadPeopleDonationsAsync(peopleDonations, _user, _zdroj);
             await Common.UploadCompanyDonationsAsync(companyDonations, _user, _zdroj);
 
             //await FixPeopleSponzorsAsync(); //Moved to downloader for regular runs

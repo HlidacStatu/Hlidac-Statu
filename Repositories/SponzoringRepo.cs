@@ -4,7 +4,6 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Threading;
 using System.Threading.Tasks;
-
 using HlidacStatu.Connectors;
 using HlidacStatu.Entities;
 using HlidacStatu.Entities.Views;
@@ -62,139 +61,124 @@ namespace HlidacStatu.Repositories
             || (s.DarCelkem <= smallSponzoringThreshold && s.Rok >= minSmallSponzoringDate.Year);
 
 
-        public static List<Sponzoring> GetByDarce(int osobaId, Expression<Func<Sponzoring, bool>> predicate, bool withCompany = true)
+        public static async Task<List<Sponzoring>> GetByDarceAsync(int osobaId, Expression<Func<Sponzoring, bool>> predicate, bool withCompany = true)
         {
-            using (DbEntities db = new DbEntities())
+            await using DbEntities db = new DbEntities();
+            
+            var osobySponzoring = await db.Sponzoring
+                .AsNoTracking()
+                .Where(s => s.OsobaIdDarce == osobaId)
+                .Where(SponzoringLimitsPredicate)
+                .Where(predicate)
+                .ToListAsync();
+
+            if (withCompany)
             {
-                var osobySponzoring = db.Sponzoring
-                    .AsNoTracking()
-                    .Where(s => s.OsobaIdDarce == osobaId)
+                //sponzoring z navazanych firem kdyz byl statutar
+                var firmySponzoring = Osoby.CachedFirmySponzoring.Get(osobaId)
+                    .AsQueryable()
                     .Where(SponzoringLimitsPredicate)
                     .Where(predicate)
                     .ToList();
 
-                if (withCompany)
-                {
-                    //sponzoring z navazanych firem kdyz byl statutar
-                    var firmySponzoring = Osoby.CachedFirmySponzoring.Get(osobaId)
-                        .AsQueryable()
-                        .Where(SponzoringLimitsPredicate)
-                        .Where(predicate)
-                        .ToList();
-
-                    osobySponzoring.AddRange(firmySponzoring);
-                }
-
-                return osobySponzoring;
+                osobySponzoring.AddRange(firmySponzoring);
             }
+
+            return osobySponzoring;
         }
 
-        public static List<Sponzoring> GetByDarce(string icoDarce, Expression<Func<Sponzoring, bool>> predicate)
+        public static async Task<List<Sponzoring>> GetByDarceAsync(string icoDarce, Expression<Func<Sponzoring, bool>> predicate)
         {
-            using (DbEntities db = new DbEntities())
-            {
-                return db.Sponzoring
-                    .AsNoTracking()
-                    .Where(predicate)
-                    .Where(s => s.IcoDarce == icoDarce)
-                    .ToList();
-            }
+            await using DbEntities db = new DbEntities();
+            return await db.Sponzoring
+                .AsNoTracking()
+                .Where(predicate)
+                .Where(s => s.IcoDarce == icoDarce)
+                .ToListAsync();
         }
 
-        public static List<Sponzoring> GetByPrijemce(int osobaId)
+        public static async Task<List<Sponzoring>> GetByPrijemceAsync(int osobaId)
         {
-            using (DbEntities db = new DbEntities())
-            {
-                return db.Sponzoring.AsNoTracking()
-                    .Where(s => s.OsobaIdPrijemce == osobaId)
-                    .Where(SponzoringLimitsPredicate)
-                    .ToList();
-            }
+            await using DbEntities db = new DbEntities();
+            return await db.Sponzoring.AsNoTracking()
+                .Where(s => s.OsobaIdPrijemce == osobaId)
+                .Where(SponzoringLimitsPredicate)
+                .ToListAsync();
         }
 
-        public static List<Sponzoring> GetByPrijemce(string icoPrijemce)
+        public static async Task<List<Sponzoring>> GetByPrijemceAsync(string icoPrijemce)
         {
-            using (DbEntities db = new DbEntities())
-            {
-                return db.Sponzoring.AsNoTracking()
-                    .Where(s => s.IcoPrijemce == icoPrijemce)
-                    .Where(SponzoringLimitsPredicate)
-                    .ToList();
-            }
+            await using DbEntities db = new DbEntities();
+            return await db.Sponzoring.AsNoTracking()
+                .Where(s => s.IcoPrijemce == icoPrijemce)
+                .Where(SponzoringLimitsPredicate)
+                .ToListAsync();
         }
         
         public static async Task<List<SponzoringDetail>> GetByPrijemceWithPersonDetailsAsync(string icoPrijemce, 
             CancellationToken cancellationToken = default)
         {
-            
-            using (DbEntities db = new DbEntities())
-            {
-                return await db.SponzoringDetails.FromSqlInterpolated(
+            await using DbEntities db = new DbEntities();
+            return await db.SponzoringDetails.FromSqlInterpolated(
                     $@"SELECT os.NameId NameIdDarce, os.Jmeno JmenoDarce, os.Prijmeni PrijmeniDarce, os.Narozeni DaumNarozeniDarce,
                               sp.IcoDarce, sp.IcoPrijemce, sp.Typ TypDaru, sp.Hodnota HodnotaDaru, sp.Popis, sp.DarovanoDne
                         FROM dbo.Sponzoring sp
                         Left Join dbo.Osoba os on sp.OsobaIdDarce = os.InternalId
                         WHERE sp.IcoPrijemce = {icoPrijemce}")
-                    .ToListAsync(cancellationToken);
-                
-            }
+                .ToListAsync(cancellationToken);
         }
 
-        public static Sponzoring Create(Sponzoring sponzoring, string user)
+        public static async Task<Sponzoring> CreateAsync(Sponzoring sponzoring, string user)
         {
-            using (DbEntities db = new DbEntities())
-            {
-                if (sponzoring.OsobaIdDarce == 0
-                    && string.IsNullOrWhiteSpace(sponzoring.IcoDarce))
-                    throw new Exception(
-                        "Cant attach sponzoring to a person or to a company since their reference is empty");
+            await using DbEntities db = new DbEntities();
+            
+            if (sponzoring.OsobaIdDarce == 0
+                && string.IsNullOrWhiteSpace(sponzoring.IcoDarce))
+                throw new Exception(
+                    "Cant attach sponzoring to a person or to a company since their reference is empty");
 
-                sponzoring.Created = DateTime.Now;
-                sponzoring.Edited = DateTime.Now;
-                sponzoring.UpdatedBy = user;
+            sponzoring.Created = DateTime.Now;
+            sponzoring.Edited = DateTime.Now;
+            sponzoring.UpdatedBy = user;
 
-                db.Sponzoring.Add(sponzoring);
-                db.SaveChanges();
+            db.Sponzoring.Add(sponzoring);
+            await db.SaveChangesAsync();
 
-                AuditRepo.Add(Audit.Operations.Create, user, sponzoring, null);
-                return sponzoring;
-            }
+            AuditRepo.Add(Audit.Operations.Create, user, sponzoring, null);
+            return sponzoring;
         }
 
-        public static void MergeDonatingOsoba(int originalOsobaId, int duplicateOsobaId, string user)
+        public static async Task MergeDonatingOsobaAsync(int originalOsobaId, int duplicateOsobaId, string user)
         {
             if (originalOsobaId == 0 && duplicateOsobaId == 0)
                 throw new ArgumentException("Id osoby nesmí být 0");
 
-            using (DbEntities db = new DbEntities())
+            await using DbEntities db = new DbEntities();
+            var sponzoring = await db.Sponzoring.Where(s => s.OsobaIdDarce == duplicateOsobaId)
+                .ToListAsync();
+
+            foreach (var donation in sponzoring)
             {
-                var sponzoring = db.Sponzoring.AsEnumerable().Where(s => s.OsobaIdDarce == duplicateOsobaId).ToList();
+                var donationBackup = donation.ShallowCopy();
 
-                foreach (var donation in sponzoring)
-                {
-                    var donationBackup = donation.ShallowCopy();
-
-                    donation.OsobaIdDarce = originalOsobaId;
-                    donation.Edited = DateTime.Now;
-                    AuditRepo.Add(Audit.Operations.Update, user, donation, donationBackup);
-                }
-
-                db.SaveChanges();
+                donation.OsobaIdDarce = originalOsobaId;
+                donation.Edited = DateTime.Now;
+                AuditRepo.Add(Audit.Operations.Update, user, donation, donationBackup);
             }
+
+            await db.SaveChangesAsync();
         }
 
-        public static void Delete(Sponzoring sponzoring, string user)
+        public static async Task DeleteAsync(Sponzoring sponzoring, string user)
         {
             if (sponzoring.Id > 0)
             {
-                using (DbEntities db = new DbEntities())
-                {
-                    db.Sponzoring.Attach(sponzoring);
-                    db.Entry(sponzoring).State = EntityState.Deleted;
-                    AuditRepo.Add(Audit.Operations.Delete, user, sponzoring, null);
+                await using DbEntities db = new DbEntities();
+                db.Sponzoring.Attach(sponzoring);
+                db.Entry(sponzoring).State = EntityState.Deleted;
+                AuditRepo.Add(Audit.Operations.Delete, user, sponzoring, null);
 
-                    db.SaveChanges();
-                }
+                await db.SaveChangesAsync();
             }
         }
 
@@ -207,7 +191,7 @@ namespace HlidacStatu.Repositories
             
             var partiesPerYear = await _cache.GetOrSetAsync<List<SponzoringOverview>>($"bookmark:{rok}_{yearSwitch}", async _=>
             {
-                using DbEntities db = new DbEntities();
+                await using DbEntities db = new DbEntities();
                 return await db.SponzoringOverviewView.FromSqlInterpolated(
                         $@"SELECT zs.KratkyNazev, IcoPrijemce as IcoStrany
                       ,Year(DarovanoDne) as Rok, SUM(Hodnota) as DaryCelkem
@@ -236,9 +220,9 @@ namespace HlidacStatu.Repositories
                       group by zs.KratkyNazev, IcoPrijemce");
                     
                     return res.ToDictionary(k => k.Item1 , v => v.Item2 ?? Firmy.GetJmeno(v.Item1));
-
                 });
-        public static Dictionary<string, string> StranyIco()
+
+        private static Dictionary<string, string> StranyIco()
         {
             return stranyIcoCache.Get();
 
@@ -257,28 +241,26 @@ namespace HlidacStatu.Repositories
             return null;
         }
 
-        public static async Task<Dictionary<int, decimal>> SponzoringPerYear(string party, int minYear, int maxYear, bool persons, bool companies)
+        public static async Task<Dictionary<int, decimal>> SponzoringPerYearAsync(string party, int minYear, int maxYear, bool persons, bool companies)
         {
             string icoStrany = ZkratkaStranyRepo.IcoStrany(party);
-            using (DbEntities db = new DbEntities())
+            await using DbEntities db = new DbEntities();
+            
+            var dataPerY = await db.Sponzoring
+                .Where(m => m.IcoPrijemce == icoStrany && m.DarovanoDne.Value.Year >= minYear && m.DarovanoDne.Value.Year <= maxYear)
+                .Where(m => (persons && m.OsobaIdDarce != null) || (companies && m.IcoDarce != null))
+                .GroupBy(k => k.DarovanoDne.Value.Year, m => m, (k, v) => new { rok = k, sum = v.Sum(m => m.Hodnota ?? 0) })
+                .ToDictionaryAsync(k => k.rok, v => v.sum);
+            
+            //add missing years
+            for (int year = minYear; year <= maxYear; year++)
             {
-                var dataPerY = db.Sponzoring
-                        .Where(m => m.IcoPrijemce == icoStrany && m.DarovanoDne.Value.Year >= minYear && m.DarovanoDne.Value.Year <= maxYear)
-                        .Where(m => (persons && m.OsobaIdDarce != null) || (companies && m.IcoDarce != null))
-                        .GroupBy(k => k.DarovanoDne.Value.Year, m => m, (k, v) => new { rok = k, sum = v.Sum(m => m.Hodnota ?? 0) })
-                        .ToDictionary(k => k.rok, v => v.sum);
-
-
-                //add missing years
-                for (int year = minYear; year <= maxYear; year++)
-                    if (!dataPerY.ContainsKey(year))
-                        dataPerY.Add(year, 0);
-
-                return dataPerY
-                    .OrderBy(m => m.Key)
-                    .ToDictionary(k => k.Key, m => m.Value);
-
+                dataPerY.TryAdd(year, 0);
             }
+
+            return dataPerY
+                .OrderBy(m => m.Key)
+                .ToDictionary(k => k.Key, m => m.Value);
         }
 
         public static async Task<List<SponzoringSummed>> PeopleSponsorsAsync(string party, CancellationToken cancellationToken)
@@ -286,9 +268,9 @@ namespace HlidacStatu.Repositories
             string icoStrany = ZkratkaStranyRepo.IcoStrany(party);
             int tenYearsBack = DateTime.Now.Year - 10;
 
-            using (DbEntities db = new DbEntities())
-            {
-                return await db.SponzoringSummedView.FromSqlInterpolated(
+            await using DbEntities db = new DbEntities();
+            
+            return await db.SponzoringSummedView.FromSqlInterpolated(
                     $@"SELECT zs.KratkyNazev as NazevStrany
                        ,sp.IcoPrijemce as IcoStrany
 	                   ,SUM(Hodnota) as DarCelkem
@@ -306,9 +288,8 @@ namespace HlidacStatu.Repositories
                       and year(sp.DarovanoDne) >= {tenYearsBack}
                     group by zs.KratkyNazev, IcoPrijemce, Year(DarovanoDne)
                       , os.NameId, os.TitulPred, os.Jmeno, os.Prijmeni, os.TitulPo, sp.icoDarce")
-                    .Where(SponzoringSummedLimitsPredicate)
-                    .ToListAsync(cancellationToken);
-            }
+                .Where(SponzoringSummedLimitsPredicate)
+                .ToListAsync(cancellationToken);
         }
 
         public static async Task<List<SponzoringSummed>> CompanySponsorsAsync(string party, CancellationToken cancellationToken)
@@ -316,10 +297,9 @@ namespace HlidacStatu.Repositories
             string icoStrany = ZkratkaStranyRepo.IcoStrany(party);
             int tenYearsBack = DateTime.Now.Year - 10;
 
-            using (DbEntities db = new DbEntities())
-            {
-                return await db.SponzoringSummedView.FromSqlInterpolated(
-                        $@"SELECT zs.KratkyNazev as NazevStrany
+            await using DbEntities db = new DbEntities();
+            return await db.SponzoringSummedView.FromSqlInterpolated(
+                    $@"SELECT zs.KratkyNazev as NazevStrany
                                ,sp.IcoPrijemce as IcoStrany
 	                           ,SUM(Hodnota) as DarCelkem
 	                           ,Year(DarovanoDne) as Rok
@@ -333,8 +313,7 @@ namespace HlidacStatu.Repositories
                             where IcoDarce is not null and sp.IcoPrijemce = {icoStrany}
                               and year(sp.DarovanoDne) >= {tenYearsBack}
                             group by zs.KratkyNazev, IcoPrijemce, Year(DarovanoDne), fi.ICO, fi.Jmeno, fi.kod_pf")
-                    .ToListAsync(cancellationToken);
-            }
+                .ToListAsync(cancellationToken);
         }
 
         /// <summary>
@@ -349,9 +328,8 @@ namespace HlidacStatu.Repositories
             int yearSwitch = year.HasValue ? 0 : 1;
             int tenYearsBack = DateTime.Now.Year - 10;
 
-            using (DbEntities db = new DbEntities())
-            {
-                var request = db.SponzoringSummedView.FromSqlInterpolated(
+            await using DbEntities db = new DbEntities();
+            var request = db.SponzoringSummedView.FromSqlInterpolated(
                     $@"SELECT null as NazevStrany
                                ,null as IcoStrany
 	                           ,SUM(Hodnota) as DarCelkem
@@ -365,13 +343,12 @@ namespace HlidacStatu.Repositories
                             where (year(sp.DarovanoDne) = {rok} or 1={yearSwitch}) and OsobaIdDarce > 0
                               and year(sp.DarovanoDne) >= {tenYearsBack}
                             group by os.NameId, os.TitulPred, os.Jmeno, os.Prijmeni, os.TitulPo")
-                    .OrderByDescending(x => x.DarCelkem);
+                .OrderByDescending(x => x.DarCelkem);
 
-                if (take != null)
-                    return await request.Take(take.Value).ToListAsync(cancellationToken);
+            if (take != null)
+                return await request.Take(take.Value).ToListAsync(cancellationToken);
 
-                return await request.ToListAsync(cancellationToken);
-            }
+            return await request.ToListAsync(cancellationToken);
         }
 
         /// <summary>
@@ -386,9 +363,8 @@ namespace HlidacStatu.Repositories
             int yearSwitch = year.HasValue ? 0 : 1;
             int tenYearsBack = DateTime.Now.Year - 10;
 
-            using (DbEntities db = new DbEntities())
-            {
-                var request = db.SponzoringSummedView.FromSqlInterpolated(
+            await using DbEntities db = new DbEntities();
+            var request = db.SponzoringSummedView.FromSqlInterpolated(
                     $@"SELECT null as NazevStrany
                                ,null as IcoStrany
 	                           ,SUM(Hodnota) as DarCelkem
@@ -402,14 +378,12 @@ namespace HlidacStatu.Repositories
                             where (year(sp.DarovanoDne) = {rok} or 1={yearSwitch}) and IcoDarce is not null
                               and year(sp.DarovanoDne) >= {tenYearsBack}
                             group by fi.ICO, fi.Jmeno, fi.kod_pf")
-                    .OrderByDescending(x => x.DarCelkem); ;
+                .OrderByDescending(x => x.DarCelkem); ;
 
-                if (take != null)
-                    return await request.Take(take.Value).ToListAsync(cancellationToken);
+            if (take != null)
+                return await request.Take(take.Value).ToListAsync(cancellationToken);
 
-                return await request.ToListAsync(cancellationToken);
-
-            }
+            return await request.ToListAsync(cancellationToken);
         }
     }
 }

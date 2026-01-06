@@ -10,16 +10,16 @@
 @{
     Layout = "_ReportLayout";
 
-    ReportDataSource<(Osoba Osoba, Osoba.Statistics.RegistrSmluv? Stat)>.Column[] columns =
+    ReportDataSource<(Osoba Osoba, Osoba.Statistics.RegistrSmluv? Stat, decimal? Sponzoring, string Description)>.Column[] columns =
     [
         new()
         {
             Name = "Členové vlády",
             HtmlRender =(s) =>
             {
-                return string.Format("<a href='{0}'>{1}</a>", s.Osoba.GetUrl(), s.Osoba.FullNameWithYear(true))
+                return $"<a href='{s.Osoba.GetUrl()}'>{s.Osoba.FullNameWithYear(true)}</a>"
                        + "<br />"
-                       + Devmasters.TextUtil.ShortenText(s.Osoba.Description(false, m => true, numOfRecords: 3), 250).Replace("\n", "<br />");
+                       + Devmasters.TextUtil.ShortenText(s.Description, 250).Replace("\n", "<br />");
             },
             OrderValueRender = (s) =>
             {
@@ -62,27 +62,29 @@
             Name = "Sponzor polit.stran",
             HtmlRender =(s) =>
             {
-                var sum = s.Osoba.Sponzoring().Sum(m => m.Hodnota);
+                var sum = s.Sponzoring;
                 if (sum == 0)
                     return "Ne";
                 else
-                    return "Celkem&nbsp;" + HlidacStatu.Util.RenderData.NicePriceHtml(sum.Value) + $"<br /><a href='{s.Osoba.GetUrl()}'>podrobnosti</a>";
+                    return $"Celkem&nbsp;{HlidacStatu.Util.RenderData.NicePriceHtml(sum.Value)}<br /><a href='{s.Osoba.GetUrl()}'>podrobnosti</a>";
             },
             OrderValueRender = (s) =>
             {
-                return HlidacStatu.Util.RenderData.OrderValueFormat(s.Osoba.Sponzoring().Sum(m => m.Hodnota));
+                return HlidacStatu.Util.RenderData.OrderValueFormat(s.Sponzoring);
             }
         }
     ];
 
-    ReportDataSource<(Osoba Osoba, Osoba.Statistics.RegistrSmluv? Stat)> vlada2017tbl = new(columns);
+    ReportDataSource<(Osoba Osoba, Osoba.Statistics.RegistrSmluv? Stat, decimal? Sponzoring, string Description)> vlada2017tbl = new(columns);
 
     foreach (var osoba in OsobaRepo.GetByZatrideni(OsobaRepo.Zatrideni.Ministr, DateTime.Now)
         .OrderBy(m => m.Prijmeni)
         .ThenBy(m => m.Jmeno))
     {
         Osoba.Statistics.RegistrSmluv? stat = await osoba.StatistikaRegistrSmluvAsync();
-        vlada2017tbl.AddRow((osoba, stat));
+        var sponzoring = (await osoba.SponzoringAsync()).Sum(m => m.Hodnota);
+        var description = await osoba.DescriptionAsync(false, m => true, numOfRecords: 3);
+        vlada2017tbl.AddRow((osoba, stat, sponzoring, description));
     }
 
 }

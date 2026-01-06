@@ -27,7 +27,7 @@
                     }
                     else
                     {
-                        @Html.Raw(item.Description(true, m => true, 3, withSponzoring: true))
+                        @Html.Raw(item.DescriptionAsync(true, m => true, 3, withSponzoring: true))
                     }
                 </td>
                 <td>

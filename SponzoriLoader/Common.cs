@@ -14,7 +14,7 @@ public static class Common
     /// <summary>
         /// Uploads new donations to Sponzoring table
         /// </summary>
-        public static void UploadPeopleDonations(Donations donations, string user, string zdroj)
+        public static async Task UploadPeopleDonationsAsync(Donations donations, string user, string zdroj)
         {
             foreach (var personDonations in donations.GetDonations())
             {
@@ -25,8 +25,7 @@ public static class Common
 
                 // Výjimka pro Radek Jonke 24.12.1970
                 if (osoba.Jmeno == "Radek"
-                    && osoba.Prijmeni == "Jonke"
-                    && osoba.Narozeni != null
+                    && osoba is { Prijmeni: "Jonke", Narozeni: not null }
                     && osoba.Narozeni.Value.Year == 1970
                     && osoba.Narozeni.Value.Month == 12
                     && osoba.Narozeni.Value.Day == 24)
@@ -49,7 +48,7 @@ public static class Common
 
                     try
                     {
-                        osoba.AddSponsoring(sponzoring, user);
+                        await osoba.AddSponsoringAsync(sponzoring, user);
                     }
                     catch (Exception e)
                     {
@@ -100,7 +99,7 @@ public static class Common
                     };
                     try
                     {
-                        firma.AddSponsoring(sponzoring, user);
+                        await firma.AddSponsoringAsync(sponzoring, user);
                     }
                     catch (Exception e)
                     {

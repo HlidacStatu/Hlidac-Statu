@@ -32,13 +32,13 @@
         (int)OsobaEvent.Types.Jine
     };
 
-    var volenaFunkceOsoba = politik.Description(true,
+    var volenaFunkceOsoba = await politik.DescriptionAsync(true,
            m => m.Type == (int)OsobaEvent.Types.VolenaFunkce,
         template: "<ul>{0}</ul>", itemTemplate: "<li>{0}</li>", itemDelimeter: "");
-    var verejnaFunkceOsoba = politik.Description(true,
+    var verejnaFunkceOsoba = await politik.DescriptionAsync(true,
         m => othtypes.Contains(m.Type),
         template: "<ul>{0}</ul>", itemTemplate: "<li>{0}</li>", itemDelimeter: "");
-    var politickaFunkceOsoba = politik.Description(true,
+    var politickaFunkceOsoba = await politik.DescriptionAsync(true,
         m => m.Type == (int)OsobaEvent.Types.Politicka || m.Type == (int)OsobaEvent.Types.PolitickaExekutivni,
         template: "<ul>{0}</ul>", itemTemplate: "<li>{0}</li>", itemDelimeter: "");
 

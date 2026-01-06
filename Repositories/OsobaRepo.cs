@@ -396,7 +396,7 @@ namespace HlidacStatu.Repositories
                 return original;
 
             //todo: předělat do transakce tak, aby se neukládaly samostatné části ?!
-            SponzoringRepo.MergeDonatingOsoba(original.InternalId, duplicated.InternalId, user);
+            await SponzoringRepo.MergeDonatingOsobaAsync(original.InternalId, duplicated.InternalId, user);
 
             List<OsobaEvent> duplicateEvents = await OsobaEventRepo.GetByOsobaIdAsync(duplicated.InternalId);
             List<OsobaEvent> originalEvents = await OsobaEventRepo.GetByOsobaIdAsync(original.InternalId);
@@ -668,7 +668,7 @@ namespace HlidacStatu.Repositories
             return results;
         }
 
-        public static Osoba.JSON Export(this Osoba osoba, bool allData = false)
+        public static async Task<JSON> ExportAsync(this Osoba osoba, bool allData = false)
         {
             var t = osoba;
             var r = new Osoba.JSON();
@@ -688,7 +688,7 @@ namespace HlidacStatu.Repositories
             if (allData == false)
                 events = Enumerable.Empty<OsobaEvent>();
 
-            r.Sponzoring = osoba.Sponzoring(s => s.IcoPrijemce != null)
+            r.Sponzoring = (await osoba.SponzoringAsync(s => s.IcoPrijemce != null))
                     .Select(s => new Osoba.JSON.sponzoring()
                     {
                         Id = s.Id,

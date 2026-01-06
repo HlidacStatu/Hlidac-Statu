@@ -15,16 +15,16 @@
         .ThenBy(o => o.Jmeno)
         .ToList();
 
-    ReportDataSource<Tuple<Osoba, Osoba.Statistics.RegistrSmluv, Osoba.Statistics.Dotace>> poslanciTable = new(new ReportDataSource<Tuple<Osoba, Osoba.Statistics.RegistrSmluv, Osoba.Statistics.Dotace>>.Column[]
+    ReportDataSource<Tuple<Osoba, Osoba.Statistics.RegistrSmluv, Osoba.Statistics.Dotace, decimal?, string>> poslanciTable = new(new ReportDataSource<Tuple<Osoba, Osoba.Statistics.RegistrSmluv, Osoba.Statistics.Dotace, decimal?, string>>.Column[]
     {
         new()
         {
             Name = "Poslanec (nováčci s <span style='padding-left:5px;' class='fad fa-star text-success' aria-hidden='true'></span> )",
             HtmlRender =(s) =>
             {
-                return string.Format("<a href='{0}'>{1}</a>", s.Item1.GetUrl(), s.Item1.FullNameWithYear(true))
+                return $"<a href='{s.Item1.GetUrl()}'>{s.Item1.FullNameWithYear(true)}</a>"
                        + "<br />"
-                       + Devmasters.TextUtil.ShortenText(s.Item1.Description(false, m => true, numOfRecords: 3), 250).Replace("\n", "<br />");
+                       + Devmasters.TextUtil.ShortenText(s.Item5, 250).Replace("\n", "<br />");
             },
             OrderValueRender = (s) =>
             {
@@ -51,12 +51,12 @@
                 string sout = "";
                 var s_smlouvyStat = s.Item2.SoukromeFirmy.Values.AggregateStats().Summary();
                 if (s_smlouvyStat.PocetSmluv > 0) {
-                    sout += "Navázané soukromé firmy uzavřely "+ s_smlouvyStat.ToNiceLinkString(s.Item1, customUrl:$"/osoba/registrsmluv/{s.Item1.NameId}") + "<br />";
+                    sout += $"Navázané soukromé firmy uzavřely {s_smlouvyStat.ToNiceLinkString(s.Item1, customUrl: $"/osoba/registrsmluv/{s.Item1.NameId}")}<br />";
                 }
 
                 var s_dotaceStat = s.Item3.SoukromeFirmy.Values.AggregateStats().Summary();
                 if (s_dotaceStat.PocetDotaci > 0) {
-                    sout += "Navázané soukromé firmy získaly  "+ s_dotaceStat.ToNiceLinkString_4pad(s.Item1, customUrl:$"/osoba/dotace/{s.Item1.NameId}") ;
+                    sout += $"Navázané soukromé firmy získaly {s_dotaceStat.ToNiceLinkString_4pad(s.Item1, customUrl: $"/osoba/dotace/{s.Item1.NameId}")}";
                 }
 
                 return sout;
@@ -71,15 +71,15 @@
             Name = "Sponzor",
             HtmlRender =(s) =>
             {
-                var sum = s.Item1.Sponzoring().Sum(m => m.Hodnota);
+                var sum = s.Item4;
                 if (sum == 0)
                     return "Ne";
                 else
-                    return "Celkem&nbsp;" + HlidacStatu.Util.RenderData.NicePriceHtml(sum.Value) + string.Format("<br /><a href='{0}'>podrobnosti</a>", s.Item1.GetUrl());
+                    return $"Celkem&nbsp;{HlidacStatu.Util.RenderData.NicePriceHtml(sum.Value)}<br /><a href='{s.Item1.GetUrl()}'>podrobnosti</a>";
             },
             OrderValueRender = (s) =>
             {
-                var val = s.Item1.Sponzoring().Sum(m => m.Hodnota);
+                var val = s.Item4;
                 return HlidacStatu.Util.RenderData.OrderValueFormat(val);
             }
         },
@@ -90,8 +90,10 @@
     {
         Osoba.Statistics.RegistrSmluv? stat = await osoba.StatistikaRegistrSmluvAsync();
         var dotacestat = await osoba.StatistikaDotaceAsync();
+        var sponzoring = (await osoba.SponzoringAsync()).Sum(m => m.Hodnota);
+        var description = await osoba.DescriptionAsync(false, m => true, numOfRecords: 3);
 
-        var tuple = new Tuple<Osoba, Osoba.Statistics.RegistrSmluv, Osoba.Statistics.Dotace>(osoba, stat, dotacestat);
+        var tuple = new Tuple<Osoba, Osoba.Statistics.RegistrSmluv, Osoba.Statistics.Dotace, decimal?, string>(osoba, stat, dotacestat, sponzoring, description);
         poslanciTable.AddRow(tuple);
     }
 }

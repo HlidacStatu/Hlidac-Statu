@@ -11,6 +11,7 @@
     Layout = null;
 
     var ceo = await Model.CurrentCeoAsync();
+    var socialContacts = (await Model.GetSocialContactsAsync()).ToList();
 }
 
 @* company header *@
@@ -54,7 +55,7 @@
             else
             {
                 var rppOsoby = await Model.CeosFromRPPAsync();
-                if (rppOsoby.Count() > 0)
+                if (rppOsoby.Any())
                 {
                     <div class="col-sm-4">
                         <div class="person-profile-thumb">
@@ -98,12 +99,12 @@
                 <td class="text-nowrap text-muted col-sm-5">Datová schránka</td>
                 <td class="col-sm-5">@string.Join(", ", Model.DatovaSchranka)</td>
             </tr>
-            @if (Model.GetSocialContacts().Any(m => m.Network == OsobaEvent.SocialNetwork.Zaznam_zastupitelstva))
+            @if (socialContacts.Any(m => m.Network == OsobaEvent.SocialNetwork.Zaznam_zastupitelstva))
             {
                 <tr>
                     <td class="text-nowrap text-muted col-sm-5">Záznamy zastupitelstva</td>
                     <td class="col-sm-5">
-                        @foreach (var ev in Model.GetSocialContacts().Where(m => m.Network == OsobaEvent.SocialNetwork.Zaznam_zastupitelstva))
+                        @foreach (var ev in socialContacts.Where(m => m.Network == OsobaEvent.SocialNetwork.Zaznam_zastupitelstva))
                         {
                             <span>@Html.SocialLinkWithIcon(ev.Network, ev.Contact, Model.ICO, "")</span>
                         }
@@ -111,12 +112,12 @@
                 </tr>
             }
 
-            @if (Model.GetSocialContacts().Any(m => m.Network != OsobaEvent.SocialNetwork.Zaznam_zastupitelstva))
+            @if (socialContacts.Any(m => m.Network != OsobaEvent.SocialNetwork.Zaznam_zastupitelstva))
             {
                 <tr>
                     <td class="text-nowrap text-muted col-sm-5">Odkazy</td>
                     <td class="col-sm-5">
-                        @foreach (var ev in Model.GetSocialContacts().Where(m => m.Network != OsobaEvent.SocialNetwork.Zaznam_zastupitelstva))
+                        @foreach (var ev in socialContacts.Where(m => m.Network != OsobaEvent.SocialNetwork.Zaznam_zastupitelstva))
                         {
                             <span>@Html.SocialLinkWithIcon(ev.Network, ev.Contact, Model.ICO, "")</span>
                         }

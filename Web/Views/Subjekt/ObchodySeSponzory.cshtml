@@ -84,7 +84,7 @@
                             }
                             else
                             {
-                                var firmaSponzoring = Firmy.Get(f.Item).SponzoringToHtml();
+                                var firmaSponzoring = await Firmy.Get(f.Item).SponzoringToHtmlAsync();
                                 if (!string.IsNullOrEmpty(firmaSponzoring))
                                 {
                                     sb.AppendFormat("<br/>{0}<br/>&nbsp;", firmaSponzoring);
