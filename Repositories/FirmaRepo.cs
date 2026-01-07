@@ -108,7 +108,7 @@ namespace HlidacStatu.Repositories
         public static Firma FromDS(string ds, bool getMissingFromExternal = false)
         {
             Firma f = FromDS(ds);
-            if (!f.Valid && getMissingFromExternal)
+            if (!(f?.Valid == true) && getMissingFromExternal)
             {
                 var d = ISDS.GetSubjektyForDS(ds);
                 if (d != null)
@@ -123,22 +123,19 @@ namespace HlidacStatu.Repositories
         public static Firma FromName(string jmeno, bool getMissingFromExternal = false, bool wildcards = false)
         {
             Firma f = FromNameFirstItem(jmeno, wildcards);
-            if (f.Valid)
+            if (f?.Valid == true)
                 return f;
 
             else if (getMissingFromExternal)
             {
                 f = Merk.FromName(jmeno);
-                if (f.Valid)
+                if (f?.Valid == true)
+                {
+                    f.RefreshDS();
+                    Save(f);
                     return f;
-
-                if (f == null)
-                    return Firma.NotFound;
-                else if (f == Firma.NotFound || f == Firma.LoadError)
-                    return f;
-
-                f.RefreshDS();
-                Save(f);
+                }
+ 
                 return f;
             }
             else
@@ -157,24 +154,22 @@ namespace HlidacStatu.Repositories
         {
             Firma f = FromIco(ico, loadAllData);
 
-            if (f.Valid)
+            if (f?.Valid == true)
                 return f;
 
             else if (getMissingFromExternal)
             {
                 f = Merk.FromIco(ico);
-                if (f.Valid)
+                if (f?.Valid == true)
                     return f;
 
-                if (!f.Valid) //try firmo
+                if (!(f?.Valid == true)) //try firmo
                 {
                     f = RZP.FromIco(ico);
                 }
 
                 if (f == null)
-                    return Firma.NotFound;
-                else if (f == Firma.NotFound || f == Firma.LoadError)
-                    return f;
+                    return null;
 
                 f.RefreshDS();
                 Save(f);
@@ -182,7 +177,7 @@ namespace HlidacStatu.Repositories
             }
             else
             {
-                return Firma.NotFound;
+                return null;
             }
         }
 
@@ -244,7 +239,7 @@ namespace HlidacStatu.Repositories
         public static Firma FromIco(string ico, bool loadInvalidIco = false)
         {
             if (Util.DataValidators.CheckCZICO(ico) == false && loadInvalidIco == false)
-                return Firma.NotFound;
+                return null;
 
             Firma f = new Firma();
             using (DbEntities db = new DbEntities())
@@ -252,7 +247,7 @@ namespace HlidacStatu.Repositories
 
                 f = db.Firma.FirstOrDefault(m => m.ICO == ico);
                 if (f is null)
-                    return Firma.NotFound;
+                    return null;
 
                 f.ICO = HlidacStatu.Util.ParseTools.NormalizeIco(f.ICO);
 
@@ -267,21 +262,21 @@ namespace HlidacStatu.Repositories
                     return f;
                 }
                 else
-                    return Firma.NotFound;
+                    return null;
             }
         }
         
         public static async Task<Firma> FromIcoAsync(string ico, bool loadInvalidIco = false)
         {
             if (Util.DataValidators.CheckCZICO(ico) == false && loadInvalidIco == false)
-                return Firma.NotFound;
+                return null;
         
             Firma f = new Firma();
             await using DbEntities db = new DbEntities();
             
             f = await db.Firma.FirstOrDefaultAsync(m => m.ICO == ico);
             if (f is null)
-                return Firma.NotFound;
+                return null;
         
             f.ICO = HlidacStatu.Util.ParseTools.NormalizeIco(f.ICO);
         
@@ -296,7 +291,7 @@ namespace HlidacStatu.Repositories
                 return f;
             }
             else
-                return Firma.NotFound;
+                return null;
         }
 
         public static Firma FromNameFirstItem(string jmeno, bool wildcards = false)
@@ -306,7 +301,7 @@ namespace HlidacStatu.Repositories
                 res = AllFromNameWildcards(jmeno);
             else
                 res = AllFromExactName(jmeno);
-            return res.FirstOrDefault(Firma.NotFound);
+            return res.FirstOrDefault();
 
         }
 
@@ -320,7 +315,7 @@ namespace HlidacStatu.Repositories
 
             if (res?.Count() > 0)
             {
-                return res.Select(m => FromIco(m)).Where(m => m.Valid);
+                return res.Select(m => FromIco(m)).Where(m => m?.Valid == true);
             }
             else
                 return new Firma[] { };
@@ -352,7 +347,7 @@ namespace HlidacStatu.Repositories
 
             if (res?.Count() > 0)
             {
-                return res.Select(m => FromIco(m)).Where(m => m.Valid);
+                return res.Select(m => FromIco(m)).Where(m => m?.Valid == true);
             }
             else
                 return new Firma[] { };
@@ -373,7 +368,7 @@ namespace HlidacStatu.Repositories
             }
             else
             {
-                return Firma.NotFound;
+                return null;
             }
 
 

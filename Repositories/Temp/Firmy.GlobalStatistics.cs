@@ -101,7 +101,7 @@ namespace HlidacStatu.Repositories
                         {
                             var ico = (string)val.Key;
                             var f = Get(ico);
-                            if (f.PatrimStatu())
+                            if (f?.PatrimStatu() == true)
                             {
                                 if ((await f.StatistikaRegistruSmluvAsync()).Any(m =>
                                         m.Value.PocetSmluv >= Entities.KIndex.Consts.MinPocetSmluvPerYear)
@@ -130,7 +130,7 @@ namespace HlidacStatu.Repositories
                         {
                             var ico = (string)val.Key;
                             var f = Get(ico);
-                            if (f.PatrimStatu())
+                            if (f?.PatrimStatu() == true)
                             {
                                 if ((await f.StatistikaRegistruSmluvAsync()).Any(m =>
                                         m.Value.PocetSmluv >= Entities.KIndex.Consts.MinPocetSmluvPerYear)
@@ -215,10 +215,13 @@ namespace HlidacStatu.Repositories
                 await Manager.DoActionForAllAsync<string>(icos,
                     (Func<string, Task<ActionOutputData>>)(async ico =>
                     {
-                        var stat = await Get(ico)?.StatistikaRegistruSmluvAsync(obor.Value);
-                        if (stat != null)
-                            data.Add(stat);
-
+                        var f = Get(ico);
+                        if (f != null)
+                        {
+                            var stat = await f.StatistikaRegistruSmluvAsync(obor.Value);
+                            if (stat != null)
+                                data.Add(stat);
+                        }
                         return new ActionOutputData();
                     }), logOutputFunc, progressOutputFunc, true, maxDegreeOfParallelism: threads
                     , prefix: $"CalculateGlobalRankPerYear_UradySmlouvy_{obor.Value} "

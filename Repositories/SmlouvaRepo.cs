@@ -122,7 +122,7 @@ namespace HlidacStatu.Repositories
                     )
                 {
                     Firma objednatel = Firmy.Get(res.SecondToCompare.objednatel.GetOnlyIco());
-                    if (objednatel.Valid)
+                    if (objednatel?.Valid == true)
                     {
                         objednatelIsTrue = await llm.DoubleCheckParties(objednatel.Jmeno, objednatel.ICO, true, t.ToString());
                     }
@@ -135,7 +135,7 @@ namespace HlidacStatu.Repositories
                     foreach (var d in res.SecondToCompare.poskytovatele)
                     {
                         Firma dodavatel = Firmy.Get(res.SecondToCompare.objednatel.GetOnlyIco());
-                        if (dodavatel.Valid)
+                        if (dodavatel?.Valid == true)
                         {
                             dodavateleAreTrue = dodavateleAreTrue &
                                 (
@@ -235,12 +235,12 @@ namespace HlidacStatu.Repositories
             Firma[] fPrijemci = smlouva.Prijemce.Select(m => m.ico)
                 .Where(m => !string.IsNullOrWhiteSpace(m))
                 .Select(m => Firmy.Get(m))
-                .Where(f => f.Valid)
+                .Where(f => f?.Valid == true)
                 .ToArray();
 
             List<Firma> firmy = fPrijemci
                 .Concat(new Firma[] { fPlatce })
-                .Where(f => f.Valid)
+                .Where(f => f?.Valid == true)
                 .ToList();
 
             smlouva.Hint.DenUzavreni = (int)Devmasters.DT.Util.TypeOfDay(smlouva.datumUzavreni);
@@ -270,7 +270,7 @@ namespace HlidacStatu.Repositories
                 }
             }
 
-            if (fPlatce.Valid && fPlatce.PatrimStatu())
+            if (fPlatce?.Valid == true && fPlatce.PatrimStatu())
             {
                 if (fPrijemci.All(f => f.PatrimStatu()))
                     smlouva.Hint.VztahSeSoukromymSubjektem =
@@ -282,7 +282,7 @@ namespace HlidacStatu.Repositories
                     smlouva.Hint.VztahSeSoukromymSubjektem = (int)HintSmlouva.VztahSeSoukromymSubjektemTyp.Kombinovane;
             }
 
-            if (fPlatce.Valid && fPlatce.PatrimStatu() == false)
+            if (fPlatce?.Valid == true && fPlatce.PatrimStatu() == false)
             {
                 if (fPrijemci.All(f => f.PatrimStatu()))
                     smlouva.Hint.VztahSeSoukromymSubjektem =
@@ -391,7 +391,7 @@ namespace HlidacStatu.Repositories
             {
                 f = Firmy.Get(smlouva.Platce.ico);
 
-                if (f.Valid && !f.PatrimStatu())
+                if (f?.Valid == true && !f.PatrimStatu())
                 {
                     if (!string.IsNullOrEmpty(smlouva.Platce.ico) && icos.Contains(smlouva.Platce.ico))
                         return true;
@@ -400,7 +400,7 @@ namespace HlidacStatu.Repositories
                 foreach (var ss in smlouva.Prijemce)
                 {
                     f = Firmy.Get(ss.ico);
-                    if (f.Valid && !f.PatrimStatu())
+                    if (f?.Valid == true && !f.PatrimStatu())
                     {
                         if (!string.IsNullOrEmpty(ss.ico) && icos.Contains(ss.ico))
                             return true;

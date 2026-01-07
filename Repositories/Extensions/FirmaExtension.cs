@@ -309,7 +309,7 @@ namespace HlidacStatu.Extensions
         {
             List<(string jmeno, string prijmeni, DateTime? poslednizmena)> osoby = new List<(string jmeno, string prijmeni, DateTime? poslednizmena)>();
 
-            if (firma.Valid == false || string.IsNullOrEmpty(firma.ICO))
+            if (!(firma?.Valid == true) || string.IsNullOrEmpty(firma.ICO))
                 return osoby.ToArray();
 
             var client = Manager.GetESClient_RPP_OVM();
@@ -545,6 +545,9 @@ namespace HlidacStatu.Extensions
 
         public static async Task<Riziko[]> GetDirectRizikoAsync(Firma firma, int rok)
         {
+            if (firma == null)
+                return Array.Empty<Riziko>();
+
             List<Riziko> res = new List<Riziko>();
             var statistics = (await firma.StatistikaRegistruSmluvAsync()).StatisticsForYear(rok);
             var kindex = (await firma.KindexAsync())?.ForYear(rok);
@@ -706,12 +709,15 @@ namespace HlidacStatu.Extensions
         
         public static async Task<InfoFact[]> GetDirectInfoFactsAsync(Firma firma)
         {
+            if (firma == null)
+                return Array.Empty<InfoFact>();
+
             var sName = firma.ObecneJmeno();
             bool sMuzsky = sName == uradName;
 
             List<InfoFact> f = new List<InfoFact>();
             //var stat = new HlidacStatu.Lib.Analysis.SubjectStatistic(this);
-            var stat = await firma.StatistikaRegistruSmluvAsync();
+            var stat = await firma.StatistikaRegistruSmluvAsync() ;
             var statHolding = await firma.HoldingStatisticsRegistrSmluvAsync();
             int rok = DateTime.Now.Year;
             if (DateTime.Now.Month < 3)

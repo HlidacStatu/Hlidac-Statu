@@ -429,10 +429,29 @@
                                     <tbody>
                                         @foreach (var owner in ownersHistory.OrderByDescending(item => item.DatumOd))
                                         {
+                                            
                                             <tr>
                                                 <td>@DisplayPerson(owner?.FormaVlastnictvi.ToString())</td>
-                                                <td>@Display(owner?.Nazev)</td>
-                                                <td>@Display(owner?.Ico)</td>
+                                                <td>
+                                                    @if (HlidacStatu.Util.DataValidators.CheckCZICO(owner?.Ico))
+                                                    {
+                                                        <a href="/subjekt/@owner.Ico">@Display(owner?.Nazev)</a>
+                                                    }
+                                                    else 
+                                                    {
+                                                        @Display(owner?.Nazev)
+                                                    }
+                                                    </td>
+                                                <td>
+                                                    @if (HlidacStatu.Util.DataValidators.CheckCZICO(owner?.Ico))
+                                                    {
+                                                        <a href="/subjekt/@owner.Ico">@Display(owner?.Nazev)</a>
+                                                    }
+                                                    else
+                                                    {
+                                                        @Display(owner?.Ico)
+                                                    }
+                                                    </td>
                                                 <td>@Display(owner?.Adresa)</td>
                                                 <td>@Display(owner?.DatumOd) - @Display(owner?.DatumDo)</td>
                                                 <td>@Display(owner?.Aktualni)</td>

@@ -227,7 +227,7 @@ namespace HlidacStatu.Repositories
 
                 var smluvniStrany = smlouva.Prijemce.Concat([smlouva.Platce])
                     .Select(m => Firmy.Get(m.ico))
-                    .Where(m => m.Valid == true)
+                    .Where(m => m?.Valid == true)
                     .ToArray();
                 
                 if (types.Count(m => vyjimkyClassif.Contains(m.Key)) > 0

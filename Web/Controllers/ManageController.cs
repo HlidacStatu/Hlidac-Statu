@@ -79,7 +79,7 @@ namespace HlidacStatu.Web.Controllers
                 foreach (var n in names)
                 {
                     Firma f = FirmaRepo.FirmaInText(n);
-                    if (f != null && f.Valid)
+                    if (f?.Valid == true)
                         res.Add(f);
                     else
                         res.Add(new Firma() { Jmeno = n, ICO = "" });
@@ -99,7 +99,7 @@ namespace HlidacStatu.Web.Controllers
                 foreach (var ic in icos)
                 {
                     Firma f = Firmy.Get(ic);
-                    if (f != null && f.Valid)
+                    if (f?.Valid == true)
                         res.Add(f);
                     else
                         res.Add(new Firma() { Jmeno = ic, ICO = ic });
@@ -149,7 +149,7 @@ namespace HlidacStatu.Web.Controllers
             if (string.IsNullOrWhiteSpace(Id))
                 return NotFound();
             Firma model = Firmy.Get(Id);
-            if (model == null || !Firma.IsValid(model))
+            if (model == null || model.Valid==false)
             {
                 return NotFound();
             }

@@ -27,7 +27,7 @@ namespace HlidacStatu.Repositories
             {
                 var res = Search(searchICOUrl, ico);
                 if (res.Count() == 0)
-                    return Firma.NotFound;
+                    return null;
                 else
                     return res.First().ToFirma();
             }
@@ -55,7 +55,7 @@ namespace HlidacStatu.Repositories
                     .FirstOrDefault();
 
                 if (r1 == null)
-                    return Firma.NotFound;
+                    return null;
                 else
                     return r1.ToFirma();
             }

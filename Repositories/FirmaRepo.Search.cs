@@ -47,7 +47,7 @@ namespace HlidacStatu.Repositories
                     foreach (var ic in specifiedIcosInQuery.Skip((page - 1) * size).Take(size))
                     {
                         Firma f = Firmy.Get(ic);
-                        if (f.Valid && FirmaRepo.IgnoredIcos.Contains(f.ICO) == false)
+                        if (f?.Valid == true && FirmaRepo.IgnoredIcos.Contains(f.ICO) == false)
                         {
                             //nalezene ICO
                             found.Add(f);

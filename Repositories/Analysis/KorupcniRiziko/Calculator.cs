@@ -33,7 +33,7 @@ namespace HlidacStatu.Repositories.Analysis.KorupcniRiziko
             Ico = ico;
 
             _urad = Firmy.Get(this.Ico);
-            if (_urad.Valid == false)
+            if (!( _urad?.Valid == true))
                 throw new ArgumentOutOfRangeException("invalid ICO");
         }
 
@@ -671,7 +671,7 @@ namespace HlidacStatu.Repositories.Analysis.KorupcniRiziko
                             if (prij.ico == s.Platce.ico)
                                 continue;
                             Firma f = Firmy.Get(prij.ico);
-                            if (f.Valid && f.PatrimStatu())
+                            if (f?.Valid == true && f.PatrimStatu())
                                 continue;
 
                             string dodavatel = prij.ico;

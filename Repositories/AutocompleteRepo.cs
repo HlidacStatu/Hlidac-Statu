@@ -304,7 +304,7 @@ namespace HlidacStatu.Repositories
                     string img = "<i class='fas fa-university'></i>";
 
                     var fi = Firmy.Get(f.Item2);
-                    if (fi.Valid)
+                    if (fi?.Valid == true)
                     {
                         var o = (await fi.CurrentCeoAsync()).Osoba;
                         if (o != null)
@@ -366,7 +366,7 @@ namespace HlidacStatu.Repositories
                     string img = "<i class='fas fa-city'></i>";
 
                     var fi = Firmy.Get(f.Ico);
-                    if (fi.Valid)
+                    if (fi?.Valid == true)
                     {
                         var o = (await fi.CurrentCeoAsync()).Osoba;
                         if (o != null)

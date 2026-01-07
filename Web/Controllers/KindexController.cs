@@ -98,7 +98,7 @@ namespace HlidacStatu.Web.Controllers
             foreach (var i in id.Split(new char[] { ' ', ',', ';' }, StringSplitOptions.RemoveEmptyEntries))
             {
                 var f = Firmy.Get(Util.ParseTools.NormalizeIco(i));
-                if (f.Valid)
+                if (f?.Valid == true)
                 {
                     SubjectWithKIndexAnnualData data = new SubjectWithKIndexAnnualData()
                     {
@@ -174,7 +174,7 @@ namespace HlidacStatu.Web.Controllers
             _ = Task.Run(() =>
             {
                 var f = Firmy.Get(Util.ParseTools.NormalizeIco(data));
-                if (f.Valid)
+                if (f?.Valid == true)
                 {
 
                     try
@@ -249,7 +249,7 @@ text zpravy: {txt}";
         {
             rok = await KIndexRepo.FixKindexYearAsync(rok);
             var f = Firmy.Get(Util.ParseTools.NormalizeIco(id));
-            if (f.Valid)
+            if (f?.Valid == true)
             {
                 var kidx = await KIndex.GetCachedAsync(Util.ParseTools.NormalizeIco(id));
 
@@ -327,7 +327,7 @@ text zpravy: {txt}";
                 foreach (var i in ico.Split(new char[] { ' ', ',', ';' }, StringSplitOptions.RemoveEmptyEntries))
                 {
                     var f = Firmy.Get(Util.ParseTools.NormalizeIco(i));
-                    if (f.Valid)
+                    if (f?.Valid == true)
                     {
                         var kidx = await KIndex.GetCachedAsync(Util.ParseTools.NormalizeIco(i), refreshCache: true);
                         if (kidx != null)

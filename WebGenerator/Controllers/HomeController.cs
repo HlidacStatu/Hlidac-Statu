@@ -97,7 +97,7 @@ namespace HlidacStatu.WebGenerator.Controllers
             if (id?.ToLower() == "subjekt")
             {
                 Firma fi = Firmy.Get(v);
-                if (fi.Valid)
+                if (fi?.Valid == true)
                 {
                     if (!(await fi.NotInterestingToShowAsync()))
                     {

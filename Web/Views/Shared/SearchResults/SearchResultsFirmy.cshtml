@@ -13,9 +13,9 @@
     <tbody>
     @foreach (var item in Model.Result)
     {
-        if (item.Valid)
+            if (item?.Valid == true)
         {
-            var stat = await item.StatistikaRegistruSmluvAsync();
+                var stat = await item.StatistikaRegistruSmluvAsync();
 
             <tr>
                 <td>

@@ -1,5 +1,7 @@
 ﻿@using System.Threading
+@using HlidacStatu.Entities
 @using HlidacStatu.Extensions
+@using HlidacStatu.Lib.Analytics
 @using HlidacStatu.Repositories
 @using HlidacStatu.DS.Graphs
 @using HlidacStatu.Repositories.Statistics
@@ -16,7 +18,7 @@
     }
 
     var statistics = await Model.StatistikaRegistrSmluvAsync();
-    var vazbyPodleAktualnosti = Model.AktualniVazby( Relation.CharakterVazbyEnum.VlastnictviKontrola, aktualnost);
+    var vazbyPodleAktualnosti = Model.AktualniVazby(Relation.CharakterVazbyEnum.VlastnictviKontrola, aktualnost);
 }
 
 
@@ -74,25 +76,25 @@
             {
                 <span>(z toho v @Devmasters.Lang.CS.Plural.Get(statistics.SmlouvyStat_NeziskovkyCount(), "jedné neziskovce", "{0} neziskovkách", "{0} neziskovkách")):</span>
             }
-        <ul>
-            @foreach (var stat in statistics.SoukromeFirmy
-                              .OrderByDescending(o => o.Value.Summary().CelkovaHodnotaSmluv)
-                         )
-            {
-                <li>
-                    <a asp-controller="Subjekt" asp-action="Index" asp-route-id="@stat.Key">
-                        @Firmy.GetJmeno(stat.Key)
-                    </a>
-                    (@Html.Raw(stat.Value.Summary().ToNiceLinkString(null, true, customUrl: $"/hledat?q=ico:{stat.Key}")) od
-                    2016
-                    @if (stat.Value.CurrentSeasonStatistics().PocetSmluv > 0)
-                    {
-                        @($", {stat.Value.CurrentSeasonStatistics().ToNiceLinkString(null, false)} v {stat.Value.CurrentSeasonYear()}")
-                    }
-                    )
-                </li>
-            }
-        </ul>
+            <ul>
+                @foreach (var stat in statistics.SoukromeFirmy
+                            .OrderByDescending(o => o.Value.Summary().CelkovaHodnotaSmluv)
+                            )
+                {
+                    <li>
+                        <a asp-controller="Subjekt" asp-action="Index" asp-route-id="@stat.Key">
+                            @Firmy.GetJmeno(stat.Key)
+                        </a>
+                        (@Html.Raw(stat.Value.Summary().ToNiceLinkString(null, true, customUrl: $"/hledat?q=ico:{stat.Key}")) od
+                        2016
+                        @if (stat.Value.CurrentSeasonStatistics().PocetSmluv > 0)
+                        {
+                            @($", {stat.Value.CurrentSeasonStatistics().ToNiceLinkString(null, false)} v {stat.Value.CurrentSeasonYear()}")
+                        }
+                        )
+                    </li>
+                }
+            </ul>
 
         </p>
     }
@@ -152,38 +154,38 @@
                     break;
             }
 
-        <ul>
-            @foreach (var stat in statistics.StatniFirmy
-                              .OrderByDescending(o => o.Value.CurrentSeasonStatistics().CelkovaHodnotaSmluv)
-                         )
-            {
-                <li>
-                    <a asp-controller="Subjekt" asp-action="Index" asp-route-id="@stat.Key">
-                        @Firmy.GetJmeno(stat.Key)
-                    </a>
-                    (@Html.Raw(stat.Value.Summary().ToNiceLinkString(null, true, customUrl: $"/hledat?q=ico:{stat.Key}")) od
-                    2016
-                    @if (stat.Value.CurrentSeasonStatistics().PocetSmluv > 0)
-                    {
-                        @($", {stat.Value.CurrentSeasonStatistics().ToNiceLinkString(null, false)} v {stat.Value.CurrentSeasonYear()}")
-                    }
-                    )
-                </li>
-            }
-        </ul>
+            <ul>
+                @foreach (var stat in statistics.StatniFirmy
+                            .OrderByDescending(o => o.Value.CurrentSeasonStatistics().CelkovaHodnotaSmluv)
+                            )
+                {
+                    <li>
+                        <a asp-controller="Subjekt" asp-action="Index" asp-route-id="@stat.Key">
+                            @Firmy.GetJmeno(stat.Key)
+                        </a>
+                        (@Html.Raw(stat.Value.Summary().ToNiceLinkString(null, true, customUrl: $"/hledat?q=ico:{stat.Key}")) od
+                        2016
+                        @if (stat.Value.CurrentSeasonStatistics().PocetSmluv > 0)
+                        {
+                            @($", {stat.Value.CurrentSeasonStatistics().ToNiceLinkString(null, false)} v {stat.Value.CurrentSeasonYear()}")
+                        }
+                        )
+                    </li>
+                }
+            </ul>
         </p>
     }
 
-    <hr/>
+    <hr />
 
     <p style="padding-top:30px;">
         @Html.Raw(
-            await HlidacStatu.Repositories.Graph.TiskVazebAsync(
-                Model.FullName(), Model.VazbyRootEdge(),
-                vazbyPodleAktualnosti,
-                Relation.TiskEnum.Html
-            )
+        await HlidacStatu.Repositories.Graph.TiskVazebAsync(
+        Model.FullName(), Model.VazbyRootEdge(),
+        vazbyPodleAktualnosti,
+        Relation.TiskEnum.Html
         )
+                )
     </p>
 
 
@@ -194,46 +196,50 @@
         var semaphore = new SemaphoreSlim(10);
 
         var dataTasks = vazbyPodleAktualnosti
-            .Where(v => v.To != null && v.To.Type == HlidacStatu.DS.Graphs.Graph.Node.NodeType.Company)
-            .GroupBy(f => f.To.Id, v => v, (ico, v) => new { ico, v })
-            .Select(async g =>
+        .Where(v => v.To != null && v.To.Type == HlidacStatu.DS.Graphs.Graph.Node.NodeType.Company)
+        .GroupBy(f => f.To.Id, v => v, (ico, v) => new { ico, v })
+        .Select(async g =>
+        {
+            await semaphore.WaitAsync();
+            try
             {
-                await semaphore.WaitAsync();
-                try
+                var f = Firmy.Get(g.ico);
+
+                StatisticsSubjectPerYear<Smlouva.Statistics.Data> stat = new();
+                if (f != null)
+                    stat = await f.StatistikaRegistruSmluvAsync();
+                return new
                 {
-                    var stat = await Firmy.Get(g.ico).StatistikaRegistruSmluvAsync();
-                    return new
-                    {
-                        ICO = g.ico,
-                        FirmaName = g.v.First().To.PrintName(),
-                        VazbyPerIco = Model.VazbyProICO(g.ico),
-                        stat
-                    };
-                }
-                finally
-                {
-                    semaphore.Release();
-                }
-            })
-            .ToArray();
+                    ICO = g.ico,
+                    FirmaName = g.v.First().To.PrintName(),
+                    VazbyPerIco = Model.VazbyProICO(g.ico),
+                    stat
+                };
+            }
+            finally
+            {
+                semaphore.Release();
+            }
+        })
+        .ToArray();
 
         var data = (await Task.WhenAll(dataTasks))
-            .OrderByDescending(m => m.stat.Summary().CelkovaHodnotaSmluv)
-            .ThenBy(m => m.ICO)
-            .ToList();
+        .OrderByDescending(m => m.stat.Summary().CelkovaHodnotaSmluv)
+        .ThenBy(m => m.ICO)
+        .ToList();
     }
     <p style="padding-top:30px;">
         @foreach (var vPerIco in data)
         {
-        <div>
-            <h4><a href="/subjekt/@(vPerIco.ICO)">@vPerIco.FirmaName</a></h4>
-            @Html.RenderVazby(vPerIco.VazbyPerIco)
+            <div>
+                <h4><a href="/subjekt/@(vPerIco.ICO)">@vPerIco.FirmaName</a></h4>
+                @Html.RenderVazby(vPerIco.VazbyPerIco)
 
 
-        </div>
-    }
+            </div>
+        }
     </p>
-    <partial name="PolitikDisclaimer" view-data="ViewData"/>
+    <partial name="PolitikDisclaimer" view-data="ViewData" />
 
 </div>
 

@@ -84,7 +84,7 @@
                 HtmlRender = (s) =>
                 {
                     string res = "";
-                    if (s.Firma.Valid)
+                    if (s.Firma?.Valid == true)
                     {
                         var chartData = new Series[]
                         {
@@ -114,7 +114,7 @@
     {
         var firma = Firmy.Get(datum.data);
         StatisticsSubjectPerYear<Smlouva.Statistics.Data>? firmaStat = null;
-        if(firma.Valid)
+        if (firma?.Valid == true)
             firmaStat = await firma.StatistikaRegistruSmluvAsync();
         tbl.AddRow((datum, firma, firmaStat));
     }

@@ -30,12 +30,12 @@
     }
 
     string icoStrany = ZkratkaStranyRepo.IcoStrany((string)Model);
-    if (string.IsNullOrEmpty(icoStrany ))
+    if (string.IsNullOrEmpty(icoStrany))
         icoStrany = ZkratkaStranyRepo.IcoStrany(System.Net.WebUtility.UrlDecode((string)Model));
 
     string stranaZkratka = "";
     Firma strana = Firmy.Get(icoStrany);
-    if (strana.Valid == false)
+    if (!( strana?.Valid == true))
     {
         <text>
             <h2>Strana nenalezena</h2><p>Pokračovat na <a href='/sponzori/strany'>přehledu všech stran</a>.</p>

@@ -42,7 +42,7 @@
 
     foreach (var firma in Model.Select(ico => Firmy.Get(ico)))
     {
-        if (firma.Valid)
+        if (firma?.Valid == true)
         {
             var srsTask = firma.StatistikaRegistruSmluvAsync();
             var kindexTask = Html.KIndexLabelLinkAsync(firma.ICO);

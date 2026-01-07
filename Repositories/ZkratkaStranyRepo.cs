@@ -24,7 +24,7 @@ namespace HlidacStatu.Repositories
             if (DataValidators.CheckCZICO(Devmasters.TextUtil.NormalizeToNumbersOnly(zkratka)))
             {
                 var f = Firmy.Get(Devmasters.TextUtil.NormalizeToNumbersOnly(zkratka));
-                if (f.Valid && f.Kod_PF == 711)
+                if (f?.Valid == true && f.Kod_PF == 711)
                     return Devmasters.TextUtil.NormalizeToNumbersOnly(zkratka);
                 else
                     return zkratka; //TODO co delat, kdyz ICO neni politicka strana

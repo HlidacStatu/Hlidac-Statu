@@ -24,12 +24,12 @@ namespace HlidacStatu.Repositories
         private static Firma getByIco(string key)
         {
             var o = FirmaRepo.FromIco(key);
-            return o ?? nullObj;
+            return o;
         }
         private static Firma getByDS(string key)
         {
             var o = FirmaRepo.FromDS(key);
-            return o ?? nullObj;
+            return o ;
         }
 
         public static Devmasters.Cache.Memcached.Manager<Firma, string> instanceByIco
@@ -67,14 +67,14 @@ namespace HlidacStatu.Repositories
         public static Firma Get(string ICO)
         {
             if (string.IsNullOrEmpty(ICO))
-                return Firma.LoadError;
+                return null;
 
             string normalizedIco = Util.ParseTools.NormalizeIco(ICO);
             if(string.IsNullOrWhiteSpace(normalizedIco))
-                return Firma.LoadError;
+                return null;
             var f = instanceByIco.Get(normalizedIco);
             if (f == null)
-                return Firma.LoadError;
+                return null;
             else
                 return f;
 
@@ -86,7 +86,7 @@ namespace HlidacStatu.Repositories
 
             var f = instanceByDS.Get(ds);
             if (f == null)
-                return Firma.LoadError;
+                return null;
             else
             {
                 f.ICO = HlidacStatu.Util.ParseTools.NormalizeIco(f.ICO); //fix

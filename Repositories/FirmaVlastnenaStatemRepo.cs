@@ -595,7 +595,7 @@ and (esa2010 in (" + string.Join(",",vzdySoukr_ESA2010.Select(m=>$"'{m}'")) + @"
              (ico, obj) =>
              {
                  var f = Firmy.Get(ico);
-                 if (f.Valid && FirmaVlastnenaStatemRepo.MuzeBytStatni_PodlePravniFormaKod(f.Kod_PF))
+                 if (f?.Valid == true && FirmaVlastnenaStatemRepo.MuzeBytStatni_PodlePravniFormaKod(f.Kod_PF))
                  {
 
                      List<string> subjIco = new List<string>();
@@ -605,7 +605,7 @@ and (esa2010 in (" + string.Join(",",vzdySoukr_ESA2010.Select(m=>$"'{m}'")) + @"
                      foreach (var inIc in subjIco)
                      {
                          var ff = Firmy.Get(inIc);
-                         if (ff.Valid 
+                         if (ff?.Valid == true
                             && FirmaVlastnenaStatemRepo.MuzeBytStatni_PodlePravniFormaKod(ff.Kod_PF)
                             && OVM_Nikdy_nejsou_statni_Filter_ESA2010_JeSoukrome(ff.ESA2010) == false
                             )

@@ -28,7 +28,7 @@ public class HomeController : Controller
         {
             //ico
             var f = Firmy.Get(id);
-            if (f.Valid)
+            if (f?.Valid == true)
                 ds = f.DatovaSchranka;
 
         }

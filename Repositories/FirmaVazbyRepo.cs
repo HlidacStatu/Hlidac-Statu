@@ -75,7 +75,7 @@ namespace HlidacStatu.Repositories
 
             Relation.AktualnostType aktualnost = Relation.AktualnostType.Nedavny;
             Firma f = Firmy.Get(icoOfMother);
-            if (f != null && f.Valid)
+            if (f != null && f?.Valid == true)
             {
                 var icos = new string[] { f.ICO }
                     .Union(

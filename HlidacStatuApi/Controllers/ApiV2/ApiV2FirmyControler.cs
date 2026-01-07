@@ -32,7 +32,7 @@ namespace HlidacStatuApi.Controllers.ApiV2
             try
             {
                 var f = Firmy.Get(ico);
-                if (f.Valid == false)
+                if (!(f?.Valid == true ))
                 {
                     return NotFound($"Firma {ico} nenalezena.");
                 }

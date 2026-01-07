@@ -221,7 +221,7 @@ public class StatisticsCache
 
         var perIcoStatTasks = firmy_maxrok
             .Select(m => new { firma = Firmy.Get(m.Key), interval = m.Value })
-            .Where(m => m.firma.Valid == true)
+            .Where(m => m.firma?.Valid == true)
             .Select(async m =>
             {
                 await semaphore.WaitAsync();
@@ -413,7 +413,12 @@ public class StatisticsCache
                 await semaphore.WaitAsync();
                 try
                 {
-                    var stat = await Firmy.Get(f.Key).StatistikaDotaciAsync();
+                    var ff = Firmy.Get(f.Key);
+
+                    StatisticsSubjectPerYear<Firma.Statistics.Dotace> stat = new();
+                    if (ff != null)
+                        stat = await ff.StatistikaDotaciAsync();
+
                     return new StatisticsSubjectPerYear<Firma.Statistics.Dotace>(
                         f.Key,
                         stat.Filter(m => m.Key >= f.Value.From?.Year && m.Key <= f.Value.To?.Year)
@@ -523,7 +528,7 @@ public class StatisticsCache
         var perIcoStat = await Task.WhenAll(
             firmy_maxrok
                 .Select(m => new { firma = Firmy.Get(m.Key), interval = m.Value })
-                .Where(m => m.firma.Valid == true)
+                .Where(m => m.firma?.Valid == true)
                 .Select(async m =>
                 {
                     await semaphore.WaitAsync();

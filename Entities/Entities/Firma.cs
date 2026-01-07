@@ -131,17 +131,6 @@ namespace HlidacStatu.Entities
             }
         }
 
-        public static bool IsValid(Firma f)
-        {
-            if (f == null)
-                return false;
-            else
-                return f.Valid;
-        }
-
-        public static Firma NotFound = new Firma() { ICO = "notfound", Valid = false };
-        public static Firma LoadError = new Firma() { ICO = "error", Valid = false };
-
 
         static string cnnStr = Config.GetWebConfigValue("OldEFSqlConnection");
 
@@ -325,24 +314,11 @@ namespace HlidacStatu.Entities
 
         bool? _valid = null;
 
+        
+        public bool ValidIC { get; set; }
 
         [NotMapped]
-        public bool Valid
-        {
-            get
-            {
-                if (_valid == null)
-                    _valid = !(ICO == NotFound.ICO
-                               || ICO == LoadError.ICO
-                               || string.IsNullOrEmpty(this.Jmeno)
-                               || string.IsNullOrWhiteSpace(this.ICO)
-                               );
-
-                return _valid.Value;
-            }
-
-            private set { _valid = value; }
-        }
+        public bool Valid { get => this.ValidIC; }
 
 
         public string JmenoBezKoncovky()

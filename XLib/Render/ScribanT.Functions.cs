@@ -194,7 +194,7 @@ namespace HlidacStatu.XLib.Render
                 if (!string.IsNullOrEmpty(ico))
                 {
                     var firma = Firmy.instanceByIco.Get(ico);
-                    if (firma.Valid)
+                    if (firma?.Valid == true)
                     {
                         var stat = await firma.StatistikaRegistruSmluvAsync();
                         var pocet = stat.Sum(stat.YearsAfter2016(), s => s.PocetSmluv);

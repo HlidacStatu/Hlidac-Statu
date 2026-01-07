@@ -1,4 +1,5 @@
-﻿@using Nest
+﻿@using HlidacStatu.Lib.Analytics
+@using Nest
 @using HlidacStatu.XLib.Render;
 @using HlidacStatu.Extensions
 @using HlidacStatu.Repositories
@@ -58,7 +59,10 @@
 
     foreach (Nest.KeyedBucket<object> val in ((BucketAggregate)res.ElasticResults.Aggregations["perIco"]).Items)
     {
-        var statRs = await Firmy.Get((string)val.Key).StatistikaRegistruSmluvAsync();
+        StatisticsSubjectPerYear<Smlouva.Statistics.Data> statRs = new();
+        var f = Firmy.Get((string)val.Key);
+        if (f != null)
+            statRs = await f.StatistikaRegistruSmluvAsync();
         rdsPerIco.AddRow(
             new Tuple<string, string> (FirmaRepo.NameFromIco((string)val.Key, true), (string)val.Key),
             val.DocCount,

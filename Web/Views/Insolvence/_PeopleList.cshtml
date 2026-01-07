@@ -1,6 +1,7 @@
 ﻿@using System.Linq;
 @using HlidacStatu.Entities
 @using HlidacStatu.Extensions
+@using HlidacStatu.Lib.Analytics
 @using HlidacStatu.Repositories
 @using HlidacStatu.Repositories.Cache
 @using Microsoft.AspNetCore.Html
@@ -58,7 +59,11 @@
 	async Task<HtmlString> statisticsForIcoAsync(string ico)
     {
         var f = Firmy.Get(ico);
-        var stat = await f.StatistikaRegistruSmluvAsync();
+		StatisticsSubjectPerYear<Smlouva.Statistics.Data> stat = null;
+		if (f != null)
+			stat = await f.StatistikaRegistruSmluvAsync();
+		stat = stat ?? new StatisticsSubjectPerYear<Smlouva.Statistics.Data>();
+		
         var pocetSmluv = Devmasters.Lang.CS.Plural.Get(stat.Summary().PocetSmluv, "{0} smlouvu;{0} smlouvy;{0} smluv");
         var smlouvyText = $" - Nalezeli jsme {pocetSmluv} v Registru smluv o celkové hodnotě <strong>{HlidacStatu.Util.RenderData.NicePriceHtml(stat.Summary().CelkovaHodnotaSmluv, mena: "Kč")}</strong>.";
 

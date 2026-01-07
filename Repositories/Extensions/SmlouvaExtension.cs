@@ -43,7 +43,7 @@ namespace HlidacStatu.Extensions
             foreach (var subj in smlouva.Prijemce.Union(new Smlouva.Subjekt[] { smlouva.Platce }))
             {
                 var firma = Firmy.Get(subj.ico);
-                if (firma.Valid && await firma.IsSponzorAsync() && firma.JsemSoukromaFirma())
+                if (firma?.Valid == true && await firma.IsSponzorAsync() && firma.JsemSoukromaFirma())
                 {
                     f.Add(new InfoFact(
                         $"{firma.Jmeno}: " +

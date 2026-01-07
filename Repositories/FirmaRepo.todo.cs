@@ -15,7 +15,7 @@ namespace HlidacStatu.Repositories
             {
                 var resp = HlidacStatu.Connectors.External.RZP.Manager.RawSearchIco(ico);
                 if (resp == null)
-                    return Firma.LoadError;
+                    return null;
 
                 if (resp.Items
                     .Where(m => m.GetType() == typeof(HlidacStatu.Connectors.External.RZP.TPodnikatelSeznam))
@@ -57,7 +57,7 @@ namespace HlidacStatu.Repositories
                     return f;
                 }
                 else
-                    return Firma.NotFound;
+                    return null;
             }
         }
 
@@ -113,7 +113,7 @@ namespace HlidacStatu.Repositories
                         foreach (var ico in FirmaCache.FirmyNazvyOnlyAscii()[simpleName])
                         {
                             Firma f = Firmy.Get(ico); //TODO StaticData.FirmyNazvyAscii.Get()[simpleName]);
-                            if (f.Valid)
+                            if (f?.Valid == true)
                             {
                                 var firmaFromText = TextUtil.ReplaceDuplicates(
                                     Regex.Replace(wordCombination, @"[,;_""']", " ", Validators.DefaultRegexOptions),

@@ -3,6 +3,7 @@
 @using System.Threading
 @using HlidacStatu.Entities
 @using HlidacStatu.Extensions
+@using HlidacStatu.Lib.Analytics
 @using HlidacStatu.Repositories
 @using Devmasters.Enums
 @using HlidacStatu.DS.Graphs
@@ -26,7 +27,12 @@ else
             await semaphore.WaitAsync();
             try
             {
-                var stat = await Firmy.Get(ico).StatistikaRegistruSmluvAsync();
+                var f = Firmy.Get(ico);
+                StatisticsSubjectPerYear<Smlouva.Statistics.Data> stat = null;
+                if (f != null)
+                    stat= await f.StatistikaRegistruSmluvAsync();
+                stat = stat ?? new StatisticsSubjectPerYear<Smlouva.Statistics.Data>();
+
                 return new
                 {
                     ICO = ico,

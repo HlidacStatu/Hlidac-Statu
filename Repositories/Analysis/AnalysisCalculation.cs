@@ -389,7 +389,7 @@ namespace HlidacStatu.Repositories.Analysis
                                     //check if it's GovType company
                                     Firma f = Firmy.Get(v.To.Id);
 
-                                    if (!Firma.IsValid(f))
+                                    if (f == null || f.Valid == false)
                                         continue; //unknown company, skip
                                     if (f.PatrimStatu())
                                     {
@@ -521,7 +521,7 @@ namespace HlidacStatu.Repositories.Analysis
             await Devmasters.Batch.Manager.DoActionForAllAsync<string, object>(allIcos, async (ico, param) =>
                 {
                     Firma ff = Firmy.Get(ico);
-                    if (Firma.IsValid(ff))
+                    if (ff?.Valid == true)
                     {
                         if (ff.PatrimStatu()) //statni firmy tam nechci
                         {
@@ -628,10 +628,12 @@ namespace HlidacStatu.Repositories.Analysis
                 await Devmasters.Batch.Manager.DoActionForAllAsync(allicos, async ico =>
                     {
                         var firma = Firmy.Get(ico);
-                        var stat = await firma.StatistikaRegistruSmluvAsync();
-                        if (stat.Summary().PocetSmluv > 10 || stat.Summary().CelkovaHodnotaSmluv > 999_999)
-                            getData.Add(stat);
-
+                        if (firma != null)
+                        {
+                            var stat = await firma.StatistikaRegistruSmluvAsync();
+                            if (stat.Summary().PocetSmluv > 10 || stat.Summary().CelkovaHodnotaSmluv > 999_999)
+                                getData.Add(stat);
+                        }
                         return new ActionOutputData();
                     },
                     Devmasters.Batch.Manager.DefaultOutputWriter,

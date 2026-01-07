@@ -83,7 +83,7 @@ namespace HlidacStatu.Repositories
             Firma f = Firmy.Get(item.Recipient.Ico);
             DateTime dotaceDate = new DateTime(item.ApprovedYear ?? 1970, 1, 1);
 
-            if (f.Valid && (item.Hints.RecipientStatus == -1 || forceRewriteHints))
+            if (f?.Valid == true && (item.Hints.RecipientStatus == -1 || forceRewriteHints))
             {
                 item.Hints.RecipientTypSubjektu = (int)f.TypSubjektu;
                 item.Hints.RecipientStatus = f.Status ?? 1;

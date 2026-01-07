@@ -102,7 +102,7 @@ namespace HlidacStatu.Extensions
                 if (subj != null)
                 {
                     var firma = Firmy.Get(subj.ICO);
-                    if (firma.Valid && await firma.IsSponzorAsync() && firma.JsemSoukromaFirma())
+                    if (firma?.Valid == true && await firma.IsSponzorAsync() && firma.JsemSoukromaFirma())
                     {
                         f.Add(new InfoFact(
                             $"{firma.Jmeno}: " +

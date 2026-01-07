@@ -112,7 +112,7 @@ namespace HlidacStatu.Plugin.Enhancers
                 )
             {
                 Firma f = FirmaRepo.FromDS(subj.datovaSchranka, true);
-                if (Firma.IsValid(f))
+                if (f?.Valid == true)
                 {
                     subj.ico = f.ICO;
                     _item.Enhancements = _item.Enhancements.AddOrUpdate(new Enhancement("Doplněno IČO subjektu", "", path + ".ico", "", f.ICO, this));
@@ -122,7 +122,7 @@ namespace HlidacStatu.Plugin.Enhancers
             else if (!string.IsNullOrEmpty(subj.ico) && string.IsNullOrEmpty(subj.datovaSchranka))
             {
                 Firma f = FirmaRepo.FromIco(subj.ico, false);
-                if (Firma.IsValid(f) && f.DatovaSchranka != null && f.DatovaSchranka.Length > 0)
+                if (f?.Valid == true && f.DatovaSchranka != null && f.DatovaSchranka.Length > 0)
                 {
                     subj.datovaSchranka = f.DatovaSchranka[0];
                     _item.Enhancements = _item.Enhancements.AddOrUpdate(new Enhancement("Doplněna datová schránka subjektu", "", path + ".datovaScranka", "", f.DatovaSchranka[0], this));
@@ -140,7 +140,7 @@ namespace HlidacStatu.Plugin.Enhancers
                 if (Firma.Koncovky.Any(m => subj.nazev.Contains(m)))
                 {
                     Firma f = FirmaRepo.FromName(subj.nazev, true);
-                    if (Firma.IsValid(f))
+                    if (f?.Valid == true)
                     {
                         subj.ico = f.ICO;
                         subj.datovaSchranka = f.DatovaSchranka.Length > 0 ? f.DatovaSchranka[0] : "";
@@ -156,7 +156,7 @@ namespace HlidacStatu.Plugin.Enhancers
 
 
                         f = FirmaRepo.FromName(modifNazev,false, true);
-                        if (Firma.IsValid(f))
+                        if (f?.Valid == true)
                         {
                             subj.ico = f.ICO;
                             subj.datovaSchranka = f.DatovaSchranka.Length > 0 ? f.DatovaSchranka[0] : "";
@@ -173,7 +173,7 @@ namespace HlidacStatu.Plugin.Enhancers
             {
                 //dopln chybejici jmeno 
                 Firma f = FirmaRepo.FromIcoExt(subj.ico, true);
-                if (Firma.IsValid(f))
+                if (f?.Valid == true)
                 {
                     subj.nazev = f.Jmeno;
                     _item.Enhancements = _item.Enhancements.AddOrUpdate(new Enhancement("Doplněn Název subjektu", "", path + ".nazev", "", f.ICO, this));

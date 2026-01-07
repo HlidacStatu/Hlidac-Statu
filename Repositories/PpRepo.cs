@@ -312,7 +312,7 @@ public static partial class PpRepo
                 .Where(v => Devmasters.DT.DateInterval.IsOverlappingIntervals(
                     new Devmasters.DT.DateInterval(v.RelFrom, v.RelTo), obdobi))
                 .Select(m => m.To.Id)
-                .Select(m => Firmy.Get(m)).Where(f => f.Valid).ToArray();
+                .Select(m => Firmy.Get(m)).Where(f => f?.Valid == true).ToArray();
             var d2 = d1
                 .Where(f => f.JsemStatniFirma() || f.JsemOVM()).ToArray();
             if (d2.Any())

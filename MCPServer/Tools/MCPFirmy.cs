@@ -181,7 +181,7 @@ namespace HlidacStatu.MCPServer.Tools
                     if (Util.DataValidators.CheckCZICO(ico) == false)
                         return null;
                     Firma f = HlidacStatu.Repositories.Firmy.Get(ico);
-                    if (f.Valid == false)
+                    if (!(f?.Valid == true))
                         return null;
 
                     var res = f.IcosInHolding(historic_view)

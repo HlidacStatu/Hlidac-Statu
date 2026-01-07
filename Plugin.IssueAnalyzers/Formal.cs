@@ -215,7 +215,7 @@ namespace HlidacStatu.Plugin.IssueAnalyzers
             {
                 //check ICO in registers
                 Firma f = FirmaRepo.FromIcoExt(d.ico, true);
-                if (!Firma.IsValid(f))
+                if (f?.Valid != true)
                 {
                     issues.Add(new Issue(this, (int)IssueType.IssueTypes.Neexistujici_ICO, "Neexistující IČO", string.Format("Subjekt '{0}' má neexistující IČO", d.nazev)));
                     hasIco = false;
@@ -276,10 +276,10 @@ namespace HlidacStatu.Plugin.IssueAnalyzers
             Firma firma = null;
             if (hasIco)
                 firma = FirmaRepo.FromIcoExt(d.ico, true);
-            if (!Firma.IsValid(firma) && hasDS)
+            if (firma == null && hasDS)
                 firma = FirmaRepo.FromDS(d.datovaSchranka, true);
 
-            if (Firma.IsValid(firma))
+            if (firma?.Valid == true)
             {
                 if (firma.IsNespolehlivyPlatceDPH())
                 {
@@ -301,7 +301,7 @@ namespace HlidacStatu.Plugin.IssueAnalyzers
                 }
             }
 
-            if (Firma.IsValid(firma) && firma.Datum_Zapisu_OR.HasValue)
+            if (firma?.Valid == true && firma.Datum_Zapisu_OR.HasValue)
             {
                 double zalozeniPredPodpisem = (item.datumUzavreni - firma.Datum_Zapisu_OR.Value).TotalDays;
 

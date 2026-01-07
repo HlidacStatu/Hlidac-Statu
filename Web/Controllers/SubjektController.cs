@@ -264,7 +264,7 @@ namespace HlidacStatu.Web.Controllers
 
             firma = Firmy.Get(ico);
 
-            if (!Firma.IsValid(firma))
+            if (firma == null || firma?.Valid == false)
             {
                 if (Util.DataValidators.IsFirmaIcoZahranicni(ico))
                     actionResult = View("Subjekt_zahranicni", new Firma() { ICO = ico, Jmeno = ico });

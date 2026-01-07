@@ -697,7 +697,7 @@
             }
 
 
-            var dotaceStats = await Model.StatistikaDotaciAsync();
+            var dotaceStats = (await Model.StatistikaDotaciAsync()) ?? new();
 
             var dotaceGraphData = new Series[]
             {
@@ -910,7 +910,7 @@
             <a href="/subjekt/Dotace/@Model.ICO" class="btn btn-hs btn-primary btn-sm my-3 position-relative">
                 Podrobnosti o dotacích organizace
                 <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
-                    @(HlidacStatu.Util.RenderData.NiceNumber((await Model.StatistikaDotaciAsync()).Summary().PocetDotaci))
+                    @(HlidacStatu.Util.RenderData.NiceNumber(((await Model.StatistikaDotaciAsync()) ?? new()).Summary().PocetDotaci))
                 </span>
             </a>
         </p>

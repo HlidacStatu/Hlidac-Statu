@@ -473,7 +473,7 @@ else if (Model.HasResults == false)
                 @foreach (var fP in splQ.Where(m => m.Category != HlidacStatu.DS.Api.Autocomplete.CategoryEnum.Person))
                 {
                     Firma fo = Firmy.Get(fP.PrefixValue);
-                    if (fo.Valid)
+                    if (fo?.Valid == true)
                     {
                         parts++;
                         <partial name="Partials/RenderFirmaBox" model="@fo" />
