@@ -204,7 +204,7 @@ namespace HlidacStatu.Repositories
                              from Firma 
                             where LEN(ico) = 8 
                               AND Kod_PF > 110
-                              AND (Typ is null OR Typ>={(int)Firma.TypSubjektuEnum.Exekutor});";
+                              AND (Typ is null OR Typ={(int)Firma.TypSubjektuEnum.Soukromy});";
 
             var lockObj = new object();
             List<Autocomplete> results = new List<Autocomplete>();
