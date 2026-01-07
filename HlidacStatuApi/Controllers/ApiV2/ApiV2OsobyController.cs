@@ -90,7 +90,7 @@ namespace HlidacStatuApi.Controllers.ApiV2
             if (oo != null)
             {
                 return Content(Newtonsoft.Json.JsonConvert.SerializeObject(
-                    new { osobaid = oo.NameId, jmeno = oo.Jmeno, prijmeni = oo.Prijmeni, politickaStrana = oo.CurrentPoliticalParty() }
+                    new { osobaid = oo.NameId, jmeno = oo.Jmeno, prijmeni = oo.Prijmeni, politickaStrana = oo.CurrentPoliticalPartyAsync() }
                 ), "application/json", System.Text.Encoding.UTF8);
             }
             else
@@ -108,7 +108,7 @@ namespace HlidacStatuApi.Controllers.ApiV2
             if (oo != null)
             {
                 return Content(Newtonsoft.Json.JsonConvert.SerializeObject(
-                    oo.Select(o => new { osobaid = o.NameId, jmeno = o.Jmeno, prijmeni = o.Prijmeni, politickaStrana = o.CurrentPoliticalParty() })
+                    oo.Select(o => new { osobaid = o.NameId, jmeno = o.Jmeno, prijmeni = o.Prijmeni, politickaStrana = o.CurrentPoliticalPartyAsync() })
                         .ToArray()
                 ), "application/json", System.Text.Encoding.UTF8);
             }

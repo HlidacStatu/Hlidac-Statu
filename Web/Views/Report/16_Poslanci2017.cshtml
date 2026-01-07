@@ -1,5 +1,4 @@
 ﻿@using System.Linq
-@using HlidacStatu.DS.Graphs
 @using HlidacStatu.Entities
 @using HlidacStatu.Extensions
 @using HlidacStatu.XLib
@@ -15,7 +14,7 @@
         .ThenBy(o => o.Jmeno)
         .ToList();
 
-    ReportDataSource<Tuple<Osoba, Osoba.Statistics.RegistrSmluv, Osoba.Statistics.Dotace, decimal?, string>> poslanciTable = new(new ReportDataSource<Tuple<Osoba, Osoba.Statistics.RegistrSmluv, Osoba.Statistics.Dotace, decimal?, string>>.Column[]
+    ReportDataSource<Tuple<Osoba, Osoba.Statistics.RegistrSmluv, Osoba.Statistics.Dotace, decimal?, string, string>> poslanciTable = new(new ReportDataSource<Tuple<Osoba, Osoba.Statistics.RegistrSmluv, Osoba.Statistics.Dotace, decimal?, string, string>>.Column[]
     {
         new()
         {
@@ -26,22 +25,13 @@
                        + "<br />"
                        + Devmasters.TextUtil.ShortenText(s.Item5, 250).Replace("\n", "<br />");
             },
-            OrderValueRender = (s) =>
-            {
-                return s.Item1.FullName(false);
-            }
+            OrderValueRender = (s) => s.Item1.FullName(false)
         },
         new()
         {
             Name = "Strana/Hnutí",
-            HtmlRender =(s) =>
-            {
-                return s.Item1.CurrentPoliticalParty();
-            },
-            OrderValueRender = (s) =>
-            {
-                return s.Item1.CurrentPoliticalParty();
-            }
+            HtmlRender =(s) => s.Item6,
+            OrderValueRender = (s) => s.Item6
         },
         new()
         {
@@ -61,10 +51,7 @@
 
                 return sout;
             },
-            OrderValueRender = (s) =>
-            {
-                return s.Item1.FullName(false);
-            }
+            OrderValueRender = (s) => s.Item1.FullName(false)
         },
         new()
         {
@@ -92,8 +79,9 @@
         var dotacestat = await osoba.StatistikaDotaceAsync();
         var sponzoring = (await osoba.SponzoringAsync()).Sum(m => m.Hodnota);
         var description = await osoba.DescriptionAsync(false, m => true, numOfRecords: 3);
+        var politicalParty = await osoba.CurrentPoliticalPartyAsync();
 
-        var tuple = new Tuple<Osoba, Osoba.Statistics.RegistrSmluv, Osoba.Statistics.Dotace, decimal?, string>(osoba, stat, dotacestat, sponzoring, description);
+        var tuple = new Tuple<Osoba, Osoba.Statistics.RegistrSmluv, Osoba.Statistics.Dotace, decimal?, string, string>(osoba, stat, dotacestat, sponzoring, description, politicalParty);
         poslanciTable.AddRow(tuple);
     }
 }

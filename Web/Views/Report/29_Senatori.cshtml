@@ -5,7 +5,7 @@
 @using HlidacStatu.Repositories
 
 @{
-        Layout = "_ReportLayout";
+    Layout = "_ReportLayout";
 
     var showList = OsobaRepo.GetByZatrideni(OsobaRepo.Zatrideni.Senator, DateTime.Now)
         .OrderBy(o => o.Prijmeni)
@@ -13,26 +13,21 @@
         .ToList();
 
 
-    var poslanciTable = new ReportDataSource<(Osoba Osoba, string Description)>(new ReportDataSource<(Osoba Osoba, string Description)>.Column[]
+    var poslanciTable = new ReportDataSource<(Osoba Osoba, string Description, string PoliticalParty)>(new ReportDataSource<(Osoba Osoba, string Description, string PoliticalParty)>.Column[]
     {
-        new() { Name="Senátor",
-            HtmlRender =(s) => {
-                return string.Format("<a href='{0}'>{1}</a>", s.Osoba.GetUrl(), s.Osoba.FullNameWithYear(true))
-                + "<br />"
-                + Devmasters.TextUtil.ShortenText(s.Description, 250).Replace("\n", "<br />");
-            },
-            OrderValueRender = (s) => {
-                return s.Osoba.FullName(false);
-            }
+        new()
+        {
+            Name = "Senátor",
+            HtmlRender = (s) => $"<a href='{s.Osoba.GetUrl()}'>{s.Osoba.FullNameWithYear(true)}</a>"
+                                + "<br />"
+                                + Devmasters.TextUtil.ShortenText(s.Description, 250).Replace("\n", "<br />"),
+            OrderValueRender = (s) => s.Osoba.FullName(false)
         },
-        new() {
-            Name ="Strana/Hnutí",
-            HtmlRender =(s) => {
-                return s.Osoba.CurrentPoliticalParty();
-            },
-            OrderValueRender = (s) => {
-                return s.Osoba.CurrentPoliticalParty();
-            }
+        new()
+        {
+            Name = "Strana/Hnutí",
+            HtmlRender = (s) => s.PoliticalParty,
+            OrderValueRender = (s) => s.PoliticalParty
         }
     });
 
@@ -40,12 +35,13 @@
     foreach (var p in showList)
     {
         var description = await p.DescriptionAsync(false, m => true, numOfRecords: 3);
-        poslanciTable.AddRow((p, description));
+        var politicalParty = await p.CurrentPoliticalPartyAsync();
+        poslanciTable.AddRow((p, description, politicalParty));
     }
 }
 
 <h3 id="tblHead">Aktuální složení senátu</h3>
-@ChartUtilExtensions.RenderReport("",ReportModel.QueueItem.types.table, poslanciTable, @"{
+@ChartUtilExtensions.RenderReport("", ReportModel.QueueItem.types.table, poslanciTable, @"{
                  'language': {
                     'url': '//cdn.datatables.net/plug-ins/1.13.4/i18n/cs.json'
                 },

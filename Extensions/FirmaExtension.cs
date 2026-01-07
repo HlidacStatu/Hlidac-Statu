@@ -1,5 +1,6 @@
 using Devmasters.Enums;
 using HlidacStatu.DS.Api.Firmy;
+using HlidacStatu.DS.Api.Osoba;
 using HlidacStatu.Entities;
 using HlidacStatu.Entities.Facts;
 using HlidacStatu.Repositories;
@@ -280,13 +281,22 @@ public static class FirmaExtensions
             1 => "Má dluh vůči VZP",
             _ => null
         };
-        res.Osoby_s_vazbou_na_firmu = f.Osoby_v_OR(aktualnost)
-                .DistinctBy(m => m.o.NameId)
-                .OrderBy(m => m.o.Prijmeni)
-                .ThenBy(m => m.o.Jmeno)
-                .ThenBy(m => m.o.Narozeni)
-                .Select(m => m.o.ToApiOsobaListItem())
-                .ToArray();
+
+        var seznamOsob = f.Osoby_v_OR(aktualnost)
+            .DistinctBy(m => m.o.NameId)
+            .OrderBy(m => m.o.Prijmeni)
+            .ThenBy(m => m.o.Jmeno)
+            .ThenBy(m => m.o.Narozeni)
+            .ToArray();
+        
+        List<ListItem> apiOsobaListItem = new(seznamOsob.Length);
+        foreach (var rec in seznamOsob)
+        {
+            apiOsobaListItem.Add(await rec.o.ToApiOsobaListItemAsync());
+        }
+
+        res.Osoby_s_vazbou_na_firmu = apiOsobaListItem.ToArray();
+                
 
         res.Dcerine_spolecnosti = f.IcosInHolding(aktualnost)
             .Select(m => new SimpleDetailInfo()

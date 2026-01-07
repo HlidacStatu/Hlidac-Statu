@@ -24,7 +24,7 @@ namespace HlidacStatuApi.Models
                 TitulPo = o.TitulPo,
                 Narozeni = o.Narozeni,
                 NameId = o.NameId,
-                PolitickaStrana = o.CurrentPoliticalParty(),
+                PolitickaStrana = await o.CurrentPoliticalPartyAsync(),
                 Profile = o.GetUrl(),
                 Sponzoring = (await o.SponzoringAsync())
                     .Select(ev => new OsobaEventDTO()

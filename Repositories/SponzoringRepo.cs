@@ -29,7 +29,7 @@ namespace HlidacStatu.Repositories
             "SPD", "STAN", "KDU-ČSL", "TOP 09", "Strana zelených"
         };
 
-        public static string[] ParlamentníStrany = new string[]
+        public static string[] ParlamentniStrany = new string[]
         {
             "ANO", "ODS", "Česká pirátská strana",
             "SPD", "STAN", "KDU-ČSL", "TOP 09"
@@ -243,7 +243,7 @@ namespace HlidacStatu.Repositories
 
         public static async Task<Dictionary<int, decimal>> SponzoringPerYearAsync(string party, int minYear, int maxYear, bool persons, bool companies)
         {
-            string icoStrany = ZkratkaStranyRepo.IcoStrany(party);
+            string icoStrany = await ZkratkaStranyRepo.IcoStranyAsync(party);
             await using DbEntities db = new DbEntities();
             
             var dataPerY = await db.Sponzoring
@@ -265,7 +265,7 @@ namespace HlidacStatu.Repositories
 
         public static async Task<List<SponzoringSummed>> PeopleSponsorsAsync(string party, CancellationToken cancellationToken)
         {
-            string icoStrany = ZkratkaStranyRepo.IcoStrany(party);
+            string icoStrany = await ZkratkaStranyRepo.IcoStranyAsync(party);
             int tenYearsBack = DateTime.Now.Year - 10;
 
             await using DbEntities db = new DbEntities();
@@ -294,7 +294,7 @@ namespace HlidacStatu.Repositories
 
         public static async Task<List<SponzoringSummed>> CompanySponsorsAsync(string party, CancellationToken cancellationToken)
         {
-            string icoStrany = ZkratkaStranyRepo.IcoStrany(party);
+            string icoStrany = await ZkratkaStranyRepo.IcoStranyAsync(party);
             int tenYearsBack = DateTime.Now.Year - 10;
 
             await using DbEntities db = new DbEntities();

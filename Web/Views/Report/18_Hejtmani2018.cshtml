@@ -15,7 +15,7 @@
         .ToList();
 
 
-    ReportDataSource<(Osoba Osoba, Osoba.Statistics.RegistrSmluv? Stat, decimal? Sponzoring, string Description)> poslanciTable = new(new ReportDataSource<(Osoba Osoba, Osoba.Statistics.RegistrSmluv? Stat, decimal? Sponzoring, string Description)>.Column[]
+    ReportDataSource<(Osoba Osoba, Osoba.Statistics.RegistrSmluv? Stat, decimal? Sponzoring, string Description, string PoliticalParty)> poslanciTable = new(new ReportDataSource<(Osoba Osoba, Osoba.Statistics.RegistrSmluv? Stat, decimal? Sponzoring, string Description, string PoliticalParty)>.Column[]
     {
         new()
         {
@@ -26,13 +26,13 @@
                        + "<br />"
                        + Devmasters.TextUtil.ShortenText(s.Description, 250).Replace("\n", "<br />");
             },
-            OrderValueRender = (s) => { return s.Osoba.FullName(false); }
+            OrderValueRender = (s) => s.Osoba.FullName(false)
         },
         new()
         {
             Name = "Strana/Hnutí",
-            HtmlRender = (s) => { return s.Osoba.CurrentPoliticalParty(); },
-            OrderValueRender = (s) => { return s.Osoba.CurrentPoliticalParty(); }
+            HtmlRender = (s) => s.PoliticalParty,
+            OrderValueRender = (s) => s.PoliticalParty
         },
         new()
         {
@@ -65,7 +65,7 @@
 
                 return sout;
             },
-            OrderValueRender = (s) => { return s.Osoba.FullName(false); }
+            OrderValueRender = (s) => s.Osoba.FullName(false)
         },
         new()
         {
@@ -92,7 +92,8 @@
         Osoba.Statistics.RegistrSmluv? stat = await osoba.StatistikaRegistrSmluvAsync();
         var sponzoring = (await osoba.SponzoringAsync()).Sum(m => m.Hodnota);
         var description = await osoba.DescriptionAsync(false, m => true, numOfRecords: 3);
-        poslanciTable.AddRow((osoba, stat, sponzoring, description));
+        var politicalParty = await osoba.CurrentPoliticalPartyAsync();
+        poslanciTable.AddRow((osoba, stat, sponzoring, description, politicalParty));
     }
 }
 
