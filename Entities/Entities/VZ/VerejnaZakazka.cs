@@ -683,7 +683,7 @@ namespace HlidacStatu.Entities.VZ
 
         public Document LastestModifiedDocument()
         {
-            if (Dokumenty != null)
+            if (Dokumenty != null && Dokumenty.Any())
                 return Dokumenty.Where(document => document.LastUpdate is not null)
                     .MaxBy(document => document.LastUpdate);
             else

@@ -33,17 +33,17 @@ namespace HlidacStatu.Repositories
         }
 
         public static Devmasters.Cache.Memcached.Manager<Firma, string> instanceByIco
-            = Devmasters.Cache.Memcached.Manager<Firma, string>.GetSafeInstance("firmyByICO_v2_", getByIco, TimeSpan.FromHours(4),
+            = Devmasters.Cache.Memcached.Manager<Firma, string>.GetSafeInstance("firmyByICO_v3_", getByIco, TimeSpan.FromHours(4),
                     Devmasters.Config.GetWebConfigValue("HazelcastServers").Split(',')
                    );
 
         public static Devmasters.Cache.Memcached.Manager<Firma, string> instanceByDS
-            = Devmasters.Cache.Memcached.Manager<Firma, string>.GetSafeInstance("firmyByDS_v2_", getByDS, TimeSpan.FromHours(4),
+            = Devmasters.Cache.Memcached.Manager<Firma, string>.GetSafeInstance("firmyByDS_v3_", getByDS, TimeSpan.FromHours(4),
                     Devmasters.Config.GetWebConfigValue("HazelcastServers").Split(',')
                     );
 
         public static Devmasters.Cache.Memcached.Manager<string, string> instanceNameOnlyByIco
-            = Devmasters.Cache.Memcached.Manager<string, string>.GetSafeInstance("firmaNameOnlyByICO_v2_", getNameByIco, TimeSpan.FromHours(12),
+            = Devmasters.Cache.Memcached.Manager<string, string>.GetSafeInstance("firmaNameOnlyByICO_v3_", getNameByIco, TimeSpan.FromHours(12),
                     Devmasters.Config.GetWebConfigValue("HazelcastServers").Split(',')
                     );
 

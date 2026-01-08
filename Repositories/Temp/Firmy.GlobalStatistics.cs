@@ -155,10 +155,12 @@ namespace HlidacStatu.Repositories
                             (i) =>
                             {
                                 var fk = Get(i);
-                                allIcos.Add(i);
-                                foreach (var pic in fk.IcosInHolding(Relation.AktualnostType.Aktualni))
-                                    allIcos.Add(pic);
-
+                                if (fk != null)
+                                {
+                                    allIcos.Add(i);
+                                    foreach (var pic in fk.IcosInHolding(Relation.AktualnostType.Aktualni))
+                                        allIcos.Add(pic);
+                                }
                                 return new ActionOutputData();
                             },
                             logOutputFunc,

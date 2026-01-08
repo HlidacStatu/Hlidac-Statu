@@ -19,6 +19,7 @@ using System.Linq.Expressions;
 using System.Threading.Tasks;
 using HlidacStatu.Lib.Analytics;
 using HlidacStatu.Repositories.Cache;
+using Nest;
 
 namespace HlidacStatu.Extensions
 {
@@ -27,6 +28,8 @@ namespace HlidacStatu.Extensions
 
         public static async Task<PuPlatStat> GetPlatyStatAsync(this Firma firma, int rok = PuRepo.DefaultYear)
         {
+            if (firma == null)
+                return null;
             var org = await PuRepo.GetFullDetailAsync(firma.DatovaSchranka);
             if (org == null)
                 return null;
@@ -37,6 +40,9 @@ namespace HlidacStatu.Extensions
 
         public static async Task<string> GetPlatyUrlAsync(this Firma firma)
         {
+            if (firma == null)
+                return default;
+
             var org = await PuRepo.GetFullDetailAsync(firma.DatovaSchranka);
             if (org == null)
                 return null;
@@ -46,6 +52,9 @@ namespace HlidacStatu.Extensions
 
         public static async Task<IEnumerable<SocialContact>> GetSocialContactsAsync(this Firma firma)
         {
+            if (firma == null)
+                return Array.Empty<SocialContact>();
+
             return (await firma.EventsAsync(oe => oe.Type == (int)OsobaEvent.Types.SocialniSite))
                 .Select(oe => new SocialContact
                 {
@@ -59,6 +68,9 @@ namespace HlidacStatu.Extensions
 
         private static async Task<bool> MaVztahySeStatemAsync(this Firma firma)
         {
+            if (firma == null)
+                return false;
+
             return await firma.IsSponzorAsync()
                    || (await firma.StatistikaRegistruSmluvAsync()).Sum(s => s.PocetSmluv) > 0
                    || (await VerejnaZakazkaRepo.Searching.SimpleSearchAsync("ico:" + firma.ICO, null, 1, 1, "0")).Total > 0
@@ -67,6 +79,9 @@ namespace HlidacStatu.Extensions
 
         public static async Task<bool> MaVazbyNaPolitikyPredAsync(this Firma firma, DateTime date)
         {
+            if (firma == null)
+                return false;
+
             if (await firma.MaVazbyNaPolitikyAsync())
             {
                 var osoby = await firma.VazbyNaPolitikyAsync();
@@ -83,6 +98,9 @@ namespace HlidacStatu.Extensions
 
         public static async Task<List<NapojenaOsoba>> NapojeneOsobyMinisterstvaAsync(this Firma firma)
         {
+            if (firma == null)
+                return new List<NapojenaOsoba>();
+
             await using var db = new DbEntities();
 
             var eventTypes = new[]
@@ -109,6 +127,9 @@ namespace HlidacStatu.Extensions
         static string[] vyjimky_v_RS_ = new string[] { "00006572", "63839407", "48136000", "48513687", "49370227", "70836981", "05553539" }; //§ 3 odst. 2 f) ... Poslanecká sněmovna, Senát, Kancelář prezidenta republiky, Ústavní soud, Nejvyšší kontrolní úřad, Kancelář veřejného ochránce práv a Úřad Národní rozpočtové rady
         public static async Task<bool> MusiPublikovatDoRSAsync(this Firma firma)
         {
+            if (firma == null)
+                return false;
+
             if (vyjimky_v_RS_.Contains(firma.ICO))
                 return false;
             bool musi = firma.JsemOVM() || firma.JsemStatniFirma();
@@ -149,6 +170,9 @@ namespace HlidacStatu.Extensions
 
         public static async Task<KategorieOVM[]> KategorieOVMAsync(this Firma firma)
         {
+            if (firma == null)
+                return Array.Empty<KategorieOVM>();
+
             Lib.Data.External.RPP.KategorieOVM[] _kategorieOVM = null;
 
             var client = Manager.GetESClient_RPP_Kategorie();
@@ -175,6 +199,9 @@ namespace HlidacStatu.Extensions
         public static async Task<StatisticsSubjectPerYear<Smlouva.Statistics.Data>> StatistikaRegistruSmluvAsync(
             this Firma firma, int? iclassif = null, bool forceUpdateCache = false)
         {
+            if (firma == null)
+                return null;
+
             Lib.Analytics.StatisticsSubjectPerYear<Smlouva.Statistics.Data> ret = null;
             ret = await FirmaStatistics.CachedFirmaStatisticsSmlouvyAsync(firma, iclassif, forceUpdateCache);
             return ret ?? new Lib.Analytics.StatisticsSubjectPerYear<Smlouva.Statistics.Data>();
@@ -183,6 +210,9 @@ namespace HlidacStatu.Extensions
         public static async Task<StatisticsSubjectPerYear<Firma.Statistics.Dotace>> StatistikaDotaciAsync(
             this Firma firma, bool forceUpdateCache = false)
         {
+            if (firma == null)
+                return null;
+
             return await FirmaStatistics.CachedStatisticsDotaceAsync(firma, forceUpdateCache) ??
                 new Lib.Analytics.StatisticsSubjectPerYear<Firma.Statistics.Dotace>() { ICO = firma.ICO };
 
@@ -190,6 +220,9 @@ namespace HlidacStatu.Extensions
         public static async Task<StatisticsSubjectPerYear<Firma.Statistics.Dotace>> HoldingStatistikaDotaciAsync(
             this Firma firma, bool forceUpdateCache = false)
         {
+            if (firma == null)
+                return null;
+
             return await FirmaStatistics.CachedHoldingStatisticsDotace(firma, forceUpdateCache) ??
                 new Lib.Analytics.StatisticsSubjectPerYear<Firma.Statistics.Dotace>() { ICO = firma.ICO };
         }
@@ -197,28 +230,43 @@ namespace HlidacStatu.Extensions
         public static async Task<StatisticsSubjectPerYear<Firma.Statistics.VZ>> StatistikaVerejneZakazkyAsync(
             this Firma firma, bool forceUpdateCache = false)
         {
+            if (firma == null)
+                return null;
+
             return await FirmaStatistics.CachedStatisticsVZ(firma, forceUpdateCache) ??
                 new Lib.Analytics.StatisticsSubjectPerYear<Firma.Statistics.VZ>() { ICO = firma.ICO };
         }
         public static async Task<StatisticsSubjectPerYear<Firma.Statistics.VZ>> HoldingStatistikaVerejneZakazkyAsync(
             this Firma firma, bool forceUpdateCache = false)
         {
+            if (firma == null)
+                return null;
+
             return await FirmaStatistics.CachedHoldingStatisticsVZAsync(firma, forceUpdateCache) ??
                 new Lib.Analytics.StatisticsSubjectPerYear<Firma.Statistics.VZ>() { ICO = firma.ICO };
         }
 
         public static Task<KIndexData> KindexAsync(this Firma firma, bool useTemp = false)
         {
+            if (firma == null)
+                return null;
+
             return KIndex.GetCachedAsync(firma.ICO, useTemp);
         }
 
         public static async Task<bool> MaVazbyNaPolitikyAsync(this Firma firma)
         {
+            if (firma == null)
+                return false;
+
             return (await MaterializedViewsCache.FirmySVazbamiNaPolitiky_NedavneAsync()).SoukromeFirmy.ContainsKey(firma.ICO);
         }
 
         public static async Task<Osoba[]> VazbyNaPolitikyAsync(this Firma firma)
         {
+            if (firma == null)
+                return null;
+
             return (await MaterializedViewsCache.FirmySVazbamiNaPolitiky_NedavneAsync())
                     .SoukromeFirmy[firma.ICO]
                     .Select(pid => OsobaRepo.PolitickyAktivni.Get().Where(m => m.InternalId == pid).FirstOrDefault())
@@ -229,11 +277,17 @@ namespace HlidacStatu.Extensions
 
         public static bool IsNespolehlivyPlatceDPH(this Firma firma)
         {
+            if (firma == null)
+                return false;
+
             return firma.NespolehlivyPlatceDPH() != null;
         }
 
         public static NespolehlivyPlatceDPH NespolehlivyPlatceDPH(this Firma firma)
         {
+            if (firma == null)
+                return null;
+
             if (StaticData.NespolehlivyPlatciDPH.Get().ContainsKey(firma.ICO))
                 return StaticData.NespolehlivyPlatciDPH.Get()[firma.ICO];
             else
@@ -242,6 +296,8 @@ namespace HlidacStatu.Extensions
 
         public static async Task<bool> NotInterestingToShowAsync(this Firma firma)
         {
+            if (firma == null)
+                return false;
             return (await firma.MaVztahySeStatemAsync() == false)
                    && (firma.IsNespolehlivyPlatceDPH() == false)
                    && (await firma.MaVazbyNaPolitikyAsync() == false);
@@ -251,11 +307,17 @@ namespace HlidacStatu.Extensions
 
         public static string SocialInfoTitle(this Firma firma)
         {
+            if (firma == null)
+                return null;
+
             return TextUtil.ShortenText(firma.Jmeno, 50);
         }
 
         public static string SocialInfoSubTitle(this Firma firma)
         {
+            if (firma == null)
+                return null;
+
             return firma.JsemOVM()
                 ? "Úřad"
                 : (firma.JsemStatniFirma() ? "Firma (spolu)vlastněná státem" : "Soukromá firma");
@@ -263,6 +325,9 @@ namespace HlidacStatu.Extensions
 
         public static async Task<string> SocialInfoBodyAsync(this Firma firma)
         {
+            if (firma == null)
+                return string.Empty;
+
             var infoFacts = await firma.InfoFactsAsync();
             return "<ul>" +
                    infoFacts.RenderFacts(4, true, true, "", "<li>{0}</li>", true)
@@ -281,6 +346,9 @@ namespace HlidacStatu.Extensions
 
         public static (Osoba o, OsobaVazby ov)[] Osoby_v_OR(this Firma firma, Relation.AktualnostType aktualnost)
         {
+            if (firma == null)
+                return null;
+
             DateTime toDate = (DateTime)System.Data.SqlTypes.SqlDateTime.MinValue;
             if (aktualnost == Relation.AktualnostType.Aktualni)
                 toDate = DateTime.Now.Date;
@@ -307,6 +375,9 @@ namespace HlidacStatu.Extensions
         }
         public static async Task<(string jmeno, string prijmeni, DateTime? poslednizmena)[]> CeosFromRPPAsync(this Firma firma)
         {
+            if (firma == null)
+                return null;
+
             List<(string jmeno, string prijmeni, DateTime? poslednizmena)> osoby = new List<(string jmeno, string prijmeni, DateTime? poslednizmena)>();
 
             if (!(firma?.Valid == true) || string.IsNullOrEmpty(firma.ICO))
@@ -331,6 +402,9 @@ namespace HlidacStatu.Extensions
         }
         public static async Task<OVMFull.Osoba[]> CeosFromRPP_FullAsync(this Firma firma)
         {
+            if (firma == null)
+                return null;
+
             List<(string jmeno, string prijmeni, DateTime? poslednizmena)> osoby = new List<(string jmeno, string prijmeni, DateTime? poslednizmena)>();
             var client = Manager.GetESClient_RPP_OVM();
             var rppReq = await client.GetAsync<HlidacStatu.Lib.Data.External.RPP.OVMFull>(firma.ICO);
@@ -347,18 +421,28 @@ namespace HlidacStatu.Extensions
         public static async Task<(Osoba Osoba, DateTime? From, string Role)> CurrentCeoAsync(this Firma firma)
         {
             var ceos = await OsobaEventRepo.GetCeosAsync(firma.ICO);
-            var lastCeo = ceos.MaxBy(c => c.From); 
-            return (lastCeo.Osoba, lastCeo.From, lastCeo.Role);
+            if (ceos.Any())
+            {
+                var lastCeo = ceos.MaxBy(c => c.From);
+                return (lastCeo.Osoba, lastCeo.From, lastCeo.Role);
+            }
+            else
+                return (null, null, null);
         }
         public static async Task<(Osoba Osoba, DateTime? From, DateTime? To, string Role)[]> CeosAsync(
             this Firma firma, DateTime? fromDate, DateTime? toDate,
             Expression<Func<OsobaEvent, bool>> predicate = null)
         {
+            if (firma == null)
+                return null;
+
             return await OsobaEventRepo.GetCeosAsync(firma.ICO, fromDate, toDate, predicate);
         }
 
         public static IEnumerable<string> IcosInHolding(this Firma firma, Relation.AktualnostType aktualnost)
         {
+            if (firma == null)
+                return null;
             return firma.AktualniVazby(aktualnost)
                 .Where(v => !string.IsNullOrEmpty(v.To?.UniqId)
                             && v.To.Type == HlidacStatu.DS.Graphs.Graph.Node.NodeType.Company)
@@ -374,6 +458,9 @@ namespace HlidacStatu.Extensions
         /// <returns></returns>
         public static IEnumerable<Firma> Holding(this Firma firma, Relation.AktualnostType aktualnost)
         {
+            if (firma == null)
+                return null;
+
             var icos = firma.IcosInHolding(aktualnost);
 
             return icos.Select(ico => Firmy.Get(ico));
@@ -384,6 +471,8 @@ namespace HlidacStatu.Extensions
             this Firma firma,
             int? obor = null, bool forceUpdateCache = false)
         {
+            if (firma == null)
+                return null;
 
             var ret = await FirmaStatistics.CachedHoldingStatisticsSmlouvyAsync(firma, obor, forceUpdateCache) ??
                 new Lib.Analytics.StatisticsSubjectPerYear<Smlouva.Statistics.Data>() { ICO = firma.ICO };
@@ -393,6 +482,9 @@ namespace HlidacStatu.Extensions
 
         public static string Kod_PF_Popis(this Firma firma)
         {
+            if (firma == null)
+                return null;
+
             var kod_pf = (firma.Kod_PF?.ToString() ?? "");
             using (DbEntities db = new DbEntities())
             {
@@ -406,6 +498,7 @@ namespace HlidacStatu.Extensions
 
         public static bool JsemSoukromaFirma(this Firma firma)
         {
+
             return firma.TypSubjektu <= Firma.TypSubjektuEnum.Exekutor;
         }
 
