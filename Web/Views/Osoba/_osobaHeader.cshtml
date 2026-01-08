@@ -1,14 +1,9 @@
 ﻿@model Osoba
 @using Devmasters.Enums
-@using HlidacStatu.DS.Graphs
 @using HlidacStatu.Extensions;
-@using HlidacStatu.Entities.Facts;
 @using System.Linq;
-@using Devmasters;
 @using HlidacStatu.Entities
 @using HlidacStatu.Repositories
-@using HlidacStatu.Repositories.SharedModels
-@using Newtonsoft.Json.Linq;
 
 @{
     Layout = null;
@@ -45,9 +40,12 @@
                 <p class="py-0 my-0 text-muted">@Model.StatusOsoby().ToNiceDisplayName()</p>
                 <p class="py-0 my-0 lead">
                     <a href="@Model.GetUrl()">@Model.FullName()</a>
-                    @if (!string.IsNullOrEmpty(Model.CurrentPoliticalParty()))
-                    {
-                        <span>@(Model.CurrentPoliticalParty())</span>
+                    @{
+                        var politickaStrana = await Model.CurrentPoliticalPartyAsync();
+                        if (!string.IsNullOrEmpty(politickaStrana))
+                        {
+                            <span>@(politickaStrana)</span>
+                        }
                     }
                 </p>
                 <p class="py-0 my-0">@Html.Raw(Model.NarozeniYear(true))</p>

@@ -68,7 +68,7 @@
                     Image = Model.osoba.HasPhoto() ? new Uri(Model.osoba.GetPhotoUrl(false, HlidacStatu.Entities.Osoba.PhotoTypes.NoBackground)) : null,
                     Brand = new Schema.NET.Brand()
                     {
-                        Name = Model.osoba.CurrentPoliticalParty(),
+                        Name = await Model.osoba.CurrentPoliticalPartyAsync(),
                     },
                     Url = new Uri("https://www.hlidacstatu.cz/osoba/" + Model.osoba.NameId),
                     Id = new Uri("https://www.hlidacstatu.cz/osoba/" + Model.osoba.NameId)

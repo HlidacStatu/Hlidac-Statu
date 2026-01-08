@@ -35,8 +35,7 @@ namespace PlatyUredniku.Cache
                         System.Collections.Concurrent.ConcurrentDictionary<string, osobaInfo> res = new();
                         var nameids = (await PpRepo.GetNameIdsForGroupAsync(PpRepo.PoliticianGroup.Vse)).Distinct();
 
-                        Devmasters.Batch.Manager.DoActionForAll(nameids,
-                            (nameid) =>
+                        await Devmasters.Batch.Manager.DoActionForAllAsync(nameids, async (nameid) =>
                             {
                                 var o = Osoby.GetByNameId.Get(nameid);
                                 if (o != null)
@@ -46,7 +45,7 @@ namespace PlatyUredniku.Cache
                                         Jmeno = o.Jmeno,
                                         Prijmeni = o.Prijmeni,
                                         Role = o.MainRolesToString(rok),
-                                        Strana = o.CurrentPoliticalParty()
+                                        Strana = await o.CurrentPoliticalPartyAsync()
                                     };
                                 }
 

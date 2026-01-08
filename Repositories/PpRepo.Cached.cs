@@ -20,11 +20,10 @@ public static partial class PpRepo
             return detail;
         }
         
-        public static List<string> GetPolitickeStranyForFilter()
+        public static async Task<List<string>> GetPolitickeStranyForFilterAsync()
         {
-            return CacheService.Cache.GetOrSet<List<string>>(
-                "politickeStranyFilterData",
-                _ =>
+            return await CacheService.Cache.GetOrSetAsync<List<string>>(
+                "politickeStranyFilterData", async _ =>
                 {
                     List<string> politickeStranyIca =
                     [
@@ -42,8 +41,15 @@ public static partial class PpRepo
                         "71339728",
                         "08288909"
                     ];
+                    
+                    var result = new List<string>();
 
-                    return politickeStranyIca.Select(ZkratkaStranyRepo.NazevStranyForIco).ToList();
+                    foreach (var ico in politickeStranyIca)
+                    {
+                        result.Add(await ZkratkaStranyRepo.NazevStranyForIcoAsync(ico));
+                    }
+
+                    return result;
                 }
             );
         }

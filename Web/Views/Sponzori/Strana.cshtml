@@ -29,9 +29,9 @@
         }
     }
 
-    string icoStrany = ZkratkaStranyRepo.IcoStrany((string)Model);
+    string icoStrany = await ZkratkaStranyRepo.IcoStranyAsync((string)Model);
     if (string.IsNullOrEmpty(icoStrany))
-        icoStrany = ZkratkaStranyRepo.IcoStrany(System.Net.WebUtility.UrlDecode((string)Model));
+        icoStrany = await ZkratkaStranyRepo.IcoStranyAsync(System.Net.WebUtility.UrlDecode((string)Model));
 
     string stranaZkratka = "";
     Firma strana = Firmy.Get(icoStrany);

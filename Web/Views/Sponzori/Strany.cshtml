@@ -17,7 +17,11 @@
         'filter': true,
     }";
 
-    string[] parlamentniIcos = SponzoringRepo.ParlamentníStrany.Select(m => ZkratkaStranyRepo.IcoStrany(m)).ToArray();
+    List<string> parlamentniIcos = new(SponzoringRepo.ParlamentniStrany.Length);
+    foreach (var parlamentniStrana in SponzoringRepo.ParlamentniStrany)
+    {
+        parlamentniIcos.Add(await ZkratkaStranyRepo.IcoStranyAsync(parlamentniStrana));
+    }
 
     var sql = @"
 select ICO, Jmeno,

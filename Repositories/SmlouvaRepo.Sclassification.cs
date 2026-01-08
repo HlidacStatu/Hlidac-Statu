@@ -3,9 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-
-using Devmasters.Cache.File;
-
 using HlidacStatu.Entities;
 using HlidacStatu.Repositories.Cache;
 using Newtonsoft.Json;
@@ -153,7 +150,7 @@ namespace HlidacStatu.Repositories
             }
 
             // save to db
-            ClassificationOverrideRepo.Save(username, smlouva.Id, smlouva.Classification, newClassification);
+            await ClassificationOverrideRepo.SaveAsync(username, smlouva.Id, smlouva.Classification, newClassification);
 
             smlouva.Classification.TypesToProperties(newClassification.ToArray());
             smlouva.Classification.LastUpdate = DateTime.Now;

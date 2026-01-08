@@ -20,7 +20,7 @@ namespace HlidacStatu.Extensions
     public static class OsobaExtension
     {
 
-        public static string CurrentPoliticalParty(this Osoba osoba)
+        public static async Task<string> CurrentPoliticalPartyAsync(this Osoba osoba)
         {
             var (organizace, ico) = osoba.Events(ev =>
                     ev.Type == (int)OsobaEvent.Types.PolitickaStrana
@@ -34,7 +34,7 @@ namespace HlidacStatu.Extensions
             if (string.IsNullOrWhiteSpace(ico))
                 return organizace;
 
-            var zkratka = ZkratkaStranyRepo.NazevStranyForIco(ico);
+            var zkratka = await ZkratkaStranyRepo.NazevStranyForIcoAsync(ico);
 
             if (!string.IsNullOrWhiteSpace(zkratka))
                 return zkratka;
@@ -43,10 +43,12 @@ namespace HlidacStatu.Extensions
         }
 
 
-        public static HlidacStatu.DS.Api.Osoba.ListItem ToApiOsobaListItem(this Osoba osoba)
+        public static async Task<ListItem> ToApiOsobaListItemAsync(this Osoba osoba)
         {
             if (osoba == null)
                 return null;
+
+            var party = await osoba.CurrentPoliticalPartyAsync();
 
             var res = new HlidacStatu.DS.Api.Osoba.ListItem
             {
@@ -56,7 +58,7 @@ namespace HlidacStatu.Extensions
                 Year_Of_Birth = osoba.Narozeni.HasValue ? osoba.Narozeni.Value.Year.ToString() : null,
                 Political_Involvement = osoba.StatusOsoby().ToNiceDisplayName(),
                 Photo_Url = osoba.HasPhoto() ? osoba.GetPhotoUrl(false) : null,
-                Current_Political_Party = osoba.CurrentPoliticalParty() ?? "None",
+                Current_Political_Party = party ?? "None",
                 Have_More_Details = true,
                 //TODO zvazit pridani vazeb urednich
                 Involved_In_Companies_Count = osoba.AktualniVazby( DS.Graphs.Relation.CharakterVazbyEnum.VlastnictviKontrola, DS.Graphs.Relation.AktualnostType.Nedavny)
@@ -75,6 +77,8 @@ namespace HlidacStatu.Extensions
             historyLimit ??= DateTime.Now.AddYears(-100);
             if (osoba == null)
                 return null;
+            
+            var party = await osoba.CurrentPoliticalPartyAsync();
 
             var res = new HlidacStatu.DS.Api.Osoba.Detail
             {
@@ -84,7 +88,7 @@ namespace HlidacStatu.Extensions
                 Year_Of_Birth = osoba.Narozeni.HasValue ? osoba.Narozeni.Value.Year.ToString() : null,
                 Political_Involvement = osoba.StatusOsoby().ToNiceDisplayName(),
                 Photo_Url = osoba.HasPhoto() ? osoba.GetPhotoUrl(false) : null,
-                Current_Political_Party = osoba.CurrentPoliticalParty() ?? "None",
+                Current_Political_Party = party ?? "None",
 
                 Recent_Public_Activities_Description = await osoba.DescriptionAsync(false, m => m.DatumDo == null || m.DatumDo > historyLimit, 5, itemDelimeter: ", "),
                 //TODO zvazit pridani vazeb urednich

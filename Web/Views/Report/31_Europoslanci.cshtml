@@ -13,7 +13,7 @@
         .ToList();
 
 
-    var poslanciTable = new ReportDataSource<(Osoba Osoba, string Description)>(new ReportDataSource<(Osoba Osoba, string Description)>.Column[]
+    var poslanciTable = new ReportDataSource<(Osoba Osoba, string Description, string PoliticalParty)>(new ReportDataSource<(Osoba Osoba, string Description, string PoliticalParty)>.Column[]
     {
         new()
         {
@@ -24,13 +24,13 @@
                        + "<br />"
                        + Devmasters.TextUtil.ShortenText(s.Description, 250).Replace("\n", "<br />");
             },
-            OrderValueRender = (s) => { return s.Osoba.FullName(false); }
+            OrderValueRender = (s) => s.Osoba.FullName(false)
         },
         new()
         {
             Name = "Strana/Hnutí",
-            HtmlRender = (s) => { return s.Osoba.CurrentPoliticalParty(); },
-            OrderValueRender = (s) => { return s.Osoba.CurrentPoliticalParty(); }
+            HtmlRender = (s) => s.PoliticalParty,
+            OrderValueRender = (s) => s.PoliticalParty
         }
     });
 
@@ -38,7 +38,8 @@
     foreach (var p in showList)
     {
         var description = await p.DescriptionAsync(false, m => true, numOfRecords: 3);
-        poslanciTable.AddRow((p, description));
+        var politicalParty = await p.CurrentPoliticalPartyAsync();
+        poslanciTable.AddRow((p, description, politicalParty));
     }
 }
 

@@ -356,19 +356,20 @@ namespace HlidacStatu.Repositories
                     await p.UpdateStatisticsAsync(smlouva);
             }
 
-            if (ClassificationOverrideRepo.TryGetOverridenClassification(smlouva.Id, out var classificationOverride))
+            var overridenClassification = await ClassificationOverrideRepo.GetOverridenClassificationAsync(smlouva.Id); 
+            if (overridenClassification is not null)
             {
                 var types = new List<Smlouva.SClassification.Classification>();
-                if (classificationOverride.CorrectCat1.HasValue)
+                if (overridenClassification.CorrectCat1.HasValue)
                     types.Add(new Smlouva.SClassification.Classification()
                     {
-                        TypeValue = classificationOverride.CorrectCat1.Value,
+                        TypeValue = overridenClassification.CorrectCat1.Value,
                         ClassifProbability = 0.9m
                     });
-                if (classificationOverride.CorrectCat2.HasValue)
+                if (overridenClassification.CorrectCat2.HasValue)
                     types.Add(new Smlouva.SClassification.Classification()
                     {
-                        TypeValue = classificationOverride.CorrectCat2.Value,
+                        TypeValue = overridenClassification.CorrectCat2.Value,
                         ClassifProbability = 0.8m
                     });
 

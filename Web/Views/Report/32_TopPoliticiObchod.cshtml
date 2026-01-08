@@ -13,36 +13,33 @@
     Osoba.Statistics.VerySimple[] showList = (await OsobaCache.GetTopPoliticiObchodujiciSeStatemAsync())[year];
 
 
-    var poslanciTable = new ReportDataSource<(Osoba.Statistics.VerySimple VerySimple, Osoba Osoba, string Description)>(new ReportDataSource<(Osoba.Statistics.VerySimple VerySimple, Osoba Osoba, string Description)>.Column[]
+    var poslanciTable = new ReportDataSource<(Osoba.Statistics.VerySimple VerySimple, Osoba Osoba, string Description, string PoliticalParty)>(new ReportDataSource<(Osoba.Statistics.VerySimple VerySimple, Osoba Osoba, string Description, string PoliticalParty)>.Column[]
     {
         new()
         {
             Name = "Politik",
-            HtmlRender = (s) =>
-            {
-                return string.Format("<a href='{0}'>{1}</a>", s.Osoba.GetUrl(), s.Osoba.FullNameWithYear(true))
-                       + "<br />"
-                       + Devmasters.TextUtil.ShortenText(s.Description, 250).Replace("\n", "<br />");
-            },
-            OrderValueRender = (s) => { return s.Osoba.FullName(false); }
+            HtmlRender = (s) => $"<a href='{s.Osoba.GetUrl()}'>{s.Osoba.FullNameWithYear(true)}</a>"
+                                + "<br />"
+                                + Devmasters.TextUtil.ShortenText(s.Description, 250).Replace("\n", "<br />"),
+            OrderValueRender = (s) => s.Osoba.FullName(false)
         },
         new()
         {
             Name = "Strana/Hnutí",
-            HtmlRender = (s) => { return s.Osoba.CurrentPoliticalParty(); },
-            OrderValueRender = (s) => { return s.Osoba.CurrentPoliticalParty(); }
+            HtmlRender = (s) => s.PoliticalParty,
+            OrderValueRender = (s) => s.PoliticalParty
         },
         new()
         {
             Name = "Objem uzavřených smluv firem, kde se angažuje",
-            HtmlRender = (s) => { return HlidacStatu.Util.RenderData.NicePrice(s.VerySimple.CelkovaHodnotaSmluv, html: true, shortFormat: true); },
-            OrderValueRender = (s) => { return HlidacStatu.Util.RenderData.OrderValueFormat(s.VerySimple.CelkovaHodnotaSmluv); }
+            HtmlRender = (s) => HlidacStatu.Util.RenderData.NicePrice(s.VerySimple.CelkovaHodnotaSmluv, html: true, shortFormat: true),
+            OrderValueRender = (s) => HlidacStatu.Util.RenderData.OrderValueFormat(s.VerySimple.CelkovaHodnotaSmluv)
         },
         new()
         {
             Name = "Počet smluv uzavřených firmami, kde se angažuje",
-            HtmlRender = (s) => { return HlidacStatu.Util.RenderData.NiceNumber(s.VerySimple.PocetSmluv, html: true); },
-            OrderValueRender = (s) => { return HlidacStatu.Util.RenderData.OrderValueFormat(s.VerySimple.PocetSmluv); }
+            HtmlRender = (s) => HlidacStatu.Util.RenderData.NiceNumber(s.VerySimple.PocetSmluv, html: true),
+            OrderValueRender = (s) => HlidacStatu.Util.RenderData.OrderValueFormat(s.VerySimple.PocetSmluv)
         }
     });
 
@@ -51,7 +48,8 @@
     {
         Osoba osoba = Osoby.GetByNameId.Get(p.OsobaNameId);
         var description = await osoba.DescriptionAsync(false, m => true, numOfRecords: 3);
-        poslanciTable.AddRow((p, osoba, description));
+        var politicalParty = await osoba.CurrentPoliticalPartyAsync();
+        poslanciTable.AddRow((p, osoba, description, politicalParty));
     }
 }
 

@@ -1,5 +1,4 @@
 using HlidacStatu.Entities;
-using HlidacStatu.Lib.Web.UI.Attributes;
 using HlidacStatu.Repositories;
 using Microsoft.AspNetCore.Mvc;
 using System;
@@ -84,7 +83,7 @@ public partial class PoliticiController : Controller
 
     public async Task<IActionResult> VsechnyOrganizace(int rok = PpRepo.DefaultYear)
     {
-        var organizaceViewData = await HlidacStatu.Extensions.Cache.Platy.Politici.GetFullOrganizaceViewDataCached(rok);
+        var organizaceViewData = await HlidacStatu.Extensions.Cache.Platy.Politici.GetFullOrganizaceViewDataCachedAsync(rok);
         var maxPocetPlatu = organizaceViewData.Max(o => o.PocetOsob);
         var maxPlatInMils = Math.Ceiling((organizaceViewData.Max(x => x.PlatyDo) + 1) / 1_000_000);
         
@@ -140,7 +139,7 @@ public partial class PoliticiController : Controller
 
     public async Task<IActionResult> VsechnyOrganizaceData(int rok = PpRepo.DefaultYear)
     {
-        var organizaceViewData = await HlidacStatu.Extensions.Cache.Platy.Politici.GetFullOrganizaceViewDataCached(rok);
+        var organizaceViewData = await HlidacStatu.Extensions.Cache.Platy.Politici.GetFullOrganizaceViewDataCachedAsync(rok);
         var filteredOrganizaceViewData = FilterOrganizaceViewData(organizaceViewData);
 
         return new JsonResult(filteredOrganizaceViewData.ToList(), new JsonSerializerOptions(JsonSerializerDefaults.Web));
@@ -148,8 +147,8 @@ public partial class PoliticiController : Controller
     
     public async Task<IActionResult> Seznam(string report = "platy", int rok = PuRepo.DefaultYear)
     {
-        var fullPoliticiViewData = await HlidacStatu.Extensions.Cache.Platy.Politici.GetFullPoliticiViewDataCached(rok);
-        var politickeStranyFilterData = PpRepo.Cached.GetPolitickeStranyForFilter();
+        var fullPoliticiViewData = await HlidacStatu.Extensions.Cache.Platy.Politici.GetFullPoliticiViewDataCachedAsync(rok);
+        var politickeStranyFilterData = await PpRepo.Cached.GetPolitickeStranyForFilterAsync();
 
         var maxJobCount = (int)fullPoliticiViewData.Max(x => x.PocetJobu) + 1;
         var maxTotalIncomeInMilions =
@@ -271,7 +270,7 @@ public partial class PoliticiController : Controller
     public async Task<IActionResult> SeznamData()
     {
 
-        var politickeStranyFilterData = PpRepo.Cached.GetPolitickeStranyForFilter();
+        var politickeStranyFilterData = await PpRepo.Cached.GetPolitickeStranyForFilterAsync();
 
         var filtered = await FilterPoliticiViewDataAsync(HttpContext.Request.Query, politickeStranyFilterData);
 
@@ -305,7 +304,7 @@ public partial class PoliticiController : Controller
 
 
         IEnumerable<HlidacStatu.Extensions.Cache.Views.PoliticiViewData> filteredData =
-            await HlidacStatu.Extensions.Cache.Platy.Politici.GetFullPoliticiViewDataCached(rok);
+            await HlidacStatu.Extensions.Cache.Platy.Politici.GetFullPoliticiViewDataCachedAsync(rok);
 
         // Gender
         if (genders.Length > 0)

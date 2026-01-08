@@ -20,7 +20,7 @@ namespace HlidacStatu.Repositories
     public static class StaticData
     {
         private static readonly ILogger _logger = Log.ForContext(typeof(StaticData));
-        
+
         private static IFusionCache _memoryCache =>
             HlidacStatu.Caching.CacheFactory.CreateNew(CacheFactory.CacheType.L1Default, nameof(StaticData));
 
@@ -64,6 +64,12 @@ namespace HlidacStatu.Repositories
                     }
                 },
                 options => options.ModifyEntryOptionsDuration(TimeSpan.FromHours(6)));
+
+        public static ValueTask<Dictionary<string, string>> GetZkratkyPolitickychStranAsync() =>
+            _memoryCache.GetOrSetAsync($"_ZkratkyPolitickychStran", async _
+                    => await ZkratkaStranyRepo.ZkratkyVsechStranAsync(),
+                options => options.ModifyEntryOptionsDuration(TimeSpan.FromHours(24)));
+
 
         static bool initialized = false;
 
@@ -188,12 +194,6 @@ namespace HlidacStatu.Repositories
             swl.StopPreviousAndStartNextLap(Util.DebugUtil.GetClassAndMethodName(MethodBase.GetCurrentMethod()) +
                                             " var SponzorujiciFirmy_Vsechny force load");
             SponzorujiciFirmy_Vsechny.Get(); //force to load
-            
-
-            //migrace: tohle by mělo jít odsud do Repo cache
-            ZkratkyStran_cache = new Devmasters.Cache.LocalMemory.Cache<Dictionary<string, string>>
-            (TimeSpan.FromHours(24), "ZkratkyStran",
-                (o) => { return ZkratkaStranyRepo.ZkratkyVsechStran(); });
 
 
             //AFERY

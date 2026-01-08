@@ -10,12 +10,9 @@ namespace HlidacStatu.Extensions.Cache;
 
 public static class Platy
 {
-    
     public static class Politici
     {
-        
-
-        public static async Task<List<Views.PoliticiViewData>> GetFullPoliticiViewDataCached(int rok)
+        public static async Task<List<Views.PoliticiViewData>> GetFullPoliticiViewDataCachedAsync(int rok)
         {
             var fullPoliticiViewData = await CacheService.Cache.GetOrSetAsync<List<Views.PoliticiViewData>>(
                 "fullPoliticiViewData_" + rok.ToString(),
@@ -32,6 +29,7 @@ public static class Platy
                         var nameid = politikPlatyKvp.Key;
                         var platy = politikPlatyKvp.Value;
                         var osoba = OsobaRepo.GetByNameId(nameid);
+                        var politStrana = await osoba.CurrentPoliticalPartyAsync();
                         var celkoveNaklady = platy.Sum(p => p.CelkoveRocniNakladyNaPolitika);
 
                         politiciViewData.Add(new Views.PoliticiViewData()
@@ -44,9 +42,7 @@ public static class Platy
                             PocetJobu = platy.Length,
                             Pohlavi = osoba.Pohlavi,
                             PolitickeRoleFilter = osoba.MainRoles(PpRepo.DefaultYear),
-                            PolitickaStrana =
-                                osoba
-                                    .CurrentPoliticalParty(), //todo: změnit na politickou stranu v konkrétním roce (přidat funkčnost)
+                            PolitickaStrana =politStrana,
                             Organizace = RenderOrganizace(platy),
                         });
                     }
@@ -58,7 +54,7 @@ public static class Platy
             return fullPoliticiViewData;
         }
 
-        public static async Task<List<Views.OrganizaceViewData>> GetFullOrganizaceViewDataCached(int rok)
+        public static async Task<List<Views.OrganizaceViewData>> GetFullOrganizaceViewDataCachedAsync(int rok)
         {
             var fullOrganizaceViewData = await CacheService.Cache.GetOrSetAsync<List<Views.OrganizaceViewData>>(
                 $"fullOrganizaceViewData_{rok}",

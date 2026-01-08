@@ -71,7 +71,7 @@ public class LocallyCachedAutocompleteService
         var data = await db.Firma.Where(f => f.Kod_PF == FirmaExtension.PolitickaStrana_kodPF)
             .ToListAsync(cancellationToken: cancellationToken);
 
-        var zkratkyStran = ZkratkaStranyRepo.ZkratkyVsechStran();
+        var zkratkyStran = await ZkratkaStranyRepo.ZkratkyVsechStranAsync();
 
         string? GetSafeZkratka(string ico)
         {
