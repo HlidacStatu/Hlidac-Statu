@@ -87,7 +87,7 @@ else
     {
         User = await UserHelper.GetCurrentUserAsync();
         _nameId = User.GetNameId();
-        Osoba = OsobaRepo.GetByNameId(_nameId);
+        Osoba = await OsobaRepo.GetByNameIdAsync(_nameId);
         if (Osoba is null)
         {
             Toaster.AddMessage("Chyba", $"Data se nepodařilo načíst", importance: ToastService.ToastMessage.ImportanceLevel.Error);

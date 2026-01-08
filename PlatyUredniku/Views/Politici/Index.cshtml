@@ -1,5 +1,6 @@
 ﻿@using HlidacStatu.Entities
 @using HlidacStatu.Repositories
+@using HlidacStatu.Repositories.Cache
 @using HlidacStatu.Util
 
 @functions {
@@ -187,7 +188,7 @@
                         .First();
                     }
                     <br /><br />
-                    Vede <a href="/politici/politik/@topJob.Key">@(Osoby.GetByNameId.Get(topJob.Key).FullName())</a> s <b>@topJob.Value.Count()</b> pozicemi.
+                    Vede <a href="/politici/politik/@topJob.Key">@((await OsobaCache.GetPersonByNameIdAsync(topJob.Key)).FullName())</a> s <b>@topJob.Value.Count()</b> pozicemi.
                 </div>
                 <div class="card-footer">
                     <p class="text-center">

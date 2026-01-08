@@ -27,7 +27,7 @@ namespace HlidacStatu.Repositories
 
 
 
-		public static void PrepareForSave(Rizeni rizeni, bool skipOsobaIdLink = false)
+		public static async Task PrepareForSaveAsync(Rizeni rizeni, bool skipOsobaIdLink = false)
 		{
 			if (skipOsobaIdLink == false)
 				rizeni.OnRadar = false; //reset settings
@@ -40,8 +40,8 @@ namespace HlidacStatu.Repositories
 					var found = Validators.JmenoInText(d.PlneJmeno);
 					if (found != null)
 					{
-						var osoba =
-							OsobaRepo.Searching.GetByName(found.Jmeno, found.Prijmeni, d.DatumNarozeni.Value);
+						var osoba = await 
+							OsobaRepo.Searching.GetByNameAsync(found.Jmeno, found.Prijmeni, d.DatumNarozeni.Value);
 						if (osoba != null)
 						{
 							d.OsobaId = osoba.NameId;
@@ -63,15 +63,9 @@ namespace HlidacStatu.Repositories
 					var found = Validators.JmenoInText(d.PlneJmeno);
 					if (found != null)
 					{
-						var osoba =
-							OsobaRepo.Searching.GetByName(found.Jmeno, found.Prijmeni, d.DatumNarozeni.Value);
-						if (osoba != null)
-						{
-							d.OsobaId = osoba.NameId;
-							//this.OnRadar = this.OnRadar || o.Status > 0;
-						}
-						else
-							d.OsobaId = "";
+						var osoba = await 
+							OsobaRepo.Searching.GetByNameAsync(found.Jmeno, found.Prijmeni, d.DatumNarozeni.Value);
+						d.OsobaId = osoba != null ? osoba.NameId : "";
 					}
 					else
 						d.OsobaId = "";
@@ -86,15 +80,9 @@ namespace HlidacStatu.Repositories
 					var found = Validators.JmenoInText(d.PlneJmeno);
 					if (found != null)
 					{
-						var osoba =
-							OsobaRepo.Searching.GetByName(found.Jmeno, found.Prijmeni, d.DatumNarozeni.Value);
-						if (osoba != null)
-						{
-							d.OsobaId = osoba.NameId;
-							//this.OnRadar = this.OnRadar || o.Status > 0;
-						}
-						else
-							d.OsobaId = "";
+						var osoba = await 
+							OsobaRepo.Searching.GetByNameAsync(found.Jmeno, found.Prijmeni, d.DatumNarozeni.Value);
+						d.OsobaId = osoba != null ? osoba.NameId : "";
 					}
 					else
 						d.OsobaId = "";
@@ -131,7 +119,7 @@ namespace HlidacStatu.Repositories
 			if (client == null)
 				client = Manager.GetESClient_Insolvence();
 
-			PrepareForSave(rizeni);
+			await PrepareForSaveAsync(rizeni);
 			if (forceOnRadarValue.HasValue)
 				rizeni.OnRadar = forceOnRadarValue.Value;
 

@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-
-namespace HlidacStatu.Searching
+﻿namespace HlidacStatu.Searching
 {
     public partial class Search
     {

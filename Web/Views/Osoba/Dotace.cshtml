@@ -26,23 +26,24 @@
                 ValueSuffix = " Kč"
             }
         },
-
     };
 
 
     string NiceString(string url, string query, int pocet, decimal cenaCelkem, int? year = null)
     {
         return $"<a href='{ValidUrl(url, query, year)}'>" +
-            Devmasters.Lang.CS.Plural.Get(pocet, "{0} dotace;{0} dotace;{0} dotací") +
-            "</a> ve výši " +
-            Smlouva.NicePrice(cenaCelkem, html: true, shortFormat: true);
+               Devmasters.Lang.CS.Plural.Get(pocet, "{0} dotace;{0} dotace;{0} dotací") +
+               "</a> ve výši " +
+               Smlouva.NicePrice(cenaCelkem, html: true, shortFormat: true);
     }
+
     string ValidUrl(string url, string query, int? year = null)
     {
         if (year.HasValue)
         {
             query = HlidacStatu.Searching.Query.ModifyQueryAND(query, $"approvedYear:{year}");
         }
+
         return $"{url}?q={System.Net.WebUtility.UrlEncode(query)}";
     }
 }
@@ -55,13 +56,13 @@
     <h4>Souhrnné statistiky dotací pro @Model.FullName()</h4>
     <p>
 
-        <div class="bs-callout info">
-            <h5>Statistiky dotací, které uzavřely firmy s vazbou na @Model.FullName()</h5>
-            <p>
-                <b>@Html.Raw(NiceString($"/dotace/hledat", $"osobaid:{Model.NameId}", (int)allStats.Summary().PocetDotaci, allStats.Summary().CelkemPrideleno))</b>
-            </p>
+    <div class="bs-callout info">
+        <h5>Statistiky dotací, které uzavřely firmy s vazbou na @Model.FullName()</h5>
+        <p>
+            <b>@Html.Raw(NiceString($"/dotace/hledat", $"osobaid:{Model.NameId}", (int)allStats.Summary().PocetDotaci, allStats.Summary().CelkemPrideleno))</b>
+        </p>
 
-        </div>
+    </div>
 
 
 
@@ -69,23 +70,23 @@
     </p>
     @Html.ColumnGraph("Hodnota získaných dotací  po letech", chartData, yTitleRight: "Kč")
 
-    <hr />
+    <hr/>
     <h4>Detailní statistiky dotací podle firem s vazbou na @Model.FullName()</h4>
 
     <table class="table table-hover table-new table-new--dotted table-striped table-bordered">
         <thead>
-            <tr>
-                <th>Firma</th>
-                <th>Dotace obdržené firmou</th>
-                <th>Vztah @Model.FullName() s firmou</th>
-            </tr>
+        <tr>
+            <th>Firma</th>
+            <th>Dotace obdržené firmou</th>
+            <th>Vztah @Model.FullName() s firmou</th>
+        </tr>
         </thead>
 
         @foreach (var vPerIco in (stats.SoukromeFirmy.Union(stats.StatniFirmy).Union(stats.Neziskovky))
-                .OrderByDescending(o => o.Value.Summary().CelkemPrideleno)
-                .ThenByDescending(o => o.Value.Summary().PocetDotaci)
-                .Where(o => o.Value.Summary().PocetDotaci > 0)
-                )
+                      .OrderByDescending(o => o.Value.Summary().CelkemPrideleno)
+                      .ThenByDescending(o => o.Value.Summary().PocetDotaci)
+                      .Where(o => o.Value.Summary().PocetDotaci > 0)
+                     )
         {
             string ico = vPerIco.Value.ICO;
             Firma f = Firmy.Get(ico);
@@ -100,7 +101,7 @@
                             <a href="/subjekt/Dotace/@(ico)">
                                 @Devmasters.Lang.CS.Plural.Get(vPerIco.Value.Summary().PocetDotaci, "{0} dotace;{0} dotace;{0} dotací")
                             </a>
-                            <br />ve výši @Html.Raw(Smlouva.NicePrice(vPerIco.Value.Summary().CelkemPrideleno, html: true, shortFormat: true))
+                            <br/>ve výši @Html.Raw(Smlouva.NicePrice(vPerIco.Value.Summary().CelkemPrideleno, html: true, shortFormat: true))
                         </span>
                     }
                     else
@@ -111,7 +112,7 @@
 
                 </td>
                 <td>
-                    @Html.RenderVazby(Model.VazbyProICO(ico))
+                    @Html.RenderVazby(await OsobaVazbyRepo.VazbyProIcoCachedAsync(Model, ico))
                 </td>
             </tr>
         }

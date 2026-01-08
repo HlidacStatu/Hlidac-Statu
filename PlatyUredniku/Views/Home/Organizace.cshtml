@@ -181,7 +181,7 @@
                                 @foreach (var pr in Model.PrijmyPolitiku.OrderByDescending(o => o.CelkoveRocniNakladyNaPolitika))
                                 {
                                     <li>
-                                        <a href="/politici/politik/@(pr.Nameid)">@pr.GetOsoba().FullName()</a>
+                                        <a href="/politici/politik/@(pr.Nameid)">@(await pr.GetCachedOsobaAsync()).FullName())</a>
                                         @if (pr.Status > 0)
                                         {
                                             @HlidacStatu.Util.RenderData.NicePriceHtml(pr.CelkovyRocniPlatVcetneOdmen)
@@ -206,7 +206,7 @@
                                 @foreach (var pr in Model.PrijmyPolitiku.OrderByDescending(o => o.CelkoveRocniNakladyNaPolitika).Take(3))
                                 {
                                     <li>
-                                        <a href="/politici/politik/@(pr.Nameid)">@pr.GetOsoba().FullName()</a>
+                                        <a href="/politici/politik/@(pr.Nameid)">@(await pr.GetCachedOsobaAsync()).FullName()</a>
 
                                         @if (pr.Status > 0)
                                         {

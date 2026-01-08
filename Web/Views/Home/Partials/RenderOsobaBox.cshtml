@@ -14,12 +14,12 @@
 }
 else
 {
-    var alldata = Model.Osoba.AktualniVazby( Relation.CharakterVazbyEnum.VlastnictviKontrola, Relation.AktualnostType.Nedavny);
+    var alldata = await Model.Osoba.AktualniVazbyAsync( Relation.CharakterVazbyEnum.VlastnictviKontrola, Relation.AktualnostType.Nedavny);
 
     var maxConcurrentTasks = 10;
     var semaphore = new SemaphoreSlim(maxConcurrentTasks);
 
-    var dataTasks = Model.Osoba.AktualniVazby( Relation.CharakterVazbyEnum.VlastnictviKontrola, Relation.AktualnostType.Nedavny)
+    var dataTasks = (await Model.Osoba.AktualniVazbyAsync( Relation.CharakterVazbyEnum.VlastnictviKontrola, Relation.AktualnostType.Nedavny))
         .Where(v => !string.IsNullOrEmpty(v.To.Id))
         .GroupBy(f => f.To.Id, v => v, (ico, v) => ico)
         .Select(async ico =>

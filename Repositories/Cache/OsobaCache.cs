@@ -18,6 +18,9 @@ public static class OsobaCache
 
     private static IFusionCache PostgreCache =>
         HlidacStatu.Caching.CacheFactory.CreateNew(CacheFactory.CacheType.L2PostgreSql, nameof(OsobaCache));
+    
+    private static IFusionCache MemcachedCache =>
+        HlidacStatu.Caching.CacheFactory.CreateNew(CacheFactory.CacheType.L2Memcache, nameof(OsobaCache));
 
     public static ValueTask<InfoFact[]> GetInfoFactsAsync(Osoba osoba) =>
         PostgreCache.GetOrSetAsync($"_InfoFacts:{osoba.NameId}",
@@ -117,8 +120,13 @@ public static class OsobaCache
                         .Distinct(),
                     async (o) =>
                     {
-                        var vazby = o.AktualniVazby(Relation.CharakterVazbyEnum.VlastnictviKontrola, Relation.AktualnostType.Nedavny)
-                                .Union(o.AktualniVazby(Relation.CharakterVazbyEnum.Uredni, Relation.AktualnostType.Nedavny));
+                        var vazbyVlastnictviTask = o.AktualniVazbyAsync(Relation.CharakterVazbyEnum.VlastnictviKontrola,
+                            Relation.AktualnostType.Nedavny);
+
+                        var vazbyUredniTask = o.AktualniVazbyAsync(Relation.CharakterVazbyEnum.Uredni,
+                            Relation.AktualnostType.Nedavny);
+                        
+                        var vazby = (await vazbyVlastnictviTask).Union(await vazbyUredniTask);
 
                         var icos = vazby
                             .Where(w => !string.IsNullOrEmpty(w.To.Id))
@@ -142,7 +150,7 @@ public static class OsobaCache
 
                                     foreach (var pd in pdluznici)
                                     {
-                                        var _v_ico = o.VazbyProICO(pd.ICO);
+                                        var _v_ico = await OsobaVazbyRepo.VazbyProIcoCachedAsync(o, pd.ICO);
                                         foreach (var v in _v_ico)
                                         {
                                             if (Devmasters.DT.Util.IsOverlappingIntervals(
@@ -194,4 +202,16 @@ public static class OsobaCache
 
     public static ValueTask InvalidatePoliticiSFirmouVInsolvenciAsync() =>
         PostgreCache.ExpireAsync($"_PoliticiSFirmouVInsolvenci");
+    
+    
+    
+    public static ValueTask<Osoba> GetPersonByNameIdAsync(string nameId) =>
+        MemcachedCache.GetOrSetAsync($"_PersonByNameId:{nameId}",
+            _ => OsobaRepo.GetByNameIdAsync(nameId),
+            options => options.ModifyEntryOptionsDuration(TimeSpan.FromMinutes(10)));
+    
+    public static ValueTask<Osoba> GetPersonByIdAsync(int key) =>
+        MemcachedCache.GetOrSetAsync($"_PersonByInternalId:{key}",
+            _ => OsobaRepo.GetByInternalIdAsync(key),
+            options => options.ModifyEntryOptionsDuration(TimeSpan.FromMinutes(10)));
 }

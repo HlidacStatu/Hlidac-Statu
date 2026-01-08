@@ -1,4 +1,5 @@
 ﻿@using HlidacStatu.Repositories
+@using HlidacStatu.Repositories.Cache
 @using HlidacStatu.Util
 
 @{
@@ -202,7 +203,7 @@
                                 .First();
                             }
                             <p>
-                                Vede <b>@(Osoby.GetByNameId.Get(topJob.Key).FullName())</b> s&nbsp;<span class="badge text-bg-warning"><b>@topJob.Value.Count()</b></span> funkcemi.
+                                Vede <b>@((await OsobaCache.GetPersonByNameIdAsync(topJob.Key)).FullName())</b> s&nbsp;<span class="badge text-bg-warning"><b>@topJob.Value.Count()</b></span> funkcemi.
                             </p>
                         </div>
                     </div>

@@ -18,6 +18,7 @@ using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
 using HlidacStatu.Connectors;
+using HlidacStatu.Repositories.Cache;
 using Serilog;
 
 namespace HlidacStatu.Datasets
@@ -122,7 +123,7 @@ namespace HlidacStatu.Datasets
 
                 if (!string.IsNullOrEmpty(t))
                 {
-                    Osoba os = Osoby.GetByNameId.Get(t);
+                    Osoba os = await OsobaCache.GetPersonByNameIdAsync(t);
                     if (os != null)
                     {
                         topTxts.Add(os.FullName() + ": ");
@@ -636,7 +637,7 @@ namespace HlidacStatu.Datasets
             if (DatasetId == DataSetDB.DataSourcesDbName) //don't analyze for registration of new dataset
                 jpathObjs = new JContainer[] { };
 
-            FillPersonData(jpathObjs);
+            await FillPersonDataAsync(jpathObjs);
 
             string updatedData = JsonConvert.SerializeObject(objDyn)
                 .Replace((char)160, ' '); //hard space to space
@@ -707,7 +708,7 @@ namespace HlidacStatu.Datasets
                     jpathObjs = jpaths.Select(j => j.Parent.Parent).ToArray();
                 }
 
-                FillPersonData(jpathObjs);
+                await FillPersonDataAsync(jpathObjs);
 
                 string id;
 
@@ -860,7 +861,7 @@ namespace HlidacStatu.Datasets
         /// Loop through array and fills in osobaid if array contains any person data
         /// </summary>
         /// <param name="jpathObjs"></param>
-        private void FillPersonData(JContainer[] jpathObjs)
+        private async Task FillPersonDataAsync(JContainer[] jpathObjs)
         {
             foreach (var jo in jpathObjs)
             {
@@ -915,13 +916,13 @@ namespace HlidacStatu.Datasets
                            ) //pokud OsobaId je vyplnena, nehledej jinou
                         {
                             string osobaId = null;
-                            var osobaInDb = OsobaRepo.Searching.GetByName(
+                            var osobaInDb = await OsobaRepo.Searching.GetByNameAsync(
                                 jo[jmenoAttrName].Value<string>(),
                                 jo[prijmeniAttrName].Value<string>(),
                                 jo[narozeniAttrName].Value<DateTime>()
                             );
                             if (osobaInDb == null)
-                                osobaInDb = OsobaRepo.Searching.GetByNameAscii(
+                                osobaInDb = await OsobaRepo.Searching.GetByNameAsciiAsync(
                                     jo[jmenoAttrName].Value<string>(),
                                     jo[prijmeniAttrName].Value<string>(),
                                     jo[narozeniAttrName].Value<DateTime>()
@@ -929,8 +930,8 @@ namespace HlidacStatu.Datasets
 
                             if (osobaInDb != null && string.IsNullOrEmpty(osobaInDb.NameId))
                             {
-                                osobaInDb.NameId = OsobaRepo.GetUniqueNamedId(osobaInDb);
-                                OsobaRepo.Save(osobaInDb);
+                                osobaInDb.NameId = await OsobaRepo.GetUniqueNamedIdAsync(osobaInDb);
+                                await OsobaRepo.SaveAsync(osobaInDb);
                             }
 
                             osobaId = osobaInDb?.NameId;
@@ -947,14 +948,14 @@ namespace HlidacStatu.Datasets
                             Osoba osobaZeJmena = Validators.JmenoInText(jo[celejmenoAttrName].Value<string>());
                             if (osobaZeJmena != null)
                             {
-                                var osobaInDb = OsobaRepo.Searching.GetByName(
+                                var osobaInDb = await OsobaRepo.Searching.GetByNameAsync(
                                     osobaZeJmena.Jmeno,
                                     osobaZeJmena.Prijmeni,
                                     jo[narozeniAttrName].Value<DateTime>()
                                 );
 
                                 if (osobaInDb == null)
-                                    osobaInDb = OsobaRepo.Searching.GetByNameAscii(
+                                    osobaInDb = await OsobaRepo.Searching.GetByNameAsciiAsync(
                                         osobaZeJmena.Jmeno,
                                         osobaZeJmena.Prijmeni,
                                         jo[narozeniAttrName].Value<DateTime>()
@@ -962,8 +963,8 @@ namespace HlidacStatu.Datasets
 
                                 if (osobaInDb != null && string.IsNullOrEmpty(osobaInDb.NameId))
                                 {
-                                    osobaInDb.NameId = OsobaRepo.GetUniqueNamedId(osobaInDb);
-                                    OsobaRepo.Save(osobaInDb);
+                                    osobaInDb.NameId = await OsobaRepo.GetUniqueNamedIdAsync(osobaInDb);
+                                    await OsobaRepo.SaveAsync(osobaInDb);
                                 }
 
                                 osobaId = osobaInDb?.NameId;

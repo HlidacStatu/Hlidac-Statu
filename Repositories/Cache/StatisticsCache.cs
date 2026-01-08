@@ -206,7 +206,7 @@ public class StatisticsCache
         Dictionary<string, StatisticsSubjectPerYear<Smlouva.Statistics.Data>> nezisk =
             new Dictionary<string, StatisticsSubjectPerYear<Smlouva.Statistics.Data>>();
 
-        var skutecneVazby = Relation.SkutecnaDobaVazby(o.AktualniVazby( Relation.CharakterVazbyEnum.VlastnictviKontrola, Relation.AktualnostType.Libovolny));
+        var skutecneVazby = Relation.SkutecnaDobaVazby(await o.AktualniVazbyAsync( Relation.CharakterVazbyEnum.VlastnictviKontrola, Relation.AktualnostType.Libovolny));
         var firmy_maxrok = new Dictionary<string, Devmasters.DT.DateInterval>();
         foreach (var v in skutecneVazby.Where(v => !string.IsNullOrEmpty(v.To?.UniqId)
                                                    && v.To.Type == HlidacStatu.DS.Graphs.Graph.Node.NodeType
@@ -512,7 +512,7 @@ public class StatisticsCache
         Dictionary<string, StatisticsSubjectPerYear<Firma.Statistics.Dotace>> nezisk =
             new Dictionary<string, StatisticsSubjectPerYear<Firma.Statistics.Dotace>>();
 
-        var skutecneVazby = Relation.SkutecnaDobaVazby(o.AktualniVazby( Relation.CharakterVazbyEnum.VlastnictviKontrola, Relation.AktualnostType.Libovolny));
+        var skutecneVazby = Relation.SkutecnaDobaVazby(await o.AktualniVazbyAsync( Relation.CharakterVazbyEnum.VlastnictviKontrola, Relation.AktualnostType.Libovolny));
         var firmy_maxrok = new Dictionary<string, Devmasters.DT.DateInterval>();
         foreach (var v in skutecneVazby.Where(v => !string.IsNullOrEmpty(v.To?.UniqId)
                                                    && v.To.Type == HlidacStatu.DS.Graphs.Graph.Node.NodeType

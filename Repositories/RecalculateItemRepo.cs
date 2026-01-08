@@ -67,7 +67,7 @@ namespace HlidacStatu.Repositories
 
         public static async Task RecalculateOsobaAsync(RecalculateItem item, bool noRebuild, bool invalidateOnly)
         {
-            var o = Osoby.GetByNameId.Get(item.Id);
+            var o = await OsobaCache.GetPersonByNameIdAsync(item.Id);
             if (o != null)
             {
                 switch (item.StatisticsType)

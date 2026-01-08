@@ -1,6 +1,6 @@
 ﻿using System.Threading.Tasks;
 using HlidacStatu.Repositories;
-
+using HlidacStatu.Repositories.Cache;
 using Microsoft.AspNetCore.Mvc;
 
 namespace HlidacStatu.Web.Controllers
@@ -23,7 +23,7 @@ namespace HlidacStatu.Web.Controllers
 
             if (!string.IsNullOrWhiteSpace(osobaNamedId))
             {
-                var o = Osoby.GetByNameId.Get(osobaNamedId);
+                var o = await OsobaCache.GetPersonByNameIdAsync(osobaNamedId);
                 if (o != null)
                     return Redirect(o.GetUrl(true));
             }

@@ -1,15 +1,12 @@
 using Devmasters;
 using Devmasters.Enums;
-
 using HlidacStatu.DS.Graphs;
 using HlidacStatu.Entities;
 using HlidacStatu.Extensions;
 using HlidacStatu.Repositories.Searching;
 using HlidacStatu.Searching;
 using Microsoft.EntityFrameworkCore;
-
 using Nest;
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -24,11 +21,10 @@ namespace HlidacStatu.Repositories
     {
         public static class Searching
         {
-            public static readonly Regex DateRegex = new(@"(\d{1,2}[-./\\]\d{1,2}[-./\\]\d{2,4})|(\d{2,4}[-./\\]\d{1,2}[-./\\]\d{1,2})");
-            public static readonly Regex YearRegexLoose = new(@"(19|20)\d{2}");
+            private static readonly Regex DateRegex =
+                new(@"(\d{1,2}[-./\\]\d{1,2}[-./\\]\d{2,4})|(\d{2,4}[-./\\]\d{1,2}[-./\\]\d{1,2})");
 
-            public const int DefaultPageSize = 40;
-            public const int MaxResultWindow = 200;
+            private static readonly Regex YearRegexLoose = new(@"(19|20)\d{2}");
 
 
             [ShowNiceDisplayName()]
@@ -45,13 +41,14 @@ namespace HlidacStatu.Repositories
                 NameAsc = 1,
 
 
-                [Disabled] FastestForScroll = 666
+                [Disabled]
+                FastestForScroll = 666
             }
 
-            public static IRule[] irules = new IRule[]
-            {
-                new TransformPrefix("osobaid:", "osobaid:", null),
-            };
+            public static IRule[] Irules =
+            [
+                new TransformPrefix("osobaid:", "osobaid:", null)
+            ];
 
 
             /// <summary>
@@ -64,9 +61,9 @@ namespace HlidacStatu.Repositories
             /// <param name="order">The order in which to sort the results.</param>
             /// <param name="exactNumOfResults">Indicates whether to return an exact number of results.</param>
             /// <returns>A task that represents the asynchronous operation, containing the search result.</returns>
-            public static QueryContainer GetSimpleQuery(string query)
+            public static async Task<QueryContainer> GetSimpleQueryAsync(string query)
             {
-                var qc = SimpleQueryCreator.GetSimpleQuery<Smlouva>(query, irules);
+                var qc = await SimpleQueryCreator.GetSimpleQueryAsync<Smlouva>(query, Irules);
                 return qc;
             }
 
@@ -82,17 +79,16 @@ namespace HlidacStatu.Repositories
             public static Task<OsobaSearchResult> SimpleSearchAsync(string query, int page, int pageSize, string order,
                 bool exactNumOfResults = false)
             {
-                order = TextUtil.NormalizeToNumbersOnly(order);
-                OrderResult eorder = OrderResult.Relevance;
-                Enum.TryParse<OrderResult>(order, out eorder);
+                order = order.NormalizeToNumbersOnly();
+                Enum.TryParse<OrderResult>(order, out var eorder);
 
                 return SimpleSearchAsync(query, page, pageSize, eorder, exactNumOfResults);
             }
 
 
-            static string[] dontIndexOsoby = Config
+            private static readonly string[] DontIndexOsoby = Config
                 .GetWebConfigValue("DontIndexOsoby")
-                .Split(new string[] { ";", "," }, StringSplitOptions.RemoveEmptyEntries)
+                .Split([";", ","], StringSplitOptions.RemoveEmptyEntries)
                 .Select(m => m.ToLower())
                 .ToArray();
 
@@ -124,9 +120,9 @@ namespace HlidacStatu.Repositories
 
                 foreach (var id in peopleIds)
                 {
-                    if (dontIndexOsoby.Contains(id) == false)
+                    if (DontIndexOsoby.Contains(id) == false)
                     {
-                        var foundPerson = OsobaRepo.GetByNameId(id);
+                        var foundPerson = await OsobaRepo.GetByNameIdAsync(id);
                         if (foundPerson != null)
                         {
                             foundPepole.Add(foundPerson);
@@ -175,10 +171,10 @@ namespace HlidacStatu.Repositories
             }
 
 
-
             public record OsobaConfidence
             {
                 public Osoba Osoba { get; set; }
+                public string CurrentPoliticalParty { get; set; }
                 public decimal Confidence { get; set; }
 
                 public FoundParts Found { get; set; } = FoundParts.None;
@@ -203,16 +199,10 @@ namespace HlidacStatu.Repositories
             /// </summary>
             public class LooseDate
             {
-                public static LooseDate FromVek(int vek, DateTime forDate)
-                {
-                    throw new NotImplementedException();
-                    return new LooseDate()
-                    {
-
-                    };
-                }
                 public LooseDate()
-                { }
+                {
+                }
+
                 /// <summary>
                 /// Initializes a new instance of the <see cref="LooseDate"/> class.
                 /// Attempts to parse the provided date string into a specific date or year.
@@ -255,14 +245,17 @@ namespace HlidacStatu.Repositories
                         {
                             if (this.Year.HasValue)
                             {
-                                _di = new Devmasters.DT.DateInterval(new DateTime(this.Year.Value, 1, 1), new DateTime(this.Year.Value, 12, 31));
+                                _di = new Devmasters.DT.DateInterval(new DateTime(this.Year.Value, 1, 1),
+                                    new DateTime(this.Year.Value, 12, 31));
                             }
                         }
+
                         return _di;
                     }
                 }
             }
-            private static OsobaConfidence OsobaConfidenceCalculation(Osoba o, DateTime? datumnarozeni,
+
+            private static async Task<OsobaConfidence> OsobaConfidenceCalculationAsync(Osoba o, DateTime? datumnarozeni,
                 bool foundWithAccent,
                 string[] isInIco = null)
             {
@@ -282,13 +275,14 @@ namespace HlidacStatu.Repositories
                     c += 1 + ((_politikStatusImportanceOrder.Count - index) / 10m);
                     res.Found |= OsobaConfidence.FoundParts.Status;
                 }
+
                 if (datumnarozeni.HasValue && o.Narozeni.HasValue
-                    && datumnarozeni == o.Narozeni)
+                                           && datumnarozeni == o.Narozeni)
                 {
                     c = c + 10;
                     res.Found |= OsobaConfidence.FoundParts.DatumNarozeni;
-
                 }
+
                 //politicke funkce
                 if (o.Events().Any(e => _politikImportanceEventTypes.Contains(e.Type)))
                 {
@@ -309,7 +303,7 @@ namespace HlidacStatu.Repositories
                 }
 
                 //sponzoruje politiky
-                bool sponzoruje = OsobaRepo.PeopleWithAnySponzoringRecord(m => m.InternalId == o.InternalId)
+                bool sponzoruje = (await OsobaRepo.PeopleWithAnySponzoringRecordAsync(m => m.InternalId == o.InternalId))
                     .Any();
                 if (sponzoruje)
                 {
@@ -320,9 +314,10 @@ namespace HlidacStatu.Repositories
                 res.Confidence = c;
                 return res;
             }
-            public static OsobaConfidence[] FindOsobyWithConfidence(string jmeno_prijmeni, string datumNarozeni,
+
+            public static async Task<OsobaConfidence[]> FindOsobyWithConfidenceAsync(string jmeno_prijmeni, string datumNarozeni,
                 string[] isInIco = null
-                )
+            )
             {
                 isInIco = isInIco ?? Array.Empty<string>();
 
@@ -333,195 +328,183 @@ namespace HlidacStatu.Repositories
                 List<OsobaConfidence> foundOsoby = new();
                 foreach (var c in nameCombinations)
                 {
-                    var found = GetAllByName(c, datumNarozeni);
-                    foundOsoby.AddRange(found.Select(m => OsobaConfidenceCalculation(m, fullDate, true, isInIco)));
+                    var found = await GetAllByNameAsync(c, datumNarozeni);
+                    foreach (var osoba in found)
+                    {
+                        foundOsoby.Add(await OsobaConfidenceCalculationAsync(osoba, fullDate, true, isInIco));
+                    }
                 }
+
                 if (foundOsoby.Count == 0)
                 {
                     foreach (var c in nameCombinations)
                     {
-                        var found = GetAllByNameAscii(c, datumNarozeni);
-                        foundOsoby.AddRange(found.Select(m => OsobaConfidenceCalculation(m, fullDate, false, isInIco)));
+                        var found = await GetAllByNameAsciiAsync(c, datumNarozeni);
+                        foreach (var osoba in found)
+                        {
+                            foundOsoby.Add(await OsobaConfidenceCalculationAsync(osoba, fullDate, false, isInIco));
+                        }
                     }
-
                 }
 
                 var duplicates = foundOsoby.Where(oc => oc.Osoba.Status == (int)Osoba.StatusOsobyEnum.Duplicita);
                 foreach (var duplicate in duplicates)
                 {
-                    if (duplicate.Osoba.OriginalId is not null)
-                    {
-                        var originalOsoba = OsobaRepo.GetByInternalId(duplicate.Osoba.OriginalId.Value);
-                        if (originalOsoba != null)
-                            duplicate.Osoba = originalOsoba;
-                    }
+                    duplicate.Osoba = await duplicate.Osoba.GetOriginalAsync();
                 }
-
-
-
+                
                 return foundOsoby
                     .OrderByDescending(o => o.Confidence)
                     .DistinctBy(oc => oc.Osoba.NameId)
                     .ToArray();
             }
 
-            public static Osoba GetByName(string jmeno, string prijmeni, DateTime narozeni)
+            public static async Task<Osoba> GetByNameAsync(string jmeno, string prijmeni, DateTime narozeni)
             {
-                var osoba = GetAllByName(jmeno, prijmeni, narozeni).FirstOrDefault();
+                var osoba = (await GetAllByNameAsync(jmeno, prijmeni, narozeni)).FirstOrDefault();
 
                 if (osoba is null || osoba.Status != (int)Osoba.StatusOsobyEnum.Duplicita)
                     return osoba;
 
-                return osoba.GetOriginal();
+                return await osoba.GetOriginalAsync();
             }
 
-
-
+            /// <Summary>
             /// Retrieves all Osoba entities matching the specified name and surname, with an optional date of birth.
+            /// ! May contain duplicates!
             /// </summary>
             /// <param name="jmeno">The first name of the Osoba.</param>
             /// <param name="prijmeni">The surname of the Osoba.</param>
             /// <param name="narozeni">The date of birth of the Osoba, if available.</param>
             /// <returns>An enumerable collection of Osoba entities that match the specified criteria.</returns>
-            public static Osoba[] GetAllByName(string jmeno, string prijmeni, DateTime? narozeni)
+            public static async Task<Osoba[]> GetAllByNameAsync(string jmeno, string prijmeni, DateTime? narozeni)
             {
-                using (DbEntities db = new DbEntities())
+                await using DbEntities db = new DbEntities();
+                if (narozeni.HasValue)
                 {
-                    if (narozeni.HasValue)
-                    {
-                        return db.Osoba.AsNoTracking()
-                              .Where(m =>
-                                  m.Jmeno == jmeno
-                                  && m.Prijmeni == prijmeni
-                                  && m.Narozeni == narozeni
-                              ).ToArray();
-                    }
-                    else
-                    {
-                        return db.Osoba.AsNoTracking()
-                          .Where(m =>
-                              m.Jmeno == jmeno
-                              && m.Prijmeni == prijmeni
-                          ).ToArray();
-                    }
-                }
-            }
-
-
-
-            public static IEnumerable<Osoba> GetAllByName(string jmeno, string prijmeni, string datumNarozeni)
-            {
-                LooseDate ld = new LooseDate(datumNarozeni);
-
-                using (DbEntities db = new DbEntities())
-                {
-                    if (ld.Date.HasValue)
-                        return db.Osoba.AsNoTracking()
-                            .Where(m =>
-                                m.Jmeno == jmeno
-                                && m.Prijmeni == prijmeni
-                                && m.Narozeni == ld.Date
-                            ).ToArray();
-                    else if (ld.Year.HasValue)
-                        return db.Osoba.AsNoTracking()
-                            .Where(m =>
-                                m.Jmeno == jmeno
-                                && m.Prijmeni == prijmeni
-                                && m.Narozeni >= ld.YearInterval.From && m.Narozeni <= ld.YearInterval.To
-                            ).ToArray();
-                    return db.Osoba.AsNoTracking()
+                    return await db.Osoba.AsNoTracking()
                         .Where(m =>
                             m.Jmeno == jmeno
                             && m.Prijmeni == prijmeni
-                        ).ToArray();
+                            && m.Narozeni == narozeni
+                        )
+                        .ToArrayAsync();
+                }
+                else
+                {
+                    return await db.Osoba.AsNoTracking()
+                        .Where(m =>
+                            m.Jmeno == jmeno
+                            && m.Prijmeni == prijmeni
+                        ).ToArrayAsync();
                 }
             }
 
-            public static IEnumerable<Osoba> GetAllByNameAscii(string jmeno, string prijmeni, string datumNarozeni)
+
+            public static async Task<IEnumerable<Osoba>> GetAllByNameAsync(string jmeno, string prijmeni, string datumNarozeni)
             {
                 LooseDate ld = new LooseDate(datumNarozeni);
 
+                await using DbEntities db = new DbEntities();
+                if (ld.Date.HasValue)
+                    return await db.Osoba.AsNoTracking()
+                        .Where(m =>
+                            m.Jmeno == jmeno
+                            && m.Prijmeni == prijmeni
+                            && m.Narozeni == ld.Date
+                        ).ToArrayAsync();
+                else if (ld.Year.HasValue)
+                    return await db.Osoba.AsNoTracking()
+                        .Where(m =>
+                            m.Jmeno == jmeno
+                            && m.Prijmeni == prijmeni
+                            && m.Narozeni >= ld.YearInterval.From && m.Narozeni <= ld.YearInterval.To
+                        ).ToArrayAsync();
+                return await db.Osoba.AsNoTracking()
+                    .Where(m =>
+                        m.Jmeno == jmeno
+                        && m.Prijmeni == prijmeni
+                    ).ToArrayAsync();
+            }
 
-                using (DbEntities db = new DbEntities())
-                {
-                    if (ld.Date.HasValue)
-                        return db.Osoba.AsNoTracking()
-                            .Where(m =>
-                                m.JmenoAscii == jmeno
-                                && m.PrijmeniAscii == prijmeni
-                                && m.Narozeni == ld.Date
-                            ).ToArray();
-                    else if (ld.Year.HasValue)
-                        return db.Osoba.AsNoTracking()
-                            .Where(m =>
-                                m.JmenoAscii == jmeno
-                                && m.PrijmeniAscii == prijmeni
-                                && m.Narozeni >= ld.YearInterval.From && m.Narozeni <= ld.YearInterval.To
-                            ).ToArray();
-                    return db.Osoba.AsNoTracking()
+            public static async Task<IEnumerable<Osoba>> GetAllByNameAsciiAsync(string jmeno, string prijmeni, string datumNarozeni)
+            {
+                LooseDate ld = new LooseDate(datumNarozeni);
+
+                await using DbEntities db = new DbEntities();
+                if (ld.Date.HasValue)
+                    return await db.Osoba.AsNoTracking()
                         .Where(m =>
                             m.JmenoAscii == jmeno
                             && m.PrijmeniAscii == prijmeni
-                        ).ToArray();
-                }
+                            && m.Narozeni == ld.Date
+                        ).ToArrayAsync();
+                else if (ld.Year.HasValue)
+                    return await db.Osoba.AsNoTracking()
+                        .Where(m =>
+                            m.JmenoAscii == jmeno
+                            && m.PrijmeniAscii == prijmeni
+                            && m.Narozeni >= ld.YearInterval.From && m.Narozeni <= ld.YearInterval.To
+                        ).ToArrayAsync();
+                return await db.Osoba.AsNoTracking()
+                    .Where(m =>
+                        m.JmenoAscii == jmeno
+                        && m.PrijmeniAscii == prijmeni
+                    ).ToArrayAsync();
             }
 
 
-            public static IEnumerable<Osoba> GetAllByName(string jmenoprijmeni, string datumNarozeni)
+            public static async Task<IEnumerable<Osoba>> GetAllByNameAsync(string jmenoprijmeni, string datumNarozeni)
             {
                 LooseDate ld = new LooseDate(datumNarozeni);
 
-                using (DbEntities db = new DbEntities())
-                {
-                    if (ld.Date.HasValue)
-                        return db.Osoba.AsNoTracking()
-                            .Where(m =>
-                                (m.Jmeno + " " + m.Prijmeni) == jmenoprijmeni
-                                && m.Narozeni == ld.Date.Value
-                            ).ToArray();
-                    else if (ld.Year.HasValue)
-                        return db.Osoba.AsNoTracking()
-                            .Where(m =>
-                                (m.Jmeno + " " + m.Prijmeni) == jmenoprijmeni
-                                && m.Narozeni >= ld.YearInterval.From && m.Narozeni <= ld.YearInterval.To
-                            ).ToArray();
-                    return db.Osoba.AsNoTracking()
+                await using DbEntities db = new DbEntities();
+                if (ld.Date.HasValue)
+                    return await db.Osoba.AsNoTracking()
                         .Where(m =>
-                                (m.Jmeno + " " + m.Prijmeni) == jmenoprijmeni
-                        ).ToArray();
-                }
+                            (m.Jmeno + " " + m.Prijmeni) == jmenoprijmeni
+                            && m.Narozeni == ld.Date.Value
+                        ).ToArrayAsync();
+                else if (ld.Year.HasValue)
+                    return await db.Osoba.AsNoTracking()
+                        .Where(m =>
+                            (m.Jmeno + " " + m.Prijmeni) == jmenoprijmeni
+                            && m.Narozeni >= ld.YearInterval.From && m.Narozeni <= ld.YearInterval.To
+                        ).ToArrayAsync();
+                return await db.Osoba.AsNoTracking()
+                    .Where(m =>
+                        (m.Jmeno + " " + m.Prijmeni) == jmenoprijmeni
+                    ).ToArrayAsync();
             }
 
-            public static IEnumerable<Osoba> GetAllByNameAscii(string jmenoprijmeni, string datumNarozeni)
+            public static async Task<IEnumerable<Osoba>> GetAllByNameAsciiAsync(string jmenoprijmeni, string datumNarozeni)
             {
                 jmenoprijmeni = jmenoprijmeni.NormalizeToPureTextLower().RemoveAccents();
                 LooseDate ld = new LooseDate(datumNarozeni);
 
-
-                using (DbEntities db = new DbEntities())
-                {
-                    if (ld.Date.HasValue)
-                        return db.Osoba.AsNoTracking()
-                            .Where(m =>
-                                (m.JmenoAscii + " " + m.PrijmeniAscii) == jmenoprijmeni
-                                && m.Narozeni == ld.Date
-                            ).ToArray();
-                    else if (ld.Year.HasValue)
-                        return db.Osoba.AsNoTracking()
-                            .Where(m =>
-                                (m.JmenoAscii + " " + m.PrijmeniAscii) == jmenoprijmeni
-                                && m.Narozeni >= ld.YearInterval.From && m.Narozeni <= ld.YearInterval.To
-                            ).ToArray();
-                    return db.Osoba.AsNoTracking()
+                await using DbEntities db = new DbEntities();
+                if (ld.Date.HasValue)
+                    return await db.Osoba.AsNoTracking()
                         .Where(m =>
-                                (m.JmenoAscii + " " + m.PrijmeniAscii) == jmenoprijmeni
-                        ).ToArray();
-                }
+                            (m.JmenoAscii + " " + m.PrijmeniAscii) == jmenoprijmeni
+                            && m.Narozeni == ld.Date
+                        ).ToArrayAsync();
+                else if (ld.Year.HasValue)
+                    return await db.Osoba.AsNoTracking()
+                        .Where(m =>
+                            (m.JmenoAscii + " " + m.PrijmeniAscii) == jmenoprijmeni
+                            && m.Narozeni >= ld.YearInterval.From && m.Narozeni <= ld.YearInterval.To
+                        ).ToArrayAsync();
+                return await db.Osoba.AsNoTracking()
+                    .Where(m =>
+                        (m.JmenoAscii + " " + m.PrijmeniAscii) == jmenoprijmeni
+                    ).ToArrayAsync();
             }
 
 
             // search all people by name, surname and dob
-            public static IEnumerable<Osoba> FindAll(string name, string birthYear, bool extendedSearch = true, int take = 200)
+            public static async Task<IEnumerable<Osoba>> FindAllAsync(string name, string birthYear, bool extendedSearch = true,
+                int take = 200)
             {
                 if (string.IsNullOrWhiteSpace(name)
                     && string.IsNullOrWhiteSpace(birthYear))
@@ -529,16 +512,15 @@ namespace HlidacStatu.Repositories
                     return Array.Empty<Osoba>();
                 }
 
-                string nquery = TextUtil.RemoveDiacritics(name.NormalizeToPureTextLower());
+                string nquery = name.NormalizeToPureTextLower().RemoveDiacritics();
                 birthYear = birthYear?.Trim();
                 bool isValidYear = int.TryParse(birthYear, out int validYear);
                 // diakritika, velikost
 
                 if (extendedSearch)
                 {
-                    using (DbEntities db = new DbEntities())
-                    {
-                        System.FormattableString sql = $@"
+                    await using DbEntities db = new DbEntities();
+                    System.FormattableString sql = $@"
                             select *
                               from Osoba os
                              where 
@@ -546,11 +528,10 @@ namespace HlidacStatu.Repositories
                                     OR (PrijmeniAscii + ' ' + JmenoAscii) LIKE {nquery} + '%')
                                and (({validYear} = 0 OR YEAR(Narozeni) = {validYear}))";
 
-                        return db.Osoba.FromSqlInterpolated(sql)
-                            .AsNoTracking()
-                            .Take(take)
-                            .ToArray();
-                    }
+                    return await db.Osoba.FromSqlInterpolated(sql)
+                        .AsNoTracking()
+                        .Take(take)
+                        .ToArrayAsync();
                 }
                 else
                 {
@@ -572,7 +553,7 @@ namespace HlidacStatu.Repositories
 
             public static IEnumerable<Osoba> GetPolitikByNameFtx(string jmeno, int maxNumOfResults = 1500)
             {
-                string nquery = TextUtil.RemoveDiacritics(jmeno.NormalizeToPureTextLower());
+                string nquery = jmeno.NormalizeToPureTextLower().RemoveDiacritics();
 
                 var res = PolitickyAktivni.Get()
                     .Where(m => m != null)
@@ -590,7 +571,8 @@ namespace HlidacStatu.Repositories
                 return res;
             }
 
-            public static async Task<IEnumerable<Osoba>> GetPolitikByQueryFromFirmyAsync(string jmeno, int maxNumOfResults = 50,
+            public static async Task<IEnumerable<Osoba>> GetPolitikByQueryFromFirmyAsync(string jmeno,
+                int maxNumOfResults = 50,
                 IEnumerable<Firma> alreadyFoundFirmyIcos = null)
             {
                 var res = new Osoba[] { };
@@ -610,7 +592,7 @@ namespace HlidacStatu.Repositories
 
                         var firmySVazbamiNaPolitiky =
                             await MaterializedViewsCache.FirmySVazbamiNaPolitiky_NedavneAsync();
-                        
+
                         if (firmySVazbamiNaPolitiky.SoukromeFirmy.TryGetValue(f.ICO, out var osobyIds))
                         {
                             foreach (var osobaId in osobyIds)
@@ -646,7 +628,8 @@ namespace HlidacStatu.Repositories
                                     break;
                                 }
 
-                                if (skipRest == false && firmySVazbamiNaPolitiky.SoukromeFirmy.TryGetValue(fv.To.Id, out var osobyIds2))
+                                if (skipRest == false &&
+                                    firmySVazbamiNaPolitiky.SoukromeFirmy.TryGetValue(fv.To.Id, out var osobyIds2))
                                 {
                                     foreach (var osobaId in osobyIds2)
                                     {
@@ -678,37 +661,45 @@ namespace HlidacStatu.Repositories
             }
 
 
-            public static List<int> PolitikStatusImportanceOrder = new List<int>() { 3, 4, 2, 1, 0 };
-            public static int[] PolitikImportanceEventTypes = new int[]
-            {
-                (int) OsobaEvent.Types.Politicka, (int) OsobaEvent.Types.PolitickaExekutivni,
-                (int) OsobaEvent.Types.VolenaFunkce
-            };
+            public static List<int> PolitikStatusImportanceOrder = [3, 4, 2, 1, 0];
 
-            static List<int> _politikStatusImportanceOrder = new List<int>() {
+            public static int[] PolitikImportanceEventTypes =
+            [
+                (int)OsobaEvent.Types.Politicka, (int)OsobaEvent.Types.PolitickaExekutivni,
+                (int)OsobaEvent.Types.VolenaFunkce
+            ];
+
+            private static readonly List<int> _politikStatusImportanceOrder =
+            [
                 (int)StatusOsobyEnum.Politik,
                 (int)StatusOsobyEnum.ByvalyPolitik,
                 (int)StatusOsobyEnum.VazbyNaPolitiky,
                 (int)StatusOsobyEnum.Sponzor,
-                (int)StatusOsobyEnum.VysokyUrednik,
-            };
+                (int)StatusOsobyEnum.VysokyUrednik
+            ];
 
-            static int[] _politikImportanceEventTypes = new int[]
-            {
-                (int) OsobaEvent.Types.Politicka, (int) OsobaEvent.Types.PolitickaExekutivni,
-                (int) OsobaEvent.Types.VolenaFunkce
-            };
-
+            static int[] _politikImportanceEventTypes =
+            [
+                (int)OsobaEvent.Types.Politicka, (int)OsobaEvent.Types.PolitickaExekutivni,
+                (int)OsobaEvent.Types.VolenaFunkce
+            ];
 
 
             public static async Task<IEnumerable<Osoba>> GetAllPoliticiFromTextAsync(string text)
             {
-                var parsedName = await Repositories.Searching.Politici.FindCitationsAsync(text); //Validators.JmenoInText(text);
+                var parsedName =
+                    await Repositories.Searching.Politici.FindCitationsAsync(text); //Validators.JmenoInText(text);
 
-                var oo = parsedName.Select(nm => Osoby.GetByNameId.Get(nm))
-                    .Where(o => o != null)
-                    .OrderPoliticiByImportance();
-                return oo;
+                var results = new List<Osoba>();
+
+                foreach (var item in parsedName)
+                {
+                    var osoba = await OsobaCache.GetPersonByNameIdAsync(item);
+                    if (osoba != null)
+                        results.Add(osoba);
+                }
+                
+                return results.OrderPoliticiByImportance();
             }
 
             public static async Task<IEnumerable<Osoba>> GetBestPoliticiFromTextAsync(string text)
@@ -737,31 +728,44 @@ namespace HlidacStatu.Repositories
                 return osoby.First();
             }
 
-            public static Osoba GetByNameAscii(string jmeno, string prijmeni, DateTime narozeni)
+            public static async Task<Osoba> GetByNameAsciiAsync(string jmeno, string prijmeni, DateTime? narozeni)
             {
-                return GetAllByNameAscii(jmeno, prijmeni, narozeni).FirstOrDefault();
+                jmeno = jmeno.RemoveDiacritics();
+                prijmeni = prijmeni.RemoveDiacritics();
+                await using DbEntities db = new DbEntities();
+                if (narozeni.HasValue)
+                    return await db.Osoba.AsNoTracking()
+                        .Where(m =>
+                            m.JmenoAscii == jmeno
+                            && m.PrijmeniAscii == prijmeni
+                            && (m.Narozeni == narozeni)
+                        ).FirstOrDefaultAsync();
+                else
+                    return await db.Osoba.AsNoTracking()
+                        .Where(m =>
+                            m.JmenoAscii == jmeno
+                            && m.PrijmeniAscii == prijmeni
+                        ).FirstOrDefaultAsync();
             }
 
-            public static IEnumerable<Osoba> GetAllByNameAscii(string jmeno, string prijmeni, DateTime? narozeni)
+            public static async Task<IEnumerable<Osoba>> GetAllByNameAsciiAsync(string jmeno, string prijmeni, DateTime? narozeni)
             {
-                jmeno = TextUtil.RemoveDiacritics(jmeno);
-                prijmeni = TextUtil.RemoveDiacritics(prijmeni);
-                using (DbEntities db = new DbEntities())
-                {
-                    if (narozeni.HasValue)
-                        return db.Osoba.AsNoTracking()
-                            .Where(m =>
-                                m.JmenoAscii == jmeno
-                                && m.PrijmeniAscii == prijmeni
-                                && (m.Narozeni == narozeni)
-                            ).ToArray();
-                    else
-                        return db.Osoba.AsNoTracking()
-                            .Where(m =>
-                                m.JmenoAscii == jmeno
-                                && m.PrijmeniAscii == prijmeni
-                            ).ToArray();
-                }
+                jmeno = jmeno.RemoveDiacritics();
+                prijmeni = prijmeni.RemoveDiacritics();
+                await using DbEntities db = new DbEntities();
+                if (narozeni.HasValue)
+                    return await db.Osoba.AsNoTracking()
+                        .Where(m =>
+                            m.JmenoAscii == jmeno
+                            && m.PrijmeniAscii == prijmeni
+                            && (m.Narozeni == narozeni)
+                        ).ToArrayAsync();
+                else
+                    return await db.Osoba.AsNoTracking()
+                        .Where(m =>
+                            m.JmenoAscii == jmeno
+                            && m.PrijmeniAscii == prijmeni
+                        ).ToArrayAsync();
             }
 
             private static int? GetYearFromString(string? yearstring)
@@ -793,9 +797,5 @@ namespace HlidacStatu.Repositories
                 return null;
             }
         }
-
-
-
-
     }
 }

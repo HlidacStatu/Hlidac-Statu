@@ -3,6 +3,7 @@
 @using HlidacStatu.XLib.Render
 @using HlidacStatu.Repositories
 @using HlidacStatu.Entities
+@using Graph = HlidacStatu.DS.Graphs.Graph
 
 @{
     Layout = null;
@@ -11,14 +12,15 @@
 @* První sloupec *@
 <div id="subjcontent_toc">
     <p class="text-muted sub-header-info">
-        Přehled jednotlivých finančních a nefinančních podpor politickým stranám. Podpory větší než 5000 Kč zobrazujeme po dobu 10 let, menší podpory po dobu 5 let.
+        Přehled jednotlivých finančních a nefinančních podpor politickým stranám. Podpory větší než 5000 Kč zobrazujeme
+        po dobu 10 let, menší podpory po dobu 5 let.
     </p>
-    
+
     @{
         var sponzoring = await Model.SponzoringAsync(m => m.Typ != (int)Sponzoring.TypDaru.DarFirmy);
 
         var sponzoringFirma = await Model.SponzoringAsync(m => m.Typ == (int)Sponzoring.TypDaru.DarFirmy);
-        
+
         var sponzoringData = new ReportDataSource<(int Rok, string Ico, decimal Dar, string Poznamka)>(
             new[]
             {
@@ -26,34 +28,35 @@
                 {
                     Name = "Rok",
                     CssClass = "number",
-                    HtmlRender =(x) => x.Rok.ToString(),
+                    HtmlRender = (x) => x.Rok.ToString(),
                     TextRender = (x) => x.Rok.ToString()
                 },
                 new ReportDataSource<(int Rok, string Ico, decimal Dar, string Poznamka)>.Column()
                 {
                     Name = "Politická strana",
-                    HtmlRender =(x) =>
-                    $"<a href=\"/subjekt/{x.Ico}\">{Firmy.GetJmeno(x.Ico)}</a>"
+                    HtmlRender = (x) =>
+                        $"<a href=\"/subjekt/{x.Ico}\">{Firmy.GetJmeno(x.Ico)}</a>"
                 },
                 new ReportDataSource<(int Rok, string Ico, decimal Dar, string Poznamka)>.Column()
                 {
                     Name = "Celkem darovali",
                     TextRender = (x) => $"{x.Dar.ToString("N0")} Kč",
-                    HtmlRender =(x) => $"{x.Dar.ToString("N0")}&nbsp;Kč",
+                    HtmlRender = (x) => $"{x.Dar.ToString("N0")}&nbsp;Kč",
                     OrderValueRender = (x) => HlidacStatu.Util.RenderData.OrderValueFormat(x.Dar),
                     CssClass = "number"
                 },
                 new ReportDataSource<(int Rok, string Ico, decimal Dar, string Poznamka)>.Column()
                 {
                     Name = "Poznámka",
-                    HtmlRender =(x) => x.Poznamka,
+                    HtmlRender = (x) => x.Poznamka,
                     TextRender = (x) => x.Poznamka
                 }
             });
         foreach (var dar in sponzoring)
         {
-            sponzoringData.AddRow((dar.DarovanoDne?.Year ?? 0,  dar.IcoPrijemce, dar.Hodnota ?? 0, dar.Popis));
+            sponzoringData.AddRow((dar.DarovanoDne?.Year ?? 0, dar.IcoPrijemce, dar.Hodnota ?? 0, dar.Popis));
         }
+
         sponzoringData.Title = "Přehled jednotlivých darů politickým stranám";
     }
     @if (sponzoring.Count > 0)
@@ -72,53 +75,46 @@
 
     @if (sponzoringFirma.Count > 0)
     {
-        var sponzoringFirmyData = new ReportDataSource<(int Rok, string Ico, string Darceico, decimal Dar, string Poznamka)>(
-            new[]
+        var sponzoringFirmyData = new ReportDataSource<(int Rok, string Ico, string Darceico, decimal Dar, string Poznamka, Graph.Edge[]? Vazby)>(new ReportDataSource<(int Rok, string Ico, string Darceico, decimal Dar, string Poznamka, Graph.Edge[]? Vazby)>.Column()
+        {
+            Name = "Sponzorující firma",
+            HtmlRender = (x) =>
             {
-                new ReportDataSource<(int Rok, string Ico, string Darceico, decimal Dar, string Poznamka)>.Column()
-                {
-                    Name = "Sponzorující firma",
-                    HtmlRender =(x) => {
-                        return $"<a href='/subjekt/{x.Darceico}'>{Firmy.GetJmeno(x.Darceico)}</a>"
-                        + $"<br/>{Html.RenderVazby(Model.VazbyProICO(x.Darceico))}";
-                    },
-                    TextRender = (x) => Firmy.GetJmeno(x.Darceico)
-
-                },
-                new ReportDataSource<(int Rok, string Ico, string Darceico, decimal Dar, string Poznamka)>.Column()
-                {
-                    Name = "Rok",
-                    CssClass = "number",
-                    HtmlRender =(x) => x.Rok.ToString(),
-                    TextRender = (x) => x.Rok.ToString()
-
-                },
-                new ReportDataSource<(int Rok, string Ico, string Darceico, decimal Dar, string Poznamka)>.Column()
-                {
-                    Name = "Politická strana",
-                    HtmlRender =(x) =>
-                    $"<a href=\"/subjekt/{x.Ico}\">{Firmy.GetJmeno(x.Ico)}</a>"
-                },
-                new ReportDataSource<(int Rok, string Ico, string Darceico, decimal Dar, string Poznamka)>.Column()
-                {
-                    Name = "Celkem darovali",
-                    TextRender = (x) => $"{x.Dar.ToString("N0")} Kč",
-                    HtmlRender =(x) => $"{x.Dar.ToString("N0")}&nbsp;Kč",
-                    OrderValueRender = (x) => HlidacStatu.Util.RenderData.OrderValueFormat(x.Dar),
-                    CssClass = "number"
-                },
-                new ReportDataSource<(int Rok, string Ico, string Darceico, decimal Dar, string Poznamka)>.Column()
-                {
-                    Name = "Poznámka",
-                    HtmlRender =(x) => x.Poznamka,
-                    TextRender = (x) => x.Poznamka
-                }
-            });
+                return $"<a href='/subjekt/{x.Darceico}'>{Firmy.GetJmeno(x.Darceico)}</a>"
+                       + $"<br/>{Html.RenderVazby(x.Vazby)}";
+            },
+            TextRender = (x) => Firmy.GetJmeno(x.Darceico)
+        }, new()
+        {
+            Name = "Rok",
+            CssClass = "number",
+            HtmlRender = (x) => x.Rok.ToString(),
+            TextRender = (x) => x.Rok.ToString()
+        }, new()
+        {
+            Name = "Politická strana",
+            HtmlRender = (x) =>
+                $"<a href=\"/subjekt/{x.Ico}\">{Firmy.GetJmeno(x.Ico)}</a>"
+        }, new()
+        {
+            Name = "Celkem darovali",
+            TextRender = (x) => $"{x.Dar.ToString("N0")} Kč",
+            HtmlRender = (x) => $"{x.Dar.ToString("N0")}&nbsp;Kč",
+            OrderValueRender = (x) => HlidacStatu.Util.RenderData.OrderValueFormat(x.Dar),
+            CssClass = "number"
+        }, new()
+        {
+            Name = "Poznámka",
+            HtmlRender = (x) => x.Poznamka,
+            TextRender = (x) => x.Poznamka
+        });
         foreach (var dar in sponzoringFirma)
         {
-            sponzoringFirmyData.AddRow((dar.DarovanoDne?.Year ?? 0, dar.IcoPrijemce, dar.IcoDarce, dar.Hodnota ?? 0, dar.Popis));
+            Graph.Edge[]? vazby = await OsobaVazbyRepo.VazbyProIcoCachedAsync(Model, dar.IcoDarce);
+            sponzoringFirmyData.AddRow((dar.DarovanoDne?.Year ?? 0, dar.IcoPrijemce, dar.IcoDarce, dar.Hodnota ?? 0, dar.Popis, vazby));
         }
-        <hr />
+
+        <hr/>
         <div>
             <h4>Sponzorování politických stran firmami, kde se osoba angažuje</h4>
             @Html.DataToHTMLTable(sponzoringFirmyData)

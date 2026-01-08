@@ -7,13 +7,13 @@ using Nest;
 using System;
 using System.Threading.Tasks;
 using Serilog;
-using HlidacStatu.Searching;
 
 namespace HlidacStatu.Repositories
 {
     public static partial class InsolvenceRepo
     {
         private static readonly ILogger _logger = Log.ForContext(typeof(InsolvenceRepo));
+
         public static class Searching
         {
             static string[] queryShorcuts = new string[]
@@ -41,26 +41,31 @@ namespace HlidacStatu.Repositories
 
             static string[] queryOperators = new string[] { "AND", "OR" };
 
-            public static QueryContainer GetSimpleQuery(string query)
+            public static Task<QueryContainer> GetSimpleQueryAsync(string query)
             {
-                return GetSimpleQuery(new InsolvenceSearchResult() { Q = query, Page = 1 });
+                return GetSimpleQueryAsync(new InsolvenceSearchResult() { Q = query, Page = 1 });
             }
 
-            public static QueryContainer GetSimpleQuery(InsolvenceSearchResult searchdata)
+            public static async Task<QueryContainer> GetSimpleQueryAsync(InsolvenceSearchResult searchdata)
             {
                 var query = searchdata.Q;
 
                 IRule[] irules = new IRule[]
                 {
-                    new OsobaId(HlidacStatu.Repositories.OsobaVazbyRepo.Icos_s_VazbouNaOsobu, "osobaid:", "ico:"),
-                    new OsobaId(HlidacStatu.Repositories.OsobaVazbyRepo.Icos_s_VazbouNaOsobu, "osobaiddluznik:", "icodluznik:"),
-                    new OsobaId(HlidacStatu.Repositories.OsobaVazbyRepo.Icos_s_VazbouNaOsobu, "osobaidveritel:", "icoveritel:"),
-                    new OsobaId(HlidacStatu.Repositories.OsobaVazbyRepo.Icos_s_VazbouNaOsobu, "osobaidspravce:", "icospravce:"),
+                    new OsobaId(HlidacStatu.Repositories.OsobaVazbyRepo.Icos_s_VazbouNaOsobuAsync, "osobaid:", "ico:"),
+                    new OsobaId(HlidacStatu.Repositories.OsobaVazbyRepo.Icos_s_VazbouNaOsobuAsync, "osobaiddluznik:",
+                        "icodluznik:"),
+                    new OsobaId(HlidacStatu.Repositories.OsobaVazbyRepo.Icos_s_VazbouNaOsobuAsync, "osobaidveritel:",
+                        "icoveritel:"),
+                    new OsobaId(HlidacStatu.Repositories.OsobaVazbyRepo.Icos_s_VazbouNaOsobuAsync, "osobaidspravce:",
+                        "icospravce:"),
 
                     new Holding(HlidacStatu.Repositories.FirmaVazbyRepo.IcosInHolding, "holding:", "ico:"),
                     new Holding(HlidacStatu.Repositories.FirmaVazbyRepo.IcosInHolding, "holdindluznik:", "icoplatce:"),
-                    new Holding(HlidacStatu.Repositories.FirmaVazbyRepo.IcosInHolding, "holdingveritel:", "icoveritel:"),
-                    new Holding(HlidacStatu.Repositories.FirmaVazbyRepo.IcosInHolding, "holdingspravce:", "icospravce:"),
+                    new Holding(HlidacStatu.Repositories.FirmaVazbyRepo.IcosInHolding, "holdingveritel:",
+                        "icoveritel:"),
+                    new Holding(HlidacStatu.Repositories.FirmaVazbyRepo.IcosInHolding, "holdingspravce:",
+                        "icospravce:"),
 
                     new TransformPrefixWithValue("ico:",
                         "(dluznici.iCO:${q} OR veritele.iCO:${q} OR spravci.iCO:${q}) ", null),
@@ -100,37 +105,44 @@ namespace HlidacStatu.Repositories
                 }
 
                 //var qc = Lib.Search.Tools.GetSimpleQuery<Rizeni>(modifiedQ, rules); ;
-                var qc = SimpleQueryCreator.GetSimpleQuery<Rizeni>(modifiedQ, irules);
+                var qc = await SimpleQueryCreator.GetSimpleQueryAsync<Rizeni>(modifiedQ, irules);
 
                 return qc;
             }
 
 
-            public static QueryContainer GetSimpleFulltextQuery(string query)
+            public static Task<QueryContainer> GetSimpleFulltextQueryAsync(string query)
             {
-                return GetSimpleQuery(new InsolvenceSearchResult() { Q = query, Page = 1 });
+                return GetSimpleQueryAsync(new InsolvenceSearchResult() { Q = query, Page = 1 });
             }
 
-            public static QueryContainer GetSimpleFulltextQuery(InsolvenceFulltextSearchResult searchdata)
+            public static async Task<QueryContainer> GetSimpleFulltextQueryAsync(
+                InsolvenceFulltextSearchResult searchdata)
             {
                 var query = searchdata.Q;
 
                 IRule[] irules = new IRule[]
                 {
-                    new OsobaId(HlidacStatu.Repositories.OsobaVazbyRepo.Icos_s_VazbouNaOsobu, "osobaid:", "ico:"),
-                    new OsobaId(HlidacStatu.Repositories.OsobaVazbyRepo.Icos_s_VazbouNaOsobu, "osobaiddluznik:", "icodluznik:"),
-                    new OsobaId(HlidacStatu.Repositories.OsobaVazbyRepo.Icos_s_VazbouNaOsobu, "osobaidveritel:", "icoveritel:"),
-                    new OsobaId(HlidacStatu.Repositories.OsobaVazbyRepo.Icos_s_VazbouNaOsobu, "osobaidspravce:", "icospravce:"),
+                    new OsobaId(HlidacStatu.Repositories.OsobaVazbyRepo.Icos_s_VazbouNaOsobuAsync, "osobaid:", "ico:"),
+                    new OsobaId(HlidacStatu.Repositories.OsobaVazbyRepo.Icos_s_VazbouNaOsobuAsync, "osobaiddluznik:",
+                        "icodluznik:"),
+                    new OsobaId(HlidacStatu.Repositories.OsobaVazbyRepo.Icos_s_VazbouNaOsobuAsync, "osobaidveritel:",
+                        "icoveritel:"),
+                    new OsobaId(HlidacStatu.Repositories.OsobaVazbyRepo.Icos_s_VazbouNaOsobuAsync, "osobaidspravce:",
+                        "icospravce:"),
 
                     new Holding(HlidacStatu.Repositories.FirmaVazbyRepo.IcosInHolding, "holding:", "ico:"),
                     new Holding(HlidacStatu.Repositories.FirmaVazbyRepo.IcosInHolding, "holdindluznik:", "icoplatce:"),
-                    new Holding(HlidacStatu.Repositories.FirmaVazbyRepo.IcosInHolding, "holdingveritel:", "icoveritel:"),
-                    new Holding(HlidacStatu.Repositories.FirmaVazbyRepo.IcosInHolding, "holdingspravce:", "icospravce:"),
+                    new Holding(HlidacStatu.Repositories.FirmaVazbyRepo.IcosInHolding, "holdingveritel:",
+                        "icoveritel:"),
+                    new Holding(HlidacStatu.Repositories.FirmaVazbyRepo.IcosInHolding, "holdingspravce:",
+                        "icospravce:"),
 
                     new TransformPrefixWithValue("ico:",
                         "(rizeni.dluznici.iCO:${q} OR rizeni.veritele.iCO:${q} OR rizeni.spravci.iCO:${q}) ", null),
                     new TransformPrefixWithValue("jmeno:",
-                        "(rizeni.dluznici.plneJmeno:${q} OR rizeni.veritele.plneJmeno:${q} OR rizeni.spravci.plneJmeno:${q})", null),
+                        "(rizeni.dluznici.plneJmeno:${q} OR rizeni.veritele.plneJmeno:${q} OR rizeni.spravci.plneJmeno:${q})",
+                        null),
 
                     new TransformPrefix("icodluznik:", "rizeni.dluznici.iCO:", null),
                     new TransformPrefix("icoveritel:", "rizeni.veritele.iCO:", null),
@@ -161,12 +173,13 @@ namespace HlidacStatu.Repositories
                     modifiedQ = Query.ModifyQueryAND(modifiedQ, "rizeni.onRadar:true", "NOT(rizeni.odstraneny:true)");
 
                 //var qc = Lib.Search.Tools.GetSimpleQuery<Rizeni>(modifiedQ, rules); ;
-                var qc = SimpleQueryCreator.GetSimpleQuery<SearchableDocument>(modifiedQ, irules);
+                var qc = await SimpleQueryCreator.GetSimpleQueryAsync<SearchableDocument>(modifiedQ, irules);
 
                 return qc;
             }
 
-            public static Task<InsolvenceSearchResult> SimpleSearchAsync(string query, int page, int pagesize, int order,
+            public static Task<InsolvenceSearchResult> SimpleSearchAsync(string query, int page, int pagesize,
+                int order,
                 bool withHighlighting = false,
                 bool limitedView = true,
                 AggregationContainerDescriptor<Rizeni> anyAggregation = null, bool exactNumOfResults = false)
@@ -181,8 +194,8 @@ namespace HlidacStatu.Repositories
                 }, withHighlighting, anyAggregation);
 
             public static async Task<InsolvenceSearchResult> SimpleSearchAsync(InsolvenceSearchResult search,
-            bool withHighlighting = false,
-            AggregationContainerDescriptor<Rizeni> anyAggregation = null, bool exactNumOfResults = false)
+                bool withHighlighting = false,
+                AggregationContainerDescriptor<Rizeni> anyAggregation = null, bool exactNumOfResults = false)
             {
                 var client = Manager.GetESClient_Insolvence();
                 var page = search.Page - 1 < 0 ? 0 : search.Page - 1;
@@ -194,12 +207,11 @@ namespace HlidacStatu.Repositories
 
                 search.OrigQuery = search.Q;
                 search.Q = HlidacStatu.Searching.Tools.FixInvalidQuery(search.Q ?? "", queryShorcuts, queryOperators);
-                var sq = GetSimpleQuery(search);
+                var sq = await GetSimpleQueryAsync(search);
 
                 ISearchResponse<Rizeni> res = null;
                 try
                 {
-
                     res = await client
                         .SearchAsync<Rizeni>(s => s
                             .Size(search.PageSize)
@@ -215,7 +227,6 @@ namespace HlidacStatu.Repositories
                                 ? true
                                 : (bool?)null)
                         );
-
                 }
                 catch (Exception e)
                 {
@@ -257,7 +268,6 @@ namespace HlidacStatu.Repositories
             }
 
 
-
             public static Task<InsolvenceFulltextSearchResult> SimpleFulltextSearchAsync(string query,
                 int page, int pagesize, int order,
                 bool withHighlighting = false,
@@ -275,8 +285,8 @@ namespace HlidacStatu.Repositories
 
             public static async Task<InsolvenceFulltextSearchResult> SimpleFulltextSearchAsync(
                 InsolvenceFulltextSearchResult search,
-            bool withHighlighting = false,
-            AggregationContainerDescriptor<Rizeni> anyAggregation = null, bool exactNumOfResults = false)
+                bool withHighlighting = false,
+                AggregationContainerDescriptor<Rizeni> anyAggregation = null, bool exactNumOfResults = false)
             {
                 var client = Manager.GetESClient_InsolvenceDocs();
                 var page = search.Page - 1 < 0 ? 0 : search.Page - 1;
@@ -285,69 +295,30 @@ namespace HlidacStatu.Repositories
                 sw.Start();
                 search.OrigQuery = search.Q;
                 search.Q = HlidacStatu.Searching.Tools.FixInvalidQuery(search.Q ?? "", queryShorcuts, queryOperators);
-                var sq = GetSimpleFulltextQuery(search);
+                var sq = await GetSimpleFulltextQueryAsync(search);
 
                 ISearchResponse<SearchableDocument> res = null;
                 try
                 {
-                    //old
-                    /*res = await client
-                        .SearchAsync<Rizeni>(s => s
+                    res = await client
+                        .SearchAsync<SearchableDocument>(s => s
                             .Size(search.PageSize)
-                            .ExpandWildcards(Elasticsearch.Net.ExpandWildcards.All)
                             .From(page * search.PageSize)
-                            .Source(sr => sr.Excludes(r => r.Fields("dokumenty.plainText")))
+                            .Source(sr => sr.Excludes(r => r.Fields("plainText")))
                             .Query(q => sq)
+                            .Collapse(c => c
+                                .Field(f => f.SpisovaZnacka)
+                                .InnerHits(ih =>
+                                    ih.Name("rec").Size(1).Source(ss => ss.Excludes(ex => ex.Field(f => f.PlainText))))
+                            )
                             //.Sort(ss => new SortDescriptor<Rizeni>().Field(m => m.Field(f => f.PosledniZmena).Descending()))
-                            .Sort(ss => GetSort(search.Order))
-                            .Highlight(h => Tools.GetHighlight<Rizeni>(withHighlighting))
+                            .Sort(ss => InsolvenceFulltextSearchResult.GetSort(search.Order))
+                            .Highlight(h => Repositories.Searching.Tools.GetHighlight<Rizeni>(withHighlighting))
                             .Aggregations(aggr => anyAggregation)
                             .TrackTotalHits(search.ExactNumOfResults || page * search.PageSize == 0
                                 ? true
                                 : (bool?)null)
-                        );*/
-                    //new with searchable docs
-                    /*POST /insolvencedocs/_search
-                    {
-                      "_source": false, 
-                      "query": {
-                        "query_string": {
-                          "query": "Vandrovec"
-                        }
-                      },
-                      "collapse": {
-                        "field": "spisovaZnacka",
-                        "inner_hits": {
-                          "name": "rec",
-                          "size": 1,
-                          "sort": [
-                            {
-                              "internalTopHit": "desc"
-                            }
-                          ]
-                        }
-                      }
-                    }*/
-
-                    res = await client
-    .SearchAsync<SearchableDocument>(s => s
-        .Size(search.PageSize)
-        .From(page * search.PageSize)
-        .Source(sr => sr.Excludes(r => r.Fields("plainText")))
-        .Query(q => sq)
-        .Collapse(c => c
-            .Field(f => f.SpisovaZnacka)
-            .InnerHits(ih => ih.Name("rec").Size(1).Source(ss => ss.Excludes(ex => ex.Field(f => f.PlainText))))
-
-        )
-        //.Sort(ss => new SortDescriptor<Rizeni>().Field(m => m.Field(f => f.PosledniZmena).Descending()))
-        .Sort(ss => InsolvenceFulltextSearchResult.GetSort(search.Order))
-        .Highlight(h => Repositories.Searching.Tools.GetHighlight<Rizeni>(withHighlighting))
-        .Aggregations(aggr => anyAggregation)
-        .TrackTotalHits(search.ExactNumOfResults || page * search.PageSize == 0
-            ? true
-            : (bool?)null)
-    );
+                        );
 
                     if (withHighlighting && res.Shards != null &&
                         res.Shards.Failed > 0) //if some error, do it again without highlighting
@@ -362,10 +333,10 @@ namespace HlidacStatu.Repositories
                                 .Collapse(c => c
                                     .Field(f => f.SpisovaZnacka)
                                     .InnerHits(ih => ih
-                                                .Name("rec")
-                                                .Size(1)
-                                                .Source(ss => ss.Excludes(ex => ex.Field(f => f.PlainText)))
-                                                )
+                                        .Name("rec")
+                                        .Size(1)
+                                        .Source(ss => ss.Excludes(ex => ex.Field(f => f.PlainText)))
+                                    )
                                 )
                                 //.Sort(ss => new SortDescriptor<Rizeni>().Field(m => m.Field(f => f.PosledniZmena).Descending()))
                                 .Sort(ss => InsolvenceFulltextSearchResult.GetSort(search.Order))
@@ -383,9 +354,9 @@ namespace HlidacStatu.Repositories
                     if (res != null && res.ServerError != null)
                     {
                         Manager.LogQueryError<SearchableDocument>(res, "Exception, Orig query:"
-                                                           + search.OrigQuery + "   query:"
-                                                           + search.Q
-                                                           + "\n\n res:" + search.ElasticResults.ToString()
+                                                                       + search.OrigQuery + "   query:"
+                                                                       + search.Q
+                                                                       + "\n\n res:" + search.ElasticResults.ToString()
                             , ex: e);
                     }
                     else
@@ -403,9 +374,9 @@ namespace HlidacStatu.Repositories
                 if (res.IsValid == false)
                 {
                     Manager.LogQueryError<SearchableDocument>(res, "Exception, Orig query:"
-                                                       + search.OrigQuery + "   query:"
-                                                       + search.Q
-                                                       + "\n\n res:" + search.ElasticResults?.ToString()
+                                                                   + search.OrigQuery + "   query:"
+                                                                   + search.Q
+                                                                   + "\n\n res:" + search.ElasticResults?.ToString()
                     );
                 }
 
@@ -415,8 +386,6 @@ namespace HlidacStatu.Repositories
                 search.ElapsedTime = sw.Elapsed;
                 return search;
             }
-
-
         }
     }
 }

@@ -1,21 +1,18 @@
 ﻿using Nest;
 
-using System.Collections.Generic;
-using System.Linq;
-
 namespace HlidacStatu.Searching
 {
     public static class SimpleQueryCreator
     {
-        public static SplittingQuery GetSimpleQuery(string query, IRule[] rules)
+        public static async Task<SplittingQuery> GetSimpleQueryAsync(string query, IRule[] rules)
         {
             var fixedQuery = Tools.FixInvalidQuery(query, rules) ?? "";
             var sq = SplittingQuery.SplitQuery(fixedQuery);
-            return GetSimpleQuery(sq, rules);
+            return await GetSimpleQueryAsync(sq, rules);
         }
 
 
-        public static SplittingQuery GetSimpleQuery(SplittingQuery sq, IRule[] rules)
+        public static async Task<SplittingQuery> GetSimpleQueryAsync(SplittingQuery sq, IRule[] rules)
         {
             SplittingQuery finalSq = new SplittingQuery();
 
@@ -37,7 +34,7 @@ namespace HlidacStatu.Searching
                     qpResults = new List<RuleResult>();
                     foreach (var qp in qToProcess)
                     {
-                        var partRest = rule.Process(qp);
+                        var partRest = await rule.ProcessAsync(qp);
                         if (partRest != null)
                             qpResults.Add(partRest);
                         else
@@ -66,10 +63,10 @@ namespace HlidacStatu.Searching
         }
 
 
-        public static QueryContainer GetSimpleQuery<T>(string query, IRule[] rules, string[] fields = null)
+        public static async Task<QueryContainer> GetSimpleQueryAsync<T>(string query, IRule[] rules, string[] fields = null)
             where T : class
         {
-            var sq = GetSimpleQuery(query, rules);
+            var sq = await GetSimpleQueryAsync(query, rules);
             string modifiedQ = sq.FullQuery();
 
             QueryContainer qc = null;

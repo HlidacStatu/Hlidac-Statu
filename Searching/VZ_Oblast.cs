@@ -1,7 +1,4 @@
-﻿using System;
-using System.Linq;
-
-namespace HlidacStatu.Searching
+﻿namespace HlidacStatu.Searching
 {
     public class VZ_Oblast
         : RuleBase
@@ -23,7 +20,7 @@ namespace HlidacStatu.Searching
         }
 
 
-        protected override RuleResult processQueryPart(SplittingQuery.Part part)
+        protected override Task<RuleResult> processQueryPartAsync(SplittingQuery.Part part)
         {
             if (part == null)
                 return null;
@@ -36,7 +33,7 @@ namespace HlidacStatu.Searching
                 {
                     string stringCpvs = String.Join(" OR ", cpvs.Select(s => "cPV:" + s + "*"));
                     var q_cpv = $" ( {stringCpvs} ) ";
-                    return new RuleResult(SplittingQuery.SplitQuery($" {q_cpv} "), NextStep);
+                    return Task.FromResult( new RuleResult(SplittingQuery.SplitQuery($" {q_cpv} "), NextStep));
                 }
             }
 

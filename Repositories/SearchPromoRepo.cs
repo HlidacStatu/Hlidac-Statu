@@ -25,7 +25,7 @@ namespace HlidacStatu.Repositories
 
         public static IRule[] Irules = new IRule[]
         {
-            new OsobaId(HlidacStatu.Repositories.OsobaVazbyRepo.Icos_s_VazbouNaOsobu, "osobaid:", "ico:"),
+            new OsobaId(HlidacStatu.Repositories.OsobaVazbyRepo.Icos_s_VazbouNaOsobuAsync, "osobaid:", "ico:"),
             new Holding(HlidacStatu.Repositories.FirmaVazbyRepo.IcosInHolding, "holdingprijemce:", "ico:"),
             new Holding(HlidacStatu.Repositories.FirmaVazbyRepo.IcosInHolding, "holdingplatce:", "ico:"),
             new Holding(HlidacStatu.Repositories.FirmaVazbyRepo.IcosInHolding, "holdingdodavatel:", "ico:"),
@@ -237,13 +237,7 @@ namespace HlidacStatu.Repositories
         public static async Task<Search.GeneralResult<SearchPromo>> SimpleSearchAsync(string query, int page, int size)
         {
             List<SearchPromo> found = new List<SearchPromo>();
-
-            string modifQ = SimpleQueryCreator
-                .GetSimpleQuery(query, Irules).FullQuery();
-
-            string[] specifiedIcosInQuery =
-                RegexUtil.GetRegexGroupValues(modifQ, @"(ico\w{0,11}\: \s? (?<ic>\d{3,8}))", "ic");
-
+            
             page = page - 1;
             if (page < 0)
                 page = 0;
@@ -253,11 +247,9 @@ namespace HlidacStatu.Repositories
                 page = 0;
                 size = 0; //return nothing
             }
-
-
-            var qc = GetSimpleQuery(query);
-
-
+            
+            var qc = await GetSimpleQueryAsync(query);
+            
             ISearchResponse<SearchPromo> res = null;
             try
             {
@@ -294,9 +286,9 @@ namespace HlidacStatu.Repositories
             }
         }
 
-        public static QueryContainer GetSimpleQuery(string query)
+        public static async Task<QueryContainer> GetSimpleQueryAsync(string query)
         {
-            var qc = SimpleQueryCreator.GetSimpleQuery<SearchPromo>(query,
+            var qc = await SimpleQueryCreator.GetSimpleQueryAsync<SearchPromo>(query,
                 Irules); //, new string[] {"fulltext","description","title","ico" });
             return qc;
         }

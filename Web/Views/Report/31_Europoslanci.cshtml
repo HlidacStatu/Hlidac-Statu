@@ -7,7 +7,7 @@
 @{
     Layout = "_ReportLayout";
 
-    var showList = OsobaRepo.GetByZatrideni(OsobaRepo.Zatrideni.Europoslanec, DateTime.Now)
+    var showList = (await OsobaRepo.GetByZatrideniAsync(OsobaRepo.Zatrideni.Europoslanec, DateTime.Now))
         .OrderBy(o => o.Prijmeni)
         .ThenBy(o => o.Jmeno)
         .ToList();

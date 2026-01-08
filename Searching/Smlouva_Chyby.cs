@@ -1,7 +1,5 @@
 ﻿using HlidacStatu.Entities.Issues;
 
-using System;
-
 namespace HlidacStatu.Searching
 {
     public class Smlouva_Chyby
@@ -19,7 +17,7 @@ namespace HlidacStatu.Searching
             }
         }
 
-        protected override RuleResult processQueryPart(SplittingQuery.Part part)
+        protected override Task<RuleResult> processQueryPartAsync(SplittingQuery.Part part)
         {
             if (part == null)
                 return null;
@@ -34,7 +32,7 @@ namespace HlidacStatu.Searching
                     levelQ = Entities.Issues.Util.IssuesByLevelQuery(ImportanceLevel.Major);
 
 
-                return new RuleResult(SplittingQuery.SplitQuery($" {levelQ} "), NextStep);
+                return Task.FromResult(new RuleResult(SplittingQuery.SplitQuery($" {levelQ} "), NextStep));
             }
             return null;//new RuleResult(part, this.NextStep);
         }

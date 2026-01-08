@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using HlidacStatu.Repositories.Cache;
 using Manager = HlidacStatu.Connectors.Manager;
 
 namespace HlidacStatu.Repositories.Searching
@@ -33,25 +34,25 @@ namespace HlidacStatu.Repositories.Searching
         /// </summary>
         /// <param name="query"></param>
         /// <returns></returns>
-        public static List<Autocomplete> CreateAutocompleteItemsFromQuery(string query)
+        public static async Task<List<Autocomplete>> CreateAutocompleteItemsFromQueryAsync(string query)
         {
             List<string> parsedQuery = ParseQueryStringWithoutOffsets(query);
-            return CreateAutocompleteItemsFromParsedQuery(parsedQuery);
+            return await CreateAutocompleteItemsFromParsedQueryAsync(parsedQuery);
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="parsedQueries"></param>
-        /// <returns></returns>
-        public static List<Autocomplete> CreateAutocompleteItemsFromParsedQuery(List<string>? parsedQueries)
+        
+        public static async Task<List<Autocomplete>> CreateAutocompleteItemsFromParsedQueryAsync(List<string>? parsedQueries)
         {
             if (parsedQueries is null)
                 return Enumerable.Empty<Autocomplete>().ToList();
-            return parsedQueries
-                .AsParallel()
-                .Select(CreateAutocompleteItemFromQueryFor)
-                .ToList();
+
+            var results = new List<Autocomplete>();
+            foreach (var parsedQuery in parsedQueries)
+            {
+                results.Add(await CreateAutocompleteItemFromQueryForAsync(parsedQuery));
+            }
+            
+            return results;
         }
 
 
@@ -75,7 +76,7 @@ namespace HlidacStatu.Repositories.Searching
                                     )
                                     .Distinct()
                                     .ToArray();
-        private static HlidacStatu.DS.Api.Autocomplete CreateAutocompleteItemFromQueryFor(string queryPart)
+        private static async Task<Autocomplete> CreateAutocompleteItemFromQueryForAsync(string queryPart)
         {
 
             var fixedQ = HlidacStatu.Searching.Tools.FixInvalidQuery(queryPart, createAutocompleteItemFromQueryForPrefixes, HlidacStatu.Searching.Tools.DefaultQueryOperators);
@@ -84,7 +85,7 @@ namespace HlidacStatu.Repositories.Searching
             if (splQ.Parts.Any(m => m.Prefix.StartsWith("osobaid", StringComparison.InvariantCultureIgnoreCase)))
             {
                 var part = splQ.Parts.First(m => m.Prefix.StartsWith("osobaid", StringComparison.InvariantCultureIgnoreCase));
-                var osoba = Osoby.GetByNameId.Get(part.Value);
+                var osoba = await OsobaCache.GetPersonByNameIdAsync(part.Value);
                 if (osoba is not null)
                 {
                     return new Autocomplete()
@@ -207,7 +208,7 @@ namespace HlidacStatu.Repositories.Searching
         public static async Task<ValidateQueryResponse> ValidateQueryRawAsync(string query)
         {
             return await ValidateSpecificQueryRawAsync<Smlouva>(Manager.GetESClient(),
-                SmlouvaRepo.Searching.GetSimpleQuery(query));
+                await SmlouvaRepo.Searching.GetSimpleQueryAsync(query));
         }
 
 
@@ -493,7 +494,7 @@ namespace HlidacStatu.Repositories.Searching
                 query = HlidacStatu.Searching.Tools.FixInvalidQuery(query, Repositories.SmlouvaRepo.Searching.Irules,
                     HlidacStatu.Searching.Tools.DefaultQueryOperators);
 
-                qs = Repositories.SmlouvaRepo.Searching.GetSimpleQuery(query);
+                qs = await Repositories.SmlouvaRepo.Searching.GetSimpleQueryAsync(query);
             }
 
             long total = 0;
@@ -586,7 +587,7 @@ namespace HlidacStatu.Repositories.Searching
                 query = HlidacStatu.Searching.Tools.FixInvalidQuery(query, Repositories.SmlouvaRepo.Searching.Irules,
                     HlidacStatu.Searching.Tools.DefaultQueryOperators);
 
-                qs = Repositories.SmlouvaRepo.Searching.GetSimpleQuery(query);
+                qs = await Repositories.SmlouvaRepo.Searching.GetSimpleQueryAsync(query);
             }
 
             return await GetAllIdsAsync(sourceESClient, maxDegreeOfParallelism, qs, batchSize,
@@ -683,10 +684,10 @@ namespace HlidacStatu.Repositories.Searching
             return res;
         }
 
-        public static List<string> SimpleGetAllSmlouvyIds(this ElasticClient sourceESClient, int maxDegreeOfParallelism,
+        public static async Task<List<string>> SimpleGetAllSmlouvyIdsAsync(this ElasticClient sourceESClient, int maxDegreeOfParallelism,
                 string simplequery, int batchSize = 100)
         {
-            var qs = Repositories.SmlouvaRepo.Searching.GetSimpleQuery(simplequery);
+            var qs = await Repositories.SmlouvaRepo.Searching.GetSimpleQueryAsync(simplequery);
             return SimpleGetAllIds(sourceESClient, maxDegreeOfParallelism, qs, batchSize);
         }
         public static List<string> SimpleGetAllIds(this ElasticClient sourceESClient, int maxDegreeOfParallelism,

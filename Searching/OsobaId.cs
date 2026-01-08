@@ -6,14 +6,15 @@ namespace HlidacStatu.Searching
     public class OsobaId
         : RuleBase
     {
-        private readonly Func<string, Relation.CharakterVazbyEnum, string[]> icosConnectedToPerson;
+        private readonly Func<string, Relation.CharakterVazbyEnum, Task<string[]>> icosConnectedToPersonAsync;
         string _specificPrefix = null;
 
-        public OsobaId(Func<string, Relation.CharakterVazbyEnum, string[]> icosConnectedToPerson, string specificPrefix, string replaceWith,
+        public OsobaId(Func<string, Relation.CharakterVazbyEnum, Task<string[]>> icosConnectedToPersonAsync, string specificPrefix,
+            string replaceWith,
             bool stopFurtherProcessing = false, string addLastCondition = "")
             : base(replaceWith, stopFurtherProcessing, addLastCondition)
         {
-            this.icosConnectedToPerson = icosConnectedToPerson;
+            this.icosConnectedToPersonAsync = icosConnectedToPersonAsync;
             _specificPrefix = specificPrefix;
         }
 
@@ -34,7 +35,7 @@ namespace HlidacStatu.Searching
             }
         }
 
-        protected override RuleResult processQueryPart(SplittingQuery.Part part)
+        protected override async Task<RuleResult> processQueryPartAsync(SplittingQuery.Part part)
         {
             if (part == null)
                 return null;
@@ -72,7 +73,7 @@ namespace HlidacStatu.Searching
                     var templ = $" ( {ReplaceWith}{{0}} ) ";
                     if (ReplaceWith.Contains("${q}"))
                         templ = $" ( {ReplaceWith.Replace("${q}", "{0}")} )";
-                    var icos = this.icosConnectedToPerson(nameId, Relation.CharakterVazbyEnum.VlastnictviKontrola);
+                    var icos = await this.icosConnectedToPersonAsync(nameId, Relation.CharakterVazbyEnum.VlastnictviKontrola);
                     if (icos != null && icos.Length > 0)
                     {
                         icosQuery = $" ( {string.Join(" OR ", icos

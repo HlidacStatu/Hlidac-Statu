@@ -9,8 +9,8 @@
 @{
     Layout = "_ReportLayout";
 
-    ReportDataSource<(Osoba Osoba, Osoba.Statistics.RegistrSmluv? Stat, decimal? Sponzoring, string Description)> poslanciTable = 
-        new(new ReportDataSource<(Osoba Osoba, Osoba.Statistics.RegistrSmluv? Stat, decimal? Sponzoring, string Description)>.Column[]
+    ReportDataSource<(Osoba Osoba, Osoba.Statistics.RegistrSmluv? Stat, decimal? Sponzoring, string Description, HlidacStatu.DS.Graphs.Graph.Edge[]? VazbyVlastnictvi)> poslanciTable = 
+        new(new ReportDataSource<(Osoba Osoba, Osoba.Statistics.RegistrSmluv? Stat, decimal? Sponzoring, string Description, HlidacStatu.DS.Graphs.Graph.Edge[]? VazbyVlastnictvi)>.Column[]
     {
         new()
         {
@@ -21,10 +21,7 @@
                        + "<br />"
                        + Devmasters.TextUtil.ShortenText(s.Description, 250).Replace("\n", "<br />");
             },
-            OrderValueRender = (s) =>
-            {
-                return s.Osoba.FullName(false);
-            }
+            OrderValueRender = (s) => s.Osoba.FullName(false)
         },
         new()
         {
@@ -33,7 +30,7 @@
             {
                 string sout = "";
 
-                if (s.Osoba.Vazby( Relation.CharakterVazbyEnum.VlastnictviKontrola) != null)
+                if (s.VazbyVlastnictvi != null)
                 {
                     foreach (var v in s.Stat.SoukromeFirmy.Take(2))
                     {
@@ -47,16 +44,13 @@
                     }
                     else if (s.Stat.SoukromeFirmy.Count() > 2)
                     {
-                        sout = sout + "<a href='" + s.Osoba.GetUrl() + "'>" + Devmasters.Lang.CS.Plural.Get(s.Osoba.Vazby( Relation.CharakterVazbyEnum.VlastnictviKontrola ).Length - 2, "+další vazba;+ další {0} vazby;+ dalších {0} vazeb") + "</a>";
+                        sout = sout + "<a href='" + s.Osoba.GetUrl() + "'>" + Devmasters.Lang.CS.Plural.Get(s.VazbyVlastnictvi.Length - 2, "+další vazba;+ další {0} vazby;+ dalších {0} vazeb") + "</a>";
                     }
                 }
 
                 return sout;
             },
-            OrderValueRender = (s) =>
-            {
-                return s.Osoba.FullName(false);
-            }
+            OrderValueRender = (s) => s.Osoba.FullName(false)
         },
         new()
         {
@@ -78,14 +72,15 @@
     });
 
 
-    foreach (var osoba in OsobaRepo.GetByZatrideni(OsobaRepo.Zatrideni.PoradcePredsedyVlady, DateTime.Now)
+    foreach (var osoba in (await OsobaRepo.GetByZatrideniAsync(OsobaRepo.Zatrideni.PoradcePredsedyVlady, DateTime.Now))
                  .OrderBy(m => m.Prijmeni)
                  .ThenBy(m => m.Jmeno))
     {
         Osoba.Statistics.RegistrSmluv? stat = await osoba.StatistikaRegistrSmluvAsync();
         var sponzoring = (await osoba.SponzoringAsync()).Sum(m => m.Hodnota);
         var description = await osoba.DescriptionAsync(false, m => true, numOfRecords: 3);
-        poslanciTable.AddRow((osoba, stat, sponzoring, description));
+        var vazbyVlastnictvi = await osoba.VazbyAsync(Relation.CharakterVazbyEnum.VlastnictviKontrola);
+        poslanciTable.AddRow((osoba, stat, sponzoring, description, vazbyVlastnictvi));
     }
 }
 

@@ -3,7 +3,7 @@ using HlidacStatu.DS.Graphs;
 using HlidacStatu.Entities;
 using HlidacStatu.Extensions;
 using HlidacStatu.Repositories;
-
+using HlidacStatu.Repositories.Cache;
 using Microsoft.AspNetCore.Mvc;
 
 namespace HlidacStatu.Web.Controllers
@@ -18,7 +18,7 @@ namespace HlidacStatu.Web.Controllers
                 return RedirectToAction("Index", "Osoby");
             }
             
-            var osoba = Osoby.GetByNameId.Get(id);
+            var osoba = await OsobaCache.GetPersonByNameIdAsync(id);
             if (osoba == null)
             {
                 return NotFound();
@@ -44,7 +44,7 @@ namespace HlidacStatu.Web.Controllers
                 return RedirectToAction("Index", "Osoby");
             }
             
-            var osoba = Osoby.GetByNameId.Get(id);
+            var osoba = await OsobaCache.GetPersonByNameIdAsync(id);
             if (osoba == null)
             {
                 return NotFound();
@@ -68,7 +68,7 @@ namespace HlidacStatu.Web.Controllers
                 return RedirectToAction("Index", "Osoby");
             }
             
-            var osoba = Osoby.GetByNameId.Get(id);
+            var osoba = await OsobaCache.GetPersonByNameIdAsync(id);
             if (osoba == null)
             {
                 return NotFound();
@@ -93,7 +93,7 @@ namespace HlidacStatu.Web.Controllers
                 return RedirectToAction("Index", "Osoby");
             }
             
-            var osoba = Osoby.GetByNameId.Get(id);
+            var osoba = await OsobaCache.GetPersonByNameIdAsync(id);
             if (osoba == null)
             {
                 return NotFound();
@@ -118,7 +118,7 @@ namespace HlidacStatu.Web.Controllers
                 return RedirectToAction("Index", "Osoby");
             }
             
-            var osoba = Osoby.GetByNameId.Get(id);
+            var osoba = await OsobaCache.GetPersonByNameIdAsync(id);
             if (osoba == null)
             {
                 return NotFound();
@@ -143,7 +143,7 @@ namespace HlidacStatu.Web.Controllers
                 return RedirectToAction("Index", "Osoby");
             }
             
-            var osoba = Osoby.GetByNameId.Get(id);
+            var osoba = await OsobaCache.GetPersonByNameIdAsync(id);
             if (osoba == null)
             {
                 return NotFound();
@@ -171,7 +171,7 @@ namespace HlidacStatu.Web.Controllers
                 return RedirectToAction("Index", "Osoby");
             }
             
-            var osoba = Osoby.GetByNameId.Get(id);
+            var osoba = await OsobaCache.GetPersonByNameIdAsync(id);
             if (osoba == null)
             {
                 return NotFound();
@@ -205,7 +205,7 @@ namespace HlidacStatu.Web.Controllers
                 return RedirectToAction("Index", "Osoby");
             }
             
-            var osoba = Osoby.GetByNameId.Get(id);
+            var osoba = await OsobaCache.GetPersonByNameIdAsync(id);
             if (osoba == null)
             {
                 return NotFound();

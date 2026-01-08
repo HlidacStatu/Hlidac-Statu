@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-
-namespace HlidacStatu.Searching
+﻿namespace HlidacStatu.Searching
 {
     public class Firmy_OVMKategorie
         : RuleBase
@@ -24,7 +19,7 @@ namespace HlidacStatu.Searching
 
         private readonly Dictionary<int, string[]> validValues;
 
-        protected override RuleResult processQueryPart(SplittingQuery.Part part)
+        protected override Task<RuleResult> processQueryPartAsync(SplittingQuery.Part part)
         {
             if (part == null)
                 return null;
@@ -37,7 +32,7 @@ namespace HlidacStatu.Searching
                     if (katId.Equals(key.ToString(), StringComparison.InvariantCultureIgnoreCase))
                     {
                         string icosQuery = $" ( {string.Join(" OR ", validValues[key].Select(t => $"ico:{t}"))} ) ";
-                        return new RuleResult(SplittingQuery.SplitQuery($"{icosQuery}"), NextStep);
+                        return Task.FromResult(new RuleResult(SplittingQuery.SplitQuery($"{icosQuery}"), NextStep));
                     }
                 }
             }

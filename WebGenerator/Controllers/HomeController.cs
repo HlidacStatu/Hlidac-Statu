@@ -4,10 +4,9 @@ using HlidacStatu.Extensions;
 using HlidacStatu.Repositories;
 using HlidacStatu.WebGenerator.Models;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Net.Http.Headers;
-using System.Diagnostics;
 using Serilog;
 using HlidacStatu.Datasets;
+using HlidacStatu.Repositories.Cache;
 using HlidacStatu.WebGenerator.Code;
 
 namespace HlidacStatu.WebGenerator.Controllers
@@ -37,10 +36,12 @@ namespace HlidacStatu.WebGenerator.Controllers
             {
                 title = $"{DateTime.Now:HH:mm:ss:f} {title}";
             }
+
             if (!string.IsNullOrEmpty(img))
             {
                 if (img.ToLower().StartsWith("http%3a") || img.ToLower().StartsWith("https%3a")
-                    || img.ToLower().StartsWith("http:") || img.ToLower().StartsWith("https:"))
+                                                        || img.ToLower().StartsWith("http:") ||
+                                                        img.ToLower().StartsWith("https:"))
                 {
                     //neresim, nechavam orig url
                 }
@@ -48,7 +49,7 @@ namespace HlidacStatu.WebGenerator.Controllers
                 {
                     //pridam full url na hlidace
                     if (img.StartsWith("/"))
-                        img = System.Net.WebUtility.UrlEncode("https://www.hlidacstatu.cz") +img;
+                        img = System.Net.WebUtility.UrlEncode("https://www.hlidacstatu.cz") + img;
                     else
                         img = System.Net.WebUtility.UrlEncode("https://www.hlidacstatu.cz/") + img;
                 }
@@ -72,17 +73,16 @@ namespace HlidacStatu.WebGenerator.Controllers
 
             return View(viewName,
                 new ImageBannerCoreData()
-                { title = title, subtitle = subtitle, body = body, footer = footer, img = img, color = color });
+                    { title = title, subtitle = subtitle, body = body, footer = footer, img = img, color = color });
         }
 
 
-
         public async Task<ActionResult> SocialBanner(string id, string v, string t, string st, string b, string f,
-    string img, string rat = "16x9", string res = "1200x628", string col = "")
+            string img, string rat = "16x9", string res = "1200x628", string col = "")
         {
             string mainUrl = "https://gen.hlidacstatu.cz";
-                
-                //HttpContext.Request.Scheme + "://" + HttpContext.Request.Host;
+
+            //HttpContext.Request.Scheme + "://" + HttpContext.Request.Host;
             // #if (DEBUG)
             //             if (System.Diagnostics.Debugger.IsAttached)
             //                 mainUrl = "http://local.hlidacstatu.cz";
@@ -143,7 +143,7 @@ namespace HlidacStatu.WebGenerator.Controllers
             }
             else if (id?.ToLower() == "osoba")
             {
-                Osoba o = Osoby.GetByNameId.Get(v);
+                Osoba o = await OsobaCache.GetPersonByNameIdAsync(v);
                 if (o != null)
                 {
                     if (await o.IsInterestingToShowAsync())
@@ -338,6 +338,5 @@ namespace HlidacStatu.WebGenerator.Controllers
 
             return url;
         }
-
     }
 }

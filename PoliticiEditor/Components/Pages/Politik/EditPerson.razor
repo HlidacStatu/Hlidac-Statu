@@ -97,7 +97,7 @@ else
         _db = new DbEntities();
 
         var nameId = User.GetNameId();
-        Osoba = OsobaRepo.GetByNameIdTracked(_db, nameId);
+        Osoba = await OsobaRepo.GetByNameIdTrackedAsync(_db, nameId);
         if (Osoba is null)
         {
             Toaster.AddMessage("Chyba", $"Data se nepodařilo načíst", importance: ToastService.ToastMessage.ImportanceLevel.Error);

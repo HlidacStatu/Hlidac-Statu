@@ -648,11 +648,12 @@ namespace HlidacStatu.Repositories.Analysis.KorupcniRiziko
             Func<int, int, Task<ISearchResponse<Smlouva>>> searchFunc = async (size, page) =>
             {
                 var client = Manager.GetESClient();
+                var sq = await SmlouvaRepo.Searching.GetSimpleQueryAsync(query);
                 return await client.SearchAsync<Smlouva>(a => a
                     .Size(size)
                     .Source(ss => ss.Excludes(sml => sml.Field(ff => ff.Prilohy)))
                     .From(page * size)
-                    .Query(q => SmlouvaRepo.Searching.GetSimpleQuery(query))
+                    .Query(q => sq)
                     .Scroll("1m")
                 );
             };

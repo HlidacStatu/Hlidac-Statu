@@ -26,9 +26,9 @@
         public NextStepEnum NextStep { get; set; } = NextStepEnum.Process;
         public string AddLastCondition { get; set; } = "";
 
-        public virtual RuleResult Process(SplittingQuery.Part queryPart)
+        public virtual async Task<RuleResult> ProcessAsync(SplittingQuery.Part queryPart)
         {
-            var res = processQueryPart(queryPart);
+            var res = await processQueryPartAsync(queryPart);
 
             if (res != null && res.LastConditionAdded == false && !string.IsNullOrEmpty(AddLastCondition))
             {
@@ -47,6 +47,6 @@
 
             return res;
         }
-        protected abstract RuleResult processQueryPart(SplittingQuery.Part queryPart);
+        protected abstract Task<RuleResult> processQueryPartAsync(SplittingQuery.Part queryPart);
     }
 }

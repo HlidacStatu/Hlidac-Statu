@@ -4,7 +4,6 @@
 @using HlidacStatu.DS.Graphs
 @using HlidacStatu.Entities
 @using HlidacStatu.Repositories
-@using HlidacStatu.Repositories.Analysis
 @using HlidacStatu.Repositories.Cache
 
 @{
@@ -33,12 +32,11 @@
             break;
     }
 
-
+    //todo: tohle je pain na refactoring... 
     Func<Smlouva, string> renderPolitiky = (item) =>
     {
         System.Text.StringBuilder sb = new();
         sb.Append("<tr>");
-
         sb.Append("<td class=\"joined\">&nbsp;</td>");
         sb.Append("<td colspan=\"5\" class=\"joined\">");
         sb.Append("<ul class='list-inline'><li>Angažovaní politici:</li>");
@@ -52,8 +50,8 @@
                     .Select(pid => OsobaRepo.PolitickyAktivni
                         .Get()
                         .FirstOrDefault(m => m.InternalId == pid))
-                    .Where(p => p != null && p.VazbyProICO(ss.ico).Count() > 0)
-                    .OrderByDescending(p => p.VazbyProICO(ss.ico).Min(m => m.RelFrom ?? DateTime.MaxValue)) //setridit podle zacatku angazovanosti, nejnovejsi na zacatek
+                    .Where(p => p != null && (OsobaVazbyRepo.VazbyProIcoCachedAsync(p, ss.ico).GetAwaiter().GetResult()).Any())
+                    .OrderByDescending(p => (OsobaVazbyRepo.VazbyProIcoCachedAsync(p, ss.ico).GetAwaiter().GetResult()).Min(m => m.RelFrom ?? DateTime.MaxValue)) //setridit podle zacatku angazovanosti, nejnovejsi na zacatek
                     .ToList();
 
                 foreach (var p in persons)
@@ -61,19 +59,19 @@
                     //doby angazovanosti politika v ICO
                     Relation.AktualnostType akt = Relation.AktualnostType.Libovolny;
                     List<string> dates = new();
-                    foreach (var v in p.VazbyProICO(ss.ico))
+                    foreach (var v in OsobaVazbyRepo.VazbyProIcoCachedAsync(p, ss.ico).GetAwaiter().GetResult())
                     {
                         if (v.RelFrom.HasValue && v.RelTo.HasValue)
                         {
-                            dates.Add(string.Format("{0}-{1}", v.RelFrom.Value.ToString("yyyy"), v.RelTo.Value.ToString("yyyy")));
+                            dates.Add($"{v.RelFrom.Value:yyyy}-{v.RelTo.Value:yyyy}");
                         }
                         else if (v.RelTo.HasValue)
                         {
-                            dates.Add(string.Format("do {0}", v.RelTo.Value.ToString("yyyy")));
+                            dates.Add($"do {v.RelTo.Value:yyyy}");
                         }
                         else if (v.RelFrom.HasValue)
                         {
-                            dates.Add(string.Format("od {0}", v.RelFrom.Value.ToString("yyyy")));
+                            dates.Add($"od {v.RelFrom.Value:yyyy}");
                         }
 
                         if (akt == Relation.AktualnostType.Libovolny)

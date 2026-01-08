@@ -122,7 +122,7 @@ namespace HlidacStatu.Web.Controllers
 
         [ResponseCache(Duration = 60 * 1, Location = ResponseCacheLocation.Client,
             VaryByQueryKeys = new string[] { "*" })]
-        public ActionResult Photo(string id, [FromQuery] Osoba.PhotoTypes phototype, [FromQuery] bool rnd,
+        public async Task<ActionResult> Photo(string id, [FromQuery] Osoba.PhotoTypes phototype, [FromQuery] bool rnd,
             [FromQuery] string f)
         {
             bool specialTime = false;
@@ -154,13 +154,13 @@ namespace HlidacStatu.Web.Controllers
                     return Redirect("/photo/" + nameId);
             }
 
-            var o = Osoby.GetByNameId.Get(id);
+            var o = await OsobaCache.GetPersonByNameIdAsync(id);
             if (o == null)
                 return Content(noPhoto, "image/svg+xml");
             else
             {
                 if (o.HasPhoto())
-                    return File(System.IO.File.ReadAllBytes(o.GetPhotoPath(phototype)), "image/jpg");
+                    return File(await System.IO.File.ReadAllBytesAsync(o.GetPhotoPath(phototype)), "image/jpg");
                 else
                     return Content(noPhoto, "image/svg+xml");
             }
@@ -1150,7 +1150,7 @@ text zpravy: {txt}
             }
             else if (id?.ToLower() == "osoba")
             {
-                Osoba o = Osoby.GetByNameId.Get(v);
+                Osoba o = await OsobaCache.GetPersonByNameIdAsync(v);
                 if (o != null)
                 {
                     if (await o.IsInterestingToShowAsync())

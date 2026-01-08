@@ -22,9 +22,9 @@ namespace HlidacStatu.Repositories
         {
             public static IRule[] Rules = new IRule[]
             {
-                new OsobaId(HlidacStatu.Repositories.OsobaVazbyRepo.Icos_s_VazbouNaOsobu, "osobaid:", "ico:"),
-                new OsobaId(HlidacStatu.Repositories.OsobaVazbyRepo.Icos_s_VazbouNaOsobu, "osobaiddodavatel:", "icododavatel:"),
-                new OsobaId(HlidacStatu.Repositories.OsobaVazbyRepo.Icos_s_VazbouNaOsobu, "osobaidzadavatel:", "icozadavatel:"),
+                new OsobaId(HlidacStatu.Repositories.OsobaVazbyRepo.Icos_s_VazbouNaOsobuAsync, "osobaid:", "ico:"),
+                new OsobaId(HlidacStatu.Repositories.OsobaVazbyRepo.Icos_s_VazbouNaOsobuAsync, "osobaiddodavatel:", "icododavatel:"),
+                new OsobaId(HlidacStatu.Repositories.OsobaVazbyRepo.Icos_s_VazbouNaOsobuAsync, "osobaidzadavatel:", "icozadavatel:"),
 
                 new Holding(HlidacStatu.Repositories.FirmaVazbyRepo.IcosInHolding, "holding:", "ico:"),
                 new Holding(HlidacStatu.Repositories.FirmaVazbyRepo.IcosInHolding, "holdingdodavatel:", "icododavatel:"),
@@ -272,7 +272,7 @@ namespace HlidacStatu.Repositories
                 "AND", "OR"
             };
 
-            public static QueryContainer GetSimpleQuery(VerejnaZakazkaSearchData searchdata)
+            public static async Task<QueryContainer> GetSimpleQueryAsync(VerejnaZakazkaSearchData searchdata)
             {
                 var query = searchdata.Q?.Trim();
                 string modifiedQ = query; // Search.Tools.FixInvalidQuery(query, queryShorcuts, queryOperators) ?? "";
@@ -288,7 +288,7 @@ namespace HlidacStatu.Repositories
                         modifiedQ = Query.ModifyQueryAND(modifiedQ, "oblast:" + oblValue);
                 }
 
-                var qc = SimpleQueryCreator.GetSimpleQuery<VerejnaZakazka>(modifiedQ, Rules);
+                var qc = await SimpleQueryCreator.GetSimpleQueryAsync<VerejnaZakazka>(modifiedQ, Rules);
 
                 return qc;
             }
@@ -350,12 +350,13 @@ namespace HlidacStatu.Repositories
                 ISearchResponse<VerejnaZakazka> res = null;
                 try
                 {
+                    var simpleQuery = await GetSimpleQueryAsync(search);
                     res = await client
                         .SearchAsync<VerejnaZakazka>(s => s
                             .Size(search.PageSize)
                             .Source(so => so.Excludes(ex => ex.Field("dokumenty.plainText")))
                             .From(page * search.PageSize)
-                            .Query(q => GetSimpleQuery(search))
+                            .Query(q => simpleQuery)
                             .Sort(ss => GetSort(search.Order))
                             .Aggregations(aggrFunc)
                             .Highlight(h => Repositories.Searching.Tools.GetHighlight<VerejnaZakazka>(withHighlighting))
@@ -372,7 +373,7 @@ namespace HlidacStatu.Repositories
                                 .Size(search.PageSize)
                                 .Source(so => so.Excludes(ex => ex.Field("dokumenty.plainText")))
                                 .From(page * search.PageSize)
-                                .Query(q => GetSimpleQuery(search))
+                                .Query(q => simpleQuery)
                                 .Sort(ss => GetSort(search.Order))
                                 .Aggregations(aggrFunc)
                                 .Highlight(h => Repositories.Searching.Tools.GetHighlight<VerejnaZakazka>(false))
@@ -502,12 +503,15 @@ namespace HlidacStatu.Repositories
                 public ElasticClient client = null;
             }
 
-            public static IAsyncEnumerable<VerejnaZakazka> GetVzForHoldingAsync(string holdingIco)
+            public static async IAsyncEnumerable<VerejnaZakazka> GetVzForHoldingAsync(string holdingIco)
             {
                 string query = HlidacStatu.Searching.Tools.FixInvalidQuery($"holding:{holdingIco}", queryShorcuts, queryOperators);
-                var qc = SimpleQueryCreator.GetSimpleQuery<VerejnaZakazka>(query, Rules);
+                var qc = await SimpleQueryCreator.GetSimpleQueryAsync<VerejnaZakazka>(query, Rules);
 
-                return YieldAllAsync(qc);
+                await foreach (var vz in YieldAllAsync(qc))
+                {
+                    yield return vz;
+                }
             }
 
             public static async Task<List<string>> GetAllIdsAsync(int year)
@@ -520,12 +524,13 @@ namespace HlidacStatu.Repositories
                 searchFunc = async (size, page) =>
                 {
                     var client = Manager.GetESClient_VerejneZakazky();
+                    var simpleQuery = await VerejnaZakazkaRepo.Searching.GetSimpleQueryAsync(
+                        new Repositories.Searching.VerejnaZakazkaSearchData() { Q = query });
                     return await client.SearchAsync<VerejnaZakazka>(a => a
                         .Size(size)
                         .From(page * size)
                         .Source(false)
-                        .Query(q => VerejnaZakazkaRepo.Searching.GetSimpleQuery(
-                            new Repositories.Searching.VerejnaZakazkaSearchData() { Q = query }))
+                        .Query(q => simpleQuery)
                         .Scroll("1m")
                     );
                 };

@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace HlidacStatu.Searching
+﻿namespace HlidacStatu.Searching
 {
     public class TransformPrefix
         : TransformPrefixWithValue

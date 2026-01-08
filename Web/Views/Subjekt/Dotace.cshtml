@@ -38,7 +38,7 @@
     };
     Dictionary<Dotace.Hint.CalculatedCategories, HlidacStatu.Lib.Analytics.SimpleStat> kategorieData = await DotaceRepo.PoKategoriichAsync(ico: Model.ICO);
     Dictionary<Dotace.Hint.CalculatedCategories, HlidacStatu.Lib.Analytics.SimpleStat> kategorieHoldingData = new();
-    if (Model.AktualniVazby(Relation.AktualnostType.Nedavny).Count() > 0)
+    if (Model.AktualniVazby(Relation.AktualnostType.Nedavny).Any())
     {
         kategorieHoldingData = await DotaceRepo.PoKategoriichAsync(query: $"holding:{Model.ICO}");
     }

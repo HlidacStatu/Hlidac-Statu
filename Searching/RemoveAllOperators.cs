@@ -1,6 +1,4 @@
-﻿using System.Linq;
-
-namespace HlidacStatu.Searching
+﻿namespace HlidacStatu.Searching
 {
     public class RemoveAllOperators
         : RuleBase
@@ -17,14 +15,14 @@ namespace HlidacStatu.Searching
             }
         }
 
-        protected override RuleResult processQueryPart(SplittingQuery.Part part)
+        protected override Task<RuleResult> processQueryPartAsync(SplittingQuery.Part part)
         {
             if (part == null)
                 return null;
 
             if (!string.IsNullOrEmpty(part.Prefix))
             {
-                return new RuleResult(SplittingQuery.SplitQuery($""), NextStep);
+                return Task.FromResult(new RuleResult(SplittingQuery.SplitQuery($""), NextStep));
             }
             else
             {
@@ -33,7 +31,7 @@ namespace HlidacStatu.Searching
                     && Tools.DefaultQueryOperators.Contains(part.Value.Trim().ToUpper())
                     )
                 {
-                    return new RuleResult(SplittingQuery.SplitQuery($""), NextStep);
+                    return Task.FromResult(new RuleResult(SplittingQuery.SplitQuery($""), NextStep));
                 }
             }
 

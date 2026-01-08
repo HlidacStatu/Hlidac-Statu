@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using HlidacStatu.Caching;
+using HlidacStatu.Repositories.Cache;
 using ZiggyCreatures.Caching.Fusion;
 
 namespace PlatyUredniku.Cache
@@ -37,7 +38,7 @@ namespace PlatyUredniku.Cache
 
                         await Devmasters.Batch.Manager.DoActionForAllAsync(nameids, async (nameid) =>
                             {
-                                var o = Osoby.GetByNameId.Get(nameid);
+                                var o = await OsobaCache.GetPersonByNameIdAsync(nameid);
                                 if (o != null)
                                 {
                                     res[nameid] = new osobaInfo()
@@ -83,7 +84,7 @@ namespace PlatyUredniku.Cache
             }
             else
             {
-                var o = Osoby.GetByNameId.Get(nameId);
+                var o = await OsobaCache.GetPersonByNameIdAsync(nameId);
                 if (o != null)
                 {
                     var allDict = cachedRoles;

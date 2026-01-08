@@ -17,8 +17,8 @@ namespace HlidacStatu.Repositories
         {
             public static async Task<OsobaEsSearchResult> FulltextSearchAsync(string query, int page, int pageSize, int? status = null)
             {
-                string modifQ = SimpleQueryCreator
-                    .GetSimpleQuery(query, new IRule[] { new RemoveAllOperators() })
+                string modifQ = (await SimpleQueryCreator
+                        .GetSimpleQueryAsync(query, new IRule[] { new RemoveAllOperators() }))
                     .FullQuery();
 
                 if (string.IsNullOrWhiteSpace(modifQ))

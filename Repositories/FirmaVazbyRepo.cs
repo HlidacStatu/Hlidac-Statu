@@ -21,22 +21,18 @@ namespace HlidacStatu.Repositories
         {
             using (DbEntities db = new DbEntities())
             {
-                var existing = db.FirmaVazby.AsQueryable()
-                    .Where(m =>
-                        m.Ico == vlastnikIco
-                        && m.VazbakIco == dcerinkaIco
-                        && m.DatumOd == fromDate
-                        && m.DatumDo == toDate
-                    )
-                    .FirstOrDefault();
+                var existing = db.FirmaVazby
+                    .AsQueryable()
+                    .FirstOrDefault(m => m.Ico == vlastnikIco
+                                         && m.VazbakIco == dcerinkaIco
+                                         && m.DatumOd == fromDate
+                                         && m.DatumDo == toDate);
                 if (existing == null)
-                    existing = db.FirmaVazby.AsQueryable()
-                        .Where(m =>
-                            m.Ico == vlastnikIco
-                            && m.VazbakIco == dcerinkaIco
-                            && m.DatumOd == fromDate
-                        )
-                        .FirstOrDefault();
+                    existing = db.FirmaVazby
+                        .AsQueryable()
+                        .FirstOrDefault(m => m.Ico == vlastnikIco
+                                             && m.VazbakIco == dcerinkaIco
+                                             && m.DatumOd == fromDate);
 
                 if (existing != null)
                 {
@@ -87,7 +83,10 @@ namespace HlidacStatu.Repositories
                         .Where(o => o.To.Type == HlidacStatu.DS.Graphs.Graph.Node.NodeType.Person)
                         .Select(o => Osoby.GetById.Get(Convert.ToInt32(o.To.Id)))
                         .Where(o => o != null)
-                        .SelectMany(o => o.AktualniVazby( Relation.CharakterVazbyEnum.VlastnictviKontrola, aktualnost))
+//todo: cant modify firmy repo and firmy vazby yet...                        
+#pragma warning disable VSTHRD002
+                        .SelectMany(o => o.AktualniVazbyAsync( Relation.CharakterVazbyEnum.VlastnictviKontrola, aktualnost).GetAwaiter().GetResult())
+#pragma warning restore VSTHRD002
                         .Select(v => v.To.Id)
                         .Distinct();
                 icos = icos.Union(icosPresLidi).Distinct();

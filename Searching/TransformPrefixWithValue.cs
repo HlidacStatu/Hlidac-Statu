@@ -1,5 +1,4 @@
-﻿using System;
-using System.Text.RegularExpressions;
+﻿using System.Text.RegularExpressions;
 
 namespace HlidacStatu.Searching
 {
@@ -25,7 +24,7 @@ namespace HlidacStatu.Searching
             }
         }
 
-        protected override RuleResult processQueryPart(SplittingQuery.Part part)
+        protected override Task<RuleResult> processQueryPartAsync(SplittingQuery.Part part)
         {
             if (part == null)
                 return null;
@@ -42,7 +41,7 @@ namespace HlidacStatu.Searching
                 )
             {
                 string rq = " " + ReplaceWith.Replace("${q}", part.Value);
-                return new RuleResult(SplittingQuery.SplitQuery($" {rq} "), NextStep);
+                return Task.FromResult(new RuleResult(SplittingQuery.SplitQuery($" {rq} "), NextStep));
             }
 
             return null;

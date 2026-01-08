@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using HlidacStatu.DS.Api;
 using Microsoft.AspNetCore.Http;
 
@@ -13,7 +14,7 @@ public static class AutocompleteHelper
     private static readonly ILogger _logger = Log.ForContext(typeof(AutocompleteHelper));
     
     
-    public static List<Autocomplete> CreateInputTagsForJs(IQueryCollection query)
+    public static async Task<List<Autocomplete>> CreateInputTagsForJsAsync(IQueryCollection query)
     {
         try
         {
@@ -22,11 +23,11 @@ public static class AutocompleteHelper
                 if (query.TryGetValue("qtl", out var qtl))
                 {
                     var parsedQueries = ParseQueryStringWithOffsets(q, qtl);
-                    return HlidacStatu.Repositories.Searching.Tools.CreateAutocompleteItemsFromParsedQuery(parsedQueries);
+                    return await HlidacStatu.Repositories.Searching.Tools.CreateAutocompleteItemsFromParsedQueryAsync(parsedQueries);
                 }
                 else
                 {
-                    return HlidacStatu.Repositories.Searching.Tools.CreateAutocompleteItemsFromQuery(q);
+                    return await HlidacStatu.Repositories.Searching.Tools.CreateAutocompleteItemsFromQueryAsync(q);
                 }
             }
             
@@ -35,11 +36,11 @@ public static class AutocompleteHelper
                 if (query.TryGetValue("qtl", out var qtl))
                 {
                     var parsedQueries = ParseQueryStringWithOffsets(qs, qtl);
-                    return HlidacStatu.Repositories.Searching.Tools.CreateAutocompleteItemsFromParsedQuery(parsedQueries);
+                    return await HlidacStatu.Repositories.Searching.Tools.CreateAutocompleteItemsFromParsedQueryAsync(parsedQueries);
                 }
                 else
                 {
-                    return HlidacStatu.Repositories.Searching.Tools.CreateAutocompleteItemsFromQuery(qs);
+                    return await HlidacStatu.Repositories.Searching.Tools.CreateAutocompleteItemsFromQueryAsync(qs);
                 }
             }
         }

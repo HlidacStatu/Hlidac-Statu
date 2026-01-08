@@ -1,8 +1,5 @@
 ﻿using HlidacStatu.Entities;
 
-using System;
-using System.Collections.Generic;
-
 namespace HlidacStatu.Searching
 {
     public class Smlouva_Oblasti
@@ -43,7 +40,7 @@ namespace HlidacStatu.Searching
 
         public readonly static Dictionary<string, string> AllValues = GetOblastiValues();
 
-        protected override RuleResult processQueryPart(SplittingQuery.Part part)
+        protected override Task<RuleResult> processQueryPartAsync(SplittingQuery.Part part)
         {
             if (part == null)
                 return null;
@@ -57,7 +54,7 @@ namespace HlidacStatu.Searching
                     {
                         var q_obl = $" ( classification.class1.typeValue:${AllValues[key]} OR classification.class2.typeValue:${AllValues[key]} OR classification.class3.typeValue:${AllValues[key]} ) ";
 
-                        return new RuleResult(SplittingQuery.SplitQuery($" {q_obl} "), NextStep);
+                        return Task.FromResult(new RuleResult(SplittingQuery.SplitQuery($" {q_obl} "), NextStep));
                     }
                 }
             }

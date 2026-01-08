@@ -8,6 +8,7 @@ using System.Text.Json;
 using System.Threading.Tasks;
 using HlidacStatu.Extensions.DataTables;
 using HlidacStatu.LibCore.Filters;
+using HlidacStatu.Repositories.Cache;
 
 namespace PlatyUredniku.Controllers;
 
@@ -43,7 +44,7 @@ public partial class PoliticiController : Controller
         //detail politika
 
         ViewBag.Title = $"Platy politika {id}";
-        var osoba = Osoby.GetByNameId.Get(id);
+        var osoba = await OsobaCache.GetPersonByNameIdAsync(id);
         if (osoba is null)
             return NotFound();
 

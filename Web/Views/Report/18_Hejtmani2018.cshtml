@@ -9,13 +9,14 @@
 @{
     Layout = "_ReportLayout";
 
-    var showList = OsobaRepo.GetByZatrideni(OsobaRepo.Zatrideni.Hejtman, DateTime.Now)
+    var showList = (await OsobaRepo.GetByZatrideniAsync(OsobaRepo.Zatrideni.Hejtman, DateTime.Now))
         .OrderBy(o => o.Prijmeni)
         .ThenBy(o => o.Jmeno)
         .ToList();
 
 
-    ReportDataSource<(Osoba Osoba, Osoba.Statistics.RegistrSmluv? Stat, decimal? Sponzoring, string Description, string PoliticalParty)> poslanciTable = new(new ReportDataSource<(Osoba Osoba, Osoba.Statistics.RegistrSmluv? Stat, decimal? Sponzoring, string Description, string PoliticalParty)>.Column[]
+    ReportDataSource<(Osoba Osoba, Osoba.Statistics.RegistrSmluv? Stat, decimal? Sponzoring, string Description, string PoliticalParty, HlidacStatu.DS.Graphs.Graph.Edge[]? VazbyVlastnictvi)> poslanciTable =
+        new(new ReportDataSource<(Osoba Osoba, Osoba.Statistics.RegistrSmluv? Stat, decimal? Sponzoring, string Description, string PoliticalParty, HlidacStatu.DS.Graphs.Graph.Edge[]? VazbyVlastnictvi)>.Column[]
     {
         new()
         {
@@ -41,7 +42,7 @@
             {
                 string sout = "";
 
-                if (s.Osoba.Vazby(Relation.CharakterVazbyEnum.VlastnictviKontrola) != null)
+                if (s.VazbyVlastnictvi != null)
                 {
                     foreach (var v in s.Stat.SoukromeFirmy.Take(2))
                     {
@@ -55,7 +56,7 @@
                     }
                     else if (s.Stat.SoukromeFirmy.Count() > 2)
                     {
-                        sout = sout + "<a href='" + s.Osoba.GetUrl() + "'>" + Devmasters.Lang.CS.Plural.Get(s.Osoba.Vazby(Relation.CharakterVazbyEnum.VlastnictviKontrola).Length - 2, "+další vazba;+ další {0} vazby;+ dalších {0} vazeb") + "</a>";
+                        sout = sout + "<a href='" + s.Osoba.GetUrl() + "'>" + Devmasters.Lang.CS.Plural.Get(s.VazbyVlastnictvi.Length - 2, "+další vazba;+ další {0} vazby;+ dalších {0} vazeb") + "</a>";
                     }
                 }
                 else
@@ -93,7 +94,8 @@
         var sponzoring = (await osoba.SponzoringAsync()).Sum(m => m.Hodnota);
         var description = await osoba.DescriptionAsync(false, m => true, numOfRecords: 3);
         var politicalParty = await osoba.CurrentPoliticalPartyAsync();
-        poslanciTable.AddRow((osoba, stat, sponzoring, description, politicalParty));
+        var vazbyVlastnictvi = await osoba.VazbyAsync(Relation.CharakterVazbyEnum.VlastnictviKontrola);
+        poslanciTable.AddRow((osoba, stat, sponzoring, description, politicalParty, vazbyVlastnictvi));
     }
 }
 

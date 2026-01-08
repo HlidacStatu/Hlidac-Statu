@@ -46,7 +46,7 @@
 
     foreach (var p in showList)
     {
-        Osoba osoba = Osoby.GetByNameId.Get(p.OsobaNameId);
+        Osoba osoba = await OsobaCache.GetPersonByNameIdAsync(p.OsobaNameId);
         var description = await osoba.DescriptionAsync(false, m => true, numOfRecords: 3);
         var politicalParty = await osoba.CurrentPoliticalPartyAsync();
         poslanciTable.AddRow((p, osoba, description, politicalParty));

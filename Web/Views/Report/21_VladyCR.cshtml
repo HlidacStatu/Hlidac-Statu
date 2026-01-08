@@ -10,21 +10,15 @@
 @{
     Layout = "_ReportLayout";
 
-    ReportDataSource<(Osoba Osoba, Osoba.Statistics.RegistrSmluv? Stat, decimal? Sponzoring, string Description)>.Column[] columns =
+    ReportDataSource<(Osoba Osoba, Osoba.Statistics.RegistrSmluv? Stat, decimal? Sponzoring, string Description, HlidacStatu.DS.Graphs.Graph.Edge[]? VazbyVlastnictvi)>.Column[] columns =
     [
         new()
         {
             Name = "Členové vlády",
-            HtmlRender =(s) =>
-            {
-                return $"<a href='{s.Osoba.GetUrl()}'>{s.Osoba.FullNameWithYear(true)}</a>"
-                       + "<br />"
-                       + Devmasters.TextUtil.ShortenText(s.Description, 250).Replace("\n", "<br />");
-            },
-            OrderValueRender = (s) =>
-            {
-                return s.Osoba.FullName(false);
-            }
+            HtmlRender =(s) => $"<a href='{s.Osoba.GetUrl()}'>{s.Osoba.FullNameWithYear(true)}</a>"
+                               + "<br />"
+                               + Devmasters.TextUtil.ShortenText(s.Description, 250).Replace("\n", "<br />"),
+            OrderValueRender = (s) => s.Osoba.FullName(false)
         },
         new()
         {
@@ -33,7 +27,7 @@
             {
                 string sout = "";
 
-                if (s.Osoba.Vazby( Relation.CharakterVazbyEnum.VlastnictviKontrola) != null)
+                if (s.VazbyVlastnictvi != null)
                 {
                     foreach (var v in s.Stat.SoukromeFirmy.Take(2))
                     {
@@ -46,7 +40,7 @@
                     }
                     else if (s.Stat.SoukromeFirmy.Count() > 2)
                     {
-                        sout = sout + "<a href='" + s.Osoba.GetUrl() + "'>" + Devmasters.Lang.CS.Plural.Get(s.Osoba.Vazby( Relation.CharakterVazbyEnum.VlastnictviKontrola).Length - 2, "+další vazba;+ další {0} vazby;+ dalších {0} vazeb") + "</a>";
+                        sout = sout + "<a href='" + s.Osoba.GetUrl() + "'>" + Devmasters.Lang.CS.Plural.Get(s.VazbyVlastnictvi.Length - 2, "+další vazba;+ další {0} vazby;+ dalších {0} vazeb") + "</a>";
                     }
                 }
                 return sout;
@@ -68,23 +62,21 @@
                 else
                     return $"Celkem&nbsp;{HlidacStatu.Util.RenderData.NicePriceHtml(sum.Value)}<br /><a href='{s.Osoba.GetUrl()}'>podrobnosti</a>";
             },
-            OrderValueRender = (s) =>
-            {
-                return HlidacStatu.Util.RenderData.OrderValueFormat(s.Sponzoring);
-            }
+            OrderValueRender = (s) => HlidacStatu.Util.RenderData.OrderValueFormat(s.Sponzoring)
         }
     ];
 
-    ReportDataSource<(Osoba Osoba, Osoba.Statistics.RegistrSmluv? Stat, decimal? Sponzoring, string Description)> vlada2017tbl = new(columns);
+    ReportDataSource<(Osoba Osoba, Osoba.Statistics.RegistrSmluv? Stat, decimal? Sponzoring, string Description, HlidacStatu.DS.Graphs.Graph.Edge[]? VazbyVlastnictvi)> vlada2017tbl = new(columns);
 
-    foreach (var osoba in OsobaRepo.GetByZatrideni(OsobaRepo.Zatrideni.Ministr, DateTime.Now)
+    foreach (var osoba in (await OsobaRepo.GetByZatrideniAsync(OsobaRepo.Zatrideni.Ministr, DateTime.Now))
         .OrderBy(m => m.Prijmeni)
         .ThenBy(m => m.Jmeno))
     {
         Osoba.Statistics.RegistrSmluv? stat = await osoba.StatistikaRegistrSmluvAsync();
         var sponzoring = (await osoba.SponzoringAsync()).Sum(m => m.Hodnota);
         var description = await osoba.DescriptionAsync(false, m => true, numOfRecords: 3);
-        vlada2017tbl.AddRow((osoba, stat, sponzoring, description));
+        var vazbyVlastnictvi = await osoba.VazbyAsync(Relation.CharakterVazbyEnum.VlastnictviKontrola);
+        vlada2017tbl.AddRow((osoba, stat, sponzoring, description, vazbyVlastnictvi));
     }
 
 }

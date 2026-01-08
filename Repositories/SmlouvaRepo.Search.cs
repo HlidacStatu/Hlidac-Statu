@@ -97,7 +97,7 @@ namespace HlidacStatu.Repositories
             }
 
             public static HlidacStatu.Searching.IRule[] Irules = new HlidacStatu.Searching.IRule[] {
-               new HlidacStatu.Searching.OsobaId(HlidacStatu.Repositories.OsobaVazbyRepo.Icos_s_VazbouNaOsobu, "osobaid:","ico:" ),
+               new HlidacStatu.Searching.OsobaId(HlidacStatu.Repositories.OsobaVazbyRepo.Icos_s_VazbouNaOsobuAsync, "osobaid:","ico:" ),
                new HlidacStatu.Searching.Holding(HlidacStatu.Repositories.FirmaVazbyRepo.IcosInHolding, "holdingprijemce:","icoprijemce:" ),
                new HlidacStatu.Searching.Holding(HlidacStatu.Repositories.FirmaVazbyRepo.IcosInHolding, "holdingplatce:","icoplatce:" ),
                new HlidacStatu.Searching.Holding(HlidacStatu.Repositories.FirmaVazbyRepo.IcosInHolding, "holdingdodavatel:","icoprijemce:" ),
@@ -142,9 +142,9 @@ namespace HlidacStatu.Repositories
             };
 
 
-            public static QueryContainer GetSimpleQuery(string query)
+            public static async Task<QueryContainer> GetSimpleQueryAsync(string query)
             {
-                QueryContainer qc = HlidacStatu.Searching.SimpleQueryCreator.GetSimpleQuery<Smlouva>(query, Irules);
+                QueryContainer qc = await HlidacStatu.Searching.SimpleQueryCreator.GetSimpleQueryAsync<Smlouva>(query, Irules);
                 return qc;
             }
 
@@ -231,7 +231,7 @@ bool withHighlighting = false, bool exactNumOfResults = false)
 
 
                 ISearchResponse<Smlouva> res =
-                    await _coreSearchAsync(GetSimpleQuery(query), page, pageSize, order, anyAggregation, platnyZaznam,
+                    await _coreSearchAsync(await GetSimpleQueryAsync(query), page, pageSize, order, anyAggregation, platnyZaznam,
                     includeNeplatne, logError, withHighlighting, exactNumOfResults, cancellationToken: cancellationToken);
 
                 AuditRepo.Add(Audit.Operations.Search, "", "", "Smlouva", res.IsValid ? "valid" : "invalid", query, null);

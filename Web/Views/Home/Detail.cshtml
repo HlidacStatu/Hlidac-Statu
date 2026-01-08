@@ -9,6 +9,7 @@
 @using HlidacStatu.Repositories
 @using Devmasters.Collections;
 @using HlidacStatu.Entities.Facts;
+@using HlidacStatu.Repositories.Cache
 
 @{
     ViewBag.Title = Devmasters.TextUtil.ShortenText(Model.predmet ?? "", 70);
@@ -23,39 +24,17 @@
                             + "<meta property=\"og:image:type\" content=\"image/png\" />";
 
     bool znepristupnena = Model.znepristupnenaSmlouva();
-
-    IReadOnlyDictionary<string, IReadOnlyCollection<string>> highlightingData = ViewBag.Highlighting as IReadOnlyDictionary<string, IReadOnlyCollection<string>>;
     var otherVersion = await Model.OtherVersionsAsync();
 
     //TODO - obsah do detailu podle hledaneho dotazu
     bool showQueryContext = false;
-    List<Autocomplete> parsedQuery = HlidacStatu.Web.Framework.AutocompleteHelper.CreateInputTagsForJs(Context.Request.Query);
-    var parsedQueryIcosInContext = new List<string>();
+    List<Autocomplete> parsedQuery = await HlidacStatu.Web.Framework.AutocompleteHelper.CreateInputTagsForJsAsync(Context.Request.Query);
     var allIcosInSmlouva = Model.Prijemce.Select(m => m.ico)
         .Union(new string[] { Model.VkladatelDoRejstriku.ico, Model.Platce.ico })
         .Distinct();
 
     showQueryContext = parsedQuery.Any(m => m.Category == HlidacStatu.DS.Api.Autocomplete.CategoryEnum.Person);
 
-    //TODO zatim vazby mezi firmama v hledani neresime
-    if (false && showQueryContext == false && parsedQuery.Any(m => m.Prefix.Contains("ico:") || m.Prefix.Contains("ds:")))
-    {
-        foreach (var item in parsedQuery.Where(m => m.Prefix.Contains("ico:") || m.Prefix.Contains("ds:")))
-        {
-            if (HlidacStatu.Util.DataValidators.CheckCZICO(item.PrefixValue)
-                && allIcosInSmlouva.Contains(item.PrefixValue)== false
-            )
-            {
-                parsedQueryIcosInContext.Add(item.PrefixValue);
-                showQueryContext = true;
-            }
-        }
-    }
-
-}
-
-@section scripts
-{
 }
 
 @section breadcrumb
@@ -71,36 +50,6 @@
     </ol>
 }
 
-
-
-@if (false && User.IsInRole("BetaTester") && Model?.Classification?.HasClassification() != null)
-{
-    <table class="table table-new table-new--dotted table-hover" id="invalidItemWarn">
-        <tbody>
-            <tr>
-                <td>
-                    Nová klasifikace smluv
-                    <br /><b>BETA</b>
-                </td>
-                <td>
-                    @if (Model.Classification.Class1 != null)
-                    {
-                        <div>@(Model.Classification.Class1.ClassifTypeName()) - @(Model.Classification.Class1.ClassifProbability)</div>
-                    }
-                    @if (Model.Classification.Class2 != null)
-                    {
-                        <div>@(Model.Classification.Class2.ClassifTypeName()) - @(Model.Classification.Class2.ClassifProbability)</div>
-                    }
-                    @if (Model.Classification.Class3 != null)
-                    {
-                        <div>@(Model.Classification.Class3.ClassifTypeName()) - @(Model.Classification.Class3.ClassifProbability)</div>
-                    }
-
-                </td>
-            </tr>
-        </tbody>
-    </table>
-}
 
 <div class="row mb-5">
     <div class="col" style="">
@@ -402,14 +351,6 @@
                                         <span>(@priloha.WordCount slov)</span>
                                     }
 
-                                    @*                                <highlight-content
-                        highlights="@highlightingData"
-                        path="prilohy.plainTextContent"
-                        content-to-compare="@priloha.PlainTextContent"
-                        prefix="<blockquote class='small'>"
-                        postfix="</blockquote>"></highlight-content>
-                        *@
-
                                 </div>
                             }
 
@@ -525,13 +466,13 @@
                 <td>
                     @foreach (var osAc in parsedQuery.Where(m => m.Category == HlidacStatu.DS.Api.Autocomplete.CategoryEnum.Person))
                     {
-                        Osoba fo = Osoby.GetByNameId.Get(osAc.PrefixValue);
+                        Osoba fo = await OsobaCache.GetPersonByNameIdAsync(osAc.PrefixValue);
                         if (fo != null)
                         {
 
                             var semaphore = new SemaphoreSlim(10);
 
-                            var dataTasks = fo.AktualniVazby( HlidacStatu.DS.Graphs.Relation.CharakterVazbyEnum.VlastnictviKontrola, HlidacStatu.DS.Graphs.Relation.AktualnostType.Nedavny)
+                            var dataTasks = (await fo.AktualniVazbyAsync( HlidacStatu.DS.Graphs.Relation.CharakterVazbyEnum.VlastnictviKontrola, HlidacStatu.DS.Graphs.Relation.AktualnostType.Nedavny))
                                 .Where(v => v.To != null && v.To.Type == HlidacStatu.DS.Graphs.Graph.Node.NodeType.Company)
                                 .Where(m => allIcosInSmlouva.Contains(m.To.Id))
                                 .GroupBy(f => f.To.Id, v => v, (ico, v) => new { ico, v })
@@ -550,7 +491,7 @@
                                         {
                                             ICO = g.ico,
                                             FirmaName = g.v.First().To.PrintName(),
-                                            VazbyPerIco = fo.VazbyProICO(g.ico),
+                                            VazbyPerIco = await OsobaVazbyRepo.VazbyProIcoCachedAsync(fo, g.ico),
                                             stat
                                         };
                                     }

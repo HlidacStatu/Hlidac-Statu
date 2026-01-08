@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-
-namespace HlidacStatu.Searching
+﻿namespace HlidacStatu.Searching
 {
     public class Query
     {

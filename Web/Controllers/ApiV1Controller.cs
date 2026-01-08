@@ -507,7 +507,7 @@ namespace HlidacStatu.Web.Controllers
         }
 
         [Authorize(Roles = "TeamMember")]
-        public ActionResult OsobaPridat(string jmeno, string prijmeni, string narozeni, string titulPred,
+        public async Task<ActionResult> OsobaPridat(string jmeno, string prijmeni, string narozeni, string titulPred,
             string titulPo, int typOsoby)
         {
             DateTime? nar = Devmasters.DT.Util.ToDateTimeFromCode(narozeni);
@@ -529,10 +529,10 @@ namespace HlidacStatu.Web.Controllers
                 }));
             }
 
-            var no = OsobaRepo.GetOrCreateNew(titulPred, jmeno, prijmeni, titulPo, nar,
+            var no = await OsobaRepo.GetOrCreateNewAsync(titulPred, jmeno, prijmeni, titulPo, nar,
                 (Osoba.StatusOsobyEnum)typOsoby, HttpContext.User.Identity.Name);
-            no.Vazby( DS.Graphs.Relation.CharakterVazbyEnum.VlastnictviKontrola, true);
-            no.Vazby(DS.Graphs.Relation.CharakterVazbyEnum.Uredni, true);
+            await no.VazbyAsync( DS.Graphs.Relation.CharakterVazbyEnum.VlastnictviKontrola, true);
+            await no.VazbyAsync(DS.Graphs.Relation.CharakterVazbyEnum.Uredni, true);
 
             return Content(Newtonsoft.Json.JsonConvert.SerializeObject(
                     new { valid = true, nameId = no.NameId })
@@ -575,7 +575,7 @@ namespace HlidacStatu.Web.Controllers
         }
 
         [Authorize(Roles = "TeamMember")]
-        public ActionResult OsobaHledat(string jmeno, string prijmeni, string narozen)
+        public async Task<ActionResult> OsobaHledat(string jmeno, string prijmeni, string narozen)
         {
             DateTime? dt = Devmasters.DT.Util.ToDateTime(narozen
                 , "yyyy-MM-dd");
@@ -586,7 +586,7 @@ namespace HlidacStatu.Web.Controllers
                 ), "application/json");
             }
 
-            var found = OsobaRepo.Searching.GetAllByNameAscii(jmeno, prijmeni, dt.Value)
+            var found = (await OsobaRepo.Searching.GetAllByNameAsciiAsync(jmeno, prijmeni, dt.Value))
                 .Select(o => new osobaResult(o))
                 .ToArray();
 

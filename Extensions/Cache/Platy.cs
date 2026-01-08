@@ -28,7 +28,7 @@ public static class Platy
                     {
                         var nameid = politikPlatyKvp.Key;
                         var platy = politikPlatyKvp.Value;
-                        var osoba = OsobaRepo.GetByNameId(nameid);
+                        var osoba = await OsobaRepo.GetByNameIdAsync(nameid);
                         var politStrana = await osoba.CurrentPoliticalPartyAsync();
                         var celkoveNaklady = platy.Sum(p => p.CelkoveRocniNakladyNaPolitika);
 

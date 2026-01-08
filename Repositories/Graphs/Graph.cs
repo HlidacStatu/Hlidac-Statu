@@ -1,13 +1,10 @@
 ﻿using Devmasters;
 using Devmasters.Enums;
-
 using HlidacStatu.Connectors;
 using HlidacStatu.DS.Graphs;
 using HlidacStatu.Entities;
 using HlidacStatu.Extensions;
 using HlidacStatu.Lib.Analytics;
-
-
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -16,6 +13,9 @@ using Microsoft.Data.SqlClient;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using HlidacStatu.Caching;
+using HlidacStatu.Repositories.Cache;
+using ZiggyCreatures.Caching.Fusion;
 
 
 namespace HlidacStatu.Repositories
@@ -39,75 +39,84 @@ namespace HlidacStatu.Repositories
             return uids;
         }
 
-        const string vazbyCacheVersion="V2";
-        private static Devmasters.Cache.Memcached.Manager<List<HlidacStatu.DS.Graphs.Graph.Edge>, (string, Relation.CharakterVazbyEnum)> vazbyIcoCache
-            = Devmasters.Cache.Memcached.Manager<List<HlidacStatu.DS.Graphs.Graph.Edge>, (string, Relation.CharakterVazbyEnum)>.GetSafeInstance("VsechnyDcerineVazby_" + vazbyCacheVersion,
-                k => vsechnyDcerineVazbyInternal(k.Item1, k.Item2, 0, true, null),
-                TimeSpan.FromDays(3),
-                    Devmasters.Config.GetWebConfigValue("HazelcastServers").Split(','),
-                    keyValueSelector: key => $"{key.Item1}_{key.Item2}");
+        private static IFusionCache MemcachedCache =>
+            HlidacStatu.Caching.CacheFactory.CreateNew(CacheFactory.CacheType.L2Memcache, nameof(Graph));
 
-        private static Devmasters.Cache.Memcached.Manager<List<HlidacStatu.DS.Graphs.Graph.Edge>, (string, Relation.CharakterVazbyEnum)> vazbyOsobaNameIdCache
-            = Devmasters.Cache.Memcached.Manager<List<HlidacStatu.DS.Graphs.Graph.Edge>, (string, Relation.CharakterVazbyEnum)>.GetSafeInstance("VsechnyDcerineVazbyOsoba_" + vazbyCacheVersion,
-                k =>
+        const string vazbyCacheVersion = "V2";
+
+        private static string GetVsechnyDcerineVazbyOsobaKey(string nameId,
+            Relation.CharakterVazbyEnum charakterVazbyEnum) =>
+            $"_VsechnyDcerineVazbyOsoba_{vazbyCacheVersion}:{nameId}_{charakterVazbyEnum}";
+        
+        private static ValueTask<List<HlidacStatu.DS.Graphs.Graph.Edge>> GetVazbyOsobaNameIdAsync(string nameId,
+            Relation.CharakterVazbyEnum charakterVazbyEnum) =>
+            MemcachedCache.GetOrSetAsync(GetVsechnyDcerineVazbyOsobaKey(nameId, charakterVazbyEnum),
+                async _ =>
                 {
-                    if (string.IsNullOrEmpty(k.Item1))
+                    if (string.IsNullOrEmpty(nameId))
                         return new List<HlidacStatu.DS.Graphs.Graph.Edge>();
-                    Osoba o = Osoby.GetByNameId.Get(k.Item1);
-                    return vsechnyDcerineVazbyInternal(o, k.Item2, 0, true, null);
+                    Osoba o = await OsobaCache.GetPersonByNameIdAsync(nameId);
+                    return VsechnyDcerineVazbyInternal(o, charakterVazbyEnum, 0, true, null);
                 },
-                TimeSpan.FromDays(3),
-                Devmasters.Config.GetWebConfigValue("HazelcastServers").Split(','),
-                keyValueSelector: key => $"{key.Item1}_{key.Item2}");
+                options => options.ModifyEntryOptionsDuration(TimeSpan.FromDays(3)));
+
+
+        private static string GetVsechnyDcerineVazbyIcoKey(string ico,
+            Relation.CharakterVazbyEnum charakterVazbyEnum) =>
+            $"_VsechnyDcerineVazbyIco_{vazbyCacheVersion}:{ico}_{charakterVazbyEnum}";
+        
+        private static List<HlidacStatu.DS.Graphs.Graph.Edge> GetVazbyIco(string ico,
+            Relation.CharakterVazbyEnum charakterVazbyEnum) =>
+            MemcachedCache.GetOrSet(GetVsechnyDcerineVazbyIcoKey(ico, charakterVazbyEnum),
+                _ => VsechnyDcerineVazbyInternal(ico, charakterVazbyEnum, 0, true, null),
+                options => options.ModifyEntryOptionsDuration(TimeSpan.FromDays(3)));
+        
 
         public static void SmazVsechnyDcerineVazbyFirmy(string ico)
         {
             foreach (Relation.CharakterVazbyEnum charakter in Enum.GetValues(typeof(Relation.CharakterVazbyEnum)))
-                vazbyIcoCache.Delete((ico, charakter));
+                MemcachedCache.Remove(GetVsechnyDcerineVazbyIcoKey(ico, charakter));
         }
+
         public static List<HlidacStatu.DS.Graphs.Graph.Edge> VsechnyDcerineVazby(string ico,
             Relation.CharakterVazbyEnum charakterVazby,
             bool refresh = false)
         {
             if (refresh)
-                vazbyIcoCache.Delete((ico,charakterVazby));
-            return vazbyIcoCache.Get((ico,charakterVazby));
+                MemcachedCache.Remove(GetVsechnyDcerineVazbyIcoKey(ico, charakterVazby));
+            return GetVazbyIco(ico, charakterVazby);
         }
-        public static void SmazVsechnyDcerineVazbyOsoby(long internalId)
+
+        public static async Task SmazVsechnyDcerineVazbyOsobyAsync(long internalId)
         {
             var nameId = DirectDB.Instance.GetValue<string>("select nameid from Osoba where internalId=@internalId",
                 param: new IDataParameter[] { new SqlParameter("internalId", internalId) });
             if (!string.IsNullOrEmpty(nameId))
             {
                 foreach (Relation.CharakterVazbyEnum charakter in Enum.GetValues(typeof(Relation.CharakterVazbyEnum)))
-                    vazbyOsobaNameIdCache.Delete((nameId,charakter));
+                    await MemcachedCache.RemoveAsync(GetVsechnyDcerineVazbyOsobaKey(nameId, charakter));
             }
         }
-        public static void SmazVsechnyDcerineVazbyOsoby(string nameId)
+
+        public static async Task SmazVsechnyDcerineVazbyOsobyAsync(string nameId)
         {
             foreach (Relation.CharakterVazbyEnum charakter in Enum.GetValues(typeof(Relation.CharakterVazbyEnum)))
-                vazbyOsobaNameIdCache.Delete((nameId, charakter));
-        }
-        public static void SmazVsechnyDcerineVazbyOsoby(Osoba person)
-        {
-            if (person == null)
-                return;
-            foreach (Relation.CharakterVazbyEnum charakter in Enum.GetValues(typeof(Relation.CharakterVazbyEnum)))
-                vazbyOsobaNameIdCache.Delete((person.NameId, charakter));
+                await MemcachedCache.RemoveAsync(GetVsechnyDcerineVazbyOsobaKey(nameId, charakter));
         }
 
-        public static List<HlidacStatu.DS.Graphs.Graph.Edge> VsechnyDcerineVazby(Osoba person,
+
+        public static async Task<List<DS.Graphs.Graph.Edge>> VsechnyDcerineVazbyAsync(Osoba person,
             Relation.CharakterVazbyEnum charakterVazby,
             bool refresh = false)
         {
             if (person == null)
                 return null;
             if (refresh)
-                vazbyOsobaNameIdCache.Delete((person.NameId, charakterVazby));
-            return vazbyOsobaNameIdCache.Get((person.NameId, charakterVazby));
+                await MemcachedCache.RemoveAsync(GetVsechnyDcerineVazbyOsobaKey(person.NameId, charakterVazby));
+            return await GetVazbyOsobaNameIdAsync(person.NameId, charakterVazby);
         }
 
-        public static List<HlidacStatu.DS.Graphs.Graph.Edge> vsechnyDcerineVazbyInternal(
+        private static List<HlidacStatu.DS.Graphs.Graph.Edge> VsechnyDcerineVazbyInternal(
             string ico,
             Relation.CharakterVazbyEnum charakterVazby,
             int level, bool goDeep, HlidacStatu.DS.Graphs.Graph.Edge parent,
@@ -116,7 +125,8 @@ namespace HlidacStatu.Repositories
             var charakterVazbyQuery = "";
             if (charakterVazby == Relation.CharakterVazbyEnum.VlastnictviKontrola)
             {
-                charakterVazbyQuery = $"and typVazby not in ({string.Join(",", Relation.CharakterVazby_UredniVazbyIds)})";
+                charakterVazbyQuery =
+                    $"and typVazby not in ({string.Join(",", Relation.CharakterVazby_UredniVazbyIds)})";
             }
             else if (charakterVazby == Relation.CharakterVazbyEnum.Uredni)
             {
@@ -143,8 +153,8 @@ namespace HlidacStatu.Repositories
         }
 
 
-        public static List<HlidacStatu.DS.Graphs.Graph.Edge> vsechnyDcerineVazbyInternal(Osoba person, 
-            Relation.CharakterVazbyEnum charakterVazby, 
+        private static List<HlidacStatu.DS.Graphs.Graph.Edge> VsechnyDcerineVazbyInternal(Osoba person,
+            Relation.CharakterVazbyEnum charakterVazby,
             int level, bool goDeep, HlidacStatu.DS.Graphs.Graph.Edge parent,
             ExcludeDataCol excludeICO = null, IEnumerable<int> excludeOsobaId = null,
             DateTime? datumOd = null, DateTime? datumDo = null, decimal minPodil = 0)
@@ -155,12 +165,14 @@ namespace HlidacStatu.Repositories
             var charakterVazbyQuery = "";
             if (charakterVazby == Relation.CharakterVazbyEnum.VlastnictviKontrola)
             {
-                charakterVazbyQuery = $"and typVazby not in ({string.Join(",", Relation.CharakterVazby_UredniVazbyIds)})";
+                charakterVazbyQuery =
+                    $"and typVazby not in ({string.Join(",", Relation.CharakterVazby_UredniVazbyIds)})";
             }
             else if (charakterVazby == Relation.CharakterVazbyEnum.Uredni)
             {
                 charakterVazbyQuery = $"and typVazby in ({string.Join(",", Relation.CharakterVazby_UredniVazbyIds)})";
             }
+
             string sql =
                 $@"select vazbakIco, vazbakOsobaId, datumOd, datumDo, typVazby, pojmenovaniVazby, podil from OsobaVazby 
                             where osobaId = @osobaId 
@@ -185,11 +197,12 @@ namespace HlidacStatu.Repositories
             {
                 var navazaneOsoby = db.OsobaVazby.AsNoTracking()
                     .Where(m => m.OsobaId == person.InternalId
-                        && m.VazbakOsobaId != null
+                                && m.VazbakOsobaId != null
                     )
                     .ToArray() //get data from DB
-                               //filter by date
-                    .Where(o => Devmasters.DT.Util.IsOverlappingIntervals(datumOd, datumDo, o.DatumOd, o.DatumDo) == true)
+                    //filter by date
+                    .Where(o => Devmasters.DT.Util.IsOverlappingIntervals(datumOd, datumDo, o.DatumOd, o.DatumDo) ==
+                                true)
                     .ToList();
 
 
@@ -204,10 +217,15 @@ namespace HlidacStatu.Repositories
                         if (!excludeOsobaId.Contains(ov.VazbakOsobaId.Value))
                         {
                             Osoba o = Osoby.GetById.Get(ov.VazbakOsobaId.Value);
-                            excludeOsobaId = excludeOsobaId.Union(new int[] { ov.VazbakOsobaId.Value, ov.OsobaId }); //pridej obe osoby pro zamezeni kruhu pri vzajemnem provazani
-                            var rel = vsechnyDcerineVazbyInternal(o, charakterVazby, level + 1, true, parentRelFound,
+                            excludeOsobaId =
+                                excludeOsobaId.Union(new int[]
+                                {
+                                    ov.VazbakOsobaId.Value, ov.OsobaId
+                                }); //pridej obe osoby pro zamezeni kruhu pri vzajemnem provazani
+                            var rel = VsechnyDcerineVazbyInternal(o, charakterVazby, level + 1, true, parentRelFound,
                                 excludeOsobaId: excludeOsobaId);
-                            relForConnectedPersons = HlidacStatu.DS.Graphs.Graph.Edge.Merge(relForConnectedPersons, rel);
+                            relForConnectedPersons =
+                                HlidacStatu.DS.Graphs.Graph.Edge.Merge(relForConnectedPersons, rel);
                         }
                     }
             }
@@ -242,9 +260,12 @@ namespace HlidacStatu.Repositories
         public static List<HlidacStatu.DS.Graphs.Graph.Edge> Holding(string ico, DateTime datumOd, DateTime datumDo,
             Relation.AktualnostType aktualnost)
         {
-            var vazby = vsechnyDcerineVazbyInternal(ico, Relation.CharakterVazbyEnum.VlastnictviKontrola, 9, true, null, datumOd: datumOd, datumDo: datumDo);
-            var parents = GetParentRelations(ico, Relation.CharakterVazbyEnum.VlastnictviKontrola, vazby, 0, datumOd, datumDo);
-            var rootNode = new HlidacStatu.DS.Graphs.Graph.Node() { Id = ico, Type = HlidacStatu.DS.Graphs.Graph.Node.NodeType.Company };
+            var vazby = VsechnyDcerineVazbyInternal(ico, Relation.CharakterVazbyEnum.VlastnictviKontrola, 9, true, null,
+                datumOd: datumOd, datumDo: datumDo);
+            var parents = GetParentRelations(ico, Relation.CharakterVazbyEnum.VlastnictviKontrola, vazby, 0, datumOd,
+                datumDo);
+            var rootNode = new HlidacStatu.DS.Graphs.Graph.Node()
+                { Id = ico, Type = HlidacStatu.DS.Graphs.Graph.Node.NodeType.Company };
             if (parents?.Count() > 0)
             {
                 if (vazby.Any(m => m.Root))
@@ -359,7 +380,7 @@ namespace HlidacStatu.Repositories
                                     && rr.fromDate <= r.fromDate
                                     && (rr.toDate >= r.toDate || rr.toDate.HasValue == false)
                                 )
-                            )
+                               )
                             {
                                 //skip
                             }
@@ -370,7 +391,6 @@ namespace HlidacStatu.Repositories
                 }
 
 
-
                 foreach (AngazovanostData ang in filteredRels.OrderBy(m => m.kod_ang))
                 {
                     if (
@@ -378,11 +398,10 @@ namespace HlidacStatu.Repositories
                         100) //souhrny (casove) vztah, zkontroluj, zda uz tam neni jiny vztah se stejnym rozsahem doby
                     {
                         if (
-                            relations.Any(
-                                r => r.To.Id == ang.subjId
-                                     && r.To.Type == ang.NodeType
-                                     && r.RelFrom == ang.fromDate
-                                     && r.RelTo == ang.toDate
+                            relations.Any(r => r.To.Id == ang.subjId
+                                               && r.To.Type == ang.NodeType
+                                               && r.RelFrom == ang.fromDate
+                                               && r.RelTo == ang.toDate
                             )
                         )
                             continue;
@@ -438,7 +457,7 @@ namespace HlidacStatu.Repositories
                 {
                     //old
                     deeperRels.AddRange(
-                        vsechnyDcerineVazbyInternal(rel.To.Id, charakterVazby, level, goDeep, rel,
+                        VsechnyDcerineVazbyInternal(rel.To.Id, charakterVazby, level, goDeep, rel,
                             excludeICO.AddItem(new ExcludeData(rel)),
                             rel.RelFrom, rel.RelTo, minPodil)
                     );
@@ -456,7 +475,8 @@ namespace HlidacStatu.Repositories
             return relationsWithLongestEdges;
         }
 
-        private static HlidacStatu.DS.Graphs.Graph.Edge AngazovanostDataToEdge(AngazovanostData ang, HlidacStatu.DS.Graphs.Graph.Node fromNode, HlidacStatu.DS.Graphs.Graph.Node toNode, int distance)
+        private static HlidacStatu.DS.Graphs.Graph.Edge AngazovanostDataToEdge(AngazovanostData ang,
+            HlidacStatu.DS.Graphs.Graph.Node fromNode, HlidacStatu.DS.Graphs.Graph.Node toNode, int distance)
         {
             var rel = new HlidacStatu.DS.Graphs.Graph.Edge();
             rel.From = fromNode;
@@ -479,16 +499,18 @@ namespace HlidacStatu.Repositories
             return rel;
         }
 
-        private static Tuple<HlidacStatu.DS.Graphs.Relation.RelationSimpleEnum, string> AngazovanostDataToRelationSimple(AngazovanostData ang)
+        private static Tuple<HlidacStatu.DS.Graphs.Relation.RelationSimpleEnum, string>
+            AngazovanostDataToRelationSimple(AngazovanostData ang)
         {
-            HlidacStatu.DS.Graphs.Relation.RelationSimpleEnum relRelationship = HlidacStatu.DS.Graphs.Relation.RelationSimpleEnum.Jiny;
+            HlidacStatu.DS.Graphs.Relation.RelationSimpleEnum relRelationship =
+                HlidacStatu.DS.Graphs.Relation.RelationSimpleEnum.Jiny;
             string descr = ang.descr;
             /*
        3  - prokura
-       4  - člen dozorčí rady    
-       24 - spolecnik       
+       4  - člen dozorčí rady
+       24 - spolecnik
        5  - Jediný akcionář
-       1 - jednatel        
+       1 - jednatel
     */
 
 
@@ -573,17 +595,20 @@ namespace HlidacStatu.Repositories
             return new Tuple<HlidacStatu.DS.Graphs.Relation.RelationSimpleEnum, string>(relRelationship, descr);
         }
 
-        public static IEnumerable<HlidacStatu.DS.Graphs.Graph.Edge> GetDirectParentRelationsFirmy(string ico, Relation.CharakterVazbyEnum charakterVazby)
+        public static IEnumerable<HlidacStatu.DS.Graphs.Graph.Edge> GetDirectParentRelationsFirmy(string ico,
+            Relation.CharakterVazbyEnum charakterVazby)
         {
             var charakterVazbyQuery = "";
             if (charakterVazby == Relation.CharakterVazbyEnum.VlastnictviKontrola)
             {
-                charakterVazbyQuery = $"and typVazby not in ({string.Join(",", Relation.CharakterVazby_UredniVazbyIds)})";
+                charakterVazbyQuery =
+                    $"and typVazby not in ({string.Join(",", Relation.CharakterVazby_UredniVazbyIds)})";
             }
             else if (charakterVazby == Relation.CharakterVazbyEnum.Uredni)
             {
                 charakterVazbyQuery = $"and typVazby in ({string.Join(",", Relation.CharakterVazby_UredniVazbyIds)})";
             }
+
             string sql = @"select ICO, vazbakIco, datumOd, datumDo, typVazby, pojmenovaniVazby, podil from FirmaVazby 
             where vazbakico=@ico 
         ";
@@ -624,8 +649,10 @@ namespace HlidacStatu.Repositories
                 {
                     AngazovanostData ang = parents[i];
                     var rel = AngazovanostDataToEdge(ang,
-                        new HlidacStatu.DS.Graphs.Graph.Node() { Type = HlidacStatu.DS.Graphs.Graph.Node.NodeType.Company, Id = ang.subjId },
-                        new HlidacStatu.DS.Graphs.Graph.Node() { Type = HlidacStatu.DS.Graphs.Graph.Node.NodeType.Company, Id = ico },
+                        new HlidacStatu.DS.Graphs.Graph.Node()
+                            { Type = HlidacStatu.DS.Graphs.Graph.Node.NodeType.Company, Id = ang.subjId },
+                        new HlidacStatu.DS.Graphs.Graph.Node()
+                            { Type = HlidacStatu.DS.Graphs.Graph.Node.NodeType.Company, Id = ico },
                         -1
                     );
                     ret.Add(rel);
@@ -678,8 +705,12 @@ namespace HlidacStatu.Repositories
                 {
                     AngazovanostData ang = parents[i];
                     var rel = AngazovanostDataToEdge(ang,
-                        new HlidacStatu.DS.Graphs.Graph.Node() { Type = HlidacStatu.DS.Graphs.Graph.Node.NodeType.Person, Id = ang.subjId },
-                        new HlidacStatu.DS.Graphs.Graph.Node() { Type = HlidacStatu.DS.Graphs.Graph.Node.NodeType.Person, Id = osobaInternalId.ToString() },
+                        new HlidacStatu.DS.Graphs.Graph.Node()
+                            { Type = HlidacStatu.DS.Graphs.Graph.Node.NodeType.Person, Id = ang.subjId },
+                        new HlidacStatu.DS.Graphs.Graph.Node()
+                        {
+                            Type = HlidacStatu.DS.Graphs.Graph.Node.NodeType.Person, Id = osobaInternalId.ToString()
+                        },
                         -1
                     );
 
@@ -733,8 +764,10 @@ namespace HlidacStatu.Repositories
                 {
                     AngazovanostData ang = parents[i];
                     var rel = AngazovanostDataToEdge(ang,
-                        new HlidacStatu.DS.Graphs.Graph.Node() { Type = HlidacStatu.DS.Graphs.Graph.Node.NodeType.Person, Id = ang.subjId },
-                        new HlidacStatu.DS.Graphs.Graph.Node() { Type = HlidacStatu.DS.Graphs.Graph.Node.NodeType.Person, Id = ico },
+                        new HlidacStatu.DS.Graphs.Graph.Node()
+                            { Type = HlidacStatu.DS.Graphs.Graph.Node.NodeType.Person, Id = ang.subjId },
+                        new HlidacStatu.DS.Graphs.Graph.Node()
+                            { Type = HlidacStatu.DS.Graphs.Graph.Node.NodeType.Person, Id = ico },
                         -1
                     );
 
@@ -755,12 +788,14 @@ namespace HlidacStatu.Repositories
             var charakterVazbyQuery = "";
             if (charakterVazby == Relation.CharakterVazbyEnum.VlastnictviKontrola)
             {
-                charakterVazbyQuery = $"and typVazby not in ({string.Join(",", Relation.CharakterVazby_UredniVazbyIds)})";
+                charakterVazbyQuery =
+                    $"and typVazby not in ({string.Join(",", Relation.CharakterVazby_UredniVazbyIds)})";
             }
             else if (charakterVazby == Relation.CharakterVazbyEnum.Uredni)
             {
                 charakterVazbyQuery = $"and typVazby in ({string.Join(",", Relation.CharakterVazby_UredniVazbyIds)})";
             }
+
             string sql = @$"select ico, vazbakIco, datumOd, datumDo, typVazby, pojmenovaniVazby, podil from Firmavazby 
             where vazbakico=@ico 
             {charakterVazbyQuery}
@@ -769,7 +804,8 @@ namespace HlidacStatu.Repositories
 
             string cnnStr = Config.GetWebConfigValue("OldEFSqlConnection");
 
-            List<HlidacStatu.DS.Graphs.Graph.Edge> relations = currRelations?.ToList() ?? new List<HlidacStatu.DS.Graphs.Graph.Edge>();
+            List<HlidacStatu.DS.Graphs.Graph.Edge> relations =
+                currRelations?.ToList() ?? new List<HlidacStatu.DS.Graphs.Graph.Edge>();
             //get zakladni informace o subj.
 
             //find politician in the DB
@@ -793,7 +829,7 @@ namespace HlidacStatu.Repositories
 
                 foreach (var parentIco in parentIcos)
                 {
-                    var parentRels = vsechnyDcerineVazbyInternal(parentIco,
+                    var parentRels = VsechnyDcerineVazbyInternal(parentIco,
                         charakterVazby,
                         0, true, null,
                         new ExcludeDataCol() { items = relations?.Select(m => new ExcludeData(m)).ToList() }
@@ -820,7 +856,8 @@ namespace HlidacStatu.Repositories
 
                 foreach (var parentIco in parentIcos)
                 {
-                    var parents = GetParentRelations(parentIco, charakterVazby, relations, distance + 1, datumOd, datumDo);
+                    var parents = GetParentRelations(parentIco, charakterVazby, relations, distance + 1, datumOd,
+                        datumDo);
                     relations.AddRange(parents);
                 }
 
@@ -867,12 +904,12 @@ namespace HlidacStatu.Repositories
             {
                 if (newI.from.HasValue && to.HasValue
                                        && to < newI.from
-                )
+                   )
                     return false;
 
                 if (newI.to.HasValue && from.HasValue
                                      && from > newI.to
-                )
+                   )
                     return false;
 
                 if (newI.from == null && newI.to == null)
@@ -965,7 +1002,8 @@ namespace HlidacStatu.Repositories
         }
 
 
-        public static async Task<string> TiskVazebAsync(string rootName, HlidacStatu.DS.Graphs.Graph.Edge origRoot, IEnumerable<HlidacStatu.DS.Graphs.Graph.Edge> vazby, Relation.TiskEnum typ, bool withStats = true)
+        public static async Task<string> TiskVazebAsync(string rootName, HlidacStatu.DS.Graphs.Graph.Edge origRoot,
+            IEnumerable<HlidacStatu.DS.Graphs.Graph.Edge> vazby, Relation.TiskEnum typ, bool withStats = true)
         {
             string htmlTemplate = "<ul id='nestedlist'><li>{0}</li>{1}</ul>";
             string textTemplate = "{0}\n|\n{1}";
@@ -974,37 +1012,49 @@ namespace HlidacStatu.Repositories
             switch (typ)
             {
                 case Relation.TiskEnum.Text:
-                    return string.Format(textTemplate, rootName, await PrintFlatRelationsAsync(origRoot, (HlidacStatu.DS.Graphs.Graph.Edge)null, 0, vazby, typ, null, withStats));
+                    return string.Format(textTemplate, rootName,
+                        await PrintFlatRelationsAsync(origRoot, (HlidacStatu.DS.Graphs.Graph.Edge)null, 0, vazby, typ,
+                            null, withStats));
                 case Relation.TiskEnum.Html:
-                    return string.Format(htmlTemplate, rootName, await PrintFlatRelationsAsync(origRoot, (HlidacStatu.DS.Graphs.Graph.Edge)null, 0, vazby, typ, null, withStats));
+                    return string.Format(htmlTemplate, rootName,
+                        await PrintFlatRelationsAsync(origRoot, (HlidacStatu.DS.Graphs.Graph.Edge)null, 0, vazby, typ,
+                            null, withStats));
                 case Relation.TiskEnum.Json:
-                    return string.Format(jsonTemplate, rootName, await PrintFlatRelationsAsync(origRoot, (HlidacStatu.DS.Graphs.Graph.Edge)null, 0, vazby, typ, null, withStats));
+                    return string.Format(jsonTemplate, rootName,
+                        await PrintFlatRelationsAsync(origRoot, (HlidacStatu.DS.Graphs.Graph.Edge)null, 0, vazby, typ,
+                            null, withStats));
                 case Relation.TiskEnum.Checkbox:
-                    return string.Format(checkboxTemplate, rootName, await PrintFlatRelationsAsync(origRoot, (HlidacStatu.DS.Graphs.Graph.Edge)null, 0, vazby, typ, null, withStats));
+                    return string.Format(checkboxTemplate, rootName,
+                        await PrintFlatRelationsAsync(origRoot, (HlidacStatu.DS.Graphs.Graph.Edge)null, 0, vazby, typ,
+                            null, withStats));
                 default:
                     return string.Empty;
             }
-
         }
 
-        private static async Task<string> PrintFlatRelationsAsync(HlidacStatu.DS.Graphs.Graph.Edge origRoot, HlidacStatu.DS.Graphs.Graph.Edge parent, int level, IEnumerable<HlidacStatu.DS.Graphs.Graph.Edge> relations, Relation.TiskEnum typ,
-           List<string> renderedIds, bool withStats = true, string highlightSubjId = null)
+        private static async Task<string> PrintFlatRelationsAsync(HlidacStatu.DS.Graphs.Graph.Edge origRoot,
+            HlidacStatu.DS.Graphs.Graph.Edge parent, int level, IEnumerable<HlidacStatu.DS.Graphs.Graph.Edge> relations,
+            Relation.TiskEnum typ,
+            List<string> renderedIds, bool withStats = true, string highlightSubjId = null)
         {
             if (parent == null)
-                return await PrintFlatRelationsAsync(origRoot, (HlidacStatu.DS.Graphs.Graph.MergedEdge)null, level, relations, typ,
+                return await PrintFlatRelationsAsync(origRoot, (HlidacStatu.DS.Graphs.Graph.MergedEdge)null, level,
+                    relations, typ,
                     renderedIds, withStats, highlightSubjId);
             else
-                return await PrintFlatRelationsAsync(origRoot, new HlidacStatu.DS.Graphs.Graph.MergedEdge(parent), level, relations, typ,
-                renderedIds, withStats, highlightSubjId);
+                return await PrintFlatRelationsAsync(origRoot, new HlidacStatu.DS.Graphs.Graph.MergedEdge(parent),
+                    level, relations, typ,
+                    renderedIds, withStats, highlightSubjId);
         }
 
-        private static async Task<string> PrintFlatRelationsAsync(HlidacStatu.DS.Graphs.Graph.Edge origRoot, HlidacStatu.DS.Graphs.Graph.MergedEdge parent, int level,
+        private static async Task<string> PrintFlatRelationsAsync(HlidacStatu.DS.Graphs.Graph.Edge origRoot,
+            HlidacStatu.DS.Graphs.Graph.MergedEdge parent, int level,
             IEnumerable<HlidacStatu.DS.Graphs.Graph.Edge> relations, Relation.TiskEnum typ,
-       List<string> renderedIds, bool withStats = true, string highlightSubjId = null)
+            List<string> renderedIds, bool withStats = true, string highlightSubjId = null)
         {
             int space = 2;
-            string horizLine = "--";//new string('\u2500',2);
-            string vertLine = "|";//new string('\u2502',1);
+            string horizLine = "--"; //new string('\u2500',2);
+            string vertLine = "|"; //new string('\u2502',1);
             string cross = "+"; //new string('\u251C', 1);
 
             if (renderedIds == null)
@@ -1023,7 +1073,8 @@ namespace HlidacStatu.Repositories
                 .Distinct()
                 .GroupBy(k => new { id = k.To.UniqId, type = k.To.Type }, (k, v) =>
                 {
-                    HlidacStatu.DS.Graphs.Graph.MergedEdge withChildren = HlidacStatu.DS.Graphs.Graph.Edge.MergeSameEdges(v);
+                    HlidacStatu.DS.Graphs.Graph.MergedEdge withChildren =
+                        HlidacStatu.DS.Graphs.Graph.Edge.MergeSameEdges(v);
                     if (withChildren == null)
                         withChildren = new HlidacStatu.DS.Graphs.Graph.MergedEdge(v.First());
 
@@ -1048,6 +1099,7 @@ namespace HlidacStatu.Repositories
                 case Relation.TiskEnum.Json:
                     break;
             }
+
             for (int i = 0; i < rels.Count(); i++)
             {
                 var rel = rels[i];
@@ -1057,7 +1109,8 @@ namespace HlidacStatu.Repositories
                 var last = i == (rels.Count() - 1);
                 StatisticsSubjectPerYear<Smlouva.Statistics.Data> stat = null;
                 if (withStats && rel.To.Type == HlidacStatu.DS.Graphs.Graph.Node.NodeType.Company)
-                    stat = await Firmy.Get(rel.To.Id).StatistikaRegistruSmluvAsync(); //new Analysis.SubjectStatistic(rel.To.Id);
+                    stat = await Firmy.Get(rel.To.Id)
+                        .StatistikaRegistruSmluvAsync(); //new Analysis.SubjectStatistic(rel.To.Id);
 
                 string subjId = rel.To.Type == HlidacStatu.DS.Graphs.Graph.Node.NodeType.Company ? rel.To.Id : "Osoba";
                 string subjName = rel.To.PrintName();
@@ -1071,57 +1124,71 @@ namespace HlidacStatu.Repositories
                                 Enumerable.Repeat(
                                     vertLine + new string(' ', space)
                                     , (level))
-                                    )
-                                );
+                            )
+                        );
                         if (rel.To.Highlighted)
                             subjName = string.Format("!!{0}!!", subjName);
 
                         sb.AppendFormat("{0}{1}:{2} {3}\n",
-                                cross + horizLine + " ",
-                                subjId,
-                                subjName,
-                                rel.Doba()
-                                );
-                        sb.Append(await PrintFlatRelationsAsync(origRoot, rel, level + 1, relations, typ, renderedIds, withStats));
+                            cross + horizLine + " ",
+                            subjId,
+                            subjName,
+                            rel.Doba()
+                        );
+                        sb.Append(await PrintFlatRelationsAsync(origRoot, rel, level + 1, relations, typ, renderedIds,
+                            withStats));
                         break;
                     case Relation.TiskEnum.Html:
                         if (withStats && stat != null)
-                            sb.AppendFormat("<li class='{3} {6}'><a href='/subjekt/{0}'>{0}:{1}</a>{7}; {4}, celkem {5}. {2}</li>",
+                            sb.AppendFormat(
+                                "<li class='{3} {6}'><a href='/subjekt/{0}'>{0}:{1}</a>{7}; {4}, celkem {5}. {2}</li>",
                                 subjId,
                                 subjName,
-                                await PrintFlatRelationsAsync(origRoot, rel, level + 1, relations, typ, renderedIds, withStats),
+                                await PrintFlatRelationsAsync(origRoot, rel, level + 1, relations, typ, renderedIds,
+                                    withStats),
                                 last ? "" : "connect",
-                                Devmasters.Lang.CS.Plural.Get(stat.Summary().PocetSmluv, Util.Consts.csCulture, "{0} smlouva", "{0} smlouvy", "{0} smluv"),
+                                Devmasters.Lang.CS.Plural.Get(stat.Summary().PocetSmluv, Util.Consts.csCulture,
+                                    "{0} smlouva", "{0} smlouvy", "{0} smluv"),
                                 Smlouva.NicePrice(stat.Summary().CelkovaHodnotaSmluv, html: true, shortFormat: true),
                                 "aktualnost" + ((int)rel.Aktualnost).ToString(),
-                                (rel.Aktualnost < Relation.AktualnostType.Aktualni) ? rel.Doba(format: "/{0}/") : string.Empty
+                                (rel.Aktualnost < Relation.AktualnostType.Aktualni)
+                                    ? rel.Doba(format: "/{0}/")
+                                    : string.Empty
                             );
                         else
-                            sb.AppendFormat("<li class='{3} {4}'><a href='/subjekt/{0}'><span class=''>{0}:{1}</span></a>{5}.  {2}</li>",
+                            sb.AppendFormat(
+                                "<li class='{3} {4}'><a href='/subjekt/{0}'><span class=''>{0}:{1}</span></a>{5}.  {2}</li>",
                                 subjId,
                                 subjName,
-                                await PrintFlatRelationsAsync(origRoot, rel, level + 1, relations, typ, renderedIds, withStats),
+                                await PrintFlatRelationsAsync(origRoot, rel, level + 1, relations, typ, renderedIds,
+                                    withStats),
                                 last ? "" : "connect",
                                 "aktualnost" + ((int)rel.Aktualnost).ToString(),
-                                (rel.Aktualnost < Relation.AktualnostType.Aktualni) ? rel.Doba(format: "/{0}/") : string.Empty,
-                                (!string.IsNullOrEmpty(highlightSubjId) && subjId == highlightSubjId) ? "highlighted" : ""
+                                (rel.Aktualnost < Relation.AktualnostType.Aktualni)
+                                    ? rel.Doba(format: "/{0}/")
+                                    : string.Empty,
+                                (!string.IsNullOrEmpty(highlightSubjId) && subjId == highlightSubjId)
+                                    ? "highlighted"
+                                    : ""
                             );
 
                         break;
                     case Relation.TiskEnum.Checkbox:
-                        sb.AppendFormat(@"<li class=""{0} {1}""><input type=""checkbox"" name=""ico"" value=""{2}"" /> <span><b>{2}</b> {3}</span>{4}</li>"
-                        , (last ? "" : "connect"),
-                        ("aktualnost" + ((int)rel.Aktualnost).ToString()),
-                        subjId, subjName,
-                        await PrintFlatRelationsAsync(origRoot, rel, level + 1, relations, typ, renderedIds, withStats)
+                        sb.AppendFormat(
+                            @"<li class=""{0} {1}""><input type=""checkbox"" name=""ico"" value=""{2}"" /> <span><b>{2}</b> {3}</span>{4}</li>"
+                            , (last ? "" : "connect"),
+                            ("aktualnost" + ((int)rel.Aktualnost).ToString()),
+                            subjId, subjName,
+                            await PrintFlatRelationsAsync(origRoot, rel, level + 1, relations, typ, renderedIds,
+                                withStats)
                         );
 
                         break;
                     case Relation.TiskEnum.Json:
                         break;
                 }
-
             }
+
             switch (typ)
             {
                 case Relation.TiskEnum.Text:
@@ -1160,8 +1227,10 @@ namespace HlidacStatu.Repositories
 
             foreach (var i in data)
             {
-                sb.AppendFormat($"{i.From?.Id}\t{i.From?.PrintName()}\t{i.To?.Id}\t{i.To?.PrintName()}\t{i.RelFrom?.ToShortDateString() ?? "Ø"}\t{i.RelTo?.ToShortDateString() ?? "Ø"}\t{i.Descr}\n");
+                sb.AppendFormat(
+                    $"{i.From?.Id}\t{i.From?.PrintName()}\t{i.To?.Id}\t{i.To?.PrintName()}\t{i.RelFrom?.ToShortDateString() ?? "Ø"}\t{i.RelTo?.ToShortDateString() ?? "Ø"}\t{i.Descr}\n");
             }
+
             return sb.ToString();
         }
 
@@ -1180,6 +1249,7 @@ namespace HlidacStatu.Repositories
                 {
                     nodes.Add(i.From.UniqId, new Graph.GraphJson(i.From, i.Distance - 1, i.Distance == 0));
                 }
+
                 if (i.To != null && !nodes.ContainsKey(i.To.UniqId))
                     nodes.Add(i.To.UniqId, new Graph.GraphJson(i.To, i.Distance));
             }
@@ -1193,7 +1263,7 @@ namespace HlidacStatu.Repositories
             };
             return Newtonsoft.Json.JsonConvert.SerializeObject(ret);
         }
-        
+
         public static string PrintName(this HlidacStatu.DS.Graphs.Graph.Node node, bool html = false)
         {
             switch (node.Type)

@@ -20,7 +20,7 @@ namespace HlidacStatu.Repositories
 
             public static readonly IRule[] Irules = new IRule[]
             {
-                new OsobaId(HlidacStatu.Repositories.OsobaVazbyRepo.Icos_s_VazbouNaOsobu, "osobaid:", "ico:"),
+                new OsobaId(HlidacStatu.Repositories.OsobaVazbyRepo.Icos_s_VazbouNaOsobuAsync, "osobaid:", "ico:"),
                 new Holding(HlidacStatu.Repositories.FirmaVazbyRepo.IcosInHolding, null, "ico:"),
                 //(prijemce.jmeno:${q} OR prijemce.obchodniJmeno:${q})
                 new TransformPrefixWithValue("ico:", "(recipient.ico:${q} OR subsidyProviderIco:${q})",null),
@@ -53,16 +53,16 @@ namespace HlidacStatu.Repositories
                 return Irules.SelectMany(m => m.Prefixes).Distinct().ToArray();
             }
 
-            public static QueryContainer GetSimpleQuery(string query)
+            public static Task<QueryContainer> GetSimpleQueryAsync(string query)
             {
-                return GetSimpleQuery(new DotaceSearchResult() { Q = query, Page = 1 });
+                return GetSimpleQueryAsync(new DotaceSearchResult() { Q = query, Page = 1 });
             }
 
-            public static QueryContainer GetSimpleQuery(DotaceSearchResult searchdata)
+            public static async Task<QueryContainer> GetSimpleQueryAsync(DotaceSearchResult searchdata)
             {
                 var query = searchdata.Q;
 
-                var qc = SimpleQueryCreator.GetSimpleQuery<Dotace>(query, Irules);
+                var qc = await SimpleQueryCreator.GetSimpleQueryAsync<Dotace>(query, Irules);
 
                 return qc;
             }
@@ -107,12 +107,13 @@ namespace HlidacStatu.Repositories
                 ISearchResponse<Dotace> res = null;
                 try
                 {
+                    var sq = await GetSimpleQueryAsync(search);
                     var client = Manager.GetESClient_Dotace();
                     res = await client.SearchAsync<Dotace>(s => s
                             .Size(search.PageSize)
                             .ExpandWildcards(Elasticsearch.Net.ExpandWildcards.All)
                             .From(page * search.PageSize)
-                            .Query(q => GetSimpleQuery(search))
+                            .Query(q => sq)
                             .Sort(ss => GetSort(search.Order))
                             .Highlight(h => Repositories.Searching.Tools.GetHighlight<Dotace>(withHighlighting))
                             .Aggregations(aggr => anyAggregation)
@@ -128,7 +129,7 @@ namespace HlidacStatu.Repositories
                                 .Size(search.PageSize)
                                 .ExpandWildcards(Elasticsearch.Net.ExpandWildcards.All)
                                 .From(page * search.PageSize)
-                                .Query(q => GetSimpleQuery(search))
+                                .Query(q => sq)
                                 .Sort(ss => GetSort(search.Order))
                                 .Highlight(h => Repositories.Searching.Tools.GetHighlight<Dotace>(false))
                                 .Aggregations(aggr => anyAggregation)

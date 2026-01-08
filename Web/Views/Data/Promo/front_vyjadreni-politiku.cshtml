@@ -4,6 +4,7 @@
 @using HlidacStatu.Datasets
 @using HlidacStatu.Entities
 @using HlidacStatu.Repositories
+@using HlidacStatu.Repositories.Cache
 
 @{
     Layout = null;
@@ -100,10 +101,15 @@
             @{
                 first = true;
                 var oPolitici = new Dictionary<Osoba, StatsAggregate>();
-                oPolitici = politici
-                    .Select(m => new { o = Osoby.GetByNameId.Get(m.Key), s = m.Value })
-                    .Where(m => m.o != null)
-                    .ToDictionary(k => k.o, v => v.s);
+
+                foreach (var statsAgregate in politici)
+                {
+                    var o = await OsobaCache.GetPersonByNameIdAsync(statsAgregate.Key);
+                    if (o is not null)
+                    {
+                        oPolitici.TryAdd(o, statsAgregate.Value);
+                    }
+                }
             }
             @foreach (var chunk in oPolitici
                 .OrderBy(m => m.Key.Prijmeni).ThenBy(m => m.Key.Jmeno)

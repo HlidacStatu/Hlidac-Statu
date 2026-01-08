@@ -20,7 +20,7 @@ public static class Common
             {
                 var donor = personDonations.Key;
 
-                Osoba osoba = OsobaRepo.GetOrCreateNew(donor.TitleBefore, donor.Name, donor.Surname, donor.TitleAfter,
+                Osoba osoba = await OsobaRepo.GetOrCreateNewAsync(donor.TitleBefore, donor.Name, donor.Surname, donor.TitleAfter,
                                                    donor.DateOfBirth, Osoba.StatusOsobyEnum.Sponzor, user);
 
                 // Výjimka pro Radek Jonke 24.12.1970

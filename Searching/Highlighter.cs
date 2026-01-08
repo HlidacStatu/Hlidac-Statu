@@ -1,7 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-
-namespace HlidacStatu.Searching
+﻿namespace HlidacStatu.Searching
 {
 
     public class Highlighter

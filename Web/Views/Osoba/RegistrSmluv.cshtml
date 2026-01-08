@@ -140,7 +140,7 @@
 
                 </td>
                 <td>
-                    @Html.RenderVazby(Model.VazbyProICO(ico))
+                    @Html.RenderVazby(await OsobaVazbyRepo.VazbyProIcoCachedAsync(Model, ico))
                 </td>
             </tr>
         }

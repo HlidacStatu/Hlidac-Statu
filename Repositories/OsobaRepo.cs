@@ -24,14 +24,16 @@ namespace HlidacStatu.Repositories
         private static readonly ILogger _logger = Log.ForContext(typeof(OsobaRepo));
         
 
-        public static Osoba GetOrCreateNew(string titulPred, string jmeno, string prijmeni, string titulPo,
+        public static async Task<Osoba> GetOrCreateNewAsync(string titulPred, string jmeno, string prijmeni, string titulPo,
             DateTime? narozeni, Osoba.StatusOsobyEnum status, string user, DateTime? umrti = null)
         {
-            var p = new Osoba();
-            p.TitulPred = Osoba.NormalizeTitul(titulPred, true);
-            p.TitulPo = Osoba.NormalizeTitul(titulPo, false);
-            p.Jmeno = Osoba.NormalizeJmeno(jmeno);
-            p.Prijmeni = Osoba.NormalizePrijmeni(prijmeni);
+            var p = new Osoba
+            {
+                TitulPred = Osoba.NormalizeTitul(titulPred, true),
+                TitulPo = Osoba.NormalizeTitul(titulPo, false),
+                Jmeno = Osoba.NormalizeJmeno(jmeno),
+                Prijmeni = Osoba.NormalizePrijmeni(prijmeni)
+            };
 
             //try to create name from surnames
             if (string.IsNullOrWhiteSpace(p.Jmeno) && !string.IsNullOrWhiteSpace(p.Prijmeni))
@@ -53,12 +55,12 @@ namespace HlidacStatu.Repositories
             {
                 p.Umrti = umrti;
                 p.Status = (int)status;
-                Save(p);
+                await SaveAsync(p);
                 AuditRepo.Add(Audit.Operations.Create, user, p, null);
                 return p;
             }
 
-            var exiO = Searching.GetByName(p.Jmeno, p.Prijmeni, narozeni.Value);
+            var exiO = await Searching.GetByNameAsync(p.Jmeno, p.Prijmeni, narozeni.Value);
 
 
             if (exiO == null)
@@ -66,7 +68,7 @@ namespace HlidacStatu.Repositories
                 p.Umrti = umrti;
                 p.Status = (int)status;
                 p.Narozeni = narozeni;
-                Save(p);
+                await SaveAsync(p);
                 AuditRepo.Add(Audit.Operations.Create, user, p, null);
                 return p;
             }
@@ -128,7 +130,7 @@ namespace HlidacStatu.Repositories
         }
 
 
-        public static string GetUniqueNamedId(Osoba osoba)
+        public static async Task<string> GetUniqueNamedIdAsync(Osoba osoba)
         {
             if (string.IsNullOrWhiteSpace(osoba.JmenoAscii) || string.IsNullOrWhiteSpace(osoba.PrijmeniAscii))
                 return "";
@@ -147,31 +149,31 @@ namespace HlidacStatu.Repositories
             Osoba exists = null;
             int num = 0;
             string checkUniqueName = basic;
-            using (DbEntities db = new DbEntities())
+            
+            await using DbEntities db = new DbEntities();
+            do
             {
-                do
+                exists = await db.Osoba.AsNoTracking()
+                    .Where(m => m.NameId.StartsWith(checkUniqueName))
+                    .OrderByDescending(m => m.NameId)
+                    .FirstOrDefaultAsync();
+                
+                if (exists != null)
                 {
-                    exists = db.Osoba.AsQueryable()
-                        .Where(m => m.NameId.StartsWith(checkUniqueName))
-                        .OrderByDescending(m => m.NameId)
-                        .FirstOrDefault();
-                    if (exists != null)
+                    Regex r = new Regex(
+                        @"(?<num>\d{1,})$", RegexOptions.IgnorePatternWhitespace);
+                    var m = r.Match(exists.NameId);
+                    if (m.Success)
                     {
-                        Regex r = new Regex(
-                            @"(?<num>\d{1,})$", RegexOptions.IgnorePatternWhitespace);
-                        var m = r.Match(exists.NameId);
-                        if (m.Success)
-                        {
-                            num = Convert.ToInt32(m.Groups["num"].Value);
-                        }
-
-                        num++;
-                        checkUniqueName = basic + "-" + num.ToString();
+                        num = Convert.ToInt32(m.Groups["num"].Value);
                     }
-                    else
-                        return checkUniqueName;
-                } while (exists != null);
-            }
+
+                    num++;
+                    checkUniqueName = basic + "-" + num.ToString();
+                }
+                else
+                    return checkUniqueName;
+            } while (exists != null);
 
             return basic;
         }
@@ -182,208 +184,188 @@ namespace HlidacStatu.Repositories
         /// <param name="osoba"></param>
         /// <param name="externalIds"></param>
         /// <returns></returns>
-        public static Osoba Save(Osoba osoba, params OsobaExternalId[] externalIds)
+        public static async Task<Osoba> SaveAsync(Osoba osoba, params OsobaExternalId[] externalIds)
         {
-            using (DbEntities db = new DbEntities())
+            await using DbEntities db = new DbEntities();
+            osoba.JmenoAscii = osoba.Jmeno.RemoveDiacritics();
+            osoba.PrijmeniAscii = osoba.Prijmeni.RemoveDiacritics();
+            osoba.PuvodniPrijmeniAscii = osoba.PuvodniPrijmeni.RemoveDiacritics();
+
+            //trim all
+            osoba.Jmeno = osoba.Jmeno?.Trim();
+            osoba.Prijmeni = osoba.Prijmeni?.Trim();
+            osoba.PuvodniPrijmeni = osoba.PuvodniPrijmeni?.Trim();
+            osoba.TitulPred = osoba.TitulPred?.Trim();
+            osoba.TitulPo = osoba.TitulPo?.Trim();
+
+            if (string.IsNullOrEmpty(osoba.NameId))
             {
-                osoba.JmenoAscii = TextUtil.RemoveDiacritics(osoba.Jmeno);
-                osoba.PrijmeniAscii = TextUtil.RemoveDiacritics(osoba.Prijmeni);
-                osoba.PuvodniPrijmeniAscii = TextUtil.RemoveDiacritics(osoba.PuvodniPrijmeni);
+                osoba.NameId = await GetUniqueNamedIdAsync(osoba);
+            }
 
-                //trim all
-                osoba.Jmeno = osoba.Jmeno?.Trim();
-                osoba.Prijmeni = osoba.Prijmeni?.Trim();
-                osoba.PuvodniPrijmeni = osoba.PuvodniPrijmeni?.Trim();
-                osoba.TitulPred = osoba.TitulPred?.Trim();
-                osoba.TitulPo = osoba.TitulPo?.Trim();
+            osoba.LastUpdate = DateTime.Now;
 
-                if (string.IsNullOrEmpty(osoba.NameId))
+            if (osoba.Pohlavi != "f" || osoba.Pohlavi != "m")
+            {
+                osoba.Pohlavi = osoba.PohlaviCalculated();
+            }
+
+            db.Osoba.Attach(osoba);
+
+
+            db.Entry(osoba).State = osoba.InternalId == 0 ? EntityState.Added : EntityState.Modified;
+
+            try
+            {
+                await db.SaveChangesAsync();
+            }
+            catch (Exception e)
+            {
+                _logger.Error(e, $"Saving osoba {osoba.NameId}");
+            }
+
+            if (externalIds != null)
+            {
+                foreach (var ex in externalIds)
                 {
-                    osoba.NameId = GetUniqueNamedId(osoba);
-                }
-
-                osoba.LastUpdate = DateTime.Now;
-
-                if (osoba.Pohlavi != "f" || osoba.Pohlavi != "m")
-                {
-                    osoba.Pohlavi = osoba.PohlaviCalculated();
-                }
-
-                db.Osoba.Attach(osoba);
-
-
-                if (osoba.InternalId == 0)
-                {
-                    db.Entry(osoba).State = EntityState.Added;
-                }
-                else
-                    db.Entry(osoba).State = EntityState.Modified;
-
-                try
-                {
-                    db.SaveChanges();
-                }
-                catch (Exception e)
-                {
-                    _logger.Error(e, $"Saving osoba {osoba.NameId}");
-                }
-
-                if (externalIds != null)
-                {
-                    foreach (var ex in externalIds)
-                    {
-                        ex.OsobaId = osoba.InternalId;
-                        OsobaExternalRepo.Add(ex);
-                    }
+                    ex.OsobaId = osoba.InternalId;
+                    OsobaExternalRepo.Add(ex);
                 }
             }
 
             return osoba;
         }
 
-        public static Osoba GetByNameId(string nameId, bool canReturnDuplicate = false)
+        public static async Task<Osoba> GetByNameIdAsync(string nameId, bool canReturnDuplicate = false)
         {
-            using (DbEntities db = new DbEntities())
-            {
-                var osoba = db.Osoba.AsQueryable()
-                    .Where(m =>
-                        m.NameId == nameId
-                    )
-                    .FirstOrDefault();
-
-                if (canReturnDuplicate)
-                    return osoba;
-
-                return osoba?.GetOriginal();
-            }
-        }
-        
-        public static Osoba GetByNameIdTracked(DbEntities db, string nameId, bool canReturnDuplicate = false)
-        {
-            var osoba = db.Osoba.FirstOrDefault(m => m.NameId == nameId);
+            await using DbEntities db = new DbEntities();
+            var osoba = await db.Osoba.AsQueryable()
+                .Where(m =>
+                    m.NameId == nameId
+                )
+                .FirstOrDefaultAsync();
 
             if (canReturnDuplicate)
                 return osoba;
 
-            return osoba.GetOriginalTracked(db);
-        }
-
-        public static Osoba GetByInternalId(int id, bool canReturnDuplicate = false)
-        {
-            using (DbEntities db = new DbEntities())
-            {
-                return GetByInternalIdTracked(db, id, canReturnDuplicate);
-            }
+            return await osoba?.GetOriginalAsync();
         }
         
-        public static Osoba GetByInternalIdTracked(DbEntities db, int id, bool canReturnDuplicate = false)
+        public static async Task<Osoba> GetByNameIdTrackedAsync(DbEntities db, string nameId, bool canReturnDuplicate = false)
         {
-            var osoba = db.Osoba.FirstOrDefault(m => m.InternalId == id);
+            var osoba = await db.Osoba.FirstOrDefaultAsync(m => m.NameId == nameId);
+
+            if (canReturnDuplicate)
+                return osoba;
+
+            return await osoba.GetOriginalTrackedAsync(db);
+        }
+
+        public static async Task<Osoba> GetByInternalIdAsync(int id, bool canReturnDuplicate = false)
+        {
+            await using DbEntities db = new DbEntities();
+            return await GetByInternalIdTrackedAsync(db, id, canReturnDuplicate);
+        }
+        
+        public static async Task<Osoba> GetByInternalIdTrackedAsync(DbEntities db, int id, bool canReturnDuplicate = false)
+        {
+            var osoba = await db.Osoba.FirstOrDefaultAsync(m => m.InternalId == id);
 
             if (canReturnDuplicate)
                 return osoba;
             
-            return osoba.GetOriginalTracked(db);
+            return await osoba.GetOriginalTrackedAsync(db);
         }
 
-        private static Osoba GetOriginal(this Osoba osoba)
+        private static async Task<Osoba> GetOriginalAsync(this Osoba osoba)
         {
             if (osoba.Status != (int)Osoba.StatusOsobyEnum.Duplicita)
                 return osoba;
 
-            using (DbEntities db = new DbEntities())
-            {
-                return osoba?.GetOriginalTracked(db);
-            }
+            await using DbEntities db = new DbEntities();
+            return await osoba?.GetOriginalTrackedAsync(db);
         }
         
-        private static Osoba GetOriginalTracked(this Osoba osoba, DbEntities db)
+        private static async Task<Osoba> GetOriginalTrackedAsync(this Osoba osoba, DbEntities db)
         {
             while (osoba is not null && osoba.Status == (int)Osoba.StatusOsobyEnum.Duplicita)
             {
-                osoba = db.Osoba.FirstOrDefault(m => m.InternalId == osoba.OriginalId);
+                osoba = await db.Osoba.FirstOrDefaultAsync(m => m.InternalId == osoba.OriginalId);
             }
 
             return osoba;
         }
 
-        public static Osoba GetByExternalID(string exId, OsobaExternalId.Source source)
+        public static async Task<Osoba> GetByExternalIDAsync(string exId, OsobaExternalId.Source source)
         {
-            using (DbEntities db = new DbEntities())
+            await using DbEntities db = new DbEntities();
+            var oei = await db.OsobaExternalId.AsNoTracking()
+                .FirstOrDefaultAsync(m => m.ExternalId == exId && m.ExternalSource == (int)source);
+            
+            if (oei == null)
+                return null;
+            else
+                return await GetByInternalIdAsync(oei.OsobaId);
+        }
+
+        public static async Task<List<Osoba>> GetByEventAsync(Expression<Func<OsobaEvent, bool>> predicate)
+        {
+            await using DbEntities db = new DbEntities();
+            var events = db.OsobaEvent
+                .Where(predicate);
+
+            var people = db.Osoba.AsNoTracking().Where(o => events.Any(e => e.OsobaId == o.InternalId));
+
+            return await people.Distinct().ToListAsync();
+        }
+
+        public static async Task SetManualTimeStampAsync(int osobaId, string author)
+        {
+            await using DbEntities db = new DbEntities();
+            var osobaToUpdate = await db.Osoba.FirstOrDefaultAsync(m => m.InternalId == osobaId);
+
+            if (osobaToUpdate != null)
             {
-                var oei = db.OsobaExternalId.AsQueryable()
-                    .Where(m => m.ExternalId == exId && m.ExternalSource == (int)source).FirstOrDefault();
-                if (oei == null)
-                    return null;
-                else
-                    return GetByInternalId(oei.OsobaId);
+                osobaToUpdate.ManuallyUpdated = DateTime.Now;
+                osobaToUpdate.ManuallyUpdatedBy = author;
+                await db.SaveChangesAsync();
             }
         }
 
-        public static List<Osoba> GetByEvent(Expression<Func<OsobaEvent, bool>> predicate)
+        public static async Task<Osoba> UpdateAsync(Osoba osoba, string user)
         {
-            using (DbEntities db = new DbEntities())
+            await using DbEntities db = new DbEntities();
+            var osobaDb = await db.Osoba
+                .AsQueryable().FirstOrDefaultAsync(m => m.InternalId == osoba.InternalId);
+
+            if (osobaDb is null)
             {
-                var events = db.OsobaEvent
-                    .Where(predicate);
-
-                var people = db.Osoba.AsQueryable().Where(o => events.Any(e => e.OsobaId == o.InternalId));
-
-                return people.Distinct().ToList();
+                return osoba;
             }
-        }
+                
+            var osobaToUpdate = await osobaDb.GetOriginalAsync();
 
-        public static void SetManualTimeStamp(int osobaId, string author)
-        {
-            using (DbEntities db = new DbEntities())
+            var osobaOriginal = osobaToUpdate?.ShallowCopy();
+
+            if (osobaToUpdate != null)
             {
-                var osobaToUpdate = db.Osoba.AsQueryable()
-                    .Where(m =>
-                        m.InternalId == osobaId
-                    ).FirstOrDefault();
+                osobaToUpdate.Jmeno = osoba.Jmeno;
+                osobaToUpdate.Prijmeni = osoba.Prijmeni;
+                osobaToUpdate.TitulPo = osoba.TitulPo;
+                osobaToUpdate.TitulPred = osoba.TitulPred;
+                osobaToUpdate.Narozeni = osoba.Narozeni;
+                osobaToUpdate.Status = osoba.Status;
+                osobaToUpdate.Umrti = osoba.Umrti;
 
-                if (osobaToUpdate != null)
-                {
-                    osobaToUpdate.ManuallyUpdated = DateTime.Now;
-                    osobaToUpdate.ManuallyUpdatedBy = author;
-                    db.SaveChanges();
-                }
-            }
-        }
+                string normalizedWikiId = osoba.WikiId?.Trim();
+                if (!string.IsNullOrWhiteSpace(normalizedWikiId))
+                    osobaToUpdate.WikiId = normalizedWikiId;
 
-        public static Osoba Update(Osoba osoba, string user)
-        {
-            using (DbEntities db = new DbEntities())
-            {
-                var osobaDb = db.Osoba.AsQueryable()
-                    .Where(m =>
-                        m.InternalId == osoba.InternalId
-                    ).FirstOrDefault();
+                await SaveAsync(osobaToUpdate);
 
-                var osobaToUpdate = osobaDb?.GetOriginal();
+                AuditRepo.Add<Osoba>(Audit.Operations.Update, user, osobaToUpdate, osobaOriginal);
 
-                var osobaOriginal = osobaToUpdate?.ShallowCopy();
-
-                if (osobaToUpdate != null)
-                {
-                    osobaToUpdate.Jmeno = osoba.Jmeno;
-                    osobaToUpdate.Prijmeni = osoba.Prijmeni;
-                    osobaToUpdate.TitulPo = osoba.TitulPo;
-                    osobaToUpdate.TitulPred = osoba.TitulPred;
-                    osobaToUpdate.Narozeni = osoba.Narozeni;
-                    osobaToUpdate.Status = osoba.Status;
-                    osobaToUpdate.Umrti = osoba.Umrti;
-
-                    string normalizedWikiId = osoba.WikiId?.Trim();
-                    if (!string.IsNullOrWhiteSpace(normalizedWikiId))
-                        osobaToUpdate.WikiId = normalizedWikiId;
-
-                    Save(osobaToUpdate);
-
-                    AuditRepo.Add<Osoba>(Audit.Operations.Update, user, osobaToUpdate, osobaOriginal);
-
-                    return osobaToUpdate;
-                }
+                return osobaToUpdate;
             }
 
             return osoba;
@@ -420,14 +402,14 @@ namespace HlidacStatu.Repositories
                 }
             }
 
-            OsobaExternalId[] dEids = duplicated.ExternalIds()
+            OsobaExternalId[] dEids = (await duplicated.ExternalIdsAsync())
                 .Where(m => m.ExternalSource != (int)OsobaExternalId.Source.HlidacSmluvGuid)
                 .ToArray();
             List<OsobaExternalId> addExternalIds = new List<OsobaExternalId>();
             foreach (var dEid in dEids)
             {
                 bool exists = false;
-                foreach (var eid in original.ExternalIds())
+                foreach (var eid in await original.ExternalIdsAsync())
                 {
                     exists = exists || (eid.ExternalId == dEid.ExternalId &&
                                         eid.ExternalSource == dEid.ExternalSource && eid.OsobaId == dEid.OsobaId);
@@ -485,13 +467,13 @@ namespace HlidacStatu.Repositories
                 }
             }
 
-            Save(original, addExternalIds.ToArray());
+            await SaveAsync(original, addExternalIds.ToArray());
 
             if (duplicated.InternalId != 0)
             {
                 duplicated.OriginalId = original.InternalId;
                 duplicated.Status = (int)Osoba.StatusOsobyEnum.Duplicita;
-                Save(duplicated);
+                await SaveAsync(duplicated);
             }
 
             return original;
@@ -531,9 +513,9 @@ namespace HlidacStatu.Repositories
         }
         public static string GetPhotoPath(this Osoba osoba, PhotoTypes phototype = PhotoTypes.Small, bool ignoreMissingFile = false)
         {
-            return _getPhotoPath(osoba, phototype.ToNiceDisplayName(), ignoreMissingFile);
+            return GetPhotoPath(osoba, phototype.ToNiceDisplayName(), ignoreMissingFile);
         }
-        private static string _getPhotoPath(this Osoba osoba, string anotherName = null, bool ignoreMissingFile = false)
+        private static string GetPhotoPath(this Osoba osoba, string anotherName = null, bool ignoreMissingFile = false)
         {
             var defaultFn = Init.OsobaFotky.GetFullPath(osoba, PhotoTypes.Small.ToNiceDisplayName());
             if (System.IO.File.Exists(defaultFn) || ignoreMissingFile)
@@ -554,9 +536,9 @@ namespace HlidacStatu.Repositories
 
         public static string GetPhotoUrl(this Osoba osoba, bool local = false, PhotoTypes phototype = PhotoTypes.Small, bool randomizeUrl = false)
         {
-            return _getPhotoUrl(osoba, local, phototype.ToString() + (randomizeUrl ? $"&rnd={Random.Shared.Next()}" : ""));
+            return GetPhotoUrl(osoba, local, phototype.ToString() + (randomizeUrl ? $"&rnd={Random.Shared.Next()}" : ""));
         }
-        private static string _getPhotoUrl(this Osoba osoba, bool local = false, string option = "")
+        private static string GetPhotoUrl(this Osoba osoba, bool local = false, string option = "")
         {
             if (local)
             {
@@ -570,16 +552,14 @@ namespace HlidacStatu.Repositories
 
         public static bool HasPhoto(this Osoba osoba)
         {
-            var path = osoba.GetPhotoPath(PhotoTypes.Small, true); //Init.OsobaFotky.GetFullPath(osoba, PhotoTypes.Small.ToNiceDisplayName()); // "small.jpg"
+            var path = osoba.GetPhotoPath(PhotoTypes.Small, true);
             return File.Exists(path);
         }
 
-        public static OsobaExternalId[] ExternalIds(this Osoba osoba)
+        public static async Task<OsobaExternalId[]> ExternalIdsAsync(this Osoba osoba)
         {
-            using (DbEntities db = new DbEntities())
-            {
-                return db.OsobaExternalId.AsQueryable().Where(o => o.OsobaId == osoba.InternalId).ToArray();
-            }
+            await using DbEntities db = new DbEntities();
+            return await db.OsobaExternalId.AsNoTracking().Where(o => o.OsobaId == osoba.InternalId).ToArrayAsync();
         }
 
         public static async Task<List<Osoba>> PeopleWithAnySponzoringRecordAsync(CancellationToken cancellationToken = default)
@@ -595,29 +575,31 @@ namespace HlidacStatu.Repositories
                     SELECT * 
                       from Osoba os
                      where os.status = {(int)Osoba.StatusOsobyEnum.Sponzor}")
+                .AsNoTracking()
                 .ToListAsync(cancellationToken: cancellationToken);
             return results;
         }
 
-        public static  List<Osoba> PeopleWithAnySponzoringRecord(Expression<Func<Osoba, bool>> predicate)
+        private static async Task<List<Osoba>> PeopleWithAnySponzoringRecordAsync(Expression<Func<Osoba, bool>> predicate)
         {
             predicate = predicate ?? (s => true);
-            using var db = new DbEntities();
+            await using var db = new DbEntities();
 
-            var neniPolitik = (int)Osoba.StatusOsobyEnum.NeniPolitik;
             var sponzor = (int)Osoba.StatusOsobyEnum.Sponzor;
 
-            var query1 = db.Osoba
+            var query1 = await db.Osoba
                 .Where(os => db.Sponzoring.Any(s => s.OsobaIdDarce == os.InternalId))
                 .Where(predicate)
+                .AsNoTracking()
                 .Distinct()
-                .ToArray();
+                .ToArrayAsync();
 
-            var query2 = db.Osoba
+            var query2 = await db.Osoba
                 .Where(os => os.Status == sponzor)
                 .Where(predicate)
+                .AsNoTracking()
                 .Distinct()
-                .ToArray();
+                .ToArrayAsync();
 
             var results = query1
                 .Union(query2)
@@ -664,6 +646,7 @@ namespace HlidacStatu.Repositories
 
                 ";
             var results = await db.Osoba.FromSqlInterpolated(sql)
+                .AsNoTracking()
                 .ToListAsync(cancellationToken: cancellationToken);
             return results;
         }
@@ -671,11 +654,13 @@ namespace HlidacStatu.Repositories
         public static async Task<JSON> ExportAsync(this Osoba osoba, bool allData = false)
         {
             var t = osoba;
-            var r = new Osoba.JSON();
+            var r = new Osoba.JSON
+            {
+                Gender = (t.Pohlavi == "f") ? Osoba.JSON.gender.Žena : Osoba.JSON.gender.Muž,
+                NameId = t.NameId,
+                Jmeno = t.Jmeno
+            };
 
-            r.Gender = (t.Pohlavi == "f") ? Osoba.JSON.gender.Žena : Osoba.JSON.gender.Muž;
-            r.NameId = t.NameId;
-            r.Jmeno = t.Jmeno;
             if (allData == false)
                 r.Narozeni = t.Narozeni?.ToString("yyyy") ?? "";
             else
@@ -718,8 +703,7 @@ namespace HlidacStatu.Repositories
                 .Where(m => Convert.ToInt32(m.Id) < 0)
                 .Select(m => m.Name).ToArray();
 
-
-            r.Vazbyfirmy = Repositories.Graph.VsechnyDcerineVazby(osoba, Relation.CharakterVazbyEnum.VlastnictviKontrola)
+            r.Vazbyfirmy = (await Repositories.Graph.VsechnyDcerineVazbyAsync(osoba, Relation.CharakterVazbyEnum.VlastnictviKontrola))
                 .Where(m => angazovanostDesc.Contains(m.Descr))
                 .Select(m =>
                     new Osoba.JSON.vazba()
@@ -730,7 +714,6 @@ namespace HlidacStatu.Repositories
                         TypVazby = (Osoba.JSON.typVazby)Enum.Parse(typeof(Osoba.JSON.typVazby), m.Descr, true),
                         VazbaKIco = m.To.Id,
                         VazbaKOsoba = m.To.PrintName()
-                        //Zdroj = m.
                     })
                 .ToArray();
 
@@ -762,10 +745,9 @@ namespace HlidacStatu.Repositories
 
         }
 
-        public static List<Osoba> GetByZatrideni(Zatrideni zatrideni, DateTime? toDate)
+        public static async Task<List<Osoba>> GetByZatrideniAsync(Zatrideni zatrideni, DateTime? toDate)
         {
-            if (!toDate.HasValue)
-                toDate = DateTime.Now;
+            toDate ??= DateTime.Now;
 
             switch (zatrideni)
             {
@@ -777,98 +759,88 @@ namespace HlidacStatu.Repositories
                         // Patří sem i volená?
                     };
 
-                    return GetByEvent(e =>
+                    return await GetByEventAsync(e =>
                             politickeEventy.Any(pe => pe == e.Type)
                             && (e.DatumDo == null || e.DatumDo >= toDate)
-                            && (e.DatumOd == null || e.DatumOd <= toDate))
-                        .ToList();
+                            && (e.DatumOd == null || e.DatumOd <= toDate));
 
                 case Zatrideni.Ministr:
-                    return GetByEvent(e =>
+                    return await GetByEventAsync(e =>
                             e.Type == (int)OsobaEvent.Types.PolitickaExekutivni
                             && e.AddInfo.ToLower().StartsWith("ministr")
                             && (e.Organizace.ToLower().StartsWith("ministerstvo")
                                 || UradyConstants.Ica.Vlada.Contains(e.Ico.Trim()))
                             && (e.DatumDo == null || e.DatumDo >= toDate)
-                            && (e.DatumOd == null || e.DatumOd <= toDate))
-                        .ToList();
+                            && (e.DatumOd == null || e.DatumOd <= toDate));
                 
                 case Zatrideni.PredsedaVlady:
-                    return GetByEvent(e =>
+                    return await GetByEventAsync(e =>
                             e.Type == (int)OsobaEvent.Types.PolitickaExekutivni
                             && (e.AddInfo.ToLower().StartsWith("předseda vlády")
                                 || e.AddInfo.ToLower().StartsWith("předsedkyně vlády"))
                             && (e.Organizace.ToLower().StartsWith("úřad vlády")
                                 || e.Ico.Trim() == UradyConstants.Ica.UradVlady)
                             && (e.DatumDo == null || e.DatumDo >= toDate)
-                            && (e.DatumOd == null || e.DatumOd <= toDate))
-                        .ToList();
+                            && (e.DatumOd == null || e.DatumOd <= toDate));
 
                 case Zatrideni.Hejtman:
-                    return GetByEvent(e =>
+                    return await GetByEventAsync(e =>
                             e.Type == (int)OsobaEvent.Types.PolitickaExekutivni
                             && e.AddInfo.ToLower().StartsWith("hejtman")
                             && (e.DatumDo == null || e.DatumDo >= toDate)
-                            && (e.DatumOd == null || e.DatumOd <= toDate))
-                        .ToList();
+                            && (e.DatumOd == null || e.DatumOd <= toDate));
 
                 case Zatrideni.Poslanec:
-                    return GetByEvent(e =>
+                    return await GetByEventAsync(e =>
                             e.Type == (int)OsobaEvent.Types.VolenaFunkce
                             && (e.AddInfo.ToLower().StartsWith("poslanec") ||
                                 e.AddInfo.ToLower().StartsWith("poslankyně"))
                             && (e.Organizace.ToLower().StartsWith("poslanecká sněmovna pčr")
                                 || e.Ico.Trim() == UradyConstants.Ica.KancelarPoslaneckeSnemovny)
                             && (e.DatumDo == null || e.DatumDo >= toDate)
-                            && (e.DatumOd == null || e.DatumOd <= toDate))
-                        .ToList();
+                            && (e.DatumOd == null || e.DatumOd <= toDate));
 
                 case Zatrideni.Europoslanec:
-                    return GetByEvent(e =>
+                    return await GetByEventAsync(e =>
                             e.Type == (int)OsobaEvent.Types.VolenaFunkce
                             && (e.AddInfo.ToLower().StartsWith("poslanec ep") ||
                                 e.AddInfo.ToLower().StartsWith("poslankyně ep"))
                             && e.Organizace.ToLower().StartsWith("evropský parlament")
                             && (e.DatumDo == null || e.DatumDo >= toDate)
-                            && (e.DatumOd == null || e.DatumOd <= toDate))
-                        .ToList();
+                            && (e.DatumOd == null || e.DatumOd <= toDate));
 
                 case Zatrideni.SefUradu:
-                    return GetByEvent(e =>
+                    return await GetByEventAsync(e =>
                             e.Ceo == 1
                             && (e.DatumDo == null || e.DatumDo >= toDate)
-                            && (e.DatumOd == null || e.DatumOd <= toDate))
-                        .ToList();
+                            && (e.DatumOd == null || e.DatumOd <= toDate));
 
                 case Zatrideni.Senator:
-                    return GetByEvent(e =>
+                    return await GetByEventAsync(e =>
                             e.Type == (int)OsobaEvent.Types.VolenaFunkce
                             && e.AddInfo.ToLower().StartsWith("senát")
                             && (e.Organizace.ToLower().StartsWith("senát")
                                 || e.Ico.Trim() == UradyConstants.Ica.Senat)
                             && (e.DatumDo == null || e.DatumDo >= toDate)
-                            && (e.DatumOd == null || e.DatumOd <= toDate))
-                        .ToList();
+                            && (e.DatumOd == null || e.DatumOd <= toDate));
 
                 case Zatrideni.PoradcePredsedyVlady:
-                    return GetByEvent(e =>
+                    return await GetByEventAsync(e =>
                             e.Type == (int)OsobaEvent.Types.PolitickaExekutivni
                             && (e.AddInfo.ToLower().StartsWith("poradce předsedy vlády") ||
                                 e.AddInfo.ToLower().StartsWith("poradkyně předsedy vlády"))
                             && (e.Organizace.ToLower().StartsWith("úřad vlády")
                                 || e.Ico.Trim() == UradyConstants.Ica.UradVlady)
                             && (e.DatumDo == null || e.DatumDo >= toDate)
-                            && (e.DatumOd == null || e.DatumOd <= toDate))
-                        .ToList();
+                            && (e.DatumOd == null || e.DatumOd <= toDate));
                 
                 case Zatrideni.KrajskyZastupitel:
-                    return GetByEvent(e =>
+                    return await GetByEventAsync(e =>
                             e.Type == (int)OsobaEvent.Types.VolenaFunkce
                             && e.AddInfo.ToLower().StartsWith("zastupitel")
                             && UradyConstants.Ica.Kraje.Contains(e.Ico.Trim())
                             && (e.DatumDo == null || e.DatumDo >= toDate)
-                            && (e.DatumOd == null || e.DatumOd <= toDate))
-                        .ToList();
+                            && (e.DatumOd == null || e.DatumOd <= toDate));
 
                 default:
                     throw new ArgumentOutOfRangeException(nameof(zatrideni), zatrideni, null);
@@ -878,7 +850,7 @@ namespace HlidacStatu.Repositories
         /// <summary>
         /// vrací všechny osoby pro daný rok
         /// </summary>
-        public static List<Osoba> GetByZatrideni(Zatrideni zatrideni, int year)
+        public static async Task<List<Osoba>> GetByZatrideniAsync(Zatrideni zatrideni, int year)
         {
             switch (zatrideni)
             {
@@ -890,98 +862,88 @@ namespace HlidacStatu.Repositories
                         // Patří sem i volená?
                     };
 
-                    return GetByEvent(e =>
+                    return await GetByEventAsync(e =>
                             politickeEventy.Any(pe => pe == e.Type)
                             && (e.DatumDo == null || e.DatumDo.Value.Year >= year)
-                            && (e.DatumOd == null || e.DatumOd.Value.Year <= year))
-                        .ToList();
+                            && (e.DatumOd == null || e.DatumOd.Value.Year <= year));
 
                 case Zatrideni.Ministr:
-                    return GetByEvent(e =>
+                    return await GetByEventAsync(e =>
                             e.Type == (int)OsobaEvent.Types.PolitickaExekutivni
                             && e.AddInfo.ToLower().StartsWith("ministr")
                             && (e.Organizace.ToLower().StartsWith("ministerstvo")
                                 || UradyConstants.Ica.Vlada.Contains(e.Ico.Trim()))
                             && (e.DatumDo == null || e.DatumDo.Value.Year >= year)
-                            && (e.DatumOd == null || e.DatumOd.Value.Year <= year))
-                        .ToList();
+                            && (e.DatumOd == null || e.DatumOd.Value.Year <= year));
                 
                 case Zatrideni.PredsedaVlady:
-                    return GetByEvent(e =>
+                    return await GetByEventAsync(e =>
                             e.Type == (int)OsobaEvent.Types.PolitickaExekutivni
                             && (e.AddInfo.ToLower().StartsWith("předseda vlády")
                                 || e.AddInfo.ToLower().StartsWith("předsedkyně vlády"))
                             && (e.Organizace.ToLower().StartsWith("úřad vlády")
                                 || e.Ico.Trim() == UradyConstants.Ica.UradVlady)
                             && (e.DatumDo == null || e.DatumDo.Value.Year >= year)
-                            && (e.DatumOd == null || e.DatumOd.Value.Year <= year))
-                        .ToList();
+                            && (e.DatumOd == null || e.DatumOd.Value.Year <= year));
 
                 case Zatrideni.Hejtman:
-                    return GetByEvent(e =>
+                    return await GetByEventAsync(e =>
                             e.Type == (int)OsobaEvent.Types.PolitickaExekutivni
                             && e.AddInfo.ToLower().StartsWith("hejtman")
                             && (e.DatumDo == null || e.DatumDo.Value.Year >= year)
-                            && (e.DatumOd == null || e.DatumOd.Value.Year <= year))
-                        .ToList();
+                            && (e.DatumOd == null || e.DatumOd.Value.Year <= year));
 
                 case Zatrideni.Poslanec:
-                    return GetByEvent(e =>
+                    return await GetByEventAsync(e =>
                             e.Type == (int)OsobaEvent.Types.VolenaFunkce
                             && (e.AddInfo.ToLower().StartsWith("poslanec") ||
                                 e.AddInfo.ToLower().StartsWith("poslankyně"))
                             && (e.Organizace.ToLower().StartsWith("poslanecká sněmovna pčr")
                                 || e.Ico.Trim() == UradyConstants.Ica.KancelarPoslaneckeSnemovny)
                             && (e.DatumDo == null || e.DatumDo.Value.Year >= year)
-                            && (e.DatumOd == null || e.DatumOd.Value.Year <= year))
-                        .ToList();
+                            && (e.DatumOd == null || e.DatumOd.Value.Year <= year));
 
                 case Zatrideni.Europoslanec:
-                    return GetByEvent(e =>
+                    return await GetByEventAsync(e =>
                             e.Type == (int)OsobaEvent.Types.VolenaFunkce
                             && (e.AddInfo.ToLower().StartsWith("poslanec ep") ||
                                 e.AddInfo.ToLower().StartsWith("poslankyně ep"))
                             && e.Organizace.ToLower().StartsWith("evropský parlament")
                             && (e.DatumDo == null || e.DatumDo.Value.Year >= year)
-                            && (e.DatumOd == null || e.DatumOd.Value.Year <= year))
-                        .ToList();
+                            && (e.DatumOd == null || e.DatumOd.Value.Year <= year));
 
                 case Zatrideni.SefUradu:
-                    return GetByEvent(e =>
+                    return await GetByEventAsync(e =>
                             e.Ceo == 1
                             && (e.DatumDo == null || e.DatumDo.Value.Year >= year)
-                            && (e.DatumOd == null || e.DatumOd.Value.Year <= year))
-                        .ToList();
+                            && (e.DatumOd == null || e.DatumOd.Value.Year <= year));
 
                 case Zatrideni.Senator:
-                    return GetByEvent(e =>
+                    return await GetByEventAsync(e =>
                             e.Type == (int)OsobaEvent.Types.VolenaFunkce
                             && e.AddInfo.ToLower().StartsWith("senát")
                             && (e.Organizace.ToLower().StartsWith("senát")
                                 || e.Ico.Trim() == UradyConstants.Ica.Senat)
                             && (e.DatumDo == null || e.DatumDo.Value.Year >= year)
-                            && (e.DatumOd == null || e.DatumOd.Value.Year <= year))
-                        .ToList();
+                            && (e.DatumOd == null || e.DatumOd.Value.Year <= year));
 
                 case Zatrideni.PoradcePredsedyVlady:
-                    return GetByEvent(e =>
+                    return await GetByEventAsync(e =>
                             e.Type == (int)OsobaEvent.Types.PolitickaExekutivni
                             && (e.AddInfo.ToLower().StartsWith("poradce předsedy vlády") ||
                                 e.AddInfo.ToLower().StartsWith("poradkyně předsedy vlády"))
                             && (e.Organizace.ToLower().StartsWith("úřad vlády")
                                 || e.Ico.Trim() == UradyConstants.Ica.UradVlady)
                             && (e.DatumDo == null || e.DatumDo.Value.Year >= year)
-                            && (e.DatumOd == null || e.DatumOd.Value.Year <= year))
-                        .ToList();
+                            && (e.DatumOd == null || e.DatumOd.Value.Year <= year));
                 
                 case Zatrideni.KrajskyZastupitel:
-                    return GetByEvent(e =>
+                    return await GetByEventAsync(e =>
                             e.Type == (int)OsobaEvent.Types.VolenaFunkce
                             && e.AddInfo.ToLower().StartsWith("zastupitel")
                             && UradyConstants.Ica.Kraje.Contains(e.Ico.Trim())
                             && (e.DatumDo == null || e.DatumDo.Value.Year >= year)
-                            && (e.DatumOd == null || e.DatumOd.Value.Year <= year))
-                        .ToList();
+                            && (e.DatumOd == null || e.DatumOd.Value.Year <= year));
 
                 default:
                     throw new ArgumentOutOfRangeException(nameof(zatrideni), zatrideni, null);

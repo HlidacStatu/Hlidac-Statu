@@ -98,12 +98,13 @@ namespace HlidacStatu.Repositories.Analysis
                         $" AND podepsano:[{from?.ToString("yyyy-MM-dd") ?? "*"} TO {from?.ToString("yyyy-MM-dd") ?? DateTime.Now.AddDays(1).ToString("yyyy-MM-dd")}]"; //podepsano:[2016-01-01 TO 2016-12-31]
 
                 var client = Manager.GetESClient();
+                var sq = await SmlouvaRepo.Searching.GetSimpleQueryAsync("ico:" + ico + sdate);
                 return await client.SearchAsync<Smlouva>(a => a
                     .TrackTotalHits(page * size == 0)
                     .Size(size)
                     .From(page * size)
                     .Source(m => m.Excludes(e => e.Field(o => o.Prilohy)))
-                    .Query(q => SmlouvaRepo.Searching.GetSimpleQuery("ico:" + ico + sdate))
+                    .Query(q => sq)
                     .Scroll("1m")
                 );
             };
@@ -364,7 +365,7 @@ namespace HlidacStatu.Repositories.Analysis
             return ret;
         }
 
-        public static VazbyFiremNaPolitiky LoadFirmySVazbamiNaPolitiky(Relation.AktualnostType aktualnostVztahu,
+        public static async Task<VazbyFiremNaPolitiky> LoadFirmySVazbamiNaPolitikyAsync(Relation.AktualnostType aktualnostVztahu,
             bool showProgress = false)
         {
             object psvLock = new();
@@ -372,14 +373,16 @@ namespace HlidacStatu.Repositories.Analysis
             object psvSfLock = new();
             Dictionary<string, List<int>> pol_SVazbami_StatniFirmy = new Dictionary<string, List<int>>();
 
-            Devmasters.Batch.Manager.DoActionForAll<Osoba>(OsobaRepo.PolitickyAktivni.Get(),
-                (p) =>
+            await Devmasters.Batch.Manager.DoActionForAllAsync<Osoba>(OsobaRepo.PolitickyAktivni.Get(), async (p) =>
                 {
                     try
                     {
-                        var vazby = p.AktualniVazby( Relation.CharakterVazbyEnum.VlastnictviKontrola, aktualnostVztahu)
-                            .Union(p.AktualniVazby(Relation.CharakterVazbyEnum.Uredni, aktualnostVztahu))
-                        ;
+                        var vazbyVlastnictviTask = p.AktualniVazbyAsync(Relation.CharakterVazbyEnum.VlastnictviKontrola,
+                            aktualnostVztahu);
+                        var vazbyUredniTask =
+                            p.AktualniVazbyAsync(Relation.CharakterVazbyEnum.Uredni, aktualnostVztahu);
+                        
+                        var vazby = (await vazbyVlastnictviTask).Union(await vazbyUredniTask);
                         if (vazby != null && vazby.Any())
                         {
                             foreach (var v in vazby)

@@ -51,7 +51,7 @@
                                 <div style="display:block">
                                     @foreach (var p in politici)
                                     {
-                                        var o = Osoby.GetByNameId.Get(p.Key);
+                                        var o = await OsobaCache.GetPersonByNameIdAsync(p.Key);
                                         sb.AppendLine($"<b>{o.FullNameWithYear()}</b><br/>");
                                         sb.AppendLine($"<div class='text-muted small-link' style='padding-left:2em;'>");
 
@@ -92,7 +92,7 @@
                                     @foreach (var p in insolvenceFiremPolitiku.Take(20).ShuffleMe())
                                         {
                                             var pd = new Devmasters.Lang.CS.PluralDef() { Values = new string[] { " a ještě jedna", "{0} další","{0} dalších" } };
-                                            var o = Osoby.GetByNameId.Get(p.Item1.OsobaNameId);
+                                            var o = await OsobaCache.GetPersonByNameIdAsync(p.Item1.OsobaNameId);
                                             sb.AppendLine($"<b>{o.FullNameWithYear()}</b><br/>");
                                             sb.AppendLine($"<div class='text-muted small-link' style='padding-left:2em;'>");
 

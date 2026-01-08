@@ -30,7 +30,7 @@ namespace HlidacStatuApi.Controllers.ApiV2
                 return BadRequest("Hodnota osobaId chybí.");
             }
 
-            var osoba = OsobaRepo.GetByNameId(osobaId);
+            var osoba = await OsobaRepo.GetByNameIdAsync(osobaId);
 
             if (osoba == null)
             {
@@ -121,7 +121,7 @@ namespace HlidacStatuApi.Controllers.ApiV2
 
         [Authorize]
         [HttpGet, Route("hledat")]
-        public ActionResult<List<OsobaDTO>> OsobySearch([FromQuery] string jmeno, [FromQuery] string prijmeni, [FromQuery] string datumNarozeni, [FromQuery] bool? ignoreDiakritiku = false)
+        public async Task<ActionResult<List<OsobaDTO>>> OsobySearch([FromQuery] string jmeno, [FromQuery] string prijmeni, [FromQuery] string datumNarozeni, [FromQuery] bool? ignoreDiakritiku = false)
         {
             if (string.IsNullOrEmpty(jmeno) || string.IsNullOrEmpty(prijmeni) || string.IsNullOrEmpty(datumNarozeni))
             {
@@ -134,9 +134,9 @@ namespace HlidacStatuApi.Controllers.ApiV2
             {
                 IEnumerable<Osoba> osoby = null;
                 if (ignoreDiakritiku == true)
-                    osoby = OsobaRepo.Searching.GetAllByNameAscii(jmeno, prijmeni, narozeni);
+                    osoby = await OsobaRepo.Searching.GetAllByNameAsciiAsync(jmeno, prijmeni, narozeni);
                 else
-                    osoby = OsobaRepo.Searching.GetAllByName(jmeno, prijmeni, narozeni);
+                    osoby = await OsobaRepo.Searching.GetAllByNameAsync(jmeno, prijmeni, narozeni);
 
                 var result = osoby.Select(o => new OsobaDTO(o)).ToList();
                 return result;
@@ -161,7 +161,7 @@ namespace HlidacStatuApi.Controllers.ApiV2
         /// <returns></returns>
         [Authorize]
         [HttpGet("social")]
-        public ActionResult<List<OsobaSocialDTO>> OsobySocial([FromQuery] OsobaEvent.SocialNetwork typ)
+        public async Task<ActionResult<List<OsobaSocialDTO>>> OsobySocial([FromQuery] OsobaEvent.SocialNetwork typ)
         {
 
             string social = typ.ToString();
@@ -170,7 +170,7 @@ namespace HlidacStatuApi.Controllers.ApiV2
                 && e.Organizace == social;
 
 
-            var osobaSocialDTOs = OsobaRepo.GetByEvent(socialNetworkFilter)
+            var osobaSocialDTOs = (await OsobaRepo.GetByEventAsync(socialNetworkFilter))
                 .Select(o => new OsobaSocialDTO(o, socialNetworkFilter))
                 .ToList();
 

@@ -15,6 +15,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using HlidacStatu.Repositories.Cache;
 
 namespace HlidacStatu.XLib.Render
 {
@@ -76,11 +77,11 @@ namespace HlidacStatu.XLib.Render
                 }
             }
 
-            public static string fn_RenderPersonNoLink(string osobaId, string jmeno = "", string prijmeni = "", string rokNarozeni = "")
+            public static async Task<string> fn_RenderPersonNoLink(string osobaId, string jmeno = "", string prijmeni = "", string rokNarozeni = "")
             {
                 if (!string.IsNullOrEmpty(osobaId))
                 {
-                    Osoba o = Osoby.GetByNameId.Get(osobaId);
+                    Osoba o = await OsobaCache.GetPersonByNameIdAsync(osobaId);
                     if (o != null)
                         return $"<span>{o.FullNameWithYear(false)}</span>";
                 }
@@ -94,11 +95,11 @@ namespace HlidacStatu.XLib.Render
                     return "";
             }
 
-            public static string fn_RenderPersonWithLink(string osobaId, string jmeno, string prijmeni, string rokNarozeni = "")
+            public static async Task<string> fn_RenderPersonWithLink(string osobaId, string jmeno, string prijmeni, string rokNarozeni = "")
             {
                 if (!string.IsNullOrEmpty(osobaId))
                 {
-                    Osoba o = Osoby.GetByNameId.Get(osobaId);
+                    Osoba o = await OsobaCache.GetPersonByNameIdAsync(osobaId);
                     if (o != null)
                         return $"<span><a href=\"{o.GetUrl(false)}\">{o.FullNameWithYear(false)}</a></span>";
                 }
@@ -113,7 +114,7 @@ namespace HlidacStatu.XLib.Render
             {
                 if (!string.IsNullOrEmpty(osobaId))
                 {
-                    Osoba o = Osoby.GetByNameId.Get(osobaId);
+                    Osoba o = await OsobaCache.GetPersonByNameIdAsync(osobaId);
                     if (o != null)
                     {
                         var stat = await o.StatistikaRegistrSmluvAsync();
@@ -129,11 +130,11 @@ namespace HlidacStatu.XLib.Render
                 return string.Empty;
             }
 
-            public static string fn_RenderPersonWithLink2(string osobaId)
+            public static async Task<string> fn_RenderPersonWithLink2(string osobaId)
             {
                 if (!string.IsNullOrEmpty(osobaId))
                 {
-                    Osoba o = Osoby.GetByNameId.Get(osobaId);
+                    Osoba o = await OsobaCache.GetPersonByNameIdAsync(osobaId);
                     if (o != null)
                         return $"<span><a href=\"{o.GetUrl(false)}\">{o.FullNameWithYear(false)}</a></span>";
                 }

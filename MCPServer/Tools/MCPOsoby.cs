@@ -5,6 +5,7 @@ using ModelContextProtocol.Server;
 using System.ComponentModel;
 using System.Reflection;
 using HlidacStatu.DS.Api.Osoba;
+using HlidacStatu.Repositories.Cache;
 
 namespace HlidacStatu.MCPServer.Tools
 {
@@ -58,7 +59,7 @@ namespace HlidacStatu.MCPServer.Tools
 
                     if (string.IsNullOrWhiteSpace(person_id) || string.IsNullOrWhiteSpace(person_id))
                         return null;
-                    Entities.Osoba o = HlidacStatu.Repositories.Osoby.GetByNameId.Get(person_id);
+                    Entities.Osoba o = await OsobaCache.GetPersonByNameIdAsync(person_id);
 
                     if (o == null)
                     {
@@ -135,14 +136,14 @@ namespace HlidacStatu.MCPServer.Tools
         {
 
 
-            var ofound = OsobaRepo.Searching.FindAll(name, year_of_birth, false)
+            var ofound = (await OsobaRepo.Searching.FindAllAsync(name, year_of_birth, false))
                      .OrderByDescending(o => o.Status)
                      .ThenByDescending(o => o.Narozeni ?? new DateTime(1970, 1, 1))
                      .Take(numOfResults)
                      .ToList();
 
             if (ofound.Any() == false && onlyPoliticians == false)
-                ofound = OsobaRepo.Searching.FindAll(name, year_of_birth, true)
+                ofound = (await OsobaRepo.Searching.FindAllAsync(name, year_of_birth, true))
                     .OrderByDescending(o => o.Status)
                     .ThenByDescending(o => o.Narozeni ?? new DateTime(1970, 1, 1))
                     .Take(numOfResults)

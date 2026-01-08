@@ -31,26 +31,31 @@
                     }
                 </td>
                 <td>
-                    @if (item.Vazby( Relation.CharakterVazbyEnum.VlastnictviKontrola) != null)
-                    {
-                        @Html.Raw("<ul>")
-                        
-                        foreach (var v in item.AktualniVazby( Relation.CharakterVazbyEnum.VlastnictviKontrola, Relation.AktualnostType.Nedavny).Take(2))
+                    @{
+                        var vazbyVlastAktual = await item.AktualniVazbyAsync(Relation.CharakterVazbyEnum.VlastnictviKontrola, Relation.AktualnostType.Nedavny);
+                        if (vazbyVlastAktual is not null)
                         {
-                            @Html.Raw( WebUtil.RenderOsobaVazba(v,"<li>{0}</li>"))
-                            
+                            @Html.Raw("<ul>")
+
+                            foreach (var v in vazbyVlastAktual.Take(2))
+                            {
+                                @Html.Raw(WebUtil.RenderOsobaVazba(v, "<li>{0}</li>"))
+                            }
+
+                            var vazbyVlast = await item.VazbyAsync(Relation.CharakterVazbyEnum.VlastnictviKontrola);
+                            if (vazbyVlast.Length == 3)
+                            {
+                                @Html.Raw(WebUtil.RenderOsobaVazba(vazbyVlast[2], "<li>{0}</li>"))
+
+                            }
+                            else if (vazbyVlastAktual.Length > 2)
+                            {
+                                <span>+ <a href="/osoba/vazby/@(item.NameId)">@Devmasters.Lang.CS.Plural.Get(await item.PocetPodrizenychSubjektuAsync(Relation.CharakterVazbyEnum.VlastnictviKontrola, Relation.AktualnostType.Nedavny) - 2, "další vazba;další {0} vazby;dalších {0} vazeb")</a></span>
+                            }
+
+                            @Html.Raw("</ul>")
+
                         }
-                        if (item.AktualniVazby( Relation.CharakterVazbyEnum.VlastnictviKontrola,Relation.AktualnostType.Nedavny).Length == 3)
-                        {
-                            @Html.Raw(WebUtil.RenderOsobaVazba(item.Vazby( Relation.CharakterVazbyEnum.VlastnictviKontrola)[2],"<li>{0}</li>"))
-                            
-                        }
-                        else if (item.AktualniVazby( Relation.CharakterVazbyEnum.VlastnictviKontrola ,Relation.AktualnostType.Nedavny).Length > 2)
-                        {
-                            <span>+ <a href="/osoba/vazby/@(item.NameId)">@Devmasters.Lang.CS.Plural.Get(item.PocetPodrizenychSubjektu( Relation.CharakterVazbyEnum.VlastnictviKontrola ,Relation.AktualnostType.Nedavny) - 2, "další vazba;další {0} vazby;dalších {0} vazeb")</a></span>
-                        }
-                        @Html.Raw("</ul>")
-                        
                     }
                 </td>
             </tr>

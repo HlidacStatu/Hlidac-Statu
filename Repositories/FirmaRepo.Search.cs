@@ -1,9 +1,7 @@
 using Devmasters;
-
 using HlidacStatu.Entities;
 using HlidacStatu.Searching;
 using Nest;
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -23,21 +21,23 @@ namespace HlidacStatu.Repositories
             private static async Task<Dictionary<int, string[]>> GetAllValuesAsync()
             {
                 var client = Manager.GetESClient_RPP_Kategorie();
-                var res = await client.SearchAsync<Lib.Data.External.RPP.KategorieOVM>(
-                    s => s.Query(q => q.MatchAll()).Size(2000)
-                    );
+                var res = await client.SearchAsync<Lib.Data.External.RPP.KategorieOVM>(s =>
+                    s.Query(q => q.MatchAll()).Size(2000)
+                );
                 return res.Hits
-                    .Select(m => new { id = m.Source.id, icos = m.Source.OVM_v_kategorii.Select(o => o.kodOvm).ToArray() })
+                    .Select(m => new
+                        { id = m.Source.id, icos = m.Source.OVM_v_kategorii.Select(o => o.kodOvm).ToArray() })
                     .ToDictionary(k => k.id, v => v.icos);
             }
 
-            public static async Task<Search.GeneralResult<Firma>> SimpleSearchAsync(string query, int page, int size, bool keepOnlyActive = false)
+            public static async Task<Search.GeneralResult<Firma>> SimpleSearchAsync(string query, int page, int size,
+                bool keepOnlyActive = false)
             {
                 List<Firma> found = new List<Firma>();
 
-                string modifQ = SimpleQueryCreator
-                    .GetSimpleQuery(query,
-                        new IRule[] { new Firmy_OVMKategorie(await AllValuesAsync()) })
+                string modifQ = (await SimpleQueryCreator
+                        .GetSimpleQueryAsync(query,
+                            new IRule[] { new Firmy_OVMKategorie(await AllValuesAsync()) }))
                     .FullQuery();
 
                 string[] specifiedIcosInQuery =
@@ -57,7 +57,7 @@ namespace HlidacStatu.Repositories
                     if (found.Count() > 0)
                         return new Search.GeneralResult<Firma>(query, specifiedIcosInQuery.Count(), found,
                                 size, true)
-                        { Page = page };
+                            { Page = page };
                 }
 
                 page = page - 1;
@@ -71,19 +71,19 @@ namespace HlidacStatu.Repositories
                 }
 
 
-                var qc = GetSimpleQuery(query);
+                var qc = await GetSimpleQueryAsync(query);
 
 
                 ISearchResponse<FirmaInElastic> res = null;
                 try
                 {
-                    var client = Manager.GetESClient_Firmy(); 
+                    var client = Manager.GetESClient_Firmy();
                     res = await client.SearchAsync<FirmaInElastic>(s => s
-                            .Size(size)
-                            .From(page * size)
-                            .TrackTotalHits(size == 0 ? true : (bool?)null)
-                            .Query(q => qc)
-                        );
+                        .Size(size)
+                        .From(page * size)
+                        .TrackTotalHits(size == 0 ? true : (bool?)null)
+                        .Query(q => qc)
+                    );
 
                     if (res.IsValid)
                     {
@@ -97,7 +97,7 @@ namespace HlidacStatu.Repositories
                             found = found.Where(m => m.Status < 6).ToList(); //see Firma.StatusFull()
 
                         return new Search.GeneralResult<Firma>(query, res.Total, found, size, true)
-                        { Page = page };
+                            { Page = page };
                     }
                     else
                     {
@@ -115,20 +115,19 @@ namespace HlidacStatu.Repositories
                 }
             }
 
-            public static QueryContainer GetSimpleQuery(string query)
+            public static async Task<QueryContainer> GetSimpleQueryAsync(string query)
             {
-                var qc = SimpleQueryCreator.GetSimpleQuery<FirmaInElastic>(query,
+                var qc = await SimpleQueryCreator.GetSimpleQueryAsync<FirmaInElastic>(query,
                     new IRule[] { });
                 return qc;
             }
 
 
-            public static async Task<IEnumerable<Firma>> FindAllAsync(string query, int limit, bool keepOnlyActive = false)
+            public static async Task<IEnumerable<Firma>> FindAllAsync(string query, int limit,
+                bool keepOnlyActive = false)
             {
-                return (await SimpleSearchAsync(query, 0, limit,keepOnlyActive)).Result;
+                return (await SimpleSearchAsync(query, 0, limit, keepOnlyActive)).Result;
             }
-
         }
-
     }
 }

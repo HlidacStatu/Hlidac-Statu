@@ -19,6 +19,7 @@ using System.Threading.Tasks;
 using HlidacStatu.Entities.KIndex;
 using Serilog;
 using HlidacStatu.LibCore.Filters;
+using HlidacStatu.Repositories.Cache;
 
 namespace HlidacStatu.Web.Controllers
 {
@@ -302,7 +303,7 @@ namespace HlidacStatu.Web.Controllers
                 if (!narozeni.HasValue)
                     continue;
 
-                Osoba p = OsobaRepo.GetOrCreateNew(titulPred, jmeno, prijmeni, titulPo, narozeni, status,
+                Osoba p = await OsobaRepo.GetOrCreateNewAsync(titulPred, jmeno, prijmeni, titulPo, narozeni, status,
                     User.Identity?.Name);
 
                 if (!string.IsNullOrWhiteSpace(clenstviStrana))
@@ -373,7 +374,7 @@ namespace HlidacStatu.Web.Controllers
         }
 
         [Authorize(Roles = "canEditData")]
-        public ActionResult Reviews(string id, string a, string reason)
+        public async Task<ActionResult> Reviews(string id, string a, string reason)
         {
             var model = new List<Review>();
             //show list
@@ -391,10 +392,10 @@ namespace HlidacStatu.Web.Controllers
                         switch (a.ToLower())
                         {
                             case "accepted":
-                                item.Accepted(User.Identity?.Name);
+                                await item.AcceptedAsync(User.Identity?.Name);
                                 break;
                             case "denied":
-                                item.Denied(User.Identity?.Name, reason);
+                                await item.DeniedAsync(User.Identity?.Name, reason);
                                 break;
                             default:
                                 break;
@@ -503,12 +504,12 @@ namespace HlidacStatu.Web.Controllers
 
 
         [AllowAnonymous]
-        public ActionResult ChangePhoto(string id)
+        public async Task<ActionResult> ChangePhoto(string id)
         {
             if (string.IsNullOrEmpty(id))
                 return RedirectToAction(nameof(OsobyController.Index), "Osoby");
 
-            var o = Osoby.GetByNameId.Get(id);
+            var o = await OsobaCache.GetPersonByNameIdAsync(id);
             if (o == null)
                 return NotFound();
 
@@ -527,7 +528,7 @@ namespace HlidacStatu.Web.Controllers
                 if (string.IsNullOrEmpty(id))
                     return RedirectToAction(nameof(OsobyController.Index), "Osoby");
 
-                var o = Osoby.GetByNameId.Get(id);
+                var o = await OsobaCache.GetPersonByNameIdAsync(id);
 
                 if (o == null)
                     return NotFound();
@@ -604,10 +605,10 @@ namespace HlidacStatu.Web.Controllers
                                         imi.SaveAsJPEG(o.GetPhotoPath(), 80);
                                         var noBackGr = await HlidacStatu.AI.Photo.RemoveBackgroundAsync(
                                                     new Uri(Devmasters.Config.GetWebConfigValue("RemoveBackgroundAPI")),
-                                                    System.IO.File.ReadAllBytes(o.GetPhotoPath()),
+                                                    await System.IO.File.ReadAllBytesAsync(o.GetPhotoPath()),
                                                     AI.Photo.RemoveBackgroundStyles.Person);
                                         if (noBackGr != null)
-                                            System.IO.File.WriteAllBytes(o.GetPhotoPath( Osoba.PhotoTypes.NoBackground, true), noBackGr);
+                                            await System.IO.File.WriteAllBytesAsync(o.GetPhotoPath( Osoba.PhotoTypes.NoBackground, true), noBackGr);
 
                                             return Redirect("/Osoba/" + o.NameId);
                                     }
@@ -616,7 +617,7 @@ namespace HlidacStatu.Web.Controllers
                                         imi.SaveAsJPEG(target, 80);
                                         //Devmasters.IO.IOTools.MoveFile(fn, HlidacStatu.Lib.Init.OsobaFotky.GetFullPath(o, "small.review.jpg"));
                                         //Devmasters.IO.IOTools.MoveFile(HlidacStatu.Lib.Init.OsobaFotky.GetFullPath(o, "uploaded.jpg"), HlidacStatu.Lib.Init.OsobaFotky.GetFullPath(o, "original.uploaded.jpg"));
-                                        using (DbEntities db = new DbEntities())
+                                        await using (DbEntities db = new DbEntities())
                                         {
                                             var r = new Review()
                                             {
@@ -634,7 +635,7 @@ namespace HlidacStatu.Web.Controllers
                                                     Newtonsoft.Json.JsonConvert.SerializeObject(r, Newtonsoft.Json.Formatting.Indented)
                                                     );
                                             }
-                                            db.SaveChanges();
+                                            await db.SaveChangesAsync();
                                         }
                                         return View("ChangePhoto_finish", o);
                                     }
@@ -689,18 +690,15 @@ namespace HlidacStatu.Web.Controllers
 
 
 
-        public ActionResult Zalozky()
+        public async Task<ActionResult> Zalozky()
         {
-            using (DbEntities db = new DbEntities())
-            {
-                var bookmarks = db.Bookmarks
-                    .AsNoTracking()
-                    .Where(m => m.UserId == User.Identity.Name)
-                    .OrderByDescending(m => m.Created)
-                    .ToArray();
-                return View(bookmarks);
-            }
-
+            await using DbEntities db = new DbEntities();
+            var bookmarks = await db.Bookmarks
+                .AsNoTracking()
+                .Where(m => m.UserId == User.Identity.Name)
+                .OrderByDescending(m => m.Created)
+                .ToArrayAsync();
+            return View(bookmarks);
         }
 
         #region Helpers

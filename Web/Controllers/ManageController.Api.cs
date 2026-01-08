@@ -5,7 +5,6 @@ using HlidacStatu.Entities.VZ;
 using HlidacStatu.Repositories;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-
 using System;
 using System.Collections.Generic;
 using System.Dynamic;
@@ -14,6 +13,7 @@ using System.Threading.Tasks;
 using HlidacStatu.Connectors;
 using HlidacStatu.Extensions;
 using HlidacStatu.LibCore.Extensions;
+using HlidacStatu.Repositories.Cache;
 using Review = HlidacStatu.Entities.Review;
 
 namespace HlidacStatu.Web.Controllers
@@ -21,9 +21,8 @@ namespace HlidacStatu.Web.Controllers
     [Authorize]
     public partial class ManageController : Controller
     {
-
         [AllowAnonymous]
-        public ActionResult AddReview()
+        public async Task<ActionResult> AddReview()
         {
             try
             {
@@ -40,6 +39,7 @@ namespace HlidacStatu.Web.Controllers
                     if (key != null && !keys.Contains(key.ToLower()))
                         eo.Add(new KeyValuePair<string, object>(key, Request.Query[key]));
                 }
+
                 var oldValue = Request.Query["oldV"].ToString();
 
                 dynamic data = eo;
@@ -47,10 +47,9 @@ namespace HlidacStatu.Web.Controllers
 
                 r.OldValue = Newtonsoft.Json.JsonConvert.SerializeObject(data);
 
-                ReviewRepo.Save(r);
+                await ReviewRepo.SaveAsync(r);
 
                 return Json("1");
-
             }
             catch (Exception e)
             {
@@ -59,20 +58,21 @@ namespace HlidacStatu.Web.Controllers
             }
         }
 
-        public async Task<ActionResult> ExportResult(string id, string q, string h, string o, string ct, int? num = null, string ds = null)
+        public async Task<ActionResult> ExportResult(string id, string q, string h, string o, string ct,
+            int? num = null, string ds = null)
         {
             try
             {
-
                 var apiAuth = Framework.ApiAuth.IsApiAuth(HttpContext,
-                parameters: new Framework.ApiCall.CallParameter[] {
-                    new Framework.ApiCall.CallParameter("id", id),
-                    new Framework.ApiCall.CallParameter("q", q),
-                    new Framework.ApiCall.CallParameter("o", o),
-                    new Framework.ApiCall.CallParameter("ct", ct),
-                    new Framework.ApiCall.CallParameter("num", num?.ToString()),
-                    new Framework.ApiCall.CallParameter("ds", ds)
-                });
+                    parameters: new Framework.ApiCall.CallParameter[]
+                    {
+                        new Framework.ApiCall.CallParameter("id", id),
+                        new Framework.ApiCall.CallParameter("q", q),
+                        new Framework.ApiCall.CallParameter("o", o),
+                        new Framework.ApiCall.CallParameter("ct", ct),
+                        new Framework.ApiCall.CallParameter("num", num?.ToString()),
+                        new Framework.ApiCall.CallParameter("ds", ds)
+                    });
 
                 if (!apiAuth.Authentificated)
                 {
@@ -116,27 +116,29 @@ namespace HlidacStatu.Web.Controllers
                     if (sres.IsValid == false && !string.IsNullOrEmpty(sres.Q))
                     {
                         Manager.LogQueryError<Smlouva>(sres.ElasticResults, "/hledej", HttpContext);
-                        rawData = System.Text.Encoding.UTF8.GetBytes("chyba při přípravě dat. Omlouváme se a řešíme to");
+                        rawData = System.Text.Encoding.UTF8.GetBytes(
+                            "chyba při přípravě dat. Omlouváme se a řešíme to");
                         contentType = "text/plain";
                         filename = "export.txt";
                         return File(rawData, contentType, filename);
                     }
+
                     foreach (var s in sres.Results)
                         data.Add(s.FlatExport());
                 } //smlouvy
                 else if (id == "zakazky")
                 {
-
                     string[] cpvs = Request.Query["cpv"].ToString().Split(',');
                     string oblast = Request.Query["oblast"].ToString().Split(',').FirstOrDefault();
                     var sres = await VerejnaZakazkaRepo.Searching.SimpleSearchAsync(q, cpvs, 1, numOfRecords,
-                        (Util.ParseTools.ToInt(o) ?? 0).ToString(), (Request.Query["zahajeny"] == "1"), 
-                        oblast:oblast
-                        );
+                        (Util.ParseTools.ToInt(o) ?? 0).ToString(), (Request.Query["zahajeny"] == "1"),
+                        oblast: oblast
+                    );
 
                     if (sres.IsValid == false && !string.IsNullOrEmpty(sres.Q))
                     {
-                        rawData = System.Text.Encoding.UTF8.GetBytes("chyba při přípravě dat. Omlouváme se a řešíme to");
+                        rawData = System.Text.Encoding.UTF8.GetBytes(
+                            "chyba při přípravě dat. Omlouváme se a řešíme to");
                         contentType = "text/plain";
                         filename = "export.txt";
                         return File(rawData, contentType, filename);
@@ -165,19 +167,23 @@ namespace HlidacStatu.Web.Controllers
                         filename = "chyba.txt";
                         return File(rawData, contentType, filename);
                     }
+
                     if (await datasource.IsFlatStructureAsync() == false)
                     {
-                        rawData = System.Text.Encoding.UTF8.GetBytes("Tato databáze nemá jednoduchou, plochou strukturu. Proto nemůže být exportována. Použijte API z hlidacstatu.cz/api");
+                        rawData = System.Text.Encoding.UTF8.GetBytes(
+                            "Tato databáze nemá jednoduchou, plochou strukturu. Proto nemůže být exportována. Použijte API z hlidacstatu.cz/api");
                         contentType = "text/plain";
                         filename = "chyba.txt";
                         return File(rawData, contentType, filename);
                     }
 
-                    DataSearchResult sres = await datasource.SearchDataAsync(q, 1, numOfRecords, (Util.ParseTools.ToInt(o) ?? 0).ToString());
+                    DataSearchResult sres = await datasource.SearchDataAsync(q, 1, numOfRecords,
+                        (Util.ParseTools.ToInt(o) ?? 0).ToString());
 
                     if (sres.IsValid == false && !string.IsNullOrEmpty(sres.Q))
                     {
-                        rawData = System.Text.Encoding.UTF8.GetBytes("chyba při přípravě dat. Omlouváme se a řešíme to");
+                        rawData = System.Text.Encoding.UTF8.GetBytes(
+                            "chyba při přípravě dat. Omlouváme se a řešíme to");
                         contentType = "text/plain";
                         filename = "export.txt";
                         return File(rawData, contentType, filename);
@@ -192,13 +198,13 @@ namespace HlidacStatu.Web.Controllers
                 }
                 else if (id == "dotace")
                 {
-
                     var sres = await DotaceRepo.Searching.SimpleSearchAsync(q, 1, numOfRecords,
                         (Util.ParseTools.ToInt(o) ?? 0).ToString());
 
                     if (sres.IsValid == false && !string.IsNullOrEmpty(sres.Q))
                     {
-                        rawData = System.Text.Encoding.UTF8.GetBytes("chyba při přípravě dat. Omlouváme se a řešíme to");
+                        rawData = System.Text.Encoding.UTF8.GetBytes(
+                            "chyba při přípravě dat. Omlouváme se a řešíme to");
                         contentType = "text/plain";
                         filename = "export.txt";
                         return File(rawData, contentType, filename);
@@ -209,6 +215,7 @@ namespace HlidacStatu.Web.Controllers
                             data.Add(s.FlatExport());
                     }
                 }
+
                 if (data.Count == 0)
                 {
                     rawData = System.Text.Encoding.UTF8.GetBytes("žádná data nejsou k dispozici");
@@ -240,10 +247,9 @@ namespace HlidacStatu.Web.Controllers
                         rawData = new HlidacStatu.ExportData.Excel().ExportData(new ExportData.Data(data));
                         contentType = "application/vnd.ms-excel";
                         filename = "export.xlsx";
-
                     }
-
                 }
+
                 return File(rawData, contentType, filename);
             }
             catch (Exception e)
@@ -251,21 +257,19 @@ namespace HlidacStatu.Web.Controllers
                 _logger.Error(e, $"Export error:  id={id}, q={q}, h={h}, o={o}, ct={ct}, num={num}, ds={ds}");
                 return Content("Nastala chyba. Zkuste to pozdeji znovu", "text/plain");
             }
-
         }
-        
+
         public async Task<ActionResult> FullExport(string q, string ds = null)
         {
-            if(!User.IsInRole("Admin"))
+            if (!User.IsInRole("Admin"))
                 return new UnauthorizedResult();
             try
             {
-
                 byte[] rawData = null;
                 string contentType = "";
                 string filename = "";
                 List<dynamic> data = new List<dynamic>();
-                
+
                 if (string.IsNullOrEmpty(ds))
                 {
                     rawData = System.Text.Encoding.UTF8.GetBytes("žádná data nejsou k dispozici");
@@ -282,9 +286,11 @@ namespace HlidacStatu.Web.Controllers
                     filename = "chyba.txt";
                     return File(rawData, contentType, filename);
                 }
+
                 if (await datasource.IsFlatStructureAsync() == false)
                 {
-                    rawData = System.Text.Encoding.UTF8.GetBytes("Tato databáze nemá jednoduchou, plochou strukturu. Proto nemůže být exportována. Použijte API z hlidacstatu.cz/api");
+                    rawData = System.Text.Encoding.UTF8.GetBytes(
+                        "Tato databáze nemá jednoduchou, plochou strukturu. Proto nemůže být exportována. Použijte API z hlidacstatu.cz/api");
                     contentType = "text/plain";
                     filename = "chyba.txt";
                     return File(rawData, contentType, filename);
@@ -307,7 +313,7 @@ namespace HlidacStatu.Web.Controllers
                         data.Add(await datasource.ExportFlatObjectAsync(s));
                     }
                 }
-                
+
                 if (data.Count == 0)
                 {
                     rawData = System.Text.Encoding.UTF8.GetBytes("žádná data nejsou k dispozici");
@@ -320,6 +326,7 @@ namespace HlidacStatu.Web.Controllers
                     contentType = "text/tab-separated-values";
                     filename = "export.tsv";
                 }
+
                 return File(rawData, contentType, filename);
             }
             catch (Exception e)
@@ -327,55 +334,60 @@ namespace HlidacStatu.Web.Controllers
                 _logger.Error(e, $"Full export error:  q={q}, ds={ds}");
                 return Content("Nastala chyba. Zkuste to pozdeji znovu", "text/plain");
             }
-
         }
 
         [Authorize(Roles = "canEditData")]
-        public JsonResult RemovePhoto(string id, HlidacStatu.Entities.Osoba.PhotoTypes phototype)
+        public async Task<JsonResult> RemovePhoto(string id, HlidacStatu.Entities.Osoba.PhotoTypes phototype)
         {
-            var o = Osoby.GetByNameId.Get(id);
+            var o = await OsobaCache.GetPersonByNameIdAsync(id);
             if (o == null)
             {
                 return new JsonResult(false);
             }
+
             if (o.HasPhoto())
             {
-                var path = o.GetPhotoPath(phototype,true);
+                var path = o.GetPhotoPath(phototype, true);
                 if (System.IO.File.Exists(path))
-                    Devmasters.IO.IOTools.DeleteFile(path, TimeSpan.FromSeconds(1), TimeSpan.FromMilliseconds(500), false);
+                    Devmasters.IO.IOTools.DeleteFile(path, TimeSpan.FromSeconds(1), TimeSpan.FromMilliseconds(500),
+                        false);
             }
+
             return new JsonResult(true);
         }
 
         [Authorize(Roles = "canEditData")]
         public async Task<JsonResult> DoPhotoRemoveBackground(string id)
         {
-
-            var o = Osoby.GetByNameId.Get(id);
+            var o = await OsobaCache.GetPersonByNameIdAsync(id);
             if (o == null)
             {
                 return new JsonResult(false);
             }
+
             if (o.HasPhoto())
             {
                 var path = o.GetPhotoPath();
                 if (System.IO.File.Exists(path))
                 {
-                    
                     var noBackGr = await HlidacStatu.AI.Photo.RemoveBackgroundAsync(
                         new Uri(Devmasters.Config.GetWebConfigValue("RemoveBackgroundAPI")),
-                        System.IO.File.ReadAllBytes(o.GetPhotoPath()), 
+                        System.IO.File.ReadAllBytes(o.GetPhotoPath()),
                         AI.Photo.RemoveBackgroundStyles.Person);
                     if (noBackGr != null)
                     {
-                        System.IO.File.WriteAllBytes(o.GetPhotoPath( Entities.Osoba.PhotoTypes.NoBackground,true), noBackGr);
+                        System.IO.File.WriteAllBytes(o.GetPhotoPath(Entities.Osoba.PhotoTypes.NoBackground, true),
+                            noBackGr);
                         return new JsonResult(true);
                     }
+
                     return new JsonResult(false);
                 }
             }
+
             return new JsonResult(false);
         }
+
         public ActionResult RemoveBookmark(string id, int type)
         {
             try
@@ -408,11 +420,11 @@ namespace HlidacStatu.Web.Controllers
         {
             using (DbEntities db = new DbEntities())
             {
-
                 if (string.IsNullOrEmpty(query))
                 {
                     return Json("0");
                 }
+
                 string id = User.GetUserId();
 
                 var dt = dataType;
@@ -437,8 +449,10 @@ namespace HlidacStatu.Web.Controllers
                     if (await DataSet.ExistsDatasetAsync(dataSetId) == false)
                     {
                         _logger.Error("AddWd - try to hack, wrong dataType = " + dataType + "." + dataSetId);
-                        throw new ArgumentOutOfRangeException("AddWd - try to hack, wrong dataType = " + dataType + "." + dataSetId);
+                        throw new ArgumentOutOfRangeException("AddWd - try to hack, wrong dataType = " + dataType +
+                                                              "." + dataSetId);
                     }
+
                     wd.DataType = nameof(DataSet) + "." + dataSetId;
                 }
                 else if (dt == WatchDog.AllDbDataType)
@@ -450,8 +464,9 @@ namespace HlidacStatu.Web.Controllers
                     _logger.Error("AddWd - try to hack, wrong dataType = " + dataType);
                     throw new ArgumentOutOfRangeException("AddWd - try to hack, wrong dataType = " + dataType);
                 }
+
                 if (!db.WatchDogs
-                     .Any(m => m.DataType == wd.DataType && m.UserId == id && m.SearchTerm == query))
+                        .Any(m => m.DataType == wd.DataType && m.UserId == id && m.SearchTerm == query))
                 {
                     wd.Save();
                 }
@@ -459,7 +474,5 @@ namespace HlidacStatu.Web.Controllers
                 return Json("1");
             }
         }
-
-
     }
 }

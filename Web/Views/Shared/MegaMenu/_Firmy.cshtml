@@ -33,7 +33,7 @@
 
                         @foreach (var pol in (await OsobaCache.GetTopPoliticiObchodujiciSeStatemAsync())[0].Take(20).ShuffleMe().Take(3))
                         {
-                            var o = Osoby.GetByNameId.Get(pol.OsobaNameId);
+                            var o = await OsobaCache.GetPersonByNameIdAsync(pol.OsobaNameId);
                             <li class="list-group-item">
                                 <div class="person-profile-thumb person-profile-thumb--verysmall">
                                     <a onclick="return trackOutLink(this,'megamenu');" href="@(o.GetUrl())">

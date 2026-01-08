@@ -7,6 +7,7 @@ using System.ComponentModel;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Text.Json;
+using HlidacStatu.Repositories.Cache;
 using static HlidacStatu.XLib.Search;
 
 namespace HlidacStatu.MCPServer.Tools
@@ -252,7 +253,7 @@ url - a URL to the document or search result item. Useful for citing specific re
                             };
                             break;
                         case "osoba":
-                            var osoba = Osoby.GetByNameId.Get(value);
+                            var osoba = await OsobaCache.GetPersonByNameIdAsync(value);
                             res = new OpenAiResultItem
                             {
                                 id = osoba.NameId,

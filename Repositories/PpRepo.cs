@@ -10,6 +10,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
+using HlidacStatu.Repositories.Cache;
 using static HlidacStatu.Entities.PuEvent;
 
 namespace HlidacStatu.Repositories;
@@ -304,10 +305,10 @@ public static partial class PpRepo
         /// ico- nameid[]
         List<Firma> res = new();
 
-        Osoba o = Osoby.GetByNameId.Get(nameId);
+        Osoba o = await OsobaCache.GetPersonByNameIdAsync(nameId);
         if (o != null)
         {
-            var vazby = o.PrimaAngazovanost(DS.Graphs.Relation.CharakterVazbyEnum.VlastnictviKontrola, HlidacStatu.DS.Graphs.Relation.AktualnostType.Nedavny);
+            var vazby = await o.PrimaAngazovanostAsync(DS.Graphs.Relation.CharakterVazbyEnum.VlastnictviKontrola, HlidacStatu.DS.Graphs.Relation.AktualnostType.Nedavny);
             var d1 = vazby
                 .Where(v => Devmasters.DT.DateInterval.IsOverlappingIntervals(
                     new Devmasters.DT.DateInterval(v.RelFrom, v.RelTo), obdobi))
@@ -351,12 +352,12 @@ public static partial class PpRepo
             .ToListAsync();
     }
 
-    public static Osoba GetOsoba(this PpPrijem prijem)
+    public static async Task<Osoba> GetCachedOsobaAsync(this PpPrijem prijem)
     {
         if (string.IsNullOrEmpty(prijem.Nameid))
             return null;
         else
-            return Osoby.GetByNameId.Get(prijem.Nameid);
+            return await OsobaCache.GetPersonByNameIdAsync(prijem.Nameid);
     }
 
 
@@ -888,8 +889,8 @@ public static partial class PpRepo
                 break;
 
             case PoliticianGroup.Vlada:
-                var ministri = OsobaRepo.GetByZatrideni(OsobaRepo.Zatrideni.Ministr, rok).Select(o => o.NameId);
-                var predseda = OsobaRepo.GetByZatrideni(OsobaRepo.Zatrideni.PredsedaVlady, rok).Select(o => o.NameId);
+                var ministri = (await OsobaRepo.GetByZatrideniAsync(OsobaRepo.Zatrideni.Ministr, rok)).Select(o => o.NameId);
+                var predseda = (await OsobaRepo.GetByZatrideniAsync(OsobaRepo.Zatrideni.PredsedaVlady, rok)).Select(o => o.NameId);
                 nameIds = ministri.Concat(predseda).Distinct().ToList();
                 break;
 

@@ -3,12 +3,14 @@ using HlidacStatu.Entities;
 using HlidacStatu.Repositories;
 
 using System;
+using System.Threading.Tasks;
+using HlidacStatu.Repositories.Cache;
 
 namespace HlidacStatu.Extensions
 {
     public static class ReviewExtension
     {
-        public static void Accepted(this Review review, string user)
+        public static async Task AcceptedAsync(this Review review, string user)
         {
             review.ReviewedBy = user;
             review.Reviewed = DateTime.Now;
@@ -18,7 +20,7 @@ namespace HlidacStatu.Extensions
             {
                 case Review.ItemTypes.osobaPhoto:
                     var data = Newtonsoft.Json.Linq.JObject.Parse(review.NewValue);
-                    Osoba o = Osoby.GetByNameId.Get(data.Value<string>("nameId"));
+                    Osoba o = await OsobaCache.GetPersonByNameIdAsync(data.Value<string>("nameId"));
                     if (o != null)
                     {
                         var path = o.GetPhotoPath(Osoba.PhotoTypes.UploadedOriginal, true); //Init.OsobaFotky.GetFullPath(o, "original.uploaded.jpg");
@@ -52,10 +54,10 @@ namespace HlidacStatu.Extensions
                     break;
             }
 
-            ReviewRepo.Save(review);
+            await ReviewRepo.SaveAsync(review);
         }
 
-        public static void Denied(this Review review, string user, string reason)
+        public static async Task DeniedAsync(this Review review, string user, string reason)
         {
             review.ReviewedBy = user;
             review.Reviewed = DateTime.Now;
@@ -70,7 +72,7 @@ namespace HlidacStatu.Extensions
                         {
                             smtp.Host = Devmasters.Config.GetWebConfigValue("SmtpHost");
                             var data = Newtonsoft.Json.Linq.JObject.Parse(review.NewValue);
-                            Osoba o = Osoby.GetByNameId.Get(data.Value<string>("nameId"));
+                            Osoba o = await OsobaCache.GetPersonByNameIdAsync(data.Value<string>("nameId"));
                             if (o != null)
                             {
                                 var m = new System.Net.Mail.MailMessage()
@@ -95,24 +97,24 @@ namespace HlidacStatu.Extensions
                 }
             }
 
-            ReviewRepo.Save(review);
+            await ReviewRepo.SaveAsync(review);
         }
 
-        public static string RenderNewValueToHtml(this Review review)
+        public static Task<string> RenderNewValueToHtmlAsync(this Review review)
         {
-            return review.RenderValueToHtml(false);
+            return review.RenderValueToHtmlAsync(false);
         }
-        public static string RenderOldValueToHtml(this Review review)
+        public static Task<string> RenderOldValueToHtmlAsync(this Review review)
         {
-            return review.RenderValueToHtml(true);
+            return review.RenderValueToHtmlAsync(true);
         }
-        private static string RenderValueToHtml(this Review review, bool oldValue)
+        private static async Task<string> RenderValueToHtmlAsync(this Review review, bool oldValue)
         {
             switch (review.ItemType)
             {
                 case Review.ItemTypes.osobaPhoto:
                     var data = Newtonsoft.Json.Linq.JObject.Parse(review.NewValue);
-                    Osoba o = Osoby.GetByNameId.Get(data.Value<string>("nameId"));
+                    Osoba o = await OsobaCache.GetPersonByNameIdAsync(data.Value<string>("nameId"));
                     if (o != null)
                     {
                         if (oldValue)
@@ -122,7 +124,7 @@ namespace HlidacStatu.Extensions
                             var fn = Init.OsobaFotky.GetFullPath(o, "small.uploaded.jpg");
                             if (System.IO.File.Exists(fn))
                                 return "<img style='width:150px;height:auto; border:solid #d0d0d0 1px; margin:5px;' src='data:image/jpeg;base64,"
-                                    + Convert.ToBase64String(System.IO.File.ReadAllBytes(fn), Base64FormattingOptions.None) + "' />" + o.FullNameWithNarozeni();
+                                    + Convert.ToBase64String(await System.IO.File.ReadAllBytesAsync(fn), Base64FormattingOptions.None) + "' />" + o.FullNameWithNarozeni();
                             else
                                 return "Žádná fotka" + o.FullNameWithNarozeni();
 
@@ -137,7 +139,7 @@ namespace HlidacStatu.Extensions
                         var osobaid = data1.Value<string>("id");
                         if (!string.IsNullOrEmpty(osobaid))
                         {
-                            var o1 = Osoby.GetByNameId.Get(data1.Value<string>("id"));
+                            var o1 = await OsobaCache.GetPersonByNameIdAsync(data1.Value<string>("id"));
                             if (o1 != null)
                             {
                                 return $"<a href='{o1.GetUrl()}'>{o1.FullNameWithNarozeni()}</a>";

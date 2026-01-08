@@ -26,7 +26,7 @@
             }
         }
 
-        protected override RuleResult processQueryPart(SplittingQuery.Part part)
+        protected override Task<RuleResult> processQueryPartAsync(SplittingQuery.Part part)
         {
             if (part == null)
                 return null;
@@ -73,7 +73,7 @@
                     icosQuery = string.Format(templ, "noOne"); //$" ( {icoprefix}:noOne ) ";
                 }
 
-                return new RuleResult(SplittingQuery.SplitQuery($"{icosQuery}"), NextStep);
+                return Task.FromResult(new RuleResult(SplittingQuery.SplitQuery($"{icosQuery}"), NextStep));
 
             }
 

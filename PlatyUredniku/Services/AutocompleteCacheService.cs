@@ -187,7 +187,7 @@ public class AutocompleteCacheService
             if(cancellationToken.IsCancellationRequested)
                 break;
 
-            var osoba = OsobaRepo.GetByNameId(nameId);
+            var osoba = await OsobaRepo.GetByNameIdAsync(nameId);
 
             var autocomplete = new Autocomplete()
             {

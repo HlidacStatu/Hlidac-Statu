@@ -18,7 +18,7 @@
     }
 
     var statistics = await Model.StatistikaRegistrSmluvAsync();
-    var vazbyPodleAktualnosti = Model.AktualniVazby(Relation.CharakterVazbyEnum.VlastnictviKontrola, aktualnost);
+    var vazbyPodleAktualnosti = await Model.AktualniVazbyAsync(Relation.CharakterVazbyEnum.VlastnictviKontrola, aktualnost);
 }
 
 
@@ -212,7 +212,7 @@
                 {
                     ICO = g.ico,
                     FirmaName = g.v.First().To.PrintName(),
-                    VazbyPerIco = Model.VazbyProICO(g.ico),
+                    VazbyPerIco = await OsobaVazbyRepo.VazbyProIcoCachedAsync(Model, g.ico),
                     stat
                 };
             }

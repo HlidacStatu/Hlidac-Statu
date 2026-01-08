@@ -1,7 +1,4 @@
-﻿using System;
-using System.Linq;
-
-namespace HlidacStatu.Searching
+﻿namespace HlidacStatu.Searching
 {
     public class VZ_Form
         : RuleBase
@@ -19,7 +16,7 @@ namespace HlidacStatu.Searching
         }
 
 
-        protected override RuleResult processQueryPart(SplittingQuery.Part part)
+        protected override Task<RuleResult> processQueryPartAsync(SplittingQuery.Part part)
         {
             if (part == null)
                 return null;
@@ -35,7 +32,7 @@ namespace HlidacStatu.Searching
                     if (forms.Length > 0)
                         q_form = $"formulare.druh:({string.Join(" OR ",forms.Select(s => s + "*"))})";
 
-                    return new RuleResult(SplittingQuery.SplitQuery($" ( {q_form} ) "), NextStep);
+                    return Task.FromResult(new RuleResult(SplittingQuery.SplitQuery($" ( {q_form} ) "), NextStep));
                 }
             }
 

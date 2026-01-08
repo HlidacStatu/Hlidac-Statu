@@ -11,10 +11,10 @@
     if (Model.Prijemce != null)
     {
         var platciPrijemci = Model.Prijemce.Union(new Smlouva.Subjekt[] { Model.Platce })
-            .Where(m => !string.IsNullOrEmpty(m.ico)).ToArray(); 
-        
+            .Where(m => !string.IsNullOrEmpty(m.ico)).ToArray();
+
         angPolitiku = platciPrijemci.Any(m => firmySVazbamiNaPolitiky.SoukromeFirmy.ContainsKey(m.ico));
-        
+
         foreach (var platcePrijemce in platciPrijemci)
         {
             if (Firmy.Get(platcePrijemce.ico)?.Valid == true && (await Firmy.Get(platcePrijemce.ico).IsSponzorAsync()) == true)
@@ -111,7 +111,7 @@
                             <p>
                                 <strong><a href="/politik/@p.NameId">@p.FullName()</a></strong>
                             <div style="padding-left:20px;">
-                                @Html.RenderVazby(p.VazbyProICO(ss.ico))
+                                @Html.RenderVazby(await OsobaVazbyRepo.VazbyProIcoCachedAsync(p, ss.ico))
                             </div>
                             </p>
                         }

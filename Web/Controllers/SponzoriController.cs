@@ -32,7 +32,7 @@ namespace HlidacStatu.Web.Controllers
             var filteredModel = model.Where(s => s.DarCelkem > 100000).ToList();
             ViewBag.Rok = rok ?? 0;
             var firstRow = filteredModel.FirstOrDefault();
-            ViewBag.TopOsoba = OsobaRepo.GetByNameId(firstRow?.Id);
+            ViewBag.TopOsoba = OsobaRepo.GetByNameIdAsync(firstRow?.Id);
             ViewBag.TopOsobaAmount = firstRow?.DarCelkem ?? 0;
 
             return View(filteredModel);
@@ -77,7 +77,7 @@ namespace HlidacStatu.Web.Controllers
             ViewBag.Strana = id;
             var model = await SponzoringRepo.PeopleSponsorsAsync(id, cancellationToken);
             var firstRow = model.FirstOrDefault();
-            ViewBag.TopOsoba = OsobaRepo.GetByNameId(firstRow?.Id);
+            ViewBag.TopOsoba = OsobaRepo.GetByNameIdAsync(firstRow?.Id);
             ViewBag.TopOsobaAmount = firstRow?.DarCelkem ?? 0;
 
             return View(model);

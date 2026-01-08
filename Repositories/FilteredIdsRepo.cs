@@ -1,6 +1,4 @@
 ﻿using HlidacStatu.Entities;
-
-
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -18,17 +16,18 @@ namespace HlidacStatu.Repositories
 
             public string Query { get; set; }
             public Action<string> LogOutputFunc { get; set; } = null;
-            public Devmasters.Batch.IProgressWriter  ProgressOutputFunc { get; set; } = null;
-
+            public Devmasters.Batch.IProgressWriter ProgressOutputFunc { get; set; } = null;
         }
 
-        public static async Task<string[]> GetDotaceIdsAsync(QueryBatch query, int maxDegreeOfParallelism = 10, Devmasters.Batch.IMonitor monitor = null)
+        public static async Task<string[]> GetDotaceIdsAsync(QueryBatch query, int maxDegreeOfParallelism = 10,
+            Devmasters.Batch.IMonitor monitor = null)
         {
             var client = Manager.GetESClient_Dotace();
-            var sq = DotaceRepo.Searching.GetSimpleQuery(query.Query);
+            var sq = await DotaceRepo.Searching.GetSimpleQueryAsync(query.Query);
             var ids = await Searching.Tools.GetAllIdsAsync(client, maxDegreeOfParallelism, sq,
                 logOutputFunc: query.LogOutputFunc, progressOutputFunc: query.ProgressOutputFunc,
-                monitor:(monitor ?? new MonitoredTaskRepo.ForBatch(part: $"{nameof(GetDotaceIdsAsync)} {query.Query}") ));
+                monitor: (monitor ??
+                          new MonitoredTaskRepo.ForBatch(part: $"{nameof(GetDotaceIdsAsync)} {query.Query}")));
 
             return ids.Result.ToArray();
         }
@@ -37,11 +36,12 @@ namespace HlidacStatu.Repositories
         {
             var client = Manager.GetESClient();
 
-            var ids = await Searching.Tools.GetAllSmlouvyIdsAsync(client, 10, query.Query, 
+            var ids = await Searching.Tools.GetAllSmlouvyIdsAsync(client, 10, query.Query,
                 logOutputFunc: query.LogOutputFunc, progressOutputFunc: query.ProgressOutputFunc);
 
             return ids.Result.ToArray();
         }
+
         public static async Task<string[]> GetSmlouvyIdAsync_old(QueryBatch query)
         {
             var stack = HlidacStatu.Util.StackReport.GetCallingMethod(true);
@@ -55,11 +55,12 @@ namespace HlidacStatu.Repositories
             Func<int, int, Task<ISearchResponse<Smlouva>>> searchFunc = async (size, page) =>
             {
                 var client = Manager.GetESClient();
+                var sq = await SmlouvaRepo.Searching.GetSimpleQueryAsync(query.Query);
                 return await client.SearchAsync<Smlouva>(a => a
                     .Size(size)
                     .Source(false)
                     .From(page * size)
-                    .Query(q => SmlouvaRepo.Searching.GetSimpleQuery(query.Query))
+                    .Query(q => sq)
                     .Scroll("1m")
                 );
             };
@@ -69,11 +70,11 @@ namespace HlidacStatu.Repositories
                 searchFunc, (hit, param) =>
                 {
                     ids2Process.Add(hit.Id);
-                    return Task.FromResult(new Devmasters.Batch.ActionOutputData() { CancelRunning = false, Log = null });
+                    return Task.FromResult(
+                        new Devmasters.Batch.ActionOutputData() { CancelRunning = false, Log = null });
                 }, null, query.LogOutputFunc, query.ProgressOutputFunc, false);
 
             return ids2Process.ToArray();
         }
     }
 }
-

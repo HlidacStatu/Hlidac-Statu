@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace HlidacStatu.Repositories
 {
@@ -69,7 +70,7 @@ namespace HlidacStatu.Repositories
         static Osoba nullObj = new Osoba() { NameId = "____NOTHING____" };
         private class OsobyMCMById : Devmasters.Cache.Memcached.Manager<Osoba, int>
         {
-            public OsobyMCMById() : base("PersonById", getById, TimeSpan.FromMinutes(10),
+            public OsobyMCMById() : base("PersonById", GetByIdAsync, TimeSpan.FromMinutes(10),
                     Devmasters.Config.GetWebConfigValue("HazelcastServers").Split(','))
             { }
 
@@ -81,9 +82,9 @@ namespace HlidacStatu.Repositories
                 else
                     return o;
             }
-            private static Osoba getById(int key)
+            private static async Task<Osoba> GetByIdAsync(int key)
             {
-                var o = OsobaRepo.GetByInternalId(key);
+                var o = await OsobaRepo.GetByInternalIdAsync(key);
                 return o ?? nullObj;
             }
 
@@ -110,50 +111,5 @@ namespace HlidacStatu.Repositories
                 return instanceById;
             }
         }
-
-        private class OsobyMCMByNameId : Devmasters.Cache.Memcached.Manager<Osoba, string>
-        {
-            public OsobyMCMByNameId() : base("PersonByNameId", getByNameId, TimeSpan.FromMinutes(10),
-                    Devmasters.Config.GetWebConfigValue("HazelcastServers").Split(','))
-            { }
-
-            public override Osoba Get(string key)
-            {
-                if (string.IsNullOrEmpty(key))
-                    return null;
-
-                var o = base.Get(key);
-                if (o == null || o?.NameId == nullObj.NameId)
-                    return null;
-                else
-                    return o;
-            }
-            private static Osoba getByNameId(string nameId)
-            {
-                var o = OsobaRepo.GetByNameId(nameId);
-                return o ?? nullObj;
-            }
-
-        }
-
-        private static OsobyMCMByNameId instanceNameId;
-        public static Devmasters.Cache.Memcached.Manager<Osoba, string> GetByNameId
-        {
-            get
-            {
-                if (instanceNameId == null)
-                {
-                    lock (lockObj)
-                    {
-                        if (instanceNameId == null)
-                        {
-                            instanceNameId = new OsobyMCMByNameId();
-                        }
-                    }
-                }
-                return instanceNameId;
-            }
-        }
-
     }
 }
