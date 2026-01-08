@@ -41,7 +41,7 @@ namespace HlidacStatu.Extensions
         public static async Task<string> GetPlatyUrlAsync(this Firma firma)
         {
             if (firma == null)
-                return default;
+                return null;
 
             var org = await PuRepo.GetFullDetailAsync(firma.DatovaSchranka);
             if (org == null)
@@ -53,7 +53,7 @@ namespace HlidacStatu.Extensions
         public static async Task<IEnumerable<SocialContact>> GetSocialContactsAsync(this Firma firma)
         {
             if (firma == null)
-                return Array.Empty<SocialContact>();
+                return null;
 
             return (await firma.EventsAsync(oe => oe.Type == (int)OsobaEvent.Types.SocialniSite))
                 .Select(oe => new SocialContact
@@ -69,7 +69,7 @@ namespace HlidacStatu.Extensions
         private static async Task<bool> MaVztahySeStatemAsync(this Firma firma)
         {
             if (firma == null)
-                return false;
+                throw new ArgumentNullException(nameof(firma));
 
             return await firma.IsSponzorAsync()
                    || (await firma.StatistikaRegistruSmluvAsync()).Sum(s => s.PocetSmluv) > 0
@@ -80,7 +80,7 @@ namespace HlidacStatu.Extensions
         public static async Task<bool> MaVazbyNaPolitikyPredAsync(this Firma firma, DateTime date)
         {
             if (firma == null)
-                return false;
+                throw new ArgumentNullException(nameof(firma));
 
             if (await firma.MaVazbyNaPolitikyAsync())
             {
@@ -99,7 +99,7 @@ namespace HlidacStatu.Extensions
         public static async Task<List<NapojenaOsoba>> NapojeneOsobyMinisterstvaAsync(this Firma firma)
         {
             if (firma == null)
-                return new List<NapojenaOsoba>();
+                return null;
 
             await using var db = new DbEntities();
 
@@ -128,7 +128,7 @@ namespace HlidacStatu.Extensions
         public static async Task<bool> MusiPublikovatDoRSAsync(this Firma firma)
         {
             if (firma == null)
-                return false;
+                throw new ArgumentNullException(nameof(firma));
 
             if (vyjimky_v_RS_.Contains(firma.ICO))
                 return false;
@@ -171,7 +171,7 @@ namespace HlidacStatu.Extensions
         public static async Task<KategorieOVM[]> KategorieOVMAsync(this Firma firma)
         {
             if (firma == null)
-                return Array.Empty<KategorieOVM>();
+                return null;
 
             Lib.Data.External.RPP.KategorieOVM[] _kategorieOVM = null;
 
@@ -257,7 +257,7 @@ namespace HlidacStatu.Extensions
         public static async Task<bool> MaVazbyNaPolitikyAsync(this Firma firma)
         {
             if (firma == null)
-                return false;
+                throw new ArgumentNullException(nameof(firma));
 
             return (await MaterializedViewsCache.FirmySVazbamiNaPolitiky_NedavneAsync()).SoukromeFirmy.ContainsKey(firma.ICO);
         }
@@ -278,7 +278,7 @@ namespace HlidacStatu.Extensions
         public static bool IsNespolehlivyPlatceDPH(this Firma firma)
         {
             if (firma == null)
-                return false;
+                throw new ArgumentNullException(nameof(firma));
 
             return firma.NespolehlivyPlatceDPH() != null;
         }
@@ -297,7 +297,7 @@ namespace HlidacStatu.Extensions
         public static async Task<bool> NotInterestingToShowAsync(this Firma firma)
         {
             if (firma == null)
-                return false;
+                throw new ArgumentNullException(nameof(firma));
             return (await firma.MaVztahySeStatemAsync() == false)
                    && (firma.IsNespolehlivyPlatceDPH() == false)
                    && (await firma.MaVazbyNaPolitikyAsync() == false);
@@ -420,6 +420,8 @@ namespace HlidacStatu.Extensions
         
         public static async Task<(Osoba Osoba, DateTime? From, string Role)> CurrentCeoAsync(this Firma firma)
         {
+            if (firma == null)
+                throw new ArgumentNullException(nameof(firma));
             var ceos = await OsobaEventRepo.GetCeosAsync(firma.ICO);
             if (ceos.Any())
             {
@@ -498,6 +500,8 @@ namespace HlidacStatu.Extensions
 
         public static bool JsemSoukromaFirma(this Firma firma)
         {
+            if (firma == null)
+                throw new ArgumentNullException(nameof(firma));
 
             return firma.TypSubjektu <= Firma.TypSubjektuEnum.Exekutor;
         }
@@ -506,6 +510,9 @@ namespace HlidacStatu.Extensions
 
         public static bool JsemNeziskovka(this Firma firma)
         {
+            if (firma == null)
+                throw new ArgumentNullException(nameof(firma));
+
             if (firma.JsemSoukromaFirma() == false)
                 return false;
             else if (firma.Kod_PF.HasValue == false)
@@ -530,6 +537,9 @@ namespace HlidacStatu.Extensions
 
         public static bool JsemZivnostnik(this Firma firma)
         {
+            if (firma == null)
+                throw new ArgumentNullException(nameof(firma));
+
             return firma.Kod_PF <= 110;
         }
         
@@ -539,21 +549,29 @@ namespace HlidacStatu.Extensions
 
         public static async Task<bool> IsSponzorAsync(this Firma firma)
         {
+            if (firma == null)
+                throw new ArgumentNullException(nameof(firma));
+
             return (await firma.SponzoringAsync()).Any();
         }
 
         public static async Task<OsobaEvent[]> EventsAsync(this Firma firma)
         {
+            if (firma == null)
+                return null;
             return await firma.EventsAsync(m => true);
         }
 
         public static async Task<List<Sponzoring>> SponzoringAsync(this Firma firma)
-        {
+        {if (firma == null)
+                return null;
             return await firma.SponzoringAsync(m => true);
         }
 
         public static async Task<string> SponzoringToHtmlAsync(this Firma firma, int take = int.MaxValue)
         {
+            if (firma == null)
+                return string.Empty;    
             return string.Join("<br />",
                 (await firma.SponzoringAsync())
                     .OrderByDescending(s => s.DarovanoDne)
@@ -563,6 +581,8 @@ namespace HlidacStatu.Extensions
 
         private static async Task<OsobaEvent[]> EventsAsync(this Firma firma, Expression<Func<OsobaEvent, bool>> predicate)
         {
+            if (firma == null)
+                return null;
             await using DbEntities db = new DbEntities();
             return await db.OsobaEvent
                 .AsNoTracking()
@@ -573,11 +593,15 @@ namespace HlidacStatu.Extensions
 
         private static async Task<List<Sponzoring>> SponzoringAsync(this Firma firma, Expression<Func<Sponzoring, bool>> predicate)
         {
+            if (firma == null)
+                return null;
             return await SponzoringRepo.GetByDarceAsync(firma.ICO, predicate);
         }
 
         public static async Task<Sponzoring> AddSponsoringAsync(this Firma firma, Sponzoring sponzoring, string user)
-        {
+        {if (firma == null)
+                return null;
+
             sponzoring.IcoDarce = firma.ICO;
             var result = await SponzoringRepo.CreateAsync(sponzoring, user);
             return result;
@@ -587,6 +611,9 @@ namespace HlidacStatu.Extensions
             string template = "{0}", string itemTemplate = "{0}",
             string itemDelimeter = "<br/>", int numOfRecords = int.MaxValue)
         {
+            if (firma == null)
+                throw new ArgumentNullException(nameof(firma));
+
             var events = await firma.EventsAsync(predicate);
             if (!events.Any())
                 return string.Empty;
@@ -621,11 +648,17 @@ namespace HlidacStatu.Extensions
 
         private static string ObecneJmeno(this Firma firma)
         {
+            if (firma == null)
+                throw new ArgumentNullException(nameof(firma));
+
             return firma.JsemOVM() ? uradName : (firma.JsemStatniFirma() ? statniName : firmaName);
         }
 
         public static bool IsSponzorBefore(this Firma firma, DateTime date)
         {
+            if (firma == null)
+                throw new ArgumentNullException(nameof(firma));
+
             if (firma.JsemOVM())
                 return false;
             if (firma.JsemStatniFirma())
@@ -638,6 +671,9 @@ namespace HlidacStatu.Extensions
 
         public static async Task<Riziko[]> GetDirectRizikoAsync(Firma firma, int rok)
         {
+            if (firma == null)
+                throw new ArgumentNullException(nameof(firma));
+
             if (firma == null)
                 return Array.Empty<Riziko>();
 
@@ -788,6 +824,9 @@ namespace HlidacStatu.Extensions
         
         public static async Task<Riziko[]> RizikaAsync(this Firma firma, int rok, bool forceUpdateCache = false) //otázka jestli tohle nebrat z cachce
         {
+            if (firma == null)
+                throw new ArgumentNullException(nameof(firma));
+
             if (forceUpdateCache)
                 await FirmaCache.InvalidateRizikoAsync(firma,rok);
             return await FirmaCache.GetRizikoAsync(firma, rok);
@@ -795,6 +834,9 @@ namespace HlidacStatu.Extensions
 
         public static async Task<InfoFact[]> InfoFactsAsync(this Firma firma, bool forceUpdateCache = false)
         {
+            if (firma == null)
+                throw new ArgumentNullException(nameof(firma));
+
             if (forceUpdateCache)
                 await FirmaCache.InvalidateInfoFactsAsync(firma);
             return await FirmaCache.GetInfoFactsAsync(firma);
@@ -803,7 +845,7 @@ namespace HlidacStatu.Extensions
         public static async Task<InfoFact[]> GetDirectInfoFactsAsync(Firma firma)
         {
             if (firma == null)
-                return Array.Empty<InfoFact>();
+                throw new ArgumentNullException(nameof(firma));
 
             var sName = firma.ObecneJmeno();
             bool sMuzsky = sName == uradName;
