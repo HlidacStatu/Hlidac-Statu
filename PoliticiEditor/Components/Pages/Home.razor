@@ -49,7 +49,7 @@ else
                 <h3>@Osoba.FullNameWithYear()</h3>
             </a>
             <div class="new-p new-p--gray new-p--small">
-                @Osoba.CurrentPoliticalPartyAsync()
+                @(CurrentPoliticalParty)
             </div>
         </div>
     </div>
@@ -80,11 +80,13 @@ else
     public string? MailHash { get; set; }
     private ClaimsPrincipal? User { get; set; }
     private HlidacStatu.Entities.Osoba Osoba { get; set; }
+    private string CurrentPoliticalParty { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
         User = await UserHelper.GetCurrentUserAsync();
         Osoba = await OsobaCache.GetPersonByNameIdAsync(User.GetNameId());
+        CurrentPoliticalParty = await Osoba.CurrentPoliticalPartyAsync();
     }
     
     

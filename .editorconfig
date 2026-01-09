@@ -1,6 +1,6 @@
 ﻿root = true
 
-[*.cs]
+[*.{cs,razor}]
 
 # CS8625: Cannot convert null literal to non-nullable reference type.
 dotnet_diagnostic.CS8625.severity = suggestion

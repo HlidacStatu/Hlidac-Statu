@@ -153,6 +153,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "public", "public", "{8DFECE
 		Directory.Build.props = Directory.Build.props
 		nuget.config = nuget.config
 		README.MD = README.MD
+		..\Hlidac-Statu-Private\.editorconfig = ..\Hlidac-Statu-Private\.editorconfig
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "private", "private", "{131AAA92-76B1-4D68-9410-7B52810BC976}"
