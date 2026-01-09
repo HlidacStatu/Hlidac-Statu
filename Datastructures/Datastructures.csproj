@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>net6.0</TargetFramework>
+    <TargetFrameworks>net6.0;net8.0</TargetFrameworks>
     <!-- .NET 6 kvuli podpore BlurredPageMinion a GDI/System.Drawing.Common na LINUX pouze do .NET 6 -->
     <AssemblyName>HlidacStatu.Datastructures</AssemblyName>
     <RootNamespace>HlidacStatu.DS</RootNamespace>
