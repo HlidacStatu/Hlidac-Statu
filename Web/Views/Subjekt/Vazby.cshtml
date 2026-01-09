@@ -42,7 +42,7 @@
         @Html.Raw(
             await HlidacStatu.Repositories.Graph.TiskVazebAsync(
                 Model.Jmeno, Model.VazbyRootEdge(),
-                Model.AktualniVazby(aktualnost),
+                Model.AktualniVazbyAsync(aktualnost),
                 Relation.TiskEnum.Html
             )
         )
@@ -54,7 +54,7 @@
     @{
         var semaphore = new SemaphoreSlim(20);
 
-        var dataTasks = Model.AktualniVazby(aktualnost)
+        var dataTasks = Model.AktualniVazbyAsync(aktualnost)
             .Where(v => v.To != null && v.To.Type == HlidacStatu.DS.Graphs.Graph.Node.NodeType.Company)
             .GroupBy(f => f.To.Id, v => v, (ico, v) => new { ico, v })
             .Select(async g =>
@@ -65,8 +65,8 @@
                     return new
                     {
                         ICO = g.ico,
-                        FirmaName = g.v.First().To.PrintName(),
-                        VazbyPerIco = Model.VazbyProICO( Relation.CharakterVazbyEnum.VlastnictviKontrola, g.ico)
+                        FirmaName = g.v.First().To.PrintNameAsync(),
+                        VazbyPerIco = await FirmaVazbyRepo.VazbyProIcoCachedAsync(Model, Relation.CharakterVazbyEnum.VlastnictviKontrola, g.ico)
                     };
                 }
                 finally

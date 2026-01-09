@@ -490,7 +490,7 @@
                                         return new
                                         {
                                             ICO = g.ico,
-                                            FirmaName = g.v.First().To.PrintName(),
+                                            FirmaName = g.v.First().To.PrintNameAsync(),
                                             VazbyPerIco = await OsobaVazbyRepo.VazbyProIcoCachedAsync(fo, g.ico),
                                             stat
                                         };

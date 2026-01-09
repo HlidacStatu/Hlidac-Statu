@@ -14,7 +14,7 @@
                   //.Select(m => new SelectListItem() { Value = m.Value, Text = m.Key, Disabled = (m.Value == "0" || m.Value == "1")})
                   .ToList();
 
-    var vazby = Model.AktualniVazby(aktualnost);
+    var vazby = Model.AktualniVazbyAsync(aktualnost);
 
 }
 
@@ -161,7 +161,7 @@
                        @Html.Raw(
                             HlidacStatu.Repositories.Graph.TiskVazebAsync(
                                 Model.Jmeno,Model.VazbyRootEdge(),
-                                Model.AktualniVazby(aktualnost),
+                                Model.AktualniVazbyAsync(aktualnost),
                                 Relation.TiskEnum.Checkbox
                             )
                         )

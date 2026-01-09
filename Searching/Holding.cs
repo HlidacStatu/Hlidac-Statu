@@ -3,12 +3,14 @@
     public class Holding
         : RuleBase
     {
-        private readonly Func<string, string[]> icosInHoldingFunc;
+        private readonly Func<string, Task<string[]>> icosInHoldingFuncAsync;
         string _specificPrefix = null;
-        public Holding(Func<string, string[]> icosInHoldingFunc, string specificPrefix, string replaceWith, bool stopFurtherProcessing = false, string addLastCondition = "")
+
+        public Holding(Func<string, Task<string[]>> icosInHoldingFuncAsync, string specificPrefix, string replaceWith,
+            bool stopFurtherProcessing = false, string addLastCondition = "")
             : base(replaceWith, stopFurtherProcessing, addLastCondition)
         {
-            this.icosInHoldingFunc = icosInHoldingFunc;
+            this.icosInHoldingFuncAsync = icosInHoldingFuncAsync;
             _specificPrefix = specificPrefix;
         }
 
@@ -19,42 +21,46 @@
                 if (!string.IsNullOrEmpty(_specificPrefix))
                     return new string[] { _specificPrefix };
                 else
-                    return new string[] { "holding:",
+                    return new string[]
+                    {
+                        "holding:",
                         "holdingprijemce:", "holdingplatce:",
                         "holdingdluznik:", "holdingveritel:", "holdingspravce:",
-                        "holdingdodavatel:", "holdingzadavatel:"};
+                        "holdingdodavatel:", "holdingzadavatel:"
+                    };
             }
         }
 
-        protected override Task<RuleResult> processQueryPartAsync(SplittingQuery.Part part)
+        protected override async Task<RuleResult> processQueryPartAsync(SplittingQuery.Part part)
         {
             if (part == null)
                 return null;
 
             if (
-                (!string.IsNullOrWhiteSpace(_specificPrefix) && part.Prefix.Equals(_specificPrefix, StringComparison.InvariantCultureIgnoreCase))
+                (!string.IsNullOrWhiteSpace(_specificPrefix) &&
+                 part.Prefix.Equals(_specificPrefix, StringComparison.InvariantCultureIgnoreCase))
                 ||
                 (string.IsNullOrWhiteSpace(_specificPrefix) &&
-                (
-                    (part.Prefix.Equals("holding:", StringComparison.InvariantCultureIgnoreCase)
-                    //RS
-                    || part.Prefix.Equals("holdingprijemce:", StringComparison.InvariantCultureIgnoreCase)
-                    || part.Prefix.Equals("holdingplatce:", StringComparison.InvariantCultureIgnoreCase)
-                    //insolvence
-                    || part.Prefix.Equals("holdingdluznik:", StringComparison.InvariantCultureIgnoreCase)
-                    || part.Prefix.Equals("holdingveritel:", StringComparison.InvariantCultureIgnoreCase)
-                    || part.Prefix.Equals("holdingspravce:", StringComparison.InvariantCultureIgnoreCase)
-                    //VZ
-                    || part.Prefix.Equals("holdingdodavatel:", StringComparison.InvariantCultureIgnoreCase)
-                    || part.Prefix.Equals("holdingzadavatel:", StringComparison.InvariantCultureIgnoreCase)
-                    )
-                )
+                 (
+                     (part.Prefix.Equals("holding:", StringComparison.InvariantCultureIgnoreCase)
+                      //RS
+                      || part.Prefix.Equals("holdingprijemce:", StringComparison.InvariantCultureIgnoreCase)
+                      || part.Prefix.Equals("holdingplatce:", StringComparison.InvariantCultureIgnoreCase)
+                      //insolvence
+                      || part.Prefix.Equals("holdingdluznik:", StringComparison.InvariantCultureIgnoreCase)
+                      || part.Prefix.Equals("holdingveritel:", StringComparison.InvariantCultureIgnoreCase)
+                      || part.Prefix.Equals("holdingspravce:", StringComparison.InvariantCultureIgnoreCase)
+                      //VZ
+                      || part.Prefix.Equals("holdingdodavatel:", StringComparison.InvariantCultureIgnoreCase)
+                      || part.Prefix.Equals("holdingzadavatel:", StringComparison.InvariantCultureIgnoreCase)
+                     )
+                 )
                 )
             )
             {
                 //list of ICO connected to this holding
                 string holdingIco = part.Value;
-                string[] holdingIcos = icosInHoldingFunc(holdingIco);
+                string[] holdingIcos = await icosInHoldingFuncAsync(holdingIco);
 
                 string icosQuery = "";
 
@@ -73,12 +79,10 @@
                     icosQuery = string.Format(templ, "noOne"); //$" ( {icoprefix}:noOne ) ";
                 }
 
-                return Task.FromResult(new RuleResult(SplittingQuery.SplitQuery($"{icosQuery}"), NextStep));
-
+                return new RuleResult(SplittingQuery.SplitQuery($"{icosQuery}"), NextStep);
             }
 
             return null;
         }
-
     }
 }

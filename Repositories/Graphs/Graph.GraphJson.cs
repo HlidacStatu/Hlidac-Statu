@@ -32,7 +32,7 @@
                 group = "nodes";
                 data.id = n.UniqId;
                 data.distance = distance;
-                data.caption = n.PrintName();
+                data.caption = await n.PrintNameAsync();
                 data.root = isRoot ? true : (bool?)null;
             }
             public GraphJson(HlidacStatu.DS.Graphs.Graph.Edge e)

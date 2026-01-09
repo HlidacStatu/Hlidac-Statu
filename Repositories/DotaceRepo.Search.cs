@@ -21,7 +21,7 @@ namespace HlidacStatu.Repositories
             public static readonly IRule[] Irules = new IRule[]
             {
                 new OsobaId(HlidacStatu.Repositories.OsobaVazbyRepo.Icos_s_VazbouNaOsobuAsync, "osobaid:", "ico:"),
-                new Holding(HlidacStatu.Repositories.FirmaVazbyRepo.IcosInHolding, null, "ico:"),
+                new Holding(HlidacStatu.Repositories.FirmaVazbyRepo.IcosInHoldingAsync, null, "ico:"),
                 //(prijemce.jmeno:${q} OR prijemce.obchodniJmeno:${q})
                 new TransformPrefixWithValue("ico:", "(recipient.ico:${q} OR subsidyProviderIco:${q})",null),
                 new TransformPrefixWithValue("icoposkytovatel:", "subsidyProviderIco:${q}",null),

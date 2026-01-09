@@ -3,12 +3,14 @@ using HlidacStatu.Repositories;
 
 using System;
 using System.Text;
+using System.Threading.Tasks;
+using HlidacStatu.Repositories.Cache;
 
 namespace HlidacStatu.Extensions
 {
     public static class OsobaEventExtension
     {
-        public static string RenderText(this OsobaEvent osobaEvent, string delimeter = "\n")
+        public static async Task<string> RenderTextAsync(this OsobaEvent osobaEvent, string delimeter = "\n")
         {
             StringBuilder sb = new StringBuilder();
             switch ((OsobaEvent.Types)osobaEvent.Type)
@@ -27,7 +29,7 @@ namespace HlidacStatu.Extensions
                 case OsobaEvent.Types.Osobni:
                     if (!string.IsNullOrEmpty(osobaEvent.AddInfo) && Devmasters.TextUtil.IsNumeric(osobaEvent.AddInfo))
                     {
-                        Osoba o = Osoby.GetById.Get(Convert.ToInt32(osobaEvent.AddInfo));
+                        Osoba o = await OsobaCache.GetPersonByIdAsync(Convert.ToInt32(osobaEvent.AddInfo));
                         if (o != null)
                             return osobaEvent.Title + " s " + o.FullName();
                     }
@@ -61,7 +63,7 @@ namespace HlidacStatu.Extensions
             }
         }
 
-        public static string RenderHtml(this OsobaEvent osobaEvent, string delimeter = ", ")
+        public static async Task<string> RenderHtmlAsync(this OsobaEvent osobaEvent, string delimeter = ", ")
         {
             string zdroj = "";
             if (!string.IsNullOrEmpty(osobaEvent.Zdroj))
@@ -88,7 +90,7 @@ namespace HlidacStatu.Extensions
                 case OsobaEvent.Types.Osobni:
                     if (!string.IsNullOrEmpty(osobaEvent.AddInfo) && Devmasters.TextUtil.IsNumeric(osobaEvent.AddInfo))
                     {
-                        Osoba o = Osoby.GetById.Get(Convert.ToInt32(osobaEvent.AddInfo));
+                        Osoba o = await OsobaCache.GetPersonByIdAsync(Convert.ToInt32(osobaEvent.AddInfo));
                         if (o != null)
                             return osobaEvent.Title + " s " + string.Format("<a href=\"{0}\">{1}</a>", o.GetUrl(), o.FullName());
                     }

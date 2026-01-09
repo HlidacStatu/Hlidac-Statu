@@ -106,8 +106,6 @@ public static class FirmaExtensions
                     PocetSmluvBezCeny = ss.Value.PocetSmluvBezCeny,
                     PocetSmluvSeZasadnimNedostatkem = ss.Value.PocetSmluvSeZasadnimNedostatkem,
                     PocetSmluvULimitu = ss.Value.PocetSmluvULimitu,
-                    //ZmenaHodnotySmluv = ss.Year == maxY ? null : new DS.Api.StatisticChange(ss.Year, maxY, "Hodnota smluv", ss.Value.CelkovaHodnotaSmluv, smlouvyStat.StatisticsForYear(maxY).CelkovaHodnotaSmluv),
-                    //ZmenaPoctuSmluv = ss.Year == maxY ? null : new DS.Api.StatisticChange(ss.Year, maxY, "Počet smluv", ss.Value.PocetSmluv, smlouvyStat.StatisticsForYear(maxY).PocetSmluv),
                 })
                 .ToList();
         }
@@ -132,13 +130,11 @@ public static class FirmaExtensions
                     Rok = ds.Year,
                     Celkem_Prideleno = ds.Value.CelkemPrideleno,
                     Pocet_Dotaci = ds.Value.PocetDotaci,
-                    //ZmenaHodnotyDotaci = ds.Year == maxY ? null : new DS.Api.StatisticChange(ds.Year, maxY, "Hodnota smluv", ds.Value.CelkemPrideleno, dotaceStat.StatisticsForYear(maxY).CelkemPrideleno),
-                    //ZmenaPoctuDotaci = ds.Year == maxY ? null : new DS.Api.StatisticChange(ds.Year, maxY, "Počet smluv", ds.Value.PocetDotaci, dotaceStat.StatisticsForYear(maxY).PocetDotaci),
                 })
                 .ToList();
         }
 
-        if (f.Holding(aktualnost)?.Any() == true)
+        if ((await f.HoldingAsync(aktualnost))?.Any() == true)
         {
             var smlouvyStatHolding = await f.HoldingStatisticsRegistrSmluvAsync();
             var maxY = HlidacStatu.Util.Consts.CalculatedCurrentYearSmlouvy;
@@ -176,14 +172,11 @@ public static class FirmaExtensions
                         PocetSmluvBezCeny = ss.Value.PocetSmluvBezCeny,
                         PocetSmluvSeZasadnimNedostatkem = ss.Value.PocetSmluvSeZasadnimNedostatkem,
                         PocetSmluvULimitu = ss.Value.PocetSmluvULimitu,
-                        //ZmenaHodnotySmluv = ss.Year == maxY ? null : new DS.Api.StatisticChange(ss.Year, maxY, "Hodnota smluv", ss.Value.CelkovaHodnotaSmluv, smlouvyStatHolding.StatisticsForYear(maxY).CelkovaHodnotaSmluv),
-                        //ZmenaPoctuSmluv = ss.Year == maxY ? null : new DS.Api.StatisticChange(ss.Year, maxY, "Počet smluv", ss.Value.PocetSmluv, smlouvyStatHolding.StatisticsForYear(maxY).PocetSmluv),
                     })
                     .ToList();
             }
 
             var dotaceStatHolding = await f.HoldingStatistikaDotaciAsync();
-            maxY = HlidacStatu.Util.Consts.CalculatedCurrentYearDotace;
             if (dotaceStatHolding != null)
             {
                 res.Statistika_Dotace_pro_Holding = new HlidacStatu.DS.Api.Firmy.SubjektDetailInfo.DotaceData()
@@ -201,8 +194,6 @@ public static class FirmaExtensions
                         Rok = ds.Year,
                         Celkem_Prideleno = ds.Value.CelkemPrideleno,
                         Pocet_Dotaci = ds.Value.PocetDotaci,
-                        //ZmenaHodnotyDotaci = ds.Year == maxY ? null : new DS.Api.StatisticChange(ds.Year, maxY, "Hodnota smluv", ds.Value.CelkemPrideleno, dotaceStatHolding.StatisticsForYear(maxY).CelkemPrideleno),
-                        //ZmenaPoctuDotaci = ds.Year == maxY ? null : new DS.Api.StatisticChange(ds.Year, maxY, "Počet smluv", ds.Value.PocetDotaci, dotaceStatHolding.StatisticsForYear(maxY).PocetDotaci),
                     })
                     .ToList();
             }
@@ -298,7 +289,7 @@ public static class FirmaExtensions
         res.Osoby_s_vazbou_na_firmu = apiOsobaListItem.ToArray();
                 
 
-        res.Dcerine_spolecnosti = f.IcosInHolding(aktualnost)
+        res.Dcerine_spolecnosti = (await f.IcosInHoldingAsync(aktualnost))
             .Select(m => new SimpleDetailInfo()
             {
                 Ico = m,

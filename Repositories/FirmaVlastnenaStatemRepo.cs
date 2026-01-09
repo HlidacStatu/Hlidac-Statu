@@ -3,10 +3,7 @@ using HlidacStatu.Caching;
 using HlidacStatu.Connectors;
 using HlidacStatu.DS.Graphs;
 using HlidacStatu.Entities;
-using HlidacStatu.Util;
-using InfluxDB.Client.Api.Domain;
 using Microsoft.EntityFrameworkCore;
-using Nest;
 using Polly;
 using Polly.Extensions.Http;
 using Polly.Retry;
@@ -29,18 +26,20 @@ namespace HlidacStatu.Repositories
     {
         private static ILogger _logger = Serilog.Log.Logger.ForContext(typeof(FirmaVlastnenaStatemRepo));
 
-        static string[] DebugCheckList = new string[] {
-"61467863",
-"26978636",
-"61061344",
-"60751606",
-"27089444",
-"60112743",
-"15886492",
-"26764652",
-"62582836",
-"64948242",
-"26080222"        };
+        static string[] DebugCheckList = new string[]
+        {
+            "61467863",
+            "26978636",
+            "61061344",
+            "60751606",
+            "27089444",
+            "60112743",
+            "15886492",
+            "26764652",
+            "62582836",
+            "64948242",
+            "26080222"
+        };
 
         //vcetne strategickych podniku z https://www.mfcr.cz/cs/aktualne/tiskove-zpravy/2020/vlada-schvalila-strategii-vlastnicke-pol-37573
         public static string[] StatniFirmyICO = new string[]
@@ -194,13 +193,12 @@ namespace HlidacStatu.Repositories
             "48204285", // Zemský hřebčinec Písek státní podnik v likvidaci
             "13695673", // Zemský hřebčinec Tlumačov, státní podnik v likvidaci
             "00009393", // ZPS, a.s. v likvidaci
-
         };
 
         public static int[] StatniFirmy_BasedKodPF = new int[]
         {
-            301, 302, 312, 313, 314, 325, 331, 352, 353, 361, 362, 381, 382, 391, 392, 521,525, 771, 801, 804, 805,811,
-
+            301, 302, 312, 313, 314, 325, 331, 352, 353, 361, 362, 381, 382, 391, 392, 521, 525, 771, 801, 804, 805,
+            811,
         };
 
         /*
@@ -230,10 +228,6 @@ namespace HlidacStatu.Repositories
  */
 
 
-
-
-
-
         public static bool MuzeBytStatni_PodlePravniFormaKod(int? kod)
         {
             if (kod.HasValue == false)
@@ -258,8 +252,8 @@ namespace HlidacStatu.Repositories
         }
 
         private static IFusionCache PermanentCache =>
-            HlidacStatu.Caching.CacheFactory.CreateNew(CacheFactory.CacheType.PermanentStore, nameof(FirmaVlastnenaStatemRepo));
-
+            HlidacStatu.Caching.CacheFactory.CreateNew(CacheFactory.CacheType.PermanentStore,
+                nameof(FirmaVlastnenaStatemRepo));
 
 
         public async static Task<HashSet<string>> IcaStatnichFiremAsync()
@@ -303,19 +297,21 @@ namespace HlidacStatu.Repositories
                 return r;
             }
         }
+
         static HashSet<string> vzdySoukr_ESA2010 = new HashSet<string>()
-            {
-        "12202","12203", //banky
-        "12302", "12303", //fondy penezniho trhu
-        "11002", "11003", //Nefinanční podniky
-        "12402", "12403", //Investiční fondy jiné než fondy peněžního trhu
-        "12502", "12503", // Ostatní finanční zprostředkovatelé kromě pojišťovacích společností a penzijních fondů
-        "12602", "12603", // Pomocné finanční instituce
-        "12702", "12703", // Kaptivní finanční instituce a půjčovatelé peněz
-        "12802", "12803", // Pojišťovací společnosti
-        "12902", "12903", // Penzijní fondy
-        "15002", "15003" // Neziskové instituce sloužící domácnostem,
-            };
+        {
+            "12202", "12203", //banky
+            "12302", "12303", //fondy penezniho trhu
+            "11002", "11003", //Nefinanční podniky
+            "12402", "12403", //Investiční fondy jiné než fondy peněžního trhu
+            "12502", "12503", // Ostatní finanční zprostředkovatelé kromě pojišťovacích společností a penzijních fondů
+            "12602", "12603", // Pomocné finanční instituce
+            "12702", "12703", // Kaptivní finanční instituce a půjčovatelé peněz
+            "12802", "12803", // Pojišťovací společnosti
+            "12902", "12903", // Penzijní fondy
+            "15002", "15003" // Neziskové instituce sloužící domácnostem,
+        };
+
         public static bool OVM_Nikdy_nejsou_statni_Filter_ESA2010_JeSoukrome(string esa2010)
         {
             if (string.IsNullOrEmpty(esa2010))
@@ -328,25 +324,27 @@ namespace HlidacStatu.Repositories
         }
 
         static HashSet<string> vzdySoukr_OVMKategorie = new HashSet<string>()
-            {
-                "KO118", //Soudní exekutoři
-                "KO155", //Notáři
-                "KO505", //Soukromé vysoké školy
-                "KO520", //Profesní komory v agendě ochrany spotřebitele
-                "KO537", //Insolvenční správci - fyzická osoba
-                "KO538", //Insolvenční správci - v.o.s.
-                "KO542", //Soukromé archivy
-            };
+        {
+            "KO118", //Soudní exekutoři
+            "KO155", //Notáři
+            "KO505", //Soukromé vysoké školy
+            "KO520", //Profesní komory v agendě ochrany spotřebitele
+            "KO537", //Insolvenční správci - fyzická osoba
+            "KO538", //Insolvenční správci - v.o.s.
+            "KO542", //Soukromé archivy
+        };
+
         private static bool OVM_Nikdy_nejsou_statni_Filter_OVM_Kategorie_JeSoukrome(string kategorieOvm)
         {
             if (string.IsNullOrEmpty(kategorieOvm))
-                return false;   
+                return false;
             if (vzdySoukr_OVMKategorie.Contains(kategorieOvm))
                 return true;
             return false;
         }
 
         static HashSet<string> _ovm_Nikdy_nejsou_statni = null;
+
         private static async Task<HashSet<string>> OVM_Nikdy_nejsou_statni(bool updateFromPrimarySource = false)
         {
             if (updateFromPrimarySource)
@@ -379,7 +377,7 @@ namespace HlidacStatu.Repositories
                     .AsNoTracking()
                     .Where(m => m.ICO != null)
                     .Where(m => m.TypDS.Contains("PFO") //fyzicke osoby nikdy nemohou byt statni firmou
-                        )
+                    )
                     .Select(m => m.ICO)
                     .Distinct()
                     .ToHashSetAsync();
@@ -392,7 +390,7 @@ select distinct o.ICO  from OrganVerejneMoci o
 where 
 1 = 1
 --Zkratka like 'spuu_%' 
-and (esa2010 in (" + string.Join(",",vzdySoukr_ESA2010.Select(m=>$"'{m}'")) + @")
+and (esa2010 in (" + string.Join(",", vzdySoukr_ESA2010.Select(m => $"'{m}'")) + @")
     or str(esa2010,5,0) like '2%' -- Nerezidenti
     )
 ");
@@ -404,20 +402,19 @@ and (esa2010 in (" + string.Join(",",vzdySoukr_ESA2010.Select(m=>$"'{m}'")) + @"
                 _ovm_Nikdy_nejsou_statni.Add("00001350"); //csob
                 _ovm_Nikdy_nejsou_statni.Add("24288110"); //Elektrárna Počerady, a.s.
                 _ovm_Nikdy_nejsou_statni.Add("28786009"); //Elektrárna Chvaletice a.s.
-
             }
+
             return _ovm_Nikdy_nejsou_statni;
             ;
         }
 
         //merge of Firmy.GlobalStatistics.VsechnyUradyAsync
         //Tasks.Merk.UpdateListStatniFirmy_InDB
-        public async static Task Najdi_Firmy_Vlastnene_Statem_z_Primarnich_ZdrojuAsync(
+        public static async Task Najdi_Firmy_Vlastnene_Statem_z_Primarnich_ZdrojuAsync(
             Action<string> outputWriter = null,
-            Devmasters.Batch.IProgressWriter  progressWriter = null
-            )
+            Devmasters.Batch.IProgressWriter progressWriter = null
+        )
         {
-
             List<string> debugCheck = new();
             using DbEntities db = new DbEntities();
 
@@ -440,19 +437,19 @@ and (esa2010 in (" + string.Join(",",vzdySoukr_ESA2010.Select(m=>$"'{m}'")) + @"
             //vsechny firmy z OR podle pravni formy
             bagOfIco.AddRange(
                 db.Firma.Where(m => StatniFirmy_BasedKodPF.Contains(m.Kod_PF ?? -1))
-                .AsNoTracking()
-                .Select(m => m.ICO)
-                .ToList()
+                    .AsNoTracking()
+                    .Select(m => m.ICO)
+                    .ToList()
             );
 
             _logger.Information("Downloading seznamu verejnych spolecnosti a vladnich instituci z mfcr.cz Part 1...");
             //firmy z MFCR - verejne spolecnosti a vladni instituce
             Console.WriteLine("Downloading from mfcr.cz 1");
-            string MFLink = "https://www.mfcr.cz/assets/cs/media/Rozp-ramce-zak-23-2017_2021_Seznam-verejnych-spolecnosti-v-CR-rijen-2021.xlsx";
+            string MFLink =
+                "https://www.mfcr.cz/assets/cs/media/Rozp-ramce-zak-23-2017_2021_Seznam-verejnych-spolecnosti-v-CR-rijen-2021.xlsx";
             string fn = @"c:\!\Seznam-verejnych-spolecnosti.xlsx";
             try
             {
-
                 using (var net = new Devmasters.Net.HttpClient.URLContent(MFLink))
                 {
                     net.Timeout = 60 * 10 * 1000;
@@ -463,14 +460,14 @@ and (esa2010 in (" + string.Join(",",vzdySoukr_ESA2010.Select(m=>$"'{m}'")) + @"
             }
             catch (Exception e)
             {
-
                 _logger.Error(e, "Chyba pri stahovani seznamu verejnych spolecnosti z " + MFLink);
             }
 
 
             _logger.Information("Downloading seznamu verejnych spolecnosti a vladnich instituci z mfcr.cz Part 2...");
             Console.WriteLine("Downloading from mfcr.cz 2");
-            string MFLink2 = "https://www.mfcr.cz/assets/cs/media/Rozp-ramce-zak-23-2017_2021_Seznam-vladnich-instituci-v-CR-rijen-2021.xlsx";
+            string MFLink2 =
+                "https://www.mfcr.cz/assets/cs/media/Rozp-ramce-zak-23-2017_2021_Seznam-vladnich-instituci-v-CR-rijen-2021.xlsx";
             string fn2 = @"c:\!\Seznam-vladnich-spolecnosti.xlsx";
             try
             {
@@ -481,11 +478,9 @@ and (esa2010 in (" + string.Join(",",vzdySoukr_ESA2010.Select(m=>$"'{m}'")) + @"
                     System.IO.File.Delete(fn2);
                     System.IO.File.WriteAllBytes(fn2, bin.Binary);
                 }
-
             }
             catch (Exception e)
             {
-
                 _logger.Error(e, "Chyba pri stahovani seznamu verejnych spolecnosti z " + MFLink2);
             }
 
@@ -533,10 +528,7 @@ and (esa2010 in (" + string.Join(",",vzdySoukr_ESA2010.Select(m=>$"'{m}'")) + @"
                         }
                     }
                 }
-
             }
-
-
 
 
             _logger.Debug("Cleaning up duplicates ...");
@@ -553,21 +545,27 @@ and (esa2010 in (" + string.Join(",",vzdySoukr_ESA2010.Select(m=>$"'{m}'")) + @"
             bagOfIco.AddRange(allOvm);
 
             _logger.Information("Adding statni firmy podle oboru cinnosti fakultni nemocnice...");
-            bagOfIco.AddRange(await FirmaRepo.Zatrideni.GetIcoDirectAsync(Firma.Zatrideni.SubjektyObory.Fakultni_nemocnice));
+            bagOfIco.AddRange(
+                await FirmaRepo.Zatrideni.GetIcoDirectAsync(Firma.Zatrideni.SubjektyObory.Fakultni_nemocnice));
             _logger.Information("Adding statni firmy podle oboru cinnosti hasice...");
-            bagOfIco.AddRange(await FirmaRepo.Zatrideni.GetIcoDirectAsync(Firma.Zatrideni.SubjektyObory.Hasicsky_zachranny_sbor));
+            bagOfIco.AddRange(
+                await FirmaRepo.Zatrideni.GetIcoDirectAsync(Firma.Zatrideni.SubjektyObory.Hasicsky_zachranny_sbor));
             _logger.Information("Adding statni firmy podle oboru cinnosti knihovny...");
             bagOfIco.AddRange(await FirmaRepo.Zatrideni.GetIcoDirectAsync(Firma.Zatrideni.SubjektyObory.Knihovny));
             _logger.Information("Adding statni firmy podle oboru cinnosti statni media...");
             bagOfIco.AddRange(await FirmaRepo.Zatrideni.GetIcoDirectAsync(Firma.Zatrideni.SubjektyObory.StatniMedia));
             _logger.Information("Adding statni firmy podle oboru cinnosti krajske spravy silnic...");
-            bagOfIco.AddRange(await FirmaRepo.Zatrideni.GetIcoDirectAsync(Firma.Zatrideni.SubjektyObory.Krajske_spravy_silnic));
+            bagOfIco.AddRange(
+                await FirmaRepo.Zatrideni.GetIcoDirectAsync(Firma.Zatrideni.SubjektyObory.Krajske_spravy_silnic));
             _logger.Information("Adding statni firmy podle oboru cinnosti velke nemocnice...");
-            bagOfIco.AddRange(await FirmaRepo.Zatrideni.GetIcoDirectAsync(Firma.Zatrideni.SubjektyObory.Velke_nemocnice));
+            bagOfIco.AddRange(
+                await FirmaRepo.Zatrideni.GetIcoDirectAsync(Firma.Zatrideni.SubjektyObory.Velke_nemocnice));
             _logger.Information("Adding statni firmy podle oboru cinnosti verejne vysoke skoly...");
-            bagOfIco.AddRange(await FirmaRepo.Zatrideni.GetIcoDirectAsync(Firma.Zatrideni.SubjektyObory.Verejne_vysoke_skoly));
+            bagOfIco.AddRange(
+                await FirmaRepo.Zatrideni.GetIcoDirectAsync(Firma.Zatrideni.SubjektyObory.Verejne_vysoke_skoly));
             _logger.Information("Adding statni firmy podle oboru cinnosti zdravotni pojistovny...");
-            bagOfIco.AddRange(await FirmaRepo.Zatrideni.GetIcoDirectAsync(Firma.Zatrideni.SubjektyObory.Zdravotni_pojistovny));
+            bagOfIco.AddRange(
+                await FirmaRepo.Zatrideni.GetIcoDirectAsync(Firma.Zatrideni.SubjektyObory.Zdravotni_pojistovny));
 
 
             //smaz vsechny OVM, kteri maji kategorii, ktera znemožnuje byt statni firmou
@@ -588,39 +586,38 @@ and (esa2010 in (" + string.Join(",",vzdySoukr_ESA2010.Select(m=>$"'{m}'")) + @"
 
             //najdi vsechny subjekty a jejich vazby           
             _logger.Information("Najdi vsechny podrizene subjekty ...");
-            object lockObj = new object();
+            
             System.Collections.Concurrent.ConcurrentBag<string> foundIcos = new();
             System.Collections.Concurrent.ConcurrentBag<(string, string)> foundDebugCheckIco = new();
-            Devmasters.Batch.Manager.DoActionForAll<string, object>(bagOfIco,
-             (ico, obj) =>
-             {
-                 var f = Firmy.Get(ico);
-                 if (f?.Valid == true && FirmaVlastnenaStatemRepo.MuzeBytStatni_PodlePravniFormaKod(f.Kod_PF))
-                 {
+            await Devmasters.Batch.Manager.DoActionForAllAsync<string, object>(bagOfIco, async (ico, obj) =>
+                {
+                    var f = Firmy.Get(ico);
+                    if (f?.Valid == true && FirmaVlastnenaStatemRepo.MuzeBytStatni_PodlePravniFormaKod(f.Kod_PF))
+                    {
+                        List<string> subjIco = new List<string>();
+                        subjIco.Add(Util.ParseTools.NormalizeIco(f.ICO));
+                        var vazby = await f.AktualniVazbyAsync(Relation.AktualnostType.Aktualni,
+                            Relation.CharakterVazbyEnum.VlastnictviKontrola, true);
+                        subjIco.AddRange(vazby.Select(m => Util.ParseTools.NormalizeIco(m.To.Id)));
+                        foreach (var inIc in subjIco)
+                        {
+                            var ff = Firmy.Get(inIc);
+                            if (ff?.Valid == true
+                                && FirmaVlastnenaStatemRepo.MuzeBytStatni_PodlePravniFormaKod(ff.Kod_PF)
+                                && OVM_Nikdy_nejsou_statni_Filter_ESA2010_JeSoukrome(ff.ESA2010) == false
+                               )
+                            {
+                                foundIcos.Add(inIc);
+                                if (DebugCheckList.Contains(inIc))
+                                    foundDebugCheckIco.Add((inIc, f.ICO));
+                            }
+                        }
+                    }
 
-                     List<string> subjIco = new List<string>();
-                     subjIco.Add(Util.ParseTools.NormalizeIco(f.ICO));
-                     var vazby = f.AktualniVazby(Relation.AktualnostType.Aktualni, Relation.CharakterVazbyEnum.VlastnictviKontrola, true);
-                     subjIco.AddRange(vazby.Select(m => Util.ParseTools.NormalizeIco(m.To.Id)));
-                     foreach (var inIc in subjIco)
-                     {
-                         var ff = Firmy.Get(inIc);
-                         if (ff?.Valid == true
-                            && FirmaVlastnenaStatemRepo.MuzeBytStatni_PodlePravniFormaKod(ff.Kod_PF)
-                            && OVM_Nikdy_nejsou_statni_Filter_ESA2010_JeSoukrome(ff.ESA2010) == false
-                            )
-                         {
-                             foundIcos.Add(inIc);
-                             if (DebugCheckList.Contains(inIc))
-                                 foundDebugCheckIco.Add((inIc, f.ICO));
-                         }
-                     }
-                 }
-
-                 return new Devmasters.Batch.ActionOutputData();
-             }, null, outputWriter, progressWriter,
-             true, prefix: "freshList statnifirmy ", monitor: new MonitoredTaskRepo.ForBatch()
-             );
+                    return new Devmasters.Batch.ActionOutputData();
+                }, null, outputWriter, progressWriter,
+                true, prefix: "freshList statnifirmy ", monitor: new MonitoredTaskRepo.ForBatch()
+            );
 
             bagOfIco.AddRange(foundIcos);
 
@@ -644,7 +641,8 @@ and (esa2010 in (" + string.Join(",",vzdySoukr_ESA2010.Select(m=>$"'{m}'")) + @"
             //reset typ for all
             _logger.Information("Updating DB ...");
             _logger.Information("Resetting all firmy to Soukromy ...");
-            string sql = $"update firma set typ={((int)(TypSubjektuEnum.Soukromy))} where typ != {((int)(TypSubjektuEnum.Soukromy))}"; // where ico not in ({ica})
+            string sql =
+                $"update firma set typ={((int)(TypSubjektuEnum.Soukromy))} where typ != {((int)(TypSubjektuEnum.Soukromy))}"; // where ico not in ({ica})
             DirectDB.Instance.NoResult(sql);
 
             List<string[]> batch = bagOfIco.Chunk(500).ToList();
@@ -658,7 +656,8 @@ and (esa2010 in (" + string.Join(",",vzdySoukr_ESA2010.Select(m=>$"'{m}'")) + @"
 
                     return new Devmasters.Batch.ActionOutputData();
                 }, outputWriter, progressWriter,
-                !System.Diagnostics.Debugger.IsAttached, prefix: "UpdateFirmyWithTyp STATNI", monitor: new MonitoredTaskRepo.ForBatch()
+                !System.Diagnostics.Debugger.IsAttached, prefix: "UpdateFirmyWithTyp STATNI",
+                monitor: new MonitoredTaskRepo.ForBatch()
             );
 
             batch.Clear();
@@ -675,7 +674,8 @@ and (esa2010 in (" + string.Join(",",vzdySoukr_ESA2010.Select(m=>$"'{m}'")) + @"
 
                     return new Devmasters.Batch.ActionOutputData();
                 }, outputWriter, progressWriter,
-                !System.Diagnostics.Debugger.IsAttached, prefix: "UpdateFirmyWithTyp OVM", monitor: new MonitoredTaskRepo.ForBatch()
+                !System.Diagnostics.Debugger.IsAttached, prefix: "UpdateFirmyWithTyp OVM",
+                monitor: new MonitoredTaskRepo.ForBatch()
             );
 
             //obce
@@ -695,30 +695,35 @@ and (esa2010 in (" + string.Join(",",vzdySoukr_ESA2010.Select(m=>$"'{m}'")) + @"
 
                     return new Devmasters.Batch.ActionOutputData();
                 }, outputWriter, progressWriter,
-                !System.Diagnostics.Debugger.IsAttached, prefix: "UpdateFirmyWithTyp OBCE", monitor: new MonitoredTaskRepo.ForBatch()
+                !System.Diagnostics.Debugger.IsAttached, prefix: "UpdateFirmyWithTyp OBCE",
+                monitor: new MonitoredTaskRepo.ForBatch()
             );
 
             //insolvencni spravci
             batch.Clear();
-            batch = (await FirmaRepo.Zatrideni.GetIcoDirectAsync(Zatrideni.SubjektyObory.Insolvencni_spravci_fyzicke_osoby))
-                    .Union(await FirmaRepo.Zatrideni.GetIcoDirectAsync(Zatrideni.SubjektyObory.Insolvencni_spravci_pravnicke_osoby))
-                        .Chunk(500).ToList();
+            batch = (await FirmaRepo.Zatrideni.GetIcoDirectAsync(Zatrideni.SubjektyObory
+                    .Insolvencni_spravci_fyzicke_osoby))
+                .Union(await FirmaRepo.Zatrideni.GetIcoDirectAsync(Zatrideni.SubjektyObory
+                    .Insolvencni_spravci_pravnicke_osoby))
+                .Chunk(500).ToList();
             _logger.Information("Setting INSOLVENCNI SPRAVCI typ...");
             Devmasters.Batch.Manager.DoActionForAll<IEnumerable<string>>(batch,
                 (icob) =>
                 {
                     string icos = string.Join(",", icob.Select(i => $"'{i}'"));
-                    string sql = $"update firma set typ={((int)(TypSubjektuEnum.InsolvecniSpravce))} where ico in ({icos})";
+                    string sql =
+                        $"update firma set typ={((int)(TypSubjektuEnum.InsolvecniSpravce))} where ico in ({icos})";
                     DirectDB.Instance.NoResult(sql);
 
                     return new Devmasters.Batch.ActionOutputData();
                 }, outputWriter, progressWriter,
-                !System.Diagnostics.Debugger.IsAttached, prefix: "UpdateFirmyWithTyp insolvecni spravci", monitor: new MonitoredTaskRepo.ForBatch()
+                !System.Diagnostics.Debugger.IsAttached, prefix: "UpdateFirmyWithTyp insolvecni spravci",
+                monitor: new MonitoredTaskRepo.ForBatch()
             );
             //exekutori
             batch.Clear();
             batch = (await FirmaRepo.Zatrideni.GetIcoDirectAsync(Zatrideni.SubjektyObory.Soudni_exekutori))
-                        .Chunk(500).ToList();
+                .Chunk(500).ToList();
             _logger.Information("Setting EXEKUTOR typ...");
             Devmasters.Batch.Manager.DoActionForAll<IEnumerable<string>>(batch,
                 (icob) =>
@@ -729,13 +734,12 @@ and (esa2010 in (" + string.Join(",",vzdySoukr_ESA2010.Select(m=>$"'{m}'")) + @"
 
                     return new Devmasters.Batch.ActionOutputData();
                 }, outputWriter, progressWriter,
-                !System.Diagnostics.Debugger.IsAttached, prefix: "UpdateFirmyWithTyp exekutor", monitor: new MonitoredTaskRepo.ForBatch()
+                !System.Diagnostics.Debugger.IsAttached, prefix: "UpdateFirmyWithTyp exekutor",
+                monitor: new MonitoredTaskRepo.ForBatch()
             );
 
             _logger.Information("Done updating statni firmy.");
-
         }
-
 
 
         [XmlRoot(ElementName = "SeznamOvmIndex")]
@@ -761,7 +765,8 @@ and (esa2010 in (" + string.Join(",",vzdySoukr_ESA2010.Select(m=>$"'{m}'")) + @"
             {
                 _logger.Error(
                     "Error during {methodName}. Server responded with [{statusCode}] status code. Reason phrase [{reasonPhrase}].",
-                    nameof(Update_OrganVerejneMoci_in_DBAsync), responseMessage.StatusCode, responseMessage.ReasonPhrase);
+                    nameof(Update_OrganVerejneMoci_in_DBAsync), responseMessage.StatusCode,
+                    responseMessage.ReasonPhrase);
                 throw new Exception($"Can't download data from {ovmUrl}");
             }
 
@@ -824,7 +829,8 @@ and (esa2010 in (" + string.Join(",",vzdySoukr_ESA2010.Select(m=>$"'{m}'")) + @"
 
                         if (!string.IsNullOrEmpty(ovm.KategorieOvm))
                         {
-                            var kategorieOvm = ovm.KategorieOvm.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+                            var kategorieOvm = ovm.KategorieOvm.Split(',',
+                                StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
                             foreach (var kat in kategorieOvm.Select(m => m.Trim()).Distinct())
                             {
                                 db.OrganVerejneMoci_KategorieOvm.Add(new OrganVerejneMoci_KategorieOvm()
@@ -834,6 +840,7 @@ and (esa2010 in (" + string.Join(",",vzdySoukr_ESA2010.Select(m=>$"'{m}'")) + @"
                                 });
                             }
                         }
+
                         if (count % 50 == 0)
                             _logger.Information("Inserting OVM {count}/{total}", count, data.Subjekt.Count);
                         db.OrganVerejneMoci.Add(ovm);
@@ -862,29 +869,48 @@ and (esa2010 in (" + string.Join(",",vzdySoukr_ESA2010.Select(m=>$"'{m}'")) + @"
             using (var db = new DbEntities())
             {
                 //doplnění
-                await db.Database.ExecuteSqlRawAsync("update dbo.OrganVerejneMoci set AdresaOvmId = 75701855 where Zkratka = 'Podvihov'");
-                await db.Database.ExecuteSqlRawAsync("update dbo.OrganVerejneMoci set AdresaOvmId = 3134717 where Zkratka = 'Hrabova'");
-                await db.Database.ExecuteSqlRawAsync("update dbo.OrganVerejneMoci set AdresaOvmId = 7530200 where Zkratka = 'PrdbceVIII'");
-                await db.Database.ExecuteSqlRawAsync("update dbo.OrganVerejneMoci set AdresaOvmId = 9401008 where Zkratka = 'Bonkov'");
-                await db.Database.ExecuteSqlRawAsync("update dbo.OrganVerejneMoci set AdresaOvmId = 440434 where Zkratka = 'Bosovice'");
-                await db.Database.ExecuteSqlRawAsync("update dbo.OrganVerejneMoci set AdresaOvmId = 15675912 where Zkratka = 'Svojsin'");
-                await db.Database.ExecuteSqlRawAsync("update dbo.OrganVerejneMoci set AdresaOvmId = 5265967 where Zkratka = 'KrznviceCh'");
-                await db.Database.ExecuteSqlRawAsync("update dbo.OrganVerejneMoci set AdresaOvmId = 16729668 where Zkratka = 'LukavecLi'");
-                await db.Database.ExecuteSqlRawAsync("update dbo.OrganVerejneMoci set AdresaOvmId = 18026834 where Zkratka = 'Lukova'");
-                await db.Database.ExecuteSqlRawAsync("update dbo.OrganVerejneMoci set AdresaOvmId = 18652255 where Zkratka = 'Mastnik'");
-                await db.Database.ExecuteSqlRawAsync("update dbo.OrganVerejneMoci set AdresaOvmId = 6661220 where Zkratka = 'Pohnani'");
-                await db.Database.ExecuteSqlRawAsync("update dbo.OrganVerejneMoci set AdresaOvmId = 3766217 where Zkratka = 'ChlmKrhvce'");
-                await db.Database.ExecuteSqlRawAsync("update dbo.OrganVerejneMoci set AdresaOvmId = 18201831 where Zkratka = 'Charovice'");
-                await db.Database.ExecuteSqlRawAsync("update dbo.OrganVerejneMoci set AdresaOvmId = 14116707 where Zkratka = 'HorniLomna'");
-                await db.Database.ExecuteSqlRawAsync("update dbo.OrganVerejneMoci set AdresaOvmId = 27506908 where Zkratka = 'JrsvNzrkou'");
-                await db.Database.ExecuteSqlRawAsync("update dbo.OrganVerejneMoci set AdresaOvmId = 12105287 where Zkratka = 'JlvDrzkova'");
-                await db.Database.ExecuteSqlRawAsync("update dbo.AdresaOvm set KrajNazev = N'Královéhradecký' where Id = 9864792");
+                await db.Database.ExecuteSqlRawAsync(
+                    "update dbo.OrganVerejneMoci set AdresaOvmId = 75701855 where Zkratka = 'Podvihov'");
+                await db.Database.ExecuteSqlRawAsync(
+                    "update dbo.OrganVerejneMoci set AdresaOvmId = 3134717 where Zkratka = 'Hrabova'");
+                await db.Database.ExecuteSqlRawAsync(
+                    "update dbo.OrganVerejneMoci set AdresaOvmId = 7530200 where Zkratka = 'PrdbceVIII'");
+                await db.Database.ExecuteSqlRawAsync(
+                    "update dbo.OrganVerejneMoci set AdresaOvmId = 9401008 where Zkratka = 'Bonkov'");
+                await db.Database.ExecuteSqlRawAsync(
+                    "update dbo.OrganVerejneMoci set AdresaOvmId = 440434 where Zkratka = 'Bosovice'");
+                await db.Database.ExecuteSqlRawAsync(
+                    "update dbo.OrganVerejneMoci set AdresaOvmId = 15675912 where Zkratka = 'Svojsin'");
+                await db.Database.ExecuteSqlRawAsync(
+                    "update dbo.OrganVerejneMoci set AdresaOvmId = 5265967 where Zkratka = 'KrznviceCh'");
+                await db.Database.ExecuteSqlRawAsync(
+                    "update dbo.OrganVerejneMoci set AdresaOvmId = 16729668 where Zkratka = 'LukavecLi'");
+                await db.Database.ExecuteSqlRawAsync(
+                    "update dbo.OrganVerejneMoci set AdresaOvmId = 18026834 where Zkratka = 'Lukova'");
+                await db.Database.ExecuteSqlRawAsync(
+                    "update dbo.OrganVerejneMoci set AdresaOvmId = 18652255 where Zkratka = 'Mastnik'");
+                await db.Database.ExecuteSqlRawAsync(
+                    "update dbo.OrganVerejneMoci set AdresaOvmId = 6661220 where Zkratka = 'Pohnani'");
+                await db.Database.ExecuteSqlRawAsync(
+                    "update dbo.OrganVerejneMoci set AdresaOvmId = 3766217 where Zkratka = 'ChlmKrhvce'");
+                await db.Database.ExecuteSqlRawAsync(
+                    "update dbo.OrganVerejneMoci set AdresaOvmId = 18201831 where Zkratka = 'Charovice'");
+                await db.Database.ExecuteSqlRawAsync(
+                    "update dbo.OrganVerejneMoci set AdresaOvmId = 14116707 where Zkratka = 'HorniLomna'");
+                await db.Database.ExecuteSqlRawAsync(
+                    "update dbo.OrganVerejneMoci set AdresaOvmId = 27506908 where Zkratka = 'JrsvNzrkou'");
+                await db.Database.ExecuteSqlRawAsync(
+                    "update dbo.OrganVerejneMoci set AdresaOvmId = 12105287 where Zkratka = 'JlvDrzkova'");
+                await db.Database.ExecuteSqlRawAsync(
+                    "update dbo.AdresaOvm set KrajNazev = N'Královéhradecký' where Id = 9864792");
                 //oprava
-                await db.Database.ExecuteSqlRawAsync("update dbo.OrganVerejneMoci set AdresaOvmId = 83068392 where Zkratka = 'Pesvice'");
-                await db.Database.ExecuteSqlRawAsync("update dbo.OrganVerejneMoci set AdresaOvmId = 79245129 where Zkratka = 'Veprova'");
-                await db.Database.ExecuteSqlRawAsync("update dbo.OrganVerejneMoci set AdresaOvmId = 5982341 where Zkratka = 'Kutrovice'");
+                await db.Database.ExecuteSqlRawAsync(
+                    "update dbo.OrganVerejneMoci set AdresaOvmId = 83068392 where Zkratka = 'Pesvice'");
+                await db.Database.ExecuteSqlRawAsync(
+                    "update dbo.OrganVerejneMoci set AdresaOvmId = 79245129 where Zkratka = 'Veprova'");
+                await db.Database.ExecuteSqlRawAsync(
+                    "update dbo.OrganVerejneMoci set AdresaOvmId = 5982341 where Zkratka = 'Kutrovice'");
             }
         }
-
     }
 }

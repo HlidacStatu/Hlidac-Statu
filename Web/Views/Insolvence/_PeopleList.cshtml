@@ -69,7 +69,7 @@
 
         var sponzori = StaticData.SponzorujiciFirmy_Vsechny.Get()
 			.Where(s => s.IcoDarce == ico)
-			.Select(s => $"sponzor {s.JmenoPrijemce()}")
+			.Select(s => $"sponzor {s.JmenoPrijemceAsync()}")
 			.Distinct()
 	        .ToList();
         var sponzoriText = sponzori.Any() ? $"<br /> - {string.Join(". ", sponzori)}" : "";

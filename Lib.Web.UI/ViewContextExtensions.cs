@@ -89,12 +89,12 @@ window.onload = function() {{
             return new HtmlString($"<span style='white-space:nowrap'>{s}</span>");
         }
 
-        public static IHtmlContent RenderOsobaVazba(HlidacStatu.DS.Graphs.Graph.Edge v, string blockFormat = "<div>{0}</div>")
+        public static async Task<IHtmlContent> RenderOsobaVazbaAsync(HlidacStatu.DS.Graphs.Graph.Edge v, string blockFormat = "<div>{0}</div>")
         {
             var sb = new StringBuilder();
 
-            var fname = $"<a href='{Firma.GetUrl(v.To.Id, true)}'>{v.To.PrintName()}</a>"; ;
-            if (string.IsNullOrEmpty(v.To.PrintName()))
+            var fname = $"<a href='{Firma.GetUrl(v.To.Id, true)}'>{v.To.PrintNameAsync()}</a>"; ;
+            if (string.IsNullOrEmpty(await v.To.PrintNameAsync()))
             {
                 fname = $"<a href='{Firma.GetUrl(v.To.Id, true)}'>{FirmaRepo.NameFromIco(v.To.Id, true)}</a>";
             }

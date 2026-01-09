@@ -33,7 +33,7 @@ namespace HlidacStatuApi.Models
                         DatumOd = ev.DarovanoDne,
                         DatumDo = ev.DarovanoDne,
                         Typ = "sponzor",
-                        Organizace = ev.JmenoPrijemce()
+                        Organizace = ev.JmenoPrijemceAsync()
                     }).ToList(),
 
                 Udalosti = o.NoFilteredEvents(ev => !unwantedEvents.Contains(ev.Type))

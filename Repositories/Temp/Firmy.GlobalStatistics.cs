@@ -158,7 +158,7 @@ namespace HlidacStatu.Repositories
                                 if (fk != null)
                                 {
                                     allIcos.Add(i);
-                                    foreach (var pic in fk.IcosInHolding(Relation.AktualnostType.Aktualni))
+                                    foreach (var pic in fk.IcosInHoldingAsync(Relation.AktualnostType.Aktualni))
                                         allIcos.Add(pic);
                                 }
                                 return new ActionOutputData();

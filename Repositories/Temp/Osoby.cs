@@ -1,12 +1,8 @@
 ﻿using HlidacStatu.Entities;
-
-
 using Microsoft.EntityFrameworkCore;
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 
 namespace HlidacStatu.Repositories
 {
@@ -63,53 +59,6 @@ namespace HlidacStatu.Repositories
                     }
                 },
                 TimeSpan.FromMinutes(2));
-
-
-
-
-        static Osoba nullObj = new Osoba() { NameId = "____NOTHING____" };
-        private class OsobyMCMById : Devmasters.Cache.Memcached.Manager<Osoba, int>
-        {
-            public OsobyMCMById() : base("PersonById", GetByIdAsync, TimeSpan.FromMinutes(10),
-                    Devmasters.Config.GetWebConfigValue("HazelcastServers").Split(','))
-            { }
-
-            public override Osoba Get(int key)
-            {
-                var o = base.Get(key);
-                if (o.NameId == nullObj.NameId)
-                    return null;
-                else
-                    return o;
-            }
-            private static async Task<Osoba> GetByIdAsync(int key)
-            {
-                var o = await OsobaRepo.GetByInternalIdAsync(key);
-                return o ?? nullObj;
-            }
-
-        }
-
-
-        private static object lockObj = new object();
-
-        private static OsobyMCMById instanceById;
-        public static Devmasters.Cache.Memcached.Manager<Osoba, int> GetById
-        {
-            get
-            {
-                if (instanceById == null)
-                {
-                    lock (lockObj)
-                    {
-                        if (instanceById == null)
-                        {
-                            instanceById = new OsobyMCMById();
-                        }
-                    }
-                }
-                return instanceById;
-            }
-        }
+        
     }
 }

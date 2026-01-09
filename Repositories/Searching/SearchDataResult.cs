@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace HlidacStatu.Repositories.Searching
@@ -92,7 +93,7 @@ namespace HlidacStatu.Repositories.Searching
         } 
 
 
-        public Func<T, string> AdditionalRender = null;
+        public Func<T, Task<string>> AdditionalRenderAsync = null;
 
         public Nest.ISearchResponse<T> ElasticResults { get; set; }
         public TimeSpan ElapsedTime { get; set; } = TimeSpan.Zero;

@@ -237,7 +237,7 @@
                 </ul>
             </div>
             if (
-                Model.AktualniVazby(Relation.AktualnostType.Nedavny).Count() > 0
+                Model.AktualniVazbyAsync(Relation.AktualnostType.Nedavny).Count() > 0
                 && holdingSummaryAfter2016.PocetSmluv > 0
             )
             {

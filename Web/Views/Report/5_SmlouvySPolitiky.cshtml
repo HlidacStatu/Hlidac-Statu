@@ -5,6 +5,7 @@
 @using HlidacStatu.Entities
 @using HlidacStatu.Repositories
 @using HlidacStatu.Repositories.Cache
+@using Graph = HlidacStatu.DS.Graphs.Graph
 
 @{
     Layout = "_ReportLayout";
@@ -32,8 +33,8 @@
             break;
     }
 
-    //todo: tohle je pain na refactoring... 
-    Func<Smlouva, string> renderPolitiky = (item) =>
+    
+    Func<Smlouva, Task<string>> renderPolitikyAsync = async (item) =>
     {
         System.Text.StringBuilder sb = new();
         sb.Append("<tr>");
@@ -45,13 +46,28 @@
         {
             if (!string.IsNullOrEmpty(ss.ico) && vazbyNaPolitiky.SoukromeFirmy.ContainsKey(ss.ico))
             {
-                List<Osoba?> persons = new();
-                persons = vazbyNaPolitiky.SoukromeFirmy[ss.ico]
+                var politickyAktivniOsoby = vazbyNaPolitiky.SoukromeFirmy[ss.ico]
                     .Select(pid => OsobaRepo.PolitickyAktivni
                         .Get()
                         .FirstOrDefault(m => m.InternalId == pid))
-                    .Where(p => p != null && (OsobaVazbyRepo.VazbyProIcoCachedAsync(p, ss.ico).GetAwaiter().GetResult()).Any())
-                    .OrderByDescending(p => (OsobaVazbyRepo.VazbyProIcoCachedAsync(p, ss.ico).GetAwaiter().GetResult()).Min(m => m.RelFrom ?? DateTime.MaxValue)) //setridit podle zacatku angazovanosti, nejnovejsi na zacatek
+                    .ToList();
+
+                var personsWithVazby = new List<(Osoba osoba, Graph.Edge[] vazby)>();
+                foreach (var osoba in politickyAktivniOsoby)
+                {
+                    if(osoba is null || osoba.IsValid() == false)
+                        continue;
+                    
+                    var vazby = await OsobaVazbyRepo.VazbyProIcoCachedAsync(osoba, ss.ico);
+                    if (vazby.Any())
+                    {
+                        personsWithVazby.Add((osoba, vazby));
+                    }
+                }
+
+                List<Osoba> persons = personsWithVazby
+                    .OrderByDescending(x => x.vazby.Min(m => m.RelFrom ?? DateTime.MaxValue))
+                    .Select(x => x.osoba)
                     .ToList();
 
                 foreach (var p in persons)
@@ -59,7 +75,7 @@
                     //doby angazovanosti politika v ICO
                     Relation.AktualnostType akt = Relation.AktualnostType.Libovolny;
                     List<string> dates = new();
-                    foreach (var v in OsobaVazbyRepo.VazbyProIcoCachedAsync(p, ss.ico).GetAwaiter().GetResult())
+                    foreach (var v in await OsobaVazbyRepo.VazbyProIcoCachedAsync(p, ss.ico))
                     {
                         if (v.RelFrom.HasValue && v.RelTo.HasValue)
                         {
@@ -132,7 +148,7 @@
         100, (SmlouvaRepo.Searching.OrderResult) (Convert.ToInt32(model.Order)));
     
     model.Chyby = false;
-    model.AdditionalRender = renderPolitiky;
+    model.AdditionalRenderAsync = renderPolitikyAsync;
 }
 
 

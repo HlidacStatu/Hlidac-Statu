@@ -66,7 +66,7 @@ namespace HlidacStatu.Extensions
                         .GroupBy(f => f.To.Id, v => v, (ico, v) => new
                         {
                             ICO = ico,
-                            FirmaName = v.First().To.PrintName(),//HlidacStatu.Lib.Data.External.FirmyDB.NameFromIco(ico, true),
+                            FirmaName = v.First().To.PrintNameAsync(),//HlidacStatu.Lib.Data.External.FirmyDB.NameFromIco(ico, true),
                         }).Count(),
             };
             return res;
@@ -97,7 +97,7 @@ namespace HlidacStatu.Extensions
                     .GroupBy(f => f.To.Id, v => v, (ico, v) => new
                     {
                         ICO = ico,
-                        FirmaName = v.First().To.PrintName(),//HlidacStatu.Lib.Data.External.FirmyDB.NameFromIco(ico, true),
+                        FirmaName = await v.First().To.PrintNameAsync()
                     })
                     .Select(m => new HlidacStatu.DS.Api.Osoba.Detail.Subject
                     {
@@ -142,7 +142,7 @@ namespace HlidacStatu.Extensions
                 string.Format(template, string.Join(itemDelimeter,
                     (await osoba.SponzoringAsync(sponzoringFilter, withCompany: withCompany))
                         .OrderByDescending(s => s.DarovanoDne)
-                        .Select(s => s.ToHtml(itemTemplate))
+                        .Select(s => s.ToHtmlAsync(itemTemplate))
                         .Take(take))
                 );
         }
@@ -261,7 +261,7 @@ namespace HlidacStatu.Extensions
                 })
                 .ThenByDescending(o => o.DatumOd)
                 .Take(numOfRecords)
-                .Select(e => html ? e.RenderHtml(", ") : e.RenderText(" "))
+                .Select(e => html ? e.RenderHtmlAsync(", ") : e.RenderTextAsync(" "))
                 .Select(s => string.Format(itemTemplate, s))
                 .ToList();
 
@@ -271,7 +271,7 @@ namespace HlidacStatu.Extensions
                 var sponzoringList = (await osoba.SponzoringAsync())
                     .OrderByDescending(s => s.DarovanoDne)
                     .Take(numOfSponzoring)
-                    .Select(s => s.ToHtml());
+                    .Select(s => await s.ToHtmlAsync());
                 evs.AddRange(sponzoringList);
             }
 

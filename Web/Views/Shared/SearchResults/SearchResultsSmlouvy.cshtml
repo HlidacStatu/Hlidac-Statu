@@ -183,10 +183,10 @@
             viewRenderTimesInt.Stop(); 
 
         }
-        if (Model.AdditionalRender != null)
+        if (Model.AdditionalRenderAsync != null)
         {
             viewRenderTimesInt = viewRenderTimes.StopPreviousAndStartNextLap("smlouvy results render 3-1 id:" + item.Id);
-            @Html.Raw(Model.AdditionalRender(rec))
+            @Html.Raw(await Model.AdditionalRenderAsync(rec))
             viewRenderTimesInt.Stop();
         }
 

@@ -60,11 +60,11 @@ namespace HlidacStatu.Repositories
                     new OsobaId(HlidacStatu.Repositories.OsobaVazbyRepo.Icos_s_VazbouNaOsobuAsync, "osobaidspravce:",
                         "icospravce:"),
 
-                    new Holding(HlidacStatu.Repositories.FirmaVazbyRepo.IcosInHolding, "holding:", "ico:"),
-                    new Holding(HlidacStatu.Repositories.FirmaVazbyRepo.IcosInHolding, "holdindluznik:", "icoplatce:"),
-                    new Holding(HlidacStatu.Repositories.FirmaVazbyRepo.IcosInHolding, "holdingveritel:",
+                    new Holding(HlidacStatu.Repositories.FirmaVazbyRepo.IcosInHoldingAsync, "holding:", "ico:"),
+                    new Holding(HlidacStatu.Repositories.FirmaVazbyRepo.IcosInHoldingAsync, "holdindluznik:", "icoplatce:"),
+                    new Holding(HlidacStatu.Repositories.FirmaVazbyRepo.IcosInHoldingAsync, "holdingveritel:",
                         "icoveritel:"),
-                    new Holding(HlidacStatu.Repositories.FirmaVazbyRepo.IcosInHolding, "holdingspravce:",
+                    new Holding(HlidacStatu.Repositories.FirmaVazbyRepo.IcosInHoldingAsync, "holdingspravce:",
                         "icospravce:"),
 
                     new TransformPrefixWithValue("ico:",
@@ -131,11 +131,11 @@ namespace HlidacStatu.Repositories
                     new OsobaId(HlidacStatu.Repositories.OsobaVazbyRepo.Icos_s_VazbouNaOsobuAsync, "osobaidspravce:",
                         "icospravce:"),
 
-                    new Holding(HlidacStatu.Repositories.FirmaVazbyRepo.IcosInHolding, "holding:", "ico:"),
-                    new Holding(HlidacStatu.Repositories.FirmaVazbyRepo.IcosInHolding, "holdindluznik:", "icoplatce:"),
-                    new Holding(HlidacStatu.Repositories.FirmaVazbyRepo.IcosInHolding, "holdingveritel:",
+                    new Holding(HlidacStatu.Repositories.FirmaVazbyRepo.IcosInHoldingAsync, "holding:", "ico:"),
+                    new Holding(HlidacStatu.Repositories.FirmaVazbyRepo.IcosInHoldingAsync, "holdindluznik:", "icoplatce:"),
+                    new Holding(HlidacStatu.Repositories.FirmaVazbyRepo.IcosInHoldingAsync, "holdingveritel:",
                         "icoveritel:"),
-                    new Holding(HlidacStatu.Repositories.FirmaVazbyRepo.IcosInHolding, "holdingspravce:",
+                    new Holding(HlidacStatu.Repositories.FirmaVazbyRepo.IcosInHoldingAsync, "holdingspravce:",
                         "icospravce:"),
 
                     new TransformPrefixWithValue("ico:",

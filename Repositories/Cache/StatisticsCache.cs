@@ -128,7 +128,7 @@ public class StatisticsCache
         var firmyMaxrok = new Dictionary<string, Devmasters.DT.DateInterval>
             { { firma.ICO, new Devmasters.DT.DateInterval(DateTime.MinValue, DateTime.MaxValue) } };
         var skutecneVazby =
-            Relation.SkutecnaDobaVazby(firma.AktualniVazby(DS.Graphs.Relation.AktualnostType.Libovolny));
+            Relation.SkutecnaDobaVazby(await firma.AktualniVazbyAsync(DS.Graphs.Relation.AktualnostType.Libovolny));
         foreach (var v in skutecneVazby)
         {
             if (!string.IsNullOrEmpty(v.To?.UniqId)
@@ -267,7 +267,7 @@ public class StatisticsCache
         var firmy_maxrok = new Dictionary<string, Devmasters.DT.DateInterval>();
         firmy_maxrok.Add(firma.ICO, new Devmasters.DT.DateInterval(DateTime.MinValue, DateTime.MaxValue));
         var skutecneVazby =
-            Relation.SkutecnaDobaVazby(firma.AktualniVazby(DS.Graphs.Relation.AktualnostType.Libovolny));
+            Relation.SkutecnaDobaVazby(await firma.AktualniVazbyAsync(DS.Graphs.Relation.AktualnostType.Libovolny));
         foreach (var v in skutecneVazby)
         {
             if (!string.IsNullOrEmpty(v.To?.UniqId)
@@ -395,7 +395,7 @@ public class StatisticsCache
         var firmy_maxrok = new Dictionary<string, Devmasters.DT.DateInterval>();
         firmy_maxrok.Add(firma.ICO, new Devmasters.DT.DateInterval(DateTime.MinValue, DateTime.MaxValue));
         var skutecneVazby =
-            Relation.SkutecnaDobaVazby(firma.AktualniVazby(DS.Graphs.Relation.AktualnostType.Libovolny));
+            Relation.SkutecnaDobaVazby(await firma.AktualniVazbyAsync(DS.Graphs.Relation.AktualnostType.Libovolny));
         foreach (var v in skutecneVazby)
         {
             if (!string.IsNullOrEmpty(v.To?.UniqId)

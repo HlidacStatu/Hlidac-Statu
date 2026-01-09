@@ -109,7 +109,7 @@ namespace HlidacStatu.Extensions
                             string.Join("<br />",
                                 (await firma.SponzoringAsync())
                                     .OrderByDescending(s => s.DarovanoDne)
-                                    .Select(s => s.ToHtml())
+                                    .Select(s => s.ToHtmlAsync())
                                     .Take(2)),
                             Fact.ImportanceLevel.Medium)
                         );
@@ -126,26 +126,26 @@ namespace HlidacStatu.Extensions
                 {
                     if (politici.Count > 0)
                     {
-                        var sPolitici = Osoby.GetById.Get(politici[0]).FullNameWithYear();
+                        var sPolitici = (await OsobaCache.GetPersonByIdAsync(politici[0])).FullNameWithYear();
                         if (politici.Count == 2)
                         {
-                            sPolitici = sPolitici + " a " + Osoby.GetById.Get(politici[1]).FullNameWithYear();
+                            sPolitici = sPolitici + " a " + (await OsobaCache.GetPersonByIdAsync(politici[1])).FullNameWithYear();
                         }
                         else if (politici.Count == 3)
                         {
                             sPolitici = sPolitici
                                         + ", "
-                                        + Osoby.GetById.Get(politici[1]).FullNameWithYear()
+                                        + (await OsobaCache.GetPersonByIdAsync(politici[1])).FullNameWithYear()
                                         + " a "
-                                        + Osoby.GetById.Get(politici[2]).FullNameWithYear();
+                                        + (await OsobaCache.GetPersonByIdAsync(politici[2])).FullNameWithYear();
                         }
                         else if (politici.Count > 3)
                         {
                             sPolitici = sPolitici
                                         + ", "
-                                        + Osoby.GetById.Get(politici[1]).FullNameWithYear()
+                                        + (await OsobaCache.GetPersonByIdAsync(politici[1])).FullNameWithYear()
                                         + ", "
-                                        + Osoby.GetById.Get(politici[2]).FullNameWithYear()
+                                        + (await OsobaCache.GetPersonByIdAsync(politici[2])).FullNameWithYear()
                                         + " a další";
                         }
 

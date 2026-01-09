@@ -26,11 +26,11 @@ namespace HlidacStatu.Repositories
         public static IRule[] Irules = new IRule[]
         {
             new OsobaId(HlidacStatu.Repositories.OsobaVazbyRepo.Icos_s_VazbouNaOsobuAsync, "osobaid:", "ico:"),
-            new Holding(HlidacStatu.Repositories.FirmaVazbyRepo.IcosInHolding, "holdingprijemce:", "ico:"),
-            new Holding(HlidacStatu.Repositories.FirmaVazbyRepo.IcosInHolding, "holdingplatce:", "ico:"),
-            new Holding(HlidacStatu.Repositories.FirmaVazbyRepo.IcosInHolding, "holdingdodavatel:", "ico:"),
-            new Holding(HlidacStatu.Repositories.FirmaVazbyRepo.IcosInHolding, "holdingzadavatel:", "ico:"),
-            new Holding(HlidacStatu.Repositories.FirmaVazbyRepo.IcosInHolding, null, "ico:"),
+            new Holding(HlidacStatu.Repositories.FirmaVazbyRepo.IcosInHoldingAsync, "holdingprijemce:", "ico:"),
+            new Holding(HlidacStatu.Repositories.FirmaVazbyRepo.IcosInHoldingAsync, "holdingplatce:", "ico:"),
+            new Holding(HlidacStatu.Repositories.FirmaVazbyRepo.IcosInHoldingAsync, "holdingdodavatel:", "ico:"),
+            new Holding(HlidacStatu.Repositories.FirmaVazbyRepo.IcosInHoldingAsync, "holdingzadavatel:", "ico:"),
+            new Holding(HlidacStatu.Repositories.FirmaVazbyRepo.IcosInHoldingAsync, null, "ico:"),
         };
 
         public static async Task FillDbAsync(bool fullRebuild = false, Action<string> outputWriter = null,

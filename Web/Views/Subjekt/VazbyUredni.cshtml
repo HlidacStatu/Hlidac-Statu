@@ -43,7 +43,7 @@
     @{
         var semaphore = new SemaphoreSlim(20);
 
-        var dataTasks = Model.AktualniVazby(aktualnost, Relation.CharakterVazbyEnum.Uredni)
+        var dataTasks = Model.AktualniVazbyAsync(aktualnost, Relation.CharakterVazbyEnum.Uredni)
         .Where(v => v.To != null && v.To.Type == HlidacStatu.DS.Graphs.Graph.Node.NodeType.Company)
         .GroupBy(f => f.To.Id, v => v, (ico, v) => new { ico, v })
         .Select(async g =>
@@ -54,8 +54,8 @@
                 return new
                 {
                     ICO = g.ico,
-                    FirmaName = g.v.First().To.PrintName(),
-                    VazbyPerIco = Model.VazbyProICO(Relation.CharakterVazbyEnum.Uredni, g.ico)
+                    FirmaName = g.v.First().To.PrintNameAsync(),
+                    VazbyPerIco = await FirmaVazbyRepo.VazbyProIcoCachedAsync(Model, Relation.CharakterVazbyEnum.Uredni, g.ico)
                 };
             }
             finally

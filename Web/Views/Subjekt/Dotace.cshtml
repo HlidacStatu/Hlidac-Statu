@@ -38,7 +38,7 @@
     };
     Dictionary<Dotace.Hint.CalculatedCategories, HlidacStatu.Lib.Analytics.SimpleStat> kategorieData = await DotaceRepo.PoKategoriichAsync(ico: Model.ICO);
     Dictionary<Dotace.Hint.CalculatedCategories, HlidacStatu.Lib.Analytics.SimpleStat> kategorieHoldingData = new();
-    if (Model.AktualniVazby(Relation.AktualnostType.Nedavny).Any())
+    if (Model.AktualniVazbyAsync(Relation.AktualnostType.Nedavny).Any())
     {
         kategorieHoldingData = await DotaceRepo.PoKategoriichAsync(query: $"holding:{Model.ICO}");
     }
@@ -111,7 +111,7 @@
 
     //holding graf a tabulka
     string holdingSubsidiesTitle = $"Přehled čerpání dotací {(Model.JsemOVM() ? "úřadu včetně podřízených organizací" : "holdingu")}";
-    var holdingFirmy = Model.Holding(Relation.AktualnostType.Nedavny).ToList();
+    var holdingFirmy = Model.HoldingAsync(Relation.AktualnostType.Nedavny).ToList();
     //holdingFirmy.Add(Model);
 
     ConcurrentBag<(Firma Firma, StatisticsSubjectPerYear<Firma.Statistics.Dotace> Stat)> holdingFirmyWithSubsidies = new();
@@ -225,7 +225,7 @@
             </p>
         }
 
-        @if (showHolding == false & Model.AktualniVazby(Relation.AktualnostType.Nedavny).Count() > 0)
+        @if (showHolding == false & Model.AktualniVazbyAsync(Relation.AktualnostType.Nedavny).Count() > 0)
         {
             <p>
                 Dceřinné firmy či firmy z holdingu neobdržely žádné dotace.
@@ -246,7 +246,7 @@
                     <p>
                         <b>@Devmasters.Lang.CS.Plural.Get(subCompaniesWithSubsidiesCount, "Jedna podřízená organizace", "{0} podřízená organizace", "{0} podřízených organizací")</b>
                         (z
-                        celkem @HlidacStatu.Util.RenderData.NiceNumber(Model.PocetPodrizenychSubjektu( Relation.CharakterVazbyEnum.VlastnictviKontrola, Relation.AktualnostType.Nedavny)))
+                        celkem @HlidacStatu.Util.RenderData.NiceNumber(Model.PocetPodrizenychSubjektuAsync( Relation.CharakterVazbyEnum.VlastnictviKontrola, Relation.AktualnostType.Nedavny)))
                         úřadu @Devmasters.TextUtil.ShortenText(Model.Jmeno, 35)
 
                         @Devmasters.Lang.CS.Plural.Get(subCompaniesWithSubsidiesCount,
@@ -271,7 +271,7 @@
                     <p>
                         <b>@Devmasters.Lang.CS.Plural.Get(subCompaniesWithSubsidiesCount, "Jedna dceřiná společnost", "{0} dceřiné společnosti", "{0} dceřiných společností")</b>
                         (z
-                        celkem @HlidacStatu.Util.RenderData.NiceNumber(Model.PocetPodrizenychSubjektu( Relation.CharakterVazbyEnum.VlastnictviKontrola, Relation.AktualnostType.Nedavny)))
+                        celkem @HlidacStatu.Util.RenderData.NiceNumber(Model.PocetPodrizenychSubjektuAsync( Relation.CharakterVazbyEnum.VlastnictviKontrola, Relation.AktualnostType.Nedavny)))
                         firmy @Devmasters.TextUtil.ShortenText(Model.Jmeno, 35)
 
                         @Devmasters.Lang.CS.Plural.Get(subCompaniesWithSubsidiesCount,

@@ -364,7 +364,7 @@ namespace HlidacStatu.Datasets
                     new TransformPrefixWithValue("id:", idQuerypath, null),
                     new OsobaId(HlidacStatu.Repositories.OsobaVazbyRepo.Icos_s_VazbouNaOsobuAsync, "osobaid:",
                         icoQuerypath, addLastCondition: osobaIdQuerypath),
-                    new Holding(HlidacStatu.Repositories.FirmaVazbyRepo.IcosInHolding, null, icoQuerypath),
+                    new Holding(HlidacStatu.Repositories.FirmaVazbyRepo.IcosInHoldingAsync, null, icoQuerypath),
 
                     new TransformPrefixWithValue("ico:", icoQuerypath, null),
                 };

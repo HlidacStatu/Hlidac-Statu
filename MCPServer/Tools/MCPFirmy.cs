@@ -184,7 +184,7 @@ namespace HlidacStatu.MCPServer.Tools
                     if (!(f?.Valid == true))
                         return null;
 
-                    var res = f.IcosInHolding(historic_view)
+                    var res = f.IcosInHoldingAsync(historic_view)
                             .Select(m => new SimpleDetailInfo()
                             {
                                 Ico = m,

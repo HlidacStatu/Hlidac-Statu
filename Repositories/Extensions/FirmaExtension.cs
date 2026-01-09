@@ -441,11 +441,11 @@ namespace HlidacStatu.Extensions
             return await OsobaEventRepo.GetCeosAsync(firma.ICO, fromDate, toDate, predicate);
         }
 
-        public static IEnumerable<string> IcosInHolding(this Firma firma, Relation.AktualnostType aktualnost)
+        public static async Task<IEnumerable<string>> IcosInHoldingAsync(this Firma firma, Relation.AktualnostType aktualnost)
         {
             if (firma == null)
                 return null;
-            return firma.AktualniVazby(aktualnost)
+            return (await firma.AktualniVazbyAsync(aktualnost))
                 .Where(v => !string.IsNullOrEmpty(v.To?.UniqId)
                             && v.To.Type == HlidacStatu.DS.Graphs.Graph.Node.NodeType.Company)
                 .Select(v => v.To)
@@ -458,12 +458,12 @@ namespace HlidacStatu.Extensions
         /// </summary>
         /// <param name="aktualnost"></param>
         /// <returns></returns>
-        public static IEnumerable<Firma> Holding(this Firma firma, Relation.AktualnostType aktualnost)
+        public static async Task<IEnumerable<Firma>> HoldingAsync(this Firma firma, Relation.AktualnostType aktualnost)
         {
             if (firma == null)
                 return null;
 
-            var icos = firma.IcosInHolding(aktualnost);
+            var icos = await firma.IcosInHoldingAsync(aktualnost);
 
             return icos.Select(ico => Firmy.Get(ico));
         }
@@ -575,7 +575,7 @@ namespace HlidacStatu.Extensions
             return string.Join("<br />",
                 (await firma.SponzoringAsync())
                     .OrderByDescending(s => s.DarovanoDne)
-                    .Select(s => s.ToHtml())
+                    .Select(s => s.ToHtmlAsync())
                     .Take(take));
         }
 
@@ -621,7 +621,7 @@ namespace HlidacStatu.Extensions
             {
                 List<string> evs = events
                     .OrderBy(e => e.DatumOd)
-                    .Select(e => html ? e.RenderHtml(", ") : e.RenderText(", "))
+                    .Select(e => html ? await e.RenderHtmlAsync(", ") : await e.RenderTextAsync(", "))
                     .Select(s => s.Trim())
                     .Where(s => !string.IsNullOrEmpty(s))
                     .Take(numOfRecords)
@@ -999,26 +999,26 @@ namespace HlidacStatu.Extensions
                     var politici = firmySVazbamiNaPolitiky.SoukromeFirmy[firma.ICO];
                     if (politici.Count > 0)
                     {
-                        var sPolitici = Osoby.GetById.Get(politici[0]).FullNameWithYear();
+                        var sPolitici = (await OsobaCache.GetPersonByIdAsync(politici[0])).FullNameWithYear();
                         if (politici.Count == 2)
                         {
-                            sPolitici = sPolitici + " a " + Osoby.GetById.Get(politici[1]).FullNameWithYear();
+                            sPolitici = sPolitici + " a " + (await OsobaCache.GetPersonByIdAsync(politici[1])).FullNameWithYear();
                         }
                         else if (politici.Count == 3)
                         {
                             sPolitici = sPolitici
                                         + ", "
-                                        + Osoby.GetById.Get(politici[1]).FullNameWithYear()
+                                        + (await OsobaCache.GetPersonByIdAsync(politici[1])).FullNameWithYear()
                                         + " a "
-                                        + Osoby.GetById.Get(politici[2]).FullNameWithYear();
+                                        + (await OsobaCache.GetPersonByIdAsync(politici[2])).FullNameWithYear();
                         }
                         else if (politici.Count > 3)
                         {
                             sPolitici = sPolitici
                                         + ", "
-                                        + Osoby.GetById.Get(politici[1]).FullNameWithYear()
+                                        + (await OsobaCache.GetPersonByIdAsync(politici[1])).FullNameWithYear()
                                         + ", "
-                                        + Osoby.GetById.Get(politici[2]).FullNameWithYear()
+                                        + (await OsobaCache.GetPersonByIdAsync(politici[2])).FullNameWithYear()
                                         + " a další";
                         }
 
@@ -1066,7 +1066,7 @@ namespace HlidacStatu.Extensions
                 );
             }
 
-            if (firma.PatrimStatu() == false && firma.IcosInHolding(Relation.AktualnostType.Aktualni).Count() > 2)
+            if (firma.PatrimStatu() == false && (await firma.IcosInHoldingAsync(Relation.AktualnostType.Aktualni)).Count() > 2)
             {
                 if (statHolding[rok].PocetSmluv > 3)
                 {

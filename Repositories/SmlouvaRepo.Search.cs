@@ -98,11 +98,11 @@ namespace HlidacStatu.Repositories
 
             public static HlidacStatu.Searching.IRule[] Irules = new HlidacStatu.Searching.IRule[] {
                new HlidacStatu.Searching.OsobaId(HlidacStatu.Repositories.OsobaVazbyRepo.Icos_s_VazbouNaOsobuAsync, "osobaid:","ico:" ),
-               new HlidacStatu.Searching.Holding(HlidacStatu.Repositories.FirmaVazbyRepo.IcosInHolding, "holdingprijemce:","icoprijemce:" ),
-               new HlidacStatu.Searching.Holding(HlidacStatu.Repositories.FirmaVazbyRepo.IcosInHolding, "holdingplatce:","icoplatce:" ),
-               new HlidacStatu.Searching.Holding(HlidacStatu.Repositories.FirmaVazbyRepo.IcosInHolding, "holdingdodavatel:","icoprijemce:" ),
-               new HlidacStatu.Searching.Holding(HlidacStatu.Repositories.FirmaVazbyRepo.IcosInHolding, "holdingzadavatel:","icoplatce:" ),
-               new HlidacStatu.Searching.Holding(HlidacStatu.Repositories.FirmaVazbyRepo.IcosInHolding, null,"ico:" ),
+               new HlidacStatu.Searching.Holding(HlidacStatu.Repositories.FirmaVazbyRepo.IcosInHoldingAsync, "holdingprijemce:","icoprijemce:" ),
+               new HlidacStatu.Searching.Holding(HlidacStatu.Repositories.FirmaVazbyRepo.IcosInHoldingAsync, "holdingplatce:","icoplatce:" ),
+               new HlidacStatu.Searching.Holding(HlidacStatu.Repositories.FirmaVazbyRepo.IcosInHoldingAsync, "holdingdodavatel:","icoprijemce:" ),
+               new HlidacStatu.Searching.Holding(HlidacStatu.Repositories.FirmaVazbyRepo.IcosInHoldingAsync, "holdingzadavatel:","icoplatce:" ),
+               new HlidacStatu.Searching.Holding(HlidacStatu.Repositories.FirmaVazbyRepo.IcosInHoldingAsync, null,"ico:" ),
 
                new HlidacStatu.Searching.TransformPrefixWithValue("ds:","(prijemce.datovaSchranka:${q} OR platce.datovaSchranka:${q}) ",null ),
                new HlidacStatu.Searching.TransformPrefix("dsprijemce:","prijemce.datovaSchranka:",null  ),

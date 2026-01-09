@@ -81,7 +81,7 @@
             <ul>
                 @foreach (var os in firmySVazbamiNaPolitiky.SoukromeFirmy[Model.ICO])
                 {
-                    var o = Osoby.GetById.Get(os);
+                    var o = await OsobaCache.GetPersonByIdAsync(os);
                     //var sponz = o.Sponzoring().ToList();
 
                     var sponzorOsoba = o.SponzoringToHtmlAsync(itemTemplate: $"<li><a href='{o.GetUrl(true)}'>{o.FullName()}</a> {{0}}</li>", itemDelimeter:"", sponzoringFilter: s=>s.OsobaIdDarce == os || s.IcoDarce == Model.ICO, withCompany: false);

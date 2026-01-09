@@ -17,7 +17,7 @@ namespace HlidacStatu.Repositories
         private static ILogger _logger = Log.ForContext<RecalculateItemRepo>();
 
         //public const string RECALCULATIONQUEUENAME = "recalculation2Process";
-        static Entities.RecalculateItemEqComparer comparer = new Entities.RecalculateItemEqComparer();
+        static Entities.RecalculateItemEqComparer comparer = new();
 
         static Devmasters.Batch.ActionProgressWriter debugProgressWr = new Devmasters.Batch.ActionProgressWriter(0.1f);
 
@@ -185,7 +185,7 @@ namespace HlidacStatu.Repositories
             }
             else if (item.ItemType == RecalculateItem.ItemTypeEnum.Person)
             {
-                var o = Osoby.GetById.Get(Convert.ToInt32(item.Id));
+                var o = await OsobaCache.GetPersonByIdAsync(Convert.ToInt32(item.Id));
                 if (o != null)
                     list = list.Union(
                             OsobaForQueue(new List<RecalculateItem>(), o, item.StatisticsType, item.ProvokedBy, 0),
@@ -240,10 +240,10 @@ namespace HlidacStatu.Repositories
             return AddToProcessingQueue(new RecalculateItem(f, statsType, provokeBy));
         }
 
-        private static List<RecalculateItem> OsobaForQueue(List<RecalculateItem> list,
+        private static async Task<List<RecalculateItem>> OsobaForQueueAsync(List<RecalculateItem> list,
             int osobaInternalId, RecalculateItem.StatisticsTypeEnum statsType, string provokeBy, int deep)
         {
-            var o = Osoby.GetById.Get(osobaInternalId);
+            var o = await OsobaCache.GetPersonByIdAsync(osobaInternalId);
             if (o != null)
                 return OsobaForQueue(list, o, statsType, provokeBy, deep);
             else
@@ -269,7 +269,7 @@ namespace HlidacStatu.Repositories
             if (deep > 50)
                 return list;
 
-            var parents = o.ParentOsoby(DS.Graphs.Relation.AktualnostType.Nedavny);
+            var parents = o.ParentOsobyAsync(DS.Graphs.Relation.AktualnostType.Nedavny);
             foreach (var oo in parents)
             {
                 var item = new RecalculateItem(oo, statsType, provokeBy);

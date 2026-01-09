@@ -4,15 +4,18 @@ using HlidacStatu.Entities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
+using HlidacStatu.Caching;
+using HlidacStatu.Repositories.Cache;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
+using ZiggyCreatures.Caching.Fusion;
 
 namespace HlidacStatu.Repositories
 {
     public static class FirmaVazbyRepo
     {
         private static readonly ILogger _logger = Log.ForContext(typeof(FirmaVazbyRepo));
-
 
         public static void AddOrUpdate(
             string vlastnikIco, string dcerinkaIco,
@@ -65,7 +68,7 @@ namespace HlidacStatu.Repositories
             }
         }
 
-        public static string[] IcosInHolding(string icoOfMother)
+        public static async Task<string[]> IcosInHoldingAsync(string icoOfMother)
         {
             string[] res = Array.Empty<string>();
 
@@ -73,35 +76,41 @@ namespace HlidacStatu.Repositories
             Firma f = Firmy.Get(icoOfMother);
             if (f != null && f?.Valid == true)
             {
-                var icos = new string[] { f.ICO }
-                    .Union(
-                        f.AktualniVazby(aktualnost)
-                        .Select(s => s.To.Id)
-                    )
-                    .Distinct();
-                var icosPresLidi = f.AktualniVazby(aktualnost)
-                        .Where(o => o.To.Type == HlidacStatu.DS.Graphs.Graph.Node.NodeType.Person)
-                        .Select(o => Osoby.GetById.Get(Convert.ToInt32(o.To.Id)))
-                        .Where(o => o != null)
-//todo: cant modify firmy repo and firmy vazby yet...                        
-#pragma warning disable VSTHRD002
-                        .SelectMany(o => o.AktualniVazbyAsync( Relation.CharakterVazbyEnum.VlastnictviKontrola, aktualnost).GetAwaiter().GetResult())
-#pragma warning restore VSTHRD002
-                        .Select(v => v.To.Id)
-                        .Distinct();
-                icos = icos.Union(icosPresLidi).Distinct();
+                var aktualniVazby = await f.AktualniVazbyAsync(aktualnost);
 
+                var icos = new string[] { f.ICO }
+                    .Union(aktualniVazby.Select(s => s.To.Id))
+                    .Distinct();
+
+                var vazbyPresOsoby = aktualniVazby
+                    .Where(o => o.To.Type == HlidacStatu.DS.Graphs.Graph.Node.NodeType.Person)
+                    .ToList();
+
+                var icosPresLidiList = new List<string>();
+                foreach (var vazba in vazbyPresOsoby)
+                {
+                    var osoba = await OsobaCache.GetPersonByIdAsync(Convert.ToInt32(vazba.To.Id));
+                    if (osoba != null)
+                    {
+                        var osobaVazby = await osoba.AktualniVazbyAsync(Relation.CharakterVazbyEnum.VlastnictviKontrola, aktualnost);
+                        icosPresLidiList.AddRange(osobaVazby.Select(v => v.To.Id));
+                    }
+                }
+
+                var icosPresLidi = icosPresLidiList.Distinct();
+                icos = icos.Union(icosPresLidi).Distinct();
+                
                 res = icos.ToArray();
             }
             return res;
         }
-        private static void UpdateVazby(this Firma firma,
+        private static async Task UpdateVazbyAsync(this Firma firma,
             Relation.CharakterVazbyEnum charakterVazby,
             bool refresh = false)
         {
             try
             {
-                var _vazby = Graph.VsechnyDcerineVazby(firma.ICO, charakterVazby, refresh);
+                var _vazby = await Graph.VsechnyDcerineVazbyAsync(firma.ICO, charakterVazby, refresh);
                 firma.SetVazbyForInstanceOnly(charakterVazby,_vazby);
             }
             catch (Exception)
@@ -109,10 +118,9 @@ namespace HlidacStatu.Repositories
                 firma.SetVazbyForInstanceOnly(charakterVazby, new HlidacStatu.DS.Graphs.Graph.Edge[] { });
             }
         }
+        
 
-
-
-        public static DS.Graphs.Graph.Edge[] Vazby(this Firma firma,
+        public static async Task<DS.Graphs.Graph.Edge[]> VazbyAsync(this Firma firma,
             Relation.CharakterVazbyEnum charakterVazby = Relation.CharakterVazbyEnum.VlastnictviKontrola,
             bool refresh = false)
         {
@@ -120,7 +128,7 @@ namespace HlidacStatu.Repositories
             {
                 if (firma._vazby == null || refresh == true)
                 {
-                    firma.UpdateVazby(charakterVazby, refresh);
+                    await firma.UpdateVazbyAsync(charakterVazby, refresh);
                 }
                 return firma._vazby;
             }
@@ -128,7 +136,7 @@ namespace HlidacStatu.Repositories
             {
                 if (firma._vazbyUredni == null || refresh == true)
                 {
-                    firma.UpdateVazby(charakterVazby, refresh);
+                    await firma.UpdateVazbyAsync(charakterVazby, refresh);
                 }
 
                 return firma._vazbyUredni;
@@ -172,21 +180,8 @@ namespace HlidacStatu.Repositories
 
             HlidacStatu.DS.Graphs.Graph.Edge[] _parentF = Graph.GetDirectParentRelationsFirmy(ico, charakterVazby).ToArray();
             var _parentVazby = _parentF
-                .Where(m => m.Aktualnost >= minAktualnost)
-                //.Where(m => Devmasters.DT.Util.IsOverlappingIntervals(parentF.RelFrom, parent.RelTo, m.RelFrom, m.RelTo))
-            ;
-
-            //List<HlidacStatu.DS.Graphs.Graph.Edge> _parentVazby = new List<HlidacStatu.DS.Graphs.Graph.Edge>();
-            //foreach (var p in _parentF)
-            //{
-            //    if (Util.DataValidators.CheckCZICO(p.From.Id))
-            //    {
-            //        var parentFirma = Firmy.Get(p.From.Id);
-            //        _parentVazby.AddRange(Relation.AktualniVazby(new Edge[] { p }, minAktualnost, parentFirma.VazbyRootEdge()));
-            //    }
-            //}
-
-
+                .Where(m => m.Aktualnost >= minAktualnost);
+                
             var _parentVazbyIco = _parentVazby
                 .Select(m => m.From.Id)
                 .Where(m => Util.DataValidators.CheckCZICO(m))
@@ -227,11 +222,11 @@ namespace HlidacStatu.Repositories
 
 
 
-        private static Firma[] _vsechnyDcerinnePodrizene(this Firma firma,
+        private static async Task<Firma[]> VsechnyDcerinnePodrizeneAsync(this Firma firma,
             Relation.CharakterVazbyEnum charakterVazby ,
             Relation.AktualnostType minAktualnost, bool refresh = false)
         {
-            var vazby = firma.AktualniVazby(minAktualnost, charakterVazby, refresh);
+            var vazby = await firma.AktualniVazbyAsync(minAktualnost, charakterVazby, refresh);
 
             var data = vazby
                 .Where(v => v.To != null && v.To.Type == HlidacStatu.DS.Graphs.Graph.Node.NodeType.Company)
@@ -257,48 +252,32 @@ namespace HlidacStatu.Repositories
             };
 
         }
-        public static int PocetPodrizenychSubjektu(this Firma firma,
+        public static async Task<int> PocetPodrizenychSubjektuAsync(this Firma firma,
             Relation.CharakterVazbyEnum charakterVazby,
             Relation.AktualnostType minAktualnost, bool refresh = false)
         {
             //firma.UpdateVazbyFromDB(); //nemelo by tu byt.
-            return firma.AktualniVazby(minAktualnost, charakterVazby,refresh)?
+            return (await firma.AktualniVazbyAsync(minAktualnost, charakterVazby,refresh))?
                 .Select(m=>m.To.UniqId)?
                 .Distinct()?
                 .Count() ?? 0;
         }
 
-        public static HlidacStatu.DS.Graphs.Graph.Edge[] AktualniVazby(this Firma firma, 
+        public static async Task<DS.Graphs.Graph.Edge[]> AktualniVazbyAsync(this Firma firma, 
             Relation.AktualnostType minAktualnost,
             Relation.CharakterVazbyEnum charakterVazby = Relation.CharakterVazbyEnum.VlastnictviKontrola,
             bool refresh = false)
         {
             //firma.UpdateVazbyFromDB(); //nemelo by tu byt.
-            var vsechnyVazby = firma.Vazby(charakterVazby, refresh);
+            var vsechnyVazby = await firma.VazbyAsync(charakterVazby, refresh);
             return Relation.AktualniVazby(vsechnyVazby, minAktualnost, firma.VazbyRootEdge());
         }
-
-
-
-        public static HlidacStatu.DS.Graphs.Graph.Edge[] VazbyProICO(this Firma firma, Relation.CharakterVazbyEnum charakterVazby, string ico)
-        {
-            return _vazbyProIcoCache.Get((firma, charakterVazby, ico));
-        }
-
-        static private Devmasters.Cache.LocalMemory.Manager<HlidacStatu.DS.Graphs.Graph.Edge[], (Firma f, Relation.CharakterVazbyEnum charakterVazby, string ico)> _vazbyProIcoCache
-            = Devmasters.Cache.LocalMemory.Manager<HlidacStatu.DS.Graphs.Graph.Edge[], (Firma f, Relation.CharakterVazbyEnum charakterVazby, string ico)>
-                .GetSafeInstance("_vazbyFirmaProIcoCache", f => { return f.f._vazbyProICO(f.charakterVazby, f.ico); },
-                    TimeSpan.FromHours(2), k => (k.f.ICO + "-"+ k.charakterVazby + "->" + k.ico)
-                );
-
-
-
-
-        private static void InitializeGraph(this Firma firma, Relation.CharakterVazbyEnum charakterVazby)
+        
+        private static async Task InitializeGraphAsync(this Firma firma, Relation.CharakterVazbyEnum charakterVazby)
         {
             var uGraph = new UnweightedGraph();
             Vertex<string> _startingVertex = null;
-            foreach (var vazba in firma.Vazby(charakterVazby))
+            foreach (var vazba in await firma.VazbyAsync(charakterVazby))
             {
                 if (vazba.From is null)
                 {
@@ -318,10 +297,10 @@ namespace HlidacStatu.Repositories
             firma._setStartingVertext(charakterVazby, _startingVertex);
         }
 
-        private static HlidacStatu.DS.Graphs.Graph.Edge[] _vazbyProICO(this Firma firma, Relation.CharakterVazbyEnum charakterVazby, string ico)
+        private static async Task<DS.Graphs.Graph.Edge[]> VazbyProICOAsync(this Firma firma, Relation.CharakterVazbyEnum charakterVazby, string ico)
         {
             if (firma._getGraph(charakterVazby) is null || firma._getGraph(charakterVazby).Vertices.Count == 0)
-                firma.InitializeGraph(charakterVazby);
+                await firma.InitializeGraphAsync(charakterVazby);
 
             if (firma._getStartingVertext(charakterVazby) is null)
                 firma._setStartingVertext(charakterVazby, new Vertex<string>(HlidacStatu.DS.Graphs.Graph.Node.Prefix_NodeType_Company + firma.ICO));
@@ -346,33 +325,46 @@ namespace HlidacStatu.Repositories
             return new Vertex<string>($"{HlidacStatu.DS.Graphs.Graph.Node.Prefix_NodeType_Company}{ico}");
         }
 
-        public static void UpdateVazbyFromDb(this Firma firma, Relation.CharakterVazbyEnum charakterVazby = Relation.CharakterVazbyEnum.VlastnictviKontrola)
+        public static async Task UpdateVazbyFromDbAsync(this Firma firma, Relation.CharakterVazbyEnum charakterVazby = Relation.CharakterVazbyEnum.VlastnictviKontrola)
         {
             List<HlidacStatu.DS.Graphs.Graph.Edge> oldRel = new List<HlidacStatu.DS.Graphs.Graph.Edge>();
 
-            var firstRel = Graph.VsechnyDcerineVazby(firma.ICO, charakterVazby, true);
+            var firstRel = await Graph.VsechnyDcerineVazbyAsync(firma.ICO, charakterVazby, true);
 
             firma.SetVazbyForInstanceOnly(charakterVazby, HlidacStatu.DS.Graphs.Graph.Edge.Merge(oldRel, firstRel).ToArray());
         }
 
-        public static void FixVazbaDatumDo()
+        public static async Task FixVazbaDatumDoAsync()
         {
-            using (DbEntities db = new DbEntities())
-            {
-                db.Database.ExecuteSqlRaw(@"update FirmaVazby
+            await using DbEntities db = new DbEntities();
+            await db.Database.ExecuteSqlRawAsync(@"update FirmaVazby
                    set DatumDo = fi.DatumZaniku 
                   from FirmaVazby fv
                   join Firma fi on fi.ICO = FV.ICO
                  where fv.datumdo is null
                    and fi.DatumZaniku is not null");
                 
-                db.Database.ExecuteSqlRaw(@"update FirmaVazby
+            await db.Database.ExecuteSqlRawAsync(@"update FirmaVazby
                    set DatumDo = fi.DatumZaniku 
                   from FirmaVazby fv
                   join Firma fi on fi.ICO = FV.VazbakICO
                  where fv.datumdo is null
                    and fi.DatumZaniku is not null");
+        }
+        
+        private static IFusionCache MemoryCache =>
+            HlidacStatu.Caching.CacheFactory.CreateNew(CacheFactory.CacheType.L1Default, nameof(FirmaVazbyRepo));
+        
+        public static ValueTask<HlidacStatu.DS.Graphs.Graph.Edge[]> VazbyProIcoCachedAsync(Firma f, Relation.CharakterVazbyEnum charakterVazby, string ico)
+        {
+            if (f is null)
+            {
+                return new ValueTask<DS.Graphs.Graph.Edge[]>([]);
             }
+                
+            return MemoryCache.GetOrSetAsync($"_VazbyFirmaProIcoCache:{f.ICO}_{charakterVazby}->{ico}",
+                _ => f.VazbyProICOAsync(charakterVazby, ico),
+                options => options.ModifyEntryOptionsDuration(TimeSpan.FromHours(2)));
         }
     }
 }

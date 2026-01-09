@@ -26,7 +26,6 @@ namespace HlidacStatu.Repositories
 
             private static readonly Regex YearRegexLoose = new(@"(19|20)\d{2}");
 
-
             [ShowNiceDisplayName()]
             [Sortable(SortableAttribute.SortAlgorithm.BySortValue)]
             public enum OrderResult
@@ -571,19 +570,19 @@ namespace HlidacStatu.Repositories
                 return res;
             }
 
-            public static async Task<IEnumerable<Osoba>> GetPolitikByQueryFromFirmyAsync(string jmeno,
+            public static async Task<List<Osoba>> GetPolitikByQueryFromFirmyAsync(string jmeno,
                 int maxNumOfResults = 50,
                 IEnumerable<Firma> alreadyFoundFirmyIcos = null)
             {
-                var res = new Osoba[] { };
-
+                List<Osoba> res = [];
+                
                 var firmy = alreadyFoundFirmyIcos;
                 if (firmy == null)
                     firmy = (await FirmaRepo.Searching.SimpleSearchAsync(jmeno, 0, maxNumOfResults * 10)).Result;
 
                 if (firmy != null && firmy.Count() > 0)
                 {
-                    Dictionary<int, int> osoby = new Dictionary<int, int>();
+                    Dictionary<int, int> osobyIdDict = new Dictionary<int, int>();
                     bool skipRest = false;
                     foreach (var f in firmy)
                     {
@@ -597,10 +596,10 @@ namespace HlidacStatu.Repositories
                         {
                             foreach (var osobaId in osobyIds)
                             {
-                                if (!osoby.TryAdd(osobaId, 1))
-                                    osoby[osobaId]++;
+                                if (!osobyIdDict.TryAdd(osobaId, 1))
+                                    osobyIdDict[osobaId]++;
 
-                                if (osoby.Count > maxNumOfResults)
+                                if (osobyIdDict.Count > maxNumOfResults)
                                 {
                                     skipRest = true;
                                     break;
@@ -610,19 +609,17 @@ namespace HlidacStatu.Repositories
 
                         if (skipRest == false)
                         {
-                            var fvazby = f.AktualniVazby(Relation.AktualnostType.Nedavny);
+                            var fvazby = await f.AktualniVazbyAsync(Relation.AktualnostType.Nedavny);
                             foreach (var fv in fvazby)
                             {
                                 if (fv.To.Type == HlidacStatu.DS.Graphs.Graph.Node.NodeType.Company)
                                 {
                                     int osobaId = Convert.ToInt32(fv.To.Id);
-                                    if (osoby.ContainsKey(osobaId))
-                                        osoby[osobaId]++;
-                                    else
-                                        osoby.Add(osobaId, 1);
+                                    if (!osobyIdDict.TryAdd(osobaId, 1))
+                                        osobyIdDict[osobaId]++;
                                 }
 
-                                if (osoby.Count > maxNumOfResults)
+                                if (osobyIdDict.Count > maxNumOfResults)
                                 {
                                     skipRest = true;
                                     break;
@@ -633,11 +630,10 @@ namespace HlidacStatu.Repositories
                                 {
                                     foreach (var osobaId in osobyIds2)
                                     {
-                                        if (osoby.ContainsKey(osobaId))
-                                            osoby[osobaId]++;
-                                        else
-                                            osoby.Add(osobaId, 1);
-                                        if (osoby.Count > maxNumOfResults)
+                                        if (!osobyIdDict.TryAdd(osobaId, 1))
+                                            osobyIdDict[osobaId]++;
+
+                                        if (osobyIdDict.Count > maxNumOfResults)
                                         {
                                             skipRest = true;
                                             break;
@@ -648,13 +644,18 @@ namespace HlidacStatu.Repositories
                         }
                     }
 
-                    res = osoby
+                    var osobyIdsSample = osobyIdDict
                         .OrderByDescending(o => o.Value)
-                        .Take(maxNumOfResults - res.Length)
-                        .Select(m => Osoby.GetById.Get(m.Key))
-                        .Where(m => m != null)
-                        .Where(m => m.IsValid()) //not empty (nullObj from OsobaCache)
-                        .ToArray();
+                        .Take(maxNumOfResults);
+
+                    foreach (var osobaIdKvp in osobyIdsSample)
+                    {
+                        var politik = await OsobaCache.GetPersonByIdAsync(osobaIdKvp.Key);
+                        if (politik != null && politik.IsValid())
+                        {
+                            res.Add(politik);
+                        }
+                    }
                 }
 
                 return res;

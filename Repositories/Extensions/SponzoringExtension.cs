@@ -1,11 +1,13 @@
+using System.Threading.Tasks;
 using HlidacStatu.Entities;
 using HlidacStatu.Repositories;
+using HlidacStatu.Repositories.Cache;
 
 namespace HlidacStatu.Extensions
 {
     public static class SponzoringExtension
     {
-        public static string JmenoPrijemce(this Sponzoring sponzoring)
+        public static async Task<string> JmenoPrijemceAsync(this Sponzoring sponzoring)
         {
             bool prijemceJeFirma = !string.IsNullOrWhiteSpace(sponzoring.IcoPrijemce);
             if (prijemceJeFirma)
@@ -19,16 +21,16 @@ namespace HlidacStatu.Extensions
             bool prijemcejeOsoba = sponzoring.OsobaIdPrijemce != null && sponzoring.OsobaIdPrijemce > 0;
             if (prijemcejeOsoba)
             {
-                return Osoby.GetById.Get(sponzoring.OsobaIdPrijemce.Value).FullName();
+                return (await OsobaCache.GetPersonByIdAsync(sponzoring.OsobaIdPrijemce.Value)).FullName();
             }
 
             //todo: log corrupted data
             return "";
         }
 
-        public static string ToHtml(this Sponzoring sponzoring, string itemTemplate = "{0}")
+        public static async Task<string> ToHtmlAsync(this Sponzoring sponzoring, string itemTemplate = "{0}")
         {
-            string kohoSponzoroval = sponzoring.JmenoPrijemce();
+            string kohoSponzoroval = await sponzoring.JmenoPrijemceAsync();
             if (string.IsNullOrWhiteSpace(kohoSponzoroval))
             {
                 // nevime

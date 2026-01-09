@@ -53,18 +53,18 @@
     {
         <span class="text-muted">@Model.StatusFull().</span>
     }
-    @if (Model.AktualniVazby(Relation.AktualnostType.Nedavny).Any())
+    @if (Model.AktualniVazbyAsync(Relation.AktualnostType.Nedavny).Any())
     {
         if (Model.PatrimStatu())
         {
             <span>
-                Řídí <a href="/subjekt/Vazby/@Model.ICO">@(Devmasters.Lang.CS.Plural.Get(Model.PocetPodrizenychSubjektu( Relation.CharakterVazbyEnum.VlastnictviKontrola, Relation.AktualnostType.Nedavny), "jednu podřízenou organizaci", "{0} podřízené organizace", "{0} podřízených organizací")).</a>
+                Řídí <a href="/subjekt/Vazby/@Model.ICO">@(Devmasters.Lang.CS.Plural.Get(Model.PocetPodrizenychSubjektuAsync( Relation.CharakterVazbyEnum.VlastnictviKontrola, Relation.AktualnostType.Nedavny), "jednu podřízenou organizaci", "{0} podřízené organizace", "{0} podřízených organizací")).</a>
             </span>
         }
         else
         {
             <span>
-                Řídí <a href="/subjekt/Vazby/@Model.ICO">@(Devmasters.Lang.CS.Plural.Get(Model.PocetPodrizenychSubjektu( Relation.CharakterVazbyEnum.VlastnictviKontrola, Relation.AktualnostType.Nedavny), "jeden podřízený subjekt", "{0} podřízené subjekty", "{0} podřízených subjektů")).</a>
+                Řídí <a href="/subjekt/Vazby/@Model.ICO">@(Devmasters.Lang.CS.Plural.Get(Model.PocetPodrizenychSubjektuAsync( Relation.CharakterVazbyEnum.VlastnictviKontrola, Relation.AktualnostType.Nedavny), "jeden podřízený subjekt", "{0} podřízené subjekty", "{0} podřízených subjektů")).</a>
             </span>
         }
     }

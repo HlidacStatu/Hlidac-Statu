@@ -15,6 +15,7 @@ using System.Linq.Expressions;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
+using HlidacStatu.Repositories.Cache;
 using static HlidacStatu.Entities.Osoba;
 
 namespace HlidacStatu.Repositories
@@ -91,14 +92,21 @@ namespace HlidacStatu.Repositories
         }
 
 
-        public static Osoba[] ParentOsoby(this Osoba osoba, Relation.AktualnostType minAktualnost)
+        public static async Task<List<Osoba>> ParentOsobyAsync(this Osoba osoba, Relation.AktualnostType minAktualnost)
         {
-            var _parents = GetAllParents(osoba.InternalId, minAktualnost)
-                    .Select(m => Osoby.GetById.Get(m))
-                    .Where(m => m != null)
-                    .ToArray();
+            var parentIds = GetAllParents(osoba.InternalId, minAktualnost).ToList();
+            var parents = new List<Osoba>();
 
-            return _parents;
+            foreach (var id in parentIds)
+            {
+                var parent = await OsobaCache.GetPersonByIdAsync(id);
+                if (parent != null)
+                {
+                    parents.Add(parent);
+                }
+            }
+            
+            return parents;
         }
 
         private static HashSet<int> GetAllParents(int osobaInternalId, Relation.AktualnostType minAktualnost,
@@ -245,10 +253,13 @@ namespace HlidacStatu.Repositories
                 )
                 .FirstOrDefaultAsync();
 
+            if(osoba is null)
+                return null;
+            
             if (canReturnDuplicate)
                 return osoba;
 
-            return await osoba?.GetOriginalAsync();
+            return await osoba.GetOriginalAsync();
         }
         
         public static async Task<Osoba> GetByNameIdTrackedAsync(DbEntities db, string nameId, bool canReturnDuplicate = false)
@@ -703,20 +714,27 @@ namespace HlidacStatu.Repositories
                 .Where(m => Convert.ToInt32(m.Id) < 0)
                 .Select(m => m.Name).ToArray();
 
-            r.Vazbyfirmy = (await Repositories.Graph.VsechnyDcerineVazbyAsync(osoba, Relation.CharakterVazbyEnum.VlastnictviKontrola))
+            
+            var vazby = (await Repositories.Graph.VsechnyDcerineVazbyAsync(osoba, Relation.CharakterVazbyEnum.VlastnictviKontrola))
                 .Where(m => angazovanostDesc.Contains(m.Descr))
-                .Select(m =>
-                    new Osoba.JSON.vazba()
-                    {
-                        DatumOd = m.RelFrom?.ToString("yyyy-MM-dd") ?? "",
-                        DatumDo = m.RelTo?.ToString("yyyy-MM-dd") ?? "",
-                        Popis = m.Descr,
-                        TypVazby = (Osoba.JSON.typVazby)Enum.Parse(typeof(Osoba.JSON.typVazby), m.Descr, true),
-                        VazbaKIco = m.To.Id,
-                        VazbaKOsoba = m.To.PrintName()
-                    })
-                .ToArray();
+                .ToList();
 
+            var vazbyList = new List<Osoba.JSON.vazba>();
+            foreach (var m in vazby)
+            {
+                var vazbaKOsoba = await m.To.PrintNameAsync();
+                vazbyList.Add(new Osoba.JSON.vazba()
+                {
+                    DatumOd = m.RelFrom?.ToString("yyyy-MM-dd") ?? "",
+                    DatumDo = m.RelTo?.ToString("yyyy-MM-dd") ?? "",
+                    Popis = m.Descr,
+                    TypVazby = (Osoba.JSON.typVazby)Enum.Parse(typeof(Osoba.JSON.typVazby), m.Descr, true),
+                    VazbaKIco = m.To.Id,
+                    VazbaKOsoba = vazbaKOsoba
+                });
+            }
+            r.Vazbyfirmy = vazbyList.ToArray();
+            
             return r;
         }
 

@@ -26,11 +26,11 @@ namespace HlidacStatu.Repositories
                 new OsobaId(HlidacStatu.Repositories.OsobaVazbyRepo.Icos_s_VazbouNaOsobuAsync, "osobaiddodavatel:", "icododavatel:"),
                 new OsobaId(HlidacStatu.Repositories.OsobaVazbyRepo.Icos_s_VazbouNaOsobuAsync, "osobaidzadavatel:", "icozadavatel:"),
 
-                new Holding(HlidacStatu.Repositories.FirmaVazbyRepo.IcosInHolding, "holding:", "ico:"),
-                new Holding(HlidacStatu.Repositories.FirmaVazbyRepo.IcosInHolding, "holdingdodavatel:", "icododavatel:"),
-                new Holding(HlidacStatu.Repositories.FirmaVazbyRepo.IcosInHolding, "holdingzadavatel:", "icozadavatel:"),
-                new Holding(HlidacStatu.Repositories.FirmaVazbyRepo.IcosInHolding, "holdingprijemce:", "icododavatel:"),
-                new Holding(HlidacStatu.Repositories.FirmaVazbyRepo.IcosInHolding, "holdingplatce:", "icozadavatel:"),
+                new Holding(HlidacStatu.Repositories.FirmaVazbyRepo.IcosInHoldingAsync, "holding:", "ico:"),
+                new Holding(HlidacStatu.Repositories.FirmaVazbyRepo.IcosInHoldingAsync, "holdingdodavatel:", "icododavatel:"),
+                new Holding(HlidacStatu.Repositories.FirmaVazbyRepo.IcosInHoldingAsync, "holdingzadavatel:", "icozadavatel:"),
+                new Holding(HlidacStatu.Repositories.FirmaVazbyRepo.IcosInHoldingAsync, "holdingprijemce:", "icododavatel:"),
+                new Holding(HlidacStatu.Repositories.FirmaVazbyRepo.IcosInHoldingAsync, "holdingplatce:", "icozadavatel:"),
 
                 new VZ_CPV(),
                 new VZ_Oblast(VerejnaZakazkaRepo.Searching.CpvOblastToCpv),
