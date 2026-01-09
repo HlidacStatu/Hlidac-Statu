@@ -619,14 +619,22 @@ namespace HlidacStatu.Extensions
                 return string.Empty;
             else
             {
-                List<string> evs = events
-                    .OrderBy(e => e.DatumOd)
-                    .Select(e => html ? await e.RenderHtmlAsync(", ") : await e.RenderTextAsync(", "))
-                    .Select(s => s.Trim())
-                    .Where(s => !string.IsNullOrEmpty(s))
-                    .Take(numOfRecords)
-                    .ToList();
+                var sortedEvents = events.OrderBy(e => e.DatumOd);
 
+                var evs = new List<string>();
+                foreach (var e in sortedEvents)
+                {
+                    if (evs.Count >= numOfRecords)
+                        break;
+        
+                    var rendered = html ? await e.RenderHtmlAsync(", ") : await e.RenderTextAsync(", ");
+                    var trimmed = rendered.Trim();
+                    if (!string.IsNullOrEmpty(trimmed))
+                    {
+                        evs.Add(trimmed);
+                    }
+                }
+                
                 if (html && evs.Count > 0)
                 {
                     return string.Format(template, string.Join(itemDelimeter, evs));

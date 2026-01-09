@@ -79,7 +79,7 @@ namespace HlidacStatu.Extensions
                 return null;
             
             var party = await osoba.CurrentPoliticalPartyAsync();
-
+            
             var res = new HlidacStatu.DS.Api.Osoba.Detail
             {
                 Person_Id = osoba.NameId,
@@ -91,20 +91,7 @@ namespace HlidacStatu.Extensions
                 Current_Political_Party = party ?? "None",
 
                 Recent_Public_Activities_Description = await osoba.DescriptionAsync(false, m => m.DatumDo == null || m.DatumDo > historyLimit, 5, itemDelimeter: ", "),
-                //TODO zvazit pridani vazeb urednich
-                Involved_In_Companies = (await osoba.AktualniVazbyAsync( DS.Graphs.Relation.CharakterVazbyEnum.VlastnictviKontrola, DS.Graphs.Relation.AktualnostType.Nedavny))
-                    .Where(v => v.To != null && v.To.Type == HlidacStatu.DS.Graphs.Graph.Node.NodeType.Company)
-                    .GroupBy(f => f.To.Id, v => v, (ico, v) => new
-                    {
-                        ICO = ico,
-                        FirmaName = await v.First().To.PrintNameAsync()
-                    })
-                    .Select(m => new HlidacStatu.DS.Api.Osoba.Detail.Subject
-                    {
-                        Ico = m.ICO,
-                        Name = m.FirmaName
-                    }).ToArray(),
-
+                
                 Business_Contracts_With_Government = (await osoba.StatistikaRegistrSmluvAsync())
                 .SmlouvyStat_SoukromeFirmySummary()
                     .Select(m => new HlidacStatu.DS.Api.Osoba.Detail.Stats
@@ -115,6 +102,27 @@ namespace HlidacStatu.Extensions
                     }).ToArray()
 
             };
+            
+            var vazby = await osoba.AktualniVazbyAsync(DS.Graphs.Relation.CharakterVazbyEnum.VlastnictviKontrola, DS.Graphs.Relation.AktualnostType.Nedavny);
+
+            var firmy = vazby
+                .Where(v => v.To != null && v.To.Type == HlidacStatu.DS.Graphs.Graph.Node.NodeType.Company)
+                .GroupBy(f => f.To.Id)
+                .ToList();
+
+            var involvedList = new List<HlidacStatu.DS.Api.Osoba.Detail.Subject>();
+            foreach (var group in firmy)
+            {
+                var firmaName = await group.First().To.PrintNameAsync();
+                involvedList.Add(new HlidacStatu.DS.Api.Osoba.Detail.Subject
+                {
+                    Ico = group.Key,
+                    Name = firmaName
+                });
+            }
+
+            res.Involved_In_Companies = involvedList.ToArray();
+            
             return res;
         }
 
@@ -268,10 +276,19 @@ namespace HlidacStatu.Extensions
             if (withSponzoring && html)
             {
                 var numOfSponzoring = numOfRecords - evs.Count;
-                var sponzoringList = (await osoba.SponzoringAsync())
+                
+                var sponzoring = await osoba.SponzoringAsync();
+
+                var topSponzoring = sponzoring
                     .OrderByDescending(s => s.DarovanoDne)
-                    .Take(numOfSponzoring)
-                    .Select(s => await s.ToHtmlAsync());
+                    .Take(numOfSponzoring);
+
+                var sponzoringList = new List<string>();
+                foreach (var s in topSponzoring)
+                {
+                    sponzoringList.Add(await s.ToHtmlAsync());
+                }
+                
                 evs.AddRange(sponzoringList);
             }
 

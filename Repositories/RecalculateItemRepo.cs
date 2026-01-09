@@ -34,7 +34,7 @@ namespace HlidacStatu.Repositories
         {
             await Devmasters.Batch.Manager.DoActionForAllAsync<int>(Enumerable.Range(0, int.MaxValue - 1), async xx =>
                 {
-                    var items = RecalculateItemRepo.GetFromProcessingQueueWithParents(1, 1, debug: debug);
+                    var items = await RecalculateItemRepo.GetFromProcessingQueueWithParentsAsync(1, 1, debug: debug);
                     if (items.Count() == 0)
                         return new Devmasters.Batch.ActionOutputData() { CancelRunning = true };
 
@@ -170,8 +170,8 @@ namespace HlidacStatu.Repositories
             }
         }
 
-        public static List<RecalculateItem> CascadeItems(RecalculateItem item,
-            ref System.Collections.Concurrent.ConcurrentBag<RecalculateItem> alreadyOnList)
+        public static async Task<List<RecalculateItem>> CascadeItemsAsync(RecalculateItem item,
+            System.Collections.Concurrent.ConcurrentBag<RecalculateItem> alreadyOnList)
         {
             List<RecalculateItem> list = new List<RecalculateItem>(alreadyOnList);
             if (item.ItemType == RecalculateItem.ItemTypeEnum.Subjekt)
@@ -179,7 +179,7 @@ namespace HlidacStatu.Repositories
                 var f = Firmy.Get(item.Id);
                 if (f?.Valid == true)
                     list = list.Union(
-                            FirmaForQueue(new List<RecalculateItem>(), f, item.StatisticsType, item.ProvokedBy, 0),
+                            await FirmaForQueueAsync(new List<RecalculateItem>(), f, item.StatisticsType, item.ProvokedBy, 0),
                             comparer)
                         .ToList();
             }
@@ -188,7 +188,7 @@ namespace HlidacStatu.Repositories
                 var o = await OsobaCache.GetPersonByIdAsync(Convert.ToInt32(item.Id));
                 if (o != null)
                     list = list.Union(
-                            OsobaForQueue(new List<RecalculateItem>(), o, item.StatisticsType, item.ProvokedBy, 0),
+                            await OsobaForQueueAsync(new List<RecalculateItem>(), o, item.StatisticsType, item.ProvokedBy, 0),
                             comparer)
                         .ToList();
             }
@@ -245,12 +245,12 @@ namespace HlidacStatu.Repositories
         {
             var o = await OsobaCache.GetPersonByIdAsync(osobaInternalId);
             if (o != null)
-                return OsobaForQueue(list, o, statsType, provokeBy, deep);
+                return await OsobaForQueueAsync(list, o, statsType, provokeBy, deep);
             else
                 return new List<RecalculateItem>();
         }
 
-        private static List<RecalculateItem> OsobaForQueue(List<RecalculateItem> list,
+        private static async Task<List<RecalculateItem>> OsobaForQueueAsync(List<RecalculateItem> list,
             Osoba o, RecalculateItem.StatisticsTypeEnum statsType, string provokeBy, int deep)
         {
             _logger?.Verbose(
@@ -269,7 +269,7 @@ namespace HlidacStatu.Repositories
             if (deep > 50)
                 return list;
 
-            var parents = o.ParentOsobyAsync(DS.Graphs.Relation.AktualnostType.Nedavny);
+            var parents = await o.ParentOsobyAsync(DS.Graphs.Relation.AktualnostType.Nedavny);
             foreach (var oo in parents)
             {
                 var item = new RecalculateItem(oo, statsType, provokeBy);
@@ -280,7 +280,7 @@ namespace HlidacStatu.Repositories
             return list;
         }
 
-        private static List<RecalculateItem> FirmaForQueue(List<RecalculateItem> list,
+        private static async Task<List<RecalculateItem>> FirmaForQueueAsync(List<RecalculateItem> list,
             Firma f, RecalculateItem.StatisticsTypeEnum statsType, string provokeBy, int deep)
         {
             _logger?.Verbose(
@@ -306,7 +306,7 @@ namespace HlidacStatu.Repositories
             {
                 var ff_it = new RecalculateItem(ff, statsType, provokeBy);
                 if (list.Contains(ff_it, comparer) == false)
-                    list = list.Union(FirmaForQueue(list, ff, statsType, provokeBy, deep + 1), comparer).ToList();
+                    list = list.Union(await FirmaForQueueAsync(list, ff, statsType, provokeBy, deep + 1), comparer).ToList();
             }
 
             var os_parents = f.Osoby_v_OR(DS.Graphs.Relation.AktualnostType.Nedavny);
@@ -315,7 +315,7 @@ namespace HlidacStatu.Repositories
                 var item = new RecalculateItem(vaz.o, statsType, provokeBy);
                 if (list.Contains(item, comparer) == false)
                 {
-                    list = list.Union(OsobaForQueue(list, vaz.o, statsType, provokeBy, deep + 1), comparer).ToList();
+                    list = list.Union(await OsobaForQueueAsync(list, vaz.o, statsType, provokeBy, deep + 1), comparer).ToList();
                 }
             }
 
@@ -397,15 +397,15 @@ namespace HlidacStatu.Repositories
             }
         }
 
-        public static void Debug()
+        public static async Task DebugAsync()
         {
             var fakeList = new System.Collections.Concurrent.ConcurrentBag<RecalculateItem>();
             var item = new RecalculateItem(Firmy.Get("00000205"), RecalculateItem.StatisticsTypeEnum.VZ,
                 "recalculateDebug");
-            List<RecalculateItem> cascade = CascadeItems(item, ref fakeList);
+            List<RecalculateItem> cascade = await CascadeItemsAsync(item, fakeList);
         }
 
-        public static IEnumerable<RecalculateItem> GetFromProcessingQueueWithParents(int count, int threads,
+        public static async Task<IEnumerable<RecalculateItem>> GetFromProcessingQueueWithParentsAsync(int count, int threads,
             Action<string> outputWriter = null, Devmasters.Batch.IProgressWriter  progressWriter = null,
             bool debug = false)
         {
@@ -417,14 +417,13 @@ namespace HlidacStatu.Repositories
 
             System.Collections.Concurrent.ConcurrentBag<RecalculateItem> list = new(res);
 
-            Devmasters.Batch.Manager.DoActionForAll<RecalculateItem>(res,
-                item =>
+            await Devmasters.Batch.Manager.DoActionForAllAsync<RecalculateItem>(res, async item =>
                 {
                     try
                     {
                         if (debug)
                             _logger?.Debug($"GetFromProcessingQueueWithParents getting cascade for {item.UniqueKey}");
-                        List<RecalculateItem> cascade = CascadeItems(item, ref list);
+                        List<RecalculateItem> cascade = await CascadeItemsAsync(item, list);
                         if (debug)
                             _logger?.Debug($"GetFromProcessingQueueWithParents got cascade for {item.UniqueKey}");
                         foreach (var i in cascade)

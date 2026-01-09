@@ -166,25 +166,24 @@ namespace HlidacStatu.MCPServer.Tools
             DS.Graphs.Relation.AktualnostType historic_view = DS.Graphs.Relation.AktualnostType.Nedavny)
         {
 
-            return await AuditRepo.AddWithElapsedTimeMeasure(
+            return await AuditRepo.AddWithElapsedTimeMeasureAsync(
                 Audit.Operations.Call,
                 server?.ServerOptions?.KnownClientInfo?.Name?.Split('|')?.FirstOrDefault(),
                 server?.ServerOptions?.KnownClientInfo?.Name?.Split('|')?.LastOrDefault(),
                 AuditRepo.GetClassAndMethodName(MethodBase.GetCurrentMethod()), "",
                 AuditRepo.GetMethodParametersWithValues(MethodBase.GetCurrentMethod().GetParameters().Skip(1), ico, historic_view),
-                null, () =>
+                null, async () =>
                 {
-
-
+                    
                     if (string.IsNullOrWhiteSpace(ico))
                         return null;
                     if (Util.DataValidators.CheckCZICO(ico) == false)
                         return null;
                     Firma f = HlidacStatu.Repositories.Firmy.Get(ico);
-                    if (!(f?.Valid == true))
+                    if (f?.Valid != true)
                         return null;
 
-                    var res = f.IcosInHoldingAsync(historic_view)
+                    var res = (await f.IcosInHoldingAsync(historic_view))
                             .Select(m => new SimpleDetailInfo()
                             {
                                 Ico = m,
@@ -193,7 +192,7 @@ namespace HlidacStatu.MCPServer.Tools
                             })
                             .ToArray();
 
-                    return Task.FromResult(res);
+                    return res;
                 });
         }
 

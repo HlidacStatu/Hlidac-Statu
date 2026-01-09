@@ -1,22 +1,16 @@
 using HlidacStatu.Entities;
-using HlidacStatu.Lib.Web.UI;
 using HlidacStatu.Repositories;
-
 using Microsoft.AspNetCore.Html;
-using Microsoft.AspNetCore.Mvc.Rendering;
-
 using Newtonsoft.Json.Linq;
-
 using System;
 using System.Linq;
-using System.Security.Principal;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace HlidacStatu.Web.Framework
 {
     public static class WebUtil
     {
-
         public static IHtmlContent IfExists(bool showExists, string exists, string ifEmpty = "")
         {
             if (showExists)
@@ -27,7 +21,6 @@ namespace HlidacStatu.Web.Framework
             {
                 return new HtmlString(ifEmpty);
             }
-
         }
 
         public static string GetSearchUrl(string url, string? query)
@@ -79,14 +72,16 @@ window.onload = function() {{
             return new HtmlString($"<span style='white-space:nowrap'>{s}</span>");
         }
 
-        public static IHtmlContent RenderOsobaVazba(HlidacStatu.DS.Graphs.Graph.Edge v, string blockFormat = "<div>{0}</div>")
+        public static async Task<IHtmlContent> RenderOsobaVazbaAsync(HlidacStatu.DS.Graphs.Graph.Edge v,
+            string blockFormat = "<div>{0}</div>")
         {
             var sb = new StringBuilder();
 
-            var fname = $"<a href='{Firma.GetUrl(v.To.Id, true)}'>{v.To.PrintNameAsync()}</a>"; ;
-            if (string.IsNullOrEmpty(v.To.PrintNameAsync()))
+            var fname = $"<a href='{Firma.GetUrl(v.To.Id, true)}'>{v.To.PrintNameAsync()}</a>";
+            
+            if (string.IsNullOrEmpty(await v.To.PrintNameAsync()))
             {
-                fname = $"<a href='{Firma.GetUrl(v.To.Id,true)}'>{FirmaRepo.NameFromIco(v.To.Id, true)}</a>";
+                fname = $"<a href='{Firma.GetUrl(v.To.Id, true)}'>{FirmaRepo.NameFromIco(v.To.Id, true)}</a>";
             }
 
             sb.Append(fname).Append(" - ").Append(v.Descr).Append("&nbsp;");
@@ -182,6 +177,7 @@ window.onload = function() {{
             {
                 sb.Append(string.Format("{0}:{1}, ", jtoken.Name, RenderProperty(jtoken, level, maxLevel, maxLength)));
             }
+
             if (sb.Length > 3)
                 sb.Remove(sb.Length - 3, 2); //remove last ,_
             sb.Append(")");
@@ -190,7 +186,6 @@ window.onload = function() {{
 
         public static string ShortenText(dynamic value, int? length = null)
         {
-
             if (value == null)
                 return string.Empty;
             else

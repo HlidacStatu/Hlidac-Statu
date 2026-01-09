@@ -16,6 +16,7 @@ namespace HlidacStatuApi.Models
                 (int)OsobaEvent.Types.SocialniSite,
             };
 
+            
             var dto = new OsobaDetailDTO()
             {
                 TitulPred = o.TitulPred,
@@ -26,16 +27,6 @@ namespace HlidacStatuApi.Models
                 NameId = o.NameId,
                 PolitickaStrana = await o.CurrentPoliticalPartyAsync(),
                 Profile = o.GetUrl(),
-                Sponzoring = (await o.SponzoringAsync())
-                    .Select(ev => new OsobaEventDTO()
-                    {
-                        Castka = ev.Hodnota,
-                        DatumOd = ev.DarovanoDne,
-                        DatumDo = ev.DarovanoDne,
-                        Typ = "sponzor",
-                        Organizace = ev.JmenoPrijemceAsync()
-                    }).ToList(),
-
                 Udalosti = o.NoFilteredEvents(ev => !unwantedEvents.Contains(ev.Type))
                     .Select(ev => new OsobaEventDTO()
                     {
@@ -46,11 +37,25 @@ namespace HlidacStatuApi.Models
                         Typ = ((OsobaEvent.Types)ev.Type).ToNiceDisplayName(),
                         Organizace = ev.Organizace
                     }).ToList(),
-
                 SocialniSite = o.NoFilteredEvents(ev => ev.Type == (int)OsobaEvent.Types.SocialniSite)
                     .Select(ev => new SocialNetworkDTO(ev))
                     .ToList()
             };
+
+            List<OsobaEventDTO> sponzoringList = [];
+            foreach (var sponzoring in await o.SponzoringAsync())
+            {
+                sponzoringList.Add(new OsobaEventDTO()
+                {
+                    Castka = sponzoring.Hodnota,
+                    DatumOd = sponzoring.DarovanoDne,
+                    DatumDo = sponzoring.DarovanoDne,
+                    Typ = "sponzor",
+                    Organizace = await sponzoring.JmenoPrijemceAsync()
+                });
+            }
+            
+            dto.Sponzoring = sponzoringList;
 
 
             return dto;

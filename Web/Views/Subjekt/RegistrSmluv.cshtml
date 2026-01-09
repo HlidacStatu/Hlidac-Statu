@@ -236,10 +236,7 @@
                     </li>
                 </ul>
             </div>
-            if (
-                Model.AktualniVazbyAsync(Relation.AktualnostType.Nedavny).Count() > 0
-                && holdingSummaryAfter2016.PocetSmluv > 0
-            )
+            if ((await Model.AktualniVazbyAsync(Relation.AktualnostType.Nedavny)).Any() && holdingSummaryAfter2016.PocetSmluv > 0)
             {
                 <b style="padding-left:30px">Statistiky
                     pro @(Model.JsemOVM() ? "úřad a jeho podřízené organizace" : "subjekt a všechny dceřiné společnosti") </b>

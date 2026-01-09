@@ -151,14 +151,13 @@ namespace HlidacStatu.Repositories
                         //podrizene organizace
                         var allIcos = new System.Collections.Concurrent.ConcurrentBag<string>();
 
-                        Manager.DoActionForAll<string>(icos.Distinct().ToArray(),
-                            (i) =>
+                        await Manager.DoActionForAllAsync<string>(icos.Distinct().ToArray(), async (i) =>
                             {
                                 var fk = Get(i);
                                 if (fk != null)
                                 {
                                     allIcos.Add(i);
-                                    foreach (var pic in fk.IcosInHoldingAsync(Relation.AktualnostType.Aktualni))
+                                    foreach (var pic in await fk.IcosInHoldingAsync(Relation.AktualnostType.Aktualni))
                                         allIcos.Add(pic);
                                 }
                                 return new ActionOutputData();

@@ -39,13 +39,13 @@
 
                             foreach (var v in vazbyVlastAktual.Take(2))
                             {
-                                @Html.Raw(WebUtil.RenderOsobaVazba(v, "<li>{0}</li>"))
+                                @Html.Raw(WebUtil.RenderOsobaVazbaAsync(v, "<li>{0}</li>"))
                             }
 
                             var vazbyVlast = await item.VazbyAsync(Relation.CharakterVazbyEnum.VlastnictviKontrola);
                             if (vazbyVlast.Length == 3)
                             {
-                                @Html.Raw(WebUtil.RenderOsobaVazba(vazbyVlast[2], "<li>{0}</li>"))
+                                @Html.Raw(WebUtil.RenderOsobaVazbaAsync(vazbyVlast[2], "<li>{0}</li>"))
 
                             }
                             else if (vazbyVlastAktual.Length > 2)

@@ -1210,7 +1210,7 @@ namespace HlidacStatu.Repositories
             return sb.ToString();
         }
 
-        public static string ExportGraphJsonData(IEnumerable<HlidacStatu.DS.Graphs.Graph.Edge> data)
+        public static async Task<string> ExportGraphJsonDataAsync(IEnumerable<HlidacStatu.DS.Graphs.Graph.Edge> data)
         {
             if (data == null)
                 return "{\"nodes\": [],\"edges\": []}";
@@ -1223,11 +1223,11 @@ namespace HlidacStatu.Repositories
             {
                 if (i.From != null && !nodes.ContainsKey(i.From.UniqId))
                 {
-                    nodes.Add(i.From.UniqId, new Graph.GraphJson(i.From, i.Distance - 1, i.Distance == 0));
+                    nodes.Add(i.From.UniqId, await Graph.GraphJson.CreateAsync(i.From, i.Distance - 1, i.Distance == 0));
                 }
 
                 if (i.To != null && !nodes.ContainsKey(i.To.UniqId))
-                    nodes.Add(i.To.UniqId, new Graph.GraphJson(i.To, i.Distance));
+                    nodes.Add(i.To.UniqId, await Graph.GraphJson.CreateAsync(i.To, i.Distance));
             }
 
             var ret = new

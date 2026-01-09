@@ -1,4 +1,6 @@
-﻿namespace HlidacStatu.Repositories
+﻿using System.Threading.Tasks;
+
+namespace HlidacStatu.Repositories
 {
     public partial class Graph
     {
@@ -27,14 +29,22 @@
         [Newtonsoft.Json.JsonObject(ItemNullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public class GraphJson
         {
-            public GraphJson(HlidacStatu.DS.Graphs.Graph.Node n, int distance, bool isRoot = false)
+            private GraphJson(HlidacStatu.DS.Graphs.Graph.Node n, int distance, string caption, bool isRoot = false)
             {
                 group = "nodes";
                 data.id = n.UniqId;
                 data.distance = distance;
-                data.caption = await n.PrintNameAsync();
+                data.caption = caption;
                 data.root = isRoot ? true : (bool?)null;
             }
+
+            public static async Task<GraphJson> CreateAsync(HlidacStatu.DS.Graphs.Graph.Node n, int distance, bool isRoot = false)
+            {
+                var caption = await n.PrintNameAsync();
+                return new GraphJson(n, distance, caption, isRoot);
+            }
+            
+            
             public GraphJson(HlidacStatu.DS.Graphs.Graph.Edge e)
             {
                 group = "edges";

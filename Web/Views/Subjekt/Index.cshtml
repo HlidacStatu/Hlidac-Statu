@@ -722,8 +722,7 @@
         }
 
 
-        @if (Model.AktualniVazbyAsync(Relation.AktualnostType.Nedavny).Count() > 0
-                )
+        @if ((await Model.AktualniVazbyAsync(Relation.AktualnostType.Nedavny)).Any())
         {
             var subjectsWithSubsidiesCount = dotaceHoldingStat
             .Select(y => y.Value)
@@ -745,7 +744,7 @@
                     <p>
                         <b>@Devmasters.Lang.CS.Plural.Get(subjectsWithSubsidiesCount, "Jedna podřízená organizace", "{0} podřízená organizace", "{0} podřízených organizací")</b>
                         (z
-                        celkem @HlidacStatu.Util.RenderData.NiceNumber(Model.PocetPodrizenychSubjektuAsync(Relation.CharakterVazbyEnum.VlastnictviKontrola, Relation.AktualnostType.Nedavny)))
+                        celkem @HlidacStatu.Util.RenderData.NiceNumber(await Model.PocetPodrizenychSubjektuAsync(Relation.CharakterVazbyEnum.VlastnictviKontrola, Relation.AktualnostType.Nedavny)))
                         úřadu @Devmasters.TextUtil.ShortenText(Model.Jmeno, 35)
 
                         @Devmasters.Lang.CS.Plural.Get(subjectsWithSubsidiesCount,
@@ -770,7 +769,7 @@
                     <p>
                         <b>@Devmasters.Lang.CS.Plural.Get(subjectsWithSubsidiesCount, "Jedna dceřiná společnost", "{0} dceřiné společnosti", "{0} dceřiných společností")</b>
                         (z
-                        celkem @HlidacStatu.Util.RenderData.NiceNumber(Model.PocetPodrizenychSubjektuAsync(Relation.CharakterVazbyEnum.VlastnictviKontrola, Relation.AktualnostType.Nedavny)))
+                        celkem @HlidacStatu.Util.RenderData.NiceNumber(await Model.PocetPodrizenychSubjektuAsync(Relation.CharakterVazbyEnum.VlastnictviKontrola, Relation.AktualnostType.Nedavny)))
                         firmy @Devmasters.TextUtil.ShortenText(Model.Jmeno, 35)
 
                         @Devmasters.Lang.CS.Plural.Get(subjectsWithSubsidiesCount,
@@ -1051,10 +1050,17 @@
             <h4>Sponzoring politických stran</h4>
             @if (await Model.IsSponzorAsync())
             {
+                var jmenaList = new List<string>();
+                foreach (var m in sponzoring)
+                {
+                    jmenaList.Add(await m.JmenoPrijemceAsync());
+                }
+                var distinctJmenaSponzoru = jmenaList.Distinct();
+                
                 <p>
                     @Html.SubjektTypTrojice(Model, "Úřad sponzoroval", "Organizace sponzorovala", "Firma sponzorovala")
                     politické
-                    strany @HlidacStatu.Util.RenderData.RenderList(sponzoring.Select(m => m.JmenoPrijemceAsync()).Distinct(), ending: "")
+                    strany @HlidacStatu.Util.RenderData.RenderList(distinctJmenaSponzoru, ending: "")
                     v celkové
                     výši @HlidacStatu.Util.RenderData.NicePriceHtml(sponzoring.Sum(m => m.Hodnota) ?? 0).
                 </p>
@@ -1399,7 +1405,7 @@
         var vazbyOsobyNow = Model.Osoby_v_OR(Relation.AktualnostType.Aktualni).Select(m => m.o).Distinct();
     }
 
-    @if (Model.AktualniVazbyAsync(Relation.AktualnostType.Nedavny).Count() > 0)
+    @if ((await Model.AktualniVazbyAsync(Relation.AktualnostType.Nedavny)).Any())
     {
         <div>
             <h4>Dceřinné společnosti a orgány</h4>
@@ -1411,13 +1417,13 @@
                 @if (Model.PatrimStatu())
                 {
                     <span>
-                        Řídí <a href="/subjekt/Vazby/@Model.ICO">@Devmasters.Lang.CS.Plural.Get(Model.PocetPodrizenychSubjektuAsync(Relation.CharakterVazbyEnum.VlastnictviKontrola, Relation.AktualnostType.Nedavny), "jednu podřízenou organizaci", "{0} podřízené organizace", "{0} podřízených organizací").</a>
+                        Řídí <a href="/subjekt/Vazby/@Model.ICO">@Devmasters.Lang.CS.Plural.Get(await Model.PocetPodrizenychSubjektuAsync(Relation.CharakterVazbyEnum.VlastnictviKontrola, Relation.AktualnostType.Nedavny), "jednu podřízenou organizaci", "{0} podřízené organizace", "{0} podřízených organizací").</a>
                     </span>
                 }
                 else
                 {
                     <span>
-                        Má vazbu na <a href="/subjekt/Vazby/@Model.ICO">@Devmasters.Lang.CS.Plural.Get(Model.PocetPodrizenychSubjektuAsync(Relation.CharakterVazbyEnum.VlastnictviKontrola, Relation.AktualnostType.Nedavny), "jeden podřízený subjekt", "{0} podřízené subjekty", "{0} podřízených subjektů").</a>
+                        Má vazbu na <a href="/subjekt/Vazby/@Model.ICO">@Devmasters.Lang.CS.Plural.Get(await Model.PocetPodrizenychSubjektuAsync(Relation.CharakterVazbyEnum.VlastnictviKontrola, Relation.AktualnostType.Nedavny), "jeden podřízený subjekt", "{0} podřízené subjekty", "{0} podřízených subjektů").</a>
                     </span>
                 }
             </p>
@@ -1436,7 +1442,7 @@
                 <a href="/subjekt/Vazby/@Model.ICO" class="btn btn-hs btn-primary btn-sm my-3 position-relative">
                     Vypsat všechny dceřinné společnosti a orgány
                     <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
-                        @(HlidacStatu.Util.RenderData.NiceNumber(Model.PocetPodrizenychSubjektuAsync(Relation.CharakterVazbyEnum.VlastnictviKontrola, Relation.AktualnostType.Nedavny) + vazbyOsoby.Count()))
+                        @(HlidacStatu.Util.RenderData.NiceNumber(await Model.PocetPodrizenychSubjektuAsync(Relation.CharakterVazbyEnum.VlastnictviKontrola, Relation.AktualnostType.Nedavny) + vazbyOsoby.Count()))
                     </span>
                 </a>
             </p>
@@ -1447,7 +1453,7 @@
 
 
 
-    @if (Model.AktualniVazbyAsync(Relation.AktualnostType.Nedavny, Relation.CharakterVazbyEnum.Uredni).Count() > 0)
+    @if ((await Model.AktualniVazbyAsync(Relation.AktualnostType.Nedavny, Relation.CharakterVazbyEnum.Uredni)).Any())
     {
         <div>
             <h4>Úřední vazby na další subjekty</h4>
@@ -1457,7 +1463,7 @@
             <p>
                 <span>
                     Spravuje či řeší <a href="/subjekt/Vazby/@Model.ICO">
-                        @Devmasters.Lang.CS.Plural.Get(Model.PocetPodrizenychSubjektuAsync(Relation.CharakterVazbyEnum.Uredni, Relation.AktualnostType.Nedavny), "jeden subjekt", "{0} subjekty", "{0} subjektů").
+                        @Devmasters.Lang.CS.Plural.Get(await Model.PocetPodrizenychSubjektuAsync(Relation.CharakterVazbyEnum.Uredni, Relation.AktualnostType.Nedavny), "jeden subjekt", "{0} subjekty", "{0} subjektů").
                     </a>
                 </span>
             </p>
@@ -1465,7 +1471,7 @@
                 <a href="/subjekt/VazbyUredni/@Model.ICO" class="btn btn-hs btn-primary btn-sm my-3 position-relative">
                     Vypsat všechny úřední vazby na další subjekty
                     <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
-                        @(HlidacStatu.Util.RenderData.NiceNumber(Model.PocetPodrizenychSubjektuAsync(Relation.CharakterVazbyEnum.Uredni, Relation.AktualnostType.Nedavny)))
+                        @(HlidacStatu.Util.RenderData.NiceNumber(await Model.PocetPodrizenychSubjektuAsync(Relation.CharakterVazbyEnum.Uredni, Relation.AktualnostType.Nedavny)))
                     </span>
                 </a>
             </p>

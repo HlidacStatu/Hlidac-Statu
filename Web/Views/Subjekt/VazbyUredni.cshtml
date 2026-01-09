@@ -43,7 +43,7 @@
     @{
         var semaphore = new SemaphoreSlim(20);
 
-        var dataTasks = Model.AktualniVazbyAsync(aktualnost, Relation.CharakterVazbyEnum.Uredni)
+        var dataTasks = (await Model.AktualniVazbyAsync(aktualnost, Relation.CharakterVazbyEnum.Uredni))
         .Where(v => v.To != null && v.To.Type == HlidacStatu.DS.Graphs.Graph.Node.NodeType.Company)
         .GroupBy(f => f.To.Id, v => v, (ico, v) => new { ico, v })
         .Select(async g =>

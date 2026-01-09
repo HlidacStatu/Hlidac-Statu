@@ -14,7 +14,7 @@
 else
 {
     var ceo = await Model.CurrentCeoAsync();
-    
+
     string box1Css = "col-sm-4 col-md-3";
 
     <div class="@box1Css searchpromo-box">
@@ -52,21 +52,23 @@ else
 
                 </div>
                 <div class="new-p new-p--gray new-p--small">
-                    @if (Model.AktualniVazbyAsync(Relation.AktualnostType.Nedavny).Any())
+                    @if ((await Model.AktualniVazbyAsync(Relation.AktualnostType.Nedavny)).Any())
                     {
                         if (Model.PatrimStatu())
                         {
                             <span>
-                                            Řídí <a
-                                    href="/subjekt/Vazby/@Model.ICO">@(Devmasters.Lang.CS.Plural.Get(Model.PocetPodrizenychSubjektuAsync( Relation.CharakterVazbyEnum.VlastnictviKontrola,Relation.AktualnostType.Nedavny), "jednu podřízenou organizaci", "{0} podřízené organizace", "{0} podřízených organizací")).</a>
-                                        </span>
+                                Řídí <a href="/subjekt/Vazby/@Model.ICO">
+                                    @(Devmasters.Lang.CS.Plural.Get(await Model.PocetPodrizenychSubjektuAsync(Relation.CharakterVazbyEnum.VlastnictviKontrola, Relation.AktualnostType.Nedavny), "jednu podřízenou organizaci", "{0} podřízené organizace", "{0} podřízených organizací")).
+                                </a>
+                            </span>
                         }
                         else
                         {
                             <span>
-                                            Řídí <a
-                                    href="/subjekt/Vazby/@Model.ICO">@(Devmasters.Lang.CS.Plural.Get(Model.PocetPodrizenychSubjektuAsync( Relation.CharakterVazbyEnum.VlastnictviKontrola, Relation.AktualnostType.Nedavny), "jeden podřízený subjekt", "{0} podřízené subjekty", "{0} podřízených subjektů")).</a>
-                                        </span>
+                                Řídí <a href="/subjekt/Vazby/@Model.ICO">
+                                    @(Devmasters.Lang.CS.Plural.Get(await Model.PocetPodrizenychSubjektuAsync(Relation.CharakterVazbyEnum.VlastnictviKontrola, Relation.AktualnostType.Nedavny), "jeden podřízený subjekt", "{0} podřízené subjekty", "{0} podřízených subjektů")).
+                                </a>
+                            </span>
                         }
                     }
 
