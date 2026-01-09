@@ -1,4 +1,4 @@
-using HlidacStatu.Entities;
+﻿using HlidacStatu.Entities;
 
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -42,6 +42,8 @@ namespace HlidacStatu.Web.Areas.Identity.Pages.Account.Manage
             [EmailAddress]
             [Display(Name = "New email")]
             public string NewEmail { get; set; }
+            [Required]
+            public string Password { get; set; }
         }
 
         private async Task LoadAsync(ApplicationUser user)
@@ -82,6 +84,21 @@ namespace HlidacStatu.Web.Areas.Identity.Pages.Account.Manage
                 await LoadAsync(user);
                 return Page();
             }
+            var checkPassword = await _userManager.CheckPasswordAsync(user, Input.Password);
+            if (checkPassword == false)
+            {
+                ModelState.AddModelError(string.Empty, "Heslo nesouhlasí.");
+                await LoadAsync(user);
+                return Page();
+            }
+
+            var existingUser = await _userManager.FindByEmailAsync(Input.NewEmail);
+                        if (existingUser != null && existingUser.Id != user.Id)
+            {
+                ModelState.AddModelError(string.Empty, "Tento email je již na Hlídač státu registrován. Změna emailu proto není možná.");
+                await LoadAsync(user);
+                return Page();
+            }
 
             var email = await _userManager.GetEmailAsync(user);
             if (Input.NewEmail != email)
@@ -95,16 +112,25 @@ namespace HlidacStatu.Web.Areas.Identity.Pages.Account.Manage
                     values: new { userId = userId, email = Input.NewEmail, code = code },
                     protocol: Request.Scheme);
 
-                var emailSender = XLib.Emails.EmailMsg.CreateEmailMsgFromPostalTemplate("Register");
+                var emailSender = XLib.Emails.EmailMsg.CreateEmailMsgFromPostalTemplate("ChangeEmail");
                 emailSender.Model.CallbackUrl = callbackUrl;
-                emailSender.To = email;
+                emailSender.Model.OldEmail = email;
+                emailSender.Model.NewEmail = Input.NewEmail;
+                emailSender.To = Input.NewEmail;
                 emailSender.SendMe();
 
-                StatusMessage = "Confirmation link to change email sent. Please check your email.";
+                var emailSender2 = XLib.Emails.EmailMsg.CreateEmailMsgFromPostalTemplate("ChangeEmailNotice");
+                emailSender2.Model.CallbackUrl = callbackUrl;
+                emailSender2.Model.OldEmail = email;
+                emailSender2.Model.NewEmail = Input.NewEmail;
+                emailSender2.To = email;
+                emailSender2.SendMe();
+
+                StatusMessage = $"Mail s potvrzením o změně email byl odeslán na {Input.NewEmail} i {email} . Otevřete ho a potvrďte změnu kliknutím na odkaz ve zprávě.";
                 return RedirectToPage();
             }
 
-            StatusMessage = "Your email is unchanged.";
+            StatusMessage = "Email nebyl změněn.";
             return RedirectToPage();
         }
 

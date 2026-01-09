@@ -1,4 +1,4 @@
-using HlidacStatu.Entities;
+﻿using HlidacStatu.Entities;
 
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -57,7 +57,7 @@ namespace HlidacStatu.Web.Areas.Identity.Pages.Account
             }
 
             await _signInManager.RefreshSignInAsync(user);
-            StatusMessage = "Thank you for confirming your email change.";
+            StatusMessage = "Děkujeme za potvrzení, email byl změněn.";
             return Page();
         }
     }

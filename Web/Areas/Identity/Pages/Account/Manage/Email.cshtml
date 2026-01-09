@@ -10,7 +10,7 @@
 <div class="row">
     <div class="col-md-6">
         <form id="email-form" method="post">
-            <div asp-validation-summary="All" class="text-danger"></div>
+            <div asp-validation-summary="All" class="text-bg-danger"></div>
             <div class="form-group">
                 <label asp-for="Email"></label>
                 @if (Model.IsEmailConfirmed)
@@ -22,16 +22,32 @@
                         </div>
                     </div>
                 }
-                 else
+                else
                 {
                     <input asp-for="Email" class="form-control" disabled />
                     <button id="email-verification" type="submit" asp-page-handler="SendVerificationEmail" class="btn btn-hs btn-link">Zaslat ověřovací e-mail</button>
                 }
             </div>
-            <div class="form-group">
-                <label asp-for="Input.NewEmail">Nový e-mail</label>
-                <input asp-for="Input.NewEmail" class="form-control" />
-                <span asp-validation-for="Input.NewEmail" class="text-danger"></span>
+            <hr />
+            <h3>Změna emailu</h3>
+            <p>
+                Při změně emailu musíme ověřit, že jste vlastníkem účtu se starým emailem - to potvrdíte tím, že nám napíšete heslo, se kterým se logujete do HLídače státu.
+            </p>
+            <p>
+                Současně si musíme ověřit, že máte přístup k novému emailu - proto Vám na nový email zašleme ověřovací odkaz.
+            </p>
+            <hr />
+            <div class="fw-bold">
+                <div class="form-group">
+                    <label asp-for="Input.Password">Heslo na zalogování do Hlídače státu (s emailem @Model.Email)</label>
+                    <input asp-for="Input.Password" type="password" class="form-control" />
+                    <span asp-validation-for="Input.Password" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="Input.NewEmail">Nový e-mail, ke kterému máte přístup - zkontrolujte si, že píšete správný email</label>
+                    <input asp-for="Input.NewEmail" class="form-control" />
+                    <span asp-validation-for="Input.NewEmail" class="text-danger"></span>
+                </div>
             </div>
             <button id="change-email-button" type="submit" asp-page-handler="ChangeEmail" class="btn btn-hs btn-primary">Změnit e-mail</button>
         </form>

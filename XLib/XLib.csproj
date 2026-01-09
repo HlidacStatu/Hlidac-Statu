@@ -7,6 +7,9 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
   <ItemGroup>
+    <EmbeddedResource Include="Emails\Templates\ChangeEmailNotice.cshtml" />
+    <EmbeddedResource Include="Emails\Templates\ChangeEmailNotice.Html.cshtml" />
+    <EmbeddedResource Include="Emails\Templates\ChangeEmailNotice.Text.cshtml" />
     <EmbeddedResource Include="Emails\Templates\ConfirmEmail.cshtml" />
     <EmbeddedResource Include="Emails\Templates\ConfirmEmail.Html.cshtml" />
     <EmbeddedResource Include="Emails\Templates\ConfirmEmail.Text.cshtml" />
@@ -35,6 +38,9 @@
     <EmbeddedResource Include="Emails\Templates\GDPR.Text.cshtml" />
     <EmbeddedResource Include="Emails\Templates\NotFoundZakazkyMarkdownPost.cshtml" />
     <EmbeddedResource Include="Emails\Templates\NotFoundZakazkyMarkdownPost.Text.cshtml" />
+    <EmbeddedResource Include="Emails\Templates\ChangeEmail.cshtml" />
+    <EmbeddedResource Include="Emails\Templates\ChangeEmail.Html.cshtml" />
+    <EmbeddedResource Include="Emails\Templates\ChangeEmail.Text.cshtml" />
     <EmbeddedResource Include="Emails\Templates\Register.cshtml" />
     <EmbeddedResource Include="Emails\Templates\Register.Html.cshtml" />
     <EmbeddedResource Include="Emails\Templates\Register.Text.cshtml" />
