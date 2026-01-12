@@ -27,12 +27,21 @@ public partial class Dotace
     
     
     [Number]
-    public decimal AssumedAmount =>
-        (PayedAmount is null || PayedAmount == 0)
-            ? SubsidyAmount ?? 0m
-            : PayedAmount.Value;
-    
-    
+    public decimal AssumedAmount
+    {
+        get
+        {
+            //overeno ze 0 znamena 0
+            if(PrimaryDataSource.Equals("Kralovehradecky Kraj", StringComparison.InvariantCultureIgnoreCase))
+                return PayedAmount ?? (SubsidyAmount ?? 0m); 
+            
+            return (PayedAmount is null || PayedAmount == 0)
+                ? SubsidyAmount ?? 0m
+                : PayedAmount.Value;
+        }
+    }
+
+
     /// <summary>
     /// Oblast kam dotace patří
     /// </summary>
