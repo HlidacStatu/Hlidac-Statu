@@ -1,9 +1,9 @@
 using System.Collections.Generic;
-using System.Data.Entity;
 using System.Linq;
 using System.Threading.Tasks;
 using HlidacStatu.Entities;
 using HlidacStatu.Util;
+using Microsoft.EntityFrameworkCore;
 
 namespace HlidacStatu.Repositories
 {

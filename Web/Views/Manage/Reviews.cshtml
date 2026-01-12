@@ -25,8 +25,8 @@
     {
     <tr>
         <td>@r.ItemType.ToString()</td>
-        <td>@Html.Raw(r.RenderOldValueToHtmlAsync())</td>
-        <td>@Html.Raw(r.RenderNewValueToHtmlAsync())</td>
+        <td>@Html.Raw(await r.RenderOldValueToHtmlAsync())</td>
+        <td>@Html.Raw(await r.RenderNewValueToHtmlAsync())</td>
         <td>@r.Created.ToShortDateString()</td>
         <td>@r.CreatedBy</td>
         <td>

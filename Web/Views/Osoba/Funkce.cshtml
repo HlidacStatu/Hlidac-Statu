@@ -19,7 +19,7 @@
 
     var osobaEvents = Model.Events(m => types.Contains(m.Type)).ToList();
     var funkceOsobaNum = osobaEvents.Count();
-    var funkceOsoba = Model.DescriptionAsync(true,
+    var funkceOsoba = await Model.DescriptionAsync(true,
            m => types.Contains(m.Type),
            template: "<ul>{0}</ul>", itemTemplate: "<li>{0}</li>", itemDelimeter: "");
 

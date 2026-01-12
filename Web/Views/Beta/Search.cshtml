@@ -77,7 +77,7 @@
 
 @{
     var query = Context.Request.Query;
-    var inputTags = AutocompleteHelper.CreateInputTagsForJsAsync(query);
+    var inputTags = await AutocompleteHelper.CreateInputTagsForJsAsync(query);
     var inputTagsJson = JsonSerializer.Serialize(inputTags);
 }
 

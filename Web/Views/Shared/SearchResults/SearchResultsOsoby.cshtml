@@ -27,7 +27,7 @@
                     }
                     else
                     {
-                        @Html.Raw(item.DescriptionAsync(true, m => true, 3, withSponzoring: true))
+                        @Html.Raw(await item.DescriptionAsync(true, m => true, 3, withSponzoring: true))
                     }
                 </td>
                 <td>
@@ -39,13 +39,13 @@
 
                             foreach (var v in vazbyVlastAktual.Take(2))
                             {
-                                @Html.Raw(WebUtil.RenderOsobaVazbaAsync(v, "<li>{0}</li>"))
+                                @Html.Raw(await WebUtil.RenderOsobaVazbaAsync(v, "<li>{0}</li>"))
                             }
 
                             var vazbyVlast = await item.VazbyAsync(Relation.CharakterVazbyEnum.VlastnictviKontrola);
                             if (vazbyVlast.Length == 3)
                             {
-                                @Html.Raw(WebUtil.RenderOsobaVazbaAsync(vazbyVlast[2], "<li>{0}</li>"))
+                                @Html.Raw(await WebUtil.RenderOsobaVazbaAsync(vazbyVlast[2], "<li>{0}</li>"))
 
                             }
                             else if (vazbyVlastAktual.Length > 2)

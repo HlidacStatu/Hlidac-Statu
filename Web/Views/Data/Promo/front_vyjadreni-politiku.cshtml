@@ -11,7 +11,7 @@
 
     DataSet ds =
         DataSet.GetCachedDataset((string)Model);
-    var reg = ds.RegistrationAsync();
+    var reg = await ds.RegistrationAsync();
 
     var politiciVds = ds.ESClient.Search<object>(s => s
         .MatchAll()

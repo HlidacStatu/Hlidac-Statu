@@ -8,20 +8,10 @@
 
     DataSet ds = DataSet.GetCachedDataset("covid-podpora");
 
-    dynamic[] allData = ds.GetAllDataForQueryAsync("auto")
-        .Result
+    dynamic[] allData = (await ds.GetAllDataForQueryAsync("auto"))
         .Select(m => (dynamic)m)
         .ToArray();
-
-    List<string> programyNames = allData
-        .Select(m => m.nazev_programu_vyzvy as string)
-        .Distinct()
-        .ToList();
-
-
-    var vyzvyStats = allData
-        .GroupBy(k => k.nazev_programu_vyzvy, v => (decimal)v.vyse_podpory, (k, v) => new { key = k, sum = v.Sum(s => s) })
-        .ToDictionary(k => k.key, v => v.sum);
+    
     var topPrijemciStats = allData
         .Where(m => !string.IsNullOrEmpty((string)m.ico))
         .GroupBy(k => k.ico, v => (decimal)v.vyse_podpory, (k, v) => new { key = k, sum = v.Sum(s => s) })

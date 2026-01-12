@@ -57,7 +57,7 @@
 </section>
 
 @{
-    using var db = new DbEntities();
+    await using var db = new DbEntities();
     var vsechnyPlaty = await PpRepo.BasePotvrzenePlaty(db, PpRepo.DefaultYear)
         .Include(i => i.Organizace).ThenInclude(o => o.FirmaDs)
         .Where(m => m.Status == PpPrijem.StatusPlatu.Zjistujeme_zadost_106)

@@ -13,9 +13,9 @@
 
     int lastYear = SponzoringRepo.DefaultLastSponzoringYear();
 
-    var biggestSponsors = SponzoringRepo.BiggestPeopleSponsorsAsync(null, CancellationToken.None, take:7);
-    var biggestSponsorsLastYear = SponzoringRepo.BiggestPeopleSponsorsAsync(lastYear, CancellationToken.None, take:7);
-    var biggestCompanySponsorsLastYear = SponzoringRepo.BiggestCompanySponsorsAsync(lastYear, CancellationToken.None, take:7);
+    var biggestSponsorsTask = SponzoringRepo.BiggestPeopleSponsorsAsync(null, CancellationToken.None, take:7);
+    var biggestSponsorsLastYearTask = SponzoringRepo.BiggestPeopleSponsorsAsync(lastYear, CancellationToken.None, take:7);
+    var biggestCompanySponsorsLastYearTask = SponzoringRepo.BiggestCompanySponsorsAsync(lastYear, CancellationToken.None, take:7);
     
 
 }
@@ -104,7 +104,7 @@
                 <div class="block-table">
                     @{
                         
-                        foreach (var sponzor in await biggestSponsors)
+                        foreach (var sponzor in await biggestSponsorsTask)
                         {
                             <div class="table-row">
                                 <div class="table-col">@HlidacStatu.Util.RenderData.NicePriceHtml(sponzor.DarCelkem, shortFormat: true)</div>
@@ -130,7 +130,7 @@
             <div class="block-col block-part">
                 <div class="block-table">
                     @{
-                        foreach (var sponzor in await biggestSponsorsLastYear)
+                        foreach (var sponzor in await biggestSponsorsLastYearTask)
                         {
                             <div class="table-row">
                                 <div class="table-col">@HlidacStatu.Util.RenderData.NicePriceHtml(sponzor.DarCelkem, shortFormat: true)</div>
@@ -156,7 +156,7 @@
             <div class="block-col block-part">
                 <div class="block-table">
                     @{
-                        foreach (var sponzor in (await biggestCompanySponsorsLastYear).Where(m=>m.PolitickaStrana == 0))
+                        foreach (var sponzor in (await biggestCompanySponsorsLastYearTask).Where(m=>m.PolitickaStrana == 0))
                         {
                             <div class="table-row">
                                 <div class="table-col">@HlidacStatu.Util.RenderData.NicePriceHtml(sponzor.DarCelkem, shortFormat: true)</div>

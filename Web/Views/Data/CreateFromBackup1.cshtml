@@ -44,7 +44,7 @@
         }
         else
         {
-            var res = DataSet.Api.CreateAsync(Model, User.Identity?.Name);
+            var res = await DataSet.Api.CreateAsync(Model, User.Identity?.Name);
 
             <p class="bg-success">
                 Dataset <b>@(Model.name)</b> byl vytvořen. <a href="/data/manage/@Model.id">Pokračujte zde</a>.

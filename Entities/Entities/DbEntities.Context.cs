@@ -1,9 +1,6 @@
-﻿using HlidacStatu.Entities;
-using HlidacStatu.Entities.Views;
-
+﻿using HlidacStatu.Entities.Views;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
-using System.Linq;
 using HlidacStatu.Entities.Entities;
 using HlidacStatu.Entities.Entities.PoliticiSelfAdmin;
 
@@ -21,10 +18,10 @@ namespace HlidacStatu.Entities
         {
         }
 
-        private static DbContextOptions GetConnectionString()
+        private static DbContextOptions<DbEntities> GetConnectionString()
         {
             var connectionString = Devmasters.Config.GetWebConfigValue("OldEFSqlConnection");
-            return new DbContextOptionsBuilder()
+            return new DbContextOptionsBuilder<DbEntities>()
                 .UseSqlServer(connectionString) //, sql=> sql.CommandTimeout(120).EnableRetryOnFailure(2) )
                 //.EnableDetailedErrors()  //ukáže který sloupec je null/nejde deserializovat v chybě
                 //.EnableSensitiveDataLogging(true)

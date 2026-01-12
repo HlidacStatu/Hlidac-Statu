@@ -156,7 +156,7 @@
                 <li class="connect @("aktualnost" + ((int)aktualnost).ToString())">
                     <input type="checkbox" /> <span><b>@Model.ICO</b> @Model.Jmeno</span>
                     <ul>
-                       @Html.Raw(
+                       @Html.Raw( await 
                             HlidacStatu.Repositories.Graph.TiskVazebAsync(
                                 Model.Jmeno,Model.VazbyRootEdge(),
                                 await Model.AktualniVazbyAsync(aktualnost),

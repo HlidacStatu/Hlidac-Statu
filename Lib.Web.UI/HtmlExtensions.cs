@@ -144,9 +144,9 @@ namespace HlidacStatu.Lib.Web.UI
                 return htmlHelper.Raw("");
 
             KIndexData.KIndexLabelValues lbl = kidx.Item2;
-            return htmlHelper.KIndexLabelLinkAsync(ico, lbl, style, showNone, rok, linkToKindex: linkToKindex);
+            return htmlHelper.KIndexLabelLink(ico, lbl, style, showNone, rok, linkToKindex: linkToKindex);
         }
-        public static IHtmlContent KIndexLabelLinkAsync(this IHtmlHelper htmlHelper, string ico,
+        public static IHtmlContent KIndexLabelLink(this IHtmlHelper htmlHelper, string ico,
             KIndexData.KIndexLabelValues label,
             string style, bool showNone = false, int? rok = null, bool linkToKindex = false)
         {

@@ -103,7 +103,7 @@
 
         var listingNum = 3;
         var funkceOsobaNum = Model.Events(m => types.Contains(m.Type)).Count();
-        var funkceOsoba = Model.DescriptionAsync(true,
+        var funkceOsoba = await Model.DescriptionAsync(true,
         m => types.Contains(m.Type),
         (funkceOsobaNum <= listingNum + 1 ? listingNum + 1 : listingNum),
         "<ul>{0}</ul>", "<li>{0}</li>", "");

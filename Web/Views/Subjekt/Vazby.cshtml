@@ -65,7 +65,7 @@
                     return new
                     {
                         ICO = g.ico,
-                        FirmaName = g.v.First().To.PrintNameAsync(),
+                        FirmaName = await g.v.First().To.PrintNameAsync(),
                         VazbyPerIco = await FirmaVazbyRepo.VazbyProIcoCachedAsync(Model, Relation.CharakterVazbyEnum.VlastnictviKontrola, g.ico)
                     };
                 }

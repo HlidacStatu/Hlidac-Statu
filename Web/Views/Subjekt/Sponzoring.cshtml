@@ -84,10 +84,10 @@
                     var o = await OsobaCache.GetPersonByIdAsync(os);
                     //var sponz = o.Sponzoring().ToList();
 
-                    var sponzorOsoba = o.SponzoringToHtmlAsync(itemTemplate: $"<li><a href='{o.GetUrl(true)}'>{o.FullName()}</a> {{0}}</li>", itemDelimeter:"", sponzoringFilter: s=>s.OsobaIdDarce == os || s.IcoDarce == Model.ICO, withCompany: false);
+                    var sponzorOsoba = await o.SponzoringToHtmlAsync(itemTemplate: $"<li><a href='{o.GetUrl(true)}'>{o.FullName()}</a> {{0}}</li>", itemDelimeter:"", sponzoringFilter: s=>s.OsobaIdDarce == os || s.IcoDarce == Model.ICO, withCompany: false);
 
                     @Html.Raw(sponzorOsoba);
-            }
+                }
             </ul>
         </div>
     }

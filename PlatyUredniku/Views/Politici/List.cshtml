@@ -70,22 +70,12 @@
         vsechnyPlaty = await PpRepo.GetPrijmyGroupedByNameIdAsync(year, true, onlyNameIds: nameIdFilter.ToArray());
     }
 
-    var sem = new SemaphoreSlim(10);
-    var map = await vsechnyPlaty.ToAsyncEnumerable()
-        .SelectAwait(async kvp =>
-        {
-            await sem.WaitAsync();
-            try
-            {
-                var role = await OsobyRolesCache.GetAsync(kvp.Key, year);
-                return (kvp.Key, Prijmy: kvp.Value, Role: role);
-            }
-            finally
-            {
-                sem.Release();
-            }
-        })
-        .ToDictionaryAsync(x => x.Key, x => (Prijmy: x.Prijmy, x.Role));
+    Dictionary<string, (PpPrijem[] Prijmy, OsobyRolesCache.osobaInfo Role)> map = [];
+    foreach (var plat in vsechnyPlaty)
+    {
+        var role = await OsobyRolesCache.GetAsync(plat.Key, year);
+        map.TryAdd(plat.Key, (Prijmy: plat.Value, Role: role));
+    }
 
     IQueryable<KeyValuePair<string, (PpPrijem[] Prijmy, OsobyRolesCache.osobaInfo Role)>> dataToRender = map.AsQueryable();
 

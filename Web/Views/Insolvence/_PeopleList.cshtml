@@ -67,11 +67,19 @@
         var pocetSmluv = Devmasters.Lang.CS.Plural.Get(stat.Summary().PocetSmluv, "{0} smlouvu;{0} smlouvy;{0} smluv");
         var smlouvyText = $" - Nalezeli jsme {pocetSmluv} v Registru smluv o celkové hodnotě <strong>{HlidacStatu.Util.RenderData.NicePriceHtml(stat.Summary().CelkovaHodnotaSmluv, mena: "Kč")}</strong>.";
 
-        var sponzori = StaticData.SponzorujiciFirmy_Vsechny.Get()
-			.Where(s => s.IcoDarce == ico)
-			.Select(s => $"sponzor {s.JmenoPrijemceAsync()}")
-			.Distinct()
+        var sponzorujiciFirmy = StaticData.SponzorujiciFirmy_Vsechny.Get()
+	        .Where(s => s.IcoDarce == ico)
 	        .ToList();
+
+        var sponzori = new List<string>();
+        foreach (var s in sponzorujiciFirmy)
+        {
+	        var jmeno = await s.JmenoPrijemceAsync();
+	        sponzori.Add($"sponzor {jmeno}");
+        }
+
+        sponzori = sponzori.Distinct().ToList();
+        
         var sponzoriText = sponzori.Any() ? $"<br /> - {string.Join(". ", sponzori)}" : "";
 
         var vazby = new List<int>();

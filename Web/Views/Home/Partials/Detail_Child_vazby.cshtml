@@ -141,7 +141,7 @@
                         </div>
                         <div class="card-body">
                             @*@Html.Raw(firma.Description(true, m => m.Type == (int)OsobaEvent.Types.Sponzor))*@
-                            @Html.Raw(firma.SponzoringToHtmlAsync())
+                            @Html.Raw(await firma.SponzoringToHtmlAsync())
                         </div>
                     </div>
                 }
