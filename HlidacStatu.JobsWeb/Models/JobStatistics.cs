@@ -15,10 +15,10 @@ namespace WatchdogAnalytics.Models
         {
             using (var db = new DbEntities())
             {
-                var subjects = db.InDocJobNameDescription.AsEnumerable().Select(m => m.Analyza.ToLower()).Distinct();
+                var subjects = db.InDocJobNameDescription.Select(m => m.Analyza.ToLower()).Distinct();
                 foreach (var subj in subjects.Where(m => !string.IsNullOrEmpty(m)))
                 {
-                    jobDescriptions.Add(subj, db.InDocJobNameDescription.AsEnumerable().Where(m => m.Analyza.ToLower() == subj).ToArray());
+                    jobDescriptions.Add(subj, db.InDocJobNameDescription.Where(m => m.Analyza.ToLower() == subj).ToArray());
                 }
             }
         }

@@ -1,5 +1,4 @@
 ﻿using Microsoft.EntityFrameworkCore;
-
 using System;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
@@ -43,7 +42,6 @@ namespace HlidacStatu.Entities
             {
                 var r = db.UserOptions
                     .FromSqlInterpolated($@"EXEC UserOption_Get @optionId = {(int)option}, @userid = {null}, @languageid = {languageId}")
-                    .AsEnumerable()
                     .FirstOrDefault();
 
                 Created = r?.Created ?? DateTime.Now;
@@ -94,7 +92,6 @@ namespace HlidacStatu.Entities
                 var r = db.UserOptions
                     .FromSqlInterpolated(
                         $@"EXEC UserOption_Get @optionId = {(int)option}, @userid = {userId}, @languageid = {languageid}")
-                    .AsEnumerable()
                     .FirstOrDefault();
                 return r;
             }

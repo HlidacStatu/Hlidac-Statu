@@ -12,7 +12,7 @@ namespace HlidacStatu.Extensions
             bool prijemceJeFirma = !string.IsNullOrWhiteSpace(sponzoring.IcoPrijemce);
             if (prijemceJeFirma)
             {
-                var zkratkyStran = StaticData.ZkratkyStran_cache.Get();
+                var zkratkyStran = await StaticData.GetZkratkyPolitickychStranAsync();
                 return zkratkyStran.TryGetValue(sponzoring.IcoPrijemce, out string nazev)
                     ? nazev
                     : Firmy.GetJmeno(sponzoring.IcoPrijemce);

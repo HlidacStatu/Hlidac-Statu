@@ -84,7 +84,6 @@ namespace HlidacStatu.Repositories
         public static Devmasters.Cache.LocalMemory.Cache<Dictionary<string, NespolehlivyPlatceDPH>>
             NespolehlivyPlatciDPH = null;
 
-        public static Devmasters.Cache.LocalMemory.Cache<Dictionary<string, string>> ZkratkyStran_cache = null;
 
         public static Dictionary<string, TemplatedQuery> Afery = new Dictionary<string, TemplatedQuery>();
 
