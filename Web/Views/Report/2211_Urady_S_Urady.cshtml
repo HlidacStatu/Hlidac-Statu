@@ -49,13 +49,13 @@
         @foreach (var uu in topDodavUrady)
         {
             <tr>
-                <td><a href="/subject/@uu.Key">@Firmy.GetJmeno(uu.Key)</a></td>
+                <td><a href="/subjekt/@uu.Key">@Firmy.GetJmeno(uu.Key)</a></td>
                 <td>@uu.Value.SumStat.ToNiceString(null, false)</td>
                 <td>
                     @foreach (var odb in uu.Value.Odberatele.OrderByDescending(o => o.Statistic.Summary.CelkemCena).Take(10))
                     {
                         <div>
-                            <a href="/subject/@odb.Odberatel.ICO">@odb.Odberatel.Nazev</a> - @odb.Statistic.Summary.ToNiceString(null, false)
+                            <a href="/subjekt/@odb.Odberatel.ICO">@odb.Odberatel.Nazev</a> - @odb.Statistic.Summary.ToNiceString(null, false)
                         </div>
                     }
                 </td>
@@ -78,8 +78,8 @@
         @foreach (var uu in urady.OrderByDescending(o => o.Statistic.Summary.CelkemCena).Take(50))
         {
             <tr>
-                <td><a href="/subject/@uu.Dodavatel.ICO">@uu.Dodavatel.Nazev</a></td>
-                <td><a href="/subject/@uu.Odberatel.ICO">@uu.Odberatel.Nazev</a></td>
+                <td><a href="/subjekt/@uu.Dodavatel.ICO">@uu.Dodavatel.Nazev</a></td>
+                <td><a href="/subjekt/@uu.Odberatel.ICO">@uu.Odberatel.Nazev</a></td>
                 <td>
                     @foreach (var sm in uu.Smlouvy.OrderByDescending(o => o.CalculatedPriceWithVATinCZK).Take(6))
                     {

@@ -106,7 +106,7 @@
                         <dl class="row">
                             <dt class="col-sm-4">Příjemce dotace</dt>
                             <dd class="col-sm-8">
-                                <a href="/subject/@Model.model.Recipient.Ico" title="Vyhledat všechny dotace pro tento subjekt">@Model.model.Recipient.DisplayName</a> @(Model.model.Recipient.YearOfBirth is null ? "" : $"({Model.model.Recipient.YearOfBirth})")
+                                <a href="/subjekt/@Model.model.Recipient.Ico" title="Vyhledat všechny dotace pro tento subjekt">@Model.model.Recipient.DisplayName</a> @(Model.model.Recipient.YearOfBirth is null ? "" : $"({Model.model.Recipient.YearOfBirth})")
 
                                 (@(Model.model.Hints.RecipientTypSubjektuEnum.ToNiceDisplayName()))
 
@@ -121,7 +121,7 @@
                             <dd class="col-sm-8">
                                 @if (Model.model.Recipient.Ico != "00000000" || !string.IsNullOrWhiteSpace(Model.model.Recipient.Ico))
                                 {
-                                    <a href="/subject/@Model.model.Recipient.Ico" title="Vyhledat všechny dotace pro tento subjekt">@Model.model.Recipient.Ico</a>
+                                    <a href="/subjekt/@Model.model.Recipient.Ico" title="Vyhledat všechny dotace pro tento subjekt">@Model.model.Recipient.Ico</a>
                                 }
                             </dd>
 
