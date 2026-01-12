@@ -355,14 +355,14 @@ namespace HlidacStatu.Repositories
         private static IFusionCache MemoryCache =>
             HlidacStatu.Caching.CacheFactory.CreateNew(CacheFactory.CacheType.L1Default, nameof(FirmaVazbyRepo));
         
-        public static ValueTask<HlidacStatu.DS.Graphs.Graph.Edge[]> VazbyProIcoCachedAsync(Firma f, Relation.CharakterVazbyEnum charakterVazby, string ico)
+        public static async Task<HlidacStatu.DS.Graphs.Graph.Edge[]> VazbyProIcoCachedAsync(Firma f, Relation.CharakterVazbyEnum charakterVazby, string ico)
         {
             if (f is null)
             {
-                return new ValueTask<DS.Graphs.Graph.Edge[]>([]);
+                return [];
             }
                 
-            return MemoryCache.GetOrSetAsync($"_VazbyFirmaProIcoCache:{f.ICO}_{charakterVazby}->{ico}",
+            return await MemoryCache.GetOrSetAsync($"_VazbyFirmaProIcoCache:{f.ICO}_{charakterVazby}->{ico}",
                 _ => f.VazbyProICOAsync(charakterVazby, ico),
                 options => options.ModifyEntryOptionsDuration(TimeSpan.FromHours(2)));
         }

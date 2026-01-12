@@ -20,7 +20,7 @@ namespace HlidacStatu.Searching
         protected override Task<RuleResult> processQueryPartAsync(SplittingQuery.Part part)
         {
             if (part == null)
-                return null;
+                return Task.FromResult<RuleResult>(null);
 
             if (part.Prefix.Equals("chyby:", StringComparison.InvariantCultureIgnoreCase))
             {
@@ -34,7 +34,7 @@ namespace HlidacStatu.Searching
 
                 return Task.FromResult(new RuleResult(SplittingQuery.SplitQuery($" {levelQ} "), NextStep));
             }
-            return null;//new RuleResult(part, this.NextStep);
+            return Task.FromResult<RuleResult>(null);
         }
 
     }

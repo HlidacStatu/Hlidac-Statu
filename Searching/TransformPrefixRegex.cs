@@ -31,7 +31,7 @@ namespace HlidacStatu.Searching
                 || string.IsNullOrWhiteSpace(_regex)
                 || !part.Prefix.Equals(_prefix, StringComparison.InvariantCultureIgnoreCase)
                 )
-                return null;
+                return Task.FromResult<RuleResult>(null);
 
             var reres = Regex.Match(part.Value, _regex, RegexOptions.CultureInvariant | RegexOptions.IgnoreCase);
             if (reres.Success)
@@ -41,7 +41,7 @@ namespace HlidacStatu.Searching
                 
             }
 
-            return null;
+            return Task.FromResult<RuleResult>(null);
         }
 
     }

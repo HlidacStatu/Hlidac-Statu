@@ -27,10 +27,10 @@ namespace HlidacStatu.Searching
         protected override Task<RuleResult> processQueryPartAsync(SplittingQuery.Part part)
         {
             if (part == null)
-                return null;
+                return Task.FromResult<RuleResult>(null);
 
             if (string.IsNullOrWhiteSpace(ReplaceWith))
-                return null; // new RuleResult(SplittingQuery.SplitQuery(" "), this.NextStep);
+                return Task.FromResult<RuleResult>(null);
 
             if (//this.ReplaceWith.Contains("${q}") &&
                 part.Prefix.Equals(_prefix, StringComparison.InvariantCultureIgnoreCase)
@@ -44,7 +44,7 @@ namespace HlidacStatu.Searching
                 return Task.FromResult(new RuleResult(SplittingQuery.SplitQuery($" {rq} "), NextStep));
             }
 
-            return null;
+            return Task.FromResult<RuleResult>(null);
         }
 
     }

@@ -19,7 +19,7 @@
         protected override Task<RuleResult> processQueryPartAsync(SplittingQuery.Part part)
         {
             if (part == null)
-                return null;
+                return Task.FromResult<RuleResult>(null);
 
             if (part.Prefix.Equals("form:", StringComparison.InvariantCultureIgnoreCase))
             {
@@ -37,7 +37,7 @@
             }
 
 
-            return null;
+            return Task.FromResult<RuleResult>(null);
         }
 
     }

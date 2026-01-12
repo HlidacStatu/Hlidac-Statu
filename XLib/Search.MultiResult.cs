@@ -349,7 +349,7 @@ namespace HlidacStatu.XLib
                     }
                     catch (System.Exception e)
                     {
-                        _logger.Error(e, "MultiResult GeneralSearch for insolvence query" + query);
+                        _logger.Error(e, "MultiResult GeneralSearch for dotace query" + query);
                     }
                 }));
             }

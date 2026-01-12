@@ -29,7 +29,7 @@
         public virtual async Task<RuleResult> ProcessAsync(SplittingQuery.Part queryPart)
         {
             var res = await processQueryPartAsync(queryPart);
-
+            
             if (res != null && res.LastConditionAdded == false && !string.IsNullOrEmpty(AddLastCondition))
             {
                 string rq = AddLastCondition;
@@ -42,8 +42,6 @@
 
                 return new RuleResult(SplittingQuery.SplitQuery($" {rq} "), NextStep);
             }
-
-
 
             return res;
         }

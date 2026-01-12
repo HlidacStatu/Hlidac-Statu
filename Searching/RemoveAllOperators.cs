@@ -18,7 +18,7 @@
         protected override Task<RuleResult> processQueryPartAsync(SplittingQuery.Part part)
         {
             if (part == null)
-                return null;
+                return Task.FromResult<RuleResult>(null);
 
             if (!string.IsNullOrEmpty(part.Prefix))
             {
@@ -36,7 +36,7 @@
             }
 
 
-            return null;
+            return Task.FromResult<RuleResult>(null);
         }
 
     }

@@ -65,11 +65,11 @@ namespace HlidacStatu.Repositories
             Relation.CharakterVazbyEnum charakterVazbyEnum) =>
             $"_VsechnyDcerineVazbyIco_{vazbyCacheVersion}:{ico}_{charakterVazbyEnum}";
         
-        private static ValueTask<List<HlidacStatu.DS.Graphs.Graph.Edge>> GetVazbyIcoAsync(string ico,
+        private static Task<List<HlidacStatu.DS.Graphs.Graph.Edge>> GetVazbyIcoAsync(string ico,
             Relation.CharakterVazbyEnum charakterVazbyEnum) =>
             MemcachedCache.GetOrSetAsync(GetVsechnyDcerineVazbyIcoKey(ico, charakterVazbyEnum),
                 async _ => await VsechnyDcerineVazbyInternalAsync(ico, charakterVazbyEnum, 0, true, null),
-                options => options.ModifyEntryOptionsDuration(TimeSpan.FromDays(3)));
+                options => options.ModifyEntryOptionsDuration(TimeSpan.FromDays(3))).AsTask();
         
 
         public static async Task SmazVsechnyDcerineVazbyFirmyAsync(string ico)

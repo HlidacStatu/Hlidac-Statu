@@ -37,7 +37,7 @@ namespace HlidacStatu.Searching
         protected override Task<RuleResult> processQueryPartAsync(SplittingQuery.Part part)
         {
             if (part == null)
-                return null;
+                return Task.FromResult<RuleResult>(null);
 
             if (part.Prefix.Equals(Prefixes.First(), StringComparison.InvariantCultureIgnoreCase))
             {
@@ -55,8 +55,7 @@ namespace HlidacStatu.Searching
                 }
             }
 
-
-            return null;
+            return Task.FromResult<RuleResult>(null);
         }
 
     }
