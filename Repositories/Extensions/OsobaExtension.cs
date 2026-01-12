@@ -261,17 +261,21 @@ namespace HlidacStatu.Extensions
 
             var events = osoba.MergedEvents(predicate).ToArray();
 
-            List<string> evs = events
+            var orderedEvents = events
                 .OrderBy(o =>
                 {
                     var index = fixedOrder.IndexOf(o.Type);
                     return index == -1 ? int.MaxValue : index;
                 })
                 .ThenByDescending(o => o.DatumOd)
-                .Take(numOfRecords)
-                .Select(e => html ? e.RenderHtmlAsync(", ") : e.RenderTextAsync(" "))
-                .Select(s => string.Format(itemTemplate, s))
-                .ToList();
+                .Take(numOfRecords);
+
+            List<string> evs = new List<string>();
+            foreach (var e in orderedEvents)
+            {
+                var s = await (html ? e.RenderHtmlAsync(", ") : e.RenderTextAsync(" "));
+                evs.Add(string.Format(itemTemplate, s));
+            }
 
             if (withSponzoring && html)
             {
