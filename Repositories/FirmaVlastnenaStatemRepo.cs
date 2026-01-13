@@ -258,7 +258,7 @@ namespace HlidacStatu.Repositories
 
         public async static Task<HashSet<string>> IcaStatnichFiremAsync()
         {
-            using (DbEntities db = new DbEntities())
+            await using (DbEntities db = new DbEntities())
             {
                 var q = db.Firma
                     .AsNoTracking()
@@ -272,7 +272,7 @@ namespace HlidacStatu.Repositories
 
         public async static Task<HashSet<string>> IcaUraduStatnichFiremAsync()
         {
-            using (DbEntities db = new DbEntities())
+            await using (DbEntities db = new DbEntities())
             {
                 var q = db.Firma
                     .AsNoTracking()
@@ -286,7 +286,7 @@ namespace HlidacStatu.Repositories
 
         public async static Task<HashSet<string>> IcaOVMAsync()
         {
-            using (DbEntities db = new DbEntities())
+            await using (DbEntities db = new DbEntities())
             {
                 var q = db.Firma
                     .AsNoTracking()
@@ -352,7 +352,7 @@ namespace HlidacStatu.Repositories
 
             if (updateFromPrimarySource || _ovm_Nikdy_nejsou_statni == null)
             {
-                using DbEntities db = new DbEntities();
+                await using DbEntities db = new DbEntities();
 
                 //kategorie, ktere nikdy nejsou statni
                 //OVM z OrganVerejneMoci
@@ -416,7 +416,7 @@ and (esa2010 in (" + string.Join(",", vzdySoukr_ESA2010.Select(m => $"'{m}'")) +
         )
         {
             List<string> debugCheck = new();
-            using DbEntities db = new DbEntities();
+            await using DbEntities db = new DbEntities();
 
 
             progressWriter = progressWriter ?? new Devmasters.Batch.ActionProgressWriter(0.1f);
@@ -490,7 +490,7 @@ and (esa2010 in (" + string.Join(",", vzdySoukr_ESA2010.Select(m => $"'{m}'")) +
             {
                 _logger.Information("Parsing downloaded excel files Part 1...");
                 Console.WriteLine("parsing excel 1");
-                using (var stream = System.IO.File.Open(fn, System.IO.FileMode.Open, System.IO.FileAccess.Read))
+                await using (var stream = System.IO.File.Open(fn, System.IO.FileMode.Open, System.IO.FileAccess.Read))
                 {
                     using (var reader = ExcelDataReader.ExcelReaderFactory.CreateReader(stream))
                     {
@@ -512,7 +512,7 @@ and (esa2010 in (" + string.Join(",", vzdySoukr_ESA2010.Select(m => $"'{m}'")) +
             {
                 _logger.Information("Parsing downloaded excel files Part 1...");
                 Console.WriteLine("parsing excel 2");
-                using (var stream = System.IO.File.Open(fn2, System.IO.FileMode.Open, System.IO.FileAccess.Read))
+                await using (var stream = System.IO.File.Open(fn2, System.IO.FileMode.Open, System.IO.FileAccess.Read))
                 {
                     using (var reader = ExcelDataReader.ExcelReaderFactory.CreateReader(stream))
                     {
@@ -771,7 +771,7 @@ and (esa2010 in (" + string.Join(",", vzdySoukr_ESA2010.Select(m => $"'{m}'")) +
             }
 
             var stream = await responseMessage.Content.ReadAsStreamAsync();
-            using var gZipStream = new GZipStream(stream, CompressionMode.Decompress);
+            await using var gZipStream = new GZipStream(stream, CompressionMode.Decompress);
             using var decompressedStream = new MemoryStream();
 
             await gZipStream.CopyToAsync(decompressedStream);
@@ -792,12 +792,12 @@ and (esa2010 in (" + string.Join(",", vzdySoukr_ESA2010.Select(m => $"'{m}'")) +
             Dictionary<string, PravniFormaOvm> pfOvm = new();
             Dictionary<int, AdresaOvm> adresyOvm = new();
 
-            using var db = new DbEntities();
+            await using var db = new DbEntities();
             var strategy = db.Database.CreateExecutionStrategy();
 
             await strategy.ExecuteAsync(async () =>
             {
-                using var transaction = await db.Database.BeginTransactionAsync();
+                await using var transaction = await db.Database.BeginTransactionAsync();
                 try
                 {
                     _logger.Information("Truncating OVM related tables");
@@ -866,7 +866,7 @@ and (esa2010 in (" + string.Join(",", vzdySoukr_ESA2010.Select(m => $"'{m}'")) +
         private static async Task FixAddresses()
         {
             _logger.Information("Updating incorrect address references");
-            using (var db = new DbEntities())
+            await using (var db = new DbEntities())
             {
                 //doplnění
                 await db.Database.ExecuteSqlRawAsync(

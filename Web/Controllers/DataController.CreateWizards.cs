@@ -471,7 +471,7 @@ namespace HlidacStatu.Web.Controllers
                 else
                 {
                     var path = uTmp.GetFullPath(fileId.ToString(), fileId.ToString() + ".csv");
-                    using (var fileStream = new FileStream(path, FileMode.Create))
+                    await using (var fileStream = new FileStream(path, FileMode.Create))
                     {
                         await file.CopyToAsync(fileStream);
                     }

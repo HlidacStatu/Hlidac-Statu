@@ -434,7 +434,7 @@ namespace HlidacStatu.Repositories
                     await DownloadFileAsync(httpClient, downloadUrl, fullTempPath, vz.Id);
 
                     // calculate checksum first and get length so we can create hlidacStorageId
-                    using (var fileStream = File.Open(fullTempPath, FileMode.Open, FileAccess.Read))
+                    await using (var fileStream = File.Open(fullTempPath, FileMode.Open, FileAccess.Read))
                     {
                         dokument.SizeInBytes = fileStream.Length;
                         dokument.Sha256Checksum = await Checksum.DoChecksumAsync(fileStream);

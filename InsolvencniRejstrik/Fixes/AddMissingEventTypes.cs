@@ -67,7 +67,7 @@ namespace InsolvencniRejstrik.Fixes
 					var rizeni = LoadRizeni(item.Key);
 					if (rizeni == null)
 					{
-						using (var stream = File.AppendText("_missing-proceeding.log"))
+						await using (var stream = File.AppendText("_missing-proceeding.log"))
 						{
 							await stream.WriteLineAsync(item.Key);
 							await stream.FlushAsync();
@@ -84,7 +84,7 @@ namespace InsolvencniRejstrik.Fixes
 						var document = rizeni.Dokumenty.FirstOrDefault(d => d.Id == doc.Key.ToString());
 						if (document == null)
 						{
-							using (var stream = File.AppendText("_invalid-document.log"))
+							await using (var stream = File.AppendText("_invalid-document.log"))
 							{
 								await stream.WriteLineAsync($"{item.Key};{doc.Key}");
 								await stream.FlushAsync();

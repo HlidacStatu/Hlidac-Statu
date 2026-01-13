@@ -43,7 +43,7 @@ namespace HlidacStatu.Repositories
             _logger.Information(
                 $"Starting SearchPromoRepo.FillDbAsync {(fullRebuild ? "with" : "without")} rebuild db");
             var dbSP = HlidacStatu.Connectors.Manager.GetESClient_SearchPromo();
-            using var db = new DbEntities();
+            await using var db = new DbEntities();
 
             // manualni 
             await SaveAsync(new SearchPromo()

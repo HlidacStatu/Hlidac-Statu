@@ -17,7 +17,7 @@ namespace HlidacStatu.Repositories
             if (analyza == "DEMO" && rok == 2018)
                 return new CenyCustomer.AccessDetail( CenyCustomer.AccessDetail.AccessDetailLevel.PRO);
 
-            using (var db = new DbEntities())
+            await using (var db = new DbEntities())
             {
                 var retAll = await db.CenyCustomer.AsQueryable()
                     .Where(m => m.Username == username && m.Analyza == analyza && m.Rok == rok && m.Paid.HasValue)

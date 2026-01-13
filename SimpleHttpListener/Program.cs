@@ -30,4 +30,4 @@ app.Run(async context =>
     await context.Response.WriteAsync("Request processed. Check the console output.");
 });
 
-app.Run();
+await app.RunAsync();

@@ -36,12 +36,12 @@
 
                     if (cpvs.Length == 0)
                     {
-                        return null;
+                        return Task.FromResult<RuleResult>(null);
                     }
                     if (cpvs.Length == 1)
                     {
                         if (cpvs[0].EndsWith("*"))
-                            return null;
+                            return Task.FromResult<RuleResult>(null);
                         else
                             q_cpv = " cPV:" + cpvs[0] + "* ";
                     }

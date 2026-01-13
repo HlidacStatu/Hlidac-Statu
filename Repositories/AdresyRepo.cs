@@ -11,7 +11,7 @@ public class AdresyRepo
 {
     public static async Task<List<AdresyKVolbam>> GetAdresyKVolbamAsync()
     {
-        using (DbEntities db = new DbEntities())
+        await using (DbEntities db = new DbEntities())
         {
             db.Database.SetCommandTimeout(TimeSpan.FromMinutes(5));
             // TypSO se filtruje kvůli číslům evidenčním, na kterých nemůže být trvalý pobyt, proto je nepotřebujeme

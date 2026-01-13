@@ -126,8 +126,7 @@ using (var activity = source.StartActivity("Starting prg"))
 {
     activity?.SetTag("test.key", "test-value");
     activity?.SetTag("env", "production");
-    // simulace práce
-    Thread.Sleep(100);
+    await Task.Delay(100);
 }
 
 
@@ -329,7 +328,7 @@ app.MapControllers();
 //todo: odstranit tohle, protože by to mělo fungovat jak to máme nakonfigurované v services.addhangfireserver
 app.UseHangfireServer();
 
-app.Run();
+await app.RunAsync();
 
 
 

@@ -70,7 +70,8 @@ namespace HlidacStatu.CachingClients.PostgreSql
                 return;
             }
 
-            Task.Run(DeleteExpiredCacheItems);
+            // this might be all refactored to the background task
+            _ = Task.Run(DeleteExpiredCacheItems);
         }
 
         private void OnShutdown()

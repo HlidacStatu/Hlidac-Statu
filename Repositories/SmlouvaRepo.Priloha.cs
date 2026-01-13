@@ -294,7 +294,7 @@ namespace HlidacStatu.Repositories
                         if (string.IsNullOrEmpty(contentType))
                         {
                             var tikaRes =
-                                AI.Doc.GetText(await GetDownloadedPrilohaPathAsync(p, s, RequestedFileType.Original));
+                                await AI.Doc.GetTextAsync(await GetDownloadedPrilohaPathAsync(p, s, RequestedFileType.Original));
 
                             if (tikaRes != null)
                                 contentType = tikaRes.ContentType;

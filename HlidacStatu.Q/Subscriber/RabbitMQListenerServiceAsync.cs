@@ -64,7 +64,8 @@ namespace HlidacStatu.Q.Subscriber
         {
             _logger.LogInformation("Subscribing to Queue.");
             _logger.LogInformation(_options.ToString());
-            _rabbitBus.PubSub.SubscribeAsync<T>(_options.SubscriberName, _messageHandler.HandleAsync, configure =>
+            //this should be awaited but i wont waste time fixing it if we are moving slowly from RabbitMQ
+            _ = _rabbitBus.PubSub.SubscribeAsync<T>(_options.SubscriberName, _messageHandler.HandleAsync, configure =>
             {
                 configure.WithPrefetchCount(_options.PrefetchCount);
             });

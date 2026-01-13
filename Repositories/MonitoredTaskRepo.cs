@@ -28,7 +28,7 @@ namespace HlidacStatu.Repositories
                 if (monitoredTask.Exception.Length > 50000)
                     monitoredTask.Exception = monitoredTask.Exception.Substring(0, 50000);
 
-            using (DbEntities db = new DbEntities())
+            await using (DbEntities db = new DbEntities())
             {
                 _ = db.MonitoredTasks.Add(monitoredTask);
                 _ = await db.SaveChangesAsync();

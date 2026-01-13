@@ -52,7 +52,7 @@ namespace HlidacStatu.Web.Controllers
             }
             var user = await _userManager.GetUserAsync(User);
             IndexViewModel model = null;
-            using (var db = new DbEntities())
+            await using (var db = new DbEntities())
             {
                 model = new IndexViewModel
                 {
@@ -378,7 +378,7 @@ namespace HlidacStatu.Web.Controllers
         {
             var model = new List<Review>();
             //show list
-            using (DbEntities db = new DbEntities())
+            await using (DbEntities db = new DbEntities())
             {
                 if (!string.IsNullOrEmpty(id)
                     && !string.IsNullOrEmpty(a)

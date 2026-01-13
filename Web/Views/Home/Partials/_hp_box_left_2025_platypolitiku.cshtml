@@ -29,7 +29,7 @@
         </p>
         @* <b>PastVina - investigativní projekt Hlídače státu</b> *@
         @{
-            using var db = new HlidacStatu.Entities.DbEntities();
+            await using var db = new HlidacStatu.Entities.DbEntities();
             var pastvinaUrl = db.TipUrl
                     .Where(m => m.Name == "HP-pastvina")
                     .Select(m => m.Url)

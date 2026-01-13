@@ -249,7 +249,7 @@ namespace HlidacStatu.Extensions
         public static Task<KIndexData> KindexAsync(this Firma firma, bool useTemp = false)
         {
             if (firma == null)
-                return null;
+                return Task.FromResult<KIndexData>(null);
 
             return KIndex.GetCachedAsync(firma.ICO, useTemp);
         }

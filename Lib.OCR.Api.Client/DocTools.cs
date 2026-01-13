@@ -57,7 +57,7 @@ namespace HlidacStatu.Lib.OCR
             byte[] b = new byte[4];
             using (var r = System.IO.File.OpenRead(filename))
             {
-                r.Read(b, 0, 4);
+                _ = r.Read(b, 0, 4);
             }
             byte[] pdfheader = new byte[] { 37, 80, 68, 70 };
             bool valid = true;

@@ -40,9 +40,9 @@ namespace HlidacStatu.Repositories
         public static Task<IEnumerable<UptimeServer.HostAvailability>> DirectShortAvailabilityAsync(int[] serverIds, TimeSpan intervalBack)
         {
             if (serverIds?.Length == null)
-                return null;
+                return Task.FromResult<IEnumerable<UptimeServer.HostAvailability>>(null);
             if (serverIds.Length == 0)
-                return null;
+                return Task.FromResult<IEnumerable<UptimeServer.HostAvailability>>(null);
 
             return DirectAvailabilityFromInFluxAsync(serverIds, intervalBack);
         }

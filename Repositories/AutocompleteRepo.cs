@@ -414,7 +414,7 @@ namespace HlidacStatu.Repositories
             };
 
             List<Autocomplete> results = new List<Autocomplete>();
-            using (DbEntities db = new DbEntities())
+            await using (DbEntities db = new DbEntities())
             {
                 SemaphoreSlim semaphoreLock = new SemaphoreSlim(1, 1);
                 await Devmasters.Batch.Manager.DoActionForAllAsync<Osoba>(db.Osoba.AsQueryable()

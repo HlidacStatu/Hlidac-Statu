@@ -418,7 +418,7 @@ namespace HlidacStatu.Web.Controllers
 
         public async Task<ActionResult> AddWd(string query, string dataType, string name, int period, int focus)
         {
-            using (DbEntities db = new DbEntities())
+            await using (DbEntities db = new DbEntities())
             {
                 if (string.IsNullOrEmpty(query))
                 {

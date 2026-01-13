@@ -85,4 +85,4 @@ app.MapPost("/account/logoutp", async (HttpContext context) =>
     return Results.Ok();
 });
 
-app.Run();
+await app.RunAsync();

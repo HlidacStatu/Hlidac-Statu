@@ -258,7 +258,7 @@ public static partial class PpRepo
 
     public async static Task<string[]> AllNameIdAsync(bool? zeny, int rok = DefaultYear)
     {
-        using var db = new DbEntities();
+        await using var db = new DbEntities();
         string[] res = null;
         if (zeny.HasValue == false)
             res = await BasePotvrzenePlaty(db, rok)

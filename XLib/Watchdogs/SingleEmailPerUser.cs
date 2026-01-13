@@ -49,7 +49,7 @@ namespace HlidacStatu.XLib.Watchdogs
                     WatchDog[] userWatchdogs = kv.Value;
 
                     ApplicationUser user = null;
-                    using (DbEntities db = new DbEntities())
+                    await using (DbEntities db = new DbEntities())
                     {
                         user = db.Users.AsQueryable()
                         .Where(m => m.Id == kv.Key)

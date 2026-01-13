@@ -40,7 +40,7 @@ namespace HlidacStatu.Web.HealthChecks
                 {
                     if (Uri.TryCreate(endp.Uri, UriKind.Absolute, out var xxx))
                     {
-                        using (ClientLow cl = new ClientLow(endp.Uri, endp.ApiKey))
+                        await using (ClientLow cl = new ClientLow(endp.Uri, endp.ApiKey))
                         {
                             Uri uri = new Uri(endp.Uri);
                             string anonUrl = endp.Name;

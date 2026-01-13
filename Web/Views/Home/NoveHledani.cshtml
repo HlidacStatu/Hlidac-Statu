@@ -60,7 +60,7 @@
         if (!string.IsNullOrEmpty(this.User?.Identity?.Name))
         {
             var email = this.User?.Identity?.Name;
-            using (DbEntities db = new())
+            await using (DbEntities db = new())
             {
                 var user = db.Users.AsQueryable().Where(m => m.Email == email && m.EmailConfirmed == false).FirstOrDefault();
                 ShowEmailConfirmation = user != null;

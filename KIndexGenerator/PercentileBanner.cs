@@ -1,5 +1,4 @@
 ﻿using Svg;
-
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -33,31 +32,42 @@ namespace HlidacStatu.KIndexGenerator
             decimal min, decimal percentile10, decimal percentile25,
             decimal percentile50, decimal percentile75,
             decimal percentile90, decimal max
-            )
-: this(currValue,
-      new Dictionary<int, decimal>() { { 0, min }, { 10, percentile10 }, { 25, percentile25 }, { 50, percentile50 }, { 75, percentile75 }, { 90, percentile90 }, { 100, max } }
-      , System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location))
-        { }
+        )
+            : this(currValue,
+                new Dictionary<int, decimal>()
+                {
+                    { 0, min }, { 10, percentile10 }, { 25, percentile25 }, { 50, percentile50 }, { 75, percentile75 },
+                    { 90, percentile90 }, { 100, max }
+                }
+                , System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location))
+        {
+        }
 
         public PercentileBanner(
             decimal currValue,
-    decimal min, decimal percentile10, decimal percentile25,
-    decimal percentile50, decimal percentile75,
-    decimal percentile90, decimal max,
-    string dataFolder
-    )
-        : this(currValue, new Dictionary<int, decimal>() { { 0, min }, { 10, percentile10 }, { 25, percentile25 }, { 50, percentile50 }, { 75, percentile75 }, { 90, percentile90 }, { 100, max } }
-            , dataFolder)
-        { }
+            decimal min, decimal percentile10, decimal percentile25,
+            decimal percentile50, decimal percentile75,
+            decimal percentile90, decimal max,
+            string dataFolder
+        )
+            : this(currValue, new Dictionary<int, decimal>()
+                {
+                    { 0, min }, { 10, percentile10 }, { 25, percentile25 }, { 50, percentile50 }, { 75, percentile75 },
+                    { 90, percentile90 }, { 100, max }
+                }
+                , dataFolder)
+        {
+        }
 
         public PercentileBanner(decimal currValue, Dictionary<int, decimal> percentilesValues)
-        : this(currValue, percentilesValues, System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location))
-        { }
+            : this(currValue, percentilesValues,
+                System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location))
+        {
+        }
 
 
         public static string GetPercentileBannerSvg()
-{
-
+        {
             var name = "HlidacStatu.KIndexGenerator.PercentileBanner.svg";
             var sourceAssembly = typeof(PercentileBanner).Assembly;
             if (sourceAssembly.GetManifestResourceNames().Contains(name))
@@ -67,14 +77,14 @@ namespace HlidacStatu.KIndexGenerator
                     using (var reader = new System.IO.StreamReader(stream))
                     {
                         var content = reader.ReadToEnd();
-                            return content;
+                        return content;
                     }
                 }
             }
             else
                 return string.Empty;
-        
         }
+
         private static Stream GenerateStreamFromString(string s)
         {
             var stream = new MemoryStream();
@@ -84,6 +94,7 @@ namespace HlidacStatu.KIndexGenerator
             stream.Position = 0;
             return stream;
         }
+
         public PercentileBanner(decimal currValue, Dictionary<int, decimal> percentilesValues, string dataFolder)
         {
             this.CurrValue = currValue;
@@ -101,7 +112,6 @@ namespace HlidacStatu.KIndexGenerator
             range = nearMax - nearMin;
 
             CreateSVG(this.CurrValue);
-
         }
 
         private int CalcTransformX(decimal value, bool text = false)
@@ -134,6 +144,7 @@ namespace HlidacStatu.KIndexGenerator
                 el = el.Parent;
                 xMove = CalcTransformX(valueForElement, true);
             }
+
             if (el.Transforms == null)
                 el = el.Parent;
             el.Transforms.Add(new Svg.Transforms.SvgTranslate(xMove));
@@ -145,7 +156,6 @@ namespace HlidacStatu.KIndexGenerator
             var txt = sdoc.GetElementById<SvgText>(id);
             //.Transforms.Add(new Svg.Transforms.SvgTranslate(CalcTransformX(valueForElement)));
             txt.Text = text;
-
         }
 
         private void CreateSVG(decimal vysledek)
@@ -184,8 +194,6 @@ namespace HlidacStatu.KIndexGenerator
             elp.Width = CalcTransformX(vals[75]) - CalcTransformX(vals[25]);
 
 
-
-
             //this.BitMap().Save(@"\!!\!sample1.png");
             //System.IO.File.WriteAllText(@"\!!\!sample1.svg", Svg());
             //sdoc.Draw(Svg.SvgRenderer)
@@ -199,12 +207,12 @@ namespace HlidacStatu.KIndexGenerator
                 sdoc.Write(mem, true);
                 ret = Encoding.UTF8.GetString(mem.ToArray());
             }
-            return ret
-                .Replace("xmlns:xml=\"http://www.w3.org/XML/1998/namespace\"", "")
-                .Replace(" d1p1:space=\"preserve\"", "")
-                .Replace("xmlns:d1p1=\"http://www.w3.org/XML/1998/namespace\"", "")
-                ; // error on line 3 at column 352: xml namespace URI mapped to wrong prefix fix
 
+            return ret
+                    .Replace("xmlns:xml=\"http://www.w3.org/XML/1998/namespace\"", "")
+                    .Replace(" d1p1:space=\"preserve\"", "")
+                    .Replace("xmlns:d1p1=\"http://www.w3.org/XML/1998/namespace\"", "")
+                ; // error on line 3 at column 352: xml namespace URI mapped to wrong prefix fix
         }
 
         public System.Drawing.Bitmap BitMap(int width = defaultImageWidth)
@@ -223,7 +231,6 @@ namespace HlidacStatu.KIndexGenerator
             //el.RenderElement(SvgRenderer.FromImage(bitmap));
 
             //return bitmap;
-
         }
     }
 }

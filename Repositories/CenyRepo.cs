@@ -9,7 +9,7 @@ namespace HlidacStatu.Repositories
     {
         public static async Task<List<Cena>> GetAllCenyAsync()
         {
-            using (var db = new DbEntities())
+            await using (var db = new DbEntities())
             {
                 return await db.Ceny.AsQueryable()
                     .ToListAsync();

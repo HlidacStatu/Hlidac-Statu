@@ -20,7 +20,7 @@
     }
 
     bool sectionBgSwitch = false;
-    using (var db = new HlidacStatu.Entities.DbEntities())
+    await using (var db = new HlidacStatu.Entities.DbEntities())
     {
         if (!string.IsNullOrWhiteSpace(k1))
         {

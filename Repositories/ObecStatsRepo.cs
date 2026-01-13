@@ -12,7 +12,7 @@ public class ObecStatsRepo
     {
 
         var obecStats = new ObecStats();
-        using (DbEntities db = new DbEntities())
+        await using (DbEntities db = new DbEntities())
         {
             obecStats.Obec = await db.ObceZUJ.FirstOrDefaultAsync(m => m.Ico == obecIco);
             if (obecStats.Obec == null)

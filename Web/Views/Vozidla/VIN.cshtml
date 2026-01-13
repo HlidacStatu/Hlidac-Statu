@@ -80,8 +80,7 @@
 }
 
 @{
-
-    using var db = new dbCtx();
+    await using var db = new dbCtx();
     TechnickeProhlidky[] technickeProhlidky = db.TechnickeProhlidky
                             .AsNoTracking()
                             .Where(v => v.Pcv == vozidlo.Pcv)

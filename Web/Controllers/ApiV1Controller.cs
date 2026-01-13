@@ -121,7 +121,7 @@ namespace HlidacStatu.Web.Controllers
 
             var userEmail = HttpContext.User.Identity.Name;
 
-            using (DbEntities db = new())
+            await using (DbEntities db = new())
             {
                 if (string.IsNullOrEmpty(id))
                 {

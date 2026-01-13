@@ -181,7 +181,7 @@ public static class GzipArchiveExtractor
         var destinationFullPath = Path.GetFullPath(destinationDirectory);
 
         await using var tarStream = new MemoryStream(tarData);
-        using var tarReader = new TarReader(tarStream);
+        await using var tarReader = new TarReader(tarStream);
 
         var entryIndex = 0;
 
