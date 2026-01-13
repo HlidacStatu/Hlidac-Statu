@@ -39,10 +39,6 @@
     <PackageReference Include="System.Security.Cryptography.Pkcs" Version="9.0.7" />
     <PackageReference Include="System.Text.Encoding.CodePages" Version="8.0.0" />
     <PackageReference Include="ZiggyCreatures.FusionCache" Version="2.4.0" />
-      <PackageReference Include="Microsoft.VisualStudio.Threading.Analyzers" Version="17.14.15">
-          <PrivateAssets>all</PrivateAssets>
-          <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
-      </PackageReference>
   </ItemGroup>
   <ItemGroup>
     <WCFMetadataStorage Include="Temp\Connected Services\Data.External.NespolehlivyPlatceDPH" />

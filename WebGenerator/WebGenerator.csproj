@@ -71,37 +71,6 @@
 	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 	  </None>
 	</ItemGroup>
-
-	<ItemGroup>
-	  <AdditionalFiles Remove="C:\Users\micha\.nuget\packages\microsoft.visualstudio.threading.analyzers\17.14.15\buildTransitive\AdditionalFiles\vs-threading.LegacyThreadSwitchingMembers.txt" />
-	</ItemGroup>
-
-	<ItemGroup>
-	  <AdditionalFiles Remove="C:\Users\micha\.nuget\packages\microsoft.visualstudio.threading.analyzers\17.14.15\buildTransitive\AdditionalFiles\vs-threading.MainThreadAssertingMethods.txt" />
-	</ItemGroup>
-
-	<ItemGroup>
-	  <AdditionalFiles Remove="C:\Users\micha\.nuget\packages\microsoft.visualstudio.threading.analyzers\17.14.15\buildTransitive\AdditionalFiles\vs-threading.MainThreadSwitchingMethods.txt" />
-	</ItemGroup>
-
-	<ItemGroup>
-	  <AdditionalFiles Remove="C:\Users\micha\.nuget\packages\microsoft.visualstudio.threading.analyzers\17.14.15\buildTransitive\AdditionalFiles\vs-threading.MembersRequiringMainThread.txt" />
-	</ItemGroup>
-
-	<ItemGroup>
-	  <AdditionalFiles Remove="C:\Users\micha\.nuget\packages\microsoft.visualstudio.threading.analyzers\17.14.15\buildTransitive\AdditionalFiles\vs-threading.LegacyThreadSwitchingMembers.txt" />
-	</ItemGroup>
-
-	<ItemGroup>
-	  <AdditionalFiles Remove="C:\Users\micha\.nuget\packages\microsoft.visualstudio.threading.analyzers\17.14.15\buildTransitive\AdditionalFiles\vs-threading.MainThreadAssertingMethods.txt" />
-	</ItemGroup>
-
-	<ItemGroup>
-	  <AdditionalFiles Remove="C:\Users\micha\.nuget\packages\microsoft.visualstudio.threading.analyzers\17.14.15\buildTransitive\AdditionalFiles\vs-threading.MainThreadSwitchingMethods.txt" />
-	</ItemGroup>
-
-	<ItemGroup>
-	  <AdditionalFiles Remove="C:\Users\micha\.nuget\packages\microsoft.visualstudio.threading.analyzers\17.14.15\buildTransitive\AdditionalFiles\vs-threading.MembersRequiringMainThread.txt" />
-	</ItemGroup>
+    
 
 </Project>
