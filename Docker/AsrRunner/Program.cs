@@ -173,7 +173,7 @@ while (!applicationCts.IsCancellationRequested)
 }
 
 logger.Information("Terminating application.");
-Log.CloseAndFlush();
+await Log.CloseAndFlushAsync();
 
 void Cleanup()
 {

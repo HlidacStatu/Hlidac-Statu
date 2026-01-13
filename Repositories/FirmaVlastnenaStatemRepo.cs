@@ -455,7 +455,7 @@ and (esa2010 in (" + string.Join(",", vzdySoukr_ESA2010.Select(m => $"'{m}'")) +
                     net.Timeout = 60 * 10 * 1000;
                     var bin = net.GetBinary();
                     System.IO.File.Delete(fn);
-                    System.IO.File.WriteAllBytes(fn, bin.Binary);
+                    await System.IO.File.WriteAllBytesAsync(fn, bin.Binary);
                 }
             }
             catch (Exception e)
@@ -476,7 +476,7 @@ and (esa2010 in (" + string.Join(",", vzdySoukr_ESA2010.Select(m => $"'{m}'")) +
                     net.Timeout = 60 * 10 * 1000;
                     var bin = net.GetBinary();
                     System.IO.File.Delete(fn2);
-                    System.IO.File.WriteAllBytes(fn2, bin.Binary);
+                    await System.IO.File.WriteAllBytesAsync(fn2, bin.Binary);
                 }
             }
             catch (Exception e)

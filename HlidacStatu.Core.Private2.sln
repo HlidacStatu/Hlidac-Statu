@@ -153,13 +153,14 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "public", "public", "{8DFECE
 		Directory.Build.props = Directory.Build.props
 		nuget.config = nuget.config
 		README.MD = README.MD
-		..\Hlidac-Statu-Private\.editorconfig = ..\Hlidac-Statu-Private\.editorconfig
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "private", "private", "{131AAA92-76B1-4D68-9410-7B52810BC976}"
 	ProjectSection(SolutionItems) = preProject
 		..\Hlidac-Statu-Private\.gitattributes = ..\Hlidac-Statu-Private\.gitattributes
 		..\Hlidac-Statu-Private\.gitignore = ..\Hlidac-Statu-Private\.gitignore
+		..\Hlidac-Statu-Private\.editorconfig = ..\Hlidac-Statu-Private\.editorconfig
+		..\Hlidac-Statu-Private\Directory.Build.props = ..\Hlidac-Statu-Private\Directory.Build.props
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "private documentation", "private documentation", "{075BD6B5-0F35-448E-95B7-A0A865FF18DE}"

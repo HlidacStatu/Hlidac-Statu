@@ -157,10 +157,10 @@ namespace HlidacStatuApi.Controllers.ApiV2
                     Done = null,
                     WaitForPK = item.Pk
                 };
-                using (DbEntities db = new DbEntities())
+                await using (DbEntities db = new DbEntities())
                 {
                     db.ItemToOcrQueue.Add(secondItem);
-                    db.SaveChanges();
+                    await db.SaveChangesAsync();
                 }
                 task.docs = task.docs.Take(50).ToArray();
             }

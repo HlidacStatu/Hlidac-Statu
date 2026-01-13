@@ -171,7 +171,7 @@ namespace HlidacStatu.Datasets
             for (int i = 1; i < 99; i++)
             {
                 var _dsId = $"hs-data_{datasetId}-{i:00}";
-                var delRes = idxClient.Indices.Delete(_dsId);
+                var delRes = await idxClient.Indices.DeleteAsync(_dsId);
                 if (delRes.IsValid == false)
                     break;
             }

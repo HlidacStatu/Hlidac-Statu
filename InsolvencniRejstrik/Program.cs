@@ -121,7 +121,7 @@ using HlidacStatu.Entities.Insolvence;
 
 					foreach (var file in Directory.EnumerateFiles(dir))
 					{
-						var rizeni = JsonConvert.DeserializeObject<Rizeni>(File.ReadAllText(file));
+						var rizeni = JsonConvert.DeserializeObject<Rizeni>(await File.ReadAllTextAsync(file));
 						await repository.SetInsolvencyProceedingAsync(rizeni);
 						if (++count % 100 == 0)
 						{

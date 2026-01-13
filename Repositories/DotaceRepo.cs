@@ -227,63 +227,11 @@ namespace HlidacStatu.Repositories
             var tasks = originalSubsidyIds.Select(async originalSubsidyId =>
             {
                 await semaphore.WaitAsync();
+                Console.WriteLine(
+                    $"Remaining to process: {totalCount - Interlocked.Increment(ref processedCount)}");
                 try
                 {
-                    Console.WriteLine(
-                        $"Remaining to process: {totalCount - Interlocked.Increment(ref processedCount)}");
-
-                    Dotace dotaceRecord = new Dotace();
-
-                    var originalSubsidy = await SubsidyRepo.GetAsync(originalSubsidyId);
-
-                    FixRecipientFromRawData(originalSubsidy);
-                    dotaceRecord.UpdateFromSubsidy(originalSubsidy);
-
-                    //update missing data from subsidy duplicates
-                    foreach (var duplicateId in originalSubsidy.Hints.Duplicates)
-                    {
-                        if (dotaceRecord.SourceIds.Contains(duplicateId))
-                            continue;
-
-                        var duplicateSubsidy = await SubsidyRepo.GetAsync(duplicateId);
-                        FixRecipientFromRawData(duplicateSubsidy);
-                        dotaceRecord.UpdateFromSubsidy(duplicateSubsidy);
-                    }
-
-                    try
-                    {
-                        bool isNew = false;
-                        bool isChanged = false;
-
-                        if (rewriteAll == false)
-                        {
-                            //check if dotace exists
-                            var dotaceOrig = await DotaceRepo.GetAsync(dotaceRecord.Id);
-                            if (dotaceOrig == null)
-                            {
-                                isNew = true;
-                            }
-                            else
-                            {
-                                isChanged = IsDotaceChanged(dotaceOrig, dotaceRecord);
-                            }
-                        }
-
-                        if (rewriteAll || isNew || isChanged)
-                        {
-                            await SaveAsync(dotaceRecord);
-
-                            //add to statistics
-                            RecalculateItem.DotaceOptions.ChangeEnum ce = isChanged
-                                ? RecalculateItem.DotaceOptions.ChangeEnum.Update
-                                : RecalculateItem.DotaceOptions.ChangeEnum.Insert;
-                            AddToProcessingQueue(dotaceRecord, ce);
-                        }
-                    }
-                    catch (Exception e)
-                    {
-                        Logger.Error(e, $"Failed to save dotace for {originalSubsidy.Id}");
-                    }
+                    await MergeSubsidyToDotaceAsync(originalSubsidyId, rewriteAll);
                 }
                 catch (Exception e)
                 {
@@ -296,6 +244,62 @@ namespace HlidacStatu.Repositories
             }).ToList();
 
             await Task.WhenAll(tasks);
+        }
+
+        public static async Task MergeSubsidyToDotaceAsync(string originalSubsidyId, bool rewriteAll)
+        {
+            Dotace dotaceRecord = new Dotace();
+
+            var originalSubsidy = await SubsidyRepo.GetAsync(originalSubsidyId);
+
+            FixRecipientFromRawData(originalSubsidy);
+            dotaceRecord.UpdateFromSubsidy(originalSubsidy);
+
+            //update missing data from subsidy duplicates
+            foreach (var duplicateId in originalSubsidy.Hints.Duplicates)
+            {
+                if (dotaceRecord.SourceIds.Contains(duplicateId))
+                    continue;
+
+                var duplicateSubsidy = await SubsidyRepo.GetAsync(duplicateId);
+                FixRecipientFromRawData(duplicateSubsidy);
+                dotaceRecord.UpdateFromSubsidy(duplicateSubsidy);
+            }
+
+            try
+            {
+                bool isNew = false;
+                bool isChanged = false;
+
+                if (rewriteAll == false)
+                {
+                    //check if dotace exists
+                    var dotaceOrig = await DotaceRepo.GetAsync(dotaceRecord.Id);
+                    if (dotaceOrig == null)
+                    {
+                        isNew = true;
+                    }
+                    else
+                    {
+                        isChanged = IsDotaceChanged(dotaceOrig, dotaceRecord);
+                    }
+                }
+
+                if (rewriteAll || isNew || isChanged)
+                {
+                    await SaveAsync(dotaceRecord);
+
+                    //add to statistics
+                    RecalculateItem.DotaceOptions.ChangeEnum ce = isChanged
+                        ? RecalculateItem.DotaceOptions.ChangeEnum.Update
+                        : RecalculateItem.DotaceOptions.ChangeEnum.Insert;
+                    AddToProcessingQueue(dotaceRecord, ce);
+                }
+            }
+            catch (Exception e)
+            {
+                Logger.Error(e, $"Failed to save dotace for {originalSubsidy.Id}");
+            }
         }
 
         public static bool IsDotaceChanged(Dotace dotaceOriginal, Dotace dotaceNew)

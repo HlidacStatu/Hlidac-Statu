@@ -86,10 +86,15 @@ namespace InsolvencniRejstrik.ByEvents
 				if (!seekEnabled)
 				{
 					var ids = id.ToString();
-					foreach (var item in File.ReadLines(CacheFile).SkipWhile(l => IsNotEqual(l, ids)).Select(l => WsResult.From(l)))
+					await foreach (var item in File.ReadLinesAsync(CacheFile))
 					{
-						yield return item;
-						latestId = item.Id;
+						if(IsNotEqual(item, ids))
+							continue;
+
+						var wsresult = WsResult.From(item);
+						
+						yield return wsresult;
+						latestId = wsresult.Id;
 					}
 				}
 			}

@@ -70,7 +70,7 @@ try
 
     app.MapControllers();
     
-    app.Run();
+    await app.RunAsync();
     return 0;
 }
 catch (Exception exception)
@@ -80,5 +80,5 @@ catch (Exception exception)
 }
 finally
 {
-    Log.CloseAndFlush();
+    await Log.CloseAndFlushAsync();
 }

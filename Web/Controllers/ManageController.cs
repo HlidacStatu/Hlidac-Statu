@@ -567,8 +567,8 @@ namespace HlidacStatu.Web.Controllers
                         if (data != null && facesFiles.Length > 0)
                         {
                             if (!string.IsNullOrWhiteSpace(source))
-                                System.IO.File.WriteAllText(pathTxt, source);
-                            System.IO.File.WriteAllBytes(path, data);
+                                await System.IO.File.WriteAllTextAsync(pathTxt, source);
+                            await System.IO.File.WriteAllBytesAsync(path, data);
                         }
                     }
                     catch (Exception e)

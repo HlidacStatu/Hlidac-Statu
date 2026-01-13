@@ -473,7 +473,7 @@ namespace HlidacStatu.Web.Controllers
                     var path = uTmp.GetFullPath(fileId.ToString(), fileId.ToString() + ".csv");
                     using (var fileStream = new FileStream(path, FileMode.Create))
                     {
-                        file.CopyTo(fileStream);
+                        await file.CopyToAsync(fileStream);
                     }
                     return RedirectToAction("ImportData", new { id = ds.DatasetId, fileId = fileId, delimiter = CreateSimpleModel.GetValidDelimiter(delimiter) });
                 }
@@ -481,7 +481,7 @@ namespace HlidacStatu.Web.Controllers
             else
             {
                 var path = uTmp.GetFullPath(fileId.ToString(), fileId.ToString() + ".csv");
-                System.IO.File.WriteAllText(path, data);
+                await System.IO.File.WriteAllTextAsync(path, data);
                 return RedirectToAction("ImportData", new { id = ds.DatasetId, fileId = fileId, delimiter = "auto" });
             }
         }

@@ -1153,7 +1153,7 @@ namespace HlidacStatu.Datasets
             else
             {
                 req = new GetRequest(client.ConnectionSettings.DefaultIndex, Id);
-                res = client.Get<object>(req);
+                res = await client.GetAsync<object>(req);
                 if (res.Found)
                     return JsonConvert.SerializeObject(res.Source);
                 else

@@ -58,13 +58,13 @@ namespace HlidacStatu.Web.HealthChecks
                     if (options.ExpectedAddresses?.Length > 0)
                     {
                         //GET /_cat/runningNodes?v&h=m,name,ip,u&s=name
-                        var catr = _client.LowLevel.Cat.Nodes<Elasticsearch.Net.StringResponse>(
+                        var catr = (await _client.LowLevel.Cat.NodesAsync<Elasticsearch.Net.StringResponse>(
                                 new Elasticsearch.Net.Specification.CatApi.CatNodesRequestParameters()
                                 {
                                     Headers = new[] { "ip" },
                                     Verbose = true
                                 }
-                            ).Body;
+                            )).Body;
                         string[] runningNodes = catr.Split(new char[] { '\n' }, StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
                         string missingExpected = string.Join(", ", options.ExpectedAddresses.Except(runningNodes)).Trim();
                         string notExpected = string.Join(", ", runningNodes.Except(options.ExpectedAddresses)).Trim();

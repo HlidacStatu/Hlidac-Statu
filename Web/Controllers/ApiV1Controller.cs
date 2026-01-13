@@ -399,19 +399,19 @@ namespace HlidacStatu.Web.Controllers
             try
             {
                 var client = Manager.GetESClient();
-                res = client.Cluster.Health();
+                res = await client.Cluster.HealthAsync();
                 num = res?.NumberOfNodes ?? 0;
                 status = res?.Status.ToString() ?? "unknown";
 
                 //GET /_cat/nodes?v&h=m,name,ip,u&s=name
-                var catr = client.LowLevel.Cat.Nodes<Elasticsearch.Net.StringResponse>(
+                var catr = (await client.LowLevel.Cat.NodesAsync<Elasticsearch.Net.StringResponse>(
                         new Elasticsearch.Net.Specification.CatApi.CatNodesRequestParameters()
                         {
                             Headers = new[] { "m", "name", "ip", "u" },
                             SortByColumns = new[] { "name" },
                             Verbose = true
                         }
-                    ).Body
+                    )).Body
                     ?.Replace("10.10.", "");
 
                 nodes = nodes + catr;

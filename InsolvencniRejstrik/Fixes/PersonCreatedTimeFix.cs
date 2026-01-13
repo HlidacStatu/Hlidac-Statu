@@ -71,7 +71,7 @@ namespace InsolvencniRejstrik.Fixes
 			{
 				Console.WriteLine("Cteni dat z cache ...");
 
-				foreach (var line in File.ReadLines(cacheFile))
+				await foreach (var line in File.ReadLinesAsync(cacheFile))
 				{
 					var item = WsResult.From(line);
 					Lines++;

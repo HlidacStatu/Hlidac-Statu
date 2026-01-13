@@ -372,11 +372,11 @@ namespace HlidacStatu.Web.Controllers
                 {
                     var noBackGr = await HlidacStatu.AI.Photo.RemoveBackgroundAsync(
                         new Uri(Devmasters.Config.GetWebConfigValue("RemoveBackgroundAPI")),
-                        System.IO.File.ReadAllBytes(o.GetPhotoPath()),
+                        await System.IO.File.ReadAllBytesAsync(o.GetPhotoPath()),
                         AI.Photo.RemoveBackgroundStyles.Person);
                     if (noBackGr != null)
                     {
-                        System.IO.File.WriteAllBytes(o.GetPhotoPath(Entities.Osoba.PhotoTypes.NoBackground, true),
+                        await System.IO.File.WriteAllBytesAsync(o.GetPhotoPath(Entities.Osoba.PhotoTypes.NoBackground, true),
                             noBackGr);
                         return new JsonResult(true);
                     }
