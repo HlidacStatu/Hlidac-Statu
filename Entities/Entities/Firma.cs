@@ -37,10 +37,10 @@ namespace HlidacStatu.Entities
             Obec = 20
         }
 
-        public static Func<Firma,bool> SoukromySubjektPredicate => (f)=>f.Typ <= (int)TypSubjektuEnum.Soukromy;
-        public static Func<Firma, bool> StatniFirmaPredicate => (f) => (f.Typ == (int)TypSubjektuEnum.PatrimStatu);
-        public static Func<Firma, bool> PatrimStatuPredicate => (f) => (f.Typ >= (int)TypSubjektuEnum.PatrimStatu );
-        public static Func<Firma, bool> OVMSubjektPredicate => (f) => (f.Typ >= (int)TypSubjektuEnum.Ovm);
+        public static Func<Firma, bool> SoukromySubjektPredicate => (f) => f is not null && f.Typ <= (int)TypSubjektuEnum.Soukromy;
+        public static Func<Firma, bool> StatniFirmaPredicate => (f) => (f is not null && f.Typ == (int)TypSubjektuEnum.PatrimStatu);
+        public static Func<Firma, bool> PatrimStatuPredicate => (f) => (f is not null && f.Typ >= (int)TypSubjektuEnum.PatrimStatu );
+        public static Func<Firma, bool> OVMSubjektPredicate => (f) => (f is not null && f.Typ >= (int)TypSubjektuEnum.Ovm);
 
 
         public static string TypSubjektuDescription(int? typ, int pad, bool jednotne = true)
