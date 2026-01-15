@@ -1123,6 +1123,23 @@ namespace HlidacStatu.Extensions
             return infofacts;
         }
 
+        public static async Task<InfoFact?> GetTwoSponzoringInfoFactsForFirmaAsync(this Firma firma)
+        {
+            if (firma == null) 
+                return null;
+            
+            var sponsoring = (await firma.SponzoringAsync())
+                .OrderByDescending(s => s.DarovanoDne)
+                .Take(2);
+
+            var htmlItems = new List<string>();
+            foreach (var s in sponsoring)
+            {
+                htmlItems.Add(await s.ToHtmlAsync());
+            }
+
+            return new InfoFact($"{firma.Jmeno}: " + string.Join("<br />", htmlItems), Fact.ImportanceLevel.Medium);
+        }
 
 
     }

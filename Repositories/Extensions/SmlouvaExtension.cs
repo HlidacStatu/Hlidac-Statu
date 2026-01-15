@@ -45,15 +45,11 @@ namespace HlidacStatu.Extensions
                 var firma = Firmy.Get(subj.ico);
                 if (firma?.Valid == true && await firma.IsSponzorAsync() && firma.JsemSoukromaFirma())
                 {
-                    f.Add(new InfoFact(
-                        $"{firma.Jmeno}: " +
-                        string.Join("<br />",
-                            (await firma.SponzoringAsync())
-                                .OrderByDescending(s => s.DarovanoDne)
-                                .Select(s => s.ToHtmlAsync())
-                                .Take(2)),
-                        Fact.ImportanceLevel.Medium)
-                    );
+                    var infoFact = await FirmaExtension.GetTwoSponzoringInfoFactsForFirmaAsync(firma);
+                    if (infoFact != null)
+                    {
+                        f.Add(infoFact);
+                    }
                 }
             }
 

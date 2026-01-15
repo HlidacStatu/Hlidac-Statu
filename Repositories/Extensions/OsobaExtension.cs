@@ -145,13 +145,18 @@ namespace HlidacStatu.Extensions
             Expression<Func<Sponzoring, bool>> all = e => true;
 
             sponzoringFilter = sponzoringFilter ?? all;
-            return
-                string.Format(template, string.Join(itemDelimeter,
-                    (await osoba.SponzoringAsync(sponzoringFilter, withCompany: withCompany))
-                        .OrderByDescending(s => s.DarovanoDne)
-                        .Select(s => s.ToHtmlAsync(itemTemplate))
-                        .Take(take))
-                );
+            
+            var sponsoring = (await osoba.SponzoringAsync(sponzoringFilter, withCompany: withCompany))
+                .OrderByDescending(s => s.DarovanoDne)
+                .Take(take);
+
+            var htmlItems = new List<string>();
+            foreach (var s in sponsoring)
+            {
+                htmlItems.Add(await s.ToHtmlAsync(itemTemplate));
+            }
+
+            return string.Format(template, string.Join(itemDelimeter, htmlItems));
         }
 
         public static IEnumerable<OsobaEvent> Events(this Osoba osoba)
