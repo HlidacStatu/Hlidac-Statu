@@ -1045,21 +1045,31 @@ namespace HlidacStatu.Repositories
             else
                 firstBatch = relations.Where(m => m.From?.UniqId == parent.To?.UniqId);
 
-            var rels = firstBatch
+            
+            
+            var mergedGroups = firstBatch
                 .Distinct()
                 .GroupBy(k => new { id = k.To.UniqId, type = k.To.Type }, (k, v) =>
                 {
-                    HlidacStatu.DS.Graphs.Graph.MergedEdge withChildren =
-                        HlidacStatu.DS.Graphs.Graph.Edge.MergeSameEdges(v);
-                    if (withChildren == null)
-                        withChildren = new HlidacStatu.DS.Graphs.Graph.MergedEdge(v.First());
-
-                    return withChildren;
+                    var withChildren = HlidacStatu.DS.Graphs.Graph.Edge.MergeSameEdges(v);
+                    return withChildren ?? new HlidacStatu.DS.Graphs.Graph.MergedEdge(v.First());
                 })
-                .OrderBy(m => m.To.PrintNameAsync())
                 .ToArray();
+            
+            var edgesWithNames = new List<(HlidacStatu.DS.Graphs.Graph.MergedEdge Edge, string SortName)>();
+            foreach (var edge in mergedGroups)
+            {
+                var name = await edge.To.PrintNameAsync();
+                edgesWithNames.Add((edge, name));
+            }
 
-            if (rels.Count() == 0)
+            var rels = edgesWithNames
+                .OrderBy(x => x.SortName)
+                .Select(x => x.Edge)
+                .ToArray();
+            
+
+            if (!rels.Any())
                 return string.Empty;
 
             StringBuilder sb = new StringBuilder(512);
