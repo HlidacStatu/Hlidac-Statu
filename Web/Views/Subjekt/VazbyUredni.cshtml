@@ -74,7 +74,7 @@
         {
             <div>
                 <h4><a href="@Url.Action("Index", "Subjekt", new { id = vPerIco.ICO })">@vPerIco.FirmaName</a></h4>
-                @Html.RenderVazby(vPerIco.VazbyPerIco)
+                @await Html.RenderVazbyAsync(vPerIco.VazbyPerIco)
 
 
             </div>

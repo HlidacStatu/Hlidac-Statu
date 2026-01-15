@@ -112,7 +112,7 @@
 
                 </td>
                 <td>
-                    @Html.RenderVazby(await OsobaVazbyRepo.VazbyProIcoCachedAsync(Model, ico))
+                    @await Html.RenderVazbyAsync(await OsobaVazbyRepo.VazbyProIcoCachedAsync(Model, ico))
                 </td>
             </tr>
         }

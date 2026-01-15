@@ -77,7 +77,7 @@ window.onload = function() {{
         {
             var sb = new StringBuilder();
 
-            var fname = $"<a href='{Firma.GetUrl(v.To.Id, true)}'>{v.To.PrintNameAsync()}</a>";
+            var fname = $"<a href='{Firma.GetUrl(v.To.Id, true)}'>{await v.To.PrintNameAsync()}</a>";
             
             if (string.IsNullOrEmpty(await v.To.PrintNameAsync()))
             {

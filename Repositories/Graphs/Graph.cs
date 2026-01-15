@@ -1202,7 +1202,7 @@ namespace HlidacStatu.Repositories
             }
         }
 
-        public static string ExportTabData(IEnumerable<HlidacStatu.DS.Graphs.Graph.Edge> data)
+        public static async Task<string> ExportTabDataAsync(IEnumerable<HlidacStatu.DS.Graphs.Graph.Edge> data)
         {
             if (data == null)
                 return "";
@@ -1213,8 +1213,17 @@ namespace HlidacStatu.Repositories
 
             foreach (var i in data)
             {
+                string fromName = "";
+                string toName = "";
+                
+                if (i.From != null)
+                    fromName = await i.From.PrintNameAsync();
+                
+                if (i.To != null)
+                    toName = await i.To.PrintNameAsync();
+                    
                 sb.AppendFormat(
-                    $"{i.From?.Id}\t{i.From?.PrintNameAsync()}\t{i.To?.Id}\t{i.To?.PrintNameAsync()}\t{i.RelFrom?.ToShortDateString() ?? "Ø"}\t{i.RelTo?.ToShortDateString() ?? "Ø"}\t{i.Descr}\n");
+                    $"{i.From?.Id}\t{fromName}\t{i.To?.Id}\t{toName}\t{i.RelFrom?.ToShortDateString() ?? "Ø"}\t{i.RelTo?.ToShortDateString() ?? "Ø"}\t{i.Descr}\n");
             }
 
             return sb.ToString();

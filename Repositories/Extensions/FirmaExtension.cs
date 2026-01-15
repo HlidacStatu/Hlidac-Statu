@@ -571,12 +571,17 @@ namespace HlidacStatu.Extensions
         public static async Task<string> SponzoringToHtmlAsync(this Firma firma, int take = int.MaxValue)
         {
             if (firma == null)
-                return string.Empty;    
-            return string.Join("<br />",
-                (await firma.SponzoringAsync())
-                    .OrderByDescending(s => s.DarovanoDne)
-                    .Select(s => s.ToHtmlAsync())
-                    .Take(take));
+                return string.Empty;
+
+            var htmlItems = new List<string>();
+            foreach (var s in (await firma.SponzoringAsync())
+                     .OrderByDescending(s => s.DarovanoDne)
+                     .Take(take))
+            {
+                htmlItems.Add(await s.ToHtmlAsync());
+            }
+
+            return string.Join("<br />", htmlItems);
         }
 
         private static async Task<OsobaEvent[]> EventsAsync(this Firma firma, Expression<Func<OsobaEvent, bool>> predicate)

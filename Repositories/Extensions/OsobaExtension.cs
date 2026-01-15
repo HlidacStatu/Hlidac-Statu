@@ -60,14 +60,13 @@ namespace HlidacStatu.Extensions
                 Photo_Url = osoba.HasPhoto() ? osoba.GetPhotoUrl(false) : null,
                 Current_Political_Party = party ?? "None",
                 Have_More_Details = true,
-                //TODO zvazit pridani vazeb urednich
-                Involved_In_Companies_Count = (await osoba.AktualniVazbyAsync( DS.Graphs.Relation.CharakterVazbyEnum.VlastnictviKontrola, DS.Graphs.Relation.AktualnostType.Nedavny))
-                        .Where(v => v.To != null && v.To.Type == HlidacStatu.DS.Graphs.Graph.Node.NodeType.Company)
-                        .GroupBy(f => f.To.Id, v => v, (ico, v) => new
-                        {
-                            ICO = ico,
-                            FirmaName = v.First().To.PrintNameAsync(),//HlidacStatu.Lib.Data.External.FirmyDB.NameFromIco(ico, true),
-                        }).Count(),
+                Involved_In_Companies_Count = (await osoba.AktualniVazbyAsync(
+                        DS.Graphs.Relation.CharakterVazbyEnum.VlastnictviKontrola, 
+                        DS.Graphs.Relation.AktualnostType.Nedavny))
+                    .Where(v => v.To != null && v.To.Type == HlidacStatu.DS.Graphs.Graph.Node.NodeType.Company)
+                    .Select(v => v.To.Id)
+                    .Distinct()
+                    .Count()
             };
             return res;
         }
