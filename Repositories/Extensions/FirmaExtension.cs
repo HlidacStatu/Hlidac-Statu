@@ -431,6 +431,8 @@ namespace HlidacStatu.Extensions
             else
                 return (null, null, null);
         }
+        
+        
         public static async Task<(Osoba Osoba, DateTime? From, DateTime? To, string Role)[]> CeosAsync(
             this Firma firma, DateTime? fromDate, DateTime? toDate,
             Expression<Func<OsobaEvent, bool>> predicate = null)

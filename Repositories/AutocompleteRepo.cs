@@ -255,8 +255,7 @@ namespace HlidacStatu.Repositories
         }
 
         //úřady
-        private static async Task<List<Autocomplete>> LoadAuthoritiesAsync(Action<string> logOutputFunc = null,
-            IProgressWriter progressOutputFunc = null)
+        private static async Task<List<Autocomplete>> LoadAuthoritiesAsync()
         {
             await using var db = new DbEntities();
             var sqlResult = await db.Firma.AsNoTracking()
@@ -275,15 +274,7 @@ namespace HlidacStatu.Repositories
             await Parallel.ForEachAsync(sqlResult, new ParallelOptions { MaxDegreeOfParallelism = 5 },
                 async (firma, ct) =>
                 {
-                    string img = "<i class='fas fa-university'></i>";
-
-                    var fi = Firmy.Get(firma.ICO);
-                    if (fi?.Valid == true)
-                    {
-                        var o = (await fi.CurrentCeoAsync()).Osoba;
-                        if (o != null)
-                            img = $"<img src='{o.GetPhotoUrl(false, Osoba.PhotoTypes.NoBackground)}' />";
-                    }
+                    var ceoImage = await LoadCeoImageHtmlStringAsync(firma.ICO);
 
                     bag.Add(new Autocomplete
                     {
@@ -294,7 +285,7 @@ namespace HlidacStatu.Repositories
                         Type = "úřad",
                         Description = FixKraj(firma.KrajId),
                         PriorityMultiplier = 2,
-                        ImageElement = img,
+                        ImageElement = string.IsNullOrWhiteSpace(ceoImage) ? "<i class='fas fa-university'></i>" : ceoImage,
                         KIndex = (await KIndex.GetCachedAsync(firma.ICO))?.LastKIndexLabel().ToString("G"),
                         Category = Autocomplete.CategoryEnum.Authority
                     });
@@ -328,28 +319,20 @@ namespace HlidacStatu.Repositories
         {
             var obce = await FirmaCache.GetSubjektyForOborAsync(Firma.Zatrideni.SubjektyObory.Obce);
             var bag = new ConcurrentBag<Autocomplete>();
-            await Parallel.ForEachAsync(obce, new ParallelOptions { MaxDegreeOfParallelism = 10 }, async (firma, ct) =>
+            await Parallel.ForEachAsync(obce, new ParallelOptions { MaxDegreeOfParallelism = 5 }, async (firma, ct) =>
             {
-                string img = "<i class='fas fa-city'></i>";
-
-                var fi = Firmy.Get(firma.Ico);
-                if (fi?.Valid == true)
-                {
-                    var o = (await fi.CurrentCeoAsync()).Osoba;
-                    if (o != null)
-                        img = $"<img src='{o.GetPhotoUrl(false, Osoba.PhotoTypes.NoBackground)}' />";
-                }
+                var ceoImage = await LoadCeoImageHtmlStringAsync(firma.Ico);
 
                 var synonyms = new Autocomplete[2];
                 synonyms[0] = new Autocomplete()
                 {
-                    Id = $"ico:{fi.ICO}",
-                    Text = fi.Jmeno,
-                    AdditionalHiddenSearchText = fi.ICO,
+                    Id = $"ico:{firma.Ico}",
+                    Text = firma.Jmeno,
+                    AdditionalHiddenSearchText = firma.Ico,
                     Type = "obec",
                     Description = firma.Kraj,
                     PriorityMultiplier = 2,
-                    ImageElement = img,
+                    ImageElement = string.IsNullOrWhiteSpace(ceoImage)? "<i class='fas fa-city'></i>" : ceoImage,
                     Category = Autocomplete.CategoryEnum.City
                 };
                 synonyms[1] = synonyms[0].Clone();
@@ -371,28 +354,19 @@ namespace HlidacStatu.Repositories
         {
             var kraje = await FirmaCache.GetSubjektyForOborAsync(Firma.Zatrideni.SubjektyObory.Kraje_Praha);
             var bag = new ConcurrentBag<Autocomplete>();
-            await Parallel.ForEachAsync(kraje, new ParallelOptions { MaxDegreeOfParallelism = 10 }, async (firma, ct) =>
+            await Parallel.ForEachAsync(kraje, new ParallelOptions { MaxDegreeOfParallelism = 5 }, async (firma, ct) =>
             {
-                string img = "<i class='fas fa-city'></i>";
-
-                var fi = Firmy.Get(firma.Ico);
-                if (fi?.Valid == true)
-                {
-                    var o = (await fi.CurrentCeoAsync()).Osoba;
-                    if (o != null)
-                        img = $"<img src='{o.GetPhotoUrl(false, Osoba.PhotoTypes.NoBackground)}' />";
-                }
+                var ceoImage = await LoadCeoImageHtmlStringAsync(firma.Ico);
 
                 var acKraje = new Autocomplete()
                 {
-                    Id = $"ico:{fi.ICO}",
-                    Text = fi.Jmeno,
-                    AdditionalHiddenSearchText = fi.ICO,
+                    Id = $"ico:{firma.Ico}",
+                    Text = firma.Jmeno,
+                    AdditionalHiddenSearchText = firma.Ico,
                     Type = "kraj",
                     Description = firma.Kraj,
                     PriorityMultiplier = 2,
-                    ImageElement = img,
-                    Category = Autocomplete.CategoryEnum.City
+                    ImageElement = string.IsNullOrWhiteSpace(ceoImage) ? "<i class='fas fa-city'></i>" : ceoImage,                    Category = Autocomplete.CategoryEnum.City
                 };
 
                 bag.Add(acKraje);
@@ -413,7 +387,7 @@ namespace HlidacStatu.Repositories
         }
 
         //lidi
-        public static async Task<List<Autocomplete>> LoadPeopleAsync()
+        private static async Task<List<Autocomplete>> LoadPeopleAsync()
         {
             var excludedInfoFactImportanceLevels = new HashSet<Fact.ImportanceLevel>()
             {
@@ -430,7 +404,7 @@ namespace HlidacStatu.Repositories
 
             var bag = new ConcurrentBag<Autocomplete>();
             //parallelism is lowered due to the infofacts possible issues during high usage
-            await Parallel.ForEachAsync(sqlResult, new ParallelOptions { MaxDegreeOfParallelism = 5 },
+            await Parallel.ForEachAsync(sqlResult, new ParallelOptions { MaxDegreeOfParallelism = 3 },
                 async (osoba, ct) =>
                 {
                     var ac = new Autocomplete()
@@ -536,6 +510,26 @@ namespace HlidacStatu.Repositories
             };
         }
 
+
+        private static async Task<string> LoadCeoImageHtmlStringAsync(string ico)
+        {
+            try
+            {
+                var ceos = await OsobaEventRepo.GetCeosAsync(ico);
+                if (ceos.Any())
+                {
+                    var lastCeo = ceos.MaxBy(c => c.From);
+                    if(lastCeo.Osoba is not null)
+                        return $"<img src='{lastCeo.Osoba.GetPhotoUrl(false, Osoba.PhotoTypes.NoBackground)}' />";
+                }
+
+            }
+            catch (Exception e)
+            {
+                _logger.Warning(e, "Error loading ceo image for {ico}", ico);
+            }
+            return string.Empty;
+        }
 
         private static string GetNiceNameForEnum(Type enumType, string enumValue)
         {
