@@ -449,8 +449,8 @@ namespace HlidacStatu.Extensions
                 if (sponzoringPrimy != null && sponzoringPrimy.Any())
                 {
                     string[] strany = sponzoringPrimy.Select(m => m.IcoPrijemce).Distinct().ToArray();
-                    int[] roky = sponzoringPrimy.Select(m => m.DarovanoDne.Value.Year).Distinct().OrderBy(y => y)
-                        .ToArray();
+                    int?[] roky = sponzoringPrimy.Select(m => m.DarovanoDne?.Year).Where(x => x != null)
+                        .Distinct().OrderBy(y => y).ToArray();
                     decimal celkem = sponzoringPrimy.Sum(m => m.Hodnota) ?? 0;
                     decimal top = sponzoringPrimy.Max(m => m.Hodnota) ?? 0;
                     //todo: přidat tabulku politických stran a změnit zde na název strany
@@ -476,8 +476,8 @@ namespace HlidacStatu.Extensions
                 if (sponzoringPresFirmu != null && sponzoringPresFirmu.Any())
                 {
                     string[] strany = sponzoringPresFirmu.Select(m => m.IcoPrijemce).Distinct().ToArray();
-                    int[] roky = sponzoringPresFirmu.Select(m => m.DarovanoDne.Value.Year).Distinct().OrderBy(y => y)
-                        .ToArray();
+                    int?[] roky = sponzoringPresFirmu.Select(m => m.DarovanoDne?.Year).Where(x => x != null).
+                        Distinct().OrderBy(y => y).ToArray();
                     decimal celkem = sponzoringPresFirmu.Sum(m => m.Hodnota) ?? 0;
                     decimal top = sponzoringPresFirmu.Max(m => m.Hodnota) ?? 0;
                     string prvniStrana = (await FirmaRepo.FromIcoAsync(strany[0])).Jmeno;
