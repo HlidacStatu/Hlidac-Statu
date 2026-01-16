@@ -223,7 +223,7 @@ namespace JobTableEditor.Data
                         LetterCount++;
                 }
 
-                DecimalValue = Devmasters.ParseText.ToDecimal(cleanText);
+                DecimalValue = HlidacStatu.Util.TextTools.GetDecimalFromText(cleanText);
                 TextValue = cleanText;
 
             }

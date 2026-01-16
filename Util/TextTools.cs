@@ -1,19 +1,22 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
+using Devmasters;
 
 namespace HlidacStatu.Util;
 
 public static class TextTools
 {
-
     public static List<string> GetPermutations(string[] words)
     {
         return _getPermutations(words, 0, words.Length - 1)
             .Select(m => string.Join(" ", m))
             .ToList();
     }
+
     // Recursive function to generate permutations.
     static List<string[]> _getPermutations(string[] words, int start, int end)
     {
@@ -33,6 +36,7 @@ public static class TextTools
                 _swap(ref words[start], ref words[i]); // backtrack
             }
         }
+
         return result;
     }
 
@@ -72,9 +76,11 @@ public static class TextTools
         for (int i = 0; i <= n; d[i, 0] = i++)
         {
         }
+
         for (int j = 1; j <= m; d[0, j] = j++)
         {
         }
+
         for (int i = 1; i <= n; i++)
         {
             for (int j = 1; j <= m; j++)
@@ -93,7 +99,7 @@ public static class TextTools
     [Obsolete("Use IsBadChar - this is copied from .net code and should be more reliable")]
     public static bool IsValidCharacter(char c)
     {
-        return (c <= 0x2D67) &&  //odfiltrovat čínštinu,... 
+        return (c <= 0x2D67) && //odfiltrovat čínštinu,... 
                (char.IsWhiteSpace(c) ||
                 char.IsSeparator(c) ||
                 char.IsPunctuation(c) ||
@@ -140,6 +146,7 @@ public static class TextTools
                 }
             }
         }
+
         return false;
     }
 
@@ -159,5 +166,99 @@ public static class TextTools
         }
 
         return cleaned.ToString();
+    }
+
+
+    /// <summary>
+    /// Specific method - do not move to devmasters
+    /// Used in subsidies and jobtable editor
+    /// </summary>
+    public static decimal? GetDecimalFromText(this string input)
+    {
+        if (string.IsNullOrWhiteSpace(input))
+            return null;
+
+        input = input.NormalizeToNumbersOnly();
+        if (input.Length == 0)
+            return null;
+
+        // Remove all spaces upfront (spaces can only be the thousand separators)
+        input = Regex.Replace(input, @"\s", "");
+
+        // If there are no separators, parse directly
+        if (!input.Contains(",") && !input.Contains("."))
+        {
+            return decimal.Parse(input, CultureInfo.InvariantCulture);
+        }
+
+        int lastCommaIndex = input.LastIndexOf(',');
+        int lastDotIndex = input.LastIndexOf('.');
+
+        // if there are both separators, then the last one is decimal separator
+        if (lastCommaIndex > -1 && lastDotIndex > -1)
+        {
+            if (lastCommaIndex > lastDotIndex)
+            {
+                input = input.Replace(".", string.Empty).Replace(",", "."); //unify to '.' as decimal separator
+            }
+            else
+            {
+                input = input.Replace(",", string.Empty);
+            }
+
+            return decimal.Parse(input, CultureInfo.InvariantCulture);
+        }
+
+        //then there is only one separator
+        int commaCount = CharCount(input, ',');
+        int dotCount = CharCount(input, '.');
+
+        // separator is used once => there are no decimals
+        if (commaCount > 1 || dotCount > 1)
+        {
+            input = input.Replace(".", string.Empty).Replace(",", string.Empty);
+            return decimal.Parse(input, CultureInfo.InvariantCulture);
+        }
+
+        // unify separator to '.'
+        if (lastCommaIndex > -1)
+        {
+            input = input.Replace(",", ".");
+        }
+
+        // If any other case, then use try parse and return null
+        // Check if '.' is exactly three digits from the start xxx.yyyyyy
+        if (input.LastIndexOf('.') == 3 && input.Length == 7)
+        {
+            // Treat as thousand separator
+            input = input.Replace(".", string.Empty);
+        }
+
+        // Attempt to parse as a decimal
+        if (decimal.TryParse(input, NumberStyles.Any, CultureInfo.InvariantCulture, out var result))
+        {
+            return result;
+        }
+
+        // If parsing fails, return null
+        return null;
+    }
+
+    public static int CharCount(ReadOnlySpan<char> input, char toFind)
+    {
+        int count = 0;
+
+        foreach (char c in input)
+        {
+            if (c == toFind)
+                count++;
+        }
+
+        return count;
+    }
+
+    public static int CharCount(string input, char toFind)
+    {
+        return CharCount(input.AsSpan(), toFind);
     }
 }
