@@ -107,10 +107,17 @@ namespace HlidacStatuApi.Controllers.ApiV2
 
             if (oo != null)
             {
-                return Content(Newtonsoft.Json.JsonConvert.SerializeObject(
-                    oo.Select(o => new { osobaid = o.NameId, jmeno = o.Jmeno, prijmeni = o.Prijmeni, politickaStrana = o.CurrentPoliticalPartyAsync() })
-                        .ToArray()
-                ), "application/json", System.Text.Encoding.UTF8);
+                var results = new List<object>();
+                foreach (var o in oo)
+                {
+                    var strana = await o.CurrentPoliticalPartyAsync();
+                    results.Add(new { osobaid = o.NameId, jmeno = o.Jmeno, prijmeni = o.Prijmeni, politickaStrana = strana });
+                }
+
+                return Content(
+                    Newtonsoft.Json.JsonConvert.SerializeObject(results), 
+                    "application/json", 
+                    System.Text.Encoding.UTF8);
             }
             else
             {

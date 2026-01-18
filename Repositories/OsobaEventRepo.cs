@@ -97,19 +97,40 @@ namespace HlidacStatu.Repositories
                 .ToArrayAsync();
 
 
-            List<(Osoba Osoba, DateTime? DatumOd, DateTime? DatumDo, string AddInfo)> ceoEventsWithOsoba = new();
-            foreach (var ce in ceoEvents)
+            // Get all unique OsobaIds
+            var osobaIds = ceoEvents.Select(ce => ce.OsobaId).Distinct().ToArray();
+    
+            // Load ALL Osoba entities in ONE query, following duplicates
+            var osobaDict = new Dictionary<int, Osoba>();
+            var osoby = await db.Osoba
+                .Where(o => osobaIds.Contains(o.InternalId))
+                .ToArrayAsync();
+    
+            foreach (var osoba in osoby)
             {
-                ceoEventsWithOsoba.Add((await OsobaRepo.GetByInternalIdAsync(ce.OsobaId), 
-                    ce.DatumOd, 
-                    ce.DatumDo,
-                    ce.AddInfo));
+                // Handle duplicates inline
+                var finalOsoba = osoba;
+                while (finalOsoba != null && finalOsoba.Status == (int)Osoba.StatusOsobyEnum.Duplicita)
+                {
+                    finalOsoba = await OsobaRepo.GetOriginalTrackedAsync(finalOsoba, db);
+                }
+                osobaDict[osoba.InternalId] = finalOsoba;
             }
 
-            if (ceoEventsWithOsoba is null)
-                return Array.Empty<(Osoba Osoba, DateTime? From, DateTime? To, string Role)>();
+            // Build result using dictionary lookup
+            var result = ceoEvents
+                .Select(ce => (
+                    Osoba: osobaDict.GetValueOrDefault(ce.OsobaId),
+                    From: ce.DatumOd,
+                    To: ce.DatumDo,
+                    Role: ce.AddInfo
+                ))
+                .ToArray();
+            
+            if (result is null)
+                return [];
 
-            return ceoEventsWithOsoba.ToArray();
+            return result;
         }
 
 

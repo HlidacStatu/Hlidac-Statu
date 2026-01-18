@@ -431,6 +431,8 @@ namespace HlidacStatu.Extensions
             else
                 return (null, null, null);
         }
+        
+        
         public static async Task<(Osoba Osoba, DateTime? From, DateTime? To, string Role)[]> CeosAsync(
             this Firma firma, DateTime? fromDate, DateTime? toDate,
             Expression<Func<OsobaEvent, bool>> predicate = null)
@@ -571,12 +573,17 @@ namespace HlidacStatu.Extensions
         public static async Task<string> SponzoringToHtmlAsync(this Firma firma, int take = int.MaxValue)
         {
             if (firma == null)
-                return string.Empty;    
-            return string.Join("<br />",
-                (await firma.SponzoringAsync())
-                    .OrderByDescending(s => s.DarovanoDne)
-                    .Select(s => s.ToHtmlAsync())
-                    .Take(take));
+                return string.Empty;
+
+            var htmlItems = new List<string>();
+            foreach (var s in (await firma.SponzoringAsync())
+                     .OrderByDescending(s => s.DarovanoDne)
+                     .Take(take))
+            {
+                htmlItems.Add(await s.ToHtmlAsync());
+            }
+
+            return string.Join("<br />", htmlItems);
         }
 
         private static async Task<OsobaEvent[]> EventsAsync(this Firma firma, Expression<Func<OsobaEvent, bool>> predicate)
@@ -1118,6 +1125,23 @@ namespace HlidacStatu.Extensions
             return infofacts;
         }
 
+        public static async Task<InfoFact?> GetTwoSponzoringInfoFactsForFirmaAsync(this Firma firma)
+        {
+            if (firma == null) 
+                return null;
+            
+            var sponsoring = (await firma.SponzoringAsync())
+                .OrderByDescending(s => s.DarovanoDne)
+                .Take(2);
+
+            var htmlItems = new List<string>();
+            foreach (var s in sponsoring)
+            {
+                htmlItems.Add(await s.ToHtmlAsync());
+            }
+
+            return new InfoFact($"{firma.Jmeno}: " + string.Join("<br />", htmlItems), Fact.ImportanceLevel.Medium);
+        }
 
 
     }

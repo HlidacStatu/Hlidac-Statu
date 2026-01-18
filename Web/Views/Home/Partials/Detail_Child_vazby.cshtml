@@ -111,7 +111,7 @@
                             <p>
                                 <strong><a href="/politik/@p.NameId">@p.FullName()</a></strong>
                             <div style="padding-left:20px;">
-                                @Html.RenderVazby(await OsobaVazbyRepo.VazbyProIcoCachedAsync(p, ss.ico))
+                                @(await Html.RenderVazbyAsync(await OsobaVazbyRepo.VazbyProIcoCachedAsync(p, ss.ico)))
                             </div>
                             </p>
                         }
@@ -140,7 +140,6 @@
                             <h3 class="card-title">@firma.Jmeno</h3>
                         </div>
                         <div class="card-body">
-                            @*@Html.Raw(firma.Description(true, m => m.Type == (int)OsobaEvent.Types.Sponzor))*@
                             @Html.Raw(await firma.SponzoringToHtmlAsync())
                         </div>
                     </div>

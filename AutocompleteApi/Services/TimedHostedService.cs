@@ -30,7 +30,7 @@ public class TimedHostedService : BackgroundService
         do
         {
             logger.Debug($"Timer triggered.");
-            await RunLoad(stoppingToken);
+            await RunLoadAsync(stoppingToken);
 
             await Task.Delay(TimeSpan.FromMinutes(3),
                 stoppingToken); // waits so that some possible stuck requests frees old indexes
@@ -39,7 +39,7 @@ public class TimedHostedService : BackgroundService
         } while (await timer.WaitForNextTickAsync(stoppingToken));
     }
 
-    private async Task RunLoad(CancellationToken stoppingToken)
+    private async Task RunLoadAsync(CancellationToken stoppingToken)
     {
         var downloadAndUpdateTasks = Enum.GetValues<AutocompleteIndexType>()
             .Select(it => DownloadAndUpdateAsync(it, stoppingToken));

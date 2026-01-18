@@ -194,7 +194,7 @@ namespace HlidacStatu.Repositories
             }
             public static async Task<Firma.Zatrideni.Item[]> GetSubjektyDirectAsync(Firma.Zatrideni.SubjektyObory obor)
             { 
-                var icos = await GetIcoDirectAsync(obor);
+                var icos = (await GetIcoDirectAsync(obor)).Where(i => i is not null).ToArray();
 
                 bool removeKraj = false;
                 switch (obor)
@@ -222,8 +222,8 @@ namespace HlidacStatu.Repositories
                     default:
                         break;
                 }
-                if (icos.Count() == 0)
-                    return new Firma.Zatrideni.Item[] { };
+                if (!icos.Any())
+                    return [];
                 else
                 {
                     var ret = new System.Collections.Generic.List<Firma.Zatrideni.Item>();

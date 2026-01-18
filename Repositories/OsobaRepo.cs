@@ -297,7 +297,7 @@ namespace HlidacStatu.Repositories
             return await osoba?.GetOriginalTrackedAsync(db);
         }
         
-        private static async Task<Osoba> GetOriginalTrackedAsync(this Osoba osoba, DbEntities db)
+        public static async Task<Osoba> GetOriginalTrackedAsync(this Osoba osoba, DbEntities db)
         {
             while (osoba is not null && osoba.Status == (int)Osoba.StatusOsobyEnum.Duplicita)
             {

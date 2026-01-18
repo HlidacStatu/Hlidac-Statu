@@ -516,7 +516,7 @@
                                         {
                                             <li>
                                                 <a class="fw-bold" href="/subjekt/@(vPerIco.ICO)">@vPerIco.FirmaName</a>:
-                                                @Html.RenderVazby(vPerIco.VazbyPerIco)
+                                                @await Html.RenderVazbyAsync(vPerIco.VazbyPerIco)
                                             </li>
                                         }
                                     </ul>

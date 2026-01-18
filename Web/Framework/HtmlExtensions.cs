@@ -33,28 +33,38 @@ namespace HlidacStatu.Web.Framework
         }
 
 
-        public static IHtmlContent RenderVazby(this IHtmlHelper self, HlidacStatu.DS.Graphs.Graph.Edge[] vazbyToRender)
+        public static async Task<IHtmlContent> RenderVazbyAsync(this IHtmlHelper self, HlidacStatu.DS.Graphs.Graph.Edge[] vazbyToRender)
         {
             if (vazbyToRender == null)
             {
                 return self.Raw("");
             }
-            if (vazbyToRender.Count() == 0)
+            if (!vazbyToRender.Any())
             {
                 return self.Raw("");
             }
 
             if (vazbyToRender.Count() == 1)
-                return self.Raw($"{vazbyToRender.First().From?.PrintNameAsync()} <i>/{vazbyToRender.First().Descr}/</i> v {vazbyToRender.First().To.PrintNameAsync()} {vazbyToRender.First().Doba()}");
+                return self.Raw($"{await vazbyToRender.First().From?.PrintNameAsync()} <i>/{vazbyToRender.First().Descr}/</i> v {await vazbyToRender.First().To.PrintNameAsync()} {vazbyToRender.First().Doba()}");
             else
             {
+                var firstVazba = vazbyToRender.First();
+                var firstFromName = await firstVazba.From?.PrintNameAsync();
+                var firstToName = await firstVazba.To.PrintNameAsync();
+
+                var remainingNames = new List<string>();
+                foreach (var m in vazbyToRender.Skip(1))
+                {
+                    remainingNames.Add($"<i>{m.Descr}</i> v {await m.To.PrintNameAsync()}");
+                }
+
                 return self.Raw("Nepřímá vazba přes:<br/>" 
-                    + "<small>"
-                    + $"{vazbyToRender.First().From?.PrintNameAsync()} <i>/{vazbyToRender.First().Descr}/</i> v {vazbyToRender.First().To.PrintNameAsync()} {vazbyToRender.First().Doba()}"
-                    + $" → "
-                    + string.Join(" → ", vazbyToRender.Skip(1).Select(m => $"<i>{m.Descr}</i> v {m.To.PrintNameAsync()}"))
-                    + "</small>"
-                    );
+                                + "<small>"
+                                + $"{firstFromName} <i>/{firstVazba.Descr}/</i> v {firstToName} {firstVazba.Doba()}"
+                                + $" → "
+                                + string.Join(" → ", remainingNames)
+                                + "</small>"
+                );
             }
         }
         

@@ -60,14 +60,13 @@ namespace HlidacStatu.Extensions
                 Photo_Url = osoba.HasPhoto() ? osoba.GetPhotoUrl(false) : null,
                 Current_Political_Party = party ?? "None",
                 Have_More_Details = true,
-                //TODO zvazit pridani vazeb urednich
-                Involved_In_Companies_Count = (await osoba.AktualniVazbyAsync( DS.Graphs.Relation.CharakterVazbyEnum.VlastnictviKontrola, DS.Graphs.Relation.AktualnostType.Nedavny))
-                        .Where(v => v.To != null && v.To.Type == HlidacStatu.DS.Graphs.Graph.Node.NodeType.Company)
-                        .GroupBy(f => f.To.Id, v => v, (ico, v) => new
-                        {
-                            ICO = ico,
-                            FirmaName = v.First().To.PrintNameAsync(),//HlidacStatu.Lib.Data.External.FirmyDB.NameFromIco(ico, true),
-                        }).Count(),
+                Involved_In_Companies_Count = (await osoba.AktualniVazbyAsync(
+                        DS.Graphs.Relation.CharakterVazbyEnum.VlastnictviKontrola, 
+                        DS.Graphs.Relation.AktualnostType.Nedavny))
+                    .Where(v => v.To != null && v.To.Type == HlidacStatu.DS.Graphs.Graph.Node.NodeType.Company)
+                    .Select(v => v.To.Id)
+                    .Distinct()
+                    .Count()
             };
             return res;
         }
@@ -146,13 +145,18 @@ namespace HlidacStatu.Extensions
             Expression<Func<Sponzoring, bool>> all = e => true;
 
             sponzoringFilter = sponzoringFilter ?? all;
-            return
-                string.Format(template, string.Join(itemDelimeter,
-                    (await osoba.SponzoringAsync(sponzoringFilter, withCompany: withCompany))
-                        .OrderByDescending(s => s.DarovanoDne)
-                        .Select(s => s.ToHtmlAsync(itemTemplate))
-                        .Take(take))
-                );
+            
+            var sponsoring = (await osoba.SponzoringAsync(sponzoringFilter, withCompany: withCompany))
+                .OrderByDescending(s => s.DarovanoDne)
+                .Take(take);
+
+            var htmlItems = new List<string>();
+            foreach (var s in sponsoring)
+            {
+                htmlItems.Add(await s.ToHtmlAsync(itemTemplate));
+            }
+
+            return string.Format(template, string.Join(itemDelimeter, htmlItems));
         }
 
         public static IEnumerable<OsobaEvent> Events(this Osoba osoba)
@@ -445,8 +449,8 @@ namespace HlidacStatu.Extensions
                 if (sponzoringPrimy != null && sponzoringPrimy.Any())
                 {
                     string[] strany = sponzoringPrimy.Select(m => m.IcoPrijemce).Distinct().ToArray();
-                    int[] roky = sponzoringPrimy.Select(m => m.DarovanoDne.Value.Year).Distinct().OrderBy(y => y)
-                        .ToArray();
+                    int?[] roky = sponzoringPrimy.Select(m => m.DarovanoDne?.Year).Where(x => x != null)
+                        .Distinct().OrderBy(y => y).ToArray();
                     decimal celkem = sponzoringPrimy.Sum(m => m.Hodnota) ?? 0;
                     decimal top = sponzoringPrimy.Max(m => m.Hodnota) ?? 0;
                     //todo: přidat tabulku politických stran a změnit zde na název strany
@@ -472,8 +476,8 @@ namespace HlidacStatu.Extensions
                 if (sponzoringPresFirmu != null && sponzoringPresFirmu.Any())
                 {
                     string[] strany = sponzoringPresFirmu.Select(m => m.IcoPrijemce).Distinct().ToArray();
-                    int[] roky = sponzoringPresFirmu.Select(m => m.DarovanoDne.Value.Year).Distinct().OrderBy(y => y)
-                        .ToArray();
+                    int?[] roky = sponzoringPresFirmu.Select(m => m.DarovanoDne?.Year).Where(x => x != null).
+                        Distinct().OrderBy(y => y).ToArray();
                     decimal celkem = sponzoringPresFirmu.Sum(m => m.Hodnota) ?? 0;
                     decimal top = sponzoringPresFirmu.Max(m => m.Hodnota) ?? 0;
                     string prvniStrana = (await FirmaRepo.FromIcoAsync(strany[0])).Jmeno;

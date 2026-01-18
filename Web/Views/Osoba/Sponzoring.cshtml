@@ -81,7 +81,7 @@
             HtmlRender = (x) =>
             {
                 return $"<a href='/subjekt/{x.Darceico}'>{Firmy.GetJmeno(x.Darceico)}</a>"
-                       + $"<br/>{Html.RenderVazby(x.Vazby)}";
+                       + $"<br/>{Html.RenderVazbyAsync(x.Vazby)}";
             },
             TextRender = (x) => Firmy.GetJmeno(x.Darceico)
         }, new()

@@ -1045,21 +1045,31 @@ namespace HlidacStatu.Repositories
             else
                 firstBatch = relations.Where(m => m.From?.UniqId == parent.To?.UniqId);
 
-            var rels = firstBatch
+            
+            
+            var mergedGroups = firstBatch
                 .Distinct()
                 .GroupBy(k => new { id = k.To.UniqId, type = k.To.Type }, (k, v) =>
                 {
-                    HlidacStatu.DS.Graphs.Graph.MergedEdge withChildren =
-                        HlidacStatu.DS.Graphs.Graph.Edge.MergeSameEdges(v);
-                    if (withChildren == null)
-                        withChildren = new HlidacStatu.DS.Graphs.Graph.MergedEdge(v.First());
-
-                    return withChildren;
+                    var withChildren = HlidacStatu.DS.Graphs.Graph.Edge.MergeSameEdges(v);
+                    return withChildren ?? new HlidacStatu.DS.Graphs.Graph.MergedEdge(v.First());
                 })
-                .OrderBy(m => m.To.PrintNameAsync())
                 .ToArray();
+            
+            var edgesWithNames = new List<(HlidacStatu.DS.Graphs.Graph.MergedEdge Edge, string SortName)>();
+            foreach (var edge in mergedGroups)
+            {
+                var name = await edge.To.PrintNameAsync();
+                edgesWithNames.Add((edge, name));
+            }
 
-            if (rels.Count() == 0)
+            var rels = edgesWithNames
+                .OrderBy(x => x.SortName)
+                .Select(x => x.Edge)
+                .ToArray();
+            
+
+            if (!rels.Any())
                 return string.Empty;
 
             StringBuilder sb = new StringBuilder(512);
@@ -1192,7 +1202,7 @@ namespace HlidacStatu.Repositories
             }
         }
 
-        public static string ExportTabData(IEnumerable<HlidacStatu.DS.Graphs.Graph.Edge> data)
+        public static async Task<string> ExportTabDataAsync(IEnumerable<HlidacStatu.DS.Graphs.Graph.Edge> data)
         {
             if (data == null)
                 return "";
@@ -1203,8 +1213,17 @@ namespace HlidacStatu.Repositories
 
             foreach (var i in data)
             {
+                string fromName = "";
+                string toName = "";
+                
+                if (i.From != null)
+                    fromName = await i.From.PrintNameAsync();
+                
+                if (i.To != null)
+                    toName = await i.To.PrintNameAsync();
+                    
                 sb.AppendFormat(
-                    $"{i.From?.Id}\t{i.From?.PrintNameAsync()}\t{i.To?.Id}\t{i.To?.PrintNameAsync()}\t{i.RelFrom?.ToShortDateString() ?? "Ø"}\t{i.RelTo?.ToShortDateString() ?? "Ø"}\t{i.Descr}\n");
+                    $"{i.From?.Id}\t{fromName}\t{i.To?.Id}\t{toName}\t{i.RelFrom?.ToShortDateString() ?? "Ø"}\t{i.RelTo?.ToShortDateString() ?? "Ø"}\t{i.Descr}\n");
             }
 
             return sb.ToString();

@@ -84,15 +84,16 @@ namespace HlidacStatu.DS.Graphs
 
                 if (RelFrom.HasValue && RelTo.HasValue)
                 {
-                    datumy = string.Format("{0}{2}{1}", RelFrom.Value.ToShortDateString(), RelTo.Value.ToShortDateString(), betweenDatesDelimiter);
+                    datumy =
+                        $"{RelFrom.Value.ToShortDateString()}{betweenDatesDelimiter}{RelTo.Value.ToShortDateString()}";
                 }
                 else if (RelTo.HasValue)
                 {
-                    datumy = string.Format("do {0}", RelTo.Value.ToShortDateString());
+                    datumy = $"do {RelTo.Value.ToShortDateString()}";
                 }
                 else if (RelFrom.HasValue)
                 {
-                    datumy = string.Format("od {0}", RelFrom.Value.ToShortDateString());
+                    datumy = $"od {RelFrom.Value.ToShortDateString()}";
                 }
                 if (string.IsNullOrEmpty(datumy))
                     return string.Empty;
