@@ -104,7 +104,7 @@ namespace HlidacStatu.Repositories
 
 
             HlidacStatu.AI.LLM.ContractParties llm = new AI.LLM.ContractParties(llmClient);
-            model = model ?? HlidacStatu.AI.LLM.Models.Model.Llama31;
+            model = model ?? HlidacStatu.AI.LLM.Models.Model.Default;
 
             string t = GetBeginningOfTheContract(smlouva, priloha, maxWordsFromBeginningOfTheText);
             AI.LLM.ContractParties.Parsed contractPartiesRes = await llm.FindContractPartiesAsync(t, maxWordsFromBeginningOfTheText, model);
