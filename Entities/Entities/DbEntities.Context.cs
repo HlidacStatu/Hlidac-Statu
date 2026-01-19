@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using HlidacStatu.Entities.Entities;
 using HlidacStatu.Entities.Entities.PoliticiSelfAdmin;
+using Microsoft.Data.SqlClient;
 
 namespace HlidacStatu.Entities
 {
@@ -21,11 +22,18 @@ namespace HlidacStatu.Entities
         private static DbContextOptions<DbEntities> GetConnectionString()
         {
             var connectionString = Devmasters.Config.GetWebConfigValue("OldEFSqlConnection");
+            var builder = new SqlConnectionStringBuilder(connectionString)
+            {
+                MaxPoolSize = 200,  // ← Increase pool size
+                MinPoolSize = 5,    // ← Optional: minimum connections to keep ready
+                
+            };
+            
             return new DbContextOptionsBuilder<DbEntities>()
-                .UseSqlServer(connectionString) //, sql=> sql.CommandTimeout(120).EnableRetryOnFailure(2) )
+                .UseSqlServer(builder.ConnectionString) 
+                //, sql=> sql.CommandTimeout(120).EnableRetryOnFailure(2) )
                 //.EnableDetailedErrors()  //ukáže který sloupec je null/nejde deserializovat v chybě
                 //.EnableSensitiveDataLogging(true)
-
                 .Options;
         }
 

@@ -1,4 +1,3 @@
-using Devmasters.Batch;
 using Devmasters.Enums;
 using HlidacStatu.Entities;
 using HlidacStatu.Extensions;
@@ -415,7 +414,7 @@ namespace HlidacStatu.Repositories
                         Type = osoba.StatusOsoby().ToNiceDisplayName(),
                         ImageElement =
                             $"<img src='{osoba.GetPhotoUrl(false, Osoba.PhotoTypes.NoBackground, false)}' />",
-                        Description = (await osoba.InfoFactsAsync(excludedInfoFactImportanceLevels)).ToArray()
+                        Description = (await osoba.InfoFactsAsync(excludedInfoFactImportanceLevels))
                             .RenderFacts(2, true, false, "", "{0}", false),
                         Category = Autocomplete.CategoryEnum.Person
                     };

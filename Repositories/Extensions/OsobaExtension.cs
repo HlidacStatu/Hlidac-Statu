@@ -19,7 +19,6 @@ namespace HlidacStatu.Extensions
 {
     public static class OsobaExtension
     {
-
         public static async Task<string> CurrentPoliticalPartyAsync(this Osoba osoba)
         {
             var (organizace, ico) = osoba.Events(ev =>
@@ -61,7 +60,7 @@ namespace HlidacStatu.Extensions
                 Current_Political_Party = party ?? "None",
                 Have_More_Details = true,
                 Involved_In_Companies_Count = (await osoba.AktualniVazbyAsync(
-                        DS.Graphs.Relation.CharakterVazbyEnum.VlastnictviKontrola, 
+                        DS.Graphs.Relation.CharakterVazbyEnum.VlastnictviKontrola,
                         DS.Graphs.Relation.AktualnostType.Nedavny))
                     .Where(v => v.To != null && v.To.Type == HlidacStatu.DS.Graphs.Graph.Node.NodeType.Company)
                     .Select(v => v.To.Id)
@@ -76,9 +75,9 @@ namespace HlidacStatu.Extensions
             historyLimit ??= DateTime.Now.AddYears(-100);
             if (osoba == null)
                 return null;
-            
+
             var party = await osoba.CurrentPoliticalPartyAsync();
-            
+
             var res = new HlidacStatu.DS.Api.Osoba.Detail
             {
                 Person_Id = osoba.NameId,
@@ -89,20 +88,21 @@ namespace HlidacStatu.Extensions
                 Photo_Url = osoba.HasPhoto() ? osoba.GetPhotoUrl(false) : null,
                 Current_Political_Party = party ?? "None",
 
-                Recent_Public_Activities_Description = await osoba.DescriptionAsync(false, m => m.DatumDo == null || m.DatumDo > historyLimit, 5, itemDelimeter: ", "),
-                
+                Recent_Public_Activities_Description = await osoba.DescriptionAsync(false,
+                    m => m.DatumDo == null || m.DatumDo > historyLimit, 5, itemDelimeter: ", "),
+
                 Business_Contracts_With_Government = (await osoba.StatistikaRegistrSmluvAsync())
-                .SmlouvyStat_SoukromeFirmySummary()
+                    .SmlouvyStat_SoukromeFirmySummary()
                     .Select(m => new HlidacStatu.DS.Api.Osoba.Detail.Stats
                     {
                         Year = m.Year,
                         Number_Of_Contracts = m.Value.PocetSmluv,
                         Total_Contract_Value = m.Value.CelkovaHodnotaSmluv
                     }).ToArray()
-
             };
-            
-            var vazby = await osoba.AktualniVazbyAsync(DS.Graphs.Relation.CharakterVazbyEnum.VlastnictviKontrola, DS.Graphs.Relation.AktualnostType.Nedavny);
+
+            var vazby = await osoba.AktualniVazbyAsync(DS.Graphs.Relation.CharakterVazbyEnum.VlastnictviKontrola,
+                DS.Graphs.Relation.AktualnostType.Nedavny);
 
             var firmy = vazby
                 .Where(v => v.To != null && v.To.Type == HlidacStatu.DS.Graphs.Graph.Node.NodeType.Company)
@@ -121,10 +121,9 @@ namespace HlidacStatu.Extensions
             }
 
             res.Involved_In_Companies = involvedList.ToArray();
-            
+
             return res;
         }
-
 
 
         public static async Task<bool> IsSponzorAsync(this Osoba osoba)
@@ -138,14 +137,15 @@ namespace HlidacStatu.Extensions
         }
 
 
-        public static async Task<string> SponzoringToHtmlAsync(this Osoba osoba, int take = int.MaxValue, string template = "{0}",
+        public static async Task<string> SponzoringToHtmlAsync(this Osoba osoba, int take = int.MaxValue,
+            string template = "{0}",
             string itemTemplate = "{0}", string itemDelimeter = "<br/>",
             Expression<Func<Sponzoring, bool>> sponzoringFilter = null, bool withCompany = true)
         {
             Expression<Func<Sponzoring, bool>> all = e => true;
 
             sponzoringFilter = sponzoringFilter ?? all;
-            
+
             var sponsoring = (await osoba.SponzoringAsync(sponzoringFilter, withCompany: withCompany))
                 .OrderByDescending(s => s.DarovanoDne)
                 .Take(take);
@@ -247,10 +247,12 @@ namespace HlidacStatu.Extensions
             return result;
         }
 
-        public static async Task<string> DescriptionAsync(this Osoba osoba, bool html, Expression<Func<OsobaEvent, bool>> predicate,
+        //při injectnutém db contextu se nesmí dělat paralelní operace
+        public static async Task<string> DescriptionAsync(this Osoba osoba, bool html,
+            Expression<Func<OsobaEvent, bool>> predicate,
             int numOfRecords = int.MaxValue, string template = "{0}",
             string itemTemplate = "{0}", string itemDelimeter = "<br/>",
-            bool withSponzoring = false)
+            bool withSponzoring = false, DbEntities db = null)
         {
             var fixedOrder = new List<int>()
             {
@@ -262,6 +264,7 @@ namespace HlidacStatu.Extensions
                 (int)OsobaEvent.Types.Osobni,
                 (int)OsobaEvent.Types.Jine
             };
+
 
             var events = osoba.MergedEvents(predicate).ToArray();
 
@@ -284,8 +287,22 @@ namespace HlidacStatu.Extensions
             if (withSponzoring && html)
             {
                 var numOfSponzoring = numOfRecords - evs.Count;
-                
-                var sponzoring = await osoba.SponzoringAsync();
+
+                bool ownsContext = db == null;
+                if (ownsContext)
+                    db = new DbEntities();
+                List<Sponzoring> sponzoring;
+                try
+                {
+                    sponzoring = await SponzoringRepo.GetByDarceAsync(osoba.InternalId, m => true, withCompany: true, db);
+                }
+                finally
+                {
+                    if (ownsContext && db != null)
+                    {
+                        await db.DisposeAsync();
+                    }
+                }
 
                 var topSponzoring = sponzoring
                     .OrderByDescending(s => s.DarovanoDne)
@@ -296,7 +313,7 @@ namespace HlidacStatu.Extensions
                 {
                     sponzoringList.Add(await s.ToHtmlAsync());
                 }
-                
+
                 evs.AddRange(sponzoringList);
             }
 
@@ -326,26 +343,27 @@ namespace HlidacStatu.Extensions
 
             return ret;
         }
+
         public static async Task<Osoba.Statistics.Dotace> StatistikaDotaceAsync(this Osoba osoba,
             bool forceUpdateCache = false)
         {
-
             Osoba.Statistics.Dotace ret = await OsobaStatistics.CachedStatistics_DotaceAsync(osoba, forceUpdateCache);
 
             return ret;
         }
-        
-        
+
+
         public static async Task<InfoFact[]> InfoFactsCachedAsync(this Osoba osoba, bool forceUpdateCache = false)
         {
             if (forceUpdateCache)
                 await OsobaCache.InvalidateInfoFactsAsync(osoba);
-            
+
             return await OsobaCache.GetInfoFactsAsync(osoba);
         }
 
+        //při injectnutém db contextu se nesmí dělat paralelní operace
         public static async Task<InfoFact[]> InfoFactsAsync(this Osoba osoba,
-            HashSet<Fact.ImportanceLevel> excludedImportanceLevels = null)
+            HashSet<Fact.ImportanceLevel> excludedImportanceLevels = null, DbEntities db = null)
         {
             int[] types =
             {
@@ -366,191 +384,219 @@ namespace HlidacStatu.Extensions
             int rok = DateTime.Now.Year;
             if (DateTime.Now.Month <= 2)
                 rok = rok - 1;
-            var kdoje = await osoba.DescriptionAsync(false,
-                m => types.Contains(m.Type),
-                2, itemDelimeter: ", ");
 
-            if (excludedImportanceLevels is null ||
-                !excludedImportanceLevels.Contains(Fact.ImportanceLevel.Summary))
-            {
-                var descr = "";
-                if (osoba.StatusOsoby() == Osoba.StatusOsobyEnum.NeniPolitik)
-                    descr = $"<b>{osoba.FullName()}</b>";
-                else
-                    descr = $"<b>{osoba.FullNameWithYear()}</b>";
-                if (!string.IsNullOrEmpty(kdoje))
-                    descr += ", " + kdoje + (kdoje.EndsWith(". ") ? "" : ". ");
-                f.Add(new InfoFact(descr, Fact.ImportanceLevel.Summary));
-            }
 
-            if (excludedImportanceLevels is null ||
-                !excludedImportanceLevels.Contains(Fact.ImportanceLevel.Stat))
+            bool ownsContext = db == null;
+            if (ownsContext)
+                db = new DbEntities();
+
+            try
             {
-                var statDesc = "";
-                if (stat.StatniFirmy.Count > 0)
-                    statDesc +=
-                        $"Angažoval se v {Plural.Get(stat.StatniFirmy.Count, "jedné státní firmě", "{0} státních firmách", "{0} státních firmách")}. ";
-                //neziskovky
-                if (stat.SoukromeFirmy.Count > 0)
+                var kdoje = await osoba.DescriptionAsync(false,
+                    m => types.Contains(m.Type),
+                    2, itemDelimeter: ", ", db: db);
+
+                if (excludedImportanceLevels is null ||
+                    !excludedImportanceLevels.Contains(Fact.ImportanceLevel.Summary))
                 {
-                    //ostatni
-                    statDesc += $"Angažoval se {(stat.StatniFirmy.Count > 0 ? "také" : "")} v <b>";
-                    if (stat.SmlouvyStat_NeziskovkyCount() > 0 && stat.SmlouvyStat_KomercniFirmyCount() == 0)
-                    {
-                        statDesc +=
-                            $"{Plural.Get(stat.SmlouvyStat_NeziskovkyCount(), "jedné neziskové organizaci", "{0} neziskových organizacích", "{0} neziskových organizacích")}";
-                    }
-                    else if (stat.SmlouvyStat_NeziskovkyCount() > 0)
-                    {
-                        statDesc +=
-                            $"{Plural.Get(stat.SmlouvyStat_NeziskovkyCount(), "jedné neziskové organizaci", "{0} neziskových organizacích", "{0} neziskových organizacích")}";
-                        statDesc +=
-                            $" a {Plural.Get(stat.SmlouvyStat_KomercniFirmyCount(), "jedné soukr.firmě", "{0} soukr.firmách", "{0} soukr.firmách")}";
-                    }
+                    var descr = "";
+                    if (osoba.StatusOsoby() == Osoba.StatusOsobyEnum.NeniPolitik)
+                        descr = $"<b>{osoba.FullName()}</b>";
                     else
-                    {
+                        descr = $"<b>{osoba.FullNameWithYear()}</b>";
+                    if (!string.IsNullOrEmpty(kdoje))
+                        descr += ", " + kdoje + (kdoje.EndsWith(". ") ? "" : ". ");
+                    f.Add(new InfoFact(descr, Fact.ImportanceLevel.Summary));
+                }
+
+                if (excludedImportanceLevels is null ||
+                    !excludedImportanceLevels.Contains(Fact.ImportanceLevel.Stat))
+                {
+                    var statDesc = "";
+                    if (stat.StatniFirmy.Count > 0)
                         statDesc +=
-                            $"{Plural.Get(stat.SoukromeFirmy.Count, "jedné soukr.firmě", "{0} soukr.firmách", "{0} soukr.firmách")}";
+                            $"Angažoval se v {Plural.Get(stat.StatniFirmy.Count, "jedné státní firmě", "{0} státních firmách", "{0} státních firmách")}. ";
+                    //neziskovky
+                    if (stat.SoukromeFirmy.Count > 0)
+                    {
+                        //ostatni
+                        statDesc += $"Angažoval se {(stat.StatniFirmy.Count > 0 ? "také" : "")} v <b>";
+                        var neziskovkyCount = stat.SmlouvyStat_NeziskovkyCount();
+                        var komercniFirmyCount = stat.SmlouvyStat_KomercniFirmyCount();
+                        if (neziskovkyCount > 0 && komercniFirmyCount == 0)
+                        {
+                            statDesc +=
+                                $"{Plural.Get(neziskovkyCount, "jedné neziskové organizaci", "{0} neziskových organizacích", "{0} neziskových organizacích")}";
+                        }
+                        else if (neziskovkyCount > 0)
+                        {
+                            statDesc +=
+                                $"{Plural.Get(neziskovkyCount, "jedné neziskové organizaci", "{0} neziskových organizacích", "{0} neziskových organizacích")}";
+                            statDesc +=
+                                $" a {Plural.Get(komercniFirmyCount, "jedné soukr.firmě", "{0} soukr.firmách", "{0} soukr.firmách")}";
+                        }
+                        else
+                        {
+                            statDesc +=
+                                $"{Plural.Get(stat.SoukromeFirmy.Count, "jedné soukr.firmě", "{0} soukr.firmách", "{0} soukr.firmách")}";
+                        }
+
+
+                        statDesc += $"</b>. Tyto subjekty mají se státem od 2016 celkem "
+                                    + Plural.Get(soukrStat.Sum(m => m.PocetSmluv), "jednu smlouvu",
+                                        "{0} smlouvy", "{0} smluv")
+                                    + " v celkové výši <b>" + Smlouva.NicePrice(
+                                        soukrStat.Sum(m => m.CelkovaHodnotaSmluv),
+                                        html: true, shortFormat: true)
+                                    + "</b>. ";
                     }
 
-
-                    statDesc += $"</b>. Tyto subjekty mají se státem od 2016 celkem "
-                                + Plural.Get(soukrStat.Sum(m => m.PocetSmluv), "jednu smlouvu",
-                                    "{0} smlouvy", "{0} smluv")
-                                + " v celkové výši <b>" + Smlouva.NicePrice(soukrStat.Sum(m => m.CelkovaHodnotaSmluv),
-                                    html: true, shortFormat: true)
-                                + "</b>. ";
+                    if (statDesc.Length > 0)
+                        f.Add(new InfoFact(statDesc, Fact.ImportanceLevel.Stat));
                 }
 
-                if (statDesc.Length > 0)
-                    f.Add(new InfoFact(statDesc, Fact.ImportanceLevel.Stat));
-            }
-
-            if (excludedImportanceLevels is null ||
-                !excludedImportanceLevels.Contains(Fact.ImportanceLevel.Salary))
-            {
-                var year = PpRepo.DefaultYear;
-                var prijmy = await PpRepo.GetPrijmyPolitikaAsync(osoba.NameId, year);
-                if (prijmy.Any())
-                    f.Add(new InfoFact(
-                        $"Příjem od státu v {year} celkem <b>{HlidacStatu.Util.RenderData.ShortNicePrice(prijmy.Sum(m=>m.CelkoveRocniNakladyNaPolitika), showDecimal: RenderData.ShowDecimalVal.Show)}</b> od <b> {Devmasters.Lang.CS.Plural.Get(prijmy.Select(m => m.IdOrganizace).Distinct().Count(),"jedné</b> organizace", "{0}</b> organizací", "{0}</b> organizací")}.",
-                         Fact.ImportanceLevel.Salary
-                        )); 
-            }
-
-            if (excludedImportanceLevels is null ||
-            !excludedImportanceLevels.Contains(Fact.ImportanceLevel.Medium))
-            {
-                DateTime datumOd = new DateTime(DateTime.Now.Year - 10, 1, 1);
-                var sponzoringPrimy = await osoba.SponzoringAsync(s => s.IcoPrijemce != null
-                                                            && s.DarovanoDne >= datumOd
-                                                            && s.Typ != (int)Entities.Sponzoring.TypDaru.DarFirmy);
-                
-                if (sponzoringPrimy != null && sponzoringPrimy.Any())
+                if (excludedImportanceLevels is null ||
+                    !excludedImportanceLevels.Contains(Fact.ImportanceLevel.Salary))
                 {
-                    string[] strany = sponzoringPrimy.Select(m => m.IcoPrijemce).Distinct().ToArray();
-                    int?[] roky = sponzoringPrimy.Select(m => m.DarovanoDne?.Year).Where(x => x != null)
-                        .Distinct().OrderBy(y => y).ToArray();
-                    decimal celkem = sponzoringPrimy.Sum(m => m.Hodnota) ?? 0;
-                    decimal top = sponzoringPrimy.Max(m => m.Hodnota) ?? 0;
-                    //todo: přidat tabulku politických stran a změnit zde na název strany
-                    string prvniStrana = (await FirmaRepo.FromIcoAsync(strany[0])).Jmeno; 
-
-                    f.Add(new InfoFact($"{osoba.FullName()} "
-                                       + Plural.Get(roky.Count(), "v roce " + roky[0],
-                                           $"mezi roky {roky.First()} - {roky.Last() - 2000}",
-                                           $"mezi roky {roky.First()} - {roky.Last() - 2000}")
-                                       + $" sponzoroval{(osoba.Muz() ? "" : "a")} " +
-                                       Plural.Get(strany.Length, "stranu " + prvniStrana,
-                                           "{0} polit. strany", "{0} polit. stran")
-                                       + $" v&nbsp;celkové výši <b>{RenderData.ShortNicePrice(celkem, html: true)}</b>. "
-                                       + $"Nejvyšší sponzorský dar byl ve výši {RenderData.ShortNicePrice(top, html: true)}. "
-                        , Fact.ImportanceLevel.Medium)
-                    );
+                    var year = PpRepo.DefaultYear;
+                    var prijmy = await PpRepo.GetPrijmyPolitikaAsync(osoba.NameId, year, db: db);
+                    if (prijmy.Any())
+                        f.Add(new InfoFact(
+                            $"Příjem od státu v {year} celkem <b>{RenderData.ShortNicePrice(prijmy.Sum(m => m.CelkoveRocniNakladyNaPolitika), showDecimal: RenderData.ShowDecimalVal.Show)}</b> od <b> {Plural.Get(prijmy.Select(m => m.IdOrganizace).Distinct().Count(), "jedné</b> organizace", "{0}</b> organizací", "{0}</b> organizací")}.",
+                            Fact.ImportanceLevel.Salary
+                        ));
                 }
 
-                var sponzoringPresFirmu = await osoba.SponzoringAsync(s => s.IcoPrijemce != null
-                                                                && s.DarovanoDne >= datumOd
-                                                                && s.Typ == (int)Entities.Sponzoring.TypDaru.DarFirmy);
-                
-                if (sponzoringPresFirmu != null && sponzoringPresFirmu.Any())
+                if (excludedImportanceLevels is null ||
+                    !excludedImportanceLevels.Contains(Fact.ImportanceLevel.Medium))
                 {
-                    string[] strany = sponzoringPresFirmu.Select(m => m.IcoPrijemce).Distinct().ToArray();
-                    int?[] roky = sponzoringPresFirmu.Select(m => m.DarovanoDne?.Year).Where(x => x != null).
-                        Distinct().OrderBy(y => y).ToArray();
-                    decimal celkem = sponzoringPresFirmu.Sum(m => m.Hodnota) ?? 0;
-                    decimal top = sponzoringPresFirmu.Max(m => m.Hodnota) ?? 0;
-                    string prvniStrana = (await FirmaRepo.FromIcoAsync(strany[0])).Jmeno;
+                    DateTime datumOd = new DateTime(DateTime.Now.Year - 10, 1, 1);
+                    var sponzoringPrimy = await SponzoringRepo.GetByDarceAsync(osoba.InternalId, s =>
+                        s.IcoPrijemce != null
+                        && s.DarovanoDne >= datumOd
+                        && s.Typ != (int)Sponzoring.TypDaru
+                            .DarFirmy, 
+                        withCompany: true, 
+                        db: db);
 
-                    f.Add(new InfoFact($"{osoba.FullName()} byl{(osoba.Muz() ? "" : "a")}"
-                                       + $" členem statutárního orgánu společnosti, která "
-                                       + Plural.Get(roky.Count(), "v roce " + roky[0],
-                                           $"mezi roky {roky.First()} - {roky.Last() - 2000}",
-                                           $"mezi roky {roky.First()} - {roky.Last() - 2000}")
-                                       + $" sponzorovala "
-                                       + Plural.Get(strany.Length, "stranu " + prvniStrana,
-                                           "{0} polit. strany", "{0} polit. stran")
-                                       + $" v&nbsp;celkové výši <b>{RenderData.ShortNicePrice(celkem, html: true)}</b>. "
-                                       + $"Nejvyšší sponzorský dar byl ve výši {RenderData.ShortNicePrice(top, html: true)}. "
-                        , Fact.ImportanceLevel.Medium)
-                    );
-                }
-
-                if (soukrStat.Sum(m => m.PocetSmluv) > 0)
-                {
-                    if (soukrStat[rok].PocetSmluv > 0)
+                    if (sponzoringPrimy != null && sponzoringPrimy.Any())
                     {
-                        string ss = "";
+                        string[] strany = sponzoringPrimy.Select(m => m.IcoPrijemce).Distinct().ToArray();
+                        int?[] roky = sponzoringPrimy.Select(m => m.DarovanoDne?.Year).Where(x => x != null)
+                            .Distinct().OrderBy(y => y).ToArray();
+                        decimal celkem = sponzoringPrimy.Sum(m => m.Hodnota) ?? 0;
+                        decimal top = sponzoringPrimy.Max(m => m.Hodnota) ?? 0;
+                        //todo: přidat tabulku politických stran a změnit zde na název strany
+                        string prvniStrana = (await FirmaRepo.FromIcoAsync(strany[0], db: db)).Jmeno;
 
-                        if (soukrStat[rok].CelkovaHodnotaSmluv == 0)
-                            ss = Plural.Get(
-                                     stat.SoukromeFirmy.Count(m => m.Value != null && m.Value[rok]?.PocetSmluv > 0),
-                                     $"Jeden subjekt, ve kterém se angažoval{(osoba.Muz() ? "" : "a")}, v&nbsp;roce {rok} uzavřel",
-                                     $"{{0}} subjekty, ve kterých se angažoval{(osoba.Muz() ? "" : "a")}, v&nbsp;roce {rok} uzavřely",
-                                     $"{{0}} subjektů, ve kterých se angažuval{(osoba.Muz() ? "" : "a")}, v&nbsp;roce {rok} uzavřely"
-                                 )
-                                 + $" smlouvy v neznámé výši, protože <b>hodnota všech smluv byla utajena</b>. ";
-                        else
-                            ss = Plural.Get(
-                                     stat.SoukromeFirmy.Count(m => m.Value != null && m.Value[rok]?.PocetSmluv > 0),
-                                     $"Jeden subjekt, ve které se angažoval{(osoba.Muz() ? "" : "a")}, v&nbsp;roce {rok} uzavřel",
-                                     $"{{0}} subjekty, ve kterých se angažoval{(osoba.Muz() ? "" : "a")}, v&nbsp;roce {rok} uzavřely",
-                                     $"{{0}} subjektů, ve kterých se angažoval{(osoba.Muz() ? "" : "a")}, v&nbsp;roce {rok} uzavřely"
-                                 )
-                                 + $" " +
-                                 Plural.Get(soukrStat[rok].PocetSmluv, " jednu smlouvu.", " {0} smlouvy",
-                                     " {0} smluv")
-                                 + "</b>. ";
-
-                        f.Add(new InfoFact(ss, Fact.ImportanceLevel.Medium));
-                    }
-                    else if (soukrStat[rok - 1].CelkovaHodnotaSmluv == 0)
-                    {
-                        string ss = "";
-                        if (soukrStat[rok].CelkovaHodnotaSmluv == 0)
-                            ss = $"Je angažován{(osoba.Muz() ? "" : "a")} v&nbsp;" +
-                                 Plural.Get(
-                                     stat.SoukromeFirmy.Count(m => m.Value != null && m.Value[rok]?.PocetSmluv > 0),
-                                     $"jednom subjektu, která v&nbsp;roce {rok - 1} uzavřela",
-                                     $"{{0}} subjektech, které v&nbsp;roce {rok} uzavřely",
-                                     $"{{0}} subjektech, které v&nbsp;roce {rok - 1} uzavřely"
-                                 )
-                                 + $" smlouvy v neznámé výši, protože <b>hodnota všech smluv byla utajena</b>. ";
-                        else
-                            ss = Plural.Get(
-                                     stat.SoukromeFirmy.Count(m => m.Value != null && m.Value[rok - 1]?.PocetSmluv > 0),
-                                     $"Jeden subjekt, ve které se angažoval{(osoba.Muz() ? "" : "a")}, v&nbsp;roce {rok} uzavřel",
-                                     $"{{0}} subjekty, ve kterých se angažoval{(osoba.Muz() ? "" : "a")}, v&nbsp;roce {rok} uzavřely",
-                                     $"{{0}} subjektů, ve kterých se angažoval{(osoba.Muz() ? "" : "a")}, v&nbsp;roce {rok} uzavřely"
-                                 )
-                                 + $" " +
-                                 Plural.Get(soukrStat[rok - 1].PocetSmluv, " jednu smlouvu.",
-                                     " {0} smlouvy", " {0} smluv")
-                                 + "</b>. ";
-
-                        f.Add(new InfoFact(ss, Fact.ImportanceLevel.Medium)
+                        f.Add(new InfoFact($"{osoba.FullName()} "
+                                           + Plural.Get(roky.Count(), "v roce " + roky[0],
+                                               $"mezi roky {roky.First()} - {roky.Last() - 2000}",
+                                               $"mezi roky {roky.First()} - {roky.Last() - 2000}")
+                                           + $" sponzoroval{(osoba.Muz() ? "" : "a")} " +
+                                           Plural.Get(strany.Length, "stranu " + prvniStrana,
+                                               "{0} polit. strany", "{0} polit. stran")
+                                           + $" v&nbsp;celkové výši <b>{RenderData.ShortNicePrice(celkem, html: true)}</b>. "
+                                           + $"Nejvyšší sponzorský dar byl ve výši {RenderData.ShortNicePrice(top, html: true)}. "
+                            , Fact.ImportanceLevel.Medium)
                         );
                     }
+
+                    var sponzoringPresFirmu = await SponzoringRepo.GetByDarceAsync(osoba.InternalId,
+                            s => s.IcoPrijemce != null
+                                 && s.DarovanoDne >= datumOd
+                                 && s.Typ == (int)Sponzoring.TypDaru
+                                     .DarFirmy, 
+                        withCompany: true, 
+                        db: db);
+                    
+                    if (sponzoringPresFirmu != null && sponzoringPresFirmu.Any())
+                    {
+                        string[] strany = sponzoringPresFirmu.Select(m => m.IcoPrijemce).Distinct().ToArray();
+                        int?[] roky = sponzoringPresFirmu.Select(m => m.DarovanoDne?.Year).Where(x => x != null)
+                            .Distinct().OrderBy(y => y).ToArray();
+                        decimal celkem = sponzoringPresFirmu.Sum(m => m.Hodnota) ?? 0;
+                        decimal top = sponzoringPresFirmu.Max(m => m.Hodnota) ?? 0;
+                        string prvniStrana = (await FirmaRepo.FromIcoAsync(strany[0], db: db)).Jmeno;
+
+                        f.Add(new InfoFact($"{osoba.FullName()} byl{(osoba.Muz() ? "" : "a")}"
+                                           + $" členem statutárního orgánu společnosti, která "
+                                           + Plural.Get(roky.Count(), "v roce " + roky[0],
+                                               $"mezi roky {roky.First()} - {roky.Last() - 2000}",
+                                               $"mezi roky {roky.First()} - {roky.Last() - 2000}")
+                                           + $" sponzorovala "
+                                           + Plural.Get(strany.Length, "stranu " + prvniStrana,
+                                               "{0} polit. strany", "{0} polit. stran")
+                                           + $" v&nbsp;celkové výši <b>{RenderData.ShortNicePrice(celkem, html: true)}</b>. "
+                                           + $"Nejvyšší sponzorský dar byl ve výši {RenderData.ShortNicePrice(top, html: true)}. "
+                            , Fact.ImportanceLevel.Medium)
+                        );
+                    }
+
+                    if (soukrStat.Sum(m => m.PocetSmluv) > 0)
+                    {
+                        if (soukrStat[rok].PocetSmluv > 0)
+                        {
+                            string ss = "";
+
+                            if (soukrStat[rok].CelkovaHodnotaSmluv == 0)
+                                ss = Plural.Get(
+                                         stat.SoukromeFirmy.Count(m => m.Value != null && m.Value[rok]?.PocetSmluv > 0),
+                                         $"Jeden subjekt, ve kterém se angažoval{(osoba.Muz() ? "" : "a")}, v&nbsp;roce {rok} uzavřel",
+                                         $"{{0}} subjekty, ve kterých se angažoval{(osoba.Muz() ? "" : "a")}, v&nbsp;roce {rok} uzavřely",
+                                         $"{{0}} subjektů, ve kterých se angažuval{(osoba.Muz() ? "" : "a")}, v&nbsp;roce {rok} uzavřely"
+                                     )
+                                     + $" smlouvy v neznámé výši, protože <b>hodnota všech smluv byla utajena</b>. ";
+                            else
+                                ss = Plural.Get(
+                                         stat.SoukromeFirmy.Count(m => m.Value != null && m.Value[rok]?.PocetSmluv > 0),
+                                         $"Jeden subjekt, ve které se angažoval{(osoba.Muz() ? "" : "a")}, v&nbsp;roce {rok} uzavřel",
+                                         $"{{0}} subjekty, ve kterých se angažoval{(osoba.Muz() ? "" : "a")}, v&nbsp;roce {rok} uzavřely",
+                                         $"{{0}} subjektů, ve kterých se angažoval{(osoba.Muz() ? "" : "a")}, v&nbsp;roce {rok} uzavřely"
+                                     )
+                                     + $" " +
+                                     Plural.Get(soukrStat[rok].PocetSmluv, " jednu smlouvu.", " {0} smlouvy",
+                                         " {0} smluv")
+                                     + "</b>. ";
+
+                            f.Add(new InfoFact(ss, Fact.ImportanceLevel.Medium));
+                        }
+                        else if (soukrStat[rok - 1].CelkovaHodnotaSmluv == 0)
+                        {
+                            string ss = "";
+                            if (soukrStat[rok].CelkovaHodnotaSmluv == 0)
+                                ss = $"Je angažován{(osoba.Muz() ? "" : "a")} v&nbsp;" +
+                                     Plural.Get(
+                                         stat.SoukromeFirmy.Count(m => m.Value != null && m.Value[rok]?.PocetSmluv > 0),
+                                         $"jednom subjektu, která v&nbsp;roce {rok - 1} uzavřela",
+                                         $"{{0}} subjektech, které v&nbsp;roce {rok} uzavřely",
+                                         $"{{0}} subjektech, které v&nbsp;roce {rok - 1} uzavřely"
+                                     )
+                                     + $" smlouvy v neznámé výši, protože <b>hodnota všech smluv byla utajena</b>. ";
+                            else
+                                ss = Plural.Get(
+                                         stat.SoukromeFirmy.Count(m =>
+                                             m.Value != null && m.Value[rok - 1]?.PocetSmluv > 0),
+                                         $"Jeden subjekt, ve které se angažoval{(osoba.Muz() ? "" : "a")}, v&nbsp;roce {rok} uzavřel",
+                                         $"{{0}} subjekty, ve kterých se angažoval{(osoba.Muz() ? "" : "a")}, v&nbsp;roce {rok} uzavřely",
+                                         $"{{0}} subjektů, ve kterých se angažoval{(osoba.Muz() ? "" : "a")}, v&nbsp;roce {rok} uzavřely"
+                                     )
+                                     + $" " +
+                                     Plural.Get(soukrStat[rok - 1].PocetSmluv, " jednu smlouvu.",
+                                         " {0} smlouvy", " {0} smluv")
+                                     + "</b>. ";
+
+                            f.Add(new InfoFact(ss, Fact.ImportanceLevel.Medium)
+                            );
+                        }
+                    }
+                }
+            }
+            finally
+            {
+                if (ownsContext && db != null)
+                {
+                    await db.DisposeAsync();
                 }
             }
 
@@ -603,7 +649,8 @@ namespace HlidacStatu.Extensions
                 .ThenByDescending(o => o.Events_VerejnopravniUdalosti().Count());
         }
 
-        public static async Task<List<Sponzoring>> SponzoringAsync(this Osoba osoba, Expression<Func<Sponzoring, bool>> predicate,
+        public static async Task<List<Sponzoring>> SponzoringAsync(this Osoba osoba,
+            Expression<Func<Sponzoring, bool>> predicate,
             bool withCompany = true)
         {
             return await SponzoringRepo.GetByDarceAsync(osoba.InternalId, predicate, withCompany);

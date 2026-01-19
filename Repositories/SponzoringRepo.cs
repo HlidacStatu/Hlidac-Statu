@@ -10,6 +10,7 @@ using HlidacStatu.Entities.Views;
 using HlidacStatu.Extensions;
 using HlidacStatu.Util;
 using Microsoft.EntityFrameworkCore;
+using Serilog;
 using ZiggyCreatures.Caching.Fusion;
 
 namespace HlidacStatu.Repositories
@@ -17,12 +18,13 @@ namespace HlidacStatu.Repositories
     public static class SponzoringRepo
     {
         private static int? _defaultLastSponzoringYear = null;
-        
+        private static readonly ILogger _logger = Log.ForContext(typeof(SponzoringRepo));
+
         private static readonly FusionCache _cache = new FusionCache(new FusionCacheOptions()
         {
             CacheName = "SponzoringCache",
         });
-        
+
         public static string[] VelkeStrany = new string[]
         {
             "ANO", "ODS", "ČSSD", "Česká pirátská strana", "KSČM",
@@ -34,18 +36,19 @@ namespace HlidacStatu.Repositories
             "ANO", "ODS", "Česká pirátská strana",
             "SPD", "STAN", "KDU-ČSL", "TOP 09"
         };
+
         public static string[] TopStrany = VelkeStrany.ToArray();
 
         public static int DefaultLastSponzoringYear()
         {
             _defaultLastSponzoringYear ??= (HlidacStatu.Connectors.DirectDB.Instance
-                                               .GetList<int?>("select max(DATEPART(yy, Sponzoring.DarovanoDne)) from sponzoring where sponzoring.darovanoDne < GetDate()")
-                                               .FirstOrDefault()
-                                           ?? (DateTime.Now.Year - 1));
-            
+                                                .GetList<int?>(
+                                                    "select max(DATEPART(yy, Sponzoring.DarovanoDne)) from sponzoring where sponzoring.darovanoDne < GetDate()")
+                                                .FirstOrDefault()
+                                            ?? (DateTime.Now.Year - 1));
+
             return _defaultLastSponzoringYear.Value;
         }
-
 
 
         private static DateTime minBigSponzoringDate = new DateTime(DateTime.Now.Year - 10, 1, 1);
@@ -61,16 +64,36 @@ namespace HlidacStatu.Repositories
             || (s.DarCelkem <= smallSponzoringThreshold && s.Rok >= minSmallSponzoringDate.Year);
 
 
-        public static async Task<List<Sponzoring>> GetByDarceAsync(int osobaId, Expression<Func<Sponzoring, bool>> predicate, bool withCompany = true)
+        //při injectnutém db contextu se nesmí dělat paralelní operace
+        public static async Task<List<Sponzoring>> GetByDarceAsync(int osobaId,
+            Expression<Func<Sponzoring, bool>> predicate, bool withCompany = true, DbEntities db = null)
         {
-            await using DbEntities db = new DbEntities();
             
-            var osobySponzoring = await db.Sponzoring
-                .AsNoTracking()
-                .Where(s => s.OsobaIdDarce == osobaId)
-                .Where(SponzoringLimitsPredicate)
-                .Where(predicate)
-                .ToListAsync();
+            List<Sponzoring> osobySponzoring;
+            bool ownsContext = db == null;
+            if (ownsContext)
+                db = new DbEntities();
+            try
+            {
+                osobySponzoring = await db.Sponzoring
+                    .AsNoTracking()
+                    .Where(s => s.OsobaIdDarce == osobaId)
+                    .Where(SponzoringLimitsPredicate)
+                    .Where(predicate)
+                    .ToListAsync();
+            }
+            catch (Exception ex)
+            {
+                _logger.Error(ex, $"Problem with getting data from {nameof(GetByDarceAsync)}");
+                throw;
+            }
+            finally
+            {
+                if (ownsContext && db != null)
+                {
+                    await db.DisposeAsync();
+                }
+            }
 
             if (withCompany)
             {
@@ -87,7 +110,8 @@ namespace HlidacStatu.Repositories
             return osobySponzoring;
         }
 
-        public static async Task<List<Sponzoring>> GetByDarceAsync(string icoDarce, Expression<Func<Sponzoring, bool>> predicate)
+        public static async Task<List<Sponzoring>> GetByDarceAsync(string icoDarce,
+            Expression<Func<Sponzoring, bool>> predicate)
         {
             await using DbEntities db = new DbEntities();
             return await db.Sponzoring
@@ -114,8 +138,8 @@ namespace HlidacStatu.Repositories
                 .Where(SponzoringLimitsPredicate)
                 .ToListAsync();
         }
-        
-        public static async Task<List<SponzoringDetail>> GetByPrijemceWithPersonDetailsAsync(string icoPrijemce, 
+
+        public static async Task<List<SponzoringDetail>> GetByPrijemceWithPersonDetailsAsync(string icoPrijemce,
             CancellationToken cancellationToken = default)
         {
             await using DbEntities db = new DbEntities();
@@ -131,7 +155,7 @@ namespace HlidacStatu.Repositories
         public static async Task<Sponzoring> CreateAsync(Sponzoring sponzoring, string user)
         {
             await using DbEntities db = new DbEntities();
-            
+
             if (sponzoring.OsobaIdDarce == 0
                 && string.IsNullOrWhiteSpace(sponzoring.IcoDarce))
                 throw new Exception(
@@ -184,16 +208,18 @@ namespace HlidacStatu.Repositories
 
 
         //přidat cache
-        public static async Task<List<SponzoringOverview>> PartiesPerYearsOverviewAsync(int? year, CancellationToken cancellationToken)
+        public static async Task<List<SponzoringOverview>> PartiesPerYearsOverviewAsync(int? year,
+            CancellationToken cancellationToken)
         {
             int rok = year ?? 0;
             int yearSwitch = year.HasValue ? 0 : 1;
-            
-            var partiesPerYear = await _cache.GetOrSetAsync<List<SponzoringOverview>>($"bookmark:{rok}_{yearSwitch}", async _=>
-            {
-                await using DbEntities db = new DbEntities();
-                return await db.SponzoringOverviewView.FromSqlInterpolated(
-                        $@"SELECT zs.KratkyNazev, IcoPrijemce as IcoStrany
+
+            var partiesPerYear = await _cache.GetOrSetAsync<List<SponzoringOverview>>($"bookmark:{rok}_{yearSwitch}",
+                async _ =>
+                {
+                    await using DbEntities db = new DbEntities();
+                    return await db.SponzoringOverviewView.FromSqlInterpolated(
+                            $@"SELECT zs.KratkyNazev, IcoPrijemce as IcoStrany
                       ,Year(DarovanoDne) as Rok, SUM(Hodnota) as DaryCelkem
                       ,SUM(case when icodarce is null or Len(IcoDarce) < 3 then Hodnota end) as DaryOsob
                       ,SUM(case when icodarce is not null and Len(IcoDarce) >= 3 then Hodnota end) as DaryFirem
@@ -203,8 +229,8 @@ namespace HlidacStatu.Repositories
                       Left Join ZkratkaStrany zs on sp.IcoPrijemce = zs.ICO
                       WHERE (year(sp.DarovanoDne) = {rok} or 1={yearSwitch})
                       group by zs.KratkyNazev, IcoPrijemce, Year(DarovanoDne)")
-                    .ToListAsync(cancellationToken);
-            }, token: cancellationToken, options: CachingOptions.Cache10m_failsave4h);
+                        .ToListAsync(cancellationToken);
+                }, token: cancellationToken, options: CachingOptions.Cache10m_failsave4h);
 
             return partiesPerYear;
         }
@@ -214,26 +240,27 @@ namespace HlidacStatu.Repositories
                 TimeSpan.FromHours(1), "stranyIcoCache",
                 (o) =>
                 {
-                    var res = DirectDB.Instance.GetList<string, string>(@"SELECT  IcoPrijemce as IcoStrany, zs.KratkyNazev
+                    var res = DirectDB.Instance.GetList<string, string>(
+                        @"SELECT  IcoPrijemce as IcoStrany, zs.KratkyNazev
                       FROM Sponzoring sp
                       Left Join ZkratkaStrany zs on sp.IcoPrijemce = zs.ICO
                       group by zs.KratkyNazev, IcoPrijemce");
-                    
-                    return res.ToDictionary(k => k.Item1 , v => v.Item2 ?? Firmy.GetJmeno(v.Item1));
+
+                    return res.ToDictionary(k => k.Item1, v => v.Item2 ?? Firmy.GetJmeno(v.Item1));
                 });
 
         private static Dictionary<string, string> StranyIco()
         {
             return stranyIcoCache.Get();
-
         }
 
         public static string IcoToKratkyNazev(string stranaIco)
         {
             if (StranyIco().ContainsKey(stranaIco))
-                return StranyIco().FirstOrDefault(m=>m.Key == stranaIco).Value;
+                return StranyIco().FirstOrDefault(m => m.Key == stranaIco).Value;
             return null;
         }
+
         public static string KratkyNazevToIco(string stranaKratkyNazev)
         {
             if (StranyIco().ContainsValue(stranaKratkyNazev))
@@ -241,17 +268,20 @@ namespace HlidacStatu.Repositories
             return null;
         }
 
-        public static async Task<Dictionary<int, decimal>> SponzoringPerYearAsync(string party, int minYear, int maxYear, bool persons, bool companies)
+        public static async Task<Dictionary<int, decimal>> SponzoringPerYearAsync(string party, int minYear,
+            int maxYear, bool persons, bool companies)
         {
             string icoStrany = await ZkratkaStranyRepo.IcoStranyAsync(party);
             await using DbEntities db = new DbEntities();
-            
+
             var dataPerY = await db.Sponzoring
-                .Where(m => m.IcoPrijemce == icoStrany && m.DarovanoDne.Value.Year >= minYear && m.DarovanoDne.Value.Year <= maxYear)
+                .Where(m => m.IcoPrijemce == icoStrany && m.DarovanoDne.Value.Year >= minYear &&
+                            m.DarovanoDne.Value.Year <= maxYear)
                 .Where(m => (persons && m.OsobaIdDarce != null) || (companies && m.IcoDarce != null))
-                .GroupBy(k => k.DarovanoDne.Value.Year, m => m, (k, v) => new { rok = k, sum = v.Sum(m => m.Hodnota ?? 0) })
+                .GroupBy(k => k.DarovanoDne.Value.Year, m => m,
+                    (k, v) => new { rok = k, sum = v.Sum(m => m.Hodnota ?? 0) })
                 .ToDictionaryAsync(k => k.rok, v => v.sum);
-            
+
             //add missing years
             for (int year = minYear; year <= maxYear; year++)
             {
@@ -263,13 +293,14 @@ namespace HlidacStatu.Repositories
                 .ToDictionary(k => k.Key, m => m.Value);
         }
 
-        public static async Task<List<SponzoringSummed>> PeopleSponsorsAsync(string party, CancellationToken cancellationToken)
+        public static async Task<List<SponzoringSummed>> PeopleSponsorsAsync(string party,
+            CancellationToken cancellationToken)
         {
             string icoStrany = await ZkratkaStranyRepo.IcoStranyAsync(party);
             int tenYearsBack = DateTime.Now.Year - 10;
 
             await using DbEntities db = new DbEntities();
-            
+
             return await db.SponzoringSummedView.FromSqlInterpolated(
                     $@"SELECT zs.KratkyNazev as NazevStrany
                        ,sp.IcoPrijemce as IcoStrany
@@ -292,7 +323,8 @@ namespace HlidacStatu.Repositories
                 .ToListAsync(cancellationToken);
         }
 
-        public static async Task<List<SponzoringSummed>> CompanySponsorsAsync(string party, CancellationToken cancellationToken)
+        public static async Task<List<SponzoringSummed>> CompanySponsorsAsync(string party,
+            CancellationToken cancellationToken)
         {
             string icoStrany = await ZkratkaStranyRepo.IcoStranyAsync(party);
             int tenYearsBack = DateTime.Now.Year - 10;
@@ -322,7 +354,8 @@ namespace HlidacStatu.Repositories
         /// <param name="year">If null it returns sum for all years</param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        public static async Task<List<SponzoringSummed>> BiggestPeopleSponsorsAsync(int? year, CancellationToken cancellationToken, int? take = null)
+        public static async Task<List<SponzoringSummed>> BiggestPeopleSponsorsAsync(int? year,
+            CancellationToken cancellationToken, int? take = null)
         {
             int rok = year ?? 0;
             int yearSwitch = year.HasValue ? 0 : 1;
@@ -357,7 +390,8 @@ namespace HlidacStatu.Repositories
         /// <param name="year">If null it returns sum for all years</param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        public static async Task<List<SponzoringSummed>> BiggestCompanySponsorsAsync(int? year, CancellationToken cancellationToken, int? take = null)
+        public static async Task<List<SponzoringSummed>> BiggestCompanySponsorsAsync(int? year,
+            CancellationToken cancellationToken, int? take = null)
         {
             int rok = year ?? 0;
             int yearSwitch = year.HasValue ? 0 : 1;
@@ -378,7 +412,8 @@ namespace HlidacStatu.Repositories
                             where (year(sp.DarovanoDne) = {rok} or 1={yearSwitch}) and IcoDarce is not null
                               and year(sp.DarovanoDne) >= {tenYearsBack}
                             group by fi.ICO, fi.Jmeno, fi.kod_pf")
-                .OrderByDescending(x => x.DarCelkem); ;
+                .OrderByDescending(x => x.DarCelkem);
+            ;
 
             if (take != null)
                 return await request.Take(take.Value).ToListAsync(cancellationToken);

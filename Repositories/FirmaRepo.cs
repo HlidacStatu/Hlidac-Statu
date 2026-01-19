@@ -266,32 +266,46 @@ namespace HlidacStatu.Repositories
             }
         }
         
-        public static async Task<Firma> FromIcoAsync(string ico, bool loadInvalidIco = false)
+        //při injectnutém db contextu se nesmí dělat paralelní operace
+        public static async Task<Firma> FromIcoAsync(string ico, bool loadInvalidIco = false, DbEntities db = null)
         {
             if (Util.DataValidators.CheckCZICO(ico) == false && loadInvalidIco == false)
                 return null;
         
             Firma f = new Firma();
-            await using DbEntities db = new DbEntities();
             
-            f = await db.Firma.FirstOrDefaultAsync(m => m.ICO == ico);
-            if (f is null)
-                return null;
-        
-            f.ICO = HlidacStatu.Util.ParseTools.NormalizeIco(f.ICO);
-        
-            if (f != null)
+            bool ownsContext = db == null;
+            if (ownsContext)
+                db = new DbEntities();
+            try
             {
-                f.DatovaSchranka = await db.Database.SqlQuery<string>($"select DatovaSchranka from firma_DS where ico={ico}")
-                    .ToArrayAsync();
-        
-                f.NACE = await db.Database.SqlQuery<string>($"select NACE from firma_Nace where ico={ico}")
-                    .ToArrayAsync();
-                    
-                return f;
+                f = await db.Firma.FirstOrDefaultAsync(m => m.ICO == ico);
+                if (f is null)
+                    return null;
+
+                f.ICO = HlidacStatu.Util.ParseTools.NormalizeIco(f.ICO);
+
+                if (f != null)
+                {
+                    f.DatovaSchranka = await db.Database
+                        .SqlQuery<string>($"select DatovaSchranka from firma_DS where ico={ico}")
+                        .ToArrayAsync();
+
+                    f.NACE = await db.Database.SqlQuery<string>($"select NACE from firma_Nace where ico={ico}")
+                        .ToArrayAsync();
+
+                    return f;
+                }
+                else
+                    return null;
             }
-            else
-                return null;
+            finally
+            {
+                if (ownsContext && db != null)
+                {
+                    await db.DisposeAsync();
+                }
+            }
         }
 
         public static Firma FromNameFirstItem(string jmeno, bool wildcards = false)
