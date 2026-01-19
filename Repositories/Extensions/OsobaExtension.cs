@@ -14,11 +14,14 @@ using System.Linq.Expressions;
 using System.Threading.Tasks;
 using HlidacStatu.DS.Api.Osoba;
 using HlidacStatu.Repositories.Cache;
+using Serilog;
 
 namespace HlidacStatu.Extensions
 {
     public static class OsobaExtension
     {
+        private static readonly ILogger _logger = Log.ForContext(typeof(OsobaExtension));
+
         public static async Task<string> CurrentPoliticalPartyAsync(this Osoba osoba)
         {
             var (organizace, ico) = osoba.Events(ev =>
@@ -472,11 +475,11 @@ namespace HlidacStatu.Extensions
                 {
                     DateTime datumOd = new DateTime(DateTime.Now.Year - 10, 1, 1);
                     var sponzoringPrimy = await SponzoringRepo.GetByDarceAsync(osoba.InternalId, s =>
-                        s.IcoPrijemce != null
-                        && s.DarovanoDne >= datumOd
-                        && s.Typ != (int)Sponzoring.TypDaru
-                            .DarFirmy, 
-                        withCompany: true, 
+                            s.IcoPrijemce != null
+                            && s.DarovanoDne >= datumOd
+                            && s.Typ != (int)Sponzoring.TypDaru
+                                .DarFirmy,
+                        withCompany: true,
                         db: db);
 
                     if (sponzoringPrimy != null && sponzoringPrimy.Any())
@@ -487,29 +490,32 @@ namespace HlidacStatu.Extensions
                         decimal celkem = sponzoringPrimy.Sum(m => m.Hodnota) ?? 0;
                         decimal top = sponzoringPrimy.Max(m => m.Hodnota) ?? 0;
                         //todo: přidat tabulku politických stran a změnit zde na název strany
-                        string prvniStrana = (await FirmaRepo.FromIcoAsync(strany[0], db: db)).Jmeno;
+                        string prvniStrana = (await FirmaRepo.FromIcoAsync(strany[0], db: db))?.Jmeno;
 
-                        f.Add(new InfoFact($"{osoba.FullName()} "
-                                           + Plural.Get(roky.Count(), "v roce " + roky[0],
-                                               $"mezi roky {roky.First()} - {roky.Last() - 2000}",
-                                               $"mezi roky {roky.First()} - {roky.Last() - 2000}")
-                                           + $" sponzoroval{(osoba.Muz() ? "" : "a")} " +
-                                           Plural.Get(strany.Length, "stranu " + prvniStrana,
-                                               "{0} polit. strany", "{0} polit. stran")
-                                           + $" v&nbsp;celkové výši <b>{RenderData.ShortNicePrice(celkem, html: true)}</b>. "
-                                           + $"Nejvyšší sponzorský dar byl ve výši {RenderData.ShortNicePrice(top, html: true)}. "
-                            , Fact.ImportanceLevel.Medium)
-                        );
+                        if (!string.IsNullOrWhiteSpace(prvniStrana))
+                        {
+                            f.Add(new InfoFact($"{osoba.FullName()} "
+                                               + Plural.Get(roky.Count(), "v roce " + roky[0],
+                                                   $"mezi roky {roky.First()} - {roky.Last() - 2000}",
+                                                   $"mezi roky {roky.First()} - {roky.Last() - 2000}")
+                                               + $" sponzoroval{(osoba.Muz() ? "" : "a")} " +
+                                               Plural.Get(strany.Length, "stranu " + prvniStrana,
+                                                   "{0} polit. strany", "{0} polit. stran")
+                                               + $" v&nbsp;celkové výši <b>{RenderData.ShortNicePrice(celkem, html: true)}</b>. "
+                                               + $"Nejvyšší sponzorský dar byl ve výši {RenderData.ShortNicePrice(top, html: true)}. "
+                                , Fact.ImportanceLevel.Medium)
+                            );
+                        }
                     }
 
                     var sponzoringPresFirmu = await SponzoringRepo.GetByDarceAsync(osoba.InternalId,
-                            s => s.IcoPrijemce != null
-                                 && s.DarovanoDne >= datumOd
-                                 && s.Typ == (int)Sponzoring.TypDaru
-                                     .DarFirmy, 
-                        withCompany: true, 
+                        s => s.IcoPrijemce != null
+                             && s.DarovanoDne >= datumOd
+                             && s.Typ == (int)Sponzoring.TypDaru
+                                 .DarFirmy,
+                        withCompany: true,
                         db: db);
-                    
+
                     if (sponzoringPresFirmu != null && sponzoringPresFirmu.Any())
                     {
                         string[] strany = sponzoringPresFirmu.Select(m => m.IcoPrijemce).Distinct().ToArray();
@@ -517,20 +523,24 @@ namespace HlidacStatu.Extensions
                             .Distinct().OrderBy(y => y).ToArray();
                         decimal celkem = sponzoringPresFirmu.Sum(m => m.Hodnota) ?? 0;
                         decimal top = sponzoringPresFirmu.Max(m => m.Hodnota) ?? 0;
-                        string prvniStrana = (await FirmaRepo.FromIcoAsync(strany[0], db: db)).Jmeno;
+                        string prvniStrana = (await FirmaRepo.FromIcoAsync(strany[0], db: db))?.Jmeno;
 
-                        f.Add(new InfoFact($"{osoba.FullName()} byl{(osoba.Muz() ? "" : "a")}"
-                                           + $" členem statutárního orgánu společnosti, která "
-                                           + Plural.Get(roky.Count(), "v roce " + roky[0],
-                                               $"mezi roky {roky.First()} - {roky.Last() - 2000}",
-                                               $"mezi roky {roky.First()} - {roky.Last() - 2000}")
-                                           + $" sponzorovala "
-                                           + Plural.Get(strany.Length, "stranu " + prvniStrana,
-                                               "{0} polit. strany", "{0} polit. stran")
-                                           + $" v&nbsp;celkové výši <b>{RenderData.ShortNicePrice(celkem, html: true)}</b>. "
-                                           + $"Nejvyšší sponzorský dar byl ve výši {RenderData.ShortNicePrice(top, html: true)}. "
-                            , Fact.ImportanceLevel.Medium)
-                        );
+                        if (!string.IsNullOrWhiteSpace(prvniStrana))
+                        {
+                            f.Add(new InfoFact($"{osoba.FullName()} byl{(osoba.Muz() ? "" : "a")}"
+                                               + $" členem statutárního orgánu společnosti, která "
+                                               + Plural.Get(roky.Count(), "v roce " + roky[0],
+                                                   $"mezi roky {roky.First()} - {roky.Last() - 2000}",
+                                                   $"mezi roky {roky.First()} - {roky.Last() - 2000}")
+                                               + $" sponzorovala "
+                                               + Plural.Get(strany.Length, "stranu " + prvniStrana,
+                                                   "{0} polit. strany", "{0} polit. stran")
+                                               + $" v&nbsp;celkové výši <b>{RenderData.ShortNicePrice(celkem, html: true)}</b>. "
+                                               + $"Nejvyšší sponzorský dar byl ve výši {RenderData.ShortNicePrice(top, html: true)}. "
+                                , Fact.ImportanceLevel.Medium)
+                            );
+                        }
+                        
                     }
 
                     if (soukrStat.Sum(m => m.PocetSmluv) > 0)
@@ -591,6 +601,10 @@ namespace HlidacStatu.Extensions
                         }
                     }
                 }
+            }
+            catch (Exception ex)
+            {
+                _logger.Error(ex, $"Infofacts load for osoba{osoba.InternalId}-{osoba.NameId} failed.");
             }
             finally
             {
