@@ -988,19 +988,21 @@ namespace HlidacStatu.Extensions
                             .ToArray();
                         decimal celkem = sponzoring.Sum(m => m.Hodnota) ?? 0;
                         decimal top = sponzoring.Max(m => m.Hodnota) ?? 0;
-                        string prvniStrana = (await FirmaRepo.FromIcoAsync(strany[0])).Jmeno;
-
-                        f.Add(new InfoFact($"{sName} "
-                                           + Devmasters.Lang.CS.Plural.Get(roky.Count(), "v roce " + roky[0],
-                                               $"mezi roky {roky.First()}-{roky.Last() - 2000}",
-                                               $"mezi roky {roky.First()}-{roky.Last() - 2000}")
-                                           + $" sponzoroval{(sMuzsky ? "" : "a")} " +
-                                           Devmasters.Lang.CS.Plural.Get(strany.Length, prvniStrana,
-                                               "{0} polit.strany", "{0} polit.stran")
-                                           + $" v&nbsp;celkové výši <b>{RenderData.ShortNicePrice(celkem, html: true)}</b>. "
-                                           + $"Nejvyšší sponzorský dar byl ve výši {RenderData.ShortNicePrice(top, html: true)}. "
-                            , Fact.ImportanceLevel.Medium)
-                        );
+                        string prvniStrana = (await FirmaRepo.FromIcoAsync(strany[0]))?.Jmeno;
+                        if (!string.IsNullOrWhiteSpace(prvniStrana))
+                        {
+                            f.Add(new InfoFact($"{sName} "
+                                               + Devmasters.Lang.CS.Plural.Get(roky.Count(), "v roce " + roky[0],
+                                                   $"mezi roky {roky.First()}-{roky.Last() - 2000}",
+                                                   $"mezi roky {roky.First()}-{roky.Last() - 2000}")
+                                               + $" sponzoroval{(sMuzsky ? "" : "a")} " +
+                                               Devmasters.Lang.CS.Plural.Get(strany.Length, prvniStrana,
+                                                   "{0} polit.strany", "{0} polit.stran")
+                                               + $" v&nbsp;celkové výši <b>{RenderData.ShortNicePrice(celkem, html: true)}</b>. "
+                                               + $"Nejvyšší sponzorský dar byl ve výši {RenderData.ShortNicePrice(top, html: true)}. "
+                                , Fact.ImportanceLevel.Medium)
+                            );
+                        }
                     }
                 }
 
