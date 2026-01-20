@@ -467,7 +467,7 @@ namespace HlidacStatu.Extensions
 
             var icos = await firma.IcosInHoldingAsync(aktualnost);
 
-            return icos.Select(ico => Firmy.Get(ico));
+            return icos.Select(ico => Firmy.GetAsync(ico));
         }
 
 

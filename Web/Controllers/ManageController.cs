@@ -89,7 +89,7 @@ namespace HlidacStatu.Web.Controllers
             return View(res);
         }
 
-        public ActionResult ICO2Firmy([FromForm] string names)
+        public async Task<ActionResult> ICO2Firmy([FromForm] string names)
         {
             List<Firma> res = null;
             string jmena = names;//Request.Form.Keys.Contains("names") ? Request.Form["names"] : "";
@@ -99,7 +99,7 @@ namespace HlidacStatu.Web.Controllers
                 res = new List<Firma>();
                 foreach (var ic in icos)
                 {
-                    Firma f = Firmy.Get(ic);
+                    Firma f = await Firmy.GetAsync(ic);
                     if (f?.Valid == true)
                         res.Add(f);
                     else
@@ -145,11 +145,11 @@ namespace HlidacStatu.Web.Controllers
                 new { id = feedback.Ico, rok = feedback.Year });
         }
 
-        public ActionResult SubjektHlidac(string Id)
+        public async Task<ActionResult> SubjektHlidac(string Id)
         {
             if (string.IsNullOrWhiteSpace(Id))
                 return NotFound();
-            Firma model = Firmy.Get(Id);
+            Firma model = await Firmy.GetAsync(Id);
             if (model == null || model.Valid==false)
             {
                 return NotFound();

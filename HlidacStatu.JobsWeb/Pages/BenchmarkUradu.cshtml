@@ -24,7 +24,7 @@
         graphModel.SubjectName = Model.Nazev;
 
         tableModel.Statistics = statistics;
-        tableModel.SubjectName = HlidacStatu.Repositories.Firmy.GetJmeno(Model.Ico);
+        tableModel.SubjectName = await HlidacStatu.Repositories.Firmy.GetJmenoAsync(Model.Ico);
     }
 }
 
@@ -96,7 +96,7 @@
     <div class="col-sm-12 col-lg-10" id="content__body">
 
         @{
-            Firma urad = HlidacStatu.Repositories.Firmy.Get(Model.Ico);
+            Firma urad = await HlidacStatu.Repositories.Firmy.GetAsync(Model.Ico);
 
             var RSstat = await HlidacStatu.Repositories.SmlouvaRepo.Searching.CachedSimpleSearchWithStat(
                 $"icoPlatce:{Model.Ico} AND " + Model.Key?.PerSubjectDesc?.Query,

@@ -93,7 +93,7 @@ namespace HlidacStatu.Repositories.Analysis.KorupcniRiziko
                     .Where(m => m.Value.KIndexReady)
                     .Select(m =>
                     {
-                        var company = Firmy.Get(m.Key);
+                        var company = Firmy.GetAsync(m.Key);
                         return new IcoDetail() { ico = m.Key, kindex = m.Value.KIndex, krajId = company.KrajId };
                     })
                     .OrderBy(m => m.kindex)
@@ -106,7 +106,7 @@ namespace HlidacStatu.Repositories.Analysis.KorupcniRiziko
                         .Where(m => m.Value.KIndexVypocet.Radky.Any(r => r.VelicinaPart == part))
                         .Select(m =>
                         {
-                            var company = Firmy.Get(m.Key);
+                            var company = Firmy.GetAsync(m.Key);
                             return new IcoDetail()
                             {
                                 ico = m.Key,

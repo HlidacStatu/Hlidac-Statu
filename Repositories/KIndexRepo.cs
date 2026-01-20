@@ -48,18 +48,16 @@ public static class KIndexRepo
         return year.Value;
     }
     
-    
-    
-    public static async Task<KIndexData> EmptyAsync(string ico, string jmeno = null)
-    {
-        KIndexData kidx = new KIndexData();
-        kidx.Ico = ico;
-        kidx.Jmeno = jmeno ?? Firmy.GetJmeno(ico);
-        kidx.roky = (await KIndexRepo.GetAvailableCalculationYearsAsync())
-            .Select(rok => KIndexData.Annual.Empty(rok))
-            .ToList();
-        return kidx;
-    }
+    // public static async Task<KIndexData> EmptyAsync(string ico, string jmeno = null)
+    // {
+    //     KIndexData kidx = new KIndexData();
+    //     kidx.Ico = ico;
+    //     kidx.Jmeno = jmeno ?? await Firmy.GetJmenoAsync(ico);
+    //     kidx.roky = (await KIndexRepo.GetAvailableCalculationYearsAsync())
+    //         .Select(rok => KIndexData.Annual.Empty(rok))
+    //         .ToList();
+    //     return kidx;
+    // }
     
     public static async Task SaveAsync(this KIndexData kIndexData, string comment, bool useTempDb = false)
     {

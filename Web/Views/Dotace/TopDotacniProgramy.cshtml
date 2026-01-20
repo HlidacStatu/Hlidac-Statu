@@ -38,7 +38,7 @@
     };
 
     ViewBag.Title = "Hlídač dotací";
-    ViewBag.SubTitle = $"{(string.IsNullOrWhiteSpace(icoPoskytovatele) ? "" : Firmy.GetJmeno(icoPoskytovatele)+": ")} Přehled největších dotačních programů{yearText} {typDotaceText}";
+    ViewBag.SubTitle = $"{(string.IsNullOrWhiteSpace(icoPoskytovatele) ? "" : Firmy.GetJmenoAsync(icoPoskytovatele)+": ")} Přehled největších dotačních programů{yearText} {typDotaceText}";
 }
 
 @section breadcrumb

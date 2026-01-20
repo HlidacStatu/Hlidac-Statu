@@ -110,7 +110,7 @@ namespace HlidacStatu.Repositories
                         //nasel jsem ico?
                         foreach (var ico in firmyNazvyOnlyAscii[simpleName])
                         {
-                            Firma f = Firmy.Get(ico); //TODO StaticData.FirmyNazvyAscii.Get()[simpleName]);
+                            Firma f = await Firmy.GetAsync(ico); //TODO StaticData.FirmyNazvyAscii.Get()[simpleName]);
                             if (f?.Valid == true)
                             {
                                 var firmaFromText = TextUtil.ReplaceDuplicates(

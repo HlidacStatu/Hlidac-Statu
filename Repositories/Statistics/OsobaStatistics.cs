@@ -34,7 +34,7 @@ namespace HlidacStatu.Repositories.Statistics
             if (registrSmluv._neziskovkyIcos == null)
             {
                 registrSmluv._neziskovkyIcos = registrSmluv.SoukromeFirmy
-                    .Select(m => Firmy.Get(m.Key))
+                    .Select(m => Firmy.GetAsync(m.Key))
                     .Where(ff => ff.JsemNeziskovka())
                     .Select(s => s.ICO)
                     .ToArray();

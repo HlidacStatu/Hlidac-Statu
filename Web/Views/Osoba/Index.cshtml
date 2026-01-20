@@ -289,7 +289,7 @@
                         {
                             <li>
                                 <a asp-controller="Subjekt" asp-action="Index" asp-route-id="@stat.Key">
-                                    @Firmy.GetJmeno(stat.Key)
+                                    @Firmy.GetJmenoAsync(stat.Key)
                                 </a>
                                 (@Html.Raw(stat.Value.Summary().ToNiceLinkString(null, true, customUrl: $"/hledat?q=ico:{stat.Key}")) od
                                 2016
@@ -377,7 +377,7 @@
                         {
                             <li>
                                 <a asp-controller="Subjekt" asp-action="Index" asp-route-id="@stat.Key">
-                                    @Firmy.GetJmeno(stat.Key)
+                                    @Firmy.GetJmenoAsync(stat.Key)
                                 </a>
                                 (@Html.Raw(stat.Value.Summary().ToNiceLinkString(null, true, customUrl: $"/hledat?q=ico:{stat.Key}")) od
                                 2016

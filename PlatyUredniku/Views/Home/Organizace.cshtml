@@ -8,7 +8,7 @@
 
 @{
     string ico = Model.Ico;
-    Firma f = Firmy.Get(ico);
+    Firma f = await Firmy.GetAsync(ico);
     ViewBag.Title = $"{Model.Nazev}";
     var ceo = await f.CurrentCeoAsync();
     var socialContacts = (await f.GetSocialContactsAsync()).ToList();

@@ -179,7 +179,7 @@
                         <dt class="col-sm-4">Poskytovatel programu</dt>
                         <dd class="col-sm-8">
                             <a asp-controller="Subjekt" asp-action="Index"
-                               asp-route-id="@Model.FirstOrDefault()?.ProviderIco">@Firmy.GetJmeno(Model.FirstOrDefault()?.ProviderIco)</a>
+                               asp-route-id="@Model.FirstOrDefault()?.ProviderIco">@Firmy.GetJmenoAsync(Model.FirstOrDefault()?.ProviderIco)</a>
                         </dd>
                         <dt class="col-sm-4">Rozsah vyplacených dotací</dt>
                         <dd class="col-sm-8">

@@ -5,7 +5,6 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Text;
 using System;
-using HlidacStatu.Lib.Web.UI.Attributes;
 using System.Linq;
 using HlidacStatu.LibCore.Filters;
 
@@ -27,7 +26,7 @@ public class HomeController : Controller
         if (HlidacStatu.Util.DataValidators.CheckCZICO(id))
         {
             //ico
-            var f = Firmy.Get(id);
+            var f = await Firmy.GetAsync(id);
             if (f?.Valid == true)
                 ds = f.DatovaSchranka;
 

@@ -197,7 +197,7 @@
                         Name = "Dodavatel",
                         HtmlRender =(m) =>
                         {
-                            var f = Firmy.Get(m.Key);
+                            var f = Firmy.GetAsync(m.Key);
                             return $"<a href='{f.GetUrl()}'>{f.Jmeno}</a>";
                         }
                     },
@@ -229,15 +229,15 @@
         <div>
             @if (topDodavateleCurrSeason.Count() > 7)
             {
-                @Html.Raw(string.Join(", ", topDodavateleCurrSeason.Take(7).Select(m => $"<a href='/subjekt/{m.ico}'>{Firmy.GetJmeno(m.ico)}</a>")))
+                @Html.Raw(string.Join(", ", topDodavateleCurrSeason.Take(7).Select(m => $"<a href='/subjekt/{m.ico}'>{Firmy.GetJmenoAsync(m.ico)}</a>")))
                 <span class="collapse" id="topDcurr">
-                    @Html.Raw(string.Join(", ", topDodavateleCurrSeason.Skip(7).Take(13).Select(m => $"<a href='/subjekt/{m.ico}'>{Firmy.GetJmeno(m.ico)}</a>")))
+                    @Html.Raw(string.Join(", ", topDodavateleCurrSeason.Skip(7).Take(13).Select(m => $"<a href='/subjekt/{m.ico}'>{Firmy.GetJmenoAsync(m.ico)}</a>")))
                 </span>
                 <a data-bs-toggle="collapse" href="#topDcurr" style="font-weight:bold">Více... &raquo;</a>
             }
             else
             {
-                @Html.Raw(string.Join(", ", topDodavateleCurrSeason.Take(20).Select(m => $"<a href='/subjekt/{m.ico}'>{Firmy.GetJmeno(m.ico)}</a>")))
+                @Html.Raw(string.Join(", ", topDodavateleCurrSeason.Take(20).Select(m => $"<a href='/subjekt/{m.ico}'>{Firmy.GetJmenoAsync(m.ico)}</a>")))
             }
         </div>
 
@@ -258,7 +258,7 @@
                 StatisticsSubjectPerYear<SimpleStat> fStat = topDodavatele.First(m => m.ICO == ico);
 
                 <tr>
-                    <td>@(Firmy.GetJmeno(ico))</td>
+                    <td>@(Firmy.GetJmenoAsync(ico))</td>
                     @foreach (var y in Years)
                     {
                         var query = HlidacStatu.Searching.Query.ModifyQueryAND(Model.Query, $"ico:{ico}", $"datumUzavreni:[{y}-01-01 TO {(y + 1)}-01-01}}");
@@ -297,7 +297,7 @@
                     Name = "Zadavatel",
                     HtmlRender =(m) =>
                     {
-                        var f = Firmy.Get(m.Key);
+                        var f = Firmy.GetAsync(m.Key);
                         return $"<a href='{f.GetUrl()}'>{f.Jmeno}</a>";
                     }
                 },
@@ -329,15 +329,15 @@
     <p>
         @if (topZadavateleCurrSeason.Count() > 7)
         {
-            @Html.Raw(string.Join(", ", topZadavateleCurrSeason.Take(7).Select(m => $"<a href='/subjekt/{m.ico}'>{Firmy.GetJmeno(m.ico)}</a>")))
+            @Html.Raw(string.Join(", ", topZadavateleCurrSeason.Take(7).Select(m => $"<a href='/subjekt/{m.ico}'>{Firmy.GetJmenoAsync(m.ico)}</a>")))
             <span class="collapse" id="topZcurr">
-                        @Html.Raw(string.Join(", ", topZadavateleCurrSeason.Skip(7).Take(13).Select(m => $"<a href='/subjekt/{m.ico}'>{Firmy.GetJmeno(m.ico)}</a>")))
+                        @Html.Raw(string.Join(", ", topZadavateleCurrSeason.Skip(7).Take(13).Select(m => $"<a href='/subjekt/{m.ico}'>{Firmy.GetJmenoAsync(m.ico)}</a>")))
             </span>
             <a data-bs-toggle="collapse" href="#topZcurr" style="font-weight:bold">Více... &raquo;</a>
         }
         else
         {
-            @Html.Raw(string.Join(", ", topZadavateleCurrSeason.Take(20).Select(m => $"<a href='/subjekt/{m.ico}'>{Firmy.GetJmeno(m.ico)}</a>")))
+            @Html.Raw(string.Join(", ", topZadavateleCurrSeason.Take(20).Select(m => $"<a href='/subjekt/{m.ico}'>{Firmy.GetJmenoAsync(m.ico)}</a>")))
         }
     </p>
 
@@ -358,7 +358,7 @@
             StatisticsSubjectPerYear<SimpleStat> fStat = topZadavatele.First(m => m.ICO == ico);
 
             <tr>
-                <td>@(Firmy.GetJmeno(ico))</td>
+                <td>@(Firmy.GetJmenoAsync(ico))</td>
                 @foreach (var y in Years)
                 {
                     var query = HlidacStatu.Searching.Query.ModifyQueryAND(Model.Query, $"ico:{ico}", $"datumUzavreni:[{y}-01-01 TO {(y + 1)}-01-01}}");

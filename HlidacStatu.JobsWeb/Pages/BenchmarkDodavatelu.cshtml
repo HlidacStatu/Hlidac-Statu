@@ -25,7 +25,7 @@
 
         tableModel.Statistics = statistics;
         tableModel.HideDodavatelCount = true;
-        tableModel.SubjectName = HlidacStatu.Repositories.Firmy.GetJmeno(Model.Ico);
+        tableModel.SubjectName = await HlidacStatu.Repositories.Firmy.GetJmenoAsync(Model.Ico);
     }
 }
 
@@ -85,7 +85,7 @@
 
 <h2>@Model.Nazev</h2>
 @{
-    Firma dodavatel = HlidacStatu.Repositories.Firmy.Get(Model.Ico);
+    Firma dodavatel = await HlidacStatu.Repositories.Firmy.GetAsync(Model.Ico);
 
     var RSstat = await HlidacStatu.Repositories.SmlouvaRepo.Searching.CachedSimpleSearchWithStat(
         $"icoPrijemce:{Model.Ico} AND " + Model.Key?.PerSubjectDesc?.Query,

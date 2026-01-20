@@ -4,8 +4,6 @@
 @using WatchdogAnalytics.Models
 @using WatchdogAnalytics.Services
 
-
-
 @{
     List<JobStatistics> zadavatelStatistics = Model.statistics;
 
@@ -14,29 +12,17 @@
     {
         return;
     }
-
-    var smlouvyQuery = "id:(" + string.Join(" OR ", smlouvyIds) + ")";
-
+    
     var firmyCount = await JobService.GetDodavateleListAsync(Model.Key.Value);
     var firmy = zadavatelStatistics.SelectMany(m => m.Dodavatele).Distinct()
-    .Select(m => new
-    {
-        ico = m,
-        name = HlidacStatu.Repositories.Firmy.GetJmeno(m),
-        count = firmyCount.Any(c => c.ico == m) ? firmyCount.First(c => c.ico == m).pocetCen : 0
-    })
-    .OrderBy(o => o.name);
+        .Select(m => new
+        {
+            ico = m,
+            name = HlidacStatu.Repositories.Firmy.GetJmenoAsync(m),
+            count = firmyCount.Any(c => c.ico == m) ? firmyCount.First(c => c.ico == m).pocetCen : 0
+        })
+        .OrderBy(o => o.name);
 
-    var uradyCount = await JobService.GetOdberateleListAsync(Model.Key.Value);
-    var urady = zadavatelStatistics.SelectMany(m => m.Odberatele).Distinct()
-    .Select(m => new
-    {
-        ico = m,
-        name = HlidacStatu.Repositories.Firmy.GetJmeno(m),
-        count = uradyCount.Any(c => c.ico == m) ? uradyCount.First(c => c.ico == m).pocetCen : 0
-    })
-    .OrderBy(o => o.name);
-    ;
 }
 
 @if (this.Context.HasAccess().Result.AnalyzeLevel < CenyCustomer.AccessDetail.AccessDetailLevel.PRO)
@@ -50,10 +36,7 @@
 }
 <div class="row">
     <h2>Porovnání cen dodavatelů pro zadavatele @Model.zadavatel.Jmeno podle jednotlivých položek</h2>
-
-    @{
-        var generalStat = JobService.GetStatistics(Model.Key.Value);
-    }
+    
     @foreach (var polozka in zadavatelStatistics.OrderBy(m => m.Name))
     {
         JobStatistics zadavatelStatisticsPolozka = zadavatelStatistics.FirstOrDefault(m => m.Name == polozka.Name);

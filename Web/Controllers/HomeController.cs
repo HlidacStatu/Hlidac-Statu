@@ -1000,7 +1000,7 @@ text zpravy: {txt}
             }
             else if (id == "vz-ed")
             {
-                string[] icos = FirmaCache.Ministerstva().Select(s => s.ICO).ToArray();
+                string[] icos = (await FirmaCache.MinisterstvaAsync()).Select(s => s.ICO).ToArray();
 
                 var vz = await VzCache.CachedSimpleSearchAsync(
                     new Repositories.Searching.VerejnaZakazkaSearchData()
@@ -1099,7 +1099,7 @@ text zpravy: {txt}
             byte[] data = null;
             if (id?.ToLower() == "subjekt")
             {
-                Firma fi = Firmy.Get(v);
+                Firma fi = await Firmy.GetAsync(v);
                 if (fi?.Valid == true)
                 {
                     if (!(await fi.NotInterestingToShowAsync()))

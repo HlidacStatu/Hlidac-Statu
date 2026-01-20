@@ -293,7 +293,7 @@ public static class FirmaExtensions
             .Select(m => new SimpleDetailInfo()
             {
                 Ico = m,
-                Jmeno = HlidacStatu.Repositories.Firmy.GetJmeno(m),
+                Jmeno = HlidacStatu.Repositories.Firmy.GetJmenoAsync(m),
                 Source_Url = null,
                 Copyright = null
             })
@@ -338,7 +338,7 @@ public static class FirmaExtensions
         }
         else
         {
-            f = Firmy.Get(ico);
+            f = await Firmy.GetAsync(ico);
         }
 
         return f;

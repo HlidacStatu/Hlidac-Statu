@@ -97,7 +97,7 @@ namespace HlidacStatu.Web.Controllers
 
             foreach (var i in id.Split(new char[] { ' ', ',', ';' }, StringSplitOptions.RemoveEmptyEntries))
             {
-                var f = Firmy.Get(Util.ParseTools.NormalizeIco(i));
+                var f = await Firmy.GetAsync(i);
                 if (f?.Valid == true)
                 {
                     SubjectWithKIndexAnnualData data = new SubjectWithKIndexAnnualData()
@@ -171,9 +171,9 @@ namespace HlidacStatu.Web.Controllers
         public ActionResult RecalculateFeedback(string email, string txt, string url, string data)
         {
             // create a task, so user doesn't have to wait for anything
-            _ = Task.Run(() =>
+            _ = Task.Run(async () =>
             {
-                var f = Firmy.Get(Util.ParseTools.NormalizeIco(data));
+                var f = await Firmy.GetAsync(data);
                 if (f?.Valid == true)
                 {
 
@@ -248,7 +248,7 @@ text zpravy: {txt}";
         public async Task<JsonResult> KindexForIco(string id, int? rok = null)
         {
             rok = await KIndexRepo.FixKindexYearAsync(rok);
-            var f = Firmy.Get(Util.ParseTools.NormalizeIco(id));
+            var f = await Firmy.GetAsync(Util.ParseTools.NormalizeIco(id));
             if (f?.Valid == true)
             {
                 var kidx = await KIndex.GetCachedAsync(Util.ParseTools.NormalizeIco(id));
@@ -326,7 +326,7 @@ text zpravy: {txt}";
 
                 foreach (var i in ico.Split(new char[] { ' ', ',', ';' }, StringSplitOptions.RemoveEmptyEntries))
                 {
-                    var f = Firmy.Get(Util.ParseTools.NormalizeIco(i));
+                    var f = await Firmy.GetAsync(i);
                     if (f?.Valid == true)
                     {
                         var kidx = await KIndex.GetCachedAsync(Util.ParseTools.NormalizeIco(i), refreshCache: true);

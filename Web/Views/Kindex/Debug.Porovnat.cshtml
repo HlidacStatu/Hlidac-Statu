@@ -58,7 +58,7 @@
     <p>
         Porovnání indexu klíčových rizik pro <br />
         <ul class="">
-            @Html.Raw(Model.Select(m => "<li>" + Firmy.Get(m.Ico).Jmeno + "</li>").Aggregate((f, s) => f + "" + s))
+            @Html.Raw(Model.Select(m => "<li>" + Firmy.GetAsync(m.Ico).Jmeno + "</li>").Aggregate((f, s) => f + "" + s))
         </ul>
     </p>
 </div>
@@ -98,7 +98,7 @@ else
                     @foreach (var ki in Model)
                     {
         <td>
-            <b>@Firmy.Get(ki.Ico).Jmeno</b>
+            <b>@Firmy.GetAsync(ki.Ico).Jmeno</b>
             <a href="/kindex/debug/@ki.Ico"><i class="fas fa-chart-line"></i></a>
             <br />@ki.Ico
         </td>}
@@ -384,7 +384,7 @@ else
                     @foreach (var ki in Model)
                     {
         <td>
-            <b>@Firmy.Get(ki.Ico).Jmeno</b>
+            <b>@Firmy.GetAsync(ki.Ico).Jmeno</b>
         </td>}
                 </tr>
                 @foreach (var cl in Smlouva.SClassification.AllTypes.Where(m => m.IsMainType))

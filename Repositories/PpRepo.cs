@@ -182,7 +182,7 @@ public static partial class PpRepo
     {
         if (HlidacStatu.Util.DataValidators.CheckCZICO(ico))
         {
-            Firma f = Firmy.Get(ico);
+            Firma f = await Firmy.GetAsync(ico);
             return await GetOrganizaceFullDetailAsync(f.DatovaSchranka);
         }
         else return null;
@@ -320,7 +320,7 @@ public static partial class PpRepo
                 .Where(v => Devmasters.DT.DateInterval.IsOverlappingIntervals(
                     new Devmasters.DT.DateInterval(v.RelFrom, v.RelTo), obdobi))
                 .Select(m => m.To.Id)
-                .Select(m => Firmy.Get(m)).Where(f => f?.Valid == true).ToArray();
+                .Select(m => Firmy.GetAsync(m)).Where(f => f?.Valid == true).ToArray();
             var d2 = d1
                 .Where(f => f.JsemStatniFirma() || f.JsemOVM()).ToArray();
             if (d2.Any())

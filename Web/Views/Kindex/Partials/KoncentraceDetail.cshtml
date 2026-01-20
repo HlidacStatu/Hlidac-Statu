@@ -42,7 +42,7 @@
 {
     List<Tuple<string, decimal>> data = koncentrace.TopDodavatele(3)
         .OrderByDescending(m => m.HodnotaSmluv)
-        .Select(m => new Tuple<string, decimal>(Firmy.GetJmeno(m.Ico), m.HodnotaSmluv))
+        .Select(m => new Tuple<string, decimal>(Firmy.GetJmenoAsync(m.Ico), m.HodnotaSmluv))
         .Take(12)
         .ToList();
     if (koncentrace.HodnotaSmluvProVypocet - data.Sum(m => m.Item2) > 0)
@@ -83,7 +83,7 @@
                                     <i class="far fa-file-search"></i>
                                 </a>
                             </td>
-                            <td>@Firmy.GetJmeno(souh.Ico)</td>
+                            <td>@Firmy.GetJmenoAsync(souh.Ico)</td>
                             <td class="number">@HlidacStatu.Util.RenderData.NiceNumber(souh.PocetSmluv)</td>
                             @if (showHodnota)
                             {

@@ -21,7 +21,7 @@ namespace HlidacStatu.Repositories
         {
             if (DataValidators.CheckCZICO(Devmasters.TextUtil.NormalizeToNumbersOnly(zkratka)))
             {
-                var f = Firmy.Get(Devmasters.TextUtil.NormalizeToNumbersOnly(zkratka));
+                var f = await Firmy.GetAsync(Devmasters.TextUtil.NormalizeToNumbersOnly(zkratka));
                 if (f?.Valid == true && f.Kod_PF == 711)
                     return Devmasters.TextUtil.NormalizeToNumbersOnly(zkratka);
                 else

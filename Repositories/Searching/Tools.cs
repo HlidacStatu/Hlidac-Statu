@@ -101,7 +101,7 @@ namespace HlidacStatu.Repositories.Searching
             else if (splQ.Parts.Any(m => m.Prefix.StartsWith("ico", StringComparison.InvariantCultureIgnoreCase)))
             {
                 var part = splQ.Parts.First(m => m.Prefix.StartsWith("ico", StringComparison.InvariantCultureIgnoreCase));
-                var firma = Firmy.Get(part.Value);
+                var firma = await Firmy.GetAsync(part.Value);
                 if (firma?.Valid == true)
                 {
                     Autocomplete.CategoryEnum kategorie = Autocomplete.CategoryEnum.Company;
@@ -127,7 +127,7 @@ namespace HlidacStatu.Repositories.Searching
             else if (splQ.Parts.Any(m => m.Prefix.StartsWith("ds", StringComparison.InvariantCultureIgnoreCase)))
             {
                 var part = splQ.Parts.First(m => m.Prefix.StartsWith("ds", StringComparison.InvariantCultureIgnoreCase));
-                var firma = Firmy.GetByDS(part.Value);
+                var firma = await Firmy.GetByDSAsync(part.Value);
                 if (firma?.Valid == true)
                 {
                     Autocomplete.CategoryEnum kategorie = Autocomplete.CategoryEnum.Company;

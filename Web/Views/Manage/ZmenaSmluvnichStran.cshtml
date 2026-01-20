@@ -92,7 +92,7 @@
 {
     private void RenderSubjekt(Smlouva.Subjekt subjekt)
     {
-        Firma firma = Firmy.Get(subjekt.ico);
+        Firma firma = Firmy.GetAsync(subjekt.ico);
 
         <span><b>@subjekt.nazev</b> (ICO <a href="/subjekt/@subjekt.ico">@subjekt.ico</a>, dat.schránka @subjekt.datovaSchranka)</span>
     }

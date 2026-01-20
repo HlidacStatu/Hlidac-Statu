@@ -51,7 +51,7 @@
             @{
                 var oMesta = new Dictionary<Firma, StatsAggregate>();
                 oMesta = mesta
-                    .Select(m => new { o = Firmy.Get(m.Key), s = m.Value })
+                    .Select(m => new { o = Firmy.GetAsync(m.Key), s = m.Value })
                     .Where(m => m.o != null)
                     .ToDictionary(k => k.o, v => v.s);
             }

@@ -27,11 +27,11 @@ namespace HlidacStatuApi.Controllers.ApiV2
         /// <returns>Ico, jméno a datová schránka</returns>
         [Authorize]
         [HttpGet("ico/{ico}")]
-        public ActionResult<FirmaDTO> CompanyPerIco([FromRoute] string ico)
+        public async Task<ActionResult<FirmaDTO>> CompanyPerIco([FromRoute] string ico)
         {
             try
             {
-                var f = Firmy.Get(ico);
+                var f = await Firmy.GetAsync(ico);
                 if (!(f?.Valid == true ))
                 {
                     return NotFound($"Firma {ico} nenalezena.");

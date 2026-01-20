@@ -4,14 +4,12 @@ using HlidacStatu.Entities;
 using HlidacStatu.Entities.Analysis;
 using HlidacStatu.Lib.Analytics;
 using HlidacStatu.Repositories;
-using HlidacStatu.Repositories.Searching;
 using HlidacStatu.Util;
 using HlidacStatu.XLib.Render;
 
 using System;
 using System.Collections.Generic;
 using System.Net;
-using System.Threading.Tasks;
 using Consts = HlidacStatu.Util.Consts;
 
 namespace HlidacStatu.XLib
@@ -34,7 +32,7 @@ namespace HlidacStatu.XLib
                     Name = "Plátci",
                     HtmlRender =(s) =>
                     {
-                        var f = Firmy.Get(s.Key);
+                        var f = Firmy.GetAsync(s.Key);
                         string html = string.Format("<a href='{0}'>{1}</a>", f.GetUrl(false), f.Jmeno);
                         if (!string.IsNullOrEmpty(query))
                         {
@@ -42,9 +40,9 @@ namespace HlidacStatu.XLib
                         }
                         return html;
                     },
-                    OrderValueRender = (s) => Firmy.GetJmeno(s.Key),
-                    ValueRender = (s) => ("\"" + Firmy.GetJmeno(s.Key) + "\""),
-                    TextRender = (s) => Firmy.GetJmeno(s.Key)
+                    OrderValueRender = (s) => Firmy.GetJmenoAsync(s.Key),
+                    ValueRender = (s) => ("\"" + Firmy.GetJmenoAsync(s.Key) + "\""),
+                    TextRender = (s) => Firmy.GetJmenoAsync(s.Key)
                 });
 
             for (int y = minDateYear.Value; y <= maxDateYear.Value; y++)

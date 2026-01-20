@@ -481,7 +481,7 @@
                                     await semaphore.WaitAsync();
                                     try
                                     {
-                                        var f = Firmy.Get(g.ico);
+                                        var f = Firmy.GetAsync(g.ico);
                                         StatisticsSubjectPerYear<Smlouva.Statistics.Data> stat = null;
                                         if (f != null)
                                             stat = await f.StatistikaRegistruSmluvAsync();
@@ -626,7 +626,7 @@
 {
     private async Task RenderSubjektAsync(Smlouva.Subjekt subjekt, int typSubjektu)
     {
-        Firma firma = Firmy.Get(subjekt.ico);
+        Firma firma = Firmy.GetAsync(subjekt.ico);
         <p>
             @(await Html.KIndexLabelLinkAsync(subjekt.ico))
             <a href="/subjekt/@subjekt.ico">

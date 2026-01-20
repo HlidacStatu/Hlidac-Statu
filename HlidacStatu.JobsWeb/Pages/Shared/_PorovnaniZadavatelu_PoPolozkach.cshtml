@@ -7,7 +7,7 @@
 
 
 @{
-    List<JobStatistics> dodavatelStatistics = Model.statistics;
+    List<WatchdogAnalytics.Models.JobStatistics> dodavatelStatistics = Model.statistics;
 
     var smlouvyIds = dodavatelStatistics.SelectMany(m => m.Contracts).Distinct();
     if (smlouvyIds.Count() == 0)
@@ -15,26 +15,14 @@
         return;
     }
 
-    var smlouvyQuery = "id:(" + string.Join(" OR ", smlouvyIds) + ")";
-
-    var firmyCount = await JobService.GetDodavateleListAsync(Model.Key.Value);
-    var firmy = dodavatelStatistics.SelectMany(m => m.Dodavatele).Distinct()
-    .Select(m => new
-    {
-        ico = m,
-        name = HlidacStatu.Repositories.Firmy.GetJmeno(m),
-        count = firmyCount.Any(c => c.ico == m) ? firmyCount.First(c => c.ico == m).pocetCen : 0
-    })
-    .OrderBy(o => o.name);
-
     var uradyCount = await JobService.GetOdberateleListAsync(Model.Key.Value);
     var urady = dodavatelStatistics.SelectMany(m => m.Odberatele).Distinct()
-    .Select(m => new
-    {
-        ico = m,
-        name = HlidacStatu.Repositories.Firmy.GetJmeno(m),
-        count = uradyCount.Any(c => c.ico == m) ? uradyCount.First(c => c.ico == m).pocetCen : 0
-    })
+        .Select(m => new
+        {
+            ico = m,
+            name = HlidacStatu.Repositories.Firmy.GetJmenoAsync(m),
+            count = uradyCount.Any(c => c.ico == m) ? uradyCount.First(c => c.ico == m).pocetCen : 0
+        })
     .OrderBy(o => o.name);
     ;
 }
@@ -50,10 +38,7 @@
 }
 <div class="row">
     <h2>Porovnání cen dodavatele @Model.dodavatel.Jmeno pro jednotlivé úřady podle jednotlivých položek</h2>
-
-    @{
-        var generalStat = JobService.GetStatistics(Model.Key.Value);
-    }
+    
     @foreach (var polozka in dodavatelStatistics.OrderBy(m => m.Name))
     {
         JobStatistics dodavatelStatisticsPolozka = dodavatelStatistics.FirstOrDefault(m => m.Name == polozka.Name);

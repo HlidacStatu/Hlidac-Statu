@@ -591,7 +591,7 @@ and (esa2010 in (" + string.Join(",", vzdySoukr_ESA2010.Select(m => $"'{m}'")) +
             System.Collections.Concurrent.ConcurrentBag<(string, string)> foundDebugCheckIco = new();
             await Devmasters.Batch.Manager.DoActionForAllAsync<string, object>(bagOfIco, async (ico, obj) =>
                 {
-                    var f = Firmy.Get(ico);
+                    var f = await Firmy.GetAsync(ico);
                     if (f?.Valid == true && FirmaVlastnenaStatemRepo.MuzeBytStatni_PodlePravniFormaKod(f.Kod_PF))
                     {
                         List<string> subjIco = new List<string>();
@@ -601,7 +601,7 @@ and (esa2010 in (" + string.Join(",", vzdySoukr_ESA2010.Select(m => $"'{m}'")) +
                         subjIco.AddRange(vazby.Select(m => Util.ParseTools.NormalizeIco(m.To.Id)));
                         foreach (var inIc in subjIco)
                         {
-                            var ff = Firmy.Get(inIc);
+                            var ff = await Firmy.GetAsync(inIc);
                             if (ff?.Valid == true
                                 && FirmaVlastnenaStatemRepo.MuzeBytStatni_PodlePravniFormaKod(ff.Kod_PF)
                                 && OVM_Nikdy_nejsou_statni_Filter_ESA2010_JeSoukrome(ff.ESA2010) == false

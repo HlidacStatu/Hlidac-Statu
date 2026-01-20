@@ -246,7 +246,7 @@ namespace HlidacStatu.Repositories
                       Left Join ZkratkaStrany zs on sp.IcoPrijemce = zs.ICO
                       group by zs.KratkyNazev, IcoPrijemce");
 
-                    return res.ToDictionary(k => k.Item1, v => v.Item2 ?? Firmy.GetJmeno(v.Item1));
+                    return res.ToDictionary(k => k.Item1, v => v.Item2 ?? Firmy.GetJmenoAsync(v.Item1));
                 });
 
         private static Dictionary<string, string> StranyIco()

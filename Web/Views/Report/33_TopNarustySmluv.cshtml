@@ -112,7 +112,7 @@
 
     foreach (var datum in data)
     {
-        var firma = Firmy.Get(datum.data);
+        var firma = Firmy.GetAsync(datum.data);
         StatisticsSubjectPerYear<Smlouva.Statistics.Data>? firmaStat = null;
         if (firma?.Valid == true)
             firmaStat = await firma.StatistikaRegistruSmluvAsync();

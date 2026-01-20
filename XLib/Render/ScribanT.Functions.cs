@@ -141,12 +141,12 @@ namespace HlidacStatu.XLib.Render
                 return string.Empty;
             }
 
-            public static string fn_RenderCompanyName(string ico, string missingCompanyName = "")
+            public static async Task<string> fn_RenderCompanyName(string ico, string missingCompanyName = "")
             {
                 ico = HlidacStatu.Util.ParseTools.NormalizeIco(ico);
                 if (!string.IsNullOrEmpty(ico))
                 {
-                    Firma o = Firmy.instanceByIco.Get(ico);
+                    Firma o = await Firmy.GetAsync(ico);
                     if (o?.Valid == true)
                     {
                         return $"<span>{o.Jmeno}</span>";
@@ -157,7 +157,7 @@ namespace HlidacStatu.XLib.Render
                 return string.Empty;
             }
 
-            public static string fn_RenderCompanyWithLink(string ico, string missingCompanyName = "")
+            public static async Task<string> fn_RenderCompanyWithLink(string ico, string missingCompanyName = "")
             {
                 if (ico == null)
                     return string.Empty;
@@ -165,7 +165,7 @@ namespace HlidacStatu.XLib.Render
                 ico = HlidacStatu.Util.ParseTools.NormalizeIco(ico);
                 if (!string.IsNullOrEmpty(ico))
                 {
-                    Firma o = Firmy.instanceByIco.Get(ico);
+                    Firma o = await Firmy.GetAsync(ico);
                     if (o?.Valid == true)
                     {
                         //var lbl = Lib.Analysis.KorupcniRiziko.KIndex.GetLastLabel(ico);
@@ -194,7 +194,7 @@ namespace HlidacStatu.XLib.Render
                 ico = HlidacStatu.Util.ParseTools.NormalizeIco(ico);
                 if (!string.IsNullOrEmpty(ico))
                 {
-                    var firma = Firmy.instanceByIco.Get(ico);
+                    var firma = await Firmy.GetAsync(ico);
                     if (firma?.Valid == true)
                     {
                         var stat = await firma.StatistikaRegistruSmluvAsync();
@@ -222,7 +222,7 @@ namespace HlidacStatu.XLib.Render
                 ico = HlidacStatu.Util.ParseTools.NormalizeIco(ico);
                 if (!string.IsNullOrEmpty(ico))
                 {
-                    var o = Firmy.instanceByIco.Get(ico);
+                    var o = await Firmy.GetAsync(ico);
                     if (o?.Valid == true)
                     {
                         string niceString = (await o.InfoFactsAsync()).RenderFacts(numberOfInfos, true, false, delimiterBetweenInfos);

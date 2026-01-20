@@ -227,10 +227,9 @@ namespace HlidacStatu.Repositories
                 else
                 {
                     var ret = new System.Collections.Generic.List<Firma.Zatrideni.Item>();
-                    Devmasters.Batch.Manager.DoActionForAll<string>(icos.Select(m => m.Trim()).Distinct(),
-                        ic =>
+                    await Devmasters.Batch.Manager.DoActionForAllAsync<string>(icos.Select(m => m.Trim()).Distinct(), async ic =>
                         {
-                            var f = Firmy.Get(ic);
+                            var f = await Firmy.GetAsync(ic);
 
                             if (f.PatrimStatu())
                             {

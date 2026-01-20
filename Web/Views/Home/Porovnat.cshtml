@@ -24,9 +24,9 @@
 <p>Připravili jsme pro vás několik připravených porovnání</p>
 <div class="row">
     <div class="col-xs-12">
-        <a href="/porovnat/subjekty?ico=@(FirmaCache.Ministerstva().Select(i=>i.ICO).Aggregate((f,s)=> f+","+s))&title=@System.Net.WebUtility.UrlEncode("Porovnání ministerstev")" class="btn btn-hs btn-secondary">Porovnat ministerstva</a>
-        <a href="/porovnat/subjekty?ico=@(FirmaCache.KrajskeUrady().Select(i=>i.ICO).Aggregate((f,s)=> f+","+s))&title=@System.Net.WebUtility.UrlEncode("Porovnání krajských úřadů")" class="btn btn-hs btn-secondary">Porovnat krajské úřady</a>
-        <a href="/porovnat/subjekty?ico=@(FirmaCache.VysokeSkoly().Select(i=>i.ICO).Aggregate((f,s)=> f+","+s))&title=@System.Net.WebUtility.UrlEncode("Porovnání vysokých škol")" class="btn btn-hs btn-secondary">Porovnat vysoké školy</a>
+        <a href="/porovnat/subjekty?ico=@(FirmaCache.MinisterstvaAsync().Select(i=>i.ICO).Aggregate((f,s)=> f+","+s))&title=@System.Net.WebUtility.UrlEncode("Porovnání ministerstev")" class="btn btn-hs btn-secondary">Porovnat ministerstva</a>
+        <a href="/porovnat/subjekty?ico=@(FirmaCache.KrajskeUradyAsync().Select(i=>i.ICO).Aggregate((f,s)=> f+","+s))&title=@System.Net.WebUtility.UrlEncode("Porovnání krajských úřadů")" class="btn btn-hs btn-secondary">Porovnat krajské úřady</a>
+        <a href="/porovnat/subjekty?ico=@(FirmaCache.VysokeSkolyAsync().Select(i=>i.ICO).Aggregate((f,s)=> f+","+s))&title=@System.Net.WebUtility.UrlEncode("Porovnání vysokých škol")" class="btn btn-hs btn-secondary">Porovnat vysoké školy</a>
         <a href="/porovnat/subjekty?ico=00066001,00090450,70947023,70946078,72053119,00080837,70971641,27502988,00085031,70932581,70960399,00095711,26913453,03447286,25396544,60733098&title=@System.Net.WebUtility.UrlEncode("Porovnání krajských správ silnic")" class="btn btn-hs btn-secondary">
         Porovnat krajské správy silnic
         </a>

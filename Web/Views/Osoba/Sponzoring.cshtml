@@ -35,7 +35,7 @@
                 {
                     Name = "Politická strana",
                     HtmlRender = (x) =>
-                        $"<a href=\"/subjekt/{x.Ico}\">{Firmy.GetJmeno(x.Ico)}</a>"
+                        $"<a href=\"/subjekt/{x.Ico}\">{Firmy.GetJmenoAsync(x.Ico)}</a>"
                 },
                 new ReportDataSource<(int Rok, string Ico, decimal Dar, string Poznamka)>.Column()
                 {
@@ -80,10 +80,10 @@
             Name = "Sponzorující firma",
             HtmlRender = (x) =>
             {
-                return $"<a href='/subjekt/{x.Darceico}'>{Firmy.GetJmeno(x.Darceico)}</a>"
+                return $"<a href='/subjekt/{x.Darceico}'>{Firmy.GetJmenoAsync(x.Darceico)}</a>"
                        + $"<br/>{Html.RenderVazbyAsync(x.Vazby)}";
             },
-            TextRender = (x) => Firmy.GetJmeno(x.Darceico)
+            TextRender = (x) => Firmy.GetJmenoAsync(x.Darceico)
         }, new()
         {
             Name = "Rok",
@@ -94,7 +94,7 @@
         {
             Name = "Politická strana",
             HtmlRender = (x) =>
-                $"<a href=\"/subjekt/{x.Ico}\">{Firmy.GetJmeno(x.Ico)}</a>"
+                $"<a href=\"/subjekt/{x.Ico}\">{Firmy.GetJmenoAsync(x.Ico)}</a>"
         }, new()
         {
             Name = "Celkem darovali",

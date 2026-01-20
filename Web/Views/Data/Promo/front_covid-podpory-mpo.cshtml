@@ -108,7 +108,7 @@
             {
                 <div>
                     <a href="/data/Hledat/covid-podpory-mpo?Q=ico.keyword%3A@(kvv.Key)">
-                    @(Firmy.GetJmeno(kvv.Key))
+                    @(Firmy.GetJmenoAsync(kvv.Key))
                     </a> 
                     <b>@(HlidacStatu.Util.RenderData.NicePriceHtml((decimal)kvv.Value.Sum,shortFormat:true, showDecimal: HlidacStatu.Util.RenderData.ShowDecimalVal.AsNeeded))</b>
 

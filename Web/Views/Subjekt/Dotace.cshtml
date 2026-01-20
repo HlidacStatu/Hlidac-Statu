@@ -545,7 +545,7 @@
                                     {
                                         <tr>
                                             <td>
-                                                <a href="/subjekt/@item.Key">@Devmasters.TextUtil.ShortenText(Firmy.GetJmeno(item.Key), 30)</a>
+                                                <a href="/subjekt/@item.Key">@Devmasters.TextUtil.ShortenText(Firmy.GetJmenoAsync(item.Key), 30)</a>
                                             </td>
                                             <td class="number">@HlidacStatu.Util.RenderData.NicePrice(item.Value)</td>
                                         </tr>

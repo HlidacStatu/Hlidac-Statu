@@ -51,8 +51,8 @@ namespace HlidacStatu.Repositories
 
                         _logger.Information($"Loading ALL ICOS");
 
-                        icos.AddRange(FirmaCache.KrajskeUrady().Select(m => m.ICO));
-                        icos.AddRange(FirmaCache.Ministerstva().Select(m => m.ICO));
+                        icos.AddRange(FirmaCache.KrajskeUradyAsync().Select(m => m.ICO));
+                        icos.AddRange(FirmaCache.MinisterstvaAsync().Select(m => m.ICO));
                         // krajske technicke sluzby
                         icos.AddRange(
                             Krajske_Technicke_Sluzby.Split(','));
@@ -73,7 +73,7 @@ namespace HlidacStatu.Repositories
                                 "select distinct ico from firma where status =1 and Kod_PF in (301,302,312,313,314,325,331,352,353,361,362,381,382,521,771,801,804,805)")
                         );
 
-                        icos.AddRange(FirmaCache.ObceSRozsirenouPusobnosti().Select(m => m.ICO));
+                        icos.AddRange(FirmaCache.ObceSRozsirenouPusobnostiAsync().Select(m => m.ICO));
                         //velka mesta
                         string velkamesta =
                             VelkaMesta;
@@ -100,7 +100,7 @@ namespace HlidacStatu.Repositories
                                  .Items)
                         {
                             var ico = (string)val.Key;
-                            var f = Get(ico);
+                            var f = await GetAsync(ico);
                             if (f?.PatrimStatu() == true)
                             {
                                 if ((await f.StatistikaRegistruSmluvAsync()).Any(m =>
@@ -129,7 +129,7 @@ namespace HlidacStatu.Repositories
                                  .Items)
                         {
                             var ico = (string)val.Key;
-                            var f = Get(ico);
+                            var f = await GetAsync(ico);
                             if (f?.PatrimStatu() == true)
                             {
                                 if ((await f.StatistikaRegistruSmluvAsync()).Any(m =>
@@ -153,7 +153,7 @@ namespace HlidacStatu.Repositories
 
                         await Manager.DoActionForAllAsync<string>(icos.Distinct().ToArray(), async (i) =>
                             {
-                                var fk = Get(i);
+                                var fk = await Firmy.GetAsync(i);
                                 if (fk != null)
                                 {
                                     allIcos.Add(i);
@@ -216,7 +216,7 @@ namespace HlidacStatu.Repositories
                 await Manager.DoActionForAllAsync<string>(icos,
                     (Func<string, Task<ActionOutputData>>)(async ico =>
                     {
-                        var f = Get(ico);
+                        var f = await Firmy.GetAsync(ico);
                         if (f != null)
                         {
                             var stat = await f.StatistikaRegistruSmluvAsync(obor.Value);

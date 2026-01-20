@@ -223,7 +223,7 @@ namespace HlidacStatu.Repositories
                 ];
 
                 var smluvniStrany = smlouva.Prijemce.Concat([smlouva.Platce])
-                    .Select(m => Firmy.Get(m.ico))
+                    .Select(m => Firmy.GetAsync(m.ico))
                     .Where(m => m?.Valid == true)
                     .ToArray();
                 

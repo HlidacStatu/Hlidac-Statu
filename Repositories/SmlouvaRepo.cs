@@ -120,7 +120,7 @@ namespace HlidacStatu.Repositories
                     res.Status == AI.LLM.ContractParties.Comparison.StatusEnum.DifferentPlatce
                     )
                 {
-                    Firma objednatel = Firmy.Get(res.SecondToCompare.objednatel.GetOnlyIco());
+                    Firma objednatel = await Firmy.GetAsync(res.SecondToCompare.objednatel.GetOnlyIco());
                     if (objednatel?.Valid == true)
                     {
                         objednatelIsTrue = await llm.DoubleCheckParties(objednatel.Jmeno, objednatel.ICO, true, t.ToString());
@@ -133,7 +133,7 @@ namespace HlidacStatu.Repositories
                 {
                     foreach (var d in res.SecondToCompare.poskytovatele)
                     {
-                        Firma dodavatel = Firmy.Get(res.SecondToCompare.objednatel.GetOnlyIco());
+                        Firma dodavatel = await Firmy.GetAsync(res.SecondToCompare.objednatel.GetOnlyIco());
                         if (dodavatel?.Valid == true)
                         {
                             dodavateleAreTrue = dodavateleAreTrue &
@@ -230,10 +230,10 @@ namespace HlidacStatu.Repositories
                 ? 1
                 : 0;
 
-            Firma fPlatce = Firmy.Get(smlouva.Platce.ico);
+            Firma fPlatce = await Firmy.GetAsync(smlouva.Platce.ico);
             Firma[] fPrijemci = smlouva.Prijemce.Select(m => m.ico)
                 .Where(m => !string.IsNullOrWhiteSpace(m))
-                .Select(m => Firmy.Get(m))
+                .Select(m => Firmy.GetAsync(m))
                 .Where(f => f?.Valid == true)
                 .ToArray();
 
@@ -389,7 +389,7 @@ namespace HlidacStatu.Repositories
             Firma f = null;
             if (smlouva.platnyZaznam)
             {
-                f = Firmy.Get(smlouva.Platce.ico);
+                f = await Firmy.GetAsync(smlouva.Platce.ico);
 
                 if (f?.Valid == true && !f.PatrimStatu())
                 {
@@ -399,7 +399,7 @@ namespace HlidacStatu.Repositories
 
                 foreach (var ss in smlouva.Prijemce)
                 {
-                    f = Firmy.Get(ss.ico);
+                    f = await Firmy.GetAsync(ss.ico);
                     if (f?.Valid == true && !f.PatrimStatu())
                     {
                         if (!string.IsNullOrEmpty(ss.ico) && icos.Contains(ss.ico))

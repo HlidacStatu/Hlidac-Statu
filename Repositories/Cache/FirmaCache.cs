@@ -49,25 +49,51 @@ public static class FirmaCache
             _ => FirmaRepo.Zatrideni.GetSubjektyDirectAsync(obor),
             options => options.ModifyEntryOptionsDuration(TimeSpan.FromDays(1))
         );
-
-    public static Firma[] Ministerstva() =>
-        MemoryCache.GetOrSet("StatData.Ministerstva",
-            _ => OvmRepo.Ministerstva().Select(m => Firmy.Get(m.ICO)).ToArray(),
+    public static async Task<Firma[]> MinisterstvaAsync() =>
+        await MemoryCache.GetOrSetAsync("StatData.Ministerstva",
+            async _ => 
+            {
+                var ministerstva = OvmRepo.Ministerstva();
+                var result = new List<Firma>();
+                foreach (var m in ministerstva)
+                {
+                    result.Add(await Firmy.GetAsync(m.ICO));
+                }
+                return result.ToArray();
+            },
             options => options.ModifyEntryOptionsDuration(TimeSpan.FromHours(6))
         );
 
-    public static Firma[] VysokeSkoly() =>
-        MemoryCache.GetOrSet("StatData.VysokeSkoly",
-            _ => OvmRepo.VysokeSkoly().Select(m => Firmy.Get(m.ICO)).ToArray(),
+    public static ValueTask<Firma[]> VysokeSkolyAsync() =>
+        MemoryCache.GetOrSetAsync("StatData.VysokeSkoly",
+            async _ => 
+            {
+                var vysokeSkoly = OvmRepo.VysokeSkoly();
+                var result = new List<Firma>();
+                foreach (var m in vysokeSkoly)
+                {
+                    result.Add(await Firmy.GetAsync(m.ICO));
+                }
+                return result.ToArray();
+            },
             options => options.ModifyEntryOptionsDuration(TimeSpan.FromHours(6))
         );
 
-    public static Firma[] KrajskeUrady() =>
-        MemoryCache.GetOrSet("StatData.KrajskeUrady",
-            _ => OvmRepo.KrajskeUrady().Select(m => Firmy.GetByDS(m.IdDS)).ToArray(),
+    public static ValueTask<Firma[]> KrajskeUradyAsync() =>
+        MemoryCache.GetOrSetAsync("StatData.KrajskeUrady",
+            async _ => 
+            {
+                var krajskeUrady = OvmRepo.KrajskeUrady();
+                var result = new List<Firma>();
+                foreach (var k in krajskeUrady)
+                {
+                    result.Add(await Firmy.GetByDSAsync(k.IdDS));
+                }
+                return result.ToArray();
+            },
             options => options.ModifyEntryOptionsDuration(TimeSpan.FromHours(6))
         );
-
+    
 
     public static Dictionary<string, string[]> MestaPodleKraju() =>
         MemoryCache.GetOrSet("StatData.MestaPodleKraju",
@@ -75,9 +101,19 @@ public static class FirmaCache
             options => options.ModifyEntryOptionsDuration(TimeSpan.FromHours(6))
         );
 
-    public static Firma[] ObceSRozsirenouPusobnosti() =>
-        MemoryCache.GetOrSet("StatData.StatutarniMestaAll",
-            _ => OvmRepo.ObceSRozsirenouPusobnosti().Select(m => Firmy.GetByDS(m.IdDS)).ToArray(),
+    
+    public static ValueTask<Firma[]> ObceSRozsirenouPusobnostiAsync() =>
+        MemoryCache.GetOrSetAsync("StatData.StatutarniMestaAll",
+            async _ => 
+            {
+                var obce = OvmRepo.ObceSRozsirenouPusobnosti();
+                var result = new List<Firma>();
+                foreach (var k in obce)
+                {
+                    result.Add(await Firmy.GetByDSAsync(k.IdDS));
+                }
+                return result.ToArray();
+            },
             options => options.ModifyEntryOptionsDuration(TimeSpan.FromHours(6))
         );
     

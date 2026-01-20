@@ -342,7 +342,7 @@
                     {
                         string t = m.Key;
                         return $"<a href='/subjekt/{t}'>"
-                               + $"{Firmy.GetJmeno(t)}"
+                               + $"{Firmy.GetJmenoAsync(t)}"
                                + $"</a>";
                     }
                 },

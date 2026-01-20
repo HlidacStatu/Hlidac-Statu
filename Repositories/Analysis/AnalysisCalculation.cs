@@ -144,7 +144,7 @@ namespace HlidacStatu.Repositories.Analysis
                             s.Prijemce.Select(m => m.ico).Where(p => !string.IsNullOrEmpty(p))
                         );
                         allIco.Add(s.Platce.ico);
-                        var urady = allIco.Select(i => Firmy.Get(i)).Where(f => f.PatrimStatu());
+                        var urady = allIco.Select(i => Firmy.GetAsync(i)).Where(f => f.PatrimStatu());
 
                         foreach (var urad in urady)
                         {
@@ -271,8 +271,7 @@ namespace HlidacStatu.Repositories.Analysis
             Dictionary<string, BasicDataForSubject<List<BasicData<string>>>> uradySoukr =
                 new Dictionary<string, BasicDataForSubject<List<BasicData<string>>>>();
             object lockObj = new object();
-            await Repositories.Searching.Tools.DoActionForQueryAsync<Smlouva>(Manager.GetESClient(), searchFunc,
-                (hit, param) =>
+            await Repositories.Searching.Tools.DoActionForQueryAsync<Smlouva>(Manager.GetESClient(), searchFunc, async (hit, param) =>
                 {
                     Smlouva s = hit.Source;
                     List<string> icos = new List<string>();
@@ -281,7 +280,7 @@ namespace HlidacStatu.Repositories.Analysis
                         var objednatelIco = s.Platce.ico;
                         if (!string.IsNullOrEmpty(objednatelIco))
                         {
-                            Firma ff = Firmy.Get(objednatelIco);
+                            Firma ff = await Firmy.GetAsync(objednatelIco);
                             if (!ff.Valid || !ff.PatrimStatu())
                                 goto end;
 
@@ -346,7 +345,7 @@ namespace HlidacStatu.Repositories.Analysis
                     }
 
                     end:
-                    return Task.FromResult(new ActionOutputData() { CancelRunning = false, Log = null });
+                    return new ActionOutputData() { CancelRunning = false, Log = null };
                 }, null,
                 showProgress ? Devmasters.Batch.Manager.DefaultOutputWriter : (Action<string>)null,
                 showProgress ? new ActionProgressWriter() : (Devmasters.Batch.IProgressWriter )null
@@ -390,7 +389,7 @@ namespace HlidacStatu.Repositories.Analysis
                                 if (!string.IsNullOrEmpty(v.To.Id))
                                 {
                                     //check if it's GovType company
-                                    Firma f = Firmy.Get(v.To.Id);
+                                    Firma f = await Firmy.GetAsync(v.To.Id);
 
                                     if (f == null || f.Valid == false)
                                         continue; //unknown company, skip
@@ -523,7 +522,7 @@ namespace HlidacStatu.Repositories.Analysis
             _logger.Debug("GetFirmyCasovePodezreleZalozene - getting first smlouva for all ico from ES");
             await Devmasters.Batch.Manager.DoActionForAllAsync<string, object>(allIcos, async (ico, param) =>
                 {
-                    Firma ff = Firmy.Get(ico);
+                    Firma ff = await Firmy.GetAsync(ico);
                     if (ff?.Valid == true)
                     {
                         if (ff.PatrimStatu()) //statni firmy tam nechci
@@ -605,7 +604,7 @@ namespace HlidacStatu.Repositories.Analysis
                 if (missingEssentialData)
                     continue;
 
-                Firma firma = Firmy.Get(dotace.Recipient.Ico);
+                Firma firma = await Firmy.GetAsync(dotace.Recipient.Ico);
 
                 if (firma.PatrimStatu()) //nechceme státní firmy
                     continue;
@@ -630,7 +629,7 @@ namespace HlidacStatu.Repositories.Analysis
                         HlidacStatu.Lib.Analytics.StatisticsSubjectPerYear<Smlouva.Statistics.Data>>();
                 await Devmasters.Batch.Manager.DoActionForAllAsync(allicos, async ico =>
                     {
-                        var firma = Firmy.Get(ico);
+                        var firma = await Firmy.GetAsync(ico);
                         if (firma != null)
                         {
                             var stat = await firma.StatistikaRegistruSmluvAsync();
@@ -769,7 +768,7 @@ namespace HlidacStatu.Repositories.Analysis
                     //.OrderByDescending(o => (o.percChange ?? int.MaxValue))
                     .OrderByDescending(o => o.change.ValueChange)
                     .Take(1000)
-                    .Where(m => Firmy.Get(m.data).JsemSoukromaFirma())
+                    .Where(m => Firmy.GetAsync(m.data).JsemSoukromaFirma())
                     .Take(100)
                     .ToArray()
                 ;
@@ -816,7 +815,7 @@ namespace HlidacStatu.Repositories.Analysis
                         lastYear = yEnd,
                     })
                     .Take(1000)
-                    .Where(m => Firmy.Get(m.data).JsemSoukromaFirma())
+                    .Where(m => Firmy.GetAsync(m.data).JsemSoukromaFirma())
                     .Take(100)
                     .ToArray()
                 ;

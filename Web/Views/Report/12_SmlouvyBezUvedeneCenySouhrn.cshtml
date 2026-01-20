@@ -60,7 +60,7 @@
     foreach (KeyedBucket<object> val in ((BucketAggregate)res.ElasticResults.Aggregations["perIco"]).Items)
     {
         StatisticsSubjectPerYear<Smlouva.Statistics.Data> statRs = new();
-        var f = Firmy.Get((string)val.Key);
+        var f = Firmy.GetAsync((string)val.Key);
         if (f != null)
             statRs = await f.StatistikaRegistruSmluvAsync();
 

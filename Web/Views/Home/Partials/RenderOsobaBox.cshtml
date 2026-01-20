@@ -27,7 +27,7 @@ else
             await semaphore.WaitAsync();
             try
             {
-                var f = Firmy.Get(ico);
+                var f = Firmy.GetAsync(ico);
                 StatisticsSubjectPerYear<Smlouva.Statistics.Data> stat = null;
                 if (f != null)
                     stat= await f.StatistikaRegistruSmluvAsync();

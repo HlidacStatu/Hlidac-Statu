@@ -17,12 +17,12 @@ namespace HlidacStatu.Repositories
     public static partial class UptimeServerRepo
     {
         private static readonly ILogger _logger = Log.ForContext(typeof(UptimeServerRepo));
-        public static string PatriPodUradJmeno(this UptimeServer server)
+        public static async Task<string> PatriPodUradJmenoAsync(this UptimeServer server)
         {
             if (string.IsNullOrEmpty(server.ICO))
                 return string.Empty;
             else
-                return Firmy.GetJmeno(server.ICO);
+                return await Firmy.GetJmenoAsync(server.ICO);
         }
         public static void SaveAlert(int serverId, Alert.AlertStatus status)
         {

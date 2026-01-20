@@ -15,7 +15,7 @@ namespace HlidacStatu.Extensions
                 var zkratkyStran = await StaticData.GetZkratkyPolitickychStranAsync();
                 return zkratkyStran.TryGetValue(sponzoring.IcoPrijemce, out string nazev)
                     ? nazev
-                    : Firmy.GetJmeno(sponzoring.IcoPrijemce);
+                    : await Firmy.GetJmenoAsync(sponzoring.IcoPrijemce);
             }
 
             bool prijemcejeOsoba = sponzoring.OsobaIdPrijemce != null && sponzoring.OsobaIdPrijemce > 0;
@@ -51,7 +51,7 @@ namespace HlidacStatu.Extensions
 
             if (sponzoring.Typ == (int)Sponzoring.TypDaru.DarFirmy)
                 return string.Format(itemTemplate,
-                    $"Člen statut. orgánu ve firmě {Firmy.GetJmeno(sponzoring.IcoDarce)} sponzorující {kohoSponzoroval} {kdySponzoroval}, hodnota daru {hodnotaDaruKc}");
+                    $"Člen statut. orgánu ve firmě {Firmy.GetJmenoAsync(sponzoring.IcoDarce)} sponzorující {kohoSponzoroval} {kdySponzoroval}, hodnota daru {hodnotaDaruKc}");
 
             return string.Format(itemTemplate, $"Sponzor {kohoSponzoroval} {kdySponzoroval} {dar} {zdroj}");
         }

@@ -9,7 +9,7 @@
     int rok = (int)ViewBag.rok;
 
     string ico = Model.Ico;
-    Firma f = Firmy.Get(ico);
+    Firma f = await Firmy.GetAsync(ico);
     ViewBag.Title = $"Politici v {f.Jmeno} ({rok})";
 }
 

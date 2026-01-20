@@ -831,7 +831,7 @@
                     @foreach (var fP in splQ.Parts.Where(m => m.Prefix == "ico:"))
                     {
                         parts++;
-                        Firma fo = Firmy.Get(fP.Value);
+                        Firma fo = Firmy.GetAsync(fP.Value);
                         <partial name="Partials/RenderFirmaBox" model="@fo"/>
 
                         if (parts % 4 == 0)

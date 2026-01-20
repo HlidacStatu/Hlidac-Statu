@@ -32,7 +32,7 @@ namespace HlidacStatu.Repositories.Analysis.KorupcniRiziko
         {
             Ico = ico;
 
-            _urad = Firmy.Get(this.Ico);
+            _urad = Firmy.GetAsync(this.Ico);
             if (!( _urad?.Valid == true))
                 throw new ArgumentOutOfRangeException("invalid ICO");
         }
@@ -328,7 +328,7 @@ namespace HlidacStatu.Repositories.Analysis.KorupcniRiziko
                 ret.KIndexReady = true;
                 ret.KIndexIssues = null;
             }
-            else if (await Firmy.Get(this.Ico).MusiPublikovatDoRSAsync() == false)
+            else if (await Firmy.GetAsync(this.Ico).MusiPublikovatDoRSAsync() == false)
             {
                 if (forceCalculateAllYears == false)
                 {
@@ -671,7 +671,7 @@ namespace HlidacStatu.Repositories.Analysis.KorupcniRiziko
                         {
                             if (prij.ico == s.Platce.ico)
                                 continue;
-                            Firma f = Firmy.Get(prij.ico);
+                            Firma f = Firmy.GetAsync(prij.ico);
                             if (f?.Valid == true && f.PatrimStatu())
                                 continue;
 

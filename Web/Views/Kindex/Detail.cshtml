@@ -24,14 +24,14 @@
     }
 
 
-    Firma f = Firmy.Get(Model.id);
+    Firma f = Firmy.GetAsync(Model.id);
     KIndexData kidx = await KIndex.GetCachedAsync(HlidacStatu.Util.ParseTools.NormalizeIco(Model.id), futureData);
     kidx.roky = kidx.roky
         .Where(m => m.Rok <= maxYearToShow)
         .ToList();
 
     ViewBag.Title = "K-Index";
-    ViewBag.SubTitle = "pro " + Firmy.GetJmeno(Model.id);
+    ViewBag.SubTitle = "pro " + Firmy.GetJmenoAsync(Model.id);
     ViewBag.HideTitle = true;
 
     if (f?.Valid == true && kidx != null)

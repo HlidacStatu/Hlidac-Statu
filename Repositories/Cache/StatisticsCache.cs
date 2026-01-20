@@ -149,7 +149,7 @@ public class StatisticsCache
                 try
                 {
                     return new StatisticsSubjectPerYear<Smlouva.Statistics.Data>(f.Key,
-                        (await Firmy.Get(f.Key).StatistikaRegistruSmluvAsync(obor))
+                        (await (await Firmy.GetAsync(f.Key)).StatistikaRegistruSmluvAsync(obor))
                         .Filter(m => m.Key >= f.Value.From?.Year && m.Key <= f.Value.To?.Year)
                     );
                 }
@@ -220,7 +220,7 @@ public class StatisticsCache
         var semaphore = new SemaphoreSlim(maxConcurrentTasks);
 
         var perIcoStatTasks = firmy_maxrok
-            .Select(m => new { firma = Firmy.Get(m.Key), interval = m.Value })
+            .Select(m => new { firma = Firmy.GetAsync(m.Key), interval = m.Value })
             .Where(m => m.firma?.Valid == true)
             .Select(async m =>
             {
@@ -285,7 +285,7 @@ public class StatisticsCache
                 await semaphore.WaitAsync();
                 try
                 {
-                    var stat = await Firmy.Get(f.Key).StatistikaVerejneZakazkyAsync();
+                    var stat = await (await Firmy.GetAsync(f.Key)).StatistikaVerejneZakazkyAsync();
                     return new StatisticsSubjectPerYear<Firma.Statistics.VZ>(
                         f.Key,
                         stat.Filter(m => m.Key >= f.Value.From?.Year && m.Key <= f.Value.To?.Year)
@@ -413,7 +413,7 @@ public class StatisticsCache
                 await semaphore.WaitAsync();
                 try
                 {
-                    var ff = Firmy.Get(f.Key);
+                    var ff = await Firmy.GetAsync(f.Key);
 
                     StatisticsSubjectPerYear<Firma.Statistics.Dotace> stat = new();
                     if (ff != null)
@@ -527,7 +527,7 @@ public class StatisticsCache
 
         var perIcoStat = await Task.WhenAll(
             firmy_maxrok
-                .Select(m => new { firma = Firmy.Get(m.Key), interval = m.Value })
+                .Select(m => new { firma = Firmy.GetAsync(m.Key), interval = m.Value })
                 .Where(m => m.firma?.Valid == true)
                 .Select(async m =>
                 {

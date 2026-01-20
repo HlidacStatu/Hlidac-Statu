@@ -115,7 +115,7 @@
                      )
         {
             string ico = vPerIco.Value.ICO;
-            Firma f = Firmy.Get(ico);
+            Firma f = Firmy.GetAsync(ico);
             <tr>
                 <td>
                     <a href="@(f.GetUrl(true))">@f.Jmeno</a>

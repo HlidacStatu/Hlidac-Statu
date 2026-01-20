@@ -40,7 +40,7 @@
     List<HlidacStatu.Lib.Analytics.StatisticsSubjectPerYear<Smlouva.Statistics.Data>> stats = new();
     var kindexMap = new Dictionary<string, IHtmlContent>();
 
-    foreach (var firma in Model.Select(ico => Firmy.Get(ico)))
+    foreach (var firma in Model.Select(ico => Firmy.GetAsync(ico)))
     {
         if (firma?.Valid == true)
         {
@@ -63,11 +63,11 @@
         HtmlRender =(s) =>
         {
             kindexMap.TryGetValue(s.ICO, out var kind);
-            return string.Format(kind?.RenderRawHtml() + @"<a title='{1}' href='/subjekt/{0}'>{2}</a>", s.ICO, Firmy.GetJmeno(s.ICO), Devmasters.TextUtil.ShortenText(Firmy.GetJmeno(s.ICO), 50));
+            return string.Format(kind?.RenderRawHtml() + @"<a title='{1}' href='/subjekt/{0}'>{2}</a>", s.ICO, Firmy.GetJmenoAsync(s.ICO), Devmasters.TextUtil.ShortenText(Firmy.GetJmenoAsync(s.ICO), 50));
         },
-        TextRender = (s) => { return Devmasters.TextUtil.ShortenText(Firmy.GetJmeno(s.ICO), 40); },
-        ValueRender = (s) => { return Firmy.GetJmeno(s.ICO); },
-        OrderValueRender = (s) => { return Firmy.GetJmeno(s.ICO); }
+        TextRender = (s) => { return Devmasters.TextUtil.ShortenText(Firmy.GetJmenoAsync(s.ICO), 40); },
+        ValueRender = (s) => { return Firmy.GetJmenoAsync(s.ICO); },
+        OrderValueRender = (s) => { return Firmy.GetJmenoAsync(s.ICO); }
     };
 
 
