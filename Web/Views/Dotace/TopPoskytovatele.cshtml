@@ -63,7 +63,7 @@
         {
             Name = "Jméno poskytovatele",
             CssClass = "text",
-            HtmlRender =(x) => $"<a href=/subjekt/{x.IcoPoskytovatele}>{FirmaRepo.NameFromIco(x.IcoPoskytovatele)}</a>",
+            HtmlRender =(x) => $"<a href=/subjekt/{x.IcoPoskytovatele}>{FirmaRepo.NameFromIcoAsync(x.IcoPoskytovatele)}</a>",
             TextRender = (x) => x.IcoPoskytovatele
         },
         new()

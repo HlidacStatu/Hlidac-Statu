@@ -17,23 +17,22 @@ namespace HlidacStatu.Repositories
     {
         private static readonly ILogger _logger = Log.ForContext(typeof(FirmaVazbyRepo));
 
-        public static void AddOrUpdate(
+        public static async Task AddOrUpdateAsync(
             string vlastnikIco, string dcerinkaIco,
             int kod_angm, string funkce, decimal? share, DateTime? fromDate, DateTime? toDate
         )
         {
-            using (DbEntities db = new DbEntities())
+            await using (DbEntities db = new DbEntities())
             {
-                var existing = db.FirmaVazby
-                    .AsQueryable()
-                    .FirstOrDefault(m => m.Ico == vlastnikIco
+                var existing = await db.FirmaVazby
+                    .FirstOrDefaultAsync(m => m.Ico == vlastnikIco
                                          && m.VazbakIco == dcerinkaIco
                                          && m.DatumOd == fromDate
                                          && m.DatumDo == toDate);
+                
                 if (existing == null)
-                    existing = db.FirmaVazby
-                        .AsQueryable()
-                        .FirstOrDefault(m => m.Ico == vlastnikIco
+                    existing = await db.FirmaVazby
+                        .FirstOrDefaultAsync(m => m.Ico == vlastnikIco
                                              && m.VazbakIco == dcerinkaIco
                                              && m.DatumOd == fromDate);
 
@@ -64,7 +63,7 @@ namespace HlidacStatu.Repositories
                     db.FirmaVazby.Add(af);
                 }
 
-                db.SaveChanges();
+                await db.SaveChangesAsync();
             }
         }
 

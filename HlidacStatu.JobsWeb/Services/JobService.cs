@@ -227,7 +227,7 @@ namespace WatchdogAnalytics.Services
             return GlobalStats[key].OdberateleStatistics.Keys.Select(k =>
                 (
                     k,
-                    FirmaRepo.NameFromIco(k, true),
+                    FirmaRepo.NameFromIcoAsync(k, true),
                     DistinctJobs.Where(x => x.IcoOdberatele == k && x.AnalyzaName == key.Obor && x.Year == key.Rok)
                         .Select(x => x.JobPk).Distinct().Count()))
                 .ToList();
@@ -249,7 +249,7 @@ namespace WatchdogAnalytics.Services
             return GlobalStats[key].DodavateleStatistics.Keys.Select(k =>
                 (
                     k,
-                    FirmaRepo.NameFromIco(k, true),
+                    FirmaRepo.NameFromIcoAsync(k, true),
                     DistinctJobs.Where(x => x.IcaDodavatelu.Any(i => i == k) && x.AnalyzaName == key.Obor && x.Year == key.Rok)
                         .Select(x => x.JobPk).Distinct().Count()
                 ))

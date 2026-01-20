@@ -52,7 +52,7 @@ namespace HlidacStatu.Repositories
             return await result.ToListAsync();
         }
 
-        public static async Task AddOborToFirma(FirmaObor firmaObor)
+        public static async Task AddOborToFirmaAsync(FirmaObor firmaObor)
         {
             await using DbEntities db = new DbEntities();
             var existingObor =
@@ -64,14 +64,14 @@ namespace HlidacStatu.Repositories
             await db.SaveChangesAsync();
         }
 
-        public static async Task RemoveOborFromFirma(FirmaObor firmaObor)
+        public static async Task RemoveOborFromFirmaAsync(FirmaObor firmaObor)
         {
             await using DbEntities db = new DbEntities();
             db.FirmaObory.Remove(firmaObor);
             await db.SaveChangesAsync();
         }
         
-        public static async Task RemoveOborFromFirma(string ico, int oborId)
+        public static async Task RemoveOborFromFirmaAsync(string ico, int oborId)
         {
             await using DbEntities db = new DbEntities();
             await db.FirmaObory.Where(f => f.ICO == ico && f.OborId == oborId)

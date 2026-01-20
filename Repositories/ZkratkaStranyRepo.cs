@@ -51,7 +51,7 @@ namespace HlidacStatu.Repositories
             if(!string.IsNullOrWhiteSpace(zkratkaStrany))
                 return zkratkaStrany;
             
-            return FirmaRepo.NameFromIco(normalizedIco);
+            return FirmaRepo.NameFromIcoAsync(normalizedIco);
         }
     }
 }

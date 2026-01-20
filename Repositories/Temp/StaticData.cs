@@ -299,7 +299,7 @@ namespace HlidacStatu.Repositories
                             {
                                 foreach (var urad in ossu.UradSluzebniSeznam.SluzebniUrady)
                                 {
-                                    var f = FirmaRepo.FromDS(urad.idDS);
+                                    var f = FirmaRepo.FromDSAsync(urad.idDS);
                                     if (f is null || !f.Valid)
                                     {
                                         if (string.IsNullOrEmpty(urad.idNadrizene))
@@ -320,7 +320,7 @@ namespace HlidacStatu.Repositories
                                             continue;
                                         }
 
-                                        f = FirmaRepo.FromDS(nadrizeny.idDS);
+                                        f = FirmaRepo.FromDSAsync(nadrizeny.idDS);
                                         if (f is null || !f.Valid)
                                         {
                                             _logger.Error(

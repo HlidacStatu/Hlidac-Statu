@@ -19,8 +19,8 @@
             {
                 Name = "Poskytovatel",
                 CssClass = "text",
-                HtmlRender =(x) => $"<a href=/subjekt/{x.SubsidyProviderIco}>{FirmaRepo.NameFromIco(x.SubsidyProviderIco)}</a>",
-                TextRender = (x) => FirmaRepo.NameFromIco(x.SubsidyProviderIco)
+                HtmlRender =(x) => $"<a href=/subjekt/{x.SubsidyProviderIco}>{FirmaRepo.NameFromIcoAsync(x.SubsidyProviderIco)}</a>",
+                TextRender = (x) => FirmaRepo.NameFromIcoAsync(x.SubsidyProviderIco)
             },
             new ReportDataSource<(string ProgramName, string ProgramCode, string SubsidyProviderIco, long Count, decimal AssumedAmountSummed)>.Column()
             {

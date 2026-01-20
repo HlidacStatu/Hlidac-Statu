@@ -17,13 +17,10 @@ namespace HlidacStatu.Repositories
                 if (resp == null)
                     return null;
 
-                if (resp.Items
-                    .Where(m => m.GetType() == typeof(HlidacStatu.Connectors.External.RZP.TPodnikatelSeznam))
-                    .Count() > 0)
+                if (resp.Items.Any(m => m.GetType() == typeof(Connectors.External.RZP.TPodnikatelSeznam)))
                 {
                     HlidacStatu.Connectors.External.RZP.TPodnikatelSeznam xf = resp.Items
-                        .Where(m => m.GetType() == typeof(HlidacStatu.Connectors.External.RZP.TPodnikatelSeznam))
-                        .First() as HlidacStatu.Connectors.External.RZP.TPodnikatelSeznam;
+                        .First(m => m.GetType() == typeof(Connectors.External.RZP.TPodnikatelSeznam)) as HlidacStatu.Connectors.External.RZP.TPodnikatelSeznam;
 
                     Firma f = new Firma();
                     f.Jmeno = xf.ObchodniJmenoSeznam.Value;
@@ -38,8 +35,7 @@ namespace HlidacStatu.Repositories
                     }
 
                     HlidacStatu.Connectors.External.RZP.TPodnikatelVypis vypis = detail.Items
-                        .Where(m => m.GetType() == typeof(HlidacStatu.Connectors.External.RZP.TPodnikatelVypis))
-                        .First() as HlidacStatu.Connectors.External.RZP.TPodnikatelVypis;
+                        .First(m => m.GetType() == typeof(Connectors.External.RZP.TPodnikatelVypis)) as HlidacStatu.Connectors.External.RZP.TPodnikatelVypis;
 
                     if (vypis.PodnikatelDetail?.SeznamZivnosti?.Zivnost?.Count() > 0)
                     {
@@ -53,7 +49,7 @@ namespace HlidacStatu.Repositories
                     }
 
                     f.RefreshDS();
-                    FirmaRepo.Save(f);
+                    FirmaRepo.SaveAsync(f);
                     return f;
                 }
                 else

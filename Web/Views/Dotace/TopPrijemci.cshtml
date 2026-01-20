@@ -69,8 +69,8 @@
             {
                 Name = "Příjemce",
                 CssClass = "text",
-                HtmlRender =(x) => $"<a href=/subjekt/{x.Ico}>{FirmaRepo.NameFromIco(x.Ico)}</a>",
-                TextRender = (x) => FirmaRepo.NameFromIco(x.Ico)
+                HtmlRender =(x) => $"<a href=/subjekt/{x.Ico}>{FirmaRepo.NameFromIcoAsync(x.Ico)}</a>",
+                TextRender = (x) => FirmaRepo.NameFromIcoAsync(x.Ico)
             },
             new ReportDataSource<(string Ico, long Pocet, decimal Castka)>.Column()
             {
@@ -98,7 +98,7 @@
     SimplePlot chartData = new SimplePlot()
     {
         Data = topPrijemciOrdered.Select(p => (double)p.Sum / 1_000_000).Take(20).ToList(),
-        Labels = topPrijemciOrdered.Select(p => FirmaRepo.NameFromIco(p.Ico)).Take(20).ToList(),
+        Labels = topPrijemciOrdered.Select(p => FirmaRepo.NameFromIcoAsync(p.Ico)).Take(20).ToList(),
         ChartType = "bar",
         Title = $"Top příjemci dotací{yearText}",
         Koncovka = "mil. Kč",

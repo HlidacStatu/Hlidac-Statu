@@ -111,7 +111,7 @@ namespace HlidacStatu.Plugin.Enhancers
                 && zahr.IsZahranicniAdresa() == false
                 )
             {
-                Firma f = FirmaRepo.FromDS(subj.datovaSchranka, true);
+                Firma f = FirmaRepo.FromDSAsync(subj.datovaSchranka, true);
                 if (f?.Valid == true)
                 {
                     subj.ico = f.ICO;
@@ -121,7 +121,7 @@ namespace HlidacStatu.Plugin.Enhancers
             }
             else if (!string.IsNullOrEmpty(subj.ico) && string.IsNullOrEmpty(subj.datovaSchranka))
             {
-                Firma f = FirmaRepo.FromIco(subj.ico, false);
+                Firma f = FirmaRepo.FromIcoAsync(subj.ico, false);
                 if (f?.Valid == true && f.DatovaSchranka != null && f.DatovaSchranka.Length > 0)
                 {
                     subj.datovaSchranka = f.DatovaSchranka[0];
@@ -139,7 +139,7 @@ namespace HlidacStatu.Plugin.Enhancers
                 //simple compare now
                 if (Firma.Koncovky.Any(m => subj.nazev.Contains(m)))
                 {
-                    Firma f = FirmaRepo.FromName(subj.nazev, true);
+                    Firma f = FirmaRepo.FromNameAsync(subj.nazev, true);
                     if (f?.Valid == true)
                     {
                         subj.ico = f.ICO;
@@ -155,7 +155,7 @@ namespace HlidacStatu.Plugin.Enhancers
                         string modifNazev = Firma.JmenoBezKoncovky(subj.nazev) + "%";
 
 
-                        f = FirmaRepo.FromName(modifNazev,false, true);
+                        f = FirmaRepo.FromNameAsync(modifNazev,false, true);
                         if (f?.Valid == true)
                         {
                             subj.ico = f.ICO;
@@ -172,7 +172,7 @@ namespace HlidacStatu.Plugin.Enhancers
             if (string.IsNullOrEmpty(subj.nazev) && !string.IsNullOrEmpty(subj.ico))
             {
                 //dopln chybejici jmeno 
-                Firma f = FirmaRepo.FromIcoExt(subj.ico, true);
+                Firma f = FirmaRepo.FromIcoExtAsync(subj.ico, true);
                 if (f?.Valid == true)
                 {
                     subj.nazev = f.Jmeno;

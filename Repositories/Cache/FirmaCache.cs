@@ -109,7 +109,7 @@ public static class FirmaCache
         }
 
         return PermanentCache.GetOrSet(key,
-            _ => FirmaRepo.GetNazvyOnlyAscii(),
+            _ => FirmaRepo.GetNazvyOnlyAsciiAsync(),
             options => options.ModifyEntryOptionsDuration(TimeSpan.FromHours(12), TimeSpan.FromDays(10 * 365))
         );
     }

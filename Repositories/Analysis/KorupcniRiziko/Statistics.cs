@@ -176,7 +176,7 @@ namespace HlidacStatu.Repositories.Analysis.KorupcniRiziko
                     {
                         _logger.Error(
                             $"Record with ico [{m.ico}] is missing in KIndexCompanies cache file. Please reset cache.");
-                        subjectName = FirmaRepo.NameFromIco(m.ico);
+                        subjectName = FirmaRepo.NameFromIcoAsync(m.ico);
                     }
 
                     return new SubjectWithKIndex()

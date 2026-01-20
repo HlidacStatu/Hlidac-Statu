@@ -99,7 +99,7 @@ namespace HlidacStatu.Repositories
                 // try to find Ico
                 if (newVZ.Zadavatel.ICO is null)
                 {
-                    var firma = FirmaRepo.FromName(newVZ.Zadavatel.Jmeno);
+                    var firma = FirmaRepo.FromNameAsync(newVZ.Zadavatel.Jmeno);
                     if(firma is not null)
                         newVZ.Zadavatel.ICO = firma.ICO;
                 }

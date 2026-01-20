@@ -96,7 +96,7 @@ HtmlRender =(s) => {
     {
     rdsNewestComp.AddRow(
     new Tuple<string, string>
-        (FirmaRepo.NameFromIco(val.ico, true), val.ico),
+        (FirmaRepo.NameFromIcoAsync(val.ico, true), val.ico),
         val.datum,
         val.sum
         );

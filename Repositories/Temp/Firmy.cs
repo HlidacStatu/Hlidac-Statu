@@ -28,7 +28,7 @@ namespace HlidacStatu.Repositories
         }
         private static Firma getByDS(string key)
         {
-            var o = FirmaRepo.FromDS(key);
+            var o = FirmaRepo.FromDSAsync(key);
             return o ;
         }
 
