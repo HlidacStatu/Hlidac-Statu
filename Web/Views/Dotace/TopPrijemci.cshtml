@@ -1,28 +1,30 @@
 @using HlidacStatu.Repositories
 @using HlidacStatu.Repositories.SharedModels
 @using HlidacStatu.XLib.Render
-@model List<(string Ico, long Count, decimal Sum)>
+@model List<(string Ico, string Jmeno, long Count, decimal Sum)>
 
 @{
     int? rok = null;
-    if(ViewData.TryGetValue("rok", out var rokObj))
+    if (ViewData.TryGetValue("rok", out var rokObj))
     {
         rok = (int?)rokObj;
     }
+
     int? ftyp = ViewData["ftyp"] as int?;
     int? dtyp = ViewData["dtyp"] as int?;
     HlidacStatu.Entities.Dotace.Hint.Type? dTypeEnum = null;
-    if (Enum.TryParse<HlidacStatu.Entities.Dotace.Hint.Type>(dtyp?.ToString(), out HlidacStatu.Entities.Dotace.Hint.Type t)) {
+    if (Enum.TryParse<HlidacStatu.Entities.Dotace.Hint.Type>(dtyp?.ToString(), out HlidacStatu.Entities.Dotace.Hint.Type t))
+    {
         dTypeEnum = t;
     }
 
-    string yearText = rok > 0 ? $" pro rok {rok}" :"";
+    string yearText = rok > 0 ? $" pro rok {rok}" : "";
 
     ViewBag.Title = "Hlídač dotací";
-    ViewBag.SubTitle = $"Top příjemci " 
-        + (dtyp != null ? " " + HlidacStatu.Entities.Dotace.Hint.TypeDescription(dtyp, 4, false) : "")
-        + $" dotací{yearText}"
-        + (ftyp != null ? " pro " + HlidacStatu.Entities.Firma.TypSubjektuDescription(ftyp, 4, false) : "")
+    ViewBag.SubTitle = $"Top příjemci "
+                       + (dtyp != null ? " " + HlidacStatu.Entities.Dotace.Hint.TypeDescription(dtyp, 4, false) : "")
+                       + $" dotací{yearText}"
+                       + (ftyp != null ? " pro " + HlidacStatu.Entities.Firma.TypSubjektuDescription(ftyp, 4, false) : "")
         ;
 
     string searchQuery = "";
@@ -30,11 +32,11 @@
     {
         searchQuery = searchQuery + "%20AND%20approvedYear:" + rok.Value;
     }
+
     if (dtyp.HasValue)
     {
         searchQuery = searchQuery + "%20AND%20hints.subsidyType:" + dtyp.Value;
     }
-
 }
 
 @section breadcrumb
@@ -58,61 +60,60 @@
     <link rel="stylesheet" type="text/css" href="//cdn.datatables.net/1.13.4/css/jquery.dataTables.css"/>
     <script type="text/javascript" charset="utf8" src="//cdn.datatables.net/1.13.4/js/jquery.dataTables.js"></script>
     <script src="/Scripts/Highcharts-7/highcharts.js"></script>
-<script src="/Scripts/highcharts.global.options.js"></script>
+    <script src="/Scripts/highcharts.global.options.js"></script>
 }
 
 @{
-    var topPrijemci = new ReportDataSource<(string Ico, long Pocet, decimal Castka)>(
+    var topPrijemci = new ReportDataSource<(string Ico, string Jmeno, long Count, decimal Sum)>(
         new[]
         {
-            new ReportDataSource<(string Ico, long Pocet, decimal Castka)>.Column()
+            new ReportDataSource<(string Ico, string Jmeno, long Count, decimal Sum)>.Column()
             {
                 Name = "Příjemce",
                 CssClass = "text",
-                HtmlRender =(x) => $"<a href=/subjekt/{x.Ico}>{FirmaRepo.NameFromIcoAsync(x.Ico)}</a>",
-                TextRender = (x) => FirmaRepo.NameFromIcoAsync(x.Ico)
+                HtmlRender = (x) => $"<a href=/subjekt/{x.Ico}>{x.Jmeno}</a>",
+                TextRender = (x) => x.Jmeno
             },
-            new ReportDataSource<(string Ico, long Pocet, decimal Castka)>.Column()
+            new ReportDataSource<(string Ico, string Jmeno, long Count, decimal Sum)>.Column()
             {
                 Name = "Počet dotací" + (rok.HasValue ? $" za {rok}" : ""),
-                TextRender = (x) => HlidacStatu.Util.RenderData.NiceNumber(x.Pocet),
-                HtmlRender =(x) => $"<a title='Najit dotace subjektu' href='/dotace/hledat?Q=ico:{x.Ico}{searchQuery}'>{HlidacStatu.Util.RenderData.NiceNumber(x.Pocet)}</a>",
-        OrderValueRender = (x) => HlidacStatu.Util.RenderData.OrderValueFormat(x.Pocet),
+                TextRender = (x) => HlidacStatu.Util.RenderData.NiceNumber(x.Count),
+                HtmlRender = (x) => $"<a title='Najit dotace subjektu' href='/dotace/hledat?Q=ico:{x.Ico}{searchQuery}'>{HlidacStatu.Util.RenderData.NiceNumber(x.Count)}</a>",
+                OrderValueRender = (x) => HlidacStatu.Util.RenderData.OrderValueFormat(x.Count),
                 CssClass = "number"
             },
-            new ReportDataSource<(string Ico, long Pocet, decimal Castka)>.Column()
+            new ReportDataSource<(string Ico, string Jmeno, long Count, decimal Sum)>.Column()
             {
                 Name = "Celková částka",
-                TextRender = (x) => HlidacStatu.Util.RenderData.NicePrice(x.Castka, shortFormat:true),
-                HtmlRender =(x) => HlidacStatu.Util.RenderData.NicePrice(x.Castka,html:true),
-                OrderValueRender = (x) => HlidacStatu.Util.RenderData.OrderValueFormat(x.Castka),
+                TextRender = (x) => HlidacStatu.Util.RenderData.NicePrice(x.Sum, shortFormat: true),
+                HtmlRender = (x) => HlidacStatu.Util.RenderData.NicePrice(x.Sum, html: true),
+                OrderValueRender = (x) => HlidacStatu.Util.RenderData.OrderValueFormat(x.Sum),
                 CssClass = "number"
             }
         });
 
-    var topPrijemciOrdered = Model.OrderByDescending(m => m.Sum).ToList(); 
-    
+    var topPrijemciOrdered = Model.OrderByDescending(m => m.Sum).ToList();
+
     topPrijemci.AddRows(topPrijemciOrdered.Take(100));
 
 
     SimplePlot chartData = new SimplePlot()
     {
         Data = topPrijemciOrdered.Select(p => (double)p.Sum / 1_000_000).Take(20).ToList(),
-        Labels = topPrijemciOrdered.Select(p => FirmaRepo.NameFromIcoAsync(p.Ico)).Take(20).ToList(),
+        Labels = topPrijemciOrdered.Select(p => p.Jmeno).Take(20).ToList(),
         ChartType = "bar",
         Title = $"Top příjemci dotací{yearText}",
         Koncovka = "mil. Kč",
         SeriesName = "Výše dotací",
         CssHeight = "600px"
     };
-    
 }
 
 <h4>Vyberte rok, za který chcete zobrazit data</h4>
-<partial name="_pager" 
-         model="@(ValueTuple.Create((int?)null, (int?)null, rok, 
+<partial name="_pager"
+         model="@(ValueTuple.Create((int?)null, (int?)null, rok,
                     "/Dotace/TopPrijemci?ftyp=" + (ftyp.HasValue ? $"{ftyp}" : "") + (dtyp.HasValue ? $"&dtyp={dtyp}" : "")
-                ))"    
+                ))"
 />
 
 @if (rok > DotaceRepo.LastCompleteYear)
@@ -130,7 +131,10 @@
 @if (rok == 2024 && dtyp.HasValue == false)
 {
     <div class="alert alert-warning my-3" role="alert">
-        Upozornění: Po zpracování přehledů jsme společně se sdružením CESNET odhalili pochybení ve vstupních datech, kdy stát chybně uváděl jako jediného příjemce dotace ve výši 1,2 miliardy Kč sdružení CESNET. Ve skutečnosti byla dotace rozdělena mezi 10 subjektů. Dle proběhlé analýzy by se tedy sdružení CESNET neumístilo na prvním místě jako soukromý příjemce dotací, ale až na desátém.
+        Upozornění: Po zpracování přehledů jsme společně se sdružením CESNET odhalili pochybení ve vstupních datech, kdy
+        stát chybně uváděl jako jediného příjemce dotace ve výši 1,2 miliardy Kč sdružení CESNET. Ve skutečnosti byla
+        dotace rozdělena mezi 10 subjektů. Dle proběhlé analýzy by se tedy sdružení CESNET neumístilo na prvním místě
+        jako soukromý příjemce dotací, ale až na desátém.
     </div>
 }
 
@@ -148,7 +152,7 @@
                         'info': false,
                         }";
     }
-    
-    @Html.DataToHTMLTable(topPrijemci, tableId:"topPrijemciTab", dataTableOptions:dataTableOptions)
+
+    @Html.DataToHTMLTable(topPrijemci, tableId: "topPrijemciTab", dataTableOptions: dataTableOptions)
 </div>
 

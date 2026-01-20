@@ -12,8 +12,6 @@ namespace HlidacStatu.Plugin.IssueAnalyzers
 {
     public class Formal : IIssueAnalyzer
     {
-
-
         public string Description
         {
             get
@@ -123,14 +121,14 @@ namespace HlidacStatu.Plugin.IssueAnalyzers
             }
 
             //platce
-            CheckSubjekt(item.Platce, item, ref issues);
+            await CheckSubjektAsync(item.Platce, item, issues);
 
             //Dodavatele
             foreach (var d in item.Prijemce)
             {
                 if (d == null)
                     continue;
-                CheckSubjekt(d, item, ref issues);
+                await CheckSubjektAsync(d, item, issues);
 
             }
 
@@ -162,7 +160,7 @@ namespace HlidacStatu.Plugin.IssueAnalyzers
             return issues;
         }
 
-        public void CheckSubjekt(Smlouva.Subjekt d, Smlouva item, ref List<Issue> issues)
+        public async Task CheckSubjektAsync(Smlouva.Subjekt d, Smlouva item, List<Issue> issues)
         {
 
             List<Issue> tmpIss = new List<Issue>();
@@ -214,7 +212,7 @@ namespace HlidacStatu.Plugin.IssueAnalyzers
             if (hasIco && zahr.IsZahranicniAdresa() == false)
             {
                 //check ICO in registers
-                Firma f = FirmaRepo.FromIcoExtAsync(d.ico, true);
+                Firma f = await FirmaRepo.FromIcoExtAsync(d.ico, true);
                 if (f?.Valid != true)
                 {
                     issues.Add(new Issue(this, (int)IssueType.IssueTypes.Neexistujici_ICO, "Neexistující IČO", string.Format("Subjekt '{0}' má neexistující IČO", d.nazev)));
@@ -275,9 +273,9 @@ namespace HlidacStatu.Plugin.IssueAnalyzers
             //datum vzniku firmy
             Firma firma = null;
             if (hasIco)
-                firma = FirmaRepo.FromIcoExtAsync(d.ico, true);
+                firma = await FirmaRepo.FromIcoExtAsync(d.ico, true);
             if (firma == null && hasDS)
-                firma = FirmaRepo.FromDSAsync(d.datovaSchranka, true);
+                firma = await FirmaRepo.FromDSAsync(d.datovaSchranka, true);
 
             if (firma?.Valid == true)
             {

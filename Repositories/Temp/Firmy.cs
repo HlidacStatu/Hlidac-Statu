@@ -2,18 +2,16 @@
 
 
 using System;
+using System.Threading.Tasks;
 
 namespace HlidacStatu.Repositories
 {
     public static partial class Firmy
     {
 
-        static Firma nullObj = new Firma();
-
-
-        private static string getNameByIco(string key)
+        private static async Task<string> GetNameByIcoAsync(string key)
         {
-            var o = FirmaRepo.FromIco(key);
+            var o = await FirmaRepo.FromIcoAsync(key);
             if (o == null)
                 return key;
             if (o.Valid == false)
@@ -21,29 +19,29 @@ namespace HlidacStatu.Repositories
             return o.Jmeno;
         }
 
-        private static Firma getByIco(string key)
+        private static async Task<Firma> GetByIcoAsync(string key)
         {
-            var o = FirmaRepo.FromIco(key);
+            var o = await FirmaRepo.FromIcoAsync(key);
             return o;
         }
-        private static Firma getByDS(string key)
+        private static async Task<Firma> GetByDSAsync(string key)
         {
-            var o = FirmaRepo.FromDSAsync(key);
+            var o = await FirmaRepo.FromDSAsync(key);
             return o ;
         }
 
         public static Devmasters.Cache.Memcached.Manager<Firma, string> instanceByIco
-            = Devmasters.Cache.Memcached.Manager<Firma, string>.GetSafeInstance("firmyByICO_v3_", getByIco, TimeSpan.FromHours(4),
+            = Devmasters.Cache.Memcached.Manager<Firma, string>.GetSafeInstance("firmyByICO_v3_", GetByIcoAsync, TimeSpan.FromHours(4),
                     Devmasters.Config.GetWebConfigValue("HazelcastServers").Split(',')
                    );
 
         public static Devmasters.Cache.Memcached.Manager<Firma, string> instanceByDS
-            = Devmasters.Cache.Memcached.Manager<Firma, string>.GetSafeInstance("firmyByDS_v3_", getByDS, TimeSpan.FromHours(4),
+            = Devmasters.Cache.Memcached.Manager<Firma, string>.GetSafeInstance("firmyByDS_v3_", GetByDSAsync, TimeSpan.FromHours(4),
                     Devmasters.Config.GetWebConfigValue("HazelcastServers").Split(',')
                     );
 
         public static Devmasters.Cache.Memcached.Manager<string, string> instanceNameOnlyByIco
-            = Devmasters.Cache.Memcached.Manager<string, string>.GetSafeInstance("firmaNameOnlyByICO_v3_", getNameByIco, TimeSpan.FromHours(12),
+            = Devmasters.Cache.Memcached.Manager<string, string>.GetSafeInstance("firmaNameOnlyByICO_v3_", GetNameByIcoAsync, TimeSpan.FromHours(12),
                     Devmasters.Config.GetWebConfigValue("HazelcastServers").Split(',')
                     );
 

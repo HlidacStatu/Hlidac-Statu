@@ -740,7 +740,7 @@ namespace HlidacStatu.Repositories
         public static async
             Task<List<(string ProgramName, string ProgramCode, string SubsidyProviderIco, long Count, decimal
                 AssumedAmountSummed)>>
-            TopDotacniProgramy(Dotace.Hint.Type? typDotace = null, int? rok = null, string? subsidyProviderIco = null,
+            TopDotacniProgramyAsync(Dotace.Hint.Type? typDotace = null, int? rok = null, string? subsidyProviderIco = null,
                 string? customquery = null)
         {
             var aggs = new AggregationContainerDescriptor<Dotace>()

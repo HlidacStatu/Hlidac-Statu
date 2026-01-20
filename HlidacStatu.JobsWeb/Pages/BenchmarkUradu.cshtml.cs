@@ -21,7 +21,7 @@ namespace WatchdogAnalytics.Pages
 
 
             Ico = id;
-            Nazev = FirmaRepo.NameFromIcoAsync(Ico, true);
+            Nazev = await FirmaRepo.NameFromIcoAsync(Ico, true);
 
             Key = HttpContext.TryFindKey();
 

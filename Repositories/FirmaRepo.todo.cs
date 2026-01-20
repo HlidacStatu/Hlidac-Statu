@@ -3,6 +3,7 @@ using HlidacStatu.Entities;
 using System;
 using System.Linq;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 using HlidacStatu.Repositories.Cache;
 
 namespace HlidacStatu.Repositories
@@ -11,7 +12,7 @@ namespace HlidacStatu.Repositories
     {
         public class RZP
         {
-            public static Firma FromIco(string ico)
+            public static async Task<Firma> FromIcoAsync(string ico)
             {
                 var resp = HlidacStatu.Connectors.External.RZP.Manager.RawSearchIco(ico);
                 if (resp == null)
@@ -49,7 +50,7 @@ namespace HlidacStatu.Repositories
                     }
 
                     f.RefreshDS();
-                    FirmaRepo.SaveAsync(f);
+                    await FirmaRepo.SaveAsync(f);
                     return f;
                 }
                 else
@@ -58,7 +59,7 @@ namespace HlidacStatu.Repositories
         }
 
         //todo: Upravit + přidat státní firma/organizace in text.
-        public static Firma FirmaInText(string text)
+        public static async Task<Firma> FirmaInTextAsync(string text)
         {
             if (string.IsNullOrEmpty(text))
                 return null;
@@ -101,12 +102,13 @@ namespace HlidacStatu.Repositories
                     //+ "|" + koncovka;
 
 
+                    var firmyNazvyOnlyAscii = await FirmaCache.FirmyNazvyOnlyAsciiAsync(); 
                     if (firmaBezKoncovky.Length > 3
-                        && FirmaCache.FirmyNazvyOnlyAscii().ContainsKey(simpleName)
+                        && firmyNazvyOnlyAscii.ContainsKey(simpleName)
                     )
                     {
                         //nasel jsem ico?
-                        foreach (var ico in FirmaCache.FirmyNazvyOnlyAscii()[simpleName])
+                        foreach (var ico in firmyNazvyOnlyAscii[simpleName])
                         {
                             Firma f = Firmy.Get(ico); //TODO StaticData.FirmyNazvyAscii.Get()[simpleName]);
                             if (f?.Valid == true)

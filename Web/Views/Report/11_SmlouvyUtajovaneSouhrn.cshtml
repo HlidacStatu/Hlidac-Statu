@@ -64,7 +64,7 @@
         if (f != null)
             statRs = await f.StatistikaRegistruSmluvAsync();
         rdsPerIco.AddRow(
-            new Tuple<string, string> (FirmaRepo.NameFromIcoAsync((string)val.Key, true), (string)val.Key),
+            new Tuple<string, string> (await FirmaRepo.NameFromIcoAsync((string)val.Key, true), (string)val.Key),
             val.DocCount,
             statRs.Summary().PocetSmluv,
             (double)val.DocCount / (double)statRs.Summary().PocetSmluv

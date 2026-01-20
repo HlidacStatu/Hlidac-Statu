@@ -1,7 +1,6 @@
 @using HlidacStatu.Repositories
 @using HlidacStatu.XLib.Render
-@using Microsoft.AspNetCore.Mvc.TagHelpers
-@model List<(string Ico, decimal SumAssumedAmmount)>
+@model List<(string Ico, string Jmeno, decimal SumAssumedAmmount)>
 
 @{
     int? rok = null;
@@ -40,17 +39,17 @@
 }
 
 @{
-    var dotace = new ReportDataSource<(string Ico, decimal SumAssumedAmmount)>(
+    var dotace = new ReportDataSource<(string Ico, string Jmeno, decimal SumAssumedAmmount)>(
         new[]
         {
-            new ReportDataSource<(string Ico, decimal SumAssumedAmmount)>.Column()
+            new ReportDataSource<(string Ico, string Jmeno, decimal SumAssumedAmmount)>.Column()
             {
                 Name = "Poskytovatel",
                 CssClass = "text",
-                HtmlRender =(x) => $"<a href=/subjekt/{x.Ico}>{FirmaRepo.NameFromIcoAsync(x.Ico)}</a>",
-                TextRender = (x) => FirmaRepo.NameFromIcoAsync(x.Ico)
+                HtmlRender =(x) => $"<a href=/subjekt/{x.Ico}>{x.Jmeno}</a>",
+                TextRender = (x) => x.Jmeno
             },
-            new ReportDataSource<(string Ico, decimal SumAssumedAmmount)>.Column()
+            new ReportDataSource<(string Ico, string Jmeno, decimal SumAssumedAmmount)>.Column()
             {
                 Name = "Celková částka",
                 TextRender = (x) => HlidacStatu.Util.RenderData.NicePrice(x.SumAssumedAmmount, shortFormat:true),
@@ -61,19 +60,6 @@
         });
     
     dotace.AddRows(Model.Take(100));
-    
-    
-    // SimplePlot chartData = new SimplePlot()
-    // {
-    //     Data = Model.Select(p => (double)p.DataSourceCount).Take(20).ToList(),
-    //     Labels = Model.Select(p => FirmaRepo.NameFromIco(p.Ico)).Take(20).ToList(),
-    //     ChartType = "bar",
-    //     Title = $"Příjemci dotací z více krajů{yearText}",
-    //     Koncovka = "krajů",
-    //     SeriesName = "krajů",
-    //     CssHeight = "600px",
-    //     YAxisTickInterval = 1
-    // };
 }
 <h4>Vyberte rok, za který chcete zobrazit data</h4>
 <partial name="_pager"
@@ -88,9 +74,7 @@
 }
 
 <h4>@ViewBag.SubTitle</h4>
-@* <div> *@
-@*     <partial name="Charts/_SimpleChart" model="chartData"/> *@
-@* </div> *@
+
 <div>
     @Html.DataToHTMLTable(dotace, dataTableOptions: HtmlExtensions.DatatableOptions(orderColumnIdx: 1, orderDirection: "desc"))
 </div>

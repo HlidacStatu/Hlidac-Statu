@@ -139,14 +139,21 @@ namespace HlidacStatuApi.Controllers.ApiV2
                 e.Type == (int)OsobaEvent.Types.SocialniSite
                 && e.Organizace == social;
 
-            var events = (await OsobaEventRepo.GetByEventAsync(socialNetworkFilter))
-                .GroupBy(e => e.Ico)
-                .Select(g => TransformEventsToFirmaSocial(g))
-                .Where(r => r != null)
-                .ToList();
+            var eventGroups = (await OsobaEventRepo.GetByEventAsync(socialNetworkFilter))
+                .GroupBy(e => e.Ico);
+
+            var events = new List<FirmaSocialDTO>();
+
+            foreach (var g in eventGroups)
+            {
+                var result = await TransformEventsToFirmaSocialAsync(g);
+                if (result != null)
+                {
+                    events.Add(result);
+                }
+            }
 
             return events;
-
         }
 
         /// <summary>
@@ -191,9 +198,9 @@ namespace HlidacStatuApi.Controllers.ApiV2
         }
 
 
-        private FirmaSocialDTO TransformEventsToFirmaSocial(IGrouping<string, OsobaEvent> groupedEvents)
+        private async Task<FirmaSocialDTO> TransformEventsToFirmaSocialAsync(IGrouping<string, OsobaEvent> groupedEvents)
         {
-            var firma = FirmaRepo.FromIco(groupedEvents.Key);
+            var firma = await FirmaRepo.FromIcoAsync(groupedEvents.Key);
             if (firma is null || !firma.Valid)
             {
                 return null;

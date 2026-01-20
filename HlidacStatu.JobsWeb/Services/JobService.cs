@@ -222,15 +222,23 @@ namespace WatchdogAnalytics.Services
         // jak to udělat správně? protože je to po letech? Jak to bude na FE?
         // a) zobrazovat roky a po vybrání roku obory a po vybrání oboru firmy?
         // b) zobrazovat firmy a po vybrání firmy nabídnout roky?
-        public static List<(string ico, string nazev, int pocetCen)> GetOdberateleList(YearlyStatisticsGroup.Key key)
+        public static async Task<List<(string ico, string nazev, int pocetCen)>> GetOdberateleListAsync(YearlyStatisticsGroup.Key key)
         {
-            return GlobalStats[key].OdberateleStatistics.Keys.Select(k =>
-                (
-                    k,
-                    FirmaRepo.NameFromIcoAsync(k, true),
-                    DistinctJobs.Where(x => x.IcoOdberatele == k && x.AnalyzaName == key.Obor && x.Year == key.Rok)
-                        .Select(x => x.JobPk).Distinct().Count()))
-                .ToList();
+            var result = new List<(string, string, int)>();
+
+            foreach (var k in GlobalStats[key].OdberateleStatistics.Keys)
+            {
+                var name = await FirmaRepo.NameFromIcoAsync(k, true);
+                var count = DistinctJobs
+                    .Where(x => x.IcoOdberatele == k && x.AnalyzaName == key.Obor && x.Year == key.Rok)
+                    .Select(x => x.JobPk)
+                    .Distinct()
+                    .Count();
+    
+                result.Add((k, name, count));
+            }
+
+            return result;
         }
 
         public static List<JobStatistics> GetOdberatelStatistics(string ico, YearlyStatisticsGroup.Key key)
@@ -244,16 +252,22 @@ namespace WatchdogAnalytics.Services
         }
 
 
-        public static List<(string ico, string nazev, int pocetCen)> GetDodavateleList(YearlyStatisticsGroup.Key key)
+        public static async Task<List<(string ico, string nazev, int pocetCen)>> GetDodavateleListAsync(YearlyStatisticsGroup.Key key)
         {
-            return GlobalStats[key].DodavateleStatistics.Keys.Select(k =>
-                (
-                    k,
-                    FirmaRepo.NameFromIcoAsync(k, true),
-                    DistinctJobs.Where(x => x.IcaDodavatelu.Any(i => i == k) && x.AnalyzaName == key.Obor && x.Year == key.Rok)
-                        .Select(x => x.JobPk).Distinct().Count()
-                ))
-                .ToList();
+            var result = new List<(string, string, int)>();
+            foreach (var k in GlobalStats[key].DodavateleStatistics.Keys)
+            {
+                var name = await FirmaRepo.NameFromIcoAsync(k, true);
+                var count = DistinctJobs
+                    .Where(x => x.IcaDodavatelu.Any(i => i == k) && x.AnalyzaName == key.Obor && x.Year == key.Rok)
+                    .Select(x => x.JobPk)
+                    .Distinct()
+                    .Count();
+    
+                result.Add((k, name, count));
+            }
+
+            return result;
         }
 
         public static List<JobStatistics> GetDodavatelStatistics(string ico, YearlyStatisticsGroup.Key key)

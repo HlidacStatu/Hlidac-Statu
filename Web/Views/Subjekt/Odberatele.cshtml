@@ -87,14 +87,14 @@
             foreach (KeyedBucket<object> val in ((BucketAggregate)res.ElasticResults.Aggregations["perIco"]).Items)
             {
                 rdsPerIco.AddRow(
-                    new Tuple<string, string>(FirmaRepo.NameFromIcoAsync((string)val.Key, true), (string)val.Key),
+                    new Tuple<string, string>(await FirmaRepo.NameFromIcoAsync((string)val.Key, true), (string)val.Key),
                     val.DocCount.ToString()
                     );
             }
             foreach (KeyedBucket<object> val in ((BucketAggregate)res.ElasticResults.Aggregations["perPrice"]).Items)
             {
                 rdsPerPrice.AddRow(
-                        new Tuple<string, string>(FirmaRepo.NameFromIcoAsync((string)val.Key, true), (string)val.Key),
+                        new Tuple<string, string>(await FirmaRepo.NameFromIcoAsync((string)val.Key, true), (string)val.Key),
                         val.Sum("sumincome").Value
                     );
             }

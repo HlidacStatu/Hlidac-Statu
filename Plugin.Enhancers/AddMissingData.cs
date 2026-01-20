@@ -5,6 +5,7 @@ using HlidacStatu.Entities.Enhancers;
 using HlidacStatu.Repositories;
 
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace HlidacStatu.Plugin.Enhancers
 {
@@ -33,22 +34,22 @@ namespace HlidacStatu.Plugin.Enhancers
         public void SetInstanceData(object data) { }
 
 
-        public bool Update(ref Smlouva item)
+        public async Task<bool> UpdateAsync(Smlouva item)
         {
             //return; //DOTO
             //check missing DS/ICO
             bool changed = false;
 
-            changed = changed | UpdateSubj(item.Platce, item, "platce");
-            changed = changed | UpdateSubj(item.VkladatelDoRejstriku, item, "platce");
+            changed = changed | await UpdateSubjAsync(item.Platce, item, "platce");
+            changed = changed | await UpdateSubjAsync(item.VkladatelDoRejstriku, item, "platce");
             for (int i = 0; i < item.Prijemce.Count(); i++)
             {
-                changed = changed | UpdateSubj(item.Prijemce[i], item, $"platce[{i}]");
+                changed = changed | await UpdateSubjAsync(item.Prijemce[i], item, $"platce[{i}]");
             }
             return changed;
         }
 
-        public bool UpdateSubj(Smlouva.Subjekt subj, Smlouva _item, string path)
+        public async Task<bool> UpdateSubjAsync(Smlouva.Subjekt subj, Smlouva smlouva, string path)
         {
 
             bool changed = false;
@@ -63,7 +64,7 @@ namespace HlidacStatu.Plugin.Enhancers
                         .Replace("HlidacStatu.Util.DataValidators+ZahranicniAdresa-", "")
                         .Replace("HlidacStatu.Util.DataValidators+ZahranicniAdresa", "")
                         ;
-                    _item.Enhancements = _item.Enhancements.AddOrUpdate(new Enhancement("Doplněno zahraniční ID subjektu. Doplněn prefix před ID firmy", "", path + ".ico", newico, subj.ico, this));
+                    smlouva.Enhancements = smlouva.Enhancements.AddOrUpdate(new Enhancement("Doplněno zahraniční ID subjektu. Doplněn prefix před ID firmy", "", path + ".ico", newico, subj.ico, this));
                     subj.ico = newico;
                     changed = true;
                 }
@@ -74,7 +75,7 @@ namespace HlidacStatu.Plugin.Enhancers
                         .Replace("HlidacStatu.Util.DataValidators+ZahranicniAdresa-","")
                         .Replace("HlidacStatu.Util.DataValidators+ZahranicniAdresa", "")
                         ;
-                    _item.Enhancements = _item.Enhancements.AddOrUpdate(new Enhancement("Upraveno zahraniční ID subjektu. Doplněn prefix před ID firmy", "", path + ".ico", zahr + "-" + subj.ico, subj.ico, this));
+                    smlouva.Enhancements = smlouva.Enhancements.AddOrUpdate(new Enhancement("Upraveno zahraniční ID subjektu. Doplněn prefix před ID firmy", "", path + ".ico", zahr + "-" + subj.ico, subj.ico, this));
                     subj.ico = newico;
                     changed = true;
                 }
@@ -100,7 +101,7 @@ namespace HlidacStatu.Plugin.Enhancers
                 ico = System.Text.RegularExpressions.Regex.Replace(ico.ToUpper(), @"[^0-9\-.,]", string.Empty);
                 if (Util.DataValidators.CheckCZICO(ico))
                 {
-                    _item.Enhancements = _item.Enhancements.AddOrUpdate(new Enhancement("Opraveno IČO subjektu", "", path + ".ico", subj.ico, ico, this));
+                    smlouva.Enhancements = smlouva.Enhancements.AddOrUpdate(new Enhancement("Opraveno IČO subjektu", "", path + ".ico", subj.ico, ico, this));
                     subj.ico = ico;
                     changed = true;
                 }
@@ -111,21 +112,21 @@ namespace HlidacStatu.Plugin.Enhancers
                 && zahr.IsZahranicniAdresa() == false
                 )
             {
-                Firma f = FirmaRepo.FromDSAsync(subj.datovaSchranka, true);
+                Firma f = await FirmaRepo.FromDSAsync(subj.datovaSchranka, true);
                 if (f?.Valid == true)
                 {
                     subj.ico = f.ICO;
-                    _item.Enhancements = _item.Enhancements.AddOrUpdate(new Enhancement("Doplněno IČO subjektu", "", path + ".ico", "", f.ICO, this));
+                    smlouva.Enhancements = smlouva.Enhancements.AddOrUpdate(new Enhancement("Doplněno IČO subjektu", "", path + ".ico", "", f.ICO, this));
                     changed = true;
                 }
             }
             else if (!string.IsNullOrEmpty(subj.ico) && string.IsNullOrEmpty(subj.datovaSchranka))
             {
-                Firma f = FirmaRepo.FromIcoAsync(subj.ico, false);
+                Firma f = await FirmaRepo.FromIcoAsync(subj.ico, false);
                 if (f?.Valid == true && f.DatovaSchranka != null && f.DatovaSchranka.Length > 0)
                 {
                     subj.datovaSchranka = f.DatovaSchranka[0];
-                    _item.Enhancements = _item.Enhancements.AddOrUpdate(new Enhancement("Doplněna datová schránka subjektu", "", path + ".datovaScranka", "", f.DatovaSchranka[0], this));
+                    smlouva.Enhancements = smlouva.Enhancements.AddOrUpdate(new Enhancement("Doplněna datová schránka subjektu", "", path + ".datovaScranka", "", f.DatovaSchranka[0], this));
                     changed = true;
                 }
             }
@@ -139,14 +140,14 @@ namespace HlidacStatu.Plugin.Enhancers
                 //simple compare now
                 if (Firma.Koncovky.Any(m => subj.nazev.Contains(m)))
                 {
-                    Firma f = FirmaRepo.FromNameAsync(subj.nazev, true);
+                    Firma f = await FirmaRepo.FromNameAsync(subj.nazev, true);
                     if (f?.Valid == true)
                     {
                         subj.ico = f.ICO;
                         subj.datovaSchranka = f.DatovaSchranka.Length > 0 ? f.DatovaSchranka[0] : "";
-                        _item.Enhancements = _item.Enhancements.AddOrUpdate(new Enhancement("Doplněno IČO subjektu", "", path + ".ico", "", f.ICO, this));
+                        smlouva.Enhancements = smlouva.Enhancements.AddOrUpdate(new Enhancement("Doplněno IČO subjektu", "", path + ".ico", "", f.ICO, this));
                         if (f.DatovaSchranka.Length > 0)
-                            _item.Enhancements = _item.Enhancements.AddOrUpdate(new Enhancement("Doplněna datová schránka subjektu", "", path + ".datovaSchranka", "", f.DatovaSchranka[0], this));
+                            smlouva.Enhancements = smlouva.Enhancements.AddOrUpdate(new Enhancement("Doplněna datová schránka subjektu", "", path + ".datovaSchranka", "", f.DatovaSchranka[0], this));
                         changed = true;
                     }
                     else
@@ -155,14 +156,14 @@ namespace HlidacStatu.Plugin.Enhancers
                         string modifNazev = Firma.JmenoBezKoncovky(subj.nazev) + "%";
 
 
-                        f = FirmaRepo.FromNameAsync(modifNazev,false, true);
+                        f = await FirmaRepo.FromNameAsync(modifNazev,false, true);
                         if (f?.Valid == true)
                         {
                             subj.ico = f.ICO;
                             subj.datovaSchranka = f.DatovaSchranka.Length > 0 ? f.DatovaSchranka[0] : "";
-                            _item.Enhancements = _item.Enhancements.AddOrUpdate(new Enhancement("Doplněno IČO subjektu", "", path + ".ico", "", f.ICO, this));
+                            smlouva.Enhancements = smlouva.Enhancements.AddOrUpdate(new Enhancement("Doplněno IČO subjektu", "", path + ".ico", "", f.ICO, this));
                             if (f.DatovaSchranka.Length > 0)
-                                _item.Enhancements = _item.Enhancements.AddOrUpdate(new Enhancement("Doplněna datová schránka subjektu", "", path + ".datovaSchranka", "", f.DatovaSchranka[0], this));
+                                smlouva.Enhancements = smlouva.Enhancements.AddOrUpdate(new Enhancement("Doplněna datová schránka subjektu", "", path + ".datovaSchranka", "", f.DatovaSchranka[0], this));
                             changed = true;
 
                         }
@@ -172,11 +173,11 @@ namespace HlidacStatu.Plugin.Enhancers
             if (string.IsNullOrEmpty(subj.nazev) && !string.IsNullOrEmpty(subj.ico))
             {
                 //dopln chybejici jmeno 
-                Firma f = FirmaRepo.FromIcoExtAsync(subj.ico, true);
+                Firma f = await FirmaRepo.FromIcoExtAsync(subj.ico, true);
                 if (f?.Valid == true)
                 {
                     subj.nazev = f.Jmeno;
-                    _item.Enhancements = _item.Enhancements.AddOrUpdate(new Enhancement("Doplněn Název subjektu", "", path + ".nazev", "", f.ICO, this));
+                    smlouva.Enhancements = smlouva.Enhancements.AddOrUpdate(new Enhancement("Doplněn Název subjektu", "", path + ".nazev", "", f.ICO, this));
                     changed = true;
                 }
             }
@@ -187,7 +188,7 @@ namespace HlidacStatu.Plugin.Enhancers
                 if (fm != null)
                 {
                     subj.adresa = fm.address.street + " " + fm.address.number + ", " + fm.address.municipality;
-                    _item.Enhancements = _item.Enhancements.AddOrUpdate(new Enhancement("Doplněna adresa subjektu", "", path + ".nazev", "", subj.ico, this));
+                    smlouva.Enhancements = smlouva.Enhancements.AddOrUpdate(new Enhancement("Doplněna adresa subjektu", "", path + ".nazev", "", subj.ico, this));
                     changed = true;
                 }
             }

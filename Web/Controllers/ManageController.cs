@@ -66,7 +66,7 @@ namespace HlidacStatu.Web.Controllers
             return View(model);
         }
 
-        public ActionResult Firmy2ICO()
+        public async Task<ActionResult> Firmy2ICO()
         {
             List<Firma> res = null;
             string jmena = "";
@@ -79,7 +79,7 @@ namespace HlidacStatu.Web.Controllers
                 res = new List<Firma>();
                 foreach (var n in names)
                 {
-                    Firma f = FirmaRepo.FirmaInText(n);
+                    Firma f = await FirmaRepo.FirmaInTextAsync(n);
                     if (f?.Valid == true)
                         res.Add(f);
                     else

@@ -37,25 +37,32 @@
         ;
 
 
-    List<(string Ico, long Pocet, decimal Castka)> data = new();
+    List<(string Ico, string Jmeno, long Pocet, decimal Castka)> data = new();
     if (rok.HasValue && rok > 0)
     {
-        data = Model
-        .Where(m=>!string.IsNullOrEmpty(m.ICO))
-        .OrderByDescending(m => m.Summary(rok.Value).CelkemPrideleno)
-        .Take(100)
-        .Select(m => (Ico:m.ICO, Pocet:(long)(m.Summary(rok.Value).PocetDotaci), Castka: m.Summary(rok.Value).CelkemPrideleno))
-        .ToList();
+        foreach (var record in Model
+                     .Where(m=>!string.IsNullOrEmpty(m.ICO))
+                     .OrderByDescending(m => m.Summary(rok.Value).CelkemPrideleno)
+                     .Take(100))
+        {
+            var jmeno = await FirmaRepo.NameFromIcoAsync(record.ICO);
+            var pocetDotaci = (long)record.Summary(rok.Value).PocetDotaci;
+            var castka = record.Summary(rok.Value).CelkemPrideleno;
+            data.Add((record.ICO, jmeno, pocetDotaci, castka));
+        }
     }
     else
     {
-        data = Model
-        .Where(m => !string.IsNullOrEmpty(m.ICO))
-        .OrderByDescending(m => m.Summary().CelkemPrideleno)
-        .Take(100)
-        .Select(m => (Ico: m.ICO, Pocet: (long)(m.Summary().PocetDotaci), Castka: m.Summary().CelkemPrideleno))
-        .ToList();
-        ;
+        foreach (var record in Model
+                     .Where(m=>!string.IsNullOrEmpty(m.ICO))
+                     .OrderByDescending(m => m.Summary().CelkemPrideleno)
+                     .Take(100))
+        {
+            var jmeno = await FirmaRepo.NameFromIcoAsync(record.ICO);
+            var pocetDotaci = (long)record.Summary().PocetDotaci;
+            var castka = record.Summary().CelkemPrideleno;
+            data.Add((record.ICO, jmeno, pocetDotaci, castka));
+        }
     }
 
     string searchQuery = "";
@@ -96,17 +103,17 @@
 }
 
 @{
-    var topPrijemci = new ReportDataSource<(string Ico, long Pocet, decimal Castka)>(
+    var topPrijemci = new ReportDataSource<(string Ico, string Jmeno, long Pocet, decimal Castka)>(
         new[]
         {
-            new ReportDataSource<(string Ico, long Pocet, decimal Castka)>.Column()
+            new ReportDataSource<(string Ico, string Jmeno, long Pocet, decimal Castka)>.Column()
             {
                 Name = "Příjemce",
                 CssClass = "text",
-                HtmlRender =(x) => $"<a href=/subjekt/{x.Ico}>{FirmaRepo.NameFromIcoAsync(x.Ico)}</a>",
-                TextRender = (x) => FirmaRepo.NameFromIcoAsync(x.Ico)
+                HtmlRender =(x) => $"<a href=/subjekt/{x.Ico}>{x.Jmeno}</a>",
+                TextRender = (x) => x.Jmeno
             },
-            new ReportDataSource<(string Ico, long Pocet, decimal Castka)>.Column()
+            new ReportDataSource<(string Ico, string Jmeno, long Pocet, decimal Castka)>.Column()
             {
                 Name = "Počet dotací" + (rok.HasValue ? $" za {rok}" : ""),
                 TextRender = (x) => HlidacStatu.Util.RenderData.NiceNumber(x.Pocet),
@@ -114,7 +121,7 @@
         OrderValueRender = (x) => HlidacStatu.Util.RenderData.OrderValueFormat(x.Pocet),
                 CssClass = "number"
             },
-            new ReportDataSource<(string Ico, long Pocet, decimal Castka)>.Column()
+            new ReportDataSource<(string Ico, string Jmeno, long Pocet, decimal Castka)>.Column()
             {
                 Name = "Celková částka",
                 TextRender = (x) => HlidacStatu.Util.RenderData.NicePrice(x.Castka, shortFormat:true),
@@ -131,7 +138,7 @@
     SimplePlot chartData = new SimplePlot()
     {
         Data = data.Select(p => (double)p.Castka / 1_000_000).Take(20).ToList(),
-        Labels = data.Select(p => FirmaRepo.NameFromIcoAsync(p.Ico)).Take(20).ToList(),
+        Labels = data.Select(p => p.Jmeno).Take(20).ToList(),
         ChartType = "bar",
         Title = $"Top holdingy - příjemci dotací{yearText}",
         Koncovka = "mil. Kč",

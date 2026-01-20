@@ -1,8 +1,4 @@
 ﻿@using HlidacStatu.Repositories
-@using HlidacStatu.Web.TagHelpers
-@using HlidacStatu.XLib.Render
-@using Microsoft.AspNetCore.Mvc.TagHelpers
-@using HlidacStatu.Entities
 @using HlidacStatu.XLib.Render
 
 @model List<HlidacStatu.Repositories.DotaceRepo.ProgramStatistics>
@@ -13,19 +9,18 @@
 
     ViewBag.Title = "Dotační program " + programName;
     ViewBag.SubTitle = "Detail programu";
-
-    string detailSearchQuery = $"&programName={System.Net.WebUtility.UrlEncode(programName)}&programCode={System.Net.WebUtility.UrlEncode(programCode)}";
+    
     string prgQuery = (string.IsNullOrEmpty(programName) ? "" : $" AND programName:\"{programName}\"")
-        + (string.IsNullOrEmpty(programCode) ? "" : $" AND programCode:\"{programCode}\"");
+                      + (string.IsNullOrEmpty(programCode) ? "" : $" AND programCode:\"{programCode}\"");
     string searchQuery = System.Net.WebUtility.UrlEncode($"hints.isOriginal:true {prgQuery} ");
-
 }
+
 @section scripts
 {
-    <link rel="stylesheet" type="text/css" href="//cdn.datatables.net/1.13.4/css/jquery.dataTables.css" />
+    <link rel="stylesheet" type="text/css" href="//cdn.datatables.net/1.13.4/css/jquery.dataTables.css"/>
     <script type="text/javascript" charset="utf8" src="//cdn.datatables.net/1.13.4/js/jquery.dataTables.js"></script>
     <script src="/Scripts/Highcharts-7/highcharts.js"></script>
-<script src="/Scripts/highcharts.global.options.js"></script>
+    <script src="/Scripts/highcharts.global.options.js"></script>
 }
 
 @section breadcrumb
@@ -55,7 +50,7 @@
             {
                 Name = "Rok",
                 TextRender = (x) => $"{x.Year}",
-                HtmlRender =(x) => $"{x.Year}",
+                HtmlRender = (x) => $"{x.Year}",
                 OrderValueRender = (x) => HlidacStatu.Util.RenderData.OrderValueFormat(x.Year),
                 CssClass = "number"
             },
@@ -63,7 +58,7 @@
             {
                 Name = "Vyplaceno",
                 TextRender = (x) => HlidacStatu.Util.RenderData.NicePrice(x.SumAssumedAmount),
-                HtmlRender =(x) => HlidacStatu.Util.RenderData.NicePrice(x.SumAssumedAmount,html:true),
+                HtmlRender = (x) => HlidacStatu.Util.RenderData.NicePrice(x.SumAssumedAmount, html: true),
                 OrderValueRender = (x) => HlidacStatu.Util.RenderData.OrderValueFormat(x.SumAssumedAmount),
                 CssClass = "number"
             },
@@ -71,7 +66,7 @@
             {
                 Name = "Průměrná dotace",
                 TextRender = (x) => HlidacStatu.Util.RenderData.NicePrice(x.AvgAssumedAmount),
-                HtmlRender =(x) => HlidacStatu.Util.RenderData.NicePrice(x.AvgAssumedAmount,html:true),
+                HtmlRender = (x) => HlidacStatu.Util.RenderData.NicePrice(x.AvgAssumedAmount, html: true),
                 OrderValueRender = (x) => HlidacStatu.Util.RenderData.OrderValueFormat(x.AvgAssumedAmount),
                 CssClass = "number"
             },
@@ -79,7 +74,7 @@
             {
                 Name = "Maximální výše jednotlivé dotace",
                 TextRender = (x) => HlidacStatu.Util.RenderData.NicePrice(x.MaxAssumedAmount),
-                HtmlRender =(x) => HlidacStatu.Util.RenderData.NicePrice(x.MaxAssumedAmount,html:true),
+                HtmlRender = (x) => HlidacStatu.Util.RenderData.NicePrice(x.MaxAssumedAmount, html: true),
                 OrderValueRender = (x) => HlidacStatu.Util.RenderData.OrderValueFormat(x.MaxAssumedAmount),
                 CssClass = "number"
             },
@@ -87,7 +82,7 @@
             {
                 Name = "Dotace pro firmy sponzorující polit.strany",
                 TextRender = (x) => HlidacStatu.Util.RenderData.NiceNumber(x.CountPolitickyAngazovanySubjekt),
-                HtmlRender =(x) => HlidacStatu.Util.RenderData.NiceNumber(x.CountPolitickyAngazovanySubjekt,html:true),
+                HtmlRender = (x) => HlidacStatu.Util.RenderData.NiceNumber(x.CountPolitickyAngazovanySubjekt, html: true),
                 OrderValueRender = (x) => HlidacStatu.Util.RenderData.OrderValueFormat(x.CountPolitickyAngazovanySubjekt),
                 CssClass = "number"
             },
@@ -95,21 +90,21 @@
             {
                 Name = "Dotace pro nově založené firmy",
                 TextRender = (x) => HlidacStatu.Util.RenderData.NiceNumber(x.CountGrantedCompaniesFirstYear),
-                HtmlRender =(x) => HlidacStatu.Util.RenderData.NiceNumber(x.CountGrantedCompaniesFirstYear,html:true),
+                HtmlRender = (x) => HlidacStatu.Util.RenderData.NiceNumber(x.CountGrantedCompaniesFirstYear, html: true),
                 OrderValueRender = (x) => HlidacStatu.Util.RenderData.OrderValueFormat(x.CountGrantedCompaniesFirstYear),
                 CssClass = "number"
             }
-                                        });
+        });
 
     var programPoLetechOrdered = Model.OrderByDescending(m => m.Year).ToList();
 
     programPoLetech.AddRows(programPoLetechOrdered);
 }
 
-<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.13.4/css/jquery.dataTables.css" />
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.13.4/css/jquery.dataTables.css"/>
 <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.js"></script>
 
-<partial name="_SearchForm" model="@(new HlidacStatu.Repositories.Searching.DotaceSearchResult())" />
+<partial name="_SearchForm" model="@(new HlidacStatu.Repositories.Searching.DotaceSearchResult())"/>
 
 <h2>
     <add-bookmark item="@Model"></add-bookmark>
@@ -183,7 +178,8 @@
                     <dl class="row">
                         <dt class="col-sm-4">Poskytovatel programu</dt>
                         <dd class="col-sm-8">
-                            <a asp-controller="Subjekt" asp-action="Index" asp-route-id="@Model.FirstOrDefault()?.ProviderIco">@Firmy.GetJmeno(Model.FirstOrDefault()?.ProviderIco)</a>
+                            <a asp-controller="Subjekt" asp-action="Index"
+                               asp-route-id="@Model.FirstOrDefault()?.ProviderIco">@Firmy.GetJmeno(Model.FirstOrDefault()?.ProviderIco)</a>
                         </dd>
                         <dt class="col-sm-4">Rozsah vyplacených dotací</dt>
                         <dd class="col-sm-8">
@@ -193,7 +189,8 @@
                         </dd>
                         <dt class="col-sm-4"></dt>
                         <dd class="col-sm-8">
-                            <a title="Najít další dotace k programu" href="/dotace/hledat?q=@(searchQuery)"><i class="fa-solid fa-magnifying-glass"></i> Najít dotace k programu</a>
+                            <a title="Najít další dotace k programu" href="/dotace/hledat?q=@(searchQuery)"><i
+                                    class="fa-solid fa-magnifying-glass"></i> Najít dotace k programu</a>
                         </dd>
                     </dl>
                 </div>
@@ -233,27 +230,25 @@
                     <h3 class="h5 mb-3">Vyplacené dotace po letech</h3>
 
                     @{
-
                         var dotaceGraphData = new Series[]
                         {
-                    new()
-                    {
-                    Name = "Objem vyplacených dotací",
-                    Type = Series.SeriesType.column,
-                    Data = Model
-                    .OrderBy(s => s.Year)
-                    .Select(s => new SeriesData(s.Year, s.SumAssumedAmount))
-                    .ToArray(),
-                    }
+                            new()
+                            {
+                                Name = "Objem vyplacených dotací",
+                                Type = Series.SeriesType.column,
+                                Data = Model
+                                    .OrderBy(s => s.Year)
+                                    .Select(s => new SeriesData(s.Year, s.SumAssumedAmount))
+                                    .ToArray(),
+                            }
                         };
-                        
                     }
                     <div>
                         @Html.ColumnGraph("Dotace programu v jednotlivých letech", dotaceGraphData, yTitleLeft: "Objem dotací v Kč")
                     </div>
 
                     <div>
-                        @Html.DataToHTMLTable(programPoLetech, tableId: "topPerYearTab", dataTableOptions: HtmlExtensions.DatatableOptions(orderColumnIdx: 0, orderDirection: "desc", paging:false, pageLength: 30, searching:false))
+                        @Html.DataToHTMLTable(programPoLetech, tableId: "topPerYearTab", dataTableOptions: HtmlExtensions.DatatableOptions(orderColumnIdx: 0, orderDirection: "desc", paging: false, pageLength: 30, searching: false))
                     </div>
                 </div>
 
@@ -272,40 +267,44 @@
                             query += $"programCode:\"{programCode}\"";
 
                         query += ")";
-                        List<(string Ico, long Count, decimal Sum)> topPrijemci =
-                            await HlidacStatu.Repositories.DotaceRepo.ReportTopPrijemciAsync(query);
-
-                        var topPrijemciRDS = new ReportDataSource<(string Ico, long Pocet, decimal Castka)>(
-                        new[]
+                        List<(string Ico, string Jmeno, long Count, decimal Sum)> topPrijemci = new();
+                        foreach (var (ico, count, sum) in await HlidacStatu.Repositories.DotaceRepo.ReportTopPrijemciAsync(query))
                         {
-                    new ReportDataSource<(string Ico, long Pocet, decimal Castka)>.Column()
-                    {
-                    Name = "Příjemce",
-                    CssClass = "text",
-                    HtmlRender =(x) => $"<a href=/subjekt/{x.Ico}>{FirmaRepo.NameFromIcoAsync(x.Ico)}</a>",
-                    TextRender = (x) => FirmaRepo.NameFromIcoAsync(x.Ico)
-                    },
-                    new ReportDataSource<(string Ico, long Pocet, decimal Castka)>.Column()
-                    {
-                    Name = "Počet dotací",
-                    TextRender = (x) => HlidacStatu.Util.RenderData.NiceNumber(x.Pocet),
-                    HtmlRender =(x) => $"<a title='Najit dotace subjektu' href='/dotace/hledat?Q=ico:{x.Ico}%20AND%20{searchQuery}'>{HlidacStatu.Util.RenderData.NiceNumber(x.Pocet)}</a>",
-                    OrderValueRender = (x) => HlidacStatu.Util.RenderData.OrderValueFormat(x.Pocet),
-                    CssClass = "number"
-                    },
-                    new ReportDataSource<(string Ico, long Pocet, decimal Castka)>.Column()
-                    {
-                    Name = "Celková částka",
-                    TextRender = (x) => HlidacStatu.Util.RenderData.NicePrice(x.Castka, shortFormat:true),
-                    HtmlRender =(x) => HlidacStatu.Util.RenderData.NicePrice(x.Castka,html:true),
-                    OrderValueRender = (x) => HlidacStatu.Util.RenderData.OrderValueFormat(x.Castka),
-                    CssClass = "number"
-                    }
-            });
+                            var jmeno = await FirmaRepo.NameFromIcoAsync(ico);
+                            topPrijemci.Add((ico, jmeno, count, sum));
+                        }
+                        
+
+                        var topPrijemciRDS = new ReportDataSource<(string Ico, string Jmeno, long Pocet, decimal Castka)>(
+                            new[]
+                            {
+                                new ReportDataSource<(string Ico, string Jmeno, long Pocet, decimal Castka)>.Column()
+                                {
+                                    Name = "Příjemce",
+                                    CssClass = "text",
+                                    HtmlRender = (x) => $"<a href=/subjekt/{x.Ico}>{x.Jmeno}</a>",
+                                    TextRender = (x) => x.Jmeno
+                                },
+                                new ReportDataSource<(string Ico, string Jmeno, long Pocet, decimal Castka)>.Column()
+                                {
+                                    Name = "Počet dotací",
+                                    TextRender = (x) => HlidacStatu.Util.RenderData.NiceNumber(x.Pocet),
+                                    HtmlRender = (x) => $"<a title='Najit dotace subjektu' href='/dotace/hledat?Q=ico:{x.Ico}%20AND%20{searchQuery}'>{HlidacStatu.Util.RenderData.NiceNumber(x.Pocet)}</a>",
+                                    OrderValueRender = (x) => HlidacStatu.Util.RenderData.OrderValueFormat(x.Pocet),
+                                    CssClass = "number"
+                                },
+                                new ReportDataSource<(string Ico, string Jmeno, long Pocet, decimal Castka)>.Column()
+                                {
+                                    Name = "Celková částka",
+                                    TextRender = (x) => HlidacStatu.Util.RenderData.NicePrice(x.Castka, shortFormat: true),
+                                    HtmlRender = (x) => HlidacStatu.Util.RenderData.NicePrice(x.Castka, html: true),
+                                    OrderValueRender = (x) => HlidacStatu.Util.RenderData.OrderValueFormat(x.Castka),
+                                    CssClass = "number"
+                                }
+                            });
 
                         var topPrijemciOrdered = topPrijemci.OrderByDescending(m => m.Sum).ToList();
                         topPrijemciRDS.AddRows(topPrijemciOrdered.Take(100));
-
                     }
                     @Html.DataToHTMLTable(topPrijemciRDS, tableId: "topPrijemciTab", dataTableOptions: HtmlExtensions.DatatableOptions(orderColumnIdx: 2, orderDirection: "desc"))
 

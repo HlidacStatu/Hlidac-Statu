@@ -5,6 +5,7 @@ using HlidacStatu.Entities.Enhancers;
 
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace HlidacStatu.Plugin.Enhancers
 {
@@ -35,9 +36,9 @@ namespace HlidacStatu.Plugin.Enhancers
         {
         }
 
-        public bool Update(ref Smlouva item)
+        public Task<bool> UpdateAsync(Smlouva item)
         {
-            return false;
+            return Task.FromResult(false);
         }
 
         public bool UpdateSmluvniStrany(ref Smlouva item, Smlouva.Subjekt platce, Smlouva.Subjekt[] prijemce)

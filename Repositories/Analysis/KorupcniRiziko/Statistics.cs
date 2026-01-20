@@ -142,7 +142,7 @@ namespace HlidacStatu.Repositories.Analysis.KorupcniRiziko
         public async Task<IEnumerable<SubjectWithKIndex>> FilterAsync(IEnumerable<IcoDetail> source,
             IEnumerable<Firma.Zatrideni.Item> filterIco = null, bool showNone = false)
         {
-            IEnumerable<SubjectWithKIndex> data;
+            List<SubjectWithKIndex> data = [];
             
             if (filterIco != null && filterIco.Count() > 0)
             {
@@ -160,12 +160,12 @@ namespace HlidacStatu.Repositories.Analysis.KorupcniRiziko
                             KrajId = yb.KrajId,
                             Kraj = yb.Kraj
                         }
-                );
+                ).ToList();
             }
             else
             {
                 var kindexCompanies = await KindexCache.GetKindexCompaniesAsync();
-                data = source.Select(m =>
+                foreach (var m in source)
                 {
                     string subjectName = "";
                     if (kindexCompanies.TryGetValue(m.ico, out var cache))
@@ -176,18 +176,18 @@ namespace HlidacStatu.Repositories.Analysis.KorupcniRiziko
                     {
                         _logger.Error(
                             $"Record with ico [{m.ico}] is missing in KIndexCompanies cache file. Please reset cache.");
-                        subjectName = FirmaRepo.NameFromIcoAsync(m.ico);
+                        subjectName = await FirmaRepo.NameFromIcoAsync(m.ico);
                     }
 
-                    return new SubjectWithKIndex()
+                    data.Add( new SubjectWithKIndex()
                     {
                         Ico = m.ico,
                         Jmeno = subjectName,
                         KrajId = m.krajId,
                         Group = "",
                         KIndex = m.kindex
-                    };
-                });
+                    });
+                }
             }
 
             if (showNone)
@@ -196,7 +196,7 @@ namespace HlidacStatu.Repositories.Analysis.KorupcniRiziko
                 {
                     var missing_ico = filterIco.Select(m => m.Ico).Except(data.Select(m => m.Ico));
 
-                    IEnumerable<SubjectWithKIndex> missing_data = missing_ico
+                    List<SubjectWithKIndex> missing_data = missing_ico
                         .Join(filterIco, mi => mi, fi => fi.Ico, (mi, fi) =>
                             new SubjectWithKIndex()
                             {
@@ -206,8 +206,9 @@ namespace HlidacStatu.Repositories.Analysis.KorupcniRiziko
                                 Group = fi.Group,
                                 KrajId = fi.KrajId,
                                 Kraj = fi.Kraj
-                            });
-                    data = data.Concat(missing_data);
+                            }).ToList();
+                    
+                    data.AddRange(missing_data);
                 }
             }
 

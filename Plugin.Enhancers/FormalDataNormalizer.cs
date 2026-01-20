@@ -4,6 +4,7 @@ using HlidacStatu.Entities;
 using HlidacStatu.Entities.Enhancers;
 
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace HlidacStatu.Plugin.Enhancers
 {
@@ -38,10 +39,8 @@ namespace HlidacStatu.Plugin.Enhancers
                 ciziStaty = test;
         }
         bool changed = false;
-        public bool Update(ref Smlouva item)
+        public Task<bool> UpdateAsync(Smlouva item)
         {
-
-
             if (item.Platce != null)
                 item.Platce.ico = GetNormalizedIco(item.Platce.ico, "platce.ico", ref item);
 
@@ -56,7 +55,7 @@ namespace HlidacStatu.Plugin.Enhancers
                 }
             }
 
-            return changed;
+            return Task.FromResult(changed);
         }
 
         private string GetNormalizedIco(string ico, string parametrName, ref Smlouva item)

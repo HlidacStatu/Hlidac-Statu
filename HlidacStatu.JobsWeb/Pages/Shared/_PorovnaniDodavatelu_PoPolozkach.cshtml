@@ -17,7 +17,7 @@
 
     var smlouvyQuery = "id:(" + string.Join(" OR ", smlouvyIds) + ")";
 
-    var firmyCount = JobService.GetDodavateleList(Model.Key.Value);
+    var firmyCount = await JobService.GetDodavateleListAsync(Model.Key.Value);
     var firmy = zadavatelStatistics.SelectMany(m => m.Dodavatele).Distinct()
     .Select(m => new
     {
@@ -27,7 +27,7 @@
     })
     .OrderBy(o => o.name);
 
-    var uradyCount = JobService.GetOdberateleList(Model.Key.Value);
+    var uradyCount = await JobService.GetOdberateleListAsync(Model.Key.Value);
     var urady = zadavatelStatistics.SelectMany(m => m.Odberatele).Distinct()
     .Select(m => new
     {

@@ -1,4 +1,6 @@
-﻿namespace HlidacStatu.Entities.Enhancers
+﻿using System.Threading.Tasks;
+
+namespace HlidacStatu.Entities.Enhancers
 {
 
 
@@ -6,7 +8,7 @@
     {
         string Name { get; }
         string Description { get; }
-        bool Update(ref Smlouva item);
+        Task<bool> UpdateAsync(Smlouva item);
 
         int Priority { get; }
         void SetInstanceData(object data);

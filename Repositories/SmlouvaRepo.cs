@@ -7,7 +7,6 @@ using HlidacStatu.Entities.Issues;
 using HlidacStatu.Extensions;
 using HlidacStatu.Repositories.Searching;
 using Nest;
-
 using System;
 using System.Collections.Generic;
 using Microsoft.Data.SqlClient;

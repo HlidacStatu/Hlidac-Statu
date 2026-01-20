@@ -5,7 +5,7 @@
 @using HlidacStatu.Repositories
 
 @{
-        Layout = "_ReportLayout";
+    Layout = "_ReportLayout";
 
     int size = 300;
 
@@ -15,12 +15,12 @@
             .Field("prijemce.ico")
             .Size(size)
             .Aggregations(agg => agg
-               .Min("mindate", s => s
-                   .Field(ff => ff.casZverejneni)
-               )
-               .Sum("sumico", s => s
-                   .Field(ff => ff.CalculatedPriceWithVATinCZK)
-               )
+                .Min("mindate", s => s
+                    .Field(ff => ff.casZverejneni)
+                )
+                .Sum("sumico", s => s
+                    .Field(ff => ff.CalculatedPriceWithVATinCZK)
+                )
             )
         )
         .Terms("perico2", m => m
@@ -28,94 +28,97 @@
             .Field("platce.ico")
             .Size(size)
             .Aggregations(agg => agg
-               .Min("mindate2", s => s
-                   .Field(ff => ff.casZverejneni)
+                .Min("mindate2", s => s
+                    .Field(ff => ff.casZverejneni)
                 )
-               .Sum("sumico", s => s
-                   .Field(ff => ff.CalculatedPriceWithVATinCZK)
-               )
-
+                .Sum("sumico", s => s
+                    .Field(ff => ff.CalculatedPriceWithVATinCZK)
+                )
             )
-    );
+        );
 
     var res = await SmlouvaRepo.Searching.RawSearchAsync("", 1, 0, anyAggregation: aggs);
 
     var tmp = ((BucketAggregate)res.Aggregations["perico"])
-    .Items
-    .Concat(((BucketAggregate)res.Aggregations["perico2"]).Items)
-    .Cast<Nest.KeyedBucket<object>>()
-    .Where(m=>m.DocCount == 1)
-    .ToArray();
-    
+        .Items
+        .Concat(((BucketAggregate)res.Aggregations["perico2"]).Items)
+        .Cast<Nest.KeyedBucket<object>>()
+        .Where(m => m.DocCount == 1)
+        .ToArray();
+
     DateTime now = DateTime.Now;
 
     var items = tmp.GroupBy(p => (string)p.Key,
-        e => new
-        {
-            epoch = (e?.Min("mindate")?.Value ?? e?.Min("mindate2")?.Value) ?? 1 ,
-            sum = e.Sum("sumico").Value,
-        },
-        (k, v) => new
-        {
-            ico = k,
-            epochTime = v.Select(m => m.epoch).Max(),
-            sum = v.Select(m => m.sum).Sum()
-        })
+            e => new
+            {
+                epoch = (e?.Min("mindate")?.Value ?? e?.Min("mindate2")?.Value) ?? 1,
+                sum = e.Sum("sumico").Value,
+            },
+            (k, v) => new
+            {
+                ico = k,
+                epochTime = v.Select(m => m.epoch).Max(),
+                sum = v.Select(m => m.sum).Sum()
+            })
         .Select(o => new
         {
             ico = o.ico,
             datum = Devmasters.DT.Util.FromEpochTimeToUTC((long)o.epochTime / 1000),
             sum = o.sum
         })
-        .Where(m=>(now - m.datum).TotalDays<2)
+        .Where(m => (now - m.datum).TotalDays < 2)
         .OrderByDescending(o => o.datum);
 
 
     ReportDataSource rdsNewestComp = new(new ReportDataSource.Column[]
-   {
-new() { Name="Firma",
-HtmlRender =(s) => {
-    System.Tuple<string,string> data = (System.Tuple<string,string>)s;
-        return string.Format("<a href='/subjekt/{0}'>{1}</a>", data.Item2, data.Item1);
-        },
-        TextRender = (s) => { return ((System.Tuple<string,string>
-    )s).Item1.ToString(); }
-    },
-    new() {
-    Name ="První výskyt v Registru smluv",
-    HtmlRender =(s) => { return ((DateTime)s).ToString("dd.MM.yyyy"); },
-    OrderValueRender = (s) => { return HlidacStatu.Util.RenderData.OrderValueFormat((DateTime)s); }
-    },
-    new() { Name="Hodnota smluv",
-    HtmlRender =(s) => { return Smlouva.NicePrice((double?)s, html:true, shortFormat:true); },
-    OrderValueRender = (s) => { return HlidacStatu.Util.RenderData.OrderValueFormat(((double)s)); }
-    },
-    }
+        {
+            new()
+            {
+                Name = "Firma",
+                HtmlRender = (s) =>
+                {
+                    System.Tuple<string, string> data = (System.Tuple<string, string>)s;
+                    return $"<a href='/subjekt/{data.Item2}'>{data.Item1}</a>";
+                },
+                TextRender = (s) => ((System.Tuple<string, string>)s).Item1.ToString()
+            },
+            new()
+            {
+                Name = "První výskyt v Registru smluv",
+                HtmlRender = (s) => ((DateTime)s).ToString("dd.MM.yyyy"),
+                OrderValueRender = (s) => HlidacStatu.Util.RenderData.OrderValueFormat((DateTime)s)
+            },
+            new()
+            {
+                Name = "Hodnota smluv",
+                HtmlRender = (s) => Smlouva.NicePrice((double?)s, html: true, shortFormat: true),
+                OrderValueRender = (s) => HlidacStatu.Util.RenderData.OrderValueFormat(((double)s))
+            },
+        }
     );
     foreach (var val in items)
     {
-    rdsNewestComp.AddRow(
-    new Tuple<string, string>
-        (FirmaRepo.NameFromIcoAsync(val.ico, true), val.ico),
-        val.datum,
-        val.sum
+        rdsNewestComp.AddRow(
+            new Tuple<string, string>
+                (await FirmaRepo.NameFromIcoAsync(val.ico, true), val.ico),
+            val.datum,
+            val.sum
         );
-        }
+    }
 
-        //chart
-
-
-        var model = new ReportModel();
-        model.Add("newCompanies","", rdsNewestComp);
-
-        }
+    //chart
 
 
-        <div class="row">
-            <div class="col-xs-12">
-                @foreach (var q in model.GetQueue("newCompanies"))
+    var model = new ReportModel();
+    model.Add("newCompanies", "", rdsNewestComp);
+}
+
+
+<div class="row">
+    <div class="col-xs-12">
+        @foreach (var q in model.GetQueue("newCompanies"))
         {
-                @ChartUtilExtensions.RenderReport(q, @"{
+            @ChartUtilExtensions.RenderReport(q, @"{
                      'language': {
                         'url': '//cdn.datatables.net/plug-ins/1.13.4/i18n/cs.json'
                     },
@@ -124,6 +127,6 @@ HtmlRender =(s) => {
                     'info': false,
                     }", q.Key)
         }
-            </div>
-        </div>
+    </div>
+</div>
 

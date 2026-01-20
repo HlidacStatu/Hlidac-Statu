@@ -1,8 +1,6 @@
 using HlidacStatu.Entities.VZ;
 using HlidacStatu.Util;
-
 using Nest;
-
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -27,11 +25,12 @@ namespace HlidacStatu.Repositories
 {
     public static partial class VerejnaZakazkaRepo
     {
-        private static ConcurrentDictionary<string,ResiliencePipeline<HttpResponseMessage>> _retryThrottledPipelinePerHost = new ();
+        private static ConcurrentDictionary<string, ResiliencePipeline<HttpResponseMessage>>
+            _retryThrottledPipelinePerHost = new();
 
         // Emergency HttpClient for cases where it is not convinient to inject HttpClient.
         private static Lazy<HttpClient> _lazyHttpClient = new();
-        
+
         private static ResiliencePipeline<HttpResponseMessage> CreateNewResiliencePipeline()
         {
             return new ResiliencePipelineBuilder<HttpResponseMessage>()
@@ -44,7 +43,7 @@ namespace HlidacStatu.Repositories
                 {
                     ShouldHandle = static args => args.Outcome switch
                     {
-                        { Exception: HttpRequestException } or { Exception: SocketException} => PredicateResult.True(),
+                        { Exception: HttpRequestException } or { Exception: SocketException } => PredicateResult.True(),
                         { Result.StatusCode: >= HttpStatusCode.InternalServerError } => PredicateResult.True(),
                         { Result.StatusCode: HttpStatusCode.RequestTimeout } => PredicateResult.True(),
                         _ => PredicateResult.False()
@@ -55,12 +54,14 @@ namespace HlidacStatu.Repositories
                 })
                 .Build();
         }
-        
+
         private static void AfterSave(VerejnaZakazka vz)
         {
-            RecalculateItemRepo.AddFirmaToProcessingQueue(vz.Zadavatel.ICO, RecalculateItem.StatisticsTypeEnum.VZ , $"VZ {vz.Id}");
+            RecalculateItemRepo.AddFirmaToProcessingQueue(vz.Zadavatel.ICO, RecalculateItem.StatisticsTypeEnum.VZ,
+                $"VZ {vz.Id}");
             foreach (var dod in vz.Dodavatele)
-                _ = RecalculateItemRepo.AddFirmaToProcessingQueue(dod.ICO, RecalculateItem.StatisticsTypeEnum.VZ, $"VZ {vz.Id}");
+                _ = RecalculateItemRepo.AddFirmaToProcessingQueue(dod.ICO, RecalculateItem.StatisticsTypeEnum.VZ,
+                    $"VZ {vz.Id}");
         }
 
         private static async Task SaveIncompleteVzAsync(VerejnaZakazka incompleteVz, ElasticClient elasticClient)
@@ -72,11 +73,11 @@ namespace HlidacStatu.Repositories
                 incompleteVz.HasIssues = true;
                 await elasticClient.IndexDocumentAsync<VerejnaZakazka>(incompleteVz);
                 AfterSave(incompleteVz);
-
             }
             catch (Exception e)
             {
-                _logger.Error(e, $"VZ ERROR Upserting ID:{incompleteVz.Id} Size:{Newtonsoft.Json.JsonConvert.SerializeObject(incompleteVz).Length}");
+                _logger.Error(e,
+                    $"VZ ERROR Upserting ID:{incompleteVz.Id} Size:{Newtonsoft.Json.JsonConvert.SerializeObject(incompleteVz).Length}");
             }
         }
 
@@ -84,7 +85,8 @@ namespace HlidacStatu.Repositories
         /// Update or insert new
         /// </summary>
         public static async Task UpsertAsync(VerejnaZakazka newVZ, ElasticClient elasticClient = null,
-            HttpClient httpClient = null, DateTime? posledniZmena = null, bool sendToOcr = true, bool updatePosledniZmena = true,
+            HttpClient httpClient = null, DateTime? posledniZmena = null, bool sendToOcr = true,
+            bool updatePosledniZmena = true,
             bool shouldDownloadFile = true)
         {
             if (newVZ is null)
@@ -92,18 +94,17 @@ namespace HlidacStatu.Repositories
 
             if (httpClient is null)
                 httpClient = _lazyHttpClient.Value;
-            
+
             try
             {
-                
                 // try to find Ico
                 if (newVZ.Zadavatel.ICO is null)
                 {
-                    var firma = FirmaRepo.FromNameAsync(newVZ.Zadavatel.Jmeno);
-                    if(firma is not null)
+                    var firma = await FirmaRepo.FromNameAsync(newVZ.Zadavatel.Jmeno);
+                    if (firma is not null)
                         newVZ.Zadavatel.ICO = firma.ICO;
                 }
-                
+
                 // there might be issues to find proper ICO, so we have to save half-complete VZ
                 if (string.IsNullOrWhiteSpace(newVZ.Zadavatel?.ICO))
                 {
@@ -111,7 +112,7 @@ namespace HlidacStatu.Repositories
                     await SaveIncompleteVzAsync(newVZ, elasticClient);
                     return;
                 }
-                
+
                 elasticClient ??= Manager.GetESClient_VerejneZakazky();
                 var storedDuplicates = await FindDocumentsFromTheSameSourcesAsync(newVZ, elasticClient);
 
@@ -146,17 +147,18 @@ namespace HlidacStatu.Repositories
 
                     newVZ = firstVz;
                 }
-                
+
                 // stáhnout dokumenty, které nemají checksum
                 if (shouldDownloadFile)
                 {
                     await StoreDocumentCopyToHlidacStorageAsync(newVZ, httpClient);
                 }
+
                 SetupUpdateDates(newVZ, posledniZmena, updatePosledniZmena);
-                
+
                 // zmergovat stejné dokumenty podle sha
                 MergeDocumentsBySHA(newVZ);
-                
+
                 if (sendToOcr)
                     SendToOcrQueue(newVZ);
 
@@ -167,30 +169,33 @@ namespace HlidacStatu.Repositories
             }
             catch (Exception e)
             {
-                _logger.Error(e, $"VZ ERROR Upserting ID:{newVZ.Id} Size:{Newtonsoft.Json.JsonConvert.SerializeObject(newVZ).Length}");
+                _logger.Error(e,
+                    $"VZ ERROR Upserting ID:{newVZ.Id} Size:{Newtonsoft.Json.JsonConvert.SerializeObject(newVZ).Length}");
             }
         }
 
         private static void FixOldUrl(VerejnaZakazka newVz)
         {
             newVz.UrlZakazky = newVz.UrlZakazky
-                .Select(u => u.Replace("https://www.vestnikverejnychzakazek.cz/SearchForm/SearchContract?contractNumber=", 
-                    "https://vvz.nipez.cz/formulare-zakazky/"))
+                .Select(u =>
+                    u.Replace("https://www.vestnikverejnychzakazek.cz/SearchForm/SearchContract?contractNumber=",
+                        "https://vvz.nipez.cz/formulare-zakazky/"))
                 .ToHashSet();
         }
 
-        public static async Task RedownloadVzFiles(VerejnaZakazka vz, ElasticClient elasticClient, HttpClient httpClient)
+        public static async Task RedownloadVzFiles(VerejnaZakazka vz, ElasticClient elasticClient,
+            HttpClient httpClient)
         {
             if (vz is null)
                 return;
-            
+
             try
             {
                 // stáhnout dokumenty, které nemají checksum
                 await StoreDocumentCopyToHlidacStorageAsync(vz, httpClient);
                 MergeDocumentsBySHA(vz);
                 SendToOcrQueue(vz);
-                
+
                 await elasticClient.IndexDocumentAsync<VerejnaZakazka>(vz);
             }
             catch (Exception e)
@@ -228,6 +233,7 @@ namespace HlidacStatu.Repositories
                     destination.Dodavatele.Add(dodavatel);
                 }
             }
+
             return destination;
         }
 
@@ -241,11 +247,13 @@ namespace HlidacStatu.Repositories
             foreach (var newDoc in newDocuments)
             {
                 // update document by checksum
-                var origDoc = originalVZ.Dokumenty.FirstOrDefault(d => d.Equals(newDoc)) 
+                var origDoc = originalVZ.Dokumenty.FirstOrDefault(d => d.Equals(newDoc))
                               // update document by link
-                              ?? originalVZ.Dokumenty.FirstOrDefault(d => d.DirectUrls.Any() && d.DirectUrls.Overlaps(newDoc.DirectUrls))
+                              ?? originalVZ.Dokumenty.FirstOrDefault(d =>
+                                  d.DirectUrls.Any() && d.DirectUrls.Overlaps(newDoc.DirectUrls))
                               // update document by storage id
-                              ?? originalVZ.Dokumenty.FirstOrDefault(d => d.StorageIds.Any() && d.StorageIds.Overlaps(newDoc.StorageIds));
+                              ?? originalVZ.Dokumenty.FirstOrDefault(d =>
+                                  d.StorageIds.Any() && d.StorageIds.Overlaps(newDoc.StorageIds));
 
                 if (origDoc is not null)
                 {
@@ -274,7 +282,8 @@ namespace HlidacStatu.Repositories
             }
         }
 
-        public static async Task UpdateDocumentsInVz(string id, List<VerejnaZakazka.Document> dokumenty, ElasticClient elasticClient = null)
+        public static async Task UpdateDocumentsInVz(string id, List<VerejnaZakazka.Document> dokumenty,
+            ElasticClient elasticClient = null)
         {
             elasticClient ??= Manager.GetESClient_VerejneZakazky();
             var zakazka = await LoadFromESAsync(id, elasticClient);
@@ -290,13 +299,13 @@ namespace HlidacStatu.Repositories
                 originalVZ.Changelog.AddRange(newVZ.Changelog);
                 originalVZ.Changelog.Add("}} Merging changelogs");
             }
-            
+
             // preferujeme nové informace před starými
             originalVZ.PosledniZmena = SetProperty(originalVZ.PosledniZmena, newVZ.PosledniZmena,
                 nameof(originalVZ.PosledniZmena), originalVZ.Changelog);
             originalVZ.LastUpdated = SetProperty(originalVZ.LastUpdated, newVZ.LastUpdated,
                 nameof(originalVZ.LastUpdated), originalVZ.Changelog);
-            
+
             originalVZ.DatumUverejneni = SetProperty(originalVZ.DatumUverejneni, newVZ.DatumUverejneni,
                 nameof(originalVZ.DatumUverejneni), originalVZ.Changelog);
             originalVZ.DatumUzavreniSmlouvy = SetProperty(originalVZ.DatumUzavreniSmlouvy, newVZ.DatumUzavreniSmlouvy,
@@ -313,15 +322,17 @@ namespace HlidacStatu.Repositories
                 nameof(originalVZ.RawHtml), originalVZ.Changelog);
             originalVZ.KonecnaHodnotaMena = SetProperty(originalVZ.KonecnaHodnotaMena, newVZ.KonecnaHodnotaMena,
                 nameof(originalVZ.KonecnaHodnotaMena), originalVZ.Changelog);
-            originalVZ.OdhadovanaHodnotaMena = SetProperty(originalVZ.OdhadovanaHodnotaMena, newVZ.OdhadovanaHodnotaMena,
+            originalVZ.OdhadovanaHodnotaMena = SetProperty(originalVZ.OdhadovanaHodnotaMena,
+                newVZ.OdhadovanaHodnotaMena,
                 nameof(originalVZ.OdhadovanaHodnotaMena), originalVZ.Changelog);
             originalVZ.StavVZ = SetProperty(originalVZ.StavVZ, newVZ.StavVZ,
                 nameof(originalVZ.StavVZ), originalVZ.Changelog);
             originalVZ.KonecnaHodnotaBezDPH = SetProperty(originalVZ.KonecnaHodnotaBezDPH, newVZ.KonecnaHodnotaBezDPH,
                 nameof(originalVZ.KonecnaHodnotaBezDPH), originalVZ.Changelog);
-            originalVZ.OdhadovanaHodnotaBezDPH = SetProperty(originalVZ.OdhadovanaHodnotaBezDPH, newVZ.OdhadovanaHodnotaBezDPH,
+            originalVZ.OdhadovanaHodnotaBezDPH = SetProperty(originalVZ.OdhadovanaHodnotaBezDPH,
+                newVZ.OdhadovanaHodnotaBezDPH,
                 nameof(originalVZ.OdhadovanaHodnotaBezDPH), originalVZ.Changelog);
-            
+
             originalVZ.Zadavatel.ProfilZadavatele = SetProperty(originalVZ.Zadavatel.ProfilZadavatele,
                 newVZ.Zadavatel.ProfilZadavatele,
                 "Zadavatel.ProfilZadavatele",
@@ -334,7 +345,7 @@ namespace HlidacStatu.Repositories
                 newVZ.Zadavatel.Jmeno,
                 "Zadavatel.Jmeno",
                 originalVZ.Changelog);
-            
+
             originalVZ.Zdroje.UnionWith(newVZ.Zdroje);
             originalVZ.CPV.UnionWith(newVZ.CPV);
             originalVZ.UrlZakazky.UnionWith(newVZ.UrlZakazky);
@@ -347,7 +358,7 @@ namespace HlidacStatu.Repositories
         private static T SetProperty<T>(T oldProp, T newProp, string propName, List<string> changelog)
         {
             //There are no changes at all
-            if(newProp is null)
+            if (newProp is null)
                 return oldProp;
             if (newProp is string stringProp && string.IsNullOrWhiteSpace(stringProp))
                 return oldProp;
@@ -357,17 +368,19 @@ namespace HlidacStatu.Repositories
                 return oldProp;
             if (newProp is 0m && oldProp is decimal and not 0m) //default decimals shouldnt overwrite value
                 return oldProp;
-            if (newProp is DateTime np && np < new DateTime(1900, 1, 1)) //fix for some cases where we do not get correct date
+            if (newProp is DateTime np &&
+                np < new DateTime(1900, 1, 1)) //fix for some cases where we do not get correct date
                 return oldProp;
-  
+
             changelog?.Add($"{DateTime.Now:yyyy-MM-dd} {propName}:[{oldProp}]=>[{newProp}]");
-            
+
             return newProp;
         }
 
         private static void SendToOcrQueue(VerejnaZakazka newVZ)
-        { 
-            if (newVZ.Dokumenty.Any(d => !d.EnoughExtractedText && d.PlainTextContentQuality == DataQualityEnum.Unknown))
+        {
+            if (newVZ.Dokumenty.Any(d =>
+                    !d.EnoughExtractedText && d.PlainTextContentQuality == DataQualityEnum.Unknown))
             {
                 ItemToOcrQueue.AddNewTask(OcrWork.DocTypes.VerejnaZakazka,
                     newVZ.Id,
@@ -386,15 +399,21 @@ namespace HlidacStatu.Repositories
         {
             int originalChangelogCount = changelog?.Count() ?? 0;
             originalDoc.Name = SetProperty(originalDoc.Name, newDoc.Name, "Document.Name", changelog);
-            originalDoc.CisloVerze = SetProperty(originalDoc.CisloVerze, newDoc.CisloVerze, "Document.CisloVerze", changelog);
-            originalDoc.ContentType = SetProperty(originalDoc.ContentType, newDoc.ContentType, "Document.ContentType", changelog);
-            originalDoc.TypDokumentu = SetProperty(originalDoc.TypDokumentu, newDoc.TypDokumentu, "Document.TypDokumentu", changelog);
-            originalDoc.LastProcessed = SetProperty(originalDoc.LastProcessed, newDoc.LastProcessed, "Document.LastProcessed", changelog);
-            originalDoc.VlozenoNaProfil = SetProperty(originalDoc.VlozenoNaProfil, newDoc.VlozenoNaProfil, "Document.VlozenoNaProfil", changelog);
+            originalDoc.CisloVerze =
+                SetProperty(originalDoc.CisloVerze, newDoc.CisloVerze, "Document.CisloVerze", changelog);
+            originalDoc.ContentType = SetProperty(originalDoc.ContentType, newDoc.ContentType, "Document.ContentType",
+                changelog);
+            originalDoc.TypDokumentu = SetProperty(originalDoc.TypDokumentu, newDoc.TypDokumentu,
+                "Document.TypDokumentu", changelog);
+            originalDoc.LastProcessed = SetProperty(originalDoc.LastProcessed, newDoc.LastProcessed,
+                "Document.LastProcessed", changelog);
+            originalDoc.VlozenoNaProfil = SetProperty(originalDoc.VlozenoNaProfil, newDoc.VlozenoNaProfil,
+                "Document.VlozenoNaProfil", changelog);
             originalDoc.Lenght = SetProperty(originalDoc.Lenght, newDoc.Lenght, "Document.Lenght", changelog);
             originalDoc.Pages = SetProperty(originalDoc.Pages, newDoc.Pages, "Document.Pages", changelog);
-            originalDoc.WordCount = SetProperty(originalDoc.WordCount, newDoc.WordCount, "Document.WordCount", changelog);
-            
+            originalDoc.WordCount =
+                SetProperty(originalDoc.WordCount, newDoc.WordCount, "Document.WordCount", changelog);
+
             // text dokumentu do changelogu dávat nechceme, protože by to bylo hodně velké
             originalDoc.PlainText = SetProperty(originalDoc.PlainText, newDoc.PlainText, "Document.PlainText", null);
 
@@ -402,14 +421,14 @@ namespace HlidacStatu.Repositories
             originalDoc.OficialUrls.UnionWith(newDoc.OficialUrls);
             originalDoc.StorageIds.UnionWith(newDoc.StorageIds);
             originalDoc.PlainDocumentIds.UnionWith(newDoc.PlainDocumentIds);
-            
-            
+
+
             originalDoc.PlainTextContentQuality = newDoc.PlainTextContentQuality == DataQualityEnum.Unknown
                 ? originalDoc.PlainTextContentQuality
                 : newDoc.PlainTextContentQuality;
 
             int currentChangelogCount = changelog?.Count() ?? 0;
-            if ( currentChangelogCount > originalChangelogCount)
+            if (currentChangelogCount > originalChangelogCount)
             {
                 originalDoc.LastUpdate = DateTime.Now;
             }
@@ -446,7 +465,7 @@ namespace HlidacStatu.Repositories
                     Directory.CreateDirectory(destinationFolder);
                     var destination = Init.VzPrilohaLocalCopy.GetFullPath(hlidacStorageId);
 
-                    if(!File.Exists(destination))
+                    if (!File.Exists(destination))
                         File.Move(fullTempPath, destination);
                 }
                 catch (Exception e)
@@ -455,26 +474,26 @@ namespace HlidacStatu.Repositories
                 }
                 finally
                 {
-                    if(!string.IsNullOrWhiteSpace(fullTempPath) && File.Exists(fullTempPath))
+                    if (!string.IsNullOrWhiteSpace(fullTempPath) && File.Exists(fullTempPath))
                         File.Delete(fullTempPath);
                 }
             }
         }
 
         private static SemaphoreSlim _fileSemaphore = new(1);
-        
+
         private static async Task<HttpResponseMessage> ExecuteHttpRequest(HttpClient httpClient, string url)
         {
             var startTime = DateTime.Now;
             var stopWatch = new Stopwatch();
             stopWatch.Start();
             HttpResponseMessage response = null;
-            var logResult=String.Empty;
+            var logResult = String.Empty;
             try
             {
                 response = await httpClient.GetAsync(url, HttpCompletionOption.ResponseHeadersRead);
             }
-            catch(Exception exception)
+            catch (Exception exception)
             {
                 logResult = exception.Message;
                 throw;
@@ -487,13 +506,13 @@ namespace HlidacStatu.Repositories
                 {
                     logResult = $"Result {response.StatusCode}";
                 }
+
                 //add to bag
                 await _fileSemaphore.WaitAsync();
                 try
                 {
                     await File.AppendAllTextAsync("e:/Data/App/HlidacSmluv/petr/vzres.tsv",
                         $"{startTime:hh:mm:ss.fff}\t{endTime:hh:mm:ss.fff}\t{stopWatch.ElapsedMilliseconds}\t{logResult}\t{url}");
-
                 }
                 catch (Exception e)
                 {
@@ -504,14 +523,14 @@ namespace HlidacStatu.Repositories
                     _fileSemaphore.Release();
                 }
             }
-            
+
             return response;
         }
 
         private static async Task DownloadFileAsync(HttpClient httpClient,
             string url,
             string path,
-            string vzId) 
+            string vzId)
         {
             // turn off retry
             // using var responseMessage = await _retryPolicy.ExecuteAsync(() =>
@@ -521,7 +540,7 @@ namespace HlidacStatu.Repositories
             var uriBase = uri.Host;
 
             var pipeline = _retryThrottledPipelinePerHost.GetOrAdd(uriBase, CreateNewResiliencePipeline());
-            
+
             HttpResponseMessage responseMessage = null;
             try
             {
@@ -535,24 +554,26 @@ namespace HlidacStatu.Repositories
             }
             catch (Exception exception)
             {
-                _logger.Warning($"During downloadFileAsync there was an exception {exception}. For Url: {url} for VZ (id:{vzId}).");
+                _logger.Warning(
+                    $"During downloadFileAsync there was an exception {exception}. For Url: {url} for VZ (id:{vzId}).");
                 throw;
             }
 
             // using var responseMessage = await httpClient.GetAsync(url, HttpCompletionOption.ResponseHeadersRead);
-            
+
             if (!responseMessage.IsSuccessStatusCode)
             {
-                _logger.Error($"Url: {url} for VZ (id:{vzId}) returned {responseMessage.StatusCode} status code with reason phrase: {responseMessage.ReasonPhrase}.");
+                _logger.Error(
+                    $"Url: {url} for VZ (id:{vzId}) returned {responseMessage.StatusCode} status code with reason phrase: {responseMessage.ReasonPhrase}.");
                 throw new Exception(
                     $"Can't download file (Url: {url}) for VZ (id:{vzId}). Http status code: {responseMessage.StatusCode}");
             }
-            
+
             try
-            {   
+            {
                 var stream = await responseMessage.Content.ReadAsStreamAsync();
                 await using var fileStream = File.Open(path, FileMode.Create);
-                
+
                 await stream.CopyToAsync(fileStream);
                 await fileStream.FlushAsync();
             }
@@ -562,12 +583,13 @@ namespace HlidacStatu.Repositories
                 throw;
             }
         }
-        
-        private static void SetupUpdateDates(VerejnaZakazka verejnaZakazka, DateTime? posledniZmena, bool updateposledniZmena)
+
+        private static void SetupUpdateDates(VerejnaZakazka verejnaZakazka, DateTime? posledniZmena,
+            bool updateposledniZmena)
         {
             if (posledniZmena.HasValue)
                 verejnaZakazka.PosledniZmena = posledniZmena;
-            else if (updateposledniZmena)           
+            else if (updateposledniZmena)
                 verejnaZakazka.PosledniZmena = verejnaZakazka.GetPosledniZmena();
 
             if (updateposledniZmena)
@@ -583,8 +605,9 @@ namespace HlidacStatu.Repositories
             else
                 return null;
         }
-        
-        public static async Task<IEnumerable<VerejnaZakazka>> FindDocumentsFromTheSameSourcesAsync(VerejnaZakazka zakazka, ElasticClient elasticClient)
+
+        public static async Task<IEnumerable<VerejnaZakazka>> FindDocumentsFromTheSameSourcesAsync(
+            VerejnaZakazka zakazka, ElasticClient elasticClient)
         {
             elasticClient ??= Manager.GetESClient_VerejneZakazky();
             // find possible candidates
@@ -601,10 +624,10 @@ namespace HlidacStatu.Repositories
                 _logger.Warning($"VZ problems with query. {res.DebugInformation}");
                 return Enumerable.Empty<VerejnaZakazka>();
             }
-            
+
             if (!res.Hits.Any())
                 return Enumerable.Empty<VerejnaZakazka>();
-            
+
             return res.Documents;
         }
 
@@ -615,7 +638,8 @@ namespace HlidacStatu.Repositories
             return res.Exists;
         }
 
-        public static async Task<string> GetDocumentTextAsync(string documentSha256Checksum, ElasticClient client = null)
+        public static async Task<string> GetDocumentTextAsync(string documentSha256Checksum,
+            ElasticClient client = null)
         {
             client ??= Manager.GetESClient_VerejneZakazky();
             // find possible candidates
@@ -629,7 +653,7 @@ namespace HlidacStatu.Repositories
                 _logger.Warning($"VZ problems with query. {res.DebugInformation}");
                 return null;
             }
-            
+
             if (!res.Hits.Any())
                 return null;
 

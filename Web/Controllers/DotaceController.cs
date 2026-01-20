@@ -7,7 +7,6 @@ using System.Collections.Generic;
 using System.Linq;
 using Devmasters;
 using HlidacStatu.Caching;
-using HlidacStatu.Lib.Web.UI.Attributes;
 using ZiggyCreatures.Caching.Fusion;
 using HlidacStatu.LibCore.Filters;
 using HlidacStatu.Repositories.Cache;
@@ -168,9 +167,13 @@ namespace HlidacStatu.Web.Controllers
             ViewData["ftyp"] = ftyp;
             ViewData["dtyp"] = dtyp;
 
-
-            var data = await DotaceRepo.ReportTopPrijemciAsync(rok, typSubj, typDotace);
-
+            var data = new List<(string Ico, string Jmeno, long Count, decimal Sum)>();
+            foreach (var (ico, count, sum) in await DotaceRepo.ReportTopPrijemciAsync(rok, typSubj, typDotace))
+            {
+                var jmeno = await FirmaRepo.NameFromIcoAsync(ico);
+                data.Add((ico, jmeno, count, sum));
+            }
+            
             return View(data);
         }
 
@@ -284,8 +287,13 @@ namespace HlidacStatu.Web.Controllers
         [HlidacOutputCache(22 * 60 * 60, "rok", false)]
         public async Task<ActionResult> DotacniExperti(int? rok = null)
         {
-            var data = await DotaceRepo.DotacniExperti(rok);
             ViewData["rok"] = rok;
+            var data = new List<(string Ico, string Jmeno, long Count, decimal Sum)>();
+            foreach (var (ico, count, sum) in await DotaceRepo.DotacniExperti(rok))
+            {
+                var jmeno = await FirmaRepo.NameFromIcoAsync(ico);
+                data.Add((ico, jmeno, count, sum));
+            }
             return View(data);
         }
 
@@ -303,8 +311,15 @@ namespace HlidacStatu.Web.Controllers
         [HlidacOutputCache(22 * 60 * 60, "rok", false)]
         public async Task<ActionResult> DotovaniSponzori(int? rok = null)
         {
-            var data = await DotaceRepo.DotovaniSponzori(rok);
             ViewData["rok"] = rok;
+            
+            var data = new List<(string Ico, string Jmeno, decimal SumAssumedAmmount)>();
+            foreach (var (ico, sumAssumedAmmount) in await DotaceRepo.DotovaniSponzori(rok))
+            {
+                var jmeno = await FirmaRepo.NameFromIcoAsync(ico);
+                data.Add((ico, jmeno, sumAssumedAmmount));
+            }
+            
             return View(data);
         }
 

@@ -30,23 +30,23 @@
 
 @section Scripts
 {
-<script>
-    $(document).ready(function() {
-      $("#submitSelectNavigace").click(function(){
-        if ($("#selectNavigace").val()!='') {
-          window.location.href= '/BenchmarkUradu/' + $("#selectNavigace").val() + window.location.search;
-        }
-      });
-      Toc.init({
-          $nav: $("#toc"),
-          $scope: $("#content__body h2, #content__body h3")
+    <script>
+        $(document).ready(function () {
+            $("#submitSelectNavigace").click(function () {
+                if ($("#selectNavigace").val() != '') {
+                    window.location.href = '/BenchmarkUradu/' + $("#selectNavigace").val() + window.location.search;
+                }
+            });
+            Toc.init({
+                $nav: $("#toc"),
+                $scope: $("#content__body h2, #content__body h3")
 
+            });
+            new bootstrap.ScrollSpy(document.body, {
+                target: '#toc'
+            })
         });
-      new bootstrap.ScrollSpy(document.body, {
-        target: '#toc'
-      })
-    });
-</script>
+    </script>
 }
 
 <h2>
@@ -61,10 +61,10 @@
             <label class="input-group-text" for="selectNavigace">Vyberte úřad:</label>
             <select class="form-select form-select-sm" id="selectNavigace">
                 <option value="" selected="@string.IsNullOrEmpty(Model.Ico)">Zvolte úřad...</option>
-                @foreach (var (ico, nazev, pocetCen) in JobService.GetOdberateleList(Model.Key.Value)
-                .Where(m => m.pocetCen > JobService._minimumPriceCountInList)
-                .OrderBy(x => x.nazev)
-                )
+                @foreach (var (ico, nazev, pocetCen) in (await JobService.GetOdberateleListAsync(Model.Key.Value))
+                              .Where(m => m.pocetCen > JobService._minimumPriceCountInList)
+                              .OrderBy(x => x.nazev)
+                             )
                 {
                     <option value="@ico" selected="@(Model.Ico == ico)">@nazev (@pocetCen cen)</option>
                 }
@@ -77,7 +77,6 @@
 </div>
 @if (statistics == null)
 {
-
     <div class="alert alert-warning" role="alert">
         Tohoto zadavatele jsme nenašli.
     </div>
@@ -110,42 +109,45 @@
                 .Count();
             bool showPouze = uniqSmluv * 3 < RSstat.Total;
         }
-        <hr />
+        <hr/>
 
         <h2>@Model.Nazev</h2>
         <p>
-            @Model.Nazev má v registru smluv za analyzovanou oblast <b>@Model.Key?.PerSubjectDesc?.NiceName</b> a rok <b>@(Model.Key?.Rok)</b>
-            celkem @(Devmasters.Lang.CS.Plural.Get(RSstat.Total,"jednu smlouvu","{0} smlouvy","{0} smluv"))
-            za @(HlidacStatu.Util.RenderData.NicePrice((decimal)sumKc,shortFormat:true)),
-            z nichž @(showPouze ? "pouze" : "") @(Devmasters.Lang.CS.Plural.Get(uniqSmluv,"jedna smlouva obsahovala","{0} smlouvy obsahovaly","{0} smluv obsahovalo")) jednotkové ceny.
+            @Model.Nazev má v registru smluv za analyzovanou oblast <b>@Model.Key?.PerSubjectDesc?.NiceName</b> a rok
+            <b>@(Model.Key?.Rok)</b>
+            celkem @(Devmasters.Lang.CS.Plural.Get(RSstat.Total, "jednu smlouvu", "{0} smlouvy", "{0} smluv"))
+            za @(HlidacStatu.Util.RenderData.NicePrice((decimal)sumKc, shortFormat: true)),
+            z
+            nichž @(showPouze ? "pouze" : "") @(Devmasters.Lang.CS.Plural.Get(uniqSmluv, "jedna smlouva obsahovala", "{0} smlouvy obsahovaly", "{0} smluv obsahovalo")) jednotkové
+            ceny.
         </p>
         @if (showStatistics)
         {
             <div style="padding-bottom:20px">
-                <partial name="Shared/_SouhrnTable" model="tableModel" />
+                <partial name="Shared/_SouhrnTable" model="tableModel"/>
             </div>
 
             <h2>Porovnání cenového rozpětí @Model.Nazev a celku</h2>
-            <partial name="Shared/_CompareTable" model="graphModel" />
-            <partial name="Shared/_BoxPlot" model="graphModel" />
+            <partial name="Shared/_CompareTable" model="graphModel"/>
+            <partial name="Shared/_BoxPlot" model="graphModel"/>
         }
 
-        <hr />
+        <hr/>
 
-       
+
         <h2>Detailní informace pro zadavatele <b>@Model.Nazev</b></h2>
 
         @{
             var detailModel = (statistics, Model.Key);
         }
-        <partial name="Shared/_DetailDodavatelZadavatel" model="detailModel" />
+        <partial name="Shared/_DetailDodavatelZadavatel" model="detailModel"/>
 
-        <hr />
+        <hr/>
 
         @{
             var porovnaniModel = (statistics, urad, Model.Key);
         }
-        <partial name="Shared/_PorovnaniDodavatelu_PoPolozkach" model="porovnaniModel" />
+        <partial name="Shared/_PorovnaniDodavatelu_PoPolozkach" model="porovnaniModel"/>
 
     </div>
 </div>

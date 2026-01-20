@@ -41,7 +41,7 @@ namespace HlidacStatu.Extensions
             if (!string.IsNullOrWhiteSpace(zkratka))
                 return zkratka;
 
-            return FirmaRepo.NameFromIcoAsync(ico);
+            return await FirmaRepo.NameFromIcoAsync(ico);
         }
 
 

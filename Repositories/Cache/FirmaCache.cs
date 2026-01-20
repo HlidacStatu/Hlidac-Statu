@@ -99,17 +99,17 @@ public static class FirmaCache
             options => options.ModifyEntryOptionsDuration(TimeSpan.FromHours(6))
         );
 
-    public static Dictionary<string, string[]> FirmyNazvyOnlyAscii(bool forceUpdate = false)
+    public static async Task<Dictionary<string, string[]>> FirmyNazvyOnlyAsciiAsync(bool forceUpdate = false)
     {
         string key = $"_FirmyNazvyOnlyAscii";
 
         if (forceUpdate)
         {
-            PermanentCache.Expire(key);
+            await PermanentCache.ExpireAsync(key);
         }
 
-        return PermanentCache.GetOrSet(key,
-            _ => FirmaRepo.GetNazvyOnlyAsciiAsync(),
+        return await PermanentCache.GetOrSetAsync(key,
+            async _ => await FirmaRepo.GetNazvyOnlyAsciiAsync(),
             options => options.ModifyEntryOptionsDuration(TimeSpan.FromHours(12), TimeSpan.FromDays(10 * 365))
         );
     }

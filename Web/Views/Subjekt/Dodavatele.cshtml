@@ -95,7 +95,7 @@
         {
             rdsPerIco.AddRow(
             new Tuple<string, string>
-                (FirmaRepo.NameFromIcoAsync((string)val.Key, true), (string)val.Key),
+                (await FirmaRepo.NameFromIcoAsync((string)val.Key, true), (string)val.Key),
                 val.DocCount.ToString()
                 );
         }
@@ -103,7 +103,7 @@
         {
             rdsPerPrice.AddRow(
             new Tuple<string, string>
-                (FirmaRepo.NameFromIcoAsync((string)val.Key, true), (string)val.Key),
+                (await FirmaRepo.NameFromIcoAsync((string)val.Key, true), (string)val.Key),
                 val.Sum("sumincome").Value
                 );
         }

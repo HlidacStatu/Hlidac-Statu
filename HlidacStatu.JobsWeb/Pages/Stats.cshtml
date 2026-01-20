@@ -11,8 +11,8 @@
 
 @{
     ViewData["Title"] = $"Statistiky";
-    List<(string ico, string nazev, int pocetCen)> dodavatele = JobService.GetDodavateleList(Model.Key.Value);
-    List<(string ico, string nazev, int pocetCen)> zadavatele = JobService.GetOdberateleList(Model.Key.Value);
+    List<(string ico, string nazev, int pocetCen)> dodavatele = await JobService.GetDodavateleListAsync(Model.Key.Value);
+    List<(string ico, string nazev, int pocetCen)> zadavatele = await JobService.GetOdberateleListAsync(Model.Key.Value);
 
     var marketStat = JobService.GetStatistics(Model.Key.Value);
     var jobs = marketStat.Where(m => !string.IsNullOrEmpty(m.Name)).OrderBy(x => x.Name).Select(m => m.Name).Distinct();

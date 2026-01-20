@@ -510,7 +510,7 @@ namespace HlidacStatu.Repositories.Analysis
             Action<string> logOutputFunc = null, IProgressWriter progressOutputFunc = null)
         {
             _logger.Debug("GetFirmyCasovePodezreleZalozene - getting all ico");
-            var allIcos = FirmaRepo.AllIcoInRSAsync();
+            var allIcos = await FirmaRepo.AllIcoInRSAsync();
             Dictionary<string, IcoSmlouvaMinMax> firmy = new Dictionary<string, IcoSmlouvaMinMax>();
             object lockFirmy = new object();
 
@@ -624,7 +624,7 @@ namespace HlidacStatu.Repositories.Analysis
             GetAllStatisticsDataAsync() =>
             PermanentCache.GetOrSetAsync($"_AllStatisticsSmlouvyDataCacheFile", async _ =>
             {
-                var allicos = FirmaRepo.AllIcoInRSAsync().ToArray();
+                var allicos = await FirmaRepo.AllIcoInRSAsync();
                 var getData =
                     new System.Collections.Concurrent.ConcurrentBag<
                         HlidacStatu.Lib.Analytics.StatisticsSubjectPerYear<Smlouva.Statistics.Data>>();

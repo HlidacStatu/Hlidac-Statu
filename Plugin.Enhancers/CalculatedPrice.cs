@@ -4,6 +4,7 @@ using HlidacStatu.Entities;
 using HlidacStatu.Entities.Enhancers;
 
 using System;
+using System.Threading.Tasks;
 using Serilog;
 
 namespace HlidacStatu.Plugin.Enhancers
@@ -34,7 +35,7 @@ namespace HlidacStatu.Plugin.Enhancers
         {
         }
 
-        public bool Update(ref Smlouva item)
+        public Task<bool> UpdateAsync(Smlouva item)
         {
             _logger.Debug("Starting CalculatedPrice for " + item.Id);
             bool changed = false;
@@ -76,7 +77,7 @@ namespace HlidacStatu.Plugin.Enhancers
                 }
 
             }
-            return changed;
+            return Task.FromResult(changed);
         }
 
 

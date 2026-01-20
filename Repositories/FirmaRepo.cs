@@ -121,7 +121,7 @@ namespace HlidacStatu.Repositories
 
                 if (!(f?.Valid == true)) //try firmo
                 {
-                    f = RZP.FromIco(ico);
+                    f = await RZP.FromIcoAsync(ico);
                 }
 
                 if (f == null)
