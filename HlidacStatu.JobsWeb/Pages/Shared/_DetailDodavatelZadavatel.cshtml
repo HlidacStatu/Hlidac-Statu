@@ -1,10 +1,9 @@
 ﻿@model (List<WatchdogAnalytics.Models.JobStatistics> statistics, WatchdogAnalytics.Models.YearlyStatisticsGroup.Key? Key)
 
 @using HlidacStatu.Entities
+@using HlidacStatu.Repositories.Cache
 @using WatchdogAnalytics.Models
 @using WatchdogAnalytics.Services
-
-
 
 @{
     List<JobStatistics> statistics = Model.statistics;
@@ -18,25 +17,28 @@
     var smlouvyQuery = "id:(" + string.Join(" OR ", smlouvyIds) + ")";
 
     var firmyCount = await JobService.GetDodavateleListAsync(Model.Key.Value);
-    var firmy = statistics.SelectMany(m => m.Dodavatele).Distinct()
-    .Select(m => new
+    
+    var distinctDodavatele = statistics.SelectMany(m => m.Dodavatele).Distinct();
+    var firmy = new List<(string ico, string name, int count)>();
+    foreach (var ico in distinctDodavatele)
     {
-        ico = m,
-        name = HlidacStatu.Repositories.await FirmaCache.GetJmenoAsync(m),
-        count = firmyCount.Any(c => c.ico == m) ? firmyCount.First(c => c.ico == m).pocetCen : 0
-    })
-    .OrderBy(o => o.name);
+        var name = await FirmaCache.GetJmenoAsync(ico);
+        var count = firmyCount.Any(c => c.ico == ico) ? firmyCount.First(c => c.ico == ico).pocetCen : 0;
+        firmy.Add((ico, name, count));
+    }
+    firmy = firmy.OrderBy(o => o.name).ToList();
 
     var uradyCount = await JobService.GetOdberateleListAsync(Model.Key.Value);
-    var urady = statistics.SelectMany(m => m.Odberatele).Distinct()
-    .Select(m => new
+    var distinctOdberatele = statistics.SelectMany(m => m.Odberatele).Distinct();
+    var urady = new List<(string ico, string name, int count)>();
+    foreach (var ico in distinctOdberatele)
     {
-        ico = m,
-        name = HlidacStatu.Repositories.await FirmaCache.GetJmenoAsync(m),
-        count = uradyCount.Any(c => c.ico == m) ? uradyCount.First(c => c.ico == m).pocetCen : 0
-    })
-    .OrderBy(o => o.name);
-    ;
+        var name = await FirmaCache.GetJmenoAsync(ico);
+        var count = uradyCount.Any(c => c.ico == ico) ? uradyCount.First(c => c.ico == ico).pocetCen : 0;
+        urady.Add((ico, name, count));
+    }
+    urady = urady.OrderBy(o => o.name).ToList();
+    
 }
 
 @if (this.Context.HasAccess().Result.AnalyzeLevel < CenyCustomer.AccessDetail.AccessDetailLevel.PRO)

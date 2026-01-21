@@ -4,6 +4,7 @@
 @using HlidacStatu.Repositories
 @using HlidacStatu.Entities
 @using HlidacStatu.Repositories.Cache
+@using Microsoft.AspNetCore.Html
 @using Graph = HlidacStatu.DS.Graphs.Graph
 
 @{
@@ -22,23 +23,23 @@
 
         var sponzoringFirma = await Model.SponzoringAsync(m => m.Typ == (int)Sponzoring.TypDaru.DarFirmy);
 
-        var sponzoringData = new ReportDataSource<(int Rok, string Ico, decimal Dar, string Poznamka)>(
+        var sponzoringData = new ReportDataSource<(int Rok, string Ico, string DarceJmeno, decimal Dar, string Poznamka)>(
             new[]
             {
-                new ReportDataSource<(int Rok, string Ico, decimal Dar, string Poznamka)>.Column()
+                new ReportDataSource<(int Rok, string Ico, string DarceJmeno, decimal Dar, string Poznamka)>.Column()
                 {
                     Name = "Rok",
                     CssClass = "number",
                     HtmlRender = (x) => x.Rok.ToString(),
                     TextRender = (x) => x.Rok.ToString()
                 },
-                new ReportDataSource<(int Rok, string Ico, decimal Dar, string Poznamka)>.Column()
+                new ReportDataSource<(int Rok, string Ico, string DarceJmeno, decimal Dar, string Poznamka)>.Column()
                 {
                     Name = "Politická strana",
                     HtmlRender = (x) =>
-                        $"<a href=\"/subjekt/{x.Ico}\">{await FirmaCache.GetJmenoAsync(x.Ico)}</a>"
+                        $"<a href=\"/subjekt/{x.Ico}\">{x.DarceJmeno}</a>"
                 },
-                new ReportDataSource<(int Rok, string Ico, decimal Dar, string Poznamka)>.Column()
+                new ReportDataSource<(int Rok, string Ico, string DarceJmeno, decimal Dar, string Poznamka)>.Column()
                 {
                     Name = "Celkem darovali",
                     TextRender = (x) => $"{x.Dar.ToString("N0")} Kč",
@@ -46,7 +47,7 @@
                     OrderValueRender = (x) => HlidacStatu.Util.RenderData.OrderValueFormat(x.Dar),
                     CssClass = "number"
                 },
-                new ReportDataSource<(int Rok, string Ico, decimal Dar, string Poznamka)>.Column()
+                new ReportDataSource<(int Rok, string Ico, string DarceJmeno, decimal Dar, string Poznamka)>.Column()
                 {
                     Name = "Poznámka",
                     HtmlRender = (x) => x.Poznamka,
@@ -55,7 +56,8 @@
             });
         foreach (var dar in sponzoring)
         {
-            sponzoringData.AddRow((dar.DarovanoDne?.Year ?? 0, dar.IcoPrijemce, dar.Hodnota ?? 0, dar.Popis));
+            var jmeno = await FirmaCache.GetJmenoAsync(dar.IcoPrijemce);
+            sponzoringData.AddRow((dar.DarovanoDne?.Year ?? 0, dar.IcoPrijemce, jmeno, dar.Hodnota ?? 0, dar.Popis));
         }
 
         sponzoringData.Title = "Přehled jednotlivých darů politickým stranám";
@@ -76,13 +78,13 @@
 
     @if (sponzoringFirma.Count > 0)
     {
-        var sponzoringFirmyData = new ReportDataSource<(int Rok, string Ico, string DarceIco, string DarceJmeno, decimal Dar, string Poznamka, Graph.Edge[]? Vazby)>(new ReportDataSource<(int Rok, string Ico, string Darceico, string DarceJmeno, decimal Dar, string Poznamka, Graph.Edge[]? Vazby)>.Column()
+        var sponzoringFirmyData = new ReportDataSource<(int Rok, string Ico, string DarceIco, string DarceJmeno, decimal Dar, string Poznamka, IHtmlContent vazbyRender)>(new ReportDataSource<(int Rok, string Ico, string Darceico, string DarceJmeno, decimal Dar, string Poznamka, IHtmlContent vazbyRender)>.Column()
         {
             Name = "Sponzorující firma",
             HtmlRender = (x) =>
             {
-                return $"<a href='/subjekt/{x.Darceico}'>{await FirmaCache.GetJmenoAsync(x.Darceico)}</a>"
-                       + $"<br/>{Html.RenderVazbyAsync(x.Vazby)}";
+                return $"<a href='/subjekt/{x.Darceico}'>{x.DarceJmeno}</a>"
+                       + $"<br/>{x.vazbyRender}";
             },
             TextRender = (x) => x.DarceJmeno
         }, new()
@@ -95,7 +97,7 @@
         {
             Name = "Politická strana",
             HtmlRender = (x) =>
-                $"<a href=\"/subjekt/{x.Ico}\">{await FirmaCache.GetJmenoAsync(x.Ico)}</a>"
+                $"<a href=\"/subjekt/{x.Ico}\">{x.DarceJmeno}</a>"
         }, new()
         {
             Name = "Celkem darovali",
@@ -113,7 +115,8 @@
         {
             Graph.Edge[]? vazby = await OsobaVazbyRepo.VazbyProIcoCachedAsync(Model, dar.IcoDarce);
             var jmenoDarce = await FirmaCache.GetJmenoAsync(dar.IcoDarce);
-            sponzoringFirmyData.AddRow((dar.DarovanoDne?.Year ?? 0, dar.IcoPrijemce, dar.IcoDarce, jmenoDarce, dar.Hodnota ?? 0, dar.Popis, vazby));
+            var ihtmlVazby = await Html.RenderVazbyAsync(vazby);
+            sponzoringFirmyData.AddRow((dar.DarovanoDne?.Year ?? 0, dar.IcoPrijemce, dar.IcoDarce, jmenoDarce, dar.Hodnota ?? 0, dar.Popis, ihtmlVazby));
         }
 
         <hr/>

@@ -81,7 +81,7 @@ window.onload = function() {{
             
             if (string.IsNullOrEmpty(await v.To.PrintNameAsync()))
             {
-                fname = $"<a href='{Firma.GetUrl(v.To.Id, true)}'>{FirmaRepo.NameFromIcoAsync(v.To.Id, true)}</a>";
+                fname = $"<a href='{Firma.GetUrl(v.To.Id, true)}'>{await FirmaRepo.NameFromIcoAsync(v.To.Id, true)}</a>";
             }
 
             sb.Append(fname).Append(" - ").Append(v.Descr).Append("&nbsp;");

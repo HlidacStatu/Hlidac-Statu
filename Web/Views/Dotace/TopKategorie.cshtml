@@ -67,14 +67,14 @@
 <div class="mt-3"></div>
 @foreach (var category in Model.Select(m => m.Category).Distinct().OrderBy(m => m.ToNiceDisplayName()))
 {
-    List<ReportDataSource<(string Ico, Dotace.Hint.CalculatedCategories Category, long Count, decimal Sum)>.Column> dataColumns =
+    List<ReportDataSource<(string Ico, string Jmeno, Dotace.Hint.CalculatedCategories Category, long Count, decimal Sum)>.Column> dataColumns =
     [
         new()
         {
             Name = "Příjemce",
             CssClass = "text",
-            HtmlRender =(x) => $"<a href=/subjekt/{x.Ico}>{FirmaRepo.NameFromIcoAsync(x.Ico)}</a>",
-            TextRender = (x) => FirmaRepo.NameFromIcoAsync(x.Ico) + $" (x.Ico)"
+            HtmlRender =(x) => $"<a href=/subjekt/{x.Ico}>{x.Jmeno}</a>",
+            TextRender = (x) => x.Jmeno + $" (x.Ico)"
         },
         new()
         {
@@ -95,13 +95,18 @@
     ];
 
 
-    var data = new ReportDataSource<(string Ico, Dotace.Hint.CalculatedCategories Category, long Count, decimal Sum)>(dataColumns);
+    var data = new ReportDataSource<(string Ico, string Jmeno, Dotace.Hint.CalculatedCategories Category, long Count, decimal Sum)>(dataColumns);
 
-    //for (var year = 2021; year < DateTime.Now.Year; year++)
-    //{
-    data.AddRows(Model.Where(m => m.Category == category).ToList());
-    //}
+    foreach (var item in Model)
+    {
+        if (item.Category == category)
+        {
+            var jmeno = await FirmaRepo.NameFromIcoAsync(item.Ico);
+            
+            data.AddRow((item.Ico, jmeno, item.Category, item.Count, item.Sum));
+        }
 
+    }
 
     <h4 id="cat_@((int)category)">@category.ToNiceDisplayName()</h4>
 

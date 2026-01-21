@@ -90,7 +90,7 @@ namespace HlidacStatuApi.Controllers.ApiV2
             if (oo != null)
             {
                 return Content(Newtonsoft.Json.JsonConvert.SerializeObject(
-                    new { osobaid = oo.NameId, jmeno = oo.Jmeno, prijmeni = oo.Prijmeni, politickaStrana = oo.CurrentPoliticalPartyAsync() }
+                    new { osobaid = oo.NameId, jmeno = oo.Jmeno, prijmeni = oo.Prijmeni, politickaStrana = await oo.CurrentPoliticalPartyAsync() }
                 ), "application/json", System.Text.Encoding.UTF8);
             }
             else

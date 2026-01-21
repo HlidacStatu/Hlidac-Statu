@@ -295,12 +295,6 @@
                     .OrderByDescending(o => o.Value.CelkemCena)
                     .ThenByDescending(o => o.Value.Pocet)
                     .ToList();
-                IEnumerable<Tuple<string, decimal>> pieData = sortedData
-                    .Take(9)
-                    .Select(m => new Tuple<string, decimal>(
-                        ((Smlouva.SClassification.ClassificationsTypes)m.Key).ToNiceDisplayName(),
-                        m.Value.CelkemCena)
-                    );
 
                 ReportDataSource<KeyValuePair<int, SimpleStat>> rds = new(
                     new ReportDataSource<KeyValuePair<int, SimpleStat>>.Column()
@@ -335,60 +329,62 @@
             }
 
 
-            ReportDataSource<KeyValuePair<string, SimpleStat>> podleHodnotyTemplate = new(
-                new ReportDataSource<KeyValuePair<string, SimpleStat>>.Column()
+            ReportDataSource<(string Ico, string Jmeno, SimpleStat Stat)> podleHodnotyTemplate = new(
+                new ReportDataSource<(string Ico, string Jmeno, SimpleStat Stat)>.Column()
                 {
                     Name = "Společnost",
-                    HtmlRender =(m) =>
-                    {
-                        string t = m.Key;
-                        return $"<a href='/subjekt/{t}'>"
-                               + $"{await FirmaCache.GetJmenoAsync(t)}"
-                               + $"</a>";
-                    }
+                    HtmlRender =(m) => $"<a href='/subjekt/{m.Ico}'>"
+                                       + $"{m.Jmeno}"
+                                       + $"</a>"
                 },
-                new ReportDataSource<KeyValuePair<string, SimpleStat>>.Column()
+                new ReportDataSource<(string Ico, string Jmeno, SimpleStat Stat)>.Column()
                 {
                     Name = "Počet smluv",
                     HtmlRender =(m) =>
                     {
-                        var query = $"ico:{Model.ICO} AND ico:{m.Key} AND "
+                        var query = $"ico:{Model.ICO} AND ico:{m.Ico} AND "
                                     + $"{HlidacStatu.Searching.Query.Formatted("podepsano", new DateTime(y, 1, 1), new DateTime(y, 12, 31))}";
                         return $"<a href='/HledatSmlouvy?Q={System.Net.WebUtility.UrlEncode(query)}'>"
-                               + $"{HlidacStatu.Util.RenderData.NiceNumber(m.Value.Pocet)}"
+                               + $"{HlidacStatu.Util.RenderData.NiceNumber(m.Stat.Pocet)}"
                                + $"</a>";
                     },
-                    OrderValueRender = (m) => HlidacStatu.Util.RenderData.OrderValueFormat(m.Value.Pocet),
+                    OrderValueRender = (m) => HlidacStatu.Util.RenderData.OrderValueFormat(m.Stat.Pocet),
                     CssClass = "number"
                 },
-                new ReportDataSource<KeyValuePair<string, SimpleStat>>.Column()
+                new ReportDataSource<(string Ico, string Jmeno, SimpleStat Stat)>.Column()
                 {
                     Name = "Hodnota smluv",
-                    HtmlRender =(m) => { return HlidacStatu.Util.RenderData.NicePrice(m.Value.CelkemCena); },
-                    OrderValueRender = (m) => HlidacStatu.Util.RenderData.OrderValueFormat(m.Value.CelkemCena),
+                    HtmlRender =(m) => { return HlidacStatu.Util.RenderData.NicePrice(m.Stat.CelkemCena); },
+                    OrderValueRender = (m) => HlidacStatu.Util.RenderData.OrderValueFormat(m.Stat.CelkemCena),
                     CssClass = "number"
                 }
             );
 
 
-            Dictionary<int, (List<(string ico, SimpleStat stat)> topPodlePoctu, List<(string ico, SimpleStat stat)> topPodleKc)>
+            Dictionary<int, (List<(string ico, SimpleStat Stat)> topPodlePoctu, List<(string ico, SimpleStat Stat)> topPodleKc)>
                 first = Model.JsemOVM() ? topDodavateleT.Result : topOdberateleT.Result;
 
-            Dictionary<int, (List<(string ico, SimpleStat stat)> topPodlePoctu, List<(string ico, SimpleStat stat)> topPodleKc)>
+            Dictionary<int, (List<(string ico, SimpleStat Stat)> topPodlePoctu, List<(string ico, SimpleStat Stat)> topPodleKc)>
                 second = Model.JsemOVM() ? topOdberateleT.Result : topDodavateleT.Result;
 
             if (first.ContainsKey(y) && first[y].topPodleKc.Count > 0)
             {
                 podleHodnotyTemplate.Clear();
-                podleHodnotyTemplate.AddRows(
-                    first[y].topPodleKc.Select(m => new KeyValuePair<string, SimpleStat>(m.ico, m.stat))
-                );
+                foreach (var x in first[y].topPodleKc)
+                {
+                    var jmeno = await FirmaCache.GetJmenoAsync(x.ico);
+                    podleHodnotyTemplate.AddRow((x.ico, jmeno, x.Stat));
+                }
+                
                 string dleHodnoty = Html.DataToHTMLTable(podleHodnotyTemplate, dataTableOptions: dataTableOptions).RenderRawHtml();
 
                 podleHodnotyTemplate.Clear();
-                podleHodnotyTemplate.AddRows(
-                    first[y].topPodlePoctu.Select(m => new KeyValuePair<string, SimpleStat>(m.ico, m.stat))
-                );
+                foreach (var x in first[y].topPodlePoctu)
+                {
+                    var jmeno = await FirmaCache.GetJmenoAsync(x.ico);
+                    podleHodnotyTemplate.AddRow((x.ico, jmeno, x.Stat));
+                }
+                
                 string dlePoctu = Html.DataToHTMLTable(podleHodnotyTemplate, dataTableOptions: dataTableOptions).RenderRawHtml();
 
                 <h4>
@@ -409,15 +405,20 @@
             if (second.ContainsKey(y) && second[y].topPodleKc.Count > 0)
             {
                 podleHodnotyTemplate.Clear();
-                podleHodnotyTemplate.AddRows(
-                    second[y].topPodleKc.Select(m => new KeyValuePair<string, SimpleStat>(m.ico, m.stat))
-                );
+                foreach (var x in second[y].topPodleKc)
+                {
+                    var jmeno = await FirmaCache.GetJmenoAsync(x.ico);
+                    podleHodnotyTemplate.AddRow((x.ico, jmeno, x.Stat));
+                }
                 string dleHodnoty = Html.DataToHTMLTable(podleHodnotyTemplate, dataTableOptions: dataTableOptions).RenderRawHtml();
 
                 podleHodnotyTemplate.Clear();
-                podleHodnotyTemplate.AddRows(
-                    second[y].topPodlePoctu.Select(m => new KeyValuePair<string, SimpleStat>(m.ico, m.stat))
-                );
+                foreach (var x in second[y].topPodlePoctu)
+                {
+                    var jmeno = await FirmaCache.GetJmenoAsync(x.ico);
+                    podleHodnotyTemplate.AddRow((x.ico, jmeno, x.Stat));
+                }
+               
                 string dlePoctu = Html.DataToHTMLTable(podleHodnotyTemplate, dataTableOptions: dataTableOptions).RenderRawHtml();
 
                 <h4>

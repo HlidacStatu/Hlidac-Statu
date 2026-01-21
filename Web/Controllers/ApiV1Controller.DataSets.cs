@@ -255,7 +255,7 @@ namespace HlidacStatu.Web.Controllers
 
         [HttpPut, ActionName("DatasetsPart")]
         [Authorize]
-        public ActionResult DatasetsPart_Update(string _id, string atribut, [FromBody] Registration data)
+        public async Task<ActionResult> DatasetsPart_Update(string _id, string atribut, [FromBody] Registration data)
         {
             string id = _id;
 
@@ -266,7 +266,7 @@ namespace HlidacStatu.Web.Controllers
             {
                 try
                 {
-                    return Json(DataSet.Api.UpdateAsync(data,
+                    return Json(await DataSet.Api.UpdateAsync(data,
                         ApplicationUser.GetByEmail(HttpContext.User.Identity
                             .Name))); //blablablabla apiAuth.ApiCall?.User?.ToLower()));
                 }

@@ -57,13 +57,13 @@
 }
 
 @{
-    List<ReportDataSource<(string IcoPoskytovatele, long Count, decimal Sum)>.Column> dataColumns =
+    List<ReportDataSource<(string IcoPoskytovatele, string JmenoPoskytovatele, long Count, decimal Sum)>.Column> dataColumns =
     [
         new()
         {
             Name = "Jméno poskytovatele",
             CssClass = "text",
-            HtmlRender =(x) => $"<a href=/subjekt/{x.IcoPoskytovatele}>{FirmaRepo.NameFromIcoAsync(x.IcoPoskytovatele)}</a>",
+            HtmlRender =(x) => $"<a href=/subjekt/{x.IcoPoskytovatele}>{x.JmenoPoskytovatele}</a>",
             TextRender = (x) => x.IcoPoskytovatele
         },
         new()
@@ -95,9 +95,13 @@
         }
     ];
     
-    var data = new ReportDataSource<(string IcoPoskytovatele, long Count, decimal Sum)>(dataColumns);
+    var data = new ReportDataSource<(string IcoPoskytovatele, string JmenoPoskytovatele, long Count, decimal Sum)>(dataColumns);
 
-    data.AddRows(Model);
+    foreach (var (icoPoskytovatele, count, sum)  in Model)
+    {
+        var jmenoPoskytovatele = await FirmaRepo.NameFromIcoAsync(icoPoskytovatele);
+        data.AddRow((icoPoskytovatele, jmenoPoskytovatele, count, sum));
+    }
     
 }
 

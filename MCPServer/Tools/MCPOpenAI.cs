@@ -260,7 +260,7 @@ url - a URL to the document or search result item. Useful for citing specific re
                                 title = osoba.FullNameWithYear(),
                                 text = (await osoba.InfoFactsAsync()).RenderFacts(5, true),
                                 url = osoba.GetUrl(false),
-                                metadata = ToDictionary(osoba.ToApiOsobaDetailAsync(DateTime.Now.AddYears(-10)))
+                                metadata = ToDictionary(await osoba.ToApiOsobaDetailAsync(DateTime.Now.AddYears(-10)))
                             };
                             break;
                         default:

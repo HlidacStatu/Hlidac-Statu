@@ -51,7 +51,7 @@ namespace HlidacStatu.Extensions
 
             if (sponzoring.Typ == (int)Sponzoring.TypDaru.DarFirmy)
                 return string.Format(itemTemplate,
-                    $"Člen statut. orgánu ve firmě {FirmaCache.GetJmenoAsync(sponzoring.IcoDarce)} sponzorující {kohoSponzoroval} {kdySponzoroval}, hodnota daru {hodnotaDaruKc}");
+                    $"Člen statut. orgánu ve firmě {await FirmaCache.GetJmenoAsync(sponzoring.IcoDarce)} sponzorující {kohoSponzoroval} {kdySponzoroval}, hodnota daru {hodnotaDaruKc}");
 
             return string.Format(itemTemplate, $"Sponzor {kohoSponzoroval} {kdySponzoroval} {dar} {zdroj}");
         }

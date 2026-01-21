@@ -155,7 +155,7 @@ public partial class PoliticiController : Controller
         var maxTotalIncomeInMilions =
             Math.Ceiling((fullPoliticiViewData.Max(x => x.CelkoveRocniNaklady_Sort) + 1) / 1_000_000);
 
-        var filteredPoliticiViewData = FilterPoliticiViewDataAsync(rok, HttpContext.Request.Query, politickeStranyFilterData);
+        var filteredPoliticiViewData = await FilterPoliticiViewDataAsync(rok, HttpContext.Request.Query, politickeStranyFilterData);
 
         // parties + "Ostatní"
         var parties = politickeStranyFilterData;

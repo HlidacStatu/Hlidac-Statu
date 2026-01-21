@@ -133,7 +133,7 @@
     };
 
     var smlouvyPodleCeny = await HlidacStatu.Web.Framework.Report.GlobalStatistics.SmlouvyPodleCenyAsync(Model.Query);
-    
+
     var pieHodnotySmluv = new SeriesTextValue()
     {
         ColorByPoint = true,
@@ -196,19 +196,19 @@
                     new ReportDataSource<(Firma firma, SimpleStat stat)>.Column()
                     {
                         Name = "Dodavatel",
-                        HtmlRender =(m) => $"<a href='{m.firma.GetUrl()}'>{m.firma.Jmeno}</a>"
+                        HtmlRender = (m) => $"<a href='{m.firma.GetUrl()}'>{m.firma.Jmeno}</a>"
                     },
                     new ReportDataSource<(Firma firma, SimpleStat stat)>.Column()
                     {
                         Name = "Počet smluv",
-                        HtmlRender =(m) => $"<a style='float:left' href='/hledatSmlouvy?q={System.Net.WebUtility.UrlEncode(Model.Query + " AND ico:" + m.firma.ICO)}'><i class='fas fa-link' aria-hidden='true'></i></a> {HlidacStatu.Util.RenderData.NiceNumber(m.stat.Pocet)}",
+                        HtmlRender = (m) => $"<a style='float:left' href='/hledatSmlouvy?q={System.Net.WebUtility.UrlEncode(Model.Query + " AND ico:" + m.firma.ICO)}'><i class='fas fa-link' aria-hidden='true'></i></a> {HlidacStatu.Util.RenderData.NiceNumber(m.stat.Pocet)}",
                         OrderValueRender = (m) => HlidacStatu.Util.RenderData.OrderValueFormat(m.stat.Pocet),
                         CssClass = "number"
                     },
                     new ReportDataSource<(Firma firma, SimpleStat stat)>.Column()
                     {
                         Name = "Hodnota smluv",
-                        HtmlRender =(m) => HlidacStatu.Util.RenderData.NicePrice(m.stat.CelkemCena),
+                        HtmlRender = (m) => HlidacStatu.Util.RenderData.NicePrice(m.stat.CelkemCena),
                         OrderValueRender = (m) => HlidacStatu.Util.RenderData.OrderValueFormat(m.stat.CelkemCena),
                         CssClass = "number"
                     }
@@ -217,7 +217,7 @@
                 foreach (var topDodavatel in topDodavatele)
                 {
                     var firma = await FirmaCache.GetAsync(topDodavatel.ICO);
-                    rdsDodav.AddRow((firma, topDodavatel.Summary()));    
+                    rdsDodav.AddRow((firma, topDodavatel.Summary()));
                 }
             }
             @Html.DataToHTMLTable(rdsDodav, dataTableOptions: HtmlExtensions.DatatableOptions(orderColumnIdx: 2, orderDirection: "desc"))
@@ -229,16 +229,40 @@
         <div>
             @if (topDodavateleCurrSeason.Count() > 7)
             {
-                @Html.Raw(string.Join(", ", topDodavateleCurrSeason.Take(7).Select(m => $"<a href='/subjekt/{m.ico}'>{await FirmaCache.GetJmenoAsync(m.ico)}</a>")))
+                var firstItems = new List<string>();
+                foreach (var m in topDodavateleCurrSeason.Take(7))
+                {
+                    var jmeno = await FirmaCache.GetJmenoAsync(m.ico);
+                    firstItems.Add($"<a href='/subjekt/{m.ico}'>{jmeno}</a>");
+                }
+
+                @Html.Raw(string.Join(", ", firstItems))
+
                 <span class="collapse" id="topDcurr">
-                    @Html.Raw(string.Join(", ", topDodavateleCurrSeason.Skip(7).Take(13).Select(m => $"<a href='/subjekt/{m.ico}'>{await FirmaCache.GetJmenoAsync(m.ico)}</a>")))
+                    @{
+                        var collapsedItems = new List<string>();
+                        foreach (var m in topDodavateleCurrSeason.Skip(7).Take(13))
+                        {
+                            var jmeno = await FirmaCache.GetJmenoAsync(m.ico);
+                            collapsedItems.Add($"<a href='/subjekt/{m.ico}'>{jmeno}</a>");
+                        }
+                    }
+                    @Html.Raw(string.Join(", ", collapsedItems))
                 </span>
                 <a data-bs-toggle="collapse" href="#topDcurr" style="font-weight:bold">Více... &raquo;</a>
             }
             else
             {
-                @Html.Raw(string.Join(", ", topDodavateleCurrSeason.Take(20).Select(m => $"<a href='/subjekt/{m.ico}'>{await FirmaCache.GetJmenoAsync(m.ico)}</a>")))
+                var allItems = new List<string>();
+                foreach (var m in topDodavateleCurrSeason.Take(20))
+                {
+                    var jmeno = await FirmaCache.GetJmenoAsync(m.ico);
+                    allItems.Add($"<a href='/subjekt/{m.ico}'>{jmeno}</a>");
+                }
+
+                @Html.Raw(string.Join(", ", allItems))
             }
+
         </div>
 
         <h4>Dodavatelé detailně</h4>
@@ -295,19 +319,19 @@
                 new ReportDataSource<(Firma firma, SimpleStat stat)>.Column()
                 {
                     Name = "Zadavatel",
-                    HtmlRender =(m) => $"<a href='{m.firma.GetUrl()}'>{m.firma.Jmeno}</a>"
+                    HtmlRender = (m) => $"<a href='{m.firma.GetUrl()}'>{m.firma.Jmeno}</a>"
                 },
                 new ReportDataSource<(Firma firma, SimpleStat stat)>.Column()
                 {
                     Name = "Počet smluv",
-                    HtmlRender =(m) => $"<a style='float:left' href='/hledatSmlouvy?q={System.Net.WebUtility.UrlEncode(Model.Query + " AND ico:" + m.firma.ICO)}'><i class='fas fa-link' aria-hidden='true'></i></a> {HlidacStatu.Util.RenderData.NiceNumber(m.stat.Pocet)}",
+                    HtmlRender = (m) => $"<a style='float:left' href='/hledatSmlouvy?q={System.Net.WebUtility.UrlEncode(Model.Query + " AND ico:" + m.firma.ICO)}'><i class='fas fa-link' aria-hidden='true'></i></a> {HlidacStatu.Util.RenderData.NiceNumber(m.stat.Pocet)}",
                     OrderValueRender = (m) => HlidacStatu.Util.RenderData.OrderValueFormat(m.stat.Pocet),
                     CssClass = "number"
                 },
                 new ReportDataSource<(Firma firma, SimpleStat stat)>.Column()
                 {
                     Name = "Hodnota smluv",
-                    HtmlRender =(m) => HlidacStatu.Util.RenderData.NicePrice(m.stat.CelkemCena),
+                    HtmlRender = (m) => HlidacStatu.Util.RenderData.NicePrice(m.stat.CelkemCena),
                     OrderValueRender = (m) => HlidacStatu.Util.RenderData.OrderValueFormat(m.stat.CelkemCena),
                     CssClass = "number"
                 }
@@ -316,7 +340,7 @@
             foreach (var zadavatel in topZadavatele)
             {
                 var firma = await FirmaCache.GetAsync(zadavatel.ICO);
-                rdsZadav.AddRow((firma, zadavatel.Summary()));    
+                rdsZadav.AddRow((firma, zadavatel.Summary()));
             }
         }
         @Html.DataToHTMLTable(rdsZadav, dataTableOptions: HtmlExtensions.DatatableOptions(orderColumnIdx: 2, orderDirection: "desc"))
@@ -328,16 +352,40 @@
     <p>
         @if (topZadavateleCurrSeason.Count() > 7)
         {
-            @Html.Raw(string.Join(", ", topZadavateleCurrSeason.Take(7).Select(m => $"<a href='/subjekt/{m.ico}'>{await FirmaCache.GetJmenoAsync(m.ico)}</a>")))
+            var firstItems = new List<string>();
+            foreach (var m in topZadavateleCurrSeason.Take(7))
+            {
+                var jmeno = await FirmaCache.GetJmenoAsync(m.ico);
+                firstItems.Add($"<a href='/subjekt/{m.ico}'>{jmeno}</a>");
+            }
+
+            @Html.Raw(string.Join(", ", firstItems))
+
             <span class="collapse" id="topZcurr">
-                        @Html.Raw(string.Join(", ", topZadavateleCurrSeason.Skip(7).Take(13).Select(m => $"<a href='/subjekt/{m.ico}'>{await FirmaCache.GetJmenoAsync(m.ico)}</a>")))
+                @{
+                    var collapsedItems = new List<string>();
+                    foreach (var m in topZadavateleCurrSeason.Skip(7).Take(13))
+                    {
+                        var jmeno = await FirmaCache.GetJmenoAsync(m.ico);
+                        collapsedItems.Add($"<a href='/subjekt/{m.ico}'>{jmeno}</a>");
+                    }
+                }
+                @Html.Raw(string.Join(", ", collapsedItems))
             </span>
             <a data-bs-toggle="collapse" href="#topZcurr" style="font-weight:bold">Více... &raquo;</a>
         }
         else
         {
-            @Html.Raw(string.Join(", ", topZadavateleCurrSeason.Take(20).Select(m => $"<a href='/subjekt/{m.ico}'>{await FirmaCache.GetJmenoAsync(m.ico)}</a>")))
+            var allItems = new List<string>();
+            foreach (var m in topZadavateleCurrSeason.Take(20))
+            {
+                var jmeno = await FirmaCache.GetJmenoAsync(m.ico);
+                allItems.Add($"<a href='/subjekt/{m.ico}'>{jmeno}</a>");
+            }
+
+            @Html.Raw(string.Join(", ", allItems))
         }
+
     </p>
 
     <h4>Zadavatelé detailně</h4>

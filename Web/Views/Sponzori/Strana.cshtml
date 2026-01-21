@@ -189,7 +189,7 @@
             {
                 Name = "Fyzické osoby",
                 Type = Series.SeriesType.column,
-                Data = SponzoringRepo.SponzoringPerYearAsync(icoStrany, SponzoringRepo.DefaultLastSponzoringYear() - 10, SponzoringRepo.DefaultLastSponzoringYear(), true, false).Result
+                Data = (await SponzoringRepo.SponzoringPerYearAsync(icoStrany, SponzoringRepo.DefaultLastSponzoringYear() - 10, SponzoringRepo.DefaultLastSponzoringYear(), true, false))
                     .Select(x => new SeriesData(x.Key, x.Value))
                     .ToArray(),
                 SeriesTooltip = new SeriesTooltip()
@@ -201,7 +201,7 @@
             {
                 Name = "Firmy",
                 Type = Series.SeriesType.column,
-                Data = SponzoringRepo.SponzoringPerYearAsync(icoStrany, SponzoringRepo.DefaultLastSponzoringYear() - 10, SponzoringRepo.DefaultLastSponzoringYear(), false, true).Result
+                Data = (await SponzoringRepo.SponzoringPerYearAsync(icoStrany, SponzoringRepo.DefaultLastSponzoringYear() - 10, SponzoringRepo.DefaultLastSponzoringYear(), false, true))
                     .Select(x => new SeriesData(x.Key, x.Value))
                     .ToArray(),
                 SeriesTooltip = new SeriesTooltip()

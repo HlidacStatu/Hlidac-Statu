@@ -71,14 +71,14 @@
         .ToDictionary(kv => kv.Key, kv => kv.Value);
 
 
-    ReportDataSource<(KeyValuePair<string, PpPrijem[]> kv, OsobyRolesCache.osobaInfo roles)> rds = new(
-        new ReportDataSource<(KeyValuePair<string, PpPrijem[]> kv, OsobyRolesCache.osobaInfo roles)>.Column()
+    ReportDataSource<(KeyValuePair<string, PpPrijem[]> kv, string firmaJmeno, OsobyRolesCache.osobaInfo roles)> rds = new(
+        new ReportDataSource<(KeyValuePair<string, PpPrijem[]> kv, string firmaJmeno, OsobyRolesCache.osobaInfo roles)>.Column()
         {
             Name = "Organizace",
-            HtmlRender = (m) => { return $"<a href='/organizace/{m.kv.Key}'>{await FirmaCache.GetJmenoAsync(m.kv.Key)}</a>"; },
-            OrderValueRender = (m) => { return $"{await FirmaCache.GetJmenoAsync(m.kv.Key)}"; },
+            HtmlRender = (m) => $"<a href='/organizace/{m.kv.Key}'>{m.firmaJmeno}</a>",
+            OrderValueRender = (m) => $"{m.firmaJmeno}",
         },
-        new ReportDataSource<(KeyValuePair<string, PpPrijem[]> kv, OsobyRolesCache.osobaInfo roles)>.Column()
+        new ReportDataSource<(KeyValuePair<string, PpPrijem[]> kv, string firmaJmeno, OsobyRolesCache.osobaInfo roles)>.Column()
         {
             Name = "Neposkytl plat pro tyto politiky",
             HtmlRender = (m) =>
@@ -100,8 +100,9 @@
         //var platyPerPolitik = vsechnyPlaty.Where(m => m.Nameid == pol).ToArray();
         if (kv.Value.Any())
         {
+            var firmaJmeno = await FirmaCache.GetJmenoAsync(kv.Key);
             var roles = await OsobyRolesCache.GetAsync(kv.Key);
-            rds.AddRow((kv, roles));
+            rds.AddRow((kv, firmaJmeno, roles));
         }
     }
 }
