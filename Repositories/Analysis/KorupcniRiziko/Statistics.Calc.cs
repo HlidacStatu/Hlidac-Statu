@@ -88,36 +88,36 @@ namespace HlidacStatu.Repositories.Analysis.KorupcniRiziko
                     continue;
 
                 var stat = new Statistics() { Rok = year };
+
                 //poradi
-                stat.SubjektOrderedListKIndexAsc = datayear
-                    .Where(m => m.Value.KIndexReady)
-                    .Select(m =>
-                    {
-                        var company = Firmy.GetAsync(m.Key);
-                        return new IcoDetail() { ico = m.Key, kindex = m.Value.KIndex, krajId = company.KrajId };
-                    })
-                    .OrderBy(m => m.kindex)
-                    .ToList();
+                var subjektList = new List<IcoDetail>();
+                foreach (var m in datayear.Where(m => m.Value.KIndexReady))
+                {
+                    var company = await Firmy.GetAsync(m.Key);
+                    subjektList.Add(new IcoDetail() { ico = m.Key, kindex = m.Value.KIndex, krajId = company.KrajId });
+                }
+                stat.SubjektOrderedListKIndexAsc = subjektList.OrderBy(m => m.kindex).ToList();
+
 
                 foreach (KIndexData.KIndexParts part in Enum.GetValues(typeof(KIndexData.KIndexParts)))
                 {
-                    stat.SubjektOrderedListPartsAsc.Add(part, datayear
+                    var filteredData = datayear
                         .Where(m => m.Value.KIndexReady)
-                        .Where(m => m.Value.KIndexVypocet.Radky.Any(r => r.VelicinaPart == part))
-                        .Select(m =>
+                        .Where(m => m.Value.KIndexVypocet.Radky.Any(r => r.VelicinaPart == part));
+
+                    var slist = new List<IcoDetail>();
+                    foreach (var m in filteredData)
+                    {
+                        var company = await Firmy.GetAsync(m.Key);
+                        slist.Add(new IcoDetail()
                         {
-                            var company = Firmy.GetAsync(m.Key);
-                            return new IcoDetail()
-                            {
-                                ico = m.Key,
-                                kindex = m.Value.KIndexVypocet.Radky.First(r => r.VelicinaPart == part).Hodnota,
-                                krajId = company.KrajId
-                            };
-                            
-                        })
-                        .OrderBy(m => m.kindex)
-                        .ToList()
-                    );
+                            ico = m.Key,
+                            kindex = m.Value.KIndexVypocet.Radky.First(r => r.VelicinaPart == part).Hodnota,
+                            krajId = company.KrajId
+                        });
+                    }
+
+                    stat.SubjektOrderedListPartsAsc.Add(part, slist.OrderBy(m => m.kindex).ToList());
                 }
 
                 //prumery

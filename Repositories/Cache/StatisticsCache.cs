@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -216,44 +217,32 @@ public class StatisticsCache
                 new Devmasters.DT.DateInterval(v.RelFrom ?? DateTime.MinValue, v.RelTo ?? DateTime.MaxValue));
         }
 
-        var maxConcurrentTasks = 10;
-        var semaphore = new SemaphoreSlim(maxConcurrentTasks);
-
-        var perIcoStatTasks = firmy_maxrok
-            .Select(m => new { firma = Firmy.GetAsync(m.Key), interval = m.Value })
-            .Where(m => m.firma?.Valid == true)
-            .Select(async m =>
-            {
-                await semaphore.WaitAsync();
-                try
-                {
-                    var stats = await m.firma.StatistikaRegistruSmluvAsync();
-                    return new
-                    {
-                        f = m.firma,
-                        ss = new StatisticsSubjectPerYear<Smlouva.Statistics.Data>(
-                            m.firma.ICO,
-                            stats.Filter(fi => fi.Key >= m.interval.From?.Year && fi.Key <= m.interval.To?.Year)
-                        )
-                    };
-                }
-                finally
-                {
-                    semaphore.Release();
-                }
-            })
-            .ToArray();
-
-        var perIcoStat = await Task.WhenAll(perIcoStatTasks);
-
-        foreach (var it in perIcoStat)
+        var perIcoStatList = new ConcurrentBag<(Firma firma, StatisticsSubjectPerYear<Smlouva.Statistics.Data> ss)>();
+        
+        await Parallel.ForEachAsync(firmy_maxrok, new ParallelOptions { MaxDegreeOfParallelism = 10 }, async (kvp, ct) =>
         {
-            if (it.f.PatrimStatu() && statni.ContainsKey(it.f.ICO) == false)
-                statni.Add(it.f.ICO, it.ss);
-            else if (it.f.JsemNeziskovka() && nezisk.ContainsKey(it.f.ICO) == false)
-                nezisk.Add(it.f.ICO, it.ss);
-            else if (soukr.ContainsKey(it.f.ICO) == false)
-                soukr.Add(it.f.ICO, it.ss);
+            var firma = await Firmy.GetAsync(kvp.Key);
+            if (firma?.Valid == true)
+            {
+                var stats = await firma.StatistikaRegistruSmluvAsync();
+                var result = (firma, 
+                    new StatisticsSubjectPerYear<Smlouva.Statistics.Data>(
+                    firma.ICO,
+                    stats.Filter(fi => fi.Key >= kvp.Value.From?.Year && fi.Key <= kvp.Value.To?.Year)));
+                
+                
+                perIcoStatList.Add(result);
+            }
+        });
+
+        foreach (var it in perIcoStatList)
+        {
+            if (it.firma.PatrimStatu() && statni.ContainsKey(it.firma.ICO) == false)
+                statni.Add(it.firma.ICO, it.ss);
+            else if (it.firma.JsemNeziskovka() && nezisk.ContainsKey(it.firma.ICO) == false)
+                nezisk.Add(it.firma.ICO, it.ss);
+            else if (soukr.ContainsKey(it.firma.ICO) == false)
+                soukr.Add(it.firma.ICO, it.ss);
         }
 
         res.StatniFirmy = statni;
@@ -522,46 +511,32 @@ public class StatisticsCache
             firmy_maxrok.TryAdd(v.To.Id,
                 new Devmasters.DT.DateInterval(v.RelFrom ?? DateTime.MinValue, v.RelTo ?? DateTime.MaxValue));
         }
-
-        var semaphore = new SemaphoreSlim(20);
-
-        var perIcoStat = await Task.WhenAll(
-            firmy_maxrok
-                .Select(m => new { firma = Firmy.GetAsync(m.Key), interval = m.Value })
-                .Where(m => m.firma?.Valid == true)
-                .Select(async m =>
-                {
-                    await semaphore.WaitAsync();
-                    try
-                    {
-                        var stat = await m.firma.StatistikaDotaciAsync();
-                        return new
-                        {
-                            f = m.firma,
-                            ss = new StatisticsSubjectPerYear<Firma.Statistics.Dotace>(
-                                m.firma.ICO,
-                                stat.Filter(fi =>
-                                    fi.Key >= m.interval.From?.Year &&
-                                    fi.Key <= m.interval.To?.Year)
-                            )
-                        };
-                    }
-                    finally
-                    {
-                        semaphore.Release();
-                    }
-                })
-        );
-
+        
+        var perIcoStat = new ConcurrentBag<(Firma Firma, StatisticsSubjectPerYear<Firma.Statistics.Dotace> DotaceStat)>();
+        
+        await Parallel.ForEachAsync(firmy_maxrok, new ParallelOptions { MaxDegreeOfParallelism = 20 }, async (kvp, ct) =>
+        {
+            var firma = await Firmy.GetAsync(kvp.Key);
+            if (firma?.Valid == true)
+            {
+                var stat = await firma.StatistikaDotaciAsync();
+                (Firma Firma, StatisticsSubjectPerYear<Firma.Statistics.Dotace>) result = (firma: firma, 
+                    new StatisticsSubjectPerYear<Firma.Statistics.Dotace>(
+                        firma.ICO,
+                        stat.Filter(fi => fi.Key >= kvp.Value.From?.Year && fi.Key <= kvp.Value.To?.Year)));
+        
+                perIcoStat.Add(result);
+            }
+        });
 
         foreach (var fStat in perIcoStat)
         {
-            if (fStat.f.PatrimStatu() && statni.ContainsKey(fStat.f.ICO) == false)
-                statni.Add(fStat.f.ICO, fStat.ss);
-            else if (fStat.f.JsemNeziskovka() && nezisk.ContainsKey(fStat.f.ICO) == false)
-                nezisk.Add(fStat.f.ICO, fStat.ss);
-            else if (soukr.ContainsKey(fStat.f.ICO) == false)
-                soukr.Add(fStat.f.ICO, fStat.ss);
+            if (fStat.Firma.PatrimStatu() && statni.ContainsKey(fStat.Firma.ICO) == false)
+                statni.Add(fStat.Firma.ICO, fStat.DotaceStat);
+            else if (fStat.Firma.JsemNeziskovka() && nezisk.ContainsKey(fStat.Firma.ICO) == false)
+                nezisk.Add(fStat.Firma.ICO, fStat.DotaceStat);
+            else if (soukr.ContainsKey(fStat.Firma.ICO) == false)
+                soukr.Add(fStat.Firma.ICO, fStat.DotaceStat);
         }
 
         res.StatniFirmy = statni;
