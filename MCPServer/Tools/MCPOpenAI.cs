@@ -243,7 +243,7 @@ url - a URL to the document or search result item. Useful for citing specific re
                             };
                             break;
                         case "firma":
-                            var firma = await Firmy.GetAsync(value);
+                            var firma = await FirmaCache.GetAsync(value);
                             res = new OpenAiResultItem
                             {
                                 id = firma.ICO,

@@ -110,7 +110,7 @@
     var coreRDS = new ReportDataSource<KeyValuePair<Firma, StatisticsPerYear<Smlouva.Statistics.Data> >>(coreColumns);
     foreach (var i in coreData)
     {
-        var firma = await Firmy.GetAsync(i.Key);
+        var firma = await FirmaCache.GetAsync(i.Key);
         coreRDS.AddRow(
             new KeyValuePair<Firma, StatisticsPerYear<Smlouva.Statistics.Data>>(firma, i.Value)
             );

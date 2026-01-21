@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using HlidacStatu.Connectors;
 using HlidacStatu.Entities.KIndex;
+using HlidacStatu.Repositories.Cache;
 using Nest;
 
 namespace HlidacStatu.Repositories.Analysis.KorupcniRiziko
@@ -93,7 +94,7 @@ namespace HlidacStatu.Repositories.Analysis.KorupcniRiziko
                 var subjektList = new List<IcoDetail>();
                 foreach (var m in datayear.Where(m => m.Value.KIndexReady))
                 {
-                    var company = await Firmy.GetAsync(m.Key);
+                    var company = await FirmaCache.GetAsync(m.Key);
                     subjektList.Add(new IcoDetail() { ico = m.Key, kindex = m.Value.KIndex, krajId = company.KrajId });
                 }
                 stat.SubjektOrderedListKIndexAsc = subjektList.OrderBy(m => m.kindex).ToList();
@@ -108,7 +109,7 @@ namespace HlidacStatu.Repositories.Analysis.KorupcniRiziko
                     var slist = new List<IcoDetail>();
                     foreach (var m in filteredData)
                     {
-                        var company = await Firmy.GetAsync(m.Key);
+                        var company = await FirmaCache.GetAsync(m.Key);
                         slist.Add(new IcoDetail()
                         {
                             ico = m.Key,

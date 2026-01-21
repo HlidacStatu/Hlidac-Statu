@@ -7,6 +7,7 @@ using System.Text;
 using System;
 using System.Linq;
 using HlidacStatu.LibCore.Filters;
+using HlidacStatu.Repositories.Cache;
 
 namespace PlatyUredniku.Controllers;
 
@@ -26,7 +27,7 @@ public class HomeController : Controller
         if (HlidacStatu.Util.DataValidators.CheckCZICO(id))
         {
             //ico
-            var f = await Firmy.GetAsync(id);
+            var f = await FirmaCache.GetAsync(id);
             if (f?.Valid == true)
                 ds = f.DatovaSchranka;
 

@@ -7,6 +7,7 @@
 @using HlidacStatu.Repositories
 @using Devmasters.Enums
 @using HlidacStatu.DS.Graphs
+@using HlidacStatu.Repositories.Cache
 
 @if (Model.Osoba == null)
 {
@@ -27,7 +28,7 @@ else
             await semaphore.WaitAsync();
             try
             {
-                var f = await Firmy.GetAsync(ico);
+                var f = await FirmaCache.GetAsync(ico);
                 StatisticsSubjectPerYear<Smlouva.Statistics.Data> stat = null;
                 if (f != null)
                     stat= await f.StatistikaRegistruSmluvAsync();

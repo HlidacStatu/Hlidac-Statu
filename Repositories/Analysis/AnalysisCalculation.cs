@@ -148,7 +148,7 @@ namespace HlidacStatu.Repositories.Analysis
                         List<Firma> urady = [];
                         foreach (var icoF in allIco)
                         {
-                            var f = await Firmy.GetAsync(icoF);
+                            var f = await FirmaCache.GetAsync(icoF);
                             if (f is not null && f.PatrimStatu())
                             {
                                 urady.Add(f);
@@ -290,7 +290,7 @@ namespace HlidacStatu.Repositories.Analysis
                         var objednatelIco = s.Platce.ico;
                         if (!string.IsNullOrEmpty(objednatelIco))
                         {
-                            Firma ff = await Firmy.GetAsync(objednatelIco);
+                            Firma ff = await FirmaCache.GetAsync(objednatelIco);
                             if (!ff.Valid || !ff.PatrimStatu())
                                 goto end;
 
@@ -399,7 +399,7 @@ namespace HlidacStatu.Repositories.Analysis
                                 if (!string.IsNullOrEmpty(v.To.Id))
                                 {
                                     //check if it's GovType company
-                                    Firma f = await Firmy.GetAsync(v.To.Id);
+                                    Firma f = await FirmaCache.GetAsync(v.To.Id);
 
                                     if (f == null || f.Valid == false)
                                         continue; //unknown company, skip
@@ -532,7 +532,7 @@ namespace HlidacStatu.Repositories.Analysis
             _logger.Debug("GetFirmyCasovePodezreleZalozene - getting first smlouva for all ico from ES");
             await Devmasters.Batch.Manager.DoActionForAllAsync<string, object>(allIcos, async (ico, param) =>
                 {
-                    Firma ff = await Firmy.GetAsync(ico);
+                    Firma ff = await FirmaCache.GetAsync(ico);
                     if (ff?.Valid == true)
                     {
                         if (ff.PatrimStatu()) //statni firmy tam nechci
@@ -614,7 +614,7 @@ namespace HlidacStatu.Repositories.Analysis
                 if (missingEssentialData)
                     continue;
 
-                Firma firma = await Firmy.GetAsync(dotace.Recipient.Ico);
+                Firma firma = await FirmaCache.GetAsync(dotace.Recipient.Ico);
 
                 if (firma.PatrimStatu()) //nechceme státní firmy
                     continue;
@@ -639,7 +639,7 @@ namespace HlidacStatu.Repositories.Analysis
                         HlidacStatu.Lib.Analytics.StatisticsSubjectPerYear<Smlouva.Statistics.Data>>();
                 await Devmasters.Batch.Manager.DoActionForAllAsync(allicos, async ico =>
                     {
-                        var firma = await Firmy.GetAsync(ico);
+                        var firma = await FirmaCache.GetAsync(ico);
                         if (firma != null)
                         {
                             var stat = await firma.StatistikaRegistruSmluvAsync();
@@ -779,7 +779,7 @@ namespace HlidacStatu.Repositories.Analysis
             var result = new List<CalculatedChangeBetweenYears<string>>();
             foreach (var item in filtered)
             {
-                var firma = await Firmy.GetAsync(item.data);
+                var firma = await FirmaCache.GetAsync(item.data);
                 if (firma.JsemSoukromaFirma())
                 {
                     result.Add(item);
@@ -833,7 +833,7 @@ namespace HlidacStatu.Repositories.Analysis
             var result = new List<CalculatedChangeBetweenYears<string>>();
             foreach (var item in filtered)
             {
-                var firma = await Firmy.GetAsync(item.data);
+                var firma = await FirmaCache.GetAsync(item.data);
                 if (firma.JsemSoukromaFirma())
                 {
                     result.Add(item);

@@ -8,6 +8,7 @@ using HlidacStatu.Connectors;
 using HlidacStatu.Entities;
 using Serilog;
 using HlidacStatu.Extensions;
+using HlidacStatu.Repositories.Cache;
 using HlidacStatu.Repositories.Searching;
 
 namespace HlidacStatu.Repositories
@@ -80,7 +81,7 @@ namespace HlidacStatu.Repositories
             }
 
 
-            Firma f = await Firmy.GetAsync(item.Recipient.Ico);
+            Firma f = await FirmaCache.GetAsync(item.Recipient.Ico);
             DateTime dotaceDate = new DateTime(item.ApprovedYear ?? 1970, 1, 1);
 
             if (f?.Valid == true && (item.Hints.RecipientStatus == -1 || forceRewriteHints))

@@ -4,6 +4,7 @@
 @using HlidacStatu.Lib.Analytics
 @using HlidacStatu.Repositories
 @using HlidacStatu.DS.Graphs
+@using HlidacStatu.Repositories.Cache
 @using HlidacStatu.Repositories.Statistics
 @using HlidacStatu.XLib
 @model HlidacStatu.Entities.Osoba
@@ -86,7 +87,7 @@
                 {
                     <li>
                         <a asp-controller="Subjekt" asp-action="Index" asp-route-id="@stat.Key">
-                            @(await Firmy.GetJmenoAsync(stat.Key))
+                            @(await FirmaCache.GetJmenoAsync(stat.Key))
                         </a>
                         (@Html.Raw(stat.Value.Summary().ToNiceLinkString(null, true, customUrl: $"/hledat?q=ico:{stat.Key}")) od
                         2016
@@ -164,7 +165,7 @@
                 {
                     <li>
                         <a asp-controller="Subjekt" asp-action="Index" asp-route-id="@stat.Key">
-                            @(await Firmy.GetJmenoAsync(stat.Key))
+                            @(await FirmaCache.GetJmenoAsync(stat.Key))
                         </a>
                         (@Html.Raw(stat.Value.Summary().ToNiceLinkString(null, true, customUrl: $"/hledat?q=ico:{stat.Key}")) od
                         2016
@@ -206,7 +207,7 @@
             await semaphore.WaitAsync();
             try
             {
-                var f = await Firmy.GetAsync(g.ico);
+                var f = await FirmaCache.GetAsync(g.ico);
 
                 StatisticsSubjectPerYear<Smlouva.Statistics.Data> stat = new();
                 if (f != null)

@@ -3,6 +3,7 @@
 @using HlidacStatu.XLib.Render
 @using HlidacStatu.Repositories
 @using HlidacStatu.Entities
+@using HlidacStatu.Repositories.Cache
 @using Graph = HlidacStatu.DS.Graphs.Graph
 
 @{
@@ -35,7 +36,7 @@
                 {
                     Name = "Politická strana",
                     HtmlRender = (x) =>
-                        $"<a href=\"/subjekt/{x.Ico}\">{Firmy.GetJmenoAsync(x.Ico)}</a>"
+                        $"<a href=\"/subjekt/{x.Ico}\">{await FirmaCache.GetJmenoAsync(x.Ico)}</a>"
                 },
                 new ReportDataSource<(int Rok, string Ico, decimal Dar, string Poznamka)>.Column()
                 {
@@ -80,7 +81,7 @@
             Name = "Sponzorující firma",
             HtmlRender = (x) =>
             {
-                return $"<a href='/subjekt/{x.Darceico}'>{Firmy.GetJmenoAsync(x.Darceico)}</a>"
+                return $"<a href='/subjekt/{x.Darceico}'>{await FirmaCache.GetJmenoAsync(x.Darceico)}</a>"
                        + $"<br/>{Html.RenderVazbyAsync(x.Vazby)}";
             },
             TextRender = (x) => x.DarceJmeno
@@ -94,7 +95,7 @@
         {
             Name = "Politická strana",
             HtmlRender = (x) =>
-                $"<a href=\"/subjekt/{x.Ico}\">{Firmy.GetJmenoAsync(x.Ico)}</a>"
+                $"<a href=\"/subjekt/{x.Ico}\">{await FirmaCache.GetJmenoAsync(x.Ico)}</a>"
         }, new()
         {
             Name = "Celkem darovali",
@@ -111,7 +112,7 @@
         foreach (var dar in sponzoringFirma)
         {
             Graph.Edge[]? vazby = await OsobaVazbyRepo.VazbyProIcoCachedAsync(Model, dar.IcoDarce);
-            var jmenoDarce = await Firmy.GetJmenoAsync(dar.IcoDarce);
+            var jmenoDarce = await FirmaCache.GetJmenoAsync(dar.IcoDarce);
             sponzoringFirmyData.AddRow((dar.DarovanoDne?.Year ?? 0, dar.IcoPrijemce, dar.IcoDarce, jmenoDarce, dar.Hodnota ?? 0, dar.Popis, vazby));
         }
 

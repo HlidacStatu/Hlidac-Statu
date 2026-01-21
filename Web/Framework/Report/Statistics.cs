@@ -6,6 +6,7 @@ using Nest;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
+using HlidacStatu.Repositories.Cache;
 
 namespace HlidacStatu.Web.Framework.Report
 {
@@ -219,11 +220,11 @@ namespace HlidacStatu.Web.Framework.Report
 
             foreach (Nest.KeyedBucket<object> val in ((BucketAggregate)res.Aggregations["perIco"]).Items)
             {
-                Firma f = await Firmy.GetAsync((string)val.Key);
+                Firma f = await FirmaCache.GetAsync((string)val.Key);
                 if (f != null && (!f.PatrimStatu() || platce))
                 {
                     rdsPerIco.AddRow(
-                        new Tuple<string, string>(await Firmy.GetJmenoAsync((string)val.Key), (string)val.Key),
+                        new Tuple<string, string>(await FirmaCache.GetJmenoAsync((string)val.Key), (string)val.Key),
                         val.DocCount.ToString()
                     );
                 }
@@ -285,11 +286,11 @@ namespace HlidacStatu.Web.Framework.Report
             ;
             foreach (Nest.KeyedBucket<object> val in ((BucketAggregate)res.Aggregations["perPrice"]).Items)
             {
-                Firma f = await Firmy.GetAsync((string)val.Key);
+                Firma f = await FirmaCache.GetAsync((string)val.Key);
                 if (f != null && (!f.PatrimStatu() || platce))
                 {
                     rdsPerPrice.AddRow(
-                        new Tuple<string, string>(await Firmy.GetJmenoAsync((string)val.Key), (string)val.Key),
+                        new Tuple<string, string>(await FirmaCache.GetJmenoAsync((string)val.Key), (string)val.Key),
                         val.Sum("sumincome").Value
                     );
                 }

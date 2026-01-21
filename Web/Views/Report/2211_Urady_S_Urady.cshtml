@@ -2,6 +2,7 @@
 @using HlidacStatu.Entities
 @using HlidacStatu.Entities.Analysis
 @using HlidacStatu.Repositories
+@using HlidacStatu.Repositories.Cache
 
 @{
         Layout = "_ReportLayout";
@@ -48,7 +49,7 @@
         @foreach (var uu in topDodavUrady)
         {
             <tr>
-                <td><a href="/subjekt/@uu.Key">@(await Firmy.GetJmenoAsync(uu.Key))</a></td>
+                <td><a href="/subjekt/@uu.Key">@(await FirmaCache.GetJmenoAsync(uu.Key))</a></td>
                 <td>@uu.Value.SumStat.ToNiceString(null, false)</td>
                 <td>
                     @foreach (var odb in uu.Value.Odberatele.OrderByDescending(o => o.Statistic.Summary.CelkemCena).Take(10))

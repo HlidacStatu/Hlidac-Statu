@@ -17,6 +17,7 @@ using HlidacStatu.Web.Framework;
 using Serilog;
 using HlidacStatu.Lib.Web.UI.Attributes;
 using HlidacStatu.LibCore.Filters;
+using HlidacStatu.Repositories.Cache;
 
 namespace HlidacStatu.Web.Controllers
 {
@@ -97,7 +98,7 @@ namespace HlidacStatu.Web.Controllers
 
             foreach (var i in id.Split(new char[] { ' ', ',', ';' }, StringSplitOptions.RemoveEmptyEntries))
             {
-                var f = await Firmy.GetAsync(i);
+                var f = await FirmaCache.GetAsync(i);
                 if (f?.Valid == true)
                 {
                     SubjectWithKIndexAnnualData data = new SubjectWithKIndexAnnualData()
@@ -173,7 +174,7 @@ namespace HlidacStatu.Web.Controllers
             // create a task, so user doesn't have to wait for anything
             _ = Task.Run(async () =>
             {
-                var f = await Firmy.GetAsync(data);
+                var f = await FirmaCache.GetAsync(data);
                 if (f?.Valid == true)
                 {
 
@@ -248,7 +249,7 @@ text zpravy: {txt}";
         public async Task<JsonResult> KindexForIco(string id, int? rok = null)
         {
             rok = await KIndexRepo.FixKindexYearAsync(rok);
-            var f = await Firmy.GetAsync(Util.ParseTools.NormalizeIco(id));
+            var f = await FirmaCache.GetAsync(Util.ParseTools.NormalizeIco(id));
             if (f?.Valid == true)
             {
                 var kidx = await KIndex.GetCachedAsync(Util.ParseTools.NormalizeIco(id));
@@ -326,7 +327,7 @@ text zpravy: {txt}";
 
                 foreach (var i in ico.Split(new char[] { ' ', ',', ';' }, StringSplitOptions.RemoveEmptyEntries))
                 {
-                    var f = await Firmy.GetAsync(i);
+                    var f = await FirmaCache.GetAsync(i);
                     if (f?.Valid == true)
                     {
                         var kidx = await KIndex.GetCachedAsync(Util.ParseTools.NormalizeIco(i), refreshCache: true);

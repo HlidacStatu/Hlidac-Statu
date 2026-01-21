@@ -33,7 +33,7 @@
         icoStrany = await ZkratkaStranyRepo.IcoStranyAsync(System.Net.WebUtility.UrlDecode((string)Model));
 
     string stranaZkratka = "";
-    Firma strana = await Firmy.GetAsync(icoStrany);
+    Firma strana = await FirmaCache.GetAsync(icoStrany);
     if (strana?.Valid != true)
     {
         <text>
@@ -122,7 +122,7 @@
     if (firmySponzori.Any())
     {
         var topF = firmyTopSponzori.First();
-        topFirma = await Firmy.GetAsync(topF.sponz.Id);
+        topFirma = await FirmaCache.GetAsync(topF.sponz.Id);
         topFirmaAmount = topF.sponz.DarCelkem;
     }
 

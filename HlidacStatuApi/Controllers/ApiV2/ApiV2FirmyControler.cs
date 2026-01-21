@@ -5,6 +5,7 @@ using HlidacStatu.DS.Api.Firmy;
 using HlidacStatu.Entities;
 using HlidacStatu.Extensions;
 using HlidacStatu.Repositories;
+using HlidacStatu.Repositories.Cache;
 using HlidacStatuApi.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -31,7 +32,7 @@ namespace HlidacStatuApi.Controllers.ApiV2
         {
             try
             {
-                var f = await Firmy.GetAsync(ico);
+                var f = await FirmaCache.GetAsync(ico);
                 if (!(f?.Valid == true ))
                 {
                     return NotFound($"Firma {ico} nenalezena.");

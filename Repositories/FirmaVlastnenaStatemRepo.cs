@@ -17,6 +17,7 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.Serialization;
+using HlidacStatu.Repositories.Cache;
 using ZiggyCreatures.Caching.Fusion;
 using static HlidacStatu.Entities.Firma;
 
@@ -591,7 +592,7 @@ and (esa2010 in (" + string.Join(",", vzdySoukr_ESA2010.Select(m => $"'{m}'")) +
             System.Collections.Concurrent.ConcurrentBag<(string, string)> foundDebugCheckIco = new();
             await Devmasters.Batch.Manager.DoActionForAllAsync<string, object>(bagOfIco, async (ico, obj) =>
                 {
-                    var f = await Firmy.GetAsync(ico);
+                    var f = await FirmaCache.GetAsync(ico);
                     if (f?.Valid == true && FirmaVlastnenaStatemRepo.MuzeBytStatni_PodlePravniFormaKod(f.Kod_PF))
                     {
                         List<string> subjIco = new List<string>();
@@ -601,7 +602,7 @@ and (esa2010 in (" + string.Join(",", vzdySoukr_ESA2010.Select(m => $"'{m}'")) +
                         subjIco.AddRange(vazby.Select(m => Util.ParseTools.NormalizeIco(m.To.Id)));
                         foreach (var inIc in subjIco)
                         {
-                            var ff = await Firmy.GetAsync(inIc);
+                            var ff = await FirmaCache.GetAsync(inIc);
                             if (ff?.Valid == true
                                 && FirmaVlastnenaStatemRepo.MuzeBytStatni_PodlePravniFormaKod(ff.Kod_PF)
                                 && OVM_Nikdy_nejsou_statni_Filter_ESA2010_JeSoukrome(ff.ESA2010) == false

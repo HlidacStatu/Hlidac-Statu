@@ -1215,7 +1215,16 @@
                     V roce @currentSeasonYear byly největšími smluvními
                     dodavateli @(Model.JsemOVM() ? "úřadu" : "subjektu") společnosti
                     <ul>
-                        @Html.Raw(string.Join("", topDodavatele.Take(6).Select(m => $"<li><a href='/subjekt/{m}'>{Firmy.GetJmenoAsync(m)}</a></li>")))
+                        @{
+                            var items = new List<string>();
+                            foreach (var m in topDodavatele.Take(6))
+                            {
+                                var jmeno = await FirmaCache.GetJmenoAsync(m);
+                                items.Add($"<li><a href='/subjekt/{m}'>{jmeno}</a></li>");
+                            }
+                        }
+                        
+                        @Html.Raw(string.Join("", items))
                     </ul>
                 </p>
                 <p class="text-center">
@@ -1245,7 +1254,16 @@
                     V roce @currentSeasonYear byly největšími smluvními
                     odběrateli @(Model.JsemOVM() ? "úřadu" : "subjektu") společnosti
                     <ul>
-                        @Html.Raw(string.Join("", topOdberatele.Take(6).Select(m => $"<li><a href='/subjekt/{m}'>{Firmy.GetJmenoAsync(m)}</a></li>")))
+                        @{
+                            var items = new List<string>();
+                            foreach (var m in topOdberatele.Take(6))
+                            {
+                                var jmeno = await FirmaCache.GetJmenoAsync(m);
+                                items.Add($"<li><a href='/subjekt/{m}'>{jmeno}</a></li>");
+                            }
+                            @Html.Raw(string.Join("", items))
+
+                        }
                     </ul>
                 </p>
                 <p class="text-center">
@@ -1276,7 +1294,7 @@
         {
             var numPercent = "0";
             var sumPercent = "0";
-            var stat = await (await Firmy.GetAsync(Model.ICO)).StatistikaRegistruSmluvAsync();
+            var stat = await (await FirmaCache.GetAsync(Model.ICO)).StatistikaRegistruSmluvAsync();
             if (stat.Summary().PocetSmluv > 0)
             {
                 numPercent = ((double)stat.Summary().PocetSmluvSponzorujiciFirmy / (double)stat.Summary().PocetSmluv).ToString("P2");

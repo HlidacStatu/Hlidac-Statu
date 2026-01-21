@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using HlidacStatu.Entities;
+using HlidacStatu.Repositories.Cache;
 using HlidacStatu.Util;
 using Microsoft.EntityFrameworkCore;
 
@@ -21,7 +22,7 @@ namespace HlidacStatu.Repositories
         {
             if (DataValidators.CheckCZICO(Devmasters.TextUtil.NormalizeToNumbersOnly(zkratka)))
             {
-                var f = await Firmy.GetAsync(Devmasters.TextUtil.NormalizeToNumbersOnly(zkratka));
+                var f = await FirmaCache.GetAsync(Devmasters.TextUtil.NormalizeToNumbersOnly(zkratka));
                 if (f?.Valid == true && f.Kod_PF == 711)
                     return Devmasters.TextUtil.NormalizeToNumbersOnly(zkratka);
                 else

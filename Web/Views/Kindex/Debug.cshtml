@@ -3,8 +3,9 @@
 @using HlidacStatu.Entities
 @using HlidacStatu.Entities.KIndex
 @using HlidacStatu.Repositories
+@using HlidacStatu.Repositories.Cache
 @{
-    var f = await Firmy.GetAsync((string)ViewBag.ICO);
+    var f = await FirmaCache.GetAsync((string)ViewBag.ICO);
     ViewBag.Title = "Index klíčových rizik";
     ViewBag.SubTitle = f.Jmeno;
 }
@@ -68,7 +69,7 @@
 
 <div class="p-5 mb-4 bg-jumbo rounded-3">
     <h1>K–Index</h1>
-    <p>Index klíčových rizik pro <b>@(await Firmy.GetJmenoAsync(Model.Ico)) (@Model.Ico)</b></p>
+    <p>Index klíčových rizik pro <b>@(await FirmaCache.GetJmenoAsync(Model.Ico)) (@Model.Ico)</b></p>
 </div>
 
 <div class="row">

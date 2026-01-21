@@ -36,7 +36,7 @@
                 {
                     Name = "Politická strana",
                     HtmlRender =(x) =>
-                    $"<a href=\"/subjekt/{x.Ico}\">{Firmy.GetJmenoAsync(x.Ico)}</a>"
+                    $"<a href=\"/subjekt/{x.Ico}\">{await FirmaCache.GetJmenoAsync(x.Ico)}</a>"
                 },
                 new ReportDataSource<(int Rok, string Ico, decimal Dar, string Poznamka)>.Column()
                 {

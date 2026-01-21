@@ -1,4 +1,5 @@
 @using HlidacStatu.Repositories
+@using HlidacStatu.Repositories.Cache
 @using HlidacStatu.XLib.Render
 @using Microsoft.AspNetCore.Mvc.TagHelpers
 
@@ -38,7 +39,7 @@
     };
 
     ViewBag.Title = "Hlídač dotací";
-    ViewBag.SubTitle = $"{(string.IsNullOrWhiteSpace(icoPoskytovatele) ? "" : Firmy.GetJmenoAsync(icoPoskytovatele)+": ")} Přehled největších dotačních programů{yearText} {typDotaceText}";
+    ViewBag.SubTitle = $"{(string.IsNullOrWhiteSpace(icoPoskytovatele) ? "" : await FirmaCache.GetJmenoAsync(icoPoskytovatele)+": ")} Přehled největších dotačních programů{yearText} {typDotaceText}";
 }
 
 @section breadcrumb

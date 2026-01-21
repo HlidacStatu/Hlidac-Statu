@@ -36,7 +36,7 @@
     var subjs = new List<Firma>();
     foreach (var m in subjIco)
     {
-        var firma = await Firmy.GetAsync(m.Ico);
+        var firma = await FirmaCache.GetAsync(m.Ico);
         if (firma != null)
         {
             subjs.Add(firma);

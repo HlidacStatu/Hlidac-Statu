@@ -2,6 +2,7 @@
 @using System.Linq
 @using HlidacStatu.Entities
 @using HlidacStatu.Repositories
+@using HlidacStatu.Repositories.Cache
 @using HlidacStatu.Util
 
 @section scripts
@@ -67,7 +68,7 @@
                 var items = new List<string>();
                 foreach (var m in Model)
                 {
-                    var jmeno = await Firmy.GetJmenoAsync(m.Ico);
+                    var jmeno = await FirmaCache.GetJmenoAsync(m.Ico);
                     items.Add("<li>" + jmeno + "</li>");
                 }
             }
@@ -114,7 +115,7 @@
                 @foreach (var ki in Model)
                 {
                     <td>
-                        <b>@(await Firmy.GetJmenoAsync(ki.Ico))</b>
+                        <b>@(await FirmaCache.GetJmenoAsync(ki.Ico))</b>
                         <a href="/kindex/debug/@ki.Ico"><i class="fas fa-chart-line"></i></a>
                         <br/>@ki.Ico
                     </td>
@@ -433,7 +434,7 @@
                 @foreach (var ki in Model)
                 {
                     <td>
-                        <b>@(await Firmy.GetJmenoAsync(ki.Ico))</b>
+                        <b>@(await FirmaCache.GetJmenoAsync(ki.Ico))</b>
                     </td>
                 }
             </tr>

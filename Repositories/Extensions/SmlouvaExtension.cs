@@ -42,7 +42,7 @@ namespace HlidacStatu.Extensions
             //sponzori
             foreach (var subj in smlouva.Prijemce.Union(new Smlouva.Subjekt[] { smlouva.Platce }))
             {
-                var firma = await Firmy.GetAsync(subj.ico);
+                var firma = await FirmaCache.GetAsync(subj.ico);
                 if (firma?.Valid == true && await firma.IsSponzorAsync() && firma.JsemSoukromaFirma())
                 {
                     var infoFact = await FirmaExtension.GetTwoSponzoringInfoFactsForFirmaAsync(firma);
@@ -142,7 +142,7 @@ namespace HlidacStatu.Extensions
                                         + " a další";
                         }
 
-                        f.Add(new InfoFact($"V dodavateli {Firmy.GetJmenoAsync(ss.ico)} se "
+                        f.Add(new InfoFact($"V dodavateli {await FirmaCache.GetJmenoAsync(ss.ico)} se "
                                            + Devmasters.Lang.CS.Plural.Get(politici.Count()
                                                , " angažuje jedna politicky angažovaná osoba - "
                                                , " angažují {0} politicky angažované osoby - "

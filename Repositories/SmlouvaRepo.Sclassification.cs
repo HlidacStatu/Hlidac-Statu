@@ -225,7 +225,7 @@ namespace HlidacStatu.Repositories
                 var smluvniStrany = new List<Firma>();
                 foreach (var strana in smlouva.Prijemce.Concat([smlouva.Platce]))
                 {
-                    smluvniStrany.Add(await Firmy.GetAsync(strana.ico));
+                    smluvniStrany.Add(await FirmaCache.GetAsync(strana.ico));
                 }
                 
                 if (types.Count(m => vyjimkyClassif.Contains(m.Key)) > 0

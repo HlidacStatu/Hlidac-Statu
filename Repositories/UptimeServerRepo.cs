@@ -5,7 +5,7 @@ using Microsoft.Data.SqlClient;
 using System.Linq;
 using System.Threading.Tasks;
 using HlidacStatu.Entities;
-
+using HlidacStatu.Repositories.Cache;
 using InfluxDB.Client.Api.Domain;
 using InfluxDB.Client.Writes;
 
@@ -22,7 +22,7 @@ namespace HlidacStatu.Repositories
             if (string.IsNullOrEmpty(server.ICO))
                 return string.Empty;
             else
-                return await Firmy.GetJmenoAsync(server.ICO);
+                return await FirmaCache.GetJmenoAsync(server.ICO);
         }
         public static void SaveAlert(int serverId, Alert.AlertStatus status)
         {

@@ -66,7 +66,7 @@ else
 
                     <tr>
                         <td>@Html.Raw(domain.CertExpirationToString(true,"{sentence}", sentenceTemplate:"{icon} {action}{actionPast} {expiration}.", action:"Skončí",actionPast:"Skončila"))</td>
-                        <td><a href="@server.pageUrl">@server.Name</a> (@(string.IsNullOrEmpty(server.ICO)?"" : HlidacStatu.Repositories.Firmy.GetJmenoAsync( server.ICO)))</td>
+                        <td><a href="@server.pageUrl">@server.Name</a> (@(string.IsNullOrEmpty(server.ICO)?"" : HlidacStatu.Repositories.await FirmaCache.GetJmenoAsync( server.ICO)))</td>
                     </tr>
                 }
             </table>

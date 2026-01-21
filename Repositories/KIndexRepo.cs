@@ -52,7 +52,7 @@ public static class KIndexRepo
     // {
     //     KIndexData kidx = new KIndexData();
     //     kidx.Ico = ico;
-    //     kidx.Jmeno = jmeno ?? await Firmy.GetJmenoAsync(ico);
+    //     kidx.Jmeno = jmeno ?? await FirmaCache.GetJmenoAsync(ico);
     //     kidx.roky = (await KIndexRepo.GetAvailableCalculationYearsAsync())
     //         .Select(rok => KIndexData.Annual.Empty(rok))
     //         .ToList();

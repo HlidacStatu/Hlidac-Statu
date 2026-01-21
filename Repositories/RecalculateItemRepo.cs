@@ -109,7 +109,7 @@ namespace HlidacStatu.Repositories
         public static async Task RecalculateFirmaAsync(RecalculateItem item, bool noRebuild, bool invalidateOnly,
             bool firmaOnly = false, bool holdingOnly = false)
         {
-            var f = await Firmy.GetAsync(item.Id);
+            var f = await FirmaCache.GetAsync(item.Id);
             if (f != null)
             {
                 switch (item.StatisticsType)
@@ -176,7 +176,7 @@ namespace HlidacStatu.Repositories
             List<RecalculateItem> list = new List<RecalculateItem>(alreadyOnList);
             if (item.ItemType == RecalculateItem.ItemTypeEnum.Subjekt)
             {
-                var f = await Firmy.GetAsync(item.Id);
+                var f = await FirmaCache.GetAsync(item.Id);
                 if (f?.Valid == true)
                     list = list.Union(
                             await FirmaForQueueAsync(new List<RecalculateItem>(), f, item.StatisticsType, item.ProvokedBy, 0),
@@ -400,7 +400,7 @@ namespace HlidacStatu.Repositories
         public static async Task DebugAsync()
         {
             var fakeList = new System.Collections.Concurrent.ConcurrentBag<RecalculateItem>();
-            var item = new RecalculateItem(await Firmy.GetAsync("00000205"), RecalculateItem.StatisticsTypeEnum.VZ,
+            var item = new RecalculateItem(await FirmaCache.GetAsync("00000205"), RecalculateItem.StatisticsTypeEnum.VZ,
                 "recalculateDebug");
             List<RecalculateItem> cascade = await CascadeItemsAsync(item, fakeList);
         }

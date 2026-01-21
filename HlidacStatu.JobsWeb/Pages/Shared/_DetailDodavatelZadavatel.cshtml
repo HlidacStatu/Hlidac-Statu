@@ -22,7 +22,7 @@
     .Select(m => new
     {
         ico = m,
-        name = HlidacStatu.Repositories.Firmy.GetJmenoAsync(m),
+        name = HlidacStatu.Repositories.await FirmaCache.GetJmenoAsync(m),
         count = firmyCount.Any(c => c.ico == m) ? firmyCount.First(c => c.ico == m).pocetCen : 0
     })
     .OrderBy(o => o.name);
@@ -32,7 +32,7 @@
     .Select(m => new
     {
         ico = m,
-        name = HlidacStatu.Repositories.Firmy.GetJmenoAsync(m),
+        name = HlidacStatu.Repositories.await FirmaCache.GetJmenoAsync(m),
         count = uradyCount.Any(c => c.ico == m) ? uradyCount.First(c => c.ico == m).pocetCen : 0
     })
     .OrderBy(o => o.name);

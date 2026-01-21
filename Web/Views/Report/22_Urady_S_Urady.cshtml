@@ -2,6 +2,7 @@
 @using HlidacStatu.Entities
 @using HlidacStatu.Entities.Analysis
 @using HlidacStatu.Repositories
+@using HlidacStatu.Repositories.Cache
 
 @{
     Layout = "_ReportLayout";
@@ -33,7 +34,7 @@
 
     //.OrderBy(o => o.Statistic.Summary.CelkemCena).Take(50);
     <hr />
-    <h2>Největší vztahy pro @(await Firmy.GetJmenoAsync(dodavico))</h2>
+    <h2>Největší vztahy pro @(await FirmaCache.GetJmenoAsync(dodavico))</h2>
     <table class="table table-bordered table-striped">
         <thead>
             <tr>

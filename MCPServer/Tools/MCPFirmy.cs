@@ -179,7 +179,7 @@ namespace HlidacStatu.MCPServer.Tools
                         return null;
                     if (Util.DataValidators.CheckCZICO(ico) == false)
                         return null;
-                    Firma f = await HlidacStatu.Repositories.Firmy.GetAsync(ico);
+                    Firma f = await FirmaCache.GetAsync(ico);
                     if (f?.Valid != true)
                         return null;
                     
@@ -190,7 +190,7 @@ namespace HlidacStatu.MCPServer.Tools
                         res.Add(new SimpleDetailInfo()
                         {
                             Ico = ico,
-                            Jmeno = await HlidacStatu.Repositories.Firmy.GetJmenoAsync(ico),
+                            Jmeno = await FirmaCache.GetJmenoAsync(ico),
                             Source_Url = HlidacStatu.Entities.Firma.GetUrl(ico, false),
                         });
                     }

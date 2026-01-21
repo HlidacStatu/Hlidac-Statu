@@ -2,6 +2,7 @@
 @using HlidacStatu.Datasets
 
 @using HlidacStatu.Repositories
+@using HlidacStatu.Repositories.Cache
 
 @{
     Layout = "_ReportLayout";
@@ -37,7 +38,7 @@
                         pocet++;
                         <div>
                             <span class="number">@(pocet.ToString("000")).</span> <a href="/data/Hledat/covid-podpora?Q=ico.keyword%3A@(kvv.Key)">
-                                @(await Firmy.GetJmenoAsync((int)kvv.Key))
+                                @(await FirmaCache.GetJmenoAsync((int)kvv.Key))
                             </a>
                             <b>@(HlidacStatu.Util.RenderData.NicePriceHtml((decimal)kvv.Value,shortFormat:true, showDecimal: HlidacStatu.Util.RenderData.ShowDecimalVal.AsNeeded))</b>
 

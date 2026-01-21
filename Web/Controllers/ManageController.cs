@@ -99,7 +99,7 @@ namespace HlidacStatu.Web.Controllers
                 res = new List<Firma>();
                 foreach (var ic in icos)
                 {
-                    Firma f = await Firmy.GetAsync(ic);
+                    Firma f = await FirmaCache.GetAsync(ic);
                     if (f?.Valid == true)
                         res.Add(f);
                     else
@@ -149,7 +149,7 @@ namespace HlidacStatu.Web.Controllers
         {
             if (string.IsNullOrWhiteSpace(Id))
                 return NotFound();
-            Firma model = await Firmy.GetAsync(Id);
+            Firma model = await FirmaCache.GetAsync(Id);
             if (model == null || model.Valid==false)
             {
                 return NotFound();

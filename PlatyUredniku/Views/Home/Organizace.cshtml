@@ -3,12 +3,13 @@
 @using HlidacStatu.Entities
 @using HlidacStatu.Repositories
 @using HlidacStatu.Extensions
+@using HlidacStatu.Repositories.Cache
 
 @model HlidacStatu.Entities.PuOrganizace
 
 @{
     string ico = Model.Ico;
-    Firma f = await Firmy.GetAsync(ico);
+    Firma f = await FirmaCache.GetAsync(ico);
     ViewBag.Title = $"{Model.Nazev}";
     var ceo = await f.CurrentCeoAsync();
     var socialContacts = (await f.GetSocialContactsAsync()).ToList();

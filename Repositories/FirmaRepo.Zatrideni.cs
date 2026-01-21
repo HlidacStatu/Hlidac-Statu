@@ -4,6 +4,7 @@ using HlidacStatu.Extensions;
 using HlidacStatu.Util;
 using System.Linq;
 using System.Threading.Tasks;
+using HlidacStatu.Repositories.Cache;
 
 namespace HlidacStatu.Repositories
 {
@@ -229,7 +230,7 @@ namespace HlidacStatu.Repositories
                     var ret = new System.Collections.Generic.List<Firma.Zatrideni.Item>();
                     await Devmasters.Batch.Manager.DoActionForAllAsync<string>(icos.Select(m => m.Trim()).Distinct(), async ic =>
                         {
-                            var f = await Firmy.GetAsync(ic);
+                            var f = await FirmaCache.GetAsync(ic);
 
                             if (f.PatrimStatu())
                             {

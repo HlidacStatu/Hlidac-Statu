@@ -4,6 +4,7 @@ using HlidacStatu.DS.Api.Osoba;
 using HlidacStatu.Entities;
 using HlidacStatu.Entities.Facts;
 using HlidacStatu.Repositories;
+using HlidacStatu.Repositories.Cache;
 using Serilog;
 
 namespace HlidacStatu.Extensions;
@@ -295,7 +296,7 @@ public static class FirmaExtensions
             dcerine.Add(new SimpleDetailInfo()
             {
                 Ico = icoHolding,
-                Jmeno = await HlidacStatu.Repositories.Firmy.GetJmenoAsync(icoHolding),
+                Jmeno = await FirmaCache.GetJmenoAsync(icoHolding),
                 Source_Url = null,
                 Copyright = null
             });
@@ -342,7 +343,7 @@ public static class FirmaExtensions
         }
         else
         {
-            f = await Firmy.GetAsync(ico);
+            f = await FirmaCache.GetAsync(ico);
         }
 
         return f;

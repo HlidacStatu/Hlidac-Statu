@@ -100,7 +100,7 @@ namespace HlidacStatu.Repositories
                                  .Items)
                         {
                             var ico = (string)val.Key;
-                            var f = await GetAsync(ico);
+                            var f = await FirmaCache.GetAsync(ico);
                             if (f?.PatrimStatu() == true)
                             {
                                 if ((await f.StatistikaRegistruSmluvAsync()).Any(m =>
@@ -129,7 +129,7 @@ namespace HlidacStatu.Repositories
                                  .Items)
                         {
                             var ico = (string)val.Key;
-                            var f = await GetAsync(ico);
+                            var f = await FirmaCache.GetAsync(ico);
                             if (f?.PatrimStatu() == true)
                             {
                                 if ((await f.StatistikaRegistruSmluvAsync()).Any(m =>
@@ -153,7 +153,7 @@ namespace HlidacStatu.Repositories
 
                         await Manager.DoActionForAllAsync<string>(icos.Distinct().ToArray(), async (i) =>
                             {
-                                var fk = await Firmy.GetAsync(i);
+                                var fk = await FirmaCache.GetAsync(i);
                                 if (fk != null)
                                 {
                                     allIcos.Add(i);
@@ -216,7 +216,7 @@ namespace HlidacStatu.Repositories
                 await Manager.DoActionForAllAsync<string>(icos,
                     (Func<string, Task<ActionOutputData>>)(async ico =>
                     {
-                        var f = await Firmy.GetAsync(ico);
+                        var f = await FirmaCache.GetAsync(ico);
                         if (f != null)
                         {
                             var stat = await f.StatistikaRegistruSmluvAsync(obor.Value);

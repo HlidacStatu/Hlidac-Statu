@@ -470,7 +470,7 @@ namespace HlidacStatu.Extensions
             List<Firma> firmy = [];
             foreach (var ico in icos)
             {
-                var f = await Firmy.GetAsync(ico);
+                var f = await FirmaCache.GetAsync(ico);
                 if (f is not null)
                 {
                     firmy.Add(f);

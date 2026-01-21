@@ -1,6 +1,7 @@
 ﻿@model (List<WatchdogAnalytics.Models.JobStatistics> statistics, Firma zadavatel, WatchdogAnalytics.Models.YearlyStatisticsGroup.Key? Key)
 
 @using HlidacStatu.Entities
+@using HlidacStatu.Repositories.Cache
 @using WatchdogAnalytics.Models
 @using WatchdogAnalytics.Services
 
@@ -18,7 +19,7 @@
     var firmy = new List<(string Ico, string Name, int Count)>();
     foreach (var ico in distinctIcos)
     {
-        var name = await HlidacStatu.Repositories.Firmy.GetJmenoAsync(ico);
+        var name = await FirmaCache.GetJmenoAsync(ico);
         var count = firmyCount.Any(c => c.ico == ico) ? firmyCount.First(c => c.ico == ico).pocetCen : 0;
         firmy.Add((ico, name, count));
     }

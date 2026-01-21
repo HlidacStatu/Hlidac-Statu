@@ -98,7 +98,7 @@
                                             var items = new List<string>();
                                             foreach (var m in p.Item2.OrderByDescending(oo => oo.Zahajeni))
                                             {
-                                                var firma = await Firmy.GetAsync(m.VybraniDluznici.First());
+                                                var firma = await FirmaCache.GetAsync(m.VybraniDluznici.First());
                                                 items.Add($"<a href='{Rizeni.GetUrlFromId(m.SpisovaZnacka)}'>" +
                                                           $"{Devmasters.TextUtil.ShortenText(firma.Jmeno, 20)}</a>" +
                                                           $" /z {m.Zahajeni.ToString("yyyy")}/");

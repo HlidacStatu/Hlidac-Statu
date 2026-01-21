@@ -146,7 +146,7 @@ namespace HlidacStatu.XLib.Render
                 ico = HlidacStatu.Util.ParseTools.NormalizeIco(ico);
                 if (!string.IsNullOrEmpty(ico))
                 {
-                    Firma o = await Firmy.GetAsync(ico);
+                    Firma o = await FirmaCache.GetAsync(ico);
                     if (o?.Valid == true)
                     {
                         return $"<span>{o.Jmeno}</span>";
@@ -165,7 +165,7 @@ namespace HlidacStatu.XLib.Render
                 ico = HlidacStatu.Util.ParseTools.NormalizeIco(ico);
                 if (!string.IsNullOrEmpty(ico))
                 {
-                    Firma o = await Firmy.GetAsync(ico);
+                    Firma o = await FirmaCache.GetAsync(ico);
                     if (o?.Valid == true)
                     {
                         //var lbl = Lib.Analysis.KorupcniRiziko.KIndex.GetLastLabel(ico);
@@ -194,7 +194,7 @@ namespace HlidacStatu.XLib.Render
                 ico = HlidacStatu.Util.ParseTools.NormalizeIco(ico);
                 if (!string.IsNullOrEmpty(ico))
                 {
-                    var firma = await Firmy.GetAsync(ico);
+                    var firma = await FirmaCache.GetAsync(ico);
                     if (firma?.Valid == true)
                     {
                         var stat = await firma.StatistikaRegistruSmluvAsync();
@@ -222,7 +222,7 @@ namespace HlidacStatu.XLib.Render
                 ico = HlidacStatu.Util.ParseTools.NormalizeIco(ico);
                 if (!string.IsNullOrEmpty(ico))
                 {
-                    var o = await Firmy.GetAsync(ico);
+                    var o = await FirmaCache.GetAsync(ico);
                     if (o?.Valid == true)
                     {
                         string niceString = (await o.InfoFactsAsync()).RenderFacts(numberOfInfos, true, false, delimiterBetweenInfos);

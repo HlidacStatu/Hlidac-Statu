@@ -8,6 +8,7 @@
 @using HlidacStatu.Entities
 @using HlidacStatu.Extensions
 @using HlidacStatu.Repositories
+@using HlidacStatu.Repositories.Cache
 @using HlidacStatu.Repositories.Statistics
 @using HlidacStatu.XLib
 
@@ -292,7 +293,7 @@
                         {
                             <li>
                                 <a asp-controller="Subjekt" asp-action="Index" asp-route-id="@stat.Key">
-                                    @(await Firmy.GetJmenoAsync(stat.Key))
+                                    @(await FirmaCache.GetJmenoAsync(stat.Key))
                                 </a>
                                 (@Html.Raw(stat.Value.Summary().ToNiceLinkString(null, true, customUrl: $"/hledat?q=ico:{stat.Key}")) od
                                 2016
@@ -380,7 +381,7 @@
                         {
                             <li>
                                 <a asp-controller="Subjekt" asp-action="Index" asp-route-id="@stat.Key">
-                                    @(await Firmy.GetJmenoAsync(stat.Key))
+                                    @(await FirmaCache.GetJmenoAsync(stat.Key))
                                 </a>
                                 (@Html.Raw(stat.Value.Summary().ToNiceLinkString(null, true, customUrl: $"/hledat?q=ico:{stat.Key}")) od
                                 2016

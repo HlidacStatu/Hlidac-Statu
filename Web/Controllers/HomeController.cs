@@ -1099,7 +1099,7 @@ text zpravy: {txt}
             byte[] data = null;
             if (id?.ToLower() == "subjekt")
             {
-                Firma fi = await Firmy.GetAsync(v);
+                Firma fi = await FirmaCache.GetAsync(v);
                 if (fi?.Valid == true)
                 {
                     if (!(await fi.NotInterestingToShowAsync()))

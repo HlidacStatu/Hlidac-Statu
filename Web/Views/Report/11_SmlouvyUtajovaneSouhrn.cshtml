@@ -4,6 +4,7 @@
 @using HlidacStatu.Extensions
 @using HlidacStatu.Repositories
 @using HlidacStatu.Entities
+@using HlidacStatu.Repositories.Cache
 
 
 @{
@@ -60,7 +61,7 @@
     foreach (Nest.KeyedBucket<object> val in ((BucketAggregate)res.ElasticResults.Aggregations["perIco"]).Items)
     {
         StatisticsSubjectPerYear<Smlouva.Statistics.Data> statRs = new();
-        var f = await Firmy.GetAsync((string)val.Key);
+        var f = await FirmaCache.GetAsync((string)val.Key);
         if (f != null)
             statRs = await f.StatistikaRegistruSmluvAsync();
         rdsPerIco.AddRow(

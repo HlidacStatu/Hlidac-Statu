@@ -35,7 +35,7 @@ public static class SponzoringCache
                 var result = new Dictionary<string, string>();
                 foreach (var item in query)
                 {
-                    var jmeno = item.KratkyNazev ?? await Firmy.GetJmenoAsync(item.IcoStrany);
+                    var jmeno = item.KratkyNazev ?? await FirmaCache.GetJmenoAsync(item.IcoStrany);
                     result.Add(item.IcoStrany, jmeno);
                 }
                 return result;

@@ -58,7 +58,7 @@
 
 	async Task<HtmlString> statisticsForIcoAsync(string ico)
     {
-        var f = await Firmy.GetAsync(ico);
+        var f = await FirmaCache.GetAsync(ico);
 		StatisticsSubjectPerYear<Smlouva.Statistics.Data> stat = null;
 		if (f != null)
 			stat = await f.StatistikaRegistruSmluvAsync();

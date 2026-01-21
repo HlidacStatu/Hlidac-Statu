@@ -27,7 +27,7 @@ namespace HlidacStatu.Web.Controllers
                 var poskytovatele = new List<poskytovateleCacheModel>();
                 foreach (var i in poskytovateleIcos)
                 {
-                    var jmeno = await Firmy.GetJmenoAsync(i.IcoPoskytovatele);
+                    var jmeno = await FirmaCache.GetJmenoAsync(i.IcoPoskytovatele);
                     poskytovatele.Add(new poskytovateleCacheModel(
                         jmeno.RemoveAccents(),
                         i.IcoPoskytovatele,

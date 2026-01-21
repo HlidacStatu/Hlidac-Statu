@@ -5,6 +5,7 @@
 @using HlidacStatu.Datasets
 @using HlidacStatu.Entities
 @using HlidacStatu.Repositories
+@using HlidacStatu.Repositories.Cache
 
 @{
     Layout = null;
@@ -52,7 +53,7 @@
                 var oMesta = new Dictionary<Firma, StatsAggregate>();
                 foreach (var m in mesta)
                 {
-                    var firma = await Firmy.GetAsync(m.Key);
+                    var firma = await FirmaCache.GetAsync(m.Key);
                     if (firma != null)
                     {
                         oMesta.Add(firma, m.Value);

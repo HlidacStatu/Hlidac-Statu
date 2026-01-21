@@ -166,7 +166,7 @@ namespace HlidacStatu.Web.Controllers
             var (isProperResult, firma, result) = await TryGetCompanyAsync(id);
             if (isProperResult)
             {
-                var popis = "Osoby s vazbou na " + Firmy.GetJmenoAsync(firma.ICO);
+                var popis = "Osoby s vazbou na " + await FirmaCache.GetJmenoAsync(firma.ICO);
             
                 if (aktualnost.HasValue == false)
                     aktualnost = Relation.AktualnostType.Nedavny;
@@ -280,7 +280,7 @@ namespace HlidacStatu.Web.Controllers
 
             string ico = Util.ParseTools.NormalizeIco(id);
 
-            firma = await Firmy.GetAsync(ico);
+            firma = await FirmaCache.GetAsync(ico);
 
             if (firma == null || firma?.Valid == false)
             {

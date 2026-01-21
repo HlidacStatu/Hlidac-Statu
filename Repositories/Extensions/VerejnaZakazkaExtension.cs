@@ -101,7 +101,7 @@ namespace HlidacStatu.Extensions
             {
                 if (subj != null)
                 {
-                    var firma = await Firmy.GetAsync(subj.ICO);
+                    var firma = await FirmaCache.GetAsync(subj.ICO);
                     if (firma?.Valid == true && await firma.IsSponzorAsync() && firma.JsemSoukromaFirma())
                     {
                         var infoFact = await FirmaExtension.GetTwoSponzoringInfoFactsForFirmaAsync(firma);
@@ -145,7 +145,7 @@ namespace HlidacStatu.Extensions
                                         + " a další";
                         }
 
-                        f.Add(new InfoFact($"V dodavateli {Firmy.GetJmenoAsync(ss.ICO)} se "
+                        f.Add(new InfoFact($"V dodavateli {await FirmaCache.GetJmenoAsync(ss.ICO)} se "
                                            + Devmasters.Lang.CS.Plural.Get(politici.Count()
                                                , " angažuje jedna politicky angažovaná osoba - "
                                                , " angažují {0} politicky angažované osoby - "

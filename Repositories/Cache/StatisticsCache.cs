@@ -150,7 +150,7 @@ public class StatisticsCache
                 try
                 {
                     return new StatisticsSubjectPerYear<Smlouva.Statistics.Data>(f.Key,
-                        (await (await Firmy.GetAsync(f.Key)).StatistikaRegistruSmluvAsync(obor))
+                        (await (await FirmaCache.GetAsync(f.Key)).StatistikaRegistruSmluvAsync(obor))
                         .Filter(m => m.Key >= f.Value.From?.Year && m.Key <= f.Value.To?.Year)
                     );
                 }
@@ -221,7 +221,7 @@ public class StatisticsCache
         
         await Parallel.ForEachAsync(firmy_maxrok, new ParallelOptions { MaxDegreeOfParallelism = 10 }, async (kvp, ct) =>
         {
-            var firma = await Firmy.GetAsync(kvp.Key);
+            var firma = await FirmaCache.GetAsync(kvp.Key);
             if (firma?.Valid == true)
             {
                 var stats = await firma.StatistikaRegistruSmluvAsync();
@@ -274,7 +274,7 @@ public class StatisticsCache
                 await semaphore.WaitAsync();
                 try
                 {
-                    var stat = await (await Firmy.GetAsync(f.Key)).StatistikaVerejneZakazkyAsync();
+                    var stat = await (await FirmaCache.GetAsync(f.Key)).StatistikaVerejneZakazkyAsync();
                     return new StatisticsSubjectPerYear<Firma.Statistics.VZ>(
                         f.Key,
                         stat.Filter(m => m.Key >= f.Value.From?.Year && m.Key <= f.Value.To?.Year)
@@ -402,7 +402,7 @@ public class StatisticsCache
                 await semaphore.WaitAsync();
                 try
                 {
-                    var ff = await Firmy.GetAsync(f.Key);
+                    var ff = await FirmaCache.GetAsync(f.Key);
 
                     StatisticsSubjectPerYear<Firma.Statistics.Dotace> stat = new();
                     if (ff != null)
@@ -516,7 +516,7 @@ public class StatisticsCache
         
         await Parallel.ForEachAsync(firmy_maxrok, new ParallelOptions { MaxDegreeOfParallelism = 20 }, async (kvp, ct) =>
         {
-            var firma = await Firmy.GetAsync(kvp.Key);
+            var firma = await FirmaCache.GetAsync(kvp.Key);
             if (firma?.Valid == true)
             {
                 var stat = await firma.StatistikaDotaciAsync();

@@ -37,7 +37,7 @@ namespace HlidacStatu.Repositories.Statistics
                 var neziskovkyIcos = new List<string>();
                 foreach (var firma in registrSmluv.SoukromeFirmy)
                 {
-                    var f = await Firmy.GetAsync(firma.Key);
+                    var f = await FirmaCache.GetAsync(firma.Key);
                     if (f.JsemNeziskovka())
                     {
                         neziskovkyIcos.Add(f.ICO);

@@ -1,5 +1,6 @@
 ﻿@using HlidacStatu.Entities
 @using HlidacStatu.Repositories
+@using HlidacStatu.Repositories.Cache
 @using HlidacStatu.XLib.Render
 @using Microsoft.EntityFrameworkCore
 @using PlatyUredniku.Cache
@@ -74,8 +75,8 @@
         new ReportDataSource<(KeyValuePair<string, PpPrijem[]> kv, OsobyRolesCache.osobaInfo roles)>.Column()
         {
             Name = "Organizace",
-            HtmlRender = (m) => { return $"<a href='/organizace/{m.kv.Key}'>{Firmy.GetJmenoAsync(m.kv.Key)}</a>"; },
-            OrderValueRender = (m) => { return $"{Firmy.GetJmenoAsync(m.kv.Key)}"; },
+            HtmlRender = (m) => { return $"<a href='/organizace/{m.kv.Key}'>{await FirmaCache.GetJmenoAsync(m.kv.Key)}</a>"; },
+            OrderValueRender = (m) => { return $"{await FirmaCache.GetJmenoAsync(m.kv.Key)}"; },
         },
         new ReportDataSource<(KeyValuePair<string, PpPrijem[]> kv, OsobyRolesCache.osobaInfo roles)>.Column()
         {

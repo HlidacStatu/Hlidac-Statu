@@ -7,6 +7,7 @@
 @using HlidacStatu.Lib.Analytics
 @using HlidacStatu.XLib.Render
 @using HlidacStatu.Repositories
+@using HlidacStatu.Repositories.Cache
 
 @{
     Layout = "_ReportLayout";
@@ -112,7 +113,7 @@
 
     foreach (var datum in data)
     {
-        var firma = await Firmy.GetAsync(datum.data);
+        var firma = await FirmaCache.GetAsync(datum.data);
         StatisticsSubjectPerYear<Smlouva.Statistics.Data>? firmaStat = null;
         if (firma?.Valid == true)
             firmaStat = await firma.StatistikaRegistruSmluvAsync();

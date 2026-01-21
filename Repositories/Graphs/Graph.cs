@@ -1095,7 +1095,7 @@ namespace HlidacStatu.Repositories
                 var last = i == (rels.Count() - 1);
                 StatisticsSubjectPerYear<Smlouva.Statistics.Data> stat = null;
                 if (withStats && rel.To.Type == HlidacStatu.DS.Graphs.Graph.Node.NodeType.Company)
-                    stat = await (await Firmy.GetAsync(rel.To.Id))
+                    stat = await (await FirmaCache.GetAsync(rel.To.Id))
                         .StatistikaRegistruSmluvAsync(); //new Analysis.SubjectStatistic(rel.To.Id);
 
                 string subjId = rel.To.Type == HlidacStatu.DS.Graphs.Graph.Node.NodeType.Company ? rel.To.Id : "Osoba";
@@ -1198,7 +1198,7 @@ namespace HlidacStatu.Repositories
                     return (await OsobaCache.GetPersonByIdAsync(Convert.ToInt32(node.Id)))?.FullNameWithYear(html) ?? "(neznámá osoba)";
                 case HlidacStatu.DS.Graphs.Graph.Node.NodeType.Company:
                 default:
-                    return await Firmy.GetJmenoAsync(node.Id);
+                    return await FirmaCache.GetJmenoAsync(node.Id);
             }
         }
 
@@ -1267,7 +1267,7 @@ namespace HlidacStatu.Repositories
                     return (await OsobaCache.GetPersonByIdAsync(Convert.ToInt32(node.Id)))?.FullNameWithYear(html) ?? "(neznámá osoba)";
                 case HlidacStatu.DS.Graphs.Graph.Node.NodeType.Company:
                 default:
-                    return await Firmy.GetJmenoAsync(node.Id);
+                    return await FirmaCache.GetJmenoAsync(node.Id);
             }
         }
     }

@@ -489,7 +489,7 @@ else if (Model.HasResults == false)
                 @* firmy *@
                 @foreach (var fP in splQ.Where(m => m.Category != HlidacStatu.DS.Api.Autocomplete.CategoryEnum.Person))
                 {
-                    Firma fo = await Firmy.GetAsync(fP.PrefixValue);
+                    Firma fo = await FirmaCache.GetAsync(fP.PrefixValue);
                     if (fo?.Valid == true)
                     {
                         parts++;

@@ -6,6 +6,7 @@
 @using HlidacStatu.Extensions
 @using HlidacStatu.Repositories
 @using HlidacStatu.Repositories.Analysis.KorupcniRiziko
+@using HlidacStatu.Repositories.Cache
 
 
 @{
@@ -24,14 +25,14 @@
     }
 
 
-    Firma f = await Firmy.GetAsync(Model.id);
+    Firma f = await FirmaCache.GetAsync(Model.id);
     KIndexData kidx = await KIndex.GetCachedAsync(HlidacStatu.Util.ParseTools.NormalizeIco(Model.id), futureData);
     kidx.roky = kidx.roky
         .Where(m => m.Rok <= maxYearToShow)
         .ToList();
 
     ViewBag.Title = "K-Index";
-    ViewBag.SubTitle = "pro " + Firmy.GetJmenoAsync(Model.id);
+    ViewBag.SubTitle = "pro " + await FirmaCache.GetJmenoAsync(Model.id);
     ViewBag.HideTitle = true;
 
     if (f?.Valid == true && kidx != null)

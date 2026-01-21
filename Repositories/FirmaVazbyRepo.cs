@@ -72,7 +72,7 @@ namespace HlidacStatu.Repositories
             string[] res = Array.Empty<string>();
 
             Relation.AktualnostType aktualnost = Relation.AktualnostType.Nedavny;
-            Firma f = await Firmy.GetAsync(icoOfMother);
+            Firma f = await FirmaCache.GetAsync(icoOfMother);
             if (f != null && f?.Valid == true)
             {
                 var aktualniVazby = await f.AktualniVazbyAsync(aktualnost);
@@ -164,7 +164,7 @@ namespace HlidacStatu.Repositories
                 var parents = new List<Firma>();
                 foreach (var ico in _getAllParents(firma.ICO, charakterVazby, minAktualnost))
                 {
-                    var f = await Firmy.GetAsync(ico);
+                    var f = await FirmaCache.GetAsync(ico);
                     if (f != null && f.Valid == true)
                     {
                         parents.Add(f);
@@ -238,7 +238,7 @@ namespace HlidacStatu.Repositories
             var data = new List<Firma>();
             foreach (var ico in grouped)
             {
-                data.Add(await Firmy.GetAsync(ico));
+                data.Add(await FirmaCache.GetAsync(ico));
             }
             return data.ToArray();
 

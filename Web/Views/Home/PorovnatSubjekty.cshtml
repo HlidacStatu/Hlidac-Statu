@@ -7,6 +7,7 @@
 @using Microsoft.AspNetCore.Http.Extensions
 @using HlidacStatu.Lib.Analytics
 @using HlidacStatu.Repositories
+@using HlidacStatu.Repositories.Cache
 @using HlidacStatu.XLib.Render
 @using Microsoft.AspNetCore.Html
 
@@ -42,7 +43,7 @@
 
     foreach (var ico in Model)
     {
-        var firma = await Firmy.GetAsync(ico);
+        var firma = await FirmaCache.GetAsync(ico);
 
         if (firma?.Valid == true)
         {
@@ -88,7 +89,7 @@
 
     foreach (var d in stats)
     {
-        var companyName = await Firmy.GetJmenoAsync(d.ICO);
+        var companyName = await FirmaCache.GetJmenoAsync(d.ICO);
         tblPocty.AddRow((d, companyName));
     }
 
@@ -127,7 +128,7 @@
     var tblCompare3 = new tblDataSource(columnsCompare3);
     foreach (var d in stats)
     {
-        var companyName = await Firmy.GetJmenoAsync(d.ICO);
+        var companyName = await FirmaCache.GetJmenoAsync(d.ICO);
         
         tblCompare1.AddRow((d, companyName));
         tblCompare2.AddRow((d, companyName));
@@ -289,7 +290,7 @@ else
             ch.Title = year.ToString();
             foreach (var d in stats)
             {
-                var companyName = await Firmy.GetJmenoAsync(d.ICO);
+                var companyName = await FirmaCache.GetJmenoAsync(d.ICO);
                 ch.AddRow((d, companyName));
             }
 

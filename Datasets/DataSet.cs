@@ -103,7 +103,7 @@ namespace HlidacStatu.Datasets
 
                 if (DataValidators.CheckCZICO(t))
                 {
-                    Firma f = await Firmy.GetAsync(t);
+                    Firma f = await FirmaCache.GetAsync(t);
                     if (f?.Valid == true)
                     {
                         topTxts.Add(f.JmenoBezKoncovky() + ":");

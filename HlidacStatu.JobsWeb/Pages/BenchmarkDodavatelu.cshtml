@@ -2,6 +2,7 @@
 @model WatchdogAnalytics.Pages.BenchmarkDodavateluModel
 
 @using HlidacStatu.Entities
+@using HlidacStatu.Repositories.Cache
 @using WatchdogAnalytics.Models
 @using WatchdogAnalytics.Services
 
@@ -25,7 +26,7 @@
 
         tableModel.Statistics = statistics;
         tableModel.HideDodavatelCount = true;
-        tableModel.SubjectName = await HlidacStatu.Repositories.Firmy.GetJmenoAsync(Model.Ico);
+        tableModel.SubjectName = await FirmaCache.GetJmenoAsync(Model.Ico);
     }
 }
 
@@ -85,7 +86,7 @@
 
 <h2>@Model.Nazev</h2>
 @{
-    Firma dodavatel = await HlidacStatu.Repositories.Firmy.GetAsync(Model.Ico);
+    Firma dodavatel = await FirmaCache.GetAsync(Model.Ico);
 
     var RSstat = await HlidacStatu.Repositories.SmlouvaRepo.Searching.CachedSimpleSearchWithStat(
         $"icoPrijemce:{Model.Ico} AND " + Model.Key?.PerSubjectDesc?.Query,

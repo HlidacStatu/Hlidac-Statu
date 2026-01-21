@@ -9,6 +9,7 @@ using HlidacStatu.Entities;
 using HlidacStatu.Entities.KIndex;
 using HlidacStatu.Extensions;
 using HlidacStatu.Lib.Analytics;
+using HlidacStatu.Repositories.Cache;
 using Nest;
 using Consts = HlidacStatu.Entities.KIndex.Consts;
 
@@ -36,7 +37,7 @@ namespace HlidacStatu.Repositories.Analysis.KorupcniRiziko
         public static async Task<Calculator> CreateCalculatorAsync(string ico, bool useTemp)
         {
             var calculator = new Calculator(ico);
-            calculator._urad = await Firmy.GetAsync(ico);
+            calculator._urad = await FirmaCache.GetAsync(ico);
             if (calculator._urad?.Valid != true)
                 throw new ArgumentOutOfRangeException("invalid ICO");
             calculator.kindex = await KIndexRepo.GetDirectAsync(ico, useTemp);
@@ -327,7 +328,7 @@ namespace HlidacStatu.Repositories.Analysis.KorupcniRiziko
                 ret.KIndexReady = true;
                 ret.KIndexIssues = null;
             }
-            else if (await (await Firmy.GetAsync(this.Ico)).MusiPublikovatDoRSAsync() == false)
+            else if (await (await FirmaCache.GetAsync(this.Ico)).MusiPublikovatDoRSAsync() == false)
             {
                 if (forceCalculateAllYears == false)
                 {
@@ -669,7 +670,7 @@ namespace HlidacStatu.Repositories.Analysis.KorupcniRiziko
                         {
                             if (prij.ico == s.Platce.ico)
                                 continue;
-                            Firma f = await Firmy.GetAsync(prij.ico);
+                            Firma f = await FirmaCache.GetAsync(prij.ico);
                             if (f?.Valid == true && f.PatrimStatu())
                                 continue;
 

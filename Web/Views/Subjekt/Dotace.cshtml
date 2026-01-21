@@ -9,6 +9,7 @@
 @using HlidacStatu.Entities;
 @using HlidacStatu.Repositories;
 @using HlidacStatu.Lib.Analytics;
+@using HlidacStatu.Repositories.Cache
 
 @{
     Layout = null;
@@ -544,7 +545,7 @@
                                     {
                                         <tr>
                                             <td>
-                                                <a href="/subjekt/@item.Key">@Devmasters.TextUtil.ShortenText(await Firmy.GetJmenoAsync(item.Key), 30)</a>
+                                                <a href="/subjekt/@item.Key">@Devmasters.TextUtil.ShortenText(await FirmaCache.GetJmenoAsync(item.Key), 30)</a>
                                             </td>
                                             <td class="number">@HlidacStatu.Util.RenderData.NicePrice(item.Value)</td>
                                         </tr>

@@ -4,6 +4,7 @@
 @using HlidacStatu.Entities
 @using HlidacStatu.Entities.KIndex
 @using HlidacStatu.Repositories
+@using HlidacStatu.Repositories.Cache
 
 @{
     KIndexData.VypocetDetail.Radek vradek = Model.CurrYear.KIndexVypocet.Radky.Where(m => m.VelicinaPart == Model.Part).First();
@@ -73,7 +74,7 @@
                         var data = new List<Tuple<string, decimal>>();
                         foreach (var m in topDodavatele)
                         {
-                            var jmeno = await Firmy.GetJmenoAsync(m.Ico);
+                            var jmeno = await FirmaCache.GetJmenoAsync(m.Ico);
                             data.Add(new Tuple<string, decimal>(jmeno, m.HodnotaSmluv));
                         }
 
@@ -110,7 +111,7 @@
                                                     <i class="far fa-file-search"></i>
                                                 </a>
                                             </td>
-                                            <td>@(await Firmy.GetJmenoAsync(souh.Ico))</td>
+                                            <td>@(await FirmaCache.GetJmenoAsync(souh.Ico))</td>
                                             <td class="number">@HlidacStatu.Util.RenderData.NiceNumber(souh.PocetSmluv)</td>
                                             <td class="number text-nowrap">@HlidacStatu.Util.RenderData.NicePriceHtml(souh.HodnotaSmluv)</td>
                                         </tr>

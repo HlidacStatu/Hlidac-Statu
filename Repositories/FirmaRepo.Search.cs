@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using HlidacStatu.Connectors;
+using HlidacStatu.Repositories.Cache;
 using NuGet.Common;
 
 namespace HlidacStatu.Repositories
@@ -46,7 +47,7 @@ namespace HlidacStatu.Repositories
                 {
                     foreach (var ic in specifiedIcosInQuery.Skip((page - 1) * size).Take(size))
                     {
-                        Firma f = await Firmy.GetAsync(ic);
+                        Firma f = await FirmaCache.GetAsync(ic);
                         if (f?.Valid == true && FirmaRepo.IgnoredIcos.Contains(f.ICO) == false)
                         {
                             //nalezene ICO
@@ -90,7 +91,7 @@ namespace HlidacStatu.Repositories
                         foreach (var i in res.Hits)
                         {
                             if (FirmaRepo.IgnoredIcos.Contains(i.Source.Ico) == false)
-                                found.Add(await Firmy.GetAsync(i.Source.Ico));
+                                found.Add(await FirmaCache.GetAsync(i.Source.Ico));
                         }
 
                         if (keepOnlyActive)
