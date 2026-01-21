@@ -191,34 +191,33 @@
         </p>
         <div>
             @{
-                ReportDataSource<KeyValuePair<string, SimpleStat>> rdsDodav = new(
-                    new ReportDataSource<KeyValuePair<string, SimpleStat>>.Column()
+                ReportDataSource<(Firma firma, SimpleStat stat)> rdsDodav = new(
+                    new ReportDataSource<(Firma firma, SimpleStat stat)>.Column()
                     {
                         Name = "Dodavatel",
-                        HtmlRender =(m) =>
-                        {
-                            var f = Firmy.GetAsync(m.Key);
-                            return $"<a href='{f.GetUrl()}'>{f.Jmeno}</a>";
-                        }
+                        HtmlRender =(m) => $"<a href='{m.firma.GetUrl()}'>{m.firma.Jmeno}</a>"
                     },
-                    new ReportDataSource<KeyValuePair<string, SimpleStat>>.Column()
+                    new ReportDataSource<(Firma firma, SimpleStat stat)>.Column()
                     {
                         Name = "Počet smluv",
-                        HtmlRender =(m) => { return $"<a style='float:left' href='/hledatSmlouvy?q={System.Net.WebUtility.UrlEncode(Model.Query + " AND ico:" + m.Key)}'><i class='fas fa-link' aria-hidden='true'></i></a> {HlidacStatu.Util.RenderData.NiceNumber(m.Value.Pocet)}"; },
-                        OrderValueRender = (m) => HlidacStatu.Util.RenderData.OrderValueFormat(m.Value.Pocet),
+                        HtmlRender =(m) => $"<a style='float:left' href='/hledatSmlouvy?q={System.Net.WebUtility.UrlEncode(Model.Query + " AND ico:" + m.firma.ICO)}'><i class='fas fa-link' aria-hidden='true'></i></a> {HlidacStatu.Util.RenderData.NiceNumber(m.stat.Pocet)}",
+                        OrderValueRender = (m) => HlidacStatu.Util.RenderData.OrderValueFormat(m.stat.Pocet),
                         CssClass = "number"
                     },
-                    new ReportDataSource<KeyValuePair<string, SimpleStat>>.Column()
+                    new ReportDataSource<(Firma firma, SimpleStat stat)>.Column()
                     {
                         Name = "Hodnota smluv",
-                        HtmlRender =(m) => { return HlidacStatu.Util.RenderData.NicePrice(m.Value.CelkemCena); },
-                        OrderValueRender = (m) => HlidacStatu.Util.RenderData.OrderValueFormat(m.Value.CelkemCena),
+                        HtmlRender =(m) => HlidacStatu.Util.RenderData.NicePrice(m.stat.CelkemCena),
+                        OrderValueRender = (m) => HlidacStatu.Util.RenderData.OrderValueFormat(m.stat.CelkemCena),
                         CssClass = "number"
                     }
                 );
 
-
-                rdsDodav.AddRows(topDodavatele.Select(m => new KeyValuePair<string, SimpleStat>(m.ICO, m.Summary())));
+                foreach (var topDodavatel in topDodavatele)
+                {
+                    var firma = await Firmy.GetAsync(topDodavatel.ICO);
+                    rdsDodav.AddRow((firma, topDodavatel.Summary()));    
+                }
             }
             @Html.DataToHTMLTable(rdsDodav, dataTableOptions: HtmlExtensions.DatatableOptions(orderColumnIdx: 2, orderDirection: "desc"))
         </div>
@@ -258,7 +257,7 @@
                 StatisticsSubjectPerYear<SimpleStat> fStat = topDodavatele.First(m => m.ICO == ico);
 
                 <tr>
-                    <td>@(Firmy.GetJmenoAsync(ico))</td>
+                    <td>@(await Firmy.GetJmenoAsync(ico))</td>
                     @foreach (var y in Years)
                     {
                         var query = HlidacStatu.Searching.Query.ModifyQueryAND(Model.Query, $"ico:{ico}", $"datumUzavreni:[{y}-01-01 TO {(y + 1)}-01-01}}");
@@ -291,34 +290,33 @@
         Od roku @(HlidacStatu.Lib.Analytics.Consts.RegistrSmluvYearsList.Min()) byly největšími smluvními zadavateli:
     <p>
         @{
-            ReportDataSource<KeyValuePair<string, SimpleStat>> rdsZadav = new(
-                new ReportDataSource<KeyValuePair<string, SimpleStat>>.Column()
+            ReportDataSource<(Firma firma, SimpleStat stat)> rdsZadav = new(
+                new ReportDataSource<(Firma firma, SimpleStat stat)>.Column()
                 {
                     Name = "Zadavatel",
-                    HtmlRender =(m) =>
-                    {
-                        var f = Firmy.GetAsync(m.Key);
-                        return $"<a href='{f.GetUrl()}'>{f.Jmeno}</a>";
-                    }
+                    HtmlRender =(m) => $"<a href='{m.firma.GetUrl()}'>{m.firma.Jmeno}</a>"
                 },
-                new ReportDataSource<KeyValuePair<string, SimpleStat>>.Column()
+                new ReportDataSource<(Firma firma, SimpleStat stat)>.Column()
                 {
                     Name = "Počet smluv",
-                    HtmlRender =(m) => { return $"<a style='float:left' href='/hledatSmlouvy?q={System.Net.WebUtility.UrlEncode(Model.Query + " AND ico:" + m.Key)}'><i class='fas fa-link' aria-hidden='true'></i></a> {HlidacStatu.Util.RenderData.NiceNumber(m.Value.Pocet)}"; },
-                    OrderValueRender = (m) => HlidacStatu.Util.RenderData.OrderValueFormat(m.Value.Pocet),
+                    HtmlRender =(m) => $"<a style='float:left' href='/hledatSmlouvy?q={System.Net.WebUtility.UrlEncode(Model.Query + " AND ico:" + m.firma.ICO)}'><i class='fas fa-link' aria-hidden='true'></i></a> {HlidacStatu.Util.RenderData.NiceNumber(m.stat.Pocet)}",
+                    OrderValueRender = (m) => HlidacStatu.Util.RenderData.OrderValueFormat(m.stat.Pocet),
                     CssClass = "number"
                 },
-                new ReportDataSource<KeyValuePair<string, SimpleStat>>.Column()
+                new ReportDataSource<(Firma firma, SimpleStat stat)>.Column()
                 {
                     Name = "Hodnota smluv",
-                    HtmlRender =(m) => { return HlidacStatu.Util.RenderData.NicePrice(m.Value.CelkemCena); },
-                    OrderValueRender = (m) => HlidacStatu.Util.RenderData.OrderValueFormat(m.Value.CelkemCena),
+                    HtmlRender =(m) => HlidacStatu.Util.RenderData.NicePrice(m.stat.CelkemCena),
+                    OrderValueRender = (m) => HlidacStatu.Util.RenderData.OrderValueFormat(m.stat.CelkemCena),
                     CssClass = "number"
                 }
             );
 
-
-            rdsZadav.AddRows(topZadavatele.Select(m => new KeyValuePair<string, SimpleStat>(m.ICO, m.Summary())));
+            foreach (var zadavatel in topZadavatele)
+            {
+                var firma = await Firmy.GetAsync(zadavatel.ICO);
+                rdsZadav.AddRow((firma, zadavatel.Summary()));    
+            }
         }
         @Html.DataToHTMLTable(rdsZadav, dataTableOptions: HtmlExtensions.DatatableOptions(orderColumnIdx: 2, orderDirection: "desc"))
     </p>
@@ -358,7 +356,7 @@
             StatisticsSubjectPerYear<SimpleStat> fStat = topZadavatele.First(m => m.ICO == ico);
 
             <tr>
-                <td>@(Firmy.GetJmenoAsync(ico))</td>
+                <td>@(await Firmy.GetJmenoAsync(ico))</td>
                 @foreach (var y in Years)
                 {
                     var query = HlidacStatu.Searching.Query.ModifyQueryAND(Model.Query, $"ico:{ico}", $"datumUzavreni:[{y}-01-01 TO {(y + 1)}-01-01}}");

@@ -3,19 +3,20 @@ using HlidacStatu.Entities;
 using HlidacStatu.Entities.OrgStrukturyStatu;
 using HlidacStatu.Extensions;
 using HlidacStatu.Repositories;
-
 using Microsoft.AspNetCore.Mvc;
-
 using System.Linq;
+using System.Threading.Tasks;
+using HlidacStatu.Repositories.Cache;
 
 namespace HlidacStatu.Web.Controllers
 {
-    public partial class SubjektController : Controller
+    public class SubjektController : Controller
     {
 
-        public ActionResult Index(string id)
+        public async Task<ActionResult> Index(string id)
         {
-            if (TryGetCompany(id, out var firma, out var result))
+            var (isProperResult, firma, result) = await TryGetCompanyAsync(id);
+            if (isProperResult)
             {
                 (Firma firma, string viewName, string title) model = (firma, "Index", $"{firma.Jmeno}");
                 return View("_subjektLayout", model);
@@ -25,9 +26,10 @@ namespace HlidacStatu.Web.Controllers
 
         }
 
-        public ActionResult VozovyPark(string id)
+        public async Task<ActionResult> VozovyPark(string id)
         {
-            if (TryGetCompany(id, out var firma, out var result))
+            var (isProperResult, firma, result) = await TryGetCompanyAsync(id);
+            if (isProperResult)
             {
                 (Firma firma, string viewName, string title) model = (firma, "VozovyPark", $"{firma.Jmeno} - Vozový park");
                 return View("_subjektLayout", model);
@@ -35,9 +37,10 @@ namespace HlidacStatu.Web.Controllers
 
             return result;
         }
-        public ActionResult Dotace(string id)
+        public async Task<ActionResult> Dotace(string id)
         {
-            if (TryGetCompany(id, out var firma, out var result))
+            var (isProperResult, firma, result) = await TryGetCompanyAsync(id);
+            if (isProperResult)
             {
                 (Firma firma, string viewName, string title) model = (firma, "Dotace", $"{firma.Jmeno} - Dotace");
                 return View("_subjektLayout", model);
@@ -46,9 +49,10 @@ namespace HlidacStatu.Web.Controllers
             return result;
         }
 
-        public ActionResult Rizika(string id)
+        public async Task<ActionResult> Rizika(string id)
         {
-            if (TryGetCompany(id, out var firma, out var result))
+            var (isProperResult, firma, result) = await TryGetCompanyAsync(id);
+            if (isProperResult)
             {
                 (Firma firma, string viewName, string title) model = (firma, "Rizika", $"{firma.Jmeno} - Sledovaná rizika");
                 return View("_subjektLayout", model);
@@ -58,9 +62,10 @@ namespace HlidacStatu.Web.Controllers
         }
 
 
-        public ActionResult ObchodySeSponzory(string id)
+        public async Task<ActionResult> ObchodySeSponzory(string id)
         {
-            if (TryGetCompany(id, out var firma, out var result))
+            var (isProperResult, firma, result) = await TryGetCompanyAsync(id);
+            if (isProperResult)
             {
                 (Firma firma, string viewName, string title) model = (firma, "ObchodySeSponzory", $"{firma.Jmeno} - Smlouvy se sponzory politických stran");
                 return View("_subjektLayout", model);
@@ -68,9 +73,10 @@ namespace HlidacStatu.Web.Controllers
 
             return result;
         }
-        public ActionResult DalsiDatabaze(string id)
+        public async Task<ActionResult> DalsiDatabaze(string id)
         {
-            if (TryGetCompany(id, out var firma, out var result))
+            var (isProperResult, firma, result) = await TryGetCompanyAsync(id);
+            if (isProperResult)
             {
                 (Firma firma, string viewName, string title) model = (firma, "DalsiDatabaze", $"{firma.Jmeno} - Další informace");
                 return View("_subjektLayout", model);
@@ -79,9 +85,10 @@ namespace HlidacStatu.Web.Controllers
             return result;
         }
 
-        public ActionResult Sponzoring(string id)
+        public async Task<ActionResult> Sponzoring(string id)
         {
-            if (TryGetCompany(id, out var firma, out var result))
+            var (isProperResult, firma, result) = await TryGetCompanyAsync(id);
+            if (isProperResult)
             {
                 (Firma firma, string viewName, string title) model = (firma, "Sponzoring", $"{firma.Jmeno} - Sponzoring politických stran");
                 return View("_subjektLayout", model);
@@ -90,9 +97,10 @@ namespace HlidacStatu.Web.Controllers
             return result;
         }
 
-        public ActionResult RegistrSmluv(string id)
+        public async Task<ActionResult> RegistrSmluv(string id)
         {
-            if (TryGetCompany(id, out var firma, out var result))
+            var (isProperResult, firma, result) = await TryGetCompanyAsync(id);
+            if (isProperResult)
             {
                 (Firma firma, string viewName, string title) model = (firma, "RegistrSmluv", $"{firma.Jmeno} - Registr smluv");
                 return View("_subjektLayout", model);
@@ -101,9 +109,10 @@ namespace HlidacStatu.Web.Controllers
             return result;
         }
 
-        public ActionResult VerejneZakazky(string id)
+        public async Task<ActionResult> VerejneZakazky(string id)
         {
-            if (TryGetCompany(id, out var firma, out var result))
+            var (isProperResult, firma, result) = await TryGetCompanyAsync(id);
+            if (isProperResult)
             {
                 (Firma firma, string viewName, string title) model = (firma, "VerejneZakazky", $"{firma.Jmeno} - Veřejné zakázky");
                 return View("_subjektLayout", model);
@@ -113,9 +122,10 @@ namespace HlidacStatu.Web.Controllers
         }
 
 
-        public ActionResult Vazby(string id, Relation.AktualnostType? aktualnost)
+        public async Task<ActionResult> Vazby(string id, Relation.AktualnostType? aktualnost)
         {
-            if (TryGetCompany(id, out var firma, out var result))
+            var (isProperResult, firma, result) = await TryGetCompanyAsync(id);
+            if (isProperResult)
             {
                 var popis = "Dceřiné společnosti";
                 if (firma.JsemOVM())
@@ -132,9 +142,10 @@ namespace HlidacStatu.Web.Controllers
 
             return result;
         }
-        public ActionResult VazbyUredni(string id, Relation.AktualnostType? aktualnost)
+        public async Task<ActionResult> VazbyUredni(string id, Relation.AktualnostType? aktualnost)
         {
-            if (TryGetCompany(id, out var firma, out var result))
+            var (isProperResult, firma, result) = await TryGetCompanyAsync(id);
+            if (isProperResult)
             {
                 var popis = "Úřední vazby na společnosti";
 
@@ -150,9 +161,10 @@ namespace HlidacStatu.Web.Controllers
             return result;
         }
 
-        public ActionResult VazbyOsoby(string id, Relation.AktualnostType? aktualnost)
+        public async Task<ActionResult> VazbyOsoby(string id, Relation.AktualnostType? aktualnost)
         {
-            if (TryGetCompany(id, out var firma, out var result))
+            var (isProperResult, firma, result) = await TryGetCompanyAsync(id);
+            if (isProperResult)
             {
                 var popis = "Osoby s vazbou na " + Firmy.GetJmenoAsync(firma.ICO);
             
@@ -167,9 +179,10 @@ namespace HlidacStatu.Web.Controllers
 
             return result;
         }
-        public ActionResult Odberatele(string id)
+        public async Task<ActionResult> Odberatele(string id)
         {
-            if (TryGetCompany(id, out var firma, out var result))
+            var (isProperResult, firma, result) = await TryGetCompanyAsync(id);
+            if (isProperResult)
             {
                 (Firma firma, string viewName, string title) model = (firma, "Odberatele", $"{firma.Jmeno} - Odběratelé");
                 return View("_subjektLayout", model);
@@ -178,9 +191,10 @@ namespace HlidacStatu.Web.Controllers
             return result;
         }
 
-        public ActionResult Dodavatele(string id)
+        public async Task<ActionResult> Dodavatele(string id)
         {
-            if (TryGetCompany(id, out var firma, out var result))
+            var (isProperResult, firma, result) = await TryGetCompanyAsync(id);
+            if (isProperResult)
             {
                 (Firma firma, string viewName, string title) model = (firma, "Dodavatele", $"{firma.Jmeno} - Dodavatelé");
                 return View("_subjektLayout", model);
@@ -189,9 +203,10 @@ namespace HlidacStatu.Web.Controllers
             return result;
         }
         
-        public ActionResult NapojeneOsoby(string id)
+        public async Task<ActionResult> NapojeneOsoby(string id)
         {
-            if (TryGetCompany(id, out var firma, out var result))
+            var (isProperResult, firma, result) = await TryGetCompanyAsync(id);
+            if (isProperResult)
             {
                 (Firma firma, string viewName, string title) model = (firma, "NapojeneOsoby", $"{firma.Jmeno} - Napojené osoby");
                 return View("_subjektLayout", model);
@@ -200,10 +215,11 @@ namespace HlidacStatu.Web.Controllers
             return result;
         }
 
-        public ActionResult OrganizacniStruktura(string id, string orgId)
+        public async Task<ActionResult> OrganizacniStruktura(string id, string orgId)
         {
             //ico => id translation!
-            if (!StaticData.OrganizacniStrukturyUraduCache.Get().Urady.TryGetValue(id, out var ossu))
+            var osu = await MaterializedViewsCache.GetOrganizacniStrukturyUraduAsync();
+            if (!osu.Urady.TryGetValue(id, out var ossu))
             {
                 return RedirectToAction("Index");
             }
@@ -219,15 +235,15 @@ namespace HlidacStatu.Web.Controllers
                 dataHierarchy = ossu.FirstOrDefault()?.GenerateD3DataHierarchy();
             }
 
-            var osu = StaticData.OrganizacniStrukturyUraduCache.Get();
             ViewBag.ExporDate = osu.PlatneKDatu;
 
             return dataHierarchy is null ? RedirectToAction("Index") : (ActionResult)View(dataHierarchy);
         }
 
-        public ActionResult DalsiInformace(string id)
+        public async Task<ActionResult> DalsiInformace(string id)
         {
-            if (TryGetCompany(id, out var firma, out var result))
+            var (isProperResult, firma, result) = await TryGetCompanyAsync(id);
+            if (isProperResult)
             {
                 (Firma firma, string viewName, string title) model = (firma, "DalsiInformace", $"{firma.Jmeno} - Informace z registrů");
                 return View("_subjektLayout", model);
@@ -237,9 +253,10 @@ namespace HlidacStatu.Web.Controllers
         }
 
 
-        public ActionResult InsolvencniRejstrik(string id)
+        public async Task<ActionResult> InsolvencniRejstrik(string id)
         {
-            if (TryGetCompany(id, out var firma, out var result))
+            var (isProperResult, firma, result) = await TryGetCompanyAsync(id);
+            if (isProperResult)
             {
                 (Firma firma, string viewName, string title) model = (firma, "InsolvencniRejstrik", $"{firma.Jmeno} - Insolvenční rejstřík");
                 return View("_subjektLayout", model);
@@ -250,14 +267,15 @@ namespace HlidacStatu.Web.Controllers
         }
 
         [NonAction()]
-        private bool TryGetCompany(string id, out Firma firma, out ActionResult actionResult)
+        private async Task<(bool, Firma? firma, ActionResult actionResult)> TryGetCompanyAsync(string id)
         {
-            firma = null;
-
+            Firma firma = null;
+            ActionResult actionResult = null;
+            
             if (string.IsNullOrWhiteSpace(id))
             {
                 actionResult = RedirectToAction("Index", "Home");
-                return false;
+                return (false, firma, actionResult);
             }
 
             string ico = Util.ParseTools.NormalizeIco(id);
@@ -275,16 +293,16 @@ namespace HlidacStatu.Web.Controllers
                     else
                         actionResult = View("Subjekt_err_nezname");
                 }
-                return false;
+                return (false, firma, actionResult);
             }
             if (Util.DataValidators.IsFirmaIcoZahranicni(ico))
             {
                 actionResult = View("Subjekt_zahranicni", firma);
-                return false;
+                return (false, firma, actionResult);
             }
 
             actionResult = View("Index", firma);
-            return true;
+            return (true, firma, actionResult);
         }
 
     }

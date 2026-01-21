@@ -75,9 +75,7 @@ namespace HlidacStatu.Repositories
 
         public static string Dumps_Path = null;
 
-        public static Devmasters.Cache.AWS_S3.AutoUpdatebleCache<OrganizacniStrukturyUradu>
-            OrganizacniStrukturyUraduCache = null;
-
+        
         public static Devmasters.Cache.LocalMemory.AutoUpdatedCache<List<Sponzoring>> SponzorujiciFirmy_Vsechny = null;
         public static Devmasters.Cache.LocalMemory.AutoUpdatedCache<List<Sponzoring>> SponzorujiciFirmy_Nedavne = null;
 
@@ -276,96 +274,7 @@ namespace HlidacStatu.Repositories
                 UrlTemplate = "/Hledat?Q={0}"
             });
 
-
-            // hierarchie uradu
-            try
-            {
-                OrganizacniStrukturyUraduCache =
-                    new Devmasters.Cache.AWS_S3.AutoUpdatebleCache<OrganizacniStrukturyUradu>(
-                        new string[] { Devmasters.Config.GetWebConfigValue("Minio.Cache.Endpoint") },
-                        Devmasters.Config.GetWebConfigValue("Minio.Cache.Bucket"),
-                        Devmasters.Config.GetWebConfigValue("Minio.Cache.AccessKey"),
-                        Devmasters.Config.GetWebConfigValue("Minio.Cache.SecretKey"),
-                        TimeSpan.FromDays(90),
-                        "OrganizacniStrukturyUradu", (obj) =>
-                        {
-                            OrganizacniStrukturyUradu res = new OrganizacniStrukturyUradu();
-                            var ossu = ParseOssu();
-
-                            res.PlatneKDatu = ossu.ExportInfo.ExportDatumCas;
-
-                            var _organizaniStrukturyUradu = new Dictionary<string, List<JednotkaOrganizacni>>();
-                            try
-                            {
-                                foreach (var urad in ossu.UradSluzebniSeznam.SluzebniUrady)
-                                {
-                                    var f = FirmaRepo.FromDSAsync(urad.idDS);
-                                    if (f is null || !f.Valid)
-                                    {
-                                        if (string.IsNullOrEmpty(urad.idNadrizene))
-                                        {
-                                            _logger.Error(
-                                                $"Organizační struktura - nenalezena datová schránka [{urad.idDS}] úřadu [{urad.oznaceni}]");
-                                            continue;
-                                        }
-
-                                        var nadrizeny = ossu.UradSluzebniSeznam.SluzebniUrady
-                                            .Where(u => u.id == urad.idNadrizene)
-                                            .FirstOrDefault();
-
-                                        if (nadrizeny is null)
-                                        {
-                                            _logger.Error(
-                                                $"Nenalezen nadřízený úřad, ani datová schránka [{urad.idDS}] úřadu [{urad.oznaceni}]");
-                                            continue;
-                                        }
-
-                                        f = FirmaRepo.FromDSAsync(nadrizeny.idDS);
-                                        if (f is null || !f.Valid)
-                                        {
-                                            _logger.Error(
-                                                $"Organizační struktura - nenalezena datová schránka [{nadrizeny.idDS}] nadřízeného úřadu [{nadrizeny.oznaceni}]");
-                                            continue;
-                                        }
-                                    }
-
-                                    var sluzebniUrad = ossu.OrganizacniStruktura.Where(os => os.id == urad.id)
-                                        .FirstOrDefault()
-                                        ?.StrukturaOrganizacni?.HlavniOrganizacniJednotka;
-
-                                    if (sluzebniUrad is null)
-                                    {
-                                        _logger.Information(
-                                            $"Služební úřad [{urad.oznaceni}] nemá podřízené organizace.");
-                                        continue;
-                                    }
-
-                                    if (_organizaniStrukturyUradu.TryGetValue(f.ICO, out var sluzebniUrady))
-                                    {
-                                        sluzebniUrady.Add(sluzebniUrad);
-                                    }
-                                    else
-                                    {
-                                        _organizaniStrukturyUradu.Add(f.ICO, new List<JednotkaOrganizacni>()
-                                        {
-                                            sluzebniUrad
-                                        });
-                                    }
-                                }
-                            }
-                            catch (Exception ex)
-                            {
-                                _logger.Error($"Chyba záznamu při zpracování struktury úřadů. {ex}");
-                            }
-
-                            res.Urady = _organizaniStrukturyUradu;
-                            return res;
-                        }, null);
-            }
-            catch (Exception ex)
-            {
-                _logger.Error($"Chyba při zpracování struktury úřadů. {ex}");
-            }
+            
 
 
             initialized = true;
@@ -375,28 +284,6 @@ namespace HlidacStatu.Repositories
             _logger.Information("Static data - Init DONE");
         }
 
-        private static organizacni_struktura_sluzebnich_uradu ParseOssu()
-        {
-            try
-            {
-                string url = "https://portal.isoss.gov.cz/opendata/ISoSS_Opendata_OSYS_OSSS.xml";
-                string xml = Devmasters.Net.HttpClient.Simple.Get(url);
-
-                var ser = new XmlSerializer(typeof(organizacni_struktura_sluzebnich_uradu));
-
-                using (var streamReader = new StringReader(xml))
-                {
-                    using (var reader = XmlReader.Create(streamReader))
-                    {
-                        return (organizacni_struktura_sluzebnich_uradu)ser.Deserialize(reader);
-                    }
-                }
-            }
-            catch (Exception e)
-            {
-                _logger.Error(e, "organizacni_struktura_sluzebnich_uradu ParseOssu");
-                return new organizacni_struktura_sluzebnich_uradu();
-            }
-        }
+        
     }
 }

@@ -1,6 +1,7 @@
 ﻿@model HlidacStatu.Entities.Firma
 @using System.Linq;
 @using HlidacStatu.Extensions
+@using HlidacStatu.Repositories.Cache
 
 @{
     Layout = null;
@@ -47,7 +48,7 @@
     }
 
 
-    @if (HlidacStatu.Repositories.StaticData.OrganizacniStrukturyUraduCache.Get().Urady.TryGetValue(Model.ICO, out var podrizeneOrg))
+    @if ((await MaterializedViewsCache.GetOrganizacniStrukturyUraduAsync()).Urady.TryGetValue(Model.ICO, out var podrizeneOrg))
     {
         var sum = new HlidacStatu.Entities.OrgStrukturyStatu.Summary(podrizeneOrg);
         <div>

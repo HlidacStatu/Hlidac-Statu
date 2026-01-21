@@ -1485,7 +1485,7 @@
 
     @{
         var ovmCats = await Model.KategorieOVMAsync();
-        HlidacStatu.Repositories.StaticData.OrganizacniStrukturyUraduCache.Get().Urady.TryGetValue(Model.ICO, out var ossu);
+        (await MaterializedViewsCache.GetOrganizacniStrukturyUraduAsync()).Urady.TryGetValue(Model.ICO, out var ossu);
     }
     @if (ovmCats.Count() > 0 || ossu?.Count > 0)
     {
