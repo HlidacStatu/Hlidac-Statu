@@ -299,8 +299,8 @@ namespace HlidacStatu.Repositories
             if (deep > 50)
                 return list;
 
-            var parents = f.ParentFirmy(DS.Graphs.Relation.CharakterVazbyEnum.VlastnictviKontrola, DS.Graphs.Relation.AktualnostType.Nedavny)
-                .UnionBy(f.ParentFirmy(DS.Graphs.Relation.CharakterVazbyEnum.Uredni, DS.Graphs.Relation.AktualnostType.Nedavny), m => m.ICO);
+            var parents = (await f.ParentFirmyAsync(DS.Graphs.Relation.CharakterVazbyEnum.VlastnictviKontrola, DS.Graphs.Relation.AktualnostType.Nedavny))
+                .UnionBy(await f.ParentFirmyAsync(DS.Graphs.Relation.CharakterVazbyEnum.Uredni, DS.Graphs.Relation.AktualnostType.Nedavny), m => m.ICO);
 
             foreach (var ff in parents)
             {

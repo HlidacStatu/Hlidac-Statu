@@ -182,17 +182,20 @@ namespace HlidacStatu.MCPServer.Tools
                     Firma f = await HlidacStatu.Repositories.Firmy.GetAsync(ico);
                     if (f?.Valid != true)
                         return null;
-
-                    var res = (await f.IcosInHoldingAsync(historic_view))
-                            .Select(m => new SimpleDetailInfo()
-                            {
-                                Ico = m,
-                                Jmeno = HlidacStatu.Repositories.Firmy.GetJmenoAsync(m),
-                                Source_Url = HlidacStatu.Entities.Firma.GetUrl(m, false),
-                            })
-                            .ToArray();
-
-                    return res;
+                    
+                    var icos = await f.IcosInHoldingAsync(historic_view);
+                    var res = new List<SimpleDetailInfo>();
+                    foreach (var ico in icos)
+                    {
+                        res.Add(new SimpleDetailInfo()
+                        {
+                            Ico = ico,
+                            Jmeno = await HlidacStatu.Repositories.Firmy.GetJmenoAsync(ico),
+                            Source_Url = HlidacStatu.Entities.Firma.GetUrl(ico, false),
+                        });
+                    }
+                    
+                    return res.ToArray();
                 });
         }
 

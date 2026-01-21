@@ -16,20 +16,14 @@
         new()
         {
             Name = "Úřad",
-            HtmlRender = (s) =>
-            {
-                return string.Format("<a href='/subjekt/{0}'>{1}</a> <br/> {2}", s.Firma.ICO,
-                    s.Firma.Jmeno,
-                    s.Stat.Summary().ToNiceLinkString(null, true, "/subjekt/" + s.Firma.ICO)
-                );
-            },
-            OrderValueRender = (s) => { return Firmy.GetJmenoAsync(s.Firma.ICO); }
+            HtmlRender = (s) => $"<a href='/subjekt/{s.Firma.ICO}'>{s.Firma.Jmeno}</a> <br/> {s.Stat.Summary().ToNiceLinkString(null, true, "/subjekt/" + s.Firma.ICO)}",
+            OrderValueRender = (s) => s.Firma.Jmeno
         },
         new()
         {
             Name = "Počet smluv",
-            HtmlRender = (s) => { return s.Bdfs.Pocet.ToString(); },
-            OrderValueRender = (s) => { return s.Bdfs.Pocet.ToString(); }
+            HtmlRender = (s) => s.Bdfs.Pocet.ToString(),
+            OrderValueRender = (s) => s.Bdfs.Pocet.ToString()
         },
         new()
         {
@@ -43,13 +37,13 @@
                 else
                     return "0";
             },
-            OrderValueRender = (s) => { return HlidacStatu.Util.RenderData.OrderValueFormat(s.Stat.Summary().PocetSmluv); }
+            OrderValueRender = (s) => HlidacStatu.Util.RenderData.OrderValueFormat(s.Stat.Summary().PocetSmluv)
         },
         new()
         {
             Name = "Celková hodnota smluv",
-            HtmlRender = (s) => { return Smlouva.NicePrice(s.Bdfs.CelkemCena, html: true, shortFormat: true); },
-            OrderValueRender = (s) => { return HlidacStatu.Util.RenderData.OrderValueFormat(s.Bdfs.CelkemCena); }
+            HtmlRender = (s) => Smlouva.NicePrice(s.Bdfs.CelkemCena, html: true, shortFormat: true),
+            OrderValueRender = (s) => HlidacStatu.Util.RenderData.OrderValueFormat(s.Bdfs.CelkemCena)
         },
         new()
         {
@@ -63,7 +57,7 @@
                 else
                     return "0";
             },
-            OrderValueRender = (s) => { return HlidacStatu.Util.RenderData.OrderValueFormat((s.Stat.Summary().CelkovaHodnotaSmluv)); }
+            OrderValueRender = (s) => HlidacStatu.Util.RenderData.OrderValueFormat((s.Stat.Summary().CelkovaHodnotaSmluv))
         },
         new()
         {
@@ -110,7 +104,7 @@
 
     foreach (var bf in data.SoukromeFirmy.Where(o => o.Pocet > 7).OrderByDescending(o => o.CelkemCena).Take(500))
     {
-        var firma = Firmy.GetAsync(bf.Ico);
+        var firma = await Firmy.GetAsync(bf.Ico);
         StatisticsSubjectPerYear<Smlouva.Statistics.Data>? stat = null;
         if (firma?.Valid == true)
         {

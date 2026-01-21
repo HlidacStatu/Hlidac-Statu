@@ -1,9 +1,9 @@
 ﻿@using HlidacStatu.Lib.Analytics
 @using Nest
 @using HlidacStatu.XLib.Render;
-@using HlidacStatu.Extensions
 @using HlidacStatu.Repositories
 @using HlidacStatu.Entities
+@using HlidacStatu.Extensions
 
 
 @{
@@ -31,28 +31,28 @@
                     Tuple<string, string> data = (Tuple<string, string>)s;
                     return string.Format(@"<a href='/subjekt/{0}'>{1}</a>", data.Item2, data.Item1);
                 },
-                TextRender = (s) => { return ((Tuple<string, string>)s).Item1.ToString(); },
-                ValueRender = (s) => { return $"\"{((System.Tuple<string, string>)s).Item1.ToString()}\""; }
+                TextRender = (s) => ((Tuple<string, string>)s).Item1.ToString(),
+                ValueRender = (s) => $"\"{((System.Tuple<string, string>)s).Item1.ToString()}\""
             },
             new()
             {
                 Name = "Počet smluv bez uvedené ceny",
-                OrderValueRender = (s) => { return HlidacStatu.Util.RenderData.OrderValueFormat(Convert.ToInt64(s)); },
-                ValueRender = (s) => { return Convert.ToInt64(s).ToString("F0", HlidacStatu.Util.Consts.enCulture); }
+                OrderValueRender = (s) => HlidacStatu.Util.RenderData.OrderValueFormat(Convert.ToInt64(s)),
+                ValueRender = (s) => Convert.ToInt64(s).ToString("F0", HlidacStatu.Util.Consts.enCulture)
             },
             new()
             {
                 Name = "Počet všech smluv",
-                OrderValueRender = (s) => { return HlidacStatu.Util.RenderData.OrderValueFormat(Convert.ToInt64(s)); },
-                ValueRender = (s) => { return Convert.ToInt64(s).ToString("F0", HlidacStatu.Util.Consts.enCulture); }
+                OrderValueRender = (s) => HlidacStatu.Util.RenderData.OrderValueFormat(Convert.ToInt64(s)),
+                ValueRender = (s) => Convert.ToInt64(s).ToString("F0", HlidacStatu.Util.Consts.enCulture)
             },
             new()
             {
                 Name = "% smluv bez cen",
-                HtmlRender =(s) => { return ((double)s).ToString("P1"); },
-                ValueRender = (s) => { return Convert.ToInt64(s).ToString("F1", HlidacStatu.Util.Consts.enCulture); },
-                TextRender = (s) => { return ((double)s).ToString("P1"); },
-                OrderValueRender = (s) => { return HlidacStatu.Util.RenderData.OrderValueFormat((double)s); }
+                HtmlRender =(s) => ((double)s).ToString("P1"),
+                ValueRender = (s) => Convert.ToInt64(s).ToString("F1", HlidacStatu.Util.Consts.enCulture),
+                TextRender = (s) => ((double)s).ToString("P1"),
+                OrderValueRender = (s) => HlidacStatu.Util.RenderData.OrderValueFormat((double)s)
             },
         }
     );
@@ -60,7 +60,7 @@
     foreach (KeyedBucket<object> val in ((BucketAggregate)res.ElasticResults.Aggregations["perIco"]).Items)
     {
         StatisticsSubjectPerYear<Smlouva.Statistics.Data> statRs = new();
-        var f = Firmy.GetAsync((string)val.Key);
+        var f = await Firmy.GetAsync((string)val.Key);
         if (f != null)
             statRs = await f.StatistikaRegistruSmluvAsync();
 

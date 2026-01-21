@@ -40,11 +40,15 @@
 
 @if (koncentrace?.Dodavatele?.Count() > 0)
 {
-    List<Tuple<string, decimal>> data = koncentrace.TopDodavatele(3)
-        .OrderByDescending(m => m.HodnotaSmluv)
-        .Select(m => new Tuple<string, decimal>(Firmy.GetJmenoAsync(m.Ico), m.HodnotaSmluv))
-        .Take(12)
-        .ToList();
+    var topDodavatele = koncentrace.TopDodavatele(3).OrderByDescending(m => m.HodnotaSmluv).Take(12);
+    var data = new List<Tuple<string, decimal>>();
+    foreach (var m in topDodavatele)
+    {
+        var jmeno = await Firmy.GetJmenoAsync(m.Ico);
+        data.Add(new Tuple<string, decimal>(jmeno, m.HodnotaSmluv));
+    }
+
+    
     if (koncentrace.HodnotaSmluvProVypocet - data.Sum(m => m.Item2) > 0)
     {
         data.Add(new Tuple<string, decimal>("ostatní", koncentrace.HodnotaSmluvProVypocet - data.Sum(m => m.Item2)));
@@ -83,7 +87,7 @@
                                     <i class="far fa-file-search"></i>
                                 </a>
                             </td>
-                            <td>@Firmy.GetJmenoAsync(souh.Ico)</td>
+                            <td>@(await Firmy.GetJmenoAsync(souh.Ico))</td>
                             <td class="number">@HlidacStatu.Util.RenderData.NiceNumber(souh.PocetSmluv)</td>
                             @if (showHodnota)
                             {

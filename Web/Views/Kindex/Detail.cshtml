@@ -24,7 +24,7 @@
     }
 
 
-    Firma f = Firmy.GetAsync(Model.id);
+    Firma f = await Firmy.GetAsync(Model.id);
     KIndexData kidx = await KIndex.GetCachedAsync(HlidacStatu.Util.ParseTools.NormalizeIco(Model.id), futureData);
     kidx.roky = kidx.roky
         .Where(m => m.Rok <= maxYearToShow)
@@ -45,7 +45,6 @@
                                 + "<meta property=\"og:image:type\" content=\"image/png\" />";
     }
 }
-
 
 @section scripts
 {
@@ -100,8 +99,6 @@
                 $('html,body').animate({scrollTop: $(urihash).offset().top}, 500);
                 $(urihash).click();
             }
-
-
         });
 
         function showHelp(btn, id) {
@@ -117,8 +114,6 @@
             }
         }
     </script>
-
-
 }
 
 @section breadcrumb
@@ -133,9 +128,6 @@
 
 @section onlyembed
 {
-    @*@Html.Action("CachedAction_Child_12H", new { model = Model, aktualnost = aktualnost, NameOfView = "OsobaProfil_embed", key = Model.NameId, param1 = aktualnost.ToString() })*@
-    @*@Html.Action("Osoba_child", new { model = Model, aktualnost = aktualnost, NameOfView = "OsobaProfil_embed" })*@
-
     <a href="@kidx.GetUrl(false, Model.rok)" target="_top">
         <img
             src="@($"https://gen.hlidacstatu.cz/socialbanner/kindex?d={DateTime.Now.ToString("yyMMdd")}&v=" + Model.id)"

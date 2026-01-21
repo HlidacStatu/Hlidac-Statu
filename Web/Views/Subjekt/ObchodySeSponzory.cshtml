@@ -22,7 +22,7 @@
 {
     var numPercent = "0";
     var sumPercent = "0";
-    var stat = await Firmy.GetAsync(uradSVazbami.Ico).StatistikaRegistruSmluvAsync();
+    var stat = await (await Firmy.GetAsync(uradSVazbami.Ico)).StatistikaRegistruSmluvAsync();
     if (stat.Summary().PocetSmluv > 0)
     {
         numPercent = ((double)uradSVazbami.Pocet / (double)stat.Summary().PocetSmluv).ToString("P2");
@@ -84,7 +84,7 @@
                             }
                             else
                             {
-                                var firmaSponzoring = await Firmy.GetAsync(f.Item).SponzoringToHtmlAsync();
+                                var firmaSponzoring = await (await Firmy.GetAsync(f.Item)).SponzoringToHtmlAsync();
                                 if (!string.IsNullOrEmpty(firmaSponzoring))
                                 {
                                     sb.AppendFormat("<br/>{0}<br/>&nbsp;", firmaSponzoring);

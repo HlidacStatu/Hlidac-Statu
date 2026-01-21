@@ -17,7 +17,8 @@
 
         foreach (var platcePrijemce in platciPrijemci)
         {
-            if (Firmy.GetAsync(platcePrijemce.ico)?.Valid == true && (await Firmy.GetAsync(platcePrijemce.ico).IsSponzorAsync()) == true)
+            var firma = await Firmy.GetAsync(platcePrijemce.ico); 
+            if (firma?.Valid == true && await firma.IsSponzorAsync())
             {
                 isSponzorStrany = true;
                 break;
@@ -132,7 +133,7 @@
 
             @foreach (var subj in Model.Prijemce.Union(new Smlouva.Subjekt[] { Model.Platce }))
             {
-                var firma = Firmy.GetAsync(subj.ico);
+                var firma = await Firmy.GetAsync(subj.ico);
                 if (firma?.Valid == true && await firma.IsSponzorAsync() && firma.JsemSoukromaFirma())
                 {
                     <div class="card bg-default">

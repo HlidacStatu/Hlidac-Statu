@@ -13,7 +13,6 @@
     Layout = null;
 }
 
-
 <div class="row">
     <div class="col-xs-12">
 
@@ -27,12 +26,12 @@
                             <div class="box-stats__content">
                                 @{
                                     var sql = @"select r.spisovaznacka, r.stav, r.datumZalozeni, r. posledniZmena, o.nameid from insolvence..Dluznici d
-                                                                            inner join Osoba o
-                                                                                on d.OsobaId collate Czech_CI_AS = o.NameId and o.Status=3
-                                                                            inner join insolvence..rizeni r
-                                                                                on d.rizeniId = r.spisovaznacka and (stav != 'MYLNÝ ZÁP.' OR stav!='ZRUŠENO VS')
-                                                                        where osobaid is not null and OsobaId != ''
-                                                                        and d.Typ='F'";
+                                                        inner join Osoba o
+                                                            on d.OsobaId collate Czech_CI_AS = o.NameId and o.Status=3
+                                                        inner join insolvence..rizeni r
+                                                            on d.rizeniId = r.spisovaznacka and (stav != 'MYLNÝ ZÁP.' OR stav!='ZRUŠENO VS')
+                                                    where osobaid is not null and OsobaId != ''
+                                                    and d.Typ='F'";
 
                                     var politici = DirectDB.Instance
                                         .GetList<string, string, DateTime, DateTime, string>(sql)
@@ -95,18 +94,26 @@
                                             var o = await OsobaCache.GetPersonByNameIdAsync(p.Item1.OsobaNameId);
                                             sb.AppendLine($"<b>{o.FullNameWithYear()}</b><br/>");
                                             sb.AppendLine($"<div class='text-muted small-link' style='padding-left:2em;'>");
+                                            
+                                            var items = new List<string>();
+                                            foreach (var m in p.Item2.OrderByDescending(oo => oo.Zahajeni))
+                                            {
+                                                var firma = await Firmy.GetAsync(m.VybraniDluznici.First());
+                                                items.Add($"<a href='{Rizeni.GetUrlFromId(m.SpisovaZnacka)}'>" +
+                                                          $"{Devmasters.TextUtil.ShortenText(firma.Jmeno, 20)}</a>" +
+                                                          $" /z {m.Zahajeni.ToString("yyyy")}/");
+                                            }
 
                                             sb.AppendLine(
                                                 RenderData.LimitedList(
                                                     2,
-                                                    p.Item2.OrderByDescending(oo => oo.Zahajeni)
-                                                        .Select(m => $"<a href='{Rizeni.GetUrlFromId(m.SpisovaZnacka)}'>"
-                                                            + $"{Devmasters.TextUtil.ShortenText(Firmy.GetAsync(m.VybraniDluznici.First()).Jmeno,20)}</a>"
-                                                            + $" /z {m.Zahajeni.ToString("yyyy")}/"),
-                                                    "{0}","<br/>",
-                                                    moreTextPrefix:"<br/>a ",
+                                                    items,
+                                                    "{0}", "<br/>",
+                                                    moreTextPrefix: "<br/>a ",
                                                     morePluralForm: pd)
                                             );
+
+                                            
                                         sb.AppendLine("</div>");
                                     }
                                     <low-box width="80">

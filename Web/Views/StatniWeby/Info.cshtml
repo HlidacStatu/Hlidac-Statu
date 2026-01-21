@@ -7,9 +7,6 @@
     ViewBag.Title = "Hlídač " + Model.Name;
     ViewBag.SubTitle = "Týdenní dostupnost pro " + Model.Name;
 
-    int hoursBack = 48;
-    DateTime backHours = DateTime.Now.AddHours(-1 * hoursBack);
-
     UptimeServer.HostAvailability web = null;
     UptimeSSL webssl = null;
     try
@@ -97,7 +94,7 @@ else
         </small>
     </h2>
     <p class="lead">
-        @UptimeServerRepo.PatriPodUradJmenoAsync(web.Host) @Html.Raw(web.Host.Description)
+        @(await UptimeServerRepo.PatriPodUradJmenoAsync(web.Host)) @Html.Raw(web.Host.Description)
     </p>
     <hr/>
     if (webssl != null)

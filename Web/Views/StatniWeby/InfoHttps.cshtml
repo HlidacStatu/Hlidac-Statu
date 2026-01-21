@@ -15,8 +15,6 @@
     {
     }
 
-
-
 }
 @section scripts
 {
@@ -73,7 +71,7 @@
     <br /><small><a href="@Model.PublicUrl" target="_blank" onclick="return trackOutLink(this,'statniweby/info');">@Model.PublicUrl</a></small>
 </h2>
 <p class="lead">
-    @UptimeServerRepo.PatriPodUradJmenoAsync(Model) @Html.Raw(Model.Description)
+    @(await UptimeServerRepo.PatriPodUradJmenoAsync(Model)) @Html.Raw(Model.Description)
 </p>
 <hr />
 

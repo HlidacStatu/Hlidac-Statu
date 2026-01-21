@@ -424,8 +424,8 @@ namespace HlidacStatu.Extensions
                     {
                         //ostatni
                         statDesc += $"Angažoval se {(stat.StatniFirmy.Count > 0 ? "také" : "")} v <b>";
-                        var neziskovkyCount = stat.SmlouvyStat_NeziskovkyCount();
-                        var komercniFirmyCount = stat.SmlouvyStat_KomercniFirmyCount();
+                        var neziskovkyCount = await stat.SmlouvyStat_NeziskovkyCountAsync();
+                        var komercniFirmyCount = await stat.SmlouvyStat_KomercniFirmyCountAsync();
                         if (neziskovkyCount > 0 && komercniFirmyCount == 0)
                         {
                             statDesc +=

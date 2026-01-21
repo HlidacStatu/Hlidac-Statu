@@ -146,8 +146,8 @@ namespace HlidacStatu.Extensions
             }
             else if (firma.JsemStatniFirma())
             {
-                var parentOVM = firma.ParentFirmy( Relation.CharakterVazbyEnum.VlastnictviKontrola, Relation.AktualnostType.Aktualni)
-                    .ToArray();
+                var parentOVM = await firma.ParentFirmyAsync(Relation.CharakterVazbyEnum.VlastnictviKontrola,
+                    Relation.AktualnostType.Aktualni);
 
                 musi = false;
                 foreach (var m in parentOVM)
@@ -460,14 +460,24 @@ namespace HlidacStatu.Extensions
         /// </summary>
         /// <param name="aktualnost"></param>
         /// <returns></returns>
-        public static async Task<IEnumerable<Firma>> HoldingAsync(this Firma firma, Relation.AktualnostType aktualnost)
+        public static async Task<List<Firma>> HoldingAsync(this Firma firma, Relation.AktualnostType aktualnost)
         {
             if (firma == null)
                 return null;
 
             var icos = await firma.IcosInHoldingAsync(aktualnost);
 
-            return icos.Select(ico => Firmy.GetAsync(ico));
+            List<Firma> firmy = [];
+            foreach (var ico in icos)
+            {
+                var f = await Firmy.GetAsync(ico);
+                if (f is not null)
+                {
+                    firmy.Add(f);
+                }
+            }
+
+            return firmy;
         }
 
 

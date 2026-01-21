@@ -222,10 +222,11 @@ namespace HlidacStatu.Repositories
                     Smlouva.SClassification.ClassificationsTypes.finance_bankovni
                 ];
 
-                var smluvniStrany = smlouva.Prijemce.Concat([smlouva.Platce])
-                    .Select(m => Firmy.GetAsync(m.ico))
-                    .Where(m => m?.Valid == true)
-                    .ToArray();
+                var smluvniStrany = new List<Firma>();
+                foreach (var strana in smlouva.Prijemce.Concat([smlouva.Platce]))
+                {
+                    smluvniStrany.Add(await Firmy.GetAsync(strana.ico));
+                }
                 
                 if (types.Count(m => vyjimkyClassif.Contains(m.Key)) > 0
                     && smluvniStrany.Any(m => m.ESA2010?.StartsWith("12") == true) == false

@@ -23,16 +23,20 @@ namespace HlidacStatu.Web.Controllers
             {
                 var poskytovateleIcos =
                     await HlidacStatu.Repositories.DotaceRepo.ReportPoskytovatelePoLetechAsync(null, null);
-
-                var poskytovatele = poskytovateleIcos
-                    .Select(i => new poskytovateleCacheModel(
-                        Firmy.GetJmenoAsync(i.IcoPoskytovatele).RemoveAccents(),
+                
+                var poskytovatele = new List<poskytovateleCacheModel>();
+                foreach (var i in poskytovateleIcos)
+                {
+                    var jmeno = await Firmy.GetJmenoAsync(i.IcoPoskytovatele);
+                    poskytovatele.Add(new poskytovateleCacheModel(
+                        jmeno.RemoveAccents(),
                         i.IcoPoskytovatele,
                         i.Count,
                         i.Sum)
-                    )
-                    .ToArray();
-                return poskytovatele;
+                    );
+                }
+
+                return poskytovatele.ToArray();
             }, options =>
             {
                 options.Duration = TimeSpan.FromHours(1);

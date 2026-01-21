@@ -31,15 +31,14 @@ namespace HlidacStatu.Repositories.Analysis.KorupcniRiziko
         private Calculator(string ico)
         {
             Ico = ico;
-
-            _urad = Firmy.GetAsync(this.Ico);
-            if (!( _urad?.Valid == true))
-                throw new ArgumentOutOfRangeException("invalid ICO");
         }
 
         public static async Task<Calculator> CreateCalculatorAsync(string ico, bool useTemp)
         {
             var calculator = new Calculator(ico);
+            calculator._urad = await Firmy.GetAsync(ico);
+            if (calculator._urad?.Valid != true)
+                throw new ArgumentOutOfRangeException("invalid ICO");
             calculator.kindex = await KIndexRepo.GetDirectAsync(ico, useTemp);
             return calculator;
         }
@@ -328,7 +327,7 @@ namespace HlidacStatu.Repositories.Analysis.KorupcniRiziko
                 ret.KIndexReady = true;
                 ret.KIndexIssues = null;
             }
-            else if (await Firmy.GetAsync(this.Ico).MusiPublikovatDoRSAsync() == false)
+            else if (await (await Firmy.GetAsync(this.Ico)).MusiPublikovatDoRSAsync() == false)
             {
                 if (forceCalculateAllYears == false)
                 {
@@ -661,8 +660,7 @@ namespace HlidacStatu.Repositories.Analysis.KorupcniRiziko
 
             List<smlouvaStat> smlStat = new List<smlouvaStat>();
             await Repositories.Searching.Tools.DoActionForQueryAsync<Smlouva>(Manager.GetESClient(),
-                searchFunc,
-                (h, o) =>
+                searchFunc, async (h, o) =>
                 {
                     Smlouva s = h.Source;
                     if (s != null)
@@ -671,7 +669,7 @@ namespace HlidacStatu.Repositories.Analysis.KorupcniRiziko
                         {
                             if (prij.ico == s.Platce.ico)
                                 continue;
-                            Firma f = Firmy.GetAsync(prij.ico);
+                            Firma f = await Firmy.GetAsync(prij.ico);
                             if (f?.Valid == true && f.PatrimStatu())
                                 continue;
 
@@ -695,7 +693,7 @@ namespace HlidacStatu.Repositories.Analysis.KorupcniRiziko
                         }
                     }
 
-                    return Task.FromResult(new Devmasters.Batch.ActionOutputData());
+                    return new Devmasters.Batch.ActionOutputData();
                 }, null,
                 null, null,
                 false, blockSize: 100,

@@ -22,7 +22,6 @@ using HlidacStatu.Entities.AI;
 using HlidacStatu.Repositories.Cache;
 using NuGet.Common;
 
-
 namespace HlidacStatu.Repositories
 {
     public static partial class SmlouvaRepo
@@ -231,14 +230,15 @@ namespace HlidacStatu.Repositories
                 : 0;
 
             Firma fPlatce = await Firmy.GetAsync(smlouva.Platce.ico);
-            Firma[] fPrijemci = smlouva.Prijemce.Select(m => m.ico)
-                .Where(m => !string.IsNullOrWhiteSpace(m))
-                .Select(m => Firmy.GetAsync(m))
-                .Where(f => f?.Valid == true)
-                .ToArray();
+            
+            var fPrijemci = new List<Firma>();
+            foreach (var ico in smlouva.Prijemce.Select(m => m.ico).Where(m => !string.IsNullOrWhiteSpace(m)))
+            {
+                fPrijemci.Add(await Firmy.GetAsync(ico));
+            }
 
             List<Firma> firmy = fPrijemci
-                .Concat(new Firma[] { fPlatce })
+                .Concat([fPlatce])
                 .Where(f => f?.Valid == true)
                 .ToList();
 

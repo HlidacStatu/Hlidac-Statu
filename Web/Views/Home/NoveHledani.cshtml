@@ -1,8 +1,5 @@
 ﻿@model HlidacStatu.XLib.Search.MultiResult
-
-@using System.Collections.Concurrent
 @using System.Linq
-@using System.Net.Http
 @using Devmasters.Collections
 @using HlidacStatu.Datasets
 @using HlidacStatu.Entities
@@ -11,9 +8,6 @@
 @using HlidacStatu.Repositories
 @using HlidacStatu.Repositories.Cache
 @using HlidacStatu.Repositories.Searching;
-
-@inject IHttpClientFactory HttpClientFactory
-
 
 @{
     Layout = null;
@@ -831,7 +825,7 @@
                     @foreach (var fP in splQ.Parts.Where(m => m.Prefix == "ico:"))
                     {
                         parts++;
-                        Firma fo = Firmy.GetAsync(fP.Value);
+                        Firma fo = await Firmy.GetAsync(fP.Value);
                         <partial name="Partials/RenderFirmaBox" model="@fo"/>
 
                         if (parts % 4 == 0)

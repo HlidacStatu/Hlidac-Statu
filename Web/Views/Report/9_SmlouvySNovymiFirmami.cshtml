@@ -78,7 +78,7 @@
     ReportDataSource<(AnalysisCalculation.IcoSmlouvaMinMax? MinMax, StatisticsSubjectPerYear<Smlouva.Statistics.Data>? Stat)> rds1 = new(tableSloupce);
     foreach (var bf in dataStatsCache.Where(m => m.days >= -45 && m.days < 0))
     {
-        var f = Firmy.GetAsync(bf.ico);
+        var f = await Firmy.GetAsync(bf.ico);
         StatisticsSubjectPerYear<Smlouva.Statistics.Data> stat = new();
         if (f != null)
             stat = await f.StatistikaRegistruSmluvAsync();
@@ -88,14 +88,14 @@
     ReportDataSource<(AnalysisCalculation.IcoSmlouvaMinMax? MinMax, StatisticsSubjectPerYear<Smlouva.Statistics.Data>? Stat)> rds2 = new(tableSloupce);
     foreach (var bf in dataStatsCache.Where(m => m.days >= 0 && m.days < 30))
     {
-        var stat = (await Firmy.GetAsync(bf.ico).StatistikaRegistruSmluvAsync()) ?? new();
+        var stat = (await (await Firmy.GetAsync(bf.ico)).StatistikaRegistruSmluvAsync()) ?? new();
         rds1.AddRow((bf, stat));
     }
 
     ReportDataSource<(AnalysisCalculation.IcoSmlouvaMinMax? MinMax, StatisticsSubjectPerYear<Smlouva.Statistics.Data>? Stat)> rds3 = new(tableSloupce);
     foreach (var bf in dataStatsCache.Where(m => m.days < -45).Take(300))
     {
-        var stat = (await Firmy.GetAsync(bf.ico).StatistikaRegistruSmluvAsync()) ?? new();
+        var stat = (await (await Firmy.GetAsync(bf.ico)).StatistikaRegistruSmluvAsync()) ?? new();
         rds1.AddRow((bf, stat));
     }
 }

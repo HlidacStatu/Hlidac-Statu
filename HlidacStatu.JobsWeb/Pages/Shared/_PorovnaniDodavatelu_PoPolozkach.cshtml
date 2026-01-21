@@ -14,14 +14,16 @@
     }
     
     var firmyCount = await JobService.GetDodavateleListAsync(Model.Key.Value);
-    var firmy = zadavatelStatistics.SelectMany(m => m.Dodavatele).Distinct()
-        .Select(m => new
-        {
-            ico = m,
-            name = HlidacStatu.Repositories.Firmy.GetJmenoAsync(m),
-            count = firmyCount.Any(c => c.ico == m) ? firmyCount.First(c => c.ico == m).pocetCen : 0
-        })
-        .OrderBy(o => o.name);
+    var distinctIcos = zadavatelStatistics.SelectMany(m => m.Dodavatele).Distinct();
+    var firmy = new List<(string Ico, string Name, int Count)>();
+    foreach (var ico in distinctIcos)
+    {
+        var name = await HlidacStatu.Repositories.Firmy.GetJmenoAsync(ico);
+        var count = firmyCount.Any(c => c.ico == ico) ? firmyCount.First(c => c.ico == ico).pocetCen : 0;
+        firmy.Add((ico, name, count));
+    }
+    firmy = firmy.OrderBy(o => o.Name).ToList();
+
 
 }
 
@@ -41,13 +43,13 @@
     {
         JobStatistics zadavatelStatisticsPolozka = zadavatelStatistics.FirstOrDefault(m => m.Name == polozka.Name);
         List<(JobStatistics stat, string firmaName)> firmyStatPolozka = new List<(JobStatistics stat, string firmaName)>();
-        foreach (var f in firmy.OrderByDescending(o => o.count))
+        foreach (var f in firmy.OrderByDescending(o => o.Count))
         {
-            var firmaStat = JobService.GetDodavatelForOdberatelStatistics(f.ico, Model.zadavatel.ICO, Model.Key.Value);
+            var firmaStat = JobService.GetDodavatelForOdberatelStatistics(f.Ico, Model.zadavatel.ICO, Model.Key.Value);
             var firmaPolozka = firmaStat.FirstOrDefault(m => m.Name.ToLowerInvariant() == polozka.Name.ToLowerInvariant());
             if (firmaPolozka != null)
             {
-                firmyStatPolozka.Add((firmaPolozka, f.name));
+                firmyStatPolozka.Add((firmaPolozka, f.Name));
             }
         }
 

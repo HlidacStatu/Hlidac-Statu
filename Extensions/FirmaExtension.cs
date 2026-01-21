@@ -287,17 +287,21 @@ public static class FirmaExtensions
         }
 
         res.Osoby_s_vazbou_na_firmu = apiOsobaListItem.ToArray();
-                
-
-        res.Dcerine_spolecnosti = (await f.IcosInHoldingAsync(aktualnost))
-            .Select(m => new SimpleDetailInfo()
+        
+        var icosHolding = await f.IcosInHoldingAsync(aktualnost);
+        var dcerine = new List<SimpleDetailInfo>();
+        foreach (var icoHolding in icosHolding)
+        {
+            dcerine.Add(new SimpleDetailInfo()
             {
-                Ico = m,
-                Jmeno = HlidacStatu.Repositories.Firmy.GetJmenoAsync(m),
+                Ico = icoHolding,
+                Jmeno = await HlidacStatu.Repositories.Firmy.GetJmenoAsync(icoHolding),
                 Source_Url = null,
                 Copyright = null
-            })
-            .ToArray();
+            });
+        }
+        res.Dcerine_spolecnosti = dcerine.ToArray();
+
         
         return res;
     }

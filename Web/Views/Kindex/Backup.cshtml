@@ -1,5 +1,4 @@
 ﻿@model HlidacStatu.Entities.KIndex.KIndexData
-
 @using Devmasters.Enums;
 @using System.Linq;
 @using HlidacStatu.Entities
@@ -8,7 +7,6 @@
 @using HlidacStatu.Extensions
 @using HlidacStatu.Repositories
 @using HlidacStatu.Repositories.Analysis.KorupcniRiziko
-
 
 @{
     int selectedYear = ViewBag.SelectedYear;
@@ -22,7 +20,7 @@
     KIndexData.Annual currYear = Model.roky.Where(y => y.Rok == selectedYear).FirstOrDefault();
 
 
-    Firma firma = Firmy.GetAsync(Model.Ico);
+    Firma firma = await Firmy.GetAsync(Model.Ico);
     ViewBag.Title = "K–Index ";
     ViewBag.SubTitle = "pro " + firma.Jmeno;
     ViewBag.HideTitle = true;
@@ -33,8 +31,6 @@
     //kindexValue = 10.9m;
 
     Statistics statistics = await Statistics.GetStatisticsAsync(selectedYear);
-
-    Func<decimal, decimal, decimal, int> sirkaGrafu = (hodnota, koeficient, celek) => { return (int) Math.Round((hodnota * koeficient / celek * 100), 0); };
 
     Func<decimal, int, int> kindexMeter = (kind, labelValue) =>
     {
@@ -54,14 +50,8 @@
 
 
         return (result > 100) ? 100 : result;
-
-        //return (int)Math.Round(((kind / constant) - labelValue) *100 ,0);
     };
 }
-
-
-
-
 
 @section breadcrumb
 {

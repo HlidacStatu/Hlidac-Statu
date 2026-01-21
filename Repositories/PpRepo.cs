@@ -316,11 +316,15 @@ public static partial class PpRepo
         {
             var vazby = await o.PrimaAngazovanostAsync(DS.Graphs.Relation.CharakterVazbyEnum.VlastnictviKontrola,
                 HlidacStatu.DS.Graphs.Relation.AktualnostType.Nedavny);
-            var d1 = vazby
-                .Where(v => Devmasters.DT.DateInterval.IsOverlappingIntervals(
-                    new Devmasters.DT.DateInterval(v.RelFrom, v.RelTo), obdobi))
-                .Select(m => m.To.Id)
-                .Select(m => Firmy.GetAsync(m)).Where(f => f?.Valid == true).ToArray();
+            
+            var d1 = new List<Firma>();
+            foreach (var v in vazby.Where(v => Devmasters.DT.DateInterval.IsOverlappingIntervals(
+                         new Devmasters.DT.DateInterval(v.RelFrom, v.RelTo), obdobi)))
+            {
+                d1.Add(await Firmy.GetAsync(v.To.Id));
+            }
+
+            
             var d2 = d1
                 .Where(f => f.JsemStatniFirma() || f.JsemOVM()).ToArray();
             if (d2.Any())

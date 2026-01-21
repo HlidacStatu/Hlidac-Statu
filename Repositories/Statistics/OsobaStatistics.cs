@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using HlidacStatu.Entities;
 using HlidacStatu.Extensions;
 using HlidacStatu.Lib.Analytics;
@@ -29,26 +30,31 @@ namespace HlidacStatu.Repositories.Statistics
         }
         
 
-        public static string[] SmlouvyStat_Neziskovky(this Osoba.Statistics.RegistrSmluv registrSmluv)
+        public static async Task<string[]> SmlouvyStat_NeziskovkyAsync(this Osoba.Statistics.RegistrSmluv registrSmluv)
         {
             if (registrSmluv._neziskovkyIcos == null)
             {
-                registrSmluv._neziskovkyIcos = registrSmluv.SoukromeFirmy
-                    .Select(m => Firmy.GetAsync(m.Key))
-                    .Where(ff => ff.JsemNeziskovka())
-                    .Select(s => s.ICO)
-                    .ToArray();
+                var neziskovkyIcos = new List<string>();
+                foreach (var firma in registrSmluv.SoukromeFirmy)
+                {
+                    var f = await Firmy.GetAsync(firma.Key);
+                    if (f.JsemNeziskovka())
+                    {
+                        neziskovkyIcos.Add(f.ICO);
+                    }
+                }
+                registrSmluv._neziskovkyIcos = neziskovkyIcos.ToArray();
             }
 
             return registrSmluv._neziskovkyIcos;
         }
 
-        public static int SmlouvyStat_NeziskovkyCount(this Osoba.Statistics.RegistrSmluv registrSmluv) =>
-            registrSmluv.SmlouvyStat_Neziskovky().Count();
+        public static async Task<int> SmlouvyStat_NeziskovkyCountAsync(this Osoba.Statistics.RegistrSmluv registrSmluv) =>
+            (await registrSmluv.SmlouvyStat_NeziskovkyAsync()).Count();
 
-        public static int SmlouvyStat_KomercniFirmyCount(this Osoba.Statistics.RegistrSmluv registrSmluv)
+        public static async Task<int> SmlouvyStat_KomercniFirmyCountAsync(this Osoba.Statistics.RegistrSmluv registrSmluv)
         {
-            return registrSmluv.SoukromeFirmy.Count - registrSmluv.SmlouvyStat_NeziskovkyCount();
+            return registrSmluv.SoukromeFirmy.Count - await registrSmluv.SmlouvyStat_NeziskovkyCountAsync();
         }
 
         public static StatisticsPerYear<Smlouva.Statistics.Data> SmlouvyStat_SoukromeFirmySummary(

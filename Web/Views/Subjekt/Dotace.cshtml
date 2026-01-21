@@ -17,7 +17,6 @@
     bool showHolding = holdingStats.Summary().PocetDotaci > 0
                        && holdingStats.Summary().CelkemPrideleno != firmaStats.Summary().CelkemPrideleno;
 
-
     //graph
     string companySubsidiesTitle = "Přehled čerpání dotací";
     var companyGraphData = new Series[]
@@ -545,7 +544,7 @@
                                     {
                                         <tr>
                                             <td>
-                                                <a href="/subjekt/@item.Key">@Devmasters.TextUtil.ShortenText(Firmy.GetJmenoAsync(item.Key), 30)</a>
+                                                <a href="/subjekt/@item.Key">@Devmasters.TextUtil.ShortenText(await Firmy.GetJmenoAsync(item.Key), 30)</a>
                                             </td>
                                             <td class="number">@HlidacStatu.Util.RenderData.NicePrice(item.Value)</td>
                                         </tr>

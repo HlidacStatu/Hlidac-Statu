@@ -72,9 +72,12 @@
 
                     break;
             }
-            @if (statistics.SmlouvyStat_NeziskovkyCount() > 0)
-            {
-                <span>(z toho v @Devmasters.Lang.CS.Plural.Get(statistics.SmlouvyStat_NeziskovkyCount(), "jedné neziskovce", "{0} neziskovkách", "{0} neziskovkách")):</span>
+            @{
+                var smlouvyNeziskovkyCount = await statistics.SmlouvyStat_NeziskovkyCountAsync(); 
+                if ( smlouvyNeziskovkyCount > 0)
+                {
+                    <span>(z toho v @Devmasters.Lang.CS.Plural.Get(smlouvyNeziskovkyCount, "jedné neziskovce", "{0} neziskovkách", "{0} neziskovkách")):</span>
+                }
             }
             <ul>
                 @foreach (var stat in statistics.SoukromeFirmy
@@ -83,7 +86,7 @@
                 {
                     <li>
                         <a asp-controller="Subjekt" asp-action="Index" asp-route-id="@stat.Key">
-                            @Firmy.GetJmenoAsync(stat.Key)
+                            @(await Firmy.GetJmenoAsync(stat.Key))
                         </a>
                         (@Html.Raw(stat.Value.Summary().ToNiceLinkString(null, true, customUrl: $"/hledat?q=ico:{stat.Key}")) od
                         2016
@@ -161,7 +164,7 @@
                 {
                     <li>
                         <a asp-controller="Subjekt" asp-action="Index" asp-route-id="@stat.Key">
-                            @Firmy.GetJmenoAsync(stat.Key)
+                            @(await Firmy.GetJmenoAsync(stat.Key))
                         </a>
                         (@Html.Raw(stat.Value.Summary().ToNiceLinkString(null, true, customUrl: $"/hledat?q=ico:{stat.Key}")) od
                         2016
@@ -203,7 +206,7 @@
             await semaphore.WaitAsync();
             try
             {
-                var f = Firmy.GetAsync(g.ico);
+                var f = await Firmy.GetAsync(g.ico);
 
                 StatisticsSubjectPerYear<Smlouva.Statistics.Data> stat = new();
                 if (f != null)

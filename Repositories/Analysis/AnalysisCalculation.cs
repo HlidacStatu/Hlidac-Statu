@@ -144,8 +144,18 @@ namespace HlidacStatu.Repositories.Analysis
                             s.Prijemce.Select(m => m.ico).Where(p => !string.IsNullOrEmpty(p))
                         );
                         allIco.Add(s.Platce.ico);
-                        var urady = allIco.Select(i => Firmy.GetAsync(i)).Where(f => f.PatrimStatu());
-
+                        
+                        List<Firma> urady = [];
+                        foreach (var icoF in allIco)
+                        {
+                            var f = await Firmy.GetAsync(icoF);
+                            if (f is not null && f.PatrimStatu())
+                            {
+                                urady.Add(f);
+                            }
+                        }
+                        
+                        
                         foreach (var urad in urady)
                         {
                             lock (lockObj)
@@ -651,46 +661,46 @@ namespace HlidacStatu.Repositories.Analysis
         public static ValueTask<CalculatedChangeBetweenYears<string>[]>
             GetNarustySmluvOdNulyTop100_AbsolutPrice_2020_24Async(int? obor) =>
             PermanentCache.GetOrSetAsync($"_NarustySmluvOdNulyTop100_AbsolutPrice_2020_24_{obor}",
-                async _ => BetweenYearsCalculatedChanges(await GetAllStatisticsDataAsync(), obor, 2018, 2021));
+                async _ => await BetweenYearsCalculatedChangesAsync(await GetAllStatisticsDataAsync(), obor, 2018, 2021));
 
         public static ValueTask<CalculatedChangeBetweenYears<string>[]>
             GetNarustySmluvOdNulyTop100_Percent_2020_24Async(int? obor) =>
             PermanentCache.GetOrSetAsync($"_NarustySmluvOdNulyTop100_Percent_2020_24_{obor}",
-                async _ => BetweenYearsCalculatedChanges_Percent(await GetAllStatisticsDataAsync(), obor, 2018, 2021));
+                async _ => await BetweenYearsCalculatedChanges_PercentAsync(await GetAllStatisticsDataAsync(), obor, 2018, 2021));
 
         public static ValueTask<CalculatedChangeBetweenYears<string>[]>
             GetNarustySmluvTop100_AbsolutPrice_Vlada2018Async(int? obor) =>
             PermanentCache.GetOrSetAsync($"_NarustySmluvTop100_AbsolutPrice_Vlada2018_{obor}",
-                async _ => BetweenYearsCalculatedChanges(await GetAllStatisticsDataAsync(), obor, 2018, 2021));
+                async _ => await BetweenYearsCalculatedChangesAsync(await GetAllStatisticsDataAsync(), obor, 2018, 2021));
 
         public static ValueTask<CalculatedChangeBetweenYears<string>[]>
             GetNarustySmluvTop100_Percent_Vlada2018Async(int? obor) =>
             PermanentCache.GetOrSetAsync($"_NarustySmluvTop100_Percent_Vlada2018_{obor}", async _ =>
-                BetweenYearsCalculatedChanges_Percent(await GetAllStatisticsDataAsync(), obor, 2018, 2021)
+                await BetweenYearsCalculatedChanges_PercentAsync(await GetAllStatisticsDataAsync(), obor, 2018, 2021)
             );
      
         public static ValueTask<CalculatedChangeBetweenYears<string>[]>
             GetNarustySmluvTop100_AbsolutPrice_Vlada2022Async(int? obor) =>
             PermanentCache.GetOrSetAsync($"_NarustySmluvTop100_AbsolutPrice_Vlada2022_{obor}", async _ =>
-                BetweenYearsCalculatedChanges(await GetAllStatisticsDataAsync(), obor, 2021, 2025)
+                await BetweenYearsCalculatedChangesAsync(await GetAllStatisticsDataAsync(), obor, 2021, 2025)
             );
 
         public static ValueTask<CalculatedChangeBetweenYears<string>[]>
             GetNarustySmluvTop100_Percent_Vlada2022Async(int? obor) =>
             PermanentCache.GetOrSetAsync($"_NarustySmluvTop100_Percent_Vlada2022_{obor}", async _ =>
-                BetweenYearsCalculatedChanges_Percent(await GetAllStatisticsDataAsync(), obor, 2022, 2025)
+                await BetweenYearsCalculatedChanges_PercentAsync(await GetAllStatisticsDataAsync(), obor, 2022, 2025)
             );
         
         public static ValueTask<CalculatedChangeBetweenYears<string>[]>
             GetNarustySmluvTop100_AbsolutPrice_2020_24Async(int? obor) =>
             PermanentCache.GetOrSetAsync($"_NarustySmluvTop100_AbsolutPrice_2020_24_{obor}", async _ =>
-                BetweenYearsCalculatedChanges(await GetAllStatisticsDataAsync(), obor, 2020, 2024)
+                await BetweenYearsCalculatedChangesAsync(await GetAllStatisticsDataAsync(), obor, 2020, 2024)
             );
 
         public static ValueTask<CalculatedChangeBetweenYears<string>[]>
             GetNarustySmluvTop100_Percent_2020_24Async(int? obor) =>
             PermanentCache.GetOrSetAsync($"_NarustySmluvTop100_Percent_2020_24_{obor}", async _ =>
-                BetweenYearsCalculatedChanges_Percent(await GetAllStatisticsDataAsync(), obor, 2020, 2024)
+                await BetweenYearsCalculatedChanges_PercentAsync(await GetAllStatisticsDataAsync(), obor, 2020, 2024)
             );
 
         public static ValueTask<CalculatedChangeBetweenYears<string>[]>
@@ -699,7 +709,7 @@ namespace HlidacStatu.Repositories.Analysis
             {
                 List<CalculatedChangeBetweenYears<string>> data = new();
                 for (int i = 2018; i <= DateTime.Now.Year - 1; i++)
-                    data.AddRange(BetweenYearsCalculatedChanges(await GetAllStatisticsDataAsync(), obor, i, i));
+                    data.AddRange(await BetweenYearsCalculatedChangesAsync(await GetAllStatisticsDataAsync(), obor, i, i));
                 return data
                     .OrderByDescending(o => o.change.ValueChange)
                     .Take(100)
@@ -712,7 +722,7 @@ namespace HlidacStatu.Repositories.Analysis
             {
                 List<CalculatedChangeBetweenYears<string>> data = new();
                 for (int i = 2018; i <= DateTime.Now.Year - 1; i++)
-                    data.AddRange(BetweenYearsCalculatedChanges_Percent(await GetAllStatisticsDataAsync(), obor, i, i));
+                    data.AddRange(await BetweenYearsCalculatedChanges_PercentAsync(await GetAllStatisticsDataAsync(), obor, i, i));
                 return data
                     .OrderByDescending(o => (o.change.PercentChange ?? int.MaxValue))
                     .ThenByDescending(o => o.change.ValueChange)
@@ -721,7 +731,7 @@ namespace HlidacStatu.Repositories.Analysis
             });
         
 
-        public static CalculatedChangeBetweenYears<string>[] BetweenYearsCalculatedChanges(
+        public static async Task<CalculatedChangeBetweenYears<string>[]> BetweenYearsCalculatedChangesAsync(
             StatisticsSubjectPerYear<Smlouva.Statistics.Data>[] allData,
             int? obor,
             int yStart,
@@ -732,9 +742,7 @@ namespace HlidacStatu.Repositories.Analysis
         {
             int yPreStart = yStart - (yEnd - yStart) - 1; //start predchoziho obdobi
 
-            CalculatedChangeBetweenYears<string>[] res = null;
-
-            var _items = allData
+            var items = allData
                 .Select(m => new
                 {
                     item = m,
@@ -745,40 +753,47 @@ namespace HlidacStatu.Repositories.Analysis
             if (minStartValue.HasValue)
             {
                 if (obor.HasValue)
-                    _items = _items.Where(m =>
+                    items = items.Where(m =>
                         m.item.Summary(Enumerable.Range(yPreStart, yStart - yPreStart).ToArray())
                             .PoOblastechHierarchicky(obor.Value).CelkemCena <= minStartValue.Value
                     );
                 else
-                    _items = _items.Where(m =>
+                    items = items.Where(m =>
                         m.item.Summary(Enumerable.Range(yPreStart, yStart - yPreStart).ToArray()).CelkovaHodnotaSmluv <=
                         minStartValue.Value
                     );
             }
 
-            res = _items
-                    .Select(m => new CalculatedChangeBetweenYears<string>()
-                    {
-                        data = m.item.ICO,
-                        change = m.change,
-                        firstYear = (yStart == yEnd) ? yStart - 1 : yStart,
-                        lastYear = yEnd,
-                    })
-                    .Where(m => m.change.ValueChange > 999_999)
-                    //.OrderByDescending(o => (o.percChange ?? int.MaxValue))
-                    .OrderByDescending(o => o.change.ValueChange)
-                    .Take(1000)
-                    .Where(m => Firmy.GetAsync(m.data).JsemSoukromaFirma())
-                    .Take(100)
-                    .ToArray()
-                ;
+            var filtered = items
+                .Select(m => new CalculatedChangeBetweenYears<string>()
+                {
+                    data = m.item.ICO,
+                    change = m.change,
+                    firstYear = (yStart == yEnd) ? yStart - 1 : yStart,
+                    lastYear = yEnd,
+                })
+                .Where(m => m.change.ValueChange > 999_999)
+                .OrderByDescending(o => o.change.ValueChange)
+                .Take(1000);
 
+            var result = new List<CalculatedChangeBetweenYears<string>>();
+            foreach (var item in filtered)
+            {
+                var firma = await Firmy.GetAsync(item.data);
+                if (firma.JsemSoukromaFirma())
+                {
+                    result.Add(item);
+                    if (result.Count >= 100)
+                        break;
+                }
+            }
+            var res = result.ToArray();
 
             return res;
         }
 
 
-        public static CalculatedChangeBetweenYears<string>[] BetweenYearsCalculatedChanges_Percent(
+        public static async Task<CalculatedChangeBetweenYears<string>[]> BetweenYearsCalculatedChanges_PercentAsync(
             StatisticsSubjectPerYear<Smlouva.Statistics.Data>[] allData,
             int? obor,
             int yStart,
@@ -788,8 +803,7 @@ namespace HlidacStatu.Repositories.Analysis
         )
         {
             int yPreStart = yStart - (yEnd - yStart) - 1; //start predchoziho obdobi
-            CalculatedChangeBetweenYears<string>[] res = null;
-            var _items = allData
+            var items = allData
                 .Select(m => new
                 {
                     item = m,
@@ -798,28 +812,36 @@ namespace HlidacStatu.Repositories.Analysis
                         : m.ChangeBetweenIntervals(yStart, yEnd, m => m.CelkovaHodnotaSmluv)
                 });
             if (minStartValue.HasValue)
-                _items = _items.Where(m =>
+                items = items.Where(m =>
                     m.item.Summary(Enumerable.Range(yPreStart, yStart - yPreStart).ToArray()).CelkovaHodnotaSmluv <=
                     minStartValue.Value
                 );
 
-            res = _items
-                    .Where(m => m.change.ValueChange > 10_000_000)
-                    .OrderByDescending(o => (o.change.PercentChange ?? int.MaxValue))
-                    .ThenByDescending(o => o.change.ValueChange)
-                    .Select(m => new CalculatedChangeBetweenYears<string>()
-                    {
-                        data = m.item.ICO,
-                        change = m.change,
-                        firstYear = yStart,
-                        lastYear = yEnd,
-                    })
-                    .Take(1000)
-                    .Where(m => Firmy.GetAsync(m.data).JsemSoukromaFirma())
-                    .Take(100)
-                    .ToArray()
-                ;
+            var filtered = items
+                .Where(m => m.change.ValueChange > 10_000_000)
+                .OrderByDescending(o => (o.change.PercentChange ?? int.MaxValue))
+                .ThenByDescending(o => o.change.ValueChange)
+                .Select(m => new CalculatedChangeBetweenYears<string>()
+                {
+                    data = m.item.ICO,
+                    change = m.change,
+                    firstYear = yStart,
+                    lastYear = yEnd,
+                })
+                .Take(1000);
 
+            var result = new List<CalculatedChangeBetweenYears<string>>();
+            foreach (var item in filtered)
+            {
+                var firma = await Firmy.GetAsync(item.data);
+                if (firma.JsemSoukromaFirma())
+                {
+                    result.Add(item);
+                    if (result.Count >= 100)
+                        break;
+                }
+            }
+            var res = result.ToArray();
 
             return res;
         }

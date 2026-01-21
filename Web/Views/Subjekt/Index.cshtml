@@ -1276,7 +1276,7 @@
         {
             var numPercent = "0";
             var sumPercent = "0";
-            var stat = await Firmy.GetAsync(Model.ICO).StatistikaRegistruSmluvAsync();
+            var stat = await (await Firmy.GetAsync(Model.ICO)).StatistikaRegistruSmluvAsync();
             if (stat.Summary().PocetSmluv > 0)
             {
                 numPercent = ((double)stat.Summary().PocetSmluvSponzorujiciFirmy / (double)stat.Summary().PocetSmluv).ToString("P2");
@@ -1370,7 +1370,7 @@
         intv = laps.StopPreviousAndStartNextLap("NapojeneOsoby");
         //POUZE MINISTERSTVA
     }
-    @if (FirmaCache.MinisterstvaAsync().Any(f => f.ICO == Model.ICO))
+    @if ((await FirmaCache.MinisterstvaAsync()).Any(f => f.ICO == Model.ICO))
     {
         var napojeneOsoby = await Model.NapojeneOsobyMinisterstvaAsync();
 

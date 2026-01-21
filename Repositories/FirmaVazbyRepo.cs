@@ -155,16 +155,23 @@ namespace HlidacStatu.Repositories
 
 
 
-        public static Firma[] ParentFirmy(this Firma firma, 
+        public static async Task<Firma[]> ParentFirmyAsync(this Firma firma, 
             Relation.CharakterVazbyEnum charakterVazby,
             Relation.AktualnostType minAktualnost)
         {
             if (firma._parents == null)
             {
-                firma._parents = _getAllParents(firma.ICO, charakterVazby, minAktualnost)
-                    .Select(m=> Firmy.GetAsync(m))
-                    .Where(m=> m!=null || m?.Valid == true)
-                    .ToArray();
+                var parents = new List<Firma>();
+                foreach (var ico in _getAllParents(firma.ICO, charakterVazby, minAktualnost))
+                {
+                    var f = await Firmy.GetAsync(ico);
+                    if (f != null && f.Valid == true)
+                    {
+                        parents.Add(f);
+                    }
+                }
+                firma._parents = parents.ToArray();
+
             }
 
             return firma._parents;
@@ -218,23 +225,23 @@ namespace HlidacStatu.Repositories
             return firma._parentVazbyFirmy.Where(m => m.Aktualnost >= minAktualnost).ToArray(); 
         }
 
-
-
-
         private static async Task<Firma[]> VsechnyDcerinnePodrizeneAsync(this Firma firma,
             Relation.CharakterVazbyEnum charakterVazby ,
             Relation.AktualnostType minAktualnost, bool refresh = false)
         {
             var vazby = await firma.AktualniVazbyAsync(minAktualnost, charakterVazby, refresh);
 
-            var data = vazby
+            var grouped = vazby
                 .Where(v => v.To != null && v.To.Type == HlidacStatu.DS.Graphs.Graph.Node.NodeType.Company)
-                        .GroupBy(f => f.To.Id, v => v, (ico, v) => new
-                        {
-                            ICO = ico,
-                            Firma = Firmy.GetAsync(ico)
-                        });
-            return data.Select(m => m.Firma).ToArray();
+                .GroupBy(f => f.To.Id, v => v, (ico, v) => ico);
+
+            var data = new List<Firma>();
+            foreach (var ico in grouped)
+            {
+                data.Add(await Firmy.GetAsync(ico));
+            }
+            return data.ToArray();
+
         }
 
         public static HlidacStatu.DS.Graphs.Graph.Edge VazbyRootEdge(this Firma firma)

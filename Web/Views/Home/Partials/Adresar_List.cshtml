@@ -33,7 +33,16 @@
             .Where(m => m.Kraj == Model.kraj)
             .ToArray();
     }
-    IEnumerable<Firma> subjs = subjIco.Select(m => Firmy.GetAsync(m.Ico)).Where(f=>f != null);
+    var subjs = new List<Firma>();
+    foreach (var m in subjIco)
+    {
+        var firma = await Firmy.GetAsync(m.Ico);
+        if (firma != null)
+        {
+            subjs.Add(firma);
+        }
+    }
+
 
     var zakazky = Model.zakazky;
 }

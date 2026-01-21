@@ -33,7 +33,7 @@
 
     //.OrderBy(o => o.Statistic.Summary.CelkemCena).Take(50);
     <hr />
-    <h2>Největší vztahy pro @Firmy.GetJmenoAsync(dodavico)</h2>
+    <h2>Největší vztahy pro @(await Firmy.GetJmenoAsync(dodavico))</h2>
     <table class="table table-bordered table-striped">
         <thead>
             <tr>
@@ -43,10 +43,8 @@
             </tr>
         </thead>
         <tbody>
-            @foreach (var uu in urady
-                                    .Where(m => m.Dodavatel.ICO == dodavico)
-                                    .OrderByDescending(o => o.Statistic.Summary.CelkemCena)
-                                    )
+            @foreach (var uu in urady.Where(m => m.Dodavatel.ICO == dodavico)
+                                    .OrderByDescending(o => o.Statistic.Summary.CelkemCena))
             {
                 <tr>
                     <td><a href="/subjekt/@uu.Dodavatel.ICO">@uu.Dodavatel.Nazev</a></td>

@@ -7,8 +7,7 @@
         Layout = "_ReportLayout";
 
     UradsUrad[] urady = Newtonsoft.Json.JsonConvert.DeserializeObject<UradsUrad[]>(
-        System.IO.File.ReadAllText(HlidacStatu.Connectors.Init.WebAppDataPath + "UradySUrady.json")
-        );
+        await System.IO.File.ReadAllTextAsync(HlidacStatu.Connectors.Init.WebAppDataPath + "UradySUrady.json"));
 
     var poUradech = urady
                .GroupBy(
@@ -49,7 +48,7 @@
         @foreach (var uu in topDodavUrady)
         {
             <tr>
-                <td><a href="/subjekt/@uu.Key">@Firmy.GetJmenoAsync(uu.Key)</a></td>
+                <td><a href="/subjekt/@uu.Key">@(await Firmy.GetJmenoAsync(uu.Key))</a></td>
                 <td>@uu.Value.SumStat.ToNiceString(null, false)</td>
                 <td>
                     @foreach (var odb in uu.Value.Odberatele.OrderByDescending(o => o.Statistic.Summary.CelkemCena).Take(10))

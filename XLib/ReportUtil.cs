@@ -1,12 +1,9 @@
 ﻿using Devmasters.Enums;
-
 using HlidacStatu.Entities;
 using HlidacStatu.Entities.Analysis;
 using HlidacStatu.Lib.Analytics;
-using HlidacStatu.Repositories;
 using HlidacStatu.Util;
 using HlidacStatu.XLib.Render;
-
 using System;
 using System.Collections.Generic;
 using System.Net;
@@ -17,39 +14,38 @@ namespace HlidacStatu.XLib
     public static class ReportUtil
     {
 
-        public static List<ReportDataSource<KeyValuePair<string, StatisticsPerYear<Smlouva.Statistics.Data>>>.Column> ComplexStatisticDefaultReportColumns<T>(RenderData.MaxScale scale,
+        public static List<ReportDataSource<KeyValuePair<Firma, StatisticsPerYear<Smlouva.Statistics.Data>>>.Column> ComplexStatisticDefaultReportColumns<T>(RenderData.MaxScale scale,
             int? minDateYear = null, int? maxDateYear = null, string query = null)
         {
             minDateYear = minDateYear ?? DataPerYear.UsualFirstYear;
             maxDateYear = maxDateYear ?? DateTime.Now.Year;
 
-            var coreColumns = new List<ReportDataSource<KeyValuePair<string, StatisticsPerYear<Smlouva.Statistics.Data>>>.Column>();
-
-            coreColumns.Add(
-                new ReportDataSource<KeyValuePair<string, StatisticsPerYear<Smlouva.Statistics.Data>>>.Column()
+            var coreColumns = new List<ReportDataSource<KeyValuePair<Firma, StatisticsPerYear<Smlouva.Statistics.Data>>>.Column>
+            {
+                new()
                 {
                     Id = "Title",
                     Name = "Plátci",
                     HtmlRender =(s) =>
                     {
-                        var f = Firmy.GetAsync(s.Key);
-                        string html = string.Format("<a href='{0}'>{1}</a>", f.GetUrl(false), f.Jmeno);
+                        string html = string.Format("<a href='{0}'>{1}</a>", s.Key.GetUrl(false), s.Key.Jmeno);
                         if (!string.IsNullOrEmpty(query))
                         {
-                            html += $" /<span class='small'>ukázat&nbsp;<a href='/hledat?q={WebUtility.UrlEncode(HlidacStatu.Searching.Query.ModifyQueryAND("ico:" + f.ICO, query))}'>smlouvy</a></span>/";
+                            html += $" /<span class='small'>ukázat&nbsp;<a href='/hledat?q={WebUtility.UrlEncode(HlidacStatu.Searching.Query.ModifyQueryAND("ico:" + s.Key.ICO, query))}'>smlouvy</a></span>/";
                         }
                         return html;
                     },
-                    OrderValueRender = (s) => Firmy.GetJmenoAsync(s.Key),
-                    ValueRender = (s) => ("\"" + Firmy.GetJmenoAsync(s.Key) + "\""),
-                    TextRender = (s) => Firmy.GetJmenoAsync(s.Key)
-                });
+                    OrderValueRender = (s) => s.Key.Jmeno,
+                    ValueRender = (s) => ("\"" + s.Key.Jmeno + "\""),
+                    TextRender = (s) => s.Key.Jmeno
+                }
+            };
 
             for (int y = minDateYear.Value; y <= maxDateYear.Value; y++)
             {
                 int year = y;
                 coreColumns.Add(
-                    new ReportDataSource<KeyValuePair<string, StatisticsPerYear<Smlouva.Statistics.Data>>>.Column()
+                    new ReportDataSource<KeyValuePair<Firma, StatisticsPerYear<Smlouva.Statistics.Data>>>.Column()
                     {
                         Id = "Cena_Y_" + year,
                         Name = $"Smlouvy {year} v {scale.ToNiceDisplayName()} Kč",
@@ -61,7 +57,7 @@ namespace HlidacStatu.XLib
                     }
                     );
                 coreColumns.Add(
-                    new ReportDataSource<KeyValuePair<string, StatisticsPerYear<Smlouva.Statistics.Data>>>.Column()
+                    new ReportDataSource<KeyValuePair<Firma, StatisticsPerYear<Smlouva.Statistics.Data>>>.Column()
                     {
                         Id = "Pocet_Y_" + year,
                         Name = $"Počet smluv v {year} ",
@@ -73,7 +69,7 @@ namespace HlidacStatu.XLib
                     }
                     );
                 coreColumns.Add(
-                        new ReportDataSource<KeyValuePair<string, StatisticsPerYear<Smlouva.Statistics.Data>>>.Column()
+                        new ReportDataSource<KeyValuePair<Firma, StatisticsPerYear<Smlouva.Statistics.Data>>>.Column()
                         {
                             Id = "PercentBezCeny_Y_" + year,
                             Name = $"Smluv bez ceny za {year} v %",
@@ -84,7 +80,7 @@ namespace HlidacStatu.XLib
                             CssClass = "number"
                         });
                 coreColumns.Add(
-                        new ReportDataSource<KeyValuePair<string, StatisticsPerYear<Smlouva.Statistics.Data>>>.Column()
+                        new ReportDataSource<KeyValuePair<Firma, StatisticsPerYear<Smlouva.Statistics.Data>>>.Column()
                         {
                             Id = "PercentSPolitiky_Y_" + year,
                             Name = $"% smluv s politiky v {year} ",
@@ -95,7 +91,7 @@ namespace HlidacStatu.XLib
                             CssClass = "number"
                         });
                 coreColumns.Add(
-                        new ReportDataSource<KeyValuePair<string, StatisticsPerYear<Smlouva.Statistics.Data>>>.Column()
+                        new ReportDataSource<KeyValuePair<Firma, StatisticsPerYear<Smlouva.Statistics.Data>>>.Column()
                         {
                             Id = "SumKcSPolitiky_Y_" + year,
                             Name = $"Hodnota smluv s politiky za {year}",
@@ -109,7 +105,7 @@ namespace HlidacStatu.XLib
                 if (year > minDateYear)
                 {
                     coreColumns.Add(
-                            new ReportDataSource<KeyValuePair<string, StatisticsPerYear<Smlouva.Statistics.Data>>>.Column()
+                            new ReportDataSource<KeyValuePair<Firma, StatisticsPerYear<Smlouva.Statistics.Data>>>.Column()
                             {
                                 Id = "CenaChangePercent_Y_" + year,
                                 Name = $"Změna hodnoty smlouvy {year - 1}-{year}",
@@ -129,7 +125,7 @@ namespace HlidacStatu.XLib
                 }
             };
             coreColumns.Add(
-                new ReportDataSource<KeyValuePair<string, StatisticsPerYear<Smlouva.Statistics.Data>>>.Column()
+                new ReportDataSource<KeyValuePair<Firma, StatisticsPerYear<Smlouva.Statistics.Data>>>.Column()
                 {
                     Id = "CenaCelkem",
                     Name = $"Smlouvy 2016-{DateTime.Now.Year} v {scale.ToNiceDisplayName()} Kč",

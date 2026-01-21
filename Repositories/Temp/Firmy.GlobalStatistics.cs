@@ -51,8 +51,8 @@ namespace HlidacStatu.Repositories
 
                         _logger.Information($"Loading ALL ICOS");
 
-                        icos.AddRange(FirmaCache.KrajskeUradyAsync().Select(m => m.ICO));
-                        icos.AddRange(FirmaCache.MinisterstvaAsync().Select(m => m.ICO));
+                        icos.AddRange((await FirmaCache.KrajskeUradyAsync()).Select(m => m.ICO));
+                        icos.AddRange((await FirmaCache.MinisterstvaAsync()).Select(m => m.ICO));
                         // krajske technicke sluzby
                         icos.AddRange(
                             Krajske_Technicke_Sluzby.Split(','));
@@ -73,7 +73,7 @@ namespace HlidacStatu.Repositories
                                 "select distinct ico from firma where status =1 and Kod_PF in (301,302,312,313,314,325,331,352,353,361,362,381,382,521,771,801,804,805)")
                         );
 
-                        icos.AddRange(FirmaCache.ObceSRozsirenouPusobnostiAsync().Select(m => m.ICO));
+                        icos.AddRange((await FirmaCache.ObceSRozsirenouPusobnostiAsync()).Select(m => m.ICO));
                         //velka mesta
                         string velkamesta =
                             VelkaMesta;

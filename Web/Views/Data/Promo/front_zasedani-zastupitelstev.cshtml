@@ -50,10 +50,14 @@
         <div class="row">
             @{
                 var oMesta = new Dictionary<Firma, StatsAggregate>();
-                oMesta = mesta
-                    .Select(m => new { o = Firmy.GetAsync(m.Key), s = m.Value })
-                    .Where(m => m.o != null)
-                    .ToDictionary(k => k.o, v => v.s);
+                foreach (var m in mesta)
+                {
+                    var firma = await Firmy.GetAsync(m.Key);
+                    if (firma != null)
+                    {
+                        oMesta.Add(firma, m.Value);
+                    }
+                }
             }
             @foreach (var chunk in oMesta
                 .OrderBy(m => m.Key.JmenoOrderReady()).ThenBy(m => m.Key.ICO)

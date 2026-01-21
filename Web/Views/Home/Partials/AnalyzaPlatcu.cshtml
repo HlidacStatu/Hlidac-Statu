@@ -94,7 +94,7 @@
 
     var coreColumns = HlidacStatu.XLib.ReportUtil.ComplexStatisticDefaultReportColumns<string>(scale, query: Model.Query);
     coreColumns.Add( 
-        new ReportDataSource<KeyValuePair<string, StatisticsPerYear<Smlouva.Statistics.Data>>>.Column()
+        new ReportDataSource<KeyValuePair<Firma, StatisticsPerYear<Smlouva.Statistics.Data>>>.Column()
     {
         Id = "detail",
         Name = "Detaily",
@@ -102,16 +102,17 @@
         {
             return string.Format("<a class='small' style='white-space:nowrap;' href='/hledatSmlouvy?q={0}'><span class='fad fa-link'></span>smlouvy</a><br/>" +
                 "<a class='small' style='white-space:nowrap;' href='/verejnezakazky/hledat?q={0}'><span class='fad fa-link'></span>zakázky</a>",
-                $"(ico:{s.Key}) AND ({Model.Query})");
+                $"(ico:{s.Key.ICO}) AND ({Model.Query})");
         }
     });
 
 
-    var coreRDS = new ReportDataSource<KeyValuePair<string, StatisticsPerYear<Smlouva.Statistics.Data> >>(coreColumns);
+    var coreRDS = new ReportDataSource<KeyValuePair<Firma, StatisticsPerYear<Smlouva.Statistics.Data> >>(coreColumns);
     foreach (var i in coreData)
     {
+        var firma = await Firmy.GetAsync(i.Key);
         coreRDS.AddRow(
-            new KeyValuePair<string, StatisticsPerYear<Smlouva.Statistics.Data>>(i.Key, i.Value)
+            new KeyValuePair<Firma, StatisticsPerYear<Smlouva.Statistics.Data>>(firma, i.Value)
             );
     }
 

@@ -16,15 +16,17 @@
     }
 
     var uradyCount = await JobService.GetOdberateleListAsync(Model.Key.Value);
-    var urady = dodavatelStatistics.SelectMany(m => m.Odberatele).Distinct()
-        .Select(m => new
-        {
-            ico = m,
-            name = HlidacStatu.Repositories.Firmy.GetJmenoAsync(m),
-            count = uradyCount.Any(c => c.ico == m) ? uradyCount.First(c => c.ico == m).pocetCen : 0
-        })
-    .OrderBy(o => o.name);
-    ;
+    
+    var distinctIcos = dodavatelStatistics.SelectMany(m => m.Odberatele).Distinct();
+    var urady = new List<(string Ico, string Name, int Count)>();
+    foreach (var ico in distinctIcos)
+    {
+        var name = await HlidacStatu.Repositories.Firmy.GetJmenoAsync(ico);
+        var count = uradyCount.Any(c => c.ico == ico) ? uradyCount.First(c => c.ico == ico).pocetCen : 0;
+        urady.Add((ico, name, count));
+    }
+    var uradySorted = urady.OrderBy(o => o.Name).ToList();
+    
 }
 
 @if (this.Context.HasAccess().Result.AnalyzeLevel < CenyCustomer.AccessDetail.AccessDetailLevel.PRO)
@@ -43,13 +45,13 @@
     {
         JobStatistics dodavatelStatisticsPolozka = dodavatelStatistics.FirstOrDefault(m => m.Name == polozka.Name);
         List<(JobStatistics stat, string firmaName)> uradyStatPolozka = new List<(JobStatistics stat, string firmaName)>();
-        foreach (var f in urady.OrderByDescending(o => o.count))
+        foreach (var f in uradySorted.OrderByDescending(o => o.Count))
         {
-            var uradStat = JobService.GetDodavatelForOdberatelStatistics(Model.dodavatel.ICO, f.ico, Model.Key.Value);
+            var uradStat = JobService.GetDodavatelForOdberatelStatistics(Model.dodavatel.ICO, f.Ico, Model.Key.Value);
             var uradPolozka = uradStat.FirstOrDefault(m => m.Name.ToLowerInvariant() == polozka.Name.ToLowerInvariant());
             if (uradPolozka != null)
             {
-                uradyStatPolozka.Add((uradPolozka, f.name));
+                uradyStatPolozka.Add((uradPolozka, f.Name));
             }
         }
         if (uradyStatPolozka.Count == 0)
