@@ -324,6 +324,7 @@ namespace HlidacStatu.Entities
         //views
         public DbSet<FindPersonDTO> FindPersonView { get; set; }
         public DbSet<SponzoringOverview> SponzoringOverviewView { get; set; }
+        public DbSet<StranaDto> StranaView { get; set; }
         public DbSet<SponzoringSummed> SponzoringSummedView { get; set; }
         public DbSet<Ids> IdsView { get; set; }
         public DbSet<UserJobStatistics> UserJobStatistics { get; set; }

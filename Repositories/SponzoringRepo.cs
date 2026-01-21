@@ -8,6 +8,7 @@ using HlidacStatu.Connectors;
 using HlidacStatu.Entities;
 using HlidacStatu.Entities.Views;
 using HlidacStatu.Extensions;
+using HlidacStatu.Repositories.Cache;
 using HlidacStatu.Util;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
@@ -19,12 +20,7 @@ namespace HlidacStatu.Repositories
     {
         private static int? _defaultLastSponzoringYear = null;
         private static readonly ILogger _logger = Log.ForContext(typeof(SponzoringRepo));
-
-        private static readonly FusionCache _cache = new FusionCache(new FusionCacheOptions()
-        {
-            CacheName = "SponzoringCache",
-        });
-
+        
         public static string[] VelkeStrany = new string[]
         {
             "ANO", "ODS", "ČSSD", "Česká pirátská strana", "KSČM",
@@ -206,67 +202,13 @@ namespace HlidacStatu.Repositories
             }
         }
 
-
-        //přidat cache
-        public static async Task<List<SponzoringOverview>> PartiesPerYearsOverviewAsync(int? year,
-            CancellationToken cancellationToken)
+        
+        public static async Task<string> IcoToKratkyNazevAsync(string stranaIco)
         {
-            int rok = year ?? 0;
-            int yearSwitch = year.HasValue ? 0 : 1;
-
-            var partiesPerYear = await _cache.GetOrSetAsync<List<SponzoringOverview>>($"bookmark:{rok}_{yearSwitch}",
-                async _ =>
-                {
-                    await using DbEntities db = new DbEntities();
-                    return await db.SponzoringOverviewView.FromSqlInterpolated(
-                            $@"SELECT zs.KratkyNazev, IcoPrijemce as IcoStrany
-                      ,Year(DarovanoDne) as Rok, SUM(Hodnota) as DaryCelkem
-                      ,SUM(case when icodarce is null or Len(IcoDarce) < 3 then Hodnota end) as DaryOsob
-                      ,SUM(case when icodarce is not null and Len(IcoDarce) >= 3 then Hodnota end) as DaryFirem
-                      ,COUNT(distinct osobaiddarce) as PocetDarujicichOsob
-                      ,COUNT(distinct icodarce) as PocetDarujicichFirem
-                      FROM Sponzoring sp
-                      Left Join ZkratkaStrany zs on sp.IcoPrijemce = zs.ICO
-                      WHERE (year(sp.DarovanoDne) = {rok} or 1={yearSwitch})
-                      group by zs.KratkyNazev, IcoPrijemce, Year(DarovanoDne)")
-                        .ToListAsync(cancellationToken);
-                }, token: cancellationToken, options: CachingOptions.Cache10m_failsave4h);
-
-            return partiesPerYear;
+            var stranyIco = await SponzoringCache.StranyIcoAsync();
+            return stranyIco.TryGetValue(stranaIco, out string zkratkaStrany) ? zkratkaStrany : null;
         }
-
-        static Devmasters.Cache.LocalMemory.Cache<Dictionary<string, string>> stranyIcoCache =
-            new Devmasters.Cache.LocalMemory.Cache<Dictionary<string, string>>(
-                TimeSpan.FromHours(1), "stranyIcoCache",
-                (o) =>
-                {
-                    var res = DirectDB.Instance.GetList<string, string>(
-                        @"SELECT  IcoPrijemce as IcoStrany, zs.KratkyNazev
-                      FROM Sponzoring sp
-                      Left Join ZkratkaStrany zs on sp.IcoPrijemce = zs.ICO
-                      group by zs.KratkyNazev, IcoPrijemce");
-
-                    return res.ToDictionary(k => k.Item1, v => v.Item2 ?? Firmy.GetJmenoAsync(v.Item1));
-                });
-
-        private static Dictionary<string, string> StranyIco()
-        {
-            return stranyIcoCache.Get();
-        }
-
-        public static string IcoToKratkyNazev(string stranaIco)
-        {
-            if (StranyIco().ContainsKey(stranaIco))
-                return StranyIco().FirstOrDefault(m => m.Key == stranaIco).Value;
-            return null;
-        }
-
-        public static string KratkyNazevToIco(string stranaKratkyNazev)
-        {
-            if (StranyIco().ContainsValue(stranaKratkyNazev))
-                return StranyIco().FirstOrDefault(m => m.Value == stranaKratkyNazev).Key;
-            return null;
-        }
+        
 
         public static async Task<Dictionary<int, decimal>> SponzoringPerYearAsync(string party, int minYear,
             int maxYear, bool persons, bool companies)
@@ -413,7 +355,6 @@ namespace HlidacStatu.Repositories
                               and year(sp.DarovanoDne) >= {tenYearsBack}
                             group by fi.ICO, fi.Jmeno, fi.kod_pf")
                 .OrderByDescending(x => x.DarCelkem);
-            ;
 
             if (take != null)
                 return await request.Take(take.Value).ToListAsync(cancellationToken);

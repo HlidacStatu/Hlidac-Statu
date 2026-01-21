@@ -121,10 +121,18 @@
                                     </td>
                                     <td>
                                         @{
-                                            var strany = (await SponzoringRepo.GetByDarceAsync(row.Id, m => true)).Select(m => SponzoringRepo.IcoToKratkyNazev(m.IcoPrijemce))
-                                            .Where(m => m != null)
-                                            .Distinct().OrderBy(m => m)
-                                            .Select(s => $"<a href='/Sponzori/Strana/{System.Net.WebUtility.UrlEncode(s)}'>{s}</a>");
+                                            var sponzoring = await SponzoringRepo.GetByDarceAsync(row.Id, m => true);
+                                            var stranyList = new List<string>();
+                                            foreach (var m in sponzoring)
+                                            {
+                                                var nazev = await SponzoringRepo.IcoToKratkyNazevAsync(m.IcoPrijemce);
+                                                if (nazev != null)
+                                                {
+                                                    stranyList.Add(nazev);
+                                                }
+                                            }
+                                            var strany = stranyList.Distinct().OrderBy(m => m)
+                                                .Select(s => $"<a href='/Sponzori/Strana/{System.Net.WebUtility.UrlEncode(s)}'>{s}</a>");
                                         }
                                         @Html.Raw(string.Join(", ", strany))
                                     </td>
@@ -157,10 +165,18 @@
                                         </td>
                                         <td>
                                             @{
-                                                var strany = (await SponzoringRepo.GetByDarceAsync(row.Id, m => true)).Select(m => SponzoringRepo.IcoToKratkyNazev(m.IcoPrijemce))
-                                                .Where(m => m != null)
-                                                .Distinct().OrderBy(m => m)
-                                                .Select(s => $"<a href='/Sponzori/Strana/{System.Net.WebUtility.UrlEncode(s)}'>{s}</a>");
+                                                var sponzoring = await SponzoringRepo.GetByDarceAsync(row.Id, m => true);
+                                                var stranyList = new List<string>();
+                                                foreach (var m in sponzoring)
+                                                {
+                                                    var nazev = await SponzoringRepo.IcoToKratkyNazevAsync(m.IcoPrijemce);
+                                                    if (nazev != null)
+                                                    {
+                                                        stranyList.Add(nazev);
+                                                    }
+                                                }
+                                                var strany = stranyList.Distinct().OrderBy(m => m)
+                                                    .Select(s => $"<a href='/Sponzori/Strana/{System.Net.WebUtility.UrlEncode(s)}'>{s}</a>");
                                             }
                                             @Html.Raw(string.Join(", ", strany))
                                         </td>

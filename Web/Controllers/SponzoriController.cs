@@ -9,6 +9,7 @@ using System;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using HlidacStatu.Repositories.Cache;
 
 namespace HlidacStatu.Web.Controllers
 {
@@ -18,7 +19,7 @@ namespace HlidacStatu.Web.Controllers
         [HlidacOutputCache(3600, "", false)]
         public async Task<ActionResult> Index(CancellationToken cancellationToken)
         {
-            var model = await SponzoringRepo.PartiesPerYearsOverviewAsync(SponzoringRepo.DefaultLastSponzoringYear(), cancellationToken);
+            var model = await SponzoringCache.PartiesPerYearsOverviewAsync(SponzoringRepo.DefaultLastSponzoringYear(), cancellationToken);
             model = model.Where(s => SponzoringRepo.TopStrany
                     .Any(x => string.Equals(x, s.KratkyNazev, StringComparison.InvariantCultureIgnoreCase)))
                 .OrderByDescending(s => s.DaryCelkem)
