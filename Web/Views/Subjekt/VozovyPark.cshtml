@@ -97,36 +97,6 @@
 
 <div id="subjcontent_toc">
 
-    @if (User.IsInRole("Admin") == false)
-    {
-        <p>Tato stránka bude dostupná až za několik dní</p>
-        return;
-    }
-    <div class="p-5 border border-3">
-    <h2>Test pristupu pro supporters</h2>
-
-    <role-limited roles="Admin,Supporter" hide-any-content="false">
-        <pass>
-            Jsi admin, zde bys viděl všechna vozidla
-            <hr />
-            <hidecontent height="70">
-                <span>@Html.Raw(string.Join("<br />", vozidla.Select(m=>$"Detail o vozidle {Html.Encode(m.Tovarni_znacka)} {Html.Encode(m.Model)}").Take(2)))
-                </span>
-            </hidecontent>
-            <p class="text-center">
-                <partial name="WebUtil/DynamicModal"
-                         model="@(new DynamicModalViewModel(
-                        $"/api/v1/SupporterOnly",
-                        nazevOdkazu: $"<span class='btn btn-hs btn-primary btn-sm my-3 position-relative'>Celý vozový park podrobně <span class='position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger'>" + HlidacStatu.Util.RenderData.NiceNumber(vozidla.Count) + "</span></span>",
-                        width: DynamicModalViewModel.WidthSizeEnum.Large
-                    ))" />
-            </p>
-        </pass>
-        <else>
-        </else>
-    </role-limited>
-    </div>
-    <hr />
    <h3>Aktuální vozový park</h3>
 
     @Html.DataToHTMLTable(rds, dataTableOptions: HtmlExtensions.DatatableOptions(pageLength: 20))

@@ -1103,20 +1103,9 @@
                              model="new Tuple<Firma, IEnumerable<HlidacStatu.RegistrVozidel.Models.VozidloLight>>(Model, vozidla.Where(m => m.Aktualni == false))" />
 
                 </div>
-                @if (User.IsInRole("Admin"))
-                {
-                    <p class="text-center">
-                        <a href="/subjekt/vozovypark/@Model.ICO" class='btn btn-hs btn-primary btn-sm my-3 position-relative'>Celý vozový park podrobně <span class='position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger'>@(HlidacStatu.Util.RenderData.NiceNumber(vozidla.Count))</span></a>
-                    </p>
-                }
-                else
-                {
-
-                    <p>
-                        Detailní informace o vozovém parku státních organizací ukážeme už za několik dní.
-                    </p>
-
-                }
+                <p class="text-center">
+                    <a href="/subjekt/vozovypark/@Model.ICO" class='btn btn-hs btn-primary btn-sm my-3 position-relative'>Celý vozový park podrobně <span class='position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger'>@(HlidacStatu.Util.RenderData.NiceNumber(vozidla.Count))</span></a>
+                </p>
                 <hr />
 
             }
