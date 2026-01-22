@@ -273,6 +273,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RegistrVozidel", "..\Hlidac
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NkodClient", "..\Hlidac-Statu-Private\NKODClient\NkodClient.csproj", "{8D6EBEF2-D72D-9107-F5D2-37823787F31E}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "MMServices", "MMServices", "{A7664DF8-45E7-4913-AEEB-A6D2332F79EA}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HealthCheckMonitor", "..\Hlidac-Statu-Private\MMServices\HealthCheckMonitor\HealthCheckMonitor.csproj", "{F75D6CBA-AAC0-48A4-90E3-E5B77C85AEC8}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -691,6 +695,10 @@ Global
 		{8D6EBEF2-D72D-9107-F5D2-37823787F31E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8D6EBEF2-D72D-9107-F5D2-37823787F31E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8D6EBEF2-D72D-9107-F5D2-37823787F31E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F75D6CBA-AAC0-48A4-90E3-E5B77C85AEC8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F75D6CBA-AAC0-48A4-90E3-E5B77C85AEC8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F75D6CBA-AAC0-48A4-90E3-E5B77C85AEC8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F75D6CBA-AAC0-48A4-90E3-E5B77C85AEC8}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -813,6 +821,8 @@ Global
 		{1F0660DA-0456-DA91-AF23-6C3C033FA4FB} = {44E67082-D88E-41AE-AF07-4739BDC44B2D}
 		{5DEFCE56-BA0F-43E7-B72B-2434C68DF3BC} = {44E67082-D88E-41AE-AF07-4739BDC44B2D}
 		{8D6EBEF2-D72D-9107-F5D2-37823787F31E} = {44E67082-D88E-41AE-AF07-4739BDC44B2D}
+		{A7664DF8-45E7-4913-AEEB-A6D2332F79EA} = {42A525EE-D63A-42EA-BB47-3E99DB948738}
+		{F75D6CBA-AAC0-48A4-90E3-E5B77C85AEC8} = {A7664DF8-45E7-4913-AEEB-A6D2332F79EA}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {17143448-F5EA-41D1-886F-00E63AE50798}
