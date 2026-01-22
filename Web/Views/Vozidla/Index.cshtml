@@ -1,7 +1,7 @@
 ﻿@using HlidacStatu.Repositories
 @using HlidacStatu.Repositories.Cache
 @{
-    ViewBag.Title = "Hlídač veřejných zakázek";
+    ViewBag.Title = "Prověření vozidla";
     ViewBag.SubTitle = "";
 }
 
@@ -14,15 +14,22 @@
     </ol>
 }
 
+<h3 class="mt-2">
+    Kupujete ojeté vozidlo? Prověřte si auto i jeho historii podle vin. Zdarma.
+</h3>
+
+
+<h4 class="mt-5">Zadejte VIN vozidla:</h4>
+
 <form method="get" action="/vozidla/VIN" class="form-inline" role="form">
     <div  class="input-group col-xs-12 custom-search-input">
         <div class="input-group col-xs-12">
 
-            <input class="form-control input" id="ID" name="ID" placeholder="Celé VIN číslo vozidla ..." style="max-width: none;" type="text" value="@Model.Q">
+            <input class="form-control input" id="ID" name="ID" placeholder="Celé VIN číslo vozidla ..." style="max-width: none;" type="text" value="">
 
             <span class="input-group-btn text-end" style="padding-right:20px;">
                 <button class="btn btn-hs btn-secondary" type="submit">
-                    <i class="fad fa-search"></i>
+                    Hledat
                 </button>
             </span>
         </div>

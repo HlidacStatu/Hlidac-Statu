@@ -14,14 +14,12 @@ namespace HlidacStatu.Web.Controllers
 
         // GET: Ucty
 
-        [HlidacOutputCache(60 * 60 * 6, "embed", false)]
         public ActionResult Index()
         {
             return View();
         }
 
 
-        [Authorize(Roles = "Admin")]
         public ActionResult VIN(string id)
         {
             if (string.IsNullOrEmpty(id))
