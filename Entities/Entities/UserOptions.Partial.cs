@@ -92,6 +92,7 @@ namespace HlidacStatu.Entities
                 var r = db.UserOptions
                     .FromSqlInterpolated(
                         $@"EXEC UserOption_Get @optionId = {(int)option}, @userid = {userId}, @languageid = {languageid}")
+                    .AsEnumerable() //tohle tady musí zůstat kvůli problému s dotazem ^ - 
                     .FirstOrDefault();
                 return r;
             }
