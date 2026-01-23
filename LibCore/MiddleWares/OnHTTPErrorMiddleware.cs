@@ -26,8 +26,12 @@ namespace HlidacStatu.LibCore.MiddleWares
             }
             catch (Exception e)
             {
+                
                 Helpers.LogHttpRequestDetail(_logger, Serilog.Events.LogEventLevel.Error, httpContext, e, 
                     "Untreated exception", nameof(OnHTTPErrorMiddleware));
+                
+                //tady sice došlo k chybě (500), ale status code = 200 
+                throw;
             }
 
             if (httpContext.Response.StatusCode >= 400)
