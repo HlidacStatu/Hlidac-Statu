@@ -305,7 +305,7 @@
                         @foreach (var pr in prijmyPolitikuOrg.OrderByDescending(o => o.CelkoveRocniNakladyNaPolitika))
                         {
                             <li>
-                                <a href="https://platy.hlidacstatu.cz/politici/politik/@(pr.Nameid)">@(await pr.GetCachedOsobaAsync()).FullName()</a>
+                                <a href="https://platy.hlidacstatu.cz/politici/politik/@(pr.Nameid)">@((await pr.GetCachedOsobaAsync()).FullName())</a>
                                 @HlidacStatu.Util.RenderData.NicePriceHtml(pr.CelkovyRocniPlatVcetneOdmen)
                                 @if (pr.Status > 0)
                                 {
