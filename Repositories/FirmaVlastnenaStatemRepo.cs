@@ -303,7 +303,7 @@ namespace HlidacStatu.Repositories
         {
             "12202", "12203", //banky
             "12302", "12303", //fondy penezniho trhu
-            "11002", "11003", //Nefinanční podniky
+            //"11002", "11003", //Nefinanční podniky
             "12402", "12403", //Investiční fondy jiné než fondy peněžního trhu
             "12502", "12503", // Ostatní finanční zprostředkovatelé kromě pojišťovacích společností a penzijních fondů
             "12602", "12603", // Pomocné finanční instituce

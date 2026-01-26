@@ -306,7 +306,7 @@ public static partial class PpRepo
 
     static IEqualityComparer<Firma> icoComparer = new FirmaByIcoComparer();
 
-    public static async Task<List<Firma>> FindStatniFirmyAsync(string nameId, Devmasters.DT.DateInterval obdobi)
+    public static async Task<List<Firma>> FindStatniFirmyProOsobuAsync(string nameId, Devmasters.DT.DateInterval obdobi)
     {
         /// ico- nameid[]
         List<Firma> res = new();
@@ -321,7 +321,9 @@ public static partial class PpRepo
             foreach (var v in vazby.Where(v => Devmasters.DT.DateInterval.IsOverlappingIntervals(
                          new Devmasters.DT.DateInterval(v.RelFrom, v.RelTo), obdobi)))
             {
-                d1.Add(await FirmaCache.GetAsync(v.To.Id));
+                var f = await FirmaCache.GetAsync(v.To.Id);
+                if (f!=null)
+                    d1.Add(f);
             }
 
             
