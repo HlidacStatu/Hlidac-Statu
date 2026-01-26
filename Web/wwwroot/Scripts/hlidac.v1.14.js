@@ -290,9 +290,27 @@ $(function () {
             $(this).addClass('btn-primary');
         });
     });
+
+
+
 });
 
+//copy to clipboard
+$(function () {
 
+    $('.copy-icon').on('click', async function () {
+        const targetId = $(this).data('target');
+        const success = await copyTextFromElement(targetId);
+
+        if (success) {
+            // Vizuální feedback - změna ikony
+            $(this).removeClass('fa-copy').addClass('fa-check');
+            setTimeout(() => {
+                $(this).removeClass('fa-check').addClass('fa-copy');
+            }, 1500);
+        }
+    });
+});
 
 var menuOpened = false;
 $(function () {
@@ -704,3 +722,72 @@ $(document).ready(function () {
     }
 })()
 // → Okamžitě se spustí definovaná funkce (IIFE).
+
+
+/**
+ * Zkopíruje text z HTML elementu do schránky
+ * @param {string} elementId - ID HTML elementu
+ * @returns {Promise<boolean>} - true při úspěchu, false při chybě
+ */
+async function copyTextFromElement(elementId) {
+    const element = document.getElementById(elementId);
+
+    if (!element) {
+        console.error(`Element s ID "${elementId}" nebyl nalezen.`);
+        return false;
+    }
+
+    // Získání textu - innerText zachovává vizuální formátování
+    const text = element.innerText;
+
+    // Moderní Clipboard API (Chrome, Safari 13.1+, Firefox, Edge)
+    if (navigator.clipboard?.writeText) {
+        try {
+            await navigator.clipboard.writeText(text);
+            return true;
+        } catch (err) {
+            console.warn('Clipboard API selhalo, zkouším fallback:', err);
+        }
+    }
+
+    // Fallback pro starší prohlížeče nebo při selhání Clipboard API
+    return copyTextFallback(text);
+}
+
+/**
+ * Fallback metoda pomocí execCommand
+ */
+function copyTextFallback(text) {
+    const textarea = document.createElement('textarea');
+    textarea.value = text;
+
+    // Styling pro neviditelnost, ale stále v DOM
+    textarea.style.cssText = 'position:fixed;top:0;left:0;width:1px;height:1px;padding:0;border:none;outline:none;box-shadow:none;opacity:0;';
+
+    document.body.appendChild(textarea);
+
+    // iOS Safari vyžaduje specifické nastavení
+    const range = document.createRange();
+    range.selectNodeContents(textarea);
+
+    const selection = window.getSelection();
+    selection.removeAllRanges();
+
+    // Pro iOS Safari
+    textarea.contentEditable = 'true';
+    textarea.readOnly = false;
+    selection.addRange(range);
+    textarea.setSelectionRange(0, text.length);
+
+    let success = false;
+    try {
+        success = document.execCommand('copy');
+    } catch (err) {
+        console.error('execCommand copy selhalo:', err);
+    }
+
+    selection.removeAllRanges();
+    document.body.removeChild(textarea);
+
+    return success;
+}

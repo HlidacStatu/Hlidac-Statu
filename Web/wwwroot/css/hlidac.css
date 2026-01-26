@@ -3981,3 +3981,17 @@ a.nav-link.dropdown-toggle.mainmenu.show {
 .text-pastvina, .text-pastvina-primary {
     color: var(--pv-cyan);
 }
+
+.copy-icon {
+    cursor: pointer;
+    color: #666;
+    transition: color 0.2s;
+}
+
+    .copy-icon:hover {
+        color: #007bff;
+    }
+
+    .copy-icon.success {
+        color: #28a745;
+    }
