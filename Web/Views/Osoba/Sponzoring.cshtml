@@ -78,7 +78,13 @@
 
     @if (sponzoringFirma.Count > 0)
     {
-        var sponzoringFirmyData = new ReportDataSource<(int Rok, string Ico, string DarceIco, string DarceJmeno, decimal Dar, string Poznamka, IHtmlContent vazbyRender)>(new ReportDataSource<(int Rok, string Ico, string Darceico, string DarceJmeno, decimal Dar, string Poznamka, IHtmlContent vazbyRender)>.Column()
+        var sponzoringFirmyData = new ReportDataSource<(int Rok, string IcoPrijemce, string JmenoPrijemce, 
+                                                        string DarceIco, string DarceJmeno,  decimal Dar, 
+                                                        string Poznamka, IHtmlContent vazbyRender)>(
+        new ReportDataSource<(
+            int Rok, string IcoPrijemnce, string JmenoPrijemce, string Darceico, 
+            string DarceJmeno, decimal Dar, string Poznamka, IHtmlContent vazbyRender
+        )>.Column()
         {
             Name = "Sponzorující firma",
             HtmlRender = (x) =>
@@ -97,7 +103,7 @@
         {
             Name = "Politická strana",
             HtmlRender = (x) =>
-                $"<a href=\"/subjekt/{x.Ico}\">{x.DarceJmeno}</a>"
+                $"<a href=\"/subjekt/{x.IcoPrijemce}\">{x.JmenoPrijemce}</a>"
         }, new()
         {
             Name = "Celkem darovali",
@@ -116,7 +122,7 @@
             Graph.Edge[]? vazby = await OsobaVazbyRepo.VazbyProIcoCachedAsync(Model, dar.IcoDarce);
             var jmenoDarce = await FirmaCache.GetJmenoAsync(dar.IcoDarce);
             var ihtmlVazby = await Html.RenderVazbyAsync(vazby);
-            sponzoringFirmyData.AddRow((dar.DarovanoDne?.Year ?? 0, dar.IcoPrijemce, dar.IcoDarce, jmenoDarce, dar.Hodnota ?? 0, dar.Popis, ihtmlVazby));
+            sponzoringFirmyData.AddRow((dar.DarovanoDne?.Year ?? 0, dar.IcoPrijemce, await dar.JmenoPrijemceAsync(), dar.IcoDarce, jmenoDarce, dar.Hodnota ?? 0, dar.Popis, ihtmlVazby));
         }
 
         <hr/>
