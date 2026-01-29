@@ -59,7 +59,7 @@
                     {
                         <div class="col-sm-4">
                             <div class="person-profile-thumb">
-                                <a href="@ceo.Osoba.GetUrl()">
+                                <a href="@ceo.Osoba.GetUrl(false)">
                                     <div class="photo">
                                         <div class="profile-picture border" style="background-image: url('@ceo.Osoba.GetPhotoUrl(local: false, phototype: Osoba.PhotoTypes.NoBackground)')"></div>
                                     </div>
@@ -69,7 +69,7 @@
                         <div class="col-sm-8">
                             <p class="py-0 my-0 text-muted">@ceo.Role</p>
                             <p class="py-0 my-0 lead">
-                                <a href="@ceo.Osoba.GetUrl()">@ceo.Osoba.FullName()</a>
+                                <a href="@ceo.Osoba.GetUrl(false)">@ceo.Osoba.FullName()</a>
                             </p>
                             <p class="py-0 my-0">od @(ceo.From?.ToString("dd.MM.yyyy"))</p>
                             @if (ceo.Osoba.GetSocialContacts().Any())
