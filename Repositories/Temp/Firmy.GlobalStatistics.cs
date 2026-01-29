@@ -68,8 +68,8 @@ namespace HlidacStatu.Repositories
                         icos.AddRange("45274649,47114983,70994226".Split(','));
                         icos.AddRange(FirmaVlastnenaStatemRepo.StatniFirmyICO);
 
-                        icos.AddRange(DirectDB.Instance
-                            .GetList<string>(
+                        icos.AddRange(await DirectDB.Instance
+                            .GetListAsync<string>(
                                 "select distinct ico from firma where status =1 and Kod_PF in (301,302,312,313,314,325,331,352,353,361,362,381,382,521,771,801,804,805)")
                         );
 

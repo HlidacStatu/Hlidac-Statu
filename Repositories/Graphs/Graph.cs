@@ -89,8 +89,8 @@ namespace HlidacStatu.Repositories
 
         public static async Task SmazVsechnyDcerineVazbyOsobyAsync(long internalId)
         {
-            var nameId = DirectDB.Instance.GetValue<string>("select nameid from Osoba where internalId=@internalId",
-                param: new IDataParameter[] { new SqlParameter("internalId", internalId) });
+            var nameId = await DirectDB.Instance.GetValueAsync<string>("select nameid from Osoba where internalId=@internalId",
+                param: new SqlParameter[] { new SqlParameter("internalId", internalId) });
             if (!string.IsNullOrEmpty(nameId))
             {
                 foreach (Relation.CharakterVazbyEnum charakter in Enum.GetValues(typeof(Relation.CharakterVazbyEnum)))
@@ -139,7 +139,7 @@ namespace HlidacStatu.Repositories
     and (podil is null or podil >= {minPodil})
 	and dbo.IsSomehowInInterval(@datumOd, @datumDo, datumOd, datumDo) = 1
 ";
-            var p = new IDataParameter[]
+            var p = new SqlParameter[]
             {
                 new SqlParameter("ico", ico),
                 new SqlParameter("datumOd", datumOd),
@@ -180,7 +180,7 @@ namespace HlidacStatu.Repositories
                             and (podil is null or podil >= {minPodil})
                 	        and dbo.IsSomehowInInterval(@datumOd, @datumDo, datumOd, datumDo) = 1
 ";
-            var p = new IDataParameter[]
+            var p = new SqlParameter[]
             {
                 new SqlParameter("osobaId", person.InternalId),
                 new SqlParameter("datumOd", datumOd),
@@ -284,7 +284,7 @@ namespace HlidacStatu.Repositories
         public static async Task<List<DS.Graphs.Graph.Edge>> GetChildrenRelationsAsync(string sql,
             Relation.CharakterVazbyEnum charakterVazby,
             HlidacStatu.DS.Graphs.Graph.Node.NodeType nodeType, string nodeId, DateTime? datumOd, DateTime? datumDo,
-            IDataParameter[] parameters, int level, bool goDeep,
+            SqlParameter[] parameters, int level, bool goDeep,
             HlidacStatu.DS.Graphs.Graph.Edge parent, ExcludeDataCol excludeICO, decimal minPodil)
         {
             if (excludeICO == null)
@@ -312,10 +312,10 @@ namespace HlidacStatu.Repositories
 
             //find politician in the DB
             var db = new Devmasters.DbConnect();
-            var sqlCall = DirectDB.Instance.GetRawSql(sql, parameters);
+            var sqlCall = await DirectDB.Instance.GetRawSqlAsync(sql, parameters);
             //string sqlFirma = "select top 1 stav_subjektu from firma where ico = @ico";
 
-            var ds = db.ExecuteDataset(cnnStr, CommandType.Text, sqlCall, null);
+            var ds = await db.ExecuteDatasetAsync(cnnStr, CommandType.Text, sqlCall, null);
 
             if (ds.Tables[0].Rows.Count > 0)
             {
@@ -596,7 +596,7 @@ namespace HlidacStatu.Repositories
 
             //find politician in the DB
             var db = new DbConnect();
-            var sqlCall = DirectDB.Instance.GetRawSql(sql, new IDataParameter[]
+            var sqlCall = DirectDB.Instance.GetRawSql(sql, new SqlParameter[]
             {
                 new SqlParameter("ico", ico)
             });
@@ -653,7 +653,7 @@ namespace HlidacStatu.Repositories
 
             //find politician in the DB
             var db = new DbConnect();
-            var sqlCall = DirectDB.Instance.GetRawSql(sql, new IDataParameter[]
+            var sqlCall = DirectDB.Instance.GetRawSql(sql, new SqlParameter[]
             {
                 new SqlParameter("internalId", osobaInternalId)
             });
@@ -712,7 +712,7 @@ namespace HlidacStatu.Repositories
 
             //find politician in the DB
             var db = new DbConnect();
-            var sqlCall = DirectDB.Instance.GetRawSql(sql, new IDataParameter[]
+            var sqlCall = DirectDB.Instance.GetRawSql(sql, new SqlParameter[]
             {
                 new SqlParameter("ico", ico)
             });
@@ -786,7 +786,7 @@ namespace HlidacStatu.Repositories
 
             //find politician in the DB
             var db = new DbConnect();
-            var sqlCall = DirectDB.Instance.GetRawSql(sql, new IDataParameter[]
+            var sqlCall = await DirectDB.Instance.GetRawSqlAsync(sql, new SqlParameter[]
             {
                 new SqlParameter("ico", ico),
                 new SqlParameter("datumOd", datumOd),
@@ -794,7 +794,7 @@ namespace HlidacStatu.Repositories
             });
             //string sqlFirma = "select top 1 stav_subjektu from firma where ico = @ico";
 
-            var ds = db.ExecuteDataset(cnnStr, CommandType.Text, sqlCall, null);
+            var ds = await db.ExecuteDatasetAsync(cnnStr, CommandType.Text, sqlCall, null);
 
             if (ds.Tables[0].Rows.Count > 0)
             {

@@ -22,6 +22,8 @@ dotnet_diagnostic.VSTHRD002.severity = error
 # VSTHRD103: Call async methods when in an async method
 dotnet_diagnostic.VSTHRD103.severity = error
 
+# VSTHRD200: Use "Async" suffix for async methods
+dotnet_diagnostic.VSTHRD200.severity = warning
 
 # Meziantou analyzer
 dotnet_diagnostic.MA0001.severity = none  # StringComparison is missing

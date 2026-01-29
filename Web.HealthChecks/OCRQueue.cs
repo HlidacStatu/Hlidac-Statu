@@ -17,7 +17,7 @@ namespace HlidacStatu.Web.HealthChecks
 
         public HealthStatus FailureStatus { get; }
 
-        public Task<HealthCheckResult> CheckHealthAsync(HealthCheckContext context, CancellationToken cancellationToken = default)
+        public async Task<HealthCheckResult> CheckHealthAsync(HealthCheckContext context, CancellationToken cancellationToken = default)
         {
             try
             {
@@ -33,7 +33,7 @@ namespace HlidacStatu.Web.HealthChecks
 		            from ItemToOcrQueue t with (nolock)
 		            order by type"; ;
 
-                var ocrQueue = HlidacStatu.Connectors.DirectDB.Instance.GetList<string, int, int, int, int>(ocrQueueSQL);
+                var ocrQueue = await HlidacStatu.Connectors.DirectDB.Instance.GetListAsync<string, int, int, int, int>(ocrQueueSQL);
 
                 var report = $"Velikost fronty:\n {string.Join("\n", ocrQueue.Select(m => $"{m.Item1}:čeká {m.Item2}"))}\n";
 
@@ -77,17 +77,17 @@ namespace HlidacStatu.Web.HealthChecks
 
 
                 if (currFailureStatus == HealthStatus.Unhealthy)
-                    return Task.FromResult(HealthCheckResult.Unhealthy(report + "\n" + string.Join("", issues)));
+                    return HealthCheckResult.Unhealthy(report + "\n" + string.Join("", issues));
                 else if (currFailureStatus == HealthStatus.Degraded)
-                    return Task.FromResult(HealthCheckResult.Degraded(report + "\n" + string.Join("", issues)));
+                    return HealthCheckResult.Degraded(report + "\n" + string.Join("", issues));
                 else
-                    return Task.FromResult(HealthCheckResult.Healthy(report + "\n" + string.Join("", issues)));
+                    return HealthCheckResult.Healthy(report + "\n" + string.Join("", issues));
 
             }
             catch (Exception e)
             {
 
-                return Task.FromResult(HealthCheckResult.Unhealthy(exception: e));
+                return HealthCheckResult.Unhealthy(exception: e);
             }
 
         }

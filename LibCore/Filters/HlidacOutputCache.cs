@@ -115,6 +115,7 @@ public sealed class HlidacOutputCacheFilter : IAsyncResultFilter
         // 3) uložíme do cache
         if (!string.IsNullOrEmpty(body) && httpContext.Response.StatusCode == StatusCodes.Status200OK)
         {
+            // nastavíme TTL podle toho, jestli je připojen debugger
             var lifetime = System.Diagnostics.Debugger.IsAttached
                 ? TimeSpan.FromSeconds(2)
                 : TimeSpan.FromSeconds(_duration);

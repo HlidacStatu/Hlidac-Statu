@@ -102,6 +102,10 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Lib.Data.External.Tables", "Lib.Data.External.Tables\Lib.Data.External.Tables.csproj", "{956497F7-9609-442E-8AB1-5F0AEEBF8081}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "_solution items", "_solution items", "{964DE48E-8813-408B-894D-072689E7005B}"
+	ProjectSection(SolutionItems) = preProject
+		.editorconfig = .editorconfig
+		..\Hlidac-Statu-Private\.editorconfig = ..\Hlidac-Statu-Private\.editorconfig
+	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Jobs", "Jobs", "{40841C9C-4BC4-4E32-AC3E-657E4A5FA1A0}"
 EndProject
@@ -157,9 +161,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "public", "public", "{8DFECE
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "private", "private", "{131AAA92-76B1-4D68-9410-7B52810BC976}"
 	ProjectSection(SolutionItems) = preProject
+		..\Hlidac-Statu-Private\.editorconfig = ..\Hlidac-Statu-Private\.editorconfig
 		..\Hlidac-Statu-Private\.gitattributes = ..\Hlidac-Statu-Private\.gitattributes
 		..\Hlidac-Statu-Private\.gitignore = ..\Hlidac-Statu-Private\.gitignore
-		..\Hlidac-Statu-Private\.editorconfig = ..\Hlidac-Statu-Private\.editorconfig
 		..\Hlidac-Statu-Private\Directory.Build.props = ..\Hlidac-Statu-Private\Directory.Build.props
 	EndProjectSection
 EndProject

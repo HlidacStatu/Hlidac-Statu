@@ -608,7 +608,7 @@ namespace HlidacStatuApi.Controllers.ApiV2
             {
                 var found = HlidacStatu.Connectors.DirectDB.Instance.GetList<string, string>(
                     "select u.Id, ur.UserId from AspNetUsers u left join AspNetUserRoles ur on u.id = ur.UserId and ur.RoleId='e9a30ca6-8aa7-423c-88f2-b7dd24eda7f8' where u.UserName = @username",
-                    System.Data.CommandType.Text, new System.Data.IDataParameter[] { new SqlParameter("username", username) }
+                    System.Data.CommandType.Text, new SqlParameter[] { new SqlParameter("username", username) }
                     );
                 if (found.Count() == 0)
                     return;
@@ -616,7 +616,7 @@ namespace HlidacStatuApi.Controllers.ApiV2
                 {
                     HlidacStatu.Connectors.DirectDB.Instance.NoResult(
                         @"insert into AspNetUserRoles select  (select id from AspNetUsers where Email like @username) as userId,'e9a30ca6-8aa7-423c-88f2-b7dd24eda7f8' as roleId",
-                        System.Data.CommandType.Text, new System.Data.IDataParameter[] { new SqlParameter("username", username) }
+                        System.Data.CommandType.Text, new SqlParameter[] { new SqlParameter("username", username) }
                         );
                 }
 
@@ -645,9 +645,9 @@ namespace HlidacStatuApi.Controllers.ApiV2
         [HttpGet("Stats")]
         public async Task<ActionResult<OCRStatistics>> Stats()
         {
-            long OCRQueueWaiting = HlidacStatu.Connectors.DirectDB.Instance.GetValue<int>("select count(*) from ItemToOcrQueue with (nolock) where started is null");
-            long OCRQueueRunning = HlidacStatu.Connectors.DirectDB.Instance.GetValue<int>("select count(*) from ItemToOcrQueue with (nolock) where started is not null and done is null"); ;
-            long OCRProcessing = HlidacStatu.Connectors.DirectDB.Instance.GetValue<int>("select count(*) from ItemToOcrQueue with (nolock) where started is not null and done is not null");
+            long OCRQueueWaiting = await HlidacStatu.Connectors.DirectDB.Instance.GetValueAsync<int>("select count(*) from ItemToOcrQueue with (nolock) where started is null");
+            long OCRQueueRunning = await HlidacStatu.Connectors.DirectDB.Instance.GetValueAsync<int>("select count(*) from ItemToOcrQueue with (nolock) where started is not null and done is null"); ;
+            long OCRProcessing = await HlidacStatu.Connectors.DirectDB.Instance.GetValueAsync<int>("select count(*) from ItemToOcrQueue with (nolock) where started is not null and done is not null");
 
 
             DateTime now = DateTime.Now;

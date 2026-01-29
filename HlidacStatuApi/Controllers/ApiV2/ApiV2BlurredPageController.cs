@@ -100,7 +100,7 @@ namespace HlidacStatuApi.Controllers.ApiV2
             {
                 var found = HlidacStatu.Connectors.DirectDB.Instance.GetList<string, string>(
                     "select u.Id, ur.UserId from AspNetUsers u left join AspNetUserRoles ur on u.id = ur.UserId and ur.RoleId='e9a30ca6-8aa7-423c-88f2-b7dd24eda7f8' where u.UserName = @username",
-                    System.Data.CommandType.Text, new IDataParameter[] { new SqlParameter("username", username) }
+                    System.Data.CommandType.Text, new SqlParameter[] { new SqlParameter("username", username) }
                     );
                 if (found.Count() == 0)
                     return;
@@ -108,7 +108,7 @@ namespace HlidacStatuApi.Controllers.ApiV2
                 {
                     HlidacStatu.Connectors.DirectDB.Instance.NoResult(
                         @"insert into AspNetUserRoles select  (select id from AspNetUsers where Email like @username) as userId,'e9a30ca6-8aa7-423c-88f2-b7dd24eda7f8' as roleId",
-                        System.Data.CommandType.Text, new IDataParameter[] { new SqlParameter("username", username) }
+                        System.Data.CommandType.Text, new SqlParameter[] { new SqlParameter("username", username) }
                         );
                 }
             }

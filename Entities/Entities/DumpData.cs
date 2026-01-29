@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Data;
+using Microsoft.Data.SqlClient;
 using Serilog;
 
 namespace HlidacStatu.Entities
@@ -23,7 +24,7 @@ namespace HlidacStatu.Entities
             string sql = @"select top 1 * from [DumpData] where mesic = @mesic and rok = @rok and den = @den order by created desc";
             using (var p = new Devmasters.DbConnect())
             {
-                var ds = p.ExecuteDataset(cnnStr, CommandType.Text, sql, new IDataParameter[] {
+                var ds = p.ExecuteDataset(cnnStr, CommandType.Text, sql, new SqlParameter[] {
                             new Microsoft.Data.SqlClient.SqlParameter("den", (int)dump.den),
                             new Microsoft.Data.SqlClient.SqlParameter("mesic", (int)dump.mesic),
                             new Microsoft.Data.SqlClient.SqlParameter("rok", (int)dump.rok),
@@ -77,7 +78,7 @@ namespace HlidacStatu.Entities
 
                 using (var p = new Devmasters.DbConnect())
                 {
-                    p.ExecuteNonQuery(cnnStr, CommandType.Text, sql, new IDataParameter[] {
+                    p.ExecuteNonQuery(cnnStr, CommandType.Text, sql, new SqlParameter[] {
                         new Microsoft.Data.SqlClient.SqlParameter("created", DateTime.Now),
                         new Microsoft.Data.SqlClient.SqlParameter("processed", processed),
                         new Microsoft.Data.SqlClient.SqlParameter("den", (int)dump.den),

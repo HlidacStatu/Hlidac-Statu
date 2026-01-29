@@ -122,7 +122,7 @@
             </tr>
             <tr>
                 <td>Počet zaregistrovaných dobrovolníků</td>
-                <td class="number">@(RenderData.NiceNumber(HlidacStatu.Connectors.DirectDB.Instance.GetList<int>("select count(*) from AspNetUserRoles ur inner join AspNetUsers u on u.id = ur.UserId where ur.RoleId='e9a30ca6-8aa7-423c-88f2-b7dd24eda7f8'").First())) Díky <i class="fa-solid fa-heart" style="color:red"></i></td>
+                <td class="number">@(RenderData.NiceNumber((await HlidacStatu.Connectors.DirectDB.Instance.GetListAsync<int>("select count(*) from AspNetUserRoles ur inner join AspNetUsers u on u.id = ur.UserId where ur.RoleId='e9a30ca6-8aa7-423c-88f2-b7dd24eda7f8'")).First())) Díky <i class="fa-solid fa-heart" style="color:red"></i></td>
             </tr>
             <tr>
                 <td>Počet smluv právě zpracovávaných</td>

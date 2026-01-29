@@ -377,12 +377,12 @@ namespace HlidacStatu.Repositories
         //     if (skipDS_Nace == false)
         //     {
         //
-        //         f.DatovaSchranka = DirectDB.Instance.GetList<string>("select DatovaSchranka from firma_DS where ico=@ico", CommandType.Text, new IDataParameter[] {
+        //         f.DatovaSchranka = await DirectDB.Instance.GetListAsync<string>("select DatovaSchranka from firma_DS where ico=@ico", CommandType.Text, new SqlParameter[] {
         //                 new SqlParameter("ico", f.ICO)
         //             })
         //             .ToArray();
         //
-        //         f.NACE = DirectDB.Instance.GetList<string>("select NACE from firma_Nace where ico=@ico", CommandType.Text, new IDataParameter[] {
+        //         f.NACE = await DirectDB.Instance.GetListAsync<string>("select NACE from firma_Nace where ico=@ico", CommandType.Text, new SqlParameter[] {
         //                 new SqlParameter("ico", f.ICO)
         //             })
         //             .ToArray();
@@ -394,7 +394,7 @@ namespace HlidacStatu.Repositories
         
         // public static IEnumerable<string> GetEntrepreneurIcos()
         // {
-        //     var data = DirectDB.Instance.GetList<string>("select ico from firma where ISNUMERIC(ICO) = 1 AND Kod_PF <=110", CommandType.Text, null);
+        //     var data = await DirectDB.Instance.GetListAsync<string>("select ico from firma where ISNUMERIC(ICO) = 1 AND Kod_PF <=110", CommandType.Text, null);
         //     return data;
         // }
         
@@ -403,7 +403,7 @@ namespace HlidacStatu.Repositories
         //     string sql = @"insert into firma(ico,dic,stav_subjektu, jmeno, jmenoascii, versionupdate, popis)
         //                         values(@ico,@dic,@stav,@jmeno,@jmenoascii,0,@adresa)";
         //
-        //     DirectDB.Instance.NoResult(sql, CommandType.Text, new IDataParameter[] {
+        //     await DirectDB.Instance.NoResultAsync(sql, CommandType.Text, new SqlParameter[] {
         //             new SqlParameter("ico", ico),
         //             new SqlParameter("dic", ico),
         //             new SqlParameter("stav", (int)1),

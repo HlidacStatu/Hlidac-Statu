@@ -13,6 +13,17 @@ namespace HlidacStatu.Web.Controllers
     [Route("Report")]
     public class ReportController : Controller
     {
+        [Route("35")]
+        [HlidacOutputCache(12 * 60 * 60, "", true)]
+        public IActionResult Stretzajmu()
+        {
+            ViewBag.Title = "Střet zájmů";
+            ViewBag.SubTitle = "Denně updatovaný report sledující střety zájmů politiků.";
+            //admins only
+            if (!User.IsInRole("Admin"))
+                return Forbid();
+            return View("35_Stretzajmu");
+        }
 
         [Route("2")]
         public IActionResult SmlouvySChybami()

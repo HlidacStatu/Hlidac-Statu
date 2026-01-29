@@ -53,7 +53,7 @@ namespace HlidacStatu.Web.Framework
             if (string.IsNullOrEmpty(page))
                 return;
             DirectDB.Instance.NoResult("AddVisit", System.Data.CommandType.StoredProcedure,
-                new System.Data.IDataParameter[] {
+                new Microsoft.Data.SqlClient.SqlParameter[] {
                     new Microsoft.Data.SqlClient.SqlParameter("@page", page.ToLower()),
                     new Microsoft.Data.SqlClient.SqlParameter("@date", DateTime.Now.Date),
                     new Microsoft.Data.SqlClient.SqlParameter("@channel", (int)channel)

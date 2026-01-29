@@ -60,7 +60,8 @@
         order by sumaLastY desc, suma desc
         ";
 
-        var stranaInfo = HlidacStatu.Connectors.DirectDB.Instance.GetList<string, string, decimal?, decimal?, int>(sql).FirstOrDefault();
+        var stranaInfo = (await HlidacStatu.Connectors.DirectDB.Instance.GetListAsync<string, string, decimal?, decimal?, int>(sql)
+            ).FirstOrDefault();
 
         <h4>
             Dary politické straně od sponzorů

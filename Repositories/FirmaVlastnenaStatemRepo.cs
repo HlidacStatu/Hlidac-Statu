@@ -383,7 +383,7 @@ namespace HlidacStatu.Repositories
                     .Distinct()
                     .ToHashSetAsync();
 
-                var res3 = DirectDB.Instance.GetList<string>(@"
+                var res3 = await DirectDB.Instance.GetListAsync<string>(@"
 select distinct o.ICO  from OrganVerejneMoci o	
 	left join Firma f on o.ICO = f.ICO
 	left join OrganVerejneMoci_KategorieOvm k on o.IdDS = k.IdDS
@@ -644,7 +644,7 @@ and (esa2010 in (" + string.Join(",", vzdySoukr_ESA2010.Select(m => $"'{m}'")) +
             _logger.Information("Resetting all firmy to Soukromy ...");
             string sql =
                 $"update firma set typ={((int)(TypSubjektuEnum.Soukromy))} where typ != {((int)(TypSubjektuEnum.Soukromy))}"; // where ico not in ({ica})
-            DirectDB.Instance.NoResult(sql);
+            await DirectDB.Instance.NoResultAsync(sql);
 
             List<string[]> batch = bagOfIco.Chunk(500).ToList();
             _logger.Information("Setting statni firmy ...");
@@ -684,8 +684,8 @@ and (esa2010 in (" + string.Join(",", vzdySoukr_ESA2010.Select(m => $"'{m}'")) +
 	inner join OrganVerejneMoci_KategorieOvm k on ovm.IdDS=k.IdDS
 	where k.KategorieOvm='KO14' or k.KategorieOvm='KO12' or k.KategorieOvm='KO137'";
             batch.Clear();
-            batch = DirectDB.Instance.GetList<string>(sqlObce)
-                .Chunk(500).ToList();
+            batch = (await DirectDB.Instance.GetListAsync<string>(sqlObce)
+                ).Chunk(500).ToList();
             _logger.Information("Setting OBCE typ...");
             Devmasters.Batch.Manager.DoActionForAll<IEnumerable<string>>(batch,
                 (icob) =>
@@ -731,7 +731,7 @@ and (esa2010 in (" + string.Join(",", vzdySoukr_ESA2010.Select(m => $"'{m}'")) +
                 {
                     string icos = string.Join(",", icob.Select(i => $"'{i}'"));
                     string sql = $"update firma set typ={((int)(TypSubjektuEnum.Exekutor))} where ico in ({icos})";
-                    DirectDB.Instance.NoResult(sql);
+                   DirectDB.Instance.NoResult(sql);
 
                     return new Devmasters.Batch.ActionOutputData();
                 }, outputWriter, progressWriter,

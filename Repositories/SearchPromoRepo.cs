@@ -126,7 +126,7 @@ namespace HlidacStatu.Repositories
                     if (Util.DataValidators.CheckCZICO(sp.Ico))
                     {
                         var zkratky =
-                            DirectDB.Instance.GetList<string>(
+                            await DirectDB.Instance.GetListAsync<string>(
                                 $"select text from AutocompleteSynonyms where query like 'ico:{sp.Ico}%'");
                         sp.Fulltext = (string.Join(" ", zkratky) + " " + sp.Fulltext).Trim();
                     }
@@ -181,7 +181,7 @@ namespace HlidacStatu.Repositories
                     if (Util.DataValidators.CheckCZICO(sp.Ico))
                     {
                         var zkratky =
-                            DirectDB.Instance.GetList<string>(
+                            await DirectDB.Instance.GetListAsync<string>(
                                 $"select text from AutocompleteSynonyms where query like 'ico:{sp.Ico}%'");
                         sp.Fulltext = (string.Join(" ", zkratky) + " " + sp.Fulltext).Trim();
                     }

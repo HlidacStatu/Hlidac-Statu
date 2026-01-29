@@ -895,7 +895,7 @@ namespace HlidacStatu.Repositories
                         {
                             /*_logger.Warning("Valid Req: Cannot load Smlouva Id " + idVerze +
                                                      "\nDebug:" + res.DebugInformation);*/
-                            //DirectDB.Instance.NoResult("delete from SmlouvyIds where id = @id", new Microsoft.Data.SqlClient.SqlParameter("id", idVerze));
+                            //await DirectDB.Instance.NoResultAsync("delete from SmlouvyIds where id = @id", new Microsoft.Data.SqlClient.SqlParameter("id", idVerze));
                         }
                         else if (res.Found == false)
                             return null;
@@ -976,7 +976,7 @@ namespace HlidacStatu.Repositories
                         {
                             _logger.Warning("Valid Req: Cannot load Smlouva Id " + idVerze +
                                                      "\nDebug:" + res.DebugInformation);
-                            //DirectDB.Instance.NoResult("delete from SmlouvyIds where id = @id", new Microsoft.Data.SqlClient.SqlParameter("id", idVerze));
+                            //await DirectDB.Instance.NoResultAsync("delete from SmlouvyIds where id = @id", new Microsoft.Data.SqlClient.SqlParameter("id", idVerze));
                         }
                         else if (res.Found == false)
                             return null;

@@ -27,7 +27,7 @@ namespace HlidacStatu.Repositories
         public static void SaveAlert(int serverId, Alert.AlertStatus status)
         {
             HlidacStatu.Connectors.DirectDB.Instance.NoResult("exec UptimeServer_Savealert @serverId, @lastAlertedStatus, @lastAlertSent ",
-                new IDataParameter[]
+                new SqlParameter[]
                 {
                     new SqlParameter("serverId", serverId),
                     new SqlParameter("lastAlertedStatus", (int)status),
@@ -86,8 +86,8 @@ namespace HlidacStatu.Repositories
             try
             {
                 var lap = swl.StopPreviousAndStartNextLap("SQL save");
-                HlidacStatu.Connectors.DirectDB.Instance.NoResult("exec UptimeServer_SaveStatus @serverId, @lastCheck, @lastResponseCode, @lastResponseSize, @lastResponseTimeInMs, @lastUptimeStatus",
-                    new IDataParameter[]
+                await  HlidacStatu.Connectors.DirectDB.Instance.NoResultAsync("exec UptimeServer_SaveStatus @serverId, @lastCheck, @lastResponseCode, @lastResponseSize, @lastResponseTimeInMs, @lastUptimeStatus",
+                    new SqlParameter[]
                     {
                         new SqlParameter("serverId", lastCheck.ServerId),
                         new SqlParameter("lastCheck", lastCheck.CheckStart),
