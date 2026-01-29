@@ -1,3 +1,4 @@
+
 using HlidacStatu.Entities;
 using HlidacStatu.Repositories;
 using Microsoft.AspNetCore.Mvc;
@@ -17,7 +18,6 @@ public class HomeController : Controller
     {
         return View("Index");
     }
-    
 
     [HlidacOutputCache(48 * 60 * 60, "*")]
     public async Task<IActionResult> Organizace(string id)
