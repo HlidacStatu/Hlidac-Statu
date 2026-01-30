@@ -41,7 +41,7 @@
     
 }
 
-@if (this.Context.HasAccess().Result.AnalyzeLevel < CenyCustomer.AccessDetail.AccessDetailLevel.PRO)
+@if (this.Context.HasAccessAsync().Result.AnalyzeLevel < CenyCustomer.AccessDetail.AccessDetailLevel.PRO)
 {
     <p>
         Zanalyzovali jsme celkem

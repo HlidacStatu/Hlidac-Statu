@@ -21,7 +21,7 @@ namespace HlidacStatu.Repositories
             {
                 existing = await GetDuplicatedAsync(tbl.CallerId, tbl.CallerTaskId, tbl.CallerTaskType, tbl.Source);
                 if (existing != null)
-                    return new Tuple<bool, QAITask>(false, await GetOnlySpecific(existing.Value));
+                    return new Tuple<bool, QAITask>(false, await GetOnlySpecificAsync(existing.Value));
             }
 
             db.QAITask.Add(tbl);
@@ -45,7 +45,7 @@ namespace HlidacStatu.Repositories
         }
 
 
-        public static async Task<QAITask> GetNextToProcess(string processEngine, 
+        public static async Task<QAITask> GetNextToProcessAsync(string processEngine, 
             string callerId = null,
             string callerTaskId = null,
             string callerTaskType = null,
@@ -80,10 +80,10 @@ namespace HlidacStatu.Repositories
         }
 
 
-        public static async Task<QAITask> Finish(HlidacStatu.DS.Api.AITask.Task task,
+        public static async Task<QAITask> FinishAsync(HlidacStatu.DS.Api.AITask.Task task,
             CancellationToken cancellationToken = default(CancellationToken))
         {
-            var q = await GetOnlySpecific(task.QId, cancellationToken);
+            var q = await GetOnlySpecificAsync(task.QId, cancellationToken);
             if (q != null)
             {
                 q.Status = (int)task.Status;
@@ -129,9 +129,9 @@ namespace HlidacStatu.Repositories
             }
             return q;
         }
-        public static async Task<QAITask> SetStatus(long qId, HlidacStatu.DS.Api.AITask.Task.CheckState status, CancellationToken cancellationToken = default(CancellationToken))
+        public static async Task<QAITask> SetStatusAsync(long qId, HlidacStatu.DS.Api.AITask.Task.CheckState status, CancellationToken cancellationToken = default(CancellationToken))
         {
-            var q = await GetOnlySpecific(qId, cancellationToken);
+            var q = await GetOnlySpecificAsync(qId, cancellationToken);
             if (q != null)
             {
                 q.Status = (int)status;
@@ -141,7 +141,7 @@ namespace HlidacStatu.Repositories
             return q;
         }
 
-        public static async Task<bool> IsDuplicated(string callerId, string callerTaskId, string callerTaskType, string sourceUri)
+        public static async Task<bool> IsDuplicatedAsync(string callerId, string callerTaskId, string callerTaskType, string sourceUri)
         {
             long? exists = await GetDuplicatedAsync(callerId, callerTaskId, callerTaskType, sourceUri);
 
@@ -191,7 +191,7 @@ namespace HlidacStatu.Repositories
         }
 
 
-        public static async Task<QAITask[]> GetByParameters(int maxItems = 1000,
+        public static async Task<QAITask[]> GetByParametersAsync(int maxItems = 1000,
         string? callerId = null, string? callerTaskId = null, string? callerTaskType = null,
         string source = null,
         HlidacStatu.DS.Api.AITask.Task.CheckState? status = null,
@@ -221,7 +221,7 @@ namespace HlidacStatu.Repositories
             }
         }
 
-        public static async Task<QAITask> GetOnlySpecific(long qId, CancellationToken cancellationToken = default(CancellationToken))
+        public static async Task<QAITask> GetOnlySpecificAsync(long qId, CancellationToken cancellationToken = default(CancellationToken))
         {
             await using (DbEntities db = new DbEntities())
             {
@@ -242,7 +242,7 @@ namespace HlidacStatu.Repositories
                 .ToList();
         }
 
-        public static async Task<int> WaitingInQueueCount(CancellationToken cancellationToken)
+        public static async Task<int> WaitingInQueueCountAsync(CancellationToken cancellationToken)
         {
             await using var db = new DbEntities();
             var count = await db.QAITask
@@ -253,7 +253,7 @@ namespace HlidacStatu.Repositories
             return count;
         }
 
-        public static async Task<int> WaitingInQueueBeforeIdCount(long qId, CancellationToken cancellationToken)
+        public static async Task<int> WaitingInQueueBeforeIdCountAsync(long qId, CancellationToken cancellationToken)
         {
             await using var db = new DbEntities();
             var count = (await db.QAITask

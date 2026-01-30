@@ -40,12 +40,12 @@ public static partial class PuRepo
         "ostatní"
     ];
 
-    public static async Task SaveVydelek(PuVydelek vydelek)
+    public static async Task SaveVydelekAsync(PuVydelek vydelek)
     {
-        await SaveVydelky(new[] { vydelek });
+        await SaveVydelkyAsync(new[] { vydelek });
     }
 
-    public static async Task SaveVydelky(IEnumerable<PuVydelek> vydelky)
+    public static async Task SaveVydelkyAsync(IEnumerable<PuVydelek> vydelky)
     {
         await using var db = new DbEntities();
 

@@ -47,7 +47,7 @@ namespace HlidacStatu.Web.Areas.Identity.Pages.Account
             public string Email { get; set; }
         }
 
-        public IActionResult OnGetAsync()
+        public IActionResult OnGet()
         {
             return RedirectToPage("./Login");
         }
@@ -133,7 +133,7 @@ namespace HlidacStatu.Web.Areas.Identity.Pages.Account
             }
         }
 
-        public IActionResult OnPostConfirmationAsync(string? retUrl_2 = null)
+        public IActionResult OnPostConfirmation(string? retUrl_2 = null)
         {
             //no confirmation needed
             return NotFound("this action is disabled");

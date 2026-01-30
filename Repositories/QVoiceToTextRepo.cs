@@ -37,7 +37,7 @@ namespace HlidacStatu.Repositories
         }
 
 
-        public static async Task<QVoiceToText> GetNextToProcess(string processEngine, CancellationToken cancellationToken = default(CancellationToken))
+        public static async Task<QVoiceToText> GetNextToProcessAsync(string processEngine, CancellationToken cancellationToken = default(CancellationToken))
         {
             await using (DbEntities db = new DbEntities())
             {
@@ -62,11 +62,11 @@ namespace HlidacStatu.Repositories
         }
 
 
-        public static async Task<QVoiceToText> Finish(long qId, string result,
+        public static async Task<QVoiceToText> FinishAsync(long qId, string result,
             HlidacStatu.DS.Api.Voice2Text.Task.CheckState status,
             CancellationToken cancellationToken = default(CancellationToken))
         {
-            var q = await GetOnlySpecific(qId, cancellationToken);
+            var q = await GetOnlySpecificAsync(qId, cancellationToken);
             if (q != null)
             {
                 q.Status = (int)status;
@@ -77,9 +77,9 @@ namespace HlidacStatu.Repositories
             }
             return q;
         }
-        public static async Task<QVoiceToText> SetStatus(long qId, HlidacStatu.DS.Api.Voice2Text.Task.CheckState status, CancellationToken cancellationToken = default(CancellationToken))
+        public static async Task<QVoiceToText> SetStatusAsync(long qId, HlidacStatu.DS.Api.Voice2Text.Task.CheckState status, CancellationToken cancellationToken = default(CancellationToken))
         {
-            var q = await GetOnlySpecific(qId, cancellationToken);
+            var q = await GetOnlySpecificAsync(qId, cancellationToken);
             if (q != null)
             {
                 q.Status = (int)status;
@@ -89,7 +89,7 @@ namespace HlidacStatu.Repositories
             return q;
         }
 
-        public static async Task<bool> IsDuplicatedBySource(string sourceUri)
+        public static async Task<bool> IsDuplicatedBySourceAsync(string sourceUri)
         {
             if (!Uri.IsWellFormedUriString(sourceUri, UriKind.Absolute))
                 return true;
@@ -122,7 +122,7 @@ namespace HlidacStatu.Repositories
                 return false;
             }
         }
-        public static async Task<QVoiceToText[]> GetByParameters(int maxItems = 1000,
+        public static async Task<QVoiceToText[]> GetByParametersAsync(int maxItems = 1000,
         string? callerId = null, string? callerTaskId = null,
         string source = null,
         HlidacStatu.DS.Api.Voice2Text.Task.CheckState? status = null,
@@ -150,7 +150,7 @@ namespace HlidacStatu.Repositories
             }
         }
 
-        public static async Task<QVoiceToText> GetOnlySpecific(long qId, CancellationToken cancellationToken = default(CancellationToken))
+        public static async Task<QVoiceToText> GetOnlySpecificAsync(long qId, CancellationToken cancellationToken = default(CancellationToken))
         {
             await using (DbEntities db = new DbEntities())
             {
@@ -171,7 +171,7 @@ namespace HlidacStatu.Repositories
                 .ToList();
         }
 
-        public static async Task<int> WaitingInQueueCount(CancellationToken cancellationToken)
+        public static async Task<int> WaitingInQueueCountAsync(CancellationToken cancellationToken)
         {
             await using var db = new DbEntities();
             var count = await db.QVoiceToText
@@ -182,7 +182,7 @@ namespace HlidacStatu.Repositories
             return count;
         }
 
-        public static async Task<int> WaitingInQueueBeforeIdCount(long qId, CancellationToken cancellationToken)
+        public static async Task<int> WaitingInQueueBeforeIdCountAsync(long qId, CancellationToken cancellationToken)
         {
             await using var db = new DbEntities();
             var count = (await db.QVoiceToText

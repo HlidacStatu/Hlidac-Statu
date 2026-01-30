@@ -318,7 +318,7 @@ namespace HlidacStatu.Web.Controllers
             ViewData["rok"] = rok;
             
             var data = new List<(string Ico, string Jmeno, decimal SumAssumedAmmount)>();
-            foreach (var (ico, sumAssumedAmmount) in await DotaceRepo.DotovaniSponzori(rok))
+            foreach (var (ico, sumAssumedAmmount) in await DotaceRepo.DotovaniSponzoriAsync(rok))
             {
                 var jmeno = await FirmaRepo.NameFromIcoAsync(ico);
                 data.Add((ico, jmeno, sumAssumedAmmount));

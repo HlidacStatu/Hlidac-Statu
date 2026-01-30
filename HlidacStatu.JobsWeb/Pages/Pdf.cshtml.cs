@@ -12,7 +12,7 @@ namespace WatchdogAnalytics.Pages
 
         public async Task<IActionResult> OnGetAsync()
         {
-            var ad = await HttpContext.HasAccess();
+            var ad = await HttpContext.HasAccessAsync();
             if (ad.Access == false)
                 return Redirect("/");
 

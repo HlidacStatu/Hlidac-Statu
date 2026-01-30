@@ -22,7 +22,7 @@ System.Globalization.CultureInfo.DefaultThreadCurrentUICulture = HlidacStatu.Uti
 // wati until generator (dependency) is running
 var baseUrl = Devmasters.Config.GetWebConfigValue("GeneratorUrl");
 var url = $"{baseUrl}/test"; //test endpoint
-await HlidacStatu.LibCore.Docker.WaitUntilServiceIsRunning(url);
+await HlidacStatu.LibCore.Docker.WaitUntilServiceIsRunningAsync(url);
 
 
 // run application

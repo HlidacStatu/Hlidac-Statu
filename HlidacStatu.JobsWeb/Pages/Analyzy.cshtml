@@ -23,7 +23,7 @@
                     @{
                         var a_it24 = new JobService.AnalysisStat(new YearlyStatisticsGroup.Key() { Obor = "IT", Rok = 2024 });
                     }
-                    @if (HttpContext.HasAccess("IT", 2024).Result.Access == false)
+                    @if (HttpContext.HasAccessAsync("IT", 2024).Result.Access == false)
                     {
                         <tr @Html.Raw(Request.Query["accent"].Equals("it2024") ? "class=\"table-warning\"" : "")>
                             <td width="60%">
@@ -67,7 +67,7 @@
                     @{
                         var a_it23 = new JobService.AnalysisStat(new YearlyStatisticsGroup.Key() { Obor = "IT", Rok = 2023 });
                     }
-                    @if (HttpContext.HasAccess("IT", 2023).Result.Access == false)
+                    @if (HttpContext.HasAccessAsync("IT", 2023).Result.Access == false)
                     {
                         <tr @Html.Raw(Request.Query["accent"].Equals("it2023") ? "class=\"table-warning\"" : "")>
                             <td width="60%">
@@ -108,7 +108,7 @@
                     @{
                         var a_it22 = new JobService.AnalysisStat(new YearlyStatisticsGroup.Key() { Obor = "IT", Rok = 2022 });
                     }
-                    @if (HttpContext.HasAccess("IT", 2022).Result.Access == false)
+                    @if (HttpContext.HasAccessAsync("IT", 2022).Result.Access == false)
                     {
                         <tr @Html.Raw(Request.Query["accent"].Equals("it2022") ? "class=\"table-warning\"" : "")>
                             <td width="60%">
@@ -162,7 +162,7 @@
                                         @{
                         var a_it21 = new JobService.AnalysisStat(new YearlyStatisticsGroup.Key() { Obor = "IT", Rok = 2021 });
                     }
-                    @if (HttpContext.HasAccess("IT", 2021).Result.Access == false)
+                    @if (HttpContext.HasAccessAsync("IT", 2021).Result.Access == false)
                     {
                         <tr @Html.Raw(Request.Query["accent"].Equals("it2021") ? "class=\"table-warning\"" : "")>
                             <td width="60%">

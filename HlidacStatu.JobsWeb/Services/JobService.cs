@@ -310,7 +310,7 @@ namespace WatchdogAnalytics.Services
             return DistinctJobs;
         }
 
-        public static async Task<CenyCustomer.AccessDetail> HasAccess(this HttpContext context)
+        public static async Task<CenyCustomer.AccessDetail> HasAccessAsync(this HttpContext context)
         {
             var key = TryFindKey(context);
             if (key?.IsDemo == true)
@@ -327,9 +327,9 @@ namespace WatchdogAnalytics.Services
             if (key == null)
                 return CenyCustomer.AccessDetail.NoAccess();
 
-            return await HasAccess(username, key?.Obor, key.Value.Rok);
+            return await HasAccessAsync(username, key?.Obor, key.Value.Rok);
         }
-        public static async Task<CenyCustomer.AccessDetail> HasAccess(this HttpContext context, string obor, int rok)
+        public static async Task<CenyCustomer.AccessDetail> HasAccessAsync(this HttpContext context, string obor, int rok)
         {
             if (context.User?.Identity?.IsAuthenticated == false)
                 return CenyCustomer.AccessDetail.NoAccess();
@@ -337,9 +337,9 @@ namespace WatchdogAnalytics.Services
             if (string.IsNullOrEmpty(username))
                 return CenyCustomer.AccessDetail.NoAccess();
 
-            return await HasAccess(username, obor, rok);
+            return await HasAccessAsync(username, obor, rok);
         }
-        public static async Task<CenyCustomer.AccessDetail> HasAccess(string username, string obor, int rok)
+        public static async Task<CenyCustomer.AccessDetail> HasAccessAsync(string username, string obor, int rok)
         {
 
             return await CenyCustomerRepo.HasAccessAsync(username, obor, rok).ConfigureAwait(false);

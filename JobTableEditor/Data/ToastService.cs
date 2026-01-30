@@ -13,7 +13,7 @@ namespace JobTableEditor.Data
                 Message = message;
                 ToastLevel = toastLevel;
 
-                _ = Task.Run(async () => await DismissInFiveSeconds()).ConfigureAwait(false);
+                _ = Task.Run(async () => await DismissInFiveSecondsAsync()).ConfigureAwait(false);
             }
 
             public string Id { get; } = Guid.NewGuid().ToString();
@@ -25,17 +25,17 @@ namespace JobTableEditor.Data
             
             public Func<Task> NotifyDismissed { get; set; }
 
-            public async Task Dismiss()
+            public async Task DismissAsync()
             {
                 IsDismissed = true;
                 if(NotifyDismissed != null)
                     await NotifyDismissed();
             }
             
-            private async Task DismissInFiveSeconds()
+            private async Task DismissInFiveSecondsAsync()
             {
                 await Task.Delay(5000).ConfigureAwait(false);
-                await Dismiss();
+                await DismissAsync();
             }
         }
         
@@ -51,28 +51,28 @@ namespace JobTableEditor.Data
         
         public event Func<ToastMessage, Task> OnChange;
         
-        public Task CreateInfoToast(string title, string message) => CreateToast(ToastLevel.Info, title, message);
-        public Task CreateInfoToast(string title, MarkupString message) => CreateToast(ToastLevel.Info, title, message);
-        public Task CreateSuccessToast(string title, string message) => CreateToast(ToastLevel.Success, title, message);
-        public Task CreateSuccessToast(string title, MarkupString message) => CreateToast(ToastLevel.Success, title, message);
-        public Task CreateWarningToast(string title, string message) => CreateToast(ToastLevel.Warning, title, message);
-        public Task CreateWarningToast(string title, MarkupString message) => CreateToast(ToastLevel.Warning, title, message);
-        public Task CreateErrorToast(string title, string message) => CreateToast(ToastLevel.Error, title, message);
-        public Task CreateErrorToast(string title, MarkupString message) => CreateToast(ToastLevel.Error, title, message);
+        public Task CreateInfoToastAsync(string title, string message) => CreateToastAsync(ToastLevel.Info, title, message);
+        public Task CreateInfoToastAsync(string title, MarkupString message) => CreateToastAsync(ToastLevel.Info, title, message);
+        public Task CreateSuccessToastAsync(string title, string message) => CreateToastAsync(ToastLevel.Success, title, message);
+        public Task CreateSuccessToastAsync(string title, MarkupString message) => CreateToastAsync(ToastLevel.Success, title, message);
+        public Task CreateWarningToastAsync(string title, string message) => CreateToastAsync(ToastLevel.Warning, title, message);
+        public Task CreateWarningToastAsync(string title, MarkupString message) => CreateToastAsync(ToastLevel.Warning, title, message);
+        public Task CreateErrorToastAsync(string title, string message) => CreateToastAsync(ToastLevel.Error, title, message);
+        public Task CreateErrorToastAsync(string title, MarkupString message) => CreateToastAsync(ToastLevel.Error, title, message);
 
-        private Task CreateToast(ToastLevel toastLevel, string title, string message) =>
-            CreateToast(toastLevel, title, new MarkupString(HttpUtility.HtmlEncode(message)));
+        private Task CreateToastAsync(ToastLevel toastLevel, string title, string message) =>
+            CreateToastAsync(toastLevel, title, new MarkupString(HttpUtility.HtmlEncode(message)));
 
-        private async Task CreateToast(ToastLevel toastLevel, string title, MarkupString message)
+        private async Task CreateToastAsync(ToastLevel toastLevel, string title, MarkupString message)
         {
             var toastMessage = new ToastMessage(title, message, toastLevel);
 
-            await NotifyChange(toastMessage);
+            await NotifyChangeAsync(toastMessage);
         }
         
-        
 
-        private async Task NotifyChange(ToastMessage toastMessage)
+
+        private async Task NotifyChangeAsync(ToastMessage toastMessage)
         {
             if (OnChange != null)
                 await OnChange(toastMessage);

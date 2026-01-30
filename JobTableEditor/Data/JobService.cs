@@ -22,7 +22,7 @@ namespace JobTableEditor.Data
             //stopwatch
             var sw = new Stopwatch(); 
             sw.Start();
-            var table = await InDocTablesRepo.GetNextForCheck(obor, user, cancellationToken);
+            var table = await InDocTablesRepo.GetNextForCheckAsync(obor, user, cancellationToken);
             sw.Stop();
             var getNextForCheckTime = sw.ElapsedMilliseconds;
             
@@ -50,7 +50,7 @@ namespace JobTableEditor.Data
 
         public async Task<SomeTable> GetSpecificTable(int pk, string user, CancellationToken cancellationToken)
         {
-            var table = await InDocTablesRepo.GetSpecific(pk, user, cancellationToken);
+            var table = await InDocTablesRepo.GetSpecificAsync(pk, user, cancellationToken);
             var cells = InTables.TableToCells(table.ParsedContent());
 
             var st = new SomeTable
@@ -65,12 +65,12 @@ namespace JobTableEditor.Data
         
         public async Task<int> WaitingInQueue(string obor, CancellationToken cancellationToken)
         {
-            return await InDocTablesRepo.WaitingInQueue(obor, cancellationToken);
+            return await InDocTablesRepo.WaitingInQueueAsync(obor, cancellationToken);
         }
         
         public async Task<List<InDocTables>> LoadHistory(string user, int take, CancellationToken cancellationToken)
         {
-            var tablesList = await InDocTablesRepo.GetHistory(user, take, cancellationToken);
+            var tablesList = await InDocTablesRepo.GetHistoryAsync(user, take, cancellationToken);
             
             return tablesList;
         }

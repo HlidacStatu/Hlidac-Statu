@@ -50,7 +50,7 @@ namespace HlidacStatu.Lib.OCR.Api
 
             }
 
-            public async Task<Result[]> Go()
+            public async Task<Result[]> GoAsync()
             {
                 List<Task<Result>> tas = new List<Task<Result>>();
 
@@ -58,7 +58,7 @@ namespace HlidacStatu.Lib.OCR.Api
 
                 foreach (var fn in files)
                 {
-                    tas.Add(OneCall(Apikey, fn));
+                    tas.Add(OneCallAsync(Apikey, fn));
                 }
 
                 _logger.Debug($"MultipleFiles waiting for {files.Count()} files for parentTaskId:{ParentTaskId ?? ""}");
@@ -76,7 +76,7 @@ namespace HlidacStatu.Lib.OCR.Api
                 MiningProgress.SetProgress(currProgress, name);
             }
 
-            private async Task<Result> OneCall(string apikey, string fn)
+            private async Task<Result> OneCallAsync(string apikey, string fn)
             {
                 Result res = null;
                 try

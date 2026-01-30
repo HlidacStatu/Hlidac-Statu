@@ -88,7 +88,7 @@
 @{
     Firma dodavatel = await FirmaCache.GetAsync(Model.Ico);
 
-    var RSstat = await HlidacStatu.Repositories.SmlouvaRepo.Searching.CachedSimpleSearchWithStat(
+    var RSstat = await HlidacStatu.Repositories.SmlouvaRepo.Searching.CachedSimpleSearchWithStatAsync(
         $"icoPrijemce:{Model.Ico} AND " + Model.Key?.PerSubjectDesc?.Query,
         1, 0, Repositories.SmlouvaRepo.Searching.OrderResult.FastestForScroll);
     double sumKc = ((Nest.ValueAggregate)RSstat.ElasticResults?.Aggregations["sumKc"])?.Value ?? 0;

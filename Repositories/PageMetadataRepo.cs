@@ -65,7 +65,7 @@ namespace HlidacStatu.Repositories
         /// </summary>
         /// <param name="smlouvaId"></param>
         /// <returns>UniqueId priloh, ktere je nutne zpracovat</returns>
-        public static async Task<IEnumerable<Smlouva.Priloha>> MissingInPageMetadata(string smlouvaId)
+        public static async Task<IEnumerable<Smlouva.Priloha>> MissingInPageMetadataAsync(string smlouvaId)
         {
             var sml = await SmlouvaRepo.LoadAsync(smlouvaId, includePlaintext: false);
             if (sml.Prilohy == null)

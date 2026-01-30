@@ -346,7 +346,7 @@ namespace HlidacStatu.Repositories
 
         static HashSet<string> _ovm_Nikdy_nejsou_statni = null;
 
-        private static async Task<HashSet<string>> OVM_Nikdy_nejsou_statni(bool updateFromPrimarySource = false)
+        private static async Task<HashSet<string>> OVM_Nikdy_nejsou_statniAsync(bool updateFromPrimarySource = false)
         {
             if (updateFromPrimarySource)
                 await Update_OrganVerejneMoci_in_DBAsync();
@@ -426,7 +426,7 @@ and (esa2010 in (" + string.Join(",", vzdySoukr_ESA2010.Select(m => $"'{m}'")) +
             var updateOVM = true;
             if (System.Diagnostics.Debugger.IsAttached)
                 updateOVM = false; //jen pri ladeni
-            HashSet<string> ovm_nikdyStatni = await OVM_Nikdy_nejsou_statni(updateOVM);
+            HashSet<string> ovm_nikdyStatni = await OVM_Nikdy_nejsou_statniAsync(updateOVM);
 
             //Find statni firmy 
 

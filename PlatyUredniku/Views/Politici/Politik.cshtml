@@ -443,7 +443,7 @@
                 <p>
                     <ol class="list-group" style="max-width:800px;">
 
-                        @foreach (var evd in (await PpRepo.GetEventsForPolitikAndOrganizace(politik.NameId, pprijem.IdOrganizace)).OrderBy(o => o.Datum).Select(m => m.GetEventDescription()))
+                        @foreach (var evd in (await PpRepo.GetEventsForPolitikAndOrganizaceAsync(politik.NameId, pprijem.IdOrganizace)).OrderBy(o => o.Datum).Select(m => m.GetEventDescription()))
                         {
                             <li class="list-group-item list-group-item-@(evd.BootStrapColor())">
                                 <div class="d-flex w-100 justify-content-between">

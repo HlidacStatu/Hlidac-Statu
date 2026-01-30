@@ -15,7 +15,7 @@ public static class Docker
     /// It sends HTTP GET requests in 1 sec intervals and waits until it gets 2xx HTTP response. 
     /// </summary>
     /// <param name="serviceUrlCheckEndpoint"></param>
-    public static async Task WaitUntilServiceIsRunning(string serviceUrlCheckEndpoint)
+    public static async Task WaitUntilServiceIsRunningAsync(string serviceUrlCheckEndpoint)
     {
         int retries = 0;
 

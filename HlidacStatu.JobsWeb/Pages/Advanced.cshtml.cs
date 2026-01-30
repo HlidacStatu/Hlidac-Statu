@@ -17,7 +17,7 @@ namespace WatchdogAnalytics.Pages
 
             var obor_rok = JobService.TryFindKey(HttpContext);
 
-            var ad = await HttpContext.HasAccess();
+            var ad = await HttpContext.HasAccessAsync();
             if (ad.Access == false)
                 return Redirect("/");
             if (ad.AnalyzeLevel < CenyCustomer.AccessDetail.AccessDetailLevel.PRO)

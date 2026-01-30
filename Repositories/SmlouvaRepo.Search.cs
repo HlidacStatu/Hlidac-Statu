@@ -464,17 +464,17 @@ bool withHighlighting = false, bool exactNumOfResults = false)
             }
             
             
-            public static Task<SmlouvaSearchResult> CachedSimpleSearchWithStat(
+            public static Task<SmlouvaSearchResult> CachedSimpleSearchWithStatAsync(
                string query, int page, int pageSize, OrderResult order,
                bool? platnyZaznam = null, bool includeNeplatne = false,
                bool logError = true, bool fixQuery = true
                )
             { 
-                return CachedSimpleSearch(query, page, pageSize, order, platnyZaznam, includeNeplatne, logError, fixQuery,
+                return CachedSimpleSearchAsync(query, page, pageSize, order, platnyZaznam, includeNeplatne, logError, fixQuery,
                     new AggregationContainerDescriptor<Smlouva>().Sum("sumKc", m => m.Field(f => f.CalculatedPriceWithVATinCZK))
                     );
             }
-            public static async Task<SmlouvaSearchResult> CachedSimpleSearch(
+            public static async Task<SmlouvaSearchResult> CachedSimpleSearchAsync(
                 string query, int page, int pageSize, OrderResult order,
                 bool? platnyZaznam = null, bool includeNeplatne = false,
                 bool logError = true, bool fixQuery = true,

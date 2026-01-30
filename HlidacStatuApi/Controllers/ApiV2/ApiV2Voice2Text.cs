@@ -27,7 +27,7 @@ namespace HlidacStatuApi.Controllers.ApiV2
             try
             {
                 //check duplication
-                if (addDuplicated == false && (await QVoiceToTextRepo.IsDuplicatedBySource(task.Source)))
+                if (addDuplicated == false && (await QVoiceToTextRepo.IsDuplicatedBySourceAsync(task.Source)))
                     return StatusCode(204);
                 
 
@@ -65,7 +65,7 @@ namespace HlidacStatuApi.Controllers.ApiV2
         [HttpGet("GetNextTask")]
         public async Task<ActionResult<HlidacStatu.DS.Api.Voice2Text.Task>> GetNextTask([FromQuery] string processEngine)
         {
-            var q = await QVoiceToTextRepo.GetNextToProcess(processEngine);
+            var q = await QVoiceToTextRepo.GetNextToProcessAsync(processEngine);
 
 
             if (q == null)
@@ -94,7 +94,7 @@ namespace HlidacStatuApi.Controllers.ApiV2
             {
                 string strResult = System.Text.Json.JsonSerializer.Serialize(task.Result);
 
-                var q = await QVoiceToTextRepo.Finish(task.QId, strResult, task.Status);
+                var q = await QVoiceToTextRepo.FinishAsync(task.QId, strResult, task.Status);
                 if (q == null)
                     return StatusCode(404);
                 else
@@ -113,7 +113,7 @@ namespace HlidacStatuApi.Controllers.ApiV2
         {
             try
             {
-                var q = await QVoiceToTextRepo.SetStatus(qId, status);
+                var q = await QVoiceToTextRepo.SetStatusAsync(qId, status);
                 if (q == null)
                     return StatusCode(404);
                 else
@@ -132,7 +132,7 @@ namespace HlidacStatuApi.Controllers.ApiV2
         {
             try
             {
-                var q = await QVoiceToTextRepo.GetOnlySpecific(qId);
+                var q = await QVoiceToTextRepo.GetOnlySpecificAsync(qId);
                 if (q == null)
                     return StatusCode(404);
                 else
@@ -168,7 +168,7 @@ namespace HlidacStatuApi.Controllers.ApiV2
             try
             {
 
-                QVoiceToText[] tasks = await QVoiceToTextRepo.GetByParameters(maxItems, callerId, callerTaskId, status: status);
+                QVoiceToText[] tasks = await QVoiceToTextRepo.GetByParametersAsync(maxItems, callerId, callerTaskId, status: status);
                 var res = new List<HlidacStatu.DS.Api.Voice2Text.Task>();
                 foreach (var m in tasks) {
                     try

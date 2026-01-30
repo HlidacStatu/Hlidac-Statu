@@ -59,7 +59,7 @@ namespace HlidacStatu.Repositories
             }
         }
 
-        public static async Task<List<Subsidy>> FindAllDuplicateReferers(string subsidyId)
+        public static async Task<List<Subsidy>> FindAllDuplicateReferersAsync(string subsidyId)
         {
             var query = new QueryContainerDescriptor<Subsidy>()
                 .Bool(b => b
@@ -107,10 +107,10 @@ namespace HlidacStatu.Repositories
             await _deleteLock.WaitAsync();
             try
             {
-                var subsidy = await GetAsync(subsidyId);
-                var referers = await FindAllDuplicateReferers(subsidyId);
+            var subsidy = await GetAsync(subsidyId);
+            var referers = await FindAllDuplicateReferersAsync(subsidyId);
 
-                string newOriginalId = null;
+            string newOriginalId = null;
                 if (subsidy.Hints.IsOriginal)
                 {
                     newOriginalId = subsidy.Hints.Duplicates.FirstOrDefault();
@@ -143,7 +143,7 @@ namespace HlidacStatu.Repositories
                         }
 
                         // Console.WriteLine("saving referer");
-                        await SaveSubsidyDirectlyToEs(referer);
+                        await SaveSubsidyDirectlyToEsAsync(referer);
                     }
                 }
 
@@ -180,7 +180,7 @@ namespace HlidacStatu.Repositories
                 }
             }
 
-            await SaveSubsidyDirectlyToEs(subsidy);
+            await SaveSubsidyDirectlyToEsAsync(subsidy);
 
             Logger.Debug(
                 $"Subsidy {subsidy.Metadata.RecordNumber} from {subsidy.Metadata.DataSource}/{subsidy.Metadata.FileName} saved");
@@ -336,10 +336,10 @@ namespace HlidacStatu.Repositories
                     original = hiddenSubsidy;
                 }
 
-                SetDuplicate(hiddenSubsidy, visibleDuplicateIds, hiddenDuplicateIds, original.Id);
+            SetDuplicate(hiddenSubsidy, visibleDuplicateIds, hiddenDuplicateIds, original.Id);
             }
 
-            await BulkSaveSubsidiesToEs(allSubsidies);
+            await BulkSaveSubsidiesToEsAsync(allSubsidies);
         }
 
         private static void SetDuplicate(Subsidy subsidy, List<string> duplicates, List<string> hiddenDuplicates,
@@ -368,7 +368,7 @@ namespace HlidacStatu.Repositories
             }
         }
 
-        private static async Task SaveSubsidyDirectlyToEs(Subsidy subsidy)
+        private static async Task SaveSubsidyDirectlyToEsAsync(Subsidy subsidy)
         {
             subsidy.Metadata.ModifiedDate = DateTime.Now;
 
@@ -381,7 +381,7 @@ namespace HlidacStatu.Repositories
             }
         }
 
-        private static async Task BulkSaveSubsidiesToEs(List<Subsidy> subsidies)
+        private static async Task BulkSaveSubsidiesToEsAsync(List<Subsidy> subsidies)
         {
             var bulkDescriptor = new BulkDescriptor();
 
@@ -411,9 +411,9 @@ namespace HlidacStatu.Repositories
         {
             var hashDuplicateTask = FindDuplicatesByHashAsync(subsidy);
             var originalIdDuplicateTask = FindDuplicatesByOriginalIdAsync(subsidy);
-            var deMinimisDuplicateTask = FindDeMinimisDuplicates(subsidy);
-            var euFondyDuplicateTask = FindDuplicatesByEuFondyProjectCode(subsidy);
-            var isRedDeMinimisDuplicateTask = FindIsRedDeMinimisDuplicates(subsidy);
+            var deMinimisDuplicateTask = FindDeMinimisDuplicatesAsync(subsidy);
+            var euFondyDuplicateTask = FindDuplicatesByEuFondyProjectCodeAsync(subsidy);
+            var isRedDeMinimisDuplicateTask = FindIsRedDeMinimisDuplicatesAsync(subsidy);
 
             var hashDuplicates = await hashDuplicateTask;
             var originalIdDuplicates = await originalIdDuplicateTask;
@@ -561,7 +561,7 @@ namespace HlidacStatu.Repositories
             "eufondy", "cedr", "isred", "dotinfo"
         };
 
-        private static async Task<List<Subsidy>> FindDuplicatesByEuFondyProjectCode(Subsidy subsidy)
+        private static async Task<List<Subsidy>> FindDuplicatesByEuFondyProjectCodeAsync(Subsidy subsidy)
         {
             try
             {
@@ -649,7 +649,7 @@ namespace HlidacStatu.Repositories
             }
         }
 
-        public static async Task<List<Subsidy>> FindDeMinimisDuplicates(Subsidy subsidy)
+        public static async Task<List<Subsidy>> FindDeMinimisDuplicatesAsync(Subsidy subsidy)
         {
             try
             {
@@ -697,7 +697,7 @@ namespace HlidacStatu.Repositories
             }
         }
 
-        public static async Task<List<Subsidy>> FindIsRedDeMinimisDuplicates(Subsidy subsidy)
+        public static async Task<List<Subsidy>> FindIsRedDeMinimisDuplicatesAsync(Subsidy subsidy)
         {
             try
             {

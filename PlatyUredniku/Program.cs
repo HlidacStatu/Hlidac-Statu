@@ -191,7 +191,7 @@ public class Program
             app.Logger.LogInformation("PlatyUredniku Web starting");
 
             // --- Minimal API endpoint pro FeedbackModalTagHelper ---
-            _ = app.MapPost(FeedbackModalTagHelper.AcceptDataUrl, FeedbackModalTagHelper.AcceptDataDelegate );
+            _ = app.MapPost(FeedbackModalTagHelper.AcceptDataUrl, FeedbackModalTagHelper.AcceptDataDelegateAsync );
 
             app.Run();
         }

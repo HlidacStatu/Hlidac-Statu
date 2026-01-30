@@ -685,7 +685,7 @@ namespace HlidacStatu.Repositories
         }
 
         public static async Task<List<(string Ico, decimal SumAssumedAmmount)>>
-            DotovaniSponzori(int? rok)
+            DotovaniSponzoriAsync(int? rok)
         {
             AggregationContainerDescriptor<Dotace> aggs = new AggregationContainerDescriptor<Dotace>()
                 .Terms("perIco", t => t

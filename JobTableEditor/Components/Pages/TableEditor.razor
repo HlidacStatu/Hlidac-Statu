@@ -157,12 +157,12 @@ else
             }
             catch (NoDataFoundException ndfe)
             {
-                await ToastService.CreateInfoToast("Fronta zpracována", "Podařilo se vám zpracovat všechny tabulky. Dobrá práce!");
+                await ToastService.CreateInfoToastAsync("Fronta zpracována", "Podařilo se vám zpracovat všechny tabulky. Dobrá práce!");
             }
             catch (Exception e)
             {
                 _logger.Debug(e, "Load new table problem");
-                await ToastService.CreateErrorToast("Problém s načítáním", "Nepodařilo se načíst novou tabulku!");
+                await ToastService.CreateErrorToastAsync("Problém s načítáním", "Nepodařilo se načíst novou tabulku!");
                 throw;
             }
         }
@@ -180,7 +180,7 @@ else
             _logger.Debug(e, "Queue task problem");
         }
 
-        await ToastService.CreateInfoToast("Nová tabulka", "Načtena nová tabulka.");
+        await ToastService.CreateInfoToastAsync("Nová tabulka", "Načtena nová tabulka.");
         
         StateHasChanged();
         
@@ -287,7 +287,7 @@ else
             hlaska = new MarkupString($"Nepodařilo se mi vymyslet správnou hlášku. Omlouvám se... <br/> Chyba je v {e.Message}");
         }
         
-        await ToastService.CreateSuccessToast("Tabulka uložena", hlaska);
+        await ToastService.CreateSuccessToastAsync("Tabulka uložena", hlaska);
         
         StateHasChanged();
 
@@ -314,7 +314,7 @@ else
         {
             _logger.Debug(e, "SaveChanges problem");
             _errorMessage = e.Message;
-            await ToastService.CreateErrorToast("Problém s ukládáním", "Nepodařilo se uložit data!");
+            await ToastService.CreateErrorToastAsync("Problém s ukládáním", "Nepodařilo se uložit data!");
             return false;
         }
 

@@ -7,7 +7,7 @@ namespace HlidacStatu.ClassificationRepair
 {
     public interface IHlidacService
     {
-        Task<IEnumerable<string>> GetTextSmlouvy(string id);
+        Task<IEnumerable<string>> GetTextSmlouvyAsync(string id);
     }
 
     public class HlidacService : IHlidacService
@@ -21,7 +21,7 @@ namespace HlidacStatu.ClassificationRepair
 
         // Result je json (array of strings), ale pro aktuální potřebu to nemá smysl přetypovat,
         // protože použijeme celý string. Stemmer si s tím poradí
-        public async Task<IEnumerable<string>> GetTextSmlouvy(string id)
+        public async Task<IEnumerable<string>> GetTextSmlouvyAsync(string id)
         {
             var uri = new Uri($"smlouvy/text/{id}?addpredmet=1", UriKind.Relative);
             var json = await _httpClient.GetStringAsync(uri).ConfigureAwait(false);

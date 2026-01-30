@@ -49,7 +49,7 @@ public static class ConfigurationValueRepo
 
     }
 
-    public static async Task<(int productionKeyCount, int stageKeyCount)> GetStatistics()
+    public static async Task<(int productionKeyCount, int stageKeyCount)> GetStatisticsAsync()
     {
         await using var dbContext = new DbEntities();
         var productionKeyCount =

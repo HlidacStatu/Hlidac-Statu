@@ -70,7 +70,7 @@ namespace HlidacStatu.Repositories.Analysis.KorupcniRiziko
 
         private async Task<KIndexData> CalculateSourceDataAsync(bool forceCalculateAllYears)
         {
-            await this.InitData();
+            await this.InitDataAsync();
             foreach (var year in Consts.ToCalculationYears)
             {
                 KIndexData.Annual data_rok = await CalculateForYearAsync(year, forceCalculateAllYears);
@@ -80,7 +80,7 @@ namespace HlidacStatu.Repositories.Analysis.KorupcniRiziko
             return kindex;
         }
 
-        public async Task InitData()
+        public async Task InitDataAsync()
         {
             kindex = new KIndexData();
             kindex.Ico = _urad.ICO;
@@ -95,7 +95,7 @@ namespace HlidacStatu.Repositories.Analysis.KorupcniRiziko
         public async Task<KIndexData.Annual> CalculateForYearAsync(int year, bool forceCalculateAllYears)
         {
             if (_calc_Stat?[year] == null)
-                await InitData();
+                await InitDataAsync();
 
             var statsRs = await _urad.StatistikaRegistruSmluvAsync();
 

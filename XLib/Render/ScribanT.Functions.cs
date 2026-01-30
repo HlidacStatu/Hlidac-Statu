@@ -1,4 +1,6 @@
-﻿using Google.Protobuf.WellKnownTypes;
+﻿#pragma warning disable VSTHRD200 
+
+using Google.Protobuf.WellKnownTypes;
 using HlidacStatu.Datasets;
 using HlidacStatu.DS.Graphs;
 using HlidacStatu.Entities;

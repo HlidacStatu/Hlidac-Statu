@@ -42,7 +42,7 @@ namespace HlidacStatu.Repositories
             return ids.Result.ToArray();
         }
 
-        public static async Task<string[]> GetSmlouvyIdAsync_old(QueryBatch query)
+        public static async Task<string[]> GetSmlouvyIdOldAsync(QueryBatch query)
         {
             var stack = HlidacStatu.Util.StackReport.GetCallingMethod(true);
 

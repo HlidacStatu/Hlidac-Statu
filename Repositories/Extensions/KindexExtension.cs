@@ -12,7 +12,7 @@ namespace HlidacStatu.Extensions
 {
     public static class KindexExtension
     {
-        private static async Task<(string kindComment, KIndexData.KIndexParts? usedPart)> Best(KIndexData.Annual data, int year, string ico)
+        private static async Task<(string kindComment, KIndexData.KIndexParts? usedPart)> BestAsync(KIndexData.Annual data, int year, string ico)
         {
             KIndexData.KIndexParts? usedPart = (await KindexCache.GetKindexOrderedValuesFromBestForInfofactsAsync(data, ico))?.FirstOrDefault();
             if (usedPart != null)
@@ -23,7 +23,7 @@ namespace HlidacStatu.Extensions
             return (null, null);
         }
 
-        private static async Task<(string kindComment, KIndexData.KIndexParts? usedPart)> Worst(KIndexData.Annual data, int year, string ico)
+        private static async Task<(string kindComment, KIndexData.KIndexParts? usedPart)> WorstAsync(KIndexData.Annual data, int year, string ico)
         {
             KIndexData.KIndexParts? usedPart = (await KindexCache.GetKindexOrderedValuesFromBestForInfofactsAsync(data, ico))?.Reverse()?.FirstOrDefault();
             if (usedPart != null)
@@ -80,8 +80,8 @@ namespace HlidacStatu.Extensions
                     break;
             }
             
-            (var sBest, var bestPart) = await Best(ann, year, kIndexData.Ico);
-            (var sworst, var worstPart) = await Worst(ann, year, kIndexData.Ico);
+            (var sBest, var bestPart) = await BestAsync(ann, year, kIndexData.Ico);
+            (var sworst, var worstPart) = await WorstAsync(ann, year, kIndexData.Ico);
 
             //A-C dej pozitivni prvni
             if (ann.KIndexLabel == KIndexData.KIndexLabelValues.A

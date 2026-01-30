@@ -183,7 +183,7 @@ namespace HlidacStatu.Repositories
                 .ToHashSet();
         }
 
-        public static async Task RedownloadVzFiles(VerejnaZakazka vz, ElasticClient elasticClient,
+        public static async Task RedownloadVzFilesAsync(VerejnaZakazka vz, ElasticClient elasticClient,
             HttpClient httpClient)
         {
             if (vz is null)
@@ -282,7 +282,7 @@ namespace HlidacStatu.Repositories
             }
         }
 
-        public static async Task UpdateDocumentsInVz(string id, List<VerejnaZakazka.Document> dokumenty,
+        public static async Task UpdateDocumentsInVzAsync(string id, List<VerejnaZakazka.Document> dokumenty,
             ElasticClient elasticClient = null)
         {
             elasticClient ??= Manager.GetESClient_VerejneZakazky();
@@ -482,7 +482,7 @@ namespace HlidacStatu.Repositories
 
         private static SemaphoreSlim _fileSemaphore = new(1);
 
-        private static async Task<HttpResponseMessage> ExecuteHttpRequest(HttpClient httpClient, string url)
+        private static async Task<HttpResponseMessage> ExecuteHttpRequestAsync(HttpClient httpClient, string url)
         {
             var startTime = DateTime.Now;
             var stopWatch = new Stopwatch();
@@ -545,7 +545,7 @@ namespace HlidacStatu.Repositories
             try
             {
                 responseMessage = await pipeline.ExecuteAsync(async _ =>
-                    await ExecuteHttpRequest(httpClient, url));
+                    await ExecuteHttpRequestAsync(httpClient, url));
             }
             catch (RateLimiterRejectedException)
             {

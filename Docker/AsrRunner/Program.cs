@@ -119,7 +119,7 @@ while (!applicationCts.IsCancellationRequested)
 
         // run ASR
         logger.Debug("Calling ASR script cd /opt/app/ && ./process.sh for [{filename}]", inputFileFtp);
-        var processResult = await "cd /opt/app/ && ./process.sh".Bash(logger);
+        var processResult = await "cd /opt/app/ && ./process.sh".BashAsync(logger);
         logger.Debug("Called ASR script cd /opt/app/ && ./process.sh for [{filename}]", inputFileFtp);
         if (processResult != 0)
         {

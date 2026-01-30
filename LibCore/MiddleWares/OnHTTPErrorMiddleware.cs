@@ -18,7 +18,7 @@ namespace HlidacStatu.LibCore.MiddleWares
             _next = next;
         }
 
-        public async Task Invoke(HttpContext httpContext)
+        public async Task InvokeAsync(HttpContext httpContext)
         {
             try
             {

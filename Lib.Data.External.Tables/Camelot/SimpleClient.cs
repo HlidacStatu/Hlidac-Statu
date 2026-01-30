@@ -39,7 +39,7 @@ namespace HlidacStatu.Lib.Data.External.Tables.Camelot
             {
                 for (int i = 0; i < numberOfTries; i++)
                 {
-                    var res = await cl.ParseFromUrl(this.PdfUrl, this.Command, this.Format, this.Pages);
+                    var res = await cl.ParseFromUrlAsync(this.PdfUrl, this.Command, this.Format, this.Pages);
                     if (res.ErrorCode == 0)
                     {
                         return res;

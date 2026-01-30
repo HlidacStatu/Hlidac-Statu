@@ -71,7 +71,7 @@ namespace HlidacStatu.CachingClients.PostgreSql
             }
 
             // this might be all refactored to the background task
-            _ = Task.Run(DeleteExpiredCacheItems);
+            _ = Task.Run(DeleteExpiredCacheItemsAsync);
         }
 
         private void OnShutdown()
@@ -79,7 +79,7 @@ namespace HlidacStatu.CachingClients.PostgreSql
             _cancellationTokenSource.Cancel();
         }
 
-        private async Task DeleteExpiredCacheItems()
+        private async Task DeleteExpiredCacheItemsAsync()
         {
             while (true)
             {

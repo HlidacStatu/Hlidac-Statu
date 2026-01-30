@@ -30,7 +30,7 @@
     
 }
 
-@if (this.Context.HasAccess().Result.AnalyzeLevel < CenyCustomer.AccessDetail.AccessDetailLevel.PRO)
+@if (this.Context.HasAccessAsync().Result.AnalyzeLevel < CenyCustomer.AccessDetail.AccessDetailLevel.PRO)
 {
     <p>
         Detailní informace porovnávající ceny mezi jednotlivými pro zadavately a dodavately jsou k dispozici v Analýzách PRO.

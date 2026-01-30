@@ -18,7 +18,7 @@ namespace HlidacStatu.Lib.Web.UI.TagHelpers
     {
 
         public static string AcceptDataUrl = "/__FeedbackModal/Submit";
-        public async static Task<IResult> AcceptDataDelegate (HttpContext context)
+        public async static Task<IResult> AcceptDataDelegateAsync (HttpContext context)
         {
             string typ = context.Request.Form["typ"];
             string email = context.Request.Form["email"];

@@ -124,7 +124,7 @@ namespace HlidacStatu.Repositories
 				rizeni.OnRadar = forceOnRadarValue.Value;
 
 			//prepare SearchableDocuments
-			var existing = await SearchableDocumentRepo.AllIds(rizeni.SpisovaZnacka);
+			var existing = await SearchableDocumentRepo.AllIdsAsync(rizeni.SpisovaZnacka);
 			if (existing == null)
 			{
 				await SearchableDocumentRepo.SaveManyAsync(SearchableDocument.CreateSearchableDocuments(rizeni));

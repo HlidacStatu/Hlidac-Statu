@@ -29,7 +29,7 @@
                     @{
                         var a_it20 = new JobService.AnalysisStat(new YearlyStatisticsGroup.Key() { Obor = "IT", Rok = 2020 });
                     }
-                    @if (HttpContext.HasAccess("IT", 2020).Result.Access == false)
+                    @if (HttpContext.HasAccessAsync("IT", 2020).Result.Access == false)
                     {
                         <tr @Html.Raw(Request.Query["accent"].Equals("it2020") ? "class=\"table-warning\"" : "")>
                             <td width="60%">
@@ -70,7 +70,7 @@
                     @{
                         var a_it21 = new JobService.AnalysisStat(new YearlyStatisticsGroup.Key() { Obor = "IT", Rok = 2021 });
                     }
-                    @if (HttpContext.HasAccess("IT", 2021).Result.Access == false)
+                    @if (HttpContext.HasAccessAsync("IT", 2021).Result.Access == false)
                     {
                         <tr @Html.Raw(Request.Query["accent"].Equals("it2021") ? "class=\"table-warning\"" : "")>
                             <td width="60%">
@@ -112,7 +112,7 @@
                     @{
                         var a_it22 = new JobService.AnalysisStat(new YearlyStatisticsGroup.Key() { Obor = "IT", Rok = 2022 });
                     }
-                    @if (HttpContext.HasAccess("IT", 2022).Result.Access == false)
+                    @if (HttpContext.HasAccessAsync("IT", 2022).Result.Access == false)
                     {
                         <tr @Html.Raw(Request.Query["accent"].Equals("it2021") ? "class=\"table-warning\"" : "")>
                             <td width="60%">

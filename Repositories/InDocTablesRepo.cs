@@ -42,7 +42,7 @@ namespace HlidacStatu.Repositories
             }
         }
 
-        public static async Task<InDocTables> GetNextForCheck(string obor, string requestedBy, CancellationToken cancellationToken = default(CancellationToken))
+        public static async Task<InDocTables> GetNextForCheckAsync(string obor, string requestedBy, CancellationToken cancellationToken = default(CancellationToken))
         {
             await using (DbEntities db = new DbEntities())
             {
@@ -77,7 +77,7 @@ namespace HlidacStatu.Repositories
             }
         }
         
-        public static async Task<InDocTables> GetSpecific(int pk, string requestedBy, CancellationToken cancellationToken = default(CancellationToken))
+        public static async Task<InDocTables> GetSpecificAsync(int pk, string requestedBy, CancellationToken cancellationToken = default(CancellationToken))
         {
             await using (DbEntities db = new DbEntities())
             {
@@ -97,7 +97,7 @@ namespace HlidacStatu.Repositories
             }
         }
         
-        public static async Task<List<InDocTables>> GetHistory(string requestedBy, int take,
+        public static async Task<List<InDocTables>> GetHistoryAsync(string requestedBy, int take,
             CancellationToken cancellationToken = default(CancellationToken))
         {
             await using (DbEntities db = new DbEntities())
@@ -113,7 +113,7 @@ namespace HlidacStatu.Repositories
             }
         }
         
-        public static async Task<Dictionary<InDocTables.CheckState, int>> GlobalStatistic(CancellationToken cancellationToken)
+        public static async Task<Dictionary<InDocTables.CheckState, int>> GlobalStatisticAsync(CancellationToken cancellationToken)
         {
             await using (DbEntities db = new DbEntities())
             {
@@ -130,7 +130,7 @@ namespace HlidacStatu.Repositories
             }
         }
         
-        public static async Task<Dictionary<InDocTables.CheckState, int>> UserStatistic(string user, CancellationToken cancellationToken)
+        public static async Task<Dictionary<InDocTables.CheckState, int>> UserStatisticAsync(string user, CancellationToken cancellationToken)
         {
             await using (DbEntities db = new DbEntities())
             {
@@ -174,7 +174,7 @@ namespace HlidacStatu.Repositories
                 .ToList();
         }
 
-        public static async Task<int> WaitingInQueue(string obor, CancellationToken cancellationToken)
+        public static async Task<int> WaitingInQueueAsync(string obor, CancellationToken cancellationToken)
         {
             await using var db = new DbEntities();
             var count = await db.InDocTables

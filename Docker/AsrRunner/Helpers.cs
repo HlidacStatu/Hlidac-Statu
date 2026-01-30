@@ -5,7 +5,7 @@ namespace AsrRunner;
 
 public static class Helpers
 {
-    public static Task<int> Bash(this string cmd, ILogger logger)
+    public static Task<int> BashAsync(this string cmd, ILogger logger)
     {
         logger.Debug("Running bash command [{command}].", cmd);
         var source = new TaskCompletionSource<int>();

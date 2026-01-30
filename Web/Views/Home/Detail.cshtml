@@ -276,7 +276,7 @@
         </tr>
 
         @{
-            var vzForSmlouva = await SmlouvaVerejnaZakazkaRepo.GetVzForSmlouva(Model.Id);
+            var vzForSmlouva = await SmlouvaVerejnaZakazkaRepo.GetVzForSmlouvaAsync(Model.Id);
             if (vzForSmlouva is not null)
             {
                 var vz = await VerejnaZakazkaRepo.LoadFromESAsync(vzForSmlouva.VzId);

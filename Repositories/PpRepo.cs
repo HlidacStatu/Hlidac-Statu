@@ -157,7 +157,7 @@ public static partial class PpRepo
         return string.Format(template, sb.ToString());
     }
 
-    public static async Task<List<PuEvent>> GetEventsForPolitikAndOrganizace(string nameId, int idOrganizace,
+    public static async Task<List<PuEvent>> GetEventsForPolitikAndOrganizaceAsync(string nameId, int idOrganizace,
         int year = PpRepo.DefaultYear)
     {
         var events = await GetAllEventsAsync(year,
@@ -168,7 +168,7 @@ public static partial class PpRepo
         return events;
     }
 
-    public static async Task<List<PuEvent>> GetEventsForPolitikAndOrganizace(string nameId, string ico,
+    public static async Task<List<PuEvent>> GetEventsForPolitikAndOrganizaceAsync(string nameId, string ico,
         int year = PpRepo.DefaultYear)
     {
         var events = await GetAllEventsAsync(year,
@@ -216,7 +216,7 @@ public static partial class PpRepo
             .FirstOrDefaultAsync();
     }
 
-    public static async Task<PuOrganizace> GetOrganizaceOnly(string datovaSchranka)
+    public static async Task<PuOrganizace> GetOrganizaceOnlyAsync(string datovaSchranka)
     {
         await using var db = new DbEntities();
 
@@ -227,7 +227,7 @@ public static partial class PpRepo
             .FirstOrDefaultAsync();
     }
 
-    public static async Task<PuOrganizace> GetOrganizaceOnly(int idOrganizace)
+    public static async Task<PuOrganizace> GetOrganizaceOnlyAsync(int idOrganizace)
     {
         await using var db = new DbEntities();
 
@@ -650,7 +650,7 @@ public static partial class PpRepo
             throw new Exception("Chybí vyplněná datová schránka");
         }
 
-        var correctDs = await GetCorrectDs(organizace.DS);
+        var correctDs = await GetCorrectDsAsync(organizace.DS);
 
         if (correctDs is null)
             throw new Exception("Organizace nebyla nalezena podle datové schránky");
@@ -705,7 +705,7 @@ public static partial class PpRepo
         }
     }
 
-    public static async Task<string> GetCorrectDs(string originalDs)
+    public static async Task<string> GetCorrectDsAsync(string originalDs)
     {
         await using var dbContext = new DbEntities();
 

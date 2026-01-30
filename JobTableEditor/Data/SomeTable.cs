@@ -19,7 +19,7 @@ namespace JobTableEditor.Data
 
         public Func<Task> OnSave { get; set; }
 
-        public async Task Save()
+        public async Task SaveAsync()
         {
             if (OnSave != null)
                 await OnSave();

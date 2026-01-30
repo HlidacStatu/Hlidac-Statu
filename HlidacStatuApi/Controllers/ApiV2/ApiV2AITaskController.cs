@@ -71,7 +71,7 @@ namespace HlidacStatuApi.Controllers.ApiV2
             [FromQuery] string filterByCallerTaskType = null
             )
         {
-            var q = await QAITaskRepo.GetNextToProcess(processEngine, filterByCallerId, filterByCallerTaskId, filterByCallerTaskType);
+            var q = await QAITaskRepo.GetNextToProcessAsync(processEngine, filterByCallerId, filterByCallerTaskId, filterByCallerTaskType);
 
 
             if (q == null)
@@ -102,7 +102,7 @@ namespace HlidacStatuApi.Controllers.ApiV2
             try
             {
 
-                var q = await QAITaskRepo.Finish(task);
+                var q = await QAITaskRepo.FinishAsync(task);
                 if (q == null)
                     return StatusCode(404);
                 else
@@ -121,7 +121,7 @@ namespace HlidacStatuApi.Controllers.ApiV2
         {
             try
             {
-                var q = await QAITaskRepo.SetStatus(qId, status);
+                var q = await QAITaskRepo.SetStatusAsync(qId, status);
                 if (q == null)
                     return StatusCode(404);
                 else
@@ -140,7 +140,7 @@ namespace HlidacStatuApi.Controllers.ApiV2
         {
             try
             {
-                var q = await QAITaskRepo.GetOnlySpecific(qId);
+                var q = await QAITaskRepo.GetOnlySpecificAsync(qId);
                 if (q == null)
                     return StatusCode(404);
                 else
@@ -179,7 +179,7 @@ namespace HlidacStatuApi.Controllers.ApiV2
             try
             {
 
-                QAITask[] tasks = await QAITaskRepo.GetByParameters(maxItems, callerId, callerTaskId, status: status);
+                QAITask[] tasks = await QAITaskRepo.GetByParametersAsync(maxItems, callerId, callerTaskId, status: status);
                 var res = new List<HlidacStatu.DS.Api.AITask.Task>();
                 foreach (var m in tasks)
                 {

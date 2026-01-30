@@ -17,7 +17,7 @@ namespace HlidacStatu.Mailerlite
             _httpClient.Timeout = TimeSpan.FromSeconds(5);
         }
 
-        public async Task AddSubscriberToGroup(string email, string groupId)
+        public async Task AddSubscriberToGroupAsync(string email, string groupId)
         {
 
             string json = $"{{\"email\":\"{email}\"}}";

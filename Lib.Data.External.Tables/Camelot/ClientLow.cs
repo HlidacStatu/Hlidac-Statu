@@ -61,7 +61,7 @@ namespace HlidacStatu.Lib.Data.External.Tables.Camelot
             }
         }
 
-        public async Task<ApiResult<HlidacStatu.DS.Api.TablesInDoc.ApiOldCamelotResult>> ParseFromUrl(string pdfUrl, Commands command, HlidacStatu.DS.Api.TablesInDoc.Formats format, string pages = "all")
+        public async Task<ApiResult<HlidacStatu.DS.Api.TablesInDoc.ApiOldCamelotResult>> ParseFromUrlAsync(string pdfUrl, Commands command, HlidacStatu.DS.Api.TablesInDoc.Formats format, string pages = "all")
         {
             try
             {

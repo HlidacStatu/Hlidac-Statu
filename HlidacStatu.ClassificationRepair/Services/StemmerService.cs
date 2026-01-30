@@ -12,13 +12,13 @@ namespace HlidacStatu.ClassificationRepair
 {
     public interface IStemmerService
     {
-        Task<IEnumerable<Explanation>> ExplainCategories(string text, CancellationToken cancellationToken);
+        Task<IEnumerable<Explanation>> ExplainCategoriesAsync(string text, CancellationToken cancellationToken);
 
-        Task<IEnumerable<string>> GetBullshitStems();
+        Task<IEnumerable<string>> GetBullshitStemsAsync();
 
-        Task<IEnumerable<string>> GetAllStems();
+        Task<IEnumerable<string>> GetAllStemsAsync();
 
-        Task<IEnumerable<string>> Stem(string text, CancellationToken cancellationToken);
+        Task<IEnumerable<string>> StemAsync(string text, CancellationToken cancellationToken);
     }
 
     public class Explanation
@@ -38,7 +38,7 @@ namespace HlidacStatu.ClassificationRepair
             _httpClient = httpClient;
         }
 
-        public async Task<IEnumerable<Explanation>> ExplainCategories(string text, CancellationToken cancellationToken)
+        public async Task<IEnumerable<Explanation>> ExplainCategoriesAsync(string text, CancellationToken cancellationToken)
         {
             var uri = new Uri("/explain_text_json", UriKind.Relative);
             string jsonText = JsonSerializer.Serialize<string>(text);
@@ -58,7 +58,7 @@ namespace HlidacStatu.ClassificationRepair
             throw new HttpRequestException($"Klasifikator responded with statusCode=[{response.StatusCode}].");
         }
 
-        public async Task<IEnumerable<string>> Stem(string text, CancellationToken cancellationToken)
+        public async Task<IEnumerable<string>> StemAsync(string text, CancellationToken cancellationToken)
         {
             var uri = new Uri("/text_stemmer_ngrams?ngrams=3", UriKind.Relative);
             string jsonText = JsonSerializer.Serialize<string>(text);
@@ -74,7 +74,7 @@ namespace HlidacStatu.ClassificationRepair
             throw new HttpRequestException($"Klasifikator responded with statusCode=[{response.StatusCode}].");
         }
 
-        public async Task<IEnumerable<string>> GetBullshitStems()
+        public async Task<IEnumerable<string>> GetBullshitStemsAsync()
         {
             var uri = new Uri("/bullshit", UriKind.Relative);
             try
@@ -89,7 +89,7 @@ namespace HlidacStatu.ClassificationRepair
             }
         }
 
-        public async Task<IEnumerable<string>> GetAllStems()
+        public async Task<IEnumerable<string>> GetAllStemsAsync()
         {
             var uri = new Uri("/all_words", UriKind.Relative);
             try

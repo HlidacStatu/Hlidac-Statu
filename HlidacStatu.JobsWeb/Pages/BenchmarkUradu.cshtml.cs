@@ -15,7 +15,7 @@ namespace WatchdogAnalytics.Pages
         public YearlyStatisticsGroup.Key? Key { get; set; }
         public async Task<IActionResult> OnGetAsync(string id)
         {
-            var ad = await HttpContext.HasAccess();
+            var ad = await HttpContext.HasAccessAsync();
             if (ad.Access == false)
                 return Redirect("/");
 

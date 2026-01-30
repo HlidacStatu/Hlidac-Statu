@@ -33,14 +33,14 @@ namespace HlidacStatu.ClassificationRepair
             {
                 _logger.Information($"New message with idSmlouvy={message.IdSmlouvy} accepted.");
 
-                var textySmlouvy = await _hlidac.GetTextSmlouvy(message.IdSmlouvy);
+                var textySmlouvy = await _hlidac.GetTextSmlouvyAsync(message.IdSmlouvy);
                 
                 string textSmlouvy = string.Join('\n', textySmlouvy);
 
-                var explainTask = _stemmer.ExplainCategories(textSmlouvy, cancellationToken);
-                var documentNgramTask = _stemmer.Stem(textSmlouvy, cancellationToken);
-                var bullshitNgramsTask = _stemmer.GetBullshitStems();
-                var allNgramsTask = _stemmer.GetAllStems();
+                var explainTask = _stemmer.ExplainCategoriesAsync(textSmlouvy, cancellationToken);
+                var documentNgramTask = _stemmer.StemAsync(textSmlouvy, cancellationToken);
+                var bullshitNgramsTask = _stemmer.GetBullshitStemsAsync();
+                var allNgramsTask = _stemmer.GetAllStemsAsync();
 
                 await Task.WhenAll(explainTask, documentNgramTask, bullshitNgramsTask, allNgramsTask);
                 //await MonitoredTask.WhenAll(documentNgramTask, bullshitNgramsTask, allNgramsTask);
@@ -50,7 +50,7 @@ namespace HlidacStatu.ClassificationRepair
                     .Except(await allNgramsTask);
 
                 // poslat mail
-                await SendMail(message.FeedbackEmail, message.IdSmlouvy,
+                await SendMailAsync(message.FeedbackEmail, message.IdSmlouvy,
                     message.ProposedCategories, (await explainTask),
                     missingNgrams);
                 _logger.Information($"Message with idSmlouvy={message.IdSmlouvy} processed.");
@@ -62,7 +62,7 @@ namespace HlidacStatu.ClassificationRepair
             }
         }
 
-        private async Task SendMail(string feedbackMail, string idSmlouvy,
+        private async Task SendMailAsync(string feedbackMail, string idSmlouvy,
             string proposedCategories, IEnumerable<Explanation> explainResult, IEnumerable<string> missingNgrams)
         {
             _logger.Information($"Sending email.");

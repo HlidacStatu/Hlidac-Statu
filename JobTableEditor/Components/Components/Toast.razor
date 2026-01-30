@@ -9,7 +9,7 @@
         <div class="toast-header">
             <strong class="me-auto">@ToastMessage.Title</strong>
             <small class="text-muted">@ToastMessage.Created.ToString("T")</small>
-            <button type="button" class="btn-close" aria-label="Close" @onclick="ToastMessage.Dismiss"></button>
+            <button type="button" class="btn-close" aria-label="Close" @onclick="ToastMessage.DismissAsync"></button>
         </div>
         <div class="toast-body">
             @ToastMessage.Message

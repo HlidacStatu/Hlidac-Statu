@@ -63,7 +63,7 @@ namespace HlidacStatu.Repositories
                 return null;
         }
 
-        public static async Task<bool> Exists(string spisovaZnacka, string dokumentId)
+        public static async Task<bool> ExistsAsync(string spisovaZnacka, string dokumentId)
         {
 
             var client = Manager.GetESClient_InsolvenceDocs();
@@ -77,7 +77,7 @@ namespace HlidacStatu.Repositories
             else
                 return false;
         }
-        public static async Task<long> HowMany(string spisovaZnacka)
+        public static async Task<long> HowManyAsync(string spisovaZnacka)
         {
 
             var client = Manager.GetESClient_InsolvenceDocs();
@@ -96,7 +96,7 @@ namespace HlidacStatu.Repositories
             else
                 return 0;
         }
-        public static async Task<string[]> AllIds(string spisovaZnacka)
+        public static async Task<string[]> AllIdsAsync(string spisovaZnacka)
         {
 
             var client = Manager.GetESClient_InsolvenceDocs();

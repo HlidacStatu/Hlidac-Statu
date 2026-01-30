@@ -7,7 +7,7 @@ namespace HlidacStatu.Repositories.Statistics
 {
     public static partial class FirmaStatistics
     {
-        public static async Task<StatisticsSubjectPerYear<Firma.Statistics.Dotace>> CachedHoldingStatisticsDotace(
+        public static async Task<StatisticsSubjectPerYear<Firma.Statistics.Dotace>> CachedHoldingStatisticsDotaceAsync(
             Firma firma, bool forceUpdateCache = false, bool invalidateOnly = false)
         {
             if (forceUpdateCache || invalidateOnly)

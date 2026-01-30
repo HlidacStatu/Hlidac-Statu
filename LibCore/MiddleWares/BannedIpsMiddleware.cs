@@ -38,7 +38,7 @@ namespace HlidacStatu.LibCore.MiddleWares
 
 
         // IMyScopedService is injected into Invoke
-        public async Task Invoke(HttpContext httpContext, AttackerDictionaryService attackerDictionary)
+        public async Task InvokeAsync(HttpContext httpContext, AttackerDictionaryService attackerDictionary)
         {
             //if on Radware, it uses header X-Forwarded-For
             IPAddress? remoteIp = HlidacStatu.Util.RealIpAddress.GetIp(httpContext);
@@ -55,13 +55,13 @@ namespace HlidacStatu.LibCore.MiddleWares
             // autoban for robots
             if (_badWords.Any(b => requestedUrl.Contains(b)))
             {
-                await BanIp(remoteIp, DateTime.Now.AddHours(6), 555, requestedUrl);
+                await BanIpAsync(remoteIp, DateTime.Now.AddHours(6), 555, requestedUrl);
             }
 
             // autoban for robots detected by honeypot
             if (httpContext.Items.TryGetValue(ContextKeyNameBotWarning, out _))
             {
-                await BanIp(remoteIp, DateTime.Now.AddHours(6), 555, requestedUrl);
+                await BanIpAsync(remoteIp, DateTime.Now.AddHours(6), 555, requestedUrl);
             }
 
             // block banned ip
@@ -91,13 +91,13 @@ namespace HlidacStatu.LibCore.MiddleWares
             // autoban for robots detected by honeypot
             if (httpContext.Items.TryGetValue(ContextKeyNameBotWarning, out _))
             {
-                await BanIp(remoteIp, DateTime.Now.AddHours(6), 555, requestedUrl);
+                await BanIpAsync(remoteIp, DateTime.Now.AddHours(6), 555, requestedUrl);
             }
             // add new ip to blocked ones in case it is attacker
             else if (attackerDictionary.IsAttacker(remoteIp, statusCode, lastPath))
             {
                 string pathList = attackerDictionary.PathsForIp(remoteIp);
-                await BanIp(remoteIp, DateTime.Now.AddHours(6), statusCode, pathList);
+                await BanIpAsync(remoteIp, DateTime.Now.AddHours(6), statusCode, pathList);
             }
 
         }
@@ -112,7 +112,7 @@ namespace HlidacStatu.LibCore.MiddleWares
             return bannedIps.Exists(b => b.Ip.Contains(ipString));
         }
 
-        private async Task BanIp(IPAddress? ipAddress, DateTime expiration, int lastStatusCode, string pathList)
+        private async Task BanIpAsync(IPAddress? ipAddress, DateTime expiration, int lastStatusCode, string pathList)
         {
             var ipString = ipAddress?.ToString() ?? "_empty";
             _logger.Information($"Adding IP [{ipString}] to ban list.");
@@ -120,7 +120,7 @@ namespace HlidacStatu.LibCore.MiddleWares
             await BannedIpRepoCached.BanIpAsync(ipString, expiration, lastStatusCode, pathList);
         }
 
-        private async Task AllowIp(IPAddress? ipAddress)
+        private async Task AllowIpAsync(IPAddress? ipAddress)
         {
             var ipString = ipAddress?.ToString() ?? "_empty";
 

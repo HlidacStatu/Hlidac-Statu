@@ -10,7 +10,7 @@ namespace HlidacStatu.Repositories;
 
 public static class SmlouvaVerejnaZakazkaRepo
 {
-    public static async Task Upsert(SmlouvaVerejnaZakazka smlouvaVerejnaZakazka)
+    public static async Task UpsertAsync(SmlouvaVerejnaZakazka smlouvaVerejnaZakazka)
     {
         await using DbEntities db = new DbEntities();
 
@@ -31,7 +31,7 @@ public static class SmlouvaVerejnaZakazkaRepo
         await db.SaveChangesAsync();
     }
 
-    public static async Task<List<SmlouvaVerejnaZakazka>> GetSmlouvyForVz(string idVz)
+    public static async Task<List<SmlouvaVerejnaZakazka>> GetSmlouvyForVzAsync(string idVz)
     {
         await using DbEntities db = new DbEntities();
         
@@ -41,7 +41,7 @@ public static class SmlouvaVerejnaZakazkaRepo
         return smlouvy;
     }
     
-    public static async Task<SmlouvaVerejnaZakazka> GetVzForSmlouva(string idsmlouvy)
+    public static async Task<SmlouvaVerejnaZakazka> GetVzForSmlouvaAsync(string idsmlouvy)
     {
         await using DbEntities db = new DbEntities();
         

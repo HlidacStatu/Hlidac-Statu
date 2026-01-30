@@ -175,7 +175,7 @@
 
     //parent save
         showModal = false;
-        await Table.Save();
+        await Table.SaveAsync();
     }
 
     private bool IsEverythingValid()
@@ -277,7 +277,7 @@
         }
         catch (Exception e)
         {
-            await ToastService.CreateErrorToast("Problém", "Neočekávaný problém - nepodařilo se změnit počet jednotek.");
+            await ToastService.CreateErrorToastAsync("Problém", "Neočekávaný problém - nepodařilo se změnit počet jednotek.");
             _logger.Debug(e, "ChangeUnitCount failed");
         }
     }
@@ -300,7 +300,7 @@
         }
         catch (Exception e)
         {
-            await ToastService.CreateErrorToast("Problém", "Neočekávaný problém - nepodařilo se změnit hodnotu DPH.");
+            await ToastService.CreateErrorToastAsync("Problém", "Neočekávaný problém - nepodařilo se změnit hodnotu DPH.");
             _logger.Debug(e, "ChangeVAT failed");
         }
     }

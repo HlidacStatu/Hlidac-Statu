@@ -29,7 +29,7 @@ namespace HlidacStatu.LibCore.MiddleWares
             _errorTimeThresholdMs = errorTimeThresholdMs;
         }
 
-        public async Task Invoke(HttpContext httpContext)
+        public async Task InvokeAsync(HttpContext httpContext)
         {
             var url = httpContext.Request.Path;
             var query = httpContext.Request.QueryString.ToString();

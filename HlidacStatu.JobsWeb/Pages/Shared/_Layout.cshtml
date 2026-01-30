@@ -1,7 +1,7 @@
 ﻿@using WatchdogAnalytics.Services
 @{
     var analyza = this.Context.TryFindKey();
-    var userAccess = await this.Context.HasAccess();
+    var userAccess = await this.Context.HasAccessAsync();
 }
 
 <!DOCTYPE html>
@@ -317,7 +317,7 @@
                         var data = JobService.DistinctJobsForYearAndSubject(analyza.Value);
                         <div style="margin-top:50px;" class="alert alert-secondary">
                             Data jsou platná k @(analyza.Value.PlatnostK), za období <b>@analyza.Value.ProObdobi</b>
-                            @if (this.Context.HasAccess("IT", 2020).Result.Access)
+                            @if (this.Context.HasAccessAsync("IT", 2020).Result.Access)
                             {
                                 <div class="float-end">Uživatel: @(this.Context.User?.Identity?.Name)</div>
                             }

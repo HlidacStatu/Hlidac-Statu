@@ -245,7 +245,7 @@ else
             <td>@(Model.PosledniZmena?.ToShortDateString() ?? "")</td>
         </tr>
         @{
-            var smlouvyForVz = await SmlouvaVerejnaZakazkaRepo.GetSmlouvyForVz(Model.Id);
+            var smlouvyForVz = await SmlouvaVerejnaZakazkaRepo.GetSmlouvyForVzAsync(Model.Id);
         }
         @if (smlouvyForVz is not null && smlouvyForVz.Any())
         {

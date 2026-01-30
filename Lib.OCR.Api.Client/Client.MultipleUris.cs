@@ -57,7 +57,7 @@ namespace HlidacStatu.Lib.OCR.Api
 
                 foreach (var url in uris)
                 {
-                    tas.Add(OneCall(apikey, url));
+                    tas.Add(OneCallAsync(apikey, url));
                 }
 
                 var res = await Task.WhenAll(tas);
@@ -73,7 +73,7 @@ namespace HlidacStatu.Lib.OCR.Api
                 MiningProgress.SetProgress(currProgress, name);
             }
 
-            private async Task<Tuple<Uri, Result>> OneCall(string apikey, Uri url)
+            private async Task<Tuple<Uri, Result>> OneCallAsync(string apikey, Uri url)
             {
                 Result res = null;
                 try

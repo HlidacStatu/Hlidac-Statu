@@ -18,7 +18,7 @@ namespace HlidacStatu.Repositories.Statistics
         }
         
 
-        public static async Task<StatisticsSubjectPerYear<Firma.Statistics.VZ>> CachedStatisticsVZ(
+        public static async Task<StatisticsSubjectPerYear<Firma.Statistics.VZ>> CachedStatisticsVZAsync(
             Firma firma,
             bool forceUpdateCache = false)
         {

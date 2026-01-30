@@ -163,7 +163,7 @@ namespace HlidacStatuApi.Controllers.ApiV2
         {
             try
             {
-                await SmlouvaVerejnaZakazkaRepo.Upsert(data);
+                await SmlouvaVerejnaZakazkaRepo.UpsertAsync(data);
             }
             catch (Exception e)
             {

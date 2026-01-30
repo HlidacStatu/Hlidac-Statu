@@ -22,7 +22,7 @@ namespace HlidacStatu.LibCore.MiddleWares
         }
 
 
-        public async Task Invoke(HttpContext context)
+        public async Task InvokeAsync(HttpContext context)
         {
 
 

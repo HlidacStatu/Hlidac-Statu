@@ -223,7 +223,7 @@ namespace HlidacStatu.Extensions
             if (firma == null)
                 return null;
 
-            return await FirmaStatistics.CachedHoldingStatisticsDotace(firma, forceUpdateCache) ??
+            return await FirmaStatistics.CachedHoldingStatisticsDotaceAsync(firma, forceUpdateCache) ??
                 new Lib.Analytics.StatisticsSubjectPerYear<Firma.Statistics.Dotace>() { ICO = firma.ICO };
         }
 
@@ -233,7 +233,7 @@ namespace HlidacStatu.Extensions
             if (firma == null)
                 return null;
 
-            return await FirmaStatistics.CachedStatisticsVZ(firma, forceUpdateCache) ??
+            return await FirmaStatistics.CachedStatisticsVZAsync(firma, forceUpdateCache) ??
                 new Lib.Analytics.StatisticsSubjectPerYear<Firma.Statistics.VZ>() { ICO = firma.ICO };
         }
         public static async Task<StatisticsSubjectPerYear<Firma.Statistics.VZ>> HoldingStatistikaVerejneZakazkyAsync(
