@@ -12,7 +12,7 @@
     <PackageReference Include="Microsoft.AspNetCore.Components" Version="8.0.18" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="9.0.7" />
     <PackageReference Include="NEST" Version="7.17.5" />
-    <PackageReference Include="Devmasters.Core" Version="8.4.0" />
+    <PackageReference Include="Devmasters.Core" Version="8.4.1" />
     <PackageReference Include="Newtonsoft.Json.Schema" Version="3.0.16" />
     <PackageReference Include="Ollama" Version="1.15.0" />
     <PackageReference Include="System.Security.Cryptography.Pkcs" Version="9.0.7" />

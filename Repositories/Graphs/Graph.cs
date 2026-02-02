@@ -312,7 +312,8 @@ namespace HlidacStatu.Repositories
 
             //find politician in the DB
             var db = new Devmasters.DbConnect();
-            var sqlCall = await DirectDB.Instance.GetRawSqlAsync(sql, parameters);
+#pragma warning 
+            var sqlCall = DirectDB.Instance.GetRawSql(sql, parameters);
             //string sqlFirma = "select top 1 stav_subjektu from firma where ico = @ico";
 
             var ds = await db.ExecuteDatasetAsync(cnnStr, CommandType.Text, sqlCall, null);
@@ -786,7 +787,7 @@ namespace HlidacStatu.Repositories
 
             //find politician in the DB
             var db = new DbConnect();
-            var sqlCall = await DirectDB.Instance.GetRawSqlAsync(sql, new SqlParameter[]
+            var sqlCall = DirectDB.Instance.GetRawSql(sql, new SqlParameter[]
             {
                 new SqlParameter("ico", ico),
                 new SqlParameter("datumOd", datumOd),
