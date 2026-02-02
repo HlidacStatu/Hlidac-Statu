@@ -17,6 +17,7 @@ Zákon o střetu zájmů
 19.12.2024 1c) člen vlády nebo vedoucí jiného ústředního správního úřadu, v jehož čele není člen vlády1),
 19.12.2024 1d) náměstek člena vlády nebo náměstek ministra vnitra pro státní službu,
 01.09.2017 1e) vedoucí Kanceláře Poslanecké sněmovny, vedoucí Kanceláře Senátu nebo vedoucí Kanceláře prezidenta republiky,
+
 01.01.2025 1f) místopředseda Úřadu pro ochranu osobních údajů,
 01.09.2017 1g) předseda Úřadu pro technickou normalizaci, metrologii a státní zkušebnictví,
 01.09.2017 1h) člen Rady Českého telekomunikačního úřadu,
@@ -34,6 +35,8 @@ Zákon o střetu zájmů
 01.09.2017 2g) státní zástupce,
     */
 
+        //přidat limitní rok od roku 2017
+        
 
         public async static Task<Role> Vlada_1c_Async()
         {
