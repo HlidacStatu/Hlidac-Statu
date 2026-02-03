@@ -98,6 +98,8 @@ namespace HlidacStatu.Entities
         	namestek = 6002,
             [NiceDisplayName("Ombudsman")]
         	ombudsman = 6003,
+            [NiceDisplayName("Člen rady ČTÚ, ERÚ, ČNB")]
+            radaCtuEruCnb = 6004,
             [NiceDisplayName("Předseda vlády")]
         	predsedaVlady = 9001,
             [NiceDisplayName("Ministr")]
@@ -106,10 +108,8 @@ namespace HlidacStatu.Entities
         	hejtman = 9003,
             [NiceDisplayName("Ředitel")]
         	reditel = 10001,
-            [NiceDisplayName("Člen rady")]
-        	clenRady = 10002,
-            [NiceDisplayName("Člen řídícího orgánu")]
-        	clenRidicihoOrganu = 10003,
+            [NiceDisplayName("Člen statutárního/dozorčího/kontrolního orgánu")]
+        	clenStatutarniDozorciKontrolni = 10002,
             [NiceDisplayName("Twitter")]
         	Twitter = 12001,
             [NiceDisplayName("Facebook page")]
