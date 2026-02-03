@@ -80,6 +80,61 @@ namespace HlidacStatu.Entities
             PolitickaStrana = 14,
             
         }
+        
+        [ShowNiceDisplayName()]
+        public enum SubTypes
+        {
+            [NiceDisplayName("Poslanec")]
+        	poslanec = 1001,
+            [NiceDisplayName("Senátor")]
+        	senator = 1002,
+            [NiceDisplayName("Europoslanec")]
+        	europoslanec = 1003,
+            [NiceDisplayName("Zastupitel")]
+        	zastupitel = 1004,
+            [NiceDisplayName("Vedoucí úřadu")]
+        	vedouciUradu = 6001,
+            [NiceDisplayName("Náměstek")]
+        	namestek = 6002,
+            [NiceDisplayName("Ombudsman")]
+        	ombudsman = 6003,
+            [NiceDisplayName("Předseda vlády")]
+        	predsedaVlady = 9001,
+            [NiceDisplayName("Ministr")]
+        	ministr = 9002,
+            [NiceDisplayName("Hejtman")]
+        	hejtman = 9003,
+            [NiceDisplayName("Ředitel")]
+        	reditel = 10001,
+            [NiceDisplayName("Člen rady")]
+        	clenRady = 10002,
+            [NiceDisplayName("Člen řídícího orgánu")]
+        	clenRidicihoOrganu = 10003,
+            [NiceDisplayName("Twitter")]
+        	Twitter = 12001,
+            [NiceDisplayName("Facebook page")]
+        	Facebook_page = 12002,
+            [NiceDisplayName("Facebook profile")]
+        	Facebook_profile = 12003,
+            [NiceDisplayName("Webové stránky")]
+        	WWW = 12004,
+            [NiceDisplayName("Instagram")]
+        	Instagram = 12005,
+            [NiceDisplayName("Youtube")]
+        	Youtube = 12006,
+            [NiceDisplayName("Záznam zastupitelstva")]
+        	Zaznam_zastupitelstva = 12007,
+            [NiceDisplayName("Instagram profile")]
+        	instagram_profile = 12008,
+            [NiceDisplayName("Twitter page")]
+        	twitter_page = 12009,
+            [NiceDisplayName("LinkedIn")]
+        	LinkedIn = 12010,
+            [NiceDisplayName("TicToc")]
+        	Tictoc = 12011,
+            [NiceDisplayName("X")]
+        	X = 12012,
+        }
 
         [JsonConverter(typeof(StringEnumConverter))]
         public enum SocialNetwork

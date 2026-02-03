@@ -22,6 +22,7 @@ namespace HlidacStatu.Entities
         [Column(TypeName = "date")]
         public DateTime? DatumDo { get; set; }
         public int Type { get; set; }
+        public int? SubType { get; set; }
         public string AddInfo { get; set; }
         [Column(TypeName = "decimal(18, 9)")]
         public decimal? AddInfoNum { get; set; }
