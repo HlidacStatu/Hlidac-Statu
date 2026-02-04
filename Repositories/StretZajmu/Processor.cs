@@ -1,5 +1,6 @@
 ﻿using HlidacStatu.Caching;
 using HlidacStatu.Entities;
+using HlidacStatu.Extensions;
 using HlidacStatu.Lib.Analytics;
 using HlidacStatu.Repositories.ProfilZadavatelu;
 using HlidacStatu.Repositories.Statistics;
@@ -29,6 +30,7 @@ namespace HlidacStatu.Repositories.StretZajmu
             if (forceUpdate)
             {
                 await PermanentCache.ExpireAsync(key);
+                await Task.Delay(200); // počkejme chvíli, ať se to projeví
             }
 
 
@@ -99,15 +101,24 @@ namespace HlidacStatu.Repositories.StretZajmu
                         var firma = await HlidacStatu.Repositories.Cache.FirmaCache.GetAsync(ed.To.Id);
                         if (firma != null)
                         {
-                            if (!
-                                (firma.TypSubjektu == Firma.TypSubjektuEnum.Soukromy 
-                                || firma.TypSubjektu == Firma.TypSubjektuEnum.Neznamy
-                                || firma.TypSubjektu == Firma.TypSubjektuEnum.InsolvecniSpravce
-                                || firma.TypSubjektu == Firma.TypSubjektuEnum.Exekutor
-                                )
-                            )
+                            //if (!
+                            //    (firma.TypSubjektu == Firma.TypSubjektuEnum.Soukromy 
+                            //    || firma.TypSubjektu == Firma.TypSubjektuEnum.Neznamy
+                            //    || firma.TypSubjektu == Firma.TypSubjektuEnum.InsolvecniSpravce
+                            //    || firma.TypSubjektu == Firma.TypSubjektuEnum.Exekutor
+                            //    )
+                            //)
+                            //    return new Devmasters.Batch.ActionOutputData();
+                            if (firma.JsemNeziskovka())
                                 return new Devmasters.Batch.ActionOutputData();
-
+                            if (firma.JsemStatniFirma())
+                                return new Devmasters.Batch.ActionOutputData();
+                            if (firma.JsemOVM())    
+                                return new Devmasters.Batch.ActionOutputData();
+                            if (firma.JsemPolitickaStrana())
+                                return new Devmasters.Batch.ActionOutputData();
+                            if (firma.PatrimStatu())
+                                return new Devmasters.Batch.ActionOutputData();
 
                             var smlouvyStatTask = SmlouvyStatAsync(firma, efektivni_doba_stretu);
                             var dotaceStatTask = DotaceStatAsync(firma, efektivni_doba_stretu);
