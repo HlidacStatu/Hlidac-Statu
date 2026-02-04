@@ -9,9 +9,19 @@ using System.Threading.Tasks;
 
 namespace HlidacStatu.Repositories.StretZajmu
 {
-    public class StretZ
+
+    public class OsobaStret
     {
         public Osoba Osoba { get; set; }
+        public Devmasters.DT.DateInterval Stret_za_obdobi { get; set; }
+        public string ParagrafOdstavec { get; set; }
+
+        public List<StretFirma> Strety { get; set; } = new();
+
+        public DateTime GeneratedAt { get; set; } = DateTime.Now;
+    }
+    public class StretFirma
+    {
         public Firma Firma { get; set; }
         public DS.Graphs.Graph.Edge Vazba { get; set; }
 

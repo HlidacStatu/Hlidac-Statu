@@ -13,7 +13,7 @@
     <PackageReference Include="Devmasters.Batch" Version="8.3.0" />
     <PackageReference Include="Devmasters.Collections" Version="8.0.0" />
     <PackageReference Include="Devmasters.Core" Version="8.4.4" />
-    <PackageReference Include="Devmasters.DT" Version="8.2.2" />
+    <PackageReference Include="Devmasters.DT" Version="8.2.4" />
     <PackageReference Include="Devmasters.Lang" Version="8.2.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="9.0.0" />

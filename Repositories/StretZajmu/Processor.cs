@@ -1,4 +1,5 @@
-﻿using HlidacStatu.Entities;
+﻿using HlidacStatu.Caching;
+using HlidacStatu.Entities;
 using HlidacStatu.Lib.Analytics;
 using HlidacStatu.Repositories.ProfilZadavatelu;
 using HlidacStatu.Repositories.Statistics;
@@ -8,11 +9,36 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using ZiggyCreatures.Caching.Fusion;
 
 namespace HlidacStatu.Repositories.StretZajmu
 {
+
+
     public class Processor
     {
+
+        private static IFusionCache PermanentCache =>
+            HlidacStatu.Caching.CacheFactory.CreateNew(CacheFactory.CacheType.PermanentStore, nameof(Processor));
+
+
+        public async static Task<List<OsobaStret>> Paragraf_4_Async(bool forceUpdate = false)
+        {
+            const string key = "Paragraf_4";
+
+            if (forceUpdate)
+            {
+                await PermanentCache.ExpireAsync(key);
+            }
+
+
+            var res = await PermanentCache.GetOrSetAsync(key,
+                async _ => await _generate_paragraf_4_Async(),
+                options => options.ModifyEntryOptionsDuration(TimeSpan.FromDays(10 * 365), TimeSpan.FromDays(10 * 365))
+            );
+            return res;
+        }
+
         /*
          * Veřejný funkcionář uvedený v § 2 odst. 1 písm. c) až m) nesmí
 01.01.2007 a) podnikat nebo provozovat jinou samostatnou výdělečnou činnost,
@@ -20,17 +46,23 @@ namespace HlidacStatu.Repositories.StretZajmu
 01.01.2007 c) být v pracovněprávním nebo obdobném vztahu nebo ve služebním poměru, nejde-li o vztah nebo poměr, v němž působí jako veřejný funkcionář.
 
          */
-        public async static Task<List<StretZ>> Paragraf_4_Async()
+        private async static Task<List<OsobaStret>> _generate_paragraf_4_Async()
         {
             var o1_c = await Data.Vlada_1c_Async();
             //var o1_d = await Data.Namestci_1d_Async();
 
-            List<StretZ> strety = new List<StretZ>();
+            List<OsobaStret> res = new();
 
             // a)
 
             foreach (var os in o1_c.Osoby)
             {
+                OsobaStret st = new OsobaStret()
+                {
+                    ParagrafOdstavec = "§ 4 odst. 1 písm. c)",
+                    Osoba = os.Osoba
+                };
+
 
                 var efektivni_doba_stretu_osoby = Devmasters.DT.DateInterval.GetOverlappingInterval(
                     new Devmasters.DT.DateInterval(os.Event.DatumOd, os.Event.DatumDo),
@@ -39,7 +71,7 @@ namespace HlidacStatu.Repositories.StretZajmu
                 if (efektivni_doba_stretu_osoby == null)
                     continue;
 
-
+                st.Stret_za_obdobi = efektivni_doba_stretu_osoby;
 
                 DS.Graphs.Graph.Edge[] vazby = await os.Osoba.AktualniVazbyAsync(
                     DS.Graphs.Relation.CharakterVazbyEnum.VlastnictviKontrola,
@@ -67,14 +99,23 @@ namespace HlidacStatu.Repositories.StretZajmu
                         var firma = await HlidacStatu.Repositories.Cache.FirmaCache.GetAsync(ed.To.Id);
                         if (firma != null)
                         {
+                            if (!
+                                (firma.TypSubjektu == Firma.TypSubjektuEnum.Soukromy 
+                                || firma.TypSubjektu == Firma.TypSubjektuEnum.Neznamy
+                                || firma.TypSubjektu == Firma.TypSubjektuEnum.InsolvecniSpravce
+                                || firma.TypSubjektu == Firma.TypSubjektuEnum.Exekutor
+                                )
+                            )
+                                return new Devmasters.Batch.ActionOutputData();
+
+
                             var smlouvyStatTask = SmlouvyStatAsync(firma, efektivni_doba_stretu);
                             var dotaceStatTask = DotaceStatAsync(firma, efektivni_doba_stretu);
 
                             await Task.WhenAll(smlouvyStatTask, dotaceStatTask);
 
-                            StretZ sz = new StretZ()
+                            StretFirma sz = new StretFirma()
                             {
-                                Osoba = os.Osoba,
                                 VazbaDistance = ed.Distance,
                                 Firma = firma,
                                 Vazba = ed,
@@ -84,7 +125,7 @@ namespace HlidacStatu.Repositories.StretZajmu
                             };
 
                             //if (sz.SmlouvyStat.Summary().PocetSmluv>0 || sz.DotaceStat.Summary().PocetDotaci > 0) {
-                            strety.Add(sz);
+                            st.Strety.Add(sz);
                         }
                         return new Devmasters.Batch.ActionOutputData();
                     },
@@ -94,12 +135,12 @@ namespace HlidacStatu.Repositories.StretZajmu
                         10, prefix: $" Paragraf_4_Async pro {os.Osoba.FullName()} "
                         , monitor: new MonitoredTaskRepo.ForBatchAsync()
                     );
+
+                if (st.Strety.Count > 0)
+                    res.Add(st);
             }
 
-
-            var debugStrety = strety.Where(s => s.SmlouvyStat.Summary().PocetSmluv > 0 || s.DotaceStat.Summary().PocetDotaci > 0).ToArray();
-
-            return strety;
+            return res;
         }
 
         public async static Task<StatisticsSubjectPerYear<Smlouva.Statistics.Data>>
