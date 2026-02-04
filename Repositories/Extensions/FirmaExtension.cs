@@ -525,13 +525,16 @@ namespace HlidacStatu.Extensions
             if (firma == null)
                 throw new ArgumentNullException(nameof(firma));
 
+            if (Neziskovky_KOD_PF.Contains(firma.Kod_PF.Value))
+                return true;
+
             if (firma.JsemSoukromaFirma() == false)
                 return false;
             else if (firma.Kod_PF.HasValue == false)
                 return false;
             else
             {
-                return Neziskovky_KOD_PF.Contains(firma.Kod_PF.Value);
+                return false;
             }
         }
 
