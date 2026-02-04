@@ -226,7 +226,7 @@ namespace HlidacStatu.Repositories
                         return new ActionOutputData();
                     }), logOutputFunc, progressOutputFunc, true, maxDegreeOfParallelism: threads
                     , prefix: $"CalculateGlobalRankPerYear_UradySmlouvy_{obor.Value} "
-                    , monitor: progressOutputFunc != null ? new MonitoredTaskRepo.ForBatch() : null
+                    , monitor: progressOutputFunc != null ? new MonitoredTaskRepo.ForBatchAsync() : null
                 );
 
                 return new GlobalStatisticsPerYear<Smlouva.Statistics.Data>(

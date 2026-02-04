@@ -207,7 +207,7 @@ namespace HlidacStatu.Repositories.Analysis
                 showProgress ? Devmasters.Batch.Manager.DefaultOutputWriter : (Action<string>)null,
                 showProgress ? new ActionProgressWriter() : (Devmasters.Batch.IProgressWriter )null,
                 !System.Diagnostics.Debugger.IsAttached, maxDegreeOfParallelism: 5,
-                prefix: "UradyObchodujiciSFirmami_NespolehlivymiPlatciDPH ", monitor: new MonitoredTaskRepo.ForBatch());
+                prefix: "UradyObchodujiciSFirmami_NespolehlivymiPlatciDPH ", monitor: new MonitoredTaskRepo.ForBatchAsync());
 
             VazbyFiremNaUradyStat ret = new VazbyFiremNaUradyStat();
             ret.StatniFirmy = uradyData
@@ -452,7 +452,7 @@ namespace HlidacStatu.Repositories.Analysis
                 showProgress ? new ActionProgressWriter() : (Devmasters.Batch.IProgressWriter )null,
                 parallel: true
                 , prefix: "LoadFirmySVazbamiNaPolitiky " + aktualnostVztahu.ToNiceDisplayName()
-                , monitor: showProgress ? new MonitoredTaskRepo.ForBatch() : null,
+                , monitor: showProgress ? new MonitoredTaskRepo.ForBatchAsync() : null,
                 maxDegreeOfParallelism: 5
             );
 
@@ -584,7 +584,7 @@ namespace HlidacStatu.Repositories.Analysis
                 null,
                 logOutputFunc ?? Devmasters.Batch.Manager.DefaultOutputWriter,
                 progressOutputFunc ?? new ActionProgressWriter(0.1f),
-                true, prefix: "GetFirmyCasovePodezreleZalozene ", monitor: new MonitoredTaskRepo.ForBatch()
+                true, prefix: "GetFirmyCasovePodezreleZalozene ", monitor: new MonitoredTaskRepo.ForBatchAsync()
             );
 
             _logger.Debug("GetFirmyCasovePodezreleZalozene - filter with close dates");
@@ -652,7 +652,7 @@ namespace HlidacStatu.Repositories.Analysis
                     new ActionProgressWriter(),
                     true, maxDegreeOfParallelism: 10,
                     prefix: "NarustySmluv getAll stats ",
-                    monitor: new MonitoredTaskRepo.ForBatch()
+                    monitor: new MonitoredTaskRepo.ForBatchAsync()
                 );
                 return getData.ToArray();
             });

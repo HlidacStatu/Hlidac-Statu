@@ -35,37 +35,8 @@ namespace HlidacStatu.Web.Framework
 
         public static async Task<IHtmlContent> RenderVazbyAsync(this IHtmlHelper self, HlidacStatu.DS.Graphs.Graph.Edge[] vazbyToRender)
         {
-            if (vazbyToRender == null)
-            {
-                return self.Raw("");
-            }
-            if (!vazbyToRender.Any())
-            {
-                return self.Raw("");
-            }
-
-            if (vazbyToRender.Count() == 1)
-                return self.Raw($"{await vazbyToRender.First().From?.PrintNameAsync()} <i>/{vazbyToRender.First().Descr}/</i> v {await vazbyToRender.First().To.PrintNameAsync()} {vazbyToRender.First().Doba()}");
-            else
-            {
-                var firstVazba = vazbyToRender.First();
-                var firstFromName = await firstVazba.From?.PrintNameAsync();
-                var firstToName = await firstVazba.To.PrintNameAsync();
-
-                var remainingNames = new List<string>();
-                foreach (var m in vazbyToRender.Skip(1))
-                {
-                    remainingNames.Add($"<i>{m.Descr}</i> v {await m.To.PrintNameAsync()}");
-                }
-
-                return self.Raw("Nepřímá vazba přes:<br/>" 
-                                + "<small>"
-                                + $"{firstFromName} <i>/{firstVazba.Descr}/</i> v {firstToName} {firstVazba.Doba()}"
-                                + $" → "
-                                + string.Join(" → ", remainingNames)
-                                + "</small>"
-                );
-            }
+            var html = await HlidacStatu.Repositories.Graph.Render.RenderVazbyAsync(vazbyToRender, html: true);
+            return self.Raw(html); 
         }
         
         public static async Task<IHtmlContent> RenderDatasetResultsAsync(this IHtmlHelper self, IDatasetResult dsResult)

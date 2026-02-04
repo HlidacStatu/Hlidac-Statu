@@ -1,5 +1,6 @@
 using HlidacStatu.Connectors;
 using HlidacStatu.Entities;
+using Serilog;
 using System;
 using System.Text;
 using System.Threading.Tasks;
@@ -8,6 +9,7 @@ namespace HlidacStatu.Repositories
 {
     public static partial class MonitoredTaskRepo
     {
+        private static readonly ILogger _logger = Log.ForContext(typeof(MonitoredTaskRepo));
         public static MonitoredTask Create(MonitoredTask monitoredTask)
         {
             if (!string.IsNullOrEmpty(monitoredTask?.Exception))
@@ -45,13 +47,52 @@ namespace HlidacStatu.Repositories
             task.Progress = SetProgress(progress);
             if ((now - task.LastTimeProgressUpdated) > task.MinIntervalBetweenUpdates)
             {
-                //Console.WriteLine($"{now:mm.ss} in db");
-                DirectDB.Instance.NoResult(
-                    "update MonitoredTasks set ItemUpdated = @now, progress=@progress where pk = @pk",
-                    new Microsoft.Data.SqlClient.SqlParameter("now", task.ItemUpdated),
-                    new Microsoft.Data.SqlClient.SqlParameter("progress", task.Progress),
-                    new Microsoft.Data.SqlClient.SqlParameter("pk", task.Pk)
-                );
+                try
+                {
+                    //Console.WriteLine($"{now:mm.ss} in db");
+                    DirectDB.Instance.NoResult(
+                        "update MonitoredTasks set ItemUpdated = @now, progress=@progress where pk = @pk",
+                        new Microsoft.Data.SqlClient.SqlParameter("now", task.ItemUpdated),
+                        new Microsoft.Data.SqlClient.SqlParameter("progress", task.Progress),
+                        new Microsoft.Data.SqlClient.SqlParameter("pk", task.Pk)
+                    );
+
+                }
+                catch (Exception e)
+                {
+
+                    _logger.Error(e, "Chyba při aktualizaci progressu monitored tasku {Pk}", task.Pk);
+                }
+                task.ProgressUpdated();
+            }
+
+            return task;
+        }
+
+        public async static Task<MonitoredTask> SetProgressAsync(this MonitoredTask task, decimal progress)
+        {
+            DateTime now = DateTime.Now;
+            task.ItemUpdated = now;
+
+            task.Progress = SetProgress(progress);
+            if ((now - task.LastTimeProgressUpdated) > task.MinIntervalBetweenUpdates)
+            {
+                try
+                {
+                    //Console.WriteLine($"{now:mm.ss} in db");
+                    await DirectDB.Instance.NoResultAsync(
+                        "update MonitoredTasks set ItemUpdated = @now, progress=@progress where pk = @pk",
+                        new Microsoft.Data.SqlClient.SqlParameter("now", task.ItemUpdated),
+                        new Microsoft.Data.SqlClient.SqlParameter("progress", task.Progress),
+                        new Microsoft.Data.SqlClient.SqlParameter("pk", task.Pk)
+                    );
+
+                }
+                catch (Exception e)
+                {
+
+                    _logger.Error(e, "Chyba při aktualizaci progressu monitored tasku {Pk}", task.Pk);
+                }
                 task.ProgressUpdated();
             }
 
@@ -64,11 +105,23 @@ namespace HlidacStatu.Repositories
             {
                 _ = db.MonitoredTasks.Attach(task);
                 db.Entry(task).State = Microsoft.EntityFrameworkCore.EntityState.Modified;
-                _ = db.SaveChanges();
+                db.SaveChanges();
             }
 
             return task;
         }
+        public async static Task<MonitoredTask> UpdateAsync(this MonitoredTask task)
+        {
+            await using (DbEntities db = new DbEntities())
+            {
+                _ = db.MonitoredTasks.Attach(task);
+                db.Entry(task).State = Microsoft.EntityFrameworkCore.EntityState.Modified;
+                await db.SaveChangesAsync();
+            }
+
+            return task;
+        }
+
 
         public static MonitoredTask Finish(this MonitoredTask task, bool success = true, Exception exception = null)
         {
@@ -110,7 +163,53 @@ namespace HlidacStatu.Repositories
             {
                 _ = db.MonitoredTasks.Attach(task);
                 db.Entry(task).State = Microsoft.EntityFrameworkCore.EntityState.Modified;
-                _ = db.SaveChanges();
+                db.SaveChanges();
+            }
+
+            return task;
+        }
+
+        public async static Task<MonitoredTask> FinishAsync(this MonitoredTask task, bool success = true, Exception exception = null)
+        {
+            string except = "";
+            if (exception?.GetType() == typeof(AggregateException))
+            {
+                StringBuilder sb = new StringBuilder(1024);
+                foreach (Exception exInnerException in ((AggregateException)exception).Flatten().InnerExceptions)
+                {
+                    Exception exNestedInnerException = exInnerException;
+                    do
+                    {
+                        if (!string.IsNullOrEmpty(exNestedInnerException.Message))
+                        {
+                            sb.AppendLine(exNestedInnerException.ToString());
+                            sb.AppendLine("\n\n----------\n\n");
+                        }
+
+                        exNestedInnerException = exNestedInnerException.InnerException;
+                    } while (exNestedInnerException != null);
+                }
+
+                except = sb.ToString();
+            }
+            else
+                except = exception?.ToString();
+
+            if (!string.IsNullOrEmpty(except))
+                if (except.Length > 50000)
+                    except = except.Substring(0, 50000);
+
+            task.Progress = SetProgress(100);
+            task.Finished = DateTime.Now;
+            task.Success = success;
+            task.Exception = except;
+            task.ItemUpdated = DateTime.Now;
+
+            await using (DbEntities db = new DbEntities())
+            {
+                _ = db.MonitoredTasks.Attach(task);
+                db.Entry(task).State = Microsoft.EntityFrameworkCore.EntityState.Modified;
+                await db.SaveChangesAsync();
             }
 
             return task;

@@ -617,7 +617,7 @@ and (esa2010 in (" + string.Join(",", vzdySoukr_ESA2010.Select(m => $"'{m}'")) +
 
                     return new Devmasters.Batch.ActionOutputData();
                 }, null, outputWriter, progressWriter,
-                true, prefix: "freshList statnifirmy ", monitor: new MonitoredTaskRepo.ForBatch()
+                true, prefix: "freshList statnifirmy ", monitor: new MonitoredTaskRepo.ForBatchAsync()
             );
 
             bagOfIco.AddRange(foundIcos);

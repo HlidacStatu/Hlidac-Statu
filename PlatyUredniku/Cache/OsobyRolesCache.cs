@@ -54,7 +54,7 @@ namespace PlatyUredniku.Cache
                             },
                             null, null,
                             true, 10,
-                            prefix: "OsobyRolesCache ", monitor: new MonitoredTaskRepo.ForBatch()
+                            prefix: "OsobyRolesCache ", monitor: new MonitoredTaskRepo.ForBatchAsync()
                         );
                         return res.ToDictionary();
                     },

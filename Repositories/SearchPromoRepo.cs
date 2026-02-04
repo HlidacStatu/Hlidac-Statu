@@ -137,7 +137,7 @@ namespace HlidacStatu.Repositories
                 }
                 , outputWriter ?? Devmasters.Batch.Manager.DefaultOutputWriter,
                 progressWriter ?? new Devmasters.Batch.ActionProgressWriter(), true,
-                prefix: "FillDbAsync platy uredniku ", monitor: new MonitoredTaskRepo.ForBatch());
+                prefix: "FillDbAsync platy uredniku ", monitor: new MonitoredTaskRepo.ForBatchAsync());
 
 
             _logger.Information($"SearchPromoRepo.FillDbAsync PlatyUredniku saved {count} records");
@@ -192,7 +192,7 @@ namespace HlidacStatu.Repositories
                 }
                 , outputWriter ?? Devmasters.Batch.Manager.DefaultOutputWriter,
                 progressWriter ?? new Devmasters.Batch.ActionProgressWriter(), true,
-                prefix: "FillDbAsync KIndex ", monitor: new MonitoredTaskRepo.ForBatch());
+                prefix: "FillDbAsync KIndex ", monitor: new MonitoredTaskRepo.ForBatchAsync());
 
 
             //=========================================================================

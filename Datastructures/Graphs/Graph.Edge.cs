@@ -37,12 +37,27 @@ namespace HlidacStatu.DS.Graphs
             public bool Root { get; set; }
             public Node From { get; set; }
             public Node To { get; set; }
-            public DateTime? RelFrom { get; set; }
-            public DateTime? RelTo { get; set; }
+            public DateTime? RelFrom { get => relFrom; set { relFrom = value; _dateInterval = null; } }
+            public DateTime? RelTo { get => relTo; set { relTo = value; _dateInterval = null; } }
             public string Descr { get; set; }
             public int VazbaType { get; set; }
             public int Distance { get; set; }
             public Relation.AktualnostType Aktualnost { get; set; }
+
+
+            Devmasters.DT.DateInterval _dateInterval = null;
+            private DateTime? relFrom;
+            private DateTime? relTo;
+
+            public Devmasters.DT.DateInterval DateInterval()
+            {
+                if (_dateInterval == null)
+                    _dateInterval = new Devmasters.DT.DateInterval(
+                        RelFrom,
+                        RelTo
+                        );
+                return _dateInterval;
+            }
 
             public void UpdateAktualnost()
             {
@@ -185,15 +200,15 @@ namespace HlidacStatu.DS.Graphs
                 var longestE = new List<Edge>();
 
                 var uniqEdges = relations.Distinct(new EdgeSimpleEqualityComparer());
-                    //.Select(r => string.Join("|", r.From?.UniqId ?? "", r.To?.UniqId ?? "", r.Distance.ToString()))
-                    //.Distinct();
+                //.Select(r => string.Join("|", r.From?.UniqId ?? "", r.To?.UniqId ?? "", r.Distance.ToString()))
+                //.Distinct();
 
                 foreach (var uniq in uniqEdges)
                 {
                     var le = GetLongestEdgesBetweenSameNodes(relations
-                                 .Where(r => 
-                                    r.From?.UniqId == uniq.From?.UniqId 
-                                    && r.To?.UniqId == uniq.To?.UniqId 
+                                 .Where(r =>
+                                    r.From?.UniqId == uniq.From?.UniqId
+                                    && r.To?.UniqId == uniq.To?.UniqId
                                     && r.Distance == uniq.Distance)
                                  );
 

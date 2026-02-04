@@ -1,18 +1,20 @@
+using Devmasters.DT;
+using HlidacStatu.Caching;
+using HlidacStatu.DS.Graphs;
+using HlidacStatu.Entities;
+using HlidacStatu.Entities.Entities;
+using HlidacStatu.Entities.VZ;
+using HlidacStatu.Extensions;
+using HlidacStatu.Lib.Analytics;
+using HlidacStatu.Repositories.Statistics;
+using Nest;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using HlidacStatu.Caching;
-using HlidacStatu.DS.Graphs;
-using HlidacStatu.Entities;
-using HlidacStatu.Entities.VZ;
-using HlidacStatu.Extensions;
-using HlidacStatu.Lib.Analytics;
-using HlidacStatu.Repositories.Statistics;
 using ZiggyCreatures.Caching.Fusion;
-using Nest;
 
 
 namespace HlidacStatu.Repositories.Cache;
@@ -122,12 +124,13 @@ public class StatisticsCache
 
 
     //Factories
-    private static async Task<StatisticsSubjectPerYear<Smlouva.Statistics.Data>> CalculateHoldingSmlouvyStatisticsAsync(
+    public static async Task<StatisticsSubjectPerYear<Smlouva.Statistics.Data>> CalculateHoldingSmlouvyStatisticsAsync(
         Firma firma,
         int? obor)
     {
         var firmyMaxrok = new Dictionary<string, Devmasters.DT.DateInterval>
             { { firma.ICO, new Devmasters.DT.DateInterval(DateTime.MinValue, DateTime.MaxValue) } };
+
         var skutecneVazby =
             Relation.SkutecnaDobaVazby(await firma.AktualniVazbyAsync(DS.Graphs.Relation.AktualnostType.Libovolny));
         foreach (var v in skutecneVazby)
@@ -159,6 +162,74 @@ public class StatisticsCache
                     semaphore.Release();
                 }
             })
+            .ToArray();
+
+        var statistiky = await Task.WhenAll(statistikyTasks);
+
+        if (statistiky.Length == 0)
+            return new StatisticsSubjectPerYear<Smlouva.Statistics.Data>(firma.ICO);
+        if (statistiky.Length == 1)
+            return statistiky[0];
+
+        StatisticsSubjectPerYear<Smlouva.Statistics.Data> aggregate =
+            Lib.Analytics.StatisticsSubjectPerYear<Smlouva.Statistics.Data>.Aggregate(firma.ICO, statistiky);
+
+        return aggregate;
+    }
+
+    public static async Task<StatisticsSubjectPerYear<Smlouva.Statistics.Data>> CalculateHoldingSmlouvyStatisticsQuery_Direct_Async(
+    Firma firma,
+    Devmasters.DT.DateInterval onlyForInterval = null)
+    {
+        var firmyMaxrok = new Dictionary<string, Devmasters.DT.DateInterval>
+            { { firma.ICO, new Devmasters.DT.DateInterval(DateTime.MinValue, DateTime.MaxValue) } };
+
+        var skutecneVazby =
+            Relation.SkutecnaDobaVazby(await firma.AktualniVazbyAsync(DS.Graphs.Relation.AktualnostType.Libovolny));
+        foreach (var v in skutecneVazby)
+        {
+            if (!string.IsNullOrEmpty(v.To?.UniqId)
+                && v.To.Type == HlidacStatu.DS.Graphs.Graph.Node.NodeType.Company)
+            {
+                firmyMaxrok.TryAdd(v.To.Id,
+                    new Devmasters.DT.DateInterval(v.RelFrom ?? DateTime.MinValue, v.RelTo ?? DateTime.MaxValue));
+            }
+        }
+
+        var maxConcurrentTasks = 10;
+        var semaphore = new SemaphoreSlim(maxConcurrentTasks);
+
+        var statistikyTasks = firmyMaxrok
+            .Select(async f =>
+            {
+                await semaphore.WaitAsync();
+                try
+                {
+                    var ff = await FirmaCache.GetAsync(f.Key);
+
+                    var intvl = Devmasters.DT.DateInterval.GetOverlappingInterval(onlyForInterval, f.Value);
+
+                    if (ff!= null && intvl != null)
+                    {
+                        string iOd = intvl?.From?.ToString("yyyy-MM-dd") ?? "*";
+                        string iDo = intvl?.To?.ToString("yyyy-MM-dd") ?? "*";
+
+                        var query = $"ico:{ff.ICO} AND podepsano:[{iOd} TO {iDo}] ";
+
+                        var ffStat = await SmlouvyStatistics.CalculateAsync(query);
+                        return new StatisticsSubjectPerYear<Smlouva.Statistics.Data>(f.Key, ffStat);
+                    }
+                    else
+                    {
+                        return null;
+                    }
+                }
+                finally
+                {
+                    semaphore.Release();
+                }
+            })
+            .Where(s => s != null)
             .ToArray();
 
         var statistiky = await Task.WhenAll(statistikyTasks);

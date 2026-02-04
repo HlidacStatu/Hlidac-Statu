@@ -68,7 +68,8 @@ namespace Vybory_PSP
             {
                 //parse HP jednani
                 //for (int cisloJednani = lastJednani; cisloJednani > 0; cisloJednani--)
-                await Devmasters.Batch.Manager.DoActionForAllAsync<int>(Enumerable.Range(1, lastJednani).Reverse(), async (cisloJednani) =>
+                await Devmasters.Batch.Manager.DoActionForAllAsync<int>(Enumerable.Range(1, lastJednani).Reverse(), 
+                    async (cisloJednani) =>
                 {
                     var jednani = JednaniKomplexni(vyborId, cisloJednani, string.Format(jednaniUrlTemplate, cisloJednani));
                     if (jednani == null)

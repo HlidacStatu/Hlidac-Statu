@@ -9,7 +9,7 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Devmasters.Core" Version="8.4.1" />
+    <PackageReference Include="Devmasters.Core" Version="8.4.4" />
     <PackageReference Include="Devmasters.DBUpgrader" Version="8.0.2" />
     <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
     <PackageReference Include="System.AppContext" Version="4.3.0" />

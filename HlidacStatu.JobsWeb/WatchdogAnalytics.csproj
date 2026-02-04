@@ -26,7 +26,7 @@ at Microsoft.Data.SqlClient.SqlInternalConnection.OnError(SqlException exception
     <None Remove="wwwroot\assets\vendor\**" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Devmasters.Core" Version="8.4.1" />
+    <PackageReference Include="Devmasters.Core" Version="8.4.4" />
     <PackageReference Include="Devmasters.Imaging" Version="8.2.6" />
     <PackageReference Include="MathNet.Numerics" Version="5.0.0" />
     <PackageReference Include="Microsoft.AspNetCore.Components" Version="8.0.18" />

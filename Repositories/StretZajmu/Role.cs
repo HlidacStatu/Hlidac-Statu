@@ -18,8 +18,17 @@ namespace HlidacStatu.Repositories.StretZajmu
         {
             get
             {
-                if (_pravniInterval != null)
-                    _pravniInterval = new Devmasters.DT.DateInterval(ZakonDatumParagraf > ZakonDatumLide ? ZakonDatumParagraf : ZakonDatumLide, null);
+                if (_pravniInterval == null)
+                {
+                    if (ZakonDatumLide == null && ZakonDatumParagraf == null)
+                        _pravniInterval = new Devmasters.DT.DateInterval((DateOnly?)null, (DateOnly?)null);
+                    else if (ZakonDatumLide == null)
+                        _pravniInterval = new Devmasters.DT.DateInterval(ZakonDatumParagraf, null);
+                    else if (ZakonDatumParagraf == null)
+                        _pravniInterval = new Devmasters.DT.DateInterval(ZakonDatumLide, null);
+                    else
+                        _pravniInterval = new Devmasters.DT.DateInterval(ZakonDatumParagraf > ZakonDatumLide ? ZakonDatumParagraf : ZakonDatumLide, null);
+                }
                 return _pravniInterval;
             }
         }
@@ -35,7 +44,7 @@ namespace HlidacStatu.Repositories.StretZajmu
         public static async Task<Role> FillRoleAsync(string sql, DateTime? zakonDatumLide, DateTime? zakonDatumParagraf)
         {
 
-            IEnumerable<Tuple<string, long>> _o1 = await HlidacStatu.Connectors.DirectDB.Instance.GetListAsync<string, long>
+            IEnumerable<Tuple<string, int>> _o1 = await HlidacStatu.Connectors.DirectDB.Instance.GetListAsync<string, int>
             (
                 sql, System.Data.CommandType.Text,
                 new SqlParameter[] { new("@zakonDatumOd", zakonDatumLide > zakonDatumParagraf ? zakonDatumLide : zakonDatumParagraf) }
@@ -43,7 +52,7 @@ namespace HlidacStatu.Repositories.StretZajmu
             return await FillRoleAsync(_o1, zakonDatumLide, zakonDatumParagraf);
         }
 
-        public static async Task<Role> FillRoleAsync(IEnumerable<Tuple<string, long>> osoby, DateTime? zakonDatumLide, DateTime? zakonDatumParagraf)
+        public static async Task<Role> FillRoleAsync(IEnumerable<Tuple<string, int>> osoby, DateTime? zakonDatumLide, DateTime? zakonDatumParagraf)
         {
 
             var r = new Role()

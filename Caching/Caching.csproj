@@ -9,7 +9,7 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <PackageReference Include="Devmasters.Core" Version="8.4.1" />
+      <PackageReference Include="Devmasters.Core" Version="8.4.4" />
       <PackageReference Include="EnyimMemcachedCore" Version="3.4.5" />
       <PackageReference Include="Serilog" Version="4.3.0" />
       <PackageReference Include="Serilog.Extensions.Hosting" Version="9.0.0" />

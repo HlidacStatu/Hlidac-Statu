@@ -59,7 +59,7 @@ public static class OsobaCache
                     Util.Consts.progressWriter,
                     true, //!System.Diagnostics.Debugger.IsAttached,
                     maxDegreeOfParallelism: 6, prefix: "TopPoliticiObchodSeStatem loading ",
-                    monitor: new MonitoredTaskRepo.ForBatch());
+                    monitor: new MonitoredTaskRepo.ForBatchAsync());
 
                 Dictionary<int, Osoba.Statistics.VerySimple[]> res = new();
                 res.Add(0,
@@ -192,7 +192,7 @@ public static class OsobaCache
                     Util.Consts.progressWriter,
                     true, //!System.Diagnostics.Debugger.IsAttached,
                     maxDegreeOfParallelism: 6, prefix: "Insolvence politiku ",
-                    monitor: new MonitoredTaskRepo.ForBatch());
+                    monitor: new MonitoredTaskRepo.ForBatchAsync());
 
                 return ret.ToArray();
             },
