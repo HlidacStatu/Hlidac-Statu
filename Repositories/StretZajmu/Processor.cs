@@ -29,7 +29,7 @@ namespace HlidacStatu.Repositories.StretZajmu
 
             if (forceUpdate)
             {
-                await PermanentCache.ExpireAsync(key);
+                await PermanentCache.RemoveAsync(key);
                 await Task.Delay(200); // počkejme chvíli, ať se to projeví
             }
 
@@ -50,7 +50,19 @@ namespace HlidacStatu.Repositories.StretZajmu
          */
         private async static Task<List<OsobaStret>> _generate_paragraf_4_Async()
         {
+            /*
+01.09.2017  (1) Veřejný funkcionář uvedený v § 2 odst. 1 písm. c) až m) nesmí
+01.01.2007      a) podnikat nebo provozovat jinou samostatnou výdělečnou činnost,
+01.09.2017      b) být členem statutárního orgánu, členem řídícího, dozorčího nebo kontrolního orgánu právnické osoby, která podniká (dále jen „podnikající právnická osoba“), pokud zvláštní právní předpis nestanoví jinak, nebo
+01.01.2007      c) být v pracovněprávním nebo obdobném vztahu nebo ve služebním poměru, nejde-li o vztah nebo poměr, v němž působí jako veřejný funkcionář.
+01.01.2007  (2) Omezení podle odstavce 1 se nevztahuje na správu vlastního majetku a na činnost vědeckou, pedagogickou, publicistickou, literární, uměleckou nebo sportovní, nejde-li o vlastní podnikání v těchto oborech.
+            
+            */
+
+
+
             var o1_c = await Data.Vlada_1c_Async();
+            o1_c.ZakonDatumParagraf = new DateTime(2017, 2, 9);
             //var o1_d = await Data.Namestci_1d_Async();
 
             List<OsobaStret> res = new();
@@ -62,7 +74,7 @@ namespace HlidacStatu.Repositories.StretZajmu
                 OsobaStret st = new OsobaStret()
                 {
                     ParagrafOdstavec = "§ 4 odst. 1 písm. c)",
-                    Osoba = os.Osoba
+                    Osoba_with_Event = os
                 };
 
 
@@ -83,66 +95,85 @@ namespace HlidacStatu.Repositories.StretZajmu
 
 
                 var aktivniVazby_dobe_platnosti = vazby
-                    .Where(v => v.DateInterval().IsOverlappingIntervalsWith(o1_c.PravniInterval))
+                    .Where(v => v.DateInterval().IsOverlappingIntervalsWith(efektivni_doba_stretu_osoby))
                     .DistinctBy(v => v.To.Id)
                     .ToArray();
 
                 int count = 0;
 
+                bool debug = false;
                 await Devmasters.Batch.Manager.DoActionForAllAsync(aktivniVazby_dobe_platnosti,
                     async (ed) =>
                     {
 
-                        var efektivni_doba_stretu = Devmasters.DT.DateInterval.GetOverlappingInterval(efektivni_doba_stretu_osoby, o1_c.PravniInterval);
-                        if (efektivni_doba_stretu == null)
+                        var efektivni_doba_stretu_s_firmou = Devmasters.DT.DateInterval.GetOverlappingInterval(efektivni_doba_stretu_osoby, ed.DateInterval());
+                        if (efektivni_doba_stretu_s_firmou == null)
                             return new Devmasters.Batch.ActionOutputData();
-
-
                         var firma = await HlidacStatu.Repositories.Cache.FirmaCache.GetAsync(ed.To.Id);
-                        if (firma != null)
+
+                        if (_spadaPodStredZajmu(firma) == false)
                         {
-                            //if (!
-                            //    (firma.TypSubjektu == Firma.TypSubjektuEnum.Soukromy 
-                            //    || firma.TypSubjektu == Firma.TypSubjektuEnum.Neznamy
-                            //    || firma.TypSubjektu == Firma.TypSubjektuEnum.InsolvecniSpravce
-                            //    || firma.TypSubjektu == Firma.TypSubjektuEnum.Exekutor
-                            //    )
-                            //)
-                            //    return new Devmasters.Batch.ActionOutputData();
-                            if (firma.JsemNeziskovka())
-                                return new Devmasters.Batch.ActionOutputData();
-                            if (firma.JsemStatniFirma())
-                                return new Devmasters.Batch.ActionOutputData();
-                            if (firma.JsemOVM())    
-                                return new Devmasters.Batch.ActionOutputData();
-                            if (firma.JsemPolitickaStrana())
-                                return new Devmasters.Batch.ActionOutputData();
-                            if (firma.PatrimStatu())
-                                return new Devmasters.Batch.ActionOutputData();
-
-                            var smlouvyStatTask = SmlouvyStatAsync(firma, efektivni_doba_stretu);
-                            var dotaceStatTask = DotaceStatAsync(firma, efektivni_doba_stretu);
-
-                            await Task.WhenAll(smlouvyStatTask, dotaceStatTask);
-
-                            StretFirma sz = new StretFirma()
-                            {
-                                VazbaDistance = ed.Distance,
-                                Firma = firma,
-                                Vazba = ed,
-                                Za_obdobi = efektivni_doba_stretu,
-                                SmlouvyStat = await smlouvyStatTask,
-                                DotaceStat = await dotaceStatTask,
-                            };
-
-                            //if (sz.SmlouvyStat.Summary().PocetSmluv>0 || sz.DotaceStat.Summary().PocetDotaci > 0) {
-                            st.Strety.Add(sz);
+                            return new Devmasters.Batch.ActionOutputData();
                         }
+
+                        if (ed.Distance > 1)
+                        { //je to dcerinka, najdi vazby zpet k matce
+                            var vazbykIco = await OsobaVazbyRepo.VazbyProIcoCachedAsync(os.Osoba, firma.ICO);
+
+                            foreach (var mv in vazbykIco)
+                            {
+
+                                var firma_ve_vazbach = await Cache.FirmaCache.GetAsync(mv.To.Id);
+                                if (firma_ve_vazbach == null) 
+                                    continue;
+                                if (firma_ve_vazbach.PatrimStatu()) //pokud je cestou statni firma, neresim konflik zajmu
+                                    return new Devmasters.Batch.ActionOutputData();
+
+                                var efektivni_doba_stretu_s_firmou_2 = Devmasters.DT.DateInterval.GetOverlappingInterval(efektivni_doba_stretu_s_firmou, mv.DateInterval());
+                                if (efektivni_doba_stretu_s_firmou_2 != null)
+                                {
+                                    efektivni_doba_stretu_s_firmou = Devmasters.DT.DateInterval.GetOverlappingInterval(
+                                        efektivni_doba_stretu_s_firmou,
+                                        efektivni_doba_stretu_s_firmou_2);
+                                }
+                            }
+
+                        }
+
+
+
+                        //if (!
+                        //    (firma.TypSubjektu == Firma.TypSubjektuEnum.Soukromy 
+                        //    || firma.TypSubjektu == Firma.TypSubjektuEnum.Neznamy
+                        //    || firma.TypSubjektu == Firma.TypSubjektuEnum.InsolvecniSpravce
+                        //    || firma.TypSubjektu == Firma.TypSubjektuEnum.Exekutor
+                        //    )
+                        //)
+                        //    return new Devmasters.Batch.ActionOutputData();
+
+                        var smlouvyStatTask = SmlouvyStatAsync(firma, efektivni_doba_stretu_s_firmou);
+                        var dotaceStatTask = DotaceStatAsync(firma, efektivni_doba_stretu_s_firmou);
+
+                        await Task.WhenAll(smlouvyStatTask, dotaceStatTask);
+
+                        StretFirma sz = new StretFirma()
+                        {
+                            VazbaDistance = ed.Distance,
+                            Firma = firma,
+                            Vazba = ed,
+                            Za_obdobi = efektivni_doba_stretu_s_firmou,
+                            SmlouvyStat = await smlouvyStatTask,
+                            DotaceStat = await dotaceStatTask,
+                        };
+
+                        //if (sz.SmlouvyStat.Summary().PocetSmluv>0 || sz.DotaceStat.Summary().PocetDotaci > 0) {
+                        st.Strety.Add(sz);
+
                         return new Devmasters.Batch.ActionOutputData();
                     },
                         null,
                         new Devmasters.Batch.ActionProgressWriter(0.1f, Devmasters.Batch.ProgressWriters.ConsoleWriter_EndsIn),
-                        true,
+                        !debug,
                         10, prefix: $" Paragraf_4_Async pro {os.Osoba.FullName()} "
                         , monitor: new MonitoredTaskRepo.ForBatchAsync()
                     );
@@ -152,6 +183,24 @@ namespace HlidacStatu.Repositories.StretZajmu
             }
 
             return res;
+        }
+
+        private static bool _spadaPodStredZajmu(Firma firma)
+        {
+            if (firma == null)
+                return false;
+
+            if (firma.PatrimStatu())
+                return false;
+            if (firma.JsemOVM())
+                return false;
+            if (firma.JsemNeziskovka())
+                return false;
+            if (firma.JsemStatniFirma())
+                return false;
+            if (firma.JsemPolitickaStrana())
+                return false;
+            return true;
         }
 
         public async static Task<StatisticsSubjectPerYear<Smlouva.Statistics.Data>>
@@ -171,11 +220,11 @@ namespace HlidacStatu.Repositories.StretZajmu
         }
 
 
-        public async static Task<StatisticsSubjectPerYear<Firma.Statistics.Dotace>> DotaceStatAsync(Firma f, 
+        public async static Task<StatisticsSubjectPerYear<Firma.Statistics.Dotace>> DotaceStatAsync(Firma f,
             Devmasters.DT.DateInterval interval)
         {
             int yFrom = interval.From?.Year ?? 1990;
-            int yTo = interval.To?.Year ?? DateTime.Now.Year+1;
+            int yTo = interval.To?.Year ?? DateTime.Now.Year + 1;
             int[] years = Enumerable.Range(yFrom, yTo - yFrom + 1).ToArray();
 
             StatisticsSubjectPerYear<Firma.Statistics.Dotace> res = await HlidacStatu.Repositories

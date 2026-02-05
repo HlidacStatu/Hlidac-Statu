@@ -55,11 +55,12 @@ and not (organizace like N'Vláda SR%')
 and not (organizace like N'%stínová%')
 and dbo.IsSomehowInInterval(datumOd,datumDo, @zakonDatumOd,null)=1
 -- and nameid like 'andrej-babis'
+-- and nameid = 'roman-prymula'
 
 ";
-            var o_1c = await Role.FillRoleAsync(sql_Vlada, new DateTime(2024, 12, 19), null);
+            Role o_1c = await Role.FillRoleAsync(sql_Vlada, null, null);
             o_1c.Osoby = o_1c.Osoby.OrderBy(o => o.Osoba.Prijmeni).ToList();
-            o_1c.ZakonDatumParagraf = new DateTime(2024, 12, 19);
+            //o_1c.ZakonDatumParagraf = new DateTime(2024, 12, 19);
             return o_1c;
         }
 
@@ -86,7 +87,7 @@ and ico in (#icos#)
                 "#icos#", string
                     .Join(",", (await FirmaRepo.Zatrideni.GetIcoDirectAsync(Firma.Zatrideni.SubjektyObory.Ministerstva)).Select(m => $"'{m}'")
             ));
-            var o_1d = await Role.FillRoleAsync(sql_NamestekMinistra, new DateTime(2024, 12, 19), null);
+            var o_1d = await Role.FillRoleAsync(sql_NamestekMinistra, null, null);
 
             return o_1d;
         }

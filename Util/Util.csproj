@@ -17,7 +17,7 @@
     <PackageReference Include="Devmasters.Batch" Version="8.3.0" />
     <PackageReference Include="Devmasters.Collections" Version="8.0.0" />
     <PackageReference Include="Devmasters.Core" Version="8.4.4" />
-    <PackageReference Include="Devmasters.DT" Version="8.2.4" />
+    <PackageReference Include="Devmasters.DT" Version="8.2.5" />
     <PackageReference Include="Devmasters.Enums" Version="8.0.2" />
     <PackageReference Include="Devmasters.IO" Version="8.1.4" />
     <PackageReference Include="Devmasters.Net" Version="8.1.7" />

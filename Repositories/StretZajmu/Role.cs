@@ -32,9 +32,9 @@ namespace HlidacStatu.Repositories.StretZajmu
                 return _pravniInterval;
             }
         }
-        public List<OsobyDates> Osoby { get; set; } = new();
+        public List<Osoba_With_Event> Osoby { get; set; } = new();
 
-        public class OsobyDates
+        public class Osoba_With_Event
         {
             public Osoba Osoba { get; set; }
             public OsobaEvent Event { get; set; }
@@ -62,7 +62,7 @@ namespace HlidacStatu.Repositories.StretZajmu
             };
             foreach (var _oo in osoby)
             {
-                r.Osoby.Add(new Role.OsobyDates()
+                r.Osoby.Add(new Role.Osoba_With_Event()
                 {
                     Osoba = await HlidacStatu.Repositories.Cache.OsobaCache.GetPersonByNameIdAsync(_oo.Item1),
                     Event = await HlidacStatu.Repositories.OsobaEventRepo.GetByIdAsync((int)_oo.Item2)

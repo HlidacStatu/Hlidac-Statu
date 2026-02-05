@@ -7,7 +7,7 @@
   <ItemGroup>
     <PackageReference Include="CsvHelper" Version="33.0.1" />
     <PackageReference Include="Devmasters.Core" Version="8.4.4" />
-    <PackageReference Include="Devmasters.DT" Version="8.2.4" />
+    <PackageReference Include="Devmasters.DT" Version="8.2.5" />
     <PackageReference Include="EPPlus" Version="8.0.7" />
     <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
     <PackageReference Include="System.Security.Cryptography.Pkcs" Version="9.0.7" />

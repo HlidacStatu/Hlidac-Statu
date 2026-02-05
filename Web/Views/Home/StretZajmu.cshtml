@@ -1,0 +1,119 @@
+﻿@model (List<OsobaStret> strety, string nameId, string paragraf)
+
+@using HlidacStatu.Entities
+@using HlidacStatu.Lib.Analytics
+@using HlidacStatu.Repositories
+@using HlidacStatu.Repositories.Analysis
+@using HlidacStatu.Repositories.StretZajmu
+@using HlidacStatu.XLib;
+
+@{
+    ViewBag.Title = "Analýza střetu zájmů dle zákona o střetu zájmů";
+    ViewBag.SubTitle = "";
+
+    var strety = Model.strety;
+    var nameId = Model.nameId;
+    var paragraf = Model.paragraf;
+
+    List<(decimal smlouvySum, long smlouvyCount, decimal dotaceSum, long dotaceCount)> stretyStats = new();
+
+    
+}
+
+<h2>Analýza střetu zájmů dle zákona o střetu zájmů dle § @paragraf</h2>
+ 
+<h3>Analyzované osoby</h3>
+<ul>
+@foreach (var os in strety)
+{
+    decimal smlouvySum = 0;
+    long smlouvyCount = 0;
+    decimal dotaceSum = 0;
+    long dotaceCount = 0;
+
+    foreach (var item in os.Strety)
+        {
+            smlouvySum += item.SmlouvyStat.Summary().CelkovaHodnotaSmluv;
+            smlouvyCount += item.SmlouvyStat.Summary().PocetSmluv;
+            dotaceSum += item.DotaceStat.Summary().CelkemPrideleno;
+            dotaceCount += item.DotaceStat.Summary().PocetDotaci;
+        }
+        stretyStats.Add((smlouvySum, smlouvyCount, dotaceSum, dotaceCount));
+
+        <li>
+            <a href="#@($"{os.Osoba_with_Event.Osoba.NameId}_{os.Stret_za_obdobi.ToNiceString(dateFormat: "d.M.yyyy", noValue: "",dateDelimiter:"-")}")">
+                @os.Osoba_with_Event.Osoba.FullName()
+                (@(os.Osoba_with_Event.Event.AddInfo))
+                 za období @(os.Stret_za_obdobi.ToNiceString(dateFormat:"d.M.yyyy", noValue:""))
+                @if (smlouvyCount + dotaceCount > 0)
+                {
+                    <div>
+                    Smlouvy: <b>@Html.Raw(HlidacStatu.Util.RenderData.NiceNumber(smlouvyCount, true))</b> ks, celkem <b>@Html.Raw(HlidacStatu.Util.RenderData.ShortNicePrice(smlouvySum,html:true,mena:""))</b> Kč<br />
+                    Dotace: <b>@Html.Raw(HlidacStatu.Util.RenderData.NiceNumber(dotaceCount, true))</b> ks, celkem <b>@Html.Raw(HlidacStatu.Util.RenderData.ShortNicePrice(dotaceSum, html:true, mena: ""))</b> Kč
+                    </div>
+                }
+            </a>
+        </li>
+    }
+</ul>
+<hr />
+@foreach (var os in strety)
+{
+    <h4 id="@($"{os.Osoba_with_Event.Osoba.NameId}_{os.Stret_za_obdobi.ToNiceString(dateFormat: "d.M.yyyy", noValue: "",dateDelimiter:"-")}")">
+        @(os.Osoba_with_Event.Osoba.FullNameWithYear())
+    </h4>
+
+
+    foreach (var item in os.Strety
+    .OrderByDescending(o => o.DotaceStat.Summary().CelkemPrideleno + o.SmlouvyStat.Summary().CelkovaHodnotaSmluv)
+    .ThenByDescending(o => o.DotaceStat.Summary().PocetDotaci + o.SmlouvyStat.Summary().PocetSmluv)
+    )
+    {
+        var vazbyPerIco = await OsobaVazbyRepo.VazbyProIcoCachedAsync(os.Osoba_with_Event.Osoba, item.Firma.ICO);
+
+        string iOd = item.Za_obdobi.From?.ToString("yyyy-MM-dd") ?? "*";
+        string iDo = item.Za_obdobi.To?.ToString("yyyy-MM-dd") ?? "*";
+        string querySmlouvy = $"ico:{item.Firma.ICO} AND podepsano:[{iOd} TO {iDo}] ";
+
+        int yFrom = item.Za_obdobi.From?.Year ?? 1990;
+        int yTo = item.Za_obdobi.To?.Year ?? DateTime.Now.Year + 1;
+        int[] years = Enumerable.Range(yFrom, yTo - yFrom + 1).ToArray();
+        string[] yearQueries = years.Select(y => $"approvedYear:{y}").ToArray();
+        string queryDotace = $"ico:{item.Firma.ICO} AND ( {string.Join(" OR ", yearQueries)} )";
+
+        string customUrlSmlouvy = $"https://www.hlidacstatu.cz/hledatsmlouvy?q=" + System.Net.WebUtility.UrlEncode(querySmlouvy);
+        string customUrlDotace = $"https://www.hlidacstatu.cz/dotace/hledat?q=" + System.Net.WebUtility.UrlEncode(queryDotace);
+
+        var svazba = await HlidacStatu.Repositories.Graph.Render.RenderVazbyAsync(vazbyPerIco, html: true, multiline: false);
+        if (item.SmlouvyStat.Summary().PocetSmluv == 0 && item.DotaceStat.Summary().PocetDotaci == 0)
+        {
+            //sb.AppendLine($"{item.Firma.ICO} {item.Firma.Jmeno} {item.Za_obdobi.ToNiceString()}\n{svazba}");
+            //sb.AppendLine($"<p>Vše v pořádku, žádné smlouvy či dotace v tomto období</p>");
+        }
+        else
+        {
+            <div>
+                <h5>@(item.Firma.ICO) @(item.Firma.Jmeno) @(item.Za_obdobi.ToNiceString(dateFormat: "d.M.yyyy")))</h5>
+                <ul>
+                    <li>Smlouvy:@Html.Raw(item.SmlouvyStat.Summary().ToNiceLinkString(null, html: true, customUrl: customUrlSmlouvy))</li>
+                    <li>Dotace:@Html.Raw(item.DotaceStat.Summary().ToNiceLinkString_1pad(null, html: true, customUrl: customUrlDotace))</li>
+                </ul>            
+            </div>
+        }
+
+    } 
+}
+
+<hr />
+
+<h2>Zákon o střetu zájmů dle § @paragraf</h2>
+<pre style="overflow-x: auto;white-space: pre-wrap;white-space: -moz-pre-wrap;white-space: -pre-wrap;white-space: -o-pre-wrap;word-wrap: break-word;">
+(1) Veřejný funkcionář uvedený v § 2 odst. 1 písm. c) až m) nesmí
+    a) podnikat nebo provozovat jinou samostatnou výdělečnou činnost,
+    b) být členem statutárního orgánu, členem řídícího, dozorčího nebo kontrolního orgánu právnické osoby, která podniká (dále jen „podnikající právnická osoba“), pokud zvláštní právní předpis nestanoví jinak, nebo
+    c) být v pracovněprávním nebo obdobném vztahu nebo ve služebním poměru, nejde-li o vztah nebo poměr, v němž působí jako veřejný funkcionář.
+
+(2) Omezení podle odstavce 1 se nevztahuje na správu vlastního majetku a na činnost vědeckou, pedagogickou, publicistickou, literární, uměleckou nebo sportovní, nejde-li o vlastní podnikání v těchto oborech.
+
+(3) Veřejní funkcionáři uvedení v odstavci 1 jsou povinni činnosti tam uvedené ukončit bez zbytečného odkladu poté, co začali vykonávat svou funkci, nejpozději však do 30 dnů ode dne zahájení výkonu funkce. Není-li k ukončení činnosti z důvodů nezávislých na vůli veřejného funkcionáře možné dodržet lhůtu uvedenou v předchozí větě, veřejný funkcionář o této skutečnosti v dané lhůtě informuje evidenční orgán a provede současně všechna potřebná opatření směřující k ukončení činnosti. Ustanovení zvláštních právních předpisů tím nejsou dotčena4).
+</pre>

@@ -6,13 +6,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using static HlidacStatu.Repositories.StretZajmu.Role;
 
 namespace HlidacStatu.Repositories.StretZajmu
 {
 
     public class OsobaStret
     {
-        public Osoba Osoba { get; set; }
+        public Osoba_With_Event Osoba_with_Event { get; set; }
         public Devmasters.DT.DateInterval Stret_za_obdobi { get; set; }
         public string ParagrafOdstavec { get; set; }
 

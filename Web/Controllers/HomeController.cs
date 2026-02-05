@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
-using Devmasters;
+﻿using Devmasters;
 using Devmasters.Enums;
 using HlidacStatu.Connectors;
 using HlidacStatu.Datasets;
@@ -11,11 +6,13 @@ using HlidacStatu.DS.Graphs;
 using HlidacStatu.Entities;
 using HlidacStatu.Entities.VZ;
 using HlidacStatu.Extensions;
-using HlidacStatu.LibCore.Filters;
+using HlidacStatu.Lib.Web.UI.Attributes;
 using HlidacStatu.LibCore.Extensions;
+using HlidacStatu.LibCore.Filters;
 using HlidacStatu.Repositories;
 using HlidacStatu.Repositories.Analysis;
 using HlidacStatu.Repositories.Cache;
+using HlidacStatu.Repositories.StretZajmu;
 using HlidacStatu.Web.Framework;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Hosting;
@@ -23,9 +20,13 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Net.Http.Headers;
 using Serilog;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Threading.Tasks;
 using static HlidacStatu.XLib.Search;
 using Visit = HlidacStatu.Web.Framework.Visit;
-using HlidacStatu.Lib.Web.UI.Attributes;
 
 
 namespace HlidacStatu.Web.Controllers
@@ -41,6 +42,14 @@ namespace HlidacStatu.Web.Controllers
         {
             _hostingEnvironment = hostingEnvironment;
             _userManager = userManager;
+        }
+
+        [Authorize(Roles = "Admin")]
+        public async Task<ActionResult> StretZajmu(string id, string paragraf)
+        {
+            List<OsobaStret> strety = await HlidacStatu.Repositories.StretZajmu.Processor.Paragraf_4_Async(false);
+            (List<OsobaStret> strety, string id, string paragraf) model = (strety, id, "4");
+            return View(model);
         }
 
         public async Task<ActionResult> MenuPage(string? id)
