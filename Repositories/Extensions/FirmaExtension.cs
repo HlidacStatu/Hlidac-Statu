@@ -518,7 +518,7 @@ namespace HlidacStatu.Extensions
             return firma.TypSubjektu <= Firma.TypSubjektuEnum.Exekutor;
         }
 
-        static int[] Neziskovky_KOD_PF = new int[] { 116, 117, 118, 141, 161, 422, 423, 671, 701, 706, 736 };
+        static int[] Neziskovky_KOD_PF = new int[] { 116, 117, 118, 141, 161, 422, 423, 671, 701, 706, 736, 751, 906, 936 };
 
         public static bool JsemNeziskovka(this Firma firma)
         {
