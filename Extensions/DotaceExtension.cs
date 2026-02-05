@@ -12,7 +12,7 @@ namespace HlidacStatu.Extensions;
 public static class DotaceExtension
 {
     private static readonly ILogger _logger = Log.ForContext(typeof(DotaceExtension));
-    
+
     public static async Task<bool?> MaSkutecnehoMajiteleAsync(this Dotace dotace)
     {
         if (dotace.ApprovedYear is null)
@@ -87,6 +87,89 @@ public static class DotaceExtension
             WriteIndented = true, Encoder = System.Text.Encodings.Web.JavaScriptEncoder.UnsafeRelaxedJsonEscaping
         });
     }
+
+    public static async Task<List<string>> GetTheoreticalSignDatesInStringsAsync(this Dotace dotace)
+    {
+        List<string> teoretickaDataPodpisu = [];
+        foreach (var sourceId in dotace.SourceIds)
+        {
+            //najdi zdrojové dotace
+            var origSource = await HlidacStatu.Repositories.SubsidyRepo.GetAsync(sourceId);
+
+            if (origSource is null)
+                continue;
+            
+            var rawData = origSource.RawData; //List<Dictionary<string, object>> 
+            if (origSource.Metadata.DataSource.Equals("isred", StringComparison.InvariantCultureIgnoreCase))
+            {
+                foreach (var record in rawData)
+                {
+                    if (TryExtractFieldFromRawData(record, "podpisdatum", out var extractedValue))
+                    {
+                        teoretickaDataPodpisu.Add(extractedValue);
+                    }
+                }
+            }
+            else if (origSource.Metadata.DataSource.Equals("deminimis", StringComparison.InvariantCultureIgnoreCase))
+            {
+                foreach (var record in rawData)
+                {
+                    if (TryExtractFieldFromRawData(record, "podporadatum", out var extractedValue))
+                    {
+                        teoretickaDataPodpisu.Add(extractedValue);
+                    }
+                }
+            }
+            else if (origSource.Metadata.DataSource.Equals("eufondy", StringComparison.InvariantCultureIgnoreCase))
+            {
+                foreach (var record in rawData)
+                {
+                    if (TryExtractFieldFromRawData(record, "dzrskut", out var extractedValue))
+                    {
+                        teoretickaDataPodpisu.Add(extractedValue);
+                    }
+                }
+            }
+        }
+
+        return teoretickaDataPodpisu;
+    }
+    
+    public static async Task<List<DateTime>> GetTheoreticalSignDatesAsync(this Dotace dotace)
+    {
+        var datesInString = await dotace.GetTheoreticalSignDatesInStringsAsync();
+
+        List<DateTime> dates = [];
+        foreach (var dateString in datesInString)
+        {
+            var dt = Devmasters.DT.Util.ToDateTime(dateString) ?? Devmasters.DT.Util.ToDate(dateString);
+            
+            if(dt.HasValue)
+                dates.Add(dt.Value);
+        }
+        
+        return dates;
+    }
+
+    private static bool TryExtractFieldFromRawData(object record, string fieldName, out string extractedValue)
+    {
+        extractedValue = null;
+        if (record is Dictionary<string, object> recordDict)
+        {
+            if (recordDict.TryGetValue(fieldName, out var datum))
+            {
+                if (datum is string datumStr && !string.IsNullOrWhiteSpace(datumStr))
+                {
+                    extractedValue = datumStr;
+                    return true;
+                }
+            }
+        }
+        
+        return false;
+    }
+    
+    
 
     public static string? DescribeDataSource(string primaryDataSource)
     {
@@ -249,8 +332,9 @@ public static class DotaceExtension
     uveď název nejvhodnější kategorie uvedený mezi znaky <cat></cat>.
 
     <text>##TEXT##</text>";
-    
-    static Dictionary<string, Dotace.Hint.CalculatedCategories> catsDescriptions = Enum.GetValues<Dotace.Hint.CalculatedCategories>()
+
+    static Dictionary<string, Dotace.Hint.CalculatedCategories> catsDescriptions = Enum
+        .GetValues<Dotace.Hint.CalculatedCategories>()
         .Select(m => new { key = m.ToString(), val = m })
         .ToDictionary(k => k.key, v => v.val);
 }
