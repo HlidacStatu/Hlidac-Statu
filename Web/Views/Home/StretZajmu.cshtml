@@ -36,15 +36,18 @@
             <div class="ms-2 me-auto">
                 <div class="fw-bold">
                     <a href="#@($"{os.Osoba_with_Event.Osoba.NameId}_{os.Stret_za_obdobi.ToNiceString(dateFormat: "d.M.yyyy", noValue: "", dateDelimiter: "-")}")">
+                        <i class="fa-solid fa-link"></i> 
                         @os.Osoba_with_Event.Osoba.FullName()
-                        (@(os.Osoba_with_Event.Event.AddInfo))
+                        (@(os.Osoba_with_Event.Event.AddInfo) - @(await HlidacStatu.Repositories.Cache.FirmaCache.GetJmenoAsync(os.Osoba_with_Event.Event.Ico)))
                     </a>
                 </div>
-                <div>
+                <div style="font-size:13px">
                     Za období <b>@(os.Stret_za_obdobi.ToNiceString(dateFormat: "d.M.yyyy", noValue: ""))</b>
                 </div>
                 <div>
-                    Smlouvy: <b>@Html.Raw(HlidacStatu.Util.RenderData.NiceNumber(os.Stat_SmlouvyCount, true))</b> ks, celkem <b>@Html.Raw(HlidacStatu.Util.RenderData.ShortNicePrice(os.Stat_SmlouvySum, html: true, mena: ""))</b> Kč<br />
+                    Našli jsme celkem ve střetu: 
+                    Smlouvy  <b>@Html.Raw(HlidacStatu.Util.RenderData.NiceNumber(os.Stat_SmlouvyCount, true))</b> ks, celkem <b>@Html.Raw(HlidacStatu.Util.RenderData.ShortNicePrice(os.Stat_SmlouvySum, html: true, mena: ""))</b> Kč
+                    ; 
                     Dotace: <b>@Html.Raw(HlidacStatu.Util.RenderData.NiceNumber(os.Stat_DotaceCount, true))</b> ks, celkem <b>@Html.Raw(HlidacStatu.Util.RenderData.ShortNicePrice(os.Stat_DotaceSum, html: true, mena: ""))</b> Kč
                 </div>
             </div>
@@ -66,7 +69,7 @@
                 <div >
 
                     <b>@os.Osoba_with_Event.Osoba.FullName()</b>
-                    (@(os.Osoba_with_Event.Event.AddInfo))
+                    (@(os.Osoba_with_Event.Event.AddInfo) - @(await HlidacStatu.Repositories.Cache.FirmaCache.GetJmenoAsync(os.Osoba_with_Event.Event.Ico))) )
 
                     <small>
                         za období <b>@(os.Stret_za_obdobi.ToNiceString(dateFormat: "d.M.yyyy", noValue: ""))</b>
@@ -84,10 +87,14 @@
         .ThenByDescending(o => o.Stat_SmlouvyCount + o.Stat_DotaceCount)
 )
 {
-    <h4 id="@($"{os.Osoba_with_Event.Osoba.NameId}_{os.Stret_za_obdobi.ToNiceString(dateFormat: "d.M.yyyy", noValue: "", dateDelimiter: "-")}")">
+    <h4 class="mt-5"
+        id="@($"{os.Osoba_with_Event.Osoba.NameId}_{os.Stret_za_obdobi.ToNiceString(dateFormat: "d.M.yyyy", noValue: "", dateDelimiter: "-")}")">
         @(os.Osoba_with_Event.Osoba.FullNameWithYear())
     </h4>
-
+    <p>
+        @(os.Osoba_with_Event.Event.AddInfo) - @(await HlidacStatu.Repositories.Cache.FirmaCache.GetJmenoAsync(os.Osoba_with_Event.Event.Ico))
+        za období <b>@(os.Stret_za_obdobi.ToNiceString(dateFormat: "d.M.yyyy", noValue: ""))</b>
+    </p>
     <ol class="list-group list-group-numbered">
 
 
@@ -121,10 +128,11 @@
             {
                 <li class="list-group-item d-flex justify-content-between align-items-start">
                     <div class="ms-2 me-auto">
-                        <div class="fw-bold">@(item.Firma.ICO) @(item.Firma.Jmeno) @(item.Za_obdobi.ToNiceString(dateFormat: "d.M.yyyy")))</div>
-                        <div>
+                        <div class="fw-bold">@(item.Firma.ICO) @(item.Firma.Jmeno) </div>
+                        <div style="font-size:13px">
                             Za období <b>@(item.Za_obdobi.ToNiceString(dateFormat: "d.M.yyyy", noValue: ""))</b>
                         </div>
+                        <div style="font-size:13px">Vazba k firmě: @Html.Raw(svazba)</div>
                         <div>
                             Smlouvy: @Html.Raw(item.SmlouvyStat.Summary().ToNiceLinkString(null, html: true, customUrl: customUrlSmlouvy))
                             <br />
