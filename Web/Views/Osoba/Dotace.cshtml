@@ -1,4 +1,5 @@
 ﻿@model HlidacStatu.Entities.Osoba
+@using HlidacStatu.DS.Graphs
 @using HlidacStatu.XLib.Render;
 @using HlidacStatu.Repositories
 @using HlidacStatu.Extensions
@@ -113,7 +114,7 @@
 
                 </td>
                 <td>
-                    @await Html.RenderVazbyAsync(await OsobaVazbyRepo.VazbyProIcoCachedAsync(Model, ico))
+                    @await Html.RenderVazbyAsync(await OsobaVazbyRepo.VazbyProIcoCachedAsync(Model, Relation.CharakterVazbyEnum.VlastnictviKontrola, ico))
                 </td>
             </tr>
         }

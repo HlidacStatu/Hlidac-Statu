@@ -58,7 +58,7 @@
                     if(osoba is null || osoba.IsValid() == false)
                         continue;
                     
-                    var vazby = await OsobaVazbyRepo.VazbyProIcoCachedAsync(osoba, ss.ico);
+                    var vazby = await OsobaVazbyRepo.VazbyProIcoCachedAsync(osoba, Relation.CharakterVazbyEnum.VlastnictviKontrola, ss.ico);
                     if (vazby.Any())
                     {
                         personsWithVazby.Add((osoba, vazby));
@@ -75,7 +75,7 @@
                     //doby angazovanosti politika v ICO
                     Relation.AktualnostType akt = Relation.AktualnostType.Libovolny;
                     List<string> dates = new();
-                    foreach (var v in await OsobaVazbyRepo.VazbyProIcoCachedAsync(p, ss.ico))
+                    foreach (var v in await OsobaVazbyRepo.VazbyProIcoCachedAsync(p, Relation.CharakterVazbyEnum.VlastnictviKontrola, ss.ico))
                     {
                         if (v.RelFrom.HasValue && v.RelTo.HasValue)
                         {

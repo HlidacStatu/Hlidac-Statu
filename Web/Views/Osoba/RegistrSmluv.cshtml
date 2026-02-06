@@ -140,7 +140,7 @@
 
                 </td>
                 <td>
-                    @await Html.RenderVazbyAsync(await OsobaVazbyRepo.VazbyProIcoCachedAsync(Model, ico))
+                    @await Html.RenderVazbyAsync(await OsobaVazbyRepo.VazbyProIcoCachedAsync(Model, Relation.CharakterVazbyEnum.VlastnictviKontrola,ico))
                 </td>
             </tr>
         }

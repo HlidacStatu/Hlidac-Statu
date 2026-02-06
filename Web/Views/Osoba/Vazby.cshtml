@@ -216,7 +216,7 @@
                 {
                     ICO = g.ico,
                     FirmaName = await g.v.First().To.PrintNameAsync(),
-                    VazbyPerIco = await OsobaVazbyRepo.VazbyProIcoCachedAsync(Model, g.ico),
+                    VazbyPerIco = await OsobaVazbyRepo.VazbyProIcoCachedAsync(Model, Relation.CharakterVazbyEnum.VlastnictviKontrola, g.ico),
                     stat
                 };
             }

@@ -1,4 +1,5 @@
 ﻿@model HlidacStatu.Entities.Osoba
+@using HlidacStatu.DS.Graphs
 @using HlidacStatu.Extensions
 @using HlidacStatu.XLib.Render
 @using HlidacStatu.Repositories
@@ -119,7 +120,7 @@
         });
         foreach (var dar in sponzoringFirma)
         {
-            Graph.Edge[]? vazby = await OsobaVazbyRepo.VazbyProIcoCachedAsync(Model, dar.IcoDarce);
+            Graph.Edge[]? vazby = await OsobaVazbyRepo.VazbyProIcoCachedAsync(Model, Relation.CharakterVazbyEnum.VlastnictviKontrola,dar.IcoDarce);
             var jmenoDarce = await FirmaCache.GetJmenoAsync(dar.IcoDarce);
             var ihtmlVazby = await Html.RenderVazbyAsync(vazby);
             sponzoringFirmyData.AddRow((dar.DarovanoDne?.Year ?? 0, dar.IcoPrijemce, await dar.JmenoPrijemceAsync(), dar.IcoDarce, jmenoDarce, dar.Hodnota ?? 0, dar.Popis, ihtmlVazby));

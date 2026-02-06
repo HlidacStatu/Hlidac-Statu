@@ -3,6 +3,7 @@
 @using System.Threading
 @using Devmasters.Enums
 @using HlidacStatu.DS.Api
+@using HlidacStatu.DS.Graphs
 @using HlidacStatu.Entities
 @using HlidacStatu.Extensions
 @using HlidacStatu.Lib.Analytics
@@ -491,7 +492,7 @@
                                         {
                                             ICO = g.ico,
                                             FirmaName = await g.v.First().To.PrintNameAsync(),
-                                            VazbyPerIco = await OsobaVazbyRepo.VazbyProIcoCachedAsync(fo, g.ico),
+                                            VazbyPerIco = await OsobaVazbyRepo.VazbyProIcoCachedAsync(fo, Relation.CharakterVazbyEnum.VlastnictviKontrola, g.ico),
                                             stat
                                         };
                                     }

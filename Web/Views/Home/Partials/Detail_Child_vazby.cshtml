@@ -1,4 +1,6 @@
 ﻿@model HlidacStatu.Entities.Smlouva
+
+@using HlidacStatu.DS.Graphs
 @using HlidacStatu.Extensions
 @using HlidacStatu.Repositories
 @using HlidacStatu.Entities
@@ -112,7 +114,9 @@
                             <p>
                                 <strong><a href="/politik/@p.NameId">@p.FullName()</a></strong>
                             <div style="padding-left:20px;">
-                                @(await Html.RenderVazbyAsync(await OsobaVazbyRepo.VazbyProIcoCachedAsync(p, ss.ico)))
+                                    @(await Html.RenderVazbyAsync(await OsobaVazbyRepo.VazbyProIcoCachedAsync(p, 
+                                    Relation.CharakterVazbyEnum.VlastnictviKontrola,
+                                    ss.ico)))
                             </div>
                             </p>
                         }

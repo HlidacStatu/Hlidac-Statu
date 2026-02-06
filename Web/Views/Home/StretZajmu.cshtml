@@ -1,5 +1,6 @@
 ﻿@model (List<OsobaStret> strety, string nameId, string paragraf)
 
+@using HlidacStatu.DS.Graphs
 @using HlidacStatu.Entities
 @using HlidacStatu.Lib.Analytics
 @using HlidacStatu.Repositories
@@ -103,7 +104,7 @@
             .ThenByDescending(o => o.DotaceStat.Summary().PocetDotaci + o.SmlouvyStat.Summary().PocetSmluv)
             )
         {
-            var vazbyPerIco = await OsobaVazbyRepo.VazbyProIcoCachedAsync(os.Osoba_with_Event.Osoba, item.Firma.ICO);
+            var vazbyPerIco = await OsobaVazbyRepo.VazbyProIcoCachedAsync(os.Osoba_with_Event.Osoba, Relation.CharakterVazbyEnum.VlastnictviKontrola, item.Firma.ICO);
 
             string iOd = item.Za_obdobi.From?.ToString("yyyy-MM-dd") ?? "*";
             string iDo = item.Za_obdobi.To?.ToString("yyyy-MM-dd") ?? "*";

@@ -243,9 +243,7 @@
     @if (statistics.SoukromeFirmy?.Count > 0 || statistics.StatniFirmy?.Count > 0)
     {
         <div>
-            <h4>
-                Vazby na firmy a organizace
-            </h4>
+            <h4>Vlastněné společnosti a společnosti, kde se účastní na řízení</h4>
             <p class="text-muted sub-header-info">
                 Firmy a organizace, které tato osoba přímo či prostřednictvím jiných společností vlastnila či
                 spoluvlastnila
@@ -414,6 +412,36 @@
     @{
         laps.StopPreviousAndStartNextLap("dotace");
     }
+
+
+
+    @if ((await Model.AktualniVazbyAsync(Relation.CharakterVazbyEnum.Uredni,Relation.AktualnostType.Nedavny)).Any())
+    {
+        <div>
+            <h4>Úřední vazby na další subjekty</h4>
+            <p class="text-muted sub-header-info">
+                Typicky společnosti spravované v rámci insolvence, exekuce a dalších obdobných řízení. Nejde o majetkové vazby.
+            </p>
+            <p>
+                <span>
+                    Spravuje či řeší <a href="/osoba/VazbyUredni/@Model.NameId">
+                        @Devmasters.Lang.CS.Plural.Get(await Model.PocetPodrizenychSubjektuAsync(Relation.CharakterVazbyEnum.Uredni, Relation.AktualnostType.Nedavny), "jeden subjekt", "{0} subjekty", "{0} subjektů").
+                    </a>
+                </span>
+            </p>
+            <p class="text-center">
+                <a href="/osoba/VazbyUredni/@Model.NameId" class="btn btn-hs btn-primary btn-sm my-3 position-relative">
+                    Vypsat všechny úřední vazby na další subjekty
+                    <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                        @(HlidacStatu.Util.RenderData.NiceNumber(await Model.PocetPodrizenychSubjektuAsync(Relation.CharakterVazbyEnum.Uredni, Relation.AktualnostType.Nedavny)))
+                    </span>
+                </a>
+            </p>
+
+        </div>
+        <hr />
+    }
+
 
     @{
         var statistikaDotaci = await Model.StatistikaDotaceAsync(); 

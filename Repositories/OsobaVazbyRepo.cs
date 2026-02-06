@@ -22,7 +22,7 @@ namespace HlidacStatu.Repositories
 
             if (p != null)
             {
-                var icos = (await p.AktualniVazbyAsync( charakterVazby, Relation.AktualnostType.Nedavny))
+                var icos = (await p.AktualniVazbyAsync(charakterVazby, Relation.AktualnostType.Nedavny))
                             .Where(w => !string.IsNullOrEmpty(w.To.Id))
                             .Select(w => w.To.Id)
                             .Distinct().ToArray();
@@ -172,11 +172,11 @@ namespace HlidacStatu.Repositories
             };
 
         }
-        
-        private static async Task<DS.Graphs.Graph.Edge[]> _vazbyProICOAsync(this Osoba osoba, string ico)
+
+        private static async Task<DS.Graphs.Graph.Edge[]> _vazbyProICOAsync(this Osoba osoba, string ico, Relation.CharakterVazbyEnum charakterVazby)
         {
             if (osoba._graph is null || osoba._graph.Vertices.Count == 0)
-                await osoba.InitializeGraphAsync();
+                await osoba.InitializeGraphAsync(charakterVazby);
 
             osoba._startingVertex ??=
                 new Vertex<string>(HlidacStatu.DS.Graphs.Graph.Node.Prefix_NodeType_Person + osoba.InternalId);
@@ -197,12 +197,11 @@ namespace HlidacStatu.Repositories
             }
         }
 
-        private static async Task InitializeGraphAsync(this Osoba osoba)
+        private static async Task InitializeGraphAsync(this Osoba osoba, Relation.CharakterVazbyEnum charakterVazby)
         {
             osoba._graph = new UnweightedGraph();
-            var vazbyVlastnictviTask = osoba.VazbyAsync(Relation.CharakterVazbyEnum.VlastnictviKontrola);
-            var vazbyUredniTask = osoba.VazbyAsync(Relation.CharakterVazbyEnum.Uredni);
-            foreach (var vazba in (await vazbyVlastnictviTask).Concat(await vazbyUredniTask))
+            var vazbyVlastnictvi = await osoba.VazbyAsync(charakterVazby);
+            foreach (var vazba in vazbyVlastnictvi)
             {
                 if (vazba.From is null)
                 {
@@ -230,15 +229,18 @@ namespace HlidacStatu.Repositories
             if (osoba == null)
                 return [];
 
-            if (refresh || osoba._vazby == null)
+            if (refresh || osoba._vazby == null || osoba._vazbyUredni == null)
             {
-                await osoba.UpdateVazbyForInstanceAsync( charakterVazby, refresh);
+                await osoba.UpdateVazbyForInstanceAsync(charakterVazby, refresh);
             }
 
-            return osoba._vazby;
+            if (charakterVazby == Relation.CharakterVazbyEnum.VlastnictviKontrola)
+                return osoba._vazby;
+            else 
+                return osoba._vazbyUredni;
         }
 
-        public static async Task<int> PocetPodrizenychSubjektuAsync(this Osoba osoba, 
+        public static async Task<int> PocetPodrizenychSubjektuAsync(this Osoba osoba,
             Relation.CharakterVazbyEnum charakterVazby,
             Relation.AktualnostType minAktualnost, bool refresh = false)
         {
@@ -247,8 +249,8 @@ namespace HlidacStatu.Repositories
                 .Distinct()?
                 .Count() ?? 0;
         }
-        public static async Task<DS.Graphs.Graph.Edge[]> PrimaAngazovanostAsync(this Osoba osoba, 
-            Relation.CharakterVazbyEnum charakterVazby, 
+        public static async Task<DS.Graphs.Graph.Edge[]> PrimaAngazovanostAsync(this Osoba osoba,
+            Relation.CharakterVazbyEnum charakterVazby,
             Relation.AktualnostType minAktualnost, bool refresh = false)
         {
             var vazby = Relation.AktualniVazby(await osoba.VazbyAsync(charakterVazby, refresh), minAktualnost, osoba.VazbyRootEdge());
@@ -257,7 +259,7 @@ namespace HlidacStatu.Repositories
             return res;
         }
 
-        public static async Task<DS.Graphs.Graph.Edge[]> AktualniVazbyAsync(this Osoba osoba, 
+        public static async Task<DS.Graphs.Graph.Edge[]> AktualniVazbyAsync(this Osoba osoba,
             Relation.CharakterVazbyEnum charakterVazby,
             Relation.AktualnostType minAktualnost, bool refresh = false)
         {
@@ -269,29 +271,35 @@ namespace HlidacStatu.Repositories
         {
             if (osoba == null)
                 return;
-            
+
             try
             {
-                osoba._vazby = (await Graph.VsechnyDcerineVazbyAsync(osoba, charakterVazby, refresh)).ToArray();
+                if (charakterVazby == Relation.CharakterVazbyEnum.VlastnictviKontrola)
+                    osoba._vazby = (await Graph.VsechnyDcerineVazbyAsync(osoba, charakterVazby, refresh)).ToArray();
+                else if (charakterVazby == Relation.CharakterVazbyEnum.Uredni)
+                    osoba._vazbyUredni = (await Graph.VsechnyDcerineVazbyAsync(osoba, charakterVazby, refresh)).ToArray();
             }
             catch (Exception)
             {
                 osoba._vazby = [];
+                osoba._vazbyUredni = [];
             }
         }
-        
+
         private static IFusionCache MemoryCache =>
             HlidacStatu.Caching.CacheFactory.CreateNew(CacheFactory.CacheType.L1Default, nameof(OsobaVazbyRepo));
-        
-        public static async Task<HlidacStatu.DS.Graphs.Graph.Edge[]> VazbyProIcoCachedAsync(Osoba osoba, string ico)
+
+        public static async Task<HlidacStatu.DS.Graphs.Graph.Edge[]> VazbyProIcoCachedAsync(Osoba osoba,
+            Relation.CharakterVazbyEnum charakterVazby, 
+            string ico)
         {
             if (osoba is null || string.IsNullOrWhiteSpace(ico))
             {
                 return [];
             }
-                
-            return await MemoryCache.GetOrSetAsync($"_VazbyOsobaProIcoCache:{osoba.NameId}_{ico}",
-                _ => osoba._vazbyProICOAsync(ico),
+
+            return await MemoryCache.GetOrSetAsync($"_VazbyOsobaProIcoCache:{osoba.NameId}_{ico}_{charakterVazby.ToString()}",
+                _ => osoba._vazbyProICOAsync(ico, charakterVazby),
                 options => options.ModifyEntryOptionsDuration(TimeSpan.FromHours(2)));
         }
     }

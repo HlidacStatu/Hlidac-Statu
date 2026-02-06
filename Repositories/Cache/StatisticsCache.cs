@@ -38,7 +38,7 @@ public class StatisticsCache
             _ => CalculateHoldingSmlouvyStatisticsAsync(firma, obor));
 
     public static ValueTask InvalidateHoldingSmlouvyStatisticsAsync(Firma firma, int? obor) =>
-        PermanentCache.ExpireAsync($"_Holding_SmlouvyStatistics_:{firma.ICO}-{obor?.ToString() ?? "null"}");
+        PermanentCache.RemoveAsync($"_Holding_SmlouvyStatistics_:{firma.ICO}-{obor?.ToString() ?? "null"}");
 
     //Firma Smlouvy
     public static ValueTask<StatisticsSubjectPerYear<Smlouva.Statistics.Data>> GetFirmaSmlouvyStatisticsAsync(
@@ -47,7 +47,7 @@ public class StatisticsCache
             _ => CalculateFirmaSmlouvyStatisticsAsync(firma, obor));
 
     public static ValueTask InvalidateFirmaSmlouvyStatisticsAsync(Firma firma, int? obor) =>
-        PermanentCache.ExpireAsync($"_Firma_SmlouvyStatistics_:{firma.ICO}-{obor?.ToString() ?? "null"}");
+        PermanentCache.RemoveAsync($"_Firma_SmlouvyStatistics_:{firma.ICO}-{obor?.ToString() ?? "null"}");
 
 
     //Osoby cache
@@ -56,7 +56,7 @@ public class StatisticsCache
             _ => CalculateSmlouvyStatAsync(osoba, obor));
 
     public static ValueTask InvalidateOsobaSmlouvyStatisticsAsync(Osoba osoba, int? obor) =>
-        PermanentCache.ExpireAsync($"_Osoba_SmlouvyStatistics_:{osoba.NameId}-{obor?.ToString() ?? "null"}");
+        PermanentCache.RemoveAsync($"_Osoba_SmlouvyStatistics_:{osoba.NameId}-{obor?.ToString() ?? "null"}");
 
     //Vz cache
     public static ValueTask<StatisticsSubjectPerYear<Firma.Statistics.VZ>> GetFirmaVzStatisticsAsync(Firma firma) =>
@@ -64,14 +64,14 @@ public class StatisticsCache
             _ => CalculateVZStatAsync(firma));
 
     public static ValueTask InvalidateFirmaVzStatisticsAsync(Firma firma) =>
-        PermanentCache.ExpireAsync($"_Firma_VZStatistics_:{firma.ICO}");
+        PermanentCache.RemoveAsync($"_Firma_VZStatistics_:{firma.ICO}");
 
     public static ValueTask<StatisticsSubjectPerYear<Firma.Statistics.VZ>> GetHoldingVzStatisticsAsync(Firma firma) =>
         PermanentCache.GetOrSetAsync($"_Holding_VZStatistics_:{firma.ICO}",
             _ => CalculateHoldingVZStatAsync(firma));
 
     public static ValueTask InvalidateHoldingVzStatisticsAsync(Firma firma) =>
-        PermanentCache.ExpireAsync($"_Holding_VZStatistics_:{firma.ICO}");
+        PermanentCache.RemoveAsync($"_Holding_VZStatistics_:{firma.ICO}");
 
 
     //Dotace cache
@@ -81,7 +81,7 @@ public class StatisticsCache
             _ => CalculateFirmaDotaceStatAsync(firma));
 
     public static ValueTask InvalidateFirmaDotaceStatisticsAsync(Firma firma) =>
-        PermanentCache.ExpireAsync($"_Firma_DotaceStatistics_:{firma.ICO}");
+        PermanentCache.RemoveAsync($"_Firma_DotaceStatistics_:{firma.ICO}");
 
     public static ValueTask<StatisticsSubjectPerYear<Firma.Statistics.Dotace>>
         GetHoldingDotaceStatisticsAsync(Firma firma) =>
@@ -89,7 +89,7 @@ public class StatisticsCache
             _ => CalculateHoldingDotaceStatAsync(firma));
 
     public static ValueTask InvalidateHoldingDotaceStatisticsAsync(Firma firma) =>
-        PermanentCache.ExpireAsync($"_Holding_DotaceStatistics_:{firma.ICO}");
+        PermanentCache.RemoveAsync($"_Holding_DotaceStatistics_:{firma.ICO}");
     
 
     public static ValueTask<Osoba.Statistics.Dotace>
@@ -98,7 +98,7 @@ public class StatisticsCache
             _ => CalculateOsobaDotaceStatAsync(osoba));
 
     public static ValueTask InvalidateOsobaDotaceStatisticsAsync(Osoba osoba) =>
-        PermanentCache.ExpireAsync($"_Osoba_DotaceStatistics_:{osoba.NameId}");
+        PermanentCache.RemoveAsync($"_Osoba_DotaceStatistics_:{osoba.NameId}");
     
     // Firmy global
     // TODO: Krom plnění daty se tato cache vůbec nikde nepoužívá
@@ -278,7 +278,11 @@ public class StatisticsCache
         Dictionary<string, StatisticsSubjectPerYear<Smlouva.Statistics.Data>> nezisk =
             new Dictionary<string, StatisticsSubjectPerYear<Smlouva.Statistics.Data>>();
 
-        var skutecneVazby = Relation.SkutecnaDobaVazby(await o.AktualniVazbyAsync( Relation.CharakterVazbyEnum.VlastnictviKontrola, Relation.AktualnostType.Libovolny));
+        var skutecneVazby = Relation.SkutecnaDobaVazby(
+            await o.AktualniVazbyAsync( 
+                Relation.CharakterVazbyEnum.VlastnictviKontrola, 
+                Relation.AktualnostType.Libovolny)
+            );
         var firmy_maxrok = new Dictionary<string, Devmasters.DT.DateInterval>();
         foreach (var v in skutecneVazby.Where(v => !string.IsNullOrEmpty(v.To?.UniqId)
                                                    && v.To.Type == HlidacStatu.DS.Graphs.Graph.Node.NodeType

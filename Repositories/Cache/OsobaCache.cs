@@ -150,7 +150,7 @@ public static class OsobaCache
 
                                     foreach (var pd in pdluznici)
                                     {
-                                        var _v_ico = await OsobaVazbyRepo.VazbyProIcoCachedAsync(o, pd.ICO);
+                                        var _v_ico = await OsobaVazbyRepo.VazbyProIcoCachedAsync(o, Relation.CharakterVazbyEnum.VlastnictviKontrola, pd.ICO);
                                         foreach (var v in _v_ico)
                                         {
                                             if (Devmasters.DT.Util.IsOverlappingIntervals(

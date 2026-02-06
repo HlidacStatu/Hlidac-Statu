@@ -175,6 +175,7 @@ namespace HlidacStatu.Entities
         public UnweightedGraph _graph = null;
         public Vertex<string> _startingVertex = null; //not for other use except as a search starting point
         public Graph.Edge[] _vazby = null;
+        public Graph.Edge[] _vazbyUredni = null;
 
         public string NarozeniYear(bool html = false)
         {

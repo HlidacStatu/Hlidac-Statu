@@ -162,7 +162,38 @@ namespace HlidacStatu.Web.Controllers
         }
 
 
+        public async Task<ActionResult> VazbyUredni(string id, Relation.AktualnostType? aktualnost)
+        {
+            if (string.IsNullOrWhiteSpace(id))
+            {
+                return RedirectToAction("Index", "Osoby");
+            }
 
+            var osoba = await OsobaCache.GetPersonByNameIdAsync(id);
+            if (osoba == null)
+            {
+                return NotFound();
+            }
+
+            bool isInteresting = await osoba.IsInterestingToShowAsync();
+
+            var popis = "Úřední vazby na další subjekty";
+
+            if (aktualnost.HasValue == false)
+                aktualnost = Relation.AktualnostType.Nedavny;
+
+            ViewBag.Aktualnost = aktualnost;
+
+            (Osoba osoba, string viewName, string title) model = (osoba, "VazbyUredni", $"{osoba.FullName()} - {popis}");
+            if (!isInteresting)
+            {
+                model.viewName = "NoInfo";
+                model.title = id;
+            }
+
+            return View("_osobaLayout", model);
+
+        }
         public async Task<ActionResult> Vazby(string id, Relation.AktualnostType? aktualnost)
         {
             

@@ -118,7 +118,7 @@ namespace HlidacStatu.Repositories.StretZajmu
 
                         if (ed.Distance > 1)
                         { //je to dcerinka, najdi vazby zpet k matce
-                            var vazbykIco = await OsobaVazbyRepo.VazbyProIcoCachedAsync(os.Osoba, firma.ICO);
+                            var vazbykIco = await OsobaVazbyRepo.VazbyProIcoCachedAsync(os.Osoba, DS.Graphs.Relation.CharakterVazbyEnum.VlastnictviKontrola, firma.ICO);
 
                             foreach (var mv in vazbykIco)
                             {
