@@ -71,12 +71,6 @@ namespace HlidacStatu.Repositories.StretZajmu
 
             foreach (var os in o1_c.Osoby)
             {
-                OsobaStret st = new OsobaStret()
-                {
-                    ParagrafOdstavec = "§ 4 odst. 1 písm. c)",
-                    Osoba_with_Event = os
-                };
-
 
                 var efektivni_doba_stretu_osoby = Devmasters.DT.DateInterval.GetOverlappingInterval(
                     new Devmasters.DT.DateInterval(os.Event.DatumOd, os.Event.DatumDo),
@@ -85,8 +79,16 @@ namespace HlidacStatu.Repositories.StretZajmu
                 if (efektivni_doba_stretu_osoby == null)
                     continue;
 
-                st.Stret_za_obdobi = efektivni_doba_stretu_osoby;
 
+                OsobaStret st = new OsobaStret()
+                {
+                    ParagrafOdstavec = "§ 4 odst. 1 písm. c)",
+                    Osoba_with_Event = os,
+                    Stret_za_obdobi = efektivni_doba_stretu_osoby,
+                };
+
+
+                
                 DS.Graphs.Graph.Edge[] vazby = await os.Osoba.AktualniVazbyAsync(
                     DS.Graphs.Relation.CharakterVazbyEnum.VlastnictviKontrola,
                     DS.Graphs.Relation.AktualnostType.Libovolny);

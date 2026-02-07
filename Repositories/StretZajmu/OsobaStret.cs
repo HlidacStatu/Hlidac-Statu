@@ -13,9 +13,29 @@ namespace HlidacStatu.Repositories.StretZajmu
 
     public class OsobaStret
     {
-        public Osoba_With_Event Osoba_with_Event { get; set; }
-        public Devmasters.DT.DateInterval Stret_za_obdobi { get; set; }
-        public string ParagrafOdstavec { get; set; }
+        private string _id;
+        public string Id { 
+            get  { 
+                if (_id == null 
+                    && Osoba_with_Event?.Osoba != null 
+                    && Stret_za_obdobi != null
+                    && !string.IsNullOrEmpty(ParagrafOdstavec)
+                    )
+                {
+                    _id = CalculateId();
+                }
+                return _id;
+            }
+            set => id = value; }
+        string CalculateId()
+        {
+            var niceId = $"{Osoba_with_Event.Osoba.NameId}_{Stret_za_obdobi.From:yyyyMMdd}_{Stret_za_obdobi.To:yyyyMMdd}_{this.ParagrafOdstavec}";
+            return Devmasters.Crypto.Hash.ComputeHashToBase64(niceId);
+        }
+
+        public required Osoba_With_Event Osoba_with_Event { get; init; }
+        public required Devmasters.DT.DateInterval Stret_za_obdobi { get; init; }
+        public required string ParagrafOdstavec { get; init; }
 
         public List<StretFirma> Strety { get; set; } = new();
 
@@ -54,6 +74,8 @@ namespace HlidacStatu.Repositories.StretZajmu
             }
         }
         decimal _stat_dotaceNum = -1;
+        private string id;
+
         public decimal Stat_DotaceCount
         {
             get
