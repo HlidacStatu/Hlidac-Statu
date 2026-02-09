@@ -55,6 +55,44 @@
 <hr class="double"/>
 
 @{
+    //Graf počet smluv za období
+    var početSmluvGraphData = new Series[]
+    {
+        new()
+        {
+            Name = "Počet nalezených smluv",
+            Type = Series.SeriesType.column,
+            Data = statisticsAfter2016
+                .Select(x => new SeriesData(x.Year, x.Value.PocetSmluv)).ToArray(),
+            SeriesTooltip = new SeriesTooltip()
+            {
+                ValueSuffix = " smluv"
+            }
+        },
+        new()
+        {
+            Name = "Počet smluv se zásadním nedostatkem",
+            Type = Series.SeriesType.column,
+            Data = statisticsAfter2016
+                .Select(x => new SeriesData(x.Year, x.Value.PocetSmluvSeZasadnimNedostatkem)).ToArray(),
+            SeriesTooltip = new SeriesTooltip()
+            {
+                ValueSuffix = " smluv"
+            }
+        },
+        new()
+        {
+            Name = "Počet smluv bez ceny",
+            Data = statisticsAfter2016
+                .Select(x => new SeriesData(x.Year, x.Value.PocetSmluvBezCeny)).ToArray(),
+            Type = Series.SeriesType.line,
+            SeriesTooltip = new SeriesTooltip()
+            {
+                ValueSuffix = " smluv"
+            }
+        }
+    };
+
     //Graf hodnota smluv
     var hodnotaSmluvGraphData = new Series[]
     {
@@ -159,18 +197,20 @@
         </div>
     </div>
     <div class="row">
-        <div class="col col-xs-12 border border-secondary-subtle rounded m-2 p-2">
+        <div class="col col-lg-6 col-xs-12 border border-secondary-subtle rounded p-2">
+            @Html.ColumnGraph("Počet nalezených smluv po letech", početSmluvGraphData, yTitleLeft: "Počet smluv", yTitleRight: "Počet smluv")
+        </div>
+        <div class="col col-lg-6 col-xs-12 border border-secondary-subtle rounded p-2">
             @Html.ColumnGraph("Hodnota nalezených smluv po letech", hodnotaSmluvGraphData, yTitleRight: "Počet smluv")
         </div>
-        <div class="col col-xs-12 border border-secondary-subtle rounded m-2 p-2">
+        <div class="col col-lg-6 col-xs-12 border border-secondary-subtle rounded p-2">
             @Html.ColumnGraph("Smlouvy s utajenou cenou a vazbou na politiky", procentaSmluvGraphData, yTitleLeft: "% smluv")
         </div>
-    </div>
-    <div class="row">
-        <div class="col col-xs-12 border border-secondary-subtle rounded m-2 p-2">
+
+        <div class="col col-lg-6 col-xs-12 border border-secondary-subtle rounded p-2">
             @Html.PieChart("Obory nalezených smluv", pieOboryData, yTitleLeft: "% smluv", tooltipFormat: "{series.name}: <b>{point.y:,.0f} Kč</b>")
         </div>
-        <div class="col-lg-6 col-xs-12 border border-secondary-subtle rounded m-2 p-2">
+        <div class="col-lg-6 col-xs-12 border border-secondary-subtle rounded p-2">
             @Html.PieChart("Smlouvy podle hodnoty", pieHodnotySmluv, tooltipFormat: "{series.name}: <b>{point.y:.1f} %</b>")
         </div>
     </div>
@@ -196,12 +236,12 @@
                     new ReportDataSource<(Firma firma, SimpleStat stat)>.Column()
                     {
                         Name = "Dodavatel",
-                        HtmlRender = (m) => $"<a href='{m.firma.GetUrl()}'>{m.firma.Jmeno}</a>"
+                        HtmlRender = (m) => $"<a href='{m.firma?.GetUrl()}'>{m.firma?.Jmeno}</a>"
                     },
                     new ReportDataSource<(Firma firma, SimpleStat stat)>.Column()
                     {
                         Name = "Počet smluv",
-                        HtmlRender = (m) => $"<a style='float:left' href='/hledatSmlouvy?q={System.Net.WebUtility.UrlEncode(Model.Query + " AND ico:" + m.firma.ICO)}'><i class='fas fa-link' aria-hidden='true'></i></a> {HlidacStatu.Util.RenderData.NiceNumber(m.stat.Pocet)}",
+                        HtmlRender = (m) => $"<a style='float:left' href='/hledatSmlouvy?q={System.Net.WebUtility.UrlEncode(Model.Query + " AND ico:" + m.firma?.ICO)}'><i class='fas fa-link' aria-hidden='true'></i></a> {HlidacStatu.Util.RenderData.NiceNumber(m.stat.Pocet)}",
                         OrderValueRender = (m) => HlidacStatu.Util.RenderData.OrderValueFormat(m.stat.Pocet),
                         CssClass = "number"
                     },
@@ -319,12 +359,12 @@
                 new ReportDataSource<(Firma firma, SimpleStat stat)>.Column()
                 {
                     Name = "Zadavatel",
-                    HtmlRender = (m) => $"<a href='{m.firma.GetUrl()}'>{m.firma.Jmeno}</a>"
+                    HtmlRender = (m) => $"<a href='{m.firma?.GetUrl()}'>{m.firma?.Jmeno}</a>"
                 },
                 new ReportDataSource<(Firma firma, SimpleStat stat)>.Column()
                 {
                     Name = "Počet smluv",
-                    HtmlRender = (m) => $"<a style='float:left' href='/hledatSmlouvy?q={System.Net.WebUtility.UrlEncode(Model.Query + " AND ico:" + m.firma.ICO)}'><i class='fas fa-link' aria-hidden='true'></i></a> {HlidacStatu.Util.RenderData.NiceNumber(m.stat.Pocet)}",
+                    HtmlRender = (m) => $"<a style='float:left' href='/hledatSmlouvy?q={System.Net.WebUtility.UrlEncode(Model.Query + " AND ico:" + m.firma?.ICO)}'><i class='fas fa-link' aria-hidden='true'></i></a> {HlidacStatu.Util.RenderData.NiceNumber(m.stat.Pocet)}",
                     OrderValueRender = (m) => HlidacStatu.Util.RenderData.OrderValueFormat(m.stat.Pocet),
                     CssClass = "number"
                 },
