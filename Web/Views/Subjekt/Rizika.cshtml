@@ -5,14 +5,16 @@
 @{
     Layout = null;
 
-    var roky = await KIndexRepo.GetAvailableCalculationYearsAsync();
+    var rizikaRoky = Enumerable.Range(2017, DateTime.Now.Year - 2017);
+    if (DateTime.Now.Month > 1)
+        rizikaRoky = rizikaRoky.Concat(new int[] { DateTime.Now.Year });
 
 }
 
 @* První sloupec *@
 <div id="subjcontent_toc">
 
-    @foreach (var rok in roky.OrderByDescending(m=>m))
+    @foreach (var rok in rizikaRoky.OrderByDescending(m => m))
     {
 
         <h4 style="padding-bottom:15px;">Sledovaná rizika pro rok @rok</h4>

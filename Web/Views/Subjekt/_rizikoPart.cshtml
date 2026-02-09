@@ -73,7 +73,8 @@
 {
     query = System.Net.WebUtility.UrlEncode($"ico:{Model.firma.ICO} AND ( chyby:zasadni ) AND datumUzavreni:[{rok}-01-01 TO {rok + 1}-01-01}}"); //
     <p>
-        <i class="fas fa-exclamation-circle" style="color:@Riziko.RizikoColor(KIndexData.DetailInfo.KIndexLabelForPart(KIndexData.KIndexParts.PercSeZasadnimNedostatkem, statistics.PercentSmluvSeZasadnimNedostatkem).AsRiziko());padding-right:20px;"></i> <b>Smlouvy se zásadními nedostatky</b>
+        <i class="fas fa-exclamation-circle" style="color:@Riziko.RizikoColor(KIndexData.DetailInfo.KIndexLabelForPart(KIndexData.KIndexParts.PercSeZasadnimNedostatkem, statistics.PercentSmluvSeZasadnimNedostatkem).AsRiziko());padding-right:20px;"></i>
+        <b>Smlouvy se zásadními nedostatky</b>
         <a href="/HledatSmlouvy?Q=@query">
             <i class='fas fa-link'></i>
         </a>
@@ -88,7 +89,7 @@
             <a href="/HledatSmlouvy?Q=@query">
                 <b>@HlidacStatu.Util.RenderData.Vysledky.PocetSmluv(statistics.PocetSmluvSeZasadnimNedostatkem, HlidacStatu.Util.RenderData.CapitalizationStyle.FirstLetterUpperCap)</b>
             </a>
-            bez uvedené ceny.
+            se zásadními nedostatky.
             <span>Tj. @HlidacStatu.Util.RenderData.NicePercent(statistics.PercentSmluvSeZasadnimNedostatkem) z celkového počtu.</span>
         </span>
     </p>

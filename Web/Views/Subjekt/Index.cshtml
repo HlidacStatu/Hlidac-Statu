@@ -138,7 +138,11 @@
 
     @* ----- Rizika ----- *@
     @{
-        int rok = (await KIndexRepo.GetAvailableCalculationYearsAsync()).Max();
+        var rizikaRoky = Enumerable.Range(2017, DateTime.Now.Year - 2017);
+        if (DateTime.Now.Month>5)
+            rizikaRoky = rizikaRoky.Concat(new int[] { DateTime.Now.Year });
+
+        int rok = rizikaRoky.Max();
     }
     <div>
         <h4>
