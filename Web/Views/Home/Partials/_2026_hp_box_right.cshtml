@@ -5,6 +5,29 @@
 
     <div class="watcher__title">
         <h3 class="new-title position-relative d-inline-block">
+            <span class="text-bg-warning px-2 py-0 rounded">
+                Najdi si svou střední školu                
+            </span>
+            <span class="position-absolute top-0 start-0 translate-middle badge rounded-pill bg-danger" style="font-size:11px">NOVÉ</span>
+            a zjisti své šance
+        </h3>
+    </div>
+    <div class="block-col ">
+        <p>
+            Přehledná data všech středních škol a maturitních oborů v České republice. Simulátor, kam se dostanete podle výsledků zkoušek nanečisto využívá reálná data z jednotných přijímacích zkoušek.
+        </p>
+        <p>
+            <a class="btn btn-hs btn-primary my-3" href="https://www.prijimackynaskolu.cz?utm_source=HP&utm_medium=referral&utm_campaign=permanent&utm_content=box1a">
+                www.PrijimackyNaSkolu.cz
+            </a>
+        </p>
+    </div>
+
+
+
+
+    <div class="watcher__title">
+        <h3 class="new-title position-relative d-inline-block">
             <span class="text-bg-warning px-2 py-0 rounded">Příjmy</span>
             <span class="position-absolute top-0 start-0 translate-middle badge rounded-pill bg-danger" style="font-size:11px">NOVÉ</span>
             politiků, kumulace funkcí
@@ -27,14 +50,17 @@
         </p>
     </div>
 
-    <div class="watcher__title">
-        <h3 class="new-title  position-relative d-inline-block">
-            <span class="position-absolute top-0 start-0 translate-middle badge rounded-pill bg-danger" style="font-size:11px">@(HlidacStatu.Repositories.DotaceRepo.LastCompleteYear)</span>
-            <span class="text-bg-warning px-2 py-0 rounded">Dotace</span>
-            EU, státní a krajské
-            @* <span style="vertical-align:middle"><img style="height:42px;color:yellow;margin-right:1px" src="/Content/exkluzivne.svg"></span> *@
-        </h3>
-    </div>
+    @if (false)
+    {
+        <div class="watcher__title">
+            <h3 class="new-title  position-relative d-inline-block">
+                <span class="position-absolute top-0 start-0 translate-middle badge rounded-pill bg-danger" style="font-size:11px">@(HlidacStatu.Repositories.DotaceRepo.LastCompleteYear)</span>
+                <span class="text-bg-warning px-2 py-0 rounded">Dotace</span>
+                EU, státní a krajské
+                @* <span style="vertical-align:middle"><img style="height:42px;color:yellow;margin-right:1px" src="/Content/exkluzivne.svg"></span> *@
+            </h3>
+        </div>
+    }
     <div class="block-col ">
         <p>
             Jediné místo, kde najdete všechny evropské, státní a krajské dotace. A hromadu <a href="/dotace/reporty">reportů a analýz</a>.
