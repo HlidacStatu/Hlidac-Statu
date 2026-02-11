@@ -101,6 +101,8 @@ namespace HlidacStatu.Repositories.StretZajmu
                     .DistinctBy(v => v.To.Id)
                     .ToArray();
 
+                var debugVazby = aktivniVazby_dobe_platnosti.Where(v => v.To.Id == "45313351").ToArray();
+
                 int count = 0;
 
                 bool debug = false;
