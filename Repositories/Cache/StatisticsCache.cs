@@ -152,8 +152,11 @@ public class StatisticsCache
                 await semaphore.WaitAsync();
                 try
                 {
+                    var _f = await FirmaCache.GetAsync(f.Key);
+                    if (_f == null)
+                        return new StatisticsSubjectPerYear<Smlouva.Statistics.Data>(f.Key);
                     return new StatisticsSubjectPerYear<Smlouva.Statistics.Data>(f.Key,
-                        (await (await FirmaCache.GetAsync(f.Key)).StatistikaRegistruSmluvAsync(obor))
+                        (await _f.StatistikaRegistruSmluvAsync(obor))
                         .Filter(m => m.Key >= f.Value.From?.Year && m.Key <= f.Value.To?.Year)
                     );
                 }
