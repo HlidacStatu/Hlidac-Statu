@@ -1,0 +1,121 @@
+﻿@model (List<OsobaStret> strety, string nameId, string paragraf)
+
+@using HlidacStatu.DS.Graphs
+@using HlidacStatu.Entities
+@using HlidacStatu.Lib.Analytics
+@using HlidacStatu.Repositories
+@using HlidacStatu.Repositories.Analysis
+@using HlidacStatu.Repositories.StretZajmu
+@using HlidacStatu.XLib;
+
+@{
+    ViewBag.Title = "Analýza střetu zájmů dle zákona o střetu zájmů";
+    ViewBag.SubTitle = "";
+
+    var strety = Model.strety;
+    var nameId = Model.nameId;
+    var paragraf = Model.paragraf;
+
+    List<(decimal smlouvySum, long smlouvyCount, decimal dotaceSum, long dotaceCount)> stretyStats = new();
+
+
+}
+@section breadcrumb
+{
+    <ol class="breadcrumb">
+        <li><a href="/">Hlídač Státu</a></li>
+        <li class="active">@ViewBag.Title</li>
+    </ol>
+}
+
+
+<h2>Analýza střetu zájmů dle zákona o střetu zájmů dle § @paragraf</h2>
+
+<h3>Analyzované osoby</h3>
+<p>U následujících osob jsme nalezli možný střet zájmu</p>
+<ol class="list-group list-group-numbered">
+    @foreach (var personData in strety
+            .Where(m => m.Stat_SmlouvyCount + m.Stat_DotaceCount > 0)
+            .GroupBy(os => os.Osoba_with_Event.Osoba.NameId, (k, v) => new { NameId = k, osoba_strety = v }))
+    {
+        var osobaStrety = personData.osoba_strety;
+        var person = await HlidacStatu.Repositories.Cache.OsobaCache.GetPersonByNameIdAsync(personData.NameId);
+        
+        <li class="list-group-item d-flex justify-content-between align-items-start">
+            <div class="ms-2 me-auto">
+                <h4 class="fw-bold">
+                    @(person.FullNameWithYear())
+                </h4>
+
+
+                @foreach (var os in osobaStrety
+                                                            .Where(m => m.Stat_SmlouvyCount + m.Stat_DotaceCount > 0)
+                                                            .OrderByDescending(o => o.Stat_SmlouvySum + o.Stat_DotaceSum)
+                                                            .ThenByDescending(o => o.Stat_SmlouvyCount + o.Stat_DotaceCount)
+                                                            )
+                {
+                    <div class="card m-4">
+                        <div class="card-body">
+                            <h5 class="card-title">@(os.Osoba_with_Event.Event.AddInfo) - @(await HlidacStatu.Repositories.Cache.FirmaCache.GetJmenoAsync(os.Osoba_with_Event.Event.Ico))</h5>
+                            <p class="card-text">
+                                <div>
+                                    Za období <b>@(os.Stret_za_obdobi.ToNiceString(dateFormat: "d.M.yyyy", noValue: ""))</b>
+                                </div>
+                                <div>
+                                    Našli jsme celkem ve střetu:
+                                    Smlouvy  <b>@Html.Raw(HlidacStatu.Util.RenderData.NiceNumber(os.Stat_SmlouvyCount, true))</b> ks, celkem <b>@Html.Raw(HlidacStatu.Util.RenderData.ShortNicePrice(os.Stat_SmlouvySum, html: true, mena: ""))</b> Kč
+                                    ;
+                                    Dotace: <b>@Html.Raw(HlidacStatu.Util.RenderData.NiceNumber(os.Stat_DotaceCount, true))</b> ks, celkem <b>@Html.Raw(HlidacStatu.Util.RenderData.ShortNicePrice(os.Stat_DotaceSum, html: true, mena: ""))</b> Kč
+                                </div>
+                                <div>
+                                    <a class="btn btn-sm btn-primary" href="/stretzajmu/@($"{os.Id}")">Detailní informace</a>
+                                </div>
+
+                            </p>
+                        </div>
+                    </div>
+                }
+            </div>
+        </li>
+
+    }
+</ol>
+
+<p>Tyto osoby jsme zkontrolovali a možný střet zájmu nenalezli.</p>
+<ul class="list-group ">
+    @foreach (var os in strety
+                    .Where(m => m.Stat_SmlouvyCount + m.Stat_DotaceCount == 0)
+                    .OrderByDescending(o => o.Osoba_with_Event.Osoba.Prijmeni)
+                    .ThenByDescending(o => o.Osoba_with_Event.Osoba.Jmeno)
+                    )
+    {
+        <li class="list-group-item d-flex justify-content-between align-items-start">
+            <div class="ms-2 me-auto">
+                <div>
+
+                    <b>@os.Osoba_with_Event.Osoba.FullName()</b>
+                    (@(os.Osoba_with_Event.Event.AddInfo) - @(await HlidacStatu.Repositories.Cache.FirmaCache.GetJmenoAsync(os.Osoba_with_Event.Event.Ico))) )
+
+                    <small>
+                        za období <b>@(os.Stret_za_obdobi.ToNiceString(dateFormat: "d.M.yyyy", noValue: ""))</b>
+                    </small>
+                </div>
+            </div>
+        </li>
+
+    }
+</ul>
+<hr />
+
+
+<h2>Zákon o střetu zájmů dle § @paragraf</h2>
+<pre style="overflow-x: auto;white-space: pre-wrap;white-space: -moz-pre-wrap;white-space: -pre-wrap;white-space: -o-pre-wrap;word-wrap: break-word;">
+    (1) Veřejný funkcionář uvedený v § 2 odst. 1 písm. c) až m) nesmí
+    a) podnikat nebo provozovat jinou samostatnou výdělečnou činnost,
+    b) být členem statutárního orgánu, členem řídícího, dozorčího nebo kontrolního orgánu právnické osoby, která podniká (dále jen „podnikající právnická osoba“), pokud zvláštní právní předpis nestanoví jinak, nebo
+    c) být v pracovněprávním nebo obdobném vztahu nebo ve služebním poměru, nejde-li o vztah nebo poměr, v němž působí jako veřejný funkcionář.
+
+    (2) Omezení podle odstavce 1 se nevztahuje na správu vlastního majetku a na činnost vědeckou, pedagogickou, publicistickou, literární, uměleckou nebo sportovní, nejde-li o vlastní podnikání v těchto oborech.
+
+    (3) Veřejní funkcionáři uvedení v odstavci 1 jsou povinni činnosti tam uvedené ukončit bez zbytečného odkladu poté, co začali vykonávat svou funkci, nejpozději však do 30 dnů ode dne zahájení výkonu funkce. Není-li k ukončení činnosti z důvodů nezávislých na vůli veřejného funkcionáře možné dodržet lhůtu uvedenou v předchozí větě, veřejný funkcionář o této skutečnosti v dané lhůtě informuje evidenční orgán a provede současně všechna potřebná opatření směřující k ukončení činnosti. Ustanovení zvláštních právních předpisů tím nejsou dotčena4).
+</pre>

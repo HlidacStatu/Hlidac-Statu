@@ -49,7 +49,16 @@ namespace HlidacStatu.Web.Controllers
         {
             List<OsobaStret> strety = await HlidacStatu.Repositories.StretZajmu.Processor.Paragraf_4_Async();
             (List<OsobaStret> strety, string id, string paragraf) model = (strety, id, "4");
-            return View("",model);
+            if (string.IsNullOrEmpty(id))
+                return View("stretzajmu_list", model);
+            else
+            {
+                var found = model.strety.FirstOrDefault(m => m.Id.ToLower() == id.ToLower());
+                if (found == null)
+                    return View("stretzajmu_list", model);
+
+                return View("stretzajmu_detail", found) ;
+            }
         }
 
         public async Task<ActionResult> MenuPage(string? id)
