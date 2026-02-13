@@ -1,15 +1,17 @@
 ﻿using Devmasters;
+using Devmasters.Enums;
 using HlidacStatu.DS.Graphs;
 using HlidacStatu.DS.Graphs2;
+using HlidacStatu.Util;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Linq;
-using System.Text.RegularExpressions;
-using HlidacStatu.Util;
-using Devmasters.Enums;
 using System.Diagnostics.CodeAnalysis;
+using System.Linq;
+using System.Runtime.Serialization;
+using System.Text.RegularExpressions;
+using static HlidacStatu.Util.Checksum;
 
 namespace HlidacStatu.Entities
 {
@@ -134,12 +136,26 @@ namespace HlidacStatu.Entities
 
         static string cnnStr = Config.GetWebConfigValue("OldEFSqlConnection");
 
+        string _checkSum = null;
+        [CheckSumIgnore]
+        [NotMapped]
+        public string CheckSum { get { 
+                if (_checkSum == null)
+                {
+                    _checkSum = HlidacStatu.Util.Checksum.ObjectCheckSum(this);
+                }
+                return _checkSum; 
+            }
+            set => _checkSum = value; 
+        }
+
 
         [Key]
         public string ICO { get; set; }
 
         public string DIC { get; set; }
 
+        [CheckSumIgnore]
         [NotMapped]
         public string[] DatovaSchranka { get; set; } = new string[] { };
 
@@ -154,17 +170,22 @@ namespace HlidacStatu.Entities
         public string KrajId { get; set; }
         public string OkresId { get; set; }
 
+        [CheckSumIgnore]
         public short? IsInRS { get; set; }
 
         public int? Kod_PF { get; set; }
 
         // https://wwwinfo.mfcr.cz/ares/nace/ares_nace.html.cz
         [NotMapped]
+        [CheckSumIgnore]
         public string[] NACE { get; set; } = new string[] { };
 
+        [CheckSumIgnore]
         public int VersionUpdate { get; set; }
 
+        [CheckSumIgnore]
         public string Source { get; set; }
+        [CheckSumIgnore]
         public string Popis { get; set; }
         private string _jmeno = string.Empty;
 
@@ -186,6 +207,7 @@ namespace HlidacStatu.Entities
             }
         }
 
+        [CheckSumIgnore]
         public string JmenoAscii { get; set; }
 
         public int? PocetZamKod { get; set; }
@@ -197,18 +219,29 @@ namespace HlidacStatu.Entities
         public int? Ma_dluh_vzpKod { get; set; } = null;
 
 
+        [CheckSumIgnore]
         public string KodOkresu { get; set; }
+        [CheckSumIgnore]
         public string ICZUJ { get; set; }
+        [CheckSumIgnore]
         public string KODADM { get; set; }
+        [CheckSumIgnore]
         public string Adresa { get; set; }
+        [CheckSumIgnore]
         public string PSC { get; set; }
+        [CheckSumIgnore]
         public string Obec { get; set; }
+        [CheckSumIgnore]
         public string CastObce { get; set; }
+        [CheckSumIgnore]
         public string Ulice { get; set; }
+        [CheckSumIgnore]
         public string CisloDomu { get; set; }
+        [CheckSumIgnore]
         public string CisloOrientacni { get; set; }
 
 
+        [CheckSumIgnore]
         [NotMapped]
         public TypSubjektuEnum TypSubjektu
         {
@@ -314,9 +347,11 @@ namespace HlidacStatu.Entities
 
         bool? _valid = null;
 
-        
+
+        [CheckSumIgnore]
         public bool ValidIC { get; set; }
 
+        [CheckSumIgnore]
         [NotMapped]
         public bool Valid { get => this.ValidIC; }
 
@@ -398,7 +433,7 @@ namespace HlidacStatu.Entities
             .Select(m=> Devmasters.TextUtil.RemoveAccents(m).Trim().ToLower())
             .Distinct()
             .ToArray();
-
+        private string checkSum;
 
         public static string NormalizedKoncovka(string koncovka)
         {

@@ -47,9 +47,9 @@ namespace HlidacStatu.Web.Controllers
         [Authorize(Roles = "Admin")]
         public async Task<ActionResult> StretZajmu(string id, string paragraf)
         {
-            List<OsobaStret> strety = await HlidacStatu.Repositories.StretZajmu.Processor.Paragraf_4_Async(false);
+            List<OsobaStret> strety = await HlidacStatu.Repositories.StretZajmu.Processor.Paragraf_4_Async();
             (List<OsobaStret> strety, string id, string paragraf) model = (strety, id, "4");
-            return View(model);
+            return View("",model);
         }
 
         public async Task<ActionResult> MenuPage(string? id)

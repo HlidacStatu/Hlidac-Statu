@@ -36,7 +36,7 @@ namespace HlidacStatu.Repositories.StretZajmu
 
             var res = await PermanentCache.GetOrSetAsync(key,
                 async _ => await _generate_paragraf_4_Async(),
-                options => options.ModifyEntryOptionsDuration(TimeSpan.FromDays(10 * 365), TimeSpan.FromDays(10 * 365))
+                options => options.ModifyEntryOptionsDuration(TimeSpan.FromHours(1), TimeSpan.FromDays(10 * 365))
             );
             return res;
         }
