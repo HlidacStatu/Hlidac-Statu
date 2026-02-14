@@ -32,15 +32,15 @@
         .ThenBy(o => o)
         )
         {
-            <h3>@g</h3>
+            <h3 class="mt-5">@g</h3>
             <div>
                 @foreach (Firma.Zatrideni.SubjektyObory item in Devmasters.Enums.EnumTools.InGroup(typeof(Firma.Zatrideni.SubjektyObory), g, true))
                 {
                     if (skip.Contains(item.ToString()) == false)
                     {
-                        <a href="/adresar/@(item.ToString())@(Model.zakazky ? "?vz=1":"")" class="btn btn-hs btn-secondary">
-                            <span class="text-gray">Zobrazit</span> @(item.ToNiceDisplayName())
-                            <span class="text-gray">(@((await FirmaCache.GetSubjektyForOborAsync(item))?.Length ?? 0))</span>
+                        <a href="/adresar/@(item.ToString())@(Model.zakazky ? "?vz=1":"")" class="btn btn-outline-primary m-1">
+                            <span class="text-muted">Zobrazit</span> @(item.ToNiceDisplayName())
+                            <span class="text-muted">(@((await FirmaCache.GetSubjektyForOborAsync(item))?.Length ?? 0))</span>
                         </a>
                     }
                 }
@@ -52,7 +52,7 @@
                                 <option value="">(vyberte kraj)</option>
                                 @Html.Raw(HlidacStatu.Util.CZ_Nuts.Kraje.OrderBy(k => k.Value).Select(k => $"<option value='{k.Value}'>{k.Value}</option>").Aggregate((f, s) => f + s))
                             </select>
-                            <button type="submit" name="specialtype" value="mestavkraji" class="btn btn-hs btn-secondary"><span class="text-gray">Zobrazit</span> města v kraji</button>
+                            <button type="submit" name="specialtype" value="mestavkraji" class="btn btn-outline-primary m-1"><span class="text-muted">Zobrazit</span> města v kraji</button>
                         </form>
                     </div>
 

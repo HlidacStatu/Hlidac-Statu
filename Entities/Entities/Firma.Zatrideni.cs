@@ -196,25 +196,25 @@ namespace HlidacStatu.Entities
 
 
                 //pokud je ID > 100_000, pak hodnota ve stovkach odpovida hodnote KOXXX z OrganVerejneMoci_KategorieList
-                [GroupValue("OVM_Soukromé")]
+                [GroupValue("Soukromé se úředním výkonem")]
                 [NiceDisplayName("Soudní exekutoři")]
                 Soudni_exekutori = 100118,
-                [GroupValue("OVM_Soukromé")]
+                [GroupValue("Soukromé se úředním výkonem")]
                 [NiceDisplayName("Notáři")]
                 Notari = 100155,
-                [GroupValue("OVM_Soukromé")]
+                [GroupValue("Soukromé se úředním výkonem")]
                 [NiceDisplayName("Soukromé vysoké školy")]
                 Soukrome_vysoke_skoly = 100505,
-                [GroupValue("OVM_Soukromé")]
+                [GroupValue("Soukromé se úředním výkonem")]
                 [NiceDisplayName("Profesní komory")]
                 Profesni_komory = 100520,
-                [GroupValue("OVM_Soukromé")]
+                [GroupValue("Soukromé se úředním výkonem")]
                 [NiceDisplayName("Insolvenční správci fyz.osoby")]
                 Insolvencni_spravci_fyzicke_osoby = 100537,
-                [GroupValue("OVM_Soukromé")]
+                [GroupValue("Soukromé se úředním výkonem")]
                 [NiceDisplayName("Insolvenční správci právnické osoby")]
                 Insolvencni_spravci_pravnicke_osoby = 100538,
-                [GroupValue("OVM_Soukromé")]
+                [GroupValue("Soukromé se úředním výkonem")]
                 [NiceDisplayName("Soukromé archivy")]
                 Soukrome_archivy = 100542,
 

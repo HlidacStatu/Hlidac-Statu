@@ -47,7 +47,7 @@ public static class FirmaCache
         PostgreCache.ExpireAsync($"_Rizika:{f.ICO}-{rok}");
 
     public static ValueTask<Firma.Zatrideni.Item[]> GetSubjektyForOborAsync(Firma.Zatrideni.SubjektyObory obor) =>
-        MemcachedCache.GetOrSetAsync($"_SubjektyForObor:{obor:G}",
+        MemcachedCache.GetOrSetAsync($"_V2_SubjektyForObor:{obor:G}",
             _ => FirmaRepo.Zatrideni.GetSubjektyDirectAsync(obor),
             options => options.ModifyEntryOptionsDuration(TimeSpan.FromHours(6))
         );

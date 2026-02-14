@@ -648,17 +648,17 @@ and (esa2010 in (" + string.Join(",", vzdySoukr_ESA2010.Select(m => $"'{m}'")) +
 
             List<string[]> batch = bagOfIco.Chunk(500).ToList();
             _logger.Information("Setting statni firmy ...");
-            Devmasters.Batch.Manager.DoActionForAll<IEnumerable<string>>(batch,
-                (icob) =>
+            await Devmasters.Batch.Manager.DoActionForAllAsync<IEnumerable<string>>(batch,
+                async (icob) =>
                 {
                     string icos = string.Join(",", icob.Select(i => $"'{i}'"));
                     string sql = $"update firma set typ={((int)(TypSubjektuEnum.PatrimStatu))} where ico in ({icos})";
-                    DirectDB.Instance.NoResult(sql);
+                    await DirectDB.Instance.NoResultAsync(sql);
 
                     return new Devmasters.Batch.ActionOutputData();
                 }, outputWriter, progressWriter,
                 !System.Diagnostics.Debugger.IsAttached, prefix: "UpdateFirmyWithTyp STATNI",
-                monitor: new MonitoredTaskRepo.ForBatch()
+                monitor: new MonitoredTaskRepo.ForBatchAsync()
             );
 
             batch.Clear();
@@ -666,17 +666,17 @@ and (esa2010 in (" + string.Join(",", vzdySoukr_ESA2010.Select(m => $"'{m}'")) +
                 .Where(m => ovm_nikdyStatni.Contains(m) == false)
                 .Chunk(500).ToList();
             _logger.Information("Setting OVM typ...");
-            Devmasters.Batch.Manager.DoActionForAll<IEnumerable<string>>(batch,
-                (icob) =>
+            await Devmasters.Batch.Manager.DoActionForAllAsync<IEnumerable<string>>(batch,
+                async(icob) =>
                 {
                     string icos = string.Join(",", icob.Select(i => $"'{i}'"));
                     string sql = $"update firma set typ={((int)(TypSubjektuEnum.Ovm))} where ico in ({icos})";
-                    DirectDB.Instance.NoResult(sql);
+                    await DirectDB.Instance.NoResultAsync(sql);
 
                     return new Devmasters.Batch.ActionOutputData();
                 }, outputWriter, progressWriter,
                 !System.Diagnostics.Debugger.IsAttached, prefix: "UpdateFirmyWithTyp OVM",
-                monitor: new MonitoredTaskRepo.ForBatch()
+                monitor: new MonitoredTaskRepo.ForBatchAsync()
             );
 
             //obce
@@ -687,17 +687,17 @@ and (esa2010 in (" + string.Join(",", vzdySoukr_ESA2010.Select(m => $"'{m}'")) +
             batch = (await DirectDB.Instance.GetListAsync<string>(sqlObce)
                 ).Chunk(500).ToList();
             _logger.Information("Setting OBCE typ...");
-            Devmasters.Batch.Manager.DoActionForAll<IEnumerable<string>>(batch,
-                (icob) =>
+            await Devmasters.Batch.Manager.DoActionForAllAsync<IEnumerable<string>>(batch,
+                async (icob) =>
                 {
                     string icos = string.Join(",", icob.Select(i => $"'{i}'"));
                     string sql = $"update firma set typ={((int)(TypSubjektuEnum.Obec))} where ico in ({icos})";
-                    DirectDB.Instance.NoResult(sql);
+                    await DirectDB.Instance.NoResultAsync(sql);
 
                     return new Devmasters.Batch.ActionOutputData();
                 }, outputWriter, progressWriter,
                 !System.Diagnostics.Debugger.IsAttached, prefix: "UpdateFirmyWithTyp OBCE",
-                monitor: new MonitoredTaskRepo.ForBatch()
+                monitor: new MonitoredTaskRepo.ForBatchAsync()
             );
 
             //insolvencni spravci
@@ -708,35 +708,35 @@ and (esa2010 in (" + string.Join(",", vzdySoukr_ESA2010.Select(m => $"'{m}'")) +
                     .Insolvencni_spravci_pravnicke_osoby))
                 .Chunk(500).ToList();
             _logger.Information("Setting INSOLVENCNI SPRAVCI typ...");
-            Devmasters.Batch.Manager.DoActionForAll<IEnumerable<string>>(batch,
-                (icob) =>
+            await Devmasters.Batch.Manager.DoActionForAllAsync<IEnumerable<string>>(batch,
+                async (icob) =>
                 {
                     string icos = string.Join(",", icob.Select(i => $"'{i}'"));
                     string sql =
                         $"update firma set typ={((int)(TypSubjektuEnum.InsolvecniSpravce))} where ico in ({icos})";
-                    DirectDB.Instance.NoResult(sql);
+                    await DirectDB.Instance.NoResultAsync(sql);
 
                     return new Devmasters.Batch.ActionOutputData();
                 }, outputWriter, progressWriter,
                 !System.Diagnostics.Debugger.IsAttached, prefix: "UpdateFirmyWithTyp insolvecni spravci",
-                monitor: new MonitoredTaskRepo.ForBatch()
+                monitor: new MonitoredTaskRepo.ForBatchAsync()
             );
             //exekutori
             batch.Clear();
             batch = (await FirmaRepo.Zatrideni.GetIcoDirectAsync(Zatrideni.SubjektyObory.Soudni_exekutori))
                 .Chunk(500).ToList();
             _logger.Information("Setting EXEKUTOR typ...");
-            Devmasters.Batch.Manager.DoActionForAll<IEnumerable<string>>(batch,
-                (icob) =>
+            await Devmasters.Batch.Manager.DoActionForAllAsync<IEnumerable<string>>(batch,
+                async (icob) =>
                 {
                     string icos = string.Join(",", icob.Select(i => $"'{i}'"));
                     string sql = $"update firma set typ={((int)(TypSubjektuEnum.Exekutor))} where ico in ({icos})";
-                   DirectDB.Instance.NoResult(sql);
+                   await DirectDB.Instance.NoResultAsync(sql);
 
                     return new Devmasters.Batch.ActionOutputData();
                 }, outputWriter, progressWriter,
                 !System.Diagnostics.Debugger.IsAttached, prefix: "UpdateFirmyWithTyp exekutor",
-                monitor: new MonitoredTaskRepo.ForBatch()
+                monitor: new MonitoredTaskRepo.ForBatchAsync()
             );
 
             _logger.Information("Done updating statni firmy.");
