@@ -41,7 +41,7 @@ namespace HlidacStatu.Entities
 
         public static Func<Firma, bool> SoukromySubjektPredicate => (f) => f is not null && f.Typ <= (int)TypSubjektuEnum.Soukromy;
         public static Func<Firma, bool> StatniFirmaPredicate => (f) => (f is not null && f.Typ == (int)TypSubjektuEnum.PatrimStatu);
-        public static Func<Firma, bool> PatrimStatuPredicate => (f) => (f is not null && f.Typ >= (int)TypSubjektuEnum.PatrimStatu );
+        public static Func<Firma, bool> PatrimStatuPredicate => (f) => (f is not null && f.Typ >= (int)TypSubjektuEnum.PatrimStatu);
         public static Func<Firma, bool> OVMSubjektPredicate => (f) => (f is not null && f.Typ >= (int)TypSubjektuEnum.Ovm);
 
 
@@ -136,17 +136,20 @@ namespace HlidacStatu.Entities
 
         static string cnnStr = Config.GetWebConfigValue("OldEFSqlConnection");
 
-        string _checkSum = null;
+        string _crc = null;
         [CheckSumIgnore]
-        [NotMapped]
-        public string CheckSum { get { 
-                if (_checkSum == null)
+        [StringLength(66)]
+        public string CRC
+        {
+            get
+            {
+                if (_crc == null)
                 {
-                    _checkSum = HlidacStatu.Util.Checksum.ObjectCheckSum(this);
+                    _crc = HlidacStatu.Util.Checksum.ObjectCheckSum(this);
                 }
-                return _checkSum; 
+                return _crc;
             }
-            set => _checkSum = value; 
+            set => _crc = value;
         }
 
 
@@ -191,7 +194,8 @@ namespace HlidacStatu.Entities
 
         public string Jmeno
         {
-            get {
+            get
+            {
                 if (string.IsNullOrEmpty(_jmeno))
                 {
                     return this.ICO;
@@ -318,8 +322,8 @@ namespace HlidacStatu.Entities
         public Graph.Edge[] _parentVazbyOsoby = null;
 
         //Napojení na graf
-        public Dictionary<Relation.CharakterVazbyEnum, UnweightedGraph> _graphs = new ();
-        public Dictionary<Relation.CharakterVazbyEnum, Vertex<string>> _graphStartingVertexs = new ();
+        public Dictionary<Relation.CharakterVazbyEnum, UnweightedGraph> _graphs = new();
+        public Dictionary<Relation.CharakterVazbyEnum, Vertex<string>> _graphStartingVertexs = new();
 
         public UnweightedGraph _getGraph(Relation.CharakterVazbyEnum charakter)
         {
@@ -330,7 +334,7 @@ namespace HlidacStatu.Entities
         }
         public void _setGraph(Relation.CharakterVazbyEnum charakter, UnweightedGraph graph)
         {
-               _graphs[charakter] = graph;
+            _graphs[charakter] = graph;
         }
 
         public Vertex<string> _getStartingVertext(Relation.CharakterVazbyEnum charakter)
@@ -429,8 +433,8 @@ namespace HlidacStatu.Entities
             .Distinct()
             .ToArray();
         public static string[] KoncovkyAscii = _koncovky
-            .SelectMany(k =>  k.Value)
-            .Select(m=> Devmasters.TextUtil.RemoveAccents(m).Trim().ToLower())
+            .SelectMany(k => k.Value)
+            .Select(m => Devmasters.TextUtil.RemoveAccents(m).Trim().ToLower())
             .Distinct()
             .ToArray();
         private string checkSum;
@@ -439,7 +443,7 @@ namespace HlidacStatu.Entities
         {
             return _koncovky.FirstOrDefault(kvp => kvp.Value.Contains(koncovka)).Key;
         }
-        
+
         public static string JmenoBezKoncovky(string name)
         {
             string ret;
@@ -451,7 +455,7 @@ namespace HlidacStatu.Entities
         }
         public static string JmenoBezKoncovkyFull(string name, out string koncovka)
         {
-            return _jmenoBezKoncovkyFull(Koncovky,name, out koncovka);
+            return _jmenoBezKoncovkyFull(Koncovky, name, out koncovka);
         }
         private static string _jmenoBezKoncovkyFull(string[] koncovky, string name, out string koncovka)
         {
@@ -540,9 +544,9 @@ namespace HlidacStatu.Entities
         {
             return Jmeno;
         }
-        }
+    }
 
-    public  class FirmaByIcoComparer : IEqualityComparer<Firma>
+    public class FirmaByIcoComparer : IEqualityComparer<Firma>
     {
         public bool Equals(Firma x, Firma y)
         {

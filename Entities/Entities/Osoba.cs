@@ -64,5 +64,6 @@ namespace HlidacStatu.Entities
         [StringLength(20)]
         public string WikiId { get; set; }
         public int? OriginalId { get; set; }
+
     }
 }
