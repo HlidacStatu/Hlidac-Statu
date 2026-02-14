@@ -232,7 +232,7 @@ namespace HlidacStatu.Repositories
                         {
                             var f = await FirmaCache.GetAsync(ic);
 
-                            if (f.PatrimStatu())
+                            if (true || f.PatrimStatu()) // TODO
                             {
                                 lock (_getSubjektyDirectLock)
                                 {
