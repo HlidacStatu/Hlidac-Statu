@@ -49,7 +49,7 @@ public static class FirmaCache
     public static ValueTask<Firma.Zatrideni.Item[]> GetSubjektyForOborAsync(Firma.Zatrideni.SubjektyObory obor) =>
         MemcachedCache.GetOrSetAsync($"_SubjektyForObor:{obor:G}",
             _ => FirmaRepo.Zatrideni.GetSubjektyDirectAsync(obor),
-            options => options.ModifyEntryOptionsDuration(TimeSpan.FromDays(1))
+            options => options.ModifyEntryOptionsDuration(TimeSpan.FromHours(6))
         );
 
     public static async Task<Firma[]> MinisterstvaAsync() =>
