@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using Devmasters.Collections;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace HlidacStatu.DS.Graphs2
@@ -7,10 +8,10 @@ namespace HlidacStatu.DS.Graphs2
     {
         public UnweightedGraph(IEnumerable<IVertex> initialNodes = null)
         {
-            Vertices = initialNodes?.ToHashSet() ?? new HashSet<IVertex>();
+            Vertices = initialNodes?.ToConcurrentHashSet() ?? new Devmasters.Collections.ConcurrentHashSet<IVertex>();
         }
 
-        public HashSet<IVertex> Vertices { get; }
+        public Devmasters.Collections.ConcurrentHashSet<IVertex> Vertices { get; }
         public IEnumerable<IEdge> Edges { get => Vertices.SelectMany(v => v.OutgoingEdges); }
 
         /// <summary>
