@@ -166,6 +166,8 @@ namespace HlidacStatu.Entities
         public DateTime? DatumZaniku { get; set; }
         public byte? Stav_subjektu { get; set; }
         public int? Status { get; set; }
+
+        [CheckSumIgnore]
         public int? Typ { get; set; }
 
         public string ESA2010 { get; set; }
