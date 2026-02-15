@@ -29,57 +29,56 @@
 }
 
 @* Header - person profile *@
-<div class="d-flex align-items-center mb-3">
+<div class="d-flex align-items-center mb-4">
     @if (osoba.HasPhoto())
     {
-        <img src="@osoba.GetPhotoUrl()" alt="@osoba.FullName()" style="width:80px;height:80px;border-radius:50%;object-fit:cover;margin-right:24px" />
+        <img src="@osoba.GetPhotoUrl()" alt="@osoba.FullName()"
+             class="rounded-circle me-3" style="width:72px;height:72px;object-fit:cover" />
     }
     <div>
-        <h2 class="new-title" style="margin-bottom:4px">
-            <a href="/osoba/@osoba.NameId">@osoba.FullNameWithYear()</a>
+        <h2 class="mb-1">
+            <a href="/osoba/@osoba.NameId" class="text-decoration-none">@osoba.FullNameWithYear()</a>
         </h2>
-        <div style="font-size:18px;color:#818C99">
+        <p class="text-muted mb-0">
             @Model.Osoba_with_Event.Event.AddInfo &ndash; @firmaJmeno
-        </div>
-        <div class="mt-1">
+        </p>
+        <p class="mb-0">
             Období střetu: <b>@(Model.Stret_za_obdobi.ToNiceString(dateFormat: "d.M.yyyy", noValue: ""))</b>
-        </div>
+        </p>
     </div>
 </div>
 
-@* Summary stats - 4 watcher-blocks *@
-<div class="watcher-blocks mb-4">
-    <div class="watcher-blocks__wrapper">
-        <div class="watcher-block">
-            <div class="watcher__title">
-                <h3 class="new-title">@Html.Raw(HlidacStatu.Util.RenderData.NiceNumber(Model.Stat_SmlouvyCount, true))</h3>
-            </div>
-            <div class="block-col">
-                <p>smluv ve střetu</p>
+@* Summary stats *@
+<div class="row g-3 mb-4">
+    <div class="col-md-3 col-sm-6">
+        <div class="card text-center">
+            <div class="card-body py-3">
+                <h4 class="card-title mb-1">@Html.Raw(HlidacStatu.Util.RenderData.NiceNumber(Model.Stat_SmlouvyCount, true))</h4>
+                <small class="text-muted">smluv ve střetu</small>
             </div>
         </div>
-        <div class="watcher-block">
-            <div class="watcher__title">
-                <h3 class="new-title">@Html.Raw(HlidacStatu.Util.RenderData.ShortNicePrice(Model.Stat_SmlouvySum, html: true, mena: "")) Kč</h3>
-            </div>
-            <div class="block-col">
-                <p>hodnota smluv celkem</p>
-            </div>
-        </div>
-        <div class="watcher-block">
-            <div class="watcher__title">
-                <h3 class="new-title">@Html.Raw(HlidacStatu.Util.RenderData.NiceNumber(Model.Stat_DotaceCount, true))</h3>
-            </div>
-            <div class="block-col">
-                <p>dotací ve střetu</p>
+    </div>
+    <div class="col-md-3 col-sm-6">
+        <div class="card text-center">
+            <div class="card-body py-3">
+                <h4 class="card-title mb-1">@Html.Raw(HlidacStatu.Util.RenderData.ShortNicePrice(Model.Stat_SmlouvySum, html: true, mena: "")) Kč</h4>
+                <small class="text-muted">hodnota smluv celkem</small>
             </div>
         </div>
-        <div class="watcher-block">
-            <div class="watcher__title">
-                <h3 class="new-title">@Html.Raw(HlidacStatu.Util.RenderData.ShortNicePrice(Model.Stat_DotaceSum, html: true, mena: "")) Kč</h3>
+    </div>
+    <div class="col-md-3 col-sm-6">
+        <div class="card text-center">
+            <div class="card-body py-3">
+                <h4 class="card-title mb-1">@Html.Raw(HlidacStatu.Util.RenderData.NiceNumber(Model.Stat_DotaceCount, true))</h4>
+                <small class="text-muted">dotací ve střetu</small>
             </div>
-            <div class="block-col">
-                <p>hodnota dotací celkem</p>
+        </div>
+    </div>
+    <div class="col-md-3 col-sm-6">
+        <div class="card text-center">
+            <div class="card-body py-3">
+                <h4 class="card-title mb-1">@Html.Raw(HlidacStatu.Util.RenderData.ShortNicePrice(Model.Stat_DotaceSum, html: true, mena: "")) Kč</h4>
+                <small class="text-muted">hodnota dotací celkem</small>
             </div>
         </div>
     </div>
@@ -115,81 +114,65 @@
         continue;
     }
 
-    <div class="watcher-blocks mb-3">
-        <div class="watcher-blocks__wrapper">
-            <div class="watcher-block" style="max-width:100%;width:100%">
-                <div class="watcher__title">
-                    <h3 class="new-title" style="font-size:24px;line-height:32px">
-                        <a href="/subjekt/@item.Firma.ICO">@item.Firma.Jmeno</a>
-                    </h3>
-                </div>
-                <div class="block-col mb-2">
-                    <div><small class="text-muted">IČO: @item.Firma.ICO</small></div>
-                    <div style="font-size:14px">Vazba: @Html.Raw(svazba)</div>
-                    <div>Období střetu: <b>@(item.Za_obdobi.ToNiceString(dateFormat: "d.M.yyyy", noValue: ""))</b></div>
-                </div>
+    <div class="card mb-3">
+        <div class="card-header">
+            <h4 class="mb-0">
+                <a href="/subjekt/@item.Firma.ICO" class="text-decoration-none">@item.Firma.Jmeno</a>
+                <small class="text-muted ms-2">IČO: @item.Firma.ICO</small>
+            </h4>
+        </div>
+        <div class="card-body">
+            <p class="mb-1"><small>Vazba: @Html.Raw(svazba)</small></p>
+            <p class="mb-3">Období střetu: <b>@(item.Za_obdobi.ToNiceString(dateFormat: "d.M.yyyy", noValue: ""))</b></p>
 
-                <div class="row">
-                    <div class="col-md-6">
-                        <h4 style="font-size:16px;font-weight:700">Smlouvy</h4>
-                        <div class="table-new table-new--dotted">
-                            <table>
-                                <tr>
-                                    <td>Počet</td>
-                                    <td class="text-end">@Html.Raw(HlidacStatu.Util.RenderData.NiceNumber(smlouvySummary.PocetSmluv, true))</td>
-                                </tr>
-                                <tr>
-                                    <td>Celková hodnota</td>
-                                    <td class="text-end text-nowrap">@Html.Raw(HlidacStatu.Util.RenderData.ShortNicePrice(smlouvySummary.CelkovaHodnotaSmluv, html: true, mena: "")) Kč</td>
-                                </tr>
-                            </table>
-                        </div>
-                        @if (smlouvySummary.PocetSmluv > 0)
-                        {
-                            <div class="mt-2">
-                                <a class="btn btn-hs btn-primary btn-sm" href="@customUrlSmlouvy" style="padding:0 16px;line-height:32px">
-                                    Zobrazit smlouvy
-                                </a>
-                            </div>
-                        }
-                    </div>
-                    <div class="col-md-6">
-                        <h4 style="font-size:16px;font-weight:700">Dotace</h4>
-                        <div class="table-new table-new--dotted">
-                            <table>
-                                <tr>
-                                    <td>Počet</td>
-                                    <td class="text-end">@Html.Raw(HlidacStatu.Util.RenderData.NiceNumber(dotaceSummary.PocetDotaci, true))</td>
-                                </tr>
-                                <tr>
-                                    <td>Celkem přiděleno</td>
-                                    <td class="text-end text-nowrap">@Html.Raw(HlidacStatu.Util.RenderData.ShortNicePrice(dotaceSummary.CelkemPrideleno, html: true, mena: "")) Kč</td>
-                                </tr>
-                            </table>
-                        </div>
-                        @if (dotaceSummary.PocetDotaci > 0)
-                        {
-                            <div class="mt-2">
-                                <a class="btn btn-hs btn-primary btn-sm" href="@customUrlDotace" style="padding:0 16px;line-height:32px">
-                                    Zobrazit dotace
-                                </a>
-                            </div>
-                        }
-                    </div>
+            <div class="row">
+                <div class="col-md-6 mb-3 mb-md-0">
+                    <h5>Smlouvy</h5>
+                    <table class="table table-sm table-bordered mb-2">
+                        <tr>
+                            <td>Počet</td>
+                            <td class="text-end fw-bold">@Html.Raw(HlidacStatu.Util.RenderData.NiceNumber(smlouvySummary.PocetSmluv, true))</td>
+                        </tr>
+                        <tr>
+                            <td>Celková hodnota</td>
+                            <td class="text-end fw-bold text-nowrap">@Html.Raw(HlidacStatu.Util.RenderData.ShortNicePrice(smlouvySummary.CelkovaHodnotaSmluv, html: true, mena: "")) Kč</td>
+                        </tr>
+                    </table>
+                    @if (smlouvySummary.PocetSmluv > 0)
+                    {
+                        <a class="btn btn-primary btn-sm" href="@customUrlSmlouvy">Zobrazit smlouvy</a>
+                    }
+                </div>
+                <div class="col-md-6">
+                    <h5>Dotace</h5>
+                    <table class="table table-sm table-bordered mb-2">
+                        <tr>
+                            <td>Počet</td>
+                            <td class="text-end fw-bold">@Html.Raw(HlidacStatu.Util.RenderData.NiceNumber(dotaceSummary.PocetDotaci, true))</td>
+                        </tr>
+                        <tr>
+                            <td>Celkem přiděleno</td>
+                            <td class="text-end fw-bold text-nowrap">@Html.Raw(HlidacStatu.Util.RenderData.ShortNicePrice(dotaceSummary.CelkemPrideleno, html: true, mena: "")) Kč</td>
+                        </tr>
+                    </table>
+                    @if (dotaceSummary.PocetDotaci > 0)
+                    {
+                        <a class="btn btn-primary btn-sm" href="@customUrlDotace">Zobrazit dotace</a>
+                    }
                 </div>
             </div>
         </div>
     </div>
-
-    <hr />
 }
 
 @* Law text - collapsible *@
 <div class="mt-4">
-    <a class="btn btn-hs btn-secondary btn-sm" data-bs-toggle="collapse" href="#lawTextSection" role="button" aria-expanded="false" aria-controls="lawTextSection">
-        Zákon o střetu zájmů dle § @paragraf
-    </a>
-    <div class="collapse mt-3" id="lawTextSection">
+    <p>
+        <a class="btn btn-outline-secondary btn-sm" data-bs-toggle="collapse" href="#lawTextSection" role="button" aria-expanded="false" aria-controls="lawTextSection">
+            Zákon o střetu zájmů dle § @paragraf
+        </a>
+    </p>
+    <div class="collapse" id="lawTextSection">
         <div class="alert alert-info" style="white-space:pre-wrap">
 (1) Veřejný funkcionář uvedený v § 2 odst. 1 písm. c) až m) nesmí
 a) podnikat nebo provozovat jinou samostatnou výdělečnou činnost,
