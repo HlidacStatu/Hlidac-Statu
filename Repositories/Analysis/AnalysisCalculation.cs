@@ -291,7 +291,7 @@ namespace HlidacStatu.Repositories.Analysis
                         if (!string.IsNullOrEmpty(objednatelIco))
                         {
                             Firma ff = await FirmaCache.GetAsync(objednatelIco);
-                            if (!ff.Valid || !ff.PatrimStatu())
+                            if (ff == null || !ff.PatrimStatu())
                                 goto end;
 
                             //vsichni prijemci smlouvy statniho subjektu
