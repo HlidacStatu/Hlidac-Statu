@@ -42,7 +42,7 @@ namespace HlidacStatu.Repositories
         private static IFusionCache MemcachedCache =>
             HlidacStatu.Caching.CacheFactory.CreateNew(CacheFactory.CacheType.L2Memcache, nameof(Graph));
 
-        const string vazbyCacheVersion = "V2";
+        const string vazbyCacheVersion = "V3";
 
         private static string GetVsechnyDcerineVazbyOsobaKey(string nameId,
             Relation.CharakterVazbyEnum charakterVazbyEnum) =>

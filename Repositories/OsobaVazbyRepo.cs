@@ -291,14 +291,19 @@ namespace HlidacStatu.Repositories
 
         public static async Task<HlidacStatu.DS.Graphs.Graph.Edge[]> VazbyProIcoCachedAsync(Osoba osoba,
             Relation.CharakterVazbyEnum charakterVazby, 
-            string ico)
+            string ico, bool refresh = false)
         {
             if (osoba is null || string.IsNullOrWhiteSpace(ico))
             {
                 return [];
             }
+            string key = $"_VazbyOsobaProIcoCache:{osoba.NameId}_{ico}_{charakterVazby.ToString()}";
+            if (refresh)
+            {
+                await MemoryCache.RemoveAsync(key);
+            }
 
-            return await MemoryCache.GetOrSetAsync($"_VazbyOsobaProIcoCache:{osoba.NameId}_{ico}_{charakterVazby.ToString()}",
+            return await MemoryCache.GetOrSetAsync(key,
                 _ => osoba._vazbyProICOAsync(ico, charakterVazby),
                 options => options.ModifyEntryOptionsDuration(TimeSpan.FromHours(2)));
         }
