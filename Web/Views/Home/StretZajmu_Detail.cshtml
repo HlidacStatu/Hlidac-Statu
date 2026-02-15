@@ -1,4 +1,4 @@
-﻿@model OsobaStret
+@model OsobaStret
 
 @using HlidacStatu.DS.Graphs
 @using HlidacStatu.Entities
@@ -9,7 +9,6 @@
 @using HlidacStatu.XLib;
 
 @{
-
     OsobaStret strety = Model;
     var osoba = Model.Osoba_with_Event.Osoba;
     var paragraf = "4";
@@ -17,93 +16,189 @@
     ViewBag.Title = osoba.FullName() + " - analýza střetu zájmů dle zákona o střetu zájmů";
     ViewBag.SubTitle = "";
 
-
+    var firmaJmeno = await HlidacStatu.Repositories.Cache.FirmaCache.GetJmenoAsync(Model.Osoba_with_Event.Event.Ico);
 }
+
 @section breadcrumb
 {
     <ol class="breadcrumb">
         <li><a href="/">Hlídač Státu</a></li>
         <li><a href="/stretzajmu">Střet zájmů</a></li>
-        <li class="active">@ViewBag.Title</li>
+        <li class="active">@osoba.FullName()</li>
     </ol>
 }
 
-<h2>Analýza střetu zájmů dle zákona o střetu zájmů dle § @paragraf</h2>
-
-<h3>@osoba.FullNameWithYear()</h3>
-<p>
-    (@(Model.Osoba_with_Event.Event.AddInfo) - @(await HlidacStatu.Repositories.Cache.FirmaCache.GetJmenoAsync(Model.Osoba_with_Event.Event.Ico)))
-</p>
-<p>
-    Za období <b>@(Model.Stret_za_obdobi.ToNiceString(dateFormat: "d.M.yyyy", noValue: ""))</b>
-</p>
-<p>
-    Našli jsme celkem ve střetu:
-    Smlouvy  <b>@Html.Raw(HlidacStatu.Util.RenderData.NiceNumber(Model.Stat_SmlouvyCount, true))</b> ks, celkem <b>@Html.Raw(HlidacStatu.Util.RenderData.ShortNicePrice(Model.Stat_SmlouvySum, html: true, mena: ""))</b> Kč
-    ;
-    Dotace: <b>@Html.Raw(HlidacStatu.Util.RenderData.NiceNumber(Model.Stat_DotaceCount, true))</b> ks, celkem <b>@Html.Raw(HlidacStatu.Util.RenderData.ShortNicePrice(Model.Stat_DotaceSum, html: true, mena: ""))</b> Kč
-</p>
-
-
-<hr />
-<ol class="list-group list-group-numbered">
-
-    @foreach (var item in Model.Strety
-                            .OrderByDescending(o => o.DotaceStat.Summary().CelkemPrideleno + o.SmlouvyStat.Summary().CelkovaHodnotaSmluv)
-                            .ThenByDescending(o => o.DotaceStat.Summary().PocetDotaci + o.SmlouvyStat.Summary().PocetSmluv)
-                            )
+@* Header - person profile *@
+<div class="d-flex align-items-center mb-3">
+    @if (osoba.HasPhoto())
     {
-        var vazbyPerIco = await OsobaVazbyRepo.VazbyProIcoCachedAsync(Model.Osoba_with_Event.Osoba, Relation.CharakterVazbyEnum.VlastnictviKontrola, item.Firma.ICO);
+        <img src="@osoba.GetPhotoUrl()" alt="@osoba.FullName()" style="width:80px;height:80px;border-radius:50%;object-fit:cover;margin-right:24px" />
+    }
+    <div>
+        <h2 class="new-title" style="margin-bottom:4px">
+            <a href="/osoba/@osoba.NameId">@osoba.FullNameWithYear()</a>
+        </h2>
+        <div style="font-size:18px;color:#818C99">
+            @Model.Osoba_with_Event.Event.AddInfo &ndash; @firmaJmeno
+        </div>
+        <div class="mt-1">
+            Období střetu: <b>@(Model.Stret_za_obdobi.ToNiceString(dateFormat: "d.M.yyyy", noValue: ""))</b>
+        </div>
+    </div>
+</div>
 
-        string iOd = item.Za_obdobi.From?.ToString("yyyy-MM-dd") ?? "*";
-        string iDo = item.Za_obdobi.To?.ToString("yyyy-MM-dd") ?? "*";
-        string querySmlouvy = $"ico:{item.Firma.ICO} AND podepsano:[{iOd} TO {iDo}] ";
+@* Summary stats - 4 watcher-blocks *@
+<div class="watcher-blocks mb-4">
+    <div class="watcher-blocks__wrapper">
+        <div class="watcher-block">
+            <div class="watcher__title">
+                <h3 class="new-title">@Html.Raw(HlidacStatu.Util.RenderData.NiceNumber(Model.Stat_SmlouvyCount, true))</h3>
+            </div>
+            <div class="block-col">
+                <p>smluv ve střetu</p>
+            </div>
+        </div>
+        <div class="watcher-block">
+            <div class="watcher__title">
+                <h3 class="new-title">@Html.Raw(HlidacStatu.Util.RenderData.ShortNicePrice(Model.Stat_SmlouvySum, html: true, mena: "")) Kč</h3>
+            </div>
+            <div class="block-col">
+                <p>hodnota smluv celkem</p>
+            </div>
+        </div>
+        <div class="watcher-block">
+            <div class="watcher__title">
+                <h3 class="new-title">@Html.Raw(HlidacStatu.Util.RenderData.NiceNumber(Model.Stat_DotaceCount, true))</h3>
+            </div>
+            <div class="block-col">
+                <p>dotací ve střetu</p>
+            </div>
+        </div>
+        <div class="watcher-block">
+            <div class="watcher__title">
+                <h3 class="new-title">@Html.Raw(HlidacStatu.Util.RenderData.ShortNicePrice(Model.Stat_DotaceSum, html: true, mena: "")) Kč</h3>
+            </div>
+            <div class="block-col">
+                <p>hodnota dotací celkem</p>
+            </div>
+        </div>
+    </div>
+</div>
 
-        int yFrom = item.Za_obdobi.From?.Year ?? 1990;
-        int yTo = item.Za_obdobi.To?.Year ?? DateTime.Now.Year + 1;
-        int[] years = Enumerable.Range(yFrom, yTo - yFrom + 1).ToArray();
-        string[] yearQueries = years.Select(y => $"approvedYear:{y}").ToArray();
-        string queryDotace = $"ico:{item.Firma.ICO} AND ( {string.Join(" OR ", yearQueries)} )";
+@* Firm cards *@
+@foreach (var item in Model.Strety
+                .OrderByDescending(o => o.DotaceStat.Summary().CelkemPrideleno + o.SmlouvyStat.Summary().CelkovaHodnotaSmluv)
+                .ThenByDescending(o => o.DotaceStat.Summary().PocetDotaci + o.SmlouvyStat.Summary().PocetSmluv))
+{
+    var vazbyPerIco = await OsobaVazbyRepo.VazbyProIcoCachedAsync(Model.Osoba_with_Event.Osoba, Relation.CharakterVazbyEnum.VlastnictviKontrola, item.Firma.ICO);
 
-        string customUrlSmlouvy = $"https://www.hlidacstatu.cz/hledatsmlouvy?q=" + System.Net.WebUtility.UrlEncode(querySmlouvy);
-        string customUrlDotace = $"https://www.hlidacstatu.cz/dotace/hledat?q=" + System.Net.WebUtility.UrlEncode(queryDotace);
+    string iOd = item.Za_obdobi.From?.ToString("yyyy-MM-dd") ?? "*";
+    string iDo = item.Za_obdobi.To?.ToString("yyyy-MM-dd") ?? "*";
+    string querySmlouvy = $"ico:{item.Firma.ICO} AND podepsano:[{iOd} TO {iDo}] ";
 
-        var svazba = await HlidacStatu.Repositories.Graph.Render.RenderVazbyAsync(vazbyPerIco, html: true, multiline: false);
+    int yFrom = item.Za_obdobi.From?.Year ?? 1990;
+    int yTo = item.Za_obdobi.To?.Year ?? DateTime.Now.Year + 1;
+    int[] years = Enumerable.Range(yFrom, yTo - yFrom + 1).ToArray();
+    string[] yearQueries = years.Select(y => $"approvedYear:{y}").ToArray();
+    string queryDotace = $"ico:{item.Firma.ICO} AND ( {string.Join(" OR ", yearQueries)} )";
 
-        @if (item.SmlouvyStat.Summary().PocetSmluv == 0 && item.DotaceStat.Summary().PocetDotaci == 0)
-        {
-            //sb.AppendLine($"{item.Firma.ICO} {item.Firma.Jmeno} {item.Za_obdobi.ToNiceString()}\n{svazba}");
-            //sb.AppendLine($"<p>Vše v pořádku, žádné smlouvy či dotace v tomto období</p>");
-        }
-        else
-        {
-            <li class="list-group-item d-flex justify-content-between align-items-start">
-                <div class="ms-2 me-auto">
-                    <div class="fw-bold"><a href="/subjekt/@(item.Firma.ICO)">IČ:@(item.Firma.ICO) - @(item.Firma.Jmeno)</a></div>
-                    <div style="font-size:13px">Vazba k firmě: @Html.Raw(svazba)</div>
-                    <div >
-                        Období střetu zájmu: <b>@(item.Za_obdobi.ToNiceString(dateFormat: "d.M.yyyy", noValue: ""))</b>
+    string customUrlSmlouvy = $"https://www.hlidacstatu.cz/hledatsmlouvy?q=" + System.Net.WebUtility.UrlEncode(querySmlouvy);
+    string customUrlDotace = $"https://www.hlidacstatu.cz/dotace/hledat?q=" + System.Net.WebUtility.UrlEncode(queryDotace);
+
+    var svazba = await HlidacStatu.Repositories.Graph.Render.RenderVazbyAsync(vazbyPerIco, html: true, multiline: false);
+
+    var smlouvySummary = item.SmlouvyStat.Summary();
+    var dotaceSummary = item.DotaceStat.Summary();
+
+    if (smlouvySummary.PocetSmluv == 0 && dotaceSummary.PocetDotaci == 0)
+    {
+        continue;
+    }
+
+    <div class="watcher-blocks mb-3">
+        <div class="watcher-blocks__wrapper">
+            <div class="watcher-block" style="max-width:100%;width:100%">
+                <div class="watcher__title">
+                    <h3 class="new-title" style="font-size:24px;line-height:32px">
+                        <a href="/subjekt/@item.Firma.ICO">@item.Firma.Jmeno</a>
+                    </h3>
+                </div>
+                <div class="block-col mb-2">
+                    <div><small class="text-muted">IČO: @item.Firma.ICO</small></div>
+                    <div style="font-size:14px">Vazba: @Html.Raw(svazba)</div>
+                    <div>Období střetu: <b>@(item.Za_obdobi.ToNiceString(dateFormat: "d.M.yyyy", noValue: ""))</b></div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <h4 style="font-size:16px;font-weight:700">Smlouvy</h4>
+                        <div class="table-new table-new--dotted">
+                            <table>
+                                <tr>
+                                    <td>Počet</td>
+                                    <td class="text-end">@Html.Raw(HlidacStatu.Util.RenderData.NiceNumber(smlouvySummary.PocetSmluv, true))</td>
+                                </tr>
+                                <tr>
+                                    <td>Celková hodnota</td>
+                                    <td class="text-end text-nowrap">@Html.Raw(HlidacStatu.Util.RenderData.ShortNicePrice(smlouvySummary.CelkovaHodnotaSmluv, html: true, mena: "")) Kč</td>
+                                </tr>
+                            </table>
+                        </div>
+                        @if (smlouvySummary.PocetSmluv > 0)
+                        {
+                            <div class="mt-2">
+                                <a class="btn btn-hs btn-primary btn-sm" href="@customUrlSmlouvy" style="padding:0 16px;line-height:32px">
+                                    Zobrazit smlouvy
+                                </a>
+                            </div>
+                        }
                     </div>
-                    <div>
-                        Smlouvy: @Html.Raw(item.SmlouvyStat.Summary().ToNiceLinkString(null, html: true, customUrl: customUrlSmlouvy))
-                        <br />
-                        Dotace: @Html.Raw(item.DotaceStat.Summary().ToNiceLinkString_1pad(null, html: true, customUrl: customUrlDotace))
+                    <div class="col-md-6">
+                        <h4 style="font-size:16px;font-weight:700">Dotace</h4>
+                        <div class="table-new table-new--dotted">
+                            <table>
+                                <tr>
+                                    <td>Počet</td>
+                                    <td class="text-end">@Html.Raw(HlidacStatu.Util.RenderData.NiceNumber(dotaceSummary.PocetDotaci, true))</td>
+                                </tr>
+                                <tr>
+                                    <td>Celkem přiděleno</td>
+                                    <td class="text-end text-nowrap">@Html.Raw(HlidacStatu.Util.RenderData.ShortNicePrice(dotaceSummary.CelkemPrideleno, html: true, mena: "")) Kč</td>
+                                </tr>
+                            </table>
+                        </div>
+                        @if (dotaceSummary.PocetDotaci > 0)
+                        {
+                            <div class="mt-2">
+                                <a class="btn btn-hs btn-primary btn-sm" href="@customUrlDotace" style="padding:0 16px;line-height:32px">
+                                    Zobrazit dotace
+                                </a>
+                            </div>
+                        }
                     </div>
                 </div>
-            </li>
+            </div>
+        </div>
+    </div>
 
-        }
-    }
-</ol>
-   
-<h2>Zákon o střetu zájmů dle § @paragraf</h2>
-<pre style="overflow-x: auto;white-space: pre-wrap;white-space: -moz-pre-wrap;white-space: -pre-wrap;white-space: -o-pre-wrap;word-wrap: break-word;">
-    (1) Veřejný funkcionář uvedený v § 2 odst. 1 písm. c) až m) nesmí
-    a) podnikat nebo provozovat jinou samostatnou výdělečnou činnost,
-    b) být členem statutárního orgánu, členem řídícího, dozorčího nebo kontrolního orgánu právnické osoby, která podniká (dále jen „podnikající právnická osoba“), pokud zvláštní právní předpis nestanoví jinak, nebo
-    c) být v pracovněprávním nebo obdobném vztahu nebo ve služebním poměru, nejde-li o vztah nebo poměr, v němž působí jako veřejný funkcionář.
+    <hr />
+}
 
-    (2) Omezení podle odstavce 1 se nevztahuje na správu vlastního majetku a na činnost vědeckou, pedagogickou, publicistickou, literární, uměleckou nebo sportovní, nejde-li o vlastní podnikání v těchto oborech.
+@* Law text - collapsible *@
+<div class="mt-4">
+    <a class="btn btn-hs btn-secondary btn-sm" data-bs-toggle="collapse" href="#lawTextSection" role="button" aria-expanded="false" aria-controls="lawTextSection">
+        Zákon o střetu zájmů dle § @paragraf
+    </a>
+    <div class="collapse mt-3" id="lawTextSection">
+        <div class="alert alert-info" style="white-space:pre-wrap">
+(1) Veřejný funkcionář uvedený v § 2 odst. 1 písm. c) až m) nesmí
+a) podnikat nebo provozovat jinou samostatnou výdělečnou činnost,
+b) být členem statutárního orgánu, členem řídícího, dozorčího nebo kontrolního orgánu právnické osoby, která podniká (dále jen „podnikající právnická osoba"), pokud zvláštní právní předpis nestanoví jinak, nebo
+c) být v pracovněprávním nebo obdobném vztahu nebo ve služebním poměru, nejde-li o vztah nebo poměr, v němž působí jako veřejný funkcionář.
 
-    (3) Veřejní funkcionáři uvedení v odstavci 1 jsou povinni činnosti tam uvedené ukončit bez zbytečného odkladu poté, co začali vykonávat svou funkci, nejpozději však do 30 dnů ode dne zahájení výkonu funkce. Není-li k ukončení činnosti z důvodů nezávislých na vůli veřejného funkcionáře možné dodržet lhůtu uvedenou v předchozí větě, veřejný funkcionář o této skutečnosti v dané lhůtě informuje evidenční orgán a provede současně všechna potřebná opatření směřující k ukončení činnosti. Ustanovení zvláštních právních předpisů tím nejsou dotčena4).
-</pre>
+(2) Omezení podle odstavce 1 se nevztahuje na správu vlastního majetku a na činnost vědeckou, pedagogickou, publicistickou, literární, uměleckou nebo sportovní, nejde-li o vlastní podnikání v těchto oborech.
+
+(3) Veřejní funkcionáři uvedení v odstavci 1 jsou povinni činnosti tam uvedené ukončit bez zbytečného odkladu poté, co začali vykonávat svou funkci, nejpozději však do 30 dnů ode dne zahájení výkonu funkce. Není-li k ukončení činnosti z důvodů nezávislých na vůli veřejného funkcionáře možné dodržet lhůtu uvedenou v předchozí větě, veřejný funkcionář o této skutečnosti v dané lhůtě informuje evidenční orgán a provede současně všechna potřebná opatření směřující k ukončení činnosti. Ustanovení zvláštních právních předpisů tím nejsou dotčena4).
+        </div>
+    </div>
+</div>

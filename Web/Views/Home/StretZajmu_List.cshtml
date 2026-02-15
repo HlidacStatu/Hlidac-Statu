@@ -1,4 +1,4 @@
-﻿@model (List<OsobaStret> strety, string nameId, string paragraf)
+@model (List<OsobaStret> strety, string nameId, string paragraf)
 
 @using HlidacStatu.DS.Graphs
 @using HlidacStatu.Entities
@@ -16,10 +16,23 @@
     var nameId = Model.nameId;
     var paragraf = Model.paragraf;
 
-    List<(decimal smlouvySum, long smlouvyCount, decimal dotaceSum, long dotaceCount)> stretyStats = new();
+    var withConflict = strety
+        .Where(m => m.Stat_SmlouvyCount + m.Stat_DotaceCount > 0)
+        .GroupBy(os => os.Osoba_with_Event.Osoba.NameId, (k, v) => new { NameId = k, osoba_strety = v })
+        .ToList();
 
+    var withoutConflict = strety
+        .Where(m => m.Stat_SmlouvyCount + m.Stat_DotaceCount == 0)
+        .OrderBy(o => o.Osoba_with_Event.Osoba.Prijmeni)
+        .ThenBy(o => o.Osoba_with_Event.Osoba.Jmeno)
+        .ToList();
 
+    var totalSmlouvyCount = strety.Where(m => m.Stat_SmlouvyCount > 0).Sum(m => m.Stat_SmlouvyCount);
+    var totalSmlouvySum = strety.Where(m => m.Stat_SmlouvySum > 0).Sum(m => m.Stat_SmlouvySum);
+    var totalDotaceCount = strety.Where(m => m.Stat_DotaceCount > 0).Sum(m => m.Stat_DotaceCount);
+    var totalDotaceSum = strety.Where(m => m.Stat_DotaceSum > 0).Sum(m => m.Stat_DotaceSum);
 }
+
 @section breadcrumb
 {
     <ol class="breadcrumb">
@@ -28,94 +41,165 @@
     </ol>
 }
 
+<h2 class="new-title">Analýza střetu zájmů dle § @paragraf</h2>
+<p class="mt-3 mb-4">U následujících osob jsme nalezli možný střet zájmu dle zákona o střetu zájmů.</p>
 
-<h2>Analýza střetu zájmů dle zákona o střetu zájmů dle § @paragraf</h2>
+@* Summary stats *@
+<div class="watcher-blocks mb-4">
+    <div class="watcher-blocks__wrapper">
+        <div class="watcher-block">
+            <div class="watcher__title">
+                <h3 class="new-title">@withConflict.Count</h3>
+            </div>
+            <div class="block-col">
+                <p>osob s nalezeným střetem zájmů</p>
+            </div>
+        </div>
+        <div class="watcher-block">
+            <div class="watcher__title">
+                <h3 class="new-title">@Html.Raw(HlidacStatu.Util.RenderData.NiceNumber(totalSmlouvyCount, true))</h3>
+            </div>
+            <div class="block-col">
+                <p>
+                    smluv ve střetu<br />
+                    celkem @Html.Raw(HlidacStatu.Util.RenderData.ShortNicePrice(totalSmlouvySum, html: true, mena: "")) Kč
+                </p>
+            </div>
+        </div>
+        <div class="watcher-block">
+            <div class="watcher__title">
+                <h3 class="new-title">@Html.Raw(HlidacStatu.Util.RenderData.NiceNumber(totalDotaceCount, true))</h3>
+            </div>
+            <div class="block-col">
+                <p>
+                    dotací ve střetu<br />
+                    celkem @Html.Raw(HlidacStatu.Util.RenderData.ShortNicePrice(totalDotaceSum, html: true, mena: "")) Kč
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
 
-<h3>Analyzované osoby</h3>
-<p>U následujících osob jsme nalezli možný střet zájmu</p>
-<ol class="list-group list-group-numbered">
-    @foreach (var personData in strety
-            .Where(m => m.Stat_SmlouvyCount + m.Stat_DotaceCount > 0)
-            .GroupBy(os => os.Osoba_with_Event.Osoba.NameId, (k, v) => new { NameId = k, osoba_strety = v }))
-    {
-        var osobaStrety = personData.osoba_strety;
-        var person = await HlidacStatu.Repositories.Cache.OsobaCache.GetPersonByNameIdAsync(personData.NameId);
-        
-        <li class="list-group-item d-flex justify-content-between align-items-start">
-            <div class="ms-2 me-auto">
-                <h4 class="fw-bold">
-                    @(person.FullNameWithYear())
-                </h4>
+@* Person cards *@
+@foreach (var personData in withConflict)
+{
+    var osobaStrety = personData.osoba_strety;
+    var person = await HlidacStatu.Repositories.Cache.OsobaCache.GetPersonByNameIdAsync(personData.NameId);
 
+    var personSmlouvyCount = osobaStrety.Sum(o => o.Stat_SmlouvyCount);
+    var personSmlouvySum = osobaStrety.Sum(o => o.Stat_SmlouvySum);
+    var personDotaceCount = osobaStrety.Sum(o => o.Stat_DotaceCount);
+    var personDotaceSum = osobaStrety.Sum(o => o.Stat_DotaceSum);
 
-                @foreach (var os in osobaStrety
-                                                            .Where(m => m.Stat_SmlouvyCount + m.Stat_DotaceCount > 0)
-                                                            .OrderByDescending(o => o.Stat_SmlouvySum + o.Stat_DotaceSum)
-                                                            .ThenByDescending(o => o.Stat_SmlouvyCount + o.Stat_DotaceCount)
-                                                            )
-                {
-                    <div class="card m-4">
-                        <div class="card-body">
-                            <h5 class="card-title">@(os.Osoba_with_Event.Event.AddInfo) - @(await HlidacStatu.Repositories.Cache.FirmaCache.GetJmenoAsync(os.Osoba_with_Event.Event.Ico))</h5>
-                            <p class="card-text">
-                                <div>
+    <div class="watcher-blocks mb-3">
+        <div class="watcher-blocks__wrapper">
+            <div class="watcher-block" style="max-width:100%;width:100%">
+                <div class="watcher__title">
+                    @if (person.HasPhoto())
+                    {
+                        <img src="@person.GetPhotoUrl()" alt="@person.FullName()" style="width:48px;height:48px;border-radius:50%;object-fit:cover;margin-right:16px" />
+                    }
+                    <h3 class="new-title" style="font-size:24px;line-height:32px">
+                        <a href="/osoba/@person.NameId">@person.FullNameWithYear()</a>
+                    </h3>
+                </div>
+
+                <div class="table-new table-new--dotted">
+                    <table>
+                        <tr>
+                            <th>Role</th>
+                            <th>Úřad</th>
+                            <th class="text-end">Smlouvy</th>
+                            <th class="text-end">Dotace</th>
+                            <th></th>
+                        </tr>
+                        @foreach (var os in osobaStrety
+                                    .Where(m => m.Stat_SmlouvyCount + m.Stat_DotaceCount > 0)
+                                    .OrderByDescending(o => o.Stat_SmlouvySum + o.Stat_DotaceSum)
+                                    .ThenByDescending(o => o.Stat_SmlouvyCount + o.Stat_DotaceCount))
+                        {
+                            var firmaJmeno = await HlidacStatu.Repositories.Cache.FirmaCache.GetJmenoAsync(os.Osoba_with_Event.Event.Ico);
+                            <tr>
+                                <td>
+                                    @os.Osoba_with_Event.Event.AddInfo
+                                    <br />
                                     Za období <b>@(os.Stret_za_obdobi.ToNiceString(dateFormat: "d.M.yyyy", noValue: ""))</b>
-                                </div>
-                                <div>
-                                    Našli jsme celkem ve střetu:
-                                    Smlouvy  <b>@Html.Raw(HlidacStatu.Util.RenderData.NiceNumber(os.Stat_SmlouvyCount, true))</b> ks, celkem <b>@Html.Raw(HlidacStatu.Util.RenderData.ShortNicePrice(os.Stat_SmlouvySum, html: true, mena: ""))</b> Kč
-                                    ;
-                                    Dotace: <b>@Html.Raw(HlidacStatu.Util.RenderData.NiceNumber(os.Stat_DotaceCount, true))</b> ks, celkem <b>@Html.Raw(HlidacStatu.Util.RenderData.ShortNicePrice(os.Stat_DotaceSum, html: true, mena: ""))</b> Kč
-                                </div>
-                                <div>
-                                    <a class="btn btn-sm btn-primary" href="/stretzajmu/@($"{os.Id}")">Detailní informace</a>
-                                </div>
+                                </td>
+                                <td>@firmaJmeno</td>
+                                <td class="text-end text-nowrap">
+                                    @Html.Raw(HlidacStatu.Util.RenderData.NiceNumber(os.Stat_SmlouvyCount, true)) ks /
+                                    @Html.Raw(HlidacStatu.Util.RenderData.ShortNicePrice(os.Stat_SmlouvySum, html: true, mena: "")) Kč
+                                </td>
+                                <td class="text-end text-nowrap">
+                                    @Html.Raw(HlidacStatu.Util.RenderData.NiceNumber(os.Stat_DotaceCount, true)) ks /
+                                    @Html.Raw(HlidacStatu.Util.RenderData.ShortNicePrice(os.Stat_DotaceSum, html: true, mena: "")) Kč
+                                </td>
+                                <td class="text-end">
+                                    <a class="btn btn-hs btn-primary btn-sm" href="/stretzajmu/@os.Id" style="padding:0 16px;line-height:32px">Detail</a>
+                                </td>
+                            </tr>
+                        }
+                        @if (osobaStrety.Count(m => m.Stat_SmlouvyCount + m.Stat_DotaceCount > 0) > 1)
+                        {
+                            <tr style="font-weight:700">
+                                <td colspan="2">Celkem</td>
+                                <td class="text-end text-nowrap">
+                                    @Html.Raw(HlidacStatu.Util.RenderData.NiceNumber(personSmlouvyCount, true)) ks /
+                                    @Html.Raw(HlidacStatu.Util.RenderData.ShortNicePrice(personSmlouvySum, html: true, mena: "")) Kč
+                                </td>
+                                <td class="text-end text-nowrap">
+                                    @Html.Raw(HlidacStatu.Util.RenderData.NiceNumber(personDotaceCount, true)) ks /
+                                    @Html.Raw(HlidacStatu.Util.RenderData.ShortNicePrice(personDotaceSum, html: true, mena: "")) Kč
+                                </td>
+                                <td></td>
+                            </tr>
+                        }
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+}
 
-                            </p>
-                        </div>
+@* No conflict section - collapsible *@
+@if (withoutConflict.Any())
+{
+    <hr />
+    <h2>Osoby bez nalezeného střetu zájmů</h2>
+    <p>Tyto osoby jsme analyzovali také a střet zájmů jsme nenalezli.</p>
+    <div class="mt-4 mb-4">
+        <div class=" mt-3" id="noConflictSection">
+            <div class="row">
+                @foreach (var os in withoutConflict)
+                {
+                    <div class="col-md-4 col-sm-6 mb-1">
+                        <b>@os.Osoba_with_Event.Osoba.FullName()</b>
+                        <small class="text-muted">
+                            (@os.Osoba_with_Event.Event.AddInfo - @(await HlidacStatu.Repositories.Cache.FirmaCache.GetJmenoAsync(os.Osoba_with_Event.Event.Ico)))
+                        </small>
                     </div>
                 }
             </div>
-        </li>
-
-    }
-</ol>
-
-<p>Tyto osoby jsme zkontrolovali a možný střet zájmu nenalezli.</p>
-<ul class="list-group ">
-    @foreach (var os in strety
-                    .Where(m => m.Stat_SmlouvyCount + m.Stat_DotaceCount == 0)
-                    .OrderByDescending(o => o.Osoba_with_Event.Osoba.Prijmeni)
-                    .ThenByDescending(o => o.Osoba_with_Event.Osoba.Jmeno)
-                    )
-    {
-        <li class="list-group-item d-flex justify-content-between align-items-start">
-            <div class="ms-2 me-auto">
-                <div>
-
-                    <b>@os.Osoba_with_Event.Osoba.FullName()</b>
-                    (@(os.Osoba_with_Event.Event.AddInfo) - @(await HlidacStatu.Repositories.Cache.FirmaCache.GetJmenoAsync(os.Osoba_with_Event.Event.Ico))) )
-
-                    <small>
-                        za období <b>@(os.Stret_za_obdobi.ToNiceString(dateFormat: "d.M.yyyy", noValue: ""))</b>
-                    </small>
-                </div>
-            </div>
-        </li>
-
-    }
-</ul>
-<hr />
+        </div>
+    </div>
+}
 
 
-<h2>Zákon o střetu zájmů dle § @paragraf</h2>
-<pre style="overflow-x: auto;white-space: pre-wrap;white-space: -moz-pre-wrap;white-space: -pre-wrap;white-space: -o-pre-wrap;word-wrap: break-word;">
-    (1) Veřejný funkcionář uvedený v § 2 odst. 1 písm. c) až m) nesmí
-    a) podnikat nebo provozovat jinou samostatnou výdělečnou činnost,
-    b) být členem statutárního orgánu, členem řídícího, dozorčího nebo kontrolního orgánu právnické osoby, která podniká (dále jen „podnikající právnická osoba“), pokud zvláštní právní předpis nestanoví jinak, nebo
-    c) být v pracovněprávním nebo obdobném vztahu nebo ve služebním poměru, nejde-li o vztah nebo poměr, v němž působí jako veřejný funkcionář.
+@* Law text - collapsible *@
+<div class="mt-4">
+    <a class="btn btn-hs btn-secondary btn-sm" data-bs-toggle="collapse" href="#lawTextSection" role="button" aria-expanded="false" aria-controls="lawTextSection">
+        Zákon o střetu zájmů dle § @paragraf
+    </a>
+    <div class="collapse mt-3" id="lawTextSection">
+        <div class="alert alert-info" style="white-space:pre-wrap">
+(1) Veřejný funkcionář uvedený v § 2 odst. 1 písm. c) až m) nesmí
+a) podnikat nebo provozovat jinou samostatnou výdělečnou činnost,
+b) být členem statutárního orgánu, členem řídícího, dozorčího nebo kontrolního orgánu právnické osoby, která podniká (dále jen „podnikající právnická osoba"), pokud zvláštní právní předpis nestanoví jinak, nebo
+c) být v pracovněprávním nebo obdobném vztahu nebo ve služebním poměru, nejde-li o vztah nebo poměr, v němž působí jako veřejný funkcionář.
 
-    (2) Omezení podle odstavce 1 se nevztahuje na správu vlastního majetku a na činnost vědeckou, pedagogickou, publicistickou, literární, uměleckou nebo sportovní, nejde-li o vlastní podnikání v těchto oborech.
+(2) Omezení podle odstavce 1 se nevztahuje na správu vlastního majetku a na činnost vědeckou, pedagogickou, publicistickou, literární, uměleckou nebo sportovní, nejde-li o vlastní podnikání v těchto oborech.
 
-    (3) Veřejní funkcionáři uvedení v odstavci 1 jsou povinni činnosti tam uvedené ukončit bez zbytečného odkladu poté, co začali vykonávat svou funkci, nejpozději však do 30 dnů ode dne zahájení výkonu funkce. Není-li k ukončení činnosti z důvodů nezávislých na vůli veřejného funkcionáře možné dodržet lhůtu uvedenou v předchozí větě, veřejný funkcionář o této skutečnosti v dané lhůtě informuje evidenční orgán a provede současně všechna potřebná opatření směřující k ukončení činnosti. Ustanovení zvláštních právních předpisů tím nejsou dotčena4).
-</pre>
+(3) Veřejní funkcionáři uvedení v odstavci 1 jsou povinni činnosti tam uvedené ukončit bez zbytečného odkladu poté, co začali vykonávat svou funkci, nejpozději však do 30 dnů ode dne zahájení výkonu funkce. Není-li k ukončení činnosti z důvodů nezávislých na vůli veřejného funkcionáře možné dodržet lhůtu uvedenou v předchozí větě, veřejný funkcionář o této skutečnosti v dané lhůtě informuje evidenční orgán a provede současně všechna potřebná opatření směřující k ukončení činnosti. Ustanovení zvláštních právních předpisů tím nejsou dotčena4).
+        </div>
+    </div>
+</div>
