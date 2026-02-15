@@ -8,10 +8,10 @@ namespace HlidacStatu.DS.Graphs2
     {
         public UnweightedGraph(IEnumerable<IVertex> initialNodes = null)
         {
-            Vertices = initialNodes?.ToConcurrentHashSet() ?? new Devmasters.Collections.ConcurrentHashSet<IVertex>();
+            Vertices = initialNodes?.ToHashSet() ?? new HashSet<IVertex>();
         }
 
-        public Devmasters.Collections.ConcurrentHashSet<IVertex> Vertices { get; }
+        public HashSet<IVertex> Vertices { get; }
         public IEnumerable<IEdge> Edges { get => Vertices.SelectMany(v => v.OutgoingEdges); }
 
         /// <summary>
@@ -32,14 +32,17 @@ namespace HlidacStatu.DS.Graphs2
             vertex1.AddOutgoingEdge(edge);
         }
 
+        object lockAddVert = new object();
         private IVertex GetOrAddVertex(IVertex vertex)
         {
             if (Vertices.TryGetValue(vertex, out IVertex actual))
             {
                 return actual;
             }
-
-            Vertices.Add(vertex);
+            lock (lockAddVert)
+            {
+                Vertices.Add(vertex);
+            }
             return (vertex);
         }
 
