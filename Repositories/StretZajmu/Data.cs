@@ -55,7 +55,6 @@ and not (organizace like N'Vláda SR%')
 and not (organizace like N'%stínová%')
 and dbo.IsSomehowInInterval(datumOd,datumDo, @zakonDatumOd,null)=1
 --and nameid like 'andrej-babis'
--- and nameid = 'roman-prymula'
 
 ";
             Role o_1c = await Role.FillRoleAsync(sql_Vlada, null, null);

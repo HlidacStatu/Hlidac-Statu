@@ -106,9 +106,13 @@ public class Checksum
 
 
         var str = string.Join("\u001F", propValues.Where(p=>p.ignore==false).Select(p => $"{p.Name}={p.Value}")); // unit-separator
-        var bytes = System.Text.Encoding.UTF8.GetBytes(str);
-        var hash = System.Security.Cryptography.SHA256.HashData(bytes);
-        return System.Convert.ToHexString(hash); // uppercase hex
+        return GetNiceHash(str);
+    }
+
+    public static string GetNiceHash(string input)
+    {
+        var hash = SHA256.HashData(Encoding.UTF8.GetBytes(input));
+        return ConvertToCorrectEndiannessFormat(hash);
     }
 
     private static AsyncRetryPolicy<HttpResponseMessage> _retryPolicy = HttpPolicyExtensions

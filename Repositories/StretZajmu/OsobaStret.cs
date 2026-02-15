@@ -30,7 +30,7 @@ namespace HlidacStatu.Repositories.StretZajmu
         string CalculateId()
         {
             var niceId = $"{Osoba_with_Event.Osoba.NameId}_{Stret_za_obdobi.From:yyyyMMdd}_{Stret_za_obdobi.To:yyyyMMdd}_{this.ParagrafOdstavec}";
-            return Devmasters.Crypto.Hash.ComputeHashToBase64(niceId);
+            return HlidacStatu.Util.Checksum.GetNiceHash(niceId);
         }
 
         public required Osoba_With_Event Osoba_with_Event { get; init; }

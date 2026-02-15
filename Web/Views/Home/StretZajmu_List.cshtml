@@ -9,12 +9,13 @@
 @using HlidacStatu.XLib;
 
 @{
-    ViewBag.Title = "Analýza střetu zájmů dle zákona o střetu zájmů";
-    ViewBag.SubTitle = "";
-
     var strety = Model.strety;
     var nameId = Model.nameId;
     var paragraf = Model.paragraf;
+
+    ViewBag.Title = "Střetu zájmů dle § "+ paragraf;
+    ViewBag.SubTitle = "Analýza střetu zájmů dle zákona o střetu zájmů";
+
 
     var withConflict = strety
         .Where(m => m.Stat_SmlouvyCount + m.Stat_DotaceCount > 0)
@@ -37,7 +38,8 @@
 {
     <ol class="breadcrumb">
         <li><a href="/">Hlídač Státu</a></li>
-        <li class="active">@ViewBag.Title</li>
+        <li><a href="/stretzajmu">Střet zájmů</a></li>
+        <li class="active">§ @paragraf</li>
     </ol>
 }
 
@@ -93,11 +95,13 @@
         <div class="card-header d-flex align-items-center">
             @if (person.HasPhoto())
             {
+                <a href="/osoba/@person.NameId" target="_blank">
                 <img src="@person.GetPhotoUrl()" alt="@person.FullName()"
                      class="rounded-circle me-3" style="width:40px;height:40px;object-fit:cover" />
+                </a>
             }
             <h4 class="mb-0">
-                <a href="/osoba/@person.NameId" class="text-decoration-none">@person.FullNameWithYear()</a>
+                <a href="/osoba/@person.NameId" target="_blank" class="text-decoration-none">@person.FullNameWithYear()</a>
             </h4>
         </div>
         <div class="card-body p-0">
@@ -114,11 +118,12 @@
                     </thead>
                     <tbody>
                         @foreach (var os in osobaStrety
-                                    .Where(m => m.Stat_SmlouvyCount + m.Stat_DotaceCount > 0)
-                                    .OrderByDescending(o => o.Stat_SmlouvySum + o.Stat_DotaceSum)
-                                    .ThenByDescending(o => o.Stat_SmlouvyCount + o.Stat_DotaceCount))
+                                                                                    .Where(m => m.Stat_SmlouvyCount + m.Stat_DotaceCount > 0)
+                                                                                    .OrderByDescending(o => o.Stat_SmlouvySum + o.Stat_DotaceSum)
+                                                                                    .ThenByDescending(o => o.Stat_SmlouvyCount + o.Stat_DotaceCount))
                         {
                             var firmaJmeno = await HlidacStatu.Repositories.Cache.FirmaCache.GetJmenoAsync(os.Osoba_with_Event.Event.Ico);
+                            
                             <tr>
                                 <td>
                                     @os.Osoba_with_Event.Event.AddInfo
@@ -135,7 +140,7 @@
                                     @Html.Raw(HlidacStatu.Util.RenderData.ShortNicePrice(os.Stat_DotaceSum, html: true, mena: "")) Kč
                                 </td>
                                 <td class="text-end">
-                                    <a class="btn btn-primary btn-sm" href="/stretzajmu/@os.Id">Detail</a>
+                                    <a class="btn btn-outline-primary btn-sm" href="/stretzajmu/@os.Id">Detail o střetu zájmů</a>
                                 </td>
                             </tr>
                         }
@@ -189,16 +194,16 @@
             Zákon o střetu zájmů dle § @paragraf
         </a>
     </p>
-    <div class="collapse" id="lawTextSection">
-        <div class="alert alert-info" style="white-space:pre-wrap">
-(1) Veřejný funkcionář uvedený v § 2 odst. 1 písm. c) až m) nesmí
-a) podnikat nebo provozovat jinou samostatnou výdělečnou činnost,
-b) být členem statutárního orgánu, členem řídícího, dozorčího nebo kontrolního orgánu právnické osoby, která podniká (dále jen „podnikající právnická osoba"), pokud zvláštní právní předpis nestanoví jinak, nebo
-c) být v pracovněprávním nebo obdobném vztahu nebo ve služebním poměru, nejde-li o vztah nebo poměr, v němž působí jako veřejný funkcionář.
+    <div class="collapse show" id="lawTextSection">
+        <div class="alert alert-info" style="white-space:pre-line;font-family:monospace">
+            (1) Veřejný funkcionář uvedený v § 2 odst. 1 písm. c) až m) nesmí
+            a) podnikat nebo provozovat jinou samostatnou výdělečnou činnost,
+            b) být členem statutárního orgánu, členem řídícího, dozorčího nebo kontrolního orgánu právnické osoby, která podniká (dále jen „podnikající právnická osoba"), pokud zvláštní právní předpis nestanoví jinak, nebo
+            c) být v pracovněprávním nebo obdobném vztahu nebo ve služebním poměru, nejde-li o vztah nebo poměr, v němž působí jako veřejný funkcionář.
 
-(2) Omezení podle odstavce 1 se nevztahuje na správu vlastního majetku a na činnost vědeckou, pedagogickou, publicistickou, literární, uměleckou nebo sportovní, nejde-li o vlastní podnikání v těchto oborech.
+            (2) Omezení podle odstavce 1 se nevztahuje na správu vlastního majetku a na činnost vědeckou, pedagogickou, publicistickou, literární, uměleckou nebo sportovní, nejde-li o vlastní podnikání v těchto oborech.
 
-(3) Veřejní funkcionáři uvedení v odstavci 1 jsou povinni činnosti tam uvedené ukončit bez zbytečného odkladu poté, co začali vykonávat svou funkci, nejpozději však do 30 dnů ode dne zahájení výkonu funkce. Není-li k ukončení činnosti z důvodů nezávislých na vůli veřejného funkcionáře možné dodržet lhůtu uvedenou v předchozí větě, veřejný funkcionář o této skutečnosti v dané lhůtě informuje evidenční orgán a provede současně všechna potřebná opatření směřující k ukončení činnosti. Ustanovení zvláštních právních předpisů tím nejsou dotčena4).
+            (3) Veřejní funkcionáři uvedení v odstavci 1 jsou povinni činnosti tam uvedené ukončit bez zbytečného odkladu poté, co začali vykonávat svou funkci, nejpozději však do 30 dnů ode dne zahájení výkonu funkce. Není-li k ukončení činnosti z důvodů nezávislých na vůli veřejného funkcionáře možné dodržet lhůtu uvedenou v předchozí větě, veřejný funkcionář o této skutečnosti v dané lhůtě informuje evidenční orgán a provede současně všechna potřebná opatření směřující k ukončení činnosti. Ustanovení zvláštních právních předpisů tím nejsou dotčena4).
         </div>
     </div>
 </div>
