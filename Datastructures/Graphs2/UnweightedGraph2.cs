@@ -9,54 +9,6 @@ using static HlidacStatu.DS.Graphs.Graph;
 
 namespace HlidacStatu.DS.Graphs2
 {
-    // TODO - temporary, use later Devmasters.Collections.ConcurrentHashSet from Devmasters.Collections v10 package
-    /*
-    public sealed class ConcurrentHashSet2<T> : IEnumerable<T>
-    {
-        private readonly ConcurrentDictionary<T, T> _dict;
-
-        public ConcurrentHashSet2() : this(comparer: null) { }
-
-        public ConcurrentHashSet2(IEqualityComparer<T>? comparer)
-            => _dict = new ConcurrentDictionary<T, T>(comparer ?? EqualityComparer<T>.Default);
-
-        public ConcurrentHashSet2(IEnumerable<T> collection, IEqualityComparer<T>? comparer = null)
-            : this(comparer)
-        {
-            // Avoid ConcurrentDictionary ctor throwing on duplicate keys in 'collection'
-            foreach (var item in collection)
-                _dict.TryAdd(item, item);
-        }
-
-        public int Count => _dict.Count;
-
-        public bool Add(T item) => _dict.TryAdd(item, item);
-
-        public bool Contains(T item) => _dict.ContainsKey(item);
-
-        public bool Remove(T item) => _dict.TryRemove(item, out _);
-
-        public void Clear() => _dict.Clear();
-
-        // Returns the canonical stored instance (if you care about that)
-        public bool TryGetValue(T equalValue, [MaybeNullWhen(false)] out T actualValue)
-            => _dict.TryGetValue(equalValue, out actualValue);
-
-        // If you keep this, at least make it explicit and non-null-forgiving
-        public bool TryGet(T equalValue, out T actualValue)
-            => _dict.TryGetValue(equalValue, out actualValue);
-
-        public IEnumerator<T> GetEnumerator() => _dict.Keys.GetEnumerator();
-        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
-
-        public static ConcurrentHashSet2<TSource> ToConcurrentHashSet<TSource>(
-            IEnumerable<TSource> source, IEqualityComparer<TSource>? comparer = null)
-        {
-            if (source is null) throw new ArgumentNullException(nameof(source));
-            return new ConcurrentHashSet2<TSource>(source, comparer);
-        }
-    }
-    */
 
     public sealed record PathResult(
     IReadOnlyList<string> Nodes,

@@ -321,7 +321,7 @@ namespace HlidacStatu.Repositories
                 var shortestPath = graph.ShortestPath(firma._getStartingVertext(charakterVazby), CreateVertexFromIco(ico));
                 if (shortestPath == null)
                     return Array.Empty<HlidacStatu.DS.Graphs.Graph.Edge>();
-                var result = shortestPath.Edges.Select(x => ((Edge<HlidacStatu.DS.Graphs.Graph.Edge>)x).BindingPayload).ToArray();
+                var result = shortestPath.Select(x => ((Edge<HlidacStatu.DS.Graphs.Graph.Edge>)x).BindingPayload).ToArray();
                 return result; // shortestGraph.ShortestTo(ico).ToArray();
             }
             catch (Exception e)

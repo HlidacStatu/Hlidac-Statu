@@ -9,11 +9,11 @@ using System.Linq;
 
 namespace HlidacStatu.DS.Graphs2
 {
-    public class UnweightedGraph
+    public class UnweightedGraph_imp2
     {
         private static readonly ILogger _logger = Log.ForContext<UnweightedGraph>();
 
-        public UnweightedGraph(IEnumerable<IVertex> initialNodes = null)
+        public UnweightedGraph_imp2(IEnumerable<IVertex> initialNodes = null)
         {
             Vertices = initialNodes == null ? new HashSet<IVertex>() : initialNodes.ToHashSet();
         }
