@@ -5,6 +5,7 @@ namespace HlidacStatu.DS.Graphs2
 {
     public interface IVertex
     {
+        string Id { get; }
         HashSet<IEdge> OutgoingEdges { get; }
 
         void AddOutgoingEdge(IEdge edge);
@@ -12,22 +13,37 @@ namespace HlidacStatu.DS.Graphs2
 
     public class Vertex<T> : IEquatable<Vertex<T>>, IVertex where T : IEquatable<T>
     {
+        public string Id { get; }
         public T Value { get; }
         public HashSet<IEdge> OutgoingEdges { get; } = new HashSet<IEdge>();
 
-        public Vertex(T value)
+        public Vertex(string id, T value)
         {
+            Id = id;
             Value = value;
         }
 
+        object lockObj = new object();
         public void AddOutgoingEdge(IEdge edge)
         {
-            OutgoingEdges.Add(edge);
+            lock (lockObj)
+            {
+                try
+                {
+                    OutgoingEdges.Add(edge);
+                }
+                catch (Exception e)
+                {
+
+                    throw;
+                }
+
+            }
         }
 
         public bool Equals(Vertex<T> other)
         {
-            return GetHashCode() == other.GetHashCode();
+            return this.GetHashCode() == other.GetHashCode();
         }
 
         public override bool Equals(object obj)
@@ -37,12 +53,12 @@ namespace HlidacStatu.DS.Graphs2
 
         public override int GetHashCode()
         {
-            return Value.GetHashCode();
+            return Id.GetHashCode();
         }
 
         public override string ToString()
         {
-            return Value.ToString();
+            return Id.ToString();
         }
     }
 }

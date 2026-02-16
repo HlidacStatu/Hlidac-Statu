@@ -372,7 +372,7 @@ namespace HlidacStatu.Repositories
                     foreach (var gIco in rows.Select(m => m.subjId).Distinct())
                     {
                         var relsForIco = rows.Where(m => m.subjId == gIco);
-                        //find longest, or separate relation
+                        //find longest, or separate relation //TODO DateInterval
                         foreach (var r in relsForIco)
                         {
                             if (relsForIco

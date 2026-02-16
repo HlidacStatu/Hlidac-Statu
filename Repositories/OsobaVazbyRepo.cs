@@ -1,12 +1,13 @@
+using HlidacStatu.Caching;
 using HlidacStatu.DS.Graphs;
 using HlidacStatu.DS.Graphs2;
 using HlidacStatu.Entities;
+using HlidacStatu.Repositories.Cache;
+using NetTopologySuite.Planargraph;
 using Serilog;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
-using HlidacStatu.Caching;
-using HlidacStatu.Repositories.Cache;
 using ZiggyCreatures.Caching.Fusion;
 
 namespace HlidacStatu.Repositories
@@ -175,19 +176,22 @@ namespace HlidacStatu.Repositories
 
         private static async Task<DS.Graphs.Graph.Edge[]> _vazbyProICOAsync(this Osoba osoba, string ico, Relation.CharakterVazbyEnum charakterVazby)
         {
-            if (osoba._graph is null || osoba._graph.Vertices.Count == 0)
+            if (osoba._getGraph(charakterVazby) is null || osoba._getGraph(charakterVazby).Vertices.Count == 0)
                 await osoba.InitializeGraphAsync(charakterVazby);
 
-            osoba._startingVertex ??=
-                new Vertex<string>(HlidacStatu.DS.Graphs.Graph.Node.Prefix_NodeType_Person + osoba.InternalId);
+            if (osoba._getStartingVertext(charakterVazby) == null)
+                osoba._setStartingVertext(charakterVazby, new Vertex<string>(
+                    HlidacStatu.DS.Graphs.Graph.Node.Prefix_NodeType_Person + osoba.InternalId
+                    , HlidacStatu.DS.Graphs.Graph.Node.Prefix_NodeType_Person + osoba.InternalId));
 
             try
             {
-                var shortestPath = osoba._graph.ShortestPath(osoba._startingVertex, CreateVertexFromIco(ico));
+                var graph = osoba._getGraph(charakterVazby);
+                var shortestPath = graph.ShortestPath(osoba._getStartingVertext(charakterVazby), CreateVertexFromIco(ico));
                 if (shortestPath == null)
                     return Array.Empty<HlidacStatu.DS.Graphs.Graph.Edge>();
 
-                var result = shortestPath.Select(x => ((Edge<HlidacStatu.DS.Graphs.Graph.Edge>)x).BindingPayload).ToArray();
+                var result = shortestPath.Edges.Select(x => ((Edge<HlidacStatu.DS.Graphs.Graph.Edge>)x).BindingPayload).ToArray();
                 return result; // shortestGraph.ShortestTo(ico).ToArray();
             }
             catch (Exception e)
@@ -199,29 +203,36 @@ namespace HlidacStatu.Repositories
 
         private static async Task InitializeGraphAsync(this Osoba osoba, Relation.CharakterVazbyEnum charakterVazby)
         {
-            osoba._graph = new UnweightedGraph();
+            var uGraph = new UnweightedGraph();
+            Vertex<string> _startingVertex = null;
+
             var vazbyVlastnictvi = await osoba.VazbyAsync(charakterVazby);
             foreach (var vazba in vazbyVlastnictvi)
             {
                 if (vazba.From is null)
                 {
-                    osoba._startingVertex = new Vertex<string>(vazba.To.UniqId);
+                    _startingVertex = new Vertex<string>(vazba.To.UniqId, vazba.To.UniqId);
                     continue;
                 }
-
+                    
                 if (vazba.To is null)
                     continue;
 
-                var fromVertex = new Vertex<string>(vazba.From.UniqId);
-                var toVertex = new Vertex<string>(vazba.To.UniqId);
+                var fromVertex = new Vertex<string>(vazba.From.UniqId, vazba.From.UniqId);
+                var toVertex = new Vertex<string>(vazba.To.UniqId, vazba.To.UniqId);
 
-                osoba._graph.AddEdge(fromVertex, toVertex, vazba);
+                uGraph.AddEdge(fromVertex, toVertex, vazba.DateInterval(), vazba);
             }
+            osoba._setGraph(charakterVazby, uGraph);
+            osoba._setStartingVertext(charakterVazby, _startingVertex);
+
         }
 
         private static Vertex<string> CreateVertexFromIco(string ico)
         {
-            return new Vertex<string>($"{HlidacStatu.DS.Graphs.Graph.Node.Prefix_NodeType_Company}{ico}");
+            return new Vertex<string>(
+                $"{HlidacStatu.DS.Graphs.Graph.Node.Prefix_NodeType_Company}{ico}",
+                $"{HlidacStatu.DS.Graphs.Graph.Node.Prefix_NodeType_Company}{ico}");
         }
 
         public static async Task<DS.Graphs.Graph.Edge[]> VazbyAsync(this Osoba osoba, Relation.CharakterVazbyEnum charakterVazby, bool refresh = false)
@@ -279,7 +290,7 @@ namespace HlidacStatu.Repositories
                 else if (charakterVazby == Relation.CharakterVazbyEnum.Uredni)
                     osoba._vazbyUredni = (await Graph.VsechnyDcerineVazbyAsync(osoba, charakterVazby, refresh)).ToArray();
             }
-            catch (Exception)
+            catch (Exception e)
             {
                 osoba._vazby = [];
                 osoba._vazbyUredni = [];

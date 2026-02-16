@@ -15,6 +15,48 @@ using ZiggyCreatures.Caching.Fusion;
 namespace HlidacStatu.Repositories.StretZajmu
 {
 
+    /*
+     
+    var o_1e = new Role() { ZakonDatumLide = new DateTime(2017, 9, 1) };
+
+    //Mgr. Petr Jäger, Ph.D. (*1980).
+    var o_1f = new Role() { ZakonDatumLide = new DateTime(2025, 1, 1) };
+
+    //Ing. Jiří Kratochvíl 12. 3. 1981
+    var o_1g = new Role() { ZakonDatumLide = new DateTime(2017, 9, 1) };
+
+    /*
+     "Ing. Mgr. Jaromír Novák","2012– "
+"Ing. Ondřej Filip, MBA","2013– "
+"Ing. Jan Duben","2014– "
+"Ing. Josef Bednář","2014– "
+"RNDr. Ing. Jiří Peterka","2015–2025"
+"Mgr. Josef Chomyn","2017– "
+"Mgr. Lukáš Zelený","2019– "
+"Ing. Mgr. Hana Továrková","2019–2023"
+"Ing. Marek Ebert","2020– "
+"Ing. Jiří Šuchman","2022– "
+"JUDr. Marek Vrbík","2024– "
+"Mgr. Vlastimil Turza","2025– "
+     
+    var o_1h = new Role() { ZakonDatumLide = new DateTime(2017, 9, 1) };
+
+
+    var o_1i = new Role() { ZakonDatumLide = new DateTime(2017, 9, 1) };
+    var o_1j = new Role() { ZakonDatumLide = new DateTime(2017, 9, 1) };
+    var o_1k = new Role() { ZakonDatumLide = new DateTime(2017, 9, 1) };
+    var o_1l = new Role() { ZakonDatumLide = new DateTime(2017, 9, 1) };
+    var o_1m = new Role() { ZakonDatumLide = new DateTime(2025, 7, 1) };
+
+    //masakr
+    var o_2b = new Role() { ZakonDatumLide = new DateTime(2022, 7, 1) };
+    var o_2c = new Role() { ZakonDatumLide = new DateTime(2009, 10, 9) };
+    var o_2d = new Role() { ZakonDatumLide = new DateTime(2017, 9, 1) };
+    var o_2e = new Role() { ZakonDatumLide = new DateTime(2017, 9, 1) };
+    var o_2f = new Role() { ZakonDatumLide = new DateTime(2017, 9, 1) };
+    var o_2g = new Role() { ZakonDatumLide = new DateTime(2017, 9, 1) };
+
+     */
 
     public class Processor
     {
@@ -36,7 +78,13 @@ namespace HlidacStatu.Repositories.StretZajmu
 
             var res = await PermanentCache.GetOrSetAsync(key,
                 async _ => await _generate_paragraf_4_Async(),
-                options => options.ModifyEntryOptionsDuration(TimeSpan.FromHours(1), TimeSpan.FromDays(10 * 365))
+                options => options.ModifyEntryOptionsDuration(
+#if DEBUG
+                    TimeSpan.FromSeconds(1),
+#else
+                    TimeSpan.FromHours(1),
+#endif
+                    TimeSpan.FromDays(10 * 365))
             );
             return res;
         }
@@ -79,6 +127,9 @@ namespace HlidacStatu.Repositories.StretZajmu
                 if (efektivni_doba_stretu_osoby == null)
                     continue;
 
+                if (efektivni_doba_stretu_osoby.From.Value.Year!=2025) //neřešíme budoucí střety
+                    continue;
+
 
                 OsobaStret st = new OsobaStret()
                 {
@@ -91,7 +142,7 @@ namespace HlidacStatu.Repositories.StretZajmu
                 
                 DS.Graphs.Graph.Edge[] vazby = await os.Osoba.AktualniVazbyAsync(
                     DS.Graphs.Relation.CharakterVazbyEnum.VlastnictviKontrola,
-                    DS.Graphs.Relation.AktualnostType.Libovolny);
+                    DS.Graphs.Relation.AktualnostType.Libovolny,true);
 
 
 
@@ -101,7 +152,7 @@ namespace HlidacStatu.Repositories.StretZajmu
                     .DistinctBy(v => v.To.Id)
                     .ToArray();
 
-                var debugVazby = aktivniVazby_dobe_platnosti.Where(v => v.To.Id == "45313351").ToArray();
+                var debugVazby = aktivniVazby_dobe_platnosti.Where(v => v.To.Id == "47307706").ToArray();
 
                 int count = 0;
 
@@ -122,7 +173,7 @@ namespace HlidacStatu.Repositories.StretZajmu
 
                         if (ed.Distance > 1)
                         { //je to dcerinka, najdi vazby zpet k matce
-                            var vazbykIco = await OsobaVazbyRepo.VazbyProIcoCachedAsync(os.Osoba, DS.Graphs.Relation.CharakterVazbyEnum.VlastnictviKontrola, firma.ICO);
+                            var vazbykIco = await OsobaVazbyRepo.VazbyProIcoCachedAsync(os.Osoba, DS.Graphs.Relation.CharakterVazbyEnum.VlastnictviKontrola, firma.ICO,true);
 
                             foreach (var mv in vazbykIco)
                             {
@@ -130,7 +181,7 @@ namespace HlidacStatu.Repositories.StretZajmu
                                 var firma_ve_vazbach = await Cache.FirmaCache.GetAsync(mv.To.Id);
                                 if (firma_ve_vazbach == null) 
                                     continue;
-                                if (firma_ve_vazbach.PatrimStatu()) //pokud je cestou statni firma, neresim konflik zajmu
+                                if (_spadaPodStredZajmu( firma_ve_vazbach)) //pokud je cestou statni firma, neresim konflik zajmu
                                     return new Devmasters.Batch.ActionOutputData();
 
                                 var efektivni_doba_stretu_s_firmou_2 = Devmasters.DT.DateInterval.GetOverlappingInterval(efektivni_doba_stretu_s_firmou, mv.DateInterval());
@@ -140,6 +191,9 @@ namespace HlidacStatu.Repositories.StretZajmu
                                         efektivni_doba_stretu_s_firmou,
                                         efektivni_doba_stretu_s_firmou_2);
                                 }
+                                //else 
+                                //    return new Devmasters.Batch.ActionOutputData();
+
                             }
 
                         }

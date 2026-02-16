@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Devmasters.DT;
+using System;
 
 namespace HlidacStatu.DS.Graphs2
 {
@@ -6,6 +7,7 @@ namespace HlidacStatu.DS.Graphs2
     {
         IVertex From { get; }
         IVertex To { get; }
+        Devmasters.DT.DateInterval ConnectionInterval { get; }
     }
 
     public class Edge<T> : IEdge, IEquatable<Edge<T>>
@@ -13,12 +15,15 @@ namespace HlidacStatu.DS.Graphs2
         public T BindingPayload { get; }
         public IVertex From { get; }
         public IVertex To { get; }
+        public Devmasters.DT.DateInterval ConnectionInterval { get; }
 
-        public Edge(IVertex from, IVertex to, T bindingPayload)
+
+        public Edge(IVertex from, IVertex to, DateInterval connectionInterval, T bindingPayload)
         {
             From = from ?? throw new ArgumentNullException(nameof(from));
             To = to ?? throw new ArgumentNullException(nameof(to));
             BindingPayload = bindingPayload;
+            this.ConnectionInterval = connectionInterval ?? new DateInterval((DateTime?)null, (DateTime?)null);
         }
 
         public bool Equals(Edge<T> other)

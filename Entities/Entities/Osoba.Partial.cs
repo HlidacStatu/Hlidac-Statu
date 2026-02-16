@@ -2,6 +2,7 @@
 
 using HlidacStatu.DS.Graphs;
 using HlidacStatu.DS.Graphs2;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
@@ -172,10 +173,37 @@ namespace HlidacStatu.Entities
 
 
         //migrace: ugly hack - tohle je hezké místo, co by šlo vylepšit
-        public UnweightedGraph _graph = null;
-        public Vertex<string> _startingVertex = null; //not for other use except as a search starting point
+        public Dictionary<Relation.CharakterVazbyEnum, UnweightedGraph> _graphs = new();
+        public Dictionary<Relation.CharakterVazbyEnum, Vertex<string>> _graphStartingVertexs = new();
+
         public Graph.Edge[] _vazby = null;
         public Graph.Edge[] _vazbyUredni = null;
+
+        public UnweightedGraph _getGraph(Relation.CharakterVazbyEnum charakter)
+        {
+            if (_graphs.ContainsKey(charakter))
+                return _graphs[charakter];
+            else
+                return null;
+        }
+        public void _setGraph(Relation.CharakterVazbyEnum charakter, UnweightedGraph graph)
+        {
+            _graphs[charakter] = graph;
+        }
+
+        public Vertex<string> _getStartingVertext(Relation.CharakterVazbyEnum charakter)
+        {
+            if (_graphStartingVertexs.ContainsKey(charakter))
+                return _graphStartingVertexs[charakter];
+            else
+                return null;
+        }
+        public void _setStartingVertext(Relation.CharakterVazbyEnum charakter, Vertex<string> vertex)
+        {
+            _graphStartingVertexs[charakter] = vertex;
+        }
+
+
 
         public string NarozeniYear(bool html = false)
         {

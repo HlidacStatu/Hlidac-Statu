@@ -133,6 +133,7 @@ public class StatisticsCache
 
         var skutecneVazby =
             Relation.SkutecnaDobaVazby(await firma.AktualniVazbyAsync(DS.Graphs.Relation.AktualnostType.Libovolny));
+
         foreach (var v in skutecneVazby)
         {
             if (!string.IsNullOrEmpty(v.To?.UniqId)
