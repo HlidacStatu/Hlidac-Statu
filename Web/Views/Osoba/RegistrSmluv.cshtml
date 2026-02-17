@@ -140,7 +140,7 @@
 
                 </td>
                 <td>
-                    @await Html.RenderVazbyAsync(await OsobaVazbyRepo.VazbyProIcoCachedAsync(Model, Relation.CharakterVazbyEnum.VlastnictviKontrola,ico))
+                    @await Html.RenderPathAsync(await HlidacStatu.Repositories.PlneVazby.Core.AllPathsCachedAsync(Model, Relation.CharakterVazbyEnum.VlastnictviKontrola, ico))
                 </td>
             </tr>
         }

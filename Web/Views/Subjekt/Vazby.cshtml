@@ -86,7 +86,11 @@
         {
         <div>
             <h4>@vPerIco.FirmaName</h4>
-            @await Html.RenderVazbyAsync(vPerIco.VazbyPerIco)
+                <br />
+                @{
+                    var paths = await HlidacStatu.Repositories.PlneVazby.Core.AllPathsCachedAsync(Model, Relation.CharakterVazbyEnum.VlastnictviKontrola, vPerIco.ICO);
+                }
+                @await Html.RenderPathAsync(paths)
 
 
         </div>

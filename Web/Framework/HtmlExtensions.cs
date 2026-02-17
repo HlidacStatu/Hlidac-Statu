@@ -36,6 +36,15 @@ namespace HlidacStatu.Web.Framework
         public static async Task<IHtmlContent> RenderVazbyAsync(this IHtmlHelper self, HlidacStatu.DS.Graphs.Graph.Edge[] vazbyToRender)
         {
             var html = await HlidacStatu.Repositories.Graph.Render.RenderVazbyAsync(vazbyToRender, html: true);
+            return self.Raw(html);
+        }
+
+        public static async Task<IHtmlContent> RenderPathAsync(
+            this IHtmlHelper self,
+            IEnumerable<Repositories.PlneVazby.AllPathsFinder.PathResult> pathToRender, 
+            bool onlyFirst = true)
+        {
+            var html = await HlidacStatu.Repositories.Graph.Render.RenderPathAsync(pathToRender, html: true, onlyFirst: onlyFirst);
             return self.Raw(html); 
         }
         

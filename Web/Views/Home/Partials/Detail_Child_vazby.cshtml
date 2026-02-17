@@ -114,7 +114,7 @@
                             <p>
                                 <strong><a href="/politik/@p.NameId">@p.FullName()</a></strong>
                             <div style="padding-left:20px;">
-                                    @(await Html.RenderVazbyAsync(await OsobaVazbyRepo.VazbyProIcoCachedAsync(p, 
+                                    @(await Html.RenderPathAsync(await HlidacStatu.Repositories.PlneVazby.Core.AllPathsCachedAsync(p,
                                     Relation.CharakterVazbyEnum.VlastnictviKontrola,
                                     ss.ico)))
                             </div>

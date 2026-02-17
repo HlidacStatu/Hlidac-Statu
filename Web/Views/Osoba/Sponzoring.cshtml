@@ -120,9 +120,9 @@
         });
         foreach (var dar in sponzoringFirma)
         {
-            Graph.Edge[]? vazby = await OsobaVazbyRepo.VazbyProIcoCachedAsync(Model, Relation.CharakterVazbyEnum.VlastnictviKontrola,dar.IcoDarce);
+            var vazby = await HlidacStatu.Repositories.PlneVazby.Core.AllPathsCachedAsync(Model, Relation.CharakterVazbyEnum.VlastnictviKontrola, dar.IcoDarce);
             var jmenoDarce = await FirmaCache.GetJmenoAsync(dar.IcoDarce);
-            var ihtmlVazby = await Html.RenderVazbyAsync(vazby);
+            var ihtmlVazby = await Html.RenderPathAsync(vazby);
             sponzoringFirmyData.AddRow((dar.DarovanoDne?.Year ?? 0, dar.IcoPrijemce, await dar.JmenoPrijemceAsync(), dar.IcoDarce, jmenoDarce, dar.Hodnota ?? 0, dar.Popis, ihtmlVazby));
         }
 
