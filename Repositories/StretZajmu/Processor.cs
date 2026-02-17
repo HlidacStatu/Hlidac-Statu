@@ -127,9 +127,6 @@ namespace HlidacStatu.Repositories.StretZajmu
                 if (efektivni_doba_stretu_osoby == null)
                     continue;
 
-                if (efektivni_doba_stretu_osoby.From.Value.Year!=2025) //neřešíme budoucí střety
-                    continue;
-
 
                 OsobaStret st = new OsobaStret()
                 {
@@ -152,11 +149,11 @@ namespace HlidacStatu.Repositories.StretZajmu
                     .DistinctBy(v => v.To.Id)
                     .ToArray();
 
-                var debugVazby = aktivniVazby_dobe_platnosti.Where(v => v.To.Id == "47307706").ToArray();
+                var debugVazby = aktivniVazby_dobe_platnosti.Where(v => v.To.Id == "46973460").ToArray();
 
                 int count = 0;
 
-                bool debug = false;
+                bool debug = true;
                 await Devmasters.Batch.Manager.DoActionForAllAsync(aktivniVazby_dobe_platnosti,
                     async (ed) =>
                     {
@@ -174,6 +171,8 @@ namespace HlidacStatu.Repositories.StretZajmu
                         if (ed.Distance > 1)
                         { //je to dcerinka, najdi vazby zpet k matce
                             var vazbykIco = await OsobaVazbyRepo.VazbyProIcoCachedAsync(os.Osoba, DS.Graphs.Relation.CharakterVazbyEnum.VlastnictviKontrola, firma.ICO,true);
+
+                            //dohledat vsechny vazby k firme primo z DB a odfiltrovat pres OverlappingInterval
 
                             foreach (var mv in vazbykIco)
                             {
@@ -267,7 +266,7 @@ namespace HlidacStatu.Repositories.StretZajmu
             string iOd = interval.From?.ToString("yyyy-MM-dd") ?? "*";
             string iDo = interval.To?.ToString("yyyy-MM-dd") ?? "*";
 
-            var query = $"ico:{f.ICO} AND podepsano:[{iOd} TO {iDo}] ";
+            var query = $"ico:{f.ICO} AND podepsano:[{iOd} TO {iDo} }} ";
 
             StatisticsSubjectPerYear<Smlouva.Statistics.Data> res = null;
             res = new StatisticsSubjectPerYear<Smlouva.Statistics.Data>(
