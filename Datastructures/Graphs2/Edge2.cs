@@ -3,22 +3,28 @@ using System;
 
 namespace HlidacStatu.DS.Graphs2
 {
-    public interface IEdge
+    public interface IEdge2
     {
-        IVertex From { get; }
-        IVertex To { get; }
+        IVertex2 From { get; }
+        IVertex2 To { get; }
         Devmasters.DT.DateInterval ConnectionInterval { get; }
     }
 
-    public class Edge<T> : IEdge, IEquatable<Edge<T>>
+    public class HSEdge2 : Edge2<Graphs.Graph.Edge>
+    {
+        public HSEdge2(IVertex2 from, IVertex2 to, DateInterval connectionInterval, Graphs.Graph.Edge bindingPayload) : base(from, to, connectionInterval, bindingPayload)
+        {
+        }
+    }
+    public class Edge2<T> : IEdge2, IEquatable<Edge2<T>>
     {
         public T BindingPayload { get; }
-        public IVertex From { get; }
-        public IVertex To { get; }
+        public IVertex2 From { get; }
+        public IVertex2 To { get; }
         public Devmasters.DT.DateInterval ConnectionInterval { get; }
 
 
-        public Edge(IVertex from, IVertex to, DateInterval connectionInterval, T bindingPayload)
+        public Edge2(IVertex2 from, IVertex2 to, DateInterval connectionInterval, T bindingPayload)
         {
             From = from ?? throw new ArgumentNullException(nameof(from));
             To = to ?? throw new ArgumentNullException(nameof(to));
@@ -26,7 +32,7 @@ namespace HlidacStatu.DS.Graphs2
             this.ConnectionInterval = connectionInterval ?? new DateInterval((DateTime?)null, (DateTime?)null);
         }
 
-        public bool Equals(Edge<T> other)
+        public bool Equals(Edge2<T> other)
         {
             return GetHashCode() == other.GetHashCode();
         }

@@ -13,7 +13,7 @@ namespace HlidacStatu.Repositories.PlneVazby
     {
         public class PathResult
         {
-            public List<IEdge> Edges { get; set; } = new();
+            public List<HSEdge2> Edges { get; set; } = new();
             public DateInterval ValidInterval { get; set; }
 
             public override string ToString()
@@ -31,7 +31,7 @@ namespace HlidacStatu.Repositories.PlneVazby
         /// Výsledky seřazeny od nejkratší cesty.
         /// </summary>
         public static List<PathResult> FindAllPaths(
-            IReadOnlyList<IEdge> edges,
+            IReadOnlyList<HSEdge2> edges,
             string startId,
             string endId,
             DateInterval searchInterval = null)
@@ -53,37 +53,78 @@ namespace HlidacStatu.Repositories.PlneVazby
 
             // DFS s backtrackingem
             var pathNodes = new HashSet<string> { startId };
-            var currentPath = new List<IEdge>();
+            var currentPath = new List<HSEdge2>();
 
             Dfs(startId, endId, interval, adjacency, pathNodes, currentPath, results);
 
             // Seřadit od nejkratší cesty
             results.Sort((a, b) => a.Edges.Count.CompareTo(b.Edges.Count));
 
-            return results;
+            var deduped = RemoveDuplicates(results);
+            return deduped;
         }
 
         public static List<PathResult> RemoveDuplicates(IEnumerable<PathResult> paths)
         {
             if (paths == null)
                 return null;
-            if (paths.Any() == false)
-                return paths.ToList();
-            if (paths.Count() == 1)
-                return paths.ToList();
-            
 
+            var pathList = paths.ToList();
+            if (pathList.Count <= 1)
+                return pathList;
+
+            // Group paths by their route (sequence of node IDs)
+            var groups = pathList.GroupBy(p => GetRouteKey(p));
+
+            var results = new List<PathResult>();
+            foreach (var group in groups)
+            {
+                var groupPaths = group.ToList();
+
+                // Merge all intervals for this route
+                var intervals = groupPaths.Select(p => p.ValidInterval).ToArray();
+                var merged = DateInterval.MergeDateIntervals(intervals);
+
+                // Create one PathResult per merged interval, reusing edges from the first path in the group
+                var templateEdges = groupPaths[0].Edges;
+                foreach (var interval in merged)
+                {
+                    results.Add(new PathResult
+                    {
+                        Edges = new List<HSEdge2>(templateEdges),
+                        ValidInterval = interval
+                    });
+                }
+            }
+
+            results.Sort((a, b) => a.Edges.Count.CompareTo(b.Edges.Count));
+            return results;
 
         }
 
+
+        private static string GetRouteKey(PathResult path)
+        {
+            if (path.Edges == null || path.Edges.Count == 0)
+                return string.Empty;
+
+            var sb = new StringBuilder();
+            foreach (var edge in path.Edges)
+            {
+                sb.Append(edge.From.Id);
+                sb.Append('>');
+            }
+            sb.Append(path.Edges[path.Edges.Count - 1].To.Id);
+            return sb.ToString();
+        }
 
         private static void Dfs(
             string current,
             string endId,
             DateInterval currentInterval,
-            Dictionary<string, List<IEdge>> adjacency,
+            Dictionary<string, List<HSEdge2>> adjacency,
             HashSet<string> pathNodes,
-            List<IEdge> currentPath,
+            List<HSEdge2> currentPath,
             List<PathResult> results)
         {
             if (!adjacency.TryGetValue(current, out var neighbors))
@@ -103,7 +144,7 @@ namespace HlidacStatu.Repositories.PlneVazby
                 {
                     results.Add(new PathResult
                     {
-                        Edges = new List<IEdge>(currentPath) { edge },
+                        Edges = new List<HSEdge2>(currentPath) { edge },
                         ValidInterval = overlap
                     });
                     continue; // nehledáme cesty PŘES cíl, ale hledáme další cesty DO cíle

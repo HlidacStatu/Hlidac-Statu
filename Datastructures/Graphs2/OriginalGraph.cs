@@ -57,13 +57,13 @@ namespace HlidacStatu.DS.Graphs2
 
     public class UnweightedGraph
     {
-        public UnweightedGraph(IEnumerable<IVertex> initialNodes = null)
+        public UnweightedGraph(IEnumerable<IVertex2> initialNodes = null)
         {
-            Vertices = initialNodes == null ? new ConcurrentHashSet2<IVertex>() : ConcurrentHashSet2<IVertex>.ToConcurrentHashSet(initialNodes) ;
+            Vertices = initialNodes == null ? new ConcurrentHashSet2<IVertex2>() : ConcurrentHashSet2<IVertex2>.ToConcurrentHashSet(initialNodes) ;
         }
 
-        public ConcurrentHashSet2<IVertex> Vertices { get; }
-        public IEnumerable<IEdge> Edges { get => Vertices.SelectMany(v => v.OutgoingEdges); }
+        public ConcurrentHashSet2<IVertex2> Vertices { get; }
+        public IEnumerable<IEdge2> Edges { get => Vertices.SelectMany(v => v.OutgoingEdges); }
 
         /// <summary>
         /// Add new directed unweighted edge to graph. If Vertices (from, to) doesn't exist, it adds them too.
@@ -73,12 +73,12 @@ namespace HlidacStatu.DS.Graphs2
         /// <param name="to">Destination vertex</param>
         /// <param name="connectionInterval">Time interval during which this edge is active/valid</param>
         /// <param name="bindingPayload">Additional data attached to the edge</param>
-        public void AddEdge<T>(IVertex from, IVertex to, DateInterval connectionInterval, T bindingPayload)
+        public void AddEdge<T>(IVertex2 from, IVertex2 to, DateInterval connectionInterval, T bindingPayload)
         {
-            IVertex vertex1 = GetOrAddVertex(from);
-            IVertex vertex2 = GetOrAddVertex(to);
+            IVertex2 vertex1 = GetOrAddVertex(from);
+            IVertex2 vertex2 = GetOrAddVertex(to);
 
-            var edge = new Edge<T>(vertex1, vertex2, connectionInterval, bindingPayload);
+            var edge = new Edge2<T>(vertex1, vertex2, connectionInterval, bindingPayload);
 
             // There can be only one direct outgoing edge from A to B
             // Other outgoing edges from A to B are skipped in graph
@@ -86,9 +86,9 @@ namespace HlidacStatu.DS.Graphs2
         }
 
         object lockAddVert = new object();
-        private IVertex GetOrAddVertex(IVertex vertex)
+        private IVertex2 GetOrAddVertex(IVertex2 vertex)
         {
-            if (Vertices.TryGetValue(vertex, out IVertex actual))
+            if (Vertices.TryGetValue(vertex, out IVertex2 actual))
             {
                 return actual;
             }
@@ -112,17 +112,17 @@ namespace HlidacStatu.DS.Graphs2
         /// When null, all edges are traversed regardless of their interval.
         /// </param>
         /// <returns>Edges in order along the path (from => to), or null if no path exists</returns>
-        public IEnumerable<IEdge> ShortestPath(IVertex from, IVertex to, DateTime? dateToCheck = null)
+        public IEnumerable<IEdge2> ShortestPath(IVertex2 from, IVertex2 to, DateTime? dateToCheck = null)
         {
             bool fromExists = Vertices.TryGetValue(from, out from);
             bool toExists = Vertices.TryGetValue(to, out to);
             if (!fromExists || !toExists)
                 return null;
 
-            var visitHistory = new List<IEdge>();
-            var visitedVertices = new HashSet<IVertex>();
+            var visitHistory = new List<IEdge2>();
+            var visitedVertices = new HashSet<IVertex2>();
 
-            Queue<IVertex> queuedVertices = new Queue<IVertex>();
+            Queue<IVertex2> queuedVertices = new Queue<IVertex2>();
             queuedVertices.Enqueue(from);
 
             while (queuedVertices.Count > 0)
@@ -163,7 +163,7 @@ namespace HlidacStatu.DS.Graphs2
         /// <param name="edge">The edge to check</param>
         /// <param name="date">The date to check against the edge's interval</param>
         /// <returns>True if the edge is active at the given date</returns>
-        private bool IsEdgeActiveAtDate(IEdge edge, DateTime date)
+        private bool IsEdgeActiveAtDate(IEdge2 edge, DateTime date)
         {
             // If there is no interval defined, the edge is always active
             if (edge.ConnectionInterval == null)
@@ -179,9 +179,9 @@ namespace HlidacStatu.DS.Graphs2
         /// <summary>
         /// Function to find path in visitHistory
         /// </summary>
-        private IEnumerable<IEdge> GetPath(IVertex from, IVertex to, List<IEdge> visitHistory)
+        private IEnumerable<IEdge2> GetPath(IVertex2 from, IVertex2 to, List<IEdge2> visitHistory)
         {
-            var results = new List<IEdge>();
+            var results = new List<IEdge2>();
             var previousVertex = to;
 
             do
@@ -192,7 +192,7 @@ namespace HlidacStatu.DS.Graphs2
 
             } while (!previousVertex.Equals(from));
 
-            return results.Reverse<IEdge>();
+            return results.Reverse<IEdge2>();
         }
 
 
@@ -207,11 +207,11 @@ namespace HlidacStatu.DS.Graphs2
         /// When null, all edges are followed regardless of their interval.
         /// </param>
         /// <returns>Vertices in breadth-first order</returns>
-        public IEnumerable<IVertex> BreathFirstIterator(IVertex from, DateTime? dateToCheck = null)
+        public IEnumerable<IVertex2> BreathFirstIterator(IVertex2 from, DateTime? dateToCheck = null)
         {
-            var visitedVertices = new HashSet<IVertex>();
+            var visitedVertices = new HashSet<IVertex2>();
 
-            Queue<IVertex> queuedVertices = new Queue<IVertex>();
+            Queue<IVertex2> queuedVertices = new Queue<IVertex2>();
             queuedVertices.Enqueue(from);
 
             while (queuedVertices.Count > 0)

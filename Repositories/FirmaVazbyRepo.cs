@@ -283,22 +283,22 @@ namespace HlidacStatu.Repositories
         private static async Task InitializeGraphAsync(this Firma firma, Relation.CharakterVazbyEnum charakterVazby)
         {
             var uGraph = new UnweightedGraph();
-            Vertex<string> _startingVertex = null;
+            Vertex2<string> _startingVertex = null;
       
             var vazbyVlastnictvi = await firma.VazbyAsync(charakterVazby);
             foreach (var vazba in vazbyVlastnictvi)
             {
                 if (vazba.From is null)
                 {
-                    _startingVertex = new Vertex<string>(vazba.To.UniqId,vazba.To.UniqId);
+                    _startingVertex = new Vertex2<string>(vazba.To.UniqId,vazba.To.UniqId);
                     continue;
                 }
 
                 if (vazba.To is null)
                     continue;
 
-                var fromVertex = new Vertex<string>(vazba.From.UniqId,vazba.From.UniqId);
-                var toVertex = new Vertex<string>(vazba.To.UniqId,vazba.To.UniqId);
+                var fromVertex = new Vertex2<string>(vazba.From.UniqId,vazba.From.UniqId);
+                var toVertex = new Vertex2<string>(vazba.To.UniqId,vazba.To.UniqId);
 
                 uGraph.AddEdge(fromVertex, toVertex, vazba.DateInterval(), vazba);
             }
@@ -312,7 +312,7 @@ namespace HlidacStatu.Repositories
                 await firma.InitializeGraphAsync(charakterVazby);
 
             if (firma._getStartingVertext(charakterVazby) is null)
-                firma._setStartingVertext(charakterVazby, new Vertex<string>(
+                firma._setStartingVertext(charakterVazby, new Vertex2<string>(
                     HlidacStatu.DS.Graphs.Graph.Node.Prefix_NodeType_Company + firma.ICO,
                     HlidacStatu.DS.Graphs.Graph.Node.Prefix_NodeType_Company + firma.ICO
                     ));
@@ -322,7 +322,7 @@ namespace HlidacStatu.Repositories
                 var shortestPath = graph.ShortestPath(firma._getStartingVertext(charakterVazby), CreateVertexFromIco(ico));
                 if (shortestPath == null)
                     return Array.Empty<HlidacStatu.DS.Graphs.Graph.Edge>();
-                var result = shortestPath.Select(x => ((Edge<HlidacStatu.DS.Graphs.Graph.Edge>)x).BindingPayload).ToArray();
+                var result = shortestPath.Select(x => ((Edge2<HlidacStatu.DS.Graphs.Graph.Edge>)x).BindingPayload).ToArray();
                 return result; // shortestGraph.ShortestTo(ico).ToArray();
             }
             catch (Exception e)
@@ -332,9 +332,9 @@ namespace HlidacStatu.Repositories
             }
         }
 
-        private static Vertex<string> CreateVertexFromIco(string ico)
+        private static Vertex2<string> CreateVertexFromIco(string ico)
         {
-            return new Vertex<string>($"{HlidacStatu.DS.Graphs.Graph.Node.Prefix_NodeType_Company}{ico}", $"{HlidacStatu.DS.Graphs.Graph.Node.Prefix_NodeType_Company}{ico}");
+            return new Vertex2<string>($"{HlidacStatu.DS.Graphs.Graph.Node.Prefix_NodeType_Company}{ico}", $"{HlidacStatu.DS.Graphs.Graph.Node.Prefix_NodeType_Company}{ico}");
         }
 
         public static async Task UpdateVazbyFromDbAsync(this Firma firma, Relation.CharakterVazbyEnum charakterVazby = Relation.CharakterVazbyEnum.VlastnictviKontrola)

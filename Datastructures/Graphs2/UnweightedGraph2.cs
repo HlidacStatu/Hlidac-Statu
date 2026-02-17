@@ -12,7 +12,7 @@ namespace HlidacStatu.DS.Graphs2
 
     public sealed record PathResult(
     IReadOnlyList<string> Nodes,
-    IReadOnlyList<IEdge> Edges,
+    IReadOnlyList<IEdge2> Edges,
     DateInterval ValidInterval
 );
 
@@ -20,26 +20,26 @@ namespace HlidacStatu.DS.Graphs2
 
     public class __UnweightedGraph
     {
-        public __UnweightedGraph(IEnumerable<IVertex> initialNodes = null)
+        public __UnweightedGraph(IEnumerable<IVertex2> initialNodes = null)
         {
-            Vertices = initialNodes == null ? new HashSet<IVertex>() : initialNodes.ToHashSet();
+            Vertices = initialNodes == null ? new HashSet<IVertex2>() : initialNodes.ToHashSet();
         }
 
-        public HashSet<IVertex> Vertices { get; }
-        public IEnumerable<IEdge> Edges { get => Vertices.SelectMany(v => v.OutgoingEdges); }
+        public HashSet<IVertex2> Vertices { get; }
+        public IEnumerable<IEdge2> Edges { get => Vertices.SelectMany(v => v.OutgoingEdges); }
 
         /// <summary>
         /// Add new directed unweighted edge to graph. If Vertices (from, to) doesn't exist. It adds them too.
         /// </summary>
         /// <param name="from">Starting vertex</param>
         /// <param name="to">Destination vertex</param>
-        public void AddEdge<T>(IVertex from, IVertex to, DateInterval connectionInterval, T bindingPayload)
+        public void AddEdge<T>(IVertex2 from, IVertex2 to, DateInterval connectionInterval, T bindingPayload)
         {
-            IVertex vertex1 = GetOrAddVertex(from);
-            IVertex vertex2 = GetOrAddVertex(to);
+            IVertex2 vertex1 = GetOrAddVertex(from);
+            IVertex2 vertex2 = GetOrAddVertex(to);
 
             //dont like this, but can't think better solution right now
-            var edge = new Edge<T>(vertex1, vertex2, connectionInterval, bindingPayload);
+            var edge = new Edge2<T>(vertex1, vertex2, connectionInterval, bindingPayload);
 
             // There can be only one direct outgoing edge from A to B
             // Other outgoing edges from A to B are skipped in graph
@@ -47,9 +47,9 @@ namespace HlidacStatu.DS.Graphs2
         }
 
         object lockAddVert = new object();
-        private IVertex GetOrAddVertex(IVertex vertex)
+        private IVertex2 GetOrAddVertex(IVertex2 vertex)
         {
-            if (Vertices.TryGetValue(vertex, out IVertex actual))
+            if (Vertices.TryGetValue(vertex, out IVertex2 actual))
             {
                 return actual;
             }
@@ -67,7 +67,7 @@ namespace HlidacStatu.DS.Graphs2
         /// <param name="from">Starting vertex</param>
         /// <param name="to">Destination vertex</param>
         /// <returns>Edges in order along the path (from => to)</returns>
-        public IEnumerable<IEdge> ShortestPath2(IVertex from, IVertex to, DateTime? fromD, DateInterval interval = null)
+        public IEnumerable<IEdge2> ShortestPath2(IVertex2 from, IVertex2 to, DateTime? fromD, DateInterval interval = null)
         {
 
             bool fromExists = Vertices.TryGetValue(from, out from);
@@ -75,10 +75,10 @@ namespace HlidacStatu.DS.Graphs2
             if (!fromExists || !toExists)
                 return null;
 
-            var visitHistory = new List<IEdge>();
-            var visitedVertices = new HashSet<IVertex>();
+            var visitHistory = new List<IEdge2>();
+            var visitedVertices = new HashSet<IVertex2>();
 
-            Queue<IVertex> queuedVertices = new Queue<IVertex>();
+            Queue<IVertex2> queuedVertices = new Queue<IVertex2>();
             queuedVertices.Enqueue(from);
 
             while (queuedVertices.Count > 0)
@@ -112,12 +112,12 @@ namespace HlidacStatu.DS.Graphs2
         /// <param name="from">Starting vertex</param>
         /// <param name="to">Destination vertex</param>
         /// <returns>Edges in order along the path (from => to)</returns>
-        public PathResult ShortestPath(IVertex from, IVertex to, DateInterval interval = null)
+        public PathResult ShortestPath(IVertex2 from, IVertex2 to, DateInterval interval = null)
         {
-            IEnumerable<IEdge> edges = this.Edges;
+            IEnumerable<IEdge2> edges = this.Edges;
             return ShortestPath(edges, from, to, interval);
         }
-        public static PathResult ShortestPath(IEnumerable<IEdge> edges, IVertex from, IVertex to, DateInterval interval = null)
+        public static PathResult ShortestPath(IEnumerable<IEdge2> edges, IVertex2 from, IVertex2 to, DateInterval interval = null)
         {
             
             string fromId = from.Id;
@@ -144,10 +144,10 @@ namespace HlidacStatu.DS.Graphs2
             var statesNode = new List<string>();
             var statesInterval = new List<DateInterval>();
             var parentState = new List<int>();          // -1 = root
-            var parentEdge = new List<IEdge>();         // null = root
+            var parentEdge = new List<IEdge2>();         // null = root
 
 
-            int NewState(string node, DateInterval interval, int parent, IEdge via)
+            int NewState(string node, DateInterval interval, int parent, IEdge2 via)
             {
                 int id = statesNode.Count;
                 statesNode.Add(node);
@@ -231,9 +231,9 @@ namespace HlidacStatu.DS.Graphs2
         List<string> nodes,
         List<DateInterval> intervals,
         List<int> parentState,
-        List<IEdge> parentEdge)
+        List<IEdge2> parentEdge)
         {
-            var pathEdges = new List<IEdge>();
+            var pathEdges = new List<IEdge2>();
             var pathNodes = new List<string>();
 
             int cur = lastStateId;
@@ -274,9 +274,9 @@ namespace HlidacStatu.DS.Graphs2
         /// <summary>
         /// Function to find path in visitHistory
         /// </summary>
-        private IEnumerable<IEdge> GetPath(IVertex from, IVertex to, List<IEdge> visitHistory)
+        private IEnumerable<IEdge2> GetPath(IVertex2 from, IVertex2 to, List<IEdge2> visitHistory)
         {
-            var results = new List<IEdge>();
+            var results = new List<IEdge2>();
             var previousVertex = to;
 
             do
@@ -287,7 +287,7 @@ namespace HlidacStatu.DS.Graphs2
 
             } while (!previousVertex.Equals(from));
 
-            return results.Reverse<IEdge>();
+            return results.Reverse<IEdge2>();
         }
 
 
@@ -296,11 +296,11 @@ namespace HlidacStatu.DS.Graphs2
         /// </summary>
         /// <param name="from">Vrchol, ze kterého se bude graf procházet</param>
         /// <returns></returns>
-        public IEnumerable<IVertex> BreathFirstIterator(IVertex from)
+        public IEnumerable<IVertex2> BreathFirstIterator(IVertex2 from)
         {
-            var visitedVertices = new HashSet<IVertex>();
+            var visitedVertices = new HashSet<IVertex2>();
 
-            Queue<IVertex> queuedVertices = new Queue<IVertex>();
+            Queue<IVertex2> queuedVertices = new Queue<IVertex2>();
             queuedVertices.Enqueue(from);
 
             while (queuedVertices.Count > 0)

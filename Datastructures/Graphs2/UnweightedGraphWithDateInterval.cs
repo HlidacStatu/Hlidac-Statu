@@ -13,26 +13,26 @@ namespace HlidacStatu.DS.Graphs2
     {
         private static readonly ILogger _logger = Log.ForContext<UnweightedGraph>();
 
-        public UnweightedGraph_imp2(IEnumerable<IVertex> initialNodes = null)
+        public UnweightedGraph_imp2(IEnumerable<IVertex2> initialNodes = null)
         {
-            Vertices = initialNodes == null ? new HashSet<IVertex>() : initialNodes.ToHashSet();
+            Vertices = initialNodes == null ? new HashSet<IVertex2>() : initialNodes.ToHashSet();
         }
 
-        public HashSet<IVertex> Vertices { get; }
-        public IEnumerable<IEdge> Edges { get => Vertices.SelectMany(v => v.OutgoingEdges); }
+        public HashSet<IVertex2> Vertices { get; }
+        public IEnumerable<IEdge2> Edges { get => Vertices.SelectMany(v => v.OutgoingEdges); }
 
         /// <summary>
         /// Add new directed unweighted edge to graph. If Vertices (from, to) doesn't exist. It adds them too.
         /// </summary>
         /// <param name="from">Starting vertex</param>
         /// <param name="to">Destination vertex</param>
-        public void AddEdge<T>(IVertex from, IVertex to, DateInterval connectionInterval, T bindingPayload)
+        public void AddEdge<T>(IVertex2 from, IVertex2 to, DateInterval connectionInterval, T bindingPayload)
         {
-            IVertex vertex1 = GetOrAddVertex(from);
-            IVertex vertex2 = GetOrAddVertex(to);
+            IVertex2 vertex1 = GetOrAddVertex(from);
+            IVertex2 vertex2 = GetOrAddVertex(to);
 
             //dont like this, but can't think better solution right now
-            var edge = new Edge<T>(vertex1, vertex2, connectionInterval, bindingPayload);
+            var edge = new Edge2<T>(vertex1, vertex2, connectionInterval, bindingPayload);
 
             // There can be only one direct outgoing edge from A to B
             // Other outgoing edges from A to B are skipped in graph
@@ -40,9 +40,9 @@ namespace HlidacStatu.DS.Graphs2
         }
 
         object lockAddVert = new object();
-        private IVertex GetOrAddVertex(IVertex vertex)
+        private IVertex2 GetOrAddVertex(IVertex2 vertex)
         {
-            if (Vertices.TryGetValue(vertex, out IVertex actual))
+            if (Vertices.TryGetValue(vertex, out IVertex2 actual))
             {
                 return actual;
             }
@@ -63,7 +63,7 @@ namespace HlidacStatu.DS.Graphs2
         /// <param name="to">Destination vertex</param>
         /// <param name="interval">Required date interval filter. If null, all edges are considered.</param>
         /// <returns>PathResult with nodes, edges, and valid interval; or null if no path found.</returns>
-        public PathResult ShortestPath(IVertex from, IVertex to, DateInterval interval = null)
+        public PathResult ShortestPath(IVertex2 from, IVertex2 to, DateInterval interval = null)
         {
             //bool fromExists = Vertices.TryGetValue(from, out from);
             //bool toExists = Vertices.TryGetValue(to, out to);
@@ -97,9 +97,9 @@ namespace HlidacStatu.DS.Graphs2
             public string NodeId { get; }
             public DateInterval ValidInterval { get; }
             public int ParentIndex { get; }
-            public IEdge ParentEdge { get; }
+            public IEdge2 ParentEdge { get; }
 
-            public BfsState(string nodeId, DateInterval validInterval, int parentIndex, IEdge parentEdge)
+            public BfsState(string nodeId, DateInterval validInterval, int parentIndex, IEdge2 parentEdge)
             {
                 NodeId = nodeId;
                 ValidInterval = validInterval;
@@ -109,7 +109,7 @@ namespace HlidacStatu.DS.Graphs2
         }
 
         public static PathResult ShortestPath(
-            IEnumerable<IEdge> edges, IVertex from, IVertex to, DateInterval interval = null)
+            IEnumerable<IEdge2> edges, IVertex2 from, IVertex2 to, DateInterval interval = null)
         {
             string fromId = from.Id;
             string toId = to.Id;
@@ -265,7 +265,7 @@ namespace HlidacStatu.DS.Graphs2
         /// </summary>
         private static PathResult ReconstructPath(int destinationIndex, List<BfsState> states)
         {
-            var pathEdges = new List<IEdge>();
+            var pathEdges = new List<IEdge2>();
             var pathNodes = new List<string>();
 
             // Walk backwards from destination to root via parent indices

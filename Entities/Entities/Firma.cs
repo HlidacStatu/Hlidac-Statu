@@ -325,7 +325,7 @@ namespace HlidacStatu.Entities
 
         //Napojení na graf
         public Dictionary<Relation.CharakterVazbyEnum, UnweightedGraph> _graphs = new();
-        public Dictionary<Relation.CharakterVazbyEnum, Vertex<string>> _graphStartingVertexs = new();
+        public Dictionary<Relation.CharakterVazbyEnum, Vertex2<string>> _graphStartingVertexs = new();
 
         public UnweightedGraph _getGraph(Relation.CharakterVazbyEnum charakter)
         {
@@ -339,14 +339,14 @@ namespace HlidacStatu.Entities
             _graphs[charakter] = graph;
         }
 
-        public Vertex<string> _getStartingVertext(Relation.CharakterVazbyEnum charakter)
+        public Vertex2<string> _getStartingVertext(Relation.CharakterVazbyEnum charakter)
         {
             if (_graphStartingVertexs.ContainsKey(charakter))
                 return _graphStartingVertexs[charakter];
             else
                 return null;
         }
-        public void _setStartingVertext(Relation.CharakterVazbyEnum charakter, Vertex<string> vertex)
+        public void _setStartingVertext(Relation.CharakterVazbyEnum charakter, Vertex2<string> vertex)
         {
             _graphStartingVertexs[charakter] = vertex;
         }

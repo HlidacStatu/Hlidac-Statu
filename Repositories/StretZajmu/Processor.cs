@@ -1,4 +1,6 @@
-﻿using HlidacStatu.Caching;
+﻿using Devmasters.DT;
+using Force.DeepCloner;
+using HlidacStatu.Caching;
 using HlidacStatu.Entities;
 using HlidacStatu.Extensions;
 using HlidacStatu.Lib.Analytics;
@@ -155,77 +157,57 @@ namespace HlidacStatu.Repositories.StretZajmu
 
                 bool debug = true;
                 await Devmasters.Batch.Manager.DoActionForAllAsync(aktivniVazby_dobe_platnosti,
-                    async (ed) =>
+                    async (vazba_edge) =>
                     {
 
-                        var efektivni_doba_stretu_s_firmou = Devmasters.DT.DateInterval.GetOverlappingInterval(efektivni_doba_stretu_osoby, ed.DateInterval());
+                        var efektivni_doba_stretu_s_firmou = Devmasters.DT.DateInterval.GetOverlappingInterval(efektivni_doba_stretu_osoby, vazba_edge.DateInterval());
                         if (efektivni_doba_stretu_s_firmou == null)
                             return new Devmasters.Batch.ActionOutputData();
-                        var firma = await HlidacStatu.Repositories.Cache.FirmaCache.GetAsync(ed.To.Id);
+                        var firma = await HlidacStatu.Repositories.Cache.FirmaCache.GetAsync(vazba_edge.To.Id);
 
                         if (_spadaPodStredZajmu(firma) == false)
                         {
                             return new Devmasters.Batch.ActionOutputData();
                         }
 
-                        if (ed.Distance > 1)
+                        if (vazba_edge.Distance > 1)
                         { //je to dcerinka, najdi vazby zpet k matce
-                            var vazbykIco = await OsobaVazbyRepo.VazbyProIcoCachedAsync(os.Osoba, DS.Graphs.Relation.CharakterVazbyEnum.VlastnictviKontrola, firma.ICO,true);
 
-                            //dohledat vsechny vazby k firme primo z DB a odfiltrovat pres OverlappingInterval
+                            //dohledat vsechny vazby k firme 
+                            var cesty = await PlneVazby.Core.AllPathsAsync(os.Osoba,
+                                DS.Graphs.Relation.CharakterVazbyEnum.VlastnictviKontrola,
+                                firma.ICO,
+                                efektivni_doba_stretu_s_firmou);
 
-                            foreach (var mv in vazbykIco)
-                            {
 
-                                var firma_ve_vazbach = await Cache.FirmaCache.GetAsync(mv.To.Id);
-                                if (firma_ve_vazbach == null) 
-                                    continue;
-                                if (_spadaPodStredZajmu( firma_ve_vazbach)) //pokud je cestou statni firma, neresim konflik zajmu
-                                    return new Devmasters.Batch.ActionOutputData();
+                            if (cesty.Any())
+                            {                            
+                                //merge vyhledanych časových úseků
+                                var casoveuseky = DateInterval.MergeDateIntervals(cesty.Select(p => p.ValidInterval).ToArray());
 
-                                var efektivni_doba_stretu_s_firmou_2 = Devmasters.DT.DateInterval.GetOverlappingInterval(efektivni_doba_stretu_s_firmou, mv.DateInterval());
-                                if (efektivni_doba_stretu_s_firmou_2 != null)
+                                foreach (var c_usek in casoveuseky)
                                 {
-                                    efektivni_doba_stretu_s_firmou = Devmasters.DT.DateInterval.GetOverlappingInterval(
-                                        efektivni_doba_stretu_s_firmou,
-                                        efektivni_doba_stretu_s_firmou_2);
+
+                                    var smlouvyStatTask = SmlouvyStatAsync(firma, c_usek);
+                                    var dotaceStatTask = DotaceStatAsync(firma, c_usek);
+
+                                    await Task.WhenAll(smlouvyStatTask, dotaceStatTask);
+
+                                    StretFirma sz = new StretFirma()
+                                    {
+                                        VazbaDistance = vazba_edge.Distance,
+                                        Firma = firma,
+                                        Vazba = vazba_edge,
+                                        Za_obdobi = c_usek,
+                                        SmlouvyStat = await smlouvyStatTask,
+                                        DotaceStat = await dotaceStatTask,
+                                    };
+
+                                    //if (sz.SmlouvyStat.Summary().PocetSmluv>0 || sz.DotaceStat.Summary().PocetDotaci > 0) {
+                                    st.Strety.Add(sz);
                                 }
-                                //else 
-                                //    return new Devmasters.Batch.ActionOutputData();
-
                             }
-
                         }
-
-
-
-                        //if (!
-                        //    (firma.TypSubjektu == Firma.TypSubjektuEnum.Soukromy 
-                        //    || firma.TypSubjektu == Firma.TypSubjektuEnum.Neznamy
-                        //    || firma.TypSubjektu == Firma.TypSubjektuEnum.InsolvecniSpravce
-                        //    || firma.TypSubjektu == Firma.TypSubjektuEnum.Exekutor
-                        //    )
-                        //)
-                        //    return new Devmasters.Batch.ActionOutputData();
-
-                        var smlouvyStatTask = SmlouvyStatAsync(firma, efektivni_doba_stretu_s_firmou);
-                        var dotaceStatTask = DotaceStatAsync(firma, efektivni_doba_stretu_s_firmou);
-
-                        await Task.WhenAll(smlouvyStatTask, dotaceStatTask);
-
-                        StretFirma sz = new StretFirma()
-                        {
-                            VazbaDistance = ed.Distance,
-                            Firma = firma,
-                            Vazba = ed,
-                            Za_obdobi = efektivni_doba_stretu_s_firmou,
-                            SmlouvyStat = await smlouvyStatTask,
-                            DotaceStat = await dotaceStatTask,
-                        };
-
-                        //if (sz.SmlouvyStat.Summary().PocetSmluv>0 || sz.DotaceStat.Summary().PocetDotaci > 0) {
-                        st.Strety.Add(sz);
-
                         return new Devmasters.Batch.ActionOutputData();
                     },
                         null,

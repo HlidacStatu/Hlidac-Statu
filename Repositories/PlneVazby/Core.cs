@@ -18,10 +18,10 @@ namespace HlidacStatu.Repositories.PlneVazby
     bool refresh = false)
         {
             var vazby = await f.VazbyAsync(Relation.CharakterVazbyEnum.VlastnictviKontrola, refresh);
-            var edges = vazby.Select(m => new Edge<HlidacStatu.DS.Graphs.Graph.Edge>(
-                new Vertex<string>(m.From?.UniqId ?? HlidacStatu.DS.Graphs.Graph.Node.Prefix_NodeType_Company + ico, m.From?.UniqId ?? HlidacStatu.DS.Graphs.Graph.Node.Prefix_NodeType_Company + ico),
-                new Vertex<string>(m.To.UniqId, m.To.UniqId),
-                m.DateInterval(), m)).ToList();
+            var edges = vazby.Select(edge => new HSEdge2(
+                new Vertex2<string>(edge.From?.UniqId ?? HlidacStatu.DS.Graphs.Graph.Node.Prefix_NodeType_Company + ico, edge.From?.UniqId ?? HlidacStatu.DS.Graphs.Graph.Node.Prefix_NodeType_Company + ico),
+                new Vertex2<string>(edge.To.UniqId, edge.To.UniqId),
+                edge.DateInterval(), edge)).ToList();
 
             List<AllPathsFinder.PathResult> paths = AllPathsFinder.FindAllPaths(
                 edges,
@@ -38,12 +38,12 @@ DateInterval searchInterval = null,
 bool refresh = false)
         {
             var vazby = await o.VazbyAsync(Relation.CharakterVazbyEnum.VlastnictviKontrola, refresh);
-            var edges = vazby.Select(m => new Edge<HlidacStatu.DS.Graphs.Graph.Edge>(
-                new Vertex<string>(
-                    m.From?.UniqId ?? HlidacStatu.DS.Graphs.Graph.Node.Prefix_NodeType_Person + o.InternalId, 
-                    m.From?.UniqId ?? HlidacStatu.DS.Graphs.Graph.Node.Prefix_NodeType_Person + o.InternalId),
-                new Vertex<string>(m.To.UniqId, m.To.UniqId),
-                m.DateInterval(), m)).ToList();
+            var edges = vazby.Select(edge => new HSEdge2(
+                new Vertex2<string>(
+                    edge.From?.UniqId ?? HlidacStatu.DS.Graphs.Graph.Node.Prefix_NodeType_Person + o.InternalId, 
+                    edge.From?.UniqId ?? HlidacStatu.DS.Graphs.Graph.Node.Prefix_NodeType_Person + o.InternalId),
+                new Vertex2<string>(edge.To.UniqId, edge.To.UniqId),
+                edge.DateInterval(), edge)).ToList();
             
             List<AllPathsFinder.PathResult> paths = AllPathsFinder.FindAllPaths(
                 edges,

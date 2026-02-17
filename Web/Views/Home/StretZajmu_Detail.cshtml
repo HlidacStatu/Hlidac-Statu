@@ -90,7 +90,6 @@
                 .OrderByDescending(o => o.DotaceStat.Summary().CelkemPrideleno + o.SmlouvyStat.Summary().CelkovaHodnotaSmluv)
                 .ThenByDescending(o => o.DotaceStat.Summary().PocetDotaci + o.SmlouvyStat.Summary().PocetSmluv))
 {
-    var vazbyPerIco = await OsobaVazbyRepo.VazbyProIcoCachedAsync(Model.Osoba_with_Event.Osoba, Relation.CharakterVazbyEnum.VlastnictviKontrola, item.Firma.ICO);
 
     string iOd = item.Za_obdobi.From?.ToString("yyyy-MM-dd") ?? "*";
     string iDo = item.Za_obdobi.To?.ToString("yyyy-MM-dd") ?? "*";
@@ -105,7 +104,15 @@
     string customUrlSmlouvy = $"https://www.hlidacstatu.cz/hledatsmlouvy?q=" + System.Net.WebUtility.UrlEncode(querySmlouvy);
     string customUrlDotace = $"https://www.hlidacstatu.cz/dotace/hledat?q=" + System.Net.WebUtility.UrlEncode(queryDotace);
 
-    var svazba = await HlidacStatu.Repositories.Graph.Render.RenderVazbyAsync(vazbyPerIco, html: true, multiline: false);
+
+    var pathsPerIco = await HlidacStatu.Repositories.PlneVazby.Core.AllPathsAsync(
+        Model.Osoba_with_Event.Osoba, 
+        Relation.CharakterVazbyEnum.VlastnictviKontrola, 
+        item.Firma.ICO,
+        item.Za_obdobi
+    );
+
+    var svazba = await HlidacStatu.Repositories.Graph.Render.RenderPathAsync(pathsPerIco, html: true, multiline: false);
 
     var smlouvySummary = item.SmlouvyStat.Summary();
     var dotaceSummary = item.DotaceStat.Summary();

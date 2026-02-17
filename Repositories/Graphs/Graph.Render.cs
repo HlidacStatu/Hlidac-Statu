@@ -76,7 +76,57 @@ namespace HlidacStatu.Repositories
                     return ret;
                 }
             }
+            public static async Task<string> RenderPathAsync(
+                IEnumerable<PlneVazby.AllPathsFinder.PathResult> pathToRender,
+            bool html = true, bool multiline = true, bool onlyFirst = true)
+            {
 
+                if (pathToRender == null)
+                {
+                    return string.Empty;
+                }
+                if (!pathToRender.Any())
+                {
+                    return string.Empty;
+                }
+
+                if (onlyFirst == false)
+                    throw new NotImplementedException("Rendering of multiple paths is not implemented yet.");
+
+                var path = pathToRender.First();
+
+                var firstVazba = path.Edges.First().BindingPayload;
+
+                if (path.Edges.Count() == 1)
+                {
+                    return await RenderVazbaAsync(firstVazba, html);
+                }
+                else
+                {
+                    var firstFromName = await PrintNameAsync(firstVazba.From, html);
+                    var firstToName = await PrintNameAsync(firstVazba.To, html);
+
+                    var remainingNames = new List<string>();
+                    foreach (var m in path.Edges.Skip(1))
+                    {
+                        remainingNames.Add($"<i>{m.BindingPayload.Descr}</i> v {await PrintNameAsync(m.BindingPayload.To, html)}");
+                    }
+
+                    var ret = html ? "Nepřímá vazba přes:" + (multiline ? "<br />" : "")
+                                    + "<small>"
+                                    + $"{firstFromName} <i>/{firstVazba.Descr}/</i> v {firstToName} {firstVazba.Doba()}"
+                                    + $" → "
+                                    + string.Join(" → ", remainingNames)
+                                    + "</small>"
+                              : "Nepřímá vazba přes:" + (multiline ? "<br />" : "")
+                                    + $"{firstFromName} /{firstVazba.Descr}/ v {firstToName} {firstVazba.Doba()}"
+                                    + $" → "
+                                    + string.Join(" → ", remainingNames)
+
+                                    ;
+                    return ret;
+                }
+            }
             public static async Task<string> PrintNameAsync(HlidacStatu.DS.Graphs.Graph.Node node, bool html = false)
             {
                 switch (node.Type)
