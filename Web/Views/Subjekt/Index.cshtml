@@ -1132,7 +1132,12 @@
             účastní jako dlužník, věřitel či správce.
         </p>
 
-        @{
+        @if (User.Identity?.IsAuthenticated == false)
+        {
+            <p>Pro základní informace o insolvenci musíte být přihlášeni</p>
+        }
+        else
+        {
             var insDluznik = await InsolvenceRepo.Searching.SimpleSearchAsync("icodluznik:" + Model.ICO, 1, 1, (int)HlidacStatu.Repositories.Searching.InsolvenceSearchResult.InsolvenceOrderResult.FastestForScroll, false, InsolvenceLimitedView.IsLimited(User));
             var insVeritel = await InsolvenceRepo.Searching.SimpleSearchAsync("icoveritel:" + Model.ICO, 1, 1, (int)HlidacStatu.Repositories.Searching.InsolvenceSearchResult.InsolvenceOrderResult.FastestForScroll, false, InsolvenceLimitedView.IsLimited(User));
             var insSpravce = await InsolvenceRepo.Searching.SimpleSearchAsync("icospravce:" + Model.ICO, 1, 1, (int)HlidacStatu.Repositories.Searching.InsolvenceSearchResult.InsolvenceOrderResult.FastestForScroll, false, InsolvenceLimitedView.IsLimited(User));
@@ -1141,35 +1146,36 @@
             insolv.Add("dluznik|dlužník|dlužníka|dlužníkem", insDluznik.Total);
             insolv.Add("veritel|věřitel|věřitele|veřitelem", insVeritel.Total);
             insolv.Add("spravce|insolvenční správce|insolvenčního správce|insolvenčním správcem", insSpravce.Total);
-        }
-        @if (insolv.Sum(m => m.Value) > 0)
-        {
-            <p>
-                @Model.Jmeno se vyskytuje
-                <ul>
-                    @foreach (var kv in insolv.OrderByDescending(m => m.Value))
-                    {
-                        var text = kv.Key.Split('|');
-                        string surl = WebUtil.GetSearchUrl("/insolvence/hledat", $"ico{text[0]}:" + Model.ICO);
+            
+            if (insolv.Sum(m => m.Value) > 0)
+            {
+                <p>
+                    @Model.Jmeno se vyskytuje
+                    <ul>
+                        @foreach (var kv in insolv.OrderByDescending(m => m.Value))
+                        {
+                            var text = kv.Key.Split('|');
+                            string surl = WebUtil.GetSearchUrl("/insolvence/hledat", $"ico{text[0]}:" + Model.ICO);
 
-                        <li>
-                            @Html.Raw(Devmasters.Lang.CS.Plural.Get((int)kv.Value,
-                            " se vyskytuje v <a href='" + surl + "'><b>jedné insolvenci</b></a>", " se vyskytuje v <a href='" + surl + "'><b>{0} insolvencích</b></a>", " se vyskytuje v <a href='" + surl + "'><b>{0} insolvencích</b></a>")) jako @text[1].
-                </li>
-                                }
-                </ul>
+                            <li>
+                                @Html.Raw(Devmasters.Lang.CS.Plural.Get((int)kv.Value,
+                                " se vyskytuje v <a href='" + surl + "'><b>jedné insolvenci</b></a>", " se vyskytuje v <a href='" + surl + "'><b>{0} insolvencích</b></a>", " se vyskytuje v <a href='" + surl + "'><b>{0} insolvencích</b></a>")) jako @text[1].
+                    </li>
+                                    }
+                    </ul>
+                </p>
+            }
+            <p class="text-center">
+                <a href="/subjekt/InsolvencniRejstrik/@Model.ICO"
+                   class="btn btn-hs btn-primary btn-sm my-3 position-relative">
+                    Podrobnosti o insolvencích se vztahem k organizaci
+                    <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                        @(HlidacStatu.Util.RenderData.NiceNumber(insDluznik.Total + insVeritel.Total + insSpravce.Total))
+                    </span>
+                </a>
             </p>
-        }
-        <p class="text-center">
-            <a href="/subjekt/InsolvencniRejstrik/@Model.ICO"
-               class="btn btn-hs btn-primary btn-sm my-3 position-relative">
-                Podrobnosti o insolvencích se vztahem k organizaci
-                <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
-                    @(HlidacStatu.Util.RenderData.NiceNumber(insDluznik.Total + insVeritel.Total + insSpravce.Total))
-                </span>
-            </a>
-        </p>
-
+            
+        }    
     </div>
     <hr />
 
