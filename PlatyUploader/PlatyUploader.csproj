@@ -15,4 +15,11 @@
     <ItemGroup>
         <PackageReference Include="EPPlus" Version="8.0.7" />
     </ItemGroup>
+
+    <ItemGroup>
+      <None Update="appsettings.development.json">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+      </None>
+    </ItemGroup>
 </Project>
