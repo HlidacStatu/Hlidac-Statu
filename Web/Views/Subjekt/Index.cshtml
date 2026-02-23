@@ -396,7 +396,7 @@
                  model="@(new AreaRangeRenderOptions() { Platy = platyUrednikuOrg.Platy, CssHeight = "380" })" />
 
         <p class="text-center">
-            <a target="_blank" href="https://platy.hlidacstatu.cz/urednici/detail/@Model.DatovaSchranka"
+            <a target="_blank" href="https://platy.hlidacstatu.cz/urednici/detail/@(platyUrednikuOrg.DS)"
                class="btn btn-hs btn-primary btn-sm my-3 position-relative">
                 Všechny platy @(Model.JsemOVM() ? "úředníků" : "manažerů") v této organizaci
                 <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">@(HlidacStatu.Util.RenderData.NiceNumber(pocetPlatuUredniku))</span>
