@@ -8,6 +8,8 @@ namespace PlatyUploader;
 public static class ParsePlatyUrednikuFile
 {
     private static readonly ILogger Logger = Log.ForContext(typeof(ParsePlatyUrednikuFile));
+    private const int minimalAvgPlat = 30_000;
+    private const int maximalAvgPlat = 400_000;
 
     public static async Task HandleFileUploadAsync(string filePath, DateTime denOdeslaniDatovky,
         DateTime denPrijetiOdpovedi)
@@ -26,6 +28,28 @@ public static class ParsePlatyUrednikuFile
             var result = parser.Parse(fileStream, denOdeslaniDatovky, denPrijetiOdpovedi);
 
             Validate(result);
+            var isPlatValid = ValidateAvgPlat(result);
+            if (!isPlatValid)
+            {
+                Console.WriteLine($"Průměrný plat pro {filePath} je mimo range <30 000 a 350 000>");
+                Console.WriteLine("Chcete tato data uložit? stiskněte klávesu A-Ano (uloží záznam - data jsou v pořádku) / klávesu N-Ne (přeskočí záznam)");
+                while (true)
+                {
+                    var keyPressed = Console.ReadLine()?.Trim().ToLowerInvariant();
+                    if (keyPressed == "a")
+                    {
+                        break;
+                    }
+
+                    if (keyPressed == "n")
+                    {
+                        Logger.Information("{FilePath} => SKIPPED", filePath);
+                        return;
+                    }
+                    Console.WriteLine("Neplatná volba. Zadejte prosím 'A' pro pokračovat nebo 'N' pro přeskočit.");
+                }
+            }
+            
             EnsureUniquePositionNames(result.Platy);
             await SaveAsync(result);
 
@@ -56,10 +80,27 @@ public static class ParsePlatyUrednikuFile
 
         if (result.Platy.Any(p => p.PocetMesicu < 0 || p.PocetMesicu > 12))
             throw new InvalidOperationException("Nesmyslný počet odpracovaných měsíců.");
+    }
+    
+    private static bool ValidateAvgPlat(ParseResult result)
+    {
+        // don't care about 0 plat
+        var platyToCheck = result.Platy
+            .Where(p => p.Plat > 0)
+            .OrderBy(p => p.HrubyMesicniPlatVcetneOdmen)
+            .ToList();
+        // to be sure we have to also skip extremes
+        platyToCheck = platyToCheck.Skip(1).SkipLast(1).ToList();
 
-        var avgPlat = result.Platy.Average(p => p.HrubyMesicniPlatVcetneOdmen);
-        if (avgPlat is <= 30_000 or >= 350_000)
-            throw new InvalidOperationException("Průměrný plat je mimo range <30 000 a 350 000>.");
+        if (platyToCheck.Count > 0)
+        {
+            var avgPlat = platyToCheck.Average(p => p.HrubyMesicniPlatVcetneOdmen);
+            if (avgPlat is <= minimalAvgPlat or >= maximalAvgPlat)
+            {
+                return false;
+            }
+        }
+        return true;
     }
 
     private static void EnsureUniquePositionNames(List<PuPlat> platy)
@@ -90,7 +131,6 @@ public static class ParsePlatyUrednikuFile
         {
             puPlat.IdOrganizace = idOrganizace;
             await PuRepo.UpsertPlatAsync(puPlat);
-
             if (!zduvodneniOdmen && puPlat.Odmeny > 0 && !string.IsNullOrWhiteSpace(puPlat.PoznamkaPlat))
             {
                 zduvodneniOdmen = true;
@@ -180,7 +220,7 @@ public class PlatyUrednikuParser
         ("Plat", ColumnName.Plat),
         ("Odměny", ColumnName.Odmeny),
         ("Nefinanční", ColumnName.NefinancniBonus),
-        ("Poznámka", ColumnName.Poznamka),
+        ("Poznámka, např. zdůvodnění", ColumnName.Poznamka),
     ];
 
     public ParseResult Parse(Stream stream, DateTime denOdeslaniDatovky, DateTime denPrijetiOdpovedi)
@@ -355,7 +395,7 @@ public class PlatyUrednikuParser
                 _warnings.Add($"neplatné odměny pro řádek {_currentRow}");
             }
 
-            return new PuPlat
+            var plat = new PuPlat
             {
                 NazevPozice = nazevPozice,
                 Rok = platRok,
@@ -366,6 +406,14 @@ public class PlatyUrednikuParser
                 NefinancniBonus = GetCellText(ColumnName.NefinancniBonus),
                 PoznamkaPlat = GetCellText(ColumnName.Poznamka)
             };
+
+            if (plat.Plat is null && plat.Odmeny is null)
+            {
+                _warnings.Add($"!NEVALIDNÍ PLAT PRO ŘÁDEK {_currentRow}");
+                return null;
+            }
+            
+            return plat;
         }
         catch (Exception ex)
         {

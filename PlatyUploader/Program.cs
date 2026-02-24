@@ -45,7 +45,11 @@ Devmasters.Config.Init(configuration);
 System.Globalization.CultureInfo.DefaultThreadCurrentCulture = HlidacStatu.Util.Consts.czCulture;
 System.Globalization.CultureInfo.DefaultThreadCurrentUICulture = HlidacStatu.Util.Consts.csCulture;
 
-
+Console.WriteLine("Running with params:");
+Console.WriteLine($"  folderPath: {folderPathArg}");
+Console.WriteLine($"  denOdeslaniDatovky: {denOdeslaniDatovky}");
+Console.WriteLine("press enter to continue...");
+Console.ReadLine();
 Console.WriteLine("I ve got everything I need. Running app now.");
 
 var directories = Directory.EnumerateDirectories(folderPathArg);
@@ -74,7 +78,8 @@ foreach (var directory in directories)
             .OrderByDescending(f => new FileInfo(f).LastWriteTime)
             .First();
 
-        await ParsePlatyUrednikuFile.HandleFileUploadAsync(file, denOdeslaniDatovky, denPrijetiOdpovedi);
+        // if(file.Contains("Úřad pro zastupování státu ve věcech majetkových"))
+            await ParsePlatyUrednikuFile.HandleFileUploadAsync(file, denOdeslaniDatovky, denPrijetiOdpovedi);
     }
 }
 
