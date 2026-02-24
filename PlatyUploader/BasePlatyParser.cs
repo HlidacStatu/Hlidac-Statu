@@ -2,7 +2,7 @@ using OfficeOpenXml;
 
 namespace PlatyUploader;
 
-public abstract class BasePlatyParser<TPlat> where TPlat : class
+public abstract class BasePlatyParser<TPlat, TColumn> where TPlat : class where TColumn : struct, Enum
 {
     // Header search boundaries
     protected const int HeaderSearchStartRow = 2;
@@ -19,11 +19,11 @@ public abstract class BasePlatyParser<TPlat> where TPlat : class
     protected const int MaxConsecutiveEmptyRows = 10;
 
     protected ExcelWorksheet Sheet = null!;
-    protected readonly Dictionary<string, char> ColumnMap = new();
+    protected readonly Dictionary<TColumn, char> ColumnMap = new();
     protected int CurrentRow;
     protected readonly List<string> Warnings = new();
 
-    protected abstract (string Pattern, string ColumnKey)[] GetColumnPatterns();
+    protected abstract (string Pattern, TColumn ColumnKey)[] GetColumnPatterns();
 
     protected abstract TPlat? ParsePlatOnCurrentRow();
 
@@ -169,7 +169,7 @@ public abstract class BasePlatyParser<TPlat> where TPlat : class
         return platy;
     }
 
-    protected string GetCellText(string columnKey)
+    protected string GetCellText(TColumn columnKey)
     {
         if (ColumnMap.TryGetValue(columnKey, out var column))
         {

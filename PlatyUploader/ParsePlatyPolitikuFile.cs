@@ -143,48 +143,51 @@ public class ParsePoliticiResult
     public List<string> Warnings { get; } = new();
 }
 
-public class PlatyPolitikuParser : BasePlatyParser<PpPrijem>
+public class PlatyPolitikuParser : BasePlatyParser<PpPrijem, PlatyPolitikuParser.ColumnName>
 {
-    private const string ColNameId = "NameId";
-    private const string ColOdpracovanychMesicu = "OdpracovanychMesicu";
-    private const string ColPlat = "Plat";
-    private const string ColOdmeny = "Odmeny";
-    private const string ColNefinancniBonusy = "NefinancniBonusy";
-    private const string ColPoznamka = "Poznamka";
-    private const string ColFunkce = "Funkce";
-    private const string ColUvolneny = "Uvolneny";
-    private const string ColPrispevky = "Prispevky";
-    private const string ColRepreNahrady = "RepreNahrady";
-    private const string ColCestoNahrady = "CestoNahrady";
-    private const string ColKanclNahrady = "KanclNahrady";
-    private const string ColUbytovaciNahrady = "UbytovaciNahrady";
-    private const string ColAdministrativniNahrady = "AdministrativniNahrady";
-    private const string ColAsistentNahrady = "AsistentNahrady";
-    private const string ColTelefonNahrady = "TelefonNahrady";
+    public enum ColumnName
+    {
+        NameId,
+        OdpracovanychMesicu,
+        Plat,
+        Odmeny,
+        NefinancniBonusy,
+        Poznamka,
+        Funkce,
+        Uvolneny,
+        Prispevky,
+        RepreNahrady,
+        CestoNahrady,
+        KanclNahrady,
+        UbytovaciNahrady,
+        AdministrativniNahrady,
+        AsistentNahrady,
+        TelefonNahrady,
+    }
 
     private int _rok;
 
-    protected override (string Pattern, string ColumnKey)[] GetColumnPatterns() =>
+    protected override (string Pattern, ColumnName ColumnKey)[] GetColumnPatterns() =>
     [
-        ("nameid", ColNameId),
-        ("Odpracováno měsíců", ColOdpracovanychMesicu),
-        ("Počet měsíců", ColOdpracovanychMesicu),
-        ("Plat", ColPlat),
-        ("Odměna/příjem", ColPlat),
-        ("Odměny", ColOdmeny),
-        ("Mimořádná odměna", ColOdmeny),
-        ("Další příspěvky", ColPrispevky),
-        ("Nefinanční bonus", ColNefinancniBonusy),
-        ("Poznámka", ColPoznamka),
-        ("Funkce", ColFunkce),
-        ("Uvolněný", ColUvolneny),
-        ("Náhrady na reprezentaci", ColRepreNahrady),
-        ("Náhrady cestovní", ColCestoNahrady),
-        ("Náhrady na kancelář", ColKanclNahrady),
-        ("Náhrady na ubytování", ColUbytovaciNahrady),
-        ("Náhrady na administrativu", ColAdministrativniNahrady),
-        ("Náhrady na asistenta", ColAsistentNahrady),
-        ("Náhrady na telefon", ColTelefonNahrady),
+        ("nameid", ColumnName.NameId),
+        ("Odpracováno měsíců", ColumnName.OdpracovanychMesicu),
+        ("Počet měsíců", ColumnName.OdpracovanychMesicu),
+        ("Plat", ColumnName.Plat),
+        ("Odměna/příjem", ColumnName.Plat),
+        ("Odměny", ColumnName.Odmeny),
+        ("Mimořádná odměna", ColumnName.Odmeny),
+        ("Další příspěvky", ColumnName.Prispevky),
+        ("Nefinanční bonus", ColumnName.NefinancniBonusy),
+        ("Poznámka", ColumnName.Poznamka),
+        ("Funkce", ColumnName.Funkce),
+        ("Uvolněný", ColumnName.Uvolneny),
+        ("Náhrady na reprezentaci", ColumnName.RepreNahrady),
+        ("Náhrady cestovní", ColumnName.CestoNahrady),
+        ("Náhrady na kancelář", ColumnName.KanclNahrady),
+        ("Náhrady na ubytování", ColumnName.UbytovaciNahrady),
+        ("Náhrady na administrativu", ColumnName.AdministrativniNahrady),
+        ("Náhrady na asistenta", ColumnName.AsistentNahrady),
+        ("Náhrady na telefon", ColumnName.TelefonNahrady),
     ];
 
     public ParsePoliticiResult Parse(Stream stream)
@@ -197,7 +200,12 @@ public class PlatyPolitikuParser : BasePlatyParser<PpPrijem>
         var (instituce, ico, ds, rok) = ParseHeader();
         _rok = rok;
         DetectColumns();
-        // if(ColumnMap.Count < )
+
+        int enumCount = Enum.GetValues<ColumnName>().Length;
+        if (ColumnMap.Count < enumCount)
+        {
+            throw new InvalidOperationException($"Nepodařilo se detekovat všechny sloupce."); 
+        }
         
         var platy = ParseAllPlaty();
 
@@ -218,11 +226,11 @@ public class PlatyPolitikuParser : BasePlatyParser<PpPrijem>
     {
         try
         {
-            var nazevFunkce = GetCellText(ColFunkce);
-            
-            var nameId = GetCellText(ColNameId).ToLower().Trim();
-            
-            var platString = Utils.TrimBadChars(GetCellText(ColPlat));
+            var nazevFunkce = GetCellText(ColumnName.Funkce);
+
+            var nameId = GetCellText(ColumnName.NameId).ToLower().Trim();
+
+            var platString = Utils.TrimBadChars(GetCellText(ColumnName.Plat));
             decimal? plat = null;
             if (!string.IsNullOrWhiteSpace(platString))
             {
@@ -245,7 +253,7 @@ public class PlatyPolitikuParser : BasePlatyParser<PpPrijem>
                 throw new InvalidOperationException($"Chybí {nameof(nazevFunkce)} na řádku {CurrentRow}."); 
             }
 
-            var uvolnenyString = GetCellText(ColUvolneny)?.Trim().RemoveDiacritics().ToLower();
+            var uvolnenyString = GetCellText(ColumnName.Uvolneny)?.Trim().RemoveDiacritics().ToLower();
             int? uvolneny = uvolnenyString switch
             {
                 var s when string.IsNullOrWhiteSpace(s) => null,
@@ -254,41 +262,41 @@ public class PlatyPolitikuParser : BasePlatyParser<PpPrijem>
                 _ => null
             };
 
-            var odpracovanychMesicuString = Utils.TrimBadChars(GetCellText(ColOdpracovanychMesicu));
+            var odpracovanychMesicuString = Utils.TrimBadChars(GetCellText(ColumnName.OdpracovanychMesicu));
             if (!decimal.TryParse(odpracovanychMesicuString, out var odpracovanychMesicu))
             {
                 throw new InvalidOperationException($"Chybí počet odpracovaných měsíců na řádku {CurrentRow}.");
             }
 
-            var odmenyString = Utils.TrimBadChars(GetCellText(ColOdmeny));
+            var odmenyString = Utils.TrimBadChars(GetCellText(ColumnName.Odmeny));
             decimal? odmeny = null;
             if (!string.IsNullOrWhiteSpace(odmenyString))
             {
                 odmeny = HlidacStatu.Util.TextTools.GetDecimalFromText(odmenyString);
             }
 
-            var prispevkyString = Utils.TrimBadChars(GetCellText(ColPrispevky));
+            var prispevkyString = Utils.TrimBadChars(GetCellText(ColumnName.Prispevky));
             decimal? prispevky = HlidacStatu.Util.TextTools.GetDecimalFromText(prispevkyString);
 
-            var repreNahradyString = Utils.TrimBadChars(GetCellText(ColRepreNahrady));
+            var repreNahradyString = Utils.TrimBadChars(GetCellText(ColumnName.RepreNahrady));
             decimal? repreNahrady = HlidacStatu.Util.TextTools.GetDecimalFromText(repreNahradyString);
 
-            var cestoNahradyString = Utils.TrimBadChars(GetCellText(ColCestoNahrady));
+            var cestoNahradyString = Utils.TrimBadChars(GetCellText(ColumnName.CestoNahrady));
             decimal? cestoNahrady = HlidacStatu.Util.TextTools.GetDecimalFromText(cestoNahradyString);
 
-            var kanclNahradyString = Utils.TrimBadChars(GetCellText(ColKanclNahrady));
+            var kanclNahradyString = Utils.TrimBadChars(GetCellText(ColumnName.KanclNahrady));
             decimal? kanclNahrady = HlidacStatu.Util.TextTools.GetDecimalFromText(kanclNahradyString);
 
-            var ubytovaciNahradyString = Utils.TrimBadChars(GetCellText(ColUbytovaciNahrady));
+            var ubytovaciNahradyString = Utils.TrimBadChars(GetCellText(ColumnName.UbytovaciNahrady));
             decimal? ubytovaciNahrady = HlidacStatu.Util.TextTools.GetDecimalFromText(ubytovaciNahradyString);
 
-            var administrativniNahradyString = Utils.TrimBadChars(GetCellText(ColAdministrativniNahrady));
+            var administrativniNahradyString = Utils.TrimBadChars(GetCellText(ColumnName.AdministrativniNahrady));
             decimal? administrativniNahrady = HlidacStatu.Util.TextTools.GetDecimalFromText(administrativniNahradyString);
 
-            var asistentNahradyString = Utils.TrimBadChars(GetCellText(ColAsistentNahrady));
+            var asistentNahradyString = Utils.TrimBadChars(GetCellText(ColumnName.AsistentNahrady));
             decimal? asistentNahrady = HlidacStatu.Util.TextTools.GetDecimalFromText(asistentNahradyString);
 
-            var telefonNahradyString = Utils.TrimBadChars(GetCellText(ColTelefonNahrady));
+            var telefonNahradyString = Utils.TrimBadChars(GetCellText(ColumnName.TelefonNahrady));
             decimal? telefonNahrady = HlidacStatu.Util.TextTools.GetDecimalFromText(telefonNahradyString);
 
             PpPrijem politikPrijem = new()
@@ -308,8 +316,8 @@ public class PlatyPolitikuParser : BasePlatyParser<PpPrijem>
                 NahradaReprezentace = repreNahrady,
                 NahradaTelefon = telefonNahrady,
                 NahradaUbytovani = ubytovaciNahrady,
-                NefinancniBonus = GetCellText(ColNefinancniBonusy),
-                PoznamkaPlat = GetCellText(ColPoznamka),
+                NefinancniBonus = GetCellText(ColumnName.NefinancniBonusy),
+                PoznamkaPlat = GetCellText(ColumnName.Poznamka),
                 Status = PpPrijem.StatusPlatu.PotvrzenyPlat_od_organizace
             };
 

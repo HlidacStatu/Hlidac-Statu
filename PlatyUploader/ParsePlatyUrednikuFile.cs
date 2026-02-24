@@ -206,27 +206,30 @@ public class ParseUredniciResult
     public List<string> Warnings { get; } = new();
 }
 
-public class PlatyUrednikuParser : BasePlatyParser<PuPlat>
+public class PlatyUrednikuParser : BasePlatyParser<PuPlat, PlatyUrednikuParser.ColumnName>
 {
-    private const string ColPozice = "Pozice";
-    private const string ColRok = "Rok";
-    private const string ColOdpracovanychMesicu = "OdpracovanychMesicu";
-    private const string ColUvazek = "Uvazek";
-    private const string ColPlat = "Plat";
-    private const string ColOdmeny = "Odmeny";
-    private const string ColNefinancniBonus = "NefinancniBonus";
-    private const string ColPoznamka = "Poznamka";
+    public enum ColumnName
+    {
+        Pozice,
+        Rok,
+        OdpracovanychMesicu,
+        Uvazek,
+        Plat,
+        Odmeny,
+        NefinancniBonus,
+        Poznamka
+    }
 
-    protected override (string Pattern, string ColumnKey)[] GetColumnPatterns() =>
+    protected override (string Pattern, ColumnName ColumnKey)[] GetColumnPatterns() =>
     [
-        ("Pozice", ColPozice),
-        ("Rok", ColRok),
-        ("Odpracováno", ColOdpracovanychMesicu),
-        ("Výše úvazku", ColUvazek),
-        ("Plat", ColPlat),
-        ("Odměny", ColOdmeny),
-        ("Nefinanční", ColNefinancniBonus),
-        ("Poznámka, např. zdůvodnění", ColPoznamka),
+        ("Pozice", ColumnName.Pozice),
+        ("Rok", ColumnName.Rok),
+        ("Odpracováno", ColumnName.OdpracovanychMesicu),
+        ("Výše úvazku", ColumnName.Uvazek),
+        ("Plat", ColumnName.Plat),
+        ("Odměny", ColumnName.Odmeny),
+        ("Nefinanční", ColumnName.NefinancniBonus),
+        ("Poznámka, např. zdůvodnění", ColumnName.Poznamka),
     ];
 
     public ParseUredniciResult Parse(Stream stream, DateTime denOdeslaniDatovky, DateTime denPrijetiOdpovedi)
@@ -259,29 +262,29 @@ public class PlatyUrednikuParser : BasePlatyParser<PuPlat>
     {
         try
         {
-            var nazevPozice = GetCellText(ColPozice);
+            var nazevPozice = GetCellText(ColumnName.Pozice);
             if (string.IsNullOrWhiteSpace(nazevPozice))
                 return null;
 
-            var rokString = Utils.TrimBadChars(GetCellText(ColRok));
+            var rokString = Utils.TrimBadChars(GetCellText(ColumnName.Rok));
             if (!int.TryParse(rokString, out var platRok))
             {
                 Warnings.Add($"chybí rok pro řádek {CurrentRow}");
             }
 
-            var odpracovanychMesicuString = Utils.TrimBadChars(GetCellText(ColOdpracovanychMesicu));
+            var odpracovanychMesicuString = Utils.TrimBadChars(GetCellText(ColumnName.OdpracovanychMesicu));
             if (!decimal.TryParse(odpracovanychMesicuString, out var odpracovanychMesicu))
             {
                 Warnings.Add($"chybí odpracované měsíce pro řádek {CurrentRow}");
             }
 
-            var uvazekString = Utils.TrimBadChars(GetCellText(ColUvazek));
+            var uvazekString = Utils.TrimBadChars(GetCellText(ColumnName.Uvazek));
             if (!decimal.TryParse(uvazekString, out var uvazek))
             {
                 Warnings.Add($"chybí úvazek pro řádek {CurrentRow}");
             }
 
-            var hrubyPlatString = Utils.TrimBadChars(GetCellText(ColPlat));
+            var hrubyPlatString = Utils.TrimBadChars(GetCellText(ColumnName.Plat));
             decimal? hrubyPlat = null;
             if (!string.IsNullOrWhiteSpace(hrubyPlatString))
             {
@@ -293,7 +296,7 @@ public class PlatyUrednikuParser : BasePlatyParser<PuPlat>
                 Warnings.Add($"neplatný hrubý plat pro řádek {CurrentRow}");
             }
 
-            var odmenyString = Utils.TrimBadChars(GetCellText(ColOdmeny));
+            var odmenyString = Utils.TrimBadChars(GetCellText(ColumnName.Odmeny));
             decimal? odmeny = null;
             if (!string.IsNullOrWhiteSpace(odmenyString))
             {
@@ -313,8 +316,8 @@ public class PlatyUrednikuParser : BasePlatyParser<PuPlat>
                 PocetMesicu = odpracovanychMesicu,
                 Plat = hrubyPlat,
                 Odmeny = odmeny,
-                NefinancniBonus = GetCellText(ColNefinancniBonus),
-                PoznamkaPlat = GetCellText(ColPoznamka)
+                NefinancniBonus = GetCellText(ColumnName.NefinancniBonus),
+                PoznamkaPlat = GetCellText(ColumnName.Poznamka)
             };
 
             if (plat.Plat is null && plat.Odmeny is null)
