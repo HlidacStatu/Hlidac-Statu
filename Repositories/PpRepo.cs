@@ -425,7 +425,7 @@ public static partial class PpRepo
         if (puorg == null)
             puorg = await PuRepo.UpsertOrganizaceAsync(new PuOrganizace()
             {
-                DS = firma.DatovaSchranka.FirstOrDefault()
+                DS = firma.PrimarniDatovaSchranka()
             });
 
         PuEvent ev = new PuEvent()
@@ -434,7 +434,7 @@ public static partial class PpRepo
             DotazovanaInformace = PuEvent.DruhDotazovaneInformace.Politik,
             IdOrganizace = puorg.Id,
             IcoOrganizace = firma.ICO,
-            DsOrganizace = firma.DatovaSchranka.FirstOrDefault() ?? "",
+            DsOrganizace = firma.PrimarniDatovaSchranka() ?? "",
             Datum = DateTime.Now,
             Typ = PuEvent.TypUdalosti.ZaslaniZadosti,
             Smer = PuEvent.SmerKomunikace.ZpravaOdNas,

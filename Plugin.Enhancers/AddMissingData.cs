@@ -125,8 +125,8 @@ namespace HlidacStatu.Plugin.Enhancers
                 Firma f = await FirmaRepo.FromIcoAsync(subj.ico, false);
                 if (f?.Valid == true && f.DatovaSchranka != null && f.DatovaSchranka.Length > 0)
                 {
-                    subj.datovaSchranka = f.DatovaSchranka[0];
-                    smlouva.Enhancements = smlouva.Enhancements.AddOrUpdate(new Enhancement("Doplněna datová schránka subjektu", "", path + ".datovaScranka", "", f.DatovaSchranka[0], this));
+                    subj.datovaSchranka = f.PrimarniDatovaSchranka();
+                    smlouva.Enhancements = smlouva.Enhancements.AddOrUpdate(new Enhancement("Doplněna datová schránka subjektu", "", path + ".datovaScranka", "", f.PrimarniDatovaSchranka(), this));
                     changed = true;
                 }
             }
@@ -144,10 +144,10 @@ namespace HlidacStatu.Plugin.Enhancers
                     if (f?.Valid == true)
                     {
                         subj.ico = f.ICO;
-                        subj.datovaSchranka = f.DatovaSchranka.Length > 0 ? f.DatovaSchranka[0] : "";
+                        subj.datovaSchranka = f.DatovaSchranka.Length > 0 ? f.PrimarniDatovaSchranka() : "";
                         smlouva.Enhancements = smlouva.Enhancements.AddOrUpdate(new Enhancement("Doplněno IČO subjektu", "", path + ".ico", "", f.ICO, this));
                         if (f.DatovaSchranka.Length > 0)
-                            smlouva.Enhancements = smlouva.Enhancements.AddOrUpdate(new Enhancement("Doplněna datová schránka subjektu", "", path + ".datovaSchranka", "", f.DatovaSchranka[0], this));
+                            smlouva.Enhancements = smlouva.Enhancements.AddOrUpdate(new Enhancement("Doplněna datová schránka subjektu", "", path + ".datovaSchranka", "", f.PrimarniDatovaSchranka(), this));
                         changed = true;
                     }
                     else
@@ -160,10 +160,10 @@ namespace HlidacStatu.Plugin.Enhancers
                         if (f?.Valid == true)
                         {
                             subj.ico = f.ICO;
-                            subj.datovaSchranka = f.DatovaSchranka.Length > 0 ? f.DatovaSchranka[0] : "";
+                            subj.datovaSchranka = f.PrimarniDatovaSchranka();
                             smlouva.Enhancements = smlouva.Enhancements.AddOrUpdate(new Enhancement("Doplněno IČO subjektu", "", path + ".ico", "", f.ICO, this));
                             if (f.DatovaSchranka.Length > 0)
-                                smlouva.Enhancements = smlouva.Enhancements.AddOrUpdate(new Enhancement("Doplněna datová schránka subjektu", "", path + ".datovaSchranka", "", f.DatovaSchranka[0], this));
+                                smlouva.Enhancements = smlouva.Enhancements.AddOrUpdate(new Enhancement("Doplněna datová schránka subjektu", "", path + ".datovaSchranka", "", f.PrimarniDatovaSchranka(), this));
                             changed = true;
 
                         }

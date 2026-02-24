@@ -161,6 +161,22 @@ namespace HlidacStatu.Entities
         [CheckSumIgnore]
         [NotMapped]
         public string[] DatovaSchranka { get; set; } = new string[] { };
+        public string PrimarniDatovaSchranka()
+        {
+            using var dsEntity = new DbEntities();
+            var debug = dsEntity.FirmaDs
+                .Where(m => m.Ico == this.ICO)
+                .OrderBy(m => m.DsParent)
+                .ToArray();
+
+            var ds = dsEntity.FirmaDs
+                .Where(m => m.Ico == this.ICO)
+                .OrderBy(m => m.DsParent)
+                .Select(m=> m.DatovaSchranka)
+                .FirstOrDefault();
+            return ds;
+        }
+
 
         public DateTime? Datum_Zapisu_OR { get; set; }
         public DateTime? DatumZaniku { get; set; }
