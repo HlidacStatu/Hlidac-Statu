@@ -168,6 +168,7 @@ public class PlatyPolitikuParser : BasePlatyParser<PpPrijem>
     [
         ("nameid", ColNameId),
         ("Odpracováno měsíců", ColOdpracovanychMesicu),
+        ("Počet měsíců", ColOdpracovanychMesicu),
         ("Plat", ColPlat),
         ("Odměna/příjem", ColPlat),
         ("Odměny", ColOdmeny),
@@ -196,6 +197,8 @@ public class PlatyPolitikuParser : BasePlatyParser<PpPrijem>
         var (instituce, ico, ds, rok) = ParseHeader();
         _rok = rok;
         DetectColumns();
+        // if(ColumnMap.Count < )
+        
         var platy = ParseAllPlaty();
 
         var result = new ParsePoliticiResult
@@ -215,11 +218,32 @@ public class PlatyPolitikuParser : BasePlatyParser<PpPrijem>
     {
         try
         {
-            var nameId = GetCellText(ColNameId).ToLower().Trim();
-            if (string.IsNullOrWhiteSpace(nameId))
-                return null;
-
             var nazevFunkce = GetCellText(ColFunkce);
+            
+            var nameId = GetCellText(ColNameId).ToLower().Trim();
+            
+            var platString = Utils.TrimBadChars(GetCellText(ColPlat));
+            decimal? plat = null;
+            if (!string.IsNullOrWhiteSpace(platString))
+            {
+                plat = HlidacStatu.Util.TextTools.GetDecimalFromText(platString);
+            }
+
+            // Prázndný řádek
+            if (string.IsNullOrWhiteSpace(nazevFunkce) && string.IsNullOrWhiteSpace(nameId) && string.IsNullOrWhiteSpace(platString))
+            {
+                return null;
+            }
+            
+            if (string.IsNullOrWhiteSpace(nameId))
+            {
+                throw new InvalidOperationException($"Chybí {nameof(nameId)} na řádku {CurrentRow}."); 
+            }
+            
+            if (string.IsNullOrWhiteSpace(nazevFunkce))
+            {
+                throw new InvalidOperationException($"Chybí {nameof(nazevFunkce)} na řádku {CurrentRow}."); 
+            }
 
             var uvolnenyString = GetCellText(ColUvolneny)?.Trim().RemoveDiacritics().ToLower();
             int? uvolneny = uvolnenyString switch
@@ -233,14 +257,7 @@ public class PlatyPolitikuParser : BasePlatyParser<PpPrijem>
             var odpracovanychMesicuString = Utils.TrimBadChars(GetCellText(ColOdpracovanychMesicu));
             if (!decimal.TryParse(odpracovanychMesicuString, out var odpracovanychMesicu))
             {
-                return null;
-            }
-
-            var platString = Utils.TrimBadChars(GetCellText(ColPlat));
-            decimal? plat = null;
-            if (!string.IsNullOrWhiteSpace(platString))
-            {
-                plat = HlidacStatu.Util.TextTools.GetDecimalFromText(platString);
+                throw new InvalidOperationException($"Chybí počet odpracovaných měsíců na řádku {CurrentRow}.");
             }
 
             var odmenyString = Utils.TrimBadChars(GetCellText(ColOdmeny));
