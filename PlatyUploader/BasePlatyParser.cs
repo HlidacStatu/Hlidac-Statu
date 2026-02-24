@@ -35,49 +35,80 @@ public abstract class BasePlatyParser<TPlat> where TPlat : class
 
     protected (string? instituce, string? ico, string ds, int rok) ParseHeader()
     {
-        char? headerColumn = null;
-        int? headerRow = null;
+        string? instituce = null;
+        string? ico = null;
+        string? ds = null;
+        int? rok = null;
+        int lastHeaderRow = HeaderSearchStartRow;
 
         for (var row = HeaderSearchStartRow; row <= HeaderSearchEndRow; row++)
         {
             for (var col = HeaderSearchFirstColumn; col <= HeaderSearchLastColumn; col++)
             {
                 var text = Sheet.Cells[$"{col}{row}"].Text?.Trim();
-                if (string.IsNullOrWhiteSpace(text) ||
-                    text.Equals("Instituce", StringComparison.InvariantCultureIgnoreCase))
+                if (string.IsNullOrWhiteSpace(text))
                     continue;
 
-                headerColumn = col;
-                headerRow = row;
-                break;
+                if (text.StartsWith("Instituce", StringComparison.InvariantCultureIgnoreCase))
+                {
+                    instituce = FindValueToRight(row, col)
+                                ?? throw new InvalidOperationException("Instituce nemá vyplněnou hodnotu.");
+                    if (row > lastHeaderRow) lastHeaderRow = row;
+                    break;
+                }
+
+                if (text.StartsWith("IČ", StringComparison.InvariantCultureIgnoreCase)
+                    || text.StartsWith("ICO", StringComparison.InvariantCultureIgnoreCase))
+                {
+                    ico = FindValueToRight(row, col)
+                          ?? throw new InvalidOperationException("IČO nemá vyplněnou hodnotu.");
+                    if (row > lastHeaderRow) lastHeaderRow = row;
+                    break;
+                }
+
+                if (text.StartsWith("Datová schránka", StringComparison.InvariantCultureIgnoreCase)
+                    || text.Equals("DS", StringComparison.InvariantCultureIgnoreCase))
+                {
+                    ds = FindValueToRight(row, col)
+                         ?? throw new InvalidOperationException("Datová schránka nemá vyplněnou hodnotu.");
+                    if (row > lastHeaderRow) lastHeaderRow = row;
+                    break;
+                }
+
+                if (text.StartsWith("Za rok", StringComparison.InvariantCultureIgnoreCase)
+                    || text.Equals("Rok", StringComparison.InvariantCultureIgnoreCase))
+                {
+                    var rokString = FindValueToRight(row, col);
+                    rok = Utils.GetYearFromString(rokString);
+                    // Fallback: try extracting year from the label cell itself (e.g. "Za rok 2025")
+                    rok ??= Utils.GetYearFromString(text);
+                    if (rok is null || rok == 0)
+                        throw new InvalidOperationException("Za rok nemá vyplněnou hodnotu.");
+                    if (row > lastHeaderRow) lastHeaderRow = row;
+                    break;
+                }
             }
-
-            if (headerColumn is not null)
-                break;
         }
 
-        if (headerColumn is null || headerRow is null)
-        {
-            throw new InvalidOperationException("Hlavička nenalezena");
-        }
-
-        var instituce = Sheet.Cells[$"{headerColumn}{headerRow}"].Text?.Trim();
-        var ico = Sheet.Cells[$"{headerColumn}{headerRow + 1}"].Text?.Trim();
-        var ds = Sheet.Cells[$"{headerColumn}{headerRow + 2}"].Text?.Trim();
-        var rokString = Sheet.Cells[$"{headerColumn}{headerRow + 3}"].Text;
-        var rok = Utils.GetYearFromString(rokString);
-
-        if (rok is null || rok == 0)
-        {
-            throw new InvalidOperationException("Rok nenalezen v hlavičce.");
-        }
-
-        if (string.IsNullOrWhiteSpace(ds))
-            throw new InvalidOperationException("V souboru není uvedená datová schránka.");
-
-        CurrentRow = headerRow.Value + 3;
+        CurrentRow = lastHeaderRow;
 
         return (instituce, ico, ds, rok.Value);
+    }
+
+    private string? FindValueToRight(int row, char labelCol, int maxGap = 3)
+    {
+        for (var offset = 1; offset <= maxGap + 1; offset++)
+        {
+            var col = (char)(labelCol + offset);
+            if (col > 'Z')
+                break;
+
+            var text = Sheet.Cells[$"{col}{row}"].Text?.Trim();
+            if (!string.IsNullOrWhiteSpace(text))
+                return text;
+        }
+
+        return null;
     }
 
     protected void DetectColumns()
