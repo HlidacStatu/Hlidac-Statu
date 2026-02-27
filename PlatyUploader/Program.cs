@@ -36,6 +36,7 @@ switch (mode)
 {
     case "uredniku":
     {
+        return 0;
         if (args.Length < 3)
         {
             Console.WriteLine("Error: uredniku mode requires <folderPath> <denOdeslaniDatovky>. Use --help for usage information.");

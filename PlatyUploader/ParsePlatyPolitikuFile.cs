@@ -47,26 +47,6 @@ public static class ParsePlatyPolitikuFile
             var result = parser.Parse(fileStream);
 
             Validate(result);
-            if (IsMissingPlaty(result))
-            {
-                Console.WriteLine($"V tabulce {filePath} jsou všechny platy nulové.");
-                Console.WriteLine("Chcete tato data uložit? stiskněte klávesu A-Ano (uloží záznam - data jsou v pořádku) / klávesu N-Ne (přeskočí záznam)");
-                while (true)
-                {
-                    var keyPressed = Console.ReadLine()?.Trim().ToLowerInvariant();
-                    if (keyPressed == "a")
-                    {
-                        break;
-                    }
-
-                    if (keyPressed == "n")
-                    {
-                        Logger.Information("{FilePath} => SKIPPED", filePath);
-                        return;
-                    }
-                    Console.WriteLine("Neplatná volba. Zadejte prosím 'A' pro pokračovat nebo 'N' pro přeskočit.");
-                }
-            }
 
             await SaveAsync(result);
 
@@ -104,17 +84,13 @@ public static class ParsePlatyPolitikuFile
     {
         var idOrganizace = await LoadOrCreateOrganizaceAsync(result.Ds);
 
-        var zduvodneniOdmen = false;
-
         foreach (var puPlat in result.Platy)
         {
             puPlat.IdOrganizace = idOrganizace;
-            await PpRepo.UpsertPrijemPolitikaAsync(puPlat);
-            if (!zduvodneniOdmen && puPlat.Odmeny > 0 && !string.IsNullOrWhiteSpace(puPlat.PoznamkaPlat))
-            {
-                zduvodneniOdmen = true;
-            }
+            //await PpRepo.UpsertPrijemPolitikaAsync(puPlat);
         }
+
+        Console.WriteLine("--upserted platy");
     }
 
     private static async Task<int> LoadOrCreateOrganizaceAsync(string ds)
@@ -204,9 +180,9 @@ public class PlatyPolitikuParser : BasePlatyParser<PpPrijem, PlatyPolitikuParser
         int enumCount = Enum.GetValues<ColumnName>().Length;
         if (ColumnMap.Count < enumCount)
         {
-            throw new InvalidOperationException($"Nepodařilo se detekovat všechny sloupce."); 
+            throw new InvalidOperationException($"Nepodařilo se detekovat všechny sloupce.");
         }
-        
+
         var platy = ParseAllPlaty();
 
         var result = new ParsePoliticiResult
@@ -224,109 +200,102 @@ public class PlatyPolitikuParser : BasePlatyParser<PpPrijem, PlatyPolitikuParser
 
     protected override PpPrijem? ParsePlatOnCurrentRow()
     {
-        try
+        var nazevFunkce = GetCellText(ColumnName.Funkce);
+
+        var nameId = GetCellText(ColumnName.NameId).ToLower().Trim();
+
+        var platString = Utils.TrimBadChars(GetCellText(ColumnName.Plat));
+        decimal? plat = null;
+        if (!string.IsNullOrWhiteSpace(platString))
         {
-            var nazevFunkce = GetCellText(ColumnName.Funkce);
-
-            var nameId = GetCellText(ColumnName.NameId).ToLower().Trim();
-
-            var platString = Utils.TrimBadChars(GetCellText(ColumnName.Plat));
-            decimal? plat = null;
-            if (!string.IsNullOrWhiteSpace(platString))
-            {
-                plat = HlidacStatu.Util.TextTools.GetDecimalFromText(platString);
-            }
-
-            // Prázndný řádek
-            if (string.IsNullOrWhiteSpace(nazevFunkce) && string.IsNullOrWhiteSpace(nameId) && string.IsNullOrWhiteSpace(platString))
-            {
-                return null;
-            }
-            
-            if (string.IsNullOrWhiteSpace(nameId))
-            {
-                throw new InvalidOperationException($"Chybí {nameof(nameId)} na řádku {CurrentRow}."); 
-            }
-            
-            if (string.IsNullOrWhiteSpace(nazevFunkce))
-            {
-                throw new InvalidOperationException($"Chybí {nameof(nazevFunkce)} na řádku {CurrentRow}."); 
-            }
-
-            var uvolnenyString = GetCellText(ColumnName.Uvolneny)?.Trim().RemoveDiacritics().ToLower();
-            int? uvolneny = uvolnenyString switch
-            {
-                var s when string.IsNullOrWhiteSpace(s) => null,
-                var s when s.StartsWith("uv", StringComparison.OrdinalIgnoreCase) => 1,
-                var s when s.StartsWith("ne", StringComparison.OrdinalIgnoreCase) => 0,
-                _ => null
-            };
-
-            var odpracovanychMesicuString = Utils.TrimBadChars(GetCellText(ColumnName.OdpracovanychMesicu));
-            if (!decimal.TryParse(odpracovanychMesicuString, out var odpracovanychMesicu))
-            {
-                throw new InvalidOperationException($"Chybí počet odpracovaných měsíců na řádku {CurrentRow}.");
-            }
-
-            var odmenyString = Utils.TrimBadChars(GetCellText(ColumnName.Odmeny));
-            decimal? odmeny = null;
-            if (!string.IsNullOrWhiteSpace(odmenyString))
-            {
-                odmeny = HlidacStatu.Util.TextTools.GetDecimalFromText(odmenyString);
-            }
-
-            var prispevkyString = Utils.TrimBadChars(GetCellText(ColumnName.Prispevky));
-            decimal? prispevky = HlidacStatu.Util.TextTools.GetDecimalFromText(prispevkyString);
-
-            var repreNahradyString = Utils.TrimBadChars(GetCellText(ColumnName.RepreNahrady));
-            decimal? repreNahrady = HlidacStatu.Util.TextTools.GetDecimalFromText(repreNahradyString);
-
-            var cestoNahradyString = Utils.TrimBadChars(GetCellText(ColumnName.CestoNahrady));
-            decimal? cestoNahrady = HlidacStatu.Util.TextTools.GetDecimalFromText(cestoNahradyString);
-
-            var kanclNahradyString = Utils.TrimBadChars(GetCellText(ColumnName.KanclNahrady));
-            decimal? kanclNahrady = HlidacStatu.Util.TextTools.GetDecimalFromText(kanclNahradyString);
-
-            var ubytovaciNahradyString = Utils.TrimBadChars(GetCellText(ColumnName.UbytovaciNahrady));
-            decimal? ubytovaciNahrady = HlidacStatu.Util.TextTools.GetDecimalFromText(ubytovaciNahradyString);
-
-            var administrativniNahradyString = Utils.TrimBadChars(GetCellText(ColumnName.AdministrativniNahrady));
-            decimal? administrativniNahrady = HlidacStatu.Util.TextTools.GetDecimalFromText(administrativniNahradyString);
-
-            var asistentNahradyString = Utils.TrimBadChars(GetCellText(ColumnName.AsistentNahrady));
-            decimal? asistentNahrady = HlidacStatu.Util.TextTools.GetDecimalFromText(asistentNahradyString);
-
-            var telefonNahradyString = Utils.TrimBadChars(GetCellText(ColumnName.TelefonNahrady));
-            decimal? telefonNahrady = HlidacStatu.Util.TextTools.GetDecimalFromText(telefonNahradyString);
-
-            PpPrijem politikPrijem = new()
-            {
-                NazevFunkce = nazevFunkce,
-                Nameid = nameId.ToLower(),
-                Rok = _rok,
-                Uvolneny = uvolneny,
-                PocetMesicu = odpracovanychMesicu,
-                Plat = plat,
-                Odmeny = odmeny,
-                Prispevky = prispevky,
-                NahradaAdministrativa = administrativniNahrady,
-                NahradaAsistent = asistentNahrady,
-                NahradaCestovni = cestoNahrady,
-                NahradaKancelar = kanclNahrady,
-                NahradaReprezentace = repreNahrady,
-                NahradaTelefon = telefonNahrady,
-                NahradaUbytovani = ubytovaciNahrady,
-                NefinancniBonus = GetCellText(ColumnName.NefinancniBonusy),
-                PoznamkaPlat = GetCellText(ColumnName.Poznamka),
-                Status = PpPrijem.StatusPlatu.PotvrzenyPlat_od_organizace
-            };
-
-            return politikPrijem;
+            plat = HlidacStatu.Util.TextTools.GetDecimalFromText(platString);
         }
-        catch (Exception ex)
+
+        // Prázndný řádek
+        if (string.IsNullOrWhiteSpace(nazevFunkce) && string.IsNullOrWhiteSpace(nameId) &&
+            string.IsNullOrWhiteSpace(platString))
         {
-            Warnings.Add($"neočekávaná chyba na řádku {CurrentRow}: {ex.Message}");
             return null;
         }
+
+        if (string.IsNullOrWhiteSpace(nameId))
+        {
+            throw new InvalidOperationException($"Chybí {nameof(nameId)} na řádku {CurrentRow}.");
+        }
+
+        if (string.IsNullOrWhiteSpace(nazevFunkce))
+        {
+            throw new InvalidOperationException($"Chybí {nameof(nazevFunkce)} na řádku {CurrentRow}.");
+        }
+
+        var uvolnenyString = GetCellText(ColumnName.Uvolneny)?.Trim().RemoveDiacritics().ToLower();
+        int? uvolneny = uvolnenyString switch
+        {
+            var s when string.IsNullOrWhiteSpace(s) => null,
+            var s when s.StartsWith("uv", StringComparison.OrdinalIgnoreCase) => 1,
+            var s when s.StartsWith("ne", StringComparison.OrdinalIgnoreCase) => 0,
+            _ => null
+        };
+
+        var odmenyString = Utils.TrimBadChars(GetCellText(ColumnName.Odmeny));
+        decimal? odmeny = null;
+        if (!string.IsNullOrWhiteSpace(odmenyString))
+        {
+            odmeny = HlidacStatu.Util.TextTools.GetDecimalFromText(odmenyString);
+        }
+
+        var prispevkyString = Utils.TrimBadChars(GetCellText(ColumnName.Prispevky));
+        decimal? prispevky = HlidacStatu.Util.TextTools.GetDecimalFromText(prispevkyString);
+
+        var repreNahradyString = Utils.TrimBadChars(GetCellText(ColumnName.RepreNahrady));
+        decimal? repreNahrady = HlidacStatu.Util.TextTools.GetDecimalFromText(repreNahradyString);
+
+        var cestoNahradyString = Utils.TrimBadChars(GetCellText(ColumnName.CestoNahrady));
+        decimal? cestoNahrady = HlidacStatu.Util.TextTools.GetDecimalFromText(cestoNahradyString);
+
+        var kanclNahradyString = Utils.TrimBadChars(GetCellText(ColumnName.KanclNahrady));
+        decimal? kanclNahrady = HlidacStatu.Util.TextTools.GetDecimalFromText(kanclNahradyString);
+
+        var ubytovaciNahradyString = Utils.TrimBadChars(GetCellText(ColumnName.UbytovaciNahrady));
+        decimal? ubytovaciNahrady = HlidacStatu.Util.TextTools.GetDecimalFromText(ubytovaciNahradyString);
+
+        var administrativniNahradyString = Utils.TrimBadChars(GetCellText(ColumnName.AdministrativniNahrady));
+        decimal? administrativniNahrady = HlidacStatu.Util.TextTools.GetDecimalFromText(administrativniNahradyString);
+
+        var asistentNahradyString = Utils.TrimBadChars(GetCellText(ColumnName.AsistentNahrady));
+        decimal? asistentNahrady = HlidacStatu.Util.TextTools.GetDecimalFromText(asistentNahradyString);
+
+        var telefonNahradyString = Utils.TrimBadChars(GetCellText(ColumnName.TelefonNahrady));
+        decimal? telefonNahrady = HlidacStatu.Util.TextTools.GetDecimalFromText(telefonNahradyString);
+        
+        var odpracovanychMesicuString = Utils.TrimBadChars(GetCellText(ColumnName.OdpracovanychMesicu));
+        if (!decimal.TryParse(odpracovanychMesicuString, out var odpracovanychMesicu))
+        {
+            odpracovanychMesicu = 12;
+        }
+        
+        PpPrijem politikPrijem = new()
+        {
+            NazevFunkce = nazevFunkce,
+            Nameid = nameId.ToLower(),
+            Rok = _rok,
+            Uvolneny = uvolneny,
+            Plat = plat,
+            Odmeny = odmeny,
+            Prispevky = prispevky,
+            PocetMesicu = odpracovanychMesicu,
+            NahradaAdministrativa = administrativniNahrady,
+            NahradaAsistent = asistentNahrady,
+            NahradaCestovni = cestoNahrady,
+            NahradaKancelar = kanclNahrady,
+            NahradaReprezentace = repreNahrady,
+            NahradaTelefon = telefonNahrady,
+            NahradaUbytovani = ubytovaciNahrady,
+            NefinancniBonus = GetCellText(ColumnName.NefinancniBonusy),
+            PoznamkaPlat = GetCellText(ColumnName.Poznamka),
+            Status = PpPrijem.StatusPlatu.PotvrzenyPlat_od_organizace
+        };
+
+        return politikPrijem;
     }
 }

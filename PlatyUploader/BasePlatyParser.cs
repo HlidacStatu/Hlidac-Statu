@@ -17,6 +17,7 @@ public abstract class BasePlatyParser<TPlat, TColumn> where TPlat : class where 
 
     // Row parsing
     protected const int MaxConsecutiveEmptyRows = 10;
+    protected const int MinRequiredColumns = 4;
 
     protected ExcelWorksheet Sheet = null!;
     protected readonly Dictionary<TColumn, char> ColumnMap = new();
@@ -114,10 +115,14 @@ public abstract class BasePlatyParser<TPlat, TColumn> where TPlat : class where 
     protected void DetectColumns()
     {
         var columnPatterns = GetColumnPatterns();
+        Dictionary<TColumn, char> bestRowMap = null;
+        int bestRowNumber = -1;
 
         for (var attempt = 0; attempt < MaxColumnDetectionAttempts; attempt++)
         {
             CurrentRow++;
+
+            var rowMap = new Dictionary<TColumn, char>();
 
             for (var col = DataFirstColumn; col <= DataLastColumn; col++)
             {
@@ -126,21 +131,39 @@ public abstract class BasePlatyParser<TPlat, TColumn> where TPlat : class where 
                 if (string.IsNullOrWhiteSpace(cellText))
                     continue;
 
+                // Skip cells with long text — likely free-text notes, not headers
+                if (cellText.Length > 120)
+                    continue;
+
                 foreach (var (pattern, columnKey) in columnPatterns)
                 {
                     if (cellText.StartsWith(pattern, StringComparison.InvariantCultureIgnoreCase))
                     {
-                        ColumnMap.TryAdd(columnKey, col);
+                        rowMap.TryAdd(columnKey, col);
                         break;
                     }
                 }
             }
 
-            if (ColumnMap.Count > 0)
-                return;
+            // Track the row with the most matches
+            if (rowMap.Count > (bestRowMap?.Count ?? 0))
+            {
+                bestRowMap = rowMap;
+                bestRowNumber = CurrentRow;
+            }
+
+            // If we matched enough columns, we're confident — stop early
+            if (bestRowMap != null && bestRowMap.Count >= MinRequiredColumns)
+                break;
         }
 
-        throw new InvalidOperationException("Nenalezeny hlavičky sloupců s daty.");
+        if (bestRowMap == null || bestRowMap.Count < MinRequiredColumns)
+            throw new InvalidOperationException("Nenalezeny hlavičky sloupců s daty.");
+
+        foreach (var kvp in bestRowMap)
+            ColumnMap.TryAdd(kvp.Key, kvp.Value);
+
+        CurrentRow = bestRowNumber;
     }
 
     protected List<TPlat> ParseAllPlaty()

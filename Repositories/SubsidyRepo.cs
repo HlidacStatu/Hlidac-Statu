@@ -20,7 +20,7 @@ namespace HlidacStatu.Repositories
         public static ElasticClient SubsidyClient => Manager.GetESClient_Subsidy();
 
         public static readonly string[] SubsidyDuplicityOrdering =
-            ["IsRed", "Cedr", "Eufondy", "Státní zemědělský intervenční fond"];
+            ["IsRed", "Cedr", "Eufondy", "Státní zemědělský intervenční fond", "DeMinimis"];
 
         private static readonly SemaphoreSlim _deleteLock = new SemaphoreSlim(1, 1);
 
@@ -107,10 +107,14 @@ namespace HlidacStatu.Repositories
             await _deleteLock.WaitAsync();
             try
             {
-            var subsidy = await GetAsync(subsidyId);
-            var referers = await FindAllDuplicateReferersAsync(subsidyId);
+                var subsidy = await GetAsync(subsidyId);
+                if (subsidy is null)
+                {
+                    return;
+                }
+                var referers = await FindAllDuplicateReferersAsync(subsidyId);
 
-            string newOriginalId = null;
+                string newOriginalId = null;
                 if (subsidy.Hints.IsOriginal)
                 {
                     newOriginalId = subsidy.Hints.Duplicates.FirstOrDefault();
@@ -336,7 +340,7 @@ namespace HlidacStatu.Repositories
                     original = hiddenSubsidy;
                 }
 
-            SetDuplicate(hiddenSubsidy, visibleDuplicateIds, hiddenDuplicateIds, original.Id);
+                SetDuplicate(hiddenSubsidy, visibleDuplicateIds, hiddenDuplicateIds, original.Id);
             }
 
             await BulkSaveSubsidiesToEsAsync(allSubsidies);
