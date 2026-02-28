@@ -164,10 +164,10 @@ namespace HlidacStatu.Entities
         public string PrimarniDatovaSchranka()
         {
             using var dsEntity = new DbEntities();
-            var debug = dsEntity.FirmaDs
-                .Where(m => m.Ico == this.ICO)
-                .OrderBy(m => m.DsParent)
-                .ToArray();
+            //var debug = dsEntity.FirmaDs
+            //    .Where(m => m.Ico == this.ICO)
+            //    .OrderBy(m => m.DsParent)
+            //    .ToArray();
 
             var ds = dsEntity.FirmaDs
                 .Where(m => m.Ico == this.ICO)
