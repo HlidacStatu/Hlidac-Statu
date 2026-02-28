@@ -11,6 +11,40 @@ public static class ParsePlatyUrednikuFile
     private const int minimalAvgPlat = 30_000;
     private const int maximalAvgPlat = 400_000;
 
+    public static async Task ProcessFolderAsync(string folderPath, DateTime denOdeslaniDatovky)
+    {
+        var directories = Directory.EnumerateDirectories(folderPath);
+        foreach (var directory in directories)
+        {
+            var dirName = Path.GetFileName(directory);
+            if (!DateTime.TryParseExact(dirName, "d.M.yyyy",
+                    System.Globalization.CultureInfo.InvariantCulture,
+                    System.Globalization.DateTimeStyles.None, out DateTime denPrijetiOdpovedi))
+            {
+                Console.WriteLine($"{directory} - date cannot be parsed from directory name '{dirName}'");
+                continue;
+            }
+
+            var subdirectories = Directory.EnumerateDirectories(directory);
+            foreach (var subdirectory in subdirectories)
+            {
+                var files = Directory.EnumerateFiles(subdirectory, "*.xlsx");
+
+                if (!files.Any())
+                {
+                    Console.WriteLine($"{subdirectory} do not contain any xlsx files");
+                    continue;
+                }
+
+                var file = files
+                    .OrderByDescending(f => new FileInfo(f).LastWriteTime)
+                    .First();
+
+                await HandleFileUploadAsync(file, denOdeslaniDatovky, denPrijetiOdpovedi);
+            }
+        }
+    }
+
     public static async Task HandleFileUploadAsync(string filePath, DateTime denOdeslaniDatovky,
         DateTime denPrijetiOdpovedi)
     {
@@ -49,7 +83,7 @@ public static class ParsePlatyUrednikuFile
                     Console.WriteLine("Neplatná volba. Zadejte prosím 'A' pro pokračovat nebo 'N' pro přeskočit.");
                 }
             }
-            
+
             EnsureUniquePositionNames(result.Platy);
             await SaveAsync(result);
 
@@ -64,14 +98,8 @@ public static class ParsePlatyUrednikuFile
         }
     }
 
-    private static void Validate(ParseResult result)
+    private static void Validate(ParseUredniciResult result)
     {
-        if (string.IsNullOrWhiteSpace(result.Ds))
-            throw new InvalidOperationException("V souboru není uvedená datová schránka.");
-
-        if (result.Rok is null)
-            throw new InvalidOperationException("Rok nenalezen v hlavičce.");
-
         if (result.Platy.Count == 0)
             throw new InvalidOperationException("Soubor neobsahuje žádné záznamy platů.");
 
@@ -81,8 +109,8 @@ public static class ParsePlatyUrednikuFile
         if (result.Platy.Any(p => p.PocetMesicu < 0 || p.PocetMesicu > 12))
             throw new InvalidOperationException("Nesmyslný počet odpracovaných měsíců.");
     }
-    
-    private static bool ValidateAvgPlat(ParseResult result)
+
+    private static bool ValidateAvgPlat(ParseUredniciResult result)
     {
         // don't care about 0 plat
         var platyToCheck = result.Platy
@@ -121,9 +149,9 @@ public static class ParsePlatyUrednikuFile
         }
     }
 
-    private static async Task SaveAsync(ParseResult result)
+    private static async Task SaveAsync(ParseUredniciResult result)
     {
-        var idOrganizace = await LoadOrCreateOrganizaceAsync(result.Ds!);
+        var idOrganizace = await LoadOrCreateOrganizaceAsync(result.Ds);
 
         var zduvodneniOdmen = false;
 
@@ -143,7 +171,7 @@ public static class ParsePlatyUrednikuFile
             ZduvodneniMimoradnychOdmen = zduvodneniOdmen,
             DatumOdeslaniZadosti = result.DenOdeslaniDatovky,
             DatumPrijetiOdpovedi = result.DenPrijetiOdpovedi,
-            Rok = result.Rok!.Value,
+            Rok = result.Rok,
             Typ = PuOrganizaceMetadata.TypMetadat.PlatyUredniku,
         };
 
@@ -166,40 +194,21 @@ public static class ParsePlatyUrednikuFile
     }
 }
 
-public class ParseResult
+public class ParseUredniciResult
 {
     public required string? Instituce { get; init; }
-    public required int? Rok { get; init; }
+    public required int Rok { get; init; }
     public required string? Ico { get; init; }
-    public required string? Ds { get; init; }
+    public required string Ds { get; init; }
     public required DateTime DenOdeslaniDatovky { get; init; }
     public required DateTime DenPrijetiOdpovedi { get; init; }
     public required List<PuPlat> Platy { get; init; }
     public List<string> Warnings { get; } = new();
 }
 
-public class PlatyUrednikuParser
+public class PlatyUrednikuParser : BasePlatyParser<PuPlat, PlatyUrednikuParser.ColumnName>
 {
-    // Header search boundaries
-    private const int HeaderSearchStartRow = 2;
-    private const int HeaderSearchEndRow = 8;
-    private const char HeaderSearchFirstColumn = 'A';
-    private const char HeaderSearchLastColumn = 'F';
-
-    // Column detection
-    private const int MaxColumnDetectionAttempts = 20;
-    private const char DataFirstColumn = 'A';
-    private const char DataLastColumn = 'Z';
-
-    // Row parsing
-    private const int MaxConsecutiveEmptyRows = 10;
-
-    private ExcelWorksheet _sheet = null!;
-    private readonly Dictionary<ColumnName, char> _columnMap = new();
-    private int _currentRow;
-    private readonly List<string> _warnings = new();
-
-    private enum ColumnName
+    public enum ColumnName
     {
         Pozice,
         Rok,
@@ -211,7 +220,7 @@ public class PlatyUrednikuParser
         Poznamka
     }
 
-    private static readonly (string Pattern, ColumnName Column)[] ColumnPatterns =
+    protected override (string Pattern, ColumnName ColumnKey)[] GetColumnPatterns() =>
     [
         ("Pozice", ColumnName.Pozice),
         ("Rok", ColumnName.Rok),
@@ -223,19 +232,18 @@ public class PlatyUrednikuParser
         ("Poznámka, např. zdůvodnění", ColumnName.Poznamka),
     ];
 
-    public ParseResult Parse(Stream stream, DateTime denOdeslaniDatovky, DateTime denPrijetiOdpovedi)
+    public ParseUredniciResult Parse(Stream stream, DateTime denOdeslaniDatovky, DateTime denPrijetiOdpovedi)
     {
-        _columnMap.Clear();
-        _warnings.Clear();
+        ResetState();
 
         using var package = new ExcelPackage(stream);
-        _sheet = package.Workbook.Worksheets[0];
+        Sheet = package.Workbook.Worksheets[0];
 
         var (instituce, ico, ds, rok) = ParseHeader();
         DetectColumns();
         var platy = ParseAllPlaty();
 
-        var result = new ParseResult
+        var result = new ParseUredniciResult
         {
             Instituce = instituce,
             Ico = ico,
@@ -245,107 +253,12 @@ public class PlatyUrednikuParser
             DenPrijetiOdpovedi = denPrijetiOdpovedi,
             Platy = platy,
         };
-        result.Warnings.AddRange(_warnings);
+        result.Warnings.AddRange(Warnings);
 
         return result;
     }
 
-    private (string? instituce, string? ico, string? ds, int? rok) ParseHeader()
-    {
-        char? headerColumn = null;
-        int? headerRow = null;
-
-        for (var row = HeaderSearchStartRow; row <= HeaderSearchEndRow; row++)
-        {
-            for (var col = HeaderSearchFirstColumn; col <= HeaderSearchLastColumn; col++)
-            {
-                var text = _sheet.Cells[$"{col}{row}"].Text?.Trim();
-                if (string.IsNullOrWhiteSpace(text) ||
-                    text.Equals("Instituce", StringComparison.InvariantCultureIgnoreCase))
-                    continue;
-
-                headerColumn = col;
-                headerRow = row;
-                break;
-            }
-
-            if (headerColumn is not null)
-                break;
-        }
-
-        if (headerColumn is null || headerRow is null)
-        {
-            throw new InvalidOperationException("Hlavička nenalezena");
-        }
-
-        var instituce = _sheet.Cells[$"{headerColumn}{headerRow}"].Text?.Trim();
-        var ico = _sheet.Cells[$"{headerColumn}{headerRow + 1}"].Text?.Trim();
-        var ds = _sheet.Cells[$"{headerColumn}{headerRow + 2}"].Text?.Trim();
-        var rokString = _sheet.Cells[$"{headerColumn}{headerRow + 3}"].Text;
-        var rok = Utils.GetYearFromString(rokString);
-
-        _currentRow = headerRow.Value + 3;
-
-        return (instituce, ico, ds, rok);
-    }
-
-    private void DetectColumns()
-    {
-        for (var attempt = 0; attempt < MaxColumnDetectionAttempts; attempt++)
-        {
-            _currentRow++;
-
-            for (var col = DataFirstColumn; col <= DataLastColumn; col++)
-            {
-                var cellText = _sheet.Cells[$"{col}{_currentRow}"].Text?.Trim();
-
-                if (string.IsNullOrWhiteSpace(cellText))
-                    continue;
-
-                foreach (var (pattern, column) in ColumnPatterns)
-                {
-                    if (cellText.StartsWith(pattern, StringComparison.InvariantCultureIgnoreCase))
-                    {
-                        _columnMap.TryAdd(column, col);
-                        break;
-                    }
-                }
-            }
-
-            if (_columnMap.Count > 0)
-                return;
-        }
-
-        throw new InvalidOperationException("Nenalezeny hlavičky sloupců s daty.");
-    }
-
-    private List<PuPlat> ParseAllPlaty()
-    {
-        var platy = new List<PuPlat>();
-        var emptyRowStreak = 0;
-
-        while (true)
-        {
-            _currentRow++;
-            var plat = ParsePlatOnCurrentRow();
-
-            if (plat is null)
-            {
-                emptyRowStreak++;
-                if (emptyRowStreak >= MaxConsecutiveEmptyRows)
-                    break;
-
-                continue;
-            }
-
-            platy.Add(plat);
-            emptyRowStreak = 0;
-        }
-
-        return platy;
-    }
-
-    private PuPlat? ParsePlatOnCurrentRow()
+    protected override PuPlat? ParsePlatOnCurrentRow()
     {
         try
         {
@@ -356,19 +269,19 @@ public class PlatyUrednikuParser
             var rokString = Utils.TrimBadChars(GetCellText(ColumnName.Rok));
             if (!int.TryParse(rokString, out var platRok))
             {
-                _warnings.Add($"chybí rok pro řádek {_currentRow}");
+                Warnings.Add($"chybí rok pro řádek {CurrentRow}");
             }
 
             var odpracovanychMesicuString = Utils.TrimBadChars(GetCellText(ColumnName.OdpracovanychMesicu));
             if (!decimal.TryParse(odpracovanychMesicuString, out var odpracovanychMesicu))
             {
-                _warnings.Add($"chybí odpracované měsíce pro řádek {_currentRow}");
+                Warnings.Add($"chybí odpracované měsíce pro řádek {CurrentRow}");
             }
 
             var uvazekString = Utils.TrimBadChars(GetCellText(ColumnName.Uvazek));
             if (!decimal.TryParse(uvazekString, out var uvazek))
             {
-                _warnings.Add($"chybí úvazek pro řádek {_currentRow}");
+                Warnings.Add($"chybí úvazek pro řádek {CurrentRow}");
             }
 
             var hrubyPlatString = Utils.TrimBadChars(GetCellText(ColumnName.Plat));
@@ -380,7 +293,7 @@ public class PlatyUrednikuParser
 
             if (hrubyPlat is null)
             {
-                _warnings.Add($"neplatný hrubý plat pro řádek {_currentRow}");
+                Warnings.Add($"neplatný hrubý plat pro řádek {CurrentRow}");
             }
 
             var odmenyString = Utils.TrimBadChars(GetCellText(ColumnName.Odmeny));
@@ -392,7 +305,7 @@ public class PlatyUrednikuParser
 
             if (odmeny is null)
             {
-                _warnings.Add($"neplatné odměny pro řádek {_currentRow}");
+                Warnings.Add($"neplatné odměny pro řádek {CurrentRow}");
             }
 
             var plat = new PuPlat
@@ -409,26 +322,16 @@ public class PlatyUrednikuParser
 
             if (plat.Plat is null && plat.Odmeny is null)
             {
-                _warnings.Add($"!NEVALIDNÍ PLAT PRO ŘÁDEK {_currentRow}");
+                Warnings.Add($"!NEVALIDNÍ PLAT PRO ŘÁDEK {CurrentRow}");
                 return null;
             }
-            
+
             return plat;
         }
         catch (Exception ex)
         {
-            _warnings.Add($"neočekávaná chyba na řádku {_currentRow}: {ex.Message}");
+            Warnings.Add($"neočekávaná chyba na řádku {CurrentRow}: {ex.Message}");
             return null;
         }
-    }
-
-    private string GetCellText(ColumnName columnName)
-    {
-        if (_columnMap.TryGetValue(columnName, out var column))
-        {
-            return _sheet.Cells[$"{column}{_currentRow}"].Text.Trim();
-        }
-
-        return string.Empty;
     }
 }
