@@ -226,6 +226,7 @@ namespace HlidacStatu.Util
 
         public static bool CheckCZICO(string ico)
         {
+            ico = ico.Trim();
             if (string.IsNullOrEmpty(ico))
                 return false;
 
