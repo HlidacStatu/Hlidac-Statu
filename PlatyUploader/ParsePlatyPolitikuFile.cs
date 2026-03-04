@@ -10,7 +10,7 @@ public static class ParsePlatyPolitikuFile
 {
     private static readonly ILogger Logger = Log.ForContext(typeof(ParsePlatyPolitikuFile));
 
-    public static async Task ProcessFolderAsync(string folderPath)
+    public static async Task ProcessFolderAsync(string folderPath, bool strictMode)
     {
         var directories = Directory.EnumerateDirectories(folderPath);
         foreach (var directory in directories)
@@ -27,11 +27,11 @@ public static class ParsePlatyPolitikuFile
                 .OrderByDescending(f => new FileInfo(f).LastWriteTime)
                 .First();
 
-            await HandleFileUploadAsync(file);
+            await HandleFileUploadAsync(file, strictMode);
         }
     }
 
-    public static async Task HandleFileUploadAsync(string filePath)
+    public static async Task HandleFileUploadAsync(string filePath, bool strictMode)
     {
         try
         {
@@ -43,7 +43,7 @@ public static class ParsePlatyPolitikuFile
 
             await using var fileStream = File.OpenRead(filePath);
 
-            var parser = new PlatyPolitikuParser();
+            var parser = new PlatyPolitikuParser(strictMode);
             var result = parser.Parse(fileStream);
 
             Validate(result);
@@ -87,10 +87,8 @@ public static class ParsePlatyPolitikuFile
         foreach (var puPlat in result.Platy)
         {
             puPlat.IdOrganizace = idOrganizace;
-            //await PpRepo.UpsertPrijemPolitikaAsync(puPlat);
+            await PpRepo.UpsertPrijemPolitikaAsync(puPlat);
         }
-
-        Console.WriteLine("--upserted platy");
     }
 
     private static async Task<int> LoadOrCreateOrganizaceAsync(string ds)
@@ -119,7 +117,11 @@ public class ParsePoliticiResult
     public List<string> Warnings { get; } = new();
 }
 
-public class PlatyPolitikuParser : BasePlatyParser<PpPrijem, PlatyPolitikuParser.ColumnName>
+/// <summary>
+/// Strict mode říká, jestli hodit error při chybějícím nameid, nebo považovat řádek za prázdný
+/// </summary>
+/// <param name="strictMode"></param>
+public class PlatyPolitikuParser(bool strictMode) : BasePlatyParser<PpPrijem, PlatyPolitikuParser.ColumnName>
 {
     public enum ColumnName
     {
@@ -220,7 +222,9 @@ public class PlatyPolitikuParser : BasePlatyParser<PpPrijem, PlatyPolitikuParser
 
         if (string.IsNullOrWhiteSpace(nameId))
         {
-            throw new InvalidOperationException($"Chybí {nameof(nameId)} na řádku {CurrentRow}.");
+            if(strictMode)
+                throw new InvalidOperationException($"Chybí {nameof(nameId)} na řádku {CurrentRow}.");
+            return null;
         }
 
         if (string.IsNullOrWhiteSpace(nazevFunkce))

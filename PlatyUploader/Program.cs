@@ -16,10 +16,11 @@ if (args.Length == 0 || args.Contains("--help") || args.Contains("-h"))
     Console.WriteLine("Arguments:");
     Console.WriteLine("  folderPath           Path to the root folder containing subdirectories with xlsx files");
     Console.WriteLine("  denOdeslaniDatovky   Date when the data request was sent (format: yyyy-MM-dd, uredniku only)");
+    Console.WriteLine("  nameid=[strict|loose]   If strict, error is thrown when missing any nameid");
     Console.WriteLine();
     Console.WriteLine("Examples:");
     Console.WriteLine("  PlatyUploader uredniku \"C:\\Data\\PlatyUredniku\" 2025-02-13");
-    Console.WriteLine("  PlatyUploader politiku \"C:\\Data\\PlatyPolitiku\"");
+    Console.WriteLine("  PlatyUploader politiku \"C:\\Data\\PlatyPolitiku\" nameid=strict");
     return 0;
 }
 
@@ -68,9 +69,9 @@ switch (mode)
     }
     case "politiku":
     {
-        if (args.Length < 2)
+        if (args.Length < 3)
         {
-            Console.WriteLine("Error: politiku mode requires <folderPath>. Use --help for usage information.");
+            Console.WriteLine("Error: politiku mode requires <folderPath> and <nameid=[strict|loose]> params.");
             return -1;
         }
 
@@ -80,6 +81,26 @@ switch (mode)
             Console.WriteLine($"Invalid folder path {folderPath}");
             return -1;
         }
+        
+        var nameIdArg = args[2].Split("=", StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries).Last();
+        if (string.IsNullOrWhiteSpace(nameIdArg))
+        {
+            Console.WriteLine($"Invalid nameId {nameIdArg} arg");
+            return -1;
+        }
+        bool strictMode = true;
+        switch (nameIdArg)
+        {
+            case "strict":
+                strictMode = true;
+                break;
+            case "loose":
+                strictMode = false;
+                break;
+            default:
+                Console.WriteLine($"Invalid nameId mode [{nameIdArg}]. use \"loose\" or \"strict\" arg value.");
+                return -1;
+        }
 
         Console.WriteLine("Running with params:");
         Console.WriteLine($"  mode: politiku");
@@ -87,7 +108,7 @@ switch (mode)
         Console.WriteLine("press enter to continue...");
         Console.ReadLine();
 
-        await ParsePlatyPolitikuFile.ProcessFolderAsync(folderPath);
+        await ParsePlatyPolitikuFile.ProcessFolderAsync(folderPath, strictMode);
         break;
     }
     default:
