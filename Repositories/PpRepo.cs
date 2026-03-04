@@ -218,11 +218,13 @@ public static partial class PpRepo
 
     public static async Task<PuOrganizace> GetOrganizaceOnlyAsync(string datovaSchranka)
     {
+        var correctDs = await GetCorrectDsAsync(datovaSchranka);
+        
         await using var db = new DbEntities();
 
         return await db.PuOrganizace
             .AsNoTracking()
-            .Where(pu => pu.DS == datovaSchranka)
+            .Where(pu => pu.DS == correctDs)
             .Include(o => o.FirmaDs)
             .FirstOrDefaultAsync();
     }
