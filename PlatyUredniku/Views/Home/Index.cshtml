@@ -1,13 +1,10 @@
-﻿@using HlidacStatu.Entities
-@using HlidacStatu.Repositories
+﻿@using HlidacStatu.Repositories
+@using HlidacStatu.Repositories.Cache
 @{
     ViewBag.Title = "Platy politiků, úředníků a zaměstnanců státu";
 
-    var puPlatyStats = await PuRepo.GetPlatyPerYearStatCache.GetAsync(PuRepo.DefaultYear);
-    var puOrgStats = await PuRepo.GetGlobalStatOrganizaceAsync();
-    PpGlobalStat polStats = await PpRepo.GetGlobalStatAsync(PpRepo.DefaultYear);
-
-    DateTime stopNovinkaPolitici = new DateTime(2025, 10, 15);
+    var uredniciStats = await PlatyCache.PlatyUrednikuStatisticPerYearAsync(PuRepo.DefaultYear);
+    var politiciStats = await PlatyCache.PlatyPolitikuStatisticPerYearAsync(PpRepo.DefaultYear);
 }
 
 
@@ -22,8 +19,8 @@
                 <b>Vaše peníze - vaše právo vědět</b>.
             </p>
             <p>
-                <a href="/politici" class="btn btn-hs btn-primary my-3">Příjmy <span class="badge text-bg-light mx-1">@(HlidacStatu.Util.RenderData.NiceNumber(polStats.PocetOsobPozadano))</span> politiků.</a>
-                <a href="/urednici" class="btn btn-hs btn-info my-3" style="margin-left:30px">Platy <span class="badge text-bg-light mx-1">@(HlidacStatu.Util.RenderData.NiceNumber(puPlatyStats.Pocet))</span> úředníků.</a>
+                <a href="/politici" class="btn btn-hs btn-primary my-3">Příjmy <span class="badge text-bg-light mx-1">@(HlidacStatu.Util.RenderData.NiceNumber(politiciStats.PocetOsobPozadano))</span> politiků.</a>
+                <a href="/urednici" class="btn btn-hs btn-info my-3" style="margin-left:30px">Platy <span class="badge text-bg-light mx-1">@(HlidacStatu.Util.RenderData.NiceNumber(uredniciStats.Pocet))</span> úředníků.</a>
             </p>
         </div>
     </div>

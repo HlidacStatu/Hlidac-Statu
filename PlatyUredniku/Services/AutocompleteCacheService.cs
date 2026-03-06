@@ -188,7 +188,11 @@ public class AutocompleteCacheService
                 break;
 
             var osoba = await OsobaRepo.GetByNameIdAsync(nameId);
-
+            if (osoba is null)
+            {
+                //při uploadech nám sem narvali nesmyslená name-ids
+                continue;
+            }
             var autocomplete = new Autocomplete()
             {
                 Id = $"/politici/politik/{osoba.NameId}",

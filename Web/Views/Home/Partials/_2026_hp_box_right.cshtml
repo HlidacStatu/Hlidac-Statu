@@ -1,5 +1,6 @@
 ﻿@using HlidacStatu.Entities
 @using HlidacStatu.Repositories
+@using HlidacStatu.Repositories.Cache
 
 <div class="watcher-block">
 
@@ -35,17 +36,17 @@
         </h3>
     </div>
     @{
-        PpGlobalStat polStats = await PpRepo.GetGlobalStatAsync(PpRepo.DefaultYear);
-        var uredniciPlatyStats = await PuRepo.GetPlatyPerYearStatCache.GetAsync(PuRepo.DefaultYear);
+        var uredniciStats = await PlatyCache.PlatyUrednikuStatisticPerYearAsync(PuRepo.DefaultYear);
+        var politiciStats = await PlatyCache.PlatyPolitikuStatisticPerYearAsync(PpRepo.DefaultYear);
     }
     <div class="block-col ">
         <p>
             Letos poprvé zveřejňujeme informace o platech a kumulacích funkcí více než <b>1000 volených politiků a političek</b>.
-            Na platy a odměny jsme se ptali v <b>@HlidacStatu.Util.RenderData.NiceNumber(polStats.PocetOrganizaciPozadano)</b> organizacích.
+            Na platy a odměny jsme se ptali v <b>@HlidacStatu.Util.RenderData.NiceNumber(politiciStats.PocetOrganizaciPozadano)</b> organizacích.
         </p>
         <p>
             <a class="btn btn-hs btn-primary my-3" href="https://platy.hlidacstatu.cz/politici?utm_source=HP&utm_medium=referral&utm_campaign=permanent&utm_content=box1a">
-                Příjmy <span class="badge text-bg-light mx-1">@HlidacStatu.Util.RenderData.NiceNumber(polStats.PocetOsobPozadano)</span> politiků
+                Příjmy <span class="badge text-bg-light mx-1">@HlidacStatu.Util.RenderData.NiceNumber(politiciStats.PocetOsobPozadano)</span> politiků
                 </a>
         </p>
     </div>
@@ -83,12 +84,12 @@
     <div class="block-col ">
         <p>
             Věříme, že občané mají právo znát platy nejvyšších představitelů státních úřadů, institucí a dalších organizačních složek státu.
-            Proto jsme se @HlidacStatu.Util.RenderData.NiceNumber(uredniciPlatyStats.Platy.Select(m=>m.IdOrganizace).Distinct().Count())
+            Proto jsme se @HlidacStatu.Util.RenderData.NiceNumber(uredniciStats.Platy.Select(m=>m.IdOrganizace).Distinct().Count())
             úřadů a organizací zeptali a výsledky zanalyzovali.
         </p>
         <p>
             <a class="btn btn-hs btn-info my-3" href="https://platy.hlidacstatu.cz/urednici?utm_source=HP&utm_medium=referral&utm_campaign=permanent&utm_content=box1a">Platy 
-                <span class="badge text-bg-light mx-1 fw-bold">@(HlidacStatu.Util.RenderData.NiceNumber(uredniciPlatyStats.Pocet))</span> 
+                <span class="badge text-bg-light mx-1 fw-bold">@(HlidacStatu.Util.RenderData.NiceNumber(uredniciStats.Pocet))</span> 
                 úředníků <span class="text-dark-emphasis">2016</span>-<span class="text-dark">@(PuRepo.DefaultYear)</span>
             </a>
         </p>
