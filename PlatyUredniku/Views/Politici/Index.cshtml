@@ -83,7 +83,7 @@
                     </h4>
                 </div>
                 <div class="card-body">
-                    Poslanci vydělali v 2024 od <b>@(HlidacStatu.Util.RenderData.NicePriceHtml(rocniPlatPoslancu.Min()))</b>
+                    Poslanci vydělali v @rok od <b>@(HlidacStatu.Util.RenderData.NicePriceHtml(rocniPlatPoslancu.Min()))</b>
                     do <b>@(HlidacStatu.Util.RenderData.NicePriceHtml(rocniPlatPoslancu.Max()))</b> ročně.
                     <br /><br />
                     Najdete u nás celkem <b>@(HlidacStatu.Util.RenderData.NiceNumber(poslanci.Count))</b> poslanců a poslankyň.
@@ -106,7 +106,7 @@
 
                 </div>
                 <div class="card-body">
-                    Ministři měli v 2024 příjem od <b>@(HlidacStatu.Util.RenderData.NicePriceHtml(rocniPlatMinistru.Min()))</b>
+                    Ministři měli v @rok příjem od <b>@(HlidacStatu.Util.RenderData.NicePriceHtml(rocniPlatMinistru.Min()))</b>
                     do <b>@(HlidacStatu.Util.RenderData.NicePriceHtml(rocniPlatMinistru.Max()))</b> ročně.
                     <br /><br />
                     Členů vlády u nás najdete <b>@(HlidacStatu.Util.RenderData.NiceNumber(vlada.Count))</b>.
@@ -131,7 +131,7 @@
                     </h4>
                 </div>
                 <div class="card-body">
-                    Senátoři inkasovali v roce 2024 příjem od <b>@(HlidacStatu.Util.RenderData.NicePriceHtml(@rocniPlatSenatoru.Min()))</b>
+                    Senátoři inkasovali v roce @rok příjem od <b>@(HlidacStatu.Util.RenderData.NicePriceHtml(@rocniPlatSenatoru.Min()))</b>
                     do <b>@(HlidacStatu.Util.RenderData.NicePriceHtml(@rocniPlatSenatoru.Max()))</b> ročně.
                     <br /><br />
                     Senátorů a senátorek u nás najdete <b>@(HlidacStatu.Util.RenderData.NiceNumber(senatori.Count))</b>.
@@ -153,7 +153,7 @@
                     </h4>
                 </div>
                 <div class="card-body">
-                    Zastupitelé dostali v roce 2024 od <b>@(HlidacStatu.Util.RenderData.NicePriceHtml(rocniPlatKraju.Where(m => m > 0).Min()))</b>
+                    Zastupitelé dostali v roce @rok od <b>@(HlidacStatu.Util.RenderData.NicePriceHtml(rocniPlatKraju.Where(m => m > 0).Min()))</b>
                     do <b>@(HlidacStatu.Util.RenderData.NicePriceHtml(rocniPlatKraju.Max()))</b> ročně.
                     <br /><br />
                     Najdete u nás celkem <b>@(HlidacStatu.Util.RenderData.NiceNumber(kraj.Count))</b> zastupitelů.
