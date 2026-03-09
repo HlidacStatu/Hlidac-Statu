@@ -34,7 +34,7 @@ namespace PlatyUredniku.Cache
                 return await _postgreSqlCache.GetOrSetAsync(cacheKey, async _ =>
                     {
                         System.Collections.Concurrent.ConcurrentDictionary<string, osobaInfo> res = new();
-                        var nameids = (await PpRepo.GetNameIdsForGroupAsync(PpRepo.PoliticianGroup.Vse)).Distinct();
+                        var nameids = (await PpRepo.GetNameIdsForGroupAsync(PpRepo.PoliticianGroup.Vse, rok)).Distinct();
 
                         await Devmasters.Batch.Manager.DoActionForAllAsync(nameids, async (nameid) =>
                             {
@@ -74,9 +74,12 @@ namespace PlatyUredniku.Cache
             return data;
         }
 
-        public static async Task<osobaInfo> GetAsync(string nameId, int rok = PpRepo.DefaultYear)
+        public static async Task<osobaInfo> GetAsync(string nameId, int? rok = null)
         {
-            var cachedRoles = await GetOrSetCachedRolesAsync(rok);
+            if (rok is null || rok == 0)
+                rok = YearPicker.PpDefaultYear;
+            
+            var cachedRoles = await GetOrSetCachedRolesAsync(rok.Value);
 
             if (cachedRoles.TryGetValue(nameId, out var role))
             {
@@ -92,9 +95,9 @@ namespace PlatyUredniku.Cache
                     {
                         Jmeno = o.Jmeno,
                         Prijmeni = o.Prijmeni,
-                        Role = o.MainRolesToString(PpRepo.DefaultYear)
+                        Role = o.MainRolesToString(YearPicker.PpDefaultYear)
                     };
-                    await GetOrSetCachedRolesAsync(rok, allDict);
+                    await GetOrSetCachedRolesAsync(rok.Value, allDict);
                     return allDict[nameId];
                 }
                 else

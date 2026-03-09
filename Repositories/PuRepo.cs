@@ -90,9 +90,8 @@ public static partial class PuRepo
     
 
 
-    public static async Task<PuRokOrganizaceStat> GetGlobalStatOrganizaceAsync(int rok = DefaultYear)
+    public static async Task<PuRokOrganizaceStat> GetGlobalStatOrganizaceAsync(int rok)
     {
-     
         await using var db = new DbEntities();
 
         PuRokOrganizaceStat stat = new PuRokOrganizaceStat();
@@ -218,18 +217,18 @@ public static partial class PuRepo
             .FirstOrDefaultAsync();
     }
 
-    public static List<PuPlat> AktualniRok(this ICollection<PuPlat> platy, int rok = DefaultYear)
+    public static List<PuPlat> AktualniRok(this ICollection<PuPlat> platy, int rok)
     {
         return platy?.Where(m => m.Rok == rok).ToList();
     }
 
-    public static List<PuOrganizaceMetadata> AktualniRok(this ICollection<PuOrganizaceMetadata> metadata, int rok = DefaultYear)
+    public static List<PuOrganizaceMetadata> AktualniRok(this ICollection<PuOrganizaceMetadata> metadata, int rok)
     {
         return metadata?.Where(m => m.Rok == rok).ToList();
     }
 
 
-    public static PuOrganizaceMetadata.Description GetMetadataDescriptionUrednici(this PuOrganizace org, int rok = DefaultYear)
+    public static PuOrganizaceMetadata.Description GetMetadataDescriptionUrednici(this PuOrganizace org, int rok)
     {
         var res = new PuOrganizaceMetadata.Description();
 
@@ -237,7 +236,7 @@ public static partial class PuRepo
         //ted pracuju pouze s jednou
         var metadata = metadataList.FirstOrDefault();
 
-        if (org.Platy.AktualniRok().Count == 0 && PuRepo.GetNeaktivniOrganizace().ToArray().Any(m => m.Item1 == org.DS))
+        if (org.Platy.AktualniRok(rok).Count == 0 && PuRepo.GetNeaktivniOrganizace().ToArray().Any(m => m.Item1 == org.DS))
         {
             res.TextStatus = "Této organizace jsme se na platy neptali";
             res.Detail = "";
@@ -293,14 +292,14 @@ public static partial class PuRepo
 
 
 
-    public static string PlatyForYearUredniciDescription(this PuOrganizace org, int rok = DefaultYear)
+    public static string PlatyForYearUredniciDescription(this PuOrganizace org, int rok)
     {
         var desc = org.GetMetadataDescriptionUrednici(rok);
         return desc.TextStatus;
     }
 
 
-    public static string PlatyForYearUredniciDescriptionHtml(this PuOrganizace org, int rok = DefaultYear, bool withDetail = false)
+    public static string PlatyForYearUredniciDescriptionHtml(this PuOrganizace org, int rok, bool withDetail = false)
     {
         var desc = org.GetMetadataDescriptionUrednici(rok);
 

@@ -200,7 +200,7 @@ public class AutocompleteCacheService
                 PriorityMultiplier = 1.3f,
                 Type = "politik",
                 ImageElement = $"<img src='{osoba.GetPhotoUrl(false, Osoba.PhotoTypes.NoBackground)}' />",
-                Description = $"{osoba.MainRolesToString(PpRepo.DefaultYear)}",
+                Description = $"{osoba.MainRolesToString(YearPicker.PpDefaultYear)}",
                 Category = Autocomplete.CategoryEnum.Person,
             };
             

@@ -1,4 +1,3 @@
-
 using HlidacStatu.Entities;
 using HlidacStatu.Repositories;
 using Microsoft.AspNetCore.Mvc;
@@ -161,7 +160,7 @@ public class HomeController : Controller
             sb.AppendLine($"<priority>0.80</priority>");
             sb.AppendLine($"</url>");
         }
-        foreach (PuOrganizace? org in (await PuRepo.GetPlatyForYearsAsync(PuRepo.MinYear, PuRepo.DefaultYear)))
+        foreach (PuOrganizace? org in (await PuRepo.GetPlatyForYearsAsync(PuRepo.MinYear, YearPicker.PuDefaultYear)))
         {
             sb.AppendLine("<url>");
             sb.AppendLine($"<loc>https://platy.hlidacstatu.cz/Urednici/detail/{System.Security.SecurityElement.Escape(org.DS)}</loc>");

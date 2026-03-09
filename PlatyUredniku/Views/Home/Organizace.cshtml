@@ -176,7 +176,7 @@
                         za roky @(string.Join(", ", Model.PrijmyPolitiku.Select(m => m.Rok).Distinct())).
                     </p>
                     <p>
-                        @if (Model.PrijmyPolitiku.Count(m => m.Rok == PpRepo.DefaultYear) < 5)
+                        @if (Model.PrijmyPolitiku.Count(m => m.Rok == YearPicker.PpDefaultYear) < 5)
                         {
                             <ul>
                                 @foreach (var pr in Model.PrijmyPolitiku.OrderByDescending(o => o.CelkoveRocniNakladyNaPolitika))
@@ -248,7 +248,7 @@
                         za roky @(string.Join(", ", Model.Platy.Select(m => m.Rok).Distinct())).
                     </p>
                     <p>
-                        @if (Model.Platy.Count(m => m.Rok == PpRepo.DefaultYear) < 5)
+                        @if (Model.Platy.Count(m => m.Rok == YearPicker.PuDefaultYear) < 5)
                         {
                             <ul>
                                 @foreach (var pl in Model.Platy.OrderByDescending(o => o.CelkovyRocniPlatVcetneOdmen))
@@ -263,7 +263,7 @@
                         else
                         {
                             <ul>
-                                @foreach (var pl in Model.Platy.Where(m => m.Rok == PuRepo.DefaultYear).OrderByDescending(o => o.CelkovyRocniPlatVcetneOdmen).Take(3))
+                                @foreach (var pl in Model.Platy.Where(m => m.Rok == YearPicker.PuDefaultYear).OrderByDescending(o => o.CelkovyRocniPlatVcetneOdmen).Take(3))
                                 {
                                     <li>
                                         <a href="/urednici/plat/@(pl.Id)">@pl.NazevPozice</a>

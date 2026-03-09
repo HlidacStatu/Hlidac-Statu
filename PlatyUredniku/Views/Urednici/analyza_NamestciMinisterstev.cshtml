@@ -14,7 +14,7 @@
                 SouhrnPlatu = (decimal?)g.Sum(p => p.HrubyMesicniPlatVcetneOdmen)
             }))
         .ToList();
-    var allYears = Enumerable.Range(ministerstvaPlatyNamestku.Min(p => p.Rok), PuRepo.DefaultYear - ministerstvaPlatyNamestku.Min(p => p.Rok)+1).ToList();
+    var allYears = Enumerable.Range(ministerstvaPlatyNamestku.Min(p => p.Rok), YearPicker.PuDefaultYear - ministerstvaPlatyNamestku.Min(p => p.Rok)+1).ToList();
     
     //fill in gaps in years
     foreach (var year in allYears)

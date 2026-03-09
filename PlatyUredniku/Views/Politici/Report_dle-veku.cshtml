@@ -2,6 +2,7 @@
 @using HlidacStatu.Util
 @{
     ViewBag.Title = "Rozdíly v platech podle věku";
+    int rok = YearPicker.PpDefaultYear;
 }
 @section breadcrumbs
 {
@@ -33,22 +34,22 @@
 }
 
 @{
-    var rocniPlatdo30 = (await PpRepo.GetPrijmyByAgeAsync(0,29))
+    var rocniPlatdo30 = (await PpRepo.GetPrijmyByAgeAsync(0,29, rok))
         .Select(m => m.Value.Where(m=>m.Status>0).Sum(m => m.CelkoveRocniNakladyNaPolitika));
-    var rocniPlat30_50 = (await PpRepo.GetPrijmyByAgeAsync(30,49))
+    var rocniPlat30_50 = (await PpRepo.GetPrijmyByAgeAsync(30,49, rok))
         .Select(m => m.Value.Where(m => m.Status > 0).Sum(m => m.CelkoveRocniNakladyNaPolitika));
-    var rocniPlat50_70 = (await PpRepo.GetPrijmyByAgeAsync(50, 69))
+    var rocniPlat50_70 = (await PpRepo.GetPrijmyByAgeAsync(50, 69, rok))
         .Select(m => m.Value.Where(m => m.Status > 0).Sum(m => m.CelkoveRocniNakladyNaPolitika));
-    var rocniPlatnad70 = (await PpRepo.GetPrijmyByAgeAsync(70,200))
+    var rocniPlatnad70 = (await PpRepo.GetPrijmyByAgeAsync(70,200, rok))
         .Select(m => m.Value.Where(m => m.Status > 0).Sum(m => m.CelkoveRocniNakladyNaPolitika));
 
-    var rocniPlatdo30orgs = (await PpRepo.GetPrijmyByAgeAsync(0, 29))
+    var rocniPlatdo30orgs = (await PpRepo.GetPrijmyByAgeAsync(0, 29, rok))
         .Select(m => m.Value.Count());
-    var rocniPlat30_50orgs = (await PpRepo.GetPrijmyByAgeAsync(30, 49))
+    var rocniPlat30_50orgs = (await PpRepo.GetPrijmyByAgeAsync(30, 49, rok))
         .Select(m => m.Value.Count());
-    var rocniPlat50_70orgs = (await PpRepo.GetPrijmyByAgeAsync(50, 69))
+    var rocniPlat50_70orgs = (await PpRepo.GetPrijmyByAgeAsync(50, 69, rok))
         .Select(m => m.Value.Count());
-    var rocniPlatnad70orgs = (await PpRepo.GetPrijmyByAgeAsync(70, 200))
+    var rocniPlatnad70orgs = (await PpRepo.GetPrijmyByAgeAsync(70, 200, rok))
         .Select(m => m.Value.Count());
 
 }

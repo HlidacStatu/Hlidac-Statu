@@ -2,7 +2,7 @@
 @using HlidacStatu.Util;
 
 @{
-    int rok = Devmasters.ParseText.ToInt(this.Context.Request.Query.GetFirstQueryParameter("rok")) ?? PuRepo.DefaultYear;
+    int rok = Devmasters.ParseText.ToInt(this.Context.Request.Query.GetFirstQueryParameter("rok")) ?? YearPicker.PuDefaultYear;
 
     var platy = await PuRepo.GetPlatyWithOrganizaceForYearAsync(rok);
     platy = platy

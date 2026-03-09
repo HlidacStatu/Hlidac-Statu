@@ -9,12 +9,12 @@
     List<PuOrganizace> notAskedOrgs = new();
     if (Model is not null && Model.Any())
     {
-        goodOrgs = Model.Where(o => o.Platy.AktualniRok().Any()).OrderBy(o => o.Nazev).ToList();
-        badOrgs = Model.Where(o => !o.Platy.AktualniRok().Any() && o.Metadata.AktualniRok().Any()).OrderBy(o => o.Nazev).ToList();
-        notAskedOrgs = Model.Where(o => !o.Platy.AktualniRok().Any() && !o.Metadata.AktualniRok().Any()).OrderBy(o => o.Nazev).ToList();
+        goodOrgs = Model.Where(o => o.Platy.AktualniRok(YearPicker.PuDefaultYear).Any()).OrderBy(o => o.Nazev).ToList();
+        badOrgs = Model.Where(o => !o.Platy.AktualniRok(YearPicker.PuDefaultYear).Any() && o.Metadata.AktualniRok(YearPicker.PuDefaultYear).Any()).OrderBy(o => o.Nazev).ToList();
+        notAskedOrgs = Model.Where(o => !o.Platy.AktualniRok(YearPicker.PuDefaultYear).Any() && !o.Metadata.AktualniRok(YearPicker.PuDefaultYear).Any()).OrderBy(o => o.Nazev).ToList();
     }
 
-    var aktualniPlaty = goodOrgs.SelectMany(o => o.Platy.AktualniRok()).ToList();
+    var aktualniPlaty = goodOrgs.SelectMany(o => o.Platy.AktualniRok(YearPicker.PuDefaultYear)).ToList();
     var platyMin = aktualniPlaty.Any() ? aktualniPlaty.Min(p => p.HrubyMesicniPlatVcetneOdmen) : 0;
     var platyMax = aktualniPlaty.Any() ? aktualniPlaty.Max(p => p.HrubyMesicniPlatVcetneOdmen) : 0;
     var platyLength = platyMax - platyMin;
@@ -49,7 +49,7 @@
                     Instituce z oblasti <hashtag tag="@ViewData["oblast"]" typ="PlatyUredniku"></hashtag>
                 </h3>
                 <p>
-                    V roce @PuRepo.DefaultYear @Html.Raw(Devmasters.Lang.CS.Plural.GetWithZero(goodOrgs.Count,
+                    V roce @YearPicker.PuDefaultYear @Html.Raw(Devmasters.Lang.CS.Plural.GetWithZero(goodOrgs.Count,
                 "informace o platech nemáme od žádné instituce",
                 "poskyla plat jedna instituce",
                 $"poskytli plat {{0}} instituce",
@@ -77,12 +77,12 @@
                                         <a asp-action="Detail" asp-route-id="@org.DS">@org.Nazev</a>
                                     </td>
                                     <td class="col-3">
-                                        @Html.Raw(org.PlatyForYearUredniciDescriptionHtml())
+                                        @Html.Raw(org.PlatyForYearUredniciDescriptionHtml(YearPicker.PuDefaultYear))
                                     </td>
-                                    @if (org.Platy.AktualniRok().Any())
+                                    @if (org.Platy.AktualniRok(YearPicker.PuDefaultYear).Any())
                                     {
-                                        var minimalniPlatOrganizace = org.Platy.AktualniRok().Min(m => m.HrubyMesicniPlatVcetneOdmen);
-                                        var maximalniPlatOrganizace = org.Platy.AktualniRok().Max(m => m.HrubyMesicniPlatVcetneOdmen);
+                                        var minimalniPlatOrganizace = org.Platy.AktualniRok(YearPicker.PuDefaultYear).Min(m => m.HrubyMesicniPlatVcetneOdmen);
+                                        var maximalniPlatOrganizace = org.Platy.AktualniRok(YearPicker.PuDefaultYear).Max(m => m.HrubyMesicniPlatVcetneOdmen);
                                         var startPer = Math.Round((minimalniPlatOrganizace - platyMin) / platyLength * 100);
                                         var endPer = Math.Round((maximalniPlatOrganizace - minimalniPlatOrganizace) / platyLength * 100);
                                         if (endPer == 0)

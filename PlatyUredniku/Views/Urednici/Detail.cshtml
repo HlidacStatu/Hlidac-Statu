@@ -77,9 +77,9 @@
         .Select(m => new { Key = m.Key, Platy = m.ToList() })
         .ToList();
 
-    if (platyPoLetech.Any(m => m.Key == PuRepo.DefaultYear) == false)
+    if (platyPoLetech.Any(m => m.Key == YearPicker.PuDefaultYear) == false)
     {
-        platyPoLetech.Add(new { Key = PuRepo.DefaultYear, Platy = new List<PuPlat>() });
+        platyPoLetech.Add(new { Key = YearPicker.PuDefaultYear, Platy = new List<PuPlat>() });
     }
 
     platyPoLetech = platyPoLetech.OrderByDescending(pg => pg.Key).ToList();

@@ -20,16 +20,16 @@
         </li>
         <li class="list-group-item list-group-item-dark">Nejvyšší nárůsty a poklesy platů</li>
         <li class="list-group-item">
-            <i class="fa-regular fa-display-chart-up-circle-dollar"></i> <a href="/urednici/analyza/ZmenaPlatuCeos">Přehled nejvyšších nárůstů ředitelských platů mezi roky <b>@(PuRepo.DefaultYear-1)-@(PuRepo.DefaultYear-2000)</b></a>
-            @foreach (var y in PuRepo.AllYears.Where(y => y < PuRepo.DefaultYear && y > 2021).Reverse())
+            <i class="fa-regular fa-display-chart-up-circle-dollar"></i> <a href="/urednici/analyza/ZmenaPlatuCeos">Přehled nejvyšších nárůstů ředitelských platů mezi roky <b>@(YearPicker.PuDefaultYear-1)-@(YearPicker.PuDefaultYear-2000)</b></a>
+            @foreach (var y in PuRepo.AllYears.Where(y => y < YearPicker.PuDefaultYear && y > 2021).Reverse())
             {
-                <text>, <a href="/urednici/analyza/ZmenaPlatuCeos?minyear=@y">@y-@(PuRepo.DefaultYear-2000)</a></text>
+                <text>, <a href="/urednici/analyza/ZmenaPlatuCeos?minyear=@y">@y-@(YearPicker.PuDefaultYear-2000)</a></text>
             }.
 
         </li>
         <li class="list-group-item">
             <i class="fa-regular fa-chart-line-down"></i> <a href="/analyza/ZmenaPlatuCeos?max=false">Přehled nejvyšších poklesů ředitelských platů od roku <b>2021</b></a>
-            @foreach (var y in PuRepo.AllYears.Where(y => y < PuRepo.DefaultYear && y > 2021))
+            @foreach (var y in PuRepo.AllYears.Where(y => y < YearPicker.PuDefaultYear && y > 2021))
             {
                 <text>, <a href="/urednici/analyza/ZmenaPlatuCeos?minyear=@y&max=false">@y</a></text>
             }.
@@ -37,7 +37,7 @@
         </li>
         <li class="list-group-item">
             <i class="fa-regular fa-display-chart-up-circle-dollar"></i> <a href="/analyza/ZmenaNejvyssihoPlatu">Přehled nejvyšších nárůstů neředitelských platů od roku <b>2021</b></a>
-            @foreach (var y in PuRepo.AllYears.Where(y => y < PuRepo.DefaultYear && y > 2021))
+            @foreach (var y in PuRepo.AllYears.Where(y => y < YearPicker.PuDefaultYear && y > 2021))
             {
                 <text>, <a href="/urednici/analyza/ZmenaNejvyssihoPlatu?minyear=@y">@y</a></text>
             }.
@@ -45,15 +45,15 @@
         </li>
         <li class="list-group-item">
             <i class="fa-regular fa-chart-line-down"></i> <a href="/analyza/ZmenaNejvyssihoPlatu?max=false">Přehled nejvyšších poklesů neředitelských platů za <b>2021</b></a>
-            @foreach (var y in PuRepo.AllYears.Where(y => y < PuRepo.DefaultYear && y > 2021))
+            @foreach (var y in PuRepo.AllYears.Where(y => y < YearPicker.PuDefaultYear && y > 2021))
             {
                 <text>, <a href="/urednici/analyza/ZmenaNejvyssihoPlatu?minyear=@y&max=false">@y</a></text>
             }.
 
         </li>
         <li class="list-group-item">
-            <i class="fa-regular fa-badge-percent"></i> <a href="/analyza/NejvyssiOdmeny">Platy s nejvyšším podílem odměny za <b>@PuRepo.DefaultYear</b></a>
-            @foreach (var y in PuRepo.AllYears.Reverse().Where(y => y < PuRepo.DefaultYear))
+            <i class="fa-regular fa-badge-percent"></i> <a href="/analyza/NejvyssiOdmeny">Platy s nejvyšším podílem odměny za <b>@YearPicker.PuDefaultYear</b></a>
+            @foreach (var y in PuRepo.AllYears.Reverse().Where(y => y < YearPicker.PuDefaultYear))
             {
                 <text>
                     , <a href="/urednici/analyza/NejvyssiOdmeny?rok=@y">@y</a>

@@ -4,7 +4,7 @@
     string[] ssrok = Model.Filters
             .FirstOrDefault(m => m.Key == PlatyUredniku.Controllers.PoliticiController.PoliticiFilterKeys.Year)
             ?.GetInitialValues()?.FirstOrDefault().Value as string[];
-    int rok = Devmasters.ParseText.ToInt( ssrok.FirstOrDefault()) ?? HlidacStatu.Repositories.PuRepo.DefaultYear;
+    int rok = Devmasters.ParseText.ToInt( ssrok.FirstOrDefault()) ?? YearPicker.PpDefaultYear;
 
 
     ViewBag.Title = "Seznam platů politiků " + rok;

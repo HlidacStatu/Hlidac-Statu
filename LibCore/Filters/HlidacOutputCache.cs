@@ -151,6 +151,8 @@ public sealed class HlidacOutputCacheFilter : IAsyncResultFilter
             sb.Append(context.User?.Identity?.IsAuthenticated == true ? "@auth" : "@notauth");
         }
 
+        sb.Append(context.User?.IsInRole("Admin") == true ? "@admin" : "@notadmin");
+        
         return sb.ToString();
     }
 }

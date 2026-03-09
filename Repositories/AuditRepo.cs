@@ -62,7 +62,7 @@ namespace HlidacStatu.Repositories
             return res;
 
         }
-        public async static Task<TResult> AddWithElapsedTimeMeasureAsync<TResult>(Audit.Operations operation, string user, string ipAddress,
+        public static async Task<TResult> AddWithElapsedTimeMeasureAsync<TResult>(Audit.Operations operation, string user, string ipAddress,
           string objectId, string objectType,
           string newObjSer, string prevObjSer, Func<Task<TResult>> codeToExecuteAsync)
         {

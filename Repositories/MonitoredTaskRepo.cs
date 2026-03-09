@@ -69,7 +69,7 @@ namespace HlidacStatu.Repositories
             return task;
         }
 
-        public async static Task<MonitoredTask> SetProgressAsync(this MonitoredTask task, decimal progress)
+        public static async Task<MonitoredTask> SetProgressAsync(this MonitoredTask task, decimal progress)
         {
             DateTime now = DateTime.Now;
             task.ItemUpdated = now;
@@ -110,7 +110,7 @@ namespace HlidacStatu.Repositories
 
             return task;
         }
-        public async static Task<MonitoredTask> UpdateAsync(this MonitoredTask task)
+        public static async Task<MonitoredTask> UpdateAsync(this MonitoredTask task)
         {
             await using (DbEntities db = new DbEntities())
             {
@@ -169,7 +169,7 @@ namespace HlidacStatu.Repositories
             return task;
         }
 
-        public async static Task<MonitoredTask> FinishAsync(this MonitoredTask task, bool success = true, Exception exception = null)
+        public static async Task<MonitoredTask> FinishAsync(this MonitoredTask task, bool success = true, Exception exception = null)
         {
             string except = "";
             if (exception?.GetType() == typeof(AggregateException))
