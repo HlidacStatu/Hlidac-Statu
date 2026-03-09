@@ -71,9 +71,9 @@
         .Select(m => new { Key = m.Key, Platy = m.OrderByDescending(o => o.CelkoveRocniNakladyNaPolitika).ThenBy(o => $"{osobaMap[o.Nameid].PrijmeniJmeno()}").ToList() })
         .ToList();
 
-    if (prijmyPoLetech.Any(m => m.Key == PpRepo.DefaultYear) == false)
+    if (prijmyPoLetech.Any(m => m.Key == YearPicker.PpDefaultYear) == false)
     {
-        prijmyPoLetech.Add(new { Key = PpRepo.DefaultYear, Platy = new List<PpPrijem>() });
+        prijmyPoLetech.Add(new { Key = YearPicker.PpDefaultYear, Platy = new List<PpPrijem>() });
     }
 
     prijmyPoLetech = prijmyPoLetech.OrderByDescending(pg => pg.Key).ToList();
@@ -196,7 +196,7 @@
                                             <td data-order="@WebUtility.HtmlEncode($"{politik.Prijmeni}-{politik.Jmeno}")">
                                                 <a href="/politici/politik/@prijemPolitika.Nameid">@politik.FullName()</a>
                                             </td>
-                                            <td class="d-none d-md-table-cell">@politik.MainRolesToString(PpRepo.DefaultYear)</td>
+                                            <td class="d-none d-md-table-cell">@politik.MainRolesToString(YearPicker.PpDefaultYear)</td>
                                             <td data-order="@(HlidacStatu.Util.RenderData.OrderValueFormat(prijemPolitika.CelkoveRocniNakladyNaPolitika))"
                                                 class="number text-nowrap">
                                                 @if (prijemPolitika.PocetMesicu < 12)

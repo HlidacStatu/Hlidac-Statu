@@ -3,8 +3,8 @@
 @{
     ViewBag.Title = "Platy politiků, úředníků a zaměstnanců státu";
 
-    var uredniciStats = await PlatyCache.PlatyUrednikuStatisticPerYearAsync(PuRepo.DefaultYear);
-    var politiciStats = await PlatyCache.PlatyPolitikuStatisticPerYearAsync(PpRepo.DefaultYear);
+    var uredniciStats = await PlatyCache.PlatyUrednikuStatisticPerYearAsync(YearPicker.PuDefaultYear);
+    var politiciStats = await PlatyCache.PlatyPolitikuStatisticPerYearAsync(YearPicker.PpDefaultYear);
 }
 
 

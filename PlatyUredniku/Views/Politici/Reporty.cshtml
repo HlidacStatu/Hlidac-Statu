@@ -5,7 +5,7 @@
 @{
     ViewBag.Title = "Žebříčky, analýzy a zajímavosti";
 
-    int rok = PpRepo.DefaultYear;
+    int rok = YearPicker.PpDefaultYear;
 
     var senatori = await PpRepo.GetPrijmyGroupedByNameIdAsync(rok, group: PpRepo.PoliticianGroup.Senatori);
     var poslanci = await PpRepo.GetPrijmyGroupedByNameIdAsync(rok, group: PpRepo.PoliticianGroup.Poslanci);
@@ -103,7 +103,7 @@
                                 @(HlidacStatu.Util.MathTools.DifferenceText(prumernyMzdaCR, rocniPlatPoslancu.Average()))
                             </div>
                             <span>než je</span>
-                            <abbr title="Průměrná měsíční mzda rok @PpRepo.DefaultYear je @HlidacStatu.Util.RenderData.NicePrice(prumernyMzdaCR / 12). Roční je  @HlidacStatu.Util.RenderData.NicePrice(prumernyMzdaCR)">
+                            <abbr title="Průměrná měsíční mzda rok @YearPicker.PpDefaultYear je @HlidacStatu.Util.RenderData.NicePrice(prumernyMzdaCR / 12). Roční je  @HlidacStatu.Util.RenderData.NicePrice(prumernyMzdaCR)">
                                 průměrná
                                 roční mzda v ČR
                             </abbr>.
@@ -126,7 +126,7 @@
                                 @(HlidacStatu.Util.MathTools.DifferenceText(prumernyMzdaCR, rocniPlatMinistru.Average()))
                             </div>
                             <span>než je</span>
-                            <abbr title="Průměrná měsíční mzda rok @PpRepo.DefaultYear je @HlidacStatu.Util.RenderData.NicePrice(prumernyMzdaCR / 12). Roční je  @HlidacStatu.Util.RenderData.NicePrice(prumernyMzdaCR)">
+                            <abbr title="Průměrná měsíční mzda rok @YearPicker.PpDefaultYear je @HlidacStatu.Util.RenderData.NicePrice(prumernyMzdaCR / 12). Roční je  @HlidacStatu.Util.RenderData.NicePrice(prumernyMzdaCR)">
                                 průměrná
                                 roční mzda v ČR
                             </abbr>.
@@ -150,7 +150,7 @@
                                 @(HlidacStatu.Util.MathTools.DifferenceText(prumernyMzdaCR, rocniPlatSenatoru.Average()))
                             </div>
                             <span>než je</span>
-                            <abbr title="Průměrná měsíční mzda rok @PpRepo.DefaultYear je @HlidacStatu.Util.RenderData.NicePrice(prumernyMzdaCR / 12). Roční je  @HlidacStatu.Util.RenderData.NicePrice(prumernyMzdaCR)">
+                            <abbr title="Průměrná měsíční mzda rok @YearPicker.PpDefaultYear je @HlidacStatu.Util.RenderData.NicePrice(prumernyMzdaCR / 12). Roční je  @HlidacStatu.Util.RenderData.NicePrice(prumernyMzdaCR)">
                                 průměrná
                                 roční mzda v ČR
                             </abbr>.
@@ -174,7 +174,7 @@
                                 vyšší
                             </div>
                             <span>než je</span>
-                            <abbr title="Průměrná měsíční mzda rok @PpRepo.DefaultYear je @HlidacStatu.Util.RenderData.NicePrice(prumernyMzdaCR / 12). Roční je  @HlidacStatu.Util.RenderData.NicePrice(prumernyMzdaCR)">
+                            <abbr title="Průměrná měsíční mzda rok @YearPicker.PpDefaultYear je @HlidacStatu.Util.RenderData.NicePrice(prumernyMzdaCR / 12). Roční je  @HlidacStatu.Util.RenderData.NicePrice(prumernyMzdaCR)">
                                 průměrná
                                 roční mzda v ČR
                             </abbr>.

@@ -25,7 +25,7 @@
                        NazevTlacitka = $"Kompletní export všech dat za všechny roky"
                    })"/>
 
-            @for (int year = PuRepo.MinYear; year <= PuRepo.DefaultYear; year++)
+            @for (int year = PuRepo.MinYear; year <= YearPicker.PpDefaultYear; year++)
             {
                 <partial 
                     name="ExportModal" 

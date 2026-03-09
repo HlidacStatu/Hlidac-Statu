@@ -59,7 +59,7 @@
 </section>
 
 @{
-    var vsechnyPlaty = await PpRepo.GetPrijmyGroupedByNameIdAsync(PpRepo.DefaultYear, true);
+    var vsechnyPlaty = await PpRepo.GetPrijmyGroupedByNameIdAsync(YearPicker.PpDefaultYear, true);
     vsechnyPlaty = vsechnyPlaty
         .Where(kv => kv.Value.Any(m => m.Status == PpPrijem.StatusPlatu.Zjistujeme_zadost_106))
         .OrderByDescending(kv => kv.Value.Count(m => m.Status == PpPrijem.StatusPlatu.Zjistujeme_zadost_106))

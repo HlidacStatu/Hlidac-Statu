@@ -16,7 +16,7 @@
 }
 
 @{
-    int rok = PpRepo.DefaultYear;
+    int rok = YearPicker.PpDefaultYear;
 
     var senatori = await PpRepo.GetPrijmyGroupedByNameIdAsync(rok, group: PpRepo.PoliticianGroup.Senatori);
     var poslanci = await PpRepo.GetPrijmyGroupedByNameIdAsync(rok, group: PpRepo.PoliticianGroup.Poslanci);

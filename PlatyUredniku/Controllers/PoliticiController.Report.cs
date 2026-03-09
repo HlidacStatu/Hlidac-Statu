@@ -25,9 +25,9 @@ public partial class PoliticiController
         switch (id)
         {
             case "top-prijem":
-                return View("List", (Group: PpRepo.PoliticianGroup.Vse, Year: PpRepo.DefaultYear, top: 100, sort:"celkem", report: id));
+                return View("List", (Group: PpRepo.PoliticianGroup.Vse, Year: YearPicker.PpDefaultYear, top: 100, sort:"celkem", report: id));
             case "top-funkce":
-                return View("List", (Group: PpRepo.PoliticianGroup.Vse, Year: PpRepo.DefaultYear, top: 100, sort: "funkce", report: id));
+                return View("List", (Group: PpRepo.PoliticianGroup.Vse, Year: YearPicker.PpDefaultYear, top: 100, sort: "funkce", report: id));
             default:
                 return View("report_" + id);
         }

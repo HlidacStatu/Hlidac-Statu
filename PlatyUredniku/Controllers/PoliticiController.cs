@@ -25,13 +25,16 @@ public partial class PoliticiController : Controller
             politicianGroup = PpRepo.PoliticianGroup.Vse;
         }
 
-        return View((Group: politicianGroup, Year: year ?? PpRepo.DefaultYear, top: top ?? int.MaxValue - 1, sort: sort,
+        return View((Group: politicianGroup, Year: year ?? YearPicker.PpDefaultYear, top: top ?? int.MaxValue - 1, sort: sort,
             report: report));
     }
 
     [HlidacOutputCache(60 * 60, "rok")]
-    public async Task<IActionResult> Index(int rok = PpRepo.DefaultYear)
+    public async Task<IActionResult> Index(int? rok = null)
     {
+        if (rok is null || rok == 0)
+            rok = YearPicker.PpDefaultYear;
+            
         //titulka politiku
 
         return View();
@@ -39,8 +42,10 @@ public partial class PoliticiController : Controller
 
 
     [HlidacOutputCache(60 * 60, "id;rok")]
-    public async Task<IActionResult> Politik(string id, int rok = PpRepo.DefaultYear)
+    public async Task<IActionResult> Politik(string id, int? rok = null)
     {
+        if (rok is null || rok == 0)
+            rok = YearPicker.PpDefaultYear;
         //detail politika
 
         ViewBag.Title = $"Platy politika {id}";
@@ -48,7 +53,7 @@ public partial class PoliticiController : Controller
         if (osoba is null)
             return NotFound();
 
-        var detail = await PpRepo.Cached.GetPrijmyPolitikaAsync(id, rok);
+        var detail = await PpRepo.Cached.GetPrijmyPolitikaAsync(id, rok.Value);
         
         if (detail == null || detail.Count == 0)
         {
@@ -61,8 +66,11 @@ public partial class PoliticiController : Controller
     }
 
     [HlidacOutputCache(48 * 60 * 60, "*")]
-    public async Task<IActionResult> Organizace(string id, int rok = PpRepo.DefaultYear)
+    public async Task<IActionResult> Organizace(string id, int? rok = null)
     {
+        if (rok is null || rok == 0)
+            rok = YearPicker.PpDefaultYear;
+        
         ViewBag.rok = rok;
         PuOrganizace detail = null;
         if (HlidacStatu.Util.DataValidators.CheckCZICO(id))
@@ -82,9 +90,12 @@ public partial class PoliticiController : Controller
             return View(detail);
     }
 
-    public async Task<IActionResult> VsechnyOrganizace(int rok = PpRepo.DefaultYear)
+    public async Task<IActionResult> VsechnyOrganizace(int? rok = null)
     {
-        var organizaceViewData = await HlidacStatu.Extensions.Cache.Platy.Politici.GetFullOrganizaceViewDataCachedAsync(rok);
+        if (rok is null || rok == 0)
+            rok = YearPicker.PpDefaultYear;
+        
+        var organizaceViewData = await HlidacStatu.Extensions.Cache.Platy.Politici.GetFullOrganizaceViewDataCachedAsync(rok.Value);
         var maxPocetPlatu = organizaceViewData.Max(o => o.PocetOsob);
         var maxPlatInMils = Math.Ceiling((organizaceViewData.Max(x => x.PlatyDo) + 1) / 1_000_000);
         
@@ -138,24 +149,30 @@ public partial class PoliticiController : Controller
         return View(model);
     }
 
-    public async Task<IActionResult> VsechnyOrganizaceData(int rok = PpRepo.DefaultYear)
+    public async Task<IActionResult> VsechnyOrganizaceData(int? rok = null)
     {
-        var organizaceViewData = await HlidacStatu.Extensions.Cache.Platy.Politici.GetFullOrganizaceViewDataCachedAsync(rok);
+        if (rok is null || rok == 0)
+            rok = YearPicker.PpDefaultYear;
+        
+        var organizaceViewData = await HlidacStatu.Extensions.Cache.Platy.Politici.GetFullOrganizaceViewDataCachedAsync(rok.Value);
         var filteredOrganizaceViewData = FilterOrganizaceViewData(organizaceViewData);
 
         return new JsonResult(filteredOrganizaceViewData.ToList(), new JsonSerializerOptions(JsonSerializerDefaults.Web));
     }
     
-    public async Task<IActionResult> Seznam(string report = "platy", int rok = PuRepo.DefaultYear)
+    public async Task<IActionResult> Seznam(string report = "platy", int? rok = null)
     {
-        var fullPoliticiViewData = await HlidacStatu.Extensions.Cache.Platy.Politici.GetFullPoliticiViewDataCachedAsync(rok);
+        if (rok is null || rok == 0)
+            rok = YearPicker.PpDefaultYear;
+        
+        var fullPoliticiViewData = await HlidacStatu.Extensions.Cache.Platy.Politici.GetFullPoliticiViewDataCachedAsync(rok.Value);
         var politickeStranyFilterData = await PpRepo.Cached.GetPolitickeStranyForFilterAsync();
 
         var maxJobCount = (int)fullPoliticiViewData.Max(x => x.PocetJobu) + 1;
         var maxTotalIncomeInMilions =
             Math.Ceiling((fullPoliticiViewData.Max(x => x.CelkoveRocniNaklady_Sort) + 1) / 1_000_000);
 
-        var filteredPoliticiViewData = await FilterPoliticiViewDataAsync(rok, HttpContext.Request.Query, politickeStranyFilterData);
+        var filteredPoliticiViewData = await FilterPoliticiViewDataAsync(rok.Value, HttpContext.Request.Query, politickeStranyFilterData);
 
         // parties + "Ostatní"
         var parties = politickeStranyFilterData;
@@ -184,9 +201,9 @@ public partial class PoliticiController : Controller
                     Hidden = true,
                     Options =
                     [
-                        new() { Value = PuRepo.DefaultYear.ToString(), Label = PuRepo.DefaultYear.ToString() },
+                        new() { Value = YearPicker.PpDefaultYear.ToString(), Label = YearPicker.PpDefaultYear.ToString() },
                     ],
-                    Initial = [PuRepo.DefaultYear.ToString()]
+                    Initial = [YearPicker.PpDefaultYear.ToString()]
                 },
                 new DataTableFilters.ChoiceFilterField
                 {
@@ -285,7 +302,7 @@ public partial class PoliticiController : Controller
         Microsoft.AspNetCore.Http.IQueryCollection q = query;
         string? year = q.Choices(PoliticiFilterKeys.Year)?.FirstOrDefault();
 
-        var rok = Devmasters.ParseText.ToInt(year) ?? PuRepo.DefaultYear;   
+        var rok = Devmasters.ParseText.ToInt(year) ?? YearPicker.PpDefaultYear;   
         return await FilterPoliticiViewDataAsync(rok, query, politickeStranyFilter);
     }
 

@@ -43,7 +43,7 @@
         template: "<ul>{0}</ul>", itemTemplate: "<li>{0}</li>", itemDelimeter: "");
 
     int[] roky = Model.Select(m => m.Rok).Distinct().OrderBy(o => o).ToArray();
-    int rok = PpRepo.DefaultYear;
+    int rok = YearPicker.PpDefaultYear;
     if (roky.Any())
     {
         rok = roky.Max();
@@ -54,7 +54,7 @@
 
     ViewBag.SocialShareTitle = $"{politik.FullNameWithYear()}";
     //ViewBag.SocialShareText = politik.InfoFactsCached().RenderFacts(4, true, true, ", ");
-    ViewBag.SocialShareText = $"{politik.FullNameWithYear()} měl v {PpRepo.DefaultYear} roční příjem {HlidacStatu.Util.RenderData.NicePrice(platyZaRokPotvrzene.Sum(m => m.CelkoveRocniNakladyNaPolitika))}"
+    ViewBag.SocialShareText = $"{politik.FullNameWithYear()} měl v {YearPicker.PpDefaultYear} roční příjem {HlidacStatu.Util.RenderData.NicePrice(platyZaRokPotvrzene.Sum(m => m.CelkoveRocniNakladyNaPolitika))}"
     + $" {Devmasters.Lang.CS.Plural.Get(platyZaRokPotvrzene.Count(), "z jedné pozice", "ze {0} pozic", "z {0} pozic")}.";
 
     ViewBag.SocialShareType = "article";
@@ -94,7 +94,7 @@
             </div>
             <div class="col-auto">
                 <h2><i class="fa-regular fa-building-columns"></i>&nbsp;@politik.FullName()</h2>
-                <p class="lead">@politik.MainRolesToString(PpRepo.DefaultYear)</p>
+                <p class="lead">@politik.MainRolesToString(YearPicker.PpDefaultYear)</p>
 
                 <p>
                     <a href="@politik.GetUrl(false)" class="btn btn-hs btn-outline-primary btn-sm ">
