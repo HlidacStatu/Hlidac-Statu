@@ -25,51 +25,6 @@ public static partial class PpRepo
         return await GetOrganizaceFullDetailAsync(new string[] { datovaSchranka });
     }
 
-    public static async Task<List<string>> GetOrganizaceBezPlatuAsync(string nameId = null, string ico = null,
-        int rok = PpRepo.DefaultYear)
-    {
-        await using var db = new DbEntities();
-        var allOrgs = BasePotvrzenePlaty(db, rok).Select(m => m.IdOrganizace).Distinct();
-
-        var query = db.PuEvents
-            .AsNoTracking()
-            .Where(m => m.ProRok == rok
-                        && m.DotazovanaInformace == PuEvent.DruhDotazovaneInformace.Politik
-                        && !allOrgs.Contains(m.IdOrganizace));
-        ;
-        if (!string.IsNullOrEmpty(ico))
-        {
-            query = query.Where(m => m.IcoOrganizace == ico);
-        }
-
-        if (!string.IsNullOrEmpty(nameId))
-        {
-            query = query.Where(m => m.OsobaNameId == nameId);
-        }
-
-        var res = await query
-            .Select(m => m.IcoOrganizace)
-            .Distinct()
-            .ToListAsync();
-
-        return res;
-    }
-
-
-    public static string GetEventFormatedDescription(this PuEvent.EventDescription evd, bool html = false)
-    {
-        throw new NotImplementedException();
-        //StringBuilder sb = new StringBuilder();
-        //sb.AppendFormat("<span class='text-{0}'>", evd.Negativity.GetBootstrapStatus());
-        //if (html)
-        //    sb.AppendFormat("<i class='{0}'></i> ", evd.Negativity.GetIcon());
-        //sb.AppendFormat("{0} {1:d. M. yyyy}", evd.Title, evd.Date);
-        //if (!string.IsNullOrEmpty(evd.Note))
-        //    sb.AppendFormat(" <span class='note'>{0}</span>", evd.Note);
-        //sb.Append("</span>");
-        //return sb.ToString();
-    }
-
     public static PuEvent.EventDescription GetEventDescription(this PuEvent ev)
     {
         EventDescription evd = new EventDescription();
@@ -141,24 +96,8 @@ public static partial class PpRepo
         return evd;
     }
 
-    public static string GetEventsTextDescription(this IEnumerable<PuEvent> events,
-        string template = "{0}", string itemTemplate = "{0}",
-        string itemDelimeter = "<br/>")
-    {
-        throw new NotImplementedException();
-        StringBuilder sb = new StringBuilder();
-
-        foreach (var ev in events.OrderBy(o => o.Datum).Select(m => m.GetEventDescription()))
-        {
-            //sb.AppendFormat(itemTemplate, ev.GetEventTextDescription());
-            //evd.Title = itemDelimeter);
-        }
-
-        return string.Format(template, sb.ToString());
-    }
-
     public static async Task<List<PuEvent>> GetEventsForPolitikAndOrganizaceAsync(string nameId, int idOrganizace,
-        int year = PpRepo.DefaultYear)
+        int year)
     {
         var events = await GetAllEventsAsync(year,
             m => m.DotazovanaInformace == PuEvent.DruhDotazovaneInformace.Politik
@@ -169,7 +108,7 @@ public static partial class PpRepo
     }
 
     public static async Task<List<PuEvent>> GetEventsForPolitikAndOrganizaceAsync(string nameId, string ico,
-        int year = PpRepo.DefaultYear)
+        int year)
     {
         var events = await GetAllEventsAsync(year,
             m => m.DotazovanaInformace == PuEvent.DruhDotazovaneInformace.Politik
@@ -251,20 +190,20 @@ public static partial class PpRepo
             .ToArrayAsync();
     }
 
-    public static IQueryable<PpPrijem> BaseAllPlaty(DbEntities db, int rok = DefaultYear)
+    public static IQueryable<PpPrijem> BaseAllPlaty(DbEntities db, int rok)
     {
         return db.PpPrijmy
             .Where(m => m.Rok == rok);
     }
 
 
-    public static IQueryable<PpPrijem> BasePotvrzenePlaty(DbEntities db, int rok = DefaultYear)
+    public static IQueryable<PpPrijem> BasePotvrzenePlaty(DbEntities db, int rok)
     {
         return BaseAllPlaty(db, rok)
             .Where(m => m.Status >= 0);
     }
 
-    public async static Task<string[]> AllNameIdAsync(bool? zeny, int rok = DefaultYear)
+    public static async Task<string[]> AllNameIdAsync(bool? zeny, int rok)
     {
         await using var db = new DbEntities();
         string[] res = null;
@@ -289,16 +228,16 @@ public static partial class PpRepo
         return res;
     }
 
-    public static List<PpPrijem> AktualniRok(this ICollection<PpPrijem> prijmy, int rok = DefaultYear)
+    public static List<PpPrijem> AktualniRok(this ICollection<PpPrijem> prijmy, int rok)
     {
         return prijmy.Where(m => m.Rok == rok).ToList();
     }
 
-    public static async Task<PpPrijem> GetPrijemAsync(int id)
+    public static async Task<PpPrijem> GetPrijemAsync(int id, int rok)
     {
         await using var db = new DbEntities();
 
-        return await BasePotvrzenePlaty(db)
+        return await BasePotvrzenePlaty(db, rok)
             .AsNoTracking()
             .Include(p => p.Organizace).ThenInclude(o => o.FirmaDs)
             .Include(p => p.Organizace).ThenInclude(o => o.Tags)
@@ -356,7 +295,7 @@ public static partial class PpRepo
 
 
     //při injectnutém db contextu se nesmí dělat paralelní operace
-    public static async Task<List<PpPrijem>> GetPrijmyPolitikaAsync(string nameid, int rok = DefaultYear,
+    public static async Task<List<PpPrijem>> GetPrijmyPolitikaAsync(string nameid, int rok,
         bool pouzePotvrzene = true, DbEntities db = null)
     {
         bool ownsContext = db == null;
@@ -573,7 +512,7 @@ public static partial class PpRepo
         return res;
     }
 
-    public static string PlatyForYearPoliticiDescriptionHtml(this PuOrganizace org, int rok = DefaultYear,
+    public static string PlatyForYearPoliticiDescriptionHtml(this PuOrganizace org, int rok,
         bool withDetail = false)
     {
         var desc = org.GetSimpleStatus(rok);
@@ -583,7 +522,7 @@ public static partial class PpRepo
     }
 
     public static PuOrganizaceMetadata.Description GetSimpleStatus(this PuOrganizace org,
-        int rok = DefaultYear)
+        int rok)
     {
         var res = new PuOrganizaceMetadata.Description();
 
@@ -803,17 +742,18 @@ public static partial class PpRepo
         Vlada
     }
 
-    public async static Task<Dictionary<string, PpPrijem[]>> GetPrijmyByAgeAsync(int minAge, int maxAge,
-        bool withDetails = false, int year = DefaultYear)
+    public static async Task<Dictionary<string, PpPrijem[]>> GetPrijmyByAgeAsync(int minAge, int maxAge,
+        int year,
+        bool withDetails = false)
     {
         var currY = DateTime.Now.Year;
         var minBirthDate = new DateTime(currY - maxAge, 1, 1);
         var maxBirthDate = new DateTime(currY - minAge, 12, 31);
-        return await GetPrijmyByAgeAsync(minBirthDate, maxBirthDate, withDetails, year);
+        return await GetPrijmyByAgeAsync(minBirthDate, maxBirthDate, year, withDetails);
     }
 
-    public async static Task<Dictionary<string, PpPrijem[]>> GetPrijmyByAgeAsync(DateTime minBirthDate,
-        DateTime maxBirthDate, bool withDetails = false, int year = DefaultYear)
+    public static async Task<Dictionary<string, PpPrijem[]>> GetPrijmyByAgeAsync(DateTime minBirthDate,
+        DateTime maxBirthDate, int year, bool withDetails = false)
     {
         await using var db = new DbEntities();
 
@@ -840,8 +780,8 @@ public static partial class PpRepo
     }
 
 
-    public async static Task<Dictionary<string, PpPrijem[]>> GetPrijmyBySexAsync(bool? woman, bool withDetails = false,
-        int year = DefaultYear)
+    public static async Task<Dictionary<string, PpPrijem[]>> GetPrijmyBySexAsync(bool? woman,
+        int year, bool withDetails = false)
     {
         await using var db = new DbEntities();
 
@@ -877,7 +817,7 @@ public static partial class PpRepo
             _ => []
         };
 
-    public static async Task<List<PpPrijem>> GetPrijmyForGroupAsync(PoliticianGroup group, int rok = DefaultYear,
+    public static async Task<List<PpPrijem>> GetPrijmyForGroupAsync(PoliticianGroup group, int rok,
         bool pouzePotvrzene = true)
     {
         await using var db = new DbEntities();
@@ -912,10 +852,9 @@ public static partial class PpRepo
             .Include(p => p.Organizace).ThenInclude(o => o.FirmaDs);
 
         return await query.ToListAsync();
-        ;
     }
 
-    public static async Task<List<string>> GetNameIdsForGroupAsync(PoliticianGroup group, int rok = DefaultYear,
+    public static async Task<List<string>> GetNameIdsForGroupAsync(PoliticianGroup group, int rok,
         bool pouzePotvrzene = true)
     {
         await using var db = new DbEntities();

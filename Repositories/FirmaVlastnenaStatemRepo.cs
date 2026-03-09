@@ -257,7 +257,7 @@ namespace HlidacStatu.Repositories
                 nameof(FirmaVlastnenaStatemRepo));
 
 
-        public async static Task<HashSet<string>> IcaStatnichFiremAsync()
+        public static async Task<HashSet<string>> IcaStatnichFiremAsync()
         {
             await using (DbEntities db = new DbEntities())
             {
@@ -271,7 +271,7 @@ namespace HlidacStatu.Repositories
             }
         }
 
-        public async static Task<HashSet<string>> IcaUraduStatnichFiremAsync()
+        public static async Task<HashSet<string>> IcaUraduStatnichFiremAsync()
         {
             await using (DbEntities db = new DbEntities())
             {
@@ -285,7 +285,7 @@ namespace HlidacStatu.Repositories
             }
         }
 
-        public async static Task<HashSet<string>> IcaOVMAsync()
+        public static async Task<HashSet<string>> IcaOVMAsync()
         {
             await using (DbEntities db = new DbEntities())
             {

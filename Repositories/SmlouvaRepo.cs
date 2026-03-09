@@ -45,7 +45,7 @@ namespace HlidacStatu.Repositories
             return res;
         }
 
-        public async static Task<bool> SameContractPartiesWithAIAsync(Smlouva smlouva,
+        public static async Task<bool> SameContractPartiesWithAIAsync(Smlouva smlouva,
             HlidacStatu.AI.LLM.Clients.BaseClient<CoreOptions> llmClient, int maxWordsFromBeginningOfTheText = 1000,
             HlidacStatu.AI.LLM.Models.Model model = null)
 
@@ -92,7 +92,7 @@ namespace HlidacStatu.Repositories
 
             return t.ToString();
         }
-        public async static Task<HlidacStatu.AI.LLM.ContractParties.Comparison> ContractPartiesComparisonWithAIAsync(
+        public static async Task<HlidacStatu.AI.LLM.ContractParties.Comparison> ContractPartiesComparisonWithAIAsync(
                 Smlouva smlouva, Smlouva.Priloha priloha,
                     HlidacStatu.AI.LLM.Clients.BaseClient<CoreOptions> llmClient, int maxWordsFromBeginningOfTheText = 1000,
                     HlidacStatu.AI.LLM.Models.Model model = null, bool doubleCheck = false)

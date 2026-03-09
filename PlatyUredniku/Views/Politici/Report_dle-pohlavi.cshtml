@@ -2,6 +2,7 @@
 @using HlidacStatu.Util
 @{
     ViewBag.Title = "Rozdíly v platech podle pohlaví";
+    int rok = PpRepo.DefaultYear;
 }
 
 @section Scripts
@@ -114,16 +115,16 @@
 }
 
 @{
-    var rocniPlatMuzi = (await PpRepo.GetPrijmyBySexAsync(false))
+    var rocniPlatMuzi = (await PpRepo.GetPrijmyBySexAsync(false, rok))
     .Select(m => m.Value.Where(m => m.Status > 0).Sum(m => m.CelkoveRocniNakladyNaPolitika));
 
-    var rocniPlatZeny = (await PpRepo.GetPrijmyBySexAsync(true))
+    var rocniPlatZeny = (await PpRepo.GetPrijmyBySexAsync(true, rok))
         .Select(m => m.Value.Where(m => m.Status > 0).Sum(m => m.CelkoveRocniNakladyNaPolitika));
 
-    var rocniPlatMuziorgs = (await PpRepo.GetPrijmyBySexAsync(false))
+    var rocniPlatMuziorgs = (await PpRepo.GetPrijmyBySexAsync(false, rok))
             .Select(m => m.Value.Count());
 
-    var rocniPlatZenyorgs = (await PpRepo.GetPrijmyBySexAsync(true))
+    var rocniPlatZenyorgs = (await PpRepo.GetPrijmyBySexAsync(true, rok))
         .Select(m => m.Value.Count());
 
 

@@ -67,7 +67,7 @@ namespace HlidacStatu.Repositories.StretZajmu
             HlidacStatu.Caching.CacheFactory.CreateNew(CacheFactory.CacheType.PermanentStore, nameof(Processor));
 
 
-        public async static Task<List<OsobaStret>> Paragraf_4_Async(bool forceUpdate = false)
+        public static async Task<List<OsobaStret>> Paragraf_4_Async(bool forceUpdate = false)
         {
             const string key = "Paragraf_4";
 
@@ -98,7 +98,7 @@ namespace HlidacStatu.Repositories.StretZajmu
 01.01.2007 c) být v pracovněprávním nebo obdobném vztahu nebo ve služebním poměru, nejde-li o vztah nebo poměr, v němž působí jako veřejný funkcionář.
 
          */
-        private async static Task<List<OsobaStret>> _generate_paragraf_4_Async()
+        private static async Task<List<OsobaStret>> _generate_paragraf_4_Async()
         {
             /*
 01.09.2017  (1) Veřejný funkcionář uvedený v § 2 odst. 1 písm. c) až m) nesmí
@@ -242,7 +242,7 @@ namespace HlidacStatu.Repositories.StretZajmu
             return true;
         }
 
-        public async static Task<StatisticsSubjectPerYear<Smlouva.Statistics.Data>>
+        public static async Task<StatisticsSubjectPerYear<Smlouva.Statistics.Data>>
             SmlouvyStatAsync(Firma f, Devmasters.DT.DateInterval interval)
         {
             string iOd = interval.From?.ToString("yyyy-MM-dd") ?? "*";
@@ -259,7 +259,7 @@ namespace HlidacStatu.Repositories.StretZajmu
         }
 
 
-        public async static Task<StatisticsSubjectPerYear<Firma.Statistics.Dotace>> DotaceStatAsync(Firma f,
+        public static async Task<StatisticsSubjectPerYear<Firma.Statistics.Dotace>> DotaceStatAsync(Firma f,
             Devmasters.DT.DateInterval interval)
         {
             int yFrom = interval.From?.Year ?? 1990;

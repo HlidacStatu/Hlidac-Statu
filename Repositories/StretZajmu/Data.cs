@@ -38,7 +38,7 @@ Zákon o střetu zájmů
         //přidat limitní rok od roku 2017
         
 
-        public async static Task<Role> Vlada_1c_Async()
+        public static async Task<Role> Vlada_1c_Async()
         {
 
             var sql_Vlada = @"
@@ -63,7 +63,7 @@ and dbo.IsSomehowInInterval(datumOd,datumDo, @zakonDatumOd,null)=1
             return o_1c;
         }
 
-        public async static Task<Role> Namestci_1d_Async()
+        public static async Task<Role> Namestci_1d_Async()
         {
             var sql_NamestekMinistra = @"select NameId, oe.pk
 

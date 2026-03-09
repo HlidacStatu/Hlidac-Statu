@@ -18,10 +18,10 @@
     var rocniPlatMinistru = vlada.Select(x => x.Value.Sum(m => m.CelkoveRocniNakladyNaPolitika));
     var rocniPlatKraju = kraj.Select(x => x.Value.Sum(m => m.CelkoveRocniNakladyNaPolitika));
 
-    var rocniPlatMuzi = (await PpRepo.GetPrijmyBySexAsync(false))
+    var rocniPlatMuzi = (await PpRepo.GetPrijmyBySexAsync(false, rok))
         .Select(m => m.Value.Sum(m => m.CelkoveRocniNakladyNaPolitika));
 
-    var rocniPlatZeny = (await PpRepo.GetPrijmyBySexAsync(true))
+    var rocniPlatZeny = (await PpRepo.GetPrijmyBySexAsync(true, rok))
         .Select(m => m.Value.Sum(m => m.CelkoveRocniNakladyNaPolitika));
 
     decimal pocetFunkci = (decimal)vsichni

@@ -34,7 +34,7 @@ namespace PlatyUredniku.Cache
                 return await _postgreSqlCache.GetOrSetAsync(cacheKey, async _ =>
                     {
                         System.Collections.Concurrent.ConcurrentDictionary<string, osobaInfo> res = new();
-                        var nameids = (await PpRepo.GetNameIdsForGroupAsync(PpRepo.PoliticianGroup.Vse)).Distinct();
+                        var nameids = (await PpRepo.GetNameIdsForGroupAsync(PpRepo.PoliticianGroup.Vse, rok)).Distinct();
 
                         await Devmasters.Batch.Manager.DoActionForAllAsync(nameids, async (nameid) =>
                             {

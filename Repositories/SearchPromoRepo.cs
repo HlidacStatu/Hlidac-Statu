@@ -116,8 +116,8 @@ namespace HlidacStatu.Repositories
                     sp.Title = "Platy úředníků";
                     sp.More = MoreTextDefault;
                     sp.Description = "<b>" + org.Nazev + "</b><br />"
-                                     + (org.Platy.AktualniRok().Count > 0
-                                         ? $"Platy od {HlidacStatu.Util.RenderData.NicePrice(org.Platy.AktualniRok().Min(m => m.HrubyMesicniPlatVcetneOdmen))} do {HlidacStatu.Util.RenderData.NicePrice(org.Platy.AktualniRok().Max(m => m.HrubyMesicniPlatVcetneOdmen))}"
+                                     + (org.Platy.AktualniRok(PuRepo.DefaultYear).Count > 0
+                                         ? $"Platy od {HlidacStatu.Util.RenderData.NicePrice(org.Platy.AktualniRok(PuRepo.DefaultYear).Min(m => m.HrubyMesicniPlatVcetneOdmen))} do {HlidacStatu.Util.RenderData.NicePrice(org.Platy.AktualniRok(PuRepo.DefaultYear).Max(m => m.HrubyMesicniPlatVcetneOdmen))}"
                                          : "Zatím platy neposkytly")
                         ;
                     sp.Fulltext = org.Nazev

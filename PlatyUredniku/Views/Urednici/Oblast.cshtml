@@ -9,12 +9,12 @@
     List<PuOrganizace> notAskedOrgs = new();
     if (Model is not null && Model.Any())
     {
-        goodOrgs = Model.Where(o => o.Platy.AktualniRok().Any()).OrderBy(o => o.Nazev).ToList();
-        badOrgs = Model.Where(o => !o.Platy.AktualniRok().Any() && o.Metadata.AktualniRok().Any()).OrderBy(o => o.Nazev).ToList();
-        notAskedOrgs = Model.Where(o => !o.Platy.AktualniRok().Any() && !o.Metadata.AktualniRok().Any()).OrderBy(o => o.Nazev).ToList();
+        goodOrgs = Model.Where(o => o.Platy.AktualniRok(PuRepo.DefaultYear).Any()).OrderBy(o => o.Nazev).ToList();
+        badOrgs = Model.Where(o => !o.Platy.AktualniRok(PuRepo.DefaultYear).Any() && o.Metadata.AktualniRok(PuRepo.DefaultYear).Any()).OrderBy(o => o.Nazev).ToList();
+        notAskedOrgs = Model.Where(o => !o.Platy.AktualniRok(PuRepo.DefaultYear).Any() && !o.Metadata.AktualniRok(PuRepo.DefaultYear).Any()).OrderBy(o => o.Nazev).ToList();
     }
 
-    var aktualniPlaty = goodOrgs.SelectMany(o => o.Platy.AktualniRok()).ToList();
+    var aktualniPlaty = goodOrgs.SelectMany(o => o.Platy.AktualniRok(PuRepo.DefaultYear)).ToList();
     var platyMin = aktualniPlaty.Any() ? aktualniPlaty.Min(p => p.HrubyMesicniPlatVcetneOdmen) : 0;
     var platyMax = aktualniPlaty.Any() ? aktualniPlaty.Max(p => p.HrubyMesicniPlatVcetneOdmen) : 0;
     var platyLength = platyMax - platyMin;
@@ -77,12 +77,12 @@
                                         <a asp-action="Detail" asp-route-id="@org.DS">@org.Nazev</a>
                                     </td>
                                     <td class="col-3">
-                                        @Html.Raw(org.PlatyForYearUredniciDescriptionHtml())
+                                        @Html.Raw(org.PlatyForYearUredniciDescriptionHtml(PuRepo.DefaultYear))
                                     </td>
-                                    @if (org.Platy.AktualniRok().Any())
+                                    @if (org.Platy.AktualniRok(PuRepo.DefaultYear).Any())
                                     {
-                                        var minimalniPlatOrganizace = org.Platy.AktualniRok().Min(m => m.HrubyMesicniPlatVcetneOdmen);
-                                        var maximalniPlatOrganizace = org.Platy.AktualniRok().Max(m => m.HrubyMesicniPlatVcetneOdmen);
+                                        var minimalniPlatOrganizace = org.Platy.AktualniRok(PuRepo.DefaultYear).Min(m => m.HrubyMesicniPlatVcetneOdmen);
+                                        var maximalniPlatOrganizace = org.Platy.AktualniRok(PuRepo.DefaultYear).Max(m => m.HrubyMesicniPlatVcetneOdmen);
                                         var startPer = Math.Round((minimalniPlatOrganizace - platyMin) / platyLength * 100);
                                         var endPer = Math.Round((maximalniPlatOrganizace - minimalniPlatOrganizace) / platyLength * 100);
                                         if (endPer == 0)

@@ -36,11 +36,11 @@
     {
         case "zeny":
             ViewBag.Title = "Pouze političky " + Model.Year;
-            vsechnyPlaty = await PpRepo.GetPrijmyBySexAsync(true, true, year);
+            vsechnyPlaty = await PpRepo.GetPrijmyBySexAsync(true, year, true);
             break;
         case "muzi":
             ViewBag.Title = "Pouze politici " + Model.Year;
-            vsechnyPlaty = await PpRepo.GetPrijmyBySexAsync(false, true, year);
+            vsechnyPlaty = await PpRepo.GetPrijmyBySexAsync(false, year, true);
             break;
         case "transparentnost":
             top = 100;
