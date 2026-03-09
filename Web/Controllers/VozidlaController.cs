@@ -25,6 +25,7 @@ namespace HlidacStatu.Web.Controllers
             if (string.IsNullOrEmpty(id))
                 return RedirectToAction("Index");
 
+
             id = id.ToUpper().Trim();   
             using var db = new dbCtx();
             var vv = db.VypisVozidel

@@ -232,7 +232,7 @@ namespace HlidacStatu.Repositories
                 _logger.Error(e, $"Saving osoba {osoba.NameId}");
             }
 
-            if (externalIds != null)
+            if (externalIds?.Length >0)
             {
                 foreach (var ex in externalIds)
                 {
