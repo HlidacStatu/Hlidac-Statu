@@ -1,6 +1,5 @@
 ﻿namespace HlidacStatu.LibCore.Filters;
 
-
 using System;
 using System.IO;
 using System.Text;
@@ -21,7 +20,7 @@ public sealed class HlidacOutputCacheAttribute : TypeFilterAttribute
     public HlidacOutputCacheAttribute(long durationInSeconds, string queryKeys = "", bool differAuth = false)
         : base(typeof(HlidacOutputCacheFilter))
     {
-        Arguments = new object[] { durationInSeconds, queryKeys ?? string.Empty, differAuth };
+        Arguments = new object[] { durationInSeconds, queryKeys ?? string.Empty, differAuth};
     }
 }
 
@@ -38,7 +37,7 @@ public sealed class HlidacOutputCacheFilter : IAsyncResultFilter
         string queryKeys,
         bool differAuth,
         IMemoryCache cache,
-        ILogger<HlidacOutputCacheFilter> logger)
+        ILogger<HlidacOutputCacheFilter> logger, bool differAdmin)
     {
         if (queryKeys == "*")
             queryKeys = string.Empty;
@@ -150,6 +149,8 @@ public sealed class HlidacOutputCacheFilter : IAsyncResultFilter
         {
             sb.Append(context.User?.Identity?.IsAuthenticated == true ? "@auth" : "@notauth");
         }
+        
+        sb.Append(context.User?.IsInRole("Admin") == true ? "@admin" : "@notadmin");
 
         return sb.ToString();
     }
