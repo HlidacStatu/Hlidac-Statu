@@ -573,11 +573,13 @@ select distinct ds.DatovaSchranka, f.ico from firma f
 
         PuOrganizaceTag origTag;
         tag.Tag = tag.Tag.Trim();
+        tag.TagNormalized = PuOrganizaceTag.NormalizeTag(tag.Tag);
+        
         await using var dbContext = new DbEntities();
         if (tag.Id == 0)
         {
             origTag = await dbContext.PuOrganizaceTags
-                .FirstOrDefaultAsync(t => t.IdOrganizace == tag.IdOrganizace && t.Tag == tag.Tag);
+                .FirstOrDefaultAsync(t => t.IdOrganizace == tag.IdOrganizace && t.TagNormalized == tag.TagNormalized);
         }
         else
         {
