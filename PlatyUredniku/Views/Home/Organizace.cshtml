@@ -173,13 +173,20 @@
                     <p>
                         U této organizace evidujeme platy
                         @(Devmasters.Lang.CS.Plural.Get(pocetPolitiku, "jednoho politika", "{0} politiků", "{0} politiků"))
-                        za roky @(string.Join(", ", Model.PrijmyPolitiku.Select(m => m.Rok).Distinct())).
+                        za léta @(Model.PrijmyPolitiku.Min(m => m.Rok)) - @(Model.PrijmyPolitiku.Max(m => m.Rok)).
                     </p>
                     <p>
-                        @if (Model.PrijmyPolitiku.Count(m => m.Rok == YearPicker.PpDefaultYear) < 5)
+                        Platy za rok @(YearPicker.PpDefaultYear):
+                    </p>
+                    <p>
+                        @{
+                            var aktualniPrijmyPolitiku = Model.PrijmyPolitiku.Where(p => p.Rok == YearPicker.PpDefaultYear).ToList();
+                        }
+                        
+                        @if (aktualniPrijmyPolitiku.Count < 5)
                         {
                             <ul>
-                                @foreach (var pr in Model.PrijmyPolitiku.OrderByDescending(o => o.CelkoveRocniNakladyNaPolitika))
+                                @foreach (var pr in aktualniPrijmyPolitiku.OrderByDescending(o => o.CelkoveRocniNakladyNaPolitika))
                                 {
                                     <li>
                                         <a href="/politici/politik/@(pr.Nameid)">@((await pr.GetCachedOsobaAsync()).FullName())</a>
@@ -204,7 +211,7 @@
                         else
                         {
                             <ul>
-                                @foreach (var pr in Model.PrijmyPolitiku.OrderByDescending(o => o.CelkoveRocniNakladyNaPolitika).Take(3))
+                                @foreach (var pr in aktualniPrijmyPolitiku.OrderByDescending(o => o.CelkoveRocniNakladyNaPolitika).Take(3))
                                 {
                                     <li>
                                         <a href="/politici/politik/@(pr.Nameid)">@((await pr.GetCachedOsobaAsync()).FullName())</a>
@@ -227,7 +234,7 @@
                             </ul>
                             <span>
                                 a
-                                <a href="/politici/organizace/@Model.DS"> @Devmasters.Lang.CS.Plural.Get(pocetPolitiku - 3, "", "další {0} politici", "dalších {0} politiků")</a>.
+                                <a href="/politici/organizace/@Model.DS"> @Devmasters.Lang.CS.Plural.Get(pocetPolitiku - 3, "", "další {0} politiky", "dalších {0} politiků") za všechna období najdete zde!</a>
                             </span>
                         }
                     </p>
@@ -248,10 +255,17 @@
                         za roky @(string.Join(", ", Model.Platy.Select(m => m.Rok).Distinct())).
                     </p>
                     <p>
-                        @if (Model.Platy.Count(m => m.Rok == YearPicker.PuDefaultYear) < 5)
+                        Platy a odměny za rok @(YearPicker.PuDefaultYear):
+                    </p>
+                    <p>
+                        @{
+                            var aktualniPrijmyUredniku = Model.Platy.Where(p => p.Rok == YearPicker.PuDefaultYear).ToList();
+                        }
+                        
+                        @if (aktualniPrijmyUredniku.Count < 5)
                         {
                             <ul>
-                                @foreach (var pl in Model.Platy.OrderByDescending(o => o.CelkovyRocniPlatVcetneOdmen))
+                                @foreach (var pl in aktualniPrijmyUredniku.OrderByDescending(o => o.CelkovyRocniPlatVcetneOdmen))
                                 {
                                     <li>
                                         <a href="/urednici/plat/@(pl.Id)">@pl.NazevPozice</a>
@@ -263,7 +277,7 @@
                         else
                         {
                             <ul>
-                                @foreach (var pl in Model.Platy.Where(m => m.Rok == YearPicker.PuDefaultYear).OrderByDescending(o => o.CelkovyRocniPlatVcetneOdmen).Take(3))
+                                @foreach (var pl in aktualniPrijmyUredniku.OrderByDescending(o => o.CelkovyRocniPlatVcetneOdmen).Take(3))
                                 {
                                     <li>
                                         <a href="/urednici/plat/@(pl.Id)">@pl.NazevPozice</a>
@@ -273,7 +287,7 @@
                             </ul>
                             <span>
                                 a
-                                <a href="/urednici/detail/@Model.DS"> @Devmasters.Lang.CS.Plural.Get(pocetPlatu - 3, "", "další {0} platy", "dalších {0} platů") </a>.
+                                <a href="/urednici/detail/@Model.DS"> @Devmasters.Lang.CS.Plural.Get(pocetPlatu - 3, "", "další {0} platy a odměny", "dalších {0} platů a odměn") za všechna období najdete zde! </a>
                             </span>
                         }
                     </p>
