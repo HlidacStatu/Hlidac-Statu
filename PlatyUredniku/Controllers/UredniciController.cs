@@ -61,7 +61,7 @@ public class UredniciController : Controller
 
     public async Task<IActionResult> DlePlatu(int id)
     {
-        int prumernyPlat = 46_013;
+        int prumernyPlat = 52_283;
         (int Min, int Max) range = (0, int.MaxValue);
         string title = "Manažerské platy ve veřejné správě";
         string noteHtml = "";
@@ -72,28 +72,28 @@ public class UredniciController : Controller
             case 2:
                 range = (0_000, prumernyPlat);
                 title = $"Manažerské platy ve veřejné správě nižší než průměrný plat v ČR za rok {YearPicker.PuDefaultYear}";
-                noteHtml = "Průměrný plat v Q4 2023 <a href='https://www.czso.cz/csu/czso/cri/prumerne-mzdy-4-ctvrtleti-2023' target='_blank'>podle ČSÚ </a>v Q4 2023 byl <b>46 013 Kč hrubého</b>.";
-                rozsah = $"Rozsah zobrazovaných platů manažerů ve veřejné správě je od nuly až po průměrný plat (<b>46 013 Kč</b>).";
+                noteHtml = "Průměrný plat v Q4 2025 <a href='https://csu.gov.cz/rychle-informace/prumerne-mzdy-4-ctvrtleti-2025' target='_blank'>podle ČSÚ </a>v Q4 2025 byl <b>52&nbsp;283&nbsp;Kč hrubého</b>.";
+                rozsah = $"Rozsah zobrazovaných platů manažerů ve veřejné správě je od nuly až po průměrný plat (<b>52&nbsp;283&nbsp;Kč</b>).";
                 odkaz = $"<a href=\"/DlePlatu/3\">Vyšší než průměrné platy</a>";
                 break;
             case 3:
                 range = (prumernyPlat, prumernyPlat * 2);
                 title = $"Manažerské platy ve veřejné správě vyšší než průměrný plat v ČR za rok {YearPicker.PuDefaultYear}";
-                noteHtml = "Průměrný plat v Q4 2023 <a href='https://www.czso.cz/csu/czso/cri/prumerne-mzdy-4-ctvrtleti-2023' target='_blank'>podle ČSÚ </a>v Q4 2023 byl <b>46 013 Kč hrubého</b>.";
-                rozsah = $"Rozsah zobrazovaných platů manažerů ve veřejné správě je od průměrného platu (<b>46 013 Kč</b>) po dvojnásobek průměrného platu (<b>92 026 Kč</b>).";
+                noteHtml = "Průměrný plat v Q4 2025 <a href='https://csu.gov.cz/rychle-informace/prumerne-mzdy-4-ctvrtleti-2025' target='_blank'>podle ČSÚ </a>v Q4 2025 byl <b>52&nbsp;283&nbsp;Kč hrubého</b>.";
+                rozsah = $"Rozsah zobrazovaných platů manažerů ve veřejné správě je od průměrného platu (<b>52&nbsp;283&nbsp;Kč</b>) po dvojnásobek průměrného platu (<b>104&nbsp;566&nbsp;Kč</b>).";
                 odkaz = $"<a href=\"/DlePlatu/4\">Nejvyšší platy ve veřejné správě</a>";
                 break;
             case 4:
                 range = (prumernyPlat * 2, 100_000_000);
                 title = $"Nejvyšší manažerské platy ve veřejné správě za rok {YearPicker.PuDefaultYear}";
-                noteHtml = "Zobrazujeme platy manažerů, které jsou více než dvojnásobné, než je průměrný plat v Q4 2023 <a href='https://www.czso.cz/csu/czso/cri/prumerne-mzdy-4-ctvrtleti-2023' target='_blank'>podle ČSÚ </a>(46 013 Kč hrubého).";
-                rozsah = $"Zobrazované platy manažerů ve veřejné správě jsou větší než dvojnásobek průměrného platu (<b>92 026 Kč</b>).";
+                noteHtml = "Zobrazujeme platy manažerů, které jsou více než dvojnásobné, než je průměrný plat v Q4 2025 <a href='https://csu.gov.cz/rychle-informace/prumerne-mzdy-4-ctvrtleti-2025' target='_blank'>podle ČSÚ </a>(52&nbsp;283&nbsp;Kč hrubého).";
+                rozsah = $"Zobrazované platy manažerů ve veřejné správě jsou větší než dvojnásobek průměrného platu (<b>104&nbsp;566&nbsp;Kč</b>).";
                 break;
             case 1:
             default:
                 range = (0_000, 35_300);
                 title = $"Manažerské platy ve veřejné správě za rok {YearPicker.PuDefaultYear} nižší než nástupní plat pokladní/ho v Lidlu ";
-                noteHtml = "Nástupní plat pokladní v Lidl v Praze byl <a href='https://spolecnost.lidl.cz/pro-novinare/tiskove-zpravy/spolecnost-lidl-navysuje-mzdy-a-rozsiruje-benefity' target='_blank'>podle iDnes</a> <b>35 300 Kč hrubého</b>.";
+                noteHtml = "Nástupní plat <a href='https://spolecnost.lidl.cz/pro-novinare/tiskove-zpravy/spolecnost-lidl-navysuje-mzdy-a-rozsiruje-benefity' target='_blank'>pokladní v Lidl v Praze byl</a> <b>35 300 Kč hrubého</b>.";
                 rozsah = $"Rozsah zobrazovaných platů manažerů ve veřejné správě je od nuly až po nástupní plat pokladní/ho v Lidlu (<b>35 300 Kč</b>).";
                 odkaz = $"<a href=\"/DlePlatu/2\">Nižší než průměrné platy</a>";
                 break;
