@@ -72,21 +72,21 @@ public class UredniciController : Controller
             case 2:
                 range = (0_000, prumernyPlat);
                 title = $"Manažerské platy ve veřejné správě nižší než průměrný plat v ČR za rok {YearPicker.PuDefaultYear}";
-                noteHtml = "Průměrný plat v Q4 2025 <a href='https://csu.gov.cz/rychle-informace/prumerne-mzdy-4-ctvrtleti-2025' target='_blank'>podle ČSÚ </a>v Q4 2025 byl <b>52&nbsp;283&nbsp;Kč hrubého</b>.";
+                noteHtml = "Průměrný plat <a href='https://csu.gov.cz/rychle-informace/prumerne-mzdy-4-ctvrtleti-2025' target='_blank'>podle ČSÚ </a>v Q4 2025 byl <b>52&nbsp;283&nbsp;Kč hrubého</b>.";
                 rozsah = $"Rozsah zobrazovaných platů manažerů ve veřejné správě je od nuly až po průměrný plat (<b>52&nbsp;283&nbsp;Kč</b>).";
                 odkaz = $"<a href=\"/DlePlatu/3\">Vyšší než průměrné platy</a>";
                 break;
             case 3:
                 range = (prumernyPlat, prumernyPlat * 2);
                 title = $"Manažerské platy ve veřejné správě vyšší než průměrný plat v ČR za rok {YearPicker.PuDefaultYear}";
-                noteHtml = "Průměrný plat v Q4 2025 <a href='https://csu.gov.cz/rychle-informace/prumerne-mzdy-4-ctvrtleti-2025' target='_blank'>podle ČSÚ </a>v Q4 2025 byl <b>52&nbsp;283&nbsp;Kč hrubého</b>.";
+                noteHtml = "Průměrný plat <a href='https://csu.gov.cz/rychle-informace/prumerne-mzdy-4-ctvrtleti-2025' target='_blank'>podle ČSÚ </a>v Q4 2025 byl <b>52&nbsp;283&nbsp;Kč hrubého</b>.";
                 rozsah = $"Rozsah zobrazovaných platů manažerů ve veřejné správě je od průměrného platu (<b>52&nbsp;283&nbsp;Kč</b>) po dvojnásobek průměrného platu (<b>104&nbsp;566&nbsp;Kč</b>).";
                 odkaz = $"<a href=\"/DlePlatu/4\">Nejvyšší platy ve veřejné správě</a>";
                 break;
             case 4:
                 range = (prumernyPlat * 2, 100_000_000);
                 title = $"Nejvyšší manažerské platy ve veřejné správě za rok {YearPicker.PuDefaultYear}";
-                noteHtml = "Zobrazujeme platy manažerů, které jsou více než dvojnásobné, než je průměrný plat v Q4 2025 <a href='https://csu.gov.cz/rychle-informace/prumerne-mzdy-4-ctvrtleti-2025' target='_blank'>podle ČSÚ </a>(52&nbsp;283&nbsp;Kč hrubého).";
+                noteHtml = "Zobrazujeme platy manažerů, které jsou více než dvojnásobné, než je Průměrný plat <a href='https://csu.gov.cz/rychle-informace/prumerne-mzdy-4-ctvrtleti-2025' target='_blank'>podle ČSÚ </a>(52&nbsp;283&nbsp;Kč hrubého).";
                 rozsah = $"Zobrazované platy manažerů ve veřejné správě jsou větší než dvojnásobek průměrného platu (<b>104&nbsp;566&nbsp;Kč</b>).";
                 break;
             case 1:
