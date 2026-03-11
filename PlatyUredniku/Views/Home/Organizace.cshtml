@@ -252,7 +252,7 @@
                     <p>
                         U této organizace evidujeme
                         @(Devmasters.Lang.CS.Plural.Get(pocetPlatu, "jeden plat", "{0} platy", "{0} platů"))
-                        za roky @(string.Join(", ", Model.Platy.Select(m => m.Rok).Distinct())).
+                        za léta @(Model.Platy.Min(m => m.Rok)) - @(Model.Platy.Max(m => m.Rok)).
                     </p>
                     <p>
                         Platy a odměny za rok @(YearPicker.PuDefaultYear):
