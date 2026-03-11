@@ -20,9 +20,9 @@ public static partial class PpRepo
     public const int DefaultYear = 2024;
     public const int MinYear = 2024;
 
-    public static async Task<PuOrganizace> GetOrganizaceFullDetailAsync(string datovaSchranka)
+    public static async Task<PuOrganizace> GetOrganizaceFullDetailUpToYearAsync(string datovaSchranka, int? maxYear)
     {
-        return await GetOrganizaceFullDetailAsync(new string[] { datovaSchranka });
+        return await GetOrganizaceFullDetailUpToYearAsync(new string[] { datovaSchranka }, maxYear);
     }
 
     public static PuEvent.EventDescription GetEventDescription(this PuEvent ev)
@@ -117,17 +117,17 @@ public static partial class PpRepo
         return events;
     }
 
-    public static async Task<PuOrganizace> GetOrganizaceFullDetailPerIcoAsync(string ico)
+    public static async Task<PuOrganizace> GetOrganizaceFullDetailUpToYearPerIcoAsync(string ico, int? maxYear)
     {
         if (HlidacStatu.Util.DataValidators.CheckCZICO(ico))
         {
             Firma f = await FirmaCache.GetAsync(ico);
-            return await GetOrganizaceFullDetailAsync(f.DatovaSchranka);
+            return await GetOrganizaceFullDetailUpToYearAsync(f.DatovaSchranka, maxYear);
         }
         else return null;
     }
 
-    public static async Task<PuOrganizace> GetOrganizaceFullDetailAsync(string[] datoveSchranky)
+    public static async Task<PuOrganizace> GetOrganizaceFullDetailUpToYearAsync(string[] datoveSchranky, int? maxYear)
     {
         await using var db = new DbEntities();
 
@@ -137,11 +137,13 @@ public static partial class PpRepo
             .Include(o => o.Metadata)
             .Include(o => o.Tags)
             .Include(o => o.FirmaDs)
-            .Include(o => o.PrijmyPolitiku) // Include PuPrijmyPolitiku
+            .Include(o => maxYear != null && maxYear > 0
+                ? o.PrijmyPolitiku.Where(p => p.Rok <= maxYear)
+                : o.PrijmyPolitiku) // Include PuPrijmyPolitiku
             .FirstOrDefaultAsync();
     }
 
-    public static async Task<PuOrganizace> GetOrganizaceFullDetailAsync(int idOrganizace)
+    public static async Task<PuOrganizace> GetOrganizaceFullDetailUpToYearAsync(int idOrganizace)
     {
         await using var db = new DbEntities();
 
@@ -356,13 +358,14 @@ public static partial class PpRepo
         return await query.ToListAsync();
     }
 
+    //todo: wth is this doing
     public static async Task<PuEvent> ZahajeniDotazovaniPlatuPolitikaAsync(Firma firma, string osobaNameId, int rok,
         string naseCj)
     {
         await using var db = new DbEntities();
 
         //existuje PuOrganizace?
-        var puorg = await PpRepo.GetOrganizaceFullDetailAsync(firma.DatovaSchranka);
+        var puorg = await PpRepo.GetOrganizaceFullDetailUpToYearAsync(firma.DatovaSchranka, null);
         if (puorg == null)
             puorg = await PuRepo.UpsertOrganizaceAsync(new PuOrganizace()
             {

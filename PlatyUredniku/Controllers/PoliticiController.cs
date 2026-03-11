@@ -76,12 +76,12 @@ public partial class PoliticiController : Controller
         if (HlidacStatu.Util.DataValidators.CheckCZICO(id))
         {
             //ico
-            detail = await PpRepo.GetOrganizaceFullDetailPerIcoAsync(id);
+            detail = await PpRepo.GetOrganizaceFullDetailUpToYearPerIcoAsync(id, rok);
         }
         else if (!string.IsNullOrEmpty(id))
         {
             //datovka
-            detail = await PpRepo.GetOrganizaceFullDetailAsync(id);
+            detail = await PpRepo.GetOrganizaceFullDetailUpToYearAsync(id, rok);
         }
 
         if (detail == null)

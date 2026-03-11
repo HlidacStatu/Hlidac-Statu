@@ -141,7 +141,7 @@ else
                     HlidacStatu.Lib.Analytics.StatisticsSubjectPerYear<Smlouva.Statistics.Data> stat = await firma.StatistikaRegistruSmluvAsync();
                     var ceo = await firma.CurrentCeoAsync();
                     var platyStat = await firma.GetPlatyStatAsync();
-                    var platyOrgDetailMetadata = (await HlidacStatu.Repositories.PuRepo.GetFullDetailAsync(firma.DatovaSchranka))?
+                    var platyOrgDetailMetadata = (await HlidacStatu.Repositories.PuRepo.GetFullDetailUpToYearAsync(firma.DatovaSchranka, PuRepo.DefaultYear))?
                                                     .MetadataPlatyUredniku.FirstOrDefault(m=>m.Rok == PuRepo.DefaultYear);
                     <tr>
                         <td>

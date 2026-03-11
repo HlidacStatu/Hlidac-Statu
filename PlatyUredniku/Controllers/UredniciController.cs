@@ -171,7 +171,10 @@ public class UredniciController : Controller
 
     public async Task<IActionResult> Detail(string id, int? rok = null)
     {
-        var detail = await PuRepo.Cached.GetFullDetailAsync(id);
+        if(rok is null || rok == 0 || rok > YearPicker.PuDefaultYear)
+            rok = YearPicker.PuDefaultYear;
+        
+        var detail = await PuRepo.Cached.GetFullDetailUpToYearAsync(id, rok);
         
         ViewBag.Title = detail.Nazev;
 

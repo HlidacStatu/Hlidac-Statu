@@ -40,8 +40,8 @@ public class HomeController : Controller
         {
             await using var db = new DbEntities();
 
-            var f1 = await PuRepo.GetFullDetailAsync(ds);
-            var f2 = await PpRepo.GetOrganizaceFullDetailAsync(ds);
+            var f1 = await PuRepo.GetFullDetailUpToYearAsync(ds, YearPicker.PuDefaultYear);
+            var f2 = await PpRepo.GetOrganizaceFullDetailUpToYearAsync(ds, YearPicker.PpDefaultYear);
             detail = f1;
             if (detail == null)
             {

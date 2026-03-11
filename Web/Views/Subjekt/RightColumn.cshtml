@@ -128,7 +128,7 @@
 
 
     @{
-        var platyUrednikuOrg = await PuRepo.GetFullDetailAsync(Model.DatovaSchranka);
+        var platyUrednikuOrg = await PuRepo.GetFullDetailUpToYearAsync(Model.DatovaSchranka, PuRepo.DefaultYear);
     }
     @if (platyUrednikuOrg != null)
     {

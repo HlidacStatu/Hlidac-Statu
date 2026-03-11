@@ -30,7 +30,7 @@ namespace HlidacStatu.Extensions
         {
             if (firma == null)
                 return null;
-            var org = await PuRepo.GetFullDetailAsync(firma.DatovaSchranka);
+            var org = await PuRepo.GetFullDetailUpToYearAsync(firma.DatovaSchranka, PuRepo.DefaultYear);
             if (org == null)
                 return null;
             var platyStat = new PuPlatStat(org.Platy);
@@ -43,7 +43,7 @@ namespace HlidacStatu.Extensions
             if (firma == null)
                 return null;
 
-            var org = await PuRepo.GetFullDetailAsync(firma.DatovaSchranka);
+            var org = await PuRepo.GetFullDetailUpToYearAsync(firma.DatovaSchranka, PuRepo.DefaultYear);
             if (org == null)
                 return null;
             return org.GetUrl(false);

@@ -149,22 +149,35 @@ public static partial class PuRepo
         return stat;
     }
 
-    public static async Task<PuOrganizace> GetFullDetailAsync(string datovaSchranka)
+    /// <summary>
+    /// Returns Full info about Organizace, its metadata, tags and platy
+    /// </summary>
+    /// <param name="maxYear">null or 0 returns data for all years in db</param>
+    /// <returns></returns>
+    public static async Task<PuOrganizace> GetFullDetailUpToYearAsync(string datovaSchranka, int? maxYear)
     {
-        return await GetFullDetailAsync(new string[] { datovaSchranka });
+        return await GetFullDetailUpToYearAsync(new string[] { datovaSchranka }, maxYear);
     }
-    public static async Task<PuOrganizace> GetFullDetailAsync(string[] datovaSchranky)
+    /// <summary>
+    /// Returns Full info about Organizace, its metadata, tags and platy
+    /// </summary>
+    /// <param name="maxYear">null or 0 returns data for all years in db</param>
+    /// <returns></returns>
+    public static async Task<PuOrganizace> GetFullDetailUpToYearAsync(string[] datovaSchranky, int? maxYear)
     {
         await using var db = new DbEntities();
 
-        return await db.PuOrganizace
+        var query = db.PuOrganizace
             .AsNoTracking()
             .Where(pu => datovaSchranky.Contains(pu.DS))
             .Include(o => o.Metadata)
             .Include(o => o.Tags)
             .Include(o => o.FirmaDs)
-            .Include(o => o.Platy) // Include PuPlat
-            .FirstOrDefaultAsync();
+            .Include(o => maxYear != null && maxYear > 0
+                ? o.Platy.Where(p => p.Rok <= maxYear)
+                : o.Platy); // Include year filtered PuPlat
+        
+        return await query.FirstOrDefaultAsync();
     }
 
     public static async Task<List<PuOrganizace>> ExportAllAsync(string? datovaSchranka, int? year)
