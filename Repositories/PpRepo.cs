@@ -358,7 +358,6 @@ public static partial class PpRepo
         return await query.ToListAsync();
     }
 
-    //todo: wth is this doing
     public static async Task<PuEvent> ZahajeniDotazovaniPlatuPolitikaAsync(Firma firma, string osobaNameId, int rok,
         string naseCj)
     {

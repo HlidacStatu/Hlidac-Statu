@@ -225,7 +225,7 @@ public static partial class PuRepo
             .Where(pu => pu.DS == tip.DS)
             .Include(o => o.Metadata.Where(m => m.Typ == PuOrganizaceMetadata.TypMetadat.PlatyUredniku))
             .Include(o => o.Tags)
-            //.Include(o => o.FirmaDs)
+            .Include(o => o.FirmaDs)
             .Include(o => o.Platy) // Include PuPlat
             .FirstOrDefaultAsync();
     }
