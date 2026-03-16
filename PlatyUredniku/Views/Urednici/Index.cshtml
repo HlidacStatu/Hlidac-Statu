@@ -5,7 +5,7 @@
 
     var organizationOfTheDay = await PuRepo.GetOrganizationOfTheDayAsync();
     var ceoOfTheDay = organizationOfTheDay.Platy.FirstOrDefault(p => p.JeHlavoun == true && p.Rok == YearPicker.PuDefaultYear);
-    var dataForOrganizationOfTheDay = await PuRepo.Cached.GetFullDetailAsync(organizationOfTheDay.DS);
+    var dataForOrganizationOfTheDay = await PuRepo.Cached.GetFullDetailUpToYearAsync(organizationOfTheDay.DS, YearPicker.PuDefaultYear);
 }
 
 

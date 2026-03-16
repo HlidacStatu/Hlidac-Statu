@@ -180,7 +180,7 @@ public static class ParsePlatyUrednikuFile
 
     private static async Task<int> LoadOrCreateOrganizaceAsync(string ds)
     {
-        var origOrganizace = await PuRepo.GetFullDetailAsync(ds);
+        var origOrganizace = await PuRepo.GetFullDetailUpToYearAsync(ds, null);
         var idOrganizace = origOrganizace?.Id ?? 0;
 
         if (idOrganizace == 0)

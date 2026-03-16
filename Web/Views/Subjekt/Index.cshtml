@@ -285,7 +285,7 @@
         || this.User.IsInRole("Admin")
         )
     {
-        var prijmyPolitikuOrg = (await PpRepo.GetOrganizaceFullDetailAsync(Model.DatovaSchranka))?.PrijmyPolitiku;
+        var prijmyPolitikuOrg = (await PpRepo.GetOrganizaceFullDetailUpToYearAsync(Model.DatovaSchranka, PpRepo.DefaultYear))?.PrijmyPolitiku;
 
         if (prijmyPolitikuOrg?.Count > 0)
         {
@@ -376,7 +376,7 @@
     @* ------- Platy úředníků ´---------- *@
 
     @{
-        var platyUrednikuOrg = await PuRepo.GetFullDetailAsync(Model.DatovaSchranka);
+        var platyUrednikuOrg = await PuRepo.GetFullDetailUpToYearAsync(Model.DatovaSchranka, PuRepo.DefaultYear);
     }
     @if (platyUrednikuOrg?.Platy?.Count > 0)
     {

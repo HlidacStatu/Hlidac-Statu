@@ -27,11 +27,11 @@ public static partial class PuRepo
             );
         }
 
-        public static async Task<PuOrganizace> GetFullDetailAsync(string datovaSchranka)
+        public static async Task<PuOrganizace> GetFullDetailUpToYearAsync(string datovaSchranka, int? maxYear)
         {
             return await CacheService.Cache.GetOrSetAsync<PuOrganizace>(
-                $"{nameof(PuRepo.GetFullDetailAsync)}_{datovaSchranka}",
-                async _ => await PuRepo.GetFullDetailAsync(datovaSchranka)
+                $"{nameof(PuRepo.GetFullDetailUpToYearAsync)}_{datovaSchranka}_{maxYear}",
+                async _ => await PuRepo.GetFullDetailUpToYearAsync(datovaSchranka, maxYear)
             );
         }
 
