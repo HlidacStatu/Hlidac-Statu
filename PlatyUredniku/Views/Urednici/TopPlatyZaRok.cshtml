@@ -1,0 +1,99 @@
+﻿@using HlidacStatu.Entities
+@using HlidacStatu.Repositories
+@using HlidacStatu.Util
+@model List<HlidacStatu.Entities.PuPlat>
+
+
+@section breadcrumbs
+{
+    <ol class="breadcrumb">
+        <li>
+            <a href="/">Platy</a>
+        </li>
+        <li>
+            <a asp-action="Index">Platy úředníků</a>
+        </li>
+        <li>
+            <a asp-action="Analyzy">Analýzy</a>
+        </li>
+        <li>
+            Přehled jednotlivých platů
+        </li>
+        <li class="active">
+            @ViewData["title"]
+        </li>
+    </ol>
+}
+
+
+<section class="d-flex align-items-center justify-content-center alter-bg-color pt-5 pageblock-small">
+    <div class="container">
+        <h2>@ViewData["title"]</h2>
+        <p class="text-muted">Informace o nejvyšších platech státních podniků, či příspěvkových organizací za
+            rok @ViewData["year"].</p>
+
+        <div class="nav flex-row nav-pills">
+            <button class="nav-link disabled" type="button" disabled="disabled">Zobrazit data od roku</button>
+            @{
+                foreach (var y in Enumerable.Range(2021, YearPicker.PuDefaultYear - 2020))
+                {
+                    bool isActive = ViewData["year"]?.ToString()?.Trim()
+                        .Equals(y.ToString(), StringComparison.InvariantCultureIgnoreCase) == true;
+
+                    <a href="@(this.Context.Request.GetCurrentUrl("year", y.ToString()))"
+                       class="@($"nav-link {(isActive ? "active" : "")}")"
+                       type="button"
+                       role="tab">
+                        @y
+                    </a>
+                }
+            }
+        </div>
+
+    </div>
+</section>
+<section class="d-flex align-items-center justify-content-center pageblock">
+    <div class="container">
+        <table class="table table-hover table-striped">
+            <thead class="xtable-light">
+            <th>Pozice</th>
+            <th>Organizace</th>
+            <th><abbr title="Průměrný měsíční plat přepočtený z ročního příjmu včetně odměn">Měsíční plat</abbr>
+                v @ViewData["year"]</th>
+            <th>Nefinanční odměna</th>
+            </thead>
+            <tbody>
+            @foreach (PuPlat plat in Model.OrderByDescending(p => p.HrubyMesicniPlatVcetneOdmen))
+            {
+                <tr>
+                    <td>
+                        <a asp-action="Plat" asp-route-id="@plat.Id"> @plat.NazevPozice</a>
+                    </td>
+                    <td>
+                        <a asp-action="Detail" asp-route-id="@plat.Organizace.DS">@plat.Organizace.Nazev</a>
+                    </td>
+                    <td class="number text-nowrap">
+                        @if (plat.PocetMesicu < 12)
+                        {
+                            <a href="#" class="link-danger" data-bs-toggle="tooltip"
+                               data-bs-title="Plat je pouze za @Devmasters.Lang.CS.Plural.Get((long)plat.PocetMesicu.Value, "jeden měsíc", "{0} měsíce", "{0} měsíců") a může obsahovat odstupné či jinou smluvní odměnu"><i
+                                    class="fa-solid fa-circle-info"></i></a>
+                        }
+                        @if (plat.Uvazek != 1)
+                        {
+                            <a href="#" class="link-warning me-2" data-bs-toggle="tooltip"
+                               data-bs-title="Výše úvazku je jiná než obvyklých 40 hodin týdně."><i
+                                    class="fa-solid fa-circle-info"></i></a>
+                        }
+
+                        @HlidacStatu.Util.RenderData.NicePrice(plat.HrubyMesicniPlatVcetneOdmen)</td>
+                    <td style="max-width:25rem">
+
+                        <small>@plat.NefinancniBonus</small>
+                    </td>
+                </tr>
+            }
+            </tbody>
+        </table>
+    </div>
+</section>

@@ -41,6 +41,12 @@ public class UredniciController : Controller
                 else
                     ViewBag.Title = "Přehled nejvyšších nárůstů ředitelských platů";
                 break;
+            case "zmenaodmenceos":
+                if (Request.Query["max"]=="false")
+                    ViewBag.Title = "Přehled nejvyšších poklesů odměn ředitelů";
+                else
+                    ViewBag.Title = "Přehled nejvyšších nárůstů odměn ředitelů";
+                break;
             default:
                 break;
         }
@@ -111,6 +117,23 @@ public class UredniciController : Controller
 
         ViewBag.Title = title;
 
+        return View(platy);
+    }
+    
+    public async Task<IActionResult> TopPlatyZaRok(int year)
+    {
+        if (year == 0 || year > YearPicker.PuDefaultYear)
+        {
+            year = YearPicker.PuDefaultYear;
+        }
+        
+        string title = $"Top 100 platů za rok {year}";
+        ViewData["title"] = title;
+        ViewData["year"] = year.ToString();
+        
+        ViewBag.Title = title;
+        
+        var platy = await PuRepo.Cached.GetTop100PlatuAsync(year);
         return View(platy);
     }
 

@@ -26,6 +26,14 @@ public static partial class PuRepo
                 async _ => await PuRepo.GetPoziceDlePlatuAsync(min, max, year)
             );
         }
+        
+        public static async Task<List<PuPlat>> GetTop100PlatuAsync(int year)
+        {
+            return await CacheService.Cache.GetOrSetAsync<List<PuPlat>>(
+                $"{nameof(PuRepo.GetTop100PlatuAsync)}_{year}",
+                async _ => await PuRepo.GetTop100PlatuAsync(year)
+            );
+        }
 
         public static async Task<PuOrganizace> GetFullDetailUpToYearAsync(string datovaSchranka, int? maxYear)
         {

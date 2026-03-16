@@ -40,7 +40,7 @@
 <section class="d-flex align-items-center justify-content-center pageblock-small">
     <div class="container">
 
-        <h2>Přehled platů u kterých odměny tvoří nejvyšší část za rok @rok</h2>
+        <h2>Přehled platů, u kterých odměny tvoří nejvyšší část za rok @rok</h2>
         <p class="text-muted">Přehled pracovních pozic, u kterých odměna tvoří nejvyšší podíl celkového příjmu.</p>
 
         <div class="nav flex-row nav-pills">
@@ -86,6 +86,7 @@
                 <th><abbr title="Průměrný měsíční plat přepočtený z ročního příjmu">Měsíční plat</abbr></th>
                 <th><abbr title="Průměrné měsíční odměny přepočtené z ročního příjmu">Měsíční odměny</abbr></th>
                 <th>Podíl odměny na celkovém příjmu v %</th>
+                <th>Celkem vyplaceno na odměnách</th>
                 </thead>
                 <tbody>
                     @foreach (var plat in platy.OrderByDescending(p => p.OsobniOhodnoceniPerc))
@@ -108,11 +109,12 @@
                                 {
                                     <a href="#" class="link-warning me-2" data-bs-toggle="tooltip"
                                        data-bs-title="Výše úvazku je jiná než obvyklých 40 hodin týdně."><i
-                                            class="fa-solid fa-circle-info"></i></a>
+                                                                                                             class="fa-solid fa-circle-info"></i></a>
                                 }
 
                                 @plat.OsobniOhodnoceniPerc?.ToString("P")
-                                </td>
+                            </td>
+                            <td class="number" data-order="@(HlidacStatu.Util.RenderData.OrderValueFormat(plat.Odmeny ?? 0))">@HlidacStatu.Util.RenderData.NicePriceHtml(plat.Odmeny ?? 0)</td>
                         </tr>
                     }
                 </tbody>
