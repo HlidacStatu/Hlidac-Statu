@@ -1,0 +1,176 @@
+@using HlidacStatu.Repositories
+@using PlatyUredniku.Models;
+@using HlidacStatu.Util;
+
+
+@{
+    bool max = this.Context.Request.Query.GetFirstQueryParameter("max") != "false";
+
+    int minYear = Devmasters.ParseText.ToInt(this.Context.Request.Query.GetFirstQueryParameter("minyear")) ?? 2021;
+    var orgs = await PuRepo.GetPlatyForYearsAsync(minYear, YearPicker.PuDefaultYear);
+
+    List<PrumerOdmen> rusty = new();
+    foreach (var org in orgs)
+    {
+        var platyCeos = org.Platy.Where(plat => plat.JeHlavoun == true).ToList();
+        var platyPrvniRok = platyCeos.Where(p => p.Rok == minYear);
+        var platyPosledniRok = platyCeos.Where(p => p.Rok == YearPicker.PuDefaultYear);
+        if (!platyPrvniRok.Any() || !platyPosledniRok.Any())
+            continue;
+
+        var rustPlatu = new PrumerOdmen()
+        {
+            DatovaSchrankaOrganizace = org.DS,
+            NazevOrganizace = org.Nazev,
+            PrepoctenaMesicniOdmenaPrvniRok = platyPrvniRok.Average(p => p.OdmenyMesicne), //tady jde o odměny
+            PrumernaOdmenaPrvniRok = platyPrvniRok.Average(p => p.Odmeny),
+            PocetMesicuPrvniRok = platyPrvniRok.Sum(p => p.PocetMesicu),
+            PocetPlatuPrvniRok = platyPrvniRok.Count(),
+            PrepoctenaMesicniOdmenaPosledniRok = platyPosledniRok.Average(p => p.OdmenyMesicne), // tady jde o odměny
+            PrumernaOdmenaPosledniRok = platyPosledniRok.Average(p => p.Odmeny),
+            PocetMesicuPosledniRok = platyPosledniRok.Sum(p => p.PocetMesicu),
+            PocetPlatuPosledniRok = platyPosledniRok.Count(),
+        };
+
+        rusty.Add(rustPlatu);
+    }
+}
+@section breadcrumbs
+{
+    <ol class="breadcrumb">
+        <li>
+            <a href="/">Platy</a>
+        </li>
+        <li>
+            <a asp-action="Index">Platy úředníků</a>
+        </li>
+        <li>
+            <a asp-action="Analyzy">Analýzy</a>
+        </li>
+        <li class="active">
+            @(max ? "Největší navýšení" : "Největší snížení") odměn top manažerů od roku @minYear
+        </li>
+    </ol>
+}
+
+@section scripts
+{
+    <link rel="stylesheet" type="text/css" href="//cdn.datatables.net/1.13.4/css/jquery.dataTables.min.css" />
+    <script type="text/javascript" charset="utf8" src="//cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
+}
+
+<section class="d-flex align-items-center justify-content-center pageblock-small">
+    <div class="container">
+        <h2>@(max ? "Největší navýšení" : "Největší snížení") odměn top manažerů od roku @minYear</h2>
+
+        <div class="nav flex-row nav-pills">
+            <button class="nav-link disabled" type="button" disabled="disabled">Zobrazit data od roku</button>
+            @{
+
+                foreach (var y in PuRepo.AllYears.Where(y => y < YearPicker.PuDefaultYear && y >= 2021))
+                {
+                    <a href="@(this.Context.Request.GetCurrentUrl("minyear",y.ToString()))"
+                       class="@($"nav-link {(minYear == y ? "active" :  "")}")"
+                       type="button"
+                       role="tab">
+                        @y
+                    </a>
+                }
+            }
+        </div>
+        <br/>
+        
+        <p class="text-muted">
+            Analýza @(max ? "největšího navýšení" : "největšího snížení") odměn
+            <b>nejvyšších představených</b> jednotlivých úřadů, státních podniků
+            či příspěvkových organizací mezi roky @minYear a @YearPicker.PuDefaultYear .
+        </p>
+
+        <div class="tab-pane width-75vp" id="rustPlatuCeo" role="tabpanel">
+            <script>
+                $(document).ready(function () {
+                    $('#tblSum_rustPlatuCeo').DataTable(
+                        {
+                            'language': {
+                                'url': '//cdn.datatables.net/plug-ins/1.13.4/i18n/cs.json'
+                            },
+                            "searching": false,
+                            "paging": true,
+                            "pageLength": 20,
+                            "lengthChange": false,
+                            "ordering": true,
+                            "order": [[3, @Html.Raw(max ? "'desc'" : "'asc'")]],
+                            "info": false
+                        });
+                });
+            </script>
+
+            <table class="table table-borderless table-striped table-hover" id="tblSum_rustPlatuCeo">
+                <thead class="table-light">
+                <th>Organizace</th>
+                <th><abbr title="Průměrný měsíční plat přepočtený z ročního příjmu včetně odměn">Měsíční odměny</abbr> v @minYear</th>
+                <th><abbr title="Průměrný měsíční plat přepočtený z ročního příjmu včetně odměn">Měsíční odměny</abbr> v @YearPicker.PuDefaultYear</th>
+                <th>Změna v Kč</th>
+                <th>Roční odměny v @minYear</th>
+                <th>Roční odměny v @YearPicker.PuDefaultYear</th>
+                <th></th>
+                </thead>
+                <tbody>
+                    @foreach (var prumerPlatu in rusty.OrderByDescending(p => p.NarustAbsolutni))
+                    {
+                        <tr>
+                            <td>
+                                <a asp-action="Detail" asp-route-id="@prumerPlatu.DatovaSchrankaOrganizace">@prumerPlatu.NazevOrganizace</a>
+                            </td>
+                            <td class="number text-nowrap" data-order="@(HlidacStatu.Util.RenderData.OrderValueFormat(prumerPlatu.PrepoctenaMesicniOdmenaPrvniRok ?? 0))">@HlidacStatu.Util.RenderData.NicePrice(prumerPlatu.PrepoctenaMesicniOdmenaPrvniRok ?? 0)</td>
+                            <td class="number text-nowrap" data-order="@(HlidacStatu.Util.RenderData.OrderValueFormat(prumerPlatu.PrepoctenaMesicniOdmenaPosledniRok ?? 0))">@HlidacStatu.Util.RenderData.NicePrice(prumerPlatu.PrepoctenaMesicniOdmenaPosledniRok ?? 0)</td>
+                            <td class="number text-nowrap" data-order="@(HlidacStatu.Util.RenderData.OrderValueFormat(prumerPlatu.NarustAbsolutni ?? 0))">@HlidacStatu.Util.RenderData.NicePrice(prumerPlatu.NarustAbsolutni ?? 0)</td>
+                            <td class="number text-nowrap" data-order="@(HlidacStatu.Util.RenderData.OrderValueFormat(prumerPlatu.PrumernaOdmenaPrvniRok ?? 0))">@HlidacStatu.Util.RenderData.NicePrice(prumerPlatu.PrumernaOdmenaPrvniRok ?? 0)</td>
+                            <td class="number text-nowrap" data-order="@(HlidacStatu.Util.RenderData.OrderValueFormat(prumerPlatu.PrumernaOdmenaPosledniRok ?? 0))">@HlidacStatu.Util.RenderData.NicePrice(prumerPlatu.PrumernaOdmenaPosledniRok ?? 0)</td>
+                            <td>
+                                @if (prumerPlatu.PocetPlatuPrvniRok >1 && prumerPlatu.PocetPlatuPosledniRok<2)
+                                {
+                                    <a href="#" class="link-danger" data-bs-toggle="tooltip" 
+                                    data-bs-title="Odměny roku @(minYear) jsou spočítány jako průměr odměn @Devmasters.Lang.CS.Plural.Get((long)prumerPlatu.PocetPlatuPrvniRok, "jednoho ředitele", "{0} ředitelů", "{0} ředitelů") a hodnota odměn může obsahovat odstupné či jinou smluvní odměnu"><i class="fa-solid fa-circle-info"></i></a>
+                                }
+                                else if (prumerPlatu.PocetPlatuPosledniRok > 1 && prumerPlatu.PocetPlatuPrvniRok < 2)
+                                {
+                                    <a href="#" class="link-danger" data-bs-toggle="tooltip"
+                                       data-bs-title="Odměny roku @(YearPicker.PuDefaultYear) jsou spočítány jako průměr odměn @Devmasters.Lang.CS.Plural.Get((long)prumerPlatu.PocetPlatuPosledniRok, "jednoho ředitele", "{0} ředitelů", "{0} ředitelů") a hodnota odměn může obsahovat odstupné či jinou smluvní odměnu"><i class="fa-solid fa-circle-info"></i></a>
+                                }
+                                else if (prumerPlatu.PocetPlatuPrvniRok > 1 && prumerPlatu.PocetPlatuPosledniRok > 1 )
+                                {
+                                    <a href="#" class="link-danger" data-bs-toggle="tooltip"
+                                       data-bs-title="Odměny roku @(minYear) jsou spočítány jako průměr odměn 
+                                            @Devmasters.Lang.CS.Plural.Get((long)prumerPlatu.PocetPlatuPrvniRok, "jednoho ředitele", "{0} ředitelů", "{0} ředitelů") 
+                                            a odměny roku @(YearPicker.PuDefaultYear) jsou spočítány jako průměr odměn
+                                            @Devmasters.Lang.CS.Plural.Get((long)prumerPlatu.PocetPlatuPosledniRok, "jednoho ředitele", "{0} ředitelů", "{0} ředitelů").
+                                            Hodnota odměn tak může obsahovat jedno nebo více odstupné či jiné smluvní odměny."><i class="fa-solid fa-circle-info"></i></a>
+                                }
+                                else if (prumerPlatu.PocetPlatuPrvniRok == 1 && prumerPlatu.PocetMesicuPrvniRok < 12
+                                    && prumerPlatu.PocetPlatuPosledniRok == 1 && prumerPlatu.PocetMesicuPosledniRok < 12)
+                                {
+                                    <a href="#" class="link-danger me-2" data-bs-toggle="tooltip" data-bs-title="Odměny roku @(minYear) jsou pouze za @Devmasters.Lang.CS.Plural.Get((long)prumerPlatu.PocetMesicuPrvniRok, "jeden měsíc", "{0} měsíce", "{0} měsíců"), odměny roku @(YearPicker.PuDefaultYear) jsou pouze za @Devmasters.Lang.CS.Plural.Get((long)prumerPlatu.PocetMesicuPosledniRok, "jeden měsíc", "{0} měsíce", "{0} měsíců") a mohou obsahovat odstupné či jinou smluvní odměnu"><i class="fa-solid fa-circle-info"></i></a>
+                                }
+                                else if (prumerPlatu.PocetPlatuPrvniRok == 1 && prumerPlatu.PocetMesicuPrvniRok < 12)
+                                {
+                                    <a href="#" class="link-danger me-2" data-bs-toggle="tooltip" data-bs-title="Odměny roku @(minYear) jsou pouze za @Devmasters.Lang.CS.Plural.Get((long)prumerPlatu.PocetMesicuPrvniRok, "jeden měsíc", "{0} měsíce", "{0} měsíců") a můžou obsahovat odstupné či jinou smluvní odměnu"><i class="fa-solid fa-circle-info"></i></a>
+                                }
+                                else if (prumerPlatu.PocetPlatuPosledniRok == 1 && prumerPlatu.PocetMesicuPosledniRok < 12)
+                                {
+                                    <a href="#" class="link-danger me-2" data-bs-toggle="tooltip" data-bs-title="Odměny roku @(YearPicker.PuDefaultYear) jsou pouze za @Devmasters.Lang.CS.Plural.Get((long)prumerPlatu.PocetMesicuPosledniRok, "jeden měsíc", "{0} měsíce", "{0} měsíců") a můžou obsahovat odstupné či jinou smluvní odměnu"><i class="fa-solid fa-circle-info"></i></a>
+                                }
+
+                                else
+                                {
+                                    <text>&nbsp;</text>
+                                }
+
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</section>

@@ -464,6 +464,19 @@ select distinct ds.DatovaSchranka, f.ico from firma f
             .Include(p => p.Organizace).ThenInclude(o => o.FirmaDs)
             .ToListAsync();
     }
+    
+    public static async Task<List<PuPlat>> GetTop100PlatuAsync(int year)
+    {
+        await using var db = new DbEntities();
+
+        return await db.PuPlaty
+            .AsNoTracking()
+            .Where(p => p.Rok == year)
+            .OrderByDescending(p => ((p.Plat ?? 0) + (p.Odmeny ?? 0)) * (1 / (p.Uvazek ?? 1)) / (p.PocetMesicu ?? 12))
+            .Include(p => p.Organizace).ThenInclude(o => o.FirmaDs)
+            .Take(100)
+            .ToListAsync();
+    }
 
     public static async Task<PuOrganizace> UpsertOrganizaceAsync(PuOrganizace organizace)
     {
