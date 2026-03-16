@@ -221,8 +221,13 @@
 
     @* -------- skutecni majitele -------- *@
 
-    @if (false)
+    @if (
+        Model.Registrovana_v_zahranici == false 
+        && (User.IsInRole("Admin") || User.IsInRole("novinar" ))
+    )
     {
+        <h4 class="pt-1">Skuteční majitelé</h4>
+        
 
         HlidacStatu.Datasets.DataSet skutMajitDS = HlidacStatu.Datasets.DataSet.GetCachedDataset("skutecni-majitele");
         var skutMajitRes = (await skutMajitDS.SearchDataRawAsync("ico:" + Model.ICO, 1, 1)).Result.ToList();
@@ -236,9 +241,15 @@
             {
                 var aktualniMajitele = obj["skutecni_majitele"].Where(m => ((JValue)m["datum_vymaz"]).Value == null);
                 var vymazaniMajitele = obj["skutecni_majitele"].Where(m => ((JValue)m["datum_vymaz"]).Value != null);
+
+                <div class="alert alert-warning" role="alert">
+                    Tyto informace jsou platné k 15.12.2025 a jsou určené pouze pro novináře.
+                </div>
+
+
                 if (aktualniMajitele.Count() > 0)
                 {
-                    <h4 class="pt-1">@(aktualniMajitele.Count() > 1 ? "Skuteční majitelé" : "Skutečný majitel")</h4>
+                    <h5 class="pt-1">@(aktualniMajitele.Count() > 1 ? "Skuteční majitelé" : "Skutečný majitel")</h5>
                     <partial name="_renderSkutecniMajitele" model="@aktualniMajitele" />
                     <div style="padding-bottom:10px;">&nbsp;</div>
                 }
@@ -246,27 +257,15 @@
 
                 if (vymazaniMajitele.Count() > 0)
                 {
-                    <h4 class="pt-1">@(vymazaniMajitele.Count() > 1 ? "Vymazaní majitelé" : "Vymazaný majitel")</h4>
+                    <h5 class="pt-1">@(vymazaniMajitele.Count() > 1 ? "Vymazaní majitelé" : "Vymazaný majitel")</h5>
                     <partial name="_renderSkutecniMajitele" model="@vymazaniMajitele" />
                 }
             }
 
             <hr />
         }
-        else if (Model.Registrovana_v_zahranici == false)
-        {
-            <h4 class="pt-1">Skuteční majitelé</h4>
-            <p>Open data obchodního rejstříku neobsahují data o skutečných majitelích této organizace</p>
-            <p class="text-center">
-                <a target="_blank"
-                   href="https://esm.justice.cz/ias/issm/rejstrik-$sm?ico=@(Model.ICO)&jenPlatne=PLATNE&polozek=50&typHledani=STARTS_WITH&typHledaniSpolku=ALL"
-                   class="btn btn-hs btn=outline-primary btn-sm my-3 position-relative">
-                    <i class="fa-regular fa-arrow-up-right-from-square"></i> Hledat v Evidenci skutečných majitelů
-                </a>
-            </p>
 
-            <hr />
-        }
+
     }
     else
     {
