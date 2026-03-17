@@ -1,0 +1,109 @@
+@{
+    ViewBag.Title = "Statistiky vozidel";
+    ViewBag.SubTitle = "Registr vozidel CR";
+}
+
+@section breadcrumb
+{
+    <ol class="breadcrumb">
+        <li><a href="/">Hlidac Statu</a></li>
+        <li><a href="/vozidla">Registr vozidel</a></li>
+        <li class="active">Statistiky</li>
+    </ol>
+}
+
+<h3 class="mt-2">Statistiky vozidel z registru vozidel</h3>
+<p class="text-muted">Data z oficialnich registru vozidel CR.</p>
+
+<div class="row mt-4">
+    <div class="col-md-6 col-lg-4 mb-4">
+        <div class="card h-100">
+            <div class="card-body">
+                <h5 class="card-title"><i class="fa-solid fa-gauge-high me-2"></i>Nejsilnejsi auta</h5>
+                <p class="card-text">Top 50 nejsilnejsich osobnich aut registrovanych v danem roce podle vykon motoru (kW).</p>
+                <a href="/vozidla/NejsilnejsiAuta" class="btn btn-outline-primary">Zobrazit</a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6 col-lg-4 mb-4">
+        <div class="card h-100">
+            <div class="card-body">
+                <h5 class="card-title"><i class="fa-solid fa-rocket me-2"></i>Nejrychlejsi auta</h5>
+                <p class="card-text">Top 50 nejrychlejsich osobnich aut registrovanych v danem roce podle maximalni rychlosti.</p>
+                <a href="/vozidla/NejrychlejsiAuta" class="btn btn-outline-primary">Zobrazit</a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6 col-lg-4 mb-4">
+        <div class="card h-100">
+            <div class="card-body">
+                <h5 class="card-title"><i class="fa-solid fa-gem me-2"></i>Luxusni auta</h5>
+                <p class="card-text">Top 50 nejvykonnejsich aut z rady luxusnich znacek registrovanych v danem roce.</p>
+                <a href="/vozidla/LuxusniAuta" class="btn btn-outline-primary">Zobrazit</a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6 col-lg-4 mb-4">
+        <div class="card h-100">
+            <div class="card-body">
+                <h5 class="card-title"><i class="fa-solid fa-calendar-plus me-2"></i>Nova auta</h5>
+                <p class="card-text">Osobni automobily nove registrovane v CR za posledni mesic.</p>
+                <a href="/vozidla/NovaAuta" class="btn btn-outline-primary">Zobrazit</a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6 col-lg-4 mb-4">
+        <div class="card h-100">
+            <div class="card-body">
+                <h5 class="card-title"><i class="fa-solid fa-triangle-exclamation me-2"></i>Propadla STK</h5>
+                <p class="card-text">Auta s neplatnou technickou prohlidkou, serazena podle data expirace.</p>
+                <a href="/vozidla/PropadlaSTK" class="btn btn-outline-warning">Zobrazit</a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6 col-lg-4 mb-4">
+        <div class="card h-100">
+            <div class="card-body">
+                <h5 class="card-title"><i class="fa-solid fa-ranking-star me-2"></i>Nejpopularnejsi znacky</h5>
+                <p class="card-text">Zebricek nejprodavanejsich automobilovych znacek v danem roce.</p>
+                <a href="/vozidla/NejpopularnejsiZnacky" class="btn btn-outline-primary">Zobrazit</a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6 col-lg-4 mb-4">
+        <div class="card h-100">
+            <div class="card-body">
+                <h5 class="card-title"><i class="fa-solid fa-bolt me-2"></i>Elektromobily a hybridy</h5>
+                <p class="card-text">Vyvoj registraci elektrickych a hybridnich vozidel v case.</p>
+                <a href="/vozidla/Elektromobily" class="btn btn-outline-success">Zobrazit</a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6 col-lg-4 mb-4">
+        <div class="card h-100">
+            <div class="card-body">
+                <h5 class="card-title"><i class="fa-solid fa-plane-arrival me-2"></i>Dovoz vozidel</h5>
+                <p class="card-text">Statistiky dovozu vozidel podle zeme puvodu za dany rok.</p>
+                <a href="/vozidla/DovozVozidel" class="btn btn-outline-primary">Zobrazit</a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6 col-lg-4 mb-4">
+        <div class="card h-100">
+            <div class="card-body">
+                <h5 class="card-title"><i class="fa-solid fa-hourglass-half me-2"></i>Stari vozidel</h5>
+                <p class="card-text">Prumerny vek registrovanych vozidel podle vyrobce.</p>
+                <a href="/vozidla/StariVozidel" class="btn btn-outline-primary">Zobrazit</a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6 col-lg-4 mb-4">
+        <div class="card h-100">
+            <div class="card-body">
+                <h5 class="card-title"><i class="fa-solid fa-gas-pump me-2"></i>Rozdeleni paliv</h5>
+                <p class="card-text">Distribuce typu paliv u nove registrovanych vozidel v danem roce.</p>
+                <a href="/vozidla/RozdeleniPaliv" class="btn btn-outline-primary">Zobrazit</a>
+            </div>
+        </div>
+    </div>
+</div>

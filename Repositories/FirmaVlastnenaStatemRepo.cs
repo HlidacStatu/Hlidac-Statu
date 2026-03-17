@@ -403,6 +403,12 @@ and (esa2010 in (" + string.Join(",", vzdySoukr_ESA2010.Select(m => $"'{m}'")) +
                 _ovm_Nikdy_nejsou_statni.Add("00001350"); //csob
                 _ovm_Nikdy_nejsou_statni.Add("24288110"); //Elektrárna Počerady, a.s.
                 _ovm_Nikdy_nejsou_statni.Add("28786009"); //Elektrárna Chvaletice a.s.
+                _ovm_Nikdy_nejsou_statni.Add("26439395"); //První certifikační autorita, a.s.
+                _ovm_Nikdy_nejsou_statni.Add("27112489"); //eIdentity, a.s.
+                _ovm_Nikdy_nejsou_statni.Add("00426547"); //Český červený kříž
+                _ovm_Nikdy_nejsou_statni.Add("00534111"); //AGEL a.s.
+                _ovm_Nikdy_nejsou_statni.Add("27797660"); //AGEL Středomoravská nemocniční a.s.
+
             }
 
             return _ovm_Nikdy_nejsou_statni;
@@ -587,7 +593,7 @@ and (esa2010 in (" + string.Join(",", vzdySoukr_ESA2010.Select(m => $"'{m}'")) +
 
             //najdi vsechny subjekty a jejich vazby           
             _logger.Information("Najdi vsechny podrizene subjekty ...");
-            
+
             System.Collections.Concurrent.ConcurrentBag<string> foundIcos = new();
             System.Collections.Concurrent.ConcurrentBag<(string, string)> foundDebugCheckIco = new();
             await Devmasters.Batch.Manager.DoActionForAllAsync<string, object>(bagOfIco, async (ico, obj) =>
@@ -667,7 +673,7 @@ and (esa2010 in (" + string.Join(",", vzdySoukr_ESA2010.Select(m => $"'{m}'")) +
                 .Chunk(500).ToList();
             _logger.Information("Setting OVM typ...");
             await Devmasters.Batch.Manager.DoActionForAllAsync<IEnumerable<string>>(batch,
-                async(icob) =>
+                async (icob) =>
                 {
                     string icos = string.Join(",", icob.Select(i => $"'{i}'"));
                     string sql = $"update firma set typ={((int)(TypSubjektuEnum.Ovm))} where ico in ({icos})";
@@ -731,7 +737,7 @@ and (esa2010 in (" + string.Join(",", vzdySoukr_ESA2010.Select(m => $"'{m}'")) +
                 {
                     string icos = string.Join(",", icob.Select(i => $"'{i}'"));
                     string sql = $"update firma set typ={((int)(TypSubjektuEnum.Exekutor))} where ico in ({icos})";
-                   await DirectDB.Instance.NoResultAsync(sql);
+                    await DirectDB.Instance.NoResultAsync(sql);
 
                     return new Devmasters.Batch.ActionOutputData();
                 }, outputWriter, progressWriter,

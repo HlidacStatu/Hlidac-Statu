@@ -1,0 +1,76 @@
+@model List<HlidacStatu.Web.Models.AgeStatItem>
+@using System.Globalization
+@{
+    ViewBag.Title = "Prumerny vek vozidel podle znacky";
+    ViewBag.SubTitle = "Registr vozidel";
+}
+
+@section breadcrumb
+{
+    <ol class="breadcrumb">
+        <li><a href="/">Hlidac Statu</a></li>
+        <li><a href="/vozidla">Registr vozidel</a></li>
+        <li><a href="/vozidla/Statistiky">Statistiky</a></li>
+        <li class="active">Stari vozidel</li>
+    </ol>
+}
+
+<h3 class="mt-2">
+    <i class="fa-solid fa-hourglass-half me-2"></i>Prumerny vek vozidel podle vyrobce
+</h3>
+<p class="text-muted">Top 30 znacek s nejnizsim prumernym vekem (pouze znacky s alespon 100 registrovanymi vozidly).</p>
+
+@if (!Model.Any())
+{
+    <div class="alert alert-info mt-3">Zadna data.</div>
+}
+else
+{
+    double maxAge = Model.Max(i => i.AverageAge);
+
+    <div class="table-responsive mt-3">
+        <table class="table table-striped table-hover align-middle">
+            <thead class="table-dark">
+                <tr>
+                    <th>#</th>
+                    <th></th>
+                    <th>Znacka</th>
+                    <th class="text-end">Prumerny vek (roky)</th>
+                    <th class="text-end">Pocet vozidel</th>
+                    <th style="min-width:200px"></th>
+                </tr>
+            </thead>
+            <tbody>
+                @{ int rank = 1; }
+                @foreach (var item in Model)
+                {
+                    double barWidth = maxAge > 0 ? item.AverageAge / maxAge * 100 : 0;
+                    string barColor = item.AverageAge <= 5 ? "success" : item.AverageAge <= 10 ? "primary" : item.AverageAge <= 15 ? "warning" : "danger";
+
+                    <tr>
+                        <td>@rank</td>
+                        <td>
+                            @if (!string.IsNullOrWhiteSpace(item.LogoSlug))
+                            {
+                                <img src="https://somedata.hlidacstatu.cz/v/optimized/@(item.LogoSlug).png"
+                                     style="max-height:2rem;max-width:3rem" alt="@item.Brand" />
+                            }
+                        </td>
+                        <td><strong>@(string.IsNullOrWhiteSpace(item.Brand) ? "-" : item.Brand)</strong></td>
+                        <td class="text-end"><strong>@item.AverageAge.ToString("N1", CultureInfo.GetCultureInfo("cs-CZ"))</strong></td>
+                        <td class="text-end">@item.Count.ToString("N0", CultureInfo.GetCultureInfo("cs-CZ"))</td>
+                        <td>
+                            <div class="progress" style="height: 1.2rem;">
+                                <div class="progress-bar bg-@barColor" role="progressbar"
+                                     style="width: @barWidth.ToString("F1", CultureInfo.InvariantCulture)%">
+                                    @item.AverageAge.ToString("N1", CultureInfo.GetCultureInfo("cs-CZ")) let
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                    rank++;
+                }
+            </tbody>
+        </table>
+    </div>
+}

@@ -1,0 +1,115 @@
+@model List<HlidacStatu.Web.Models.VehicleStatItem>
+@using System.Globalization
+@{
+    ViewBag.Title = "Auta s proslou STK";
+    ViewBag.SubTitle = "Registr vozidel";
+}
+
+@section breadcrumb
+{
+    <ol class="breadcrumb">
+        <li><a href="/">Hlidac Statu</a></li>
+        <li><a href="/vozidla">Registr vozidel</a></li>
+        <li><a href="/vozidla/Statistiky">Statistiky</a></li>
+        <li class="active">Propadla STK</li>
+    </ol>
+}
+
+<h3 class="mt-2">
+    <i class="fa-solid fa-triangle-exclamation me-2"></i>Auta s neplatnou technickou prohlidkou
+</h3>
+<p class="text-muted">Osobni automobily, jejichz posledni technicka prohlidka jiz neni platna.</p>
+
+@if (!Model.Any())
+{
+    <div class="alert alert-success mt-3">Zadna vozidla s proslou STK nebyla nalezena.</div>
+}
+else
+{
+    <p class="mb-3"><strong>Zobrazeno:</strong> @Model.Count vozidel</p>
+    <div class="table-responsive mt-3">
+        <table class="table table-striped table-hover align-middle">
+            <thead class="table-dark">
+                <tr>
+                    <th>#</th>
+                    <th></th>
+                    <th>Znacka</th>
+                    <th>Model</th>
+                    <th class="text-end">STK platna do</th>
+                    <th class="text-end">Proslych dni</th>
+                    <th class="text-end">Vykon (kW)</th>
+                    <th>Palivo</th>
+                    <th>Rok vyroby</th>
+                    <th>Registrace</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @{ int rank = 1; }
+                @foreach (var item in Model)
+                {
+                    int? daysExpired = item.StkExpiryDate.HasValue
+                        ? (int)(DateTime.Today - item.StkExpiryDate.Value).TotalDays
+                        : null;
+
+                    string rowClass = daysExpired switch
+                    {
+                        > 365 => "table-danger",
+                        > 90 => "table-warning",
+                        _ => ""
+                    };
+
+                    <tr class="@rowClass">
+                        <td>@rank</td>
+                        <td>
+                            @if (!string.IsNullOrWhiteSpace(item.LogoSlug))
+                            {
+                                <img src="https://somedata.hlidacstatu.cz/v/optimized/@(item.LogoSlug).png"
+                                     style="max-height:2rem;max-width:3rem" alt="@item.Brand" />
+                            }
+                        </td>
+                        <td><strong>@Display(item.Brand)</strong></td>
+                        <td>@Display(item.Model)</td>
+                        <td class="text-end"><strong>@DisplayDate(item.StkExpiryDate)</strong></td>
+                        <td class="text-end">
+                            @if (daysExpired.HasValue)
+                            {
+                                <span class="badge bg-@(daysExpired > 365 ? "danger" : daysExpired > 90 ? "warning" : "secondary")">
+                                    @daysExpired dni
+                                </span>
+                            }
+                        </td>
+                        <td class="text-end">@DisplayDecimal(item.PowerKw)</td>
+                        <td>@Display(item.Fuel)</td>
+                        <td>@DisplayInt(item.YearOfManufacture)</td>
+                        <td>@DisplayDate(item.RegistrationDate)</td>
+                        <td>
+                            @if (!string.IsNullOrEmpty(item.VIN))
+                            {
+                                <a href="/vozidla/VIN?id=@item.VIN" class="btn btn-sm btn-outline-secondary"
+                                   title="Detail vozidla">
+                                    <i class="fa-solid fa-magnifying-glass"></i>
+                                </a>
+                            }
+                        </td>
+                    </tr>
+                    rank++;
+                }
+            </tbody>
+        </table>
+    </div>
+}
+
+@functions {
+    private static string Display(string value)
+        => string.IsNullOrWhiteSpace(value) ? "-" : value;
+
+    private static string DisplayDecimal(decimal? value)
+        => value.HasValue ? value.Value.ToString("N0", CultureInfo.GetCultureInfo("cs-CZ")) : "-";
+
+    private static string DisplayInt(int? value)
+        => value.HasValue ? value.Value.ToString() : "-";
+
+    private static string DisplayDate(DateTime? value)
+        => value.HasValue ? value.Value.ToString("d.M.yyyy", CultureInfo.InvariantCulture) : "-";
+}

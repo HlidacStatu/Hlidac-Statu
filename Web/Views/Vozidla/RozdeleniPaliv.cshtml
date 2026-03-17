@@ -1,0 +1,91 @@
+@model HlidacStatu.Web.Models.FuelYearReport
+@using System.Globalization
+@{
+    ViewBag.Title = $"Rozdeleni paliv - {Model.SelectedYear}";
+    ViewBag.SubTitle = "Registr vozidel";
+    string[] barColors = { "primary", "success", "warning", "info", "danger", "secondary", "dark" };
+}
+
+@section breadcrumb
+{
+    <ol class="breadcrumb">
+        <li><a href="/">Hlidac Statu</a></li>
+        <li><a href="/vozidla">Registr vozidel</a></li>
+        <li><a href="/vozidla/Statistiky">Statistiky</a></li>
+        <li class="active">Rozdeleni paliv</li>
+    </ol>
+}
+
+<h3 class="mt-2">
+    <i class="fa-solid fa-gas-pump me-2"></i>Rozdeleni typu paliv v roce @Model.SelectedYear
+</h3>
+<p class="text-muted">Distribuce typu paliv u nove registrovanych osobnich automobilu.</p>
+
+<form method="get" class="d-inline-block mb-3">
+    <label for="rok" class="form-label me-2">Rok registrace:</label>
+    <select name="rok" id="rok" class="form-select d-inline-block w-auto" onchange="this.form.submit()">
+        @foreach (var y in Model.AvailableYears)
+        {
+            if (y == Model.SelectedYear)
+            {
+                <option value="@y" selected="selected">@y</option>
+            }
+            else
+            {
+                <option value="@y">@y</option>
+            }
+        }
+    </select>
+</form>
+
+@if (!Model.Items.Any())
+{
+    <div class="alert alert-info mt-3">Zadna data pro rok @Model.SelectedYear.</div>
+}
+else
+{
+    <p class="mb-3"><strong>Celkem registraci s udajem o palivu:</strong> @Model.TotalCount.ToString("N0", CultureInfo.GetCultureInfo("cs-CZ"))</p>
+
+    <div class="table-responsive mt-3">
+        <table class="table table-striped table-hover align-middle">
+            <thead class="table-dark">
+                <tr>
+                    <th>#</th>
+                    <th>Typ paliva</th>
+                    <th class="text-end">Pocet</th>
+                    <th class="text-end">Podil</th>
+                    <th style="min-width:250px"></th>
+                </tr>
+            </thead>
+            <tbody>
+                @{ int rank = 1; }
+                @foreach (var item in Model.Items)
+                {
+                    double percent = Model.TotalCount > 0 ? (double)item.Count / Model.TotalCount * 100 : 0;
+                    string color = barColors[(rank - 1) % barColors.Length];
+
+                    <tr>
+                        <td>@rank</td>
+                        <td><strong>@(string.IsNullOrWhiteSpace(item.FuelType) ? "-" : item.FuelType)</strong></td>
+                        <td class="text-end"><strong>@item.Count.ToString("N0", CultureInfo.GetCultureInfo("cs-CZ"))</strong></td>
+                        <td class="text-end">@percent.ToString("N1", CultureInfo.GetCultureInfo("cs-CZ")) %</td>
+                        <td>
+                            <div class="progress" style="height: 1.2rem;">
+                                <div class="progress-bar bg-@color" role="progressbar"
+                                     style="width: @percent.ToString("F1", CultureInfo.InvariantCulture)%"
+                                     aria-valuenow="@percent.ToString("F1", CultureInfo.InvariantCulture)"
+                                     aria-valuemin="0" aria-valuemax="100">
+                                    @if (percent > 5)
+                                    {
+                                        @($"{percent:N1} %")
+                                    }
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                    rank++;
+                }
+            </tbody>
+        </table>
+    </div>
+}
