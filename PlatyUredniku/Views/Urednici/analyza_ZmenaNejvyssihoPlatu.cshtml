@@ -32,7 +32,10 @@
         //filter results
         if (rustPlatu.PlatPrvniRok > 0 && rustPlatu.PlatPosledniRok > 0)
         {
-            rusty.Add(rustPlatu);
+            if (max && rustPlatu.NarustProcentualni > 0)
+                rusty.Add(rustPlatu);
+            else if (max == false && rustPlatu.NarustProcentualni < 0)
+                rusty.Add(rustPlatu);
         }
 
     }
@@ -111,7 +114,7 @@
             </script>
 
             <table class="table table-borderless table-striped table-hover" id="tblSum_rustPlatuCeo">
-                <thead class="table-dark">
+                <thead class="table-light">
                 <th>Organizace</th>
                 <th><abbr title="Průměrný měsíční plat přepočtený z ročního příjmu včetně odměn">Měsíční plat</abbr> v @minYear</th>
                 <th><abbr title="Průměrný měsíční plat přepočtený z ročního příjmu včetně odměn">Měsíční plat</abbr> v @YearPicker.PuDefaultYear</th>
