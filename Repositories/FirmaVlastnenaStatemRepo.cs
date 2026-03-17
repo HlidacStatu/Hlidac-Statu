@@ -412,7 +412,7 @@ and (esa2010 in (" + string.Join(",", vzdySoukr_ESA2010.Select(m => $"'{m}'")) +
             }
 
             return _ovm_Nikdy_nejsou_statni;
-            ;
+            
         }
 
         //merge of Firmy.GlobalStatistics.VsechnyUradyAsync
