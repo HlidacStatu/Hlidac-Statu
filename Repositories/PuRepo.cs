@@ -166,18 +166,23 @@ public static partial class PuRepo
     public static async Task<PuOrganizace> GetFullDetailUpToYearAsync(string[] datovaSchranky, int? maxYear)
     {
         await using var db = new DbEntities();
-
-        var query = db.PuOrganizace
-            .AsNoTracking()
+        
+        IQueryable<PuOrganizace> query = db.PuOrganizace
             .Where(pu => datovaSchranky.Contains(pu.DS))
             .Include(o => o.Metadata)
             .Include(o => o.Tags)
-            .Include(o => o.FirmaDs)
-            .Include(o => maxYear != null && maxYear > 0
-                ? o.Platy.Where(p => p.Rok <= maxYear)
-                : o.Platy); // Include year filtered PuPlat
-        
-        return await query.FirstOrDefaultAsync();
+            .Include(o => o.FirmaDs);
+
+        if (maxYear != null && maxYear > 0)
+        {
+            query = query.Include(o => o.Platy.Where(p => p.Rok <= maxYear));
+        }
+        else
+        {
+            query = query.Include(o => o.Platy);
+        }
+
+        return await query.AsNoTracking().FirstOrDefaultAsync();
     }
 
     public static async Task<List<PuOrganizace>> ExportAllAsync(string? datovaSchranka, int? year)
