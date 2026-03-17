@@ -4,8 +4,6 @@
 
 
 @{
-    bool max = this.Context.Request.Query.GetFirstQueryParameter("max") != "false";
-
     int minYear = Devmasters.ParseText.ToInt(this.Context.Request.Query.GetFirstQueryParameter("minyear")) ?? 2021;
     var orgs = await PuRepo.GetPlatyForYearsAsync(minYear, YearPicker.PuDefaultYear);
 
@@ -48,7 +46,7 @@
             <a asp-action="Analyzy">Analýzy</a>
         </li>
         <li class="active">
-            @(max ? "Největší navýšení" : "Největší snížení") odměn top manažerů od roku @minYear
+            Změny v odměnách top manažerů od roku @minYear
         </li>
     </ol>
 }
@@ -61,7 +59,7 @@
 
 <section class="d-flex align-items-center justify-content-center pageblock-small">
     <div class="container">
-        <h2>@(max ? "Největší navýšení" : "Největší snížení") odměn top manažerů od roku @minYear</h2>
+        <h2>Změny v odměnách top manažerů od roku @minYear</h2>
 
         <div class="nav flex-row nav-pills">
             <button class="nav-link disabled" type="button" disabled="disabled">Zobrazit data od roku</button>
@@ -81,9 +79,8 @@
         <br/>
         
         <p class="text-muted">
-            Analýza @(max ? "největšího navýšení" : "největšího snížení") odměn
-            <b>nejvyšších představených</b> jednotlivých úřadů, státních podniků
-            či příspěvkových organizací mezi roky @minYear a @YearPicker.PuDefaultYear .
+            Analýza změn v odměnách <b>nejvyšších představených</b> jednotlivých úřadů, státních podniků
+            či příspěvkových organizací mezi roky @minYear a @(YearPicker.PuDefaultYear).
         </p>
 
         <div class="tab-pane width-75vp" id="rustPlatuCeo" role="tabpanel">
@@ -99,7 +96,7 @@
                             "pageLength": 20,
                             "lengthChange": false,
                             "ordering": true,
-                            "order": [[3, @Html.Raw(max ? "'desc'" : "'asc'")]],
+                            "order": [[3, "'desc'"]],
                             "info": false
                         });
                 });
@@ -110,13 +107,14 @@
                 <th>Organizace</th>
                 <th><abbr title="Průměrný měsíční plat přepočtený z ročního příjmu včetně odměn">Měsíční odměny</abbr> v @minYear</th>
                 <th><abbr title="Průměrný měsíční plat přepočtený z ročního příjmu včetně odměn">Měsíční odměny</abbr> v @YearPicker.PuDefaultYear</th>
-                <th>Změna v Kč</th>
+                <th>Změna měsíčních odměn v Kč</th>
                 <th>Roční odměny v @minYear</th>
                 <th>Roční odměny v @YearPicker.PuDefaultYear</th>
+                <th>Změna ročních odměn v Kč</th>
                 <th></th>
                 </thead>
                 <tbody>
-                    @foreach (var prumerPlatu in rusty.OrderByDescending(p => p.NarustAbsolutni))
+                    @foreach (var prumerPlatu in rusty.OrderByDescending(p => p.NarustMesicniAbsolutni))
                     {
                         <tr>
                             <td>
@@ -124,9 +122,10 @@
                             </td>
                             <td class="number text-nowrap" data-order="@(HlidacStatu.Util.RenderData.OrderValueFormat(prumerPlatu.PrepoctenaMesicniOdmenaPrvniRok ?? 0))">@HlidacStatu.Util.RenderData.NicePrice(prumerPlatu.PrepoctenaMesicniOdmenaPrvniRok ?? 0)</td>
                             <td class="number text-nowrap" data-order="@(HlidacStatu.Util.RenderData.OrderValueFormat(prumerPlatu.PrepoctenaMesicniOdmenaPosledniRok ?? 0))">@HlidacStatu.Util.RenderData.NicePrice(prumerPlatu.PrepoctenaMesicniOdmenaPosledniRok ?? 0)</td>
-                            <td class="number text-nowrap" data-order="@(HlidacStatu.Util.RenderData.OrderValueFormat(prumerPlatu.NarustAbsolutni ?? 0))">@HlidacStatu.Util.RenderData.NicePrice(prumerPlatu.NarustAbsolutni ?? 0)</td>
+                            <td class="number text-nowrap" data-order="@(HlidacStatu.Util.RenderData.OrderValueFormat(prumerPlatu.NarustMesicniAbsolutni ?? 0))">@HlidacStatu.Util.RenderData.NicePrice(prumerPlatu.NarustMesicniAbsolutni ?? 0)</td>
                             <td class="number text-nowrap" data-order="@(HlidacStatu.Util.RenderData.OrderValueFormat(prumerPlatu.PrumernaOdmenaPrvniRok ?? 0))">@HlidacStatu.Util.RenderData.NicePrice(prumerPlatu.PrumernaOdmenaPrvniRok ?? 0)</td>
                             <td class="number text-nowrap" data-order="@(HlidacStatu.Util.RenderData.OrderValueFormat(prumerPlatu.PrumernaOdmenaPosledniRok ?? 0))">@HlidacStatu.Util.RenderData.NicePrice(prumerPlatu.PrumernaOdmenaPosledniRok ?? 0)</td>
+                            <td class="number text-nowrap" data-order="@(HlidacStatu.Util.RenderData.OrderValueFormat(prumerPlatu.NarustRocniAbsolutni ?? 0))">@HlidacStatu.Util.RenderData.NicePrice(prumerPlatu.NarustRocniAbsolutni ?? 0)</td>
                             <td>
                                 @if (prumerPlatu.PocetPlatuPrvniRok >1 && prumerPlatu.PocetPlatuPosledniRok<2)
                                 {
