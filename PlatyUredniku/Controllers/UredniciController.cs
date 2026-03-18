@@ -120,20 +120,21 @@ public class UredniciController : Controller
         return View(platy);
     }
     
-    public async Task<IActionResult> TopPlatyZaRok(int year)
+    public async Task<IActionResult> TopPlatyZaRok(int year, string tag)
     {
         if (year == 0 || year > YearPicker.PuDefaultYear)
         {
             year = YearPicker.PuDefaultYear;
         }
         
-        string title = $"Top 100 platů za rok {year}";
+        string title = $"Top 100 platů za rok {year} ve veřejné správě";
         ViewData["title"] = title;
         ViewData["year"] = year.ToString();
-        
         ViewBag.Title = title;
+
+        ViewData["tag"] = tag;
         
-        var platy = await PuRepo.Cached.GetTop100PlatuAsync(year);
+        var platy = await PuRepo.Cached.GetTop100PlatuAsync(year, tag);
         return View(platy);
     }
 
