@@ -137,6 +137,21 @@ public class UredniciController : Controller
         var platy = await PuRepo.Cached.GetTop100PlatuAsync(year, tag);
         return View(platy);
     }
+    
+    public async Task<IActionResult> NejvetsiSkokani(int minyear)
+    {
+        if (minyear == 0 || minyear > YearPicker.PuDefaultYear)
+        {
+            minyear = YearPicker.PuDefaultYear;
+        }
+        
+        string title = $"Největší skokani ve firmách od roku {minyear}";
+        ViewData["title"] = title;
+        ViewData["year"] = minyear.ToString();
+        ViewBag.Title = title;
+
+        return View();
+    }
 
     public async Task<IActionResult> Oblast(string id)
     {

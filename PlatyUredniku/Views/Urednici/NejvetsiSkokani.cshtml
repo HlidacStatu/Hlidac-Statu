@@ -1,0 +1,143 @@
+@using HlidacStatu.Entities
+@using HlidacStatu.Repositories
+@using HlidacStatu.Util;
+
+
+@{
+    int minYear = Devmasters.ParseText.ToInt(this.Context.Request.Query.GetFirstQueryParameter("minyear")) ?? 2021;
+    var orgs = await PuRepo.GetPlatyForYearsAsync(minYear, YearPicker.PuDefaultYear);
+
+    decimal MaxPlatForYear(PuOrganizace org, int year) =>
+        org.Platy?.Where(p => p.Rok == year)?.Select(p => p.HrubyMesicniPlatVcetneOdmen)?.DefaultIfEmpty(0).Max() ?? 0;
+    
+    int? MaxPlatIdForYear(PuOrganizace org, int year) =>
+        org.Platy?.Where(p => p.Rok == year).DefaultIfEmpty().MaxBy(p => p?.HrubyMesicniPlatVcetneOdmen ?? 0)?.Id;
+
+    decimal AbsolutePlatDifference(PuOrganizace org)
+    {
+        var minYearVal = MaxPlatForYear(org, minYear);
+        var maxYearVal = MaxPlatForYear(org, YearPicker.PuDefaultYear);
+        return maxYearVal - minYearVal;
+    }
+
+    decimal PercentualPlatDifference(PuOrganizace org)
+    {
+        var minYearVal = MaxPlatForYear(org, minYear);
+        var maxYearVal = MaxPlatForYear(org, YearPicker.PuDefaultYear);
+
+        if (minYearVal == 0)
+        {
+            return 0;
+        }
+
+        return maxYearVal / minYearVal - 1;
+    }
+    
+    
+}
+@section breadcrumbs
+{
+    <ol class="breadcrumb">
+        <li>
+            <a href="/">Platy</a>
+        </li>
+        <li>
+            <a asp-action="Index">Platy úředníků</a>
+        </li>
+        <li>
+            <a asp-action="Analyzy">Analýzy</a>
+        </li>
+        <li class="active">
+            Největší skokani ve firmách od roku @minYear
+        </li>
+    </ol>
+}
+
+@section scripts
+{
+    <link rel="stylesheet" type="text/css" href="//cdn.datatables.net/1.13.4/css/jquery.dataTables.min.css" />
+    <script type="text/javascript" charset="utf8" src="//cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
+}
+
+<section class="d-flex align-items-center justify-content-center pageblock-small">
+    <div class="container">
+        <h2>Největší skokani ve firmách od roku @minYear</h2>
+
+        <div class="nav flex-row nav-pills">
+            <button class="nav-link disabled" type="button" disabled="disabled">Zobrazit data od roku</button>
+            @{
+
+                foreach (var y in PuRepo.AllYears.Where(y => y < YearPicker.PuDefaultYear && y >= 2021))
+                {
+                    <a href="@(this.Context.Request.GetCurrentUrl("minyear",y.ToString()))"
+                       class="@($"nav-link {(minYear == y ? "active" :  "")}")"
+                       type="button"
+                       role="tab">
+                        @y
+                    </a>
+                }
+            }
+        </div>
+        <br/>
+        
+        <p class="text-muted">
+            Analýza největších skokanů ve firmách mezi roky @minYear a @YearPicker.PuDefaultYear .
+        </p>
+
+        <div class="tab-pane width-75vp" id="rustPlatuCeo" role="tabpanel">
+            <script>
+                $(document).ready(function () {
+                    $('#tblSum_rustPlatuCeo').DataTable(
+                        {
+                            'language': {
+                                'url': '//cdn.datatables.net/plug-ins/1.13.4/i18n/cs.json'
+                            },
+                            "searching": false,
+                            "paging": true,
+                            "pageLength": 20,
+                            "lengthChange": false,
+                            "ordering": true,
+                            "order": [[4, "desc"]],
+                            "info": false
+                        });
+                });
+            </script>
+
+            <table class="table table-borderless table-striped table-hover" id="tblSum_rustPlatuCeo">
+                <thead class="table-light">
+                <th>Organizace</th>
+                <th><abbr title="Měsíční plat přepočtený z ročního příjmu včetně odměn">Nejvyšší měsíční plat</abbr> v @minYear</th>
+                <th><abbr title="Měsíční plat přepočtený z ročního příjmu včetně odměn">Nejvyšší měsíční plat</abbr> v @YearPicker.PuDefaultYear</th>
+                <th>Změna v %</th>
+                <th>Změna v Kč</th>
+                </thead>
+                <tbody>
+                    @foreach (var organizace in orgs)
+                    {
+                        <tr>
+                            <td>
+                                <a asp-action="Detail" asp-route-id="@organizace.DS">@organizace.Nazev</a>
+                            </td>
+                            <td class="number text-nowrap" data-order="@(HlidacStatu.Util.RenderData.OrderValueFormat(MaxPlatForYear(organizace, minYear)))">
+                                <a asp-action="Plat" asp-route-id="@MaxPlatIdForYear(organizace, minYear)">
+                                    @HlidacStatu.Util.RenderData.NicePrice(MaxPlatForYear(organizace, minYear))
+                                </a>
+                            </td>
+                            <td class="number text-nowrap" data-order="@(HlidacStatu.Util.RenderData.OrderValueFormat(MaxPlatForYear(organizace, YearPicker.PuDefaultYear)))">
+                                <a asp-action="Plat" asp-route-id="@MaxPlatIdForYear(organizace, YearPicker.PuDefaultYear)">
+                                    @HlidacStatu.Util.RenderData.NicePrice(MaxPlatForYear(organizace, YearPicker.PuDefaultYear))
+                                </a>
+                            </td>
+                            <td class="number text-nowrap" data-order="@(HlidacStatu.Util.RenderData.OrderValueFormat(PercentualPlatDifference(organizace)))">
+                                @PercentualPlatDifference(organizace).ToString("P")
+                            </td>
+                            <td class="number text-nowrap" data-order="@(HlidacStatu.Util.RenderData.OrderValueFormat(AbsolutePlatDifference(organizace)))">
+                                @HlidacStatu.Util.RenderData.NicePrice(AbsolutePlatDifference(organizace))
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</section>
