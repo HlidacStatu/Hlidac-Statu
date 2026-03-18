@@ -13,6 +13,6 @@ public class PrumerOdmen
     public decimal? PrumernaOdmenaPosledniRok { get; set; }
     public int PocetPlatuPosledniRok { get; set; }
     public decimal? PocetMesicuPosledniRok { get; set; }
-    public decimal? NarustMesicniAbsolutni => PrepoctenaMesicniOdmenaPosledniRok - PrepoctenaMesicniOdmenaPrvniRok;
-    public decimal? NarustRocniAbsolutni => PrumernaOdmenaPosledniRok - PrumernaOdmenaPrvniRok;
+    public decimal? NarustMesicniAbsolutni => (PrepoctenaMesicniOdmenaPosledniRok ?? 0) - (PrepoctenaMesicniOdmenaPrvniRok ?? 0);
+    public decimal? NarustRocniAbsolutni => (PrumernaOdmenaPosledniRok ?? 0) - (PrumernaOdmenaPrvniRok ?? 0);
 }
