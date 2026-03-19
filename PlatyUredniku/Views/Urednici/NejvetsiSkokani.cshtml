@@ -4,7 +4,7 @@
 
 
 @{
-    int minYear = Devmasters.ParseText.ToInt(this.Context.Request.Query.GetFirstQueryParameter("minyear")) ?? 2021;
+    int minYear = Devmasters.ParseText.ToInt(this.Context.Request.Query.GetFirstQueryParameter("minyear")) ?? YearPicker.PuDefaultYear - 1;
     var orgs = await PuRepo.GetPlatyForYearsAsync(minYear, YearPicker.PuDefaultYear);
 
     decimal MaxPlatForYear(PuOrganizace org, int year) =>
@@ -81,7 +81,7 @@
         <br/>
         
         <p class="text-muted">
-            Analýza největších skokanů ve firmách mezi roky @minYear a @YearPicker.PuDefaultYear .
+            Analýza největších skokanů ve firmách mezi roky @minYear a @(YearPicker.PuDefaultYear).
         </p>
 
         <div class="tab-pane width-75vp" id="rustPlatuCeo" role="tabpanel">
@@ -93,8 +93,7 @@
                                 'url': '//cdn.datatables.net/plug-ins/1.13.4/i18n/cs.json'
                             },
                             "searching": false,
-                            "paging": true,
-                            "pageLength": 20,
+                            "paging": false,
                             "lengthChange": false,
                             "ordering": true,
                             "order": [[4, "desc"]],
@@ -114,6 +113,10 @@
                 <tbody>
                     @foreach (var organizace in orgs)
                     {
+                        //zobrazit jen platy, které jsou o 50 % větší
+                        if(PercentualPlatDifference(organizace) < 0.5m)
+                            continue;
+                        
                         <tr>
                             <td>
                                 <a asp-action="Detail" asp-route-id="@organizace.DS">@organizace.Nazev</a>

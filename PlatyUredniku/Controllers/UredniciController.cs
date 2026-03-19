@@ -152,6 +152,21 @@ public class UredniciController : Controller
 
         return View();
     }
+    
+    public async Task<IActionResult> NejvetsiKombo(int year)
+    {
+        if (year == 0 || year > YearPicker.PuDefaultYear)
+        {
+            year = YearPicker.PuDefaultYear;
+        }
+        
+        string title = $"Přehled platů pro rok {year}";
+        ViewData["title"] = title;
+        ViewData["year"] = year.ToString();
+        ViewBag.Title = title;
+
+        return View();
+    }
 
     public async Task<IActionResult> Oblast(string id)
     {

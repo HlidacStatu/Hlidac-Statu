@@ -752,10 +752,6 @@ select distinct ds.DatovaSchranka, f.ico from firma f
         {
             throw new ArgumentException("ICO is missing");
         }
-        if (string.IsNullOrWhiteSpace(_event.OsobaNameId))
-        {
-            throw new ArgumentException("OsobaNameId is missing");
-        }
 
         PuEvent? original = null;
         if (_event.Pk == 0)
