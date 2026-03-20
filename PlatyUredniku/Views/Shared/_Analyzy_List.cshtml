@@ -5,7 +5,7 @@
 </p>
 <div class="card text-bg-light mb-3">
     <ul class="list-group list-group-flush">
-        <li class="list-group-item list-group-item-dark">TOP Žebříčky</li>
+        <li class="list-group-item list-group-item-dark">TOP platové žebříčky a skokani</li>
         <li class="list-group-item">
             <i class="fa-regular fa-gauge-min"></i> <a asp-controller="Urednici" asp-action="DlePlatu" asp-route-id="1">Platy nižší než je nástupní plat pokladní v Lidlu</a>
         </li>
@@ -13,56 +13,19 @@
             <i class="fa-regular fa-gauge-low"></i> <a asp-controller="Urednici" asp-action="DlePlatu" asp-route-id="2">Platy nižší než průměrné platy v ČR</a>
         </li>
         <li class="list-group-item">
-            <i class="fa-regular fa-gauge-max"></i> <a asp-controller="Urednici" asp-action="TopPlatyZaRok" asp-route-year="@YearPicker.PuDefaultYear">Stovka nejvyšších platů ve veřejné správě</a>
+            <i class="fa-regular fa-gauge-max"></i> <a asp-controller="Urednici" asp-action="TopPlatyZaRok" asp-route-year="@YearPicker.PuDefaultYear">Stovka nejvyšších platů včetně odměn ve veřejné správě</a>
+        </li>
+        <li class="list-group-item">
+            <a asp-controller="Urednici" asp-action="TopZakladniPlat" asp-route-year="@YearPicker.PuDefaultYear">Nejvyšší měsíční platy</a>
+        </li>
+        <li class="list-group-item">
+            <a asp-controller="Urednici" asp-action="TopOdmeny" asp-route-year="@YearPicker.PuDefaultYear">Nejvyšší roční odměny</a>
+        </li>
+        <li class="list-group-item">
+            <a asp-controller="Urednici" asp-action="NejvetsiSkokani">Největší úřední skokani</a>
         </li>
         
-        <li class="list-group-item list-group-item-dark">Skokani</li>
-        @{
-            var reportYears = PuRepo.AllYears.Where(y => y < YearPicker.PuDefaultYear && y > 2020).ToList();
-            var allYears = PuRepo.AllYears.Where(y => y <= YearPicker.PuDefaultYear).Reverse().ToList();
-        }
-        <li class="list-group-item">
-            <i class="fa-regular fa-display-chart-up-circle-dollar"></i> <a href="/urednici/analyza/ZmenaPlatuCeos">Nejvyšší nárůst ředitelských platů oproti roku <b>@(reportYears.First())</b></a>
-            @foreach (var y in reportYears.Skip(1))
-            {
-                <text>, <a href="/urednici/analyza/ZmenaPlatuCeos?minyear=@y">@y</a></text>
-            }
-        </li>
-        <li class="list-group-item">
-            <i class="fa-regular fa-chart-line-down"></i> <a href="/analyza/ZmenaPlatuCeos?max=false">Největší pokles ředitelských platů oproti roku <b>@(reportYears.First())</b></a>
-            @foreach (var y in reportYears.Skip(1))
-            {
-                <text>, <a href="/urednici/analyza/ZmenaPlatuCeos?minyear=@y&max=false">@y</a></text>
-            }
-        </li>
-        <li class="list-group-item">
-            <i class="fa-regular fa-display-chart-up-circle-dollar"></i> <a href="/urednici/analyza/ZmenaOdmenCeos?minyear=@(reportYears.First())">Změny v odměnách ředitelů oproti roku <b>@(reportYears.First())</b></a>
-            @foreach (var y in reportYears.Skip(1))
-            {
-                <text>, <a href="/urednici/analyza/ZmenaOdmenCeos?minyear=@y">@y</a></text>
-            }
-        </li>
-        <li class="list-group-item">
-            <i class="fa-regular fa-display-chart-up-circle-dollar"></i> <a href="/analyza/ZmenaNejvyssihoPlatu">Největší nárůst neředitelských platů oproti roku <b>@(reportYears.First())</b></a>
-            @foreach (var y in reportYears.Skip(1))
-            {
-                <text>, <a href="/urednici/analyza/ZmenaNejvyssihoPlatu?minyear=@y">@y</a></text>
-            }
-        </li>
-        <li class="list-group-item">
-            <i class="fa-regular fa-chart-line-down"></i> <a href="/analyza/ZmenaNejvyssihoPlatu?max=false">Největší pokles neředitelských platů oproti roku <b>@(reportYears.First())</b></a>
-            @foreach (var y in reportYears.Skip(1))
-            {
-                <text>, <a href="/urednici/analyza/ZmenaNejvyssihoPlatu?minyear=@y&max=false">@y</a></text>
-            }
-        </li>
-        <li class="list-group-item">
-            <i class="fa-regular fa-badge-percent"></i> <a href="/analyza/NejvyssiOdmeny">Platy s nejvyšším podílem odměny za <b>@(allYears.First())</b></a>
-            @foreach (var y in allYears.Skip(1))
-            {
-                <text>, <a href="/urednici/analyza/NejvyssiOdmeny?rok=@y">@y</a></text>
-            }
-        </li>
+        
         <li class="list-group-item list-group-item-dark">Porovnání průměrných výdělků v různých oborech ve veřejné i soukromé sféře </li>
         <li class="list-group-item">
             <i class="fa-regular fa-code-compare"></i> <a href="/urednici/analyza/kategorie">Porovnání a vývoj platů a mezd v různých kategoriích zaměstnání</a>

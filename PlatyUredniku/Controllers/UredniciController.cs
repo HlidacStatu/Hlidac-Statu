@@ -127,7 +127,7 @@ public class UredniciController : Controller
             year = YearPicker.PuDefaultYear;
         }
         
-        string title = $"Top 100 platů za rok {year} ve veřejné správě";
+        string title = $"Stovka nejvyšších platů včetně odměn ve veřejné správě za rok {year}.";
         ViewData["title"] = title;
         ViewData["year"] = year.ToString();
         ViewBag.Title = title;
@@ -142,10 +142,10 @@ public class UredniciController : Controller
     {
         if (minyear == 0 || minyear > YearPicker.PuDefaultYear)
         {
-            minyear = YearPicker.PuDefaultYear;
+            minyear = YearPicker.PuDefaultYear - 1;
         }
         
-        string title = $"Největší skokani ve firmách od roku {minyear}";
+        string title = $"Největší úřední skokani od roku {minyear}";
         ViewData["title"] = title;
         ViewData["year"] = minyear.ToString();
         ViewBag.Title = title;
@@ -161,6 +161,34 @@ public class UredniciController : Controller
         }
         
         string title = $"Přehled platů pro rok {year}";
+        ViewData["title"] = title;
+        ViewData["year"] = year.ToString();
+        ViewBag.Title = title;
+
+        return View();
+    }
+    public async Task<IActionResult> TopZakladniPlat(int year)
+    {
+        if (year == 0 || year > YearPicker.PuDefaultYear)
+        {
+            year = YearPicker.PuDefaultYear;
+        }
+        
+        string title = $"Nejvyšší měsíční platy pro rok {year}";
+        ViewData["title"] = title;
+        ViewData["year"] = year.ToString();
+        ViewBag.Title = title;
+
+        return View();
+    }
+    public async Task<IActionResult> TopOdmeny(int year)
+    {
+        if (year == 0 || year > YearPicker.PuDefaultYear)
+        {
+            year = YearPicker.PuDefaultYear;
+        }
+        
+        string title = $"Nejvyšší roční odměny pro rok {year}";
         ViewData["title"] = title;
         ViewData["year"] = year.ToString();
         ViewBag.Title = title;

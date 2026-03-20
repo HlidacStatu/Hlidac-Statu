@@ -48,7 +48,7 @@
             <a asp-action="Analyzy">Analýzy</a>
         </li>
         <li class="active">
-            Největší skokani ve firmách od roku @minYear
+            @ViewData["title"]
         </li>
     </ol>
 }
@@ -61,13 +61,13 @@
 
 <section class="d-flex align-items-center justify-content-center pageblock-small">
     <div class="container">
-        <h2>Největší skokani ve firmách od roku @minYear</h2>
+        <h2>@ViewData["title"]</h2>
 
         <div class="nav flex-row nav-pills">
             <button class="nav-link disabled" type="button" disabled="disabled">Zobrazit data od roku</button>
             @{
 
-                foreach (var y in PuRepo.AllYears.Where(y => y < YearPicker.PuDefaultYear && y >= 2021))
+                foreach (var y in Enumerable.Range(2021, YearPicker.PuDefaultYear - 2021))
                 {
                     <a href="@(this.Context.Request.GetCurrentUrl("minyear",y.ToString()))"
                        class="@($"nav-link {(minYear == y ? "active" :  "")}")"
@@ -81,7 +81,10 @@
         <br/>
         
         <p class="text-muted">
-            Analýza největších skokanů ve firmách mezi roky @minYear a @(YearPicker.PuDefaultYear).
+            Nejvyšší měsíční plat včetně odměn v úřadu mezi roky @minYear a @(YearPicker.PuDefaultYear). 
+            Nemusí jít nutně o stejnou pozici či člověka. 
+            Příklad: na úřadě x byl v roce 2024 nejvyšší měsíční plat pro náměstka 631 tisíc, na stejném úřadě x byl 
+            v roce 2025 nejvyšší měsíční plat pro ředitele sekce 720 tisíc.
         </p>
 
         <div class="tab-pane width-75vp" id="rustPlatuCeo" role="tabpanel">
@@ -96,7 +99,7 @@
                             "paging": false,
                             "lengthChange": false,
                             "ordering": true,
-                            "order": [[4, "desc"]],
+                            "order": [[3, "desc"]],
                             "info": false
                         });
                 });

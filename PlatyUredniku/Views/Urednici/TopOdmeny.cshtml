@@ -1,0 +1,112 @@
+@using HlidacStatu.Repositories
+@using HlidacStatu.Util;
+
+
+@{
+    int year = Devmasters.ParseText.ToInt(this.Context.Request.Query.GetFirstQueryParameter("year")) ?? YearPicker.PuDefaultYear;
+    var platy = await PuRepo.GetPlatyWithOrganizaceForYearAsync(year);
+    
+    var top100 = platy.OrderByDescending(p => p.Odmeny).Take(100).ToList();
+}
+@section breadcrumbs
+{
+    <ol class="breadcrumb">
+        <li>
+            <a href="/">Platy</a>
+        </li>
+        <li>
+            <a asp-action="Index">Platy úředníků</a>
+        </li>
+        <li>
+            <a asp-action="Analyzy">Analýzy</a>
+        </li>
+        <li class="active">
+            @ViewData["title"]
+        </li>
+    </ol>
+}
+
+@section scripts
+{
+    <link rel="stylesheet" type="text/css" href="//cdn.datatables.net/1.13.4/css/jquery.dataTables.min.css" />
+    <script type="text/javascript" charset="utf8" src="//cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
+}
+
+<section class="d-flex align-items-center justify-content-center pageblock-small">
+    <div class="container">
+        <h2>@ViewData["title"]</h2>
+
+        <div class="nav flex-row nav-pills">
+            <button class="nav-link disabled" type="button" disabled="disabled">Zobrazit data pro rok</button>
+            @{
+
+                foreach (var y in Enumerable.Range(2021, YearPicker.PuDefaultYear - 2020))
+                {
+                    <a href="@(this.Context.Request.GetCurrentUrl("year",y.ToString()))"
+                       class="@($"nav-link {(year == y ? "active" :  "")}")"
+                       type="button"
+                       role="tab">
+                        @y
+                    </a>
+                }
+            }
+        </div>
+        <br/>
+        
+        <p class="text-muted">
+            Žebříček nejvyšších ročních odměn ve státních podnicích či příspěvkových organizacích za rok @(year).
+        </p>
+
+        <div class="tab-pane width-75vp" id="rustPlatuCeo" role="tabpanel">
+            <script>
+                $(document).ready(function () {
+                    $('#tblSum_rustPlatuCeo').DataTable(
+                        {
+                            'language': {
+                                'url': '//cdn.datatables.net/plug-ins/1.13.4/i18n/cs.json'
+                            },
+                            "searching": false,
+                            "paging": true,
+                            "pageLength": 20,
+                            "lengthChange": false,
+                            "ordering": true,
+                            "order": [[2, "desc"]],
+                            "info": false
+                        });
+                });
+            </script>
+
+            <table class="table table-borderless table-striped table-hover" id="tblSum_rustPlatuCeo">
+                <thead class="table-light">
+                <th>Organizace</th>
+                <th>Funkce</th>
+                <th>Celkové odměny za rok @year</th>
+                <th></th>
+                </thead>
+                <tbody>
+                    @foreach (var plat in top100)
+                    {
+                        <tr>
+                            <td>
+                                <a asp-action="Detail" asp-route-id="@plat.Organizace.DS">@plat.Organizace.Nazev</a>
+                            </td>
+                            <td>
+                                <a asp-action="Plat" asp-route-id="@plat.Id">@plat.NazevPozice</a>
+                            </td>
+                            <td class="number text-nowrap" data-order="@(plat.Odmeny ?? 0)">
+                                @HlidacStatu.Util.RenderData.NicePrice(plat.Odmeny ?? 0)
+                            </td>
+                            <td>
+                                @if (plat is { PocetMesicu: < 12, Odmeny: > 500_000 })
+                                {
+                                    <a href="#" class="link-danger me-2" data-bs-toggle="tooltip" data-bs-title="Odměny jsou vysoké. Navíc odměněná osoba byla ve funkci pouze @(Devmasters.Lang.CS.Plural.Get((long)plat.PocetMesicu.Value, "jeden měsíc", "{0} měsíce", "{0} měsíců"))."><i class="fa-duotone fa-thin fa-parachute-box" style="--fa-primary-color: rgb(0, 0, 0); --fa-secondary-color: rgb(255, 223, 1); --fa-secondary-opacity: 1;"></i></a>
+                                }
+
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</section>

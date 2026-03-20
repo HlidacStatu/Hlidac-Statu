@@ -20,9 +20,6 @@
         <li>
             <a asp-action="Analyzy">Analýzy</a>
         </li>
-        <li>
-            Přehled jednotlivých platů
-        </li>
         <li class="active">
             @ViewData["title"]
         </li>
@@ -33,8 +30,9 @@
 <section class="d-flex align-items-center justify-content-center alter-bg-color pt-5 pageblock-small">
     <div class="container">
         <h2>@ViewData["title"]</h2>
-        <p class="text-muted">Informace o nejvyšších platech státních podniků, či příspěvkových organizací za
-            rok @ViewData["year"].</p>
+        <p class="text-muted">
+            Žebříček 100 nejvyšších platů včetně odměn ve státních podnicích či příspěvkových organizacích za rok @ViewData["year"].
+        </p>
 
         <div class="nav flex-row nav-pills">
             <button class="nav-link disabled" type="button" disabled="disabled">Zobrazit data od roku</button>
