@@ -1,19 +1,17 @@
-@using HlidacStatu.Repositories
-
 <p class="text-muted">
-    Přehledné reporty k platům a odměnám úředníků - už od roku 2016!
+    Přehledné reporty k platům a odměnám úředníků
 </p>
 <div class="card text-bg-light mb-3">
     <ul class="list-group list-group-flush">
         <li class="list-group-item list-group-item-dark">TOP platové žebříčky a skokani</li>
         <li class="list-group-item">
-            <i class="fa-regular fa-gauge-min"></i> <a asp-controller="Urednici" asp-action="DlePlatu" asp-route-id="1">Platy nižší než je nástupní plat pokladní v Lidlu</a>
+            <a asp-controller="Urednici" asp-action="DlePlatu" asp-route-id="1">Platy nižší než je nástupní plat pokladní v Lidlu</a>
         </li>
         <li class="list-group-item">
-            <i class="fa-regular fa-gauge-low"></i> <a asp-controller="Urednici" asp-action="DlePlatu" asp-route-id="2">Platy nižší než průměrné platy v ČR</a>
+            <a asp-controller="Urednici" asp-action="DlePlatu" asp-route-id="2">Platy nižší než průměrné platy v ČR</a>
         </li>
         <li class="list-group-item">
-            <i class="fa-regular fa-gauge-max"></i> <a asp-controller="Urednici" asp-action="TopPlatyZaRok" asp-route-year="@YearPicker.PuDefaultYear">Stovka nejvyšších platů včetně odměn ve veřejné správě</a>
+            <a asp-controller="Urednici" asp-action="TopPlatyZaRok" asp-route-year="@YearPicker.PuDefaultYear">Stovka nejvyšších platů včetně odměn ve veřejné správě</a>
         </li>
         <li class="list-group-item">
             <a asp-controller="Urednici" asp-action="TopZakladniPlat" asp-route-year="@YearPicker.PuDefaultYear">Nejvyšší měsíční platy</a>
@@ -28,16 +26,16 @@
         
         <li class="list-group-item list-group-item-dark">Porovnání průměrných výdělků v různých oborech ve veřejné i soukromé sféře </li>
         <li class="list-group-item">
-            <i class="fa-regular fa-code-compare"></i> <a href="/urednici/analyza/kategorie">Porovnání a vývoj platů a mezd v různých kategoriích zaměstnání</a>
+            <a href="/urednici/analyza/kategorie">Porovnání a vývoj platů a mezd v různých kategoriích zaměstnání</a>
         </li>
         <li class="list-group-item">
-            <i class="fa-regular fa-caret-right"></i> <i class="fa-regular fa-code-compare"></i> <a href="/urednici/analyza/kategorie?k1=2341&k2=2330">Např. vývoj platů učitelů 1. stupně základní školy a srovnání se soukromými školami</a>
+            <i class="fa-regular fa-caret-right"></i> <a href="/urednici/analyza/kategorie?k1=2341&k2=2330">Např. vývoj platů učitelů 1. stupně základní školy a srovnání se soukromými školami</a>
         </li>
         <li class="list-group-item">
-            <i class="fa-regular fa-caret-right"></i> <i class="fa-regular fa-code-compare"></i> <a href="/urednici/analyza/kategorie?k1=2212&k2=2211">Např. vývoj a porovnání platů lékařů specialistů a praktických lékařů v soukromém i veřejném sektoru</a>
+            <i class="fa-regular fa-caret-right"></i> <a href="/urednici/analyza/kategorie?k1=2212&k2=2211">Např. vývoj a porovnání platů lékařů specialistů a praktických lékařů v soukromém i veřejném sektoru</a>
         </li>
         <li class="list-group-item">
-            <i class="fa-regular fa-caret-right"></i> <i class="fa-regular fa-code-compare"></i> <a href="/urednici/analyza/kategorie?k1=1345&k2=">Např. vývoj a porovnání výdělků manažerů ve vzdělávání v soukromém a veřejném sektoru</a>
+            <i class="fa-regular fa-caret-right"></i> <a href="/urednici/analyza/kategorie?k1=1345&k2=">Např. vývoj a porovnání výdělků manažerů ve vzdělávání v soukromém a veřejném sektoru</a>
         </li>
 
     </ul>
