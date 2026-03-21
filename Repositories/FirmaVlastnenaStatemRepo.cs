@@ -408,7 +408,7 @@ and (esa2010 in (" + string.Join(",", vzdySoukr_ESA2010.Select(m => $"'{m}'")) +
                 _ovm_Nikdy_nejsou_statni.Add("00426547"); //Český červený kříž
                 _ovm_Nikdy_nejsou_statni.Add("00534111"); //AGEL a.s.
                 _ovm_Nikdy_nejsou_statni.Add("27797660"); //AGEL Středomoravská nemocniční a.s.
-
+                _ovm_Nikdy_nejsou_statni.Add("00177041"); //skoda auto
             }
 
             return _ovm_Nikdy_nejsou_statni;

@@ -1,4 +1,4 @@
-@model List<HlidacStatu.Web.Models.AgeStatItem>
+@model List<HlidacStatu.RegistrVozidel.Models.AgeStatItem>
 @using System.Globalization
 @{
     ViewBag.Title = "Prumerny vek vozidel podle znacky";
@@ -19,6 +19,14 @@
     <i class="fa-solid fa-hourglass-half me-2"></i>Prumerny vek vozidel podle vyrobce
 </h3>
 <p class="text-muted">Top 30 znacek s nejnizsim prumernym vekem (pouze znacky s alespon 100 registrovanymi vozidly).</p>
+
+<form method="get" class="d-flex align-items-center gap-3 mb-3 flex-wrap">
+    <div class="form-check">
+        <input class="form-check-input" type="checkbox" name="statniOnly" value="true" id="statniOnly"
+               @(((bool?)ViewBag.StatniOnly == true) ? "checked" : "") onchange="this.form.submit()" />
+        <label class="form-check-label" for="statniOnly">Pouze statni organizace</label>
+    </div>
+</form>
 
 @if (!Model.Any())
 {

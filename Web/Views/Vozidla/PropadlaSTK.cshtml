@@ -1,8 +1,9 @@
-@model List<HlidacStatu.Web.Models.VehicleStatItem>
+@model List<HlidacStatu.RegistrVozidel.Models.VozidloLightPerIco>
 @using System.Globalization
 @{
     ViewBag.Title = "Auta s proslou STK";
     ViewBag.SubTitle = "Registr vozidel";
+    bool statniOnly = (bool?)ViewBag.StatniOnly == true;
 }
 
 @section breadcrumb
@@ -19,6 +20,14 @@
     <i class="fa-solid fa-triangle-exclamation me-2"></i>Auta s neplatnou technickou prohlidkou
 </h3>
 <p class="text-muted">Osobni automobily, jejichz posledni technicka prohlidka jiz neni platna.</p>
+
+<form method="get" class="d-flex align-items-center gap-3 mb-3 flex-wrap">
+    <div class="form-check">
+        <input class="form-check-input" type="checkbox" name="statniOnly" value="true" id="statniOnly"
+               @(statniOnly ? "checked" : "") onchange="this.form.submit()" />
+        <label class="form-check-label" for="statniOnly">Pouze statni organizace</label>
+    </div>
+</form>
 
 @if (!Model.Any())
 {
@@ -48,8 +57,8 @@ else
                 @{ int rank = 1; }
                 @foreach (var item in Model)
                 {
-                    int? daysExpired = item.StkExpiryDate.HasValue
-                        ? (int)(DateTime.Today - item.StkExpiryDate.Value).TotalDays
+                    int? daysExpired = item.PlastnostStk.HasValue
+                        ? DateOnly.FromDateTime(DateTime.Today).DayNumber - item.PlastnostStk.Value.DayNumber
                         : null;
 
                     string rowClass = daysExpired switch
@@ -62,15 +71,15 @@ else
                     <tr class="@rowClass">
                         <td>@rank</td>
                         <td>
-                            @if (!string.IsNullOrWhiteSpace(item.LogoSlug))
+                            @if (!string.IsNullOrWhiteSpace(item.Logoslug))
                             {
-                                <img src="https://somedata.hlidacstatu.cz/v/optimized/@(item.LogoSlug).png"
-                                     style="max-height:2rem;max-width:3rem" alt="@item.Brand" />
+                                <img src="https://somedata.hlidacstatu.cz/v/optimized/@(item.Logoslug).png"
+                                     style="max-height:2rem;max-width:3rem" alt="@item.Tovarni_znacka" />
                             }
                         </td>
-                        <td><strong>@Display(item.Brand)</strong></td>
+                        <td><strong>@Display(item.Tovarni_znacka)</strong></td>
                         <td>@Display(item.Model)</td>
-                        <td class="text-end"><strong>@DisplayDate(item.StkExpiryDate)</strong></td>
+                        <td class="text-end"><strong>@DisplayDate(item.PlastnostStk)</strong></td>
                         <td class="text-end">
                             @if (daysExpired.HasValue)
                             {
@@ -79,10 +88,10 @@ else
                                 </span>
                             }
                         </td>
-                        <td class="text-end">@DisplayDecimal(item.PowerKw)</td>
-                        <td>@Display(item.Fuel)</td>
-                        <td>@DisplayInt(item.YearOfManufacture)</td>
-                        <td>@DisplayDate(item.RegistrationDate)</td>
+                        <td class="text-end">@DisplayDecimal(item.Max_vykon)</td>
+                        <td>@Display(item.Palivo)</td>
+                        <td>@DisplayInt(item.Rok_vyroby)</td>
+                        <td>@DisplayDate(item.Datum_1_registrace_v_CR)</td>
                         <td>
                             @if (!string.IsNullOrEmpty(item.VIN))
                             {
@@ -110,6 +119,6 @@ else
     private static string DisplayInt(int? value)
         => value.HasValue ? value.Value.ToString() : "-";
 
-    private static string DisplayDate(DateTime? value)
+    private static string DisplayDate(DateOnly? value)
         => value.HasValue ? value.Value.ToString("d.M.yyyy", CultureInfo.InvariantCulture) : "-";
 }

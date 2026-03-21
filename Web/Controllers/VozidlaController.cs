@@ -1,8 +1,10 @@
+using HlidacStatu.Entities;
+using HlidacStatu.RegistrVozidel;
 using HlidacStatu.RegistrVozidel.Models;
-using HlidacStatu.Web.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
+using Nest;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -31,6 +33,13 @@ namespace HlidacStatu.Web.Controllers
 
         private static readonly string VehicleCategoryFilter = "v.Kategorie_vozidla LIKE 'M1%'";
 
+        private static string StatniOnlyFilter(bool statniOnly, string pcvColumn = "v.PCV")
+        {
+            return statniOnly
+                ? $"AND EXISTS (SELECT 1 FROM vlastnik_provozovatel_vozidla vl WITH (NOLOCK) INNER JOIN firmy.dbo.Firma f WITH (NOLOCK) ON f.ICO = vl.ICO AND f.typ >= 9 WHERE vl.PCV = {pcvColumn})"
+                : "";
+        }
+
         private static List<int> GetAvailableYears()
         {
             var years = new List<int>();
@@ -46,7 +55,7 @@ namespace HlidacStatu.Web.Controllers
             return View();
         }
 
-        public ActionResult VIN(string id)
+        public ActionResult VIN(string? id)
         {
             if (string.IsNullOrEmpty(id))
                 return RedirectToAction("Index");
@@ -71,26 +80,69 @@ namespace HlidacStatu.Web.Controllers
 
         // ==================== Report A: Top 50 most powerful cars by year ====================
 
-        public async Task<ActionResult> NejsilnejsiAuta(int? rok)
+        public async Task<ActionResult> NejsilnejsiAuta(string? id, int? rok, bool statniOnly = false)
         {
-            int year = rok ?? DateTime.Now.Year;
             var sql = $@"
-                SELECT TOP 50
-                    v.PCV, v.Tovarni_znacka, v.Obchodni_oznaceni, v.Typ,
-                    v.Max_vykon, v.Nejvyssi_rychlost, v.Palivo,
-                    v.Datum_1_registrace_v_CR, v.Barva, v.logoslug, v.VIN,
-                    v.Rok_vyroby, v.Zdvihovy_objem
-                FROM vypis_vozidel v WITH (NOLOCK)
-                WHERE YEAR(v.Datum_1_registrace_v_CR) = @rok
-                    AND v.Max_vykon IS NOT NULL
-                    AND v.Max_vykon > 0
-                    AND {VehicleCategoryFilter}
-                ORDER BY v.Max_vykon DESC";
+SELECT DISTINCT TOP 200
+    p.Pcv,
+    p.Ico,
+    p.Typ_Subjektu        AS Typ_subjekt,
+    p.Vztah_K_Vozidlu      AS Vztah_k_vozidlu,
+    p.Aktualni,
+    p.Datum_Od,
+    p.Datum_Do,
+    -- from VypisVozidel (v)
+    v.Vin               AS VIN,
+    v.Palivo,
+    v.Kategorie_Vozidla  AS Kategorie_vozidla,
+    v.Tovarni_Znacka     AS Tovarni_znacka,
+    v.Obchodni_Oznaceni   AS Model,
+    v.Rok_Vyroby         AS Rok_vyroby,
+    v.Datum_1_registrace   AS Datum_1_registrace,
+    v.Datum_1_registrace_v_CR AS Datum_1_registrace_v_CR,
+    v.Zdvihovy_Objem     AS Zdvihovy_objem,
+    v.Barva,
+    v.Nejvyssi_Rychlost  AS Nejvyssi_rychlost,
+    v.Plne_Elektricke_Vozidlo,
+    v.Hybridni_Vozidlo,
+    v.Stupen_Plneni_Emisni_Urovne AS Stupen_plneni_emisni_urovne,
+    v.Provozni_Hmotnost,
+    -- from TechnickeProhlidky (stk aggregate)
+    stk.PosledniStk,
+    stk.PlatnostStkMax   AS PlastnostStk,
+    0 as pocet,
+    v.Max_vykon
+FROM Vlastnik_Provozovatel_Vozidla p
+INNER JOIN Vypis_Vozidel v ON p.Pcv = v.Pcv
+    AND v.PCV in (
+     select top 200 pcv from vypis_vozidel 
+        where (YEAR(Datum_1_registrace_v_CR) = @rok OR @rok IS NULL)
+                    AND Max_vykon IS NOT NULL
+                    AND Max_vykon > 0
+                ORDER BY Max_vykon DESC
+     )
+INNER JOIN (
+    SELECT
+        Pcv,
+        MAX(Platnost_Od) AS PosledniStk,
+        MAX(Platnost_Do) AS PlatnostStkMax
+    FROM Technicke_Prohlidky
+    GROUP BY Pcv
+) stk
+    ON p.Pcv = stk.Pcv
+    inner join vlastnik_provozovatel_vozidla vl with (nolock) on v.PCV = vl.PCV
 
-            var items = await ExecuteVehicleQueryAsync(sql, new[] { new SqlParameter("@rok", year) });
+    inner join firmy.dbo.Firma f  with (nolock) on f.ICO = vl.ICO and f.typ>={(statniOnly ? "9" : "0")}
+            and (f.ico = '{id}' or '{id}' is null or '{id}'='')
+
+ORDER BY v.Max_vykon DESC
+";
+
+            var items = await Repo.ExecuteVehicleQueryAsync(sql, new[] { new SqlParameter("@rok", (object)rok ?? DBNull.Value) });
+            ViewBag.StatniOnly = statniOnly;
             var model = new VehicleYearReport
             {
-                SelectedYear = year,
+                SelectedYear = rok,
                 AvailableYears = GetAvailableYears(),
                 Items = items
             };
@@ -99,26 +151,70 @@ namespace HlidacStatu.Web.Controllers
 
         // ==================== Report B: Top 50 fastest cars by year ====================
 
-        public async Task<ActionResult> NejrychlejsiAuta(int? rok)
+        public async Task<ActionResult> NejrychlejsiAuta(string? id, int? rok, bool statniOnly = false)
         {
-            int year = rok ?? DateTime.Now.Year;
             var sql = $@"
-                SELECT TOP 50
-                    v.PCV, v.Tovarni_znacka, v.Obchodni_oznaceni, v.Typ,
-                    v.Max_vykon, v.Nejvyssi_rychlost, v.Palivo,
-                    v.Datum_1_registrace_v_CR, v.Barva, v.logoslug, v.VIN,
-                    v.Rok_vyroby, v.Zdvihovy_objem
-                FROM vypis_vozidel v WITH (NOLOCK)
-                WHERE YEAR(v.Datum_1_registrace_v_CR) = @rok
-                    AND v.Nejvyssi_rychlost IS NOT NULL
-                    AND v.Nejvyssi_rychlost > 0
-                    AND {VehicleCategoryFilter}
-                ORDER BY v.Nejvyssi_rychlost DESC";
+SELECT DISTINCT TOP 200
+    p.Pcv,
+    p.Ico,
+    p.Typ_Subjektu        AS Typ_subjekt,
+    p.Vztah_K_Vozidlu      AS Vztah_k_vozidlu,
+    p.Aktualni,
+    p.Datum_Od,
+    p.Datum_Do,
+    -- from VypisVozidel (v)
+    v.Vin               AS VIN,
+    v.Palivo,
+    v.Kategorie_Vozidla  AS Kategorie_vozidla,
+    v.Tovarni_Znacka     AS Tovarni_znacka,
+    v.Obchodni_Oznaceni   AS Model,
+    v.Rok_Vyroby         AS Rok_vyroby,
+    v.Datum_1_registrace   AS Datum_1_registrace,
+    v.Datum_1_registrace_v_CR AS Datum_1_registrace_v_CR,
+    v.Zdvihovy_Objem     AS Zdvihovy_objem,
+    v.Barva,
+    v.Nejvyssi_Rychlost  AS Nejvyssi_rychlost,
+    v.Plne_Elektricke_Vozidlo,
+    v.Hybridni_Vozidlo,
+    v.Stupen_Plneni_Emisni_Urovne AS Stupen_plneni_emisni_urovne,
+    v.Provozni_Hmotnost,
+    -- from TechnickeProhlidky (stk aggregate)
+    stk.PosledniStk,
+    stk.PlatnostStkMax   AS PlastnostStk,
+    0 as pocet,
+    v.Nejvyssi_rychlost 
+FROM Vlastnik_Provozovatel_Vozidla p
+INNER JOIN Vypis_Vozidel v ON p.Pcv = v.Pcv
+    AND v.PCV in (
+     select top 200 pcv from vypis_vozidel 
+        where (YEAR(Datum_1_registrace_v_CR) = @rok or @rok IS NULL)
+                    AND Nejvyssi_rychlost IS NOT NULL
+                    AND Nejvyssi_rychlost > 0
+                ORDER BY Nejvyssi_rychlost DESC
+     )
 
-            var items = await ExecuteVehicleQueryAsync(sql, new[] { new SqlParameter("@rok", year) });
+INNER JOIN (
+    SELECT
+        Pcv,
+        MAX(Platnost_Od) AS PosledniStk,
+        MAX(Platnost_Do) AS PlatnostStkMax
+    FROM Technicke_Prohlidky
+    GROUP BY Pcv
+) stk
+    ON p.Pcv = stk.Pcv
+    inner join vlastnik_provozovatel_vozidla vl with (nolock) on v.PCV = vl.PCV
+
+    inner join firmy.dbo.Firma f  with (nolock) on f.ICO = vl.ICO and f.typ>={(statniOnly ? "9" : "0")}
+            and (f.ico = '{id}' or '{id}' is null or '{id}'='')
+
+
+    ORDER BY v.Nejvyssi_rychlost DESC";
+
+            var items = await Repo.ExecuteVehicleQueryAsync(sql, new[] { new SqlParameter("@rok", (object)rok ?? DBNull.Value) });
+            ViewBag.StatniOnly = statniOnly;
             var model = new VehicleYearReport
             {
-                SelectedYear = year,
+                SelectedYear = rok,
                 AvailableYears = GetAvailableYears(),
                 Items = items
             };
@@ -127,26 +223,66 @@ namespace HlidacStatu.Web.Controllers
 
         // ==================== Report C: Top 50 luxury cars by year ====================
 
-        public async Task<ActionResult> LuxusniAuta(int? rok)
+        public async Task<ActionResult> LuxusniAuta(string? id, int? rok, bool statniOnly = false)
         {
-            int year = rok ?? DateTime.Now.Year;
             var brandList = string.Join(", ", LuxuryBrands.Select(b => $"'{b}'"));
             var sql = $@"
-                SELECT TOP 50
-                    v.PCV, v.Tovarni_znacka, v.Obchodni_oznaceni, v.Typ,
-                    v.Max_vykon, v.Nejvyssi_rychlost, v.Palivo,
-                    v.Datum_1_registrace_v_CR, v.Barva, v.logoslug, v.VIN,
-                    v.Rok_vyroby, v.Zdvihovy_objem
-                FROM vypis_vozidel v WITH (NOLOCK)
-                WHERE YEAR(v.Datum_1_registrace_v_CR) = @rok
-                    AND {VehicleCategoryFilter}
-                    AND UPPER(v.Tovarni_znacka) IN ({brandList})
-                ORDER BY v.Max_vykon DESC";
+                SELECT DISTINCT TOP 50
+    p.Pcv,
+    p.Ico,
+    p.Typ_Subjektu        AS Typ_subjekt,
+    p.Vztah_K_Vozidlu      AS Vztah_k_vozidlu,
+    p.Aktualni,
+    p.Datum_Od,
+    p.Datum_Do,
+    -- from VypisVozidel (v)
+    v.Vin               AS VIN,
+    v.Palivo,
+    v.Kategorie_Vozidla  AS Kategorie_vozidla,
+    v.Tovarni_Znacka     AS Tovarni_znacka,
+    v.Obchodni_Oznaceni   AS Model,
+    v.Rok_Vyroby         AS Rok_vyroby,
+    v.Datum_1_registrace   AS Datum_1_registrace,
+    v.Datum_1_registrace_v_CR AS Datum_1_registrace_v_CR,
+    v.Zdvihovy_Objem     AS Zdvihovy_objem,
+    v.Barva,
+    v.Nejvyssi_Rychlost  AS Nejvyssi_rychlost,
+    v.Plne_Elektricke_Vozidlo,
+    v.Hybridni_Vozidlo,
+    v.Stupen_Plneni_Emisni_Urovne AS Stupen_plneni_emisni_urovne,
+    v.Provozni_Hmotnost,
+    -- from TechnickeProhlidky (stk aggregate)
+    stk.PosledniStk,
+    stk.PlatnostStkMax   AS PlastnostStk,
+    0 as pocet,
+    v.Max_vykon
+FROM Vlastnik_Provozovatel_Vozidla p
+INNER JOIN Vypis_Vozidel v ON p.Pcv = v.Pcv
+    AND v.PCV in (
+     select top 200 pcv from vypis_vozidel 
+            WHERE (YEAR(Datum_1_registrace_v_CR) = @rok OR @rok IS NULL)
+                AND UPPER(Tovarni_znacka) IN ({brandList})
+            ORDER BY Max_vykon DESC
+     )
 
-            var items = await ExecuteVehicleQueryAsync(sql, new[] { new SqlParameter("@rok", year) });
+INNER JOIN (
+    SELECT
+        Pcv,
+        MAX(Platnost_Od) AS PosledniStk,
+        MAX(Platnost_Do) AS PlatnostStkMax
+    FROM Technicke_Prohlidky
+    GROUP BY Pcv
+) stk ON p.Pcv = stk.Pcv
+
+    inner join firmy.dbo.Firma f  with (nolock) on f.ICO = p.ICO and f.typ>={(statniOnly ? "9" : "0")}
+            and (f.ico = '{id}' or '{id}' is null or '{id}'='')
+    ORDER BY v.Max_vykon DESC";
+
+            var items = await Repo.ExecuteVehicleQueryAsync(sql, new[] { new SqlParameter("@rok", (object)rok ?? DBNull.Value) });
+            ViewBag.StatniOnly = statniOnly;
             var model = new VehicleYearReport
             {
-                SelectedYear = year,
+                SelectedYear = rok,
                 AvailableYears = GetAvailableYears(),
                 Items = items
             };
@@ -155,60 +291,87 @@ namespace HlidacStatu.Web.Controllers
 
         // ==================== Report D: Newly registered cars (last month) ====================
 
-        public async Task<ActionResult> NovaAuta()
+        public async Task<ActionResult> NovaAuta(string? id, bool statniOnly = false)
         {
             var sql = $@"
-                SELECT TOP 200
-                    v.PCV, v.Tovarni_znacka, v.Obchodni_oznaceni, v.Typ,
-                    v.Max_vykon, v.Nejvyssi_rychlost, v.Palivo,
-                    v.Datum_1_registrace_v_CR, v.Barva, v.logoslug, v.VIN,
-                    v.Rok_vyroby, v.Zdvihovy_objem
-                FROM vypis_vozidel v WITH (NOLOCK)
-                WHERE v.Datum_1_registrace_v_CR >= DATEADD(MONTH, -1, CAST(GETDATE() AS DATE))
-                    AND {VehicleCategoryFilter}
-                ORDER BY v.Datum_1_registrace_v_CR DESC";
+SELECT DISTINCT TOP 200
+    p.Pcv,
+    p.Ico,
+    p.Typ_Subjektu        AS Typ_subjekt,
+    p.Vztah_K_Vozidlu      AS Vztah_k_vozidlu,
+    p.Aktualni,
+    p.Datum_Od,
+    p.Datum_Do,
+    -- from VypisVozidel (v)
+    v.Vin               AS VIN,
+    v.Palivo,
+    v.Kategorie_Vozidla  AS Kategorie_vozidla,
+    v.Tovarni_Znacka     AS Tovarni_znacka,
+    v.Obchodni_Oznaceni   AS Model,
+    v.Rok_Vyroby         AS Rok_vyroby,
+    v.Datum_1_registrace   AS Datum_1_registrace,
+    v.Datum_1_registrace_v_CR AS Datum_1_registrace_v_CR,
+    v.Zdvihovy_Objem     AS Zdvihovy_objem,
+    v.Barva,
+    v.Nejvyssi_Rychlost  AS Nejvyssi_rychlost,
+    v.Plne_Elektricke_Vozidlo,
+    v.Hybridni_Vozidlo,
+    v.Stupen_Plneni_Emisni_Urovne AS Stupen_plneni_emisni_urovne,
+    v.Provozni_Hmotnost,
+    -- from TechnickeProhlidky (stk aggregate)
+    stk.PosledniStk,
+    stk.PlatnostStkMax   AS PlastnostStk,
+    0 as pocet,
+    v.Max_vykon
+FROM Vlastnik_Provozovatel_Vozidla p
+INNER JOIN Vypis_Vozidel v ON p.Pcv = v.Pcv
+    and v.pcv in 
+        (select top 300 pcv from Vypis_vozidel order by Datum_1_registrace_v_CR DESC)
+inner join firmy.dbo.Firma f  with (nolock) on f.ICO = p.ICO and f.typ>={(statniOnly ? "9" : "0")}
+        and (f.ico = '{id}' or '{id}' is null or '{id}'='')
 
-            var items = await ExecuteVehicleQueryAsync(sql);
+INNER JOIN (
+    SELECT
+        Pcv,
+        MAX(Platnost_Od) AS PosledniStk,
+        MAX(Platnost_Do) AS PlatnostStkMax
+    FROM Technicke_Prohlidky
+    GROUP BY Pcv
+) stk ON p.Pcv = stk.Pcv
+
+    ORDER BY v.Datum_1_registrace_v_CR DESC";
+
+            var items = await Repo.ExecuteVehicleQueryAsync(sql);
+            ViewBag.StatniOnly = statniOnly;
             return View(items);
         }
 
         // ==================== Report E: Cars with expired technical inspection ====================
 
-        public async Task<ActionResult> PropadlaSTK()
+        public async Task<ActionResult> PropadlaSTK(string? id, bool statniOnly = false)
         {
             var sql = $@"
-                SELECT TOP 200
-                    v.PCV, v.Tovarni_znacka, v.Obchodni_oznaceni, v.Typ,
-                    v.Max_vykon, v.Palivo,
-                    v.Datum_1_registrace_v_CR, v.Barva, v.logoslug, v.VIN,
-                    v.Rok_vyroby,
-                    tp.Platnost_do
-                FROM vypis_vozidel v WITH (NOLOCK)
-                INNER JOIN technicke_prohlidky tp WITH (NOLOCK)
-                    ON v.PCV = tp.PCV AND tp.Aktualni = 1
-                WHERE tp.Platnost_do IS NOT NULL
-                    AND tp.Platnost_do < CAST(GETDATE() AS DATE)
-                    AND {VehicleCategoryFilter}
-                ORDER BY tp.Platnost_do DESC";
 
-            var items = await ExecuteVehicleQueryAsync(sql);
+";
+
+        var items = await Repo.ExecuteVehicleQueryAsync(sql);
+            ViewBag.StatniOnly = statniOnly;
             return View(items);
         }
 
         // ==================== Additional Report: Most popular brands by year ====================
 
-        public async Task<ActionResult> NejpopularnejsiZnacky(int? rok)
+        public async Task<ActionResult> NejpopularnejsiZnacky(int? rok, bool statniOnly = false)
         {
-            int year = rok ?? DateTime.Now.Year;
             var sql = $@"
                 SELECT TOP 50
                     v.Tovarni_znacka,
                     MIN(v.logoslug) AS logoslug,
                     COUNT(*) AS Pocet
                 FROM vypis_vozidel v WITH (NOLOCK)
-                WHERE YEAR(v.Datum_1_registrace_v_CR) = @rok
-                    AND {VehicleCategoryFilter}
+                WHERE (YEAR(v.Datum_1_registrace_v_CR) = @rok OR @rok IS NULL)
                     AND v.Tovarni_znacka IS NOT NULL
+                    {StatniOnlyFilter(statniOnly)}
                 GROUP BY v.Tovarni_znacka
                 ORDER BY Pocet DESC";
 
@@ -217,7 +380,7 @@ namespace HlidacStatu.Web.Controllers
             await connection.OpenAsync();
             await using var command = new SqlCommand(sql, connection);
             command.CommandTimeout = CommandTimeoutSeconds;
-            command.Parameters.Add(new SqlParameter("@rok", year));
+            command.Parameters.Add(new SqlParameter("@rok", (object)rok ?? DBNull.Value));
 
             await using var reader = await command.ExecuteReaderAsync();
             while (await reader.ReadAsync())
@@ -230,9 +393,10 @@ namespace HlidacStatu.Web.Controllers
                 });
             }
 
+            ViewBag.StatniOnly = statniOnly;
             var model = new BrandYearReport
             {
-                SelectedYear = year,
+                SelectedYear = rok,
                 AvailableYears = GetAvailableYears(),
                 Items = items
             };
@@ -241,7 +405,7 @@ namespace HlidacStatu.Web.Controllers
 
         // ==================== Additional Report: Electric and hybrid vehicles trend ====================
 
-        public async Task<ActionResult> Elektromobily()
+        public async Task<ActionResult> Elektromobily(bool statniOnly = false)
         {
             var sql = $@"
                 SELECT
@@ -251,8 +415,8 @@ namespace HlidacStatu.Web.Controllers
                     COUNT(*) AS Celkem
                 FROM vypis_vozidel v WITH (NOLOCK)
                 WHERE v.Datum_1_registrace_v_CR IS NOT NULL
-                    AND {VehicleCategoryFilter}
                     AND YEAR(v.Datum_1_registrace_v_CR) >= 2010
+                    {StatniOnlyFilter(statniOnly)}
                 GROUP BY YEAR(v.Datum_1_registrace_v_CR)
                 ORDER BY Rok";
 
@@ -274,24 +438,24 @@ namespace HlidacStatu.Web.Controllers
                 });
             }
 
+            ViewBag.StatniOnly = statniOnly;
             return View(items);
         }
 
         // ==================== Additional Report: Import statistics by country ====================
 
-        public async Task<ActionResult> DovozVozidel(int? rok)
+        public async Task<ActionResult> DovozVozidel(int? rok, bool statniOnly = false)
         {
-            int year = rok ?? DateTime.Now.Year;
             var sql = $@"
                 SELECT TOP 30
                     d.Stat,
                     COUNT(*) AS Pocet
                 FROM vozidla_dovoz d WITH (NOLOCK)
                 INNER JOIN vypis_vozidel v WITH (NOLOCK) ON d.PCV = v.PCV
-                WHERE YEAR(d.Datum_dovozu) = @rok
-                    AND {VehicleCategoryFilter}
+                WHERE (YEAR(d.Datum_dovozu) = @rok OR @rok IS NULL)
                     AND d.Stat IS NOT NULL
                     AND d.Stat <> ''
+                    {StatniOnlyFilter(statniOnly)}
                 GROUP BY d.Stat
                 ORDER BY Pocet DESC";
 
@@ -300,7 +464,7 @@ namespace HlidacStatu.Web.Controllers
             await connection.OpenAsync();
             await using var command = new SqlCommand(sql, connection);
             command.CommandTimeout = CommandTimeoutSeconds;
-            command.Parameters.Add(new SqlParameter("@rok", year));
+            command.Parameters.Add(new SqlParameter("@rok", (object)rok ?? DBNull.Value));
 
             await using var reader = await command.ExecuteReaderAsync();
             while (await reader.ReadAsync())
@@ -312,9 +476,10 @@ namespace HlidacStatu.Web.Controllers
                 });
             }
 
+            ViewBag.StatniOnly = statniOnly;
             var model = new ImportYearReport
             {
-                SelectedYear = year,
+                SelectedYear = rok,
                 AvailableYears = GetAvailableYears(),
                 Items = items
             };
@@ -323,21 +488,30 @@ namespace HlidacStatu.Web.Controllers
 
         // ==================== Additional Report: Average vehicle age by brand ====================
 
-        public async Task<ActionResult> StariVozidel()
+        public async Task<ActionResult> StariVozidel(bool statniOnly = false)
         {
             var sql = $@"
-                SELECT TOP 30
-                    v.Tovarni_znacka,
-                    MIN(v.logoslug) AS logoslug,
-                    AVG(CAST(DATEDIFF(YEAR, v.Datum_1_registrace, GETDATE()) AS FLOAT)) AS PrumernyVek,
-                    COUNT(*) AS Pocet
-                FROM vypis_vozidel v WITH (NOLOCK)
-                WHERE v.Datum_1_registrace IS NOT NULL
-                    AND {VehicleCategoryFilter}
-                    AND v.Tovarni_znacka IS NOT NULL
-                GROUP BY v.Tovarni_znacka
-                HAVING COUNT(*) >= 100
-                ORDER BY PrumernyVek ASC";
+SELECT TOP 30
+    v.logoslug,
+    AVG(CAST(DATEDIFF(YEAR, v.Datum_1_registrace, GETDATE()) AS FLOAT)) AS PrumernyVek,
+    COUNT(*) AS Pocet
+FROM vypis_vozidel v WITH (NOLOCK)
+
+WHERE v.Datum_1_registrace IS NOT NULL
+    AND v.logoslug IS NOT NULL
+    and (RM_zaniku = '' or RM_zaniku is null)
+    AND NOT EXISTS (
+            SELECT 1 FROM vozidla_vyrazena_z_provozu vzp with (nolock)
+            WHERE vzp.PCV = v.PCV
+        )
+    and Datum_1_registrace IS NOT NULL 
+    AND Tovarni_znacka IS NOT NULL
+    {StatniOnlyFilter(statniOnly)}
+GROUP BY v.logoslug
+HAVING COUNT(*) >= 5
+ORDER BY PrumernyVek desc
+
+";
 
             var items = new List<AgeStatItem>();
             await using var connection = new SqlConnection(RegistrVozidelCnnStr);
@@ -357,6 +531,7 @@ namespace HlidacStatu.Web.Controllers
                 });
             }
 
+            ViewBag.StatniOnly = statniOnly;
             return View(items);
         }
 
@@ -364,14 +539,12 @@ namespace HlidacStatu.Web.Controllers
 
         public async Task<ActionResult> RozdeleniPaliv(int? rok)
         {
-            int year = rok ?? DateTime.Now.Year;
             var sql = $@"
                 SELECT
                     v.Palivo,
                     COUNT(*) AS Pocet
                 FROM vypis_vozidel v WITH (NOLOCK)
-                WHERE YEAR(v.Datum_1_registrace_v_CR) = @rok
-                    AND {VehicleCategoryFilter}
+                WHERE (YEAR(v.Datum_1_registrace_v_CR) = @rok OR @rok IS NULL)
                     AND v.Palivo IS NOT NULL
                     AND v.Palivo <> ''
                 GROUP BY v.Palivo
@@ -383,7 +556,7 @@ namespace HlidacStatu.Web.Controllers
             await connection.OpenAsync();
             await using var command = new SqlCommand(sql, connection);
             command.CommandTimeout = CommandTimeoutSeconds;
-            command.Parameters.Add(new SqlParameter("@rok", year));
+            command.Parameters.Add(new SqlParameter("@rok", (object)rok ?? DBNull.Value));
 
             await using var reader = await command.ExecuteReaderAsync();
             while (await reader.ReadAsync())
@@ -399,7 +572,7 @@ namespace HlidacStatu.Web.Controllers
 
             var model = new FuelYearReport
             {
-                SelectedYear = year,
+                SelectedYear = rok,
                 AvailableYears = GetAvailableYears(),
                 Items = items,
                 TotalCount = totalCount
@@ -407,75 +580,6 @@ namespace HlidacStatu.Web.Controllers
             return View(model);
         }
 
-        // ==================== SQL Helpers ====================
 
-        private static async Task<List<VehicleStatItem>> ExecuteVehicleQueryAsync(
-            string sql, SqlParameter[] parameters = null)
-        {
-            var items = new List<VehicleStatItem>();
-            await using var connection = new SqlConnection(RegistrVozidelCnnStr);
-            await connection.OpenAsync();
-            await using var command = new SqlCommand(sql, connection);
-            command.CommandTimeout = CommandTimeoutSeconds;
-            if (parameters != null)
-                command.Parameters.AddRange(parameters);
-
-            await using var reader = await command.ExecuteReaderAsync();
-            while (await reader.ReadAsync())
-            {
-                var item = new VehicleStatItem();
-                for (int i = 0; i < reader.FieldCount; i++)
-                {
-                    if (await reader.IsDBNullAsync(i)) continue;
-                    switch (reader.GetName(i))
-                    {
-                        case "PCV":
-                            item.PCV = reader.GetString(i);
-                            break;
-                        case "Tovarni_znacka":
-                            item.Brand = reader.GetString(i);
-                            break;
-                        case "Obchodni_oznaceni":
-                            item.Model = reader.GetString(i);
-                            break;
-                        case "Typ":
-                            item.Type = reader.GetString(i);
-                            break;
-                        case "Max_vykon":
-                            item.PowerKw = reader.GetDecimal(i);
-                            break;
-                        case "Nejvyssi_rychlost":
-                            item.TopSpeedKmh = reader.GetDecimal(i);
-                            break;
-                        case "Palivo":
-                            item.Fuel = reader.GetString(i);
-                            break;
-                        case "Datum_1_registrace_v_CR":
-                            item.RegistrationDate = reader.GetDateTime(i);
-                            break;
-                        case "Barva":
-                            item.Color = reader.GetString(i);
-                            break;
-                        case "logoslug":
-                            item.LogoSlug = reader.GetString(i);
-                            break;
-                        case "VIN":
-                            item.VIN = reader.GetString(i);
-                            break;
-                        case "Rok_vyroby":
-                            item.YearOfManufacture = reader.GetInt32(i);
-                            break;
-                        case "Zdvihovy_objem":
-                            item.EngineDisplacement = reader.GetString(i);
-                            break;
-                        case "Platnost_do":
-                            item.StkExpiryDate = reader.GetDateTime(i);
-                            break;
-                    }
-                }
-                items.Add(item);
-            }
-            return items;
-        }
     }
 }

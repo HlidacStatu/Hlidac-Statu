@@ -11,10 +11,7 @@
 
     List<VozidloLight> vozidlaRaw = 
         await HlidacStatu.RegistrVozidel.Repo.Cached.GetForICOAsync(this.Model.ICO);
-    List<VozidloLightPerIco> vozidla = vozidlaRaw
-        .GroupBy(g => g.Pcv)
-        .Select(s => new VozidloLightPerIco(s))
-        .ToList();
+    List<VozidloLightPerIco> vozidla = VozidloLightPerIco.FromVozidloLight(vozidlaRaw);
 
 
     ReportDataSource<VozidloLightPerIco> rds = new(

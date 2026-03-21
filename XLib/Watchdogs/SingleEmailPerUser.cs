@@ -79,7 +79,7 @@ namespace HlidacStatu.XLib.Watchdogs
                     return new Devmasters.Batch.ActionOutputData();
                 },
                 logOutputFunc, progressOutputFunc,
-                true, maxDegreeOfParallelism: maxDegreeOfParallelism, prefix:"Send watchdogs "
+                !System.Diagnostics.Debugger.IsAttached, maxDegreeOfParallelism: maxDegreeOfParallelism, prefix:"Send watchdogs "
                , monitor: new MonitoredTaskRepo.ForBatchAsync()
                 );
 

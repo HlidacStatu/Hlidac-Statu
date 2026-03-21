@@ -1,7 +1,7 @@
-@model HlidacStatu.Web.Models.FuelYearReport
+@model HlidacStatu.RegistrVozidel.Models.FuelYearReport
 @using System.Globalization
 @{
-    ViewBag.Title = $"Rozdeleni paliv - {Model.SelectedYear}";
+    ViewBag.Title = "Rozdeleni paliv" + (Model.SelectedYear.HasValue ? $" - {Model.SelectedYear}" : "");
     ViewBag.SubTitle = "Registr vozidel";
     string[] barColors = { "primary", "success", "warning", "info", "danger", "secondary", "dark" };
 }
@@ -17,30 +17,33 @@
 }
 
 <h3 class="mt-2">
-    <i class="fa-solid fa-gas-pump me-2"></i>Rozdeleni typu paliv v roce @Model.SelectedYear
+    <i class="fa-solid fa-gas-pump me-2"></i>Rozdeleni typu paliv @(Model.SelectedYear.HasValue ? $"v roce {Model.SelectedYear}" : "za vsechny roky")
 </h3>
 <p class="text-muted">Distribuce typu paliv u nove registrovanych osobnich automobilu.</p>
 
-<form method="get" class="d-inline-block mb-3">
-    <label for="rok" class="form-label me-2">Rok registrace:</label>
-    <select name="rok" id="rok" class="form-select d-inline-block w-auto" onchange="this.form.submit()">
-        @foreach (var y in Model.AvailableYears)
-        {
-            if (y == Model.SelectedYear)
+<form method="get" class="d-flex align-items-center gap-3 mb-3 flex-wrap">
+    <div class="d-flex align-items-center gap-2">
+        <label for="rok" class="form-label mb-0">Rok registrace:</label>
+        <select name="rok" id="rok" class="form-select d-inline-block w-auto" onchange="this.form.submit()">
+            <option value="">Vsechny roky</option>
+            @foreach (var y in Model.AvailableYears)
             {
-                <option value="@y" selected="selected">@y</option>
+                if (y == Model.SelectedYear)
+                {
+                    <option value="@y" selected="selected">@y</option>
+                }
+                else
+                {
+                    <option value="@y">@y</option>
+                }
             }
-            else
-            {
-                <option value="@y">@y</option>
-            }
-        }
-    </select>
+        </select>
+    </div>
 </form>
 
 @if (!Model.Items.Any())
 {
-    <div class="alert alert-info mt-3">Zadna data pro rok @Model.SelectedYear.</div>
+    <div class="alert alert-info mt-3">Zadna data @(Model.SelectedYear.HasValue ? $"pro rok {Model.SelectedYear}" : "").</div>
 }
 else
 {
