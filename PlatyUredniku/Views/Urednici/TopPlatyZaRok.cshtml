@@ -3,6 +3,10 @@
 @using HlidacStatu.Util
 @model List<HlidacStatu.Entities.PuPlat>
 
+@{
+    var tags = await PuRepo.GetAllTagsAsync();
+    
+}
 
 @section breadcrumbs
 {
@@ -16,9 +20,6 @@
         <li>
             <a asp-action="Analyzy">Analýzy</a>
         </li>
-        <li>
-            Přehled jednotlivých platů
-        </li>
         <li class="active">
             @ViewData["title"]
         </li>
@@ -29,8 +30,9 @@
 <section class="d-flex align-items-center justify-content-center alter-bg-color pt-5 pageblock-small">
     <div class="container">
         <h2>@ViewData["title"]</h2>
-        <p class="text-muted">Informace o nejvyšších platech státních podniků, či příspěvkových organizací za
-            rok @ViewData["year"].</p>
+        <p class="text-muted">
+            Žebříček 100 nejvyšších platů včetně odměn ve státních podnicích či příspěvkových organizacích za rok @ViewData["year"].
+        </p>
 
         <div class="nav flex-row nav-pills">
             <button class="nav-link disabled" type="button" disabled="disabled">Zobrazit data od roku</button>
@@ -49,7 +51,30 @@
                 }
             }
         </div>
+        
+        <div class="d-flex align-items-center mt-3 gap-2">
+            <label for="tagFilter" class="text-muted text-nowrap mb-0">Filtrovat podle oblasti</label>
+            <select id="tagFilter" class="form-select form-select-sm" style="max-width: 20rem;"
+                    onchange="window.location.href=this.value;">
+                @{
+                    string currentTag = PuOrganizaceTag.NormalizeTag(ViewData["tag"]?.ToString());
+                }
+                <!option value="@(this.Context.Request.GetCurrentUrl("tag", ""))"
+                        @(string.IsNullOrEmpty(currentTag) ? "selected" : "")>
+                    Všechny organizace
+                </!option>
+                @foreach (var t in tags)
+                {
+                    string normalizedTag = PuOrganizaceTag.NormalizeTag(t);
+                    bool isActive = string.Equals(currentTag, normalizedTag, StringComparison.InvariantCultureIgnoreCase);
 
+                    <!option value="@(this.Context.Request.GetCurrentUrl("tag", normalizedTag))" @(isActive ? "selected" : "")>
+                        @t
+                    </!option>
+                }
+            </select>
+        </div>
+        
     </div>
 </section>
 <section class="d-flex align-items-center justify-content-center pageblock">

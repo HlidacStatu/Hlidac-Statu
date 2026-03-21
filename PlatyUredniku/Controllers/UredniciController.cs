@@ -120,21 +120,80 @@ public class UredniciController : Controller
         return View(platy);
     }
     
-    public async Task<IActionResult> TopPlatyZaRok(int year)
+    public async Task<IActionResult> TopPlatyZaRok(int year, string tag)
     {
         if (year == 0 || year > YearPicker.PuDefaultYear)
         {
             year = YearPicker.PuDefaultYear;
         }
         
-        string title = $"Top 100 platů za rok {year}";
+        string title = $"Stovka nejvyšších platů včetně odměn ve veřejné správě za rok {year}.";
         ViewData["title"] = title;
         ViewData["year"] = year.ToString();
-        
         ViewBag.Title = title;
+
+        ViewData["tag"] = tag;
         
-        var platy = await PuRepo.Cached.GetTop100PlatuAsync(year);
+        var platy = await PuRepo.Cached.GetTop100PlatuAsync(year, tag);
         return View(platy);
+    }
+    
+    public async Task<IActionResult> NejvetsiSkokani(int minyear)
+    {
+        if (minyear == 0 || minyear > YearPicker.PuDefaultYear)
+        {
+            minyear = YearPicker.PuDefaultYear - 1;
+        }
+        
+        string title = $"Největší úřední skokani od roku {minyear}";
+        ViewData["title"] = title;
+        ViewData["year"] = minyear.ToString();
+        ViewBag.Title = title;
+
+        return View();
+    }
+    
+    public async Task<IActionResult> NejvetsiKombo(int year)
+    {
+        if (year == 0 || year > YearPicker.PuDefaultYear)
+        {
+            year = YearPicker.PuDefaultYear;
+        }
+        
+        string title = $"Přehled platů pro rok {year}";
+        ViewData["title"] = title;
+        ViewData["year"] = year.ToString();
+        ViewBag.Title = title;
+
+        return View();
+    }
+    public async Task<IActionResult> TopZakladniPlat(int year)
+    {
+        if (year == 0 || year > YearPicker.PuDefaultYear)
+        {
+            year = YearPicker.PuDefaultYear;
+        }
+        
+        string title = $"Nejvyšší měsíční platy pro rok {year}";
+        ViewData["title"] = title;
+        ViewData["year"] = year.ToString();
+        ViewBag.Title = title;
+
+        return View();
+    }
+    public async Task<IActionResult> TopOdmeny(int year)
+    {
+        if (year == 0 || year > YearPicker.PuDefaultYear)
+        {
+            year = YearPicker.PuDefaultYear;
+        }
+        
+        string title = $"Nejvyšší roční odměny pro rok {year}";
+        ViewData["title"] = title;
+        ViewData["year"] = year.ToString();
+        ViewBag.Title = title;
+
+        return View();
     }
 
     public async Task<IActionResult> Oblast(string id)

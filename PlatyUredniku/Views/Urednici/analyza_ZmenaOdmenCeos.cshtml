@@ -30,7 +30,10 @@
             PocetPlatuPosledniRok = platyPosledniRok.Count(),
         };
 
-        rusty.Add(rustPlatu);
+        if (rustPlatu.NarustRocniAbsolutni != 0)
+        {
+            rusty.Add(rustPlatu);
+        }
     }
 }
 @section breadcrumbs

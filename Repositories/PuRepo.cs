@@ -39,6 +39,20 @@ public static partial class PuRepo
         "životní prostředí",
         "ostatní"
     ];
+    
+    
+
+    public static async Task<List<string>> GetAllTagsAsync()
+    {
+        await using var db = new DbEntities();
+        
+        return await db.PuOrganizaceTags
+            .AsNoTracking()
+            .Select(t => t.Tag)
+            .Distinct()
+            .OrderBy(t => t)
+            .ToListAsync();
+    }
 
     public static async Task SaveVydelekAsync(PuVydelek vydelek)
     {
@@ -246,6 +260,12 @@ public static partial class PuRepo
     }
 
 
+    //todo: tohle předělat do eventů + nafingovat historicky eventy, tak aby to sedělo
+    // to samé ideálně udělat i pro politiky - sjednotit prostě tyhle stavy
+    // politici už to mají
+    // je potřeba následující data převést do PuEvent a vyplnit:
+    // rok, dotazovanaInformace = 1, komunikacnikanal = 0, podle stavu vyplnit typ,
+    // smer = 2, poznamka = "zpetne doplneni informace"
     public static PuOrganizaceMetadata.Description GetMetadataDescriptionUrednici(this PuOrganizace org, int rok)
     {
         var res = new PuOrganizaceMetadata.Description();
@@ -470,13 +490,21 @@ select distinct ds.DatovaSchranka, f.ico from firma f
             .ToListAsync();
     }
     
-    public static async Task<List<PuPlat>> GetTop100PlatuAsync(int year)
+    public static async Task<List<PuPlat>> GetTop100PlatuAsync(int year, string tag = null)
     {
         await using var db = new DbEntities();
 
-        return await db.PuPlaty
+        var query = db.PuPlaty
             .AsNoTracking()
-            .Where(p => p.Rok == year)
+            .Where(p => p.Rok == year);
+
+        if (!string.IsNullOrEmpty(tag))
+        {
+            var normalizedTag = PuOrganizaceTag.NormalizeTag(tag);
+            query = query.Where(p => p.Organizace.Tags.Any(t => t.TagNormalized == normalizedTag));
+        }
+
+        return await query
             .OrderByDescending(p => ((p.Plat ?? 0) + (p.Odmeny ?? 0)) * (1 / (p.Uvazek ?? 1)) / (p.PocetMesicu ?? 12))
             .Include(p => p.Organizace).ThenInclude(o => o.FirmaDs)
             .Take(100)
@@ -723,10 +751,6 @@ select distinct ds.DatovaSchranka, f.ico from firma f
         if (string.IsNullOrWhiteSpace(_event.IcoOrganizace))
         {
             throw new ArgumentException("ICO is missing");
-        }
-        if (string.IsNullOrWhiteSpace(_event.OsobaNameId))
-        {
-            throw new ArgumentException("OsobaNameId is missing");
         }
 
         PuEvent? original = null;

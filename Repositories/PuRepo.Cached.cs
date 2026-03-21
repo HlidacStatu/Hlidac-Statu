@@ -27,11 +27,11 @@ public static partial class PuRepo
             );
         }
         
-        public static async Task<List<PuPlat>> GetTop100PlatuAsync(int year)
+        public static async Task<List<PuPlat>> GetTop100PlatuAsync(int year, string tag = null)
         {
             return await CacheService.Cache.GetOrSetAsync<List<PuPlat>>(
-                $"{nameof(PuRepo.GetTop100PlatuAsync)}_{year}",
-                async _ => await PuRepo.GetTop100PlatuAsync(year)
+                $"{nameof(PuRepo.GetTop100PlatuAsync)}_{year}_{tag}",
+                async _ => await PuRepo.GetTop100PlatuAsync(year, tag)
             );
         }
 
