@@ -116,7 +116,10 @@ FROM Vlastnik_Provozovatel_Vozidla p
 INNER JOIN Vypis_Vozidel v ON p.Pcv = v.Pcv
     AND v.PCV in (
      select top 200 pcv from vypis_vozidel 
-        where (YEAR(Datum_1_registrace_v_CR) = @rok OR @rok IS NULL)
+        where 
+            ((Datum_1_registrace_v_CR >= DATEFROMPARTS(@rok, 1, 1) 
+                   AND Datum_1_registrace_v_CR < DATEFROMPARTS(@rok + 1, 1, 1))
+                   OR @rok IS NULL)
                     AND Max_vykon IS NOT NULL
                     AND Max_vykon > 0
                 ORDER BY Max_vykon DESC
@@ -136,6 +139,7 @@ INNER JOIN (
             and (f.ico = '{id}' or '{id}' is null or '{id}'='')
 
 ORDER BY v.Max_vykon DESC
+OPTION (RECOMPILE)
 ";
 
             var items = await Repo.ExecuteVehicleQueryAsync(sql, new[] { new SqlParameter("@rok", (object)rok ?? DBNull.Value) });
@@ -187,7 +191,11 @@ FROM Vlastnik_Provozovatel_Vozidla p
 INNER JOIN Vypis_Vozidel v ON p.Pcv = v.Pcv
     AND v.PCV in (
      select top 200 pcv from vypis_vozidel 
-        where (YEAR(Datum_1_registrace_v_CR) = @rok or @rok IS NULL)
+        where 
+            ((Datum_1_registrace_v_CR >= DATEFROMPARTS(@rok, 1, 1) 
+                   AND Datum_1_registrace_v_CR < DATEFROMPARTS(@rok + 1, 1, 1))
+                   OR @rok IS NULL)
+
                     AND Nejvyssi_rychlost IS NOT NULL
                     AND Nejvyssi_rychlost > 0
                 ORDER BY Nejvyssi_rychlost DESC
@@ -208,7 +216,9 @@ INNER JOIN (
             and (f.ico = '{id}' or '{id}' is null or '{id}'='')
 
 
-    ORDER BY v.Nejvyssi_rychlost DESC";
+    ORDER BY v.Nejvyssi_rychlost DESC
+OPTION (RECOMPILE)
+";
 
             var items = await Repo.ExecuteVehicleQueryAsync(sql, new[] { new SqlParameter("@rok", (object)rok ?? DBNull.Value) });
             ViewBag.StatniOnly = statniOnly;
@@ -260,7 +270,11 @@ FROM Vlastnik_Provozovatel_Vozidla p
 INNER JOIN Vypis_Vozidel v ON p.Pcv = v.Pcv
     AND v.PCV in (
      select top 200 pcv from vypis_vozidel 
-            WHERE (YEAR(Datum_1_registrace_v_CR) = @rok OR @rok IS NULL)
+        WHERE 
+            ((Datum_1_registrace_v_CR >= DATEFROMPARTS(@rok, 1, 1) 
+                   AND Datum_1_registrace_v_CR < DATEFROMPARTS(@rok + 1, 1, 1))
+                   OR @rok IS NULL)
+
                 AND UPPER(Tovarni_znacka) IN ({brandList})
             ORDER BY Max_vykon DESC
      )
@@ -276,7 +290,9 @@ INNER JOIN (
 
     inner join firmy.dbo.Firma f  with (nolock) on f.ICO = p.ICO and f.typ>={(statniOnly ? "9" : "0")}
             and (f.ico = '{id}' or '{id}' is null or '{id}'='')
-    ORDER BY v.Max_vykon DESC";
+    ORDER BY v.Max_vykon DESC
+OPTION (RECOMPILE)
+";
 
             var items = await Repo.ExecuteVehicleQueryAsync(sql, new[] { new SqlParameter("@rok", (object)rok ?? DBNull.Value) });
             ViewBag.StatniOnly = statniOnly;
@@ -369,11 +385,20 @@ INNER JOIN (
                     MIN(v.logoslug) AS logoslug,
                     COUNT(*) AS Pocet
                 FROM vypis_vozidel v WITH (NOLOCK)
-                WHERE (YEAR(v.Datum_1_registrace_v_CR) = @rok OR @rok IS NULL)
+                WHERE 
+                    ((v.Datum_1_registrace_v_CR >= DATEFROMPARTS(@rok, 1, 1) 
+                           AND v.Datum_1_registrace_v_CR < DATEFROMPARTS(@rok + 1, 1, 1))
+                           OR @rok IS NULL)
+                    AND NOT EXISTS (
+                            SELECT 1 FROM vozidla_vyrazena_z_provozu vzp with (nolock)
+                            WHERE vzp.PCV = v.PCV
+                        )
+
                     AND v.Tovarni_znacka IS NOT NULL
                     {StatniOnlyFilter(statniOnly)}
                 GROUP BY v.Tovarni_znacka
-                ORDER BY Pocet DESC";
+                ORDER BY Pocet DESC
+OPTION (RECOMPILE)";
 
             var items = new List<BrandStatItem>();
             await using var connection = new SqlConnection(RegistrVozidelCnnStr);
@@ -414,8 +439,7 @@ INNER JOIN (
                     SUM(CASE WHEN v.Hybridni_vozidlo = 1 THEN 1 ELSE 0 END) AS Hybridni,
                     COUNT(*) AS Celkem
                 FROM vypis_vozidel v WITH (NOLOCK)
-                WHERE v.Datum_1_registrace_v_CR IS NOT NULL
-                    AND YEAR(v.Datum_1_registrace_v_CR) >= 2010
+                WHERE v.Datum_1_registrace_v_CR IS NOT NULL                    
                     {StatniOnlyFilter(statniOnly)}
                 GROUP BY YEAR(v.Datum_1_registrace_v_CR)
                 ORDER BY Rok";
@@ -452,12 +476,17 @@ INNER JOIN (
                     COUNT(*) AS Pocet
                 FROM vozidla_dovoz d WITH (NOLOCK)
                 INNER JOIN vypis_vozidel v WITH (NOLOCK) ON d.PCV = v.PCV
-                WHERE (YEAR(d.Datum_dovozu) = @rok OR @rok IS NULL)
+                WHERE (
+                    (v.Datum_dovozu >= DATEFROMPARTS(@rok, 1, 1) 
+                       AND v.Datum_dovozu < DATEFROMPARTS(@rok + 1, 1, 1))
+                   OR @rok IS NULL)
+                    
                     AND d.Stat IS NOT NULL
                     AND d.Stat <> ''
                     {StatniOnlyFilter(statniOnly)}
                 GROUP BY d.Stat
-                ORDER BY Pocet DESC";
+                ORDER BY Pocet DESC
+";
 
             var items = new List<ImportStatItem>();
             await using var connection = new SqlConnection(RegistrVozidelCnnStr);
@@ -537,18 +566,27 @@ ORDER BY PrumernyVek desc
 
         // ==================== Additional Report: Fuel type distribution by year ====================
 
-        public async Task<ActionResult> RozdeleniPaliv(int? rok)
+        public async Task<ActionResult> RozdeleniPaliv(int? rok, bool statniOnly = false)
         {
             var sql = $@"
                 SELECT
-                    v.Palivo,
+                    v.Palivo_Kategorie,
                     COUNT(*) AS Pocet
                 FROM vypis_vozidel v WITH (NOLOCK)
-                WHERE (YEAR(v.Datum_1_registrace_v_CR) = @rok OR @rok IS NULL)
-                    AND v.Palivo IS NOT NULL
-                    AND v.Palivo <> ''
-                GROUP BY v.Palivo
-                ORDER BY Pocet DESC";
+                WHERE 
+                    ((v.Datum_1_registrace_v_CR >= DATEFROMPARTS(@rok, 1, 1)
+                          AND v.Datum_1_registrace_v_CR < DATEFROMPARTS(@rok + 1, 1, 1))
+                       OR @rok IS NULL)
+                    AND v.Palivo_Kategorie IS NOT NULL
+                    AND v.Palivo_Kategorie <> ''
+                    AND NOT EXISTS (
+                            SELECT 1 FROM vozidla_vyrazena_z_provozu vzp with (nolock)
+                            WHERE vzp.PCV = v.PCV
+                        )
+                    {StatniOnlyFilter(statniOnly)}
+                GROUP BY v.Palivo_Kategorie
+                ORDER BY Pocet DESC
+OPTION (RECOMPILE) ";
 
             var items = new List<FuelStatItem>();
             int totalCount = 0;
