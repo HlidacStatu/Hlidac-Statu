@@ -10,11 +10,18 @@
     Layout = null;
 
     bool historicke = this.Context.Request.Query.ContainsKey("historicky");
+    bool bezSTK = ViewBag.BezSTK ?? false;
 
-
-    List<VozidloLightPerIco> vozidla =
-        await HlidacStatu.RegistrVozidel.Repo.Cached.GetForICOAsync(this.Model.ICO);
-
+    List<VozidloLightPerIco> vozidla;
+    
+    if (bezSTK)
+    {
+        vozidla = await HlidacStatu.RegistrVozidel.Repo.PropadleSTKListAsync(this.Model.ICO);
+    }
+    else
+    {
+        vozidla = await HlidacStatu.RegistrVozidel.Repo.Cached.GetForICOAsync(this.Model.ICO);
+    }
 
     ReportDataSource<VozidloLightPerIco> rds = new(
         new[]
@@ -102,8 +109,15 @@
 }
 
 <div id="subjcontent_toc">
-
-    @if (historicke == false)
+    @if (bezSTK)
+    {
+        <h3>Vozidla bez STK</h3>
+        <p class="text-muted">Registr vozidel obsahuje i nepřesné a neaktualizované údaje. 
+            Námi zobrazené data přesně odpovídají obsahu uveřejněného registru smluv.</p>
+        @Html.DataToHTMLTable(rds, dataTableOptions: HtmlExtensions.DatatableOptions(pageLength: 20))
+        
+    }
+    else if (historicke == false)
     {
         <h3>Aktuální vozový park</h3>
 

@@ -37,11 +37,12 @@ namespace HlidacStatu.Web.Controllers
             return result;
         }
 
-        public async Task<ActionResult> VozovyParkList(string id)
+        public async Task<ActionResult> VozovyParkList(string id, bool bezSTK = false)
         {
             var (isProperResult, firma, result) = await TryGetCompanyAsync(id);
             if (isProperResult)
             {
+                ViewBag.BezSTK = bezSTK;
                 (Firma firma, string viewName, string title) model = (firma, "VozovyParkList", $"{firma.Jmeno} - Vozový park");
                 return View("_subjektLayout", model);
             }
