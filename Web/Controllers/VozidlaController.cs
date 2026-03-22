@@ -133,7 +133,7 @@ INNER JOIN (
     GROUP BY Pcv
 ) stk
     ON p.Pcv = stk.Pcv
-    inner join firmy.dbo.Firma f  with (nolock) on f.ICO = .ICO and f.typ>={(statniOnly ? "9" : "0")}
+    inner join firmy.dbo.Firma f  with (nolock) on f.ICO = p.ICO and f.typ>={(statniOnly ? "9" : "0")}
             and (f.ico = '{id}' or '{id}' is null or '{id}'='') and p.Aktualni = 1
 
 ORDER BY v.Max_vykon DESC
@@ -516,7 +516,7 @@ OPTION (RECOMPILE)";
         public async Task<ActionResult> StariVozidel(bool statniOnly = false)
         {
             var sql = $@"
-SELECT TOP 30
+SELECT TOP 100
     v.logoslug,
     AVG(CAST(DATEDIFF(YEAR, v.Datum_1_registrace, GETDATE()) AS FLOAT)) AS PrumernyVek,
     COUNT(*) AS Pocet
@@ -533,7 +533,7 @@ WHERE v.Datum_1_registrace IS NOT NULL
     AND Tovarni_znacka IS NOT NULL
     {StatniOnlyFilter(statniOnly)}
 GROUP BY v.logoslug
---HAVING COUNT(*) >= 2
+HAVING COUNT(*) >= 100
 ORDER BY PrumernyVek desc
 
 ";
@@ -549,10 +549,10 @@ ORDER BY PrumernyVek desc
             {
                 items.Add(new AgeStatItem
                 {
-                    Brand = await reader.IsDBNullAsync(0) ? null : reader.GetString(0),
-                    LogoSlug = await reader.IsDBNullAsync(1) ? null : reader.GetString(1),
-                    AverageAge = await reader.IsDBNullAsync(2) ? 0 : reader.GetDouble(2),
-                    Count = reader.GetInt32(3)
+                    Brand= await reader.IsDBNullAsync(1) ? null : reader.GetString(0),
+                    LogoSlug = await reader.IsDBNullAsync(1) ? null : reader.GetString(0),
+                    AverageAge = await reader.IsDBNullAsync(2) ? 0 : reader.GetDouble(1),
+                    Count = reader.GetInt32(2)
                 });
             }
 
