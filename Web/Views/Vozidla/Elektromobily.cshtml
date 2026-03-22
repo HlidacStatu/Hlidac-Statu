@@ -8,7 +8,7 @@
 @section breadcrumb
 {
     <ol class="breadcrumb">
-        <li><a href="/">Hlidac Statu</a></li>
+        <li><a href="/">Hlídač Státu</a></li>
         <li><a href="/vozidla">Registr vozidel</a></li>
         <li><a href="/vozidla/Statistiky">Statistiky</a></li>
         <li class="active">Elektromobily a hybridy</li>
@@ -16,21 +16,21 @@
 }
 
 <h3 class="mt-2">
-    <i class="fa-solid fa-bolt me-2"></i>Vyvoj registraci elektrickych a hybridnich vozidel
+    <i class="fa-solid fa-bolt me-2"></i>Vývoj registrací elektrických a hybridních vozidel
 </h3>
-<p class="text-muted">Pocty nove registrovanych elektrickych a hybridnich osobnich automobilu od roku 2010.</p>
+<p class="text-muted">Počty nově registrovaných elektrických a hybridních osobních automobilů od roku 2010.</p>
 
 <form method="get" class="d-flex align-items-center gap-3 mb-3 flex-wrap">
     <div class="form-check">
         <input class="form-check-input" type="checkbox" name="statniOnly" value="true" id="statniOnly"
                @(((bool?)ViewBag.StatniOnly == true) ? "checked" : "") onchange="this.form.submit()" />
-        <label class="form-check-label" for="statniOnly">Pouze statni organizace</label>
+        <label class="form-check-label" for="statniOnly">Pouze státní organizace</label>
     </div>
 </form>
 
 @if (!Model.Any())
 {
-    <div class="alert alert-info mt-3">Zadna data.</div>
+    <div class="alert alert-info mt-3">Žádná data.</div>
 }
 else
 {
@@ -39,13 +39,13 @@ else
             <thead class="table-dark">
                 <tr>
                     <th>Rok</th>
-                    <th class="text-end">Elektricka</th>
-                    <th class="text-end">Hybridni</th>
+                    <th class="text-end">Elektrická</th>
+                    <th class="text-end">Hybridní</th>
                     <th class="text-end">EV + hybrid celkem</th>
-                    <th class="text-end">Vse celkem</th>
-                    <th class="text-end">Podil EV</th>
-                    <th class="text-end">Podil hybrid</th>
-                    <th style="min-width:200px">EV podil</th>
+                    <th class="text-end">Vše celkem</th>
+                    <th class="text-end">Podíl EV</th>
+                    <th class="text-end">Podíl hybrid</th>
+                    <th style="min-width:200px">EV podíl</th>
                 </tr>
             </thead>
             <tbody>
@@ -67,7 +67,7 @@ else
                             <div class="progress" style="height: 1.2rem;">
                                 <div class="progress-bar bg-success" role="progressbar"
                                      style="width: @(Math.Min(evPercent * 2, 100).ToString("F1", CultureInfo.InvariantCulture))%"
-                                     title="Elektricka: @evPercent.ToString("F2")%">
+                                     title="Elektrická: @evPercent.ToString("F2")%">
                                     @if (evPercent > 2)
                                     {
                                         @($"{evPercent:F1}%")
@@ -75,7 +75,7 @@ else
                                 </div>
                                 <div class="progress-bar bg-info" role="progressbar"
                                      style="width: @(Math.Min(hybridPercent * 2, 100).ToString("F1", CultureInfo.InvariantCulture))%"
-                                     title="Hybridni: @hybridPercent.ToString("F2")%">
+                                     title="Hybridní: @hybridPercent.ToString("F2")%">
                                     @if (hybridPercent > 2)
                                     {
                                         @($"{hybridPercent:F1}%")
@@ -90,8 +90,8 @@ else
     </div>
 
     <div class="mt-2 small text-muted">
-        <span class="badge bg-success">Elektricka</span>
-        <span class="badge bg-info">Hybridni</span>
-        <span class="ms-2">(Sloupcovy graf je 2x zvetseny pro lepsi citelnost)</span>
+        <span class="badge bg-success">Elektrická</span>
+        <span class="badge bg-info">Hybridní</span>
+        <span class="ms-2">(Sloupcový graf je 2x zvětšený pro lepší čitelnost)</span>
     </div>
 }

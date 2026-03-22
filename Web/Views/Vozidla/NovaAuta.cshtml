@@ -1,7 +1,7 @@
 @model List<HlidacStatu.RegistrVozidel.Models.VozidloLightPerIco>
 @using System.Globalization
 @{
-    ViewBag.Title = "Nove registrovana auta";
+    ViewBag.Title = "Nově registrovaná auta";
     ViewBag.SubTitle = "Registr vozidel";
     bool statniOnly = (bool?)ViewBag.StatniOnly == true;
 }
@@ -9,46 +9,46 @@
 @section breadcrumb
 {
     <ol class="breadcrumb">
-        <li><a href="/">Hlidac Statu</a></li>
+        <li><a href="/">Hlídač Státu</a></li>
         <li><a href="/vozidla">Registr vozidel</a></li>
         <li><a href="/vozidla/Statistiky">Statistiky</a></li>
-        <li class="active">Nova auta</li>
+        <li class="active">Nová auta</li>
     </ol>
 }
 
 <h3 class="mt-2">
-    <i class="fa-solid fa-calendar-plus me-2"></i>Nove registrovana osobni auta za posledni mesic
+    <i class="fa-solid fa-calendar-plus me-2"></i>Nově registrovaná osobní auta za poslední měsíc
 </h3>
-<p class="text-muted">Vozidla prvne registrovana v CR behem poslednich 30 dni.</p>
+<p class="text-muted">Vozidla prvně registrovaná v ČR během posledních 30 dní.</p>
 
 <form method="get" class="d-flex align-items-center gap-3 mb-3 flex-wrap">
     <div class="form-check">
         <input class="form-check-input" type="checkbox" name="statniOnly" value="true" id="statniOnly"
                @(statniOnly ? "checked" : "") onchange="this.form.submit()" />
-        <label class="form-check-label" for="statniOnly">Pouze statni organizace</label>
+        <label class="form-check-label" for="statniOnly">Pouze státní organizace</label>
     </div>
 </form>
 
 @if (!Model.Any())
 {
-    <div class="alert alert-info mt-3">Zadna nova registrace za posledni mesic.</div>
+    <div class="alert alert-info mt-3">Žádná nová registrace za poslední měsíc.</div>
 }
 else
 {
-    <p class="mb-3"><strong>Pocet registraci:</strong> @Model.Count</p>
+    <p class="mb-3"><strong>Počet registrací:</strong> @Model.Count</p>
     <div class="table-responsive mt-3">
         <table class="table table-striped table-hover align-middle">
             <thead class="table-dark">
                 <tr>
                     <th>#</th>
                     <th></th>
-                    <th>Znacka</th>
+                    <th>Značka</th>
                     <th>Model</th>
-                    <th class="text-end">Vykon (kW)</th>
+                    <th class="text-end">Výkon (kW)</th>
                     <th class="text-end">Max. rychlost</th>
                     <th>Palivo</th>
                     <th>Barva</th>
-                    <th>Rok vyroby</th>
+                    <th>Rok výroby</th>
                     <th>Registrace</th>
                     <th></th>
                 </tr>

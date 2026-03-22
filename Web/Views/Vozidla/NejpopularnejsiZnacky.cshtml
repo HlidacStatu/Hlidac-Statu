@@ -1,30 +1,30 @@
 @model HlidacStatu.RegistrVozidel.Models.BrandYearReport
 @using System.Globalization
 @{
-    ViewBag.Title = "Nejpopularnejsi znacky" + (Model.SelectedYear.HasValue ? $" - {Model.SelectedYear}" : "");
+    ViewBag.Title = "Nejpopulárnější značky" + (Model.SelectedYear.HasValue ? $" - {Model.SelectedYear}" : "");
     ViewBag.SubTitle = "Registr vozidel";
 }
 
 @section breadcrumb
 {
     <ol class="breadcrumb">
-        <li><a href="/">Hlidac Statu</a></li>
+        <li><a href="/">Hlídač Státu</a></li>
         <li><a href="/vozidla">Registr vozidel</a></li>
         <li><a href="/vozidla/Statistiky">Statistiky</a></li>
-        <li class="active">Nejpopularnejsi znacky</li>
+        <li class="active">Nejpopulárnější značky</li>
     </ol>
 }
 
 <h3 class="mt-2">
-    <i class="fa-solid fa-ranking-star me-2"></i>Nejpopularnejsi automobilove znacky @(Model.SelectedYear.HasValue ? $"v roce {Model.SelectedYear}" : "za vsechny roky")
+    <i class="fa-solid fa-ranking-star me-2"></i>Nejpopulárnější automobilové značky @(Model.SelectedYear.HasValue ? $"v roce {Model.SelectedYear}" : "za všechny roky")
 </h3>
-<p class="text-muted">Top 50 znacek podle poctu nove registrovanych osobnich automobilu.</p>
+<p class="text-muted">Top 50 značek podle počtu nově registrovaných osobních automobilů.</p>
 
 <form method="get" class="d-flex align-items-center gap-3 mb-3 flex-wrap">
     <div class="d-flex align-items-center gap-2">
         <label for="rok" class="form-label mb-0">Rok registrace:</label>
         <select name="rok" id="rok" class="form-select d-inline-block w-auto" onchange="this.form.submit()">
-            <option value="">Vsechny roky</option>
+            <option value="">Všechny roky</option>
             @foreach (var y in Model.AvailableYears)
             {
                 if (y == Model.SelectedYear)
@@ -41,18 +41,18 @@
     <div class="form-check">
         <input class="form-check-input" type="checkbox" name="statniOnly" value="true" id="statniOnly"
                @(((bool?)ViewBag.StatniOnly == true) ? "checked" : "") onchange="this.form.submit()" />
-        <label class="form-check-label" for="statniOnly">Pouze statni organizace</label>
+        <label class="form-check-label" for="statniOnly">Pouze státní organizace</label>
     </div>
 </form>
 
 @if (!Model.Items.Any())
 {
-    <div class="alert alert-info mt-3">Zadna data @(Model.SelectedYear.HasValue ? $"pro rok {Model.SelectedYear}" : "").</div>
+    <div class="alert alert-info mt-3">Žádná data @(Model.SelectedYear.HasValue ? $"pro rok {Model.SelectedYear}" : "").</div>
 }
 else
 {
     int totalRegistrations = Model.Items.Sum(i => i.Count);
-    <p class="mb-3"><strong>Celkem registraci:</strong> @totalRegistrations.ToString("N0", CultureInfo.GetCultureInfo("cs-CZ"))</p>
+    <p class="mb-3"><strong>Celkem registrací:</strong> @totalRegistrations.ToString("N0", CultureInfo.GetCultureInfo("cs-CZ"))</p>
 
     <div class="table-responsive mt-3">
         <table class="table table-striped table-hover align-middle">
@@ -60,9 +60,9 @@ else
                 <tr>
                     <th>#</th>
                     <th></th>
-                    <th>Znacka</th>
-                    <th class="text-end">Pocet registraci</th>
-                    <th class="text-end">Podil</th>
+                    <th>Značka</th>
+                    <th class="text-end">Počet registrací</th>
+                    <th class="text-end">Podíl</th>
                     <th style="min-width:200px"></th>
                 </tr>
             </thead>
