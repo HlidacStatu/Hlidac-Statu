@@ -422,7 +422,7 @@
                                             <th>IČO</th>
                                             <th>Adresa</th>
                                             <th>Období</th>
-                                            <th>Aktuální</th>
+                                            @* <th>Aktuální<br/>záznam</th> *@
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -442,18 +442,11 @@
                                                     }
                                                     </td>
                                                 <td>
-                                                    @if (HlidacStatu.Util.DataValidators.CheckCZICO(owner?.Ico))
-                                                    {
-                                                        <a href="/subjekt/@owner.Ico">@Display(owner?.Nazev)</a>
-                                                    }
-                                                    else
-                                                    {
-                                                        @Display(owner?.Ico)
-                                                    }
+                                                        <a href="/subjekt/@owner.Ico">@Display(owner?.Ico)</a>
                                                     </td>
                                                 <td>@Display(owner?.Adresa)</td>
                                                 <td>@Display(owner?.DatumOd) - @Display(owner?.DatumDo)</td>
-                                                <td>@Display(owner?.Aktualni)</td>
+                                                @* <td>@Display(owner?.Aktualni)</td> *@
                                             </tr>
                                         }
                                     </tbody>

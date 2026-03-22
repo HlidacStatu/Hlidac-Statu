@@ -1,4 +1,4 @@
-﻿@model HlidacStatu.Entities.Firma 
+﻿@model HlidacStatu.Entities.Firma
 @using System.Linq;
 @using HlidacStatu.RegistrVozidel.Models
 @using HlidacStatu.Repositories
@@ -9,15 +9,17 @@
 @{
     Layout = null;
 
-    List<VozidloLight> vozidlaRaw = 
+    bool historicke = this.Context.Request.Query.ContainsKey("historicky");
+
+
+    List<VozidloLightPerIco> vozidla =
         await HlidacStatu.RegistrVozidel.Repo.Cached.GetForICOAsync(this.Model.ICO);
-    List<VozidloLightPerIco> vozidla = VozidloLightPerIco.FromVozidloLight(vozidlaRaw);
 
 
     ReportDataSource<VozidloLightPerIco> rds = new(
         new[]
 {
-            new  ReportDataSource<VozidloLightPerIco>.Column() { 
+            new  ReportDataSource<VozidloLightPerIco>.Column() {
                 Name="Značka",
                 HtmlRender =(s) => {
                     return s.Tovarni_znacka;
@@ -55,7 +57,7 @@
                 Name="Rok výroby",
                 HtmlRender =(s) => {
                     return s.Rok_vyroby == null ? "&pm;"+s.Datum_1_registrace?.ToString("yyyy") : s.Rok_vyroby.ToString();
-                    
+
                 },
                 ValueRender = (s) => { return s.Rok_vyroby == null ? s.Datum_1_registrace?.ToString("yyyy") : s.Rok_vyroby.ToString(); },
                 TextRender = (s) => { return s.Rok_vyroby == null ? s.Datum_1_registrace?.ToString("yyyy") : s.Rok_vyroby.ToString();},
@@ -89,23 +91,30 @@
             },
         });
 
-    rds.AddRows(vozidla.Where(m=>m.Aktualni==true));
+    if (historicke)
+    {
+        rds.AddRows(vozidla.Where(m => m.Aktualni == false));
+    }
+    else
+    {
+        rds.AddRows(vozidla.Where(m => m.Aktualni == true));
+    }
 }
 
 <div id="subjcontent_toc">
 
-   <h3>Aktuální vozový park</h3>
+    @if (historicke == false)
+    {
+        <h3>Aktuální vozový park</h3>
 
-    @Html.DataToHTMLTable(rds, dataTableOptions: HtmlExtensions.DatatableOptions(pageLength: 20))
+        @Html.DataToHTMLTable(rds, dataTableOptions: HtmlExtensions.DatatableOptions(pageLength: 20))
 
-    @{
-        rds.Clear();
-        rds.AddRows(vozidla.Where(m=>m.Aktualni==false));
     }
-    <hr />
-    <h3>Historický vozový park</h3>
-    @Html.DataToHTMLTable(rds, dataTableOptions: HtmlExtensions.DatatableOptions(pageLength: 20, orderColumnIdx:4))
-
+    else
+    {
+        <h3>Historický vozový park</h3>
+        @Html.DataToHTMLTable(rds, dataTableOptions: HtmlExtensions.DatatableOptions(pageLength: 20, orderColumnIdx: 4))
+    }
 
 </div>
 

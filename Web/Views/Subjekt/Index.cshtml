@@ -1092,7 +1092,7 @@
     {
         <div>
             @{
-                List<HlidacStatu.RegistrVozidel.Models.VozidloLight> vozidla = await HlidacStatu.RegistrVozidel.Repo.Cached.GetForICOAsync(this.Model.ICO);
+                List<HlidacStatu.RegistrVozidel.Models.VozidloLightPerIco> vozidla = await HlidacStatu.RegistrVozidel.Repo.Cached.GetForICOAsync(this.Model.ICO);
             }
             @if (vozidla.Any())
             {
@@ -1101,14 +1101,14 @@
                 <p class="text-muted sub-header-info">Detailní informace o aktuálním i dřívějším vozovém parku organizace.</p>
                 <div>
                     <partial name="_renderVozidlaSouhrn"
-                             model="new Tuple<Firma, IEnumerable<HlidacStatu.RegistrVozidel.Models.VozidloLight>>(Model, vozidla.Where(m => m.Aktualni == true))" />
+                             model="new Tuple<Firma, IEnumerable<HlidacStatu.RegistrVozidel.Models.VozidloLightPerIco>>(Model, vozidla.Where(m => m.Aktualni == true))" />
 
                     <partial name="_renderVozidlaSouhrn"
-                             model="new Tuple<Firma, IEnumerable<HlidacStatu.RegistrVozidel.Models.VozidloLight>>(Model, vozidla.Where(m => m.Aktualni == false))" />
+                             model="new Tuple<Firma, IEnumerable<HlidacStatu.RegistrVozidel.Models.VozidloLightPerIco>>(Model, vozidla.Where(m => m.Aktualni == false))" />
 
                 </div>
                 <p class="text-center">
-                    <a href="/subjekt/vozovypark/@Model.ICO" class='btn btn-hs btn-primary btn-sm my-3 position-relative'>Celý vozový park podrobně <span class='position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger'>@(HlidacStatu.Util.RenderData.NiceNumber(vozidla.Count))</span></a>
+                    <a href="/subjekt/vozovyparkPrehled/@Model.ICO" class='btn btn-hs btn-primary btn-sm my-3 position-relative'>Celý vozový park podrobně <span class='position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger'>@(HlidacStatu.Util.RenderData.NiceNumber(vozidla.Count))</span></a>
                 </p>
                 <hr />
 

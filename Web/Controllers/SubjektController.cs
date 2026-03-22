@@ -25,13 +25,24 @@ namespace HlidacStatu.Web.Controllers
             return result;
 
         }
-
-        public async Task<ActionResult> VozovyPark(string id)
+        public async Task<ActionResult> VozovyParkPrehled(string id)
         {
             var (isProperResult, firma, result) = await TryGetCompanyAsync(id);
             if (isProperResult)
             {
-                (Firma firma, string viewName, string title) model = (firma, "VozovyPark", $"{firma.Jmeno} - Vozový park");
+                (Firma firma, string viewName, string title) model = (firma, "VozovyParkPrehled", $"{firma.Jmeno} - Přehled vozového parku");
+                return View("_subjektLayout", model);
+            }
+
+            return result;
+        }
+
+        public async Task<ActionResult> VozovyParkList(string id)
+        {
+            var (isProperResult, firma, result) = await TryGetCompanyAsync(id);
+            if (isProperResult)
+            {
+                (Firma firma, string viewName, string title) model = (firma, "VozovyParkList", $"{firma.Jmeno} - Vozový park");
                 return View("_subjektLayout", model);
             }
 

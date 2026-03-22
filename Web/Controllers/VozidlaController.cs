@@ -36,7 +36,7 @@ namespace HlidacStatu.Web.Controllers
         private static string StatniOnlyFilter(bool statniOnly, string pcvColumn = "v.PCV")
         {
             return statniOnly
-                ? $"AND EXISTS (SELECT 1 FROM vlastnik_provozovatel_vozidla vl WITH (NOLOCK) INNER JOIN firmy.dbo.Firma f WITH (NOLOCK) ON f.ICO = vl.ICO AND f.typ >= 9 WHERE vl.PCV = {pcvColumn})"
+                ? $"AND EXISTS (SELECT 1 FROM vlastnik_provozovatel_vozidla vl WITH (NOLOCK) INNER JOIN firmy.dbo.Firma f WITH (NOLOCK) ON f.ICO = vl.ICO AND f.typ >= 9 WHERE vl.PCV = {pcvColumn} and  and vl.Aktualni = 1)"
                 : "";
         }
 
@@ -133,10 +133,8 @@ INNER JOIN (
     GROUP BY Pcv
 ) stk
     ON p.Pcv = stk.Pcv
-    inner join vlastnik_provozovatel_vozidla vl with (nolock) on v.PCV = vl.PCV
-
-    inner join firmy.dbo.Firma f  with (nolock) on f.ICO = vl.ICO and f.typ>={(statniOnly ? "9" : "0")}
-            and (f.ico = '{id}' or '{id}' is null or '{id}'='')
+    inner join firmy.dbo.Firma f  with (nolock) on f.ICO = .ICO and f.typ>={(statniOnly ? "9" : "0")}
+            and (f.ico = '{id}' or '{id}' is null or '{id}'='') and p.Aktualni = 1
 
 ORDER BY v.Max_vykon DESC
 OPTION (RECOMPILE)
@@ -210,10 +208,8 @@ INNER JOIN (
     GROUP BY Pcv
 ) stk
     ON p.Pcv = stk.Pcv
-    inner join vlastnik_provozovatel_vozidla vl with (nolock) on v.PCV = vl.PCV
-
-    inner join firmy.dbo.Firma f  with (nolock) on f.ICO = vl.ICO and f.typ>={(statniOnly ? "9" : "0")}
-            and (f.ico = '{id}' or '{id}' is null or '{id}'='')
+    inner join firmy.dbo.Firma f  with (nolock) on f.ICO = p.ICO and f.typ>={(statniOnly ? "9" : "0")}
+            and (f.ico = '{id}' or '{id}' is null or '{id}'='') and p.Aktualni = 1
 
 
     ORDER BY v.Nejvyssi_rychlost DESC
@@ -289,7 +285,7 @@ INNER JOIN (
 ) stk ON p.Pcv = stk.Pcv
 
     inner join firmy.dbo.Firma f  with (nolock) on f.ICO = p.ICO and f.typ>={(statniOnly ? "9" : "0")}
-            and (f.ico = '{id}' or '{id}' is null or '{id}'='')
+            and (f.ico = '{id}' or '{id}' is null or '{id}'='') and p.Aktualni = 1
     ORDER BY v.Max_vykon DESC
 OPTION (RECOMPILE)
 ";
@@ -344,7 +340,7 @@ INNER JOIN Vypis_Vozidel v ON p.Pcv = v.Pcv
     and v.pcv in 
         (select top 300 pcv from Vypis_vozidel order by Datum_1_registrace_v_CR DESC)
 inner join firmy.dbo.Firma f  with (nolock) on f.ICO = p.ICO and f.typ>={(statniOnly ? "9" : "0")}
-        and (f.ico = '{id}' or '{id}' is null or '{id}'='')
+        and (f.ico = '{id}' or '{id}' is null or '{id}'='') and p.Aktualni = 1
 
 INNER JOIN (
     SELECT
@@ -537,7 +533,7 @@ WHERE v.Datum_1_registrace IS NOT NULL
     AND Tovarni_znacka IS NOT NULL
     {StatniOnlyFilter(statniOnly)}
 GROUP BY v.logoslug
-HAVING COUNT(*) >= 5
+--HAVING COUNT(*) >= 2
 ORDER BY PrumernyVek desc
 
 ";
