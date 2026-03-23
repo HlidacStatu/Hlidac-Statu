@@ -77,7 +77,7 @@
                                         <a asp-action="Detail" asp-route-id="@org.DS">@org.Nazev</a>
                                     </td>
                                     <td class="col-3">
-                                        @Html.Raw(org.PlatyForYearUredniciDescriptionHtml(YearPicker.PuDefaultYear))
+                                        @Html.Raw(await org.PlatyForYearUredniciDescriptionHtmlAsync(YearPicker.PuDefaultYear))
                                     </td>
                                     @if (org.Platy.AktualniRok(YearPicker.PuDefaultYear).Any())
                                     {

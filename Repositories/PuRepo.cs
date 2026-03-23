@@ -39,13 +39,12 @@ public static partial class PuRepo
         "životní prostředí",
         "ostatní"
     ];
-    
-    
+
 
     public static async Task<List<string>> GetAllTagsAsync()
     {
         await using var db = new DbEntities();
-        
+
         return await db.PuOrganizaceTags
             .AsNoTracking()
             .Select(t => t.Tag)
@@ -100,8 +99,6 @@ public static partial class PuRepo
 
         return res;
     }
-
-    
 
 
     public static async Task<PuRokOrganizaceStat> GetGlobalStatOrganizaceAsync(int rok)
@@ -172,6 +169,7 @@ public static partial class PuRepo
     {
         return await GetFullDetailUpToYearAsync(new string[] { datovaSchranka }, maxYear);
     }
+
     /// <summary>
     /// Returns Full info about Organizace, its metadata, tags and platy
     /// </summary>
@@ -180,7 +178,7 @@ public static partial class PuRepo
     public static async Task<PuOrganizace> GetFullDetailUpToYearAsync(string[] datovaSchranky, int? maxYear)
     {
         await using var db = new DbEntities();
-        
+
         IQueryable<PuOrganizace> query = db.PuOrganizace
             .Where(pu => datovaSchranky.Contains(pu.DS))
             .Include(o => o.Metadata)
@@ -220,6 +218,7 @@ public static partial class PuRepo
             query = query.Where(pu =>
                 pu.Metadata.Any(m => m.Rok == year.Value) || pu.Platy.Any(p => p.Rok == year.Value));
         }
+
         var data = await query.ToListAsync();
         data = data
             .Where(o => o.Tags.Any())
@@ -260,93 +259,174 @@ public static partial class PuRepo
     }
 
 
-    //todo: tohle předělat do eventů + nafingovat historicky eventy, tak aby to sedělo
-    // to samé ideálně udělat i pro politiky - sjednotit prostě tyhle stavy
-    // politici už to mají
-    // je potřeba následující data převést do PuEvent a vyplnit:
-    // rok, dotazovanaInformace = 1, komunikacnikanal = 0, podle stavu vyplnit typ,
-    // smer = 2, poznamka = "zpetne doplneni informace"
-    public static PuOrganizaceMetadata.Description GetMetadataDescriptionUrednici(this PuOrganizace org, int rok)
+    //this became old
+    // public static PuOrganizaceMetadata.Description GetMetadataDescriptionUrednici(this PuOrganizace org, int rok)
+    // {
+    //     var res = new PuOrganizaceMetadata.Description();
+    //
+    //     var metadataList = org.MetadataPlatyUredniku
+    //         .Where(m => m.Rok == rok && m.Typ == PuOrganizaceMetadata.TypMetadat.PlatyUredniku).ToList();
+    //     //ted pracuju pouze s jednou
+    //     var metadata = metadataList.FirstOrDefault();
+    //
+    //     if (org.Platy.AktualniRok(rok).Count == 0 &&
+    //         PuRepo.GetNeaktivniOrganizace().ToArray().Any(m => m.Item1 == org.DS))
+    //     {
+    //         res.TextStatus = "Této organizace jsme se na platy neptali";
+    //         res.Detail = "";
+    //         res.BootstrapStatus = "primary";
+    //         res.Icon = "fa-solid fa-question-circle";
+    //     }
+    //     else if (metadata == null)
+    //     {
+    //         res.TextStatus = "Této organizace jsme se na platy neptali";
+    //         res.Detail = "";
+    //         res.BootstrapStatus = "primary";
+    //         res.Icon = "fa-solid fa-question-circle";
+    //     }
+    //     else if (metadata.DatumPrijetiOdpovedi == null)
+    //     {
+    //         res.TextStatus = $"{metadata.DatumOdeslaniZadosti:d. M. yyyy} Odeslána žádost o platy";
+    //         res.Detail = "Data jsme zatím nedostali nebo nezpracovali.";
+    //         res.BootstrapStatus = "primary";
+    //         res.Icon = "fa-solid fa-question-circle";
+    //     }
+    //     else if (org.Platy.AktualniRok(rok).Count == 0)
+    //     {
+    //         res.TextStatus = "Odmítli poskytnout platy";
+    //         res.Detail = metadata.PoznamkaHlidace;
+    //         res.BootstrapStatus = "danger";
+    //         res.Icon = "fa-solid fa-circle-xmark";
+    //     }
+    //     else if (org.Platy.AktualniRok(rok).Count == 1)
+    //     {
+    //         res.TextStatus = "Evidujeme jeden plat jedné pozice";
+    //         res.Detail = metadata.PoznamkaHlidace;
+    //         res.BootstrapStatus = "warning";
+    //         res.Icon = "fa-solid fa-circle-exclamation";
+    //     }
+    //     else if (org.Platy.AktualniRok(rok).Count < 5)
+    //     {
+    //         res.TextStatus = $"{org.Platy.AktualniRok(rok).Count} platy";
+    //         res.Detail = metadata.PoznamkaHlidace;
+    //         res.BootstrapStatus = "success";
+    //         res.Icon = "fa-solid fa-badge-check";
+    //     }
+    //     else
+    //     {
+    //         res.TextStatus = $"{org.Platy.AktualniRok(rok).Count} platů";
+    //         res.Detail = metadata.PoznamkaHlidace;
+    //         res.BootstrapStatus = "success";
+    //         res.Icon = "fa-solid fa-badge-check";
+    //     }
+    //
+    //     return res;
+    // }
+
+    public static async Task<PuOrganizaceMetadata.Description> GetMetadataDescriptionFromEventsUredniciAsync(
+        this PuOrganizace org, int rok)
     {
         var res = new PuOrganizaceMetadata.Description();
 
-        var metadataList = org.MetadataPlatyUredniku.Where(m => m.Rok == rok && m.Typ == PuOrganizaceMetadata.TypMetadat.PlatyUredniku).ToList();
-        //ted pracuju pouze s jednou
-        var metadata = metadataList.FirstOrDefault();
+        await using var db = new DbEntities();
 
-        if (org.Platy.AktualniRok(rok).Count == 0 && PuRepo.GetNeaktivniOrganizace().ToArray().Any(m => m.Item1 == org.DS))
+        var puEvents = await db.PuEvents.Where(e =>
+                e.ProRok == rok && org.Id == e.IdOrganizace &&
+                e.DotazovanaInformace == PuEvent.DruhDotazovaneInformace.Urednik)
+            .ToListAsync();
+
+        var request = puEvents
+            .FirstOrDefault(e => e.Smer == PuEvent.SmerKomunikace.ZpravaOdNas && e.Typ == PuEvent.TypUdalosti.ZaslaniZadosti);
+        
+        if (org.Platy.AktualniRok(rok).Count == 0 &&
+            PuRepo.GetNeaktivniOrganizace().ToArray().Any(m => m.Item1 == org.DS))
         {
             res.TextStatus = "Této organizace jsme se na platy neptali";
             res.Detail = "";
             res.BootstrapStatus = "primary";
             res.Icon = "fa-solid fa-question-circle";
+            return res;
         }
-        else if (metadata == null)
+
+        if (puEvents is null || puEvents.Count == 0 || request is null)
         {
             res.TextStatus = "Této organizace jsme se na platy neptali";
             res.Detail = "";
             res.BootstrapStatus = "primary";
             res.Icon = "fa-solid fa-question-circle";
-
+            return res;
         }
-        else if (metadata.DatumPrijetiOdpovedi == null)
+
+        var response = puEvents
+            .Where(e => e.Smer == PuEvent.SmerKomunikace.ZpravaProNas).OrderByDescending(e => e.Datum)
+            .FirstOrDefault();
+
+        var metadata = org.MetadataPlatyUredniku.FirstOrDefault(m => m.Rok == rok);
+
+        if (response is null)
         {
-            res.TextStatus = $"{metadata.DatumOdeslaniZadosti:d. M. yyyy} Odeslána žádost o platy";
+            res.TextStatus = $"{request.Datum:d. M. yyyy} Odeslána žádost o platy";
             res.Detail = "Data jsme zatím nedostali nebo nezpracovali.";
             res.BootstrapStatus = "primary";
             res.Icon = "fa-solid fa-question-circle";
-
+            return res;
         }
-        else if (org.Platy.AktualniRok(rok).Count == 0)
+        
+        if (response.Typ == PuEvent.TypUdalosti.CastecneOdmitnutiPoskytnutiInformaci ||
+            response.Typ == PuEvent.TypUdalosti.UplneOdmitnutiPoskytnutiInformaci)
         {
-            res.TextStatus = "Odmítli poskytnout platy";
-            res.Detail = metadata.PoznamkaHlidace;
+            res.TextStatus = response.GetEventDescription()?.Title;
+            res.Detail = metadata?.PoznamkaHlidace;
             res.BootstrapStatus = "danger";
             res.Icon = "fa-solid fa-circle-xmark";
+            return res;
         }
+        
         else if (org.Platy.AktualniRok(rok).Count == 1)
         {
             res.TextStatus = "Evidujeme jeden plat jedné pozice";
-            res.Detail = metadata.PoznamkaHlidace;
+            res.Detail = metadata?.PoznamkaHlidace;
             res.BootstrapStatus = "warning";
             res.Icon = "fa-solid fa-circle-exclamation";
         }
         else if (org.Platy.AktualniRok(rok).Count < 5)
         {
             res.TextStatus = $"{org.Platy.AktualniRok(rok).Count} platy";
-            res.Detail = metadata.PoznamkaHlidace;
+            res.Detail = metadata?.PoznamkaHlidace;
             res.BootstrapStatus = "success";
             res.Icon = "fa-solid fa-badge-check";
         }
         else
         {
             res.TextStatus = $"{org.Platy.AktualniRok(rok).Count} platů";
-            res.Detail = metadata.PoznamkaHlidace;
+            res.Detail = metadata?.PoznamkaHlidace;
             res.BootstrapStatus = "success";
             res.Icon = "fa-solid fa-badge-check";
         }
+
         return res;
     }
 
 
-
-    public static string PlatyForYearUredniciDescription(this PuOrganizace org, int rok)
+    public static async Task<string> PlatyForYearUredniciDescriptionAsync(this PuOrganizace org, int rok)
     {
-        var desc = org.GetMetadataDescriptionUrednici(rok);
+        var desc = await org.GetMetadataDescriptionFromEventsUredniciAsync(rok);
         return desc.TextStatus;
     }
 
 
-    public static string PlatyForYearUredniciDescriptionHtml(this PuOrganizace org, int rok, bool withDetail = false)
+    public static async Task<string> PlatyForYearUredniciDescriptionHtmlAsync(this PuOrganizace org, int rok, bool withDetail = false)
     {
-        var desc = org.GetMetadataDescriptionUrednici(rok);
+        var desc = await org.GetMetadataDescriptionFromEventsUredniciAsync(rok);
 
-        return $"<span class='text-{desc.BootstrapStatus}'><i class='{desc.Icon}'></i> {desc.TextStatus}{(withDetail ? $". {desc.Detail}" : "")}</span>";
+        return
+            $"<span class='text-{desc.BootstrapStatus}'><i class='{desc.Icon}'></i> {desc.TextStatus}{(withDetail ? $". {desc.Detail}" : "")}</span>";
     }
 
 
     static Devmasters.Cache.LocalMemory.AutoUpdatedCache<IEnumerable<Tuple<string, string>>> _neaktivniOrganizaceCache
-        = new Devmasters.Cache.LocalMemory.AutoUpdatedCache<IEnumerable<Tuple<string, string>>>(TimeSpan.FromHours(1), "NeaktivniOrganizace",
+        = new Devmasters.Cache.LocalMemory.AutoUpdatedCache<IEnumerable<Tuple<string, string>>>(TimeSpan.FromHours(1),
+            "NeaktivniOrganizace",
             (o) =>
             {
                 return DirectDB.Instance.GetList<string, string>(@"
@@ -356,8 +436,7 @@ select distinct ds.DatovaSchranka, f.ico from firma f
 	where f.status>1 	
 ");
             }
-
-            );
+        );
 
     /// <summary>
     /// dvojice datovaschranka , ICO
@@ -373,7 +452,7 @@ select distinct ds.DatovaSchranka, f.ico from firma f
     public static async Task<List<PuOrganizace>> GetActiveOrganizaceForTagAsync(string tag, int limit = 0)
     {
         var normalizedTag = PuOrganizaceTag.NormalizeTag(tag);
-        
+
         await using var db = new DbEntities();
 
         var query = db.PuOrganizaceTags
@@ -381,7 +460,8 @@ select distinct ds.DatovaSchranka, f.ico from firma f
             .Where(t => tag == null || t.TagNormalized.Equals(normalizedTag))
             .Where(t => t.Organizace.Metadata.Any(m => m.Typ == PuOrganizaceMetadata.TypMetadat.PlatyUredniku))
             .Include(t => t.Organizace).ThenInclude(o => o.FirmaDs)
-            .Include(t => t.Organizace).ThenInclude(o => o.Metadata.Where(m => m.Typ == PuOrganizaceMetadata.TypMetadat.PlatyUredniku))
+            .Include(t => t.Organizace).ThenInclude(o =>
+                o.Metadata.Where(m => m.Typ == PuOrganizaceMetadata.TypMetadat.PlatyUredniku))
             .Include(t => t.Organizace).ThenInclude(o => o.Platy)
             .Select(t => t.Organizace);
 
@@ -390,11 +470,11 @@ select distinct ds.DatovaSchranka, f.ico from firma f
 
         return await query.ToListAsync();
     }
-    
+
     public static async Task<PuOrganizaceTag> GetTagAsync(string tag)
     {
         var normalizedTag = PuOrganizaceTag.NormalizeTag(tag);
-        
+
         await using var db = new DbEntities();
 
         return await db.PuOrganizaceTags.AsNoTracking().FirstOrDefaultAsync(t => t.TagNormalized.Equals(normalizedTag));
@@ -489,7 +569,7 @@ select distinct ds.DatovaSchranka, f.ico from firma f
             .Include(p => p.Organizace).ThenInclude(o => o.FirmaDs)
             .ToListAsync();
     }
-    
+
     public static async Task<List<PuPlat>> GetTop100PlatuAsync(int year, string tag = null)
     {
         await using var db = new DbEntities();
@@ -548,7 +628,6 @@ select distinct ds.DatovaSchranka, f.ico from firma f
         }
 
 
-
         if (metadata is not null)
         {
             foreach (var metadatum in metadata)
@@ -572,6 +651,7 @@ select distinct ds.DatovaSchranka, f.ico from firma f
                 await UpsertPlatAsync(plat);
             }
         }
+
         return res;
     }
 
@@ -633,7 +713,7 @@ select distinct ds.DatovaSchranka, f.ico from firma f
         PuOrganizaceTag origTag;
         tag.Tag = tag.Tag.Trim();
         tag.TagNormalized = PuOrganizaceTag.NormalizeTag(tag.Tag);
-        
+
         await using var dbContext = new DbEntities();
         if (tag.Id == 0)
         {
@@ -742,7 +822,7 @@ select distinct ds.DatovaSchranka, f.ico from firma f
             return x.o;
         }).ToList();
     }
-    
+
 
     public static async Task<PuEvent> UpsertEventAsync(PuEvent _event, bool addNewCj)
     {
@@ -756,11 +836,12 @@ select distinct ds.DatovaSchranka, f.ico from firma f
         PuEvent? original = null;
         if (_event.Pk == 0)
         {
-            original = await dbContext.PuEvents.FirstOrDefaultAsync(o => o.IdOrganizace == _event.IdOrganizace 
-                                                                         && o.OsobaNameId == _event.OsobaNameId 
-                                                                         && o.Kanal == _event.Kanal 
+            original = await dbContext.PuEvents.FirstOrDefaultAsync(o => o.IdOrganizace == _event.IdOrganizace
+                                                                         && o.OsobaNameId == _event.OsobaNameId
+                                                                         && o.Kanal == _event.Kanal
                                                                          && o.ProRok == _event.ProRok
-                                                                         && o.DotazovanaInformace == _event.DotazovanaInformace
+                                                                         && o.DotazovanaInformace ==
+                                                                         _event.DotazovanaInformace
                                                                          && o.Smer == _event.Smer
                                                                          && o.Typ == _event.Typ
                                                                          && o.Kanal == _event.Kanal);
@@ -769,7 +850,7 @@ select distinct ds.DatovaSchranka, f.ico from firma f
         {
             original = await dbContext.PuEvents.FirstOrDefaultAsync(o => o.Pk == _event.Pk);
         }
-        
+
         if (original is null)
         {
             dbContext.PuEvents.Add(_event);
@@ -779,12 +860,12 @@ select distinct ds.DatovaSchranka, f.ico from firma f
             _event.Pk = original.Pk;
             dbContext.Entry(original).CurrentValues.SetValues(_event);
         }
+
         if (addNewCj && string.IsNullOrEmpty(_event.NaseCJ))
             _event.NaseCJ = await GetNewCisloJednaciAsync(_event.DotazovanaInformace);
         await dbContext.SaveChangesAsync();
 
         return _event;
-
     }
 
     public static async Task<string> GetNewCisloJednaciAsync(PuEvent.DruhDotazovaneInformace druh)
@@ -810,7 +891,7 @@ select distinct ds.DatovaSchranka, f.ico from firma f
             .Select(m => m.Split('/'))
             .Where(m => m.Length == 3)
             .Select(m => new { cislo = int.Parse(m[0]), rok = int.Parse(m[1]), druh = m[2] })
-            .Where(m => m.rok == DateTime.Now.Year && m.druh==postfix)
+            .Where(m => m.rok == DateTime.Now.Year && m.druh == postfix)
             .OrderByDescending(m => m.cislo)
             .FirstOrDefault();
         if (parts == null)
@@ -825,7 +906,7 @@ select distinct ds.DatovaSchranka, f.ico from firma f
             return null;
 
         await using var db = new DbEntities();
-        
+
         var foundFirmy = await db.FirmaDs.AsNoTracking()
             .Where(o => o.Ico == ico && o.DsParent == null)
             .ToListAsync();
@@ -844,16 +925,16 @@ select distinct ds.DatovaSchranka, f.ico from firma f
                 return foundPuOrg;
             }
         }
-        
+
         var firstCompany = foundFirmy.FirstOrDefault();
-        
+
         // create new org
         var newOrganizace = new PuOrganizace()
         {
             DS = firstCompany.DatovaSchranka
         };
         await PpRepo.UpsertOrganizaceAsync(newOrganizace);
-        
+
         return newOrganizace;
     }
 }
