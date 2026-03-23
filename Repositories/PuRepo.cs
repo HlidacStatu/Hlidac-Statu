@@ -372,10 +372,10 @@ public static partial class PuRepo
             return res;
         }
         
-        if (org.Platy.AktualniRok(rok).Count == 0)
+        if (response.Typ == PuEvent.TypUdalosti.CastecneOdmitnutiPoskytnutiInformaci ||
+            response.Typ == PuEvent.TypUdalosti.UplneOdmitnutiPoskytnutiInformaci)
         {
             res.TextStatus = response.GetEventDescription()?.Title;
-            res.TextStatus = "Odmítli poskytnout platy";
             res.Detail = metadata?.PoznamkaHlidace;
             res.BootstrapStatus = "danger";
             res.Icon = "fa-solid fa-circle-xmark";
