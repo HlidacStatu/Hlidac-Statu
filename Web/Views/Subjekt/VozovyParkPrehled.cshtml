@@ -118,29 +118,19 @@
         </div>
         
         DateOnly predrokem = DateOnly.FromDateTime(DateTime.Now.AddYears(-1));
-        var pocetNovych = vozidla.Where(m => m.Aktualni == aktualni && m.Datum_1_registrace_v_CR>predrokem).Count();
+        var pocetNovych = vozidla.Where(m => m.Aktualni == aktualni && m.Datum_1_registrace_v_CR > predrokem).Count();
         if (statni && aktualni && pocetNovych > 0)
         {
             <h4>Nová vozidla</h4>
             <p class="text-muted">Nová vozidla uvedená do provozu za posledních 12 měsíců.</p>
             <div>
-                @foreach (var typy in vozidla.Where(m => m.Aktualni == aktualni && m.Datum_1_registrace_v_CR > predrokem)
+                <div class="col-auto">
+                    @foreach (var typy in vozidla.Where(m => m.Aktualni == aktualni && m.Datum_1_registrace_v_CR > predrokem)
                                     .GroupBy(k => k.Logoslug)
                                     .OrderByDescending(o => o.Count())
                                 
                                     )
-                {
-                    typyCount++;
-                    if (typyCount > 10)
                     {
-                        <div class="col-auto">
-                            <span class="badge text-bg-light p-2 m-1 fs-6" style="white-space:nowrap">
-                                a další....
-                            </span>
-                        </div>
-                        break;
-                    }
-                    <div class="col-auto">
                         <span class="badge text-bg-light p-2 m-1 fs-6" style="white-space:nowrap">
                             @if (!string.IsNullOrWhiteSpace(typy.Key))
                             {
@@ -154,32 +144,35 @@
                             }
                             <span class="badge text-bg-primary">@(typy.Count())</span>
                         </span>
-                    </div>
     
-                }
-            
+                    }
+                    <span class="badge text-bg-light p-2 m-1 fs-6" style="white-space:nowrap">
+                        <a class="btn btn-hs btn-sm btn-outline-primary" href="/subjekt/VozovyParkList/@(Model.ICO)?nove=true&mesice=12">Vypsat nová auta</a>                        
+                    </span>
+                </div>
             </div>
         }
         var pocetBezStkRec = await HlidacStatu.RegistrVozidel.Repo.PropadleSTKperICOAsync(Model.ICO);
-        if(statni && aktualni && pocetBezStkRec.FirstOrDefault()?.Item2 > 0)
+        if (statni && aktualni && pocetBezStkRec.FirstOrDefault()?.Item2 > 0)
         {
             <h4>Nalezené problémy</h4>
             <div>
                 <div class="alert alert-warning d-flex align-items-center" role="alert">
-                    <i class="fa-solid fa-circle-exclamation"></i>
+                    <i class="fa-solid fa-circle-exclamation me-3"></i>
                     <div>
                         &nbsp;U organizace @Model.Jmeno jsme identifikovali
                         <b>
                             @Devmasters.Lang.CS.Plural.Get(pocetBezStkRec.FirstOrDefault().Item2, "jeden neodhlášený vůz", "{0} neodhlášená vozidla", "{0} neodhlášených vozidel")
                             bez platné STK
                         </b>.
-                        <a class="btn btn-hs btn-sm btn-warning " href="/subjekt/VozovyParkList/@(Model.ICO)?bezSTK=true">Ukázat vozidla bez platné STK</a>
+                        <a class="btn btn-hs btn-sm btn-outline-warning ms-2" style="color:black" href="/subjekt/VozovyParkList/@(Model.ICO)?bezSTK=true">Ukázat vozidla bez platné STK</a>
                     </div>
                 </div>
             </div>
         }
 
-        <a class="btn btn-hs btn-sm btn-primary my-3" href="/subjekt/VozovyParkList/@(Model.ICO)@(aktualni ? "" : "?historicky=1")">Výpis všech @(aktualni ? "aktuálních" : "historických") vozidel</a>
+        <h4>Kompletní seznam vozidel</h4>
+        <a class="btn btn-hs btn-primary my-3" href="/subjekt/VozovyParkList/@(Model.ICO)@(aktualni ? "" : "?historicky=1")">Výpis všech @(aktualni ? "aktuálních" : "historických") vozidel organizace</a>
     
         @if (aktualni)
         {
