@@ -11,6 +11,11 @@
 
     bool historicke = this.Context.Request.Query.ContainsKey("historicky");
     bool bezSTK = ViewBag.BezSTK ?? false;
+    int? mesice = (int?)ViewBag.Mesice ;
+    bool nove = ViewBag.Nove ?? false;
+    nove = nove && mesice.HasValue;
+    var mesiceDate = DateOnly.FromDateTime(DateTime.Now.AddMonths(-mesice ?? 0));
+    string zaMesice = Devmasters.Lang.CS.Plural.Get(mesice ?? 0, "za poslední měsíc", "za poslední {0} měsíce", "za posledních {0} měsíců");
 
     List<VozidloLightPerIco> vozidla;
     
@@ -18,7 +23,14 @@
     {
         vozidla = await HlidacStatu.RegistrVozidel.Repo.PropadleSTKListAsync(this.Model.ICO);
     }
-    else
+    else if (nove)
+    {
+        vozidla = VozidloLightPerIco.FromVozidloLight(
+            await HlidacStatu.RegistrVozidel.Repo.GetForICOAsync(this.Model.ICO,
+                vypisVozidelPredicate: v => v.Datum1RegistraceVCr >= mesiceDate)
+        );
+    }
+    else 
     {
         vozidla = await HlidacStatu.RegistrVozidel.Repo.Cached.GetForICOAsync(this.Model.ICO);
     }
@@ -114,6 +126,15 @@
         <h3>Vozidla bez STK</h3>
         <p class="text-muted">Registr vozidel obsahuje i nepřesné a neaktualizované údaje. 
             Námi zobrazené data přesně odpovídají obsahu uveřejněného registru smluv.</p>
+        @Html.DataToHTMLTable(rds, dataTableOptions: HtmlExtensions.DatatableOptions(pageLength: 20))
+        
+    }
+    else if (nove)
+    {
+        <h3>Nová vozidla @zaMesice</h3>
+        <p class="text-muted">
+            Nově registrovaná vozidla organizace @zaMesice.
+        </p>
         @Html.DataToHTMLTable(rds, dataTableOptions: HtmlExtensions.DatatableOptions(pageLength: 20))
         
     }

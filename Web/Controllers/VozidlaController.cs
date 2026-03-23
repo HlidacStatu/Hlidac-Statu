@@ -36,7 +36,7 @@ namespace HlidacStatu.Web.Controllers
         private static string StatniOnlyFilter(bool statniOnly, string pcvColumn = "v.PCV")
         {
             return statniOnly
-                ? $"AND EXISTS (SELECT 1 FROM vlastnik_provozovatel_vozidla vl WITH (NOLOCK) INNER JOIN firmy.dbo.Firma f WITH (NOLOCK) ON f.ICO = vl.ICO AND f.typ >= 9 WHERE vl.PCV = {pcvColumn} and  and vl.Aktualni = 1)"
+                ? $"AND EXISTS (SELECT 1 FROM vlastnik_provozovatel_vozidla vl WITH (NOLOCK) INNER JOIN firmy.dbo.Firma f WITH (NOLOCK) ON f.ICO = vl.ICO AND f.typ >= 9 WHERE vl.PCV = {pcvColumn} and vl.Aktualni = 1)"
                 : "";
         }
 
@@ -303,58 +303,11 @@ OPTION (RECOMPILE)
 
         // ==================== Report D: Newly registered cars (last month) ====================
 
-        public async Task<ActionResult> NovaAuta(string? id, bool statniOnly = false)
+        public async Task<ActionResult> NovaAuta(string? id, int mesice=12, int top = 150)
         {
-            var sql = $@"
-SELECT DISTINCT TOP 200
-    p.Pcv,
-    p.Ico,
-    p.Typ_Subjektu        AS Typ_subjekt,
-    p.Vztah_K_Vozidlu      AS Vztah_k_vozidlu,
-    p.Aktualni,
-    p.Datum_Od,
-    p.Datum_Do,
-    -- from VypisVozidel (v)
-    v.Vin               AS VIN,
-    v.Palivo,
-    v.Kategorie_Vozidla  AS Kategorie_vozidla,
-    v.Tovarni_Znacka     AS Tovarni_znacka,
-    v.Obchodni_Oznaceni   AS Model,
-    v.Rok_Vyroby         AS Rok_vyroby,
-    v.Datum_1_registrace   AS Datum_1_registrace,
-    v.Datum_1_registrace_v_CR AS Datum_1_registrace_v_CR,
-    v.Zdvihovy_Objem     AS Zdvihovy_objem,
-    v.Barva,
-    v.Nejvyssi_Rychlost  AS Nejvyssi_rychlost,
-    v.Plne_Elektricke_Vozidlo,
-    v.Hybridni_Vozidlo,
-    v.Stupen_Plneni_Emisni_Urovne AS Stupen_plneni_emisni_urovne,
-    v.Provozni_Hmotnost,
-    -- from TechnickeProhlidky (stk aggregate)
-    stk.PosledniStk,
-    stk.PlatnostStkMax   AS PlastnostStk,
-    0 as pocet,
-    v.Max_vykon
-FROM Vlastnik_Provozovatel_Vozidla p
-INNER JOIN Vypis_Vozidel v ON p.Pcv = v.Pcv
-    and v.pcv in 
-        (select top 300 pcv from Vypis_vozidel order by Datum_1_registrace_v_CR DESC)
-inner join firmy.dbo.Firma f  with (nolock) on f.ICO = p.ICO and f.typ>={(statniOnly ? "9" : "0")}
-        and (f.ico = '{id}' or '{id}' is null or '{id}'='') and p.Aktualni = 1
-
-INNER JOIN (
-    SELECT
-        Pcv,
-        MAX(Platnost_Od) AS PosledniStk,
-        MAX(Platnost_Do) AS PlatnostStkMax
-    FROM Technicke_Prohlidky
-    GROUP BY Pcv
-) stk ON p.Pcv = stk.Pcv
-
-    ORDER BY v.Datum_1_registrace_v_CR DESC";
-
-            var items = await Repo.ExecuteVehicleQueryAsync(sql);
-            ViewBag.StatniOnly = statniOnly;
+            var fromD = DateTime.Now.AddMonths(-1*mesice);
+            IEnumerable<Tuple<string, int, Dictionary<string, int>>> items = await Repo.NoveVozyPerIcoAsync(fromD, id, top);
+            ViewBag.Mesice = mesice;
             return View(items);
         }
 

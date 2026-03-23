@@ -1,16 +1,19 @@
 ﻿@model HlidacStatu.Entities.Firma
 
+@using System;
 @using System.Linq;
-@using HlidacStatu.Entities
-@using HlidacStatu.RegistrVozidel.Models
-@using HlidacStatu.Repositories
-@using HlidacStatu.XLib.Render
+@using System.Collections.Generic;
+@using HlidacStatu.Entities;
+@using HlidacStatu.Extensions;
+@using HlidacStatu.RegistrVozidel.Models;
+@using HlidacStatu.Repositories;
+@using HlidacStatu.XLib.Render;
 @using Devmasters;
 @using Devmasters.DT;
 
 @{
     Layout = null;
-
+    var statni = Model.PatrimStatu();
     List<VozidloLightPerIco> vozidla =
         await HlidacStatu.RegistrVozidel.Repo.Cached.GetForICOAsync(this.Model.ICO);
 
@@ -114,8 +117,51 @@
     
         </div>
         
+        DateOnly predrokem = DateOnly.FromDateTime(DateTime.Now.AddYears(-1));
+        var pocetNovych = vozidla.Where(m => m.Aktualni == aktualni && m.Datum_1_registrace_v_CR>predrokem).Count();
+        if (statni && aktualni && pocetNovych > 0)
+        {
+            <h4>Nová vozidla</h4>
+            <p class="text-muted">Nová vozidla uvedená do provozu za posledních 12 měsíců.</p>
+            <div>
+                @foreach (var typy in vozidla.Where(m => m.Aktualni == aktualni && m.Datum_1_registrace_v_CR > predrokem)
+                                    .GroupBy(k => k.Logoslug)
+                                    .OrderByDescending(o => o.Count())
+                                
+                                    )
+                {
+                    typyCount++;
+                    if (typyCount > 10)
+                    {
+                        <div class="col-auto">
+                            <span class="badge text-bg-light p-2 m-1 fs-6" style="white-space:nowrap">
+                                a další....
+                            </span>
+                        </div>
+                        break;
+                    }
+                    <div class="col-auto">
+                        <span class="badge text-bg-light p-2 m-1 fs-6" style="white-space:nowrap">
+                            @if (!string.IsNullOrWhiteSpace(typy.Key))
+                            {
+                                <img src="https://somedata.hlidacstatu.cz/v/optimized/@(typy.Key).png"
+                                     style="max-height:2rem;max-width:3rem" alt="@typy.Key" />
+                                @typy.Key
+                            }
+                            else
+                            {
+                                <span>ostatní vozidla</span>
+                            }
+                            <span class="badge text-bg-primary">@(typy.Count())</span>
+                        </span>
+                    </div>
+    
+                }
+            
+            </div>
+        }
         var pocetBezStkRec = await HlidacStatu.RegistrVozidel.Repo.PropadleSTKperICOAsync(Model.ICO);
-        if(aktualni && pocetBezStkRec.FirstOrDefault()?.Item2 > 0)
+        if(statni && aktualni && pocetBezStkRec.FirstOrDefault()?.Item2 > 0)
         {
             <h4>Nalezené problémy</h4>
             <div>
