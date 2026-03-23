@@ -197,7 +197,7 @@
                         }
                         else
                         {
-                            var desc = Model.GetMetadataDescriptionUrednici(platGroup.Key);
+                            var desc = await Model.GetMetadataDescriptionFromEventsUredniciAsync(platGroup.Key);
 
                             <div class="alert alert-@(desc.BootstrapStatus)" role="alert">
                                 <h4 class="alert-heading">@desc.TextStatus</h4>
