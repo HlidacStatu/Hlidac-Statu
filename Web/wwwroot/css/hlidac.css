@@ -1144,7 +1144,7 @@ div.verticaltab-container {
             }
 
                 div.verticaltab-container div.verticaltab-menu div.list-group > a .fa, div.verticaltab-container div.verticaltab-menu div.list-group > a .fad, div.verticaltab-container div.verticaltab-menu div.list-group > a .fal, div.verticaltab-container div.verticaltab-menu div.list-group > a .far, div.verticaltab-container div.verticaltab-menu div.list-group > a .fas {
-                    color: #818c99
+                    color: #474b4f
                 }
 
                 div.verticaltab-container div.verticaltab-menu div.list-group > a:first-child {
@@ -1584,7 +1584,7 @@ h1.hs {
 }
 
 .link, .link--small {
-    color: #818c99;
+    color: #474b4f;
     text-decoration: underline;
     letter-spacing: .44px
 }
@@ -1615,7 +1615,7 @@ h1.hs {
 }
 
 .breadcrumb a, .link--big {
-    color: #818c99
+    color: #474b4f
 }
 
 .header__content .header__search__hint:active, .header__content .header__search__hint:hover {
@@ -1717,7 +1717,7 @@ h1.hs {
 }
 
 .text-gray {
-    color: #818c99 !important
+    color: #474b4f !important
 }
 
 .new-p {
@@ -1751,7 +1751,7 @@ h1.hs {
 }
 
 .detail-note, .new-p--gray, .search-result-label, .small-darkgray-text {
-    color: #818c99
+    color: #474b4f
 }
 
 .new-p--small, .search-result-label, .small-darkgray-text {
@@ -1965,42 +1965,42 @@ textarea.code {
     }
 
 ::-ms-input-placeholder {
-    color: #818c99;
+    color: #474b4f;
     letter-spacing: .4px;
     font-style: italic;
     font-weight: 400
 }
 
 ::placeholder {
-    color: #818c99;
+    color: #474b4f;
     letter-spacing: .4px;
     font-style: italic;
     font-weight: 400
 }
 
 ::-webkit-input-placeholder {
-    color: #818c99;
+    color: #474b4f;
     letter-spacing: .4px;
     font-style: italic;
     font-weight: 400
 }
 
 :-moz-placeholder {
-    color: #818c99;
+    color: #474b4f;
     letter-spacing: .4px;
     font-style: italic;
     font-weight: 400
 }
 
 ::-moz-placeholder {
-    color: #818c99;
+    color: #474b4f;
     letter-spacing: .4px;
     font-style: italic;
     font-weight: 400
 }
 
 :-ms-input-placeholder {
-    color: #818c99;
+    color: #474b4f;
     letter-spacing: .4px;
     font-style: italic;
     font-weight: 400
@@ -2031,7 +2031,7 @@ select.hs {
 }
 
 .label, .navbar__level1 ul {
-    color: #818c99;
+    color: #474b4f;
     font-weight: 400
 }
 
@@ -2643,7 +2643,7 @@ select.hs {
         }
 
 .watcher-block p {
-    color: #818c99;
+    color: #474b4f;
     font-size: 16px;
     line-height: 24px;
     letter-spacing: .3px
@@ -2733,7 +2733,7 @@ select.hs {
 }
 
     .funding .funding-box .btn-funding {
-        color: #818c99
+        color: #474b4f
     }
 
     .funding .funding-box .btn-funding--selected {
@@ -2810,7 +2810,7 @@ select.hs {
 
 .funding .funding-box .funding-secured-by {
     text-align: center;
-    color: #818c99;
+    color: #474b4f;
     padding: 24px 0 0;
     font-size: 14px;
     line-height: 24px;
@@ -3511,7 +3511,7 @@ a.form-search__hint:active, a.form-search__hint:active:focus, a.form-search__hin
 }
 
 .table-new table .cell-gray {
-    color: #818c99
+    color: #474b4f
 }
 
 .table-new td, .table-new th {
@@ -3530,7 +3530,7 @@ a.form-search__hint:active, a.form-search__hint:active:focus, a.form-search__hin
 }
 
 .table-new .cell-gray {
-    color: #818c99
+    color: #474b4f
 }
 
 .table-new--wider table td, .table-new--wider table th, .table-new--wider td, .table-new--wider th {

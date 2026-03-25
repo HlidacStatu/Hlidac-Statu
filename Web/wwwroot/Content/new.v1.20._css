@@ -137,7 +137,7 @@ h1 {
 }
 
 .link, .link--small, .link--blue, .navbar__level1 ul li a, .navbar__level2 ul li a, .watcher-block .block-list a, .watcher-block .block-status-list .status-item a, .footer__content__col a, .link--big, .header__content .header__search__hint, .breadcrumb a {
-    color: #818C99;
+    color: #474b4f;
     font-size: 14px;
     font-weight: 400;
     line-height: 24px;
@@ -177,7 +177,7 @@ h1 {
 }
 
 .text-gray {
-    color: #818C99 !important;
+    color: #474b4f !important;
 }
 
 .new-p, .small-darkgray-text, .table-new table th, .table-new table td, .table-new th, .table-new td,  .search-result-label, .funding .funding-box .funding-secured-by, .searching__intro, .searching__questions {
@@ -195,7 +195,7 @@ h1 {
 }
 
 .new-p--gray, .small-darkgray-text, .table-new table td, .table-new td,  .search-result-label, .detail-note {
-    color: #818C99;
+    color: #474b4f;
 }
 
 .new-p--small, .small-darkgray-text, .table-new table td, .table-new td,  .search-result-label, .detail-note {
@@ -540,56 +540,56 @@ textarea.code {
     }
 
 ::-webkit-input-placeholder {
-    color: #818C99;
+    color: #474b4f;
     letter-spacing: 0.4px;
     font-style: italic;
     font-weight: 400;
 }
 
 :-ms-input-placeholder {
-    color: #818C99;
+    color: #474b4f;
     letter-spacing: 0.4px;
     font-style: italic;
     font-weight: 400;
 }
 
 ::-ms-input-placeholder {
-    color: #818C99;
+    color: #474b4f;
     letter-spacing: 0.4px;
     font-style: italic;
     font-weight: 400;
 }
 
 ::placeholder {
-    color: #818C99;
+    color: #474b4f;
     letter-spacing: 0.4px;
     font-style: italic;
     font-weight: 400;
 }
 
 ::-webkit-input-placeholder {
-    color: #818C99;
+    color: #474b4f;
     letter-spacing: 0.4px;
     font-style: italic;
     font-weight: 400;
 }
 
 :-moz-placeholder {
-    color: #818C99;
+    color: #474b4f;
     letter-spacing: 0.4px;
     font-style: italic;
     font-weight: 400;
 }
 
 ::-moz-placeholder {
-    color: #818C99;
+    color: #474b4f;
     letter-spacing: 0.4px;
     font-style: italic;
     font-weight: 400;
 }
 
 :-ms-input-placeholder {
-    color: #818C99;
+    color: #474b4f;
     letter-spacing: 0.4px;
     font-style: italic;
     font-weight: 400;
@@ -614,7 +614,7 @@ select {
 }
 
 .label {
-    color: #818C99;
+    color: #474b4f;
     font-size: 16px;
     font-weight: 400;
     line-height: 24px;
@@ -1103,7 +1103,7 @@ select {
 }
 
     .navbar__level1 ul {
-        color: #818C99;
+        color: #474b4f;
         font-size: 16px;
         font-weight: 400;
         letter-spacing: 0.3px;
@@ -1690,7 +1690,7 @@ select {
         }
 
 .watcher-block p {
-    color: #818C99;
+    color: #474b4f;
     font-size: 16px;
     line-height: 24px;
     letter-spacing: 0.3px;
@@ -1782,7 +1782,7 @@ select {
 }
 
     .funding .funding-box .btn-funding {
-        color: #818C99;
+        color: #474b4f;
     }
 
     .funding .funding-box .btn-funding--selected {
@@ -1865,7 +1865,7 @@ select {
 
 .funding .funding-box .funding-secured-by {
     text-align: center;
-    color: #818C99;
+    color: #474b4f;
     padding: 24px 0 0;
     font-size: 14px;
     line-height: 24px;
@@ -2752,7 +2752,7 @@ a.form-search__hint:active:focus {
 }
 
 .table-new table .cell-gray {
-    color: #818C99;
+    color: #474b4f;
 }
 
 
@@ -2788,7 +2788,7 @@ a.form-search__hint:active:focus {
 }
 
 .table-new .cell-gray {
-    color: #818C99;
+    color: #474b4f;
 }
 
 

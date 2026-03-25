@@ -1498,7 +1498,7 @@ div.verticaltab-container {
                 div.verticaltab-container div.verticaltab-menu div.list-group > a .fal,
                 div.verticaltab-container div.verticaltab-menu div.list-group > a .fad,
                 div.verticaltab-container div.verticaltab-menu div.list-group > a .fa {
-                    color: #818C99;
+                    color: #474b4f;
                 }
 
                 div.verticaltab-container div.verticaltab-menu div.list-group > a:first-child {
