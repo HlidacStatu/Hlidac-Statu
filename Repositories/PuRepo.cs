@@ -11,7 +11,7 @@ namespace HlidacStatu.Repositories;
 
 public static partial class PuRepo
 {
-    public const int DefaultYear = 2024;
+    public const int DefaultYear = 2025;
     public const int MinYear = 2016;
 
     public static int[] AllYears = Enumerable.Range(MinYear, DefaultYear - MinYear + 1).ToArray();
