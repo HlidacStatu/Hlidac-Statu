@@ -116,7 +116,7 @@ public static class CacheFactory
         DistributedCacheDuration = TimeSpan.FromDays(10 * 365),
         DistributedCacheFailSafeMaxDuration = TimeSpan.FromDays(10 * 365),
 
-        FactorySoftTimeout = TimeSpan.FromMilliseconds(5000),
+        FactorySoftTimeout = TimeSpan.FromSeconds(5),
         FactoryHardTimeout = TimeSpan.FromHours(4),
         DistributedCacheSoftTimeout = TimeSpan.FromSeconds(2),
         DistributedCacheHardTimeout = TimeSpan.FromMinutes(1),
@@ -138,12 +138,12 @@ public static class CacheFactory
     private static IServiceProvider? _serviceProvider = null;
 
     private static readonly ConcurrentDictionary<(CacheType, string), IFusionCache> _cacheInstances = new();
-    
+
     public static IFusionCache CreateNew(CacheType cacheType, string cachePrefix)
     {
         return _cacheInstances.GetOrAdd((cacheType, cachePrefix), key => CreateNewInternal(key.Item1, key.Item2));
     }
-    
+
     private static IFusionCache CreateNewInternal(CacheType cacheType, string cachePrefix)
     {
         _serviceProvider ??= BuildServiceProvider();
@@ -172,7 +172,17 @@ public static class CacheFactory
             if (cacheType == CacheType.L2PostgreSqlBinarySerializer)
                 cache.SetupDistributedCache(distributedCache, new FusionCacheNeueccMessagePackSerializer());
             else
-                cache.SetupDistributedCache(distributedCache, new FusionCacheSystemTextJsonSerializer());
+                cache.SetupDistributedCache(distributedCache,
+                    new FusionCacheSystemTextJsonSerializer(
+                            new System.Text.Json.JsonSerializerOptions()
+                            {
+                                IncludeFields = true,
+                                WriteIndented = false,
+
+                            }
+                        )
+                    );
+            //cache.SetupDistributedCache(distributedCache, new ZiggyCreatures.Caching.Fusion.Serialization.NewtonsoftJson.FusionCacheNewtonsoftJsonSerializer());
         }
 
         return cache;

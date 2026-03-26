@@ -71,7 +71,7 @@
       <Version>7.17.5</Version>
     </PackageReference>
     <PackageReference Include="Newtonsoft.Json">
-      <Version>13.0.3</Version>
+      <Version>13.0.4</Version>
     </PackageReference>
     <PackageReference Include="Ollama" Version="1.15.0" />
     <PackageReference Include="System.Data.DataSetExtensions" Version="4.5.0" />

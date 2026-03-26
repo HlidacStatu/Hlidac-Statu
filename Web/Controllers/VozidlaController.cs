@@ -25,8 +25,9 @@ namespace HlidacStatu.Web.Controllers
         {
             "ROLLS-ROYCE", "BENTLEY", "FERRARI", "LAMBORGHINI", "BUGATTI",
             "PAGANI", "KOENIGSEGG", "MCLAREN", "ASTON MARTIN", "MASERATI",
-            "PORSCHE", "JAGUAR", "LOTUS", "TESLA", "LEXUS",
-            "INFINITI", "ALFA ROMEO", "CADILLAC", "LINCOLN", "GENESIS",
+            "PORSCHE", "JAGUAR", "LOTUS", 
+            "TESLA", //?? 
+            "LEXUS","INFINITI", "ALFA ROMEO", "CADILLAC", "LINCOLN", "GENESIS",
             "POLESTAR", "RIMAC", "MORGAN", "MAYBACH", "LAND ROVER",
             "HUMMER", "DS", "LANCIA", "CUPRA", "VOLVO"
         };
@@ -80,74 +81,12 @@ namespace HlidacStatu.Web.Controllers
 
         // ==================== Report A: Top 50 most powerful cars by year ====================
 
-        public async Task<ActionResult> NejsilnejsiAuta(string? id, int? rok, bool statniOnly = false)
+        public async Task<ActionResult> AutaPodleVykonu(int? refresh)
         {
-            var sql = $@"
-SELECT DISTINCT TOP 200
-    p.Pcv,
-    p.Ico,
-    p.Typ_Subjektu        AS Typ_subjekt,
-    p.Vztah_K_Vozidlu      AS Vztah_k_vozidlu,
-    p.Aktualni,
-    p.Datum_Od,
-    p.Datum_Do,
-    -- from VypisVozidel (v)
-    v.Vin               AS VIN,
-    v.Palivo,
-    v.Kategorie_Vozidla  AS Kategorie_vozidla,
-    v.Tovarni_Znacka     AS Tovarni_znacka,
-    v.Obchodni_Oznaceni   AS Model,
-    v.Rok_Vyroby         AS Rok_vyroby,
-    v.Datum_1_registrace   AS Datum_1_registrace,
-    v.Datum_1_registrace_v_CR AS Datum_1_registrace_v_CR,
-    v.Zdvihovy_Objem     AS Zdvihovy_objem,
-    v.Barva,
-    v.Nejvyssi_Rychlost  AS Nejvyssi_rychlost,
-    v.Plne_Elektricke_Vozidlo,
-    v.Hybridni_Vozidlo,
-    v.Stupen_Plneni_Emisni_Urovne AS Stupen_plneni_emisni_urovne,
-    v.Provozni_Hmotnost,
-    -- from TechnickeProhlidky (stk aggregate)
-    stk.PosledniStk,
-    stk.PlatnostStkMax   AS PlastnostStk,
-    0 as pocet,
-    v.Max_vykon
-FROM Vlastnik_Provozovatel_Vozidla p
-INNER JOIN Vypis_Vozidel v ON p.Pcv = v.Pcv
-    AND v.PCV in (
-     select top 200 pcv from vypis_vozidel 
-        where 
-            ((Datum_1_registrace_v_CR >= DATEFROMPARTS(@rok, 1, 1) 
-                   AND Datum_1_registrace_v_CR < DATEFROMPARTS(@rok + 1, 1, 1))
-                   OR @rok IS NULL)
-                    AND Max_vykon IS NOT NULL
-                    AND Max_vykon > 0
-                ORDER BY Max_vykon DESC
-     )
-INNER JOIN (
-    SELECT
-        Pcv,
-        MAX(Platnost_Od) AS PosledniStk,
-        MAX(Platnost_Do) AS PlatnostStkMax
-    FROM Technicke_Prohlidky
-    GROUP BY Pcv
-) stk
-    ON p.Pcv = stk.Pcv
-    inner join firmy.dbo.Firma f  with (nolock) on f.ICO = p.ICO and f.typ>={(statniOnly ? "9" : "0")}
-            and (f.ico = '{id}' or '{id}' is null or '{id}'='') and p.Aktualni = 1
+            List<(int min_vykon, int max_vykon, int stat_count, int soukr_count)> model = new();
+            foreach (var interval in HlidacStatu.RegistrVozidel.Repo.PoctyVozidelPodleVykonuIntervals)
+                model.Add( await HlidacStatu.RegistrVozidel.Repo.Cached.GetPoctyVozidelPodleVykonuAsync(interval.Item1, interval.Item2, refresh==1));
 
-ORDER BY v.Max_vykon DESC
-OPTION (RECOMPILE)
-";
-
-            var items = await Repo.ExecuteVehicleQueryAsync(sql, new[] { new SqlParameter("@rok", (object)rok ?? DBNull.Value) });
-            ViewBag.StatniOnly = statniOnly;
-            var model = new VehicleYearReport
-            {
-                SelectedYear = rok,
-                AvailableYears = GetAvailableYears(),
-                Items = items
-            };
             return View(model);
         }
 
@@ -343,7 +282,7 @@ OPTION (RECOMPILE)
                             WHERE vzp.PCV = v.PCV
                         )
 
-                    AND v.Tovarni_znacka IS NOT NULL
+                    AND v.logoslug IS NOT NULL
                     {StatniOnlyFilter(statniOnly)}
                 GROUP BY v.Tovarni_znacka
                 ORDER BY Pocet DESC

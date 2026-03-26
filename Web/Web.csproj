@@ -114,7 +114,7 @@ at Microsoft.Data.SqlClient.SqlInternalConnection.OnError(SqlException exception
 		<PackageReference Include="Swashbuckle.AspNetCore.Annotations" Version="7.1.0" />
 		<PackageReference Include="System.Security.Cryptography.Pkcs" Version="9.0.7" />
 		<PackageReference Include="System.Text.Encoding.CodePages" Version="8.0.0" />
-		<PackageReference Include="ZiggyCreatures.FusionCache.OpenTelemetry" Version="2.4.0" />
+		<PackageReference Include="ZiggyCreatures.FusionCache.OpenTelemetry" Version="2.6.0" />
 	</ItemGroup>
 	<ItemGroup>
 		<ProjectReference Include="..\..\Hlidac-Statu-Private\AI\AI.csproj" />
