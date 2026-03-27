@@ -1,4 +1,5 @@
 using HlidacStatu.Entities;
+using HlidacStatu.LibCore.Filters;
 using HlidacStatu.RegistrVozidel;
 using HlidacStatu.RegistrVozidel.Models;
 using Microsoft.AspNetCore.Mvc;
@@ -92,79 +93,6 @@ namespace HlidacStatu.Web.Controllers
 
         // ==================== Report B: Top 50 fastest cars by year ====================
 
-        public async Task<ActionResult> NejrychlejsiAuta(string? id, int? rok, bool statniOnly = false)
-        {
-            var sql = $@"
-SELECT DISTINCT TOP 200
-    p.Pcv,
-    p.Ico,
-    p.Typ_Subjektu        AS Typ_subjekt,
-    p.Vztah_K_Vozidlu      AS Vztah_k_vozidlu,
-    p.Aktualni,
-    p.Datum_Od,
-    p.Datum_Do,
-    -- from VypisVozidel (v)
-    v.Vin               AS VIN,
-    v.Palivo,
-    v.Kategorie_Vozidla  AS Kategorie_vozidla,
-    v.Tovarni_Znacka     AS Tovarni_znacka,
-    v.Obchodni_Oznaceni   AS Model,
-    v.Rok_Vyroby         AS Rok_vyroby,
-    v.Datum_1_registrace   AS Datum_1_registrace,
-    v.Datum_1_registrace_v_CR AS Datum_1_registrace_v_CR,
-    v.Zdvihovy_Objem     AS Zdvihovy_objem,
-    v.Barva,
-    v.Nejvyssi_Rychlost  AS Nejvyssi_rychlost,
-    v.Plne_Elektricke_Vozidlo,
-    v.Hybridni_Vozidlo,
-    v.Stupen_Plneni_Emisni_Urovne AS Stupen_plneni_emisni_urovne,
-    v.Provozni_Hmotnost,
-    -- from TechnickeProhlidky (stk aggregate)
-    stk.PosledniStk,
-    stk.PlatnostStkMax   AS PlastnostStk,
-    0 as pocet,
-    v.Nejvyssi_rychlost 
-FROM Vlastnik_Provozovatel_Vozidla p
-INNER JOIN Vypis_Vozidel v ON p.Pcv = v.Pcv
-    AND v.PCV in (
-     select top 200 pcv from vypis_vozidel 
-        where 
-            ((Datum_1_registrace_v_CR >= DATEFROMPARTS(@rok, 1, 1) 
-                   AND Datum_1_registrace_v_CR < DATEFROMPARTS(@rok + 1, 1, 1))
-                   OR @rok IS NULL)
-
-                    AND Nejvyssi_rychlost IS NOT NULL
-                    AND Nejvyssi_rychlost > 0
-                ORDER BY Nejvyssi_rychlost DESC
-     )
-
-INNER JOIN (
-    SELECT
-        Pcv,
-        MAX(Platnost_Od) AS PosledniStk,
-        MAX(Platnost_Do) AS PlatnostStkMax
-    FROM Technicke_Prohlidky
-    GROUP BY Pcv
-) stk
-    ON p.Pcv = stk.Pcv
-    inner join firmy.dbo.Firma f  with (nolock) on f.ICO = p.ICO and f.typ>={(statniOnly ? "9" : "0")}
-            and (f.ico = '{id}' or '{id}' is null or '{id}'='') and p.Aktualni = 1
-
-
-    ORDER BY v.Nejvyssi_rychlost DESC
-OPTION (RECOMPILE)
-";
-
-            var items = await Repo.ExecuteVehicleQueryAsync(sql, new[] { new SqlParameter("@rok", (object)rok ?? DBNull.Value) });
-            ViewBag.StatniOnly = statniOnly;
-            var model = new VehicleYearReport
-            {
-                SelectedYear = rok,
-                AvailableYears = GetAvailableYears(),
-                Items = items
-            };
-            return View(model);
-        }
 
         // ==================== Report C: Top 50 luxury cars by year ====================
 
@@ -242,6 +170,7 @@ OPTION (RECOMPILE)
 
         // ==================== Report D: Newly registered cars (last month) ====================
 
+        [HlidacOutputCache(durationInSeconds: 10 * 60 * 60)]
         public async Task<ActionResult> NovaAuta(string? id, int mesice=12, int top = 150)
         {
             var fromD = DateTime.Now.AddMonths(-1*mesice);
@@ -252,14 +181,11 @@ OPTION (RECOMPILE)
 
         // ==================== Report E: Cars with expired technical inspection ====================
 
-        public async Task<ActionResult> PropadlaSTK(string? id, bool statniOnly = false)
+        [HlidacOutputCache(durationInSeconds: 10*60*60)]
+        public async Task<ActionResult> PropadleSTK()
         {
-            var sql = $@"
-
-";
-
-        var items = await Repo.ExecuteVehicleQueryAsync(sql);
-            ViewBag.StatniOnly = statniOnly;
+            
+            IEnumerable<Tuple<string, int>> items = await Repo.Cached.GetPropadleSTKperICOTopAsync();
             return View(items);
         }
 
