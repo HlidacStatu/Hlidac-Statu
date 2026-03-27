@@ -82,6 +82,13 @@ namespace HlidacStatu.Web.Controllers
 
         // ==================== Report A: Top 50 most powerful cars by year ====================
 
+        public async Task<ActionResult> AutaPodlePohonu(int? refresh)
+        {
+            var model = await Repo.Cached.GetPoctyVozidelPodlePohonuAsync(refresh == 1);
+            return View(model);
+        }
+
+
         public async Task<ActionResult> AutaPodleVykonu(int? refresh)
         {
             List<(int min_vykon, int max_vykon, int stat_count, int soukr_count)> model = new();

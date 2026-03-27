@@ -1,0 +1,286 @@
+@model List<(int min_vykon, int max_vykon, int stat_count, int soukr_count)>
+@{
+    ViewBag.Title = "Auta podle výkonu - porovnání stát vs. soukromý sektor";
+    ViewBag.SubTitle = "Registr vozidel";
+
+    var totalStat = Model.Sum(m => m.stat_count);
+    var totalSoukr = Model.Sum(m => m.soukr_count);
+    var totalAll = totalStat + totalSoukr;
+
+    var ordered = Model.OrderBy(o => o.min_vykon).ToList();
+
+    // Build labels and percentage data for charts
+    var labels = new List<string>();
+    var statPcts = new List<double>();
+    var soukrPcts = new List<double>();
+    foreach (var row in ordered)
+    {
+        string label;
+        if (row.min_vykon == 0)
+            label = "do " + HlidacStatu.Util.RenderData.NiceNumber(row.max_vykon) + " kW";
+        else if (row.max_vykon == int.MaxValue)
+            label = "nad " + HlidacStatu.Util.RenderData.NiceNumber(row.min_vykon) + " kW";
+        else
+            label = HlidacStatu.Util.RenderData.NiceNumber(row.min_vykon) + " – " + HlidacStatu.Util.RenderData.NiceNumber(row.max_vykon) + " kW";
+        labels.Add(label);
+        statPcts.Add(totalStat > 0 ? Math.Round(100.0 * row.stat_count / totalStat, 1) : 0);
+        soukrPcts.Add(totalSoukr > 0 ? Math.Round(100.0 * row.soukr_count / totalSoukr, 1) : 0);
+    }
+
+    var labelsJson = "[" + string.Join(",", labels.Select(l => $"'{l}'")) + "]";
+    var statPctsJson = "[" + string.Join(",", statPcts.Select(v => v.ToString("F1", System.Globalization.CultureInfo.InvariantCulture))) + "]";
+    var soukrPctsJson = "[" + string.Join(",", soukrPcts.Select(v => v.ToString("F1", System.Globalization.CultureInfo.InvariantCulture))) + "]";
+
+    // Find key insight: biggest difference between state and private
+    var maxDiffRow = ordered
+        .Select(r => new {
+            r,
+            statPct = totalStat > 0 ? 100.0 * r.stat_count / totalStat : 0,
+            soukrPct = totalSoukr > 0 ? 100.0 * r.soukr_count / totalSoukr : 0
+        })
+        .OrderByDescending(x => Math.Abs(x.statPct - x.soukrPct))
+        .First();
+    var insightLabel = maxDiffRow.r.min_vykon == 0
+        ? "do " + HlidacStatu.Util.RenderData.NiceNumber(maxDiffRow.r.max_vykon) + " kW"
+        : maxDiffRow.r.max_vykon == int.MaxValue
+            ? "nad " + HlidacStatu.Util.RenderData.NiceNumber(maxDiffRow.r.min_vykon) + " kW"
+            : HlidacStatu.Util.RenderData.NiceNumber(maxDiffRow.r.min_vykon) + " – " + HlidacStatu.Util.RenderData.NiceNumber(maxDiffRow.r.max_vykon) + " kW";
+    var insightStatMore = maxDiffRow.statPct > maxDiffRow.soukrPct;
+}
+
+@section breadcrumb
+{
+    <ol class="breadcrumb">
+        <li><a href="/">Hlídač Státu</a></li>
+        <li><a href="/vozidla">Registr vozidel</a></li>
+        <li><a href="/vozidla/Statistiky">Statistiky</a></li>
+        <li class="active">Auta podle výkonu</li>
+    </ol>
+}
+
+<h3 class="mt-2">
+    <i class="fa-solid fa-gauge-high me-2"></i>Auta podle výkonu - porovnání stát vs. soukromý sektor
+</h3>
+<p class="text-muted">Osobní automobily rozdělené podle výkonu motoru (kW). Porovnání počtu aut vlastněných státem a soukromým sektorem.</p>
+
+@* ── Summary cards with colored accents ── *@
+<div class="row mb-3">
+    <div class="col-md-4">
+        <div class="card" style="border-left: 4px solid #6c757d;">
+            <div class="card-body text-center">
+                <h5 class="card-title text-muted">Celkem aut</h5>
+                <p class="display-6 fw-bold">@totalAll.ToString("N0")</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card" style="border-left: 4px solid #dc3545;">
+            <div class="card-body text-center">
+                <h5 class="card-title" style="color: #dc3545;">Stát</h5>
+                <p class="display-6 fw-bold" style="color: #dc3545;">@totalStat.ToString("N0")</p>
+                <p class="text-muted mb-0">@(totalAll > 0 ? (100.0 * totalStat / totalAll).ToString("F1") : "0") % z celku</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card" style="border-left: 4px solid #198754;">
+            <div class="card-body text-center">
+                <h5 class="card-title" style="color: #198754;">Soukromý sektor</h5>
+                <p class="display-6 fw-bold" style="color: #198754;">@totalSoukr.ToString("N0")</p>
+                <p class="text-muted mb-0">@(totalAll > 0 ? (100.0 * totalSoukr / totalAll).ToString("F1") : "0") % z celku</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+@* ── Key insight box ── *@
+<div class="alert alert-info d-flex align-items-start mb-4" role="alert" style="border-left: 4px solid #0d6efd;">
+    <i class="fa-solid fa-lightbulb me-3 mt-1" style="font-size: 1.3em; color: #0d6efd;"></i>
+    <div>
+        <strong>Zajímavost:</strong>
+        @if (insightStatMore)
+        {
+            <span>
+                Stát má v kategorii <strong>@insightLabel</strong> celých
+                <strong>@maxDiffRow.statPct.ToString("F1") %</strong> svých vozidel,
+                zatímco v soukromém sektoru je to jen <strong>@maxDiffRow.soukrPct.ToString("F1") %</strong>.
+                Státní vozový park je tedy výrazně posunut k @(maxDiffRow.r.min_vykon >= 50 ? "výkonnějším" : "slabším") automobilům.
+            </span>
+        }
+        else
+        {
+            <span>
+                Stát má v kategorii <strong>@insightLabel</strong> pouze
+                <strong>@maxDiffRow.statPct.ToString("F1") %</strong> svých vozidel,
+                zatímco v soukromém sektoru je to <strong>@maxDiffRow.soukrPct.ToString("F1") %</strong>.
+                Státní flotila tak obsahuje méně @(maxDiffRow.r.min_vykon < 100 ? "slabších" : "výkonnějších") aut a je posunutá k vyššímu výkonu.
+            </span>
+        }
+    </div>
+</div>
+
+@* ── Grouped bar chart: State vs Private % ── *@
+<div class="card mb-4">
+    <div class="card-body">
+        <div id="chart-grouped-bar"></div>
+    </div>
+</div>
+
+@* ── Stacked 100% comparison bars ── *@
+<div class="card mb-4">
+    <div class="card-body">
+        <div id="chart-stacked-bar"></div>
+    </div>
+</div>
+
+@* ── Data table with progress bars ── *@
+<div class="table-responsive">
+    <table class="table table-striped table-hover">
+        <thead>
+            <tr>
+                <th>Výkon (kW)</th>
+                <th class="text-end">Stát</th>
+                <th class="text-end" style="min-width: 140px;">% ze státních</th>
+                <th class="text-end">Soukromý sektor</th>
+                <th class="text-end" style="min-width: 140px;">% ze soukromých</th>
+                <th class="text-end">Celkem</th>
+                <th class="text-end" style="min-width: 120px;">% z celku</th>
+            </tr>
+        </thead>
+        <tbody>
+            @for (int i = 0; i < ordered.Count; i++)
+            {
+                var row = ordered[i];
+                var rowTotal = row.stat_count + row.soukr_count;
+                var pctStat = statPcts[i];
+                var pctSoukr = soukrPcts[i];
+                var pctTotal = totalAll > 0 ? Math.Round(100.0 * rowTotal / totalAll, 1) : 0;
+                <tr>
+                    <td class="fw-semibold">@labels[i]</td>
+                    <td class="text-end">@row.stat_count.ToString("N0")</td>
+                    <td class="text-end">
+                        <div class="d-flex align-items-center justify-content-end gap-2">
+                            <div style="width: 60px; height: 8px; background: #f0f0f0; border-radius: 4px; overflow: hidden;">
+                                <div style="width: @(pctStat.ToString("F0"))%; height: 100%; background: #dc3545; border-radius: 4px;"></div>
+                            </div>
+                            <span>@pctStat.ToString("F1") %</span>
+                        </div>
+                    </td>
+                    <td class="text-end">@row.soukr_count.ToString("N0")</td>
+                    <td class="text-end">
+                        <div class="d-flex align-items-center justify-content-end gap-2">
+                            <div style="width: 60px; height: 8px; background: #f0f0f0; border-radius: 4px; overflow: hidden;">
+                                <div style="width: @(pctSoukr.ToString("F0"))%; height: 100%; background: #198754; border-radius: 4px;"></div>
+                            </div>
+                            <span>@pctSoukr.ToString("F1") %</span>
+                        </div>
+                    </td>
+                    <td class="text-end">@rowTotal.ToString("N0")</td>
+                    <td class="text-end">
+                        <div class="d-flex align-items-center justify-content-end gap-2">
+                            <div style="width: 60px; height: 8px; background: #f0f0f0; border-radius: 4px; overflow: hidden;">
+                                <div style="width: @(pctTotal.ToString("F0"))%; height: 100%; background: #0d6efd; border-radius: 4px;"></div>
+                            </div>
+                            <span>@pctTotal.ToString("F1") %</span>
+                        </div>
+                    </td>
+                </tr>
+            }
+        </tbody>
+        <tfoot>
+            <tr class="fw-bold">
+                <td>Celkem</td>
+                <td class="text-end">@totalStat.ToString("N0")</td>
+                <td class="text-end">100,0 %</td>
+                <td class="text-end">@totalSoukr.ToString("N0")</td>
+                <td class="text-end">100,0 %</td>
+                <td class="text-end">@totalAll.ToString("N0")</td>
+                <td class="text-end">100,0 %</td>
+            </tr>
+        </tfoot>
+    </table>
+</div>
+
+@section footerscripts
+{
+    <script src="/Scripts/Highcharts-8/highcharts.js"></script>
+    <script src="/Scripts/highcharts.global.options.js"></script>
+    <script>
+        // Grouped bar chart
+        Highcharts.chart('chart-grouped-bar', {
+            chart: { type: 'column' },
+            title: { text: 'Rozložení vozidel podle výkonu', align: 'left' },
+            subtitle: { text: 'Procentuální podíl v rámci kategorie vlastníka', align: 'left' },
+            xAxis: {
+                categories: @Html.Raw(labelsJson),
+                crosshair: true
+            },
+            yAxis: {
+                min: 0,
+                title: { text: 'Podíl (%)' },
+                labels: { format: '{value} %' }
+            },
+            tooltip: {
+                shared: true,
+                valueSuffix: ' %'
+            },
+            plotOptions: {
+                column: {
+                    borderRadius: 3,
+                    groupPadding: 0.15,
+                    pointPadding: 0.05
+                }
+            },
+            colors: ['#dc3545', '#198754'],
+            series: [{
+                name: 'Stát',
+                data: @Html.Raw(statPctsJson)
+            }, {
+                name: 'Soukromý sektor',
+                data: @Html.Raw(soukrPctsJson)
+            }],
+            credits: { enabled: false }
+        });
+
+        // Stacked 100% horizontal bar
+        Highcharts.chart('chart-stacked-bar', {
+            chart: { type: 'bar', height: 250 },
+            title: { text: 'Struktura vozového parku podle výkonu', align: 'left' },
+            subtitle: { text: 'Porovnání rozložení výkonových kategorií', align: 'left' },
+            xAxis: {
+                categories: ['Stát', 'Soukromý sektor'],
+                lineWidth: 0
+            },
+            yAxis: {
+                min: 0,
+                max: 100,
+                title: { text: '' },
+                labels: { format: '{value} %' },
+                reversedStacks: false
+            },
+            tooltip: {
+                pointFormat: '<span style="color:{series.color}">\u25CF</span> {series.name}: <b>{point.y:.1f} %</b><br/>',
+                shared: false
+            },
+            plotOptions: {
+                bar: {
+                    stacking: 'normal',
+                    borderRadius: 2,
+                    dataLabels: {
+                        enabled: true,
+                        format: '{y:.1f} %',
+                        style: { fontSize: '11px', textOutline: '1px contrast' }
+                    }
+                }
+            },
+            colors: ['#adb5bd', '#7cb5ec', '#434348', '#f7a35c', '#e4d354', '#f45b5b'],
+            series: [
+                @for (int i = 0; i < labels.Count; i++)
+                {
+                    <text>{ name: '@labels[i]', data: [@statPcts[i].ToString("F1", System.Globalization.CultureInfo.InvariantCulture), @soukrPcts[i].ToString("F1", System.Globalization.CultureInfo.InvariantCulture)] },</text>
+                }
+            ],
+            credits: { enabled: false }
+        });
+    </script>
+}

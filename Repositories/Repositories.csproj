@@ -20,7 +20,8 @@
     <ProjectReference Include="..\Util\Util.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Devmasters.Cache.AWS_S3" Version="8.1.0" />
+	  <PackageReference Include="Devmasters.Db" Version="8.5.1" />
+	  <PackageReference Include="Devmasters.Cache.AWS_S3" Version="8.1.0" />
     <PackageReference Include="Devmasters.Cache.Memcached" Version="8.2.0" />
     <PackageReference Include="EFCore.BulkExtensions.MIT" Version="8.22.0" />
     <PackageReference Include="MathNet.Numerics" Version="5.0.0" />
